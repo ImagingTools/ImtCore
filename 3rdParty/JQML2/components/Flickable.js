@@ -52,7 +52,11 @@ class Flickable extends Item {
 
     $widthChanged(){
         if(this.getPropertyValue('width') > this.getPropertyValue('contentItem').getPropertyValue('width')) {
-            this.getProperty('contentX').reset(this.getPropertyValue('originX'))
+            if(this.$items && this.$items[0]){
+                this.getStatement('contentX').reset(this.$items[0].getPropertyValue('x'))
+            } else {
+                this.getStatement('contentX').reset(this.getPropertyValue('originX'))
+            }
         } else if(this.getPropertyValue('contentX') > this.getPropertyValue('contentItem').getPropertyValue('width') + this.getPropertyValue('originX') - this.getPropertyValue('width')) {
             this.getProperty('contentX').reset(this.getPropertyValue('contentItem').getPropertyValue('width') + this.getPropertyValue('originX') - this.getPropertyValue('width'))
         }
@@ -61,7 +65,11 @@ class Flickable extends Item {
 
     $heightChanged(){
         if(this.getPropertyValue('height') > this.getPropertyValue('contentItem').getPropertyValue('height')) {
-            this.getProperty('contentY').reset(this.getPropertyValue('originY'))
+            if(this.$items && this.$items[0]){
+                this.getStatement('contentY').reset(this.$items[0].getPropertyValue('y'))
+            } else {
+                this.getStatement('contentY').reset(this.getPropertyValue('originY'))
+            }
         } else if(this.getPropertyValue('contentY') > this.getPropertyValue('contentItem').getPropertyValue('height') + this.getPropertyValue('originY') - this.getPropertyValue('height')) {
             this.getProperty('contentY').reset(this.getPropertyValue('contentItem').getPropertyValue('height') + this.getPropertyValue('originY') - this.getPropertyValue('height'))
         }

@@ -579,7 +579,11 @@ class ListView extends Flickable {
     $contentWidthChanged(){
         this.getStatement('contentItem').get().getStatement('width').reset(this.getStatement('contentWidth').get())
         if(this.getPropertyValue('contentWidth') < this.getPropertyValue('width')){
-            this.getProperty('contentX').reset(0)
+            if(this.$items && this.$items[0]){
+                this.getStatement('contentX').reset(this.$items[0].getPropertyValue('x'))
+            } else {
+                this.getStatement('contentX').reset(this.getPropertyValue('originX'))
+            }
         }
         // if(this.getPropertyValue('contentX') > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')){
         //     this.getProperty('contentX').reset(this.getPropertyValue('contentWidth') - this.getPropertyValue('width'))
@@ -592,7 +596,11 @@ class ListView extends Flickable {
     $contentHeightChanged(){
         this.getStatement('contentItem').get().getStatement('height').reset(this.getStatement('contentHeight').get())
         if(this.getPropertyValue('contentWidth') < this.getPropertyValue('width')){
-            this.getProperty('contentY').reset(0)
+            if(this.$items && this.$items[0]){
+                this.getStatement('contentY').reset(this.$items[0].getPropertyValue('y'))
+            } else {
+                this.getStatement('contentY').reset(this.getPropertyValue('originY'))
+            }
         }
         // if(this.getPropertyValue('contentY') > this.getPropertyValue('contentHeight') - this.getPropertyValue('height')){
         //     this.getProperty('contentY').reset(this.getPropertyValue('contentHeight') - this.getPropertyValue('height'))

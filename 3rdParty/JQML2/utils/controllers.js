@@ -107,34 +107,40 @@ class MouseController {
                     obj.$signals.wheel()
                     if(obj.$signals.wheel.accepted) return
                 }
-            }if(obj instanceof ListView){
-                if(obj.getPropertyValue('enabled') && obj.getPropertyValue('visible') && obj.getPropertyValue('interactive')) {
-                    if(obj.getPropertyValue('orientation') === ListView.Vertical){
-                        if(obj.getPropertyValue('contentHeight') <= obj.getPropertyValue('height')){
-                            obj.getStatement('contentY').reset(0)
-                        } else if(obj.getPropertyValue('contentY') + (deltaY) > obj.getPropertyValue('originY') && obj.getPropertyValue('contentY') + (deltaY) < obj.getPropertyValue('contentHeight') + obj.getPropertyValue('originY') - obj.getPropertyValue('height')){
-                            obj.getStatement('contentY').reset(obj.getPropertyValue('contentY') + (deltaY))
-                            return
-                        } else {
-                            if(obj.getPropertyValue('contentY') + (deltaY) <= obj.getPropertyValue('originY')) {
-                                obj.getStatement('contentY').reset(obj.getPropertyValue('originY'))
+            } else if(obj instanceof Flickable){
+                let top = obj.getPropertyValue('originY')
+                let bottom = obj.getPropertyValue('contentItem').getPropertyValue('height') - obj.getPropertyValue('height') + obj.getPropertyValue('originY')
+                let currentY = obj.getPropertyValue('contentY')
+
+                if(obj instanceof ListView){
+                    let length = obj.getPropertyValue('model').getPropertyValue('data').length
+                    if(obj.$items[0]) {
+                        top = obj.$items[0].getPropertyValue('y')
+                    }
+                    if(obj.$items[length-1]) {
+                        bottom = obj.$items[length-1].getPropertyValue('y') + obj.$items[length-1].getPropertyValue('height') - obj.getPropertyValue('height')
+                    }
+
+                    if(obj.getPropertyValue('enabled') && obj.getPropertyValue('visible') && obj.getPropertyValue('interactive')) {
+                        if(obj.getPropertyValue('orientation') === ListView.Vertical){
+                            if(deltaY + currentY < top){
+                                obj.getProperty('contentY').reset(top)
+                            } else if(deltaY + currentY > bottom){
+                                obj.getProperty('contentY').reset(bottom)
+                            } else {
+                                obj.getProperty('contentY').reset(deltaY + currentY)
                             }
-                            if(obj.getPropertyValue('contentY') + (deltaY) >= obj.getPropertyValue('contentHeight') + obj.getPropertyValue('originY') - obj.getPropertyValue('height')) {
-                                obj.getStatement('contentY').reset(obj.getPropertyValue('contentHeight') + obj.getPropertyValue('originY') - obj.getPropertyValue('height'))
-                            }
-            
                         }
                     }
-                    
-                }
-            } else if(obj instanceof Flickable){
-                if(obj.getPropertyValue('enabled') && obj.getPropertyValue('visible') && obj.getPropertyValue('interactive')) {
-                    if(obj.getPropertyValue('contentY') + (deltaY) > 0 && obj.getPropertyValue('contentY') + (deltaY) < obj.getPropertyValue('contentItem').getPropertyValue('height') - obj.getPropertyValue('height')){
-                        obj.getStatement('contentY').reset(obj.getPropertyValue('contentY') + (deltaY))
-                        return
-                    } else {
-                        if(obj.getPropertyValue('contentY') + (deltaY) <= 0) obj.getStatement('contentY').reset(0)
-                        if(obj.getPropertyValue('contentY') + (deltaY) >= obj.getPropertyValue('contentItem').getPropertyValue('height') - obj.getPropertyValue('height')) obj.getStatement('contentY').reset(obj.getPropertyValue('contentItem').getPropertyValue('height') - obj.getPropertyValue('height'))
+                } else {
+                    if(obj.getPropertyValue('enabled') && obj.getPropertyValue('visible') && obj.getPropertyValue('interactive')) {
+                        if(deltaY + currentY < top){
+                            obj.getProperty('contentY').reset(top)
+                        } else if(deltaY + currentY > bottom){
+                            obj.getProperty('contentY').reset(bottom)
+                        } else {
+                            obj.getProperty('contentY').reset(deltaY + currentY)
+                        } 
                     }
                 }
             } else if(obj instanceof Map){
@@ -467,64 +473,64 @@ class MouseController {
         
 
         if(this.target && this.target instanceof Flickable){
+            let left = this.target.getPropertyValue('originX')
+            let top = this.target.getPropertyValue('originY')
+            let right = this.target.getPropertyValue('contentItem').getPropertyValue('width') - this.target.getPropertyValue('width') + this.target.getPropertyValue('originX')
+            let bottom = this.target.getPropertyValue('contentItem').getPropertyValue('height') - this.target.getPropertyValue('height') + this.target.getPropertyValue('originY')
+            let currentX = this.target.getPropertyValue('contentX')
+            let currentY = this.target.getPropertyValue('contentY')
+
             if(this.target instanceof ListView){
+                let length = this.target.getPropertyValue('model').getPropertyValue('data').length
+                if(this.target.$items[0]) {
+                    left = this.target.$items[0].getPropertyValue('x')
+                    top = this.target.$items[0].getPropertyValue('y')
+                }
+                if(this.target.$items[length-1]) {
+                    right = this.target.$items[length-1].getPropertyValue('x') + this.target.$items[length-1].getPropertyValue('width') - this.target.getPropertyValue('width')
+                    bottom = this.target.$items[length-1].getPropertyValue('y') + this.target.$items[length-1].getPropertyValue('height') - this.target.getPropertyValue('height')
+                }
+
                 if(this.target.getPropertyValue('enabled') && this.target.getPropertyValue('visible') && this.target.getPropertyValue('interactive')) {
                     if(this.target.getPropertyValue('orientation') === ListView.Vertical){
-                        if(this.target.getPropertyValue('contentHeight') <= this.target.getPropertyValue('height')){
-                            this.target.getStatement('contentY').reset(0)
-            
-                        } else if(this.target.getPropertyValue('contentY') + (dy) > this.target.getPropertyValue('originY') && this.target.getPropertyValue('contentY') + (dy) < this.target.getPropertyValue('contentHeight') + this.target.getPropertyValue('originY') - this.target.getPropertyValue('height')){
-                            this.target.getStatement('contentY').reset(this.target.getPropertyValue('contentY') + (dy))
-                            return
+                        if(dy + currentY < top){
+                            this.target.getProperty('contentY').reset(top)
+                        } else if(dy + currentY > bottom){
+                            this.target.getProperty('contentY').reset(bottom)
                         } else {
-                            if(this.target.getPropertyValue('contentY') + (dy) <= this.target.getPropertyValue('originY')) {
-                                this.target.getStatement('contentY').reset(this.target.getPropertyValue('originY'))
-                                // MouseController.stopPropogation(null)
-                            }
-                            if(this.target.getPropertyValue('contentY') + (dy) >= this.target.getPropertyValue('contentHeight') + this.target.getPropertyValue('originY') - this.target.getPropertyValue('height')) {
-                                this.target.getStatement('contentY').reset(this.target.getPropertyValue('contentHeight') + this.target.getPropertyValue('originY') - this.target.getPropertyValue('height'))
-                                // MouseController.stopPropogation(null)
-                            }
-            
+                            this.target.getProperty('contentY').reset(dy + currentY)
                         }
                     } else {
-                        if(this.target.getPropertyValue('contentWidth') <= this.target.getPropertyValue('width')){
-                            this.target.getStatement('contentX').reset(0)
-            
-                        } else if(this.target.getPropertyValue('contentX') + (dx) > this.target.getPropertyValue('originX') && this.target.getPropertyValue('contentX') + (dx) < this.target.getPropertyValue('contentWidth') + this.target.getPropertyValue('originX') - this.target.getPropertyValue('width')){
-                            this.target.getStatement('contentX').reset(this.target.getPropertyValue('contentX') + (dx))
-                            return
+                        if(dx + currentX < left){
+                            this.target.getProperty('contentX').reset(left)
+                        } else if(dx + currentX > right){
+                            this.target.getProperty('contentX').reset(right)
                         } else {
-                            if(this.target.getPropertyValue('contentX') + (dx) <= this.target.getPropertyValue('originX')) {
-                                this.target.getStatement('contentX').reset(this.target.getPropertyValue('originX'))
-                                // MouseController.stopPropogation(null)
-                            }
-                            if(this.target.getPropertyValue('contentX') + (dx) >= this.target.getPropertyValue('contentWidth') + this.target.getPropertyValue('originX') - this.target.getPropertyValue('width')) {
-                                this.target.getStatement('contentX').reset(this.target.getPropertyValue('contentWidth') + this.target.getPropertyValue('originX') - this.target.getPropertyValue('width'))
-                                // MouseController.stopPropogation(null)
-                            }
-            
+                            this.target.getProperty('contentX').reset(dx + currentX)
                         }
                     }
-                    
                 }
-            } else if(this.target instanceof Flickable){
+            } else {
                 if(this.target.getPropertyValue('enabled') && this.target.getPropertyValue('visible') && this.target.getPropertyValue('interactive')) {
-                    if(this.target.getPropertyValue('contentX') + (dx) > 0 && this.target.getPropertyValue('contentX') + (dx) < this.target.getPropertyValue('contentItem').getPropertyValue('width') - this.target.getPropertyValue('width')){
-                        this.target.getStatement('contentX').reset(this.target.getPropertyValue('contentX') + (dx))
+                    if(dy + currentY < top){
+                        this.target.getProperty('contentY').reset(top)
+                    } else if(dy + currentY > bottom){
+                        this.target.getProperty('contentY').reset(bottom)
                     } else {
-                        if(this.target.getPropertyValue('contentX') + (dx) <= 0) this.target.getStatement('contentX').reset(0)
-                        if(this.target.getPropertyValue('contentX') + (dx) >= this.target.getPropertyValue('contentItem').getPropertyValue('width')) this.target.getStatement('contentX').reset(this.target.getPropertyValue('contentItem').getPropertyValue('width') - this.target.getPropertyValue('width'))
+                        this.target.getProperty('contentY').reset(dy + currentY)
                     }
-        
-                    if(this.target.getPropertyValue('contentY') + (dy) > 0 && this.target.getPropertyValue('contentY') + (dy) < this.target.getPropertyValue('contentItem').getPropertyValue('height') - this.target.getPropertyValue('height')){
-                        this.target.getStatement('contentY').reset(this.target.getPropertyValue('contentY') + (dy))
+                  
+                    if(dx + currentX < left){
+                        this.target.getProperty('contentX').reset(left)
+                    } else if(dx + currentX > right){
+                        this.target.getProperty('contentX').reset(right)
                     } else {
-                        if(this.target.getPropertyValue('contentY') + (dy) <= 0) this.target.getStatement('contentY').reset(0)
-                        if(this.target.getPropertyValue('contentY') + (dy) >= this.target.getPropertyValue('contentItem').getPropertyValue('height')) this.target.getStatement('contentY').reset(this.target.getPropertyValue('contentItem').getPropertyValue('height') - this.target.getPropertyValue('height'))
-                    }
+                        this.target.getProperty('contentX').reset(dx + currentX)
+                    }  
                 }
             }
+
+            
         }
     }
 
