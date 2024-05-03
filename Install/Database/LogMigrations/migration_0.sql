@@ -8,7 +8,3 @@ CREATE TABLE "Messages"
     "Checksum" bigint,
     "IsActive" boolean
 );
-
-CREATE INDEX LastModifedIndex ON Messages (
-    LastModified DESC
-);
