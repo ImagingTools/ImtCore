@@ -195,7 +195,7 @@ Item {
                 }
 
             }
-            onPropertiesChanged: {
+            onPropertiesChangedSignal: {
                 comboBoxContainerGql.currentIndex = -1;
                 comboBoxContainerGql.currentText = "";
             }

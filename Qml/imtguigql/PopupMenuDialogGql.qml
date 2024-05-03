@@ -88,6 +88,7 @@ Item {
     signal textEdited();
     signal started();
     signal clearSignal();
+    signal propertiesChangedSignal();
 
 
     function onBackgroundClicked(){
@@ -127,6 +128,9 @@ Item {
 
         for (var item = 0; item < popupMenuContainer.properties.GetItemsCount(); item++){
             modelFilter.SetData(popupMenuContainer.properties.GetData("Id", item),  popupMenuContainer.properties.GetData("Value", item));
+        }
+        if(popupMenuContainer.properties.GetItemsCount()){
+            propertiesChangedSignal();
         }
         //itemsModel.updateModel(0);
         //popupMenuContainer.rootItem.currentIndex = -1;
