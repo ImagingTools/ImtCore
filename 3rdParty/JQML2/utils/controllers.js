@@ -112,6 +112,8 @@ class MouseController {
                 let bottom = obj.getPropertyValue('contentItem').getPropertyValue('height') - obj.getPropertyValue('height') + obj.getPropertyValue('originY')
                 let currentY = obj.getPropertyValue('contentY')
 
+                if(obj.getPropertyValue('contentItem').getPropertyValue('height') <= obj.getPropertyValue('height')) bottom = top
+
                 if(obj instanceof ListView){
                     let length = obj.getPropertyValue('model').getPropertyValue('data').length
                     if(obj.$items[0]) {
@@ -119,6 +121,7 @@ class MouseController {
                     }
                     if(obj.$items[length-1]) {
                         bottom = obj.$items[length-1].getPropertyValue('y') + obj.$items[length-1].getPropertyValue('height') - obj.getPropertyValue('height')
+                        if(obj.getPropertyValue('contentItem').getPropertyValue('height') <= obj.getPropertyValue('height')) bottom = top
                     }
 
                     if(obj.getPropertyValue('enabled') && obj.getPropertyValue('visible') && obj.getPropertyValue('interactive')) {
@@ -480,6 +483,9 @@ class MouseController {
             let currentX = this.target.getPropertyValue('contentX')
             let currentY = this.target.getPropertyValue('contentY')
 
+            if(this.target.getPropertyValue('contentItem').getPropertyValue('width') <= this.target.getPropertyValue('width')) right = left
+            if(this.target.getPropertyValue('contentItem').getPropertyValue('height') <= this.target.getPropertyValue('height')) bottom = top
+
             if(this.target instanceof ListView){
                 let length = this.target.getPropertyValue('model').getPropertyValue('data').length
                 if(this.target.$items[0]) {
@@ -489,6 +495,9 @@ class MouseController {
                 if(this.target.$items[length-1]) {
                     right = this.target.$items[length-1].getPropertyValue('x') + this.target.$items[length-1].getPropertyValue('width') - this.target.getPropertyValue('width')
                     bottom = this.target.$items[length-1].getPropertyValue('y') + this.target.$items[length-1].getPropertyValue('height') - this.target.getPropertyValue('height')
+
+                    if(this.target.getPropertyValue('contentItem').getPropertyValue('width') <= this.target.getPropertyValue('width')) right = left
+                    if(this.target.getPropertyValue('contentItem').getPropertyValue('height') <= this.target.getPropertyValue('height')) bottom = top
                 }
 
                 if(this.target.getPropertyValue('enabled') && this.target.getPropertyValue('visible') && this.target.getPropertyValue('interactive')) {
