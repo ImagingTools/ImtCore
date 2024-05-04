@@ -251,17 +251,16 @@ Item {
             }
             else{
                 url.protocol = "ws";
+                if (webSocketPortProvider.port >= 0){
+                    url.port = webSocketPortProvider.port;
+                }
+                else{
+                    console.error("WebSocket port provider has invalid port!");
+                }
             }
 
             if (context.appName && context.appName !== ""){
                 url.pathname = "/" + context.appName + "/wssub";
-            }
-
-            if (webSocketPortProvider.port >= 0){
-                url.port = webSocketPortProvider.port;
-            }
-            else{
-                console.error("WebSocket port provider has invalid port!");
             }
 
             return String(url)
