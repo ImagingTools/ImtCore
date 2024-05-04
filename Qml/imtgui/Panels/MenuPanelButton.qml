@@ -7,7 +7,7 @@ ControlBase {
 
     decorator: Style.menuPanelButtonDecorator;
 
-    property string text: "Test";
+    property string text: "";
     property string iconSource: "";
     property string textColor: "#335777";//"#191970"
     property string fontName: "";
@@ -28,6 +28,7 @@ ControlBase {
     property alias subPagesCount: subPagesRepeater.count;
 
     property Item menuPanelRef: null;
+    property alias mouseArea: ma;
 
     signal clicked;
 
@@ -82,10 +83,6 @@ ControlBase {
 
         property int currentIndex: 0;
 
-        onCurrentIndexChanged: {
-
-        }
-
         Repeater {
             id: subPagesRepeater;
 
@@ -98,7 +95,6 @@ ControlBase {
                 selected: subPagesColumn.currentIndex == model.index;
                 title: model["Name"]
 
-
                 MouseArea{
                     anchors.fill: parent;
 
@@ -107,12 +103,6 @@ ControlBase {
 
                     onClicked: {
                         subPagesColumn.currentIndex = model.index;
-
-//                        console.log("pagesManager.activeItem", pagesManager.activeItem);
-//                        pagesManager.activeItem.startPageObj = {"Id": model.PageId,
-//                            "Name": model.Name,
-//                            "Source": model.StartItem,
-//                            "CommandId": model.PageId};
                     }
                 }
             }

@@ -142,6 +142,7 @@
         <file alias="imtcontrols/Views/ComboBoxCellContentComp.qml">Views/ComboBoxCellContentComp.qml</file>
         <file alias="imtcontrols/Views/InputView.qml">Views/InputView.qml</file>
 	<file alias="imtcontrols/Views/PopupDetailedDelegateDecorator.qml">Views/PopupDetailedDelegateDecorator.qml</file>
+	<file alias="imtcontrols/Views/TooltipArea.qml">Views/TooltipArea.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

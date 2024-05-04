@@ -34,6 +34,8 @@ ControlBase {
 
         anchors.fill: tabDelegate;
 
+        hoverEnabled: true;
+
         onClicked: {
             tabDelegate.clicked();
         }

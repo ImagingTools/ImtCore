@@ -16,9 +16,10 @@ DecoratorBase {
     property bool selected: !leftPanelElement.baseElement ? false : leftPanelElement.baseElement.selected;
     property string text;
 
+    property bool textIsCropped: helperText.width > description.width;
+
     signal accepted(string text);
     signal clicked();
-
 
     onWidthChanged: {
         if(leftPanelElement.baseElement){
@@ -90,5 +91,29 @@ DecoratorBase {
             elide: Text.ElideRight;
             horizontalAlignment: Text.AlignHCenter;
         }
+
+        Text {
+            id: helperText;
+
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_small;
+
+            text: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.text;
+            wrapMode: Text.NoWrap;
+            elide: Text.ElideRight;
+            horizontalAlignment: Text.AlignHCenter;
+
+            visible: false;
+        }
+    }
+
+    TooltipArea {
+        id: tooltipArea;
+
+        anchors.fill: parent;
+
+        mouseArea: !leftPanelElement.baseElement ? null : leftPanelElement.baseElement.mouseArea;
+
+        text: !leftPanelElement.baseElement || !leftPanelElement.textIsCropped ? "" : leftPanelElement.baseElement.text;
     }
 }

@@ -9,6 +9,7 @@ DecoratorBase {
     height: baseElement ? baseElement.height : 50
 
     property string firstElementImageSource: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElementImageSource : "";
+    property bool textIsCropped: textHelper.width > text.width;
 
     onFirstElementImageSourceChanged: {
         if (tabPanelDecorator.firstElementImageSource !== ""){
@@ -143,6 +144,16 @@ DecoratorBase {
                 tabPanelDecorator.baseElement.closeSignal();
             }
         }
+    }
+
+    TooltipArea {
+        id: tooltipArea;
+
+        anchors.fill: parent;
+
+        mouseArea: !tabPanelDecorator.baseElement ? null : tabPanelDecorator.baseElement.mouseArea;
+
+        text: !tabPanelDecorator.baseElement || !tabPanelDecorator.textIsCropped ? "" : tabPanelDecorator.baseElement.text;
     }
 }
 

@@ -144,4 +144,5 @@ ItemDelegate 1.0 ./Views/ItemDelegate.qml
 ItemDelegateDecorator 1.0 ./Views/ItemDelegateDecorator.qml
 InputView 1.0 ./Views/InputView.qml
 PopupDetailedDelegateDecorator 1.0 ./Views/PopupDetailedDelegateDecorator.qml
+TooltipArea 1.0 ./Views/TooltipArea.qml
 
