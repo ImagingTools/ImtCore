@@ -244,7 +244,14 @@ Item {
         try {
             let url = new URL(serverUrl);
 
-            url.protocol = "ws";
+            console.log("url.protocol",  url.protocol)
+
+            if (url.protocol === "https:"){
+                url.protocol = "wss";
+            }
+            else{
+                url.protocol = "ws";
+            }
 
             if (context.appName && context.appName !== ""){
                 url.pathname = "/" + context.appName + "/wssub";
