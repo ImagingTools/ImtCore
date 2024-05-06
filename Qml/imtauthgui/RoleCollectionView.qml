@@ -56,32 +56,21 @@ RemoteCollectionView {
             newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
 
             onRoleDoubleClicked: {
-                console.log("onRoleDoubleClicked", index);
-
                 roleCollectionViewContainer.table.select(index);
 
                 roleCollectionViewContainer.doubleClicked(id, index)
             }
 
             onRoleClicked: {
-                console.log("onRoleClicked", index);
                 roleCollectionViewContainer.table.select(index)
                 roleCollectionViewContainer.table.elementsList.forceActiveFocus();
             }
 
             onNewClicked: {
-                console.log("onNewClicked");
-
                 if (roleCollectionViewContainer.commandsDelegate){
                     roleCollectionViewContainer.commandsDelegate.onNew();
                 }
             }
-        }
-    }
-
-    commandsControllerComp: Component {CommandsRepresentationProvider {
-            commandId: "Roles";
-            uuid: roleCollectionViewContainer.viewId;
         }
     }
 

@@ -24,13 +24,17 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CClientUserContextComp);
-		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
+	I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
 	CClientUserContextComp();
 
 Q_SIGNALS:
 	void LanguageChanged();
+
+public:
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 public:
 	void SetLanguage(QString translation);

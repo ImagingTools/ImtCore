@@ -124,6 +124,7 @@ QtObject {
 
     function setLanguage(langId){
         console.log("setLanguage", langId);
+        console.log("context.language", context.language);
         if (context.language !== langId){
             context.language = langId;
 
@@ -140,6 +141,8 @@ QtObject {
     }
 
     function onServerSettingsSaved(){
+        let lang = getLanguage();
+
         if (localizationChanged){
             Events.sendEvent("OnLocalizationChanged", container.currentLanguage);
 

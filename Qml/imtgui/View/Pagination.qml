@@ -25,7 +25,6 @@ Row {
     }
 
     onPagesSizeChanged: {
-        console.log("Pagination onPagesSizeChanged", pagesSize);
         if (paginationContainer.currentIndex > paginationContainer.pagesSize - 1){
             paginationContainer.currentIndex = 0;
         }

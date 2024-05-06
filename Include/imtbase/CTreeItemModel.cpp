@@ -755,7 +755,6 @@ bool CTreeItemModel::SerializeModel(iser::IArchive& archive)
 }
 
 
-
 // protected methods
 
 bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArray& tagName)

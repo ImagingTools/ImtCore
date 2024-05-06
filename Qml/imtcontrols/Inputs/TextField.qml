@@ -92,8 +92,6 @@ ControlBase {
     }
 
     onFocusChanged: {
-        console.log("CustomTextField onFocusChanged", textField.text, containerTextField.focus);
-
         if (containerTextField.focus){
             if (!textField.readOnly){
                 textField.selectAll();

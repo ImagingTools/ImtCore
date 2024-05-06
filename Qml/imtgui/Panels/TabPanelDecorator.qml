@@ -125,7 +125,6 @@ DecoratorBase {
 
                 elide: Text.ElideRight;
             }
-
         }
 
         ToolButton {

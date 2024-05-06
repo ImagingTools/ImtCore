@@ -38,6 +38,19 @@ Item {
 
     property bool updatingModel: serverReady && application.settingsProvider.serverModel != null;
 
+    property bool firstModelsInitStart: authorizationServerConnected && subscriptionManager_.status == WebSocket.Open;
+
+    onFirstModelsInitStartChanged: {
+        if (firstModelsInitStart){
+            let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
+            if (loggedUserId === ""){
+                thumbnailDecorator.closeAllPages();
+
+                application.firstModelsInit();
+            }
+        }
+    }
+
     signal updateSystemStatus();
     signal settingsUpdate();
     signal localSettingsUpdated();
@@ -45,18 +58,6 @@ Item {
     onUpdatingModelChanged: {
         if (updatingModel){
             Events.sendEvent("UpdateModels");
-        }
-    }
-
-    onAuthorizationServerConnectedChanged: {
-        console.log("onAuthorizationServerConnectedChanged", authorizationServerConnected);
-        if (authorizationServerConnected){
-            let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-            if (loggedUserId === ""){
-                thumbnailDecorator.closeAllPages();
-
-                application.firstModelsInit();
-            }
         }
     }
 
@@ -217,12 +218,12 @@ Item {
         }
         else if (status === WebSocket.Open){
             // No error
-            let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-            if (loggedUserId === ""){
-                thumbnailDecorator.closeAllPages();
+//            let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
+//            if (loggedUserId === ""){
+//                thumbnailDecorator.closeAllPages();
 
-                application.firstModelsInit();
-            }
+//                application.firstModelsInit();
+//            }
         }
         else if (status === 5){
             thumbnailDecorator.messagePage.visible = true;
@@ -239,12 +240,8 @@ Item {
     }
 
     function getWebSocketUrl(serverUrl){
-        console.log("getWebSocketUrl", serverUrl);
-
         try {
             let url = new URL(serverUrl);
-
-            console.log("url.protocol",  url.protocol)
 
             if (url.protocol === "https:"){
                 url.protocol = "wss";

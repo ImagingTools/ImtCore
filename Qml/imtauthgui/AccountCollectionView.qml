@@ -13,17 +13,6 @@ RemoteCollectionView {
     visibleMetaInfo: true;
     collectionId: "Accounts";
 
-    dataControllerComp: Component {CollectionRepresentation {
-            collectionId: "Accounts";
-        }
-    }
-
-    commandsControllerComp: Component {CommandsRepresentationProvider {
-            commandId: "Accounts";
-            uuid: container.viewId;
-        }
-    }
-
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
             collectionView: container;
 

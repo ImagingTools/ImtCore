@@ -34,6 +34,7 @@ Item {
     }
 
     function onLocalizationChanged(language){
+        console.log("Pages onLocalizationChanged", language);
         if (container.authorizationStatusProvider != null){
             let loggedUserId = container.authorizationStatusProvider.getLoggedUserId();
             if (loggedUserId !== ""){

@@ -25,10 +25,7 @@ Item {
         id: tooltip;
 
         text: root.text;
-        fitToTextWidth: false;
         componentMinHeight: 30;
-
-        fitToHCenter: true;
 
         function openTooltip(xX, yY){
             var point = mapToItem(null, xX, yY);

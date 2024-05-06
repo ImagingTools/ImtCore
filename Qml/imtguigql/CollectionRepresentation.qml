@@ -30,6 +30,7 @@ Item {
     signal endUpdate();
 
     onCollectionIdChanged: {
+        console.log("onCollectionIdChanged", collectionId)
         updateModel();
     }
 
@@ -49,12 +50,20 @@ Item {
     }
 
     function updateModel(){
+        console.log("updateModel")
+
         updateHeaders();
 
         updateObjectEditorInfo();
     }
 
     function updateObjectEditorInfo(){
+        if (root.collectionId === ""){
+            console.error("Unable to update object view 'collectionId' is empty!");
+
+            return;
+        }
+
         objectViewModel.getObjectView();
     }
 
@@ -78,7 +87,7 @@ Item {
         }
 
         if (root.collectionId === ""){
-            console.error();
+            console.error("Unable to update elements 'collectionId' is empty!");
 
             return;
         }

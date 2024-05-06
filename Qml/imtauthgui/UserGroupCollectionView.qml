@@ -12,17 +12,6 @@ RemoteCollectionView {
     collectionId: "Groups";
     visibleMetaInfo: true;
 
-    dataControllerComp: Component {CollectionRepresentation {
-        collectionId: "Groups";
-    }
-    }
-
-    commandsControllerComp: Component {CommandsRepresentationProvider {
-        commandId: "Groups";
-        uuid: userGroupCollectionViewContainer.viewId;
-    }
-    }
-
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
         collectionView: userGroupCollectionViewContainer;
 

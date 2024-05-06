@@ -7,23 +7,11 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 
-
 RemoteCollectionView {
     id: userCollectionViewContainer;
 
     collectionId: "Users";
     visibleMetaInfo: true;
-
-    dataControllerComp: Component {CollectionRepresentation {
-        collectionId: "Users";
-    }
-    }
-
-    commandsControllerComp: Component {CommandsRepresentationProvider {
-        commandId: "Users";
-        uuid: userCollectionViewContainer.viewId;
-    }
-    }
 
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
         collectionView: userCollectionViewContainer;

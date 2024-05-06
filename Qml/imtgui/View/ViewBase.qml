@@ -129,8 +129,6 @@ Item {
     // Update representation model from GUI
     function doUpdateModel()
     {
-        console.log("View doUpdateModel");
-
         if (readOnly || internal.blockingUpdateModel || internal.blockingUpdateGui){
             return;
         }
@@ -145,8 +143,6 @@ Item {
     // Update GUI from representation model
     function doUpdateGui()
     {
-        console.log("View doUpdateGui");
-
         if (internal.blockingUpdateGui || internal.blockingUpdateModel){
             return;
         }
@@ -201,10 +197,6 @@ Item {
 
         property int countIncomingChanges: 0;
 
-        Component.onDestruction: {
-            console.log("internal onDestruction");
-        }
-
         onBlockingUpdateGuiChanged: {
             if (!blockingUpdateGui && countIncomingChanges > 0){
                 countIncomingChanges = 0;
@@ -213,16 +205,12 @@ Item {
         }
 
         function onCommandsModelChanged(){
-            console.log("onCommandsModelChanged");
             if (viewBase.visible){
                 viewBase.updateCommandsGui();
             }
         }
 
         function onLocalizationChanged(language){
-            console.log("onLocalizationChanged Events.events", Events.events["OnLocalizationChanged"]);
-
-            console.log("ViewBase onLocalizationChanged", language);
             if (!viewBase.visible){
                 localizationChanged = true;
                 return;

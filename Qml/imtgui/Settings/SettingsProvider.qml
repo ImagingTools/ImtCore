@@ -139,15 +139,12 @@ QtObject {
     }
 
     onLocalModelChanged: {
-        console.log("SettingsProvider onLocalModelChanged", container.localModel.ToJson());
-
         if (container.localModel){
             container.localModel.dataChanged.connect(container.onLocalModelDataChanged);
         }
     }
 
     function onLocalModelDataChanged(){
-        console.log("onLocalModelDataChanged", container.localModel.ToJson());
     }
 
     function clearModel(){
@@ -157,7 +154,6 @@ QtObject {
     }
 
     function getRepresentationModel(){
-        console.log("getRepresentationModel");
         private_.representationModel.Clear();
 
         private_.mergeWithExternModel(container.serverModel);
@@ -187,8 +183,6 @@ QtObject {
     }
 
     function setDesignSchema(schema){
-        console.log("setDesignSchema", schema);
-
         let model = container.serverModel;
 
         if (!model){
@@ -317,9 +311,7 @@ QtObject {
     }
 
     function getValue(parameterId){
-        console.log("getValue", parameterId);
         let settingsModel = getRepresentationModel();
-        console.log("settingsModel", settingsModel.ToJson());
 
         return findValue(settingsModel, parameterId);
     }
@@ -346,8 +338,6 @@ QtObject {
 
     property GqlModel settingsQuery: GqlModel {
         function getSettings() {
-            console.log("GetSettings");
-
             var query = Gql.GqlRequest("query", "GetSettings");
 
             var gqlData = query.GetQuery();
@@ -356,8 +346,6 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, container.settingsQuery);
-
             if (this.state === "Ready") {
                 var dataModelLocal;
 
@@ -373,8 +361,6 @@ QtObject {
                     if (dataModelLocal.ContainsKey("GetSettings")){
                         dataModelLocal = dataModelLocal.GetData("GetSettings");
 
-                        console.log("GetSettings", dataModelLocal.ToJson());
-
                         container.serverModel = dataModelLocal;
                     }
                 }
@@ -384,8 +370,6 @@ QtObject {
 
     property GqlModel preferenceSaveQuery: GqlModel {
         function save(){
-            console.log("SetSettings");
-
             var query = Gql.GqlRequest("mutation", "SetSettings");
 
             var inputParams = Gql.GqlObject("input");
@@ -400,7 +384,6 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, container.preferenceSaveQuery);
             if (this.state === "Ready") {
                 if (this.ContainsKey("errors")){
                     return;

@@ -12,6 +12,8 @@ Item{
     property bool compl: false;
     property bool complCompl: headerDelegate.compl && headerDelegate.tableItem;
 
+    property bool textIsCropped: helperText.width > name.width;
+
     Component.onCompleted: {
         headerDelegate.compl = true;
     }
@@ -247,6 +249,18 @@ Item{
         text: model.Name;
     }
 
+    Text {
+        id: helperText;
+
+        font.pixelSize: name.font.pixelSize;
+        font.family: name.font.family;
+        font.bold: name.font.bold;
+
+        visible: false;
+
+        text: name.text;
+    }
+
     Image {
         id: iconSort;
 
@@ -272,6 +286,7 @@ Item{
         id: headerMa;
 
         anchors.fill: parent;
+        hoverEnabled: true;
 
         visible: headerDelegate.tableItem.hasSort;
 
@@ -287,6 +302,16 @@ Item{
             headerDelegate.tableItem.headerClicked(model.Id);
             //console.log("HEADER CLICKED")
         }
+    }
+
+    TooltipArea {
+        id: tooltipArea;
+
+        anchors.fill: parent;
+
+        mouseArea: headerMa;
+
+        text: headerDelegate.textIsCropped ? name.text : "";
     }
 
     MouseArea{

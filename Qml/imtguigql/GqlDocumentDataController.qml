@@ -45,18 +45,14 @@ DocumentDataController {
     }
 
     function updateDocumentModel(){
-        console.log("updateDocumentModel");
         gqlGetModel.getData();
     }
 
     function insertDocument(){
-        console.log("insertDocument", documentModel.ToJson());
         gqlAddModel.save();
     }
 
     function saveDocument(){
-        console.log("saveDocument", documentModel.ToJson());
-
         gqlUpdateModel.save();
     }
 
@@ -67,7 +63,6 @@ DocumentDataController {
 
     property SubscriptionClient subscriptionClient: SubscriptionClient {
         function register(){
-            console.log("Document RegisterSubscription", container.subscriptionCommandId, container.documentId);
 
             let subscriptionRequestId = container.subscriptionCommandId;
             var query = Gql.GqlRequest("subscription", subscriptionRequestId);

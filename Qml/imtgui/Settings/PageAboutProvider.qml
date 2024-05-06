@@ -26,7 +26,6 @@ QtObject {
     }
 
     function getRepresentationModel(){
-        console.log("PageAboutProvider getRepresentationModel");
         root.representationModel.Clear();
 
         root.representationModel.SetData("Id", "About");

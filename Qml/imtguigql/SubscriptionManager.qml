@@ -114,7 +114,6 @@ WebSocket {
     }
 
     function registerSubscriptionToServer(){
-        console.log("registerSubscriptionToServer",container.status);
         if (container.status != WebSocket.Open){
             return;
         }
@@ -129,16 +128,12 @@ WebSocket {
                 payload["data"] = query.GetQuery()
                 request["payload"] = payload
 
-                console.log("Id", JSON.stringify(request));
-
                 container.sendTextMessage(JSON.stringify(request))
             }
         }
     }
 
     function registerSubscription(query, subscriptionClient){
-        console.log("registerSubscription", query, subscriptionClient);
-
         for (let index = 0; index < subscriptionModel.length; index++){
             if (subscriptionModel[index]["subscription"] === subscriptionClient){
                 return;

@@ -380,8 +380,6 @@ StyleComponents {
     }
 
     function parseStyleTheme(themeType){
-        console.log("parseStyleTheme", themeType.ToJson());
-
         if (themeType.ContainsKey("source")){
             let dataSource = themeType.GetData("source");
             styleContainer.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource);

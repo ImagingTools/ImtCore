@@ -72,8 +72,6 @@ FocusScope {
     }
 
     onFocusChanged: {
-        console.log("CustomTextField onFocusChanged", textField.text, containerTextField.focus);
-
         if (containerTextField.focus){
             if (!containerTextField.readOnly){
                 textField.selectAll();
