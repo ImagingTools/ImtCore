@@ -4,9 +4,12 @@ project(ImtCore)
 
 if(NOT DEFINED QT_VERSION_MAJOR)
 	find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
-	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Widgets QuickWidgets Core Gui Xml Network Svg Sql WebSockets Qml Concurrent QuickControls2 PrintSupport REQUIRED)
+	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Widgets Core Gui Xml Network Svg Sql WebSockets Qml Concurrent QuickControls2 PrintSupport REQUIRED)
 	if(QT_VERSION_MAJOR EQUAL 6)
 		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core5Compat REQUIRED)
+	endif()
+	if(NOT DEFINED USE_QTQML OR USE_QTQML)
+		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS QuickWidgets REQUIRED)
 	endif()
 endif()
 
