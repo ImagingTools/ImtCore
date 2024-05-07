@@ -9,7 +9,7 @@ DecoratorBase {
     height: baseElement ? baseElement.height : 50
 
     property string firstElementImageSource: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElementImageSource : "";
-    property bool textIsCropped: textHelper.width > text.width;
+    property bool textIsCropped: textHelper.text != "" && textHelper.width > text.width;
 
     onFirstElementImageSourceChanged: {
         if (tabPanelDecorator.firstElementImageSource !== ""){
@@ -49,6 +49,13 @@ DecoratorBase {
 
         color: Style.tabSelectedColor;
         visible: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected: false;
+    }
+
+    TooltipArea {
+        id: tooltipArea;
+
+        mouseArea: !tabPanelDecorator.baseElement ? null : tabPanelDecorator.baseElement.mouseArea;
+        text: (!tabPanelDecorator.baseElement || !tabPanelDecorator.textIsCropped) ? "" : tabPanelDecorator.baseElement.text;
     }
 
     Row {
@@ -140,19 +147,10 @@ DecoratorBase {
             iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
+                tooltipArea.tooltip.closeTooltip();
                 tabPanelDecorator.baseElement.closeSignal();
             }
         }
-    }
-
-    TooltipArea {
-        id: tooltipArea;
-
-        anchors.fill: parent;
-
-        mouseArea: !tabPanelDecorator.baseElement ? null : tabPanelDecorator.baseElement.mouseArea;
-
-        text: !tabPanelDecorator.baseElement || !tabPanelDecorator.textIsCropped ? "" : tabPanelDecorator.baseElement.text;
     }
 }
 

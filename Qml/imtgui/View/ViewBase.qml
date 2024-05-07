@@ -18,11 +18,15 @@ Item {
     property bool readOnly: false;
 
     Component.onCompleted: {
+        console.log("ViewBase onCompleted", visible, viewId);
+
         viewId = UuidGenerator.generateUUID();
         Events.subscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged)
     }
 
     Component.onDestruction: {
+        console.log("ViewBase onDestruction", visible, viewId);
+
         if (commandsDelegate){
             Events.unSubscribeEvent(viewId + "CommandActivated", commandsDelegate.commandHandle);
         }
@@ -65,13 +69,12 @@ Item {
     }
 
     onVisibleChanged: {
+        console.log("ViewBase onVisibleChanged", visible);
         if (commandsController){
             if (visible){
                 if (internal.localizationChanged){
                     internal.updateCommandsAtferLocalizationChanged();
                 }
-
-                viewBase.updateCommandsGui();
             }
             else{
                 viewBase.clearCommandsGui();
@@ -172,14 +175,28 @@ Item {
     }
 
     function updateCommandsGui(){
+        console.log("updateCommandsGui", viewBase.viewId);
+
         if (commandsController && viewBase.viewId !== ""){
-            Events.sendEvent("UpdateCommandsGui", {"Model": commandsController.commandsModel, "ViewId": viewBase.viewId});
+            if (commandsController.commandsModel.isReady){
+                return;
+            }
+
+            Events.sendEvent("GetActiveCommandsViewId", function(activeViewId){
+                if (activeViewId !== viewBase.viewId){
+                    Events.sendEvent("UpdateCommandsGui", {"Model": commandsController.commandsModel, "ViewId": viewBase.viewId});
+                }
+            });
         }
     }
 
     function clearCommandsGui(){
         if (commandsController){
-            Events.sendEvent("ClearCommandsGui", {"ViewId": viewBase.viewId});
+            Events.sendEvent("GetActiveCommandsViewId", function(activeViewId){
+                if (activeViewId !== viewBase.viewId){
+                    Events.sendEvent("ClearCommandsGui", {"ViewId": viewBase.viewId});
+                }
+            });
         }
     }
 
@@ -197,6 +214,13 @@ Item {
 
         property int countIncomingChanges: 0;
 
+        property bool startUpdateCommands: viewBase.visible && viewBase.commandsController != null && viewBase.commandsController.isReady;
+        onStartUpdateCommandsChanged: {
+            if (startUpdateCommands){
+                viewBase.updateCommandsGui();
+            }
+        }
+
         onBlockingUpdateGuiChanged: {
             if (!blockingUpdateGui && countIncomingChanges > 0){
                 countIncomingChanges = 0;
@@ -206,7 +230,7 @@ Item {
 
         function onCommandsModelChanged(){
             if (viewBase.visible){
-                viewBase.updateCommandsGui();
+//                viewBase.updateCommandsGui();
             }
         }
 

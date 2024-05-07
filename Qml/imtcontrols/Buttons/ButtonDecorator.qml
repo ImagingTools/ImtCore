@@ -24,7 +24,7 @@ DecoratorBase {
     property alias backgroundItem: background
 
     property bool contentCentered: true;
-    property bool textIsCropped: helperText.width > textObj.width;
+    property bool textIsCropped: textObj.text !== "" && helperText.width > textObj.width;
 
     property string tooltipText: baseElement && baseElement.tooltipText !== "" ? baseElement.tooltipText : (textIsCropped ? textObj.text : "");
     property bool enabled: baseElement ? baseElement.enabled : false;
@@ -166,7 +166,9 @@ DecoratorBase {
         }
 
         function show(xX, yY){
-            openTooltip(xX, yY);
+            if (text !== ""){
+                openTooltip(xX, yY);
+            }
         }
     }
 }

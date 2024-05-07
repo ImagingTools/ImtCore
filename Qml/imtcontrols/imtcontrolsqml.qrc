@@ -26,7 +26,6 @@
         <file alias="imtcontrols/Buttons/TextButton.qml">Buttons/TextButton.qml</file>
         <file alias="imtcontrols/Buttons/ButtonDecorator.qml">Buttons/ButtonDecorator.qml</file>
         <file alias="imtcontrols/Buttons/ExternalSegmentDecorator.qml">Buttons/ExternalSegmentDecorator.qml</file>
-        <file alias="imtcontrols/Buttons/ButtonDecorator.qml">Buttons/ButtonDecorator.qml</file>
         <file alias="imtcontrols/Buttons/RadioButtonDecorator.qml">Buttons/RadioButtonDecorator.qml</file>
         <file alias="imtcontrols/Buttons/RadioButton.qml">Buttons/RadioButton.qml</file>
         <file alias="imtcontrols/Buttons/TextButtonDecorator.qml">Buttons/TextButtonDecorator.qml</file>
@@ -75,14 +74,12 @@
         <file alias="imtcontrols/Inputs/BarControl.qml">Inputs/BarControl.qml</file>
         <file alias="imtcontrols/Models/ModelIndex.qml">Models/ModelIndex.qml</file>
         <file alias="imtcontrols/Models/UuidGenerator.qml">Models/UuidGenerator.qml</file>
-        <file alias="imtcontrols/Models/ModelIndex.qml">Models/ModelIndex.qml</file>
         <file alias="imtcontrols/Models/SortController.qml">Models/SortController.qml</file>
         <file alias="imtcontrols/Models/StateMachine.qml">Models/StateMachine.qml</file>
         <file alias="imtcontrols/Models/TableProperties.qml">Models/TableProperties.qml</file>
         <file alias="imtcontrols/Models/TableSelection.qml">Models/TableSelection.qml</file>
         <file alias="imtcontrols/Models/TreeItemModelConverter.qml">Models/TreeItemModelConverter.qml</file>
         <file alias="imtcontrols/Models/TreeItemModelObserver.qml">Models/TreeItemModelObserver.qml</file>
-        <file alias="imtcontrols/Models/UuidGenerator.qml">Models/UuidGenerator.qml</file>
         <file alias="imtcontrols/Models/CommandsController.qml">Models/CommandsController.qml</file>
         <file alias="imtcontrols/Models/CommandsProvider.qml">Models/CommandsProvider.qml</file>
 	<file alias="imtcontrols/Models/MacAddressValidator.qml">Models/MacAddressValidator.qml</file>

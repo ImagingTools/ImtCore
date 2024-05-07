@@ -14,12 +14,14 @@ Item {
         Events.subscribeEvent("Logout", commandsDecoratorContainer.clearModel);
         Events.subscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
         Events.subscribeEvent("ClearCommandsGui", commandsDecoratorContainer.clearModel);
+        Events.subscribeEvent("GetActiveCommandsViewId", commandsDecoratorContainer.getCommandIdRequest);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("Logout", commandsDecoratorContainer.clearModel);
         Events.unSubscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
         Events.unSubscribeEvent("ClearCommandsGui", commandsDecoratorContainer.clearModel);
+        Events.unSubscribeEvent("GetActiveCommandsViewId", commandsDecoratorContainer.getCommandIdRequest);
     }
 
     property int loadImages: 0
@@ -35,11 +37,19 @@ Item {
          }
     }
 
+    function getCommandIdRequest(callback){
+        if (callback){
+            callback(commandId);
+        }
+    }
+
     function counterImage(){
         loadImages--
     }
 
     function setCommandsModel(parameters){
+        console.log("setCommandsModel");
+
         let model = parameters["Model"];
         let commId = parameters["ViewId"];
 
@@ -71,6 +81,7 @@ Item {
     function clearModel(parameters){
         if (parameters){
             let commandId = parameters["ViewId"];
+
             if (commandId !== commandsDecoratorContainer.commandId){
                 return;
             }

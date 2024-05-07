@@ -5,24 +5,41 @@ import imtcontrols 1.0
 Item {
     id: root;
 
-    property alias text: tooltip.text;
+    property alias text: tp.text;
     property MouseArea mouseArea: null;
+    property alias tooltip: tp;
+
+    onMouseAreaChanged: {
+        if (mouseArea){
+            mouseArea.hoverEnabled = true;
+        }
+    }
 
     Connections {
+        id: conn;
+
         target: root.mouseArea;
+        enabled: root.mouseArea;
+
+        function onPositionChanged(){
+            if(tp.text !== "" && root.mouseArea.enabled){
+                if(root.mouseArea.containsMouse){
+                    if (!tp.openST){
+                        tp.openTooltip(root.mouseArea.mouseX, root.mouseArea.mouseY);
+                    }
+                }
+            }
+        }
 
         function onContainsMouseChanged(){
-            if (root.mouseArea.containsMouse && root.text !== ""){
-                tooltip.openTooltip(root.mouseArea.mouseX, root.mouseArea.mouseY);
-            }
-            else{
-                tooltip.closeTooltip();
+            if (tp.openST && !root.mouseArea.containsMouse){
+                tp.closeTooltip();
             }
         }
     }
 
     CustomTooltip {
-        id: tooltip;
+        id: tp;
 
         text: root.text;
         componentMinHeight: 30;
@@ -30,9 +47,7 @@ Item {
         function openTooltip(xX, yY){
             var point = mapToItem(null, xX, yY);
 
-            modalDialogManager.openDialog(tooltip.tooltipContentComp, {"x": point.x, "y": point.y});
-            modalDialogManager.backgroundItem.visible = false;
-            tooltip.openST = true;
+            open(point.x, point.y)
         }
     }
 }

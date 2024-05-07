@@ -96,6 +96,7 @@ ControlBase {
         }
 
         onExited: {
+            console.log("Button onExited")
             baseButton.exited(mouseX, mouseY);
         }
 

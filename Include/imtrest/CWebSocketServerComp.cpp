@@ -227,7 +227,6 @@ void CWebSocketServerComp::OnWebSocketBinaryMessage(const QByteArray& dataMessag
 {
 	QString message = QString("Web socket binary message received: %1").arg(qPrintable(dataMessage));
 	SendInfoMessage(0, message, "CWebSocketServerComp");
-//	qDebug() << message;
 }
 
 
@@ -238,7 +237,6 @@ void CWebSocketServerComp::OnError(QAbstractSocket::SocketError /*error*/)
 		QString errorMessage = QString("Web socket server error: %1").arg(webSocketPtr->errorString());
 
 		SendErrorMessage(0, errorMessage, "CWebSocketServerComp");
-//		qDebug() << errorMessage;
 	}
 }
 

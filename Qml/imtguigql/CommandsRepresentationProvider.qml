@@ -40,6 +40,8 @@ CommandsController {
             }
             var gqlData = query.GetQuery();
             this.SetGqlQuery(gqlData);
+
+            commandsProviderContainer.isReady = false;
         }
 
         onStateChanged: {

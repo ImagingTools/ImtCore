@@ -38,11 +38,12 @@ ControlBase {
     property int delay: 500;
     property int timeout: -1;
 
+    // Index this dialog from ModalDialogManager
+    property int dialogIndex: -1;
+
     property real lineHeight: 1;
 
     property Component tooltipContentComp: hint;
-
-
 
     Component.onDestruction: {
         customTooltip.closeTooltip();
@@ -53,13 +54,16 @@ ControlBase {
 
             var point = mapToItem(null, xX, yY);
 
-            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y});
-
-            modalDialogManager.backgroundItem.visible = false;
-
-            customTooltip.openST = true;
+            open(xX, yY);
         }
+    }
 
+    function open(xX, yY){
+        customTooltip.dialogIndex = modalDialogManager.count;
+
+        modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": xX, "y": yY});
+        modalDialogManager.backgroundItem.visible = false;
+        customTooltip.openST = true;
     }
 
     function openTooltip(xX, yY){
@@ -86,24 +90,17 @@ ControlBase {
                 point.y = point.y + 2*customTooltip.componentMargin;
             }
 
-            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y});
-
-            modalDialogManager.backgroundItem.visible = false;
-
-            customTooltip.openST = true;
+            open(point.x, point.y);
         }
     }
 
     function closeTooltip(){
         if(customTooltip.openST){
-            modalDialogManager.closeDialog();
+            modalDialogManager.closeDialog(customTooltip.dialogIndex);
 
             customTooltip.openST = false;
         }
-
     }
-
-
 
     Text{
         id: forHeightText;

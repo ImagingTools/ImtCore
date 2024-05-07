@@ -7,6 +7,7 @@ Item {
     id: documentManager;
 
     property string defaultDocumentName: qsTr("<no name>");
+    property int documentsCount: documentsModel.count;
 
     property ListModel documentsModel: ListModel {
         dynamicRoles: true;
@@ -14,6 +15,19 @@ Item {
 
     signal documentClosed(int documentIndex, string documentId);
     signal documentAdded(int documentIndex, string documentId);
+
+    onDocumentsCountChanged: {
+        documentIndexCorrection();
+    }
+
+    function documentIndexCorrection(){
+        for (let i = 0; i < documentsModel.count; i++){
+            let documentData = documentsModel.get(i).DocumentData;
+            if (documentData){
+                documentData.documentIndex = i;
+            }
+        }
+    }
 
 
     function openErrorDialog(message){
@@ -417,6 +431,7 @@ Item {
         }
 
         let documentTitle = generateDocumentTitle(documentIndex);
+
         setDocumentTitle(documentIndex, documentTitle);
     }
 
@@ -731,7 +746,6 @@ Item {
             }
 
             function commandHandle(commandId){
-                console.log("DocumentManager commandHandle, documentId", documentId);
                 if (!documentManager){
                     return;
                 }

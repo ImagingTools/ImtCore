@@ -22,10 +22,6 @@ Item {
     // Top level dialog finished
     signal finished(string result);
 
-    onFinished: {
-        console.log("DialogsManager onFinished", result);
-    }
-
     function openDialog(comp, parameters, mode, callback){
         console.log("DialogsManager addDialog", comp, parameters, mode, callback);
         let dialogMode = mode !== undefined ? mode : Style.dialogMode !== undefined ? Style.dialogMode: "Internal";
@@ -44,11 +40,17 @@ Item {
 
     }
 
-    function closeDialog(){
-        console.log("DialogsManager closeDialog", modalDialogModels.count);
+    function closeDialog(index){
+        if (!index){
+            index = -1;
 
-        if (modalDialogModels.count > 0){
-            modalDialogModels.remove(modalDialogModels.count - 1);
+            if (modalDialogModels.count > 0){
+                index = modalDialogModels.count - 1;
+            }
+        }
+
+        if (index >= 0 && index < modalDialogModels.count){
+            modalDialogModels.remove(index);
         }
     }
 

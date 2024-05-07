@@ -13,6 +13,7 @@ ControlBase {
     decorator: Style.dialogDecorator;
     property var decoratorItem: null;
 
+    property string dialogId;
     property string title;
     property string bodySource;
     property string topPanelSource;

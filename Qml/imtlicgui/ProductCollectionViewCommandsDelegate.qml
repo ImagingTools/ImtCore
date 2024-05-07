@@ -75,11 +75,15 @@ DocumentCollectionViewDelegate {
             let indexes = container.collectionView.table.getSelectedIndexes();
             if (indexes.length > 0){
                 let index = indexes[0];
+                let selectedName = container.collectionView.table.elements.GetData("ProductId", indexes[0]);
+                if (!selectedName){
+                    selectedName = "";
+                }
+
                 let selectedProductId = container.collectionView.table.elements.GetData("Id", index);
                 if (selectedProductId !== ""){
-                    if (fileName == ""){
-                        fileName = {};
-                        fileName["name"] = selectedProductId + ".xml";
+                    if (fileName === ""){
+                        fileName = selectedName + "Features.xml";
                     }
 
                     remoteFileController.GetFile(selectedProductId, fileName);
