@@ -124,6 +124,10 @@ Item {
         }
     }
 
+    onPropertiesChanged: {
+        comboBoxContainerGql.currentIndex = -1;
+        comboBoxContainerGql.currentText = "";
+    }
 
     Component {
         id: popupMenu;

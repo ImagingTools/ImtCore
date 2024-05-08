@@ -83,6 +83,8 @@ Item {
 
     property bool hoverBlocked: true;
 
+    property bool notSetProperties: true;
+
     signal finished(string commandId, int index);
     signal endList();
     signal textEdited();
@@ -129,9 +131,10 @@ Item {
         for (var item = 0; item < popupMenuContainer.properties.GetItemsCount(); item++){
             modelFilter.SetData(popupMenuContainer.properties.GetData("Id", item),  popupMenuContainer.properties.GetData("Value", item));
         }
-        if(popupMenuContainer.properties.GetItemsCount()){
+        if(!notSetProperties){
             propertiesChangedSignal();
         }
+        notSetProperties = false;
         //itemsModel.updateModel(0);
         //popupMenuContainer.rootItem.currentIndex = -1;
     }
