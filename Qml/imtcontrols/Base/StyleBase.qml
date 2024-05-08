@@ -95,6 +95,9 @@ StyleComponents {
     property string color_text_titles: "#7700FF";
     property string color_text_notActive: "#C2CEDB";
 
+    property alias mainFontLoader: mainFont;
+    property alias boldFontLoader: boldFont;
+
     property string mainFontSource: "../../../Fonts/Ubuntu-Light.ttf";
     property string boldFontSource: "../../../Fonts/Ubuntu-Medium.ttf";
 
