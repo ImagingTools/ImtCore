@@ -9,7 +9,7 @@ class ListModel extends QtObject {
     }
 
     static defaultSignals = {
-        
+        $transaction: ['sender', 'changeset']
     }
 
     constructor(parent,exCtx,exModel){
@@ -31,6 +31,20 @@ class ListModel extends QtObject {
     }
 
     $dataChanged(topLeft, bottomRight, roles){
+        if(roles){
+            if(TransactionController.add(this)) {
+                let change = this.$changeset[this.$changeset.length-1]
+                if(change && change[0] === topLeft && change[1] === bottomRight && change[2] === 'insert' && roles === 'remove'){
+                    this.$changeset.pop()
+                } else {
+                    this.$changeset.push([topLeft, bottomRight, roles])
+                }
+            } else {
+                if(this.$signals.$transaction) this.$signals.$transaction(this, [[topLeft, bottomRight, roles]])
+            }
+        }
+        
+
         let parent = this.getProperty('parent').get()
         if(parent instanceof ListModel){
             parent.getProperty('data').getNotify()()
@@ -74,7 +88,7 @@ class ListModel extends QtObject {
         this.getStatement('data').value = []
 
         this.getStatement('count').reset(0)
-        this.getStatement('data').getNotify()(leftTop, rightBottom, 'remove')
+        this.$emitDataChanged(leftTop, rightBottom, 'remove')
     }
     get(index){
         return index >= 0 && index < this.getStatement('data').get().length ? this.getStatement('data').get()[index] : undefined
@@ -113,7 +127,7 @@ class ListModel extends QtObject {
         this.getStatement('data').get().splice(index, count)
         let data = this.getStatement('data').get()
         for(let i = index; i < data.length; i++){
-            data[i].index -= count
+            data[i].index = i
         }
         this.getStatement('count').reset(this.getStatement('data').get().length)
         

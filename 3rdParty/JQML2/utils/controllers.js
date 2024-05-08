@@ -115,7 +115,8 @@ class MouseController {
                 if(obj.getPropertyValue('contentItem').getPropertyValue('height') <= obj.getPropertyValue('height')) bottom = top
 
                 if(obj instanceof ListView){
-                    let length = obj.getPropertyValue('model').getPropertyValue('data').length
+                    let model = obj.getPropertyValue('model')
+                    let length = typeof model === 'object' ? model.getPropertyValue('data').length : model
                     if(obj.$items[0]) {
                         top = obj.$items[0].getPropertyValue('y')
                     }
@@ -132,6 +133,7 @@ class MouseController {
                                 obj.getProperty('contentY').reset(bottom)
                             } else {
                                 obj.getProperty('contentY').reset(deltaY + currentY)
+                                return
                             }
                         }
                     }
@@ -143,6 +145,7 @@ class MouseController {
                             obj.getProperty('contentY').reset(bottom)
                         } else {
                             obj.getProperty('contentY').reset(deltaY + currentY)
+                            return
                         } 
                     }
                 }
@@ -487,7 +490,8 @@ class MouseController {
             if(this.target.getPropertyValue('contentItem').getPropertyValue('height') <= this.target.getPropertyValue('height')) bottom = top
 
             if(this.target instanceof ListView){
-                let length = this.target.getPropertyValue('model').getPropertyValue('data').length
+                let model = this.target.getPropertyValue('model')
+                let length = typeof model === 'object' ? model.getPropertyValue('data').length : model
                 if(this.target.$items[0]) {
                     left = this.target.$items[0].getPropertyValue('x')
                     top = this.target.$items[0].getPropertyValue('y')
@@ -553,7 +557,9 @@ class KeyboardController {
             for(let el of mainRoot.$focusedElements){
                 if(elements.indexOf(el) < 0) elements.push(el)
             }
-        
+            
+            let ignore = []
+
             for(let target of elements){
                 if(target){
                     if(e.key === 'Enter' || e.key === 'Return'){
@@ -626,50 +632,50 @@ class KeyboardController {
                                 }
                             }
                         }
+                        if(ignore.indexOf(parent) < 0 && parent.$signals['Keys.pressed']){
+                            ignore.push(parent)
+                            e.accepted = false
+                            parent.$signals['Keys.pressed'](e)
+                            if(e.accepted) return
+                        }
+                        if(e.key === 'ArrowLeft' && parent.$signals['Keys.leftPressed']){
+                            e.accepted = false
+                            parent.$signals['Keys.leftPressed'](e)
+                            if(e.accepted) return
+                        }
+                        if(e.key === 'ArrowRight' && parent.$signals['Keys.rightPressed']){
+                            e.accepted = false
+                            parent.$signals['Keys.rightPressed'](e)
+                            if(e.accepted) return
+                        }
+                        if(e.key === 'ArrowUp' && parent.$signals['Keys.upPressed']){
+                            e.accepted = false
+                            parent.$signals['Keys.upPressed'](e)
+                            if(e.accepted) return
+                        }
+                        if(e.key === 'ArrowDown' && parent.$signals['Keys.downPressed']){
+                            e.accepted = false
+                            parent.$signals['Keys.downPressed'](e)
+                            if(e.accepted) return
+                        }
+                        if(e.key === 'Return' && parent.$signals['Keys.returnPressed']){
+                            e.accepted = false
+                            parent.$signals['Keys.returnPressed'](e)
+                            if(e.accepted) return
+                        }
+                        if(e.key === 'Enter' && parent.$signals['Keys.enterPressed']){
+                            e.accepted = false
+                            parent.$signals['Keys.enterPressed'](e)
+                            if(e.accepted) return
+                        }
+                        if(e.key === 'Space' && parent.$signals['Keys.spacePressed']){
+                            e.accepted = false
+                            parent.$signals['Keys.spacePressed'](e)
+                            if(e.accepted) return
+                        }
                         parent = parent.getPropertyValue('parent')
                     }
                     
-
-                    if(obj.$signals['Keys.pressed']){
-                        e.accepted = false
-                        obj.$signals['Keys.pressed'](e)
-                        if(e.accepted) return
-                    }
-                    if(e.key === 'ArrowLeft' && obj.$signals['Keys.leftPressed']){
-                        e.accepted = false
-                        obj.$signals['Keys.leftPressed'](e)
-                        if(e.accepted) return
-                    }
-                    if(e.key === 'ArrowRight' && obj.$signals['Keys.rightPressed']){
-                        e.accepted = false
-                        obj.$signals['Keys.rightPressed'](e)
-                        if(e.accepted) return
-                    }
-                    if(e.key === 'ArrowUp' && obj.$signals['Keys.upPressed']){
-                        e.accepted = false
-                        obj.$signals['Keys.upPressed'](e)
-                        if(e.accepted) return
-                    }
-                    if(e.key === 'ArrowDown' && obj.$signals['Keys.downPressed']){
-                        e.accepted = false
-                        obj.$signals['Keys.downPressed'](e)
-                        if(e.accepted) return
-                    }
-                    if(e.key === 'Return' && obj.$signals['Keys.returnPressed']){
-                        e.accepted = false
-                        obj.$signals['Keys.returnPressed'](e)
-                        if(e.accepted) return
-                    }
-                    if(e.key === 'Enter' && obj.$signals['Keys.enterPressed']){
-                        e.accepted = false
-                        obj.$signals['Keys.enterPressed'](e)
-                        if(e.accepted) return
-                    }
-                    if(e.key === 'Space' && obj.$signals['Keys.spacePressed']){
-                        e.accepted = false
-                        obj.$signals['Keys.spacePressed'](e)
-                        if(e.accepted) return
-                    }
                 }
             }
 
@@ -927,9 +933,63 @@ class ImageController {
     }
 }
 
+class TransactionController {
+    objects = new Set()
+    levels = {}
+    level = 0
+
+    begin(){
+        this.level += 1
+        this.levels[this.level] = []
+    }
+
+    end(){
+        if(this.level > 0){
+            this.run()
+            this.clear()
+
+            this.level -= 1
+        } else {
+            this.level = 0
+        }
+    }
+
+    add(obj){
+        if(this.level > 0){
+            if(!this.objects.has(obj)){
+                obj.$changeset = []
+                this.levels[this.level].push(obj)
+                this.objects.add(obj)
+            }
+            return true
+        } else {
+            return false
+        }
+    }
+
+    clear(){
+        if(this.level > 0){
+            for(let obj of this.levels[this.level]){
+                this.objects.delete(obj)
+            }
+            delete this.levels[this.level]
+        }
+    }
+
+    run(){
+        if(this.level > 0){
+            for(let obj of this.levels[this.level]){
+                // console.log('*Transaction*', this.level, obj)
+                if(obj.UID && obj.$signals.$transaction) obj.$signals.$transaction(obj, obj.$changeset)
+            }
+        }
+    }
+}
+
 
 module.exports.MouseController = MouseController
 module.exports.KeyboardController = KeyboardController
 module.exports.TextFontController = TextFontController
 module.exports.AnimationController = AnimationController
 module.exports.ImageController = ImageController
+module.exports['TransactionController'] = TransactionController

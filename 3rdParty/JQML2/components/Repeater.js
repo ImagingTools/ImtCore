@@ -77,6 +77,7 @@ class Repeater extends Item {
                 delete this.$items[key]
             }
         }
+        if(!this.UID) return
         this.$items.length.reset(0)
         if(typeof this.getPropertyValue('model') === 'number'){     
             this.$items.length.setCompute(()=>{this.$items.length.subscribe(this.getProperty('model')); return this.getPropertyValue('model')})
