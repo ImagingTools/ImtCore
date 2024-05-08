@@ -18,7 +18,7 @@ class FileDialog extends Item {
         defaultSuffix: { type: QString, value: '' },
         title: { type: QString, value: '' },
         nameFilters: { type: QVar, value: undefined, changed: '$nameFiltersChanged' },
-        fileUrl: { type: QString, value: '' },
+        fileUrl: { type: QVar, value: '' },
         fileUrls: { type: QVar, value: undefined },
         folder: { type: QString, value: '' },
         selectExisting: { type: QBool, value: false },
@@ -35,11 +35,14 @@ class FileDialog extends Item {
         currentFile: { type: QString, value: '' },
         currentFiles: { type: QVar, value: undefined },
         fileMode: { type: QInt, value: FileDialog.OpenFile },
-        file: { type: QString, value: '' },
+        file: { type: QVar, value: '' },
         files: { type: QVar, value: undefined },
         options: { type: QVar, value: undefined },
         rejectLabel: { type: QString, value: '' },
         seleectedNameFilter: { type: QVar, value: undefined },
+
+        selectedFile: { type: QVar, value: '' },
+        selectedFiles: { type: QVar, value: undefined },
     }
 
 
@@ -61,20 +64,22 @@ class FileDialog extends Item {
         this.$input.type = 'file'
         this.getDom().appendChild(this.$input)
 
-        this.$input.addEventListener('change', ()=>{
+        this.$input.addEventListener('change', (e)=>{
             if(this.getPropertyValue('selectMultiple')){
                 this.getProperty('fileUrls').reset(e.target.files)
                 this.getProperty('files').reset(e.target.files)
+                this.getProperty('selectedFile').reset(e.target.files)
                 for(let fileUrl of e.target.files){
-                    fileUrl.toString = ()=>{return this.getPropertyValue('fileUrl')}
-                    fileUrl.replace = ()=>{return this.getPropertyValue('fileUrl')}
+                    fileUrl.toString = ()=>{return fileUrl}
+                    fileUrl.replace = ()=>{return fileUrl}
                 }
             } else {
                 let fileUrl = e.target.files[0]
-                fileUrl.toString = ()=>{return this.getPropertyValue('fileUrl')}
-                fileUrl.replace = ()=>{return this.getPropertyValue('fileUrl')}
+                fileUrl.toString = ()=>{return fileUrl}
+                fileUrl.replace = ()=>{return fileUrl}
                 this.getProperty('fileUrl').reset(fileUrl)
                 this.getProperty('file').reset(fileUrl)
+                this.getProperty('selectedFiles').reset(fileUrl)
             }
             
             if(this.$signals.accepted) this.$signals.accepted()
@@ -104,7 +109,7 @@ class FileDialog extends Item {
     }
 
     open(){
-        if(this.$signals.accepted) this.$signals.accepted()
+        this.getProperty('visible').reset(true)
     }
 
     destroy(){
