@@ -13,5 +13,6 @@ TableCellDelegateBase {
 
         rowDelegate: delegateContainer.rowDelegate
         text: delegateContainer.getValue()
+        columnIndex: delegateContainer.columnIndex
     }
 }

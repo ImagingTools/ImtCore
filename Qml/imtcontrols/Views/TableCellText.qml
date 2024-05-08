@@ -6,15 +6,15 @@ Text {
     id: name
 
     property TableRowDelegateBase rowDelegate
-
+    property int columnIndex: -1;
     verticalAlignment: Text.AlignVCenter
-    horizontalAlignment: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Text.AlignLeft : rowDelegate.tableItem.cellDecorator.IsValidData("TextPosition", rowDelegate.columnIndex) ? rowDelegate.tableItem.cellDecorator.GetData("TextPosition", rowDelegate.columnIndex) : Text.AlignLeft : Text.AlignLeft
+    horizontalAlignment: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Text.AlignLeft : rowDelegate.tableItem.cellDecorator.IsValidData("TextPosition", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.GetData("TextPosition", name.columnIndex) : Text.AlignLeft : Text.AlignLeft
 
-    font.pixelSize: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Style.fontSize_common : rowDelegate.tableItem.cellDecorator.IsValidData("FontSize", rowDelegate.columnIndex) ? rowDelegate.tableItem.cellDecorator.GetData("FontSize", rowDelegate.columnIndex) : Style.fontSize_common : Style.fontSize_common
+    font.pixelSize: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Style.fontSize_common : rowDelegate.tableItem.cellDecorator.IsValidData("FontSize", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.GetData("FontSize", name.columnIndex) : Style.fontSize_common : Style.fontSize_common
     font.family: Style.fontFamily
 
     color: rowDelegate
-           && rowDelegate.enabled ? (rowDelegate.tableItem.emptyDecorCell ? Style.textColor : rowDelegate.tableItem.cellDecorator.IsValidData("FontColor", rowDelegate.columnIndex) ? rowDelegate.tableItem.cellDecorator.GetData("FontColor", rowDelegate.columnIndex) : Style.textColor) : Style.inactive_textColor
+           && rowDelegate.enabled ? (rowDelegate.tableItem.emptyDecorCell ? Style.textColor : rowDelegate.tableItem.cellDecorator.IsValidData("FontColor", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.GetData("FontColor", name.columnIndex) : Style.textColor) : Style.inactive_textColor
 
     elide: rowDelegate ? rowDelegate.elideMode : Text.ElideLeft
     wrapMode: (!rowDelegate
@@ -39,8 +39,7 @@ Text {
         }
         if (wrapMode !== Text.NoWrap && rowDelegate) {
             var height_ = name.height + 2 * rowDelegate.textMarginVer
-
-            rowDelegate.setHeightModelElememt(rowDelegate.columnIndex, height_)
+            rowDelegate.setHeightModelElememt(name.columnIndex, height_)
         }
     }
 }

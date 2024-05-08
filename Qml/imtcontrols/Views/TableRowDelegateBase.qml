@@ -49,7 +49,7 @@ Rectangle {
     property bool visibleBottomBorderLast: true;
 
     property bool canSetBorderParams: false;
-    property int wrapMode: Text.NoWrap;
+    property int wrapMode: tableItem ? tableItem.wrapMode_deleg : Text.NoWrap;
     property int elideMode: Text.ElideRight;
     property bool isRightBorder: false;
     //
@@ -150,21 +150,19 @@ Rectangle {
         }
     }
 
-    onWidthChanged: {
-        if(tableDelegateContainer.wrapMode !== Text.NoWrap){
-            if(pauseHeight){
-                pauseHeight.stop();
-                pauseHeight.start();
-            }
-        }
-    }
+//    onWidthChanged: {
+//        if(tableDelegateContainer.wrapMode !== Text.NoWrap){
+//            if(pauseHeight){
+//                pauseHeight.restart();
+//            }
+//        }
+//    }
 
     onColumnCountChanged: {
-        if(tableDelegateContainer.wrapMode !== Text.NoWrap){
-            heightModel.append({"cellHeight": 0});
+        if(tableDelegateContainer.tableItem.wrapMode_deleg !== Text.NoWrap){
+            setCellHeightModelDefault();
             if(pauseHeight){
-                pauseHeight.stop();
-                pauseHeight.start();
+                pauseHeight.restart()
             }
         }
     }
@@ -249,25 +247,36 @@ Rectangle {
         if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
             return;
         }
+        if(tableDelegateContainer.tableItem.wrapMode_deleg == Text.NoWrap){
+            return;
+        }
+        //console.log("table_test::setHeightModelElememt", index_, heightModel.count, height_)
+
         if(index_ < heightModel.count){
             heightModel.setProperty(index_, "cellHeight", height_);
+        }
+        if(pauseHeight){
+            pauseHeight.restart();
         }
     }
 
     function setCellHeightModelDefault(){
+        //console.log("table_test::setCellHeightModelDefault")
         if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
             return;
         }
+        heightModel.clear();
         for(var i = 0; i < tableDelegateContainer.columnCount; i++){
             heightModel.append({"cellHeight": tableDelegateContainer.minHeight})
         }
     }
 
     function setCellHeight(){
+        //console.log("table_test::setCellHeight")
         if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
             return;
         }
-        if(tableDelegateContainer.wrapMode == Text.NoWrap){
+        if(tableDelegateContainer.tableItem.wrapMode_deleg == Text.NoWrap){
             return;
         }
 
@@ -311,6 +320,7 @@ Rectangle {
 
     PauseAnimation {
         id: pauseHeight;
+
         duration: 100;
         onFinished: {
             tableDelegateContainer.setCellHeight();
