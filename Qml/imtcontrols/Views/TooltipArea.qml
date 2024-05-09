@@ -25,7 +25,7 @@ Item {
             if(tp.text !== "" && root.mouseArea.enabled){
                 if(root.mouseArea.containsMouse){
                     if (!tp.openST){
-                        tp.openTooltip(root.mouseArea.mouseX, root.mouseArea.mouseY);
+                        tp.openTooltip(root.mouseArea.mouseX, root.mouseArea.height);
                     }
                 }
             }

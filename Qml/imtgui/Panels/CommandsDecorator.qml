@@ -48,8 +48,6 @@ Item {
     }
 
     function setCommandsModel(parameters){
-        console.log("setCommandsModel");
-
         let model = parameters["Model"];
         let commId = parameters["ViewId"];
 
@@ -103,14 +101,12 @@ Item {
         id: buttonPanel;
 
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
-        anchors.left: parent ? parent.left : undefined;
-        anchors.leftMargin: 100;
 
         width:  parent.width - 2*anchors.leftMargin;
         height: parent.height
 
         horizontalSpacing: 15;
-        verticalSpacing: 10;
+        verticalSpacing: Style.size_mainMargin;
 
         openButtonImageSource: "../../../" + Style.getIconPath("Icons/Next", Icon.Mode.On, Icon.State.Active);
 

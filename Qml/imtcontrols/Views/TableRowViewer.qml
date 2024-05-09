@@ -28,7 +28,6 @@ Row {
             }
 
             Component.onDestruction: {
-                // console.log("*Debug* cell onDestruction")
                 if (dataList.rowDelegate && dataList.rowDelegate.tableItem){
                     dataList.rowDelegate.tableItem.widthRecalc.disconnect(cell.setCellWidth)
                 }
@@ -45,7 +44,6 @@ Row {
             }
 
             function setCellWidth(){
-
                 if(!dataList.rowDelegate || !dataList.rowDelegate.tableItem){
                     return;
                 }

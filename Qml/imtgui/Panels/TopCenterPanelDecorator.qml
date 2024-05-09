@@ -7,14 +7,11 @@ DecoratorBase {
     id: topCenterPanelDecorator;
 
     Component.onDestruction: {
-        console.log("topCenterPanelDecorator onDestruction");
         Events.unSubscribeEvent("UpdateCommandsGui", commandsDecorator.setCommandsModel);
     }
 
     CommandsDecorator {
         id: commandsDecorator;
-
-        anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined;
 
         onVisibleChanged: {
             if (!commandsDecorator.visible){
@@ -23,7 +20,6 @@ DecoratorBase {
         }
 
         Component.onCompleted: {
-            console.log("topCenterPanelDecorator onCompleted");
             Events.subscribeEvent("UpdateCommandsGui", commandsDecorator.setCommandsModel);
         }
     }

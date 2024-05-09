@@ -75,8 +75,8 @@ ElementView {
     Component {
         id: textInputComp;
         CustomTextField {
-            width: 350;
-            height: 30;
+            width: root.controlWidth;
+            height: root.controlHeight;
 
             text: root.text;
 

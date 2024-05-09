@@ -11,8 +11,8 @@ ComboBoxElementView {
     Component {
         id: cbComp;
         Item {
-            width: 350;
-            height: 30;
+            width: root.controlWidth;
+            height: root.controlHeight;
 
             onFocusChanged: {
                 if (focus){

@@ -49,7 +49,6 @@ Item{
             width = defaultWidth;
         }
     }
-
     //borders
 
     Rectangle{
@@ -92,8 +91,6 @@ Item{
 
         color: headerDelegate.tableItem.borderColorVertical;
     }
-
-
     //borders
 
     Rectangle{
@@ -115,9 +112,6 @@ Item{
         radius: headerDelegate.tableItem.emptyDecorHeader ? 0 :
                                                   headerDelegate.tableItem.headerDecorator.IsValidData("CellRadius", headerDelegate.columnIndex) ?
                                                       headerDelegate.tableItem.headerDecorator.GetData("CellRadius", headerDelegate.columnIndex) :0;
-
-
-
 
         //cornerPatches
         Rectangle{
@@ -142,8 +136,6 @@ Item{
             visible: headerDelegate.tableItem.emptyDecorHeader ? true :
                                                        headerDelegate.tableItem.headerDecorator.IsValidData("RightTopRound", headerDelegate.columnIndex) ?
                                                            !headerDelegate.tableItem.headerDecorator.GetData("RightTopRound", headerDelegate.columnIndex) :true;
-
-
         }
 
         Rectangle{
@@ -170,47 +162,15 @@ Item{
                                                            !headerDelegate.tableItem.headerDecorator.GetData("RightBottomRound", headerDelegate.columnIndex) :true;
         }
         //cornerPatches
-
-
-
     }//mainRec
-
-    CheckBox {
-        id: checkBox;
-
-        z: 1000;
-
-        anchors.verticalCenter: mainRec.verticalCenter;
-        anchors.left: mainRec.left;
-        anchors.leftMargin: 8;
-
-        checkState: headerDelegate.tableItem.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
-
-        visible: headerDelegate.tableItem.checkable && headerDelegate.columnIndex === 0 && headerDelegate.tableItem.elementsList.count > 0 && headerDelegate.tableItem.canSelectAll;
-
-        isActive: !headerDelegate.tableItem.readOnly;
-
-        onClicked: {
-            if (headerDelegate.tableItem.readOnly){
-                return;
-            }
-
-            if (checkBox.checkState === Qt.Checked){
-                headerDelegate.tableItem.uncheckAll();
-            }
-            else{
-                headerDelegate.tableItem.checkAll();
-            }
-        }
-    }
 
     Text {
         id: name;
 
         anchors.verticalCenter: mainRec.verticalCenter;
-        anchors.left: checkBox.visible ? checkBox.right : mainRec.left;
-        anchors.right: iconSort.visible ? iconSort.left : mainRec.right;
+        anchors.left: mainRec.left;
         anchors.leftMargin: headerDelegate.tableItem.textMarginHor;
+        anchors.right: iconSort.visible ? iconSort.left : mainRec.right;
         anchors.rightMargin: iconSort.visible ? 0 : headerDelegate.tableItem.textMarginHor;
 
         verticalAlignment: Text.AlignVCenter;
@@ -266,11 +226,10 @@ Item{
 
         anchors.verticalCenter: mainRec.verticalCenter;
         anchors.right: mainRec.right;
+        anchors.rightMargin: Style.size_smallMargin;
 
-        anchors.rightMargin: 5;
-
-        height: 10;
-        width: visible ? 10 : 0;
+        width: visible ? Style.iconSizeExtraSmall : 0;
+        height: width;
 
         visible: headerDelegate.tableItem.currentHeaderId === model.Id && headerDelegate.tableItem.hasSort;
         rotation: headerDelegate.tableItem.currentSortOrder == "ASC" ? 180 : 0
@@ -300,7 +259,6 @@ Item{
 
         onClicked: {
             headerDelegate.tableItem.headerClicked(model.Id);
-            //console.log("HEADER CLICKED")
         }
     }
 
@@ -319,21 +277,24 @@ Item{
 
         anchors.right:  parent.right;
 
-        height: parent.height;
         width: 15;
+        height: parent.height;
 
         visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex < headerDelegate.columnCount -1;
         enabled: visible;
 
         hoverEnabled: true;
         cursorShape: pressed ?  Qt.SplitHCursor : isWithinBorder ? Qt.SplitHCursor : Qt.ArrowCursor;
+
         property bool isWithinBorder: mouseX >= width - splitterWidth //&& mouseX <= width/2 + splitterWidth/2;
         property int splitterWidth: 6;
         property var coord: mapToItem(movingRight,0,0);
         property bool  blocked: false;
+
         onPressed: {
             movingRight.coord = mapToItem(movingRight,mouse.x,mouse.y)
         }
+
         onPositionChanged: {
             if(pressed){
                 var newCoords = mapToItem(movingRight,mouse.x,mouse.y);
@@ -357,9 +318,11 @@ Item{
             blocked = true;
             blockmovingRightPause.restart();
         }
+
         onReleased: {
             headerDelegate.tableItem.saveWidth();
         }
+
         onClicked: {
             if(blocked){
                 mouse.accepted = true;
@@ -368,14 +331,13 @@ Item{
                 mouse.accepted = false;
             }
         }
-
     }
-
 
     PauseAnimation {
         id: blockmovingRightPause;
 
         duration: 200
+
         onFinished: {
             movingRight.blocked = false;
         }
@@ -398,9 +360,11 @@ Item{
         property int splitterWidth: 6;
         property var coord: mapToItem(movingLeft,0,0);
         property bool  blocked: false;
+
         onPressed: {
             movingLeft.coord = mapToItem(movingLeft,mouse.x,mouse.y)
         }
+
         onPositionChanged: {
             if(pressed){
                 var newCoords = mapToItem(movingLeft,mouse.x,mouse.y);
@@ -424,9 +388,11 @@ Item{
             blocked = true;
             blockmovingLeftPause.restart();
         }
+
         onReleased: {
             headerDelegate.tableItem.saveWidth();
         }
+
         onClicked: {
             if(blocked){
                 mouse.accepted = true;
@@ -435,20 +401,16 @@ Item{
                 mouse.accepted = false;
             }
         }
-
     }
-
 
     PauseAnimation {
         id: blockmovingLeftPause;
 
         duration: 200
+
         onFinished: {
             movingLeft.blocked = false;
         }
     }
-
-
-
 }//delegate
 

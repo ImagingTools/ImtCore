@@ -65,6 +65,7 @@ const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& /*requ
 
 
 // reimplemented (imtauth::ILogin)
+
 QByteArray CWebSocketClientComp::GetLoggedUserId() const
 {
 	return QByteArray();
@@ -73,7 +74,6 @@ QByteArray CWebSocketClientComp::GetLoggedUserId() const
 
 bool CWebSocketClientComp::Login(const QByteArray& /*userId*/, const QString& /*password*/)
 {
-//	m_refreshTimer.start();
 	EmitStartTimer();
 
 	return true;
@@ -82,7 +82,6 @@ bool CWebSocketClientComp::Login(const QByteArray& /*userId*/, const QString& /*
 
 bool CWebSocketClientComp::Logout()
 {
-//	m_refreshTimer.stop();
 	EmitStopTimer();
 	EmitAgentinoDisconnect();
 
@@ -142,7 +141,6 @@ QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArra
 }
 
 
-
 void CWebSocketClientComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
@@ -179,6 +177,7 @@ void CWebSocketClientComp::OnConnectedTimer()
 {
 	Connect();
 }
+
 
 void CWebSocketClientComp::OnWebSocketConnected()
 {
@@ -227,14 +226,12 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError /*error
 {
 	QString errorText = m_webSocket.errorString();
 
-	qDebug() << errorText;
+	SendErrorMessage(0, errorText, "CWebSocketClientComp");
 }
 
 
 void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message)
 {
-	qDebug() << "OnWebSocketTextMessageReceived" << message;
-
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 
 	if (webSocketPtr == nullptr){
@@ -271,7 +268,6 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 	if (responsePtr.IsValid()){
 		QByteArray data = responsePtr->GetData();
-		qDebug() << "Responce" << data;
 
 		webSocketPtr->sendTextMessage(data);
 
@@ -289,8 +285,6 @@ void CWebSocketClientComp::OnWebSocketBinaryMessageReceived(const QByteArray& /*
 
 void CWebSocketClientComp::Connect()
 {
-	qDebug() << "CWebSocketClientComp::Connect";
-
 	QString host;
 	QString path;
 	int port = 0;
@@ -323,10 +317,9 @@ void CWebSocketClientComp::Connect()
 	url.setScheme("ws");
 	url.setPort(port);
 
-	qDebug() << "url" << url;
-
 	m_webSocket.open(url);
 }
+
 
 // public methods of the embedded class NetworkOperation
 

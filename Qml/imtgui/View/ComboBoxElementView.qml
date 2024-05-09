@@ -36,8 +36,6 @@ ElementView {
     }
 
     onChangeableChanged: {
-        console.log("comboBoxElementView onChangeableChanged", cbRef);
-
         if (cbRef){
             cbRef.changeable = changeable;
         }
@@ -80,8 +78,8 @@ ElementView {
         ComboBox {
             id: cb;
 
-            width: 350;
-            height: 30;
+            width: comboBoxElementView.controlWidth;
+            height: comboBoxElementView.controlHeight;
 
             Component.onCompleted: {
                 if (comboBoxElementView.delegate){

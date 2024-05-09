@@ -6,10 +6,9 @@ import imtcontrols 1.0
 Rectangle {
     id: tabPanelContainer;
 
-    height: 40;
     width: 1000;
+    height: 40;
 
-//    color: Style.backgroundColor;
     color: Style.tabPanelBackgroundColor;
 
     property int selectedIndex: 0;
@@ -24,8 +23,20 @@ Rectangle {
     signal rightClicked();
     signal leftClicked();
 
+    Component.onCompleted: {
+        Events.subscribeEvent("AppSizeChanged", appSizeChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("AppSizeChanged", appSizeChanged);
+    }
+
     function viewTabInListView(index) {
         list.positionViewAtIndex(index, ListView.Contain);
+    }
+
+    function appSizeChanged(){
+        viewTabInListView(selectedIndex);
     }
 
     onSelectedIndexChanged: {
@@ -44,6 +55,7 @@ Rectangle {
 
         orientation: ListView.Horizontal;
         boundsBehavior: Flickable.StopAtBounds;
+        interactive: false;
 
         spacing: 0;
 

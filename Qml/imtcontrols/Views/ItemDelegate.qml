@@ -5,7 +5,7 @@ import imtcontrols 1.0
 Button {
     id: root;
 
-    width: parent.width;
+    width: parent ? parent.width : 0;
     height: 30;
 
     decorator: Style.itemDelegateDecorator;

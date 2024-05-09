@@ -37,6 +37,9 @@ Rectangle {
 
     property alias nameWidth: textName.width;
 
+    property int controlWidth: 400;
+    property int controlHeight: 30;
+
     onFocusChanged: {
         if (focus && controlItem){
             controlItem.forceActiveFocus();

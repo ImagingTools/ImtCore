@@ -114,10 +114,12 @@ Row {
     Row{
         anchors.verticalCenter: parent.verticalCenter;
 
+        spacing: Style.size_smallMargin;
+
         Repeater {
             id: repeaterPagination;
 
-            delegate: Button {
+            delegate: Component {Button {
                 id: buttonDelegate;
 
                 width: 24;
@@ -127,6 +129,7 @@ Row {
 
                 enabled: model.number !== -1 && paginationContainer.currentIndex !== model.number - 1;
                 text: model.number === -1 ? "..." : model.number;
+
                 onClicked: {
                     paginationContainer.currentIndex = model.number - 1;
                     if (paginationContainer.pagesSize >= props.maxElementCount){
@@ -142,6 +145,13 @@ Row {
                     color: Style.tabSelectedColor;
                     visible: (model.index == undefined ||  model.selected == undefined) ? false : paginationContainer.pagesSize < props.maxElementCount ? model.index === paginationContainer.currentIndex : model.selected;
                 }
+
+                BaseText {
+                    id: helperText;
+                    text: buttonDelegate.text;
+                    visible: false;
+                }
+            }
             }
         }
     }

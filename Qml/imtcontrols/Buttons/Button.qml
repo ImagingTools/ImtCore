@@ -83,7 +83,6 @@ ControlBase {
         onPressed: {
             baseButton.down = true
             baseButton.pressed();
-
         }
 
         onReleased: {
@@ -96,7 +95,6 @@ ControlBase {
         }
 
         onExited: {
-            console.log("Button onExited")
             baseButton.exited(mouseX, mouseY);
         }
 

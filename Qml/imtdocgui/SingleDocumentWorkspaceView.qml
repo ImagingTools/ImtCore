@@ -47,9 +47,9 @@ DocumentManager {
         let id = parameters["Id"];
         let alertPanelComp = parameters["AlertPanelComp"];
 
-        if (id === documentManager.startPageObj["Id"]){
-            setAlertPanel(alertPanelComp);
-        }
+//        if (id === documentManager.startPageObj["Id"]){
+//            setAlertPanel(alertPanelComp);
+//        }
     }
 
     function loadStartItem(){

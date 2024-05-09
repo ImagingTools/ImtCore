@@ -130,8 +130,8 @@ Rectangle {
 
     property string maxLengthText: '';
 
-    property int textMarginHor: 8;
-    property int textMarginVer: 8;
+    property int textMarginHor: Style.size_mainMargin;
+    property int textMarginVer: Style.size_mainMargin;
 
     property bool emptyDecor: true;
     property bool emptyDecorHeader: true;
@@ -591,10 +591,42 @@ Rectangle {
 
         clip: true;
 
+        CheckBox {
+            id: checkBox;
+
+            z: 1000;
+
+            anchors.verticalCenter: parent.verticalCenter;
+            anchors.left: parent.left;
+            anchors.leftMargin: Style.size_mainMargin;
+
+            checkState: tableContainer.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
+
+            visible: tableContainer.checkable && tableContainer.elementsList.count > 0 && tableContainer.canSelectAll;
+
+            isActive: !tableContainer.readOnly;
+
+            onClicked: {
+                if (tableContainer.readOnly){
+                    return;
+                }
+
+                if (checkBox.checkState === Qt.Checked){
+                    tableContainer.uncheckAll();
+                }
+                else{
+                    tableContainer.checkAll();
+                }
+            }
+        }
+
         ListView {
             id: headersList;
 
-            anchors.fill: parent;
+            anchors.left: checkBox.visible ? checkBox.right : parent.left;
+            anchors.right: parent.right;
+            anchors.top: parent.top;
+            anchors.bottom: parent.bottom;
 
             clip: true;
             orientation: ListView.Horizontal;

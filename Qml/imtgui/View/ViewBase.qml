@@ -192,11 +192,13 @@ Item {
 
     function clearCommandsGui(){
         if (commandsController){
-            Events.sendEvent("GetActiveCommandsViewId", function(activeViewId){
-                if (activeViewId !== viewBase.viewId){
-                    Events.sendEvent("ClearCommandsGui", {"ViewId": viewBase.viewId});
-                }
-            });
+            Events.sendEvent("ClearCommandsGui", {"ViewId": viewBase.viewId});
+
+//            Events.sendEvent("GetActiveCommandsViewId", function(activeViewId){
+//                if (activeViewId !== viewBase.viewId){
+//                    Events.sendEvent("ClearCommandsGui", {"ViewId": viewBase.viewId});
+//                }
+//            });
         }
     }
 
@@ -230,7 +232,7 @@ Item {
 
         function onCommandsModelChanged(){
             if (viewBase.visible){
-//                viewBase.updateCommandsGui();
+                viewBase.updateCommandsGui();
             }
         }
 

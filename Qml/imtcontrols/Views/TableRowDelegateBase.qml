@@ -71,9 +71,7 @@ Rectangle {
     signal clicked();
     signal rightButtonMouseClicked(int mX, int mY);
     signal doubleClicked(int mX, int mY);
-
     signal widthRecalc();
-
 
     Component.onCompleted: {
         tableDelegateContainer.compl = true;
@@ -170,10 +168,6 @@ Rectangle {
     Connections {
         id: tableConnections;
 
-//        function onCheckedItemsChanged(selection){
-//            checkedState = tableItem.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
-//        }
-
         function onSelectionChanged(selection){
             if (!tableDelegateContainer.tableItem){
                 return;
@@ -240,7 +234,6 @@ Rectangle {
         if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("ElideMode")){
             tableDelegateContainer.elideMode = tableDelegateContainer.tableItem.cellDecorator.GetData("ElideMode");
         }
-
     }
 
     function setHeightModelElememt(index_,height_){
@@ -290,7 +283,6 @@ Rectangle {
         tableDelegateContainer.height = Math.max(maxVal, tableDelegateContainer.minHeight);
     }
 
-
     function selectionChanged(){
         if (tableItem){
             selected = tableItem.tableSelection.selectedIndexes.includes(model.index);
@@ -316,7 +308,6 @@ Rectangle {
             readOnly = !enabled;
         }
     }
-
 
     PauseAnimation {
         id: pauseHeight;
@@ -354,7 +345,7 @@ Rectangle {
         anchors.fill: parent;
         hoverEnabled: true;
 
-        propagateComposedEvents: true;
+//        propagateComposedEvents: true;
 
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
@@ -404,7 +395,7 @@ Rectangle {
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: parent.left;
-            anchors.leftMargin: 10;
+            anchors.leftMargin: Style.size_mainMargin;
 
             checkState: tableDelegateContainer.checkedState;
 
@@ -426,7 +417,6 @@ Rectangle {
                 else{
                     tableDelegateContainer.tableItem.checkItem(tableDelegateContainer.rowIndex);
                 }
-
             }
         }
     }

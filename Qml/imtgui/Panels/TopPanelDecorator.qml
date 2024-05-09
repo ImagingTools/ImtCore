@@ -11,10 +11,6 @@ DecoratorBase {
     property Item centerPanel: null;
     property Item topPanel: null;
 
-    Component.onCompleted: {
-        console.log("topPanelDecorator base onCompleted")
-    }
-
     Rectangle {
         anchors.fill: parent
 
@@ -26,22 +22,24 @@ DecoratorBase {
         }
     }
 
+    TopLeftPanel {
+        id: topLeftPanel;
+        anchors.left: parent.left;
+        width: 100;
+        height: topPanelDecorator.height;
+    }
+
     TopCenterPanel {
         id: topCenterPanel;
-
-        anchors.left: parent.left;
-
-        width: topPanelDecorator.width - rightPanel.width;
+        anchors.left: topLeftPanel.right;
+        anchors.right: rightPanel.left;
         height: topPanelDecorator.height;
     }
 
     TopRightPanel {
         id: rightPanel;
-
         z: 100;
-
         anchors.right: parent.right;
-
         width: 100;
         height: topPanelDecorator.height;
     }
