@@ -647,6 +647,8 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                             stat.value.push(`XMLHttpRequest`)
                         } else if(tree[1] === 'QtPositioning'){
                             stat.value.push(`QtPositioning`)
+                        } else if(tree[1] === 'FileReader'){
+                            stat.value.push(`FileReader`)
                         } else if(tree[1] in Qt){
                             stat.compute = true
                             stat.value.push(`Qt.${tree[1]}`)
