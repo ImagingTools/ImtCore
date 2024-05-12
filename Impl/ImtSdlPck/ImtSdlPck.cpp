@@ -44,6 +44,11 @@ I_EXPORT_COMPONENT(
 		"The C++ class modificator, adds loading generated SDL types from GraphQL request",
 		"Schema Definition Language SDL Class Generator GraphQL GQL")
 
+I_EXPORT_COMPONENT(
+	SdlClassJsonModificator,
+	"The C++ class modificator, adds loading generated SDL types from JSON value",
+	"Schema Definition Language SDL Class Generator JSON")
+
 } // namespace ImtSdlPck
 
 

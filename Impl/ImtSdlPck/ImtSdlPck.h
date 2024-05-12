@@ -11,6 +11,7 @@
 #include <imtsdl/CSdlClassCodeGeneratorComp.h>
 #include <imtsdl/CSdlClassTreeModelModificatorComp.h>
 #include <imtsdl/CSdlClassGqlModificatorComp.h>
+#include <imtsdl/CSdlClassJsonModificatorComp.h>
 
 
 /**
@@ -26,6 +27,7 @@ typedef imtsdl::CGqlSchemaParserComp GqlSchemaParser;
 typedef imtsdl::CSdlClassCodeGeneratorComp SdlClassCodeGenerator;
 typedef imtsdl::CSdlClassTreeModelModificatorComp SdlClassTreeModelModificator;
 typedef imtsdl::CSdlClassGqlModificatorComp SdlClassGqlModificator;
+typedef imtsdl::CSdlClassJsonModificatorComp SdlClassJsonModificator;
 
 
 } // namespace ImtSdlPck
