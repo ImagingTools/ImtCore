@@ -42,25 +42,8 @@ DecoratorBase {
         verboseFilter.text = qsTr("Verbose");
     }
 
-    Rectangle{
-        anchors.fill: parent;
-
-        color: Style.backgroundColor;
-    }
-
-
     function onLocalizationChanged(language){
         updateText()
-    }
-
-
-
-    TreeItemModel {
-        id: modelCategogy;
-
-        Component.onCompleted: {
-            mainItem.updateModel();
-        }
     }
 
     SegmentedButton {

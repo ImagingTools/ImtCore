@@ -54,6 +54,18 @@ Item {
         }
     }
 
+    function closeByComp(comp){
+        for (let i = 0; i < modalDialogModels.count; i++){
+            let c = modalDialogModels.get(i).Component;
+            if (c && c === comp){
+                modalDialogModels.remove(i);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     Repeater {
         id: modalDialogs;
 

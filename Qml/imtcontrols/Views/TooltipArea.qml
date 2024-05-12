@@ -9,32 +9,24 @@ Item {
     property MouseArea mouseArea: null;
     property alias tooltip: tp;
 
-    onMouseAreaChanged: {
-        if (mouseArea){
-            mouseArea.hoverEnabled = true;
+    property bool containsMouse: mouseArea ? mouseArea.containsMouse : false;
+
+    onContainsMouseChanged: {
+        console.log("onContainsMouseChanged", containsMouse, text);
+
+        if (!containsMouse){
+            tp.closeTooltip();
+        }
+        else{
+            if (!tp.openST && tp.text !== "" ){
+                tp.openTooltip(root.mouseArea.mouseX, -tp.componentHeight);
+            }
         }
     }
 
-    Connections {
-        id: conn;
-
-        target: root.mouseArea;
-        enabled: root.mouseArea;
-
-        function onPositionChanged(){
-            if(tp.text !== "" && root.mouseArea.enabled){
-                if(root.mouseArea.containsMouse){
-                    if (!tp.openST){
-                        tp.openTooltip(root.mouseArea.mouseX, root.mouseArea.height);
-                    }
-                }
-            }
-        }
-
-        function onContainsMouseChanged(){
-            if (tp.openST && !root.mouseArea.containsMouse){
-                tp.closeTooltip();
-            }
+    onMouseAreaChanged: {
+        if (mouseArea){
+            mouseArea.hoverEnabled = true;
         }
     }
 

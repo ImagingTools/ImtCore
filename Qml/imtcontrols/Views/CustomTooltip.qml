@@ -96,7 +96,8 @@ ControlBase {
 
     function closeTooltip(){
         if(customTooltip.openST){
-            modalDialogManager.closeDialog(customTooltip.dialogIndex);
+//            modalDialogManager.closeDialog(customTooltip.dialogIndex);
+            modalDialogManager.closeByComp(customTooltip.tooltipContentComp);
 
             customTooltip.openST = false;
         }
