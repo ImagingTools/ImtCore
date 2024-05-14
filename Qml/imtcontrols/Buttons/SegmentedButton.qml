@@ -24,6 +24,8 @@ Item {
     property alias rowAlias: row;
     property int rowCount: 0;
 
+    signal clicked(int index);
+
     onReadyChanged: {
         console.log("SegmentedButton children.length:: ", children.length)
         let count  = children.length
@@ -53,6 +55,7 @@ Item {
         }
         row.children[itemIndex].checked = true
         container.selectedIndex = itemIndex
+
     }
 
     Component {
@@ -63,6 +66,7 @@ Item {
             function onClicked(){
                 console.log("sender", itemIndex, row.children[itemIndex])
                 container.setChecked(itemIndex)
+                container.clicked(itemIndex)
             }
         }
     }
