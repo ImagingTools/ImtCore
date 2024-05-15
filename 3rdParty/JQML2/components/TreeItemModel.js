@@ -22,6 +22,50 @@ class TreeItemModel extends JSONListModel {
         if(this.getPropertyValue('isUpdateEnabled')) super.$emitDataChanged(topLeft, bottomRight, roles)
     }
 
+    append(dict){
+        let copied = []
+
+        if (Array.isArray(dict)) {
+			if (dict.length === 0)
+				return
+
+            
+            for(let i = 0; i < dict.length; i++){
+                if(typeof dict[i] === 'object' && !Array.isArray(dict[i])){
+                    copied.push(dict[i])
+                } else {
+                    copied.push({'': dict[i]})
+                }
+            }
+		} else {
+            copied = dict
+        }
+
+        super.append(copied)
+    }
+
+    insert(index, dict){
+        let copied = []
+
+        if (Array.isArray(dict)) {
+			if (dict.length === 0)
+				return
+
+            
+            for(let i = 0; i < dict.length; i++){
+                if(typeof dict[i] === 'object' && !Array.isArray(dict[i])){
+                    copied.push(dict[i])
+                } else {
+                    copied.push({'': dict[i]})
+                }
+            }
+		} else {
+            copied = dict
+        }
+
+        super.insert(index, copied)
+    }
+
     addResource(resource){
         super.addResource(resource)
 
@@ -63,7 +107,13 @@ class TreeItemModel extends JSONListModel {
                 modelObject[key] = retModel
             }
 
-            if(Object.keys(retVal).length) retModel.append(retVal)
+            if(Object.keys(retVal).length) {
+                if (Array.isArray(retVal)){
+                    retModel.SetIsArray(true)
+                }
+
+                retModel.append(retVal)
+            }
 
             return  retModel
         }
@@ -404,7 +454,7 @@ class TreeItemModel extends JSONListModel {
                 retVal += ","
             }
             if (this.isArray || this.count > 1)
-                retVal += "{"
+                if(modelObject && Object.keys(modelObject).indexOf('') < 0) retVal += "{"
 
             let recurciveJSON = function(modelData){
                 if (modelData === null || modelData === undefined) {
@@ -415,7 +465,7 @@ class TreeItemModel extends JSONListModel {
                         for (let property in modelObject) {
                             if (j > 0) retVal += ","
                             j++;
-                            retVal += "\"" + property + "\":"
+                            if(property !== '') retVal += "\"" + property + "\":"
 
                             recurciveJSON(modelData[property])
                         }
@@ -435,8 +485,10 @@ class TreeItemModel extends JSONListModel {
 
             recurciveJSON(modelObject)
 
-            if (this.isArray || this.count > 1)
-                retVal += "}"
+            if (this.isArray || this.count > 1){
+                if(modelObject && Object.keys(modelObject).indexOf('') < 0) retVal += "}"
+            }
+                
         }
 
         if (this.isArray || this.count > 1)
@@ -462,7 +514,13 @@ class TreeItemModel extends JSONListModel {
                         modelObject[keys[index]] = retModel
                     }
 
-                    if(Object.keys(retVal).length) retModel.append(retVal)
+                    if(Object.keys(retVal).length) {
+                        if (Array.isArray(retVal)){
+                            retModel.SetIsArray(true)
+                        }
+
+                        retModel.append(retVal)
+                    }
                     retVal = retModel
                     retVal.updateTreeItemJSONModel()
                 }

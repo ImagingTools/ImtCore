@@ -971,10 +971,11 @@ class QVariant extends QVar {
 
 class QModelData {
     constructor(model, data, index){
-        this.index = new QInt(index)
+        // this.index = new QInt(index)
 
         Object.assign(this, typeof data === 'object' ? data : {})
         let lock = false
+        let $index = new QInt(index)
 
         return new Proxy(this, {
             has(target, name){
@@ -985,12 +986,26 @@ class QModelData {
                     return lock
                 }
 
-                let caller = global.queueLink[global.queueLink.length-1]
-                if(caller) {
-                    if(!(target[name] instanceof QProperty)) target[name] = new QVar(target[name])
-                    caller.subscribe(target[name])
+                if(name === '' && !(name in target)){
+                    return undefined
                 }
-                return target[name] instanceof QProperty ? target[name].get() : target[name]
+
+                let caller = global.queueLink[global.queueLink.length-1]
+
+                if(name === 'index' && !(name in target)){
+                    if(caller) {
+                        caller.subscribe($index)
+                    }
+
+                    return $index.get()
+                } else {
+                    if(caller) {
+                        if(!(target[name] instanceof QProperty)) target[name] = new QVar(target[name])
+                        caller.subscribe(target[name])
+                    }
+    
+                    return target[name] instanceof QProperty ? target[name].get() : target[name]
+                }
             },
             set(target, name, value){
                 if(name === '$lock'){
@@ -998,15 +1013,24 @@ class QModelData {
                     return true
                 }
 
+                if(name === '' && !(name in target)){
+                    return false
+                }
+
+                if(name === 'index' && !(name in target)){
+                    $index.reset(value)
+                    return true
+                }
+
                 if(target[name] instanceof QProperty){
                     if(target[name].value !== value){
                         target[name].reset(value)
-                        if(name !== 'index' && !lock) model.$emitDataChanged()
+                        if(!lock) model.$emitDataChanged()
                     }
                 } else {
                     if(target[name] !== value){
                         target[name] = value
-                        if(name !== 'index' && !lock) model.$emitDataChanged()
+                        if(!lock) model.$emitDataChanged()
                     } 
                 }
                 
