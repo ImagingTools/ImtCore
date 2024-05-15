@@ -98,6 +98,29 @@ FocusScope{
         }
     }
 
+    function setText(model_, role_){
+        let currText = "";
+        let count = 0;
+        let itemsCount = model_.GetItemsCount();
+        if(!itemsCount){
+            return;
+        }
+        for(var i = 0; i < itemsCount ; i++){
+            let checkSt = model_.IsValidData(role_,i) ?
+                        model_.GetData(role_, i) : Qt.Unchecked
+
+            let name_ = model_.GetData(checkBoxMenu.nameId,i);
+            if(checkSt){
+                if(currText !== ""){
+                    currText = currText + ", ";
+                }
+                currText = currText + name_;
+                count++;
+            }
+        }
+        checkBoxMenu.currentText = currText;
+    }
+
     Component {
         id: popupMenu;
 
