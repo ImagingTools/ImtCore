@@ -288,6 +288,8 @@ Item {
             if (container.dataController){
                 container.dataController.updateElements(count, offset, container.collectionFilter.filterModel);
             }
+
+            container.table.resetSelection();
         }
 
         function openPopupMenu(x, y){

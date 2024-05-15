@@ -55,7 +55,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			}
 		}
 		else{
-			SendWarningMessage(0, QString("Invalid GraphQL-context for the access token %1. Command-ID: %2.").arg(qPrintable(accessToken)).arg(qPrintable(gqlCommand)), "GraphQL - servlet");
+			SendWarningMessage(0, QString("Invalid GraphQL-context for the access token '%1'. Command-ID: '%2'.").arg(qPrintable(accessToken)).arg(qPrintable(gqlCommand)), "GraphQL - servlet");
 
 			QByteArray responseData;
 

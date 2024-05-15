@@ -381,6 +381,8 @@ StyleComponents {
             property alias textVisible: cbTitleTxt.visible;
             property alias iconVisible: cbArrowIcon.visible;
 
+            property bool isCropped: textHelper.width > cbTitleTxt.width;
+
             border.color: !baseElement ? "transparent" : baseElement.borderColor;
             border.width: 1;
 
@@ -404,6 +406,16 @@ StyleComponents {
                 elide: Text.ElideRight;
             }
 
+            Text {
+                id: textHelper;
+
+                text: cbTitleTxt.text;
+                font.family: cbTitleTxt.font.family;
+                font.pixelSize: cbTitleTxt.font.pixelSize;
+
+                visible: false;
+            }
+
             Image {
                 id: cbArrowIcon;
 
@@ -421,8 +433,14 @@ StyleComponents {
                 sourceSize.width: width;
                 sourceSize.height: height;
             }
-        }
 
+            TooltipArea {
+                id: tooltipArea;
+
+                mouseArea: !cbMainRect.baseElement ? null : cbMainRect.baseElement.mouseArea;
+                text: (!cbMainRect.baseElement || !cbMainRect.isCropped) ? "" : cbTitleTxt.text;
+            }
+        }
     }
 
     Component {

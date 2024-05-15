@@ -44,7 +44,6 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 	}
 
 	QByteArray commandId = gqlRequest.GetCommandId();
-	qDebug() << "Command-ID" << commandId;
 
 	imtgql::CGqlRequest sessionGqlRequest(imtgql::CGqlRequest::RT_QUERY, "GetSessionInfo");
 	imtgql::CGqlObject inputParams("input");
