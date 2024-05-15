@@ -109,7 +109,12 @@ class FileDialog extends Item {
     }
 
     open(){
-        this.getProperty('visible').reset(true)
+        if(this.getPropertyValue('fileMode') === FileDialog.SaveFile) {
+            if(this.$signals.accepted) this.$signals.accepted()
+        } else {
+            this.getProperty('visible').reset(true)
+        }
+        
     }
 
     destroy(){
