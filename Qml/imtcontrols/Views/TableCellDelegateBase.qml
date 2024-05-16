@@ -12,12 +12,13 @@ Item {
     width: rowDelegate ? rowDelegate.width/rowDelegate.columnCount : 0;
 
     property int columnCount: rowDelegate && rowDelegate.tableItem ? rowDelegate.tableItem.columnCount : 0;
-
+    property int rowCount: rowDelegate && rowDelegate.tableItem ? rowDelegate.tableItem.elementsCount : 0;
     property real textLeftIndent: 0
     property real textRightIndent: 0
 
     property int columnIndex: -1
     property int rowIndex: rowDelegate ? rowDelegate.rowIndex : -1;
+    property bool ready: rowCount && rowIndex > -1;
 
     Component.onDestruction: {
         if (rowDelegate && rowDelegate.tableItem){
@@ -25,22 +26,46 @@ Item {
         }
     }
 
+    onReadyChanged:  {
+        if(!ready){
+            return;
+        }
+        if (delegateContainer.rowDelegate.horizontalBorderSize){
+            if(delegateContainer.rowCount && delegateContainer.rowIndex > 0 && delegateContainer.rowIndex < delegateContainer.rowCount){
+                topBorder.createObject(delegateContainer)
+                //console.log("createTop__")
+            }
+            else if(delegateContainer.rowDelegate.visibleTopBorderFirst && delegateContainer.rowIndex == 0 && delegateContainer.rowCount){
+                topBorder.createObject(delegateContainer)
+                //console.log("createTop")
+            }
+        }
+        if (delegateContainer.rowDelegate.horizontalBorderSize){
+            if(delegateContainer.rowDelegate.visibleBottomBorderLast && delegateContainer.rowIndex == delegateContainer.rowCount -1){
+                bottomBorder.createObject(delegateContainer)
+                //console.log("createBottom")
+            }
+        }
+    }
 
-    onRowDelegateChanged: {
+    onColumnCountChanged:  {
         if (!delegateContainer.rowDelegate){
             return
         }
-        if (delegateContainer.rowDelegate.visibleTopBorderFirst){
-            topBorder.createObject(delegateContainer)
+
+
+        if (delegateContainer.rowDelegate.verticalBorderSize){
+            if(delegateContainer.columnIndex > 0){
+                leftBorder.createObject(delegateContainer)
+            }
+            else if(columnIndex == 0 && delegateContainer.rowDelegate.visibleLeftBorderFirst){
+                leftBorder.createObject(delegateContainer)
+            }
         }
-        if (delegateContainer.rowDelegate.visibleBottomBorderLast){
-            bottomBorder.createObject(delegateContainer)
-        }
-        if (delegateContainer.rowDelegate.visibleLeftBorderFirst){
-            leftBorder.createObject(delegateContainer)
-        }
-        if (delegateContainer.rowDelegate.visibleRightBorderLast){
-            rightBorder.createObject(delegateContainer)
+        if (delegateContainer.rowDelegate.verticalBorderSize){
+            if((delegateContainer.columnIndex == delegateContainer.columnCount -1) && delegateContainer.rowDelegate.visibleRightBorderLast){
+                rightBorder.createObject(delegateContainer)
+            }
         }
 
         // let emptyDecorCell = delegateContainer.rowDelegate.tableItem.emptyDecorCell
@@ -84,7 +109,9 @@ Item {
             anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.visibleTopBorderFirst  ? delegateContainer.rowDelegate.horizontalBorderSize : 0 : 0;
+            height: !delegateContainer.rowDelegate ? 0 :
+                                                     (delegateContainer.rowIndex > 0 && delegateContainer.rowIndex < delegateContainer.rowCount) ? delegateContainer.rowDelegate.horizontalBorderSize :
+                                                                                                                                                   (delegateContainer.rowIndex == 0 && delegateContainer.rowDelegate.visibleTopBorderFirst) ? delegateContainer.rowDelegate.horizontalBorderSize : 0;
             color: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.borderColorHorizontal : "transparent";
         }
     }
@@ -97,6 +124,7 @@ Item {
             anchors.right: parent.right;
             height: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.visibleBottomBorderLast ? delegateContainer.rowDelegate.horizontalBorderSize : 0 : 0;
             color:  delegateContainer.rowDelegate ? delegateContainer.rowDelegate.borderColorHorizontal : "transparent";
+
         }
     }
 
@@ -106,6 +134,7 @@ Item {
             anchors.left: parent.left;
             anchors.top: parent.top;
             anchors.bottom: parent.bottom;
+            z: -1;
             width: delegateContainer.rowDelegate ?
                        delegateContainer.rowDelegate.isRightBorder ? delegateContainer.rowDelegate.verticalBorderSize * delegateContainer.rowDelegate.visibleLeftBorderFirst * (delegateContainer.columnIndex == 0)
                                                                                : delegateContainer.rowDelegate.visibleLeftBorderFirst ? delegateContainer.rowDelegate.verticalBorderSize : delegateContainer.columnIndex > 0 ? delegateContainer.rowDelegate.verticalBorderSize : 0
@@ -115,11 +144,12 @@ Item {
     }
 
     Component{
+        id: rightBorder;
         Rectangle{
-            id: rightBorder;
             anchors.right: parent.right;
             anchors.top: parent.top;
             anchors.bottom: parent.bottom;
+            z: -2;
             width: delegateContainer.rowDelegate ?
                        !delegateContainer.rowDelegate.isRightBorder ?
                            delegateContainer.rowDelegate.verticalBorderSize * delegateContainer.rowDelegate.visibleRightBorderLast  * (delegateContainer.columnIndex == (delegateContainer.columnCount -1)) * (delegateContainer.columnCount > 0) :
