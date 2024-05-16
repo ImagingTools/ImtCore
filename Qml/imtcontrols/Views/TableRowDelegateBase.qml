@@ -48,7 +48,7 @@ Rectangle {
     property bool visibleTopBorderFirst: false;
     property bool visibleBottomBorderLast: true;
 
-    property bool canSetBorderParams: false;
+    property bool canSetBorderParams: tableItem ? tableItem.canSetBorderParams : false;
     property int wrapMode: tableItem ? tableItem.wrapMode_deleg : Text.NoWrap;
     property int elideMode: Text.ElideRight;
     property bool isRightBorder: false;
@@ -201,6 +201,7 @@ Rectangle {
     }
 
     function setBorderParams(){
+        //console.log("SET_BORDER")
         if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("BorderColorHorizontal")){
             tableDelegateContainer.borderColorHorizontal = tableDelegateContainer.tableItem.cellDecorator.GetData("BorderColorHorizontal");
         }
