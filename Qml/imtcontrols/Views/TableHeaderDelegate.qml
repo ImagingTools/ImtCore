@@ -74,6 +74,7 @@ Item{
         anchors.left: parent.left;
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
+        z: -1;
         width: headerDelegate.tableItem.isRightBorder ? headerDelegate.tableItem.verticalBorderSize * headerDelegate.tableItem.visibleLeftBorderFirst * (headerDelegate.columnIndex == 0)
                                             : headerDelegate.tableItem.visibleLeftBorderFirst ? headerDelegate.tableItem.verticalBorderSize : headerDelegate.columnIndex > 0 ? headerDelegate.tableItem.verticalBorderSize : 0;
         color:  headerDelegate.tableItem.borderColorVertical;
@@ -84,6 +85,7 @@ Item{
         anchors.right: parent.right;
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
+        z: -2;
         width: !headerDelegate.tableItem.isRightBorder ?
                    headerDelegate.tableItem.verticalBorderSize * headerDelegate.tableItem.visibleRightBorderLast  * (headerDelegate.columnIndex == (headerDelegate.columnCount -1)) * (headerDelegate.columnCount > 0) :
                    headerDelegate.tableItem.visibleRightBorderLast ? headerDelegate.tableItem.verticalBorderSize  :
