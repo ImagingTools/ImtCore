@@ -467,25 +467,54 @@ class ListView extends Flickable {
 
         let obj = undefined
 
-            let ctx = new ContextController(this.getProperty('delegate').get().$exCtx, this.$exCtx)
-            let createObject = this.getProperty('delegate').get().createObject
-            let cls = this.getProperty('delegate').get().constructor
-            
-            if(typeof this.getPropertyValue('model') === 'number'){
-                obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, {index: index}, false) : new cls(this.getProperty('contentItem').get(),ctx, {index: index})
+        let ctx = new ContextController(this.getProperty('delegate').get().$exCtx, this.$exCtx)
+        let createObject = this.getProperty('delegate').get().createObject
+        let cls = this.getProperty('delegate').get().constructor
+        
+        if(typeof this.getPropertyValue('model') === 'number'){
+            obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, {index: index}, false) : new cls(this.getProperty('contentItem').get(),ctx, {index: index})
 
-                this.$items[index] = obj
-            } else {
-                let model = this.getPropertyValue('model').getPropertyValue('data')[index]
-                obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, model, false) : new cls(this.getProperty('contentItem').get(),ctx, model)
+            this.$items[index] = obj
+        } else {
+            let model = this.getPropertyValue('model').getPropertyValue('data')[index]
+            obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, model, false) : new cls(this.getProperty('contentItem').get(),ctx, model)
 
-                this.$items[index] = obj   
+            this.$items[index] = obj   
+        }
+
+        for(let update of updateList.splice(0, updateList.length)){
+            update()
+        }
+
+        if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
+            obj.setStyle({
+                visibility: 'hidden'
+            })
+        } else {
+            obj.setStyle({
+                visibility: 'visible'
+            })
+        }
+    
+        obj.getProperty('x').getNotify().connect(()=>{
+            if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                let index = this.$items.indexOf(obj)
+                if(index >= 0 && this.$items[index+1]){
+                    this.$items[index+1].getProperty('x').reset(this.$items[index].getPropertyValue('x')+this.$items[index].getPropertyValue('width'))
+                }
             }
-
-            for(let update of updateList.splice(0, updateList.length)){
-                update()
+            this.$updateGeometry()
+        })
+        obj.getProperty('y').getNotify().connect(()=>{
+            if(this.getPropertyValue('orientation') === ListView.Vertical){
+                let index = this.$items.indexOf(obj)
+                if(index >= 0 && this.$items[index+1]){
+                    this.$items[index+1].getProperty('y').reset(this.$items[index].getPropertyValue('y')+this.$items[index].getPropertyValue('height'))
+                }
             }
-
+            this.$updateGeometry()
+        })
+        obj.getProperty('width').getNotify().connect(()=>{
             if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
                 obj.setStyle({
                     visibility: 'hidden'
@@ -495,61 +524,32 @@ class ListView extends Flickable {
                     visibility: 'visible'
                 })
             }
-    
-            obj.getProperty('x').getNotify().connect(()=>{
-                if(this.getPropertyValue('orientation') === ListView.Horizontal){
-                    let index = this.$items.indexOf(obj)
-                    if(index >= 0 && this.$items[index+1]){
-                        this.$items[index+1].getProperty('x').reset(this.$items[index].getPropertyValue('x')+this.$items[index].getPropertyValue('width'))
-                    }
+            if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                let index = this.$items.indexOf(obj)
+                if(index >= 0 && this.$items[index+1]){
+                    this.$items[index+1].getProperty('x').reset(obj.getPropertyValue('x')+obj.getPropertyValue('width')+this.getPropertyValue('spacing'))
                 }
-                this.$updateGeometry()
-            })
-            obj.getProperty('y').getNotify().connect(()=>{
-                if(this.getPropertyValue('orientation') === ListView.Vertical){
-                    let index = this.$items.indexOf(obj)
-                    if(index >= 0 && this.$items[index+1]){
-                        this.$items[index+1].getProperty('y').reset(this.$items[index].getPropertyValue('y')+this.$items[index].getPropertyValue('height'))
-                    }
+            }
+            this.$updateGeometry()
+        })
+        obj.getProperty('height').getNotify().connect(()=>{
+            if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
+                obj.setStyle({
+                    visibility: 'hidden'
+                })
+            } else {
+                obj.setStyle({
+                    visibility: 'visible'
+                })
+            }
+            if(this.getPropertyValue('orientation') === ListView.Vertical){
+                let index = this.$items.indexOf(obj)
+                if(index >= 0 && this.$items[index+1]){
+                    this.$items[index+1].getProperty('y').reset(obj.getPropertyValue('y')+obj.getPropertyValue('height')+this.getPropertyValue('spacing'))
                 }
-                this.$updateGeometry()
-            })
-            obj.getProperty('width').getNotify().connect(()=>{
-                if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
-                    obj.setStyle({
-                        visibility: 'hidden'
-                    })
-                } else {
-                    obj.setStyle({
-                        visibility: 'visible'
-                    })
-                }
-                if(this.getPropertyValue('orientation') === ListView.Horizontal){
-                    let index = this.$items.indexOf(obj)
-                    if(index >= 0 && this.$items[index+1]){
-                        this.$items[index+1].getProperty('x').reset(this.$items[index].getPropertyValue('x')+this.$items[index].getPropertyValue('width'))
-                    }
-                }
-                this.$updateGeometry()
-            })
-            obj.getProperty('height').getNotify().connect(()=>{
-                if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
-                    obj.setStyle({
-                        visibility: 'hidden'
-                    })
-                } else {
-                    obj.setStyle({
-                        visibility: 'visible'
-                    })
-                }
-                if(this.getPropertyValue('orientation') === ListView.Vertical){
-                    let index = this.$items.indexOf(obj)
-                    if(index >= 0 && this.$items[index+1]){
-                        this.$items[index+1].getProperty('y').reset(this.$items[index].getPropertyValue('y')+this.$items[index].getPropertyValue('height'))
-                    }
-                }
-                this.$updateGeometry()
-            })
+            }
+            this.$updateGeometry()
+        })
 
 
         obj.getProperty('x').reset(info.x)
