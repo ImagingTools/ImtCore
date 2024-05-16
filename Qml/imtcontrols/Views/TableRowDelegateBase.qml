@@ -56,6 +56,8 @@ Rectangle {
 
     property string maxLengthText: '';
 
+    property string cellColor: "transparent";
+
     property int textMarginHor: 8;
     property int textLeftMargin: 8;
     property int textRightMargin: 8;
@@ -235,6 +237,10 @@ Rectangle {
         if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("ElideMode")){
             tableDelegateContainer.elideMode = tableDelegateContainer.tableItem.cellDecorator.GetData("ElideMode");
         }
+        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("Color")){
+            tableDelegateContainer.cellColor = tableDelegateContainer.tableItem.cellDecorator.GetData("Color");
+        }
+
     }
 
     function setHeightModelElememt(index_,height_){

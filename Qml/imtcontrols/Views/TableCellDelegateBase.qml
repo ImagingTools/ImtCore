@@ -53,6 +53,9 @@ Item {
             return
         }
 
+        if (delegateContainer.rowDelegate.cellColor !== "transparent"){
+                cellBackground.createObject(delegateContainer)
+        }
 
         if (delegateContainer.rowDelegate.verticalBorderSize){
             if(delegateContainer.columnIndex > 0){
@@ -102,6 +105,15 @@ Item {
         delegateContainer.rowDelegate.tableItem.widthRecalc.connect(delegateContainer.setCellWidth)
     }
 
+
+    Component{
+        id: cellBackground;
+        Rectangle{
+            anchors.fill: parent;
+            z:-3;
+            color:  delegateContainer.rowDelegate ? delegateContainer.rowDelegate.cellColor : "transparent";
+        }
+    }
 
     Component{
         id: topBorder;
