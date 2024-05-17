@@ -22,10 +22,18 @@ class Column extends Item {
         let h = 0
         for(let i = 0; i < children.length; i++){
             if(children[i].getPropertyValue('visible')){
+                if(children[i] instanceof Repeater) continue
                 w = Math.max(w, children[i].getPropertyValue('width'))
                 if(children[i].getPropertyValue('width') > 0 && children[i].getPropertyValue('height') > 0){
                     h += children[i].getPropertyValue('height')
-                    if(i < children.length - 1 && children[i+1].getPropertyValue('width') > 0 && children[i+1].getPropertyValue('height') > 0){
+                    let find = false
+                    for(let k = i + 1; k < children.length; k++){
+                        if(children[k] instanceof Repeater) continue
+                        if(children[k].getPropertyValue('width') > 0 && children[k].getPropertyValue('height') > 0){
+                            find = true
+                        }
+                    }
+                    if(i < children.length - 1 && find){
                         h += this.getPropertyValue('spacing')
                         children[i].setStyle({
                             marginBottom: `${this.getPropertyValue('spacing')}px`

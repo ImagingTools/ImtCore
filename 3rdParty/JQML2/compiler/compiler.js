@@ -1220,7 +1220,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         }
         
         stat.value.unshift('try{TransactionController.begin();')
-        stat.value.push('}catch{}finally{TransactionController.end()}')
+        stat.value.push('}catch(error){console.error(error)}finally{TransactionController.end()}')
         if(linkedProperty){
             code.push(`${currentInstructions.name}.getStatement('${name}').getNotify().connect(${currentInstructions.name}, function(){${stat.value.join('')}})`)
         } else {
@@ -1248,7 +1248,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         let index = stat.value.indexOf('{')
         if(index >= 0){
             stat.value.splice(index+1,0,'try{TransactionController.begin();')
-            stat.value.splice(stat.value.length-1,0,'}catch{}finally{TransactionController.end()}')
+            stat.value.splice(stat.value.length-1,0,'}catch(error){console.error(error)}finally{TransactionController.end()}')
         }
         code.push(`${currentInstructions.name}.${name}=${stat.value.join('')}`)
     }
@@ -1451,7 +1451,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         }
         
         stat.value.unshift('try{TransactionController.begin();')
-        stat.value.push('}catch{}finally{TransactionController.end()}')
+        stat.value.push('}catch(error){console.error(error)}finally{TransactionController.end()}')
         
         if(linkedProperty){
             code.push(`${currentInstructions.name}.getStatement('${name}').getNotify().connect(${currentInstructions.name}, function(){${stat.value.join('')}})`)

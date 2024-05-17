@@ -18,10 +18,18 @@ class Row extends Item {
         let h = 0
         for(let i = 0; i < children.length; i++){
             if(children[i].getPropertyValue('visible')){
+                if(children[i] instanceof Repeater) continue
                 h = Math.max(h, children[i].getPropertyValue('height'))
                 if(children[i].getPropertyValue('width') > 0 && children[i].getPropertyValue('height') > 0){
                     w += children[i].getPropertyValue('width')
-                    if(i < children.length - 1 && children[i+1].getPropertyValue('width') > 0 && children[i+1].getPropertyValue('height') > 0){
+                    let find = false
+                    for(let k = i + 1; k < children.length; k++){
+                        if(children[k] instanceof Repeater) continue
+                        if(children[k].getPropertyValue('width') > 0 && children[k].getPropertyValue('height') > 0){
+                            find = true
+                        }
+                    }
+                    if(i < children.length - 1 && find){
                         w += this.getPropertyValue('spacing')
                         children[i].setStyle({
                             marginRight: `${this.getPropertyValue('spacing')}px`

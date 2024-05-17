@@ -307,15 +307,19 @@ class Item extends QtObject {
     }
 
     $opacityChanged(){
-        if(this.getPropertyValue('opacity') > 0){
-            this.setStyle({
-                opacity: 1
-            })
-        } else {
-            this.setStyle({
-                opacity: 0
-            })
-        }
+        // if(this.getPropertyValue('opacity') > 0){
+        //     this.setStyle({
+        //         opacity: 1
+        //     })
+        // } else {
+        //     this.setStyle({
+        //         opacity: 0
+        //     })
+        // }
+
+        this.setStyle({
+            opacity: this.getPropertyValue('opacity')
+        })
     }
 
     $keyNavigationChanged(){

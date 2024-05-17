@@ -358,6 +358,9 @@ class QColor extends QProperty {
     }
     
     typeCasting(value){
+        if(value === undefined) throw 'Cannot assign [undefined] to QColor'
+        if(typeof value === 'object') throw 'Cannot assign QJSValue to QColor'
+        if(value === null) throw 'Cannot assign [null] to QColor'
         return value
     }
 }

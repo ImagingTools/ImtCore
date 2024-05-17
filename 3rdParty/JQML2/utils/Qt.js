@@ -589,6 +589,171 @@ var Qt = {
 
         return `#${_r}${_g}${_b}${_a}`
     },
+    rgbToHsl(r, g, b) {
+        r /= 255, g /= 255, b /= 255;
+      
+        var max = Math.max(r, g, b), min = Math.min(r, g, b);
+        var h, s, l = (max + min) / 2;
+      
+        if (max == min) {
+          h = s = 0;
+        } else {
+          var d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+          switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+          }
+      
+          h /= 6;
+        }
+      
+        return [ h, s, l ];
+    },
+    hslToRgb(h, s, l) {
+        var r, g, b;
+      
+        if (s == 0) {
+          r = g = b = l; // achromatic
+        } else {
+          function hue2rgb(p, q, t) {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+          }
+      
+          var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+          var p = 2 * l - q;
+      
+          r = hue2rgb(p, q, h + 1/3);
+          g = hue2rgb(p, q, h);
+          b = hue2rgb(p, q, h - 1/3);
+        }
+      
+        return [ r * 255, g * 255, b * 255 ];
+    },
+    rgbToHsv(r, g, b) {
+        r /= 255, g /= 255, b /= 255;
+      
+        var max = Math.max(r, g, b), min = Math.min(r, g, b);
+        var h, s, v = max;
+      
+        var d = max - min;
+        s = max == 0 ? 0 : d / max;
+      
+        if (max == min) {
+          h = 0; // achromatic
+        } else {
+          switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+          }
+      
+          h /= 6;
+        }
+      
+        return [ h, s, v ];
+    },
+    hsvToRgb(h, s, v) {
+        var r, g, b;
+      
+        var i = Math.floor(h * 6);
+        var f = h * 6 - i;
+        var p = v * (1 - s);
+        var q = v * (1 - f * s);
+        var t = v * (1 - (1 - f) * s);
+      
+        switch (i % 6) {
+          case 0: r = v, g = t, b = p; break;
+          case 1: r = q, g = v, b = p; break;
+          case 2: r = p, g = v, b = t; break;
+          case 3: r = p, g = q, b = v; break;
+          case 4: r = t, g = p, b = v; break;
+          case 5: r = v, g = p, b = q; break;
+        }
+      
+        return [ r * 255, g * 255, b * 255 ];
+    },
+    toRGBA(value){
+        if(!value){
+            return {
+                r: 255,
+                g: 255,
+                b: 255,
+                a: 0,
+            }
+        }
+        let hexColor = '#ffffff'
+        let alpha = false
+
+        if(value[0] === '#') {
+            if(value.length === 4){
+                hexColor = `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}`
+            } else if(value.length === 7) {
+                hexColor = value
+            } else if(value.length === 5) {
+                alpha = true
+                hexColor = `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}${value[4]}${value[4]}`
+            } else if(value.length === 9) {
+                alpha = true
+                hexColor = value
+            } else {
+                hexColor = value
+            }
+        } else {
+            return {
+                r: 255,
+                g: 255,
+                b: 255,
+                a: 0,
+            }
+        }
+        
+        if(alpha){
+            return {
+                r: parseInt(hexColor[3]+hexColor[4], 16),
+                g: parseInt(hexColor[5]+hexColor[6], 16),
+                b: parseInt(hexColor[7]+hexColor[8], 16),
+                a: parseInt(hexColor[1]+hexColor[2], 16)/255,
+            }
+        } else {
+            return {
+                r: parseInt(hexColor[1]+hexColor[2], 16),
+                g: parseInt(hexColor[3]+hexColor[4], 16),
+                b: parseInt(hexColor[5]+hexColor[6], 16),
+                a: 1,
+            }
+        }
+        
+
+    },
+    darker(baseColor, factor = 1.5){
+        let rgba = this.toRGBA(baseColor)
+        let hsv = this.rgbToHsv(rgba.r, rgba.g, rgba.b)
+        rgba = this.hsvToRgb(hsv[0], hsv[0], hsv[0] / factor)
+        let rh = rgba[0] > 15 ? rgba[0].toString(16) : '0' + rgba[0].toString(16)
+        let gh = rgba[1] > 15 ? rgba[1].toString(16) : '0' + rgba[1].toString(16)
+        let bh = rgba[2] > 15 ? rgba[2].toString(16) : '0' + rgba[2].toString(16)
+        return `#${rh}${gh}${bh}`
+    },
+    lighter(baseColor, factor = 2.0){
+        let rgba = this.toRGBA(baseColor)
+        let hsv = this.rgbToHsv(rgba.r, rgba.g, rgba.b)
+        rgba = this.hsvToRgb(hsv[0], hsv[0], hsv[0] * factor)
+        let rh = rgba[0] > 15 ? rgba[0].toString(16) : '0' + rgba[0].toString(16)
+        let gh = rgba[1] > 15 ? rgba[1].toString(16) : '0' + rgba[1].toString(16)
+        let bh = rgba[2] > 15 ? rgba[2].toString(16) : '0' + rgba[2].toString(16)
+        return `#${rh}${gh}${bh}`
+    },
+    tint(baseColor, tintColor){
+
+    },
     openUrlExternally: function(url){
         return window.open(url, '_blank')
     },

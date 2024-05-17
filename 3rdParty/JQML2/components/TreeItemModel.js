@@ -423,8 +423,18 @@ class TreeItemModel extends JSONListModel {
         if (this.getPropertyValue('isUpdateEnabled')){
             this.modelChanged()
         }
+    } 
+
+    IsTreeModel(key, index){
+        return this.GetTreeItemModel(key, index) != null
     }
 
+    GetTreeItemModel(key, index){
+        let data = this.GetData(key, index)
+        if(data !== null || data !== undefined) return data
+
+        return null
+    }
 
     AddTreeModel(key, row){
         let retModel = new TreeItemModel(this)
