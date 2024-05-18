@@ -354,7 +354,6 @@ class TreeItemModel extends JSONListModel {
         if(this.count > 0){
             let modelObject = this.get(index)
             for(let key in modelObject){
-                if(key === 'index' || key === 'model' || key === 'context') continue
                 keys.push(key)
             }
         }

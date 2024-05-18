@@ -369,6 +369,11 @@ class QBool extends QProperty {
     getDefaultValue(){
         return false
     }
+
+    typeCasting(value){
+        if(value === undefined) throw 'Cannot assign [undefined] to QBool'
+        return value ? true : false
+    }
 }
 
 class QLinkedBool extends QBool {
@@ -982,7 +987,7 @@ class QModelData {
 
         return new Proxy(this, {
             has(target, name){
-                return true
+                return name in target
             },
             get(target, name){
                 if(name === '$lock'){
