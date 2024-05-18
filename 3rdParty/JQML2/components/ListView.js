@@ -185,12 +185,23 @@ class ListView extends Flickable {
         this.$clear()
 
         let model = this.getPropertyValue('model')
+        let length = 0 
 
         if(model instanceof ListModel){     
             this.$connectModel(model)
+            length = model.getPropertyValue('count')
+        } else if(typeof model === 'number'){
+            length = model
         }
 
+        let countChanged = this.getPropertyValue('count') !== length
+        this.getProperty('count').value = length
+
         this.$updateView()
+
+        if(countChanged && this.getProperty('count').notify){
+            this.getProperty('count').notify()
+        }
     }
 
     $delegateChanged(){
@@ -220,9 +231,6 @@ class ListView extends Flickable {
         }
 
         if(length === 0) return
-
-        let countChanged = this.getPropertyValue('count') !== length
-        this.getProperty('count').value = length
 
         let firstIndex = 0
         let lastIndex = 0
@@ -255,11 +263,6 @@ class ListView extends Flickable {
                 this.$items[i] = undefined
             }
         }
-
-        if(countChanged && this.getProperty('count').notify){
-            this.getProperty('count').notify()
-        }
-
     }
 
     $updateGeometry(){
