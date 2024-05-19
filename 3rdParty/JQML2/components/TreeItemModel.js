@@ -83,11 +83,6 @@ class TreeItemModel extends JSONListModel {
         return this.count
     }
 
-    GetTreeItemModel(key, row){
-        let model = this.GetData(key, row);
-        return model && typeof model === 'object' && model instanceof TreeItemModel ? model : null
-    }
-
     GetData(key, row){
         if(row === undefined || row === null) row = 0
 
@@ -430,7 +425,7 @@ class TreeItemModel extends JSONListModel {
 
     GetTreeItemModel(key, index){
         let data = this.GetData(key, index)
-        if(data !== null || data !== undefined) return data
+        if(data instanceof TreeItemModel) return data
 
         return null
     }
