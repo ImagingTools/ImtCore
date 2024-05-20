@@ -143,6 +143,16 @@ class ListView extends Flickable {
                             this.$createElement(i, info)
                         }
                     }
+                    for(let i = bottomRight; i < this.$items.length; i++){
+                        let info = this.$getItemInfo(i)
+                        if(!info.inner && info.exist){
+                            let removed = this.$items.splice(i, this.$items.length - i)
+                            for(let item of removed){
+                                if(item) item.destroy()
+                            } 
+                            break
+                        }
+                    }
                 } else if(roles === 'remove'){
                     let removed = this.$items.splice(leftTop, bottomRight - leftTop)
 
@@ -196,6 +206,7 @@ class ListView extends Flickable {
 
         let countChanged = this.getPropertyValue('count') !== length
         this.getProperty('count').value = length
+        this.getProperty('count').reset(length)
 
         this.$updateView()
 
