@@ -23,7 +23,7 @@ WebSocket {
     }
 
     onStatusChanged: {
-        console.log("SubscriptionManager onStatusChanged", status)
+        console.log("onStatusChanged", status);
 
         if (status == WebSocket.Error){
             console.error("SubscriptionManager ERROR", errorString)
@@ -51,18 +51,12 @@ WebSocket {
         interval: 4000;
 
         repeat: true;
-        running: true;
+        running: container.status == WebSocket.Closed ||
+                 container.status == WebSocket.Error;
 
         onTriggered: {
-            if (container.status == WebSocket.Closed ||
-                container.status == WebSocket.Error){
-                container.reconnect()
-            }
+            container.reconnect()
         }
-    }
-
-    onUrlChanged: {
-        console.log("SubscriptionManager onUrlChanged", url)
     }
 
     onTextMessageReceived:{
@@ -134,13 +128,18 @@ WebSocket {
     }
 
     function registerSubscription(query, subscriptionClient){
+        let commandId = query.GetCommandId()
+        if (commandId === ""){
+            console.error("Unable to register subscription with empty command-ID")
+            return;
+        }
+
         for (let index = 0; index < subscriptionModel.length; index++){
             if (subscriptionModel[index]["subscription"] === subscriptionClient){
                 return;
             }
         }
 
-        let commandId = query.GetCommandId()
         subscriptionModel.push(
                     {
                         "commandId": commandId,

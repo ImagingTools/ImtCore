@@ -63,6 +63,10 @@ DocumentDataController {
 
     property SubscriptionClient subscriptionClient: SubscriptionClient {
         function register(){
+            if (container.subscriptionCommandId === ""){
+                console.warn("Unable to register subscription for document because command-ID is empty");
+                return;
+            }
 
             let subscriptionRequestId = container.subscriptionCommandId;
             var query = Gql.GqlRequest("subscription", subscriptionRequestId);

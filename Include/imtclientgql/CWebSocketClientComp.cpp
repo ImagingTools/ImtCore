@@ -25,6 +25,7 @@ namespace imtclientgql
 CWebSocketClientComp::CWebSocketClientComp()
 	:m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
 {
+	m_lastSocketError = QAbstractSocket::SocketError::UnknownSocketError;
 }
 
 
@@ -222,11 +223,15 @@ void CWebSocketClientComp::OnWebSocketDisconnected()
 }
 
 
-void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError /*error*/)
+void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError error)
 {
-	QString errorText = m_webSocket.errorString();
+	if (m_lastSocketError != error){
+		QString errorText = m_webSocket.errorString();
 
-	SendErrorMessage(0, errorText, "CWebSocketClientComp");
+		SendErrorMessage(0, errorText, "CWebSocketClientComp");
+
+		m_lastSocketError = error;
+	}
 }
 
 

@@ -219,15 +219,12 @@ CollectionView {
                 var queryFields = Gql.GqlObject("notification");
                 queryFields.InsertField("Id");
                 query.AddField(queryFields);
-                console.log("RegisterSubscription", subscriptionRequestId);
 
                 Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
             }
         }
 
         onStateChanged: {
-            console.log("SubscriptionClient onStateChanged", state);
-
             if (state === "Ready"){
                 if (subscriptionClient.ContainsKey("data")){
                     let dataModelLocal = subscriptionClient.GetData("data")
