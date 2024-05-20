@@ -43,7 +43,8 @@ RemoteCollectionView {
                         contextMenuModel.SetData("Icon", "Icons/Delete", index);
                     }
 
-                    if (canEdit){
+                    let ok = PermissionsController.checkPermission("ChangeAccountDescription");
+                    if (ok){
                         let index = contextMenuModel.InsertNewItem();
 
                         contextMenuModel.SetData("Id", "SetDescription", index);

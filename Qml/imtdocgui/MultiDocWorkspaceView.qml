@@ -84,7 +84,7 @@ DocumentManager {
 
         height: visible ? 40: 0;
 
-        visible: alertPanel.item;
+        visible: alertPanel.item != null && alertPanel.item !== undefined;
     }
 
     Repeater {
