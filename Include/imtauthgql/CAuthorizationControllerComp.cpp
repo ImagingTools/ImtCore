@@ -23,6 +23,8 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
+	QByteArray login;
+
 	if (m_userCollectionCompPtr.IsValid()){
 		const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParam("input");
 		if (gqlInputParamPtr == nullptr){
@@ -34,7 +36,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 
 		QByteArray productId = gqlInputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
 
-		QByteArray login = gqlInputParamPtr->GetFieldArgumentValue("Login").toByteArray();
+		login = gqlInputParamPtr->GetFieldArgumentValue("Login").toByteArray();
 		QByteArray password = gqlInputParamPtr->GetFieldArgumentValue("Password").toByteArray();
 
 		QByteArray passwordHash;
@@ -56,7 +58,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 			QByteArray userObjectId = userIds[0];
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
-				const imtauth::CUserInfo* userInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
+				imtauth::CUserInfo* userInfoPtr = dynamic_cast<imtauth::CUserInfo*>(dataPtr.GetPtr());
 				if (userInfoPtr != nullptr){
 					QByteArray userPassword = userInfoPtr->GetPasswordHash();
 					if (userPassword == passwordHash){
@@ -79,6 +81,12 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 							m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.PopPtr(), tokenValue);
 						}
 
+						userInfoPtr->SetLastConnection(QDateTime::currentDateTimeUtc());
+
+						if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr)){
+							SendWarningMessage(0, QString("Unable to update an user with ID: '%1'").arg(userObjectId), "imtgql::CAuthorizationControllerComp");
+						}
+
 						return rootModelPtr.PopPtr();
 					}
 				}
@@ -86,8 +94,8 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 		}
 	}
 
-	SendWarningMessage(0, QString("Invalid login or password"), "imtgql::CAuthorizationControllerComp");
-	errorMessage = QT_TR_NOOP("Invalid login or password");
+	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'.").arg(login));
+	SendWarningMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 
 	imtbase::CTreeItemModel* errorsItemModelPtr = rootModelPtr->AddTreeModel("errors");
 	errorsItemModelPtr->SetData("message", errorMessage);

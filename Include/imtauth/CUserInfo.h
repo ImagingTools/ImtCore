@@ -16,6 +16,8 @@ class CUserInfo: virtual public IUserInfo, public CUserBaseInfo
 public:
 	typedef CUserBaseInfo BaseClass;
 
+	void SetLastConnection(const QDateTime& lastConnection);
+
 	// reimplemented (iser::IUserInfo)
 	virtual QByteArray GetPasswordHash() const override;
 	virtual void SetPasswordHash(const QByteArray& passwordHash) override;
@@ -27,6 +29,7 @@ public:
 	virtual bool RemoveFromGroup(const QByteArray& groupId) override;
 	virtual RoleIds GetRoles(const QByteArray& productId) const override;
 	virtual FeatureIds GetPermissions(const QByteArray& productId = QByteArray()) const override;
+	virtual QDateTime GetLastConnection() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -40,6 +43,7 @@ private:
 	QByteArray m_passwordHash;
 	QString m_mail;
 	IUserGroupInfo::GroupIds m_groupIds;
+	QDateTime m_lastConnection;
 };
 
 
@@ -47,6 +51,5 @@ typedef imtbase::TIdentifiableWrap<CUserInfo> CIdentifiableUserInfo;
 
 
 } // namespace imtauth
-
 
 

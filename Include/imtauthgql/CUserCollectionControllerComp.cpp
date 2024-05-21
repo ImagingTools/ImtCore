@@ -230,6 +230,12 @@ bool CUserCollectionControllerComp::SetupGqlItem(
 
 					elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
+				else if(informationId == "LastConnection"){
+					QDateTime lastConnection = userInfoPtr->GetLastConnection();
+					lastConnection.setTimeSpec(Qt::UTC);
+
+					elementInformation = lastConnection.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+				}
 
 				if(elementInformation.isNull()){
 					elementInformation = GetObjectInformation(informationId, collectionId);

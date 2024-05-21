@@ -15,6 +15,18 @@ namespace imtauth
 
 // public methods
 
+void CUserInfo::SetLastConnection(const QDateTime& lastConnection)
+{
+	if (m_lastConnection != lastConnection){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_lastConnection = lastConnection;
+	}
+}
+
+
+// reimplemented (iser::IUserInfo)
+
 QByteArray CUserInfo::GetPasswordHash() const
 {
 	return m_passwordHash;
@@ -119,9 +131,24 @@ IUserBaseInfo::FeatureIds CUserInfo::GetPermissions(const QByteArray& productId)
 }
 
 
+QDateTime CUserInfo::GetLastConnection() const
+{
+	return m_lastConnection;
+}
+
+
+// reimplemented (iser::ISerializable)
+
 bool CUserInfo::Serialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+	quint32 imtCoreVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
+		imtCoreVersion = 0;
+	}
+
 	bool retVal = true;
 
 	retVal = retVal && BaseClass::Serialize(archive);
@@ -138,9 +165,18 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_groupIds, "Groups", "Group");
 
+	if (imtCoreVersion > 9799) {
+		iser::CArchiveTag lastConnectionTag("LastConnection", "LastConnection", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(lastConnectionTag);
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_lastConnection);
+		retVal = retVal && archive.EndTag(lastConnectionTag);
+	}
+
 	return retVal;
 }
 
+
+// reimplemented (iser::IChangeable)
 
 bool CUserInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 {

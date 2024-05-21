@@ -95,6 +95,11 @@ public:
 		Remove this user from group.
 	*/
 	virtual bool RemoveFromGroup(const QByteArray& groupId) = 0;
+
+	/**
+		Get last connection of the user.
+	*/
+	virtual QDateTime GetLastConnection() const = 0;
 };
 
 

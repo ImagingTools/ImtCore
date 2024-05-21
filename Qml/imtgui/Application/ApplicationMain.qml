@@ -5,6 +5,13 @@ import imtguigql 1.0
 import imtcontrols 1.0
 import QtWebSockets 1.2
 
+//QuickApplication {
+
+//}
+
+//ServerBasedApplication {
+
+//}
 
 Item {
     id: application;
@@ -41,6 +48,7 @@ Item {
     property bool firstModelsInitStart: authorizationServerConnected && subscriptionManager_.status == WebSocket.Open;
 
     onFirstModelsInitStartChanged: {
+        console.log("onFirstModelsInitStartChanged", firstModelsInitStart);
         if (firstModelsInitStart){
             let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
             if (loggedUserId === ""){
@@ -49,6 +57,10 @@ Item {
                 application.firstModelsInit();
             }
         }
+    }
+
+    onAuthorizationServerConnectedChanged: {
+        console.log("onAuthorizationServerConnectedChanged", authorizationServerConnected);
     }
 
     signal updateSystemStatus();

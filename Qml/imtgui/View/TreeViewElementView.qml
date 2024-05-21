@@ -19,6 +19,8 @@ ElementView {
             width: root.contentWidth;
             height: 600;
 
+            headerVisible: false;
+
             Component.onCompleted: {
                 root.treeView = treeView;
             }
