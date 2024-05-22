@@ -156,11 +156,11 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 	iser::CArchiveTag mailTag("Mail", "Mail of user", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(mailTag);
 	retVal = retVal && archive.Process(m_mail);
-	retVal = retVal && archive.Process(m_passwordHash);
 	retVal = retVal && archive.EndTag(mailTag);
 
 	iser::CArchiveTag passwordTag("PasswordHash", "Password hash", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(passwordTag);
+	retVal = retVal && archive.Process(m_passwordHash);
 	retVal = retVal && archive.EndTag(passwordTag);
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_groupIds, "Groups", "Group");
