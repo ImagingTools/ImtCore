@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5147" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5222" Description="ACF"/>
+            <Version Id="1" Number="2207" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -602,7 +602,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>ViewGroups</Value>
-                                            <Value>EditGroup</Value>
+                                            <Value>ChangeGroup</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -615,7 +615,6 @@
                                 <AttributeInfo Id="NewCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>EditGroup</Value>
                                             <Value>AddGroup</Value>
                                         </Values>
                                     </Data>
@@ -623,7 +622,6 @@
                                 <AttributeInfo Id="RemoveCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>EditGroup</Value>
                                             <Value>RemoveGroup</Value>
                                         </Values>
                                     </Data>

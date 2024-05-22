@@ -588,7 +588,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>ViewUsers</Value>
-                                            <Value>EditUser</Value>
+                                            <Value>ChangeUser</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -601,7 +601,6 @@
                                 <AttributeInfo Id="NewCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>EditUser</Value>
                                             <Value>AddUser</Value>
                                         </Values>
                                     </Data>
@@ -609,7 +608,6 @@
                                 <AttributeInfo Id="RemoveCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>EditUser</Value>
                                             <Value>RemoveUser</Value>
                                         </Values>
                                     </Data>

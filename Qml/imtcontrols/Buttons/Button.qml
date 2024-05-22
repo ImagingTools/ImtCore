@@ -91,15 +91,21 @@ ControlBase {
         }
 
         onEntered: {
-            baseButton.entered(mouseX, mouseY);
+            if (baseButton){
+                baseButton.entered(mouseX, mouseY);
+            }
         }
 
         onExited: {
-            baseButton.exited(mouseX, mouseY);
+            if (baseButton){
+                baseButton.exited(mouseX, mouseY);
+            }
         }
 
         onPositionChanged: {
-            baseButton.positionChanged(mouse.x, mouse.y);
+            if (baseButton){
+                baseButton.positionChanged(mouse.x, mouse.y);
+            }
         }
     }
 }

@@ -18,15 +18,11 @@ Item {
     property bool readOnly: false;
 
     Component.onCompleted: {
-        console.log("ViewBase onCompleted", visible, viewId);
-
         viewId = UuidGenerator.generateUUID();
         Events.subscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged)
     }
 
     Component.onDestruction: {
-        console.log("ViewBase onDestruction", visible, viewId);
-
         if (commandsDelegate){
             Events.unSubscribeEvent(viewId + "CommandActivated", commandsDelegate.commandHandle);
         }
@@ -69,7 +65,6 @@ Item {
     }
 
     onVisibleChanged: {
-        console.log("ViewBase onVisibleChanged", visible);
         if (commandsController){
             if (visible){
                 if (internal.localizationChanged){
@@ -92,6 +87,12 @@ Item {
                     let isEnabled = internal.cachedCommandsModel.GetData("IsEnabled", i);
 
                     viewBase.commandsController.setCommandIsEnabled(id, isEnabled);
+                }
+
+                if (internal.localizationChanged){
+                    viewBase.updateCommandsGui();
+
+                    internal.localizationChanged = false;
                 }
             }
 
@@ -118,8 +119,6 @@ Item {
     onCommandsControllerChanged: {
         if (commandsController){
             commandsConnections.target = commandsController;
-
-            commandsController.commandsModelChanged.connect(internal.onCommandsModelChanged);
         }
     }
 
@@ -182,23 +181,18 @@ Item {
                 return;
             }
 
-            Events.sendEvent("GetActiveCommandsViewId", function(activeViewId){
-                if (activeViewId !== viewBase.viewId){
-                    Events.sendEvent("UpdateCommandsGui", {"Model": commandsController.commandsModel, "ViewId": viewBase.viewId});
-                }
-            });
+            Events.sendEvent("UpdateCommandsGui", {"Model": commandsController.commandsModel, "ViewId": viewBase.viewId});
+
+//            Events.sendEvent("GetActiveCommandsViewId", function(activeViewId){
+//                if (activeViewId !== viewBase.viewId){
+//                }
+//            });
         }
     }
 
     function clearCommandsGui(){
         if (commandsController){
             Events.sendEvent("ClearCommandsGui", {"ViewId": viewBase.viewId});
-
-//            Events.sendEvent("GetActiveCommandsViewId", function(activeViewId){
-//                if (activeViewId !== viewBase.viewId){
-//                    Events.sendEvent("ClearCommandsGui", {"ViewId": viewBase.viewId});
-//                }
-//            });
         }
     }
 
@@ -230,12 +224,6 @@ Item {
             }
         }
 
-        function onCommandsModelChanged(){
-            if (viewBase.visible){
-                viewBase.updateCommandsGui();
-            }
-        }
-
         function onLocalizationChanged(language){
             if (!viewBase.visible){
                 localizationChanged = true;
@@ -243,8 +231,6 @@ Item {
             }
 
             updateCommandsAtferLocalizationChanged();
-
-            localizationChanged = false
         }
 
         function updateCommandsAtferLocalizationChanged(){

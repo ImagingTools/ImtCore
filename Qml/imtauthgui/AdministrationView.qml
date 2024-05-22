@@ -3,6 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
+import imtauthgui 1.0
 
 Rectangle {
     id: container;
@@ -22,8 +23,6 @@ Rectangle {
     }
 
     function onLocalizationChanged(language){
-        console.log("Administration onLocalizationChanged", language);
-
         let rolesIndex = multiPageView.getIndexById("Roles");
         if (rolesIndex >= 0){
             multiPageView.pagesModel.setProperty(rolesIndex, "Name", qsTr("Roles"))
@@ -76,9 +75,20 @@ Rectangle {
         function updateModel(){
             multiPageView.clear();
 
-            multiPageView.addPage("Roles", qsTr("Roles"), roleCollectionComp);
-            multiPageView.addPage("Users", qsTr("Users"), userCollectionComp);
-            multiPageView.addPage("Groups", qsTr("Groups"), userGroupCollectionComp);
+            let ok = PermissionsController.checkPermission("ViewRoles");
+            if (ok){
+                multiPageView.addPage("Roles", qsTr("Roles"), roleCollectionComp);
+            }
+
+            ok = PermissionsController.checkPermission("ViewUsers");
+            if (ok){
+                multiPageView.addPage("Users", qsTr("Users"), userCollectionComp);
+            }
+
+            ok = PermissionsController.checkPermission("ViewGroups");
+            if (ok){
+                multiPageView.addPage("Groups", qsTr("Groups"), userGroupCollectionComp);
+            }
 
             multiPageView.currentIndex = 0;
         }

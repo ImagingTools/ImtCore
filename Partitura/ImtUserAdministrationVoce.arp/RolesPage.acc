@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5211" Description="ACF"/>
-            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5222" Description="ACF"/>
+            <Version Id="1" Number="2207" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -576,7 +576,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>ViewRoles</Value>
-                                            <Value>EditRole</Value>
+                                            <Value>ChangeRole</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -589,7 +589,6 @@
                                 <AttributeInfo Id="NewCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>EditRole</Value>
                                             <Value>AddRole</Value>
                                         </Values>
                                     </Data>
@@ -597,7 +596,6 @@
                                 <AttributeInfo Id="RemoveCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>EditRole</Value>
                                             <Value>RemoveRole</Value>
                                         </Values>
                                     </Data>

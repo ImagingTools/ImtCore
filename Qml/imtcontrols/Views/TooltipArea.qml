@@ -12,8 +12,6 @@ Item {
     property bool containsMouse: mouseArea ? mouseArea.containsMouse : false;
 
     onContainsMouseChanged: {
-        console.log("onContainsMouseChanged", containsMouse, text);
-
         if (!containsMouse){
             tp.closeTooltip();
         }
