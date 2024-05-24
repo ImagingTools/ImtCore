@@ -56,4 +56,5 @@ module.exports.listComponents = [
     'DragHandler',
     'JSONListModel',
     'TreeItemModel',
+    'GqlModel',
 ]

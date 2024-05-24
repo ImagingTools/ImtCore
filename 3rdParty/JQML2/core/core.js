@@ -154,6 +154,7 @@ RegExp.prototype.toPartialMatchRegex = function() {
     return new RegExp(process(), this.flags);
 };
 
+XMLHttpRequest.querySet = {}
 let XMLProxy = XMLHttpRequest.prototype.open
 XMLHttpRequest.prototype.open = function() {  
     let opened = XMLProxy.apply(this, [].slice.call(arguments))
@@ -466,6 +467,6 @@ window.onload = ()=>{
     
     mainRoot.$complete()
 
-    removeFunc()
+    // removeFunc()
     console.timeEnd('build')
 }

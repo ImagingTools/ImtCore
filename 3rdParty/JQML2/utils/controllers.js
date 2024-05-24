@@ -257,6 +257,8 @@ class MouseController {
         }
     }
     onMouseUp(x, y, button, e){
+        global['TransactionController'].begin()
+
         for(let i = 0; i < this.pressed.length; i++){
             if(this.pressed[i] instanceof MouseArea) this.pressed[i].getProperty('pressed').value = false
         }
@@ -355,6 +357,8 @@ class MouseController {
         this.pressed = []
         this.pressedMouseArea = []
         this.target = null
+
+        global['TransactionController'].end()
     }
     onMouseMove(x, y, e){
         let dx = this.moveX - x
@@ -967,6 +971,18 @@ class TransactionController {
         }
     }
 
+    add1(obj){
+        if(this.level > 0){
+            if(!this.objects.has(obj)){
+                this.levels[1].push(obj)
+                this.objects.add(obj)
+            }
+            return true
+        } else {
+            return false
+        }
+    }
+
     clear(){
         if(this.level > 0){
             for(let obj of this.levels[this.level]){
@@ -981,6 +997,7 @@ class TransactionController {
             for(let obj of this.levels[this.level]){
                 // console.log('*Transaction*', this.level, obj)
                 if(obj.UID && obj.$signals.$transaction) obj.$signals.$transaction(obj, obj.$changeset)
+                if(!obj.UID && this.level === 1) obj.$free()
             }
         }
     }

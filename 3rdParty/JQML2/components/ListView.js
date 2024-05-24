@@ -127,6 +127,7 @@ class ListView extends Flickable {
             }
             let countChanged = this.getPropertyValue('count') !== length
             this.getProperty('count').value = length
+            // this.getProperty('count').reset(length)
 
             for(let change of changeset){
                 let leftTop = change[0]
@@ -206,7 +207,7 @@ class ListView extends Flickable {
 
         let countChanged = this.getPropertyValue('count') !== length
         this.getProperty('count').value = length
-        this.getProperty('count').reset(length)
+        // this.getProperty('count').reset(length)
 
         this.$updateView()
 

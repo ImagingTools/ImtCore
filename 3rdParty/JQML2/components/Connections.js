@@ -50,13 +50,15 @@ class Connections extends QtObject {
         let connections = this.$getConnections()
         if(this.$target){
             for(let connection of connections){
-                let signal = this.$target.getSignal(connection.signalName)
-                if(!signal) signal = this.$target.getSignal(connection.signalName.replaceAll('Changed', ''))
-                if(!signal) {
-                    let property = this.$target.getProperty(connection.signalName.replaceAll('Changed', ''))
-                    if(property) signal = property.getNotify()
+                if(this.$target.UID){
+                    let signal = this.$target.getSignal(connection.signalName)
+                    if(!signal) signal = this.$target.getSignal(connection.signalName.replaceAll('Changed', ''))
+                    if(!signal) {
+                        let property = this.$target.getProperty(connection.signalName.replaceAll('Changed', ''))
+                        if(property) signal = property.getNotify()
+                    }
+                    if(signal) signal.disconnect(this, this[connection.slotName])
                 }
-                if(signal) signal.disconnect(this, this[connection.slotName])
             }
         }
         super.destroy()

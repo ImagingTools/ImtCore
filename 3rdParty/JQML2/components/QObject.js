@@ -186,7 +186,8 @@ class QObject extends ComplexObject {
             if(data[i] instanceof QObject) data[i].destroy()
         } 
 
-        RemoveList.push(this)
+        TransactionController.add1(this)
+        // RemoveList.push(this)
     }
 
     $free(){
