@@ -1,12 +1,14 @@
 #include "CObjectCollectionPartituraTestBase.h"
-#include "imtbase/CCollectionFilter.h"
+
+
+// ACF includes
 #include <iprm/CParamsSet.h>
-
-
-// ImtCore includes
-#include <imtbase/IObjectCollection.h>
 #include <ifile/CCompactXmlFileReadArchive.h>
 #include <ifile/CCompactXmlFileWriteArchive.h>
+
+// ImtCore includes
+#include <imtbase/CCollectionFilter.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtauth/CAccountInfo.h>
 #include <imtauth/CAccountInfoMetaInfo.h>
 #include <imtauth/IAccountInfo.h>
@@ -146,28 +148,28 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithNonExistElementTest(
 
 void CObjectCollectionPartituraTestBase::GetDataFromEmpyObjectIdTest()
 {
-    initTestCase();
-    istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
-    compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
-    if (compositePtr.IsValid()){
+	initTestCase();
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
+	if (compositePtr.IsValid()){
 
-        // get component object collection
-        imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
-        if (objectCollectionPtr != nullptr){
+		// get component object collection
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		if (objectCollectionPtr != nullptr){
 
-            // reset data from object collection
-            objectCollectionPtr->ResetData();
+			// reset data from object collection
+			objectCollectionPtr->ResetData();
 
 			// insert objects in collection
 			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), QByteArray(""));
 			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), QByteArray("1_object"));
 
-            imtbase::CObjectCollection::DataPtr dataPtr = nullptr;
+			imtbase::CObjectCollection::DataPtr dataPtr = nullptr;
 			bool checkGetData = objectCollectionPtr->GetObjectData(QByteArray(""), dataPtr);
 
 			QVERIFY2(!checkGetData, "GetData from object with empty Id is failed");
-        }
-    }
+		}
+	}
 }
 
 
@@ -595,7 +597,6 @@ void CObjectCollectionPartituraTestBase::GetObjectTypeIdTest()
 			if (!idNewObject.isEmpty()){
 				imtbase::ICollectionInfo::Id gettedObjectTypeId = objectCollectionPtr->GetObjectTypeId(idNewObject);
 				QVERIFY2((gettedObjectTypeId == m_typeIdObjectCollection), "Type id of object is incorrect");
-
 			}
 			else{
 				QFAIL("Object don't insert");
@@ -609,40 +610,6 @@ void CObjectCollectionPartituraTestBase::GetObjectTypeIdTest()
 		QFAIL("Component is not initialized");
 	}
 }
-
-
-//void CObjectCollectionPartituraTestBase::GetOperationFlagsInsertedObjectTest()
-//{
-//	initTestCase();
-//	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
-//	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
-//	if (compositePtr.IsValid()){
-
-//		// get component object collection
-//		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
-//		if (objectCollectionPtr != nullptr){
-
-//			// Reset collection
-//			objectCollectionPtr->ResetData();
-
-//			// insert new object and check flags him
-//			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription");
-//			if (!idNewObject.isEmpty()){
-//				int flagsInsertedObject = objectCollectionPtr->GetOperationFlags(idNewObject);
-//				QVERIFY2((flagsInsertedObject == (imtbase::IObjectCollection::OF_ALL & ~imtbase::IObjectCollection::OF_SUPPORT_PAGINATION)), "Operation flags of inserted object is incorrect");
-//			}
-//			else{
-//				QFAIL("Object don't insert");
-//			}
-//		}
-//		else{
-//			QFAIL("Object collection is nullptr");
-//		}
-//	}
-//	else{
-//		QFAIL("Component is not initialized");
-//	}
-//}
 
 
 void CObjectCollectionPartituraTestBase::GetElementsCountTest_data()
@@ -753,8 +720,8 @@ void CObjectCollectionPartituraTestBase::PaginationTest_data()
 	QTest::newRow("count is NULL")<< 1 << NULL << true;
 	QTest::newRow("count out of size") << 1 << 100 << false;
 	QTest::newRow("all params correct") << 1 << 100 << false;
-//	QTest::newRow("count is negative") << 1 << -5 << true; for sql
-//	QTest::newRow("offset is negative") << -5 << 5 << true;
+	//	QTest::newRow("count is negative") << 1 << -5 << true; for sql
+	//	QTest::newRow("offset is negative") << -5 << 5 << true;
 }
 
 
@@ -1058,10 +1025,10 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest_data()
 	QTest::newRow("all params is empty") << NULL << NULL << "" << "NO ORDER" << QByteArray("Name") << true;
 	QTest::newRow("offset is empty") << NULL << 15 << "TestFilterName1" << "ASC" << QByteArray("Name") << false;
 	QTest::newRow("offset is out of size") << 100 << 15 << "TestFilterName1" << "ASC" << QByteArray("Name") << true;
-//	QTest::newRow("offset is negative") << -10 << 15 << "TestFilterName1" << "ASC" << QByteArray("Name") << true;
+	//	QTest::newRow("offset is negative") << -10 << 15 << "TestFilterName1" << "ASC" << QByteArray("Name") << true;
 	QTest::newRow("count is empty") << 3 << NULL << "TestFilterName1" << "ASC" << QByteArray("Name") << true;
 	QTest::newRow("count is out of size") << 3 << 100 << "TestFilterName1" << "ASC" << QByteArray("Name") << false;
-//	QTest::newRow("count is negative") << 3 << -10 << "TestFilterName1" << "ASC" << QByteArray("Name") << false; for sql
+	//	QTest::newRow("count is negative") << 3 << -10 << "TestFilterName1" << "ASC" << QByteArray("Name") << false; for sql
 	QTest::newRow("testFilter is empty") << 3 << 15 << "" << "ASC" << QByteArray("Name") << false;
 	QTest::newRow("testFilter is non-exist") << 3 << 15 << "AnotherTestFilter" << "ASC" << QByteArray("Name") << true;
 	QTest::newRow("sortOrder is NO ORDER") << 3 << 15 << "TestFilterName1" << "NO ORDER" << QByteArray("Name") << false;

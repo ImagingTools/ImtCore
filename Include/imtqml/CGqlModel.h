@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtNetwork/QNetworkReply>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlRequest.h>
@@ -28,6 +31,8 @@ public:
 public Q_SLOTS:
 	bool SetGqlQuery(QString query);
 	void replyFinished();
+	void errorOccurred(QNetworkReply::NetworkError code);
+
 	static void SetGlobalAccessToken(const QString& accessToken);
 
 private:

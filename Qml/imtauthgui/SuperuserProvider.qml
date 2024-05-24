@@ -37,7 +37,7 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("State:", this.state);
+            console.log("Superuser provider state:", this.state);
             if (this.state === "Ready"){
                 var dataModelLocal;
 

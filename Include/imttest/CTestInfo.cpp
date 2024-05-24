@@ -21,20 +21,26 @@ CTestInfo::CTestInfo()
 {
 }
 
+
+// reimplemented (imtlic::ITestInfo)
+
 QByteArray CTestInfo::GetTestId() const
 {
 	return m_testId;
 }
+
 
 QString CTestInfo::GetTestName() const
 {
 	return m_testName;
 }
 
+
 QString CTestInfo::GetTestDescription() const
 {
 	return m_testDescription;
 }
+
 
 void CTestInfo::SetTestId(QByteArray testId)
 {
@@ -44,6 +50,7 @@ void CTestInfo::SetTestId(QByteArray testId)
 	}
 }
 
+
 void CTestInfo::SetTestName(QString testName)
 {
 	if (m_testName != testName){
@@ -51,6 +58,7 @@ void CTestInfo::SetTestName(QString testName)
 		m_testName = testName;
 	}
 }
+
 
 void CTestInfo::SetTestDescription(QString testDescription)
 {
@@ -60,18 +68,21 @@ void CTestInfo::SetTestDescription(QString testDescription)
 	}
 }
 
+
+// reimplemented (iser::ISerializable)
+
 bool CTestInfo::Serialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
 	bool retVal = true;
 
-	static iser::CArchiveTag testIdTag("TestId", "Test id", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag testIdTag("TestId", "Test id", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(testIdTag);
 	retVal = retVal && archive.Process(m_testId);
 	retVal = retVal && archive.EndTag(testIdTag);
 
-	static iser::CArchiveTag testNameTag("TestName", "Test name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag testNameTag("TestName", "Test name", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(testNameTag);
 	retVal = retVal && archive.Process(m_testName);
 	retVal = retVal && archive.EndTag(testNameTag);
@@ -79,10 +90,14 @@ bool CTestInfo::Serialize(iser::IArchive &archive)
 	return retVal;
 }
 
+
+// reimplemented (istd::IChangeable)
+
 int CTestInfo::GetSupportedOperations() const
 {
 	return SO_CLONE | SO_COPY | SO_RESET;
 }
+
 
 bool CTestInfo::CopyFrom(const IChangeable &object, CompatibilityMode mode)
 {
@@ -103,6 +118,7 @@ bool CTestInfo::CopyFrom(const IChangeable &object, CompatibilityMode mode)
 	return false;
 }
 
+
 istd::IChangeable *CTestInfo::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CTestInfo> clonePtr(new CTestInfo);
@@ -112,6 +128,7 @@ istd::IChangeable *CTestInfo::CloneMe(CompatibilityMode mode) const
 
 	return nullptr;
 }
+
 
 bool CTestInfo::ResetData(CompatibilityMode /*mode*/)
 {

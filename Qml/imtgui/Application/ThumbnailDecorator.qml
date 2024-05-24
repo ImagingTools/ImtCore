@@ -13,70 +13,37 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property alias messagePage: serverNoConnectionView;
-    property alias loadingPage: loading;
+    property alias drawingContainer: drawingContainer_;
+    property alias stackView: stackView_;
+    property alias topPanel: topPanel_;
 
     property int mainMargin: Style.mainWindowMargin !== undefined ? Style.mainWindowMargin : 0;
     property int pageMargin: Style.pageMargin !== undefined ? Style.pageMargin : 0;
     property int mainRadius: 0;
 
-    property alias authorizationPageAlias: authorizationPage;
-    property alias superuserPasswordPageAlias: superuserPasswordPage;
-
-    property alias userManagementProvider: userManagement;
-//    property alias documentManager: mainDocumentManager;
     property Item dialogManager: modalDialogManager;
 
     property alias menuPanelRadius: menuPanel.radius;
     property alias loadPageByClick: pagesManager.loadByClick;
-    property alias canRecoveryPassword: authorizationPage.canRecoveryPassword;
-
-    property var applicationMain: null;
+    property bool canRecoveryPassword: true;
 
     property SettingsProvider settingsProvider: null;
     property SettingsObserver settingsObserver: null;
 
     Component.onCompleted: {
-        Events.subscribeEvent("StartLoading", thumbnailDecoratorContainer.loadingPage.start);
-        Events.subscribeEvent("StopLoading", loading.stop);
+        Events.subscribeEvent("StartLoading", thumbnailDecoratorContainer.startLoading);
+        Events.subscribeEvent("StopLoading", thumbnailDecoratorContainer.stopLoading);
 
         Events.subscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
         Events.subscribeEvent("Logout", thumbnailDecoratorContainer.onLogout);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("StartLoading", thumbnailDecoratorContainer.loadingPage.start);
-        Events.unSubscribeEvent("StopLoading", thumbnailDecoratorContainer.loadingPage.stop);
+        Events.unSubscribeEvent("StartLoading", thumbnailDecoratorContainer.startLoading);
+        Events.unSubscribeEvent("StopLoading", thumbnailDecoratorContainer.stopLoading);
 
         Events.unSubscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
         Events.unSubscribeEvent("Logout", thumbnailDecoratorContainer.onLogout);
-    }
-
-    property SuperuserProvider superuserProvider : SuperuserProvider {
-        onResult: {
-            if (exists){
-                thumbnailDecoratorContainer.closeAllPages();
-
-                authorizationPage.visible = true;
-            }
-            else{
-                if (error === ""){
-                    superuserPasswordPage.visible = true;
-                }
-                else{
-                    Events.sendEvent("SendCriticalError", error);
-                }
-            }
-        }
-
-        onModelStateChanged: {
-            if (state === "Ready"){
-                thumbnailDecoratorContainer.loadingPage.stop();
-            }
-            else{
-                 thumbnailDecoratorContainer.loadingPage.start();
-            }
-        }
     }
 
     function updateModels(){
@@ -84,16 +51,10 @@ Rectangle {
     }
 
     function closeAllPages(){
-        serverNoConnectionView.visible = false;
-        authorizationPage.visible = false;
-        superuserPasswordPage.visible = false;
-        thumbnailDecoratorContainer.loadingPage.visible = false;
-        serverNoConnectionView.visible = false;
     }
 
     function onLogout(){
         clearModels();
-        authorizationPage.logout();
         drawingContainer.content = null;
 // soon...
 //        let exists = mainDocumentManager.dirtyDocumentsExists();
@@ -123,7 +84,7 @@ Rectangle {
 
         anchors.left: parent.left;
         anchors.leftMargin: thumbnailDecoratorContainer.mainMargin;
-        anchors.top: topPanel.bottom;
+        anchors.top: topPanel_.bottom;
         anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
         anchors.bottom: bottomPanel.top;
         anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
@@ -165,7 +126,7 @@ Rectangle {
 
         anchors.left: menuPanel.right;
         anchors.right: thumbnailDecoratorContainer.right;
-        anchors.top: topPanel.bottom;
+        anchors.top: topPanel_.bottom;
         anchors.bottom: thumbnailDecoratorContainer.bottom;
 
         anchors.topMargin: thumbnailDecoratorContainer.pageMargin;
@@ -175,28 +136,26 @@ Rectangle {
 
         activePageIndex: menuPanel.activePageIndex;
 
-        authorizationStatusProvider: authorizationPage;
-
         onModelStateChanged: {
-            if (pagesManager.modelState === "Ready"){
-                thumbnailDecoratorContainer.loadingPage.stop();
-            }
-            else{
-//                thumbnailDecoratorContainer.loadingPage.start();
-            }
+//            if (pagesManager.modelState === "Ready"){
+//                thumbnailDecoratorContainer.startLoading();
+//            }
+//            else{
+//                thumbnailDecoratorContainer.stopLoading();
+//            }
         }
     }
 
     DrawingContainer{
-        id: drawingContainer;
+        id: drawingContainer_;
+        z: topPanel_.z + 1;
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 50;
         edge: Qt.RightEdge;
-        z: topPanel.z + 1;
     }
 
     TopPanel {
-        id: topPanel;
+        id: topPanel_;
 
         z: 10;
 
@@ -205,27 +164,6 @@ Rectangle {
 
         width: parent.width;
         height: Style.size_panelsHeight !== undefined ? Style.size_panelsHeight : 60;
-    }
-
-    ServerNoConnectionView {
-        id: serverNoConnectionView;
-
-        z: 5;
-
-        anchors.fill: parent;
-
-        visible: false;
-
-        onVisibleChanged: {
-            Events.sendEvent("SetCommandsVisible", !visible);
-            Events.sendEvent("SetUserPanelVisible", !visible);
-        }
-
-        onRefresh: {
-            if (thumbnailDecoratorContainer.applicationMain != null){
-                thumbnailDecoratorContainer.applicationMain.updateSystemStatus();
-            }
-        }
     }
 
     function showPreferencePage(){
@@ -240,63 +178,80 @@ Rectangle {
         }
     }
 
-    AuthorizationPage {
-        id: authorizationPage;
+    StackView {
+        id: stackView_;
+
+        z: 11;
 
         anchors.fill: parent;
-        anchors.topMargin: topPanel.height;
+    }
 
-        visible: false;
+    function showPage(pageComp){
+        stackView.pagesModel.clear();
 
-        onLoginSuccessful: {
-            authorizationPage.visible = false;
-            authorizationPage.state = "authorized";
-
-            drawingContainer.content = Style.drawingContainerDecorator;
-            Events.sendEvent("UpdateSettings");
-//            Events.sendEvent("UpdateModels");
+        if (pageComp){
+            stackView.push(pageComp)
         }
     }
 
-    SuperuserPasswordPage {
-        id: superuserPasswordPage;
+    property Component authorizationPageComp: Component {
+        AuthorizationPage {
+            id: authorizationPage;
 
-        anchors.fill: parent;
+            anchors.fill: parent;
+            anchors.topMargin: topPanel_.height;
 
-        visible: false;
-
-        onBeforeSetted: {
-             thumbnailDecoratorContainer.loadingPage.start();
+            canRecoveryPassword: thumbnailDecoratorContainer.canRecoveryPassword;
         }
+    }
 
-        onVisibleChanged: {
-            if (visible){
-                thumbnailDecoratorContainer.loadingPage.visible = false;
+    property Component superuserPasswordPageComp: Component {
+        SuperuserPasswordPage {
+            id: superuserPasswordPage;
+
+            anchors.fill: parent;
+            anchors.topMargin: topPanel_.height;
+
+            onBeforeSetted: {
+                thumbnailDecoratorContainer.startLoading();
+            }
+
+            onVisibleChanged: {
+                if (visible){
+                    thumbnailDecoratorContainer.stopLoading();
+                }
+            }
+
+            onPasswordSetted: {
+                thumbnailDecoratorContainer.stopLoading();
+
+                thumbnailDecoratorContainer.showPage(thumbnailDecoratorContainer.authorizationPageComp);
+            }
+
+            onFailed: {
+                thumbnailDecoratorContainer.stopLoading();
+                thumbnailDecoratorContainer.showPage(thumbnailDecoratorContainer.superuserPasswordPageComp);
             }
         }
+    }
 
-        onPasswordSetted: {
-            thumbnailDecoratorContainer.loadingPage.stop();
-
-            superuserPasswordPage.visible = false;
-            authorizationPage.visible = true;
-        }
-
-        onFailed: {
-            thumbnailDecoratorContainer.loadingPage.stop();
-
-            thumbnailDecoratorContainer.closeAllPages();
+    property Component loadingPageComp: Component {
+        Loading {
+            id: loading;
+            z: 9999;
+            anchors.fill: parent;
         }
     }
 
-    Loading {
-        id: loading;
+    function startLoading(){
+        stackView.push(loadingPageComp);
+    }
 
-        z: 9999;
-
-        anchors.fill: parent;
-
-        visible: false;
+    function stopLoading(){
+        let index = stackView.getPageIndex(loadingPageComp);
+        if (index >= 0){
+            stackView.removePageByIndex(index);
+        }
     }
 
     Component {
@@ -310,10 +265,6 @@ Rectangle {
                 }
             }
         }
-    }
-
-    UserManagementProvider {
-        id: userManagement;
     }
 
     ShortcutManager {
@@ -331,7 +282,7 @@ Rectangle {
 
         anchors.fill: parent;
 
-        errorPage: serverNoConnectionView;
+//        errorPage: serverNoConnectionView;
 
         visible: false;
     }

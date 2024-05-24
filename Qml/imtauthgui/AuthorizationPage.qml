@@ -10,23 +10,13 @@ Rectangle {
 
     property string state:"";
 
-    property alias tokenProvider: userTokenProvider;
-    property alias login: userTokenProvider.login;
-    property alias userId: userTokenProvider.userId;
-
     property int mainRadius: 3;
     property string mainColor: Style.backgroundColor;
 
-    property alias modelState: userTokenProvider.modelState;
-
     property bool canRecoveryPassword: true;
-
-    signal loginSuccessful();
-    signal loginFailed();
 
     Component.onCompleted: {
         decoratorPause.start();
-        PermissionsController.authorizationPage = authPageContainer;
         Events.subscribeEvent("OnLocalizationChanged", authPageContainer.onLocalizationChanged);
     }
 
@@ -36,15 +26,6 @@ Rectangle {
 
     function onLocalizationChanged(language){
         titleLogin.text = qsTr("Login")
-    }
-
-    onLoginSuccessful: {
-        let obj = {}
-        obj["Login"] = authPageContainer.login;
-        obj["UserId"] = authPageContainer.userId;
-        obj["PasswordHash"] = userTokenProvider.passwordHash;
-
-        Events.sendEvent("Login", obj);
     }
 
     onVisibleChanged: {
@@ -58,30 +39,8 @@ Rectangle {
         }
     }
 
-    function loggedUserIsSuperuser(){
-        return authPageContainer.login === "su";
-    }
-
-    function getLoggedUserId(){
-        return authPageContainer.login;
-    }
-
-    function setLoggedUserId(login){
-        authPageContainer.login = login;
-    }
-
     function passwordRecovery(){
         console.log("passwordRecovery");
-    }
-
-    function logout(){
-        authPageContainer.login = "";
-        authPageContainer.userId = "";
-        userTokenProvider.token = "";
-
-        authPageContainer.visible = true;
-
-        userTokenProvider.authorizationGqlModel.SetGlobalAccessToken("");
     }
 
     function setDecorators(){
@@ -414,24 +373,10 @@ Rectangle {
                     text: qsTr("Login");
 
                     onClicked: {
-                        userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
+                        Events.sendEvent("Login", {"Login": loginTextInput.text, "Password": passwordTextInput.text})
                     }
                 }
             }//
         }//bodyColumn
-    }
-
-    UserTokenProvider {
-        id: userTokenProvider;
-
-        onAccepted: {
-            authPageContainer.loginSuccessful();
-        }
-
-        onFailed: {
-            errorMessage.text = message;
-
-            authPageContainer.loginFailed();
-        }
     }
 }

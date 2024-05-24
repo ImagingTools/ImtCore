@@ -23,6 +23,7 @@ QtObject {
     }
 
     function updateModel(){
+        userMode = "";
         userModeModel.getUserMode();
     }
 
@@ -36,7 +37,6 @@ QtObject {
         id: saveQuery;
 
         function updateModel(password){
-            console.log( "updateModel saveModel");
             var query = Gql.GqlRequest("query", "UserAdd");
 
             var queryFields = Gql.GqlObject('addedNotification');
@@ -47,7 +47,6 @@ QtObject {
             let obj = {"Username": "su", "UserId": "su", "Password": password, "Name": "superuser"}
 
             var jsonString = JSON.stringify(obj);
-            //            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
             inputParams.InsertField ("Item", jsonString);
 
@@ -68,7 +67,6 @@ QtObject {
         id: userModeModel;
 
         function getUserMode() {
-            console.log("getUserMode UserMode");
             var query = Gql.GqlRequest("query", "UserMode");
 
             var gqlData = query.GetQuery();
@@ -77,7 +75,6 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("UserMode State:", this.state, userModeModel);
             if (this.state === "Ready"){
                 var dataModelLocal;
 
@@ -119,8 +116,6 @@ QtObject {
                 }
                 container.updated();
             }
-            // container.userMode = "NO_USER_MANAGEMENT"
-            // container.updated();
         }
     }
 }

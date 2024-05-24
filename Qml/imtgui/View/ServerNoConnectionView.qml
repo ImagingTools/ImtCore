@@ -11,8 +11,6 @@ Rectangle {
     property alias text: textNoConnection.text;
     property alias loadingVisible: loading.visible;
 
-    signal refresh();
-
     Column {
         id: content;
 

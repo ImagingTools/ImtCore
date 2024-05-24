@@ -3,7 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
-import QtWebSockets 1.2
+import imtauthgui 1.0
 
 //QuickApplication {
 
@@ -45,22 +45,24 @@ Item {
 
     property bool updatingModel: serverReady && application.settingsProvider.serverModel != null;
 
-    property bool firstModelsInitStart: authorizationServerConnected && subscriptionManager_.status == WebSocket.Open;
+    property bool firstModelsInitStart: authorizationServerConnected && subscriptionManager_.status == 1;
 
     onFirstModelsInitStartChanged: {
-        console.log("onFirstModelsInitStartChanged", firstModelsInitStart);
-        if (firstModelsInitStart){
-            let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-            if (loggedUserId === ""){
-                thumbnailDecorator.closeAllPages();
+        if (!authorizationServerConnected){
+            checkStatus(5);
 
+            return;
+        }
+
+        if (firstModelsInitStart){
+            let loggedUserId = AuthorizationController.getLoggedUserId();
+            if (loggedUserId === ""){
                 application.firstModelsInit();
             }
+            else{
+                checkStatus(1);
+            }
         }
-    }
-
-    onAuthorizationServerConnectedChanged: {
-        console.log("onAuthorizationServerConnectedChanged", authorizationServerConnected);
     }
 
     signal updateSystemStatus();
@@ -82,7 +84,6 @@ Item {
     }
 
     onApplicationInfoChanged: {
-        console.log("onApplicationInfoChanged", application.applicationInfo.ToJson());
         if (application.applicationInfo){
             applicationInfoProvider.clientApplicationInfo = application.applicationInfo;
         }
@@ -131,9 +132,7 @@ Item {
         Events.subscribeEvent("Logout", application.onLogout);
         Events.subscribeEvent("Reconnect", application.reconnect);
 
-        thumbnailDecorator.userManagementProvider.updated.connect(application.onUserModeChanged);
-
-        thumbnailDecorator.loadingPage.start();
+//        thumbnailDecorator.loadingPage.start();
     }
 
     Component.onDestruction: {
@@ -160,7 +159,6 @@ Item {
         applicationInfoProvider: application.applicationInfoProvider;
 
         onServerModelChanged: {
-            console.log("onServerModelChanged", serverModel);
             let design = application.designProvider.getDesignSchema();
 
             let index = application.designProvider.getDesignSchemaIndex(design);
@@ -175,7 +173,6 @@ Item {
 
         property bool applyCachedLanguage: application.serverReady && application.settingsProvider.serverModel != null;
         onApplyCachedLanguageChanged: {
-            console.log("onApplyCachedLanguageChanged", applyCachedLanguage);
             if (applyCachedLanguage){
                 let lang = application.languageProvider.getLanguage();
                 application.languageProvider.setLanguage(lang);
@@ -186,7 +183,6 @@ Item {
 
         property bool applyCachedSchema: application.serverReady && application.settingsProvider.localModel != null;
         onApplyCachedSchemaChanged: {
-            console.log("onApplyCachedSchemaChanged", applyCachedSchema);
             if (applyCachedSchema){
                 application.designProvider.applyCachedDesignSchema();
             }
@@ -214,32 +210,60 @@ Item {
     }
 
     function checkStatus(status){
-        thumbnailDecorator.closeAllPages();
-        thumbnailDecorator.messagePage.loadingVisible = false;
+        thumbnailDecorator.stackView.clear();
 
-        if (status === WebSocket.Connecting){
-            thumbnailDecorator.messagePage.visible = true;
-            thumbnailDecorator.messagePage.loadingVisible = true;
+//        0 - WebSocket.Connecting
+//        1 - WebSocket.Open
+//        2 - WebSocket.Closing
+//        3 - WebSocket.Closed
+//        4 - WebSocket.Error
+//        5 - Authorization Error
 
-            let serverUrl = application.getServerUrl();
-            thumbnailDecorator.messagePage.text = qsTr("Try connecting to ") + serverUrl + " ...";
+        Events.sendEvent("SetCommandsVisible", false);
+        Events.sendEvent("SetUserPanelEnabled", false);
+
+        if (status === 0){
+            thumbnailDecorator.stackView.push(connectingMessagePageComp);
         }
-        else if (status === WebSocket.Error || status === WebSocket.Closed){
-            thumbnailDecorator.messagePage.visible = true;
-            thumbnailDecorator.messagePage.text = qsTr("Server connection error")
+        else if (status === 4 || status === 3){
+            thumbnailDecorator.stackView.push(errorMessagePageComp);
         }
-        else if (status === WebSocket.Open){
-            // No error
-//            let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-//            if (loggedUserId === ""){
-//                thumbnailDecorator.closeAllPages();
-
-//                application.firstModelsInit();
-//            }
+        else if (status === 1){
+            Events.sendEvent("SetCommandsVisible", true);
+            Events.sendEvent("SetUserPanelEnabled", true);
         }
         else if (status === 5){
-            thumbnailDecorator.messagePage.visible = true;
-            thumbnailDecorator.messagePage.text = qsTr("Authorization server connection error")
+            thumbnailDecorator.stackView.push(authorizatioErrorMessagePageComp);
+        }
+    }
+
+    property Component connectingMessagePageComp: Component {
+        ServerNoConnectionView {
+            z: 5;
+            anchors.fill: parent;
+            anchors.topMargin: thumbnailDecorator.topPanel.height;
+            loadingVisible: true;
+            text: qsTr("Try connecting to ") + application.getServerUrl() + " ...";
+        }
+    }
+
+    property Component errorMessagePageComp: Component {
+        ServerNoConnectionView {
+            z: 5;
+            anchors.fill: parent;
+            anchors.topMargin: thumbnailDecorator.topPanel.height;
+            loadingVisible: false;
+            text: qsTr("Server connection error")
+        }
+    }
+
+    property Component authorizatioErrorMessagePageComp: Component {
+        ServerNoConnectionView {
+            z: 5;
+            anchors.fill: parent;
+            anchors.topMargin: thumbnailDecorator.topPanel.height;
+            loadingVisible: false;
+            text: qsTr("Authorization server connection error")
         }
     }
 
@@ -286,8 +310,6 @@ Item {
 
         settingsProvider: application.settingsProvider;
         settingsObserver: application.settingsObserver;
-
-        applicationMain: application;
     }
 
     function onLogout(){
@@ -302,41 +324,24 @@ Item {
     }
 
     function onSimpleUserManagement(){
-        let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-        if (loggedUserId === ""){
-            thumbnailDecorator.authorizationPageAlias.setLoggedUserId("Anonim");
-
-            application.updateAllModels();
-        }
+        application.updateAllModels();
     }
 
     function onStrongUserManagement(){
-        let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
+        let loggedUserId = AuthorizationController.getLoggedUserId();
         if (loggedUserId === ""){
             if (!authorizationServerConnected){
                 checkStatus(5);
                 return;
             }
 
-            thumbnailDecorator.superuserProvider.superuserExists();
+            AuthorizationController.updateSuperuserModel();
         }
     }
 
     function firstModelsInit(){
         console.log("firstModelsInit");
-        thumbnailDecorator.userManagementProvider.updateModel();
-    }
-
-    function onUserModeChanged(){
-        let userMode = thumbnailDecorator.userManagementProvider.userMode;
-        let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-
-        if (userMode == "NO_USER_MANAGEMENT" || userMode == "OPTIONAL_USER_MANAGEMENT"){
-            application.onSimpleUserManagement();
-        }
-        else if (userMode == "STRONG_USER_MANAGEMENT"){
-            application.onStrongUserManagement();
-        }
+        AuthorizationController.updateUserManagementModel();
     }
 
     function connectToWebSocketServer(){
@@ -349,6 +354,38 @@ Item {
         let webSocketServerUrl = getWebSocketUrl(serverUrl);
         subscriptionManager_.url = webSocketServerUrl;
         subscriptionManager_.active = true;
+    }
+
+    Connections {
+        target: AuthorizationController;
+
+        function onUserModeChanged(userMode){
+            if (userMode === "NO_USER_MANAGEMENT" || userMode === "OPTIONAL_USER_MANAGEMENT"){
+                application.onSimpleUserManagement();
+            }
+            else if (userMode === "STRONG_USER_MANAGEMENT"){
+                application.onStrongUserManagement();
+            }
+        }
+
+        function onSuperuserExistResult(exists){
+            if (exists){
+                thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
+            }
+            else{
+                thumbnailDecorator.showPage(thumbnailDecorator.superuserPasswordPageComp)
+            }
+        }
+
+        function onLoginSuccessful(){
+            thumbnailDecorator.drawingContainer.content = Style.drawingContainerDecorator;
+            thumbnailDecorator.showPage(undefined)
+            Events.sendEvent("UpdateSettings");
+        }
+
+        function onLogoutSignal(){
+            application.firstModelsInit();
+        }
     }
 
     property Timer timer: Timer{
@@ -365,7 +402,7 @@ Item {
             }
 
             if (webSocketPortProvider.port == -1){
-                application.checkStatus(WebSocket.Error)
+                application.checkStatus(4)
 
                 if (application.serverReady){
                     webSocketPortProvider.updateModel();

@@ -13,9 +13,6 @@ namespace imttest
 {
 
 
-//class ITestInfo;
-
-
 /**
 	Common interface for a test instance. A test instance is the result of the test installation by the customer.
 	A test instance can have a subset of the defined test licenses and is therefore a provider of actually available licenses for the current instance.
@@ -25,7 +22,6 @@ namespace imttest
 class ITestInfo: virtual public iser::IObject
 {
 public:
-
 	enum MetaInfoTypes
 	{
 		/**

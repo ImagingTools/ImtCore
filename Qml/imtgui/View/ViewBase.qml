@@ -174,8 +174,6 @@ Item {
     }
 
     function updateCommandsGui(){
-        console.log("updateCommandsGui", viewBase.viewId);
-
         if (commandsController && viewBase.viewId !== ""){
             if (commandsController.commandsModel.isReady){
                 return;

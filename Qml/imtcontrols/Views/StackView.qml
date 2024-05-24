@@ -13,8 +13,6 @@ Item {
     signal itemRemoved(int index, var item);
 
     function push(item){
-        console.log("StackView push", item);
-
         pagesModel.append({"Component": item})
     }
 
@@ -23,7 +21,17 @@ Item {
         pagesModel.remove(pagesModel.count - 1)
     }
 
-    function peek(){
+    function peekComp(){
+        if (pagesModel.count > 0){
+            let loader = repeaterView.itemAt(pagesModel.count - 1);
+
+            return loader.sourceComponent;
+        }
+
+        return null;
+    }
+
+    function peekItem(){
         if (pagesModel.count > 0){
             let loader = repeaterView.itemAt(pagesModel.count - 1);
 
@@ -31,6 +39,32 @@ Item {
         }
 
         return null;
+    }
+
+    function getPageIndex(pageComp){
+        for (let i = 0; i < pagesModel.count; i++){
+            let comp = pagesModel.get(i).Component;
+            if (comp && comp === pageComp){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    function removePageByIndex(index){
+        pagesModel.remove(index)
+    }
+
+    function removePageByComp(pageComp){
+        let index = getPageIndex(pageComp);
+        if (index >= 0){
+            removePageByIndex(index);
+        }
+    }
+
+    function clear(){
+        pagesModel.clear();
     }
 
     Repeater {
@@ -41,8 +75,6 @@ Item {
         model: container.pagesModel;
 
         delegate: Loader {
-            id: dialogLoader;
-
             anchors.fill: parent;
 
             sourceComponent: model.Component;

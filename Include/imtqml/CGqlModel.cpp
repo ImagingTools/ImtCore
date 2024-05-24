@@ -4,7 +4,6 @@
 // Qt includes
 #include <QtQml/QQmlEngine>
 #include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
 
 
 namespace imtqml
@@ -17,13 +16,11 @@ QString CGqlModel::s_accessToken = QString();
 CGqlModel::CGqlModel(QObject *parent)
 	:BaseClass(parent)
 {
-
 }
 
 
 CGqlModel::~CGqlModel()
 {
-
 }
 
 
@@ -47,9 +44,12 @@ bool CGqlModel::SetGqlQuery(QString query)
 			networkRequest.setRawHeader("X-authentication-token", s_accessToken.toUtf8());
 		}
 
-		qDebug() << QString("Post to url %1 query %2 ").arg(requestUrl.toString()).arg(query);
+		QString message = QString("Post to url '%1' query '%2'").arg(requestUrl.toString()).arg(query);
+		qDebug() << message;
+
 		QNetworkReply* reply = accessManager->post(networkRequest, query.toUtf8());
 		connect(reply, &QNetworkReply::finished, this, &CGqlModel::replyFinished);
+		connect(reply, &QNetworkReply::errorOccurred, this, &CGqlModel::errorOccurred);
 
 		return true;
 	}
@@ -75,6 +75,17 @@ void CGqlModel::replyFinished()
 			SetState("Error");
 		}
 		reply->deleteLater();
+	}
+}
+
+
+void CGqlModel::errorOccurred(QNetworkReply::NetworkError /*code*/)
+{
+	QNetworkReply* networkReplyPtr = dynamic_cast<QNetworkReply*>(sender());
+	if (networkReplyPtr != nullptr){
+		qDebug() << networkReplyPtr->errorString();
+
+		networkReplyPtr->deleteLater();
 	}
 }
 

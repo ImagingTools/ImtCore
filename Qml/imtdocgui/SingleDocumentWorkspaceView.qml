@@ -52,6 +52,32 @@ DocumentManager {
 //        }
     }
 
+    function generateDocumentTitle(documentIndex){
+        if (documentIndex < 0 || documentIndex >= documentsModel.count){
+            return "";
+        }
+
+        let title = defaultDocumentName;
+
+        let documentData = documentsModel.get(documentIndex).DocumentData;
+
+        let documentName = "";
+
+        if (documentData){
+            documentName = documentData.getDocumentName();
+        }
+
+        if (documentName && documentName !== ""){
+            title = documentName;
+        }
+
+        if (documentData && documentData.isDirty){
+            title = title + " *";
+        }
+
+        return title;
+    }
+
     function loadStartItem(){
         if (startItemIsLoaded){
             return;

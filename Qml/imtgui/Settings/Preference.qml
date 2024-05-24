@@ -15,10 +15,7 @@ Rectangle {
     color: Style.backgroundColor;
 
     property TreeItemModel settingsModel: TreeItemModel {
-            onDataChanged: {
-                console.log("settingsModel onDataChanged");
-            }
-      };
+    };
 
     property alias leftPanelWidth: mainPanelBackground.width;
     property alias mainWidth: root.width;
@@ -35,6 +32,14 @@ Rectangle {
 
     onModelChanged: {
         root.modelIsDirty = true;
+    }
+
+    Connections {
+        target: root.settingsModel;
+
+        function onDataChanged(){
+            console.log("settingsModel onDataChanged", root.settingsModel.ToJson());
+        }
     }
 
     onSettingsModelChanged: {

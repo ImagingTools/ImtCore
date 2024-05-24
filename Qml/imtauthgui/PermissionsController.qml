@@ -7,16 +7,14 @@ import imtcontrols 1.0
 Item {
     id: root;
 
-    property AuthorizationPage authorizationPage: null;
-
     Component.onCompleted: {
         Events.subscribeEvent("SetPermissions", private_.setPermissions)
-        Events.subscribeEvent("OnLogout", private_.onLogout)
+        Events.subscribeEvent("Logout", private_.onLogout)
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("SetPermissions", private_.setPermissions)
-        Events.unSubscribeEvent("OnLogout", private_.onLogout)
+        Events.unSubscribeEvent("Logout", private_.onLogout)
     }
 
     QtObject {
@@ -34,10 +32,8 @@ Item {
     }
 
     function checkPermission(permissionId){
-        if (root.authorizationPage != null){
-            if (root.authorizationPage.loggedUserIsSuperuser()){
-                return true;
-            }
+        if (AuthorizationController.loggedUserIsSuperuser()){
+            return true;
         }
 
         if (private_.permissions.includes(permissionId)){

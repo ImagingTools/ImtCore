@@ -6,8 +6,8 @@ import imtgui 1.0
 Item {
     id: root;
 
-    height: 30;
     width: 50;
+    height: 30;
 
     property string username;
     property string userId;
@@ -19,37 +19,41 @@ Item {
     property bool isExitButton: false;
 
     Component.onCompleted: {
-        Events.subscribeEvent("SetUserPanelVisible", root.setVisible);
-        Events.subscribeEvent("Logout", root.onLogout);
-        Events.subscribeEvent("Login", root.onLogin);
         Events.subscribeEvent("OnLocalizationChanged", root.onLocalizationChanged);
+        Events.subscribeEvent("SetUserPanelEnabled", root.setUserPanelEnabled);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("SetUserPanelVisible", root.setVisible);
-        Events.unSubscribeEvent("Logout", root.onLogout);
-        Events.unSubscribeEvent("Login", root.onLogin);
         Events.unSubscribeEvent("OnLocalizationChanged", root.onLocalizationChanged);
+        Events.unSubscribeEvent("SetUserPanelEnabled", root.setUserPanelEnabled);
     }
 
-    function onLogout(){
-        root.username = "";
-        root.userId = "";
-        root.passwordHash = "";
+    Connections {
+        target: AuthorizationController;
 
-        root.enabled = false;
+        function onLoginSuccessful(){
+            root.username = AuthorizationController.userTokenProvider.login;
+            root.userId = AuthorizationController.userTokenProvider.userId;
+            root.passwordHash = AuthorizationController.userTokenProvider.passwordHash;
+
+            root.enabled = true;
+        }
+
+        function onLogoutSignal(){
+            root.username = "";
+            root.userId = "";
+            root.passwordHash = "";
+
+            root.enabled = false;
+        }
+    }
+
+    function setUserPanelEnabled(enabled){
+        root.enabled = enabled;
     }
 
     function setVisible(visible){
         root.visible = visible;
-    }
-
-    function onLogin(loginData){
-        root.username = loginData["Login"];
-        root.userId = loginData["UserId"];
-        root.passwordHash = loginData["PasswordHash"];
-
-        root.enabled = true;
     }
 
     function onLocalizationChanged(language){

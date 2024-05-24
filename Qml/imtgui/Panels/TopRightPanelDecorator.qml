@@ -8,28 +8,32 @@ DecoratorBase {
     id: topRightPanelDecorator;
 
     Component.onCompleted: {
-        Events.subscribeEvent("UserModeChanged", topRightPanelDecorator.onUserModeChanged);
-        Events.subscribeEvent("Login", topRightPanelDecorator.onLogin);
-        Events.subscribeEvent("Logout", topRightPanelDecorator.onLogout);
-
         onLogout();
     }
 
-    Component.onDestruction: {
-        Events.unSubscribeEvent("UserModeChanged", topRightPanelDecorator.onUserModeChanged);
-        Events.unSubscribeEvent("Login", topRightPanelDecorator.onLogin);
-        Events.unSubscribeEvent("Logout", topRightPanelDecorator.onLogout);
-    }
+    Connections {
+        target: AuthorizationController;
 
-    function onUserModeChanged(userMode){
-        if (userMode === "NO_USER_MANAGEMENT"){
-            userPanel.visible = false;
+        function onUserModeChanged(userMode){
+            if (userMode === "NO_USER_MANAGEMENT"){
+                userPanel.visible = false;
+            }
+            else if (userMode === "OPTIONAL_USER_MANAGEMENT"){
+                userPanel.visible = true;
+            }
+            else if (userMode === "STRONG_USER_MANAGEMENT"){
+                userPanel.visible = true;
+            }
         }
-        else if (userMode === "OPTIONAL_USER_MANAGEMENT"){
-            userPanel.visible = true;
+
+        function onLoginSuccessful(){
+            if (Qt.platform.os === "web"){
+                preferenceButton.visible = true;
+            }
         }
-        else if (userMode === "STRONG_USER_MANAGEMENT"){
-            userPanel.visible = true;
+
+        function onLogoutSignal(){
+            topRightPanelDecorator.onLogout()
         }
     }
 

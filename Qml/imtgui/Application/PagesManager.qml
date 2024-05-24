@@ -9,7 +9,6 @@ Item {
     property TreeItemModel pageModel: TreeItemModel {};
     property Item activeItem: null;
     property int activePageIndex: -1;
-    property AuthorizationPage authorizationStatusProvider: null;
 
     /**
         The page will be loaded only by click if it hasn't loaded yet
@@ -34,12 +33,9 @@ Item {
     }
 
     function onLocalizationChanged(language){
-        console.log("Pages onLocalizationChanged", language);
-        if (container.authorizationStatusProvider != null){
-            let loggedUserId = container.authorizationStatusProvider.getLoggedUserId();
-            if (loggedUserId !== ""){
-                pagesProvider.updateModel();
-            }
+        let loggedUserId = AuthorizationController.getLoggedUserId();
+        if (loggedUserId !== ""){
+            pagesProvider.updateModel();
         }
     }
 

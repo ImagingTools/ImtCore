@@ -1,9 +1,12 @@
 #pragma once
 
-// ImtCore includes
-#include <imtbase/CCollectionInfo.h>
-#include <imttest/ITestInfo.h>
+
+// ACF includes
 #include <imod/CModelUpdateBridge.h>
+
+// ImtCore includes
+#include <imttest/ITestInfo.h>
+#include <imtbase/CCollectionInfo.h>
 #include <imtbase/IObjectCollection.h>
 
 
@@ -11,11 +14,6 @@ namespace imttest
 {
 
 
-/**
-	Common implementation of ITestInfo interface.
-	\sa ITestInfo
-	\ingroup LicenseManagement
-*/
 class CTestInfo: virtual public imttest::ITestInfo
 {
 public:
@@ -49,6 +47,6 @@ private:
 };
 
 
-} // namespace imtlic
+} // namespace imttest
 
 

@@ -22,10 +22,10 @@ class CObjectCollectionTest: public QObject
 
 private slots:
 	void initTestCase();
+	void cleanupTestCase();
 	void ResetCollectionWithFixedObjectTest();
 	void GetOperationFlagsFixedObjectTest();
 	void CheckSerializeTest();
-	void cleanupTestCase();
 
 private:
 	QString m_imtCorePath;

@@ -3,12 +3,13 @@
 
 // ImtCore includes
 #include <imttest/ITestInfo.h>
-#include <imttest/ITestInfoProvider.h>
 
 
 namespace imttest
 {
 
+
+// reimplemented (idoc::IDocumentMetaInfo)
 
 QString CTestMetaInfo::GetMetaInfoName(int metaInfoType) const
 {

@@ -221,9 +221,36 @@ DocumentDataController {
     }//GqlModel itemModel
 
     property GqlModel gqlAddModel: GqlModel {
+        function save(){
+            var query = Gql.GqlRequest("mutation", container.gqlAddCommandId);
+
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("Id", container.documentId);
+            inputParams.InsertField ("Item", container.documentModel.ToJson());
+
+            let additionInputParams = container.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+            }
+
+            query.AddParam(inputParams);
+
+            var queryFields = Gql.GqlObject("addedNotification");
+            queryFields.InsertField("Id");
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+
+            this.SetGqlQuery(gqlData);
+        }
+
         onStateChanged: {
-            console.log("onResult", container.gqlAddModel.state);
-            let state = container.gqlAddModel.state;
+            console.log("onResult", state);
+
             if (state === "Error"){
                 container.error("Network error", "Critical");
             }
@@ -268,32 +295,6 @@ DocumentDataController {
                     }
                 }
             }
-        }
-
-        function save(){
-            var query = Gql.GqlRequest("mutation", container.gqlAddCommandId);
-
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", container.documentId);
-            inputParams.InsertField ("Item", container.documentModel.ToJson());
-
-            let additionInputParams = container.getAdditionalInputParams();
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-                inputParams.InsertFieldObject(additionParams);
-            }
-
-            query.AddParam(inputParams);
-
-            var queryFields = Gql.GqlObject("addedNotification");
-            queryFields.InsertField("Id");
-            query.AddField(queryFields);
-
-            var gqlData = query.GetQuery();
-            this.SetGqlQuery(gqlData);
         }
     }
 }
