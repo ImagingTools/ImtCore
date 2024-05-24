@@ -10,12 +10,6 @@ Item {
     signal undo();
     signal redo();
 
-    Component.onDestruction: {
-        if (modelIsRegistered()){
-            unregisterModel();
-        }
-    }
-
     function getCurrentStateModel()
     {
         if (internal.m_undoStack.length > 0){
@@ -292,21 +286,6 @@ Item {
                 undoRedoManager.commandHandle("Redo");
             }
         }
-    }
-
-    function printInfo(){
-        console.log("printInfo");
-        console.log("---------UNDO-----------");
-        for (let i = 0; i < internal.m_undoStack.length; ++i){
-            console.log(i, internal.m_undoStack[i].ToJson());
-        }
-        console.log("-------------------------");
-
-        console.log("---------REDO-----------");
-        for (let i = 0; i < internal.m_redoStack.length; ++i){
-            console.log(i, internal.m_redoStack[i].ToJson());
-        }
-        console.log("-------------------------");
     }
 }
 

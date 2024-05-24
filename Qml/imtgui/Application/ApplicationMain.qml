@@ -394,7 +394,7 @@ Item {
         interval: 3000;
 
         repeat: true;
-        running: true;
+        running: application.useWebSocketSubscription && webSocketPortProvider.port == -1;
 
         onTriggered: {
             if (!application.useWebSocketSubscription){
