@@ -25,6 +25,32 @@ CollectionView {
         return {};
     }
 
+    function registerSubscription(){
+        let subscriptionRequestId = "On" + root.collectionId + "CollectionChanged"
+        var query = Gql.GqlRequest("subscription", subscriptionRequestId);
+        var inputParams = Gql.GqlObject("input");
+
+        let additionInputParams = root.getAdditionalInputParams();
+        if (Object.keys(additionInputParams).length > 0){
+            let additionParams = Gql.GqlObject("addition");
+            for (let key in additionInputParams){
+                additionParams.InsertField(key, additionInputParams[key]);
+            }
+            inputParams.InsertFieldObject(additionParams);
+        }
+
+        query.AddParam(inputParams);
+        var queryFields = Gql.GqlObject("notification");
+        queryFields.InsertField("Id");
+        query.AddField(queryFields);
+
+        Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
+    }
+
+    function unRegisterSubscription(){
+        Events.sendEvent("UnRegisterSubscription", subscriptionClient);
+    }
+
     dataControllerComp: Component {
         CollectionRepresentation {
             property bool isReady: false;
@@ -196,31 +222,13 @@ CollectionView {
         id: subscriptionClient;
 
         Component.onDestruction: {
-            Events.sendEvent("UnRegisterSubscription", subscriptionClient);
+            root.unRegisterSubscription()
         }
 
         property bool ok: root.collectionId !== "" && subscriptionClient.subscriptionId !== "";
         onOkChanged: {
             if (ok){
-                let subscriptionRequestId = "On" + root.collectionId + "CollectionChanged"
-                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
-                var inputParams = Gql.GqlObject("input");
-
-                let additionInputParams = root.getAdditionalInputParams();
-                if (Object.keys(additionInputParams).length > 0){
-                    let additionParams = Gql.GqlObject("addition");
-                    for (let key in additionInputParams){
-                        additionParams.InsertField(key, additionInputParams[key]);
-                    }
-                    inputParams.InsertFieldObject(additionParams);
-                }
-
-                query.AddParam(inputParams);
-                var queryFields = Gql.GqlObject("notification");
-                queryFields.InsertField("Id");
-                query.AddField(queryFields);
-
-                Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
+                root.registerSubscription()
             }
         }
 

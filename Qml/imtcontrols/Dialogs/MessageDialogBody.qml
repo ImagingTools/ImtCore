@@ -23,16 +23,17 @@ Rectangle {
 
         spacing: 5;
 
-        Text {
+        TextEdit {
             id: messageText;
 
             width: columnBody.width;
+            height: contentHeight
 
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
-            elide: Text.ElideRight;
             wrapMode: Text.WordWrap;
+            readOnly: true
 
             text: inputDialogBodyContainer.message;
         }

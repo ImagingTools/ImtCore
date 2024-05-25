@@ -286,12 +286,14 @@ FocusScope{
                 CheckBox{
                     id: checkBoxAll;
 
+                    // anchors.top: body.top
+                    // anchors.topMargin: 50
                     anchors.left: parent.left;
                     anchors.leftMargin: Style.size_mainMargin;
                     anchors.verticalCenter: searchBlock.verticalCenter;
 
-                    width: 28;
-                    height: 28;
+                    width: 20;
+                    height: 20;
                     //radius: 5
                     mainMargin: 16;
                     borderColor:Style.color_gray;
@@ -299,7 +301,7 @@ FocusScope{
                     visible: checkBoxMenu.hasAllSelection;
                     enabled: visible;
 
-                    text: checkBoxMenu.hasSearch ? "" : "Все";
+                    text: checkBoxMenu.hasSearch ? "" : qsTr("All0");
 
                     //imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
 
@@ -361,7 +363,7 @@ FocusScope{
                 ListView{
                     id: listView;
 
-                    anchors.top: checkBoxMenu.hasAllSelection ? searchBlock.bottom : parent.top;
+                    anchors.top: checkBoxMenu.hasAllSelection ? checkBoxAll.bottom : parent.top;
                     anchors.bottom: parent.bottom;
                     anchors.left: parent.left;
                     anchors.right: parent.right;
@@ -385,8 +387,8 @@ FocusScope{
 
                             anchors.verticalCenter: parent.verticalCenter;
 
-                            width: 28;
-                            height: 28;
+                            width: 20;
+                            height: 20;
                             //radius: 5
                             mainMargin: 16;
                             borderColor:Style.color_gray;

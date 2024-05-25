@@ -11,6 +11,9 @@ DecoratorBase {
     width: baseElement ? baseElement.width: 0;
     height: 40;
 
+    property alias segmentedButton: segmentedButton_
+    property alias filtermenu: filtermenu_
+
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", onLocalizationChanged);
         checkWidth();
@@ -26,11 +29,11 @@ DecoratorBase {
     }
 
     function checkWidth(){
-        if (width - filtermenu.width <= content.width + 2 * content.spacing){
-            content.visible = false;
+        if (width - filtermenu.width <= segmentedButton.width + 2 * segmentedButton.spacing){
+            segmentedButton.visible = false;
         }
         else{
-            content.visible = true;
+            segmentedButton.visible = true;
         }
     }
 
@@ -47,8 +50,7 @@ DecoratorBase {
     }
 
     SegmentedButton {
-        id: content;
-
+        id: segmentedButton_
         anchors.left: parent.left;
         anchors.verticalCenter: parent.verticalCenter;
 
@@ -125,8 +127,7 @@ DecoratorBase {
     }
 
     FilterPanelDecorator {
-        id: filtermenu
-
+        id: filtermenu_
         anchors.verticalCenter: parent.verticalCenter;
         anchors.right: parent.right;
 

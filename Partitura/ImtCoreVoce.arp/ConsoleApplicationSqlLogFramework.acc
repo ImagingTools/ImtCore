@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5200" Description="ACF"/>
-            <Version Id="1" Number="2203" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394753" Description="Qt Framework"/>
+            <Version Id="0" Number="5221" Description="ACF"/>
+            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Base framework for a console application</Description>
@@ -14,7 +14,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LogSqlRepository"/>
+                        <Data IsEnabled="true" Value="MessageSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ConsoleApplicationFramework/RuntimeStatus"/>
@@ -67,7 +67,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="LogSqlRepository" PackageId="ImtDatabaseVoce" ComponentId="LogSqlRepository">
+        <Element Id="MessageSqlRepository" PackageId="ImtDatabaseVoce" ComponentId="LogSqlRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
@@ -101,6 +101,7 @@
         <Component ExportedId="DatabaseFilePath" ComponentId="SqLiteDatabaseEngine/DatabaseFilePath"/>
         <Component ExportedId="Log" ComponentId="ConsoleApplicationFramework/Log"/>
         <Component ExportedId="LogFilePath" ComponentId="ConsoleApplicationFramework/LogFilePath"/>
+        <Component ExportedId="MessageSqlRepository" ComponentId="MessageSqlRepository"/>
         <Component ExportedId="RuntimeStatus" ComponentId="ConsoleApplicationFramework/RuntimeStatus"/>
     </ExportedComponents>
 </Acf>
