@@ -5,6 +5,19 @@ import imtcolgui 1.0
 CollectionFilter {
     id: root;
 
+    TreeItemModel {
+        id: filterableHeadersModel
+    }
+
+    Component.onCompleted: {
+        filterableHeadersModel.SetData("Id", "Text")
+        let index = filterableHeadersModel.InsertNewItem()
+        filterableHeadersModel.SetData("Id", "Timestamp", index)
+        index = filterableHeadersModel.InsertNewItem()
+        filterableHeadersModel.SetData("Id", "Source", index)
+        setFilteringInfoIds(filterableHeadersModel)
+    }
+
     function setMessageStatusFilter(messageKey, status){
         console.log("*DEBUG* setMessageStatusFilter")
         let objectFilter = filterModel.GetData("ObjectFilter");
