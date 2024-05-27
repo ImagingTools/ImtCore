@@ -479,7 +479,7 @@ class QData extends QProperty {
 // }
 
 class QAlias extends QProperty {
-    // once = true
+    once = true
     constructor(getTargetProperty){
         super()
         this.getTargetProperty = getTargetProperty   
@@ -490,6 +490,10 @@ class QAlias extends QProperty {
         }   
         let targetProperty = this.getTargetProperty()
         if(targetProperty instanceof QProperty) {
+            if(this.once){
+                this.value = targetProperty.getDefaultValue()
+                delete this.once
+            }
             return targetProperty.get()
         } else {
             return targetProperty
@@ -499,6 +503,12 @@ class QAlias extends QProperty {
 
     set(newValue){
         let targetProperty = this.getTargetProperty()
+        if(targetProperty instanceof QProperty) {
+            if(this.once){
+                this.value = targetProperty.getDefaultValue()
+                delete this.once
+            }
+        }
         let safeValue = targetProperty instanceof QProperty ? this.getTargetProperty().typeCasting.call(this, newValue) : newValue
         if(safeValue !== this.value || ((targetProperty instanceof QProperty) && safeValue !== targetProperty.value)){
             this.value = safeValue
@@ -523,10 +533,10 @@ class QAlias extends QProperty {
                 } else {
                     targetProperty.set(safeValue)
                 }
-                if(this.once){
-                    delete this.once
-                    if(!targetProperty.compute) return
-                }
+                // if(this.once){
+                //     delete this.once
+                //     if(!targetProperty.compute) return
+                // }
                 
             }
             if(this.notify) this.notify()
@@ -537,6 +547,12 @@ class QAlias extends QProperty {
         this.subscribersReset()
         this.unsubscribe()
         let targetProperty = this.getTargetProperty()
+        if(targetProperty instanceof QProperty) {
+            if(this.once){
+                this.value = targetProperty.getDefaultValue()
+                delete this.once
+            }
+        }
         let safeValue = targetProperty instanceof QProperty ? this.getTargetProperty().typeCasting.call(this, newValue) : newValue
         if(safeValue !== this.value){
             this.value = safeValue
@@ -551,9 +567,15 @@ class QAlias extends QProperty {
         if(this.updating) return
         this.updating = true
         global.queueLink.push(this)
-        let value = this.value
         
         let targetProperty = this.getTargetProperty()
+        if(targetProperty instanceof QProperty) {
+            if(this.once){
+                this.value = targetProperty.getDefaultValue()
+                delete this.once
+            }
+        }
+        let value = this.value
         if(targetProperty instanceof QProperty) this.subscribe(targetProperty)
 
         try {

@@ -9,7 +9,7 @@ class ListModel extends QtObject {
     }
 
     static defaultSignals = {
-        $transaction: ['sender', 'changeset']
+        $transaction: { params: ['sender', 'changeset'] },
     }
 
     constructor(parent,exCtx,exModel){
