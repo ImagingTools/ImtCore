@@ -36,6 +36,8 @@ public:
 	virtual bool IsGenerateMode() const override;
 	virtual bool IsDependenciesMode() const override;
 	virtual bool IsModificatorEnabled(const QString& modificatorName) const override;
+	virtual bool IsQmlEnabled() const override;
+	virtual bool IsCppEnabled() const override;
 
 private:
 	QString m_schemaFilePath;
@@ -48,6 +50,8 @@ private:
 	bool m_isDependenciesMode;
 	bool m_useAllModificators;
 	bool m_notUseModificators;
+	bool m_qmlEnabled;
+	bool m_cppEnabled;
 };
 
 

@@ -29,6 +29,10 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 	int retVal = iproc::IProcessor::TS_OK;
 
+	if (!m_argumentParserCompPtr->IsCppEnabled()){
+		return retVal;
+	}
+
 	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");

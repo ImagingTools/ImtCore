@@ -12,6 +12,7 @@
 #include <imtsdl/CSdlClassTreeModelModificatorComp.h>
 #include <imtsdl/CSdlClassGqlModificatorComp.h>
 #include <imtsdl/CSdlClassJsonModificatorComp.h>
+#include <imtsdl/CQmlCodeGeneratorComp.h>
 
 
 /**
@@ -28,6 +29,7 @@ typedef imtsdl::CSdlClassCodeGeneratorComp SdlClassCodeGenerator;
 typedef imtsdl::CSdlClassTreeModelModificatorComp SdlClassTreeModelModificator;
 typedef imtsdl::CSdlClassGqlModificatorComp SdlClassGqlModificator;
 typedef imtsdl::CSdlClassJsonModificatorComp SdlClassJsonModificator;
+typedef imtsdl::CQmlCodeGeneratorComp QmlCodeGenerator;
 
 
 } // namespace ImtSdlPck

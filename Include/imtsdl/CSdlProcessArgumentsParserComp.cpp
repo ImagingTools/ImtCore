@@ -20,7 +20,9 @@ CSdlProcessArgumentsParserComp::CSdlProcessArgumentsParserComp()
 :	m_isDependenciesMode(false),
 	m_isGenerateMode(true),
 	m_useAllModificators(false),
-	m_notUseModificators(true)
+	m_notUseModificators(true),
+	m_qmlEnabled(false),
+	m_cppEnabled(true)
 {
 }
 
@@ -39,6 +41,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption dependenciesOption({"D", "dependencies"}, "Generate a dependencies list to be generated. No code will be generated");
 	QCommandLineOption modificatorsOption({"M", "modificator"}, "Modificator to generate code. You can provide multiple modificators. Note: modifier names are case sensitive.", "ModificatorList");
 	QCommandLineOption allModificatorsOption("use-all-modificators", "Use all modificators to generate code");
+	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP if it not setted explicit)", "QML");
+	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)", "CPP");
 
 	QCommandLineParser commandLineParser;
 	bool isOptionsAdded = commandLineParser.addOptions(
@@ -49,7 +53,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 					generateOption,
 					dependenciesOption,
 					modificatorsOption,
-					allModificatorsOption
+					allModificatorsOption,
+					qmlOption,
+					cppOption
 				});
 	if (!isOptionsAdded){
 		Q_ASSERT(false);
@@ -83,6 +89,13 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	if (commandLineParser.isSet(allModificatorsOption)){
 		m_useAllModificators = true;
 		m_notUseModificators = false;
+	}
+	if (commandLineParser.isSet(qmlOption)){
+		m_qmlEnabled = true;
+		m_cppEnabled = false;
+	}
+	if (commandLineParser.isSet(cppOption)){
+		m_cppEnabled = true;
 	}
 
 	// only one mode must be used
@@ -156,6 +169,18 @@ bool CSdlProcessArgumentsParserComp::IsModificatorEnabled(const QString& modific
 	}
 
 	return retVal;
+}
+
+
+bool CSdlProcessArgumentsParserComp::IsQmlEnabled() const
+{
+	return m_qmlEnabled;
+}
+
+
+bool CSdlProcessArgumentsParserComp::IsCppEnabled() const
+{
+	return m_cppEnabled;
 }
 
 

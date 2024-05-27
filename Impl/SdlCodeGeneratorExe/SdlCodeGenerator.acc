@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5181" Description="ACF"/>
-            <Version Id="1" Number="2199" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -58,6 +58,21 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="QmlCodeGenerator" PackageId="ImtSdlPck" ComponentId="QmlCodeGenerator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SdlClassCodeGenerator" PackageId="ImtSdlVoce" ComponentId="SdlClassCodeGeneratorFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -83,6 +98,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>SdlClassCodeGenerator</Value>
+                                <Value>QmlCodeGenerator</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

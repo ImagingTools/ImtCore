@@ -22,6 +22,8 @@ public:
 	virtual bool IsDependenciesMode() const = 0;
 	virtual bool IsGenerateMode() const = 0;
 	virtual bool IsModificatorEnabled(const QString& modificatorName) const = 0;
+	virtual bool IsQmlEnabled() const = 0;
+	virtual bool IsCppEnabled() const = 0;
 };
 
 

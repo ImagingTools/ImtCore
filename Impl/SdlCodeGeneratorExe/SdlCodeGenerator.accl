@@ -2,17 +2,18 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5181" Description="ACF"/>
-            <Version Id="1" Number="2199" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApplicationInfo" X="125" Y="250" Note=""/>
-        <Element ComponentName="ConsoleApplication" X="575" Y="375" Note=""/>
-        <Element ComponentName="ConsoleLog" X="975" Y="475" Note=""/>
-        <Element ComponentName="SdlClassCodeGenerator" X="575" Y="650" Note=""/>
-        <Element ComponentName="SdlCoreFramework" X="568.700394751" Y="503.77976315" Note=""/>
+        <Element ComponentName="ConsoleApplication" X="575" Y="225" Note=""/>
+        <Element ComponentName="ConsoleLog" X="975" Y="500" Note=""/>
+        <Element ComponentName="QmlCodeGenerator" X="225" Y="450" Note=""/>
+        <Element ComponentName="SdlClassCodeGenerator" X="575" Y="625" Note=""/>
+        <Element ComponentName="SdlCoreFramework" X="575" Y="400" Note=""/>
         <Element ComponentName="VersionInfo" X="125" Y="150" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
