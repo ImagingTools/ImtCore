@@ -41,8 +41,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption dependenciesOption({"D", "dependencies"}, "Generate a dependencies list to be generated. No code will be generated");
 	QCommandLineOption modificatorsOption({"M", "modificator"}, "Modificator to generate code. You can provide multiple modificators. Note: modifier names are case sensitive.", "ModificatorList");
 	QCommandLineOption allModificatorsOption("use-all-modificators", "Use all modificators to generate code");
-	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP if it not setted explicit)", "QML");
-	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)", "CPP");
+	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP if it not setted explicit)");
+	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
 
 	QCommandLineParser commandLineParser;
 	bool isOptionsAdded = commandLineParser.addOptions(

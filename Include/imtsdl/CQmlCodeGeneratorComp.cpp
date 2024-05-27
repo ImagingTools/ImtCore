@@ -157,6 +157,11 @@ int CQmlCodeGeneratorComp::DoProcessing(
 		xmlWriter.writeCharacters(sdlType.GetName() + ".qml");
 		xmlWriter.writeEndElement();
 	}
+	// also add qmldir file
+	xmlWriter.writeStartElement("file");
+	xmlWriter.writeAttribute("alias", currentNamespace + "/qmldir");
+	xmlWriter.writeCharacters("qmldir");
+	xmlWriter.writeEndElement();
 
 	xmlWriter.writeEndElement(); // end qresource
 	xmlWriter.writeEndElement(); // end RCC
