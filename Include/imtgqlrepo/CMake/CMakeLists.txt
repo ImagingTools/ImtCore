@@ -18,5 +18,6 @@ GenerateSdl(
 	"${CMAKE_CURRENT_LIST_DIR}/../SDL/General.sdl"
 	"${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL"
 	"${PROJECT_NAME}::sdl"
+	"--use-all-modificators"
 )
 
