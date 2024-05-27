@@ -766,6 +766,11 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	iser::CArchiveTag objectTag(tagName, "key", iser::CArchiveTag::TT_GROUP);
 	bool isMultiTag = false;
 
+	QList<QByteArray> keys = m_roleNames.values();
+	if (keys.size() == 1 && keys[0] == ""){
+		subArrayTag = iser::CArchiveTag("Item", "array item", iser::CArchiveTag::TT_LEAF, &arrayTag);
+	}
+
 	if (m_isArray || countSize > 1){
 		isMultiTag = true;
 	}
