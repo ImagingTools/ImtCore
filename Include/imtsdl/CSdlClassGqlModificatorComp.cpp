@@ -43,7 +43,7 @@ bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const CSdlType& sdlType
 	FeedStream(ofStream, 1, false);
 
 	// add write method definition
-	ofStream << QStringLiteral("\t[[nodiscard]] bool AddMeToGraphQlObject(imtgql::CGqlObject& request) const;");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToGraphQlObject(imtgql::CGqlObject& request) const;");
 
 	FeedStream(ofStream, 2);
 
@@ -78,7 +78,7 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const CSdlType& sdlType
 	// write method implementation
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::AddMeToGraphQlObject(imtgql::CGqlObject& request) const");
+	ofStream << QStringLiteral("::WriteToGraphQlObject(imtgql::CGqlObject& request) const");
 	FeedStream(ofStream, 1, false);
 	ofStream << '{';
 	FeedStream(ofStream, 1, false);
@@ -277,7 +277,7 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("if (!m_");
 	stream << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral(".AddMeToGraphQlObject(");
+	stream << QStringLiteral(".WriteToGraphQlObject(");
 	stream << dataObjectVariableName;
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
@@ -324,7 +324,7 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStre
 
 	// inLoop: add me to temp object and checks
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("if (!iterableValue.AddMeToGraphQlObject(");
+	stream << QStringLiteral("if (!iterableValue.WriteToGraphQlObject(");
 	stream << dataObjectVariableName << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
 

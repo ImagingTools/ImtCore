@@ -48,7 +48,7 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const CSdlType& s
 	}
 
 	// add method definitions
-	ofStream << QStringLiteral("\t[[nodiscard]] bool AddMeToModel(imtbase::CTreeItemModel& model, int modelIndex = 0, const QList<QString>& requiredFields = QList<QString>()) const;");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToModel(imtbase::CTreeItemModel& model, int modelIndex = 0, const QList<QString>& requiredFields = QList<QString>()) const;");
 	FeedStream(ofStream, 1, false);
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromModel(C");
 	ofStream << sdlType.GetName();
@@ -71,7 +71,7 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const CSdlType& s
 	// add method implementation
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::AddMeToModel(imtbase::CTreeItemModel& model, int modelIndex, const QList<QString>& requiredFields) const\n{");
+	ofStream << QStringLiteral("::WriteToModel(imtbase::CTreeItemModel& model, int modelIndex, const QList<QString>& requiredFields) const\n{");
 
 	// first add fields check
 	// a)add static variable with all suppotred fields
@@ -278,7 +278,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelImplCode(QText
 	stream << GetCapitalizedValue(field.GetId());
 	stream << QStringLiteral("Added = m_");
 	stream << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral(".AddMeToModel(*");
+	stream << QStringLiteral(".WriteToModel(*");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral("NewModelPtr, 0);");
 	FeedStream(stream, 1, false);
@@ -434,7 +434,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("if (!m_") << GetDecapitalizedValue(field.GetId());
 	stream << '[' << treeModelIndexVarName << ']';
-	stream << QStringLiteral(".AddMeToModel(*") << newTreeModelVarName;
+	stream << QStringLiteral(".WriteToModel(*") << newTreeModelVarName;
 	stream << QStringLiteral(", ") << treeModelIndexVarName;
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);

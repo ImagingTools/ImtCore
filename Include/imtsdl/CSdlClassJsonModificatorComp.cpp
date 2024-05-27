@@ -52,7 +52,7 @@ bool CSdlClassJsonModificatorComp::ProcessHeaderClassFile(const CSdlType& sdlTyp
 	}
 
 	// add method definitions
-	ofStream << QStringLiteral("\t[[nodiscard]] bool AddMeToJsonObject(QJsonObject& jsonObject) const;");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;");
 	FeedStream(ofStream, 1, false);
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromJsonObject(C");
 	ofStream << sdlType.GetName();
@@ -75,7 +75,7 @@ bool CSdlClassJsonModificatorComp::ProcessSourceClassFile(const CSdlType& sdlTyp
 	// add method implementation
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::AddMeToJsonObject(QJsonObject& jsonObject) const\n{");
+	ofStream << QStringLiteral("::WriteToJsonObject(QJsonObject& jsonObject) const\n{");
 
 	// add write logic for each field
 	for (const CSdlField& field: sdlType.GetFields()){
@@ -120,11 +120,11 @@ void CSdlClassJsonModificatorComp::AddIncludeDerective(QTextStream& stream, bool
 		FeedStream(stream, 1, false);
 	}
 
-	stream << QStringLiteral("#include <QtCore/QJsonObject.h>");
+	stream << QStringLiteral("#include <QtCore/QJsonObject>");
 	FeedStream(stream, 1, false);
-	stream << QStringLiteral("#include <QtCore/QJsonArray.h>");
+	stream << QStringLiteral("#include <QtCore/QJsonArray>");
 	FeedStream(stream, 1, false);
-	stream << QStringLiteral("#include <QtCore/QJsonValue.h>");
+	stream << QStringLiteral("#include <QtCore/QJsonValue>");
 }
 
 
@@ -286,7 +286,7 @@ void CSdlClassJsonModificatorComp::AddCustomFieldWriteToJsonImplCode(QTextStream
 	stream << GetCapitalizedValue(field.GetId());
 	stream << QStringLiteral("Added = m_");
 	stream << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral(".AddMeToJsonObject(");
+	stream << QStringLiteral(".WriteToJsonObject(");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral("Json);");
 	FeedStream(stream, 1, false);
@@ -603,7 +603,7 @@ void CSdlClassJsonModificatorComp:: AddCustomArrayFieldWriteToJsonImplCode(
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("if (!m_") << GetDecapitalizedValue(field.GetId());
 	stream << '[' << dataIndexVarName << ']';
-	stream << QStringLiteral(".AddMeToJsonObject(") << newJsonObjectVarName;
+	stream << QStringLiteral(".WriteToJsonObject(") << newJsonObjectVarName;
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
 

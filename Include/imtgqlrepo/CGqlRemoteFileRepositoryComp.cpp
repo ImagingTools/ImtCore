@@ -203,7 +203,7 @@ bool CGqlRemoteFileRepositoryComp::RemoveElement(
 	removeRequest.SetId(elementId);
 
 	imtgql::CGqlObject removeRequestParam;
-	const bool isAdded = removeRequest.AddMeToGraphQlObject(removeRequestParam);
+	const bool isAdded = removeRequest.WriteToGraphQlObject(removeRequestParam);
 	if (!isAdded){
 		SendCriticalMessage("Unable to add request to ghaphQL request", "RemoveElement");
 		Q_ASSERT_X(false, "RemoveElement", "Unable to add request to ghaphQL request");
@@ -243,7 +243,7 @@ QString CGqlRemoteFileRepositoryComp::GetFile(
 	fileDataRequest.SetId(objectId);
 
 	imtgql::CGqlObject fileDataRequestParam;
-	const bool isAdded = fileDataRequest.AddMeToGraphQlObject(fileDataRequestParam);
+	const bool isAdded = fileDataRequest.WriteToGraphQlObject(fileDataRequestParam);
 	if (!isAdded){
 		SendCriticalMessage("Unable to add request to ghaphQL request", logTag);
 		Q_ASSERT_X(false, logTag, "Unable to add request to ghaphQL request");
@@ -361,7 +361,7 @@ QByteArray CGqlRemoteFileRepositoryComp::InsertFile(
 	insertRequest.SetTotalSize(fileData.length());
 
 	imtgql::CGqlObject insertRequestParam;
-	const bool isAdded = insertRequest.AddMeToGraphQlObject(insertRequestParam);
+	const bool isAdded = insertRequest.WriteToGraphQlObject(insertRequestParam);
 	if (!isAdded){
 		SendCriticalMessage("Unable to add request to ghaphQL request", logTag);
 		Q_ASSERT_X(false, logTag, "Unable to add request to ghaphQL request");

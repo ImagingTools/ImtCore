@@ -458,7 +458,7 @@ bool CGqlFileRepositoryHandlerComp::SetupGqlItem(
 	fileMetaInfo.SetChecksumValue(elementMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM).toString());
 	fileMetaInfo.SetVersion(elementMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION).toString());
 
-	bool retVal = fileMetaInfo.AddMeToModel(model, 0);
+	bool retVal = fileMetaInfo.WriteToModel(model, 0);
 	Q_ASSERT_X(retVal, "SetupGqlItem", "Unable to add metainfo to model");
 
 	return retVal;
