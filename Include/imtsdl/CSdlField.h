@@ -43,6 +43,7 @@ public:
 
 	// operators
 	bool operator==(const CSdlField& other) const;
+	bool operator!=(const CSdlField& other) const {return !(operator==(other));}
 
 	// reimplemented(iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;

@@ -30,6 +30,7 @@ public:
 	I_BEGIN_COMPONENT(CGqlSchemaParserComp)
 		I_REGISTER_INTERFACE(iproc::IProcessor)
 		I_REGISTER_INTERFACE(ISdlTypeListProvider)
+		I_REGISTER_INTERFACE(ISdlRequestListProvider)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 	I_END_COMPONENT;
 

@@ -127,6 +127,12 @@ SdlFieldList CGqlSchemaParser::GetFields(const QString typeName) const
 }
 
 
+SdlRequestList CGqlSchemaParser::GetRequests() const
+{
+	return m_requests;
+}
+
+
 // protected methods
 
 bool CGqlSchemaParser::ProcessSchema()
@@ -192,6 +198,19 @@ bool CGqlSchemaParser::ProcessType()
 
 	QByteArray typeName;
 	retVal = ReadToDelimeter("{",typeName);
+
+	// first ensure it is not a query or mutation or subscription
+	if (typeName == m_keywordMap[KI_QUERY]){
+		return ProcessQuery();
+	}
+	else if (typeName == m_keywordMap[KI_MUTATION]){
+		return ProcessMutation();
+	}
+	else if (typeName == m_keywordMap[KI_SUBSCRIPTION]){
+		return ProcessSubscription();
+	}
+
+	// if not, process as common type
 	CSdlType gqlType;
 	gqlType.SetName(QString(typeName.trimmed()));
 
@@ -300,29 +319,13 @@ bool CGqlSchemaParser::ProcessDirective()
 
 bool CGqlSchemaParser::ProcessQuery()
 {
-	bool retVal = false;
-		SendLogMessage(
-				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
-				0,
-				QString("Process query is not implemented yet"),
-				"CGqlSchemaParser");
-	Q_ASSERT(retVal);
-
-	return retVal;
+	return ProcessRequests(CSdlRequest::T_QUERY);
 }
 
 
 bool CGqlSchemaParser::ProcessMutation()
 {
-	bool retVal = false;
-		SendLogMessage(
-				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
-				0,
-				QString("Process mutation is not implemented yet"),
-				"CGqlSchemaParser");
-	Q_ASSERT(retVal);
-
-	return retVal;
+	return ProcessRequests(CSdlRequest::T_MUTATION);
 }
 
 
@@ -357,7 +360,6 @@ bool CGqlSchemaParser::ProcessValue(SdlFieldList& output, bool* endOfReadPtr)
 		retVal = retVal && MoveToNextReadableSymbol();
 		field.SetIsArray(true);
 		QByteArray valueType;
-		char foundDelimeter = ';';
 		retVal = retVal && ReadToDelimeter("!]", valueType, &foundDelimeter);
 		if (foundDelimeter == '!'){
 			field.SetIsNonEmpty(true);
@@ -376,26 +378,74 @@ bool CGqlSchemaParser::ProcessValue(SdlFieldList& output, bool* endOfReadPtr)
 	// process scalar values
 	else {
 		QByteArray valueType;
-		retVal = retVal && ReadToDelimeterOrSpace(",!}", valueType, &foundDelimeter);
+		retVal = retVal && ReadToDelimeterOrSpace(",!})", valueType, &foundDelimeter);
 		field.SetType(valueType);
 
 		if (foundDelimeter == '!'){
 			field.SetIsRequired(true);
 		}
-		retVal = retVal && MoveToNextReadableSymbol(&foundDelimeter);
 
-		if (endOfReadPtr != nullptr){
-			*endOfReadPtr = bool(foundDelimeter == '}');
+		if (foundDelimeter != ')'){
+			retVal = retVal && MoveToNextReadableSymbol(&foundDelimeter);
 		}
 	}
 
 	output << field;
 
 	if (endOfReadPtr != nullptr){
-		*endOfReadPtr = bool(m_lastReadChar == '}');
+		*endOfReadPtr = bool(foundDelimeter == '}' || foundDelimeter == ')');
 	}
 
-	Q_ASSERT(m_lastReadChar == '}' || QChar(m_lastReadChar).isLetter());
+	Q_ASSERT(foundDelimeter == '}'|| foundDelimeter == ')' || QChar(foundDelimeter).isLetter());
+
+	return retVal;
+}
+
+
+bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
+{
+	bool retVal = true;
+
+	QByteArray devNull;
+	retVal = MoveToNextReadableSymbol();
+
+	char foundDelimiter = ':';
+	do {
+		CSdlRequest request;
+		request.SetType(type);
+
+		// get name
+		QByteArray requestName;
+		retVal = retVal && ReadToDelimeter("(", requestName, &foundDelimiter) && MoveToNextReadableSymbol();
+		request.SetName(requestName.trimmed());
+
+		// extract input params
+		SdlFieldList inputArguments;
+		bool atEnd = false;
+		while (!atEnd){
+			retVal = retVal && ProcessValue(inputArguments, &atEnd);
+			Q_ASSERT(m_lastReadChar != '}');
+		}
+		request.SetInputArguments(inputArguments);
+
+		// set output
+		retVal = retVal && ReadToDelimeter(":",devNull) && MoveToNextReadableSymbol(&foundDelimiter);
+		Q_ASSERT(foundDelimiter != '[');
+
+		CSdlField outputArgument;
+		QByteArray outputArgumentType;
+		retVal = retVal && ReadToDelimeterOrSpace("!",outputArgumentType, &foundDelimiter);
+		outputArgument.SetType(outputArgumentType);
+
+		Q_ASSERT(foundDelimiter != ']');
+		if (foundDelimiter == '!'){
+			outputArgument.SetIsRequired(true);
+		}
+		m_requests << request;
+
+		retVal = retVal && MoveToNextReadableSymbol(&foundDelimiter);
+	}
+	while(foundDelimiter != '}');
 
 	return retVal;
 }
@@ -500,6 +550,7 @@ bool CGqlSchemaParser::ReadToDelimeterOrSpace(const QByteArray& delimeters,
 	newDelimeters.append(' ');
 	newDelimeters.append('\n');
 	newDelimeters.append('\r');
+	newDelimeters.append('\t');
 	return ReadToDelimeter(
 				newDelimeters,
 				result,
@@ -511,7 +562,6 @@ bool CGqlSchemaParser::ReadToDelimeterOrSpace(const QByteArray& delimeters,
 
 bool CGqlSchemaParser::MoveToCharType(
 			QChar::Category category,
-
 			char* foundDelimeterPtr,
 			bool skipDelimeter)
 {

@@ -1,0 +1,105 @@
+#include <imtsdl/CSdlRequest.h>
+
+//Acf includes
+#include <istd/CChangeNotifier.h>
+#include <iser/CArchiveTag.h>
+#include <iser/IArchive.h>
+#include <iser/CPrimitiveTypesSerializer.h>
+
+
+namespace imtsdl
+{
+
+// public methods
+
+CSdlRequest::Type CSdlRequest::GetType() const
+{
+	return m_type;
+}
+
+void CSdlRequest::SetType(Type type)
+{
+	if (m_type != type){
+		istd::CChangeNotifier notifier(this);
+		m_type = type;
+	}
+}
+
+QString CSdlRequest::GetName() const
+{
+	return m_name;
+}
+
+
+void CSdlRequest::SetName(const QString& name)
+{
+	if (m_name != name){
+		istd::CChangeNotifier notifier(this);
+		m_name = name;
+	}
+}
+
+
+SdlFieldList CSdlRequest::GetInputArguments() const
+{
+	return m_inputArguments;
+}
+
+
+void CSdlRequest::SetInputArguments(const SdlFieldList& inputArguments)
+{
+	if (m_inputArguments != inputArguments){
+		istd::CChangeNotifier notifier(this);
+		m_inputArguments = inputArguments;
+	}
+}
+
+
+CSdlField CSdlRequest::GetOutputArgument() const
+{
+	return m_outputArgument;
+}
+
+
+void CSdlRequest::SetOutputArgument(const CSdlField& outputArgument)
+{
+	if (m_outputArgument != outputArgument){
+		istd::CChangeNotifier notifier(this);
+		m_outputArgument = outputArgument;
+	}
+}
+
+
+// reimplemented(iser::ISerializable)
+
+bool CSdlRequest::Serialize(iser::IArchive& archive)
+{
+	bool retVal = true;
+
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
+
+	iser::CArchiveTag typeTag("Type", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(typeTag);
+	retVal = retVal && I_SERIALIZE_ENUM(Type, archive, m_type);
+	retVal = retVal && archive.EndTag(typeTag);
+
+	iser::CArchiveTag nameTag("Name", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(nameTag);
+	retVal = retVal && archive.Process(m_name);
+	retVal = retVal && archive.EndTag(nameTag);
+
+	retVal = retVal && CSdlField::SerializeSdlFieldList(archive, m_inputArguments, "InputArguments", "Argument");
+
+	iser::CArchiveTag outputArgumentTag("OutputArgument", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(outputArgumentTag);
+	retVal = retVal && m_outputArgument.Serialize(archive);
+	retVal = retVal && archive.EndTag(outputArgumentTag);
+
+
+	return retVal;
+}
+
+
+} // namespace imtsdl
+
+

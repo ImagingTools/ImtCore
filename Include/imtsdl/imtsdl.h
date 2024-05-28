@@ -11,10 +11,12 @@ namespace imtsdl
 class CSdlField;
 class CSdlType;
 class CSdlMethod;
+class CSdlRequest;
 
 typedef QList<CSdlType> SdlTypeList;
 typedef QList<CSdlField> SdlFieldList;
 typedef QList<CSdlMethod> SdlMethodList;
+typedef QList<CSdlRequest> SdlRequestList;
 
 enum KeyId
 {

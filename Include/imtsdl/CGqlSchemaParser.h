@@ -12,6 +12,8 @@
 
 // imtsdl includes
 #include <imtsdl/ISdlTypeListProvider.h>
+#include <imtsdl/ISdlRequestListProvider.h>
+#include <imtsdl/CSdlRequest.h>
 
 
 namespace imtsdl
@@ -23,6 +25,7 @@ namespace imtsdl
 class CGqlSchemaParser:
 			virtual public istd::IPolymorphic,
 			virtual public ISdlTypeListProvider,
+			virtual public ISdlRequestListProvider,
 			virtual protected istd::ILogger
 {
 
@@ -41,6 +44,9 @@ public:
 	virtual SdlTypeList GetSdlTypes() const override;
 	virtual SdlFieldList GetFields(const QString typeName) const override;
 
+	// reimplemented (ISdlRequestListProvider)
+	virtual SdlRequestList GetRequests() const override;
+
 protected:
 	virtual bool ProcessSchema();
 	virtual bool ProcessType();
@@ -55,6 +61,8 @@ protected:
 	virtual bool ProcessMutation();
 	virtual bool ProcessSubscription();
 	virtual bool ProcessValue(SdlFieldList& output, bool* endOfReadPtr);
+
+	bool ProcessRequests(CSdlRequest::Type type);
 
 	void SetDevice(QIODevice& device);
 	bool ReadToDelimeter(
@@ -82,6 +90,7 @@ protected:
 	QMap<KeyId, QByteArray> m_keywordMap;
 
 	SdlTypeList m_sdlTypes;
+	SdlRequestList m_requests;
 };
 
 
