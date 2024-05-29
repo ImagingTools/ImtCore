@@ -353,4 +353,18 @@ QString CSdlTools::FromVariantMapAccessString(const CSdlField& sdlField)
 }
 
 
+bool CSdlTools::GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList& typeList, CSdlType& sdlType)
+{
+	for (const CSdlType& type: typeList){
+		if (type.GetName() == sdlField.GetType()){
+			sdlType.SetFields(type.GetFields());
+			sdlType.SetName(type.GetName());
+
+			return true;
+		}
+	}
+	return false;
+}
+
+
 } // namespace imtsdl
