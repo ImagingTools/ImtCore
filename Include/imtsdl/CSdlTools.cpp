@@ -227,6 +227,31 @@ bool CSdlTools::IsTypeHasFundamentalTypes(const CSdlType& sdlType, QSet<QString>
 }
 
 
+bool CSdlTools::IsTypeHasFundamentalTypes(const CSdlRequest& sdlRequest, QSet<QString>* foundTypesPtr)
+{
+	bool retVal = false;
+
+	SdlFieldList fields;
+	fields << sdlRequest.GetInputArguments();
+	fields << sdlRequest.GetOutputArgument();
+
+	for(const CSdlField& sdlField: fields){
+		bool isComplex = true;
+		bool isArray = false;
+		const QString convertedType = ConvertType(sdlField, nullptr, &isComplex, &isArray);
+		isComplex = isComplex || isArray;
+
+		if (foundTypesPtr != nullptr && !isComplex){
+			foundTypesPtr->insert(convertedType);
+		}
+
+		retVal = retVal || !isComplex;
+	}
+
+	return retVal;
+}
+
+
 bool CSdlTools::IsTypeHasNonFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr)
 {
 	bool retVal = false;
