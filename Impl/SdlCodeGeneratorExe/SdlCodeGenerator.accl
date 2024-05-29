@@ -8,13 +8,14 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfo" X="125" Y="250" Note=""/>
-        <Element ComponentName="ConsoleApplication" X="575" Y="225" Note=""/>
-        <Element ComponentName="ConsoleLog" X="975" Y="500" Note=""/>
-        <Element ComponentName="QmlCodeGenerator" X="225" Y="450" Note=""/>
-        <Element ComponentName="SdlClassCodeGenerator" X="575" Y="625" Note=""/>
-        <Element ComponentName="SdlCoreFramework" X="575" Y="400" Note=""/>
-        <Element ComponentName="VersionInfo" X="125" Y="150" Note=""/>
+        <Element ComponentName="ApplicationInfo" X="150" Y="200" Note=""/>
+        <Element ComponentName="ConsoleApplication" X="500" Y="200" Note=""/>
+        <Element ComponentName="ConsoleLog" X="1100" Y="450" Note=""/>
+        <Element ComponentName="GqlWrapClassCodeGenerator" X="825" Y="325" Note=""/>
+        <Element ComponentName="QmlCodeGenerator" X="625" Y="675" Note=""/>
+        <Element ComponentName="SdlClassCodeGenerator" X="125" Y="775" Note=""/>
+        <Element ComponentName="SdlCoreFramework" X="500" Y="450" Note=""/>
+        <Element ComponentName="VersionInfo" X="100" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

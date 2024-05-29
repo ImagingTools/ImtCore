@@ -58,6 +58,24 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="GqlWrapClassCodeGenerator" PackageId="ImtSdlPck" ComponentId="GqlWrapClassCodeGenerator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="QmlCodeGenerator" PackageId="ImtSdlPck" ComponentId="QmlCodeGenerator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -99,6 +117,7 @@
                             <Values>
                                 <Value>SdlClassCodeGenerator</Value>
                                 <Value>QmlCodeGenerator</Value>
+                                <Value>GqlWrapClassCodeGenerator</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
