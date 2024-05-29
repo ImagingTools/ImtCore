@@ -10,7 +10,7 @@
 
 // imtsdl includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
-#include <imtsdl/CGqlSchemaParser.h>
+#include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/CSdlTools.h>
 
 
@@ -22,13 +22,11 @@ namespace imtsdl
 */
 class CSdlClassCodeGeneratorComp:
 			public iproc::CSyncProcessorCompBase,
-			public CGqlSchemaParser,
 			private CSdlTools
 {
 
 public:
 	typedef iproc::CSyncProcessorCompBase BaseClass;
-	typedef CGqlSchemaParser BaseClass2;
 
 	I_BEGIN_COMPONENT(CSdlClassCodeGeneratorComp)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
