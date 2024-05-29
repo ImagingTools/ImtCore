@@ -6,6 +6,8 @@
 // imtsdl includes
 #include <imtsdl/CSdlField.h>
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlRequest.h>
+
 
 namespace imtsdl
 {
@@ -246,7 +248,35 @@ bool CSdlTools::IsTypeHasNonFundamentalTypes(const CSdlType& sdlType, QSet<QStri
 		retVal = retVal || isComplex;
 	}
 
-	return true;
+	return retVal;
+}
+
+bool CSdlTools::IsTypeHasNonFundamentalTypes(const CSdlRequest& sdlRequest, QSet<QString>* foundTypesPtr)
+{
+	bool retVal = false;
+
+	SdlFieldList fields;
+	fields << sdlRequest.GetInputArguments();
+	fields << sdlRequest.GetOutputArgument();
+
+	for(const CSdlField& sdlField: fields){
+		bool isComplex = false;
+		bool isArray = false;
+		ConvertType(sdlField, nullptr, &isComplex, &isArray);
+
+		if (foundTypesPtr != nullptr && isComplex){
+			foundTypesPtr->insert(ConvertType(sdlField.GetType()));
+		}
+
+		// add QList as non fundamental type (for includes)
+		if (foundTypesPtr != nullptr && isArray){
+			foundTypesPtr->insert(QStringLiteral("QList"));
+		}
+
+		retVal = retVal || isComplex;
+	}
+
+	return retVal;
 }
 
 QString CSdlTools::GetFromVariantConversionString(const CSdlField& sdlField)

@@ -29,6 +29,7 @@ public:
 	static QString GetDecapitalizedValue(const QString& inputValue);
 	static bool IsTypeHasFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr =  nullptr);
 	static bool IsTypeHasNonFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr =  nullptr);
+	static bool IsTypeHasNonFundamentalTypes(const CSdlRequest& sdlRequest, QSet<QString>* foundTypesPtr =  nullptr);
 	static QString GetFromVariantConversionString(const CSdlField& sdlField);
 	static QString FromVariantMapAccessString(const CSdlField& sdlField);
 };
