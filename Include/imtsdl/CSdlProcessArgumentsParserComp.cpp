@@ -41,8 +41,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption dependenciesOption({"D", "dependencies"}, "Generate a dependencies list to be generated. No code will be generated");
 	QCommandLineOption modificatorsOption({"M", "modificator"}, "Modificator to generate code. You can provide multiple modificators. Note: modifier names are case sensitive.", "ModificatorList");
 	QCommandLineOption allModificatorsOption("use-all-modificators", "Use all modificators to generate code");
-	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP if it not setted explicit)");
+	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
+	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)");
+	QCommandLineOption gqlOption("GQL", "GraphQL Modificator to generate GrqphQL wrap C++ code . (disables CPP and QML if it not setted explicit)");
 
 	QCommandLineParser commandLineParser;
 	bool isOptionsAdded = commandLineParser.addOptions(
@@ -55,7 +57,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 					modificatorsOption,
 					allModificatorsOption,
 					qmlOption,
-					cppOption
+					cppOption,
+					gqlOption
 				});
 	if (!isOptionsAdded){
 		Q_ASSERT(false);
@@ -90,13 +93,15 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 		m_useAllModificators = true;
 		m_notUseModificators = false;
 	}
-	if (commandLineParser.isSet(qmlOption)){
-		m_qmlEnabled = true;
-		m_cppEnabled = false;
-	}
-	if (commandLineParser.isSet(cppOption)){
-		m_cppEnabled = true;
-	}
+
+	// special modes
+	bool isCppInParams = commandLineParser.isSet(cppOption);
+	bool isQmlInParams = commandLineParser.isSet(qmlOption);
+	bool isGqlInParams = commandLineParser.isSet(gqlOption);
+
+	m_cppEnabled = isCppInParams || (!isQmlInParams && !isGqlInParams);
+	m_qmlEnabled = isQmlInParams;
+	m_gqlEnabled = isGqlInParams;
 
 	// only one mode must be used
 	Q_ASSERT(commandLineParser.isSet(generateOption) ^ commandLineParser.isSet(dependenciesOption));
@@ -181,6 +186,11 @@ bool CSdlProcessArgumentsParserComp::IsQmlEnabled() const
 bool CSdlProcessArgumentsParserComp::IsCppEnabled() const
 {
 	return m_cppEnabled;
+}
+
+bool CSdlProcessArgumentsParserComp::IsGqlEnabled() const
+{
+	return m_gqlEnabled;
 }
 
 
