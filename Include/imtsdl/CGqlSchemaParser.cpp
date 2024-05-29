@@ -441,6 +441,8 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 		if (foundDelimiter == '!'){
 			outputArgument.SetIsRequired(true);
 		}
+		request.SetOutputArgument(outputArgument);
+
 		m_requests << request;
 
 		retVal = retVal && MoveToNextReadableSymbol(&foundDelimiter);
