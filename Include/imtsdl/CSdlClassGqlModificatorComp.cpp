@@ -359,31 +359,6 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStre
 
 // help methods
 
-void CSdlClassGqlModificatorComp::AddSelfCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
-{
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (!") << FromVariantMapAccessString(field);
-	stream << QStringLiteral(".isNull()){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents);
-	stream << '}';
-	FeedStream(stream, 1, false);
-}
-
-
-void CSdlClassGqlModificatorComp::AddBeginSelfCheckNonRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
-{
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (!") << FromVariantMapAccessString(field);
-	stream << QStringLiteral(".isNull()){");
-	FeedStream(stream, 1, false);
-}
-
 
 // general help methods for scalar
 

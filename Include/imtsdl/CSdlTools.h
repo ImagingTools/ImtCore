@@ -34,6 +34,8 @@ public:
 	static QString GetFromVariantConversionString(const CSdlField& sdlField);
 	static QString FromVariantMapAccessString(const CSdlField& sdlField);
 	static bool GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList& typeList, CSdlType& sdlType);
+	static void AddSelfCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	static void AddBeginSelfCheckNonRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 };
 
 

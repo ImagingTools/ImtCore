@@ -367,4 +367,31 @@ bool CSdlTools::GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList&
 }
 
 
+
+void CSdlTools::AddSelfCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (!") << FromVariantMapAccessString(field);
+	stream << QStringLiteral(".isNull()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+}
+
+
+void CSdlTools::AddBeginSelfCheckNonRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (!") << FromVariantMapAccessString(field);
+	stream << QStringLiteral(".isNull()){");
+	FeedStream(stream, 1, false);
+}
+
+
 } // namespace imtsdl

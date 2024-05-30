@@ -42,12 +42,6 @@ private:
 	void AddCustomFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 	void AddCustomListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 
-	// help methods
-	/// \todo move it to \c CSdlTools
-	void AddSelfCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
-	/// \todo move it to \c CSdlTools
-	void AddBeginSelfCheckNonRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
-
 	// general help methods for scalar
 	void AddExtractValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 	/// \todo add error handling for it.
