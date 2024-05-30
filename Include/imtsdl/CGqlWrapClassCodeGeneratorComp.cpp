@@ -209,20 +209,23 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& s
 		}
 	}
 
-	FeedStream(ifStream, 2, false);
+	// add imtgql includes
+	FeedStream(ifStream, 1, false);
+	ifStream << QStringLiteral("//imtgql includes");
+	FeedStream(ifStream, 1, false);
+	ifStream << QStringLiteral("#include <imtgql/CGqlRequest.h>");
+	FeedStream(ifStream, 1, false);
+	ifStream << QStringLiteral("#include <imtgql/CGqlObject.h>");
+	FeedStream(ifStream, 3, false);
 
 	// namespace begin
-	QString namespaceString;
 	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
 	if (!sdlNamespace.isEmpty()){
-		namespaceString = QStringLiteral("namespace ");
-		namespaceString+= sdlNamespace;
-		namespaceString += QStringLiteral("\n{");
-	}
-
-	if (!namespaceString.isEmpty()){
-		ifStream << namespaceString;
-		FeedStream(ifStream, 3, false);
+		ifStream << QStringLiteral("namespace ");
+		ifStream <<  sdlNamespace;
+		FeedStream(ifStream, 1, false);
+		ifStream <<  QStringLiteral("{");
+		FeedStream(ifStream, 1, false);
 	}
 
 	// RequestInfo struct Begin
@@ -263,34 +266,64 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& s
 	FeedStream(ifStream, 1, false);
 
 
-
-/// \todo finish it!
-#if 0
 	// main GQL-wrap class begin
-	ifStream << QStringLiteral("class C") << sdlRequest.GetName() << '\n';
+	FeedStream(ifStream, 2, false);
+	ifStream << QStringLiteral("class C") << sdlRequest.GetName() << QStringLiteral("GqlRequest");
+	FeedStream(ifStream, 1, false);
 	ifStream << QStringLiteral("{");
 	FeedStream(ifStream, 1, false);
 
+	// public section
 	ifStream << QStringLiteral("public:");
 	FeedStream(ifStream, 1, false);
 
-	// default constructor for defining primitive types
-	if (IsTypeHasFundamentalTypes(sdlRequest)){
-		ifStream << QStringLiteral("\tC") << sdlType.GetName() << QStringLiteral("();");
-		FeedStream(ifStream, 2);
-	}
+	// default constructor with GraphQL request
+	FeedStreamHorizontally(ifStream);
+	ifStream << 'C' << sdlRequest.GetName() << QStringLiteral("GqlRequest (const imtgql::CGqlRequest& gqlRequest);");
+	FeedStream(ifStream, 1, false);
 
-	// defining member's access methods
-	for (const CSdlField& sdlField: sdlType.GetFields()){
-		ifStream << GenerateAccessMethods(sdlField);
-		FeedStream(ifStream);
-	}
+	// validation method
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("bool IsValid() const;");
+	FeedStream(ifStream, 1, false);
 
-	// end of class
+	// GetRequestedArguments method
+	FeedStreamHorizontally(ifStream);
+	ifStream << GetCapitalizedValue(sdlRequest.GetName());
+	ifStream << QStringLiteral("RequestArguments GetRequestedArguments() const;");
+	FeedStream(ifStream, 1, false);
+
+	// GetRequestInfo method
+	FeedStreamHorizontally(ifStream);
+	ifStream << GetCapitalizedValue(sdlRequest.GetName());
+	ifStream << QStringLiteral("RequestInfo GetRequestInfo() const;");
+
+	FeedStream(ifStream, 1, false);
+
+	// private section
+	FeedStream(ifStream, 1, false);
+	ifStream << QStringLiteral("private:");
+	FeedStream(ifStream, 1, false);
+
+	// validation property
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("bool m_isValid;");
+	FeedStream(ifStream, 1, false);
+
+	// Arguments property
+	FeedStreamHorizontally(ifStream);
+	ifStream << GetCapitalizedValue(sdlRequest.GetName()) << QStringLiteral(" m_requestedArguments;");
+	FeedStream(ifStream, 1, false);
+
+	// Info property
+	FeedStreamHorizontally(ifStream);
+	ifStream << GetCapitalizedValue(sdlRequest.GetName()) << QStringLiteral(" m_requestInfo;");
+	FeedStream(ifStream, 1, false);
+
+
+	// main GQL-wrap end of class
 	ifStream << QStringLiteral("};");
-	FeedStream(ifStream, 3, false);
-#endif
-
+	FeedStream(ifStream, 1, false);
 
 	// end of namespace
 	FeedStream(ifStream, 2, false);
