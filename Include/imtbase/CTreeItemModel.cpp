@@ -179,6 +179,17 @@ bool CTreeItemModel::IsEqualWithModel(CTreeItemModel* modelPtr) const
 }
 
 
+bool CTreeItemModel::IsEqualWithModel(const CTreeItemModel* modelPtr) const
+{
+	CTreeItemModel* notConstModelPtr = const_cast<CTreeItemModel*>(modelPtr);
+	if (notConstModelPtr == nullptr){
+		return false;
+	}
+
+	return IsEqualWithModel(notConstModelPtr);
+}
+
+
 void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap& map)
 {
 	if (index < 0 || index > m_items.count()){

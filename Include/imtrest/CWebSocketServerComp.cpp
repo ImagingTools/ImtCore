@@ -140,15 +140,9 @@ void CWebSocketServerComp::OnSocketDisconnected()
 			istd::CChangeNotifier notifier(this, &loginChangeSet);
 			m_senderLoginStatusMap.remove(key);
 
-			QString message = QString("Web socket sender %1 removed").arg(qPrintable(key));
-			SendInfoMessage(0, message, "CWebSocketServerComp");
-
 			break;
 		}
 	}
-
-	QString message = QString("Web socket disconnected");
-	SendInfoMessage(0, message, "CWebSocketServerComp");
 
 	socketObjectPtr->deleteLater();
 }

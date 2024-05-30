@@ -37,10 +37,6 @@ ControlBase {
         setChecked(switchCustom.checked)
     }
 
-    onCheckedChanged: {
-        setChecked(checked);
-    }
-
     function setChecked(checkedVal){
         if(checkedVal !== switchCustom.checked){
             switchCustom.checked = checkedVal;
@@ -90,8 +86,6 @@ ControlBase {
                 switchCustom.controlRecX = 0;
                 switchCustom.checked = false;
             }
-
-
         }
         onPositionChanged:  {
             if(ma.canDrag){

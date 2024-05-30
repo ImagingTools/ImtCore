@@ -131,8 +131,6 @@ Item {
         Events.subscribeEvent("UpdateModels", application.updateAllModels);
         Events.subscribeEvent("Logout", application.onLogout);
         Events.subscribeEvent("Reconnect", application.reconnect);
-
-//        thumbnailDecorator.loadingPage.start();
     }
 
     Component.onDestruction: {

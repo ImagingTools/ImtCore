@@ -17,6 +17,8 @@ Item {
 
     property bool readOnly: false;
 
+    signal commandsModelChanged(var commandsModel)
+
     Component.onCompleted: {
         viewId = UuidGenerator.generateUUID();
         Events.subscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged)
@@ -94,6 +96,8 @@ Item {
 
                     internal.localizationChanged = false;
                 }
+
+                viewBase.commandsModelChanged(viewBase.commandsController.commandsModel)
             }
 
             blockArea.visible = false;
@@ -175,16 +179,11 @@ Item {
 
     function updateCommandsGui(){
         if (commandsController && viewBase.viewId !== ""){
-            if (commandsController.commandsModel.isReady){
-                return;
-            }
+//            if (commandsController.isReady){
+//                return;
+//            }
 
             Events.sendEvent("UpdateCommandsGui", {"Model": commandsController.commandsModel, "ViewId": viewBase.viewId});
-
-//            Events.sendEvent("GetActiveCommandsViewId", function(activeViewId){
-//                if (activeViewId !== viewBase.viewId){
-//                }
-//            });
         }
     }
 

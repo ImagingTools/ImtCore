@@ -37,7 +37,8 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("Superuser provider state:", this.state);
+            console.log("Superuser model:", this.ToJson());
+
             if (this.state === "Ready"){
                 var dataModelLocal;
 

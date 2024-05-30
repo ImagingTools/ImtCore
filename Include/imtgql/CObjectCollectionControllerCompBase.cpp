@@ -258,7 +258,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 
 	istd::IChangeable* newObjectPtr = CreateObject(gqlRequest, objectId, name, description, errorMessage);
 	if (newObjectPtr == nullptr){
-		SendErrorMessage(0, "Unable to create object from gql request", "Object collection controller");
+		SendErrorMessage(0, "Unable to create object from GraphQL request", "Object collection controller");
 
 		return nullptr;
 	}
@@ -279,7 +279,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 
 	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr, objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (newObjectId.isEmpty()){
-		errorMessage = QT_TR_NOOP(QString("Can not insert object: %1").arg(qPrintable(objectId)));
+		errorMessage = QT_TR_NOOP(QString("Error when creating a new object. Object-ID: '%1'.").arg(qPrintable(objectId)));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return nullptr;

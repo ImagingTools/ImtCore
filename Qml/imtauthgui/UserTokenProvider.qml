@@ -10,6 +10,7 @@ QtObject {
     property string login: "";
     property string userId: "";
     property string passwordHash: "";
+    property var permissions: [];
 
     signal accepted();
     signal failed(string message);
@@ -94,15 +95,15 @@ QtObject {
 
                             let userPasswordHash = dataModelLocal.GetData("PasswordHash");
                             container.passwordHash = userPasswordHash;
-
-                            if (dataModelLocal.ContainsKey("Permissions")){
-                                let permissions = dataModelLocal.GetData("Permissions");
-
-                                Events.sendEvent("SetPermissions", permissions.split(';'))
-                            }
-
-                            container.accepted();
                         }
+
+                        if (dataModelLocal.ContainsKey("Permissions")){
+                            let permissions = dataModelLocal.GetData("Permissions");
+
+                            container.permissions = permissions.split(';')
+                        }
+
+                        container.accepted();
                     }
                 }
             }

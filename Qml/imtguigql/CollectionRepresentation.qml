@@ -511,6 +511,7 @@ Item {
 
         onStateChanged: {
             if (this.state === "Ready"){
+                console.log("List model", this.ToJson());
                 var dataModelLocal;
                 if (this.ContainsKey("errors")){
                     dataModelLocal = this.GetData("errors");

@@ -21,7 +21,7 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSessionModelObserverComp);
-		I_ASSIGN(m_sessionChangeNotifierCompPtr, "SessionChangeNotifier", "Session change notifier", true, "SessionChangeNotifier");
+		I_ASSIGN(m_sessionChangeNotifierCompPtr, "SessionChangeNotifier", "Session change notifier", false, "SessionChangeNotifier");
 		I_ASSIGN(m_modelCompPtr, "Model", "Model", true, "Model");
 	I_END_COMPONENT;
 

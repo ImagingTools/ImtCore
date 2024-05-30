@@ -46,6 +46,7 @@ CommandsController {
 
         onStateChanged: {
             if (this.state === "Ready"){
+                console.log("Commands GQL model:", this.ToJson());
                 var dataModelLocal;
 
                 if (this.ContainsKey("errors")){

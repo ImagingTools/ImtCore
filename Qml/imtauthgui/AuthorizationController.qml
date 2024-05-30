@@ -61,10 +61,15 @@ QtObject {
         return userTokenProvider.login;
     }
 
+    function getPermissions(){
+        return userTokenProvider.permissions;
+    }
+
     function userLogout(param){
         userTokenProvider.login = ""
         userTokenProvider.userId = ""
         userTokenProvider.token = ""
+        userTokenProvider.permissions = []
 
         userTokenProvider.authorizationGqlModel.SetGlobalAccessToken("");
 

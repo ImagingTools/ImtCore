@@ -72,7 +72,8 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 						imtauth::IUserInfo::FeatureIds permissionIds = userInfoPtr->GetPermissions(productId);
 						dataModelPtr->SetData("Permissions", permissionIds.join(';'));
 
-						istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
+						istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr;
+						sessionInfoPtr.SetPtr(new imtauth::CSessionInfo());
 
 						sessionInfoPtr->SetUserId(userObjectId);
 						sessionInfoPtr->SetToken(tokenValue);

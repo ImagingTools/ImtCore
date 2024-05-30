@@ -43,6 +43,10 @@ Rectangle {
         onSaved: {
             root.passwordSetted();
         }
+
+        onError: {
+            root.failed(message);
+        }
     }
 
     function checkPassword(){

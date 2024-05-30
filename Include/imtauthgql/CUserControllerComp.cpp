@@ -22,7 +22,7 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "GetObject m_objectCollectionCompPtr is not valid", "imtauthgql::CUserControllerComp");
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		errorMessage = QString("Internal error").toUtf8();
 
 		return nullptr;
 	}
@@ -116,7 +116,7 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 	}
 
 	if (!objectExists && !userId.isEmpty()){
-		errorMessage = QObject::tr("Object with ID %1 does not exist").arg(qPrintable(userId));
+		errorMessage = QString("The user with the ID: '%1' does not exist").arg(qPrintable(userId));
 
 		imtbase::CTreeItemModel* errorsModelPtr = rootModelPtr->AddTreeModel("errors");
 		errorsModelPtr->SetData("message", errorMessage);

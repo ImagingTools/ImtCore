@@ -202,6 +202,10 @@ Rectangle {
             anchors.topMargin: topPanel_.height;
 
             canRecoveryPassword: thumbnailDecoratorContainer.canRecoveryPassword;
+
+            Component.onCompleted: {
+                Events.sendEvent("SetUserPanelEnabled", false);
+            }
         }
     }
 
@@ -211,6 +215,10 @@ Rectangle {
 
             anchors.fill: parent;
             anchors.topMargin: topPanel_.height;
+
+            Component.onCompleted: {
+                Events.sendEvent("SetUserPanelEnabled", false);
+            }
 
             onBeforeSetted: {
                 thumbnailDecoratorContainer.startLoading();
