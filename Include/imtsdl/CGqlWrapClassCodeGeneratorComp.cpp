@@ -486,14 +486,287 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 
 
 void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
-			QTextStream& ifStream,
+			QTextStream& stream,
 			const CSdlRequest& sdlRequest,
 			uint hIndents)
 {
-	FeedStreamHorizontally(ifStream, hIndents);
-	ifStream << "/// \\todo GenerateRequestParsing";
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("// reading input arguments");
+	FeedStream(stream, 1, false);
+	for (const CSdlField& field: sdlRequest.GetInputArguments()){
+		AddFieldReadFromRequestCode(stream, field);
+	}
 
-	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("// reading requested fields");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("/// implemenatation will be in new version");
+	FeedStream(stream, 1, false);
+}
+
+
+// read methods
+
+bool CGqlWrapClassCodeGeneratorComp::AddFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
+{
+	bool isCustom = false;
+	bool isArray = false;
+	ConvertType(field, &isCustom, nullptr, &isArray);
+
+	if (isArray){
+		QString errorString = QString("Arrays is not allowed in request arguments! FieldID = '%1', FieldType = '%2'").arg(field.GetId(), field.GetType());
+		SendCriticalMessage(0, errorString);
+		Q_ASSERT_X(false, __func__, errorString.toLocal8Bit());
+
+		return false;
+	}
+	if (isCustom){
+		AddCustomFieldReadFromRequestCode(stream, field);
+	}
+	else {
+		AddScalarFieldReadFromRequestCode(stream, field);
+	}
+
+	return true;
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AddScalarFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
+{
+	AddExtractValueFromRequestCode(stream, field);
+	FeedStreamHorizontally(stream);
+
+	if (field.IsRequired()){
+		AddDataCheckRequiredValueCode(stream, field);
+		FeedStreamHorizontally(stream);
+
+		AddSetValueToObjectCode(stream, field);
+		FeedStream(stream, 1, false);
+	}
+	else {
+		stream << QStringLiteral("if (!") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 2);
+		AddSetValueToObjectCode(stream, field);
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 1, false);
+	}
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AddCustomFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
+{
+	AddExtractCustomValueFromRequestCode(stream, field);
+	FeedStreamHorizontally(stream);
+
+	if (field.IsRequired()){
+		AddCheckCustomRequiredValueCode(stream, field);
+		FeedStreamHorizontally(stream);
+
+		AddSetCustomValueToObjectCode(stream, field);
+		FeedStream(stream, 1, false);
+	}
+	else {
+		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr != nullptr){");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 2);
+		AddSetCustomValueToObjectCode(stream, field, 2);
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 1, false);
+	}
+}
+
+
+// write methods
+
+bool CGqlWrapClassCodeGeneratorComp::AddFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field)
+{
+	bool isCustom = false;
+	bool isArray = false;
+	ConvertType(field, &isCustom, nullptr, &isArray);
+
+	if (isArray){
+		QString errorString = QString("Arrays is not allowed in request arguments! FieldID = '%1', FieldType = '%2'").arg(field.GetId(), field.GetType());
+		SendCriticalMessage(0, errorString);
+		Q_ASSERT_X(false, __func__, errorString.toLocal8Bit());
+
+		return false;
+	}
+
+	const bool isFieldRequired = field.IsRequired();
+	if (isFieldRequired){
+		AddSelfCheckRequiredValueCode(stream, field);
+	}
+	else {
+		AddBeginSelfCheckNonRequiredValueCode(stream, field);
+	}
+	const int hIndents = (isFieldRequired ? 1 : 2);
+	if (isCustom){
+		AddCustomFieldWriteToRequestCode(stream, field, hIndents);
+	}
+	else {
+		AddScalarFieldWriteToRequestCode(stream, field, hIndents);
+	}
+
+	if (!isFieldRequired){
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 1, false);
+	}
+
+	return true;
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AddScalarFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("request.InsertField(");
+	stream << '"' << field.GetId() << '"';
+	stream << ',' << ' ' << FromVariantMapAccessString(field);
+	stream << QStringLiteral(");");
+	FeedStream(stream, 1, false);
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	// declare temp GQL object
+	const QString dataObjectVariableName = field.GetId() + QStringLiteral("DataObject");
+	stream << QStringLiteral("imtgql::CGqlObject ") << dataObjectVariableName << ';';
+	FeedStream(stream, 1, false);
+
+	// add me to temt object and checks
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (!m_");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral(".WriteToGraphQlObject(");
+	stream << dataObjectVariableName;
+	stream << QStringLiteral(")){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	// insert temp GQL object
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("request.InsertField(");
+	stream << '"' << field.GetId() << '"';
+	stream << ',' << ' ';
+	stream << dataObjectVariableName;
+	stream << ')' << ';';
+	FeedStream(stream, 1, false);
+}
+
+
+// help methods
+
+
+// general help methods for scalar
+
+void CGqlWrapClassCodeGeneratorComp::AddExtractValueFromRequestCode(QTextStream& stream, const CSdlField& field, quint32 hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = request.GetFieldArgumentValue(");
+	stream << '"' << field.GetId() << '"';
+	stream << QStringLiteral(");");
+	FeedStream(stream, 1, false);
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AddDataCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, quint32 hIndents)
+{
+	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AddSetValueToObjectCode(QTextStream& stream, const CSdlField& field)
+{
+	stream << QStringLiteral("m_requestedArguments.") << field.GetId() << QStringLiteral(" = ");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
+	stream << GetFromVariantConversionString(field) << ';';
+}
+
+
+// general help methods for custom
+
+void CGqlWrapClassCodeGeneratorComp::AddExtractCustomValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("const imtgql::CGqlObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
+	stream << '"' << field.GetId() << '"';
+	stream << QStringLiteral(");");
+	FeedStream(stream, 1, false);
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AddCheckCustomRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr == nullptr){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("m_isValid = false;");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+	// declare bool variable and read data in private property
+	stream << QStringLiteral("const bool is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read = ");
+	stream << 'C' << GetCapitalizedValue(field.GetType()) << QStringLiteral("::ReadFromGraphQlObject(");
+	stream << QStringLiteral("m_requestedArguments.") << field.GetId() << QStringLiteral(", *");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr);");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+
+	// check the result of reading...
+	stream << QStringLiteral("if (!is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read){");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+
+	// ...and exit if it fail
+	stream << QStringLiteral("m_isValid = false;");
+	FeedStream(stream, 2, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+
+	stream << QStringLiteral("return;");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
 }
 
 

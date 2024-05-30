@@ -51,6 +51,28 @@ private:
 	void GenerateRequestParsing(QTextStream& ifStream, const CSdlRequest& sdlRequest, uint hIndents = 1);
 	void AbortCurrentProcessing();
 
+	// read methods
+	bool AddFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
+	void AddScalarFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
+	void AddCustomFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
+
+	// write methods
+	bool AddFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field);
+	void AddScalarFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	void AddCustomFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+
+	// general help methods for scalar
+	void AddExtractValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	/// \todo add error handling for it.
+	void AddDataCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	void AddSetValueToObjectCode(QTextStream& stream, const CSdlField& field);
+
+	// general help methods for custom
+	void AddExtractCustomValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	/// \todo add error handling for it.
+	void AddCheckCustomRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	void AddSetCustomValueToObjectCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+
 private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(ISdlTypeListProvider, m_sdlTypeListCompPtr);
