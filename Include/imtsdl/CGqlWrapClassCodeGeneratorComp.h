@@ -48,6 +48,7 @@ private:
 	bool ProcessHeaderClassFile(const CSdlRequest& sdlRequest);
 	bool ProcessSourceClassFile(const CSdlRequest& sdlRequest);
 	void GenerateFieldRequestInfo(QTextStream& stream, const CSdlField& sdlField, uint hIndents = 1, bool createStructDefinition = false);
+	void GenerateRequestParsing(QTextStream& ifStream, const CSdlRequest& sdlRequest, uint hIndents = 1);
 	void AbortCurrentProcessing();
 
 private:

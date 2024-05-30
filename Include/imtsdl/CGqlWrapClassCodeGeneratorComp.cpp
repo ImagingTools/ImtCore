@@ -201,7 +201,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& s
 		}
 		// then add inclides
 
-		/// \todo resolve path
+		/// \todo resolve path in the future
 		for (QSet<QString>::const_iterator complexIter = complexTypeList.cbegin(); complexIter != complexTypeList.cend(); ++complexIter){
 			const QString& complexTypeName = *complexIter;
 			ifStream << QStringLiteral("#include \"") << complexTypeName << QStringLiteral(".h\"");
@@ -257,7 +257,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& s
 	SdlFieldList requestArguments = sdlRequest.GetInputArguments();
 	for (const CSdlField& sdlField: requestArguments){
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << sdlField.GetType() << ' ' << sdlField.GetId() << ';';
+		ifStream << ConvertType(sdlField) << ' ' << sdlField.GetId() << ';';
 		FeedStream(ifStream, 1, false);
 	}
 
@@ -366,9 +366,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 	FeedStream(ifStream, 1, false);
 	ifStream << '{';
 	FeedStream(ifStream, 1, false);
-	FeedStreamHorizontally(ifStream);
-	ifStream << "/// \\todo add parsing here";
-	FeedStream(ifStream, 1, false);
+	GenerateRequestParsing(ifStream, sdlRequest, 1);
 	ifStream << '}';
 	FeedStream(ifStream, 1, false);
 
@@ -423,17 +421,6 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 }
 
 
-void CGqlWrapClassCodeGeneratorComp::AbortCurrentProcessing()
-{
-	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
-
-	I_CRITICAL();
-
-	m_headerFilePtr->remove();
-	m_sourceFilePtr->remove();
-}
-
 void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 			QTextStream& stream,
 			const CSdlField& sdlField,
@@ -463,12 +450,17 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 	for (const CSdlField& fieldFromType: sdlType.GetFields()){
 		FeedStreamHorizontally(stream, hIndents + createStructDefinition);
 		stream << QStringLiteral("bool is") << GetCapitalizedValue(fieldFromType.GetId()) << QStringLiteral("Requested = ");
+/// \todo fix it in \c GenerateRequestParsing
+#if SDL__PARSING_OF_REQUESTED_FIELDS_FIXED
 		if (fieldFromType.IsRequired()){
 			stream << QStringLiteral("true");
 		}
 		else {
 			stream << QStringLiteral("false");
 		}
+#else
+		stream << QStringLiteral("true");
+#endif
 		stream << ';';
 		FeedStream(stream, 1, false);
 
@@ -491,6 +483,30 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 		stream << sdlField.GetId() << ';';
 		FeedStream(stream, 1, false);
 	}
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
+			QTextStream& ifStream,
+			const CSdlRequest& sdlRequest,
+			uint hIndents)
+{
+	FeedStreamHorizontally(ifStream, hIndents);
+	ifStream << "/// \\todo GenerateRequestParsing";
+
+	FeedStream(ifStream, 1, false);
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AbortCurrentProcessing()
+{
+	m_headerFilePtr->close();
+	m_sourceFilePtr->close();
+
+	I_CRITICAL();
+
+	m_headerFilePtr->remove();
+	m_sourceFilePtr->remove();
 }
 
 
