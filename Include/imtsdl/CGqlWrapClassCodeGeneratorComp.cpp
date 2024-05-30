@@ -312,14 +312,13 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& s
 
 	// Arguments property
 	FeedStreamHorizontally(ifStream);
-	ifStream << GetCapitalizedValue(sdlRequest.GetName()) << QStringLiteral(" m_requestedArguments;");
+	ifStream << GetCapitalizedValue(sdlRequest.GetName()) << QStringLiteral("RequestArguments m_requestedArguments;");
 	FeedStream(ifStream, 1, false);
 
 	// Info property
 	FeedStreamHorizontally(ifStream);
-	ifStream << GetCapitalizedValue(sdlRequest.GetName()) << QStringLiteral(" m_requestInfo;");
+	ifStream << GetCapitalizedValue(sdlRequest.GetName()) << QStringLiteral("RequestInfo m_requestInfo;");
 	FeedStream(ifStream, 1, false);
-
 
 	// main GQL-wrap end of class
 	ifStream << QStringLiteral("};");
