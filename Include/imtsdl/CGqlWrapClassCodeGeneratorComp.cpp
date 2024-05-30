@@ -347,25 +347,72 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 	FeedStream(ifStream, 3);
 
 	// namespace begin
-	QString namespaceString;
 	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
 	if (!sdlNamespace.isEmpty()){
-		namespaceString = QStringLiteral("namespace ");
-		namespaceString+= sdlNamespace;
-		namespaceString += QStringLiteral("\n{");
+		ifStream << QStringLiteral("namespace ");
+		ifStream << sdlNamespace;
+		FeedStream(ifStream, 1, false);
+		ifStream << '{';
+		FeedStream(ifStream, 1, false);
 	}
 
-	if (!namespaceString.isEmpty()){
-		ifStream << namespaceString;
-		FeedStream(ifStream, 3);
-	}
-
+	const QString className = 'C' + sdlRequest.GetName() + QStringLiteral("GqlRequest");
 	// implementation of methods
 
-	/// \todo add it!
+	// MAIN CONSTRUCTOR + PARSING
+	FeedStream(ifStream, 2, false);
+	ifStream << className << ':' << ':' << className;
+	ifStream << QStringLiteral("(const imtgql::CGqlRequest& gqlRequest)");
+	FeedStream(ifStream, 1, false);
+	ifStream << '{';
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream);
+	ifStream << "/// \\todo add parsing here";
+	FeedStream(ifStream, 1, false);
+	ifStream << '}';
+	FeedStream(ifStream, 1, false);
 
+	// IsValid
+	FeedStream(ifStream, 2, false);
+	ifStream << className << ':' << ':' ;
+	ifStream << QStringLiteral("IsValid() const");
+	FeedStream(ifStream, 1, false);
+	ifStream << '{';
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream);
+	ifStream << "return m_isValid;";
+	FeedStream(ifStream, 1, false);
+	ifStream << '}';
+	FeedStream(ifStream, 1, false);
+
+	// GetRequestedArguments
+	FeedStream(ifStream, 2, false);
+	ifStream << className << ':' << ':' ;
+	ifStream << QStringLiteral("GetRequestedArguments() const");
+	FeedStream(ifStream, 1, false);
+	ifStream << '{';
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream);
+	ifStream << "return m_requestedArguments;";
+	FeedStream(ifStream, 1, false);
+	ifStream << '}';
+	FeedStream(ifStream, 1, false);
+
+	// GetRequestInfo
+	FeedStream(ifStream, 2, false);
+	ifStream << className << ':' << ':' ;
+	ifStream << QStringLiteral("GetRequestInfo() const");
+	FeedStream(ifStream, 1, false);
+	ifStream << '{';
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream);
+	ifStream << "return m_requestInfo;";
+	FeedStream(ifStream, 1, false);
+	ifStream << '}';
+	FeedStream(ifStream, 1, false);
 
 	// end of namespace
+	FeedStream(ifStream, 2, false);
 	if (!sdlNamespace.isEmpty()){
 		ifStream << QStringLiteral("} // namespace ");
 		ifStream << sdlNamespace;
