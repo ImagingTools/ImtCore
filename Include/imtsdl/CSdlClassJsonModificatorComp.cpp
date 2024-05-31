@@ -469,7 +469,7 @@ void CSdlClassJsonModificatorComp::AddArrayFieldReadFromJsonImplCode(QTextStream
 	// declare container array
 	const QString arrayVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Array");
 	stream << QStringLiteral("const QJsonArray ") << arrayVariableName << QStringLiteral(" = jsonObject[\"");
-	stream << field.GetId() << QStringLiteral("]\";");
+	stream << field.GetId() << QStringLiteral("\"].toArray();");
 	FeedStream(stream, 1, false);
 
 	// declare count value
@@ -658,7 +658,7 @@ void CSdlClassJsonModificatorComp:: AddCustomArrayFieldReadToJsonImplCode(
 	// declare container array
 	const QString arrayVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Array");
 	stream << QStringLiteral("const QJsonArray ") << arrayVariableName << QStringLiteral(" = jsonObject[\"");
-	stream << field.GetId() << QStringLiteral("]\";");
+	stream << field.GetId() << QStringLiteral("\"].toArray();");
 	FeedStream(stream, 1, false);
 
 
@@ -708,8 +708,9 @@ void CSdlClassJsonModificatorComp:: AddCustomArrayFieldReadToJsonImplCode(
 	stream << QStringLiteral("if (!");
 	stream << 'C' << GetCapitalizedValue(field.GetType());
 	stream << QStringLiteral("::ReadFromJsonObject(");
+	stream << GetDecapitalizedValue(field.GetId()) << ',' << ' ';
 	stream << arrayVariableName << '[';
-	stream << indexVariableName << QStringLiteral("].toObject()){");
+	stream << indexVariableName << QStringLiteral("].toObject())){");
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents + 2);
 	stream << QStringLiteral("return false;");
