@@ -502,8 +502,6 @@ Item {
 
             var gqlData = query.GetQuery();
 
-            console.log(gqlData);
-
             root.beginUpdate();
 
             this.SetGqlQuery(gqlData);
@@ -511,7 +509,6 @@ Item {
 
         onStateChanged: {
             if (this.state === "Ready"){
-                console.log("List model", this.ToJson());
                 var dataModelLocal;
                 if (this.ContainsKey("errors")){
                     dataModelLocal = this.GetData("errors");

@@ -371,7 +371,6 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			return nullptr;
 		}
 
-
 		if (m_hashCalculatorCompPtr.IsValid()){
 			password = m_hashCalculatorCompPtr->GenerateHash(username + password);
 		}
@@ -430,7 +429,7 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 		return userInfoPtr;
 	}
 
-	errorMessage = QString("Can not create user: %1").arg(QString(objectId));
+	errorMessage = QString("Can not create user: '%1'").arg(QString(objectId));
 	SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 	return nullptr;
