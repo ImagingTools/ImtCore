@@ -371,6 +371,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 
 	// IsValid
 	FeedStream(ifStream, 2, false);
+	ifStream << QStringLiteral("bool ");
 	ifStream << className << ':' << ':' ;
 	ifStream << QStringLiteral("IsValid() const");
 	FeedStream(ifStream, 1, false);
@@ -384,6 +385,8 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 
 	// GetRequestedArguments
 	FeedStream(ifStream, 2, false);
+	ifStream << GetCapitalizedValue(sdlRequest.GetName());
+	ifStream << QStringLiteral("RequestArguments ");
 	ifStream << className << ':' << ':' ;
 	ifStream << QStringLiteral("GetRequestedArguments() const");
 	FeedStream(ifStream, 1, false);
@@ -397,6 +400,8 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 
 	// GetRequestInfo
 	FeedStream(ifStream, 2, false);
+	ifStream << GetCapitalizedValue(sdlRequest.GetName());
+	ifStream << QStringLiteral("RequestInfo ");
 	ifStream << className << ':' << ':' ;
 	ifStream << QStringLiteral("GetRequestInfo() const");
 	FeedStream(ifStream, 1, false);
@@ -682,7 +687,7 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 void CGqlWrapClassCodeGeneratorComp::AddExtractValueFromRequestCode(QTextStream& stream, const CSdlField& field, quint32 hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = request.GetFieldArgumentValue(");
+	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = gqlRequest.GetField(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
@@ -717,7 +722,7 @@ void CGqlWrapClassCodeGeneratorComp::AddSetValueToObjectCode(QTextStream& stream
 void CGqlWrapClassCodeGeneratorComp::AddExtractCustomValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const imtgql::CGqlObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
+	stream << QStringLiteral("const imtgql::CGqlObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = gqlRequest.GetField(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
