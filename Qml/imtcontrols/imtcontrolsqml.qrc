@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/qml">
         <file alias="imtcontrols/qmldir">qmldir</file>
+        <file alias="imtcontrols/Base/BaseClass.qml">Base/BaseClass.qml</file>
+        <file alias="imtcontrols/Base/BaseModel.qml">Base/BaseModel.qml</file>
         <file alias="imtcontrols/Base/StyleBase.qml">Base/StyleBase.qml</file>
         <file alias="imtcontrols/Base/StyleComponents.qml">Base/StyleComponents.qml</file>
         <file alias="imtcontrols/Base/ControlBase.qml">Base/ControlBase.qml</file>

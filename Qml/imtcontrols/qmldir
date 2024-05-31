@@ -6,6 +6,8 @@ singleton Enums 1.0 ./Base/Enums.qml
 Icon 1.0 ./Base/Icon.js
 ButtonType 1.0 ./Base/ButtonType.js
 
+BaseClass 1.0 ./Base/BaseClass.qml
+BaseModel 1.0 ./Base/BaseModel.qml
 ControlBase 1.0 ./Base/ControlBase.qml
 DecoratorBase 1.0 ./Base/DecoratorBase.qml
 Decorators 1.0 ./Base/Decorators.qml
