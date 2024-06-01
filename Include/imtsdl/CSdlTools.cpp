@@ -152,6 +152,88 @@ QString CSdlTools::ConvertType(const QString& sdlType, bool* isCustomPtr, bool* 
 }
 
 
+QString CSdlTools::QmlConvertType(const QString& sdlType, bool* isCustomPtr)
+{
+	// A signed 32‐bit integer
+	if (sdlType == QStringLiteral("Int") || sdlType == QStringLiteral("Integer")){
+		if (isCustomPtr != nullptr){
+			*isCustomPtr = false;
+		}
+
+		return QStringLiteral("int");
+	}
+
+	// QML for long types uses 'real' type
+	if (sdlType == QStringLiteral("Long")){
+		if (isCustomPtr != nullptr){
+			*isCustomPtr = false;
+		}
+
+		return QStringLiteral("real");
+	}
+
+	if (sdlType == QStringLiteral("LongLong")){
+		if (isCustomPtr != nullptr){
+			*isCustomPtr = false;
+		}
+
+		return QStringLiteral("real");
+	}
+
+	// A signed double-precision floating-point value
+	if (sdlType == QStringLiteral("Float")){
+		if (isCustomPtr != nullptr){
+			*isCustomPtr = false;
+		}
+
+		return QStringLiteral("real");
+	}
+
+	// A signed double-precision floating-point value
+	if (sdlType == QStringLiteral("Double")){
+		if (isCustomPtr != nullptr){
+			*isCustomPtr = false;
+		}
+
+		return QStringLiteral("double");
+	}
+
+	// A UTF‐8 character sequence
+	if (sdlType == QStringLiteral("String")){
+		if (isCustomPtr != nullptr){
+			*isCustomPtr = false;
+		}
+
+		return QStringLiteral("string");
+	}
+
+	// true or false
+	if (sdlType == QStringLiteral("Boolean") || sdlType == QStringLiteral("Bool")){
+		if (isCustomPtr != nullptr){
+			*isCustomPtr = false;
+		}
+
+		return QStringLiteral("bool");
+	}
+
+	// (serialized as a String): A unique identifier that's often used to refetch an object or as the key for a cache.
+	if (sdlType == QStringLiteral("ID")){
+		if (isCustomPtr != nullptr){
+			*isCustomPtr = false;
+		}
+
+		return QStringLiteral("string");
+	}
+
+	// custom type (another class)
+	if (isCustomPtr != nullptr){
+		*isCustomPtr = true;
+	}
+
+	return GetCapitalizedValue(sdlType);
+}
+
+
 void CSdlTools::FeedStream(QTextStream& stream, uint lines, bool flush)
 {
 	for (uint i = 0; i < lines; ++i){
