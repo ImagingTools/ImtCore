@@ -22,6 +22,7 @@ public:
 public:
 	static QString ConvertType(const CSdlField& sdlField, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr);
 	static QString ConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr);
+	static QString QmlConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr);
 	static void FeedStream(QTextStream& stream, uint lines = 1, bool flush = true);
 	static void FeedLineHorizontally(QString& line, uint indents = 1, char indentDelimiter = '\t');
 	static void FeedStreamHorizontally(QTextStream& stream, uint indents = 1, char indentDelimiter = '\t');
