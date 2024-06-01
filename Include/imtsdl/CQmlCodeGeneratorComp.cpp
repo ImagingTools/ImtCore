@@ -218,22 +218,93 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	QTextStream ifStream(m_qmlFilePtr.GetPtr());
 
 	// import section
-	ifStream << QStringLiteral("pragma Singleton");
-	FeedStream(ifStream, 1, false);
 	ifStream << QStringLiteral("import QtQuick");
+	FeedStream(ifStream, 1, false);
+	ifStream << QStringLiteral("import imtcontrols 1.0");
 	FeedStream(ifStream, 2, false);
 
-	// Qt object
-	ifStream << QStringLiteral("QtObject {");
-	FeedStream(ifStream, 1, false);
+	// Base QML
+	ifStream << QStringLiteral("BaseClass {");
 
+	// static props
+	/// \todo rework it
+#if SDL__STATIC_PROPS_REWORKED
 	for (const CSdlField& sdlField: sdlType.GetFields()){
+		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 1);
 		ifStream << QStringLiteral("readonly property string s_");
 		ifStream << GetDecapitalizedValue(sdlField.GetId()) << QStringLiteral(": \"") << sdlField.GetId() << '"';
-		FeedStream(ifStream, 1, false);
 	}
+#endif
 
+	FeedStream(ifStream, 1, false);
+	// container's props
+	for (const CSdlField& sdlField: sdlType.GetFields()){
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 1);
+
+		ifStream << QStringLiteral("property ");
+		if (sdlField.IsArray()){
+			ifStream << QStringLiteral("BaseModel");
+		}
+		else {
+			ifStream << QmlConvertType(sdlField.GetType());
+		}
+		// by convention, all QML/JS types must start with a lowercase letter
+		ifStream << ' ' << GetDecapitalizedValue(sdlField.GetId());
+	}
+	FeedStream(ifStream, 1, false);
+
+	// base class reimplementation methods
+	// getJSONKeyForProperty
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("function getJSONKeyForProperty(propertyId){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("switch (propertyId){");
+	for (const CSdlField& sdlField: sdlType.GetFields()){
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 3);
+		ifStream << QStringLiteral("case '") << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral("': return '") << sdlField.GetId() << '\'';
+	}
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << '}'; // end of switch
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << '}'; // end of function
+
+	// createComponent (custom and arrays only)
+	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("function createComponent(propertyId){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("switch (propertyId){");
+	for (const CSdlField& sdlField: sdlType.GetFields()){
+		bool isCustom = false;
+		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
+		if (!isCustom && !sdlField.IsArray()){
+			// skip simple scalars
+			continue;
+		}
+
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 3);
+		ifStream << QStringLiteral("case '") << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral("': return Qt.createComponent('");
+		ifStream << convertedType << QStringLiteral("'.qml')");
+	}
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << '}'; // end of switch
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << '}'; // end of function
+
+	FeedStream(ifStream, 1, false);
 	return true;
 }
 
