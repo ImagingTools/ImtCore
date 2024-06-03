@@ -128,7 +128,6 @@ int CQmlCodeGeneratorComp::DoProcessing(
 	qmldirStream << currentNamespace;
 	FeedStream(qmldirStream, 2, false);
 	for (const CSdlType& sdlType: sdlTypeList){
-		qmldirStream << QStringLiteral("singleton ");
 		qmldirStream << sdlType.GetName();
 		qmldirStream << QStringLiteral(" 1.0 ");
 		qmldirStream << sdlType.GetName() << ".qml";
@@ -298,7 +297,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 		FeedStreamHorizontally(ifStream, 3);
 		ifStream << QStringLiteral("case '") << GetDecapitalizedValue(sdlField.GetId());
 		ifStream << QStringLiteral("': return Qt.createComponent('");
-		ifStream << convertedType << QStringLiteral("'.qml')");
+		ifStream << convertedType << QStringLiteral(".qml')");
 	}
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 2);
