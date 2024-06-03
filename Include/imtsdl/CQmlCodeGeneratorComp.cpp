@@ -228,18 +228,6 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	// Base QML
 	ifStream << QStringLiteral("BaseClass {");
 
-	// static props
-	/// \todo rework it
-#if SDL__STATIC_PROPS_REWORKED
-	for (const CSdlField& sdlField: sdlType.GetFields()){
-		FeedStream(ifStream, 1, false);
-		FeedStreamHorizontally(ifStream, 1);
-		ifStream << QStringLiteral("readonly property string s_");
-		ifStream << GetDecapitalizedValue(sdlField.GetId()) << QStringLiteral(": \"") << sdlField.GetId() << '"';
-	}
-#endif
-
-	FeedStream(ifStream, 1, false);
 	// container's props
 	for (const CSdlField& sdlField: sdlType.GetFields()){
 		FeedStream(ifStream, 1, false);
@@ -252,9 +240,14 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 		else {
 			ifStream << QmlConvertType(sdlField.GetType());
 		}
-		// by convention, all QML/JS types must start with a lowercase letter
-		ifStream << ' ' << GetDecapitalizedValue(sdlField.GetId());
+		// use 'm_' prefix to avoid ambiguity
+		ifStream << QStringLiteral(" m_") << sdlField.GetId();
 	}
+	FeedStream(ifStream, 2, false);
+
+	FeedStreamHorizontally(ifStream, 1);
+	// and static props container alias; use '_' prefix to avoid ambiguity (private properies by the JS convention)
+	ifStream << QStringLiteral("property alias s_keys: _keys");
 	FeedStream(ifStream, 1, false);
 
 	// base class reimplementation methods
@@ -268,7 +261,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	for (const CSdlField& sdlField: sdlType.GetFields()){
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 3);
-		ifStream << QStringLiteral("case '") << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral("case 'm_") << sdlField.GetId();
 		ifStream << QStringLiteral("': return '") << sdlField.GetId() << '\'';
 	}
 	FeedStream(ifStream, 1, false);
@@ -295,7 +288,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 3);
-		ifStream << QStringLiteral("case '") << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral("case 'm_") << sdlField.GetId();
 		ifStream << QStringLiteral("': return Qt.createComponent('");
 		ifStream << convertedType << QStringLiteral(".qml')");
 	}
@@ -305,6 +298,26 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 1);
 	ifStream << '}'; // end of function
+
+	// static props as internal QtObject
+	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("QtObject {");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	// and static props container alias; use '_' prefix to avoid ambiguity (private properies by the JS convention)
+	ifStream << QStringLiteral("id: _keys");
+	FeedStream(ifStream, 1, false);
+	for (const CSdlField& sdlField: sdlType.GetFields()){
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+
+		// use 's_' prefix to avoid ambiguity
+		ifStream << QStringLiteral("readonly property string s_");
+		ifStream << sdlField.GetId();
+		ifStream << QStringLiteral(": '");
+		ifStream << sdlField.GetId() << '\'';
+	}
 
 	FeedStream(ifStream, 1, false);
 	return true;
