@@ -170,12 +170,18 @@ Item {
                         if (dataModelLocal.ContainsKey("items")){
                             container.collectionModel = dataModelLocal.GetData("items");
                         }
+                        else{
+                            console.error("Unable to parsing data: tag 'items' not found!");
+                        }
 
                         if (dataModelLocal.ContainsKey("notification")){
                             dataModelLocal = dataModelLocal.GetData("notification");
                             if (dataModelLocal.ContainsKey("PagesCount")){
                                 dataModelLocal = dataModelLocal.GetData("PagesCount");
                             }
+                        }
+                        else{
+                            console.warn("Unable to get notification info for collection model.");
                         }
 
                         container.modelUpdated();

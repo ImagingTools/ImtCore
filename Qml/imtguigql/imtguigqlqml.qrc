@@ -18,5 +18,6 @@
 	<file alias="imtguigql/MetaInfoProvider.qml">MetaInfoProvider.qml</file>
 	<file alias="imtguigql/WebSocketPortProvider.qml">WebSocketPortProvider.qml</file>
 	<file alias="imtguigql/SystemStatusController.qml">SystemStatusController.qml</file>
+	<file alias="imtguigql/ComboBoxGqlSimpleElementView.qml">ComboBoxGqlSimpleElementView.qml</file>
     </qresource>
 </RCC>
