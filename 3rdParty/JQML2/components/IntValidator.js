@@ -21,6 +21,17 @@ class IntValidator extends QtObject {
         }
         return false
     }
+
+    hasPartialMatch(str){
+        if(!str) return true
+        let regExp = /^(-|\+)?\s*[0-9]+$/
+
+        if (regExp.test(str.trim())) {
+            let value = parseInt(str, 10)
+            return (this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value) || (str.length - (this.getPropertyValue('top')-1).toString().length === 1)
+        }
+        return false
+    }
 }
 
 module.exports.IntValidator = IntValidator

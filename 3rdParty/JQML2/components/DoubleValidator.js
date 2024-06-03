@@ -37,11 +37,21 @@ class DoubleValidator extends QtObject {
     }
     validate(str) {
         let regExp = this.getRegExpForNotation()
-        if (!regExp.test(str.trim())) {
+        if (!regExp.test(str)) {
             return false
         }
         let value = parseFloat(str)
         let acceptable = this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value && this.getDecimalsForNumber(value) <= this.getPropertyValue('decimals')
+        return acceptable
+    }
+
+    hasPartialMatch(str){
+        if(!str) return true
+        if(str.indexOf('.') >= 0) return false
+        let value = Number(str.replaceAll(',','.'))
+        if(isNaN(value)) return false
+        let decimals = str.indexOf(',') >= 0 ? str.split(',')[1] : []
+        let acceptable = this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value && decimals.length <= this.getPropertyValue('decimals')
         return acceptable
     }
 }
