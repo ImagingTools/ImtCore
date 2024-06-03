@@ -54,7 +54,10 @@ int CQmlCodeGeneratorComp::DoProcessing(
 		for (const CSdlType& sdlType: sdlTypeList){
 			std::cout << QString(outputDirectoryPath + '/' + sdlType.GetName() + ".qml").toStdString() << std::endl;
 		}
+		// qmldir
 		std::cout << QString(outputDirectoryPath + "qmldir").toStdString() << std::endl;
+		// generated QRC file
+		std::cout << QString(outputDirectoryPath + "/" + m_argumentParserCompPtr->GetNamespace() + ".qrc").toStdString() << std::endl;
 
 		return iproc::IProcessor::TS_OK;
 	}
