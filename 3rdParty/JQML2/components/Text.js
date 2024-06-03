@@ -46,7 +46,9 @@ class Text extends Item {
     }
 
     static defaultSignals = {
-        linkActivated: { params: [] },
+        lineLaidOut: { params: ['line'] },
+        linkActivated: { params: ['link'] },
+        linkHovered: { params: ['link'] },
     }
 
     constructor(parent,exCtx,exModel){

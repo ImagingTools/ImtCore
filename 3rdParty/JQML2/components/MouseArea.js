@@ -7,6 +7,7 @@ class MouseArea extends Item {
     static defaultProperties = {
         acceptedButtons: { type: QInt, value: Qt.LeftButton },
         containsMouse: { type: QBool, value: false },
+        containsPress: { type: QBool, value: false },
         hoverEnabled: { type: QBool, value: false },
         propagateComposedEvents: { type: QBool, value: false },
         preventStealing: { type: QBool, value: false },

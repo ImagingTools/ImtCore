@@ -11,7 +11,7 @@ for(let componentName of listComponents){
 const listProperties = require('../utils/properties')
 
 const args = {
-    source: process.argv.length >= 3 ? process.argv[2] : 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQML2\\test\\qml',
+    source: process.argv.length >= 3 ? process.argv[2] : 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\Bin\\web\\src',//'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQML2\\test\\qml',
     debug: 0
 }
 for(let _argv of process.argv.slice(2)){
@@ -407,7 +407,9 @@ function preCompile(className, meta, on, instructions){
                     }
                 }
                 if(!find){
-                    console.log(`Warning: class ${className} not found into file ${instructions.fileName}`)
+                    if(_classList.length > 1) {
+                        console.log(`Warning: several ${className} found [${_classList.join(', ').replaceAll('_','.')}]`)
+                    }
                     instructions.className = _classList[0]
                     if(!instructions.className) {
                         console.log(`Error: class ${className} not found into file ${instructions.fileName}`)
@@ -643,7 +645,9 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                             stat.createComponent = true
                         }
 
-                        if(tree[1] === 'XMLHttpRequest'){
+                        if(tree[1] === 'ImageController'){
+                            stat.value.push(`ImageController`)
+                        } else if(tree[1] === 'XMLHttpRequest'){
                             stat.value.push(`XMLHttpRequest`)
                         } else if(tree[1] === 'QtPositioning'){
                             stat.value.push(`QtPositioning`)
