@@ -6,6 +6,7 @@
 	<file alias="imtguigql/GqlDocumentObserver.qml">GqlDocumentObserver.qml</file>
 	<file alias="imtguigql/GqlDocumentDataController.qml">GqlDocumentDataController.qml</file>
 	<file alias="imtguigql/ComboBoxGql.qml">ComboBoxGql.qml</file>
+	<file alias="imtguigql/ComboBoxGqlSimple.qml">ComboBoxGqlSimple.qml</file>
 	<file alias="imtguigql/PopupMenuDialogGql.qml">PopupMenuDialogGql.qml</file>
 	<file alias="imtguigql/RemoteFileController.qml">RemoteFileController.qml</file>
 	<file alias="imtguigql/SubscriptionClient.qml">SubscriptionClient.qml</file>

@@ -68,22 +68,6 @@ ViewBase {
         }
     }
 
-//    CollectionDataProvider {
-//        id: usersProvider;
-
-//        commandId: "Users";
-
-//        fields: ["Id", "Name"];
-
-//        onModelUpdated: {
-//            if (usersProvider.collectionModel != null){
-//                usersTable.elements = usersProvider.collectionModel;
-
-//                groupUsersContainer.doUpdateGui();
-//            }
-//        }
-//    }
-
     Rectangle {
         id: background;
         anchors.fill: parent;

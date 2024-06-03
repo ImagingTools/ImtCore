@@ -9,7 +9,7 @@ CollectionDataProvider {
 
     fields: ["Id", "Name", "Description", "ParentGroups", "Roles"];
 
-    commandId: "Groups";
+    commandId: "GroupsList";
 
     sortByField: "Name";
 }

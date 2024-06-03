@@ -31,13 +31,9 @@ Item {
     signal modelUpdated();
     signal failed();
 
-    function updateModel(inputParams){
-        if (!inputParams){
-            inputParams = {}
-        }
-
+    function updateModel(){
         if (collectionModel && collectionModel.GetItemsCount() === 0){
-            container.itemsInfoModel.updateModel(inputParams, container.fields);
+            container.itemsInfoModel.updateModel(container.fields);
             return;
         }
 
@@ -48,7 +44,7 @@ Item {
                 return;
             }
 
-            container.itemsInfoModel.updateModel(inputParams, container.fields);
+            container.itemsInfoModel.updateModel(container.fields);
         }
 
         container.updateSubscription();
@@ -121,9 +117,13 @@ Item {
         return null;
     }
 
+    function getAdditionalInputParams(){
+        return {};
+    }
+
     property GqlModel itemsInfoModel: GqlModel {
-        function updateModel(externInputParams, fields) {
-            var query = Gql.GqlRequest("query", container.commandId + "List");
+        function updateModel(fields) {
+            var query = Gql.GqlRequest("query", container.commandId);
 
             var viewParams = Gql.GqlObject("viewParams");
             viewParams.InsertField("Offset", container.offset);
@@ -133,11 +133,14 @@ Item {
             viewParams.InsertField("FilterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");
-            let keys = Object.keys(externInputParams)
-            for (let key of keys){
-                inputParams.InsertField(key, externInputParams[key]);
+            let additionInputParams = container.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
             }
-            inputParams.InsertFieldObject(viewParams);
 
             query.AddParam(inputParams);
 
@@ -155,6 +158,8 @@ Item {
 
         onStateChanged: {
             if (this.state === "Ready"){
+                console.log("CollectionDataProvider ", container.itemsInfoModel.ToJson());
+
                 var dataModelLocal;
                 if (container.itemsInfoModel.ContainsKey("errors")){
                     return;
@@ -162,8 +167,8 @@ Item {
 
                 if (container.itemsInfoModel.ContainsKey("data")){
                     dataModelLocal = container.itemsInfoModel.GetData("data");
-                    if (dataModelLocal.ContainsKey(container.commandId + "List")){
-                        dataModelLocal = dataModelLocal.GetData(container.commandId + "List");
+                    if (dataModelLocal.ContainsKey(container.commandId)){
+                        dataModelLocal = dataModelLocal.GetData(container.commandId);
                         if (dataModelLocal.ContainsKey("items")){
                             container.collectionModel = dataModelLocal.GetData("items");
                         }

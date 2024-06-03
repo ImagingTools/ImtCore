@@ -144,31 +144,4 @@ Item {
             }
         }
     }
-
-//    SubscriptionClient {
-//        id: subscriptionClient;
-
-//        property string ok: container.commandId !== "" && container.subscriptionId !== "";
-//        onOkChanged: {
-//            if (container.commandId !== ""){
-//                let subscriptionRequestId = "On" + container.commandId + "CollectionChanged"
-//                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
-//                var queryFields = Gql.GqlObject("notification");
-//                queryFields.InsertField("Id");
-//                query.AddField(queryFields);
-
-//                console.log("CollectionDataProvider registerSubscription", subscriptionClient.commandId);
-
-//                subscriptionManager.registerSubscription(query, subscriptionClient);
-//            }
-//        }
-
-//        onStateChanged: {
-//            if (state === "Ready"){
-//                console.log("CollectionDataProvider subscriptionClient Ready", subscriptionClient.commandId);
-
-//                container.updateModel();
-//            }
-//        }
-//    }
 }

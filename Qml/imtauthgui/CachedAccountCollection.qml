@@ -8,7 +8,7 @@ CollectionDataProvider {
     id: container;
 
     fields: ["Id", "Name", "Description"];
-    commandId: "Accounts";
+    commandId: "AccountsList";
 
     sortByField: "Name";
 }

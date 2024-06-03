@@ -7,7 +7,7 @@ import imtcolgui 1.0
 CollectionDataProvider {
     id: container;
 
-    commandId: "Products";
+    commandId: "ProductsList";
     fields: ["Id", "ProductName", "Description", "CategoryId", "Licenses", "Features"];
     sortByField: "ProductName";
 
