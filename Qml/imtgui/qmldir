@@ -69,3 +69,5 @@ TreeViewElementView 1.0 View/TreeViewElementView.qml
 SwitchElementView 1.0 View/SwitchElementView.qml
 TextElementView 1.0 View/TextElementView.qml
 MacAddressElementView 1.0 View/MacAddressElementView.qml
+IntegerInputElementView 1.0 View/IntegerInputElementView.qml
+DoubleInputElementView 1.0 View/DoubleInputElementView.qml

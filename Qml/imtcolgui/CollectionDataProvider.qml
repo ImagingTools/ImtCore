@@ -158,8 +158,6 @@ Item {
 
         onStateChanged: {
             if (this.state === "Ready"){
-                console.log("CollectionDataProvider ", container.itemsInfoModel.ToJson());
-
                 var dataModelLocal;
                 if (container.itemsInfoModel.ContainsKey("errors")){
                     return;
