@@ -250,6 +250,11 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		typeId = params.at(0).GetFieldArgumentValue("typeId").toByteArray();
 		name = params.at(0).GetFieldArgumentValue("name").toByteArray();
 		description = params.at(0).GetFieldArgumentValue("description").toString();
+
+		const imtgql::CGqlObject* addition = params.at(0).GetFieldArgumentObjectPtr("addition");
+		if (addition != nullptr){
+			typeId = addition->GetFieldArgumentValue("typeId").toByteArray();
+		}
 	}
 
 	if (typeId.isEmpty()){
