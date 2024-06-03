@@ -13,11 +13,19 @@ ComboBox {
         dataProvider.updateModel();
     }
 
+    function getAdditionalInputParams(){
+        return {};
+    }
+
     CollectionDataProvider {
         id: dataProvider;
 
         onCollectionModelChanged: {
             root.model = dataProvider.collectionModel;
+        }
+
+        function getAdditionalInputParams(){
+            return root.getAdditionalInputParams();
         }
     }
 }

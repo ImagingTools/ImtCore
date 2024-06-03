@@ -12,6 +12,10 @@ ComboBoxElementView {
 
     controlComp: cbComp;
 
+    function getAdditionalInputParams(){
+        return {};
+    }
+
     Component {
         id: cbComp;
 
@@ -30,6 +34,10 @@ ComboBoxElementView {
                 }
 
                 root.setupComboBox(cb);
+            }
+
+            function getAdditionalInputParams(){
+                return root.getAdditionalInputParams();
             }
         }
     }
