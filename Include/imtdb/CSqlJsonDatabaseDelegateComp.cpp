@@ -362,6 +362,8 @@ bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& fil
 		}
 	}
 
+    QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
+
 	if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()){
 		filterQuery = " AND ";
 	}
@@ -374,6 +376,15 @@ bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& fil
 	if (!textFilterQuery.isEmpty()){
 		filterQuery += "(" + textFilterQuery + ")";
 	}
+
+    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()) && !additionalFilters.isEmpty()){
+        filterQuery += " AND ";
+    }
+
+    if(!additionalFilters.isEmpty()){
+        filterQuery += "(" + additionalFilters + ")";
+    }
+
 	return true;
 }
 
