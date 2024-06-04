@@ -8,6 +8,8 @@ CollectionDataProvider {
     id: container;
 
     commandId: "ProductsList";
+    subscriptionCommandId: "OnProductsCollectionChanged"
+
     fields: ["Id", "ProductName", "Description", "CategoryId", "Licenses", "Features"];
     sortByField: "ProductName";
 

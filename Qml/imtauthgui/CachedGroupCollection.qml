@@ -10,6 +10,7 @@ CollectionDataProvider {
     fields: ["Id", "Name", "Description", "ParentGroups", "Roles"];
 
     commandId: "GroupsList";
+    subscriptionCommandId: "OnGroupsCollectionChanged"
 
     sortByField: "Name";
 }

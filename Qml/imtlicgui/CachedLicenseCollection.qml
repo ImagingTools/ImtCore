@@ -8,6 +8,7 @@ CollectionDataProvider {
     id: container;
 
     commandId: "LicensesList";
+    subscriptionCommandId: "OnLicensesCollectionChanged"
 
     fields: ["Id", "LicenseId", "LicenseName", "ProductId", "ParentLicenses", "Features", "ProductUuid"]
     sortByField: "LicenseName";

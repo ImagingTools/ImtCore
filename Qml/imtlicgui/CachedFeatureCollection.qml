@@ -8,6 +8,8 @@ CollectionDataProvider {
     id: container;
 
     commandId: "FeaturesList";
+    subscriptionCommandId: "OnFeaturesCollectionChanged"
+
     fields: ["Id", "FeatureId", "FeatureName", "FeatureDescription", "Optional", "ChildModel"];
     sortByField: "FeatureName";
 

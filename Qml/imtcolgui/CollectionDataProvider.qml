@@ -9,6 +9,7 @@ Item {
     property TreeItemModel collectionModel: TreeItemModel {};
 
     property string commandId;
+    property string subscriptionCommandId;
 
     // Property indicating whether the model is ready for use
     property bool completed: false;
@@ -200,12 +201,14 @@ Item {
     }
 
     function updateSubscription(){
-        if (container.commandId === ""){
+        console.log("updateSubscription", container.subscriptionCommandId);
+
+        if (container.subscriptionCommandId === ""){
             console.error("Unable to update subscription, command-ID is empty!");
             return;
         }
 
-        let subscriptionRequestId = "On" + container.commandId + "CollectionChanged"
+        let subscriptionRequestId = container.subscriptionCommandId;
         var query = Gql.GqlRequest("subscription", subscriptionRequestId);
         var queryFields = Gql.GqlObject("notification");
         queryFields.InsertField("Id");
@@ -217,7 +220,7 @@ Item {
     SubscriptionClient {
         id: subscriptionClient;
 
-        property bool ok: container.commandId !== "" && subscriptionClient.subscriptionId !== "";
+        property bool ok: container.subscriptionCommandId !== "" && subscriptionClient.subscriptionId !== "";
         onOkChanged: {
             if (ok){
                 container.updateSubscription();
@@ -226,6 +229,7 @@ Item {
 
         onStateChanged: {
             if (state === "Ready"){
+                console.log("SubscriptionClient", subscriptionClient.ToJson());
                 container.hasRemoteChanges = true;
             }
         }

@@ -9,6 +9,7 @@ CollectionDataProvider {
 
     fields: ["Id", "Name", "Description"];
     commandId: "AccountsList";
+    subscriptionCommandId: "OnAccountsCollectionChanged"
 
     sortByField: "Name";
 }
