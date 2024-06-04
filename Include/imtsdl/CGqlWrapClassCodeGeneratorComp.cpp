@@ -661,6 +661,10 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("m_isValid = false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return;");
 	FeedStream(stream, 1, false);
 
@@ -697,6 +701,10 @@ void CGqlWrapClassCodeGeneratorComp::AddExtractValueFromRequestCode(QTextStream&
 void CGqlWrapClassCodeGeneratorComp::AddDataCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, quint32 hIndents)
 {
 	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("m_isValid = false;");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
