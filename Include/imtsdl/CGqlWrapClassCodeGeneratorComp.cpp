@@ -687,7 +687,7 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 void CGqlWrapClassCodeGeneratorComp::AddExtractValueFromRequestCode(QTextStream& stream, const CSdlField& field, quint32 hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = gqlRequest.GetField(");
+	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = gqlRequest.GetParam(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
@@ -722,7 +722,7 @@ void CGqlWrapClassCodeGeneratorComp::AddSetValueToObjectCode(QTextStream& stream
 void CGqlWrapClassCodeGeneratorComp::AddExtractCustomValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const imtgql::CGqlObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = gqlRequest.GetField(");
+	stream << QStringLiteral("const imtgql::CGqlObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = gqlRequest.GetParam(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
