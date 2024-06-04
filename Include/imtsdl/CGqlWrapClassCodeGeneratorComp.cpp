@@ -661,7 +661,7 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return false;");
+	stream << QStringLiteral("return;");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents);
@@ -700,7 +700,7 @@ void CGqlWrapClassCodeGeneratorComp::AddDataCheckRequiredValueCode(QTextStream& 
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return false;");
+	stream << QStringLiteral("return;");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents);
