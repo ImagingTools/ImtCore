@@ -430,6 +430,11 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
+	// inLoop: insert ien item to model
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << newTreeModelVarName << QStringLiteral("->InsertNewItem();");
+	FeedStream(stream, 1, false);
+
 	// inLoop: add item and check
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("if (!m_") << GetDecapitalizedValue(field.GetId());
