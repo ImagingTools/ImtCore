@@ -36,7 +36,8 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInter
 imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeItemModelFromResponse(const imtgql::IGqlResponse& response) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> retVal(new imtbase::CTreeItemModel());
-	QJsonDocument document = QJsonDocument::fromJson(response.GetResponseData());
+	QByteArray responseData = response.GetResponseData();
+	QJsonDocument document = QJsonDocument::fromJson(responseData);
 	if (document.isObject()){
 		QJsonObject dataObject = document.object();
 

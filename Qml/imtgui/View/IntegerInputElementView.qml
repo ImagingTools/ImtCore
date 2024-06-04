@@ -6,10 +6,12 @@ import imtcontrols 1.0
 TextInputElementView {
     id: root;
 
-    textInputValidator: intValidator.intRegExp;
-
     IntValidator {
         id: intValidator;
+    }
+
+    Component.onCompleted: {
+        root.textInputValidator = intValidator;
     }
 }
 

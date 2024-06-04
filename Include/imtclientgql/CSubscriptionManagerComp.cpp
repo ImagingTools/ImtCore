@@ -211,7 +211,15 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		break;
 
 		case imtrest::CWebSocketRequest::MT_ERROR:
-			SendErrorMessage(0, message);
+		{
+			QMutexLocker queryLocker(&m_queryDataMapMutex);
+
+			m_queryDataMap.insert(webSocketRequest->GetSubscriptionId(), webSocketRequest->GetBody());
+
+			queryLocker.unlock();
+
+			Q_EMIT OnQueryDataReceived(1);
+		}
 			break;
 
 		default:
@@ -245,6 +253,8 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
+	qDebug() << "SendRequest" << key;
+
 	QJsonObject dataObject;
 	dataObject["type"] = "query";
 	dataObject["id"] = key;
@@ -274,6 +284,9 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 			break;
 		}
 	}
+
+	qDebug() << "resultCode" << resultCode << key;
+
 	if(resultCode == 1){
 		QMutexLocker queryLocker(&m_queryDataMapMutex);
 
@@ -340,7 +353,6 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 
 	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&request);
 	if (requestImplPtr != nullptr){
-		requestImplPtr->GetParams();
 		const imtgql::CGqlObject* input = requestImplPtr->GetParam("input");
 		if (input != nullptr){
 			const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
@@ -378,21 +390,26 @@ void CSubscriptionManagerComp::OnComponentCreated()
 
 imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const
 {
+	QByteArray requestBody = request.GetBody();
+	QJsonDocument document = QJsonDocument::fromJson(requestBody);
+	QJsonObject object = document.object();
+
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
 	QString body = QString(R""(
 {
+	"id": "%1",
 	"type": "error",
 	"payload": {
 		"errors": [
 			{
 				"errorType": "ProcessRequestError",
-				"message": "%1"
+				"message": "%2"
 			}
 		]
 	}
 }
-	)"" ).arg(QString(errorMessage));
+	)"" ).arg(object["id"].toString()).arg(QString(errorMessage));
 
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 

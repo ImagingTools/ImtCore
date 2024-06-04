@@ -23,6 +23,8 @@ ElementView {
     signal editingFinished();
 
     onTextInputValidatorChanged: {
+        console.log("onTextInputValidatorChanged", textInputValidator);
+
         if (textInputValidator && controlItem){
             controlItem.textInputValidator = textInputValidator;
         }
@@ -84,6 +86,7 @@ ElementView {
             readOnly: root.readOnly
             placeHolderText: root.placeHolderText;
             echoMode: root.echoMode;
+            textInputValidator: root.textInputValidator;
 
             onAccepted: {
                 root.accepted();
