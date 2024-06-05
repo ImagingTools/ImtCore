@@ -111,7 +111,8 @@ Item {
         Rectangle{
             anchors.fill: parent;
             z:-3;
-            color:  delegateContainer.rowDelegate ? delegateContainer.rowDelegate.cellColor : "transparent";
+            color:  !delegateContainer.rowDelegate ? "transparent" : delegateContainer.rowDelegate.selected ? delegateContainer.rowDelegate.selectedColor: delegateContainer.rowDelegate.cellColor;
+
         }
     }
 

@@ -190,6 +190,7 @@ Rectangle {
     }
 
 
+
     function getItemData(){
         return model;
     }
@@ -344,6 +345,7 @@ Rectangle {
                 tableDelegateContainer.tableItem.enableAlternating && model.index % 2 === 0 ? tableDelegateContainer.tableItem.alternatingOpacity: 0;
 
         visible: !tableDelegateContainer.selected && (tableDelegateContainer.tableItem.enableAlternating || tableDelegateContainer.tableItem.selectable);
+        z: 10;
     }
 
     MouseArea {
@@ -351,6 +353,7 @@ Rectangle {
 
         anchors.fill: parent;
         hoverEnabled: true;
+        z: 11;
 
 //        propagateComposedEvents: true;
 
