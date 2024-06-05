@@ -59,7 +59,7 @@ QtObject {
 
     function fromObject(sourceObject){
         for(let key in sourceObject){
-            let _key = key[0].toLowerCase() + key.slice(1, key.length)
+            let _key = "m_" + key
             if(typeof sourceObject[key] === "object"){
                 if(Array.isArray(sourceObject[key])){
                     if(this[_key]){
