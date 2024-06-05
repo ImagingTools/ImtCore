@@ -784,7 +784,15 @@ var Qt = {
             }
         }
         
-        return new cls(parent)
+        return {
+            createObject: (parent)=>{
+                let obj = new cls(parent)
+                for(let update of updateList.splice(0, updateList.length)){
+                    update()
+                }
+                return obj
+            }
+        }
     },
 }
 
