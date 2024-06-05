@@ -270,7 +270,7 @@ Item {
             }
         }
 
-        function updateGui(){
+        function doUpdateGui(){
             if (!container.visible){
                 internal.guiUpdateRequired = true;
 

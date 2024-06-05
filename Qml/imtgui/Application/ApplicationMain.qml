@@ -5,13 +5,6 @@ import imtguigql 1.0
 import imtcontrols 1.0
 import imtauthgui 1.0
 
-//QuickApplication {
-
-//}
-
-//ServerBasedApplication {
-
-//}
 
 Item {
     id: application;
@@ -45,24 +38,8 @@ Item {
 
     property bool updatingModel: serverReady && application.settingsProvider.serverModel != null;
 
-    property bool firstModelsInitStart: authorizationServerConnected && subscriptionManager_.status == 1;
-
-    onFirstModelsInitStartChanged: {
-        if (!authorizationServerConnected){
-            checkStatus(5);
-
-            return;
-        }
-
-        if (firstModelsInitStart){
-            let loggedUserId = AuthorizationController.getLoggedUserId();
-            if (loggedUserId === ""){
-                application.firstModelsInit();
-            }
-            else{
-                checkStatus(1);
-            }
-        }
+    onAuthorizationServerConnectedChanged: {
+        application.firstModelsInit();
     }
 
     signal updateSystemStatus();
@@ -204,10 +181,15 @@ Item {
 
         onStatusChanged: {
             application.checkStatus(status)
+
+            if (status == 1){
+                application.firstModelsInit();
+            }
         }
     }
 
     function checkStatus(status){
+        console.log("checkStatus", status);
         thumbnailDecorator.stackView.clear();
 
 //        0 - WebSocket.Connecting
@@ -338,8 +320,18 @@ Item {
     }
 
     function firstModelsInit(){
-        console.log("firstModelsInit");
-        AuthorizationController.updateUserManagementModel();
+        if (!authorizationServerConnected){
+            checkStatus(5);
+
+            return;
+        }
+
+        checkStatus(1);
+
+        let loggedUserId = AuthorizationController.getLoggedUserId();
+        if (loggedUserId === ""){
+            AuthorizationController.updateUserManagementModel();
+        }
     }
 
     function connectToWebSocketServer(){

@@ -18,7 +18,7 @@ Rectangle {
 
         width: parent.width - 100;
 
-        spacing: 10;
+        spacing: Style.size_mainMargin;
 
         Text {
             id: textNoConnection;
@@ -44,5 +44,14 @@ Rectangle {
 
             visible: false;
         }
+    }
+
+    MouseArea {
+        anchors.fill: parent;
+
+        hoverEnabled: true
+
+        onWheel: {}
+        onClicked: {}
     }
 }

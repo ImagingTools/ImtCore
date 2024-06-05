@@ -210,7 +210,7 @@ Item {
 
     function insertNewDocument(documentTypeId, viewTypeId)
     {
-        let documentData = createTemplateDocument("", documentTypeId, createDocumentModel(null));
+        let documentData = createTemplateDocument("", documentTypeId);
         if (!documentData){
             return false;
         }
@@ -234,11 +234,15 @@ Item {
 
         documentAdded(documentsModel.count - 1, "");
 
+        if (documentData.documentDataController){
+            documentData.documentDataController.documentModel = createDocumentModel(null);
+        }
+
         return true;
     }
 
 
-    function createTemplateDocument(documentId, documentTypeId, documentModel){
+    function createTemplateDocument(documentId, documentTypeId){
         let singleDocumentData = singleDocumentDataComp.createObject(documentManager);
         if (singleDocumentData){
             if (documentId === ""){
@@ -263,13 +267,6 @@ Item {
             let documentValidator = getDocumentValidator(documentTypeId);
             if (documentValidator){
                 singleDocumentData.documentValidator = documentValidator;
-            }
-
-            if (documentModel){
-                documentDataController.documentModel = documentModel;
-            }
-            else{
-                documentDataController.updateDocumentModel();
             }
 
             return singleDocumentData;
@@ -312,6 +309,10 @@ Item {
                               });
 
         documentAdded(documentsModel.count - 1, documentId);
+
+        if (documentData.documentDataController){
+            documentData.documentDataController.updateDocumentModel();
+        }
 
         return true;
     }
@@ -556,9 +557,9 @@ Item {
 
                     if (wasChanges){
                         singleDocumentData.undoManager.onDataChanged();
-                    }
 
-                    console.log("Document model changed: ", JSON.stringify(changeList));
+                        console.log("Document model changed: ", JSON.stringify(changeList));
+                    }
                 }
             }
             property UndoRedoManager undoManager: UndoRedoManager {
@@ -630,7 +631,6 @@ Item {
 
                     for (let i = 0; i < singleDocumentData.views.length; i++){
                         singleDocumentData.views[i].model = documentModel;
-
                         if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
                             singleDocumentData.views[i].doUpdateModel();
                         }
@@ -646,6 +646,9 @@ Item {
                     singleDocumentData.undoManager.registerModel(documentModel);
                     singleDocumentData.documentValidator.documentModel = documentModel;
 
+                    singleDocumentData.modelConnections.target = singleDocumentData.documentDataController.documentModel;
+                    singleDocumentData.modelConnections.enabled = true;
+
                     Events.sendEvent("StopLoading");
                 }
 
@@ -655,7 +658,7 @@ Item {
             }
 
             property Connections modelConnections: Connections {
-                target: singleDocumentData.documentDataController.documentModel;
+                enabled: false;
 
                 function onDataChanged(){
                     if (singleDocumentData.blockingUpdateModel){
@@ -663,8 +666,6 @@ Item {
                     }
 
                     singleDocumentData.treeItemModelObserver.observedModelDataChanged();
-
-//                    singleDocumentData.isDirty = true;
                 }
             }
 
@@ -701,7 +702,7 @@ Item {
             }
 
             onViewAdded: {
-                if (!view || !view.model){
+                if (!view){
                     return;
                 }
 

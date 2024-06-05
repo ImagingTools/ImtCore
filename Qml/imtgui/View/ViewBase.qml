@@ -7,7 +7,7 @@ Item {
     id: viewBase;
 
     property string viewId;
-    property TreeItemModel model: TreeItemModel {}
+    property var model;
 
     property Component commandsControllerComp: null;
     property CommandsController commandsController: null;
@@ -135,6 +135,12 @@ Item {
     // Update representation model from GUI
     function doUpdateModel()
     {
+        if (!model){
+            return;
+        }
+
+        console.log("doUpdateModel", model);
+
         if (readOnly || internal.blockingUpdateModel || internal.blockingUpdateGui){
             return;
         }
@@ -149,6 +155,12 @@ Item {
     // Update GUI from representation model
     function doUpdateGui()
     {
+        if (!model){
+            return;
+        }
+
+        console.log("doUpdateGui", model);
+
         if (internal.blockingUpdateGui || internal.blockingUpdateModel){
             return;
         }
@@ -179,10 +191,6 @@ Item {
 
     function updateCommandsGui(){
         if (commandsController && viewBase.viewId !== ""){
-//            if (commandsController.isReady){
-//                return;
-//            }
-
             Events.sendEvent("UpdateCommandsGui", {"Model": commandsController.commandsModel, "ViewId": viewBase.viewId});
         }
     }

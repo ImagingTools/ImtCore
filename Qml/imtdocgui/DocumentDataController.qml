@@ -4,7 +4,7 @@ import Acf 1.0
 QtObject {
     id: root;
 
-    property TreeItemModel documentModel: TreeItemModel {}
+    property var documentModel;
 
     property string documentId;
     property string documentName;

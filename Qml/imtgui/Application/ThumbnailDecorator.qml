@@ -135,15 +135,6 @@ Rectangle {
         anchors.rightMargin: thumbnailDecoratorContainer.pageMargin;
 
         activePageIndex: menuPanel.activePageIndex;
-
-        onModelStateChanged: {
-//            if (pagesManager.modelState === "Ready"){
-//                thumbnailDecoratorContainer.startLoading();
-//            }
-//            else{
-//                thumbnailDecoratorContainer.stopLoading();
-//            }
-        }
     }
 
     DrawingContainer{
@@ -181,7 +172,7 @@ Rectangle {
     StackView {
         id: stackView_;
 
-        z: 11;
+        z: 31;
 
         anchors.fill: parent;
     }
@@ -289,8 +280,6 @@ Rectangle {
         id: errorManager;
 
         anchors.fill: parent;
-
-//        errorPage: serverNoConnectionView;
 
         visible: false;
     }

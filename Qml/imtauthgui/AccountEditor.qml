@@ -40,6 +40,7 @@ ViewBase {
     }
 
     function updateGui(){
+        console.log("updateGui start");
         if (accountEditorContainer.model.ContainsKey("Name")){
             accountNameInput.text = accountEditorContainer.model.GetData("Name");
         }
@@ -114,6 +115,8 @@ ViewBase {
                 }
             }
         }
+
+        console.log("updateGui end");
     }
 
     function updateModel(){
