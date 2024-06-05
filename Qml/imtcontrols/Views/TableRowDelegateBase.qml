@@ -353,7 +353,6 @@ Rectangle {
 
         anchors.fill: parent;
         hoverEnabled: true;
-        z: 11;
 
 //        propagateComposedEvents: true;
 
