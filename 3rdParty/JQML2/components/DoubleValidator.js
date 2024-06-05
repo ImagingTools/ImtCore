@@ -36,23 +36,28 @@ class DoubleValidator extends QtObject {
         return /\d*$/.exec(str)[0].length
     }
     validate(str) {
-        let regExp = this.getRegExpForNotation()
-        if (!regExp.test(str)) {
-            return false
-        }
-        let value = parseFloat(str)
-        let acceptable = this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value && this.getDecimalsForNumber(value) <= this.getPropertyValue('decimals')
-        return acceptable
+        if(!str) return false
+
+        let value = Number(str.replaceAll(',','.'))
+        if(isNaN(value)) return false
+
+        let decimals = str.indexOf(',') >= 0 ? str.split(',')[1] : []
+
+        return (this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value) && decimals.length <= this.getPropertyValue('decimals')
     }
 
     hasPartialMatch(str){
         if(!str) return true
+
+        if(this.getPropertyValue('bottom') < 0 || this.getPropertyValue('top') < 0){
+            if(str === '-') return true
+        }
+
         if(str.indexOf('.') >= 0) return false
         let value = Number(str.replaceAll(',','.'))
         if(isNaN(value)) return false
         let decimals = str.indexOf(',') >= 0 ? str.split(',')[1] : []
-        let acceptable = this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value && decimals.length <= this.getPropertyValue('decimals')
-        return acceptable
+        return decimals.length <= this.getPropertyValue('decimals')
     }
 }
 

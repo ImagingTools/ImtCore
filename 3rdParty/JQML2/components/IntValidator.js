@@ -13,24 +13,24 @@ class IntValidator extends QtObject {
     }
 
     validate(str) {
-        let regExp = /^(-|\+)?\s*[0-9]+$/
+        if(!str) return false
 
-        if (regExp.test(str.trim())) {
-            let value = parseInt(str, 10)
-            return this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value
-        }
-        return false
+        let value = Number(str)
+        if(isNaN(value)) return false
+
+        return (this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value)
     }
 
     hasPartialMatch(str){
         if(!str) return true
-        let regExp = /^(-|\+)?\s*[0-9]+$/
 
-        if (regExp.test(str.trim())) {
-            let value = parseInt(str, 10)
-            return (this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value) || (str.length - (this.getPropertyValue('top')-1).toString().length === 1)
+        if(this.getPropertyValue('bottom') < 0 || this.getPropertyValue('top') < 0){
+            if(str === '-') return true
         }
-        return false
+        let value = Number(str)
+        if(isNaN(value)) return false
+
+        return (this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value) || (str.length - (this.getPropertyValue('top')-1).toString().length === 1)
     }
 }
 
