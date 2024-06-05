@@ -318,6 +318,9 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 		ifStream << QStringLiteral(": '");
 		ifStream << sdlField.GetId() << '\'';
 	}
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << '}'; // end of QtObject
 
 	FeedStream(ifStream, 1, false);
 	return true;
