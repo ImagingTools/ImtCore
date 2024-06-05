@@ -19,5 +19,7 @@
 	<file alias="imtguigql/WebSocketPortProvider.qml">WebSocketPortProvider.qml</file>
 	<file alias="imtguigql/SystemStatusController.qml">SystemStatusController.qml</file>
 	<file alias="imtguigql/ComboBoxGqlSimpleElementView.qml">ComboBoxGqlSimpleElementView.qml</file>
+	<file alias="imtguigql/GqlRequest.qml">GqlRequest.qml</file>
+	<file alias="imtguigql/GqlRequestDocumentDataController.qml">GqlRequestDocumentDataController.qml</file>
     </qresource>
 </RCC>
