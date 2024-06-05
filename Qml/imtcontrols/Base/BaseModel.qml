@@ -3,11 +3,20 @@ import QtQuick 2.0
 ListModel {
     function getProperties(item){
         let list = []
-        for(let key in item){
-            if(key !== 'objectName' && key !== 'enableNotifications' && typeof item[key] !== "function" && item[key] !== undefined && item[key] !== null){
-                list.push(key)
+        if(Qt.platform.os === 'web'){
+            for(let key in item.$properties){
+                if(key.indexOf('m_') >= 0 && key !== 'objectName' && key !== 'enableNotifications' && typeof item[key] !== "function" && item[key] !== undefined && item[key] !== null){
+                    list.push(key)
+                }
+            }
+        } else {
+            for(let key in item){
+                if(key !== 'objectName' && key !== 'enableNotifications' && typeof item[key] !== "function" && item[key] !== undefined && item[key] !== null){
+                    list.push(key)
+                }
             }
         }
+
 
         return list
     }

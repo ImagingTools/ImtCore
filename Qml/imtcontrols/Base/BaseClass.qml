@@ -4,20 +4,16 @@ QtObject {
     signal propertyChanged(string name, var sender)
     property bool enableNotifications: true
 
-    Component.onCompleted: {
-        // let list = getProperties()
-        // for(let name of list){
-        //     this[name+'Changed'].connect(()=>{
-        //                                     console.log('**TEST**', name+'Changed')
-        //                                  })
-        // }
-    }
+    // Component.onCompleted: {
+    //     let list = getProperties()
+    //     for(let name of list){
+    //         this[name+'Changed'].connect(()=>{
+    //                                         console.log('**TEST**', name+'Changed')
+    //                                      })
+    //     }
+    // }
 
-    function getType(name){
-
-    }
-
-    function getTypeForArray(name){
+    function createComponent(name){
 
     }
 
@@ -27,11 +23,21 @@ QtObject {
 
     function getProperties(){
         let list = []
-        for(let key in this){
-            if(key !== 'objectName' && key !== 'enableNotifications' && typeof this[key] !== "function"){
-                list.push(key)
+        if(Qt.platform.os === 'web'){
+            for(let key in this.$properties){
+                if(key.indexOf('m_') >= 0 && key !== 'objectName' && key !== 'enableNotifications' && typeof this[key] !== "function"){
+                    list.push(key)
+                }
+            }
+        } else {
+            for(let key in this){
+                if(key !== 'objectName' && key !== 'enableNotifications' && typeof this[key] !== "function"){
+                    list.push(key)
+                }
             }
         }
+
+
 
         return list
     }
