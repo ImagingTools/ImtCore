@@ -135,7 +135,7 @@ protected:
 	/**
 		Set multiple optional additional filters to initially get a more refined collection.
 	*/
-	virtual void SetAdditionalFilters(const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const;
+    virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest,const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const;
 
 	/**
 		Set object filter.
