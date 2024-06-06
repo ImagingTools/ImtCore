@@ -13,6 +13,26 @@ QtObject {
     //     }
     // }
 
+    function createMe(){
+        return Qt.createComponent('BaseClass.qml').createObject()
+    }
+
+    function copyMe(){
+        let obj = createMe()
+        obj.fromJSON(toJSON())
+        return obj
+    }
+
+    function copyFrom(item){
+        fromJSON(item.toJSON())
+        return true
+    }
+
+    function copyTo(item){
+        item.fromJSON(toJSON())
+        return true
+    }
+
     function createComponent(name){
 
     }
