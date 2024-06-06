@@ -6,12 +6,60 @@ import imtcontrols 1.0
 TextInputElementView {
     id: root;
 
+    property alias topValue: doubleValidator.top;
+    property alias bottomValue: doubleValidator.bottom;
+
+    onAcceptableInputChanged: {
+        if (topValue != Number.POSITIVE_INFINITY && bottomValue != Number.NEGATIVE_INFINITY){
+            root.bottomComp = acceptableInput ? undefined : errorComp1;
+        }
+        else if (topValue == Number.POSITIVE_INFINITY && bottomValue != Number.NEGATIVE_INFINITY){
+            root.bottomComp = acceptableInput ? undefined : errorComp3;
+        }
+        else if (topValue != Number.POSITIVE_INFINITY && bottomValue == Number.NEGATIVE_INFINITY){
+            root.bottomComp = acceptableInput ? undefined : errorComp2;
+        }
+    }
+
     DoubleValidator {
         id: doubleValidator;
     }
 
     Component.onCompleted: {
         root.textInputValidator = doubleValidator;
+    }
+
+    Component {
+        id: errorComp1;
+
+        Text {
+            text: qsTr("Please enter a value ranging from") + " " + root.bottomValue + " " + qsTr("to") + " " + root.topValue;
+            color: Style.errorTextColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+        }
+    }
+
+    Component {
+        id: errorComp2;
+
+        Text {
+            text: qsTr("Please enter a value less than or equal to") + " " + root.topValue;
+            color: Style.errorTextColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+        }
+    }
+
+    Component {
+        id: errorComp3;
+
+        Text {
+            text: qsTr("Please enter a value greater than or equal to") + " " + root.bottomValue;
+            color: Style.errorTextColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+        }
     }
 }
 

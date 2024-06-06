@@ -6,6 +6,9 @@ import imtcontrols 1.0
 TextInputElementView {
     id: root;
 
+    property alias topValue: intValidator.top;
+    property alias bottomValue: intValidator.bottom;
+
     IntValidator {
         id: intValidator;
     }
