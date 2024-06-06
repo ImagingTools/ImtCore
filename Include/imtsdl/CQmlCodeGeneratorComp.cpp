@@ -299,6 +299,19 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	FeedStreamHorizontally(ifStream, 1);
 	ifStream << '}'; // end of function
 
+	// createMe
+	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("function createMe(){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("return Qt.createComponent('");
+	ifStream << sdlType.GetName();
+	ifStream << QStringLiteral(".qml').createObject()");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << '}'; // end of function
+
 	// static props as internal QtObject
 	FeedStream(ifStream, 2, false);
 	FeedStreamHorizontally(ifStream, 1);
