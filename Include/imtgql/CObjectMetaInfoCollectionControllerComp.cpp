@@ -86,7 +86,7 @@ imtbase::CTreeItemModel* CObjectMetaInfoCollectionControllerComp::ListObjects(co
 			}
 
 			filterParams.SetEditableParameter("Filter", &m_filter);
-			this->SetAdditionalFilters(*viewParamsGql, &filterParams);
+            this->SetAdditionalFilters(gqlRequest, *viewParamsGql, &filterParams);
 		}
 
 		int pagesCount = std::ceil(m_objectCollectionCompPtr->GetElementsCount(&filterParams) / (double)count);

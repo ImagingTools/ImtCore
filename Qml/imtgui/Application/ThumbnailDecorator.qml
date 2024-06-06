@@ -52,6 +52,7 @@ Rectangle {
 
     function onLogout(){
         clearModels();
+        Events.sendEvent("DrawerSetVisible", false);
         drawingContainer.content = null;
 // soon...
 //        let exists = mainDocumentManager.dirtyDocumentsExists();

@@ -25,7 +25,7 @@ protected:
 
 
 	// reimplemented (imtgql::CObjectCollectionControllerCompBase)
-    virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const;
+    virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const override;
     virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
     virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
     bool checkHasChildren(const QString& id) const;

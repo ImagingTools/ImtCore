@@ -572,13 +572,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 						if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, objectCollectionIterator.GetPtr(), errorMessage)){
 							SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-							return nullptr;
+                            return nullptr;
 						}
 					}
 				}
 				else{
 					errorMessage = QString("Unable to get object data from object collection iterator.");
-					SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+                    SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 					return nullptr;
 				}
 			}
@@ -1144,12 +1144,12 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	filterParams.SetEditableParameter("Filter", collectionFilterPtr.PopPtr());
 	filterParams.SetEditableParameter("ObjectFilter", objectFilterPtr.PopPtr());
 
-	this->SetAdditionalFilters(viewParamsGql, &filterParams);
+    this->SetAdditionalFilters(gqlRequest, viewParamsGql, &filterParams);
 }
 
 
 
-void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGqlObject& /*viewParamsGql*/, iprm::CParamsSet* /*filterParams*/) const
+void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGqlRequest& /*gqlRequest*/, const imtgql::CGqlObject& /*viewParamsGql*/, iprm::CParamsSet* /*filterParams*/) const
 {
 }
 

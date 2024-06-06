@@ -377,12 +377,8 @@ bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& fil
 		filterQuery += "(" + textFilterQuery + ")";
 	}
 
-    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()) && !additionalFilters.isEmpty()){
-        filterQuery += " AND ";
-    }
-
     if(!additionalFilters.isEmpty()){
-        filterQuery += "(" + additionalFilters + ")";
+        filterQuery += " AND (" + additionalFilters + ")";
     }
 
 	return true;
