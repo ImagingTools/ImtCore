@@ -54,6 +54,7 @@ PopupDecorator 1.0 ./Dialogs/PopupDecorator.qml
 PopupItemDelegateDecorator 1.0 ./Dialogs/PopupItemDelegateDecorator.qml
 DialogDecorator 1.0 ./Dialogs/DialogDecorator.qml
 DialogManagerView 1.0 ./Dialogs/DialogManagerView.qml
+CriticalErrorDialog 1.0 ./Dialogs/CriticalErrorDialog.qml
 
 Calendar 1.0 ./Inputs/Calendar.qml
 CalendarNew 1.0 ./Inputs/CalendarNew.qml

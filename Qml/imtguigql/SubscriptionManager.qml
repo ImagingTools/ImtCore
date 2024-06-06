@@ -85,7 +85,7 @@ WebSocket {
                     subscription.state = "Processing"
                     let dataModelLocal = socketModel.GetData("payload");
 
-                    if (subscription){
+                    if (subscription && dataModelLocal){
                         subscription.Copy(dataModelLocal)
                         subscription.state = "Ready"
                     }

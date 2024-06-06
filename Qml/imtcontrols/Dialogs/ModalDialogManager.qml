@@ -71,11 +71,19 @@ Item {
     }
 
     function showCriticalDialog(message){
+        openDialog(criticalDialog, {"message": message});
     }
 
     property Component warningDialog: Component{
         ErrorDialog {
             title: qsTr("Warning message");
+            onFinished: {}
+        }
+    }
+
+    property Component criticalDialog: Component{
+        CriticalErrorDialog {
+            title: qsTr("Critical message");
             onFinished: {}
         }
     }

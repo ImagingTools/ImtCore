@@ -48,7 +48,7 @@ QtObject {
                 }
             }
             else if (this.state === "Error"){
-                Events.sendEvent("SendError", {"Message": "Request failed", "ErrorType": "Critical"})
+                ModalDialogManager.showWarningDialog("Request failed")
             }
         }
     }

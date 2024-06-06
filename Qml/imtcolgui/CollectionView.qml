@@ -89,7 +89,7 @@ Item {
         collectionMetaInfo.metaInfoModel = metaInfoModel;
     }
 
-    function onEdit(id, index) {
+    function onEdit(id, index){
         if (container.commandsDelegate){
             container.commandsDelegate.commandHandle("Edit");
         }
@@ -112,8 +112,7 @@ Item {
             root.elementsChanged();
         }
 
-        function onHeadersChanged()
-        {
+        function onHeadersChanged(){
             root.headersChanged();
         }
 

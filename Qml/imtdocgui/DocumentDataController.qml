@@ -13,13 +13,14 @@ QtObject {
 
     signal saved(string id, string name);
     signal error(string message, string type);
+    signal modelChanged();
 
     function getDocumentName(){
         return documentName;
     }
 
     function updateDocumentModel(){
-        documentModelChanged();
+        modelChanged();
     }
 
     function insertDocument(){

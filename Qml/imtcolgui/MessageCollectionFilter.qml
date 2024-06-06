@@ -5,8 +5,7 @@ import imtcolgui 1.0
 CollectionFilter {
     id: root;
 
-    TreeItemModel {
-        id: filterableHeadersModel
+    property TreeItemModel filterableHeadersModel: TreeItemModel{
     }
 
     Component.onCompleted: {

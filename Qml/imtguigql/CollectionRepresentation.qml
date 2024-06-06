@@ -200,7 +200,7 @@ Item {
                         type = dataModelLocal.GetData("type");
                     }
 
-                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+                    ModalDialogManager.showWarningDialog(message)
 
                     return;
                 }
@@ -280,7 +280,7 @@ Item {
                             type = dataModelLocal.GetData("type");
                         }
 
-                        Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+                        ModalDialogManager.showWarningDialog(message)
                     }
 
                     return;
@@ -352,7 +352,7 @@ Item {
                             type = dataModelLocal.GetData("type");
                         }
 
-                        Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+                        ModalDialogManager.showWarningDialog(message)
                     }
 
                     return;
@@ -426,7 +426,7 @@ Item {
                         type = dataModelLocal.GetData("type");
                     }
 
-                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+                    ModalDialogManager.showWarningDialog(message)
 
                     return;
                 }
@@ -508,6 +508,7 @@ Item {
         }
 
         onStateChanged: {
+            console.log("List", this.ToJson());
             if (this.state === "Ready"){
                 var dataModelLocal;
                 if (this.ContainsKey("errors")){
@@ -527,7 +528,7 @@ Item {
                         type = dataModelLocal.GetData("type");
                     }
 
-                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+                    ModalDialogManager.showWarningDialog(message)
 
                     return;
                 }
@@ -605,7 +606,7 @@ Item {
                         type = dataModelLocal.GetData("type");
                     }
 
-                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+                    ModalDialogManager.showWarningDialog(message)
 
                     return;
                 }

@@ -90,7 +90,9 @@ DecoratorBase {
 
             iconSource: "../../../../" + Style.getIconPath("Icons/Error", Icon.State.On, Icon.Mode.Normal);
             onCheckedChanged: {
-                mainItem.baseElement.filterChanged("ErrorFilter", checked);
+                if (mainItem.baseElement){
+                    mainItem.baseElement.filterChanged("ErrorFilter", checked);
+                }
             }
         }
 
@@ -103,7 +105,9 @@ DecoratorBase {
 
             iconSource: "../../../../" + Style.getIconPath("Icons/Critical", Icon.State.On, Icon.Mode.Normal);
             onCheckedChanged: {
-                mainItem.baseElement.filterChanged("CriticalFilter", checked);
+                if (mainItem.baseElement){
+                    mainItem.baseElement.filterChanged("CriticalFilter", checked);
+                }
             }
         }
 
@@ -116,11 +120,15 @@ DecoratorBase {
             iconSource: "../../../../" + Style.getIconPath("Icons/Diagnostics", Icon.State.On, Icon.Mode.Normal);
 
             Component.onCompleted: {
-                 mainItem.baseElement.filterChanged("VerboseFilter", false);
+                if (mainItem.baseElement){
+                    mainItem.baseElement.filterChanged("VerboseFilter", false);
+                }
             }
 
             onCheckedChanged: {
-                mainItem.baseElement.filterChanged("VerboseFilter", checked);
+                if (mainItem.baseElement){
+                    mainItem.baseElement.filterChanged("VerboseFilter", checked);
+                }
             }
         }
 

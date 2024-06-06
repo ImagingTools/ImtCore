@@ -50,9 +50,6 @@ Rectangle {
         pagesManager.updateModel();
     }
 
-    function closeAllPages(){
-    }
-
     function onLogout(){
         clearModels();
         drawingContainer.content = null;
@@ -169,18 +166,18 @@ Rectangle {
         }
     }
 
-    DialogManagerView {
-        anchors.fill: parent;
-
-        z: 30;
-    }
-
     StackView {
         id: stackView_;
 
-        z: 31;
+        z: topPanel_.z + 1;
 
         anchors.fill: parent;
+    }
+
+    DialogManagerView {
+        anchors.fill: parent;
+
+        z: topPanel_.z + 1;
     }
 
     function showPage(pageComp){
@@ -281,39 +278,4 @@ Rectangle {
             onFinished: {}
         }
     }
-
-    ErrorManager {
-        id: errorManager;
-
-        anchors.fill: parent;
-
-        visible: false;
-    }
-
-    // TODO
-//    function closeApp(){
-//        if (mainDocumentManager.dirtyDocumentsExists()){
-//            ModalDialogManager.openDialog(saveDialog, {});
-//        }
-//    }
-
-//    Component {
-//        id: saveDialog;
-//        MessageDialog {
-//            title: qsTr("Save dirty documents");
-//            message: qsTr("Save all dirty documents ?");
-//            Component.onCompleted: {
-//                buttonsModel.append({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
-//            }
-
-//            onFinished: {
-//                if (buttonId == "Yes"){
-//                    documentManager.saveDirtyDocuments();
-//                }
-//                else if (buttonId == "No"){
-//                    documentManager.closeAllDocuments();
-//                }
-//            }
-//        }
-//    }
 }

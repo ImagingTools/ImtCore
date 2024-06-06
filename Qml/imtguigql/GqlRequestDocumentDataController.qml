@@ -18,7 +18,7 @@ DocumentDataController {
     }
 
     onError: {
-        Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+        ModalDialogManager.showWarningDialog(message)
     }
 
     onDocumentModelChanged: {

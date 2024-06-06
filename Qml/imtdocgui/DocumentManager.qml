@@ -200,7 +200,8 @@ Item {
         if (!dataControllerIsRegistered(documentTypeId)){
             console.error("Data controller for documents with type-ID: ", documentTypeId, " is unregistered!");
 
-            return defaultDataController.createObject(documentManager);
+//            return defaultDataController.createObject(documentManager);
+            return null;
         }
 
         let dataControllerComp = internal.m_registeredDataControllers[documentTypeId];
@@ -255,13 +256,11 @@ Item {
             singleDocumentData.uuid = UuidGenerator.generateUUID();
 
             let documentDataController = getDocumentDataController(documentTypeId);
-            if (!documentDataController){
-                return false;
+            if (documentDataController){
+                documentDataController.documentId = singleDocumentData.documentId;
+                singleDocumentData.documentDataController = documentDataController;
             }
 
-            documentDataController.documentId = singleDocumentData.documentId;
-
-            singleDocumentData.documentDataController = documentDataController;
             singleDocumentData.documentTypeId = documentTypeId;
 
             let documentValidator = getDocumentValidator(documentTypeId);
@@ -312,6 +311,9 @@ Item {
 
         if (documentData.documentDataController){
             documentData.documentDataController.updateDocumentModel();
+        }
+        else{
+            Events.sendEvent("StopLoading");
         }
 
         return true;
@@ -544,7 +546,7 @@ Item {
             property string documentId;
             property string documentName;
             property string documentTypeId;
-            property DocumentDataController documentDataController: DocumentDataController {};
+            property DocumentDataController documentDataController: null;
             property DocumentValidator documentValidator: DocumentValidator {};
 
             property TreeItemModelObserver treeItemModelObserver: TreeItemModelObserver {
@@ -610,8 +612,10 @@ Item {
                     documentManager.onDocumentSaved(documentId, singleDocumentData.documentIndex);
                 }
 
-                function onDocumentModelChanged(){
+                function onModelChanged(){
                     if (!singleDocumentData.documentDataController || !singleDocumentData.documentDataController.documentModel){
+                        Events.sendEvent("StopLoading");
+
                         return;
                     }
 

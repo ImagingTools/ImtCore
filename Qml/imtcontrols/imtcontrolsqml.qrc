@@ -52,6 +52,7 @@
         <file alias="imtcontrols/Dialogs/PopupItemDelegateDecorator.qml">Dialogs/PopupItemDelegateDecorator.qml</file>
         <file alias="imtcontrols/Dialogs/DialogDecorator.qml">Dialogs/DialogDecorator.qml</file>
 	<file alias="imtcontrols/Dialogs/DialogManagerView.qml">Dialogs/DialogManagerView.qml</file>
+	<file alias="imtcontrols/Dialogs/CriticalErrorDialog.qml">Dialogs/CriticalErrorDialog.qml</file>
         <file alias="imtcontrols/Inputs/CustomTextField.qml">Inputs/CustomTextField.qml</file>
         <file alias="imtcontrols/Inputs/Calendar.qml">Inputs/Calendar.qml</file>
         <file alias="imtcontrols/Inputs/CalendarNew.qml">Inputs/CalendarNew.qml</file>

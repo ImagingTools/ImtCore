@@ -104,7 +104,7 @@ Item {
     }
 
     onRenamed: {
-//        containerBase.documentManagerPtr.setDocumentTitle({"Id": id, "Title": newName});
+        //        containerBase.documentManagerPtr.setDocumentTitle({"Id": id, "Title": newName});
         if (autoUpdateAfterChanges){
             containerBase.collectionStructureBase.updateGui();
         }
@@ -268,7 +268,7 @@ Item {
             message: containerBase.removeMessage;
             title: containerBase.removeDialogTitle;
             onFinished: {
-                if (buttonId == "Yes"){                    
+                if (buttonId == "Yes"){
                     let index = containerBase.treeView.selectedIndex;
                     let id = containerBase.treeView.getData("Id", index);
                     let typeId = containerBase.treeView.getData("TypeId", index);
@@ -404,12 +404,7 @@ Item {
                         type = dataModelLocal.GetData("type");
                     }
 
-                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
-                    //                    if (dataModelLocal.ContainsKey(containerBase.removeGqlCommand)){
-                    //                        dataModelLocal = dataModelLocal.GetData(containerBase.removeGqlCommand);
-                    //                        var message = dataModelLocal.GetData("message");
-                    //                        ModalDialogManager.openDialog(errorDialog, {"message": message});
-                    //                    }
+                    ModalDialogManager.showWarningDialog(message)
 
                     return;
                 }
@@ -508,12 +503,7 @@ Item {
                             type = dataModelLocal.GetData("type");
                         }
 
-                        Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
-
-                        //                        if (dataModelLocal.ContainsKey("message")){
-                        //                            var message = dataModelLocal.GetData("message");
-                        //                            ModalDialogManager.openDialog(errorDialog, {"message": message});
-                        //                        }
+                        ModalDialogManager.showWarningDialog(message)
                     }
 
                     return;
@@ -587,12 +577,7 @@ Item {
                             type = dataModelLocal.GetData("type");
                         }
 
-                        Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
-
-                        //                        if (dataModelLocal.ContainsKey("message")){
-                        //                            var message = dataModelLocal.GetData("message");
-                        //                            ModalDialogManager.openDialog(errorDialog, {"message": message});
-                        //                        }
+                        ModalDialogManager.showWarningDialog(message)
                     }
 
                     return;
@@ -669,7 +654,7 @@ Item {
                             type = dataModelLocal.GetData("type");
                         }
 
-                        Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+                        ModalDialogManager.showWarningDialog(message)
                     }
 
                     return;

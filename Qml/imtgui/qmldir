@@ -5,7 +5,6 @@ AlertMessage 1.0 ./Application/AlertMessage.qml
 ApplicationInfoProvider 1.0 ./Application/ApplicationInfoProvider.qml
 DatabaseBackupController 1.0 ./Application/DatabaseBackupController.qml
 DesignSchemaProvider 1.0 ./Application/DesignSchemaProvider.qml
-ErrorManager 1.0 ./Application/ErrorManager.qml
 LanguageProvider 1.0 ./Application/LanguageProvider.qml
 PagesManager 1.0 ./Application/PagesManager.qml
 PagesProvider 1.0 ./Application/PagesProvider.qml

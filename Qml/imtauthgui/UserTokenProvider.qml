@@ -70,7 +70,7 @@ QtObject {
 
                     container.failed(message);
 
-                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+                    ModalDialogManager.showWarningDialog(message)
 
                     return;
                 }

@@ -6,7 +6,6 @@
         <file alias="imtgui/Application/ApplicationMain.qml">Application/ApplicationMain.qml</file>
         <file alias="imtgui/Application/DatabaseBackupController.qml">Application/DatabaseBackupController.qml</file>
         <file alias="imtgui/Application/DesignSchemaProvider.qml">Application/DesignSchemaProvider.qml</file>
-        <file alias="imtgui/Application/ErrorManager.qml">Application/ErrorManager.qml</file>
         <file alias="imtgui/Application/LanguageProvider.qml">Application/LanguageProvider.qml</file>
         <file alias="imtgui/Application/PagesManager.qml">Application/PagesManager.qml</file>
         <file alias="imtgui/Application/PagesProvider.qml">Application/PagesProvider.qml</file>
@@ -55,20 +54,20 @@
         <file alias="imtgui/View/ViewBase.qml">View/ViewBase.qml</file>
         <file alias="imtgui/View/ViewCommandsDelegateBase.qml">View/ViewCommandsDelegateBase.qml</file>
         <file alias="imtgui/View/LogView.qml">View/LogView.qml</file>
-	<file alias="imtgui/View/TextInputElementView.qml">View/TextInputElementView.qml</file>
-	<file alias="imtgui/View/ElementView.qml">View/ElementView.qml</file>
-	<file alias="imtgui/View/ComboBoxElementView.qml">View/ComboBoxElementView.qml</file>
-	<file alias="imtgui/View/GroupElementView.qml">View/GroupElementView.qml</file>
-	<file alias="imtgui/View/GroupHeaderView.qml">View/GroupHeaderView.qml</file>
-	<file alias="imtgui/View/ClearableComboBoxElementView.qml">View/ClearableComboBoxElementView.qml</file>
-	<file alias="imtgui/View/FilterableComboBoxElementView.qml">View/FilterableComboBoxElementView.qml</file>
-	<file alias="imtgui/View/TableElementView.qml">View/TableElementView.qml</file>
-	<file alias="imtgui/View/TreeViewElementView.qml">View/TreeViewElementView.qml</file>
-	<file alias="imtgui/View/SwitchElementView.qml">View/SwitchElementView.qml</file>
-	<file alias="imtgui/View/TextElementView.qml">View/TextElementView.qml</file>
-	<file alias="imtgui/View/MacAddressElementView.qml">View/MacAddressElementView.qml</file>
-	<file alias="imtgui/View/IntegerInputElementView.qml">View/IntegerInputElementView.qml</file>
-	<file alias="imtgui/View/DoubleInputElementView.qml">View/DoubleInputElementView.qml</file>
+        <file alias="imtgui/View/TextInputElementView.qml">View/TextInputElementView.qml</file>
+        <file alias="imtgui/View/ElementView.qml">View/ElementView.qml</file>
+        <file alias="imtgui/View/ComboBoxElementView.qml">View/ComboBoxElementView.qml</file>
+        <file alias="imtgui/View/GroupElementView.qml">View/GroupElementView.qml</file>
+        <file alias="imtgui/View/GroupHeaderView.qml">View/GroupHeaderView.qml</file>
+        <file alias="imtgui/View/ClearableComboBoxElementView.qml">View/ClearableComboBoxElementView.qml</file>
+        <file alias="imtgui/View/FilterableComboBoxElementView.qml">View/FilterableComboBoxElementView.qml</file>
+        <file alias="imtgui/View/TableElementView.qml">View/TableElementView.qml</file>
+        <file alias="imtgui/View/TreeViewElementView.qml">View/TreeViewElementView.qml</file>
+        <file alias="imtgui/View/SwitchElementView.qml">View/SwitchElementView.qml</file>
+        <file alias="imtgui/View/TextElementView.qml">View/TextElementView.qml</file>
+        <file alias="imtgui/View/MacAddressElementView.qml">View/MacAddressElementView.qml</file>
+        <file alias="imtgui/View/IntegerInputElementView.qml">View/IntegerInputElementView.qml</file>
+        <file alias="imtgui/View/DoubleInputElementView.qml">View/DoubleInputElementView.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
