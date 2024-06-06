@@ -122,7 +122,7 @@ Row {
             delegate: Component {Button {
                 id: buttonDelegate;
 
-                width: 24;
+                width: Math.max(24, helperText.width + 8);
                 height: 20;
 
                 decorator: buttonDecorator;
