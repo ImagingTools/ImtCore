@@ -105,7 +105,7 @@ Rectangle {
 
             onClicked: {
                 let param = {"centered" : true};
-                modalDialogManager.openDialog(confirmationComp, param);
+                ModalDialogManager.openDialog(confirmationComp, param);
                 //gallery.deleteSignal(list.selectedIndex);
             }
         }

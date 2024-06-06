@@ -142,7 +142,7 @@ Rectangle {
 
         if(buttonPanel.openST){
             buttonPanel.openST = false;
-            modalDialogManager.closeDialog();
+            ModalDialogManager.closeDialog();
         }
     }
 
@@ -289,7 +289,7 @@ Rectangle {
     function onBackgroundClicked(){
         console.log("ButtonPanel onBackgroundClicked");
 
-        modalDialogManager.closeDialog();
+        ModalDialogManager.closeDialog();
         buttonPanel.openST = false;
     }
 
@@ -466,14 +466,14 @@ Rectangle {
         if(buttonPanel.canChangeOrder){
             if(buttonPanel.openST && !buttonPanel.verticalModel.GetItemsCount()){
                 buttonPanel.openST = false;
-                modalDialogManager.closeDialog();
+                ModalDialogManager.closeDialog();
             }
 
         }
         else{
             if(buttonPanel.openST && buttonPanel.horizCount == buttonPanel.buttonModel.GetItemsCount()){
                 buttonPanel.openST = false;
-                modalDialogManager.closeDialog();
+                ModalDialogManager.closeDialog();
             }
         }
 
@@ -682,12 +682,12 @@ Rectangle {
             buttonPanel.setVertMenuWidth();
             var point = buttonPanel.getMenuPoint();
 
-            modalDialogManager.openDialog(vertMenuComp, {
+            ModalDialogManager.openDialog(vertMenuComp, {
                                               "x":     point.x,
                                               "y":     point.y,
                                           });
 
-            buttonPanel.vertMenuItem = modalDialogManager.topItem;
+            buttonPanel.vertMenuItem = ModalDialogManager.topItem;
             buttonPanel.openST = true;
         }
     }

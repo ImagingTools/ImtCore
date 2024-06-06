@@ -45,7 +45,7 @@ ViewCommandsDelegateBase {
                 featureIds = features.split(';');
             }
 
-            modalDialogManager.openDialog(featuresDialogComp, {"excludeFeatureIds": featureIds, "featuresModel": container.view.allFeaturesModel});
+            ModalDialogManager.openDialog(featuresDialogComp, {"excludeFeatureIds": featureIds, "featuresModel": container.view.allFeaturesModel});
         }
         else if (commandId === "Remove"){
             let selectedIndex = container.view.tableView.selectedIndex;

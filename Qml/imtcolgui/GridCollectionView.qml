@@ -125,7 +125,7 @@ Item {
             documentManagerPtr.insertNewDocument(commandsId);
         }
         else{
-            modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentSource": editorPath, "contentCommandsId": commandsId});
+            ModalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentSource": editorPath, "contentCommandsId": commandsId});
         }
     }
 

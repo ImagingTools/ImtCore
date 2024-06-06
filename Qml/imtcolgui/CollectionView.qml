@@ -297,7 +297,7 @@ Item {
                 let contextMenuModel = container.commandsDelegate.getContextMenuModel();
 
                 let offset = 26 * contextMenuModel.GetItemsCount();
-                modalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": contextMenuModel});
+                ModalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": contextMenuModel});
             }
         }
 

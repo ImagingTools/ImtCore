@@ -25,7 +25,7 @@ Item {
     }
 
     function showWarningError(message){
-        modalDialogManager.openDialog(warningDialog, {"message": message});
+        ModalDialogManager.openDialog(warningDialog, {"message": message});
     }
 
     function onError(parameters){

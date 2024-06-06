@@ -136,7 +136,7 @@ RemoteCollectionView {
                     propagateComposedEvents: true;
                     onDoubleClicked: {
                         var parameters = {"centered": true, "message": tooltipArea.text};
-                        modalDialogManager.openDialog(messageDialogComp, parameters);
+                        ModalDialogManager.openDialog(messageDialogComp, parameters);
                     }
                 }
 

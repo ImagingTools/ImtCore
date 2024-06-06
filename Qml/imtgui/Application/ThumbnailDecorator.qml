@@ -21,7 +21,7 @@ Rectangle {
     property int pageMargin: Style.pageMargin !== undefined ? Style.pageMargin : 0;
     property int mainRadius: 0;
 
-    property Item dialogManager: modalDialogManager;
+    property Item dialogManager: ModalDialogManager;
 
     property alias menuPanelRadius: menuPanel.radius;
     property alias loadPageByClick: pagesManager.loadByClick;
@@ -59,7 +59,7 @@ Rectangle {
 // soon...
 //        let exists = mainDocumentManager.dirtyDocumentsExists();
 //        if (exists){
-//            modalDialogManager.openDialog(saveDialog, {});
+//            ModalDialogManager.openDialog(saveDialog, {});
 //        }
 //        else{
 //            clearModels();
@@ -165,8 +165,14 @@ Rectangle {
                 thumbnailDecoratorContainer.settingsObserver.registerModel(representationModel);
             }
 
-            modalDialogManager.openDialog(preferenceDialogComp, {"settingsModel": representationModel, "settingsProvider": thumbnailDecoratorContainer.settingsProvider });
+            ModalDialogManager.openDialog(preferenceDialogComp, {"settingsModel": representationModel, "settingsProvider": thumbnailDecoratorContainer.settingsProvider });
         }
+    }
+
+    DialogManagerView {
+        anchors.fill: parent;
+
+        z: 30;
     }
 
     StackView {
@@ -287,7 +293,7 @@ Rectangle {
     // TODO
 //    function closeApp(){
 //        if (mainDocumentManager.dirtyDocumentsExists()){
-//            modalDialogManager.openDialog(saveDialog, {});
+//            ModalDialogManager.openDialog(saveDialog, {});
 //        }
 //    }
 

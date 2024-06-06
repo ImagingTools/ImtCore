@@ -27,7 +27,7 @@ Item{
 
     function open(){
         var parameters = {"centered": true};
-        modalDialogManager.openDialog(dialogComp, parameters);
+        ModalDialogManager.openDialog(dialogComp, parameters);
     }
 
     Component{

@@ -29,7 +29,7 @@ Item {
         if (!y){
             y = 0
         }
-//        modalDialogManager.closeDialog();
+//        ModalDialogManager.closeDialog();
         contextMenuModel.clear();
 
         if (inputActions.canCut){
@@ -52,7 +52,7 @@ Item {
             contextMenuModel.append({"Id": "SelectAll", "Name": qsTr("Select All"), "IconSource": ""});
         }
 
-        modalDialogManager.openDialog(popupMenu, {"x": x, "y": y, "model": contextMenuModel});
+        ModalDialogManager.openDialog(popupMenu, {"x": x, "y": y, "model": contextMenuModel});
     }
 
     Component {

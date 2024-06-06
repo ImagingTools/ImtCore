@@ -26,7 +26,7 @@ FocusScope{
     property color backgroundColor: Style.baseColor;
     property bool isColor: false;
     property int dialogsCountPrev: 1000;
-    property int dialogsCount: modalDialogManager.count;
+    property int dialogsCount: ModalDialogManager.count;
 
     property alias image: cbArrowIcon;
     property alias imageSource: cbArrowIcon.source;
@@ -71,9 +71,9 @@ FocusScope{
 
     function openPopupMenu(){
         checkBoxMenu.isOpen = true;
-        checkBoxMenu.dialogsCountPrev = modalDialogManager.count;
+        checkBoxMenu.dialogsCountPrev = ModalDialogManager.count;
         var point = checkBoxMenu.mapToItem(null, 0, checkBoxMenu.height);
-        modalDialogManager.openDialog(popupMenu, { "x":     point.x,
+        ModalDialogManager.openDialog(popupMenu, { "x":     point.x,
                                           "y":     point.y ,
                                           "width": checkBoxMenu.width,
                                           "dataModel": checkBoxMenu.dataModel,
@@ -85,7 +85,7 @@ FocusScope{
         checkBoxMenu.finished();
         checkBoxMenu.isOpen = false;
         checkBoxMenu.focus = false;
-        modalDialogManager.closeDialog();
+        ModalDialogManager.closeDialog();
     }
 
     function createMenuItem(){

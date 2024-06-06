@@ -113,7 +113,7 @@ ComboBox {
     function openPopupMenu(){
         comboBoxContainer.isOpen = true;
         var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
-        modalDialogManager.openDialog(popupMenuComp, {
+        ModalDialogManager.openDialog(popupMenuComp, {
                                           "x":     point.x,
                                           "y":     point.y - (comboBoxContainer.height - 2),
                                           "model": comboBoxContainer.model,

@@ -142,7 +142,7 @@ TreeViewItemDelegateBase {
                     property bool block: false
 
                     onEditingFinished: {
-                        if (modalDialogManager.count > 0){
+                        if (ModalDialogManager.count > 0){
                             return;
                         }
 

@@ -31,7 +31,7 @@ DocumentCollectionViewDelegate {
     }
 
     function onRemove(){
-        modalDialogManager.openDialog(removeDialog, {});
+        ModalDialogManager.openDialog(removeDialog, {});
     }
 
     Component {

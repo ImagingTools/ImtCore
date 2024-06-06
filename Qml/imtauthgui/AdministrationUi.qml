@@ -13,7 +13,6 @@ SingleDocumentWorkspaceView {
     property string commandId;
 
     property Decorators decorators: decorators_
-    property alias modalDialogManager: modalDialogManager_
 
     signal commandsModelChanged(var commandsModel);
 
@@ -51,12 +50,6 @@ SingleDocumentWorkspaceView {
 
     UserTokenProvider {
         id: userTokenProvider;
-    }
-
-    ModalDialogManager {
-        id: modalDialogManager_;
-        z: 99;
-        anchors.fill: parent;
     }
 
     SubscriptionManager {

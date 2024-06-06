@@ -42,7 +42,7 @@ Item {
     property int textSize: Style.fontSize_common;//
     property int textDelegateSize: Style.fontSize_common;
     property int dialogsCountPrev: 1000;
-    property int dialogsCount: modalDialogManager.count;
+    property int dialogsCount: ModalDialogManager.count;
 
     property string commandId: "";
     property string filterName: "Name";
@@ -219,11 +219,11 @@ Item {
     }
 
     function openPopupMenu(){
-        comboBoxContainerGql.dialogsCountPrev = modalDialogManager.count;
+        comboBoxContainerGql.dialogsCountPrev = ModalDialogManager.count;
         //var point = comboBoxContainerGql.mapToItem(thumbnailDecoratorContainer, 0, 0);
         var point = comboBoxContainerGql.mapToItem(null, 0, 0);
         var filterText_ = comboBoxContainerGql.keepFilterText ? comboBoxContainerGql.currentText : "";
-        modalDialogManager.openDialog(popupMenu, { "x":     point.x,
+        ModalDialogManager.openDialog(popupMenu, { "x":     point.x,
                                                    "y":     point.y,
                                                    "filterText": filterText_,
                                                    "model": comboBoxContainerGql.model,
@@ -233,7 +233,7 @@ Item {
 
     function closeFunc(){
         if(comboBoxContainerGql.closeEmpty){
-            modalDialogManager.closeDialog();
+            ModalDialogManager.closeDialog();
             closeEmptySignal();
         }
     }

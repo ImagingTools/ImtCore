@@ -55,7 +55,7 @@ QtObject {
             let documentId = documentPtr.documentId;
             let documentTypeId = documentPtr.documentTypeId;
 
-            modalDialogManager.openDialog(documentHistoryDialogComp, {"documentId": documentId, "documentTypeId": documentTypeId});
+            ModalDialogManager.openDialog(documentHistoryDialogComp, {"documentId": documentId, "documentTypeId": documentTypeId});
         }
     }
 }

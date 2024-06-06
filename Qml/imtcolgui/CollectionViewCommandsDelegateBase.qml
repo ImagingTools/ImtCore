@@ -137,7 +137,7 @@ ViewCommandsDelegateBase {
     }
 
     function onRemove(){
-        modalDialogManager.openDialog(removeDialog, {});
+        ModalDialogManager.openDialog(removeDialog, {});
     }
 
     function onNew(){}
@@ -146,7 +146,7 @@ ViewCommandsDelegateBase {
         let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
         if (indexes.length > 0){
             let selectedName = collectionViewCommandsDelegate.collectionView.table.elements.GetData("Name", indexes[0]);
-            modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
+            ModalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
     }
 
@@ -161,7 +161,7 @@ ViewCommandsDelegateBase {
                 selectedDescription = elements.GetData(collectionViewCommandsDelegate.descriptionFieldId, indexes[0]);
             }
 
-            modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
+            ModalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
         }
     }
 

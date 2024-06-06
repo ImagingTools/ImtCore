@@ -59,10 +59,10 @@ ControlBase {
     }
 
     function open(xX, yY){
-        customTooltip.dialogIndex = modalDialogManager.count;
+        customTooltip.dialogIndex = ModalDialogManager.count;
 
-        modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": xX, "y": yY});
-        modalDialogManager.backgroundItem.visible = false;
+        ModalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": xX, "y": yY});
+        ModalDialogManager.backgroundItem.visible = false;
         customTooltip.openST = true;
     }
 
@@ -71,7 +71,7 @@ ControlBase {
             var point = mapToItem(null, xX, yY);
             var centeredAdd = customTooltip.fitToTextWidth ? customTooltip.fitToHCenter * (forWidthText.width/2 + customTooltip.textMargin + customTooltip.componentMargin) :
                                                              customTooltip.fitToHCenter * (customTooltip.tooltipWidth/2 + customTooltip.componentMargin);
-            if(point.x > modalDialogManager.width*2/3){
+            if(point.x > ModalDialogManager.width*2/3){
                 if(customTooltip.fitToTextWidth){
                     point.x = point.x - forWidthText.width - 2*customTooltip.textMargin - customTooltip.componentMargin + centeredAdd;
                 }
@@ -83,7 +83,7 @@ ControlBase {
                 point.x = point.x + customTooltip.componentMargin - centeredAdd;
             }
 
-            if(point.y > modalDialogManager.height*2/3){
+            if(point.y > ModalDialogManager.height*2/3){
                 point.y = point.y - customTooltip.componentHeight - customTooltip.componentMargin;
             }
             else{
@@ -96,8 +96,8 @@ ControlBase {
 
     function closeTooltip(){
         if(customTooltip.openST){
-//            modalDialogManager.closeDialog(customTooltip.dialogIndex);
-            modalDialogManager.closeByComp(customTooltip.tooltipContentComp);
+//            ModalDialogManager.closeDialog(customTooltip.dialogIndex);
+            ModalDialogManager.closeByComp(customTooltip.tooltipContentComp);
 
             customTooltip.openST = false;
         }
@@ -259,7 +259,7 @@ ControlBase {
             customTooltip.decorator_.hide();
         }
         else {
-            let item = modalDialogManager.topItem;
+            let item = ModalDialogManager.topItem;
             if(item && item.closeAnimFunc !== undefined){
                 item.closeAnimFunc()
                 closeAnim.start();

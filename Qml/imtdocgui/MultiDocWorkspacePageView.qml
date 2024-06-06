@@ -62,7 +62,7 @@ Rectangle {
             for(let i = 0; i < model.GetItemsCount(); i++){
                 let curr_id = model.GetData("Id",i);
                 let curr_name = model.GetData("Name",i);
-                if(curr_id == id){
+                if(curr_id == id && curr_name && documentManager_.documentsModel){
                     documentManager_.documentsModel.setProperty(0, "Title", curr_name);
                     break;
                 }

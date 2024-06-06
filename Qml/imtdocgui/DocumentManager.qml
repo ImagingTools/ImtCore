@@ -31,7 +31,7 @@ Item {
 
 
     function openErrorDialog(message){
-        modalDialogManager.openDialog(errorDialogComp, {"message": message});
+        ModalDialogManager.openDialog(errorDialogComp, {"message": message});
     }
 
 
@@ -485,10 +485,10 @@ Item {
                     documentManager.closeDocumentByIndex(documentIndex);
                 }
 
-                modalDialogManager.finished.disconnect(callback);
+                ModalDialogManager.finished.disconnect(callback);
             }
 
-            modalDialogManager.openDialog(saveDialog, {}, "", callback);
+            ModalDialogManager.openDialog(saveDialog, {}, "", callback);
         }
         else{
             let index = internal.m_closingDocuments.indexOf(documentData.documentId);
@@ -758,7 +758,7 @@ Item {
                     documentManager.saveDocument(documentId);
                 }
                 else if (commandId === "History"){
-                    modalDialogManager.openDialog(documentHistoryDialogComp,
+                    ModalDialogManager.openDialog(documentHistoryDialogComp,
                                                   {
                                                       "documentId": documentId,
                                                       "documentTypeId": documentTypeId

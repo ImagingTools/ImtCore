@@ -14,7 +14,7 @@ Item {
 
     signal userUpdated();
 
-    property var dialogManager: modalDialogManager;
+    property var dialogManager: ModalDialogManager;
 
     function logout(){
         Events.sendEvent("Logout");

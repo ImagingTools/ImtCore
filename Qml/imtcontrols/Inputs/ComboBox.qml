@@ -169,7 +169,7 @@ ControlBase {
 
     function openPopupMenu(){
         var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
-        modalDialogManager.openDialog(popupMenuComp, {
+        ModalDialogManager.openDialog(popupMenuComp, {
                                           "x":     point.x,
                                           "y":     point.y,
                                           "model": comboBoxContainer.model,

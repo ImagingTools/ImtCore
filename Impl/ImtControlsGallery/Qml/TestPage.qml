@@ -297,7 +297,7 @@ Rectangle {
 //                counter++;
 //                //var parameters = {"title": "message " + String(counter), "modality": Qt.WindowModal};
 //                var parameters = {"title": "message " + String(counter)};
-//                modalDialogManager.openWindow(content, parameters);
+//                ModalDialogManager.openWindow(content, parameters);
 
 //            }
 //        }

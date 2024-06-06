@@ -32,7 +32,7 @@ Rectangle {
                 text: "Message";
                 onClicked: {
                     var parameters = {"centered": true};
-                    modalDialogManager.openDialog(messageDialogComp, parameters);
+                    ModalDialogManager.openDialog(messageDialogComp, parameters);
                 }
             }
 
@@ -44,7 +44,7 @@ Rectangle {
                 text: "Confirmation";
                 onClicked: {
                     var parameters = {"centered": true};
-                    modalDialogManager.openDialog(confirmationDialogComp, parameters);
+                    ModalDialogManager.openDialog(confirmationDialogComp, parameters);
                 }
             }
 
@@ -56,7 +56,7 @@ Rectangle {
                 text: "Content";
                 onClicked: {
                     var parameters = {"centered": true};
-                    modalDialogManager.openDialog(contentDialogComp, parameters);
+                    ModalDialogManager.openDialog(contentDialogComp, parameters);
                 }
             }
 
@@ -68,7 +68,7 @@ Rectangle {
                 text: "Input";
                 onClicked: {
                     var parameters = {"centered": true};
-                    modalDialogManager.openDialog(inputDialogComp, parameters);
+                    ModalDialogManager.openDialog(inputDialogComp, parameters);
                 }
             }
         }//row1
@@ -101,7 +101,7 @@ Rectangle {
                 onClicked: {
                     //var parameters = {"title": "Confirmation(window)", "modality": Qt.WindowModal};
                     var parameters = {"title": "Confirmation(window)"};
-                    modalDialogManager.openDialog(confirmationDialogComp, parameters, "External");
+                    ModalDialogManager.openDialog(confirmationDialogComp, parameters, "External");
                 }
             }
         }

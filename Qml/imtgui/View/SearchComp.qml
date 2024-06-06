@@ -116,7 +116,7 @@ Rectangle{
         searchContainer.accepted("");
 
         if(searchTextField.openST){
-            var popup = modalDialogManager.topItem;
+            var popup = ModalDialogManager.topItem;
 
             popup.modelFilterAlias.Clear();
             popup.modelFilterAlias.AddTreeModel("FilterIds");
@@ -174,7 +174,7 @@ Rectangle{
             searchContainer.accepted(retV);
 
             if(searchTextField.openST){
-                var popup = modalDialogManager.topItem;
+                var popup = ModalDialogManager.topItem;
 
                 popup.modelFilterAlias.Clear();
                 popup.modelFilterAlias.AddTreeModel("FilterIds");
@@ -221,7 +221,7 @@ Rectangle{
         if(searchContainer.isAddressSearch){
 
             if(searchTextField.openST){
-                var popup = modalDialogManager.topItem;
+                var popup = ModalDialogManager.topItem;
 
                 if(!searchContainer.isTextIncrease){//NOT isTextIncrease
                     var arrCount_prev = searchContainer.arraySize(searchContainer.selectedText);
@@ -492,7 +492,7 @@ Rectangle{
         duration: 400;
         onFinished: {
             if(searchTextField.openST && !searchTextField.canClose){
-                var popup = modalDialogManager.topItem;
+                var popup = ModalDialogManager.topItem;
                 popup.updateModel();
             }
         }

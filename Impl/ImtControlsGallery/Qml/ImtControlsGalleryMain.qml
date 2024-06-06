@@ -7,14 +7,6 @@ import imtguivars 1.0
 ApplicationMain{
     id: window;
 
-    ModalDialogManager {
-        id: modalDialogManager;
-
-        z: 30;
-
-        anchors.fill: parent;
-    }
-
     Component {
         id: topPanelDecoratorCustom
         TopPanelDecoratorCustom {
@@ -30,17 +22,11 @@ ApplicationMain{
         id: decoratorsQt
     }
 
-    Component.onCompleted: {
-        console.log("MainOnCompleted", topPanelDecoratorCustom)
-//        console.log("IconMode.selected", IconMode.selected)
-    }
-
     onServerReadyChanged: {
         firstModelsInit();
     }
 
     function updateAllModels(){
-        console.log("settingsProviderLocal.updateModel", Style.textColor);
         decorators.topPanelDecorator = topPanelDecoratorCustom
         Style.setDecorators(decorators)
         Events.subscribeEvent("OnStyleDecoratorChanged", window.onStyleDecoratorChanged);
@@ -51,7 +37,6 @@ ApplicationMain{
     }
 
     function onStyleDecoratorChanged(decoratorId){
-        console.log("onStyleDecoratorChanged", decoratorId);
         if (decoratorId == "StyleQt"){
             Style.setDecorators(decoratorsQt)
         }

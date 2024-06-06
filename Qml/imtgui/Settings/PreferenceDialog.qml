@@ -28,7 +28,9 @@ Dialog {
     }
 
     onSettingsModelChanged: {
-        messageDialog.contentItem.settingsModel = messageDialog.settingsModel;
+        if (messageDialog.contentItem){
+            messageDialog.contentItem.settingsModel = messageDialog.settingsModel;
+        }
     }
 
     onLocalizationChanged: {

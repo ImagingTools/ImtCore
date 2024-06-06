@@ -94,7 +94,7 @@ Item {
             else{
                 var point = mapToItem(null, x - width, y + height);
                 point.x = point.x - 200;
-                modalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": contextMenuModel});
+                ModalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": contextMenuModel});
             }
         }
     }

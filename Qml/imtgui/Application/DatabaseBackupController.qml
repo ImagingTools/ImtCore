@@ -50,15 +50,15 @@ Item {
         prefix: "/files";
 
         onFileUploaded: {
-            modalDialogManager.openDialog(messageErrorDialog, {"title" : qsTr("Restore successful"),"message": qsTr("Database restore was successful")});
+            ModalDialogManager.openDialog(messageErrorDialog, {"title" : qsTr("Restore successful"),"message": qsTr("Database restore was successful")});
         }
 
         onFileUploadFailed: {
-            modalDialogManager.openDialog(messageErrorDialog, {"message": qsTr("Error when trying to restore the database")});
+            ModalDialogManager.openDialog(messageErrorDialog, {"message": qsTr("Error when trying to restore the database")});
         }
 
         onFileDownloadFailed: {
-            modalDialogManager.openDialog(messageErrorDialog, {"message": qsTr("Error when trying to create a database backup")});
+            ModalDialogManager.openDialog(messageErrorDialog, {"message": qsTr("Error when trying to create a database backup")});
         }
 
         onStateChanged: {

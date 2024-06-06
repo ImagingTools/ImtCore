@@ -129,13 +129,13 @@ Item {
 
     function openPopupMenu(x, y){
         console.log("openPopupMenu")
-        modalDialogManager.closeDialog();
+        ModalDialogManager.closeDialog();
 
         if (containerBase.contextMenuModel != null){
             console.log("openPopupMenu", x, y)
 
             let offset = 26 * contextMenuModel.count;
-            modalDialogManager.openDialog(popupMenu, {"x": x, "y": y - offset, "model": contextMenuModel});
+            ModalDialogManager.openDialog(popupMenu, {"x": x, "y": y - offset, "model": contextMenuModel});
         }
     }
 
@@ -160,7 +160,7 @@ Item {
             return;
         }
 
-        modalDialogManager.openDialog(removeDialog, {});
+        ModalDialogManager.openDialog(removeDialog, {});
     }
 
     function onNewDocument(){
@@ -178,7 +178,7 @@ Item {
             index = containerBase.treeView.findParentIndex(containerBase.treeView.selectedIndex)
         }
         // let selectedName = containerBase.treeView.GetData("Name", index);
-        modalDialogManager.openDialog(newNodeDialog, {"message": qsTr("Please enter the name of the new node"), "inputValue": ""});
+        ModalDialogManager.openDialog(newNodeDialog, {"message": qsTr("Please enter the name of the new node"), "inputValue": ""});
     }
 
     function onRename(){
@@ -189,7 +189,7 @@ Item {
 
         let index = containerBase.treeView.selectedIndex
         if (index >= 0){            let selectedName = containerBase.tableData.elements.GetData("Name", index);
-            modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
+            ModalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
     }
 
@@ -209,7 +209,7 @@ Item {
                 selectedDescription = elements.GetData(containerBase.descriptionFieldId, indexes[0]);
             }
 
-            modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
+            ModalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
         }
     }
 
@@ -408,7 +408,7 @@ Item {
                     //                    if (dataModelLocal.ContainsKey(containerBase.removeGqlCommand)){
                     //                        dataModelLocal = dataModelLocal.GetData(containerBase.removeGqlCommand);
                     //                        var message = dataModelLocal.GetData("message");
-                    //                        modalDialogManager.openDialog(errorDialog, {"message": message});
+                    //                        ModalDialogManager.openDialog(errorDialog, {"message": message});
                     //                    }
 
                     return;
@@ -512,7 +512,7 @@ Item {
 
                         //                        if (dataModelLocal.ContainsKey("message")){
                         //                            var message = dataModelLocal.GetData("message");
-                        //                            modalDialogManager.openDialog(errorDialog, {"message": message});
+                        //                            ModalDialogManager.openDialog(errorDialog, {"message": message});
                         //                        }
                     }
 
@@ -591,7 +591,7 @@ Item {
 
                         //                        if (dataModelLocal.ContainsKey("message")){
                         //                            var message = dataModelLocal.GetData("message");
-                        //                            modalDialogManager.openDialog(errorDialog, {"message": message});
+                        //                            ModalDialogManager.openDialog(errorDialog, {"message": message});
                         //                        }
                     }
 
@@ -656,7 +656,7 @@ Item {
 
                         //                        if (dataModelLocal.ContainsKey("message")){
                         //                            var message = dataModelLocal.GetData("message");
-                        //                            modalDialogManager.openDialog(errorDialog, {"message": message});
+                        //                            ModalDialogManager.openDialog(errorDialog, {"message": message});
                         //                        }
 
                         let message = ""
