@@ -38,10 +38,16 @@ class DoubleValidator extends QtObject {
     validate(str) {
         if(!str) return false
 
-        let value = Number(str.replaceAll(',','.'))
+        let locale = this.getPropertyValue('locale').replaceAll('_', '-')
+        let delimiter = this.getPropertyValue('context').getPropertyValue('delimiter')
+
+        let regexp = new RegExp(`^-*[0-9]*[${delimiter}]*[0-9]*$`)
+        if(!regexp.test(str)) return false
+
+        let value = Number(str.replaceAll(delimiter,'.'))
         if(isNaN(value)) return false
 
-        let decimals = str.indexOf(',') >= 0 ? str.split(',')[1] : []
+        let decimals = str.indexOf(delimiter) >= 0 ? str.split(delimiter)[1] : []
 
         return (this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value) && decimals.length <= this.getPropertyValue('decimals')
     }
@@ -49,14 +55,19 @@ class DoubleValidator extends QtObject {
     hasPartialMatch(str){
         if(!str) return true
 
+        let locale = this.getPropertyValue('locale').replaceAll('_', '-')
+        let delimiter = this.getPropertyValue('context').getPropertyValue('delimiter')
+
         if(this.getPropertyValue('bottom') < 0 || this.getPropertyValue('top') < 0){
             if(str === '-') return true
         }
 
-        if(str.indexOf('.') >= 0) return false
-        let value = Number(str.replaceAll(',','.'))
+        let regexp = new RegExp(`^-*[0-9]*[${delimiter}]*[0-9]*$`)
+        if(!regexp.test(str)) return false
+
+        let value = Number(str.replaceAll(delimiter,'.'))
         if(isNaN(value)) return false
-        let decimals = str.indexOf(',') >= 0 ? str.split(',')[1] : []
+        let decimals = str.indexOf(delimiter) >= 0 ? str.split(delimiter)[1] : []
         return decimals.length <= this.getPropertyValue('decimals')
     }
 }
