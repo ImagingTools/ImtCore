@@ -1,6 +1,7 @@
 module imtgui
 
 ApplicationMain 1.0 ./Application/ApplicationMain.qml
+Configurator 1.0 ./Application/Configurator.qml
 AlertMessage 1.0 ./Application/AlertMessage.qml
 ApplicationInfoProvider 1.0 ./Application/ApplicationInfoProvider.qml
 DatabaseBackupController 1.0 ./Application/DatabaseBackupController.qml

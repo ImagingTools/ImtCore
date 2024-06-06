@@ -4,6 +4,7 @@
         <file alias="imtgui/Application/AlertMessage.qml">Application/AlertMessage.qml</file>
         <file alias="imtgui/Application/ApplicationInfoProvider.qml">Application/ApplicationInfoProvider.qml</file>
         <file alias="imtgui/Application/ApplicationMain.qml">Application/ApplicationMain.qml</file>
+	<file alias="imtgui/Application/Configurator.qml">Application/Configurator.qml</file>
         <file alias="imtgui/Application/DatabaseBackupController.qml">Application/DatabaseBackupController.qml</file>
         <file alias="imtgui/Application/DesignSchemaProvider.qml">Application/DesignSchemaProvider.qml</file>
         <file alias="imtgui/Application/LanguageProvider.qml">Application/LanguageProvider.qml</file>
