@@ -98,4 +98,16 @@ QtObject {
             callback(userTokenProvider.login);
         }
     }
+
+    function getUserMode(){
+        return userManagementProvider.userMode;
+    }
+
+    function isStrongUserManagement(){
+        return userManagementProvider.userMode === "STRONG_USER_MANAGEMENT";
+    }
+
+    function isSimpleUserManagement(){
+        return userManagementProvider.userMode === "NO_USER_MANAGEMENT" || userManagementProvider.userMode === "OPTIONAL_USER_MANAGEMENT";
+    }
 }

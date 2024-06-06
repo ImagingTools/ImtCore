@@ -320,7 +320,7 @@ Item {
     }
 
     function firstModelsInit(){
-        if (!authorizationServerConnected){
+        if (AuthorizationController.isStrongUserManagement() && !authorizationServerConnected){
             checkStatus(5);
 
             return;
@@ -350,11 +350,11 @@ Item {
         target: AuthorizationController;
 
         function onUserModeChanged(userMode){
-            if (userMode === "NO_USER_MANAGEMENT" || userMode === "OPTIONAL_USER_MANAGEMENT"){
-                application.onSimpleUserManagement();
-            }
-            else if (userMode === "STRONG_USER_MANAGEMENT"){
+            if (AuthorizationController.isStrongUserManagement()){
                 application.onStrongUserManagement();
+            }
+            else if (AuthorizationController.isSimpleUserManagement()){
+                application.onSimpleUserManagement();
             }
         }
 
