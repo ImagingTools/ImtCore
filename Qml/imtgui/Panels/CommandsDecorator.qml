@@ -183,7 +183,6 @@ Item {
 
         buttonDelegateVert: Component{
             Item{
-
                 id: verticalComp;
 
                 width: model.Name == "" ? splitter.width : textButtonDelegateContainer.width;

@@ -6,11 +6,7 @@ QtObject {
     property var owner
 
     Component.onCompleted: {
-        let self = this
-        let list = getProperties()
-        for(let name of list){
-            this[name+'Changed'].connect(function(){if(self.enableNotifications) self.dataChanged(name, self)})
-        }
+        connectProperties();
     }
 
     onDataChanged: {
@@ -19,11 +15,32 @@ QtObject {
         }
     }
 
+    function connectProperties(){
+        let self = this
+        let list = getProperties()
+        console.log("list", list);
+
+        for(let name of list){
+            this[name+'Changed'].connect(function(){
+                if(self.enableNotifications)
+                    self.dataChanged(name, self)
+            }
+           )
+        }
+    }
+
     function createMe(){
         return Qt.createComponent('BaseClass.qml').createObject()
     }
 
-    function copyMe(){
+    function Refresh(){
+    }
+
+    function Copy(item){
+        return copyFrom(item)
+    }
+
+    function CopyMe(){
         let obj = createMe()
         obj.fromJSON(toJSON())
         return obj
@@ -62,8 +79,6 @@ QtObject {
                 }
             }
         }
-
-
 
         return list
     }
