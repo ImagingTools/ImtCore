@@ -98,6 +98,7 @@
         <file alias="imtcontrols/Views/TableCellDelegate.qml">Views/TableCellDelegate.qml</file>
         <file alias="imtcontrols/Views/TableCellDelegateBase.qml">Views/TableCellDelegateBase.qml</file>
         <file alias="imtcontrols/Views/TableCellTextDelegate.qml">Views/TableCellTextDelegate.qml</file>
+        <file alias="imtcontrols/Views/TableCellTextWithTooltipDelegate.qml">Views/TableCellTextWithTooltipDelegate.qml</file>
         <file alias="imtcontrols/Views/TableCellIconTextDelegate.qml">Views/TableCellIconTextDelegate.qml</file>
         <file alias="imtcontrols/Views/TableCellText.qml">Views/TableCellText.qml</file>
         <file alias="imtcontrols/Views/TableDelegate.qml">Views/TableDelegate.qml</file>

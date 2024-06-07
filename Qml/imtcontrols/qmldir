@@ -96,12 +96,14 @@ TableBase 1.0 ./Views/TableBase.qml
 TableCellDelegate 1.0 ./Views/TableCellDelegate.qml
 TableCellDelegateBase 1.0 ./Views/TableCellDelegateBase.qml
 TableCellTextDelegate 1.0 ./Views/TableCellTextDelegate.qml
+TableCellTextWithTooltipDelegate 1.0 ./Views/TableCellTextWithTooltipDelegate.qml
 TableCellIconTextDelegate 1.0 ./Views/TableCellIconTextDelegate.qml
 TableDelegate 1.0 ./Views/TableDelegate.qml
 TableRowDelegateBase 1.0 ./Views/TableRowDelegateBase.qml
 TableRowDelegate 1.0 ./Views/TableRowDelegate.qml
 SimpleTableDelegate 1.0 ./Views/SimpleTableDelegate.qml
 TableRowViewer 1.0 ./Views/TableRowViewer.qml
+TableCellText 1.0 ./Views/TableCellText.qml
 
 TableTreeView 1.0 ./Views/TableTreeView.qml
 TableDecorator 1.0 ./Views/TableDecorator.qml
