@@ -176,6 +176,14 @@ add_custom_command(
 		"[resource wrap::${WRAP_TARGET}] CREATING RES ${QRC_CPP_CURRENT_FILE}"
 )
 
+set(QML_IMPORT_DIRS ${QML_IMPORT_PATH})
+list(APPEND QML_IMPORT_DIRS "${CURRENT_FILE_PATH}/../")
+list(REMOVE_DUPLICATES QML_IMPORT_DIRS)
+set(QML_IMPORT_PATH ${QML_IMPORT_DIRS}
+	CACHE STRING "Qt Creator extra qml import paths for ${PROJECT_NAME}"
+	FORCE
+)
+
 endfunction()
 
 

@@ -613,6 +613,7 @@ Item {
                 }
 
                 function onModelChanged(){
+                    console.log("*DEBUG* onModelChanged")
                     if (!singleDocumentData.documentDataController || !singleDocumentData.documentDataController.documentModel){
                         Events.sendEvent("StopLoading");
 
@@ -623,12 +624,18 @@ Item {
 
                     singleDocumentData.treeItemModelObserver.registerModel(documentModel);
 
-                    if (documentModel.ContainsKey("Id")){
-                        singleDocumentData.documentId = documentModel.GetData("Id");
+                    if (documentModel.m_Id){
+                        singleDocumentData.documentId = documentModel.m_Id
+                        singleDocumentData.documentName = documentModel.m_Name
                     }
+                    else{
+                        if (documentModel.ContainsKey("Id")){
+                            singleDocumentData.documentId = documentModel.GetData("Id");
+                        }
 
-                    if (documentModel.ContainsKey("Name")){
-                        singleDocumentData.documentName = documentModel.GetData("Name");
+                        if (documentModel.ContainsKey("Name")){
+                            singleDocumentData.documentName = documentModel.GetData("Name");
+                        }
                     }
 
                     singleDocumentData.blockingUpdateModel = true;

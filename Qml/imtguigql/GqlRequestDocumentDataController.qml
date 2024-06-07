@@ -11,6 +11,8 @@ DocumentDataController {
     property string gqlAddCommandId;
     property string gqlUpdateCommandId;
 
+    property var payloadModel
+
     property string subscriptionCommandId;
 
     Component.onDestruction: {
@@ -23,6 +25,7 @@ DocumentDataController {
 
     onDocumentModelChanged: {
         hasRemoteChanges = false;
+        modelChanged();
     }
 
     onSaved: {
@@ -189,8 +192,10 @@ DocumentDataController {
 
                 if ("data" in responseObj){
                     let dataObject = responseObj["data"];
+                    let itemObject = dataObject[container.gqlGetCommandId];
+                    console.log("*DEBUG* itemObject", itemObject)
 
-                    container.documentModel.fromObject(dataObject);
+                    container.payloadModel.fromObject(itemObject);
                 }
             }
         }
