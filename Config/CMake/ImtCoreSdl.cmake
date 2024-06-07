@@ -156,7 +156,7 @@ function (ImtCoreFutureResourceWrap
 	WRAP_TARGET
 	WRAP_RESOURCE_FILE)
 
-get_filename_component(CURRENT_FILE_NAME "${WRAP_RESOURCE_FILE}" NAME)
+get_filename_component(CURRENT_FILE_NAME "${WRAP_RESOURCE_FILE}" NAME_WE)
 get_filename_component(CURRENT_FILE_PATH "${WRAP_RESOURCE_FILE}" DIRECTORY)
 set(CURRENT_FILE_DEST_PATH "${CURRENT_FILE_PATH}/_qrcWrap")
 
