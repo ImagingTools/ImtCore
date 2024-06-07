@@ -251,9 +251,6 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="HeadersModelId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Users"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="HeadersNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
