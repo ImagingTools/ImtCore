@@ -121,8 +121,6 @@ RemoteCollectionView {
         TableCellDelegateBase {
             id: cellDelegate
 
-            property Item tableCellDelegate: null;
-
             onRowIndexChanged: {
                 if (!rowDelegate){
                     return
@@ -146,31 +144,39 @@ RemoteCollectionView {
                 }
             }
 
-            Text {
-                id: name2;
+            Item {
+                anchors.fill: parent;
 
-                anchors.verticalCenter: parent.verticalCenter;
+                clip: true;
 
-                font.pixelSize: Style.fontSize_common;
-                font.family: Style.fontFamily;
-                color: Style.textColor;
+                Text {
+                    id: name2;
 
-                elide: Text.ElideRight;
-            }
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.left: parent.left
+                    anchors.leftMargin: Style.size_mainMargin;
 
-            ToolButton {
-                id: arrowButton;
+                    font.pixelSize: Style.fontSize_common;
+                    font.family: Style.fontFamily;
+                    color: Style.textColor;
 
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.left: name2.right;
-                anchors.leftMargin: 5;
+                    elide: Text.ElideRight;
+                }
 
-                width: 15;
-                height: width;
+                ToolButton {
+                    id: arrowButton;
 
-                visible: name2.text !== "";
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.left: name2.right;
+                    anchors.leftMargin: Style.size_smallMargin;
 
-                iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
+                    width: 15;
+                    height: width;
+
+                    visible: name2.text !== "";
+
+                    iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
+                }
             }
         }
     }
