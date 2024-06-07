@@ -1,17 +1,23 @@
 import QtQuick 2.0
 
 QtObject {
-    signal propertyChanged(string name, var sender)
+    signal dataChanged(string name, var sender)
     property bool enableNotifications: true
+    property var owner
 
-    // Component.onCompleted: {
-    //     let list = getProperties()
-    //     for(let name of list){
-    //         this[name+'Changed'].connect(()=>{
-    //                                         console.log('**TEST**', name+'Changed')
-    //                                      })
-    //     }
-    // }
+    Component.onCompleted: {
+        let self = this
+        let list = getProperties()
+        for(let name of list){
+            this[name+'Changed'].connect(function(){if(self.enableNotifications) self.dataChanged(name, self)})
+        }
+    }
+
+    onDataChanged: {
+        if(owner && owner.enableNotifications && owner.dataChanged){
+            owner.dataChanged(name, sender)
+        }
+    }
 
     function createMe(){
         return Qt.createComponent('BaseClass.qml').createObject()
@@ -45,13 +51,13 @@ QtObject {
         let list = []
         if(Qt.platform.os === 'web'){
             for(let key in this.$properties){
-                if(key.indexOf('m_') >= 0 && key !== 'objectName' && key !== 'enableNotifications' && typeof this[key] !== "function"){
+                if(key.indexOf('m_') >= 0 && key !== 'owner' && key !== 'objectName' && key !== 'enableNotifications' && typeof this[key] !== "function"){
                     list.push(key)
                 }
             }
         } else {
             for(let key in this){
-                if(key !== 'objectName' && key !== 'enableNotifications' && typeof this[key] !== "function"){
+                if(key !== 'objectName' && key !== 'owner' && key !== 'enableNotifications' && typeof this[key] !== "function"){
                     list.push(key)
                 }
             }
@@ -95,14 +101,16 @@ QtObject {
                         this[_key] = obj
                     }
                     for(let sourceObjectInner of sourceObject[key]){
-                        let obj = createComponent(_key).createObject()
+                        let obj = createComponent(_key).createObject(this)
                         obj.fromObject(sourceObjectInner)
                         this[_key].append({item: obj})
+                        obj.owner = this
                     }
                 } else {
                     let obj = createComponent(_key).createObject(this)
                     obj.fromObject(sourceObject[key])
                     this[_key] = obj
+                    obj.owner = this
                 }
             } else {
                 this[_key] = sourceObject[key]
