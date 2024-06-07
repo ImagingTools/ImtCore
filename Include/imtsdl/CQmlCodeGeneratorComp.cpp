@@ -243,11 +243,6 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 		// use 'm_' prefix to avoid ambiguity
 		ifStream << QStringLiteral(" m_") << sdlField.GetId();
 	}
-	FeedStream(ifStream, 2, false);
-
-	FeedStreamHorizontally(ifStream, 1);
-	// and static props container alias; use '_' prefix to avoid ambiguity (private properies by the JS convention)
-	ifStream << QStringLiteral("property alias s_keys: _keys");
 	FeedStream(ifStream, 1, false);
 
 	// base class reimplementation methods
@@ -315,12 +310,8 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	// static props as internal QtObject
 	FeedStream(ifStream, 2, false);
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("QtObject {");
-	FeedStream(ifStream, 1, false);
-	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("property QtObject _keys: QtObject{");
 	// and static props container alias; use '_' prefix to avoid ambiguity (private properies by the JS convention)
-	ifStream << QStringLiteral("id: _keys");
-	FeedStream(ifStream, 1, false);
 	for (const CSdlField& sdlField: sdlType.GetFields()){
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 2);
