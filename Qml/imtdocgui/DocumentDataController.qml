@@ -15,6 +15,10 @@ QtObject {
     signal error(string message, string type);
     signal modelChanged();
 
+    function getDocumentId(){
+        return documentId;
+    }
+
     function getDocumentName(){
         return documentName;
     }

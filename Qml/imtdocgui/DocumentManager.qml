@@ -200,8 +200,7 @@ Item {
         if (!dataControllerIsRegistered(documentTypeId)){
             console.error("Data controller for documents with type-ID: ", documentTypeId, " is unregistered!");
 
-//            return defaultDataController.createObject(documentManager);
-            return null;
+            return defaultDataController.createObject(documentManager);
         }
 
         let dataControllerComp = internal.m_registeredDataControllers[documentTypeId];
@@ -308,6 +307,8 @@ Item {
                               });
 
         documentAdded(documentsModel.count - 1, documentId);
+
+        console.log("documentData.documentDataController", documentData.documentDataController);
 
         if (documentData.documentDataController){
             documentData.documentDataController.updateDocumentModel();
@@ -549,21 +550,26 @@ Item {
             property DocumentDataController documentDataController: null;
             property DocumentValidator documentValidator: DocumentValidator {};
 
-            property TreeItemModelObserver treeItemModelObserver: TreeItemModelObserver {
-                onModelChanged: {
-                    let wasChanges = changeList.length > 0;
+            property QtObject changesChecker: QtObject {
+                property var defaultModel;
 
-                    if (!singleDocumentData.isDirty){
-                        singleDocumentData.isDirty = wasChanges;
+                function registerModel(model){
+                    if (!model){
+                        return;
                     }
 
-                    if (wasChanges){
-                        singleDocumentData.undoManager.onDataChanged();
+                    defaultModel = model.CopyMe();
+                }
 
-                        console.log("Document model changed: ", JSON.stringify(changeList));
+                function isEqual(){
+                    if (!defaultModel){
+                        return;
                     }
+
+                    return singleDocumentData.documentDataController.documentModel.IsEqualWithModel(defaultModel);
                 }
             }
+
             property UndoRedoManager undoManager: UndoRedoManager {
                 autoTracking: false;
 
@@ -613,7 +619,6 @@ Item {
                 }
 
                 function onModelChanged(){
-                    console.log("*DEBUG* onModelChanged")
                     if (!singleDocumentData.documentDataController || !singleDocumentData.documentDataController.documentModel){
                         Events.sendEvent("StopLoading");
 
@@ -622,21 +627,10 @@ Item {
 
                     let documentModel = singleDocumentData.documentDataController.documentModel;
 
-                    singleDocumentData.treeItemModelObserver.registerModel(documentModel);
+                    singleDocumentData.changesChecker.registerModel(documentModel);
 
-                    if (documentModel.m_Id){
-                        singleDocumentData.documentId = documentModel.m_Id
-                        singleDocumentData.documentName = documentModel.m_Name
-                    }
-                    else{
-                        if (documentModel.ContainsKey("Id")){
-                            singleDocumentData.documentId = documentModel.GetData("Id");
-                        }
-
-                        if (documentModel.ContainsKey("Name")){
-                            singleDocumentData.documentName = documentModel.GetData("Name");
-                        }
-                    }
+                    singleDocumentData.documentId = singleDocumentData.documentDataController.getDocumentId();
+                    singleDocumentData.documentName = singleDocumentData.documentDataController.getDocumentName();
 
                     singleDocumentData.blockingUpdateModel = true;
 
@@ -645,19 +639,19 @@ Item {
                         if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
                             singleDocumentData.views[i].doUpdateModel();
                         }
+
+                        if (singleDocumentData.views[i].commandsDelegate){
+                            singleDocumentData.views[i].commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
+                        }
                     }
                     singleDocumentData.blockingUpdateModel = false;
 
                     documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
 
-                    if (singleDocumentData.undoManager.modelIsRegistered()){
-                        singleDocumentData.undoManager.unregisterModel();
-                    }
-
                     singleDocumentData.undoManager.registerModel(documentModel);
                     singleDocumentData.documentValidator.documentModel = documentModel;
 
-                    singleDocumentData.modelConnections.target = singleDocumentData.documentDataController.documentModel;
+                    singleDocumentData.modelConnections.target = singleDocumentData.documentDataController.documentModel
                     singleDocumentData.modelConnections.enabled = true;
 
                     Events.sendEvent("StopLoading");
@@ -676,7 +670,17 @@ Item {
                         return;
                     }
 
-                    singleDocumentData.treeItemModelObserver.observedModelDataChanged();
+                    if (singleDocumentData.undoManager && singleDocumentData.undoManager.isTransaction()){
+                        return;
+                    }
+
+                    let isEqual = singleDocumentData.changesChecker.isEqual()
+
+                    singleDocumentData.isDirty = !isEqual;
+
+                    if (!isEqual){
+                        singleDocumentData.undoManager.onDataChanged();
+                    }
                 }
             }
 
@@ -709,28 +713,6 @@ Item {
             onDocumentIdChanged: {
                 if (documentDataController){
                     documentDataController.documentId = documentId;
-                }
-            }
-
-            onViewAdded: {
-                if (!view){
-                    return;
-                }
-
-                if (view.commandsDelegate){
-                    view.commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
-                }
-
-                if (singleDocumentData.documentDataController){
-                    singleDocumentData.blockingUpdateModel = true;
-                    if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
-                        view.model = singleDocumentData.documentDataController.documentModel;
-
-                        view.doUpdateModel();
-                    }
-                    singleDocumentData.blockingUpdateModel = false;
-
-                    documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
                 }
             }
 
@@ -778,12 +760,15 @@ Item {
             }
 
             function checkDocumentModel(){
+                console.log("checkDocumentModel");
                 let currentStateModel = undoManager.getStandardModel();
                 if (currentStateModel){
                     let documentModel = singleDocumentData.documentDataController.documentModel
                     let isEqual = currentStateModel.IsEqualWithModel(documentModel);
                     isDirty = !isEqual;
                 }
+
+                console.log("end checkDocumentModel");
             }
 
             property Component documentHistoryDialogComp: Component {

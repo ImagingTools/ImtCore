@@ -115,7 +115,7 @@ ViewBase {
     }
 
     function updateGui(){
-        console.log("RoleEditor updateGui");
+        console.log("RoleEditor updateGui2");
 
         if (roleEditorContainer.model.ContainsKey("RoleId")){
             roleIdInput.text = model.GetData("RoleId");
@@ -162,6 +162,8 @@ ViewBase {
                 }
             }
         }
+
+        console.log("RoleEditor end updateGui");
     }
 
     function updateModel(){

@@ -30,6 +30,10 @@ ElementView {
         }
     }
 
+    onEditingFinished: {
+        console.log("onEditingFinished", text);
+    }
+
     onMaximumLengthChanged: {
         if (controlItem){
             controlItem.maximumLength = maximumLength;

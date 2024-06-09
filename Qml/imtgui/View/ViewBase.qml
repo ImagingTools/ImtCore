@@ -139,11 +139,11 @@ Item {
             return;
         }
 
-        console.log("doUpdateModel", model);
-
         if (readOnly || internal.blockingUpdateModel || internal.blockingUpdateGui){
             return;
         }
+
+        console.log("doUpdateModel", model);
 
         internal.blockingUpdateGui = true;
 
@@ -159,11 +159,11 @@ Item {
             return;
         }
 
-        console.log("doUpdateGui", model);
-
         if (internal.blockingUpdateGui || internal.blockingUpdateModel){
             return;
         }
+
+        console.log("doUpdateGui", model);
 
         internal.blockingUpdateModel = true;
 
@@ -213,19 +213,11 @@ Item {
         property bool blockingUpdateGui: false;
         property bool blockingUpdateModel: false;
 
-        property int countIncomingChanges: 0;
 
         property bool startUpdateCommands: viewBase.visible && viewBase.commandsController != null && viewBase.commandsController.isReady;
         onStartUpdateCommandsChanged: {
             if (startUpdateCommands){
                 viewBase.updateCommandsGui();
-            }
-        }
-
-        onBlockingUpdateGuiChanged: {
-            if (!blockingUpdateGui && countIncomingChanges > 0){
-                countIncomingChanges = 0;
-                viewBase.onModelChanged();
             }
         }
 

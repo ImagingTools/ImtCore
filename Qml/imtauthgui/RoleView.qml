@@ -183,8 +183,6 @@ ViewBase {
                 }
 
                 function updateGui(){
-                    console.log("RoleEditor updateGui");
-
                     if (container.model.ContainsKey("RoleId")){
                         roleIdInput.text = container.model.GetData("RoleId");
                     }

@@ -15,22 +15,12 @@ QtObject {
     signal modelChanged(var changeList);
 
     function registerModel(model){
-        console.log("PreferenceObserver registerModel", model);
-
         container.observedModel = model;
 
         container.private_.beginModel = model.CopyMe();
     }
 
     function observedModelDataChanged(){
-//        console.log("observedModelDataChanged");
-//        console.log("container.private_.beginModel", container.private_.beginModel.ToJson());
-//        console.log("container.observedModel", container.observedModel.ToJson());
-
-//        if (container.private_.block){
-//            return;
-//        }
-
         container.private_.block = true;
 
         let changeList = compare(container.private_.beginModel, container.observedModel);

@@ -186,12 +186,12 @@ FocusScope {
             if(containerTextField.text !== text){// for web TEMP!!!
                 containerTextField.text = text
             }
-
-            editingFinishedTimer.restart();
         }
 
         onTextEdited: {
             containerTextField.textEdited();
+
+            editingFinishedTimer.restart();
         }
 
         onAcceptableInputChanged: {

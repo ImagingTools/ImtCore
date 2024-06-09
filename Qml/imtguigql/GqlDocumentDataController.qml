@@ -42,8 +42,22 @@ DocumentDataController {
         }
     }
 
+    function getDocumentId(){
+        let id = "";
+        if (documentModel && documentModel.ContainsKey("Id")){
+            id = documentModel.GetData("Id");
+        }
+
+        return id;
+    }
+
     function getDocumentName(){
-        return documentName;
+        let name = "";
+        if (documentModel && documentModel.ContainsKey("Name")){
+            name = documentModel.GetData("Name");
+        }
+
+        return name;
     }
 
     function updateDocumentModel(){

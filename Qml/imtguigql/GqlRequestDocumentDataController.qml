@@ -39,8 +39,20 @@ DocumentDataController {
         }
     }
 
+    function getDocumentId(){
+        if (documentModel.m_Id){
+            return documentModel.m_Id;
+        }
+
+        return "";
+    }
+
     function getDocumentName(){
-        return documentName;
+        if (documentModel.m_Name){
+            return documentModel.m_Name;
+        }
+
+        return "";
     }
 
     function updateDocumentModel(){

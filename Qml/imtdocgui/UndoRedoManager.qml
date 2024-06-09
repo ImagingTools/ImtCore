@@ -41,24 +41,31 @@ Item {
     }
 
 
-    function doUndo(steps)
+    function doUndo()
     {
+        console.log("doUndo");
+
         internal.m_isBlocked = true;
 
-        internal.m_redoStack.push(internal.m_observedModel.CopyMe());
+        internal.m_redoStack.push(internal.m_observedModel.ToJson());
 
         let prevStateModel = internal.m_undoStack.pop();
-        if (internal.m_observedModel.Copy(prevStateModel)){
-            internal.m_observedModel.Refresh();
-        }
 
-        internal.m_beginStateModel = internal.m_observedModel.CopyMe();
+        let copiedModel = internal.m_defaultStateModel.CopyMe();
+        copiedModel.CreateFromJson(prevStateModel)
+        internal.m_observedModel.Copy(copiedModel)
+
+        //internal.m_observedModel.CreateFromJson(prevStateModel) ???
+
+        internal.m_beginStateModel = prevStateModel;
 
         internal.m_isBlocked = false;
 
         modelChanged();
 
         undo();
+
+        console.log("end doUndo");
     }
 
 
@@ -66,14 +73,18 @@ Item {
     {
         internal.m_isBlocked = true;
 
-        internal.m_undoStack.push(internal.m_observedModel.CopyMe());
+        internal.m_undoStack.push(internal.m_observedModel.ToJson());
 
         let nextStateModel = internal.m_redoStack.pop();
-        if (internal.m_observedModel.Copy(nextStateModel)){
-            internal.m_observedModel.Refresh();
-        }
 
-        internal.m_beginStateModel = internal.m_observedModel.CopyMe();
+        let copiedModel = internal.m_defaultStateModel.CopyMe();
+        copiedModel.CreateFromJson(nextStateModel)
+
+        internal.m_observedModel.Copy(copiedModel)
+
+//        internal.m_observedModel.CreateFromJson(nextStateModel) ???
+
+        internal.m_beginStateModel = internal.m_observedModel.ToJson();
 
         internal.m_isBlocked = false;
 
@@ -113,15 +124,16 @@ Item {
 
     function registerModel(model)
     {
+        console.log("UndoManager registerModel", model.ToJson());
         if (modelIsRegistered()){
-            console.error("Model is already registered in the undo manager");
+            console.warn("Model is already registered in the undo manager");
 
-            return;
+            unregisterModel();
         }
 
         resetUndo();
 
-        internal.m_beginStateModel = model.CopyMe();
+        internal.m_beginStateModel = model.ToJson();
 
         internal.m_observedModel = model;
 
@@ -150,6 +162,11 @@ Item {
     }
 
 
+    function isTransaction(){
+        return internal.m_isBlocked;
+    }
+
+
     function beginChanges()
     {
         if (!modelIsRegistered()){
@@ -164,7 +181,7 @@ Item {
             return;
         }
 
-        internal.m_beginStateModel = internal.m_observedModel.CopyMe();
+        internal.m_beginStateModel = internal.m_observedModel.ToJson();
 
         internal.m_isBlocked = true;
     }
@@ -192,10 +209,10 @@ Item {
             return;
         }
 
-        if (internal.m_beginStateModel != null){
-            let copiedModel = internal.m_beginStateModel.CopyMe();
+        console.log("makeChanges", internal.m_beginStateModel);
 
-            internal.m_undoStack.push(copiedModel)
+        if (internal.m_beginStateModel != ""){
+            internal.m_undoStack.push(internal.m_beginStateModel)
             internal.m_redoStack = []
 
             modelChanged();
@@ -227,8 +244,7 @@ Item {
             return;
         }
 
-        let copiedModel = model.CopyMe();
-        internal.m_defaultStateModel = copiedModel;
+        internal.m_defaultStateModel = model.CopyMe();
     }
 
 
@@ -245,22 +261,24 @@ Item {
 
         property bool m_isBlocked: false;
 
-        property TreeItemModel m_observedModel: null;
-        property TreeItemModel m_beginStateModel: null;
-        property TreeItemModel m_defaultStateModel: null;
+        property var m_observedModel: null;
+        property string m_beginStateModel;
+        property var m_defaultStateModel: null;
 
         property var m_undoStack: [];
         property var m_redoStack: [];
     }
 
     function onDataChanged(){
+        console.log("UndoManager onDataChanged");
+
         if (internal.m_isBlocked){
             return;
         }
 
         undoRedoManager.makeChanges();
 
-        internal.m_beginStateModel = internal.m_observedModel.CopyMe();
+        internal.m_beginStateModel = internal.m_observedModel.ToJson();
     }
 
     Shortcut {

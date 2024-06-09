@@ -177,8 +177,9 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 		}
 
 		if (itemModel.ContainsKey("PostalCode")){
-			int postalCode = itemModel.GetData("PostalCode").toInt();
-			address.SetPostalCode(postalCode);
+			QString postalCodeStr = itemModel.GetData("PostalCode").toString();
+
+			address.SetPostalCode(postalCodeStr.toInt());
 		}
 
 		if (itemModel.ContainsKey("Street")){

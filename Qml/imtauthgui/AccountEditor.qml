@@ -120,6 +120,7 @@ ViewBase {
     }
 
     function updateModel(){
+        console.log("start updateModel", model.ToJson());
         let name = accountNameInput.text;
         accountEditorContainer.model.SetData("Name", name)
 
@@ -155,6 +156,8 @@ ViewBase {
 
         let groups = selectedGroupIds.join(';');
         accountEditorContainer.model.SetData("Groups", groups)
+
+        console.log("end updateModel", model.ToJson());
     }
 
     CustomScrollbar {

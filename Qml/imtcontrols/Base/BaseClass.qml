@@ -18,7 +18,6 @@ QtObject {
     function connectProperties(){
         let self = this
         let list = getProperties()
-        console.log("list", list);
 
         for(let name of list){
             this[name+'Changed'].connect(function(){
@@ -33,6 +32,49 @@ QtObject {
         return Qt.createComponent('BaseClass.qml').createObject()
     }
 
+    function IsEqualWithModel(model){
+        if (typeof this != typeof model){
+            return false;
+        }
+
+        let selfKeys = this.getProperties()
+        let sourceKeys = model.getProperties()
+
+        console.log("self", this.ToJson())
+        console.log("source", model.ToJson())
+
+
+        if (selfKeys.length !== sourceKeys.length){
+            return false;
+        }
+
+        for(let i = 0; i < selfKeys.length; i++){
+            let key = selfKeys[i];
+
+            if (!sourceKeys.includes(key)){
+                return false;
+            }
+
+            if(typeof this[key] !== typeof model[key]){
+                return false;
+            }
+
+            if(typeof this[key] === 'object'){
+                let ok = this[key].IsEqualWithModel(model[key]);
+                if (!ok){
+                    return false;
+                }
+            }
+            else{
+                if (this[key] !== model[key]){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     function Refresh(){
     }
 
@@ -42,17 +84,17 @@ QtObject {
 
     function CopyMe(){
         let obj = createMe()
-        obj.fromJSON(toJSON())
+        obj.fromJSON(ToJson())
         return obj
     }
 
     function copyFrom(item){
-        fromJSON(item.toJSON())
+        fromJSON(item.ToJson())
         return true
     }
 
     function copyTo(item){
-        item.fromJSON(toJSON())
+        item.fromJSON(ToJson())
         return true
     }
 
@@ -83,14 +125,18 @@ QtObject {
         return list
     }
 
-    function toJSON(){
+    function CreateFromJson(json){
+        return fromJSON(json);
+    }
+
+    function ToJson(){
         let list = getProperties()
 
         let json = '{'
         for(let i = 0; i < list.length; i++){
             let key = list[i]
             if(typeof this[key] === 'object'){
-                json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJSON()
+                json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].ToJson()
             } else {
                 json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + this[key] + '"' : this[key])
             }
