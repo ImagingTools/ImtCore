@@ -310,8 +310,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	// static props as internal QtObject
 	FeedStream(ifStream, 2, false);
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("property QtObject _keys: QtObject{");
-	// and static props container alias; use '_' prefix to avoid ambiguity (private properies by the JS convention)
+	ifStream << QStringLiteral("property QtObject s_keys: QtObject{");
 	for (const CSdlField& sdlField: sdlType.GetFields()){
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 2);
