@@ -167,10 +167,6 @@ class TreeItemModel extends JSONListModel {
         }
     }
 
-    clear(){
-        this.clear()
-    }
-
     isValidData(key, row){
         let data = this.getData(key, row)
         let retVal = (data === undefined || data === null) ? false : true
