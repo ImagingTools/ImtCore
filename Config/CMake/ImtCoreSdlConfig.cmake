@@ -53,9 +53,21 @@ function (ImtCoreConfigureSdlQml
 		"${QML_MODULE_NAME}"
 		"--QML;--use-all-modificators")
 
+
+	include (${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ImtCoreSdl.cmake)
 	ImtCoreFutureResourceWrap (
 		${PROJECT_NAME}
 		"${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL/${OUTPUT_SUBDIR}/${QML_MODULE_NAME}/${QML_MODULE_NAME}.qrc")
+
+	# update QML import paths for Qt creator
+	set(QML_IMPORT_DIRS ${QML_IMPORT_PATH})
+	list(APPEND QML_IMPORT_DIRS "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL/${OUTPUT_SUBDIR}")
+	list(REMOVE_DUPLICATES QML_IMPORT_DIRS)
+	set(QML_IMPORT_PATH ${QML_IMPORT_DIRS}
+		CACHE STRING "Qt Creator extra qml import paths for ${PROJECT_NAME}"
+		FORCE
+	)
+
 endfunction()
 
 
@@ -64,7 +76,7 @@ endfunction()
 function (ImtCoreConfigureSdlQmlSingle
 		SDL_FILE_NAME)
 
-	ImtCoreConfigureSdlQmlBase(
+	ImtCoreConfigureSdlQml(
 		"${SDL_FILE_NAME}"
 		"QML"
 		"${PROJECT_NAME}Sdl")
