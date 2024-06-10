@@ -61,7 +61,7 @@ DocumentDataController {
     }
 
     function updateDocumentModel(){
-        gqlGetModel.getData();
+        gqlGetModel.getModel();
     }
 
     function insertDocument(){
@@ -173,7 +173,7 @@ DocumentDataController {
     }
 
     property GqlModel gqlGetModel: GqlModel {
-        function getData(){
+        function getModel(){
             console.log("getData", container.gqlGetCommandId)
             var query = Gql.GqlRequest("query", container.gqlGetCommandId);
 

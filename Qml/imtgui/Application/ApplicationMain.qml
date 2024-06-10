@@ -189,7 +189,6 @@ Item {
     }
 
     function checkStatus(status){
-        console.log("checkStatus", status);
         thumbnailDecorator.stackView.clear();
 
 //        0 - WebSocket.Connecting

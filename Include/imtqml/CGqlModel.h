@@ -25,7 +25,7 @@ class CGqlModel: public imtbase::CTreeItemModel
 public:
 	typedef imtbase::CTreeItemModel BaseClass;
 
-	Q_INVOKABLE inline bool setGqlQuery(QString query) { return SetGqlQuery(query); }
+	Q_INVOKABLE inline bool setGqlQuery(QString query){ return SetGqlQuery(query); }
 
 	explicit CGqlModel(QObject* parent = nullptr);
 	~CGqlModel();
