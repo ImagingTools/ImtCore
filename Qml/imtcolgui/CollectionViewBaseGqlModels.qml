@@ -77,7 +77,7 @@ QtObject {
 
             var gqlData = query.GetQuery();
             console.log("headerInfoModel query ", gqlData);
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -177,7 +177,7 @@ QtObject {
 
             console.log("gqlData", gqlData);
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -267,7 +267,7 @@ QtObject {
 
             var gqlData = query.GetQuery();
             console.log("CollectionView objectView query ", gqlData);
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

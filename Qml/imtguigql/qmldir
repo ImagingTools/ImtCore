@@ -18,6 +18,5 @@ MetaInfoProvider 1.0 MetaInfoProvider.qml
 WebSocketPortProvider 1.0 WebSocketPortProvider.qml
 SystemStatusController 1.0 SystemStatusController.qml
 ComboBoxGqlSimpleElementView 1.0 ComboBoxGqlSimpleElementView.qml
-GqlRequest 1.0 GqlRequest.qml
 GqlRequestDocumentDataController 1.0 GqlRequestDocumentDataController.qml
 

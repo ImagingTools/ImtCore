@@ -27,7 +27,7 @@ StyleBase {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

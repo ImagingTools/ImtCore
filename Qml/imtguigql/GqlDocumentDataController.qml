@@ -124,7 +124,7 @@ DocumentDataController {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -197,7 +197,7 @@ DocumentDataController {
 
             var gqlData = query.GetQuery();
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -261,7 +261,7 @@ DocumentDataController {
 
             var gqlData = query.GetQuery();
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

@@ -177,7 +177,7 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -256,7 +256,7 @@ Item {
 
             var gqlData = query.GetQuery();
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -329,7 +329,7 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -402,7 +402,7 @@ Item {
             var gqlData = query.GetQuery();
 
             internal.headersUpdatingBlock = true;
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -504,7 +504,7 @@ Item {
 
             root.beginUpdate();
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -582,7 +582,7 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

@@ -48,7 +48,7 @@ QtObject {
 
             console.log("UserToken", gqlData);
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

@@ -34,7 +34,7 @@ QtObject {
 
             console.log("gqlData", gqlData);
 
-            this.SetGqlQuery(gqlData)
+            this.setGqlQuery(gqlData)
         }
 
         onStateChanged: {

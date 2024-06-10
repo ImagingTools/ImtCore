@@ -8,8 +8,8 @@ TreeItemModel {
         XMLHttpRequest.QMLAuthToken = token
     }
     
-    function SetGqlQuery(gqlData){
-        console.log("SetGqlQuery",gqlData)
+    function setGqlQuery(gqlData){
+        console.log("setGqlQuery",gqlData)
         this.state = "Loading"
         var xhr = new XMLHttpRequest;
         xhr.open("POST", "../../graphql");

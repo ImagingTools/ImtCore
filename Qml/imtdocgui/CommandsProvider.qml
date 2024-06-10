@@ -177,7 +177,7 @@ QtObject {
                 query.AddParam(inputParams);
             }
             var gqlData = query.GetQuery();
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

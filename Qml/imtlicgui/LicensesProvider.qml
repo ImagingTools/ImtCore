@@ -46,7 +46,7 @@ QtObject {
 
             provider.completed = false;;
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

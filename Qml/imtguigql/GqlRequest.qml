@@ -6,7 +6,7 @@ QtObject {
     property string json;
     property string state;
 
-    function SetGqlQuery(gqlData){
+    function setGqlQuery(gqlData){
         root.state = "Loading"
 
         let xhr = new XMLHttpRequest
@@ -14,6 +14,8 @@ QtObject {
         xhr.send(gqlData)
 
         xhr.onreadystatechange = function(){
+            console.log("onreadystatechange", xhr.readyState);
+
             if (xhr.readyState === XMLHttpRequest.DONE){
                 root.json = xhr.responseText;
 

@@ -522,7 +522,7 @@ Item {
 
             //console.log("COMBO_QUERY ", gqlData);
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

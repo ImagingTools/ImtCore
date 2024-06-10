@@ -594,7 +594,7 @@ Rectangle {
 
            var gqlData = query.GetQuery();
            console.log("PreferenceDialog GqlModel getSettings query ", gqlData);
-           this.SetGqlQuery(gqlData);
+           this.setGqlQuery(gqlData);
        }
 
        onStateChanged: {
@@ -649,7 +649,7 @@ Rectangle {
 
            var gqlData = query.GetQuery();
            console.log("Preference GqlModel SaveSettings query ", gqlData);
-           this.SetGqlQuery(gqlData);
+           this.setGqlQuery(gqlData);
        }
 
        onStateChanged: {
@@ -721,7 +721,7 @@ Rectangle {
 
            var gqlData = query.GetQuery();
            console.log("fileQuery gqlData", gqlData);
-           this.SetGqlQuery(gqlData);
+           this.setGqlQuery(gqlData);
        }
 
        onStateChanged: {

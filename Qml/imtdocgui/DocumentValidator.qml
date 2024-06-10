@@ -4,7 +4,7 @@ import Acf 1.0
 QtObject {
     id: root;
 
-    property TreeItemModel documentModel: null;
+    property var documentModel: null;
 
     function isValid(message){
         return true;

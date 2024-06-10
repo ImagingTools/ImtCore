@@ -154,7 +154,7 @@ Item {
             var gqlData = query.GetQuery();
 
             container.completed = false;
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

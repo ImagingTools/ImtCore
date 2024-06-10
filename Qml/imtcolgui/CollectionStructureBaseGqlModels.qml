@@ -95,7 +95,7 @@ QtObject {
 
             console.log("gqlData", gqlData);
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -173,7 +173,7 @@ QtObject {
 
             var gqlData = query.GetQuery();
             console.log("CollectionStructure objectView query ", gqlData);
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

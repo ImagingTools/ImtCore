@@ -378,7 +378,7 @@ Item {
 
                 var gqlData = query.GetQuery();
                 console.log("removeModel query ", gqlData);
-                this.SetGqlQuery(gqlData);
+                this.setGqlQuery(gqlData);
             }
         }
 
@@ -479,7 +479,7 @@ Item {
             var gqlData = query.GetQuery();
             console.log("CollectionStructure newNodeQuery", gqlData);
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -553,7 +553,7 @@ Item {
             var gqlData = query.GetQuery();
             console.log("CollectionStructure renameQuery rename", gqlData);
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -625,7 +625,7 @@ Item {
 
             var gqlData = query.GetQuery();
             console.log("CollectionStructure setDescription query ", gqlData);
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

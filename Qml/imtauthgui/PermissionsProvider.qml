@@ -33,7 +33,7 @@ Item {
             var gqlData = query.GetQuery();
 
             console.log(gqlData);
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

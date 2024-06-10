@@ -308,7 +308,7 @@ Item {
 
                 var gqlData = query.GetQuery();
                 console.log("removeModel query ", gqlData);
-                this.SetGqlQuery(gqlData);
+                this.setGqlQuery(gqlData);
             }
         }
 
@@ -378,7 +378,7 @@ Item {
             var gqlData = query.GetQuery();
             console.log("CollectionView renameQuery rename", gqlData);
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -443,7 +443,7 @@ Item {
 
             var gqlData = query.GetQuery();
             console.log("CollectionView setDescription query ", gqlData);
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

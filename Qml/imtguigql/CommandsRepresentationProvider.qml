@@ -39,7 +39,7 @@ CommandsController {
                 query.AddParam(inputParams);
             }
             var gqlData = query.GetQuery();
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
 
             commandsProviderContainer.isReady = false;
         }

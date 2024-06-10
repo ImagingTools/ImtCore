@@ -89,7 +89,7 @@ QtObject {
 
             var gqlData = query.GetQuery();
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -131,7 +131,7 @@ QtObject {
 
             var gqlData = query.GetQuery();
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

@@ -24,6 +24,10 @@ Item {
         Events.subscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged)
     }
 
+    onModelChanged: {
+        console.log("ViewBase onModelChanged", model);
+    }
+
     Component.onDestruction: {
         if (commandsDelegate){
             Events.unSubscribeEvent(viewId + "CommandActivated", commandsDelegate.commandHandle);

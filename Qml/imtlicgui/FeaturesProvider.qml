@@ -56,7 +56,7 @@ QtObject {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            provider.featuresModel.SetGqlQuery(gqlData);
+            provider.featuresModel.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

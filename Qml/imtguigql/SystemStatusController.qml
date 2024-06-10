@@ -177,7 +177,7 @@ QtObject {
             var gqlData = query.GetQuery();
 
             systemStatusController.serverStatus = 0;
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -209,7 +209,7 @@ QtObject {
 
             systemStatusController.databaseStatus = 0;
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

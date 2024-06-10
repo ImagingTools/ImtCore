@@ -74,7 +74,7 @@ QtObject {
 
             container.completed = false;
             console.log("gqlModelBaseContainer query ", gqlData);
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

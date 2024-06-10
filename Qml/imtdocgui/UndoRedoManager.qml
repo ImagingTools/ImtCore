@@ -44,6 +44,9 @@ Item {
     function doUndo()
     {
         console.log("doUndo");
+        if (!modelIsRegistered()){
+            return;
+        }
 
         internal.m_isBlocked = true;
 
@@ -51,9 +54,13 @@ Item {
 
         let prevStateModel = internal.m_undoStack.pop();
 
-        let copiedModel = internal.m_defaultStateModel.copyMe();
-        copiedModel.createFromJson(prevStateModel)
-        internal.m_observedModel.copy(copiedModel)
+        console.log("internal.m_defaultStateModel", internal.m_defaultStateModel);
+
+        if (internal.m_defaultStateModel){
+            let copiedModel = internal.m_defaultStateModel.copyMe();
+            copiedModel.createFromJson(prevStateModel)
+            internal.m_observedModel.copy(copiedModel)
+        }
 
         //internal.m_observedModel.createFromJson(prevStateModel) ???
 
@@ -71,16 +78,22 @@ Item {
 
     function doRedo(steps)
     {
+        if (!modelIsRegistered()){
+            return;
+        }
+
         internal.m_isBlocked = true;
 
         internal.m_undoStack.push(internal.m_observedModel.toJson());
 
         let nextStateModel = internal.m_redoStack.pop();
 
-        let copiedModel = internal.m_defaultStateModel.copyMe();
-        copiedModel.createFromJson(nextStateModel)
+        if (internal.m_defaultStateModel){
+            let copiedModel = internal.m_defaultStateModel.copyMe();
+            copiedModel.createFromJson(nextStateModel)
 
-        internal.m_observedModel.copy(copiedModel)
+            internal.m_observedModel.copy(copiedModel)
+        }
 
 //        internal.m_observedModel.createFromJson(nextStateModel) ???
 
@@ -238,6 +251,8 @@ Item {
 
     function setStandardModel(model)
     {
+        console.log("UndoManager setStandardModel", model);
+
         if (!modelIsRegistered()){
             console.error("Unable to set standard model. Model is not registered");
 

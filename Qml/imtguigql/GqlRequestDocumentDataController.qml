@@ -119,7 +119,7 @@ DocumentDataController {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
@@ -164,7 +164,6 @@ DocumentDataController {
 
     property GqlRequest gqlGetModel: GqlRequest {
         function getData(){
-            console.log("getData", container.gqlGetCommandId)
             var query = Gql.GqlRequest("query", container.gqlGetCommandId);
 
             var queryFields = Gql.GqlObject("item");
@@ -187,10 +186,12 @@ DocumentDataController {
 
             var gqlData = query.GetQuery();
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
+            console.log("gqlGetModel onStateChanged", container.gqlGetModel.state)
+
             let state = container.gqlGetModel.state;
             if (state === "Error"){
                 container.error("Network error", "Critical");
@@ -238,7 +239,7 @@ DocumentDataController {
 
             var gqlData = query.GetQuery();
 
-            this.SetGqlQuery(gqlData);
+            this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {

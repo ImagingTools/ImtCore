@@ -31,7 +31,7 @@ public:
 
 	Q_INVOKABLE inline bool copy(const CTreeItemModel* object) { return Copy(object); }
 	Q_INVOKABLE inline void setParent(QObject *parent){ SetParent(parent); }
-	Q_INVOKABLE inline bool copyMe(){ return CopyMe(); }
+	Q_INVOKABLE inline imtbase::CTreeItemModel* copyMe(){ return CopyMe(); }
 	Q_INVOKABLE inline bool isEqualWithModel(CTreeItemModel* modelPtr){ return IsEqualWithModel(modelPtr); }
 	Q_INVOKABLE inline void insertNewItemWithParameters(int index, const QVariantMap& map){ InsertNewItemWithParameters(index, map); }
 	Q_INVOKABLE inline int insertNewItem(){ return InsertNewItem(); }

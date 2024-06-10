@@ -11,7 +11,7 @@ GqlModel {
     function updateModel() {
         var query = Gql.GqlRequest("query", "GetWebSocketUrl");
         var gqlData = query.GetQuery();
-        this.SetGqlQuery(gqlData);
+        this.setGqlQuery(gqlData);
     }
 
     onStateChanged: {
