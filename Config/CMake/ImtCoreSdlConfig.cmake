@@ -1,4 +1,4 @@
-function (ImtCoreConfigureSdlBase
+function (ImtCoreConfigureSdl
 		SDL_FILE_NAME
 		OUTPUT_SUBDIR
 		NAMESPACE
@@ -16,22 +16,23 @@ endfunction()
 
 #CPP
 
-function (ImtCoreConfigureSdlCpp
+function (ImtCoreConfigureSdlCppSingle
 		SDL_FILE_NAME)
 
-	ImtCoreConfigureSdlBase(
+	ImtCoreConfigureSdl(
 		"${SDL_FILE_NAME}"
 		"CPP"
 		"${PROJECT_NAME}::sdl"
 		"--CPP;--use-all-modificators")
 endfunction()
 
+
 # CPP+GQL
 
-function (ImtCoreConfigureSdlCppGql
+function (ImtCoreConfigureSdlCppGqlSingle
 		SDL_FILE_NAME)
 
-	ImtCoreConfigureSdlBase(
+	ImtCoreConfigureSdl(
 		"${SDL_FILE_NAME}"
 		"CPP"
 		"${PROJECT_NAME}::sdl"
@@ -40,12 +41,13 @@ endfunction()
 
 
 # QML
-function (ImtCoreConfigureSdlQmlBase
+
+function (ImtCoreConfigureSdlQml
 		SDL_FILE_NAME
 		OUTPUT_SUBDIR
 		QML_MODULE_NAME)
 
-	ImtCoreConfigureSdlBase(
+	ImtCoreConfigureSdl(
 		"${SDL_FILE_NAME}"
 		"${OUTPUT_SUBDIR}/${QML_MODULE_NAME}"
 		"${QML_MODULE_NAME}"
@@ -57,7 +59,9 @@ function (ImtCoreConfigureSdlQmlBase
 endfunction()
 
 
-function (ImtCoreConfigureSdlQml
+# QML single
+
+function (ImtCoreConfigureSdlQmlSingle
 		SDL_FILE_NAME)
 
 	ImtCoreConfigureSdlQmlBase(
@@ -68,11 +72,29 @@ function (ImtCoreConfigureSdlQml
 endfunction()
 
 
-function (ImtCoreConfigureSdl 
+# Lazy CPP+QML+GQL WARNING this function enables ALL modificators
+
+function (ImtCoreConfigureSdlCppQml
+		SDL_FILE_NAME
+		CPP_OUT_SUBFOLDER
+		CPP_NAMESPACE
+		QML_OUT_SUBFOLDER
+		QML_MODULE_NAME
+	)
+
+ImtCoreConfigureSdl("${SDL_FILE_NAME}" "${CPP_OUT_SUBFOLDER}" "${CPP_NAMESPACE}" "--use-all-modificators;--CPP;--GQL")
+ImtCoreConfigureSdlQml("${SDL_FILE_NAME}" "${QML_OUT_SUBFOLDER}" "${QML_MODULE_NAME}")
+
+endfunction()
+
+
+# Lazy single file CPP+QML+GQL WARNING this function enables ALL modificators
+
+function (ImtCoreConfigureSdlSingle
 	SDL_FILE_NAME)
 
-	ImtCoreConfigureSdlCppGql(${SDL_FILE_NAME})
-	ImtCoreConfigureSdlQml(${SDL_FILE_NAME})
+	ImtCoreConfigureSdlCppGqlSingle(${SDL_FILE_NAME})
+	ImtCoreConfigureSdlQmlSingle(${SDL_FILE_NAME})
 
 endfunction()
 
