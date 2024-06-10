@@ -75,15 +75,15 @@ class TreeItemModel extends JSONListModel {
         }
     }
 
-    SetUpdateEnabled(flag){
+    setUpdateEnabled(flag){
         this.getProperty('isUpdateEnabled').reset(flag)
     }
 
-    GetItemsCount(){
+    getItemsCount(){
         return this.count
     }
 
-    GetData(key, row){
+    getData(key, row){
         if(row === undefined || row === null) row = 0
 
         let modelObject = this.get(row)
@@ -104,7 +104,7 @@ class TreeItemModel extends JSONListModel {
 
             if(Object.keys(retVal).length) {
                 if (Array.isArray(retVal)){
-                    retModel.SetIsArray(true)
+                    retModel.setIsArray(true)
                 }
 
                 retModel.append(retVal)
@@ -117,7 +117,7 @@ class TreeItemModel extends JSONListModel {
     }
 
 
-    SetData(key, value, row){
+    setData(key, value, row){
         if(row === undefined || row === null) row = 0
 
         if(this.count === 0 && row === 0){
@@ -151,7 +151,7 @@ class TreeItemModel extends JSONListModel {
     }
 
 
-    RemoveData(key, row){
+    removeData(key, row){
         if(row === undefined || row === null) row = 0
 
         let modelObject = this.get(row)
@@ -167,36 +167,36 @@ class TreeItemModel extends JSONListModel {
         }
     }
 
-    Clear(){
+    clear(){
         this.clear()
     }
 
-    IsValidData(key, row){
-        let data = this.GetData(key, row)
+    isValidData(key, row){
+        let data = this.getData(key, row)
         let retVal = (data === undefined || data === null) ? false : true
         return retVal
     }
 
-    SetExternTreeModel(key, value, row){
-        this.SetData(key, value, row)
+    setExternTreeModel(key, value, row){
+        this.setData(key, value, row)
     }
 
-    CopyItemDataFromModel(index, externTreeModel, externIndex){
-        this.RemoveItem(index)
-        this.InsertNewItem(index)
+    copyItemDataFromModel(index, externTreeModel, externIndex){
+        this.removeItem(index)
+        this.insertNewItem(index)
 
         let retVal = true
-        let keys = externTreeModel.GetKeys(externIndex)
+        let keys = externTreeModel.getKeys(externIndex)
 
         for(let key of keys){
-            let value = externTreeModel.GetData(key, externIndex)
+            let value = externTreeModel.getData(key, externIndex)
 
             if (typeof value === 'object' && value instanceof TreeItemModel){
-                let childModel = this.AddTreeModel(key, index)
+                let childModel = this.addTreeModel(key, index)
 
-                retVal = retVal && childModel.CopyFrom(value)
+                retVal = retVal && childModel.copyFrom(value)
             } else {
-                retVal = retVal && this.SetData(key, value, index)
+                retVal = retVal && this.setData(key, value, index)
             }
 
             if (!retVal){
@@ -212,26 +212,26 @@ class TreeItemModel extends JSONListModel {
         return retVal
     }
 
-    CopyFrom(externTreeModel){
+    copyFrom(externTreeModel){
         if(externTreeModel){
-            this.Clear()
+            this.clear()
 
             let retVal = true
 
-            for(let index = 0; index < externTreeModel.GetItemsCount(); index++){
-                this.InsertNewItem(index)
+            for(let index = 0; index < externTreeModel.getItemsCount(); index++){
+                this.insertNewItem(index)
 
-                let keys = externTreeModel.GetKeys(index)
+                let keys = externTreeModel.getKeys(index)
 
                 for(let key of keys){
-                    let value = externTreeModel.GetData(key, index)
+                    let value = externTreeModel.getData(key, index)
 
                     if (typeof value === 'object' && value instanceof TreeItemModel){
-                        let childModel = this.AddTreeModel(key, index)
+                        let childModel = this.addTreeModel(key, index)
 
-                        retVal = retVal && childModel.CopyFrom(value)
+                        retVal = retVal && childModel.copyFrom(value)
                     } else {
-                        retVal = retVal && this.SetData(key, value, index)
+                        retVal = retVal && this.setData(key, value, index)
                     }
 
                     if (!retVal){
@@ -247,45 +247,45 @@ class TreeItemModel extends JSONListModel {
         return false
     }
 
-    CopyItemDataToModel(index, model, externIndex){
+    copyItemDataToModel(index, model, externIndex){
         if(externIndex === undefined) externIndex = 0
         
-        let keys = this.GetKeys(index)
+        let keys = this.getKeys(index)
 
         for(let key in keys){
-            let value = this.GetData(keys[key], index)
-            model.SetData(keys[key], value, externIndex)
+            let value = this.getData(keys[key], index)
+            model.setData(keys[key], value, externIndex)
         }
     }
 
-    GetModelFromItem(index){
+    getModelFromItem(index){
         if(this.count <= 0 || index < 0 || index >= this.count) return
 
         let item = this.get(index)
         let retModel = new TreeItemModel()
-        this.CopyItemDataToModel(index, retModel, 0)
+        this.copyItemDataToModel(index, retModel, 0)
         return retModel
 
     }
 
-    IsEqualWithModel(externModel){
+    isEqualWithModel(externModel){
         if(!externModel) return false
         
-        return this.IsEqual(externModel)
+        return this.isEqual(externModel)
     }
 
-    IsEqual(sourceModel){
+    isEqual(sourceModel){
         if(sourceModel) {
-            if(this.GetItemsCount() !== sourceModel.GetItemsCount()){
+            if(this.getItemsCount() !== sourceModel.getItemsCount()){
                 return false
             }
 
-            for(let i = 0; i < sourceModel.GetItemsCount(); ++i){
-                let item = this.GetModelFromItem(i)
-                let sourceItem = sourceModel.GetModelFromItem(i)
+            for(let i = 0; i < sourceModel.getItemsCount(); ++i){
+                let item = this.getModelFromItem(i)
+                let sourceItem = sourceModel.getModelFromItem(i)
 
-                let itemKeys = item.GetKeys()
-                let sourceItemKeys = sourceItem.GetKeys()
+                let itemKeys = item.getKeys()
+                let sourceItemKeys = sourceItem.getKeys()
 
                 if(itemKeys.length !== sourceItemKeys.length){
                     return false
@@ -296,15 +296,15 @@ class TreeItemModel extends JSONListModel {
                         return false
                     }
 
-                    let itemValue = item.GetData(sourceItemKeys[key])
-                    let sourceValue = sourceItem.GetData(sourceItemKeys[key])
+                    let itemValue = item.getData(sourceItemKeys[key])
+                    let sourceValue = sourceItem.getData(sourceItemKeys[key])
 
                     if(typeof sourceValue === 'object'){
                         if(typeof itemValue !== 'object'){
                             return false
                         }
 
-                        let result = sourceValue.IsEqual(itemValue)
+                        let result = sourceValue.isEqual(itemValue)
 
                         if(!result){
                             return false
@@ -322,27 +322,27 @@ class TreeItemModel extends JSONListModel {
         return false
     }
 
-    Copy(obj){
+    copy(obj){
         if(!obj) return false
 
         this.clear()
         for(let i = 0; i < obj.count; i++){
-            this.CopyItemDataFromModel(this.InsertNewItem(), obj, i)
+            this.copyItemDataFromModel(this.insertNewItem(), obj, i)
         }
         return true
     }
 
-    CopyMe(){
+    copyMe(){
         let retModel = new TreeItemModel()
 
-        if (!retModel.Copy(this)){
+        if (!retModel.copy(this)){
             return null
         }
 
         return retModel
     }
 
-    GetKeys(index){
+    getKeys(index){
         if (index === undefined || index === null) index = 0
 
         let keys = []
@@ -356,14 +356,14 @@ class TreeItemModel extends JSONListModel {
     }
 
 
-    ContainsKey(key, row){
+    containsKey(key, row){
         if(row === undefined || row === null) row = 0
         if(this.count > row) return this.get(row).hasOwnProperty(key)
         return false
     }
 
 
-    SetQueryParam(key, value){
+    setQueryParam(key, value){
         this.queryParams[key] = value
     }
 
@@ -386,17 +386,17 @@ class TreeItemModel extends JSONListModel {
     }
 
 
-    Refresh(){
+    refresh(){
 
     }
 
 
-    SetIsArray(value){
+    setIsArray(value){
         this.isArray = value
     }
 
 
-    InsertNewItem(index){
+    insertNewItem(index){
         if(index !== undefined && index !== null && typeof index === 'number'){
             this.insert(index, {})
             return index
@@ -406,12 +406,12 @@ class TreeItemModel extends JSONListModel {
         }
     }
 
-    InsertNewItemWithParameters(index, parameters){
+    insertNewItemWithParameters(index, parameters){
         this.append(parameters)
         return this.count - 1
     }
 
-    RemoveItem(index){
+    removeItem(index){
         this.remove(index)
 
         if (this.getPropertyValue('isUpdateEnabled')){
@@ -419,34 +419,34 @@ class TreeItemModel extends JSONListModel {
         }
     } 
 
-    IsTreeModel(key, index){
-        return this.GetTreeItemModel(key, index) != null
+    isTreeModel(key, index){
+        return this.getTreeItemModel(key, index) != null
     }
 
-    GetTreeItemModel(key, index){
-        let data = this.GetData(key, index)
+    getTreeItemModel(key, index){
+        let data = this.getData(key, index)
         if(data instanceof TreeItemModel) return data
 
         return null
     }
 
-    AddTreeModel(key, row){
+    addTreeModel(key, row){
         let retModel = new TreeItemModel(this)
-        this.SetUpdateEnabled(false)
-        this.SetData(key, retModel, row)
-        this.SetUpdateEnabled(true)
+        this.setUpdateEnabled(false)
+        this.setData(key, retModel, row)
+        this.setUpdateEnabled(true)
         return retModel
     }
 
-    CreateFromJson(jsonString){
-        this.Clear()
+    createFromJson(jsonString){
+        this.clear()
         this.json = jsonString
 
         this.updateJSONModel()
         this.updateTreeItemJSONModel()
     }
 
-    ToJson(){
+    toJson(){
         let retVal = ""
         if (this.isArray || this.count > 1)
             retVal += "["
@@ -474,7 +474,7 @@ class TreeItemModel extends JSONListModel {
                             recurciveJSON(modelData[property])
                         }
                     } else if(modelData instanceof TreeItemModel){
-                        retVal += modelData.ToJson()
+                        retVal += modelData.toJson()
                     } else if(modelData instanceof QtObject){
                         retVal += "null"
                     } else {
@@ -503,7 +503,7 @@ class TreeItemModel extends JSONListModel {
     }
 
     updateTreeItemJSONModel(){
-        for(let row = 0; row < this.GetItemsCount(); row++){
+        for(let row = 0; row < this.getItemsCount(); row++){
             let modelObject = this.get(row)
             let keys = Object.keys(modelObject)
             for ( let index in keys ) {
@@ -520,7 +520,7 @@ class TreeItemModel extends JSONListModel {
 
                     if(Object.keys(retVal).length) {
                         if (Array.isArray(retVal)){
-                            retModel.SetIsArray(true)
+                            retModel.setIsArray(true)
                         }
 
                         retModel.append(retVal)
@@ -528,7 +528,7 @@ class TreeItemModel extends JSONListModel {
                     retVal = retModel
                     retVal.updateTreeItemJSONModel()
                 }
-                this.SetData(keys[index],retVal,row)
+                this.setData(keys[index],retVal,row)
             }
         }
     }
