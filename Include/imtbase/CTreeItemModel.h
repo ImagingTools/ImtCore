@@ -37,12 +37,12 @@ public:
 
 	virtual bool SerializeModel(iser::IArchive& archive);
 
-public Q_SLOTS:
+	Q_INVOKABLE inline bool copy(const CTreeItemModel* object) { return Copy(object); }
+
 	void SetParent(QObject *parent);
 	bool Copy(const CTreeItemModel* object);
 	imtbase::CTreeItemModel* CopyMe() const;
 	bool IsEqualWithModel(CTreeItemModel* modelPtr) const;
-	bool IsEqualWithModel(const CTreeItemModel* modelPtr) const;
 	void InsertNewItemWithParameters(int index, const QVariantMap& map);
 	int InsertNewItem();
 	int InsertNewItem(int index);
@@ -68,17 +68,13 @@ public Q_SLOTS:
 	bool IsArray();
 	void SetIsArray(const bool& isArray);
 	bool CreateFromJson(const QByteArray& jsonContent);
-
 	void SetQueryParam(const QByteArray& key, const QByteArray& value);
 	QByteArray GetQueryParam(const QByteArray& key);
 	QByteArray TakeQueryParam(const QByteArray& key);
 	QMap<QByteArray, QByteArray> &GetQueryParams();
 	void ClearQueryParams(const QByteArray& key);
 	void SetUpdateEnabled(bool updateEnabled);
-	void OnDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
-
 	void Refresh();
-
 	QString ToJson();
 
 	// reimplemented (QAbstractListModel)
@@ -86,6 +82,9 @@ public Q_SLOTS:
 	virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
 	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 	virtual QHash<int, QByteArray> roleNames() const override;
+
+public Q_SLOTS:
+	void OnDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
 
 Q_SIGNALS:
 	void stateChanged(const QString& state);
