@@ -61,8 +61,9 @@ protected:
 	virtual bool ProcessMutation();
 	virtual bool ProcessSubscription();
 	virtual bool ProcessValue(SdlFieldList& output, bool* endOfReadPtr);
+	virtual bool ProcessRequests(CSdlRequest::Type type);
 
-	bool ProcessRequests(CSdlRequest::Type type);
+	virtual bool ValidateSchema();
 
 	void SetDevice(QIODevice& device);
 	bool ReadToDelimeter(

@@ -1,6 +1,10 @@
 #include "CGqlSchemaParser.h"
 
 
+// imtsdl includes
+#include <imtsdl/CSdlTools.h>
+
+
 namespace imtsdl
 {
 
@@ -29,9 +33,13 @@ bool CGqlSchemaParser::ParseGqlSchema()
 	QByteArray keyword;
 	retVal = retVal && ReadToDelimeterOrSpace("{", keyword);
 
+	// if we reached end of data validate and exit
 	if (m_stream.atEnd()){
-		return true;
+		bool isSchemaValid = ValidateSchema();
+
+		return isSchemaValid;
 	}
+
 	keyword = keyword.trimmed();
 
 	if (keyword == QByteArrayLiteral("schema")){
@@ -450,6 +458,38 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 	while(foundDelimiter != '}');
 
 	return retVal;
+}
+
+
+bool CGqlSchemaParser::ValidateSchema()
+{
+	for (const CSdlType& sdlType: m_sdlTypes){
+		for (const CSdlField& sdlField: sdlType.GetFields()){
+			bool isCustom = false;
+			CSdlTools::ConvertType(sdlField, &isCustom);
+			CSdlType dummy;
+			if (isCustom && !CSdlTools::GetSdlTypeForField(sdlField, m_sdlTypes, dummy)){
+				QString errorString = QString("Schema error! Type '%1' has field '%2' with unknown type '%3' at %4")
+							.arg(sdlType.GetName(),
+							sdlField.GetId(),
+							sdlField.GetType(),
+							QString::number(m_sdlTypes.indexOf(sdlType) + 1));
+
+				SendLogMessage(
+					istd::IInformationProvider::InformationCategory::IC_ERROR,
+					0,
+					errorString,
+					"ValidateSchema");
+
+				Q_ASSERT_X(false, __func__, errorString.toLocal8Bit());
+
+				return false;
+			}
+		}
+	}
+
+
+	return true;
 }
 
 
