@@ -8,6 +8,7 @@
 
 // imtsdl includes
 #include <imtsdl/imtsdl.h>
+#include <imtsdl/CSdlTools.h>
 
 
 namespace imtsdl
@@ -102,6 +103,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_cppEnabled = isCppInParams || (!isQmlInParams && !isGqlInParams);
 	m_qmlEnabled = isQmlInParams;
 	m_gqlEnabled = isGqlInParams;
+
+	// add VMap implicitly
+	/// \todo add argument to disable it
+	m_usedModificators << CSdlTools::s_variantMapModificatorArgumentName;
 
 	// only one mode must be used
 	Q_ASSERT(commandLineParser.isSet(generateOption) ^ commandLineParser.isSet(dependenciesOption));
