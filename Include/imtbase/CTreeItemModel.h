@@ -43,6 +43,7 @@ public:
 	bool Copy(const CTreeItemModel* object);
 	imtbase::CTreeItemModel* CopyMe() const;
 	bool IsEqualWithModel(CTreeItemModel* modelPtr) const;
+	bool IsEqualWithModel(const CTreeItemModel* modelPtr) const;
 	void InsertNewItemWithParameters(int index, const QVariantMap& map);
 	int InsertNewItem();
 	int InsertNewItem(int index);
