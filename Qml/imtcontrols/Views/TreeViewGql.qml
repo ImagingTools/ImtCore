@@ -144,14 +144,14 @@ Rectangle{
                             if(model.HasChildren__){
                                 if(!deleg.isOpen){
                                     if(!model.HasBranch__){
-                                        treeViewGql.model.SetData("HasBranch__", true, model.index);
+                                        treeViewGql.model.setData("HasBranch__", true, model.index);
                                         treeViewGql.requestSignal(model.index)
                                     }
                                     else {
                                         treeViewGql.setVisibleElements(true, model.index)
                                     }
-                                    treeViewGql.model.SetData("IsOpen__", true, model.index);
-                                    treeViewGql.model.SetData("OpenState__", 1, model.index);
+                                    treeViewGql.model.setData("IsOpen__", true, model.index);
+                                    treeViewGql.model.setData("OpenState__", 1, model.index);
 
                                     treeViewGql.openBranch(model.index)
                                     treeViewGql.openButtonClicked(model.index);
@@ -159,8 +159,8 @@ Rectangle{
                                 else if(deleg.isOpen){
                                     //console.log(model.ChildrenCount__, treeViewGql._maxCountToClose)
                                     if(model.ChildrenCount__ <= treeViewGql._maxCountToClose){
-                                        treeViewGql.model.SetData("IsOpen__", false, model.index);
-                                        treeViewGql.model.SetData("OpenState__", 0, model.index);
+                                        treeViewGql.model.setData("IsOpen__", false, model.index);
+                                        treeViewGql.model.setData("OpenState__", 0, model.index);
                                         treeViewGql.setVisibleElements(false, model.index)
                                         treeViewGql.closeBranch(model.index)
                                     }
@@ -282,11 +282,11 @@ Rectangle{
 
     function insertTree(index, model_){
 
-        if(!model_ || !model_.GetItemsCount()){
+        if(!model_ || !model_.getItemsCount()){
             return;
         }
 
-        let level_ = treeViewGql.model.IsValidData("Level__", index) ? treeViewGql.model.GetData("Level__", index) : -1;
+        let level_ = treeViewGql.model.isValidData("Level__", index) ? treeViewGql.model.getData("Level__", index) : -1;
         //console.log("INSERT TREE", index, level_);
 
         if((level_ + 1) > list.maxLevel){
@@ -296,23 +296,23 @@ Rectangle{
         let date = new Date();
         let val = date.valueOf();
 
-        let branchIds_parent = treeViewGql.model.IsValidData("BranchIds__", index) ? treeViewGql.model.GetData("BranchIds__", index) : "";
-        let innerId_parent = treeViewGql.model.IsValidData("InnerId__", index) ? treeViewGql.model.GetData("InnerId__", index) : "";
+        let branchIds_parent = treeViewGql.model.isValidData("BranchIds__", index) ? treeViewGql.model.getData("BranchIds__", index) : "";
+        let innerId_parent = treeViewGql.model.isValidData("InnerId__", index) ? treeViewGql.model.getData("InnerId__", index) : "";
         let branchIds = branchIds_parent !== "" ? branchIds_parent + "," + innerId_parent: innerId_parent;
 
         let counter = 0;
-        for(let i = 0; i < model_.GetItemsCount(); i++){
+        for(let i = 0; i < model_.getItemsCount(); i++){
             let newIndex =  index + i + 1;
-            treeViewGql.model.InsertNewItem(newIndex);
-            treeViewGql.model.CopyItemDataFromModel(newIndex, model_, i);
-            treeViewGql.model.SetData("Level__", level_ + 1, newIndex);
-            treeViewGql.model.SetData("BranchIds__", branchIds, newIndex);
-            treeViewGql.model.SetData("Visible__", true, newIndex);
-            treeViewGql.model.SetData("IsOpen__", false, newIndex);
-            treeViewGql.model.SetData("OpenState__", -1, newIndex);
-            treeViewGql.model.SetData("HasBranch__", false, newIndex);
-            treeViewGql.model.SetData("InnerId__", String(val + newIndex), newIndex);
-            treeViewGql.model.SetData("ChildrenCount__", -1, newIndex);
+            treeViewGql.model.insertNewItem(newIndex);
+            treeViewGql.model.copyItemDataFromModel(newIndex, model_, i);
+            treeViewGql.model.setData("Level__", level_ + 1, newIndex);
+            treeViewGql.model.setData("BranchIds__", branchIds, newIndex);
+            treeViewGql.model.setData("Visible__", true, newIndex);
+            treeViewGql.model.setData("IsOpen__", false, newIndex);
+            treeViewGql.model.setData("OpenState__", -1, newIndex);
+            treeViewGql.model.setData("HasBranch__", false, newIndex);
+            treeViewGql.model.setData("InnerId__", String(val + newIndex), newIndex);
+            treeViewGql.model.setData("ChildrenCount__", -1, newIndex);
 
             if(i == 0 && level_ == -1){
                 listFrame.contentHeight = treeViewGql.delegateHeight;
@@ -322,9 +322,9 @@ Rectangle{
             }
             counter++;
         }
-        //console.log("ChildrenCount__", model_.GetItemsCount())
+        //console.log("ChildrenCount__", model_.getItemsCount())
         if(index >= 0){
-            treeViewGql.model.SetData("ChildrenCount__", model_.GetItemsCount(), index);
+            treeViewGql.model.setData("ChildrenCount__", model_.getItemsCount(), index);
         }
 
         if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
@@ -338,16 +338,16 @@ Rectangle{
     function deleteBranch(index){
         //console.log("DELETE BRANCH", index);
         if (index < 0){
-            treeViewGql.model.Clear()
+            treeViewGql.model.clear()
 
             return
         }
 
-        let innerId = treeViewGql.model.GetData("InnerId__", index);
+        let innerId = treeViewGql.model.getData("InnerId__", index);
         let found = false;
         let foundChangeCount = 0;
-        for(let i = index + 1; i < treeViewGql.model.GetItemsCount(); i++){
-            let branchIds = treeViewGql.model.IsValidData("BranchIds__", i) ? treeViewGql.model.GetData("BranchIds__", i) : "";
+        for(let i = index + 1; i < treeViewGql.model.getItemsCount(); i++){
+            let branchIds = treeViewGql.model.isValidData("BranchIds__", i) ? treeViewGql.model.getData("BranchIds__", i) : "";
             //console.log("branchIds:: ", branchIds)
             let ok = false;
             let arr = branchIds.split(",");
@@ -373,7 +373,7 @@ Rectangle{
             }
             //
             if(ok){
-                treeViewGql.model.RemoveItem(i);
+                treeViewGql.model.removeItem(i);
                 treeViewGql._deleteCounter++;
                 listFrame.contentHeight -= treeViewGql.delegateHeight;
                 treeViewGql.deleteBranch(index);
@@ -385,32 +385,32 @@ Rectangle{
 
         treeViewGql._deleteCounter = 0;
 
-        treeViewGql.model.SetData("IsOpen__", false, index);
-        treeViewGql.model.SetData("OpenState__", -1, index);
-        treeViewGql.model.SetData("HasBranch__", false, index);
+        treeViewGql.model.setData("IsOpen__", false, index);
+        treeViewGql.model.setData("OpenState__", -1, index);
+        treeViewGql.model.setData("HasBranch__", false, index);
 
         treeViewGql.setContentWidth();
     }
 
     function setVisibleElements(visible, index){
         //console.log("SET VISIBLE", visible, index);
-        let innerId = treeViewGql.model.GetData("InnerId__", index);
+        let innerId = treeViewGql.model.getData("InnerId__", index);
         let found = false;
         let foundChangeCount = 0;
 
         //for closed
         let currClosedLevel = -1;
 
-        for(let i = index + 1; i < treeViewGql.model.GetItemsCount(); i++){
-            let branchIds = treeViewGql.model.IsValidData("BranchIds__", i) ? treeViewGql.model.GetData("BranchIds__", i) : "";
+        for(let i = index + 1; i < treeViewGql.model.getItemsCount(); i++){
+            let branchIds = treeViewGql.model.isValidData("BranchIds__", i) ? treeViewGql.model.getData("BranchIds__", i) : "";
             //console.log("branchIds:: ", branchIds)
             let ok = false;
             let arr = branchIds.split(",");
             let arrCounter = 0;
 
             //*****************for closed*************//
-            let openST = treeViewGql.model.GetData("OpenState__", i);
-            let level_curr = treeViewGql.model.GetData("Level__", i);
+            let openST = treeViewGql.model.getData("OpenState__", i);
+            let level_curr = treeViewGql.model.getData("Level__", i);
 
             if(level_curr <= currClosedLevel){
                 currClosedLevel = -1;
@@ -453,7 +453,7 @@ Rectangle{
 
             //
             if(ok){
-                treeViewGql.model.SetData("Visible__", visible && ok_visible, i);
+                treeViewGql.model.setData("Visible__", visible && ok_visible, i);
                 let coeff = visible ? 1 : -1;
                 listFrame.contentHeight += coeff * treeViewGql.delegateHeight;
             }
@@ -466,9 +466,9 @@ Rectangle{
     function setContentWidth(){
         let maxWidth = 0;
         let maxLevel_= 0;
-        for(let i = 0; i < treeViewGql.model.GetItemsCount(); i++){
-            let visible = treeViewGql.model.GetData("Visible__",i);
-            let level = !visible ? 0 : treeViewGql.model.GetData("Level__",i);
+        for(let i = 0; i < treeViewGql.model.getItemsCount(); i++){
+            let visible = treeViewGql.model.getData("Visible__",i);
+            let level = !visible ? 0 : treeViewGql.model.getData("Level__",i);
             let width_ = !visible ? 0 : level * treeViewGql.shift + list.delegateWidth;
             if(level > maxLevel_){
                 maxLevel_ = level;
@@ -492,18 +492,18 @@ Rectangle{
             return;
         }
         let isForcedOpen = false;
-        if(treeViewGql.model.GetData("HasChildren__", index)){
-            if(treeViewGql.model.GetData("OpenState__", index) !== 1){
-                if(!treeViewGql.model.GetData("HasBranch__", index)){
-                    treeViewGql.model.SetData("HasBranch__", true, index);
+        if(treeViewGql.model.getData("HasChildren__", index)){
+            if(treeViewGql.model.getData("OpenState__", index) !== 1){
+                if(!treeViewGql.model.getData("HasBranch__", index)){
+                    treeViewGql.model.setData("HasBranch__", true, index);
                     treeViewGql.requestSignal(index)
                 }
                 else {
                     treeViewGql.setVisibleElements(true, index)
                     isForcedOpen = true;
                 }
-                treeViewGql.model.SetData("IsOpen__", true, index);
-                treeViewGql.model.SetData("OpenState__", 1, index);
+                treeViewGql.model.setData("IsOpen__", true, index);
+                treeViewGql.model.setData("OpenState__", 1, index);
 
                 treeViewGql.openBranch(index);
             }
@@ -521,7 +521,7 @@ Rectangle{
     }
 
     function moveToElement(index){
-        if(index < 0 || index >= treeViewGql.model.GetItemsCount()){
+        if(index < 0 || index >= treeViewGql.model.getItemsCount()){
             return;
         }
         let maxContentY = list.contentHeight - list.height + list.originY;
@@ -530,7 +530,7 @@ Rectangle{
         }
         let contentY__ = list.originY;
         for(let i = 0; i < index; i++){
-            let isVisible = treeViewGql.model.GetData("Visible__", i);
+            let isVisible = treeViewGql.model.getData("Visible__", i);
             contentY__ += isVisible * treeViewGql.delegateHeight;
         }
         list.contentY = Math.min(contentY__, maxContentY);
@@ -555,7 +555,7 @@ Rectangle{
     }
 
     function getData(key,index){
-        return treeViewGql.model.GetData(key, index);
+        return treeViewGql.model.getData(key, index);
     }
 
     function getSelectedIndex(){
@@ -564,17 +564,17 @@ Rectangle{
 
 
     function checkIsOpen(index){
-        return model.GetData("IsOpen__", index);
+        return model.getData("IsOpen__", index);
     }
 
     function checkHasChildren(index){
-        return model.GetData("HasChildren__", index);
+        return model.getData("HasChildren__", index);
     }
 
 
     function findParentIndex(index){
         let foundIndex = -1;
-        let branchIds = treeViewGql.model.IsValidData("BranchIds__", index) ? treeViewGql.model.GetData("BranchIds__", index) : "";
+        let branchIds = treeViewGql.model.isValidData("BranchIds__", index) ? treeViewGql.model.getData("BranchIds__", index) : "";
         if(branchIds == ""){
             //console.log("FOUND_INDEX_ RETURN ", foundIndex);
             return -1;
@@ -582,7 +582,7 @@ Rectangle{
         let arr = branchIds.split(",");
         let parentId = arr[arr.length - 1];
         for(let i = index - 1; i >=0; i--){
-            let innerId = treeViewGql.model.GetData("InnerId__", i);
+            let innerId = treeViewGql.model.getData("InnerId__", i);
             if(innerId == parentId){
                 foundIndex =  i;
                 break;
@@ -597,8 +597,8 @@ Rectangle{
             nameId = "Id";
         }
         let foundIndex = -1;
-        for(let i = 0; i < treeViewGql.model.GetItemsCount(); i++){
-            let id_curr = treeViewGql.model.IsValidData(nameId, i) ? treeViewGql.model.GetData(nameId, i) : "";
+        for(let i = 0; i < treeViewGql.model.getItemsCount(); i++){
+            let id_curr = treeViewGql.model.isValidData(nameId, i) ? treeViewGql.model.getData(nameId, i) : "";
             if(id_curr == id){
                 foundIndex = i;
                 break;

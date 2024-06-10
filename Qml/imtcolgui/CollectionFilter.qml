@@ -9,24 +9,24 @@ QtObject {
     signal filterChanged();
 
     function getTextFilter(){
-        if (filterModel.ContainsKey("TextFilter")){
-            return filterModel.GetData("TextFilter");
+        if (filterModel.containsKey("TextFilter")){
+            return filterModel.getData("TextFilter");
         }
 
         return "";
     }
 
     function setTextFilter(filter){
-        filterModel.SetData("TextFilter", filter);
+        filterModel.setData("TextFilter", filter);
 
         root.filterChanged();
     }
 
     function getSortingOrder(){
-        if (filterModel.ContainsKey("Sort")){
-            let sortModel = filterModel.GetData("Sort");
-            if (sortModel.ContainsKey("SortOrder")){
-                return sortModel.GetData("SortOrder")
+        if (filterModel.containsKey("Sort")){
+            let sortModel = filterModel.getData("Sort");
+            if (sortModel.containsKey("SortOrder")){
+                return sortModel.getData("SortOrder")
             }
         }
 
@@ -34,21 +34,21 @@ QtObject {
     }
 
     function setSortingOrder(sortingOrder){
-        let sortModel = filterModel.GetData("Sort");
+        let sortModel = filterModel.getData("Sort");
         if (!sortModel){
-            sortModel = filterModel.AddTreeModel("Sort");
+            sortModel = filterModel.addTreeModel("Sort");
         }
 
-        sortModel.SetData("SortOrder", sortingOrder);
+        sortModel.setData("SortOrder", sortingOrder);
 
         root.filterChanged();
     }
 
     function getSortingInfoId(){
-        if (filterModel.ContainsKey("Sort")){
-            let sortModel = filterModel.GetData("Sort");
-            if (sortModel.ContainsKey("HeaderId")){
-                return sortModel.GetData("HeaderId")
+        if (filterModel.containsKey("Sort")){
+            let sortModel = filterModel.getData("Sort");
+            if (sortModel.containsKey("HeaderId")){
+                return sortModel.getData("HeaderId")
             }
         }
 
@@ -56,26 +56,26 @@ QtObject {
     }
 
     function setSortingInfoId(sortingInfoId){
-        let sortModel = filterModel.GetData("Sort");
+        let sortModel = filterModel.getData("Sort");
         if (!sortModel){
-            sortModel = filterModel.AddTreeModel("Sort");
+            sortModel = filterModel.addTreeModel("Sort");
         }
 
-        sortModel.SetData("HeaderId", sortingInfoId);
+        sortModel.setData("HeaderId", sortingInfoId);
 
         root.filterChanged();
     }
 
     function getFilteringInfoIds(){
-        if (filterModel.ContainsKey("FilterIds")){
-            return filterModel.GetData("FilterIds");
+        if (filterModel.containsKey("FilterIds")){
+            return filterModel.getData("FilterIds");
         }
 
         return "";
     }
 
     function setFilteringInfoIds(filteringInfoIds){
-        filterModel.SetExternTreeModel("FilterIds", filteringInfoIds)
+        filterModel.setExternTreeModel("FilterIds", filteringInfoIds)
 
         root.filterChanged();
     }

@@ -31,17 +31,17 @@ QtObject {
             return;
         }
 
-        for (let i = 0; i < localModel.GetItemsCount(); i++){
-            let pageModel = localModel.GetModelFromItem(i);
+        for (let i = 0; i < localModel.getItemsCount(); i++){
+            let pageModel = localModel.getModelFromItem(i);
             if (pageModel){
-                let pageId = pageModel.GetData("Id");
+                let pageId = pageModel.getData("Id");
                 if (pageId == "General"){
-                    let elements = pageModel.GetData("Parameters");
+                    let elements = pageModel.getData("Parameters");
 
-                    for (let j = 0; j < elements.GetItemsCount(); j++){
-                        let elementId = elements.GetData("Id", j);
+                    for (let j = 0; j < elements.getItemsCount(); j++){
+                        let elementId = elements.getData("Id", j);
                         if (elementId == "DesignSchema"){
-                            schemesModel.Copy(elements.GetData("Parameters", j))
+                            schemesModel.copy(elements.getData("Parameters", j))
                             break;
                         }
                     }
@@ -84,21 +84,21 @@ QtObject {
             return null;
         }
 
-        for (let i = 0; i < localModel.GetItemsCount(); i++){
-            let pageModel = localModel.GetModelFromItem(i);
+        for (let i = 0; i < localModel.getItemsCount(); i++){
+            let pageModel = localModel.getModelFromItem(i);
 
             if (pageModel){
-                let pageId = pageModel.GetData("Id");
+                let pageId = pageModel.getData("Id");
                 if (pageId == "General"){
-                    let elements = pageModel.GetData("Parameters");
+                    let elements = pageModel.getData("Parameters");
 
-                    for (let j = 0; j < elements.GetItemsCount(); j++){
-                        let elementId = elements.GetData("Id", j);
+                    for (let j = 0; j < elements.getItemsCount(); j++){
+                        let elementId = elements.getData("Id", j);
                         if (elementId == "DesignSchema"){
-                            let elementValue = elements.GetData("Value", j);
-                            let parameters = elements.GetData("Parameters", j);
+                            let elementValue = elements.getData("Value", j);
+                            let parameters = elements.getData("Parameters", j);
 
-                            let scheme = parameters.GetData("Id", elementValue);
+                            let scheme = parameters.getData("Id", elementValue);
 
                             return scheme;
                         }
@@ -111,12 +111,12 @@ QtObject {
     }
 
     function getSchemaByIndex(index){
-        if (settingsProvider == null || index < 0 || index >= container.schemesModel.GetItemsCount()){
+        if (settingsProvider == null || index < 0 || index >= container.schemesModel.getItemsCount()){
             return "";
         }
 
-        if (container.schemesModel.ContainsKey("Id", index)){
-            let schema = container.schemesModel.GetData("Id", index);
+        if (container.schemesModel.containsKey("Id", index)){
+            let schema = container.schemesModel.getData("Id", index);
             return schema;
         }
 
@@ -138,20 +138,20 @@ QtObject {
             return -1;
         }
 
-        for (let i = 0; i < localModel.GetItemsCount(); i++){
-            let pageModel = localModel.GetModelFromItem(i);
+        for (let i = 0; i < localModel.getItemsCount(); i++){
+            let pageModel = localModel.getModelFromItem(i);
             if (pageModel){
-                let pageId = pageModel.GetData("Id");
+                let pageId = pageModel.getData("Id");
                 if (pageId == "General"){
-                    let elements = pageModel.GetData("Parameters");
+                    let elements = pageModel.getData("Parameters");
 
-                    for (let j = 0; j < elements.GetItemsCount(); j++){
-                        let elementId = elements.GetData("Id", j);
+                    for (let j = 0; j < elements.getItemsCount(); j++){
+                        let elementId = elements.getData("Id", j);
                         if (elementId == "DesignSchema"){
-                            let parameters = elements.GetData("Parameters", j);
+                            let parameters = elements.getData("Parameters", j);
 
-                            for (let k = 0; k < parameters.GetItemsCount(); k++){
-                                let id = parameters.GetData("Id", k);
+                            for (let k = 0; k < parameters.getItemsCount(); k++){
+                                let id = parameters.getData("Id", k);
                                 if (String(id) == String(designId)){
                                     return k;
                                 }

@@ -29,9 +29,9 @@ ViewBase {
     }
 
     function updateGroupsModel(){
-        copiedGroupsModel.Copy(groupsModel);
+        copiedGroupsModel.copy(groupsModel);
 
-        let objectId = userGroupEditorContainer.model.GetData("Id");
+        let objectId = userGroupEditorContainer.model.getData("Id");
         let removedIndexes = []
 
         let childrenIds = []
@@ -39,16 +39,16 @@ ViewBase {
 
         // Get all parent ID-s
         let parentIds = []
-        if (userGroupEditorContainer.model.ContainsKey("ParentGroups")){
-            let parentGroups = userGroupEditorContainer.model.GetData("ParentGroups")
+        if (userGroupEditorContainer.model.containsKey("ParentGroups")){
+            let parentGroups = userGroupEditorContainer.model.getData("ParentGroups")
             let parentGroupIds = parentGroups.split(';')
             for (let j = 0; j < parentGroupIds.length; j++){
                 userGroupEditorContainer.getAllParentGroupIds(parentGroupIds[j], parentIds);
             }
         }
 
-        for (let i = 0; i < userGroupEditorContainer.copiedGroupsModel.GetItemsCount(); i++){
-            let id = userGroupEditorContainer.copiedGroupsModel.GetData("Id", i);
+        for (let i = 0; i < userGroupEditorContainer.copiedGroupsModel.getItemsCount(); i++){
+            let id = userGroupEditorContainer.copiedGroupsModel.getData("Id", i);
             if (id === objectId || childrenIds.includes(id)){
                 removedIndexes.push(i);
             }
@@ -56,7 +56,7 @@ ViewBase {
 
         let removedCount = 0
         for (let i = 0; i < removedIndexes.length; i++){
-            userGroupEditorContainer.copiedGroupsModel.RemoveItem(removedIndexes[i] - removedCount);
+            userGroupEditorContainer.copiedGroupsModel.removeItem(removedIndexes[i] - removedCount);
             removedCount++;
         }
 
@@ -65,9 +65,9 @@ ViewBase {
     }
 
     function getAllChildrenGroups(groupId, retVal){
-        for (let i = 0; i < userGroupEditorContainer.copiedGroupsModel.GetItemsCount(); i++){
-            let id = userGroupEditorContainer.copiedGroupsModel.GetData("Id", i);
-            let parentGroups = userGroupEditorContainer.copiedGroupsModel.GetData("ParentGroups", i);
+        for (let i = 0; i < userGroupEditorContainer.copiedGroupsModel.getItemsCount(); i++){
+            let id = userGroupEditorContainer.copiedGroupsModel.getData("Id", i);
+            let parentGroups = userGroupEditorContainer.copiedGroupsModel.getData("ParentGroups", i);
             if (parentGroups !== ""){
                 let parentGroupIds = parentGroups.split(';')
                 if (parentGroupIds.includes(groupId)){
@@ -80,10 +80,10 @@ ViewBase {
     }
 
     function getAllParentGroupIds(groupId, retVal){
-        for (let i = 0; i < userGroupEditorContainer.copiedGroupsModel.GetItemsCount(); i++){
-            let id = userGroupEditorContainer.copiedGroupsModel.GetData("Id", i);
+        for (let i = 0; i < userGroupEditorContainer.copiedGroupsModel.getItemsCount(); i++){
+            let id = userGroupEditorContainer.copiedGroupsModel.getData("Id", i);
             if (id === groupId){
-                let parentGroups = userGroupEditorContainer.copiedGroupsModel.GetData("ParentGroups", i);
+                let parentGroups = userGroupEditorContainer.copiedGroupsModel.getData("ParentGroups", i);
                 if (parentGroups !== ""){
                     let parentGroupsIds = parentGroups.split(';');
                     for (let j = 0; j < parentGroupsIds.length; j++){
@@ -98,23 +98,23 @@ ViewBase {
     function updateGui(){
         console.log("GroupEditor updateGui");
 
-        if (userGroupEditorContainer.model.ContainsKey("Name")){
-            nameInput.text = userGroupEditorContainer.model.GetData("Name");
+        if (userGroupEditorContainer.model.containsKey("Name")){
+            nameInput.text = userGroupEditorContainer.model.getData("Name");
         }
         else{
             nameInput.text = "";
         }
 
-        if (userGroupEditorContainer.model.ContainsKey("Description")){
-            descriptionInput.text = userGroupEditorContainer.model.GetData("Description");
+        if (userGroupEditorContainer.model.containsKey("Description")){
+            descriptionInput.text = userGroupEditorContainer.model.getData("Description");
         }
         else{
             descriptionInput.text = "";
         }
 
         let parentGroupIds = []
-        if (userGroupEditorContainer.model.ContainsKey("ParentGroups")){
-            let parentGroups = userGroupEditorContainer.model.GetData("ParentGroups");
+        if (userGroupEditorContainer.model.containsKey("ParentGroups")){
+            let parentGroups = userGroupEditorContainer.model.getData("ParentGroups");
             if (parentGroups !== ""){
                 parentGroupIds = parentGroups.split(';')
             }
@@ -126,8 +126,8 @@ ViewBase {
 
         parentGroupsTable.uncheckAll();
         if (parentGroupsTable.elements){
-            for (let i = 0; i < parentGroupsTable.elements.GetItemsCount(); i++){
-                let id = parentGroupsTable.elements.GetData("Id", i);
+            for (let i = 0; i < parentGroupsTable.elements.getItemsCount(); i++){
+                let id = parentGroupsTable.elements.getData("Id", i);
                 if (parentGroupIds.includes(id)){
                     parentGroupsTable.checkItem(i);
                 }
@@ -136,19 +136,19 @@ ViewBase {
     }
 
     function updateModel(){
-        userGroupEditorContainer.model.SetData("Description", descriptionInput.text);
-        userGroupEditorContainer.model.SetData("Name", nameInput.text);
+        userGroupEditorContainer.model.setData("Description", descriptionInput.text);
+        userGroupEditorContainer.model.setData("Name", nameInput.text);
 
         let selectedGroupIds = []
         let indexes = parentGroupsTable.getCheckedItems();
         for (let index of indexes){
-            let id = parentGroupsTable.elements.GetData("Id", index);
+            let id = parentGroupsTable.elements.getData("Id", index);
             selectedGroupIds.push(id);
         }
 
         selectedGroupIds.sort();
 
-        userGroupEditorContainer.model.SetData("ParentGroups", selectedGroupIds.join(';'));
+        userGroupEditorContainer.model.setData("ParentGroups", selectedGroupIds.join(';'));
 
         if (!parentGroupsTable.elements){
             updateGroupsModel();
@@ -284,14 +284,14 @@ ViewBase {
         id: groupsHeadersModel;
 
         function updateHeaders(){
-            groupsHeadersModel.Clear();
+            groupsHeadersModel.clear();
 
-            let index = groupsHeadersModel.InsertNewItem();
+            let index = groupsHeadersModel.insertNewItem();
 
-            groupsHeadersModel.SetData("Id", "Name");
-            groupsHeadersModel.SetData("Name", qsTr("Group Name"));
+            groupsHeadersModel.setData("Id", "Name");
+            groupsHeadersModel.setData("Name", qsTr("Group Name"));
 
-            groupsHeadersModel.Refresh();
+            groupsHeadersModel.refresh();
 
             parentGroupsTable.headers = groupsHeadersModel;
         }

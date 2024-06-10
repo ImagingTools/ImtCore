@@ -38,7 +38,7 @@ TableCellDelegateBase {
                     tooltip.show(width/2, mouseY);
                 }
                 else{
-                    closeTooltip();
+                    tooltip.closeTooltip();
                 }
             }
         }

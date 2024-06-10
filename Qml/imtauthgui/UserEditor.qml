@@ -10,29 +10,29 @@ ViewBase {
     property int panelWidth: 400;
 
     function updateGui(){
-        if (userEditorContainer.model.ContainsKey("Username")){
-            usernameInput.text = userEditorContainer.model.GetData("Username");
+        if (userEditorContainer.model.containsKey("Username")){
+            usernameInput.text = userEditorContainer.model.getData("Username");
         }
         else{
             usernameInput.text = "";
         }
 
-        if (userEditorContainer.model.ContainsKey("Name")){
-            nameInput.text = userEditorContainer.model.GetData("Name");
+        if (userEditorContainer.model.containsKey("Name")){
+            nameInput.text = userEditorContainer.model.getData("Name");
         }
         else{
             nameInput.text = "";
         }
 
-        if (userEditorContainer.model.ContainsKey("Email")){
-            mailInput.text = userEditorContainer.model.GetData("Email");
+        if (userEditorContainer.model.containsKey("Email")){
+            mailInput.text = userEditorContainer.model.getData("Email");
         }
         else{
             mailInput.text = "";
         }
 
-        if (userEditorContainer.model.ContainsKey("Password")){
-            passwordInput.text = userEditorContainer.model.GetData("Password");
+        if (userEditorContainer.model.containsKey("Password")){
+            passwordInput.text = userEditorContainer.model.getData("Password");
         }
         else{
             passwordInput.text = "";
@@ -40,10 +40,10 @@ ViewBase {
     }
 
     function updateModel(){
-        userEditorContainer.model.SetData("Username", usernameInput.text);
-        userEditorContainer.model.SetData("Name", nameInput.text);
-        userEditorContainer.model.SetData("Email", mailInput.text);
-        userEditorContainer.model.SetData("Password", passwordInput.text);
+        userEditorContainer.model.setData("Username", usernameInput.text);
+        userEditorContainer.model.setData("Name", nameInput.text);
+        userEditorContainer.model.setData("Email", mailInput.text);
+        userEditorContainer.model.setData("Password", passwordInput.text);
     }
 
     Rectangle {
@@ -99,7 +99,7 @@ ViewBase {
                     readOnly: userEditorContainer.readOnly;
 
                     onEditingFinished: {
-                        let oldText = userEditorContainer.model.GetData("Username");
+                        let oldText = userEditorContainer.model.getData("Username");
                         if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
 
                             userEditorContainer.doUpdateModel();
@@ -134,7 +134,7 @@ ViewBase {
                     readOnly: userEditorContainer.readOnly;
 
                     onEditingFinished: {
-                        let oldText = userEditorContainer.model.GetData("Password");
+                        let oldText = userEditorContainer.model.getData("Password");
                         if (oldText && oldText !== passwordInput.text || !oldText && passwordInput.text !== ""){
                             userEditorContainer.doUpdateModel();
                         }
@@ -165,7 +165,7 @@ ViewBase {
                     readOnly: userEditorContainer.readOnly;
 
                     onEditingFinished: {
-                        let oldText = userEditorContainer.model.GetData("Name");
+                        let oldText = userEditorContainer.model.getData("Name");
                         if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
                             userEditorContainer.doUpdateModel();
                         }

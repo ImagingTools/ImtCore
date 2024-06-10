@@ -32,8 +32,8 @@ ViewBase {
 
     function updateGui(){
         let selectedPermissionsIds = [];
-        if (rolePermissionsContainer.model.ContainsKey("Permissions")){
-            let selectedPermissions = rolePermissionsContainer.model.GetData("Permissions");
+        if (rolePermissionsContainer.model.containsKey("Permissions")){
+            let selectedPermissions = rolePermissionsContainer.model.getData("Permissions");
             if (selectedPermissions !== ""){
                 selectedPermissionsIds = selectedPermissions.split(';');
             }
@@ -74,8 +74,8 @@ ViewBase {
 
         selectedPermissionIds.sort();
 
-        let permissions = rolePermissionsContainer.model.GetData("Permissions");
-        rolePermissionsContainer.model.SetData("Permissions", selectedPermissionIds.join(';'));
+        let permissions = rolePermissionsContainer.model.getData("Permissions");
+        rolePermissionsContainer.model.setData("Permissions", selectedPermissionIds.join(';'));
     }
 
     TreeViewElementView {
@@ -119,13 +119,13 @@ ViewBase {
             id: permissionHeaders;
 
             function updateHeaders(){
-                permissionHeaders.Clear();
+                permissionHeaders.clear();
 
-                let index = permissionHeaders.InsertNewItem();
-                permissionHeaders.SetData("Id", "FeatureName", index)
-                permissionHeaders.SetData("Name", qsTr("Permission"), index)
+                let index = permissionHeaders.insertNewItem();
+                permissionHeaders.setData("Id", "FeatureName", index)
+                permissionHeaders.setData("Name", qsTr("Permission"), index)
 
-                permissionHeaders.Refresh();
+                permissionHeaders.refresh();
 
                 permissionsGroup.treeView.columnModel = permissionHeaders;
             }

@@ -34,7 +34,7 @@ Table{
     signal inserted(int index);
 
     onWidthChanged: {
-        if(tableTreeView.model.GetItemsCount()){
+        if(tableTreeView.model.getItemsCount()){
             setContentWidth();
         }
         tableTreeView.contentX = tableTreeView.originX;
@@ -119,7 +119,7 @@ Table{
             id : topElement;
 
             height: parent.height;
-            width: tableTreeView.widthDecoratorDynamic.GetData("Width",0);
+            width: tableTreeView.widthDecoratorDynamic.getData("Width",0);
 
             color: "transparent";
 
@@ -128,8 +128,8 @@ Table{
             }
 
             function widthRecalc(){
-                if(tableTreeView && tableTreeView.widthDecoratorDynamic && tableTreeView.widthDecoratorDynamic.GetItemsCount())
-                    width = tableTreeView.widthDecoratorDynamic.IsValidData("Width",0) ? tableTreeView.widthDecoratorDynamic.GetData("Width",0) : 0;
+                if(tableTreeView && tableTreeView.widthDecoratorDynamic && tableTreeView.widthDecoratorDynamic.getItemsCount())
+                    width = tableTreeView.widthDecoratorDynamic.isValidData("Width",0) ? tableTreeView.widthDecoratorDynamic.getData("Width",0) : 0;
             }
 
             Rectangle{
@@ -166,22 +166,22 @@ Table{
                         if(model.HasChildren__){
                             if(!deleg.isOpen){
                                 if(!model.HasBranch__){
-                                    tableTreeView.model.SetData("HasBranch__", true, model.index);
+                                    tableTreeView.model.setData("HasBranch__", true, model.index);
                                     tableTreeView.requestSignal(model.index, model.Level__)
                                 }
                                 else {
                                     tableTreeView.setVisibleElements(true, model.index)
                                 }
-                                tableTreeView.model.SetData("IsOpen__", true, model.index);
-                                tableTreeView.model.SetData("OpenState__", 1, model.index);
+                                tableTreeView.model.setData("IsOpen__", true, model.index);
+                                tableTreeView.model.setData("OpenState__", 1, model.index);
 
                                 tableTreeView.openBranch(model.index)
                                 tableTreeView.openButtonClicked(model.index);
                             }
                             else if(deleg.isOpen){
                                 if(model.ChildrenCount__ <= tableTreeView._maxCountToClose){
-                                    tableTreeView.model.SetData("IsOpen__", false, model.index);
-                                    tableTreeView.model.SetData("OpenState__", 0, model.index);
+                                    tableTreeView.model.setData("IsOpen__", false, model.index);
+                                    tableTreeView.model.setData("OpenState__", 0, model.index);
                                     tableTreeView.setVisibleElements(false, model.index)
                                     tableTreeView.closeBranch(model.index);
                                 }
@@ -243,11 +243,11 @@ Table{
 
     function insertTree(index, model_){
 
-        if(!model_ || !model_.GetItemsCount()){
+        if(!model_ || !model_.getItemsCount()){
             return;
         }
 
-        let level_ = tableTreeView.model.IsValidData("Level__", index) ? tableTreeView.model.GetData("Level__", index) : -1;
+        let level_ = tableTreeView.model.isValidData("Level__", index) ? tableTreeView.model.getData("Level__", index) : -1;
         //console.log("INSERT TREE", index, level_);
 
         if((level_ + 1) > tableTreeView.maxLevel){
@@ -257,23 +257,23 @@ Table{
         let date = new Date();
         let val = date.valueOf();
 
-        let branchIds_parent = tableTreeView.model.IsValidData("BranchIds__", index) ? tableTreeView.model.GetData("BranchIds__", index) : "";
-        let innerId_parent = tableTreeView.model.IsValidData("InnerId__", index) ? tableTreeView.model.GetData("InnerId__", index) : "";
+        let branchIds_parent = tableTreeView.model.isValidData("BranchIds__", index) ? tableTreeView.model.getData("BranchIds__", index) : "";
+        let innerId_parent = tableTreeView.model.isValidData("InnerId__", index) ? tableTreeView.model.getData("InnerId__", index) : "";
         let branchIds = branchIds_parent !== "" ? branchIds_parent + "," + innerId_parent: innerId_parent;
 
         let counter = 0;
-        for(let i = 0; i < model_.GetItemsCount(); i++){
+        for(let i = 0; i < model_.getItemsCount(); i++){
             let newIndex =  index + i + 1;
-            tableTreeView.model.InsertNewItem(newIndex);
-            tableTreeView.model.CopyItemDataFromModel(newIndex, model_, i);
-            tableTreeView.model.SetData("Level__", level_ + 1, newIndex);
-            tableTreeView.model.SetData("BranchIds__", branchIds, newIndex);
-            tableTreeView.model.SetData("Visible__", true, newIndex);
-            tableTreeView.model.SetData("IsOpen__", false, newIndex);
-            tableTreeView.model.SetData("OpenState__", -1, newIndex);
-            tableTreeView.model.SetData("HasBranch__", false, newIndex);
-            tableTreeView.model.SetData("InnerId__", String(val + newIndex), newIndex);
-            tableTreeView.model.SetData("ChildrenCount__", -1, newIndex);
+            tableTreeView.model.insertNewItem(newIndex);
+            tableTreeView.model.copyItemDataFromModel(newIndex, model_, i);
+            tableTreeView.model.setData("Level__", level_ + 1, newIndex);
+            tableTreeView.model.setData("BranchIds__", branchIds, newIndex);
+            tableTreeView.model.setData("Visible__", true, newIndex);
+            tableTreeView.model.setData("IsOpen__", false, newIndex);
+            tableTreeView.model.setData("OpenState__", -1, newIndex);
+            tableTreeView.model.setData("HasBranch__", false, newIndex);
+            tableTreeView.model.setData("InnerId__", String(val + newIndex), newIndex);
+            tableTreeView.model.setData("ChildrenCount__", -1, newIndex);
 
             if(i == 0 && level_ == -1){
                 tableTreeView.setContentHeight(tableTreeView.delegateHeight);
@@ -287,7 +287,7 @@ Table{
         }
 
         if(index >= 0){
-            tableTreeView.model.SetData("ChildrenCount__", model_.GetItemsCount(), index);
+            tableTreeView.model.setData("ChildrenCount__", model_.getItemsCount(), index);
         }
 
         if(tableTreeView.selectedIndex >=0 && tableTreeView.selectedIndex > index){
@@ -300,12 +300,12 @@ Table{
 
     function deleteBranch(index){
         //console.log("DELETE BRANCH", index);
-        let innerId = tableTreeView.model.GetData("InnerId__", index);
+        let innerId = tableTreeView.model.getData("InnerId__", index);
         let found = false;
         let foundChangeCount = 0;
 
-        for(let i = index + 1; i < tableTreeView.model.GetItemsCount(); i++){
-            let branchIds = tableTreeView.model.IsValidData("BranchIds__", i) ? tableTreeView.model.GetData("BranchIds__", i) : "";
+        for(let i = index + 1; i < tableTreeView.model.getItemsCount(); i++){
+            let branchIds = tableTreeView.model.isValidData("BranchIds__", i) ? tableTreeView.model.getData("BranchIds__", i) : "";
             //console.log("branchIds:: ", branchIds)
             let ok = false;
             let arr = branchIds.split(",");
@@ -331,7 +331,7 @@ Table{
             }
             //
             if(ok){
-                tableTreeView.model.RemoveItem(i);
+                tableTreeView.model.removeItem(i);
                 tableTreeView._deleteCounter++;
                 let content_height = tableTreeView.getContentHeight();
                 content_height -= tableTreeView.delegateHeight;
@@ -348,25 +348,25 @@ Table{
 
         tableTreeView._deleteCounter = 0;
 
-        tableTreeView.model.SetData("IsOpen__", false, index);
-        tableTreeView.model.SetData("OpenState__", -1, index);
-        tableTreeView.model.SetData("HasBranch__", false, index);
+        tableTreeView.model.setData("IsOpen__", false, index);
+        tableTreeView.model.setData("OpenState__", -1, index);
+        tableTreeView.model.setData("HasBranch__", false, index);
 
         tableTreeView.setContentWidth();
     }
 
     function setVisibleElements(visible, index){
         // console.log("SET VISIBLE", visible, index);
-        let innerId = tableTreeView.model.GetData("InnerId__", index);
-        let level = tableTreeView.model.GetData("Level__", index);
+        let innerId = tableTreeView.model.getData("InnerId__", index);
+        let level = tableTreeView.model.getData("Level__", index);
         let found = false;
         let foundChangeCount = 0;
 
         //for closed
         let currClosedLevel = -1;
 
-        for(let i = index + 1; i < tableTreeView.model.GetItemsCount(); i++){
-            let branchIds = tableTreeView.model.IsValidData("BranchIds__", i) ? tableTreeView.model.GetData("BranchIds__", i) : "";
+        for(let i = index + 1; i < tableTreeView.model.getItemsCount(); i++){
+            let branchIds = tableTreeView.model.isValidData("BranchIds__", i) ? tableTreeView.model.getData("BranchIds__", i) : "";
             //console.log("branchIds:: ", branchIds)
 
             let ok = false;
@@ -374,8 +374,8 @@ Table{
             let arrCounter = 0;
 
             //*****************for closed*************//
-            let openST = tableTreeView.model.GetData("OpenState__", i);
-            let level_curr = tableTreeView.model.GetData("Level__", i);
+            let openST = tableTreeView.model.getData("OpenState__", i);
+            let level_curr = tableTreeView.model.getData("Level__", i);
 
             if(level_curr <= currClosedLevel){
                 currClosedLevel = -1;
@@ -418,7 +418,7 @@ Table{
 
             //
             if(ok){
-                tableTreeView.model.SetData("Visible__", visible && ok_visible, i);
+                tableTreeView.model.setData("Visible__", visible && ok_visible, i);
                 let coeff = visible ? 1 : -1;
                 let content_height = tableTreeView.getContentHeight();
                 content_height += coeff * tableTreeView.delegateHeight;
@@ -434,9 +434,9 @@ Table{
         //console.log("___setContentWidth___")
         let maxWidth = 0;
         let maxLevel_= 0;
-        for(let i = 0; i < tableTreeView.model.GetItemsCount(); i++){
-            let visible = tableTreeView.model.GetData("Visible__",i);
-            let level = !visible ? 0 : tableTreeView.model.GetData("Level__",i);
+        for(let i = 0; i < tableTreeView.model.getItemsCount(); i++){
+            let visible = tableTreeView.model.getData("Visible__",i);
+            let level = !visible ? 0 : tableTreeView.model.getData("Level__",i);
             let width_ = !visible ? 0 : level * tableTreeView.shift + tableTreeView.delegateWidth;
             if(level > maxLevel_){
                 maxLevel_ = level;
@@ -446,15 +446,15 @@ Table{
             }
         }
         tableTreeView.maxLevel = maxLevel_;
-        tableTreeView.widthDecorator.SetData("MinWidth", maxWidth, 0);
+        tableTreeView.widthDecorator.setData("MinWidth", maxWidth, 0);
 
         let restWidth = 0;
-        for(let i = 1; i < tableTreeView.widthDecoratorDynamic.GetItemsCount(); i++){
-            let currCellWidth = tableTreeView.widthDecoratorDynamic.GetData("Width",i);
+        for(let i = 1; i < tableTreeView.widthDecoratorDynamic.getItemsCount(); i++){
+            let currCellWidth = tableTreeView.widthDecoratorDynamic.getData("Width",i);
             restWidth += currCellWidth;
         }
 
-        let firstCellWidth = tableTreeView.widthDecoratorDynamic.GetData("Width",0);
+        let firstCellWidth = tableTreeView.widthDecoratorDynamic.getData("Width",0);
         tableTreeView.contentWidth += (maxWidth - firstCellWidth);
         if(tableTreeView.contentWidth < tableTreeView.elementsListWidth){
             tableTreeView.contentWidth = tableTreeView.elementsListWidth;
@@ -472,7 +472,7 @@ Table{
             maxWidth =  tableWidth - restWidth;
         }
 
-        tableTreeView.widthDecorator.SetData("Width", maxWidth, 0);
+        tableTreeView.widthDecorator.setData("Width", maxWidth, 0);
         tableTreeView.setWidth();
 
     }
@@ -483,18 +483,18 @@ Table{
             return;
         }
         let isForcedOpen = false;
-        if(tableTreeView.model.GetData("HasChildren__", index)){
-            if(tableTreeView.model.GetData("OpenState__", index) !== 1){
-                if(!tableTreeView.model.GetData("HasBranch__", index)){
-                    tableTreeView.model.SetData("HasBranch__", true, index);
+        if(tableTreeView.model.getData("HasChildren__", index)){
+            if(tableTreeView.model.getData("OpenState__", index) !== 1){
+                if(!tableTreeView.model.getData("HasBranch__", index)){
+                    tableTreeView.model.setData("HasBranch__", true, index);
                     tableTreeView.requestSignal(index)
                 }
                 else {
                     tableTreeView.setVisibleElements(true, index)
                     isForcedOpen = true;
                 }
-                tableTreeView.model.SetData("IsOpen__", true, index);
-                tableTreeView.model.SetData("OpenState__", 1, index);
+                tableTreeView.model.setData("IsOpen__", true, index);
+                tableTreeView.model.setData("OpenState__", 1, index);
 
                 tableTreeView.openBranch(index);
             }
@@ -512,7 +512,7 @@ Table{
     }
 
     function moveToElement(index){
-        if(index < 0 || index >= tableTreeView.model.GetItemsCount()){
+        if(index < 0 || index >= tableTreeView.model.getItemsCount()){
             return;
         }
         let maxContentY = tableTreeView.contentHeight - tableTreeView.height + tableTreeView.originY;
@@ -521,7 +521,7 @@ Table{
         }
         let contentY__ = tableTreeView.originY;
         for(let i = 0; i < index; i++){
-            let isVisible = tableTreeView.model.GetData("Visible__", i);
+            let isVisible = tableTreeView.model.getData("Visible__", i);
             contentY__ += isVisible * tableTreeView.delegateHeight;
         }
         tableTreeView.contentY = Math.min(contentY__, maxContentY);
@@ -545,7 +545,7 @@ Table{
     }
 
     function getData(key,index){
-        return tableTreeView.model.GetData(key, index);
+        return tableTreeView.model.getData(key, index);
     }
 
     function getSelectedIndex(){
@@ -554,17 +554,17 @@ Table{
 
 
     function checkIsOpen(index){
-        return tableTreeView.model.GetData("IsOpen__", index);
+        return tableTreeView.model.getData("IsOpen__", index);
     }
 
     function checkHasChildren(index){
-        return tableTreeView.model.GetData("HasChildren__", index);
+        return tableTreeView.model.getData("HasChildren__", index);
     }
 
 
     function findParentIndex(index){
         let foundIndex = -1;
-        let branchIds = tableTreeView.model.IsValidData("BranchIds__", index) ? tableTreeView.model.GetData("BranchIds__", index) : "";
+        let branchIds = tableTreeView.model.isValidData("BranchIds__", index) ? tableTreeView.model.getData("BranchIds__", index) : "";
         if(branchIds == ""){
             //console.log("FOUND_INDEX_ RETURN ", foundIndex);
             return -1;
@@ -572,7 +572,7 @@ Table{
         let arr = branchIds.split(",");
         let parentId = arr[arr.length - 1];
         for(let i = index - 1; i >=0; i--){
-            let innerId = tableTreeView.model.GetData("InnerId__", i);
+            let innerId = tableTreeView.model.getData("InnerId__", i);
             if(innerId == parentId){
                 foundIndex =  i;
                 break;
@@ -584,8 +584,8 @@ Table{
 
     function findIndexById(id){
         let foundIndex = -1;
-        for(let i = 0; i < tableTreeView.model.GetItemsCount(); i++){
-            let id_curr = tableTreeView.model.IsValidData("Id", i) ? tableTreeView.model.GetData("Id", i) : "";
+        for(let i = 0; i < tableTreeView.model.getItemsCount(); i++){
+            let id_curr = tableTreeView.model.isValidData("Id", i) ? tableTreeView.model.getData("Id", i) : "";
             if(id_curr == id){
                 foundIndex = i;
                 break;

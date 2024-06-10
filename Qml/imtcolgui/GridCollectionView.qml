@@ -76,8 +76,8 @@ Item {
 
 
 //    Component.onCompleted: {
-//        itemId = documentsData.GetData("Id", model.index);
-//        itemName = documentsData.GetData("Title", model.index);
+//        itemId = documentsData.getData("Id", model.index);
+//        itemName = documentsData.getData("Title", model.index);
 //    }
 
     Component.onDestruction: {
@@ -134,8 +134,8 @@ Item {
             nameId = "Id";
         }
         let foundIndex = -1;
-        for(let i = 0; i < gridCollectionViewContainer.gridElementsModel.GetItemsCount(); i++){
-            let id_curr = gridCollectionViewContainer.gridElementsModel.IsValidData(nameId, i) ? gridCollectionViewContainer.gridElementsModel.GetData(nameId, i) : "";
+        for(let i = 0; i < gridCollectionViewContainer.gridElementsModel.getItemsCount(); i++){
+            let id_curr = gridCollectionViewContainer.gridElementsModel.isValidData(nameId, i) ? gridCollectionViewContainer.gridElementsModel.getData(nameId, i) : "";
             if(id_curr == id){
                 foundIndex = i;
                 break;

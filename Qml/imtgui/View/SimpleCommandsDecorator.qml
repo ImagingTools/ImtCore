@@ -20,10 +20,10 @@ Item {
     }
 
     function setCommandVisible(commandId, visible){
-        for (let i = 0; i < container.commandModel.GetItemsCount(); i++){
-            let id = container.commandModel.GetData("Id", i);
+        for (let i = 0; i < container.commandModel.getItemsCount(); i++){
+            let id = container.commandModel.getData("Id", i);
             if (id === commandId){
-                container.commandModel.SetData("Visible", visible, i);
+                container.commandModel.setData("Visible", visible, i);
                 break;
             }
         }
@@ -34,12 +34,12 @@ Item {
             return;
         }
 
-        for (let i = 0; i < container.commandModel.GetItemsCount(); i++){
-            let currentCommandId = container.commandModel.GetData("Id", i);
+        for (let i = 0; i < container.commandModel.getItemsCount(); i++){
+            let currentCommandId = container.commandModel.getData("Id", i);
             if (currentCommandId == commandId){
-                let currentIsEnabled = container.commandModel.GetData("IsEnabled", i);
+                let currentIsEnabled = container.commandModel.getData("IsEnabled", i);
                 if (currentIsEnabled !== isEnabled){
-                    container.commandModel.SetData("IsEnabled", isEnabled, i);
+                    container.commandModel.setData("IsEnabled", isEnabled, i);
                 }
             }
         }

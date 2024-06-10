@@ -14,7 +14,7 @@ QtObject {
 
     Component.onDestruction: {
         if (commandsModel){
-            commandsModel.Clear();
+            commandsModel.clear();
         }
     }
 
@@ -31,9 +31,9 @@ QtObject {
             return false;
         }
 
-        for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
-            let isEnabled = commandsProviderContainer.commandsModel.GetData("IsEnabled", i);
+        for (let i = 0; i < commandsProviderContainer.commandsModel.getItemsCount(); i++){
+            let currentCommandId = commandsProviderContainer.commandsModel.getData("Id", i);
+            let isEnabled = commandsProviderContainer.commandsModel.getData("IsEnabled", i);
 
             if (currentCommandId == commandId){
                 return isEnabled;
@@ -54,8 +54,8 @@ QtObject {
             return -1;
         }
 
-        for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+        for (let i = 0; i < commandsProviderContainer.commandsModel.getItemsCount(); i++){
+            let currentCommandId = commandsProviderContainer.commandsModel.getData("Id", i);
             if (currentCommandId === commandId){
                 return i;
             }
@@ -65,10 +65,10 @@ QtObject {
     }
 
     function mergeModelWith(externModel){
-        for (let i = 0; i < externModel.GetItemsCount(); i++){
+        for (let i = 0; i < externModel.getItemsCount(); i++){
 
-            let index = commandsModel.InsertNewItem()
-            commandsModel.CopyItemDataFromModel(index, externModel, i)
+            let index = commandsModel.insertNewItem()
+            commandsModel.copyItemDataFromModel(index, externModel, i)
         }
     }
 
@@ -77,9 +77,9 @@ QtObject {
             return;
         }
 
-        for (let i = 0; i < model.GetItemsCount(); i++){
-            model.SetData("IsToggleable", false, i);
-            model.SetData("IsToggled", false, i);
+        for (let i = 0; i < model.getItemsCount(); i++){
+            model.setData("IsToggleable", false, i);
+            model.setData("IsToggled", false, i);
         }
     }
 }

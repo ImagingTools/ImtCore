@@ -84,9 +84,9 @@ Item {
 
         function onCommandsModelChanged(){
             if (viewBase.commandsController){
-                for (let i = 0; i < internal.cachedCommandsModel.GetItemsCount(); i++){
-                    let id = internal.cachedCommandsModel.GetData("Id", i);
-                    let isEnabled = internal.cachedCommandsModel.GetData("IsEnabled", i);
+                for (let i = 0; i < internal.cachedCommandsModel.getItemsCount(); i++){
+                    let id = internal.cachedCommandsModel.getData("Id", i);
+                    let isEnabled = internal.cachedCommandsModel.getData("IsEnabled", i);
 
                     viewBase.commandsController.setCommandIsEnabled(id, isEnabled);
                 }
@@ -232,8 +232,8 @@ Item {
 
         function updateCommandsAtferLocalizationChanged(){
             if (viewBase.commandsController){
-                internal.cachedCommandsModel.Clear();
-                internal.cachedCommandsModel.Copy(viewBase.commandsController.commandsModel);
+                internal.cachedCommandsModel.clear();
+                internal.cachedCommandsModel.copy(viewBase.commandsController.commandsModel);
                 viewBase.commandsController.updateModel();
             }
         }

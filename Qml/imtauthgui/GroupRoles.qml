@@ -27,8 +27,8 @@ ViewBase {
         console.log("UserRoles updateGui");
 
         let roleIds = [];
-        if (groupRolesContainer.model.ContainsKey("Roles")){
-            let roles = groupRolesContainer.model.GetData("Roles")
+        if (groupRolesContainer.model.containsKey("Roles")){
+            let roles = groupRolesContainer.model.getData("Roles")
             if (roles !== ""){
                 roleIds = roles.split(';');
             }
@@ -36,8 +36,8 @@ ViewBase {
 
         rolesTable.uncheckAll();
         if (rolesTable.elements){
-            for (let i = 0; i < rolesTable.elements.GetItemsCount(); i++){
-                let id = rolesTable.elements.GetData("Id", i);
+            for (let i = 0; i < rolesTable.elements.getItemsCount(); i++){
+                let id = rolesTable.elements.getData("Id", i);
                 if (roleIds.includes(id)){
                     rolesTable.checkItem(i);
                 }
@@ -49,14 +49,14 @@ ViewBase {
         let selectedRoleIds = []
         let indexes = rolesTable.getCheckedItems();
         for (let index of indexes){
-            let id = rolesTable.elements.GetData("Id", index);
+            let id = rolesTable.elements.getData("Id", index);
             selectedRoleIds.push(id);
         }
 
         selectedRoleIds.sort();
 
         let result = selectedRoleIds.join(';');
-        groupRolesContainer.model.SetData("Roles", result);
+        groupRolesContainer.model.setData("Roles", result);
     }
 
     Component{
@@ -100,14 +100,14 @@ ViewBase {
         id: headersModel;
 
         function updateHeaders(){
-            headersModel.Clear();
+            headersModel.clear();
 
-            headersModel.InsertNewItem();
+            headersModel.insertNewItem();
 
-            headersModel.SetData("Id", "Name");
-            headersModel.SetData("Name", qsTr("Role Name"));
+            headersModel.setData("Id", "Name");
+            headersModel.setData("Name", qsTr("Role Name"));
 
-            headersModel.Refresh();
+            headersModel.refresh();
 
             rolesTable.headers = headersModel;
         }

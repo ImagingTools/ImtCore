@@ -124,7 +124,7 @@ Rectangle {
                 width: buttonPanel.verticalMenuWidth;
                 height: model.Name == "" && model.index == 0 ? -buttonPanel.verticalSpacing : 2;
                 color: Style.textColor;
-                visible: model.Name !== "" ? false : model.index == 0 ? false : model.index == (buttonPanel.verticalModel.GetItemsCount() - 1) ? false : true ;
+                visible: model.Name !== "" ? false : model.index == 0 ? false : model.index == (buttonPanel.verticalModel.getItemsCount() - 1) ? false : true ;
             }
         }
     }
@@ -164,9 +164,9 @@ Rectangle {
             return;
         }
 
-        if(buttonPanel.buttonModel.GetItemsCount()){
-            for(let i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
-                buttonPanel.buttonModel.SetData("IsHorizontal", true, i);
+        if(buttonPanel.buttonModel.getItemsCount()){
+            for(let i = 0; i < buttonPanel.buttonModel.getItemsCount(); i++){
+                buttonPanel.buttonModel.setData("IsHorizontal", true, i);
             }
             buttonPanel.widthArr = [];
             buttonPanel.widthArrVer = [];
@@ -213,13 +213,13 @@ Rectangle {
         horizontalListView.model = 0;
         buttonSizeRep.model = 0;
         buttonSizeRepVert.model = 0;
-        buttonPanel.horizontalModel.Clear();
-        buttonPanel.verticalModel.Clear();
+        buttonPanel.horizontalModel.clear();
+        buttonPanel.verticalModel.clear();
         buttonPanel.setOpenButtonVisible();
     }
 
     function setReady(){
-        var count = buttonPanel.buttonModel.GetItemsCount();
+        var count = buttonPanel.buttonModel.getItemsCount();
         let ok1 = buttonPanel.compl;
         let ok2 = count;
         let ok3 = buttonPanel.widthArr.length === count;
@@ -231,7 +231,7 @@ Rectangle {
         let count = 0;
         if(buttonPanel.canChangeOrder){
             if (buttonPanel.buttonModel){
-                count = buttonPanel.buttonModel.GetItemsCount();
+                count = buttonPanel.buttonModel.getItemsCount();
             }
         }
         else {
@@ -257,14 +257,14 @@ Rectangle {
         }
         else {
             if(buttonPanel.hasActiveState && buttonPanel.canChangeOrder){
-                buttonPanel.rightOrderModel.Clear();
-                for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
-                    var active = buttonPanel.buttonModel.GetData("Active",i);
+                buttonPanel.rightOrderModel.clear();
+                for(var i = 0; i < buttonPanel.buttonModel.getItemsCount(); i++){
+                    var active = buttonPanel.buttonModel.getData("Active",i);
                     if(active){
-                        buttonPanel.activeId = buttonPanel.buttonModel.GetData("Id",i);
+                        buttonPanel.activeId = buttonPanel.buttonModel.getData("Id",i);
                     }
-                    buttonPanel.rightOrderModel.InsertNewItem()
-                    buttonPanel.rightOrderModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+                    buttonPanel.rightOrderModel.insertNewItem()
+                    buttonPanel.rightOrderModel.copyItemDataFromModel(i,buttonPanel.buttonModel,i);
                 }
             }
 
@@ -274,7 +274,7 @@ Rectangle {
 
     function setVertMenuWidth(){
         if(!buttonPanel.canChangeOrder){
-            let visibleCount_ = buttonPanel.buttonModel.GetItemsCount() - buttonPanel.horizCount;
+            let visibleCount_ = buttonPanel.buttonModel.getItemsCount() - buttonPanel.horizCount;
             let maxVal = 0;
             for(let i = buttonPanel.widthArrVer.length - visibleCount_; i < buttonPanel.widthArrVer.length; i++){
                 let width_ = buttonPanel.widthArrVer[i];
@@ -295,8 +295,8 @@ Rectangle {
 
     function getMaxString(){
         var max = "";
-        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
-            var str = buttonPanel.buttonModel.GetData("Name",i);
+        for(var i = 0; i < buttonPanel.buttonModel.getItemsCount(); i++){
+            var str = buttonPanel.buttonModel.getData("Name",i);
             if(str.length > max.length){
                 max = str;
             }
@@ -324,16 +324,16 @@ Rectangle {
                 return;
             }
 
-            if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
+            if(buttonPanel.buttonModel.getItemsCount() !== undefined && buttonPanel.buttonModel.getItemsCount()){
                 buttonPanel.setModels();
             }
-            if(buttonPanel.hasActiveState && buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
+            if(buttonPanel.hasActiveState && buttonPanel.buttonModel.getItemsCount() !== undefined && buttonPanel.buttonModel.getItemsCount()){
                 var index = buttonPanel.checkActiveInVertical();
                 if(index > -1){
                     buttonPanel.setModelsWithActive(index);
                 }
 
-                if(buttonPanel.buttonModel.GetItemsCount() <= buttonPanel.horizCount){
+                if(buttonPanel.buttonModel.getItemsCount() <= buttonPanel.horizCount){
                     buttonPanel.setRightOrder();
                 }
             }
@@ -353,17 +353,17 @@ Rectangle {
                 buttonPanel.vertMenuItem.y = point.y;
 
             }
-            if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
+            if(buttonPanel.buttonModel.getItemsCount() !== undefined && buttonPanel.buttonModel.getItemsCount()){
                 buttonPanel.setModels();
             }
 
-            if(buttonPanel.hasActiveState && buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
+            if(buttonPanel.hasActiveState && buttonPanel.buttonModel.getItemsCount() !== undefined && buttonPanel.buttonModel.getItemsCount()){
                 var index = buttonPanel.checkActiveInVertical();
                 if(index > -1){
                     buttonPanel.setModelsWithActive(index);
                 }
 
-                if(buttonPanel.buttonModel.GetItemsCount() <= buttonPanel.horizCount){
+                if(buttonPanel.buttonModel.getItemsCount() <= buttonPanel.horizCount){
                     buttonPanel.setRightOrder();
                 }
             }
@@ -372,8 +372,8 @@ Rectangle {
 
     function setModels(){
         if(buttonPanel.canChangeOrder){
-            buttonPanel.horizontalModel.Clear();
-            buttonPanel.verticalModel.Clear();
+            buttonPanel.horizontalModel.clear();
+            buttonPanel.verticalModel.clear();
         }
 
         let width_max = 0;
@@ -421,37 +421,37 @@ Rectangle {
 
         buttonPanel.horizCount = countAdded_2;
 
-        var count = buttonPanel.buttonModel.GetItemsCount();
+        var count = buttonPanel.buttonModel.getItemsCount();
         if(count <= buttonPanel.horizCount){
             for(let i = 0; i < count; i++){
                 if(buttonPanel.canChangeOrder){
-                    buttonPanel.horizontalModel.InsertNewItem()
-                    buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+                    buttonPanel.horizontalModel.insertNewItem()
+                    buttonPanel.horizontalModel.copyItemDataFromModel(i,buttonPanel.buttonModel,i);
                 }
                 else {
-                    buttonPanel.buttonModel.SetData("IsHorizontal",true, i)
+                    buttonPanel.buttonModel.setData("IsHorizontal",true, i)
                 }
             }
         }
         else{
             for(i = 0; i < buttonPanel.horizCount; i++){
                 if(buttonPanel.canChangeOrder){
-                    buttonPanel.horizontalModel.InsertNewItem()
-                    buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+                    buttonPanel.horizontalModel.insertNewItem()
+                    buttonPanel.horizontalModel.copyItemDataFromModel(i,buttonPanel.buttonModel,i);
                 }
                 else {
-                    buttonPanel.buttonModel.SetData("IsHorizontal",true, i)
+                    buttonPanel.buttonModel.setData("IsHorizontal",true, i)
 
                 }
             }
 
             for(var k = buttonPanel.horizCount; k < count; k++){
                 if(buttonPanel.canChangeOrder){
-                    var kk = buttonPanel.verticalModel.InsertNewItem();
-                    buttonPanel.verticalModel.CopyItemDataFromModel(kk,buttonPanel.buttonModel,k);
+                    var kk = buttonPanel.verticalModel.insertNewItem();
+                    buttonPanel.verticalModel.copyItemDataFromModel(kk,buttonPanel.buttonModel,k);
                 }
                 else {
-                    buttonPanel.buttonModel.SetData("IsHorizontal",false, k)
+                    buttonPanel.buttonModel.setData("IsHorizontal",false, k)
                 }
 
             }
@@ -464,14 +464,14 @@ Rectangle {
         }
 
         if(buttonPanel.canChangeOrder){
-            if(buttonPanel.openST && !buttonPanel.verticalModel.GetItemsCount()){
+            if(buttonPanel.openST && !buttonPanel.verticalModel.getItemsCount()){
                 buttonPanel.openST = false;
                 ModalDialogManager.closeDialog();
             }
 
         }
         else{
-            if(buttonPanel.openST && buttonPanel.horizCount == buttonPanel.buttonModel.GetItemsCount()){
+            if(buttonPanel.openST && buttonPanel.horizCount == buttonPanel.buttonModel.getItemsCount()){
                 buttonPanel.openST = false;
                 ModalDialogManager.closeDialog();
             }
@@ -482,15 +482,15 @@ Rectangle {
 
     function setActive(buttonId){
         var retval = 0;
-        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
-            var id = buttonPanel.buttonModel.GetData("Id",i);
+        for(var i = 0; i < buttonPanel.buttonModel.getItemsCount(); i++){
+            var id = buttonPanel.buttonModel.getData("Id",i);
             if(id == buttonId){
-                buttonPanel.buttonModel.SetData("Active",true, i);
+                buttonPanel.buttonModel.setData("Active",true, i);
                 retval = i;
 
             }
             else{
-                buttonPanel.buttonModel.SetData("Active",false, i);
+                buttonPanel.buttonModel.setData("Active",false, i);
             }
         }
 
@@ -499,43 +499,43 @@ Rectangle {
 
     function setModelsWithActive(index){
         if(buttonPanel.horizCount == 0){
-            for(var i = 0; i < buttonPanel.verticalModel.GetItemsCount(); i++){
-                buttonPanel.verticalModel.SetData("Active",(index == i), i);
+            for(var i = 0; i < buttonPanel.verticalModel.getItemsCount(); i++){
+                buttonPanel.verticalModel.setData("Active",(index == i), i);
             }
         }
 
         else{
             if (index < buttonPanel.horizCount){
-                for(let i = 0; i < buttonPanel.horizontalModel.GetItemsCount(); i++){
-                    buttonPanel.horizontalModel.SetData("Active",(index == i), i);
+                for(let i = 0; i < buttonPanel.horizontalModel.getItemsCount(); i++){
+                    buttonPanel.horizontalModel.setData("Active",(index == i), i);
                 }
             }
 
             else{//перезаполнение моделей
                 buttonPanel.startActiveIndex = index;
 
-                buttonPanel.proxiModel.Clear();
+                buttonPanel.proxiModel.clear();
 
-                var count = buttonPanel.buttonModel.GetItemsCount();
+                var count = buttonPanel.buttonModel.getItemsCount();
 
                 var countVert = 0;
                 for(i = index; i < count; i++){
-                    buttonPanel.proxiModel.InsertNewItem()
-                    buttonPanel.proxiModel.CopyItemDataFromModel(countVert,buttonPanel.buttonModel,i);
+                    buttonPanel.proxiModel.insertNewItem()
+                    buttonPanel.proxiModel.copyItemDataFromModel(countVert,buttonPanel.buttonModel,i);
                     countVert++;
                 }
 
                 var countHoriz = 0;
                 for(i = 0; i < count - countVert ; i++){
-                    buttonPanel.proxiModel.InsertNewItem()
-                    buttonPanel.proxiModel.CopyItemDataFromModel(countVert + countHoriz,buttonPanel.buttonModel,i);
+                    buttonPanel.proxiModel.insertNewItem()
+                    buttonPanel.proxiModel.copyItemDataFromModel(countVert + countHoriz,buttonPanel.buttonModel,i);
                     countHoriz++;
                 }
 
-                buttonPanel.buttonModel.Clear();
+                buttonPanel.buttonModel.clear();
                 for(i = 0; i < count  ; i++){
-                    buttonPanel.buttonModel.InsertNewItem()
-                    buttonPanel.buttonModel.CopyItemDataFromModel(i,buttonPanel.proxiModel,i);
+                    buttonPanel.buttonModel.insertNewItem()
+                    buttonPanel.buttonModel.copyItemDataFromModel(i,buttonPanel.proxiModel,i);
                 }
 
                 buttonPanel.setModels();
@@ -545,8 +545,8 @@ Rectangle {
 
     function checkActiveInVertical(){
         var index = false;
-        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
-            var active = buttonPanel.buttonModel.GetData("Active",i);
+        for(var i = 0; i < buttonPanel.buttonModel.getItemsCount(); i++){
+            var active = buttonPanel.buttonModel.getData("Active",i);
             if(active){
                 index = i;
                 break;
@@ -561,15 +561,15 @@ Rectangle {
     }
 
     function setRightOrder(){
-        buttonPanel.buttonModel.Clear();
-        for(var i = 0; i < buttonPanel.rightOrderModel.GetItemsCount(); i++){
-            buttonPanel.buttonModel.InsertNewItem()
-            buttonPanel.buttonModel.CopyItemDataFromModel(i,buttonPanel.rightOrderModel,i);
+        buttonPanel.buttonModel.clear();
+        for(var i = 0; i < buttonPanel.rightOrderModel.getItemsCount(); i++){
+            buttonPanel.buttonModel.insertNewItem()
+            buttonPanel.buttonModel.copyItemDataFromModel(i,buttonPanel.rightOrderModel,i);
         }
 
-        for(let i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
-            var id = buttonPanel.buttonModel.GetData("Id",i);
-            buttonPanel.buttonModel.SetData("Active",(id == buttonPanel.activeId), i);
+        for(let i = 0; i < buttonPanel.buttonModel.getItemsCount(); i++){
+            var id = buttonPanel.buttonModel.getData("Id",i);
+            buttonPanel.buttonModel.setData("Active",(id == buttonPanel.activeId), i);
         }
 
         buttonPanel.setModels();
@@ -589,7 +589,7 @@ Rectangle {
 
         onItemAdded: {
             let okLength = buttonPanel.widthArr.length == 0 ? true :
-                                                              buttonPanel.widthArr.length < buttonPanel.buttonModel.GetItemsCount();
+                                                              buttonPanel.widthArr.length < buttonPanel.buttonModel.getItemsCount();
 
             let width__ = item.width;
 
@@ -620,7 +620,7 @@ Rectangle {
 
         onItemAdded: {
             let okLength = buttonPanel.widthArrVer.length == 0 ? true :
-                                                              buttonPanel.widthArrVer.length < buttonPanel.buttonModel.GetItemsCount();
+                                                              buttonPanel.widthArrVer.length < buttonPanel.buttonModel.getItemsCount();
 
             let width__ = item.width;
 
@@ -676,7 +676,7 @@ Rectangle {
         height: buttonPanel.openButtonHeight;
         text: buttonPanel.openButtonText;
         iconSource: buttonPanel.openButtonImageSource;
-        visible: false;//buttonPanel.buttonModel.GetItemsCount() && buttonPanel.buttonModel.GetItemsCount() > buttonPanel.horizCount;
+        visible: false;//buttonPanel.buttonModel.getItemsCount() && buttonPanel.buttonModel.getItemsCount() > buttonPanel.horizCount;
 
         onClicked: {
             buttonPanel.setVertMenuWidth();

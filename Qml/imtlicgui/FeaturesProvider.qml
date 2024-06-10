@@ -15,9 +15,9 @@ QtObject {
     }
 
     function featureIsExists(featureId){
-        for (let i = 0; i < provider.model.GetItemsCount(); i++){
-            let packageId = provider.model.GetData("Id", i);
-            let childModel = provider.model.GetData("ChildModel", i);
+        for (let i = 0; i < provider.model.getItemsCount(); i++){
+            let packageId = provider.model.getData("Id", i);
+            let childModel = provider.model.getData("ChildModel", i);
             if (childModel){
                 let ok = provider.__featureExists(childModel, featureId);
                 if (ok){
@@ -30,13 +30,13 @@ QtObject {
     }
 
     function __featureExists(externModel, featureId){
-        for (let i = 0; i < externModel.GetItemsCount(); i++){
-            let id = externModel.GetData("Id", i);
+        for (let i = 0; i < externModel.getItemsCount(); i++){
+            let id = externModel.getData("Id", i);
             if (id === featureId){
                 return true;
             }
 
-            let childModel = externModel.GetData("ChildModel", i);
+            let childModel = externModel.getData("ChildModel", i);
             if (childModel){
                 let ok = provider.__featureExists(childModel, featureId)
                 if (ok){
@@ -62,9 +62,9 @@ QtObject {
         onStateChanged: {
             console.log("State:", this.state, provider.featuresModel);
             if (this.state === "Ready"){
-                var dataModelLocal = this.GetData("data");
-                if (dataModelLocal.ContainsKey("GetFeatures")){
-                    dataModelLocal = dataModelLocal.GetData("GetFeatures");
+                var dataModelLocal = this.getData("data");
+                if (dataModelLocal.containsKey("GetFeatures")){
+                    dataModelLocal = dataModelLocal.getData("GetFeatures");
 
                     provider.model = dataModelLocal;
                 }

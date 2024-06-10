@@ -26,38 +26,38 @@ QtObject {
     }
 
     function getRepresentationModel(){
-        root.representationModel.Clear();
+        root.representationModel.clear();
 
-        root.representationModel.SetData("Id", "About");
-        root.representationModel.SetData("Name", qsTr("About"));
+        root.representationModel.setData("Id", "About");
+        root.representationModel.setData("Name", qsTr("About"));
 
-        let parameters = root.representationModel.AddTreeModel("Parameters");
+        let parameters = root.representationModel.addTreeModel("Parameters");
 
         let index;
 
         if (root.applicationInfoProvider != null){
             if (root.applicationInfoProvider.clientApplicationInfo != null){
-                index = parameters.InsertNewItem();
-                parameters.CopyItemDataFromModel(index, applicationInfoProvider.clientApplicationInfo)
-                parameters.SetData("Name", qsTr("Client Version"), index);
+                index = parameters.insertNewItem();
+                parameters.copyItemDataFromModel(index, applicationInfoProvider.clientApplicationInfo)
+                parameters.setData("Name", qsTr("Client Version"), index);
             }
 
             if (root.applicationInfoProvider.serverApplicationInfo != null){
-                index = parameters.InsertNewItem();
-                parameters.CopyItemDataFromModel(index, applicationInfoProvider.serverApplicationInfo)
-                parameters.SetData("Name", qsTr("Server Version"), index);
+                index = parameters.insertNewItem();
+                parameters.copyItemDataFromModel(index, applicationInfoProvider.serverApplicationInfo)
+                parameters.setData("Name", qsTr("Server Version"), index);
             }
         }
 
         let canReadServerLog = PermissionsController.checkPermission("ShowServerLog");
         if (canReadServerLog){
-            index = parameters.InsertNewItem();
-            parameters.SetData("Id", "ServerLog", index);
-            parameters.SetData("Name", qsTr("Server Log"), index);
-            parameters.SetData("Source", "qrc:/qml/imtgui/Settings/ServerLogProvider.qml", index);
+            index = parameters.insertNewItem();
+            parameters.setData("Id", "ServerLog", index);
+            parameters.setData("Name", qsTr("Server Log"), index);
+            parameters.setData("Source", "qrc:/qml/imtgui/Settings/ServerLogProvider.qml", index);
         }
 
-        root.representationModel.Refresh();
+        root.representationModel.refresh();
 
         return root.representationModel;
     }

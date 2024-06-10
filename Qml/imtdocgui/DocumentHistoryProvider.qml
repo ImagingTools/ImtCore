@@ -31,16 +31,16 @@ QtObject {
         onStateChanged: {
             console.log("State:", this.state, root.documentHistoryGqlModel);
             if (this.state === "Ready"){
-                if (root.documentHistoryGqlModel.ContainsKey("errors")){
+                if (root.documentHistoryGqlModel.containsKey("errors")){
                     return;
                 }
 
-                if (root.documentHistoryGqlModel.ContainsKey("data")){
-                    var dataModelLocal = root.documentHistoryGqlModel.GetData("data");
+                if (root.documentHistoryGqlModel.containsKey("data")){
+                    var dataModelLocal = root.documentHistoryGqlModel.getData("data");
 
                     if (dataModelLocal){
-                        if (dataModelLocal.ContainsKey(root.documentTypeId + "History")){
-                            dataModelLocal = dataModelLocal.GetData(root.documentTypeId + "History");
+                        if (dataModelLocal.containsKey(root.documentTypeId + "History")){
+                            dataModelLocal = dataModelLocal.getData(root.documentTypeId + "History");
                             root.historyModel = dataModelLocal;
                         }
                     }

@@ -69,8 +69,8 @@ RemoteCollectionView {
                     return
                 }
 
-                let username = userCollectionViewContainer.table.elements.GetData("Name", rowIndex);
-                let roles = userCollectionViewContainer.table.elements.GetData("Roles", rowIndex);
+                let username = userCollectionViewContainer.table.elements.getData("Name", rowIndex);
+                let roles = userCollectionViewContainer.table.elements.getData("Roles", rowIndex);
                 arrowButton.visible = roles !== "";
                 if (roles !== ""){
                     let roleList = roles.split(';');
@@ -126,8 +126,8 @@ RemoteCollectionView {
                     return
                 }
 
-                let username = userCollectionViewContainer.table.elements.GetData("Name", rowIndex);
-                let groups = userCollectionViewContainer.table.elements.GetData("Groups", rowIndex);
+                let username = userCollectionViewContainer.table.elements.getData("Name", rowIndex);
+                let groups = userCollectionViewContainer.table.elements.getData("Groups", rowIndex);
                 arrowButton.visible = groups !== "";
                 if (groups !== ""){
                     let groupList = groups.split(';');

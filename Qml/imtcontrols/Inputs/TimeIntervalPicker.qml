@@ -215,20 +215,20 @@ Item {
     //        id: intervalModel;
 
     //        Component.onCompleted: {
-    //            let index = intervalModel.InsertNewItem();
+    //            let index = intervalModel.insertNewItem();
 
-    //            intervalModel.SetData("Id", "minute", index)
-    //            intervalModel.SetData("Name", "minute", index)
+    //            intervalModel.setData("Id", "minute", index)
+    //            intervalModel.setData("Name", "minute", index)
 
-    //            index = intervalModel.InsertNewItem();
+    //            index = intervalModel.insertNewItem();
 
-    //            intervalModel.SetData("Id", "hour", index)
-    //            intervalModel.SetData("Name", "hour", index)
+    //            intervalModel.setData("Id", "hour", index)
+    //            intervalModel.setData("Name", "hour", index)
 
-    //            index = intervalModel.InsertNewItem();
+    //            index = intervalModel.insertNewItem();
 
-    //            intervalModel.SetData("Id", "day", index)
-    //            intervalModel.SetData("Name", "day", index)
+    //            intervalModel.setData("Id", "day", index)
+    //            intervalModel.setData("Name", "day", index)
 
     //            comboBox.model = intervalModel;
     //        }
@@ -331,7 +331,7 @@ Item {
 
     //            onCurrentIndexChanged: {
     //                if (comboBox.currentIndex >= 0){
-    //                    let id = comboBox.model.GetData("Id", comboBox.currentIndex);
+    //                    let id = comboBox.model.getData("Id", comboBox.currentIndex);
     //                    root.type = id;
     //                }
     //            }

@@ -123,7 +123,7 @@ ViewBase {
     }
 
     function updateGui(){
-        console.log("updateGui", model.ToJson());
+        console.log("updateGui", model.toJson());
 
         featureEditor.updateTreeViewGui();
     }
@@ -131,9 +131,9 @@ ViewBase {
     function updateModel(){
         console.log("updateModel");
 
-        if (model.GetItemsCount() !== 1){
+        if (model.getItemsCount() !== 1){
             let emptyModel = featureEditor.treeItemModelComp.createObject(model);
-            model.InsertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
+            model.insertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
         }
     }
 
@@ -356,7 +356,7 @@ ViewBase {
 
                 dependenciesHeadersModel.updateHeaders();
 
-                featureEditor.dependenciewViewModel.Copy(FeaturesProvider.model);
+                featureEditor.dependenciewViewModel.copy(FeaturesProvider.model);
                 featureDependenciesView.rowModel = featureEditor.dependenciewViewModel;
 
                 FeaturesProvider.modelChanged.connect(featureDependenciesView.onFeaturesProviderModelChanged);
@@ -370,22 +370,22 @@ ViewBase {
                 id: dependenciesHeadersModel;
 
                 function updateHeaders(){
-                    dependenciesHeadersModel.Clear();
+                    dependenciesHeadersModel.clear();
 
-                    let index = dependenciesHeadersModel.InsertNewItem();
-                    dependenciesHeadersModel.SetData("Id", "FeatureName", index)
-                    dependenciesHeadersModel.SetData("Name", qsTr("Dependencies"), index)
+                    let index = dependenciesHeadersModel.insertNewItem();
+                    dependenciesHeadersModel.setData("Id", "FeatureName", index)
+                    dependenciesHeadersModel.setData("Name", qsTr("Dependencies"), index)
 
-                    dependenciesHeadersModel.Refresh();
+                    dependenciesHeadersModel.refresh();
 
                     featureDependenciesView.columnModel = dependenciesHeadersModel;
                 }
             }
 
             function onFeaturesProviderModelChanged(){
-                featureEditor.dependenciewViewModel.Copy(FeaturesProvider.model)
+                featureEditor.dependenciewViewModel.copy(FeaturesProvider.model)
 
-                featureEditor.dependenciewViewModel.Refresh();
+                featureEditor.dependenciewViewModel.refresh();
 
                 featureEditor.updateTreeViewGui();
             }
@@ -504,25 +504,25 @@ ViewBase {
     }
 
     function updateHeaders(){
-        headersModel.Clear();
+        headersModel.clear();
 
-        let index = headersModel.InsertNewItem();
-        headersModel.SetData("Id", "FeatureName", index);
-        headersModel.SetData("Name", qsTr("Feature Name"), index);
+        let index = headersModel.insertNewItem();
+        headersModel.setData("Id", "FeatureName", index);
+        headersModel.setData("Name", qsTr("Feature Name"), index);
 
-        index = headersModel.InsertNewItem();
-        headersModel.SetData("Id", "FeatureId", index);
-        headersModel.SetData("Name", qsTr("Feature-ID"), index);
+        index = headersModel.insertNewItem();
+        headersModel.setData("Id", "FeatureId", index);
+        headersModel.setData("Name", qsTr("Feature-ID"), index);
 
-        index = headersModel.InsertNewItem();
-        headersModel.SetData("Id", "FeatureDescription", index);
-        headersModel.SetData("Name", qsTr("Feature Description"), index);
+        index = headersModel.insertNewItem();
+        headersModel.setData("Id", "FeatureDescription", index);
+        headersModel.setData("Name", qsTr("Feature Description"), index);
 
-        index = headersModel.InsertNewItem();
-        headersModel.SetData("Id", "Optional", index);
-        headersModel.SetData("Name", qsTr("Optional"), index);
+        index = headersModel.insertNewItem();
+        headersModel.setData("Id", "Optional", index);
+        headersModel.setData("Name", qsTr("Optional"), index);
 
-        headersModel.Refresh();
+        headersModel.refresh();
 
         tableView_.columnModel = headersModel;
     }

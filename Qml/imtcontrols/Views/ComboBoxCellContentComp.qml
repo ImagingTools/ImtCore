@@ -19,18 +19,18 @@ Component {
             if (tableCellDelegate){
                 let paramModel = tableCellDelegate.getValue();
 
-                let elementsModel = paramModel.GetData("Elements");
+                let elementsModel = paramModel.getData("Elements");
                 if (!elementsModel){
                     return;
                 }
 
                 cb.model = elementsModel;
 
-                if (paramModel.ContainsKey("CurrentIndex")){
-                    let index = paramModel.GetData("CurrentIndex")
+                if (paramModel.containsKey("CurrentIndex")){
+                    let index = paramModel.getData("CurrentIndex")
 
                     if (index >= 0){
-                        textLabel.text = elementsModel.GetData("Name", index);
+                        textLabel.text = elementsModel.getData("Name", index);
                     }
                 }
             }
@@ -61,12 +61,12 @@ Component {
 
                 if (bodyItem.tableCellDelegate){
                     if (cb.model){
-                        let name = cb.model.GetData("Name", cb.currentIndex)
+                        let name = cb.model.getData("Name", cb.currentIndex)
 
                         textLabel.text = name;
 
                         let valueModel = bodyItem.tableCellDelegate.getValue();
-                        valueModel.SetData("CurrentIndex", cb.currentIndex);
+                        valueModel.setData("CurrentIndex", cb.currentIndex);
 
                         bodyItem.tableCellDelegate.setValue(valueModel);
                     }

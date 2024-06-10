@@ -22,9 +22,9 @@ Item {
             return false;
         }
 
-        for (let i = 0; i < root.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = root.commandsModel.GetData("Id", i);
-            let isEnabled = root.commandsModel.GetData("IsEnabled", i);
+        for (let i = 0; i < root.commandsModel.getItemsCount(); i++){
+            let currentCommandId = root.commandsModel.getData("Id", i);
+            let isEnabled = root.commandsModel.getData("IsEnabled", i);
 
             if (currentCommandId == commandId){
                 return isEnabled;
@@ -41,12 +41,12 @@ Item {
             return;
         }
 
-        for (let i = 0; i < root.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = root.commandsModel.GetData("Id", i);
+        for (let i = 0; i < root.commandsModel.getItemsCount(); i++){
+            let currentCommandId = root.commandsModel.getData("Id", i);
             if (currentCommandId == commandId){
-                let currentIsEnabled = root.commandsModel.GetData("IsEnabled", i);
+                let currentIsEnabled = root.commandsModel.getData("IsEnabled", i);
                 if (currentIsEnabled !== isEnabled){
-                    root.commandsModel.SetData("IsEnabled", isEnabled, i);
+                    root.commandsModel.setData("IsEnabled", isEnabled, i);
                 }
             }
         }
@@ -57,10 +57,10 @@ Item {
             return;
         }
 
-        for (let i = 0; i < root.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = root.commandsModel.GetData("Id", i);
+        for (let i = 0; i < root.commandsModel.getItemsCount(); i++){
+            let currentCommandId = root.commandsModel.getData("Id", i);
             if (currentCommandId === commandId){
-                root.commandsModel.SetData("Icon", icon, i);
+                root.commandsModel.setData("Icon", icon, i);
                 break;
             }
         }
@@ -71,10 +71,10 @@ Item {
             return;
         }
 
-        for (let i = 0; i < root.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = root.commandsModel.GetData("Id", i);
+        for (let i = 0; i < root.commandsModel.getItemsCount(); i++){
+            let currentCommandId = root.commandsModel.getData("Id", i);
             if (currentCommandId === commandId){
-                root.commandsModel.SetData("Name", commandName, i);
+                root.commandsModel.setData("Name", commandName, i);
                 break;
             }
         }
@@ -85,10 +85,10 @@ Item {
             return;
         }
 
-        for (let i = 0; i < root.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = root.commandsModel.GetData("Id", i);
+        for (let i = 0; i < root.commandsModel.getItemsCount(); i++){
+            let currentCommandId = root.commandsModel.getData("Id", i);
             if (currentCommandId === commandId){
-                root.commandsModel.SetData("Status", notification, i);
+                root.commandsModel.setData("Status", notification, i);
                 break;
             }
         }
@@ -99,10 +99,10 @@ Item {
             return;
         }
 
-        for (let i = 0; i < root.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = root.commandsModel.GetData("Id", i);
+        for (let i = 0; i < root.commandsModel.getItemsCount(); i++){
+            let currentCommandId = root.commandsModel.getData("Id", i);
             if (currentCommandId === commandId){
-                root.commandsModel.SetData("Visible", isVisible, i);
+                root.commandsModel.setData("Visible", isVisible, i);
                 break;
             }
         }
@@ -113,8 +113,8 @@ Item {
             return -1;
         }
 
-        for (let i = 0; i < root.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = root.commandsModel.GetData("Id", i);
+        for (let i = 0; i < root.commandsModel.getItemsCount(); i++){
+            let currentCommandId = root.commandsModel.getData("Id", i);
             if (currentCommandId === commandId){
                 return i;
             }
@@ -127,7 +127,7 @@ Item {
         let index = root.getCommandIndex(commandId);
 
         if (index >= 0){
-            root.commandsModel.SetData("IsToggleable", toggleable, index);
+            root.commandsModel.setData("IsToggleable", toggleable, index);
         }
     }
 
@@ -135,7 +135,7 @@ Item {
         let index = root.getCommandIndex(commandId);
 
         if (index >= 0){
-            return root.commandsModel.GetData("IsToggleable", index);
+            return root.commandsModel.getData("IsToggleable", index);
         }
 
         return false;
@@ -145,7 +145,7 @@ Item {
         let index = root.getCommandIndex(commandId);
 
         if (index >= 0){
-            return root.commandsModel.GetData("IsToggled", index);
+            return root.commandsModel.getData("IsToggled", index);
         }
 
         return false;
@@ -155,7 +155,7 @@ Item {
         let index = root.getCommandIndex(commandId);
 
         if (index >= 0){
-            root.commandsModel.SetData("IsToggled", toggled, index);
+            root.commandsModel.setData("IsToggled", toggled, index);
         }
     }
 
@@ -170,9 +170,9 @@ Item {
             return;
         }
 
-        for (let i = 0; i < model.GetItemsCount(); i++){
-            model.SetData("IsToggleable", false, i);
-            model.SetData("IsToggled", false, i);
+        for (let i = 0; i < model.getItemsCount(); i++){
+            model.setData("IsToggleable", false, i);
+            model.setData("IsToggled", false, i);
         }
     }
 }

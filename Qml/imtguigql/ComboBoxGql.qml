@@ -94,7 +94,7 @@ Item {
 
     onSetCurrentText: {
         if(!comboBoxContainerGql.complexModel){
-            comboBoxContainerGql.currentText = modelll.GetData(comboBoxContainerGql.nameId,index);
+            comboBoxContainerGql.currentText = modelll.getData(comboBoxContainerGql.nameId,index);
         }
     }
 
@@ -112,7 +112,7 @@ Item {
 
     onModelChanged: {
         if (comboBoxContainerGql.currentIndex > -1){
-            comboBoxContainerGql.currentText = popup.model.GetData("Name");
+            comboBoxContainerGql.currentText = popup.model.getData("Name");
         }
     }
 
@@ -157,7 +157,7 @@ Item {
             // doNotCorrectPosition: comboBoxContainerGql.doNotCorrectPosition; !!!!!!!!!!!!
 
 //            function getCurrentText(index){
-//                return popup.model.GetData("Name",index);
+//                return popup.model.getData("Name",index);
 //            }
 //            Connections{
 //                target: comboBoxContainerGql;
@@ -179,14 +179,14 @@ Item {
                 console.log(index)
                 console.log(commandId)
                 if (index > -1){
-                    for (var item = 0; item < comboBoxContainerGql.gettedParams.GetItemsCount(); item++){
-                        let param = comboBoxContainerGql.gettedParams.GetData("Name",  item);
-                        let value = popup.model.GetData(param, index);
+                    for (var item = 0; item < comboBoxContainerGql.gettedParams.getItemsCount(); item++){
+                        let param = comboBoxContainerGql.gettedParams.getData("Name",  item);
+                        let value = popup.model.getData(param, index);
                         console.log(param, " = ", value);
-                        comboBoxContainerGql.gettedParams.SetData("Value", value, item);
+                        comboBoxContainerGql.gettedParams.setData("Value", value, item);
                     }
                 }
-                //comboBoxContainerGql.currentText = popup.model.GetData("Name", index);
+                //comboBoxContainerGql.currentText = popup.model.getData("Name", index);
                 comboBoxContainerGql.setCurrentText(popup.model,index)
                 if (comboBoxContainerGql.currentText == ""){
                     comboBoxContainerGql.currentText = popup.filterText;

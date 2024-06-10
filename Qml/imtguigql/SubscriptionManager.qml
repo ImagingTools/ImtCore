@@ -60,33 +60,33 @@ WebSocket {
     }
 
     onTextMessageReceived:{
-        let ok = socketModel.CreateFromJson(message)
+        let ok = socketModel.createFromJson(message)
 
-        if (socketModel.GetData("type") === "connection_ask"){
+        if (socketModel.getData("type") === "connection_ask"){
             registerSubscriptionToServer()
         }
-        else if (socketModel.GetData("type") === "start_ask"){
+        else if (socketModel.getData("type") === "start_ask"){
             for (let index = 0; index < subscriptionModel.length; index++){
-                if (subscriptionModel[index]["subscriptionId"] === socketModel.GetData("id")){
+                if (subscriptionModel[index]["subscriptionId"] === socketModel.getData("id")){
                     let subscription = subscriptionModel[index]["subscription"]
                     subscriptionModel[index]["status"] = "registered"
                     subscription.state = "Registered"
                 }
             }
         }
-        else if (socketModel.GetData("type") === "data"){
+        else if (socketModel.getData("type") === "data"){
             for (let index = 0; index < subscriptionModel.length; index++){
-                if (subscriptionModel[index]["subscriptionId"] == socketModel.GetData("id")){
+                if (subscriptionModel[index]["subscriptionId"] == socketModel.getData("id")){
                     let subscription = subscriptionModel[index]["subscription"]
                     if (!subscription){
                         continue;
                     }
 
                     subscription.state = "Processing"
-                    let dataModelLocal = socketModel.GetData("payload");
+                    let dataModelLocal = socketModel.getData("payload");
 
                     if (subscription && dataModelLocal){
-                        subscription.Copy(dataModelLocal)
+                        subscription.copy(dataModelLocal)
                         subscription.state = "Ready"
                     }
 

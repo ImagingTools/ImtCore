@@ -48,8 +48,8 @@ Item {
                     userPanelDelegate.cacheData.login = this.login;
                     userPanelDelegate.cacheData.password = this.password;
 
-                    userPanelDelegate.userModel.SetData("Password", this.password)
-                    userPanelDelegate.userModel.SetData("Username", this.login)
+                    userPanelDelegate.userModel.setData("Password", this.password)
+                    userPanelDelegate.userModel.setData("Username", this.login)
 
                     documentController.documentId = userPanelDelegate.userId;
                     documentController.documentModel = userPanelDelegate.userModel;

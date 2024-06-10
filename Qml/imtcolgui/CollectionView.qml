@@ -179,14 +179,14 @@ Item {
                 }
 
                 let notificationModel = container.dataController.notificationModel;
-                if (notificationModel.ContainsKey("TotalCount")){
-                    let totalCount = notificationModel.GetData("TotalCount")
+                if (notificationModel.containsKey("TotalCount")){
+                    let totalCount = notificationModel.getData("TotalCount")
 
                     container.pagination.countAllElements = totalCount;
                 }
 
-                if (notificationModel.ContainsKey("PagesCount")){
-                    let pagesCount = notificationModel.GetData("PagesCount")
+                if (notificationModel.containsKey("PagesCount")){
+                    let pagesCount = notificationModel.getData("PagesCount")
 
                     container.pagination.pagesSize = pagesCount;
                 }
@@ -295,7 +295,7 @@ Item {
             if (container.commandsDelegate){
                 let contextMenuModel = container.commandsDelegate.getContextMenuModel();
 
-                let offset = 26 * contextMenuModel.GetItemsCount();
+                let offset = 26 * contextMenuModel.getItemsCount();
                 ModalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": contextMenuModel});
             }
         }

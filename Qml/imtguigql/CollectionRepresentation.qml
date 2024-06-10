@@ -113,37 +113,37 @@ Item {
     }
 
     function removeElement(elementIndex){
-        if (elementIndex < 0 || elementIndex >= root.elementsModel.GetItemsCount()){
+        if (elementIndex < 0 || elementIndex >= root.elementsModel.getItemsCount()){
             console.error();
 
             return;
         }
 
-        let elementId = root.elementsModel.GetData("Id", elementIndex);
+        let elementId = root.elementsModel.getData("Id", elementIndex);
 
         removeModel.remove(elementId)
     }
 
     function setElementName(elementIndex, name){
-        if (elementIndex < 0 || elementIndex >= root.elementsModel.GetItemsCount()){
+        if (elementIndex < 0 || elementIndex >= root.elementsModel.getItemsCount()){
             console.error();
 
             return;
         }
 
-        let elementId = root.elementsModel.GetData("Id", elementIndex);
+        let elementId = root.elementsModel.getData("Id", elementIndex);
 
         renameQuery.rename(elementId, name)
     }
 
     function setElementDescription(elementIndex, description){
-        if (elementIndex < 0 || elementIndex >= root.elementsModel.GetItemsCount()){
+        if (elementIndex < 0 || elementIndex >= root.elementsModel.getItemsCount()){
             console.error();
 
             return;
         }
 
-        let elementId = root.elementsModel.GetData("Id", elementIndex);
+        let elementId = root.elementsModel.getData("Id", elementIndex);
 
         setDescriptionQuery.setDescription(elementId, description)
     }
@@ -183,21 +183,21 @@ Item {
         onStateChanged: {
             if (this.state === "Ready"){
                 var dataModelLocal;
-                if (removeModel.ContainsKey("errors")){
-                    dataModelLocal = removeModel.GetData("errors");
+                if (removeModel.containsKey("errors")){
+                    dataModelLocal = removeModel.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(internal.removeGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(internal.removeGqlCommand);
+                    if (dataModelLocal.containsKey(internal.removeGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(internal.removeGqlCommand);
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     ModalDialogManager.showWarningDialog(message)
@@ -205,17 +205,17 @@ Item {
                     return;
                 }
 
-                if (removeModel.ContainsKey("data")){
-                    dataModelLocal = removeModel.GetData("data");
+                if (removeModel.containsKey("data")){
+                    dataModelLocal = removeModel.getData("data");
 
-                    if (dataModelLocal.ContainsKey(internal.removeGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(internal.removeGqlCommand);
+                    if (dataModelLocal.containsKey(internal.removeGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(internal.removeGqlCommand);
 
-                        if (dataModelLocal.ContainsKey("removedNotification")){
-                            dataModelLocal = dataModelLocal.GetData("removedNotification");
+                        if (dataModelLocal.containsKey("removedNotification")){
+                            dataModelLocal = dataModelLocal.getData("removedNotification");
 
-                            if (dataModelLocal.ContainsKey("Id")){
-                                var itemId = dataModelLocal.GetData("Id");
+                            if (dataModelLocal.containsKey("Id")){
+                                var itemId = dataModelLocal.getData("Id");
 
                                 root.removed(itemId);
                             }
@@ -264,20 +264,20 @@ Item {
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (renameQuery.ContainsKey("errors")){
-                    dataModelLocal = renameQuery.GetData("errors");
+                if (renameQuery.containsKey("errors")){
+                    dataModelLocal = renameQuery.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(internal.renameGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(internal.renameGqlCommand);
+                    if (dataModelLocal.containsKey(internal.renameGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(internal.renameGqlCommand);
 
                         let message = ""
-                        if (dataModelLocal.ContainsKey("message")){
-                            message = dataModelLocal.GetData("message");
+                        if (dataModelLocal.containsKey("message")){
+                            message = dataModelLocal.getData("message");
                         }
 
                         let type;
-                        if (dataModelLocal.ContainsKey("type")){
-                            type = dataModelLocal.GetData("type");
+                        if (dataModelLocal.containsKey("type")){
+                            type = dataModelLocal.getData("type");
                         }
 
                         ModalDialogManager.showWarningDialog(message)
@@ -286,14 +286,14 @@ Item {
                     return;
                 }
 
-                if (renameQuery.ContainsKey("data")){
-                    dataModelLocal = renameQuery.GetData("data");
+                if (renameQuery.containsKey("data")){
+                    dataModelLocal = renameQuery.getData("data");
 
-                    if (dataModelLocal.ContainsKey(internal.renameGqlCommand)) {
-                        dataModelLocal = dataModelLocal.GetData(internal.renameGqlCommand);
+                    if (dataModelLocal.containsKey(internal.renameGqlCommand)) {
+                        dataModelLocal = dataModelLocal.getData(internal.renameGqlCommand);
 
-                        let id = dataModelLocal.GetData("Id");
-                        let newName = dataModelLocal.GetData("Name");
+                        let id = dataModelLocal.getData("Id");
+                        let newName = dataModelLocal.getData("Name");
 
                         root.renamed(id, newName);
                     }
@@ -336,20 +336,20 @@ Item {
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (setDescriptionQuery.ContainsKey("errors")){
-                    dataModelLocal = setDescriptionQuery.GetData("errors");
+                if (setDescriptionQuery.containsKey("errors")){
+                    dataModelLocal = setDescriptionQuery.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(internal.setDescriptionGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(internal.setDescriptionGqlCommand);
+                    if (dataModelLocal.containsKey(internal.setDescriptionGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(internal.setDescriptionGqlCommand);
 
                         let message = ""
-                        if (dataModelLocal.ContainsKey("message")){
-                            message = dataModelLocal.GetData("message");
+                        if (dataModelLocal.containsKey("message")){
+                            message = dataModelLocal.getData("message");
                         }
 
                         let type;
-                        if (dataModelLocal.ContainsKey("type")){
-                            type = dataModelLocal.GetData("type");
+                        if (dataModelLocal.containsKey("type")){
+                            type = dataModelLocal.getData("type");
                         }
 
                         ModalDialogManager.showWarningDialog(message)
@@ -358,15 +358,15 @@ Item {
                     return;
                 }
 
-                if (setDescriptionQuery.ContainsKey("data")){
-                    dataModelLocal = setDescriptionQuery.GetData("data");
+                if (setDescriptionQuery.containsKey("data")){
+                    dataModelLocal = setDescriptionQuery.getData("data");
 
-                    if (dataModelLocal.ContainsKey(internal.setDescriptionGqlCommand)) {
+                    if (dataModelLocal.containsKey(internal.setDescriptionGqlCommand)) {
 
-                        dataModelLocal = dataModelLocal.GetData(internal.setDescriptionGqlCommand);
+                        dataModelLocal = dataModelLocal.getData(internal.setDescriptionGqlCommand);
 
-                        var id = dataModelLocal.GetData("Id");
-                        var description = dataModelLocal.GetData("Description");
+                        var id = dataModelLocal.getData("Id");
+                        var description = dataModelLocal.getData("Description");
 
                         root.descriptionSetted(id ,description);
                     }
@@ -409,21 +409,21 @@ Item {
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (this.ContainsKey("errors")){
-                    dataModelLocal = this.GetData("errors");
+                if (this.containsKey("errors")){
+                    dataModelLocal = this.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(root.collectionId + "Info")){
-                        dataModelLocal = dataModelLocal.GetData(root.collectionId + "Info");
+                    if (dataModelLocal.containsKey(root.collectionId + "Info")){
+                        dataModelLocal = dataModelLocal.getData(root.collectionId + "Info");
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     ModalDialogManager.showWarningDialog(message)
@@ -431,23 +431,23 @@ Item {
                     return;
                 }
 
-                if (this.ContainsKey("data")){
-                    dataModelLocal = this.GetData("data");
+                if (this.containsKey("data")){
+                    dataModelLocal = this.getData("data");
 
-                    if (dataModelLocal.ContainsKey(root.collectionId + "Info")){
-                        dataModelLocal = dataModelLocal.GetData(root.collectionId + "Info");
+                    if (dataModelLocal.containsKey(root.collectionId + "Info")){
+                        dataModelLocal = dataModelLocal.getData(root.collectionId + "Info");
                         if (!dataModelLocal){
                             return;
                         }
 
-                        if (dataModelLocal.ContainsKey("FilterSearch")){
-                            let filterSearchModel = dataModelLocal.GetData("FilterSearch")
+                        if (dataModelLocal.containsKey("FilterSearch")){
+                            let filterSearchModel = dataModelLocal.getData("FilterSearch")
 
                             root.filterableHeadersModel = filterSearchModel;
                         }
 
-                        if(dataModelLocal.ContainsKey("Headers")){
-                            dataModelLocal = dataModelLocal.GetData("Headers");
+                        if(dataModelLocal.containsKey("Headers")){
+                            dataModelLocal = dataModelLocal.getData("Headers");
 
                             root.headersModel = dataModelLocal;
 
@@ -468,7 +468,7 @@ Item {
             var viewParams = Gql.GqlObject("viewParams");
             viewParams.InsertField("Count", count);
             viewParams.InsertField("Offset", offset);
-            viewParams.InsertField("FilterModel", filterModel.ToJson());
+            viewParams.InsertField("FilterModel", filterModel.toJson());
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
@@ -489,8 +489,8 @@ Item {
             queryFields.InsertField("Id");
             queryFields.InsertField("Name");
 
-            for(var i = 0; i < root.headersModel.GetItemsCount(); i++){
-                let headerId = root.headersModel.GetData("Id", i);
+            for(var i = 0; i < root.headersModel.getItemsCount(); i++){
+                let headerId = root.headersModel.getData("Id", i);
                 queryFields.InsertField(headerId);
             }
 
@@ -508,24 +508,24 @@ Item {
         }
 
         onStateChanged: {
-            console.log("List", this.ToJson());
+            console.log("List", this.toJson());
             if (this.state === "Ready"){
                 var dataModelLocal;
-                if (this.ContainsKey("errors")){
-                    dataModelLocal = this.GetData("errors");
+                if (this.containsKey("errors")){
+                    dataModelLocal = this.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(root.collectionId + "List")){
-                        dataModelLocal = dataModelLocal.GetData(root.collectionId + "List");
+                    if (dataModelLocal.containsKey(root.collectionId + "List")){
+                        dataModelLocal = dataModelLocal.getData(root.collectionId + "List");
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     ModalDialogManager.showWarningDialog(message)
@@ -533,20 +533,20 @@ Item {
                     return;
                 }
 
-                if (this.ContainsKey("data")){
-                    dataModelLocal = this.GetData("data");
-                    if (dataModelLocal.ContainsKey(root.collectionId + "List")){
-                        dataModelLocal = dataModelLocal.GetData(root.collectionId + "List");
-                        if (dataModelLocal.ContainsKey("notification")){
-                            root.notificationModel = dataModelLocal.GetData("notification");
+                if (this.containsKey("data")){
+                    dataModelLocal = this.getData("data");
+                    if (dataModelLocal.containsKey(root.collectionId + "List")){
+                        dataModelLocal = dataModelLocal.getData(root.collectionId + "List");
+                        if (dataModelLocal.containsKey("notification")){
+                            root.notificationModel = dataModelLocal.getData("notification");
                         }
 
-                        if (!dataModelLocal.ContainsKey("items")){
-                            dataModelLocal.AddTreeModel("items")
+                        if (!dataModelLocal.containsKey("items")){
+                            dataModelLocal.addTreeModel("items")
                         }
 
-                        if (dataModelLocal.ContainsKey("items")){
-                            root.elementsModel = dataModelLocal.GetData("items");
+                        if (dataModelLocal.containsKey("items")){
+                            root.elementsModel = dataModelLocal.getData("items");
                         }
                     }
                 }
@@ -589,21 +589,21 @@ Item {
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (this.ContainsKey("errors")){
-                    dataModelLocal = this.GetData("errors");
+                if (this.containsKey("errors")){
+                    dataModelLocal = this.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(root.collectionId + "ObjectView")){
-                        dataModelLocal = dataModelLocal.GetData(root.collectionId + "ObjectView");
+                    if (dataModelLocal.containsKey(root.collectionId + "ObjectView")){
+                        dataModelLocal = dataModelLocal.getData(root.collectionId + "ObjectView");
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     ModalDialogManager.showWarningDialog(message)
@@ -611,12 +611,12 @@ Item {
                     return;
                 }
 
-                dataModelLocal = this.GetData("data");
+                dataModelLocal = this.getData("data");
                 if(!dataModelLocal)
                     return;
 
-                if (dataModelLocal.ContainsKey(root.collectionId + "ObjectView")){
-                    dataModelLocal = dataModelLocal.GetData(root.collectionId + "ObjectView");
+                if (dataModelLocal.containsKey(root.collectionId + "ObjectView")){
+                    dataModelLocal = dataModelLocal.getData(root.collectionId + "ObjectView");
 
                     root.objectEditorInfoModel = dataModelLocal;
                 }

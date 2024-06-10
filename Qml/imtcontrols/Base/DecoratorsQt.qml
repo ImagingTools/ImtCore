@@ -279,7 +279,7 @@ Item {
             }
 
             onActivated: {
-                var id = model.GetData("Id", currentIndex);
+                var id = model.getData("Id", currentIndex);
                 console.log("Activated", currentIndex, id)
                 if(baseElement){
                     baseElement.finished(id, currentIndex);

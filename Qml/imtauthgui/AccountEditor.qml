@@ -41,65 +41,65 @@ ViewBase {
 
     function updateGui(){
         console.log("updateGui start");
-        if (accountEditorContainer.model.ContainsKey("Name")){
-            accountNameInput.text = accountEditorContainer.model.GetData("Name");
+        if (accountEditorContainer.model.containsKey("Name")){
+            accountNameInput.text = accountEditorContainer.model.getData("Name");
         }
         else{
             accountNameInput.text = "";
         }
 
-        if (accountEditorContainer.model.ContainsKey("Description")){
-            accountDescriptionInput.text = accountEditorContainer.model.GetData("Description");
+        if (accountEditorContainer.model.containsKey("Description")){
+            accountDescriptionInput.text = accountEditorContainer.model.getData("Description");
         }
         else{
             accountDescriptionInput.text = "";
         }
 
-        if (accountEditorContainer.model.ContainsKey("Country")){
-            countryInput.text = accountEditorContainer.model.GetData("Country");
+        if (accountEditorContainer.model.containsKey("Country")){
+            countryInput.text = accountEditorContainer.model.getData("Country");
         }
         else{
             countryInput.text = "";
         }
 
-        if (accountEditorContainer.model.ContainsKey("PostalCode")){
-            postalCodeInput.text = accountEditorContainer.model.GetData("PostalCode");
+        if (accountEditorContainer.model.containsKey("PostalCode")){
+            postalCodeInput.text = accountEditorContainer.model.getData("PostalCode");
         }
         else{
             postalCodeInput.text = "";
         }
 
-        if (accountEditorContainer.model.ContainsKey("City")){
-            cityInput.text = accountEditorContainer.model.GetData("City");
+        if (accountEditorContainer.model.containsKey("City")){
+            cityInput.text = accountEditorContainer.model.getData("City");
         }
         else{
             cityInput.text = "";
         }
 
-        if (accountEditorContainer.model.ContainsKey("Street")){
-            streetInput.text = accountEditorContainer.model.GetData("Street");
+        if (accountEditorContainer.model.containsKey("Street")){
+            streetInput.text = accountEditorContainer.model.getData("Street");
         }
         else{
             streetInput.text = "";
         }
 
-        if (accountEditorContainer.model.ContainsKey("Email")){
-            emailInput.text = accountEditorContainer.model.GetData("Email");
+        if (accountEditorContainer.model.containsKey("Email")){
+            emailInput.text = accountEditorContainer.model.getData("Email");
         }
         else{
             emailInput.text = "";
         }
 
-        if (accountEditorContainer.model.ContainsKey("CustomerId")){
-            customerIdInput.text = accountEditorContainer.model.GetData("CustomerId");
+        if (accountEditorContainer.model.containsKey("CustomerId")){
+            customerIdInput.text = accountEditorContainer.model.getData("CustomerId");
         }
         else{
             customerIdInput.text = "";
         }
 
         let groupIds = [];
-        if (accountEditorContainer.model.ContainsKey("Groups")){
-            let groups = accountEditorContainer.model.GetData("Groups")
+        if (accountEditorContainer.model.containsKey("Groups")){
+            let groups = accountEditorContainer.model.getData("Groups")
             if (groups !== ""){
                 groupIds = groups.split(';');
             }
@@ -108,8 +108,8 @@ ViewBase {
         groupsElement.table.uncheckAll();
 
         if (groupsElement.table.elements){
-            for (let i = 0; i < groupsElement.table.elements.GetItemsCount(); i++){
-                let id = groupsElement.table.elements.GetData("Id", i);
+            for (let i = 0; i < groupsElement.table.elements.getItemsCount(); i++){
+                let id = groupsElement.table.elements.getData("Id", i);
                 if (groupIds.includes(id)){
                     groupsElement.table.checkItem(i);
                 }
@@ -120,44 +120,44 @@ ViewBase {
     }
 
     function updateModel(){
-        console.log("start updateModel", model.ToJson());
+        console.log("start updateModel", model.toJson());
         let name = accountNameInput.text;
-        accountEditorContainer.model.SetData("Name", name)
+        accountEditorContainer.model.setData("Name", name)
 
         let description = accountDescriptionInput.text;
-        accountEditorContainer.model.SetData("Description", description)
+        accountEditorContainer.model.setData("Description", description)
 
         let country = countryInput.text;
-        accountEditorContainer.model.SetData("Country", country)
+        accountEditorContainer.model.setData("Country", country)
 
         let postalCode = postalCodeInput.text;
-        accountEditorContainer.model.SetData("PostalCode", postalCode)
+        accountEditorContainer.model.setData("PostalCode", postalCode)
 
         let city = cityInput.text;
-        accountEditorContainer.model.SetData("City", city)
+        accountEditorContainer.model.setData("City", city)
 
         let street = streetInput.text;
-        accountEditorContainer.model.SetData("Street", street)
+        accountEditorContainer.model.setData("Street", street)
 
         let email = emailInput.text;
-        accountEditorContainer.model.SetData("Email", email);
+        accountEditorContainer.model.setData("Email", email);
 
         let customerId = customerIdInput.text;
-        accountEditorContainer.model.SetData("CustomerId", customerId);
+        accountEditorContainer.model.setData("CustomerId", customerId);
 
         let selectedGroupIds = []
         let indexes = groupsElement.table.getCheckedItems();
         for (let index of indexes){
-            let id = groupsElement.table.elements.GetData("Id", index);
+            let id = groupsElement.table.elements.getData("Id", index);
             selectedGroupIds.push(id)
         }
 
         selectedGroupIds.sort()
 
         let groups = selectedGroupIds.join(';');
-        accountEditorContainer.model.SetData("Groups", groups)
+        accountEditorContainer.model.setData("Groups", groups)
 
-        console.log("end updateModel", model.ToJson());
+        console.log("end updateModel", model.toJson());
     }
 
     CustomScrollbar {
@@ -435,12 +435,12 @@ ViewBase {
             }
 
             function updateHeaders(){
-                headersModel.Clear();
+                headersModel.clear();
 
-                headersModel.InsertNewItem();
+                headersModel.insertNewItem();
 
-                headersModel.SetData("Id", "Name");
-                headersModel.SetData("Name", qsTr("Group Name"));
+                headersModel.setData("Id", "Name");
+                headersModel.setData("Name", qsTr("Group Name"));
 
                 groupsElement.table.headers = headersModel;
             }

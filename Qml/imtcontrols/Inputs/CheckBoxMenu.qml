@@ -101,15 +101,15 @@ FocusScope{
     function setText(model_, role_){
         let currText = "";
         let count = 0;
-        let itemsCount = model_.GetItemsCount();
+        let itemsCount = model_.getItemsCount();
         if(!itemsCount){
             return;
         }
         for(var i = 0; i < itemsCount ; i++){
-            let checkSt = model_.IsValidData(role_,i) ?
-                        model_.GetData(role_, i) : Qt.Unchecked
+            let checkSt = model_.isValidData(role_,i) ?
+                        model_.getData(role_, i) : Qt.Unchecked
 
-            let name_ = model_.GetData(checkBoxMenu.nameId,i);
+            let name_ = model_.getData(checkBoxMenu.nameId,i);
             if(checkSt){
                 if(currText !== ""){
                     currText = currText + ", ";
@@ -136,7 +136,7 @@ FocusScope{
             signal setCheckedSignal();
 
             onDataModelChanged: {
-                if(dataModel.GetItemsCount()){
+                if(dataModel.getItemsCount()){
                     popupMenuContainer.setAllChecked();
                     popupMenuContainer.setCheckedSignal();
                 }
@@ -166,10 +166,10 @@ FocusScope{
 
             function setAllCheckedInModel(state_){
 
-                let itemsCount = popupMenuContainer.dataModel.GetItemsCount();
+                let itemsCount = popupMenuContainer.dataModel.getItemsCount();
                  for(var i = 0; i < itemsCount ; i++){
-                     popupMenuContainer.dataModel.SetData("checkState", state_,i)
-                     popupMenuContainer.rootItem.dataModel.SetData("checkState", state_,i)
+                     popupMenuContainer.dataModel.setData("checkState", state_,i)
+                     popupMenuContainer.rootItem.dataModel.setData("checkState", state_,i)
                  }
                  popupMenuContainer.setCheckedSignal();
                  setCurrentText();
@@ -177,13 +177,13 @@ FocusScope{
 
             function setAllChecked(){
                 let count = 0;
-                let itemsCount = popupMenuContainer.dataModel.GetItemsCount();
+                let itemsCount = popupMenuContainer.dataModel.getItemsCount();
                 if(!itemsCount){
                     return;
                 }
                 for(var i = 0; i < itemsCount ; i++){
-                    let checkSt = popupMenuContainer.dataModel.IsValidData("checkState",i) ?
-                                popupMenuContainer.dataModel.GetData("checkState", i) : Qt.Unchecked
+                    let checkSt = popupMenuContainer.dataModel.isValidData("checkState",i) ?
+                                popupMenuContainer.dataModel.getData("checkState", i) : Qt.Unchecked
 
                     if(checkSt > 0){
                         count++;
@@ -204,15 +204,15 @@ FocusScope{
             function setCurrentText(){
                 let currText = "";
                 let count = 0;
-                let itemsCount = popupMenuContainer.dataModel.GetItemsCount();
+                let itemsCount = popupMenuContainer.dataModel.getItemsCount();
                 if(!itemsCount){
                     return;
                 }
                 for(var i = 0; i < itemsCount ; i++){
-                    let checkSt = popupMenuContainer.dataModel.IsValidData("checkState",i) ?
-                                popupMenuContainer.dataModel.GetData("checkState", i) : Qt.Unchecked
+                    let checkSt = popupMenuContainer.dataModel.isValidData("checkState",i) ?
+                                popupMenuContainer.dataModel.getData("checkState", i) : Qt.Unchecked
 
-                    let name_ = popupMenuContainer.dataModel.GetData(checkBoxMenu.nameId,i);
+                    let name_ = popupMenuContainer.dataModel.getData(checkBoxMenu.nameId,i);
                     if(checkSt){
                         if(currText !== ""){
                             currText = currText + ", ";
@@ -401,19 +401,19 @@ FocusScope{
                             }
 
                             function setCheckState(){
-                                if(popupMenuContainer.dataModel.IsValidData("checkState", model.index)){
-                                    checkState = popupMenuContainer.dataModel.GetData("checkState", model.index);
+                                if(popupMenuContainer.dataModel.isValidData("checkState", model.index)){
+                                    checkState = popupMenuContainer.dataModel.getData("checkState", model.index);
                                 }
                             }
 
                             onClicked: {
                                 if(checkState == Qt.Unchecked){
-                                    popupMenuContainer.dataModel.SetData("checkState", Qt.Checked, model.index);
-                                    popupMenuContainer.rootItem.dataModel.SetData("checkState", Qt.Checked, model.index);
+                                    popupMenuContainer.dataModel.setData("checkState", Qt.Checked, model.index);
+                                    popupMenuContainer.rootItem.dataModel.setData("checkState", Qt.Checked, model.index);
                                 }
                                 else if(checkState == Qt.Checked){
-                                    popupMenuContainer.dataModel.SetData("checkState", Qt.Unchecked, model.index);
-                                    popupMenuContainer.rootItem.dataModel.SetData("checkState", Qt.Unchecked, model.index);
+                                    popupMenuContainer.dataModel.setData("checkState", Qt.Unchecked, model.index);
+                                    popupMenuContainer.rootItem.dataModel.setData("checkState", Qt.Unchecked, model.index);
                                 }
                                 checkBox.setCheckState();
                                 popupMenuContainer.setAllChecked();
@@ -494,7 +494,7 @@ FocusScope{
             onClicked: {
                 checkBoxMenu.focus = true
 
-                if (checkBoxMenu.canOpenMenu && checkBoxMenu.dataModel !==undefined && checkBoxMenu.dataModel !== null && checkBoxMenu.dataModel.GetItemsCount() > 0){
+                if (checkBoxMenu.canOpenMenu && checkBoxMenu.dataModel !==undefined && checkBoxMenu.dataModel !== null && checkBoxMenu.dataModel.getItemsCount() > 0){
                     checkBoxMenu.openPopupMenu();
                 }
 

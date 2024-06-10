@@ -82,24 +82,24 @@ Rectangle{
     }
 
     function setGettedParamsModel(param){
-        searchContainer.gettedParamsModel.Clear();
-        var index = searchContainer.gettedParamsModel.InsertNewItem();
-        searchContainer.gettedParamsModel.SetData("Name", param, index);
+        searchContainer.gettedParamsModel.clear();
+        var index = searchContainer.gettedParamsModel.insertNewItem();
+        searchContainer.gettedParamsModel.setData("Name", param, index);
 
     }
 
     function setFilterIdsModel(id){
-        searchContainer.filterIdsModel.Clear();
-        var index = searchContainer.filterIdsModel.InsertNewItem();
-        searchContainer.filterIdsModel.SetData("Id", id, index);
+        searchContainer.filterIdsModel.clear();
+        var index = searchContainer.filterIdsModel.insertNewItem();
+        searchContainer.filterIdsModel.setData("Id", id, index);
     }
 
     function setPropertiesModel(id_,value_){
-        searchContainer.propertiesModel.Clear();
+        searchContainer.propertiesModel.clear();
         if(searchContainer.hasSearchProperty){
-            var index = searchContainer.propertiesModel.InsertNewItem();
-            searchContainer.propertiesModel.SetData("Id", id_);
-            searchContainer.propertiesModel.SetData("Value", value_);
+            var index = searchContainer.propertiesModel.insertNewItem();
+            searchContainer.propertiesModel.setData("Id", id_);
+            searchContainer.propertiesModel.setData("Value", value_);
         }
 
     }
@@ -108,7 +108,7 @@ Rectangle{
         searchTextField.excludeFilterPart = "";
         searchTextField.currentText = "";
         searchContainer.selectedText = "";
-        searchContainer.propertiesModel.Clear();
+        searchContainer.propertiesModel.clear();
         searchContainer.parentIds = "";
         setPropertiesModel(searchContainer.propertyId, "");
 
@@ -118,13 +118,13 @@ Rectangle{
         if(searchTextField.openST){
             var popup = ModalDialogManager.topItem;
 
-            popup.modelFilterAlias.Clear();
-            popup.modelFilterAlias.AddTreeModel("FilterIds");
-            popup.modelFilterAlias.SetData("FilterIds", searchContainer.filterIdsModel)
-            popup.modelFilterAlias.AddTreeModel("Sort");
-            popup.modelFilterAlias.SetData("ParentIds",  searchContainer.parentIds);
+            popup.modelFilterAlias.clear();
+            popup.modelFilterAlias.addTreeModel("FilterIds");
+            popup.modelFilterAlias.setData("FilterIds", searchContainer.filterIdsModel)
+            popup.modelFilterAlias.addTreeModel("Sort");
+            popup.modelFilterAlias.setData("ParentIds",  searchContainer.parentIds);
 
-            popup.modelFilterAlias.SetData("TextFilter", "");
+            popup.modelFilterAlias.setData("TextFilter", "");
             popup.excludeFilterPart = searchContainer.currentText;
             popup.filterText = searchContainer.currentText;
             popup.updateModel();
@@ -138,18 +138,18 @@ Rectangle{
             //searchTextField.currentIndex = -1;
             var addStrNew = addStr_ !== undefined ? addStr_ : "";
 
-            var tempStr = currentText = modelll.GetData(searchContainer.valueName, index_) + addStrNew
+            var tempStr = currentText = modelll.getData(searchContainer.valueName, index_) + addStrNew
 //            if(tempStr[tempStr.length - 1] == ","){
 //                tempStr = tempStr.slice(0, tempStr.length - 1);
 //            }
 
-            searchTextField.currentText = tempStr;//modelll.GetData(searchContainer.valueName, index_) + addStrNew;
+            searchTextField.currentText = tempStr;//modelll.getData(searchContainer.valueName, index_) + addStrNew;
 
-            var parentIds__ = modelll.GetData("ParentIds",index_) !== undefined ? modelll.GetData("ParentIds", index_) : "";
+            var parentIds__ = modelll.getData("ParentIds",index_) !== undefined ? modelll.getData("ParentIds", index_) : "";
             if(parentIds__ !== ""){
                 parentIds__ = parentIds__ + ",";
             }
-            var addressId__ = modelll.GetData("Id", index_);
+            var addressId__ = modelll.getData("Id", index_);
             searchContainer.parentIds = parentIds__ + addressId__;
             searchContainer.selectedText = searchTextField.currentText;
             setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
@@ -158,7 +158,7 @@ Rectangle{
 
             var retV;
             if(searchContainer.retValName !== ""){
-                retV = modelll.GetData(searchContainer.retValName, index_);
+                retV = modelll.getData(searchContainer.retValName, index_);
             }
             else {
                 retV = searchContainer.externalSearchParam;
@@ -166,8 +166,8 @@ Rectangle{
             //console.log("searchContainer.externalSearchParam", searchContainer.externalSearchParam)
 
             if(searchContainer.canReturnModel){
-                searchContainer.returnModel.Clear();
-                searchContainer.returnModel.CopyItemDataFromModel(0, modelll, index_);
+                searchContainer.returnModel.clear();
+                searchContainer.returnModel.copyItemDataFromModel(0, modelll, index_);
                 searchContainer.returnModelSignal();
             }
 
@@ -176,13 +176,13 @@ Rectangle{
             if(searchTextField.openST){
                 var popup = ModalDialogManager.topItem;
 
-                popup.modelFilterAlias.Clear();
-                popup.modelFilterAlias.AddTreeModel("FilterIds");
-                popup.modelFilterAlias.SetData("FilterIds", searchContainer.filterIdsModel)
-                popup.modelFilterAlias.AddTreeModel("Sort");
-                popup.modelFilterAlias.SetData("ParentIds",  searchContainer.parentIds);
+                popup.modelFilterAlias.clear();
+                popup.modelFilterAlias.addTreeModel("FilterIds");
+                popup.modelFilterAlias.setData("FilterIds", searchContainer.filterIdsModel)
+                popup.modelFilterAlias.addTreeModel("Sort");
+                popup.modelFilterAlias.setData("ParentIds",  searchContainer.parentIds);
 
-                popup.modelFilterAlias.SetData("TextFilter", "");
+                popup.modelFilterAlias.setData("TextFilter", "");
                 popup.excludeFilterPart = searchContainer.currentText;
                 popup.filterText = searchContainer.currentText;
 
@@ -196,10 +196,10 @@ Rectangle{
     }
 
     function setCurrentTextFunc(modelll, index_){
-        searchTextField.currentText = modelll.GetData(searchContainer.valueName, index_);
+        searchTextField.currentText = modelll.getData(searchContainer.valueName, index_);
         var retV;
         if(searchContainer.retValName !== ""){
-            retV = modelll.GetData(searchContainer.retValName, index_);
+            retV = modelll.getData(searchContainer.retValName, index_);
         }
         else{
             retV = searchTextField.currentText;
@@ -244,14 +244,14 @@ Rectangle{
                         setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
                         popup.excludeFilterPart = searchTextField.excludeFilterPart;
 
-                        popup.modelFilterAlias.Clear();
-                        popup.modelFilterAlias.AddTreeModel("FilterIds");
-                        popup.modelFilterAlias.SetData("FilterIds", searchContainer.filterIdsModel)
-                        popup.modelFilterAlias.AddTreeModel("Sort");
-                        popup.modelFilterAlias.SetData("ParentIds",  searchContainer.parentIds);
+                        popup.modelFilterAlias.clear();
+                        popup.modelFilterAlias.addTreeModel("FilterIds");
+                        popup.modelFilterAlias.setData("FilterIds", searchContainer.filterIdsModel)
+                        popup.modelFilterAlias.addTreeModel("Sort");
+                        popup.modelFilterAlias.setData("ParentIds",  searchContainer.parentIds);
 
                         var str = filterText.replace(popup.excludeFilterPart, "");
-                        popup.modelFilterAlias.SetData("TextFilter", str);
+                        popup.modelFilterAlias.setData("TextFilter", str);
 
                         updatePause.restart();
 
@@ -261,13 +261,13 @@ Rectangle{
                 }
 
                 else {//isTextIncrease
-                    var modelCount = popup.model.GetItemsCount();
+                    var modelCount = popup.model.getItemsCount();
                     if(modelCount){
                         if(filterText[filterText.length -1] == ","){
                             let str = filterText.slice(0,-1);
                             var strArrCount = searchContainer.arraySize(str);
-                            //var newAddress = searchContainer.keepNElements(popup.model.GetData(searchContainer.valueName),strArrCount)//;
-                            var newAddress = popup.model.GetData(searchContainer.valueName);
+                            //var newAddress = searchContainer.keepNElements(popup.model.getData(searchContainer.valueName),strArrCount)//;
+                            var newAddress = popup.model.getData(searchContainer.valueName);
                              str = str.replace(/ +/g, '');
                              newAddress = newAddress.replace(/ +/g, '');
                             //console.log("ЗАПЯТАЯ " , "str: ", str, "newAddress: ", newAddress);
@@ -345,51 +345,51 @@ Rectangle{
     }
 
     function clearModels(){
-        searchContainer.gettedParamsModel.Clear();
-        searchContainer.filterIdsModel.Clear();
-        searchContainer.propertiesModel.Clear();
+        searchContainer.gettedParamsModel.clear();
+        searchContainer.filterIdsModel.clear();
+        searchContainer.propertiesModel.clear();
     }
 
     function setSearchModels(gettedParamModel_, filterIdsModel_, propertiesModel_){
         searchContainer.clearModels();
 
-        for(let i = 0; i < gettedParamModel_.GetItemsCount(); i++){
-            searchContainer.gettedParamsModel.InsertNewItem();
-            searchContainer.gettedParamsModel.CopyItemDataFromModel(i,gettedParamModel_,i);
+        for(let i = 0; i < gettedParamModel_.getItemsCount(); i++){
+            searchContainer.gettedParamsModel.insertNewItem();
+            searchContainer.gettedParamsModel.copyItemDataFromModel(i,gettedParamModel_,i);
         }
-        for(let j = 0; j < filterIdsModel_.GetItemsCount(); j++){
-            searchContainer.filterIdsModel.InsertNewItem();
-            searchContainer.filterIdsModel.CopyItemDataFromModel(j,filterIdsModel_,j);
+        for(let j = 0; j < filterIdsModel_.getItemsCount(); j++){
+            searchContainer.filterIdsModel.insertNewItem();
+            searchContainer.filterIdsModel.copyItemDataFromModel(j,filterIdsModel_,j);
         }
         if(propertiesModel_ !== null){
-            for(let k = 0; k < propertiesModel_.GetItemsCount(); k++){
-                searchContainer.propertiesModel.InsertNewItem();
-                searchContainer.propertiesModel.CopyItemDataFromModel(k,propertiesModel_,k);
+            for(let k = 0; k < propertiesModel_.getItemsCount(); k++){
+                searchContainer.propertiesModel.insertNewItem();
+                searchContainer.propertiesModel.copyItemDataFromModel(k,propertiesModel_,k);
             }
         }
     }
 
     function copyToGettedParamsModel(gettedParamModel_){
-        searchContainer.gettedParamsModel.Clear();
-        for(let i = 0; i < gettedParamModel_.GetItemsCount(); i++){
-            searchContainer.gettedParamsModel.InsertNewItem();
-            searchContainer.gettedParamsModel.CopyItemDataFromModel(i,gettedParamModel_,i);
+        searchContainer.gettedParamsModel.clear();
+        for(let i = 0; i < gettedParamModel_.getItemsCount(); i++){
+            searchContainer.gettedParamsModel.insertNewItem();
+            searchContainer.gettedParamsModel.copyItemDataFromModel(i,gettedParamModel_,i);
         }
     }
 
     function copyToFilterIdsModel(filterIdsModel_){
-        searchContainer.filterIdsModel.Clear();
-        for(let j = 0; j < filterIdsModel_.GetItemsCount(); j++){
-            searchContainer.filterIdsModel.InsertNewItem();
-            searchContainer.filterIdsModel.CopyItemDataFromModel(j,filterIdsModel_,j);
+        searchContainer.filterIdsModel.clear();
+        for(let j = 0; j < filterIdsModel_.getItemsCount(); j++){
+            searchContainer.filterIdsModel.insertNewItem();
+            searchContainer.filterIdsModel.copyItemDataFromModel(j,filterIdsModel_,j);
         }
     }
 
     function copyToPropertiesModel(propertiesModel_){
-        searchContainer.propertiesModel.Clear();
-        for(let k = 0; k < propertiesModel_.GetItemsCount(); k++){
-            searchContainer.propertiesModel.InsertNewItem();
-            searchContainer.propertiesModel.CopyItemDataFromModel(k,propertiesModel_,k);
+        searchContainer.propertiesModel.clear();
+        for(let k = 0; k < propertiesModel_.getItemsCount(); k++){
+            searchContainer.propertiesModel.insertNewItem();
+            searchContainer.propertiesModel.copyItemDataFromModel(k,propertiesModel_,k);
         }
     }
 
@@ -559,11 +559,11 @@ Rectangle{
 
         onCloseSignal:{
             if(searchContainer.isAddressSearch){
-                var modelCount = model_.GetItemsCount();
+                var modelCount = model_.getItemsCount();
                 if(modelCount){
 
                     var str = currentText;
-                    var newAddress = model_.GetData(searchContainer.valueName),strArrCount;
+                    var newAddress = model_.getData(searchContainer.valueName),strArrCount;
                     var str_form = str.replace(/ +/g, '');
                     var newAddress_form = newAddress.replace(/ +/g, '');
 

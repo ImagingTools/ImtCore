@@ -305,9 +305,9 @@ Rectangle {
     function fillMonthComboModel(){
         if(calendar.hasMonthCombo){
             for(var i = 0; i < calendar.monthNames.length; i++){
-                var index = monthComboModel.InsertNewItem();
-                monthComboModel.SetData("Id", index, index);
-                monthComboModel.SetData("Name",qsTr(calendar.monthNames[i]),index);
+                var index = monthComboModel.insertNewItem();
+                monthComboModel.setData("Id", index, index);
+                monthComboModel.setData("Name",qsTr(calendar.monthNames[i]),index);
             }
         }
     }
@@ -316,9 +316,9 @@ Rectangle {
     function fillYearComboModel(){
         if(calendar.hasYearCombo){
             for(var i = calendar.startYear; i <= calendar.lastYear;i++){
-                let index = yearComboModel.InsertNewItem();
-                yearComboModel.SetData("Id", index, index);
-                yearComboModel.SetData("Name", String(i),index);
+                let index = yearComboModel.insertNewItem();
+                yearComboModel.setData("Id", index, index);
+                yearComboModel.setData("Name", String(i),index);
             }
         }
     }
@@ -375,7 +375,7 @@ Rectangle {
 
         listview.canFillModel = false;
 
-        calendar.monthTreeModel.Clear();
+        calendar.monthTreeModel.clear();
 
         var prevMonth = month == 0 ? 11 : month - 1;
         var prevMonth_year = month == 0 ? year -1 : year;
@@ -388,11 +388,11 @@ Rectangle {
 
         calendar.fillDayModel(dayTreeModelNext, nextMonth, nextMonth_year);
 
-        //calendar.monthTreeModel.Clear();
+        //calendar.monthTreeModel.clear();
 
         var modelToFill;
         var isFirstTempModel = true;
-        if(!calendar.monthTreeModel_temp1.GetItemsCount()){
+        if(!calendar.monthTreeModel_temp1.getItemsCount()){
             modelToFill = calendar.monthTreeModel_temp1;
             isFirstTempModel = true;
         }
@@ -401,47 +401,47 @@ Rectangle {
             isFirstTempModel = false;
         }
 
-        var index = modelToFill.InsertNewItem();
-        modelToFill.SetData("DayModel", dayTreeModelPrev, index);
-        modelToFill.SetData("MonthName", calendar.monthName(prevMonth), index);
-        modelToFill.SetData("Month", prevMonth, index);
-        modelToFill.SetData("Year", prevMonth_year , index);
+        var index = modelToFill.insertNewItem();
+        modelToFill.setData("DayModel", dayTreeModelPrev, index);
+        modelToFill.setData("MonthName", calendar.monthName(prevMonth), index);
+        modelToFill.setData("Month", prevMonth, index);
+        modelToFill.setData("Year", prevMonth_year , index);
 
-        index = modelToFill.InsertNewItem();
-        modelToFill.SetData("DayModel", dayTreeModel, index);
-        modelToFill.SetData("MonthName", calendar.monthName(month), index);
-        modelToFill.SetData("Month", month, index);
-        modelToFill.SetData("Year", year, index);
+        index = modelToFill.insertNewItem();
+        modelToFill.setData("DayModel", dayTreeModel, index);
+        modelToFill.setData("MonthName", calendar.monthName(month), index);
+        modelToFill.setData("Month", month, index);
+        modelToFill.setData("Year", year, index);
 
-        index = modelToFill.InsertNewItem();
-        modelToFill.SetData("DayModel", dayTreeModelNext, index);
-        modelToFill.SetData("MonthName", calendar.monthName(nextMonth), index);
-        modelToFill.SetData("Month", nextMonth, index);
-        modelToFill.SetData("Year", nextMonth_year , index);
+        index = modelToFill.insertNewItem();
+        modelToFill.setData("DayModel", dayTreeModelNext, index);
+        modelToFill.setData("MonthName", calendar.monthName(nextMonth), index);
+        modelToFill.setData("Month", nextMonth, index);
+        modelToFill.setData("Year", nextMonth_year , index);
 
 
-        modelToFill.SetIsArray(true);
+        modelToFill.setIsArray(true);
 
         calendar.monthTreeModel = modelToFill;
         if(isFirstTempModel){
-            calendar.monthTreeModel_temp2.Clear();
+            calendar.monthTreeModel_temp2.clear();
         }
         else{
-            calendar.monthTreeModel_temp1.Clear();
+            calendar.monthTreeModel_temp1.clear();
         }
 
 
         //console.log("____________MonthModel______________");
-        //        console.log(calendar.monthTreeModel.ToJson());
+        //        console.log(calendar.monthTreeModel.toJson());
 
 
 
         listview.positionViewAtIndex(1,ListView.Beginning);
         calendar.listViewContentX = listview.contentX;
 
-        //calendar.selectedIndexMonth = calendar.monthTreeModel.GetData("Month",1);
+        //calendar.selectedIndexMonth = calendar.monthTreeModel.getData("Month",1);
         calendar.selectedMonthName = calendar.monthName(calendar.selectedIndexMonth);
-        //calendar.selectedIndexYear = calendar.monthTreeModel.GetData("Year",1);
+        //calendar.selectedIndexYear = calendar.monthTreeModel.getData("Year",1);
 
         listview.canFillModel = true;
 
@@ -450,7 +450,7 @@ Rectangle {
 
 
     function fillDayModel(model, month, year){
-        model.Clear();
+        model.clear();
 
         var date  = new Date(year, month, 1);
         var firstWeekDay = calendar.weekDayNumber(date.getDay());
@@ -461,23 +461,23 @@ Rectangle {
 
 
         for(var i = prevMonthLastDay - (firstWeekDay - 1 -1) ; i <= prevMonthLastDay; i++){
-            var index = model.InsertNewItem();
-            model.SetData("Id", index, index);
-            model.SetData("Day",i,index);
-            model.SetData("Month",prevMonth,index);
-            model.SetData("Year",prevMonth_year,index);
-            model.SetData("CurrMonth",false,index);
+            var index = model.insertNewItem();
+            model.setData("Id", index, index);
+            model.setData("Day",i,index);
+            model.setData("Month",prevMonth,index);
+            model.setData("Year",prevMonth_year,index);
+            model.setData("CurrMonth",false,index);
 
         }
 
         var lastDay = calendar.getLastDayOfMonth(month, year);
         for(i = 1; i <= lastDay; i++){
-            index = model.InsertNewItem();
-            model.SetData("Id", index, index);
-            model.SetData("Day",i,index);
-            model.SetData("Month",month,index);
-            model.SetData("Year",year,index);
-            model.SetData("CurrMonth",true,index);
+            index = model.insertNewItem();
+            model.setData("Id", index, index);
+            model.setData("Day",i,index);
+            model.setData("Month",month,index);
+            model.setData("Year",year,index);
+            model.setData("CurrMonth",true,index);
 
 
         }
@@ -485,15 +485,15 @@ Rectangle {
         var nextMonth = month == 11 ? 0 : month + 1;
         var nextMonth_year = month == 11 ? year + 1 : year;
 
-        var count = model.GetItemsCount();
+        var count = model.getItemsCount();
 
         for(i = 1; i <= (42 - count); i++){
-            index = model.InsertNewItem();
-            model.SetData("Id", index, index);
-            model.SetData("Day",i,index);
-            model.SetData("Month",nextMonth,index);
-            model.SetData("Year",nextMonth_year,index);
-            model.SetData("CurrMonth",false,index);
+            index = model.insertNewItem();
+            model.setData("Id", index, index);
+            model.setData("Day",i,index);
+            model.setData("Month",nextMonth,index);
+            model.setData("Year",nextMonth_year,index);
+            model.setData("CurrMonth",false,index);
 
         }
 

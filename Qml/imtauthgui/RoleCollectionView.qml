@@ -40,7 +40,7 @@ RemoteCollectionView {
                     return;
                 }
 
-                let itemId = elementsModel.GetData("Roles").GetData("Id", elementIndex);
+                let itemId = elementsModel.getData("Roles").getData("Id", elementIndex);
                 removeGqlModel.remove(itemId);
             }
         }
@@ -109,19 +109,19 @@ RemoteCollectionView {
         if(!permissionsProvider) return
 
         let productId = ""
-        if (table.elements.ContainsKey("Id")){
-            productId = table.elements.GetData("Id");
+        if (table.elements.containsKey("Id")){
+            productId = table.elements.getData("Id");
         }
 
         if (productId === ""){
             return
         }
 
-        permissionsProvider.productId = table.elements.GetData("Id");
+        permissionsProvider.productId = table.elements.getData("Id");
 
-        if (table.elements.ContainsKey("Roles")){
-            let elementsModel = table.elements.GetData("Roles");
-            table.tableSelection.countElements = elementsModel.GetItemsCount();
+        if (table.elements.containsKey("Roles")){
+            let elementsModel = table.elements.getData("Roles");
+            table.tableSelection.countElements = elementsModel.getItemsCount();
         }
 
         permissionsProvider.updateModel();
@@ -168,7 +168,7 @@ RemoteCollectionView {
 
             Component.onCompleted: {
                 let elements = roleCollectionViewContainer.table.elements;
-                productId = elements.GetData("Id")
+                productId = elements.getData("Id")
             }
         }
     }
@@ -183,7 +183,7 @@ RemoteCollectionView {
 
             function getAdditionalInputParams(){
                 let elements = roleCollectionViewContainer.table.elements;
-                let productId = elements.GetData("Id")
+                let productId = elements.getData("Id")
 
                 let obj = {}
                 obj["ProductId"] = productId;

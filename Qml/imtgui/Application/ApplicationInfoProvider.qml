@@ -40,17 +40,17 @@ QtObject {
             if (this.state === "Ready") {
                 var dataModelLocal;
 
-                if (root.applicationInfoQuery.ContainsKey("errors")){
-                    dataModelLocal = root.applicationInfoQuery.GetData("errors");
+                if (root.applicationInfoQuery.containsKey("errors")){
+                    dataModelLocal = root.applicationInfoQuery.getData("errors");
 
                     return;
                 }
 
-                if (root.applicationInfoQuery.ContainsKey("data")){
-                    dataModelLocal = root.applicationInfoQuery.GetData("data");
+                if (root.applicationInfoQuery.containsKey("data")){
+                    dataModelLocal = root.applicationInfoQuery.getData("data");
 
-                    if (dataModelLocal.ContainsKey("GetApplicationInfo")){
-                        dataModelLocal = dataModelLocal.GetData("GetApplicationInfo");
+                    if (dataModelLocal.containsKey("GetApplicationInfo")){
+                        dataModelLocal = dataModelLocal.getData("GetApplicationInfo");
 
                         root.serverApplicationInfo = dataModelLocal;
                     }

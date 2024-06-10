@@ -44,7 +44,7 @@ Item {
             }
 
             for (let i = 0; i < listModel.count; i++){
-                let index = treeItemModel.InsertNewItem();
+                let index = treeItemModel.insertNewItem();
 
                 let objItem = listModel.get(i);
 
@@ -55,12 +55,12 @@ Item {
                     let value = objItem[key];
 
                     if (typeof value == 'object'){
-                        let obj = treeItemModel.AddTreeModel(key, index);
+                        let obj = treeItemModel.addTreeModel(key, index);
 
                         convertFromListModelRecursive(value, obj);
                     }
                     else{
-                        treeItemModel.SetData(key, value, index);
+                        treeItemModel.setData(key, value, index);
                     }
                 }
             }
@@ -71,14 +71,14 @@ Item {
                 return;
             }
 
-            for (let i = 0; i < treeItemModel.GetItemsCount(); i++){
-                let itemKeys = treeItemModel.GetKeys(i);
+            for (let i = 0; i < treeItemModel.getItemsCount(); i++){
+                let itemKeys = treeItemModel.getKeys(i);
 
                 let objectItem = {}
                 for (let j = 0; j < itemKeys.length; j++){
                     let key = itemKeys[j];
 
-                    let value = treeItemModel.GetData(key, i);
+                    let value = treeItemModel.getData(key, i);
                     if (typeof value == 'object'){
                         let obj = listModelComp.createObject(listModel);
 

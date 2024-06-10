@@ -28,8 +28,8 @@ ViewBase {
         console.log("UserGroups updateGui");
 
         let groupIds = []
-        if (userGroupsContainer.model.ContainsKey("Groups")){
-            let parentGroups = userGroupsContainer.model.GetData("Groups");
+        if (userGroupsContainer.model.containsKey("Groups")){
+            let parentGroups = userGroupsContainer.model.getData("Groups");
             if (parentGroups !== ""){
                 groupIds = parentGroups.split(';')
             }
@@ -37,8 +37,8 @@ ViewBase {
 
         groupsTable.uncheckAll();
         if (groupsTable.elements){
-            for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
-                let id = groupsTable.elements.GetData("Id", i);
+            for (let i = 0; i < groupsTable.elements.getItemsCount(); i++){
+                let id = groupsTable.elements.getData("Id", i);
                 if (groupIds.includes(id)){
                     groupsTable.checkItem(i);
                 }
@@ -52,13 +52,13 @@ ViewBase {
 
         let indexes = groupsTable.getCheckedItems();
         for (let index of indexes){
-            let id = groupsTable.elements.GetData("Id", index);
+            let id = groupsTable.elements.getData("Id", index);
             selectedGroupIds.push(id);
         }
 
         selectedGroupIds.sort();
 
-        userGroupsContainer.model.SetData("Groups", selectedGroupIds.join(';'));
+        userGroupsContainer.model.setData("Groups", selectedGroupIds.join(';'));
     }
 
     Component{
@@ -101,18 +101,18 @@ ViewBase {
         id: groupsHeadersModel;
 
         function updateHeaders(){
-            groupsHeadersModel.Clear();
+            groupsHeadersModel.clear();
 
-            let index = groupsHeadersModel.InsertNewItem();
-            groupsHeadersModel.SetData("Id", "Name", index);
-            groupsHeadersModel.SetData("Name", qsTr("Group Name"), index);
+            let index = groupsHeadersModel.insertNewItem();
+            groupsHeadersModel.setData("Id", "Name", index);
+            groupsHeadersModel.setData("Name", qsTr("Group Name"), index);
 
-            index = groupsHeadersModel.InsertNewItem();
+            index = groupsHeadersModel.insertNewItem();
 
-            groupsHeadersModel.SetData("Id", "Description", index);
-            groupsHeadersModel.SetData("Name", qsTr("Description"), index);
+            groupsHeadersModel.setData("Id", "Description", index);
+            groupsHeadersModel.setData("Name", qsTr("Description"), index);
 
-            groupsHeadersModel.Refresh();
+            groupsHeadersModel.refresh();
 
             groupsTable.headers = groupsHeadersModel;
         }

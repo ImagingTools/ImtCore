@@ -118,17 +118,17 @@ Item {
 
             Component.onCompleted: {
 
-                let index = comboBoxModel.InsertNewItem();
-                comboBoxModel.SetData("Id", "Day", index)
-                comboBoxModel.SetData("Name", "Day", index)
+                let index = comboBoxModel.insertNewItem();
+                comboBoxModel.setData("Id", "Day", index)
+                comboBoxModel.setData("Name", "Day", index)
 
-                index = comboBoxModel.InsertNewItem();
-                comboBoxModel.SetData("Id", "Week", index)
-                comboBoxModel.SetData("Name", "Week", index)
+                index = comboBoxModel.insertNewItem();
+                comboBoxModel.setData("Id", "Week", index)
+                comboBoxModel.setData("Name", "Week", index)
 
-                index = comboBoxModel.InsertNewItem();
-                comboBoxModel.SetData("Id", "Month", index)
-                comboBoxModel.SetData("Name", "Month", index)
+                index = comboBoxModel.insertNewItem();
+                comboBoxModel.setData("Id", "Month", index)
+                comboBoxModel.setData("Name", "Month", index)
 
                 comboBox.model = comboBoxModel;
             }
@@ -147,7 +147,7 @@ Item {
             onCurrentIndexChanged: {
                 console.log("onCurrentIndexChanged", root.itemData.Interval);
                 if (comboBox.currentIndex >= 0){
-                    let id = comboBox.model.GetData("Id", comboBox.currentIndex);
+                    let id = comboBox.model.getData("Id", comboBox.currentIndex);
                     let secondsInHour = 3600;
 
                     let newInterval = -1;

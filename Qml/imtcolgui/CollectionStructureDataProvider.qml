@@ -59,11 +59,11 @@ Item {
     }
 
     function getData(objectId, value){
-        for (let i = 0; i < container.collectionModel.GetItemsCount(); i++){
-            let objectCollectionId = container.collectionModel.GetData("Id", i);
+        for (let i = 0; i < container.collectionModel.getItemsCount(); i++){
+            let objectCollectionId = container.collectionModel.getData("Id", i);
             if (objectCollectionId === objectId){
-                if (container.collectionModel.ContainsKey(value, i)){
-                    return container.collectionModel.GetData(value, i);
+                if (container.collectionModel.containsKey(value, i)){
+                    return container.collectionModel.getData(value, i);
                 }
 
                 break;
@@ -82,7 +82,7 @@ Item {
             viewParams.InsertField("Offset", container.offset);
             viewParams.InsertField("Count", container.count);
 
-            var jsonString = container.filterModel.ToJson();
+            var jsonString = container.filterModel.toJson();
             viewParams.InsertField("FilterModel", jsonString);
             console.log( "gqlModelBaseContainer filterModel", jsonString);
 
@@ -112,22 +112,22 @@ Item {
             console.log("State:", this.state, container.itemsInfoModel);
             if (this.state === "Ready"){
                 var dataModelLocal;
-                if (container.itemsInfoModel.ContainsKey("errors")){
+                if (container.itemsInfoModel.containsKey("errors")){
                     return;
                 }
 
-                if (container.itemsInfoModel.ContainsKey("data")){
-                    dataModelLocal = container.itemsInfoModel.GetData("data");
-                    if (dataModelLocal.ContainsKey(container.commandId + "List")){
-                        dataModelLocal = dataModelLocal.GetData(container.commandId + "List");
-                        if (dataModelLocal.ContainsKey("items")){
-                            container.collectionModel = dataModelLocal.GetData("items");
+                if (container.itemsInfoModel.containsKey("data")){
+                    dataModelLocal = container.itemsInfoModel.getData("data");
+                    if (dataModelLocal.containsKey(container.commandId + "List")){
+                        dataModelLocal = dataModelLocal.getData(container.commandId + "List");
+                        if (dataModelLocal.containsKey("items")){
+                            container.collectionModel = dataModelLocal.getData("items");
                         }
 
-                        if (dataModelLocal.ContainsKey("notification")){
-                            dataModelLocal = dataModelLocal.GetData("notification");
-                            if (dataModelLocal.ContainsKey("PagesCount")){
-                                dataModelLocal = dataModelLocal.GetData("PagesCount");
+                        if (dataModelLocal.containsKey("notification")){
+                            dataModelLocal = dataModelLocal.getData("notification");
+                            if (dataModelLocal.containsKey("PagesCount")){
+                                dataModelLocal = dataModelLocal.getData("PagesCount");
                             }
                         }
 

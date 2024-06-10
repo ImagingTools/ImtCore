@@ -86,21 +86,21 @@ QtObject {
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (gqlModelBaseContainer.headerInfoModel.ContainsKey("errors")){
-                    dataModelLocal = gqlModelBaseContainer.headerInfoModel.GetData("errors");
+                if (gqlModelBaseContainer.headerInfoModel.containsKey("errors")){
+                    dataModelLocal = gqlModelBaseContainer.headerInfoModel.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getHeadersGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getHeadersGqlCommand);
+                    if (dataModelLocal.containsKey(gqlModelBaseContainer.getHeadersGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(gqlModelBaseContainer.getHeadersGqlCommand);
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     ModalDialogManager.showWarningDialog(message)
@@ -108,26 +108,26 @@ QtObject {
                     return;
                 }
 
-                if (gqlModelBaseContainer.headerInfoModel.ContainsKey("data")){
-                    dataModelLocal = gqlModelBaseContainer.headerInfoModel.GetData("data");
+                if (gqlModelBaseContainer.headerInfoModel.containsKey("data")){
+                    dataModelLocal = gqlModelBaseContainer.headerInfoModel.getData("data");
 
-                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getHeadersGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getHeadersGqlCommand);
+                    if (dataModelLocal.containsKey(gqlModelBaseContainer.getHeadersGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(gqlModelBaseContainer.getHeadersGqlCommand);
                         if (!dataModelLocal){
                             return;
                         }
 
-                        if (dataModelLocal.ContainsKey("FilterSearch")){
-                            let filterSearchModel = dataModelLocal.GetData("FilterSearch")
-                            gqlModelBaseContainer.rootItem.modelFilter.SetData("FilterIds", filterSearchModel);
+                        if (dataModelLocal.containsKey("FilterSearch")){
+                            let filterSearchModel = dataModelLocal.getData("FilterSearch")
+                            gqlModelBaseContainer.rootItem.modelFilter.setData("FilterIds", filterSearchModel);
                         }
 
-                        if(dataModelLocal.ContainsKey("Headers")){
-                            dataModelLocal = dataModelLocal.GetData("Headers");
+                        if(dataModelLocal.containsKey("Headers")){
+                            dataModelLocal = dataModelLocal.getData("Headers");
                             gqlModelBaseContainer.headers = dataModelLocal;
 
-                            for(var i = 0; i < gqlModelBaseContainer.headers.GetItemsCount(); i++){
-                                let headerId = gqlModelBaseContainer.headers.GetData("Id", i);
+                            for(var i = 0; i < gqlModelBaseContainer.headers.getItemsCount(); i++){
+                                let headerId = gqlModelBaseContainer.headers.getData("Id", i);
                                 if (!gqlModelBaseContainer.fieldsData.includes(headerId)){
                                     gqlModelBaseContainer.fieldsData.push(headerId);
                                 }
@@ -153,7 +153,7 @@ QtObject {
             viewParams.InsertField("FilterModel");
 
             let filterModel = gqlModelBaseContainer.rootItem.modelFilter;
-            var jsonString = filterModel.ToJson();
+            var jsonString = filterModel.toJson();
             viewParams.InsertField("FilterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");
@@ -185,21 +185,21 @@ QtObject {
             gqlModelBaseContainer.itemsInfoGqlStateChanged(this.state);
             if (this.state === "Ready"){
                 var dataModelLocal;
-                if (gqlModelBaseContainer.itemsInfoModel.ContainsKey("errors")){
-                    dataModelLocal = gqlModelBaseContainer.itemsInfoModel.GetData("errors");
+                if (gqlModelBaseContainer.itemsInfoModel.containsKey("errors")){
+                    dataModelLocal = gqlModelBaseContainer.itemsInfoModel.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getItemsGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getItemsGqlCommand);
+                    if (dataModelLocal.containsKey(gqlModelBaseContainer.getItemsGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(gqlModelBaseContainer.getItemsGqlCommand);
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     ModalDialogManager.showWarningDialog(message)
@@ -207,31 +207,31 @@ QtObject {
                     return;
                 }
 
-                if (gqlModelBaseContainer.itemsInfoModel.ContainsKey("data")){
-                    dataModelLocal = gqlModelBaseContainer.itemsInfoModel.GetData("data");
-                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getItemsGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getItemsGqlCommand);
-                        if (dataModelLocal.ContainsKey("notification")){
-                            gqlModelBaseContainer.notificationModel = dataModelLocal.GetData("notification");
+                if (gqlModelBaseContainer.itemsInfoModel.containsKey("data")){
+                    dataModelLocal = gqlModelBaseContainer.itemsInfoModel.getData("data");
+                    if (dataModelLocal.containsKey(gqlModelBaseContainer.getItemsGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(gqlModelBaseContainer.getItemsGqlCommand);
+                        if (dataModelLocal.containsKey("notification")){
+                            gqlModelBaseContainer.notificationModel = dataModelLocal.getData("notification");
                         }
 
-                        if (!dataModelLocal.ContainsKey("items")){
-                            dataModelLocal.AddTreeModel("items")
+                        if (!dataModelLocal.containsKey("items")){
+                            dataModelLocal.addTreeModel("items")
                         }
 
-                        if (dataModelLocal.ContainsKey("items")){
+                        if (dataModelLocal.containsKey("items")){
                             if (!gqlModelBaseContainer.table){
                                 return;
                             }
 
                             let indexes = gqlModelBaseContainer.table.getSelectedIndexes();
                             gqlModelBaseContainer.table.resetSelection();
-                            gqlModelBaseContainer.items.Clear();
-                            gqlModelBaseContainer.items = dataModelLocal.GetData("items");
+                            gqlModelBaseContainer.items.clear();
+                            gqlModelBaseContainer.items = dataModelLocal.getData("items");
 
                             if (indexes.length === 1){
                                 let selectedIndex = indexes[0];
-                                if (gqlModelBaseContainer.items.GetItemsCount() > selectedIndex){
+                                if (gqlModelBaseContainer.items.getItemsCount() > selectedIndex){
                                     gqlModelBaseContainer.table.select(selectedIndex);
                                 }
                             }
@@ -275,21 +275,21 @@ QtObject {
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (gqlModelBaseContainer.objectViewModel.ContainsKey("errors")){
-                    dataModelLocal = gqlModelBaseContainer.objectViewModel.GetData("errors");
+                if (gqlModelBaseContainer.objectViewModel.containsKey("errors")){
+                    dataModelLocal = gqlModelBaseContainer.objectViewModel.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getObjectViewGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getObjectViewGqlCommand);
+                    if (dataModelLocal.containsKey(gqlModelBaseContainer.getObjectViewGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(gqlModelBaseContainer.getObjectViewGqlCommand);
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     ModalDialogManager.showWarningDialog(message)
@@ -297,14 +297,14 @@ QtObject {
                     return;
                 }
 
-                dataModelLocal = gqlModelBaseContainer.objectViewModel.GetData("data");
+                dataModelLocal = gqlModelBaseContainer.objectViewModel.getData("data");
                 if(!dataModelLocal)
                     return;
-                if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getObjectViewGqlCommand)){
-                    dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getObjectViewGqlCommand);
+                if (dataModelLocal.containsKey(gqlModelBaseContainer.getObjectViewGqlCommand)){
+                    dataModelLocal = dataModelLocal.getData(gqlModelBaseContainer.getObjectViewGqlCommand);
 
-                    let objectView = dataModelLocal.GetData("Path");
-                    let objectViewCommandsId = dataModelLocal.GetData("CommandId");
+                    let objectView = dataModelLocal.getData("Path");
+                    let objectViewCommandsId = dataModelLocal.getData("CommandId");
 
                     gqlModelBaseContainer.objectViewEditorPath = objectView;
                     gqlModelBaseContainer.objectViewEditorCommandsId = objectViewCommandsId;

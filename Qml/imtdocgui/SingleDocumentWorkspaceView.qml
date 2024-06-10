@@ -100,9 +100,9 @@ DocumentManager {
         if(!documentManager.startPageObj) return
 
         let id = documentManager.startPageObj["Id"];
-        for(let i = 0; i < model.GetItemsCount(); i++){
-            let curr_id = model.GetData("Id",i);
-            let curr_name = model.GetData("Name",i);
+        for(let i = 0; i < model.getItemsCount(); i++){
+            let curr_id = model.getData("Id",i);
+            let curr_name = model.getData("Name",i);
             if(curr_id == id){
                 documentManager.documentsModel.setProperty(0, "Title", curr_name);
                 break;

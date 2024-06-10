@@ -58,16 +58,16 @@ Item {
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (metaInfo.ContainsKey("errors")){
-                    dataModelLocal = metaInfo.GetData("errors");
+                if (metaInfo.containsKey("errors")){
+                    dataModelLocal = metaInfo.getData("errors");
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     ModalDialogManager.showWarningDialog(message)
@@ -75,12 +75,12 @@ Item {
                     return;
                 }
 
-                if (metaInfo.ContainsKey("data")){
-                    dataModelLocal = metaInfo.GetData("data");
+                if (metaInfo.containsKey("data")){
+                    dataModelLocal = metaInfo.getData("data");
 
-                    if (dataModelLocal.ContainsKey(container.getMetaInfoGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(container.getMetaInfoGqlCommand);
-                        console.log( "dataModelLocal", dataModelLocal.ToJson());
+                    if (dataModelLocal.containsKey(container.getMetaInfoGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(container.getMetaInfoGqlCommand);
+                        console.log( "dataModelLocal", dataModelLocal.toJson());
 
                         container.metaInfoModel = dataModelLocal;
                     }

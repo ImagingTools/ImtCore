@@ -205,41 +205,41 @@ Rectangle {
 
     function setBorderParams(){
         //console.log("SET_BORDER")
-        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("BorderColorHorizontal")){
-            tableDelegateContainer.borderColorHorizontal = tableDelegateContainer.tableItem.cellDecorator.GetData("BorderColorHorizontal");
+        if(tableDelegateContainer.tableItem.cellDecorator.isValidData("BorderColorHorizontal")){
+            tableDelegateContainer.borderColorHorizontal = tableDelegateContainer.tableItem.cellDecorator.getData("BorderColorHorizontal");
         }
-        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("BorderColorVertical")){
-            tableDelegateContainer.borderColorVertical = tableDelegateContainer.tableItem.cellDecorator.GetData("BorderColorVertical");
+        if(tableDelegateContainer.tableItem.cellDecorator.isValidData("BorderColorVertical")){
+            tableDelegateContainer.borderColorVertical = tableDelegateContainer.tableItem.cellDecorator.getData("BorderColorVertical");
         }
-        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("HorizontalBorderSize")){
-            tableDelegateContainer.horizontalBorderSize = tableDelegateContainer.tableItem.cellDecorator.GetData("HorizontalBorderSize");
+        if(tableDelegateContainer.tableItem.cellDecorator.isValidData("HorizontalBorderSize")){
+            tableDelegateContainer.horizontalBorderSize = tableDelegateContainer.tableItem.cellDecorator.getData("HorizontalBorderSize");
         }
-        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("VerticalBorderSize")){
-            tableDelegateContainer.verticalBorderSize = tableDelegateContainer.tableItem.cellDecorator.GetData("VerticalBorderSize");
+        if(tableDelegateContainer.tableItem.cellDecorator.isValidData("VerticalBorderSize")){
+            tableDelegateContainer.verticalBorderSize = tableDelegateContainer.tableItem.cellDecorator.getData("VerticalBorderSize");
         }
-        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("VisibleLeftBorderFirst")){
-            tableDelegateContainer.visibleLeftBorderFirst = tableDelegateContainer.tableItem.cellDecorator.GetData("VisibleLeftBorderFirst");
+        if(tableDelegateContainer.tableItem.cellDecorator.isValidData("VisibleLeftBorderFirst")){
+            tableDelegateContainer.visibleLeftBorderFirst = tableDelegateContainer.tableItem.cellDecorator.getData("VisibleLeftBorderFirst");
         }
-        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("VisibleRightBorderLast")){
-            tableDelegateContainer.visibleRightBorderLast = tableDelegateContainer.tableItem.cellDecorator.GetData("VisibleRightBorderLast");
+        if(tableDelegateContainer.tableItem.cellDecorator.isValidData("VisibleRightBorderLast")){
+            tableDelegateContainer.visibleRightBorderLast = tableDelegateContainer.tableItem.cellDecorator.getData("VisibleRightBorderLast");
         }
-        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("VisibleTopBorderFirst")){
-            tableDelegateContainer.visibleTopBorderFirst = tableDelegateContainer.tableItem.cellDecorator.GetData("VisibleTopBorderFirst");
+        if(tableDelegateContainer.tableItem.cellDecorator.isValidData("VisibleTopBorderFirst")){
+            tableDelegateContainer.visibleTopBorderFirst = tableDelegateContainer.tableItem.cellDecorator.getData("VisibleTopBorderFirst");
         }
-        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("VisibleBottomBorderLast")){
-            tableDelegateContainer.visibleBottomBorderLast = tableDelegateContainer.tableItem.cellDecorator.GetData("VisibleBottomBorderLast");
+        if(tableDelegateContainer.tableItem.cellDecorator.isValidData("VisibleBottomBorderLast")){
+            tableDelegateContainer.visibleBottomBorderLast = tableDelegateContainer.tableItem.cellDecorator.getData("VisibleBottomBorderLast");
         }
-        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("WrapMode")){
-            tableDelegateContainer.wrapMode = tableDelegateContainer.tableItem.cellDecorator.GetData("WrapMode");
+        if(tableDelegateContainer.tableItem.cellDecorator.isValidData("WrapMode")){
+            tableDelegateContainer.wrapMode = tableDelegateContainer.tableItem.cellDecorator.getData("WrapMode");
         }
-        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("IsRightBorder")){
-            tableDelegateContainer.isRightBorder = tableDelegateContainer.tableItem.cellDecorator.GetData("IsRightBorder");
+        if(tableDelegateContainer.tableItem.cellDecorator.isValidData("IsRightBorder")){
+            tableDelegateContainer.isRightBorder = tableDelegateContainer.tableItem.cellDecorator.getData("IsRightBorder");
         }
-        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("ElideMode")){
-            tableDelegateContainer.elideMode = tableDelegateContainer.tableItem.cellDecorator.GetData("ElideMode");
+        if(tableDelegateContainer.tableItem.cellDecorator.isValidData("ElideMode")){
+            tableDelegateContainer.elideMode = tableDelegateContainer.tableItem.cellDecorator.getData("ElideMode");
         }
-        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("Color")){
-            tableDelegateContainer.cellColor = tableDelegateContainer.tableItem.cellDecorator.GetData("Color");
+        if(tableDelegateContainer.tableItem.cellDecorator.isValidData("Color")){
+            tableDelegateContainer.cellColor = tableDelegateContainer.tableItem.cellDecorator.getData("Color");
         }
 
     }

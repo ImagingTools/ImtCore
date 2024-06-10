@@ -17,14 +17,14 @@ QtObject {
     }
 
     function getLicenseName(productId, licenseId){
-        for (let i = 0; i < provider.model.GetItemsCount(); i++){
-            let id = provider.model.GetData("Id", i);
+        for (let i = 0; i < provider.model.getItemsCount(); i++){
+            let id = provider.model.getData("Id", i);
             if (id === productId){
-                if (provider.model.ContainsKey("Licenses", i)){
-                    let productLicensesModel = provider.model.GetData("Licenses", i);
-                     for (let licenseIndex = 0; licenseIndex < productLicensesModel.GetItemsCount(); licenseIndex++){
-                         if (licenseId === productLicensesModel.GetData("Id", licenseIndex)){
-                             return productLicensesModel.GetData("Name", licenseIndex)
+                if (provider.model.containsKey("Licenses", i)){
+                    let productLicensesModel = provider.model.getData("Licenses", i);
+                     for (let licenseIndex = 0; licenseIndex < productLicensesModel.getItemsCount(); licenseIndex++){
+                         if (licenseId === productLicensesModel.getData("Id", licenseIndex)){
+                             return productLicensesModel.getData("Name", licenseIndex)
                          }
                      }
                 }
@@ -51,10 +51,10 @@ QtObject {
 
         onStateChanged: {
             if (this.state === "Ready"){
-                if (provider.licensesModel.ContainsKey("data")){
-                    var dataModelLocal = provider.licensesModel.GetData("data");
-                    if (dataModelLocal.ContainsKey("Licenses")){
-                        dataModelLocal = dataModelLocal.GetData("Licenses");
+                if (provider.licensesModel.containsKey("data")){
+                    var dataModelLocal = provider.licensesModel.getData("data");
+                    if (dataModelLocal.containsKey("Licenses")){
+                        dataModelLocal = dataModelLocal.getData("Licenses");
                         provider.model = dataModelLocal;
 
                         provider.completed = true;

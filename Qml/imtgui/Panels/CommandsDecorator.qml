@@ -55,9 +55,9 @@ Item {
 
         if (Qt.platform.os === "web"){
             buttonModel = model;
-            for (let index = 0; index < model.GetItemsCount(); index++){
-                let modelIcon = model.GetData("Icon",index)
-                let isEnabled = model.GetData("IsEnabled",index)
+            for (let index = 0; index < model.getItemsCount(); index++){
+                let modelIcon = model.getData("Icon",index)
+                let isEnabled = model.getData("IsEnabled",index)
                 let path = modelIcon === "" ? "" : isEnabled ? Style.getIconPath(modelIcon, Icon.State.On, Icon.Mode.Normal) :
                                                                Style.getIconPath(modelIcon, Icon.State.Off, Icon.Mode.Disabled)
                 if (path !== ""){
@@ -225,7 +225,7 @@ Item {
                     width: verticalComp.isHorizontal ? 1 : buttonPanel.verticalMenuWidth;
                     height: model.Name == "" && model.index == buttonPanel.horizCount ? -buttonPanel.verticalSpacing : 2;
                     color: Style.textColor;
-                    visible: model.Name !== "" ? false : model.index == buttonPanel.horizCount ? false : model.index == (buttonPanel.buttonModel.GetItemsCount() - 1) ? false : true ;
+                    visible: model.Name !== "" ? false : model.index == buttonPanel.horizCount ? false : model.index == (buttonPanel.buttonModel.getItemsCount() - 1) ? false : true ;
                 }
             }
         }

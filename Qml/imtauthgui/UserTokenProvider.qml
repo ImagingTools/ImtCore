@@ -52,20 +52,20 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("User Token State:", this.state, container.authorizationGqlModel.ToJson());
+            console.log("User Token State:", this.state, container.authorizationGqlModel.toJson());
 
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (container.authorizationGqlModel.ContainsKey("errors")){
-                    dataModelLocal = container.authorizationGqlModel.GetData("errors")
-                    dataModelLocal = dataModelLocal.GetData("UserToken")
+                if (container.authorizationGqlModel.containsKey("errors")){
+                    dataModelLocal = container.authorizationGqlModel.getData("errors")
+                    dataModelLocal = dataModelLocal.getData("UserToken")
 
-                    let message = dataModelLocal.GetData("message");
+                    let message = dataModelLocal.getData("message");
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     container.failed(message);
@@ -75,30 +75,30 @@ QtObject {
                     return;
                 }
 
-                if (container.authorizationGqlModel.ContainsKey("data")){
-                    dataModelLocal = container.authorizationGqlModel.GetData("data");
+                if (container.authorizationGqlModel.containsKey("data")){
+                    dataModelLocal = container.authorizationGqlModel.getData("data");
 
-                    if (dataModelLocal.ContainsKey("UserToken")){
-                        dataModelLocal = dataModelLocal.GetData("UserToken");
+                    if (dataModelLocal.containsKey("UserToken")){
+                        dataModelLocal = dataModelLocal.getData("UserToken");
 
-                        if (dataModelLocal.ContainsKey("Token")){
-                            let token = dataModelLocal.GetData("Token");
+                        if (dataModelLocal.containsKey("Token")){
+                            let token = dataModelLocal.getData("Token");
                             container.token = token;
 
                             this.SetGlobalAccessToken(token);
 
-                            let login = dataModelLocal.GetData("Login");
+                            let login = dataModelLocal.getData("Login");
                             container.login = login;
 
-                            let userId = dataModelLocal.GetData("UserId");
+                            let userId = dataModelLocal.getData("UserId");
                             container.userId = userId;
 
-                            let userPasswordHash = dataModelLocal.GetData("PasswordHash");
+                            let userPasswordHash = dataModelLocal.getData("PasswordHash");
                             container.passwordHash = userPasswordHash;
                         }
 
-                        if (dataModelLocal.ContainsKey("Permissions")){
-                            let permissions = dataModelLocal.GetData("Permissions");
+                        if (dataModelLocal.containsKey("Permissions")){
+                            let permissions = dataModelLocal.getData("Permissions");
 
                             container.permissions = permissions.split(';')
                         }

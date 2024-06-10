@@ -39,8 +39,8 @@ Rectangle {
                 //orientation: Qt.Vertical;//!!!
 
                 Component.onCompleted: {
-                    //sizeModel.SetData("MinimumWidth", 50, 0);
-                    sizeModel.SetData("FillWidth", true, 0);
+                    //sizeModel.setData("MinimumWidth", 50, 0);
+                    sizeModel.setData("FillWidth", true, 0);
                 }
 
                 Rectangle{

@@ -101,7 +101,7 @@ ControlBase {
         }
 
         if (comboBoxContainer.currentIndex > -1){
-            comboBoxContainer.currentText = comboBoxContainer.model.GetData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
+            comboBoxContainer.currentText = comboBoxContainer.model.getData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
         }
     }
 
@@ -111,8 +111,8 @@ ControlBase {
         }
 
         if (comboBoxContainer.currentIndex > -1){
-            if (comboBoxContainer.model.ContainsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
-                let name = comboBoxContainer.model.GetData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
+            if (comboBoxContainer.model.containsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
+                let name = comboBoxContainer.model.getData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
                 comboBoxContainer.currentText = name;
             }
         }
@@ -194,7 +194,7 @@ ControlBase {
             comboBoxContainer.focus = true;
             comboBoxContainer.forceActiveFocus();
 
-            if (comboBoxContainer.model !==undefined && comboBoxContainer.model.GetItemsCount() > 0){
+            if (comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() > 0){
                 comboBoxContainer.openPopupMenu();
             }
 
@@ -238,7 +238,7 @@ ControlBase {
         sequence: "Ctrl+Up";
         enabled: !comboBoxContainer.isOpen && comboBoxContainer.activeFocus && comboBoxContainer.visible;
         onActivated: {
-            if(comboBoxContainer.model !==undefined && comboBoxContainer.model.GetItemsCount() && comboBoxContainer.currentIndex > 0){
+            if(comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() && comboBoxContainer.currentIndex > 0){
                 comboBoxContainer.currentIndex--;
             }
 
@@ -249,7 +249,7 @@ ControlBase {
         sequence: "Ctrl+Down";
         enabled: !comboBoxContainer.isOpen && comboBoxContainer.activeFocus && comboBoxContainer.visible;
         onActivated: {
-            if(comboBoxContainer.model !==undefined && comboBoxContainer.model.GetItemsCount() && comboBoxContainer.currentIndex < (comboBoxContainer.model.GetItemsCount()-1)){
+            if(comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() && comboBoxContainer.currentIndex < (comboBoxContainer.model.getItemsCount()-1)){
                 comboBoxContainer.currentIndex++;
             }
 

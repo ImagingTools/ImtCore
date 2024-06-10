@@ -38,7 +38,7 @@ Rectangle {
         target: root.settingsModel;
 
         function onDataChanged(){
-            console.log("settingsModel onDataChanged", root.settingsModel.ToJson());
+            console.log("settingsModel onDataChanged", root.settingsModel.toJson());
         }
     }
 
@@ -51,20 +51,20 @@ Rectangle {
     }
 
     function clearModels(){
-        root.settingsModel.Clear();
+        root.settingsModel.clear();
         bodyPanelRepeater.model = 0;
     }
 
     function updateGui(){
         mainPanel.selectedIndex = 0;
 
-        let parametersModel = root.settingsModel.GetData("Parameters", 0)
+        let parametersModel = root.settingsModel.getData("Parameters", 0)
         bodyPanelRepeater.model = parametersModel
     }
 
     function getPageIndexByPageId(pageId){
-        for (let i = 0; i < root.settingsModel.GetItemsCount(); i++){
-            let id = root.settingsModel.GetData("Id", i);
+        for (let i = 0; i < root.settingsModel.getItemsCount(); i++){
+            let id = root.settingsModel.getData("Id", i);
             if (id === pageId){
                 return i;
             }

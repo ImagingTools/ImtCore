@@ -20,7 +20,7 @@ Item{
     }
 
     onModelChanged: {
-        //console.log("INPUT_MODEL:: ", model.ToJson())
+        //console.log("INPUT_MODEL:: ", model.toJson())
     }
 
     ListView{
@@ -57,20 +57,20 @@ Item{
                 }
 
                 let keys = [];
-                keys = inputView.model.GetKeys(model.index);
+                keys = inputView.model.getKeys(model.index);
                 for(let i = 0; i < keys.length; i++){
                     //console.log("KEY::", keys[i], item[keys[i]])
                     if(keys[i] == "value"){
-                        loader.setValue(inputView.model.GetData(keys[i], model.index));
+                        loader.setValue(inputView.model.getData(keys[i], model.index));
                     }
                     else {
                         if(item[keys[i]] !==undefined){
-                            if(inputView.model.IsTreeModel(keys[i], model.index)){
+                            if(inputView.model.isTreeModel(keys[i], model.index)){
                                 //console.log("IS_MODEL:: ", keys[i])
-                                item[keys[i]] = inputView.model.GetTreeItemModel(keys[i], model.index);
+                                item[keys[i]] = inputView.model.getTreeItemModel(keys[i], model.index);
                             }
                             else {
-                                item[keys[i]] = inputView.model.GetData(keys[i], model.index);
+                                item[keys[i]] = inputView.model.getData(keys[i], model.index);
                             }
                         }
                     }

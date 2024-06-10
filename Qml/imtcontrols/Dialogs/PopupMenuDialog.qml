@@ -125,7 +125,7 @@ ControlBase {
 
     function onReturn(){
         if(popupMenuContainer.selectedIndex >= 0){
-            var id = popupMenuContainer.model.GetData("Id", popupMenuContainer.selectedIndex);
+            var id = popupMenuContainer.model.getData("Id", popupMenuContainer.selectedIndex);
             popupMenuContainer.finished(id, popupMenuContainer.selectedIndex);
         }
     }
@@ -139,7 +139,7 @@ ControlBase {
     }
 
     function onKeyboardDown(){
-        if(popupMenuContainer.selectedIndex < popupMenuContainer.model.GetItemsCount() - 1){
+        if(popupMenuContainer.selectedIndex < popupMenuContainer.model.getItemsCount() - 1){
             popupMenuContainer.selectedIndex++;
 
             popupMenuContainer.decorator_.contentYCorrection(true);

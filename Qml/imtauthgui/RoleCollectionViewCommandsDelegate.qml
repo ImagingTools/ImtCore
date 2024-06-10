@@ -25,7 +25,7 @@ DocumentCollectionViewDelegate {
         if (indexes.length > 0){
             let index = indexes[0];
 
-            let itemId = elementsModel.GetData("Roles").GetData("Id", index);
+            let itemId = elementsModel.getData("Roles").getData("Id", index);
             container.openDocumentEditor(itemId, documentTypeId, viewTypeId);
         }
     }

@@ -65,10 +65,10 @@ Item {
         }
 
         var defaultWidth = delegateContainer.columnCount == 0 ? 0 : delegateContainer.pTableDelegateContainer.width/delegateContainer.columnCount;
-        var widthFromModel = delegateContainer.pTableDelegateContainer.tableItem.widthDecoratorDynamic.IsValidData("Width", model.index) ?
-                    delegateContainer.pTableDelegateContainer.tableItem.widthDecoratorDynamic.GetData("Width", model.index) : -1;
+        var widthFromModel = delegateContainer.pTableDelegateContainer.tableItem.widthDecoratorDynamic.isValidData("Width", model.index) ?
+                    delegateContainer.pTableDelegateContainer.tableItem.widthDecoratorDynamic.getData("Width", model.index) : -1;
 
-        if(!delegateContainer.pTableDelegateContainer.tableItem.widthDecoratorDynamic.GetItemsCount()){
+        if(!delegateContainer.pTableDelegateContainer.tableItem.widthDecoratorDynamic.getItemsCount()){
             delegateContainer.width = defaultWidth;
         }
         else if(widthFromModel >= 0){
@@ -133,18 +133,18 @@ Item {
         anchors.right: rightBorder.left;
         anchors.bottom: bottomBorder.top;
         color: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.emptyDecorCell ? "transparent" :
-                                                                          delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("Color", model.index) ?
-                                                                              delegateContainer.pTableDelegateContainer.cellDecorator.GetData("Color", model.index) :
+                                                                          delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("Color", model.index) ?
+                                                                              delegateContainer.pTableDelegateContainer.cellDecorator.getData("Color", model.index) :
                                                                               "transparent" : "transparent"
 
         opacity: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.emptyDecorCell ? 1 :
-                                                                            delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("Opacity", model.index) ?
-                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.GetData("Opacity", model.index) :
+                                                                            delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("Opacity", model.index) ?
+                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.getData("Opacity", model.index) :
                                                                                 1 : 0;
 
         radius: delegateContainer.pTableDelegateContainer ?  delegateContainer.pTableDelegateContainer.emptyDecorCell ? 0 :
-                                                                           delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("CellRadius", model.index) ?
-                                                                               delegateContainer.pTableDelegateContainer.cellDecorator.GetData("CellRadius", model.index) :0 : 0;
+                                                                           delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("CellRadius", model.index) ?
+                                                                               delegateContainer.pTableDelegateContainer.cellDecorator.getData("CellRadius", model.index) :0 : 0;
 
         //cornerPatches
         Rectangle{
@@ -155,8 +155,8 @@ Item {
             height: parent.height/2;
             color: parent.color;
             visible: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :
-                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("LeftTopRound", model.index) ?
-                                                                                    !delegateContainer.pTableDelegateContainer.cellDecorator.GetData("LeftTopRound", model.index) :true : 0;
+                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("LeftTopRound", model.index) ?
+                                                                                    !delegateContainer.pTableDelegateContainer.cellDecorator.getData("LeftTopRound", model.index) :true : 0;
         }
 
         Rectangle{
@@ -167,8 +167,8 @@ Item {
             height: parent.height/2;
             color: parent.color;
             visible: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :
-                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("RightTopRound", model.index) ?
-                                                                                    !delegateContainer.pTableDelegateContainer.cellDecorator.GetData("RightTopRound", model.index) :true : 0;
+                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("RightTopRound", model.index) ?
+                                                                                    !delegateContainer.pTableDelegateContainer.cellDecorator.getData("RightTopRound", model.index) :true : 0;
         }
 
         Rectangle{
@@ -180,8 +180,8 @@ Item {
             color: parent.color;
             visible: delegateContainer.pTableDelegateContainer ?
                          delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :
-                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("LeftBottomRound", model.index) ?
-                                                                                    !delegateContainer.pTableDelegateContainer.cellDecorator.GetData("LeftBottomRound", model.index) :true : 0;
+                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("LeftBottomRound", model.index) ?
+                                                                                    !delegateContainer.pTableDelegateContainer.cellDecorator.getData("LeftBottomRound", model.index) :true : 0;
         }
 
         Rectangle{
@@ -192,8 +192,8 @@ Item {
             height: parent.height/2;
             color: parent.color;
             visible: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :
-                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("RightBottomRound", model.index) ?
-                                                                                    !delegateContainer.pTableDelegateContainer.cellDecorator.GetData("RightBottomRound", model.index) :true : 0;
+                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("RightBottomRound", model.index) ?
+                                                                                    !delegateContainer.pTableDelegateContainer.cellDecorator.getData("RightBottomRound", model.index) :true : 0;
         }
         //cornerPatches
     }//mainRec
@@ -238,7 +238,7 @@ Item {
         if (delegateContainer.complCompl){
             if (delegateContainer.columnIndex >= 0){
                 if(delegateContainer.pTableDelegateContainer !== null && delegateContainer.pTableDelegateContainer.dataModel !==null){
-                    return delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex)];
+                    return delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.getData("Id", delegateContainer.columnIndex)];
                 }
             }
         }
@@ -253,10 +253,10 @@ Item {
                 if(delegateContainer.pTableDelegateContainer !== null && delegateContainer.pTableDelegateContainer.tableItem !==null){
                     let tableItem = delegateContainer.pTableDelegateContainer.tableItem;
                     let elements = tableItem.elements;
-                    let headerId = delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex);
+                    let headerId = delegateContainer.pTableDelegateContainer.headers.getData("Id", delegateContainer.columnIndex);
 
-                    elements.SetData(headerId, value, delegateContainer.rowIndex);
-//                    elements.Refresh();
+                    elements.setData(headerId, value, delegateContainer.rowIndex);
+//                    elements.refresh();
                 }
             }
         }
@@ -278,23 +278,23 @@ Item {
             verticalAlignment: Text.AlignVCenter;
             horizontalAlignment: delegateContainer.pTableDelegateContainer ?
                                      delegateContainer.pTableDelegateContainer.emptyDecorCell ? Text.AlignLeft :
-                                                                                            delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("TextPosition", delegateContainer.columnIndex) ?
-                                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.GetData("TextPosition", delegateContainer.columnIndex) :
+                                                                                            delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("TextPosition", delegateContainer.columnIndex) ?
+                                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.getData("TextPosition", delegateContainer.columnIndex) :
                                                                                                 Text.AlignLeft: Text.AlignLeft;
             font.pixelSize: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.emptyDecorCell ? Style.fontSize_common:
-                                                                                       delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("FontSize", delegateContainer.columnIndex) ?
-                                                                                           delegateContainer.pTableDelegateContainer.cellDecorator.GetData("FontSize", delegateContainer.columnIndex) :
+                                                                                       delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("FontSize", delegateContainer.columnIndex) ?
+                                                                                           delegateContainer.pTableDelegateContainer.cellDecorator.getData("FontSize", delegateContainer.columnIndex) :
                                                                                            Style.fontSize_common : Style.fontSize_common;
             font.family: Style.fontFamily;
 //            font.bold: delegateContainer.pTableDelegateContainer ?
 //                           delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :
-//                                                                                  delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("FontBold", delegateContainer.columnIndex) ?
-//                                                                                      delegateContainer.pTableDelegateContainer.cellDecorator.GetData("FontBold", delegateContainer.columnIndex) :
+//                                                                                  delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("FontBold", delegateContainer.columnIndex) ?
+//                                                                                      delegateContainer.pTableDelegateContainer.cellDecorator.getData("FontBold", delegateContainer.columnIndex) :
 //                                                                                      true: false;
             color: delegateContainer.pTableDelegateContainer && delegateContainer.pTableDelegateContainer.enabled ?
                        (delegateContainer.pTableDelegateContainer.emptyDecorCell ? Style.textColor :
-                                                                              delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("FontColor", delegateContainer.columnIndex) ?
-                                                                                  delegateContainer.pTableDelegateContainer.cellDecorator.GetData("FontColor", delegateContainer.columnIndex) :
+                                                                              delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("FontColor", delegateContainer.columnIndex) ?
+                                                                                  delegateContainer.pTableDelegateContainer.cellDecorator.getData("FontColor", delegateContainer.columnIndex) :
                                                                                   Style.textColor) : Style.inactive_textColor;
 
 
@@ -303,8 +303,8 @@ Item {
             onLinkActivated: {
                 Qt.openUrlExternally(link);
             }
-//            text: delegateContainer.pTableDelegateContainer ? delegateContainer.columnIndex >= 0 ? delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex)] : "" : "";
-//            text: delegateContainer.pTableDelegateContainer.headers.GetData("Id", 1)
+//            text: delegateContainer.pTableDelegateContainer ? delegateContainer.columnIndex >= 0 ? delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.getData("Id", delegateContainer.columnIndex)] : "" : "";
+//            text: delegateContainer.pTableDelegateContainer.headers.getData("Id", 1)
 
             text: delegateContainer.getValue() !== undefined ? delegateContainer.getValue() : "";
             onTextChanged: {

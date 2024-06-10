@@ -18,23 +18,23 @@ CollectionDataProvider {
 
     onCompletedChanged: {
         if (completed){
-            hardwareProductsModel.Clear();
-            softwareProductsModel.Clear();
+            hardwareProductsModel.clear();
+            softwareProductsModel.clear();
 
-            for (let i = 0; i < container.collectionModel.GetItemsCount(); i++){
-                let category = container.collectionModel.GetData("CategoryId", i);
+            for (let i = 0; i < container.collectionModel.getItemsCount(); i++){
+                let category = container.collectionModel.getData("CategoryId", i);
                 if (category === "Software"){
-                    let index = softwareProductsModel.InsertNewItem();
-                    softwareProductsModel.CopyItemDataFromModel(index, container.collectionModel, i)
+                    let index = softwareProductsModel.insertNewItem();
+                    softwareProductsModel.copyItemDataFromModel(index, container.collectionModel, i)
                 }
                 else if (category === "Hardware"){
-                    let index = hardwareProductsModel.InsertNewItem();
-                    hardwareProductsModel.CopyItemDataFromModel(index, container.collectionModel, i)
+                    let index = hardwareProductsModel.insertNewItem();
+                    hardwareProductsModel.copyItemDataFromModel(index, container.collectionModel, i)
                 }
             }
 
-            hardwareProductsModel.Refresh();
-            softwareProductsModel.Refresh();
+            hardwareProductsModel.refresh();
+            softwareProductsModel.refresh();
         }
     }
 }

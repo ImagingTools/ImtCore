@@ -38,7 +38,7 @@ ViewCommandsDelegateBase {
         }
 
         if (commandId === "New"){
-            let features = container.view.model.GetData("Features");
+            let features = container.view.model.getData("Features");
 
             let featureIds = []
             if (features !== ""){
@@ -52,7 +52,7 @@ ViewCommandsDelegateBase {
             if (selectedIndex != null){
                 let index = selectedIndex.index;
 
-                let featureId = container.view.tableView.rowModel.GetData("Id", index);
+                let featureId = container.view.tableView.rowModel.getData("Id", index);
 
                 container.view.removeFeature(featureId);
 
@@ -67,7 +67,7 @@ ViewCommandsDelegateBase {
                 if (this.selectedIndexes.length > 0){
                     let index = this.selectedIndexes[0];
 
-                    let featureId = tableModel.GetData("Id", index);
+                    let featureId = tableModel.getData("Id", index);
 
                     container.view.addFeature(featureId);
                     container.view.updateFeaturesGui();

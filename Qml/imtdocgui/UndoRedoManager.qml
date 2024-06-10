@@ -47,15 +47,15 @@ Item {
 
         internal.m_isBlocked = true;
 
-        internal.m_redoStack.push(internal.m_observedModel.ToJson());
+        internal.m_redoStack.push(internal.m_observedModel.toJson());
 
         let prevStateModel = internal.m_undoStack.pop();
 
-        let copiedModel = internal.m_defaultStateModel.CopyMe();
-        copiedModel.CreateFromJson(prevStateModel)
-        internal.m_observedModel.Copy(copiedModel)
+        let copiedModel = internal.m_defaultStateModel.copyMe();
+        copiedModel.createFromJson(prevStateModel)
+        internal.m_observedModel.copy(copiedModel)
 
-        //internal.m_observedModel.CreateFromJson(prevStateModel) ???
+        //internal.m_observedModel.createFromJson(prevStateModel) ???
 
         internal.m_beginStateModel = prevStateModel;
 
@@ -73,18 +73,18 @@ Item {
     {
         internal.m_isBlocked = true;
 
-        internal.m_undoStack.push(internal.m_observedModel.ToJson());
+        internal.m_undoStack.push(internal.m_observedModel.toJson());
 
         let nextStateModel = internal.m_redoStack.pop();
 
-        let copiedModel = internal.m_defaultStateModel.CopyMe();
-        copiedModel.CreateFromJson(nextStateModel)
+        let copiedModel = internal.m_defaultStateModel.copyMe();
+        copiedModel.createFromJson(nextStateModel)
 
-        internal.m_observedModel.Copy(copiedModel)
+        internal.m_observedModel.copy(copiedModel)
 
-//        internal.m_observedModel.CreateFromJson(nextStateModel) ???
+//        internal.m_observedModel.createFromJson(nextStateModel) ???
 
-        internal.m_beginStateModel = internal.m_observedModel.ToJson();
+        internal.m_beginStateModel = internal.m_observedModel.toJson();
 
         internal.m_isBlocked = false;
 
@@ -104,8 +104,8 @@ Item {
             internal.m_isBlocked = true;
 
             let stateModel = fromList[fromList.length - steps];
-            if (internal.m_observedModel.Copy(stateModel)){
-                internal.m_observedModel.Refresh();
+            if (internal.m_observedModel.copy(stateModel)){
+                internal.m_observedModel.refresh();
             }
             else{
                 console.log("Unable to copy observer model from current state model");
@@ -124,7 +124,7 @@ Item {
 
     function registerModel(model)
     {
-        console.log("UndoManager registerModel", model.ToJson());
+        console.log("UndoManager registerModel", model.toJson());
         if (modelIsRegistered()){
             console.warn("Model is already registered in the undo manager");
 
@@ -133,7 +133,7 @@ Item {
 
         resetUndo();
 
-        internal.m_beginStateModel = model.ToJson();
+        internal.m_beginStateModel = model.toJson();
 
         internal.m_observedModel = model;
 
@@ -181,7 +181,7 @@ Item {
             return;
         }
 
-        internal.m_beginStateModel = internal.m_observedModel.ToJson();
+        internal.m_beginStateModel = internal.m_observedModel.toJson();
 
         internal.m_isBlocked = true;
     }
@@ -244,7 +244,7 @@ Item {
             return;
         }
 
-        internal.m_defaultStateModel = model.CopyMe();
+        internal.m_defaultStateModel = model.copyMe();
     }
 
 
@@ -278,7 +278,7 @@ Item {
 
         undoRedoManager.makeChanges();
 
-        internal.m_beginStateModel = internal.m_observedModel.ToJson();
+        internal.m_beginStateModel = internal.m_observedModel.toJson();
     }
 
     Shortcut {

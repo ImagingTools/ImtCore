@@ -185,7 +185,7 @@ Rectangle {
     onHeadersChanged: {
         tableContainer.columnContentComps = [];
 
-        for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+        for (let i = 0; i < tableContainer.headers.getItemsCount(); i++){
             tableContainer.columnContentComps.push(null);
         }
 
@@ -213,18 +213,18 @@ Rectangle {
             return;
         }
 
-        tableContainer.headerDecorator = tableContainer.tableDecorator.GetTreeItemModel("Headers");
-        tableContainer.cellDecorator = tableContainer.tableDecorator.GetTreeItemModel("Cells");
-        tableContainer.widthDecorator = tableContainer.tableDecorator.GetTreeItemModel("CellWidth");
+        tableContainer.headerDecorator = tableContainer.tableDecorator.getTreeItemModel("Headers");
+        tableContainer.cellDecorator = tableContainer.tableDecorator.getTreeItemModel("Cells");
+        tableContainer.widthDecorator = tableContainer.tableDecorator.getTreeItemModel("CellWidth");
 
         if (tableContainer.cellDecorator){
-            tableContainer.emptyDecorCell = !tableContainer.cellDecorator.GetItemsCount()
+            tableContainer.emptyDecorCell = !tableContainer.cellDecorator.getItemsCount()
         }
 
-        tableContainer.emptyDecor = !tableContainer.tableDecorator.GetItemsCount();
+        tableContainer.emptyDecor = !tableContainer.tableDecorator.getItemsCount();
 
         if (tableContainer.headerDecorator){
-            tableContainer.emptyDecorHeader = !tableContainer.headerDecorator.GetItemsCount();
+            tableContainer.emptyDecorHeader = !tableContainer.headerDecorator.getItemsCount();
         }
 
         tableContainer.setBorderParams();
@@ -232,7 +232,7 @@ Rectangle {
         tableContainer.setWidth();
 
         if(tableContainer.wrapMode !== Text.NoWrap){
-            for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+            for(var i = 0; i < tableContainer.headers.getItemsCount(); i++){
                 heightModel.append({"cellHeight": 0});
             }
             tableContainer.heightRecalc();
@@ -298,7 +298,7 @@ Rectangle {
         }
 
         let indexes = []
-        let count = tableContainer.elements.GetItemsCount();
+        let count = tableContainer.elements.getItemsCount();
         for (let i = 0; i < count; i++){
             indexes.push(i);
         }
@@ -311,7 +311,7 @@ Rectangle {
             return false;
         }
 
-        let count = tableContainer.elements.GetItemsCount();
+        let count = tableContainer.elements.getItemsCount();
         for (let i = 0; i < count; i++){
             let isChecked = tableContainer.itemIsChecked(i);
             if (!isChecked){
@@ -347,8 +347,8 @@ Rectangle {
             return -1;
         }
 
-        for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
-            if (tableContainer.headers.GetData("Id", i) === headerId){
+        for (let i = 0; i < tableContainer.headers.getItemsCount(); i++){
+            if (tableContainer.headers.getData("Id", i) === headerId){
                 return i;
             }
         }
@@ -376,26 +376,26 @@ Rectangle {
             return;
         }
 
-        var headersCount = tableContainer.headers.GetItemsCount();
+        var headersCount = tableContainer.headers.getItemsCount();
         var tableWidth_ = Math.max(tableContainer.width, tableContainer.contentWidth);
 
-        if(!tableContainer.widthDecorator.GetItemsCount() && tableContainer.headers.GetItemsCount()){
+        if(!tableContainer.widthDecorator.getItemsCount() && tableContainer.headers.getItemsCount()){
             for(var ind = 0; ind < headersCount ; ind++){
-                var index = tableContainer.widthDecorator.InsertNewItem();
-                tableContainer.widthDecorator.SetData("Width",-1,index);
-                tableContainer.widthDecorator.SetData("WidthPercent",-1,index);
+                var index = tableContainer.widthDecorator.insertNewItem();
+                tableContainer.widthDecorator.setData("Width",-1,index);
+                tableContainer.widthDecorator.setData("WidthPercent",-1,index);
             }
         }
 
-        tableContainer.widthDecoratorDynamic.Clear();
-        tableContainer.widthDecoratorDynamic.Copy(tableContainer.widthDecorator);
+        tableContainer.widthDecoratorDynamic.clear();
+        tableContainer.widthDecoratorDynamic.copy(tableContainer.widthDecorator);
 
         var count_ = 0;
         var lengthMinus = 0;
 
-        for(var i = 0; i < tableContainer.widthDecorator.GetItemsCount(); i++){
-            var width_ = tableContainer.widthDecorator.IsValidData("Width",i) ? tableContainer.widthDecorator.GetData("Width",i): -1;
-            var widthPercent_ = tableContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableContainer.widthDecorator.GetData("WidthPercent",i): -1;
+        for(var i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
+            var width_ = tableContainer.widthDecorator.isValidData("Width",i) ? tableContainer.widthDecorator.getData("Width",i): -1;
+            var widthPercent_ = tableContainer.widthDecorator.isValidData("WidthPercent",i) ? tableContainer.widthDecorator.getData("WidthPercent",i): -1;
 
             if((width_ == -1) && (widthPercent_ == -1)){
                 count_++;
@@ -406,35 +406,35 @@ Rectangle {
                 lengthMinus += Math.max(width_,widthPercent_);
             }
         }
-        if((tableWidth_ - lengthMinus) < count_ * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.GetItemsCount() ){
-            tableContainer.widthDecoratorDynamic.Clear();
+        if((tableWidth_ - lengthMinus) < count_ * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.getItemsCount() ){
+            tableContainer.widthDecoratorDynamic.clear();
             for(let ind = 0; ind < headersCount; ind++){
-                let index = tableContainer.widthDecoratorDynamic.InsertNewItem();
-                tableContainer.widthDecoratorDynamic.SetData("Width",tableWidth_/headersCount,index);
+                let index = tableContainer.widthDecoratorDynamic.insertNewItem();
+                tableContainer.widthDecoratorDynamic.setData("Width",tableWidth_/headersCount,index);
             }
             tableContainer.widthRecalc();
             return;
         }
 
-        for(let i = 0; i < tableContainer.widthDecorator.GetItemsCount(); i++){
-            let width_ = tableContainer.widthDecorator.IsValidData("Width",i) ? tableContainer.widthDecorator.GetData("Width",i): -1;
-            let widthPercent_ = tableContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableContainer.widthDecorator.GetData("WidthPercent",i): -1;
+        for(let i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
+            let width_ = tableContainer.widthDecorator.isValidData("Width",i) ? tableContainer.widthDecorator.getData("Width",i): -1;
+            let widthPercent_ = tableContainer.widthDecorator.isValidData("WidthPercent",i) ? tableContainer.widthDecorator.getData("WidthPercent",i): -1;
 
             if(width_ < 0  && widthPercent_ < 0 ){
                 if(count_){
-                    tableContainer.widthDecoratorDynamic.SetData("Width",(tableWidth_ - lengthMinus)/count_,i);
+                    tableContainer.widthDecoratorDynamic.setData("Width",(tableWidth_ - lengthMinus)/count_,i);
                 }
             }
             else if(width_ < 0  && widthPercent_ >= 0){
-                tableContainer.widthDecoratorDynamic.SetData("Width", widthPercent_*tableWidth_/100,i);
+                tableContainer.widthDecoratorDynamic.setData("Width", widthPercent_*tableWidth_/100,i);
             }
 
             else if(width_ >= 0  && widthPercent_ < 0){
-                tableContainer.widthDecoratorDynamic.SetData("Width", width_,i);
+                tableContainer.widthDecoratorDynamic.setData("Width", width_,i);
             }
 
             else if(width_ >= 0  && widthPercent_ >= 0){
-                tableContainer.widthDecoratorDynamic.SetData("Width", width_,i);
+                tableContainer.widthDecoratorDynamic.setData("Width", width_,i);
             }
 
         }
@@ -454,38 +454,38 @@ Rectangle {
             return;
         }
 
-        if(tableContainer.headerDecorator.IsValidData("BorderColorHorizontal")){
-            tableContainer.borderColorHorizontal = tableContainer.headerDecorator.GetData("BorderColorHorizontal");
+        if(tableContainer.headerDecorator.isValidData("BorderColorHorizontal")){
+            tableContainer.borderColorHorizontal = tableContainer.headerDecorator.getData("BorderColorHorizontal");
         }
-        if(tableContainer.headerDecorator.IsValidData("BorderColorVertical")){
-            tableContainer.borderColorVertical = tableContainer.headerDecorator.GetData("BorderColorVertical");
+        if(tableContainer.headerDecorator.isValidData("BorderColorVertical")){
+            tableContainer.borderColorVertical = tableContainer.headerDecorator.getData("BorderColorVertical");
         }
-        if(tableContainer.headerDecorator.IsValidData("HorizontalBorderSize")){
-            tableContainer.horizontalBorderSize = tableContainer.headerDecorator.GetData("HorizontalBorderSize");
+        if(tableContainer.headerDecorator.isValidData("HorizontalBorderSize")){
+            tableContainer.horizontalBorderSize = tableContainer.headerDecorator.getData("HorizontalBorderSize");
         }
-        if(tableContainer.headerDecorator.IsValidData("VerticalBorderSize")){
-            tableContainer.verticalBorderSize = tableContainer.headerDecorator.GetData("VerticalBorderSize");
+        if(tableContainer.headerDecorator.isValidData("VerticalBorderSize")){
+            tableContainer.verticalBorderSize = tableContainer.headerDecorator.getData("VerticalBorderSize");
         }
-        if(tableContainer.headerDecorator.IsValidData("VisibleLeftBorderFirst")){
-            tableContainer.visibleLeftBorderFirst = tableContainer.headerDecorator.GetData("VisibleLeftBorderFirst");
+        if(tableContainer.headerDecorator.isValidData("VisibleLeftBorderFirst")){
+            tableContainer.visibleLeftBorderFirst = tableContainer.headerDecorator.getData("VisibleLeftBorderFirst");
         }
-        if(tableContainer.headerDecorator.IsValidData("VisibleRightBorderLast")){
-            tableContainer.visibleRightBorderLast = tableContainer.headerDecorator.GetData("VisibleRightBorderLast");
+        if(tableContainer.headerDecorator.isValidData("VisibleRightBorderLast")){
+            tableContainer.visibleRightBorderLast = tableContainer.headerDecorator.getData("VisibleRightBorderLast");
         }
-        if(tableContainer.headerDecorator.IsValidData("VisibleTopBorderFirst")){
-            tableContainer.visibleTopBorderFirst = tableContainer.headerDecorator.GetData("VisibleTopBorderFirst");
+        if(tableContainer.headerDecorator.isValidData("VisibleTopBorderFirst")){
+            tableContainer.visibleTopBorderFirst = tableContainer.headerDecorator.getData("VisibleTopBorderFirst");
         }
-        if(tableContainer.headerDecorator.IsValidData("VisibleBottomBorderLast")){
-            tableContainer.visibleBottomBorderLast = tableContainer.headerDecorator.GetData("VisibleBottomBorderLast");
+        if(tableContainer.headerDecorator.isValidData("VisibleBottomBorderLast")){
+            tableContainer.visibleBottomBorderLast = tableContainer.headerDecorator.getData("VisibleBottomBorderLast");
         }
-        if(tableContainer.headerDecorator.IsValidData("WrapMode")){
-            tableContainer.wrapMode = tableContainer.headerDecorator.GetData("WrapMode");
+        if(tableContainer.headerDecorator.isValidData("WrapMode")){
+            tableContainer.wrapMode = tableContainer.headerDecorator.getData("WrapMode");
         }
-        if(tableContainer.headerDecorator.IsValidData("IsRightBorder")){
-            tableContainer.isRightBorder = tableContainer.headerDecorator.GetData("IsRightBorder");
+        if(tableContainer.headerDecorator.isValidData("IsRightBorder")){
+            tableContainer.isRightBorder = tableContainer.headerDecorator.getData("IsRightBorder");
         }
-        if(tableContainer.headerDecorator.IsValidData("ElideMode")){
-            tableContainer.elideMode = tableContainer.headerDecorator.GetData("ElideMode");
+        if(tableContainer.headerDecorator.isValidData("ElideMode")){
+            tableContainer.elideMode = tableContainer.headerDecorator.getData("ElideMode");
         }
 
     }
@@ -496,8 +496,8 @@ Rectangle {
 
         let indexes = tableContainer.getSelectedIndexes();
         for (let i = 0; i < indexes.length; i++){
-            if (elementsListObj.model.ContainsKey("Id", indexes[i])){
-                let id = elementsListObj.model.GetData("Id", indexes[i]);
+            if (elementsListObj.model.containsKey("Id", indexes[i])){
+                let id = elementsListObj.model.getData("Id", indexes[i]);
                 retVal.push(id);
             }
         }
@@ -510,8 +510,8 @@ Rectangle {
 
         let indexes = tableContainer.getSelectedIndexes();
         for (let i = 0; i < indexes.length; i++){
-            if (elementsListObj.model.ContainsKey("Name", indexes[i])){
-                let name = elementsListObj.model.GetData("Name", indexes[i]);
+            if (elementsListObj.model.containsKey("Name", indexes[i])){
+                let name = elementsListObj.model.getData("Name", indexes[i]);
                 retVal.push(name);
             }
         }

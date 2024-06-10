@@ -41,19 +41,19 @@ QtObject {
             return;
         }
 
-        for (let i = 0; i < localModel.GetItemsCount(); i++){
-            let pageModel = localModel.GetModelFromItem(i);
+        for (let i = 0; i < localModel.getItemsCount(); i++){
+            let pageModel = localModel.getModelFromItem(i);
             if (pageModel){
-                let pageId = pageModel.GetData("Id");
+                let pageId = pageModel.getData("Id");
                 if (String(pageId) == String("General")){
-                    let elements = pageModel.GetData("Parameters");
+                    let elements = pageModel.getData("Parameters");
 
-                    for (let j = 0; j < elements.GetItemsCount(); j++){
-                        let elementId = elements.GetData("Id", j);
+                    for (let j = 0; j < elements.getItemsCount(); j++){
+                        let elementId = elements.getData("Id", j);
                         if (String(elementId) == String("Language")){
-                            languagesModel.Clear();
-                            languagesModel.Copy(elements.GetData("Parameters", j))
-                            languagesModel.Refresh();
+                            languagesModel.clear();
+                            languagesModel.copy(elements.getData("Parameters", j))
+                            languagesModel.refresh();
 
                             break;
                         }
@@ -65,12 +65,12 @@ QtObject {
     }
 
     function getLanguageIdByIndex(index){
-        if (settingsProvider == null || index < 0 || index >= container.languagesModel.GetItemsCount()){
+        if (settingsProvider == null || index < 0 || index >= container.languagesModel.getItemsCount()){
             return "";
         }
 
-        if (container.languagesModel.ContainsKey("Id", index)){
-            let langId = container.languagesModel.GetData("Id", index);
+        if (container.languagesModel.containsKey("Id", index)){
+            let langId = container.languagesModel.getData("Id", index);
             return langId;
         }
 
@@ -92,21 +92,21 @@ QtObject {
             return null;
         }
 
-        for (let i = 0; i < localModel.GetItemsCount(); i++){
-            let pageModel = localModel.GetModelFromItem(i);
+        for (let i = 0; i < localModel.getItemsCount(); i++){
+            let pageModel = localModel.getModelFromItem(i);
 
             if (pageModel){
-                let pageId = pageModel.GetData("Id");
+                let pageId = pageModel.getData("Id");
                 if (pageId == "General"){
-                    let elements = pageModel.GetData("Parameters");
+                    let elements = pageModel.getData("Parameters");
 
-                    for (let j = 0; j < elements.GetItemsCount(); j++){
-                        let elementId = elements.GetData("Id", j);
+                    for (let j = 0; j < elements.getItemsCount(); j++){
+                        let elementId = elements.getData("Id", j);
                         if (elementId == "Language"){
-                            let elementValue = elements.GetData("Value", j);
-                            let parameters = elements.GetData("Parameters", j);
+                            let elementValue = elements.getData("Value", j);
+                            let parameters = elements.getData("Parameters", j);
                             if (parameters){
-                                let scheme = parameters.GetData("Id", elementValue);
+                                let scheme = parameters.getData("Id", elementValue);
 
                                 return scheme;
                             }

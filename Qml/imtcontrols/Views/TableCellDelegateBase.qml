@@ -74,30 +74,30 @@ Item {
         // let emptyDecorCell = delegateContainer.rowDelegate.tableItem.emptyDecorCell
 
         // let leftTopCornerPatchVisible = emptyDecorCell ? true :
-        //                                             delegateContainer.rowDelegate.cellDecorator.IsValidData("LeftTopRound", delegateContainer.columnIndex) ?
-        //                                             !delegateContainer.rowDelegate.cellDecorator.GetData("LeftTopRound", delegateContainer.columnIndex) :true
+        //                                             delegateContainer.rowDelegate.cellDecorator.isValidData("LeftTopRound", delegateContainer.columnIndex) ?
+        //                                             !delegateContainer.rowDelegate.cellDecorator.getData("LeftTopRound", delegateContainer.columnIndex) :true
         // if (leftTopCornerPatchVisible){
         //     leftTopCornerPatch.createObject(mainRec)
         // }
 
         // let rightTopCornerPatchVisible = emptyDecorCell ? true :
-        //                                             delegateContainer.rowDelegate.cellDecorator.IsValidData("RightTopRound", delegateContainer.columnIndex) ?
-        //                                             !delegateContainer.rowDelegate.cellDecorator.GetData("RightTopRound", delegateContainer.columnIndex) :true
+        //                                             delegateContainer.rowDelegate.cellDecorator.isValidData("RightTopRound", delegateContainer.columnIndex) ?
+        //                                             !delegateContainer.rowDelegate.cellDecorator.getData("RightTopRound", delegateContainer.columnIndex) :true
         // if (rightTopCornerPatchVisible){
         //     rightTopCornerPatch.createObject(mainRec)
         // }
 
 
         // let leftBottomCornerPatchVisible = emptyDecorCell ? true :
-        //                                             delegateContainer.rowDelegate.cellDecorator.IsValidData("LeftBottomRound", delegateContainer.columnIndex) ?
-        //                                             !delegateContainer.rowDelegate.cellDecorator.GetData("LeftBottomRound", delegateContainer.columnIndex) :true
+        //                                             delegateContainer.rowDelegate.cellDecorator.isValidData("LeftBottomRound", delegateContainer.columnIndex) ?
+        //                                             !delegateContainer.rowDelegate.cellDecorator.getData("LeftBottomRound", delegateContainer.columnIndex) :true
         // if (leftBottomCornerPatchVisible){
         //     leftBottomCornerPatch.createObject(mainRec)
         // }
 
         // let rightBottomCornerPatchVisible = emptyDecorCell ? true :
-        //                                             delegateContainer.rowDelegate.cellDecorator.IsValidData("RightBottomRound", delegateContainer.columnIndex) ?
-        //                                             !delegateContainer.rowDelegate.cellDecorator.GetData("RightBottomRound", delegateContainer.columnIndex) :true
+        //                                             delegateContainer.rowDelegate.cellDecorator.isValidData("RightBottomRound", delegateContainer.columnIndex) ?
+        //                                             !delegateContainer.rowDelegate.cellDecorator.getData("RightBottomRound", delegateContainer.columnIndex) :true
         // if (rightBottomCornerPatchVisible){
         //     rightBottomCornerPatch.createObject(mainRec)
         // }
@@ -183,8 +183,8 @@ Item {
             height: parent.height/2;
             color: parent.color;
             visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-                                                                                                    delegateContainer.rowDelegate.cellDecorator.IsValidData("LeftTopRound", delegateContainer.columnIndex) ?
-                                                                                                        !delegateContainer.rowDelegate.cellDecorator.GetData("LeftTopRound", delegateContainer.columnIndex) :true : 0;
+                                                                                                    delegateContainer.rowDelegate.cellDecorator.isValidData("LeftTopRound", delegateContainer.columnIndex) ?
+                                                                                                        !delegateContainer.rowDelegate.cellDecorator.getData("LeftTopRound", delegateContainer.columnIndex) :true : 0;
         }
     }
 
@@ -197,8 +197,8 @@ Item {
             height: parent.height/2;
             color: parent.color;
             visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-                                                                                                    delegateContainer.rowDelegate.cellDecorator.IsValidData("RightTopRound", delegateContainer.columnIndex) ?
-                                                                                                        !delegateContainer.rowDelegate.cellDecorator.GetData("RightTopRound", delegateContainer.columnIndex) :true : 0;
+                                                                                                    delegateContainer.rowDelegate.cellDecorator.isValidData("RightTopRound", delegateContainer.columnIndex) ?
+                                                                                                        !delegateContainer.rowDelegate.cellDecorator.getData("RightTopRound", delegateContainer.columnIndex) :true : 0;
         }
     }
 
@@ -212,8 +212,8 @@ Item {
             color: parent.color;
             visible: delegateContainer.rowDelegate ?
                          delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-                                                                              delegateContainer.rowDelegate.cellDecorator.IsValidData("LeftBottomRound", delegateContainer.columnIndex) ?
-                                                                                  !delegateContainer.rowDelegate.cellDecorator.GetData("LeftBottomRound", delegateContainer.columnIndex) :true : 0;
+                                                                              delegateContainer.rowDelegate.cellDecorator.isValidData("LeftBottomRound", delegateContainer.columnIndex) ?
+                                                                                  !delegateContainer.rowDelegate.cellDecorator.getData("LeftBottomRound", delegateContainer.columnIndex) :true : 0;
         }
     }
 
@@ -226,15 +226,15 @@ Item {
             height: parent.height/2;
             color: parent.color;
             visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-                                                                                                          delegateContainer.rowDelegate.cellDecorator.IsValidData("RightBottomRound", delegateContainer.columnIndex) ?
-                                                                                                              !delegateContainer.rowDelegate.cellDecorator.GetData("RightBottomRound", delegateContainer.columnIndex) :true : 0;
+                                                                                                          delegateContainer.rowDelegate.cellDecorator.isValidData("RightBottomRound", delegateContainer.columnIndex) ?
+                                                                                                              !delegateContainer.rowDelegate.cellDecorator.getData("RightBottomRound", delegateContainer.columnIndex) :true : 0;
         }
     }
 
     function getValue(){
             if (delegateContainer && delegateContainer.columnIndex >= 0){
                 if(delegateContainer.rowDelegate !== null && delegateContainer.rowDelegate.tableItem !==null && delegateContainer.rowDelegate.dataModel != null){
-                    let val = delegateContainer.rowDelegate.dataModel[delegateContainer.rowDelegate.tableItem.headers.GetData("Id", delegateContainer.columnIndex)];
+                    let val = delegateContainer.rowDelegate.dataModel[delegateContainer.rowDelegate.tableItem.headers.getData("Id", delegateContainer.columnIndex)];
                     return val !== undefined ? val : "";
                 }
             }
@@ -248,10 +248,10 @@ Item {
         }
 
         var defaultWidth = delegateContainer.columnCount == 0 ? 0 : delegateContainer.rowDelegate.width/delegateContainer.columnCount;
-        var widthFromModel = delegateContainer.rowDelegate.tableItem.widthDecoratorDynamic.IsValidData("Width", delegateContainer.columnIndex) ?
-                    delegateContainer.rowDelegate.tableItem.widthDecoratorDynamic.GetData("Width", delegateContainer.columnIndex) : -1;
+        var widthFromModel = delegateContainer.rowDelegate.tableItem.widthDecoratorDynamic.isValidData("Width", delegateContainer.columnIndex) ?
+                    delegateContainer.rowDelegate.tableItem.widthDecoratorDynamic.getData("Width", delegateContainer.columnIndex) : -1;
 
-        if(!delegateContainer.rowDelegate.tableItem.widthDecoratorDynamic.GetItemsCount()){
+        if(!delegateContainer.rowDelegate.tableItem.widthDecoratorDynamic.getItemsCount()){
             delegateContainer.width = defaultWidth;
         }
         else if(widthFromModel >= 0){

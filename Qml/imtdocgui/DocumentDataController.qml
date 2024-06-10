@@ -28,10 +28,10 @@ QtObject {
     }
 
     function insertDocument(){
-        console.log("DocumentDataController insertDocument", documentModel.ToJson());
+        console.log("DocumentDataController insertDocument", documentModel.toJson());
     }
 
     function saveDocument(){
-        console.log("DocumentDataController saveDocument", documentModel.ToJson());
+        console.log("DocumentDataController saveDocument", documentModel.toJson());
     }
 }

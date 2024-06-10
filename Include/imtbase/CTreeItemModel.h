@@ -29,6 +29,44 @@ class CTreeItemModel: public QAbstractListModel
 public:
 	typedef QAbstractListModel BaseClass2;
 
+	Q_INVOKABLE inline bool copy(const CTreeItemModel* object) { return Copy(object); }
+	Q_INVOKABLE inline void setParent(QObject *parent){ SetParent(parent); }
+	Q_INVOKABLE inline bool copyMe(){ return CopyMe(); }
+	Q_INVOKABLE inline bool isEqualWithModel(CTreeItemModel* modelPtr){ return IsEqualWithModel(modelPtr); }
+	Q_INVOKABLE inline void insertNewItemWithParameters(int index, const QVariantMap& map){ InsertNewItemWithParameters(index, map); }
+	Q_INVOKABLE inline int insertNewItem(){ return InsertNewItem(); }
+	Q_INVOKABLE inline int insertNewItem(int index){ return InsertNewItem(index); }
+	Q_INVOKABLE inline int removeItem(int index){ return RemoveItem(index); }
+	Q_INVOKABLE inline imtbase::CTreeItemModel* addTreeModel(const QByteArray &key, int index = 0){ return AddTreeModel(key, index); }
+	Q_INVOKABLE inline bool setExternTreeModel(const QByteArray &key, CTreeItemModel *externTreeModel, int index = 0){ return SetExternTreeModel(key, externTreeModel, index); }
+	Q_INVOKABLE inline bool copyItemDataFromModel(int index, const CTreeItemModel *externTreeModel, int externIndex = 0){ return CopyItemDataFromModel(index, externTreeModel, externIndex); }
+	Q_INVOKABLE inline bool copyItemDataFromModel(int index, CTreeItemModel *externTreeModel, int externIndex = 0){ return CopyItemDataFromModel(index, externTreeModel, externIndex); }
+	Q_INVOKABLE inline bool copyItemDataToModel(int index, CTreeItemModel *externTreeModel, int externIndex = 0) const{ return CopyItemDataToModel(index, externTreeModel, externIndex); }
+	Q_INVOKABLE inline bool setData(const QByteArray &key, const QVariant &value, int index = 0){ return SetData(key, value, index); }
+	Q_INVOKABLE inline bool removeData(const QByteArray &key, int index = 0){ return RemoveData(key, index); }
+	Q_INVOKABLE inline QVariant getData(const QByteArray &key, int index = 0) const{ return GetData(key, index); }
+	Q_INVOKABLE inline imtbase::CTreeItemModel* getParent() const{ return GetParent(); }
+	Q_INVOKABLE inline bool isTreeModel(const QByteArray &key, int index = 0) const{ return IsTreeModel(key, index); }
+	Q_INVOKABLE inline bool containsKey(const QByteArray &key, int index = 0) const{ return ContainsKey(key, index); }
+	Q_INVOKABLE inline bool isValidData(const QByteArray &key, int index = 0) const{ return IsValidData(key, index); }
+	Q_INVOKABLE inline imtbase::CTreeItemModel* getTreeItemModel(const QByteArray &key, int index = 0) const{ return GetTreeItemModel(key, index); }
+	Q_INVOKABLE inline imtbase::CTreeItemModel* getModelFromItem(int itemIndex = 0) const{ return GetModelFromItem(itemIndex); }
+	Q_INVOKABLE inline int getItemsCount() const{ return GetItemsCount(); }
+	Q_INVOKABLE inline void getKeys(QList<QByteArray>& keys, int index = 0) const{ return GetKeys(keys, index); }
+	Q_INVOKABLE inline QList<QString> getKeys(int index = 0) const{ return GetKeys(index); }
+	Q_INVOKABLE inline void clear(){ Clear(); }
+	Q_INVOKABLE inline bool isArray(){ return IsArray(); }
+	Q_INVOKABLE inline void setIsArray(const bool& isArray){ SetIsArray(isArray); }
+	Q_INVOKABLE inline bool createFromJson(const QByteArray& jsonContent){ return CreateFromJson(jsonContent); }
+	Q_INVOKABLE inline void setQueryParam(const QByteArray& key, const QByteArray& value){ SetQueryParam(key, value); }
+	Q_INVOKABLE inline QByteArray getQueryParam(const QByteArray& key){ return GetQueryParam(key); }
+	Q_INVOKABLE inline QByteArray takeQueryParam(const QByteArray& key){ return TakeQueryParam(key); }
+	Q_INVOKABLE inline QMap<QByteArray, QByteArray> &getQueryParams(){ return GetQueryParams(); }
+	Q_INVOKABLE inline void clearQueryParams(const QByteArray& key){ ClearQueryParams(key); }
+	Q_INVOKABLE inline void setUpdateEnabled(bool updateEnabled){ SetUpdateEnabled(updateEnabled); }
+	Q_INVOKABLE inline void refresh(){ Refresh(); }
+	Q_INVOKABLE inline QString toJson(){ return ToJson(); }
+
 	explicit CTreeItemModel(QObject* parent = nullptr);
 	~CTreeItemModel();
 
@@ -36,8 +74,6 @@ public:
 	void SetState(const QString &newState);
 
 	virtual bool SerializeModel(iser::IArchive& archive);
-
-	Q_INVOKABLE inline bool copy(const CTreeItemModel* object) { return Copy(object); }
 
 	void SetParent(QObject *parent);
 	bool Copy(const CTreeItemModel* object);

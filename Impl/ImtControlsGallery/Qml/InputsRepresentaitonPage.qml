@@ -17,18 +17,18 @@ Rectangle {
         id: comboModel;
 
         Component.onCompleted: {
-            var index = comboModel.InsertNewItem();
+            var index = comboModel.insertNewItem();
 
-            comboModel.SetData("Id",index, index);
-            comboModel.SetData("Name", "Name 1", index);
+            comboModel.setData("Id",index, index);
+            comboModel.setData("Name", "Name 1", index);
 
-            index = comboModel.InsertNewItem();
-            comboModel.SetData("Id",index, index);
-            comboModel.SetData("Name", "Name 2", index);
+            index = comboModel.insertNewItem();
+            comboModel.setData("Id",index, index);
+            comboModel.setData("Name", "Name 2", index);
 
-            index = comboModel.InsertNewItem();
-            comboModel.SetData("Id",index, index);
-            comboModel.SetData("Name", "Name 3", index);
+            index = comboModel.insertNewItem();
+            comboModel.setData("Id",index, index);
+            comboModel.setData("Name", "Name 3", index);
         }
     }
 

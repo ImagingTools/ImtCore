@@ -8,13 +8,13 @@ Text {
     property TableRowDelegateBase rowDelegate
     property int columnIndex: -1;
     verticalAlignment: Text.AlignVCenter
-    horizontalAlignment: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Text.AlignLeft : rowDelegate.tableItem.cellDecorator.IsValidData("TextPosition", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.GetData("TextPosition", name.columnIndex) : Text.AlignLeft : Text.AlignLeft
+    horizontalAlignment: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Text.AlignLeft : rowDelegate.tableItem.cellDecorator.isValidData("TextPosition", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("TextPosition", name.columnIndex) : Text.AlignLeft : Text.AlignLeft
 
-    font.pixelSize: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Style.fontSize_common : rowDelegate.tableItem.cellDecorator.IsValidData("FontSize", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.GetData("FontSize", name.columnIndex) : Style.fontSize_common : Style.fontSize_common
+    font.pixelSize: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Style.fontSize_common : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", name.columnIndex) : Style.fontSize_common : Style.fontSize_common
     font.family: Style.fontFamily
 
     color: rowDelegate
-           && rowDelegate.enabled ? (rowDelegate.tableItem.emptyDecorCell ? Style.textColor : rowDelegate.tableItem.cellDecorator.IsValidData("FontColor", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.GetData("FontColor", name.columnIndex) : Style.textColor) : Style.inactive_textColor
+           && rowDelegate.enabled ? (rowDelegate.tableItem.emptyDecorCell ? Style.textColor : rowDelegate.tableItem.cellDecorator.isValidData("FontColor", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontColor", name.columnIndex) : Style.textColor) : Style.inactive_textColor
 
     elide: rowDelegate ? rowDelegate.elideMode : Text.ElideLeft
     wrapMode: (!rowDelegate

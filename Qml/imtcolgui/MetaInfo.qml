@@ -56,7 +56,7 @@ Rectangle {
                     height: childColumn.height + nameTitle.height + container.elementHeight;
 
                     Component.onCompleted: {
-                        repeaterChilds.model = repeaterColumn.model.GetData("Children", model.index);
+                        repeaterChilds.model = repeaterColumn.model.getData("Children", model.index);
                     }
 
                     Text {

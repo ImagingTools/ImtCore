@@ -22,25 +22,25 @@ RemoteCollectionView {
         }
 
         function updateHeaders(){
-            collectionHeadersModel.Clear();
+            collectionHeadersModel.clear();
 
-            let index = collectionHeadersModel.InsertNewItem();
-            collectionHeadersModel.SetData("Id", "Text", index);
-            collectionHeadersModel.SetData("Name", qsTr("Description"), index);
+            let index = collectionHeadersModel.insertNewItem();
+            collectionHeadersModel.setData("Id", "Text", index);
+            collectionHeadersModel.setData("Name", qsTr("Description"), index);
 
-            index = collectionHeadersModel.InsertNewItem();
-            collectionHeadersModel.SetData("Id", "LastModified", index);
-            collectionHeadersModel.SetData("Name", qsTr("Time"), index);
+            index = collectionHeadersModel.insertNewItem();
+            collectionHeadersModel.setData("Id", "LastModified", index);
+            collectionHeadersModel.setData("Name", qsTr("Time"), index);
 
-            index = collectionHeadersModel.InsertNewItem();
-            collectionHeadersModel.SetData("Id", "Source", index);
-            collectionHeadersModel.SetData("Name", qsTr("Source"), index);
+            index = collectionHeadersModel.insertNewItem();
+            collectionHeadersModel.setData("Id", "Source", index);
+            collectionHeadersModel.setData("Name", qsTr("Source"), index);
 
             log.dataController.headersModel  = collectionHeadersModel;
         }
 
         onHeadersChanged: {
-            if (log.table.headers.GetItemsCount() > 0){
+            if (log.table.headers.getItemsCount() > 0){
                 log.table.tableDecorator = logTableDecoratorModel
                 log.table.setColumnContentComponent(0, messageColumnContentComp);
             }
@@ -85,16 +85,16 @@ RemoteCollectionView {
             id: logTableDecoratorModel;
 
             Component.onCompleted: {
-                var cellWidthModel = logTableDecoratorModel.AddTreeModel("CellWidth");
+                var cellWidthModel = logTableDecoratorModel.addTreeModel("CellWidth");
 
-                let index = cellWidthModel.InsertNewItem();
-                cellWidthModel.SetData("Width", -1, index);
+                let index = cellWidthModel.insertNewItem();
+                cellWidthModel.setData("Width", -1, index);
 
-                index = cellWidthModel.InsertNewItem();
-                cellWidthModel.SetData("Width", 200, index);
+                index = cellWidthModel.insertNewItem();
+                cellWidthModel.setData("Width", 200, index);
 
-                index = cellWidthModel.InsertNewItem();
-                cellWidthModel.SetData("Width", 300, index);
+                index = cellWidthModel.insertNewItem();
+                cellWidthModel.setData("Width", 300, index);
             }
         }
 
@@ -110,7 +110,7 @@ RemoteCollectionView {
                 id: cellDelegate
                 onRowIndexChanged: {
                     if (rowIndex >= 0){
-                        let category = rowDelegate.tableItem.elements.GetData("Category", rowIndex);
+                        let category = rowDelegate.tableItem.elements.getData("Category", rowIndex);
                         if (category === 0){
                             icon.source = "../../../../" + Style.getIconPath("Icons/Diagnostics", Icon.State.On, Icon.Mode.Normal);
                         }

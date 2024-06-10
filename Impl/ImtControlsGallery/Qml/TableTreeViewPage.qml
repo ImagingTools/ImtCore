@@ -23,74 +23,74 @@ Rectangle {
             let index;
 
             for(let i = 0; i < 10; i++){
-                index = testInsertModelLevel0.InsertNewItem();
-                testInsertModelLevel0.SetData("Id", String(val + index), index);
-                testInsertModelLevel0.SetData("Name","ул. Ленина", index);
-                testInsertModelLevel0.SetData("TypeId__", "Node", index);
-                testInsertModelLevel0.SetData("HasChildren__", true, index);
+                index = testInsertModelLevel0.insertNewItem();
+                testInsertModelLevel0.setData("Id", String(val + index), index);
+                testInsertModelLevel0.setData("Name","ул. Ленина", index);
+                testInsertModelLevel0.setData("TypeId__", "Node", index);
+                testInsertModelLevel0.setData("HasChildren__", true, index);
 
-                testInsertModelLevel0.SetData("Date", "26.12.23", index);
-                testInsertModelLevel0.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
-
-                tableTreeViewPage.size_++
-
-
-                index = testInsertModelLevel0.InsertNewItem();
-                testInsertModelLevel0.SetData("Id", String(val + index), index);
-                testInsertModelLevel0.SetData("Name","ул. Маркса", index);
-                testInsertModelLevel0.SetData("TypeId__", "Node", index);
-                testInsertModelLevel0.SetData("HasChildren__", true, index);
-
-                testInsertModelLevel0.SetData("Date", "26.12.23", index);
-                testInsertModelLevel0.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
+                testInsertModelLevel0.setData("Date", "26.12.23", index);
+                testInsertModelLevel0.setData("Size",  String(tableTreeViewPage.size_ + index +1), index);
 
                 tableTreeViewPage.size_++
 
 
-                index = testInsertModelLevel0.InsertNewItem();
-                testInsertModelLevel0.SetData("Id", String(val + index), index);
-                testInsertModelLevel0.SetData("Name","ул. Менделеева", index);
-                testInsertModelLevel0.SetData("TypeId__", "Node", index);
-                testInsertModelLevel0.SetData("HasChildren__", true, index);
+                index = testInsertModelLevel0.insertNewItem();
+                testInsertModelLevel0.setData("Id", String(val + index), index);
+                testInsertModelLevel0.setData("Name","ул. Маркса", index);
+                testInsertModelLevel0.setData("TypeId__", "Node", index);
+                testInsertModelLevel0.setData("HasChildren__", true, index);
 
-                testInsertModelLevel0.SetData("Date", "26.12.23", index);
-                testInsertModelLevel0.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
-
-                tableTreeViewPage.size_++
-
-
-                index = testInsertModelLevel0.InsertNewItem();
-                testInsertModelLevel0.SetData("Id", String(val + index), index);
-                testInsertModelLevel0.SetData("Name","ул. Королёва", index);
-                testInsertModelLevel0.SetData("TypeId__", "Node", index);
-                testInsertModelLevel0.SetData("HasChildren__", true, index);
-
-                testInsertModelLevel0.SetData("Date", "26.12.23", index);
-                testInsertModelLevel0.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
+                testInsertModelLevel0.setData("Date", "26.12.23", index);
+                testInsertModelLevel0.setData("Size",  String(tableTreeViewPage.size_ + index +1), index);
 
                 tableTreeViewPage.size_++
 
 
-                index = testInsertModelLevel0.InsertNewItem();
-                testInsertModelLevel0.SetData("Id", String(val + index), index);
-                testInsertModelLevel0.SetData("Name","ул. Гагарина", index);
-                testInsertModelLevel0.SetData("TypeId__", "Node", index);
-                testInsertModelLevel0.SetData("HasChildren__", false, index);
+                index = testInsertModelLevel0.insertNewItem();
+                testInsertModelLevel0.setData("Id", String(val + index), index);
+                testInsertModelLevel0.setData("Name","ул. Менделеева", index);
+                testInsertModelLevel0.setData("TypeId__", "Node", index);
+                testInsertModelLevel0.setData("HasChildren__", true, index);
 
-                testInsertModelLevel0.SetData("Date", "26.12.23", index);
-                testInsertModelLevel0.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
+                testInsertModelLevel0.setData("Date", "26.12.23", index);
+                testInsertModelLevel0.setData("Size",  String(tableTreeViewPage.size_ + index +1), index);
 
                 tableTreeViewPage.size_++
 
 
-                index = testInsertModelLevel0.InsertNewItem();
-                testInsertModelLevel0.SetData("Id", String(val + index), index);
-                testInsertModelLevel0.SetData("Name","ул. Мира", index);
-                testInsertModelLevel0.SetData("TypeId__", "Doc", index);
-                testInsertModelLevel0.SetData("HasChildren__", false, index);
+                index = testInsertModelLevel0.insertNewItem();
+                testInsertModelLevel0.setData("Id", String(val + index), index);
+                testInsertModelLevel0.setData("Name","ул. Королёва", index);
+                testInsertModelLevel0.setData("TypeId__", "Node", index);
+                testInsertModelLevel0.setData("HasChildren__", true, index);
 
-                testInsertModelLevel0.SetData("Date", "26.12.23", index);
-                testInsertModelLevel0.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
+                testInsertModelLevel0.setData("Date", "26.12.23", index);
+                testInsertModelLevel0.setData("Size",  String(tableTreeViewPage.size_ + index +1), index);
+
+                tableTreeViewPage.size_++
+
+
+                index = testInsertModelLevel0.insertNewItem();
+                testInsertModelLevel0.setData("Id", String(val + index), index);
+                testInsertModelLevel0.setData("Name","ул. Гагарина", index);
+                testInsertModelLevel0.setData("TypeId__", "Node", index);
+                testInsertModelLevel0.setData("HasChildren__", false, index);
+
+                testInsertModelLevel0.setData("Date", "26.12.23", index);
+                testInsertModelLevel0.setData("Size",  String(tableTreeViewPage.size_ + index +1), index);
+
+                tableTreeViewPage.size_++
+
+
+                index = testInsertModelLevel0.insertNewItem();
+                testInsertModelLevel0.setData("Id", String(val + index), index);
+                testInsertModelLevel0.setData("Name","ул. Мира", index);
+                testInsertModelLevel0.setData("TypeId__", "Doc", index);
+                testInsertModelLevel0.setData("HasChildren__", false, index);
+
+                testInsertModelLevel0.setData("Date", "26.12.23", index);
+                testInsertModelLevel0.setData("Size",  String(tableTreeViewPage.size_ + index +1), index);
 
                 tableTreeViewPage.size_++
 
@@ -110,35 +110,35 @@ Rectangle {
             let val = date.valueOf();
             let index;
 
-            index = testInsertModel.InsertNewItem();
-            testInsertModel.SetData("Name", "дом 1" , index);
-            testInsertModel.SetData("TypeId__", "Node", index);
-            testInsertModel.SetData("HasChildren__", true, index);
+            index = testInsertModel.insertNewItem();
+            testInsertModel.setData("Name", "дом 1" , index);
+            testInsertModel.setData("TypeId__", "Node", index);
+            testInsertModel.setData("HasChildren__", true, index);
 
-            testInsertModel.SetData("Date", "26.12.23", index);
-            testInsertModel.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
-
-            tableTreeViewPage.size_++
-
-
-            index = testInsertModel.InsertNewItem();
-            testInsertModel.SetData("Name","дом 2" , index);
-            testInsertModel.SetData("TypeId__", "Node", index);
-            testInsertModel.SetData("HasChildren__", true, index);
-
-            testInsertModel.SetData("Date", "26.12.23", index);
-            testInsertModel.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
+            testInsertModel.setData("Date", "26.12.23", index);
+            testInsertModel.setData("Size",  String(tableTreeViewPage.size_ + index +1), index);
 
             tableTreeViewPage.size_++
 
 
-            index = testInsertModel.InsertNewItem();
-            testInsertModel.SetData("Name", "дом 3" , index);
-            testInsertModel.SetData("TypeId__", "Doc", index);
-            testInsertModel.SetData("HasChildren__", false, index);
+            index = testInsertModel.insertNewItem();
+            testInsertModel.setData("Name","дом 2" , index);
+            testInsertModel.setData("TypeId__", "Node", index);
+            testInsertModel.setData("HasChildren__", true, index);
 
-            testInsertModel.SetData("Date", "26.12.23", index);
-            testInsertModel.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
+            testInsertModel.setData("Date", "26.12.23", index);
+            testInsertModel.setData("Size",  String(tableTreeViewPage.size_ + index +1), index);
+
+            tableTreeViewPage.size_++
+
+
+            index = testInsertModel.insertNewItem();
+            testInsertModel.setData("Name", "дом 3" , index);
+            testInsertModel.setData("TypeId__", "Doc", index);
+            testInsertModel.setData("HasChildren__", false, index);
+
+            testInsertModel.setData("Date", "26.12.23", index);
+            testInsertModel.setData("Size",  String(tableTreeViewPage.size_ + index +1), index);
 
             tableTreeViewPage.size_++
         }
@@ -151,17 +151,17 @@ Rectangle {
 
         property bool compl: false;
         Component.onCompleted: {
-            let index = tableHeaderModel.InsertNewItem();
-            tableHeaderModel.SetData("Id", "Name", index);
-            tableHeaderModel.SetData("Name", qsTr("Name"), index);
+            let index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("Id", "Name", index);
+            tableHeaderModel.setData("Name", qsTr("Name"), index);
 
-            index = tableHeaderModel.InsertNewItem();
-            tableHeaderModel.SetData("Id", "Date", index);
-            tableHeaderModel.SetData("Name", qsTr("Date"), index);
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("Id", "Date", index);
+            tableHeaderModel.setData("Name", qsTr("Date"), index);
 
-            index = tableHeaderModel.InsertNewItem();
-            tableHeaderModel.SetData("Id", "Size", index);
-            tableHeaderModel.SetData("Name", qsTr("Size"), index);
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("Id", "Size", index);
+            tableHeaderModel.setData("Name", qsTr("Size"), index);
 
 
             tableTreeView.headers = tableHeaderModel;
@@ -216,28 +216,28 @@ Rectangle {
 
         onComplComplChanged: {
             if(decorModel.complCompl){
-                var headers = tableDec.GetTreeItemModel("Headers");
-                //headers.SetData("CellRadius",2);
-                tableDec.setDefault(decorModel,tableHeaderModel.GetItemsCount());
+                var headers = tableDec.getTreeItemModel("Headers");
+                //headers.setData("CellRadius",2);
+                tableDec.setDefault(decorModel,tableHeaderModel.getItemsCount());
 
-                headers = decorModel.GetTreeItemModel("Headers");//
-                var cells = decorModel.GetTreeItemModel("Cells");//
-                var cellWidth = decorModel.GetTreeItemModel("CellWidth");//
-
-
-                //cellWidth.SetData("Width",200,1);
-                //cellWidth.SetData("Width",200,2);
-                cellWidth.SetData("MinWidth",200,0);
-                //cellWidth.SetData("MinWidth",100,1);
-                //cellWidth.SetData("MinWidth",100,2);
+                headers = decorModel.getTreeItemModel("Headers");//
+                var cells = decorModel.getTreeItemModel("Cells");//
+                var cellWidth = decorModel.getTreeItemModel("CellWidth");//
 
 
-                //cells.SetData("TextPosition",Text.AlignLeft,0);
-                //cells.SetData("TextPosition",Text.AlignLeft,1);
-                //cells.SetData("TextPosition",Text.AlignLeft,2);
+                //cellWidth.setData("Width",200,1);
+                //cellWidth.setData("Width",200,2);
+                cellWidth.setData("MinWidth",200,0);
+                //cellWidth.setData("MinWidth",100,1);
+                //cellWidth.setData("MinWidth",100,2);
 
-                //headers.SetData("LeftTopRound",true,0)
-                //headers.SetData("RightTopRound",true,tableHeaderModel.GetItemsCount()-1)
+
+                //cells.setData("TextPosition",Text.AlignLeft,0);
+                //cells.setData("TextPosition",Text.AlignLeft,1);
+                //cells.setData("TextPosition",Text.AlignLeft,2);
+
+                //headers.setData("LeftTopRound",true,0)
+                //headers.setData("RightTopRound",true,tableHeaderModel.getItemsCount()-1)
 
                 tableTreeView.tableDecorator = decorModel;
 

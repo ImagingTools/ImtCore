@@ -67,14 +67,14 @@ RemoteCollectionView {
                                 let childModel = selectedIndex.getData("ChildModel");
 
                                 let emptyModel = treeItemModelComp.createObject(childModel)
-                                childModel.InsertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
+                                childModel.insertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
                             }
                         }
                         else if (commandId === "RemoveFeature"){
                             if (selectedIndex != null){
                                 let parentModel = selectedIndex.getParentModel();
 
-                                parentModel.RemoveItem(selectedIndex.index);
+                                parentModel.removeItem(selectedIndex.index);
                             }
                         }
                     }

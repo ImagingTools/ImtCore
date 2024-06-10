@@ -29,7 +29,7 @@ Item {
 
     function clearModels(){
         pagesData.model = 0;
-        pageModel.Clear();
+        pageModel.clear();
     }
 
     function onLocalizationChanged(language){
@@ -50,8 +50,8 @@ Item {
             let updateRepeaterModel = true;
 
             if (pagesData.model){
-                let countPages = pagesData.model.GetItemsCount();
-                if (pagesProvider.pagesModel.GetItemsCount() === countPages){
+                let countPages = pagesData.model.getItemsCount();
+                if (pagesProvider.pagesModel.getItemsCount() === countPages){
                     updateRepeaterModel = false;
                 }
             }

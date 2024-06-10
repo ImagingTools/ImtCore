@@ -8,27 +8,27 @@ Item {
     property TreeItemModel sortModel: TreeItemModel {}
 
     function setHeaderSort(headerId, sortOrder){
-        container.sortModel.SetData("HeaderId", headerId);
-        container.sortModel.SetData("SortOrder", sortOrder);
+        container.sortModel.setData("HeaderId", headerId);
+        container.sortModel.setData("SortOrder", sortOrder);
     }
 
     function getCurrentSort(){
-        if (container.sortModel.ContainsKey("SortOrder")){
-            return container.sortModel.GetData("SortOrder")
+        if (container.sortModel.containsKey("SortOrder")){
+            return container.sortModel.getData("SortOrder")
         }
 
         return "";
     }
 
     function getCurrentHeaderId(){
-        if (container.sortModel.ContainsKey("HeaderId")){
-            return container.sortModel.GetData("HeaderId")
+        if (container.sortModel.containsKey("HeaderId")){
+            return container.sortModel.getData("HeaderId")
         }
 
         return "";
     }
 
     function isEmpty(){
-        return container.sortModel.GetItemsCount() === 0;
+        return container.sortModel.getItemsCount() === 0;
     }
 }

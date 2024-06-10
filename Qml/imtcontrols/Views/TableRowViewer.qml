@@ -49,10 +49,10 @@ Row {
                 }
 
                 var defaultWidth = dataList.rowDelegate.tableItem.columnCount == 0 ? 0 : dataList.rowDelegate.tableItem.width/dataList.rowDelegate.tableItem.columnCount;
-                var widthFromModel = dataList.rowDelegate.tableItem.widthDecoratorDynamic.IsValidData("Width", model.index) ?
-                            dataList.rowDelegate.tableItem.widthDecoratorDynamic.GetData("Width", model.index) : -1;
+                var widthFromModel = dataList.rowDelegate.tableItem.widthDecoratorDynamic.isValidData("Width", model.index) ?
+                            dataList.rowDelegate.tableItem.widthDecoratorDynamic.getData("Width", model.index) : -1;
 
-                if(!dataList.rowDelegate.tableItem.widthDecoratorDynamic.GetItemsCount()){
+                if(!dataList.rowDelegate.tableItem.widthDecoratorDynamic.getItemsCount()){
                     cell.width = defaultWidth;
                 }
                 else if(widthFromModel >= 0){

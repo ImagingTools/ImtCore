@@ -97,7 +97,7 @@ CollectionView {
         if (selection.length === 1){
             let index = selection[0];
             let elementsModel = root.table.elements;
-            let elementId = elementsModel.GetData("Id", index);
+            let elementId = elementsModel.getData("Id", index);
             metaInfoProvider.getMetaInfo(elementId);
         }
     }
@@ -205,8 +205,8 @@ CollectionView {
             return;
         }
 
-        if (dataModel.ContainsKey("token")){
-            let accessToken = dataModel.GetData("token");
+        if (dataModel.containsKey("token")){
+            let accessToken = dataModel.getData("token");
             Events.sendEvent("GetToken", function (token){
                 if (String(token) == String(accessToken)){
                     root.doUpdateGui();
@@ -234,8 +234,8 @@ CollectionView {
 
         onStateChanged: {
             if (state === "Ready"){
-                if (subscriptionClient.ContainsKey("data")){
-                    let dataModelLocal = subscriptionClient.GetData("data")
+                if (subscriptionClient.containsKey("data")){
+                    let dataModelLocal = subscriptionClient.getData("data")
                     root.handleSubscription(dataModelLocal);
                 }
             }

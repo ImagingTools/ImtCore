@@ -94,42 +94,42 @@ ViewCommandsDelegateBase {
     function setupContextMenu(){
         let commandsController = collectionView.commandsController;
         if (commandsController){
-            collectionViewCommandsDelegate.contextMenuModel.Clear();
+            collectionViewCommandsDelegate.contextMenuModel.clear();
 
             let canEdit = commandsController.commandExists("Edit");
             let canRemove = commandsController.commandExists("Remove");
 
             if (canEdit){
-                let index = collectionViewCommandsDelegate.contextMenuModel.InsertNewItem();
+                let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
 
-                collectionViewCommandsDelegate.contextMenuModel.SetData("Id", "Edit", index);
-                collectionViewCommandsDelegate.contextMenuModel.SetData("Name", qsTr("Edit"), index);
-                collectionViewCommandsDelegate.contextMenuModel.SetData("Icon", "Icons/Edit", index);
+                collectionViewCommandsDelegate.contextMenuModel.setData("Id", "Edit", index);
+                collectionViewCommandsDelegate.contextMenuModel.setData("Name", qsTr("Edit"), index);
+                collectionViewCommandsDelegate.contextMenuModel.setData("Icon", "Icons/Edit", index);
             }
 
             if (canRemove){
-                let index = collectionViewCommandsDelegate.contextMenuModel.InsertNewItem();
+                let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
 
-                collectionViewCommandsDelegate.contextMenuModel.SetData("Id", "Remove", index);
-                collectionViewCommandsDelegate.contextMenuModel.SetData("Name", qsTr("Remove"), index);
-                collectionViewCommandsDelegate.contextMenuModel.SetData("Icon", "Icons/Delete", index);
+                collectionViewCommandsDelegate.contextMenuModel.setData("Id", "Remove", index);
+                collectionViewCommandsDelegate.contextMenuModel.setData("Name", qsTr("Remove"), index);
+                collectionViewCommandsDelegate.contextMenuModel.setData("Icon", "Icons/Delete", index);
             }
 
             if (canEdit){
-                let index = collectionViewCommandsDelegate.contextMenuModel.InsertNewItem();
+                let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
 
-                collectionViewCommandsDelegate.contextMenuModel.SetData("Id", "Rename", index);
-                collectionViewCommandsDelegate.contextMenuModel.SetData("Name", qsTr("Rename"), index);
-                collectionViewCommandsDelegate.contextMenuModel.SetData("Icon", "", index);
+                collectionViewCommandsDelegate.contextMenuModel.setData("Id", "Rename", index);
+                collectionViewCommandsDelegate.contextMenuModel.setData("Name", qsTr("Rename"), index);
+                collectionViewCommandsDelegate.contextMenuModel.setData("Icon", "", index);
 
-                index = collectionViewCommandsDelegate.contextMenuModel.InsertNewItem();
+                index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
 
-                collectionViewCommandsDelegate.contextMenuModel.SetData("Id", "SetDescription", index);
-                collectionViewCommandsDelegate.contextMenuModel.SetData("Name", qsTr("Set Description"), index);
-                collectionViewCommandsDelegate.contextMenuModel.SetData("Icon", "", index);
+                collectionViewCommandsDelegate.contextMenuModel.setData("Id", "SetDescription", index);
+                collectionViewCommandsDelegate.contextMenuModel.setData("Name", qsTr("Set Description"), index);
+                collectionViewCommandsDelegate.contextMenuModel.setData("Icon", "", index);
             }
 
-            collectionViewCommandsDelegate.contextMenuModel.Refresh();
+            collectionViewCommandsDelegate.contextMenuModel.refresh();
         }
     }
 
@@ -145,7 +145,7 @@ ViewCommandsDelegateBase {
     function onRename(){
         let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
         if (indexes.length > 0){
-            let selectedName = collectionViewCommandsDelegate.collectionView.table.elements.GetData("Name", indexes[0]);
+            let selectedName = collectionViewCommandsDelegate.collectionView.table.elements.getData("Name", indexes[0]);
             ModalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
     }
@@ -157,8 +157,8 @@ ViewCommandsDelegateBase {
         if (indexes.length > 0){
             let selectedDescription = "";
 
-            if (elements.ContainsKey(collectionViewCommandsDelegate.descriptionFieldId, indexes[0])){
-                selectedDescription = elements.GetData(collectionViewCommandsDelegate.descriptionFieldId, indexes[0]);
+            if (elements.containsKey(collectionViewCommandsDelegate.descriptionFieldId, indexes[0])){
+                selectedDescription = elements.getData(collectionViewCommandsDelegate.descriptionFieldId, indexes[0]);
             }
 
             ModalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});

@@ -52,7 +52,7 @@ ComboBoxElementView {
 
                 height: 30;
 
-                text: qsTr("Clear");
+                text: qsTr("clear");
 
                 widthFromDecorator: true;
 

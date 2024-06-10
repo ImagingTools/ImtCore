@@ -27,8 +27,8 @@ ViewBase {
         console.log("GroupUsers updateGui");
 
         let userIds = [];
-        if (groupUsersContainer.model.ContainsKey("Users")){
-            let roles = groupUsersContainer.model.GetData("Users")
+        if (groupUsersContainer.model.containsKey("Users")){
+            let roles = groupUsersContainer.model.getData("Users")
             if (roles !== ""){
                 userIds = roles.split(';');
             }
@@ -36,8 +36,8 @@ ViewBase {
 
         usersTable.uncheckAll();
         if (usersTable.elements){
-            for (let i = 0; i < usersTable.elements.GetItemsCount(); i++){
-                let id = usersTable.elements.GetData("Id", i);
+            for (let i = 0; i < usersTable.elements.getItemsCount(); i++){
+                let id = usersTable.elements.getData("Id", i);
                 if (userIds.includes(id)){
                     usersTable.checkItem(i);
                 }
@@ -51,14 +51,14 @@ ViewBase {
 
         let indexes = usersTable.getCheckedItems();
         for (let index of indexes){
-            let id = usersTable.elements.GetData("Id", index);
+            let id = usersTable.elements.getData("Id", index);
             selectedUserIds.push(id);
         }
 
         selectedUserIds.sort()
 
         let result = selectedUserIds.join(';');
-        groupUsersContainer.model.SetData("Users", result);
+        groupUsersContainer.model.setData("Users", result);
     }
 
     Component{
@@ -101,14 +101,14 @@ ViewBase {
         id: headersModel;
 
         function updateHeaders(){
-            headersModel.Clear();
+            headersModel.clear();
 
-            headersModel.InsertNewItem();
+            headersModel.insertNewItem();
 
-            headersModel.SetData("Id", "Name");
-            headersModel.SetData("Name", qsTr("User Name"));
+            headersModel.setData("Id", "Name");
+            headersModel.setData("Name", qsTr("User Name"));
 
-            headersModel.Refresh();
+            headersModel.refresh();
 
             usersTable.headers = headersModel;
         }

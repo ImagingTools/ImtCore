@@ -31,7 +31,7 @@ TableRowDelegateBase {
     function getSelectedId(){
         let elements = model.Roles;
 
-        let roleId = elements.GetData("Id", rolesRepeater.selectedIndex);
+        let roleId = elements.getData("Id", rolesRepeater.selectedIndex);
 
         return roleId;
     }
@@ -39,7 +39,7 @@ TableRowDelegateBase {
     function getSelectedName(){
         let elements = model.Roles;
 
-        let roleName = elements.GetData("Name", rolesRepeater.selectedIndex);
+        let roleName = elements.getData("Name", rolesRepeater.selectedIndex);
 
         return roleName;
     }

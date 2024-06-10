@@ -13,7 +13,7 @@ QtObject {
     }
 
     function clearModel(){
-        pagesModel.Clear();
+        pagesModel.clear();
     }
 
     property string modelState: pagesProvider.pagesGqlModel.state;
@@ -37,11 +37,11 @@ QtObject {
 
         onStateChanged: {
             if (this.state === "Ready"){
-                if (this.ContainsKey("data")){
-                    var dataModelLocal = this.GetData("data");
+                if (this.containsKey("data")){
+                    var dataModelLocal = this.getData("data");
 
-                    if(dataModelLocal.ContainsKey("PagesData")){
-                        dataModelLocal = dataModelLocal.GetData("PagesData");
+                    if(dataModelLocal.containsKey("PagesData")){
+                        dataModelLocal = dataModelLocal.getData("PagesData");
 
                         pagesProvider.pagesModel = dataModelLocal;
                     }

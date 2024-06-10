@@ -41,18 +41,18 @@ Item {
             if (this.state === "Ready"){
                 let dataModelLocal;
 
-                if (permissionModel.ContainsKey("errors")){
+                if (permissionModel.containsKey("errors")){
                     return;
                 }
 
-                if (permissionModel.ContainsKey("data")){
-                    dataModelLocal = permissionModel.GetData("data");
-                    if (dataModelLocal.ContainsKey("ProductPermissions")){
-                        dataModelLocal = dataModelLocal.GetData("ProductPermissions");
+                if (permissionModel.containsKey("data")){
+                    dataModelLocal = permissionModel.getData("data");
+                    if (dataModelLocal.containsKey("ProductPermissions")){
+                        dataModelLocal = dataModelLocal.getData("ProductPermissions");
                         permissionsProvider.dataModel = dataModelLocal;
 
-//                        if (dataModelLocal.ContainsKey("Dependencies")){
-//                            permissionsProvider.dependenciesModel = dataModelLocal.GetData("Dependencies");
+//                        if (dataModelLocal.containsKey("Dependencies")){
+//                            permissionsProvider.dependenciesModel = dataModelLocal.getData("Dependencies");
 //                        }
                     }
                 }

@@ -44,7 +44,7 @@ ViewBase {
             tableInternal.currentHeaderId = collectionViewBaseContainer.collectionFilter.getSortingInfoId();
             tableInternal.currentSortOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
 
-            if (tableInternal.headers.GetItemsCount() > 0){
+            if (tableInternal.headers.getItemsCount() > 0){
 //                collectionViewBaseContainer.doUpdateGui();
             }
         }
@@ -102,34 +102,34 @@ ViewBase {
                 if(tableDecoratorModel.complCompl){
 
                     var tableDecorator = loaderTableDecorator.item;
-                    var count = tableInternal.headers.GetItemsCount();
+                    var count = tableInternal.headers.getItemsCount();
 
-                    if(tableDecorator.GetItemsCount()){
+                    if(tableDecorator.getItemsCount()){
 
-                        var headers = tableDecoratorModel.AddTreeModel("Headers");
-                        var cells = tableDecoratorModel.AddTreeModel("Cells");
-                        var cellWidth = tableDecoratorModel.AddTreeModel("CellWidth");
+                        var headers = tableDecoratorModel.addTreeModel("Headers");
+                        var cells = tableDecoratorModel.addTreeModel("Cells");
+                        var cellWidth = tableDecoratorModel.addTreeModel("CellWidth");
 
                         var general;
-                        if(tableDecorator.IsValidData("General")){
-                            general = tableDecorator.GetTreeItemModel("General")
-                            let keys = general.GetKeys();
+                        if(tableDecorator.isValidData("General")){
+                            general = tableDecorator.getTreeItemModel("General")
+                            let keys = general.getKeys();
                             for(let i = 0; i < keys.length; i++){
                                 if(tableInternal[keys[i]] !== undefined){
-                                    tableInternal[keys[i]] = general.GetData(keys[i]);
+                                    tableInternal[keys[i]] = general.getData(keys[i]);
                                 }
                             }
                         }
 
                         for(let i = 0; i < count; i++){
-                            headers.InsertNewItem();
-                            cells.InsertNewItem();
-                            cellWidth.InsertNewItem();
-                            headers.CopyItemDataFromModel(i,tableDecorator.GetTreeItemModel("Headers"));
-                            cells.CopyItemDataFromModel(i,tableDecorator.GetTreeItemModel("Cells"));
-                            //cellWidth.CopyItemDataFromModel(i,tableDecorator.GetTreeItemModel("CellWidth"));
-                            var widthVal = tableDecorator.GetTreeItemModel("CellWidth").IsValidData("Width",i) ? tableDecorator.GetTreeItemModel("CellWidth").GetData("Width",i) : -1;
-                            cellWidth.SetData("Width", widthVal,i);
+                            headers.insertNewItem();
+                            cells.insertNewItem();
+                            cellWidth.insertNewItem();
+                            headers.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Headers"));
+                            cells.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Cells"));
+                            //cellWidth.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("CellWidth"));
+                            var widthVal = tableDecorator.getTreeItemModel("CellWidth").isValidData("Width",i) ? tableDecorator.getTreeItemModel("CellWidth").getData("Width",i) : -1;
+                            cellWidth.setData("Width", widthVal,i);
 
                         }
 
@@ -186,7 +186,7 @@ ViewBase {
 
             onHeadersChanged: {
                 collectionViewBaseContainer.headersChanged();
-                if(tableInternal.headers.GetItemsCount()){
+                if(tableInternal.headers.getItemsCount()){
                     tableInternal.headersCompl = true;
                 }
             }

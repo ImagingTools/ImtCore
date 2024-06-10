@@ -122,13 +122,13 @@ Item {
             }
 
             for(var i = 0; i < monthCount; i++){
-                var index = monthTreeModel.InsertNewItem();
-                monthTreeModel.SetData("Id", index, index);
-                monthTreeModel.SetData("Name",qsTr(datePicker.monthNames[i]),index);
+                var index = monthTreeModel.insertNewItem();
+                monthTreeModel.setData("Id", index, index);
+                monthTreeModel.setData("Name",qsTr(datePicker.monthNames[i]),index);
             }
         }
 
-        if(datePicker.hasYearCombo && !yearComboObj.model.GetItemsCount()){
+        if(datePicker.hasYearCombo && !yearComboObj.model.getItemsCount()){
             if(datePicker.startYear < 1 || datePicker.lastYear < 1){
                 datePicker.startYear = 1900;
                 datePicker.lastYear = 2100;
@@ -144,9 +144,9 @@ Item {
                 datePicker.lastYear = temp;
             }
             for(let i = datePicker.startYear; i <= datePicker.lastYear;i++){
-                let index = yearTreeModel.InsertNewItem();
-                yearTreeModel.SetData("Id", index, index);
-                yearTreeModel.SetData("Name", String(i),index);
+                let index = yearTreeModel.insertNewItem();
+                yearTreeModel.setData("Id", index, index);
+                yearTreeModel.setData("Name", String(i),index);
             }
 
         }
@@ -240,19 +240,19 @@ Item {
     }
 
     function fillDayModel(){
-        dayTreeModel.Clear();
+        dayTreeModel.clear();
         var lastDay = datePicker.getLastDayOfMonth(datePicker.selectedIndexMonth + 1);
         for(var i = 1; i <= lastDay; i++){
-            var index = dayTreeModel.InsertNewItem();
-            dayTreeModel.SetData("Id", i, index);
-            dayTreeModel.SetData("Name",i,index);
+            var index = dayTreeModel.insertNewItem();
+            dayTreeModel.setData("Id", i, index);
+            dayTreeModel.setData("Name",i,index);
 
         }
 
     }
 
     function fillMonthModel(){
-        monthTreeModel.Clear();
+        monthTreeModel.clear();
 
         let monthCount = datePicker.monthNames.length;
         let monthComboIndexPrev = datePicker.selectedIndexMonth;
@@ -262,12 +262,12 @@ Item {
         }
 
         for(var i = 0; i < monthCount; i++){
-            var index = monthTreeModel.InsertNewItem();
-            monthTreeModel.SetData("Id", index, index);
-            monthTreeModel.SetData("Name",qsTr(datePicker.monthNames[i]),index);
+            var index = monthTreeModel.insertNewItem();
+            monthTreeModel.setData("Id", index, index);
+            monthTreeModel.setData("Name",qsTr(datePicker.monthNames[i]),index);
         }
 
-        if(monthComboIndexPrev > monthTreeModel.GetItemsCount() - 1){
+        if(monthComboIndexPrev > monthTreeModel.getItemsCount() - 1){
             monthComboIndexPrev = 0;
         }
 

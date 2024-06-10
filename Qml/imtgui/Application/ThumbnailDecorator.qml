@@ -89,7 +89,7 @@ Rectangle {
 
         model: pagesManager.pageModel;
 
-        color: !pagesManager.pageModel.GetItemsCount() ? "transparent" : Style.color_menuPanel !==undefined ? Style.color_menuPanel : Style.imagingToolsGradient1;
+        color: !pagesManager.pageModel.getItemsCount() ? "transparent" : Style.color_menuPanel !==undefined ? Style.color_menuPanel : Style.imagingToolsGradient1;
 
         Component.onCompleted: {
             MainDocumentManager.documentOpened.connect(onDocumentOpened);
@@ -100,8 +100,8 @@ Rectangle {
         }
 
         function onDocumentOpened(typeId, documentId, documentTypeId){
-            for (let i = 0; i < menuPanel.model.GetItemsCount(); i++){
-                let pageId = menuPanel.model.GetData("Id", i);
+            for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
+                let pageId = menuPanel.model.getData("Id", i);
                 if (pageId === typeId){
                     menuPanel.activePageIndex = i;
                     break;

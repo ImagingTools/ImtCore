@@ -26,7 +26,7 @@ QtObject {
         console.log("getAvailableModel", statusId);
         let index = root.getStateIndex(statusId);
         if (index >= 0){
-            root.availableModel.Clear();
+            root.availableModel.clear();
 
             let data = root.states[statusId];
 
@@ -34,10 +34,10 @@ QtObject {
                 let id = data[i];
                 let name = root.getStateName(id);
 
-                let j = root.availableModel.InsertNewItem();
+                let j = root.availableModel.insertNewItem();
 
-                root.availableModel.SetData("Id", id, j);
-                root.availableModel.SetData("Name", name, j);
+                root.availableModel.setData("Id", id, j);
+                root.availableModel.setData("Name", name, j);
             }
 
             return root.availableModel;
@@ -51,8 +51,8 @@ QtObject {
             return -1;
         }
 
-        for (let i = 0; i < root.stateModel.GetItemsCount(); i++){
-            let id = root.stateModel.GetData("Id", i);
+        for (let i = 0; i < root.stateModel.getItemsCount(); i++){
+            let id = root.stateModel.getData("Id", i);
             if (id === statusId){
                 return i;
             }
@@ -66,10 +66,10 @@ QtObject {
             return "";
         }
 
-        for (let i = 0; i < root.stateModel.GetItemsCount(); i++){
-            let id = root.stateModel.GetData("Id", i);
+        for (let i = 0; i < root.stateModel.getItemsCount(); i++){
+            let id = root.stateModel.getData("Id", i);
             if (id === statusId){
-                let name = root.stateModel.GetData("Name", i);
+                let name = root.stateModel.getData("Name", i);
                 return name;
             }
         }

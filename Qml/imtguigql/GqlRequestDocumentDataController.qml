@@ -101,7 +101,7 @@ DocumentDataController {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", container.documentId);
-            inputParams.InsertField ("Item", container.documentModel.toJSON());
+            inputParams.InsertField ("Item", container.documentModel.toJson());
 
             let additionInputParams = container.getAdditionalInputParams();
             if (Object.keys(additionInputParams).length > 0){
@@ -219,7 +219,7 @@ DocumentDataController {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", container.documentId);
-            inputParams.InsertField ("Item", container.documentModel.toJSON());
+            inputParams.InsertField ("Item", container.documentModel.toJson());
 
             let additionInputParams = container.getAdditionalInputParams();
             if (Object.keys(additionInputParams).length > 0){

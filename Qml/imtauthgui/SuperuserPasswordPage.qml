@@ -18,14 +18,14 @@ Rectangle {
     signal failed(string message);
 
     Component.onCompleted: {
-        root.userModel.SetData("Username", "su");
-        root.userModel.SetData("Name", "superuser");
+        root.userModel.setData("Username", "su");
+        root.userModel.setData("Name", "superuser");
     }
 
     function setSuperuserPassword(password){
         root.beforeSetted();
 
-        root.userModel.SetData("Password", password);
+        root.userModel.setData("Password", password);
 
         documentController.documentModel = root.userModel;
         documentController.insertDocument();

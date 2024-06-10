@@ -48,18 +48,18 @@ CommandsController {
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (this.ContainsKey("errors")){
+                if (this.containsKey("errors")){
                     return;
                 }
 
-                if (this.ContainsKey("data")){
-                    dataModelLocal = this.GetData("data")
+                if (this.containsKey("data")){
+                    dataModelLocal = this.getData("data")
                     if (!dataModelLocal){
                         return;
                     }
 
-                    if(dataModelLocal.ContainsKey(commandsProviderContainer.commandId + "Commands")){
-                        dataModelLocal = dataModelLocal.GetData(commandsProviderContainer.commandId + "Commands");
+                    if(dataModelLocal.containsKey(commandsProviderContainer.commandId + "Commands")){
+                        dataModelLocal = dataModelLocal.getData(commandsProviderContainer.commandId + "Commands");
                         if (dataModelLocal != "null"){
                             commandsProviderContainer.setAdditionalProperties(dataModelLocal);
                             commandsProviderContainer.commandsModel = dataModelLocal;

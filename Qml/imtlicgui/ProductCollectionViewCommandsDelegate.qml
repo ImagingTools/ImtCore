@@ -36,7 +36,7 @@ DocumentCollectionViewDelegate {
             let indexes = container.collectionView.table.getSelectedIndexes();
             if (indexes.length > 0){
                 let index = indexes[0];
-                let productId = container.collectionView.table.elements.GetData("ProductId", index);
+                let productId = container.collectionView.table.elements.getData("ProductId", index);
                 let fileName = productId + "Features"
 
                 fileDialogSave.currentFile = 'file:///' + fileName + ".xml";
@@ -48,7 +48,7 @@ DocumentCollectionViewDelegate {
     function onRename(){
         let indexes = container.collectionView.table.getSelectedIndexes();
         if (indexes.length > 0){
-            let selectedName = container.collectionView.table.elements.GetData("ProductName", indexes[0]);
+            let selectedName = container.collectionView.table.elements.getData("ProductName", indexes[0]);
             ModalDialogManager.openDialog(renameDialogComp, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
     }
@@ -75,12 +75,12 @@ DocumentCollectionViewDelegate {
             let indexes = container.collectionView.table.getSelectedIndexes();
             if (indexes.length > 0){
                 let index = indexes[0];
-                let selectedName = container.collectionView.table.elements.GetData("ProductId", indexes[0]);
+                let selectedName = container.collectionView.table.elements.getData("ProductId", indexes[0]);
                 if (!selectedName){
                     selectedName = "";
                 }
 
-                let selectedProductId = container.collectionView.table.elements.GetData("Id", index);
+                let selectedProductId = container.collectionView.table.elements.getData("Id", index);
                 if (selectedProductId !== ""){
                     if (fileName === ""){
                         fileName = selectedName + "Features.xml";

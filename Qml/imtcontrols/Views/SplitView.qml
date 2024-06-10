@@ -172,22 +172,22 @@ Item{
 
     function fillSizeModelDefault(count_){
         for(let i = 0; i < count_; i++){
-            let index = sizeModel.InsertNewItem();
-            sizeModel.SetData("MinimumWidth", 0, index);
-            sizeModel.SetData("MinimumHeight", 0, index);
-            sizeModel.SetData("MaximumWidth", 1000000, index);
-            sizeModel.SetData("MaximumHeight", 1000000, index);
+            let index = sizeModel.insertNewItem();
+            sizeModel.setData("MinimumWidth", 0, index);
+            sizeModel.setData("MinimumHeight", 0, index);
+            sizeModel.setData("MaximumWidth", 1000000, index);
+            sizeModel.setData("MaximumHeight", 1000000, index);
 
             let width_ = splitView.children[0].children[2*i].width;
             let height_ = splitView.children[0].children[2*i].height;
 
-            sizeModel.SetData("PreferredWidth", width_, index);
-            sizeModel.SetData("PreferredHeight", height_, index);
+            sizeModel.setData("PreferredWidth", width_, index);
+            sizeModel.setData("PreferredHeight", height_, index);
 
             let fillWidth = i < (count_ - 1) ? false : true;
             let fillHeight = i < (count_ - 1) ? false : true;
-            sizeModel.SetData("FillWidth", fillWidth, index);
-            sizeModel.SetData("FillHeight", fillHeight, index);
+            sizeModel.setData("FillWidth", fillWidth, index);
+            sizeModel.setData("FillHeight", fillHeight, index);
 
         }
     }
@@ -195,15 +195,15 @@ Item{
     function chechModel(){
         let hasFillWidth = false;
         let hasFillHeight = false;
-        for(let i = 0; i < sizeModel.GetItemsCount(); i++){
+        for(let i = 0; i < sizeModel.getItemsCount(); i++){
             if(hasFillWidth){
-                sizeModel.SetData("FillWidth", false, i);
+                sizeModel.setData("FillWidth", false, i);
             }
             if(hasFillHeight){
-                sizeModel.SetData("FillHeight", false, i);
+                sizeModel.setData("FillHeight", false, i);
             }
-            let fillWidth = sizeModel.GetData("FillWidth", i);
-            let fillHeight = sizeModel.GetData("FillHeight", i);
+            let fillWidth = sizeModel.getData("FillWidth", i);
+            let fillHeight = sizeModel.getData("FillHeight", i);
             if(fillWidth){
                 hasFillWidth = true;
             }
@@ -232,13 +232,13 @@ Item{
 
             if(totalValue <= splitView.width){
                 widthRest = widthSplitters;
-                for(let i = 0; i < sizeModel.GetItemsCount(); i++){
-                    let ok = sizeModel.GetData("FillWidth", i) && indexFillWidth < 0;
+                for(let i = 0; i < sizeModel.getItemsCount(); i++){
+                    let ok = sizeModel.getData("FillWidth", i) && indexFillWidth < 0;
                     if(ok){
                         indexFillWidth = 2*i;
                     }
                     else {
-                        widthRest += sizeModel.GetData("PreferredWidth",i);
+                        widthRest += sizeModel.getData("PreferredWidth",i);
                     }
                 }
                 if(indexFillWidth >=0 && splitView.width - widthRest > 0){
@@ -275,13 +275,13 @@ Item{
 
             if(totalValue <= splitView.height){
                 heightRest = heightSplitters;
-                for(let i = 0; i < sizeModel.GetItemsCount(); i++){
-                    let ok =  sizeModel.GetData("FillHeight", i) && indexFillHeight < 0;
+                for(let i = 0; i < sizeModel.getItemsCount(); i++){
+                    let ok =  sizeModel.getData("FillHeight", i) && indexFillHeight < 0;
                     if(ok){
                         indexFillHeight = 2*i;
                     }
                     else {
-                        heightRest += sizeModel.GetData("PreferredHeight",i);
+                        heightRest += sizeModel.getData("PreferredHeight",i);
                     }
                 }
                 if(indexFillHeight >=0 && splitView.height - heightRest > 0){
@@ -306,9 +306,9 @@ Item{
     }
 
     function setElementsSizeFromModel(){
-        for(let i = 0; i < sizeModel.GetItemsCount(); i++){
-            let width_ = sizeModel.GetData("PreferredWidth", i);
-            let height_ = sizeModel.GetData("PreferredHeight", i);
+        for(let i = 0; i < sizeModel.getItemsCount(); i++){
+            let width_ = sizeModel.getData("PreferredWidth", i);
+            let height_ = sizeModel.getData("PreferredHeight", i);
             if(splitView.orientation == Qt.Horizontal){
                 splitView.children[0].children[2*i].width = width_;
             }
@@ -363,10 +363,10 @@ Item{
                 let childrenPrev = splitView.children[0].children[splitter.rowIndex - 1]
                 let childrenNext = splitView.children[0].children[splitter.rowIndex + 1]
 
-                if(childrenPrev.width + delta_ > splitView.sizeModel.GetData("MinimumWidth", prevModelIndex) &&
-                        childrenPrev.width + delta_ <  splitView.sizeModel.GetData("MaximumWidth", prevModelIndex) &&
-                        childrenNext.width - delta_ > splitView.sizeModel.GetData("MinimumWidth", nextModelIndex) &&
-                        childrenNext.width - delta_ <  splitView.sizeModel.GetData("MaximumWidth", nextModelIndex))
+                if(childrenPrev.width + delta_ > splitView.sizeModel.getData("MinimumWidth", prevModelIndex) &&
+                        childrenPrev.width + delta_ <  splitView.sizeModel.getData("MaximumWidth", prevModelIndex) &&
+                        childrenNext.width - delta_ > splitView.sizeModel.getData("MinimumWidth", nextModelIndex) &&
+                        childrenNext.width - delta_ <  splitView.sizeModel.getData("MaximumWidth", nextModelIndex))
                 {
                     if(splitView.hasAnimation){
                         let width1 = childrenPrev.width;
@@ -471,10 +471,10 @@ Item{
                 let childrenNext = splitView.children[0].children[splitterForVert.rowIndex + 1]
 
 
-                if(childrenPrev.height + delta_ > splitView.sizeModel.GetData("MinimumHeight", prevModelIndex) &&
-                        childrenPrev.height + delta_ <  splitView.sizeModel.GetData("MaximumHeight", prevModelIndex) &&
-                        childrenNext.height - delta_ > splitView.sizeModel.GetData("MinimumHeight", nextModelIndex) &&
-                        childrenNext.height - delta_ <  splitView.sizeModel.GetData("MaximumHeight", nextModelIndex))
+                if(childrenPrev.height + delta_ > splitView.sizeModel.getData("MinimumHeight", prevModelIndex) &&
+                        childrenPrev.height + delta_ <  splitView.sizeModel.getData("MaximumHeight", prevModelIndex) &&
+                        childrenNext.height - delta_ > splitView.sizeModel.getData("MinimumHeight", nextModelIndex) &&
+                        childrenNext.height - delta_ <  splitView.sizeModel.getData("MaximumHeight", nextModelIndex))
                 {
 
                     if(splitView.hasAnimation){

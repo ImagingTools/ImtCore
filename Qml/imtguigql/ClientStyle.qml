@@ -34,22 +34,22 @@ StyleBase {
             if (this.state === "Ready") {
                 var dataModelLocal;
 
-                if (styleQuery.ContainsKey("errors")){
+                if (styleQuery.containsKey("errors")){
                     return;
                 }
 
-                if (styleQuery.ContainsKey("data")){
-                    dataModelLocal = styleQuery.GetData("data");
+                if (styleQuery.containsKey("data")){
+                    dataModelLocal = styleQuery.getData("data");
 
-                    if(dataModelLocal.ContainsKey("GetStyle")) {
-                        dataModelLocal = dataModelLocal.GetData("GetStyle");
+                    if(dataModelLocal.containsKey("GetStyle")) {
+                        dataModelLocal = dataModelLocal.getData("GetStyle");
                     }
 
-                    if (dataModelLocal.ContainsKey("theme")){
-                        styleContainer.theme = dataModelLocal.GetData("theme");
+                    if (dataModelLocal.containsKey("theme")){
+                        styleContainer.theme = dataModelLocal.getData("theme");
                     }
 
-                    if(dataModelLocal.ContainsKey("source")){
+                    if(dataModelLocal.containsKey("source")){
                         styleContainer.parseStyleTheme(dataModelLocal);
                     }
 

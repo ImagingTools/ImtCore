@@ -18,14 +18,14 @@ Rectangle {
 
     onDeleteSignal: {
         console.log("Delete selected photo: ", index);
-        model.RemoveItem(index);
-        model.Refresh();
+        model.removeItem(index);
+        model.refresh();
         list.positionViewAtIndex(0, ListView.Center);
         list.selectedIndex = 0;
     }
 
     function open(){
-        if(!gallery.visible && model && model.GetItemsCount()){
+        if(!gallery.visible && model && model.getItemsCount()){
             gallery.width = 0;
             gallery.visible = true;
             widthAnimTo.start();
@@ -101,7 +101,7 @@ Rectangle {
 
             enabled: visible;
 
-            iconSource:  "../../../" +Style.getIconPath("Icons/Clear", Icon.State.On, Icon.Mode.Normal);
+            iconSource:  "../../../" +Style.getIconPath("Icons/clear", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
                 let param = {"centered" : true};

@@ -59,12 +59,12 @@ Item {
         else{
             var minVal;
             var firstVal;
-            var count = diagram.model.GetItemsCount();
+            var count = diagram.model.getItemsCount();
             if(count){
-                firstVal = Number(diagram.model.GetData("positive",0)) + Number(diagram.model.GetData("negative",0));
+                firstVal = Number(diagram.model.getData("positive",0)) + Number(diagram.model.getData("negative",0));
                 minVal = firstVal;
-                for(var i = 0; i < diagram.model.GetItemsCount(); i++){
-                    var currVal = Number(diagram.model.GetData("positive",i)) + Number(diagram.model.GetData("negative",i));
+                for(var i = 0; i < diagram.model.getItemsCount(); i++){
+                    var currVal = Number(diagram.model.getData("positive",i)) + Number(diagram.model.getData("negative",i));
                     if(currVal < minVal){
                         minVal = currVal;
                     }
@@ -78,14 +78,14 @@ Item {
 
 
     function setMaxValue(){
-        if(diagram.model.GetItemsCount()){
+        if(diagram.model.getItemsCount()){
 
             setMinValue();
 
             var maxVal = 0;
-            for(var i = 0; i < diagram.model.GetItemsCount(); i++)
+            for(var i = 0; i < diagram.model.getItemsCount(); i++)
             {
-                var currVal = Number(diagram.model.GetData("positive",i)) + Number(diagram.model.GetData("negative",i)) - Number(diagram.minValue);
+                var currVal = Number(diagram.model.getData("positive",i)) + Number(diagram.model.getData("negative",i)) - Number(diagram.minValue);
                 if(currVal > maxVal){
                     maxVal = currVal;
                 }
@@ -99,21 +99,21 @@ Item {
     }
 
     function fillAxeYModel(){
-        diagram.axeYValueModel.Clear();
+        diagram.axeYValueModel.clear();
         for(var i = 4; i >= 0 ; i--){
             var val;
             if(i == 4){
                 val = diagram.roundDigit((diagram.maxValue/4 * i),true);
                 diagram.maxAxeYValue = val;
                 let valToModel = val + diagram.minValue;
-                var index = diagram.axeYValueModel.InsertNewItem();
-                diagram.axeYValueModel.SetData("text", valToModel, index);
+                var index = diagram.axeYValueModel.insertNewItem();
+                diagram.axeYValueModel.setData("text", valToModel, index);
             }
             else {
                 val = diagram.roundDigit((diagram.maxValue/4 * i),false);
                 let valToModel = Math.trunc((val + diagram.minValue)*100)/100;
-                index = diagram.axeYValueModel.InsertNewItem();
-                diagram.axeYValueModel.SetData("text", valToModel, index);
+                index = diagram.axeYValueModel.insertNewItem();
+                diagram.axeYValueModel.setData("text", valToModel, index);
             }
         }
         diagram.setSizeText();
@@ -122,8 +122,8 @@ Item {
 
     function setSizeText(){
         var maxText = "";
-        for (var i = 0; i < diagram.axeYValueModel.GetItemsCount(); i++){
-            var currText = String(diagram.axeYValueModel.GetData("text",i));
+        for (var i = 0; i < diagram.axeYValueModel.getItemsCount(); i++){
+            var currText = String(diagram.axeYValueModel.getData("text",i));
             if(currText.length > maxText.length){
                 maxText = currText;
             }

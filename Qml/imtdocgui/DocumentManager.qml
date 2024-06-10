@@ -558,7 +558,7 @@ Item {
                         return;
                     }
 
-                    defaultModel = model.CopyMe();
+                    defaultModel = model.copyMe();
                 }
 
                 function isEqual(){
@@ -566,7 +566,7 @@ Item {
                         return;
                     }
 
-                    return singleDocumentData.documentDataController.documentModel.IsEqualWithModel(defaultModel);
+                    return singleDocumentData.documentDataController.documentModel.isEqualWithModel(defaultModel);
                 }
             }
 
@@ -764,7 +764,7 @@ Item {
                 let currentStateModel = undoManager.getStandardModel();
                 if (currentStateModel){
                     let documentModel = singleDocumentData.documentDataController.documentModel
-                    let isEqual = currentStateModel.IsEqualWithModel(documentModel);
+                    let isEqual = currentStateModel.isEqualWithModel(documentModel);
                     isDirty = !isEqual;
                 }
 

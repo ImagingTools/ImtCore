@@ -22,8 +22,8 @@ DocumentDataController {
     }
 
     onDocumentModelChanged: {
-        if (documentModel.ContainsKey("Name")){
-            documentName = documentModel.GetData("Name");
+        if (documentModel.containsKey("Name")){
+            documentName = documentModel.getData("Name");
         }
 
         hasRemoteChanges = false;
@@ -44,8 +44,8 @@ DocumentDataController {
 
     function getDocumentId(){
         let id = "";
-        if (documentModel && documentModel.ContainsKey("Id")){
-            id = documentModel.GetData("Id");
+        if (documentModel && documentModel.containsKey("Id")){
+            id = documentModel.getData("Id");
         }
 
         return id;
@@ -53,8 +53,8 @@ DocumentDataController {
 
     function getDocumentName(){
         let name = "";
-        if (documentModel && documentModel.ContainsKey("Name")){
-            name = documentModel.GetData("Name");
+        if (documentModel && documentModel.containsKey("Name")){
+            name = documentModel.getData("Name");
         }
 
         return name;
@@ -106,7 +106,7 @@ DocumentDataController {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", container.documentId);
-            inputParams.InsertField ("Item", container.documentModel.ToJson());
+            inputParams.InsertField ("Item", container.documentModel.toJson());
 
             let additionInputParams = container.getAdditionalInputParams();
             if (Object.keys(additionInputParams).length > 0){
@@ -135,35 +135,35 @@ DocumentDataController {
             }
             if (state === "Ready"){
                 var dataModelLocal;
-                if (container.gqlUpdateModel.ContainsKey("errors")){
-                    dataModelLocal = container.gqlUpdateModel.GetData("errors");
+                if (container.gqlUpdateModel.containsKey("errors")){
+                    dataModelLocal = container.gqlUpdateModel.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(container.gqlUpdateCommandId)){
-                        dataModelLocal = dataModelLocal.GetData(container.gqlUpdateCommandId);
+                    if (dataModelLocal.containsKey(container.gqlUpdateCommandId)){
+                        dataModelLocal = dataModelLocal.getData(container.gqlUpdateCommandId);
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     container.error(message, type);
                 }
 
-                else if (container.gqlUpdateModel.ContainsKey("data")){
-                    dataModelLocal = container.gqlUpdateModel.GetData("data");
+                else if (container.gqlUpdateModel.containsKey("data")){
+                    dataModelLocal = container.gqlUpdateModel.getData("data");
 
-                    if (dataModelLocal.ContainsKey(container.gqlUpdateCommandId)){
-                        dataModelLocal = dataModelLocal.GetData(container.gqlUpdateCommandId);
-                        dataModelLocal = dataModelLocal.GetData("updatedNotification");
+                    if (dataModelLocal.containsKey(container.gqlUpdateCommandId)){
+                        dataModelLocal = dataModelLocal.getData(container.gqlUpdateCommandId);
+                        dataModelLocal = dataModelLocal.getData("updatedNotification");
 
-                        let documentId = dataModelLocal.GetData("Id");
-                        let documentName = dataModelLocal.GetData("Name");
+                        let documentId = dataModelLocal.getData("Id");
+                        let documentName = dataModelLocal.getData("Name");
 
                         container.saved(documentId, documentName);
                     }
@@ -206,30 +206,30 @@ DocumentDataController {
                 container.error("Network error", "Critical");
             }
             else if (state === "Ready"){
-                if (container.gqlGetModel.ContainsKey("errors")){
-                    let dataModelLocal = container.gqlGetModel.GetData("errors");
+                if (container.gqlGetModel.containsKey("errors")){
+                    let dataModelLocal = container.gqlGetModel.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(container.gqlGetCommandId)){
-                        dataModelLocal = dataModelLocal.GetData(container.gqlGetCommandId);
+                    if (dataModelLocal.containsKey(container.gqlGetCommandId)){
+                        dataModelLocal = dataModelLocal.getData(container.gqlGetCommandId);
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     container.error(message, type);
                 }
 
-                else if (container.gqlGetModel.ContainsKey("data")){
-                    let dataModelLocal = container.gqlGetModel.GetData("data")
-                    if (dataModelLocal.ContainsKey(container.gqlGetCommandId)){
-                        container.documentModel = dataModelLocal.GetData(container.gqlGetCommandId)
+                else if (container.gqlGetModel.containsKey("data")){
+                    let dataModelLocal = container.gqlGetModel.getData("data")
+                    if (dataModelLocal.containsKey(container.gqlGetCommandId)){
+                        container.documentModel = dataModelLocal.getData(container.gqlGetCommandId)
                     }
                 }
             }
@@ -242,7 +242,7 @@ DocumentDataController {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", container.documentId);
-            inputParams.InsertField ("Item", container.documentModel.ToJson());
+            inputParams.InsertField ("Item", container.documentModel.toJson());
 
             let additionInputParams = container.getAdditionalInputParams();
             if (Object.keys(additionInputParams).length > 0){
@@ -272,39 +272,39 @@ DocumentDataController {
             }
             if (state === "Ready"){
                 var dataModelLocal;
-                if (container.gqlAddModel.ContainsKey("errors")){
-                    dataModelLocal = container.gqlAddModel.GetData("errors");
+                if (container.gqlAddModel.containsKey("errors")){
+                    dataModelLocal = container.gqlAddModel.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(container.gqlAddCommandId)){
-                        dataModelLocal = dataModelLocal.GetData(container.gqlAddCommandId);
+                    if (dataModelLocal.containsKey(container.gqlAddCommandId)){
+                        dataModelLocal = dataModelLocal.getData(container.gqlAddCommandId);
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     container.error(message, type);
                 }
 
-                else if (container.gqlAddModel.ContainsKey("data")){
-                    dataModelLocal = container.gqlAddModel.GetData("data");
+                else if (container.gqlAddModel.containsKey("data")){
+                    dataModelLocal = container.gqlAddModel.getData("data");
 
-                    if (dataModelLocal.ContainsKey(container.gqlAddCommandId)){
-                        dataModelLocal = dataModelLocal.GetData(container.gqlAddCommandId);
-                        dataModelLocal = dataModelLocal.GetData("addedNotification");
+                    if (dataModelLocal.containsKey(container.gqlAddCommandId)){
+                        dataModelLocal = dataModelLocal.getData(container.gqlAddCommandId);
+                        dataModelLocal = dataModelLocal.getData("addedNotification");
 
                         let documentId = ""
                         let documentName = ""
 
                         if (dataModelLocal){
-                            documentId = dataModelLocal.GetData("Id");
-                            documentName = dataModelLocal.GetData("Name");
+                            documentId = dataModelLocal.getData("Id");
+                            documentName = dataModelLocal.getData("Name");
                         }
 
                         container.saved(documentId, documentName);

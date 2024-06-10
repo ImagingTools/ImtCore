@@ -5,10 +5,6 @@ QtObject {
     property bool enableNotifications: true
     property var owner
 
-    Component.onCompleted: {
-        connectProperties();
-    }
-
     onDataChanged: {
         if(owner && owner.enableNotifications && owner.dataChanged){
             owner.dataChanged(name, sender)
@@ -32,17 +28,13 @@ QtObject {
         return Qt.createComponent('BaseClass.qml').createObject()
     }
 
-    function IsEqualWithModel(model){
+    function isEqualWithModel(model){
         if (typeof this != typeof model){
             return false;
         }
 
         let selfKeys = this.getProperties()
         let sourceKeys = model.getProperties()
-
-        console.log("self", this.ToJson())
-        console.log("source", model.ToJson())
-
 
         if (selfKeys.length !== sourceKeys.length){
             return false;
@@ -60,7 +52,7 @@ QtObject {
             }
 
             if(typeof this[key] === 'object'){
-                let ok = this[key].IsEqualWithModel(model[key]);
+                let ok = this[key].isEqualWithModel(model[key]);
                 if (!ok){
                     return false;
                 }
@@ -75,26 +67,26 @@ QtObject {
         return true;
     }
 
-    function Refresh(){
+    function refresh(){
     }
 
-    function Copy(item){
+    function copy(item){
         return copyFrom(item)
     }
 
-    function CopyMe(){
+    function copyMe(){
         let obj = createMe()
-        obj.fromJSON(ToJson())
+        obj.fromJSON(toJson())
         return obj
     }
 
     function copyFrom(item){
-        fromJSON(item.ToJson())
+        fromJSON(item.toJson())
         return true
     }
 
     function copyTo(item){
-        item.fromJSON(ToJson())
+        item.fromJSON(toJson())
         return true
     }
 
@@ -125,18 +117,18 @@ QtObject {
         return list
     }
 
-    function CreateFromJson(json){
+    function createFromJson(json){
         return fromJSON(json);
     }
 
-    function ToJson(){
+    function toJson(){
         let list = getProperties()
 
         let json = '{'
         for(let i = 0; i < list.length; i++){
             let key = list[i]
             if(typeof this[key] === 'object'){
-                json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].ToJson()
+                json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
             } else {
                 let value = this[key]
                 if (value === undefined){
@@ -171,12 +163,16 @@ QtObject {
                         obj.fromObject(sourceObjectInner)
                         this[_key].append({item: obj})
                         obj.owner = this
+                        obj.connectProperties()
+
                     }
                 } else {
                     let obj = createComponent(_key).createObject(this)
                     obj.fromObject(sourceObject[key])
                     this[_key] = obj
                     obj.owner = this
+                    obj.connectProperties()
+
                 }
             } else {
                 this[_key] = sourceObject[key]

@@ -16,16 +16,16 @@ GqlModel {
 
     onStateChanged: {
         if (this.state === "Ready") {
-            console.log("GetWebSocketUrl", webSocketUrlGqlModel.ToJson());
+            console.log("GetWebSocketUrl", webSocketUrlGqlModel.toJson());
             var dataModelLocal;
 
-            if (webSocketUrlGqlModel.ContainsKey("data")){
-                dataModelLocal = webSocketUrlGqlModel.GetData("data")
-                if (dataModelLocal.ContainsKey("GetWebSocketUrl")){
-                    dataModelLocal = dataModelLocal.GetData("GetWebSocketUrl")
+            if (webSocketUrlGqlModel.containsKey("data")){
+                dataModelLocal = webSocketUrlGqlModel.getData("data")
+                if (dataModelLocal.containsKey("GetWebSocketUrl")){
+                    dataModelLocal = dataModelLocal.getData("GetWebSocketUrl")
 
-                    if (dataModelLocal.ContainsKey("Value")){
-                        let value = dataModelLocal.GetData("Value")
+                    if (dataModelLocal.containsKey("Value")){
+                        let value = dataModelLocal.getData("Value")
 
                         try {
                             let url = new URL(value);

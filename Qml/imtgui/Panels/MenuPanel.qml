@@ -66,10 +66,10 @@ Rectangle {
         if ('Name' in data){
             let pageName = data["Name"];
 
-            for (let i = 0; i < menuPanel.model.GetItemsCount(); i++){
-                let id = menuPanel.model.GetData("Id", i);
+            for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
+                let id = menuPanel.model.getData("Id", i);
                 if (pageId == id){
-                    menuPanel.model.SetData("Name", pageName,  i);
+                    menuPanel.model.setData("Name", pageName,  i);
 
                     break;
                 }
@@ -79,10 +79,10 @@ Rectangle {
         if ('Icon' in data){
             let pageIcon = data["Icon"];
 
-            for (let i = 0; i < menuPanel.model.GetItemsCount(); i++){
-                let id = menuPanel.model.GetData("Id", i);
+            for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
+                let id = menuPanel.model.getData("Id", i);
                 if (pageId == id){
-                    menuPanel.model.SetData("Icon", pageIcon,  i);
+                    menuPanel.model.setData("Icon", pageIcon,  i);
 
                     break;
                 }
@@ -106,7 +106,7 @@ Rectangle {
     }
 
     onModelChanged: {
-        console.log("MenuPanel onModelChanged", menuPanel.model.ToJson())
+        console.log("MenuPanel onModelChanged", menuPanel.model.toJson())
         let pageIndex = menuPanel.activePageIndex;
 
         lvPages.model = 0;

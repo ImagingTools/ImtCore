@@ -17,14 +17,14 @@ Rectangle {
         property bool compl: false;
         Component.onCompleted: {
             for(let i = 0; i < 200; i++){
-                let index = tableDataModel.InsertNewItem();
-                tableDataModel.SetData("Account", 10000 + index, index);
-                tableDataModel.SetData("FullName", "Иванов Иван Иванович", index);
-                tableDataModel.SetData("Address", "Проспект Мира " + String(index +1), index);
-                tableDataModel.SetData("Residents", String(index +1), index);
-                tableDataModel.SetData("Branch", String(index +1), index);
-                tableDataModel.SetData("Type", String(index +1), index);
-                tableDataModel.SetData("Gauges", String(index +1), index);
+                let index = tableDataModel.insertNewItem();
+                tableDataModel.setData("Account", 10000 + index, index);
+                tableDataModel.setData("FullName", "Иванов Иван Иванович", index);
+                tableDataModel.setData("Address", "Проспект Мира " + String(index +1), index);
+                tableDataModel.setData("Residents", String(index +1), index);
+                tableDataModel.setData("Branch", String(index +1), index);
+                tableDataModel.setData("Type", String(index +1), index);
+                tableDataModel.setData("Gauges", String(index +1), index);
             }
 
             tableDataModel.compl = true;
@@ -38,33 +38,33 @@ Rectangle {
         id: tableHeaderModel;
         property bool compl: false;
         Component.onCompleted: {
-            let index = tableHeaderModel.InsertNewItem();
-            tableHeaderModel.SetData("Id", "Account", index);
-            tableHeaderModel.SetData("Name", qsTr("ЛС"), index);
+            let index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("Id", "Account", index);
+            tableHeaderModel.setData("Name", qsTr("ЛС"), index);
 
-            index = tableHeaderModel.InsertNewItem();
-            tableHeaderModel.SetData("Id", "FullName", index);
-            tableHeaderModel.SetData("Name", qsTr("ФИО"), index);
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("Id", "FullName", index);
+            tableHeaderModel.setData("Name", qsTr("ФИО"), index);
 
-            index = tableHeaderModel.InsertNewItem();
-            tableHeaderModel.SetData("Id", "Address", index);
-            tableHeaderModel.SetData("Name", qsTr("Адрес"), index);
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("Id", "Address", index);
+            tableHeaderModel.setData("Name", qsTr("Адрес"), index);
 
-            index = tableHeaderModel.InsertNewItem();
-            tableHeaderModel.SetData("Id", "Residents", index);
-            tableHeaderModel.SetData("Name", qsTr("Проживает"), index);
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("Id", "Residents", index);
+            tableHeaderModel.setData("Name", qsTr("Проживает"), index);
 
-            index = tableHeaderModel.InsertNewItem();
-            tableHeaderModel.SetData("Id", "Branch", index);
-            tableHeaderModel.SetData("Name", qsTr("Филиал"), index);
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("Id", "Branch", index);
+            tableHeaderModel.setData("Name", qsTr("Филиал"), index);
 
-            index = tableHeaderModel.InsertNewItem();
-            tableHeaderModel.SetData("Id", "Type", index);
-            tableHeaderModel.SetData("Name", qsTr("Тип"), index);
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("Id", "Type", index);
+            tableHeaderModel.setData("Name", qsTr("Тип"), index);
 
-            index = tableHeaderModel.InsertNewItem();
-            tableHeaderModel.SetData("Id", "Gauges", index);
-            tableHeaderModel.SetData("Name", qsTr("Счетчики"), index);
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("Id", "Gauges", index);
+            tableHeaderModel.setData("Name", qsTr("Счетчики"), index);
 
             table.headers = tableHeaderModel;
             tableDecor.headers = tableHeaderModel;
@@ -164,24 +164,24 @@ Rectangle {
         onComplComplChanged: {
             if(decorModel.complCompl){
                 console.log("onTableDecoratorChanged decorModel")
-                var cells = tableDec.GetTreeItemModel("Cells");
-                cells.SetData("FontSize",18);
-                tableDec.setDefault(decorModel,tableHeaderModel.GetItemsCount());
+                var cells = tableDec.getTreeItemModel("Cells");
+                cells.setData("FontSize",18);
+                tableDec.setDefault(decorModel,tableHeaderModel.getItemsCount());
 
-                var headers = decorModel.GetTreeItemModel("Headers");//
-                cells = decorModel.GetTreeItemModel("Cells");//
-                var cellWidth = decorModel.GetTreeItemModel("CellWidth");//
+                var headers = decorModel.getTreeItemModel("Headers");//
+                cells = decorModel.getTreeItemModel("Cells");//
+                var cellWidth = decorModel.getTreeItemModel("CellWidth");//
 
 
-                cellWidth.SetData("Width",100,0);
-                cellWidth.SetData("Width",300,1);
-                cellWidth.SetData("Width",400,2);
+                cellWidth.setData("Width",100,0);
+                cellWidth.setData("Width",300,1);
+                cellWidth.setData("Width",400,2);
 
-                cells.SetData("TextPosition",Text.AlignLeft,1);
-                cells.SetData("TextPosition",Text.AlignLeft,2);
+                cells.setData("TextPosition",Text.AlignLeft,1);
+                cells.setData("TextPosition",Text.AlignLeft,2);
 
-                headers.SetData("LeftTopRound",true,0)
-                headers.SetData("RightTopRound",true,tableHeaderModel.GetItemsCount()-1)
+                headers.setData("LeftTopRound",true,0)
+                headers.setData("RightTopRound",true,tableHeaderModel.getItemsCount()-1)
             }
         }
     }

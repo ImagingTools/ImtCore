@@ -182,17 +182,17 @@ QtObject {
 
         onStateChanged: {
             if (this.state === "Ready") {
-                console.log("serverStatusGqlModel Ready", this.ToJson());
+                console.log("serverStatusGqlModel Ready", this.toJson());
 
                 var dataModelLocal;
 
-                if (this.ContainsKey("errors")){
+                if (this.containsKey("errors")){
                     systemStatusController.serverStatus = 1;
 
                     return;
                 }
 
-                if (this.ContainsKey("data")){
+                if (this.containsKey("data")){
                     systemStatusController.serverStatus = 2;
                 }
             }
@@ -214,17 +214,17 @@ QtObject {
 
         onStateChanged: {
             if (this.state === "Ready") {
-                console.log("databaseStatusGqlModel Ready", this.ToJson());
+                console.log("databaseStatusGqlModel Ready", this.toJson());
 
                 var dataModelLocal;
 
-                if (this.ContainsKey("errors")){
+                if (this.containsKey("errors")){
                     systemStatusController.databaseStatus = 1;
 
                     return;
                 }
 
-                if (this.ContainsKey("data")){
+                if (this.containsKey("data")){
                     systemStatusController.databaseStatus = 2;
 
                 }

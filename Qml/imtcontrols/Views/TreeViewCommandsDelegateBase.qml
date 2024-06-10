@@ -29,28 +29,28 @@ Item {
     function insertNewItem(model){
         console.log("", model);
         console.log("=====================================");
-        let index = model.InsertNewItem();
+        let index = model.insertNewItem();
 
-        model.SetData("Id", "", index);
-        model.SetData("Name", "", index);
-        model.SetData("Active", true, index);
-        model.SetData("Opened", false, index);
-        model.SetData("Selected", false, index);
-        model.SetData("Visible", true, index);
-        model.SetData("State", 0, index);
-        model.SetData("Optional", 2, index);
+        model.setData("Id", "", index);
+        model.setData("Name", "", index);
+        model.setData("Active", true, index);
+        model.setData("Opened", false, index);
+        model.setData("Selected", false, index);
+        model.setData("Visible", true, index);
+        model.setData("State", 0, index);
+        model.setData("Optional", 2, index);
 
-        let parentModel = model.GetParent();
+        let parentModel = model.getParent();
 
         let level = 1;
         if (parentModel){
-            let id = parentModel.GetData("Id");
-            let parentLevel = Number(parentModel.GetData("Level"));
+            let id = parentModel.getData("Id");
+            let parentLevel = Number(parentModel.getData("Level"));
             level = parentLevel + 1;
         }
 
-        model.SetData("Level", level, index);
-        model.AddTreeModel("ChildModel", index);
+        model.setData("Level", level, index);
+        model.addTreeModel("ChildModel", index);
 
         console.log("=====================================");
 
@@ -63,16 +63,16 @@ Item {
 //    */
     function getSelectedItem(model){
         console.log("getSelectedItem", model);
-        let count = model.GetItemsCount();
+        let count = model.getItemsCount();
         for (let i = 0; i < count; i++){
-            let id = model.GetData("Id", i);
-            let selectedItem = model.GetData("Selected", i);
+            let id = model.getData("Id", i);
+            let selectedItem = model.getData("Selected", i);
 
             if (selectedItem){
                 return model;
             }
 
-            let childModel = model.GetData("ChildModel", i);
+            let childModel = model.getData("ChildModel", i);
             if (childModel){
                 let result = treeViewDelegate.getSelectedItem(childModel);
                 if (result){
@@ -90,9 +90,9 @@ Item {
             return -1;
         }
 
-        let count = model.GetItemsCount();
+        let count = model.getItemsCount();
         for (let i = 0; i < count; i++){
-            let selected = model.GetData("Selected", i);
+            let selected = model.getData("Selected", i);
 
             if (selected){
                 return i;
@@ -111,7 +111,7 @@ Item {
                 let index = treeViewDelegate.getSelectedItemIndex(item);
 
                 if (buttonId == "Ok"){
-                    item.SetData("Name", inputValue, index);
+                    item.setData("Name", inputValue, index);
                 }
             }
         }
@@ -123,32 +123,32 @@ Item {
         if (commandId == "NewRoot"){
             let index = treeViewDelegate.insertNewItem(treeViewDelegate.treeViewModel);
 
-            treeViewDelegate.treeViewModel.SetData("Id", "", index);
-            treeViewDelegate.treeViewModel.SetData("Name", "Feature Name", index);
+            treeViewDelegate.treeViewModel.setData("Id", "", index);
+            treeViewDelegate.treeViewModel.setData("Name", "Feature Name", index);
 
-            treeViewDelegate.treeViewModel.Refresh();
+            treeViewDelegate.treeViewModel.refresh();
         }
         else if (commandId == "New"){
             let item = treeViewDelegate.getSelectedItem(treeViewDelegate.treeViewModel);
             let index = treeViewDelegate.getSelectedItemIndex(item);
 
-            let childModel = item.GetData("ChildModel", index);
+            let childModel = item.getData("ChildModel", index);
             if (!childModel){
-                childModel = item.AddTreeModel("ChildModel", index);
+                childModel = item.addTreeModel("ChildModel", index);
             }
 
             let childIndex = insertNewItem(childModel);
 
-            childModel.SetData("Id", "", childIndex);
-            childModel.SetData("Name", "Feature Name", childIndex);
+            childModel.setData("Id", "", childIndex);
+            childModel.setData("Name", "Feature Name", childIndex);
 
-            treeViewDelegate.treeViewModel.Refresh();
+            treeViewDelegate.treeViewModel.refresh();
         }
         else if (commandId == "Remove"){
 
             let item = treeViewDelegate.getSelectedItem(treeViewDelegate.treeViewModel);
             let index = treeViewDelegate.getSelectedItemIndex(item);
-            item.RemoveItem(index);
+            item.removeItem(index);
 
         }
         else{

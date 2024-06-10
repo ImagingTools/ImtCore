@@ -65,7 +65,7 @@ QtObject {
             viewParams.InsertField("FilterModel");
 
             let filterModel = gqlModelBaseContainer.rootItem.modelFilter;
-            var jsonString = filterModel.ToJson();
+            var jsonString = filterModel.toJson();
             viewParams.InsertField("FilterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");
@@ -103,21 +103,21 @@ QtObject {
             gqlModelBaseContainer.itemsInfoGqlStateChanged(this.state);
             if (this.state === "Ready"){
                 let dataModelLocal;
-                if (gqlModelBaseContainer.itemsInfoModel.ContainsKey("errors")){
-                    dataModelLocal = gqlModelBaseContainer.itemsInfoModel.GetData("errors");
+                if (gqlModelBaseContainer.itemsInfoModel.containsKey("errors")){
+                    dataModelLocal = gqlModelBaseContainer.itemsInfoModel.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getItemsGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getItemsGqlCommand);
+                    if (dataModelLocal.containsKey(gqlModelBaseContainer.getItemsGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(gqlModelBaseContainer.getItemsGqlCommand);
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     ModalDialogManager.showWarningDialog(message)
@@ -125,21 +125,21 @@ QtObject {
                     return;
                 }
 
-                if (gqlModelBaseContainer.itemsInfoModel.ContainsKey("data")){
-                    dataModelLocal = gqlModelBaseContainer.itemsInfoModel.GetData("data");
-                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getItemsGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getItemsGqlCommand);
-                        if (dataModelLocal.ContainsKey("notification")){
-                            gqlModelBaseContainer.notificationModel = dataModelLocal.GetData("notification");
+                if (gqlModelBaseContainer.itemsInfoModel.containsKey("data")){
+                    dataModelLocal = gqlModelBaseContainer.itemsInfoModel.getData("data");
+                    if (dataModelLocal.containsKey(gqlModelBaseContainer.getItemsGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(gqlModelBaseContainer.getItemsGqlCommand);
+                        if (dataModelLocal.containsKey("notification")){
+                            gqlModelBaseContainer.notificationModel = dataModelLocal.getData("notification");
                         }
 
-                        if (!dataModelLocal.ContainsKey("items")){
-                            dataModelLocal.AddTreeModel("items")
+                        if (!dataModelLocal.containsKey("items")){
+                            dataModelLocal.addTreeModel("items")
                         }
 
-                        if (dataModelLocal.ContainsKey("items")){
-                            let items = dataModelLocal.GetData("items");
-                            let selectIndex = dataModelLocal.GetData("selectIndex");
+                        if (dataModelLocal.containsKey("items")){
+                            let items = dataModelLocal.getData("items");
+                            let selectIndex = dataModelLocal.getData("selectIndex");
                             gqlModelBaseContainer.itemsReceived(selectIndex, items)
 
                             // Events.sendEvent(gqlModelBaseContainer.commandId + "StructureUpdated");
@@ -181,35 +181,35 @@ QtObject {
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (gqlModelBaseContainer.objectViewModel.ContainsKey("errors")){
-                    dataModelLocal = gqlModelBaseContainer.objectViewModel.GetData("errors");
+                if (gqlModelBaseContainer.objectViewModel.containsKey("errors")){
+                    dataModelLocal = gqlModelBaseContainer.objectViewModel.getData("errors");
 
-                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getObjectViewGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getObjectViewGqlCommand);
+                    if (dataModelLocal.containsKey(gqlModelBaseContainer.getObjectViewGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(gqlModelBaseContainer.getObjectViewGqlCommand);
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type");
                     }
 
                     ModalDialogManager.showWarningDialog(message)
                     return;
                 }
 
-                dataModelLocal = gqlModelBaseContainer.objectViewModel.GetData("data");
+                dataModelLocal = gqlModelBaseContainer.objectViewModel.getData("data");
                 if(!dataModelLocal)
                     return;
-                if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getObjectViewGqlCommand)){
-                    dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getObjectViewGqlCommand);
+                if (dataModelLocal.containsKey(gqlModelBaseContainer.getObjectViewGqlCommand)){
+                    dataModelLocal = dataModelLocal.getData(gqlModelBaseContainer.getObjectViewGqlCommand);
 
-                    let objectView = dataModelLocal.GetData("Path");
-                    let objectViewCommandsId = dataModelLocal.GetData("CommandId");
+                    let objectView = dataModelLocal.getData("Path");
+                    let objectViewCommandsId = dataModelLocal.getData("CommandId");
 
                     gqlModelBaseContainer.objectViewEditorPath = objectView;
                     gqlModelBaseContainer.objectViewEditorCommandsId = objectViewCommandsId;

@@ -100,7 +100,7 @@ Item {
 
     function onTextFilterChanged(index, text){
         console.log("onTextFilterChanged", text);
-        modelFilterObj.SetData("TextFilter", text);
+        modelFilterObj.setData("TextFilter", text);
         gqlModels.updateModels();
     }
 
@@ -112,7 +112,7 @@ Item {
         let index = treeViewInternal.findIndexById(nodeId)
         // if (index > -1){
             treeViewInternal.deleteBranch(index)
-            treeViewInternal.model.SetData("IsOpen", true, index);
+            treeViewInternal.model.setData("IsOpen", true, index);
             gqlModels.updateItemsModel(nodeId)
         // }
     }
@@ -218,9 +218,9 @@ Item {
             id: modelFilterObj;
 
             Component.onCompleted: {
-                modelFilterObj.SetUpdateEnabled(true)
-                modelFilterObj.AddTreeModel("FilterIds");
-                console.log("modelFilterObj onCompleted", modelFilterObj.ToJson())
+                modelFilterObj.setUpdateEnabled(true)
+                modelFilterObj.addTreeModel("FilterIds");
+                console.log("modelFilterObj onCompleted", modelFilterObj.toJson())
             }
         }
 
@@ -246,9 +246,9 @@ Item {
             let index = treeViewInternal.findIndexById(selectIndex)
             console.log("onItemsReceived", selectIndex, index)
             treeViewInternal.insertTree(index, items)
-            treeViewInternal.model.SetData("IsOpen", true, index);
-            for (let i = 0; i < items.GetItemsCount(); i++){
-                let nodeId = items.GetData("Id", i)
+            treeViewInternal.model.setData("IsOpen", true, index);
+            for (let i = 0; i < items.getItemsCount(); i++){
+                let nodeId = items.getData("Id", i)
                 if (visualControl.contains(nodeId)){
                     gqlModels.updateItemsModel(nodeId)
                 }

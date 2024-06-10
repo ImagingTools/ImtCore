@@ -179,14 +179,14 @@ FocusScope {
         let childModel = modelIndex.getData("ChildModel");
 
         if (!childModel){
-            childModel = treeModel.AddTreeModel("ChildModel", currentIndex);
+            childModel = treeModel.addTreeModel("ChildModel", currentIndex);
         }
 
         if (!childModel){
             return false;
         }
 
-        childModel.InsertNewItemWithParameters(0, rowObj)
+        childModel.insertNewItemWithParameters(0, rowObj)
 
         return true;
     }
@@ -200,7 +200,7 @@ FocusScope {
 
             let currentIndex = modelIndex.index;
 
-            treeModel.RemoveItem(currentIndex);
+            treeModel.removeItem(currentIndex);
 
             return true;
         }
@@ -216,7 +216,7 @@ FocusScope {
                 if (!parentModel){
                     parentModel = tableViewRoot.rowModel;
                 }
-                parentModel.RemoveItem(modelIndex.getIndex());
+                parentModel.removeItem(modelIndex.getIndex());
                 return true;
             }
         }

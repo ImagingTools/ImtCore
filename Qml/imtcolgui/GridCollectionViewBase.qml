@@ -139,19 +139,19 @@ Item {
                     var tableDecorator = loaderTableDecorator.item;
                     var count = gridInternal.columnCount;
 
-                    if(tableDecorator.GetItemsCount()){
+                    if(tableDecorator.getItemsCount()){
 
-                        var headers = gridDecoratorModel.AddTreeModel("Headers");
-                        var cells = gridDecoratorModel.AddTreeModel("Cells");
-                        var cellWidth = gridDecoratorModel.AddTreeModel("CellWidth");
+                        var headers = gridDecoratorModel.addTreeModel("Headers");
+                        var cells = gridDecoratorModel.addTreeModel("Cells");
+                        var cellWidth = gridDecoratorModel.addTreeModel("CellWidth");
 
                         for(var i = 0; i < count; i++){
-                            headers.InsertNewItem();
-                            cells.InsertNewItem();
-                            cellWidth.InsertNewItem();
-                            headers.CopyItemDataFromModel(i,tableDecorator.GetTreeItemModel("Headers"));
-                            cells.CopyItemDataFromModel(i,tableDecorator.GetTreeItemModel("Cells"));
-                            cellWidth.CopyItemDataFromModel(i,tableDecorator.GetTreeItemModel("CellWidth"));
+                            headers.insertNewItem();
+                            cells.insertNewItem();
+                            cellWidth.insertNewItem();
+                            headers.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Headers"));
+                            cells.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Cells"));
+                            cellWidth.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("CellWidth"));
                         }
 
                         //gridInternal.tableDecorator = gridDecoratorModel;
@@ -419,8 +419,8 @@ Item {
         id: modelFilterObj;
 
         Component.onCompleted: {
-            modelFilterObj.AddTreeModel("FilterIds");
-            modelFilterObj.AddTreeModel("Sort");
+            modelFilterObj.addTreeModel("FilterIds");
+            modelFilterObj.addTreeModel("Sort");
         }
     }
 
@@ -467,7 +467,7 @@ Item {
 
         onItemsChanged: {
             console.log("baseCommands.items - ", baseCommands.items);
-            console.log("baseCommands.items.ToJson - ", baseCommands.items.ToJson());
+            console.log("baseCommands.items.toJson - ", baseCommands.items.toJson());
             gridInternal.model = baseCommands.items;
         }
     }

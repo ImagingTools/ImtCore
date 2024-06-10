@@ -27,12 +27,12 @@ Dialog {
     }
 
     onFeaturesModelChanged: {
-        for (let i = 0; i < featuresModel.GetItemsCount(); i++){
-            let featureId = featuresModel.GetData("Id", i);
+        for (let i = 0; i < featuresModel.getItemsCount(); i++){
+            let featureId = featuresModel.getData("Id", i);
             if (!excludeFeatureIds.includes(featureId)){
-                let index = tableModel.InsertNewItem();
+                let index = tableModel.insertNewItem();
 
-                tableModel.CopyItemDataFromModel(index, featuresModel, i)
+                tableModel.copyItemDataFromModel(index, featuresModel, i)
             }
         }
 
@@ -71,13 +71,13 @@ Dialog {
 
         property TreeItemModel headersModel: TreeItemModel {
             function updateHeaders(){
-                dialogBody.headersModel.Clear();
+                dialogBody.headersModel.clear();
 
-                let index = dialogBody.headersModel.InsertNewItem();
-                dialogBody.headersModel.SetData("Id", "FeatureName", index);
-                dialogBody.headersModel.SetData("Name", qsTr("Feature Name"), index);
+                let index = dialogBody.headersModel.insertNewItem();
+                dialogBody.headersModel.setData("Id", "FeatureName", index);
+                dialogBody.headersModel.setData("Name", qsTr("Feature Name"), index);
 
-                dialogBody.headersModel.Refresh();
+                dialogBody.headersModel.refresh();
 
                 tableTreeView.headers = dialogBody.headersModel;
             }

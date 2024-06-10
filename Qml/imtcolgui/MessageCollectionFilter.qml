@@ -9,26 +9,26 @@ CollectionFilter {
     }
 
     Component.onCompleted: {
-        filterableHeadersModel.SetData("Id", "Text")
-        let index = filterableHeadersModel.InsertNewItem()
-        filterableHeadersModel.SetData("Id", "Timestamp", index)
-        index = filterableHeadersModel.InsertNewItem()
-        filterableHeadersModel.SetData("Id", "Source", index)
+        filterableHeadersModel.setData("Id", "Text")
+        let index = filterableHeadersModel.insertNewItem()
+        filterableHeadersModel.setData("Id", "Timestamp", index)
+        index = filterableHeadersModel.insertNewItem()
+        filterableHeadersModel.setData("Id", "Source", index)
         setFilteringInfoIds(filterableHeadersModel)
     }
 
     function setMessageStatusFilter(messageKey, status){
         console.log("*DEBUG* setMessageStatusFilter")
-        let objectFilter = filterModel.GetData("ObjectFilter");
+        let objectFilter = filterModel.getData("ObjectFilter");
         if (!objectFilter){
-            objectFilter = filterModel.AddTreeModel("ObjectFilter")
+            objectFilter = filterModel.addTreeModel("ObjectFilter")
         }
-        let categoryFilter = objectFilter.GetData("Category");
+        let categoryFilter = objectFilter.getData("Category");
         if (!categoryFilter){
-            categoryFilter = objectFilter.AddTreeModel("Category")
+            categoryFilter = objectFilter.addTreeModel("Category")
         }
-        categoryFilter.SetData(messageKey, status);
-        console.log("*DEBUG* filterModel", filterModel.ToJson())
+        categoryFilter.setData(messageKey, status);
+        console.log("*DEBUG* filterModel", filterModel.toJson())
 
         filterChanged();
     }

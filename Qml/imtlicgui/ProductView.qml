@@ -34,21 +34,21 @@ ViewBase {
     }
 
     function updateHeaders(){
-        productViewContainer.softwareHeadersModel.Clear();
+        productViewContainer.softwareHeadersModel.clear();
 
-        let index = productViewContainer.softwareHeadersModel.InsertNewItem();
-        productViewContainer.softwareHeadersModel.SetData("Id", "FeatureName", index);
-        productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Feature Name"), index);
+        let index = productViewContainer.softwareHeadersModel.insertNewItem();
+        productViewContainer.softwareHeadersModel.setData("Id", "FeatureName", index);
+        productViewContainer.softwareHeadersModel.setData("Name", qsTr("Feature Name"), index);
 
-        index = productViewContainer.softwareHeadersModel.InsertNewItem();
-        productViewContainer.softwareHeadersModel.SetData("Id", "FeatureId", index);
-        productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Feature-ID"), index);
+        index = productViewContainer.softwareHeadersModel.insertNewItem();
+        productViewContainer.softwareHeadersModel.setData("Id", "FeatureId", index);
+        productViewContainer.softwareHeadersModel.setData("Name", qsTr("Feature-ID"), index);
 
-        index = productViewContainer.softwareHeadersModel.InsertNewItem();
-        productViewContainer.softwareHeadersModel.SetData("Id", "FeatureDescription", index);
-        productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Description"), index);
+        index = productViewContainer.softwareHeadersModel.insertNewItem();
+        productViewContainer.softwareHeadersModel.setData("Id", "FeatureDescription", index);
+        productViewContainer.softwareHeadersModel.setData("Name", qsTr("Description"), index);
 
-        productViewContainer.softwareHeadersModel.Refresh();
+        productViewContainer.softwareHeadersModel.refresh();
 
         tableView_.columnModel = productViewContainer.softwareHeadersModel;
     }
@@ -60,37 +60,37 @@ ViewBase {
     }
 
     function updateModel(){
-        productViewContainer.model.SetData("ProductName", productNameInput.text);
+        productViewContainer.model.setData("ProductName", productNameInput.text);
 
         let productId = productNameInput.text.replace(/\s+/g, '');
-        productViewContainer.model.SetData("ProductId", productId);
+        productViewContainer.model.setData("ProductId", productId);
 
         if (categoryComboBox.currentIndex == 0){
-            productViewContainer.model.SetData("CategoryId", "Software");
+            productViewContainer.model.setData("CategoryId", "Software");
         }
         else if (categoryComboBox.currentIndex == 1){
-            productViewContainer.model.SetData("CategoryId", "Hardware");
+            productViewContainer.model.setData("CategoryId", "Hardware");
         }
         else{
-            productViewContainer.model.SetData("CategoryId", "");
+            productViewContainer.model.setData("CategoryId", "");
         }
 
-        if (!productViewContainer.model.ContainsKey("Features")){
-            productViewContainer.model.SetData("Features", "");
+        if (!productViewContainer.model.containsKey("Features")){
+            productViewContainer.model.setData("Features", "");
         }
     }
 
     function updateGui(){
-        if (productViewContainer.model.ContainsKey("ProductName")){
-            productNameInput.text = productViewContainer.model.GetData("ProductName")
+        if (productViewContainer.model.containsKey("ProductName")){
+            productNameInput.text = productViewContainer.model.getData("ProductName")
         }
         else{
             productNameInput.text = "";
         }
 
         let categoryFound = false;
-        if (productViewContainer.model.ContainsKey("CategoryId")){
-            let categoryId = productViewContainer.model.GetData("CategoryId")
+        if (productViewContainer.model.containsKey("CategoryId")){
+            let categoryId = productViewContainer.model.getData("CategoryId")
             if (categoryId === "Software"){
                 categoryComboBox.currentIndex = 0;
                 categoryFound = true;
@@ -109,9 +109,9 @@ ViewBase {
     }
 
     function updateFeaturesGui(){
-        productViewContainer.productFeaturesViewModel.Clear();
+        productViewContainer.productFeaturesViewModel.clear();
 
-        let features = productViewContainer.model.GetData("Features")
+        let features = productViewContainer.model.getData("Features")
         if (!features){
             return;
         }
@@ -127,13 +127,13 @@ ViewBase {
                 continue;
             }
 
-            for (let i = 0; i < productViewContainer.allFeaturesModel.GetItemsCount(); i++){
-                let id = productViewContainer.allFeaturesModel.GetData("Id", i);
+            for (let i = 0; i < productViewContainer.allFeaturesModel.getItemsCount(); i++){
+                let id = productViewContainer.allFeaturesModel.getData("Id", i);
 
                 if (featureId === id){
-                    let index = productViewContainer.productFeaturesViewModel.InsertNewItem();
+                    let index = productViewContainer.productFeaturesViewModel.insertNewItem();
 
-                    productViewContainer.productFeaturesViewModel.CopyItemDataFromModel(index, productViewContainer.allFeaturesModel, i);
+                    productViewContainer.productFeaturesViewModel.copyItemDataFromModel(index, productViewContainer.allFeaturesModel, i);
                 }
             }
         }
@@ -143,7 +143,7 @@ ViewBase {
     }
 
     function addFeature(featureId){
-        let features = productViewContainer.model.GetData("Features")
+        let features = productViewContainer.model.getData("Features")
 
         let featureIds = []
         if (features !== ""){
@@ -154,11 +154,11 @@ ViewBase {
             featureIds.push(featureId)
         }
 
-        productViewContainer.model.SetData("Features", featureIds.join(';'))
+        productViewContainer.model.setData("Features", featureIds.join(';'))
     }
 
     function removeFeature(featureId){
-        let features = productViewContainer.model.GetData("Features")
+        let features = productViewContainer.model.getData("Features")
 
         let featureIds = []
 
@@ -171,22 +171,22 @@ ViewBase {
             featureIds.splice(i, 1);
         }
 
-        productViewContainer.model.SetData("Features", featureIds.join(';'))
+        productViewContainer.model.setData("Features", featureIds.join(';'))
     }
 
     TreeItemModel {
         id: modelCategogy;
 
         Component.onCompleted: {
-            let index = modelCategogy.InsertNewItem();
+            let index = modelCategogy.insertNewItem();
 
-            modelCategogy.SetData("Id", "Software", index);
-            modelCategogy.SetData("Name", "Software", index);
+            modelCategogy.setData("Id", "Software", index);
+            modelCategogy.setData("Name", "Software", index);
 
-            index = modelCategogy.InsertNewItem();
+            index = modelCategogy.insertNewItem();
 
-            modelCategogy.SetData("Id", "Hardware", index);
-            modelCategogy.SetData("Name", "Hardware", index);
+            modelCategogy.setData("Id", "Hardware", index);
+            modelCategogy.setData("Name", "Hardware", index);
 
             categoryComboBox.model = modelCategogy;
         }
@@ -322,7 +322,7 @@ ViewBase {
 
                     let id = rootFeatureUuid + "/" + featureId;
 
-                    let features = productViewContainer.model.GetData("Features");
+                    let features = productViewContainer.model.getData("Features");
 
                     let featureIds = []
                     if (features !== ""){

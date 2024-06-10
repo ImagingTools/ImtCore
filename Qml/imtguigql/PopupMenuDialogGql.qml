@@ -110,9 +110,9 @@ Item {
     Component.onCompleted: {
         //console.log("_____________POPUP_COMPL_____________", popupMenuContainer.preventFirstLoading);
         popupMenuContainer.forceActiveFocus();
-        modelFilter.AddTreeModel("FilterIds");
-        modelFilter.SetData("FilterIds", popupMenuContainer.filterIdsModel)
-        modelFilter.AddTreeModel("Sort");
+        modelFilter.addTreeModel("FilterIds");
+        modelFilter.setData("FilterIds", popupMenuContainer.filterIdsModel)
+        modelFilter.addTreeModel("Sort");
 
         if(!popupMenuContainer.preventFirstLoading){
             itemsModel.updateModel(0);
@@ -128,8 +128,8 @@ Item {
     onPropertiesChanged: {
         //console.log("_____________PROPERTIES_CHANGED_____________")
 
-        for (var item = 0; item < popupMenuContainer.properties.GetItemsCount(); item++){
-            modelFilter.SetData(popupMenuContainer.properties.GetData("Id", item),  popupMenuContainer.properties.GetData("Value", item));
+        for (var item = 0; item < popupMenuContainer.properties.getItemsCount(); item++){
+            modelFilter.setData(popupMenuContainer.properties.getData("Id", item),  popupMenuContainer.properties.getData("Value", item));
         }
         if(!notSetProperties){
             propertiesChangedSignal();
@@ -195,9 +195,9 @@ Item {
             if(popupMenuContainer.ready){
                 popupMenuContainer.rootItem.currentIndex = -1;
                 popupMenuContainer.offset = 0;
-                //modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
+                //modelFilter.setData("TextFilter", popupMenuContainer.filterText);
                 var str = text.replace(popupMenuContainer.excludeFilterPart, "");
-                modelFilter.SetData("TextFilter", str);
+                modelFilter.setData("TextFilter", str);
                 popupMenuContainer.rootItem.editSignal();
                 pause.stop();
                 pause.start();
@@ -437,7 +437,7 @@ Item {
         onActivated: {
             if(popupMenuContainer.rootItem){
                 if(popupMenuContainer.rootItem.selectedIndex >=0){
-                    var id = popupMenuContainer.model.GetData("Id", popupMenuContainer.rootItem.selectedIndex);
+                    var id = popupMenuContainer.model.getData("Id", popupMenuContainer.rootItem.selectedIndex);
                     popupMenuContainer.finished(id, popupMenuContainer.rootItem.selectedIndex);
                 }
             }
@@ -472,11 +472,11 @@ Item {
             popupMenuContainer.hoverBlocked = true;
             if(popupMenuContainer.rootItem){
                 popupMenuContainer.rootItem.hoverBlocked = true;
-                if(popupMenuContainer.rootItem.selectedIndex < popupMenuContainer.model.GetItemsCount() - 1){
+                if(popupMenuContainer.rootItem.selectedIndex < popupMenuContainer.model.getItemsCount() - 1){
                     popupMenuContainer.rootItem.selectedIndex++;
                     popupMenuContainer.contentYCorrection(true);
                 }
-                else if(popupMenuContainer.rootItem.selectedIndex == popupMenuContainer.model.GetItemsCount() - 1){
+                else if(popupMenuContainer.rootItem.selectedIndex == popupMenuContainer.model.getItemsCount() - 1){
                     if(popupMenuContainer.rootItem.selectedIndex >=0 && popupMenuContainer.elementsCount -1 > popupMenuContainer.rootItem.selectedIndex){
                         popupMenuContainer.createAdditionalQuery();
                     }
@@ -506,14 +506,14 @@ Item {
             viewParams.InsertField("Offset", offsetVar);
             viewParams.InsertField("Count", popupMenuContainer.count);
             viewParams.InsertField("FilterModel");
-            var jsonString = modelFilter.ToJson();
+            var jsonString = modelFilter.toJson();
             //            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
             viewParams.InsertField("FilterModel", jsonString);
             inputParams.InsertFieldObject(viewParams);
             var queryFields = Gql.GqlObject("items");
 
-            for (var item = 0; item < popupMenuContainer.gettedParams.GetItemsCount(); item++){
-                var nameParam = popupMenuContainer.gettedParams.GetData("Name", item);
+            for (var item = 0; item < popupMenuContainer.gettedParams.getItemsCount(); item++){
+                var nameParam = popupMenuContainer.gettedParams.getData("Name", item);
                 queryFields.InsertField(nameParam);
             }
 
@@ -531,35 +531,35 @@ Item {
 
                 let dataModelLocal;
 
-                if (itemsModel.ContainsKey("errors")){
+                if (itemsModel.containsKey("errors")){
                     return;
                 }
 
 
-                if (itemsModel.ContainsKey("data")){
+                if (itemsModel.containsKey("data")){
 
-                    dataModelLocal = itemsModel.GetData("data");
+                    dataModelLocal = itemsModel.getData("data");
 
-                    if (dataModelLocal.ContainsKey(popupMenuContainer.commandId)){
-                        dataModelLocal = dataModelLocal.GetData(popupMenuContainer.commandId);
+                    if (dataModelLocal.containsKey(popupMenuContainer.commandId)){
+                        dataModelLocal = dataModelLocal.getData(popupMenuContainer.commandId);
                         var isClosing = false;
-                        if (dataModelLocal.ContainsKey("notification")){
-                            var notifModel = dataModelLocal.GetData("notification");
-                            if (notifModel.ContainsKey("ElementsCount")){
-                                popupMenuContainer.elementsCount = notifModel.GetData("ElementsCount");
+                        if (dataModelLocal.containsKey("notification")){
+                            var notifModel = dataModelLocal.getData("notification");
+                            if (notifModel.containsKey("ElementsCount")){
+                                popupMenuContainer.elementsCount = notifModel.getData("ElementsCount");
                             }
-                            if(notifModel.ContainsKey("Close")){
-                                if(notifModel.GetData("Close")){
+                            if(notifModel.containsKey("Close")){
+                                if(notifModel.getData("Close")){
                                     isClosing = true;
                                     //popupMenuContainer.rootItem.closeFunc();
                                 }
                             }
                         }
 
-                        dataModelLocal = dataModelLocal.GetData("items");
+                        dataModelLocal = dataModelLocal.getData("items");
 
                         //console.log(popupMenuContainer.commandId, " = ", dataModelLocal);
-                        //console.log("comboModel:::", dataModelLocal.ToJson());
+                        //console.log("comboModel:::", dataModelLocal.toJson());
                         if (popupMenuContainer.offset == 0){
                             popupMenuContainer.model = dataModelLocal;
                             //popupMenuListView.model = popupMenuContainer.model;
@@ -573,13 +573,13 @@ Item {
                         }
                         else{//OFSET !== 0
 
-                            //console.log("count items = ", dataModelLocal.GetItemsCount(), dataModelLocal.ToJson())
+                            //console.log("count items = ", dataModelLocal.getItemsCount(), dataModelLocal.toJson())
 
-                            if(dataModelLocal.GetItemsCount() > 0){
-                                for (var i = 0; i < dataModelLocal.GetItemsCount(); i++){
-                                    var index_ = popupMenuContainer.model.InsertNewItem();
-                                    //dataModelLocal.CopyItemDataToModel(i, popupMenuContainer.model, popupMenuContainer.offset + i);
-                                    dataModelLocal.CopyItemDataToModel(i, popupMenuContainer.model, index_);
+                            if(dataModelLocal.getItemsCount() > 0){
+                                for (var i = 0; i < dataModelLocal.getItemsCount(); i++){
+                                    var index_ = popupMenuContainer.model.insertNewItem();
+                                    //dataModelLocal.copyItemDataToModel(i, popupMenuContainer.model, popupMenuContainer.offset + i);
+                                    dataModelLocal.copyItemDataToModel(i, popupMenuContainer.model, index_);
                                 }
                                 //popupMenuListView.model = popupMenuContainer.model;
                                 popupMenuContainer.endListStatus = false;
@@ -596,7 +596,7 @@ Item {
                             }
                         }
                     }
-                    dataModelLocal.Refresh();
+                    dataModelLocal.refresh();
                 }
 
 

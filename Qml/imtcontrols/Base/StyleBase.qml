@@ -208,17 +208,17 @@ StyleComponents {
     }
 
     function getThemeColor(colorType, colorKey, themeType){
-        if (themeType.ContainsKey("Style")){
-            let styleModel = themeType.GetData("Style");
-            if (styleModel.ContainsKey(colorType)){
-                let typeModel = styleModel.GetData(colorType);
-                if (typeModel.ContainsKey(colorKey)){
-                    let colorPalette = typeModel.GetData(colorKey);
+        if (themeType.containsKey("Style")){
+            let styleModel = themeType.getData("Style");
+            if (styleModel.containsKey(colorType)){
+                let typeModel = styleModel.getData(colorType);
+                if (typeModel.containsKey(colorKey)){
+                    let colorPalette = typeModel.getData(colorKey);
 
-                    if (themeType.ContainsKey("ColorPalette")){
-                        let themeModel = themeType.GetData("ColorPalette")
-                        if (themeModel.ContainsKey(colorPalette)){
-                            return themeModel.GetData(colorPalette)
+                    if (themeType.containsKey("ColorPalette")){
+                        let themeModel = themeType.getData("ColorPalette")
+                        if (themeModel.containsKey(colorPalette)){
+                            return themeModel.getData(colorPalette)
                         }
                     }
                 }
@@ -383,8 +383,8 @@ StyleComponents {
     }
 
     function parseStyleTheme(themeType){
-        if (themeType.ContainsKey("source")){
-            let dataSource = themeType.GetData("source");
+        if (themeType.containsKey("source")){
+            let dataSource = themeType.getData("source");
             styleContainer.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource);
             styleContainer.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource);
             styleContainer.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", dataSource);
@@ -409,19 +409,19 @@ StyleComponents {
             styleContainer.buttonHoverColor = styleContainer.alternateBaseColor;
             styleContainer.buttonPressedColor = styleContainer.getThemeColor("ActiveColors", "BackgroundSelected", dataSource);
 
-            styleContainer.imagingToolsGradient0 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient0");
-            styleContainer.imagingToolsGradient1 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient1");
-            styleContainer.imagingToolsGradient2 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient2");
-            styleContainer.imagingToolsGradient3 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient3");
-            styleContainer.imagingToolsGradient4 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient4");
-            styleContainer.greenColor = dataSource.GetData("ColorPalette").GetData("Green");
+            styleContainer.imagingToolsGradient0 = dataSource.getData("ColorPalette").getData("ImagingToolsGradient0");
+            styleContainer.imagingToolsGradient1 = dataSource.getData("ColorPalette").getData("ImagingToolsGradient1");
+            styleContainer.imagingToolsGradient2 = dataSource.getData("ColorPalette").getData("ImagingToolsGradient2");
+            styleContainer.imagingToolsGradient3 = dataSource.getData("ColorPalette").getData("ImagingToolsGradient3");
+            styleContainer.imagingToolsGradient4 = dataSource.getData("ColorPalette").getData("ImagingToolsGradient4");
+            styleContainer.greenColor = dataSource.getData("ColorPalette").getData("Green");
 
             styleContainer.iconColorOnSelected = styleContainer.getThemeColor("ActiveColors", "Highlight", dataSource);
 
             styleContainer.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", dataSource);
             styleContainer.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);
 
-            styleContainer.imaginToolsAccent = dataSource.GetData("ColorPalette").GetData("ImaginTools Accent");
+            styleContainer.imaginToolsAccent = dataSource.getData("ColorPalette").getData("ImaginTools Accent");
         }
     }
 

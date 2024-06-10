@@ -37,20 +37,20 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("Superuser model:", this.ToJson());
+            console.log("Superuser model:", this.toJson());
 
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (root.gqlGetModel.ContainsKey("errors")){
-                    dataModelLocal = root.gqlGetModel.GetData("errors");
+                if (root.gqlGetModel.containsKey("errors")){
+                    dataModelLocal = root.gqlGetModel.getData("errors");
 
                     root.result(false, "");
 
                     return;
                 }
 
-                if (root.gqlGetModel.ContainsKey("data")){
+                if (root.gqlGetModel.containsKey("data")){
                     root.result(true, "");
                 }
             }

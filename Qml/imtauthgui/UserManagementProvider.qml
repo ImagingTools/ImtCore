@@ -78,16 +78,16 @@ QtObject {
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (userModeModel.ContainsKey("errors")){
-                    dataModelLocal = userModeModel.GetData("errors");
+                if (userModeModel.containsKey("errors")){
+                    dataModelLocal = userModeModel.getData("errors");
 
-                    if (dataModelLocal.ContainsKey("UserMode")){
-                        dataModelLocal = dataModelLocal.GetData("UserMode");
+                    if (dataModelLocal.containsKey("UserMode")){
+                        dataModelLocal = dataModelLocal.getData("UserMode");
                     }
 
                     let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message");
                     }
 
                     ModalDialogManager.showWarningDialog(message)
@@ -95,17 +95,17 @@ QtObject {
                     return;
                 }
 
-                if (userModeModel.ContainsKey("data")){
-                    dataModelLocal = userModeModel.GetData("data")
-                    if (dataModelLocal.ContainsKey("UserMode")){
-                        dataModelLocal = dataModelLocal.GetData("UserMode");
+                if (userModeModel.containsKey("data")){
+                    dataModelLocal = userModeModel.getData("data")
+                    if (dataModelLocal.containsKey("UserMode")){
+                        dataModelLocal = dataModelLocal.getData("UserMode");
                     }
 
-                    if (dataModelLocal.ContainsKey("Parameters")){
-                        let parameters = dataModelLocal.GetData("Parameters");
-                        let value = dataModelLocal.GetData("Value");
+                    if (dataModelLocal.containsKey("Parameters")){
+                        let parameters = dataModelLocal.getData("Parameters");
+                        let value = dataModelLocal.getData("Value");
                         if (value >= 0){
-                            container.userMode = parameters.GetData("Id", value);
+                            container.userMode = parameters.getData("Id", value);
                         }
                     }
                 }

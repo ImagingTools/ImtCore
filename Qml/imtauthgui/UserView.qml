@@ -101,7 +101,7 @@ ViewBase {
                     readOnly: container.readOnly;
 
                     onEditingFinished: {
-                        let oldText = container.model.GetData("Username");
+                        let oldText = container.model.getData("Username");
                         if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
 
                             container.doUpdateModel();
@@ -123,7 +123,7 @@ ViewBase {
                     readOnly: container.readOnly;
 
                     onEditingFinished: {
-                        let oldText = container.model.GetData("Password");
+                        let oldText = container.model.getData("Password");
                         if (oldText && oldText !== passwordInput.text || !oldText && passwordInput.text !== ""){
                             container.doUpdateModel();
                         }
@@ -141,7 +141,7 @@ ViewBase {
                     readOnly: container.readOnly;
 
                     onEditingFinished: {
-                        let oldText = container.model.GetData("Name");
+                        let oldText = container.model.getData("Name");
                         if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
                             container.doUpdateModel();
                         }
@@ -175,29 +175,29 @@ ViewBase {
                 }
 
                 function updateGui(){
-                    if (container.model.ContainsKey("Username")){
-                        usernameInput.text = container.model.GetData("Username");
+                    if (container.model.containsKey("Username")){
+                        usernameInput.text = container.model.getData("Username");
                     }
                     else{
                         usernameInput.text = "";
                     }
 
-                    if (container.model.ContainsKey("Name")){
-                        nameInput.text = container.model.GetData("Name");
+                    if (container.model.containsKey("Name")){
+                        nameInput.text = container.model.getData("Name");
                     }
                     else{
                         nameInput.text = "";
                     }
 
-                    if (container.model.ContainsKey("Email")){
-                        mailInput.text = container.model.GetData("Email");
+                    if (container.model.containsKey("Email")){
+                        mailInput.text = container.model.getData("Email");
                     }
                     else{
                         mailInput.text = "";
                     }
 
-                    if (container.model.ContainsKey("Password")){
-                        passwordInput.text = container.model.GetData("Password");
+                    if (container.model.containsKey("Password")){
+                        passwordInput.text = container.model.getData("Password");
                     }
                     else{
                         passwordInput.text = "";
@@ -205,10 +205,10 @@ ViewBase {
                 }
 
                 function updateModel(){
-                    container.model.SetData("Username", usernameInput.text);
-                    container.model.SetData("Name", nameInput.text);
-                    container.model.SetData("Email", mailInput.text);
-                    container.model.SetData("Password", passwordInput.text);
+                    container.model.setData("Username", usernameInput.text);
+                    container.model.setData("Name", nameInput.text);
+                    container.model.setData("Email", mailInput.text);
+                    container.model.setData("Password", passwordInput.text);
                 }
             }
 
@@ -249,14 +249,14 @@ ViewBase {
                     id: headersModel;
 
                     function updateHeaders(){
-                        headersModel.Clear();
+                        headersModel.clear();
 
-                        headersModel.InsertNewItem();
+                        headersModel.insertNewItem();
 
-                        headersModel.SetData("Id", "Name");
-                        headersModel.SetData("Name", qsTr("Role Name"));
+                        headersModel.setData("Id", "Name");
+                        headersModel.setData("Name", qsTr("Role Name"));
 
-                        headersModel.Refresh();
+                        headersModel.refresh();
 
                         rolesTable.table.checkable = true;
                         rolesTable.table.headers = headersModel;
@@ -270,8 +270,8 @@ ViewBase {
 
                 function updateGui(){
                     let roleIds = [];
-                    if (container.model.ContainsKey("Roles")){
-                        let roles = container.model.GetData("Roles")
+                    if (container.model.containsKey("Roles")){
+                        let roles = container.model.getData("Roles")
                         if (roles !== ""){
                             roleIds = roles.split(';');
                         }
@@ -280,8 +280,8 @@ ViewBase {
                     rolesTable.table.uncheckAll();
 
                     if (rolesTable.table.elements){
-                        for (let i = 0; i < rolesTable.table.elements.GetItemsCount(); i++){
-                            let id = rolesTable.table.elements.GetData("Id", i);
+                        for (let i = 0; i < rolesTable.table.elements.getItemsCount(); i++){
+                            let id = rolesTable.table.elements.getData("Id", i);
                             if (roleIds.includes(id)){
                                 rolesTable.table.checkItem(i);
                             }
@@ -290,11 +290,11 @@ ViewBase {
                 }
 
                 function updateModel(){
-                    console.log("Roles updateModel", container.model.ToJson());
+                    console.log("Roles updateModel", container.model.toJson());
                     let selectedRoleIds = []
                     let indexes = rolesTable.table.getCheckedItems();
                     for (let index of indexes){
-                        let id = rolesTable.table.elements.GetData("Id", index);
+                        let id = rolesTable.table.elements.getData("Id", index);
                         selectedRoleIds.push(id);
                     }
 
@@ -302,7 +302,7 @@ ViewBase {
                     console.log("selectedRoleIds", selectedRoleIds);
 
                     let result = selectedRoleIds.join(';');
-                    container.model.SetData("Roles", result);
+                    container.model.setData("Roles", result);
                 }
             }
 
@@ -343,18 +343,18 @@ ViewBase {
                     id: groupsHeadersModel;
 
                     function updateHeaders(){
-                        groupsHeadersModel.Clear();
+                        groupsHeadersModel.clear();
 
-                        let index = groupsHeadersModel.InsertNewItem();
-                        groupsHeadersModel.SetData("Id", "Name", index);
-                        groupsHeadersModel.SetData("Name", qsTr("Group Name"), index);
+                        let index = groupsHeadersModel.insertNewItem();
+                        groupsHeadersModel.setData("Id", "Name", index);
+                        groupsHeadersModel.setData("Name", qsTr("Group Name"), index);
 
-                        index = groupsHeadersModel.InsertNewItem();
+                        index = groupsHeadersModel.insertNewItem();
 
-                        groupsHeadersModel.SetData("Id", "Description", index);
-                        groupsHeadersModel.SetData("Name", qsTr("Description"), index);
+                        groupsHeadersModel.setData("Id", "Description", index);
+                        groupsHeadersModel.setData("Name", qsTr("Description"), index);
 
-                        groupsHeadersModel.Refresh();
+                        groupsHeadersModel.refresh();
 
                         groupsTable.table.checkable = true;
                         groupsTable.table.headers = groupsHeadersModel;
@@ -370,8 +370,8 @@ ViewBase {
                     console.log("UserGroups updateGui");
 
                     let groupIds = []
-                    if (container.model.ContainsKey("Groups")){
-                        let parentGroups = container.model.GetData("Groups");
+                    if (container.model.containsKey("Groups")){
+                        let parentGroups = container.model.getData("Groups");
                         if (parentGroups !== ""){
                             groupIds = parentGroups.split(';')
                         }
@@ -379,8 +379,8 @@ ViewBase {
 
                     groupsTable.table.uncheckAll();
                     if (groupsTable.table.elements){
-                        for (let i = 0; i < groupsTable.table.elements.GetItemsCount(); i++){
-                            let id = groupsTable.table.elements.GetData("Id", i);
+                        for (let i = 0; i < groupsTable.table.elements.getItemsCount(); i++){
+                            let id = groupsTable.table.elements.getData("Id", i);
                             if (groupIds.includes(id)){
                                 groupsTable.table.checkItem(i);
                             }
@@ -393,13 +393,13 @@ ViewBase {
 
                     let indexes = groupsTable.table.getCheckedItems();
                     for (let index of indexes){
-                        let id = groupsTable.table.elements.GetData("Id", index);
+                        let id = groupsTable.table.elements.getData("Id", index);
                         selectedGroupIds.push(id);
                     }
 
                     selectedGroupIds.sort();
 
-                    container.model.SetData("Groups", selectedGroupIds.join(';'));
+                    container.model.setData("Groups", selectedGroupIds.join(';'));
                 }
             }
         }

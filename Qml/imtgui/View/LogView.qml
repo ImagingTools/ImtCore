@@ -32,8 +32,8 @@ ViewBase {
     }
 
     function updateGui(){
-        if (root.model.ContainsKey("Text")){
-            textContent.text = root.model.GetData("Text")
+        if (root.model.containsKey("Text")){
+            textContent.text = root.model.getData("Text")
         }
         else{
             textContent.text = "";

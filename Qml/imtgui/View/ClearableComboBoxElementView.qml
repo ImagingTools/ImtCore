@@ -43,7 +43,7 @@ ComboBoxElementView {
 
                 widthFromDecorator: true;
 
-                text: qsTr("Clear");
+                text: qsTr("clear");
 
                 enabled: root.changeable && root.currentIndex >= 0;
 

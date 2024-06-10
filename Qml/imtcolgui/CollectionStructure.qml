@@ -158,8 +158,8 @@ Item {
         let documentName = collectionStructureContainer.documentName;
 
         if (notificationModel != null){
-            if (notificationModel.ContainsKey("TotalCount")){
-                let totalCount = notificationModel.GetData("TotalCount");
+            if (notificationModel.containsKey("TotalCount")){
+                let totalCount = notificationModel.getData("TotalCount");
 
                 documentName += " (" + totalCount + ")";
             }
@@ -465,10 +465,10 @@ Item {
             if (state === "Ready"){
                 console.log("subscriptionClient Ready");
 
-                if (subscriptionClient.ContainsKey("data")){
-                    let dataModelLocal = subscriptionClient.GetData("data")
-                    if (dataModelLocal.ContainsKey("NodeId")){
-                        let nodeId = dataModelLocal.GetData("NodeId");
+                if (subscriptionClient.containsKey("data")){
+                    let dataModelLocal = subscriptionClient.getData("data")
+                    if (dataModelLocal.containsKey("NodeId")){
+                        let nodeId = dataModelLocal.getData("NodeId");
                             collectionStructureBase.updateBranch(nodeId)
                     }
                 }

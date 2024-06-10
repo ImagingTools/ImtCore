@@ -19,8 +19,8 @@ QtObject {
     function getDependencies(featureId){
         let result = [];
 
-        if (provider.model.ContainsKey(featureId)){
-            let dependencies = provider.model.GetData(featureId);
+        if (provider.model.containsKey(featureId)){
+            let dependencies = provider.model.getData(featureId);
             result =  dependencies.split(';');
         }
 
@@ -38,8 +38,8 @@ QtObject {
 
     function getAllDependenciesRecursive(featureId, dependenciesModel, retVal){
         console.log("getAllDependenciesRecursive", featureId, dependenciesModel, retVal);
-        if (dependenciesModel.ContainsKey(featureId)){
-            let dependencies = dependenciesModel.GetData(featureId);
+        if (dependenciesModel.containsKey(featureId)){
+            let dependencies = dependenciesModel.getData(featureId);
 
             let dependenciesList = dependencies.split(';');
 
@@ -54,12 +54,12 @@ QtObject {
     }
 
     function getAllDependentFeaturesRecursive(featureId, retVal){
-        let keys = provider.model.GetKeys();
+        let keys = provider.model.getKeys();
 
         for (let i = 0; i < keys.length; i++){
             let key = keys[i];
 
-            let values = provider.model.GetData(key);
+            let values = provider.model.getData(key);
             if (values != ""){
                 let dependenciesList = values.split(';');
                 if (dependenciesList.includes(featureId)){

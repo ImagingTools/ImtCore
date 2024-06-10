@@ -17,7 +17,7 @@ QtObject {
     function registerModel(model){
         container.observedModel = model;
 
-        container.private_.beginModel = model.CopyMe();
+        container.private_.beginModel = model.copyMe();
     }
 
     function observedModelDataChanged(){
@@ -26,7 +26,7 @@ QtObject {
         let changeList = compare(container.private_.beginModel, container.observedModel);
         container.modelChanged(changeList);
 
-        container.private_.beginModel = container.observedModel.CopyMe();
+        container.private_.beginModel = container.observedModel.copyMe();
 
         container.private_.block = false;
     }
@@ -42,8 +42,8 @@ QtObject {
             return;
         }
 
-        let countItems1 = model1.GetItemsCount();
-        let countItems2 = model2.GetItemsCount();
+        let countItems1 = model1.getItemsCount();
+        let countItems2 = model2.getItemsCount();
 
         if (countItems1 !== countItems2){
             let changeObj = {}
@@ -60,24 +60,24 @@ QtObject {
             return;
         }
 
-        for (let i = 0; i < model1.GetItemsCount(); i++){
-            let dataId = model1.GetData("Id", i);
+        for (let i = 0; i < model1.getItemsCount(); i++){
+            let dataId = model1.getData("Id", i);
 
-            let keys = model1.GetKeys(i);
+            let keys = model1.getKeys(i);
             for (let j = 0; j < keys.length; j++){
                 let key = keys[j];
                 let globalId = parentKey + '/' + dataId;
-                if (model1.ContainsKey(key, i) && model2.ContainsKey(key, i)){
+                if (model1.containsKey(key, i) && model2.containsKey(key, i)){
 
-                    let model1Value = model1.GetTreeItemModel(key, i);
-                    let model2Value = model2.GetTreeItemModel(key, i);
+                    let model1Value = model1.getTreeItemModel(key, i);
+                    let model2Value = model2.getTreeItemModel(key, i);
 
                     if (model1Value != null && model2Value != null){
                         container.compareRecursive(model1Value, model2Value, changeList, globalId);
                     }
                     else{
-                        let value1 = String(model1.GetData(key, i));
-                        let value2 = String(model2.GetData(key, i));
+                        let value1 = String(model1.getData(key, i));
+                        let value2 = String(model2.getData(key, i));
 
                         if (value1 !== value2){
                             let changeObj = {}
@@ -93,8 +93,8 @@ QtObject {
                         }
                     }
                 }
-                else if (model1.ContainsKey(key, i) && !model2.ContainsKey(key, i)){
-                    let model1Value = model1.GetData(key, i);
+                else if (model1.containsKey(key, i) && !model2.containsKey(key, i)){
+                    let model1Value = model1.getData(key, i);
                     let changeObj = {}
 
                     changeObj["operation"] = "remove";
@@ -105,8 +105,8 @@ QtObject {
 
                     changeList.push(changeObj)
                 }
-                else if (!model1.ContainsKey(key, i) && model2.ContainsKey(key, i)){
-                    let model2Value = model2.GetData(key, i);
+                else if (!model1.containsKey(key, i) && model2.containsKey(key, i)){
+                    let model2Value = model2.getData(key, i);
                     let changeObj = {}
 
                     changeObj["operation"] = "insert";

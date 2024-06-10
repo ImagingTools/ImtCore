@@ -17,8 +17,8 @@ CollectionDataProvider {
 
     onCollectionModelChanged: {
         if (container.collectionModel != null){
-            if (container.collectionModel.ContainsKey("Roles")){
-                let rolesModel = container.collectionModel.GetData("Roles");
+            if (container.collectionModel.containsKey("Roles")){
+                let rolesModel = container.collectionModel.getData("Roles");
                 container.rolesModel = rolesModel;
             }
         }

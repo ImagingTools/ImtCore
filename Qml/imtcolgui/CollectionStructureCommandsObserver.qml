@@ -22,11 +22,11 @@ Item {
     function commandsModelLoaded(){
         let removeIsExists = root.commandsProvider.commandExists("Remove");
         if (!removeIsExists){
-            for (let i = 0; i < root.commandsProvider.commandsModel.GetItemsCount(); i++){
-                let currentCommandId = root.commandsProvider.commandsModel.GetData("Id", i);
+            for (let i = 0; i < root.commandsProvider.commandsModel.getItemsCount(); i++){
+                let currentCommandId = root.commandsProvider.commandsModel.getData("Id", i);
                 if (currentCommandId === "Edit"){
                     let open = qsTr("Open");
-                    root.commandsProvider.commandsModel.SetData("Name", open, i);
+                    root.commandsProvider.commandsModel.setData("Name", open, i);
                 }
             }
         }

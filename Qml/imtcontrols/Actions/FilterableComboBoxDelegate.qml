@@ -29,7 +29,7 @@ DetailedPopupMenuDelegate {
 
         acceptable = false;
 
-        let keys = comboBoxRef.model.GetKeys(model.index);
+        let keys = comboBoxRef.model.getKeys(model.index);
         for (let i = 0; i < comboBoxRef.filteringFields.length; i++){
             let id = comboBoxRef.filteringFields[i];
             if (keys.includes(id)){

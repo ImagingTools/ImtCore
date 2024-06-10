@@ -33,7 +33,7 @@ Item {
     signal failed();
 
     function updateModel(){
-        if (collectionModel && collectionModel.GetItemsCount() === 0){
+        if (collectionModel && collectionModel.getItemsCount() === 0){
             container.itemsInfoModel.updateModel(container.fields);
             return;
         }
@@ -52,35 +52,35 @@ Item {
     }
 
     function clearModel(){
-        collectionModel.Clear();
+        collectionModel.clear();
     }
 
     Component.onCompleted: {
-        let sortModel = filterModel.GetTreeItemModel("Sort");
+        let sortModel = filterModel.getTreeItemModel("Sort");
         if (!sortModel){
-            sortModel = filterModel.AddTreeModel("Sort")
+            sortModel = filterModel.addTreeModel("Sort")
         }
 
-        sortModel.SetData("SortOrder", orderType);
-        sortModel.SetData("HeaderId", sortByField);
+        sortModel.setData("SortOrder", orderType);
+        sortModel.setData("HeaderId", sortByField);
     }
 
     onOrderTypeChanged: {
-        let sortModel = filterModel.GetTreeItemModel("Sort");
+        let sortModel = filterModel.getTreeItemModel("Sort");
         if (!sortModel){
-            sortModel = filterModel.AddTreeModel("Sort")
+            sortModel = filterModel.addTreeModel("Sort")
         }
 
-        sortModel.SetData("SortOrder", orderType);
+        sortModel.setData("SortOrder", orderType);
     }
 
     onSortByFieldChanged: {
-        let sortModel = filterModel.GetTreeItemModel("Sort");
+        let sortModel = filterModel.getTreeItemModel("Sort");
         if (!sortModel){
-            sortModel = filterModel.AddTreeModel("Sort")
+            sortModel = filterModel.addTreeModel("Sort")
         }
 
-        sortModel.SetData("HeaderId", sortByField);
+        sortModel.setData("HeaderId", sortByField);
     }
 
     onHasRemoteChangesChanged: {
@@ -104,11 +104,11 @@ Item {
     }
 
     function getData(objectId, value){
-        for (let i = 0; i < container.collectionModel.GetItemsCount(); i++){
-            let objectCollectionId = container.collectionModel.GetData("Id", i);
+        for (let i = 0; i < container.collectionModel.getItemsCount(); i++){
+            let objectCollectionId = container.collectionModel.getData("Id", i);
             if (objectCollectionId === objectId){
-                if (container.collectionModel.ContainsKey(value, i)){
-                    return container.collectionModel.GetData(value, i);
+                if (container.collectionModel.containsKey(value, i)){
+                    return container.collectionModel.getData(value, i);
                 }
 
                 break;
@@ -130,7 +130,7 @@ Item {
             viewParams.InsertField("Offset", container.offset);
             viewParams.InsertField("Count", container.count);
 
-            var jsonString = container.filterModel.ToJson();
+            var jsonString = container.filterModel.toJson();
             viewParams.InsertField("FilterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");
@@ -160,25 +160,25 @@ Item {
         onStateChanged: {
             if (this.state === "Ready"){
                 var dataModelLocal;
-                if (container.itemsInfoModel.ContainsKey("errors")){
+                if (container.itemsInfoModel.containsKey("errors")){
                     return;
                 }
 
-                if (container.itemsInfoModel.ContainsKey("data")){
-                    dataModelLocal = container.itemsInfoModel.GetData("data");
-                    if (dataModelLocal.ContainsKey(container.commandId)){
-                        dataModelLocal = dataModelLocal.GetData(container.commandId);
-                        if (dataModelLocal.ContainsKey("items")){
-                            container.collectionModel = dataModelLocal.GetData("items");
+                if (container.itemsInfoModel.containsKey("data")){
+                    dataModelLocal = container.itemsInfoModel.getData("data");
+                    if (dataModelLocal.containsKey(container.commandId)){
+                        dataModelLocal = dataModelLocal.getData(container.commandId);
+                        if (dataModelLocal.containsKey("items")){
+                            container.collectionModel = dataModelLocal.getData("items");
                         }
                         else{
                             console.error("Unable to parsing data: tag 'items' not found!");
                         }
 
-                        if (dataModelLocal.ContainsKey("notification")){
-                            dataModelLocal = dataModelLocal.GetData("notification");
-                            if (dataModelLocal.ContainsKey("PagesCount")){
-                                dataModelLocal = dataModelLocal.GetData("PagesCount");
+                        if (dataModelLocal.containsKey("notification")){
+                            dataModelLocal = dataModelLocal.getData("notification");
+                            if (dataModelLocal.containsKey("PagesCount")){
+                                dataModelLocal = dataModelLocal.getData("PagesCount");
                             }
                         }
                         else{
@@ -229,7 +229,7 @@ Item {
 
         onStateChanged: {
             if (state === "Ready"){
-                console.log("SubscriptionClient", subscriptionClient.ToJson());
+                console.log("SubscriptionClient", subscriptionClient.toJson());
                 container.hasRemoteChanges = true;
             }
         }

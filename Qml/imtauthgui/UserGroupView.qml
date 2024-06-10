@@ -140,14 +140,14 @@ ViewBase {
                         id: groupsHeadersModel;
 
                         function updateHeaders(){
-                            groupsHeadersModel.Clear();
+                            groupsHeadersModel.clear();
 
-                            let index = groupsHeadersModel.InsertNewItem();
+                            let index = groupsHeadersModel.insertNewItem();
 
-                            groupsHeadersModel.SetData("Id", "Name");
-                            groupsHeadersModel.SetData("Name", qsTr("Group Name"));
+                            groupsHeadersModel.setData("Id", "Name");
+                            groupsHeadersModel.setData("Name", qsTr("Group Name"));
 
-                            groupsHeadersModel.Refresh();
+                            groupsHeadersModel.refresh();
 
                             parentGroupsTable.table.checkable = true;
                             parentGroupsTable.table.headers = groupsHeadersModel;
@@ -160,12 +160,12 @@ ViewBase {
                 }
 
                 function updateGroupsModel(){
-                    container.copiedGroupsModel.Copy(container.groupsModel);
+                    container.copiedGroupsModel.copy(container.groupsModel);
 
                     let objectId = "";
 
-                    if (container.model.ContainsKey("Id")){
-                        objectId = container.model.GetData("Id");
+                    if (container.model.containsKey("Id")){
+                        objectId = container.model.getData("Id");
                     }
 
                     let removedIndexes = []
@@ -175,16 +175,16 @@ ViewBase {
 
                     // Get all parent ID-s
                     let parentIds = []
-                    if (container.model.ContainsKey("ParentGroups")){
-                        let parentGroups = container.model.GetData("ParentGroups")
+                    if (container.model.containsKey("ParentGroups")){
+                        let parentGroups = container.model.getData("ParentGroups")
                         let parentGroupIds = parentGroups.split(';')
                         for (let j = 0; j < parentGroupIds.length; j++){
                             getAllParentGroupIds(parentGroupIds[j], parentIds);
                         }
                     }
 
-                    for (let i = 0; i < container.copiedGroupsModel.GetItemsCount(); i++){
-                        let id = container.copiedGroupsModel.GetData("Id", i);
+                    for (let i = 0; i < container.copiedGroupsModel.getItemsCount(); i++){
+                        let id = container.copiedGroupsModel.getData("Id", i);
                         if (id === objectId || childrenIds.includes(id)){
                             removedIndexes.push(i);
                         }
@@ -192,7 +192,7 @@ ViewBase {
 
                     let removedCount = 0
                     for (let i = 0; i < removedIndexes.length; i++){
-                        container.copiedGroupsModel.RemoveItem(removedIndexes[i] - removedCount);
+                        container.copiedGroupsModel.removeItem(removedIndexes[i] - removedCount);
                         removedCount++;
                     }
 
@@ -201,9 +201,9 @@ ViewBase {
                 }
 
                 function getAllChildrenGroups(groupId, retVal){
-                    for (let i = 0; i < container.copiedGroupsModel.GetItemsCount(); i++){
-                        let id = container.copiedGroupsModel.GetData("Id", i);
-                        let parentGroups = container.copiedGroupsModel.GetData("ParentGroups", i);
+                    for (let i = 0; i < container.copiedGroupsModel.getItemsCount(); i++){
+                        let id = container.copiedGroupsModel.getData("Id", i);
+                        let parentGroups = container.copiedGroupsModel.getData("ParentGroups", i);
                         if (parentGroups !== ""){
                             let parentGroupIds = parentGroups.split(';')
                             if (parentGroupIds.includes(groupId)){
@@ -216,10 +216,10 @@ ViewBase {
                 }
 
                 function getAllParentGroupIds(groupId, retVal){
-                    for (let i = 0; i < container.copiedGroupsModel.GetItemsCount(); i++){
-                        let id = container.copiedGroupsModel.GetData("Id", i);
+                    for (let i = 0; i < container.copiedGroupsModel.getItemsCount(); i++){
+                        let id = container.copiedGroupsModel.getData("Id", i);
                         if (id === groupId){
-                            let parentGroups = container.copiedGroupsModel.GetData("ParentGroups", i);
+                            let parentGroups = container.copiedGroupsModel.getData("ParentGroups", i);
                             if (parentGroups !== ""){
                                 let parentGroupsIds = parentGroups.split(';');
                                 for (let j = 0; j < parentGroupsIds.length; j++){
@@ -232,23 +232,23 @@ ViewBase {
                 }
 
                 function updateGui(){
-                    if (container.model.ContainsKey("Name")){
-                        nameInput.text = container.model.GetData("Name");
+                    if (container.model.containsKey("Name")){
+                        nameInput.text = container.model.getData("Name");
                     }
                     else{
                         nameInput.text = "";
                     }
 
-                    if (container.model.ContainsKey("Description")){
-                        descriptionInput.text = container.model.GetData("Description");
+                    if (container.model.containsKey("Description")){
+                        descriptionInput.text = container.model.getData("Description");
                     }
                     else{
                         descriptionInput.text = "";
                     }
 
                     let parentGroupIds = []
-                    if (container.model.ContainsKey("ParentGroups")){
-                        let parentGroups = container.model.GetData("ParentGroups");
+                    if (container.model.containsKey("ParentGroups")){
+                        let parentGroups = container.model.getData("ParentGroups");
                         if (parentGroups !== ""){
                             parentGroupIds = parentGroups.split(';')
                         }
@@ -260,8 +260,8 @@ ViewBase {
 
                     parentGroupsTable.table.uncheckAll();
                     if (parentGroupsTable.table.elements){
-                        for (let i = 0; i < parentGroupsTable.table.elements.GetItemsCount(); i++){
-                            let id = parentGroupsTable.table.elements.GetData("Id", i);
+                        for (let i = 0; i < parentGroupsTable.table.elements.getItemsCount(); i++){
+                            let id = parentGroupsTable.table.elements.getData("Id", i);
                             if (parentGroupIds.includes(id)){
                                 parentGroupsTable.table.checkItem(i);
                             }
@@ -270,19 +270,19 @@ ViewBase {
                 }
 
                 function updateModel(){
-                    container.model.SetData("Description", descriptionInput.text);
-                    container.model.SetData("Name", nameInput.text);
+                    container.model.setData("Description", descriptionInput.text);
+                    container.model.setData("Name", nameInput.text);
 
                     let selectedGroupIds = []
                     let indexes = parentGroupsTable.table.getCheckedItems();
                     for (let index of indexes){
-                        let id = parentGroupsTable.table.elements.GetData("Id", index);
+                        let id = parentGroupsTable.table.elements.getData("Id", index);
                         selectedGroupIds.push(id);
                     }
 
                     selectedGroupIds.sort();
 
-                    container.model.SetData("ParentGroups", selectedGroupIds.join(';'));
+                    container.model.setData("ParentGroups", selectedGroupIds.join(';'));
 
                     if (!parentGroupsTable.table.elements){
                         updateGroupsModel();
@@ -325,14 +325,14 @@ ViewBase {
                     id: headersModel;
 
                     function updateHeaders(){
-                        headersModel.Clear();
+                        headersModel.clear();
 
-                        headersModel.InsertNewItem();
+                        headersModel.insertNewItem();
 
-                        headersModel.SetData("Id", "Name");
-                        headersModel.SetData("Name", qsTr("User Name"));
+                        headersModel.setData("Id", "Name");
+                        headersModel.setData("Name", qsTr("User Name"));
 
-                        headersModel.Refresh();
+                        headersModel.refresh();
 
                         usersTable.table.checkable = true;
                         usersTable.table.headers = headersModel;
@@ -346,8 +346,8 @@ ViewBase {
 
                 function updateGui(){
                     let userIds = [];
-                    if (container.model.ContainsKey("Users")){
-                        let roles = container.model.GetData("Users")
+                    if (container.model.containsKey("Users")){
+                        let roles = container.model.getData("Users")
                         if (roles !== ""){
                             userIds = roles.split(';');
                         }
@@ -355,8 +355,8 @@ ViewBase {
 
                     usersTable.table.uncheckAll();
                     if (usersTable.table.elements){
-                        for (let i = 0; i < usersTable.table.elements.GetItemsCount(); i++){
-                            let id = usersTable.table.elements.GetData("Id", i);
+                        for (let i = 0; i < usersTable.table.elements.getItemsCount(); i++){
+                            let id = usersTable.table.elements.getData("Id", i);
                             if (userIds.includes(id)){
                                 usersTable.table.checkItem(i);
                             }
@@ -369,14 +369,14 @@ ViewBase {
 
                     let indexes = usersTable.table.getCheckedItems();
                     for (let index of indexes){
-                        let id = usersTable.table.elements.GetData("Id", index);
+                        let id = usersTable.table.elements.getData("Id", index);
                         selectedUserIds.push(id);
                     }
 
                     selectedUserIds.sort()
 
                     let result = selectedUserIds.join(';');
-                    container.model.SetData("Users", result);
+                    container.model.setData("Users", result);
                 }
             }
 
@@ -415,14 +415,14 @@ ViewBase {
                     id: rolesHeadersModel;
 
                     function updateHeaders(){
-                        rolesHeadersModel.Clear();
+                        rolesHeadersModel.clear();
 
-                        rolesHeadersModel.InsertNewItem();
+                        rolesHeadersModel.insertNewItem();
 
-                        rolesHeadersModel.SetData("Id", "Name");
-                        rolesHeadersModel.SetData("Name", qsTr("Role Name"));
+                        rolesHeadersModel.setData("Id", "Name");
+                        rolesHeadersModel.setData("Name", qsTr("Role Name"));
 
-                        rolesHeadersModel.Refresh();
+                        rolesHeadersModel.refresh();
 
                         rolesTable.table.checkable = true;;
                         rolesTable.table.elements = container.rolesModel;
@@ -436,8 +436,8 @@ ViewBase {
 
                 function updateGui(){
                     let roleIds = [];
-                    if (container.model.ContainsKey("Roles")){
-                        let roles = container.model.GetData("Roles")
+                    if (container.model.containsKey("Roles")){
+                        let roles = container.model.getData("Roles")
                         if (roles !== ""){
                             roleIds = roles.split(';');
                         }
@@ -445,8 +445,8 @@ ViewBase {
 
                     rolesTable.table.uncheckAll();
                     if (rolesTable.table.elements){
-                        for (let i = 0; i < rolesTable.table.elements.GetItemsCount(); i++){
-                            let id = rolesTable.table.elements.GetData("Id", i);
+                        for (let i = 0; i < rolesTable.table.elements.getItemsCount(); i++){
+                            let id = rolesTable.table.elements.getData("Id", i);
                             if (roleIds.includes(id)){
                                 rolesTable.table.checkItem(i);
                             }
@@ -458,14 +458,14 @@ ViewBase {
                     let selectedRoleIds = []
                     let indexes = rolesTable.table.getCheckedItems();
                     for (let index of indexes){
-                        let id = rolesTable.table.elements.GetData("Id", index);
+                        let id = rolesTable.table.elements.getData("Id", index);
                         selectedRoleIds.push(id);
                     }
 
                     selectedRoleIds.sort();
 
                     let result = selectedRoleIds.join(';');
-                    container.model.SetData("Roles", result);
+                    container.model.setData("Roles", result);
                 }
             }
         }

@@ -101,7 +101,7 @@ ViewBase {
                     placeHolderText: qsTr("Enter the role name");
 
                     onEditingFinished: {
-                        let oldText = container.model.GetData("Name");
+                        let oldText = container.model.getData("Name");
                         if (oldText && oldText !== roleNameInput.text || !oldText && roleNameInput.text !== ""){
                             roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
                             container.doUpdateModel();
@@ -130,7 +130,7 @@ ViewBase {
                     placeHolderText: qsTr("Enter the description");
 
                     onEditingFinished: {
-                        let oldText = container.model.GetData("Description");
+                        let oldText = container.model.getData("Description");
                         if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
                             container.doUpdateModel();
                         }
@@ -165,14 +165,14 @@ ViewBase {
                     id: rolesHeadersModel;
 
                     function updateHeaders(){
-                        rolesHeadersModel.Clear();
+                        rolesHeadersModel.clear();
 
-                        let index = rolesHeadersModel.InsertNewItem();
+                        let index = rolesHeadersModel.insertNewItem();
 
-                        rolesHeadersModel.SetData("Id", "Name");
-                        rolesHeadersModel.SetData("Name", qsTr("Role Name"));
+                        rolesHeadersModel.setData("Id", "Name");
+                        rolesHeadersModel.setData("Name", qsTr("Role Name"));
 
-                        rolesHeadersModel.Refresh();
+                        rolesHeadersModel.refresh();
 
                         parentRolesTable.table.headers = rolesHeadersModel;
                     }
@@ -183,30 +183,30 @@ ViewBase {
                 }
 
                 function updateGui(){
-                    if (container.model.ContainsKey("RoleId")){
-                        roleIdInput.text = container.model.GetData("RoleId");
+                    if (container.model.containsKey("RoleId")){
+                        roleIdInput.text = container.model.getData("RoleId");
                     }
                     else{
                         roleIdInput.text = "";
                     }
 
-                    if (container.model.ContainsKey("Name")){
-                        roleNameInput.text = container.model.GetData("Name");
+                    if (container.model.containsKey("Name")){
+                        roleNameInput.text = container.model.getData("Name");
                     }
                     else{
                         roleNameInput.text = "";
                     }
 
-                    if (container.model.ContainsKey("Description")){
-                        descriptionInput.text = container.model.GetData("Description");
+                    if (container.model.containsKey("Description")){
+                        descriptionInput.text = container.model.getData("Description");
                     }
                     else{
                         descriptionInput.text = "";
                     }
 
                     let parentRolesIds = []
-                    if (container.model.ContainsKey("ParentRoles")){
-                        let parentGroups = container.model.GetData("ParentRoles");
+                    if (container.model.containsKey("ParentRoles")){
+                        let parentGroups = container.model.getData("ParentRoles");
                         if (parentGroups !== ""){
                             parentRolesIds = parentGroups.split(';')
                         }
@@ -221,8 +221,8 @@ ViewBase {
                     parentRolesTable.table.uncheckAll();
 
                     if (parentRolesTable.table.elements){
-                        for (let i = 0; i < parentRolesTable.table.elements.GetItemsCount(); i++){
-                            let id = parentRolesTable.table.elements.GetData("Id", i);
+                        for (let i = 0; i < parentRolesTable.table.elements.getItemsCount(); i++){
+                            let id = parentRolesTable.table.elements.getData("Id", i);
                             if (parentRolesIds.includes(id)){
                                 parentRolesTable.table.checkItem(i);
                             }
@@ -231,20 +231,20 @@ ViewBase {
                 }
 
                 function updateModel(){
-                    container.model.SetData("RoleId", roleIdInput.text);
-                    container.model.SetData("Name", roleNameInput.text);
-                    container.model.SetData("Description", descriptionInput.text);
+                    container.model.setData("RoleId", roleIdInput.text);
+                    container.model.setData("Name", roleNameInput.text);
+                    container.model.setData("Description", descriptionInput.text);
 
                     let selectedRoleIds = []
                     let indexes = parentRolesTable.table.getCheckedItems();
                     for (let index of indexes){
-                        let id = parentRolesTable.table.elements.GetData("Id", index);
+                        let id = parentRolesTable.table.elements.getData("Id", index);
                         selectedRoleIds.push(id);
                     }
 
                     selectedRoleIds.sort();
 
-                    container.model.SetData("ParentRoles", selectedRoleIds.join(';'));
+                    container.model.setData("ParentRoles", selectedRoleIds.join(';'));
 
                     if (!parentRolesTable.table.elements){
                         updateRolesModel();
@@ -252,9 +252,9 @@ ViewBase {
                 }
 
                 function updateRolesModel(){
-                    container.copiedRolesModel.Copy(container.rolesModel);
+                    container.copiedRolesModel.copy(container.rolesModel);
 
-                    let documentId = container.model.GetData("Id");
+                    let documentId = container.model.getData("Id");
 
                     // Get all children ID-s
                     let childrenIds = []
@@ -262,8 +262,8 @@ ViewBase {
 
                     // Get all parent ID-s
                     let parentIds = []
-                    if (container.model.ContainsKey("ParentRoles")){
-                        let parentRoles = container.model.GetData("ParentRoles")
+                    if (container.model.containsKey("ParentRoles")){
+                        let parentRoles = container.model.getData("ParentRoles")
                         let parentRolesIds = parentRoles.split(';')
                         for (let j = 0; j < parentRolesIds.length; j++){
                             getAllParentRoleIds(parentRolesIds[j], container.copiedRolesModel, parentIds);
@@ -272,8 +272,8 @@ ViewBase {
 
                     // Indexes for deleting
                     let removedIndexes = []
-                    for (let i = 0; i < container.copiedRolesModel.GetItemsCount(); i++){
-                        let id = container.copiedRolesModel.GetData("Id", i);
+                    for (let i = 0; i < container.copiedRolesModel.getItemsCount(); i++){
+                        let id = container.copiedRolesModel.getData("Id", i);
                         console.log("id", id);
 
                         if (id === documentId || childrenIds.includes(id)){
@@ -283,7 +283,7 @@ ViewBase {
 
                     let removedCount = 0
                     for (let i = 0; i < removedIndexes.length; i++){
-                        container.copiedRolesModel.RemoveItem(removedIndexes[i] - removedCount);
+                        container.copiedRolesModel.removeItem(removedIndexes[i] - removedCount);
                         removedCount++;
                     }
 
@@ -291,10 +291,10 @@ ViewBase {
                 }
 
                 function getAllParentRoleIds(roleId, rolesModel, retVal){
-                    for (let i = 0; i < rolesModel.GetItemsCount(); i++){
-                        let id = rolesModel.GetData("Id", i);
+                    for (let i = 0; i < rolesModel.getItemsCount(); i++){
+                        let id = rolesModel.getData("Id", i);
                         if (id === roleId){
-                            let parentRoles = rolesModel.GetData("ParentRoles", i);
+                            let parentRoles = rolesModel.getData("ParentRoles", i);
                             let parentRolesIds = parentRoles.split(';');
                             for (let j = 0; j < parentRolesIds.length; j++){
                                 retVal.push(parentRolesIds[j])
@@ -305,10 +305,10 @@ ViewBase {
                 }
 
                 function getAllChildrenRoleIds(roleId, rolesModel, retVal){
-                    for (let i = 0; i < rolesModel.GetItemsCount(); i++){
-                        let id = rolesModel.GetData("Id", i);
+                    for (let i = 0; i < rolesModel.getItemsCount(); i++){
+                        let id = rolesModel.getData("Id", i);
 
-                        let parentRoles = rolesModel.GetData("ParentRoles", i);
+                        let parentRoles = rolesModel.getData("ParentRoles", i);
                         if (parentRoles !== ""){
                             let parentRolesIds = parentRoles.split(';');
                             if (parentRolesIds.includes(roleId)){
@@ -345,8 +345,8 @@ ViewBase {
 
                     function updateGui(){
                         let selectedPermissionsIds = [];
-                        if (container.model.ContainsKey("Permissions")){
-                            let selectedPermissions = container.model.GetData("Permissions");
+                        if (container.model.containsKey("Permissions")){
+                            let selectedPermissions = container.model.getData("Permissions");
                             if (selectedPermissions !== ""){
                                 selectedPermissionsIds = selectedPermissions.split(';');
                             }
@@ -387,8 +387,8 @@ ViewBase {
 
                         selectedPermissionIds.sort();
 
-                        let permissions = container.model.GetData("Permissions");
-                        container.model.SetData("Permissions", selectedPermissionIds.join(';'));
+                        let permissions = container.model.getData("Permissions");
+                        container.model.setData("Permissions", selectedPermissionIds.join(';'));
                     }
 
                     Connections {
@@ -403,13 +403,13 @@ ViewBase {
                         id: permissionHeaders;
 
                         function updateHeaders(){
-                            permissionHeaders.Clear();
+                            permissionHeaders.clear();
 
-                            let index = permissionHeaders.InsertNewItem();
-                            permissionHeaders.SetData("Id", "FeatureName", index)
-                            permissionHeaders.SetData("Name", qsTr("Permission"), index)
+                            let index = permissionHeaders.insertNewItem();
+                            permissionHeaders.setData("Id", "FeatureName", index)
+                            permissionHeaders.setData("Name", qsTr("Permission"), index)
 
-                            permissionHeaders.Refresh();
+                            permissionHeaders.refresh();
 
                             permissionsGroup.treeView.columnModel = permissionHeaders;
                             permissionsGroup.treeView.rowModel = container.permissionsModel;
