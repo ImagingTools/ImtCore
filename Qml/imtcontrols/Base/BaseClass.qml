@@ -110,13 +110,13 @@ QtObject {
         let list = []
         if(Qt.platform.os === 'web'){
             for(let key in this.$properties){
-                if(key.indexOf('m_') >= 0 && key !== 'owner' && key !== 'objectName' && key !== 'enableNotifications' && typeof this[key] !== "function"){
+                if(key.indexOf('m_') >= 0 && key !== 'owner' && key !== 's_keys' && key !== 'objectName' && key !== 'enableNotifications' && typeof this[key] !== "function"){
                     list.push(key)
                 }
             }
         } else {
             for(let key in this){
-                if(key !== 'objectName' && key !== 'owner' && key !== 'enableNotifications' && typeof this[key] !== "function"){
+                if(key !== 'objectName' && key !== 'owner' && key !== 's_keys' && key !== 'enableNotifications' && typeof this[key] !== "function"){
                     list.push(key)
                 }
             }
@@ -138,7 +138,12 @@ QtObject {
             if(typeof this[key] === 'object'){
                 json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].ToJson()
             } else {
-                json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + this[key] + '"' : this[key])
+                let value = this[key]
+                if (value === undefined){
+                    value = null
+                }
+
+                json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + this[key] + '"' : value)
             }
             if(i < list.length - 1) json += ','
         }
@@ -152,7 +157,7 @@ QtObject {
 
     function fromObject(sourceObject){
         for(let key in sourceObject){
-            let _key = "m_" + key
+            let _key = "m_" + key[0].toLowerCase() + key.slice(1,key.length)
             if(typeof sourceObject[key] === "object"){
                 if(Array.isArray(sourceObject[key])){
                     if(this[_key]){
