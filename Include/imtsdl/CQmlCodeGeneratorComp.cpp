@@ -241,7 +241,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 			ifStream << QmlConvertType(sdlField.GetType());
 		}
 		// use 'm_' prefix to avoid ambiguity
-		ifStream << QStringLiteral(" m_") << sdlField.GetId();
+		ifStream << QStringLiteral(" m_") << GetDecapitalizedValue(sdlField.GetId());
 	}
 	FeedStream(ifStream, 1, false);
 
@@ -256,7 +256,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	for (const CSdlField& sdlField: sdlType.GetFields()){
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 3);
-		ifStream << QStringLiteral("case 'm_") << sdlField.GetId();
+		ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId());
 		ifStream << QStringLiteral("': return '") << sdlField.GetId() << '\'';
 	}
 	FeedStream(ifStream, 1, false);
@@ -283,7 +283,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 3);
-		ifStream << QStringLiteral("case 'm_") << sdlField.GetId();
+		ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId());
 		ifStream << QStringLiteral("': return Qt.createComponent('");
 		ifStream << convertedType << QStringLiteral(".qml')");
 	}
@@ -317,7 +317,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 
 		// use 's_' prefix to avoid ambiguity
 		ifStream << QStringLiteral("readonly property string s_");
-		ifStream << sdlField.GetId();
+		ifStream << GetDecapitalizedValue(sdlField.GetId());
 		ifStream << QStringLiteral(": '");
 		ifStream << sdlField.GetId() << '\'';
 	}
