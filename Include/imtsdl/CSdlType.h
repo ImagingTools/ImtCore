@@ -10,8 +10,6 @@
 
 // imtsdl includes
 #include <imtsdl/imtsdl.h>
-#include <imtsdl/CSdlField.h>
-
 
 
 namespace imtsdl
@@ -31,6 +29,10 @@ public:
 
 	// reimplemented(iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
+
+	// operators
+	bool operator==(const CSdlType& other) const;
+	bool operator!=(const CSdlType& other) const { return !(operator==(other)); }
 
 private:
 	QString m_name;

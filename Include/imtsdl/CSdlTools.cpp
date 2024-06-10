@@ -445,6 +445,7 @@ bool CSdlTools::GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList&
 			return true;
 		}
 	}
+
 	return false;
 }
 

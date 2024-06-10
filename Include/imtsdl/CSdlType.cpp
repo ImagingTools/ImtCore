@@ -7,6 +7,10 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 
 
+// imtsdl includes
+#include <imtsdl/CSdlField.h>
+
+
 namespace imtsdl
 {
 
@@ -59,6 +63,12 @@ bool CSdlType::Serialize(iser::IArchive& archive)
 	retVal = retVal && CSdlField::SerializeSdlFieldList(archive, m_fields, "Fields", "Field");
 
 	return retVal;
+}
+
+
+bool CSdlType::operator==(const CSdlType& other) const
+{
+	return 	m_name == other.m_name && m_fields == other.m_fields;
 }
 
 
