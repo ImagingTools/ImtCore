@@ -71,6 +71,16 @@ public:
 	*/
 	virtual void SetAddress(QString adr) = 0;
 
+    /**
+        Get has children.
+    */
+    virtual bool GetHasChildren() const = 0;
+
+    /**
+        Set has children.
+    */
+    virtual void SetHasChildren(bool hasChildren) = 0;
+
 };
 
 

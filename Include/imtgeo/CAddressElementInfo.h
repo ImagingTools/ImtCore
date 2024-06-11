@@ -31,6 +31,8 @@ public:
     virtual void SetDescription(QString description) override;
 	virtual QString GetAddress() const override;
 	virtual void SetAddress(QString adr) override;
+    virtual bool GetHasChildren() const override;
+    virtual void SetHasChildren(bool hasChildren) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -50,6 +52,7 @@ private:
 	QString m_name;    
     QString m_description;
 	QString m_address;
+    bool m_hasChildren = false;
 
 };
 

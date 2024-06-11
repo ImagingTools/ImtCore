@@ -74,6 +74,11 @@ istd::IChangeable* CAddressElementDatabaseDelegateComp::CreateObjectFromRecord(c
 		adrElementInfoPtr->SetAddress(address);
 	}
 
+    if(record.contains("HasChildren")){
+        bool hasChildren = record.value("HasChildren").toBool();
+        adrElementInfoPtr->SetHasChildren(hasChildren);
+    }
+
 	if(record.contains("Latitude")){
 		double lat = record.value("Latitude").toDouble();
 		adrElementInfoPtr->SetLatitude(lat);

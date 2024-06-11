@@ -116,10 +116,21 @@ void CAddressElementInfo::SetAddress(QString adr)
 	if (m_address != adr){
 		istd::CChangeNotifier notifier(this);
 		m_address = adr;
-	}
+    }
 }
 
+bool CAddressElementInfo::GetHasChildren() const
+{
+    return m_hasChildren;
+}
 
+void CAddressElementInfo::SetHasChildren(bool hasChildren)
+{
+    if (m_hasChildren != hasChildren){
+        istd::CChangeNotifier notifier(this);
+        m_hasChildren = hasChildren;
+    }
+}
 
 
 // reimplemented (iser::ISerializable)
