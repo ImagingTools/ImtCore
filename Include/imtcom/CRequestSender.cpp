@@ -113,7 +113,7 @@ CRequestSender::NetworkOperation::NetworkOperation(int timeout)
 
 CRequestSender::NetworkOperation::~NetworkOperation()
 {
-	networkManagerPtr->deleteLater();
+    networkManagerPtr->deleteLater();
 }
 
 
