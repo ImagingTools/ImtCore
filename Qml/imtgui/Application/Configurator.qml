@@ -95,7 +95,6 @@ Rectangle {
             }
 
             onFinished: {
-                console.log("saveDialog onFinished", buttonId);
                 if (buttonId == Enums.yes){
                     window.settingsUpdate();
 

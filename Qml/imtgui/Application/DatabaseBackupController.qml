@@ -15,7 +15,11 @@ Item {
 
         width: parent.width;
 
-        spacing: 10;
+        spacing: Style.size_mainMargin;
+
+        BaseText {
+            text: qsTr("Before performing the operation, check the connection to the server");
+        }
 
         Button {
             id: backupButton;
@@ -62,7 +66,6 @@ Item {
         }
 
         onStateChanged: {
-            console.log("onStateChanged", remoteFileController.state);
             if (remoteFileController.state === "Loading"){
                 Events.sendEvent("StartLoading");
             }
