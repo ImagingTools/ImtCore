@@ -44,7 +44,8 @@ public:
 		MIT_CALIBRATION = MIT_LAST + 1,
 		MIT_CALIBRATION_TYPE_ID,
 		MIT_CALIBRATION_3D,
-		MIT_REFERENCE_BITMAP
+		MIT_REFERENCE_BITMAP,
+		MIT_ROBOT_TRAJECTORY
 	};
 
 	typedef iimg::CReflectedBitmapBase BaseClass;
@@ -57,6 +58,8 @@ public:
 	void SetCalibration3d(const CImage3dCalibration& calibration3d);
 	void SetReferenceBitmap(const iimg::CGeneralBitmap& referenceBitmap);
 	void ResetReferenceBitmap();
+	void SetRobotTrajectory(const IDepthBitmap::RobotTrajectory& robotPositions);
+
 	bool ComputeDepthRange(const i2d::IObject2d* aoi, istd::CRange& depthRange) const;
 
 	// reimplemented (IDepthBitmap)
@@ -64,6 +67,7 @@ public:
 	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size) override;
 	virtual const IImage3dCalibration* GetCalibration3d() const override;
 	virtual const iimg::IBitmap* GetReferenceBitmap() const override;
+	virtual const RobotTrajectory* GetRobotTrajectory() const override;
 
 	// reimplemented (iimg::IRasterImage)
 	virtual void ResetImage() override;
@@ -88,6 +92,8 @@ protected:
 	virtual bool ConvertToQImage(QImage& result) const override;
 
 private:
+	static QByteArray SerializeRobotTrajectory(const RobotTrajectory& robotTrajectory);
+	static RobotTrajectory DeserealizeRobotTrajectory(const QByteArray& robotTrajectoryArchive);
 	void EnsureMetaInfoCreated();
 
 private:
@@ -95,6 +101,7 @@ private:
 	ColorMapType m_colorMapType;
 	CImage3dCalibration m_calibration3d;
 	iimg::CGeneralBitmap m_referenceBitmap;
+	RobotTrajectory m_robotTrajectory;
 };
 
 

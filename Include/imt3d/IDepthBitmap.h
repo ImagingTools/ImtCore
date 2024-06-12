@@ -21,6 +21,16 @@ namespace imt3d
 class IDepthBitmap: virtual public iimg::IBitmap
 {
 public:
+	struct RobotPosition
+	{
+		int64_t timestampMicrosecond;
+		float x;
+		float y;
+		float z;
+	};
+
+	typedef std::vector<RobotPosition> RobotTrajectory;
+
 	enum
 	{
 		MIT_MIN_DEPTH = idoc::IDocumentMetaInfo::MIT_USER,
@@ -51,6 +61,7 @@ public:
 
 	virtual const IImage3dCalibration* GetCalibration3d() const = 0;
 	virtual const iimg::IBitmap* GetReferenceBitmap() const = 0;
+	virtual const RobotTrajectory* GetRobotTrajectory() const = 0;
 };
 
 
