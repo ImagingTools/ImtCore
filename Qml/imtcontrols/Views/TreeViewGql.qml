@@ -158,7 +158,9 @@ Rectangle{
                                 }
                                 else if(deleg.isOpen){
                                     //console.log(model.ChildrenCount__, treeViewGql._maxCountToClose)
-                                    if(model.ChildrenCount__ <= treeViewGql._maxCountToClose){
+                                    let count_ = getVisibleCountInBranch(model.index);
+                                    //let count_ = model.ChildrenCount__;
+                                    if(count_ <= treeViewGql._maxCountToClose){
                                         treeViewGql.model.setData("IsOpen__", false, model.index);
                                         treeViewGql.model.setData("OpenState__", 0, model.index);
                                         treeViewGql.setVisibleElements(false, model.index)
@@ -461,6 +463,24 @@ Rectangle{
 
         treeViewGql.setContentWidth();
 
+    }
+
+    function getVisibleCountInBranch(index){
+        let count_ = 0;
+        let level_ = treeViewGql.model.getData("Level__", index)
+        for(let i = index + 1; i < treeViewGql.model.getItemsCount(); i++){
+            let currLevel_ = treeViewGql.model.getData("Level__", i)
+            if(currLevel_ === level_){
+                break;
+            }
+            let currVisible_ = treeViewGql.model.getData("Visible__", i)
+            if(currVisible_){
+                count_++;
+            }
+        }
+        //console.log("VisibleCountInBranch:: ", count_);
+
+        return count_;
     }
 
     function setContentWidth(){

@@ -179,7 +179,9 @@ Table{
                                 tableTreeView.openButtonClicked(model.index);
                             }
                             else if(deleg.isOpen){
-                                if(model.ChildrenCount__ <= tableTreeView._maxCountToClose){
+                                let count_ = getVisibleCountInBranch(model.index);
+                                //let count_ = model.ChildrenCount__;
+                                if(count_ <= tableTreeView._maxCountToClose){
                                     tableTreeView.model.setData("IsOpen__", false, model.index);
                                     tableTreeView.model.setData("OpenState__", 0, model.index);
                                     tableTreeView.setVisibleElements(false, model.index)
@@ -428,6 +430,24 @@ Table{
 
         tableTreeView.setContentWidth();
 
+    }
+
+    function getVisibleCountInBranch(index){
+        let count_ = 0;
+        let level_ = tableTreeView.model.getData("Level__", index)
+        for(let i = index + 1; i < tableTreeView.model.getItemsCount(); i++){
+            let currLevel_ = tableTreeView.model.getData("Level__", i)
+            if(currLevel_ === level_){
+                break;
+            }
+            let currVisible_ = tableTreeView.model.getData("Visible__", i)
+            if(currVisible_){
+                count_++;
+            }
+        }
+        //console.log("VisibleCountInBranch:: ", count_);
+
+        return count_;
     }
 
     function setContentWidth(){
