@@ -285,9 +285,11 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 
 	QString textFilterQuery;
 	QString parentIdsFilterQuery;
+    QString parentIdFilterQuery;
 	QString typeIdFilterQuery;
 	iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
 	iprm::TParamsPtr<imtbase::ICollectionFilter> parentIdsFilterParamPtr(&filterParams, "ParentIds");
+    iprm::TParamsPtr<imtbase::ICollectionFilter> parentIdFilterParamPtr(&filterParams, "ParentId");
 	iprm::TParamsPtr<imtbase::ICollectionFilter> typeIdFilterParamPtr(&filterParams, "TypeId");
 	if (collectionFilterParamPtr.IsValid()){
 		retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
@@ -297,11 +299,20 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 		parentIdsFilterQuery = "'" + parentIdsFilterParamPtr->GetTextFilter() + "' <@ (\"ParentIds\")";
 	}
 
+    if (parentIdFilterParamPtr.IsValid() ){
+        if(parentIdFilterParamPtr->GetTextFilter() != ""){
+            parentIdFilterQuery = QString(R"("ParentIds"->>(jsonb_array_length("ParentIds")-1))").append(" = ").append("'").append(parentIdFilterParamPtr->GetTextFilter().append("'"));
+        }
+        else {
+            parentIdFilterQuery = QString(R"(jsonb_array_length("ParentIds") = 0)");
+        }
+    }
+
 	if (typeIdFilterParamPtr.IsValid() && typeIdFilterParamPtr->GetTextFilter() != ""){
 		typeIdFilterQuery = "\"Type\" = '" + typeIdFilterParamPtr->GetTextFilter() + "'";
 	}
 
-    if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty() || !typeIdFilterQuery.isEmpty()){
+    if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty() || !parentIdFilterQuery.isEmpty()|| !typeIdFilterQuery.isEmpty()){
 		filterQuery = " WHERE ";
 	}
 
@@ -324,13 +335,21 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 		filterQuery += "(" + parentIdsFilterQuery + ")";
 	}
 
-	if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty()) && !typeIdFilterQuery.isEmpty()){
-		filterQuery += " AND ";
-	}
+    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty()) && !parentIdFilterQuery.isEmpty()){
+        filterQuery += " AND ";
+    }
 
-	if (!typeIdFilterQuery.isEmpty()){
-		filterQuery += "(" + typeIdFilterQuery + ")";
-	}
+    if (!typeIdFilterQuery.isEmpty()){
+        filterQuery += "(" + parentIdFilterQuery + ")";
+    }
+
+    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty()  || !parentIdFilterQuery.isEmpty()) && !typeIdFilterQuery.isEmpty()){
+        filterQuery += " AND ";
+    }
+
+    if (!typeIdFilterQuery.isEmpty()){
+        filterQuery += "(" + typeIdFilterQuery + ")";
+    }
 
 	return true;
 }

@@ -74,12 +74,13 @@ imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::ListObjects(const
             viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
         }
 
+        iprm::CParamsSet filterParams;
         imtbase::CCollectionFilter filter;
         //imtbase::CCollectionFilter filterOnParentId;
         imtbase::CCollectionFilter filterOnParentIds;
+        imtbase::CCollectionFilter filterOnParentId;
         imtbase::CCollectionFilter filterOnTypeId;
         int offset = 0, count = -1;
-        //QString parentId = "";
         QString parentIds = "";
         QString filterText = "";
         QString typeId = "";
@@ -115,13 +116,14 @@ imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::ListObjects(const
                     filterOnParentIds.SetTextFilter(qPrintable(QJsonDocument(jsonArray).toJson(QJsonDocument::Compact)));
                 }
 
-//                if (!parentId.isEmpty()){
-//                    QByteArrayList filteringOnParentIdInfoIds;
-//                    filteringOnParentIdInfoIds << "ParentId";
-//                    filterOnParentId.SetFilteringInfoIds(filteringOnParentIdInfoIds);
-//                    filterOnParentId.SetTextFilter(parentId);
-//                }
-
+                if(generalModel.ContainsKey("ParentId")){
+                    QString parentId = generalModel.GetData("ParentId").toString();
+                    QByteArrayList filteringOnParentIdInfoIds;
+                    filteringOnParentIdInfoIds << "ParentId";
+                    filterOnParentId.SetFilteringInfoIds(filteringOnParentIdInfoIds);
+                    filterOnParentId.SetTextFilter(parentId);
+                    filterParams.SetEditableParameter("ParentId", &filterOnParentId);
+                }
 
                 typeId = generalModel.GetData("TypeId").toString();
 
@@ -171,7 +173,7 @@ imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::ListObjects(const
                 }
             }
         }
-        iprm::CParamsSet filterParams;
+
         filterParams.SetEditableParameter("Filter", &filter);
         filterParams.SetEditableParameter("ParentIds", &filterOnParentIds);
         filterParams.SetEditableParameter("TypeId", &filterOnTypeId);
@@ -237,9 +239,10 @@ imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::ListObjects(const
                         itemsModel->SetData("Longitude", lon, itemIndex);
 
                         bool isNode = false;
-                        if(typeAddressId != "9"){//TEMP
-                            isNode = true;
-                        }
+                        isNode = addressElementInfoPtr->GetHasChildren();
+//                        if(typeAddressId != "9"){//TEMP
+//                            isNode = true;
+//                        }
                         QString typeId__ = isNode ? "Node" : "Doc";
                         itemsModel->SetData("TypeId__", typeId__, itemIndex);
                         itemsModel->SetData("HasChildren__", isNode, itemIndex);
