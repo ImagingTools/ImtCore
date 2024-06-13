@@ -11,6 +11,8 @@ QtObject {
 
     property bool hasRemoteChanges: false;
 
+    property Component documentModelComp;
+
     signal saved(string id, string name);
     signal error(string message, string type);
     signal modelChanged();
@@ -33,5 +35,14 @@ QtObject {
 
     function saveDocument(){
         console.log("DocumentDataController saveDocument", documentModel.toJson());
+    }
+
+    function createDocumentModel(){
+        if (root.documentModelComp){
+            documentModel = root.documentModelComp.createObject(null);
+        }
+        else{
+            console.error("Unable to create document model for DocumentDataController. Error: 'documentModelComp' is invalid")
+        }
     }
 }

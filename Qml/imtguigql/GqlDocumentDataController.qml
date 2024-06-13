@@ -13,6 +13,12 @@ DocumentDataController {
 
     property string subscriptionCommandId;
 
+    documentModelComp: Component {
+        id: treeItemModelComp;
+
+        TreeItemModel {}
+    }
+
     Component.onDestruction: {
         Events.sendEvent("UnRegisterSubscription", container.subscriptionClient);
     }

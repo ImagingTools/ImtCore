@@ -235,7 +235,7 @@ Item {
         documentAdded(documentsModel.count - 1, "");
 
         if (documentData.documentDataController){
-            documentData.documentDataController.documentModel = createDocumentModel(null);
+            documentData.documentDataController.createDocumentModel();
         }
 
         return true;
@@ -783,11 +783,6 @@ Item {
         }
     }
 
-    Component {
-        id: treeItemModelComp;
-
-        TreeItemModel {}
-    }
 
     Component {
         id: defaultDataController;
