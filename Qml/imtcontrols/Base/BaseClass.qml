@@ -2,6 +2,7 @@ import QtQuick 2.0
 
 QtObject {
     signal dataChanged(string name, var sender)
+    signal finished
     property bool enableNotifications: true
     property var owner
 
@@ -179,5 +180,6 @@ QtObject {
             }
 
         }
+        finished()
     }
 }
