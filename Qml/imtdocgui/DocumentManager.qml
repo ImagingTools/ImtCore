@@ -529,11 +529,6 @@ Item {
     }
 
 
-    function createDocumentModel(parent)
-    {
-        return treeItemModelComp.createObject(parent);
-    }
-
     Component {
         id: singleDocumentDataComp;
 
@@ -730,6 +725,8 @@ Item {
                 if (singleDocumentData.documentDataController){
                     return singleDocumentData.documentDataController.getDocumentName();
                 }
+
+                return "";
             }
 
             // Processing commands that came from the view

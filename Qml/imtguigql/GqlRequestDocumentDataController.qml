@@ -23,16 +23,6 @@ DocumentDataController {
         ModalDialogManager.showWarningDialog(message)
     }
 
-    onDocumentModelChanged: {
-        hasRemoteChanges = false;
-        modelChanged();
-    }
-
-    onSaved: {
-        documentName = name;
-        documentId = id;
-    }
-
     onDocumentIdChanged: {
         console.log("GqlRequestDocumentDataController onDocumentIdChanged", documentId)
         if (documentId !== ""){
@@ -40,26 +30,13 @@ DocumentDataController {
         }
     }
 
-    function getDocumentId(){
-        if (documentModel.m_id){
-            return documentModel.m_id;
-        }
-        else{
-            console.error("Unable to get document-ID. Error: field 'm_id' is not found.");
-        }
-
-        return "";
-    }
-
-    function getDocumentName(){
+    function setupDocumentInfo(){
         if (documentModel.m_name){
-            return documentModel.m_name;
+            container.documentName = documentModel.m_name;
         }
         else{
-            console.error("Unable to get document name. Error: field 'm_name' is not found.");
+            console.error("Unable to set document name. Error: field 'm_name' is not found.");
         }
-
-        return "";
     }
 
     function updateDocumentModel(){

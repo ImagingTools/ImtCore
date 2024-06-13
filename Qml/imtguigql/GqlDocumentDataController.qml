@@ -27,43 +27,19 @@ DocumentDataController {
         ModalDialogManager.showWarningDialog(message)
     }
 
-    onDocumentModelChanged: {
-        if (documentModel.containsKey("Name")){
-            documentName = documentModel.getData("Name");
-        }
-
-        hasRemoteChanges = false;
-
-        modelChanged();
-    }
-
-    onSaved: {
-        documentName = name;
-        documentId = id;
-    }
-
     onDocumentIdChanged: {
         if (documentId !== ""){
             container.subscriptionClient.register();
         }
     }
 
-    function getDocumentId(){
-        let id = "";
-        if (documentModel && documentModel.containsKey("Id")){
-            id = documentModel.getData("Id");
-        }
-
-        return id;
-    }
-
-    function getDocumentName(){
-        let name = "";
+    function setupDocumentInfo(){
         if (documentModel && documentModel.containsKey("Name")){
-            name = documentModel.getData("Name");
+            container.documentName = documentModel.getData("Name");
         }
-
-        return name;
+        else{
+            console.error("Unable to set document name. Error: Document model is not contains key 'Name'");
+        }
     }
 
     function updateDocumentModel(){

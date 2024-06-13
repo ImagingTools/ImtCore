@@ -17,6 +17,18 @@ QtObject {
     signal error(string message, string type);
     signal modelChanged();
 
+    onDocumentModelChanged: {
+        setupDocumentInfo();
+
+        hasRemoteChanges = false;
+        modelChanged();
+    }
+
+    onSaved: {
+        documentId = id;
+        documentName = name;
+    }
+
     function getDocumentId(){
         return documentId;
     }
@@ -35,6 +47,9 @@ QtObject {
 
     function saveDocument(){
         console.log("DocumentDataController saveDocument", documentModel.toJson());
+    }
+
+    function setupDocumentInfo(){
     }
 
     function createDocumentModel(){
