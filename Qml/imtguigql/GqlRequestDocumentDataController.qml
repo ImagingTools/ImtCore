@@ -34,22 +34,29 @@ DocumentDataController {
     }
 
     onDocumentIdChanged: {
+        console.log("GqlRequestDocumentDataController onDocumentIdChanged", documentId)
         if (documentId !== ""){
             container.subscriptionClient.register();
         }
     }
 
     function getDocumentId(){
-        if (documentModel.m_Id){
-            return documentModel.m_Id;
+        if (documentModel.m_id){
+            return documentModel.m_id;
+        }
+        else{
+            console.error("Unable to get document-ID. Error: field 'm_id' is not found.");
         }
 
         return "";
     }
 
     function getDocumentName(){
-        if (documentModel.m_Name){
-            return documentModel.m_Name;
+        if (documentModel.m_name){
+            return documentModel.m_name;
+        }
+        else{
+            console.error("Unable to get document name. Error: field 'm_name' is not found.");
         }
 
         return "";
@@ -97,6 +104,8 @@ DocumentDataController {
 
     property GqlRequest gqlUpdateModel: GqlRequest {
         function save(){
+            console.log("gqlUpdateModel save", container.documentId);
+
             var query = Gql.GqlRequest("mutation", container.gqlUpdateCommandId);
 
             var inputParams = Gql.GqlObject("input");
@@ -128,6 +137,7 @@ DocumentDataController {
                 container.error("Network error", "Critical");
             }
             if (state === "Ready"){
+                console.log("gqlUpdateModel Ready", this.json);
                 let responseObj = JSON.parse(this.json)
                 if (!responseObj){
                     console.error("Unable convert json ", json, " to object")

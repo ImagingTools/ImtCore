@@ -14,7 +14,7 @@ QtObject {
         xhr.send(gqlData)
 
         xhr.onreadystatechange = function(){
-            console.log("onreadystatechange", xhr.readyState);
+            console.log("onreadystatechange", xhr.readyState, xhr.responseText);
 
             if (xhr.readyState === XMLHttpRequest.DONE){
                 root.json = xhr.responseText;
