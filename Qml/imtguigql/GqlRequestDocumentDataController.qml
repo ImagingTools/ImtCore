@@ -52,8 +52,6 @@ DocumentDataController {
     }
 
     function createDocumentModel(){
-        console.log("DocumentDataController createDocumentModel", root.documentModelComp);
-
         if (container.documentModelComp){
             let objectData = container.documentModelComp.createObject(null);
             objectData.connectProperties();
@@ -62,8 +60,6 @@ DocumentDataController {
         else{
             console.error("Unable to create document model for DocumentDataController. Error: 'documentModelComp' is invalid")
         }
-
-        console.log("DocumentDataController end createDocumentModel", root.documentModelComp);
     }
 
     function getAdditionalInputParams(){
