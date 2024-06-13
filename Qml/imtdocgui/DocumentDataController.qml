@@ -18,6 +18,8 @@ QtObject {
     signal modelChanged();
 
     onDocumentModelChanged: {
+        console.log("DocumentDataController onDocumentModelChanged");
+
         setupDocumentInfo();
 
         hasRemoteChanges = false;
@@ -49,15 +51,19 @@ QtObject {
         console.log("DocumentDataController saveDocument", documentModel.toJson());
     }
 
-    function setupDocumentInfo(){
-    }
+    // For setted documentId/documentName from documentModel
+    function setupDocumentInfo(){}
 
     function createDocumentModel(){
+        console.log("DocumentDataController createDocumentModel", root.documentModelComp);
+
         if (root.documentModelComp){
             documentModel = root.documentModelComp.createObject(null);
         }
         else{
             console.error("Unable to create document model for DocumentDataController. Error: 'documentModelComp' is invalid")
         }
+
+        console.log("DocumentDataController end createDocumentModel", root.documentModelComp);
     }
 }

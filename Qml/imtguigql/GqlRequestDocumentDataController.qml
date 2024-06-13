@@ -51,6 +51,21 @@ DocumentDataController {
         gqlUpdateModel.save();
     }
 
+    function createDocumentModel(){
+        console.log("DocumentDataController createDocumentModel", root.documentModelComp);
+
+        if (container.documentModelComp){
+            let objectData = container.documentModelComp.createObject(null);
+            objectData.connectProperties();
+            documentModel = objectData;
+        }
+        else{
+            console.error("Unable to create document model for DocumentDataController. Error: 'documentModelComp' is invalid")
+        }
+
+        console.log("DocumentDataController end createDocumentModel", root.documentModelComp);
+    }
+
     function getAdditionalInputParams(){
         let obj = {}
         return obj;

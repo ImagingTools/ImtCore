@@ -6,13 +6,29 @@ QtObject {
     property bool enableNotifications: true
     property var owner
 
+    Component.onCompleted: {
+        console.log("BaseClass onCompleted");
+
+        connectProperties();
+    }
+
     onDataChanged: {
+        console.log("BaseClass onDataChanged");
+
         if(owner && owner.enableNotifications && owner.dataChanged){
             owner.dataChanged(name, sender)
         }
     }
 
+    property bool propertiesIsConnected: false
+
     function connectProperties(){
+        console.log("BaseClass connectProperties");
+
+        if (propertiesIsConnected){
+            return;
+        }
+
         let self = this
         let list = getProperties()
 
@@ -23,6 +39,8 @@ QtObject {
             }
            )
         }
+
+        propertiesIsConnected = true;
     }
 
     function createMe(){
@@ -109,7 +127,7 @@ QtObject {
             }
         } else {
             for(let key in this){
-                if(key !== 'objectName' && key !== 'owner' && key !== 's_keys' && key !== 'enableNotifications' && typeof this[key] !== "function"){
+                if(key.indexOf('m_') >= 0 && key !== 'objectName' && key !== 'owner' && key !== 's_keys' && key !== 'enableNotifications' && typeof this[key] !== "function"){
                     list.push(key)
                 }
             }

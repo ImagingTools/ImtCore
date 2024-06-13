@@ -620,6 +620,8 @@ Item {
                         return;
                     }
 
+                    console.log("Document manager onModelChanged");
+
                     let documentModel = singleDocumentData.documentDataController.documentModel;
 
                     singleDocumentData.changesChecker.registerModel(documentModel);
@@ -668,6 +670,8 @@ Item {
                     if (singleDocumentData.undoManager && singleDocumentData.undoManager.isTransaction()){
                         return;
                     }
+
+                    console.log("Document manager onDataChanged");
 
                     let isEqual = singleDocumentData.changesChecker.isEqual()
 
