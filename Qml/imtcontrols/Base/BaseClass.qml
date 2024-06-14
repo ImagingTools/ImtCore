@@ -162,6 +162,28 @@ QtObject {
         return json
     }
 
+    function toGraphQL(){
+        let list = getProperties()
+
+        let graphQL = '{'
+        for(let i = 0; i < list.length; i++){
+            let key = list[i]
+            if(typeof this[key] === 'object'){
+                graphQL += this.getJSONKeyForProperty(key) + ':' + this[key].toGraphQL()
+            } else {
+                let value = this[key]
+                if (value === undefined){
+                    value = null
+                }
+
+                graphQL += this.getJSONKeyForProperty(key) + ':' + (typeof this[key] === 'string' ? '"' + this[key] + '"' : value)
+            }
+            if(i < list.length - 1) graphQL += ','
+        }
+        graphQL +='}'
+        return graphQL
+    }
+
     function fromJSON(json){
         return fromObject(JSON.parse(json))
     }

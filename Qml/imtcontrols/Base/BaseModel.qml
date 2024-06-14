@@ -21,7 +21,7 @@ ListModel {
         return list
     }
 
-    function toJSON(){
+    function toJson(){
         let json = '['
         for(let i = 0; i < count; i++){
             let item = get(i).item
@@ -31,7 +31,7 @@ ListModel {
             for(let j = 0; j < list.length; j++){
                 let key = list[j]
                 if(typeof item[key] === 'object'){
-                    json += '"' + item.getJSONKeyForProperty(key) + '":' + item[key].toJSON()
+                    json += '"' + item.getJSONKeyForProperty(key) + '":' + item[key].toJson()
                 } else {
                     let value = item[key]
                     if (value === undefined){
@@ -47,5 +47,33 @@ ListModel {
         }
         json +=']'
         return json
+    }
+
+    function toGraphQL(){
+        let graphQL = '['
+        for(let i = 0; i < count; i++){
+            let item = get(i).item
+            let list = getProperties(item)
+
+            graphQL += '{'
+            for(let j = 0; j < list.length; j++){
+                let key = list[j]
+                if(typeof item[key] === 'object'){
+                    graphQL += item.getJSONKeyForProperty(key) + ':' + item[key].toGraphQL()
+                } else {
+                    let value = item[key]
+                    if (value === undefined){
+                        value = null
+                    }
+                    graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + item[key] + '"' : value)
+                }
+                if(j < list.length - 1) graphQL += ','
+            }
+            graphQL +='}'
+
+            if(i < count - 1) graphQL += ','
+        }
+        graphQL +=']'
+        return graphQL
     }
 }
