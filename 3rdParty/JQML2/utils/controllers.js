@@ -997,7 +997,7 @@ class TransactionController {
             for(let obj of this.levels[this.level]){
                 // console.log('*Transaction*', this.level, obj)
                 if(obj.$signals && obj.$signals.$transaction) obj.$signals.$transaction(obj, obj.$changeset)
-                if(obj.UID) obj.$complete()
+                obj.$complete()
                 if(!obj.UID && this.level === 1) obj.$free()
             }
         }

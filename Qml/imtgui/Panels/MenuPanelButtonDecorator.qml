@@ -50,8 +50,10 @@ DecoratorBase {
         id: body;
 
         anchors.verticalCenter: leftPanelElement.verticalCenter;
-        anchors.left: leftPanelElement.left;
+        anchors.left: indicator.right;
+        anchors.leftMargin: Style.size_smallMargin;
         anchors.right: leftPanelElement.right;
+        anchors.rightMargin: Style.size_smallMargin;
 
         height: image.height + description.height + description.anchors.topMargin;
 
@@ -77,9 +79,7 @@ DecoratorBase {
             anchors.top: image.bottom;
             anchors.topMargin: Style.size_mainMargin;
             anchors.left: parent.left;
-            anchors.leftMargin:  indicator.width;
             anchors.right: parent.right;
-            anchors.rightMargin: indicator.width;
 
             color: (leftPanelElement.selected || leftPanelElement.highlighted) ? Style.iconColorOnSelected: Style.textColor;
 

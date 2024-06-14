@@ -169,8 +169,22 @@ bool CTreeItemModel::IsEqualWithModel(CTreeItemModel* modelPtr) const
 					return false;
 				}
 			}
-			else if (sourceValue != itemValue) {
-				return false;
+			else{
+				if (sourceValue.typeId() == QMetaType::Int && sourceValue.toInt() != itemValue.toInt()){
+					return false;
+				}
+
+				if (sourceValue.typeId() == QMetaType::QByteArray && sourceValue.toByteArray() != itemValue.toByteArray()){
+					return false;
+				}
+
+				if (sourceValue.typeId() == QMetaType::QString && sourceValue.toString() != itemValue.toString()){
+					return false;
+				}
+
+				if (sourceValue.typeId() == QMetaType::Bool && sourceValue.toBool() != itemValue.toBool()){
+					return false;
+				}
 			}
 		}
 	}

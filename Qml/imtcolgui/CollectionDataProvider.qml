@@ -134,6 +134,8 @@ Item {
             viewParams.InsertField("FilterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");
+            inputParams.InsertFieldObject(viewParams);
+
             let additionInputParams = container.getAdditionalInputParams();
             if (Object.keys(additionInputParams).length > 0){
                 let additionParams = Gql.GqlObject("addition");
