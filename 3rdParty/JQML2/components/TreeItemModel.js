@@ -89,8 +89,8 @@ class TreeItemModel extends JSONListModel {
         let modelObject = this.get(row)
         let retVal = modelObject ? modelObject[key] : undefined
 
-        if (retVal === undefined)
-            return undefined
+        if (retVal === undefined || retVal === null)
+            return retVal
 
         if(typeof retVal === 'object' && !(retVal instanceof QtObject)){
             let retModel = new TreeItemModel(this)

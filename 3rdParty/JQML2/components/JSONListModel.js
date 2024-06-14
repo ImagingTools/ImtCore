@@ -16,6 +16,8 @@ class JSONListModel extends ListModel {
     }
 
     $complete(){
+        if(this.$completed) return
+        
         this.updateJSONModel()
         super.$complete()
     }
