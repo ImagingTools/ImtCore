@@ -40,7 +40,6 @@ ViewBase {
     }
 
     function updateGui(){
-        console.log("updateGui start");
         if (accountEditorContainer.model.containsKey("Name")){
             accountNameInput.text = accountEditorContainer.model.getData("Name");
         }
@@ -115,12 +114,9 @@ ViewBase {
                 }
             }
         }
-
-        console.log("updateGui end");
     }
 
     function updateModel(){
-        console.log("start updateModel", model.toJson());
         let name = accountNameInput.text;
         accountEditorContainer.model.setData("Name", name)
 
@@ -156,8 +152,6 @@ ViewBase {
 
         let groups = selectedGroupIds.join(';');
         accountEditorContainer.model.setData("Groups", groups)
-
-        console.log("end updateModel", model.toJson());
     }
 
     CustomScrollbar {

@@ -54,23 +54,20 @@ Item {
 
         let prevStateModel = internal.m_undoStack.pop();
 
-        console.log("internal.m_defaultStateModel", internal.m_defaultStateModel);
+        let copiedModel = internal.m_observedModel.copyMe();
+        console.log("copiedModel", copiedModel);
 
-        if (internal.m_defaultStateModel){
-            let copiedModel = internal.m_defaultStateModel.copyMe();
-            copiedModel.createFromJson(prevStateModel)
-            internal.m_observedModel.copy(copiedModel)
-        }
+        copiedModel.createFromJson(prevStateModel)
+        internal.m_observedModel.copy(copiedModel);
 
-        //internal.m_observedModel.createFromJson(prevStateModel) ???
+//        internal.m_observedModel.createFromJson(prevStateModel)
 
         internal.m_beginStateModel = prevStateModel;
 
-        internal.m_isBlocked = false;
-
         modelChanged();
-
         undo();
+
+        internal.m_isBlocked = false;
 
         console.log("end doUndo");
     }
@@ -78,6 +75,8 @@ Item {
 
     function doRedo(steps)
     {
+        console.log("doRedo");
+
         if (!modelIsRegistered()){
             return;
         }
@@ -87,23 +86,13 @@ Item {
         internal.m_undoStack.push(internal.m_observedModel.toJson());
 
         let nextStateModel = internal.m_redoStack.pop();
-
-        if (internal.m_defaultStateModel){
-            let copiedModel = internal.m_defaultStateModel.copyMe();
-            copiedModel.createFromJson(nextStateModel)
-
-            internal.m_observedModel.copy(copiedModel)
-        }
-
-//        internal.m_observedModel.createFromJson(nextStateModel) ???
-
+        internal.m_observedModel.createFromJson(nextStateModel)
         internal.m_beginStateModel = internal.m_observedModel.toJson();
 
-        internal.m_isBlocked = false;
-
         modelChanged();
-
         redo();
+
+        internal.m_isBlocked = false;
     }
 
 
@@ -222,7 +211,7 @@ Item {
             return;
         }
 
-        console.log("makeChanges", internal.m_beginStateModel);
+        console.log("UndoManager makeChanges", internal.m_beginStateModel);
 
         if (internal.m_beginStateModel != ""){
             internal.m_undoStack.push(internal.m_beginStateModel)
@@ -285,11 +274,11 @@ Item {
     }
 
     function onDataChanged(){
-        console.log("UndoManager onDataChanged");
-
         if (internal.m_isBlocked){
             return;
         }
+
+        console.log("UndoManager onDataChanged", internal.m_observedModel.toJson());
 
         undoRedoManager.makeChanges();
 

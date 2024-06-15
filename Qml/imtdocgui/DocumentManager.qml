@@ -545,29 +545,7 @@ Item {
             property DocumentDataController documentDataController: null;
             property DocumentValidator documentValidator: DocumentValidator {};
 
-            property QtObject changesChecker: QtObject {
-                property var defaultModel;
-
-                function registerModel(model){
-                    if (!model){
-                        return;
-                    }
-
-                    defaultModel = model.copyMe();
-                }
-
-                function isEqual(){
-                    if (!defaultModel){
-                        return;
-                    }
-
-                    return singleDocumentData.documentDataController.documentModel.isEqualWithModel(defaultModel);
-                }
-            }
-
             property UndoRedoManager undoManager: UndoRedoManager {
-                autoTracking: false;
-
                 onUndo: {
                     singleDocumentData.checkDocumentModel();
                 }
@@ -577,6 +555,8 @@ Item {
                 }
 
                 onModelChanged: {
+                    console.log("UndoManager onModelChanged");
+
                     let undoSteps = getAvailableUndoSteps();
                     let redoSteps = getAvailableRedoSteps();
 
@@ -624,7 +604,7 @@ Item {
 
                     let documentModel = singleDocumentData.documentDataController.documentModel;
 
-                    singleDocumentData.changesChecker.registerModel(documentModel);
+//                    singleDocumentData.changesChecker.registerModel(documentModel);
 
                     singleDocumentData.documentId = singleDocumentData.documentDataController.getDocumentId();
                     singleDocumentData.documentName = singleDocumentData.documentDataController.getDocumentName();
@@ -673,13 +653,8 @@ Item {
 
                     console.log("Document manager onDataChanged");
 
-                    let isEqual = singleDocumentData.changesChecker.isEqual()
-
-                    singleDocumentData.isDirty = !isEqual;
-
-                    if (!isEqual){
-                        singleDocumentData.undoManager.onDataChanged();
-                    }
+                    singleDocumentData.isDirty = true;
+//                    singleDocumentData.undoManager.onDataChanged();
                 }
             }
 

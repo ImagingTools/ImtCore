@@ -66,7 +66,9 @@ ControlBase {
     }
 
     onRootChanged: {
-        root.backgroundItem.opacity = 0.4;
+        if (root && root.backgroundItem){
+            root.backgroundItem.opacity = 0.4;
+        }
     }
 
     onFinished: {

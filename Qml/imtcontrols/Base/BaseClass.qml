@@ -7,7 +7,7 @@ QtObject {
     property var owner
 
     Component.onCompleted: {
-        console.log("BaseClass onCompleted");
+        console.log("BaseClass onCompleted", this);
 
         connectProperties();
     }
@@ -205,7 +205,6 @@ QtObject {
                         this[_key].append({item: obj})
                         obj.owner = this
                         obj.connectProperties()
-
                     }
                 } else {
                     let obj = createComponent(_key).createObject(this)
@@ -213,7 +212,6 @@ QtObject {
                     this[_key] = obj
                     obj.owner = this
                     obj.connectProperties()
-
                 }
             } else {
                 this[_key] = sourceObject[key]
