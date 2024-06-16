@@ -49,6 +49,7 @@ public:
 
 protected:
 	virtual bool ProcessSchema();
+	virtual bool ProcessSchemaImports();
 	virtual bool ProcessType();
 	virtual bool ProcessInterface();
 	virtual bool ProcessUnion();
@@ -62,6 +63,7 @@ protected:
 	virtual bool ProcessSubscription();
 	virtual bool ProcessValue(SdlFieldList& output, bool* endOfReadPtr);
 	virtual bool ProcessRequests(CSdlRequest::Type type);
+
 
 	virtual bool ValidateSchema();
 
@@ -82,6 +84,7 @@ protected:
 	bool MoveToCharType(QChar::Category category, char* foundDelimeterPtr = nullptr, bool skipDelimeter = false);
 	bool MoveToCharType(const QList<QChar::Category>& categoryList, char* foundDelimeterPtr = nullptr, bool skipDelimeter = false);
 	bool MoveToNextReadableSymbol(char* foundDelimeterPtr = nullptr, bool skipDelimeter = false);
+	bool MoveAfterWord(const QString& word);
 
 protected:
 	QTextStream m_stream;

@@ -174,6 +174,9 @@ bool CGqlSchemaParser::ProcessSchema()
 		else if (schemaType == QByteArrayLiteral("subscription")){
 			m_keywordMap[KI_SUBSCRIPTION] = schemaSynonym;
 		}
+		else if (schemaType == QByteArrayLiteral("import")){
+			retVal = retVal && ProcessSchemaImports();
+		}
 		else if (foundDelimiter == '}'){
 			// schema parsing is done nothing to do anymore
 		}
@@ -197,6 +200,14 @@ bool CGqlSchemaParser::ProcessSchema()
 	}
 
 	return retVal;
+}
+
+
+bool CGqlSchemaParser::ProcessSchemaImports()
+{
+	I_CRITICAL();
+
+	return false;
 }
 
 
@@ -659,7 +670,36 @@ bool CGqlSchemaParser::MoveToNextReadableSymbol(char* foundDelimeterPtr, bool sk
 				<< QChar::Symbol_Currency
 				<< QChar::Symbol_Modifier
 				<< QChar::Symbol_Other,
-				foundDelimeterPtr, skipDelimeter);
+						  foundDelimeterPtr, skipDelimeter);
+}
+
+
+bool CGqlSchemaParser::MoveAfterWord(const QString& word)
+{
+	if (word.isEmpty()){
+		I_CRITICAL();
+
+		return false;
+	}
+
+	QByteArray dummy;
+	bool isFound = false;
+	bool isRead = true;
+	do {
+		isRead = isRead && ReadToDelimeter(QByteArray(word.toUtf8()[0], 1), dummy, nullptr, false, false);
+		for (int i = 1; i < word.length(); ++i){
+			char expectedSymbol = word.toUtf8()[i];
+			char actualSymbol = ' ';
+			isRead = isRead && MoveToNextReadableSymbol(&actualSymbol, false);
+			if (expectedSymbol != actualSymbol){
+				break;
+			}
+			isFound = true;
+		}
+		dummy.clear();
+	} while (!isRead || isFound);
+
+	return isFound;
 }
 
 
