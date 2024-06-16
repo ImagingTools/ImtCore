@@ -42,6 +42,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption dependenciesOption({"D", "dependencies"}, "Generate a dependencies list to be generated. No code will be generated");
 	QCommandLineOption modificatorsOption({"M", "modificator"}, "Modificator to generate code. You can provide multiple modificators. Note: modifier names are case sensitive.", "ModificatorList");
 	QCommandLineOption allModificatorsOption("use-all-modificators", "Use all modificators to generate code");
+	QCommandLineOption baseClassOption({"B", "base-class"}, "Defines base class of all generated classes with include path CLASS=/include/path", "BaseClassList");
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
 	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)");
@@ -59,7 +60,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 					allModificatorsOption,
 					qmlOption,
 					cppOption,
-					gqlOption
+					gqlOption,
+					baseClassOption
 				});
 	if (!isOptionsAdded){
 		Q_ASSERT(false);
@@ -93,6 +95,20 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	if (commandLineParser.isSet(allModificatorsOption)){
 		m_useAllModificators = true;
 		m_notUseModificators = false;
+	}
+	if (commandLineParser.isSet(baseClassOption)){
+		const QStringList baseClassList = commandLineParser.values(baseClassOption);
+		for (const QString& baseClassDeclaration: baseClassList){
+			if (!baseClassDeclaration.contains('=')){
+				SendCriticalMessage(0, QString("Declaration '%1' does not contains include directive").arg(baseClassDeclaration));
+				Q_ASSERT_X(false, "base class declarations parsing", "Declaration does not contains include directive");
+
+				return false;
+			}
+			QString className = baseClassDeclaration.split('=')[0];
+			QString includeDirective = baseClassDeclaration.split('=')[1];
+			m_baseClassList.insert(className, includeDirective);
+		}
 	}
 
 	// special modes
@@ -193,9 +209,16 @@ bool CSdlProcessArgumentsParserComp::IsCppEnabled() const
 	return m_cppEnabled;
 }
 
+
 bool CSdlProcessArgumentsParserComp::IsGqlEnabled() const
 {
 	return m_gqlEnabled;
+}
+
+
+QMap<QString, QString> CSdlProcessArgumentsParserComp::GetBaseClassList() const
+{
+	return m_baseClassList;
 }
 
 

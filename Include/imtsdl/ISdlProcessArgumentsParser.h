@@ -25,6 +25,7 @@ public:
 	virtual bool IsCppEnabled() const = 0;
 	virtual bool IsQmlEnabled() const = 0;
 	virtual bool IsGqlEnabled() const = 0;
+	virtual QMap<QString/*class name*/, QString/*include directive*/> GetBaseClassList() const = 0;
 };
 
 

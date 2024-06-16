@@ -39,6 +39,7 @@ public:
 	virtual bool IsQmlEnabled() const override;
 	virtual bool IsCppEnabled() const override;
 	virtual bool IsGqlEnabled() const override;
+	virtual QMap<QString, QString> GetBaseClassList() const override;
 
 private:
 	QString m_schemaFilePath;
@@ -54,6 +55,7 @@ private:
 	bool m_cppEnabled;
 	bool m_qmlEnabled;
 	bool m_gqlEnabled;
+	QMap<QString, QString> m_baseClassList;
 };
 
 
