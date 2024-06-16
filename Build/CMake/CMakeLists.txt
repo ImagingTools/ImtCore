@@ -103,7 +103,6 @@ add_subdirectory("${INCLUDE_DIR}/imtcom/CMake" "${AUX_INCLUDE_DIR}/imtcom")
 add_subdirectory("${INCLUDE_DIR}/imthttp/CMake" "${AUX_INCLUDE_DIR}/imthttp")
 add_dependencies(imthttp imtcom)
 add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb")
-add_subdirectory("${INCLUDE_DIR}/imtgqlrepo/CMake" "${AUX_INCLUDE_DIR}/imtgqlrepo")
 add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
 
 if(NOT DEFINED USE_GEO OR USE_GEO)
@@ -207,8 +206,6 @@ if(NOT ANDROID)
 
 	add_subdirectory("${IMPL_DIR}/ImtGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtGqlPck")
 	add_dependencies(ImtGqlPck imtgql)
-
-	add_subdirectory("${IMPL_DIR}/ImtGqlRepoPck/CMake" "${AUX_INCLUDE_DIR}/ImtGqlRepoPck")
 
 	add_subdirectory("${IMPL_DIR}/ImtClientGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtClientGqlPck")
 	add_dependencies(ImtClientGqlPck ImtGqlPck imtclientgql)
