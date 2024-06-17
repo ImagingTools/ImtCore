@@ -35,16 +35,16 @@ class CBaseClassExtenderComp:
 public:
 	typedef iproc::CSyncProcessorCompBase BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CBaseClassExtenderComp)
+	I_BEGIN_COMPONENT(CBaseClassExtenderComp)
 	I_END_COMPONENT;
 
 	// reimplemented (iproc::IProcessor)
 	/**
-		Adds
+		Adds inheritance to class files
 		\param paramsPtr (required)
 			- (optional) [IncludePaths]		of \c iprm::IOptionsList		- [id] - directory to lookup source files
-			- (required) [HeaderFile]		of \c iprm::IFileNameParam		- header file to modify
-			- (optional) [SourceFile]		of \c iprm::IFileNameParam		- source file to modify
+			- (required) [HeaderFile]		of \c ifile::IFileNameParam		- header file to modify
+			- (optional) [SourceFile]		of \c ifile::IFileNameParam		- source file to modify
 			- (optional) [Override]			of \c iprm::IEnableableParam -	- if enabled add override of all virtual methods if SourceFile is set - adds in SourceFile and in HeaderFile otherwise
 		\param inputPtr - \c iprm::IOptionsList (required)
 							- [id] - class name
@@ -60,11 +60,11 @@ public:
 
 protected:
 	virtual bool ProcessHeaderClassFile(
-				const iprm::IParamsSet* paramsPtr,
-				const iprm::IOptionsList* baseClassList);
+				const iprm::IParamsSet& paramsPtr,
+				const iprm::IOptionsList& baseClassList);
 	virtual bool ProcessSourceClassFile(
-				const iprm::IParamsSet* paramsPtr,
-				const iprm::IOptionsList* baseClassList);
+				const iprm::IParamsSet& paramsPtr,
+				const iprm::IOptionsList& baseClassList);
 	virtual bool BeginClassFiles();
 	virtual bool EndClassFiles();
 	virtual bool CloseFiles();

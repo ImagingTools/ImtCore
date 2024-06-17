@@ -23,6 +23,110 @@
 namespace imtsdl
 {
 
+static QRegularExpression s_includeRemarkRegExp(QStringLiteral("\\/\\/(.*)includes"));
+static QRegularExpression s_includeDirectiveRegExp(QStringLiteral("\\#\\s*include\\s*[<\"]{1}(.*)[>\"]{1}"));
+
+// static help methods
+
+QSet<QString> GetRemarks(const QMap<QString, QString>& direciveIncludeMap)
+{
+	QSet<QString> retVal;
+	QMapIterator mapIterator(direciveIncludeMap);
+	while(mapIterator.hasNext()){
+		retVal.insert(mapIterator.next().value());
+	}
+
+	return retVal;
+}
+
+
+bool FindRemark(const QMap<QString, QString>& container, const QString& remark)
+{
+	QString remarkName = remark;
+	QRegularExpressionMatch remarkMatch = s_includeRemarkRegExp.match(remark);
+	if (remarkMatch.hasMatch()){
+		remarkName = remarkMatch.capturedTexts().constLast();
+	}
+
+	for (auto iter = container.cbegin(); iter != container.cend(); ++iter){
+		QRegularExpressionMatch match = s_includeRemarkRegExp.match(iter.value());
+		if (match.hasMatch()){
+			const QString containerRemarkName = match.capturedTexts().constLast();
+			return remarkName == containerRemarkName;
+		}
+	}
+
+	return false;
+}
+
+
+bool FindDirective(const QMap<QString, QString>& container, const QString& directive)
+{
+	QString directiveName = directive;
+	QRegularExpressionMatch remarkMatch = s_includeDirectiveRegExp.match(directive);
+	if (remarkMatch.hasMatch()){
+		directiveName = remarkMatch.capturedTexts().constLast();
+	}
+
+	for (auto iter = container.cbegin(); iter != container.cend(); ++iter){
+		QRegularExpressionMatch match = s_includeRemarkRegExp.match(iter.key());
+		if (match.hasMatch()){
+			const QString containerRemarkName = match.capturedTexts().constLast();
+			return directiveName == containerRemarkName;
+		}
+	}
+
+	return false;
+}
+
+
+QStringList GetDirectivesByRemark(const QMap<QString, QString>& direciveIncludeMap, const QString& remark)
+{
+	QString remarkName = remark;
+	QRegularExpressionMatch remarkMatch = s_includeRemarkRegExp.match(remark);
+	if (remarkMatch.hasMatch()){
+		remarkName = remarkMatch.capturedTexts().constLast();
+	}
+
+	QStringList retVal;
+	QMapIterator mapIterator(direciveIncludeMap);
+	while(mapIterator.hasNext()){
+		auto mapIndex = mapIterator.next();
+		QString includeDirective = mapIndex.value();
+		QRegularExpressionMatch match = s_includeRemarkRegExp.match(includeDirective);
+		if(match.hasMatch()){
+			const QString containerRemarkName = match.capturedTexts().constLast();
+			if (remarkName == containerRemarkName){
+				retVal << mapIndex.key();
+			}
+		}
+	}
+
+	return retVal;
+}
+
+
+void RemoveDirectivesByRemark(QMap<QString, QString>& direciveIncludeMap, const QString& remark)
+{
+	QString remarkName = remark;
+	QRegularExpressionMatch remarkMatch = s_includeRemarkRegExp.match(remark);
+	if (remarkMatch.hasMatch()){
+		remarkName = remarkMatch.capturedTexts().constLast();
+	}
+
+	QMutableMapIterator mapIterator(direciveIncludeMap);
+	while(mapIterator.hasNext()){
+		QString includeDirective = mapIterator.next().value();
+		QRegularExpressionMatch match = s_includeRemarkRegExp.match(includeDirective);
+		if(match.hasMatch()){
+			const QString containerRemarkName = match.capturedTexts().constLast();
+			if (remarkName == containerRemarkName){
+				mapIterator.remove();
+			}
+		}
+	}
+}
+
 
 // public methods
 
@@ -35,6 +139,12 @@ int CBaseClassExtenderComp::DoProcessing(
 			ibase::IProgressManager* progressManagerPtr)
 {
 	int retVal = iproc::IProcessor::TS_OK;
+
+	if (paramsPtr == nullptr){
+		I_CRITICAL();
+
+		return TS_INVALID;
+	}
 
 	const iprm::IOptionsList* baseClassOptionListPtr = dynamic_cast<const iprm::IOptionsList*>(inputPtr);
 	if (baseClassOptionListPtr == nullptr){
@@ -54,12 +164,12 @@ int CBaseClassExtenderComp::DoProcessing(
 	}
 
 	m_originalHeaderFilePtr.SetPtr(new QFile(headerFilePathPtr->GetPath()));
-	m_headerFilePtr.SetPtr(new QFile(tempPath + "/headerFileBuffer"));
+	m_headerFilePtr.SetPtr(new QFile(tempPath + QDir::separator() + QFileInfo(*m_originalHeaderFilePtr).fileName()));
 
 	iprm::TParamsPtr<ifile::IFileNameParam> sourceFilePathPtr(paramsPtr, QByteArrayLiteral("SourceFile"), false);
 	if (sourceFilePathPtr.IsValid()){
-		m_sourceFilePtr.SetPtr(new QFile(tempPath + "/sourceFileBuffer"));
 		m_originalSourceFilePtr.SetPtr(new QFile(sourceFilePathPtr->GetPath()));
+		m_sourceFilePtr.SetPtr(new QFile(tempPath + QDir::separator() + QFileInfo(*m_originalSourceFilePtr).fileName()));
 	}
 
 	bool isOk = BeginClassFiles();
@@ -69,14 +179,14 @@ int CBaseClassExtenderComp::DoProcessing(
 		return iproc::IProcessor::TS_INVALID;
 	}
 
-	isOk = isOk && ProcessHeaderClassFile(paramsPtr, baseClassOptionListPtr);
+	isOk = isOk && ProcessHeaderClassFile(*paramsPtr, *baseClassOptionListPtr);
 	if (!isOk){
 		AbortCurrentProcessing();
 
 		return iproc::IProcessor::TS_INVALID;
 	}
 
-	isOk = isOk && ProcessSourceClassFile(paramsPtr, baseClassOptionListPtr);
+	isOk = isOk && ProcessSourceClassFile(*paramsPtr, *baseClassOptionListPtr);
 	if (!isOk){
 		AbortCurrentProcessing();
 
@@ -99,19 +209,98 @@ int CBaseClassExtenderComp::DoProcessing(
 
 
 bool CBaseClassExtenderComp::ProcessHeaderClassFile(
-			const iprm::IParamsSet* paramsPtr,
-			const iprm::IOptionsList* baseClassList)
+			const iprm::IParamsSet& paramsPtr,
+			const iprm::IOptionsList& baseClassList)
 {
-	/// \todo finish it
-	// QTextStream
+	QTextStream ofStream(m_headerFilePtr.GetPtr());
+	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
+
+	QMap<QString/*directive*/, QString/*remark*/> necessaryDireciveIncludeMap;
+
+	// fill include directives /remarks
+	int baseListCount = baseClassList.GetOptionsCount();
+	for (int i = 0; i < baseListCount; ++i){
+		const QString includeDirective = QString("#include <%1>").arg(baseClassList.GetOptionName(i));
+		QString classLib = QString(baseClassList.GetOptionId(i).split(':').constFirst());
+		classLib = (QString("// %1 includes").arg(classLib));
+		necessaryDireciveIncludeMap.insert(includeDirective, classLib);
+	}
+
+	if (!necessaryDireciveIncludeMap.isEmpty()){
+		while (!ifStream.atEnd()){
+			const QString readLine = ifStream.readLine();
+
+			// check if any of included directives already added
+			if (s_includeDirectiveRegExp.match(readLine).hasMatch()){
+				QMutableMapIterator mapIterator(necessaryDireciveIncludeMap);
+				while (mapIterator.hasNext()){
+					auto indexIter = mapIterator.next();
+					QRegularExpressionMatch match = s_includeDirectiveRegExp.match(indexIter.key());
+					if (match.hasMatch()){
+						if (FindDirective(necessaryDireciveIncludeMap, readLine)){
+							mapIterator.remove();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// read file from start
+	ifStream.seek(0);
+	while (!ifStream.atEnd()){
+		const QString readLine = ifStream.readLine();
+		QRegularExpressionMatch includeRemarkMatch = s_includeRemarkRegExp.match(readLine);
+		bool addDirective = false;
+		// if include remark, check if we have additionad directives for this remark
+		if (includeRemarkMatch.hasMatch()){
+			addDirective = FindRemark(necessaryDireciveIncludeMap, readLine);
+		}
+
+		if (addDirective){
+			FeedStream(ofStream, 1, false);
+			const QStringList directivesForRemark = GetDirectivesByRemark(necessaryDireciveIncludeMap, QString(readLine));
+			for (const QString& directive: directivesForRemark){
+				ofStream << directive;
+				FeedStream(ofStream, 1, false);
+			}
+			RemoveDirectivesByRemark(necessaryDireciveIncludeMap, QString(readLine));
+		}
+		else if (!necessaryDireciveIncludeMap.isEmpty()){
+			// add remaining includes
+			static QRegularExpression namespaceRegExp(QStringLiteral("\\s*namespace"));
+			if (namespaceRegExp.match(readLine).hasMatch()){
+				// remove extra line
+				ofStream.seek(ofStream.pos() - 1);
+
+				QSet<QString> remarks = GetRemarks(necessaryDireciveIncludeMap);
+				for (const QString& remark: remarks){
+					ofStream << remark;
+					FeedStream(ofStream, 1, false);
+
+					const QStringList directivesForRemark = GetDirectivesByRemark(necessaryDireciveIncludeMap, remark);
+					for (const QString& directive: directivesForRemark){
+						ofStream << directive;
+						FeedStream(ofStream, 1, false);
+					}
+					FeedStream(ofStream, 1, false);
+				}
+
+				FeedStream(ofStream, 2, false);
+			}
+		}
+
+		ofStream << readLine;
+		FeedStream(ofStream);
+	}
 
 	return true;
 }
 
 
 bool CBaseClassExtenderComp::ProcessSourceClassFile(
-			const iprm::IParamsSet* /*paramsPtr*/,
-			const iprm::IOptionsList* /*baseClassList*/)
+			const iprm::IParamsSet& /*paramsPtr*/,
+			const iprm::IOptionsList& /*baseClassList*/)
 {
 	if (!m_sourceFilePtr.IsValid() || !m_originalSourceFilePtr.IsValid()){
 		return true;
