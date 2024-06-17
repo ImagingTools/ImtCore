@@ -9,6 +9,9 @@
 
 //Acf includes
 #include <istd/CSystem.h>
+#include <iprm/CParamsSet.h>
+#include <iprm/COptionsManager.h>
+#include <ifile/CFileNameParam.h>
 
 // imtsdl includes
 #include <imtsdl/CSdlType.h>
@@ -31,6 +34,13 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 	if (!m_argumentParserCompPtr->IsCppEnabled()){
 		return retVal;
+	}
+
+	if (!m_baseClassExtenderCompPtr.IsValid()){
+		SendCriticalMessage(0, "BaseClassExtender is not set");
+		I_CRITICAL();
+
+		return iproc::IProcessor::TS_INVALID;
 	}
 
 	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
@@ -78,6 +88,31 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 			I_CRITICAL();
 
 			return iproc::IProcessor::TS_INVALID;
+		}
+	}
+
+	QMap<QString, QString> baseClassList = m_argumentParserCompPtr->GetBaseClassList();
+	if (!baseClassList.isEmpty()){
+
+		for (const CSdlType& sdlType: sdlTypeList){
+			iprm::CParamsSet paramsSet;
+
+			ifile::CFileNameParam headerFileNameParam;
+			headerFileNameParam.SetPath(outputDirectoryPath + "/C" + sdlType.GetName() + ".h");
+			paramsSet.SetEditableParameter(QByteArrayLiteral("HeaderFile"), &headerFileNameParam);
+
+			iprm::COptionsManager baseClassDirectivesList;
+			for (auto iter = baseClassList.cbegin(); iter != baseClassList.cend(); ++iter){
+				baseClassDirectivesList.InsertOption(iter.value(), iter.key().toUtf8());
+			}
+
+			int extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
+			if (extendResult != TS_OK){
+				SendErrorMessage(0, "Unable to extend");
+				I_CRITICAL();
+
+				return extendResult;
+			}
 		}
 	}
 

@@ -2,12 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5223" Description="ACF"/>
-            <Version Id="1" Number="2207" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="BaseClassExtender" X="586" Y="278" Note=""/>
         <Element ComponentName="CSdlClassGqlModificatorComp" X="875" Y="600" Note=""/>
         <Element ComponentName="SdlClassCodeGenerator" X="575" Y="425" Note=""/>
         <Element ComponentName="SdlClassJsonModificator" X="275" Y="425" Note=""/>

@@ -35,6 +35,11 @@ I_EXPORT_COMPONENT(
 		"Schema Definition Language SDL Class Generator")
 
 I_EXPORT_COMPONENT(
+	BaseClassExtender,
+	"The C++ class extender adds inheritance to class files",
+	"Schema Definition Language Class Generator Base Class")
+
+I_EXPORT_COMPONENT(
 	QmlCodeGenerator,
 	"The QML generator of SDL types",
 	"Schema Definition Language SDL QML Class Generator")

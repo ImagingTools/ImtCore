@@ -9,6 +9,7 @@
 #include <imtsdl/CSdlProcessArgumentsParserComp.h>
 #include <imtsdl/CGqlSchemaParserComp.h>
 #include <imtsdl/CSdlClassCodeGeneratorComp.h>
+#include <imtsdl/CBaseClassExtenderComp.h>
 #include <imtsdl/CSdlClassTreeModelModificatorComp.h>
 #include <imtsdl/CSdlClassGqlModificatorComp.h>
 #include <imtsdl/CSdlClassJsonModificatorComp.h>
@@ -27,6 +28,7 @@ typedef imtsdl::CSdlGeneralManagerComp SdlGeneralManager;
 typedef imtsdl::CSdlProcessArgumentsParserComp SdlProcessArgumentsParser;
 typedef imtsdl::CGqlSchemaParserComp GqlSchemaParser;
 typedef imtsdl::CSdlClassCodeGeneratorComp SdlClassCodeGenerator;
+typedef imtsdl::CBaseClassExtenderComp BaseClassExtender;
 typedef imtsdl::CSdlClassTreeModelModificatorComp SdlClassTreeModelModificator;
 typedef imtsdl::CSdlClassGqlModificatorComp SdlClassGqlModificator;
 typedef imtsdl::CSdlClassJsonModificatorComp SdlClassJsonModificator;
