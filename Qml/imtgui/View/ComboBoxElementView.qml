@@ -18,19 +18,19 @@ ElementView {
     property ComboBox cbRef: null;
 
     onModelChanged: {
-        if (cbRef && model){
+        if (cbRef && cbRef.model != model){
             cbRef.model = model;
         }
     }
 
     onControlItemChanged: {
-        if (cbRef && model){
+        if (cbRef && cbRef.model != model){
             cbRef.model = model;
         }
     }
 
     onCurrentIndexChanged: {
-        if (cbRef){
+        if (cbRef && cbRef.currentIndex !== currentIndex){
             cbRef.currentIndex = currentIndex;
         }
     }

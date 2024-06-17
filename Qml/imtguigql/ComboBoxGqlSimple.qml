@@ -21,6 +21,8 @@ ComboBox {
         id: dataProvider;
 
         onCollectionModelChanged: {
+            console.log("onCollectionModelChanged")
+
             root.model = dataProvider.collectionModel;
         }
 
