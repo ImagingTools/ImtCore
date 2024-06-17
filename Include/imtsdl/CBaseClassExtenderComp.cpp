@@ -215,15 +215,17 @@ bool CBaseClassExtenderComp::ProcessHeaderClassFile(
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
 	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
 
-	QMap<QString/*directive*/, QString/*remark*/> necessaryDireciveIncludeMap;
 
 	// fill include directives /remarks
+	QMap<QString/*directive*/, QString/*remark*/> necessaryDireciveIncludeMap;
+	QStringList classList;
 	int baseListCount = baseClassList.GetOptionsCount();
 	for (int i = 0; i < baseListCount; ++i){
 		const QString includeDirective = QString("#include <%1>").arg(baseClassList.GetOptionName(i));
 		QString classLib = QString(baseClassList.GetOptionId(i).split(':').constFirst());
 		classLib = (QString("// %1 includes").arg(classLib));
 		necessaryDireciveIncludeMap.insert(includeDirective, classLib);
+		classList << QString(baseClassList.GetOptionId(i));
 	}
 
 	if (!necessaryDireciveIncludeMap.isEmpty()){
@@ -290,8 +292,21 @@ bool CBaseClassExtenderComp::ProcessHeaderClassFile(
 			}
 		}
 
-		ofStream << readLine;
-		FeedStream(ofStream);
+		bool writeLine = true;
+		if (!classList.isEmpty()){
+			// add inheritance if we found a class
+			static QRegularExpression classRegExp(QStringLiteral("\\s*class"));
+			if (classRegExp.match(readLine).hasMatch()){
+				writeLine = false;
+				ofStream << readLine;
+				ofStream.flush();
+				AddInheritance(ifStream, ofStream, classList);
+			}
+		}
+		if (writeLine){
+			ofStream << readLine;
+			FeedStream(ofStream);
+		}
 	}
 
 	return true;
@@ -408,6 +423,60 @@ void CBaseClassExtenderComp::AbortCurrentProcessing()
 
 	m_headerFilePtr->remove();
 	m_sourceFilePtr->remove();
+}
+
+
+void CBaseClassExtenderComp::AddInheritance(QTextStream& ifStream, QTextStream& ofStream, const QStringList& classNameList)
+{
+	QStringList buffer;
+
+	// find end of class declaration and potential inheritances
+	bool addColon = true;
+	while(!ifStream.atEnd()){
+		QString bufferLine = ifStream.readLine();
+
+		// we found existing inheritance(s) no colon needed
+		if (bufferLine.contains(':')){
+			addColon = false;
+		}
+
+		// we found end of class declaration. Add requered inheritance(s)
+		if (bufferLine.startsWith('{')){
+			WriteBufferToStream(ofStream, buffer);
+
+			if (addColon){
+				ofStream << ':';
+			}
+			FeedStream(ofStream, 1, false);
+			qsizetype classNameSize = classNameList.size();
+			for (int i = 0; i < classNameSize; ++i){
+				const QString& className = classNameList[i];
+				FeedStreamHorizontally(ofStream, 3);
+				ofStream << QStringLiteral("public ");
+				ofStream << className;
+
+				if (i < classNameSize - 1){
+					ofStream << ',';
+				}
+				FeedStream(ofStream, 1, false);
+			}
+
+			break;
+		}
+
+		buffer << bufferLine;
+	}
+
+	WriteBufferToStream(ofStream, buffer);
+}
+
+void CBaseClassExtenderComp::WriteBufferToStream(QTextStream& stream, QStringList& buffer)
+{
+	while (!buffer.isEmpty()){
+		const QString& bufferLine = buffer.takeFirst();
+		stream << bufferLine;
+		FeedStream(stream, 1, true);
+	}
 }
 
 

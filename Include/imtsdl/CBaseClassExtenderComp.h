@@ -70,6 +70,9 @@ protected:
 	virtual bool CloseFiles();
 	virtual void AbortCurrentProcessing();
 
+	virtual void AddInheritance(QTextStream& ifStream, QTextStream& ofStream, const QStringList& classNameList);
+	virtual void WriteBufferToStream(QTextStream& stream, QStringList& buffer);
+
 protected:
 	istd::TDelPtr<QFile> m_headerFilePtr;
 	istd::TDelPtr<QFile> m_sourceFilePtr;
