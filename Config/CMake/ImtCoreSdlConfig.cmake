@@ -36,7 +36,7 @@ function (ImtCoreConfigureSdlCppGqlSingle
 		"${SDL_FILE_NAME}"
 		"CPP"
 		"${PROJECT_NAME}::sdl"
-		"--CPP;--GQL;--use-all-modificators")
+		"--CPP;--GQL;--use-all-modificators;-Bistd::IPolymorphic=istd/IPolymorphic.h")
 endfunction()
 
 
