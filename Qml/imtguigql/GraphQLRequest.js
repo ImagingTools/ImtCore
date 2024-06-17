@@ -183,7 +183,7 @@ var GqlRequest = function(requestType, commandId){
                             value = value.replace(/\t/g,"\\\\\\\\t")
                             retVal += "\\\""
                         }
-                        retVal += value
+                        retVal += (typeof value.toGraphQL === "function") ? value.toGraphQL().replace(/\"/g, "\\\"") : value
                         if (isString) {
                             retVal += "\\\""
                         }

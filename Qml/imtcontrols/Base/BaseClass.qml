@@ -13,7 +13,7 @@ QtObject {
     }
 
     onDataChanged: {
-        console.log("BaseClass onDataChanged");
+        console.log("BaseClass onDataChanged", name, sender);
 
         if(owner && owner.enableNotifications && owner.dataChanged){
             owner.dataChanged(name, sender)
@@ -142,12 +142,13 @@ QtObject {
 
     function toJson(){
         let list = getProperties()
-
         let json = '{'
         for(let i = 0; i < list.length; i++){
             let key = list[i]
             if(typeof this[key] === 'object'){
-                json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
+                if (this[key]){
+                    json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
+                }
             } else {
                 let value = this[key]
                 if (value === undefined){
