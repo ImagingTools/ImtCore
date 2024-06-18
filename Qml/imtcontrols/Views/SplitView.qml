@@ -94,7 +94,7 @@ Item{
 
             fillSizeModelDefault(count);
             correctSize();
-            sizeModel.dataChanged.connect(onModelDataChanged)
+            sizeModel.modelChanged.connect(onModelDataChanged)
 
             prevWidth = width;
             prevHeight = height;

@@ -15,8 +15,8 @@ ElementView {
     property bool readOnly: false;
 
     onCheckedChanged: {
-        if (switchRef){
-            switchRef.checked = checked;
+        if (switchRef && switchRef.checked != checked){
+            switchRef.setChecked(checked);
         }
     }
 

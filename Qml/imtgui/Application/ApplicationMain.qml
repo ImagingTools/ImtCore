@@ -378,8 +378,6 @@ Item {
     }
 
     property Timer timer: Timer{
-        id: timer;
-
         interval: 3000;
 
         repeat: true;

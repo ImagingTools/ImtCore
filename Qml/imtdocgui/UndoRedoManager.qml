@@ -43,7 +43,6 @@ Item {
 
     function doUndo()
     {
-        console.log("doUndo");
         if (!modelIsRegistered()){
             return;
         }
@@ -55,28 +54,19 @@ Item {
         let prevStateModel = internal.m_undoStack.pop();
 
         let copiedModel = internal.m_observedModel.copyMe();
-        console.log("copiedModel", copiedModel);
-
         copiedModel.createFromJson(prevStateModel)
         internal.m_observedModel.copy(copiedModel);
-
-//        internal.m_observedModel.createFromJson(prevStateModel)
-
         internal.m_beginStateModel = prevStateModel;
 
         modelChanged();
         undo();
 
         internal.m_isBlocked = false;
-
-        console.log("end doUndo");
     }
 
 
     function doRedo(steps)
     {
-        console.log("doRedo");
-
         if (!modelIsRegistered()){
             return;
         }
@@ -86,7 +76,12 @@ Item {
         internal.m_undoStack.push(internal.m_observedModel.toJson());
 
         let nextStateModel = internal.m_redoStack.pop();
-        internal.m_observedModel.createFromJson(nextStateModel)
+
+        let copiedModel = internal.m_observedModel.copyMe();
+        copiedModel.createFromJson(nextStateModel)
+        internal.m_observedModel.copy(copiedModel);
+
+//        internal.m_observedModel.createFromJson(nextStateModel)
         internal.m_beginStateModel = internal.m_observedModel.toJson();
 
         modelChanged();
@@ -126,7 +121,6 @@ Item {
 
     function registerModel(model)
     {
-        console.log("UndoManager registerModel", model.toJson());
         if (modelIsRegistered()){
             console.warn("Model is already registered in the undo manager");
 
@@ -140,7 +134,7 @@ Item {
         internal.m_observedModel = model;
 
         if (autoTracking){
-            internal.m_observedModel.dataChanged.connect(onDataChanged);
+            internal.m_observedModel.modelChanged.connect(onModelChanged);
         }
 
         setStandardModel(model);
@@ -150,7 +144,7 @@ Item {
     function unregisterModel()
     {
         if (autoTracking){
-            internal.m_observedModel.dataChanged.disconnect(onDataChanged);
+            internal.m_observedModel.modelChanged.disconnect(onModelChanged);
         }
 
         internal.m_observedModel = null;
@@ -211,8 +205,6 @@ Item {
             return;
         }
 
-        console.log("UndoManager makeChanges", internal.m_beginStateModel);
-
         if (internal.m_beginStateModel != ""){
             internal.m_undoStack.push(internal.m_beginStateModel)
             internal.m_redoStack = []
@@ -240,8 +232,6 @@ Item {
 
     function setStandardModel(model)
     {
-        console.log("UndoManager setStandardModel", model);
-
         if (!modelIsRegistered()){
             console.error("Unable to set standard model. Model is not registered");
 
@@ -273,12 +263,10 @@ Item {
         property var m_redoStack: [];
     }
 
-    function onDataChanged(){
+    function onModelChanged(){
         if (internal.m_isBlocked){
             return;
         }
-
-        console.log("UndoManager onDataChanged", internal.m_observedModel.toJson());
 
         undoRedoManager.makeChanges();
 

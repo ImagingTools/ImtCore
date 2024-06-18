@@ -11,15 +11,64 @@ class TreeItemModel extends JSONListModel {
     }
 
     static defaultSignals = {
-        modelChanged: { params: [] },
+        modelChanged: { params: ['changeset'] },
     }
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
+        this.m_countChanges = 0
+        this.m_isTransaction = false
+    }
+
+    $onModelChanged(){
+        if(this.m_isTransaction){
+            this.m_countChanges++
+            return
+        }
+    
+        if(this.getPropertyValue('isUpdateEnabled')){
+            let signal = this.getSignal('modelChanged')
+            if(signal) signal()
+        }
+    
+        
+        if(this.getPropertyValue('parent') instanceof TreeItemModel){
+            if (this.getPropertyValue('parent').getPropertyValue('isUpdateEnabled')){
+                this.getPropertyValue('parent').$onModelChanged()
+            }
+        }
+    }
+
+    beginChanges(){
+        if (this.m_isTransaction){
+            return false
+        }
+
+        this.m_isTransaction = true
+
+        return true
+    }
+
+    endChanges(){
+        if (!this.m_isTransaction){
+            return false
+        }
+
+        this.m_isTransaction = false
+
+        if (this.m_countChanges > 0){
+            this.$onModelChanged()
+
+            this.m_countChanges = 0
+        }
+
+        return true
     }
 
     $emitDataChanged(topLeft, bottomRight, roles){
         if(this.getPropertyValue('isUpdateEnabled')) super.$emitDataChanged(topLeft, bottomRight, roles)
+
+        this.$onModelChanged()
     }
 
     append(dict){
@@ -129,6 +178,7 @@ class TreeItemModel extends JSONListModel {
         if (modelObject[key] === undefined && value === ""){
             modelObject[key] = value
 
+            this.$onModelChanged()
             return true
         }
 
@@ -147,6 +197,8 @@ class TreeItemModel extends JSONListModel {
             }
         }
 
+        this.$onModelChanged()
+
         return true
     }
 
@@ -161,10 +213,7 @@ class TreeItemModel extends JSONListModel {
             delete modelObject[key]
         }
 
-        if (this.getPropertyValue('isUpdateEnabled')){
-            let signal = this.getSignal('modelChanged')
-            if(signal) signal()
-        }
+        this.$onModelChanged()
     }
 
     isValidData(key, row){
@@ -174,10 +223,16 @@ class TreeItemModel extends JSONListModel {
     }
 
     setExternTreeModel(key, value, row){
+        this.beginChanges()
+
         this.setData(key, value, row)
+
+        this.endChanges()
     }
 
     copyItemDataFromModel(index, externTreeModel, externIndex){
+        this.beginChanges()
+
         this.removeItem(index)
         this.insertNewItem(index)
 
@@ -205,7 +260,15 @@ class TreeItemModel extends JSONListModel {
             if(signal) signal()
         }
 
+        this.endChanges()
+
         return retVal
+    }
+
+    clear(){
+        super.clear()
+
+        this.$onModelChanged()
     }
 
     copyFrom(externTreeModel){
@@ -325,6 +388,9 @@ class TreeItemModel extends JSONListModel {
         for(let i = 0; i < obj.count; i++){
             this.copyItemDataFromModel(this.insertNewItem(), obj, i)
         }
+
+        this.$onModelChanged()
+
         return true
     }
 
@@ -395,15 +461,24 @@ class TreeItemModel extends JSONListModel {
     insertNewItem(index){
         if(index !== undefined && index !== null && typeof index === 'number'){
             this.insert(index, {})
+
+            this.$onModelChanged()
+
             return index
         } else {
             this.append({})
+
+            this.$onModelChanged()
+
             return this.count - 1
         }
     }
 
     insertNewItemWithParameters(index, parameters){
         this.append(parameters)
+
+        this.$onModelChanged()
+
         return this.count - 1
     }
 
@@ -413,6 +488,8 @@ class TreeItemModel extends JSONListModel {
         if (this.getPropertyValue('isUpdateEnabled')){
             this.modelChanged()
         }
+
+        this.$onModelChanged()
     } 
 
     isTreeModel(key, index){
@@ -427,19 +504,28 @@ class TreeItemModel extends JSONListModel {
     }
 
     addTreeModel(key, row){
+        this.beginChanges()
+
         let retModel = new TreeItemModel(this)
         this.setUpdateEnabled(false)
         this.setData(key, retModel, row)
         this.setUpdateEnabled(true)
+
+        this.endChanges()
+
         return retModel
     }
 
     createFromJson(jsonString){
+        this.beginChanges()
+
         this.clear()
         this.json = jsonString
 
         this.updateJSONModel()
         this.updateTreeItemJSONModel()
+
+        this.endChanges()
     }
 
     toJson(){

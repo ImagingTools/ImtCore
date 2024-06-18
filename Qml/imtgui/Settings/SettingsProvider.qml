@@ -140,7 +140,7 @@ QtObject {
 
     onLocalModelChanged: {
         if (container.localModel){
-            container.localModel.dataChanged.connect(container.onLocalModelDataChanged);
+            container.localModel.modelChanged.connect(container.onLocalModelDataChanged);
         }
     }
 

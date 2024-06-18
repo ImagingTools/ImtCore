@@ -1,30 +1,84 @@
 import QtQuick 2.0
 
 QtObject {
-    signal dataChanged(string name, var sender)
+    id: root;
+
+    signal modelChanged(var changeSet)
     signal finished
     property bool enableNotifications: true
     property var owner
 
-    Component.onCompleted: {
-        console.log("BaseClass onCompleted", this);
+    property QtObject _internal: QtObject{
+        property bool isTransaction: false; // if true - transaction started else stopped
+        property int countChanges: 0; // the number of changes during the transaction
+        property var changeList: [];
+        signal internalModelChanged(string name, var sender); // internal modelChanged
 
+        onInternalModelChanged: {
+            if (isTransaction){
+                let changeObj = {};
+                changeObj["name"] = name;
+                changeObj["sender"] = sender;
+
+                changeList.push(changeObj)
+
+                countChanges++;
+
+                return;
+            }
+
+            root.modelChanged([{"name":name,"sender":sender}]);
+        }
+
+        function startTransaction(){
+            if (isTransaction){
+                console.error("Unable to start transaction. Error: transaction already started.");
+
+                return;
+            }
+
+            changeList = []
+            isTransaction = true;
+        }
+
+        function stopTransaction(){
+            if (!isTransaction){
+                console.error("Unable to stop transaction. Error: there is no active transaction.");
+
+                return;
+            }
+
+            if (countChanges > 0){
+                root.modelChanged(changeList);
+
+                countChanges = 0;
+            }
+
+            isTransaction = false;
+        }
+    }
+
+    Component.onCompleted: {
         connectProperties();
     }
 
-    onDataChanged: {
-        console.log("BaseClass onDataChanged", name, sender);
-
-        if(owner && owner.enableNotifications && owner.dataChanged){
-            owner.dataChanged(name, sender)
+    onModelChanged: {
+        if(owner && owner.enableNotifications && owner.modelChanged){
+            owner.modelChanged(name, sender)
         }
+    }
+
+    function beginChanges(){
+        this._internal.startTransaction();
+    }
+
+    function endChanges(){
+        this._internal.stopTransaction();
     }
 
     property bool propertiesIsConnected: false
 
     function connectProperties(){
-        console.log("BaseClass connectProperties");
-
         if (propertiesIsConnected){
             return;
         }
@@ -35,7 +89,7 @@ QtObject {
         for(let name of list){
             this[name+'Changed'].connect(function(){
                 if(self.enableNotifications)
-                    self.dataChanged(name, self)
+                    self._internal.internalModelChanged(name, self)
             }
            )
         }

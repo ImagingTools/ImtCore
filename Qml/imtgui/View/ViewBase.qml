@@ -21,11 +21,7 @@ Item {
 
     Component.onCompleted: {
         viewId = UuidGenerator.generateUUID();
-        Events.subscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged)
-    }
-
-    onModelChanged: {
-        console.log("ViewBase onModelChanged", model);
+        Events.subscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged);
     }
 
     Component.onDestruction: {
@@ -33,13 +29,13 @@ Item {
             Events.unSubscribeEvent(viewId + "CommandActivated", commandsDelegate.commandHandle);
         }
 
-        Events.unSubscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged)
+        Events.unSubscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged);
     }
 
     onCommandsControllerCompChanged: {
         if (commandsController){
             commandsController.destroy();
-            commandsController = null
+            commandsController = null;
         }
 
         if (commandsControllerComp){
@@ -149,11 +145,19 @@ Item {
 
         console.log("doUpdateModel", model);
 
+        if (model.beginChanges !== undefined){
+            model.beginChanges();
+        }
+
         internal.blockingUpdateGui = true;
 
         updateModel();
 
         internal.blockingUpdateGui = false;
+
+        if (model.endChanges !== undefined){
+            model.endChanges();
+        }
     }
 
     // Update GUI from representation model

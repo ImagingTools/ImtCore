@@ -12,7 +12,7 @@ QtObject {
 
     Component.onDestruction: {
         if (container.observedModel != null){
-            container.observedModel.dataChanged.disconnect(container.observedModelDataChanged);
+            container.observedModel.modelChanged.disconnect(container.observedModelDataChanged);
         }
     }
 
@@ -20,7 +20,7 @@ QtObject {
         console.log("PreferenceObserver registerModel", model);
 
         container.observedModel = model;
-        container.observedModel.dataChanged.connect(container.observedModelDataChanged);
+        container.observedModel.modelChanged.connect(container.observedModelDataChanged);
         container.beginModel.Copy(container.observedModel);
     }
 

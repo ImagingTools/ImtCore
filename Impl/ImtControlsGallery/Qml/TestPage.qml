@@ -18,15 +18,17 @@ Rectangle {
         id: testModel;
 
         Component.onCompleted: {
+            testModel.beginChanges();
             testModel.insertNewItem();
             testModel.setData("CustomerId", "Test");
             testModel.addTreeModel("ChildModel")
+            testModel.endChanges();
 
             undoRedoManager.registerModel(testModel);
         }
 
-        onDataChanged: {
-            console.log("testModel onDataChanged", testModel.toJson());
+        onModelChanged: {
+            console.log("testModel onModelChanged", testModel.toJson());
         }
     }
 

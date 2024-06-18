@@ -29,6 +29,8 @@ class CTreeItemModel: public QAbstractListModel
 public:
 	typedef QAbstractListModel BaseClass2;
 
+	Q_INVOKABLE inline bool beginChanges(){ return BeginChanges(); }
+	Q_INVOKABLE inline bool endChanges(){ return EndChanges(); }
 	Q_INVOKABLE inline bool copy(const CTreeItemModel* object) { return Copy(object); }
 	Q_INVOKABLE inline void setParent(QObject *parent){ SetParent(parent); }
 	Q_INVOKABLE inline imtbase::CTreeItemModel* copyMe(){ return CopyMe(); }
@@ -74,6 +76,9 @@ public:
 	void SetState(const QString &newState);
 
 	virtual bool SerializeModel(iser::IArchive& archive);
+
+	bool BeginChanges();
+	bool EndChanges();
 
 	void SetParent(QObject *parent);
 	bool Copy(const CTreeItemModel* object);
@@ -121,7 +126,7 @@ public:
 	virtual QHash<int, QByteArray> roleNames() const override;
 
 public Q_SLOTS:
-	void OnDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
+	void OnModelChanged();
 
 Q_SIGNALS:
 	void stateChanged(const QString& state);
@@ -168,7 +173,9 @@ private:
 
 	QString m_state;
 	bool m_isUpdateEnabled;
+
 	bool m_isTransaction;
+	int m_countChanges;
 
 protected:
 	virtual int GetKeyRole(const QByteArray& key) const;

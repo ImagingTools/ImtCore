@@ -49,7 +49,7 @@ Rectangle {
     }
 
     Component.onDestruction: {
-        container.commonModel.dataChanged.disconnect(container.modelChanged);
+        container.commonModel.modelChanged.disconnect(container.modelChanged);
         Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
     }
 
@@ -90,8 +90,8 @@ Rectangle {
                 container.settingsProvider.rewriteModel(container.serverModel, container.localModel);
             }
 
-            container.localModel.dataChanged.connect(container.modelChanged);
-            container.serverModel.dataChanged.connect(container.modelChanged);
+            container.localModel.modelChanged.connect(container.modelChanged);
+            container.serverModel.modelChanged.connect(container.modelChanged);
 
             updateGui();
 

@@ -308,8 +308,6 @@ Item {
 
         documentAdded(documentsModel.count - 1, documentId);
 
-        console.log("documentData.documentDataController", documentData.documentDataController);
-
         if (documentData.documentDataController){
             documentData.documentDataController.updateDocumentModel();
         }
@@ -389,6 +387,18 @@ Item {
         }
 
         return -1;
+    }
+
+
+    function getDocumentDataByView(view){
+        for (let i = 0; i < documentsModel.count; i++){
+            let documentData = documentsModel.get(i).DocumentData;
+            if (documentData && documentData.views.includes(view)){
+                return documentData;
+            }
+        }
+
+        return null;
     }
 
 
@@ -642,7 +652,7 @@ Item {
             property Connections modelConnections: Connections {
                 enabled: false;
 
-                function onDataChanged(){
+                function onModelChanged(){
                     if (singleDocumentData.blockingUpdateModel){
                         return;
                     }
@@ -651,10 +661,8 @@ Item {
                         return;
                     }
 
-                    console.log("Document manager onDataChanged");
-
                     singleDocumentData.isDirty = true;
-//                    singleDocumentData.undoManager.onDataChanged();
+//                    singleDocumentData.undoManager.onModelChanged();
                 }
             }
 

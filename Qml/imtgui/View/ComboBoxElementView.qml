@@ -18,7 +18,7 @@ ElementView {
     property ComboBox cbRef: null;
 
     onModelChanged: {
-        if (cbRef && cbRef.model != model){
+        if (cbRef && cbRef.model != comboBoxElementView.model){
             cbRef.model = model;
         }
     }

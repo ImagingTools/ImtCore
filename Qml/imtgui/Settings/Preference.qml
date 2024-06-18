@@ -34,17 +34,9 @@ Rectangle {
         root.modelIsDirty = true;
     }
 
-    Connections {
-        target: root.settingsModel;
-
-        function onDataChanged(){
-            console.log("settingsModel onDataChanged", root.settingsModel.toJson());
-        }
-    }
-
     onSettingsModelChanged: {
         if (root.settingsModel != null){
-            root.settingsModel.dataChanged.connect(root.modelChanged);
+            root.settingsModel.modelChanged.connect(root.modelChanged);
 
             root.updateGui();
         }

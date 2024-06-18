@@ -101,7 +101,9 @@ ControlBase {
         }
 
         if (comboBoxContainer.currentIndex > -1){
-            comboBoxContainer.currentText = comboBoxContainer.model.getData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
+            if (comboBoxContainer.model.containsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
+                comboBoxContainer.currentText = comboBoxContainer.model.getData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
+            }
         }
     }
 

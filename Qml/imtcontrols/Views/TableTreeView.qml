@@ -179,7 +179,7 @@ Table{
                                 tableTreeView.openButtonClicked(model.index);
                             }
                             else if(deleg.isOpen){
-                                let count_ = getVisibleCountInBranch(model.index);
+                                let count_ = tableTreeView.getVisibleCountInBranch(model.index);
                                 //let count_ = model.ChildrenCount__;
                                 if(count_ <= tableTreeView._maxCountToClose){
                                     tableTreeView.model.setData("IsOpen__", false, model.index);

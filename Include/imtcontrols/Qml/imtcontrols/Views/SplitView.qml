@@ -79,7 +79,7 @@ Row{
         fillSizeModelDefault(count);
         correctSize();
         splitView.compl = true;
-        sizeModel.dataChanged.connect(onModelDataChanged)
+        sizeModel.modelChanged.connect(onModelDataChanged)
     }
 
     function fillSizeModelDefault(count_){
