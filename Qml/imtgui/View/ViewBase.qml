@@ -6,6 +6,9 @@ import imtcontrols 1.0
 Item {
     id: viewBase;
 
+    property string updateCommandsGuiEventCommandId: "UpdateCommandsGui";
+    property string clearCommandsGuiEventCommandId: "ClearCommandsGui";
+
     property string viewId;
     property var model;
 
@@ -199,13 +202,13 @@ Item {
 
     function updateCommandsGui(){
         if (commandsController && viewBase.viewId !== ""){
-            Events.sendEvent("UpdateCommandsGui", {"Model": commandsController.commandsModel, "ViewId": viewBase.viewId});
+            Events.sendEvent(viewBase.updateCommandsGuiEventCommandId, {"Model": commandsController.commandsModel, "ViewId": viewBase.viewId});
         }
     }
 
     function clearCommandsGui(){
         if (commandsController){
-            Events.sendEvent("ClearCommandsGui", {"ViewId": viewBase.viewId});
+            Events.sendEvent(viewBase.clearCommandsGuiEventCommandId, {"ViewId": viewBase.viewId});
         }
     }
 
