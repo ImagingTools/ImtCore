@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Rectangle {
     id: root;
 
-    height: titleText.height;
+    height: titleText.height + topPadding + bottomPadding;
 
     color: "transparent";
 
@@ -14,6 +14,8 @@ Rectangle {
 
     property GroupElementView groupView: null;
     property alias title: titleText.text;
+    property int topPadding: 0
+    property int bottomPadding: 0
 
     onOpenedChanged: {
         if (!groupView){
@@ -55,6 +57,7 @@ Rectangle {
 
         height: 22;
         width: height;
+        visible: root.groupView != null
 
         iconSource: root.opened
                     ? "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal)
@@ -68,8 +71,9 @@ Rectangle {
     Text {
         id: titleText;
 
+        anchors.top: parent.top
+        anchors.topMargin: root.topPadding
         anchors.left: parent.left;
-        anchors.verticalCenter: parent.verticalCenter;
 
         color: Style.textColor;
         font.family: Style.fontFamilyBold;
