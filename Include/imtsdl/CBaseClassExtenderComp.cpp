@@ -447,12 +447,15 @@ void CBaseClassExtenderComp::AddInheritance(QTextStream& ifStream, QTextStream& 
 			if (addColon){
 				ofStream << ':';
 			}
+			else {
+				ofStream << ',';
+			}
 			FeedStream(ofStream, 1, false);
 			qsizetype classNameSize = classNameList.size();
 			for (int i = 0; i < classNameSize; ++i){
 				const QString& className = classNameList[i];
 				FeedStreamHorizontally(ofStream, 3);
-				ofStream << QStringLiteral("public ");
+				ofStream << QStringLiteral("virtual public ");
 				ofStream << className;
 
 				if (i < classNameSize - 1){
@@ -461,10 +464,9 @@ void CBaseClassExtenderComp::AddInheritance(QTextStream& ifStream, QTextStream& 
 				FeedStream(ofStream, 1, false);
 			}
 
+			buffer << bufferLine;
 			break;
 		}
-
-		buffer << bufferLine;
 	}
 
 	WriteBufferToStream(ofStream, buffer);
