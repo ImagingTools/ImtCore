@@ -43,6 +43,7 @@ Item {
 
     function doUndo()
     {
+        console.log("doUndo")
         if (!modelIsRegistered()){
             return;
         }
@@ -55,7 +56,11 @@ Item {
 
         let copiedModel = internal.m_observedModel.copyMe();
         copiedModel.createFromJson(prevStateModel)
+
+        console.log("copy1")
         internal.m_observedModel.copy(copiedModel);
+        console.log("copy2")
+
         internal.m_beginStateModel = prevStateModel;
 
         modelChanged();
@@ -199,6 +204,8 @@ Item {
 
     function makeChanges()
     {
+        console.log("UndoRedoManager.qml makeChanges");
+
         if (!modelIsRegistered()){
             console.error("Unable to make changes. Model is not registered");
 
@@ -267,6 +274,7 @@ Item {
         if (internal.m_isBlocked){
             return;
         }
+        console.log("UndoRedoManager.qml onModelChanged");
 
         undoRedoManager.makeChanges();
 
