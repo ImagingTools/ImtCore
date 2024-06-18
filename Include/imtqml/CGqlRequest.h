@@ -28,8 +28,9 @@ public:
 	explicit CGqlRequest(QObject* parent = nullptr);
 	~CGqlRequest();
 
-public Q_SLOTS:
 	bool SetGqlQuery(QString query);
+
+public Q_SLOTS:
 	void replyFinished();
 	void errorOccurred(QNetworkReply::NetworkError code);
 
