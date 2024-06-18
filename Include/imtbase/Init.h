@@ -13,6 +13,7 @@
 #include <imtstyle/CImtStyle.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtqml/CGqlModel.h>
+#include <imtqml/CGqlRequest.h>
 #include <imtqml/CRemoteFileController.h>
 
 
@@ -53,6 +54,7 @@ public:
 
 		qmlRegisterType<imtbase::CTreeItemModel>("Acf", 1, 0, "TreeItemModel");
 		qmlRegisterType<imtqml::CGqlModel>("Acf", 1, 0, "GqlModel");
+		qmlRegisterType<imtqml::CGqlRequest>("Acf", 1, 0, "GqlRequest");
 		qmlRegisterType<imtqml::CRemoteFileController>("Acf", 1, 0, "RemoteFileController");
 
 	#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
