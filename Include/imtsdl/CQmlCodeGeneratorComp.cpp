@@ -242,6 +242,24 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 		}
 		// use 'm_' prefix to avoid ambiguity
 		ifStream << QStringLiteral(" m_") << GetDecapitalizedValue(sdlField.GetId());
+		bool isCustom = false;
+		QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
+		if (!isCustom) {
+			ifStream << ':' << ' ';
+			if (convertedType == QStringLiteral("int") ||
+				convertedType == QStringLiteral("real") ||
+				convertedType == QStringLiteral("double"))
+			{
+				ifStream << QStringLiteral("0");
+			}
+			else if (convertedType == QStringLiteral("bool")){
+				ifStream << QStringLiteral("false");
+			}
+			else if (convertedType == QStringLiteral("string"))
+			{
+				ifStream << QStringLiteral("''");
+			}
+		}
 	}
 	FeedStream(ifStream, 1, false);
 
