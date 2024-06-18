@@ -10,18 +10,22 @@ Item {
 
     property string commandId;
 
+    property string clearEventCommandId: "ClearCommandsGui";
+    property string setCommandsVisibleEventCommandId: "SetCommandsVisible";
+    property string updateCommandsGuiEventCommandId: "UpdateCommandsGui";
+
     Component.onCompleted: {
         Events.subscribeEvent("Logout", commandsDecoratorContainer.clearModel);
-        Events.subscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
-        Events.subscribeEvent("ClearCommandsGui", commandsDecoratorContainer.clearModel);
-        Events.subscribeEvent("GetActiveCommandsViewId", commandsDecoratorContainer.getCommandIdRequest);
+        Events.subscribeEvent(setCommandsVisibleEventCommandId, commandsDecoratorContainer.setVisible);
+        Events.subscribeEvent(clearEventCommandId, commandsDecoratorContainer.clearModel);
+        Events.subscribeEvent(updateCommandsGuiEventCommandId, commandsDecoratorContainer.setCommandsModel);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("Logout", commandsDecoratorContainer.clearModel);
-        Events.unSubscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
-        Events.unSubscribeEvent("ClearCommandsGui", commandsDecoratorContainer.clearModel);
-        Events.unSubscribeEvent("GetActiveCommandsViewId", commandsDecoratorContainer.getCommandIdRequest);
+        Events.unSubscribeEvent(setCommandsVisibleEventCommandId, commandsDecoratorContainer.setVisible);
+        Events.unSubscribeEvent(clearEventCommandId, commandsDecoratorContainer.clearModel);
+        Events.unSubscribeEvent(updateCommandsGuiEventCommandId, commandsDecoratorContainer.setCommandsModel);
     }
 
     property int loadImages: 0
