@@ -53,7 +53,7 @@ Rectangle {
 
         anchors.verticalCenter: parent.verticalCenter;
         anchors.right: parent.right;
-        anchors.rightMargin: 10;
+        anchors.rightMargin: Style.size_mainMargin;
 
         height: 22;
         width: height;

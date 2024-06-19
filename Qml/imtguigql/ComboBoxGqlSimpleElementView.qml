@@ -36,6 +36,7 @@ ComboBoxElementView {
                 root.setupComboBox(cb);
             }
 
+            onModelChanged: root.model = model;
 
             function getAdditionalInputParams(){
                 return root.getAdditionalInputParams();

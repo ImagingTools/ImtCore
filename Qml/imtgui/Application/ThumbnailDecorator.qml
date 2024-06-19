@@ -238,6 +238,14 @@ Rectangle {
         }
     }
 
+    Loader {
+        id: loadingPageLoader;
+
+        z: 9999;
+
+        anchors.fill: parent;
+    }
+
     property Component loadingPageComp: Component {
         Loading {
             id: loading;
@@ -247,14 +255,11 @@ Rectangle {
     }
 
     function startLoading(){
-        stackView.push(loadingPageComp);
+        loadingPageLoader.sourceComponent = loadingPageComp;
     }
 
     function stopLoading(){
-        let index = stackView.getPageIndex(loadingPageComp);
-        if (index >= 0){
-            stackView.removePageByIndex(index);
-        }
+        loadingPageLoader.sourceComponent = undefined;
     }
 
     Component {
