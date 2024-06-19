@@ -36,6 +36,9 @@ ControlBase {
     property bool canMove: false;
     property bool decoratorVisible: !decorator_ ? true: decorator_.visible;
 
+    property bool closeAfterPause: false;
+    property int displayDuration: 2000;
+
     property Component topPanelComp: Style.topPanelDialogDecorator;
     property Component topPanelDefault: Component{TopPanelDialog{}};
     property Component contentComp: null;
@@ -68,6 +71,9 @@ ControlBase {
     onRootChanged: {
         if (root && root.backgroundItem){
             root.backgroundItem.opacity = 0.4;
+            if(dialogContainer.closeAfterPause){
+                closeAnim.start();
+            }
         }
     }
 
@@ -138,6 +144,18 @@ ControlBase {
         enabled: true;
         onActivated: {
             dialogContainer.finished(Enums.cancel)
+        }
+    }
+
+
+    PauseAnimation {
+        id: closeAnim;
+
+        duration: dialogContainer.displayDuration;
+        onFinished: {
+            if(dialogContainer.root){
+                root.closeDialog();
+            }
         }
     }
 }
