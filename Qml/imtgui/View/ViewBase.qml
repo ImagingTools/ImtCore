@@ -33,6 +33,8 @@ Item {
         }
 
         Events.unSubscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged);
+
+        internal.isDestroyed = true;
     }
 
     onCommandsControllerCompChanged: {
@@ -70,6 +72,7 @@ Item {
     }
 
     onVisibleChanged: {
+//        console.log("ViewBase onVisibleChanged", viewId);
         if (commandsController){
             if (visible){
                 if (internal.localizationChanged){
@@ -223,12 +226,18 @@ Item {
         property TreeItemModel cachedCommandsModel: TreeItemModel {};
         property bool blockingUpdateGui: false;
         property bool blockingUpdateModel: false;
+        property bool isDestroyed: false;
 
-
-        property bool startUpdateCommands: viewBase.visible && viewBase.commandsController != null && viewBase.commandsController.isReady;
+        property bool startUpdateCommands: viewBase.visible && viewBase.commandsController && viewBase.commandsController.isReady;
         onStartUpdateCommandsChanged: {
-            if (startUpdateCommands){
-                viewBase.updateCommandsGui();
+            if (internal.isDestroyed){
+                return;
+            }
+
+            if (viewBase.commandsController){
+                if (startUpdateCommands){
+                    viewBase.updateCommandsGui();
+                }
             }
         }
 

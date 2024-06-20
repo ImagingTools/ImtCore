@@ -39,15 +39,12 @@ CollectionViewCommandsDelegateBase {
     }
 
     function openDocumentEditor(objectId, typeId, viewTypeId){
-        console.log("openDocumentEditor", objectId, typeId, viewTypeId);
-
         if (root.documentManager){
             root.documentManager.openDocument(objectId, typeId, viewTypeId);
         }
     }
 
     function onEdit(){
-        console.log("onEdit")
         let elementsModel = root.collectionView.table.elements;
         if (!elementsModel){
             return;
@@ -65,7 +62,6 @@ CollectionViewCommandsDelegateBase {
     }
 
     function onNew(){
-        console.log("onNew", documentTypeId, viewTypeId)
         root.createNewObject(documentTypeId, viewTypeId);
     }
 }

@@ -21,6 +21,9 @@ ViewCommandsDelegateBase {
     property alias removeDialogComp: removeDialog;
     property alias setDescriptionDialogComp: setDescriptionDialog;
 
+    property bool canRename: false;
+    property bool canSetDescription: false;
+
     signal renamed(string id, string newName);
     signal descriptionSetted(string id, string description);
     signal removed(string id);
@@ -116,17 +119,21 @@ ViewCommandsDelegateBase {
             }
 
             if (canEdit){
-                let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
+                if (collectionViewCommandsDelegate.canRename){
+                    let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
 
-                collectionViewCommandsDelegate.contextMenuModel.setData("Id", "Rename", index);
-                collectionViewCommandsDelegate.contextMenuModel.setData("Name", qsTr("Rename"), index);
-                collectionViewCommandsDelegate.contextMenuModel.setData("Icon", "", index);
+                    collectionViewCommandsDelegate.contextMenuModel.setData("Id", "Rename", index);
+                    collectionViewCommandsDelegate.contextMenuModel.setData("Name", qsTr("Rename"), index);
+                    collectionViewCommandsDelegate.contextMenuModel.setData("Icon", "", index);
+                }
 
-                index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
+                if (collectionViewCommandsDelegate.canSetDescription){
+                    let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
 
-                collectionViewCommandsDelegate.contextMenuModel.setData("Id", "SetDescription", index);
-                collectionViewCommandsDelegate.contextMenuModel.setData("Name", qsTr("Set Description"), index);
-                collectionViewCommandsDelegate.contextMenuModel.setData("Icon", "", index);
+                    collectionViewCommandsDelegate.contextMenuModel.setData("Id", "SetDescription", index);
+                    collectionViewCommandsDelegate.contextMenuModel.setData("Name", qsTr("Set Description"), index);
+                    collectionViewCommandsDelegate.contextMenuModel.setData("Icon", "", index);
+                }
             }
 
             collectionViewCommandsDelegate.contextMenuModel.refresh();

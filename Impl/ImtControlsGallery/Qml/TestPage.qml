@@ -18,11 +18,15 @@ Rectangle {
         id: testModel;
 
         Component.onCompleted: {
-            testModel.beginChanges();
-            testModel.insertNewItem();
-            testModel.setData("CustomerId", "Test");
-            testModel.addTreeModel("ChildModel")
-            testModel.endChanges();
+            console.log("start createFromJson");
+            testModel.createFromJson("{\"CustomerId\":\"Test\", \"ChildModel\":{}}")
+            console.log("end createFromJson");
+
+//            testModel.beginChanges();
+//            testModel.insertNewItem();
+//            testModel.setData("CustomerId", "Test");
+//            testModel.addTreeModel("ChildModel")
+//            testModel.endChanges();
 
             undoRedoManager.registerModel(testModel);
         }

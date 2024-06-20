@@ -174,7 +174,7 @@ private:
 	QString m_state;
 	bool m_isUpdateEnabled;
 
-	bool m_isTransaction;
+	int m_countTransaction;
 	int m_countChanges;
 
 protected:

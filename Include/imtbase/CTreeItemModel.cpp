@@ -18,7 +18,7 @@ CTreeItemModel::CTreeItemModel(QObject *parent)
 	m_isUpdateEnabled(true)
 {
 	m_countChanges = 0;
-	m_isTransaction = false;
+	m_countTransaction = 0;
 }
 
 
@@ -436,11 +436,15 @@ bool CTreeItemModel::SetData(
 			const QVariant& value,
 			int index)
 {
+	BeginChanges();
+
 	if (m_items.isEmpty() && index == 0){
 		InsertNewItem();
 	}
 
 	if (index < 0 || index > m_items.count() - 1){
+		EndChanges();
+
 		return false;
 	}
 
@@ -452,6 +456,8 @@ bool CTreeItemModel::SetData(
 	Item* item = m_items[index];
 
 	if (item->Value(key) == value){
+		EndChanges();
+
 		return true;
 	}
 
@@ -466,6 +472,8 @@ bool CTreeItemModel::SetData(
 	}
 
 	OnModelChanged();
+
+	EndChanges();
 
 	return true;
 }
@@ -692,7 +700,7 @@ void CTreeItemModel::SetUpdateEnabled(bool updateEnabled)
 
 void  CTreeItemModel::OnModelChanged()
 {
-	if (m_isTransaction){
+	if (m_countTransaction > 0){
 		m_countChanges++;
 
 		return;
@@ -791,11 +799,7 @@ bool CTreeItemModel::SerializeModel(iser::IArchive& archive)
 
 bool CTreeItemModel::BeginChanges()
 {
-	if (m_isTransaction){
-		return false;
-	}
-
-	m_isTransaction = true;
+	m_countTransaction++;
 
 	return true;
 }
@@ -803,19 +807,17 @@ bool CTreeItemModel::BeginChanges()
 
 bool CTreeItemModel::EndChanges()
 {
-	if (!m_isTransaction){
-		return false;
-	}
+	m_countTransaction--;
 
-	m_isTransaction = false;
-
-	if (m_countChanges > 0){
+	if (m_countChanges > 0 && m_countTransaction == 0){
 		OnModelChanged();
 
 		m_countChanges = 0;
+
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 

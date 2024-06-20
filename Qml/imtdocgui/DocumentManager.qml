@@ -565,8 +565,6 @@ Item {
                 }
 
                 onModelChanged: {
-                    console.log("UndoManager onModelChanged");
-
                     let undoSteps = getAvailableUndoSteps();
                     let redoSteps = getAvailableRedoSteps();
 

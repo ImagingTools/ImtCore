@@ -55,8 +55,9 @@ Item {
 
         let copiedModel = internal.m_observedModel.copyMe();
         copiedModel.createFromJson(prevStateModel)
-
         internal.m_observedModel.copy(copiedModel);
+
+//        internal.m_observedModel.createFromJson(prevStateModel)
 
         internal.m_beginStateModel = prevStateModel;
 
@@ -84,6 +85,7 @@ Item {
         internal.m_observedModel.copy(copiedModel);
 
 //        internal.m_observedModel.createFromJson(nextStateModel)
+
         internal.m_beginStateModel = internal.m_observedModel.toJson();
 
         modelChanged();

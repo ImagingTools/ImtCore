@@ -11,6 +11,9 @@ DocumentManager {
 
     property bool startItemIsLoaded: false;
 
+    property string titleSeparation: "/";
+    property bool initialItemTitleVisible: true;
+
     onStartPageObjChanged: {
         let typeId = startPageObj["CommandId"];
 
@@ -181,25 +184,30 @@ DocumentManager {
         anchors.left: buttonPanel.right;
         anchors.leftMargin: Style.size_mainMargin;
         anchors.right: parent.right;
-
-        height: 40;
-
+        height: visible ? 40 : 0;
         orientation: ListView.Horizontal;
         boundsBehavior: Flickable.StopAtBounds;
-
         model: documentManager.documentsModel;
 
-        spacing: Style.size_mainMargin;
+        visible: count === 1 && !documentManager.initialItemTitleVisible ? false : true;
 
         delegate: Item {
-            width: content.width;
+            width: visible ? content.width + spacer.width: 0;
             height: headersListView.height;
+            visible: model.index === 0 ? documentManager.initialItemTitleVisible : true;
+
+            Item {
+                id: spacer;
+                anchors.left: parent.left;
+                width: visible ? Style.size_mainMargin : 0;
+
+                visible: model.index === 1 && !documentManager.initialItemTitleVisible ? false : true;
+            }
 
             Row {
                 id: content;
-
+                anchors.left: spacer.right;
                 height: parent.height;
-
                 spacing: Style.size_mainMargin;
 
                 Text {
@@ -212,9 +220,9 @@ DocumentManager {
 
                     color: Style.titleColor;
 
-                    text: "/"
+                    text: documentManager.titleSeparation;
 
-                    visible: model.index > 0;
+                    visible: model.index === 1 && !documentManager.initialItemTitleVisible ? false : model.index > 0;
                 }
 
                 Text {

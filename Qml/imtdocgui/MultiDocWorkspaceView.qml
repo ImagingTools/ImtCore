@@ -91,9 +91,9 @@ DocumentManager {
         id: documentRepeater;
 
         anchors.top: alertPanel.bottom;
-        anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
 
         model: workspaceView.documentsModel;
 
@@ -105,16 +105,17 @@ DocumentManager {
             Loader {
                 id: documentLoader;
 
-                anchors.top: parent.top;
-                anchors.left: parent.left;
-                anchors.right: parent.right;
-                anchors.bottom: parent.bottom;
-
-                visible: tabPanel.selectedIndex === model.index;
+                anchors.fill: parent;
 
                 sourceComponent: model.DocumentViewComp;
 
                 clip: true;
+
+                property int selectedIndex: tabPanel.selectedIndex
+
+                onSelectedIndexChanged: {
+                    documentLoader.visible = tabPanel.selectedIndex === model.index;
+                }
 
                 onLoaded: {
                     if (item.viewId !== undefined){
