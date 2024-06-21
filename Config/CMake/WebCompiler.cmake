@@ -133,14 +133,14 @@ function(jqml_compile_web2)
 	endif()
 
 	message("buildwebdir ${buildwebdir}")
-#	message("webdirs ${webdirs}")
 
-        set(NODE_EXE node)
-
-	if(${MSVC})
-	        set(NODE_EXE  ${IMTCOREDIR}/3rdParty/nodejs/node.exe)
+	if(NOT NODE_EXE)
+		if(${MSVC})
+			set(NODE_EXE  ${IMTCOREDIR}/3rdParty/nodejs/node.exe)
+		else()
+			set(NODE_EXE node)
+		endif()
 	endif()
-
 
 	list(LENGTH webdirs DIRS_COUNT)
 
