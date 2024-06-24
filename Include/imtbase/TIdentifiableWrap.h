@@ -141,8 +141,10 @@ bool TIdentifiableWrap<Base>::CopyFrom(const istd::IChangeable& object,  Compati
 template<class Base>
 bool TIdentifiableWrap<Base>::IsEqual(const istd::IChangeable& object) const
 {
+    bool retVal = Base::IsEqual(object);
 	const TIdentifiableWrap<Base>* sourcePtr = dynamic_cast<const TIdentifiableWrap<Base>*>(&object);
-	if (sourcePtr != nullptr){
+
+    if (retVal && sourcePtr != nullptr){
 		return (m_identifier == sourcePtr->m_identifier);
 	}
 
