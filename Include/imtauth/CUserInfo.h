@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/qdatetime.h>
+
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
 #include <imtauth/IUserInfo.h>
@@ -35,7 +38,8 @@ public:
 	virtual bool Serialize(iser::IArchive &archive) override;
 
 	// reimplemented (iser::IChangeable)
-	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+    virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+    virtual bool IsEqual(const IChangeable& object) const override;
 	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 

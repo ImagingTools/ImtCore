@@ -436,6 +436,24 @@ bool CUserBaseInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode
 }
 
 
+bool CUserBaseInfo::IsEqual(const IChangeable& object) const
+{
+    const CUserBaseInfo* sourcePtr = dynamic_cast<const CUserBaseInfo*>(&object);
+    if (sourcePtr != nullptr){
+        bool retVal = m_restrictions == sourcePtr->m_restrictions;
+        retVal = retVal && m_permissionsMap == sourcePtr->m_permissionsMap;
+        retVal = retVal && m_rolesMap == sourcePtr->m_rolesMap;
+        retVal = retVal && m_name == sourcePtr->m_name;
+        retVal = retVal && m_id == sourcePtr->m_id;
+        retVal = retVal && m_description == sourcePtr->m_description;
+
+        return retVal;
+    }
+
+    return false;
+}
+
+
 istd::IChangeable *CUserBaseInfo::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CUserBaseInfo> clonePtr(new CUserBaseInfo);
