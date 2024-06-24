@@ -203,6 +203,25 @@ bool CAddressElementInfo::CopyFrom(const IChangeable& object, CompatibilityMode 
 }
 
 
+bool CAddressElementInfo::IsEqual(const IChangeable& object) const
+{
+    const CAddressElementInfo* sourcePtr = dynamic_cast<const CAddressElementInfo*>(&object);
+    if (sourcePtr != nullptr){
+        bool retVal = m_id == sourcePtr->m_id;
+        retVal = retVal && m_parentIds == sourcePtr->m_parentIds;
+        retVal = retVal && m_adrTypeId == sourcePtr->m_adrTypeId;
+        retVal = retVal && m_name == sourcePtr->m_name;
+        retVal = retVal && m_description == sourcePtr->m_description;
+        retVal = retVal && m_address == sourcePtr->m_address;
+        retVal = retVal && m_hasChildren == sourcePtr->m_hasChildren;
+
+        return retVal;
+    }
+
+    return false;
+}
+
+
 istd::IChangeable* CAddressElementInfo::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CAddressElementInfo> clonePtr(new CAddressElementInfo);
