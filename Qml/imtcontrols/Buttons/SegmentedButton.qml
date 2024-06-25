@@ -23,6 +23,7 @@ Item {
     property int selectedIndex: -1;
     property alias rowAlias: row;
     property int rowCount: 0;
+    property bool readOnly: false;
 
     signal clicked(int index);
 
