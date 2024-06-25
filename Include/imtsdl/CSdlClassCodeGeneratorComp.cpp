@@ -681,6 +681,9 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 		stream << GetDecapitalizedValue(sdlField.GetId());
 		stream << QStringLiteral(" != m_");
 		stream << GetDecapitalizedValue(sdlField.GetId());
+		stream << QStringLiteral(" || ");
+		stream << FromVariantMapAccessString(sdlField);
+		stream << QStringLiteral(".isNull()");
 		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, indents + 2);
