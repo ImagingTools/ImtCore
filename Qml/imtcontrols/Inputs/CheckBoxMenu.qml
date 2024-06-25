@@ -19,7 +19,7 @@ FocusScope{
     property int radius: 2;
     property int currentIndex: -1;
     property string placeHolderText: "";
-    property string multipleChoiceText: "Мультивыбор";//"Multiple choice";
+    property string multipleChoiceText: "Multiple choice";
 
 
     property color borderColor: checkBoxMenu.focus ? Style.iconColorOnSelected : Style.borderColor;
