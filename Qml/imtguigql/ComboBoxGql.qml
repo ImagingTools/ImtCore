@@ -62,6 +62,7 @@ Item {
     property int selectedIndex: -1;
     property bool hoverBlocked: true;
     property bool doNotCorrectPosition : false;
+    property bool readOnly: false;
 
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainerGql.width;
@@ -298,14 +299,16 @@ Item {
             id: cbMouseArea;
 
             anchors.fill: parent;
-            hoverEnabled: true;
+            hoverEnabled: !comboBoxContainerGql.readOnly;
 
-            cursorShape: Qt.PointingHandCursor;
+            cursorShape: hoverEnabled ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
             onClicked: {
-                console.log("ComboBox clicked !");
-                comboBoxContainerGql.openPopupMenu();
-                comboBoxContainerGql.clicked();
+                if(!comboBoxContainerGql.readOnly){
+                    console.log("ComboBox clicked !");
+                    comboBoxContainerGql.openPopupMenu();
+                    comboBoxContainerGql.clicked();
+                }
 
             }
 
