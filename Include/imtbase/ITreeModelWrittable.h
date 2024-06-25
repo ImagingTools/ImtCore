@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtCore/QJsonObject.h>
+#include <QtCore/QJsonObject>
 
 // Acf includes
 #include <istd/IPolymorphic.h>
