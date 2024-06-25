@@ -26,7 +26,7 @@ CSqlDatabaseObjectCollectionIterator::CSqlDatabaseObjectCollectionIterator(
 
 // reimplemented (imtbase::IObjectCollectionIterator)
 
-bool CSqlDatabaseObjectCollectionIterator::Next()
+bool CSqlDatabaseObjectCollectionIterator::Next() const
 {
 	int recordsSize = m_records.size();
 	if (m_currentIndex < recordsSize - 1){
@@ -39,7 +39,7 @@ bool CSqlDatabaseObjectCollectionIterator::Next()
 }
 
 
-bool CSqlDatabaseObjectCollectionIterator::Previous()
+bool CSqlDatabaseObjectCollectionIterator::Previous() const
 {
 	if (m_currentIndex > 0){
 		m_currentIndex--;

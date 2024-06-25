@@ -24,8 +24,8 @@ public:
 	CSqlDatabaseObjectCollectionIterator(QSqlQuery& sqlQuery, ISqlDatabaseObjectDelegate* databaseDelegate);
 
 	// reimplemented (imtbase::IObjectCollectionIterator)
-	virtual bool Next() override;
-	virtual bool Previous() override;
+	virtual bool Next() const override;
+	virtual bool Previous() const override;
 	virtual QByteArray GetObjectId() const override;
 	virtual bool GetObjectData(imtbase::IObjectCollection::DataPtr& dataPtr) const override;
 	virtual idoc::MetaInfoPtr GetDataMetaInfo() const override;
@@ -34,7 +34,7 @@ private:
 	QList<QSqlRecord> m_records;
 	ISqlDatabaseObjectDelegate* m_databaseDelegate;
 
-	int m_currentIndex;
+	mutable int m_currentIndex;
 };
 
 

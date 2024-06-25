@@ -19,12 +19,12 @@ public:
 	/**
 		Move iterator to the next position, if available.
 	*/
-	virtual bool Next() = 0;
+	virtual bool Next() const = 0;
 
 	/**
 		Move iterator to the previous position, if available.
 	*/
-	virtual bool Previous() = 0;
+	virtual bool Previous() const = 0;
 
 	/**
 		Get object-ID at the current iterator position.
