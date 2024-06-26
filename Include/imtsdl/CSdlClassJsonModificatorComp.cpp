@@ -314,19 +314,17 @@ void CSdlClassJsonModificatorComp::AddCustomFieldWriteToJsonImplCode(QTextStream
 
 void CSdlClassJsonModificatorComp::AddArrayFieldWriteToJsonCode(QTextStream& stream, const CSdlField& field)
 {
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
-		stream << QStringLiteral("if (");
-		stream << FromVariantMapAccessString(field) << QStringLiteral(".isNull()){");
-		FeedStream(stream, 1, false);
-		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("return false;\n\t}");
-		FeedStream(stream, 1, false);
+		if (field.IsArray() && field.IsNonEmpty()){
+			AddArrayInternalChecksFail(stream, field, true);
+		}
+		else if (!field.IsArray() || field.IsNonEmpty()){
+			AddArrayInternalChecksFail(stream, field, false);
+		}
 		AddArrayFieldWriteToJsonImplCode(stream, field);
-		FeedStream(stream, 1, false);
 	}
 	else {
+		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("if (!");
 		stream << FromVariantMapAccessString(field);
 		stream << QStringLiteral(".isNull()){");
@@ -550,17 +548,17 @@ void CSdlClassJsonModificatorComp::AddArrayFieldReadFromJsonImplCode(QTextStream
 
 void CSdlClassJsonModificatorComp::AddCustomArrayFieldWriteToJsonCode(QTextStream& stream, const CSdlField& field)
 {
-	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
-		stream << QStringLiteral("if (");
-		stream << FromVariantMapAccessString(field) << QStringLiteral(".isNull()){");
-		FeedStream(stream, 1, false);
-		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("return false;\n\t}");
-		FeedStream(stream, 1, false);
+		if (field.IsArray() && field.IsNonEmpty()){
+			AddArrayInternalChecksFail(stream, field, true);
+		}
+		else if (!field.IsArray() || field.IsNonEmpty()){
+			AddArrayInternalChecksFail(stream, field, false);
+		}
 		AddCustomArrayFieldWriteToJsonImplCode(stream, field);
 	}
 	else {
+		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("if (!");
 		stream << FromVariantMapAccessString(field);
 		stream << QStringLiteral(".isNull()){");
