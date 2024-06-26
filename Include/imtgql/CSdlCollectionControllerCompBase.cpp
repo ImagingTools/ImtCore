@@ -13,7 +13,8 @@ namespace imtgql
 // protected methods
 
 imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
-	const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()) {
 		errorMessage = QString("Unable to list objects. Component reference 'ObjectCollection' was not set");
@@ -23,7 +24,8 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 		return nullptr;
 	}
 
-	int offset = 0, count = -1;
+	int offset = 0;
+	int count = -1;
 
 	const imtgql::CGqlObject* viewParamsGql = nullptr;
 	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
@@ -46,20 +48,40 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 		pagesCount = 1;
 	}
 
-
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
-	if (objectCollectionIterator == nullptr){
+	if (!objectCollectionIterator.IsValid()){
+		errorMessage = QString("Spot color collection iterator could not be created");
+
+		SendCriticalMessage(0, errorMessage, "CSpotColorCollectionControllerComp");
+
+		return nullptr;
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 
-	istd::TDelPtr<imtbase::ITreeModelWrittable> listPayloadWrittablePtr(CreateSdlItemList(gqlRequest,pagesCount, elementsCount, objectCollectionIterator.GetPtr(), errorMessage));
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	if (dataModelPtr != nullptr){
+		istd::TDelPtr<imtbase::ITreeModelWrittable> listPayloadWrittablePtr(
+					CreateSdlItemList(
+								gqlRequest,
+								pagesCount,
+								elementsCount,
+								objectCollectionIterator.GetPtr(),
+								errorMessage));
+		if (listPayloadWrittablePtr.IsValid()){
+			if (!listPayloadWrittablePtr->WriteToModel(*dataModelPtr)){
+				errorMessage = QString("Unable to setup GraphQL-item. Unable to write the list model");
 
-	if (dataModel != nullptr && !listPayloadWrittablePtr->WriteToModel(*dataModel)){
-		errorMessage = QString("Unable to setup gql item. Unable to write list model.");
-		SendCriticalMessage(0, errorMessage, "CSpotColorCollectionControllerComp");
+				SendCriticalMessage(0, errorMessage, "CSpotColorCollectionControllerComp");
 
+				return nullptr;
+			}
+		}
+		else{
+			return nullptr;
+		}
+	}
+	else {
 		return nullptr;
 	}
 
@@ -68,9 +90,9 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 
 
 imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
-	const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
-
 	if (!m_objectCollectionCompPtr.IsValid()) {
 		errorMessage = QString("Internal error");
 		SendErrorMessage(0, errorMessage, "CSubstrateCollectionControllerComp");
@@ -104,6 +126,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
 	}
 
 	errorMessage = QT_TR_NOOP(QString("Unable to get an substrate with ID: '%1'.").arg(qPrintable(objectId)));
+
 	SendErrorMessage(0, errorMessage, "CSubstrateCollectionControllerComp");
 
 	return nullptr;
