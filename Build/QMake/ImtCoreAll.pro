@@ -8,6 +8,12 @@ SUBDIRS += imtdesign
 imtdesign.file = ../../Include/imtdesign/QMake/imtdesign.pro
 imtdesign.depends = imtbase
 
+SUBDIRS += imtddl
+imtddl.file = ../../Include/imtddl/QMake/imtddl.pro
+
+SUBDIRS += imtsdl
+imtsdl.file = ../../Include/imtsdl/QMake/imtsdl.pro
+
 SUBDIRS += ImtDesignPck
 ImtDesignPck.file = ../../Impl/ImtDesignPck/QMake/ImtDesignPck.pro
 ImtDesignPck.depends = imtdesign
@@ -15,9 +21,6 @@ ImtDesignPck.depends = imtdesign
 SUBDIRS += DesignTokenCreator
 DesignTokenCreator.file = ../../Impl/DesignTokenCreatorExe/QMake/DesignTokenCreatorExe.pro
 DesignTokenCreator.depends = imtbase imtdesign ImtDesignPck
-
-SUBDIRS += imtddl
-imtddl.file = ../../Include/imtddl/QMake/imtddl.pro
 
 SUBDIRS += ImtDdlPck
 ImtDdlPck.file = ../../Impl/ImtDdlPck/QMake/ImtDdlPck.pro
@@ -324,4 +327,12 @@ ImtServicePck.depends = imtservice
 SUBDIRS += ImtControlsGallery
 ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
 ImtControlsGallery.depends = imtgui imtqml imtstyle imtstylecontrolsqml
+
+SUBDIRS += ImtSdlPck
+ImtSdlPck.file = ../../Impl/ImtSdlPck/QMake/ImtSdlPck.pro
+ImtSdlPck.depends = imtsdl ImtSdlPck
+
+SUBDIRS += SdlCodeGenerator
+SdlCodeGenerator.file = ../../Impl/SdlCodeGeneratorExe/QMake/SdlCodeGeneratorExe.pro
+SdlCodeGenerator.depends = imtsdl ImtSdlPck
 
