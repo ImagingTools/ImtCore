@@ -477,4 +477,23 @@ void CSdlTools::AddBeginSelfCheckNonRequiredValueCode(QTextStream& stream, const
 }
 
 
+void CSdlTools::AddArrayInternalChecksFail(QTextStream& stream, const CSdlField& field, bool checkEmpty, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (");
+	stream << FromVariantMapAccessString(field);
+	stream  << QStringLiteral(".isNull()");
+	if (checkEmpty){
+		stream << QStringLiteral(" || m_");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral(".isEmpty()");
+	}
+	stream << QStringLiteral("){");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("return false;\n\t}");
+	FeedStream(stream, 1, false);
+}
+
+
 } // namespace imtsdl
