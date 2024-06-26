@@ -63,8 +63,10 @@ Item {
         id: objectHelper
         QtObject {
             property int itemIndex: -1
-
             function onClicked(){
+                if(container.readOnly){
+                    return;
+                }
                 console.log("sender", itemIndex, row.children[itemIndex])
                 container.setChecked(itemIndex)
                 container.clicked(itemIndex)
