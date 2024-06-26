@@ -154,6 +154,7 @@ ControlBase {
         duration: dialogContainer.displayDuration;
         onFinished: {
             if(dialogContainer.root){
+                dialogContainer.canceled()
                 root.closeDialog();
             }
         }
