@@ -370,14 +370,13 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadToModelImplCode(QTextS
 
 void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldWriteToModelCode(QTextStream& stream, const CSdlField& field)
 {
-	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
-		stream << QStringLiteral("if (");
-		stream << FromVariantMapAccessString(field) << QStringLiteral(".isNull()){");
-		FeedStream(stream, 1, false);
-		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("return false;\n\t}");
-		FeedStream(stream, 1, false);
+		if (field.IsArray() && field.IsNonEmpty()){
+			AddArrayInternalChecksFail(stream, field, true);
+		}
+		else if (!field.IsArray() || field.IsNonEmpty()){
+			AddArrayInternalChecksFail(stream, field, false);
+		}
 		AddCustomArrayFieldWriteToModelImplCode(stream, field);
 	}
 	else {
@@ -451,9 +450,8 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldReadFromModelCode(QTe
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream);
 
-	if (field.IsRequired() || field.IsNonEmpty()){
-
-		// value checks
+	// value checks
+	if (field.IsRequired()){
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model == nullptr){");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, 2);
@@ -493,15 +491,17 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadToModelImplCode(
 	FeedStream(stream, 1, false);
 
 	// value checks
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (") << countVariableName << QStringLiteral(" <= 0){");
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, hIndents);
-	stream << '}';
-	FeedStream(stream, 1, false);
+	if (field.IsNonEmpty()){
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("if (") << countVariableName << QStringLiteral(" <= 0){");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("return false;");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, hIndents);
+		stream << '}';
+		FeedStream(stream, 1, false);
+	}
 
 	// declare temp list var
 	const QString listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("List");
