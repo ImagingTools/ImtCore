@@ -188,15 +188,17 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldReadFromRequestCode(QTextStr
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream);
 
-	if (field.IsRequired() || field.IsNonEmpty()){
-		AddCheckCustomListRequiredValueCode(stream, field);
+	if (field.IsRequired()){
+		if (field.IsNonEmpty()){
+			AddCheckCustomListRequiredValueCode(stream, field);
+		}
 
 		AddSetCustomListValueToObjectCode(stream, field);
 		FeedStream(stream, 1, false);
 	}
 	else {
+		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count > 0){");
 		FeedStream(stream, 1, false);
 
@@ -220,7 +222,12 @@ void CSdlClassGqlModificatorComp::AddFieldWriteToRequestCode(QTextStream& stream
 
 	const bool isFieldRequired = field.IsRequired();
 	if (isFieldRequired){
-		AddSelfCheckRequiredValueCode(stream, field);
+		if (field.IsArray() && field.IsNonEmpty()){
+			AddArrayInternalChecksFail(stream, field, true);
+		}
+		else if (!field.IsArray() || field.IsNonEmpty()){
+			AddArrayInternalChecksFail(stream, field, false);
+		}
 	}
 	else {
 		AddBeginSelfCheckNonRequiredValueCode(stream, field);
@@ -273,7 +280,7 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 	stream << QStringLiteral("imtgql::CGqlObject ") << dataObjectVariableName << ';';
 	FeedStream(stream, 1, false);
 
-	// add me to temt object and checks
+	// add me to temp object and checks
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("if (!m_");
 	stream << GetDecapitalizedValue(field.GetId());
