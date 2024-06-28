@@ -8,6 +8,9 @@
 #include <iproc/TSyncProcessorCompBase.h>
 #include <icomp/TMakeComponentWrap.h>
 
+// imtbase includes
+#include <imtbase/CTempDir.h>
+
 // imtsdl includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/CGqlSchemaParser.h>
@@ -44,6 +47,7 @@ public:
 private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	istd::TDelPtr<QFile> m_currentInputFilePtr;
+	istd::TDelPtr<imtbase::CTempDir> m_tempDirPtr;
 };
 
 
