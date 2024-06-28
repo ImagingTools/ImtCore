@@ -70,6 +70,7 @@ Rectangle {
         height: 40;
 
         Button {
+            width: 50;
             text: "+"
 
             onClicked: {
@@ -78,6 +79,7 @@ Rectangle {
         }
 
         Button {
+            width: 50;
             text: "-"
 
             onClicked: {
@@ -128,6 +130,7 @@ Rectangle {
 
         Button {
             id: undoButton;
+            width: 50;
 
             text: "Undo"
             enabled: false;
@@ -140,6 +143,7 @@ Rectangle {
         Button {
             id: redoButton;
             text: "Redo"
+            width: 50;
 
             enabled: false;
 

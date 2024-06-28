@@ -58,7 +58,7 @@ DecoratorBase {
             id: rect;
             width: item.width;
             height: parent.height;
-            color: "transparent";
+            color: filterEnabled ? Style.iconColorOnSelected : "transparent";
             border.width: 1;
             border.color: Style.borderColor;
             radius: 3;
@@ -90,6 +90,7 @@ DecoratorBase {
                         id: buttonText;
                         anchors.verticalCenter: parent.verticalCenter;
                         text: !rect.filterEnabled ? qsTr("Date") : "";
+                        color: rect.filterEnabled ? Style.baseColor : Style.textColor;
                     }
 
                     ToolButton {
@@ -105,6 +106,11 @@ DecoratorBase {
                             filterModel.clear();
                             filterPanelDecorator.baseElement.filterChanged("TimeFilter", filterModel);
                         }
+                        decorator: Component {
+                            ToolButtonDecorator {
+                                color: "transparent";
+                            }
+                        }
                     }
 
                     ToolButton {
@@ -116,6 +122,11 @@ DecoratorBase {
                         visible: !rect.filterEnabled;
                         onClicked: {
                             ma.clicked();
+                        }
+                        decorator: Component {
+                            ToolButtonDecorator {
+                                color: "transparent";
+                            }
                         }
                     }
                 }

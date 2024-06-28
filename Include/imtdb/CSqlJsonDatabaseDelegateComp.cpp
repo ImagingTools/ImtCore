@@ -27,10 +27,10 @@ namespace imtdb
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 QByteArray CSqlJsonDatabaseDelegateComp::GetSelectionQuery(
-			const QByteArray& objectId,
-			int offset,
-			int count,
-			const iprm::IParamsSet* paramsPtr) const
+		const QByteArray& objectId,
+		int offset,
+		int count,
+		const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
 		return QString("SELECT * FROM \"%1\" WHERE \"IsActive\" = true AND \"%2\" = '%3'")
@@ -107,12 +107,12 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::CreateNewObjectQuery(
-			const QByteArray& typeId,
-			const QByteArray& proposedObjectId,
-			const QString& objectName,
-			const QString& /*objectDescription*/,
-			const istd::IChangeable* valuePtr,
-			const imtbase::IOperationContext* operationContextPtr) const
+		const QByteArray& typeId,
+		const QByteArray& proposedObjectId,
+		const QString& objectName,
+		const QString& /*objectDescription*/,
+		const istd::IChangeable* valuePtr,
+		const imtbase::IOperationContext* operationContextPtr) const
 {
 	NewObjectQuery retVal;
 
@@ -154,9 +154,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 
 
 QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& objectId,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+		const imtbase::IObjectCollection& /*collection*/,
+		const QByteArray& objectId,
+		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(*m_objectIdColumnAttrPtr)).arg(qPrintable(objectId)).toUtf8();
 
@@ -165,11 +165,11 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectQuery(
 
 
 QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& objectId,
-			const istd::IChangeable& object,
-			const imtbase::IOperationContext* operationContextPtr,
-			bool /*useExternDelegate*/) const
+		const imtbase::IObjectCollection& /*collection*/,
+		const QByteArray& objectId,
+		const istd::IChangeable& object,
+		const imtbase::IOperationContext* operationContextPtr,
+		bool /*useExternDelegate*/) const
 {
 	QByteArray retVal;
 
@@ -201,10 +201,10 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 
 QByteArray CSqlJsonDatabaseDelegateComp::CreateDescriptionObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& objectId,
-			const QString& description,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+		const imtbase::IObjectCollection& /*collection*/,
+		const QByteArray& objectId,
+		const QString& description,
+		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"Document\" = jsonb_set(\"Document\", '{Description}', '\"%2\"', true), \"LastModified\" = '%3' WHERE \"%4\" ='%5' AND \"IsActive\" = true;")
 			.arg(qPrintable(*m_tableNameAttrPtr))
@@ -394,8 +394,8 @@ bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& fil
 
 
 bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
-			const iprm::IParamsSet& filterParams,
-			QString& filterQuery) const
+		const iprm::IParamsSet& filterParams,
+		QString& filterQuery) const
 {
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
 
@@ -427,8 +427,8 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 
 
 bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
-			const imtbase::ICollectionFilter& collectionFilter,
-			QString& textFilterQuery) const
+		const imtbase::ICollectionFilter& collectionFilter,
+		QString& textFilterQuery) const
 {
 	QByteArrayList filteringColumnIds = collectionFilter.GetFilteringInfoIds();
 	if (filteringColumnIds.isEmpty()){
@@ -458,19 +458,71 @@ bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFil
 	case imtbase::ITimeFilterParam::TU_CUSTOM:
 		break;
 	case imtbase::ITimeFilterParam::TU_HOUR:
-		timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 hour' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp)))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp) - interval '1 hour'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 hour' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
 		break;
 	case imtbase::ITimeFilterParam::TU_DAY:
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp)))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp) - interval '1 day'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 day' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
 		timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp)))").arg(addedStrQuery);
 		break;
 	case imtbase::ITimeFilterParam::TU_WEEK:
-		timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp)))").arg(addedStrQuery);
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp)))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp) - interval '1 week'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 week' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
 		break;
 	case imtbase::ITimeFilterParam::TU_MONTH:
-		timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp)))").arg(addedStrQuery);
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp)))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp) - interval '1 month'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 month' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
+
 		break;
 	case imtbase::ITimeFilterParam::TU_YEAR:
-		timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 year' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp)))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp) - interval '1 year'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 year' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
 		break;
 	}
 
@@ -478,9 +530,9 @@ bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFil
 		imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
 		if (!timeRange.IsNull()){
 			timeFilterQuery += QString(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
-						.arg(addedStrQuery)
-						.arg(timeRange.GetBeginTime().toString(Qt::ISODateWithMs))
-						.arg(timeRange.GetEndTime().toString(Qt::ISODateWithMs));
+					.arg(addedStrQuery)
+					.arg(timeRange.GetBeginTime().toString(Qt::ISODateWithMs))
+					.arg(timeRange.GetEndTime().toString(Qt::ISODateWithMs));
 		}
 	}
 
@@ -527,9 +579,9 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateOperationDescriptionQuery(const Q
 
 
 QByteArray CSqlJsonDatabaseDelegateComp::CreateObjectHistoryQuery(
-			int offset,
-			int count,
-			const iprm::IParamsSet* paramsPtr) const
+		int offset,
+		int count,
+		const iprm::IParamsSet* paramsPtr) const
 {
 	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(paramsPtr, "Id");
 	if (idParamPtr.IsValid()){
@@ -551,9 +603,9 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateObjectHistoryQuery(
 
 
 bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(
-			const QByteArray& /*typeId*/,
-			const istd::IChangeable& object,
-			QByteArray& data) const
+		const QByteArray& /*typeId*/,
+		const istd::IChangeable& object,
+		QByteArray& data) const
 {
 	iser::ISerializable* serializableObjectPtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&object));
 	if (serializableObjectPtr == nullptr){
@@ -572,9 +624,9 @@ bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(
 
 
 bool CSqlJsonDatabaseDelegateComp::ReadDataFromMemory(
-			const QByteArray& /*typeId*/,
-			const QByteArray& data,
-			istd::IChangeable& object) const
+		const QByteArray& /*typeId*/,
+		const QByteArray& data,
+		istd::IChangeable& object) const
 {
 	iser::ISerializable* serializableObjectPtr = dynamic_cast<iser::ISerializable*>(&object);
 	if (serializableObjectPtr == nullptr){

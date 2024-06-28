@@ -53,10 +53,12 @@ PopupView {
         listView.currentIndex = -1;
         if (root.model.containsKey("TimeUnit")){
             let unit = root.model.getData("TimeUnit")
+            let mode = root.model.getData("InterpretationMode")
 
             for (let i = 0; i < treeModel.getItemsCount(); i++){
                 let id = treeModel.getData("Id", i);
-                if (unit == id){
+                let interpretationMode = treeModel.getData("InterpretationMode", i);
+                if (unit == id && interpretationMode == mode){
                     listView.currentIndex = i;
                     break;
                 }
@@ -70,18 +72,37 @@ PopupView {
         let index = treeModel.insertNewItem();
         treeModel.setData("Id", "Hour", index);
         treeModel.setData("Name", qsTr("Last hour"), index);
+        treeModel.setData("InterpretationMode", "Last", index);
 
         index = treeModel.insertNewItem();
         treeModel.setData("Id", "Day", index);
         treeModel.setData("Name", qsTr("Today"), index);
+        treeModel.setData("InterpretationMode", "Current", index);
 
         index = treeModel.insertNewItem();
         treeModel.setData("Id", "Week", index);
         treeModel.setData("Name", qsTr("This week"), index);
+        treeModel.setData("InterpretationMode", "Current", index);
 
         index = treeModel.insertNewItem();
         treeModel.setData("Id", "Month", index);
         treeModel.setData("Name", qsTr("This month"), index);
+        treeModel.setData("InterpretationMode", "Current", index);
+
+        index = treeModel.insertNewItem();
+        treeModel.setData("Id", "Month", index);
+        treeModel.setData("Name", qsTr("Last month"), index);
+        treeModel.setData("InterpretationMode", "Last", index);
+
+        index = treeModel.insertNewItem();
+        treeModel.setData("Id", "Year", index);
+        treeModel.setData("Name", qsTr("This year"), index);
+        treeModel.setData("InterpretationMode", "Current", index);
+
+        index = treeModel.insertNewItem();
+        treeModel.setData("Id", "Year", index);
+        treeModel.setData("Name", qsTr("Last year"), index);
+        treeModel.setData("InterpretationMode", "Last", index);
 
         listView.model = treeModel;
     }
@@ -126,6 +147,7 @@ PopupView {
                             listView.currentIndex = model.index;
                             root.model.clear();
                             root.model.setData("TimeUnit", model.Id);
+                            root.model.setData("InterpretationMode", model.InterpretationMode);
                             root.accepted(model.Id, model.Name);
                         }
                     }
