@@ -4,20 +4,16 @@ import imtgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
 
-Rectangle {
+Item {
     id: container;
 
     anchors.fill: parent;
-
-    color: Style.backgroundColor;
 
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
     }
 
     Component.onDestruction: {
-        console.log("Administration onDestruction");
-
         Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
     }
 
@@ -36,6 +32,11 @@ Rectangle {
         if (groupsIndex >= 0){
             multiPageView.pagesModel.setProperty(groupsIndex, "Name", qsTr("Groups"))
         }
+    }
+
+    Rectangle {
+        anchors.fill: parent;
+        color: Style.backgroundColor2;
     }
 
     Component {

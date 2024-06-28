@@ -22,9 +22,9 @@ QString CLicenseDatabaseDelegateComp::GetBaseSelectionQuery() const
 				"DocumentId",
 				"Document",
 				"LastModified",
-				(SELECT "LastModified" FROM "Licenses" as t2 WHERE "RevisionNumber" = 1 AND t2."DocumentId" = t1."DocumentId" LIMIT 1) as "Added",
-				(SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = t1."Document"->>'ProductId' AND pr."IsActive" = true) as "ProductId"
-			FROM "Licenses" as t1 WHERE "IsActive" = true
+				(SELECT "LastModified" FROM "Licenses" as t2 WHERE "RevisionNumber" = 1 AND t2."DocumentId" = root."DocumentId" LIMIT 1) as "Added",
+				(SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = root."Document"->>'ProductId' AND pr."IsActive" = true) as "ProductId"
+			FROM "Licenses" as root WHERE "IsActive" = true
 		)";
 }
 
@@ -77,7 +77,7 @@ bool CLicenseDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::ICollect
 			}
 
 			if (filteringColumnIds[i] == "ProductId"){
-				textFilterQuery += QString("%1 ILIKE '%%2%'").arg(R"((SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = t1."Document"->>'ProductId' AND pr."IsActive" = true))").arg(textFilter);
+				textFilterQuery += QString("%1 ILIKE '%%2%'").arg(R"((SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = root."Document"->>'ProductId' AND pr."IsActive" = true))").arg(textFilter);
 			}
 		}
 	}

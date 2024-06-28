@@ -18,13 +18,72 @@ Item {
     property Component commandsDelegateComp: null;
     property ViewCommandsDelegateBase commandsDelegate: null;
 
+    property alias commandsView: headerViewLoader.item;
+    property alias commandsViewComp: headerViewLoader.sourceComponent;
+
     property bool readOnly: false;
 
     signal commandsModelChanged(var commandsModel)
 
+    Component {
+        id: commandsDecoratorComp;
+        CommandsDecorator {
+            id: commandsDecorator;
+            height: 30;
+        }
+    }
+
+    Item {
+        id: headerViewItem;
+        anchors.top: parent.top;
+        width: parent.width;
+        height: visible ? 30 + 2 * Style.size_mainMargin : 0;
+        objectName: "ViewBase";
+        visible: headerViewLoader.item && viewBase.commandsController != null;
+
+        Loader {
+            id: headerViewLoader;
+            anchors.verticalCenter: parent.verticalCenter;
+            width: parent.width;
+            sourceComponent: commandsDecoratorComp;
+        }
+    }
+
+    Rectangle {
+        id: separator;
+        anchors.top: headerViewItem.bottom;
+        width: parent.width;
+        height: visible ? 1 : 0;
+        color: Style.borderColor;
+        visible: headerViewLoader.item && viewBase.commandsController != null;
+        objectName: "ViewBase";
+    }
+
+    Rectangle {
+        id: viewContent;
+        anchors.top: separator.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
+        objectName: "ViewBase";
+        color: Style.backgroundColor2;
+    }
+
     Component.onCompleted: {
         viewId = UuidGenerator.generateUUID();
         Events.subscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged);
+
+        for (let i = 0; i < viewBase.children.length; i++){
+            if (viewBase.children[i].objectName !== "ViewBase"){
+                let element = viewBase.children[i];
+                if (viewBase.children.splice){
+                    viewBase.children.splice(i, 1);
+                }
+                viewContent.children.push(element);
+                element.parent = viewContent;
+                i--;
+            }
+        }
     }
 
     Component.onDestruction: {
@@ -72,15 +131,11 @@ Item {
     }
 
     onVisibleChanged: {
-//        console.log("ViewBase onVisibleChanged", viewId);
         if (commandsController){
             if (visible){
                 if (internal.localizationChanged){
                     internal.updateCommandsAtferLocalizationChanged();
                 }
-            }
-            else{
-                viewBase.clearCommandsGui();
             }
         }
     }
@@ -120,6 +175,7 @@ Item {
     }
 
     function onModelChanged(){
+        console.log("ViewBase onModelChanged", model.toJson());
         doUpdateGui();
     }
 
@@ -204,14 +260,17 @@ Item {
     }
 
     function updateCommandsGui(){
-        if (commandsController && viewBase.viewId !== ""){
-            Events.sendEvent(viewBase.updateCommandsGuiEventCommandId, {"Model": commandsController.commandsModel, "ViewId": viewBase.viewId});
+        console.log("updateCommandsGui");
+        if (commandsView && commandsController){
+            console.log("commandsController.commandsModel", commandsController.commandsModel.toJson());
+
+            commandsView.setCommandsModel({"Model": commandsController.commandsModel, "ViewId": viewBase.viewId});
         }
     }
 
     function clearCommandsGui(){
-        if (commandsController){
-            Events.sendEvent(viewBase.clearCommandsGuiEventCommandId, {"ViewId": viewBase.viewId});
+        if (commandsView && commandsController){
+            commandsView.clearModel({"ViewId": viewBase.viewId});
         }
     }
 
@@ -261,12 +320,10 @@ Item {
 
     MouseArea {
         id: blockArea;
-
-        z: parent.z + 1;
-
+        z: parent.z + 2;
         anchors.fill: parent;
-
         visible: viewBase.commandsController != null;
+        objectName: "Base";
     }
 }
 

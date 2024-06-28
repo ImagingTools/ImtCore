@@ -188,6 +188,19 @@ Item {
     }
 
     function getDate(){
+        let date = new Date(datePicker.selectedYear, datePicker.selectedIndexMonth, Number(datePicker.selectedDay));
+        let ok1 = date.getFullYear() == datePicker.selectedYear &&
+                  date.getMonth() == datePicker.selectedIndexMonth &&
+                  date.getDate() == Number(datePicker.selectedDay);
+
+        if (!ok1){
+            return null;
+        }
+
+        return new Date(datePicker.selectedYear, datePicker.selectedIndexMonth, Number(datePicker.selectedDay))
+    }
+
+    function getDateAsString(){
         let monthStr = String(datePicker.selectedIndexMonth + 1)
         if (monthStr.length == 1){
             monthStr = "0" + monthStr;

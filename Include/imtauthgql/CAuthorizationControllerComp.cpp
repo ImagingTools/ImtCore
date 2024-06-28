@@ -3,7 +3,7 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
-#include <iprm/CTextParam.h>
+#include <iprm/CIdParam.h>
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
@@ -47,8 +47,8 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 		iprm::CParamsSet filterParam;
 		iprm::CParamsSet paramsSet;
 
-		iprm::CTextParam userId;
-		userId.SetText(login);
+		iprm::CIdParam userId;
+		userId.SetId(login);
 
 		paramsSet.SetEditableParameter("Id", &userId);
 		filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
@@ -85,7 +85,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 						userInfoPtr->SetLastConnection(QDateTime::currentDateTimeUtc());
 
 						if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr)){
-							SendWarningMessage(0, QString("Unable to update an user with ID: '%1'").arg(userObjectId), "imtgql::CAuthorizationControllerComp");
+							SendWarningMessage(0, QString("Unable to set last connection info for user with login: '%1'").arg(login), "imtgql::CAuthorizationControllerComp");
 						}
 
 						return rootModelPtr.PopPtr();

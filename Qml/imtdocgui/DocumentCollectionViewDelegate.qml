@@ -7,8 +7,8 @@ CollectionViewCommandsDelegateBase {
 
     property DocumentManager documentManager: null;
 
-    property string documentTypeId;
-    property string viewTypeId;
+    property string documentTypeId; // default document type-ID
+    property string viewTypeId; // default document view type-ID
 
     onCollectionViewChanged: {
         if (collectionView && collectionView.dataController){

@@ -133,6 +133,7 @@ DocumentManager {
 
         anchors.fill: parent;
 
+
         color: Style.backgroundColor2;
     }
 

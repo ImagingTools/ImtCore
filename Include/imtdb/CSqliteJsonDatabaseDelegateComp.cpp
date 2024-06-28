@@ -3,7 +3,7 @@
 
 // ACF includes
 #include <iprm/TParamsPtr.h>
-#include <iprm/ITextParam.h>
+#include <iprm/IIdParam.h>
 #include <iprm/IEnableableParam.h>
 
 
@@ -114,7 +114,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParam
 		for (int i = 0; i < idsList.size(); i++){
 			QByteArray key = idsList[i];
 
-			const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter(key));
+			const iprm::IIdParam* textParamPtr = dynamic_cast<const iprm::IIdParam*>(filterParams.GetParameter(key));
 			if (textParamPtr == nullptr){
 				return false;
 			}
@@ -123,7 +123,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParam
 				filterQuery += " OR ";
 			}
 
-			QString value = textParamPtr->GetText();
+			QString value = textParamPtr->GetId();
 			filterQuery += QString("json_extract(\"Document\",'$.%1') = '%2'").arg(qPrintable(key)).arg(value);
 		}
 	}

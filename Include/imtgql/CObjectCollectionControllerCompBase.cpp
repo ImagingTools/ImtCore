@@ -16,6 +16,7 @@
 #include <imtbase/CCollectionFilter.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/COperationContext.h>
+#include <imtbase/CTimeFilterParam.h>
 #include <imtbase/CObjectCollection.h>
 #include <imtbase/COperationDescription.h>
 #include <imtgql/imtgql.h>
@@ -1135,6 +1136,20 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 			imtbase::CTreeItemModel objectFilterModel;
 			SetObjectFilter(gqlRequest, objectFilterModel, *objectFilterPtr);
 		}
+
+		if (generalModel.ContainsKey("TimeFilter")){
+			imtbase::CTreeItemModel* timeRangeFilterModelPtr = generalModel.GetTreeItemModel("TimeFilter");
+			if (timeRangeFilterModelPtr != nullptr){
+				imtbase::CTimeFilterParam* timeFilterParamPtr = new imtbase::CTimeFilterParam();
+
+				if (m_timeFilterParamRepresentationController.GetDataModelFromRepresentation(*timeRangeFilterModelPtr, *timeFilterParamPtr)){
+					filterParams.SetEditableParameter("TimeFilter", timeFilterParamPtr, true);
+				}
+				else{
+					SendWarningMessage(0, QString("Unable to create time range filter param from representation model"));
+				}
+			}
+		}
 	}
 
 	filterParams.SetEditableParameter("Filter", collectionFilterPtr, true);
@@ -1154,30 +1169,15 @@ void CObjectCollectionControllerCompBase::SetObjectFilter(
 			const imtbase::CTreeItemModel& objectFilterModel,
 			iprm::CParamsSet& filterParams) const
 {
-	QByteArray key;
-	if (objectFilterModel.ContainsKey("Key")){
-		key = objectFilterModel.GetData("Key").toByteArray();
-	}
+	QStringList keys = objectFilterModel.GetKeys();
 
-	iprm::CTextParam* textParamPtr = new iprm::CTextParam();
-	if (objectFilterModel.ContainsKey("Value")){
-		QString value = objectFilterModel.GetData("Value").toString();
-		textParamPtr->SetText(value);
-	}
+	for (const QString& key : keys){
+		QByteArray value = objectFilterModel.GetData(key.toUtf8()).toByteArray();
 
-	iprm::CEnableableParam* enableableParamPtr = new iprm::CEnableableParam();
-	if (objectFilterModel.ContainsKey("IsEqual")){
-		bool isEqual = objectFilterModel.GetData("IsEqual").toBool();
-		enableableParamPtr->SetEnabled(isEqual);
+		iprm::CIdParam* idParamPtr = new iprm::CIdParam();
+		idParamPtr->SetId(value);
 
-		iprm::CParamsSet* paramsSetPtr = new iprm::CParamsSet();
-		paramsSetPtr->SetEditableParameter("Value", textParamPtr, true);
-		paramsSetPtr->SetEditableParameter("IsEqual", enableableParamPtr, true);
-
-		filterParams.SetEditableParameter(key, paramsSetPtr, true);
-	}
-	else{
-		filterParams.SetEditableParameter(key, textParamPtr, true);
+		filterParams.SetEditableParameter(key.toUtf8(), idParamPtr, true);
 	}
 }
 

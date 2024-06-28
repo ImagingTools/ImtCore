@@ -411,6 +411,12 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 }
 
 
+bool CSqlDatabaseObjectDelegateCompBase::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const
+{
+	return true;
+}
+
+
 bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(
 			const imtbase::ICollectionFilter& collectionFilter,
 			QString& sortQuery) const

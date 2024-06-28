@@ -142,7 +142,7 @@ Rectangle {
 
         if(buttonPanel.openST){
             buttonPanel.openST = false;
-            ModalDialogManager.closeDialog();
+            ModalDialogManager.closeByComp(vertMenuComp);
         }
     }
 
@@ -289,7 +289,7 @@ Rectangle {
     function onBackgroundClicked(){
         console.log("ButtonPanel onBackgroundClicked");
 
-        ModalDialogManager.closeDialog();
+        ModalDialogManager.closeByComp(vertMenuComp);
         buttonPanel.openST = false;
     }
 
@@ -466,14 +466,14 @@ Rectangle {
         if(buttonPanel.canChangeOrder){
             if(buttonPanel.openST && !buttonPanel.verticalModel.getItemsCount()){
                 buttonPanel.openST = false;
-                ModalDialogManager.closeDialog();
+                ModalDialogManager.closeByComp(vertMenuComp);
             }
 
         }
         else{
             if(buttonPanel.openST && buttonPanel.horizCount == buttonPanel.buttonModel.getItemsCount()){
                 buttonPanel.openST = false;
-                ModalDialogManager.closeDialog();
+                ModalDialogManager.closeByComp(vertMenuComp);
             }
         }
 
@@ -658,6 +658,7 @@ Rectangle {
 
             boundsBehavior: Flickable.StopAtBounds;
             orientation: ListView.Horizontal;
+            interactive: false;
 
             spacing: buttonPanel.horizontalSpacing;
 
@@ -698,8 +699,10 @@ Rectangle {
         Rectangle{
             id: verticalListViewContainer;
 
-            width: verticalListView.width + 2*buttonPanel.mainMargin;
-            height: verticalListView.height + 2*buttonPanel.mainMargin;
+//            width: verticalListView.width + 2*buttonPanel.mainMargin;
+//            height: verticalListView.height + 2*buttonPanel.mainMargin;
+            width: verticalListView.width;
+            height: verticalListView.height;
             radius: 4;
             border.width: 1;
             border.color: buttonPanel.shadowColor;
@@ -721,13 +724,14 @@ Rectangle {
 
                 anchors.horizontalCenter: parent.horizontalCenter;
                 anchors.top: parent.top;
-                anchors.topMargin: buttonPanel.mainMargin;
+//                anchors.topMargin: buttonPanel.mainMargin;
 
                 width: buttonPanel.verticalMenuWidth;
                 height: contentHeight;
 
                 clip: true;
                 boundsBehavior: Flickable.StopAtBounds;
+                interactive: false;
 
                 spacing: buttonPanel.verticalSpacing;
 

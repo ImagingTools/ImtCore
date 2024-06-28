@@ -180,8 +180,8 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 		QString queryStr;
 		if (*m_isMultiTypeAttrPtr){
 			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', true, "
-                               " (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1,"
-                               " (SELECT \"TypeId\" FROM \"%1\" WHERE \"DocumentId\" = '%2' LIMIT 1) );" );
+							   " (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1,"
+							   " (SELECT \"TypeId\" FROM \"%1\" WHERE \"DocumentId\" = '%2' LIMIT 1) );" );
 		}
 		else{
 			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );");
@@ -231,15 +231,15 @@ QString CSqlJsonDatabaseDelegateComp::GetBaseSelectionQuery() const
 {
 	if (*m_isMultiTypeAttrPtr){
 		return QString("SELECT \"Id\", \"%1\", \"TypeId\", \"Document\", \"RevisionNumber\", \"LastModified\","
-					"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
-					" as t2 WHERE \"IsActive\" = true")
+					   "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND root.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
+					   " as root WHERE \"IsActive\" = true")
 				.arg(qPrintable(*m_objectIdColumnAttrPtr))
 				.arg(qPrintable(*m_tableNameAttrPtr));
 	}
 	else{
 		return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
-					"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
-					" as t2 WHERE \"IsActive\" = true")
+					   "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND root.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
+					   " as root WHERE \"IsActive\" = true")
 				.arg(qPrintable(*m_objectIdColumnAttrPtr))
 				.arg(qPrintable(*m_tableNameAttrPtr));
 	}
@@ -362,24 +362,32 @@ bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& fil
 		}
 	}
 
-    QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
-
-	if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()){
-		filterQuery = " AND ";
+	QString timeFilterQuery;
+	iprm::TParamsPtr<imtbase::ITimeFilterParam> timeFilterParamPtr(&filterParams, "TimeFilter");
+	if (timeFilterParamPtr.IsValid()){
+		retVal = CreateTimeFilterQuery(*timeFilterParamPtr, timeFilterQuery);
+		if (!retVal){
+			return false;
+		}
 	}
 
-	filterQuery += objectFilterQuery;
-	if (!objectFilterQuery.isEmpty() && !textFilterQuery.isEmpty()){
-		filterQuery += " AND ";
+	QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
+
+	if (!objectFilterQuery.isEmpty()){
+		filterQuery += " AND (" + objectFilterQuery + ")";
 	}
 
 	if (!textFilterQuery.isEmpty()){
-		filterQuery += "(" + textFilterQuery + ")";
+		filterQuery += " AND (" + textFilterQuery + ")";
 	}
 
-    if(!additionalFilters.isEmpty()){
-        filterQuery += " AND (" + additionalFilters + ")";
-    }
+	if (!timeFilterQuery.isEmpty()){
+		filterQuery += " AND (" + timeFilterQuery + ")";
+	}
+
+	if(!additionalFilters.isEmpty()){
+		filterQuery += " AND (" + additionalFilters + ")";
+	}
 
 	return true;
 }
@@ -400,7 +408,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 		for (int i = 0; i < idsList.size(); i++){
 			QByteArray key = idsList[i];
 
-			const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter(key));
+			const iprm::IIdParam* textParamPtr = dynamic_cast<const iprm::IIdParam*>(filterParams.GetParameter(key));
 			if (textParamPtr == nullptr){
 				return false;
 			}
@@ -409,7 +417,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 				filterQuery += " OR ";
 			}
 
-			QString value = textParamPtr->GetText();
+			QString value = textParamPtr->GetId();
 			filterQuery += QString("\"Document\"->>'%1' = '%2'").arg(qPrintable(key)).arg(value);
 		}
 	}
@@ -435,6 +443,44 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 			textFilterQuery += " OR ";
 
 			textFilterQuery += QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+		}
+	}
+
+	return true;
+}
+
+
+bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const
+{
+	QString addedStrQuery = QString(R"((SELECT "LastModified" FROM "%1" as temp WHERE "RevisionNumber" = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))").arg(*m_tableNameAttrPtr);
+
+	switch (timeFilter.GetTimeUnit()){
+	case imtbase::ITimeFilterParam::TU_CUSTOM:
+		break;
+	case imtbase::ITimeFilterParam::TU_HOUR:
+		timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 hour' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+		break;
+	case imtbase::ITimeFilterParam::TU_DAY:
+		timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp)))").arg(addedStrQuery);
+		break;
+	case imtbase::ITimeFilterParam::TU_WEEK:
+		timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp)))").arg(addedStrQuery);
+		break;
+	case imtbase::ITimeFilterParam::TU_MONTH:
+		timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp)))").arg(addedStrQuery);
+		break;
+	case imtbase::ITimeFilterParam::TU_YEAR:
+		timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 year' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+		break;
+	}
+
+	if (timeFilterQuery.isEmpty()){
+		imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
+		if (!timeRange.IsNull()){
+			timeFilterQuery += QString(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
+						.arg(addedStrQuery)
+						.arg(timeRange.GetBeginTime().toString(Qt::ISODateWithMs))
+						.arg(timeRange.GetEndTime().toString(Qt::ISODateWithMs));
 		}
 	}
 
@@ -493,11 +539,11 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateObjectHistoryQuery(
 		CreatePaginationQuery(offset, count, paginationQuery);
 
 		return QString(R"((SELECT * FROM "%1" WHERE "%2" = '%3' %4) ORDER BY "RevisionNumber" DESC;)")
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(*m_objectIdColumnAttrPtr))
-					.arg(qPrintable(objectId))
-					.arg(qPrintable(paginationQuery))
-					.toUtf8();
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(*m_objectIdColumnAttrPtr))
+				.arg(qPrintable(objectId))
+				.arg(qPrintable(paginationQuery))
+				.toUtf8();
 	}
 
 	return QByteArray();

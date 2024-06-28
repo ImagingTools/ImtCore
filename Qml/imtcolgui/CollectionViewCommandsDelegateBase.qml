@@ -220,6 +220,7 @@ ViewCommandsDelegateBase {
         InputDialog {
             width: 300;
             title: qsTr("Set description");
+            placeHolderText: qsTr("Enter the description")
             onFinished: {
                 if (buttonId == Enums.ok){
                     let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
@@ -241,6 +242,7 @@ ViewCommandsDelegateBase {
         InputDialog {
             width: 300;
             title: qsTr("Rename document");
+            placeHolderText: qsTr("Enter the name")
             onFinished: {
                 if (buttonId == Enums.ok){
                     let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();

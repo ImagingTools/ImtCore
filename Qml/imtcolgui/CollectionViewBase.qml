@@ -6,6 +6,8 @@ import imtgui 1.0
 ViewBase {
     id: collectionViewBaseContainer;
 
+    clip: true;
+
     property alias table: tableInternal;
     property bool hasPagination: true;
     property bool hasFilter: true;
@@ -26,7 +28,7 @@ ViewBase {
     signal elementsChanged();
     signal headersChanged();
 
-    signal filterChanged(string filterId, string filterValue);
+    signal filterChanged(string filterId, var filterValue);
 
     signal selectionChanged(var selection);
     signal checkedItemsChanged();
@@ -43,25 +45,15 @@ ViewBase {
         function onFilterChanged(){
             tableInternal.currentHeaderId = collectionViewBaseContainer.collectionFilter.getSortingInfoId();
             tableInternal.currentSortOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
-
-            if (tableInternal.headers.getItemsCount() > 0){
-//                collectionViewBaseContainer.doUpdateGui();
-            }
         }
     }
 
     function onModelChanged(){}
 
-    Rectangle{
-        anchors.fill: parent;
-
-        color: Style.backgroundColor2;
-    }
-
     FilterMenu {
         id: filterMenu_;
 
-        anchors.top: collectionViewBaseContainer.top;
+        anchors.top: parent.top;
         anchors.topMargin: Style.margin;
         anchors.left: parent.left;
         anchors.leftMargin: Style.margin;
@@ -73,17 +65,27 @@ ViewBase {
         }
 
         onFilterChanged: {
-            collectionViewBaseContainer.filterChanged(filterId, filterValue);
+            if (filterId == "TextFilter"){
+                collectionViewBaseContainer.collectionFilter.setTextFilter(filterValue);
+                collectionViewBaseContainer.doUpdateGui();
+            }
+            else if (filterId == "TimeFilter"){
+                collectionViewBaseContainer.collectionFilter.setTimeFilter(filterValue);
+                collectionViewBaseContainer.doUpdateGui();
+            }
+            else{
+                collectionViewBaseContainer.filterChanged(filterId, filterValue);
+            }
         }
     }
 
     Rectangle {
         id: backgroundTable;
 
-        anchors.bottom: paginationObj.top;
         anchors.top: filterMenu_.visible ? filterMenu_.bottom: parent.top;
-        anchors.topMargin: filterMenu_.visible ? Style.margin : 0;
         anchors.left: parent.left;
+        anchors.topMargin: filterMenu_.visible ? Style.size_mainMargin : 0;
+        anchors.bottom: paginationObj.top;
 
         width: tableInternal.minWidth * tableInternal.columnCount < parent.width ? tableInternal.minWidth * tableInternal.columnCount : parent.width;
 

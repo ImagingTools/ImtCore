@@ -240,9 +240,7 @@ Rectangle {
 
     Loader {
         id: loadingPageLoader;
-
         z: 9999;
-
         anchors.fill: parent;
     }
 

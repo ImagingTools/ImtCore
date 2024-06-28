@@ -199,19 +199,19 @@ bool CUserInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 
 bool CUserInfo::IsEqual(const IChangeable& object) const
 {
-    bool retVal = BaseClass::IsEqual(object);
+	bool retVal = BaseClass::IsEqual(object);
 
-    const CUserInfo* sourcePtr = dynamic_cast<const CUserInfo*>(&object);
-    if (retVal && sourcePtr != nullptr){
-        bool retVal = m_passwordHash == sourcePtr->m_passwordHash;
-        retVal = retVal && m_mail == sourcePtr->m_mail;
-        retVal = retVal && m_groupIds == sourcePtr->m_groupIds;
-        retVal = retVal && m_lastConnection == sourcePtr->m_lastConnection;
+	const CUserInfo* sourcePtr = dynamic_cast<const CUserInfo*>(&object);
+	if (retVal && sourcePtr != nullptr){
+		bool retVal = m_passwordHash == sourcePtr->m_passwordHash;
+		retVal = retVal && m_mail == sourcePtr->m_mail;
+		retVal = retVal && m_groupIds == sourcePtr->m_groupIds;
+		retVal = retVal && m_lastConnection == sourcePtr->m_lastConnection;
 
-        return retVal;
-    }
+		return retVal;
+	}
 
-    return false;
+	return false;
 }
 
 

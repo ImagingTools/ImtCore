@@ -172,8 +172,8 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 QString CUserGroupDatabaseDelegateComp::GetBaseSelectionQuery() const
 {
 	return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
-				   "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
-				   " as t2 WHERE \"IsActive\" = true")
+				   "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND root.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
+				   " as root WHERE \"IsActive\" = true")
 			.arg(qPrintable(*m_objectIdColumnAttrPtr))
 			.arg(qPrintable(*m_tableNameAttrPtr));
 }

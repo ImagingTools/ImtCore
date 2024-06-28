@@ -26,7 +26,8 @@ RemoteCollectionView {
 
     table.showHeaders: false;
 
-    table.backgroundElementsColor: Style.backgroundColor;
+    table.backgroundElementsColor: Style.backgroundColor2;
+    table.enableAlternating: false;
     filterMenuVisible: false;
 
     dataControllerComp: Component {CollectionRepresentation {
@@ -57,7 +58,6 @@ RemoteCollectionView {
 
             onRoleDoubleClicked: {
                 roleCollectionViewContainer.table.select(index);
-
                 roleCollectionViewContainer.doubleClicked(id, index)
             }
 

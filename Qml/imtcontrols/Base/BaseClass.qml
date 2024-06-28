@@ -64,7 +64,7 @@ QtObject {
 
     onModelChanged: {
         if(owner && owner.enableNotifications && owner.modelChanged){
-            owner.modelChanged(name, sender)
+            owner.modelChanged(changeSet)
         }
     }
 

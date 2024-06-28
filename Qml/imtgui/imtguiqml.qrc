@@ -33,6 +33,7 @@
         <file alias="imtgui/Panels/TopPanelDecorator.qml">Panels/TopPanelDecorator.qml</file>
         <file alias="imtgui/Panels/TopRightPanel.qml">Panels/TopRightPanel.qml</file>
         <file alias="imtgui/Panels/TopRightPanelDecorator.qml">Panels/TopRightPanelDecorator.qml</file>
+	<file alias="imtgui/Panels/CommandsPanel.qml">Panels/CommandsPanel.qml</file>
         <file alias="imtgui/Settings/DatabaseInput.qml">Settings/DatabaseInput.qml</file>
         <file alias="imtgui/Settings/PageAboutProvider.qml">Settings/PageAboutProvider.qml</file>
         <file alias="imtgui/Settings/Preference.qml">Settings/Preference.qml</file>
@@ -69,6 +70,8 @@
         <file alias="imtgui/View/MacAddressElementView.qml">View/MacAddressElementView.qml</file>
         <file alias="imtgui/View/IntegerInputElementView.qml">View/IntegerInputElementView.qml</file>
         <file alias="imtgui/View/DoubleInputElementView.qml">View/DoubleInputElementView.qml</file>
+		<file alias="imtgui/View/TimeFilterParamView.qml">View/TimeFilterParamView.qml</file>
+		<file alias="imtgui/View/PopupView.qml">View/PopupView.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

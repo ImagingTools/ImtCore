@@ -165,15 +165,20 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	QByteArray documentContent;
 	if (WriteDataToMemory("DocumentInfo", *userInfoPtr, documentContent)){
-		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
-		retVal += QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );")
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(objectId))
-				.arg(SqlEncode(documentContent))
-				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
-				.arg(checksum).toUtf8();
+		if (oldObjectPtr->GetLastConnection() != userInfoPtr->GetLastConnection()){
+			retVal += QString(R"(UPDATE "Users" SET "Document" = '%1' WHERE "DocumentId" = '%2' AND "IsActive" = true;)").arg(SqlEncode(documentContent)).arg(objectId).toUtf8();
+		}
+		else{
+			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+			retVal += QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(objectId))
+					.arg(SqlEncode(documentContent))
+					.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
+					.arg(checksum).toUtf8();
 
-		retVal += CreateOperationDescriptionQuery(objectId, operationContextPtr);
+			retVal += CreateOperationDescriptionQuery(objectId, operationContextPtr);
+		}
 	}
 
 	return retVal;

@@ -48,7 +48,6 @@ Item {
     }
 
     function getPageByIndex(index){
-
         if (index < 0 || bodyRepeater.count <= index){
             return null;
         }
@@ -68,7 +67,7 @@ Item {
         return -1;
     }
 
-    Rectangle {
+    Item {
         id: mainPanelBackground;
 
         anchors.top: parent.top;
@@ -78,8 +77,6 @@ Item {
         anchors.leftMargin: root.mainMargin;
 
         width: root.panelWidth;
-
-        color: Style.backgroundColor;
 
         Loader{
             id: mainPanelBackgroundDecoratorLoader;
@@ -146,7 +143,7 @@ Item {
         }
     }
 
-    Rectangle {
+    Item {
         id: bodyAdministration;
 
         anchors.left: mainPanelBackground.right;
@@ -156,8 +153,6 @@ Item {
         anchors.topMargin: root.mainMargin;
         anchors.leftMargin: root.mainMargin;
         anchors.rightMargin: root.mainMargin;
-
-        color: Style.backgroundColor;
 
         z: 5;
 

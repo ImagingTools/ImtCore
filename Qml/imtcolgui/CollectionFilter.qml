@@ -79,4 +79,38 @@ QtObject {
 
         root.filterChanged();
     }
+
+    function setTimeFilter(timeFilterModel){
+        filterModel.setExternTreeModel("TimeFilter", timeFilterModel.copyMe());
+
+        root.filterChanged();
+    }
+
+    function addAdditionalFilter(key, value){
+        let objectFilter = filterModel.getData("ObjectFilter");
+        if (!objectFilter){
+            objectFilter = filterModel.addTreeModel("ObjectFilter")
+        }
+
+        objectFilter.setData(key, value);
+
+        root.filterChanged();
+    }
+
+    function removeFilterById(key){
+        let objectFilter = filterModel.getData("ObjectFilter");
+        if (objectFilter){
+            if (objectFilter.containsKey(key)){
+                objectFilter.removeData(key);
+
+                root.filterChanged();
+            }
+        }
+    }
+
+    function clearFilter(){
+        filterModel.removeData("ObjectFilter")
+
+        root.filterChanged();
+    }
 }

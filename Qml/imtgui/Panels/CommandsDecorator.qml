@@ -6,8 +6,6 @@ import imtgui 1.0
 Item {
     id: commandsDecoratorContainer;
 
-    anchors.fill: parent;
-
     property string commandId;
 
     property string clearEventCommandId: "ClearCommandsGui";
@@ -104,25 +102,28 @@ Item {
     ButtonPanel{
         id: buttonPanel;
 
-        anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
+        anchors.verticalCenter: parent.verticalCenter;
+        anchors.left: parent.left;
+        anchors.leftMargin: Style.size_mainMargin;
 
         width:  parent.width - 2*anchors.leftMargin;
         height: parent.height
 
-        horizontalSpacing: 15;
-        verticalSpacing: Style.size_mainMargin;
+        horizontalSpacing: Style.size_mainMargin;
+        verticalSpacing: 2;
 
         openButtonImageSource: "../../../" + Style.getIconPath("Icons/Next", Icon.Mode.On, Icon.State.Active);
 
-        centered: true;
+        menuAlignRight: true;
 
         buttonDelegate: Component{
             Item{
                 width: isHorizontal ? topButtonDelegate.width : -buttonPanel.horizontalSpacing;
-
                 height: topButtonDelegate.height;
 
                 property bool isHorizontal: model.IsHorizontal == undefined ? true : model.IsHorizontal;
+
+                visible: model.Id !== "";
                 Button {
                     id: topButtonDelegate;
 
@@ -189,13 +190,14 @@ Item {
             Item{
                 id: verticalComp;
 
-                width: model.Name == "" ? splitter.width : textButtonDelegateContainer.width;
+                width: 150;
                 height: isHorizontal ? -buttonPanel.verticalSpacing : model.Name == "" ? splitter.height : textButtonDelegateContainer.height;
 
                 property bool isHorizontal: model.IsHorizontal == undefined ? true : model.IsHorizontal;
 
                 Button {
                     id: textButtonDelegateContainer;
+                    width: parent.width;
                     visible: model.Name !== "";
                     iconSource: model.IsEnabled !== "" ? (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) : "") :
                                                          (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled) : "");
@@ -206,8 +208,8 @@ Item {
 
                     decorator: Component {
                         ButtonDecorator {
-                            color: !baseElement ? "transparent" : baseElement.down || baseElement.checked ? Style.buttonPressedColor : baseElement.hovered ?  Style.buttonHoverColor : "transparent"
                             border.color: "transparent"
+                            color: "transparent";
                         }
                     }
 
@@ -227,11 +229,13 @@ Item {
                     anchors.top: parent.top;
 
                     width: verticalComp.isHorizontal ? 1 : buttonPanel.verticalMenuWidth;
-                    height: model.Name == "" && model.index == buttonPanel.horizCount ? -buttonPanel.verticalSpacing : 2;
+                    height: model.Name == "" && model.index == buttonPanel.horizCount ? -buttonPanel.verticalSpacing : 1;
                     color: Style.textColor;
                     visible: model.Name !== "" ? false : model.index == buttonPanel.horizCount ? false : model.index == (buttonPanel.buttonModel.getItemsCount() - 1) ? false : true ;
                 }
             }
         }
     }
+
+
 }

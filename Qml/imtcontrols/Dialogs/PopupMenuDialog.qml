@@ -64,13 +64,10 @@ ControlBase {
 
     //forShortcutEnter
     Component.onCompleted: {
-        console.log("Popup onCompleted", selectedIndex);
         Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
     }
 
     Component.onDestruction: {
-        console.log("Popup onDestruction");
-
         Events.unSubscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
         Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged);
     }
@@ -103,13 +100,10 @@ ControlBase {
     }
 
     function onAppSizeChanged(parameters){
-        console.log("Popup onAppSizeChanged");
         onBackgroundClicked();
     }
 
     function onBackgroundClicked(){
-        console.log("Popup onBackgroundClicked");
-
         popupMenuContainer.finished('', -1);
     }
 

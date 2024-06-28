@@ -20,7 +20,6 @@ TableRowDelegateBase {
     signal roleDoubleClicked(string id, int index);
 
     Component.onCompleted: {
-        console.log("Roles delegate onCompleted", model.Roles);
         if (model.Roles){
             rolesRepeater.model = model.Roles;
         }

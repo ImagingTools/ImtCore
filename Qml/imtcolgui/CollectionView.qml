@@ -10,6 +10,9 @@ Item {
 
     property alias viewId: container.viewId;
 
+    property alias commandsViewComp: container.commandsViewComp;
+    property alias commandsView: container.commandsView;
+
     property alias updateCommandsGuiEventCommandId: container.updateCommandsGuiEventCommandId;
     property alias clearCommandsGuiEventCommandId: container.clearCommandsGuiEventCommandId;
 

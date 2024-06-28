@@ -12,6 +12,7 @@
 #include <imtgql/IOperationContextController.h>
 #include <imtgql/CPermissibleGqlRequestHandlerComp.h>
 #include <imtgql/IGqlRequestExtractor.h>
+#include <imtbase/CTimeFilterParamRepresentationController.h>
 
 
 #undef GetObject
@@ -152,6 +153,8 @@ protected:
 	I_REF(imtgql::IGqlRequestHandler, m_objectViewProviderCompPtr);
 	I_REF(imtgql::IOperationContextController, m_operationContextControllerCompPtr);
 	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
+
+	imtbase::CTimeFilterParamRepresentationController m_timeFilterParamRepresentationController;
 };
 
 

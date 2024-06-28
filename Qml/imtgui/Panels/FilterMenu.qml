@@ -9,7 +9,7 @@ ControlBase {
 
     heightFromDecorator: true;
 
-    signal filterChanged(string filterId, string filterValue);
+    signal filterChanged(string filterId, var filterValue);
     signal close();
     signal clear();
 }
