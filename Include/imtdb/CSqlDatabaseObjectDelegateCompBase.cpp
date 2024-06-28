@@ -7,7 +7,7 @@
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <iprm/TParamsPtr.h>
-#include <iprm/ITextParam.h>
+#include <iprm/IIdParam.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 
@@ -372,12 +372,12 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 #endif
 			QByteArray key = idsList[0];
 
-			iprm::TParamsPtr<iprm::ITextParam> textParamPtr(objectFilterParamPtr.GetPtr(), key);
+            iprm::TParamsPtr<iprm::IIdParam> textParamPtr(objectFilterParamPtr.GetPtr(), key);
 			if (!textParamPtr.IsValid()){
 				return false;
 			}
 
-			QString value = textParamPtr->GetText();
+            QString value = textParamPtr->GetId();
 
 			filterQuery = QString("\"%1\" = '%2'").arg(qPrintable(key)).arg(value);
 		}
