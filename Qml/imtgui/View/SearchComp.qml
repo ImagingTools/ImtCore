@@ -213,7 +213,11 @@ Rectangle{
         }
         //console.log("filterText:: " ,filterText);
         searchContainer.isTextIncrease = searchContainer.previousText.length < filterText.length;
-        var comaDeleted = searchContainer.previousText[searchContainer.previousText.length -1] == "," && filterText[filterText.length -1] !== ",";
+        //var comaDeleted = searchContainer.previousText[searchContainer.previousText.length -1] == "," && filterText[filterText.length -1] !== ",";
+        let comaCountPrev = searchContainer.comaCount(searchContainer.previousText);
+        let comaCountNew = searchContainer.comaCount(filterText);
+        let comaDeletedDiff = comaCountPrev - comaCountNew ;
+        let comaDeleted = comaDeletedDiff > 0;
         searchContainer.previousText = filterText;
 
         console.log("isTextIncrease:: " , searchContainer.isTextIncrease)
@@ -231,7 +235,7 @@ Rectangle{
                     if(arrCount <= arrCount_prev){
                         var keepCount = arrCount;
                         if(comaDeleted){
-                            keepCount--;
+                            keepCount = keepCount - comaDeletedDiff;
                         }
                         if(keepCount < 0){
                             keepCount = 0;
@@ -483,6 +487,17 @@ Rectangle{
         }
         console.log("newArrayCount:: ", newArrayCount);
         return newArrayCount;
+    }
+
+    function comaCount(text){
+        let length_ = text.length;
+        let comaCount_ = 0;
+        let pos = -1;
+        let target = ",";
+        while ((pos = text.indexOf(target, pos + 1)) != -1) {
+          comaCount_++;
+        }
+       return comaCount_;
     }
 
 
