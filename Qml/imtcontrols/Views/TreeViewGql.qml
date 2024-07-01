@@ -158,7 +158,7 @@ Rectangle{
                                 }
                                 else if(deleg.isOpen){
                                     //console.log(model.ChildrenCount__, treeViewGql._maxCountToClose)
-                                    let count_ = getVisibleCountInBranch(model.index);
+                                    let count_ = treeViewGql.getVisibleCountInBranch(model.index);
                                     //let count_ = model.ChildrenCount__;
                                     if(count_ <= treeViewGql._maxCountToClose){
                                         treeViewGql.model.setData("IsOpen__", false, model.index);
