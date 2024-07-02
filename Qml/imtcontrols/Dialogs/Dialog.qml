@@ -93,9 +93,9 @@ ControlBase {
     }
 
     onDecoratorVisibleChanged: {
-        if(!decoratorVisible && root){
-            root.closeDialog();
-        }
+//        if(!decoratorVisible && root){
+//            root.closeDialog();
+//        }
     }
 
     onDecoratorChanged: {
