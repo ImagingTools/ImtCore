@@ -15,6 +15,7 @@ Rectangle {
     property int count: 0;
 
     property string firstElementImageSource;
+    property string displayRoleId: "Title";
     property bool isCloseEnable: true;
 
     property alias model: list.model;
@@ -71,7 +72,7 @@ Rectangle {
             firstElement: model.index === 0;
             lastElement: model.index === list.count - 1;
             firstElementImageSource: tabPanelContainer.firstElementImageSource;
-            text: model.Title ? model.Title : "";
+            text: model[tabPanelContainer.displayRoleId] ? model[tabPanelContainer.displayRoleId] : "";
             isCloseEnable: tabPanelContainer.isCloseEnable;
             listView: list;
 

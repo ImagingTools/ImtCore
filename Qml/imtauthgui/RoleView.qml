@@ -259,6 +259,7 @@ ViewBase {
                     // Get all children ID-s
                     let childrenIds = []
                     getAllChildrenRoleIds(documentId, container.copiedRolesModel, childrenIds);
+                    console.log("getAllChildrenRoleIds", childrenIds);
 
                     // Get all parent ID-s
                     let parentIds = []
@@ -274,8 +275,6 @@ ViewBase {
                     let removedIndexes = []
                     for (let i = 0; i < container.copiedRolesModel.getItemsCount(); i++){
                         let id = container.copiedRolesModel.getData("Id", i);
-                        console.log("id", id);
-
                         if (id === documentId || childrenIds.includes(id)){
                             removedIndexes.push(i);
                         }
@@ -286,6 +285,8 @@ ViewBase {
                         container.copiedRolesModel.removeItem(removedIndexes[i] - removedCount);
                         removedCount++;
                     }
+
+                    console.log("container.copiedRolesModel", container.copiedRolesModel.toJson());
 
                     parentRolesTable.table.elements = container.copiedRolesModel;
                 }

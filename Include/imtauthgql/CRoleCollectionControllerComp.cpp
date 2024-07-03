@@ -107,57 +107,88 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 }
 
 
-imtbase::CTreeItemModel* CRoleCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
+bool CRoleCollectionControllerComp::SetupGqlItem(
+		const imtgql::CGqlRequest& gqlRequest,
+		imtbase::CTreeItemModel& model,
+		int itemIndex,
+		const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+		QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
-		return nullptr;
+	if (objectCollectionIterator == nullptr){
+		errorMessage = QString("Unable to setup GQL item for role");
+		return false;
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	Q_ASSERT(dataModelPtr != nullptr);
+	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
 
 	QByteArray productId;
-	if (m_productIdAttrPtr.IsValid()){
-		productId = *m_productIdAttrPtr;
+	if (!paramsPtr.empty()){
+		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
 	}
 
-	const imtgql::CGqlObject* inputParams = gqlRequest.GetParam("input");
-	if (inputParams != nullptr){
-		if (productId.isEmpty()){
-			productId = inputParams->GetFieldArgumentValue("ProductId").toByteArray();
+	bool retVal = true;
+	QByteArray collectionId = objectCollectionIterator->GetObjectId();
+	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
+
+	if (!informationIds.isEmpty()){
+		const imtauth::IRole* roleInfoPtr = nullptr;
+		imtbase::IObjectCollection::DataPtr roleDataPtr;
+		if (objectCollectionIterator->GetObjectData(roleDataPtr)){
+			roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
 		}
-	}
 
-	imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->AddTreeModel("items");
+		idoc::MetaInfoPtr elementMetaInfo = objectCollectionIterator->GetDataMetaInfo();
+		for (QByteArray informationId : informationIds){
+			QVariant elementInformation;
 
-	itemsModelPtr->SetData("Id", productId);
-	itemsModelPtr->SetData("Name", productId);
-	imtbase::CTreeItemModel* rolesModelPtr = itemsModelPtr->AddTreeModel("Roles");
-
-	imtbase::ICollectionInfo::Ids rolesIds = m_objectCollectionCompPtr->GetElementIds();
-	for (const imtbase::ICollectionInfo::Id& roleId : rolesIds){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(roleId, dataPtr)){
-			const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
-			if (roleInfoPtr != nullptr){
-				QByteArray roleProductId = roleInfoPtr->GetProductId();
-				if (productId == roleProductId){
-					int roleIndex = rolesModelPtr->InsertNewItem();
-
-					rolesModelPtr->SetData("Id", roleId, roleIndex);
-					rolesModelPtr->SetData("RoleId", roleInfoPtr->GetRoleId(), roleIndex);
-					rolesModelPtr->SetData("ProductId", productId, roleIndex);
-					rolesModelPtr->SetData("Name", roleInfoPtr->GetRoleName(), roleIndex);
-					rolesModelPtr->SetData("Description", roleInfoPtr->GetRoleDescription(), roleIndex);
-					rolesModelPtr->SetData("ParentRoles", roleInfoPtr->GetIncludedRoles().join(';'), roleIndex);
-				}
+			if(informationId == "Id"){
+				elementInformation = QString(collectionId);
 			}
+			if(informationId == "Name"){
+				elementInformation = roleInfoPtr->GetRoleName();
+			}
+			else if(informationId == "RoleId"){
+				elementInformation = roleInfoPtr->GetRoleId();
+			}
+			else if(informationId == "ProductId"){
+				elementInformation = roleInfoPtr->GetProductId();
+			}
+			else if(informationId == "RoleName"){
+				elementInformation = roleInfoPtr->GetRoleName();
+			}
+			else if(informationId == "ParentRoles"){
+				elementInformation = roleInfoPtr->GetIncludedRoles().join(';');
+			}
+			else if(informationId == "RoleDescription"){
+				elementInformation = roleInfoPtr->GetRoleDescription();
+			}
+			else if(informationId == "Added"){
+				QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
+				addedTime.setTimeSpec(Qt::UTC);
+
+				elementInformation = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+			}
+			else if(informationId == "LastModified"){
+				QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
+				lastTime.setTimeSpec(Qt::UTC);
+
+				elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+			}
+
+			if(elementInformation.isNull()){
+				elementInformation = GetObjectInformation(informationId, collectionId);
+			}
+			if (elementInformation.isNull()){
+				elementInformation = "";
+			}
+
+			retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
 		}
+
+		return true;
 	}
 
-	return rootModelPtr.PopPtr();
+	return false;
 }
 
 

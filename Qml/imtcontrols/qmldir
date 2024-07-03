@@ -89,6 +89,7 @@ singleton UuidGenerator 1.0 Models/UuidGenerator.qml
 CommandsController 1.0 Models/CommandsController.qml
 CommandsProvider 1.0 Models/CommandsProvider.qml
 MacAddressValidator 1.0 Models/MacAddressValidator.qml
+singleton NavigationController 1.0 Models/NavigationController.qml
 
 AuxTable 1.0 ./Views/AuxTable.qml
 Table 1.0 ./Views/Table.qml

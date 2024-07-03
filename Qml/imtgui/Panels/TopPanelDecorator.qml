@@ -12,14 +12,9 @@ DecoratorBase {
     property Item topPanel: null;
 
     Rectangle {
-        anchors.fill: parent
+        anchors.fill: parent;
 
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
-            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
-            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
-        }
+        color: Style.backgroundColor;
     }
 
     TopLeftPanel {
@@ -42,6 +37,13 @@ DecoratorBase {
         anchors.right: parent.right;
         width: 100;
         height: topPanelDecorator.height;
+    }
+
+    Rectangle {
+        anchors.bottom: parent.bottom;
+        width: parent.width;
+        height: 1;
+        color: Style.borderColor;
     }
 }
 

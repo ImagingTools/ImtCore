@@ -10,66 +10,17 @@ import imtdocgui 1.0
 RemoteCollectionView {
     id: roleCollectionViewContainer;
 
-    anchors.left: parent.left;
-    anchors.leftMargin: Style.size_mainMargin;
-    anchors.right: parent.right;
-    anchors.rightMargin: Style.size_mainMargin;
-    anchors.top: parent.top;
-    anchors.topMargin: Style.size_mainMargin;
-
-    hasFilter: false;
-    hasPagination: false;
-
     collectionId: "Roles";
+    visibleMetaInfo: true;
 
-    property bool newCommandIsEnabled: true;
-
-    table.showHeaders: false;
-
-    table.backgroundElementsColor: Style.backgroundColor2;
-    table.enableAlternating: false;
-    filterMenuVisible: false;
-
-    dataControllerComp: Component {CollectionRepresentation {
+    dataControllerComp:
+        Component {
+        CollectionRepresentation {
             collectionId: roleCollectionViewContainer.collectionId;
-            additionalFieldIds: roleCollectionViewContainer.additionalFieldIds;
 
-            function removeElement(elementIndex){
-                if (elementIndex < 0){
-                    console.error();
-
-                    return;
-                }
-
-                let itemId = elementsModel.getData("Roles").getData("Id", elementIndex);
-                removeGqlModel.remove(itemId);
-            }
-        }
-    }
-
-    Component {
-        id: roleTableDelegateComp;
-
-        TableProductRolesDelegate {
-            tableItem: roleCollectionViewContainer.table;
-            width: roleCollectionViewContainer.table.width;
-
-            newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
-
-            onRoleDoubleClicked: {
-                roleCollectionViewContainer.table.select(index);
-                roleCollectionViewContainer.doubleClicked(id, index)
-            }
-
-            onRoleClicked: {
-                roleCollectionViewContainer.table.select(index)
-                roleCollectionViewContainer.table.elementsList.forceActiveFocus();
-            }
-
-            onNewClicked: {
-                if (roleCollectionViewContainer.commandsDelegate){
-                    roleCollectionViewContainer.commandsDelegate.onNew();
-                }
+            Component.onCompleted: {
+                additionalFieldIds.push("ProductId");
+                additionalFieldIds.push("ParentRoles");
             }
         }
     }
@@ -81,6 +32,8 @@ RemoteCollectionView {
             viewTypeId: "RoleEditor";
         }
     }
+
+    property string productId;
 
     function onLocalizationChanged(language){
         roleCollectionViewContainer.dataController.updateHeaders();
@@ -101,43 +54,33 @@ RemoteCollectionView {
             documentManager.registerDocumentView("Role", "RoleEditor", roleDocumentComp);
             documentManager.registerDocumentDataController("Role", dataControllerComp);
         }
-
-        table.rowDelegate = roleTableDelegateComp;
     }
 
     onElementsChanged: {
         if(!permissionsProvider) return
 
         let productId = ""
-        if (table.elements.containsKey("Id")){
-            productId = table.elements.getData("Id");
+        if (table.elements.containsKey("ProductId")){
+            productId = table.elements.getData("ProductId");
         }
 
         if (productId === ""){
             return
         }
 
-        permissionsProvider.productId = table.elements.getData("Id");
-
-        if (table.elements.containsKey("Roles")){
-            let elementsModel = table.elements.getData("Roles");
-            table.tableSelection.countElements = elementsModel.getItemsCount();
-        }
+        roleCollectionViewContainer.productId = productId;
 
         permissionsProvider.updateModel();
     }
 
-    function onCommandsModelChanged(){
-        roleCollectionViewContainer.newCommandIsEnabled = commandsController.commandExists("New");
-    }
-
-    property TreeItemModel rolesModel: CachedRoleCollection.rolesModel;
+    property TreeItemModel rolesModel: CachedRoleCollection.collectionModel;
     property TreeItemModel permissionsModel: TreeItemModel {};
 
     PermissionsProvider {
         id: permissionsProvider;
 
         property bool compl: false;
+        productId: roleCollectionViewContainer.productId;
 
         onDataModelChanged: {
             if (permissionsProvider.dataModel != null){
@@ -154,6 +97,7 @@ RemoteCollectionView {
 
             permissionsModel: roleCollectionViewContainer.permissionsModel;
             rolesModel: roleCollectionViewContainer.rolesModel;
+            productId: roleCollectionViewContainer.productId;
 
             commandsDelegateComp: Component {ViewCommandsDelegateBase {
                     view: roleEditor;
@@ -164,11 +108,6 @@ RemoteCollectionView {
                     commandId: "Role";
                     uuid: roleEditor.viewId;
                 }
-            }
-
-            Component.onCompleted: {
-                let elements = roleCollectionViewContainer.table.elements;
-                productId = elements.getData("Id")
             }
         }
     }
@@ -182,11 +121,8 @@ RemoteCollectionView {
             gqlAddCommandId: "RoleAdd";
 
             function getAdditionalInputParams(){
-                let elements = roleCollectionViewContainer.table.elements;
-                let productId = elements.getData("Id")
-
                 let obj = {}
-                obj["ProductId"] = productId;
+                obj["ProductId"] = roleCollectionViewContainer.productId;
 
                 return obj;
             }

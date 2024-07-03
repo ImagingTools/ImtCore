@@ -93,10 +93,12 @@ Rectangle {
 
         Component.onCompleted: {
             MainDocumentManager.documentOpened.connect(onDocumentOpened);
+            Events.subscribeEvent("GlobalSearchActivated", seacrhActivated)
         }
 
         Component.onDestruction: {
             MainDocumentManager.documentOpened.disconnect(onDocumentOpened);
+            Events.unSubscribeEvent("GlobalSearchActivated", seacrhActivated)
         }
 
         function onDocumentOpened(typeId, documentId, documentTypeId){
@@ -105,6 +107,15 @@ Rectangle {
                 if (pageId === typeId){
                     menuPanel.activePageIndex = i;
                     break;
+                }
+            }
+        }
+
+        function seacrhActivated(){
+            for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
+                let pageId = menuPanel.model.getData("Id", i);
+                if (pageId === "Search"){
+                    menuPanel.activePageIndex = i;
                 }
             }
         }

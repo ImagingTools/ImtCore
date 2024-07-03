@@ -38,7 +38,7 @@ RemoteCollectionView {
     }
 
     property TreeItemModel usersModel: CachedUserCollection.collectionModel;
-    property TreeItemModel rolesModel: CachedRoleCollection.rolesModel;
+    property TreeItemModel rolesModel: CachedRoleCollection.collectionModel;
     property TreeItemModel groupsModel: CachedGroupCollection.collectionModel;
 
     Component {

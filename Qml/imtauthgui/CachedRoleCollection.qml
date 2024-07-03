@@ -7,22 +7,11 @@ import imtcolgui 1.0
 CollectionDataProvider {
     id: container;
 
-    fields: ["Id", "Name", "Description"];
+    fields: ["Id", "RoleName", "RoleDescription", "ParentRoles", "RoleId", "Name"];
     commandId: "RolesList";
     subscriptionCommandId: "OnRolesCollectionChanged"
 
     sortByField: "Name";
-
-    property TreeItemModel rolesModel: TreeItemModel {}
-
-    onCollectionModelChanged: {
-        if (container.collectionModel != null){
-            if (container.collectionModel.containsKey("Roles")){
-                let rolesModel = container.collectionModel.getData("Roles");
-                container.rolesModel = rolesModel;
-            }
-        }
-    }
 }
 
 

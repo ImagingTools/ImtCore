@@ -183,9 +183,7 @@ Rectangle {
 
         Loader {
             id: bottomLoader;
-
             width: parent.width;
-
             visible: item;
         }
     }

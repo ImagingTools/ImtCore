@@ -62,6 +62,7 @@ RemoteCollectionView {
         collectionFilter.setSortingOrder("ASC");
         collectionFilter.setSortingInfoId("Name");
 
+        MainDocumentManager.registerDefaultDocumentData("Accounts", "Account", "AccountEditor");
         let documentManager = MainDocumentManager.getDocumentManager("Accounts");
         if (documentManager){
             container.commandsDelegate.documentManager = documentManager;

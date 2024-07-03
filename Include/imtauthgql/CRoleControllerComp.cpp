@@ -110,7 +110,6 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
 	if (inputParamPtr != nullptr){
 		objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
-//		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
 		itemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
 
 		const imtgql::CGqlObject* additionalParamsPtr = inputParamPtr->GetFieldArgumentObjectPtr("addition");

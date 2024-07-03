@@ -4,49 +4,60 @@ import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
 
-Item {
+QtObject {
     id: root;
 
     property var documentManagers: ({})
 
     signal documentOpened(string typeId, string documentId, string documentTypeId);
 
-    Component.onCompleted: {
-        Events.subscribeEvent("RegisterDocumentManager", registerDocumentManager);
-        Events.subscribeEvent("GetDocumentManager", registerDocumentManager);
-        Events.subscribeEvent("OpenDocument", openDocument);
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("RegisterDocumentManager", registerDocumentManager);
-        Events.unSubscribeEvent("OpenDocument", openDocument);
-    }
-
     function clear(){
         root.documentManagers = {};
     }
 
     function getDocumentManager(typeId){
-        return root.documentManagers[typeId];
+        return root.documentManagers[typeId]["DocumentManager"];
     }
 
-    function registerDocumentManager(typeId, documentManager){
-        root.documentManagers[typeId] = documentManager;
+    function registerDocumentManager(typeId, documentManager, defaultDocumentTypeId, defaultViewTypeId){
+        if (!defaultDocumentTypeId){
+            defaultDocumentTypeId = ""
+        }
+
+        if (!defaultViewTypeId){
+            defaultViewTypeId = ""
+        }
+
+        let obj = {}
+        obj["DocumentManager"] = documentManager;
+        obj["DefaultDocumentTypeId"] = defaultDocumentTypeId;
+        obj["DefaultViewTypeId"] = defaultViewTypeId;
+
+        root.documentManagers[typeId] = obj;
+
         return true;
     }
 
-    function openDocument(parameters){
-        console.log("main openDocument", parameters);
+    function registerDefaultDocumentData(typeId, defaultDocumentTypeId, defaultViewTypeId){
+        if (typeId in root.documentManagers){
+            root.documentManagers[typeId]["DefaultDocumentTypeId"] = defaultDocumentTypeId;
+            root.documentManagers[typeId]["DefaultViewTypeId"] = defaultViewTypeId;
+        }
+    }
 
-        let typeId = parameters["TypeId"];
-        let documentId = parameters["DocumentId"];
-        let documentTypeId = parameters["DocumentTypeId"];
-        let viewTypeId = parameters["ViewTypeId"];
-
-        documentOpened(typeId, documentId ,documentTypeId);
+    function openDocument(typeId, documentId, documentTypeId, viewTypeId){
+        documentOpened(typeId, documentId, documentTypeId);
 
         if (typeId in root.documentManagers){
-            let documentManager = root.documentManagers[typeId];
+            if (!documentTypeId){
+                documentTypeId = root.documentManagers[typeId]["DefaultDocumentTypeId"]
+            }
+
+            if (!viewTypeId){
+                viewTypeId = root.documentManagers[typeId]["DefaultViewTypeId"]
+            }
+
+            let documentManager = root.documentManagers[typeId]["DocumentManager"];
             if (documentManager){
                 documentManager.openDocument(documentId, documentTypeId, viewTypeId);
             }

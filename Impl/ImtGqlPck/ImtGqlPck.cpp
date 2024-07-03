@@ -114,6 +114,11 @@ I_EXPORT_COMPONENT(
 			"Slave subscriber controller",
 			"GraphQl Subscriber Controller");
 
+I_EXPORT_COMPONENT(
+			GqlSearchController,
+			"GraphQL search controller",
+			"GraphQL GQL Search Controller");
+
 
 } // namespace ImtGqlPck
 

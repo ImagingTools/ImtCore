@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5222" Description="ACF"/>
-            <Version Id="1" Number="2207" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -26,9 +26,6 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -183,9 +180,6 @@
                     <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -198,7 +192,9 @@
                     <AttributeInfo Id="HeadersIds" Type="String[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Name</Value>
+                                <Value>RoleName</Value>
+                                <Value>RoleId</Value>
+                                <Value>RoleDescription</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -206,6 +202,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Role Name</Value>
+                                <Value>Role-ID</Value>
+                                <Value>Description</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -215,7 +213,9 @@
                     <AttributeInfo Id="SearchByFilterIds" Type="String[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Name</Value>
+                                <Value>RoleName</Value>
+                                <Value>RoleId</Value>
+                                <Value>RoleDescription</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -486,6 +486,7 @@
                                 <AttributeInfo Id="GuiElementModels" Type="Reference[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
+                                            <Value>New</Value>
                                             <Value>Remove</Value>
                                             <Value>Edit</Value>
                                         </Values>
@@ -540,10 +541,10 @@
                                     <Data IsEnabled="true" Value="true"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
-                                    <Data IsEnabled="true" Value="false"/>
+                                    <Data IsEnabled="true" Value="true"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Name" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="New"/>
+                                    <Data IsEnabled="true" Value="New role"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
