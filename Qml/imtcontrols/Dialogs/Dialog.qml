@@ -55,6 +55,7 @@ ControlBase {
     signal accepted();
     signal canceled();
     signal applied();
+    signal closed();
 
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", dialogContainer.onLocalizationChanged);
@@ -154,7 +155,7 @@ ControlBase {
         duration: dialogContainer.displayDuration;
         onFinished: {
             if(dialogContainer.root){
-                dialogContainer.canceled()
+                dialogContainer.closed()
                 root.closeDialog();
             }
         }
