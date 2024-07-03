@@ -234,7 +234,15 @@ Item {
     function getValue(){
             if (delegateContainer && delegateContainer.columnIndex >= 0){
                 if(delegateContainer.rowDelegate !== null && delegateContainer.rowDelegate.tableItem !==null && delegateContainer.rowDelegate.dataModel != null){
-                    let val = delegateContainer.rowDelegate.dataModel[delegateContainer.rowDelegate.tableItem.headers.getData("Id", delegateContainer.columnIndex)];
+                    let val
+                    let key = delegateContainer.rowDelegate.tableItem.headers.getData("Id", delegateContainer.columnIndex)
+                    if ("item" in delegateContainer.rowDelegate.dataModel){
+                        val = delegateContainer.rowDelegate.dataModel.item[key]
+                        console.log("data", key, val)
+                    }
+                    else {
+                        val = delegateContainer.rowDelegate.dataModel[key];
+                    }
                     return val !== undefined ? val : "";
                 }
             }

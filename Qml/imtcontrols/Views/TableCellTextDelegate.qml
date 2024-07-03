@@ -4,7 +4,10 @@ import Acf 1.0
 TableCellDelegateBase {
     id: delegateContainer
 
+    property alias cellText: tableCellText
+
     TableCellText {
+        id: tableCellText
         anchors.left: parent.left
         anchors.leftMargin: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.textLeftMargin : 0
         anchors.right: parent.right
