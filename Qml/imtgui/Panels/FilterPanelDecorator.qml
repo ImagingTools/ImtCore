@@ -109,6 +109,7 @@ DecoratorBase {
                         decorator: Component {
                             ToolButtonDecorator {
                                 color: "transparent";
+                                icon.width: 16;
                             }
                         }
                     }
@@ -126,6 +127,7 @@ DecoratorBase {
                         decorator: Component {
                             ToolButtonDecorator {
                                 color: "transparent";
+                                icon.width: 16;
                             }
                         }
                     }
@@ -169,6 +171,12 @@ DecoratorBase {
                 visible: tfc.text != "";
 
                 iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+                decorator: Component {
+                    ToolButtonDecorator {
+                        color: "transparent";
+                        icon.width: 16;
+                    }
+                }
 
                 onClicked: {
                     console.log("iconClear onClicked")

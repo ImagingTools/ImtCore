@@ -19,6 +19,7 @@ Rectangle {
     property bool isCloseEnable: true;
 
     property alias model: list.model;
+    property Component tabDelegateDecorator: Style.tabPanelDecorator;
 
     signal closeItem(int index);
     signal rightClicked();
@@ -75,6 +76,7 @@ Rectangle {
             text: model[tabPanelContainer.displayRoleId] ? model[tabPanelContainer.displayRoleId] : "";
             isCloseEnable: tabPanelContainer.isCloseEnable;
             listView: list;
+            decorator: tabPanelContainer.tabDelegateDecorator;
 
             onClicked: {
                 tabPanelContainer.selectedIndex = model.index;

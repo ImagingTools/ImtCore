@@ -48,6 +48,20 @@ Rectangle {
         Events.sendEvent("ActivePageIdChanged", menuPanel.activePageId);
     }
 
+    property bool block: false;
+    onActivePageIndexChanged: {
+        if (block || activePageIndex < 0){
+            return;
+        }
+
+        let index = menuPanel.activePageIndex
+        NavigationController.push(menuPanel, function(menuPanel){
+            menuPanel.block = true;
+            menuPanel.activePageIndex = index;
+            menuPanel.block = false;
+        }
+        );
+    }
 
     function onMenuModelRequest(ok){
         Events.sendEvent("MenuModelChanged", menuPanel.model);
@@ -163,8 +177,6 @@ Rectangle {
             property string pageId: model["Id"];
 
             onClicked: {
-                //                lvPages.currentIndex = model.index;
-                console.log("MenuPanel onClicked", model.index);
                 menuPanel.activePageName = model["Name"];
                 menuPanel.activeIcon = model["Icon"];
                 menuPanel.activePageId = model["Id"];
@@ -174,5 +186,4 @@ Rectangle {
             }
         }
     }
-
 }

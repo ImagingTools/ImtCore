@@ -111,11 +111,16 @@ Rectangle {
             }
         }
 
-        function seacrhActivated(){
+        function seacrhActivated(text){
+            if (text == ""){
+                return;
+            }
+
             for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
                 let pageId = menuPanel.model.getData("Id", i);
                 if (pageId === "Search"){
                     menuPanel.activePageIndex = i;
+                    break;
                 }
             }
         }

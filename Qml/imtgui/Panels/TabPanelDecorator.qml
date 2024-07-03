@@ -136,15 +136,17 @@ DecoratorBase {
 
         ToolButton {
             id: closeButton;
-
             anchors.verticalCenter: parent.verticalCenter;
-
             width: Style.iconSizeSmall;
             height: width;
-
             visible: !tabPanelDecorator.baseElement.firstElement && tabPanelDecorator.baseElement.isCloseEnable;
-
             iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+            decorator: Component {
+                ToolButtonDecorator {
+                    color: "transparent";
+                    icon.width: 16;
+                }
+            }
 
             onClicked: {
                 tooltipArea.tooltip.closeTooltip();

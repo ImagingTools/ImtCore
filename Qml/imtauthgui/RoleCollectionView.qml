@@ -33,7 +33,7 @@ RemoteCollectionView {
         }
     }
 
-    property string productId;
+    property string productId: context.appName;
 
     function onLocalizationChanged(language){
         roleCollectionViewContainer.dataController.updateHeaders();
@@ -58,17 +58,6 @@ RemoteCollectionView {
 
     onElementsChanged: {
         if(!permissionsProvider) return
-
-        let productId = ""
-        if (table.elements.containsKey("ProductId")){
-            productId = table.elements.getData("ProductId");
-        }
-
-        if (productId === ""){
-            return
-        }
-
-        roleCollectionViewContainer.productId = productId;
 
         permissionsProvider.updateModel();
     }

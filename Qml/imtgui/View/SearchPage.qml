@@ -68,11 +68,21 @@ ViewBase {
         Events.unSubscribeEvent("GlobalSearchActivated", root.update)
     }
 
-    function update(text){
+    function clearAll(){
+        console.log("clearAll");
+
         root.model.clear();
         table.elements = 0;
         tabPanel.selectedIndex = 0;
-        gqlModel.send(text);
+    }
+
+    function update(text){
+        console.log("update", text);
+        clearAll();
+
+        if (text !== ""){
+            gqlModel.send(text);
+        }
     }
 
     function updateGui(){
@@ -106,6 +116,60 @@ ViewBase {
             table.resetSelection();
             root.doUpdateGui();
         }
+        tabDelegateDecorator: Component {
+            DecoratorBase {
+                id: tabPanelDecorator;
+
+                width: content.width + 2 * Style.size_mainMargin;
+                height: baseElement ? baseElement.height : 50
+
+                Rectangle {
+                    anchors.fill: tabPanelDecorator;
+                    color: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent": "transparent";
+                }
+
+                Rectangle {
+                    anchors.right: tabPanelDecorator.right;
+                    anchors.verticalCenter: tabPanelDecorator.verticalCenter;
+                    width: 1;
+                    height: tabPanelDecorator.height / 2;
+                    visible: tabPanelDecorator.baseElement
+                             ? tabPanelDecorator.baseElement.index < tabPanelDecorator.baseElement.listView.count - 1 &&
+                               !tabPanelDecorator.baseElement.selected &&
+                               (tabPanelDecorator.baseElement.index + 1) !== tabPanelDecorator.baseElement.selectedIndex
+                             : false;
+
+                    color: Style.borderColor2;
+                }
+
+                Rectangle {
+                    id: selection;
+                    anchors.bottom: tabPanelDecorator.bottom;
+                    anchors.left: tabPanelDecorator.left;
+                    anchors.right: tabPanelDecorator.right;
+                    height: 2;
+                    color: Style.tabSelectedColor;
+                    visible: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected: false;
+                }
+
+                Row {
+                    id: content;
+                    anchors.centerIn: tabPanelDecorator;
+                    height: tabPanelDecorator.height;
+                    spacing: Style.size_mainMargin;
+
+                    Text {
+                        id: text;
+                        anchors.verticalCenter: parent.verticalCenter;
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+                        text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
+                        elide: Text.ElideRight;
+                    }
+                }
+            }
+        }
     }
 
     Table {
@@ -116,6 +180,7 @@ ViewBase {
         anchors.right: parent.right;
 
         onSelectionChanged: {
+            console.log("onSelectionChanged", selection);
             if (root.commandsController){
                 root.commandsController.setCommandIsEnabled("Open", selection.length > 0);
             }
@@ -128,10 +193,18 @@ ViewBase {
         }
     }
 
+    Loading {
+        id: loading;
+        anchors.fill: parent;
+        visible: gqlModel.state === "Loading";
+    }
+
     GqlModel {
         id: gqlModel;
 
         function send(text){
+            console.log("gqlModel send", text);
+
             var query = Gql.GqlRequest("query", "Search");
 
             var inputParams = Gql.GqlObject("input");

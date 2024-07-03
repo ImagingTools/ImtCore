@@ -175,7 +175,6 @@ Item {
     }
 
     function onModelChanged(){
-        console.log("ViewBase onModelChanged", model.toJson());
         doUpdateGui();
     }
 
@@ -260,10 +259,7 @@ Item {
     }
 
     function updateCommandsGui(){
-        console.log("updateCommandsGui");
         if (commandsView && commandsController){
-            console.log("commandsController.commandsModel", commandsController.commandsModel.toJson());
-
             commandsView.setCommandsModel({"Model": commandsController.commandsModel, "ViewId": viewBase.viewId});
         }
     }
