@@ -400,7 +400,9 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 	// add a new model,to store list
 	const QString newTreeModelVarName = QStringLiteral("new") + GetCapitalizedValue(field.GetId()) + QStringLiteral("ModelPtr");
 	stream << QStringLiteral("imtbase::CTreeItemModel* ") << newTreeModelVarName;
-	stream << QStringLiteral(" = model.AddTreeModel(") << '"' << field.GetId() << '"' << QStringLiteral(");");
+	stream << QStringLiteral(" = model.AddTreeModel(");
+	stream << '"' << field.GetId() << '"';
+	stream << QStringLiteral(", modelIndex);");
 	FeedStream(stream, 1, false);
 
 	// declare loop
