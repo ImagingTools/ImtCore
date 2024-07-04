@@ -5,7 +5,6 @@ import imtcontrols 1.0
 DecoratorBase {
     id: commonButtonDecorator
 
-//    width: Math.max(Style.iconSizeSmall + textItem.width + Style.size_mainMargin * 2, widthDefault)
     width: Math.max(contentWidth + Style.size_mainMargin * 2, widthDefault)
     height: Style.buttonHeight;
 
@@ -14,6 +13,7 @@ DecoratorBase {
     property int maxTextWidth: 100;
     property int minTextWidth: 20;
     property int iconSize: Style.size_mainMargin;
+    property int contentSpacing: Style.size_mainMargin;
     property alias contentWidth: content.width;
 
     property int widthDefault: 0;
@@ -102,6 +102,7 @@ DecoratorBase {
 
         Image {
             id: iconObj
+            anchors.verticalCenter: content.verticalCenter;
             anchors.left: parent.left;
             width: !visible ? 0 : Style.iconSizeSmall
             height: width
@@ -114,8 +115,9 @@ DecoratorBase {
         Item {
             id: textItem;
             anchors.centerIn: iconObj && iconObj.visible ? undefined : content;
+            anchors.verticalCenter: content.verticalCenter;
             anchors.left: iconObj && iconObj.visible ? iconObj.right : undefined;
-            anchors.leftMargin: iconObj && iconObj.visible ? Style.size_mainMargin : 0;
+            anchors.leftMargin: iconObj && iconObj.visible ? commonButtonDecorator.contentSpacing : 0;
             width: visible ? helperText.width > commonButtonDecorator.maxTextWidth ? commonButtonDecorator.maxTextWidth : helperText.width : -Style.size_mainMargin;
             height: textObj.height;
             visible: textObj.text !== "";
@@ -146,61 +148,6 @@ DecoratorBase {
             }
         }
     }
-
-//    Row {
-//        id: content;
-
-//        anchors.centerIn: commonButtonDecorator;
-
-//        height: Math.max(iconObj.height, textItem.height)
-
-//        spacing: Style.size_mainMargin;
-
-//        Image {
-//            id: iconObj
-
-//            width: source == "" ? 0 : Style.iconSizeSmall
-//            height: width
-
-//            sourceSize.width: width
-//            sourceSize.height: height
-//            source: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.iconSource
-//        }
-
-//        Item {
-//            id: textItem;
-
-//            width: helperText.width > commonButtonDecorator.maxTextWidth ? commonButtonDecorator.maxTextWidth : helperText.width;
-//            height: textObj.height;
-
-//            visible: textObj.text !== "";
-
-//            Text {
-//                id: textObj
-
-//                width: parent.width;
-
-//                color: !commonButtonDecorator.baseElement ? "transparent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
-
-//                font.pixelSize: Style.fontSize_common
-//                font.family: Style.fontFamily
-
-//                text: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.text
-//                elide: Text.ElideRight;
-//            }
-
-//            Text {
-//                id: helperText;
-
-//                font.pixelSize: Style.fontSize_common
-//                font.family: Style.fontFamily
-
-//                text: textObj.text;
-
-//                visible: false;
-//            }
-//        }
-//    }
 
     function closeTooltip(){
         if(tooltip && tooltip.openST){

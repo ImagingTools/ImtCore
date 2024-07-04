@@ -13,5 +13,6 @@ DocumentHistoryView 1.0 DocumentHistoryView.qml
 DocumentDataController 1.0 DocumentDataController.qml
 DocumentCollectionViewDelegate 1.0 DocumentCollectionViewDelegate.qml
 DocumentValidator 1.0 DocumentValidator.qml
+SearchPageSingleDocumentView 1.0 SearchPageSingleDocumentView.qml
 
 

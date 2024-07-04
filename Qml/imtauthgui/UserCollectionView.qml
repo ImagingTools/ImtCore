@@ -111,6 +111,13 @@ RemoteCollectionView {
                 height: width;
 
                 iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
+
+                decorator: Component {
+                    ToolButtonDecorator {
+                        color: "transparent";
+                        icon.width: 16;
+                    }
+                }
             }
         }
     }
@@ -176,6 +183,14 @@ RemoteCollectionView {
                     visible: name2.text !== "";
 
                     iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
+
+                    decorator: Component {
+                        ToolButtonDecorator {
+                            color: "transparent";
+                            icon.width: 16;
+                        }
+                    }
+
                 }
             }
         }

@@ -6,14 +6,17 @@ import Acf 1.0
 QtObject {
     id: root;
 
+    property var nextStack: [];
+    property var prevStack: [];
+
     property var stack: [];
     property int currentIndex: -1;
-    property int maxSize: 100;
+    property int maxSize: 10;
 
     function goTo(path){}
 
     function next(){
-        if (currentIndex < stack.length - 1){
+        if (hasNext()){
             currentIndex++;
 
             let elem = stack[currentIndex]["Element"]
@@ -21,13 +24,21 @@ QtObject {
         }
     }
 
+    function hasNext(){
+        return currentIndex < stack.length - 1;
+    }
+
     function prev(){
-        if (currentIndex > 0){
+        if (hasPrev()){
             currentIndex--;
             let elem = stack[currentIndex]["Element"]
 
             stack[currentIndex]["Callback"](elem);
         }
+    }
+
+    function hasPrev(){
+        return currentIndex > 0;
     }
 
     function push(elementRef, callback){
@@ -44,7 +55,11 @@ QtObject {
         obj["Callback"] = callback;
 
         stack.push(obj);
-        currentIndex++;
+        currentIndex = stack.length - 1;
+    }
+
+    function currentIndexCorrection(){
+
     }
 
     function pop(){

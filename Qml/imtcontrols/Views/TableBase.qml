@@ -42,6 +42,7 @@ Rectangle {
 
     property alias rowDelegate: elementsListObj.delegate;
     property alias elements: elementsListObj.model;
+    property alias elementsSpacing: elementsListObj.spacing;
 
     property alias elementsList: elementsListObj;
     property alias cacheBuffer: elementsListObj.cacheBuffer;
@@ -682,7 +683,7 @@ Rectangle {
 
         z: 100;
 
-        anchors.right: elementsListObj.right;
+        anchors.right: parent.right;
         anchors.rightMargin: tableContainer.scrollbarRightMargin;
         anchors.bottom: elementsListObj.bottom;
         anchors.top: elementsListObj.top;
@@ -716,7 +717,7 @@ Rectangle {
         id: elementsListObj;
 
         anchors.left: parent.left;
-        anchors.right: headersPanel.right;
+        anchors.right: scrollbar.visible ? scrollbar.left : parent.right;
         anchors.top: headersPanel.bottom;
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: scrollHoriz.visible ? scrollHoriz.secondSize + scrollHoriz.anchors.topMargin : 0;

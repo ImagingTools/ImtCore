@@ -138,7 +138,6 @@ Rectangle {
         boundsBehavior: Flickable.StopAtBounds;
 
         Keys.onPressed: {
-            console.log("menuPanel.activePageIndex");
             if (event.key == Qt.Key_Up){
                 if (menuPanel.activePageIndex >= 1){
                     menuPanel.activePageIndex--;

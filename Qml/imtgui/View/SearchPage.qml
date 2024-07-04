@@ -10,17 +10,25 @@ ViewBase {
 
     model: TreeItemModel {}
 
-    commandsControllerComp: Component {
-        CommandsController {
-            id: commandsController;
+    //    commandsControllerComp: Component {
+    //        id: commandsControllerComp_;
+    //        CommandsController {
+    //            id: commandsController;
+    //            isReady: true;
+    //            Component.onCompleted: {
+    //                commandsController.commandsModel = commandsModel2;
+    //            }
+    //        }
+    //    }
 
-            isReady: true;
-
-            Component.onCompleted: {
-                commandsController.commandsModel = commandsModel2;
-            }
-        }
-    }
+    //    commandsViewComp: Component {
+    //        id: commandsDecoratorComp;
+    //        CommandsDecorator {
+    //            id: commandsDecorator;
+    //            height: 30;
+    //            visible: tabPanel.visible;
+    //        }
+    //    }
 
     commandsDelegateComp: Component {
         ViewCommandsDelegateBase {
@@ -39,6 +47,10 @@ ViewBase {
                 }
             }
         }
+    }
+
+    onModelChanged: {
+        tabPanel.visible = model.getItemsCount() > 0;
     }
 
     TreeItemModel {
@@ -69,15 +81,13 @@ ViewBase {
     }
 
     function clearAll(){
-        console.log("clearAll");
-
         root.model.clear();
         table.elements = 0;
         tabPanel.selectedIndex = 0;
+        tabPanel.visible = false;
     }
 
     function update(text){
-        console.log("update", text);
         clearAll();
 
         if (text !== ""){
@@ -93,25 +103,31 @@ ViewBase {
         }
     }
 
-    TreeItemModel {
-        id: headers;
+    Rectangle {
+        id: noResultsRect;
+        anchors.fill: parent;
+        color: Style.backgroundColor2;
+        visible: !tabPanel.visible;
 
-        Component.onCompleted: {
-            let index = headers.insertNewItem();
-            headers.setData("Id", "Description", index)
-            headers.setData("Name", "Description", index)
-
-            table.headers = headers;
+        BaseText {
+            anchors.centerIn: parent;
+            text: qsTr("No results");
+            font.family: Style.fontFamilyBold;
+            font.bold: true;
         }
     }
 
     TabPanel {
         id: tabPanel;
         anchors.top: parent.top;
-        width: parent.width;
+        anchors.topMargin: Style.size_mainMargin;
+        anchors.horizontalCenter: parent.horizontalCenter;
+        height: 30;
         model: root.model;
         displayRoleId: "Name";
-        isCloseEnable: false;
+        visible: false;
+        spacing: Style.size_mainMargin;
+        color: Style.backgroundColor2;
         onSelectedIndexChanged: {
             table.resetSelection();
             root.doUpdateGui();
@@ -125,31 +141,10 @@ ViewBase {
 
                 Rectangle {
                     anchors.fill: tabPanelDecorator;
-                    color: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent": "transparent";
-                }
-
-                Rectangle {
-                    anchors.right: tabPanelDecorator.right;
-                    anchors.verticalCenter: tabPanelDecorator.verticalCenter;
-                    width: 1;
-                    height: tabPanelDecorator.height / 2;
-                    visible: tabPanelDecorator.baseElement
-                             ? tabPanelDecorator.baseElement.index < tabPanelDecorator.baseElement.listView.count - 1 &&
-                               !tabPanelDecorator.baseElement.selected &&
-                               (tabPanelDecorator.baseElement.index + 1) !== tabPanelDecorator.baseElement.selectedIndex
-                             : false;
-
-                    color: Style.borderColor2;
-                }
-
-                Rectangle {
-                    id: selection;
-                    anchors.bottom: tabPanelDecorator.bottom;
-                    anchors.left: tabPanelDecorator.left;
-                    anchors.right: tabPanelDecorator.right;
-                    height: 2;
-                    color: Style.tabSelectedColor;
-                    visible: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected: false;
+                    color: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? Style.selectedColor: "transparent";
+                    radius: 15;
+                    border.width: 1;
+                    border.color: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? Style.iconColorOnSelected: Style.borderColor;
                 }
 
                 Row {
@@ -160,7 +155,7 @@ ViewBase {
 
                     Text {
                         id: text;
-                        anchors.verticalCenter: parent.verticalCenter;
+                        anchors.verticalCenter: content.verticalCenter;
                         color: Style.textColor;
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
@@ -172,16 +167,67 @@ ViewBase {
         }
     }
 
+    Rectangle {
+        id: separator;
+        anchors.top: tabPanel.bottom;
+        anchors.topMargin: Style.size_mainMargin;
+        width: parent.width;
+        height: 1;
+        color: Style.borderColor;
+    }
+
     Table {
         id: table;
-        anchors.top: tabPanel.bottom;
+        anchors.top: separator.bottom;
+        anchors.topMargin: Style.size_mainMargin;
         anchors.bottom: parent.bottom;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
+        anchors.bottomMargin: Style.size_mainMargin;
+        anchors.horizontalCenter: parent.horizontalCenter;
+        width: 700;
+        visible: tabPanel.visible;
+        showHeaders: false;
+        backgroundElementsColor: Style.backgroundColor2;
+        elementsSpacing: Style.size_mainMargin;
+        enableAlternating: false;
+        itemHeight: 70;
+        rowDelegate: Component {
+            TableRowDelegateBase {
+                id: tableDelegate;
+                tableItem: table
+                width: table.width
+                height: elementView.height;
+                selectedOpacity: 0;
+                hoverOpacity: 0;
+
+                ElementView {
+                    id: elementView;
+                    z: tableDelegate.z + 1;
+                    width: parent.width;
+                    name: model.Name;
+                    description: model.Description;
+                    color: parent.selected ? Style.selectedColor : Style.baseColor;
+                    controlComp: tableDelegate.mouseArea.containsMouse ? button : undefined;
+
+                    Component {
+                        id: button;
+                        ToolButton {
+                            width: 20;
+                            height: width;
+                            iconSource: "../../../" + Style.getIconPath("Icons/ExternalLink", Icon.State.On, Icon.Mode.Normal);
+                            tooltipText: qsTr("Go to the content");
+                            onClicked: {
+                                table.select(model.index);
+                                table.doubleClicked("", model.index)
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         onSelectionChanged: {
-            console.log("onSelectionChanged", selection);
             if (root.commandsController){
+                let selection = table.getSelectedIndexes();
                 root.commandsController.setCommandIsEnabled("Open", selection.length > 0);
             }
         }
@@ -203,22 +249,16 @@ ViewBase {
         id: gqlModel;
 
         function send(text){
-            console.log("gqlModel send", text);
-
             var query = Gql.GqlRequest("query", "Search");
-
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Text", text);
             query.AddParam(inputParams);
-
             var gqlData = query.GetQuery();
             this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
             if (this.state === "Ready"){
-                console.log("Search onStateChanged", this.toJson());
-
                 let resultModel;
                 if (this.containsKey("data")){
                     resultModel = this.getData("data")

@@ -6,85 +6,100 @@ import imtgui 1.0
 DecoratorBase {
     id: topCenterPanelDecorator;
 
-//    Row {
-//        anchors.verticalCenter: parent.verticalCenter;
-//        anchors.horizontalCenter: parent.horizontalCenter;
+    Row {
+        anchors.verticalCenter: parent.verticalCenter;
+        anchors.horizontalCenter: parent.horizontalCenter;
 
-//        height: 30;
+        height: 30;
 
-//        spacing: Style.size_mainMargin;
+        spacing: Style.size_mainMargin;
 
-//        Connections {
-//            target: NavigationController;
+        Connections {
+            target: NavigationController;
 
-//            function onCurrentIndexChanged(){
-//                leftButton.enabled = NavigationController.currentIndex > 0;
-//                rightButton.enabled = NavigationController.currentIndex < NavigationController.stack.length - 1;
-//            }
-//        }
+            function onCurrentIndexChanged(){
+                leftButton.enabled = NavigationController.hasPrev();
+                rightButton.enabled = NavigationController.hasNext();
+            }
+        }
 
-//        Item {
-//            height: parent.height;
-//            width: leftButton.width + rightButton.width;
+        Item {
+            height: parent.height;
+            width: leftButton.width + rightButton.width;
 
-//            ToolButton {
-//                id: leftButton;
-//                anchors.left: parent.left;
-//                width: 24;
-//                height: parent.height;
-//                iconSource: enabled ? "../../../" +  Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal)
-//                                    : "../../../" +  Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled);
-//                enabled: false;
-//                onClicked: {
-//                    NavigationController.prev();
-//                }
-//            }
+            ToolButton {
+                id: leftButton;
+                anchors.left: parent.left;
+                width: 24;
+                height: parent.height;
+                iconSource: enabled ? "../../../" +  Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal)
+                                    : "../../../" +  Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled);
+                enabled: false;
+                onClicked: {
+                    NavigationController.prev();
+                }
+            }
 
-//            ToolButton {
-//                id: rightButton;
-//                anchors.left: leftButton.right;
-//                width: 24;
-//                height: parent.height;
-//                iconSource: enabled ? "../../../" +  Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
-//                                    : "../../../" +  Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled);
-//                enabled: false;
-//                onClicked: {
-//                    NavigationController.next();
-//                }
-//            }
-//        }
+            ToolButton {
+                id: rightButton;
+                anchors.left: leftButton.right;
+                width: 24;
+                height: parent.height;
+                iconSource: enabled ? "../../../" +  Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
+                                    : "../../../" +  Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled);
+                enabled: false;
+                onClicked: {
+                    NavigationController.next();
+                }
+            }
+        }
 
-//        CustomTextField {
-//            width: 350;
-//            height: parent.height;
-//            placeHolderText: qsTr("Enter text for search");
-//            textFieldRightMargin: iconClear.width + 2 * margin;
-//            onEditingFinished: {
-//                Events.sendEvent("GlobalSearchActivated", text)
-//            }
+        CustomTextField {
+            id: tfc;
+            width: 350;
+            height: parent.height;
+            placeHolderText: qsTr("Enter text for search");
+            textFieldRightMargin: iconClear.width + 2 * margin;
 
-//            ToolButton {
-//                id: iconClear;
+            onTextChanged: {
+                timer.restart();
+            }
 
-//                z: 999;
+            Timer {
+                id: timer;
+                interval: 500;
+                onTriggered: {
+                    Events.sendEvent("GlobalSearchActivated", tfc.text)
+                }
+            }
 
-//                anchors.verticalCenter: parent.verticalCenter;
-//                anchors.right: parent.right;
-//                anchors.rightMargin: Style.margin;
+            ToolButton {
+                id: iconClear;
 
-//                width: Style.buttonWidthSmall;
-//                height: width;
+                z: 999;
 
-//                visible: parent.text != "";
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.right: parent.right;
+                anchors.rightMargin: Style.margin;
 
-//                iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+                width: Style.buttonWidthSmall;
+                height: width;
 
-//                onClicked: {
-//                    console.log("iconClear onClicked")
-//                    parent.text = "";
-//                }
-//            }
-//        }
-//    }
+                visible: parent.text != "";
+
+                iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+                decorator: Component {
+                    ToolButtonDecorator {
+                        color: "transparent";
+                        icon.width: 16;
+                    }
+                }
+
+                onClicked: {
+                    parent.text = "";
+                }
+            }
+        }
+    }
 }
 

@@ -31,9 +31,8 @@ ControlBase {
 
     MouseArea {
         id: ma;
-
         anchors.fill: tabDelegate;
-
+        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
         hoverEnabled: true;
 
         onClicked: {

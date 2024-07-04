@@ -15,11 +15,14 @@ public:
 	struct SearchResult
 	{
 		QByteArray contextId;
+		QString resultName;
 		QString resultDescription;
 
 		bool operator == (const SearchResult& other) const
 		{
-			return (contextId == other.contextId) && (resultDescription == other.resultDescription);
+			return (contextId == other.contextId) &&
+					(resultName == other.resultName) &&
+					(resultDescription == other.resultDescription);
 		}
 	};
 

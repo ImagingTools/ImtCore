@@ -6,13 +6,14 @@ import imtcontrols 1.0
 Rectangle {
     id: tabPanelContainer;
 
-    width: 1000;
+    width: list.contentWidth;
     height: 40;
 
     color: Style.tabPanelBackgroundColor;
 
     property int selectedIndex: 0;
     property int count: 0;
+    property alias spacing: list.spacing;
 
     property string firstElementImageSource;
     property string displayRoleId: "Title";

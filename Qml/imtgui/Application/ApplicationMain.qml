@@ -46,6 +46,20 @@ Item {
     signal settingsUpdate();
     signal localSettingsUpdated();
 
+    Component.onCompleted: {
+        setDecorators()
+
+        Events.subscribeEvent("UpdateModels", application.updateAllModels);
+        Events.subscribeEvent("Logout", application.onLogout);
+        Events.subscribeEvent("Reconnect", application.reconnect);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("UpdateModels", application.updateAllModels);
+        Events.unSubscribeEvent("Logout", application.onLogout);
+        Events.unSubscribeEvent("Reconnect", application.reconnect);
+    }
+
     onUpdatingModelChanged: {
         if (updatingModel){
             Events.sendEvent("UpdateModels");
@@ -100,20 +114,6 @@ Item {
 
     function reconnect(){
         webSocketPortProvider.port = -1;
-    }
-
-    Component.onCompleted: {
-        setDecorators()
-
-        Events.subscribeEvent("UpdateModels", application.updateAllModels);
-        Events.subscribeEvent("Logout", application.onLogout);
-        Events.subscribeEvent("Reconnect", application.reconnect);
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("UpdateModels", application.updateAllModels);
-        Events.unSubscribeEvent("Logout", application.onLogout);
-        Events.unSubscribeEvent("Reconnect", application.reconnect);
     }
 
     property alias thumbnailDecoratorGui: thumbnailDecorator;
@@ -295,6 +295,7 @@ Item {
         settingsProvider.serverModel = null;
 
         subscriptionManager_.clear();
+        NavigationController.clear();
     }
 
     function updateAllModels(){

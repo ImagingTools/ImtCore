@@ -5,21 +5,13 @@ import imtcontrols 1.0
 DecoratorBase {
     id: leftPanelElement;
 
-    width: 90;
+    width: 85;
     height: 80;
-
-    property string title: "";
-    property string imageSource: "";
-    property bool visibleMarker: false;
-
-    property bool highlighted: !leftPanelElement.baseElement ? false : leftPanelElement.baseElement.highlighted;
-    property bool selected: !leftPanelElement.baseElement ? false : leftPanelElement.baseElement.selected;
-    property string text;
-
-    property bool textIsCropped: helperText.width > description.width;
 
     signal accepted(string text);
     signal clicked();
+
+    property bool textIsCropped: helperText.width > description.width;
 
     onWidthChanged: {
         if(leftPanelElement.baseElement){
@@ -34,86 +26,66 @@ DecoratorBase {
     }
 
     Rectangle {
-        id: indicator;
-
-        anchors.top: leftPanelElement.top;
-        anchors.bottom: leftPanelElement.bottom;
-        anchors.left: leftPanelElement.left;
-
-        width: 5;
-
-        color: Style.iconColorOnSelected;
-        visible: leftPanelElement.selected;
+        id: marker;
+        anchors.fill: leftPanelElement;
+        anchors.margins: Style.size_smallMargin;
+        radius: Style.buttonRadius;
+        color: leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted ? Style.backgroundColor2 : "transparent";
+        border.width: 1;
+        border.color: leftPanelElement.baseElement.selected ? Style.iconColorOnSelected : "transparent";
     }
 
     Item{
-        id: body;
-
         anchors.verticalCenter: leftPanelElement.verticalCenter;
-        anchors.left: indicator.right;
-        anchors.leftMargin: Style.size_smallMargin;
+        anchors.left: leftPanelElement.left;
         anchors.right: leftPanelElement.right;
-        anchors.rightMargin: Style.size_smallMargin;
-
         height: image.height + description.height + description.anchors.topMargin;
 
         Image {
             id: image;
-
-            anchors.horizontalCenter: body.horizontalCenter;
-            anchors.top: body.top;
-
-            width: 60;
-            height: 45;
-
+            anchors.horizontalCenter: parent.horizontalCenter;
+            anchors.top: parent.top;
+            width: 30;
+            height: width;
             fillMode: Image.PreserveAspectFit;
-
-            source: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.iconSource;
+            source: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.iconSource
             sourceSize.height: height;
             sourceSize.width: width;
         }
 
         Text {
             id: description;
-
+            anchors.horizontalCenter: parent.horizontalCenter;
             anchors.top: image.bottom;
             anchors.topMargin: Style.size_mainMargin;
             anchors.left: parent.left;
+            anchors.leftMargin: Style.size_mainMargin;
             anchors.right: parent.right;
-
-            color: (leftPanelElement.selected || leftPanelElement.highlighted) ? Style.iconColorOnSelected: Style.textColor;
-
+            anchors.rightMargin: Style.size_mainMargin;
+            color: leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted ? Style.iconColorOnSelected : Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_small;
-
-            text: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.text;
-            wrapMode: Text.NoWrap;
-            elide: Text.ElideRight;
+            text: leftPanelElement.baseElement.text;
             horizontalAlignment: Text.AlignHCenter;
+            elide: Text.ElideRight;
         }
 
         Text {
             id: helperText;
-
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_small;
-
+            font.pixelSize: description.font.pixelSize;
             text: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.text;
             wrapMode: Text.NoWrap;
             elide: Text.ElideRight;
             horizontalAlignment: Text.AlignHCenter;
-
             visible: false;
         }
     }
 
     TooltipArea {
         id: tooltipArea;
-
         anchors.fill: parent;
-
         mouseArea: !leftPanelElement.baseElement ? null : leftPanelElement.baseElement.mouseArea;
-
         text: !leftPanelElement.baseElement || !leftPanelElement.textIsCropped ? "" : leftPanelElement.baseElement.text;
     }
 }

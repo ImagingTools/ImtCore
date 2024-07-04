@@ -6,6 +6,7 @@
         <file alias="imtdocgui/MultiDocWorkspacePageView.qml">MultiDocWorkspacePageView.qml</file>
         <file alias="imtdocgui/MultiDocWorkspaceView.qml">MultiDocWorkspaceView.qml</file>
         <file alias="imtdocgui/SingleDocumentWorkspaceView.qml">SingleDocumentWorkspaceView.qml</file>
+	<file alias="imtdocgui/SearchPageSingleDocumentView.qml">SearchPageSingleDocumentView.qml</file>
         <file alias="imtdocgui/UndoRedoManager.qml">UndoRedoManager.qml</file>
         <file alias="imtdocgui/DocumentManager.qml">DocumentManager.qml</file>
         <file alias="imtdocgui/DocumentHistoryDialog.qml">DocumentHistoryDialog.qml</file>

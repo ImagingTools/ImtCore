@@ -152,36 +152,6 @@ Item {
                     onClicked: {
                         Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
                     }
-
-                    Rectangle {
-                        id: notification;
-
-                        z: parent.z + 1;
-
-                        anchors.top: parent.top;
-                        anchors.right: parent.right;
-
-                        width: notificationText.width + 10;
-                        height: notificationText.height;
-
-                        color: Style.errorTextColor;
-                        radius: width;
-
-                        visible: model.Status && model.Status !== "";
-
-                        Text {
-                            id: notificationText;
-
-                            anchors.centerIn: notification;
-
-                            text: model.Status;
-
-                            font.family: Style.fontFamilyBold;
-                            font.pixelSize: Style.fontSize_common;
-
-                            color: Style.baseColor;
-                        }
-                    }
                 }
             }
         }

@@ -16,6 +16,7 @@ ControlBase {
     property bool hovered: enabled && hoverEnabled ? ma.containsMouse : false;
     property bool checkable: false;
     property bool checked: false;
+    property bool enabled: true;
 
     property int focusPolicy: Qt.WheelFocus;
     property int focusReason: -1;

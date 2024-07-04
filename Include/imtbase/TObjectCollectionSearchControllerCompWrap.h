@@ -80,7 +80,8 @@ const imtbase::ISearchResults* TObjectCollectionSearchControllerCompWrap<ObjectC
 				QString description = metaInfoPtr->GetMetaInfo(imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 				searchResult.contextId = objectCollectionIterator->GetObjectId();
-				searchResult.resultDescription = name + " " + description;
+				searchResult.resultName = name;
+				searchResult.resultDescription = description;
 
 				searchResultsPtr->AddSearchResult(searchResult);
 			}

@@ -14,7 +14,7 @@ ControlBase {
     property int tooltipWidth: customTooltip.fitToTextWidth ? forWidthText.width + 2*customTooltip.textMargin : Math.min(customTooltip.componentWidth, forWidthText.width + 2*customTooltip.textMargin);
 
     property int componentMinHeight: 40;
-    property int componentMargin: 12;
+    property int componentMargin: Style.size_mainMargin;
 
     property bool fitToTextWidth: false;
     property bool fitToHCenter: false;
@@ -25,7 +25,7 @@ ControlBase {
     property int fontPixelSize: Style.fontSize_common;
     property bool fontBold: false;
     property string fontColor: Style.textColor;
-    property int textMargin: 4;
+    property int textMargin: Style.size_smallMargin;
     property int horizontalAlignment: Text.AlignHCenter;
 
     property int radius: 4;
@@ -120,8 +120,7 @@ ControlBase {
 
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
 
-        text: qsTr(customTooltip.text);
-
+        text: customTooltip.text;
     }
 
     Text{
@@ -134,7 +133,7 @@ ControlBase {
         font.bold: customTooltip.fontBold;
         color: customTooltip.fontColor;
 
-        text: qsTr(customTooltip.text);
+        text: customTooltip.text;
     }
 
     Component{
@@ -197,9 +196,9 @@ ControlBase {
                 horizontalAlignment: customTooltip.fitToTextWidth ? Text.AlignLeft: customTooltip.horizontalAlignment;
                 verticalAlignment: Text.AlignVCenter;
 
-                wrapMode: customTooltip.fitToTextWidth ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere;
+                wrapMode: customTooltip.fitToTextWidth ? Text.NoWrap : Text.WordWrap;
 
-                text: qsTr(customTooltip.text);
+                text: customTooltip.text;
 
                 lineHeight: customTooltip.lineHeight;
             }
