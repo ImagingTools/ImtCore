@@ -222,7 +222,17 @@ class ListView extends Flickable {
     }
 
     $spacingChanged(){
-        // this.$updateView()
+        for(let i = 0; i < this.$items.length - 1; i++){
+            if(this.$items[i] && this.$items[i + 1]){
+                if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                    this.$items[i + 1].getProperty('x').reset(this.$items[i].getPropertyValue('x')+this.$items[i].getPropertyValue('width')+this.getPropertyValue('spacing'))
+                } else {
+                    this.$items[i + 1].getProperty('y').reset(this.$items[i].getPropertyValue('y')+this.$items[i].getPropertyValue('height')+this.getPropertyValue('spacing'))
+                }
+                break
+            }
+        }
+        this.$updateView()
     }
 
     $updateView(){
