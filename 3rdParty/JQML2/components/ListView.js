@@ -524,7 +524,7 @@ class ListView extends Flickable {
             if(this.getPropertyValue('orientation') === ListView.Horizontal){
                 let index = this.$items.indexOf(obj)
                 if(index >= 0 && this.$items[index+1]){
-                    this.$items[index+1].getProperty('x').reset(this.$items[index].getPropertyValue('x')+this.$items[index].getPropertyValue('width'))
+                    this.$items[index+1].getProperty('x').reset(this.$items[index].getPropertyValue('x')+this.$items[index].getPropertyValue('width')+this.getPropertyValue('spacing'))
                 }
             }
             this.$updateGeometry()
@@ -533,7 +533,7 @@ class ListView extends Flickable {
             if(this.getPropertyValue('orientation') === ListView.Vertical){
                 let index = this.$items.indexOf(obj)
                 if(index >= 0 && this.$items[index+1]){
-                    this.$items[index+1].getProperty('y').reset(this.$items[index].getPropertyValue('y')+this.$items[index].getPropertyValue('height'))
+                    this.$items[index+1].getProperty('y').reset(this.$items[index].getPropertyValue('y')+this.$items[index].getPropertyValue('height')+this.getPropertyValue('spacing'))
                 }
             }
             this.$updateGeometry()
