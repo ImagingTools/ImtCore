@@ -12,144 +12,42 @@ Rectangle {
     anchors.fill: parent;
     clip: true;
 
-    property var defaultModel;
+    Component.onCompleted: {
+        let index = rootModel.insertNewItem();
+        rootModel.setData("Id", "Hardware", index)
+        rootModel.setData("Name", "Hardware", index)
+
+        let itemsModel = rootModel.addTreeModel("Items")
+
+        for (let i = 0; i < 100; i++){
+            let index = itemsModel.insertNewItem();
+            itemsModel.setData("Id", i, index)
+
+            if (i < 33){
+                itemsModel.setData("Name", "Hardware" + i, index)
+                itemsModel.setData("Description", "Hardware"  + i, index)
+            }
+            else if (i < 66){
+                itemsModel.setData("Name", "", index)
+                itemsModel.setData("Description", "", index)
+            }
+            else{
+                itemsModel.setData("Name", "Hardware" + i, index)
+                itemsModel.setData("Description", "", index)
+            }
+        }
+
+        searchPage.model = rootModel;
+
+        searchPage.doUpdateGui();
+    }
 
     TreeItemModel {
-        id: testModel;
-
-        Component.onCompleted: {
-            console.log("start createFromJson");
-            testModel.createFromJson("{\"CustomerId\":\"Test\", \"ChildModel\":{}}")
-            console.log("end createFromJson");
-
-//            testModel.beginChanges();
-//            testModel.insertNewItem();
-//            testModel.setData("CustomerId", "Test");
-//            testModel.addTreeModel("ChildModel")
-//            testModel.endChanges();
-
-            undoRedoManager.registerModel(testModel);
-        }
-
-        onModelChanged: {
-            console.log("testModel onModelChanged", testModel.toJson());
-        }
+        id: rootModel;
     }
 
-    function updateGui(){
-        customerIdInput.text = testModel.getData("CustomerId");
-        listView.model = testModel.getData("ChildModel");
-    }
-
-    function updateModel(){
-        testModel.setData("CustomerId", customerIdInput.text);
-    }
-
-    ListView {
-        id: listView;
-
-        width: 500;
-        height: 200;
-
-        delegate: Component {
-            Rectangle {
-                width: listView.width;
-                height: 10;
-
-                color: "red";
-            }
-        }
-    }
-
-    Row {
-        id: buttons;
-
-        anchors.top: listView.bottom;
-        anchors.topMargin: 10;
-
-        height: 40;
-
-        Button {
-            width: 50;
-            text: "+"
-
-            onClicked: {
-                listView.model.insertNewItemWithParameters(0, {"Id":"test"});
-            }
-        }
-
-        Button {
-            width: 50;
-            text: "-"
-
-            onClicked: {
-                if (listView.model.getItemsCount() > 0){
-                    listView.model.removeItem(0)
-                }
-            }
-        }
-    }
-
-    TextInputElementView {
-        id: customerIdInput;
-
-        anchors.top: buttons.bottom;
-
-        width: 700;
-        height: 100;
-
-        name: qsTr("Customer-ID");
-        placeHolderText: qsTr("Enter the customer-ID");
-
-        onEditingFinished: {
-            testPage.updateModel()
-        }
-    }
-
-    UndoRedoManager {
-        id: undoRedoManager;
-
-        onModelChanged: {
-            console.log("UndoManager onModelChanged");
-
-            let undoSteps = getAvailableUndoSteps();
-            let redoSteps = getAvailableRedoSteps();
-
-            undoButton.enabled = undoSteps > 0;
-            redoButton.enabled = redoSteps > 0;
-
-            testPage.updateGui();
-        }
-    }
-
-    Row {
-        anchors.top: customerIdInput.bottom;
-        anchors.topMargin: 10;
-
-        height: 40;
-
-        Button {
-            id: undoButton;
-            width: 50;
-
-            text: "Undo"
-            enabled: false;
-
-            onClicked: {
-                undoRedoManager.doUndo();
-            }
-        }
-
-        Button {
-            id: redoButton;
-            text: "Redo"
-            width: 50;
-
-            enabled: false;
-
-            onClicked: {
-                undoRedoManager.doRedo();
-            }
-        }
+    SearchPage {
+        id: searchPage;
+        anchors.fill: parent;
     }
 }
