@@ -384,15 +384,15 @@ Item{
                 }
             }
 
-            Rectangle{
+
+            Text {
                 anchors.centerIn: parent;
-
-                width: 2;
-                height: 10;//20;
-                radius: width;
-
-                color: "gray";
-                opacity: 0.5;
+                anchors.horizontalCenterOffset: Style.fontSizeMedium / 2
+                font.family: Style.fontFamily
+                font.pointSize: Style.fontSizeMedium
+                color: Style.textColor
+                text: "..."
+                rotation: 90
             }
 
             MouseArea {
@@ -496,15 +496,12 @@ Item{
 
             }
 
-            Rectangle{
+            Text {
                 anchors.centerIn: parent;
-
-                width: 10;//20;
-                height: 2;
-                radius: height;
-
-                color: "gray";
-                opacity: 0.5;
+                font.family: Style.fontFamily
+                font.pointSize: Style.fontSizeMedium
+                color: Style.textColor
+                text: "..."
             }
 
             MouseArea {
