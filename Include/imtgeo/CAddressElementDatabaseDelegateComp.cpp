@@ -131,7 +131,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 				.arg(description)
 				.arg(lat)
 				.arg(lon)
-				.toLocal8Bit();
+				.toUtf8();
 
 	retVal.objectName = name;
 
@@ -227,7 +227,7 @@ QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(const QByteArr
 //                    .arg(qPrintable(*m_tableNameAttrPtr))
 //                    .arg(qPrintable(*m_objectIdColumnAttrPtr))
 //                    .arg(qPrintable(objectId))
-//                    .toLocal8Bit();
+//                    .toUtf8();
 
         return QString(R"sql(SELECT "Id", "ParentIds", "Type", "Name", "Latitude", "Longitude",(SELECT get_full_address(ae."ParentIds", ae."Name", ae."Type")) AS "FullAddress" FROM "%1" AS ae WHERE ae."%2" = '%3')sql")
 					.arg(qPrintable(*m_tableNameAttrPtr))
