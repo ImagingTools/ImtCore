@@ -7,6 +7,7 @@ ComboBox {
     id: root;
 
     property alias gqlCommandId: dataProvider.commandId;
+    property alias subscriptionCommandId: dataProvider.subscriptionCommandId;
     property alias fields: dataProvider.fields;
 
     Component.onCompleted: {
@@ -21,8 +22,6 @@ ComboBox {
         id: dataProvider;
 
         onCollectionModelChanged: {
-            console.log("onCollectionModelChanged")
-
             root.model = dataProvider.collectionModel;
         }
 

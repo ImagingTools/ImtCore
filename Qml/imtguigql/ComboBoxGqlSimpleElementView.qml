@@ -8,6 +8,7 @@ ComboBoxElementView {
     id: root;
 
     property string gqlCommandId;
+    property string subscriptionCommandId;
     property var fields;
 
     controlComp: cbComp;
@@ -27,6 +28,7 @@ ComboBoxElementView {
 
             gqlCommandId: root.gqlCommandId;
             fields: root.fields;
+            subscriptionCommandId: root.subscriptionCommandId;
 
             Component.onCompleted: {
                 if (root.delegate){
