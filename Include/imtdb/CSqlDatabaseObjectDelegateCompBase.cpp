@@ -411,9 +411,11 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 }
 
 
-bool CSqlDatabaseObjectDelegateCompBase::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const
+bool CSqlDatabaseObjectDelegateCompBase::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& /*timeFilter*/, QString& /*timeFilterQuery*/) const
 {
-	return true;
+	Q_ASSERT_X(false, "CSqlDatabaseObjectDelegateCompBase::CreateTimeFilterQuery", "Method not implemented");
+
+	return false;
 }
 
 

@@ -13,7 +13,9 @@ namespace imtgql
 
 // reimplemented (imtgql::CGqlRequestHandlerCompBase)
 
-imtbase::CTreeItemModel* CGqlSearchControllerComp::CreateInternalResponse(const CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CGqlSearchControllerComp::CreateInternalResponse(
+			const CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
 {
 	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
 	if (inputParamPtr == nullptr){
@@ -45,10 +47,10 @@ imtbase::CTreeItemModel* CGqlSearchControllerComp::CreateInternalResponse(const 
 
 					imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->AddTreeModel("Items", index);
 
-					for (int i = 0; i < resultsCount; i++){
+					for (int resultIndex = 0; resultIndex < resultsCount; ++resultIndex){
 						int itemIndex = itemsModelPtr->InsertNewItem();
 
-						imtbase::ISearchResults::SearchResult searchResult = searchResultsPtr->GetSearchResult(i);
+						imtbase::ISearchResults::SearchResult searchResult = searchResultsPtr->GetSearchResult(resultIndex);
 						if (searchResult.resultName.isEmpty()){
 							searchResult.resultName = QT_TR_NOOP("Unnamed result");
 						}
