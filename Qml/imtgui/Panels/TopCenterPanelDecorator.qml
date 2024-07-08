@@ -2,9 +2,44 @@ import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 
 DecoratorBase {
     id: topCenterPanelDecorator;
+
+    property bool canSearch: false;
+    visible: canSearch;
+
+    Component.onCompleted: {
+        Events.subscribeEvent("SearchVisible", topCenterPanelDecorator.setVisible);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("SearchVisible", topCenterPanelDecorator.setVisible);
+    }
+
+    Connections {
+        target: AuthorizationController;
+
+        function onLoginSuccessful(){
+            topCenterPanelDecorator.canSearch = PermissionsController.checkPermission("ViewSearch");
+            topCenterPanelDecorator.visible = topCenterPanelDecorator.canSearch;
+        }
+
+        function onLogoutSignal(){
+            topCenterPanelDecorator.canSearch = false;
+            topCenterPanelDecorator.visible = topCenterPanelDecorator.canSearch;
+        }
+    }
+
+    function setVisible(visible){
+        if (visible && !canSearch){
+            topCenterPanelDecorator.visible = false;
+            return;
+        }
+
+        topCenterPanelDecorator.visible = visible;
+    }
 
     Row {
         anchors.verticalCenter: parent.verticalCenter;

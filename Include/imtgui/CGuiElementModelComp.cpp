@@ -79,9 +79,19 @@ bool CGuiElementModelComp::IsVisible() const
 }
 
 
-const imtgui::IGuiElementModel* CGuiElementModelComp::GetSubElements() const
+int CGuiElementModelComp::GetPriority() const
 {
-	return nullptr;
+	if (m_priorityAttrPtr.IsValid()){
+		return *m_priorityAttrPtr;
+	}
+
+	return 0;
+}
+
+
+const imtgui::IGuiElementContainer* CGuiElementModelComp::GetSubElements() const
+{
+	return m_subElementsCompPtr.GetPtr();
 }
 
 

@@ -4,6 +4,9 @@
 // ACF includes
 #include <istd/IChangeable.h>
 
+// ImtCore includes
+#include <imtgui/IGuiElementContainer.h>
+
 
 namespace imtgui
 {
@@ -19,7 +22,8 @@ public:
 	virtual QString GetElementStatus() const = 0;
 	virtual bool IsEnabled() const = 0;
 	virtual bool IsVisible() const = 0;
-	virtual const IGuiElementModel* GetSubElements() const = 0;
+	virtual int GetPriority() const = 0;
+	virtual const imtgui::IGuiElementContainer* GetSubElements() const = 0;
 };
 
 

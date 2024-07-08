@@ -198,7 +198,7 @@ Item {
 //        4 - WebSocket.Error
 //        5 - Authorization Error
 
-        Events.sendEvent("SetCommandsVisible", false);
+        Events.sendEvent("SearchVisible", false);
         Events.sendEvent("SetUserPanelEnabled", false);
 
         if (status === 0){
@@ -208,7 +208,7 @@ Item {
             thumbnailDecorator.stackView.push(errorMessagePageComp);
         }
         else if (status === 1){
-            Events.sendEvent("SetCommandsVisible", true);
+            Events.sendEvent("SearchVisible", true);
             Events.sendEvent("SetUserPanelEnabled", true);
         }
         else if (status === 5){

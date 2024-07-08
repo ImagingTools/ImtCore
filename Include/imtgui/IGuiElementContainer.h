@@ -1,13 +1,15 @@
 #pragma once
 
 
-// ImtCore includes
-#include <imtgui/IGuiElementModel.h>
+// ACF includes
+#include <istd/IChangeable.h>
 
 
 namespace imtgui
 {
 
+
+class IGuiElementModel;
 
 class IGuiElementContainer: virtual public istd::IChangeable
 {

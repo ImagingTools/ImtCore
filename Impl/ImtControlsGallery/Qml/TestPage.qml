@@ -19,15 +19,22 @@ Rectangle {
 
         let itemsModel = rootModel.addTreeModel("Items")
 
-        for (let i = 0; i < 100; i++){
+//        for (let i = 0; i < 100; i++){
+//            let index = itemsModel.insertNewItem();
+//            itemsModel.setData("Id", i, index)
+//            itemsModel.setData("Name", "", index)
+//            itemsModel.setData("Description", "", index)
+//        }
+
+        for (let i = 0; i < 300; i++){
             let index = itemsModel.insertNewItem();
             itemsModel.setData("Id", i, index)
 
-            if (i < 33){
+            if (i < 100){
                 itemsModel.setData("Name", "Hardware" + i, index)
                 itemsModel.setData("Description", "Hardware"  + i, index)
             }
-            else if (i < 66){
+            else if (i < 200){
                 itemsModel.setData("Name", "", index)
                 itemsModel.setData("Description", "", index)
             }
@@ -36,6 +43,21 @@ Rectangle {
                 itemsModel.setData("Description", "", index)
             }
         }
+
+//        index = itemsModel.insertNewItem();
+//        itemsModel.setData("Id", index, index)
+//        itemsModel.setData("Name", "Hardware" + index, index)
+//        itemsModel.setData("Description", "Hardware"  + index, index)
+
+//        index = itemsModel.insertNewItem();
+//        itemsModel.setData("Id", index, index)
+//        itemsModel.setData("Name", "", index)
+//        itemsModel.setData("Description", "", index)
+
+//        index = itemsModel.insertNewItem();
+//        itemsModel.setData("Id", index, index)
+//        itemsModel.setData("Name", "Hardware" + index, index)
+//        itemsModel.setData("Description", "", index)
 
         searchPage.model = rootModel;
 

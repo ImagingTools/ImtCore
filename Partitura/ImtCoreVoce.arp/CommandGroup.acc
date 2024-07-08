@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ContainerRepresentationController" PackageId="ImtGuiPck" ComponentId="GuiElementContainerRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RepresentationControllers" Type="Reference[]" ExportId="CommandsRepresentations">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Group" PackageId="ImtGuiPck" ComponentId="CommandGroup">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Alignment" Type="Integer" ExportId="Alignment">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Description" Type="Text" ExportId="Description">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconPath" Type="String" ExportId="IconPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Id" Type="Id" ExportId="GroupId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="IsEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="IsVisible">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="String" ExportId="Name">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Priority" Type="Integer" ExportId="Priority">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Status" Type="Text" ExportId="Status">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubElementsContainer" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GroupCommands"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GroupCommands" PackageId="ImtGuiPck" ComponentId="GuiElementContainer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GuiElementModels" Type="Reference[]" ExportId="Commands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GroupPermissions" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="GroupId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="GroupPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GroupRepresentationController" PackageId="ImtGuiPck" ComponentId="CommandGroupRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ContainerRepresentationController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ContainerRepresentationController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ModelId" Type="Reference" ExportId="GroupId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtbase::ICommandGroup" ComponentId="Group"/>
+        <Interface InterfaceId="imtbase::ICommandPermissionsProvider" ComponentId="GroupPermissions"/>
+        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="GroupRepresentationController"/>
+        <Interface InterfaceId="imtgui::IGuiElementContainer" ComponentId="GroupCommands"/>
+        <Interface InterfaceId="imtgui::IGuiElementModel" ComponentId="Group"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="Group"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="GroupRepresentationController"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

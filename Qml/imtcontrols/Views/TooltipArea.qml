@@ -10,6 +10,7 @@ Item {
     property alias tooltip: tp;
 
     property bool containsMouse: mouseArea ? mouseArea.containsMouse : false;
+    property alias interval: timer.interval;
 
     onContainsMouseChanged: {
         if (!containsMouse){
@@ -28,6 +29,14 @@ Item {
         }
     }
 
+    Timer {
+        id: timer;
+        interval: 3000;
+        onTriggered: {
+            tp.closeTooltip();
+        }
+    }
+
     CustomTooltip {
         id: tp;
 
@@ -38,6 +47,8 @@ Item {
             var point = mapToItem(null, xX, yY);
 
             open(point.x, point.y)
+
+            timer.restart();
         }
     }
 }

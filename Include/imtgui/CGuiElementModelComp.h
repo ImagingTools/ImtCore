@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 
 // ACF includes
@@ -6,14 +6,16 @@
 
 // ImtCore includes
 #include <imtgui/IGuiElementModel.h>
+#include <imtgui/IGuiElementContainer.h>
 
 
 namespace imtgui
 {
 
 
-class CGuiElementModelComp: public icomp::CComponentBase,
-		virtual public imtgui::IGuiElementModel
+class CGuiElementModelComp:
+			public icomp::CComponentBase,
+			virtual public imtgui::IGuiElementModel
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -28,6 +30,8 @@ public:
 		I_ASSIGN(m_elementStatusAttrPtr, "Status", "Element status", false, "");
 		I_ASSIGN(m_enabledAttrPtr, "IsEnabled", "Element is enabled", false, true);
 		I_ASSIGN(m_visibleAttrPtr, "IsVisible", "Element visibility", false, true);
+		I_ASSIGN(m_priorityAttrPtr, "Priority", "Element priority", false, 0);
+		I_ASSIGN(m_subElementsCompPtr, "SubElementsContainer", "Container of the sub elements", false, "SubElementsContainer");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgui::IGuiElementContainer)
@@ -38,7 +42,8 @@ public:
 	virtual QString GetElementStatus() const override;
 	virtual bool IsEnabled() const override;
 	virtual bool IsVisible() const override;
-	virtual const IGuiElementModel* GetSubElements() const override;
+	virtual int GetPriority() const override;
+	virtual const IGuiElementContainer* GetSubElements() const override;
 
 protected:
 	I_ATTR(QByteArray, m_elementIdAttrPtr);
@@ -48,7 +53,8 @@ protected:
 	I_TEXTATTR(m_elementStatusAttrPtr);
 	I_ATTR(bool, m_enabledAttrPtr);
 	I_ATTR(bool, m_visibleAttrPtr);
-	I_MULTIREF(imtgui::IGuiElementModel, m_subElementsCompPtr);
+	I_ATTR(int, m_priorityAttrPtr);
+	I_REF(imtgui::IGuiElementContainer, m_subElementsCompPtr);
 };
 
 

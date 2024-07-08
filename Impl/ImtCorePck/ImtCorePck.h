@@ -89,7 +89,6 @@ typedef imtbase::CNumericParamSummaryRepresentationControllerComp NumericParamSu
 typedef imtbase::CTextParamSummaryRepresentationControllerComp TextParamSummaryRepresentationController;
 typedef imtbase::CBinaryDataProviderComp BinaryDataProvider;
 typedef ibase::TModelObserverCompWrap<imtbase::CParameterLinkControllerComp> ParameterLinkController;
-// typedef imtbase::CObjectCollectionBasedPersistenceComp ObjectCollectionBasedPersistence;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtbase::CTimeFilterParam,

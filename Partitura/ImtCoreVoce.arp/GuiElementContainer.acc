@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ElementContainer" PackageId="ImtGuiPck" ComponentId="GuiElementContainer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GuiElementModels" Type="Reference[]" ExportId="GuiElementModels">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ElementContainerRepresentationController" PackageId="ImtGuiPck" ComponentId="GuiElementContainerRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RepresentationControllers" Type="Reference[]" ExportId="RepresentationControllers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="ElementContainerRepresentationController"/>
+        <Interface InterfaceId="imtgui::IGuiElementContainer" ComponentId="ElementContainer"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="ElementContainer"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

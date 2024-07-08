@@ -190,6 +190,7 @@ ViewBase {
         elementsSpacing: Style.size_mainMargin;
         enableAlternating: false;
         itemHeight: 70;
+
         rowDelegate: Component {
             TableRowDelegateBase {
                 id: tableDelegate;
@@ -202,10 +203,10 @@ ViewBase {
                 ElementView {
                     id: elementView;
                     z: tableDelegate.z + 1;
-                    width: parent.width;
+                    width: tableDelegate.width;
                     name: model.Name;
                     description: model.Description;
-                    color: parent.selected ? Style.selectedColor : Style.baseColor;
+                    color: tableDelegate.mouseArea.containsMouse || tableDelegate.selected ? Style.selectedColor : Style.baseColor;
                     controlComp: tableDelegate.mouseArea.containsMouse ? button : undefined;
 
                     Component {

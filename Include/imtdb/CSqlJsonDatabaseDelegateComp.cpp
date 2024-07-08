@@ -460,10 +460,10 @@ bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFil
 	case imtbase::ITimeFilterParam::TU_HOUR:
 		switch(timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
-			timeFilterQuery += QString(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp)))").arg(addedStrQuery);
+			timeFilterQuery += QString(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
 			break;
 		case imtbase::ITimeFilterParam::IM_LAST:
-			timeFilterQuery += QString(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp) - interval '1 hour'))").arg(addedStrQuery);
+			timeFilterQuery += QString(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp at time zone 'utc') - interval '1 hour'))").arg(addedStrQuery);
 			break;
 		case imtbase::ITimeFilterParam::IM_FOR:
 			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 hour' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
@@ -473,24 +473,23 @@ bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFil
 	case imtbase::ITimeFilterParam::TU_DAY:
 		switch(timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
-			timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp)))").arg(addedStrQuery);
+			timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
 			break;
 		case imtbase::ITimeFilterParam::IM_LAST:
-			timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp) - interval '1 day'))").arg(addedStrQuery);
+			timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp at time zone 'utc') - interval '1 day'))").arg(addedStrQuery);
 			break;
 		case imtbase::ITimeFilterParam::IM_FOR:
 			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 day' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
 			break;
 		}
-		timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp)))").arg(addedStrQuery);
 		break;
 	case imtbase::ITimeFilterParam::TU_WEEK:
 		switch(timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
-			timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp)))").arg(addedStrQuery);
+			timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
 			break;
 		case imtbase::ITimeFilterParam::IM_LAST:
-			timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp) - interval '1 week'))").arg(addedStrQuery);
+			timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp at time zone 'utc') - interval '1 week'))").arg(addedStrQuery);
 			break;
 		case imtbase::ITimeFilterParam::IM_FOR:
 			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 week' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
@@ -500,10 +499,10 @@ bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFil
 	case imtbase::ITimeFilterParam::TU_MONTH:
 		switch(timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
-			timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp)))").arg(addedStrQuery);
+			timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
 			break;
 		case imtbase::ITimeFilterParam::IM_LAST:
-			timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp) - interval '1 month'))").arg(addedStrQuery);
+			timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp at time zone 'utc') - interval '1 month'))").arg(addedStrQuery);
 			break;
 		case imtbase::ITimeFilterParam::IM_FOR:
 			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 month' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
@@ -514,10 +513,10 @@ bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFil
 	case imtbase::ITimeFilterParam::TU_YEAR:
 		switch(timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
-			timeFilterQuery += QString(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp)))").arg(addedStrQuery);
+			timeFilterQuery += QString(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
 			break;
 		case imtbase::ITimeFilterParam::IM_LAST:
-			timeFilterQuery += QString(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp) - interval '1 year'))").arg(addedStrQuery);
+			timeFilterQuery += QString(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp at time zone 'utc') - interval '1 year'))").arg(addedStrQuery);
 			break;
 		case imtbase::ITimeFilterParam::IM_FOR:
 			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 year' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);

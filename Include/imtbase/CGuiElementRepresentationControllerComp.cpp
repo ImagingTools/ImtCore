@@ -17,6 +17,29 @@ namespace imtbase
 
 // public methods
 
+bool CGuiElementRepresentationControllerComp::SetupItemModel(
+			const imtgui::IGuiElementModel& guiElementModel,
+			CTreeItemModel& representation,
+			int index,
+			const iprm::IParamsSet* paramsPtr) const
+{
+	if (!m_commandRepresentationControllerPtr.IsValid()){
+		return false;
+	}
+
+	imtbase::CTreeItemModel commandRepresentation;
+	if (!m_commandRepresentationControllerPtr->GetRepresentationFromDataModel(guiElementModel, commandRepresentation, paramsPtr)){
+		return false;
+	}
+
+	if (!representation.CopyItemDataFromModel(index, &commandRepresentation)){
+		return false;
+	}
+
+	return true;
+}
+
+
 // reimplemented (imtbase::CObjectRepresentationControllerCompBase)
 
 bool CGuiElementRepresentationControllerComp::GetRepresentationFromValue(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
@@ -31,12 +54,6 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromValue(const i
 	if (userInfoParamPtr.IsValid()){
 		userPermissions = userInfoParamPtr->GetPermissions();
 		isAdmin = userInfoParamPtr->IsAdmin();
-	}
-
-	iprm::TParamsPtr<iprm::IIdParam> languageParamPtr(paramsPtr, "LanguageParam");
-	QByteArray languageId;
-	if (languageParamPtr.IsValid()){
-		languageId = languageParamPtr->GetId();
 	}
 
 	representation.Clear();
@@ -60,29 +77,8 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromValue(const i
 				}
 			}
 
-			QString elementName = guiElementPtr->GetElementName();
-			QString elementDescription = guiElementPtr->GetElementDescription();
-			QString elementPath = guiElementPtr->GetElementItemPath();
-			QString elementStatus = guiElementPtr->GetElementStatus();
-			bool isEnabled = guiElementPtr->IsEnabled();
-			bool isVisible = guiElementPtr->IsVisible();
-
-			if (m_translationManagerCompPtr.IsValid()){
-				QByteArray context = "Attribute";
-				QString elementNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), elementName.toUtf8(), languageId, context);
-
-				elementName = elementNameTr;
-			}
-
 			int index = representation.InsertNewItem();
-
-			representation.SetData("Id", elementId, index);
-			representation.SetData("Name", elementName, index);
-			representation.SetData("Description", elementDescription, index);
-			representation.SetData("IsEnabled", isEnabled, index);
-			representation.SetData("Visible", isVisible, index);
-			representation.SetData("Icon", elementPath, index);
-			representation.SetData("Status", elementStatus, index);
+			SetupItemModel(*guiElementPtr, representation, index, paramsPtr);
 		}
 	}
 
@@ -108,6 +104,16 @@ bool CGuiElementRepresentationControllerComp::GetDataModelFromRepresentation(
 			istd::IChangeable& /*dataModel*/) const
 {
 	return true;
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CGuiElementRepresentationControllerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	m_commandRepresentationControllerPtr.SetPtr(new imtbase::CCommandRepresentationController(m_translationManagerCompPtr.GetPtr()));
 }
 
 

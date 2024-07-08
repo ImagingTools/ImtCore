@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ContainerRepresentationController" X="750" Y="300" Note=""/>
+        <Element ComponentName="Group" X="250" Y="150" Note=""/>
+        <Element ComponentName="GroupCommands" X="250" Y="300" Note=""/>
+        <Element ComponentName="GroupPermissions" X="550" Y="425" Note=""/>
+        <Element ComponentName="GroupRepresentationController" X="750" Y="150" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
