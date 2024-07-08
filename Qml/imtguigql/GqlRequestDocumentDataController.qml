@@ -80,7 +80,7 @@ DocumentDataController {
             queryFields.InsertField("Id");
             query.AddField(queryFields);
 
-            // Events.sendEvent("RegisterSubscription", {"Query": query, "Client": container.subscriptionClient});
+            Events.sendEvent("RegisterSubscription", {"Query": query, "Client": container.subscriptionClient});
         }
 
         onStateChanged: {
