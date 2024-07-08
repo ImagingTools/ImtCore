@@ -49,6 +49,7 @@
         <file alias="imtgui/Settings/SettingsTimePicker.qml">Settings/SettingsTimePicker.qml</file>
         <file alias="imtgui/Settings/UrlParamEditor.qml">Settings/UrlParamEditor.qml</file>
         <file alias="imtgui/View/MultiPageView.qml">View/MultiPageView.qml</file>
+        <file alias="imtgui/View/TabView.qml">View/TabView.qml</file>
         <file alias="imtgui/View/Pagination.qml">View/Pagination.qml</file>
         <file alias="imtgui/View/SimpleCommandsDecorator.qml">View/SimpleCommandsDecorator.qml</file>
         <file alias="imtgui/View/ServerNoConnectionView.qml">View/ServerNoConnectionView.qml</file>

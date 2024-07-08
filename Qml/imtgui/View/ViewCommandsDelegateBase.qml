@@ -9,6 +9,7 @@ Item {
     signal commandActivated(string commandId);
 
     function commandHandle(commandId){
+        console.log("commandHandle", commandId)
         if (commandId === "Save"){
         }
         else if (commandId === "Close"){

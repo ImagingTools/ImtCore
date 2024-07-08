@@ -51,6 +51,7 @@ SettingsTimePicker 1.0 Settings/SettingsTimePicker.qml
 UrlParamEditor 1.0 Settings/UrlParamEditor.qml
 
 MultiPageView 1.0 View/MultiPageView.qml
+TabView 1.0 View/TabView.qml
 Pagination 1.0 View/Pagination.qml
 ServerNoConnectionView 1.0 View/ServerNoConnectionView.qml
 SimpleCommandsDecorator 1.0 View/SimpleCommandsDecorator.qml

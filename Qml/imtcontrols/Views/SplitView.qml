@@ -384,15 +384,18 @@ Item{
                 }
             }
 
-
-            Text {
-                anchors.centerIn: parent;
-                anchors.horizontalCenterOffset: Style.fontSizeMedium / 2
-                font.family: Style.fontFamily
-                font.pointSize: Style.fontSizeMedium
-                color: Style.textColor
-                text: "..."
-                rotation: 90
+            Column {
+                anchors.centerIn: parent
+                spacing: 3
+                Repeater{
+                    model: 3
+                    delegate: Rectangle {
+                            width: 2
+                            height: width
+                            radius: width / 2
+                            color: Style.textColor
+                    }
+                }
             }
 
             MouseArea {
@@ -496,12 +499,18 @@ Item{
 
             }
 
-            Text {
-                anchors.centerIn: parent;
-                font.family: Style.fontFamily
-                font.pointSize: Style.fontSizeMedium
-                color: Style.textColor
-                text: "..."
+            Row {
+                anchors.centerIn: parent
+                spacing: 2
+                Repeater{
+                    model: 3
+                    delegate: Rectangle {
+                            width: 2
+                            height: width
+                            radius: width / 2
+                            color: Style.textColor
+                    }
+                }
             }
 
             MouseArea {
