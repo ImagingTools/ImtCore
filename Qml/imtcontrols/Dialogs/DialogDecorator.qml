@@ -92,8 +92,6 @@ DecoratorBase {
 
         width: Math.max(buttonsWidth, bodyWidth);
 
-        spacing: Style.size_mainMargin;
-
         property real bodyWidth: !loaderBodyDialog.item ? 1 : loaderBodyDialog.item.width;
         property real buttonsWidth: buttonsContainer.width + 2 * buttonsContainer.anchors.rightMargin;
 
