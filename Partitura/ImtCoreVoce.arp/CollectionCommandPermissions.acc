@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5191" Description="ACF"/>
-            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -21,6 +21,8 @@
                                 <Value>Remove</Value>
                                 <Value>Rename</Value>
                                 <Value>SetDescription</Value>
+                                <Value>Import</Value>
+                                <Value>Export</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -34,6 +36,42 @@
                         <Data IsEnabled="true" Value="Edit"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="EditCommandPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Export" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Export"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="ExportCommandPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Import" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Import"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="ImportCommandPermissions">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
