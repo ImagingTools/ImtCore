@@ -12,64 +12,76 @@ Rectangle {
     anchors.fill: parent;
     clip: true;
 
-    Component.onCompleted: {
-        let index = rootModel.insertNewItem();
-        rootModel.setData("Id", "Hardware", index)
-        rootModel.setData("Name", "Hardware", index)
+    Button {
+        id: button;
 
-        let itemsModel = rootModel.addTreeModel("Items")
+        width: 70;
+        height: 30;
 
-//        for (let i = 0; i < 100; i++){
-//            let index = itemsModel.insertNewItem();
-//            itemsModel.setData("Id", i, index)
-//            itemsModel.setData("Name", "", index)
-//            itemsModel.setData("Description", "", index)
-//        }
+        text: "Open";
 
-        for (let i = 0; i < 300; i++){
-            let index = itemsModel.insertNewItem();
-            itemsModel.setData("Id", i, index)
+        onClicked: {
+            ModalDialogManager.openDialog(dialogComp);
+        }
+    }
 
-            if (i < 100){
-                itemsModel.setData("Name", "Hardware" + i, index)
-                itemsModel.setData("Description", "Hardware"  + i, index)
+    Component {
+        id: dialogComp;
+        Dialog {
+            id: dialog;
+            width: 300;
+
+            function fillButtons(){
+               buttonsModel.clear();
+               buttonsModel.append({"Id": Enums.ok, "Name": qsTr("Apply"), "Enabled": false});
+               buttonsModel.append({"Id": Enums.cancel, "Name": qsTr("Close"), "Enabled": true});
             }
-            else if (i < 200){
-                itemsModel.setData("Name", "", index)
-                itemsModel.setData("Description", "", index)
-            }
-            else{
-                itemsModel.setData("Name", "Hardware" + i, index)
-                itemsModel.setData("Description", "", index)
+
+            contentComp: Component {
+                id: productPairEditor;
+
+                Table {
+                    id: table;
+                    width: dialog.width;
+                    height: contentHeight;
+
+                    TreeItemModel {
+                        id: headers;
+
+                        Component.onCompleted: {
+                            let index = headers.insertNewItem();
+                            headers.setData("Id", "Id", index);
+                            headers.setData("Name", "Name", index);
+                        }
+                    }
+
+                    TreeItemModel {
+                        id: elements;
+
+                        Component.onCompleted: {
+                            let index = elements.insertNewItem();
+                            elements.setData("Id", "Test1", index);
+                            elements.setData("Name", "Test1", index);
+
+                            index = elements.insertNewItem();
+                            elements.setData("Id", "Test2", index);
+                            elements.setData("Name", "Test2", index);
+
+                            table.headers = headers;
+                            table.elements = elements;
+                        }
+                    }
+
+                    onDoubleClicked: {
+                        console.log("Table onDoubleClicked");
+                    }
+                }
             }
         }
-
-//        index = itemsModel.insertNewItem();
-//        itemsModel.setData("Id", index, index)
-//        itemsModel.setData("Name", "Hardware" + index, index)
-//        itemsModel.setData("Description", "Hardware"  + index, index)
-
-//        index = itemsModel.insertNewItem();
-//        itemsModel.setData("Id", index, index)
-//        itemsModel.setData("Name", "", index)
-//        itemsModel.setData("Description", "", index)
-
-//        index = itemsModel.insertNewItem();
-//        itemsModel.setData("Id", index, index)
-//        itemsModel.setData("Name", "Hardware" + index, index)
-//        itemsModel.setData("Description", "", index)
-
-        searchPage.model = rootModel;
-
-        searchPage.doUpdateGui();
     }
 
     TreeItemModel {
         id: rootModel;
     }
 
-    SearchPage {
-        id: searchPage;
-        anchors.fill: parent;
-    }
 }
