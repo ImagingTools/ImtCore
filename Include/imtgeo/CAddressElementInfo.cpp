@@ -142,23 +142,23 @@ bool CAddressElementInfo::Serialize(iser::IArchive& archive)
     bool retVal = BaseClass::Serialize(archive);
 
 	static iser::CArchiveTag idTag("Id", "Address elemen id", iser::CArchiveTag::TT_LEAF);
-	retVal = archive.BeginTag(idTag);
+    retVal = retVal && archive.BeginTag(idTag);
 	retVal = retVal && archive.Process(m_id);
 	retVal = retVal && archive.EndTag(idTag);
 
 	static iser::CArchiveTag adrTypeTag("AddressTypeId", "Type address id", iser::CArchiveTag::TT_LEAF);
-	retVal = archive.BeginTag(adrTypeTag);
+    retVal = retVal && archive.BeginTag(adrTypeTag);
 	QByteArray typeId = m_adrTypeId;
 	retVal = retVal && archive.Process(typeId);
 	retVal = retVal && archive.EndTag(adrTypeTag);
 
 	static iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
-	retVal = archive.BeginTag(nameTag);
+    retVal = retVal && archive.BeginTag(nameTag);
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
 
 	static iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
-	retVal = archive.BeginTag(descriptionTag);
+    retVal = retVal && archive.BeginTag(descriptionTag);
 	retVal = retVal && archive.Process(m_description);
 	retVal = retVal && archive.EndTag(descriptionTag);
 
@@ -212,8 +212,8 @@ bool CAddressElementInfo::IsEqual(const IChangeable& object) const
         retVal = retVal && m_adrTypeId == sourcePtr->m_adrTypeId;
         retVal = retVal && m_name == sourcePtr->m_name;
         retVal = retVal && m_description == sourcePtr->m_description;
-        retVal = retVal && m_address == sourcePtr->m_address;
-        retVal = retVal && m_hasChildren == sourcePtr->m_hasChildren;
+        // retVal = retVal && m_address == sourcePtr->m_address;
+        // retVal = retVal && m_hasChildren == sourcePtr->m_hasChildren;
 
         return retVal;
     }
