@@ -8,12 +8,28 @@ Item {
     width: contentWidth;
     height: 30;
 
+    property string eventCommandPrefix;
     property alias contentWidth: content_.width;
     property int maximumWidth: -1;
-    property string commandId;
 
+    // Count of the command groups in this view
     property alias countGroups: repeater.count;
     property TreeItemModel commandsModel: TreeItemModel {}
+
+    // Reference on the all elements in order of visibility to this view
+    property var allElements: []
+
+    // Reference on the all elements in order of priority to this view
+    property var priorityElements: []
+
+    // Commands with negative accent
+    property var negativeAccentCommandIds: []
+
+     // Commands with positive accent
+    property var positiveAccentCommandIds: []
+
+    property string positiveAccentColor: Style.imaginToolsAccent;
+    property string negativeAccentColor: Style.errorTextColor;
 
     onVisibleChanged: {
         if (visible){
@@ -55,6 +71,8 @@ Item {
         repeater.model = commandsItem.commandsModel;
     }
 
+
+    // Clear view
     function clear(){
         commandsModel.clear();
         allElements = []
@@ -75,17 +93,14 @@ Item {
         return commandsModel.getItemsCount() === 0;
     }
 
+    // The function checks whether the commands fit into the maximum width of this view
+    // If they do not fit, then we hide the command with the lowest priority
     function checkWidth(){
-        console.log("CommandsView checkWidth");
-
         if (maximumWidth < 0){
             return;
         }
 
-        console.log("maximumWidth", maximumWidth);
         let totalContentWidth = contentWidth + Style.size_mainMargin;
-        console.log("totalContentWidth", totalContentWidth);
-
         if (totalContentWidth > maximumWidth){
             let tempWidth = totalContentWidth;
             for (let j = priorityElements.length - 1; j >= 0; j--){
@@ -120,9 +135,6 @@ Item {
         }
     }
 
-    property var allElements: []
-    property var priorityElements: []
-
     Row {
         id: content_;
         height: commandsItem.height;
@@ -141,11 +153,13 @@ Item {
                     Row {
                         id: listView;
                         height: commandsItem.height;
+                        spacing: Style.size_mainMargin;
 
                         Repeater {
                             id: repeater2;
                             model: itemDelegate.dataModel.SubElements;
                             delegate: Component { Button {
+                                    id: button;
                                     enabled: model.IsEnabled;
                                     visible: model.Visible;
                                     text: model.Name;
@@ -154,16 +168,28 @@ Item {
                                     iconSource: model.Icon === "" ? "" : model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
                                                                                            "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
                                     decorator: Component {
-                                        TopButtonDecorator {}
+                                        TopButtonDecorator {
+                                            property string baseColor: baseElement && baseElement.mouseArea.containsMouse ? Style.baseColor : Style.backgroundColor2;
+                                            property string baseTextColor: !baseElement ? "transparent" : baseElement.enabled ? Style.textColor : Style.inactive_textColor;
+                                            color: button.isPositiveAccent ? commandsItem.positiveAccentColor : button.isNegativeAccent ? commandsItem.negativeAccentColor : baseColor;
+                                            textColor: button.isPositiveAccent || button.isNegativeAccent ? "white" : baseTextColor;
+                                            icon.source: button.isPositiveAccent || button.isNegativeAccent ?
+                                                           "../../../../" + Style.getIconPath(button.modelData.Icon, Icon.State.Off, Icon.Mode.Disabled)
+                                                           : baseElement.iconSource;
+                                            border.width: button.isPositiveAccent || button.isNegativeAccent ? 0 : baseElement.mouseArea.containsMouse;
+                                        }
                                     }
 
                                     onClicked: {
-                                        Events.sendEvent(commandsItem.commandId + "CommandActivated", model.Id);
+                                        Events.sendEvent(commandsItem.eventCommandPrefix + "CommandActivated", model.Id);
                                     }
 
                                     onWidthChanged: {
                                         maxWidth = Math.max(maxWidth, width);
                                     }
+
+                                    property bool isNegativeAccent: commandsItem.negativeAccentCommandIds.includes(model.Id);
+                                    property bool isPositiveAccent: commandsItem.positiveAccentCommandIds.includes(model.Id);
 
                                     property int priority: model.Priority;
                                     property int groupPriority: itemDelegate.priority;
@@ -205,6 +231,6 @@ Item {
                 }
             }
         }
-    }
+    } // Main row
 }
 

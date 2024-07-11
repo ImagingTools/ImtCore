@@ -25,6 +25,18 @@ Item {
         return result;
     }
 
+    function setNegativeAccentCommandIds(commandIds){
+        leftCommands.negativeAccentCommandIds = commandIds;
+        centerCommands.negativeAccentCommandIds = commandIds;
+        rightCommands.negativeAccentCommandIds = commandIds;
+    }
+
+    function setPositiveAccentCommandIds(commandIds){
+        leftCommands.positiveAccentCommandIds = commandIds;
+        centerCommands.positiveAccentCommandIds = commandIds;
+        rightCommands.positiveAccentCommandIds = commandIds;
+    }
+
     function setCommandData(commandId, key, value){
         leftCommands.setCommandData(commandId, key, value);
         centerCommands.setCommandData(commandId, key, value);
@@ -62,7 +74,6 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("CommandsPanel onCompleted");
         widthTimer.restart();
         buttonTimer.restart();
     }
@@ -102,10 +113,7 @@ Item {
     }
 
     function checkButtonVisible(){
-        console.log("checkButtonVisible");
-
         button.visible = leftCommands.hasHiddenCommands() || centerCommands.hasHiddenCommands() || rightCommands.hasHiddenCommands();
-        console.log("button.visible", button.visible);
     }
 
     CommandsView {
@@ -113,21 +121,21 @@ Item {
         anchors.left: parent.left;
         anchors.leftMargin: Style.size_mainMargin;
         maximumWidth: centerCommands.countGroups > 0 ? centerCommands.x : rightCommands.countGroups > 0 ? rightCommands.x : commandsItem.width;
-        commandId: commandsItem.commandId;
+        eventCommandPrefix: commandsItem.commandId;
     }
 
     CommandsView {
         id: centerCommands;
         anchors.horizontalCenter: parent.horizontalCenter;
-        commandId: commandsItem.commandId;
         maximumWidth: rightCommands.countGroups > 0 ? rightCommands.x - centerCommands.x : commandsItem.width - centerCommands.x;
+        eventCommandPrefix: commandsItem.commandId;
     }
 
     CommandsView {
         id: rightCommands;
         anchors.right: button.left;
         anchors.rightMargin: Style.size_mainMargin;
-        commandId: commandsItem.commandId;
+        eventCommandPrefix: commandsItem.commandId;
     }
 
     ToolButton {
@@ -141,11 +149,6 @@ Item {
         decorator: Component {
             ToolButtonDecorator {
                 color: baseElement && baseElement.hovered  ? Style.baseColor : "transparent";
-
-//                color: !commonButtonDecorator.baseElement ? "transparent" :
-//                                                            commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
-//                                                            Style.baseColor : commonButtonDecorator.baseElement.hovered ?
-//                                                            Style.baseColor : Style.backgroundColor2
             }
         }
 

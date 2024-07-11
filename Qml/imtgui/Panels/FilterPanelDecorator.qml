@@ -98,7 +98,7 @@ DecoratorBase {
                         anchors.verticalCenter: parent.verticalCenter;
                         width: 15;
                         height: width;
-                        iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+                        iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.Off, Icon.Mode.Disabled)
                         visible: rect.filterEnabled;
                         onClicked: {
                             rect.filterEnabled = false;
@@ -110,6 +110,7 @@ DecoratorBase {
                             ToolButtonDecorator {
                                 color: "transparent";
                                 icon.width: 16;
+                                textColor: "white";
                             }
                         }
                     }
