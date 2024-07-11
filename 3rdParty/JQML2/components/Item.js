@@ -88,6 +88,8 @@ class Item extends QtObject {
         /* Keys */
     }
 
+    $anchorsUpdateList = []
+
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
         this.createDom('div', {
@@ -105,6 +107,17 @@ class Item extends QtObject {
 
             this.getProperty('activeFocus').setCompute(()=>{this.getProperty('activeFocus').subscribe(this.getProperty('focus'));return this.getProperty('focus').get()})
             this.getProperty('activeFocus').update()
+        }
+    }
+
+    $complete(){
+        super.$complete()
+        this.$anchorsUpdate()
+    }
+
+    $anchorsUpdate(){
+        for(let func of this.$anchorsUpdateList.splice(0, this.$anchorsUpdateList.length)){
+            func()
         }
     }
     
@@ -412,7 +425,7 @@ class Item extends QtObject {
             if(this.$completed){
                 update()
             } else {
-                updateList.push(update)
+                this.$anchorsUpdateList.push(update)
             }
             
             return
@@ -451,7 +464,7 @@ class Item extends QtObject {
             if(this.$completed){
                 update()
             } else {
-                updateList.push(update)
+                this.$anchorsUpdateList.push(update)
             }
             
             
@@ -554,7 +567,7 @@ class Item extends QtObject {
                 if(this.$completed){
                     update()
                 } else {
-                    updateList.push(update)
+                    this.$anchorsUpdateList.push(update)
                 }
         
             } else if(this.getProperty('anchors').getPropertyValue('left')){
@@ -608,7 +621,7 @@ class Item extends QtObject {
                 if(this.$completed){
                     update()
                 } else {
-                    updateList.push(update)
+                    this.$anchorsUpdateList.push(update)
                 }
             } else if(this.getProperty('anchors').getPropertyValue('right')){
                 this.getProperty('x').freeze()
@@ -662,7 +675,7 @@ class Item extends QtObject {
                 if(this.$completed){
                     update()
                 } else {
-                    updateList.push(update)
+                    this.$anchorsUpdateList.push(update)
                 }
             }
         } 
@@ -763,7 +776,7 @@ class Item extends QtObject {
                 if(this.$completed){
                     update()
                 } else {
-                    updateList.push(update)
+                    this.$anchorsUpdateList.push(update)
                 }
         
             } else if(this.getProperty('anchors').getPropertyValue('top')){
@@ -817,7 +830,7 @@ class Item extends QtObject {
                 if(this.$completed){
                     update()
                 } else {
-                    updateList.push(update)
+                    this.$anchorsUpdateList.push(update)
                 }
             } else if(this.getProperty('anchors').getPropertyValue('bottom')){
                 this.getProperty('y').freeze()
@@ -870,7 +883,7 @@ class Item extends QtObject {
                 if(this.$completed){
                     update()
                 } else {
-                    updateList.push(update)
+                    this.$anchorsUpdateList.push(update)
                 }
             }
         }
@@ -926,7 +939,7 @@ class Item extends QtObject {
             if(this.$completed){
                 update()
             } else {
-                updateList.push(update)
+                this.$anchorsUpdateList.push(update)
             }
         }
 
@@ -981,7 +994,7 @@ class Item extends QtObject {
             if(this.$completed){
                 update()
             } else {
-                updateList.push(update)
+                this.$anchorsUpdateList.push(update)
             }
         }
     }
