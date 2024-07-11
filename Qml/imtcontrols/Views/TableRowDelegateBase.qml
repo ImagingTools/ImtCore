@@ -369,50 +369,50 @@ Rectangle {
 
         property int clickCount: 0;
 
-        onDoubleClicked: {
-            if (mouse.button === Qt.RightButton) {
-                return;
-            }
-
-            tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
-
-            mouse.accepted = false;
-        }
-
-        onClicked: {
-            if (mouse.button === Qt.RightButton) {
-                tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
-            }
-            tableDelegateContainer.clicked();
-
-            mouse.accepted = false;
-        }
-
-//        onClicked: {
-//            clickCount++;
-
-//            if (ma.clickCount == 1){
-//                if (mouse.button === Qt.RightButton) {
-//                    tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
-//                }
-//                tableDelegateContainer.clicked();
-
-//                timer.start();
+//        onDoubleClicked: {
+//            if (mouse.button === Qt.RightButton) {
+//                return;
 //            }
 
-//            if (ma.clickCount == 2){
-//                if (mouse.button === Qt.RightButton) {
-//                    return;
-//                }
-
-//                tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
-
-//                ma.clickCount = 0;
-//                timer.stop();
-//            }
+//            tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
 
 //            mouse.accepted = false;
 //        }
+
+//        onClicked: {
+//            if (mouse.button === Qt.RightButton) {
+//                tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
+//            }
+//            tableDelegateContainer.clicked();
+
+//            mouse.accepted = false;
+//        }
+
+        onClicked: {
+            clickCount++;
+
+            if (ma.clickCount == 1){
+                if (mouse.button === Qt.RightButton) {
+                    tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
+                }
+                tableDelegateContainer.clicked();
+
+                timer.start();
+            }
+
+            if (ma.clickCount == 2){
+                if (mouse.button === Qt.RightButton) {
+                    return;
+                }
+
+                tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
+
+                ma.clickCount = 0;
+                timer.stop();
+            }
+
+            mouse.accepted = false;
+        }
     }
 
     Component{

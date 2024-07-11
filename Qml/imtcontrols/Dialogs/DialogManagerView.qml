@@ -49,7 +49,6 @@ Item {
                         Events.sendEvent("DialogBackgroundClicked");
                         mouse.accepted = true;
                     }
-                    onDoubleClicked: {}
                     onReleased: {}
                     onPressAndHold: {}
                     onPressed: {}

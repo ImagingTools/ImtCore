@@ -119,7 +119,7 @@ Item {
         id: button;
         anchors.verticalCenter: parent.verticalCenter;
         anchors.right: parent.right;
-        width: visible ? Style.buttonWidthMedium : 0;
+        width: visible ? 30 : 0;
         height: width;
         iconSource: "../../../" + Style.getIconPath("Icons/More", Icon.Mode.On, Icon.State.Active);
         visible: false;
