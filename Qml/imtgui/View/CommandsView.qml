@@ -5,154 +5,198 @@ import imtcontrols 1.0
 
 Item {
     id: commandsItem;
+    width: contentWidth;
     height: 30;
 
+    property alias contentWidth: content_.width;
+    property int maximumWidth: -1;
+    property string commandId;
+
+    property alias countGroups: repeater.count;
     property TreeItemModel commandsModel: TreeItemModel {}
-    property alias content: content_;
+
+    onVisibleChanged: {
+        if (visible){
+            timer.restart();
+        }
+    }
+
+    Timer {
+        id: timer;
+        interval: 10;
+        onTriggered: {
+            commandsItem.checkWidth();
+        }
+    }
+
+    function setCommandData(commandId, key, value){
+        for (let j = 0; j < allElements.length; j++){
+            if (allElements[j].modelData["Id"] === commandId){
+                allElements[j].modelData[key] = value;
+
+                break;
+            }
+        }
+    }
+
+    function getCommandData(commandId, key){
+        for (let j = 0; j < allElements.length; j++){
+            if (allElements[j].modelData["Id"] === commandId){
+                return allElements[j].modelData[key];
+            }
+        }
+
+        return null;
+    }
 
     function addCommandGroup(commands){
         let index = commandsModel.insertNewItem();
-
-        let subModel = commandsModel.addTreeModel("SubElements", index)
-        subModel.copy(commands);
-
+        commandsModel.copyItemDataFromModel(index, commands);
         repeater.model = commandsItem.commandsModel;
     }
 
     function clear(){
         commandsModel.clear();
+        allElements = []
+        priorityElements = []
     }
+
+    function hasHiddenCommands(){
+        for (let j = 0; j < allElements.length; j++){
+            if (!allElements[j].modelData.Visible){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function isEmpty(){
+        return commandsModel.getItemsCount() === 0;
+    }
+
+    function checkWidth(){
+        if (maximumWidth < 0){
+            return;
+        }
+
+        let totalContentWidth = contentWidth + Style.size_mainMargin;
+        if (totalContentWidth > maximumWidth){
+            let tempWidth = totalContentWidth;
+            for (let j = priorityElements.length - 1; j >= 0; j--){
+                if (priorityElements[j].modelData.Visible){
+                    let elementWidth = priorityElements[j].maxWidth;
+                    tempWidth -= elementWidth;
+
+                    priorityElements[j].modelData.Visible = false;
+
+                    if (tempWidth < maximumWidth){
+                        break;
+                    }
+                }
+            }
+        }
+        else{
+            let tempWidth = totalContentWidth;
+            for (let j = 0; j < priorityElements.length; j++){
+                if (!priorityElements[j].modelData.Visible){
+                    let elementWidth = priorityElements[j].maxWidth;
+                    tempWidth += elementWidth;
+
+                    if (tempWidth < maximumWidth){
+                        priorityElements[j].modelData.Visible = true;
+                    }
+
+                    if (tempWidth >= maximumWidth){
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    property var allElements: []
+    property var priorityElements: []
 
     Row {
         id: content_;
         height: commandsItem.height;
-        spacing: 50;
+        spacing: Style.size_mainMargin;
 
         Repeater {
             id: repeater;
             delegate: Component {
                 Item {
-                    id: item;
+                    id: itemDelegate;
+                    width: listView.width;
                     height: commandsItem.height;
-                    width: commandsItem.width;
                     property var dataModel: model;
+                    property int priority: model.Priority ? model.Priority: -1;
 
-                    ButtonPanel {
+                    Row {
                         id: listView;
-                        width: commandsItem.width;
-                        height: parent.height
-                        horizontalSpacing: Style.size_mainMargin;
-                        verticalSpacing: 2;
-                        openButtonImageSource: "../../../" + Style.getIconPath("Icons/Next", Icon.Mode.On, Icon.State.Active);
-                        menuAlignRight: true;
-//                        buttonModel: item.dataModel.SubElements;
-                        buttonModel: model.SubElements;
-                        onButtonModelChanged: {
-                            updateModel();
-                        }
+                        height: commandsItem.height;
 
-                        buttonDelegate: Component {
-                            Item {
-                                width: isHorizontal ? topButtonDelegate.width : -listView.horizontalSpacing;
-                                height: topButtonDelegate.height;
-                                property bool isHorizontal: model.IsHorizontal == undefined ? true : model.IsHorizontal;
-                                visible: model.Id !== "";
-
-                                Button {
-                                    id: topButtonDelegate;
-                                    decorator: Style.topButtonDecorator
-                                    iconSource: model.Icon === "" ? "" : model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
-                                                                   "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
+                        Repeater {
+                            id: repeater2;
+                            model: itemDelegate.dataModel.SubElements;
+                            delegate: Component { Button {
                                     enabled: model.IsEnabled;
                                     visible: model.Visible;
                                     text: model.Name;
-                                    checkable: model.IsToggleable !== undefined ? model.IsToggleable : false
                                     widthFromDecorator: true;
                                     heightFromDecorator: true;
-                                    property bool isToggled: model.IsToggled !== undefined ? model.IsToggled : false;
-                                    onIsToggledChanged: {
-                                        checked = checkable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
+                                    iconSource: model.Icon === "" ? "" : model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
+                                                                                           "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
+                                    decorator: Component {
+                                        TopButtonDecorator {}
                                     }
+
                                     onClicked: {
-//                                        Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
+                                        Events.sendEvent(commandsItem.commandId + "CommandActivated", model.Id);
                                     }
+
+                                    onWidthChanged: {
+                                        maxWidth = Math.max(maxWidth, width);
+                                    }
+
+                                    property int priority: model.Priority;
+                                    property int groupPriority: itemDelegate.priority;
+                                    property var modelData: model;
+                                    property var subElements: repeater2.model;
+
+                                    property int maxWidth: -1;
                                 }
                             }
-                        }
 
-                        buttonDelegateVert: Component{
-                            Item{
-                                id: verticalComp;
-
-                                width: 150;
-                                height: isHorizontal ? -listView.verticalSpacing : model.Name == "" ? splitter.height : textButtonDelegateContainer.height;
-
-                                property bool isHorizontal: model.IsHorizontal == undefined ? true : model.IsHorizontal;
-
-                                Button {
-                                    id: textButtonDelegateContainer;
-                                    width: parent.width;
-                                    visible: model.Name !== "";
-                                    iconSource: model.IsEnabled !== "" ? (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) : "") :
-                                                                         (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled) : "");
-                                    enabled: model.IsEnabled;
-                                    text: model.Name !== undefined ? model.Name : "";
-                                    checked: checkable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
-                                    checkable: model.IsToggleable !== undefined ? model.IsToggleable : false
-
-                                    decorator: Component {
-                                        ButtonDecorator {
-                                            border.color: "transparent"
-                                            color: "transparent";
-                                        }
-                                    }
-
-                                    property string id: model.Id !== undefined ? model.Id : "";
-
-                                    onClicked: {
-//                                        Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
-//                                        if (listView){
-//                                            listView.clicked(id);
-//                                        }
-                                    }
+                            onItemAdded: {
+                                if (!commandsItem.allElements.includes(item)){
+                                    commandsItem.allElements.push(item);
                                 }
 
-                                Rectangle{
-                                    id: splitter;
-
-                                    anchors.top: parent.top;
-
-                                    width: verticalComp.isHorizontal ? 1 : listView.verticalMenuWidth;
-                                    height: model.Name == "" && model.index == listView.horizCount ? -listView.verticalSpacing : 1;
-                                    color: Style.textColor;
-                                    visible: model.Name !== "" ? false : model.index == listView.horizCount ? false : model.index == listView ? false : true ;
+                                if (!commandsItem.priorityElements.includes(item)){
+                                    commandsItem.priorityElements.push(item);
                                 }
+
+                                commandsItem.priorityElements.sort(function(item1, item2){
+                                    if (item1.groupPriority > item2.groupPriority){
+                                        return -1;
+                                    }
+                                    if (item1.groupPriority < item2.groupPriority){
+                                        return 1;
+                                    }
+                                    if (item1.priority > item2.priority){
+                                        return -1;
+                                    }
+                                    if (item1.priority < item2.priority){
+                                        return 1;
+                                    }
+
+                                    return 0;
+                                });
                             }
                         }
                     }
-
-//                    ListView {
-//                        id: listView;
-//                        width: contentWidth;
-//                        height: parent.height;
-//                        boundsBehavior: Flickable.StopAtBounds;
-//                        orientation: ListView.Horizontal;
-//                        interactive: false;
-//                        spacing: Style.size_mainMargin;
-//                        model: item.dataModel.SubElements;
-//                        delegate: Button {
-//                            enabled: model.IsEnabled;
-//                            visible: model.Visible;
-//                            text: model.Name;
-//                            widthFromDecorator: true;
-//                            heightFromDecorator: true;
-//                            iconSource: model.Icon === "" ? "" : model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
-//                                                           "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
-//                            decorator: Component {
-//                                TopButtonDecorator {}
-//                            }
-//                        }
-//                    }
                 }
             }
         }

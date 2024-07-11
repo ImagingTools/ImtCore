@@ -25,6 +25,8 @@ public:
 		I_ASSIGN(m_representationControllerCompPtr, "ContainerRepresentationController", "Representation controller for the sub elements container", false, "ContainerRepresentationController");
 		I_ASSIGN(m_modelIdAttrPtr, "ModelId", "Model-ID", false, "");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
+		I_ASSIGN(m_commandPermissionsProviderCompPtr, "CommandPermissionsProvider", "Command permissions provider", false, "CommandPermissionsProvider");
+		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
 	I_END_COMPONENT;
 
 protected:
@@ -43,6 +45,8 @@ protected:
 	I_ATTR(QByteArray, m_modelIdAttrPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 	I_REF(imtbase::IRepresentationController, m_representationControllerCompPtr);
+	I_REF(imtbase::ICommandPermissionsProvider, m_commandPermissionsProviderCompPtr);
+	I_REF(imtauth::IPermissionChecker, m_checkPermissionCompPtr);
 };
 
 

@@ -251,6 +251,27 @@ DocumentDataController {
                     return;
                 }
 
+                if ("errors" in responseObj){
+                    let errorsObject = responseObj["errors"];
+                    if (container.gqlAddCommandId in errorsObject){
+                        errorsObject = errorsObject[container.gqlAddCommandId]
+                    }
+
+                    let message = ""
+                    if ("message" in errorsObject){
+                        message = errorsObject["message"];
+                    }
+
+                    let type;
+                    if ("type" in type){
+                        type = errorsObject["type"];
+                    }
+
+                    container.error(message, type);
+
+                    return;
+                }
+
                 if ("data" in responseObj){
                     let dataObject = responseObj["data"];
 

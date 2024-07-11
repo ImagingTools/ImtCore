@@ -22,17 +22,10 @@ ItemDelegateDecorator {
 
     Rectangle {
         id: separator;
-
-        anchors.left: root.left;
-        anchors.leftMargin: Style.size_mainMargin;
-        anchors.right: root.right;
-        anchors.rightMargin: Style.size_mainMargin;
         anchors.verticalCenter: root.verticalCenter;
-
+        width: root.width;
         height: 1;
-
-        color: Style.textColor;
-
+        color: Style.borderColor;
         visible: root.isSeparator;
     }
 }

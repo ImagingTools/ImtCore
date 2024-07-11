@@ -8,12 +8,12 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CheckPermissionOr" X="575" Y="575" Note=""/>
+        <Element ComponentName="CheckPermissionOr" X="825" Y="100" Note=""/>
         <Element ComponentName="Command" X="275" Y="175" Note=""/>
-        <Element ComponentName="CommandPermissions" X="550" Y="425" Note=""/>
-        <Element ComponentName="CommandRepresentationController" X="800" Y="175" Note=""/>
+        <Element ComponentName="CommandPermissions" X="825" Y="200" Note=""/>
+        <Element ComponentName="CommandRepresentationController" X="825" Y="350" Note=""/>
         <Element ComponentName="SubCommands" X="275" Y="325" Note=""/>
-        <Element ComponentName="SubElementsRepresentationController" X="800" Y="325" Note=""/>
+        <Element ComponentName="SubElementsRepresentationController" X="825" Y="475" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

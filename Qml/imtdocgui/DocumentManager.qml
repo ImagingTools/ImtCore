@@ -95,10 +95,14 @@ Item {
     }
 
 
-    function registerDocumentView(documentTypeId, viewTypeId, viewComp)
+    function registerDocumentView(documentTypeId, viewTypeId, viewComp, byDefault)
     {
         if (documentTypeId === "" || viewTypeId === "" || !viewComp){
             return false;
+        }
+
+        if (!byDefault){
+            byDefault = false;
         }
 
         if (documentIsRegistered(documentTypeId)){
@@ -108,10 +112,10 @@ Item {
                 return false;
             }
 
-            internal.m_registeredView[documentTypeId].push({"ViewTypeId": viewTypeId, "ViewComp": viewComp});
+            internal.m_registeredView[documentTypeId].push({"ViewTypeId": viewTypeId, "ViewComp": viewComp, "ByDefault": byDefault});
         }
         else{
-            internal.m_registeredView[documentTypeId] = [{"ViewTypeId": viewTypeId, "ViewComp": viewComp}]
+            internal.m_registeredView[documentTypeId] = [{"ViewTypeId": viewTypeId, "ViewComp": viewComp, "ByDefault": byDefault}]
         }
 
         return true;

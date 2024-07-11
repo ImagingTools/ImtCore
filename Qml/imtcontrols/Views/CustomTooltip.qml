@@ -62,16 +62,23 @@ ControlBase {
         customTooltip.dialogIndex = ModalDialogManager.count;
 
         ModalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": xX, "y": yY});
-        ModalDialogManager.backgroundItem.visible = false;
+        if (ModalDialogManager.backgroundItem){
+            ModalDialogManager.backgroundItem.visible = false;
+        }
+
         customTooltip.openST = true;
     }
 
     function openTooltip(xX, yY){
         if(!customTooltip.openST){
+            if (!ModalDialogManager.activeView){
+                return;
+            }
+
             var point = mapToItem(null, xX, yY);
             var centeredAdd = customTooltip.fitToTextWidth ? customTooltip.fitToHCenter * (forWidthText.width/2 + customTooltip.textMargin + customTooltip.componentMargin) :
                                                              customTooltip.fitToHCenter * (customTooltip.tooltipWidth/2 + customTooltip.componentMargin);
-            if(point.x > ModalDialogManager.width*2/3){
+            if(point.x > ModalDialogManager.activeView.width*2/3){
                 if(customTooltip.fitToTextWidth){
                     point.x = point.x - forWidthText.width - 2*customTooltip.textMargin - customTooltip.componentMargin + centeredAdd;
                 }
@@ -83,7 +90,7 @@ ControlBase {
                 point.x = point.x + customTooltip.componentMargin - centeredAdd;
             }
 
-            if(point.y > ModalDialogManager.height*2/3){
+            if(point.y > ModalDialogManager.activeView.height*2/3){
                 point.y = point.y - customTooltip.componentHeight - customTooltip.componentMargin;
             }
             else{
@@ -96,7 +103,6 @@ ControlBase {
 
     function closeTooltip(){
         if(customTooltip.openST){
-//            ModalDialogManager.closeDialog(customTooltip.dialogIndex);
             ModalDialogManager.closeByComp(customTooltip.tooltipContentComp);
 
             customTooltip.openST = false;

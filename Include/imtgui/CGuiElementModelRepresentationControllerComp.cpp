@@ -2,8 +2,8 @@
 
 
 // ACF includes
-#include <iprm/TParamsPtr.h>
 #include <iprm/IIdParam.h>
+#include <iprm/TParamsPtr.h>
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
@@ -51,14 +51,37 @@ bool CGuiElementModelRepresentationControllerComp::GetRepresentationFromDataMode
 		return false;
 	}
 
+	iprm::TParamsPtr<imtauth::IUserInfo> userInfoParamPtr(paramsPtr, "UserInfo");
+
+	imtauth::IUserInfo::FeatureIds userPermissions;
+	bool isAdmin = true;
+	if (userInfoParamPtr.IsValid()){
+		userPermissions = userInfoParamPtr->GetPermissions();
+		isAdmin = userInfoParamPtr->IsAdmin();
+	}
+
 	QByteArray elementId = guiElementPtr->GetElementId();
+
+	if (!isAdmin){
+		if (m_commandPermissionsProviderCompPtr.IsValid()){
+			QByteArrayList elementPermissions = m_commandPermissionsProviderCompPtr->GetCommandPermissions(elementId);
+			if (m_checkPermissionCompPtr.IsValid() && !elementPermissions.isEmpty()){
+				bool result = m_checkPermissionCompPtr->CheckPermission(userPermissions, elementPermissions);
+				if (!result){
+					return false;
+				}
+			}
+		}
+	}
+
+	QString elementName = guiElementPtr->GetElementName();
 	QString elementDescription = guiElementPtr->GetElementDescription();
 	QString elementPath = guiElementPtr->GetElementItemPath();
 	QString elementStatus = guiElementPtr->GetElementStatus();
 	bool isEnabled = guiElementPtr->IsEnabled();
 	bool isVisible = guiElementPtr->IsVisible();
 	int priority = guiElementPtr->GetPriority();
-	QString elementName = guiElementPtr->GetElementName();
+	int alignment = guiElementPtr->GetAlignment();
 
 	QByteArray languageId;
 	if (paramsPtr != nullptr){
@@ -91,6 +114,7 @@ bool CGuiElementModelRepresentationControllerComp::GetRepresentationFromDataMode
 	representation.SetData("Icon", elementPath);
 	representation.SetData("Status", elementStatus);
 	representation.SetData("Priority", priority);
+	representation.SetData("Alignment", alignment);
 
 	const imtgui::IGuiElementContainer* subElementsPtr = guiElementPtr->GetSubElements();
 	if (subElementsPtr != nullptr && m_representationControllerCompPtr.IsValid()){

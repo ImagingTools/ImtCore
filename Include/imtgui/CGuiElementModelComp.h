@@ -31,10 +31,11 @@ public:
 		I_ASSIGN(m_enabledAttrPtr, "IsEnabled", "Element is enabled", false, true);
 		I_ASSIGN(m_visibleAttrPtr, "IsVisible", "Element visibility", false, true);
 		I_ASSIGN(m_priorityAttrPtr, "Priority", "Element priority", false, 0);
+		I_ASSIGN(m_alignmentAttrPtr, "Alignment", "Alignment", false, 1);
 		I_ASSIGN(m_subElementsCompPtr, "SubElementsContainer", "Container of the sub elements", false, "SubElementsContainer");
 	I_END_COMPONENT;
 
-	// reimplemented (imtgui::IGuiElementContainer)
+	// reimplemented (imtgui::IGuiElementModel)
 	virtual QByteArray GetElementId() const override;
 	virtual QString GetElementName() const override;
 	virtual QString GetElementDescription() const override;
@@ -43,6 +44,7 @@ public:
 	virtual bool IsEnabled() const override;
 	virtual bool IsVisible() const override;
 	virtual int GetPriority() const override;
+	virtual int GetAlignment() const override;
 	virtual const IGuiElementContainer* GetSubElements() const override;
 
 protected:
@@ -54,6 +56,7 @@ protected:
 	I_ATTR(bool, m_enabledAttrPtr);
 	I_ATTR(bool, m_visibleAttrPtr);
 	I_ATTR(int, m_priorityAttrPtr);
+	I_ATTR(int, m_alignmentAttrPtr);
 	I_REF(imtgui::IGuiElementContainer, m_subElementsCompPtr);
 };
 

@@ -102,17 +102,6 @@ DocumentManager {
         delegate: Item {
             anchors.fill: documentRepeater;
 
-//            CommandsPanel {
-//                id: commandsPanelItem;
-//                width: parent.width;
-//                visible: documentLoader.visible;
-//                onLoaded: {
-//                    if (documentLoader.item){
-//                        documentLoader.item.commandsView = item;
-//                    }
-//                }
-//            }
-
             Loader {
                 id: documentLoader;
 
@@ -132,10 +121,6 @@ DocumentManager {
                 }
 
                 onLoaded: {
-//                    if (item.commandsViewComp){
-//                        commandsPanelItem.commandsSourceComp = item.commandsViewComp;
-//                    }
-
                     if (item.viewId !== undefined){
                         item.viewId = model.Uuid;
                     }

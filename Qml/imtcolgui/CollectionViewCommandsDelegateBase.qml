@@ -36,9 +36,9 @@ ViewCommandsDelegateBase {
 
     onCollectionViewChanged: {
         if (collectionView){
+            commandsControllerConn.target = collectionView.commandsController
             collectionConnections.target = collectionView;
             elementsConnections.target = collectionView.table;
-            commandsControllerConn.target = collectionView.commandsController
         }
     }
 
@@ -46,6 +46,7 @@ ViewCommandsDelegateBase {
         id: commandsControllerConn;
 
         function onCommandsModelChanged(){
+            console.log("collectionViewCommandsDelegate onCommandsModelChanged");
             collectionViewCommandsDelegate.setupContextMenu();
         }
     }
@@ -55,18 +56,6 @@ ViewCommandsDelegateBase {
 
         function onSelectionChanged(selection){
             collectionViewCommandsDelegate.updateItemSelection(selection);
-        }
-    }
-
-    QtObject {
-        id: internal;
-
-        function onSelectionChanged(selection){
-            collectionViewCommandsDelegate.updateItemSelection(selection);
-        }
-
-        function onCommandsModelChanged(){
-            collectionViewCommandsDelegate.setupContextMenu();
         }
     }
 
@@ -173,6 +162,8 @@ ViewCommandsDelegateBase {
     }
 
     function commandHandle(commandId){
+        console.log("commandHandle", commandId);
+
         if (!collectionViewCommandsDelegate.collectionView){
             return;
         }
@@ -191,6 +182,8 @@ ViewCommandsDelegateBase {
                 collectionViewCommandsDelegate.onRemove();
             }
             else if (commandId === "Edit"){
+                console.log("onEdit", commandId);
+
                 collectionViewCommandsDelegate.onEdit();
             }
         }

@@ -89,6 +89,16 @@ int CGuiElementModelComp::GetPriority() const
 }
 
 
+int CGuiElementModelComp::GetAlignment() const
+{
+	if (m_alignmentAttrPtr.IsValid()){
+		return *m_alignmentAttrPtr;
+	}
+
+	return 1;
+}
+
+
 const imtgui::IGuiElementContainer* CGuiElementModelComp::GetSubElements() const
 {
 	return m_subElementsCompPtr.GetPtr();

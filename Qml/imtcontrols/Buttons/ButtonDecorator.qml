@@ -108,7 +108,7 @@ DecoratorBase {
             height: width
             sourceSize.width: width
             sourceSize.height: height
-            source: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.iconSource
+            source: commonButtonDecorator.baseElement &&  commonButtonDecorator.baseElement.iconSource ? commonButtonDecorator.baseElement.iconSource: "";
             visible: source != "";
         }
 

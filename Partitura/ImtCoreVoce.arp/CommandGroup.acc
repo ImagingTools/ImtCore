@@ -10,6 +10,11 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="CheckPermissionOr" PackageId="ImtAuthPck" ComponentId="CheckPermissionOr">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="ContainerRepresentationController" PackageId="ImtGuiPck" ComponentId="GuiElementContainerRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -94,14 +99,20 @@
         <Element Id="GroupRepresentationController" PackageId="ImtGuiPck" ComponentId="CommandGroupRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="CommandPermissionsProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GroupPermissions"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ContainerRepresentationController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ContainerRepresentationController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ModelId" Type="Reference" ExportId="GroupId">
+                    <AttributeInfo Id="ModelId" Type="Id" ExportId="GroupId">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CheckPermissionOr"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>

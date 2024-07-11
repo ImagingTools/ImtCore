@@ -208,11 +208,6 @@ I_EXPORT_COMPONENT(
 			"Selection Param Gui");
 
 I_EXPORT_COMPONENT(
-			CommandGroup,
-			"Command group gui",
-			"Command Group Gui");
-
-I_EXPORT_COMPONENT(
 			GuiElementModelRepresentationController,
 			"Gui element model representation controller",
 			"Gui Element Model Representation Controller");
@@ -221,11 +216,6 @@ I_EXPORT_COMPONENT(
 			GuiElementContainerRepresentationController,
 			"Gui element container representation controller",
 			"Gui Element Container Representation Controller");
-
-I_EXPORT_COMPONENT(
-			CommandGroupRepresentationController,
-			"Command group representation controller",
-			"Command Group Representation Controller");
 
 
 } // namespace ImtGuiPck

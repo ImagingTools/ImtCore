@@ -19,7 +19,7 @@ ControlBase {
     property Item root: null;
 
     property int itemWidth: 200;
-    property int itemHeight: 26;
+    property int itemHeight: 30;
     property int shownItemsCount: 5;
 
     property int textSize: Style.fontSize_common;
@@ -47,6 +47,7 @@ ControlBase {
 
         text: model[popupMenuContainer.nameId];
         iconSource: model.Icon === "" ? "" : "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal);
+        enabled: model.IsEnabled != null && model.IsEnabled != undefined ? model.IsEnabled : true;
 
         selected: popupMenuContainer.selectedIndex == model.index;
 

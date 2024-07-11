@@ -6,7 +6,6 @@
 #include <iprm/IIdParam.h>
 
 // ImtCore includes
-#include <imtbase/ICommandGroup.h>
 #include <imtgui/IGuiElementContainer.h>
 
 
@@ -69,10 +68,32 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 		return false;
 	}
 
+	iprm::TParamsPtr<imtauth::IUserInfo> userInfoParamPtr(paramsPtr, "UserInfo");
+
+	imtauth::IUserInfo::FeatureIds userPermissions;
+	bool isAdmin = true;
+	if (userInfoParamPtr.IsValid()){
+		userPermissions = userInfoParamPtr->GetPermissions();
+		isAdmin = userInfoParamPtr->IsAdmin();
+	}
+
 	QByteArrayList elementIds = guiElementContainerPtr->GetElementIds();
 	for (const QByteArray& elementId : elementIds){
 		const imtgui::IGuiElementModel* guiElementModelPtr = guiElementContainerPtr->GetGuiElementModel(elementId);
 		if (guiElementModelPtr != nullptr){
+			if (!isAdmin){
+				if (m_commandPermissionsProviderCompPtr.IsValid() && !elementId.isEmpty()){
+					QByteArrayList elementPermissions = m_commandPermissionsProviderCompPtr->GetCommandPermissions(elementId);
+
+					if (m_checkPermissionCompPtr.IsValid()){
+						bool result = m_checkPermissionCompPtr->CheckPermission(userPermissions, elementPermissions);
+						if (!result){
+							continue;
+						}
+					}
+				}
+			}
+
 			const imtbase::IRepresentationController* representationControllerPtr = FindRepresentationController(elementId);
 			if (representationControllerPtr != nullptr){
 				imtbase::CTreeItemModel guiElementRepresentationModel;

@@ -25,7 +25,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RepresentationControllers" Type="Reference[]" ExportId="RepresentationControllers">
+                    <AttributeInfo Id="RepresentationControllers" Type="Reference[]" ExportId="GuiElementModels">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">

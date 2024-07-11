@@ -23,6 +23,7 @@ public:
 	virtual bool IsEnabled() const = 0;
 	virtual bool IsVisible() const = 0;
 	virtual int GetPriority() const = 0;
+	virtual int GetAlignment() const = 0;
 	virtual const imtgui::IGuiElementContainer* GetSubElements() const = 0;
 };
 

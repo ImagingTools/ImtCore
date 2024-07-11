@@ -185,20 +185,9 @@ DecoratorBase {
             }
         }
 
-        ToolButton {
-            id: closeButton;
-
-            anchors.verticalCenter: content.verticalCenter;
-
+        Item {
             width: Style.buttonWidthMedium;
             height: width;
-
-            iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
-
-            onClicked: {
-                tfc.text = "";
-                filterPanelDecorator.baseElement.close();
-            }
         }
     }
 }

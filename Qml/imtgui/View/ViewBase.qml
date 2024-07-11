@@ -35,58 +35,14 @@ Item {
 
 //    Component {
 //        id: commandsDecoratorComp;
-//        Item {
-//            id: commandsItem;
-//            width: viewBase.width;
-//            height: 30;
 
-//            function setCommandsModel(params){
-//                clearModel();
+//        CommandsPanel {
+//            commandId: viewBase.viewId;
 
-//                let commId = params["ViewId"];
-//                let model = params["Model"];
-
-//                for (let i = 0; i < model.getItemsCount(); i++){
-//                    let alignment = model.getData("Alignment", i);
-//                    if (i == 0){
-//                        leftCommands.addCommandGroup(model.getData("SubElements", i));
-//                    }
-//                    else if (i == 1){
-//                        centerCommands.addCommandGroup(model.getData("SubElements", i));
-//                    }
-//                    else{
-//                        rightCommands.addCommandGroup(model.getData("SubElements", i));
-//                    }
+//            onCommandActivated: {
+//                if (viewBase.commandsDelegate){
+//                    viewBase.commandsDelegate.commandHandle(commandId);
 //                }
-//            }
-
-//            function clearModel(){
-//                leftCommands.clear();
-//                centerCommands.clear();
-//                rightCommands.clear();
-//            }
-
-//            CommandsView {
-//                id: leftCommands;
-//                anchors.left: parent.left;
-//                width: commandsItem.width / 3;
-//                height: commandsItem.height;
-//            }
-
-//            CommandsView {
-//                id: centerCommands;
-//                anchors.horizontalCenter: parent.horizontalCenter;
-//                width: commandsItem.width / 3;
-//                height: commandsItem.height;
-//                content.anchors.horizontalCenter: centerCommands.horizontalCenter;
-//            }
-
-//            CommandsView {
-//                id: rightCommands;
-//                anchors.right: parent.right;
-//                width: commandsItem.width / 3;
-//                height: commandsItem.height;
-//                content.anchors.right: rightCommands.right;
 //            }
 //        }
 //    }
@@ -377,7 +333,7 @@ Item {
         z: parent.z + 2;
         anchors.fill: parent;
         visible: viewBase.commandsController != null;
-        objectName: "Base";
+        objectName: "ViewBase";
     }
 }
 

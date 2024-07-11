@@ -1,6 +1,6 @@
 import QtQuick 2.12
-import Qt5Compat.GraphicalEffects 6.0
-import QtGraphicalEffects 1.12
+import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 import Acf 1.0
 import imtcontrols 1.0
 
@@ -50,12 +50,14 @@ DecoratorBase {
         anchors.top: topContentLoader.bottom;
 
         width: root.width;
-        height: popupMenuListView.height;
+        height: popupMenuListView.height + 2 * Style.size_smallMargin;
 
         color: Style.baseColor;
 
         border.width: 1;
-        border.color: Style.alternateBaseColor;
+        border.color: Style.borderColor;
+
+        radius: Style.buttonRadius;
 
         CustomScrollbar {
             id: scrollbar;
@@ -73,6 +75,8 @@ DecoratorBase {
 
         Flickable {
             id: popupMenuListView;
+
+            anchors.verticalCenter: parent.verticalCenter;
 
             width: root.width;
             height: Math.min(root.shownItemsCount * root.itemHeight, contentHeight)
@@ -104,7 +108,11 @@ DecoratorBase {
 
             Column {
                 id: column;
-                width: parent.width;
+                anchors.left: parent.left;
+                anchors.leftMargin: Style.size_smallMargin//itemBody.border.width;
+                anchors.right: parent.right;
+                anchors.rightMargin: Style.size_smallMargin//itemBody.border.width;
+                clip: true;
 
                 Repeater {
                     id: repeater_;
@@ -133,18 +141,20 @@ DecoratorBase {
 
     DropShadow {
         id: dropShadow;
-
         anchors.fill: itemBody;
-
-		z: itemBody.z-1
-
-        horizontalOffset: 2;
-        verticalOffset: 2;
-
-        radius: 4;
+        z: itemBody.z-1
+        horizontalOffset: 3;
+        verticalOffset: 3;
+        radius: 8;
+        spread: 0;
         color: Style.shadowColor;
-
         source: itemBody;
+
+        Component.onCompleted: {
+            if (Qt.platform.os === "web"){
+                dropShadow.samples = 17;
+            }
+        }
     }
 
     function contentYCorrection(down_){

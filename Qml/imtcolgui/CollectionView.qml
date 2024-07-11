@@ -108,6 +108,16 @@ Item {
     }
 
     Connections {
+        target: container.commandsController;
+
+        function onCommandsModelChanged(){
+            if (root.commandsDelegate){
+                root.commandsDelegate.setupContextMenu();
+            }
+        }
+    }
+
+    Connections {
         target: container;
 
         function onSelectedIndexChanged(index){
@@ -300,9 +310,11 @@ Item {
         function openPopupMenu(x, y){
             if (container.commandsDelegate){
                 let contextMenuModel = container.commandsDelegate.getContextMenuModel();
-
-                let offset = 26 * contextMenuModel.getItemsCount();
-                ModalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": contextMenuModel});
+                let count = contextMenuModel.getItemsCount();
+                if (count > 0){
+                    let offset = 30 * count;
+                    ModalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": contextMenuModel});
+                }
             }
         }
 
@@ -329,7 +341,9 @@ Item {
 
             PopupMenuDialog {
                 onFinished: {
-                    container.commandsDelegate.commandHandle(commandId);
+                    if (commandId !== ""){
+                        container.commandsDelegate.commandHandle(commandId);
+                    }
                 }
             }
         }
