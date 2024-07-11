@@ -110,7 +110,7 @@ PopupView {
     Rectangle {
         id: background;
         anchors.fill: parent;
-        color: Style.backgroundColor2;
+        color: Style.baseColor;
         radius: Style.buttonRadius;
         border.width: 1;
         border.color: Style.borderColor;

@@ -7,12 +7,10 @@ import imtguigql 1.0
 ClientStyle {
     id: styleContainer;
 
-    size_mainMargin: 11;
-
     buttonWidthMedium: 20;
 
-    dialogBackgroundColor: styleContainer.backgroundColor;
+    dialogBackgroundColor: styleContainer.backgroundColor2;
 
-    property int comboBoxHeight: 27;
+    property int comboBoxHeight: 30;
     property int size_panelsHeight: 50;
 }

@@ -32,7 +32,9 @@ Item {
             container.openWindow(comp, parameters);
         }
         else {
+            console.log("append1");
             modalDialogModels.append({"Component": comp, "Parameters": parameters});
+            console.log("append2");
 
             if (callback){
                 finished.connect(callback);

@@ -72,7 +72,7 @@ ControlBase {
     property alias mouseArea: cbMouseArea;
 
     property int textSize: Style.fontSize_common;
-    property int itemHeight: 26;
+    property int itemHeight: 30;
     property string fontColor: Style.textColor;
     property string fontColorTitle: fontColor;
 

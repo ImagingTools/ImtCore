@@ -73,6 +73,7 @@ Rectangle {
     property string borderColorVertical: "black";
     property int horizontalBorderSize: 0;
     property int verticalBorderSize: 0;
+    property int verticalBorderHeight: -1;
 
     property bool visibleLeftBorderFirst: true;
     property bool visibleRightBorderLast: false;

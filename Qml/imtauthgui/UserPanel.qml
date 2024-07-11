@@ -125,9 +125,9 @@ Item {
 
         function fillModel(){
             contextMenuModel.clear();
-            contextMenuModel.append({"Id": "ChangePassword", "Name": qsTr("Change Password"), "Icon": ""});
+            contextMenuModel.append({"Id": "ChangePassword", "Name": qsTr("Change Password"), "Icon": "Icons/Empty"});
             contextMenuModel.append({"Id": "", "Name": "", "Icon": ""});
-            contextMenuModel.append({"Id": "Logout", "Name": qsTr("Logout"), "Icon": ""});
+            contextMenuModel.append({"Id": "Logout", "Name": qsTr("Logout"), "Icon": "Icons/Exit"});
         }
     }
 

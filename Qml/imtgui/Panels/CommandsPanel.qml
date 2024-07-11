@@ -50,6 +50,9 @@ Item {
                 rightCommands.addCommandGroup(groupModel);
             }
         }
+
+        widthTimer.restart();
+        buttonTimer.restart();
     }
 
     function clearModel(){
@@ -59,25 +62,34 @@ Item {
     }
 
     Component.onCompleted: {
-        checkCommandsWidth();
-        timer.restart();
+        console.log("CommandsPanel onCompleted");
+        widthTimer.restart();
+        buttonTimer.restart();
     }
 
     onVisibleChanged: {
         if (visible){
             checkCommandsWidth();
-            timer.restart();
+            buttonTimer.restart();
         }
     }
 
     onWidthChanged: {
         checkCommandsWidth();
-        timer.restart();
+        buttonTimer.restart();
     }
 
     Timer {
-        id: timer;
-        interval: 10;
+        id: widthTimer;
+        interval: 500;
+        onTriggered: {
+            commandsItem.checkCommandsWidth();
+        }
+    }
+
+    Timer {
+        id: buttonTimer;
+        interval: 500;
         onTriggered: {
             commandsItem.checkButtonVisible();
         }
@@ -90,7 +102,10 @@ Item {
     }
 
     function checkButtonVisible(){
+        console.log("checkButtonVisible");
+
         button.visible = leftCommands.hasHiddenCommands() || centerCommands.hasHiddenCommands() || rightCommands.hasHiddenCommands();
+        console.log("button.visible", button.visible);
     }
 
     CommandsView {
@@ -123,6 +138,17 @@ Item {
         height: width;
         iconSource: "../../../" + Style.getIconPath("Icons/More", Icon.Mode.On, Icon.State.Active);
         visible: false;
+        decorator: Component {
+            ToolButtonDecorator {
+                color: baseElement && baseElement.hovered  ? Style.baseColor : "transparent";
+
+//                color: !commonButtonDecorator.baseElement ? "transparent" :
+//                                                            commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
+//                                                            Style.baseColor : commonButtonDecorator.baseElement.hovered ?
+//                                                            Style.baseColor : Style.backgroundColor2
+            }
+        }
+
         onClicked: {
             var point = button.mapToItem(null, width, height);
             let empty = {

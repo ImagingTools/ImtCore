@@ -69,7 +69,7 @@ CollectionView {
                 Events.unSubscribeEvent("CommandsGuiReady", commandsIsReady);
             }
 
-//            collectionId: isReady ? root.collectionId : "";
+            //            collectionId: isReady ? root.collectionId : "";
             collectionId: root.collectionId;
 
             additionalFieldIds: root.additionalFieldIds;

@@ -108,8 +108,28 @@ QtObject {
         }
     }
 
-    function clearFilter(){
+    function clearAllFilters(){
+        filterModel.removeData("TextFilter")
         filterModel.removeData("ObjectFilter")
+        filterModel.removeData("TimeFilter")
+
+        root.filterChanged();
+    }
+
+    function clearObjectFilter(){
+        filterModel.removeData("ObjectFilter")
+
+        root.filterChanged();
+    }
+
+    function clearTextFilter(){
+        filterModel.removeData("TextFilter")
+
+        root.filterChanged();
+    }
+
+    function clearTimeFilter(){
+        filterModel.removeData("TimeFilter")
 
         root.filterChanged();
     }

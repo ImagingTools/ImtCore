@@ -119,11 +119,11 @@ Item {
 
                 onLoaded: {
                     ModalDialogManager.topItem = dialogLoader.item;
-
                     ModalDialogManager.backgroundItem = background;
 
                     dialogLoader.item.root = ModalDialogManager;
                     for (let key in model.Parameters) {
+
                         dialogLoader.item[key] = model.Parameters[key];
                     }
                     if (dialogLoader.item.centered){

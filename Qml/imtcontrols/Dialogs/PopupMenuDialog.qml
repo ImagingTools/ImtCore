@@ -46,7 +46,8 @@ ControlBase {
         height: popupMenuContainer.itemHeight;
 
         text: model[popupMenuContainer.nameId];
-        iconSource: model.Icon === "" ? "" : "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal);
+        iconSource: model.Icon === "" ? "" :  enabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
+                                                        "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
         enabled: model.IsEnabled != null && model.IsEnabled != undefined ? model.IsEnabled : true;
 
         selected: popupMenuContainer.selectedIndex == model.index;

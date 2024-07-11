@@ -38,11 +38,6 @@ DecoratorBase {
     }
 
     function updateText(){
-        infoFilter.text = qsTr("Info");
-        warningFilter.text = qsTr("Warning");
-        errorFilter.text = qsTr("Error");
-        criticalFilter.text = qsTr("Critical");
-        verboseFilter.text = qsTr("Verbose");
     }
 
     function onLocalizationChanged(language){
@@ -63,6 +58,7 @@ DecoratorBase {
             anchors.verticalCenter: parent.verticalCenter;
             checkable: true
             checked: true
+            text: qsTr("Info")
             iconSource: "../../../../" + Style.getIconPath("Icons/Info", Icon.State.On, Icon.Mode.Normal);
             onCheckedChanged: {
                 mainItem.baseElement.filterChanged("InfoFilter", checked);
@@ -75,6 +71,7 @@ DecoratorBase {
             anchors.verticalCenter: parent.verticalCenter;
             checkable: true
             checked: true
+            text: qsTr("Warning")
             iconSource: "../../../../" + Style.getIconPath("Icons/Warning", Icon.State.On, Icon.Mode.Normal);
             onCheckedChanged: {
                 mainItem.baseElement.filterChanged("WarningFilter", checked);
@@ -87,7 +84,7 @@ DecoratorBase {
             anchors.verticalCenter: parent.verticalCenter;
             checkable: true
             checked: true
-
+            text: qsTr("Error");
             iconSource: "../../../../" + Style.getIconPath("Icons/Error", Icon.State.On, Icon.Mode.Normal);
             onCheckedChanged: {
                 if (mainItem.baseElement){
@@ -102,7 +99,7 @@ DecoratorBase {
             anchors.verticalCenter: parent.verticalCenter;
             checkable: true
             checked: true
-
+            text: qsTr("Critical");
             iconSource: "../../../../" + Style.getIconPath("Icons/Critical", Icon.State.On, Icon.Mode.Normal);
             onCheckedChanged: {
                 if (mainItem.baseElement){
@@ -118,7 +115,7 @@ DecoratorBase {
             checkable: true
             checked: false
             iconSource: "../../../../" + Style.getIconPath("Icons/Diagnostics", Icon.State.On, Icon.Mode.Normal);
-
+            text: qsTr("Verbose");
             Component.onCompleted: {
                 if (mainItem.baseElement){
                     mainItem.baseElement.filterChanged("VerboseFilter", false);

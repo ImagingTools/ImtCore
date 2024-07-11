@@ -71,12 +71,12 @@ Item{
 
     Rectangle{
         id: leftBorder;
-        anchors.left: parent.left;
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
         z: -1;
+        anchors.verticalCenter: parent.verticalCenter;
+        anchors.left: parent.left;
         width: headerDelegate.tableItem.isRightBorder ? headerDelegate.tableItem.verticalBorderSize * headerDelegate.tableItem.visibleLeftBorderFirst * (headerDelegate.columnIndex == 0)
                                             : headerDelegate.tableItem.visibleLeftBorderFirst ? headerDelegate.tableItem.verticalBorderSize : headerDelegate.columnIndex > 0 ? headerDelegate.tableItem.verticalBorderSize : 0;
+        height: headerDelegate.tableItem.verticalBorderHeight;
         color:  headerDelegate.tableItem.borderColorVertical;
     }
 
@@ -228,9 +228,9 @@ Item{
 
         anchors.verticalCenter: mainRec.verticalCenter;
         anchors.right: mainRec.right;
-        anchors.rightMargin: Style.size_smallMargin;
+        anchors.rightMargin: Style.size_mainMargin;
 
-        width: visible ? Style.iconSizeExtraSmall : 0;
+        width: visible ? 12 : 0;
         height: width;
 
         visible: headerDelegate.tableItem.currentHeaderId === model.Id && headerDelegate.tableItem.hasSort;

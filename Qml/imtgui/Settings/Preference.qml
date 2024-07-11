@@ -12,7 +12,7 @@ Rectangle {
     width: 450;
     height: 480;
 
-    color: Style.backgroundColor;
+    color: Style.backgroundColor2;
 
     property TreeItemModel settingsModel: TreeItemModel {
     };

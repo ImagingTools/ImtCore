@@ -85,8 +85,12 @@ DecoratorBase {
         radius: Style.buttonRadius
         color: !commonButtonDecorator.baseElement ? "transparent" :
                                                     commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
-                                                    Style.buttonPressedColor : commonButtonDecorator.baseElement.hovered ?
-                                                    Style.buttonHoverColor : Style.buttonColor
+                                                    Style.baseColor : commonButtonDecorator.baseElement.hovered ?
+                                                    Style.baseColor : Style.backgroundColor2
+//        color: !commonButtonDecorator.baseElement ? "transparent" :
+//                                                    commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
+//                                                    Style.buttonPressedColor : commonButtonDecorator.baseElement.hovered ?
+//                                                    Style.buttonHoverColor : Style.buttonColor
         border.width: Style.buttonBorderWidth
         border.color: !commonButtonDecorator.baseElement ? "transparent" :
                                                     commonButtonDecorator.baseElement.focus ? Style.buttonBorderFocusColor :

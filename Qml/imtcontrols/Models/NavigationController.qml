@@ -6,12 +6,9 @@ import Acf 1.0
 QtObject {
     id: root;
 
-    property var nextStack: [];
-    property var prevStack: [];
-
     property var stack: [];
     property int currentIndex: -1;
-    property int maxSize: 10;
+    property int maxSize: 99;
 
     function goTo(path){}
 

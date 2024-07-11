@@ -173,6 +173,10 @@ ViewBase {
             canMoveColumns: true;
 
             scrollbarRightMargin: -20;
+            verticalBorderHeight: headerHeight / 2;
+            verticalBorderSize: 1;
+            visibleLeftBorderFirst: false;
+            borderColorVertical: Style.borderColor;
 
             onSelectionChanged: {
                 collectionViewBaseContainer.selectionChanged(selection);

@@ -1,6 +1,8 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
+import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 
 DecoratorBase {
     id: leftPanelElement;
@@ -35,11 +37,15 @@ DecoratorBase {
         border.color: leftPanelElement.baseElement.selected ? Style.iconColorOnSelected : "transparent";
     }
 
-    Item{
+    Rectangle {
+        id: itemBody;
+
         anchors.verticalCenter: leftPanelElement.verticalCenter;
         anchors.left: leftPanelElement.left;
         anchors.right: leftPanelElement.right;
         height: image.height + description.height + description.anchors.topMargin;
+
+        color: "transparent";
 
         Image {
             id: image;
@@ -79,6 +85,27 @@ DecoratorBase {
             elide: Text.ElideRight;
             horizontalAlignment: Text.AlignHCenter;
             visible: false;
+        }
+    }
+
+    DropShadow {
+        id: dropShadow;
+        anchors.fill: marker;
+        z: marker.z-1
+        horizontalOffset:ok ? 3 : 0;
+        verticalOffset: ok ? 3 : 0;
+        radius: ok ? 8 : 0;
+        spread: 0;
+        color: ok ? Style.shadowColor : "transparent";
+        source: marker;
+        visible: ok;
+
+        property bool ok: leftPanelElement.baseElement && (leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted);
+
+        Component.onCompleted: {
+            if (Qt.platform.os === "web"){
+                dropShadow.samples = 17;
+            }
         }
     }
 

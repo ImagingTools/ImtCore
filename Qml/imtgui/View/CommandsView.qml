@@ -76,11 +76,16 @@ Item {
     }
 
     function checkWidth(){
+        console.log("CommandsView checkWidth");
+
         if (maximumWidth < 0){
             return;
         }
 
+        console.log("maximumWidth", maximumWidth);
         let totalContentWidth = contentWidth + Style.size_mainMargin;
+        console.log("totalContentWidth", totalContentWidth);
+
         if (totalContentWidth > maximumWidth){
             let tempWidth = totalContentWidth;
             for (let j = priorityElements.length - 1; j >= 0; j--){

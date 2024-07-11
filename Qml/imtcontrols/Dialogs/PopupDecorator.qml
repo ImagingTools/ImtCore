@@ -68,7 +68,7 @@ DecoratorBase {
             anchors.bottom: popupMenuListView.bottom;
 
             secondSize: !root.baseElement ? 0 :
-                                            !root.baseElement.visibleScrollBar ? 0 : Style.isMobile == undefined ? 10 : Style.isMobile ? 4 : 10;
+                                            !root.baseElement.visibleScrollBar ? 0 : Style.isMobile == undefined ? 8 : Style.isMobile ? 4 : 8;
             targetItem: popupMenuListView;
             canFade: Style.isMobile == undefined ? false : Style.isMobile;
         }
