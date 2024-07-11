@@ -400,29 +400,20 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 			}
 			else{
 				if (!text.isEmpty()) {
-					SetParseText(text);
+					StartArray(text);
 					text.clear();
 				}
-				startText = true;
-				startBigText = true;
-				startArray = true;
+				startText = false;
+				m_startKey = true;
 			}
 			break;
 		
 		case ']':
-			if (startArray){
-				QString str = text;
-				QStringList list = str.split(',');
-				m_activeGqlObjectPtr->InsertField(m_currentField, QVariant(list));
-				text.clear();
-				startText = false;
-				startBigText = false;
-				startArray = false;
+			if (startBigText){
+				text.append(chr);
 			}
 			else{
-				if (startBigText || startText){
-					text.append(chr);
-				}
+				CloseArray();
 			}
 
 			break;
@@ -815,6 +806,16 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 	if (m_activeGqlObjectPtr == nullptr){
 		SetParseObject("");
 	}
+	QByteArray lastArrayId;
+	if (!m_activeArrayIds.isEmpty()){
+		lastArrayId = m_activeArrayIds.last();
+	}
+	if (!lastArrayId.isEmpty() && m_activeGqlObjectPtr->IsObjectList(lastArrayId)){
+		CGqlObject newObject;
+		newObject.InsertField(text);
+		m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendFieldToArray(lastArrayId, newObject);
+		m_currentField = text;
+	}
 	if (m_startKey){
 		m_activeGqlObjectPtr->InsertField(text);
 		m_currentField = text;
@@ -823,6 +824,24 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 		m_activeGqlObjectPtr->InsertField(m_currentField, QVariant(text));
 	}
 
+}
+
+
+void CGqlRequest::StartArray(const QByteArray& text)
+{
+	if (m_activeGqlObjectPtr != nullptr && m_startKey){
+		QList<CGqlObject> objectList;
+		m_activeGqlObjectPtr->InsertField(text, objectList);
+		m_currentField = text;
+		m_activeArrayIds.append(text);
+	}
+}
+
+
+void CGqlRequest::CloseArray()
+{
+	// m_activeGqlObjectPtr = m_activeGqlObjectPtr->GetParentObject();
+	m_activeArrayIds.removeLast();
 }
 
 

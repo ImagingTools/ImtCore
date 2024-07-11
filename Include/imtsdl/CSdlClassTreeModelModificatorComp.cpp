@@ -404,6 +404,8 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(", modelIndex);");
 	FeedStream(stream, 1, false);
+	stream << newTreeModelVarName <<QStringLiteral("->setIsArray(true);");
+	FeedStream(stream, 1, false);
 
 	// declare loop
 	FeedStreamHorizontally(stream, hIndents);

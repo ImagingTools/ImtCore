@@ -31,7 +31,9 @@ ListModel {
             for(let j = 0; j < list.length; j++){
                 let key = list[j]
                 if(typeof item[key] === 'object'){
-                    json += '"' + item.getJSONKeyForProperty(key) + '":' + item[key].toJson()
+                    if (item[key].toJson === "function"){
+                        json += '"' + item.getJSONKeyForProperty(key) + '":' + item[key].toJson()
+                    }
                 } else {
                     let value = item[key]
                     if (value === undefined){

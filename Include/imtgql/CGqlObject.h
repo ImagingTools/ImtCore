@@ -35,6 +35,7 @@ public:
 	void InsertField(const QByteArray& fieldId, const imtgql::CGqlEnum& value);
 	void InsertField(const QByteArray& fieldId, const CGqlObject& object);
 	void InsertField(const QByteArray& fieldId, const QList<CGqlObject> objectList);
+	CGqlObject* AppendFieldToArray(const QByteArray& fieldId, const CGqlObject& object);
 	bool IsObject(const QByteArray& fieldId) const;
 	bool IsEnum(const QByteArray& fieldId) const;
 	bool IsObjectList(const QByteArray& fieldId) const;

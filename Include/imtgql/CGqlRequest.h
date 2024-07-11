@@ -63,6 +63,8 @@ protected:
 private:
 	void SetParseObject(const QByteArray& commandId);
 	void SetParseText(const QByteArray& text);
+	void StartArray(const QByteArray& text);
+	void CloseArray();
 
 protected:
 	QByteArray m_commandId;
@@ -78,6 +80,7 @@ protected:
 
 	CGqlObject* m_activeGqlObjectPtr;
 	imtgql::IGqlContext* m_gqlContextPtr;
+	QList<QByteArray> m_activeArrayIds;
 };
 
 

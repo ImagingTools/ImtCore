@@ -139,6 +139,25 @@ void CGqlObject::InsertField(const QByteArray &fieldId, const QList<CGqlObject> 
 }
 
 
+CGqlObject* CGqlObject::AppendFieldToArray(const QByteArray& fieldId, const CGqlObject& object)
+{
+	CGqlObject* retVal = nullptr;
+	if (m_objectFieldsArray.contains(fieldId)){
+		istd::TSmartPtr<CGqlObject> objectPtr(new CGqlObject());
+		*objectPtr = object;
+		objectPtr->m_parentPtr = this;
+		QByteArray fieldIdLocal = fieldId;
+		if (fieldId.isEmpty()){
+			fieldIdLocal = objectPtr->GetId();
+		}
+		m_objectFieldsArray[fieldId].append(objectPtr);
+		retVal = objectPtr.GetPtr();
+	}
+
+	return retVal;
+}
+
+
 bool CGqlObject::IsObject(const QByteArray &fieldId) const
 {
 	bool retVal = false;
