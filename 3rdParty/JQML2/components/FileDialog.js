@@ -68,18 +68,20 @@ class FileDialog extends Item {
             if(this.getPropertyValue('selectMultiple')){
                 this.getProperty('fileUrls').reset(e.target.files)
                 this.getProperty('files').reset(e.target.files)
-                this.getProperty('selectedFile').reset(e.target.files)
+                this.getProperty('selectedFiles').reset(e.target.files)
                 for(let fileUrl of e.target.files){
                     fileUrl.toString = ()=>{return fileUrl}
                     fileUrl.replace = ()=>{return fileUrl}
+                    fileUrl.split = (delimiter)=>{return fileUrl.name.split(delimiter)}
                 }
             } else {
                 let fileUrl = e.target.files[0]
                 fileUrl.toString = ()=>{return fileUrl}
                 fileUrl.replace = ()=>{return fileUrl}
+                fileUrl.split = (delimiter)=>{return fileUrl.name.split(delimiter)}
                 this.getProperty('fileUrl').reset(fileUrl)
                 this.getProperty('file').reset(fileUrl)
-                this.getProperty('selectedFiles').reset(fileUrl)
+                this.getProperty('selectedFile').reset(fileUrl)
             }
             
             if(this.$signals.accepted) this.$signals.accepted()
