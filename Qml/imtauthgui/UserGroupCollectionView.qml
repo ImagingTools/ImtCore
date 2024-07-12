@@ -55,9 +55,10 @@ RemoteCollectionView {
                 view: groupEditor;
             }}
 
-            commandsControllerComp: Component {CommandsRepresentationProvider {
+            commandsControllerComp: Component {CommandsPanelController {
                 commandId: "Group";
                 uuid: groupEditor.viewId;
+                commandsView: groupEditor.commandsView;
             }
             }
         }

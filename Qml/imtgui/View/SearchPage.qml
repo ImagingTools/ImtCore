@@ -10,26 +10,6 @@ ViewBase {
 
     model: TreeItemModel {}
 
-    //    commandsControllerComp: Component {
-    //        id: commandsControllerComp_;
-    //        CommandsController {
-    //            id: commandsController;
-    //            isReady: true;
-    //            Component.onCompleted: {
-    //                commandsController.commandsModel = commandsModel2;
-    //            }
-    //        }
-    //    }
-
-    //    commandsViewComp: Component {
-    //        id: commandsDecoratorComp;
-    //        CommandsDecorator {
-    //            id: commandsDecorator;
-    //            height: 30;
-    //            visible: tabPanel.visible;
-    //        }
-    //    }
-
     commandsDelegateComp: Component {
         ViewCommandsDelegateBase {
             onCommandActivated: {
@@ -51,25 +31,6 @@ ViewBase {
 
     onModelChanged: {
         tabPanel.visible = model.getItemsCount() > 0;
-    }
-
-    TreeItemModel {
-        id: commandsModel2;
-
-        Component.onCompleted: {
-            let index = commandsModel2.insertNewItem();
-            commandsModel2.setData("Id", "Open", index);
-            commandsModel2.setData("Name", "Open", index);
-            commandsModel2.setData("Description", "", index);
-            commandsModel2.setData("IsEnabled", false, index);
-            commandsModel2.setData("Visible", true, index);
-            commandsModel2.setData("Icon", "Icons/Edit", index);
-            commandsModel2.setData("Status", "", index);
-
-            if (root.commandsController){
-                root.commandsController.commandsModel = commandsModel2;
-            }
-        }
     }
 
     Component.onCompleted: {
@@ -190,12 +151,11 @@ ViewBase {
         elementsSpacing: Style.size_mainMargin;
         enableAlternating: false;
         itemHeight: 70;
-
         rowDelegate: Component {
             TableRowDelegateBase {
                 id: tableDelegate;
                 tableItem: table
-                width: table.width
+                width: table.elementsListWidth - Style.size_mainMargin;
                 height: elementView.height;
                 selectedOpacity: 0;
                 hoverOpacity: 0;

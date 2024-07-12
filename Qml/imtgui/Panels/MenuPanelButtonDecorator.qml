@@ -109,10 +109,10 @@ DecoratorBase {
         }
     }
 
-    TooltipArea {
-        id: tooltipArea;
-        anchors.fill: parent;
-        mouseArea: !leftPanelElement.baseElement ? null : leftPanelElement.baseElement.mouseArea;
-        text: !leftPanelElement.baseElement || !leftPanelElement.textIsCropped ? "" : leftPanelElement.baseElement.text;
-    }
+//    TooltipArea {
+//        id: tooltipArea;
+//        anchors.fill: parent;
+//        mouseArea: !leftPanelElement.baseElement ? null : leftPanelElement.baseElement.mouseArea;
+//        text: !leftPanelElement.baseElement || !leftPanelElement.textIsCropped ? "" : leftPanelElement.baseElement.text;
+//    }
 }

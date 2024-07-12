@@ -40,9 +40,10 @@ RemoteCollectionView {
         ProductView {
             id: productEditor;
 
-            commandsControllerComp: Component {CommandsRepresentationProvider {
+            commandsControllerComp: Component {CommandsPanelController {
                 commandId: "Product";
                 uuid: productEditor.viewId;
+                commandsView: productEditor.commandsView;
             }
             }
 

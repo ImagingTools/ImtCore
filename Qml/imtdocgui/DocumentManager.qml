@@ -679,21 +679,6 @@ Item {
             signal viewAdded(var view);
             signal viewRemoved(var view);
 
-            Component.onDestruction: {
-                Events.unSubscribeEvent(uuid + "CommandActivated", commandHandle);
-                if (singleDocumentData.undoManager){
-                    Events.unSubscribeEvent(uuid + "CommandActivated", singleDocumentData.undoManager.commandHandle);
-                }
-            }
-
-            onUuidChanged: {
-                Events.subscribeEvent(uuid + "CommandActivated", commandHandle);
-
-                if (singleDocumentData.undoManager){
-                    Events.subscribeEvent(uuid + "CommandActivated", singleDocumentData.undoManager.commandHandle);
-                }
-            }
-
             onDocumentIdChanged: {
                 if (documentDataController){
                     documentDataController.documentId = documentId;
@@ -704,6 +689,12 @@ Item {
                 for (let i = 0; i < singleDocumentData.views.length; i++){
                     if (singleDocumentData.views[i].commandsController){
                         singleDocumentData.views[i].commandsController.setCommandIsEnabled("Save", isDirty);
+                    }
+
+                    if (singleDocumentData.views[i].commandsView){
+                        if (singleDocumentData.views[i].commandsView.setPositiveAccentCommandIds !== undefined){
+                            singleDocumentData.views[i].commandsView.setPositiveAccentCommandIds(["Save"]);
+                        }
                     }
                 }
 
@@ -720,12 +711,14 @@ Item {
 
             // Processing commands that came from the view
             function viewCommandHandle(commandId){
-                if (commandId === "Save"){
-                    commandHandle("Save");
+                if (singleDocumentData.undoManager){
+                    singleDocumentData.undoManager.commandHandle(commandId);
                 }
+                singleDocumentData.commandHandle(commandId);
             }
 
             function commandHandle(commandId){
+                console.log("DocumentManager commandHandle", commandId);
                 if (!documentManager){
                     return;
                 }
@@ -746,15 +739,12 @@ Item {
             }
 
             function checkDocumentModel(){
-                console.log("checkDocumentModel");
                 let currentStateModel = undoManager.getStandardModel();
                 if (currentStateModel){
                     let documentModel = singleDocumentData.documentDataController.documentModel
                     let isEqual = currentStateModel.isEqualWithModel(documentModel);
                     isDirty = !isEqual;
                 }
-
-                console.log("end checkDocumentModel");
             }
 
             property Component documentHistoryDialogComp: Component {

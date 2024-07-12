@@ -55,6 +55,7 @@ ViewCommandsDelegateBase {
         id: collectionConnections;
 
         function onSelectionChanged(selection){
+            collectionViewCommandsDelegate.updateBaseCommandsAccent();
             collectionViewCommandsDelegate.updateItemSelection(selection);
         }
     }
@@ -71,6 +72,25 @@ ViewCommandsDelegateBase {
     function getContextMenuModel(){
         return collectionViewCommandsDelegate.contextMenuModel;
     }
+
+    function updateBaseCommandsAccent(){
+        let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
+        let isEnabled = indexes.length > 0;
+
+        let commandsView = collectionViewCommandsDelegate.collectionView.commandsView;
+        if (commandsView){
+            commandsView.setPositiveAccentCommandIds(["New"]);
+
+            if (isEnabled){
+                commandsView.setNegativeAccentCommandIds(["Remove"]);
+                commandsView.setPositiveAccentCommandIds(["Edit"]);
+            }
+        }
+
+        collectionViewCommandsDelegate.updateCustomCommandsAccent();
+    }
+
+    function updateCustomCommandsAccent(){}
 
     function updateItemSelection(selectedItems){
         if (collectionViewCommandsDelegate.collectionView && collectionViewCommandsDelegate.collectionView.commandsController){

@@ -154,7 +154,7 @@ Item {
         }
 
         onClicked: {
-            var point = button.mapToItem(null, width, height);
+            var point = button.mapToItem(null, 0, height);
             let empty = {
                 "Id": "",
                 "Name": "",
@@ -192,7 +192,6 @@ Item {
         function addModel(elements){
             let result = false;
             for (let i = 0; i < elements.length; i++){
-//                if (!elements[i].modelData.Visible){
                 if (!elements[i].visible){
                     insertNewItem({
                                       "Id": elements[i].modelData.Id,

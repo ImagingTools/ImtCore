@@ -27,25 +27,18 @@ Item {
 
     Component {
         id: commandsDecoratorComp;
-        CommandsDecorator {
-            id: commandsDecorator;
-            height: 30;
+
+        CommandsPanel {
+            commandId: viewBase.viewId;
+
+            onCommandActivated: {
+                console.log("viewBase onCommandActivated", commandId);
+                if (viewBase.commandsDelegate){
+                    viewBase.commandsDelegate.commandHandle(commandId);
+                }
+            }
         }
     }
-
-//    Component {
-//        id: commandsDecoratorComp;
-
-//        CommandsPanel {
-//            commandId: viewBase.viewId;
-
-//            onCommandActivated: {
-//                if (viewBase.commandsDelegate){
-//                    viewBase.commandsDelegate.commandHandle(commandId);
-//                }
-//            }
-//        }
-//    }
 
     Item {
         id: headerViewItem;

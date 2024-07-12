@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CenterCommands" X="625" Y="300" Note=""/>
+        <Element ComponentName="GqlCommandsController" X="625" Y="50" Note=""/>
+        <Element ComponentName="GuiElementContainer" X="625" Y="150" Note=""/>
+        <Element ComponentName="LeftCommands" X="225" Y="300" Note=""/>
+        <Element ComponentName="RightCommands" X="975" Y="300" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

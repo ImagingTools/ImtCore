@@ -225,6 +225,7 @@ Item {
 
     function commandHandle(commandId)
     {
+        console.log("UndoRedoManager commandHandle", commandId);
         if (commandId === "Undo"){
             doUndo()
         }

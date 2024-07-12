@@ -47,9 +47,10 @@ RemoteCollectionView {
         FeatureEditor {
             id: featureEditor;
 
-            commandsControllerComp: Component {CommandsRepresentationProvider {
+            commandsControllerComp: Component {CommandsPanelController {
                     commandId: "Feature";
                     uuid: featureEditor.viewId;
+                    commandsView: featureEditor.commandsView;
                 }
             }
 

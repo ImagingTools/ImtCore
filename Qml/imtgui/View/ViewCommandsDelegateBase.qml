@@ -9,23 +9,14 @@ Item {
     signal commandActivated(string commandId);
 
     function commandHandle(commandId){
-        console.log("commandHandle", commandId)
-        if (commandId === "Save"){
-        }
-        else if (commandId === "Close"){
-        }
-        else{
-            commandActivated(commandId);
-        }
+        commandActivated(commandId);
     }
 
     Shortcut {
         sequence: "Ctrl+S";
-
         enabled: container.view ? container.view.visible : false;
         onActivated: {
-            console.log("Ctrl+S onActivated");
-            container.commandActivated("Save");
+            container.commandHandle("Save");
         }
     }
 }

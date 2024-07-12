@@ -3,6 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 
+// Commands with priority = -1 always hidden
 Item {
     id: commandsItem;
     width: contentWidth;
@@ -25,7 +26,7 @@ Item {
     // Commands with negative accent
     property var negativeAccentCommandIds: []
 
-     // Commands with positive accent
+    // Commands with positive accent
     property var positiveAccentCommandIds: []
 
     property string positiveAccentColor: Style.imaginToolsAccent;
@@ -81,7 +82,7 @@ Item {
 
     function hasHiddenCommands(){
         for (let j = 0; j < allElements.length; j++){
-            if (!allElements[j].modelData.Visible){
+            if (!allElements[j].visible){
                 return true;
             }
         }
@@ -104,7 +105,7 @@ Item {
         if (totalContentWidth > maximumWidth){
             let tempWidth = totalContentWidth;
             for (let j = priorityElements.length - 1; j >= 0; j--){
-                if (priorityElements[j].modelData.Visible){
+                if (priorityElements[j].visible){
                     let elementWidth = priorityElements[j].maxWidth;
                     tempWidth -= elementWidth;
 
@@ -119,7 +120,7 @@ Item {
         else{
             let tempWidth = totalContentWidth;
             for (let j = 0; j < priorityElements.length; j++){
-                if (!priorityElements[j].modelData.Visible){
+                if (!priorityElements[j].visible){
                     let elementWidth = priorityElements[j].maxWidth;
                     tempWidth += elementWidth;
 
@@ -161,7 +162,7 @@ Item {
                             delegate: Component { Button {
                                     id: button;
                                     enabled: model.IsEnabled;
-                                    visible: model.Visible;
+                                    visible: priority < 0 ? false : model.Visible;
                                     text: model.Name;
                                     widthFromDecorator: true;
                                     heightFromDecorator: true;
@@ -174,11 +175,19 @@ Item {
                                             color: button.isPositiveAccent ? commandsItem.positiveAccentColor : button.isNegativeAccent ? commandsItem.negativeAccentColor : baseColor;
                                             textColor: button.isPositiveAccent || button.isNegativeAccent ? "white" : baseTextColor;
                                             icon.source: button.isPositiveAccent || button.isNegativeAccent ?
-                                                           "../../../../" + Style.getIconPath(button.modelData.Icon, Icon.State.Off, Icon.Mode.Disabled)
+                                                             "../../../../" + Style.getIconPath(button.modelData.Icon, Icon.State.Off, Icon.Mode.Disabled)
                                                            : baseElement.iconSource;
                                             border.width: button.isPositiveAccent || button.isNegativeAccent ? 0 : baseElement.mouseArea.containsMouse;
                                         }
                                     }
+
+                                    property bool isNegativeAccent: model.IsEnabled ? commandsItem.negativeAccentCommandIds.includes(model.Id) : false;
+                                    property bool isPositiveAccent: model.IsEnabled ? commandsItem.positiveAccentCommandIds.includes(model.Id) : false;
+                                    property int priority: model.Priority;
+                                    property int groupPriority: itemDelegate.priority;
+                                    property var modelData: model;
+                                    property var subElements: repeater2.model;
+                                    property int maxWidth: -1;
 
                                     onClicked: {
                                         Events.sendEvent(commandsItem.eventCommandPrefix + "CommandActivated", model.Id);
@@ -187,16 +196,6 @@ Item {
                                     onWidthChanged: {
                                         maxWidth = Math.max(maxWidth, width);
                                     }
-
-                                    property bool isNegativeAccent: commandsItem.negativeAccentCommandIds.includes(model.Id);
-                                    property bool isPositiveAccent: commandsItem.positiveAccentCommandIds.includes(model.Id);
-
-                                    property int priority: model.Priority;
-                                    property int groupPriority: itemDelegate.priority;
-                                    property var modelData: model;
-                                    property var subElements: repeater2.model;
-
-                                    property int maxWidth: -1;
                                 }
                             }
 

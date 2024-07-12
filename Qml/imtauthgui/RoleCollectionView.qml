@@ -93,9 +93,10 @@ RemoteCollectionView {
                 }
             }
 
-            commandsControllerComp: Component {CommandsRepresentationProvider {
+            commandsControllerComp: Component {CommandsPanelController {
                     commandId: "Role";
                     uuid: roleEditor.viewId;
+                    commandsView: roleEditor.commandsView;
                 }
             }
         }

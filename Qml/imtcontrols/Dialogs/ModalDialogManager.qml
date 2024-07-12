@@ -24,7 +24,6 @@ Item {
     signal finished(string result);
 
     function openDialog(comp, parameters, mode, callback){
-        console.log("DialogsManager addDialog", comp, parameters, mode, callback);
         let dialogMode = mode !== undefined ? mode : Style.dialogMode !== undefined ? Style.dialogMode: "Internal";
 
         /*for Windows style dialogs*/
@@ -32,9 +31,7 @@ Item {
             container.openWindow(comp, parameters);
         }
         else {
-            console.log("append1");
             modalDialogModels.append({"Component": comp, "Parameters": parameters});
-            console.log("append2");
 
             if (callback){
                 finished.connect(callback);
@@ -92,7 +89,6 @@ Item {
 
     /*for Windows style dialogs*/
     function openWindow(comp, parameters){
-        console.log("DialogsManager addWindow", comp);
         let obj = windowComp.createObject(container);
         obj.parameters = parameters;
         obj.sourceComponent = comp;

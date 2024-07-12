@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="Close" X="1075" Y="350" Note="Container for standard document commands"/>
+        <Element ComponentName="Group" X="600" Y="125" Note=""/>
+        <Element ComponentName="History" X="900" Y="350" Note=""/>
+        <Element ComponentName="Redo" X="625" Y="350" Note=""/>
+        <Element ComponentName="Save" X="125" Y="350" Note=""/>
+        <Element ComponentName="Undo" X="450" Y="350" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

@@ -83,9 +83,10 @@ RemoteCollectionView {
             }
             }
 
-            commandsControllerComp: Component {CommandsRepresentationProvider {
+            commandsControllerComp: Component {CommandsPanelController {
                     commandId: "Account";
                     uuid: accountEditor.viewId;
+                    commandsView: accountEditor.commandsView;
                 }
             }
         }
