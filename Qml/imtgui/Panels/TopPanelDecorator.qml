@@ -22,6 +22,7 @@ DecoratorBase {
         anchors.left: parent.left;
         width: 100;
         height: topPanelDecorator.height;
+        clip: true;
     }
 
     TopCenterPanel {
@@ -29,6 +30,7 @@ DecoratorBase {
         anchors.left: topLeftPanel.right;
         anchors.right: rightPanel.left;
         height: topPanelDecorator.height;
+        clip: true;
     }
 
     TopRightPanel {
@@ -37,6 +39,7 @@ DecoratorBase {
         anchors.right: parent.right;
         width: 100;
         height: topPanelDecorator.height;
+        clip: true;
     }
 
     Rectangle {

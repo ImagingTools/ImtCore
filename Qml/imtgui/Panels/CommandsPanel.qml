@@ -136,6 +136,7 @@ Item {
         anchors.right: button.left;
         anchors.rightMargin: Style.size_mainMargin;
         eventCommandPrefix: commandsItem.commandId;
+        maximumWidth: commandsItem.width - (centerCommands.x + centerCommands.contentWidth);
     }
 
     ToolButton {
@@ -191,8 +192,8 @@ Item {
         function addModel(elements){
             let result = false;
             for (let i = 0; i < elements.length; i++){
-                if (!elements[i].modelData.Visible){
-                    console.log("addModel", elements[i].modelData.Id, elements[i].modelData.IsEnabled);
+//                if (!elements[i].modelData.Visible){
+                if (!elements[i].visible){
                     insertNewItem({
                                       "Id": elements[i].modelData.Id,
                                       "Name": elements[i].modelData.Name,
