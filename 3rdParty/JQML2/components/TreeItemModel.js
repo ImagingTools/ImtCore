@@ -556,7 +556,13 @@ class TreeItemModel extends JSONListModel {
                         retVal += JSON.stringify(modelData)
                     }
                 } else if(typeof modelData === 'string'){
-                    retVal += "\"" + modelData.replaceAll('\u005C', '\u005C\u005C') + "\""
+                    let safeValue = modelData
+                    safeValue = safeValue.replaceAll('\u005C', '\u005C\u005C')
+                    safeValue = safeValue.replaceAll('"','\u005C"')
+                    safeValue = safeValue.replaceAll('\n','\u005C\n')
+                    safeValue = safeValue.replaceAll('\t','\u005C\t')
+                    safeValue = safeValue.replaceAll('\r','\u005C\r')
+                    retVal += "\"" + safeValue + "\""
                 } else {
                     retVal += modelData
                 }
