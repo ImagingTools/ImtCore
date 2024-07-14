@@ -38,7 +38,7 @@ public:
 private:
 	QByteArray m_objectUuid;
 	QByteArray m_objectTypeId;
-	imtbase::IObjectCollection* m_collectionPtr;
+	const imtbase::IObjectCollection* m_collectionPtr;
 };
 
 
