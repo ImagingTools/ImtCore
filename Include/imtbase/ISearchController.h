@@ -1,9 +1,6 @@
 #pragma once
 
 
-// ACF includes
-#include <istd/IPolymorphic.h>
-
 // ImtCore includes
 #include <imtbase/ISearchResults.h>
 

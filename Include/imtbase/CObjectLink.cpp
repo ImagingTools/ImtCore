@@ -25,12 +25,26 @@ void CObjectLink::SetObjectUuid(const QByteArray& objectUuid)
 
 void CObjectLink::SetFactoryId(const QByteArray& objectType)
 {
-	if (m_objectType != objectType){
+	if (m_objectTypeId != objectType){
 		istd::CChangeNotifier notifier(this);
 		Q_UNUSED(notifier);
 
-		m_objectType = objectType;
+		m_objectTypeId = objectType;
 	}
+}
+
+
+void CObjectLink::SetCollectionPtr(const imtbase::IObjectCollection* collectionPtr)
+{
+	m_collectionPtr = collectionPtr;
+}
+
+
+// reimplemented (ICollectionObjectLink)
+
+const imtbase::IObjectCollection* CObjectLink::GetCollection() const
+{
+	return m_collectionPtr;
 }
 
 
@@ -46,7 +60,7 @@ QByteArray CObjectLink::GetObjectUuid() const
 
 QByteArray CObjectLink::GetFactoryId() const
 {
-	return m_objectType;
+	return m_objectTypeId;
 }
 
 
@@ -66,7 +80,7 @@ bool CObjectLink::Serialize(iser::IArchive& archive)
 
 	static iser::CArchiveTag objectTypeTag("ObjectType", "Object Type", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(objectTypeTag);
-	retVal = retVal && archive.Process(m_objectType);
+	retVal = retVal && archive.Process(m_objectTypeId);
 	retVal = retVal && archive.EndTag(objectTypeTag);
 
 	return retVal;
@@ -77,7 +91,7 @@ bool CObjectLink::Serialize(iser::IArchive& archive)
 
 int CObjectLink::GetSupportedOperations() const
 {
-	return SO_CLONE | SO_COMPARE | SO_COPY | SO_OBSERVE | SO_RESET;
+	return SO_CLONE | SO_COMPARE | SO_COPY | SO_RESET;
 }
 
 
@@ -85,8 +99,10 @@ bool CObjectLink::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 {
 	const CObjectLink* sourcePtr = dynamic_cast<const CObjectLink*>(&object);
 	if (sourcePtr != NULL){
+		istd::CChangeNotifier changeNotifier(this);
+
 		m_objectUuid = sourcePtr->m_objectUuid;
-		m_objectType = sourcePtr->m_objectType;
+		m_objectTypeId = sourcePtr->m_objectTypeId;
 
 		return true;
 	}
@@ -100,7 +116,7 @@ bool CObjectLink::IsEqual(const IChangeable& object) const
 	const CObjectLink* sourcePtr = dynamic_cast<const CObjectLink*>(&object);
 	if (sourcePtr != NULL){
 		return m_objectUuid == sourcePtr->m_objectUuid &&
-				m_objectType == sourcePtr->m_objectType;
+				m_objectTypeId == sourcePtr->m_objectTypeId;
 	}
 
 	return false;
@@ -120,8 +136,10 @@ istd::IChangeable* CObjectLink::CloneMe(istd::IChangeable::CompatibilityMode mod
 
 bool CObjectLink::ResetData(CompatibilityMode /*mode*/)
 {
+	istd::CChangeNotifier changeNotifier(this);
+
 	m_objectUuid.clear();
-	m_objectType.clear();
+	m_objectTypeId.clear();
 
 	return true;
 }

@@ -1,22 +1,23 @@
 #pragma once
 
 
-// ACF includes
-#include <iser/IObject.h>
-
 // ImtCore includes
-#include <imtbase/IIdentifiable.h>
+#include <imtbase/ICollectionObjectLink.h>
 
 
 namespace imtbase
 {
 
 
-class CObjectLink: virtual public IIdentifiable, virtual public iser::IObject
+class CObjectLink: virtual public ICollectionObjectLink
 {
 public:
 	virtual void SetObjectUuid(const QByteArray& objectUuid);
 	virtual void SetFactoryId(const QByteArray& objectType);
+	virtual void SetCollectionPtr(const imtbase::IObjectCollection* collectionPtr);
+
+	// reimplemented (ICollectionObjectLink)
+	virtual const imtbase::IObjectCollection* GetCollection() const override;
 
 	// reimplemented (IIdentifiable)
 	virtual QByteArray GetObjectUuid() const override;
@@ -36,7 +37,8 @@ public:
 
 private:
 	QByteArray m_objectUuid;
-	QByteArray m_objectType;
+	QByteArray m_objectTypeId;
+	imtbase::IObjectCollection* m_collectionPtr;
 };
 
 
