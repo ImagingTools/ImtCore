@@ -7,7 +7,7 @@ import QtGraphicalEffects 1.0
 DecoratorBase {
     id: leftPanelElement;
 
-    width: 85;
+    width: 87;
     height: 80;
 
     signal accepted(string text);
@@ -30,7 +30,8 @@ DecoratorBase {
     Rectangle {
         id: marker;
         anchors.fill: leftPanelElement;
-        anchors.margins: Style.size_smallMargin;
+//        anchors.margins: Style.size_smallMargin;
+        anchors.margins: 8;
         radius: Style.buttonRadius;
         color: leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted ? Style.backgroundColor2 : "transparent";
         border.width: 1;
@@ -104,15 +105,8 @@ DecoratorBase {
 
         Component.onCompleted: {
             if (Qt.platform.os === "web"){
-                dropShadow.samples = 17;
+                dropShadow.samples = 15;
             }
         }
     }
-
-//    TooltipArea {
-//        id: tooltipArea;
-//        anchors.fill: parent;
-//        mouseArea: !leftPanelElement.baseElement ? null : leftPanelElement.baseElement.mouseArea;
-//        text: !leftPanelElement.baseElement || !leftPanelElement.textIsCropped ? "" : leftPanelElement.baseElement.text;
-//    }
 }

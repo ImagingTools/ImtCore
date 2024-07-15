@@ -37,7 +37,7 @@ FocusScope {
             return;
         }
 
-        decorator_ = decorator.createObject(controlBase);
+        decorator_ = decorator.createObject(controlBase);        
         decorator_.baseElement = controlBase;
     }
 

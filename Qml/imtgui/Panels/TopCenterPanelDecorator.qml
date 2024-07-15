@@ -95,6 +95,7 @@ DecoratorBase {
             height: parent.height;
             placeHolderText: qsTr("Enter text for search");
             textFieldRightMargin: iconClear.width + 2 * margin;
+            radius: 4;
 
             onTextChanged: {
                 timer.restart();

@@ -54,6 +54,7 @@ bool CCommandRepresentationController::GetRepresentationFromDataModel(
 	bool isEnabled = guiElementPtr->IsEnabled();
 	bool isVisible = guiElementPtr->IsVisible();
 	int priority = guiElementPtr->GetPriority();
+	int alignment = guiElementPtr->GetAlignment();
 
 	QString elementName = guiElementPtr->GetElementName();
 
@@ -88,7 +89,7 @@ bool CCommandRepresentationController::GetRepresentationFromDataModel(
 	representation.SetData("Icon", elementPath);
 	representation.SetData("Status", elementStatus);
 	representation.SetData("Priority", priority);
-
+	representation.SetData("Alignment", alignment);
 
 	return true;
 }

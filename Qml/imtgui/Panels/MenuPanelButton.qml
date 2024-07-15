@@ -32,16 +32,6 @@ ControlBase {
 
     signal clicked;
 
-    onWidthChanged: {
-        if (!menuPanelRef){
-            return;
-        }
-
-        if (menuPanelRef.contentWidth != container.width){
-            menuPanelRef.contentWidth = container.width;
-        }
-    }
-
     Component.onCompleted: {
         if (model.SubPages){
             subPagesRepeater.model = model.SubPages;

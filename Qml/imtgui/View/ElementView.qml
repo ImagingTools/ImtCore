@@ -41,6 +41,7 @@ Rectangle {
     property int controlHeight: 30;
 
     onFocusChanged: {
+        console.log("ElementView.qml onFocusChanged",focus, controlItem);
         if (focus && controlItem){
             controlItem.forceActiveFocus();
         }

@@ -7,4 +7,6 @@ Item {
     id: decoratorBase;
     
     property var baseElement;
+
+    function clearGui(){}
 }

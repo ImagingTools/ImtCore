@@ -94,7 +94,9 @@ Item {
         id: widthTimer;
         interval: 500;
         onTriggered: {
-            commandsItem.checkCommandsWidth();
+            if (commandsItem){
+                commandsItem.checkCommandsWidth();
+            }
         }
     }
 
@@ -102,14 +104,24 @@ Item {
         id: buttonTimer;
         interval: 500;
         onTriggered: {
-            commandsItem.checkButtonVisible();
+            if (commandsItem){
+                commandsItem.checkButtonVisible();
+            }
         }
     }
 
     function checkCommandsWidth(){
-        leftCommands.checkWidth();
-        centerCommands.checkWidth();
-        rightCommands.checkWidth();
+        if (leftCommands){
+            leftCommands.checkWidth();
+        }
+
+        if (centerCommands){
+            centerCommands.checkWidth();
+        }
+
+        if (rightCommands){
+            rightCommands.checkWidth();
+        }
     }
 
     function checkButtonVisible(){

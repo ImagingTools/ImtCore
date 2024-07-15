@@ -4,14 +4,11 @@ import imtcontrols 1.0
 
 Rectangle {
     id: menuPanel;
-
-    color: Style.backgroundColor;
-
-    radius: 7;
-
+    width: buttonWidth;
     clip: true;
 
-    width: visible ? contentWidth : 0;
+    color: Style.backgroundColor;
+    radius: 7;
 
     property string textColor: Style.textColor;
     property string fontName: "Helvetica";
@@ -21,31 +18,47 @@ Rectangle {
     property string firstElementImageSources: "";
 
     property int activePageIndex: -1;
-    property int pagesCount: lvPages.count;
 
     property TreeItemModel model: TreeItemModel {};
 
+    // Model for pages with top alignment
+    property TreeItemModel topPagesModel: TreeItemModel {};
+
+    // Model for pages with bottom alignment
+    property TreeItemModel bottomPagesModel: TreeItemModel {};
+
     property int spacing: 0;
-
-    property int count: lvPages.count;
-    property int contentWidth: 80;
-
     signal activePageChanged;
+
+    property int buttonWidth: -1;
+    property int buttonHeight: -1;
 
     Component.onCompleted: {
         Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
-        Events.subscribeEvent("ChangePage", menuPanel.changePage);
         Events.subscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
-        Events.unSubscribeEvent("ChangePage", menuPanel.changePage);
         Events.unSubscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
     }
 
     onActivePageIdChanged: {
         Events.sendEvent("ActivePageIdChanged", menuPanel.activePageId);
+    }
+
+    Keys.onPressed: {
+        if (event.key === Qt.Key_Up){
+            if (menuPanel.activePageIndex >= 1){
+                menuPanel.activePageIndex--;
+            }
+        }
+
+        if (event.key === Qt.Key_Down){
+            if (menuPanel.activePageIndex < model.getItemsCount() - 1){
+                menuPanel.activePageIndex++;
+            }
+        }
     }
 
     property bool block: false;
@@ -105,84 +118,149 @@ Rectangle {
     }
 
     function clearModels(){
-        lvPages.model = 0;
+        menuPanel.model.clear();
         menuPanel.activePageIndex = -1;
-    }
-
-    function changePage(pageId){
-        console.log("MenuPanel onChangePage", pageId);
-        for(var i = 0; i < lvPages.count; ++i){
-            let item = lvPages.itemAtIndex(i);
-            if(item.pageId === pageId){
-                item.clicked();
-            }
-        }
+        allPages.model = 0;
+        topAlignmentPages.model = 0;
+        bottomAlignmentPages.model = 0;
     }
 
     onModelChanged: {
-        console.log("MenuPanel onModelChanged", menuPanel.model.toJson())
-        let pageIndex = menuPanel.activePageIndex;
-
-        lvPages.model = 0;
-        lvPages.model = menuPanel.model;
-
         Events.sendEvent("MenuModelChanged", menuPanel.model);
-
+        updateGui();
     }
 
-    ListView {
-        id: lvPages;
+    function updateGui(){
+        if (!model){
+            return;
+        }
 
-        anchors.fill: parent;
+        topPagesModel.clear();
+        bottomPagesModel.clear();
 
-        boundsBehavior: Flickable.StopAtBounds;
+        allPages.model = 0;
+        topAlignmentPages.model = 0;
+        bottomAlignmentPages.model = 0;
 
-        Keys.onPressed: {
-            if (event.key == Qt.Key_Up){
-                if (menuPanel.activePageIndex >= 1){
-                    menuPanel.activePageIndex--;
+        for (let i = 0; i < model.getItemsCount(); i++){
+            if (model.containsKey("Alignment", i)){
+                let alignment = model.getData("Alignment", i);
+                if (alignment === 1){
+                    let index = topPagesModel.insertNewItem();
+                    topPagesModel.copyItemDataFromModel(index, model, i)
                 }
-            }
-
-            if (event.key == Qt.Key_Down){
-                if (menuPanel.activePageIndex < lvPages.count - 1){
-                    menuPanel.activePageIndex++;
+                else if (alignment === 2){
+                    let index = bottomPagesModel.insertNewItem();
+                    bottomPagesModel.copyItemDataFromModel(index, model, i)
                 }
             }
         }
 
-        delegate: MenuPanelButton {
+        allPages.model = model;
+        topAlignmentPages.model = topPagesModel;
+        bottomAlignmentPages.model = bottomPagesModel;
+    }
+
+    function setActivePage(pageId){
+        for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
+            let id = menuPanel.model.getData("Id", i);
+            if (id === pageId){
+                menuPanel.activePageId = id;
+                menuPanel.activePageIndex = i;
+                break;
+            }
+        }
+    }
+
+    property Component delegate: Component {
+        MenuPanelButton {
             Component.onCompleted: {
                 if (model.index === 0 && menuPanel.activePageIndex === -1){
                     this.clicked();
                 }
             }
 
-            property string pageName: model["Name"];
-            onPageNameChanged: {
-                Events.sendEvent("PageNameChanged", {"Id": model["Id"], "Name": model["Name"]})
-            }
-
             text:  model["Name"];
             textColor: Style.textColor;
             fontName: menuPanel.fontName;
-
             menuPanelRef: menuPanel;
-
             iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["Icon"], "On", "Selected"):
-                                                     "../../../" + Style.getIconPath(model["Icon"], "On", "Normal");
+                                                    "../../../" + Style.getIconPath(model["Icon"], "On", "Normal");
 
             selected: menuPanel.activePageIndex === model.index;
             property string pageId: model["Id"];
 
             onClicked: {
-                menuPanel.activePageName = model["Name"];
-                menuPanel.activeIcon = model["Icon"];
-                menuPanel.activePageId = model["Id"];
+                menuPanel.setActivePage(model.Id)
+            }
 
-                menuPanel.activePageIndex = model.index;
-                lvPages.forceActiveFocus();
+            onWidthChanged: {
+                menuPanel.buttonWidth = width;
+            }
+
+            onHeightChanged: {
+                menuPanel.buttonHeight = height;
+            }
+        }
+    }
+
+    ListView {
+        id: allPages;
+        anchors.top: menuPanel.top;
+        anchors.left: menuPanel.left;
+        anchors.right: menuPanel.right;
+        anchors.bottom: menuPanel.bottom;
+        boundsBehavior: Flickable.StopAtBounds;
+        delegate: menuPanel.delegate;
+        visible: topAlignmentPages.y + topAlignmentPages.height > bottomAlignmentPages.y;
+    }
+
+    ListView {
+        id: topAlignmentPages;
+        anchors.top: menuPanel.top;
+        anchors.left: menuPanel.left;
+        anchors.right: menuPanel.right;
+        height: count * menuPanel.buttonHeight;
+        visible: !allPages.visible;
+        boundsBehavior: Flickable.StopAtBounds;
+        interactive: false;
+        delegate: Component {
+            MenuPanelButton {
+                text:  model["Name"];
+                textColor: Style.textColor;
+                menuPanelRef: menuPanel;
+                iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["Icon"], "On", "Selected"):
+                                                        "../../../" + Style.getIconPath(model["Icon"], "On", "Normal");
+                selected: menuPanel.activePageIndex <= topAlignmentPages.count - 1 ? model.index === menuPanel.activePageIndex : false;
+                onClicked: {
+                    menuPanel.setActivePage(model.Id)
+                }
+            }
+        }
+    }
+
+    ListView {
+        id: bottomAlignmentPages;
+        anchors.left: menuPanel.left;
+        anchors.right: menuPanel.right;
+        anchors.bottom: menuPanel.bottom;
+        height: count * menuPanel.buttonHeight;
+        visible: !allPages.visible;
+        boundsBehavior: Flickable.StopAtBounds;
+        interactive: false;
+        delegate: Component {
+            MenuPanelButton {
+                text:  model["Name"];
+                textColor: Style.textColor;
+                menuPanelRef: menuPanel;
+                iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["Icon"], "On", "Selected"):
+                                                        "../../../" + Style.getIconPath(model["Icon"], "On", "Normal");
+                selected: menuPanel.activePageIndex > topAlignmentPages.count - 1 ? menuPanel.activePageIndex - topAlignmentPages.count === model.index : false;
+                onClicked: {
+                    menuPanel.setActivePage(model.Id)
+                }
             }
         }
     }
 }
+

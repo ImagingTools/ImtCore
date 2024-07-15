@@ -42,7 +42,9 @@ Item {
         id: timer;
         interval: 10;
         onTriggered: {
-            commandsItem.checkWidth();
+            if (commandsItem){
+                commandsItem.checkWidth();
+            }
         }
     }
 
@@ -172,12 +174,14 @@ Item {
                                         TopButtonDecorator {
                                             property string baseColor: baseElement && baseElement.mouseArea.containsMouse ? Style.baseColor : Style.backgroundColor2;
                                             property string baseTextColor: !baseElement ? "transparent" : baseElement.enabled ? Style.textColor : Style.inactive_textColor;
-                                            color: button.isPositiveAccent ? commandsItem.positiveAccentColor : button.isNegativeAccent ? commandsItem.negativeAccentColor : baseColor;
+                                            color: button.isPositiveAccent ? commandsItem.positiveAccentColor :
+                                                                             button.isNegativeAccent ? commandsItem.negativeAccentColor : baseColor;
                                             textColor: button.isPositiveAccent || button.isNegativeAccent ? "white" : baseTextColor;
                                             icon.source: button.isPositiveAccent || button.isNegativeAccent ?
                                                              "../../../../" + Style.getIconPath(button.modelData.Icon, Icon.State.Off, Icon.Mode.Disabled)
                                                            : baseElement.iconSource;
                                             border.width: button.isPositiveAccent || button.isNegativeAccent ? 0 : baseElement.mouseArea.containsMouse;
+                                            opacity: button.hovered && (button.isPositiveAccent || button.isNegativeAccent) ? 0.85 : 1;
                                         }
                                     }
 
