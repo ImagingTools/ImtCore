@@ -65,6 +65,10 @@ Item {
         return false;
     }
 
+    function showInfoDialog(message){
+        openDialog(infoDialog, {"message": message});
+    }
+
     function showWarningDialog(message){
         openDialog(warningDialog, {"message": message});
     }
@@ -73,16 +77,23 @@ Item {
         openDialog(criticalDialog, {"message": message});
     }
 
+    property Component infoDialog: Component{
+        ErrorDialog {
+            title: qsTr("Information");
+            onFinished: {}
+        }
+    }
+
     property Component warningDialog: Component{
         ErrorDialog {
-            title: qsTr("Warning message");
+            title: qsTr("Warning");
             onFinished: {}
         }
     }
 
     property Component criticalDialog: Component{
         CriticalErrorDialog {
-            title: qsTr("Critical message");
+            title: qsTr("Critical");
             onFinished: {}
         }
     }
