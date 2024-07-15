@@ -85,7 +85,9 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 						userInfoPtr->SetLastConnection(QDateTime::currentDateTimeUtc());
 
 						if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr)){
-							SendWarningMessage(0, QString("Unable to set last connection info for user with login: '%1'").arg(login), "imtgql::CAuthorizationControllerComp");
+							errorMessage = QString("Unable to set last connection info for user with login: '%1'").arg(login);
+
+							SendWarningMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 						}
 
 						return rootModelPtr.PopPtr();
