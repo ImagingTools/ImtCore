@@ -135,6 +135,22 @@ bool EjPropKeyBlock::compare(const EjBlock &other) const
 }
 
 
+QDataStream& EjPropKeyBlock::write(QDataStream& os) const
+{
+	EjBlock::write(os);
+	os << num << key;
+	return os;
+}
+
+
+QDataStream& EjPropKeyBlock::read(QDataStream& is)
+{
+	EjBlock::read(is);
+	is >> num >> key;
+	return is;
+}
+
+
 EjBlock *EjGroupBlock::findProp(QList<EjBlock*> *lBlocks, int type, int num, bool check)
 {
 	EjBlock *block = nullptr;
@@ -498,6 +514,31 @@ bool EjPropPntBlock::compare(const EjBlock &other) const
 }
 
 
+QDataStream& EjPropPntBlock::write(QDataStream& os) const
+{
+	quint32 k1 = x_value;
+	IntVarLen t1(k1);
+	quint32 k2 = y_value;
+	IntVarLen t2(k2);
+	EjBlock::write(os);
+	os << num << t1 << t2;
+	return os;
+}
+
+
+QDataStream& EjPropPntBlock::read(QDataStream& is)
+{
+	quint32 k1;
+	IntVarLen t1(k1);
+	quint32 k2;
+	IntVarLen t2(k2);
+	EjBlock::read(is);
+	is >> num >> t1 >> t2;
+	x_value = k1; y_value = k2;
+	return is;
+}
+
+
 EjBlock *EjPropIntBlock::makeCopy()
 {
 	EjPropIntBlock *res = new EjPropIntBlock();
@@ -522,6 +563,28 @@ bool EjPropIntBlock::compare(const EjBlock &other) const
 }
 
 
+QDataStream& EjPropIntBlock::write(QDataStream& os) const
+{
+	quint32 k = value;
+	IntVarLen t1(k);
+
+	EjBlock::write(os);
+	os << num << t1;
+	return os;
+}
+
+
+QDataStream& EjPropIntBlock::read(QDataStream& is)
+{
+	quint32 k = value;
+	IntVarLen t1(k);
+	EjBlock::read(is);
+	is >> num >> t1;
+	value = k;
+	return is;
+}
+
+
 EjBlock *EjPropTextBlock::makeCopy()
 {
 	EjPropTextBlock *res = new EjPropTextBlock();
@@ -530,6 +593,7 @@ EjBlock *EjPropTextBlock::makeCopy()
     res->text = text;
     return res;
 }
+
 
 bool EjPropTextBlock::compare(const EjBlock &other) const
 {
@@ -542,6 +606,24 @@ bool EjPropTextBlock::compare(const EjBlock &other) const
     if(this->num != cur_propTxtBlock->num || this->text != cur_propTxtBlock->text)
         res = false;
     return res;
+}
+
+
+QDataStream& EjPropTextBlock::write(QDataStream& os) const
+{
+	EjBlock::write(os);
+	os << num;
+	writeSmallString(os,text); // os << text;
+	return os;
+}
+
+
+QDataStream& EjPropTextBlock::read(QDataStream& is)
+{
+	EjBlock::read(is);
+	is >> num;
+	readSmallString(is,text); //        is >> text;
+	return is;
 }
 
 
@@ -589,6 +671,7 @@ void EjTableFragment::setEndColum(quint16 colum)
     endBlock = tmp;
 }
 
+
 EjTableFragment *EjTableFragment::makeCopy()
 {
 	EjTableFragment * res = new EjTableFragment();
@@ -597,6 +680,7 @@ EjTableFragment *EjTableFragment::makeCopy()
     res->endBlock = endBlock;
     return res;
 }
+
 
 bool EjTableFragment::compare(const EjBlock &other) const
 {
@@ -608,6 +692,45 @@ bool EjTableFragment::compare(const EjBlock &other) const
     if(startBlock != curFragment->startBlock || endBlock != curFragment->endBlock)
         res = false;
     return res;
+}
+
+
+QDataStream& EjTableFragment::write(QDataStream& os) const
+{
+	EjBlock::write(os);
+	quint32 k1 = startRow();
+	IntVarLen startR(k1);
+	quint32 k2 = startColum();
+	IntVarLen startC(k2);
+	quint32 k3 = endRow();
+	IntVarLen endR(k3);
+	quint32 k4 = endColum();
+	IntVarLen endC(k4);
+
+	os << startR << startC << endR << endC << vid;
+	return os;
+}
+
+
+QDataStream& EjTableFragment::read(QDataStream& is)
+{
+	EjBlock::read(is);
+	quint32 k1;
+	IntVarLen startR(k1);
+	quint32 k2;
+	IntVarLen startC(k2);
+	quint32 k3;
+	IntVarLen endR(k3);
+	quint32 k4;
+	IntVarLen endC(k4);
+
+	is >> startR >> startC >> endR >> endC >> vid;
+	setStartRow(k1);
+	setStartColum(k2);
+	setEndRow(k3);
+	setEndColum(k4);
+	//    readSmallString(is,text); //        is >> text;
+	return is;
 }
 
 
@@ -623,6 +746,7 @@ EjBlock *EjFragmentBlock::makeCopy()
     return res;
 }
 
+
 bool EjFragmentBlock::compare(const EjBlock &other) const
 {
 	if(!EjBlock::compare(other)) {
@@ -633,6 +757,31 @@ bool EjFragmentBlock::compare(const EjBlock &other) const
     if(vid != curFragment->vid)
         res = false;
     return res;
+}
+
+
+QDataStream& EjFragmentBlock::write(QDataStream& os) const
+{
+	EjBlock::write(os);
+	os << vid;
+	//    quint32 k = countBlocks;
+	//    IntVarLen t(k);
+
+	//    os << t << vid;
+	return os;
+}
+
+
+QDataStream& EjFragmentBlock::read(QDataStream& is)
+{
+	EjBlock::read(is);
+	is >> vid;
+	//    quint32 k;
+	//    IntVarLen t(k);
+
+	//    is >> t >> vid;
+	//    countBlocks = k;
+	return is;
 }
 
 
@@ -656,6 +805,25 @@ bool EjEndFragmentBlock::compare(const EjBlock &other) const
     if(vid != curFragment->vid)
         res = false;
     return res;
+}
+
+
+QDataStream& EjEndFragmentBlock::write(QDataStream& os) const
+{
+	EjBlock::write(os);
+
+	os << vid;
+	return os;
+}
+
+
+QDataStream& EjEndFragmentBlock::read(QDataStream& is)
+{
+	EjBlock::read(is);
+
+	is >> vid;
+
+	return is;
 }
 
 
@@ -737,6 +905,25 @@ bool EjSizeProp::compare(const EjBlock &other) const
 }
 
 
+QDataStream& EjSizeProp::write(QDataStream& os) const
+{
+	EjBlock::write(os);
+	quint8 count_prop = 3;
+	os << count_prop << num << min << max;
+	return os;
+}
+
+
+QDataStream& EjSizeProp::read(QDataStream& is)
+{
+	quint8 count_prop;
+
+	EjBlock::read(is);
+	is >> count_prop >> num >> min >> max;
+	return is;
+}
+
+
 EjBlock *EjNumStyleBlock::makeCopy()
 {
     EjNumStyleBlock *res = new EjNumStyleBlock();
@@ -749,6 +936,7 @@ EjBlock *EjNumStyleBlock::makeCopy()
     return res;
 }
 
+
 bool EjNumStyleBlock::compare(const EjBlock &other) const
 {
 	if(!EjBlock::compare(other)) {
@@ -759,6 +947,27 @@ bool EjNumStyleBlock::compare(const EjBlock &other) const
     if(this->num != cur_numStyleBlock->num)
         res = false;
     return res;
+}
+
+
+QDataStream& EjNumStyleBlock::write(QDataStream& os) const
+{
+	EjBlock::write(os);
+	quint32 k = num;
+	IntVarLen t(k);
+	os << t;
+	return os;
+}
+
+
+QDataStream& EjNumStyleBlock::read(QDataStream& is)
+{
+	EjBlock::read(is);
+	quint32 k;
+	IntVarLen t(k);
+	is >> t;
+	num = (quint16)k;
+	return is;
 }
 
 
@@ -794,6 +1003,7 @@ EjBlock *EjPropInt8Block::makeCopy()
     return res;
 }
 
+
 bool EjPropInt8Block::compare(const EjBlock &other) const
 {
 	if(!EjBlock::compare(other)) {
@@ -808,6 +1018,21 @@ bool EjPropInt8Block::compare(const EjBlock &other) const
 }
 
 
+QDataStream& EjPropInt8Block::write(QDataStream& os) const
+{
+	EjBlock::write(os);
+	os << num << value;
+	return os;
+}
+
+QDataStream& EjPropInt8Block::read(QDataStream& is)
+{
+	EjBlock::read(is);
+	is >> num >> value;
+	return is;
+}
+
+
 EjBlock *EjPropInt64Block::makeCopy()
 {
 	EjPropInt64Block *res = new EjPropInt64Block();
@@ -816,6 +1041,7 @@ EjBlock *EjPropInt64Block::makeCopy()
     res->value = value;
     return res;
 }
+
 
 bool EjPropInt64Block::compare(const EjBlock &other) const
 {
@@ -831,6 +1057,22 @@ bool EjPropInt64Block::compare(const EjBlock &other) const
 }
 
 
+QDataStream& EjPropInt64Block::write(QDataStream& os) const
+{
+	EjBlock::write(os);
+	os << num << value;
+	return os;
+}
+
+
+QDataStream& EjPropInt64Block::read(QDataStream& is)
+{
+	EjBlock::read(is);
+	is >> num >> value;
+	return is;
+}
+
+
 EjBlock *EjPropByteArrayBlock::makeCopy()
 {
 	EjPropByteArrayBlock *res = new EjPropByteArrayBlock();
@@ -839,6 +1081,7 @@ EjBlock *EjPropByteArrayBlock::makeCopy()
     res->data = data;
     return res;
 }
+
 
 bool EjPropByteArrayBlock::compare(const EjBlock &other) const
 {
@@ -851,6 +1094,28 @@ bool EjPropByteArrayBlock::compare(const EjBlock &other) const
     if(this->num != cur_propBABlock->num || this->data != cur_propBABlock->data)
         res = false;
     return res;
+}
+
+
+QDataStream& EjPropByteArrayBlock::write(QDataStream& os) const
+{
+	EjBlock::write(os);
+	os << num;
+	quint8 size = (quint8)data.size();
+	os << size;
+	os.device()->write(data.data(),size);
+	return os;
+}
+
+
+QDataStream& EjPropByteArrayBlock::read(QDataStream& is)
+{
+	quint8 size;
+	EjBlock::read(is);
+	is >> num;
+	is >> size;
+	data = is.device()->read(size);
+	return is;
 }
 
 
@@ -922,8 +1187,24 @@ EjBlock *EjPropDoc::makeCopy() {
     return res;
 }
 
+
 bool EjPropDoc::compare(const EjBlock &other) const{
 	return EjBlock::compare(other) && ((EjPropDoc*)&other)->m_vid == m_vid; // && ((PropDoc*)&other)->num == num;
+}
+
+
+QDataStream& EjPropDoc::write(QDataStream& os) const
+{
+	EjBlock::write(os);
+	os << m_vid;
+	return os;
+}
+
+
+QDataStream& EjPropDoc::read(QDataStream& is)
+{
+	EjBlock::read(is);
+	return is;
 }
 
 
@@ -935,6 +1216,7 @@ EjBlock *EjPropColorBlock::makeCopy()
     res->color = color;
     return res;
 }
+
 
 bool EjPropColorBlock::compare(const EjBlock &other) const
 {
@@ -950,6 +1232,26 @@ bool EjPropColorBlock::compare(const EjBlock &other) const
 }
 
 
+QDataStream& EjPropColorBlock::write(QDataStream& os) const
+{
+	quint32 k = color.rgba();
+
+	EjBlock::write(os);
+	os << num << k;
+	return os;
+}
+
+
+QDataStream& EjPropColorBlock::read(QDataStream& is)
+{
+	quint32 k;
+	EjBlock::read(is);
+	is >> num >> k;
+	color = QColor::fromRgba(k);
+	return is;
+}
+
+
 EjBlock *EjPropBigTextBlock::makeCopy()
 {
 	EjPropBigTextBlock *res = new EjPropBigTextBlock();
@@ -957,6 +1259,7 @@ EjBlock *EjPropBigTextBlock::makeCopy()
     res->num = num;
     return (EjGroupBlock*)res;
 }
+
 
 bool EjPropBigTextBlock::compare(const EjBlock &other) const
 {
@@ -969,6 +1272,22 @@ bool EjPropBigTextBlock::compare(const EjBlock &other) const
     if(this->num != cur_propBigTextBlock->num)
         res = false;
     return res;
+}
+
+
+QDataStream& EjPropBigTextBlock::write(QDataStream& os) const
+{
+	EjGroupBlock::write(os);
+	os << num;
+	return os;
+}
+
+
+QDataStream& EjPropBigTextBlock::read(QDataStream& is)
+{
+	EjGroupBlock::read(is);
+	is >> num;
+	return is;
 }
 
 

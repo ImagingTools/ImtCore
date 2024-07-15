@@ -127,6 +127,7 @@ public:
 	EjBlock(EjBlock&&) = default;
 	EjBlock& operator=(const EjBlock&) = default;
 	EjBlock& operator=(EjBlock&&) = default;
+
 	virtual ~EjBlock() {}
     quint8 type; // 0-BASE 1-ENTER 2-SPACE 3-TEXT 4-CONTACT 5 - IMAGE ...
     qint32 width;
@@ -171,10 +172,35 @@ public:
     }
 
 
+	friend QDataStream& operator <<(QDataStream &os, const EjBlock &value)
+	{
+		return value.write(os);
+	}
+
+
+	friend QDataStream& operator >>(QDataStream &is, EjBlock &value)
+	{
+		return value.read(is);
+	}
+
+
 	virtual bool compare(const EjBlock &other) const {
         bool res = (this->type == other.type) ? true : false;
         return res;
     }
+
+
+	virtual QDataStream& write(QDataStream &os) const {
+		//        os << type << style << page;
+		os << type;
+		return os;
+	}
+
+	virtual QDataStream& read(QDataStream &is) {
+		//        is >> style >> page;
+		return is;
+	}
+
     virtual ItemBlock* newItem(qreal viewScale, QQuickItem *parent) { Q_UNUSED(viewScale); Q_UNUSED(parent); return NULL; }
     virtual QQuickItem* newViewItem(int vid, QQuickItem *parent) { Q_UNUSED(vid); Q_UNUSED(parent); return NULL; }
     virtual void calcBlock(int &index, EjCalcParams *calcParams) { Q_UNUSED(index); Q_UNUSED(calcParams); }
@@ -346,6 +372,15 @@ public:
 	bool compare(const EjBlock &other) const override{
 		return EjBlock::compare(other);
     }
+	QDataStream& write(QDataStream &os) const override{
+		EjBlock::write(os);
+		return os;
+	}
+
+	QDataStream& read(QDataStream &is) override{
+		EjBlock::read(is);
+		return is;
+	}
 
     int m_index;
     int m_counts;
@@ -363,6 +398,8 @@ public:
 
 	EjBlock* makeCopy() override;
 	bool compare(const EjBlock &other) const override;
+	QDataStream& write(QDataStream &os) const override;
+	QDataStream& read(QDataStream &is) override;
     quint8 m_vid;
     int num;
 
@@ -386,6 +423,17 @@ public:
 	EjPointBlock():EjBlock(VECTOR_POINT) { }
 	EjBlock* makeCopy();
 	bool compare(const EjBlock &other) const;
+	QDataStream& write(QDataStream &os) const {
+		EjBlock::write(os);
+		os << x << y;
+		return os;
+	}
+
+	QDataStream& read(QDataStream &is) {
+		EjBlock::read(is);
+		is >> x >> y;
+		return is;
+	}
 };
 
 
@@ -398,6 +446,8 @@ public:
     quint8 num;
 	EjBlock* makeCopy() override = 0;
 	bool compare(const EjBlock &other) const override = 0;
+	QDataStream& write(QDataStream &os) const override = 0;
+	QDataStream& read(QDataStream &is) override = 0;
 };
 
 class COMMONSHARED_EXPORT EjPropKeyBlock : public EjPropBase
@@ -408,6 +458,8 @@ public:
     QUuid key;
 	EjBlock* makeCopy();
 	bool compare(const EjBlock &other) const;
+	QDataStream& write(QDataStream &os) const;
+	QDataStream& read(QDataStream &is);
 };
 
 class COMMONSHARED_EXPORT EjPropPntBlock : public EjPropBase
@@ -417,6 +469,8 @@ public:
 	EjPropPntBlock(quint8 num_):EjPropBase(PROP_PNT) { num = num_; }
 	EjBlock* makeCopy();
 	bool compare(const EjBlock &other) const;
+	QDataStream& write(QDataStream &os) const;
+	QDataStream& read(QDataStream &is);
     qint32 x_value;
     qint32 y_value;
 
@@ -429,6 +483,8 @@ public:
 	EjPropColorBlock(quint8 num_):EjPropBase(PROP_COLOR) { num = num_; }
 	EjBlock* makeCopy();
 	bool compare(const EjBlock &other) const;
+	QDataStream& write(QDataStream &os) const;
+	QDataStream& read(QDataStream &is);
     QColor color;
 };
 
@@ -439,6 +495,8 @@ public:
 	EjPropIntBlock(quint8 num_):EjPropBase(PROP_INT) { num = num_; }
 	EjBlock* makeCopy();
 	bool compare(const EjBlock &other) const;
+	QDataStream& write(QDataStream &os) const;
+	QDataStream& read(QDataStream &is);
     qint32 value;
 };
 
@@ -450,6 +508,8 @@ public:
 	EjPropInt8Block(quint8 num_):EjPropBase(PROP_INT8) { num = num_; }
 	EjBlock* makeCopy();
 	bool compare(const EjBlock &other) const;
+	QDataStream& write(QDataStream &os) const;
+	QDataStream& read(QDataStream &is);
     qint8 value;
 };
 
@@ -461,6 +521,8 @@ public:
 	EjPropInt64Block(quint8 num_):EjPropBase(PROP_INT64) { num = num_; }
 	EjBlock* makeCopy();
 	bool compare(const EjBlock &other) const;
+	QDataStream& write(QDataStream &os) const;
+	QDataStream& read(QDataStream &is);
     qint64 value;
 };
 
@@ -472,6 +534,8 @@ public:
 	EjPropTextBlock(quint8 num_):EjPropBase(PROP_TXT) { num = num_; }
 	EjBlock* makeCopy();
 	bool compare(const EjBlock &other) const;
+	QDataStream& write(QDataStream &os) const;
+	QDataStream& read(QDataStream &is);
     QString text;
 };
 
@@ -482,6 +546,8 @@ public:
 	EjPropByteArrayBlock(quint8 num_):EjPropBase(PROP_BA) { num = num_; }
 	EjBlock* makeCopy();
 	bool compare(const EjBlock &other) const;
+	QDataStream& write(QDataStream &os) const;
+	QDataStream& read(QDataStream &is);
     QByteArray data;
 };
 
@@ -501,6 +567,17 @@ public:
 
 	EjBlock* makeCopy() override;
 	bool compare(const EjBlock &other) const override;
+	QDataStream& write(QDataStream &os) const override {
+		EjBlock::write(os);
+		os << num << value;
+		return os;
+	}
+
+	QDataStream& read(QDataStream &is) override {
+		EjBlock::read(is);
+		is >> num >> value;
+		return is;
+	}
 
     bool isEditAsParent() { return value & 0x01; }
     bool isSecAsParent() { return (value >> 5) & 0x01; }
@@ -527,6 +604,17 @@ public:
 
 	EjBlock* makeCopy() override;
 	bool compare(const EjBlock &other) const override;
+	QDataStream& write(QDataStream &os) const override {
+		EjBlock::write(os);
+		os << value;
+		return os;
+	}
+
+	QDataStream& read(QDataStream &is) override {
+		EjBlock::read(is);
+		is >> value;
+		return is;
+	}
     bool isEditAsParent() { return value & 0x01; }
     bool isSecAsParent() { return (value >> 5) & 0x01; }
     int editLevel() { return (value >> 1) & 0x03; }
@@ -545,6 +633,8 @@ public:
 	EjPropBigTextBlock(quint8 num_):EjGroupBlock() { type = PROP_BIG_TEXT; num = num_; }
 	EjBlock* makeCopy();
 	bool compare(const EjBlock &other) const;
+	QDataStream& write(QDataStream &os) const;
+	QDataStream& read(QDataStream &is);
 	void setText(QString source, QList<EjBlock*> *lBlocks);
 	QString text(QList<EjBlock*> *lBlocks);
     quint8 num;
@@ -561,6 +651,8 @@ public:
 
 	EjBlock* makeCopy() override;
 	bool compare(const EjBlock &other) const override;
+	QDataStream& write(QDataStream &os) const override;
+	QDataStream& read(QDataStream &is) override;
     void calcBlock(int &index, EjCalcParams *calcParams) override;
 
     quint16 num;
@@ -575,6 +667,17 @@ public:
 	EjMapLabelBlock():EjGroupBlock() { type = MAP_LABEL; m_style = NULL; }
 	bool compare(const EjBlock &other) const override;
     void setCoords(qint32 x_souce, qint32 y_source);
+	QDataStream& write(QDataStream &os) const override{
+		EjBlock::write(os);
+		os << x << y;
+		return os;
+	}
+
+	QDataStream& read(QDataStream &is) override{
+		EjBlock::read(is);
+		is >> x >> y;
+		return is;
+	}
 protected:
     PointStyle *m_style;
 };
@@ -608,6 +711,8 @@ public:
 
 	virtual EjBlock* makeCopy() override;
 	virtual bool compare(const EjBlock &other) const override;
+	virtual QDataStream& write(QDataStream &os) const override;
+	virtual QDataStream& read(QDataStream &is) override;
 };
 
 class EjEndFragmentBlock : public EjBlock
@@ -618,6 +723,8 @@ public:
 
 	virtual EjBlock* makeCopy();
 	virtual bool compare(const EjBlock &other) const;
+	virtual QDataStream& write(QDataStream &os) const;
+	virtual QDataStream& read(QDataStream &is);
 };
 
 class EjTableFragment : public EjFragmentBlock
@@ -635,6 +742,8 @@ public:
     void setEndColum(quint16 colum);
 	EjTableFragment *makeCopy() override;
 	virtual bool compare(const EjBlock &other) const override;
+	virtual QDataStream& write(QDataStream &os) const override;
+	virtual QDataStream& read(QDataStream &is) override;
 };
 
 
@@ -646,8 +755,18 @@ public:
 	virtual ~EjSpaceBlock() override {}
 
 	EjBlock* makeCopy() override;
+	QDataStream& write(QDataStream &os) const override {
+		EjBlock::write(os);
+		return os;
+	}
+
+	QDataStream& read(QDataStream &is) override {
+		EjBlock::read(is);
+		return is;
+	}
     void calcBlock(int &index, EjCalcParams *calcParams) override;
 };
+
 
 class COMMONSHARED_EXPORT EjTextBlock : public EjBlock
 {
@@ -659,9 +778,21 @@ public:
 
 	EjBlock* makeCopy() override;
 	bool compare(const EjBlock &other) const override;
+	QDataStream& write(QDataStream &os) const override {
+		EjBlock::write(os);
+		writeSmallString(os,text); // os << text;
+		return os;
+	}
+
+	QDataStream& read(QDataStream &is) override {
+		EjBlock::read(is);
+		readSmallString(is,text); //        is >> text;
+		return is;
+	}
     void calcBlock(int &index, EjCalcParams *calcParams) override;
 
 };
+
 
 struct EjSizeProp : public EjBlock {
 	EjSizeProp() { type = 9; min = 0; max = 0xffff; }
@@ -672,6 +803,8 @@ struct EjSizeProp : public EjBlock {
     bool isMax;
 	EjBlock* makeCopy();
 	bool compare(const EjBlock &other) const;
+	QDataStream& write(QDataStream &os) const;
+	QDataStream& read(QDataStream &is);
 };
 
 

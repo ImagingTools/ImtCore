@@ -91,6 +91,12 @@ public:
     float scaleSize;
     bool m_startCursor;
 
+    Q_INVOKABLE inline void Clear(){ clear(); }
+    Q_INVOKABLE inline void SetStatusMode(e_statusMode mode){ setStatusMode(mode); }
+    Q_INVOKABLE inline void SetText(const QString &source){ setText(source); }
+    Q_INVOKABLE inline quint32 InputEnter(bool force = false){ return inputEnter(force); }
+    Q_INVOKABLE inline void CalcData(bool force = false){ calcData(force); }
+
     void inputText(QString text);
     void addImage(QString path);
 	void addExtBlock(EjBlock *block);
