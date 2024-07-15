@@ -20,11 +20,6 @@ DecoratorBase {
             GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
         }
     }
-//    Rectangle {
-//        anchors.fill: parent;
-
-//        color: Style.backgroundColor;
-//    }
 
     TopLeftPanel {
         id: topLeftPanel;

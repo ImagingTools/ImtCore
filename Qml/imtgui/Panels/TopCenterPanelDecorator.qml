@@ -70,6 +70,11 @@ DecoratorBase {
                 iconSource: enabled ? "../../../" +  Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal)
                                     : "../../../" +  Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled);
                 enabled: false;
+                decorator: Component {
+                    ToolButtonDecorator {
+                        icon.width: 16;
+                    }
+                }
                 onClicked: {
                     NavigationController.prev();
                 }
@@ -83,6 +88,11 @@ DecoratorBase {
                 iconSource: enabled ? "../../../" +  Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
                                     : "../../../" +  Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled);
                 enabled: false;
+                decorator: Component {
+                    ToolButtonDecorator {
+                        icon.width: 16;
+                    }
+                }
                 onClicked: {
                     NavigationController.next();
                 }

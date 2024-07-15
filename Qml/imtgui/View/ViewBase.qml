@@ -165,10 +165,14 @@ Item {
         function onCommandsModelChanged(){
             if (viewBase.commandsController){
                 for (let i = 0; i < internal.cachedCommandsModel.getItemsCount(); i++){
-                    let id = internal.cachedCommandsModel.getData("Id", i);
-                    let isEnabled = internal.cachedCommandsModel.getData("IsEnabled", i);
-
-                    viewBase.commandsController.setCommandIsEnabled(id, isEnabled);
+                    let subElements = internal.cachedCommandsModel.getData("SubElements", i);
+                    if (subElements){
+                        for (let j = 0; j < subElements.getItemsCount(); j++){
+                            let id = subElements.getData("Id", j);
+                            let isEnabled = subElements.getData("IsEnabled", j);
+                            viewBase.commandsController.setCommandIsEnabled(id, isEnabled);
+                        }
+                    }
                 }
 
                 if (internal.localizationChanged){
