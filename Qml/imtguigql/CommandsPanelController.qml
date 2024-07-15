@@ -7,8 +7,6 @@ import imtgui 1.0
 CommandsRepresentationProvider {
     id: container;
 
-    property CommandsPanel commandsView: null;
-
     function commandExists(commandId){
         for (let i = 0; i < commandsModel.getItemsCount(); i++){
             let subElements = commandsModel.getData("SubElements", i)

@@ -6,6 +6,7 @@ QtObject {
     id: root;
 
     property TreeItemModel commandsModel: TreeItemModel {}
+    property Item commandsView: null;
 
     property string uuid;
 

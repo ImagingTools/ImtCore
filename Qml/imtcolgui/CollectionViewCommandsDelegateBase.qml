@@ -79,11 +79,18 @@ ViewCommandsDelegateBase {
 
         let commandsView = collectionViewCommandsDelegate.collectionView.commandsView;
         if (commandsView){
-            commandsView.setPositiveAccentCommandIds(["New"]);
+            if (commandsView.setPositiveAccentCommandIds !== undefined){
+                commandsView.setPositiveAccentCommandIds(["New"]);
+            }
 
             if (isEnabled){
-                commandsView.setNegativeAccentCommandIds(["Remove"]);
-                commandsView.setPositiveAccentCommandIds(["Edit"]);
+                if (commandsView.setNegativeAccentCommandIds !== undefined){
+                    commandsView.setNegativeAccentCommandIds(["Remove"]);
+                }
+
+                if (commandsView.setPositiveAccentCommandIds !== undefined){
+                    commandsView.setPositiveAccentCommandIds(["Edit"]);
+                }
             }
         }
 

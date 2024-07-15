@@ -53,6 +53,11 @@ Item {
             anchors.verticalCenter: parent.verticalCenter;
             width: parent.width;
             sourceComponent: commandsDecoratorComp;
+            onLoaded: {
+                if (viewBase.commandsController){
+                    viewBase.commandsController.commandsView = item;
+                }
+            }
         }
     }
 
@@ -111,6 +116,13 @@ Item {
 
         if (commandsControllerComp){
             commandsController = commandsControllerComp.createObject(viewBase);
+        }
+    }
+
+    onCommandsControllerChanged: {
+        if (commandsController){
+            commandsController.commandsView = viewBase.commandsView;
+            commandsConnections.target = commandsController;
         }
     }
 
@@ -186,12 +198,6 @@ Item {
     }
 
     function setReadOnly(readOnly){
-    }
-
-    onCommandsControllerChanged: {
-        if (commandsController){
-            commandsConnections.target = commandsController;
-        }
     }
 
     // for override
