@@ -2,6 +2,7 @@ module imtauthgui
 
 AccountEditor 1.0 AccountEditor.qml
 AccountCollectionView 1.0 AccountCollectionView.qml
+AdministrationView 1.0 AdministrationView.qml
 AuthorizationPage 1.0 AuthorizationPage.qml
 singleton AuthorizationController 1.0 AuthorizationController.qml
 

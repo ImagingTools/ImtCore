@@ -24,6 +24,16 @@ CSqlDatabaseObjectCollectionIterator::CSqlDatabaseObjectCollectionIterator(
 }
 
 
+QSqlRecord CSqlDatabaseObjectCollectionIterator::GetRecord()
+{
+    if(m_currentIndex > -1){
+        return m_records[m_currentIndex];
+    }
+
+    return QSqlRecord();
+}
+
+
 // reimplemented (imtbase::IObjectCollectionIterator)
 
 bool CSqlDatabaseObjectCollectionIterator::Next() const

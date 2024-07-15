@@ -84,6 +84,11 @@ I_EXPORT_COMPONENT(
 			"Commands observer qml",
 			"Commands Observer Qml QML Provider");
 
+I_EXPORT_COMPONENT(
+			QmlObjectCollection,
+			"Qml Object Collection",
+			"Qml Object Collection");
+
 
 } // namespace ImtQmlPck
 

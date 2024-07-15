@@ -9,6 +9,10 @@ Item {
 
     anchors.fill: parent;
 
+    property alias multiPageView: multiPageView;
+    signal multiPageUpdated();
+
+
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
     }
@@ -68,6 +72,7 @@ Item {
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
 
+
         Component.onCompleted: {
             updateModel();
         }
@@ -91,6 +96,7 @@ Item {
             }
 
             multiPageView.currentIndex = 0;
+            container.multiPageUpdated();
         }
     }
 }
