@@ -208,8 +208,15 @@ QtObject {
                 if (value === undefined){
                     value = null
                 }
-
-                json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + this[key] + '"' : value)
+                let safeValue = this[key]
+                if (typeof safeValue === 'string'){
+                    safeValue = safeValue.replaceAll('\u005C', '\u005C\u005C')
+                    safeValue = safeValue.replaceAll('"','\u005C"')
+                    safeValue = safeValue.replaceAll('\n','\u005C\n')
+                    safeValue = safeValue.replaceAll('\t','\u005C\t')
+                    safeValue = safeValue.replaceAll('\r','\u005C\r')
+                }
+                json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + safeValue + '"' : value)
             }
             if(i < list.length - 1) json += ','
         }

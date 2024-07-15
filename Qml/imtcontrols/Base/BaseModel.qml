@@ -31,7 +31,7 @@ ListModel {
             for(let j = 0; j < list.length; j++){
                 let key = list[j]
                 if(typeof item[key] === 'object'){
-                    if (item[key].toJson === "function"){
+                    if (typeof item[key].toJson === "function"){
                         json += '"' + item.getJSONKeyForProperty(key) + '":' + item[key].toJson()
                     }
                 } else {
@@ -39,7 +39,15 @@ ListModel {
                     if (value === undefined){
                         value = null
                     }
-                    json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + item[key] + '"' : value)
+                    let safeValue = item[key]
+                    if (typeof safeValue === 'string'){
+                        safeValue = safeValue.replaceAll('\u005C', '\u005C\u005C')
+                        safeValue = safeValue.replaceAll('"','\u005C"')
+                        safeValue = safeValue.replaceAll('\n','\u005C\n')
+                        safeValue = safeValue.replaceAll('\t','\u005C\t')
+                        safeValue = safeValue.replaceAll('\r','\u005C\r')
+                    }
+                    json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
                 }
                 if(j < list.length - 1) json += ','
             }
