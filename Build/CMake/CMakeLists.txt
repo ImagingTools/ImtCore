@@ -149,6 +149,10 @@ if(NOT DEFINED USE_QTDB OR USE_QTDB)
 	add_subdirectory("${INCLUDE_DIR}/imtgqldb/CMake" "${AUX_INCLUDE_DIR}/imtgqldb")
 endif()
 
+if(DEFINED USE_MDBX AND USE_MDBX)
+	add_subdirectory("${INCLUDE_DIR}/imtmdbx/CMake" "${AUX_INCLUDE_DIR}/imtmdbx")
+endif()
+
 
 #-------- Impl --------
 
@@ -304,6 +308,7 @@ if (${BUILD_TESTING})
 	endif()
 
 	add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
+	add_subdirectory("${INCLUDE_DIR}/imtmdbx/Test/CMake" "${AUX_INCLUDE_DIR}/imtmdbx/Test")
 
 	add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
 	add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")
