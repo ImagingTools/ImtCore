@@ -416,7 +416,8 @@ Item{
                 property bool isPressed;
 
                 onPressed: {
-                    startX = mouse.x;
+                    let startPoint = mapToItem(splitterMA.parent, mouse.x, 0);
+                    startX = startPoint.x;
                     isPressed = true;
                 }
 
@@ -430,7 +431,8 @@ Item{
                 onPositionChanged:  {
 
                     if (splitterMA.pressed){
-                        let x_ = mouse.x;
+                        let startPoint = mapToItem(splitterMA.parent, mouse.x, 0);
+                        let x_ = startPoint.x;
                         let delta = x_ - startX;
                         splitter.correctSizes(delta);
 
@@ -519,7 +521,7 @@ Item{
                 anchors.centerIn: parent;
 
                 width: parent.width;
-                height: parent.height * 10;
+                height: parent.height * (1 + isPressed * 9);
 
                 hoverEnabled: true;
                 acceptedButtons: Qt.LeftButton;
@@ -528,21 +530,36 @@ Item{
                 cursorShape: pressed && containsMouse ? Qt.SplitVCursor : !pressed && withinParent ? Qt.SplitVCursor : Qt.ArrowCursor;
                 property bool withinParent:  mouseY > (height - parent.height)/2 && mouseY <  (height + parent.height)/2;
                 property int startY;
+                property bool isPressed;
 
                 onPressed: {
-                    startY = mouse.y;
+                    let startPoint = mapToItem(splitterMAForVert.parent, 0, mouse.y);
+                    startY = startPoint.y;
+                    isPressed = true;
                 }
 
                 onClicked: {
-                    mouse.accepted = false;
+                    mouse.accepted = true;
+                    isPressed = false;
                 }
 
                 onPositionChanged:  {
 
                     if (splitterMAForVert.pressed){
-                        let y_ = mouse.y;
+                        let startPoint = mapToItem(splitterMAForVert.parent, 0, mouse.y);
+                        let y_ = startPoint.y;
                         let delta = y_ - startY;
                         splitterForVert.correctSizes(delta);
+
+                        movingPauseForVert.restart()
+                    }
+                }
+
+                PauseAnimation {
+                    id: movingPauseForVert;
+                    duration: 2000;
+                    onFinished: {
+                        splitterMAForVert.isPressed = false;
                     }
                 }
             }
