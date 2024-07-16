@@ -56,6 +56,7 @@ imtbase::CTreeItemModel* CGqlSearchControllerComp::CreateInternalResponse(
 						}
 
 						itemsModelPtr->SetData("Id", searchResult.contextId, itemIndex);
+						itemsModelPtr->SetData("TypeId", searchResult.contextTypeId, itemIndex);
 						itemsModelPtr->SetData("Name", searchResult.resultName, itemIndex);
 						itemsModelPtr->SetData("Description", searchResult.resultDescription, itemIndex);
 					}

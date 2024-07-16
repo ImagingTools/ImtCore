@@ -16,52 +16,55 @@ QtObject {
     }
 
     function getDocumentManager(typeId){
-        return root.documentManagers[typeId]["DocumentManager"];
+        return root.documentManagers[typeId];
     }
 
-    function registerDocumentManager(typeId, documentManager, defaultDocumentTypeId, defaultViewTypeId){
-        if (!defaultDocumentTypeId){
-            defaultDocumentTypeId = ""
+    function registerDocumentManager(typeId, documentManager){
+        if (!typeId || typeId === ""){
+            console.error("Unable to register document manager. Type-ID is invalid!");
+            return false;
         }
 
-        if (!defaultViewTypeId){
-            defaultViewTypeId = ""
+        if (!documentManager){
+            console.error("Unable to register document manager. Reference on the document manager is invalid!");
+            return false;
         }
 
-        let obj = {}
-        obj["DocumentManager"] = documentManager;
-        obj["DefaultDocumentTypeId"] = defaultDocumentTypeId;
-        obj["DefaultViewTypeId"] = defaultViewTypeId;
-
-        root.documentManagers[typeId] = obj;
+        root.documentManagers[typeId] = documentManager;
 
         return true;
     }
 
-    function registerDefaultDocumentData(typeId, defaultDocumentTypeId, defaultViewTypeId){
-        if (typeId in root.documentManagers){
-            root.documentManagers[typeId]["DefaultDocumentTypeId"] = defaultDocumentTypeId;
-            root.documentManagers[typeId]["DefaultViewTypeId"] = defaultViewTypeId;
-        }
-    }
-
     function openDocument(typeId, documentId, documentTypeId, viewTypeId){
-        documentOpened(typeId, documentId, documentTypeId);
-
-        if (typeId in root.documentManagers){
-            if (!documentTypeId){
-                documentTypeId = root.documentManagers[typeId]["DefaultDocumentTypeId"]
-            }
-
-            if (!viewTypeId){
-                viewTypeId = root.documentManagers[typeId]["DefaultViewTypeId"]
-            }
-
-            let documentManager = root.documentManagers[typeId]["DocumentManager"];
-            if (documentManager){
-                documentManager.openDocument(documentId, documentTypeId, viewTypeId);
-            }
+        if ((!typeId || typeId === "") || (!documentId || documentId === "") || (!documentTypeId || documentTypeId === "")){
+            console.error("Unable to open document, please check input parameters");
+            return;
         }
+
+        if (!(typeId in root.documentManagers)){
+            console.error("Unable to open document. Document manager with Type-ID: '" , typeId, "' unregistered!");
+            return;
+        }
+
+        let documentManager = root.documentManagers[typeId];
+        if (!documentManager){
+            console.error("Unable to open document. Document manager with Type-ID: '" , typeId, "' is invalid!");
+            return;
+        }
+
+        if (!viewTypeId || viewTypeId === ""){
+            let viewTypeIds = documentManager.getViewTypeIds(documentTypeId);
+            if (viewTypeIds.length === 0){
+                console.error("Unable to open document. View none are registered for the manager with Type-ID: ", typeId);
+                return;
+            }
+
+            viewTypeId = viewTypeIds[0];
+        }
+
+        documentManager.openDocument(documentId, documentTypeId, viewTypeId);
+
+        documentOpened(typeId, documentId, documentTypeId);
     }
 
     function saveDirtyDocuments(){

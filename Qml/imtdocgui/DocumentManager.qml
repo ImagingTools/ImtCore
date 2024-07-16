@@ -95,14 +95,10 @@ Item {
     }
 
 
-    function registerDocumentView(documentTypeId, viewTypeId, viewComp, byDefault)
+    function registerDocumentView(documentTypeId, viewTypeId, viewComp)
     {
         if (documentTypeId === "" || viewTypeId === "" || !viewComp){
             return false;
-        }
-
-        if (!byDefault){
-            byDefault = false;
         }
 
         if (documentIsRegistered(documentTypeId)){
@@ -112,10 +108,10 @@ Item {
                 return false;
             }
 
-            internal.m_registeredView[documentTypeId].push({"ViewTypeId": viewTypeId, "ViewComp": viewComp, "ByDefault": byDefault});
+            internal.m_registeredView[documentTypeId].push({"ViewTypeId": viewTypeId, "ViewComp": viewComp});
         }
         else{
-            internal.m_registeredView[documentTypeId] = [{"ViewTypeId": viewTypeId, "ViewComp": viewComp, "ByDefault": byDefault}]
+            internal.m_registeredView[documentTypeId] = [{"ViewTypeId": viewTypeId, "ViewComp": viewComp}]
         }
 
         return true;
@@ -243,6 +239,25 @@ Item {
         }
 
         return true;
+    }
+
+
+    function getViewTypeIds(documentTypeId){
+        console.log("getViewTypeIds", documentTypeId);
+        console.log("internal.m_registeredView", JSON.stringify(internal.m_registeredView));
+        if (!documentIsRegistered(documentTypeId)){
+            return []
+        }
+
+        let result = []
+        let registeredViewList = internal.m_registeredView[documentTypeId];
+        for (let i = 0; i < registeredViewList.length; i++){
+            let registeredViewObj = registeredViewList[i];
+            let viewTypeId = registeredViewObj["ViewTypeId"];
+            result.push(viewTypeId)
+        }
+
+        return result;
     }
 
 

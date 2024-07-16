@@ -1,0 +1,64 @@
+#include <imtgui/CPageGuiElementModelRepresentationControllerComp.h>
+
+
+// ImtCore includes
+#include <imtqml/IPageGuiElementModel.h>
+
+
+namespace imtgui
+{
+
+
+// protected methods
+
+// reimplemented (imtbase::IRepresentationController)
+
+bool CPageGuiElementModelRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
+{
+	const imtqml::IPageGuiElementModel* guiElementPtr = dynamic_cast<const imtqml::IPageGuiElementModel*>(&dataModel);
+	if (guiElementPtr != nullptr) {
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CPageGuiElementModelRepresentationControllerComp::GetRepresentationFromDataModel(
+			const istd::IChangeable& dataModel,
+			imtbase::CTreeItemModel& representation,
+			const iprm::IParamsSet* paramsPtr) const
+{
+	Q_ASSERT(IsModelSupported(dataModel));
+
+	const imtqml::IPageGuiElementModel* guiElementPtr = dynamic_cast<const imtqml::IPageGuiElementModel*>(&dataModel);
+	if (guiElementPtr == nullptr) {
+		return false;
+	}
+
+	bool result = BaseClass::GetRepresentationFromDataModel(dataModel, representation, paramsPtr);
+	if (!result){
+		return false;
+	}
+
+	QString pageQmlItemFilePath = guiElementPtr->GetPageQmlItemFilePath();
+	QString startSourceItem = guiElementPtr->GetStartSourceItem();
+
+	representation.SetData("Source", pageQmlItemFilePath);
+	representation.SetData("StartItem", startSourceItem);
+
+	return true;
+}
+
+
+bool CPageGuiElementModelRepresentationControllerComp::GetDataModelFromRepresentation(
+			const imtbase::CTreeItemModel& /*representation*/,
+			istd::IChangeable& /*dataModel*/) const
+{
+	return false;
+}
+
+
+} // namespace imtgui
+
+

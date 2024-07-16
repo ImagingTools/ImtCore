@@ -20,8 +20,9 @@ ViewBase {
                             let typeId = root.model.getData("Id", tabPanel.selectedIndex);
                             let elements = table.elements;
                             let elementId = elements.getData("Id", indexes[0])
+                            let elementTypeId = elements.getData("TypeId", indexes[0])
 
-                            MainDocumentManager.openDocument(typeId, elementId);
+                            MainDocumentManager.openDocument(typeId, elementId, elementTypeId);
                         }
                     }
                 }
@@ -220,6 +221,7 @@ ViewBase {
 
         onStateChanged: {
             if (this.state === "Ready"){
+                console.log("Search", this.toJson());
                 let resultModel;
                 if (this.containsKey("data")){
                     resultModel = this.getData("data")

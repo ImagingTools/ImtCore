@@ -47,6 +47,7 @@
 #include <imtgui/CButtonBasedSelectionGuiComp.h>
 #include <imtgui/CGuiElementModelRepresentationControllerComp.h>
 #include <imtgui/CGuiElementContainerRepresentationControllerComp.h>
+#include <imtgui/CPageGuiElementModelRepresentationControllerComp.h>
 
 
 /**
@@ -97,6 +98,7 @@ typedef imtgui::CMultiSelectionEditorComp MultiSelectionEditor;
 typedef imtgui::CButtonBasedSelectionGuiComp ButtonBasedSelectionGui;
 typedef imtgui::CGuiElementModelRepresentationControllerComp GuiElementModelRepresentationController;
 typedef imtgui::CGuiElementContainerRepresentationControllerComp GuiElementContainerRepresentationController;
+typedef imtgui::CPageGuiElementModelRepresentationControllerComp PageGuiElementModelRepresentationController;
 
 
 } // namespace ImtGuiPck

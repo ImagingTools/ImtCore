@@ -72,6 +72,7 @@ const imtbase::ISearchResults* TObjectCollectionSearchControllerCompWrap<ObjectC
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(BaseClass::CreateObjectCollectionIterator(0, -1, &paramsSet));
 	if (objectCollectionIterator != nullptr){
 		while (objectCollectionIterator->Next()){
+			QByteArray objectId = objectCollectionIterator->GetObjectId();
 			idoc::MetaInfoPtr metaInfoPtr = objectCollectionIterator->GetDataMetaInfo();
 			if (metaInfoPtr.IsValid()){
 				imtbase::ISearchResults::SearchResult searchResult;
@@ -79,7 +80,8 @@ const imtbase::ISearchResults* TObjectCollectionSearchControllerCompWrap<ObjectC
 				QString name = metaInfoPtr->GetMetaInfo(imtbase::ICollectionInfo::EIT_NAME).toString();
 				QString description = metaInfoPtr->GetMetaInfo(imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
-				searchResult.contextId = objectCollectionIterator->GetObjectId();
+				searchResult.contextId = objectId;
+				searchResult.contextTypeId = BaseClass::GetObjectTypeId(objectId);
 				searchResult.resultName = name;
 				searchResult.resultDescription = description;
 

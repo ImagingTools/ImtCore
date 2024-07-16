@@ -217,6 +217,11 @@ I_EXPORT_COMPONENT(
 			"Gui element container representation controller",
 			"Gui Element Container Representation Controller");
 
+I_EXPORT_COMPONENT(
+			PageGuiElementModelRepresentationController,
+			"Page gui element model representation controller",
+			"Page Gui Element Model Representation Controller");
+
 
 } // namespace ImtGuiPck
 
