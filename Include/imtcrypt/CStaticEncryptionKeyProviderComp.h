@@ -27,7 +27,7 @@ public:
 		I_ASSIGN(m_publicKeyCompPtr, "PublicKey", "Public key for RSA algorithm", false, "PublicKey");
 		I_ASSIGN(m_privateKeyCompPtr, "PrivateKey", "Private key for RSA algorithm", false, "PrivateKey");
 		I_ASSIGN(m_passwordCompPtr, "Password", "Password key for AES algorithm", false, "Password");
-		I_ASSIGN(m_initializationVectorCompPtr, "InitializationVector", "Initialization vector key für AES algorithm", false, "InitializationVector");
+		I_ASSIGN(m_initializationVectorCompPtr, "InitializationVector", "Initialization vector key for AES algorithm", false, "InitializationVector");
 	I_END_COMPONENT;
 
 	CStaticEncryptionKeyProviderComp();
