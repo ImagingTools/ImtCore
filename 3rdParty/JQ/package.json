@@ -1,0 +1,19 @@
+{
+  "name": "jq",
+  "version": "1.0.0",
+  "description": "",
+  "main": "compiler/compiler.js",
+  "scripts": {
+    "build-core": "webpack --mode production --config webpack.config.js",
+    "build-core-dev": "webpack --mode development --config webpack.config.js",
+    "compile": "node ./compiler/compiler.js"
+  },
+  "author": "Artur Menshikov",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "ol": "^7.3.0"
+  }
+}
