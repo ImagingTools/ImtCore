@@ -19,7 +19,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Alignment" Type="Integer" ExportId="Alignment">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="32"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Description" Type="Text" ExportId="Description">
                         <Data IsEnabled="false"/>
