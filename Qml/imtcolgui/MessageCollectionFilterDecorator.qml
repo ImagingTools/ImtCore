@@ -60,6 +60,8 @@ DecoratorBase {
             checked: true
             text: qsTr("Info")
             iconSource: "../../../../" + Style.getIconPath("Icons/Info", Icon.State.On, Icon.Mode.Normal);
+            widthFromDecorator: true;
+            heightFromDecorator: true;
             onCheckedChanged: {
                 mainItem.baseElement.filterChanged("InfoFilter", checked);
             }
@@ -73,6 +75,8 @@ DecoratorBase {
             checked: true
             text: qsTr("Warning")
             iconSource: "../../../../" + Style.getIconPath("Icons/Warning", Icon.State.On, Icon.Mode.Normal);
+            widthFromDecorator: true;
+            heightFromDecorator: true;
             onCheckedChanged: {
                 mainItem.baseElement.filterChanged("WarningFilter", checked);
             }
@@ -86,6 +90,8 @@ DecoratorBase {
             checked: true
             text: qsTr("Error");
             iconSource: "../../../../" + Style.getIconPath("Icons/Error", Icon.State.On, Icon.Mode.Normal);
+            widthFromDecorator: true;
+            heightFromDecorator: true;
             onCheckedChanged: {
                 if (mainItem.baseElement){
                     mainItem.baseElement.filterChanged("ErrorFilter", checked);
@@ -101,6 +107,8 @@ DecoratorBase {
             checked: true
             text: qsTr("Critical");
             iconSource: "../../../../" + Style.getIconPath("Icons/Critical", Icon.State.On, Icon.Mode.Normal);
+            widthFromDecorator: true;
+            heightFromDecorator: true;
             onCheckedChanged: {
                 if (mainItem.baseElement){
                     mainItem.baseElement.filterChanged("CriticalFilter", checked);
@@ -115,6 +123,8 @@ DecoratorBase {
             checkable: true
             checked: false
             iconSource: "../../../../" + Style.getIconPath("Icons/Diagnostics", Icon.State.On, Icon.Mode.Normal);
+            widthFromDecorator: true;
+            heightFromDecorator: true;
             text: qsTr("Verbose");
             Component.onCompleted: {
                 if (mainItem.baseElement){
