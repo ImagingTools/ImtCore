@@ -37,7 +37,7 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} iauth)
 target_link_libraries(${PROJECT_NAME} imtbase imtzip imtrest imtcrypt imtstyle imtqml imtdb imtfile imtguigqlqml imtauthguiqml imtguiqml imtcolguiqml)
-target_link_libraries(${PROJECT_NAME} imtlicgql imtguigql imtgql imtclientgql imtauthgui imtauthgql imtauthdb imtapp imtstylecontrolsqml imtcontrolsqml imtdocguiqml)
+target_link_libraries(${PROJECT_NAME} imtlicgql imtguigql imtgql imtclientgql imtauthgui imtauthgql imtauthdb imtapp imtstylecontrolsqml imtcontrolsqml imtdocguiqml imtgui)
 # target_link_libraries(${PROJECT_NAME} lisaqml ImtCoreLoc LisaLoc)
 target_link_libraries(${PROJECT_NAME} iqtgui)
 target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::Quick  Qt${QT_VERSION_MAJOR}::WebSockets)

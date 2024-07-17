@@ -5,10 +5,9 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 
+target_link_libraries(${PROJECT_NAME} imeas)
+target_link_libraries(${PROJECT_NAME} imt3dgui imt3dview imt3d imtgui imtwidgets imtstyle)
+
 if(QT_VERSION_MAJOR EQUAL 6)
 	target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
 endif()
-
-target_link_libraries(${PROJECT_NAME} imeas)
-target_link_libraries(${PROJECT_NAME} imt3d imt3dgui imt3dview imtgui imtwidgets imtstyle)
-
