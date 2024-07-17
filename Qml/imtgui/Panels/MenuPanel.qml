@@ -145,11 +145,11 @@ Rectangle {
         for (let i = 0; i < model.getItemsCount(); i++){
             if (model.containsKey("Alignment", i)){
                 let alignment = model.getData("Alignment", i);
-                if (alignment === 1){
+                if (alignment === 32/*Qt.AlignTop*/){
                     let index = topPagesModel.insertNewItem();
                     topPagesModel.copyItemDataFromModel(index, model, i)
                 }
-                else if (alignment === 2){
+                else if (alignment === 64/*Qt.AlignBottom*/){
                     let index = bottomPagesModel.insertNewItem();
                     bottomPagesModel.copyItemDataFromModel(index, model, i)
                 }

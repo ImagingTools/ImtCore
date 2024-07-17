@@ -180,7 +180,6 @@ DecoratorBase {
                 }
 
                 onClicked: {
-                    console.log("iconClear onClicked")
                     tfc.text = "";
                 }
             }
