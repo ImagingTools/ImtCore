@@ -210,11 +210,8 @@ QtObject {
                 }
                 let safeValue = this[key]
                 if (typeof safeValue === 'string'){
-                    safeValue = safeValue.replaceAll('\u005C', '\u005C\u005C')
-                    safeValue = safeValue.replaceAll('"','\u005C"')
-                    safeValue = safeValue.replaceAll('\n','\u005C\n')
-                    safeValue = safeValue.replaceAll('\t','\u005C\t')
-                    safeValue = safeValue.replaceAll('\r','\u005C\r')
+                    safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
+                    safeValue = safeValue.replace(/\"/g,'\u005C"')
                 }
                 json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + safeValue + '"' : value)
             }

@@ -50,8 +50,8 @@ DecoratorBase {
 
         Image {
             id: image;
-            anchors.horizontalCenter: parent.horizontalCenter;
-            anchors.top: parent.top;
+            anchors.horizontalCenter: itemBody.horizontalCenter;
+            anchors.top: itemBody.top;
             width: 30;
             height: width;
             fillMode: Image.PreserveAspectFit;
@@ -62,12 +62,11 @@ DecoratorBase {
 
         Text {
             id: description;
-            anchors.horizontalCenter: parent.horizontalCenter;
             anchors.top: image.bottom;
             anchors.topMargin: Style.size_mainMargin;
-            anchors.left: parent.left;
+            anchors.left: itemBody.left;
             anchors.leftMargin: Style.size_mainMargin;
-            anchors.right: parent.right;
+            anchors.right: itemBody.right;
             anchors.rightMargin: Style.size_mainMargin;
             color: leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted ? Style.iconColorOnSelected : Style.textColor;
             font.family: Style.fontFamily;

@@ -5,18 +5,25 @@ ListModel {
         let list = []
         if(Qt.platform.os === 'web'){
             for(let key in item.$properties){
-                if(key.indexOf('m_') >= 0 && key !== 'owner' && key !== 's_keys' && key !== 'objectName' && key !== 'enableNotifications' && typeof item[key] !== "function" && item[key] !== undefined && item[key] !== null){
+                if(
+                    key.indexOf('m_') >= 0
+                    && typeof item[key] !== "function"
+                    && item[key] !== undefined
+                    && item[key] !== null){
                     list.push(key)
                 }
             }
         } else {
             for(let key in item){
-                if(key !== 'objectName' && key !== 'owner' && key !== 's_keys' && key !== 'enableNotifications' && typeof item[key] !== "function" && item[key] !== undefined && item[key] !== null){
+                if(
+                    key.indexOf('m_') >= 0
+                    && typeof item[key] !== "function"
+                    && item[key] !== undefined
+                    && item[key] !== null){
                     list.push(key)
                 }
             }
         }
-
 
         return list
     }
@@ -41,11 +48,8 @@ ListModel {
                     }
                     let safeValue = item[key]
                     if (typeof safeValue === 'string'){
-                        safeValue = safeValue.replaceAll('\u005C', '\u005C\u005C')
-                        safeValue = safeValue.replaceAll('"','\u005C"')
-                        safeValue = safeValue.replaceAll('\n','\u005C\n')
-                        safeValue = safeValue.replaceAll('\t','\u005C\t')
-                        safeValue = safeValue.replaceAll('\r','\u005C\r')
+                        safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
+                        safeValue = safeValue.replace(/\"/g,'\u005C"')
                     }
                     json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
                 }

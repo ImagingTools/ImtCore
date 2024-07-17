@@ -90,7 +90,7 @@ ElementView {
             readOnly: root.readOnly
             placeHolderText: root.placeHolderText;
             echoMode: root.echoMode;
-            textInputValidator: root.textInputValidator ? root.textInputValidator : undefined;
+            textInputValidator: root.textInputValidator ? root.textInputValidator : null;
 
             onAccepted: {
                 root.accepted();

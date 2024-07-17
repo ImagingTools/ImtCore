@@ -42,8 +42,8 @@ DecoratorBase {
     }
 
     Row {
-        anchors.verticalCenter: parent.verticalCenter;
-        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.verticalCenter: topCenterPanelDecorator.verticalCenter;
+        anchors.horizontalCenter: topCenterPanelDecorator.horizontalCenter;
 
         height: 30;
 
