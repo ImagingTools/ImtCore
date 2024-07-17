@@ -29,6 +29,6 @@ elseif(APPLE)
 	endif()
 
 elseif(UNIX)
-    target_link_libraries(${PROJECT_NAME} -lcrypto)
+    target_link_libraries(${PROJECT_NAME} /usr/lib/x86_64-linux-gnu/libcrypto.so.1.1)
 endif()
 
