@@ -145,7 +145,7 @@ Rectangle {
         for (let i = 0; i < model.getItemsCount(); i++){
             if (model.containsKey("Alignment", i)){
                 let alignment = model.getData("Alignment", i);
-                if (alignment === 32/*Qt.AlignTop*/){
+                if (alignment === 32/*Qt.AlignTop*/|| alignment === 1){
                     let index = topPagesModel.insertNewItem();
                     topPagesModel.copyItemDataFromModel(index, model, i)
                 }
