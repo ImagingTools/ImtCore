@@ -13,13 +13,14 @@ namespace imtmdbx
 
 CDocumentTable::CDocumentTable(const QString& name, mdbx::txn_managed &txn,
 							   mdbx::key_mode keyMode,
-							   mdbx::value_mode valueMode):
+							   mdbx::value_mode valueMode,
+							   bool hasIndex):
 			m_tableName(name),
 			m_txn(txn),
 			m_keyMode(keyMode),
 			m_valueMode(valueMode)
 {
-	m_hasIndex = Exists(m_tableName + "Index");
+	m_hasIndex = hasIndex ? hasIndex : Exists(m_tableName + "Index");
 	bool isReadOnly = m_txn.is_readonly();
 
 	if (isReadOnly){
@@ -144,7 +145,7 @@ bool CDocumentTable::UpdateDocument(qint64 key, const QByteArray &data)
 
 qint64 CDocumentTable::GetKey(const QByteArray &value)
 {
-	qDebug() << "CDocumentTable::GetKey";
+	//qDebug() << "CDocumentTable::GetKey";
 
 	try{
 		qint64 key = -1;
@@ -192,7 +193,7 @@ qint64 CDocumentTable::GetKey(const QByteArray &value)
 		return key;
 	}
 	catch(...){
-
+		return -1;
 	}
 
 	return -1;

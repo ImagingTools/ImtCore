@@ -15,7 +15,7 @@ namespace imtmdbx
 class CDocumentTable: virtual public IDocumentTable
 {
 public:
-	CDocumentTable(const QString& name, mdbx::txn_managed& txn, mdbx::key_mode keyMode = mdbx::key_mode::reverse, mdbx::value_mode valueMode = mdbx::value_mode::single);
+	CDocumentTable(const QString& name, mdbx::txn_managed& txn, mdbx::key_mode keyMode = mdbx::key_mode::reverse, mdbx::value_mode valueMode = mdbx::value_mode::single, bool hasIndex = false);
 
 	// reimplemented (imtmdbx::IDocumentTable)
 	virtual qint64 AddDocument(const QByteArray& data) override;
