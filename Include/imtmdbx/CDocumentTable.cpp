@@ -157,11 +157,11 @@ qint64 CDocumentTable::GetKey(const QByteArray &value)
 				key = result.value.as_int64();
 			}
 			catch(...){
-				key = -1;
+				return -1;
 			}
 		}
 
-		if(key < 0){
+		else {
 			try{
 				mdbx::cursor::move_result result = m_cursor.to_first();
 				while(1){
