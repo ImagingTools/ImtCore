@@ -15,6 +15,7 @@
 #include <imtqml/CGqlModel.h>
 #include <imtqml/CGqlRequest.h>
 #include <imtqml/CRemoteFileController.h>
+#include <imtqml/CFileIO.h>
 
 
 class DefaultImtCoreQmlInitializer
@@ -56,6 +57,7 @@ public:
 		qmlRegisterType<imtqml::CGqlModel>("Acf", 1, 0, "GqlModel");
 		qmlRegisterType<imtqml::CGqlRequest>("Acf", 1, 0, "GqlRequest");
 		qmlRegisterType<imtqml::CRemoteFileController>("Acf", 1, 0, "RemoteFileController");
+		qmlRegisterType<imtqml::FileIO>("Acf", 1, 0, "FileIO");
 
 	#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 		qmlRegisterModule("QtGraphicalEffects", 1, 12);
