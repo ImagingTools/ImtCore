@@ -10,13 +10,13 @@ namespace imtqml
 {
 
 
-QUrl FileIO::source()
+QString FileIO::source()
 {
 	return m_source;
 }
 
 
-void FileIO::setSource(QUrl source)
+void FileIO::setSource(QString source)
 {
 	m_source = source;
 }
@@ -27,9 +27,9 @@ QString FileIO::read()
 	if(m_source.isEmpty()) {
 		return QString();
 	}
-	QFile file(m_source.toLocalFile());
+	QFile file(m_source);
 	if(!file.exists()) {
-		qWarning() << "Does not exits: " << m_source.toLocalFile();
+		qWarning() << "Does not exits: " << m_source;
 		return QString();
 	}
 
@@ -48,7 +48,7 @@ bool FileIO::write(QString text)
 	if(m_source.isEmpty()) {
 		return false;
 	}
-	QFile file(m_source.toLocalFile());
+	QFile file(m_source);
 	if(file.open(QIODevice::WriteOnly)) {
 		QTextStream stream(&file);
 		stream << text;
