@@ -57,4 +57,5 @@ module.exports.listComponents = [
     'JSONListModel',
     'TreeItemModel',
     'GqlModel',
+    'FileIO',
 ]
