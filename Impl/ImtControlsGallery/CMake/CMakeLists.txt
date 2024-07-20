@@ -48,7 +48,7 @@ message("PROJECT_BINARY_DIR ${IMTCOREDIR}/Bin/web")
 set(buildwebdir ${CMAKE_CURRENT_LIST_DIR}/../../../Bin/web)
 message("LASA binary dir ${buildwebdir}")
 
-list(APPEND webdirs ${IMTCOREDIR}/3rdParty/JQML2/Core/dist)
+list(APPEND webdirs ${IMTCOREDIR}/3rdParty/JQML2/core/dist)
 list(APPEND webdirs ${buildwebdir}/Resources)
 
 # copy lisa qml from to
