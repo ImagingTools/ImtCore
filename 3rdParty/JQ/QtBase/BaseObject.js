@@ -10,6 +10,8 @@ class BaseObject{
         },
         get(target, key){
             if(key === Symbol.toPrimitive) return target.__toPrimitive
+            // if(key === Symbol.iterator) return target.__toPrimitive
+
             if(key[0] === '_' && key[1] === '_') {
                 if(key === '__self') return target
                 return target[key]

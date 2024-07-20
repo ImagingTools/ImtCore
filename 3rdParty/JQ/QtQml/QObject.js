@@ -44,6 +44,7 @@ class QObject extends BaseObject {
             if(this[key] instanceof Property){
                 let caller = Property.queueLink[Property.queueLink.length-1]
                 if(caller) caller.__subscribe(this[key])
+                return this[key].__get()
             }
             return this[key]
         }

@@ -108,7 +108,8 @@ class Item extends QtObject {
         self.__DOM = self.__createDOM()
         self.__connectDOM(parent)
         self.__setDOMStyle({
-            position: 'absolute'
+            position: 'absolute',
+            overflow: 'unset',
         })
 
         return proxy
@@ -172,6 +173,11 @@ class Item extends QtObject {
     onScaleChanged(){
         this.__setDOMStyle({
             transform: `scale(${this.scale}) rotate(${this.rotation}deg)`
+        })
+    }
+    onClipChanged(){
+        this.__setDOMStyle({
+            overflow: this.clip ? "hidden" : "unset"
         })
     }
 

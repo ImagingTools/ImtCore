@@ -3,6 +3,7 @@ const AnchorLine = require("./AnchorLine")
 const Real = require("./Real")
 const Var = require("./Var")
 const Signal = require("./Signal")
+const QtFunctions = require("../Qt/functions")
 
 class Anchors extends GroupProperty {
     static meta = {
@@ -49,35 +50,41 @@ class Anchors extends GroupProperty {
     onFillChanged(){
         let target = this.fill.__get()
         if(this.__parent && target){
-            this.__parent.x.__setCompute(()=>{return this.leftMargin})
-            this.__parent.y.__setCompute(()=>{return this.topMargin})
-            this.__parent.width.__setCompute(()=>{return target.width - (this.leftMargin + this.rightMargin)})
-            this.__parent.height.__setCompute(()=>{return target.height - (this.topMargin + this.bottomMargin)})
+            let updateList = []
+            this.__parent.x = QtFunctions.binding(()=>{return this.leftMargin},updateList)
+            this.__parent.y = QtFunctions.binding(()=>{return this.topMargin},updateList)
+            this.__parent.width = QtFunctions.binding(()=>{return target.width - (this.leftMargin + this.rightMargin)},updateList)
+            this.__parent.height = QtFunctions.binding(()=>{return target.height - (this.topMargin + this.bottomMargin)},updateList)
 
-            this.__parent.x.__update()
-            this.__parent.y.__update()
-            this.__parent.width.__update()
-            this.__parent.height.__update()
+            for(let property of updateList){
+                property.__update()
+            }
         }
     }
 
     onCenterInChanged(){
         let target = this.centerIn.__get()
         if(this.__parent && target){
-            this.__parent.x.__setCompute(()=>{return target.width / 2 - this.__parent.width / 2})
-            this.__parent.y.__setCompute(()=>{return target.height / 2 - this.__parent.height / 2})
+            let updateList = []
+            this.__parent.x = QtFunctions.binding(()=>{return target.width / 2 - this.__parent.width / 2},updateList)
+            this.__parent.y = QtFunctions.binding(()=>{return target.height / 2 - this.__parent.height / 2},updateList)
 
-            this.__parent.x.__update()
-            this.__parent.y.__update()
+            for(let property of updateList){
+                property.__update()
+            }
         }
     }
 
     onHorizontalCenterChanged(){
         let target = this.horizontalCenter.__get()
         if(this.__parent && target){
+            let updateList = []
             if(target.__float === AnchorLine.HorizontalCenter){
-                this.__parent.x.__setCompute(()=>{return target.__parent.width / 2 - this.__parent.width / 2})
-                this.__parent.x.__update()
+                this.__parent.x = QtFunctions.binding(()=>{return target.__parent.width / 2 - this.__parent.width / 2},updateList)
+            }
+
+            for(let property of updateList){
+                property.__update()
             }
         }
     }
@@ -85,9 +92,13 @@ class Anchors extends GroupProperty {
     onVerticalCenterChanged(){
         let target = this.verticalCenter.__get()
         if(this.__parent && target){
+            let updateList = []
             if(target.__float === AnchorLine.VerticalCenter){
-                this.__parent.y.__setCompute(()=>{return target.__parent.height / 2 - this.__parent.height / 2})
-                this.__parent.y.__update()
+                this.__parent.y = QtFunctions.binding(()=>{return target.__parent.height / 2 - this.__parent.height / 2},updateList)
+            }
+
+            for(let property of updateList){
+                property.__update()
             }
         }
     }

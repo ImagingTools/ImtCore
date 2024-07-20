@@ -73,6 +73,12 @@ class Property extends BaseObject {
     }
 
     __set(key, value){
+        if(typeof value === 'function' && value.bound){
+            this.__setCompute(value)
+            if(value.queue) value.queue.push(this)
+            return true
+        }
+
         let safeValue = this.__typecasting(value)
 
         if(key){

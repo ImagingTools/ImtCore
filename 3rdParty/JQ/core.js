@@ -1,16 +1,12 @@
-const QtBase = require('./QtBase/QtBase')
-const Qt = require('./Qt/Qt')
-const QtQml = require('./QtQml/QtQml')
-const QtQuick = require('./QtQuick/QtQuick')
-const Qt5Compat = require('./Qt5Compat/Qt5Compat')
-const QtWebSockets = require('./QtWebSockets/QtWebSockets')
+global.JQModules = {
+    QtBase: require('./QtBase/QtBase'),
+    Qt: require('./Qt/Qt'),
+    QtQml: require('./QtQml/QtQml'),
+    QtQuick: require('./QtQuick/QtQuick'),
+    Qt5Compat: require('./Qt5Compat/Qt5Compat'),
+    QtWebSockets: require('./QtWebSockets/QtWebSockets'),
+}
 
-global.QtBase = QtBase
-global.Qt = Qt
-global.QtQml = QtQml
-global.QtQuick = QtQuick
-global.Qt5Compat = Qt5Compat
-global.QtWebSockets = QtWebSockets
 
 document.head.insertAdjacentHTML("beforeend", `
     <style>
