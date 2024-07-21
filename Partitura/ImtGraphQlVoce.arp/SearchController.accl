@@ -8,10 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Design" X="225" Y="400" Note=""/>
-        <Element ComponentName="General" X="600" Y="200" Note=""/>
-        <Element ComponentName="Language" X="600" Y="400" Note=""/>
-        <Element ComponentName="TableViewParam" X="1000" Y="400" Note=""/>
+        <Element ComponentName="SearchController" X="575" Y="125" Note=""/>
+        <Element ComponentName="SearchControllersInfo" X="575" Y="300" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

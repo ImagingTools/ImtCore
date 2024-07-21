@@ -147,6 +147,7 @@
         <file alias="imtcontrols/Views/InputView.qml">Views/InputView.qml</file>
         <file alias="imtcontrols/Views/PopupDetailedDelegateDecorator.qml">Views/PopupDetailedDelegateDecorator.qml</file>
         <file alias="imtcontrols/Views/TooltipArea.qml">Views/TooltipArea.qml</file>
+	<file alias="imtcontrols/Views/TableViewParams.qml">Views/TableViewParams.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

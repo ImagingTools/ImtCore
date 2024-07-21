@@ -62,9 +62,9 @@ QtObject {
             viewTypeId = viewTypeIds[0];
         }
 
-        documentManager.openDocument(documentId, documentTypeId, viewTypeId);
-
         documentOpened(typeId, documentId, documentTypeId);
+
+        documentManager.openDocument(documentId, documentTypeId, viewTypeId);
     }
 
     function saveDirtyDocuments(){

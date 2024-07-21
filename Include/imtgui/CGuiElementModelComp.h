@@ -31,7 +31,7 @@ public:
 		I_ASSIGN(m_enabledAttrPtr, "IsEnabled", "Element is enabled", false, true);
 		I_ASSIGN(m_visibleAttrPtr, "IsVisible", "Element visibility", false, true);
 		I_ASSIGN(m_priorityAttrPtr, "Priority", "Element priority", false, 0);
-		I_ASSIGN(m_alignmentAttrPtr, "Alignment", "Alignment", false, 1);
+		I_ASSIGN(m_alignmentAttrPtr, "Alignment", "1 - Left alignment, 2 - Right alignment, 4 - HCenter alignment, 8 - Justify alignment, 32 - Top alignment, 64 - Bottom alignment, 128 - VCenter alignment", false, 1);
 		I_ASSIGN(m_subElementsCompPtr, "SubElementsContainer", "Container of the sub elements", false, "SubElementsContainer");
 	I_END_COMPONENT;
 

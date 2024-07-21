@@ -116,7 +116,6 @@ Rectangle {
     }
 
     onDoubleClicked: {
-        console.log("onDoubleClicked")
         if (tableItem){
             tableItem.doubleClicked(model.Id, model.index)
         }
@@ -140,6 +139,7 @@ Rectangle {
         if (tableItem){
             tableConnections.target = tableItem;
 
+            checkedItemsChanged()
             tableItem.checkedItemsChanged.connect(tableDelegateContainer.checkedItemsChanged);
 
             tableItem.properties.visibleItemsChanged.connect(tableDelegateContainer.visibleItemsChanged);
@@ -150,14 +150,6 @@ Rectangle {
             }
         }
     }
-
-//    onWidthChanged: {
-//        if(tableDelegateContainer.wrapMode !== Text.NoWrap){
-//            if(pauseHeight){
-//                pauseHeight.restart();
-//            }
-//        }
-//    }
 
     onColumnCountChanged: {
         if(tableDelegateContainer.tableItem.wrapMode_deleg !== Text.NoWrap){

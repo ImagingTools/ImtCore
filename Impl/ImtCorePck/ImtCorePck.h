@@ -51,6 +51,8 @@
 #include <imtbase/CCachedObjectCollectionComp.h>
 #include <imtbase/CDelegatedBinaryDataProviderComp.h>
 #include <imtbase/CSelectionIdBinderComp.h>
+#include <imtbase/CTableViewParamRepresentationControllerComp.h>
+#include <imtbase/CTableViewParam.h>
 
 
 /**
@@ -117,6 +119,12 @@ typedef icomp::TModelCompWrap<imtbase::CSelectionParamAdapterComp> SelectionPara
 typedef icomp::TModelCompWrap<imtbase::CSystemStatusComp> SystemStatus;
 typedef imtbase::CDelegatedBinaryDataProviderComp DelegatedBinaryDataProviders;
 typedef icomp::TModelCompWrap<imtbase::CSelectionIdBinderComp> SelectionIdBinder;
+typedef imtbase::CTableViewParamRepresentationControllerComp TableViewParamRepresentationController;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtbase::CTableViewParam,
+						imtbase::ITableViewParam,
+						iser::ISerializable>> TableViewParam;
 
 
 } // namespace ImtCorePck

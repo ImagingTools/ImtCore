@@ -61,6 +61,8 @@ Row {
                 else{
                     cell.width = defaultWidth;
                 }
+
+                cell.visible = cell.width > 0;
             }
 
             Loader {

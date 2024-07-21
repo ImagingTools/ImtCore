@@ -29,6 +29,8 @@ Rectangle {
     property alias separatorVisible: bottomLine.visible;
     property string sortIndicatorIcon: "../../../" +  Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
 
+    property TableViewParams tableViewParams: TableViewParams {}
+
     property TreeItemModel headers
 
     property TreeItemModel tableDecorator
@@ -373,6 +375,17 @@ Rectangle {
         tableContainer.headerHeight = Math.max(maxVal, tableContainer.headerMinHeight);
     }
 
+    function getVisibleColumnCount(){
+        let count = 0;
+        for(var i = 0; i < tableContainer.widthDecoratorDynamic.getItemsCount(); i++){
+            if (tableContainer.widthDecorator.containsKey("Width", i)){
+
+            }
+        }
+
+        return count;
+    }
+
     function setWidth(){
         if (!tableContainer.widthDecorator || !tableContainer.headers || !tableContainer.widthDecoratorDynamic){
             return;
@@ -438,7 +451,6 @@ Rectangle {
             else if(width_ >= 0  && widthPercent_ >= 0){
                 tableContainer.widthDecoratorDynamic.setData("Width", width_,i);
             }
-
         }
 
         tableContainer.widthRecalc();
@@ -493,7 +505,6 @@ Rectangle {
     }
 
     function getSelectedIds(){
-        console.log("getSelectedIds");
         let retVal = []
 
         let indexes = tableContainer.getSelectedIndexes();
@@ -554,7 +565,7 @@ Rectangle {
         elementsBg.contentHeight = content_height;
     }
     function getContentHeight(){
-       return elementsBg.contentHeight;
+        return elementsBg.contentHeight;
     }
 
 

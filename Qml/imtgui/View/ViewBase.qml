@@ -30,9 +30,7 @@ Item {
 
         CommandsPanel {
             commandId: viewBase.viewId;
-
             onCommandActivated: {
-                console.log("viewBase onCommandActivated", commandId);
                 if (viewBase.commandsDelegate){
                     viewBase.commandsDelegate.commandHandle(commandId);
                 }
@@ -43,7 +41,8 @@ Item {
     Item {
         id: headerViewItem;
         anchors.top: parent.top;
-        width: parent.width;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
         height: visible ? 30 + 2 * Style.size_mainMargin : 0;
         objectName: "ViewBase";
         visible: headerViewLoader.item && viewBase.commandsController != null;

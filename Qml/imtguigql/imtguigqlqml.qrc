@@ -21,5 +21,6 @@
 	<file alias="imtguigql/ComboBoxGqlSimpleElementView.qml">ComboBoxGqlSimpleElementView.qml</file>
 	<file alias="imtguigql/GqlRequestDocumentDataController.qml">GqlRequestDocumentDataController.qml</file>
 	<file alias="imtguigql/CommandsPanelController.qml">CommandsPanelController.qml</file>
+	<file alias="imtguigql/TableViewParamController.qml">TableViewParamController.qml</file>
     </qresource>
 </RCC>

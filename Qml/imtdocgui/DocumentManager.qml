@@ -243,8 +243,6 @@ Item {
 
 
     function getViewTypeIds(documentTypeId){
-        console.log("getViewTypeIds", documentTypeId);
-        console.log("internal.m_registeredView", JSON.stringify(internal.m_registeredView));
         if (!documentIsRegistered(documentTypeId)){
             return []
         }

@@ -46,6 +46,7 @@ Item {
     signal selectionChanged(var selection);
     signal checkedItemsChanged();
     signal rightButtonMouseClicked(int mouseX, int mouseY);
+    signal tableViewParamsAccepted();
 
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", onLocalizationChanged)
@@ -162,6 +163,10 @@ Item {
 
                 dataController = dataControllerComp.createObject(container);
             }
+        }
+
+        onTableViewParamsAccepted: {
+            root.tableViewParamsAccepted();
         }
 
         commandsDelegateComp: Component {

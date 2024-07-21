@@ -244,6 +244,16 @@ I_EXPORT_COMPONENT(
 			"Combined list of selected ids",
 			"Selection Param Id Ids Bind");
 
+I_EXPORT_COMPONENT(
+			TableViewParamRepresentationController,
+			"Table view param representation controller",
+			"Table View Param Representation Controller");
+
+I_EXPORT_COMPONENT(
+			TableViewParam,
+			"Table view param",
+			"Table View Param");
+
 
 } // namespace ImtCorePck
 

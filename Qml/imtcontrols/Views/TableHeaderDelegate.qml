@@ -8,6 +8,7 @@ Item{
     property TableBase tableItem
     property int columnCount: tableItem ? tableItem.columnCount : 0
     property int columnIndex: model.index
+    property string headerId: model.Id;
 
     property bool compl: false;
     property bool complCompl: headerDelegate.compl && headerDelegate.tableItem;
@@ -48,6 +49,8 @@ Item{
         else{
             width = defaultWidth;
         }
+
+        visible = width > 0;
     }
     //borders
 
@@ -75,7 +78,7 @@ Item{
         anchors.verticalCenter: parent.verticalCenter;
         anchors.left: parent.left;
         width: headerDelegate.tableItem.isRightBorder ? headerDelegate.tableItem.verticalBorderSize * headerDelegate.tableItem.visibleLeftBorderFirst * (headerDelegate.columnIndex == 0)
-                                            : headerDelegate.tableItem.visibleLeftBorderFirst ? headerDelegate.tableItem.verticalBorderSize : headerDelegate.columnIndex > 0 ? headerDelegate.tableItem.verticalBorderSize : 0;
+                                                      : headerDelegate.tableItem.visibleLeftBorderFirst ? headerDelegate.tableItem.verticalBorderSize : headerDelegate.columnIndex > 0 ? headerDelegate.tableItem.verticalBorderSize : 0;
         height: headerDelegate.tableItem.verticalBorderHeight;
         color:  headerDelegate.tableItem.borderColorVertical;
     }
@@ -89,7 +92,7 @@ Item{
         width: !headerDelegate.tableItem.isRightBorder ?
                    headerDelegate.tableItem.verticalBorderSize * headerDelegate.tableItem.visibleRightBorderLast  * (headerDelegate.columnIndex == (headerDelegate.columnCount -1)) * (headerDelegate.columnCount > 0) :
                    headerDelegate.tableItem.visibleRightBorderLast ? headerDelegate.tableItem.verticalBorderSize  :
-                                                           headerDelegate.tableItem.verticalBorderSize * (headerDelegate.columnIndex < (headerDelegate.columnCount -1));
+                                                                     headerDelegate.tableItem.verticalBorderSize * (headerDelegate.columnIndex < (headerDelegate.columnCount -1));
 
         color: headerDelegate.tableItem.borderColorVertical;
     }
@@ -102,18 +105,18 @@ Item{
         anchors.right: rightBorder.left;
         anchors.bottom: bottomBorder.top;
         color: headerDelegate.tableItem.emptyDecorHeader ? "transparent" :
-                                                 headerDelegate.tableItem.headerDecorator.isValidData("Color", headerDelegate.columnIndex) ?
-                                                     headerDelegate.tableItem.headerDecorator.getData("Color", headerDelegate.columnIndex) :
-                                                     "transparent";
+                                                           headerDelegate.tableItem.headerDecorator.isValidData("Color", headerDelegate.columnIndex) ?
+                                                               headerDelegate.tableItem.headerDecorator.getData("Color", headerDelegate.columnIndex) :
+                                                               "transparent";
 
         opacity:  headerDelegate.tableItem.emptyDecorHeader ? 1 :
-                                                    headerDelegate.tableItem.headerDecorator.isValidData("Opacity", headerDelegate.columnIndex) ?
-                                                        headerDelegate.tableItem.headerDecorator.getData("Opacity", headerDelegate.columnIndex) :
-                                                        1;
+                                                              headerDelegate.tableItem.headerDecorator.isValidData("Opacity", headerDelegate.columnIndex) ?
+                                                                  headerDelegate.tableItem.headerDecorator.getData("Opacity", headerDelegate.columnIndex) :
+                                                                  1;
 
         radius: headerDelegate.tableItem.emptyDecorHeader ? 0 :
-                                                  headerDelegate.tableItem.headerDecorator.isValidData("CellRadius", headerDelegate.columnIndex) ?
-                                                      headerDelegate.tableItem.headerDecorator.getData("CellRadius", headerDelegate.columnIndex) :0;
+                                                            headerDelegate.tableItem.headerDecorator.isValidData("CellRadius", headerDelegate.columnIndex) ?
+                                                                headerDelegate.tableItem.headerDecorator.getData("CellRadius", headerDelegate.columnIndex) :0;
 
         //cornerPatches
         Rectangle{
@@ -124,8 +127,8 @@ Item{
             height: parent.height/2;
             color: parent.color;
             visible: headerDelegate.tableItem.emptyDecorHeader ? true :
-                                                       headerDelegate.tableItem.headerDecorator.isValidData("LeftTopRound", headerDelegate.columnIndex) ?
-                                                           !headerDelegate.tableItem.headerDecorator.getData("LeftTopRound", headerDelegate.columnIndex) :true;
+                                                                 headerDelegate.tableItem.headerDecorator.isValidData("LeftTopRound", headerDelegate.columnIndex) ?
+                                                                     !headerDelegate.tableItem.headerDecorator.getData("LeftTopRound", headerDelegate.columnIndex) :true;
         }
 
         Rectangle{
@@ -136,8 +139,8 @@ Item{
             height: parent.height/2;
             color: parent.color;
             visible: headerDelegate.tableItem.emptyDecorHeader ? true :
-                                                       headerDelegate.tableItem.headerDecorator.isValidData("RightTopRound", headerDelegate.columnIndex) ?
-                                                           !headerDelegate.tableItem.headerDecorator.getData("RightTopRound", headerDelegate.columnIndex) :true;
+                                                                 headerDelegate.tableItem.headerDecorator.isValidData("RightTopRound", headerDelegate.columnIndex) ?
+                                                                     !headerDelegate.tableItem.headerDecorator.getData("RightTopRound", headerDelegate.columnIndex) :true;
         }
 
         Rectangle{
@@ -148,8 +151,8 @@ Item{
             height: parent.height/2;
             color: parent.color;
             visible: headerDelegate.tableItem.emptyDecorHeader ? true :
-                                                       headerDelegate.tableItem.headerDecorator.isValidData("LeftBottomRound", headerDelegate.columnIndex) ?
-                                                           !headerDelegate.tableItem.headerDecorator.getData("LeftBottomRound", headerDelegate.columnIndex) :true;
+                                                                 headerDelegate.tableItem.headerDecorator.isValidData("LeftBottomRound", headerDelegate.columnIndex) ?
+                                                                     !headerDelegate.tableItem.headerDecorator.getData("LeftBottomRound", headerDelegate.columnIndex) :true;
         }
 
         Rectangle{
@@ -160,8 +163,8 @@ Item{
             height: parent.height/2;
             color: parent.color;
             visible: headerDelegate.tableItem.emptyDecorHeader ? true :
-                                                       headerDelegate.tableItem.headerDecorator.isValidData("RightBottomRound", headerDelegate.columnIndex) ?
-                                                           !headerDelegate.tableItem.headerDecorator.getData("RightBottomRound", headerDelegate.columnIndex) :true;
+                                                                 headerDelegate.tableItem.headerDecorator.isValidData("RightBottomRound", headerDelegate.columnIndex) ?
+                                                                     !headerDelegate.tableItem.headerDecorator.getData("RightBottomRound", headerDelegate.columnIndex) :true;
         }
         //cornerPatches
     }//mainRec
@@ -177,29 +180,29 @@ Item{
 
         verticalAlignment: Text.AlignVCenter;
         horizontalAlignment: headerDelegate.tableItem.emptyDecorHeader ? Text.AlignLeft :
-                                                               headerDelegate.tableItem.headerDecorator.isValidData("TextPosition", headerDelegate.columnIndex) ?
-                                                                   headerDelegate.tableItem.headerDecorator.getData("TextPosition", headerDelegate.columnIndex) :
-                                                                   Text.AlignLeft;
+                                                                         headerDelegate.tableItem.headerDecorator.isValidData("TextPosition", headerDelegate.columnIndex) ?
+                                                                             headerDelegate.tableItem.headerDecorator.getData("TextPosition", headerDelegate.columnIndex) :
+                                                                             Text.AlignLeft;
 
 
         font.pixelSize: headerDelegate.tableItem.emptyDecorHeader ? Style.fontSize_common * headerDelegate.scale :
-                                                          headerDelegate.tableItem.headerDecorator.isValidData("FontSize", headerDelegate.columnIndex) ?
-                                                              headerDelegate.tableItem.headerDecorator.getData("FontSize", headerDelegate.columnIndex) :
-                                                              Style.fontSize_common * headerDelegate.scale;
+                                                                    headerDelegate.tableItem.headerDecorator.isValidData("FontSize", headerDelegate.columnIndex) ?
+                                                                        headerDelegate.tableItem.headerDecorator.getData("FontSize", headerDelegate.columnIndex) :
+                                                                        Style.fontSize_common * headerDelegate.scale;
 
 
         font.family: Style.fontFamilyBold;
 
         font.bold: headerDelegate.tableItem.emptyDecorHeader ? true :
-                                                     headerDelegate.tableItem.headerDecorator.isValidData("FontBold", headerDelegate.columnIndex) ?
-                                                         headerDelegate.tableItem.headerDecorator.getData("FontBold", headerDelegate.columnIndex) :
-                                                         true;
+                                                               headerDelegate.tableItem.headerDecorator.isValidData("FontBold", headerDelegate.columnIndex) ?
+                                                                   headerDelegate.tableItem.headerDecorator.getData("FontBold", headerDelegate.columnIndex) :
+                                                                   true;
 
 
         color: headerDelegate.tableItem.emptyDecorHeader ? Style.textColor :
-                                                 headerDelegate.tableItem.headerDecorator.isValidData("FontColor", headerDelegate.columnIndex) ?
-                                                     headerDelegate.tableItem.headerDecorator.getData("FontColor", headerDelegate.columnIndex) :
-                                                     Style.textColor;
+                                                           headerDelegate.tableItem.headerDecorator.isValidData("FontColor", headerDelegate.columnIndex) ?
+                                                               headerDelegate.tableItem.headerDecorator.getData("FontColor", headerDelegate.columnIndex) :
+                                                               Style.textColor;
         elide: headerDelegate.tableItem.elideMode;
 
         wrapMode: headerDelegate.tableItem.wrapMode;
@@ -282,7 +285,7 @@ Item{
         width: 15;
         height: parent.height;
 
-        visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex < headerDelegate.columnCount -1;
+        visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex < headerDelegate.columnCount -1 && headerDelegate.visible;
         enabled: visible;
 
         hoverEnabled: true;
@@ -306,14 +309,19 @@ Item{
                 var width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
                 var width_next_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex+1) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex+1) : headerDelegate.tableItem.minCellWidth;
 
+                width_ -= deltaX;
+                width_next += deltaX;
 
-                width_ += deltaX;
-                width_next -= deltaX
                 if(width_ > width_min && width_next > width_next_min){
                     headerDelegate.tableItem.widthDecorator.setData("Width", width_, headerDelegate.columnIndex);
                     headerDelegate.tableItem.widthDecorator.setData("Width", width_next, headerDelegate.columnIndex+1);
 
                     headerDelegate.tableItem.setWidth();
+
+                    headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, width_)
+
+                    let nextHeaderId = headerDelegate.tableItem.headers.getData("Id", headerDelegate.columnIndex+1);
+                    headerDelegate.tableItem.tableViewParams.setHeaderSize(nextHeaderId, width_next)
                 }
             }
 
@@ -353,7 +361,7 @@ Item{
         height: parent.height;
         width: 15;
 
-        visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex > 0;
+        visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex > 0 && headerDelegate.visible;
         enabled: visible;
 
         hoverEnabled: true;
@@ -376,14 +384,19 @@ Item{
                 var width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
                 var width_prev_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex-1) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex-1) : headerDelegate.tableItem.minCellWidth;
 
-
                 width_ -= deltaX;
-                width_prev += deltaX
+                width_prev += deltaX;
+
                 if(width_ > width_min && width_prev > width_prev_min){
                     headerDelegate.tableItem.widthDecorator.setData("Width", width_, headerDelegate.columnIndex);
                     headerDelegate.tableItem.widthDecorator.setData("Width", width_prev, headerDelegate.columnIndex-1);
 
                     headerDelegate.tableItem.setWidth();
+
+                    headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, width_)
+
+                    let prevHeaderId = headerDelegate.tableItem.headers.getData("Id", headerDelegate.columnIndex-1);
+                    headerDelegate.tableItem.tableViewParams.setHeaderSize(prevHeaderId, width_prev)
                 }
             }
 

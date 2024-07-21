@@ -61,8 +61,6 @@ istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(co
 	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	if (paramSetPtr != nullptr){
 		if (record.contains("Settings")){
-			data = record.value("Settings").toByteArray();
-
 			data = QByteArray::fromBase64(record.value("Settings").toByteArray());
 
 			iser::CMemoryReadArchive archive(data.constData(), data.size());
@@ -151,7 +149,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	QByteArray data;
 	{
-		iser::CMemoryWriteArchive archive;
+		iser::CMemoryWriteArchive archive(m_versionInfoCompPtr.GetPtr());
 
 		bool retVal = settingsPtr->Serialize(archive);
 		if (!retVal){

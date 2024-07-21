@@ -24,6 +24,7 @@ ViewBase {
     property CollectionFilter collectionFilter: CollectionFilter {}
 
     signal selectedIndexChanged(int index);
+    signal tableViewParamsAccepted();
 
     signal elementsChanged();
     signal headersChanged();
@@ -75,6 +76,18 @@ ViewBase {
             }
             else{
                 collectionViewBaseContainer.filterChanged(filterId, filterValue);
+            }
+        }
+    }
+
+    onHeadersChanged: {
+        table.tableViewParams.clear();
+
+        for (let i = 0; i < table.headers.getItemsCount(); i++){
+            let headerId = table.headers.getData("Id", i);
+            if (!table.tableViewParams.headerIsExists(headerId)){
+                table.tableViewParams.setHeaderSize(headerId, -1);
+                table.tableViewParams.setHeaderVisible(headerId, true);
             }
         }
     }
@@ -153,7 +166,7 @@ ViewBase {
             }
         }
 
-       Table {
+        Table {
             id: tableInternal;
 
             anchors.left: parent.left;
@@ -219,6 +232,34 @@ ViewBase {
 
                 collectionViewBaseContainer.doUpdateGui();
             }
+
+            function updateWidthFromViewParams(){
+                for (let i = 0; i < tableInternal.widthDecorator.getItemsCount(); i++){
+                    let headerId = tableInternal.headers.getData("Id", i);
+                    for (let j = 0; j < tableInternal.tableViewParams.getItemsCount(); j++){
+                        let id = tableInternal.tableViewParams.getData("HeaderId", j);
+                        if (headerId === id){
+                            let visible = tableInternal.tableViewParams.getData("Visible", j);
+                            let size = tableInternal.tableViewParams.getData("Size", j);
+                            if (visible){
+                                tableInternal.widthDecorator.setData("Width", size, i)
+                            }
+                            else{
+                                tableInternal.widthDecorator.setData("Width", 0, i)
+                            }
+
+                            break;
+                        }
+
+                    }
+                }
+
+                tableInternal.setWidth();
+            }
+
+            function updateViewParamsFromWidthModel(){
+
+            }
         }
 
         Item {
@@ -239,26 +280,231 @@ ViewBase {
 
                 width: parent.width;
                 height: tableInternal.headerHeight;
+                //                ToolButton {
+                //                    id: iconFilter;
+
+                //                    anchors.centerIn: parent;
+
+                //                    width: Style.buttonWidthMedium;
+                //                    height: width;
+
+                //                    visible: collectionViewBaseContainer.hasFilter;
+
+                //                    iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
+
+                //                    onClicked: {
+                //                        filterMenu_.visible = !filterMenu_.visible;
+                //                    }
+                //                }
 
                 ToolButton {
-                    id: iconFilter;
+                    id: tableHeaderSettings;
 
                     anchors.centerIn: parent;
 
                     width: Style.buttonWidthMedium;
                     height: width;
 
-                    visible: collectionViewBaseContainer.hasFilter;
-
-                    iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
+                    iconSource: "../../../" + Style.getIconPath("Icons/Settings", Icon.State.On, Icon.Mode.Normal);
 
                     onClicked: {
-                        filterMenu_.visible = !filterMenu_.visible;
+                        ModalDialogManager.openDialog(tableHeaderParamComp, {});
                     }
                 }
             }
         }
     }
+
+    Component {
+        id: tableHeaderParamComp;
+
+        Dialog {
+            id: dialog;
+            width: 300;
+            title: qsTr("Table params");
+            property TableViewParams tableViewParamsCopied: TableViewParams {};
+            contentComp: Component {
+                Item {
+                    id: item;
+
+                    width: 300;
+                    height: leftTable.height;
+
+                    property var checkedIndexes: [];
+
+                    property bool block: true;
+                    function updateGui(){
+                        item.block = true;
+                        for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
+                            let id = leftTable.elements.getData("Id", i)
+
+                            if (dialog.tableViewParamsCopied.headerIsVisible(id)){
+                                leftTable.checkItem(i);
+                            }
+                        }
+                        item.block = false;
+                    }
+
+                    function updateModel(){
+                        dialog.tableViewParamsCopied.copyFrom(tableInternal.tableViewParams)
+                        leftTable.headers = availableHeadersModel;
+                        leftTable.elements = tableInternal.headers;
+                    }
+
+                    Table {
+                        id: leftTable;
+                        anchors.left: parent.left;
+                        width: 300;
+                        height: itemHeight * elementsCount + headerHeight;
+                        checkable: true;
+                        onCheckedItemsChanged: {
+                            item.checkedIndexes = getCheckedItems();
+                            if (item.block){
+                                return;
+                            }
+
+                            for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
+                                let id = leftTable.elements.getData("Id", i)
+
+                                dialog.tableViewParamsCopied.setHeaderVisible(id, item.checkedIndexes.includes(i));
+                            }
+                        }
+
+                        onElementsChanged: {
+                            item.updateGui();
+                        }
+                    }
+
+                    TreeItemModel {
+                        id: availableHeadersModel;
+
+                        Component.onCompleted: {
+                            let index = availableHeadersModel.insertNewItem();
+                            availableHeadersModel.setData("Id", "Name", index)
+                            availableHeadersModel.setData("Name", qsTr("Available Columns"), index)
+
+                            item.updateModel()
+                        }
+                    }
+                }
+            }
+
+            Component.onCompleted: {
+                buttonsModel.append({Id: Enums.apply, Name:qsTr("Apply"), Enabled: true})
+                buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
+            }
+
+            onFinished: {
+                if (buttonId === Enums.apply){
+                    if (contentItem){
+                        tableInternal.tableViewParams.copyFrom(dialog.tableViewParamsCopied);
+
+                        tableInternal.updateWidthFromViewParams();
+                        collectionViewBaseContainer.tableViewParamsAccepted();
+                    }
+                }
+            }
+        }
+    }
+
+    //                    TreeItemModel {
+    //                        id: headersModel;
+
+    //                        Component.onCompleted: {
+    //                            let index = headersModel.insertNewItem();
+    //                            headersModel.setData("Id", "Name", index)
+    //                            headersModel.setData("Name", "Selected Columns", index)
+
+    //                            rightTable.headers = headersModel;
+    //                        }
+    //                    }
+
+    //                    Item {
+    //                        id: movingItem;
+    //                        anchors.left: leftTable.right;
+    //                        width: 50;
+    //                        height: parent.height;
+
+    //                        Column {
+    //                            anchors.centerIn: parent;
+    //                            width: parent.width;
+    //                            ToolButton {
+    //                                id: rightButton;
+    //                                anchors.horizontalCenter: parent.horizontalCenter;
+    //                                width: 18;
+    //                                height: 25;
+    //                                enabled: false;
+    //                                iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal):
+    //                                                      "../../../" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled)
+    //                                onClicked: {
+    //                                    let checkedItems = leftTable.getCheckedItems();
+    //                                    if (checkedItems.length > 0){
+    //                                        for (let i = 0; i < checkedItems.length; i++){
+    //                                            let index = checkedItems[i];
+
+    //                                        }
+    //                                    }
+    //                                }
+    //                            }
+
+    //                            ToolButton {
+    //                                id: leftButton;
+    //                                anchors.horizontalCenter: parent.horizontalCenter;
+    //                                width: 18;
+    //                                height: 25;
+    //                                enabled: false;
+    //                                iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal):
+    //                                                      "../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled)
+    //                                onClicked: {
+    //                                }
+    //                            }
+    //                        }
+    //                    }
+
+    //                    Table {
+    //                        id: rightTable;
+    //                        anchors.left: movingItem.right;
+    //                        width: 200;
+    //                        height: 300;
+    //                        checkable: true;
+    //                        onCheckedItemsChanged: {
+    //                            let checkedItems = getCheckedItems();
+    //                            leftButton.enabled = checkedItems.length > 0;
+    //                        }
+    //                    }
+
+    //                    Item {
+    //                        id: orderedItem;
+    //                        anchors.left: rightTable.right;
+    //                        width: 50;
+    //                        height: parent.height;
+
+    //                        Column {
+    //                            anchors.centerIn: parent;
+    //                            width: parent.width;
+    //                            ToolButton {
+    //                                anchors.horizontalCenter: parent.horizontalCenter;
+    //                                width: 18;
+    //                                height: 25;
+    //                                rotation: -90;
+    //                                iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Top", Icon.State.On, Icon.Mode.Normal):
+    //                                                      "../../../" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled)
+    //                                onClicked: {
+    //                                }
+    //                            }
+
+    //                            ToolButton {
+    //                                anchors.horizontalCenter: parent.horizontalCenter;
+    //                                width: 18;
+    //                                height: 25;
+    //                                rotation: -90;
+    //                                iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal):
+    //                                                      "../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled)
+    //                                onClicked: {
+    //                                }
+    //                            }
+    //                        }
+    //                    }
 
     Loading {
         id: loading_;

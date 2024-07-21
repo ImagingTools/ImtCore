@@ -2,17 +2,21 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5191" Description="ACF"/>
-            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfoController" X="550" Y="275" Note=""/>
-        <Element ComponentName="ApplicationInfoRepresentation" X="575" Y="475" Note=""/>
+        <Element ComponentName="ApplicationInfoController" X="425" Y="275" Note=""/>
+        <Element ComponentName="ApplicationInfoRepresentation" X="450" Y="375" Note=""/>
         <Element ComponentName="Demultiplexer" X="550" Y="100" Note=""/>
-        <Element ComponentName="GetStyleDataController" X="225" Y="275" Note=""/>
+        <Element ComponentName="GeneralSettingsFactory" X="625" Y="650" Note=""/>
+        <Element ComponentName="GetStyleDataController" X="175" Y="275" Note=""/>
+        <Element ComponentName="PageViewParamSet" X="950" Y="650" Note=""/>
         <Element ComponentName="SettingsController" X="925" Y="275" Note=""/>
+        <Element ComponentName="TableViewParamController" X="925" Y="425" Note=""/>
+        <Element ComponentName="UserSettings" X="625" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

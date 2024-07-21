@@ -23,6 +23,25 @@ CollectionView {
         }
     }
 
+    TableViewParamController {
+        id: tableViewParamController;
+        tableId: root.collectionId;
+
+        onTableIdChanged: {
+            getModel();
+        }
+
+        onUpdated: {
+            root.table.tableViewParams = tableViewParamController.tableViewParams;
+            root.table.updateWidthFromViewParams();
+        }
+    }
+
+    onTableViewParamsAccepted: {
+        tableViewParamController.tableViewParams = root.table.tableViewParams;
+        tableViewParamController.saveModel();
+    }
+
     function getAdditionalInputParams(){
         return {};
     }

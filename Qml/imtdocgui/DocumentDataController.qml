@@ -55,15 +55,11 @@ QtObject {
     function setupDocumentInfo(){}
 
     function createDocumentModel(){
-        console.log("DocumentDataController createDocumentModel", root.documentModelComp);
-
         if (root.documentModelComp){
             documentModel = root.documentModelComp.createObject(null);
         }
         else{
             console.error("Unable to create document model for DocumentDataController. Error: 'documentModelComp' is invalid")
         }
-
-        console.log("DocumentDataController end createDocumentModel", root.documentModelComp);
     }
 }

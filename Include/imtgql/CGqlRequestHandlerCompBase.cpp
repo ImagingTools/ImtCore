@@ -22,7 +22,7 @@ imtbase::CTreeItemModel* CGqlRequestHandlerCompBase::CreateResponse(const CGqlRe
 	Q_ASSERT(IsRequestSupported(gqlRequest));
 
 	if (!IsRequestSupported(gqlRequest)){
-		SendErrorMessage(0, QString("GQL handler is not supported GQL Request with command %1").arg(qPrintable(gqlRequest.GetCommandId())));
+		SendErrorMessage(0, QString("GQL handler is not supported GQL request with command-ID:'%1'").arg(qPrintable(gqlRequest.GetCommandId())));
 
 		return nullptr;
 	}

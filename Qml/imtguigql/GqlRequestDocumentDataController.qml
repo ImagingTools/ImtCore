@@ -24,7 +24,6 @@ DocumentDataController {
     }
 
     onDocumentIdChanged: {
-        console.log("GqlRequestDocumentDataController onDocumentIdChanged", documentId)
         if (documentId !== ""){
             container.subscriptionClient.register();
         }

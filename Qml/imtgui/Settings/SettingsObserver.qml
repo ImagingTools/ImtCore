@@ -50,7 +50,6 @@ TreeItemModelObserver {
     }
 
     function onServerUrlChanged(newVal){
-        console.log("onServerUrlChanged", newVal);
         if (container.settingsProvider != null){
             container.settingsProvider.setServerUrl(newVal);
             Events.sendEvent("Logout");
@@ -59,11 +58,8 @@ TreeItemModelObserver {
     }
 
     function onLanguageChanged(newVal){
-        console.log("onLanguageChanged", newVal);
         if (container.languageProvider != null){
             let lang = container.languageProvider.getLanguageIdByIndex(newVal);
-
-            console.log("lang", lang);
 
             container.languageProvider.setLanguage(lang);
         }

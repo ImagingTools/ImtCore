@@ -13,8 +13,6 @@ imtbase::CTreeItemModel* CGqlControllerComp::CreateInternalResponse(const CGqlRe
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	Q_UNUSED(dataModelPtr);
-
 	dataModelPtr->SetData("Status", "OK");
 
 	return rootModelPtr.PopPtr();

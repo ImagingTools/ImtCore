@@ -119,6 +119,11 @@ I_EXPORT_COMPONENT(
 			"GraphQL search controller",
 			"GraphQL GQL Search Controller");
 
+I_EXPORT_COMPONENT(
+			TableViewParamController,
+			"Table view param controller",
+			"Table View Param Controller");
+
 
 } // namespace ImtGqlPck
 

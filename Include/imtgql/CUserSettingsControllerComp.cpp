@@ -126,18 +126,21 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 		return false;
 	}
 
-	istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
-	Q_ASSERT(userSettingsPtr.IsValid());
-	if (!userSettingsPtr.IsValid()){
-		return false;
+	istd::TOptDelPtr<imtauth::IUserSettings> userSettingsPtr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
+		userSettingsPtr.SetPtr(dynamic_cast<imtauth::IUserSettings*>(dataPtr.GetPtr()), false);
 	}
 
-	userSettingsPtr->SetUserId(userId);
+	if (!userSettingsPtr.IsValid()){
+		userSettingsPtr.SetPtr(m_userSettingsInfoFactCompPtr.CreateInstance(), true);
+		userSettingsPtr->SetUserId(userId);
+	}
 
 	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	Q_ASSERT(paramSetPtr != nullptr);
 	if (paramSetPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to get setting from user %1.").arg(qPrintable(userId)));
+		SendErrorMessage(0, QString("Unable to get setting from user: '%1'.").arg(qPrintable(userId)));
 
 		return false;
 	}
