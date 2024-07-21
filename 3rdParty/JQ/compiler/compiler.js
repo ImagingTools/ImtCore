@@ -397,10 +397,10 @@ class Instruction {
                         return stat
                     }
 
-                    try {
-                        eval(tree[1])
+                    try {               
+                        let obj = eval(tree[1])
                         stat.value += tree[1]
-                        stat.dotObj = null
+                        stat.dotObj = obj
                         return stat
                     } catch {}
 
@@ -421,6 +421,7 @@ class Instruction {
                     stat.wasDot = true
                     this.prepare(tree[1], stat)
                     stat.value += '.' + tree[2] 
+
                     if(stat.dotObj){
                         let path = ''
                         if(stat.dotObj instanceof QmlFile){
@@ -439,8 +440,11 @@ class Instruction {
                                 if(path) stat.dotObj = path.obj
                             }
                             // if(tree[2] in stat.dotObj) stat.dotObj = path.obj
+                        } else if(tree[2] in stat.dotObj){
+                            path = stat.dotObj[tree[2]]
+                            stat.dotObj = typeof stat.dotObj[tree[2]] === 'object' ? stat.dotObj[tree[2]] : null
                         } else {
-                            path = stat.dotObj
+                            path = null
                             stat.dotObj = null
                         }
                         if(!path){
@@ -1024,7 +1028,11 @@ class Instruction {
             }
             
         }
-        if(isRoot) code.push(`for(let property of __updateList){property.__update()}`) // property update !!!
+        if(isRoot) {
+            code.push(`for(let property of __updateList){property.__update()}`) // property update !!!
+            code.push(`self.__complete()`)
+        }
+
         code.push('return self')
         code.push('}')
 

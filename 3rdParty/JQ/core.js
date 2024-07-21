@@ -28,4 +28,27 @@ document.head.insertAdjacentHTML("beforeend", `
         h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;}
         br {}
 
+        .Item {
+            position: absolute;
+            display: flex;
+            overflow: unset;
+        }
+        .Rectangle {
+            background-color: white;
+        }
+        .Repeater {
+            display: none;
+        }
+        .Row {
+            flex-direction: row;
+        }
+        .Column {
+            flex-direction: column;
+        }
+        .Row > *{
+            position: relative;
+        }
+        .Column > * {
+            position: relative;
+        }
     </style>`)

@@ -20,11 +20,7 @@ class Rectangle extends Item {
 
     static create(parent, ...args){
         let proxy = super.create(parent, ...args)
-        let self = proxy.__self 
-
-        self.__setDOMStyle({
-            backgroundColor: 'white'
-        })
+        proxy.__DOM.classList.add('Rectangle')
 
         return proxy
     }

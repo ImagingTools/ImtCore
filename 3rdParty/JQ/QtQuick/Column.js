@@ -9,6 +9,18 @@ class Column extends Item {
         spacingChanged: {type:Signal, slotName:'onSpacingChanged', args:[]},
     })
 
+    static create(parent, ...args){
+        let proxy = super.create(parent, ...args)
+        proxy.__DOM.classList.add('Column')
+
+        return proxy
+    }
+
+    onSpacingChanged(){
+        this.__setDOMStyle({
+            gap: this.spacing + 'px'
+        })
+    }
 }
 
 module.exports = Column

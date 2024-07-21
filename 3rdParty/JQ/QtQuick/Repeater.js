@@ -17,8 +17,33 @@ class Repeater extends Item {
         itemRemoved: {type:Signal, slotName:'onItemRemoved', args:['item']},
     })
 
+    static create(parent, ...args){
+        let proxy = super.create(parent, ...args)
+        proxy.__DOM.classList.add('Repeater')
+
+        return proxy
+    }
+
+    __items = []
+
     itemAt(index){
 
+    }
+
+    onModelChanged(){
+        this.__updateView()
+    }
+
+    onDelegateChanged(){
+        this.__updateView()
+    }
+
+    __updateView(){
+        if(this.delegate && this.model){
+            for(let i = 0; i < this.model; i++){
+                this.__items.push(this.delegate.createObject(this.parent))
+            }
+        }
     }
 }
 

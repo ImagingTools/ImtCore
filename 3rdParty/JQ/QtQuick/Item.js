@@ -106,11 +106,8 @@ class Item extends QtObject {
         let self = proxy.__self 
 
         self.__DOM = self.__createDOM()
+        self.__DOM.classList.add('Item')
         self.__connectDOM(parent)
-        self.__setDOMStyle({
-            position: 'absolute',
-            overflow: 'unset',
-        })
 
         return proxy
     }

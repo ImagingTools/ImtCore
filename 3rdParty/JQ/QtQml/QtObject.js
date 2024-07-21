@@ -19,6 +19,30 @@ class QtObject extends QObject {
         'Component.completed': {type:Signal, slotName:'Component.onCompleted', args:[]},
         'Component.destruction': {type:Signal, slotName:'Component.onDestruction', args:[]},
     })  
+
+    __complete(){
+        if(this.__completed) return
+
+        this.__completed = true
+        for(let i = this.children.length-1; i >= 0; i--){
+            this.children[i].__complete()
+        }
+        
+        this['Component.completed']()
+    }
+
+    static create(parent, ...args){
+        let proxy = super.create(parent, ...args)
+        proxy.children = []
+        proxy.resources = []
+        proxy.data = []
+
+        if(parent){
+            parent.children.push(proxy)
+        }
+
+        return proxy
+    }
 }
 
 module.exports = QtObject
