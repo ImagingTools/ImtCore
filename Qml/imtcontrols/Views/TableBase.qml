@@ -154,8 +154,10 @@ Rectangle {
     signal doubleClicked(string id, int index);
     signal setActiveFocusFromTable();
     signal headerClicked(string headerId);
+    signal headerRightMouseClicked(string headerId);
     signal textFilterChanged(string id, int index, string text);
     signal filterClicked();
+    signal saveWidth();
 
     signal widthRecalc();
     signal heightRecalc();
@@ -179,6 +181,10 @@ Rectangle {
     }
 
     onWidthChanged: {
+        if (!visible){
+            return;
+        }
+
         tableContainer.setWidth();
         if(tableContainer.wrapMode !== Text.NoWrap){
             pauseHeight.stop();
@@ -375,17 +381,6 @@ Rectangle {
         tableContainer.headerHeight = Math.max(maxVal, tableContainer.headerMinHeight);
     }
 
-    function getVisibleColumnCount(){
-        let count = 0;
-        for(var i = 0; i < tableContainer.widthDecoratorDynamic.getItemsCount(); i++){
-            if (tableContainer.widthDecorator.containsKey("Width", i)){
-
-            }
-        }
-
-        return count;
-    }
-
     function setWidth(){
         if (!tableContainer.widthDecorator || !tableContainer.headers || !tableContainer.widthDecoratorDynamic){
             return;
@@ -394,7 +389,7 @@ Rectangle {
         var headersCount = tableContainer.headers.getItemsCount();
         var tableWidth_ = Math.max(tableContainer.width, tableContainer.contentWidth);
 
-        if(!tableContainer.widthDecorator.getItemsCount() && tableContainer.headers.getItemsCount()){
+        if(tableContainer.widthDecorator.getItemsCount() === 0 && headersCount !== 0){
             for(var ind = 0; ind < headersCount ; ind++){
                 var index = tableContainer.widthDecorator.insertNewItem();
                 tableContainer.widthDecorator.setData("Width",-1,index);
@@ -405,14 +400,19 @@ Rectangle {
         tableContainer.widthDecoratorDynamic.clear();
         tableContainer.widthDecoratorDynamic.copy(tableContainer.widthDecorator);
 
-        var count_ = 0;
-        var lengthMinus = 0;
+        var count_ = 0; // Count column with auto width
+        var visibleColumnCount = 0;
+        var lengthMinus = 0; // Total column width without automatic width
 
         for(var i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
             var width_ = tableContainer.widthDecorator.isValidData("Width",i) ? tableContainer.widthDecorator.getData("Width",i): -1;
             var widthPercent_ = tableContainer.widthDecorator.isValidData("WidthPercent",i) ? tableContainer.widthDecorator.getData("WidthPercent",i): -1;
 
-            if((width_ == -1) && (widthPercent_ == -1)){
+            if (width_ !== 0 && widthPercent_ !== 0){
+                visibleColumnCount++;
+            }
+
+            if((width_ === -1) && (widthPercent_ === -1)){
                 count_++;
             }
             else{
@@ -421,13 +421,22 @@ Rectangle {
                 lengthMinus += Math.max(width_,widthPercent_);
             }
         }
-        if((tableWidth_ - lengthMinus) < count_ * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.getItemsCount() ){
+
+        if((tableWidth_/* - lengthMinus*/) < visibleColumnCount * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.getItemsCount()){
             tableContainer.widthDecoratorDynamic.clear();
             for(let ind = 0; ind < headersCount; ind++){
                 let index = tableContainer.widthDecoratorDynamic.insertNewItem();
-                tableContainer.widthDecoratorDynamic.setData("Width",tableWidth_/headersCount,index);
+
+                let columnWidth = tableContainer.widthDecorator.getData("Width", ind);
+                if (columnWidth === 0){
+                    tableContainer.widthDecoratorDynamic.setData("Width", 0, index);
+                }
+                else{
+                    tableContainer.widthDecoratorDynamic.setData("Width", tableWidth_/visibleColumnCount, index);
+                }
             }
             tableContainer.widthRecalc();
+
             return;
         }
 
@@ -435,8 +444,11 @@ Rectangle {
             let width_ = tableContainer.widthDecorator.isValidData("Width",i) ? tableContainer.widthDecorator.getData("Width",i): -1;
             let widthPercent_ = tableContainer.widthDecorator.isValidData("WidthPercent",i) ? tableContainer.widthDecorator.getData("WidthPercent",i): -1;
 
-            if(width_ < 0  && widthPercent_ < 0 ){
-                if(count_){
+            if (widthPercent_ >= 0){
+                tableContainer.widthDecoratorDynamic.setData("Width", widthPercent_*tableWidth_/100,i);
+            }
+            else if(width_ < 0  && widthPercent_ < 0 ){
+                if(visibleColumnCount !== 0){
                     tableContainer.widthDecoratorDynamic.setData("Width",(tableWidth_ - lengthMinus)/count_,i);
                 }
             }
@@ -454,10 +466,6 @@ Rectangle {
         }
 
         tableContainer.widthRecalc();
-    }
-
-    function saveWidth(){
-
     }
 
     function setBorderParams(){
@@ -501,7 +509,6 @@ Rectangle {
         if(tableContainer.headerDecorator.isValidData("ElideMode")){
             tableContainer.elideMode = tableContainer.headerDecorator.getData("ElideMode");
         }
-
     }
 
     function getSelectedIds(){

@@ -210,6 +210,10 @@ ViewBase {
                 }
             }
 
+            onHeaderRightMouseClicked: {
+                ModalDialogManager.openDialog(tableHeaderParamComp, {});
+            }
+
             onRightButtonMouseClicked: {
                 collectionViewBaseContainer.rightButtonMouseClicked(mouseX, mouseY);
             }
@@ -242,9 +246,11 @@ ViewBase {
                             let visible = tableInternal.tableViewParams.getData("Visible", j);
                             let size = tableInternal.tableViewParams.getData("Size", j);
                             if (visible){
+                                tableInternal.widthDecorator.setData("WidthPercent", size, i)
                                 tableInternal.widthDecorator.setData("Width", size, i)
                             }
                             else{
+                                tableInternal.widthDecorator.setData("WidthPercent", 0, i)
                                 tableInternal.widthDecorator.setData("Width", 0, i)
                             }
 
@@ -255,10 +261,6 @@ ViewBase {
                 }
 
                 tableInternal.setWidth();
-            }
-
-            function updateViewParamsFromWidthModel(){
-
             }
         }
 
@@ -280,35 +282,20 @@ ViewBase {
 
                 width: parent.width;
                 height: tableInternal.headerHeight;
-                //                ToolButton {
-                //                    id: iconFilter;
-
-                //                    anchors.centerIn: parent;
-
-                //                    width: Style.buttonWidthMedium;
-                //                    height: width;
-
-                //                    visible: collectionViewBaseContainer.hasFilter;
-
-                //                    iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
-
-                //                    onClicked: {
-                //                        filterMenu_.visible = !filterMenu_.visible;
-                //                    }
-                //                }
-
                 ToolButton {
-                    id: tableHeaderSettings;
+                    id: iconFilter;
 
                     anchors.centerIn: parent;
 
                     width: Style.buttonWidthMedium;
                     height: width;
 
-                    iconSource: "../../../" + Style.getIconPath("Icons/Settings", Icon.State.On, Icon.Mode.Normal);
+                    visible: collectionViewBaseContainer.hasFilter;
+
+                    iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
 
                     onClicked: {
-                        ModalDialogManager.openDialog(tableHeaderParamComp, {});
+                        filterMenu_.visible = !filterMenu_.visible;
                     }
                 }
             }
@@ -324,15 +311,13 @@ ViewBase {
             title: qsTr("Table params");
             property TableViewParams tableViewParamsCopied: TableViewParams {};
             contentComp: Component {
-                Item {
+                Column {
                     id: item;
-
                     width: 300;
-                    height: leftTable.height;
-
                     property var checkedIndexes: [];
-
                     property bool block: true;
+                    spacing: Style.size_mainMargin;
+
                     function updateGui(){
                         item.block = true;
                         for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
@@ -354,7 +339,7 @@ ViewBase {
                     Table {
                         id: leftTable;
                         anchors.left: parent.left;
-                        width: 300;
+                        width: parent.width;
                         height: itemHeight * elementsCount + headerHeight;
                         checkable: true;
                         onCheckedItemsChanged: {
@@ -363,16 +348,28 @@ ViewBase {
                                 return;
                             }
 
+                            dialog.buttonsModel.setProperty(0, 'Enabled', item.checkedIndexes.length > 0)
+                            errorText.visible = item.checkedIndexes.length < 1;
+
                             for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
                                 let id = leftTable.elements.getData("Id", i)
-
-                                dialog.tableViewParamsCopied.setHeaderVisible(id, item.checkedIndexes.includes(i));
+                                let visible = item.checkedIndexes.includes(i);
+                                dialog.tableViewParamsCopied.setHeaderVisible(id, visible);
+                                dialog.tableViewParamsCopied.setHeaderSize(id, visible ? -1 : 0);
                             }
                         }
 
                         onElementsChanged: {
                             item.updateGui();
                         }
+                    }
+
+                    BaseText {
+                        id: errorText;
+                        anchors.horizontalCenter: parent.horizontalCenter;
+                        color: Style.errorTextColor;
+                        text: qsTr("Select at least one column");
+                        visible: false;
                     }
 
                     TreeItemModel {
@@ -390,7 +387,7 @@ ViewBase {
             }
 
             Component.onCompleted: {
-                buttonsModel.append({Id: Enums.apply, Name:qsTr("Apply"), Enabled: true})
+                buttonsModel.append({Id: Enums.apply, Name:qsTr("Apply"), Enabled: false})
                 buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
             }
 
@@ -406,105 +403,6 @@ ViewBase {
             }
         }
     }
-
-    //                    TreeItemModel {
-    //                        id: headersModel;
-
-    //                        Component.onCompleted: {
-    //                            let index = headersModel.insertNewItem();
-    //                            headersModel.setData("Id", "Name", index)
-    //                            headersModel.setData("Name", "Selected Columns", index)
-
-    //                            rightTable.headers = headersModel;
-    //                        }
-    //                    }
-
-    //                    Item {
-    //                        id: movingItem;
-    //                        anchors.left: leftTable.right;
-    //                        width: 50;
-    //                        height: parent.height;
-
-    //                        Column {
-    //                            anchors.centerIn: parent;
-    //                            width: parent.width;
-    //                            ToolButton {
-    //                                id: rightButton;
-    //                                anchors.horizontalCenter: parent.horizontalCenter;
-    //                                width: 18;
-    //                                height: 25;
-    //                                enabled: false;
-    //                                iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal):
-    //                                                      "../../../" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled)
-    //                                onClicked: {
-    //                                    let checkedItems = leftTable.getCheckedItems();
-    //                                    if (checkedItems.length > 0){
-    //                                        for (let i = 0; i < checkedItems.length; i++){
-    //                                            let index = checkedItems[i];
-
-    //                                        }
-    //                                    }
-    //                                }
-    //                            }
-
-    //                            ToolButton {
-    //                                id: leftButton;
-    //                                anchors.horizontalCenter: parent.horizontalCenter;
-    //                                width: 18;
-    //                                height: 25;
-    //                                enabled: false;
-    //                                iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal):
-    //                                                      "../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled)
-    //                                onClicked: {
-    //                                }
-    //                            }
-    //                        }
-    //                    }
-
-    //                    Table {
-    //                        id: rightTable;
-    //                        anchors.left: movingItem.right;
-    //                        width: 200;
-    //                        height: 300;
-    //                        checkable: true;
-    //                        onCheckedItemsChanged: {
-    //                            let checkedItems = getCheckedItems();
-    //                            leftButton.enabled = checkedItems.length > 0;
-    //                        }
-    //                    }
-
-    //                    Item {
-    //                        id: orderedItem;
-    //                        anchors.left: rightTable.right;
-    //                        width: 50;
-    //                        height: parent.height;
-
-    //                        Column {
-    //                            anchors.centerIn: parent;
-    //                            width: parent.width;
-    //                            ToolButton {
-    //                                anchors.horizontalCenter: parent.horizontalCenter;
-    //                                width: 18;
-    //                                height: 25;
-    //                                rotation: -90;
-    //                                iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Top", Icon.State.On, Icon.Mode.Normal):
-    //                                                      "../../../" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled)
-    //                                onClicked: {
-    //                                }
-    //                            }
-
-    //                            ToolButton {
-    //                                anchors.horizontalCenter: parent.horizontalCenter;
-    //                                width: 18;
-    //                                height: 25;
-    //                                rotation: -90;
-    //                                iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal):
-    //                                                      "../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled)
-    //                                onClicked: {
-    //                                }
-    //                            }
-    //                        }
-    //                    }
 
     Loading {
         id: loading_;

@@ -248,11 +248,10 @@ Item{
     ////
     MouseArea {
         id: headerMa;
-
         anchors.fill: parent;
         hoverEnabled: true;
-
         visible: headerDelegate.tableItem.hasSort;
+        acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
         onReleased: {
             headerDelegate.scale = 1;
@@ -263,7 +262,12 @@ Item{
         }
 
         onClicked: {
-            headerDelegate.tableItem.headerClicked(model.Id);
+            if (mouse.button === Qt.LeftButton) {
+                headerDelegate.tableItem.headerClicked(model.Id);
+            }
+            else if (mouse.button === Qt.RightButton){
+                headerDelegate.tableItem.headerRightMouseClicked(model.Id);
+            }
         }
     }
 
@@ -275,6 +279,28 @@ Item{
         mouseArea: headerMa;
 
         text: headerDelegate.textIsCropped ? name.text : "";
+    }
+
+    function getPrevHeaderIndex(){
+        for (let i = headerDelegate.columnIndex - 1; i >= 0; i--){
+            let width = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", i);
+            if (width > 0){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    function getNextHeaderIndex(){
+        for (let i = headerDelegate.columnIndex + 1; i < headerDelegate.columnCount; i++){
+            let width = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", i);
+            if (width > 0){
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     MouseArea{
@@ -305,23 +331,33 @@ Item{
                 var newCoords = mapToItem(movingRight,mouse.x,mouse.y);
                 var deltaX = Math.trunc(newCoords.x - movingRight.coord.x);
                 var width_ = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex);
-                var width_next = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex+1);
-                var width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
-                var width_next_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex+1) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex+1) : headerDelegate.tableItem.minCellWidth;
 
-                width_ -= deltaX;
-                width_next += deltaX;
+                let nextIndex = headerDelegate.getNextHeaderIndex();
+
+                var width_next = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", nextIndex);
+                var width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
+                var width_next_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", nextIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", nextIndex) : headerDelegate.tableItem.minCellWidth;
+
+                width_ += deltaX;
+                width_next -= deltaX;
+
+                let currentPercent = (width_ / headerDelegate.tableItem.width) * 100;
+                let nextPercent = (width_next / headerDelegate.tableItem.width) * 100;
 
                 if(width_ > width_min && width_next > width_next_min){
                     headerDelegate.tableItem.widthDecorator.setData("Width", width_, headerDelegate.columnIndex);
-                    headerDelegate.tableItem.widthDecorator.setData("Width", width_next, headerDelegate.columnIndex+1);
+                    headerDelegate.tableItem.widthDecorator.setData("Width", width_next, nextIndex);
+
+                    if (headerDelegate.tableItem.width > 0){
+                        headerDelegate.tableItem.widthDecorator.setData("WidthPercent", currentPercent, headerDelegate.columnIndex);
+                        headerDelegate.tableItem.widthDecorator.setData("WidthPercent", nextPercent, nextIndex);
+                    }
 
                     headerDelegate.tableItem.setWidth();
 
-                    headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, width_)
-
-                    let nextHeaderId = headerDelegate.tableItem.headers.getData("Id", headerDelegate.columnIndex+1);
-                    headerDelegate.tableItem.tableViewParams.setHeaderSize(nextHeaderId, width_next)
+                    headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, currentPercent)
+                    let nextHeaderId = headerDelegate.tableItem.headers.getData("Id", nextIndex);
+                    headerDelegate.tableItem.tableViewParams.setHeaderSize(nextHeaderId, nextPercent)
                 }
             }
 
@@ -379,24 +415,34 @@ Item{
             if(pressed){
                 var newCoords = mapToItem(movingLeft,mouse.x,mouse.y);
                 var deltaX = Math.trunc(newCoords.x - movingLeft.coord.x);
+
                 var width_ = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex);
-                var width_prev = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex-1);
                 var width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
-                var width_prev_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex-1) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex-1) : headerDelegate.tableItem.minCellWidth;
+
+                let prevIndex = headerDelegate.getPrevHeaderIndex();
+                var width_prev = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", prevIndex);
+                var width_prev_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", prevIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", prevIndex) : headerDelegate.tableItem.minCellWidth;
 
                 width_ -= deltaX;
                 width_prev += deltaX;
 
+                let currentPercent = (width_ / headerDelegate.tableItem.width) * 100;
+                let prevPercent = (width_prev / headerDelegate.tableItem.width) * 100;
+
                 if(width_ > width_min && width_prev > width_prev_min){
                     headerDelegate.tableItem.widthDecorator.setData("Width", width_, headerDelegate.columnIndex);
-                    headerDelegate.tableItem.widthDecorator.setData("Width", width_prev, headerDelegate.columnIndex-1);
+                    headerDelegate.tableItem.widthDecorator.setData("Width", width_prev, prevIndex);
+
+                    if (headerDelegate.tableItem.width > 0){
+                        headerDelegate.tableItem.widthDecorator.setData("WidthPercent", currentPercent, headerDelegate.columnIndex);
+                        headerDelegate.tableItem.widthDecorator.setData("WidthPercent", prevPercent, prevIndex);
+                    }
 
                     headerDelegate.tableItem.setWidth();
 
-                    headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, width_)
-
-                    let prevHeaderId = headerDelegate.tableItem.headers.getData("Id", headerDelegate.columnIndex-1);
-                    headerDelegate.tableItem.tableViewParams.setHeaderSize(prevHeaderId, width_prev)
+                    headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, currentPercent)
+                    let prevHeaderId = headerDelegate.tableItem.headers.getData("Id", prevIndex);
+                    headerDelegate.tableItem.tableViewParams.setHeaderSize(prevHeaderId, prevPercent)
                 }
             }
 

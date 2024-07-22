@@ -625,11 +625,7 @@ Item {
                         return;
                     }
 
-                    console.log("Document manager onModelChanged");
-
                     let documentModel = singleDocumentData.documentDataController.documentModel;
-
-//                    singleDocumentData.changesChecker.registerModel(documentModel);
 
                     singleDocumentData.documentId = singleDocumentData.documentDataController.getDocumentId();
                     singleDocumentData.documentName = singleDocumentData.documentDataController.getDocumentName();
@@ -731,7 +727,6 @@ Item {
             }
 
             function commandHandle(commandId){
-                console.log("DocumentManager commandHandle", commandId);
                 if (!documentManager){
                     return;
                 }

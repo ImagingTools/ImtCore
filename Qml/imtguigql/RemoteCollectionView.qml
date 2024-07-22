@@ -28,7 +28,7 @@ CollectionView {
         tableId: root.collectionId;
 
         onTableIdChanged: {
-            getModel();
+            tableViewParamController.getModel();
         }
 
         onUpdated: {
@@ -98,10 +98,12 @@ CollectionView {
     }
 
     Component.onCompleted: {
+        table.saveWidth.connect(root.tableViewParamsAccepted)
         Events.subscribeEvent("UpdateAllModels", root.receiveRemoteChanges);
     }
 
     Component.onDestruction: {
+        table.saveWidth.disconnect(root.tableViewParamsAccepted)
         Events.unSubscribeEvent("UpdateAllModels", root.receiveRemoteChanges);
     }
 
