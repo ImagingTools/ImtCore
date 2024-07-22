@@ -85,6 +85,128 @@ class TextInput extends Item {
         textEdited: {type:Signal, slotName:'onTextEdited', args:[]},
     })
 
+    static create(parent, ...args){
+        let proxy = super.create(parent, ...args)
+        proxy.__DOM.classList.add('TextInput')
+        proxy.__DOM.setAttribute('contenteditable', true)
+
+        let cacheRange = {
+            startOffset: 0,
+            endOffset: 0,
+        }
+        proxy.__DOM.onkeydown = (e)=>{
+            let range = document.getSelection().getRangeAt(0)
+            cacheRange.startOffset = range.startOffset
+            cacheRange.endOffset = range.endOffset
+        }
+        proxy.__DOM.oninput = (e)=>{
+            let selection = document.getSelection()
+            selection.removeAllRanges()
+
+            let buff = proxy.text.split('') 
+            switch(e.inputType){
+                case 'insertText': {
+                    buff.splice(cacheRange.startOffset, cacheRange.endOffset-cacheRange.startOffset, e.data)
+                    proxy.text = buff.join('')
+
+                    let range = new Range()
+                        if(proxy.__DOM.childNodes.length){
+                            range.setStart(proxy.__DOM.childNodes[0], cacheRange.endOffset+1)
+                            range.setEnd(proxy.__DOM.childNodes[0], cacheRange.endOffset+1)
+                        } else {
+                            range.setStart(proxy.__DOM, 0)
+                            range.setEnd(proxy.__DOM, 0)
+                        }
+                        selection.addRange(range)
+
+                    break
+                }
+                case 'insertFromPaste': {
+                    navigator.clipboard.readText().then((text) => {
+                        let data = buff.splice(cacheRange.startOffset, cacheRange.endOffset-cacheRange.startOffset, text)
+                        proxy.text = buff.join('')
+
+                        let range = new Range()
+                        if(proxy.__DOM.childNodes.length){
+                            range.setStart(proxy.__DOM.childNodes[0], cacheRange.endOffset-data.length+text.length)
+                            range.setEnd(proxy.__DOM.childNodes[0], cacheRange.endOffset-data.length+text.length)
+                        } else {
+                            range.setStart(proxy.__DOM, 0)
+                            range.setEnd(proxy.__DOM, 0)
+                        }
+                        selection.addRange(range)
+                    })
+                    break
+                }
+                case 'deleteByCut': {
+                    let data = buff.splice(cacheRange.startOffset, cacheRange.endOffset-cacheRange.startOffset)
+                    navigator.clipboard.writeText(data.join('')).then(() => {
+                        proxy.text = buff.join('')
+
+                        let range = new Range()
+                        if(proxy.__DOM.childNodes.length){
+                            range.setStart(proxy.__DOM.childNodes[0], cacheRange.endOffset)
+                            range.setEnd(proxy.__DOM.childNodes[0], cacheRange.endOffset)
+                        } else {
+                            range.setStart(proxy.__DOM, 0)
+                            range.setEnd(proxy.__DOM, 0)
+                        }
+                        selection.addRange(range)
+                    })
+                    break
+                }
+                case 'deleteContentBackward': {
+                    let data = []
+                    if(cacheRange.startOffset === cacheRange.endOffset){
+                        data = buff.splice(cacheRange.startOffset-1, cacheRange.endOffset-(cacheRange.startOffset-1))
+                    } else {
+                        data = buff.splice(cacheRange.startOffset, cacheRange.endOffset-cacheRange.startOffset)
+                    }
+                    proxy.text = buff.join('')
+
+                    let range = new Range()
+                    if(proxy.__DOM.childNodes.length){
+                        range.setStart(proxy.__DOM.childNodes[0], cacheRange.endOffset-data.length)
+                        range.setEnd(proxy.__DOM.childNodes[0], cacheRange.endOffset-data.length)
+                    } else {
+                        range.setStart(proxy.__DOM, 0)
+                        range.setEnd(proxy.__DOM, 0)
+                    }
+                    selection.addRange(range)
+
+                    break
+                }
+                case 'deleteContentForward': {
+                    let data = []
+                    if(cacheRange.startOffset === cacheRange.endOffset){
+                        data = buff.splice(cacheRange.startOffset, cacheRange.endOffset+1-cacheRange.startOffset)
+                    } else {
+                        data = buff.splice(cacheRange.startOffset, cacheRange.endOffset-cacheRange.startOffset)
+                    }
+                    proxy.text = buff.join('')
+
+                    let range = new Range()
+                    if(proxy.__DOM.childNodes.length){
+                        range.setStart(proxy.__DOM.childNodes[0], cacheRange.endOffset)
+                        range.setEnd(proxy.__DOM.childNodes[0], cacheRange.endOffset)
+                    } else {
+                        range.setStart(proxy.__DOM, 0)
+                        range.setEnd(proxy.__DOM, 0)
+                    }
+                    selection.addRange(range)
+
+                    break
+                }
+            }
+
+        }
+        return proxy
+    }
+
+    onTextChanged(){
+        this.__DOM.innerText = this.text.replaceAll(/./g, '*')
+    }
+
     cut(){
 
     }

@@ -39,6 +39,17 @@ document.head.insertAdjacentHTML("beforeend", `
         .Repeater {
             display: none;
         }
+        .Text, .TextInput, .TextEdit {
+            text-align: inherit;
+            white-space: pre;
+            line-height: normal;
+            font-size: 14px;
+            font-family: 'Segoe UI';
+        }
+        .TextInput, .TextEdit {
+            flex-direction: column;
+        }
+
         .Row {
             flex-direction: row;
         }
@@ -58,7 +69,7 @@ document.head.insertAdjacentHTML("beforeend", `
             display: none;
         }
 
-        
+
         *[invisible] {
             display: none;
         }

@@ -72,6 +72,20 @@ class TextEdit extends Item {
         editingFinished: {type:Signal, slotName:'onEditingFinished', args:[]},
     })
 
+    static create(parent, ...args){
+        let proxy = super.create(parent, ...args)
+        proxy.__DOM.classList.add('TextEdit')
+        proxy.__DOM.oninput = (e)=>{
+            proxy.text = e.target.innerText
+        }
+
+        return proxy
+    }
+
+    onTextChanged(){
+        if(this.__DOM.innerText !== this.text) this.__DOM.innerText = this.text
+    }
+
     cut(){
 
     }

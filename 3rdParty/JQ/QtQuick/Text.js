@@ -67,15 +67,7 @@ class Text extends Item {
 
     static create(parent, ...args){
         let proxy = super.create(parent, ...args)
-        let self = proxy.__self 
-
-        self.__setDOMStyle({
-            textAlign: 'inherit',
-            whiteSpace: 'pre',
-            lineHeight: 'normal',
-            fontSize: '14px',
-            fontFamily: 'Segoe UI',
-        })
+        proxy.__DOM.classList.add('Text')
 
         return proxy
     }
@@ -95,6 +87,12 @@ class Text extends Item {
         this.__setDOMStyle({
             color: this.color
         })
+    }
+
+    onVisibleChanged(){
+        super.onVisibleChanged()
+
+        this.__updateGeometry()
     }
 
     onFontChanged(){
