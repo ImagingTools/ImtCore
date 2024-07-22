@@ -51,4 +51,15 @@ document.head.insertAdjacentHTML("beforeend", `
         .Column > * {
             position: relative;
         }
+        .Row > *[no-view] {
+            display: none;
+        }
+        .Column > *[no-view] {
+            display: none;
+        }
+
+        
+        *[invisible] {
+            display: none;
+        }
     </style>`)

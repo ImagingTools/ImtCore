@@ -134,6 +134,20 @@ class Item extends QtObject {
         }
     }
 
+    __checkVisibility(){
+        if(this.visible){
+            this.__DOM.removeAttribute('invisible')
+            if(this.width > 0 && this.height > 0){
+                this.__DOM.removeAttribute('no-view')
+            } else {
+                this.__DOM.setAttribute('no-view', '')
+            }
+        } else {
+            this.__DOM.setAttribute('invisible', '')
+        }
+        
+    }
+
     onParentChanged(){
         this.__connectDOM(this.parent)
     }
@@ -150,13 +164,19 @@ class Item extends QtObject {
         })
     }
 
+    onVisibleChanged(){
+        this.__checkVisibility()
+    }
+
     onWidthChanged(){
+        this.__checkVisibility()
         this.__setDOMStyle({
             width: this.width+'px'
         })
     }
 
     onHeightChanged(){
+        this.__checkVisibility()
         this.__setDOMStyle({
             height: this.height+'px'
         })
