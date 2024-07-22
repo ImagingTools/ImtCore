@@ -119,16 +119,8 @@ imtzip.file = ../../Include/imtzip/QMake/imtzip.pro
 SUBDIRS += imthttp
 imthttp.file = ../../Include/imthttp/QMake/imthttp.pro
 
-#!macx {
-#	SUBDIRS += imtpy
-#	imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
-#}
-
 SUBDIRS += imtqml
 imtqml.file = ../../Include/imtqml/QMake/imtqml.pro
-
-SUBDIRS += imtcontrols
-imtcontrols.file = ../../Include/imtcontrols/QMake/imtcontrols.pro
 
 SUBDIRS += imtlic
 imtlic.file = ../../Include/imtlic/QMake/imtlic.pro
