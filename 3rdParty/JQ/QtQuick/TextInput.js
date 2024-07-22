@@ -7,6 +7,7 @@ const Color = require('../QtQml/Color')
 const Real = require('../QtQml/Real')
 const Font = require('../QtQml/Font')
 const Signal = require('../QtQml/Signal')
+const QtEnums = require('../Qt/enums')
 
 class TextInput extends Item {
     static AlignLeft = 0
@@ -90,14 +91,46 @@ class TextInput extends Item {
         proxy.__DOM.classList.add('TextInput')
         proxy.__DOM.setAttribute('contenteditable', true)
 
-        let cacheRange = {
-            startOffset: 0,
-            endOffset: 0,
+        proxy.__DOM.onmousemove = (e)=>{
+            let selection = document.getSelection()
+
+            if(selection.rangeCount){
+                let range = selection.getRangeAt(0)
+
+                proxy.selectionStart = range.startOffset
+                proxy.selectionEnd = range.endOffset
+            } else {
+                proxy.selectionStart = 0
+                proxy.selectionEnd = 0
+            }
+            
         }
         proxy.__DOM.onkeydown = (e)=>{
-            let range = document.getSelection().getRangeAt(0)
-            cacheRange.startOffset = range.startOffset
-            cacheRange.endOffset = range.endOffset
+            let selection = document.getSelection()
+
+            if(selection.rangeCount){
+                let range = selection.getRangeAt(0)
+
+                proxy.selectionStart = range.startOffset
+                proxy.selectionEnd = range.endOffset
+            } else {
+                proxy.selectionStart = 0
+                proxy.selectionEnd = 0
+            }
+
+            if(e.keyCode === QtEnums.Key_C && e.ctrlKey){
+                e.preventDefault()
+                proxy.copy()
+            } else if(e.keyCode === QtEnums.Key_V && e.ctrlKey){
+                e.preventDefault()
+                proxy.paste()
+            } else if(e.keyCode === QtEnums.Key_X && e.ctrlKey){
+                e.preventDefault()
+                proxy.cut()
+            } else if(e.code === QtEnums.Key_Enter){
+                e.preventDefault()
+                proxy.accepted()
+            }
         }
         proxy.__DOM.oninput = (e)=>{
             let selection = document.getSelection()
@@ -106,95 +139,39 @@ class TextInput extends Item {
             let buff = proxy.text.split('') 
             switch(e.inputType){
                 case 'insertText': {
-                    buff.splice(cacheRange.startOffset, cacheRange.endOffset-cacheRange.startOffset, e.data)
+                    buff.splice(proxy.selectionStart, proxy.selectionEnd-proxy.selectionStart, e.data)
                     proxy.text = buff.join('')
-
-                    let range = new Range()
-                        if(proxy.__DOM.childNodes.length){
-                            range.setStart(proxy.__DOM.childNodes[0], cacheRange.endOffset+1)
-                            range.setEnd(proxy.__DOM.childNodes[0], cacheRange.endOffset+1)
-                        } else {
-                            range.setStart(proxy.__DOM, 0)
-                            range.setEnd(proxy.__DOM, 0)
-                        }
-                        selection.addRange(range)
-
+                    proxy.select(proxy.selectionEnd+1, proxy.selectionEnd+1)
                     break
                 }
                 case 'insertFromPaste': {
-                    navigator.clipboard.readText().then((text) => {
-                        let data = buff.splice(cacheRange.startOffset, cacheRange.endOffset-cacheRange.startOffset, text)
-                        proxy.text = buff.join('')
-
-                        let range = new Range()
-                        if(proxy.__DOM.childNodes.length){
-                            range.setStart(proxy.__DOM.childNodes[0], cacheRange.endOffset-data.length+text.length)
-                            range.setEnd(proxy.__DOM.childNodes[0], cacheRange.endOffset-data.length+text.length)
-                        } else {
-                            range.setStart(proxy.__DOM, 0)
-                            range.setEnd(proxy.__DOM, 0)
-                        }
-                        selection.addRange(range)
-                    })
+                    proxy.paste()
                     break
                 }
                 case 'deleteByCut': {
-                    let data = buff.splice(cacheRange.startOffset, cacheRange.endOffset-cacheRange.startOffset)
-                    navigator.clipboard.writeText(data.join('')).then(() => {
-                        proxy.text = buff.join('')
-
-                        let range = new Range()
-                        if(proxy.__DOM.childNodes.length){
-                            range.setStart(proxy.__DOM.childNodes[0], cacheRange.endOffset)
-                            range.setEnd(proxy.__DOM.childNodes[0], cacheRange.endOffset)
-                        } else {
-                            range.setStart(proxy.__DOM, 0)
-                            range.setEnd(proxy.__DOM, 0)
-                        }
-                        selection.addRange(range)
-                    })
+                    proxy.cut()
                     break
                 }
                 case 'deleteContentBackward': {
                     let data = []
-                    if(cacheRange.startOffset === cacheRange.endOffset){
-                        data = buff.splice(cacheRange.startOffset-1, cacheRange.endOffset-(cacheRange.startOffset-1))
+                    if(proxy.selectionStart === proxy.selectionEnd){
+                        data = buff.splice(proxy.selectionStart-1, proxy.selectionEnd-(proxy.selectionStart-1))
                     } else {
-                        data = buff.splice(cacheRange.startOffset, cacheRange.endOffset-cacheRange.startOffset)
+                        data = buff.splice(proxy.selectionStart, proxy.selectionEnd-proxy.selectionStart)
                     }
                     proxy.text = buff.join('')
-
-                    let range = new Range()
-                    if(proxy.__DOM.childNodes.length){
-                        range.setStart(proxy.__DOM.childNodes[0], cacheRange.endOffset-data.length)
-                        range.setEnd(proxy.__DOM.childNodes[0], cacheRange.endOffset-data.length)
-                    } else {
-                        range.setStart(proxy.__DOM, 0)
-                        range.setEnd(proxy.__DOM, 0)
-                    }
-                    selection.addRange(range)
-
+                    proxy.select(proxy.selectionEnd-data.length, proxy.selectionEnd-data.length)
                     break
                 }
                 case 'deleteContentForward': {
                     let data = []
-                    if(cacheRange.startOffset === cacheRange.endOffset){
-                        data = buff.splice(cacheRange.startOffset, cacheRange.endOffset+1-cacheRange.startOffset)
+                    if(proxy.selectionStart === proxy.selectionEnd){
+                        data = buff.splice(proxy.selectionStart, proxy.selectionEnd+1-proxy.selectionStart)
                     } else {
-                        data = buff.splice(cacheRange.startOffset, cacheRange.endOffset-cacheRange.startOffset)
+                        data = buff.splice(proxy.selectionStart, proxy.selectionEnd-proxy.selectionStart)
                     }
                     proxy.text = buff.join('')
-
-                    let range = new Range()
-                    if(proxy.__DOM.childNodes.length){
-                        range.setStart(proxy.__DOM.childNodes[0], cacheRange.endOffset)
-                        range.setEnd(proxy.__DOM.childNodes[0], cacheRange.endOffset)
-                    } else {
-                        range.setStart(proxy.__DOM, 0)
-                        range.setEnd(proxy.__DOM, 0)
-                    }
-                    selection.addRange(range)
-
+                    proxy.select(proxy.selectionEnd, proxy.selectionEnd)
                     break
                 }
             }
@@ -203,47 +180,95 @@ class TextInput extends Item {
         return proxy
     }
 
+    onEchoModeChanged(){
+        if(this.echoMode === TextInput.Password){
+            this.__DOM.innerText = this.text.replaceAll(/./g, '*')
+        } else {
+            this.__DOM.innerText = this.text
+        }
+    }
+
     onTextChanged(){
-        this.__DOM.innerText = this.text.replaceAll(/./g, '*')
-    }
-
-    cut(){
-
-    }
-
-    copy(){
-        
-    }
-
-    paste(){
-        
+        if(this.echoMode === TextInput.Password){
+            this.__DOM.innerText = this.text.replaceAll(/./g, '*')
+        } else {
+            this.__DOM.innerText = this.text
+        }
     }
 
     clear(){
-        
+        this.text = ''
     }
-
-    redo(){
-        
+    copy(){
+        navigator.clipboard.writeText(this.text.slice(this.selectionStart, this.selectionEnd))
     }
-
-    undo(){
-        
+    cut(){
+        let text = this.text.slice(this.selectionStart, this.selectionEnd)
+        navigator.clipboard.writeText(text).then(()=>{
+            this.text = this.text.slice(0, this.selectionStart) + this.text.slice(this.selectionEnd, this.text.length)
+            this.select(this.selectionStart, this.selectionStart)
+        })
     }
-
-    remove(start, end){
-
+    deselect(){
+        document.getSelection().removeAllRanges()
     }
-
-    select(start, end){
-
-    }
-
-    selectAll(){
-
-    }
-
     ensureVisible(position){
+
+    }
+    getText(start, end){
+        return this.text.slice(start, end)
+    }
+    insert(position, text){
+        this.text = this.text.slice(0, position) + text + this.text.slice(position, this.text.length)
+    }
+    isRightToLeft(start, end){
+
+    }
+    moveCursorSelection(position, mode){
+
+    }
+    paste(){
+        navigator.clipboard.readText().then((text) => {
+            let buff = this.text.split('')
+            let replaced = buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart, text)
+            this.text = buff.join('')
+            this.select(this.selectionEnd-replaced.length+text.length, this.selectionEnd-replaced.length+text.length)
+        })
+    }
+    positionAt(x, y, position){
+
+    }
+    positionToRectangle(pos){
+
+    }
+    redo(){
+
+    }
+    remove(start, end){
+        this.text = this.text.slice(0, start) + this.text.slice(end, this.text.length)
+    }
+    select(start, end){
+        let selection = document.getSelection()
+        selection.removeAllRanges()
+        let range = new Range()
+        if(this.__DOM.childNodes.length){
+            range.setStart(this.__DOM.childNodes[0], start)
+            range.setEnd(this.__DOM.childNodes[0], end)
+        } else {
+            range.setStart(this.__DOM, 0)
+            range.setEnd(this.__DOM, 0)
+        }
+        selection.addRange(range)
+        this.selectionStart = start
+        this.selectionEnd = end
+    }
+    selectAll(){
+        this.select(0, this.text.length)
+    }
+    selectWord(){
+
+    }
+    undo(){
 
     }
 }
