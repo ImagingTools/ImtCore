@@ -29,7 +29,7 @@ class QObject extends BaseObject {
             return true
         } else if(key in this.constructor.meta){
             let meta = this.constructor.meta[key]
-            this[key] = meta.type.create(this, meta)
+            this[key] = meta.type.create(this.__proxy, meta)
 
             return true
         }

@@ -43,6 +43,13 @@ class Flickable extends Item {
         movementEnded: {type:Signal, slotName:'onMovementEnded', args:[]},
         movementStarted: {type:Signal, slotName:'onMovementStarted', args:[]},
     })
+
+    static create(parent, ...args){
+        let proxy = super.create(parent, ...args)
+        proxy.__DOM.classList.add('Flickable')
+
+        return proxy
+    }
 }
 
 module.exports = Flickable

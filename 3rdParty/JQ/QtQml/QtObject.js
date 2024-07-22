@@ -1,15 +1,16 @@
 const QObject = require("./QObject")
 const Var = require("./Var")
 const Int = require("./Int")
+const List = require("./List")
 const Signal = require("./Signal")
 
 class QtObject extends QObject {
     static meta = Object.assign({}, QObject.meta, {
         model: {type:Var, value:undefined, signalName:'modelChanged'},
         index: {type:Int, value:0, signalName:'indexChanged'},
-        children: {type:Var, value:undefined, signalName:'childrenChanged'},
-        resources: {type:Var, value:undefined, signalName:'resourcesChanged'},
-        data: {type:Var, value:undefined, signalName:'dataChanged'},
+        children: {type:List, signalName:'childrenChanged'},
+        resources: {type:List, signalName:'resourcesChanged'},
+        data: {type:List, signalName:'dataChanged'},
         
         modelChanged: {type:Signal, slotName:'onModelChanged', args:[]},
         childrenChanged: {type:Signal, slotName:'onChildrenChanged', args:[]},
@@ -20,6 +21,16 @@ class QtObject extends QObject {
         'Component.destruction': {type:Signal, slotName:'Component.onDestruction', args:[]},
     })  
 
+    static create(parent, ...args){
+        let proxy = super.create(parent, ...args)
+
+        if(parent){
+            parent.children.push(proxy)
+        }
+
+        return proxy
+    }
+
     __complete(){
         if(this.__completed) return
 
@@ -29,19 +40,6 @@ class QtObject extends QObject {
         }
         
         this['Component.completed']()
-    }
-
-    static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
-        proxy.children = []
-        proxy.resources = []
-        proxy.data = []
-
-        if(parent){
-            parent.children.push(proxy)
-        }
-
-        return proxy
     }
 }
 

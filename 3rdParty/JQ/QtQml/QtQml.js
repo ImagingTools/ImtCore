@@ -22,6 +22,7 @@ module.exports = {
     bool: require("./Bool"),
     var: require("./Var"),
     alias: require("./Alias"),
+    list: require("./List"),
 
     Signal: require("./Signal"),
 
