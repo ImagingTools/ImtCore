@@ -14,12 +14,12 @@ QtObject {
 
     function getModel(){
         if (tableId !== ""){
-            getModelQuery.get();
+            getModelQuery.getModel();
         }
     }
 
     function saveModel(){
-        saveModelQuery.set();
+        saveModelQuery.setModel();
     }
 
     function clearModel(){
@@ -29,7 +29,7 @@ QtObject {
     }
 
     property GqlModel getModelQuery: GqlModel {
-        function get(){
+        function getModel(){
             var query = Gql.GqlRequest("query", "GetTableViewParams");
 
             var inputParams = Gql.GqlObject("input");
@@ -65,7 +65,7 @@ QtObject {
     }//GetSettings
 
     property GqlModel saveModelQuery: GqlModel {
-        function set(){
+        function setModel(){
             var query = Gql.GqlRequest("mutation", "SetTableViewParams");
 
             var inputParams = Gql.GqlObject("input");
