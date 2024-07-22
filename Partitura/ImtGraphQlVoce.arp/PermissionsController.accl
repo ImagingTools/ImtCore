@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="PermissionController" X="575" Y="175" Note=""/>
+        <Element ComponentName="SingleProductPermission" X="575" Y="400" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
