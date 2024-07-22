@@ -330,7 +330,7 @@ ImtControlsGallery.depends = imtgui imtqml imtstyle imtstylecontrolsqml
 
 SUBDIRS += ImtSdlPck
 ImtSdlPck.file = ../../Impl/ImtSdlPck/QMake/ImtSdlPck.pro
-ImtSdlPck.depends = imtsdl ImtSdlPck
+ImtSdlPck.depends = imtsdl
 
 SUBDIRS += SdlCodeGenerator
 SdlCodeGenerator.file = ../../Impl/SdlCodeGeneratorExe/QMake/SdlCodeGeneratorExe.pro
