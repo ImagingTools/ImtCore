@@ -88,9 +88,9 @@ bool CIconDataProviderComp::GetData(
 			if (!destinationFile.open(QFile::ReadOnly)){
 				QString baseName = destinationEntry.baseName();
 				if (baseName.contains('_')){
-					QStringList data = baseName.split('_');
-					if (data.size() >= 3){
-						QString newName = data[0];
+					QStringList nameComponents = baseName.split('_');
+					if (nameComponents.size() >= 3){
+						QString newName = nameComponents[0];
 						QStringList fileData = destinationFileAbsoluteFilePath.split('/');
 
 						fileData.removeLast();

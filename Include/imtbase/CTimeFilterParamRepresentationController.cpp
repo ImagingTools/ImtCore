@@ -32,7 +32,7 @@ bool CTimeFilterParamRepresentationController::IsModelSupported(const istd::ICha
 bool CTimeFilterParamRepresentationController::GetRepresentationFromDataModel(
 			const istd::IChangeable& dataModel,
 			CTreeItemModel& representation,
-			const iprm::IParamsSet* paramsPtr) const
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!IsModelSupported(dataModel)){
 		return false;

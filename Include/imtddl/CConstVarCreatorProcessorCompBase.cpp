@@ -1,5 +1,6 @@
 #include <imtddl/CConstVarCreatorProcessorCompBase.h>
 
+
 // Qt includes
 #include <QtCore/QFile>
 #include <QtCore/QDir>
@@ -15,7 +16,7 @@ namespace imtddl
 {
 
 
-bool CConstVarCreatorProcessorCompBase::OpenFiles(const iprm::IParamsSet* paramsPtr)
+bool CConstVarCreatorProcessorCompBase::OpenFiles(const iprm::IParamsSet* /*paramsPtr*/)
 {
 	return true;
 }
@@ -44,13 +45,13 @@ bool CConstVarCreatorProcessorCompBase::OpenFile(const QString filePath, QFile& 
 
 
 
-bool CConstVarCreatorProcessorCompBase::CloseFiles(const iprm::IParamsSet *paramsPtr)
+bool CConstVarCreatorProcessorCompBase::CloseFiles(const iprm::IParamsSet* /*paramsPtr*/)
 {
 	return true;
 }
 
 
-QString CConstVarCreatorProcessorCompBase::GetTemplateDirPath(const iprm::IParamsSet *paramsPtr) const
+QString CConstVarCreatorProcessorCompBase::GetTemplateDirPath(const iprm::IParamsSet* paramsPtr) const
 {
 	iprm::TParamsPtr<iprm::ITextParam> dirPathParamPtr(paramsPtr, "TemplateDirPath");
 
@@ -92,24 +93,25 @@ QString CConstVarCreatorProcessorCompBase::GetQmlDirPath(const iprm::IParamsSet 
 }
 
 
-QString CConstVarCreatorProcessorCompBase::GetModuleName(const iprm::IParamsSet* paramsPtr)
+QString CConstVarCreatorProcessorCompBase::GetModuleName(const iprm::IParamsSet* /*paramsPtr*/)
 {
 	return QString();
 }
 
 
-bool CConstVarCreatorProcessorCompBase::CreateBody(const QString moduleName, const QJsonDocument& templateDocument, const iprm::IParamsSet *paramsPtr)
+bool CConstVarCreatorProcessorCompBase::CreateBody(const QString moduleName, const QJsonDocument& /*templateDocument*/, const iprm::IParamsSet* /*paramsPtr*/)
 {
 	return false;
 }
 
 
 // reimplemented (iproc::IProcessor)
+
 int CConstVarCreatorProcessorCompBase::DoProcessing(
 			const iprm::IParamsSet* paramsPtr,
-			const istd::IPolymorphic* inputPtr,
-			istd::IChangeable* outputPtr,
-			ibase::IProgressManager* progressManagerPtr)
+			const istd::IPolymorphic* /*inputPtr*/,
+			istd::IChangeable* /*outputPtr*/,
+			ibase::IProgressManager* /*progressManagerPtr*/)
 {
 	QString moduleName = GetModuleName(paramsPtr);
 
@@ -119,9 +121,7 @@ int CConstVarCreatorProcessorCompBase::DoProcessing(
 		return TS_INVALID;
 	}
 
-
 	iprm::TParamsPtr<iprm::ITextParam> templateDirPathParamPtr(paramsPtr, "TemplateDirPath");
-
 	if (!templateDirPathParamPtr.IsValid()){
 		SendErrorMessage(__LINE__, QString("The template dir path is invalid"));
 

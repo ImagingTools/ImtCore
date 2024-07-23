@@ -135,8 +135,8 @@ void RemoveDirectivesByRemark(QMap<QString, QString>& direciveIncludeMap, const 
 int CBaseClassExtenderComp::DoProcessing(
 			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* inputPtr,
-			istd::IChangeable* outputPtr,
-			ibase::IProgressManager* progressManagerPtr)
+			istd::IChangeable* /*outputPtr*/,
+			ibase::IProgressManager* /*progressManagerPtr*/)
 {
 	int retVal = iproc::IProcessor::TS_OK;
 
@@ -209,7 +209,7 @@ int CBaseClassExtenderComp::DoProcessing(
 
 
 bool CBaseClassExtenderComp::ProcessHeaderClassFile(
-			const iprm::IParamsSet& paramsPtr,
+			const iprm::IParamsSet& /*paramsPtr*/,
 			const iprm::IOptionsList& baseClassList)
 {
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
@@ -389,13 +389,14 @@ bool CBaseClassExtenderComp::CloseFiles()
 	bool retVal = true;
 
 	retVal = m_headerFilePtr->flush();
-	Q_ASSERT(retVal);	
+	Q_ASSERT(retVal);
+
 	m_headerFilePtr->close();
 
 	m_originalHeaderFilePtr->close();
 
-	const QString originalPath = QFileInfo(*m_originalHeaderFilePtr).absolutePath();
-	retVal = retVal && istd::CSystem::FileMove(m_headerFilePtr->fileName(), originalPath, true);
+	const QString originalHeaderFilePath = QFileInfo(*m_originalHeaderFilePtr).absolutePath();
+	retVal = retVal && istd::CSystem::FileMove(m_headerFilePtr->fileName(), originalHeaderFilePath, true);
 	Q_ASSERT(retVal);
 
 	if (m_sourceFilePtr.IsValid() && m_originalSourceFilePtr.IsValid()){
@@ -405,8 +406,8 @@ bool CBaseClassExtenderComp::CloseFiles()
 		m_sourceFilePtr->close();
 		m_originalSourceFilePtr->close();
 
-		const QString originalPath = QFileInfo(*m_originalSourceFilePtr).absolutePath();
-		retVal = retVal && istd::CSystem::FileMove(m_sourceFilePtr->fileName(), originalPath, true);
+		const QString originalSourceFilePath = QFileInfo(*m_originalSourceFilePtr).absolutePath();
+		retVal = retVal && istd::CSystem::FileMove(m_sourceFilePtr->fileName(), originalSourceFilePath, true);
 		Q_ASSERT(retVal);
 	}
 

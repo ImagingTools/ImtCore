@@ -42,8 +42,8 @@ int CStandardSqlMetaInfoTableDelegateComp::GetMetaInfoType(const QByteArray& col
 
 QVariant CStandardSqlMetaInfoTableDelegateComp::ToTableRepresentation(const QVariant& data, const QByteArray& /*columnId*/) const
 {
-	switch (data.type()){
-	case QVariant::Image: {
+	switch (data.typeId()){
+	case QMetaType::QImage: {
 		QImage image = data.value<QImage>();
 
 		QByteArray imageBuffer;

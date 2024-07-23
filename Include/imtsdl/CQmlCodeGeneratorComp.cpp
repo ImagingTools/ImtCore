@@ -397,7 +397,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 }
 
 
-bool CQmlCodeGeneratorComp::EndQmlFile(const CSdlType& sdlType)
+bool CQmlCodeGeneratorComp::EndQmlFile(const CSdlType& /*sdlType*/)
 {
 	QTextStream ifStream(m_qmlFilePtr.GetPtr());
 	ifStream << '}';

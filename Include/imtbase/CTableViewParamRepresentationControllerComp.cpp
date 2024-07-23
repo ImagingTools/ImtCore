@@ -43,7 +43,7 @@ bool CTableViewParamRepresentationControllerComp::IsModelSupported(const istd::I
 bool CTableViewParamRepresentationControllerComp::GetRepresentationFromDataModel(
 			const istd::IChangeable& dataModel,
 			imtbase::CTreeItemModel& representation,
-			const iprm::IParamsSet* paramsPtr) const
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	Q_ASSERT(IsModelSupported(dataModel));
 

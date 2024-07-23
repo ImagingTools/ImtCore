@@ -1,7 +1,7 @@
 #pragma once
 
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/CSdlClassModificatorBaseComp.h>
 
 
@@ -15,7 +15,6 @@ namespace imtsdl
  */
 class CSdlClassGqlModificatorComp: public CSdlClassModificatorBaseComp
 {
-
 public:
 	typedef CSdlClassModificatorBaseComp BaseClass;
 
@@ -31,14 +30,14 @@ private:
 	// read methods
 	void AddFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
 	void AddScalarFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
-	void AddScalarListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field) throw();
+	void AddScalarListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
 	void AddCustomFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
 	void AddCustomListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
 
 	// write methods
 	void AddFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field);
 	void AddScalarFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
-	void AddScalarListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1) throw();
+	void AddScalarListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 	void AddCustomFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 	void AddCustomListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 
@@ -58,11 +57,9 @@ private:
 	/// \todo add error handling for it. do not forget about arrays and arrays.isEmpty
 	void AddCheckCustomListRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 	void AddSetCustomListValueToObjectCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
-
-
-
 };
 
 
 } // namespace imtsdl
+
 

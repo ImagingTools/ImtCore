@@ -27,16 +27,16 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 	QByteArray addressId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(addressId, dataPtr)){
-        const IAddressElementInfo* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(dataPtr.GetPtr());
-        const CPositionIdentifiable* addressPosition = dynamic_cast<const CPositionIdentifiable*>(dataPtr.GetPtr());
+	if (m_objectCollectionCompPtr->GetObjectData(addressId, dataPtr)) {
+		const IAddressElementInfo* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(dataPtr.GetPtr());
+		const CPositionIdentifiable* addressPosition = dynamic_cast<const CPositionIdentifiable*>(dataPtr.GetPtr());
 
-		if (addressInfoPtr == nullptr){
+		if (addressInfoPtr == nullptr) {
 			errorMessage = QT_TR_NOOP("Unable to get an address info");
 			return nullptr;
 		}
 
-        QByteArray id = addressPosition->GetObjectUuid();
+		QByteArray id = addressPosition->GetObjectUuid();
 		QByteArray parentId;
 		QList<QByteArray> parents = addressInfoPtr->GetParentIds();
 		if (!parents.isEmpty()){
@@ -49,8 +49,8 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 		if (m_addressTypeCollectionPtr->GetObjectData(typeId, dataTypePtr)){
 			const IAddressTypeInfo* addressTypeInfoPtr =
 				dynamic_cast<const IAddressTypeInfo*>(dataTypePtr.GetPtr());
-			QString typeName = addressTypeInfoPtr->GetName();
-			QString typeShortName = addressTypeInfoPtr->GetShortName();
+			typeName = addressTypeInfoPtr->GetName();
+			typeShortName = addressTypeInfoPtr->GetShortName();
 		}
 		QString name = addressInfoPtr->GetName();
 		QString address = addressInfoPtr->GetAddress();
@@ -72,6 +72,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 					}
 				}
 			}
+
 			address += typeShortName + " " + name;
 		}
 
@@ -88,7 +89,6 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 		dataModel->SetData("Description", description);
 		dataModel->SetData("Latitude", lat);
 		dataModel->SetData("Longitude", lon);
-
 	}
 
 	rootModelPtr->SetExternTreeModel("data", dataModel);

@@ -471,9 +471,9 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 	if (!removedUserId.isEmpty()){
 		imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 		if (contextPtr != nullptr){
-			const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
-			if (userInfoPtr != nullptr){
-				QByteArray userId = userInfoPtr->GetId();
+			const imtauth::IUserInfo* contextUserInfoPtr = contextPtr->GetUserInfo();
+			if (contextUserInfoPtr != nullptr){
+				QByteArray userId = contextUserInfoPtr->GetId();
 				if (removedUserId == userId){
 					errorMessage = QString("It is not possible to delete a user");
 

@@ -21,7 +21,7 @@ CButtonBasedSelectionGuiComp::CButtonBasedSelectionGuiComp()
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
-void CButtonBasedSelectionGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
+void CButtonBasedSelectionGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	QLayout* layoutPtr = Frame->layout();
 	Q_ASSERT(layoutPtr != nullptr);
@@ -109,7 +109,7 @@ void CButtonBasedSelectionGuiComp::OnButtonClicked(bool checked)
 // private methods
 
 void CButtonBasedSelectionGuiComp::OnOptionListUpdate(
-	const istd::IChangeable::ChangeSet& changeSet, const iprm::IOptionsList* objectPtr)
+	const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IOptionsList* objectPtr)
 {
 	if (IsGuiCreated() && !IsUpdateBlocked() && IsModelAttached()) {
 		QLayout* layoutPtr = Frame->layout();
@@ -182,7 +182,7 @@ void CButtonBasedSelectionGuiComp::OnOptionListUpdate(
 
 
 void CButtonBasedSelectionGuiComp::OnIconsUpdate(
-	const istd::IChangeable::ChangeSet& changeSet, const iqtgui::IIconProvider* objectPtr)
+	const istd::IChangeable::ChangeSet& /*changeSet*/, const iqtgui::IIconProvider* objectPtr)
 {
 	QList<QToolButton*> buttonList = Frame->findChildren<QToolButton*>();
 	for (int i = 0; i < buttonList.count(); i++) {

@@ -96,8 +96,8 @@ bool CCommandRepresentationController::GetRepresentationFromDataModel(
 
 
 bool CCommandRepresentationController::GetDataModelFromRepresentation(
-			const imtbase::CTreeItemModel& representation,
-			istd::IChangeable& dataModel) const
+			const imtbase::CTreeItemModel& /*representation*/,
+			istd::IChangeable& /*dataModel*/) const
 {
 	return false;
 }

@@ -4,7 +4,7 @@
 // Qt includes
 #include <QtCore/QRegularExpression>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/CSdlType.h>
 
 
@@ -147,7 +147,7 @@ void CSdlClassGqlModificatorComp::AddScalarFieldReadFromRequestCode(QTextStream&
 }
 
 
-void CSdlClassGqlModificatorComp::AddScalarListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field) throw()
+void CSdlClassGqlModificatorComp::AddScalarListFieldReadFromRequestCode(QTextStream& /*stream*/, const CSdlField& /*field*/)
 {
 	/// \todo implement it if GQL will be able to store scalar list
 	qFatal("GQL model does not support insert list of scalars(. Change schema or disable GQL modificator");
@@ -265,7 +265,7 @@ void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& 
 }
 
 
-void CSdlClassGqlModificatorComp::AddScalarListFieldWriteToRequestCode(QTextStream& /*stream*/, const CSdlField& /*field*/, uint /*hIndents*/) throw()
+void CSdlClassGqlModificatorComp::AddScalarListFieldWriteToRequestCode(QTextStream& /*stream*/, const CSdlField& /*field*/, uint /*hIndents*/)
 {
 	/// \todo implement it if GQL will be able to store scalar list
 	qFatal("GQL model does not support insert list of scalars(. Change schema or disable GQL modificator");
@@ -549,5 +549,7 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 	stream << ')' << ';';
 }
 
+
 } // namespace imtsdl
+
 

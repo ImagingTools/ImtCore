@@ -203,7 +203,7 @@ bool CUserInfo::IsEqual(const IChangeable& object) const
 
 	const CUserInfo* sourcePtr = dynamic_cast<const CUserInfo*>(&object);
 	if (retVal && sourcePtr != nullptr){
-		bool retVal = m_passwordHash == sourcePtr->m_passwordHash;
+		retVal = retVal && m_passwordHash == sourcePtr->m_passwordHash;
 		retVal = retVal && m_mail == sourcePtr->m_mail;
 		retVal = retVal && m_groupIds == sourcePtr->m_groupIds;
 		retVal = retVal && m_lastConnection == sourcePtr->m_lastConnection;

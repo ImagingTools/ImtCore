@@ -72,9 +72,6 @@ bool CConstVarQmlCreatorProcessorComp::CreateBody(
 	}
 
 	if (rootObject.value("type") == "object"){
-		QJsonObject properties = rootObject.value("properties").toObject();
-		QStringList propertyKeys = properties.keys();
-
 		for (QString key: propertyKeys){
 			QJsonObject property = properties.value(key).toObject();
 			QString normalKey = key;

@@ -162,8 +162,8 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateRemoveNodeRequ
 imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateInsertLeafRequest(
 			const Id& leafId,
 			const Id& nodeId,
-			const QString& leafName,
-			const imtbase::IOperationContext* operationContextPtr) const
+			const QString& /*leafName*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	imtgql::CGqlRequest* requestPtr = nullptr;
 
@@ -333,51 +333,51 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateGetItemPathReq
 
 
 imtbase::IHierarchicalStructureIterator* CGqlHierarchicalStructureDelegateComp::CreateHierarchicalStructureIterator(
-			int offset,
-			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return nullptr;
 }
 
 
-bool CGqlHierarchicalStructureDelegateComp::IsValid(imtgql::IGqlResponse& reqponse) const
+bool CGqlHierarchicalStructureDelegateComp::IsValid(imtgql::IGqlResponse& /*response*/) const
 {
 	return false;
 }
 
 
-bool CGqlHierarchicalStructureDelegateComp::GetNodeId(imtgql::IGqlResponse& reqponse, Id& out) const
+bool CGqlHierarchicalStructureDelegateComp::GetNodeId(imtgql::IGqlResponse& /*response*/, Id& /*out*/) const
 {
 	return false;
 }
 
 
-bool CGqlHierarchicalStructureDelegateComp::GetOperationResult(imtgql::IGqlResponse& reqponse, bool& out) const
+bool CGqlHierarchicalStructureDelegateComp::GetOperationResult(imtgql::IGqlResponse& /*response*/, bool& /*out*/) const
 {
 	return false;
 }
 
 
-bool CGqlHierarchicalStructureDelegateComp::GetItemCount(imtgql::IGqlResponse& reqponse, bool out) const
+bool CGqlHierarchicalStructureDelegateComp::GetItemCount(imtgql::IGqlResponse& /*response*/, bool /*out*/) const
 {
 	return false;
 }
 
 
-bool CGqlHierarchicalStructureDelegateComp::GetItemIds(imtgql::IGqlResponse& reqponse, Ids& out) const
+bool CGqlHierarchicalStructureDelegateComp::GetItemIds(imtgql::IGqlResponse& /*response*/, Ids& /*out*/) const
 {
 	return false;
 }
 
 
-bool CGqlHierarchicalStructureDelegateComp::GetItemPath(imtgql::IGqlResponse& reqponse, Ids& out) const
+bool CGqlHierarchicalStructureDelegateComp::GetItemPath(imtgql::IGqlResponse& /*response*/, Ids& /*out*/) const
 {
 	return false;
 }
 
 
-bool CGqlHierarchicalStructureDelegateComp::GetItemInfos(imtgql::IGqlResponse& reqponse, imtbase::IHierarchicalStructureInfo::ItemInfoList& out) const
+bool CGqlHierarchicalStructureDelegateComp::GetItemInfos(imtgql::IGqlResponse& /*response*/, imtbase::IHierarchicalStructureInfo::ItemInfoList& /*out*/) const
 {
 	return false;
 }

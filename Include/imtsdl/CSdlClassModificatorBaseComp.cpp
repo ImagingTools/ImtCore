@@ -25,10 +25,10 @@ namespace imtsdl
 //reimplemented(iproc::IProcessor)
 
 int CSdlClassModificatorBaseComp::DoProcessing(
-			const iprm::IParamsSet* paramsPtr,
-			const istd::IPolymorphic* inputPtr,
-			istd::IChangeable* outputPtr,
-			ibase::IProgressManager* progressManagerPtr)
+			const iprm::IParamsSet* /*paramsPtr*/,
+			const istd::IPolymorphic* /*inputPtr*/,
+			istd::IChangeable* /*outputPtr*/,
+			ibase::IProgressManager* /*progressManagerPtr*/)
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
@@ -144,7 +144,7 @@ bool CSdlClassModificatorBaseComp::BeginClassFiles(const CSdlType& sdlType)
 }
 
 
-bool CSdlClassModificatorBaseComp::EndClassFiles(const CSdlType& sdlType)
+bool CSdlClassModificatorBaseComp::EndClassFiles(const CSdlType& /*sdlType*/)
 {
 	return CloseFiles();
 }

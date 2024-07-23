@@ -147,7 +147,7 @@ void CObserverQmlComp::OnLanguageChanged(const istd::IChangeable::ChangeSet& /*c
 }
 
 
-void CObserverQmlComp::OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IUrlParam* urlParamPtr)
+void CObserverQmlComp::OnUrlParamChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::IUrlParam* /*urlParamPtr*/)
 {
 	ApplyUrl();
 }
