@@ -59,8 +59,8 @@ public:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (imtrest::IRequestServlet)
-	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request) const override;
-	virtual QByteArray GetSupportedCommandId() const override;
+	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
+	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 	// reimplemented (IGqlClient)
 	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr) const override;
@@ -110,7 +110,6 @@ private:
 	mutable imtauth::ILoginStatusProvider::LoginStatusFlags m_loginStatus;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
 	mutable QMutex m_registeredClientsMutex;
-//	QMutex m_loginStatusMutex;
 	mutable QMutex m_queryDataMapMutex;
 };
 

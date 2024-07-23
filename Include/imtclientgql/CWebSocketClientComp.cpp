@@ -53,12 +53,6 @@ int CWebSocketClientComp::GetLoginStatus(const QByteArray& /*clientId*/) const
 
 // reimplemented (imtrest::IRequestManager)
 
-const imtrest::IRequest* CWebSocketClientComp::GetRequest(const QByteArray& /*requestId*/) const
-{
-	return nullptr;
-}
-
-
 const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& /*requestId*/) const
 {
 	return this;

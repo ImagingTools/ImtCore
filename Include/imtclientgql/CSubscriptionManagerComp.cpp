@@ -122,11 +122,17 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 
 // reimplemented (imtrest::IRequestServlet)
 
-imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest::IRequest& request) const
+bool CSubscriptionManagerComp::IsCommandSupported(const QByteArray& /*commandId*/) const
+{
+	return true;
+}
+
+
+imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId) const
 {
 	QMutexLocker locker(&m_registeredClientsMutex);
 
-	QByteArray commandId = request.GetCommandId();
+	QByteArray commandId = subCommandId.isEmpty() ? request.GetCommandId() : subCommandId;
 
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	if (webSocketRequest != nullptr){
@@ -238,12 +244,6 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 	}
 
 	return imtrest::ConstResponsePtr();
-}
-
-
-QByteArray CSubscriptionManagerComp::GetSupportedCommandId() const
-{
-	return QByteArray();
 }
 
 

@@ -67,7 +67,6 @@ public:
 	virtual int GetLoginStatus(const QByteArray& clientId = QByteArray()) const override;
 
 	// reimplemented (imtrest::IRequestManager)
-	virtual const imtrest::IRequest* GetRequest(const QByteArray& requestId) const override;
 	virtual const imtrest::ISender* GetSender(const QByteArray& requestId) const override;
 
 	// reimplemented (imtauth::ILogin)
