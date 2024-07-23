@@ -1,7 +1,11 @@
 #include <imtwidgets/CMenuPanel.h>
 
 
+// STL includes
+#include <math.h>
+
 // Qt includes
+#include <QtCore/QDebug>
 #include <QtCore/QEvent>
 #include <QtCore/QtMath>
 #include <QtCore/QStack>
@@ -703,6 +707,15 @@ void CMenuPanel::on_pushTop_clicked()
 bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 {
 	int eventType = event->type();
+
+	// #10702
+	if (eventType == QEvent::KeyPress) {
+		auto keyEvent = dynamic_cast<QKeyEvent*>(event);
+		if (keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Backtab) {
+			return true;
+		}
+		return QObject::eventFilter(watched, event);
+	}
 
 	if (m_mainWidgetPtr != nullptr && watched == m_mainWidgetPtr){
 		if (eventType == QEvent::Resize){

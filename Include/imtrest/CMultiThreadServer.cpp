@@ -236,7 +236,7 @@ bool CSocketThread::SendResponse(ConstResponsePtr& response) const
 }
 
 
-bool CSocketThread::SendRequest(ConstRequestPtr& reguest) const
+bool CSocketThread::SendRequest(ConstRequestPtr& /*reguest*/) const
 {
 	return false;
 }
@@ -286,7 +286,7 @@ imtrest::IProtocolEngine* CMultiThreadServer::GetProtocolEngine()
 
 // reimplemented (imtrest::IRequestManager)
 
-const IRequest* CMultiThreadServer::GetRequest(const QByteArray& requestId) const
+const IRequest* CMultiThreadServer::GetRequest(const QByteArray& /*requestId*/) const
 {
 	return nullptr;
 }

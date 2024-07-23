@@ -14,11 +14,11 @@ CSdlJsonServletBaseComp::ResponsePtr CSdlJsonServletBaseComp::CreateDefaultError
 {
 	ResponsePtr retVal;
 
-	QJsonObject replyObject = QJsonObject({
-		std::make_pair("Code", errorCode),
-		std::make_pair("ErrorString", errorString),
-		std::make_pair("AdditionalInfo", additionalInfo),
-	});
+	QJsonObject replyObject;
+	replyObject["Code"] = errorCode;
+	replyObject["ErrorString"] = errorString;
+	replyObject["AdditionalInfo"] = additionalInfo;
+
 	QByteArray replyPayload = QJsonDocument(replyObject).toJson(QJsonDocument::Compact);
 
 	retVal.reset(request.GetProtocolEngine().CreateResponse(

@@ -230,7 +230,7 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::DeleteObject(
 	}
 
 	if (userGroupInfoPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to get group with ID: '%1'").arg(userGroupId));
+		SendErrorMessage(0, QString("Unable to get group with ID: '%1'").arg(qPrintable(userGroupId)));
 
 		return nullptr;
 	}

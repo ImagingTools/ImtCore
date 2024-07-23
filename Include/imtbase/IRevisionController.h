@@ -37,6 +37,7 @@ public:
 		QDateTime timestamp;
 		QString user;
 		QString comment;
+		QString softwareVersion;
 		bool isRevisionAvailable;
 	};
 

@@ -44,8 +44,7 @@ protected:
 			const QString& errorString,
 			const QString& additionalInfo,
 			IProtocolEngine::StatusCode protocolStatusCode,
-			const imtrest::CHttpRequest& request
-		) const;
+			const imtrest::CHttpRequest& request) const;
 };
 
 
@@ -129,3 +128,5 @@ bool CSdlJsonServletBaseComp::CreateResponseFromSdlStruct(
 
 
 } // namespace imtrest
+
+

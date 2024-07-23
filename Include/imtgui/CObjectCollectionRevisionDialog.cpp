@@ -1,3 +1,6 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
 #include <imtgui/CObjectCollectionRevisionDialog.h>
 
 
@@ -38,7 +41,8 @@ void CObjectCollectionRevisionDialog::SetParams(
 		Table->setItem(i, 0, new QTableWidgetItem(QString::number(revisions[i].revision)));
 		Table->setItem(i, 1, new QTableWidgetItem(revisions[i].timestamp.toString("dd.MM.yyyy hh:mm:ss")));
 		Table->setItem(i, 2, new QTableWidgetItem(revisions[i].user));
-		Table->setItem(i, 3, new QTableWidgetItem(revisions[i].comment));
+		Table->setItem(i, 3, new QTableWidgetItem(revisions[i].softwareVersion));
+		Table->setItem(i, 4, new QTableWidgetItem(revisions[i].comment));
 
 		if (revisions[i].revision == currentRevision){
 			QFont font = Table->item(i, 0)->font();
@@ -47,6 +51,7 @@ void CObjectCollectionRevisionDialog::SetParams(
 			Table->item(i, 1)->setFont(font);
 			Table->item(i, 2)->setFont(font);
 			Table->item(i, 3)->setFont(font);
+			Table->item(i, 4)->setFont(font);
 		}
 
 		if (!revisions[i].isRevisionAvailable){
@@ -55,10 +60,12 @@ void CObjectCollectionRevisionDialog::SetParams(
 			Table->item(i, 1)->setForeground(Qt::red);
 			Table->item(i, 2)->setForeground(Qt::red);
 			Table->item(i, 3)->setForeground(Qt::red);
+			Table->item(i, 4)->setForeground(Qt::red);
 			Table->item(i, 0)->setToolTip(tr("Revision package not found"));
 			Table->item(i, 1)->setToolTip(tr("Revision package not found"));
 			Table->item(i, 2)->setToolTip(tr("Revision package not found"));
 			Table->item(i, 3)->setToolTip(tr("Revision package not found"));
+			Table->item(i, 4)->setToolTip(tr("Revision package not found"));
 		}
 
 		Table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
@@ -96,10 +103,9 @@ void CObjectCollectionRevisionDialog::OnCustomContextMenuRequested(const QPoint 
 		return;
 	}
 
-	QAction* actionRestore;
 	QMenu menu(Table);
 
-	actionRestore = menu.addAction(QIcon(":/Icons/Export"), tr("Export"));
+	QAction* actionRestore = menu.addAction(QIcon(":/Icons/Export"), tr("Export"));
 	connect(actionRestore, &QAction::triggered, this, &CObjectCollectionRevisionDialog::OnExport);
 
 	menu.exec(Table->viewport()->mapToGlobal(point));

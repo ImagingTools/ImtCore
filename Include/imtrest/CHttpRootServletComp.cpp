@@ -1,7 +1,7 @@
 #include <imtrest/CHttpRootServletComp.h>
 
 
-// Qt i ncludes
+// Qt includes
 #include <QtCore/QDataStream>
 #include <QtCore/QRegularExpression>
 
