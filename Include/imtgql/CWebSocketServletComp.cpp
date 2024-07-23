@@ -21,9 +21,15 @@ namespace imtgql
 
 // reimplemented (IRequestHandler)
 
-imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::IRequest& request) const
+bool CWebSocketServletComp::IsCommandSupported(const QByteArray& /*commandId*/) const
 {
-	QByteArray commandId = request.GetCommandId();
+	return true;
+}
+
+
+imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId) const
+{
+	QByteArray commandId = subCommandId.isEmpty() ? request.GetCommandId() : subCommandId;
 
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 
@@ -66,12 +72,6 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 	}
 
 	return imtrest::ConstResponsePtr();
-}
-
-
-QByteArray CWebSocketServletComp::GetSupportedCommandId() const
-{
-	return "";
 }
 
 
@@ -128,11 +128,6 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 		}
 
 		QString responseData = responseDataModel->ToJson();
-//		responseData.replace('\\', "\\\\");
-//		responseData.replace('\"', "\\\"");
-//		responseData.replace('\n', "\\n");
-//		responseData.replace('\r', "\\r");
-//		responseData.replace('\t', "\\t");
 
 		QByteArray data = QString(R""(
 {
@@ -249,7 +244,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(QByteArray d
 	imtrest::ConstResponsePtr responsePtr(
 				engine.CreateResponse(
 							request,
-							imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
+							imtrest::IProtocolEngine::SC_OK,
 							data,
 							reponseTypeId));
 

@@ -25,12 +25,8 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (IRequestServlet)
-	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request) const override;
-	virtual QByteArray GetSupportedCommandId() const override;
-
-	// reimplemented (IGqlClient)
-//	virtual bool SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const override;
-
+	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
+	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 protected:
 	virtual imtrest::ConstResponsePtr InitConnection(const imtrest::IRequest& request) const;
