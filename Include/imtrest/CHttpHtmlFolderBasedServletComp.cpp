@@ -211,7 +211,13 @@ QByteArray CHttpHtmlFolderBasedServletComp::GetMimeType(const QFileInfo& fileInf
 
 // reimplemented (IRequestHandler)
 
-ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessRequest(const IRequest& request) const
+bool CHttpHtmlFolderBasedServletComp::IsCommandSupported(const QByteArray& commandId) const
+{
+	return (commandId  == *m_commandIdAttrPtr);
+}
+
+
+ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessRequest(const IRequest& request, const QByteArray& /*subCommandId*/) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
@@ -296,12 +302,6 @@ ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessRequest(const IRequest&
 	ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId));
 
 	return responsePtr;
-}
-
-
-QByteArray CHttpHtmlFolderBasedServletComp::GetSupportedCommandId() const
-{
-	return *m_commandIdAttrPtr;
 }
 
 

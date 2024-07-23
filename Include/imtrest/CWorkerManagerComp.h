@@ -28,10 +28,10 @@ public:
 	CWorker(const imtrest::IRequestServlet* requestServletPtr, CWorkerThread* workerThread);
 
 Q_SIGNALS:
-	void FinishProcess(const IRequest* request);
+	void FinishProcess(const IRequest* request, const QByteArray& subCommandId);
 
 public Q_SLOTS:
-	void ProcessRequest(const IRequest* request);
+	void ProcessRequest(const IRequest* request, const QByteArray& subCommandId);
 
 private:
 	const imtrest::IRequestServlet* m_requestServletPtr;
@@ -44,7 +44,7 @@ class CWorkerThread: public QThread
 {
 	Q_OBJECT
 public:
-	CWorkerThread(const CWorkerManagerComp* workerManager);
+	CWorkerThread(const CWorkerManagerComp* workerManager, const QByteArray& subCommandId);
 
 	enum Status
 	{
@@ -61,12 +61,12 @@ public:
 	void run() override;
 
 Q_SIGNALS:
-	void StartProcess(const IRequest* request);
-	void FinishProcess(const IRequest* request);
+	void StartProcess(const IRequest* request, const QByteArray& subCommandId);
+	void FinishProcess(const IRequest* request, const QByteArray& subCommandId);
 
 protected Q_SLOTS:
 	void OnStarted();
-	void OnFinishProcess(const IRequest* request);
+	void OnFinishProcess(const IRequest* request, const QByteArray& subCommandId);
 
 private:
 	imtrest::IRequestServlet* m_requestServletPtr;
@@ -75,6 +75,7 @@ private:
 	istd::TDelPtr<CWorker> m_workerPtr;
 	const IRequest* m_requestPtr;
 	mutable QMutex m_statusMutex;
+	QByteArray m_subCommandId;
 };
 
 
@@ -100,14 +101,14 @@ public:
 	const ISender* GetSender(const QByteArray& requestId);
 
 	// reimplemented (IRequestHandler)
-	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;
-	virtual QByteArray GetSupportedCommandId() const override;
+	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
+	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 Q_SIGNALS:
 	void Start(const IRequest* request);
 
 protected Q_SLOTS:
-	void OnFinish(const IRequest* request);
+	void OnFinish(const IRequest* request, const QByteArray& subCommandId);
 	void AboutToQuit();
 
 private:

@@ -17,7 +17,6 @@ namespace imtrest
 class IRequestManager: virtual public istd::IPolymorphic
 {
 public:
-	virtual const IRequest* GetRequest(const QByteArray& requestId) const = 0;
 	/**
 		Get sender instance using for sending responses to the clients.
 	*/

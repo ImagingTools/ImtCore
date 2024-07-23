@@ -18,8 +18,16 @@ class IRequest;
 class IRequestServlet: virtual public istd::IPolymorphic
 {
 public:
-	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const = 0;
-	virtual QByteArray GetSupportedCommandId() const = 0;
+	/**
+		Returns \c true if the command (also a hierachical command) is supported by the servlet.
+		Only supported commands can be processed and are supported in \c ProcessRequest.
+	*/
+	virtual bool IsCommandSupported(const QByteArray& commandId) const = 0;
+
+	/**
+		Process a given request.
+	*/
+	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const = 0;
 };
 
 

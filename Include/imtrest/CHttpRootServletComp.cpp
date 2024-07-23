@@ -25,8 +25,16 @@ namespace imtrest
 
 // reimplemented (IRequestHandler)
 
-ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request) const
+bool CHttpRootServletComp::IsCommandSupported(const QByteArray& /*commandId*/) const
 {
+	return true;
+}
+
+
+ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
+{
+	Q_ASSERT(subCommandId.isEmpty());
+
 	QByteArray commandId = request.GetCommandId();
 	if (commandId.startsWith('/')){
 		commandId = commandId.remove(0, 1);
@@ -37,13 +45,12 @@ ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request) c
 	}
 
 	QByteArray bodyRequest = request.GetBody();
-//    qDebug() << "commandId:" << commandId << "bodyRequest:" << bodyRequest;
 
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 
 	const IRequestServlet* handlerPtr = FindRequestHandler(commandId);
 	if (handlerPtr != nullptr){
-		ConstResponsePtr responsePtr = handlerPtr->ProcessRequest(request);
+		ConstResponsePtr responsePtr = handlerPtr->ProcessRequest(request, commandId);
 		const CHttpResponse* httpResponseConstPtr = dynamic_cast<const CHttpResponse*>(responsePtr.GetPtr());
 		CHttpResponse* httpResponsePtr = dynamic_cast<CHttpResponse*>(const_cast<CHttpResponse*>(httpResponseConstPtr));
 
@@ -61,7 +68,6 @@ ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request) c
 						encodingType = ET_GZIP;
 					}
 				}
-
 			}
 			if (encodingType == ET_DEFLATE){
 				QByteArray data = responsePtr->GetData();
@@ -97,8 +103,8 @@ ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request) c
 				headers.insert("Content-Encoding", "gzip");
 				httpResponsePtr->SetHeaders(headers);
 			}
-
 		}
+
 		return responsePtr;
 	}
 	else if (commandId.isEmpty()){
@@ -130,40 +136,16 @@ ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request) c
 
 IRequestServlet* CHttpRootServletComp::FindRequestHandler(const QByteArray& commandId) const
 {
-	/// contains an IRequestHandler pointer in which the commandID is exactly the same as the request (highest priority)
-	/// \warning This pointer MUST be returned if is not null!
-	IRequestServlet* exactsCommandIdHandler = nullptr;
-
-	/// contains an IRequestHandler pointer in which the commandID is exactly the same as the request (highest priority)
-	/// \warning This pointer chould be returned ONLY exactsCommandIdHandler is null!
-	IRequestServlet* startsCommandIdHandler = nullptr;
-
 	for (int i = 0; i < m_requestHandlersCompPtr.GetCount(); ++i){
 		IRequestServlet* handlerPtr = m_requestHandlersCompPtr[i];
-		if (i > m_commandIdsAttrPtr.GetCount() - 1){
-			break;
-		}
-		if (handlerPtr != nullptr){
-			//			QByteArray handlersPtrSupportedCommandId = handlerPtr->GetSupportedCommandId();
-			QByteArray handlersPtrSupportedCommandId = m_commandIdsAttrPtr[i];
-			if (handlersPtrSupportedCommandId == commandId)
-			{
-				exactsCommandIdHandler = handlerPtr;
-				startsCommandIdHandler = nullptr;
-				break;
+		if (handlerPtr != nullptr) {
+			if (handlerPtr->IsCommandSupported(commandId)) {
+				return handlerPtr;
 			}
-
-			if
-					(handlersPtrSupportedCommandId.endsWith("*") &&
-					 commandId.startsWith(handlersPtrSupportedCommandId.remove(handlersPtrSupportedCommandId.length() - 1, 1))
-					 )
-			{
-				startsCommandIdHandler = handlerPtr;
-			}
-
 		}
 	}
-	return exactsCommandIdHandler == nullptr ? startsCommandIdHandler : exactsCommandIdHandler;
+
+	return nullptr;
 }
 
 
@@ -188,12 +170,6 @@ void CHttpRootServletComp::OnComponentCreated()
 			}
 		}
 	}
-}
-
-
-QByteArray CHttpRootServletComp::GetSupportedCommandId() const
-{
-	return "/";
 }
 
 

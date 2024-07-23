@@ -24,15 +24,14 @@ public:
 
 	I_BEGIN_COMPONENT(CHttpRootServletComp);
 		I_REGISTER_INTERFACE(IRequestServlet);
-		I_ASSIGN_MULTI_0(m_commandIdsAttrPtr, "CommandIds", "List of command-IDs used with corresponded handlers", true);
-		I_ASSIGN_MULTI_0(m_requestHandlersCompPtr, "RequestHandlers", "List of request handlers for corresponding command-IDs", false);
+		I_ASSIGN_MULTI_0(m_requestHandlersCompPtr, "RequestHandlers", "List of request handlers", false);
 		I_ASSIGN(m_autoCompressionAttrPtr, "AutoCompression", "Automatic data compression", true, false);
 		I_ASSIGN(m_compressionLevelAttrPtr, "CompressionLevel", "Compression level for automatic compression", true, 8);
 	I_END_COMPONENT
 
 	// reimplemented (IRequestHandler)
-	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;
-	virtual QByteArray GetSupportedCommandId() const override;
+	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
+	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 protected:
 	enum EncodingType

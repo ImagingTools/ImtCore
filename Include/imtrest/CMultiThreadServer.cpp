@@ -212,17 +212,17 @@ void CSocketThread::run()
 
 // reimplemented (IRequestHandler)
 
-ConstResponsePtr CSocketThread::ProcessRequest(const IRequest& request) const
+bool CSocketThread::IsCommandSupported(const QByteArray& /*commandId*/) const
 {
-	Q_EMIT m_server->NewThreadConnection(&request);
-
-	return ConstResponsePtr();
+	return true;
 }
 
 
-QByteArray CSocketThread::GetSupportedCommandId() const
+ConstResponsePtr CSocketThread::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
 {
-	return QByteArray();
+	Q_EMIT m_server->NewThreadConnection(&request, subCommandId);
+
+	return ConstResponsePtr();
 }
 
 
@@ -285,12 +285,6 @@ imtrest::IProtocolEngine* CMultiThreadServer::GetProtocolEngine()
 
 
 // reimplemented (imtrest::IRequestManager)
-
-const IRequest* CMultiThreadServer::GetRequest(const QByteArray& /*requestId*/) const
-{
-	return nullptr;
-}
-
 
 const ISender* CMultiThreadServer::GetSender(const QByteArray& requestId) const
 {

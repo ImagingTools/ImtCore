@@ -80,14 +80,6 @@ void CTcpServerComp::OnComponentCreated()
 }
 
 
-const IRequest* CTcpServerComp::GetRequest(const QByteArray& requestId) const
-{
-	const IRequest* requestPtr = m_server->GetRequest(requestId);
-
-	return requestPtr;
-}
-
-
 const ISender* CTcpServerComp::GetSender(const QByteArray& requestId) const
 {
 	const ISender* senderPtr = m_server->GetSender(requestId);
@@ -121,10 +113,10 @@ bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 }
 
 
-void CTcpServerComp::OnNewThreadConnection(const IRequest* request)
+void CTcpServerComp::OnNewThreadConnection(const IRequest* request, const QByteArray& subCommandId)
 {
 	if (m_requestHandlerCompPtr.IsValid()){
-		m_requestHandlerCompPtr->ProcessRequest(*request);
+		m_requestHandlerCompPtr->ProcessRequest(*request, subCommandId);
 	}
 }
 

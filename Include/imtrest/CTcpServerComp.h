@@ -63,14 +63,13 @@ protected:
 	virtual void OnComponentCreated() override;
 
 	// reimplemented (icomp::IRequestManager)
-	virtual const IRequest* GetRequest(const QByteArray& requestId) const override;
 	virtual const ISender* GetSender(const QByteArray& requestId) const override;
 
 private:
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);
 
 private Q_SLOTS:
-	void OnNewThreadConnection(const IRequest* request);
+	void OnNewThreadConnection(const IRequest* request, const QByteArray& subCommandId);
 
 private:
 	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);

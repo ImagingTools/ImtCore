@@ -15,12 +15,7 @@ namespace imtrest
 
 // public methods
 
-
-const IRequest* CWebSocketServerComp::GetRequest(const QByteArray& /*requestId*/) const
-{
-	return nullptr;
-}
-
+// reimplemented (icomp::IRequestManager)
 
 const ISender* CWebSocketServerComp::GetSender(const QByteArray& requestId) const
 {
@@ -196,17 +191,20 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 				istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QObject::tr("Login"));
 				loginChangeSet.SetChangeInfo("ClientId", clientId);
 				istd::CChangeNotifier notifier(this, &loginChangeSet);
+
 				m_senderLoginStatusMap.insert(clientId, imtauth::ILoginStatusProvider::LSF_LOGGED_IN);
+
 				if (!clientId.isEmpty()){
 					newRequestPtr.PopPtr();
 					QSharedPointer<CWebSocketSender> socketSender(new CWebSocketSender(webSocketPtr));
 					m_senders.insert(clientId, socketSender);
 					QObject::connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
-
 				}
 			}
+
 			responsePtr = m_requestServerHandlerCompPtr->ProcessRequest(*webSocketRequest);
 		}
+
 		if (responsePtr.IsValid()){
 			QByteArray data = responsePtr->GetData();
 			webSocketPtr->sendTextMessage(data);

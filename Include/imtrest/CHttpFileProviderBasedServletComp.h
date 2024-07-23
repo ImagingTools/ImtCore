@@ -13,9 +13,10 @@
 namespace imtrest
 {
 
+
 /**
- * \brief The CHttpFileProviderBasedServletComp class generates HTML-document with list of objects for all the files and directories in the directory
- */
+	\brief The CHttpFileProviderBasedServletComp class generates HTML-document with list of objects for all the files and directories in the directory
+*/
 class CHttpFileProviderBasedServletComp: public CHttpServletCompBase
 {
 public:
@@ -31,12 +32,12 @@ public:
 	QByteArray GetMimeType(QByteArray fileSuffix) const;
 
 	// reimplemented (IRequestHandler)
+	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual ConstResponsePtr OnGet(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const override;
-	virtual QByteArray GetSupportedCommandId() const override;
 
 protected:
 	I_ATTR(QString, m_fileIdCommandParamAttrPtr);

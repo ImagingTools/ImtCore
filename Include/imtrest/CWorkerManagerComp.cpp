@@ -21,7 +21,7 @@ CWorker::CWorker(const imtrest::IRequestServlet* requestServletPtr, CWorkerThrea
 }
 
 
-void CWorker::ProcessRequest(const IRequest* request)
+void CWorker::ProcessRequest(const IRequest* request, const QByteArray& subCommandId)
 {
 	m_workerThread->SetStatus(CWorkerThread::ST_PROCESS);
 
@@ -32,7 +32,7 @@ void CWorker::ProcessRequest(const IRequest* request)
 			body += "...";
 		}
 		qDebug() << "Start process " << request->GetCommandId() << body;
-		ConstResponsePtr responsePtr = m_requestServletPtr->ProcessRequest(*request);
+		ConstResponsePtr responsePtr = m_requestServletPtr->ProcessRequest(*request, subCommandId);
 		if (responsePtr.IsValid()){
 			const ISender* sender = m_workerThread->GetSender(request->GetRequestId());
 			if (sender != nullptr){
@@ -46,13 +46,14 @@ void CWorker::ProcessRequest(const IRequest* request)
 
 	m_workerThread->SetStatus(CWorkerThread::ST_CLOSE);
 
-	Q_EMIT FinishProcess(request);
+	Q_EMIT FinishProcess(request, subCommandId);
 }
 
 
-CWorkerThread::CWorkerThread(const CWorkerManagerComp* workerManager)
+CWorkerThread::CWorkerThread(const CWorkerManagerComp* workerManager, const QByteArray& subCommandId)
 	:m_status(ST_PROCESS),
-	m_workerPtr(nullptr)
+	m_workerPtr(nullptr),
+	m_subCommandId(subCommandId)
 {
 	m_workerManager = dynamic_cast<CWorkerManagerComp*>(const_cast<CWorkerManagerComp*>(workerManager));
 }
@@ -106,7 +107,7 @@ void CWorkerThread::run()
 	connect(this, &CWorkerThread::StartProcess, m_workerPtr.GetPtr(), &CWorker::ProcessRequest); //, Qt::QueuedConnection
 	connect(m_workerPtr.GetPtr(), &CWorker::FinishProcess, this, &CWorkerThread::OnFinishProcess, Qt::DirectConnection); //, Qt::QueuedConnection
 
-	m_workerPtr->ProcessRequest(m_requestPtr);
+	m_workerPtr->ProcessRequest(m_requestPtr, m_subCommandId);
 
 	exec();
 }
@@ -114,13 +115,13 @@ void CWorkerThread::run()
 
 void CWorkerThread::OnStarted()
 {
-	Q_EMIT StartProcess(m_requestPtr);
+	Q_EMIT StartProcess(m_requestPtr, m_subCommandId);
 }
 
 
-void CWorkerThread::OnFinishProcess(const IRequest* request)
+void CWorkerThread::OnFinishProcess(const IRequest* request, const QByteArray& subCommandId)
 {
-	Q_EMIT FinishProcess(request);
+	Q_EMIT FinishProcess(request,subCommandId);
 }
 
 
@@ -157,7 +158,7 @@ const ISender* CWorkerManagerComp::GetSender(const QByteArray& requestId)
 
 // reimplemented (IRequestHandler)
 
-ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request) const
+ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
 {
 	QMutexLocker loc(&m_requestListMutex);
 
@@ -173,14 +174,14 @@ ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request) con
 
 			workerPtr->SetStatus(CWorkerThread::ST_PROCESS);
 
-			Q_EMIT workerPtr->StartProcess(requestPtr);
+			Q_EMIT workerPtr->StartProcess(requestPtr, subCommandId);
 
 			return retVal;
 		}
 	}
 
 	if (m_workerList.count() < *m_threadsLimitAttrPtr){
-		CWorkerThread* workerPtr = new CWorkerThread(this);
+		CWorkerThread* workerPtr = new CWorkerThread(this, subCommandId);
 		connect(workerPtr, &CWorkerThread::FinishProcess, this, &CWorkerManagerComp::OnFinish); //, Qt::QueuedConnection
 		m_workerList.append(workerPtr);
 
@@ -199,13 +200,13 @@ ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request) con
 }
 
 
-QByteArray CWorkerManagerComp::GetSupportedCommandId() const
+bool CWorkerManagerComp::IsCommandSupported(const QByteArray& /*commandId*/) const
 {
-	return QByteArray();
+	return true;
 }
 
 
-void CWorkerManagerComp::OnFinish(const IRequest* request)
+void CWorkerManagerComp::OnFinish(const IRequest* request, const QByteArray& subCommandId)
 {
 	QMutexLocker loc(&m_requestListMutex);
 
@@ -221,7 +222,7 @@ void CWorkerManagerComp::OnFinish(const IRequest* request)
 			m_requestList.removeAt(0);
 
 			workerPtr->SetStatus(CWorkerThread::ST_PROCESS);
-			Q_EMIT workerPtr->StartProcess(requestPtr);
+			Q_EMIT workerPtr->StartProcess(requestPtr, subCommandId);
 
 			return;
 		}

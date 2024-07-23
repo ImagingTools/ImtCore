@@ -43,8 +43,8 @@ public:
 	QByteArray GetMimeType(const QFileInfo& fileInfo) const;
 
 	// reimplemented (IRequestServlet)
-	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;
-	virtual QByteArray GetSupportedCommandId() const override;
+	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
+	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 private:
 	I_ATTR (QString, m_homeDirPathAttrPtr);

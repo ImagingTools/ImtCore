@@ -16,7 +16,7 @@ namespace imtrest
 
 // reimplemented (IProtocolEngine)
 
-ConstResponsePtr CHttpServletCompBase::ProcessRequest(const imtrest::IRequest& request) const
+ConstResponsePtr CHttpServletCompBase::ProcessRequest(const imtrest::IRequest& request, const QByteArray& /*subCommandId*/) const
 {
 	imtrest::CHttpRequest* httpRequestPtr = dynamic_cast<imtrest::CHttpRequest*>(const_cast<imtrest::IRequest*>(&request));
 	if (httpRequestPtr == nullptr){
@@ -30,9 +30,9 @@ ConstResponsePtr CHttpServletCompBase::ProcessRequest(const imtrest::IRequest& r
 }
 
 
-QByteArray CHttpServletCompBase::GetSupportedCommandId() const
+bool CHttpServletCompBase::IsCommandSupported(const QByteArray& commandId) const
 {
-	return *m_commandIdAttrPtr;
+	return (commandId  == *m_commandIdAttrPtr);
 }
 
 

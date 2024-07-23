@@ -71,8 +71,8 @@ public:
 	void run() override;
 
 	// reimplemented (IRequestHandler)
-	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;
-	virtual QByteArray GetSupportedCommandId() const override;
+	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
+	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 	// reimplemented (ISender)
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
@@ -111,11 +111,10 @@ public:
 	imtrest::IProtocolEngine* GetProtocolEngine();
 
 	// reimplemented (imtrest::IRequestManager)
-	virtual const IRequest* GetRequest(const QByteArray& requestId) const override;
 	virtual const ISender* GetSender(const QByteArray& requestId) const override;
 
 Q_SIGNALS:
-	void NewThreadConnection(const IRequest* request);
+	void NewThreadConnection(const IRequest* request, const QByteArray& subCommandId);
 
 public Q_SLOTS:
 	void Disconnected(QByteArray requestId);

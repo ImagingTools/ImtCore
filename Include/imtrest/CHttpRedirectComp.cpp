@@ -13,7 +13,13 @@ namespace imtrest
 
 // reimplemented (IProtocolEngine)
 
-ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IRequest& request) const
+bool CHttpRedirectComp::IsCommandSupported(const QByteArray& /*commandId*/) const
+{
+	return true;
+}
+
+
+ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IRequest& request, const QByteArray& /*subCommandId*/) const
 {
 	QByteArray body;
 	body = R"(<head> <meta http-equiv="refresh" content="0; URL=)";
@@ -28,11 +34,6 @@ ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IRequest& request) cons
 							"text/html; charset=UTF-8"));
 
 	return retval;
-}
-
-QByteArray CHttpRedirectComp::GetSupportedCommandId() const
-{
-	return *m_commandIdAttrPtr;
 }
 
 

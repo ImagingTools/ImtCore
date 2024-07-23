@@ -52,7 +52,6 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (icomp::IRequestManager)
-	virtual const IRequest* GetRequest(const QByteArray& requestId) const override;
 	virtual const ISender* GetSender(const QByteArray& requestId) const override;
 
 protected:
