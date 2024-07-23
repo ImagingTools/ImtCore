@@ -303,81 +303,83 @@ Item{
         return -1;
     }
 
-    MouseArea{
-        id: movingRight;
+//    MouseArea{
+//        id: movingRight;
 
-        anchors.right:  parent.right;
+//        anchors.right:  parent.right;
 
-        width: 15;
-        height: parent.height;
+//        width: 15;
+//        height: parent.height;
 
-        visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex < headerDelegate.columnCount -1 && headerDelegate.visible;
-        enabled: visible;
+//        visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex < headerDelegate.columnCount -1 && headerDelegate.visible;
+//        enabled: visible;
 
-        hoverEnabled: true;
-        cursorShape: pressed ?  Qt.SplitHCursor : isWithinBorder ? Qt.SplitHCursor : Qt.ArrowCursor;
+//        hoverEnabled: true;
+//        cursorShape: pressed ?  Qt.SplitHCursor : isWithinBorder ? Qt.SplitHCursor : Qt.ArrowCursor;
 
-        property bool isWithinBorder: mouseX >= width - splitterWidth //&& mouseX <= width/2 + splitterWidth/2;
-        property int splitterWidth: 6;
-        property var coord: mapToItem(movingRight,0,0);
-        property bool  blocked: false;
+//        property bool isWithinBorder: mouseX >= width - splitterWidth //&& mouseX <= width/2 + splitterWidth/2;
+//        property int splitterWidth: 6;
+//        property var coord: mapToItem(movingRight,0,0);
+//        property bool  blocked: false;
 
-        onPressed: {
-            movingRight.coord = mapToItem(movingRight,mouse.x,mouse.y)
-        }
+//        onPressed: {
+//            movingRight.coord = mapToItem(movingRight,mouse.x,mouse.y)
+//        }
 
-        onPositionChanged: {
-            if(pressed){
-                var newCoords = mapToItem(movingRight,mouse.x,mouse.y);
-                var deltaX = Math.trunc(newCoords.x - movingRight.coord.x);
-                var width_ = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex);
+//        onPositionChanged: {
+//            if(pressed){
+//                console.log("movingRight onPositionChanged");
 
-                let nextIndex = headerDelegate.getNextHeaderIndex();
+//                var newCoords = mapToItem(movingRight,mouse.x,mouse.y);
+//                var deltaX = Math.trunc(newCoords.x - movingRight.coord.x);
+//                var width_ = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex);
 
-                var width_next = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", nextIndex);
-                var width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
-                var width_next_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", nextIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", nextIndex) : headerDelegate.tableItem.minCellWidth;
+//                let nextIndex = headerDelegate.getNextHeaderIndex();
 
-                width_ += deltaX;
-                width_next -= deltaX;
+//                var width_next = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", nextIndex);
+//                var width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
+//                var width_next_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", nextIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", nextIndex) : headerDelegate.tableItem.minCellWidth;
 
-                let currentPercent = (width_ / headerDelegate.tableItem.width) * 100;
-                let nextPercent = (width_next / headerDelegate.tableItem.width) * 100;
+//                width_ += deltaX;
+//                width_next -= deltaX;
 
-                if(width_ > width_min && width_next > width_next_min){
-                    headerDelegate.tableItem.widthDecorator.setData("Width", width_, headerDelegate.columnIndex);
-                    headerDelegate.tableItem.widthDecorator.setData("Width", width_next, nextIndex);
+//                let currentPercent = (width_ / headerDelegate.tableItem.width) * 100;
+//                let nextPercent = (width_next / headerDelegate.tableItem.width) * 100;
 
-                    if (headerDelegate.tableItem.width > 0){
-                        headerDelegate.tableItem.widthDecorator.setData("WidthPercent", currentPercent, headerDelegate.columnIndex);
-                        headerDelegate.tableItem.widthDecorator.setData("WidthPercent", nextPercent, nextIndex);
-                    }
+//                if(width_ > width_min && width_next > width_next_min){
+//                    headerDelegate.tableItem.widthDecorator.setData("Width", width_, headerDelegate.columnIndex);
+//                    headerDelegate.tableItem.widthDecorator.setData("Width", width_next, nextIndex);
 
-                    headerDelegate.tableItem.setWidth();
+//                    if (headerDelegate.tableItem.width > 0){
+//                        headerDelegate.tableItem.widthDecorator.setData("WidthPercent", currentPercent, headerDelegate.columnIndex);
+//                        headerDelegate.tableItem.widthDecorator.setData("WidthPercent", nextPercent, nextIndex);
+//                    }
 
-                    headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, currentPercent)
-                    let nextHeaderId = headerDelegate.tableItem.headers.getData("Id", nextIndex);
-                    headerDelegate.tableItem.tableViewParams.setHeaderSize(nextHeaderId, nextPercent)
-                }
-            }
+//                    headerDelegate.tableItem.setWidth();
 
-            blocked = true;
-            blockmovingRightPause.restart();
-        }
+//                    headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, currentPercent)
+//                    let nextHeaderId = headerDelegate.tableItem.headers.getData("Id", nextIndex);
+//                    headerDelegate.tableItem.tableViewParams.setHeaderSize(nextHeaderId, nextPercent)
+//                }
+//            }
 
-        onReleased: {
-            headerDelegate.tableItem.saveWidth();
-        }
+//            blocked = true;
+//            blockmovingRightPause.restart();
+//        }
 
-        onClicked: {
-            if(blocked){
-                mouse.accepted = true;
-            }
-            else {
-                mouse.accepted = false;
-            }
-        }
-    }
+//        onReleased: {
+//            headerDelegate.tableItem.saveWidth();
+//        }
+
+//        onClicked: {
+//            if(blocked){
+//                mouse.accepted = true;
+//            }
+//            else {
+//                mouse.accepted = false;
+//            }
+//        }
+//    }
 
     PauseAnimation {
         id: blockmovingRightPause;
@@ -423,8 +425,8 @@ Item{
                 var width_prev = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", prevIndex);
                 var width_prev_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", prevIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", prevIndex) : headerDelegate.tableItem.minCellWidth;
 
-                width_ -= deltaX;
-                width_prev += deltaX;
+                width_ = width_ - deltaX;
+                width_prev = width_prev + deltaX;
 
                 let currentPercent = (width_ / headerDelegate.tableItem.width) * 100;
                 let prevPercent = (width_prev / headerDelegate.tableItem.width) * 100;
