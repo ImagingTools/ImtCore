@@ -1,7 +1,3 @@
-/********************************************************************************
-**
-**	Copyright (C) 2017-2020 ImagingTools GmbH
-*/
 #include <imtgui/CObjectCollectionRevisionDialog.h>
 
 
