@@ -492,8 +492,9 @@ Rectangle{
     function comaCount(text){
         let length_ = text.length;
         let comaCount_ = 0;
-        let pos = text.indexOf(target, pos + 1);
         let target = ",";
+
+        let pos = text.indexOf(target, pos + 1);
         while (pos !== -1) {
             pos = text.indexOf(target, pos + 1)
             comaCount_++;

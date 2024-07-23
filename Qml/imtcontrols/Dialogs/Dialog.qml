@@ -156,7 +156,7 @@ ControlBase {
         onFinished: {
             if(dialogContainer.root){
                 dialogContainer.closed()
-                root.closeDialog();
+                dialogContainer.root.closeDialog();
             }
         }
     }

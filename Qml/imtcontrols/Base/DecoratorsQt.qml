@@ -573,7 +573,7 @@ Item {
             }
             onButtonsModelCountChanged: {
                 //dialogContainer.buttonIds = dialogContainer.baseElement.buttonIds;
-                //setDecoratorSize(dialogContainer.content_)
+                //dialogContainer.setDecoratorSize(dialogContainer.content_)
                 buttonIdsPause.restart();
             }
 
@@ -587,7 +587,7 @@ Item {
 
                 //buttonIdsPause.restart();
                 //dialogContainer.buttonIds = dialogContainer.baseElement.buttonIds;
-                setDecoratorSize(content_)
+                dialogContainer.setDecoratorSize(content_)
 
 
             }
@@ -620,7 +620,7 @@ Item {
                 duration: 20;
                 onFinished: {
                     dialogContainer.buttonIds = dialogContainer.baseElement.buttonIds;
-                    setDecoratorSize(dialogContainer.content_)
+                    dialogContainer.setDecoratorSize(dialogContainer.content_)
 
                 }
             }
@@ -649,7 +649,7 @@ Item {
             property var targetItem: !baseElement ? null : baseElement.targetItem;
 
             onPositionChanged: {
-                if((pressed || hovered) && baseElement){
+                if((scrollBarItem.pressed || scrollBarItem.hovered) && baseElement){
                     baseElement.setContentPositionFunc(position);
                 }
             }

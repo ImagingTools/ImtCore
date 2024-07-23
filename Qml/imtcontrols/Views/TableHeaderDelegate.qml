@@ -381,15 +381,15 @@ Item{
 //        }
 //    }
 
-    PauseAnimation {
-        id: blockmovingRightPause;
+    // PauseAnimation {
+    //     id: blockmovingRightPause;
 
-        duration: 200
+    //     duration: 200
 
-        onFinished: {
-            movingRight.blocked = false;
-        }
-    }
+    //     onFinished: {
+    //         movingRight.blocked = false;
+    //     }
+    // }
 
     MouseArea{
         id: movingLeft;
