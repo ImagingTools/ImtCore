@@ -5,8 +5,8 @@ namespace imtmdbx
 {
 
 
-CMask::CMask(const QString &name, mdbx::txn_managed &txn, mdbx::key_mode keyMode, mdbx::value_mode valueMode):
-	CDocumentTable(name, txn, keyMode, valueMode)
+CMask::CMask(const QString &name, mdbx::txn_managed &txn, mdbx::key_mode keyMode, mdbx::value_mode valueMode, bool hasIndex):
+	CDocumentTable(name, txn, keyMode, valueMode, hasIndex)
 {
 
 }

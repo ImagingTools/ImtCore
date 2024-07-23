@@ -12,7 +12,7 @@ namespace imtmdbx
 class CMask: virtual public IMask, public CDocumentTable
 {
 public:
-	CMask(const QString& name, mdbx::txn_managed& txn, mdbx::key_mode keyMode = mdbx::key_mode::ordinal, mdbx::value_mode valueMode = mdbx::value_mode::single);
+	CMask(const QString& name, mdbx::txn_managed& txn, mdbx::key_mode keyMode = mdbx::key_mode::ordinal, mdbx::value_mode valueMode = mdbx::value_mode::single, bool hasIndex = false);
 
 	virtual bool GetUnit(qint64 position) override;
 	virtual bool SetUnit(qint64 position, bool unit) override;
