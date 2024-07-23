@@ -47,7 +47,6 @@ QtObject {
 
                 if (container.getModelQuery.containsKey("errors")){
                     dataModelLocal = container.getModelQuery.getData("errors");
-
                     return;
                 }
 

@@ -23,14 +23,13 @@ CollectionView {
         }
     }
 
+    onHeadersChanged: {
+        tableViewParamController.getModel();
+    }
+
     TableViewParamController {
         id: tableViewParamController;
         tableId: root.collectionId;
-
-        onTableIdChanged: {
-            tableViewParamController.getModel();
-        }
-
         onUpdated: {
             root.table.tableViewParams = tableViewParamController.tableViewParams;
             root.table.updateWidthFromViewParams();

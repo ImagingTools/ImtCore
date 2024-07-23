@@ -82,6 +82,8 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 		pageViewParamCollectionPtr = dynamic_cast<imtbase::IObjectCollection*>(parameterPtr);
 	}
 
+	Q_ASSERT(pageViewParamCollectionPtr != nullptr);
+
 	iprm::IParamsSet* paramSetPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr paramSetDataPtr;
 	if (pageViewParamCollectionPtr->GetObjectData(tableId, paramSetDataPtr)){
