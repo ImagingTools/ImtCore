@@ -82,11 +82,6 @@ QByteArray CHttpFileProviderBasedServletComp::GetMimeType(QByteArray fileSuffix)
 
 // reimplemented (IRequestHandler)
 
-bool CHttpFileProviderBasedServletComp::IsCommandSupported(const QByteArray& commandId) const
-{
-	return (commandId == *m_commandIdAttrPtr);
-}
-
 
 ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 			const QByteArray& /*commandId*/,

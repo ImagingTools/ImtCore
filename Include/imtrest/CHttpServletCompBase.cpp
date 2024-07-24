@@ -32,7 +32,40 @@ ConstResponsePtr CHttpServletCompBase::ProcessRequest(const imtrest::IRequest& r
 
 bool CHttpServletCompBase::IsCommandSupported(const QByteArray& commandId) const
 {
-	return (commandId  == *m_commandIdAttrPtr);
+	QByteArray clearCommandId = commandId;
+	if (clearCommandId.startsWith('/')){
+		clearCommandId = clearCommandId.remove(0, 1);
+	}
+
+	if (clearCommandId.endsWith('/')){
+		clearCommandId = clearCommandId.remove(clearCommandId.length() - 1, 1);
+	}
+
+	QByteArrayList inputCommandList = clearCommandId.split('/');
+	QByteArray localCommandId = *m_commandIdAttrPtr;
+	QByteArrayList localCommandList = localCommandId.split('/');
+
+	bool retVal = true;
+
+	for (int i = 0; i < localCommandList.count(); i++){
+		if (localCommandList[i] == "*"){
+			break;
+		}
+
+		if (i >= inputCommandList.count() || inputCommandList[i] != localCommandList[i]){
+			retVal = false;
+
+			break;
+		}
+
+		if (i == localCommandList.count() - 1 && localCommandList.count() < inputCommandList.count()){
+			retVal = false;
+
+			break;
+		}
+	}
+
+	return retVal;
 }
 
 

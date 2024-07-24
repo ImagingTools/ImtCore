@@ -32,7 +32,6 @@ public:
 	QByteArray GetMimeType(QByteArray fileSuffix) const;
 
 	// reimplemented (IRequestHandler)
-	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual ConstResponsePtr OnGet(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
