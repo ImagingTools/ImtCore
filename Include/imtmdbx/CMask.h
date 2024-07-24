@@ -17,7 +17,7 @@ public:
 	virtual bool GetUnit(qint64 position) override;
 	virtual bool SetUnit(qint64 position, bool unit) override;
 
-	virtual quint64 GetItem(qint64 offset) override;
+	virtual bool GetItem(qint64 offset, quint64& item) override;
 	virtual bool SetItem(qint64 offset, quint64 item) override;
 	virtual qint64 GetNextItemOffset(qint64 startOffset = -1) override;
 	virtual qint64 GetPreviosItemOffset(qint64 startOffset = 0xffffffff) override;

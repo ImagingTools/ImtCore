@@ -18,9 +18,13 @@ bool CMask::GetUnit(qint64 position)
 		qint64 offset = position / 64;
 		qint64 bitPosition = position % 64;
 
-		quint64 item = GetItem(offset);
+		quint64 item;
 
-		return (item >> bitPosition) & (unsigned long)1;
+		if (!GetItem(offset, item)){
+			item = 0;
+		}
+
+		return (item >> bitPosition) & (quint64)1;
 	}
 	catch(...){
 		return false;
@@ -35,13 +39,14 @@ bool CMask::SetUnit(qint64 position, bool unit)
 		qint64 offset = position / 64;
 		qint64 bitPosition = position % 64;
 
-		quint64 item = GetItem(offset);
-		if (item < 0){
+		quint64 item;
+
+		if (!GetItem(offset, item)){
 			item = 0;
 		}
 
-		item = item | ((unsigned long)1 << bitPosition);
-		//item = (item & ~((unsigned long)1 << bitPosition)) | ((unsigned long)unit << bitPosition);
+		item = item | ((quint64)1 << bitPosition);
+		//item = (item & ~((quint64)1 << bitPosition)) | ((quint64)unit << bitPosition);
 
 		SetItem(offset, item);
 
@@ -54,7 +59,7 @@ bool CMask::SetUnit(qint64 position, bool unit)
 }
 
 
-quint64 CMask::GetItem(qint64 offset)
+bool CMask::GetItem(qint64 offset, quint64& item)
 {
 	//qDebug() << "CMask::GetItem";
 
@@ -62,13 +67,15 @@ quint64 CMask::GetItem(qint64 offset)
 		mdbx::slice keySlice(&offset, 8);
 
 		mdbx::cursor::move_result result = m_cursor.find(keySlice);
-		quint64 value = result.value.as_int64();
+		item = result.value.as_int64();
 
-		return value;
+		return true;
 	}
 	catch(...){
-		return -1;
+		//item = 0;
 	}
+
+	return false;
 }
 
 

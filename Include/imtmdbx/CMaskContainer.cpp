@@ -84,12 +84,20 @@ qint64 CMaskContainer::GetUnitCount()
 		}
 		activeOffset = maxOffset;
 		for(int i = 0; i < m_maskList.length(); i++){
-			quint64 item = m_maskList.at(i)->GetItem(activeOffset);
+			quint64 item;
+			if (!m_maskList.at(i)->GetItem(activeOffset, item)){
+				item = 0;
+			}
 
 			activeItem = activeItem & item;
 		}
 		for(int i = 0; i < m_maskListInv.length(); i++){
-			quint64 item = m_maskListInv.at(i)->GetItem(activeOffset);
+
+			quint64 item;
+			if (!m_maskListInv.at(i)->GetItem(activeOffset, item)){
+				item = 0;
+			}
+
 			activeItem = activeItem & ~item;//Inversion
 		}
 
@@ -130,11 +138,18 @@ QList<quint64> CMaskContainer::GetUnitPositions(qint64 offset, int limit)
 		}
 		activeOffset = maxOffset;
 		for(int i = 0; i < m_maskList.length(); i++){
-			quint64 item = m_maskList.at(i)->GetItem(activeOffset);
+
+			quint64 item;
+			if (!m_maskList.at(i)->GetItem(activeOffset, item)){
+				item = 0;
+			}
 			activeItem = activeItem & item;
 		}
 		for(int i = 0; i < m_maskListInv.length(); i++){
-			quint64 item = m_maskListInv.at(i)->GetItem(activeOffset);
+			quint64 item;
+			if (!m_maskListInv.at(i)->GetItem(activeOffset, item)){
+				item = 0;
+			}
 			activeItem = activeItem & ~item;//Inversion
 		}
 
