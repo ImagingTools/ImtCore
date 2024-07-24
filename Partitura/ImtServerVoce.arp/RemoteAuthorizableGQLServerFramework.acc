@@ -41,7 +41,7 @@
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FileAccessCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Acula/files*"/>
+                        <Data IsEnabled="true" Value="Acula/files/*"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlContextController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GqlContextController"/>
@@ -55,10 +55,10 @@
                     <AttributeInfo Id="HttpCommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Acula/Views*</Value>
+                                <Value>Acula/Views/*</Value>
                                 <Value></Value>
                                 <Value>Acula/graphql</Value>
-                                <Value>Acula/files*</Value>
+                                <Value>Acula/files/*</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -72,7 +72,7 @@
                         <Data IsEnabled="true" Value="Acula/Views/html/index.html?item=Pages/StartPage.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Acula/Views*"/>
+                        <Data IsEnabled="true" Value="Acula/Views/*"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

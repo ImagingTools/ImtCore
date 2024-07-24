@@ -137,7 +137,7 @@ StyleComponents {
     property string errorTextColor: "#FF4500";
     property string shadowColor: "#ececec";
 
-    property string buttonColor: "#dddddd#dedede";
+    property string buttonColor: "#dddddd";
     property string buttonBorderColor: "#b0b0b0";
     property string buttonHoverColor: "#d2d2d2";
     property string buttonPressedColor: "#c6c6c6";

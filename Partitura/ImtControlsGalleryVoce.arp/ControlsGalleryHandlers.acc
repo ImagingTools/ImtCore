@@ -29,7 +29,7 @@
                         <Data IsEnabled="true" Value="60"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FileAccessCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="ControlsGallery/Views*"/>
+                        <Data IsEnabled="true" Value="ControlsGallery/Views/*"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlRequestHandler" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -44,10 +44,10 @@
                     <AttributeInfo Id="HttpCommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ControlsGallery/Views*</Value>
+                                <Value>ControlsGallery/Views/*</Value>
                                 <Value></Value>
                                 <Value>ControlsGallery/graphql</Value>
-                                <Value>ControlsGallery/files*</Value>
+                                <Value>ControlsGallery/files/*</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -61,7 +61,7 @@
                         <Data IsEnabled="true" Value="ControlsGallery/Views/html/index.html?item=Pages/StartPage.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="ControlsGallery/Views*"/>
+                        <Data IsEnabled="true" Value="ControlsGallery/Views/*"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

@@ -200,7 +200,7 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="FileAccessCommandId">
-                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/files*"/>
+                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/files/*"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
@@ -235,7 +235,7 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="WebCommandId">
-                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/Views*"/>
+                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/Views/*"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>

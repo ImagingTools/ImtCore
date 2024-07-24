@@ -35,7 +35,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FileAccessCommandId" Type="Id" ExportId="FileAccessCommandId">
-                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/files*"/>
+                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/files/*"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlContextController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GqlContextController"/>
@@ -62,7 +62,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebCommandId" Type="Id" ExportId="WebCommandId">
-                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/Views*"/>
+                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/Views/*"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
