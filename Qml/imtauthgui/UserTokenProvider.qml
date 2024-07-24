@@ -46,14 +46,10 @@ QtObject {
 
             var gqlData = query.GetQuery();
 
-            console.log("UserToken", gqlData);
-
             this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
-            console.log("User Token State:", this.state, container.authorizationGqlModel.toJson());
-
             if (this.state === "Ready"){
                 var dataModelLocal;
 

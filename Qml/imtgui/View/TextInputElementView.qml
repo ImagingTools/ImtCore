@@ -23,15 +23,9 @@ ElementView {
     signal editingFinished();
 
     onTextInputValidatorChanged: {
-        console.log("onTextInputValidatorChanged", textInputValidator);
-
         if (textInputValidator && controlItem){
             controlItem.textInputValidator = textInputValidator;
         }
-    }
-
-    onEditingFinished: {
-        console.log("onEditingFinished", text);
     }
 
     onMaximumLengthChanged: {

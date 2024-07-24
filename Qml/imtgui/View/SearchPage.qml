@@ -35,6 +35,7 @@ ViewBase {
     }
 
     Component.onCompleted: {
+        checkWidth();
         Events.subscribeEvent("GlobalSearchActivated", root.update)
     }
 
@@ -62,6 +63,21 @@ ViewBase {
             if (root.model.containsKey("Items", tabPanel.selectedIndex)){
                 table.elements = root.model.getData("Items", tabPanel.selectedIndex);
             }
+        }
+    }
+
+    onWidthChanged: {
+        checkWidth();
+    }
+
+    property int contentWidth: 700;
+
+    function checkWidth(){
+        if (width - 2 * Style.size_mainMargin <= root.contentWidth){
+            table.width = width - 2 * Style.size_mainMargin;
+        }
+        else{
+            table.width = root.contentWidth;
         }
     }
 
@@ -145,7 +161,7 @@ ViewBase {
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: Style.size_mainMargin;
         anchors.horizontalCenter: parent.horizontalCenter;
-        width: 700;
+        width: root.contentWidth;
         visible: tabPanel.visible;
         showHeaders: false;
         backgroundElementsColor: Style.backgroundColor2;
@@ -221,7 +237,6 @@ ViewBase {
 
         onStateChanged: {
             if (this.state === "Ready"){
-                console.log("Search", this.toJson());
                 let resultModel;
                 if (this.containsKey("data")){
                     resultModel = this.getData("data")

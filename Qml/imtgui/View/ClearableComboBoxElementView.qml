@@ -15,8 +15,6 @@ ComboBoxElementView {
             height: root.controlHeight;
 
             onFocusChanged: {
-                console.log("ClearableComboBoxElementView.qml onFocusChanged",focus);
-
                 if (focus){
                     cb.forceActiveFocus();
                 }
@@ -33,10 +31,6 @@ ComboBoxElementView {
 
                 Component.onCompleted: {
                     root.setupComboBox(cb);
-                }
-
-                onFocusChanged: {
-                    console.log("ComboBox onFocusChanged",focus);
                 }
             }
 

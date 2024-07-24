@@ -105,10 +105,7 @@ Rectangle{
             scrollContainer.targetItem.contentX =
             position_ * scrollContainer.width / scrollContainer.koeff + scrollContainer.targetItem.originX;
         }
-
     }
-    /*for Qt Style decoration*/
-
 
     Component.onCompleted: {
         scrollContainer.opacity = !scrollContainer.canFade;
@@ -153,7 +150,6 @@ Rectangle{
                 visible = targetItem.contentWidth > scrollContainer.width;
             }
         }
-
     }
 
     PauseAnimation {
@@ -167,7 +163,6 @@ Rectangle{
             scrollContainer.isMoving = true;
         }
     }
-
 
     NumberAnimation {
         id: animTo;
@@ -209,21 +204,16 @@ Rectangle{
         onFinished: {
             scrollContainer.contentXSignal(scrollContainer.targetItem.contentX);
         }
-
     }
 
     MouseArea{
         id:scrollContainerMA;
-
         anchors.fill: parent;
-
-        //        visible: scrollContainer.visible && !scrollContainer.notUsed;
         visible: scrollContainer.visible;
         enabled: visible;
         hoverEnabled: enabled;
         property int delta: 40;
-        preventStealing: true;
-        //cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+
         onClicked: {
             if (scrollContainer.koeff == 0){
                 return
@@ -235,16 +225,12 @@ Rectangle{
                             (newCoords.y - scrollIndicator.height) / scrollContainer.koeff + scrollContainer.targetItem.originY : newCoords.y / scrollContainer.koeff + scrollContainer.targetItem.originY;
 
                 scrollContainer.contentYSignal(scrollContainer.targetItem.contentY);
-
             }
-
             else{//horiz
                 scrollContainer.targetItem.contentX = (newCoords.x >= scrollIndicator.x + scrollIndicator.width) ?
                             (newCoords.x - scrollIndicator.width) / scrollContainer.koeff + scrollContainer.targetItem.originX : newCoords.x / scrollContainer.koeff + scrollContainer.targetItem.originX;
 
-
                 scrollContainer.contentXSignal(scrollContainer.targetItem.contentX);
-
             }
 
             scrollMA.coord = newCoords;
@@ -253,31 +239,25 @@ Rectangle{
         onPressed: {
             scrollContainer.color = scrollContainer.highlightColor;
         }
+
         onReleased: {
             scrollContainer.color = scrollContainer.backgroundColor;
         }
 
         onWheel: {
-
             if(scrollContainer.inSideTarget){
                 wheel.accepted = false;
             }
             else {
-
                 if(scrollContainer.vertical){
-
                     if(scrollContainer.targetItem.contentHeight > scrollContainer.targetItem.height){
-
                         if(wheel.angleDelta.y > 0){//up
                             if((scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY - scrollContainerMA.delta)>=0){
-                                //scrollContainer.targetItem.contentY -= scrollContainerMA.delta;
                                 animWheelY.from = scrollContainer.targetItem.contentY;
                                 animWheelY.to = scrollContainer.targetItem.contentY - scrollContainerMA.delta;
                                 animWheelY.start();
-
                             }
                             else {
-                                //scrollContainer.targetItem.contentY = scrollContainer.targetItem.originY;
                                 animWheelY.from = scrollContainer.targetItem.contentY;
                                 animWheelY.to = scrollContainer.targetItem.originY;
                                 animWheelY.start();
@@ -285,7 +265,6 @@ Rectangle{
                         }
                         else {//down
                             if((scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + scrollContainerMA.delta)< (scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)){
-                                //scrollContainer.targetItem.contentY += scrollContainerMA.delta;
                                 animWheelY.from = scrollContainer.targetItem.contentY;
                                 animWheelY.to = scrollContainer.targetItem.contentY + scrollContainerMA.delta;
                                 animWheelY.start();
@@ -295,27 +274,19 @@ Rectangle{
                                 animWheelY.from = scrollContainer.targetItem.contentY;
                                 animWheelY.to = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height + scrollContainer.targetItem.originY;
                                 animWheelY.start();
-
                             }
                         }
                     }
-
                 }//vertical
-
                 else{//horiz
-
                     if(scrollContainer.targetItem.contentWidth > scrollContainer.targetItem.width){
-
                         if(wheel.angleDelta.y > 0){//left
                             if((scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX - scrollContainerMA.delta) >= 0){
-                                //scrollContainer.targetItem.contentX -= scrollContainerMA.delta;
                                 animWheelX.from = scrollContainer.targetItem.contentX;
                                 animWheelX.to = scrollContainer.targetItem.contentX - scrollContainerMA.delta;
                                 animWheelX.start();
-
                             }
                             else{
-                                //scrollContainer.targetItem.contentX = scrollContainer.targetItem.originX;
                                 animWheelX.from = scrollContainer.targetItem.contentX;
                                 animWheelX.to = scrollContainer.targetItem.originX;
                                 animWheelX.start();
@@ -323,21 +294,17 @@ Rectangle{
                         }
                         else {//right
                             if((scrollContainer.targetItem.contentX  - scrollContainer.targetItem.originX + scrollContainerMA.delta)< (scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)){
-                                //scrollContainer.targetItem.contentX += scrollContainerMA.delta;
                                 animWheelX.from = scrollContainer.targetItem.contentX;
                                 animWheelX.to = scrollContainer.targetItem.contentX + scrollContainerMA.delta;
                                 animWheelX.start();
                             }
                             else{
-                                //scrollContainer.targetItem.contentX = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width  + scrollContainer.targetItem.originY;
                                 animWheelX.from = scrollContainer.targetItem.contentX;
                                 animWheelX.to = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width  + scrollContainer.targetItem.originY;
                                 animWheelX.start();
-
                             }
                         }
                     }
-
                 }//horizontal
 
                 wheel.accepted = true;
@@ -382,7 +349,6 @@ Rectangle{
             if(x !== 0 && !scrollContainer.vertical && scrollContainer.canFade){
                 fadePause.stop();
                 fadePause.start();
-
             }
             scrollContainer.movingSignal();
         }
@@ -394,28 +360,20 @@ Rectangle{
             if(y !== 0 && scrollContainer.vertical && scrollContainer.canFade){
                 fadePause.stop();
                 fadePause.start();
-
             }
             scrollContainer.movingSignal();
         }
-
 
         MouseArea{
             id:scrollMA;
 
             anchors.fill: parent;
-
-            //            visible: parent.visible && !scrollContainer.notUsed;
             visible: scrollContainer.visible;
             enabled: visible;
             hoverEnabled: enabled;
-            preventStealing: true;
 
             property bool dragEnabled: false;
 
-            onDragEnabledChanged: {
-                //console.log("onDragEnabledChanged", dragEnabled)
-            }
             onVisibleChanged: {
                 if(!visible){
                     dragEnabled = false;
@@ -423,28 +381,21 @@ Rectangle{
             }
 
             property var coord: mapToItem(scrollContainer,0,0);
-            //cursorShape: containsMouse ? Qt.PointingHandCursor: Qt.ArrowCursor;
+            onClicked: {}
             onWheel: {
-
                 if(scrollContainer.inSideTarget){
                     wheel.accepted = false;
                 }
                 else {
-
                     if(scrollContainer.vertical){
-
                         if(scrollContainer.targetItem.contentHeight > scrollContainer.targetItem.height){
-
                             if(wheel.angleDelta.y > 0){//up
                                 if((scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY - scrollContainerMA.delta)>=0){
-                                    //scrollContainer.targetItem.contentY -= scrollContainerMA.delta;
                                     animWheelY.from = scrollContainer.targetItem.contentY;
                                     animWheelY.to = scrollContainer.targetItem.contentY - scrollContainerMA.delta;
                                     animWheelY.start();
-
                                 }
                                 else {
-                                    //scrollContainer.targetItem.contentY = scrollContainer.targetItem.originY;
                                     animWheelY.from = scrollContainer.targetItem.contentY;
                                     animWheelY.to = scrollContainer.targetItem.originY;
                                     animWheelY.start();
@@ -452,37 +403,27 @@ Rectangle{
                             }
                             else {//down
                                 if((scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + scrollContainerMA.delta)< (scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)){
-                                    //scrollContainer.targetItem.contentY += scrollContainerMA.delta;
                                     animWheelY.from = scrollContainer.targetItem.contentY;
                                     animWheelY.to = scrollContainer.targetItem.contentY + scrollContainerMA.delta;
                                     animWheelY.start();
                                 }
                                 else{
-                                    //scrollContainer.targetItem.contentY = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height + scrollContainer.targetItem.originY;
                                     animWheelY.from = scrollContainer.targetItem.contentY;
                                     animWheelY.to = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height + scrollContainer.targetItem.originY;
                                     animWheelY.start();
-
                                 }
                             }
                         }
-
                     }//vertical
-
                     else{//horiz
-
                         if(scrollContainer.targetItem.contentWidth > scrollContainer.targetItem.width){
-
                             if(wheel.angleDelta.y > 0){//left
                                 if((scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX - scrollContainerMA.delta) >= 0){
-                                    //scrollContainer.targetItem.contentX -= scrollContainerMA.delta;
                                     animWheelX.from = scrollContainer.targetItem.contentX;
                                     animWheelX.to = scrollContainer.targetItem.contentX - scrollContainerMA.delta;
                                     animWheelX.start();
-
                                 }
                                 else{
-                                    //scrollContainer.targetItem.contentX = scrollContainer.targetItem.originX;
                                     animWheelX.from = scrollContainer.targetItem.contentX;
                                     animWheelX.to = scrollContainer.targetItem.originX;
                                     animWheelX.start();
@@ -490,21 +431,17 @@ Rectangle{
                             }
                             else {//right
                                 if((scrollContainer.targetItem.contentX  - scrollContainer.targetItem.originX + scrollContainerMA.delta)< (scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)){
-                                    //scrollContainer.targetItem.contentX += scrollContainerMA.delta;
                                     animWheelX.from = scrollContainer.targetItem.contentX;
                                     animWheelX.to = scrollContainer.targetItem.contentX + scrollContainerMA.delta;
                                     animWheelX.start();
                                 }
                                 else{
-                                    //scrollContainer.targetItem.contentX = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width  + scrollContainer.targetItem.originY;
                                     animWheelX.from = scrollContainer.targetItem.contentX;
                                     animWheelX.to = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width  + scrollContainer.targetItem.originY;
                                     animWheelX.start();
-
                                 }
                             }
                         }
-
                     }//horizontal
 
                     wheel.accepted = true;
@@ -519,15 +456,10 @@ Rectangle{
             onReleased: {
                 scrollMA.dragEnabled = false;
             }
-            onExited: {
-                //                scrollMA.dragEnabled = false;
-            }
+            onExited: {}
             onPositionChanged: {
-                //console.log("onPositionChanged", scrollMA.dragEnabled);
-                if(scrollMA.dragEnabled)
-                {
+                if(scrollMA.dragEnabled){
                     var newCoords = mapToItem(scrollContainer, mouse.x, mouse.y);
-
                     if(scrollContainer.vertical){
                         var deltaY = newCoords.y - scrollMA.coord.y;
                         if(scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + deltaY/scrollContainer.koeff <= 0){
@@ -545,14 +477,12 @@ Rectangle{
                             else {
                                 scrollContainer.targetItem.contentY += deltaY/scrollContainer.koeff;
                             }
-
                         }
                         else {
                             scrollContainer.targetItem.contentY += deltaY/scrollContainer.koeff;
                         }
                         scrollContainer.contentYSignal(scrollContainer.targetItem.contentY);
                     }
-
                     else{//horiz
                         var deltaX = newCoords.x - scrollMA.coord.x;
                         if(scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX + deltaX/scrollContainer.koeff <= 0){
@@ -575,7 +505,6 @@ Rectangle{
                             scrollContainer.targetItem.contentX += deltaX/scrollContainer.koeff;
                         }
                         scrollContainer.contentXSignal(scrollContainer.targetItem.contentX);
-
                     }
 
                     scrollMA.coord = newCoords;

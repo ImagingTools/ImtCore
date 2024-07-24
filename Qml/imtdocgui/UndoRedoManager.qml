@@ -109,7 +109,7 @@ Item {
                 internal.m_observedModel.refresh();
             }
             else{
-                console.log("Unable to copy observer model from current state model");
+                console.warn("Unable to copy observer model from current state model");
             }
 
             for (let i = 0; i < steps; ++i){
@@ -225,7 +225,6 @@ Item {
 
     function commandHandle(commandId)
     {
-        console.log("UndoRedoManager commandHandle", commandId);
         if (commandId === "Undo"){
             doUndo()
         }

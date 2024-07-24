@@ -29,7 +29,6 @@ Item {
         id: metaInfo;
 
         function getMetaInfo(objectId){
-            console.log( "CollectionView metaInfo getMetaInfo");
             var query = Gql.GqlRequest("query", container.getMetaInfoGqlCommand);
 
             var inputParams = Gql.GqlObject("input");
@@ -80,8 +79,6 @@ Item {
 
                     if (dataModelLocal.containsKey(container.getMetaInfoGqlCommand)){
                         dataModelLocal = dataModelLocal.getData(container.getMetaInfoGqlCommand);
-                        console.log( "dataModelLocal", dataModelLocal.toJson());
-
                         container.metaInfoModel = dataModelLocal;
                     }
                 }

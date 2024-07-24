@@ -46,7 +46,6 @@ ViewCommandsDelegateBase {
         id: commandsControllerConn;
 
         function onCommandsModelChanged(){
-            console.log("collectionViewCommandsDelegate onCommandsModelChanged");
             collectionViewCommandsDelegate.setupContextMenu();
         }
     }

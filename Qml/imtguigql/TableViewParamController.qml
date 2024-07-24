@@ -42,7 +42,6 @@ QtObject {
 
         onStateChanged: {
             if (this.state === "Ready") {
-                console.log("GetTableViewParams", this.toJson());
                 var dataModelLocal;
 
                 if (container.getModelQuery.containsKey("errors")){

@@ -176,14 +176,10 @@ Item {
                 comboBoxContainerGql.currentText = popup.filterText;
             }
             onFinished: {
-                //console.log("__________FINISHED______________")
-                console.log(index)
-                console.log(commandId)
                 if (index > -1){
                     for (var item = 0; item < comboBoxContainerGql.gettedParams.getItemsCount(); item++){
                         let param = comboBoxContainerGql.gettedParams.getData("Name",  item);
                         let value = popup.model.getData(param, index);
-                        console.log(param, " = ", value);
                         comboBoxContainerGql.gettedParams.setData("Value", value, item);
                     }
                 }
@@ -305,7 +301,6 @@ Item {
 
             onClicked: {
                 if(!comboBoxContainerGql.readOnly){
-                    console.log("ComboBox clicked !");
                     comboBoxContainerGql.openPopupMenu();
                     comboBoxContainerGql.clicked();
                 }

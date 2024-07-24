@@ -9,7 +9,6 @@ QtObject {
     property TreeItemModel schemesModel: TreeItemModel {}
 
     onSettingsProviderChanged: {
-        console.log("DesignProvider onSettingsProviderChanged", settingsProvider);
         if (container.settingsProvider != null){
             container.settingsProvider.localModelChanged.connect(container.modelUpdated);
             container.settingsProvider.serverModelChanged.connect(container.modelUpdated);
@@ -52,7 +51,6 @@ QtObject {
     }
 
     function applyDesignSchema(design){
-        console.log("applyDesignSchema");
         if (design == undefined){
             design = getDesignSchema();
         }

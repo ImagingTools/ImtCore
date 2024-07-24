@@ -110,7 +110,6 @@ DocumentDataController {
         }
 
         onStateChanged: {
-            console.log("onResult", container.gqlUpdateModel.state);
             let state = container.gqlUpdateModel.state;
             if (state === "Error"){
                 container.error("Network error", "Critical");
@@ -246,8 +245,6 @@ DocumentDataController {
         }
 
         onStateChanged: {
-            console.log("onResult", state);
-
             if (state === "Error"){
                 container.error("Network error", "Critical");
             }

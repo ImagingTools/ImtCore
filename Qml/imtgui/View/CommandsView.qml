@@ -69,8 +69,6 @@ Item {
     }
 
     function addCommandGroup(commands){
-        console.log("commandsItem addCommandGroup", commands.toJson());
-
         let index = commandsModel.insertNewItem();
         commandsModel.copyItemDataFromModel(index, commands);
         repeater.model = commandsItem.commandsModel;

@@ -12,7 +12,6 @@ QtObject {
     signal failed();
 
     function updateModel(){
-        console.log("LicensesProvider updateModel");
         provider.licensesModel.updateModel();
     }
 
@@ -35,7 +34,6 @@ QtObject {
 
     property GqlModel licensesModel: GqlModel {
         function updateModel() {
-            console.log("LicensesProvider updateModel Licenses");
             var query = Gql.GqlRequest("query", "Licenses");
 
             var queryFields = Gql.GqlObject("LicensesItems");

@@ -46,9 +46,7 @@ CommandsController {
 
         onStateChanged: {
             if (this.state === "Ready"){
-                console.log("Commands", this.toJson());
                 var dataModelLocal;
-
                 if (this.containsKey("errors")){
                     return;
                 }

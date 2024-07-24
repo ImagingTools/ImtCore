@@ -20,6 +20,7 @@ DocumentDataController {
     }
 
     onError: {
+        Events.sendEvent("StopLoading");
         ModalDialogManager.showWarningDialog(message)
     }
 
@@ -91,8 +92,6 @@ DocumentDataController {
 
     property GqlRequest gqlUpdateModel: GqlRequest {
         function save(){
-            console.log("gqlUpdateModel save", container.documentId);
-
             var query = Gql.GqlRequest("mutation", container.gqlUpdateCommandId);
 
             var inputParams = Gql.GqlObject("input");
@@ -124,10 +123,30 @@ DocumentDataController {
                 container.error("Network error", "Critical");
             }
             if (state === "Ready"){
-                console.log("gqlUpdateModel Ready", this.json);
                 let responseObj = JSON.parse(this.json)
                 if (!responseObj){
                     console.error("Unable convert json ", json, " to object")
+                    return;
+                }
+
+                if ("errors" in responseObj){
+                    let errorsObject = responseObj["errors"];
+                    if (container.gqlUpdateCommandId in errorsObject){
+                        errorsObject = errorsObject[container.gqlUpdateCommandId]
+                    }
+
+                    let message = ""
+                    if ("message" in errorsObject){
+                        message = errorsObject["message"];
+                    }
+
+                    let type;
+                    if ("type" in type){
+                        type = errorsObject["type"];
+                    }
+
+                    container.error(message, type);
+
                     return;
                 }
 
@@ -187,8 +206,6 @@ DocumentDataController {
         }
 
         onStateChanged: {
-            console.log("gqlGetModel onStateChanged", container.gqlGetModel.state)
-
             let state = container.gqlGetModel.state;
             if (state === "Error"){
                 container.error("Network error", "Critical");
@@ -197,6 +214,27 @@ DocumentDataController {
                 let responseObj = JSON.parse(this.json)
                 if (!responseObj){
                     console.error("Unable convert json ", json, " to object")
+                    return;
+                }
+
+                if ("errors" in responseObj){
+                    let errorsObject = responseObj["errors"];
+                    if (container.gqlGetCommandId in errorsObject){
+                        errorsObject = errorsObject[container.gqlGetCommandId]
+                    }
+
+                    let message = ""
+                    if ("message" in errorsObject){
+                        message = errorsObject["message"];
+                    }
+
+                    let type;
+                    if ("type" in type){
+                        type = errorsObject["type"];
+                    }
+
+                    container.error(message, type);
+
                     return;
                 }
 

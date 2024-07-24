@@ -11,13 +11,9 @@ TreeItemModelObserver {
     property SettingsProvider settingsProvider: null;
 
     onModelChanged: {
-        console.log("SettingsObserver onModelChanged");
-
         for (let i = 0; i < changeList.length; i++){
             let changeObj = changeList[i]
             let changeId = changeObj["id"];
-
-            console.log("changeId", changeId)
 
             let ids = changeId.split('/')
             if (ids.includes("Language")){

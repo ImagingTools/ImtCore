@@ -203,8 +203,6 @@ Item {
     }
 
     function updateSubscription(){
-        console.log("updateSubscription", container.subscriptionCommandId);
-
         if (container.subscriptionCommandId === ""){
             console.error("Unable to update subscription, command-ID is empty!");
             return;

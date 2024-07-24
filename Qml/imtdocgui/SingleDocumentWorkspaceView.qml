@@ -91,7 +91,7 @@ DocumentManager {
 
         var startItemComp = Qt.createComponent(source);
         if (startItemComp.status !== Component.Ready) {
-            console.log("Start component not ready!", startItemComp.errorString());
+            console.error("Start component not ready!", startItemComp.errorString());
 
             return;
         }

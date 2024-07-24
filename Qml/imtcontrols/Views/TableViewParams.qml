@@ -64,13 +64,10 @@ TreeItemModel {
     }
 
     function copyFromTreeModel(model){
-        console.log("copyFromTreeModel", model.toJson());
         if (!model){
             return false;
         }
         clear();
-        console.log("copy", model.toJson());
-
         copy(model);
     }
 

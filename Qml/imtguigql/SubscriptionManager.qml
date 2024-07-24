@@ -23,8 +23,6 @@ WebSocket {
     }
 
     onStatusChanged: {
-        console.log("onStatusChanged", status);
-
         if (status == WebSocket.Error){
             console.error("SubscriptionManager ERROR", errorString)
         }

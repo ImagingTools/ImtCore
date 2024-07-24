@@ -75,10 +75,7 @@ Dialog {
         Preference {
             width: messageDialog.width;
             onModelChanged: {
-                console.log("onModelChanged");
-
                 messageDialog.buttons.setButtonState(Enums.apply, true);
-
                 messageDialog.buttonsModel.setProperty(1, "Name", qsTr("Cancel"));
             }
         }

@@ -207,7 +207,6 @@ Rectangle {
                         }
 
                         onLoaded: {
-                            console.log("Loader onLoaded", item.parameters);
                             if (loader.item.parameters !== undefined){
                                 loader.item.parameters = model.Parameters;
                             }

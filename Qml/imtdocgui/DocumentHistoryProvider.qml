@@ -29,7 +29,6 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, root.documentHistoryGqlModel);
             if (this.state === "Ready"){
                 if (root.documentHistoryGqlModel.containsKey("errors")){
                     return;

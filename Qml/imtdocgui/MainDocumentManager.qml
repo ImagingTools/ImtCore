@@ -113,7 +113,6 @@ QtObject {
     }
 
     function closeDocument(){
-        console.log("closeDocument");
         let keys = Object.keys(documents);
         if (keys.length > 0){
             let typeId = keys[0];
@@ -126,7 +125,6 @@ QtObject {
 
                     documentManager.closeDocument(documentId, false,
                                                   function (result){
-                                                      console.log("closing result", result);
                                                       if (result){
                                                           root.documents[typeId].pop();
 

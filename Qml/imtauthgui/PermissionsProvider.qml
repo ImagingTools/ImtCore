@@ -24,7 +24,6 @@ Item {
         id: permissionModel;
 
         function updateModel() {
-            console.log("updateModel ProductPermissions");
             var query = Gql.GqlRequest("query", "ProductPermissions");
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("ProductId", permissionsProvider.productId);
@@ -32,12 +31,10 @@ Item {
 
             var gqlData = query.GetQuery();
 
-            console.log(gqlData);
             this.setGqlQuery(gqlData);
         }
 
         onStateChanged: {
-            console.log("State:", this.state, permissionModel);
             if (this.state === "Ready"){
                 let dataModelLocal;
 

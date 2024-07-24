@@ -18,10 +18,6 @@ QtObject {
         Events.sendEvent("CommandsEnabledChanged", {"Model": root.commandsModel, "CommandId": uuid});
     }
 
-    onCommandsModelChanged: {
-        console.log("onCommandsModelChanged", commandsModel);
-    }
-
     function commandIsEnabled(commandId){
         if(!root.commandsModel){
             return false;

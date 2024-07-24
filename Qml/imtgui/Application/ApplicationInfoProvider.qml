@@ -20,8 +20,6 @@ QtObject {
     }
 
     function updateModel(){
-        console.log("ApplicationInfo updateModel");
-
         root.applicationInfoQuery.updateModel();
     }
 
@@ -35,8 +33,6 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, root.applicationInfoQuery);
-
             if (this.state === "Ready") {
                 var dataModelLocal;
 

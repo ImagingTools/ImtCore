@@ -30,7 +30,6 @@ Item {
     signal endUpdate();
 
     onCollectionIdChanged: {
-        console.log("onCollectionIdChanged", collectionId)
         updateModel();
     }
 
@@ -50,8 +49,6 @@ Item {
     }
 
     function updateModel(){
-        console.log("updateModel")
-
         updateHeaders();
 
         updateObjectEditorInfo();
@@ -260,7 +257,6 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, renameQuery);
             if (this.state === "Ready"){
                 var dataModelLocal;
 
@@ -508,7 +504,6 @@ Item {
         }
 
         onStateChanged: {
-            console.log("List", this.toJson());
             if (this.state === "Ready"){
                 var dataModelLocal;
                 if (this.containsKey("errors")){

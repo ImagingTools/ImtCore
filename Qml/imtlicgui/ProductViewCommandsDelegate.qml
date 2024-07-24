@@ -32,7 +32,6 @@ ViewCommandsDelegateBase {
     }
 
     onCommandActivated: {
-        console.log("ProductsCommands onCommandActivated", commandId);
         if (!container.view){
             return;
         }

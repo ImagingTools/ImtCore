@@ -34,7 +34,7 @@ CollectionViewCommandsDelegateBase {
             root.documentManager.insertNewDocument(typeId, viewTypeId);
         }
         else{
-            console.log("documentManager undefined!")
+            console.error("documentManager undefined!")
         }
     }
 
