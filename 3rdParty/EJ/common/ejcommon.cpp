@@ -255,7 +255,7 @@ int EjGroupBlock::findPropIndex(QList<EjBlock *> *lBlocks, int type, int num, in
 void EjGroupBlock::addProp(QList<EjBlock*> *lBlocks, EjBlock *block)
 {
     lBlocks->insert(m_index + m_counts,block);
-    block->parent = this;
+    block->m_parent = this;
     m_counts++;
 }
 
@@ -284,7 +284,7 @@ void EjGroupBlock::remBlock(QList<EjBlock *> *lBlocks, EjBlock *block)
     }
     else if(block->type == END_GROUP)
     {
-        EjGroupBlock *groupBlock = dynamic_cast<EjGroupBlock*>(block->parent);
+        EjGroupBlock *groupBlock = dynamic_cast<EjGroupBlock*>(block->m_parent);
         if(groupBlock && groupBlock != this)
         {
             groupBlock->remFromBlocks(lBlocks);
@@ -370,7 +370,7 @@ void EjGroupBlock::calcBlock(int &index, EjCalcParams *calcParams)
             cur_block = (*iter);
             while(iter != lBlocks->end() && cur_block->type != END_GROUP) {
                 m_counts++;
-                cur_block->parent = this;
+                cur_block->m_parent = this;
                 if(cur_block->type >= GROUP_BLOCK) {
                     int index2 = iter - lBlocks->begin();
                     ((EjGroupBlock*)cur_block)->calcBlock(index2, calcParams);
@@ -389,7 +389,7 @@ void EjGroupBlock::calcBlock(int &index, EjCalcParams *calcParams)
                 cur_block = (*iter);
             }
             if(iter != lBlocks->end() && (*iter)->type == END_GROUP) {
-                (*iter)->parent = this;
+				(*iter)->m_parent = this;
                 m_counts++;
             }
             afterCalc(calcParams);
@@ -412,7 +412,7 @@ void EjGroupBlock::calcLenght(int &index, QList<EjBlock *> *lBlocks)
     cur_block = (*iter);
     while(iter != lBlocks->end() && cur_block->type != END_GROUP) {
         m_counts++;
-        cur_block->parent = this;
+        cur_block->m_parent = this;
         if(cur_block->type >= GROUP_BLOCK) {
             int index2 = iter - lBlocks->begin();
             ((EjGroupBlock*)cur_block)->calcLenght(index2, lBlocks);
@@ -424,7 +424,7 @@ void EjGroupBlock::calcLenght(int &index, QList<EjBlock *> *lBlocks)
             cur_block = (*iter);
     }
     if(iter != lBlocks->end() && (*iter)->type == END_GROUP) {
-        (*iter)->parent = this;
+		(*iter)->m_parent = this;
         m_counts++;
     }
 
@@ -1150,22 +1150,22 @@ void EjSpaceBlock::calcBlock(int &index, EjCalcParams *calcParams)
 EjBlock *EjBlock::rootBlock()
 {
 	EjBlock *res = this;
-    while(res->parent)
+    while(res->m_parent)
     {
-        if(res->parent->isGlassy())
+        if(res->m_parent->isGlassy())
         {
-			EjBlock *next = res->parent;
+			EjBlock *next = res->m_parent;
             while (next && next->isGlassy())
             {
-                next = next->parent;
+                next = next->m_parent;
             }
-            if(next && next->parent)
+            if(next && next->m_parent)
                 res = next;
             else
                 break;
         }
         else
-            res = res->parent;
+            res = res->m_parent;
 
     }
     return res;

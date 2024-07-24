@@ -479,7 +479,8 @@ void EjStorageHelper::updateDoc(EjDocument* doc, quint16 patchVer, quint32 patch
 
 		qDeleteAll(*doc->lPropBlocks);
 		doc->lPropBlocks->clear();
-		doc->lPropBlocks = &src_prop;
+		*doc->lPropBlocks = src_prop;
+		src_prop.clear();
 
 		//        qDeleteAll(*doc->lStyles);
 		doc->lStyles->clear();

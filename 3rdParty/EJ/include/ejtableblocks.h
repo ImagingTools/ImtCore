@@ -4,8 +4,9 @@
 #include "ejtextcontrol.h"
 
 
-class COMMONSHARED_EXPORT EjTableBlock : public EjGroupBlock
+class COMMONSHARED_EXPORT EjTableBlock : public QObject, public EjGroupBlock
 {
+	Q_OBJECT
 public:
     enum NumProp {
         TBL_KEY = 0,
@@ -73,17 +74,19 @@ public:
 
 	void cellParams(EjBlock *block, int &row, int &colum, QList<EjBlock *> *l_blocks = nullptr);
 	void addString(EjTextControl *control, EjBlock *curBlock, bool force = true);
+	Q_INVOKABLE void addString(EjTextControl *control, int index, bool force = true);
 	void addColum(EjTextControl *control, EjBlock *curBlock);
 	void delString(QList<EjBlock *> *l_blocks, int &active_block);
 	void delColum(QList<EjBlock*> *l_blocks, int &active_block);
 	void moveString(EjTextControl *control, EjBlock *curBlock, bool isUp);
 	void moveColum(EjTextControl *control, EjBlock *curBlock, bool isLeft);
 
-	int cellIndex(int row, int colum, QList<EjBlock *> *l_blocks);
-    int cellIndex(int row, int colum);
+	Q_INVOKABLE int cellIndex(int row, int colum, QList<EjBlock *> *l_blocks);
+	Q_INVOKABLE int cellIndex(int row, int colum);
     int prevCell(int index);
     int currCellIndex(int index);
-	EjCellBlock *currentCell(int index);
+	Q_INVOKABLE EjCellBlock *currentCell(int index);
+	Q_INVOKABLE EjCellBlock *getCell(int row, int colum);
 	EjCellBlock *prevCell(EjBlock*block); // slow function!
     int nextCell(int index);
 	EjCellBlock *nextCell(EjBlock*block); // slow function!
@@ -95,7 +98,7 @@ public:
 	void setParagraphStyle(EjCellBlock *cell,EjParagraphStyle *style);
     EjCellStyle *getCellStyle(int block);
 	QQuickItem *onCellClicked(int statusMode, EjTextControl *control, EjCellBlock *cell, QQuickItem *parent);
-    QString tableName();
+	Q_INVOKABLE QString tableName();
     void setTableName(QString name);
     QString tableAdditional();
     void setTableAdditional(QString additional);
@@ -121,8 +124,9 @@ protected:
 
 
 
-class COMMONSHARED_EXPORT EjCellBlock : public EjTextBlock
+class COMMONSHARED_EXPORT EjCellBlock : public QObject, public EjTextBlock
 {
+	Q_OBJECT
 public:
 	EjCellBlock();
 	virtual ~EjCellBlock() override;
@@ -201,7 +205,7 @@ public:
     void clearData(EjDocument *doc, bool isAll = false);
 
     bool isSelected(int &index, int &startSelect, int &endSelect) override;
-    void setText(const QString &source, EjTextControl *control = nullptr);
+	Q_INVOKABLE void setText(const QString &source, EjTextControl *control = nullptr);
     QString getText();
     void setTextStyle(EjTextStyle *style, EjTextControl *control);
     void merge(int rows, int colums);

@@ -10,6 +10,7 @@
 #include <QVariant>
 #include <QUuid>
 #include <QFont>
+#include <QObject>
 
 
 COMMONSHARED_EXPORT int writeSmallString(QDataStream &stream,const QString &source);
@@ -121,7 +122,7 @@ class COMMONSHARED_EXPORT EjBlock
 {
 public:
 	EjBlock(EjBlock *parent_ = nullptr){
-        type = width = x = y = ascent = descent = interval_top = interval_bottom = 0; flag_redraw = true; parent = parent_; }
+		type = width = x = y = ascent = descent = interval_top = interval_bottom = 0; flag_redraw = true; m_parent = parent_; }
 	EjBlock(int f_type, EjBlock *parent_ = nullptr):EjBlock(parent_) {  type = static_cast<quint8>(f_type); }
 	EjBlock(const EjBlock&) = default;
 	EjBlock(EjBlock&&) = default;
@@ -138,7 +139,7 @@ public:
     qint32 x;
     qint32 y;
     bool flag_redraw;
-	EjBlock *parent;
+	EjBlock *m_parent;
 
 
     int height() { return ascent + descent; }

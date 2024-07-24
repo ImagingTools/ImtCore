@@ -61,7 +61,7 @@ EjTableBlock::EjTableBlock(int rows, int colums, EjDocument *doc, int index) : E
                 this->lColums.append(new ColumProp());
             doc->lBlocks->insert(index,new EjCellBlock());
             curCellBlock = dynamic_cast<EjCellBlock*>(doc->lBlocks->at(index));
-            curCellBlock->parent = this;
+			curCellBlock->m_parent = this;
             curCellBlock->cellStyle = cellStyle;
             index++;
             m_counts++;
@@ -141,7 +141,7 @@ void EjTableBlock::calcBlock(int &index, EjCalcParams *calcParams)
             index++;
         else
             break;
-        lBlocks->at(index)->parent = this;
+		lBlocks->at(index)->m_parent = this;
         this->m_counts++;
     }
     deltaProps = m_counts + 1;
@@ -165,14 +165,14 @@ void EjTableBlock::calcBlock(int &index, EjCalcParams *calcParams)
                 curCellBlock = (EjCellBlock*)lBlocks->at(index2);
                 curCellBlock->width = this->lColums[colum]->sizeProp.min;
                 curCellBlock->ascent = calcParams->textStyle->m_fontMetrics.height() * 100 * 0.347 + this->spacing * 2; //* 1.5;
-                curCellBlock->parent = this;
+				curCellBlock->m_parent = this;
                 while(index2 < lBlocks->count() - 1 && lBlocks->at(index2 + 1)->type != BASECELL && lBlocks->at(index2 + 1)->type != END_GROUP)
                 {
                     delta++;
                     index2++;
                     cur_block = lBlocks->at(index2);
                     cur_block->calcBlock(index2,calcParams);
-                    cur_block->parent = this;
+					cur_block->m_parent = this;
                     if(cur_block->type >= GROUP_BLOCK) {
                         delta += ((EjGroupBlock*)cur_block)->m_counts;
                     }
@@ -640,7 +640,7 @@ void EjTableBlock::calcBlock(int &index, EjCalcParams *calcParams)
                             && colum_tmp <= nColums()))
                     {
                         dynamic_cast<EjCellBlock*>(m_doc->lBlocks->at(index))->visible = false;
-                        m_doc->lBlocks->at(index)->parent = curCellBlock;
+						m_doc->lBlocks->at(index)->m_parent = curCellBlock;
                         while(index < endBlock() && m_doc->lBlocks->at(index + 1)->type != BASECELL)
                         {
                             index++;
@@ -820,7 +820,7 @@ void EjTableBlock::addString(EjTextControl *control, EjBlock *curBlock, bool for
 
         curCell = new EjCellBlock();
         curCell->cellStyle = curCellStyle;
-        curCell->parent = this;
+		curCell->m_parent = this;
         m_doc->lBlocks->insert(index2,curCell);
         index2++;
         k = 1;
@@ -830,7 +830,7 @@ void EjTableBlock::addString(EjTextControl *control, EjBlock *curBlock, bool for
             curNumStyle = new EjNumStyleBlock();
             curNumStyle->style = curCellStyle;
             curNumStyle->num = curCellStyle->num;
-            curNumStyle->parent = this;
+			curNumStyle->m_parent = this;
             m_doc->lBlocks->insert(index2,curNumStyle);
             index2++;
             k++;
@@ -852,6 +852,14 @@ void EjTableBlock::addString(EjTextControl *control, EjBlock *curBlock, bool for
     control->doc->tableStringsInserted(this,row,row);
 
 }
+
+
+void EjTableBlock::addString(EjTextControl* control, int index, bool force)
+{
+	EjBlock *curBlock = this->currentCell(index);
+	addString(control, curBlock, force);
+}
+
 
 void EjTableBlock::addColum(EjTextControl *control, EjBlock *curBlock)
 {
@@ -897,7 +905,7 @@ void EjTableBlock::addColum(EjTextControl *control, EjBlock *curBlock)
         control->doc->lBlocks->insert(index,new EjCellBlock());
         m_counts++;
         curCell2 = dynamic_cast<EjCellBlock*>(control->doc->lBlocks->at(index));
-        curCell2->parent = this;
+		curCell2->m_parent = this;
         curCell2->cellStyle = curCellStyle;
 
         index++;
@@ -906,7 +914,7 @@ void EjTableBlock::addColum(EjTextControl *control, EjBlock *curBlock)
             curNumStyle = new EjNumStyleBlock();
             curNumStyle->style = curCellStyle;
             curNumStyle->num = curCellStyle->num;
-            curNumStyle->parent = this;
+			curNumStyle->m_parent = this;
             control->doc->lBlocks->insert(index,curNumStyle);
             index++;
             m_counts++;
@@ -950,7 +958,7 @@ void EjTableBlock::delString(QList<EjBlock *> *l_blocks, int &active_block)
         active_block--;
 
     curCell = dynamic_cast<EjCellBlock*>(l_blocks->at(active_block));
-    curTable = ((EjTableBlock*)(curCell->parent));
+	curTable = ((EjTableBlock*)(curCell->m_parent));
 
     if(curTable == this)
     {
@@ -1051,7 +1059,7 @@ void EjTableBlock::delColum(QList<EjBlock *> *l_blocks, int &active_block)
         active_block--;
 
     curCell = (EjCellBlock*)l_blocks->at(active_block);
-    curTable = ((EjTableBlock*)(curCell->parent));
+	curTable = ((EjTableBlock*)(curCell->m_parent));
 
     if(curTable == this)
     {
@@ -1404,6 +1412,14 @@ EjCellBlock *EjTableBlock::currentCell(int index)
     return res;
 }
 
+EjCellBlock* EjTableBlock::getCell(int row, int colum)
+{
+	int index = cellIndex(row, colum);
+	EjCellBlock *res = currentCell(index);
+
+	return res;
+}
+
 EjCellBlock *EjTableBlock::prevCell(EjBlock *block)
 {
     if(!m_doc)
@@ -1457,7 +1473,7 @@ bool EjTableBlock::chekMinMax(int &startRow, int &startColum, int &endRow, int &
     bool bChange = false;
     if(cell->visible == false)
     {
-        mergeCell = dynamic_cast<EjCellBlock*>(cell->parent);
+		mergeCell = dynamic_cast<EjCellBlock*>(cell->m_parent);
     }
     if(cell->mergeRows > 0 && cell->mergeColums > 0)
     {
@@ -1599,7 +1615,7 @@ void EjTableBlock::setCellStyles(int startRow, int startColum, int endRow, int e
                 curNumStyle = new EjNumStyleBlock();
                 curNumStyle->num = m_doc->lStyles->indexOf(curStyleCell);
                 curNumStyle->style = curStyleCell;
-                curNumStyle->parent = this;
+				curNumStyle->m_parent = this;
                 m_doc->lBlocks->insert(index,curNumStyle);
                 oldStyleCell = curStyleCell;
                 m_counts++;
@@ -1646,7 +1662,7 @@ void EjTableBlock::setCellStyle(EjCellBlock *cell, EjCellStyle *style)
     EjNumStyleBlock *curNumStyle = new EjNumStyleBlock();
     curNumStyle->num = curStyleCell->num;
     curNumStyle->style = curStyleCell;
-    curNumStyle->parent = this;
+	curNumStyle->m_parent = this;
     m_doc->lBlocks->insert(index,curNumStyle);
     m_counts++;
     index++;
@@ -1752,7 +1768,7 @@ void EjTableBlock::setParagraphStyle(int startRow, int startColum, int endRow, i
                 curNumStyle = new EjNumStyleBlock();
                 curNumStyle->num = curStylePrg->num;
                 curNumStyle->style = curStylePrg;
-                curNumStyle->parent = this;
+				curNumStyle->m_parent = this;
                 m_doc->lBlocks->insert(index,curNumStyle);
                 if(!bFinishStyle || colum == endColum)
                     writeStylePrg = curStylePrg;
@@ -1808,7 +1824,7 @@ void EjTableBlock::setParagraphStyle(EjCellBlock *cell, EjParagraphStyle *style)
     EjNumStyleBlock *curNumStyle = new EjNumStyleBlock();
     curNumStyle->num = curStylePrg->num;
     curNumStyle->style = curStylePrg;
-    curNumStyle->parent = this;
+	curNumStyle->m_parent = this;
     m_doc->lBlocks->insert(index,curNumStyle);
     m_counts++;
     index++;
@@ -2249,9 +2265,9 @@ bool EjTableBlock::containsMerginCells(int startRow, int startColum, int endRow,
         if(m_doc->lBlocks->at(index)->type == BASECELL && colum >= startColum && colum <= endColum)
         {
             curCell = dynamic_cast<EjCellBlock*>(m_doc->lBlocks->at(index));
-            while(curCell->parent && curCell->parent->type == BASECELL)
+			while(curCell->m_parent && curCell->m_parent->type == BASECELL)
             {
-                curCell = dynamic_cast<EjCellBlock*>(curCell->parent);
+				curCell = dynamic_cast<EjCellBlock*>(curCell->m_parent);
             }
             if((curCell->mergeRows > 0 || curCell->mergeColums > 0) )
             {
@@ -2402,7 +2418,7 @@ void EjTableBlock::cellParams(EjBlock *block, int &row, int &colum, QList<EjBloc
 
 EjCellBlock::EjCellBlock() : EjTextBlock()
 {
-    type = BASECELL; value = 0; parent = nullptr; vid = CELL_AUTO;
+	type = BASECELL; value = 0; EjBlock::m_parent = nullptr; vid = CELL_AUTO;
     cellStyle = nullptr;
     visible = true;
     mergeColums = 0;
@@ -2415,14 +2431,14 @@ EjCellBlock::~EjCellBlock()
 
 void EjCellBlock::setValue(double value)
 {
-	QList<EjBlock*> *lBlocks = ((EjTableBlock*)this->parent)->m_doc->lBlocks;
+	QList<EjBlock*> *lBlocks = ((EjTableBlock*)this->m_parent)->m_doc->lBlocks;
     int index = lBlocks->indexOf(this);
 	EjPropTextBlock *curTxtProp = dynamic_cast<EjPropTextBlock*>(findProp(CELL_ADDITIONAL));
 
     bool bOk;
 
     this->value = value;
-    QString text = getDText(this->value, ((EjTableBlock*)(this->parent))->accuracy);
+	QString text = getDText(this->value, ((EjTableBlock*)(this->m_parent))->accuracy);
     this->value = getDValue(text, &bOk);
     setText(text);
     this->text = getDText(this->value, 12);
@@ -2608,7 +2624,7 @@ QList<qint64> EjCellBlock::getGUIDRefData()
 {
     QList<qint64> res;
 	EjPropInt64Block *intProp;
-	QList<EjBlock *> *lBlocks = ((EjTableBlock*)this->parent)->m_doc->lBlocks;
+	QList<EjBlock *> *lBlocks = ((EjTableBlock*)this->m_parent)->m_doc->lBlocks;
     int index = lBlocks->indexOf(this) + 1;
     if(index == 0)
         return res;
@@ -2673,9 +2689,9 @@ EjTableBlock *EjCellBlock::getTable()
 {
     EjTableBlock *res = nullptr;
 	EjBlock *curBlock = nullptr;
-    curBlock = this->parent;
+	curBlock = this->m_parent;
     while(curBlock && curBlock->type != EXT_TABLE)
-        curBlock = curBlock->parent;
+		curBlock = curBlock->m_parent;
     if(curBlock && curBlock->type == EXT_TABLE)
         res = dynamic_cast<EjTableBlock*>(curBlock);
     return res;
@@ -2683,19 +2699,19 @@ EjTableBlock *EjCellBlock::getTable()
 
 void EjCellBlock::addProp(EjPropBase *prop)
 {
-	QList<EjBlock *> *lBlocks = ((EjTableBlock*)this->parent)->m_doc->lBlocks;
+	QList<EjBlock *> *lBlocks = ((EjTableBlock*)this->m_parent)->m_doc->lBlocks;
     int index = lBlocks->indexOf(this) + 1;
     if(index == 0)
         return;
     while(lBlocks->at(index)->isProperty())
         index++;
     lBlocks->insert(index,prop);
-    ((EjTableBlock*)this->parent)->m_counts++;
+	((EjTableBlock*)this->m_parent)->m_counts++;
 }
 
 EjPropBase *EjCellBlock::findProp(int num)
 {
-	QList<EjBlock *> *lBlocks = ((EjTableBlock*)this->parent)->m_doc->lBlocks;
+	QList<EjBlock *> *lBlocks = ((EjTableBlock*)this->m_parent)->m_doc->lBlocks;
 	EjPropBase *res = nullptr;
     int index = lBlocks->indexOf(this) + 1;
     if(index == 0)
@@ -2715,12 +2731,12 @@ EjPropBase *EjCellBlock::findProp(int num)
 
 void EjCellBlock::removeProp(int num, bool isAll)
 {
-	QList<EjBlock *> *lBlocks = ((EjTableBlock*)this->parent)->m_doc->lBlocks;
+	QList<EjBlock *> *lBlocks = ((EjTableBlock*)this->m_parent)->m_doc->lBlocks;
 	EjPropBase *prop = findProp(num);
     while(prop) {
         delete lBlocks->takeAt(lBlocks->indexOf(prop));
-        ((EjTableBlock*)this->parent)->m_counts--;
-        ((EjTableBlock*)this->parent)->deltaProps--;
+		((EjTableBlock*)this->m_parent)->m_counts--;
+		((EjTableBlock*)this->m_parent)->deltaProps--;
         if(isAll)
             prop = findProp(num);
         else
@@ -2735,9 +2751,9 @@ void EjCellBlock::clearAll(EjDocument *doc)
 
 void EjCellBlock::clearData(EjDocument *doc, bool isAll)
 {
-    if(!parent || parent->type != EXT_TABLE)
+	if(!EjBlock::m_parent || EjBlock::m_parent->type != EXT_TABLE)
         return;
-    EjTableBlock *table = (EjTableBlock*)parent;
+	EjTableBlock *table = (EjTableBlock*)EjBlock::m_parent;
     int i = doc->lBlocks->indexOf(this);
     if(i == -1)
         return;
@@ -2782,9 +2798,9 @@ void EjCellBlock::clearData(EjDocument *doc, bool isAll)
 
 bool EjCellBlock::isSelected(int &index, int &startSelect, int &endSelect)
 {
-    if(!this->parent)
+	if(!this->m_parent)
         return true;
-    EjTableBlock *curTable = (EjTableBlock*)(this->parent);
+	EjTableBlock *curTable = (EjTableBlock*)(this->m_parent);
     return curTable->isSelected(index,startSelect,endSelect);
 }
 
@@ -2792,7 +2808,7 @@ void EjCellBlock::setText(const QString &source, EjTextControl *control)
 {
     QString txt = source;
     QString left;
-    EjTableBlock *table = (EjTableBlock*) parent;
+	EjTableBlock *table = (EjTableBlock*) EjBlock::m_parent;
     int index = table->m_doc->lBlocks->indexOf(this);
 	EjTextBlock *curTextBlock;
 	EjSpaceBlock *curSpaceBlock;
@@ -2824,7 +2840,7 @@ void EjCellBlock::setText(const QString &source, EjTextControl *control)
        if(!str.isEmpty())
        {
 			curTextBlock = new EjTextBlock(str);
-            curTextBlock->parent = table;
+			curTextBlock->m_parent = table;
             table->m_doc->lBlocks->insert(index,curTextBlock);
             table->m_counts++;
             index++;
@@ -2841,7 +2857,7 @@ void EjCellBlock::setText(const QString &source, EjTextControl *control)
             insertText();
 
 			curBlock = new EjSpaceBlock();
-            curBlock->parent = table;
+			curBlock->m_parent = table;
             table->m_doc->lBlocks->insert(index,curBlock);
             table->m_counts++;
             index++;
@@ -2852,7 +2868,7 @@ void EjCellBlock::setText(const QString &source, EjTextControl *control)
             insertText();
 
 			curBlock = new EjBlock(ENTER);
-            curBlock->parent = table;
+			curBlock->m_parent = table;
             table->m_doc->lBlocks->insert(index,curBlock);
             table->m_counts++;
             index++;
@@ -2923,7 +2939,7 @@ QString EjCellBlock::getText()
 
 void EjCellBlock::setTextStyle(EjTextStyle *style, EjTextControl *control)
 {
-    EjTableBlock *table = (EjTableBlock*)parent;
+	EjTableBlock *table = (EjTableBlock*)EjBlock::m_parent;
     int index = control->doc->lBlocks->indexOf(this);
     while(control->doc->lBlocks->at(index)->type != BASECELL && control->doc->lBlocks->at(index)->type != END_GROUP )
     {
@@ -2941,7 +2957,7 @@ void EjCellBlock::setTextStyle(EjTextStyle *style, EjTextControl *control)
 
 void EjCellBlock::merge(int rows, int colums)
 {
-	QList<EjBlock*> *lBlocks = ((EjTableBlock*)this->parent)->m_doc->lBlocks;
+	QList<EjBlock*> *lBlocks = ((EjTableBlock*)this->m_parent)->m_doc->lBlocks;
 
     if(rows <= 0 || colums <= 0)
     {
@@ -2970,7 +2986,7 @@ void EjCellBlock::unMerge()
     visible = true;
     if(mergeRows > 0 || mergeColums > 0)
     {
-        EjTableBlock *table = dynamic_cast<EjTableBlock*>(parent);
+		EjTableBlock *table = dynamic_cast<EjTableBlock*>(EjBlock::m_parent);
 		QList<EjBlock*> *lBlocks = table->m_doc->lBlocks;
         int index = lBlocks->indexOf(this);
         int colum;
@@ -3001,9 +3017,9 @@ void EjCellBlock::unMerge()
         removeProp(CELL_MERGE_ROWS);
 
     }
-    if(parent->type == BASECELL)
+	if(EjBlock::m_parent->type == BASECELL)
     {
-        EjCellBlock *curCell = dynamic_cast<EjCellBlock*>(parent);
+		EjCellBlock *curCell = dynamic_cast<EjCellBlock*>(EjBlock::m_parent);
         if(curCell)
             curCell->unMerge();
     }

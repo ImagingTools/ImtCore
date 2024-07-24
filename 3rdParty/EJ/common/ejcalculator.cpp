@@ -276,8 +276,8 @@ void EjCalculator::setLinkData(QString str_link, EjBlock *source)
 int EjCalculator::calcCell(EjCellBlock *cell, EjBlock *table)
 {
     int accuracy = 3;
-    if(cell->parent)
-        accuracy = ((EjTableBlock*)(cell->parent))->accuracy;
+	if(cell->m_parent)
+		accuracy = ((EjTableBlock*)(cell->m_parent))->accuracy;
     QString formula = cell->formula();
     if(cell->type != EjCellBlock::CELL_FORMULA || formula.isEmpty())
     {
@@ -354,8 +354,8 @@ int EjCalculator::calcCell(EjCellBlock *cell, EjBlock *table)
   }
   shunting_yard(lItems,lItems_out);
   cell->value = execution_order(lItems_out);
-  if(cell->parent)
-      accuracy = ((EjTableBlock*)(cell->parent))->accuracy;
+  if(cell->m_parent)
+	  accuracy = ((EjTableBlock*)(cell->m_parent))->accuracy;
   cell->setText(getDText(cell->value,accuracy));
 }
 

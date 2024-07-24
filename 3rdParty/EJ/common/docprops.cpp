@@ -514,7 +514,7 @@ void EjAttrProp::setKey(QString key)
     {
 		propKey = new EjPropKeyBlock(AP_DOC_KEY);
         m_doc->lPropBlocks->insert(m_index + 1,propKey);
-        propKey->parent = this;
+		propKey->m_parent = this;
         m_counts++;
     }
     propKey->key = uuid;
@@ -555,7 +555,7 @@ void EjAttrProp::setTemplateKey(QString key)
     {
 		propKey = new EjPropKeyBlock(AP_DOC_TEMPLATE_KEY);
         m_doc->lPropBlocks->insert(m_index + 1,propKey);
-        propKey->parent = this;
+		propKey->m_parent = this;
         m_counts++;
     }
     propKey->key = uuid;
@@ -585,7 +585,7 @@ void EjAttrProp::setName(QString name)
 		propText = new EjPropBigTextBlock(AP_DOC_NAME);
         propText->createDefault( m_doc->lPropBlocks, m_index + 1);
 //        m_doc->lPropBlocks->insert(m_index + 1,(GroupBlock*)propText);
-        ((EjGroupBlock*)propText)->parent = this;
+		((EjGroupBlock*)propText)->m_parent = this;
         m_counts += propText->m_counts + 1;
 //        addProp(m_document->lBlocks,propKey);
     }
@@ -606,7 +606,7 @@ void EjAttrProp::setType(char type)
     {
 		propInt = new EjPropInt8Block(AP_DOC_TYPE);
         addProp(m_doc->lPropBlocks,propInt);
-        propInt->parent = this;
+		propInt->m_parent = this;
     }
     propInt->value = type;
     emit typeChanged(type);
@@ -622,7 +622,7 @@ void EjAttrProp::setEditLevel(int source)
     {
 		propAccess = new EjPropAccessBlock();
         addProp(m_doc->lPropBlocks,propAccess);
-        propAccess->parent = this;
+		propAccess->m_parent = this;
     }
     propAccess->setEditLevel(source);
     emit editLevelChanged();
@@ -637,7 +637,7 @@ void EjAttrProp::setIsEditAsParent(bool source)
     {
 		propAccess = new EjPropAccessBlock();
         addProp(m_doc->lPropBlocks,propAccess);
-        propAccess->parent = this;
+		propAccess->m_parent = this;
     }
     propAccess->setIsEditAsParent(source);
     emit isEditAsParentChanged();

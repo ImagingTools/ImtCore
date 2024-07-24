@@ -522,9 +522,9 @@ quint32 EjTextControl::inputEnter(bool force)
         {
             int center = (table->startCell() + table->endBlock()) / 2;
             EjBlock *block = table;
-            while(block->parent)
+			while(block->m_parent)
             {
-                block = block->parent;
+				block = block->m_parent;
             }
 
             if(activeIndex < center)
@@ -769,8 +769,8 @@ void EjTextControl::inputBackSpace()
         else
         {
             curBlock = doc->lBlocks->at(activeIndex);
-            while(curBlock->parent)
-                curBlock = curBlock->parent;
+			while(curBlock->m_parent)
+				curBlock = curBlock->m_parent;
             if(curBlock->type >= GROUP_BLOCK)
             {
                 EjGroupBlock *curGroupBlock = dynamic_cast<EjGroupBlock*>(curBlock);
@@ -1225,7 +1225,7 @@ int EjTextControl::wichBlock(int x, int y)
     while(1)
     {
         qDebug() << "while 2" << cur1 << cur2 << cur3;
-        if(doc->lBlocks->at(cur1)->parent != NULL && !doc->lBlocks->at(cur1)->parent->isGlassy())
+		if(doc->lBlocks->at(cur1)->m_parent != NULL && !doc->lBlocks->at(cur1)->m_parent->isGlassy())
         {
             block = doc->lBlocks->at(cur1);
             block = block->rootBlock();
@@ -1236,7 +1236,7 @@ int EjTextControl::wichBlock(int x, int y)
             }
         }
         cur3 = cur2;
-        if(doc->lBlocks->at(cur2)->parent != NULL && !doc->lBlocks->at(cur2)->parent->isGlassy())
+		if(doc->lBlocks->at(cur2)->m_parent != NULL && !doc->lBlocks->at(cur2)->m_parent->isGlassy())
         {
             block = doc->lBlocks->at(cur2);
             block = block->rootBlock();
@@ -1264,7 +1264,7 @@ int EjTextControl::wichBlock(int x, int y)
             cur3++;
         while(doc->lBlocks->at(cur3)->isProperty() && cur3 < doc->lBlocks->count() - 1)
             cur3++;
-        if(doc->lBlocks->at(cur3)->parent != NULL && !doc->lBlocks->at(cur3)->parent->isGlassy())
+		if(doc->lBlocks->at(cur3)->m_parent != NULL && !doc->lBlocks->at(cur3)->m_parent->isGlassy())
         {
             block = doc->lBlocks->at(cur3);
             block = block->rootBlock();
@@ -1329,7 +1329,7 @@ int EjTextControl::wichBlock(int x, int y)
                         d2 = (curCell->x + curCell->width - x) * (curCell->x + curCell->width - x) + (curCell->y + curCell->height() - y) * (curCell->y + curCell->height() - y);
                         if(curCell->visible == false)
                         {
-							curCell = (EjCellBlock*)curCell->parent;
+							curCell = (EjCellBlock*)curCell->m_parent;
                             res = doc->lBlocks->indexOf(curCell);
                             d1 = (curCell->x - x) * (curCell->x - x) + (curCell->y - y) * (curCell->y - y);
                             d2 = (curCell->x + curCell->width - x) * (curCell->x + curCell->width - x) + (curCell->y + curCell->height() - y) * (curCell->y + curCell->height() - y);
@@ -1347,7 +1347,7 @@ int EjTextControl::wichBlock(int x, int y)
                     curCell = table->currentCell(i);
                     if(curCell->visible == false)
                     {
-						curCell = (EjCellBlock*)curCell->parent;
+						curCell = (EjCellBlock*)curCell->m_parent;
                         res = doc->lBlocks->indexOf(curCell);
                     }
                     break;
@@ -2616,7 +2616,7 @@ void EjTextControl::delTableString(QList<EjBlock*> *l_blocks, int &active_block)
         active_block--;
 
 	curCell = (EjCellBlock*)l_blocks->at(active_block);
-	curTable = ((EjTableBlock*)(curCell->parent));
+	curTable = ((EjTableBlock*)(curCell->m_parent));
 
     if(curTable)
     {
@@ -2731,7 +2731,7 @@ void EjTextControl::delTableColum(QList<EjBlock *> *l_blocks, int &active_block)
         active_block--;
 
 	curCell = (EjCellBlock*)l_blocks->at(active_block);
-	curTable = ((EjTableBlock*)(curCell->parent));
+	curTable = ((EjTableBlock*)(curCell->m_parent));
 
     if(curTable)
     {
@@ -3140,7 +3140,7 @@ void EjTextControl::updateTables(EjDocument *fdoc)
             fdoc->lTables->append(curTable);
             while(i < fdoc->lBlocks->count() - 1 && curBlock->type != BASECELL && curBlock->type != END_GROUP) {
                 curBlock = fdoc->lBlocks->at(i);
-                curBlock->parent = curTable;
+				curBlock->m_parent = curTable;
                 if(curBlock->type == PROP_INT) {
 					propInt = dynamic_cast<EjPropIntBlock*>(curBlock);
 					if(propInt->num == EjTableBlock::TBL_ROWS)
@@ -3176,7 +3176,7 @@ void EjTextControl::updateTables(EjDocument *fdoc)
             curBlock = fdoc->lBlocks->at(i);
             while(i < fdoc->lBlocks->count() - 1 && curBlock->type != END_GROUP) {
                 curBlock = fdoc->lBlocks->at(i);
-                curBlock->parent = curTable;
+				curBlock->m_parent = curTable;
                 if(curBlock->type >= GROUP_BLOCK)
                 {
                     EjGroupBlock *groupBlock = dynamic_cast<EjGroupBlock*>(curBlock);
@@ -3256,9 +3256,9 @@ bool EjTextControl::isNumber()
     if(activeIndex < 0 || doc->lBlocks->at(activeIndex)->type != BASECELL)
         return false;
 	EjCellBlock *curBlock = (EjCellBlock*)doc->lBlocks->at(activeIndex);
-	if(((EjTableBlock*)(curBlock->parent))->vid == EjTableBlock::SHOP_LIST)
+	if(((EjTableBlock*)(curBlock->m_parent))->vid == EjTableBlock::SHOP_LIST)
     {
-		EjTableBlock *curTable = (EjTableBlock*)curBlock->parent;
+		EjTableBlock *curTable = (EjTableBlock*)curBlock->m_parent;
         int row;   // = (activeBlock - index) / curTable->nColums();
         int colum; // = activeBlock - index - row * curTable->nColums();
         cellParams(curTable,activeIndex,row,colum);
@@ -3281,7 +3281,7 @@ bool EjTextControl::isCellEditFormula()
     if(activeIndex < 0 || doc->lBlocks->at(activeIndex)->type != BASECELL)
         return false;
 	EjCellBlock *curBlock = (EjCellBlock*)doc->lBlocks->at(activeIndex);
-	if(((EjTableBlock*)(curBlock->parent))->vid != EjTableBlock::SHOP_LIST && curBlock->vid == EjCellBlock::CELL_FORMULA)
+	if(((EjTableBlock*)(curBlock->m_parent))->vid != EjTableBlock::SHOP_LIST && curBlock->vid == EjCellBlock::CELL_FORMULA)
         return true;
     return false;
 
@@ -3785,8 +3785,8 @@ bool EjTextControl::menuActivate(QString command, QString data)
                 else if(doc->lBlocks->at(i)->type == BASECELL)
                 {
 					curCell = (EjCellBlock*)doc->lBlocks->at(i);
-					indexStart = ((EjTableBlock*)(curCell->parent))->m_index + 1;
-					indexEnd = ((EjTableBlock*)(curCell->parent))->endBlock();
+					indexStart = ((EjTableBlock*)(curCell->m_parent))->m_index + 1;
+					indexEnd = ((EjTableBlock*)(curCell->m_parent))->endBlock();
 
 
 					curTable = (EjTableBlock*)curTable->makeCopy();
@@ -3805,7 +3805,7 @@ bool EjTextControl::menuActivate(QString command, QString data)
                         if(curBlock->type == BASECELL)
                         {
 							cell_block = (EjCellBlock *)curBlock;
-							((EjCellBlock *)curBlock)->parent = curTable;
+							((EjCellBlock *)curBlock)->m_parent = curTable;
 							int index = doc->lPropBlocks->indexOf(((EjCellBlock *)doc->lBlocks->at(j))->cellStyle);
 							((EjCellBlock *)curBlock)->cellStyle = (EjCellStyle *)(m_clipboardDoc->lPropBlocks->at(index));
 						}
@@ -3823,12 +3823,12 @@ bool EjTextControl::menuActivate(QString command, QString data)
 					if(curTable->vid == EjTableBlock::SHOP_LIST)
                     {
                         colum_start = 0;
-						colum_end = ((EjTableBlock*)(curCell->parent))->nColums();
+						colum_end = ((EjTableBlock*)(curCell->m_parent))->nColums();
                     }
-					row_end = ((EjTableBlock*)(curCell->parent))->nRows() - row_end - 1;
+					row_end = ((EjTableBlock*)(curCell->m_parent))->nRows() - row_end - 1;
                     if(row_end < 0)
                         row_end = 0;
-					colum_end = ((EjTableBlock*)(curCell->parent))->nColums() - colum_end - 1;
+					colum_end = ((EjTableBlock*)(curCell->m_parent))->nColums() - colum_end - 1;
                     if(colum_end < 0)
                         colum_end = 0;
                     indexStart = curTable->cellIndex(0,0,m_clipboardDoc->lBlocks);
@@ -4085,7 +4085,7 @@ bool EjTextControl::menuActivate(QString command, QString data)
                     if(cur_Block->type == EXT_TABLE)
                     {
 						EjTableBlock *curTable = (EjTableBlock*)m_clipboardDoc->lBlocks->at(i);
-						EjTableBlock *curActiveTable = ((EjTableBlock*)(curCell->parent));
+						EjTableBlock *curActiveTable = ((EjTableBlock*)(curCell->m_parent));
 						EjCellBlock *curCell2;
 						EjTableFragment *curFragment = NULL;
                         int active_row, active_colum;
@@ -4233,12 +4233,12 @@ bool EjTextControl::menuActivate(QString command, QString data)
                     {
                         if(cur_Block->type == ENTER)
                         {
-							count = ((EjTableBlock*)(curCell->parent))->m_counts;
-							if(activeIndex + ((EjTableBlock*)(curCell->parent))->nColums() > doc->lBlocks->indexOf(curCell->parent) + 1 + count)
+							count = ((EjTableBlock*)(curCell->m_parent))->m_counts;
+							if(activeIndex + ((EjTableBlock*)(curCell->m_parent))->nColums() > doc->lBlocks->indexOf(curCell->m_parent) + 1 + count)
                             {
                                 addTableString();
                             }
-							activeIndex += ((EjTableBlock*)(curCell->parent))->nColums();
+							activeIndex += ((EjTableBlock*)(curCell->m_parent))->nColums();
 							curCell = (EjCellBlock*)doc->lBlocks->at(activeIndex);
 							curCell->vid = EjCellBlock::CELL_AUTO;
                             position = 0;
@@ -4262,7 +4262,7 @@ bool EjTextControl::menuActivate(QString command, QString data)
                 {
                     int row, colum;
                     int base_colum;
-					EjTableBlock *curTable = ((EjTableBlock*)(curCell->parent));
+					EjTableBlock *curTable = ((EjTableBlock*)(curCell->m_parent));
 
                     cellParams(curTable,activeIndex,row,base_colum);
 

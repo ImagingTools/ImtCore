@@ -212,11 +212,11 @@ public:
     QPoint getCursor() {return QPoint(m_posCursorX,m_posCursorY); }
     void calcTables();
     void moveTable(int dX);
-	QList<EjBlock*> *getBlocks() { return doc->lBlocks; }
+	Q_INVOKABLE QList<EjBlock*> *getBlocks() { return doc->lBlocks; }
     QList<JString*> *getStrings() { return doc->lStrings; }
     QList<Page*> *getPages() { return doc->lPages; }
     QList<EjBaseStyle*> *getStyles() { return doc->lStyles; }
-    QList<EjTableBlock*> *getTables() { return doc->lTables; }
+	Q_INVOKABLE QList<EjTableBlock*> *getTables() { return doc->lTables; }
     void calcInputMethodParams();
     int delText(int delta, int count);
 	void calcString(JString *string, Page *page, EjCalcParams *calcParams);
