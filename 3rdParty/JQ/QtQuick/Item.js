@@ -107,6 +107,7 @@ class Item extends QtObject {
 
         self.__DOM = self.__createDOM()
         self.__DOM.classList.add('Item')
+        self.__DOM.qml = proxy
         self.__connectDOM(parent)
 
         return proxy
@@ -200,6 +201,15 @@ class Item extends QtObject {
 
     mapToItem(item, x, y){}
     forceActiveFocus(){}
+
+
+
+    onMouseMove(x, y, button){}
+    onMouseDown(x, y, button){}
+    onMouseUp(x, y, button){}
+    onMouseClick(x, y, button){}
+    onMouseDblClick(x, y, button){}
+    onWheel(x, y, button){}
 }
 
 module.exports = Item

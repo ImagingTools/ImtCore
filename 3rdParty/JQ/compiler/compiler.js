@@ -1315,4 +1315,8 @@ for(let className in Singletons){
     fullCode.push(Singletons[className].toCode())
 }
 
+if(config.entry){
+    fullCode.push(`${config.entry.replaceAll('.qml', '')}.create(JQApplication.root)`)
+}
+
 if(config.output) fs.writeFileSync(path.resolve(configDirPath, config.output), fullCode.join('\n'))
