@@ -11,6 +11,7 @@ CollectionView {
     property string collectionId;
 
     property bool hasRemoteChanges: false;
+    property bool tableViewParamsStoredServer: true;
 
     // Invisible fields that will be requested for collection
     property var additionalFieldIds: ["Id", "Name"]
@@ -24,7 +25,9 @@ CollectionView {
     }
 
     onHeadersChanged: {
-        tableViewParamController.getModel();
+        if (table.headers.getItemsCount() > 0 && tableViewParamsStoredServer){
+            tableViewParamController.getModel();
+        }
     }
 
     TableViewParamController {
@@ -37,8 +40,10 @@ CollectionView {
     }
 
     onTableViewParamsAccepted: {
-        tableViewParamController.tableViewParams = root.table.tableViewParams;
-        tableViewParamController.saveModel();
+        if (tableViewParamsStoredServer){
+            tableViewParamController.tableViewParams = root.table.tableViewParams;
+            tableViewParamController.saveModel();
+        }
     }
 
     function getAdditionalInputParams(){

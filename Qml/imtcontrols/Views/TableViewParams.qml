@@ -63,6 +63,7 @@ TreeItemModel {
         return getHeaderIds().includes(headerId)
     }
 
+    // Copy from TreeItemModel
     function copyFromTreeModel(model){
         if (!model){
             return false;
@@ -71,6 +72,7 @@ TreeItemModel {
         copy(model);
     }
 
+    // Copy from another TableViewParams
     function copyFrom(obj){
         if (!obj){
             return false;
