@@ -1,6 +1,10 @@
 #include "CCluster.h"
 
 
+// ACF includes
+#include <istd/CChangeNotifier.h>
+
+
 using namespace std;
 
 namespace imtgeo
