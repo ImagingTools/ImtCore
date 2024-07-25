@@ -50,7 +50,7 @@ bool CIdentifiable::SetObjectUuid(const QByteArray& identifier)
 bool CIdentifiable::Serialize(iser::IArchive& archive)
 {
 	iser::CArchiveTag identifierTag("Uuid", "Unique identifier of the object", iser::CArchiveTag::TT_LEAF);
-	bool retVal = retVal && archive.BeginTag(identifierTag);
+	bool retVal = archive.BeginTag(identifierTag);
 	retVal = retVal && archive.Process(m_identifier);
 	retVal = retVal && archive.EndTag(identifierTag);
 
