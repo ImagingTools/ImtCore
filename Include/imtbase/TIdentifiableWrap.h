@@ -39,7 +39,7 @@ public:
 template<class Base>
 bool TIdentifiableWrap<Base>::Serialize(iser::IArchive& archive)
 {
-	bool retVal = retVal && Base::Serialize(archive);
+	bool retVal = Base::Serialize(archive);
 	retVal = retVal && BaseClass::Serialize(archive);
 
 	return retVal;
