@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/CIdentifiable.h>
+#include <imtcore/Version.h>
 
 
 namespace imtbase
