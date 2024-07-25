@@ -3,40 +3,69 @@ module.exports = {
     chain: [],
 
     init: function(){   
+        // window.addEventListener('mouseover', (e)=>{
+        //     if(e.target.qml) {
+        //         e.target.qml.__onMouseOver(this.chain, e.pageX, e.pageY, e.button)
+        //     }
+        // })
+        window.addEventListener('mouseout', (e)=>{
+            if(e.target.qml) {
+                e.target.qml.__onMouseOut(this.chain, e.pageX, e.pageY, e.button)
+            }
+        })
         window.addEventListener('mousemove', (e)=>{
-            // global.JQModules.QtQuick.Item.onMouseMove(e, e.pageX, e.pageY)
+            let elements = document.elementsFromPoint(e.pageX, e.pageY)
+            for(el of elements){
+                if(el.qml) {
+                    el.qml.__onMouseMove(this.chain, e.pageX, e.pageY, e.button)
+                }
+            }
         })
         window.addEventListener('click', (e)=>{
             if(e.timeStamp - this.timeStamp > 300){
                 this.timeStamp = e.timeStamp
 
                 for(obj of this.chain){
-                    obj.onMouseClick(this.chain, e.pageX, e.pageY, e.button)
+                    obj.__onMouseClick(this.chain, e.pageX, e.pageY, e.button)
+                }
+            } else {
+                for(obj of this.chain){
+                    obj.__onMouseDblClick(this.chain, e.pageX, e.pageY, e.button)
                 }
             }
+            this.chain = []
         })
         window.addEventListener('dblclick', (e)=>{
-            for(obj of this.chain){
-                obj.onMouseDblClick(this.chain, e.pageX, e.pageY, e.button)
-            }
+            e.preventDefault()
         })
         window.addEventListener('mousedown', (e)=>{
             this.chain = []
             let elements = document.elementsFromPoint(e.pageX, e.pageY)
             for(el of elements){
                 if(el.qml) {
-                    if(el.qml.onMouseDown(this.chain, e.pageX, e.pageY, e.button)) break
+                    if(el.qml.__onMouseDown(this.chain, e.pageX, e.pageY, e.button)) break
                 }
             }
         })
         window.addEventListener('mouseup', (e)=>{
-            // let elements = document.elementsFromPoint(e.pageX, e.pageY)
             for(obj of this.chain){
-                obj.onMouseUp(this.chain, e.pageX, e.pageY, e.button)
+                obj.__onMouseUp(this.chain, e.pageX, e.pageY, e.button)
             }
         })
         window.addEventListener('contextmenu', (e)=>{
-            // global.JQModules.QtQuick.Item.onMouseClick(e, e.pageX, e.pageY)
+            e.preventDefault()
+            if(e.timeStamp - this.timeStamp > 300){
+                this.timeStamp = e.timeStamp
+
+                for(obj of this.chain){
+                    obj.__onMouseClick(this.chain, e.pageX, e.pageY, e.button)
+                }
+            } else {
+                for(obj of this.chain){
+                    obj.__onMouseDblClick(this.chain, e.pageX, e.pageY, e.button)
+                }
+            }
+            this.chain = []
         })
         window.addEventListener('touchstart', (e)=>{
             // global.JQModules.QtQuick.Item.onMouseDown(e, e.changedTouches[0].pageX, e.changedTouches[0].pageY, 0)
@@ -48,7 +77,12 @@ module.exports = {
             // global.JQModules.QtQuick.Item.onMouseMove(e, e.changedTouches[0].pageX, e.changedTouches[0].pageY)
         })
         window.addEventListener('wheel', (e)=>{
-            // global.JQModules.QtQuick.Item.onWheel(e, e.pageX, e.pageY, e.deltaX, e.deltaY)
+            let elements = document.elementsFromPoint(e.pageX, e.pageY)
+            for(el of elements){
+                if(el.qml) {
+                    if(el.qml.__onWheel(this.chain, e.pageX, e.pageY)) break
+                }
+            }
         })
     }
 }
