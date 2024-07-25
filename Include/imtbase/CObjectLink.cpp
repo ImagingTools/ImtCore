@@ -12,17 +12,6 @@ namespace imtbase
 {
 
 
-void CObjectLink::SetObjectUuid(const QByteArray& objectUuid)
-{
-	if (m_objectUuid != objectUuid){
-		istd::CChangeNotifier notifier(this);
-		Q_UNUSED(notifier);
-
-		m_objectUuid = objectUuid;
-	}
-}
-
-
 void CObjectLink::SetFactoryId(const QByteArray& objectType)
 {
 	if (m_objectTypeId != objectType){
@@ -53,6 +42,19 @@ const imtbase::IObjectCollection* CObjectLink::GetCollection() const
 QByteArray CObjectLink::GetObjectUuid() const
 {
 	return m_objectUuid;
+}
+
+
+bool CObjectLink::SetObjectUuid(const QByteArray& objectUuid)
+{
+	if (m_objectUuid != objectUuid){
+		istd::CChangeNotifier notifier(this);
+		Q_UNUSED(notifier);
+
+		m_objectUuid = objectUuid;
+	}
+
+	return true;
 }
 
 

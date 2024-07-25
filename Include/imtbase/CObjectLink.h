@@ -12,7 +12,6 @@ namespace imtbase
 class CObjectLink: virtual public ICollectionObjectLink
 {
 public:
-	virtual void SetObjectUuid(const QByteArray& objectUuid);
 	virtual void SetFactoryId(const QByteArray& objectType);
 	virtual void SetCollectionPtr(const imtbase::IObjectCollection* collectionPtr);
 
@@ -21,6 +20,7 @@ public:
 
 	// reimplemented (IIdentifiable)
 	virtual QByteArray GetObjectUuid() const override;
+	virtual bool SetObjectUuid(const QByteArray& objectUuid);
 
 	// reimplemented (iser::IObject)
 	virtual QByteArray GetFactoryId() const override;
