@@ -65,15 +65,47 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 	MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
-#set(outlibdir "${PROJECT_SOURCE_DIR}/../libs/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
 
-#set_target_properties( ${PROJECT_NAME}
-#	PROPERTIES
-#	ARCHIVE_OUTPUT_DIRECTORY ${outlibdir}
-#	LIBRARY_OUTPUT_DIRECTORY ${outlibdir}
-#	RUNTIME_OUTPUT_DIRECTORY ${outlibdir}
-#	POSITION_INDEPENDENT_CODE ON
-#)
+
+
+set(COMPILER_NAME "Clang")
+if(${MSVC})
+	if(${MSVC_TOOLSET_VERSION} STREQUAL 142)
+		set(COMPILER_NAME "VC16")
+	elseif(${MSVC_TOOLSET_VERSION} STREQUAL 143)
+		set(COMPILER_NAME "VC17")
+	endif()
+elseif(${APPLE})
+	if("${CMAKE_OSX_ARCHITECTURES}" STREQUAL "arm64")
+		set(COMPILER_CODE "${COMPILER_NAME}OSX_arm64")
+		add_compile_definitions(COMPILER_NAME=ClangOSX)
+		add_compile_definitions(PLATFORM_CODE=arm64)
+	else()
+		set(COMPILER_CODE "${COMPILER_NAME}OSX_x64")
+		add_compile_definitions(COMPILER_NAME=ClangOSX)
+		add_compile_definitions(PLATFORM_CODE=x64)
+	endif()
+elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		set(COMPILER_CODE "GCCLinux_x64")
+		add_compile_definitions(COMPILER_NAME=GCCLinux)
+	else()
+		set(COMPILER_CODE "ClangLinux_x64")
+		add_compile_definitions(COMPILER_NAME=ClangLinux)
+	endif()
+	add_compile_definitions(PLATFORM_CODE=x64)
+endif()
+
+
+set(outlibdir "${PROJECT_SOURCE_DIR}/../libs/${CMAKE_BUILD_TYPE}_Qt${QT_VERSION_MAJOR}_${COMPILER_NAME}_x64")
+
+set_target_properties( ${PROJECT_NAME}
+	PROPERTIES
+	ARCHIVE_OUTPUT_DIRECTORY ${outlibdir}
+	LIBRARY_OUTPUT_DIRECTORY ${outlibdir}
+	RUNTIME_OUTPUT_DIRECTORY ${outlibdir}
+	POSITION_INDEPENDENT_CODE ON
+)
 
 if(QT_VERSION_MAJOR EQUAL 6)
 #    qt_import_qml_plugins(${PROJECT_NAME})
