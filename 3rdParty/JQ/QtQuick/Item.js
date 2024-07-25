@@ -202,15 +202,15 @@ class Item extends QtObject {
     mapToItem(item, x, y){}
     forceActiveFocus(){}
 
-
-    __onMouseOver(chain, x, y){}
-    __onMouseOut(chain, x, y){}
-    __onMouseMove(chain, x, y){}
-    __onMouseDown(chain, x, y, button){}
-    __onMouseUp(chain, x, y, button){}
-    __onMouseClick(chain, x, y, button){}
-    __onMouseDblClick(chain, x, y, button){}
-    __onWheel(chain, x, y){}
+    
+    __onEntered(){}
+    __onExited(){}
+    __onPositionChanged(x, y){}
+    __onPressed(x, y, button){}
+    __onReleased(x, y, button){}
+    __onClick(x, y, button){}
+    __onDblClick(x, y, button){}
+    __onWheel(){}
 }
 
 module.exports = Item

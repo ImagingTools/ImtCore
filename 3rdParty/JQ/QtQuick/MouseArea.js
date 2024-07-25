@@ -53,8 +53,7 @@ class MouseArea extends Item {
 
     mouse = {
         pressed: false,
-        entered: false,
-        exited: false,
+        mouseOver: false,
         accepted: true,
         button: QtEnums.LeftButton,
         buttons: QtEnums.LeftButton,
@@ -66,190 +65,67 @@ class MouseArea extends Item {
         y: 0,
     }
 
-    __getRelativePoint(absX, absY){
-        let rect = this.__DOM.getBoundingClientRect()
-        return {
-            x: absX - rect.x,
-            y: absY - rect.y,
+    __onEntered(){
+        if(!this.mouse.mouseOver && (this.hoverEnabled || this.mouse.pressed)) {
+            this.mouse.mouseOver = true
+            this.entered()
         }
     }
-
-    __onMouseOver(chain, x, y){}
-
-    __onMouseOut(chain, x, y){
-        if(chain.length){
-            if(!this.hoverEnabled){
-                let point = this.__getRelativePoint(x, y)
-
-                if(point.x < 0 || point.y < 0 || point.x >= this.width || point.y >= this.height){
-                    if(!this.mouse.exited){
-                        this.mouse.exited = true
-                        this.exited()
-                    }
-                    this.mouse.entered = false
-                }
-            }
-            
-        } else {
-            if(this.hoverEnabled){
-                let point = this.__getRelativePoint(x, y)
-
-                if(point.x < 0 || point.y < 0 || point.x >= this.width || point.y >= this.height){
-                    if(!this.mouse.exited){
-                        this.mouse.exited = true
-                        this.exited()
-                    }
-                    this.mouse.entered = false
-                }
-            }
+    __onExited(){
+        if(this.mouse.mouseOver) {
+            this.mouse.mouseOver = false
+            this.exited()
         }
     }
-    __onMouseMove(chain, x, y){
-        if(chain.length){
-            if(chain.indexOf(this) >= 0 && this.mouse.pressed){
-                let point = this.__getRelativePoint(x, y)
-                this.mouse.x = point.x
-                this.mouse.y = point.y
-                this.mouseX = point.x
-                this.mouseY = point.y
+    __onPositionChanged(x, y){
+        this.mouse.x = x
+        this.mouse.y = y
+        this.mouseX = x
+        this.mouseY = y
 
-                if(point.x >= 0 && point.y >= 0 && point.x < this.width && point.y < this.height){
-                    if(!this.mouse.entered){
-                        this.mouse.entered = true
-                        this.entered()
-                    }
-                    this.mouse.exited = false
-                }
-
-                this.positionChanged()
-            }
-        } else if(this.hoverEnabled){
-            let point = this.__getRelativePoint(x, y)
-            this.mouse.x = point.x
-            this.mouse.y = point.y
-            this.mouseX = point.x
-            this.mouseY = point.y
-
-            if(point.x >= 0 && point.y >= 0 && point.x < this.width && point.y < this.height){
-                if(!this.mouse.entered){
-                    this.mouse.entered = true
-                    this.entered()
-                }
-                this.mouse.exited = false
-            }
-
-            this.positionChanged()
-        }
+        if(this.hoverEnabled || this.mouse.pressed) this.positionChanged()
     }
-    __onMouseDown(chain, x, y, button){
-        let point = this.__getRelativePoint(x, y)
-        this.mouse.x = point.x
-        this.mouse.y = point.y
-        this.mouseX = point.x
-        this.mouseY = point.y
+    __onPressed(x, y, button){
+        this.mouse.pressed = true
+        this.__onEntered()
 
-        if(point.x >= 0 && point.y >= 0 && point.x < this.width && point.y < this.height){
-            if(!this.mouse.entered){
-                this.mouse.entered = true
-                this.entered()
-            }
-            this.mouse.exited = false
-        }
+        this.mouse.x = x
+        this.mouse.y = y
+        this.mouseX = x
+        this.mouseY = y
 
         this.pressed()
-        this.mouse.pressed = true
-
-        if(this.mouse.accepted){
-            for(let obj of chain){
-                if(obj instanceof MouseArea){
-                    obj.mouse.pressed = false
-                }
-            }
-            // let i = 0
-            // while(i < chain.length){
-            //     if(chain[i] instanceof MouseArea){
-            //         chain[i].mouse.pressed = false
-            //         chain.splice(i, 1)
-            //     } else {
-            //         i++
-            //     }
-            // }
-        }
-
-        chain.push(this)
         return this.mouse.accepted
     }
-    __onMouseUp(chain, x, y, button){
-        if(this.mouse.pressed){
-            let point = this.__getRelativePoint(x, y)
-            this.mouse.x = point.x
-            this.mouse.y = point.y
-            this.mouseX = point.x
-            this.mouseY = point.y
+    __onReleased(x, y, button){
+        this.mouse.pressed = false
 
-            this.released()
-        }
+        this.mouse.x = x
+        this.mouse.y = y
+        this.mouseX = x
+        this.mouseY = y
+
+        this.released()
     }
-    __onMouseClick(chain, x, y, button){
-        let point = this.__getRelativePoint(x, y)
+    __onClick(x, y, button){
+        this.mouse.x = x
+        this.mouse.y = y
+        this.mouseX = x
+        this.mouseY = y
 
-        if(this.mouse.pressed){
-            this.mouse.x = point.x
-            this.mouse.y = point.y
-            this.mouseX = point.x
-            this.mouseY = point.y
-
-            this.clicked()
-            this.mouse.pressed = false
-        }
-
-        if(this.hoverEnabled){
-            if(point.x < 0 || point.y < 0 || point.x >= this.width || point.y >= this.height){
-                if(!this.mouse.exited){
-                    this.mouse.exited = true
-                    this.exited()
-                }
-                this.mouse.entered = false
-            }
-        } else {
-            if(!this.mouse.exited){
-                this.mouse.exited = true
-                this.exited()
-            }
-            this.mouse.entered = false
-        }
-        
+        this.clicked()
+        if(this.propagateComposedEvents) return this.mouse.accepted
     }
-    __onMouseDblClick(chain, x, y, button){
-        let point = this.__getRelativePoint(x, y)
+    __onDblClick(x, y, button){
+        this.mouse.x = x
+        this.mouse.y = y
+        this.mouseX = x
+        this.mouseY = y
 
-        if(this.mouse.pressed){
-            this.mouse.x = point.x
-            this.mouse.y = point.y
-            this.mouseX = point.x
-            this.mouseY = point.y
-
-            this.doubleClicked()
-            this.mouse.pressed = false
-        }
-
-        if(this.hoverEnabled){
-            if(point.x < 0 || point.y < 0 || point.x >= this.width || point.y >= this.height){
-                if(!this.mouse.exited){
-                    this.mouse.exited = true
-                    this.exited()
-                }
-                this.mouse.entered = false
-            }
-        } else {
-            if(!this.mouse.exited){
-                this.mouse.exited = true
-                this.exited()
-            }
-            this.mouse.entered = false
-        }
+        this.doubleClicked()
+        if(this.propagateComposedEvents) return this.mouse.accepted
     }
-    __onWheel(chain, x, y){}
+    __onWheel(){}
 }
 
 module.exports = MouseArea

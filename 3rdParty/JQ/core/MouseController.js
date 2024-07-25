@@ -1,55 +1,109 @@
 module.exports = {
     timeStamp: 0,
-    chain: [],
+    pressed: [],
+    entered: [],
+    enteredWithoutPressed: [],
+
+    getRelativeRect(el, absX, absY){
+        let rect = el.getBoundingClientRect()
+        return {
+            x: absX - rect.x,
+            y: absY - rect.y,
+            width: rect.width,
+            height: rect.height,
+        }
+    },
 
     init: function(){   
-        // window.addEventListener('mouseover', (e)=>{
-        //     if(e.target.qml) {
-        //         e.target.qml.__onMouseOver(this.chain, e.pageX, e.pageY, e.button)
-        //     }
-        // })
-        window.addEventListener('mouseout', (e)=>{
-            if(e.target.qml) {
-                e.target.qml.__onMouseOut(this.chain, e.pageX, e.pageY, e.button)
-            }
-        })
         window.addEventListener('mousemove', (e)=>{
             let elements = document.elementsFromPoint(e.pageX, e.pageY)
+
             for(el of elements){
-                if(el.qml) {
-                    el.qml.__onMouseMove(this.chain, e.pageX, e.pageY, e.button)
+                if(!el.qml) continue
+
+                if(this.pressed.length === 0 || this.pressed.indexOf(el) >= 0) {
+                    if(this.entered.indexOf(el) < 0){
+                        this.entered.push(el)
+                        el.qml.__onEntered()
+                    }
+
+                    let rect = this.getRelativeRect(el, e.pageX, e.pageY)
+                    el.qml.__onPositionChanged(rect.x, rect.y)
+                }
+            }
+
+            for(let el of this.pressed){
+                if(elements.indexOf(el) < 0){
+                    let rect = this.getRelativeRect(el, e.pageX, e.pageY)
+                    el.qml.__onPositionChanged(rect.x, rect.y)
+                }
+            }
+
+            let i = 0
+            while(i < this.entered.length){
+                if(elements.indexOf(this.entered[i]) < 0){
+                    if(this.pressed.length === 0 || this.pressed.indexOf(this.entered[i]) >= 0) this.entered[i].qml.__onExited()
+                    this.entered.splice(i, 1)
+                } else {
+                    i++
                 }
             }
         })
+
         window.addEventListener('click', (e)=>{
             if(e.timeStamp - this.timeStamp > 300){
                 this.timeStamp = e.timeStamp
 
-                for(obj of this.chain){
-                    obj.__onMouseClick(this.chain, e.pageX, e.pageY, e.button)
+                for(el of this.pressed){
+                    let rect = this.getRelativeRect(el, e.pageX, e.pageY)
+                    if(el.qml.__onClick(rect.x, rect.y, e.button)) break
                 }
             } else {
-                for(obj of this.chain){
-                    obj.__onMouseDblClick(this.chain, e.pageX, e.pageY, e.button)
+                for(el of this.pressed){
+                    let rect = this.getRelativeRect(el, e.pageX, e.pageY)
+                    if(el.qml.__onDblClick(rect.x, rect.y, e.button)) break
                 }
             }
-            this.chain = []
+            for(el of this.pressed){
+                if(!el.qml) continue
+
+                el.qml.__onExited()
+            }
+
+            let elements = document.elementsFromPoint(e.pageX, e.pageY)
+
+            for(el of this.enteredWithoutPressed){
+                if(!el.qml) continue
+
+                if(elements.indexOf(el) < 0){
+                    el.qml.__onExited()
+                }
+            }
+            this.pressed = []
         })
         window.addEventListener('dblclick', (e)=>{
             e.preventDefault()
         })
         window.addEventListener('mousedown', (e)=>{
-            this.chain = []
+            this.pressed = []
+            this.enteredWithoutPressed = this.entered.slice()
             let elements = document.elementsFromPoint(e.pageX, e.pageY)
             for(el of elements){
-                if(el.qml) {
-                    if(el.qml.__onMouseDown(this.chain, e.pageX, e.pageY, e.button)) break
+                if(!el.qml) continue
+
+                let rect = this.getRelativeRect(el, e.pageX, e.pageY)
+                if(el.qml.__onPressed(rect.x, rect.y, e.button)) {
+                    this.pressed = [el]
+                    break
                 }
+
+                this.pressed.push(el)
             }
         })
         window.addEventListener('mouseup', (e)=>{
-            for(obj of this.chain){
-                obj.__onMouseUp(this.chain, e.pageX, e.pageY, e.button)
+            for(el of this.pressed){
+                let rect = this.getRelativeRect(el, e.pageX, e.pageY)
+                el.qml.__onReleased(rect.x, rect.y, e.button)
             }
         })
         window.addEventListener('contextmenu', (e)=>{
@@ -57,33 +111,45 @@ module.exports = {
             if(e.timeStamp - this.timeStamp > 300){
                 this.timeStamp = e.timeStamp
 
-                for(obj of this.chain){
-                    obj.__onMouseClick(this.chain, e.pageX, e.pageY, e.button)
+                for(el of this.pressed){
+                    let rect = this.getRelativeRect(el, e.pageX, e.pageY)
+                    if(el.qml.__onClick(rect.x, rect.y, e.button)) break
                 }
             } else {
-                for(obj of this.chain){
-                    obj.__onMouseDblClick(this.chain, e.pageX, e.pageY, e.button)
+                for(el of this.pressed){
+                    let rect = this.getRelativeRect(el, e.pageX, e.pageY)
+                    if(el.qml.__onDblClick(rect.x, rect.y, e.button)) break
                 }
             }
-            this.chain = []
-        })
-        window.addEventListener('touchstart', (e)=>{
-            // global.JQModules.QtQuick.Item.onMouseDown(e, e.changedTouches[0].pageX, e.changedTouches[0].pageY, 0)
-        })
-        window.addEventListener('touchend', (e)=>{
-            // global.JQModules.QtQuick.Item.onMouseUp(e, e.changedTouches[0].pageX, e.changedTouches[0].pageY, 0)
-        })
-        window.addEventListener('touchmove', (e)=>{
-            // global.JQModules.QtQuick.Item.onMouseMove(e, e.changedTouches[0].pageX, e.changedTouches[0].pageY)
-        })
-        window.addEventListener('wheel', (e)=>{
+            for(el of this.pressed){
+                if(!el.qml) continue
+
+                el.qml.__onExited()
+            }
+
             let elements = document.elementsFromPoint(e.pageX, e.pageY)
-            for(el of elements){
-                if(el.qml) {
-                    if(el.qml.__onWheel(this.chain, e.pageX, e.pageY)) break
+
+            for(el of this.enteredWithoutPressed){
+                if(!el.qml) continue
+
+                if(elements.indexOf(el) < 0){
+                    el.qml.__onExited()
                 }
             }
+            this.pressed = []
         })
+        // window.addEventListener('touchstart', (e)=>{
+
+        // })
+        // window.addEventListener('touchend', (e)=>{
+
+        // })
+        // window.addEventListener('touchmove', (e)=>{
+
+        // })
+        // window.addEventListener('wheel', (e)=>{
+
+        // })
     }
 }
 
