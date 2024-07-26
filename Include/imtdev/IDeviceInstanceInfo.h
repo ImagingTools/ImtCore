@@ -13,7 +13,7 @@ namespace imtdev
 class IDeviceStaticInfo;
 
 
-class IDeviceInstanceInfo: virtual public iser::ISerializable
+class IDeviceInstanceInfo: virtual public istd::IChangeable
 {
 public:
 	enum IdTypes
