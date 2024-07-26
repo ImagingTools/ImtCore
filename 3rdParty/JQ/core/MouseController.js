@@ -147,9 +147,18 @@ module.exports = {
         // window.addEventListener('touchmove', (e)=>{
 
         // })
-        // window.addEventListener('wheel', (e)=>{
+        window.addEventListener('wheel', (e)=>{
+            let elements = document.elementsFromPoint(e.pageX, e.pageY)
 
-        // })
+            for(el of elements){
+                if(!el.qml) continue
+
+                if(this.pressed.length === 0 || this.pressed.indexOf(el) >= 0) {
+                    let rect = this.getRelativeRect(el, e.pageX, e.pageY)
+                    if(el.qml.__onWheel(rect.x, rect.y, e.deltaX / 8, e.deltaY / 8)) break
+                }
+            }
+        })
     }
 }
 

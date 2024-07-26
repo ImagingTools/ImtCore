@@ -32,16 +32,16 @@ class MouseArea extends Item {
         mouseYChanged: { type:Signal, slotName:'onMouseYChanged', args:[] },
         cursorShapeChanged: { type:Signal, slotName:'onCursorShapeChanged', args:[] },
 
-        clicked: { type:Signal, slotName:'onClicked', args:[] },
 		entered: { type:Signal, slotName:'onEntered', args:[] },
 		exited: { type:Signal, slotName:'onExited', args:[] },
 		canceled: { type:Signal, slotName:'onCanceled', args:[] },
-		pressAndHold: { type:Signal, slotName:'onPressAndHold', args:[] },
-		pressed: { type:Signal, slotName:'onPressed', args:[] },
-		released: { type:Signal, slotName:'onReleased', args:[] },
-		wheel: { type:Signal, slotName:'onWheel', args:[] },
-		doubleClicked: { type:Signal, slotName:'onDoubleClicked', args:[] },
-		positionChanged: { type:Signal, slotName:'onPositionChanged', args:[] },
+		pressAndHold: { type:Signal, slotName:'onPressAndHold', args:['mouse'] },
+		pressed: { type:Signal, slotName:'onPressed', args:['mouse'] },
+		released: { type:Signal, slotName:'onReleased', args:['mouse'] },
+		wheel: { type:Signal, slotName:'onWheel', args:['wheel'] },
+        clicked: { type:Signal, slotName:'onClicked', args:['mouse'] },
+		doubleClicked: { type:Signal, slotName:'onDoubleClicked', args:['mouse'] },
+		positionChanged: { type:Signal, slotName:'onPositionChanged', args:['mouse'] },
     })
 
     static create(parent, ...args){
@@ -51,81 +51,109 @@ class MouseArea extends Item {
         return proxy
     }
 
-    mouse = {
-        pressed: false,
-        mouseOver: false,
-        accepted: true,
-        button: QtEnums.LeftButton,
-        buttons: QtEnums.LeftButton,
-        //flags: int,
-        modifiers: 0,
-        //source: int,
-        wasHeld: false,
-        x: 0,
-        y: 0,
+    __mousePressed = false
+    __mouseOver = false
+
+    __getMouseEventStructure(){
+        return {
+            accepted: true,
+            button: QtEnums.LeftButton,
+            buttons: QtEnums.LeftButton,
+            modifiers: 0,
+            wasHeld: false,
+            x: 0,
+            y: 0,
+        }
+    }
+
+    __getWheelEventStructure(){
+        return {
+            accepted: false,
+            angleDelta: {
+                x: 0,
+                y: 0,
+            },
+            x: 0,
+            y: 0,
+        }
     }
 
     __onEntered(){
-        if(!this.mouse.mouseOver && (this.hoverEnabled || this.mouse.pressed)) {
-            this.mouse.mouseOver = true
+        if(!this.__mouseOver && (this.hoverEnabled || this.__mousePressed)) {
+            this.__mouseOver = true
             this.entered()
         }
     }
     __onExited(){
-        if(this.mouse.mouseOver) {
-            this.mouse.mouseOver = false
+        if(this.__mouseOver) {
+            this.__mouseOver = false
             this.exited()
         }
     }
     __onPositionChanged(x, y){
-        this.mouse.x = x
-        this.mouse.y = y
+        let mouse = this.__getMouseEventStructure()
+        mouse.x = x
+        mouse.y = y
         this.mouseX = x
         this.mouseY = y
 
-        if(this.hoverEnabled || this.mouse.pressed) this.positionChanged()
+        if(this.hoverEnabled || this.__mousePressed) this.positionChanged(mouse)
     }
     __onPressed(x, y, button){
-        this.mouse.pressed = true
+        this.__mousePressed = true
         this.__onEntered()
 
-        this.mouse.x = x
-        this.mouse.y = y
+        let mouse = this.__getMouseEventStructure()
+        mouse.x = x
+        mouse.y = y
         this.mouseX = x
         this.mouseY = y
 
-        this.pressed()
-        return this.mouse.accepted
+        this.pressed(mouse)
+        return mouse.accepted
     }
     __onReleased(x, y, button){
-        this.mouse.pressed = false
+        this.__mousePressed = false
 
-        this.mouse.x = x
-        this.mouse.y = y
+        let mouse = this.__getMouseEventStructure()
+        mouse.x = x
+        mouse.y = y
         this.mouseX = x
         this.mouseY = y
 
-        this.released()
+        this.released(mouse)
     }
     __onClick(x, y, button){
-        this.mouse.x = x
-        this.mouse.y = y
+        let mouse = this.__getMouseEventStructure()
+        mouse.x = x
+        mouse.y = y
         this.mouseX = x
         this.mouseY = y
 
-        this.clicked()
-        if(this.propagateComposedEvents) return this.mouse.accepted
+        this.clicked(mouse)
+        if(this.propagateComposedEvents) return mouse.accepted
     }
     __onDblClick(x, y, button){
-        this.mouse.x = x
-        this.mouse.y = y
+        let mouse = this.__getMouseEventStructure()
+        mouse.x = x
+        mouse.y = y
         this.mouseX = x
         this.mouseY = y
 
-        this.doubleClicked()
-        if(this.propagateComposedEvents) return this.mouse.accepted
+        this.doubleClicked(mouse)
+        if(this.propagateComposedEvents) return mouse.accepted
     }
-    __onWheel(){}
+    __onWheel(x, y, deltaX, deltaY){
+        let wheel = this.__getWheelEventStructure()
+        wheel.x = x
+        wheel.y = y
+        wheel.angleDelta.x = deltaX
+        wheel.angleDelta.y = deltaY
+
+        this.wheel(wheel)
+
+        return wheel.accepted
+    }
 }
 
 module.exports = MouseArea
