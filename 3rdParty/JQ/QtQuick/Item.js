@@ -202,11 +202,12 @@ class Item extends QtObject {
     mapToItem(item, x, y){}
     forceActiveFocus(){}
 
-    
+
     __onEntered(){}
     __onExited(){}
     __onPositionChanged(x, y){}
     __onPressed(x, y, button){}
+    __onPressAndHold(x, y, button){}
     __onReleased(x, y, button){}
     __onClick(x, y, button){}
     __onDblClick(x, y, button){}

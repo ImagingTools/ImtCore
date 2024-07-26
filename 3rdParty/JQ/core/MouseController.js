@@ -56,12 +56,16 @@ module.exports = {
 
                 for(el of this.pressed){
                     let rect = this.getRelativeRect(el, e.pageX, e.pageY)
-                    if(el.qml.__onClick(rect.x, rect.y, e.button)) break
+                    if(rect.x >= 0 && rect.y >= 0 && rect.x < rect.width && rect.y < rect.height){
+                        if(el.qml.__onClick(rect.x, rect.y, e.button)) break
+                    }
                 }
             } else {
                 for(el of this.pressed){
                     let rect = this.getRelativeRect(el, e.pageX, e.pageY)
-                    if(el.qml.__onDblClick(rect.x, rect.y, e.button)) break
+                    if(rect.x >= 0 && rect.y >= 0 && rect.x < rect.width && rect.y < rect.height){
+                        if(el.qml.__onDblClick(rect.x, rect.y, e.button)) break
+                    }
                 }
             }
             for(el of this.pressed){
@@ -98,6 +102,13 @@ module.exports = {
                 }
 
                 this.pressed.push(el)
+            }
+
+            for(el of this.pressed){
+                if(!el.qml) continue
+                
+                let rect = this.getRelativeRect(el, e.pageX, e.pageY)
+                el.qml.__onPressAndHold(rect.x, rect.y, e.button)
             }
         })
         window.addEventListener('mouseup', (e)=>{
