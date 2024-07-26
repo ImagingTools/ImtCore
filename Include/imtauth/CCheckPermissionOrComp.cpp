@@ -12,6 +12,10 @@ namespace imtauth
 bool CCheckPermissionOrComp::CheckPermission(const IUserInfo::FeatureIds &userPermissions, const QByteArrayList &permissionIds)
 {
 	for (const QByteArray& permissionId : permissionIds){
+		if (permissionId == "*"){
+			return true;
+		}
+
 		if (userPermissions.contains(permissionId)){
 			return true;
 		}
