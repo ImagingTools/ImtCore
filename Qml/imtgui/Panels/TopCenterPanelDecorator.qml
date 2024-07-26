@@ -22,7 +22,7 @@ DecoratorBase {
         target: AuthorizationController;
 
         function onLoginSuccessful(){
-            topCenterPanelDecorator.canSearch = PermissionsController.checkPermission("ViewSearch");
+            topCenterPanelDecorator.canSearch = true;
             topCenterPanelDecorator.visible = topCenterPanelDecorator.canSearch;
         }
 
