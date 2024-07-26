@@ -42,6 +42,23 @@ CDocumentTable::CDocumentTable(const QString& name, mdbx::txn_managed &txn,
 	}
 }
 
+//CDocumentTable::~CDocumentTable()
+//{
+//	try{
+//		m_cursor.close();
+
+
+//		if(m_hasIndex){
+//			m_cursorIndex.close();
+//		}
+//	}
+//	catch(...){
+
+//	}
+
+
+//}
+
 
 // reimplemented (imtmdbx::IDocumentTable)
 qint64 CDocumentTable::AddDocument(const QByteArray &data)
@@ -55,27 +72,47 @@ qint64 CDocumentTable::AddDocument(qint64 data)
 	return AddDocument((char*)&data, 8);
 }
 
+qint64 CDocumentTable::AddDocument(const QByteArray &key, const QByteArray &data)
+{
+	return AddDocument(data.data(), data.length(), key);
+}
 
-qint64 CDocumentTable::AddDocument(const char *data, int count)
+
+qint64 CDocumentTable::AddDocument(const char *data, int count, const QByteArray& keyStr)
 {
 	try{
 		mdbx::cursor::move_result result = m_cursor.to_last(false);
 
 		qint64 key = 0;
 
+
 		if(result.done){
 			key = result.key.as_int64();
 			key++;
 		}
 
+
+
 		mdbx::slice keySlice(&key, 8);
+		mdbx::slice keyStrSlice(keyStr, keyStr.length());
 		mdbx::slice valueSlice(data, count);
-		m_txn.put(m_mapHandle, keySlice, valueSlice, mdbx::put_mode::upsert);
+		if(keyStr.isEmpty()){
+			m_txn.put(m_mapHandle, keySlice, valueSlice, mdbx::put_mode::upsert);
+		}
+		else {
+			m_txn.put(m_mapHandle, keyStrSlice, valueSlice, mdbx::put_mode::upsert);
+		}
 
 		if(m_hasIndex){
 			mdbx::slice keySliceIndex(data, count);
 			mdbx::slice valueSliceIndex(&key, 8);
-			m_txn.put(m_mapHandleIndex, keySliceIndex, valueSliceIndex, mdbx::put_mode::upsert);
+			mdbx::slice valueStrSliceIndex(keyStr, keyStr.length());
+			if(keyStr.isEmpty()){
+				m_txn.put(m_mapHandleIndex, keySliceIndex, valueSliceIndex, mdbx::put_mode::upsert);
+			}
+			else {
+				m_txn.put(m_mapHandleIndex, keySliceIndex, valueStrSliceIndex, mdbx::put_mode::upsert);
+			}
 		}
 
 		return key;
@@ -262,6 +299,20 @@ bool CDocumentTable::Exists(const QString& name)
 
 	return ok;
 
+}
+
+bool CDocumentTable::CloseTable(mdbx::env_managed& env)
+{
+	try{
+		m_cursor.close();
+		env.close_map(m_mapHandle);
+
+		return true;
+	}
+	catch(...){
+		//qDebug() << "НЕ УДАЛОСЬ ЗАКРЫТЬ ТАБЛИЦУ";
+	}
+	return false;
 }
 
 

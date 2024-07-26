@@ -17,17 +17,21 @@ class CDocumentTable: virtual public IDocumentTable
 public:
 	CDocumentTable(const QString& name, mdbx::txn_managed& txn, mdbx::key_mode keyMode = mdbx::key_mode::reverse, mdbx::value_mode valueMode = mdbx::value_mode::single, bool hasIndex = false);
 
+	//~CDocumentTable();
+
 	// reimplemented (imtmdbx::IDocumentTable)
 	virtual qint64 AddDocument(const QByteArray& data) override;
 	virtual qint64 AddDocument(qint64 data) override;
+	virtual qint64 AddDocument(const QByteArray& key, const QByteArray& data) override;
 	virtual QByteArray GetDocument(qint64 key) override;
 	virtual bool UpdateDocument(qint64 key,  const QByteArray& data) override;
 	virtual qint64 GetKey(const QByteArray& value) override;
 	virtual bool CreateIndex() override;
 	virtual bool Exists(const QString& name) override;
+	bool CloseTable(mdbx::env_managed& env);
 
 protected:
-	virtual qint64 AddDocument(const char *data, int count);
+	virtual qint64 AddDocument(const char *data, int count, const QByteArray& keyStr = QByteArray());
 
 	QString m_tableName;
 	mdbx::txn_managed& m_txn;

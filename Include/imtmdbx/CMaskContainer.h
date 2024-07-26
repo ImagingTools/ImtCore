@@ -28,8 +28,8 @@ public:
 	CMaskContainer(OperationType operationType);
 
 	void AddMask(IMask* mask, bool isInversion);
-    qint64 GetUnitCount();
-	QList<quint64> GetUnitPositions(qint64 offset = 0, int limit = -1);
+	quint64 GetUnitCount();
+	QList<quint64> GetUnitPositions(quint64 offset = 0, int limit = -1);
 
 protected:
 	QList<IMask*> m_maskList;

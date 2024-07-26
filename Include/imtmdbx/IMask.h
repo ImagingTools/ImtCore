@@ -10,14 +10,14 @@ namespace imtmdbx
 class IMask
 {
 public:
-	virtual bool GetUnit(qint64 position) = 0;
-	virtual bool SetUnit(qint64 position, bool unit) = 0;
+	virtual bool GetUnit(quint64 position) = 0;
+	virtual bool SetUnit(quint64 position, bool unit) = 0;
 
-	virtual bool GetItem(qint64 offset, quint64& item) = 0;
-	virtual bool SetItem(qint64 offset, quint64 item) = 0;
+	virtual bool GetItem(quint64 offset, quint64& item) = 0;
+	virtual bool SetItem(quint64 offset, quint64 item) = 0;
 
-	virtual qint64 GetNextItemOffset(qint64 startOffset = 0) = 0;
-	virtual qint64 GetPreviosItemOffset(qint64 startOffset = 0xffffffffffffff) = 0;
+	virtual bool GetNextItemOffset(quint64& offset, qint64 startOffset = -1) = 0;
+	virtual bool GetPreviosItemOffset(quint64& offset, quint64 startOffset = 0xffffffffffffff) = 0;
 
 };
 
