@@ -32,6 +32,9 @@ public:
 	QList<quint64> GetUnitPositions(quint64 offset = 0, int limit = -1);
 
 protected:
+	bool GetActiveItem(quint64& activeOffset, quint64& activeItem, bool isStart);
+
+protected:
 	QList<IMask*> m_maskList;
 	QList<IMask*> m_maskListInv;
 	OperationType m_operationType;

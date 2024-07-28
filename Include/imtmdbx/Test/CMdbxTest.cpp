@@ -2,8 +2,10 @@
 
 #include <QtTest>
 
-#include "CMask.h"
-#include "CMaskContainer.h"
+// ImtCore includes
+#include <imtmdbx/CMask.h>
+#include <imtmdbx/CMaskContainer.h>
+#include <imtmdbx/CDoubleMask.h>
 
 #include <iostream>
 #include <QThread>
@@ -846,6 +848,7 @@ void CMdbxTest::test_write_masks(){
 	mdbx::txn_managed txn = env.start_write();
 	QString maskNameMln = "Mask1mln";
 	QString maskName1000 = "Mask1000";
+	QString doubleMaskName = "DoubleMask";
 
 	{
 		imtmdbx::CMask mask1mln(maskNameMln, txn);
@@ -861,6 +864,8 @@ void CMdbxTest::test_write_masks(){
 		}
 		std::cout << "Write 1mln: " << time.elapsed() << std::endl;
 	}
+	txn.commit();
+	txn = env.start_write();
 
 	{
 		imtmdbx::CMask mask1000(maskName1000, txn);
@@ -877,22 +882,46 @@ void CMdbxTest::test_write_masks(){
 		std::cout << "Write 1000: " << time.elapsed() << std::endl;
 	}
 	txn.commit();
+	txn = env.start_write();
+	{
+		for (int j = 0; j < 3; j++){
+			imtmdbx::CDoubleMask doubleMask(doubleMaskName + QString::number(5+j), txn, 5 + j);
+			QElapsedTimer time;
+			time.start();
+			for(int i = 3; i < 10; i++){
+				//			if (i%1000 == 0){
+				doubleMask.SetUnit(i,true);
+				//			}
+				if (i%10000 == 0){
+					std::cout << "Write i: " << i / 10000 << " " << time.elapsed() << std::endl;
+				}
+			}
+
+			bool unit = doubleMask.GetUnit(5);
+			std::cout << "Write 1000: " << time.elapsed() << std::endl;
+		}
+	}
+
+	txn.commit();
 	txn = env.start_read();
 
 	{
 		imtmdbx::CMask mask1mln(maskNameMln, txn);
 		imtmdbx::CMask mask1000(maskName1000, txn);
+		imtmdbx::CDoubleMask doubleMask(doubleMaskName + QString::number(6), txn, 6);
 //		quint64 unit =  mask1mln.GetUnit(2);
+		bool unit = doubleMask.GetUnit(5);
 
 		imtmdbx::CMaskContainer container(imtmdbx::CMaskContainer::OT_AND);
 		container.AddMask(&mask1mln, false);
+		container.AddMask(&doubleMask, false);
 		//container.AddMask(&mask1000, false);
 
 		QElapsedTimer time;
 		time.start();
 		int count = container.GetUnitCount();
 		QList<quint64> result;
-		result = container.GetUnitPositions(0,1000000);
+		result = container.GetUnitPositions(0,10);
 
 		std::cout << "Unit count: " << count << " result count:" << result.count() << " time:" << time.elapsed() << std::endl;
 	}

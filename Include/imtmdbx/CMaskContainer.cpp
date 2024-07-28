@@ -59,84 +59,21 @@ void CMaskContainer::AddMask(IMask *mask, bool isInversion)
 quint64 CMaskContainer::GetUnitCount()
 {
 	std::cout << "GetUnitCount";
-	qint64 activeOffset = -1;
+	quint64 activeOffset = 0;
 	quint64 unitCount = 0;
+	bool isStart = true;
 
 	int whileCount = 0;
 	while(1){
-		std::cout << whileCount;
-		qint64 maxOffset = activeOffset;
 		quint64 activeItem = 0xffffffffffffffff;
-		for(int i = 0; i < m_maskList.length(); i++){
-			quint64 offset = 0;
-			if(!m_maskList.at(i)->GetNextItemOffset(offset, activeOffset)){
-				return unitCount;
-			}
-			qint64 offset_ = offset;
-			if(offset_ > maxOffset){
-				maxOffset = offset;
-			}
-		}
-		for(int i = 0; i < m_maskListInv.length(); i++){
-			quint64 offset = 0;
-			if(!m_maskListInv.at(i)->GetNextItemOffset(offset, activeOffset)){
-				return unitCount;
-			}
-			qint64 offset_ = offset;
-			if(offset_ > maxOffset){
-				maxOffset = offset;
-			}
+
+		if (GetActiveItem(activeOffset, activeItem, isStart) == false){
+			return unitCount;
 		}
 
-		activeOffset = maxOffset;
-
-		for(int i = 0; i < m_maskList.length(); i++){
-			quint64 item;
-			if(activeOffset >= 0){
-				if (!m_maskList.at(i)->GetItem(activeOffset, item)){
-					item = 0;
-				}
-			}
-			else {
-				item = 0;
-			}
-
-			if(m_operationType == imtmdbx::CMaskContainer::OT_AND){
-				activeItem = activeItem & item;
-			}
-			else if(m_operationType == imtmdbx::CMaskContainer::OT_OR){
-				activeItem = activeItem | item;
-			}
-
-
-		}
-		for(int i = 0; i < m_maskListInv.length(); i++){
-
-			quint64 item;
-			if(activeOffset >= 0){
-				if (!m_maskListInv.at(i)->GetItem(activeOffset, item)){
-					item = 0;
-				}
-			}
-			else {
-				item = 0;
-			}
-
-
-			if(m_operationType == imtmdbx::CMaskContainer::OT_AND){
-				activeItem = activeItem & ~item;//Inversion
-			}
-			else if(m_operationType == imtmdbx::CMaskContainer::OT_OR){
-				activeItem = activeItem | ~item;//Inversion
-			}
-		}
+		isStart = false;
 
 		unitCount += BitCount(activeItem);
-
-		whileCount++;
-		if(whileCount > 1000){
-			break;
-		}
 	}
 
 	return unitCount;
@@ -146,68 +83,18 @@ quint64 CMaskContainer::GetUnitCount()
 QList<quint64> CMaskContainer::GetUnitPositions(quint64 offset, int limit)
 {
 	QList<quint64> list;
-	qint64 activeOffset = -1;
+	quint64 activeOffset = 0;
 	quint64 unitCount = 0;
+	bool isStart = true;
 
 	while(1){
-		qint64 maxOffset = activeOffset;
 		quint64 activeItem = 0xffffffffffffffff;
-		for(int i = 0; i < m_maskList.length(); i++){
-			quint64 offset = 0;
-			if(!m_maskList.at(i)->GetNextItemOffset(offset, activeOffset)){
-				return list;
-			}
-			qint64 offset_ = offset;
-			if(offset_ > maxOffset){
-				maxOffset = offset;
-			}
-		}
-		for(int i = 0; i < m_maskListInv.length(); i++){
-			quint64 offset = 0;
-			if(!m_maskListInv.at(i)->GetNextItemOffset(offset, activeOffset)){
-				return list;
-			}
-			qint64 offset_ = offset;
-			if(offset_ > maxOffset){
-				maxOffset = offset;
-			}
-		}
-		activeOffset = maxOffset;
-		for(int i = 0; i < m_maskList.length(); i++){
 
-			quint64 item;
-			if(activeOffset >= 0){
-				if (!m_maskList.at(i)->GetItem(activeOffset, item)){
-					item = 0;
-				}
-			}
-			else {
-				item = 0;
-			}
-			if(m_operationType == imtmdbx::CMaskContainer::OT_AND){
-				activeItem = activeItem & item;
-			}
-			else if(m_operationType == imtmdbx::CMaskContainer::OT_OR){
-				activeItem = activeItem | item;
-			}
+		if (GetActiveItem(activeOffset, activeItem, isStart) == false){
+			return list;
 		}
-		for(int i = 0; i < m_maskListInv.length(); i++){
-			quint64 item;
-			if(activeOffset >= 0){
-				if (!m_maskListInv.at(i)->GetItem(activeOffset, item)){
-					item = 0;
-				}
-			}
-			else {
-				item = 0;
-			}
-			if(m_operationType == imtmdbx::CMaskContainer::OT_AND){
-				activeItem = activeItem & ~item;//Inversion
-			}
-			else if(m_operationType == imtmdbx::CMaskContainer::OT_OR){
-				activeItem = activeItem | ~item;//Inversion
-			}
-		}
+
+		isStart = false;
 
 		for(int i = 0; i < 64; i++){
 			bool ok = (activeItem >> i) & (quint64)1;//check activeItem
@@ -227,6 +114,91 @@ QList<quint64> CMaskContainer::GetUnitPositions(quint64 offset, int limit)
     return list;
 }
 
+
+bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, bool isStart)
+{
+	qint64 maxOffset = activeOffset;
+	activeItem = 0xffffffffffffffff;
+	for(int i = 0; i < m_maskList.length(); i++){
+		quint64 offset = 0;
+		if (isStart){
+			if (!m_maskList.at(i)->GetNearestOffset(offset, activeOffset)){
+				return false;
+			}
+		}
+		else{
+			if (!m_maskList.at(i)->GetNextItemOffset(offset, activeOffset)){
+				return false;
+			}
+		}
+		qint64 offset_ = offset;
+		if(offset_ > maxOffset){
+			maxOffset = offset;
+		}
+	}
+	for(int i = 0; i < m_maskListInv.length(); i++){
+		quint64 offset = 0;
+		if (isStart){
+			if (!m_maskListInv.at(i)->GetNearestOffset(offset, activeOffset)){
+				return false;
+			}
+		}
+		else{
+			if(!m_maskListInv.at(i)->GetNextItemOffset(offset, activeOffset)){
+				return false;
+			}
+		}
+		qint64 offset_ = offset;
+		if(offset_ > maxOffset){
+			maxOffset = offset;
+		}
+	}
+
+	activeOffset = maxOffset;
+
+	for(int i = 0; i < m_maskList.length(); i++){
+		quint64 item;
+		if(activeOffset >= 0){
+			if (!m_maskList.at(i)->GetItem(activeOffset, item)){
+				item = 0;
+			}
+		}
+		else {
+			item = 0;
+		}
+
+		if(m_operationType == imtmdbx::CMaskContainer::OT_AND){
+			activeItem = activeItem & item;
+		}
+		else if(m_operationType == imtmdbx::CMaskContainer::OT_OR){
+			activeItem = activeItem | item;
+		}
+
+
+	}
+	for(int i = 0; i < m_maskListInv.length(); i++){
+
+		quint64 item;
+		if(activeOffset >= 0){
+			if (!m_maskListInv.at(i)->GetItem(activeOffset, item)){
+				item = 0;
+			}
+		}
+		else {
+			item = 0;
+		}
+
+
+		if(m_operationType == imtmdbx::CMaskContainer::OT_AND){
+			activeItem = activeItem & ~item;//Inversion
+		}
+		else if(m_operationType == imtmdbx::CMaskContainer::OT_OR){
+			activeItem = activeItem | ~item;//Inversion
+		}
+	}
+
+	return true;
+}
 
 
 }//namespace imtmdbx

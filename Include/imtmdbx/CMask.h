@@ -21,6 +21,7 @@ public:
 protected:
 	virtual bool GetItem(quint64 offset, quint64& item) override;
 	virtual bool SetItem(quint64 offset, quint64 item) override;
+	virtual bool GetNearestOffset(quint64& offset, quint64 startOffset = 0) override;
 	virtual bool GetNextItemOffset(quint64& offset, qint64 startOffset = -1) override;
 	virtual bool GetPreviosItemOffset(quint64& offset, quint64 startOffset = 0xffffffff) override;
 };

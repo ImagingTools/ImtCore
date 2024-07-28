@@ -60,8 +60,6 @@ bool CMask::SetUnit(quint64 position, bool unit)
 
 bool CMask::GetItem(quint64 offset, quint64& item)
 {
-	//qDebug() << "CMask::GetItem";
-
 	try{
 		mdbx::slice keySlice(&offset, 8);
 
@@ -72,17 +70,14 @@ bool CMask::GetItem(quint64 offset, quint64& item)
 	}
 	catch(...){
 		//item = 0;
-
 	}
-	return false;
 
+	return false;
 }
 
 
 bool CMask::SetItem(quint64 offset, quint64 item)
 {
-	//qDebug() << "CMask::SetItem";
-
 	try{
 		mdbx::slice keySlice(&offset, 8);
 		mdbx::slice valueSlice(&item, 8);
@@ -94,19 +89,40 @@ bool CMask::SetItem(quint64 offset, quint64 item)
 	catch(...){
 
 	}
+
 	return false;
 }
 
+
+bool CMask::GetNearestOffset(quint64& offset, quint64 startOffset)
+{
+	try{
+		mdbx::slice keySlice(&startOffset, 8);
+
+		mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice);
+
+		offset = result.key.as_uint64();
+
+		return true;
+	}
+	catch(...){
+
+	}
+
+	return false;
+}
 
 bool CMask::GetNextItemOffset(quint64& offset, qint64 startOffset)
 {
 	try{
 		mdbx::slice keySlice(&startOffset, 8);
 
-		mdbx::cursor::move_result result = m_cursor.to_first();
-		if(startOffset > -1){
-			result = m_cursor.find(keySlice);
+		mdbx::cursor::move_result result = m_cursor.find(keySlice);
+		if(result.done){
 			result = m_cursor.to_next(true);
+		}
+		else{
+			return false;
 		}
 
 		offset = result.key.as_uint64();
@@ -116,6 +132,7 @@ bool CMask::GetNextItemOffset(quint64& offset, qint64 startOffset)
 	catch(...){
 
 	}
+
 	return false;
 }
 
