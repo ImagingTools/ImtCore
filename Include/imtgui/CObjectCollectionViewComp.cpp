@@ -103,49 +103,6 @@ bool CObjectCollectionViewComp::SetSelectedIds(const Ids& /*selectedIds*/)
 }
 
 
-// reimplemented (ibase::IProgressManager)
-
-int CObjectCollectionViewComp::BeginProgressSession(
-		const QByteArray& /*progressId*/,
-		const QString& /*description*/,
-		bool /*isCancelable*/)
-{
-	if (IsGuiCreated()){
-		Message->setText(tr("Reading collection..."));
-		Progress->setValue(0);
-		Message->show();
-		Progress->show();
-	}
-	return 0;
-}
-
-
-void CObjectCollectionViewComp::EndProgressSession(int /*sessionId*/)
-{
-	if (IsGuiCreated()){
-		Progress->setValue(0);
-		Message->hide();
-		Progress->hide();
-	}
-}
-
-
-void CObjectCollectionViewComp::OnProgress(int /*sessionId*/, double currentProgress)
-{
-	if (IsGuiCreated()){
-		Message->setText(tr("Reading collection..."));
-		Progress->setValue(currentProgress);
-		Message->show();
-		Progress->show();
-	}
-}
-
-bool CObjectCollectionViewComp::IsCanceled(int /*sessionId*/) const
-{
-	return false;
-}
-
-
 // reimplemented (iser::ISerialize)
 
 bool CObjectCollectionViewComp::Serialize(iser::IArchive& /*archive*/)

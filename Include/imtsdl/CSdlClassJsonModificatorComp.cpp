@@ -33,13 +33,13 @@ bool CSdlClassJsonModificatorComp::ProcessHeaderClassFile(const CSdlType& sdlTyp
 				ofStream << readLine;
 				FeedStream(ofStream, 1, true);
 
-				AddIncludeDerective(ofStream, false);
+				AddIncludeDirective(ofStream, false);
 				isIncludesAdded = true;
 			}
 			// if we first, check if we reached end of include declaration (namespace begin)
 			static QRegularExpression namespaceRegExp(QStringLiteral("\\s*namespace"));
 			if (namespaceRegExp.match(readLine).hasMatch()){
-				AddIncludeDerective(ofStream, true);
+				AddIncludeDirective(ofStream, true);
 				isIncludesAdded = true;
 				FeedStream(ofStream, 3, false);
 			}
@@ -112,7 +112,7 @@ bool CSdlClassJsonModificatorComp::ProcessSourceClassFile(const CSdlType& sdlTyp
 
 // private methods
 
-void CSdlClassJsonModificatorComp::AddIncludeDerective(QTextStream& stream, bool addRemark)
+void CSdlClassJsonModificatorComp::AddIncludeDirective(QTextStream& stream, bool addRemark)
 {
 	if (addRemark){
 		stream.seek(stream.pos() - 1); // remove extra new line

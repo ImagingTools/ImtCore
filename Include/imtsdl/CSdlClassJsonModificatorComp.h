@@ -28,7 +28,7 @@ protected:
 	virtual bool ProcessSourceClassFile(const CSdlType& sdlType) override;
 
 private:
-	void AddIncludeDerective(QTextStream& stream, bool addRemark);
+	void AddIncludeDirective(QTextStream& stream, bool addRemark);
 	void AddFieldWriteToJsonCode(QTextStream& stream, const CSdlField& field);
 	void AddFieldReadFromJsonCode(QTextStream& stream, const CSdlField& field);
 	void AddCustomFieldWriteToJsonCode(QTextStream& stream, const CSdlField& field);

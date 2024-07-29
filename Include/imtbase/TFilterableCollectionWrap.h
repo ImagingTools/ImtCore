@@ -89,7 +89,6 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
 }
 
 
-
 // protected methods
 
 template <class Base>

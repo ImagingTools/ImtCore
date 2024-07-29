@@ -64,7 +64,6 @@ protected:
 class CObjectCollectionViewComp:
 		public CObjectCollectionViewAttr,
 		public imod::CMultiModelDispatcherBase,
-		virtual public ibase::IProgressManager,
 		virtual public imtbase::ISelection
 {
 	Q_OBJECT
@@ -73,7 +72,6 @@ public:
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
-		I_REGISTER_INTERFACE(ibase::IProgressManager);
 		I_REGISTER_INTERFACE(imtbase::ISelection);
 		I_REGISTER_SUBELEMENT(PageSelection);
 		I_REGISTER_SUBELEMENT_INTERFACE(PageSelection, iprm::ISelectionParam, ExtractPageSelection);
@@ -113,15 +111,6 @@ public:
 	virtual bool SetSelectionMode(SelectionMode mode) override;
 	virtual Ids GetSelectedIds() const override;
 	virtual bool SetSelectedIds(const Ids& selectedIds) override;
-
-	// reimplemented (ibase::IProgressManager)
-	virtual int BeginProgressSession(
-				const QByteArray &progressId,
-				const QString &description,
-				bool isCancelable = false) override;
-	virtual void EndProgressSession(int sessionId) override;
-	virtual void OnProgress(int sessionId, double currentProgress) override;
-	virtual bool IsCanceled(int sessionId) const override;
 
 	// reimplemented (iser::ISerialize)
 	virtual bool Serialize(iser::IArchive& archive) override;

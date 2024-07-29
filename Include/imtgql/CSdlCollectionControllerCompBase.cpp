@@ -50,9 +50,9 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
 	if (!objectCollectionIterator.IsValid()){
-		errorMessage = QString("Spot color collection iterator could not be created");
+		errorMessage = QString("Object collection iterator could not be created");
 
-		SendCriticalMessage(0, errorMessage, "CSpotColorCollectionControllerComp");
+		SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 
 		return nullptr;
 	}
@@ -72,7 +72,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 			if (!listPayloadWrittablePtr->WriteToModel(*dataModelPtr)){
 				errorMessage = QString("Unable to setup GraphQL-item. Unable to write the list model");
 
-				SendCriticalMessage(0, errorMessage, "CSpotColorCollectionControllerComp");
+				SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 
 				return nullptr;
 			}
@@ -94,8 +94,9 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()) {
-		errorMessage = QString("Internal error");
-		SendErrorMessage(0, errorMessage, "CSubstrateCollectionControllerComp");
+		errorMessage = QString("Internal error: Object collection component was not set or resolved");
+
+		SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 
 		return nullptr;
 	}
@@ -117,17 +118,17 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
 		istd::TDelPtr<imtbase::ITreeModelWrittable> substrateWrittablePtr(CreateSdlItem(gqlRequest,objectId, dataPtr, errorMessage));
 
 		if (!substrateWrittablePtr.IsValid() || !substrateWrittablePtr->WriteToModel(*dataModelPtr)){
-			errorMessage = QString("Unable to setup gql item. Unable to write model.");
-			SendCriticalMessage(0, errorMessage, "CSubstrateCollectionControllerComp");
+			errorMessage = QString("Unable to setup GraphQL-item. Unable to write model");
+			SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 			Q_ASSERT(0);
 		}
 
 		return rootModelPtr.PopPtr();
 	}
 
-	errorMessage = QT_TR_NOOP(QString("Unable to get an substrate with ID: '%1'.").arg(qPrintable(objectId)));
+	errorMessage = QT_TR_NOOP(QString("Unable to get an object with ID: '%1'.").arg(qPrintable(objectId)));
 
-	SendErrorMessage(0, errorMessage, "CSubstrateCollectionControllerComp");
+	SendErrorMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 
 	return nullptr;
 }
