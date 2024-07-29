@@ -5,20 +5,20 @@ import imtdocgui 1.0
 import imtgui 1.0
 
 DocumentWorkspacePageView {
-    id: multiDocPageView;
+    id: root;
 
-    documentManagerView: documentManagerView_;
+    documentManagerView: documentManagerView;
 
     onStartItemSourceCompChanged: {
         if (startItemSourceComp){
-            documentManagerView_.addFixedView(startItemSourceComp, pageName, 0);
+            documentManagerView.addInitialItem(startItemSourceComp, pageName);
         }
     }
 
-    MultiDocWorkspaceView {
-        id: documentManagerView_;
+    SingleDocumentWorkspaceView {
+        id: documentManagerView;
         anchors.fill: parent;
-        documentManager: multiDocPageView.documentManager;
+        documentManager: root.documentManager;
 
         Component.onCompleted: {
             Events.subscribeEvent("SetAlertPanel", setAlert);
@@ -30,14 +30,14 @@ DocumentWorkspacePageView {
 
         function setAlert(parameters){
             if (!parameters){
-                console.error("Unable to set an alert panel, 'parameters' is invalid");
+                console.error("Unable to set alert panel, 'parameters' is invalid");
                 return;
             }
 
             let id = parameters["Id"];
             let alertPanelComp = parameters["AlertPanelComp"];
 
-            if (id === multiDocPageView.pageId){
+            if (id === root.pageId){
                 setAlertPanel(alertPanelComp);
             }
         }

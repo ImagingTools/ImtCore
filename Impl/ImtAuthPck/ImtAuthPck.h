@@ -30,6 +30,9 @@
 #include <imtauth/CUserGroupInfoProviderComp.h>
 #include <imtauth/CUserCollectionAdapterComp.h>
 #include <imtauth/CSessionInfo.h>
+#include <imtauth/CLdapUserCollectionControllerComp.h>
+#include <imtauth/CLdapCredentialControllerComp.h>
+#include <imtauth/CCredentialControllerComp.h>
 
 
 namespace ImtAuthPck
@@ -83,6 +86,9 @@ typedef icomp::TModelCompWrap<
 						iser::IObject,
 						iser::ISerializable,
 						istd::IChangeable>> SessionInfo;
+typedef imtauth::CLdapUserCollectionControllerComp LdapUserCollectionController;
+typedef imtauth::CCredentialControllerComp CredentialController;
+typedef imtauth::CLdapCredentialControllerComp LdapCredentialController;
 
 
 } // namespace ImtAuthPck

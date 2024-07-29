@@ -137,6 +137,22 @@ QDateTime CUserInfo::GetLastConnection() const
 }
 
 
+IUserInfo::SystemInfo CUserInfo::GetSystemInfo() const
+{
+	return m_systemInfo;
+}
+
+
+void CUserInfo::SetSystemInfo(IUserInfo::SystemInfo systemInfo)
+{
+	if (m_systemInfo != systemInfo){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_systemInfo = systemInfo;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CUserInfo::Serialize(iser::IArchive &archive)
@@ -172,6 +188,18 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 		retVal = retVal && archive.EndTag(lastConnectionTag);
 	}
 
+	if (imtCoreVersion >= 10541){
+		iser::CArchiveTag systemIdTag("SystemId", "System-ID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(systemIdTag);
+		retVal = retVal && archive.Process(m_systemInfo.systemId);
+		retVal = retVal && archive.EndTag(systemIdTag);
+
+		iser::CArchiveTag systemNameTag("SystemName", "System Name", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(systemNameTag);
+		retVal = retVal && archive.Process(m_systemInfo.systemName);
+		retVal = retVal && archive.EndTag(systemNameTag);
+	}
+
 	return retVal;
 }
 
@@ -189,6 +217,7 @@ bool CUserInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 		m_passwordHash = sourcePtr->m_passwordHash;
 		m_mail = sourcePtr->m_mail;
 		m_groupIds = sourcePtr->m_groupIds;
+		m_systemInfo = sourcePtr->m_systemInfo;
 
 		return true;
 	}
@@ -207,6 +236,7 @@ bool CUserInfo::IsEqual(const IChangeable& object) const
 		retVal = retVal && m_mail == sourcePtr->m_mail;
 		retVal = retVal && m_groupIds == sourcePtr->m_groupIds;
 		retVal = retVal && m_lastConnection == sourcePtr->m_lastConnection;
+		retVal = retVal && m_systemInfo == sourcePtr->m_systemInfo;
 
 		return retVal;
 	}

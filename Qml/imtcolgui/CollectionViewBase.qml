@@ -308,7 +308,7 @@ ViewBase {
         Dialog {
             id: dialog;
             width: 300;
-            title: qsTr("Table params");
+            title: qsTr("Table configuration");
             property TableViewParams tableViewParamsCopied: TableViewParams {};
             contentComp: Component {
                 Column {

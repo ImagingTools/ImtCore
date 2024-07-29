@@ -141,6 +141,7 @@ Rectangle {
         allPages.model = 0;
         topAlignmentPages.model = 0;
         bottomAlignmentPages.model = 0;
+        menuPanel.activePageIndex = 0;
 
         for (let i = 0; i < model.getItemsCount(); i++){
             if (model.containsKey("Alignment", i)){

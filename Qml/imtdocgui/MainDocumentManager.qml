@@ -19,6 +19,19 @@ QtObject {
         return root.documentManagers[typeId];
     }
 
+    function unregisterDocumentManager(documentManager){
+        let typeIds = Object.keys(root.documentManagers);
+        for (let i = 0; i < typeIds.length; i++){
+            let manager = root.documentManagers[typeIds[i]];
+            if (manager === documentManager){
+                delete root.documentManagers[typeIds[i]];
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function registerDocumentManager(typeId, documentManager){
         if (!typeId || typeId === ""){
             console.error("Unable to register document manager. Type-ID is invalid!");

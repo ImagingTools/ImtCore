@@ -388,7 +388,8 @@ Item {
         }
 
         if (documentIndex >= 0){
-            if (documentsModel.get(documentIndex).IsNew){
+            let documentData = documentsModel.get(documentIndex);
+            if (documentData && documentData.IsNew){
                 documentsModel.setProperty(documentIndex, "IsNew", false);
             }
         }
@@ -673,7 +674,6 @@ Item {
                     }
 
                     singleDocumentData.isDirty = true;
-//                    singleDocumentData.undoManager.onModelChanged();
                 }
             }
 
@@ -767,12 +767,9 @@ Item {
         }
     }
 
-
     Component {
         id: defaultDataController;
-
-        DocumentDataController {
-        }
+        DocumentDataController {}
     }
 
     QtObject {

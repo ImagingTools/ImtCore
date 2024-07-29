@@ -54,7 +54,7 @@ bool CGuiElementModelRepresentationControllerComp::GetRepresentationFromDataMode
 	iprm::TParamsPtr<imtauth::IUserInfo> userInfoParamPtr(paramsPtr, "UserInfo");
 
 	imtauth::IUserInfo::FeatureIds userPermissions;
-	bool isAdmin = true;
+	bool isAdmin = false;
 	if (userInfoParamPtr.IsValid()){
 		userPermissions = userInfoParamPtr->GetPermissions();
 		isAdmin = userInfoParamPtr->IsAdmin();

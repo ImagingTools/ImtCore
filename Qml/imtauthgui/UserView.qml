@@ -23,6 +23,18 @@ ViewBase {
         groupsBlock.updateModel();
     }
 
+    onModelChanged: {
+        if (model.containsKey("SystemId")){
+            let systemId = model.getData("SystemId");
+            if (systemId !== ""){
+                usernameInput.readOnly = true;
+                passwordInput.readOnly = true;
+                nameInput.readOnly = true;
+                mailInput.readOnly = true;
+            }
+        }
+    }
+
     CustomScrollbar {
         id: scrollbar;
 

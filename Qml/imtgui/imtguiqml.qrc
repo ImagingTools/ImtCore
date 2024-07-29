@@ -71,10 +71,11 @@
         <file alias="imtgui/View/MacAddressElementView.qml">View/MacAddressElementView.qml</file>
         <file alias="imtgui/View/IntegerInputElementView.qml">View/IntegerInputElementView.qml</file>
         <file alias="imtgui/View/DoubleInputElementView.qml">View/DoubleInputElementView.qml</file>
-		<file alias="imtgui/View/TimeFilterParamView.qml">View/TimeFilterParamView.qml</file>
-		<file alias="imtgui/View/PopupView.qml">View/PopupView.qml</file>
-		<file alias="imtgui/View/SearchPage.qml">View/SearchPage.qml</file>
-		<file alias="imtgui/View/CommandsView.qml">View/CommandsView.qml</file>
+	<file alias="imtgui/View/TimeFilterParamView.qml">View/TimeFilterParamView.qml</file>
+	<file alias="imtgui/View/PopupView.qml">View/PopupView.qml</file>
+	<file alias="imtgui/View/SearchPage.qml">View/SearchPage.qml</file>
+	<file alias="imtgui/View/CommandsView.qml">View/CommandsView.qml</file>
+	<file alias="imtgui/View/PageContainer.qml">View/PageContainer.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

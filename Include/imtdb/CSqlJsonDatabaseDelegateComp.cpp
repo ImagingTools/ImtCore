@@ -414,7 +414,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 			}
 
 			if (i > 0){
-				filterQuery += " OR ";
+				filterQuery += " AND ";
 			}
 
 			QString value = textParamPtr->GetId();

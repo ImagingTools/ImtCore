@@ -56,6 +56,22 @@ public:
 		MIT_GROUPS
 	};
 
+	struct SystemInfo
+	{
+		QByteArray systemId;
+		QString systemName;
+
+		bool operator == (const SystemInfo& other) const
+		{
+			return (systemId == other.systemId) && (systemName == other.systemName);
+		}
+
+		bool operator != (const SystemInfo& other) const
+		{
+			return !(*this == other);
+		}
+	};
+
 	/**
 		Get password hash of the user.
 	*/
@@ -100,6 +116,16 @@ public:
 		Get last connection of the user.
 	*/
 	virtual QDateTime GetLastConnection() const = 0;
+
+	/**
+		Get information about the system in which this user is located.
+	*/
+	virtual SystemInfo GetSystemInfo() const = 0;
+
+	/**
+		To set information about the system in which this user is located.
+	*/
+	virtual void SetSystemInfo(SystemInfo systemInfo) = 0;
 };
 
 

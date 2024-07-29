@@ -106,6 +106,9 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 				dataModel->SetData("Groups", groupList.join(';'));
 				dataModel->SetData("Roles", roleList.join(';'));
 
+				imtauth::IUserInfo::SystemInfo systemInfo = userInfoPtr->GetSystemInfo();
+				dataModel->SetData("SystemId", systemInfo.systemId);
+
 				if (allFields.contains("Permissions")){
 					QByteArray permissions = userInfoPtr->GetPermissions(productId).join(';');
 					std::sort(permissions.begin(), permissions.end());
@@ -134,7 +137,6 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "m_objectCollectionCompPtr is not valid", "imtauthgql::CUserControllerComp");
-
 		return nullptr;
 	}
 
@@ -155,16 +157,16 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 	}
 
 	if (userInfoPtr == nullptr){
-		SendErrorMessage(0, "userInfoPtr is nullptr", "imtauthgql::CUserControllerComp");
-		errorMessage = QString("Unable to update user with ID: %1").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to update user with ID: '%1'").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 		return nullptr;
 	}
 
 	imtbase::CTreeItemModel representationModel;
 	if (!representationModel.CreateFromJson(representationData)){
-		SendErrorMessage(0, QString("Error when try to create a representation model from json: %1").arg(qPrintable(representationData)), "imtauthgql::CUserControllerComp");
-		errorMessage = QString("Error when try to create a representation model from json% 1").arg(qPrintable(representationData));
+		errorMessage = QString("Error when try to create a representation model from json '%1'").arg(qPrintable(representationData));
+		SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 		return nullptr;
 	}
@@ -186,8 +188,8 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 		if (!userIds.isEmpty()){
 			QByteArray userObjectId = userIds[0];
 			if (userObjectId != objectId){
-				SendWarningMessage(0, QString("Unable to update user username %1 already exists.").arg(qPrintable(username)), "imtauthgql::CUserControllerComp");
-				errorMessage = QString("Username already exists").arg(qPrintable(representationData));
+				errorMessage = QString("Unable to set username to user. Error: username '%1' already exists").arg(username);
+				SendWarningMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 				return nullptr;
 			}
@@ -205,6 +207,12 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 	QByteArray password;
 	if (representationModel.ContainsKey("Password")){
 		password = representationModel.GetData("Password").toByteArray();
+	}
+
+	if (password.isEmpty()){
+		errorMessage = QT_TR_NOOP("Password cannot be empty");
+
+		return nullptr;
 	}
 
 	bool calculate = true;
@@ -255,8 +263,8 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 	}
 
 	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *userInfoPtr)){
-		SendWarningMessage(0, QString("Unable to save user with ID: %1").arg(qPrintable(objectId)), "imtauthgql::CUserControllerComp");
-		errorMessage = QString("Unable to save user with ID: %1").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to save user with ID: '%1'").arg(qPrintable(objectId));
+		SendWarningMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 		return nullptr;
 	}
@@ -441,7 +449,7 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = "No collection component was set";
+		errorMessage = QString("No collection component was set");
 
 		return nullptr;
 	}
@@ -451,22 +459,25 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	if (objectId.isEmpty()){
 		errorMessage = QString("No object-ID could not be extracted from the request");
+		SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 		return nullptr;
 	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
-	QByteArray removedUserId;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 	}
 
 	if (userInfoPtr == nullptr){
+		errorMessage = QString("Unable to delete an user with ID: '%1'. User does not exist.").arg(objectId);
+		SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
+
 		return nullptr;
 	}
 
-	removedUserId = userInfoPtr->GetId();
+	QByteArray removedUserId = userInfoPtr->GetId();
 
 	if (!removedUserId.isEmpty()){
 		imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
@@ -475,7 +486,8 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 			if (contextUserInfoPtr != nullptr){
 				QByteArray userId = contextUserInfoPtr->GetId();
 				if (removedUserId == userId){
-					errorMessage = QString("It is not possible to delete a user");
+					errorMessage = QString("It is impossible to delete yourself. User-ID: '%1'.").arg(userId);
+					SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 					return nullptr;
 				}
@@ -483,9 +495,17 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 		}
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtauth::IUserInfo::SystemInfo systemInfo = userInfoPtr->GetSystemInfo();
+	if (!systemInfo.systemId.isEmpty()){
+		errorMessage = QString("Unable to delete an user with User-ID: '%1'. The user is on a different system.").arg(removedUserId);
+		SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
+
+		return nullptr;
+	}
 
 	if (m_objectCollectionCompPtr->RemoveElement(objectId)){
+		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+
 		imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 		imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel();
 
@@ -511,17 +531,14 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 				}
 			}
 		}
-	}
-	else{
-		errorMessage = QString("Can't remove user: %1").arg(QString(objectId));
+
+		return rootModelPtr.PopPtr();
 	}
 
-	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsModel = rootModelPtr->AddTreeModel("errors");
-		errorsModel->SetData("message", errorMessage);
-	}
+	errorMessage = QString("Can't remove user: '%1'").arg(QString(objectId));
+	SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
-	return rootModelPtr.PopPtr();
+	return nullptr;
 }
 
 

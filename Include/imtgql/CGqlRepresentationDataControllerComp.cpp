@@ -38,7 +38,7 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentat
 		return rootModelPtr.PopPtr();
 	}
 
-	errorMessage = QString("Unable to get representation from the data model. Command-ID: %1").arg(qPrintable(gqlRequest.GetCommandId()));
+	errorMessage = QString("Unable to get representation from the data model. Command-ID: '%1'").arg(qPrintable(gqlRequest.GetCommandId()));
 
 	SendErrorMessage(0, errorMessage);
 

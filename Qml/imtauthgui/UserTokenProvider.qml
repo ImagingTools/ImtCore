@@ -80,22 +80,26 @@ QtObject {
                         if (dataModelLocal.containsKey("Token")){
                             let token = dataModelLocal.getData("Token");
                             container.token = token;
+                            container.authorizationGqlModel.SetGlobalAccessToken(token);
+                        }
 
-                            this.SetGlobalAccessToken(token);
-
+                        if (dataModelLocal.containsKey("Login")){
                             let login = dataModelLocal.getData("Login");
                             container.login = login;
+                        }
 
+                        if (dataModelLocal.containsKey("UserId")){
                             let userId = dataModelLocal.getData("UserId");
                             container.userId = userId;
+                        }
 
+                        if (dataModelLocal.containsKey("PasswordHash")){
                             let userPasswordHash = dataModelLocal.getData("PasswordHash");
                             container.passwordHash = userPasswordHash;
                         }
 
                         if (dataModelLocal.containsKey("Permissions")){
                             let permissions = dataModelLocal.getData("Permissions");
-
                             container.permissions = permissions.split(';')
                         }
 

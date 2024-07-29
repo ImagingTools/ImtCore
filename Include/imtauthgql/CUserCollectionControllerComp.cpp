@@ -179,6 +179,19 @@ bool CUserCollectionControllerComp::SetupGqlItem(
 				else if(informationId == "Mail"){
 					elementInformation = userInfoPtr->GetMail();
 				}
+				else if(informationId == "SystemId"){
+					imtauth::IUserInfo::SystemInfo systemInfo = userInfoPtr->GetSystemInfo();
+					elementInformation = systemInfo.systemId;
+				}
+				else if(informationId == "SystemName"){
+					imtauth::IUserInfo::SystemInfo systemInfo = userInfoPtr->GetSystemInfo();
+					if (systemInfo.systemId.isEmpty()){
+						elementInformation = QT_TR_NOOP("Internal");
+					}
+					else{
+						elementInformation = systemInfo.systemName;
+					}
+				}
 				else if(informationId == "Roles"){
 					QByteArrayList resultList;
 					if (m_roleInfoProviderCompPtr.IsValid()){

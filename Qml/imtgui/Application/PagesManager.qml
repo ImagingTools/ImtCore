@@ -64,76 +64,48 @@ Item {
 
     Repeater {
         id: pagesData;
-
         anchors.fill: parent;
-
         clip: true;
-
         delegate: Item {
             id: pagesDeleg;
-
             anchors.fill: container;
-
             visible: container.activePageIndex === model.index;
 
-            property bool isLoaded: false;
+            Component.onCompleted: {
+                load();
+            }
 
             onVisibleChanged: {
-                if (visible){
-                    load();
+                load();
+            }
+
+            Loader {
+                id: loader;
+                anchors.fill: parent;
+                onLoaded: {
+                    if (item.pageId !== undefined){
+                        item.pageId = model.Id;
+                    }
+
+                    if (item.pageName !== undefined){
+                        item.pageName = model.Name;
+                    }
+
+                    if (item.startItemSource !== undefined){
+                        item.startItemSource = model.StartItem;
+                    }
+                }
+                onStatusChanged: {
+                    if (status == Loader.Error){
+                        console.error("Unable to create page component. Please check the source path:", loader.source);
+                    }
                 }
             }
 
             function load(){
-                if (isLoaded){
-                    return;
-                }
-
-                if(pagesDeleg.visible){
-                    if (!pagesLoader.item){
-                        pagesLoader.source = model.Source;
-                    }
-
-                    if (pagesLoader.item){
-                        Events.sendEvent("StartLoading")
-
-                        if (pagesLoader.item.loadStartItem !== undefined){
-                            pagesLoader.item.loadStartItem();
-                        }
-
-                        pagesDeleg.isLoaded = true;
-
-                        Events.sendEvent("StopLoading")
-                    }
-                }
-            }
-
-            Component.onCompleted: {
-                if (!container.loadByClick || container.activePageIndex === model.index){
-                    pagesLoader.source = model.Source;
-
-                    load();
-                }
-            }
-
-            Loader {
-                id: pagesLoader;
-                anchors.fill: parent;
-
-                visible: parent.visible;
-
-                onLoaded: {
-                    pagesLoader.item.startPageObj = {
-                        "Id": model.Id,
-                        "Name": model.Name,
-                        "Source": model.StartItem,
-                        "CommandId": model.Id
-                    };
-                }
-
-                onStatusChanged: {
-                    if (status == Loader.Error){
-                        console.error("Loading page with source", pagesLoader.source, "was failed!");
+                if (pagesDeleg.visible || !container.loadByClick){
+                    if (loader){
+                        loader.source = model.Source;
                     }
                 }
             }

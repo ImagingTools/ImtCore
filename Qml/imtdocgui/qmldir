@@ -14,5 +14,5 @@ DocumentDataController 1.0 DocumentDataController.qml
 DocumentCollectionViewDelegate 1.0 DocumentCollectionViewDelegate.qml
 DocumentValidator 1.0 DocumentValidator.qml
 SearchPageSingleDocumentView 1.0 SearchPageSingleDocumentView.qml
-
-
+DocumentWorkspacePageView 1.0 DocumentWorkspacePageView.qml
+SingleDocumentWorkspacePageView 1.0 SingleDocumentWorkspacePageView.qml

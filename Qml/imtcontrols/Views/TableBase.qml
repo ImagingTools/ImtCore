@@ -417,12 +417,12 @@ Rectangle {
             }
             else{
                 width_ = width_< 0 ? 0 : width_;
-                widthPercent_ = widthPercent_ < 0 ? 0 : widthPercent_* tableWidth_/100;
-                lengthMinus += Math.max(width_,widthPercent_);
+                let newWidth = tableWidth_ * (widthPercent_ / 100);
+                lengthMinus += newWidth;
             }
         }
 
-        if((tableWidth_/* - lengthMinus*/) < visibleColumnCount * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.getItemsCount()){
+        if((tableWidth_ /*- lengthMinus*/) < visibleColumnCount * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.getItemsCount()){
             tableContainer.widthDecoratorDynamic.clear();
             for(let ind = 0; ind < headersCount; ind++){
                 let index = tableContainer.widthDecoratorDynamic.insertNewItem();
@@ -437,28 +437,17 @@ Rectangle {
             }
         }
         else {
-
             for(let i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
                 let width_ = tableContainer.widthDecorator.isValidData("Width",i) ? tableContainer.widthDecorator.getData("Width",i): -1;
                 let widthPercent_ = tableContainer.widthDecorator.isValidData("WidthPercent",i) ? tableContainer.widthDecorator.getData("WidthPercent",i): -1;
 
-                if (widthPercent_ >= 0){
+                if (widthPercent_ >= 0 || width_ < 0  && widthPercent_ >= 0){
                     tableContainer.widthDecoratorDynamic.setData("Width", widthPercent_*tableWidth_/100,i);
                 }
                 else if(width_ < 0  && widthPercent_ < 0 ){
-                    if(visibleColumnCount !== 0){
-                        tableContainer.widthDecoratorDynamic.setData("Width",(tableWidth_ - lengthMinus)/count_,i);
-                    }
+                    tableContainer.widthDecoratorDynamic.setData("Width",(tableWidth_ - lengthMinus)/count_,i);
                 }
-                else if(width_ < 0  && widthPercent_ >= 0){
-                    tableContainer.widthDecoratorDynamic.setData("Width", widthPercent_*tableWidth_/100,i);
-                }
-
-                else if(width_ >= 0  && widthPercent_ < 0){
-                    tableContainer.widthDecoratorDynamic.setData("Width", width_,i);
-                }
-
-                else if(width_ >= 0  && widthPercent_ >= 0){
+                else if(width_ >= 0  && widthPercent_ < 0 || width_ >= 0  && widthPercent_ >= 0){
                     tableContainer.widthDecoratorDynamic.setData("Width", width_,i);
                 }
             }

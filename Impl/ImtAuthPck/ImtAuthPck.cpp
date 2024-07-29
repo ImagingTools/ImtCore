@@ -14,11 +14,6 @@ I_EXPORT_PACKAGE(
 			"ImagingTools license management component package",
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
-//I_EXPORT_COMPONENT(
-//			ContactInfo,
-//			"Contact information",
-//			"Contact Information Authority");
-
 I_EXPORT_COMPONENT(
 			Address,
 			"Address information",
@@ -72,7 +67,7 @@ I_EXPORT_COMPONENT(
 I_EXPORT_COMPONENT(
 			UserGroupInfo,
 			"User group Info",
-			"User Group Info");			
+			"User Group Info");
 
 I_EXPORT_COMPONENT(
 			UserCollection,
@@ -128,6 +123,21 @@ I_EXPORT_COMPONENT(
 			SessionInfo,
 			"Session info",
 			"Session Info");
+
+I_EXPORT_COMPONENT(
+			LdapUserCollectionController,
+			"Ldap user collection controller",
+			"Ldap User Collection Controller");
+
+I_EXPORT_COMPONENT(
+			CredentialController,
+			"Credential controller",
+			"Credential Controller");
+
+I_EXPORT_COMPONENT(
+			LdapCredentialController,
+			"Ldap credential controller",
+			"Ldap Credential Controller");
 
 
 } // namespace ImtAuthPck

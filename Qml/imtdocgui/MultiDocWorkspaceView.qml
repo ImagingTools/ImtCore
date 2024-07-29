@@ -4,37 +4,57 @@ import imtguigql 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 
-DocumentManager {
+Item {
     id: workspaceView;
 
-    onDocumentClosed: {
-        if (documentIndex <= tabPanel.selectedIndex && documentIndex > 0){
-            tabPanel.selectedIndex--;
+    property DocumentManager documentManager;
+    property alias tabPanel: tabPanel_;
+
+    onDocumentManagerChanged: {
+        if (documentManager){
+            connections.target = workspaceView.documentManager;
+            tabPanel_.model = workspaceView.documentManager.documentsModel;
+            documentRepeater.model = workspaceView.documentManager.documentsModel;
+        }
+        else{
+            connections.target = undefined;
+            tabPanel_.model = 0;
+            documentRepeater.model = 0;
         }
     }
 
-    onDocumentAdded: {
-        tabPanel.selectedIndex = documentIndex;
+    Connections {
+        id: connections;
+
+        function onDocumentAdded(documentIndex, documentId){
+            workspaceView.tabPanel.selectedIndex = documentIndex;
+        }
+
+        function onDocumentClosed(documentIndex, documentId){
+            if (documentIndex <= workspaceView.tabPanel.selectedIndex && documentIndex > 0){
+                workspaceView.tabPanel.selectedIndex--;
+            }
+        }
     }
 
     function addFixedView(viewComp, name, index){
         let viewName = name;
         if (!viewName || viewName == ""){
-            viewName = defaultDocumentName;
+            viewName = workspaceView.documentManager.defaultDocumentName;
         }
 
         if (!index){
-            index = documentsModel.count;
+            index = workspaceView.documentManager.documentsModel.count;
         }
 
-        documentsModel.insert(index, {
+         workspaceView.documentManager.documentsModel.insert(index, {
                                   "Uuid": UuidGenerator.generateUUID(),
                                   "Title": viewName,
                                   "DocumentViewComp": viewComp,
                                   "Fixed": true
                               })
 
-        documentAdded(index, "");
+        workspaceView.documentManager.documentAdded(index, "");
     }
 
     function setAlertPanel(alertPanelComp){
@@ -43,82 +63,60 @@ DocumentManager {
 
     Rectangle {
         anchors.fill: parent;
-
         color: Style.backgroundColor2;
     }
 
     TabPanel {
-        id: tabPanel;
+        id: tabPanel_;
 
         anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
 
-        model: workspaceView.documentsModel;
-
         clip: true;
 
         onCloseItem: {
-            workspaceView.closeDocumentByIndex(index);
+            workspaceView.documentManager.closeDocumentByIndex(index);
         }
 
         onRightClicked: {
-            if (tabPanel.selectedIndex < workspaceView.documentsModel.count - 1){
-                tabPanel.selectedIndex++;
+            if (tabPanel_.selectedIndex < workspaceView.documentManager.documentsModel.count - 1){
+                tabPanel_.selectedIndex++;
             }
         }
 
         onLeftClicked: {
-            if (tabPanel.selectedIndex > 0){
-                tabPanel.selectedIndex--;
+            if (tabPanel_.selectedIndex > 0){
+                tabPanel_.selectedIndex--;
             }
         }
     }
 
     Loader {
         id: alertPanel;
-
-        anchors.top: tabPanel.bottom;
+        anchors.top: tabPanel_.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
-
         height: visible ? 40: 0;
-
         visible: alertPanel.item != null && alertPanel.item !== undefined;
     }
 
     Repeater {
         id: documentRepeater;
-
         anchors.top: alertPanel.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
-
-        model: workspaceView.documentsModel;
-
         clip: true;
-
         delegate: Item {
             anchors.fill: documentRepeater;
 
             Loader {
                 id: documentLoader;
-
-                anchors.top: parent.top;
-                anchors.left: parent.left;
-                anchors.right: parent.right;
-                anchors.bottom: parent.bottom;
-
+                anchors.fill: parent;
                 sourceComponent: model.DocumentViewComp;
-
                 clip: true;
-
-                property int selectedIndex: tabPanel.selectedIndex
-
-                onSelectedIndexChanged: {
-                    documentLoader.visible = tabPanel.selectedIndex === model.index;
-                }
+                visible: tabPanel_.selectedIndex === model.index;
 
                 onLoaded: {
                     if (item.viewId !== undefined){
@@ -137,13 +135,12 @@ DocumentManager {
                         }
                     }
 
-                    let documentData = workspaceView.documentsModel.get(model.index).DocumentData;
+                    let documentData = workspaceView.documentManager.documentsModel.get(model.index).DocumentData;
                     if (documentData){
                         documentData.views.push(item);
-                        documentData.viewAdded(item);
                     }
 
-                    workspaceView.updateDocumentTitle(model.index);
+                    workspaceView.documentManager.updateDocumentTitle(model.index);
                 }
 
                 onStatusChanged: {

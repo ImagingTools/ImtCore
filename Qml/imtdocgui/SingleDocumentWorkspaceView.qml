@@ -4,65 +4,48 @@ import imtguigql 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 
-DocumentManager {
-    id: documentManager;
+Rectangle {
+    id: root;
 
-    property var startPageObj;
-
-    property bool startItemIsLoaded: false;
+    color: Style.backgroundColor2;
 
     property string titleSeparation: "/";
     property bool initialItemTitleVisible: true;
 
-    onStartPageObjChanged: {
-        let typeId = startPageObj["CommandId"];
+    property DocumentManager documentManager;
 
-        MainDocumentManager.registerDocumentManager(typeId, documentManager);
+    onDocumentManagerChanged: {
+        if (documentManager){
+            connections.target = documentManager;
+            headersListView.model = documentManager.documentsModel;
+        }
+        else{
+            connections.target = undefined;
+            headersListView.model = 0;
+        }
     }
 
-    onDocumentAdded: {
-        let documentComp = documentsModel.get(documentIndex).DocumentViewComp;
+    Connections {
+        id: connections;
 
-        stackView.push(documentComp);
-    }
-
-    onDocumentClosed: {
-        stackView.pop();
-    }
-
-    Component.onCompleted: {
-        Events.subscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
-        Events.subscribeEvent("SetAlertPanel", setAlert);
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
-        Events.unSubscribeEvent("SetAlertPanel", setAlert);
-    }
-
-
-    function setAlert(parameters){
-        if (!parameters){
-            console.error("Unable to set alert panel, 'parameters' is invalid");
-            return;
+        function onDocumentAdded(documentIndex, documentId){
+            let documentComp = root.documentManager.documentsModel.get(documentIndex).DocumentViewComp;
+            stackView.push(documentComp);
         }
 
-        let id = parameters["Id"];
-        let alertPanelComp = parameters["AlertPanelComp"];
-
-//        if (id === documentManager.startPageObj["Id"]){
-//            setAlertPanel(alertPanelComp);
-//        }
+        function onDocumentClosed(documentIndex, documentId){
+            stackView.pop();
+        }
     }
 
     function generateDocumentTitle(documentIndex){
-        if (documentIndex < 0 || documentIndex >= documentsModel.count){
+        if (documentIndex < 0 || documentIndex >= documentManager.documentsModel.count){
             return "";
         }
 
-        let title = defaultDocumentName;
+        let title = documentManager.defaultDocumentName;
 
-        let documentData = documentsModel.get(documentIndex).DocumentData;
+        let documentData = documentManager.documentsModel.get(documentIndex).DocumentData;
 
         let documentName = "";
 
@@ -81,67 +64,24 @@ DocumentManager {
         return title;
     }
 
-    function loadStartItem(){
-        if (startItemIsLoaded){
-            return;
-        }
-
-        let name = startPageObj["Name"];
-        let source = startPageObj["Source"];
-
-        var startItemComp = Qt.createComponent(source);
-        if (startItemComp.status !== Component.Ready) {
-            console.error("Start component not ready!", startItemComp.errorString());
-
-            return;
-        }
-
-        addInitialItem(startItemComp, name);
-    }
-
-    function onMenuModelChanged(model){
-        if(!documentManager.startPageObj) return
-
-        let id = documentManager.startPageObj["Id"];
-        for(let i = 0; i < model.getItemsCount(); i++){
-            let curr_id = model.getData("Id",i);
-            let curr_name = model.getData("Name",i);
-            if(curr_id == id){
-                documentManager.documentsModel.setProperty(0, "Title", curr_name);
-                break;
-            }
-        }
-    }
-
     function addInitialItem(viewComp, name){
-        documentsModel.append({
-                                  "Uuid": UuidGenerator.generateUUID(),
-                                  "Title": name,
-                                  "DocumentViewComp": viewComp,
-                                  "Fixed": true
-                              });
+        documentManager.documentsModel.append({
+                                                  "Uuid": UuidGenerator.generateUUID(),
+                                                  "Title": name,
+                                                  "DocumentViewComp": viewComp,
+                                                  "Fixed": true
+                                              });
 
-        documentAdded(documentsModel.count - 1, "");
+        documentManager.documentAdded(documentManager.documentsModel.count - 1, "");
     }
 
     function setAlertPanel(alertPanelComp){
         alertPanel.sourceComponent = alertPanelComp;
     }
 
-    Rectangle {
-        id: background;
-
-        anchors.fill: parent;
-
-
-        color: Style.backgroundColor2;
-    }
-
     Loader {
         id: alertPanel;
-
         height: visible ? 40: 0;
-
         visible: false;
     }
 
@@ -168,9 +108,9 @@ DocumentManager {
             iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
-                let index = documentManager.documentsModel.count - 1 ;
+                let index = root.documentManager.documentsModel.count - 1 ;
                 if (index > 0){
-                    let uuid = documentManager.documentsModel.get(index).Uuid;
+                    let uuid = root.documentManager.documentsModel.get(index).Uuid;
 
                     Events.sendEvent(uuid + "CommandActivated", "Close")
                 }
@@ -188,21 +128,20 @@ DocumentManager {
         height: visible ? 40 : 0;
         orientation: ListView.Horizontal;
         boundsBehavior: Flickable.StopAtBounds;
-        model: documentManager.documentsModel;
 
-        visible: count === 1 && !documentManager.initialItemTitleVisible ? false : true;
+        visible: count === 1 && !root.initialItemTitleVisible ? false : true;
 
         delegate: Item {
             width: visible ? content.width + spacer.width: 0;
             height: headersListView.height;
-            visible: model.index === 0 ? documentManager.initialItemTitleVisible : true;
+            visible: model.index === 0 ? root.initialItemTitleVisible : true;
 
             Item {
                 id: spacer;
                 anchors.left: parent.left;
                 width: visible ? Style.size_mainMargin : 0;
 
-                visible: model.index === 1 && !documentManager.initialItemTitleVisible ? false : true;
+                visible: model.index === 1 && !root.initialItemTitleVisible ? false : true;
             }
 
             Row {
@@ -221,9 +160,9 @@ DocumentManager {
 
                     color: Style.titleColor;
 
-                    text: documentManager.titleSeparation;
+                    text: root.titleSeparation;
 
-                    visible: model.index === 1 && !documentManager.initialItemTitleVisible ? false : model.index > 0;
+                    visible: model.index === 1 && !root.initialItemTitleVisible ? false : model.index > 0;
                 }
 
                 Text {
@@ -260,7 +199,7 @@ DocumentManager {
         anchors.right: parent.right;
 
         onItemAdded: {
-            let documentObj = documentManager.documentsModel.get(index);
+            let documentObj = root.documentManager.documentsModel.get(index);
 
             if (item.viewId !== undefined){
                 item.viewId = documentObj.Uuid;

@@ -15,6 +15,8 @@
         <file alias="imtdocgui/DocumentDataController.qml">DocumentDataController.qml</file>
 	<file alias="imtdocgui/DocumentCollectionViewDelegate.qml">DocumentCollectionViewDelegate.qml</file>
 	<file alias="imtdocgui/DocumentValidator.qml">DocumentValidator.qml</file>
+	<file alias="imtdocgui/DocumentWorkspacePageView.qml">DocumentWorkspacePageView.qml</file>
+	<file alias="imtdocgui/SingleDocumentWorkspacePageView.qml">SingleDocumentWorkspacePageView.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

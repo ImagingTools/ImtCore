@@ -41,19 +41,21 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 
 		QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 
-		QByteArrayList groupIds = userInfoPtr->GetGroups();
-		for (const QByteArray& groupId : groupIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr)){
-				imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
-				if (userGroupInfoPtr != nullptr){
-					userGroupInfoPtr->AddUser(objectId);
-					retVal.query += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
-								*m_userGroupCollectionCompPtr,
-								groupId,
-								*userGroupInfoPtr,
-								operationContextPtr,
-								false);
+		if (m_userGroupCollectionCompPtr.IsValid() && m_userGroupDatabaseDelegateCompPtr.IsValid()){
+			QByteArrayList groupIds = userInfoPtr->GetGroups();
+			for (const QByteArray& groupId : groupIds){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr)){
+					imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+					if (userGroupInfoPtr != nullptr){
+						userGroupInfoPtr->AddUser(objectId);
+						retVal.query += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
+									*m_userGroupCollectionCompPtr,
+									groupId,
+									*userGroupInfoPtr,
+									operationContextPtr,
+									false);
+					}
 				}
 			}
 		}
@@ -125,38 +127,40 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 			}
 		}
 
-		for (const QByteArray& groupId : addedGroups){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr)){
-				imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
-				if (userGroupInfoPtr != nullptr){
-					if (!userGroupInfoPtr->GetUsers().contains(objectId)){
-						userGroupInfoPtr->AddUser(objectId);
+		if (m_userGroupCollectionCompPtr.IsValid() && m_userGroupDatabaseDelegateCompPtr.IsValid()){
+			for (const QByteArray& groupId : addedGroups){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr)){
+					imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+					if (userGroupInfoPtr != nullptr){
+						if (!userGroupInfoPtr->GetUsers().contains(objectId)){
+							userGroupInfoPtr->AddUser(objectId);
 
-						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
-									*m_userGroupCollectionCompPtr,
-									groupId,
-									*userGroupInfoPtr,
-									operationContextPtr,
-									false);
+							retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
+										*m_userGroupCollectionCompPtr,
+										groupId,
+										*userGroupInfoPtr,
+										operationContextPtr,
+										false);
+						}
 					}
 				}
 			}
-		}
 
-		for (const QByteArray& groupId : removedGroups){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr)){
-				imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
-				if (userGroupInfoPtr != nullptr){
-					bool result = userGroupInfoPtr->RemoveUser(objectId);
-					if (result){
-						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
-									*m_userGroupCollectionCompPtr,
-									groupId,
-									*userGroupInfoPtr,
-									operationContextPtr,
-									false);
+			for (const QByteArray& groupId : removedGroups){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr)){
+					imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+					if (userGroupInfoPtr != nullptr){
+						bool result = userGroupInfoPtr->RemoveUser(objectId);
+						if (result){
+							retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
+										*m_userGroupCollectionCompPtr,
+										groupId,
+										*userGroupInfoPtr,
+										operationContextPtr,
+										false);
+						}
 					}
 				}
 			}

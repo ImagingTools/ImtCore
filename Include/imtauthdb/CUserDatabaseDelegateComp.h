@@ -15,8 +15,8 @@ public:
 	typedef imtdb::CSqlJsonDatabaseDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CUserDatabaseDelegateComp)
-		I_ASSIGN(m_userGroupDatabaseDelegateCompPtr, "UserGroupDatabaseSqlDelegate", "User group database sql delegate", true, "UserGroupDatabaseSqlDelegate");
-		I_ASSIGN(m_userGroupCollectionCompPtr, "UserGroupCollection", "User group collection", true, "UserGroupCollection");
+		I_ASSIGN(m_userGroupDatabaseDelegateCompPtr, "UserGroupDatabaseSqlDelegate", "User group database sql delegate", false, "UserGroupDatabaseSqlDelegate");
+		I_ASSIGN(m_userGroupCollectionCompPtr, "UserGroupCollection", "User group collection", false, "UserGroupCollection");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)

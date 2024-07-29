@@ -21,6 +21,16 @@ RemoteCollectionView {
     }
     }
 
+    dataControllerComp:
+        Component {
+        CollectionRepresentation {
+            collectionId: userCollectionViewContainer.collectionId;
+            Component.onCompleted: {
+                additionalFieldIds.push("SystemId");
+            }
+        }
+    }
+
     function onLocalizationChanged(language){
         userCollectionViewContainer.dataController.updateHeaders();
     }
@@ -44,14 +54,32 @@ RemoteCollectionView {
             documentManager.registerDocumentView("User", "UserEditor", userDocumentComp);
             documentManager.registerDocumentDataController("User", dataControllerComp);
         }
+
+        table.rowDelegate = tableRowDelegateBaseComp;
+    }
+
+    Component {
+        id: tableRowDelegateBaseComp;
+
+        TableRowDelegate {
+            tableItem: userCollectionViewContainer.table;
+            width: userCollectionViewContainer.table.width;
+            minHeight: userCollectionViewContainer.table.itemHeight;
+            readOnly: userCollectionViewContainer.table.readOnly;
+//            color: selected ? Style.selectedColor : model.SystemId !== "" ? "red" : "transparent";
+        }
     }
 
     onHeadersChanged: {
         let rolesIndex = table.getHeaderIndex("Roles");
-        let groupsIndex = table.getHeaderIndex("Groups");
+        if (rolesIndex >= 0){
+            table.setColumnContentComponent(rolesIndex, dataComp);
+        }
 
-        table.setColumnContentComponent(rolesIndex, dataComp);
-        table.setColumnContentComponent(groupsIndex, groupsContentComp);
+        let groupsIndex = table.getHeaderIndex("Groups");
+        if (groupsIndex >= 0){
+            table.setColumnContentComponent(groupsIndex, groupsContentComp);
+        }
     }
 
     Component {
