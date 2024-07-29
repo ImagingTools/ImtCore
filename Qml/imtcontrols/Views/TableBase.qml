@@ -199,11 +199,12 @@ Rectangle {
             tableContainer.columnContentComps.push(null);
         }
 
-        setWidth();
+        tableContainer.setWidth();
     }
 
     onElementsChanged: {
         uncheckAll();
+        tableContainer.setWidth();
     }
 
     onSelectionChanged: {

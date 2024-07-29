@@ -186,10 +186,11 @@ Rectangle {
             tableContainer.columnContentComps.push(null);
         }
 
-        setWidth();
+        tableContainer.setWidth();
     }
 
     onElementsChanged: {
+        tableContainer.setWidth();
         uncheckAll();
     }
 
