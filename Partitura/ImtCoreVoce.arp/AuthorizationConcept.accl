@@ -3,12 +3,12 @@
     <AcfHeader>
         <VersionInfos>
             <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1" Number="2210" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395010" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AuthorizationController" X="575" Y="275" Note=""/>
+        <Element ComponentName="AuthorizationController" X="575" Y="300" Note=""/>
         <Element ComponentName="CredentialController" X="569" Y="207" Note=""/>
         <Element ComponentName="HashCalculator" X="575" Y="100" Note=""/>
         <Element ComponentName="UserSessionRepository" X="575" Y="375" Note=""/>

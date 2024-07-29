@@ -19,11 +19,11 @@ SingleDocumentWorkspaceView {
     Component.onCompleted: {
         Style.setDecorators(decorators)
 
-        startPageObj = {
-            "Id": "Administration",
-            "Name": "Administration",
-            "Source": "../imtauthgui/AdministrationView.qml",
-            "CommandId": "Administration"};
+        // startPageObj = {
+        //     "Id": "Administration",
+        //     "Name": "Administration",
+        //     "Source": "../imtauthgui/AdministrationView.qml",
+        //     "CommandId": "Administration"};
 
         Events.subscribeEvent("CommandsModelChanged", container.onCommandsModelUpdated);
         Events.subscribeEvent("CommandsEnabledChanged", container.onCommandsEnabledChanged);
