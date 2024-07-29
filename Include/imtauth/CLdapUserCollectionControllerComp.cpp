@@ -11,6 +11,7 @@
 
 // ACF includes
 #include <istd/CChangeGroup.h>
+#include <istd/TSingleFactory.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/CIdParam.h>
 
@@ -37,6 +38,9 @@ CLdapUserCollectionControllerComp::CLdapUserCollectionControllerComp()
 void CLdapUserCollectionControllerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	typedef istd::TSingleFactory<istd::IChangeable, imtauth::CIdentifiableUserInfo> FactoryUserImpl;
+	RegisterFactory<FactoryUserImpl>("User");
 
 	m_checkLdapUsersThreadThread.Start();
 }
@@ -139,44 +143,30 @@ const imtauth::IUserInfo* CLdapUserCollectionControllerComp::CheckLdapUsersThrea
 
 void CLdapUserCollectionControllerComp::CheckLdapUsersThread::run()
 {
-	if (!m_parent.m_userCollectionCompPtr.IsValid()){
-		return;
-	}
-
-	int interval = m_parent.m_checkIntervalAttrPtr.IsValid() ? *m_parent.m_checkIntervalAttrPtr : 60000;
+	int interval = m_parent.m_checkIntervalAttrPtr.IsValid() ? *m_parent.m_checkIntervalAttrPtr : 60;
 
 	while (!isInterruptionRequested()){
-		QByteArrayList expectedLdapUserIds = GetLdapUserIds();
+		QByteArrayList expectedUserIds = GetLdapUserIds();
+		QByteArrayList actualUserIds = m_parent.GetElementIds();
 
-		iprm::CParamsSet filterParam;
-		iprm::CParamsSet paramsSet;
+		istd::CChangeGroup changeGroup(&m_parent);
 
-		iprm::CIdParam systemId;
-		systemId.SetId("Ldap");
-
-		paramsSet.SetEditableParameter("SystemId", &systemId);
-		filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
-
-		imtbase::IObjectCollection::Ids actualLdapUserIds = m_parent.m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-
-		istd::CChangeGroup changeGroup(m_parent.m_userCollectionCompPtr.GetPtr());
-
-		// Add new LDAP users
-		for (const QByteArray& userId : expectedLdapUserIds){
-			if (!actualLdapUserIds.contains(userId)){
+		for (const QByteArray& userId : expectedUserIds){
+			if (!actualUserIds.contains(userId)){
 				istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr(GetUserInfoFromLdapUserId(userId));
 				if (userInfoPtr.IsValid()){
-					m_parent.m_userCollectionCompPtr->InsertNewObject("", "", "", userInfoPtr.GetPtr(), userId);
+					m_parent.InsertNewObject("User", "", "", userInfoPtr.GetPtr(), userId);
 				}
 			}
 		}
 
-		// Remove missing LDAP users
-		for (const QByteArray& userId : actualLdapUserIds){
-			if (!expectedLdapUserIds.contains(userId)){
-				m_parent.m_userCollectionCompPtr->RemoveElement(userId);
+		for (const QByteArray& userId : actualUserIds){
+			if (!expectedUserIds.contains(userId)){
+				m_parent.RemoveElement(userId);
 			}
 		}
+
+		changeGroup.Reset();
 
 		sleep(interval);
 	}

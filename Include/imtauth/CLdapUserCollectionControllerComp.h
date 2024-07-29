@@ -7,9 +7,11 @@
 // ACF includes
 #include <icomp/CComponentBase.h>
 #include <iprm/IEnableableParam.h>
+#include <imod/TModelWrap.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/CObjectCollection.h>
 #include <imtauth/IUserInfo.h>
 
 
@@ -17,19 +19,16 @@ namespace imtauth
 {
 
 
-class CLdapUserCollectionControllerComp:
-			public QObject,
-			public icomp::CComponentBase
+class CLdapUserCollectionControllerComp: public icomp::CComponentBase, public imod::TModelWrap<imtbase::CObjectCollection>
 {
-	Q_OBJECT
 public:
 	typedef icomp::CComponentBase BaseClass;
+	typedef imod::TModelWrap<imtbase::CObjectCollection> BaseClass2;
 
 	I_BEGIN_COMPONENT(CLdapUserCollectionControllerComp);
+		I_REGISTER_INTERFACE(imod::IModel)
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection)
-		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
-		I_ASSIGN(m_enableableParamCompPtr, "EnableableParam", "Enable/disable", false, "EnableableParam");
-		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "The interval for synchronization LDAP users", false, 60000);
+		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "The interval for synchronization LDAP users (in secs)", false, 60);
 	I_END_COMPONENT;
 
 	CLdapUserCollectionControllerComp();
@@ -60,8 +59,6 @@ protected:
 	CheckLdapUsersThread m_checkLdapUsersThreadThread;
 
 protected:
-	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
-	I_REF(iprm::IEnableableParam, m_enableableParamCompPtr);
 	I_ATTR(int, m_checkIntervalAttrPtr);
 };
 

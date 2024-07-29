@@ -139,6 +139,11 @@ I_EXPORT_COMPONENT(
 			"Ldap credential controller",
 			"Ldap Credential Controller");
 
+I_EXPORT_COMPONENT(
+			LdapUserCollectionJoiner,
+			"Ldap user collection joiner",
+			"Ldap User Collection Joiner");
+
 
 } // namespace ImtAuthPck
 

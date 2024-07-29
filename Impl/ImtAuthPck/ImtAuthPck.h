@@ -33,6 +33,7 @@
 #include <imtauth/CLdapUserCollectionControllerComp.h>
 #include <imtauth/CLdapCredentialControllerComp.h>
 #include <imtauth/CCredentialControllerComp.h>
+#include <imtauth/CLdapUserCollectionJoinerComp.h>
 
 
 namespace ImtAuthPck
@@ -89,6 +90,7 @@ typedef icomp::TModelCompWrap<
 typedef imtauth::CLdapUserCollectionControllerComp LdapUserCollectionController;
 typedef imtauth::CCredentialControllerComp CredentialController;
 typedef imtauth::CLdapCredentialControllerComp LdapCredentialController;
+typedef imtauth::CLdapUserCollectionJoinerComp LdapUserCollectionJoiner;
 
 
 } // namespace ImtAuthPck

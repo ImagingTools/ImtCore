@@ -250,7 +250,9 @@ CollectionView {
         id: subscriptionClient;
 
         Component.onDestruction: {
-            root.unRegisterSubscription()
+            if (root){
+                root.unRegisterSubscription()
+            }
         }
 
         property bool ok: root.collectionId !== "" && subscriptionClient.subscriptionId !== "";

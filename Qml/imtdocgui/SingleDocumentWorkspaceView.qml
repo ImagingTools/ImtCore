@@ -65,6 +65,10 @@ Rectangle {
     }
 
     function addInitialItem(viewComp, name){
+        if (!documentManager){
+            return;
+        }
+
         documentManager.documentsModel.append({
                                                   "Uuid": UuidGenerator.generateUUID(),
                                                   "Title": name,
