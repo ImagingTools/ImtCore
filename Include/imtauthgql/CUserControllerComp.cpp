@@ -209,12 +209,6 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 		password = representationModel.GetData("Password").toByteArray();
 	}
 
-	if (password.isEmpty()){
-		errorMessage = QT_TR_NOOP("Password cannot be empty");
-
-		return nullptr;
-	}
-
 	bool calculate = true;
 	if (userInfoPtr != nullptr){
 		if (userInfoPtr->GetPasswordHash() == password){

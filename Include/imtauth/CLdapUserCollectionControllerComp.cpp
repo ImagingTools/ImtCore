@@ -122,7 +122,12 @@ const imtauth::IUserInfo* CLdapUserCollectionControllerComp::CheckLdapUsersThrea
 		userInfoPtr->SetPasswordHash(password);
 
 		QString name = QString::fromWCharArray(userInfo3BufPtr->usri3_full_name);
-		userInfoPtr->SetName(name);
+		if (!name.isEmpty()){
+			userInfoPtr->SetName(name);
+		}
+		else{
+			userInfoPtr->SetName(userId);
+		}
 
 		QString description = QString::fromWCharArray(userInfo3BufPtr->usri3_comment);
 		userInfoPtr->SetDescription(description);

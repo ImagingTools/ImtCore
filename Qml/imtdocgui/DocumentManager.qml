@@ -3,7 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 
-Item {
+QtObject {
     id: documentManager;
 
     property string defaultDocumentName: qsTr("<no name>");
@@ -557,9 +557,7 @@ Item {
     }
 
 
-    Component {
-        id: singleDocumentDataComp;
-
+    property Component singleDocumentDataComp: Component{
         QtObject {
             id: singleDocumentData;
 
@@ -767,14 +765,11 @@ Item {
         }
     }
 
-    Component {
-        id: defaultDataController;
+    property Component defaultDataController: Component {
         DocumentDataController {}
     }
 
-    QtObject {
-        id: internal;
-
+    property QtObject internal: QtObject {
         function getSingleDocumentData(index)
         {
             if (index < 0 || index >= internal.m_documentInfos.length){
@@ -806,16 +801,12 @@ Item {
         property var m_closingDocuments: [];
     }
 
-    Component {
-        id: errorDialogComp;
-
+    property Component errorDialogComp: Component {
         ErrorDialog {
         }
     }
 
-    Component {
-        id: saveDialog;
-
+    property Component saveDialog: Component {
         MessageDialog {
             title: qsTr("Save document");
 

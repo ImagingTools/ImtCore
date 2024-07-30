@@ -212,7 +212,6 @@ Rectangle {
             let documentData = documentObj.DocumentData;
             if (documentData){
                 documentData.views.push(item);
-                documentData.viewAdded(item);
             }
         }
     }

@@ -39,6 +39,7 @@ IconButtonDecorator 1.0 ./Buttons/IconButtonDecorator.qml
 RadioButtonDecorator 1.0 ./Buttons/RadioButtonDecorator.qml
 SegmentedButton 1.0 ./Buttons/SegmentedButton.qml
 
+singleton ModalDialogManager 1.0 ./Dialogs/ModalDialogManager.qml
 DialogButtons 1.0 ./Dialogs/DialogButtons.qml
 Dialog 1.0 ./Dialogs/Dialog.qml
 TopPanelDialog 1.0 ./Dialogs/TopPanelDialog.qml
@@ -48,7 +49,6 @@ InputDialog 1.0 ./Dialogs/InputDialog.qml
 InputDialogBody 1.0 ./Dialogs/InputDialogBody.qml
 MessageDialog 1.0 ./Dialogs/MessageDialog.qml
 MessageDialogBody 1.0 ./Dialogs/MessageDialogBody.qml
-singleton ModalDialogManager 1.0 ./Dialogs/ModalDialogManager.qml
 PopupMenuDialog 1.0 ./Dialogs/PopupMenuDialog.qml
 PopupDecorator 1.0 ./Dialogs/PopupDecorator.qml
 PopupItemDelegateDecorator 1.0 ./Dialogs/PopupItemDelegateDecorator.qml
@@ -80,16 +80,16 @@ SpinBox 1.0 ./Inputs/SpinBox.qml
 SpinBoxComp 1.0 ./Inputs/SpinBoxComp.qml
 BarControl 1.0 ./Inputs/BarControl.qml
 
+singleton UuidGenerator 1.0 Models/UuidGenerator.qml
+singleton NavigationController 1.0 Models/NavigationController.qml
 ModelIndex 1.0 Models/ModelIndex.qml
 SortController 1.0 Models/SortController.qml
 StateMachine 1.0 Models/StateMachine.qml
 TreeItemModelConverter 1.0 ./Models/TreeItemModelConverter.qml
 TreeItemModelObserver 1.0 ./Models/TreeItemModelObserver.qml
-singleton UuidGenerator 1.0 Models/UuidGenerator.qml
 CommandsController 1.0 Models/CommandsController.qml
 CommandsProvider 1.0 Models/CommandsProvider.qml
 MacAddressValidator 1.0 Models/MacAddressValidator.qml
-singleton NavigationController 1.0 Models/NavigationController.qml
 
 AuxTable 1.0 ./Views/AuxTable.qml
 Table 1.0 ./Views/Table.qml

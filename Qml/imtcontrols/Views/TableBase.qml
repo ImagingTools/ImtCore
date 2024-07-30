@@ -389,6 +389,7 @@ Rectangle {
 
         var headersCount = tableContainer.headers.getItemsCount();
         var tableWidth_ = tableContainer.width;
+//        var tableWidth_ = Math.max(tableContainer.width, tableContainer.contentWidth)
 
         if(tableContainer.widthDecorator.getItemsCount() === 0 && headersCount !== 0){
             for(var ind = 0; ind < headersCount ; ind++){

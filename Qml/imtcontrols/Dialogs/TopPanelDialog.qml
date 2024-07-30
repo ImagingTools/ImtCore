@@ -65,7 +65,6 @@ Rectangle {
         iconSource: "../../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
         onClicked: {
-            console.log("closeButtonClicked");
             topPanelDialogContainer.closeButtonClicked(Enums.cancel);
         }
 
