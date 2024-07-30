@@ -27,11 +27,16 @@ include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 include(${IMTCOREDIR}/Config/CMake/PartituraUpgrade.cmake)
 imt_core_upgrade_partitura("${CMAKE_CURRENT_LIST_DIR}/../..")
 
+message("ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
+
+
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
 set (QML_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Qml")
 set (TESTS_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Tests")
-set(AUX_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../AuxInclude/${TARGETNAME}/GeneratedFiles")
+
+set(AUX_INCLUDE_DIR "${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}/GeneratedFiles")
+
 set(BUILD_TESTING OFF CACHE BOOL "Configures projects for testing")
 
 include_directories(${AUX_INCLUDE_DIR}/..)
@@ -40,6 +45,7 @@ include_directories(${AUX_INCLUDE_DIR}/..)
 #------ DesignToken ------
 
 add_subdirectory("${INCLUDE_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbase")
+
 add_subdirectory("${INCLUDE_DIR}/imtdesign/CMake" "${AUX_INCLUDE_DIR}/imtdesign")
 
 add_subdirectory("${IMPL_DIR}/ImtDesignPck/CMake" "${AUX_INCLUDE_DIR}/ImtDesignPck")
@@ -70,6 +76,9 @@ add_dependencies(ImtSdlPck imtsdl)
 
 add_subdirectory("${IMPL_DIR}/SdlCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/SdlCodeGenerator")
 add_dependencies(SdlCodeGenerator ImtSdlPck imtsdl)
+
+
+if(DEFINED IMT_BUILD_ONLYTOOLS AND NOT IMT_BUILD_ONLYTOOLS)
 
 #-------- Include --------
 
@@ -316,4 +325,6 @@ if (${BUILD_TESTING})
 	add_subdirectory("${TESTS_DIR}/StructureTest/CMake" "${AUX_INCLUDE_DIR}/StructureTest")
 	file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 endif()
+
+endif() # NOT ONLYTOOLS
 

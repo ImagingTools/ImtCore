@@ -36,8 +36,8 @@ if(NOT DEFINED ZLIBDIR)
 	endif()
 endif()
 
-include_directories("${IMTCOREDIR}/AuxInclude/${TARGETNAME}")
+include_directories("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}")
 include_directories("${IMTCOREDIR}/Include")
 include_directories("${IMTCOREDIR}/Impl")
 
-link_directories("${IMTCOREDIR}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
+link_directories("${BUILDDIR}/ImtCore/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
