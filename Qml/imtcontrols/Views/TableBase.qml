@@ -418,7 +418,13 @@ Rectangle {
             }
             else{
                 width_ = width_< 0 ? 0 : width_;
-                let newWidth = tableWidth_ * (widthPercent_ / 100);
+                let newWidth;
+                if(widthPercent_ >= 0){
+                    newWidth = tableWidth_ * (widthPercent_ / 100);
+                }
+                else {
+                    newWidth = width_;
+                }
                 lengthMinus += newWidth;
             }
         }
