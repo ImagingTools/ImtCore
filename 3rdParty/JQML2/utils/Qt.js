@@ -757,6 +757,11 @@ var Qt = {
     openUrlExternally: function(url){
         return window.open(url, '_blank')
     },
+    locale: function(){
+        return {
+            decimalPoint: mainRoot.delimiter
+        }
+    },
     qsTr: function(sourceText){
         let translate = mainRoot.languages[mainRoot.language]
         let result = translate ? translate[sourceText] : sourceText
