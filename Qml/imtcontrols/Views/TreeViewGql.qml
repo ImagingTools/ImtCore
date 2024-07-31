@@ -105,6 +105,7 @@ Rectangle{
                 height: model.Visible__ ? treeViewGql.delegateHeight : 0;
                 opacity: model.Visible__;
                 property bool isOpen: model.IsOpen__ == undefined ? false : model.IsOpen__;
+                property int index: model.index;
 
                 Component.onCompleted: {
                     if(treeViewGql.hasAddDelegInfo){
