@@ -8,6 +8,7 @@ TextInputElementView {
 
     property alias topValue: doubleValidator.top;
     property alias bottomValue: doubleValidator.bottom;
+    property double value: 0
 
     onAcceptableInputChanged: {
         if (topValue != Number.POSITIVE_INFINITY && bottomValue != Number.NEGATIVE_INFINITY){
@@ -23,6 +24,22 @@ TextInputElementView {
 
     DoubleValidator {
         id: doubleValidator;
+    }
+
+    onTextChanged: {
+        let decimal = Qt.locale().decimalPoint
+        let tempText = text.replace(decimal, ".")
+
+        value = Number(tempText)
+    }
+
+    onValueChanged: {
+        let decimal = Qt.locale().decimalPoint
+        let tempText = value.toString()
+
+        text = tempText.replace(".", decimal);
+
+        console.log("Debug Value Changed", tempText, text, value, decimal)
     }
 
     Component.onCompleted: {
