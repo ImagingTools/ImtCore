@@ -29,6 +29,9 @@ Rectangle{
     property int _maxCountToClose: 10;
     property int _deleteCounter: 0;
 
+    property bool hasAddDelegInfo: false;
+    property Component additionalDelegateComp: Component{Item{}}
+
     signal requestSignal(int index);
 
     signal clicked(int index);
@@ -48,6 +51,8 @@ Rectangle{
     onWidthChanged: {
         list.contentX = list.originX;
     }
+
+
 
 
     Rectangle{
@@ -101,6 +106,12 @@ Rectangle{
                 opacity: model.Visible__;
                 property bool isOpen: model.IsOpen__ == undefined ? false : model.IsOpen__;
 
+                Component.onCompleted: {
+                    if(treeViewGql.hasAddDelegInfo){
+                        var addItem =  treeViewGql.additionalDelegateComp.createObject(deleg);
+                    }
+                }
+
                 Rectangle{
                     id: selectionRec;
 
@@ -136,9 +147,9 @@ Rectangle{
                         iconSource:  "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
 
                         decorator: Component { ButtonDecorator{
-                            color: "transparent";
-                            border.color: "transparent";
-                        }}
+                                color: "transparent";
+                                border.color: "transparent";
+                            }}
 
                         onClicked: {
                             if(model.HasChildren__){
@@ -239,7 +250,6 @@ Rectangle{
                         }
                     }
                 }
-
 
             }//delegate
 
