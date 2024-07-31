@@ -42,38 +42,34 @@ set(BUILD_TESTING OFF CACHE BOOL "Configures projects for testing")
 include_directories(${AUX_INCLUDE_DIR}/..)
 
 
-#------ DesignToken ------
-
+#------ Required libs ------
 add_subdirectory("${INCLUDE_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbase")
 
 add_subdirectory("${INCLUDE_DIR}/imtdesign/CMake" "${AUX_INCLUDE_DIR}/imtdesign")
-
 add_subdirectory("${IMPL_DIR}/ImtDesignPck/CMake" "${AUX_INCLUDE_DIR}/ImtDesignPck")
 add_dependencies(ImtDesignPck imtdesign)
 
-add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreator")
-add_dependencies(DesignTokenCreator imtbase imtdesign)
-
-add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
-add_dependencies(imtstyle DesignTokenCreator)
-
-#------ DDLCodeCreator ------
+add_subdirectory("${INCLUDE_DIR}/imtfile/CMake" "${AUX_INCLUDE_DIR}/imtfile")
+add_subdirectory("${IMPL_DIR}/ImtFilePck/CMake" "${AUX_INCLUDE_DIR}/ImtFilePck")
+add_dependencies(ImtFilePck imtbase imtfile)
 
 add_subdirectory("${INCLUDE_DIR}/imtddl/CMake" "${AUX_INCLUDE_DIR}/imtddl")
-
 add_subdirectory("${IMPL_DIR}/ImtDdlPck/CMake" "${AUX_INCLUDE_DIR}/ImtDdlPck")
 add_dependencies(ImtDdlPck imtddl)
 
+add_subdirectory("${INCLUDE_DIR}/imtsdl/CMake" "${AUX_INCLUDE_DIR}/imtsdl")
+add_subdirectory("${IMPL_DIR}/ImtSdlPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlPck")
+add_dependencies(ImtSdlPck imtsdl imtfile imtbase)
+
+#------ DesignToken ------
+add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreator")
+add_dependencies(DesignTokenCreator imtbase imtdesign)
+
+#------ DDLCodeCreator ------
 add_subdirectory("${IMPL_DIR}/DdlCodeCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DdlCodeCreator")
 add_dependencies(DdlCodeCreator imtddl)
 
 #------ SDL ------
-
-add_subdirectory("${INCLUDE_DIR}/imtsdl/CMake" "${AUX_INCLUDE_DIR}/imtsdl")
-
-add_subdirectory("${IMPL_DIR}/ImtSdlPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlPck")
-add_dependencies(ImtSdlPck imtsdl)
-
 add_subdirectory("${IMPL_DIR}/SdlCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/SdlCodeGenerator")
 add_dependencies(SdlCodeGenerator ImtSdlPck imtsdl)
 
@@ -85,6 +81,8 @@ if(DEFINED IMT_BUILD_ONLYTOOLS AND NOT IMT_BUILD_ONLYTOOLS)
 add_subdirectory("${INCLUDE_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtapp")
 add_subdirectory("${INCLUDE_DIR}/imtdev/CMake" "${AUX_INCLUDE_DIR}/imtdev")
 add_subdirectory("${INCLUDE_DIR}/imtrest/CMake" "${AUX_INCLUDE_DIR}/imtrest")
+add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
+add_dependencies(imtstyle DesignTokenCreator)
 add_subdirectory("${INCLUDE_DIR}/imtgql/CMake" "${AUX_INCLUDE_DIR}/imtgql")
 add_dependencies(imtgql imtrest)
 add_subdirectory("${INCLUDE_DIR}/imtclientgql/CMake" "${AUX_INCLUDE_DIR}/imtclientgql")
