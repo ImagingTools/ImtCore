@@ -43,6 +43,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption modificatorsOption({"M", "modificator"}, "Modificator to generate code. You can provide multiple modificators. Note: modifier names are case sensitive.", "ModificatorList");
 	QCommandLineOption allModificatorsOption("use-all-modificators", "Use all modificators to generate code");
 	QCommandLineOption baseClassOption({"B", "base-class"}, "Defines base class of all generated classes with include path CLASS=/include/path", "BaseClassList");
+	QCommandLineOption joinRulesOption({"J", "join"}, "Defines file types, will be joined TYPE(H or CPP)=/Destination/File/Path", "JoinRules");
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
 	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)");
@@ -61,7 +62,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 					qmlOption,
 					cppOption,
 					gqlOption,
-					baseClassOption
+					baseClassOption,
+					joinRulesOption
 				});
 	if (!isOptionsAdded){
 		Q_ASSERT(false);
@@ -108,6 +110,29 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 			QString className = baseClassDeclaration.split('=')[0];
 			QString includeDirective = baseClassDeclaration.split('=')[1];
 			m_baseClassList.insert(className, includeDirective);
+		}
+	}
+
+	if (commandLineParser.isSet(joinRulesOption)){
+		const QStringList joinRules = commandLineParser.values(joinRulesOption);
+		for (const QString& joinRule: joinRules){
+			if (!joinRule.contains('=')){
+				SendCriticalMessage(0, QString("Declaration '%1' does not contains destination path").arg(joinRule));
+				Q_ASSERT_X(false, "destination path of join rule parsing", "Destination path is not set");
+
+				return false;
+			}
+
+			QString fileType = joinRule.split('=')[0];
+			if (fileType != s_headerFileType || fileType != s_sourceFileType){
+				SendCriticalMessage(0, QString("Unknown file type. extected on of: %1 %2").arg(s_headerFileType, s_sourceFileType));
+				I_CRITICAL();
+
+				return false;
+			}
+
+			QString destinationPath = joinRule.split('=')[1];
+			m_joinRules.insert(fileType, destinationPath);
 		}
 	}
 
@@ -219,6 +244,11 @@ bool CSdlProcessArgumentsParserComp::IsGqlEnabled() const
 QMap<QString, QString> CSdlProcessArgumentsParserComp::GetBaseClassList() const
 {
 	return m_baseClassList;
+}
+
+QMap<QString, QString> CSdlProcessArgumentsParserComp::GetJoinRules() const
+{
+	return m_joinRules;
 }
 
 

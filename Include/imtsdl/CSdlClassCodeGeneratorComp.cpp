@@ -11,10 +11,12 @@
 #include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
+#include <iprm/CTextParam.h>
 #include <ifile/CFileNameParam.h>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/CSdlType.h>
+#include <imtfile/CSimpleFileJoinerComp.h>
 
 
 namespace imtsdl
@@ -142,6 +144,46 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 		// And complete the processing
 		EndClassFiles(sdlType);
+	}
+
+	// join files if required
+	const QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
+	if (!joinRules.isEmpty()){
+		if (m_filesJoinerCompPtr.IsValid()){
+			iprm::CParamsSet inputParams;
+			ifile::CFileNameParam sourceDirPathParam;
+			sourceDirPathParam.SetPath(outputDirectoryPath);
+			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
+			ifile::CFileNameParam outputFileNameParam;
+			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
+
+			iprm::CTextParam filterParams;
+
+			if (joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType)){
+				filterParams.SetText(QStringLiteral("*.h"));
+				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
+				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
+				if (joinProcessResult != TS_OK){
+					SendCriticalMessage(0, "Unable to join header files");
+					I_CRITICAL();
+
+					return TS_INVALID;
+				}
+
+			}
+			if (joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType)){
+				filterParams.SetText(QStringLiteral("*.cpp"));
+				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType]);
+				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
+				if (joinProcessResult != TS_OK){
+					SendCriticalMessage(0, "Unable to join cource  files");
+					I_CRITICAL();
+
+					return TS_INVALID;
+				}
+			}
+
+		}
 	}
 
 	return retVal;

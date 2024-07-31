@@ -15,6 +15,10 @@ namespace imtsdl
 class ISdlProcessArgumentsParser: virtual public istd::IPolymorphic
 {
 public:
+	static inline const QString s_sourceFileType = QStringLiteral("CPP");
+	static inline const QString s_headerFileType = QStringLiteral("H");
+
+public:
 	virtual bool SetArguments(int argc, char** argv) = 0;
 	virtual QString GetSchemaFilePath() const = 0;
 	virtual QString GetOutputDirectoryPath() const = 0;
@@ -26,6 +30,8 @@ public:
 	virtual bool IsQmlEnabled() const = 0;
 	virtual bool IsGqlEnabled() const = 0;
 	virtual QMap<QString/*class name*/, QString/*include directive*/> GetBaseClassList() const = 0;
+	virtual QMap<QString/*File extention*/, QString/*Destination path*/> GetJoinRules() const = 0;
+
 };
 
 

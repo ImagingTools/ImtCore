@@ -40,6 +40,7 @@ public:
 	virtual bool IsCppEnabled() const override;
 	virtual bool IsGqlEnabled() const override;
 	virtual QMap<QString, QString> GetBaseClassList() const override;
+	virtual QMap<QString, QString> GetJoinRules() const override;
 
 private:
 	QString m_schemaFilePath;
@@ -56,6 +57,7 @@ private:
 	bool m_qmlEnabled;
 	bool m_gqlEnabled;
 	QMap<QString, QString> m_baseClassList;
+	QMap<QString, QString> m_joinRules;
 };
 
 
