@@ -51,130 +51,65 @@ class MouseArea extends Item {
         return proxy
     }
 
-    __mousePressed = false
-    __mouseOver = false
+    __pressed = false
+    __entered = false
     __timer = null
 
-    __getMouseEventStructure(){
-        return {
-            accepted: true,
-            button: QtEnums.LeftButton,
-            buttons: QtEnums.LeftButton,
-            modifiers: 0,
-            wasHeld: false,
-            x: 0,
-            y: 0,
+    __onMouseCanceled(mouse){
+        this.canceled()
+    }
+
+    __onMouseEnter(mouse){
+        if((this.hoverEnabled && !mouse.target) || (mouse.target === this)){
+            this.__entered = true
+            this.entered(mouse)
+            return true
         }
     }
 
-    __getWheelEventStructure(){
-        return {
-            accepted: false,
-            angleDelta: {
-                x: 0,
-                y: 0,
-            },
-            x: 0,
-            y: 0,
+    __onMouseLeave(mouse){
+        if((this.hoverEnabled && !mouse.target) || (mouse.target === this)){
+            this.__entered = false
+            this.exited(mouse)
         }
     }
 
-    __onEntered(){
-        if(!this.__mouseOver && (this.hoverEnabled || this.__mousePressed)) {
-            this.__mouseOver = true
-            this.entered()
+    __onMouseMove(mouse){
+        if((this.hoverEnabled && !mouse.target) || (mouse.target === this && this.__pressed)){
+            this.positionChanged(mouse)
         }
     }
 
-    __onExited(){
-        if(this.__mouseOver) {
-            this.__mouseOver = false
-            this.exited()
+    __onMouseDown(mouse){
+        if(!mouse.target){
+            this.__pressed = true
+            if(!this.__entered) this.entered()
+            this.pressed(mouse)
+
+            if(mouse.accepted) mouse.target = this
         }
     }
 
-    __onPositionChanged(x, y){
-        let mouse = this.__getMouseEventStructure()
-        mouse.x = x
-        mouse.y = y
-        this.mouseX = x
-        this.mouseY = y
-
-        if(this.hoverEnabled || this.__mousePressed) this.positionChanged(mouse)
+    __onMouseUp(mouse){
+        if(!mouse.target || mouse.target === this){
+            this.released(mouse)
+        }
     }
 
-    __onPressed(x, y, button){
-        this.__mousePressed = true
-        this.__onEntered()
+    __onMouseClick(mouse){
+        if(mouse.target === this && this.__pressed){
+            this.clicked(mouse)
+        }
 
-        let mouse = this.__getMouseEventStructure()
-        mouse.x = x
-        mouse.y = y
-        this.mouseX = x
-        this.mouseY = y
-
-        this.pressed(mouse)
-        return mouse.accepted
+        this.__pressed = false
     }
 
-    __onPressAndHold(x, y, button){
-        clearTimeout(this.__timer)
+    __onMouseDblClick(mouse){
+        if(mouse.target === this && this.__pressed){
+            this.doubleClicked(mouse)
+        }
 
-        this.__timer = setTimeout(()=>{
-            if(this.mouseX >= 0 && this.mouseY >= 0 && this.mouseX < this.width && this.mouseY < this.height){
-                let mouse = this.__getMouseEventStructure()
-                mouse.x = this.mouseX
-                mouse.y = this.mouseY
-                this.pressAndHold(mouse)
-            }
-        }, this.pressAndHoldInterval)
-    }
-
-    __onReleased(x, y, button){
-        clearTimeout(this.__timer)
-        this.__mousePressed = false
-
-        let mouse = this.__getMouseEventStructure()
-        mouse.x = x
-        mouse.y = y
-        this.mouseX = x
-        this.mouseY = y
-
-        this.released(mouse)
-    }
-
-    __onClick(x, y, button){
-        let mouse = this.__getMouseEventStructure()
-        mouse.x = x
-        mouse.y = y
-        this.mouseX = x
-        this.mouseY = y
-
-        this.clicked(mouse)
-        if(this.propagateComposedEvents) return mouse.accepted
-    }
-
-    __onDblClick(x, y, button){
-        let mouse = this.__getMouseEventStructure()
-        mouse.x = x
-        mouse.y = y
-        this.mouseX = x
-        this.mouseY = y
-
-        this.doubleClicked(mouse)
-        if(this.propagateComposedEvents) return mouse.accepted
-    }
-
-    __onWheel(x, y, deltaX, deltaY){
-        let wheel = this.__getWheelEventStructure()
-        wheel.x = x
-        wheel.y = y
-        wheel.angleDelta.x = deltaX
-        wheel.angleDelta.y = deltaY
-
-        this.wheel(wheel)
-
-        return wheel.accepted
+        this.__pressed = false
     }
 }
 

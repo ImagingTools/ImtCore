@@ -15,7 +15,7 @@ class QObject extends BaseObject {
 
     static create(parent, ...args){
         let proxy = super.create(parent, ...args)
-        proxy.parent = parent
+        proxy.setParent(parent)
 
         return proxy
     }
@@ -61,6 +61,10 @@ class QObject extends BaseObject {
         }
         this[key] = value
         return true
+    }
+
+    setParent(parent){
+        this.parent = parent
     }
 }
 

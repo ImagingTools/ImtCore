@@ -203,8 +203,19 @@ class Item extends QtObject {
     forceActiveFocus(){}
 
 
+
+    __onMouseCanceled(mouse){}
+    __onMouseEnter(mouse){}
+    __onMouseLeave(mouse){}
+    __onMouseMove(mouse){}
+    __onMouseDown(mouse){}
+    __onMouseUp(mouse){}
+    __onMouseClick(mouse){}
+    __onMouseDblClick(mouse){}
+
     __onEntered(){}
     __onExited(){}
+    __onCanceled(){}
     __onPositionChanged(x, y){}
     __onPressed(x, y, button){}
     __onPressAndHold(x, y, button){}

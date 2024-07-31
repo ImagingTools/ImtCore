@@ -25,7 +25,7 @@ class QtObject extends QObject {
         let proxy = super.create(parent, ...args)
 
         if(parent){
-            parent.children.push(proxy)
+            proxy.parent.children.push(proxy)
         }
 
         return proxy

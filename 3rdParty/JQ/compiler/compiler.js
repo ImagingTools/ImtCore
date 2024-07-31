@@ -1024,7 +1024,16 @@ class Instruction {
             if(this.extends === 'Component'){
                 code.push(`self.component=` + this.children[i].toCode())
             } else {
-                code.push(`let child${i}=(` + this.children[i].toCode() + ').create(self)')
+                let type = this.getTypeInfo(this.extends).type
+                while(type instanceof QmlFile){
+                    type = type.instruction.getTypeInfo(type.instruction.extends).type
+                }
+                if(type === JQModules.QtQuick.Flickable || type === JQModules.QtQuick.ListView || type === JQModules.QtQuick.GridView){
+                    code.push(`let child${i}=(` + this.children[i].toCode() + ').create(self.contentItem)')
+                } else {
+                    code.push(`let child${i}=(` + this.children[i].toCode() + ').create(self)')
+                }
+                
             }
             
         }
