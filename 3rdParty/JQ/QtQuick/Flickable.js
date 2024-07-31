@@ -3,6 +3,7 @@ const Real = require("../QtQml/Real")
 const Bool = require("../QtQml/Bool")
 const Signal = require("../QtQml/Signal")
 const QtFunctions = require("../Qt/functions")
+const MouseArea = require("./MouseArea")
 
 class Flickable extends Item {
     static AutoFlickDirection = 0
@@ -70,8 +71,13 @@ class Flickable extends Item {
 
     __onMouseMove(mouse){
         if(mouse.wasDrag) {
-            if(mouse.target) mouse.target.__onMouseCanceled()
-            mouse.target = this
+            if(mouse.target) {
+                if(mouse.target instanceof MouseArea && mouse.target.preventStealing === false) mouse.target = this
+                mouse.target.__onMouseCanceled()
+            } else {
+                mouse.target = this
+            }
+            
         }
 
         if(mouse.target === this){
@@ -82,12 +88,14 @@ class Flickable extends Item {
                             this.contentX += mouse.moveX
                         } else {
                             this.contentX = this.contentWidth - this.width
+                            mouse.target = null
                         }
                     } else {
                         if(this.contentX + mouse.moveX >= 0) {
                             this.contentX += mouse.moveX
                         } else {
                             this.contentX = 0
+                            mouse.target = null
                         }
                     }
                 }
@@ -97,12 +105,14 @@ class Flickable extends Item {
                             this.contentY += mouse.moveY
                         } else {
                             this.contentY = this.contentHeight - this.height
+                            mouse.target = null
                         }
                     } else {
                         if(this.contentY + mouse.moveY >= 0) {
                             this.contentY += mouse.moveY
                         } else {
                             this.contentY = 0
+                            mouse.target = null
                         }
                     }
                 }
@@ -120,8 +130,6 @@ class Flickable extends Item {
             mouse.target = null
         }
     }
-    __onMouseClick(mouse){}
-    __onMouseDblClick(mouse){}
 }
 
 module.exports = Flickable

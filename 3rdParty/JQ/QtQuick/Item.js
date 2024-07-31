@@ -212,17 +212,7 @@ class Item extends QtObject {
     __onMouseUp(mouse){}
     __onMouseClick(mouse){}
     __onMouseDblClick(mouse){}
-
-    __onEntered(){}
-    __onExited(){}
-    __onCanceled(){}
-    __onPositionChanged(x, y){}
-    __onPressed(x, y, button){}
-    __onPressAndHold(x, y, button){}
-    __onReleased(x, y, button){}
-    __onClick(x, y, button){}
-    __onDblClick(x, y, button){}
-    __onWheel(){}
+    __onWheel(wheel){}
 }
 
 module.exports = Item
