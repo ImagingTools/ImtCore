@@ -86,15 +86,13 @@ qint64 CDocumentTable::AddDocument(const char *data, int count, const QByteArray
 		qint64 key = 0;
 
 
-		if(result.done){
+		if(result.done && keyStr.isEmpty()){
 			key = result.key.as_int64();
 			key++;
 		}
 
-
-
 		mdbx::slice keySlice(&key, 8);
-		mdbx::slice keyStrSlice(keyStr, keyStr.length());
+		mdbx::slice keyStrSlice(keyStr.data(), keyStr.length());
 		mdbx::slice valueSlice(data, count);
 		if(keyStr.isEmpty()){
 			m_txn.put(m_mapHandle, keySlice, valueSlice, mdbx::put_mode::upsert);
@@ -106,7 +104,7 @@ qint64 CDocumentTable::AddDocument(const char *data, int count, const QByteArray
 		if(m_hasIndex){
 			mdbx::slice keySliceIndex(data, count);
 			mdbx::slice valueSliceIndex(&key, 8);
-			mdbx::slice valueStrSliceIndex(keyStr, keyStr.length());
+			mdbx::slice valueStrSliceIndex(keyStr.data(), keyStr.length());
 			if(keyStr.isEmpty()){
 				m_txn.put(m_mapHandleIndex, keySliceIndex, valueSliceIndex, mdbx::put_mode::upsert);
 			}
@@ -141,6 +139,59 @@ QByteArray CDocumentTable::GetDocument(qint64 key)
 
 	return doc;
 }
+
+
+QByteArray CDocumentTable::GetDocument(const QByteArray &key)
+{
+	QByteArray doc = QByteArray();
+	mdbx::slice keySlice(key.data(), key.length());
+
+	try{
+		mdbx::cursor::move_result result = m_cursor.find(keySlice);
+		std::string value = result.value.as_string();
+		doc = QByteArray(value.data());
+	}
+	catch(...){
+		doc = QByteArray();
+	}
+
+	return doc;
+}
+
+
+bool CDocumentTable::HasRecord(qint64 key)
+{
+	bool ok = false;
+	mdbx::slice keySlice(&key, 8);
+
+	try{
+		mdbx::cursor::move_result result = m_cursor.find(keySlice);
+		ok = true;
+	}
+	catch(...){
+		ok = false;
+	}
+
+	return ok;
+}
+
+
+bool CDocumentTable::HasRecord(const QByteArray &key)
+{
+	bool ok = false;
+	mdbx::slice keySlice(key.data(), key.length());
+
+	try{
+		mdbx::cursor::move_result result = m_cursor.find(keySlice);
+		ok = true;
+	}
+	catch(...){
+		ok = false;
+	}
+
+	return ok;
+}
+
 
 bool CDocumentTable::UpdateDocument(qint64 key, const QByteArray &data)
 {
@@ -234,6 +285,64 @@ qint64 CDocumentTable::GetKey(const QByteArray &value)
 	}
 
 	return -1;
+}
+
+
+QString CDocumentTable::GetStringKey(const QByteArray &value)
+{
+	//qDebug() << "CDocumentTable::GetKey";
+
+	try{
+		QString key =QString();
+
+		if(m_hasIndex){
+			mdbx::slice valueSlice(value);
+			try{
+				mdbx::cursor::move_result result = m_cursorIndex.find(valueSlice);
+				key = QString::fromStdString(result.value.as_string());
+			}
+			catch(...){
+				return QString();
+			}
+		}
+
+		else {
+			try{
+				mdbx::cursor::move_result result = m_cursor.to_first();
+				while(1){
+					QString keyRead;
+					std::string valueRead;
+					if (result.done){
+						keyRead = QString::fromStdString(result.key.as_string());
+						valueRead = result.value.as_string();
+						if(valueRead.data() == value){
+							key = keyRead;
+							break;
+						}
+					}
+					bool onLast = m_cursor.on_last();
+					if(onLast){
+						break;
+					}
+					if(!onLast){
+						result = m_cursor.to_next();
+					}
+				}
+			}
+			catch(...){
+				return QString();
+			}
+
+		}
+
+		return key;
+	}
+	catch(...){
+		return QString();
+	}
+
+	return QString();
+
 }
 
 

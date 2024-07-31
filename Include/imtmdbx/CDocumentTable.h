@@ -24,8 +24,12 @@ public:
 	virtual qint64 AddDocument(qint64 data) override;
 	virtual qint64 AddDocument(const QByteArray& key, const QByteArray& data) override;
 	virtual QByteArray GetDocument(qint64 key) override;
+	virtual QByteArray GetDocument(const QByteArray& key) override;
+	virtual bool HasRecord(qint64 key) override;
+	virtual bool HasRecord(const QByteArray& key) override;
 	virtual bool UpdateDocument(qint64 key,  const QByteArray& data) override;
 	virtual qint64 GetKey(const QByteArray& value) override;
+	virtual QString GetStringKey(const QByteArray& value) override;
 	virtual bool CreateIndex() override;
 	virtual bool Exists(const QString& name) override;
 	bool CloseTable(mdbx::env_managed& env);
