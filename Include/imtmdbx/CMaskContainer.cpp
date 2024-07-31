@@ -37,7 +37,7 @@ void Initialize()
 
 
 CMaskContainer::CMaskContainer(OperationType operationType):
-	m_operationType(operationType)
+	m_operationType(operationType), m_documentTable(nullptr)
 {
 	if (!isInit){
 		Initialize();
@@ -56,9 +56,14 @@ void CMaskContainer::AddMask(IMask *mask, bool isInversion)
 }
 
 
+void CMaskContainer::SetDocumentTable(IDocumentTable* documentTable)
+{
+	m_documentTable = documentTable;
+}
+
+
 quint64 CMaskContainer::GetUnitCount()
 {
-	std::cout << "GetUnitCount";
 	quint64 activeOffset = 0;
 	quint64 unitCount = 0;
 	bool isStart = true;
@@ -112,6 +117,45 @@ QList<quint64> CMaskContainer::GetUnitPositions(quint64 offset, int limit)
 	}
 
     return list;
+}
+
+
+QList<QByteArray> CMaskContainer::GetDocuments(quint64 offset, int limit)
+{
+	QList<QByteArray> list;
+	quint64 activeOffset = 0;
+	quint64 unitCount = 0;
+	bool isStart = true;
+
+	if (m_documentTable == nullptr){
+		return list;
+	}
+
+	while(1){
+		quint64 activeItem = 0xffffffffffffffff;
+
+		if (GetActiveItem(activeOffset, activeItem, isStart) == false){
+			return list;
+		}
+
+		isStart = false;
+
+		for(int i = 0; i < 64; i++){
+			bool ok = (activeItem >> i) & (quint64)1;//check activeItem
+			if(ok){
+				unitCount++;
+				if (unitCount > offset){
+					int position = activeOffset * 64 + i;
+					list.append(m_documentTable->GetDocument(position));
+					if(list.length() >= limit){
+						return list;
+					}
+				}
+			}
+		}
+	}
+
+	return list;
 }
 
 

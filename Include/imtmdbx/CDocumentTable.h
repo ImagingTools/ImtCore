@@ -31,11 +31,11 @@ public:
 	virtual qint64 GetKey(const QByteArray& value) override;
 	virtual QString GetStringKey(const QByteArray& value) override;
 	virtual bool CreateIndex() override;
-	virtual bool Exists(const QString& name) override;
 	bool CloseTable(mdbx::env_managed& env);
 
 protected:
 	virtual qint64 AddDocument(const char *data, int count, const QByteArray& keyStr = QByteArray());
+	virtual bool Exists(const QString& name);
 
 	QString m_tableName;
 	mdbx::txn_managed& m_txn;

@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtmdbx/IMask.h>
+#include <imtmdbx/IDocumentTable.h>
 
 // Qt includes
 #include <QtCore/QList>
@@ -28,8 +29,10 @@ public:
 	CMaskContainer(OperationType operationType);
 
 	void AddMask(IMask* mask, bool isInversion);
+	void SetDocumentTable(IDocumentTable* documentTable);
 	quint64 GetUnitCount();
 	QList<quint64> GetUnitPositions(quint64 offset = 0, int limit = -1);
+	QList<QByteArray> GetDocuments(quint64 offset = 0, int limit = -1);
 
 protected:
 	bool GetActiveItem(quint64& activeOffset, quint64& activeItem, bool isStart);
@@ -38,6 +41,7 @@ protected:
 	QList<IMask*> m_maskList;
 	QList<IMask*> m_maskListInv;
 	OperationType m_operationType;
+	IDocumentTable* m_documentTable;
 };
 
 

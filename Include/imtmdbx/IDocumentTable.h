@@ -22,7 +22,6 @@ public:
 	virtual qint64 GetKey(const QByteArray& value) = 0;
 	virtual QString GetStringKey(const QByteArray& value) = 0;
 	virtual bool CreateIndex() = 0;
-	virtual bool Exists(const QString& name) = 0;
 };
 
 
