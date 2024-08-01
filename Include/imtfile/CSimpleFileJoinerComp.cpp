@@ -11,6 +11,8 @@
 // Acf includes
 #include <istd/CSystem.h>
 #include <iprm/TParamsPtr.h>
+#include <iprm/IOptionsList.h>
+#include <iprm/IEnableableParam.h>
 #include <ifile/IFileNameParam.h>
 
 // ImtCore includes
@@ -24,6 +26,7 @@ namespace imtfile
 // public static variables
 const QByteArray CSimpleFileJoinerComp:: s_sourceDirPathParamId = QByteArrayLiteral("SourceDirPath");
 const QByteArray CSimpleFileJoinerComp:: s_targetFilePathParamId = QByteArrayLiteral("TargetFilePath");
+const QByteArray CSimpleFileJoinerComp:: s_appendModeParamId = QByteArrayLiteral("Append");
 
 
 // private static variables
@@ -73,6 +76,13 @@ int CSimpleFileJoinerComp::DoProcessing(
 		return TS_INVALID;
 	}
 
+	const iprm::IOptionsList* filesToJoinListPtr = dynamic_cast<const iprm::IOptionsList*>(inputPtr);
+	if (filesToJoinListPtr == nullptr){
+		SendErrorMessage(0, QString("Files to join is not set"));
+
+		return TS_INVALID;
+	}
+
 	QFileInfo targetFileInfo(targetFilePath);
 	const QString targetFileDirPath = targetFileInfo.absoluteDir().absolutePath();
 	if (!istd::CSystem::EnsurePathExists(targetFileDirPath)){
@@ -81,6 +91,27 @@ int CSimpleFileJoinerComp::DoProcessing(
 		return TS_INVALID;
 	}
 
+	// check if append is enabled
+	bool appendDataToFile = false;
+	iprm::TParamsPtr<iprm::IEnableableParam> appendDataToFileParamPtr(paramsPtr, s_appendModeParamId, false);
+	if (appendDataToFileParamPtr.IsValid()){
+		appendDataToFile = appendDataToFileParamPtr->IsEnabled();
+	}
+
+	// define temp workspace
+	imtbase::CTempDir tempDir;
+	QFile tempJoinedFile(tempDir.Path() + targetFileInfo.fileName());
+
+	// save original file if append is enabled
+	if (appendDataToFile){
+		if (!QFile::rename(targetFilePath, tempJoinedFile.fileName())){
+			SendErrorMessage(0, QString("Unable to move target file: '%1' to '%2'").arg(targetFilePath, tempJoinedFile.fileName()));
+
+			return TS_INVALID;
+		}
+	}
+
+	// remove existing file
 	if (targetFileInfo.isFile() && targetFileInfo.exists()){
 		if (!QFile::remove(targetFilePath)){
 			SendErrorMessage(0, QString("Unable to remove target file: '%1'").arg(targetFilePath));
@@ -97,10 +128,12 @@ int CSimpleFileJoinerComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	// init temp-working dir
-	imtbase::CTempDir tempDir;
-	QFile tempJoinedFile(tempDir.Path() + targetFileInfo.fileName());
-	if (!tempJoinedFile.open(QIODevice::WriteOnly)){
+	// init temp workspace
+	QIODevice::OpenMode openFlags = QIODevice::ReadWrite;
+	if (appendDataToFile){
+		openFlags.setFlag(QIODevice::Append);
+	}
+	if (!tempJoinedFile.open(openFlags)){
 		SendErrorMessage(0, QString("Unable to open temp file: '%1'").arg(tempJoinedFile.fileName()));
 
 		return TS_INVALID;
@@ -114,46 +147,11 @@ int CSimpleFileJoinerComp::DoProcessing(
 		headText = m_filePartSeparatorTextCompPtr->GetText();
 	}
 
-	// setup filters
-	QStringList fileFilters = {"*"};
-	const iprm::ITextParam* singleFilterParamPtr = dynamic_cast<const iprm::ITextParam*>(inputPtr);
-	if (singleFilterParamPtr != nullptr){
-		fileFilters = {singleFilterParamPtr->GetText()};
-	}
-
-	const iprm::IParamsSet* fileFiltersParamsPtr = dynamic_cast<const iprm::IParamsSet*>(inputPtr);
-	if (fileFiltersParamsPtr != nullptr && !fileFiltersParamsPtr->GetParamIds().isEmpty()){
-		fileFilters.clear();
-		const iprm::IParamsSet::Ids paramIdList = fileFiltersParamsPtr->GetParamIds();
-		for (const QByteArray& paramId: paramIdList){
-			iprm::TParamsPtr<iprm::ITextParam> filterParamPtr(fileFiltersParamsPtr, paramId, true);
-			if (!filterParamPtr.IsValid()){
-				SendErrorMessage(0, "Unexpected filter param");
-
-				return TS_INVALID;
-			}
-			fileFilters << filterParamPtr->GetText();
-		}
-	}
-
 	// process files
-	QDirIterator sourceDirIterator(sourceDir.absolutePath(), fileFilters, QDir::Files | QDir::Readable, QDirIterator::Subdirectories);
-	while(sourceDirIterator.hasNext()){
-		const QString currentFilePath = sourceDirIterator.next();
-
-		// skip target file
-		QFileInfo currentFileInfo(currentFilePath);
-		QString targetFileInfoCanonicalFilePath = targetFileInfo.canonicalFilePath();
-		QString currentFileInfoCanonicalFilePath = currentFileInfo.canonicalFilePath();
-		if (targetFileInfoCanonicalFilePath == currentFileInfoCanonicalFilePath){
-			SendVerboseMessage(QString("Skipping '%1'. It is target: '%2'").arg(currentFilePath, targetFilePath));
-
-			continue;
-		}
-
-		SendVerboseMessage(QString("processing '%1'. Target: '%2'").arg(currentFileInfoCanonicalFilePath, targetFileInfoCanonicalFilePath));
-
-		const QString currentRelativePath = sourceDir.relativeFilePath(currentFilePath);
+	int filesCount = filesToJoinListPtr->GetOptionsCount();
+	for (int fileNameIndex = 0; fileNameIndex < filesCount; ++fileNameIndex){
+		const QString currentRelativePath = filesToJoinListPtr->GetOptionName(fileNameIndex);
+		const QString currentFilePath = sourceDir.absoluteFilePath(currentRelativePath);
 		QFile currentFile(currentFilePath);
 		if (!currentFile.open(QIODevice::ReadOnly)){
 			SendErrorMessage(0, QString("Unable to open processing file: '%1'").arg(currentFilePath));

@@ -20,6 +20,7 @@ class CSimpleFileJoinerComp:
 public:
 	static const QByteArray s_sourceDirPathParamId;
 	static const QByteArray s_targetFilePathParamId;
+	static const QByteArray s_appendModeParamId;
 
 	typedef iproc::CSyncProcessorCompBase BaseClass;
 
@@ -35,9 +36,11 @@ public:
 		\param paramsPtr - (required)
 				- (required) [\c s_sourceDirPathParamId]	\c ifile::IFileNameParam	- dir fo files search
 				- (required) [\c s_targetFilePathParamId]	\c ifile::IFileNameParam	- file path where file will be created
-		\param inputPtr (optional)
-				- list of file filters as \c iprm::IParamsSet of \c iprm::ITextParam \note if not set (is \c nullptr), all files will be used
-				- or single filter \c iprm::ITextParam
+				- (optional) [\c s_appendModeParamId]		\c iprm::IEnableableParam	- if enabled file data will be append
+		\param inputPtr (required)
+				- list of file filters as \c iprm::IOptionsList \note order will be preserved
+					- [id] - unused
+					- [name] - file path related to the source dir
 		\param outputPtr - unused
 		\param progressManagerPtr - unused
 	*/
