@@ -61,12 +61,60 @@ class Flickable extends Item {
         this.contentItem.y = -this.contentY
     }
 
+    onWidthChanged(){
+        super.onWidthChanged()
+        if(this.contentWidth - this.width > 0){
+            if(this.contentX < 0){
+                this.contentX = 0
+            }
+            if(this.contentX > this.contentWidth - this.width){
+                this.contentX = this.contentWidth - this.width
+            }
+        } else {
+            this.contentX = 0
+        }
+    }
+
+    onHeightChanged(){
+        super.onHeightChanged()
+        if(this.contentHeight - this.height > 0){
+            if(this.contentY < 0){
+                this.contentY = 0
+            }
+            if(this.contentY > this.contentHeight - this.height){
+                this.contentY = this.contentHeight - this.height
+            }
+        } else {
+            this.contentY = 0
+        }
+    }
+
     onContentWidthChanged(){
         this.contentItem.width = this.contentWidth
+        if(this.contentWidth - this.width > 0){
+            if(this.contentX < 0){
+                this.contentX = 0
+            }
+            if(this.contentX > this.contentWidth - this.width){
+                this.contentX = this.contentWidth - this.width
+            }
+        } else {
+            this.contentX = 0
+        }
     }
 
     onContentHeightChanged(){
         this.contentItem.height = this.contentHeight
+        if(this.contentHeight - this.height > 0){
+            if(this.contentY < 0){
+                this.contentY = 0
+            }
+            if(this.contentY > this.contentHeight - this.height){
+                this.contentY = this.contentHeight - this.height
+            }
+        } else {
+            this.contentY = 0
+        }
     }
 
     __onMouseMove(mouse){

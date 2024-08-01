@@ -10,18 +10,6 @@ class NumberAnimation extends PropertyAnimation {
         toChanged: { type:Signal, slotName:'onToChanged', args:[] },
         fromChanged: { type:Signal, slotName:'onFromChanged', args:[] },
     })
-
-    static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
-        let self = proxy.__self 
-
-        return proxy
-    }
-
-    restart() {
-
-    }
- 
 }
 
 module.exports = NumberAnimation

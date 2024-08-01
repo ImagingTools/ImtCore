@@ -23,13 +23,65 @@ class PropertyAnimation extends Animation {
 
     static create(parent, ...args){
         let proxy = super.create(parent, ...args)
-        let self = proxy.__self 
+        proxy.target = parent
 
         return proxy
     }
 
-    restart() {
+    onPropertyChanged(){
+        this.properties = this.property
+    }   
+    
+    restart() { 
+        let properties = this.properties.split(',')
+        for(let prop of properties){
+            if(this.target[prop] !== this.from){
+                this.target[prop] = this.from
+            }
+            
+        }
+		super.restart()
+    }
 
+    __tick(){
+        if(this.target && this.running){
+            
+            let properties = this.properties.split(',')
+
+            for(let prop of properties){
+                if(this.to === undefined) this.to = this.target[prop]
+                if(this.from === undefined) this.from = this.target[prop]
+                
+                let increment = (this.to - this.from) / (this.duration / (1000 / 60))
+     
+                this.target[prop] = this.target[prop] + increment
+     
+
+                if(this.to >= this.from && this.target[prop] >= this.to) {
+                    this.target[prop] = this.to
+                    let loops = this.__loopCounter + 1
+                    if(loops < this.loops || this.loops === Animation.Infinite){
+                        this.restart()
+                        this.__loopCounter = loops
+                    } else {
+                        this.running = false
+                        this.stopped()
+                        this.finished()
+                    }
+                } else if(this.to <= this.from && this.target[prop] <= this.to) {
+                    this.target[prop] = this.to
+                    let loops = this.__loopCounter + 1
+                    if(loops < this.loops || this.loops === Animation.Infinite){
+                        this.restart()
+                        this.__loopCounter = loops
+                    } else {
+                        this.running = false
+                        this.stopped()
+                        this.finished()
+                    }
+                }
+            }
+        }
     }
  
 }

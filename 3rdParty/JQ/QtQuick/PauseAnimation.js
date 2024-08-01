@@ -9,17 +9,27 @@ class PauseAnimation extends Animation {
         durationChanged: { type:Signal, slotName:'onDurationChanged', args:[] },
     })
 
-    static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
-        let self = proxy.__self 
-
-        return proxy
-    }
-
-    restart() {
-
-    }
+    __duration = 250
  
+    onDurationChanged() {
+        this.__duration = this.duration
+    }
+
+    restart() { 
+        this.__duration = this.duration
+        super.restart()
+    }
+
+    __tick(){
+        if(this.running && !this.paused && this.__duration > 0){
+            this.__duration -= 1000/60
+
+            if(this.__duration <= 0) {
+                this.running = false
+                this.finished()
+            }
+        }
+    }
 }
 
 module.exports = PauseAnimation
