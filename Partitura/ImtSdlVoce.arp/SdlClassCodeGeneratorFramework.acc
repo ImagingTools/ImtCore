@@ -196,5 +196,7 @@
         <Interface InterfaceId="iproc::IProcessor" ComponentId="SdlClassCodeGenerator"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SdlClassCodeGenerator"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="SimpleFileJoiner" ComponentId="SimpleFileJoiner"/>
+    </ExportedComponents>
 </Acf>

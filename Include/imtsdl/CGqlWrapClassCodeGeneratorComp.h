@@ -33,6 +33,7 @@ public:
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
 		I_ASSIGN(m_sdlRequestListCompPtr, "SdlRequestListProvider", "SDL requests used to create a GraphQL wrap code", true, "SdlRequestListProvider")
+		I_ASSIGN(m_filesJoinerCompPtr, "FilesJoiner", "Compoment, used to join files into a single", false, "FilesJoiner")
 	I_END_COMPONENT;
 
 	//reimplemented(iproc::IProcessor)
@@ -44,9 +45,9 @@ public:
 
 private:
 	bool CloseFiles();
-	bool ProcessFiles(const CSdlRequest& sdlRequest);
-	bool ProcessHeaderClassFile(const CSdlRequest& sdlRequest);
-	bool ProcessSourceClassFile(const CSdlRequest& sdlRequest);
+	bool ProcessFiles(const CSdlRequest& sdlRequest, bool addDependenciesInclude, bool addSelfHeaderInclude);
+	bool ProcessHeaderClassFile(const CSdlRequest& sdlRequest, bool addDependenciesInclude);
+	bool ProcessSourceClassFile(const CSdlRequest& sdlRequest, bool addSelfHeaderInclude);
 	void GenerateFieldRequestInfo(QTextStream& stream, const CSdlField& sdlField, uint hIndents = 1, bool createStructDefinition = false);
 	void GenerateRequestParsing(QTextStream& ifStream, const CSdlRequest& sdlRequest, uint hIndents = 1);
 	void AbortCurrentProcessing();
@@ -77,6 +78,7 @@ private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(ISdlTypeListProvider, m_sdlTypeListCompPtr);
 	I_REF(ISdlRequestListProvider, m_sdlRequestListCompPtr);
+	I_REF(iproc::IProcessor, m_filesJoinerCompPtr);
 
 	istd::TDelPtr<QFile> m_headerFilePtr;
 	istd::TDelPtr<QFile> m_sourceFilePtr;

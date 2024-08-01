@@ -11,12 +11,11 @@
 #include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
-#include <iprm/CTextParam.h>
 #include <ifile/CFileNameParam.h>
 
 // ImtCore includes
-#include <imtsdl/CSdlType.h>
 #include <imtfile/CSimpleFileJoinerComp.h>
+#include <imtsdl/CSdlType.h>
 
 
 namespace imtsdl
@@ -170,10 +169,14 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 			ifile::CFileNameParam outputFileNameParam;
 			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
 
-			iprm::CTextParam filterParams;
+			iprm::COptionsManager filterParams;
 
 			if (joinHeaders){
-				filterParams.SetText(QStringLiteral("*.h"));
+				filterParams.ResetOptions();
+				for (const CSdlType& sdlType: sdlTypeList){
+					filterParams.InsertOption("C" + sdlType.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
+				}
+
 				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
 				if (joinProcessResult != TS_OK){
@@ -189,7 +192,11 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 				}
 			}
 			if (joinSources){
-				filterParams.SetText(QStringLiteral("*.cpp"));
+				filterParams.ResetOptions();
+				for (const CSdlType& sdlType: sdlTypeList){
+					filterParams.InsertOption("C" + sdlType.GetName() + ".cpp", QByteArray::number(filterParams.GetOptionsCount()));
+				}
+
 				const QString sourceFilePath = joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
 				outputFileNameParam.SetPath(sourceFilePath);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);

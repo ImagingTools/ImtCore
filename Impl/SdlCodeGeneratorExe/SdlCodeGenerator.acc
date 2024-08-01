@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5229" Description="ACF"/>
+            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -64,6 +64,9 @@
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SdlCoreFramework"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="FilesJoiner" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlClassCodeGenerator/SimpleFileJoiner"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ConsoleLog"/>
                     </AttributeInfo>
@@ -96,6 +99,9 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ConsoleLog"/>
