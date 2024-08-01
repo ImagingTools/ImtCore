@@ -124,7 +124,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 			}
 
 			QString fileType = joinRule.split('=')[0];
-			if (fileType != s_headerFileType || fileType != s_sourceFileType){
+			if (fileType != s_headerFileType && fileType != s_sourceFileType){
 				SendCriticalMessage(0, QString("Unknown file type. extected on of: %1 %2").arg(s_headerFileType, s_sourceFileType));
 				I_CRITICAL();
 

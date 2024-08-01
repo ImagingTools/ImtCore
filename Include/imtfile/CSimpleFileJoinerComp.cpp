@@ -140,10 +140,20 @@ int CSimpleFileJoinerComp::DoProcessing(
 	QDirIterator sourceDirIterator(sourceDir.absolutePath(), fileFilters, QDir::Files | QDir::Readable, QDirIterator::Subdirectories);
 	while(sourceDirIterator.hasNext()){
 		const QString currentFilePath = sourceDirIterator.next();
+
+		// skip target file
+		QFileInfo currentFileInfo(currentFilePath);
+		QString targetFileInfoCanonicalFilePath = targetFileInfo.canonicalFilePath();
+		QString currentFileInfoCanonicalFilePath = currentFileInfo.canonicalFilePath();
+		if (targetFileInfoCanonicalFilePath == currentFileInfoCanonicalFilePath){
+			SendVerboseMessage(QString("Skipping '%1'. It is target: '%2'").arg(currentFilePath, targetFilePath));
+
+			continue;
+		}
+
+		SendVerboseMessage(QString("processing '%1'. Target: '%2'").arg(currentFileInfoCanonicalFilePath, targetFileInfoCanonicalFilePath));
+
 		const QString currentRelativePath = sourceDir.relativeFilePath(currentFilePath);
-
-		SendVerboseMessage(QString("Processing '%1' file...").arg(currentFilePath));
-
 		QFile currentFile(currentFilePath);
 		if (!currentFile.open(QIODevice::ReadOnly)){
 			SendErrorMessage(0, QString("Unable to open processing file: '%1'").arg(currentFilePath));

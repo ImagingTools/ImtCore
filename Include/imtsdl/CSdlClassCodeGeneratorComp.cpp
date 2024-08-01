@@ -60,11 +60,25 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 		return iproc::IProcessor::TS_INVALID;
 	}
 
+	const QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
+	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
+	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
+
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
 		SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes();
 		for (const CSdlType& sdlType: sdlTypeList){
-			std::cout << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h").toStdString() << std::endl;
-			std::cout << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp").toStdString() << std::endl;
+			if (!joinHeaders) {
+				std::cout << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h").toStdString() << std::endl;
+			}
+			if (!joinSources){
+				std::cout << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp").toStdString() << std::endl;
+			}
+		}
+		if (joinHeaders){
+			std::cout << joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType].toStdString() << std::endl;
+		}
+		if (joinSources){
+			std::cout << joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType].toStdString() << std::endl;
 		}
 
 		return iproc::IProcessor::TS_OK;
@@ -77,7 +91,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 		m_headerFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
 		m_sourceFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
 
-		if (!BeginClassFiles(sdlType)){
+		if (!BeginClassFiles(sdlType, !joinHeaders, !joinSources)){
 			SendErrorMessage(0, QString("Unable to begin files"));
 			I_CRITICAL();
 
@@ -147,7 +161,6 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 	}
 
 	// join files if required
-	const QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
 	if (!joinRules.isEmpty()){
 		if (m_filesJoinerCompPtr.IsValid()){
 			iprm::CParamsSet inputParams;
@@ -159,7 +172,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 			iprm::CTextParam filterParams;
 
-			if (joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType)){
+			if (joinHeaders){
 				filterParams.SetText(QStringLiteral("*.h"));
 				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
@@ -170,10 +183,15 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 					return TS_INVALID;
 				}
 
+				// cleanup joined files
+				for (const CSdlType& sdlType: sdlTypeList){
+					QFile::remove(QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
+				}
 			}
-			if (joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType)){
+			if (joinSources){
 				filterParams.SetText(QStringLiteral("*.cpp"));
-				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType]);
+				const QString sourceFilePath = joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
+				outputFileNameParam.SetPath(sourceFilePath);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
 				if (joinProcessResult != TS_OK){
 					SendCriticalMessage(0, "Unable to join cource  files");
@@ -181,8 +199,31 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 					return TS_INVALID;
 				}
-			}
 
+				// cleanup joined files
+				for (const CSdlType& sdlType: sdlTypeList){
+					QFile::remove(QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
+				}
+
+				// add joined header include directive
+				if (joinHeaders){
+					QFile joinedSourceFile(sourceFilePath);
+					if (!joinedSourceFile.open(QIODevice::ReadWrite)){
+						SendCriticalMessage(0, QString("Unable to open joined filee '%1'").arg(sourceFilePath));
+						I_CRITICAL();
+
+						return TS_INVALID;
+					}
+					QFileInfo headerFileInfo(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
+					QByteArray sourceReadData = joinedSourceFile.readAll();
+					joinedSourceFile.seek(0);
+					QByteArray includeDirective = QByteArrayLiteral("#include ");
+					includeDirective.append('"').append(headerFileInfo.fileName().toUtf8()).append('"');
+					includeDirective.append('\n').append('\n').append('\n');
+					sourceReadData.prepend(includeDirective);
+					joinedSourceFile.write(sourceReadData);
+				}
+			}
 		}
 	}
 
@@ -235,7 +276,7 @@ bool CSdlClassCodeGeneratorComp::CloseFiles()
 }
 
 
-bool CSdlClassCodeGeneratorComp::BeginClassFiles(const CSdlType& sdlType)
+bool CSdlClassCodeGeneratorComp::BeginClassFiles(const CSdlType& sdlType, bool addDependenciesInclude, bool addSelfHeaderInclude)
 {
 	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
 		SendErrorMessage(0,
@@ -258,14 +299,14 @@ bool CSdlClassCodeGeneratorComp::BeginClassFiles(const CSdlType& sdlType)
 	}
 
 	bool retVal = true;
-	retVal = retVal && BeginHeaderClassFile(sdlType);
-	retVal = retVal && BeginSourceClassFile(sdlType);
+	retVal = retVal && BeginHeaderClassFile(sdlType, addDependenciesInclude);
+	retVal = retVal && BeginSourceClassFile(sdlType, addSelfHeaderInclude);
 
 	return retVal;
 }
 
 
-bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
+bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType, bool addDependenciesInclude)
 {
 	QTextStream ifStream(m_headerFilePtr.GetPtr());
 
@@ -328,17 +369,19 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 		}
 
 		// Add user custom types
-		bool isCustomGeneratedCommentAdded = false;
-		for (QSet<QString>::const_iterator complexIter = complexTypeList.cbegin(); complexIter != complexTypeList.cend(); ++complexIter){
-			if (!isCustomGeneratedCommentAdded){
-				ifStream << QStringLiteral("// ") << m_argumentParserCompPtr->GetNamespace() << QStringLiteral(" includes");
-				FeedStream(ifStream, 1, false);
-				isCustomGeneratedCommentAdded = true;
-			}
+		if (addDependenciesInclude){
+			bool isCustomGeneratedCommentAdded = false;
+			for (QSet<QString>::const_iterator complexIter = complexTypeList.cbegin(); complexIter != complexTypeList.cend(); ++complexIter){
+				if (!isCustomGeneratedCommentAdded){
+					ifStream << QStringLiteral("// ") << m_argumentParserCompPtr->GetNamespace() << QStringLiteral(" includes");
+					FeedStream(ifStream, 1, false);
+					isCustomGeneratedCommentAdded = true;
+				}
 
-			const QString& complexTypeName = *complexIter;
-			ifStream << QStringLiteral("#include \"") << complexTypeName << QStringLiteral(".h\"");
-			FeedStream(ifStream, 1, false);
+				const QString& complexTypeName = *complexIter;
+				ifStream << QStringLiteral("#include \"") << complexTypeName << QStringLiteral(".h\"");
+				FeedStream(ifStream, 1, false);
+			}
 		}
 	}
 
@@ -420,14 +463,16 @@ bool CSdlClassCodeGeneratorComp::EndHeaderClassFile(const CSdlType& sdlType)
 }
 
 
-bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const CSdlType& sdlType)
+bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const CSdlType& sdlType, bool addSelfHeaderInclude)
 {
 	QTextStream ifStream(m_sourceFilePtr.GetPtr());
 
 	// include section
-	ifStream << QStringLiteral("#include \"C");
-	ifStream << sdlType.GetName() << QStringLiteral(".h\"");
-	FeedStream(ifStream, 3);
+	if (addSelfHeaderInclude){
+		ifStream << QStringLiteral("#include \"C");
+		ifStream << sdlType.GetName() << QStringLiteral(".h\"");
+		FeedStream(ifStream, 3);
+	}
 
 	// namespace begin
 	QString namespaceString;

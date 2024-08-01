@@ -46,10 +46,10 @@ public:
 private:
 	bool ReOpenFiles();
 	bool CloseFiles();
-	bool BeginClassFiles(const CSdlType& sdlType);
-	bool BeginHeaderClassFile(const CSdlType& sdlType);
+	bool BeginClassFiles(const CSdlType& sdlType, bool addDependenciesInclude, bool addSelfHeaderInclude);
+	bool BeginHeaderClassFile(const CSdlType& sdlType, bool addDependenciesInclude);
 	bool EndHeaderClassFile(const CSdlType& sdlType);
-	bool BeginSourceClassFile(const CSdlType& sdlType);
+	bool BeginSourceClassFile(const CSdlType& sdlType, bool addSelfHeaderInclude);
 	bool EndSourceClassFile(const CSdlType& sdlType);
 	bool EndClassFiles(const CSdlType& sdlType);
 	void AbortCurrentProcessing();
