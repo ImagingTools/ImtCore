@@ -15,8 +15,7 @@
 #include <imtgeo/CMapTileCollectionControllerComp.h>
 #include <imtgeo/CCluster.h>
 #include <imtgeo/CMapClusterDatabaseDelegateComp.h>
-
-
+#include <imtgeo/CAddressControllerComp.h>
 
 
 /**
@@ -56,6 +55,7 @@ typedef imtgeo::CAddressCollectionControllerComp AddressCollectionController;
 typedef imtgeo::CAddressTreeCollectionControllerComp AddressTreeCollectionController;
 typedef imtgeo::CMapTileCollectionControllerComp MapTileCollectionController;
 typedef imtgeo::CMapClusterDatabaseDelegateComp MapClusterDatabaseDelegate;
+typedef imtgeo::CAddressControllerComp AddressController;
 
 
 } // namespace ImtGeoPck

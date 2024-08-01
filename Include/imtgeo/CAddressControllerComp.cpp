@@ -124,7 +124,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 			addressElementInfo.CopyFrom(*dataPtr);
 		}
 
-		if (errorMessage.isEmpty() && (newObjectId.isEmpty() || newFullAddressObjectId.isEmpty())){
+		if (!errorMessage.isEmpty() || newObjectId.isEmpty()){
 			errorMessage = QObject::tr("Can not insert object: %1").arg(qPrintable(objectId));
 		}
 	}
@@ -299,43 +299,6 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 		notificationModel->SetData("Id", newObjectId);
 		notificationModel->SetData("Name", name);
 		dataModel->SetExternTreeModel("updatedNotification", notificationModel);
-	}
-	rootModelPtr->SetExternTreeModel("data", dataModel);
-
-	return rootModelPtr.PopPtr();
-}
-
-
-imtbase::CTreeItemModel* CAddressControllerComp::DeleteObject(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = "No collection component was set";
-
-		return nullptr;
-	}
-
-	QByteArray objectId = GetObjectIdFromInputParams(gqlRequest.GetParams());
-	if (objectId.isEmpty()){
-		errorMessage = QObject::tr("No object-ID could not be extracted from the request");
-
-		return nullptr;
-	}
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* notificationModel = nullptr;
-
-	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsModel = rootModelPtr->AddTreeModel("errors");
-		errorsModel->SetData("message", errorMessage);
-	}
-	else{
-		dataModel = new imtbase::CTreeItemModel();
-		notificationModel = new imtbase::CTreeItemModel();
-		notificationModel->SetData("Id", objectId);
-		dataModel->SetExternTreeModel("removedNotification", notificationModel);
 	}
 	rootModelPtr->SetExternTreeModel("data", dataModel);
 
