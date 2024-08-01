@@ -100,6 +100,7 @@ Item {
     }
 
 
+
     signal clicked();
     signal finished(string commandId, int index);
     signal editSignal();
@@ -171,9 +172,9 @@ Item {
             }
 
             onFilterTextChanged: {
-                comboBoxContainerGql.filterText = popup.filterText;
-                comboBoxContainerGql.currentIndex = -1;
-                comboBoxContainerGql.currentText = popup.filterText;
+//                comboBoxContainerGql.filterText = popup.filterText;
+//                comboBoxContainerGql.currentIndex = -1;
+//                comboBoxContainerGql.currentText = popup.filterText;
             }
             onFinished: {
                 if (index > -1){

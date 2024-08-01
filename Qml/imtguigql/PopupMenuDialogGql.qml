@@ -192,6 +192,12 @@ Item {
         //        }
         onTextChanged:  {
 
+            if(popupMenuContainer.rootItem){
+                popupMenuContainer.rootItem.filterText = text;
+                popupMenuContainer.rootItem.currentIndex = -1;
+                popupMenuContainer.rootItem.currentText = text;
+            }
+
             if(popupMenuContainer.ready){
                 popupMenuContainer.rootItem.currentIndex = -1;
                 popupMenuContainer.offset = 0;
