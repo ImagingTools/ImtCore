@@ -67,6 +67,10 @@ private:
 				bool generateGetter = true,
 				bool generateSetter = true,
 				bool generateExistenceChecks = true);
+	void GenerateMetaInfo(
+				QTextStream& stream,
+				const CSdlType& sdlType,
+				uint indents = 1);
 
 private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);

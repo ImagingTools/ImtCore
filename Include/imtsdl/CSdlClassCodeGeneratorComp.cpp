@@ -416,6 +416,10 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType, b
 	ifStream << QStringLiteral("public:");
 	FeedStream(ifStream, 1, false);
 
+	// add metainfo
+	GenerateMetaInfo(ifStream, sdlType);
+	FeedStream(ifStream, 1);
+
 	// default constructor for defining primitive types
 	if (IsTypeHasFundamentalTypes(sdlType)){
 		ifStream << QStringLiteral("\tC") << sdlType.GetName() << QStringLiteral("();");
@@ -860,6 +864,36 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 	}
 }
 
+
+void CSdlClassCodeGeneratorComp::GenerateMetaInfo(
+			QTextStream& stream,
+			const CSdlType& sdlType,
+			uint indents)
+{
+	FeedStreamHorizontally(stream, indents);
+	// create struct to store field id list
+	stream << QStringLiteral("struct Fields");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, indents);
+	stream << '{';
+
+	// create variables for all fields
+	for (const CSdlField& sdlField: sdlType.GetFields()){
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, indents + 1);
+		stream << QStringLiteral("static const inline QString ");
+		stream << GetCapitalizedValue(sdlField.GetId());
+		stream << QStringLiteral(" = \"");
+		stream << sdlField.GetId();
+		stream << '"' << ';';
+	}
+
+	// finish struct
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, indents);
+	stream << '}' << ';';
+	FeedStream(stream, 1, false);
+}
 
 } // namespace imtsdl
 

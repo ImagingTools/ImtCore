@@ -230,6 +230,8 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessFiles(const CSdlRequest& sdlRequest,
 
 bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& sdlRequest, bool addDependenciesInclude)
 {
+	/// \todo SEPARATE IT!!!!!!!!!
+
 	QTextStream ifStream(m_headerFilePtr.GetPtr());
 
 	// preprocessor's section
@@ -375,6 +377,11 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& s
 	ifStream << QStringLiteral("public:");
 	FeedStream(ifStream, 1, false);
 
+	// CommandId method
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("static QByteArray GetCommandId();");
+	FeedStream(ifStream, 2, false);
+
 	// default constructor with GraphQL request
 	FeedStreamHorizontally(ifStream);
 	ifStream << 'C' << sdlRequest.GetName() << QStringLiteral("GqlRequest (const imtgql::CGqlRequest& gqlRequest);");
@@ -436,6 +443,8 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& s
 
 bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& sdlRequest, bool addSelfHeaderInclude)
 {
+	/// \todo SEPARATE IT!!!!!!!!!
+
 	QTextStream ifStream(m_sourceFilePtr.GetPtr());
 
 	// include section
@@ -458,6 +467,22 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 
 	const QString className = 'C' + sdlRequest.GetName() + QStringLiteral("GqlRequest");
 	// implementation of methods
+
+	// CommandId method
+	FeedStream(ifStream, 2, false);
+	ifStream << QStringLiteral("QByteArray");
+	ifStream << className << ':' << ':' << className;
+	ifStream << QStringLiteral("GetCommandId()");
+	FeedStream(ifStream, 1, false);
+	ifStream << '{';
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("return QByteArrayLiteral(\"");
+	ifStream << sdlRequest.GetName();
+	ifStream << '"' << ')' << ';';
+	FeedStream(ifStream, 1, false);
+	ifStream << '}';
+	FeedStream(ifStream, 1, false);
 
 	// MAIN CONSTRUCTOR + PARSING
 	FeedStream(ifStream, 2, false);
