@@ -4,6 +4,8 @@ import Acf 1.0
 TableCellDelegateBase {
     id: delegateContainer
 
+
+
     TableCellText {
         id: tableCellText;
 
@@ -26,6 +28,15 @@ TableCellDelegateBase {
     MouseArea{
         id: ma;
         anchors.fill: parent;
+        property Item tableItem:  delegateContainer.rowDelegate && delegateContainer.rowDelegate.tableItem ? delegateContainer.rowDelegate.tableItem : null;
+
+
+        onClicked: {
+            if(tableItem && tableItem.elements.getItemsCount() && delegateContainer.rowIndex > -1){
+                tableItem.tableSelection.singleSelect(delegateContainer.rowIndex)
+
+            }
+        }
     }
 
 }
