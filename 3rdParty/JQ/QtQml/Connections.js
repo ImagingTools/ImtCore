@@ -13,6 +13,26 @@ class Connections extends QtObject {
         targetChanged: {type:Signal, slotName:'onTargetChanged', args:[]},
         ignoreUnknownSignalsChanged: {type:Signal, slotName:'onIgnoreUnknownSignalsChanged', args:[]},
     })
+
+    __target = null
+    __connectionsInfo = {}
+
+    onTargetChanged(){
+        for(let signalName in this.__connectionsInfo){
+            let slotName = this.__connectionsInfo[signalName]
+        
+            if(this.__target){
+                if(this.__target[signalName] instanceof Signal) this.__target[signalName].disconnect(this, this[slotName])
+            }
+
+            this.__target = this.target
+
+            if(this.__target){
+                if(this.__target[signalName] instanceof Signal) this.__target[signalName].connect(this, this[slotName])
+            }
+            
+        }
+    }
 }
 
 module.exports = Connections

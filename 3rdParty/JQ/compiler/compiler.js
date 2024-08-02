@@ -967,6 +967,10 @@ class Instruction {
     toCode(isRoot = false){
         let code = []
         let typeInfo = this.getTypeInfo(this.extends)
+        let typeBase = typeInfo.type
+        while(typeBase instanceof QmlFile){
+            typeBase = typeBase.instruction.getTypeInfo(typeBase.instruction.extends).typeBase
+        }
 
         if(this.qmlFile.singleton && isRoot){
             code.push(`const ${this.className} = (class extends ${typeInfo.path} {`)
@@ -1024,11 +1028,7 @@ class Instruction {
             if(this.extends === 'Component'){
                 code.push(`self.component=` + this.children[i].toCode())
             } else {
-                let type = this.getTypeInfo(this.extends).type
-                while(type instanceof QmlFile){
-                    type = type.instruction.getTypeInfo(type.instruction.extends).type
-                }
-                if(type === JQModules.QtQuick.Flickable || type === JQModules.QtQuick.ListView || type === JQModules.QtQuick.GridView){
+                if(typeBase === JQModules.QtQuick.Flickable){
                     code.push(`let child${i}=(` + this.children[i].toCode() + ').create(self.contentItem)')
                 } else {
                     code.push(`let child${i}=(` + this.children[i].toCode() + ').create(self)')
@@ -1045,10 +1045,20 @@ class Instruction {
         code.push('return self')
         code.push('}')
 
+        let connectionsInfo = {}
         for(let defineMethod of this.defineMethods){
+            if(defineMethod.name.slice(0, 2) === 'on'){
+                let signalName = defineMethod.name[2].toLowerCase() + defineMethod.name.slice(3)
+                connectionsInfo[signalName] = defineMethod.name
+            }
             let stat = this.prepare(defineMethod.source, {isCompute:false, thisKey: 'this', value:'', local:[]})
             code.push(stat.value)
         }
+
+        if(typeBase === JQModules.QtQml.Connections){
+            code.push(`__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
+        }
+        
 
         for(let connectedSignal of this.connectedSignals){
             let names = connectedSignal.slotName.replaceAll("['", '').replaceAll("']", '').split('.')
