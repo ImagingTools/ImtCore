@@ -30,7 +30,7 @@ DocumentDataController {
     }
 
     function setupDocumentInfo(){
-        if (documentModel.m_name){
+        if (documentModel && documentModel.m_name){
             container.documentName = documentModel.m_name;
         }
         else{
