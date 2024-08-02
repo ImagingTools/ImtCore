@@ -7,6 +7,7 @@
 #include <imtgql/IGqlRequestHandler.h>
 #include <imtgql/IGqlContextController.h>
 #include <imtgql/IGqlRequestProvider.h>
+#include <imtbase/IObjectCollection.h>
 
 
 namespace imtgql
