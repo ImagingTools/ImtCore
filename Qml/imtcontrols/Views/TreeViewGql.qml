@@ -340,9 +340,9 @@ Rectangle{
             treeViewGql.model.setData("ChildrenCount__", model_.getItemsCount(), index);
         }
 
-        if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
-            treeViewGql.selectedIndex += counter;
-        }
+        // if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
+             // treeViewGql.selectedIndex += counter;
+        // }
         treeViewGql.setContentWidth();
 
         treeViewGql.inserted(index);
