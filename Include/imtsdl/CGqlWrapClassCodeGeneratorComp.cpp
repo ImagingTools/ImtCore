@@ -470,8 +470,8 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 
 	// CommandId method
 	FeedStream(ifStream, 2, false);
-	ifStream << QStringLiteral("QByteArray");
-	ifStream << className << ':' << ':' << className;
+	ifStream << QStringLiteral("QByteArray ");
+	ifStream << className << ':' << ':';
 	ifStream << QStringLiteral("GetCommandId()");
 	FeedStream(ifStream, 1, false);
 	ifStream << '{';
