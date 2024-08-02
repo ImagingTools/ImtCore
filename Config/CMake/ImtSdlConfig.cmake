@@ -22,7 +22,7 @@ macro(GetSdlGeneratorPath OUTPUT_SDL_GENERATOR_EXE_PATH)
 endmacro()
 
 #! Generates code form SDL, and including provided deps to sources
-function(ImtCoreGenerateSdlWithDeps
+function(ImtGenerateSdlWithDeps
 	SDL_GENERATOR_COMMAND_PARAM_INPUT_FILE_PATH
 	SDL_GENERATOR_COMMAND_PARAM_OUTPUT_DIR
 	SDL_GENERATOR_COMMAND_PARAM_NAMESPACE
@@ -51,7 +51,7 @@ function(ImtCoreGenerateSdlWithDeps
 endfunction()
 
 #! Generates CPP(CXX) code form SDL schema
-function(ImtCoreGenerateCppSdl
+function(ImtGenerateCppSdl
 		SDL_GENERATOR_COMMAND_PARAM_INPUT_FILE_PATH
 		SDL_GENERATOR_COMMAND_PARAM_OUTPUT_DIR
 		SDL_GENERATOR_COMMAND_PARAM_NAMESPACE
@@ -79,7 +79,7 @@ function(ImtCoreGenerateCppSdl
 	list(APPEND SDL_NEW_GENERATOR_COMMAND_PARAM_MODIFICATORS "-JH=${SDL_HEADER_JOINED_FILE_PATH}")
 	list(APPEND SDL_NEW_GENERATOR_COMMAND_PARAM_MODIFICATORS "-JCPP=${SDL_SOURCE_JOINED_FILE_PATH}")
 
-	ImtCoreGenerateSdlWithDeps(
+	ImtGenerateSdlWithDeps(
 		${SDL_GENERATOR_COMMAND_PARAM_INPUT_FILE_PATH}
 		${SDL_GENERATOR_COMMAND_PARAM_OUTPUT_DIR}
 		${SDL_GENERATOR_COMMAND_PARAM_NAMESPACE}
@@ -90,7 +90,7 @@ function(ImtCoreGenerateCppSdl
 endfunction()
 
 #! Generates QML code form SDL schema
-function(ImtCoreGenerateQmlSdl
+function(ImtGenerateQmlSdl
 		SDL_GENERATOR_COMMAND_PARAM_INPUT_FILE_PATH
 		SDL_GENERATOR_COMMAND_PARAM_OUTPUT_DIR
 		SDL_GENERATOR_COMMAND_PARAM_NAMESPACE
@@ -115,7 +115,7 @@ function(ImtCoreGenerateQmlSdl
 
 	message(VERBOSE "SDL found deps for ${PROJECT_NAME}: ${SDL_DEPS}")
 
-	ImtCoreGenerateSdlWithDeps(
+	ImtGenerateSdlWithDeps(
 		${SDL_GENERATOR_COMMAND_PARAM_INPUT_FILE_PATH}
 		${SDL_GENERATOR_COMMAND_PARAM_OUTPUT_DIR}
 		${SDL_GENERATOR_COMMAND_PARAM_NAMESPACE}
@@ -126,7 +126,7 @@ function(ImtCoreGenerateQmlSdl
 endfunction()
 
 #! Generates code form SDL schema with separated files
-function(ImtCoreGenerateSdlSeparated
+function(ImtGenerateSdlSeparated
 	SDL_GENERATOR_COMMAND_PARAM_INPUT_FILE_PATH
 	SDL_GENERATOR_COMMAND_PARAM_OUTPUT_DIR
 	SDL_GENERATOR_COMMAND_PARAM_NAMESPACE
@@ -180,7 +180,7 @@ function(ImtCoreGenerateSdlSeparated
 	file(REMOVE ${SDL_DEPS_FILE_PATH})
 	file(REMOVE ${SDL_ERRORS_FILE_PATH})
 
-	ImtCoreGenerateSdlWithDeps(
+	ImtGenerateSdlWithDeps(
 		${SDL_GENERATOR_COMMAND_PARAM_INPUT_FILE_PATH}
 		${SDL_GENERATOR_COMMAND_PARAM_OUTPUT_DIR}
 		${SDL_GENERATOR_COMMAND_PARAM_NAMESPACE}
@@ -192,7 +192,7 @@ endfunction()
 
 
 #! wrap for qt resources
-function (ImtCoreFutureResourceWrap
+function (ImtFutureResourceWrap
 	WRAP_TARGET
 	WRAP_RESOURCE_FILE)
 
