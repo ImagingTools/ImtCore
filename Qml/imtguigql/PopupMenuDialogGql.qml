@@ -91,6 +91,7 @@ Item {
     signal started();
     signal clearSignal();
     signal propertiesChangedSignal();
+    signal destructionSignal();
 
 
     function onBackgroundClicked(){
@@ -100,6 +101,7 @@ Item {
     function updateModel(){
         itemsModel.updateModel(0);
     }
+
 
 
     TreeItemModel{
@@ -121,7 +123,7 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
-
+        destructionSignal();
     }
 
 
@@ -556,6 +558,7 @@ Item {
                             }
                             if(notifModel.containsKey("Close")){
                                 if(notifModel.getData("Close")){
+                                    //console.log("CLOSE::::")
                                     isClosing = true;
                                     //popupMenuContainer.rootItem.closeFunc();
                                 }

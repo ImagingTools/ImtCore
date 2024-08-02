@@ -131,6 +131,10 @@ Item {
         comboBoxContainerGql.currentText = "";
     }
 
+    function popupDestruction(){
+        console.log("popupDestruction");
+    }
+
     Component {
         id: popupMenu;
         PopupMenuDialogGql {
@@ -200,6 +204,9 @@ Item {
             onPropertiesChangedSignal: {
                 comboBoxContainerGql.currentIndex = -1;
                 comboBoxContainerGql.currentText = "";
+            }
+            onDestructionSignal: {
+                comboBoxContainerGql.popupDestruction();
             }
 
 

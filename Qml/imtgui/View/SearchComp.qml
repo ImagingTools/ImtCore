@@ -105,9 +105,11 @@ Rectangle{
     }
 
     function clearSearchFunc(){
+        console.log("clearSearchFunc")
         searchTextField.excludeFilterPart = "";
         searchTextField.currentText = "";
         searchContainer.selectedText = "";
+        searchContainer.previousText = "";
         searchContainer.propertiesModel.clear();
         searchContainer.parentIds = "";
         setPropertiesModel(searchContainer.propertyId, "");
@@ -134,11 +136,12 @@ Rectangle{
     }
 
     function setCurrentTextAddressFunc(modelll, index_, addStr_){
+        console.log("setCurrentTextAddressFunc")
         if(searchContainer.isAddressSearch){
             //searchTextField.currentIndex = -1;
             var addStrNew = addStr_ !== undefined ? addStr_ : "";
 
-            var tempStr = currentText = modelll.getData(searchContainer.valueName, index_) + addStrNew
+            var tempStr = searchTextField.currentText = modelll.getData(searchContainer.valueName, index_) + addStrNew
 //            if(tempStr[tempStr.length - 1] == ","){
 //                tempStr = tempStr.slice(0, tempStr.length - 1);
 //            }
@@ -153,6 +156,7 @@ Rectangle{
             searchContainer.parentIds = parentIds__ + addressId__;
             searchContainer.selectedText = searchTextField.currentText;
             setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
+            //console.log("PARENT_IDS::", searchContainer.parentIds)
 
             searchContainer.externalSearchParam = searchContainer.parentIds;
 
@@ -208,28 +212,30 @@ Rectangle{
     }
 
     function textChangeFunc(filterText){
+        if(!searchTextField.openST){
+            return;
+        }
         if(!filterText){
             return;
         }
         //console.log("filterText:: " ,filterText);
         searchContainer.isTextIncrease = searchContainer.previousText.length < filterText.length;
         //var comaDeleted = searchContainer.previousText[searchContainer.previousText.length -1] == "," && filterText[filterText.length -1] !== ",";
-        let comaCountPrev = searchContainer.comaCount(searchContainer.previousText);
-        let comaCountNew = searchContainer.comaCount(filterText);
+        let comaCountPrev = searchContainer.arraySize(searchContainer.previousText);
+        let comaCountNew = searchContainer.arraySize(filterText);
         let comaDeletedDiff = comaCountPrev - comaCountNew ;
         let comaDeleted = comaDeletedDiff > 0;
         searchContainer.previousText = filterText;
-
-        console.log("isTextIncrease:: " , searchContainer.isTextIncrease)
+        //console.log("TEXT_CHANGE:: ", comaCountPrev, comaCountNew)
+        //console.log("isTextIncrease:: " , searchContainer.isTextIncrease)
 
         if(searchContainer.isAddressSearch){
-
             if(searchTextField.openST){
                 var popup = ModalDialogManager.topItem;
 
                 if(!searchContainer.isTextIncrease){//NOT isTextIncrease
-                    var arrCount_prev = searchContainer.arraySize(searchContainer.selectedText);
-                    var arrCount = searchContainer.newArrayCount(searchContainer.selectedText, filterText);
+                    var arrCount_prev = comaCountPrev//searchContainer.arraySize(searchContainer.selectedText);
+                    var arrCount = comaCountNew//searchContainer.newArrayCount(searchContainer.selectedText, filterText);
                     //console.log("arrCount::: prev , curr ", arrCount_prev, arrCount);
 
                     if(arrCount <= arrCount_prev){
@@ -326,8 +332,8 @@ Rectangle{
                     searchContainer.parentIds = searchContainer.removeLastElement(searchContainer.parentIds);
                 }
                 setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
-
-//                searchTextField.excludeFilterPart = searchTextField.currentText;
+                //searchContainer.externalSearchParam = searchContainer.parentIds;
+                //searchTextField.excludeFilterPart = searchTextField.currentText;
 //                setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
 
                 //console.log("secondSearch:: ", "parentIds:: " ,searchContainer.parentIds)
@@ -494,10 +500,11 @@ Rectangle{
         let comaCount_ = 0;
         let target = ",";
 
-        let pos = text.indexOf(target, pos + 1);
-        while (pos !== -1) {
-            pos = text.indexOf(target, pos + 1)
-            comaCount_++;
+        for (let i = 0; i < length_; i++) {
+            let pos = text[i].indexOf(target)
+            if(pos > -1){
+                comaCount_++;
+            }
         }
        return comaCount_;
     }
@@ -550,7 +557,6 @@ Rectangle{
 
         onCloseEmptySignal:{
             if(searchContainer.isAddressSearch){
-                searchContainer.removeLastAddressElement();
             }
         }
 
@@ -574,13 +580,15 @@ Rectangle{
             }
         }
 
+
         onCloseSignal:{
+            console.log("CLOSE_SIGNAL")
             if(searchContainer.isAddressSearch){
                 var modelCount = model_.getItemsCount();
                 if(modelCount){
 
                     var str = currentText;
-                    var newAddress = model_.getData(searchContainer.valueName),strArrCount;
+                    var newAddress = model_.getData(searchContainer.valueName)//,strArrCount;
                     var str_form = str.replace(/ +/g, '');
                     var newAddress_form = newAddress.replace(/ +/g, '');
 
@@ -591,6 +599,13 @@ Rectangle{
                         searchContainer.searchPartialAddress(currentText);
                     }
                 }
+            }
+        }
+
+        function popupDestruction() {
+            console.log("popupDestruction override")
+            if(searchContainer.isAddressSearch){
+                closeComboAddressFunc();
             }
         }
 
@@ -644,26 +659,9 @@ Rectangle{
 
         }}//delegate
 
-        onOpenSTChanged: {
-            if(!searchTextField.openST){
-                pauseClose.start();
-            }
-        }
+
     }
 
-    PauseAnimation {
-        id: pauseClose;
-        duration: 10;
-
-        onFinished: {
-            if(searchContainer.isAddressSearch){
-                searchContainer.closeComboAddressFunc();
-            }
-            else{
-                searchContainer.closeComboFunc();
-            }
-        }
-    }
 
 
     Text {
