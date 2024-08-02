@@ -25,6 +25,44 @@ class Binding extends QtObject {
         valueChanged: {type:Signal, slotName:'onValueChanged', args:[]},
         whenChanged: {type:Signal, slotName:'onWhenChanged', args:[]},
     })
+
+    onDelayedChanged(){
+        this.__update()
+    }
+
+    onPropertyChanged(){
+        this.__update()
+    }
+
+    onRestoreModeChanged(){
+        this.__update()
+    }
+
+    onTargetChanged(){
+        this.__update()
+    }
+
+    onValueChanged(){
+        this.__update()
+    }
+
+    onWhenChanged(){
+        this.__update()
+    }  
+
+    __update(){
+        if(this.target && this.property){
+            let path = this.property.split('.')
+            let prop = this.target
+
+            while(path.length-1){
+                let propName = path.shift()
+                prop = prop[propName]
+            }
+
+            prop[path.shift()] = this.value
+        }
+    }
 }
 
 module.exports = Binding
