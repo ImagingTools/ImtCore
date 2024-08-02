@@ -124,6 +124,12 @@ class Instruction {
             if(meta[5]){
                 try {
                     defaultValue = eval(meta[5])
+                    if(defaultValue && typeof defaultValue === 'object') {
+                        this.assignProperties.push({
+                            name: meta[2],
+                            value: meta[4],
+                        })
+                    }
                 } catch {
                     this.assignProperties.push({
                         name: meta[2],
@@ -143,9 +149,8 @@ class Instruction {
                 type: meta[3],
                 value: defaultValue, 
                 signalName: meta[2]+'Changed',
+                info: meta.info,
             }) 
-
-            
         }
         
     }
@@ -981,7 +986,13 @@ class Instruction {
         if(this.defineProperties.length || this.defineSignals.length){
             code.push(`static meta = Object.assign({}, ${typeInfo.path}.meta, {`)
             for(let defineProperty of this.defineProperties){
-                let _typeInfo = this.getTypeInfo(defineProperty.type)
+                let _typeInfo
+                try {
+                    _typeInfo = this.getTypeInfo(defineProperty.type)
+                } catch (error) {
+                    throw `${this.qmlFile.fileName}:${defineProperty.info.line+1}:${defineProperty.info.col+1}: error: ${defineProperty.info.value} is not founded`
+                }
+                
 
                 if(typeof defineProperty.value === 'object'){
                     code.push(`${defineProperty.name}:{type:${_typeInfo.path}, signalName:'${defineProperty.signalName}'},`)

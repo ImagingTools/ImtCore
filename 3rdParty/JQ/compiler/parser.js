@@ -1660,6 +1660,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
   }
 
   function qmlpropdef(attrs) {
+    var info = S.token
     var type = S.token.value;
     next();
 
@@ -1679,7 +1680,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
       if (!is("name"))
         unexpected();
       var objName = S.token.value;
-      var info = [S.token]
+      info = [S.token]
       next();
       var propName = []
       while (is("punc", ".")) {
@@ -1698,7 +1699,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
       return as_statement("qmlpropdef", attrs, name, type);
     } else if (is("punc", ";"))
       next();
-    return as_(undefined, "qmlpropdef", attrs, name, type);
+    return as_(info, "qmlpropdef", attrs, name, type);
   }
 
   function qmldefaultprop() {
