@@ -123,14 +123,10 @@ ViewBase {
     }
 
     function updateGui(){
-        console.log("updateGui", model.toJson());
-
         featureEditor.updateTreeViewGui();
     }
 
     function updateModel(){
-        console.log("updateModel");
-
         if (model.getItemsCount() !== 1){
             let emptyModel = featureEditor.treeItemModelComp.createObject(model);
             model.insertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
@@ -139,17 +135,17 @@ ViewBase {
 
     Rectangle {
         anchors.fill: parent;
-
-        color: Style.backgroundColor;
+        color: Style.backgroundColor2;
     }
 
     Item {
         id: centerPanel;
 
         anchors.top: parent.top;
+        anchors.topMargin: Style.size_mainMargin;
         anchors.left: parent.left;
+        anchors.leftMargin: Style.size_mainMargin;
         anchors.right: rightBlock.left;
-        anchors.rightMargin: 20;
 
         height: parent.height;
 
@@ -303,9 +299,10 @@ ViewBase {
         id: rightBlock;
 
         anchors.top: parent.top;
+        anchors.topMargin: Style.size_mainMargin;
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
-        anchors.rightMargin: 5;
+        anchors.rightMargin: Style.size_mainMargin;
 
         width: 300;
 

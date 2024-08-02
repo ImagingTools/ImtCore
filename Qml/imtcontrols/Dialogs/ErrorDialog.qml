@@ -8,6 +8,7 @@ Dialog {
     width: 400;
 
     title: qsTr("Error");
+    forceFocus: true;
 
     topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 

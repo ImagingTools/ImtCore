@@ -155,26 +155,33 @@ void CLdapUserCollectionControllerComp::CheckLdapUsersThread::run()
 		QByteArrayList expectedUserIds = GetLdapUserIds();
 		QByteArrayList actualUserIds = m_parent.GetElementIds();
 
-		istd::CChangeGroup changeGroup(&m_parent);
+		{
+			istd::CChangeGroup changeGroup(&m_parent);
 
-		for (const QByteArray& userId : expectedUserIds){
-			if (!actualUserIds.contains(userId)){
-				istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr(GetUserInfoFromLdapUserId(userId));
-				if (userInfoPtr.IsValid()){
-					m_parent.InsertNewObject("User", "", "", userInfoPtr.GetPtr(), userId);
+			for (const QByteArray& userId : expectedUserIds){
+				if (!actualUserIds.contains(userId)){
+					istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr(GetUserInfoFromLdapUserId(userId));
+					if (userInfoPtr.IsValid()){
+						m_parent.InsertNewObject("User", "", "", userInfoPtr.GetPtr(), userId);
+					}
+				}
+			}
+
+			for (const QByteArray& userId : actualUserIds){
+				if (!expectedUserIds.contains(userId)){
+					m_parent.RemoveElement(userId);
 				}
 			}
 		}
 
-		for (const QByteArray& userId : actualUserIds){
-			if (!expectedUserIds.contains(userId)){
-				m_parent.RemoveElement(userId);
+		int count = interval;
+		while (count-- > 0){
+			if (isInterruptionRequested()){
+				return;
 			}
+
+			sleep(1);
 		}
-
-		changeGroup.Reset();
-
-		sleep(interval);
 	}
 }
 

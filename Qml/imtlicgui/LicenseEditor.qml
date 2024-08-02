@@ -30,7 +30,6 @@ ViewBase {
     }
 
     function updateModel(){
-        console.log("updateModel1", root.model.toJson());
         root.model.setData("LicenseName", licenseNameInput.text);
         root.model.setData("LicenseId", licenseIdInput.text);
         root.model.setData("LicenseDescription", descriptionInput.text);
@@ -70,16 +69,9 @@ ViewBase {
         else{
             root.model.setData("ParentLicenses", "");
         }
-
-//        root.updateFeaturesModel()
-//        root.updateLicensesModel()
-
-        console.log("updateModel2", root.model.toJson());
     }
 
     function updateGui(){
-        console.log("updateGui1", root.model.toJson());
-
         if (root.model.containsKey("LicenseId")){
             licenseIdInput.text = root.model.getData("LicenseId")
         }
@@ -108,8 +100,6 @@ ViewBase {
                 }
             }
         }
-
-        console.log("productFound", productFound);
 
         if (!productFound){
             productsCB.currentIndex = -1;
@@ -154,8 +144,6 @@ ViewBase {
                 }
             }
         }
-
-        console.log("updateGui2", root.model.toJson());
     }
 
     function updateLicensesGui(){
@@ -208,8 +196,6 @@ ViewBase {
     }
 
     function updateFeaturesModel(){
-        console.log("updateFeaturesModel");
-
         featuresTable.elements = 0;
         root.featuresModel.clear();
 
@@ -231,22 +217,16 @@ ViewBase {
     }
 
     function updateFeaturesGui(){
-        console.log("updateFeaturesGui");
         if (root.model.containsKey("Features")){
             let licenseFeatures = root.model.getData("Features");
             let licenseFeatureIds = licenseFeatures.split(';');
-            console.log("licenseFeatureIds", licenseFeatureIds);
-            console.log("featuresTable.elements", featuresTable.elements);
-
             featuresTable.uncheckAll();
 
             if (featuresTable.elements){
                 for (let i = 0; i < featuresTable.elements.getItemsCount(); i++){
                     let id = featuresTable.elements.getData("Id", i);
-                    console.log("id", id);
 
                     if (licenseFeatureIds.includes(id)){
-                        console.log("ok", id);
                         featuresTable.checkItem(i);
                     }
                 }
@@ -256,15 +236,16 @@ ViewBase {
 
     Rectangle {
         anchors.fill: parent;
-
-        color: Style.backgroundColor;
+        color: Style.backgroundColor2;
     }
 
     Column {
         id: column;
-
+        anchors.top: parent.top;
+        anchors.topMargin: Style.size_mainMargin;
+        anchors.left: parent.left;
+        anchors.leftMargin: Style.size_mainMargin;
         width: 500;
-
         spacing: Style.size_mainMargin;
 
         Text {
@@ -411,9 +392,9 @@ ViewBase {
         id: featuresTable;
 
         anchors.top: column.bottom;
-        anchors.topMargin: column.spacing;
+        anchors.topMargin: Style.size_mainMargin;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 10;
+        anchors.bottomMargin: Style.size_mainMargin;
 
         width: column.width;
         height: 300;
@@ -428,8 +409,6 @@ ViewBase {
         }
 
         onCheckedItemsChanged: {
-            console.log("Table onCheckedItemsChanged", getCheckedItems());
-
             root.doUpdateModel();
         }
     }
@@ -438,12 +417,13 @@ ViewBase {
         id: dependenciesBlock;
 
         anchors.top: parent.top;
+        anchors.topMargin: Style.size_mainMargin;
         anchors.left: column.right;
-        anchors.leftMargin: 10;
+        anchors.leftMargin: Style.size_mainMargin;
         anchors.right: parent.right;
-        anchors.rightMargin: 10;
+        anchors.rightMargin: Style.size_mainMargin;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 10;
+        anchors.bottomMargin: Style.size_mainMargin;
 
         Text {
             id: dependenciesTitle;

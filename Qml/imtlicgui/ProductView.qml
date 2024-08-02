@@ -194,17 +194,17 @@ ViewBase {
 
     Rectangle {
         anchors.fill: headerPanel;
-
-        color: Style.backgroundColor;
+        color: Style.backgroundColor2;
     }
 
     Row {
         id: headerPanel;
 
-        width: parent.width;
+        anchors.left: parent.left;
+        anchors.leftMargin: Style.size_mainMargin
         height: 50;
 
-        spacing: 10;
+        spacing: Style.size_mainMargin;
 
         Text {
             id: productNameLable;

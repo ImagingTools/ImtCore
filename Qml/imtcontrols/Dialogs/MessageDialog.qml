@@ -12,6 +12,7 @@ Dialog {
     property string message;
 
     canMove: true;
+    forceFocus: true;
 
     Component.onCompleted: {
         buttonsModel.append({Id: Enums.yes, Name:qsTr("Yes"), Enabled: true})

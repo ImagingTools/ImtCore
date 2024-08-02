@@ -17,6 +17,7 @@ ControlBase {
     property string title;
     property string bodySource;
     property string topPanelSource;
+    property bool forceFocus: false;
 
     property bool centered: true;
     property bool hasIcon: true;

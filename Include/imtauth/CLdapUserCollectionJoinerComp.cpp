@@ -16,6 +16,13 @@ namespace imtauth
 
 // public methods
 
+CLdapUserCollectionJoinerComp::CLdapUserCollectionJoinerComp()
+	:m_ldapUserCollectionObserver(*this),
+	m_isBlocked(true)
+{
+}
+
+
 QByteArray CLdapUserCollectionJoinerComp::GetUserUuidByLogin(const QByteArray& login) const
 {
 	iprm::CParamsSet filterParam;
@@ -56,26 +63,28 @@ void CLdapUserCollectionJoinerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_ldapUserCollectionModelCompPtr.IsValid()){
-		m_ldapUserCollectionModelCompPtr->AttachObserver(this);
-	}
+	m_ldapUserCollectionObserver.RegisterObject(m_ldapUserCollectionCompPtr.GetPtr(), &CLdapUserCollectionJoinerComp::OnUpdate);
+
+	m_isBlocked = false;
 }
 
 
 void CLdapUserCollectionJoinerComp::OnComponentDestroyed()
 {
-	if (m_ldapUserCollectionModelCompPtr.IsValid()){
-		m_ldapUserCollectionModelCompPtr->DetachObserver(this);
-	}
+	m_ldapUserCollectionObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
 }
 
 
-// reimplemented (imod::CSingleModelObserverBase)
-
-void CLdapUserCollectionJoinerComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CLdapUserCollectionJoinerComp::OnUpdate(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtbase::IObjectCollection* /*objectCollectionPtr*/)
 {
+	if (m_isBlocked){
+		return;
+	}
+
 	istd::CChangeGroup changeGroup(m_userCollectionCompPtr.GetPtr());
 
 	QByteArrayList actualLdapUserIds = m_ldapUserCollectionCompPtr->GetElementIds();
