@@ -1,3 +1,4 @@
+const { Qt } = require('../utils/Qt')
 const { QtObject } = require('./QtObject')
 const { QReal, QString } = require('../utils/properties')
 
@@ -39,15 +40,15 @@ class DoubleValidator extends QtObject {
         if(!str) return false
 
         let locale = this.getPropertyValue('locale').replaceAll('_', '-')
-        let delimiter = this.getPropertyValue('context').getPropertyValue('delimiter')
+        let decimalPoint = Qt.locale().decimalPoint
 
-        let regexp = new RegExp(`^-*[0-9]*[${delimiter}]*[0-9]*$`)
+        let regexp = new RegExp(`^-*[0-9]*[${decimalPoint}]*[0-9]*$`)
         if(!regexp.test(str)) return false
 
-        let value = Number(str.replaceAll(delimiter,'.'))
+        let value = Number(str.replaceAll(decimalPoint,'.'))
         if(isNaN(value)) return false
 
-        let decimals = str.indexOf(delimiter) >= 0 ? str.split(delimiter)[1] : []
+        let decimals = str.indexOf(decimalPoint) >= 0 ? str.split(decimalPoint)[1] : []
 
         return (this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value) && decimals.length <= this.getPropertyValue('decimals')
     }
@@ -56,18 +57,18 @@ class DoubleValidator extends QtObject {
         if(!str) return true
 
         let locale = this.getPropertyValue('locale').replaceAll('_', '-')
-        let delimiter = this.getPropertyValue('context').getPropertyValue('delimiter')
+        let decimalPoint = Qt.locale().decimalPoint
 
         if(this.getPropertyValue('bottom') < 0 || this.getPropertyValue('top') < 0){
             if(str === '-') return true
         }
 
-        let regexp = new RegExp(`^-*[0-9]*[${delimiter}]*[0-9]*$`)
+        let regexp = new RegExp(`^-*[0-9]*[${decimalPoint}]*[0-9]*$`)
         if(!regexp.test(str)) return false
 
-        let value = Number(str.replaceAll(delimiter,'.'))
+        let value = Number(str.replaceAll(decimalPoint,'.'))
         if(isNaN(value)) return false
-        let decimals = str.indexOf(delimiter) >= 0 ? str.split(delimiter)[1] : []
+        let decimals = str.indexOf(decimalPoint) >= 0 ? str.split(decimalPoint)[1] : []
         return decimals.length <= this.getPropertyValue('decimals')
     }
 }

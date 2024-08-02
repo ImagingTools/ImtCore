@@ -271,6 +271,8 @@ class QReal extends QProperty {
     }
 }
 
+class QDouble extends QReal {}
+
 class QPositiveReal extends QReal {
     typeCasting(value){
         let number = super.typeCasting(value)
@@ -1081,6 +1083,7 @@ module.exports.QColor = QColor
 module.exports.QInt = QInt
 module.exports.QProperty = QProperty
 module.exports.QReal = QReal
+module.exports.QDouble = QDouble
 module.exports.QPositiveReal = QPositiveReal
 module.exports.QString = QString
 module.exports.QVar = QVar

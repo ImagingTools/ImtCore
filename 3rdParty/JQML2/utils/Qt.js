@@ -759,7 +759,7 @@ var Qt = {
     },
     locale: function(){
         return {
-            decimalPoint: mainRoot.delimiter
+            decimalPoint: (1.1).toLocaleString().substring(1, 2)
         }
     },
     qsTr: function(sourceText){
