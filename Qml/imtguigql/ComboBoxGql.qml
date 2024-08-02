@@ -304,6 +304,7 @@ Item {
 
             anchors.fill: parent;
             hoverEnabled: !comboBoxContainerGql.readOnly;
+            enabled: comboBoxContainerGql.enabled;
 
             cursorShape: hoverEnabled ? Qt.PointingHandCursor : Qt.ArrowCursor;
 

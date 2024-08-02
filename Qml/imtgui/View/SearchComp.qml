@@ -605,7 +605,7 @@ Rectangle{
         function popupDestruction() {
             console.log("popupDestruction override")
             if(searchContainer.isAddressSearch){
-                closeComboAddressFunc();
+                searchContainer.closeComboAddressFunc();
             }
         }
 
