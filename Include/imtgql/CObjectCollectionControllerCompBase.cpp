@@ -1174,8 +1174,8 @@ void CObjectCollectionControllerCompBase::SetObjectFilter(
 	for (const QString& key : keys){
 		QByteArray value = objectFilterModel.GetData(key.toUtf8()).toByteArray();
 
-		iprm::CIdParam* idParamPtr = new iprm::CIdParam();
-		idParamPtr->SetId(value);
+		iprm::CTextParam* idParamPtr = new iprm::CTextParam();
+		idParamPtr->SetText(value);
 
 		filterParams.SetEditableParameter(key.toUtf8(), idParamPtr, true);
 	}

@@ -3,7 +3,7 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
-#include <iprm/CIdParam.h>
+#include <iprm/CTextParam.h>
 
 
 namespace imtauth
@@ -27,14 +27,14 @@ bool CCredentialControllerComp::CheckCredential(const QByteArray& login, const Q
 	iprm::CParamsSet filterParam;
 	iprm::CParamsSet paramsSet;
 
-	iprm::CIdParam userId;
-	userId.SetId(login);
+	iprm::CTextParam userId;
+	userId.SetText(login);
 	paramsSet.SetEditableParameter("Id", &userId);
 
 	QByteArray passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password);
 
-	iprm::CIdParam passwordHashParam;
-	passwordHashParam.SetId(passwordHash);
+	iprm::CTextParam passwordHashParam;
+	passwordHashParam.SetText(passwordHash);
 	paramsSet.SetEditableParameter("PasswordHash", &passwordHashParam);
 
 	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);

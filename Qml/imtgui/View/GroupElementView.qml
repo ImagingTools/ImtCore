@@ -12,7 +12,7 @@ Rectangle {
     border.width: 1;
     border.color: Style.borderColor;
 
-    radius: 5;
+    radius: Style.size_smallMargin;
 
     color: Style.baseColor;
 

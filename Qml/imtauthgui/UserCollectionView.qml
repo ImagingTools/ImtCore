@@ -14,11 +14,103 @@ RemoteCollectionView {
     visibleMetaInfo: true;
 
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
-        collectionView: userCollectionViewContainer;
+            collectionView: userCollectionViewContainer;
 
-        documentTypeId: "User";
-        viewTypeId: "UserEditor";
+            documentTypeId: "User";
+            viewTypeId: "UserEditor";
+
+            function updateItemSelection(selectedItems){
+                if (userCollectionViewContainer.commandsController){
+                    let isEnabled = selectedItems.length === 1;
+                    if (isEnabled){
+                        let index = selectedItems[0];
+                        let systemIds = userCollectionViewContainer.table.elements.getData("SystemId", index);
+
+                        let commandsController = userCollectionViewContainer.commandsController;
+                        if(commandsController){
+                            commandsController.setCommandIsEnabled("Remove", isEnabled && !systemIds.includes("Ldap"));
+                            commandsController.setCommandIsEnabled("Edit", isEnabled);
+                        }
+                    }
+                }
+            }
+        }
     }
+
+    filterMenu.decorator: filterDecoratorComp;
+
+    Component {
+        id: filterDecoratorComp;
+
+        DecoratorBase {
+            id: decoratorBase;
+
+            width: baseElement ? baseElement.width: 0;
+            height: 40;
+
+            Row {
+                id: content;
+                anchors.left: parent.left;
+                anchors.verticalCenter: parent.verticalCenter;
+                spacing: Style.size_mainMargin;
+
+                TreeItemModel {
+                    id: systemInfoModel;
+
+                    Component.onCompleted: {
+                        updateModel();
+                    }
+
+                    function updateModel(){
+                        systemInfoModel.clear();
+
+                        let index = systemInfoModel.insertNewItem();
+                        systemInfoModel.setData("Id", "All", index)
+                        systemInfoModel.setData("Name", qsTr("All System"), index)
+
+                        index = systemInfoModel.insertNewItem();
+                        systemInfoModel.setData("Id", "Internal", index)
+                        systemInfoModel.setData("Name", qsTr("Internal"), index)
+
+                        index = systemInfoModel.insertNewItem();
+                        systemInfoModel.setData("Id", "Ldap", index)
+                        systemInfoModel.setData("Name", qsTr("LDAP"), index)
+
+                        systemComboBox.model = systemInfoModel;
+                    }
+                }
+
+                ComboBox {
+                    id: systemComboBox;
+
+                    width: 250;
+                    height: filtermenu.height;
+                    currentIndex: 0;
+                    onCurrentIndexChanged: {
+                        if (currentIndex == 1){
+                            userCollectionViewContainer.collectionFilter.addAdditionalFilter("SystemId", "")
+                        }
+                        else if (currentIndex > 1){
+                            let id = systemComboBox.model.getData("Id", currentIndex);
+                            userCollectionViewContainer.collectionFilter.addAdditionalFilter("SystemId", id)
+                        }
+                        else{
+                            userCollectionViewContainer.collectionFilter.removeFilterById("SystemId");
+                        }
+
+                        userCollectionViewContainer.doUpdateGui();
+                    }
+                }
+            }
+
+            FilterPanelDecorator {
+                id: filtermenu
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.right: parent.right;
+                baseElement: decoratorBase.baseElement;
+                width: 325;
+            }
+        }
     }
 
     dataControllerComp:
@@ -66,7 +158,7 @@ RemoteCollectionView {
             width: userCollectionViewContainer.table.width;
             minHeight: userCollectionViewContainer.table.itemHeight;
             readOnly: userCollectionViewContainer.table.readOnly;
-//            color: selected ? Style.selectedColor : model.SystemId !== "" ? "red" : "transparent";
+            //            color: selected ? Style.selectedColor : model.SystemId !== "" ? "red" : "transparent";
         }
     }
 
@@ -237,15 +329,15 @@ RemoteCollectionView {
             groupsModel: userCollectionViewContainer.groupsModel;
 
             commandsDelegateComp: Component {ViewCommandsDelegateBase {
-                view: userEditor;
-            }
+                    view: userEditor;
+                }
             }
 
             commandsControllerComp: Component {CommandsPanelController {
-                commandId: "User";
-                uuid: userEditor.viewId;
-                commandsView: userEditor.commandsView;
-            }
+                    commandId: "User";
+                    uuid: userEditor.viewId;
+                    commandsView: userEditor.commandsView;
+                }
             }
         }
     }

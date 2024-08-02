@@ -38,7 +38,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
-		SendErrorMessage(0, QString("Unable to open file with name %1").arg(filePathTmp), "CRestoringDatabaseControllerComp");
+		SendErrorMessage(0, QString("Unable to open file with name '%1'").arg(filePathTmp), "CRestoringDatabaseControllerComp");
 
 		return false;
 	}

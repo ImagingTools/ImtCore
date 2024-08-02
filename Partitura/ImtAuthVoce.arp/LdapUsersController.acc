@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="LdapCredentialController" PackageId="ImtAuthPck" ComponentId="LdapCredentialController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="LdapUserCollectionController" PackageId="ImtAuthPck" ComponentId="LdapUserCollectionController">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CheckInterval" Type="Integer" ExportId="CheckInterval">
+                        <Data IsEnabled="true" Value="60"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LdapUserCollectionJoiner" PackageId="ImtAuthPck" ComponentId="LdapUserCollectionJoiner">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="InternalUserCollection" Type="Reference" ExportId="InternalUserCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LdapSystemId" Type="Id" ExportId="LdapSystemId">
+                        <Data IsEnabled="true" Value="Ldap"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LdapSystemName" Type="Text" ExportId="LdapSystemName">
+                        <Data IsEnabled="true" Value="LDAP"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LdapUserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LdapUserCollectionController"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="LdapUserCollectionController"/>
+        <Interface InterfaceId="imtauth::ICredentialController" ComponentId="LdapCredentialController"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="LdapUserCollectionController"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="LdapUserCollectionController"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

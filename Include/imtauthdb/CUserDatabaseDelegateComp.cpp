@@ -4,6 +4,8 @@
 // ACF includes
 #include <istd/CCrcCalculator.h>
 #include <istd/TOptDelPtr.h>
+#include <iprm/ITextParam.h>
+#include <iprm/TParamsPtr.h>
 
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
@@ -248,6 +250,46 @@ bool CUserDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& re
 
 			metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_GROUPS, groups.join(';'));
 		}
+	}
+
+	return true;
+}
+
+
+
+bool CUserDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
+{
+	iprm::TParamsPtr<iprm::ITextParam> systemIdParamPtr(&filterParams, "SystemId");
+	if (systemIdParamPtr.IsValid()){
+		QString systemId = systemIdParamPtr->GetText();
+
+		if (!filterQuery.isEmpty()){
+			filterQuery += " AND ";
+		}
+
+		filterQuery += QString(R"((('%1' = '' AND NOT root."Document" ? 'SystemInfos') OR EXISTS (SELECT 1 FROM jsonb_array_elements(root."Document"->'SystemInfos') as s WHERE s->>'SystemId' = '%1')))").arg(systemId);
+	}
+	else{
+		BaseClass::CreateObjectFilterQuery(filterParams, filterQuery);
+	}
+
+	return true;
+}
+
+
+bool CUserDatabaseDelegateComp::CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const
+{
+	QByteArrayList infoIds = collectionFilter.GetSortingInfoIds();
+	imtbase::ICollectionFilter::SortingOrder sortingOrder = collectionFilter.GetSortingOrder();
+	if (infoIds.contains("SystemName")){
+		sortQuery = QString(R"(ORDER BY CASE
+					WHEN (NOT root."Document" ? 'SystemInfos') THEN 0
+					WHEN root."Document"->'SystemInfos'->0->>'SystemId' = '' THEN 1
+					WHEN root."Document"->'SystemInfos'->0->>'SystemId' != '' THEN 2
+					ELSE 3 END %1)").arg(sortingOrder == imtbase::ICollectionFilter::SO_ASC ? "ASC" : "DESC");
+	}
+	else{
+		return BaseClass::CreateSortQuery(collectionFilter, sortQuery);
 	}
 
 	return true;

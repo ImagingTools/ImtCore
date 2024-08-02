@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="AuthorizationController" X="350" Y="300" Note=""/>
+        <Element ComponentName="CredentialController" X="425" Y="450" Note=""/>
+        <Element ComponentName="Demultiplexer" X="575" Y="125" Note=""/>
+        <Element ComponentName="HashCalculator" X="425" Y="625" Note=""/>
+        <Element ComponentName="LdapCredentialController" X="125" Y="450" Note=""/>
+        <Element ComponentName="SessionController" X="825" Y="300" Note=""/>
+        <Element ComponentName="SessionInfoProvider" X="1050" Y="450" Note=""/>
+        <Element ComponentName="UserSessionRepository" X="750" Y="450" Note=""/>
+        <Element ComponentName="UsersSessionsDatabaseDelegate" X="825" Y="625" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

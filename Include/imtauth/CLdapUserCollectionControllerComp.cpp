@@ -14,6 +14,7 @@
 #include <istd/TSingleFactory.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/CIdParam.h>
+#include <iprm/CTextParam.h>
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
@@ -113,7 +114,7 @@ const imtauth::IUserInfo* CLdapUserCollectionControllerComp::CheckLdapUsersThrea
 		systemInfo.systemId = "Ldap";
 		systemInfo.systemName = "LDAP";
 
-		userInfoPtr->SetSystemInfo(systemInfo);
+		userInfoPtr->AddToSystem(systemInfo);
 
 		QByteArray userId = QString::fromWCharArray(userInfo3BufPtr->usri3_name).toUtf8();
 		userInfoPtr->SetId(userId);

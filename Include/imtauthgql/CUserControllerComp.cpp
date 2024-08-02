@@ -106,8 +106,23 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 				dataModel->SetData("Groups", groupList.join(';'));
 				dataModel->SetData("Roles", roleList.join(';'));
 
-				imtauth::IUserInfo::SystemInfo systemInfo = userInfoPtr->GetSystemInfo();
-				dataModel->SetData("SystemId", systemInfo.systemId);
+				imtbase::CTreeItemModel* systemInfosModelPtr = dataModel->AddTreeModel("SystemInfos");
+
+				imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
+				for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+					int index = systemInfosModelPtr->InsertNewItem();
+
+					systemInfosModelPtr->SetData("Id", systemInfo.systemId, index);
+
+					if (systemInfo.systemName.isEmpty()){
+						systemInfosModelPtr->SetData("Name", QT_TR_NOOP("Internal"), index);
+					}
+					else{
+						systemInfosModelPtr->SetData("Name", systemInfo.systemName, index);
+					}
+
+					systemInfosModelPtr->SetData("Enabled", systemInfo.enabled, index);
+				}
 
 				if (allFields.contains("Permissions")){
 					QByteArray permissions = userInfoPtr->GetPermissions(productId).join(';');
@@ -256,6 +271,28 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 		}
 	}
 
+	if (representationModel.ContainsKey("SystemInfos")){
+		imtbase::CTreeItemModel* systemInfosModelPtr = representationModel.GetTreeItemModel("SystemInfos");
+		if (systemInfosModelPtr != nullptr){
+			for (imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
+				userInfoPtr->RemoveFromSystem(systemInfo.systemId);
+			}
+
+			for (int i = 0; i < systemInfosModelPtr->GetItemsCount(); i++){
+				QByteArray systemId = systemInfosModelPtr->GetData("Id", i).toByteArray();
+				QString systemName = systemInfosModelPtr->GetData("Name", i).toString();
+				bool enabled = systemInfosModelPtr->GetData("Enabled", i).toBool();
+
+				imtauth::IUserInfo::SystemInfo systemInfo;
+				systemInfo.systemId = systemId;
+				systemInfo.systemName = systemName;
+				systemInfo.enabled = enabled;
+
+				userInfoPtr->AddToSystem(systemInfo);
+			}
+		}
+	}
+
 	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *userInfoPtr)){
 		errorMessage = QString("Unable to save user with ID: '%1'").arg(qPrintable(objectId));
 		SendWarningMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
@@ -377,6 +414,10 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			password = m_hashCalculatorCompPtr->GenerateHash(username + password);
 		}
 
+		// User from internal system
+		imtauth::IUserInfo::SystemInfo systemInfo;
+		userInfoPtr->AddToSystem(systemInfo);
+
 		userInfoPtr->SetPasswordHash(password);
 
 		if (itemModel.ContainsKey("Email")){
@@ -489,12 +530,14 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 		}
 	}
 
-	imtauth::IUserInfo::SystemInfo systemInfo = userInfoPtr->GetSystemInfo();
-	if (!systemInfo.systemId.isEmpty()){
-		errorMessage = QString("Unable to delete an user with User-ID: '%1'. The user is on a different system.").arg(removedUserId);
-		SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
+	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
+	for (imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+		if(!systemInfo.systemId.isEmpty()){
+			errorMessage = QString("Unable to delete an user with User-ID: '%1'. The user is on a different system.").arg(removedUserId);
+			SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
-		return nullptr;
+			return nullptr;
+		}
 	}
 
 	if (m_objectCollectionCompPtr->RemoveElement(objectId)){

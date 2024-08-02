@@ -21,7 +21,7 @@ Item {
     }
 
     Component.onCompleted: {
-        // fileDialog.currentFolder = model.Path;
+         fileDialog.currentFolder = model.Path;
     }
 
     Item {
@@ -48,22 +48,24 @@ Item {
             anchors.right: parent.right;
             anchors.verticalCenter: parent.verticalCenter;
 
+            widthFromDecorator: true;
+
             text: "Browse...";
 
             onClicked: {
-                // fileDialog.open();
+                 fileDialog.open();
             }
         }
     }
 
-//    FolderDialog {
-//        id: fileDialog;
+    FolderDialog {
+        id: fileDialog;
 
-//        onAccepted: {
-//            var pathDir = fileDialog.folder.toString();
-//            console.log("fileUrl", fileDialog.folder);
-//            pathDir = pathDir.replace('file:///', '')
-//            root.path = pathDir;
-//        }
-//    }
+        onAccepted: {
+            var pathDir = fileDialog.folder.toString();
+            console.log("fileUrl", fileDialog.folder);
+            pathDir = pathDir.replace('file:///', '')
+            root.path = pathDir;
+        }
+    }
 }

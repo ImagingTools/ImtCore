@@ -1,5 +1,6 @@
 #pragma once
 
+
 // ImtCore includes
 #include <imtauth/IUserGroupInfo.h>
 #include <imtauth/IUserBaseInfo.h>
@@ -16,7 +17,6 @@ namespace imtauth
 class IUserInfo: virtual public IUserBaseInfo
 {
 public:
-
 	/**
 		Supported action types.
 	*/
@@ -60,10 +60,11 @@ public:
 	{
 		QByteArray systemId;
 		QString systemName;
+		bool enabled = true;
 
 		bool operator == (const SystemInfo& other) const
 		{
-			return (systemId == other.systemId) && (systemName == other.systemName);
+			return (systemId == other.systemId) && (systemName == other.systemName) && (enabled == other.enabled);
 		}
 
 		bool operator != (const SystemInfo& other) const
@@ -71,6 +72,8 @@ public:
 			return !(*this == other);
 		}
 	};
+
+	typedef QList<SystemInfo> SystemInfoList;
 
 	/**
 		Get password hash of the user.
@@ -120,12 +123,17 @@ public:
 	/**
 		Get information about the system in which this user is located.
 	*/
-	virtual SystemInfo GetSystemInfo() const = 0;
+	virtual SystemInfoList GetSystemInfos() const = 0;
 
 	/**
-		To set information about the system in which this user is located.
+		Add user to the system.
 	*/
-	virtual void SetSystemInfo(SystemInfo systemInfo) = 0;
+	virtual bool AddToSystem(SystemInfo systemInfo) = 0;
+
+	/**
+		Remove an user from the system.
+	*/
+	virtual bool RemoveFromSystem(const QByteArray& systemId) = 0;
 };
 
 

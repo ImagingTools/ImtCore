@@ -408,7 +408,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 		for (int i = 0; i < idsList.size(); i++){
 			QByteArray key = idsList[i];
 
-			const iprm::IIdParam* textParamPtr = dynamic_cast<const iprm::IIdParam*>(filterParams.GetParameter(key));
+			const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter(key));
 			if (textParamPtr == nullptr){
 				return false;
 			}
@@ -417,7 +417,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 				filterQuery += " AND ";
 			}
 
-			QString value = textParamPtr->GetId();
+			QString value = textParamPtr->GetText();
 			filterQuery += QString("\"Document\"->>'%1' = '%2'").arg(qPrintable(key)).arg(value);
 		}
 	}

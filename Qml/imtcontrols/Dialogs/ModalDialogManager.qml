@@ -65,6 +65,17 @@ Item {
         return false;
     }
 
+    function dialogIsOpened(dialogComp){
+        for (let i = 0; i < modalDialogModels.count; i++){
+            let c = modalDialogModels.get(i).Component;
+            if (c && c === dialogComp){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function showInfoDialog(message){
         openDialog(infoDialog, {"message": message});
     }

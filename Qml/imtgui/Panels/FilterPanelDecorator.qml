@@ -8,14 +8,25 @@ DecoratorBase {
 
     height: content.height;
 
+    property alias contentWidth: content.width;
+
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", onLocalizationChanged)
-
         updateText();
+        checkWidth()
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("OnLocalizationChanged", onLocalizationChanged)
+    }
+
+    onWidthChanged: {
+        checkWidth();
+    }
+
+    function checkWidth(){
+//        rect.visible = width - rect.width <= contentWidth + Style.size_largeMargin;
+//        tfc.visible = width - tfc.width <= contentWidth + Style.size_largeMargin;
     }
 
     function onLocalizationChanged(language){

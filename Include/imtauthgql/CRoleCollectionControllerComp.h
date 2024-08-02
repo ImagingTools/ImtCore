@@ -28,6 +28,7 @@ protected:
 				int itemIndex,
 				const imtbase::IObjectCollectionIterator* objectCollectionIterator,
 				QString& errorMessage) const override;
+	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest,const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const override;
 
 protected:
 	I_ATTR(QByteArray, m_productIdAttrPtr);

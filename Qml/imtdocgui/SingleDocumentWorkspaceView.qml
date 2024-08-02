@@ -16,6 +16,7 @@ Rectangle {
 
     onDocumentManagerChanged: {
         if (documentManager){
+//            documentManager.generateDocumentTitle = root.generateDocumentTitle;
             connections.target = documentManager;
             headersListView.model = documentManager.documentsModel;
         }

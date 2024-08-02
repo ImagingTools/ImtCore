@@ -33,8 +33,9 @@ public:
 	virtual RoleIds GetRoles(const QByteArray& productId) const override;
 	virtual FeatureIds GetPermissions(const QByteArray& productId = QByteArray()) const override;
 	virtual QDateTime GetLastConnection() const override;
-	virtual SystemInfo GetSystemInfo() const override;
-	virtual void SetSystemInfo(SystemInfo systemInfo) override;
+	virtual SystemInfoList GetSystemInfos() const override;
+	virtual bool AddToSystem(SystemInfo systemInfo) override;
+	virtual bool RemoveFromSystem(const QByteArray& systemId) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -50,7 +51,7 @@ private:
 	QString m_mail;
 	IUserGroupInfo::GroupIds m_groupIds;
 	QDateTime m_lastConnection;
-	SystemInfo m_systemInfo;
+	SystemInfoList m_systemInfos;
 };
 
 

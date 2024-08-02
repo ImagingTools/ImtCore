@@ -3,6 +3,8 @@
 
 // ACF includes
 #include <idoc/CStandardDocumentMetaInfo.h>
+#include <iprm/CTextParam.h>
+#include <iprm/TParamsPtr.h>
 
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
@@ -189,6 +191,34 @@ bool CRoleCollectionControllerComp::SetupGqlItem(
 	}
 
 	return false;
+}
+
+
+void CRoleCollectionControllerComp::SetAdditionalFilters(
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlObject& /*viewParamsGql*/,
+			iprm::CParamsSet* filterParams) const
+{
+	const imtgql::CGqlObject* inputParamObjectPtr = gqlRequest.GetParam("input");
+	if (inputParamObjectPtr == nullptr){
+		return;
+	}
+
+	iser::ISerializable* objectFilterPtr = filterParams->GetEditableParameter("ObjectFilter");
+	if (objectFilterPtr == nullptr){
+		return;
+	}
+
+	iprm::CParamsSet* objectParamSetPtr = dynamic_cast<iprm::CParamsSet*>(objectFilterPtr);
+	if (objectParamSetPtr == nullptr){
+		return;
+	}
+
+	QByteArray productId = inputParamObjectPtr->GetFieldArgumentValue("ProductId").toByteArray();
+	iprm::CTextParam* textParam = new iprm::CTextParam;
+	textParam->SetText(productId);
+
+	objectParamSetPtr->SetEditableParameter("ProductId", textParam, true);
 }
 
 

@@ -15,24 +15,34 @@ ViewBase {
         generalGroup.updateGui();
         rolesGroup.updateGui();
         groupsBlock.updateGui();
+        systemInfoGroup.updateGui();
     }
 
     function updateModel(){
         generalGroup.updateModel();
         rolesGroup.updateModel();
         groupsBlock.updateModel();
+        systemInfoGroup.updateModel();
     }
 
     onModelChanged: {
-        if (model.containsKey("SystemId")){
-            let systemId = model.getData("SystemId");
+        let systemInfosModel = container.model.getData("SystemInfos");
+        systemInfoTable.table.elements = systemInfosModel;
+
+        if (systemInfoTable.table.elementsCount <= 1){
+            headerSystemInfoGroup.visible = false;
+            systemInfoGroup.visible = false;
+        }
+
+        for (let i = 0; i < systemInfosModel.getItemsCount(); i++){
+            let systemId = systemInfosModel.getData("Id", i);
             if (systemId !== ""){
                 usernameInput.readOnly = true;
-                passwordInput.readOnly = true;
-                nameInput.readOnly = true;
-                mailInput.readOnly = true;
+                break;
             }
         }
+
+        systemInfoTableConn.enabled = true;
     }
 
     CustomScrollbar {
@@ -109,6 +119,7 @@ ViewBase {
 
                     name: qsTr("Username");
                     placeHolderText: qsTr("Enter the user name");
+                    description: qsTr();
 
                     readOnly: container.readOnly;
 
@@ -225,6 +236,81 @@ ViewBase {
             }
 
             GroupHeaderView {
+                id: headerSystemInfoGroup;
+                width: parent.width;
+
+                title: qsTr("System Information");
+                groupView: systemInfoGroup;
+            }
+
+            GroupElementView {
+                id: systemInfoGroup;
+                width: parent.width;
+
+                TableElementView {
+                    id: systemInfoTable;
+                    TreeItemModel {
+                        id: headersModel2;
+
+                        Component.onCompleted: {
+                            updateModel();
+                        }
+
+                        function updateModel(){
+                            headersModel2.clear();
+
+                            let index = headersModel2.insertNewItem();
+                            headersModel2.setData("Id", "Name", index)
+                            headersModel2.setData("Name", qsTr("System Name"), index)
+
+                            systemInfoTable.table.headers = headersModel2;
+                        }
+                    }
+
+                    onTableChanged: {
+                        if (table){
+                            table.checkable = true;
+                        }
+                    }
+
+                    Connections {
+                        id: systemInfoTableConn;
+                        target: systemInfoTable.table;
+                        enabled: false;
+
+                        function onCheckedItemsChanged(){
+                            container.doUpdateModel();
+                        }
+                    }
+                }
+
+                function updateGui(){
+                    systemInfoTable.table.uncheckAll();
+                    let systemInfosModel = container.model.getData("SystemInfos");
+                    if (systemInfosModel){
+                        for (let i = 0; i < systemInfosModel.getItemsCount(); i++){
+                            let enabled = systemInfosModel.getData("Enabled", i);
+
+                            if (enabled){
+                                systemInfoTable.table.checkItem(i);
+                            }
+                        }
+                    }
+                }
+
+                function updateModel(){
+                    let systemInfosModel = container.model.getData("SystemInfos");
+                    if (systemInfosModel){
+                        let indexes = systemInfoTable.table.getCheckedItems();
+
+                        for (let i = 0; i < systemInfosModel.getItemsCount(); i++){
+                            systemInfosModel.setData("Enabled", indexes.includes(i), i);
+                        }
+                    }
+                }
+            }
+
+            GroupHeaderView {
                 width: parent.width;
 
                 title: qsTr("Roles");
@@ -242,16 +328,10 @@ ViewBase {
                     KeyNavigation.tab: groupsTable;
                     KeyNavigation.backtab: mailInput;
 
-                    Component.onCompleted: {
-                        rolesTable.table.readOnly = container.readOnly;
-                    }
-
                     Connections {
                         target: rolesTable.table;
 
                         function onCheckedItemsChanged(){
-                            console.log("rolesTable onCheckedItemsChanged")
-
                             container.doUpdateModel();
                         }
                     }
@@ -302,7 +382,6 @@ ViewBase {
                 }
 
                 function updateModel(){
-                    console.log("Roles updateModel", container.model.toJson());
                     let selectedRoleIds = []
                     let indexes = rolesTable.table.getCheckedItems();
                     for (let index of indexes){
@@ -311,7 +390,6 @@ ViewBase {
                     }
 
                     selectedRoleIds.sort();
-                    console.log("selectedRoleIds", selectedRoleIds);
 
                     let result = selectedRoleIds.join(';');
                     container.model.setData("Roles", result);
@@ -344,8 +422,6 @@ ViewBase {
                         target: groupsTable.table;
 
                         function onCheckedItemsChanged(){
-                            console.log("groupsTable onCheckedItemsChanged")
-
                             container.doUpdateModel();
                         }
                     }
@@ -379,8 +455,6 @@ ViewBase {
                 }
 
                 function updateGui(){
-                    console.log("UserGroups updateGui");
-
                     let groupIds = []
                     if (container.model.containsKey("Groups")){
                         let parentGroups = container.model.getData("Groups");

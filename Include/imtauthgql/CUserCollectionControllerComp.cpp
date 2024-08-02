@@ -180,17 +180,27 @@ bool CUserCollectionControllerComp::SetupGqlItem(
 					elementInformation = userInfoPtr->GetMail();
 				}
 				else if(informationId == "SystemId"){
-					imtauth::IUserInfo::SystemInfo systemInfo = userInfoPtr->GetSystemInfo();
-					elementInformation = systemInfo.systemId;
+					QByteArrayList systemIdList;
+					imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
+					for (imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+						systemIdList << systemInfo.systemId;
+					}
+
+					elementInformation = systemIdList.join(';');
 				}
 				else if(informationId == "SystemName"){
-					imtauth::IUserInfo::SystemInfo systemInfo = userInfoPtr->GetSystemInfo();
-					if (systemInfo.systemId.isEmpty()){
-						elementInformation = QT_TR_NOOP("Internal");
+					QStringList systemNameList;
+					imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
+					for (imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+						if (systemInfo.systemName.isEmpty()){
+							systemNameList << QT_TR_NOOP("Internal");
+						}
+						else{
+							systemNameList << systemInfo.systemName;
+						}
 					}
-					else{
-						elementInformation = systemInfo.systemName;
-					}
+
+					elementInformation = systemNameList.join(';');
 				}
 				else if(informationId == "Roles"){
 					QByteArrayList resultList;

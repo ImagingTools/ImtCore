@@ -19,7 +19,9 @@ namespace imtauth
 {
 
 
-class CLdapUserCollectionControllerComp: public icomp::CComponentBase, public imod::TModelWrap<imtbase::CObjectCollection>
+class CLdapUserCollectionControllerComp:
+			public icomp::CComponentBase,
+			public imod::TModelWrap<imtbase::CObjectCollection>
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -64,3 +66,5 @@ protected:
 
 
 } // namespace imtauth
+
+

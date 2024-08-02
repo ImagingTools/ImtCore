@@ -4,7 +4,7 @@
 // ACF includes
 #include <istd/CChangeGroup.h>
 #include <iprm/CParamsSet.h>
-#include <iprm/CIdParam.h>
+#include <iprm/CTextParam.h>
 
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
@@ -15,6 +15,40 @@ namespace imtauth
 
 
 // public methods
+
+QByteArray CLdapUserCollectionJoinerComp::GetUserUuidByLogin(const QByteArray& login) const
+{
+	iprm::CParamsSet filterParam;
+	iprm::CParamsSet paramsSet;
+
+	iprm::CTextParam userIdParam;
+	userIdParam.SetText(login);
+
+	paramsSet.SetEditableParameter("Id", &userIdParam);
+	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+
+	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+	if (userIds.isEmpty()){
+		return QByteArray();
+	}
+
+	return userIds[0];
+}
+
+
+QByteArray CLdapUserCollectionJoinerComp::GetLoginByUserUuid(const QByteArray& userUuid) const
+{
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_userCollectionCompPtr->GetObjectData(userUuid, dataPtr)){
+		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+		if (userInfoPtr != nullptr){
+			return userInfoPtr->GetId();
+		}
+	}
+
+	return QByteArray();
+}
+
 
 // reimplemented (icomp::CComponentBase)
 
@@ -42,38 +76,52 @@ void CLdapUserCollectionJoinerComp::OnComponentDestroyed()
 
 void CLdapUserCollectionJoinerComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
+	istd::CChangeGroup changeGroup(m_userCollectionCompPtr.GetPtr());
+
+	QByteArrayList actualLdapUserIds = m_ldapUserCollectionCompPtr->GetElementIds();
+
 	iprm::CParamsSet filterParam;
 	iprm::CParamsSet paramsSet;
-
-	iprm::CIdParam systemId;
-	systemId.SetId("Ldap");
-
+	iprm::CTextParam systemId;
+	systemId.SetText(*m_ldapSystemIdAttrPtr);
 	paramsSet.SetEditableParameter("SystemId", &systemId);
 	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
 
-	imtbase::IObjectCollection::Ids actualLdapUserIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+	imtbase::IObjectCollection::Ids storedLdapUserIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 
-	istd::CChangeGroup changeGroup(m_userCollectionCompPtr.GetPtr());
+	// Remove missing LDAP users from internal collection
+	for (const QByteArray& userUuid : storedLdapUserIds){
+		QByteArray login = GetLoginByUserUuid(userUuid);
+		if (!actualLdapUserIds.contains(login)){
+			m_userCollectionCompPtr->RemoveElement(userUuid);
+		}
+	}
 
-	QByteArrayList expectedLdapUserIds = m_ldapUserCollectionCompPtr->GetElementIds();
-
-	// Add new LDAP users
-	for (const QByteArray& userId : expectedLdapUserIds){
-		if (!actualLdapUserIds.contains(userId)){
+	for (const QByteArray& userId : actualLdapUserIds){
+		QByteArray objectId = GetUserUuidByLogin(userId);
+		if (objectId.isEmpty()){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_ldapUserCollectionCompPtr->GetObjectData(userId, dataPtr)){
 				const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 				if (userInfoPtr != nullptr){
-					m_userCollectionCompPtr->InsertNewObject("", "", "", userInfoPtr, userId);
+					m_userCollectionCompPtr->InsertNewObject("", "", "", userInfoPtr);
 				}
 			}
 		}
-	}
+		else{
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_userCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+				imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
+				if (userInfoPtr != nullptr){
+					imtauth::IUserInfo::SystemInfo systemInfo;
+					systemInfo.systemId = *m_ldapSystemIdAttrPtr;
+					systemInfo.systemName = *m_ldapSystemNameAttrPtr;
 
-	// Remove missing LDAP users
-	for (const QByteArray& userId : actualLdapUserIds){
-		if (!expectedLdapUserIds.contains(userId)){
-			m_userCollectionCompPtr->RemoveElement(userId);
+					if (userInfoPtr->AddToSystem(systemInfo)){
+						m_userCollectionCompPtr->SetObjectData(objectId, *userInfoPtr);
+					}
+				}
+			}
 		}
 	}
 }

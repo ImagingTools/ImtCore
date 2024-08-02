@@ -137,19 +137,38 @@ QDateTime CUserInfo::GetLastConnection() const
 }
 
 
-IUserInfo::SystemInfo CUserInfo::GetSystemInfo() const
+IUserInfo::SystemInfoList CUserInfo::GetSystemInfos() const
 {
-	return m_systemInfo;
+	return m_systemInfos;
 }
 
 
-void CUserInfo::SetSystemInfo(IUserInfo::SystemInfo systemInfo)
+bool CUserInfo::AddToSystem(SystemInfo systemInfo)
 {
-	if (m_systemInfo != systemInfo){
+	if (!m_systemInfos.contains(systemInfo)){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_systemInfo = systemInfo;
+		m_systemInfos << systemInfo;
+
+		return true;
 	}
+
+	return false;
+}
+
+
+bool CUserInfo::RemoveFromSystem(const QByteArray& systemId)
+{
+	for (const SystemInfo& systemInfo : m_systemInfos){
+		if (systemInfo.systemId == systemId){
+			istd::CChangeNotifier changeNotifier(this);
+			m_systemInfos.removeOne(systemInfo);
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 
@@ -188,16 +207,77 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 		retVal = retVal && archive.EndTag(lastConnectionTag);
 	}
 
-	if (imtCoreVersion >= 10541){
+	if (imtCoreVersion >= 10541 && imtCoreVersion <= 10570){
+		SystemInfo systemInfo;
+
+		if (archive.IsStoring() && m_systemInfos.count() > 0){
+			systemInfo = m_systemInfos[0];
+		}
+
 		iser::CArchiveTag systemIdTag("SystemId", "System-ID", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(systemIdTag);
-		retVal = retVal && archive.Process(m_systemInfo.systemId);
+		retVal = retVal && archive.Process(systemInfo.systemId);
 		retVal = retVal && archive.EndTag(systemIdTag);
 
 		iser::CArchiveTag systemNameTag("SystemName", "System Name", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(systemNameTag);
-		retVal = retVal && archive.Process(m_systemInfo.systemName);
+		retVal = retVal && archive.Process(systemInfo.systemName);
 		retVal = retVal && archive.EndTag(systemNameTag);
+
+		if (!archive.IsStoring()){
+			m_systemInfos << systemInfo;
+		}
+	}
+	else if (imtCoreVersion > 10570){
+		int count = m_systemInfos.count();
+
+		if (!archive.IsStoring()){
+			m_systemInfos.clear();
+			count = 0;
+		}
+
+		iser::CArchiveTag infosTag("SystemInfos", "System infos", iser::CArchiveTag::TT_MULTIPLE);
+		iser::CArchiveTag infoTag("SystemInfo", "System info", iser::CArchiveTag::TT_GROUP, &infosTag);
+
+		retVal = retVal && archive.BeginMultiTag(infosTag, infoTag, count);
+		for (int index = 0; index < count; index++){
+			retVal = retVal && archive.BeginTag(infoTag);
+
+			SystemInfo systemInfo;
+
+			if (archive.IsStoring()){
+				systemInfo = m_systemInfos[index];
+			}
+
+			iser::CArchiveTag systemIdTag("SystemId", "System-ID", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(systemIdTag);
+			retVal = retVal && archive.Process(systemInfo.systemId);
+			retVal = retVal && archive.EndTag(systemIdTag);
+
+			iser::CArchiveTag systemNameTag("SystemName", "System Name", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(systemNameTag);
+			retVal = retVal && archive.Process(systemInfo.systemName);
+			retVal = retVal && archive.EndTag(systemNameTag);
+
+			iser::CArchiveTag systemEnabledTag("Enabled", "System enabled", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(systemEnabledTag);
+			retVal = retVal && archive.Process(systemInfo.enabled);
+			retVal = retVal && archive.EndTag(systemEnabledTag);
+
+			retVal = retVal && archive.EndTag(infoTag);
+
+			if (retVal && !archive.IsStoring()){
+				m_systemInfos << systemInfo;
+			}
+		}
+
+		retVal = retVal && archive.EndTag(infosTag);
+	}
+	else{
+		if (!archive.IsStoring()){
+			SystemInfo systemInfo;
+			m_systemInfos << systemInfo;
+		}
 	}
 
 	return retVal;
@@ -206,7 +286,7 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 
 // reimplemented (iser::IChangeable)
 
-bool CUserInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
+bool CUserInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CUserInfo* sourcePtr = dynamic_cast<const CUserInfo*>(&object);
 	if (sourcePtr != nullptr){
@@ -217,7 +297,7 @@ bool CUserInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 		m_passwordHash = sourcePtr->m_passwordHash;
 		m_mail = sourcePtr->m_mail;
 		m_groupIds = sourcePtr->m_groupIds;
-		m_systemInfo = sourcePtr->m_systemInfo;
+		m_systemInfos = sourcePtr->m_systemInfos;
 
 		return true;
 	}
@@ -236,7 +316,7 @@ bool CUserInfo::IsEqual(const IChangeable& object) const
 		retVal = retVal && m_mail == sourcePtr->m_mail;
 		retVal = retVal && m_groupIds == sourcePtr->m_groupIds;
 		retVal = retVal && m_lastConnection == sourcePtr->m_lastConnection;
-		retVal = retVal && m_systemInfo == sourcePtr->m_systemInfo;
+		retVal = retVal && m_systemInfos == sourcePtr->m_systemInfos;
 
 		return retVal;
 	}

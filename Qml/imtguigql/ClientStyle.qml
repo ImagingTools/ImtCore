@@ -22,7 +22,6 @@ StyleBase {
             var queryFields = Gql.GqlObject("style");
             queryFields.InsertField("theme", theme);
             queryFields.InsertField("source", "source");
-            queryFields.InsertField("test", "test");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();

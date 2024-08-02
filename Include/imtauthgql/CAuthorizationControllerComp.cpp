@@ -3,7 +3,7 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
-#include <iprm/CIdParam.h>
+#include <iprm/CTextParam.h>
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
@@ -52,10 +52,10 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 	iprm::CParamsSet filterParam;
 	iprm::CParamsSet paramsSet;
 
-	iprm::CIdParam userId;
-	userId.SetId(login);
+	iprm::CTextParam userIdParam;
+	userIdParam.SetText(login);
 
-	paramsSet.SetEditableParameter("Id", &userId);
+	paramsSet.SetEditableParameter("Id", &userIdParam);
 	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
 
 	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
@@ -74,15 +74,22 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
-	imtauth::IUserInfo::SystemInfo systemInfo = userInfoPtr->GetSystemInfo();
+	bool ok = false;
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
+		if (systemInfo.enabled){
+			int index = m_systemIdsAttrPtr.FindValue(systemInfo.systemId);
+			Q_ASSERT_X(index >= 0, "CAuthorizationControllerComp::CreateInternalResponse", QString("System-ID '%1' cannot found").arg(systemInfo.systemId).toUtf8());
 
-	int index = m_systemIdsAttrPtr.FindValue(systemInfo.systemId);
-	Q_ASSERT_X(index >= 0, "CAuthorizationControllerComp::CreateInternalResponse", QString("System-ID '%1' cannot found").arg(systemInfo.systemId).toUtf8());
+			const imtauth::ICredentialController* credentialControllerPtr = m_credentialControllersCompPtr[index];
+			Q_ASSERT_X(credentialControllerPtr != nullptr, "CAuthorizationControllerComp::CreateInternalResponse", "Invalid credential controller");
 
-	const imtauth::ICredentialController* credentialControllerPtr = m_credentialControllersCompPtr[index];
-	Q_ASSERT_X(credentialControllerPtr != nullptr, "CAuthorizationControllerComp::CreateInternalResponse", "Invalid credential controller");
+			if (credentialControllerPtr->CheckCredential(login, password)){
+				ok = true;
+				break;
+			}
+		}
+	}
 
-	bool ok = credentialControllerPtr->CheckCredential(login, password);
 	if (!ok){
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}

@@ -51,7 +51,7 @@ Item {
     RemoteFileController {
         id: remoteFileController;
 
-        prefix: "/files";
+        prefix: "/files/";
 
         onFileUploaded: {
             ModalDialogManager.openDialog(messageErrorDialog, {"title" : qsTr("Restore successful"),"message": qsTr("Database restore was successful")});

@@ -3,12 +3,10 @@
 
 // ACF includes
 #include <iser/IObject.h>
-#include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtauth/IRoleInfoProvider.h>
 #include <imtlic/IFeatureInfoProvider.h>
-#include <imtlic/IProductLicensingInfo.h>
 
 
 namespace imtauth
@@ -73,7 +71,7 @@ public:
 	/**
 		Set permissions of role.
 	*/
-	virtual void SetLocalPermissions(const FeatureIds &permissions) = 0;
+	virtual void SetLocalPermissions(const FeatureIds& permissions) = 0;
 
 	/**
 		Get role permissions restrictions.
@@ -83,7 +81,7 @@ public:
 	/**
 		Set role permissions restrictions.
 	*/
-	virtual void SetProhibitions(const FeatureIds &prohibitions) = 0;
+	virtual void SetProhibitions(const FeatureIds& prohibitions) = 0;
 
 	/**
 		Get product ID.
