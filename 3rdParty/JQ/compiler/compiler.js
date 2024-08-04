@@ -1346,7 +1346,7 @@ for(let className in Singletons){
 }
 
 if(config.entry){
-    fullCode.push(`${config.entry.replaceAll('.qml', '')}.create(JQApplication.root)`)
+    fullCode.push(`window.addEventListener('load', ()=>{${config.entry.replaceAll('.qml', '')}.create(JQApplication.root)})`)
 }
 
 if(config.output) fs.writeFileSync(path.resolve(configDirPath, config.output), fullCode.join('\n'))

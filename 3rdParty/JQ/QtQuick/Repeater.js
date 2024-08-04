@@ -40,9 +40,14 @@ class Repeater extends Item {
 
     __updateView(){
         if(this.delegate && this.model){
+            this.__beginUpdateParent()
             for(let i = 0; i < this.model; i++){
-                this.__items.push(this.delegate.createObject(this.parent))
+                let item = this.delegate.createObject(this.parent)
+                this.__items.push(item)
+                item.__complete()
+                this.itemAdded(item)
             }
+            this.__endUpdateParent()
         }
     }
 }

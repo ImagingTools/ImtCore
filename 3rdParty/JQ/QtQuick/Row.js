@@ -21,6 +21,20 @@ class Row extends Item {
             gap: this.spacing + 'px'
         })
     }
+
+    __updateGeometry(){
+        let rect = this.__DOM.getBoundingClientRect()
+        this.width = rect.width
+        this.height = rect.height
+    }
+
+    __onUpdate(sender, options){
+        this.__updateGeometry()
+    }
+
+    __onUpdateAll(list){
+        this.__updateGeometry()
+    }
 }
 
 module.exports = Row

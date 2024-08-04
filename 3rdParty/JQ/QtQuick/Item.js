@@ -167,6 +167,7 @@ class Item extends QtObject {
 
     onVisibleChanged(){
         this.__checkVisibility()
+        this.__updateParent()
     }
 
     onWidthChanged(){
@@ -174,6 +175,7 @@ class Item extends QtObject {
         this.__setDOMStyle({
             width: this.width+'px'
         })
+        this.__updateParent()
     }
 
     onHeightChanged(){
@@ -181,17 +183,20 @@ class Item extends QtObject {
         this.__setDOMStyle({
             height: this.height+'px'
         })
+        this.__updateParent()
     }
 
     onRotationChanged(){
         this.__setDOMStyle({
             transform: `scale(${this.scale}) rotate(${this.rotation}deg)`
         })
+        this.__updateParent()
     }
     onScaleChanged(){
         this.__setDOMStyle({
             transform: `scale(${this.scale}) rotate(${this.rotation}deg)`
         })
+        this.__updateParent()
     }
     onClipChanged(){
         this.__setDOMStyle({

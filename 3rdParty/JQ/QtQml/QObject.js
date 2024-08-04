@@ -63,6 +63,53 @@ class QObject extends BaseObject {
         return true
     }
 
+    __update(sender, options){
+        if(!this.__updating){
+            this.__onUpdate(sender, options)
+        } else {
+            this.__updateList.push({
+                sender: sender,
+                options: options,
+            })
+        }
+    }
+
+    __updateParent(options){
+        if(this.parent){
+            this.parent.__update(this, options)
+        }
+    }
+
+    __onUpdate(sender, options){
+
+    }
+
+    __onUpdateAll(list){
+
+    }
+
+    __beginUpdate(){
+        this.__updating = true
+        this.__updateList = []
+    }
+    __endUpdate(){
+        delete this.__updating
+        this.__onUpdateAll(this.__updateList)
+        delete this.__updateList
+    }
+
+    __beginUpdateParent(){
+        if(this.parent){
+            this.parent.__beginUpdate()
+        }
+    }
+
+    __endUpdateParent(options){
+        if(this.parent){
+            this.parent.__endUpdate()
+        }
+    }
+
     setParent(parent){
         this.parent = parent
     }
