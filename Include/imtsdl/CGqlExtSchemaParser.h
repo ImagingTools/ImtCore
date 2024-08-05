@@ -42,6 +42,7 @@ public:
 
 protected:
 	virtual bool ProcessDocumentSchema();
+	bool ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& documentType);
 
 	// reimplemented (CGqlSchemaParser)
 	virtual bool ProcessCustomSection(const QString& sectionName) override;

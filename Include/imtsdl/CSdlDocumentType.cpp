@@ -57,6 +57,16 @@ void CSdlDocumentType::SetOperationsList(const QMap<OperationType, CSdlRequest>&
 	}
 }
 
+void CSdlDocumentType::AddOperation(OperationType type, const CSdlRequest& operation)
+{
+	Q_ASSERT(!m_operationsList.contains(type));
+
+	if (!m_operationsList.contains(type)){
+		istd::CChangeNotifier notifier(this);
+		m_operationsList.insert(type, operation);
+	}
+}
+
 
 SdlDocumentTypeList CSdlDocumentType::GetSubtypes() const
 {

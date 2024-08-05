@@ -42,6 +42,7 @@ public:
 
 	QMap<OperationType, CSdlRequest> GetOperationsList() const;
 	void SetOperationsList(const QMap<OperationType, CSdlRequest>& operationsList);
+	void AddOperation(OperationType type, const CSdlRequest& operation);
 
 	SdlDocumentTypeList GetSubtypes() const;
 	void SetSubtypes(const SdlDocumentTypeList& subtypes);
