@@ -55,6 +55,11 @@ void CMaskContainer::AddMask(IMask *mask, bool isInversion)
 	}
 }
 
+void CMaskContainer::Clear()
+{
+	m_maskList.clear();
+	m_maskListInv.clear();
+}
 
 void CMaskContainer::SetDocumentTable(IDocumentTable* documentTable)
 {

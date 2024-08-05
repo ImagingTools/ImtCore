@@ -29,6 +29,7 @@ public:
 	CMaskContainer(OperationType operationType);
 
 	void AddMask(IMask* mask, bool isInversion);
+	void Clear();
 	void SetDocumentTable(IDocumentTable* documentTable);
 	quint64 GetUnitCount();
 	QList<quint64> GetUnitPositions(quint64 offset = 0, int limit = -1);
