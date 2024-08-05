@@ -123,12 +123,11 @@ Rectangle{
                     color: !treeViewGql.hasSelection ? "transparent" : model.index == treeViewGql.selectedIndex ? treeViewGql.selectionColor: delegateMA.containsMouse ? treeViewGql.hoverColor : "transparent";
                 }
 
-                Rectangle{
+                Item{
                     anchors.left: parent.left;
                     anchors.leftMargin: model.Level__ !== undefined ? model.Level__ * treeViewGql.shift : 0;
                     width: list.delegateWidth;
                     height: parent.height;
-                    color: "transparent";
 
 
                     Button{
