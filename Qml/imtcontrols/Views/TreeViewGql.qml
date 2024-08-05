@@ -106,6 +106,10 @@ Rectangle{
                 opacity: model.Visible__;
                 property bool isOpen: model.IsOpen__ == undefined ? false : model.IsOpen__;
                 property int index: model.index;
+                property bool isSelected: model.index == treeViewGql.selectedIndex;
+                property bool isHovered: delegateMA.containsMouse;
+                property var selection_ : null;
+                property var hover_ : null;
 
                 Component.onCompleted: {
                     if(treeViewGql.hasAddDelegInfo){
@@ -113,15 +117,74 @@ Rectangle{
                     }
                 }
 
-                Rectangle{
-                    id: selectionRec;
-
-                    anchors.fill: parent;
-
-                    radius: treeViewGql.selectionRadius;
-                    opacity: treeViewGql.selectionOpacity;
-                    color: !treeViewGql.hasSelection ? "transparent" : model.index == treeViewGql.selectedIndex ? treeViewGql.selectionColor: delegateMA.containsMouse ? treeViewGql.hoverColor : "transparent";
+                onIsSelectedChanged: {
+                    if(treeViewGql.hasSelection){
+                        if(deleg.isSelected){
+                            if(deleg.hover_){
+                                deleg.hover_.destroy();
+                                deleg.hover_ = null;
+                            }
+                            if(!deleg.selection_){
+                                deleg.selection_ = selectionComp.createObject(deleg)
+                                deleg.selection_.z = -1;
+                            }
+                        }
+                        else {
+                            if(deleg.selection_){
+                                deleg.selection_.destroy();
+                                deleg.selection_ = null;
+                            }
+                        }
+                    }
                 }
+
+                onIsHoveredChanged: {
+                    if(treeViewGql.hasSelection && !deleg.isSelected){
+                        if(deleg.isHovered){
+                            if(!deleg.hover_){
+                                deleg.hover_ = hoverComp.createObject(deleg)
+                                deleg.hover_.z = -1;
+                            }
+                        }
+                        else {
+                            if(deleg.hover_){
+                                deleg.hover_.destroy();
+                                deleg.hover_ = null;
+                            }
+                        }
+                    }
+
+                }
+
+                Component{
+                    id: selectionComp;
+                    Rectangle{
+                        anchors.fill: parent;
+                        radius: treeViewGql.selectionRadius;
+                        opacity: treeViewGql.selectionOpacity;
+                        color: treeViewGql.selectionColor;
+                    }
+                }
+
+                Component{
+                    id: hoverComp;
+                    Rectangle{
+                        anchors.fill: parent;
+                        radius: treeViewGql.selectionRadius;
+                        opacity: treeViewGql.selectionOpacity;
+                        color: treeViewGql.hoverColor;
+                    }
+                }
+
+//                Rectangle{
+//                    id: selectionRec;
+
+//                    anchors.fill: parent;
+
+//                    radius: treeViewGql.selectionRadius;
+//                    opacity: treeViewGql.selectionOpacity;
+//                    color: !treeViewGql.hasSelection ? "transparent" : model.index == treeViewGql.selectedIndex ? treeViewGql.selectionColor: delegateMA.containsMouse ? treeViewGql.hoverColor : "transparent";
+//                }
 
                 Item{
                     anchors.left: parent.left;
