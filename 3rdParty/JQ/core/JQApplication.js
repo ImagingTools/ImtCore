@@ -95,6 +95,38 @@ module.exports = {
         })
 
         MouseController.init()
-    }
+    },
+
+    objectsAwaitingUpdate: new Set(),
+    updateLayers: [],
+
+    beginUpdate: function(){
+        this.updateLayers.push([])
+    },
+
+    updateLater(obj){
+        if(!obj) return
+
+        if(this.updateLayers.length){
+            if(!this.objectsAwaitingUpdate.has(obj)){
+                obj.__beginUpdate()
+                this.objectsAwaitingUpdate.add(obj)
+                this.updateLayers[this.updateLayers.length-1].push(obj)
+            }
+        } else {
+            obj.__beginUpdate()
+            obj.__endUpdate()
+        }
+    },
+
+    endUpdate: function(){
+        let layer = this.updateLayers.pop()
+
+        if(layer)
+        for(let obj of layer){
+            this.objectsAwaitingUpdate.delete(obj)
+            obj.__endUpdate()
+        }
+    },
 }
 

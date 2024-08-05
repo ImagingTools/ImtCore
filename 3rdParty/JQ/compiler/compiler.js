@@ -671,12 +671,12 @@ class Instruction {
                     }
                     
                     stat.value += ')'
-                    stat.value += '{'
+                    stat.value += '{try{JQApplication.beginUpdate();'
                     stat.local.push(local)
                     this.prepare(tree[3], stat)
                     let index = stat.local.indexOf(local)
                     if(index >= 0) stat.local.splice(index, 1)
-                    stat.value += '}'
+                    stat.value += '}finally{JQApplication.endUpdate()}}'
                     return stat
                 }
                 case 'object': {
@@ -969,7 +969,7 @@ class Instruction {
         
     }
 
-    toCode(isRoot = false){
+    toCode(isRoot = false, isComponent = false){
         let code = []
         let typeInfo = this.getTypeInfo(this.extends)
         let typeBase = typeInfo.type
@@ -1014,10 +1014,14 @@ class Instruction {
 
         code.push('static create(...args){')
         code.push('let self = super.create(...args)')
+
         if(isRoot) {
             code.push(`let __context={}`) // context !!!
             code.push(`let __updateList=[]`) // property update !!!
+        } else if(isComponent){
+            code.push(`let __updateList=[]`) // property update !!!
         }
+
         if(this.id) code.push(`__context['${this.id}']=self`)  // context !!!
 
         for(let assignProperty of this.assignProperties){
@@ -1037,7 +1041,7 @@ class Instruction {
         }
         for(let i = 0; i < this.children.length; i++){
             if(this.extends === 'Component'){
-                code.push(`self.component=` + this.children[i].toCode())
+                code.push(`self.component=` + this.children[i].toCode(false, true))
             } else {
                 if(typeBase === JQModules.QtQuick.Flickable){
                     code.push(`let child${i}=(` + this.children[i].toCode() + ').create(self.contentItem)')
@@ -1048,7 +1052,7 @@ class Instruction {
             }
             
         }
-        if(isRoot) {
+        if(isRoot || isComponent) {
             code.push(`for(let property of __updateList){property.__update()}`) // property update !!!
             code.push(`self.__complete()`)
         }
@@ -1091,11 +1095,11 @@ class Instruction {
             }
 
 
-            code.push(`${connectedSignal.slotName}(${connectedSignal.args.join(',')}){`)
+            code.push(`${connectedSignal.slotName}(${connectedSignal.args.join(',')}){try{JQApplication.beginUpdate();`)
             
             let stat = this.prepare(connectedSignal.source, {isCompute:false, thisKey: 'this', value:'', local:[connectedSignal.args]}) 
             code.push(stat.value)
-            code.push(`}`)
+            code.push(`}finally{JQApplication.endUpdate()}}`)
         }
 
         if(this.qmlFile.singleton && isRoot){

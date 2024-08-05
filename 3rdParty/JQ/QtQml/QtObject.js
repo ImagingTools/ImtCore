@@ -21,8 +21,12 @@ class QtObject extends QObject {
         'Component.destruction': {type:Signal, slotName:'Component.onDestruction', args:[]},
     })  
 
-    static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
+    static create(parent, model, ...args){
+        let proxy = super.create(parent, model, ...args)
+
+        if(model){
+            proxy.model = model
+        }
 
         if(parent){
             proxy.parent.children.push(proxy)

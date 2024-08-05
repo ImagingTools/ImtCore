@@ -7,6 +7,7 @@ const Signal = require("../QtQml/Signal")
 const KeyNavigation = require("../QtQml/KeyNavigation")
 const Anchors = require("../QtQml/Anchors")
 const AnchorLine = require("../QtQml/AnchorLine")
+const JQApplication = require("../core/JQApplication")
 
 class Item extends QtObject {
     static TopLeft = 0
@@ -101,8 +102,8 @@ class Item extends QtObject {
         'Keys.yesPressed': {type:Signal, slotName: 'Keys.onYesPressed', args: ['event'] },
     })
 
-    static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
+    static create(parent, model, ...args){
+        let proxy = super.create(parent, model, ...args)
         let self = proxy.__self 
 
         self.__DOM = self.__createDOM()
@@ -167,7 +168,7 @@ class Item extends QtObject {
 
     onVisibleChanged(){
         this.__checkVisibility()
-        this.__updateParent()
+        JQApplication.updateLater(this.parent)
     }
 
     onWidthChanged(){
@@ -175,7 +176,7 @@ class Item extends QtObject {
         this.__setDOMStyle({
             width: this.width+'px'
         })
-        this.__updateParent()
+        JQApplication.updateLater(this.parent)
     }
 
     onHeightChanged(){
@@ -183,20 +184,20 @@ class Item extends QtObject {
         this.__setDOMStyle({
             height: this.height+'px'
         })
-        this.__updateParent()
+        JQApplication.updateLater(this.parent)
     }
 
     onRotationChanged(){
         this.__setDOMStyle({
             transform: `scale(${this.scale}) rotate(${this.rotation}deg)`
         })
-        this.__updateParent()
+        JQApplication.updateLater(this.parent)
     }
     onScaleChanged(){
         this.__setDOMStyle({
             transform: `scale(${this.scale}) rotate(${this.rotation}deg)`
         })
-        this.__updateParent()
+        JQApplication.updateLater(this.parent)
     }
     onClipChanged(){
         this.__setDOMStyle({

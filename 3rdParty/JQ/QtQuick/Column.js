@@ -28,11 +28,7 @@ class Column extends Item {
         this.height = rect.height
     }
 
-    __onUpdate(sender, options){
-        this.__updateGeometry()
-    }
-
-    __onUpdateAll(list){
+    __endUpdate(...args){
         this.__updateGeometry()
     }
 }

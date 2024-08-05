@@ -15,8 +15,8 @@ class Gradient extends QtObject {
         orientationChanged: {type:Signal, slotName:'onOrientationChanged', args:[]},
     })
 
-    static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
+    static create(parent, model, ...args){
+        let proxy = super.create(parent, model, ...args)
         proxy.stops = []
 
         return proxy

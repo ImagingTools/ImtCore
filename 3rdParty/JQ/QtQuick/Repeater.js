@@ -2,6 +2,7 @@ const Item = require("./Item")
 const Var = require("../QtQml/Var")
 const Real = require("../QtQml/Real")
 const Signal = require("../QtQml/Signal")
+const JQApplication = require("../core/JQApplication")
 
 class Repeater extends Item {
     static meta = Object.assign({}, Item.meta, {
@@ -32,22 +33,38 @@ class Repeater extends Item {
 
     onModelChanged(){
         this.__updateView()
+        
+        if(typeof this.model === 'object'){
+            this.model.__addViewListener(this)
+        }
     }
 
     onDelegateChanged(){
         this.__updateView()
     }
 
-    __updateView(){
+    __updateView(options){
         if(this.delegate && this.model){
-            this.__beginUpdateParent()
-            for(let i = 0; i < this.model; i++){
-                let item = this.delegate.createObject(this.parent)
-                this.__items.push(item)
-                item.__complete()
-                this.itemAdded(item)
+            JQApplication.beginUpdate()
+            JQApplication.updateLater(this.parent)
+
+            if(typeof this.model === 'number'){
+                for(let i = 0; i < this.model; i++){
+                    let item = this.delegate.createObject(this.parent)
+                    this.__items.push(item)
+                    // item.__complete()
+                    this.itemAdded(item)
+                }
+            } else {
+                for(let i = 0; i < this.model.data.length; i++){
+                    let item = this.delegate.createObject(this.parent, this.model.data[i])
+                    this.__items.push(item)
+                    // item.__complete()
+                    this.itemAdded(item)
+                }
             }
-            this.__endUpdateParent()
+
+            JQApplication.endUpdate()
         }
     }
 }

@@ -18,8 +18,8 @@ class Rectangle extends Item {
         gradientChanged: {type:Signal, slotName:'onGradientChanged', args:[]},
     })
 
-    static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
+    static create(parent, model, ...args){
+        let proxy = super.create(parent, model, ...args)
         proxy.__DOM.classList.add('Rectangle')
 
         return proxy

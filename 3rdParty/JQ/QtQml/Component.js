@@ -10,8 +10,8 @@ class Component extends QQmlComponent {
         return proxy
     } 
 
-    createObject(parent, properties){
-        return this.component.create(parent)
+    createObject(parent, model){
+        return this.component.create(parent, model)
     }
 }
 

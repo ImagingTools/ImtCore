@@ -53,8 +53,8 @@ class Animation extends QtObject {
         finished: { type:Signal, slotName:'onFinished', args:[] },
     })
 
-    static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
+    static create(parent, model, ...args){
+        let proxy = super.create(parent, model, ...args)
 
         AnimationController.add(proxy)
 

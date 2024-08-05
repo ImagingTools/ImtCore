@@ -27,8 +27,8 @@ class Shortcut extends QtObject {
         activatedAmbiguously: { type:Signal, slotName:'onActivatedAmbiguously', args:[] },
     })
 
-    static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
+    static create(parent, model, ...args){
+        let proxy = super.create(parent, model, ...args)
         let self = proxy.__self 
 
         return proxy
