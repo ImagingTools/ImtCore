@@ -29,6 +29,9 @@ imt_core_upgrade_partitura("${CMAKE_CURRENT_LIST_DIR}/../..")
 
 message("ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
 
+if(NOT DEFINED BUILDDIR)
+	set(BUILDDIR "${CMAKE_CURRENT_LIST_DIR}/../../..")
+endif()
 
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
@@ -72,8 +75,7 @@ add_subdirectory("${IMPL_DIR}/SdlCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/Sdl
 add_dependencies(SdlCodeGenerator ImtSdlPck imtsdl)
 
 
-if(DEFINED IMT_BUILD_ONLYTOOLS AND NOT IMT_BUILD_ONLYTOOLS)
-
+if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 #-------- Include --------
 
 add_subdirectory("${INCLUDE_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtapp")
