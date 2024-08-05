@@ -17,8 +17,11 @@ public:
 
 protected:
 	virtual imtbase::CTreeItemModel* ListObjects(
-		const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual imtbase::CTreeItemModel* GetObject(
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 protected:
 	virtual imtbase::ITreeModelWrittable* CreateSdlItem(
