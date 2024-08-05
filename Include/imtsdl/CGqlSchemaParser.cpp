@@ -78,7 +78,7 @@ bool CGqlSchemaParser::ParseGqlSchema()
 	else if (keyword == m_keywordMap[KI_SUBSCRIPTION]){
 		retVal = retVal && ProcessSubscription();
 	}
-	else {
+	else if (!ProcessCustomSection(keyword)){
 		SendLogMessage(
 					istd::IInformationProvider::InformationCategory::IC_ERROR,
 					0,
@@ -469,6 +469,23 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 	while(foundDelimiter != '}');
 
 	return retVal;
+}
+
+
+bool CGqlSchemaParser::ProcessCustomSection(const QString& sectionName)
+{
+	QString errorString = QString("Schema error! Unsupported type '%1' at %2")
+							  .arg(sectionName, QString::number(m_lastReadLine + 1));
+
+	SendLogMessage(
+		istd::IInformationProvider::InformationCategory::IC_ERROR,
+		0,
+		errorString,
+		"ProcessCustomSection");
+
+	Q_ASSERT_X(false, __func__, errorString.toLocal8Bit());
+
+	return false;
 }
 
 

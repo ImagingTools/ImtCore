@@ -64,6 +64,13 @@ protected:
 	virtual bool ProcessValue(SdlFieldList& output, bool* endOfReadPtr);
 	virtual bool ProcessRequests(CSdlRequest::Type type);
 
+	/**
+		Processing Custom Sections
+		\param sectionName - name of a section
+		\warning Base implementation always returns \c false and generates an error
+	 */
+	virtual bool ProcessCustomSection(const QString& sectionName);
+
 
 	virtual bool ValidateSchema();
 

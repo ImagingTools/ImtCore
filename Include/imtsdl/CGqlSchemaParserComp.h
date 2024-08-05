@@ -13,7 +13,7 @@
 
 // imtsdl includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
-#include <imtsdl/CGqlSchemaParser.h>
+#include <imtsdl/CGqlExtSchemaParser.h>
 
 
 namespace imtsdl
@@ -21,13 +21,13 @@ namespace imtsdl
 
 
 class CGqlSchemaParserComp:
-			public ilog::TLoggerCompWrap<icomp::TMakeComponentWrap<CGqlSchemaParser>>,
+			public ilog::TLoggerCompWrap<icomp::TMakeComponentWrap<CGqlExtSchemaParser>>,
 			public iproc::TSyncProcessorWrap<iproc::IProcessor>
 {
 
 public:
 //	typedef icomp::CComponentBase BaseClass;
-	typedef ilog::TLoggerCompWrap<icomp::TMakeComponentWrap<CGqlSchemaParser>> BaseClass;
+	typedef ilog::TLoggerCompWrap<icomp::TMakeComponentWrap<CGqlExtSchemaParser>> BaseClass;
 	typedef iproc::TSyncProcessorWrap<iproc::IProcessor> BaseClass2;
 
 	I_BEGIN_COMPONENT(CGqlSchemaParserComp)

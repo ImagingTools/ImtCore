@@ -1,0 +1,245 @@
+#include <imtsdl/CSdlDocumentType.h>
+
+// Acf includes
+#include <istd/CChangeNotifier.h>
+#include <iser/CArchiveTag.h>
+#include <iser/IArchive.h>
+#include <iser/CPrimitiveTypesSerializer.h>
+
+
+namespace imtsdl
+{
+
+
+// public methods
+
+QString CSdlDocumentType::GetName() const
+{
+	return m_name;
+}
+
+
+void CSdlDocumentType::SetName(const QString& name)
+{
+	if (m_name != name){
+		istd::CChangeNotifier notifier(this);
+		m_name = name;
+	}
+}
+
+
+CSdlType CSdlDocumentType::GetReferenceType() const
+{
+	return m_referenceType;
+}
+
+
+void CSdlDocumentType::SetReferenceType(const CSdlType& referenceType)
+{
+	if (m_referenceType != referenceType){
+		istd::CChangeNotifier notifier(this);
+		m_referenceType = referenceType;
+	}
+}
+
+
+QMap<CSdlDocumentType::OperationType, CSdlRequest> CSdlDocumentType::GetOperationsList() const
+{
+	return m_operationsList;
+}
+
+
+void CSdlDocumentType::SetOperationsList(const QMap<OperationType, CSdlRequest>& operationsList)
+{
+	if (m_operationsList != operationsList){
+		istd::CChangeNotifier notifier(this);
+		m_operationsList = operationsList;
+	}
+}
+
+
+SdlDocumentTypeList CSdlDocumentType::GetSubtypes() const
+{
+	return m_subtypes;
+}
+
+
+void CSdlDocumentType::SetSubtypes(const SdlDocumentTypeList& subtypes)
+{
+	if (m_subtypes != subtypes){
+		istd::CChangeNotifier notifier(this);
+		m_subtypes = subtypes;
+	}
+}
+
+
+bool CSdlDocumentType::operator==(const CSdlDocumentType& other) const
+{
+	return
+		m_name == other.m_name &&
+		m_referenceType == other.m_referenceType &&
+		m_operationsList == other.m_operationsList;
+		// m_subtypes == other.m_subtypes;
+}
+
+
+
+// reimplemented(iser::ISerializable)
+
+bool CSdlDocumentType::Serialize(iser::IArchive& archive)
+{
+	bool retVal = true;
+
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
+
+	iser::CArchiveTag nameTag("Name", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(nameTag);
+	retVal = retVal && archive.Process(m_name);
+	retVal = retVal && archive.EndTag(nameTag);
+
+	iser::CArchiveTag referenceTag("Reference", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(referenceTag);
+	retVal = retVal && m_referenceType.Serialize(archive);
+	retVal = retVal && archive.EndTag(referenceTag);
+
+
+	iser::CArchiveTag outputTag("Operations", "", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(outputTag);
+	retVal = retVal && archive.BeginTag(outputTag);
+
+	retVal = retVal && SerializeOperationsList(archive, m_operationsList, "OperationList", "Operation", "Type", "Request");
+
+	retVal = retVal && SerializeDocumentTypeList(archive, m_subtypes, "SubtypeList", "Subtype");
+
+	return retVal;
+}
+
+
+// public static methods
+
+bool CSdlDocumentType::SerializeDocumentTypeList(
+			iser::IArchive& archive,
+			SdlDocumentTypeList& container,
+			const QByteArray& containerTagName,
+			const QByteArray& elementTagName)
+{
+	iser::CArchiveTag elementsTag(containerTagName, "List of elements", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag elementTag(elementTagName, "Single element", iser::CArchiveTag::TT_LEAF, &elementsTag);
+
+	bool retVal = true;
+
+	bool isStoring = archive.IsStoring();
+	int elementsCount = container.count();
+
+	retVal = retVal && archive.BeginMultiTag(elementsTag, elementTag, elementsCount);
+	if (!retVal){
+		return false;
+	}
+
+	if (isStoring){
+		for (int i = 0; i < elementsCount; ++i){
+			CSdlDocumentType sdlField = container[i];
+
+			retVal = retVal && archive.BeginTag(elementTag);
+			retVal = retVal && sdlField.Serialize(archive);
+			retVal = retVal && archive.EndTag(elementTag);
+		}
+	}
+	else{
+		container.clear();
+
+		for (int i = 0; i < elementsCount; ++i){
+			CSdlDocumentType sdlField;
+			retVal = retVal && archive.BeginTag(elementTag);
+			retVal = retVal && sdlField.Serialize(archive);
+			retVal = retVal && archive.EndTag(elementTag);
+
+			if (retVal){
+				container.push_back(sdlField);
+			}
+		}
+	}
+
+	retVal = retVal && archive.EndTag(elementsTag);
+
+	return retVal;
+}
+
+
+bool CSdlDocumentType::SerializeOperationsList(
+			iser::IArchive& archive,
+			QMap<OperationType, CSdlRequest>& container,
+			const QByteArray& containerTagName,
+			const QByteArray& elementTagName,
+			const QByteArray& keyTagId,
+			const QByteArray& valueTagId)
+{
+	bool retVal = true;
+
+	static iser::CArchiveTag parametersTag(containerTagName, "Container", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag parameterTag(elementTagName, "Single element", iser::CArchiveTag::TT_GROUP, &parametersTag, true);
+	static iser::CArchiveTag parameterKeyTag(keyTagId, "Key of parameter", iser::CArchiveTag::TT_LEAF, &parameterTag);
+	static iser::CArchiveTag parameterValueTag(valueTagId, "Value of parameter", iser::CArchiveTag::TT_WEAK, &parameterTag, true);
+
+	if (archive.IsStoring()){
+		int paramsCount = container.count();
+
+		retVal = retVal && archive.BeginMultiTag(parametersTag, parameterTag, paramsCount);
+
+		for (auto iterator = container.begin(); iterator != container.end(); ++iterator){
+			retVal = retVal && archive.BeginTag(parameterTag);
+
+			OperationType key = iterator.key();
+			retVal = retVal && archive.BeginTag(parameterKeyTag);
+			retVal = retVal && I_SERIALIZE_ENUM(OperationType, archive, key);
+			retVal = retVal && archive.EndTag(parameterKeyTag);
+
+			CSdlRequest value = iterator.value();
+			retVal = retVal && archive.BeginTag(parameterValueTag);
+			retVal = retVal && value.Serialize(archive);
+			retVal = retVal && archive.EndTag(parameterValueTag);
+
+			retVal = retVal && archive.EndTag(parameterTag);
+		}
+
+		retVal = retVal && archive.EndTag(parametersTag);
+	}
+	else{
+		int paramsCount = 0;
+		container.clear();
+
+		retVal = retVal && archive.BeginMultiTag(parametersTag, parameterTag, paramsCount);
+
+		if (!retVal){
+			return false;
+		}
+
+		for (int i = 0; i < paramsCount; ++i){
+			retVal = retVal && archive.BeginTag(parameterTag);
+
+			OperationType key;
+			retVal = retVal && archive.BeginTag(parameterKeyTag);
+			retVal = retVal && I_SERIALIZE_ENUM(OperationType, archive, key);
+			retVal = retVal && archive.EndTag(parameterKeyTag);
+
+			if (!retVal){
+				return false;
+			}
+
+			CSdlRequest value;
+			retVal = retVal && archive.BeginTag(parameterValueTag);
+			retVal = retVal && value.Serialize(archive);
+			retVal = retVal && archive.EndTag(parameterValueTag);
+
+			retVal = retVal && archive.EndTag(parameterTag);
+
+			container.insert(key, value);
+		}
+
+		retVal = retVal && archive.EndTag(parametersTag);
+	}
+
+	return retVal;
+}
+
+} // namespace imtsdl

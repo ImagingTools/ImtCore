@@ -71,6 +71,16 @@ void CSdlRequest::SetOutputArgument(const CSdlField& outputArgument)
 }
 
 
+bool CSdlRequest::operator==(const CSdlRequest& other) const
+{
+	return
+		m_type == other.m_type &&
+		m_name == other.m_name &&
+		m_inputArguments == other.m_inputArguments &&
+		m_outputArgument == other.m_outputArgument;
+}
+
+
 // reimplemented(iser::ISerializable)
 
 bool CSdlRequest::Serialize(iser::IArchive& archive)

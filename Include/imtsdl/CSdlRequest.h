@@ -44,6 +44,10 @@ public:
 	CSdlField GetOutputArgument() const;
 	void SetOutputArgument(const CSdlField& outputArgument);
 
+	// operators
+	bool operator==(const CSdlRequest& other) const;
+	bool operator!=(const CSdlRequest& other) const {return !(operator==(other));}
+
 	// reimplemented(iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
