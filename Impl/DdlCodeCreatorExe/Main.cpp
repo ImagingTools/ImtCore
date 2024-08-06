@@ -24,7 +24,6 @@ int main(int argc, char *argv[])
 	}
 	else {
 		argumentsParser->SetArguments(argc, argv);
-//		std::cout << "Creating new style for " << argumentsParser->GetProjectName().constData() << " from " << argumentsParser->GetDesignTokenFilePath().constData() << '\n';
 	}
 
 
