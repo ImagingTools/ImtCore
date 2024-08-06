@@ -16,7 +16,10 @@ Rectangle {
 
     onDocumentManagerChanged: {
         if (documentManager){
-//            documentManager.generateDocumentTitle = root.generateDocumentTitle;
+            if (Qt.platform.os === "web"){
+                documentManager.generateDocumentTitle = root.generateDocumentTitle;
+            }
+
             connections.target = documentManager;
             headersListView.model = documentManager.documentsModel;
         }

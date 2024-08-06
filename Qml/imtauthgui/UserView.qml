@@ -26,12 +26,15 @@ ViewBase {
     }
 
     onModelChanged: {
+        setBlockingUpdateModel(true);
         let systemInfosModel = container.model.getData("SystemInfos");
-        systemInfoTable.table.elements = systemInfosModel;
+        if (systemInfoTable.table){
+            systemInfoTable.table.elements = systemInfosModel;
 
-        if (systemInfoTable.table.elementsCount <= 1){
-            headerSystemInfoGroup.visible = false;
-            systemInfoGroup.visible = false;
+            if (systemInfoTable.table.elementsCount <= 1){
+                headerSystemInfoGroup.visible = false;
+                systemInfoGroup.visible = false;
+            }
         }
 
         for (let i = 0; i < systemInfosModel.getItemsCount(); i++){
@@ -42,7 +45,7 @@ ViewBase {
             }
         }
 
-        systemInfoTableConn.enabled = true;
+        setBlockingUpdateModel(false);
     }
 
     CustomScrollbar {
@@ -119,8 +122,6 @@ ViewBase {
 
                     name: qsTr("Username");
                     placeHolderText: qsTr("Enter the user name");
-                    description: qsTr();
-
                     readOnly: container.readOnly;
 
                     onEditingFinished: {
@@ -263,7 +264,9 @@ ViewBase {
                             headersModel2.setData("Id", "Name", index)
                             headersModel2.setData("Name", qsTr("System Name"), index)
 
-                            systemInfoTable.table.headers = headersModel2;
+                            if (systemInfoTable.table){
+                                systemInfoTable.table.headers = headersModel2;
+                            }
                         }
                     }
 
@@ -276,7 +279,6 @@ ViewBase {
                     Connections {
                         id: systemInfoTableConn;
                         target: systemInfoTable.table;
-                        enabled: false;
 
                         function onCheckedItemsChanged(){
                             container.doUpdateModel();
@@ -285,14 +287,16 @@ ViewBase {
                 }
 
                 function updateGui(){
-                    systemInfoTable.table.uncheckAll();
-                    let systemInfosModel = container.model.getData("SystemInfos");
-                    if (systemInfosModel){
-                        for (let i = 0; i < systemInfosModel.getItemsCount(); i++){
-                            let enabled = systemInfosModel.getData("Enabled", i);
+                    if (systemInfoTable.table){
+                        systemInfoTable.table.uncheckAll();
+                        let systemInfosModel = container.model.getData("SystemInfos");
+                        if (systemInfosModel){
+                            for (let i = 0; i < systemInfosModel.getItemsCount(); i++){
+                                let enabled = systemInfosModel.getData("Enabled", i);
 
-                            if (enabled){
-                                systemInfoTable.table.checkItem(i);
+                                if (enabled){
+                                    systemInfoTable.table.checkItem(i);
+                                }
                             }
                         }
                     }
@@ -350,9 +354,11 @@ ViewBase {
 
                         headersModel.refresh();
 
-                        rolesTable.table.checkable = true;
-                        rolesTable.table.headers = headersModel;
-                        rolesTable.table.elements = container.rolesModel;
+                        if (rolesTable.table){
+                            rolesTable.table.checkable = true;
+                            rolesTable.table.headers = headersModel;
+                            rolesTable.table.elements = container.rolesModel;
+                        }
                     }
 
                     Component.onCompleted: {
@@ -369,30 +375,34 @@ ViewBase {
                         }
                     }
 
-                    rolesTable.table.uncheckAll();
+                    if (rolesTable.table){
+                        rolesTable.table.uncheckAll();
 
-                    if (rolesTable.table.elements){
-                        for (let i = 0; i < rolesTable.table.elements.getItemsCount(); i++){
-                            let id = rolesTable.table.elements.getData("Id", i);
-                            if (roleIds.includes(id)){
-                                rolesTable.table.checkItem(i);
+                        if (rolesTable.table.elements){
+                            for (let i = 0; i < rolesTable.table.elements.getItemsCount(); i++){
+                                let id = rolesTable.table.elements.getData("Id", i);
+                                if (roleIds.includes(id)){
+                                    rolesTable.table.checkItem(i);
+                                }
                             }
                         }
                     }
                 }
 
                 function updateModel(){
-                    let selectedRoleIds = []
-                    let indexes = rolesTable.table.getCheckedItems();
-                    for (let index of indexes){
-                        let id = rolesTable.table.elements.getData("Id", index);
-                        selectedRoleIds.push(id);
+                    if (rolesTable.table){
+                        let selectedRoleIds = []
+                        let indexes = rolesTable.table.getCheckedItems();
+                        for (let index of indexes){
+                            let id = rolesTable.table.elements.getData("Id", index);
+                            selectedRoleIds.push(id);
+                        }
+
+                        selectedRoleIds.sort();
+
+                        let result = selectedRoleIds.join(';');
+                        container.model.setData("Roles", result);
                     }
-
-                    selectedRoleIds.sort();
-
-                    let result = selectedRoleIds.join(';');
-                    container.model.setData("Roles", result);
                 }
             }
 
@@ -415,7 +425,9 @@ ViewBase {
                     KeyNavigation.backtab: rolesTable;
 
                     Component.onCompleted: {
-                        groupsTable.table.readOnly = container.readOnly;
+                        if (groupsTable.table){
+                            groupsTable.table.readOnly = container.readOnly;
+                        }
                     }
 
                     Connections {
@@ -444,9 +456,11 @@ ViewBase {
 
                         groupsHeadersModel.refresh();
 
-                        groupsTable.table.checkable = true;
-                        groupsTable.table.headers = groupsHeadersModel;
-                        groupsTable.table.elements = container.groupsModel;
+                        if (groupsTable.table){
+                            groupsTable.table.checkable = true;
+                            groupsTable.table.headers = groupsHeadersModel;
+                            groupsTable.table.elements = container.groupsModel;
+                        }
                     }
 
                     Component.onCompleted: {
@@ -463,12 +477,14 @@ ViewBase {
                         }
                     }
 
-                    groupsTable.table.uncheckAll();
-                    if (groupsTable.table.elements){
-                        for (let i = 0; i < groupsTable.table.elements.getItemsCount(); i++){
-                            let id = groupsTable.table.elements.getData("Id", i);
-                            if (groupIds.includes(id)){
-                                groupsTable.table.checkItem(i);
+                    if (groupsTable.table){
+                        groupsTable.table.uncheckAll();
+                        if (groupsTable.table.elements){
+                            for (let i = 0; i < groupsTable.table.elements.getItemsCount(); i++){
+                                let id = groupsTable.table.elements.getData("Id", i);
+                                if (groupIds.includes(id)){
+                                    groupsTable.table.checkItem(i);
+                                }
                             }
                         }
                     }
@@ -477,15 +493,17 @@ ViewBase {
                 function updateModel(){
                     let selectedGroupIds = []
 
-                    let indexes = groupsTable.table.getCheckedItems();
-                    for (let index of indexes){
-                        let id = groupsTable.table.elements.getData("Id", index);
-                        selectedGroupIds.push(id);
+                    if (groupsTable.table){
+                        let indexes = groupsTable.table.getCheckedItems();
+                        for (let index of indexes){
+                            let id = groupsTable.table.elements.getData("Id", index);
+                            selectedGroupIds.push(id);
+                        }
+
+                        selectedGroupIds.sort();
+
+                        container.model.setData("Groups", selectedGroupIds.join(';'));
                     }
-
-                    selectedGroupIds.sort();
-
-                    container.model.setData("Groups", selectedGroupIds.join(';'));
                 }
             }
         }
