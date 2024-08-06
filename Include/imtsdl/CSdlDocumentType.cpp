@@ -83,13 +83,24 @@ void CSdlDocumentType::SetSubtypes(const SdlDocumentTypeList& subtypes)
 }
 
 
+void CSdlDocumentType::AddSubtype(const CSdlDocumentType& subtype)
+{
+	Q_ASSERT(!m_subtypes.contains(subtype));
+
+	if (!m_subtypes.contains(subtype)){
+		istd::CChangeNotifier notifier(this);
+		m_subtypes << subtype;
+	}
+}
+
+
 bool CSdlDocumentType::operator==(const CSdlDocumentType& other) const
 {
 	return
 		m_name == other.m_name &&
 		m_referenceType == other.m_referenceType &&
-		m_operationsList == other.m_operationsList;
-		// m_subtypes == other.m_subtypes;
+		m_operationsList == other.m_operationsList &&
+		m_subtypes == other.m_subtypes;
 }
 
 

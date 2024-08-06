@@ -76,6 +76,7 @@ bool CGqlExtSchemaParser::ProcessDocumentSchema()
 	return retVal;
 }
 
+
 bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& documentType)
 {
 	bool retVal = true;
@@ -84,7 +85,7 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 		QByteArray keyword;
 
 		char foundDelimiter = ' ';
-		retVal = retVal && MoveToNextReadableSymbol() && ReadToDelimeter(":{}", keyword, &foundDelimiter);
+		retVal = retVal && MoveToNextReadableSymbol() && ReadToDelimeterOrSpace(":{}", keyword, &foundDelimiter);
 
 		// check if we at end of reading
 		if (foundDelimiter == '}'){
@@ -111,15 +112,19 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 		}
 		// extract operations
 		else if (keyword == QByteArrayLiteral("operations")){
-
 			while (!m_stream.atEnd()) {
 				QByteArray operationTypeId;
-				retVal = retVal && ReadToDelimeter(":}", operationTypeId, &foundDelimiter);
+				retVal = retVal && ReadToDelimeter(":{}", operationTypeId, &foundDelimiter);
 				operationTypeId = operationTypeId.trimmed();
 
 				// check if we at end of operations directive
 				if (foundDelimiter == '}'){
 					break;
+				}
+
+				if (foundDelimiter == '{'){
+					retVal = retVal && MoveToNextReadableSymbol(&foundDelimiter);
+					retVal = retVal && ReadToDelimeter(":{}", operationTypeId, &foundDelimiter);
 				}
 
 				CSdlDocumentType::OperationType operationType = CSdlDocumentType::OT_LIST;
@@ -144,6 +149,18 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 					return false;
 				}
 				documentType.AddOperation(operationType, *foundIterator);
+			}
+		}
+		// extract subtypes
+		else if (keyword == QByteArrayLiteral("subtype")){
+			QByteArray subtypeName;
+			retVal = retVal && ReadToDelimeter("{", subtypeName);
+			CSdlDocumentType documentSubtype;
+			documentType.SetName(subtypeName.trimmed());
+
+			retVal = retVal && ExtractDocumentTypeFromCurrentEntry(documentSubtype);
+			if (retVal){
+				documentType.AddSubtype(documentSubtype);
 			}
 		}
 		else {

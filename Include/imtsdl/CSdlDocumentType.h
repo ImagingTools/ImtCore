@@ -46,6 +46,7 @@ public:
 
 	SdlDocumentTypeList GetSubtypes() const;
 	void SetSubtypes(const SdlDocumentTypeList& subtypes);
+	void AddSubtype(const CSdlDocumentType& subtype);
 
 	// operators
 	bool operator==(const CSdlDocumentType& other) const;
