@@ -34,7 +34,7 @@ PageContainer {
     }
 
     function checkCreation(){
-        if (visible && !startItemIsCreated()){
+        if (!startItemIsCreated()){
             createStartItemComp();
         }
     }

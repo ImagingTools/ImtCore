@@ -40,8 +40,6 @@ TextInputElementView {
         let tempText = value.toString()
 
         text = tempText.replace(".", decimal);
-
-        console.log("Debug Value Changed", tempText, text, value, decimal)
     }
 
     Component.onCompleted: {

@@ -15,14 +15,20 @@ namespace imtgql
 
 imtbase::CTreeItemModel* CGqlSearchControllerComp::CreateInternalResponse(
 			const CGqlRequest& gqlRequest,
-			QString& /*errorMessage*/) const
+			QString& errorMessage) const
 {
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
-	if (inputParamPtr == nullptr){
+	if (!m_optionListCompPtr.IsValid()){
+		errorMessage = QString("CGqlSearchControllerComp attribute 'm_optionListCompPtr' was not set");
+		SendErrorMessage(0, errorMessage, "imtgql::CGqlSearchControllerComp");
+
 		return nullptr;
 	}
 
-	if (!m_optionListCompPtr.IsValid()){
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	if (inputParamPtr == nullptr){
+		errorMessage = QString("GraphQL input params is invalid");
+		SendErrorMessage(0, errorMessage, "imtgql::CGqlSearchControllerComp");
+
 		return nullptr;
 	}
 

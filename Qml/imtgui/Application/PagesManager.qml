@@ -83,6 +83,8 @@ Item {
                 id: loader;
                 anchors.fill: parent;
                 onLoaded: {
+                    console.log("Page onLoaded", item);
+
                     if (item.pageId !== undefined){
                         item.pageId = model.Id;
                     }
@@ -104,7 +106,7 @@ Item {
 
             function load(){
                 if (pagesDeleg.visible || !container.loadByClick){
-                    if (loader){
+                    if (loader && !loader.item){
                         loader.source = model.Source;
                     }
                 }

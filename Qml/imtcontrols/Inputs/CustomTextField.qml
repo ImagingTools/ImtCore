@@ -195,12 +195,7 @@ FocusScope {
         }
 
         onAcceptableInputChanged: {
-            if (textField.acceptableInput){
-                containerTextField.borderColor = Style.iconColorOnSelected;
-            }
-            else{
-                containerTextField.borderColor = Style.errorTextColor;
-            }
+            console.log("onAcceptableInputChanged", acceptableInput);
         }
 
         onEditingFinished: {

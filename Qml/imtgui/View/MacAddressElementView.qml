@@ -37,16 +37,21 @@ TextInputElementView {
 
         if (rootElement.text.length == 0){
             rootElement.borderColor = Style.iconColorOnSelected
+            rootElement.acceptableInput = true;
         }
         else if (rootElement.text.length < rootElement.maximumLength){
             rootElement.borderColor = Style.errorTextColor;
             rootElement.bottomComp = errorComp1;
+
+            rootElement.acceptableInput = false;
         }
         else{
             let isValid = macAddressValidator.isValid(rootElement.text);
 
             rootElement.borderColor = isValid ? Style.iconColorOnSelected : Style.errorTextColor;
             rootElement.bottomComp = isValid ? undefined : errorComp2;
+
+            rootElement.acceptableInput = isValid;
         }
     }
 

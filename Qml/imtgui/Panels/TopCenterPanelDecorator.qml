@@ -29,6 +29,7 @@ DecoratorBase {
         function onLogoutSignal(){
             topCenterPanelDecorator.canSearch = false;
             topCenterPanelDecorator.visible = topCenterPanelDecorator.canSearch;
+            tfc.text = "";
         }
     }
 

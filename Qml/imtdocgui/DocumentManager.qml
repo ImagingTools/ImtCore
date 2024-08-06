@@ -772,25 +772,25 @@ QtObject {
     property QtObject internal: QtObject {
         function getSingleDocumentData(index)
         {
-            if (index < 0 || index >= internal.m_documentInfos.length){
+            if (index < 0 || index >= m_documentInfos.length){
                 return null;
             }
 
-            return internal.m_documentInfos[index];
+            return m_documentInfos[index];
         }
 
         function getDocumentInfoFromView(view)
         {
             let documentsCount = documentManager.getDocumentsCount();
             for (let documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
-                let info = internal.getSingleDocumentData(documentIndex);
+                let info = getSingleDocumentData(documentIndex);
 
                 for (let viewIndex = 0; viewIndex < documentsCount; ++viewIndex){
 
                 }
             }
 
-            return internal.m_activeViewPtr[index];
+            return m_activeViewPtr[index];
         }
 
         property var m_registeredView: ({});
