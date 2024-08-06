@@ -759,13 +759,13 @@ CFileRepositoryComp::DataPtr CFileRepositoryComp::CreateObjectFromFile(const QSt
 }
 
 
-bool CFileRepositoryComp::WriteItemInfo(const CFileCollectionItem& repositoryItem) const
+bool CFileRepositoryComp::WriteItemInfo(const CFileCollectionItem& /*repositoryItem*/) const
 {
 	return false;
 }
 
 
-bool CFileRepositoryComp::WriteFileMetaInfo(const idoc::IDocumentMetaInfo& metaInfo) const
+bool CFileRepositoryComp::WriteFileMetaInfo(const idoc::IDocumentMetaInfo& /*metaInfo*/) const
 {
 	return false;
 }

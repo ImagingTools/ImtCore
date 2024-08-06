@@ -208,11 +208,11 @@ bool CSdlProcessArgumentsParserComp::IsModificatorEnabled(const QString& modific
 	// maybe modificators provided with option (i.e. contains : ) e.g. Json:Compact
 	if (!retVal){
 		static QRegularExpression regExp("^(.+)\\:");
-		for (const QString& modificatorName: std::as_const(m_usedModificators)){
-			QRegularExpressionMatch match = regExp.match(modificatorName);
+		for (const QString& modificator: std::as_const(m_usedModificators)){
+			QRegularExpressionMatch match = regExp.match(modificator);
 			if (match.hasMatch()){
 				const QString clearVal = match.capturedTexts().constLast();
-				if (modificatorName == clearVal){
+				if (modificator == clearVal){
 					return true;
 				}
 			}

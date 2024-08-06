@@ -56,6 +56,7 @@ cppSdlCompiler$${TARGET}.variable_out = SOURCES
 cppSdlCompiler$${TARGET}.dependency_type = TYPE_C
 cppSdlCompiler$${TARGET}.depends = $$SDL_GENERATOR_SCHEME_PATH
 QMAKE_EXTRA_COMPILERS += cppSdlCompiler$${TARGET}
+GENERATED_SOURCES += $${SDL_HEADER_JOINED_FILE_PATH} $${SDL_SOURCE_JOINED_FILE_PATH}
 
 
 #QML

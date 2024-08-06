@@ -59,12 +59,12 @@ void CPopupControllerComp::ClosePopup(const QByteArray& popupId)
 }
 
 
-void CPopupControllerComp::RegisterEventHandler(IPopupEventHandler* handlerPtr)
+void CPopupControllerComp::RegisterEventHandler(IPopupEventHandler* /*handlerPtr*/)
 {
 }
 
 
-void CPopupControllerComp::UnRegisterEventHandler(IPopupEventHandler* handlerPtr)
+void CPopupControllerComp::UnRegisterEventHandler(IPopupEventHandler* /*handlerPtr*/)
 {
 }
 
