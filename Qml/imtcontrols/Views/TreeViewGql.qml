@@ -176,78 +176,63 @@ Rectangle{
                     }
                 }
 
-//                Rectangle{
-//                    id: selectionRec;
-
-//                    anchors.fill: parent;
-
-//                    radius: treeViewGql.selectionRadius;
-//                    opacity: treeViewGql.selectionOpacity;
-//                    color: !treeViewGql.hasSelection ? "transparent" : model.index == treeViewGql.selectedIndex ? treeViewGql.selectionColor: delegateMA.containsMouse ? treeViewGql.hoverColor : "transparent";
-//                }
-
                 Item{
+                    id: delegateContainer;
+
                     anchors.left: parent.left;
                     anchors.leftMargin: model.Level__ !== undefined ? model.Level__ * treeViewGql.shift : 0;
                     width: list.delegateWidth;
                     height: parent.height;
 
+                    function openButtonClicked(){
+                        if(model.HasChildren__){
+                            if(!deleg.isOpen){
+                                if(!model.HasBranch__){
+                                    treeViewGql.model.setData("HasBranch__", true, model.index);
+                                    treeViewGql.requestSignal(model.index)
+                                }
+                                else {
+                                    treeViewGql.setVisibleElements(true, model.index)
+                                }
+                                treeViewGql.model.setData("IsOpen__", true, model.index);
+                                treeViewGql.model.setData("OpenState__", 1, model.index);
 
-                    Button{
+                                treeViewGql.openBranch(model.index)
+                                treeViewGql.openButtonClicked(model.index);
+                            }
+                            else if(deleg.isOpen){
+                                //console.log(model.ChildrenCount__, treeViewGql._maxCountToClose)
+                                let count_ = treeViewGql.getVisibleCountInBranch(model.index);
+                                //let count_ = model.ChildrenCount__;
+                                if(count_ <= treeViewGql._maxCountToClose){
+                                    treeViewGql.model.setData("IsOpen__", false, model.index);
+                                    treeViewGql.model.setData("OpenState__", 0, model.index);
+                                    treeViewGql.setVisibleElements(false, model.index)
+                                    treeViewGql.closeBranch(model.index)
+                                }
+                                else {
+                                    treeViewGql.deleteBranch(model.index);
+                                    treeViewGql.closeBranch(model.index);
+                                }
+                            }
+                        }
+                    }
+
+                    Image{
                         id: openButton;
 
                         anchors.verticalCenter: parent.verticalCenter;
                         anchors.left: parent.left;
                         anchors.leftMargin: 8;
 
+                        visible: model.HasChildren__ == undefined ? false : model.HasChildren__;
                         width: 16;
                         height: width;
-
-                        visible: model.HasChildren__ == undefined ? false : model.HasChildren__;
-                        enabled: visible;
-
+                        sourceSize.width: width;
+                        sourceSize.height: height;
+                        source: "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
                         property string imageName: deleg.isOpen ? "Icons/Down" : "Icons/Right";
-                        iconSource:  "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
 
-                        decorator: Component { ButtonDecorator{
-                                color: "transparent";
-                                border.color: "transparent";
-                            }}
-
-                        onClicked: {
-                            if(model.HasChildren__){
-                                if(!deleg.isOpen){
-                                    if(!model.HasBranch__){
-                                        treeViewGql.model.setData("HasBranch__", true, model.index);
-                                        treeViewGql.requestSignal(model.index)
-                                    }
-                                    else {
-                                        treeViewGql.setVisibleElements(true, model.index)
-                                    }
-                                    treeViewGql.model.setData("IsOpen__", true, model.index);
-                                    treeViewGql.model.setData("OpenState__", 1, model.index);
-
-                                    treeViewGql.openBranch(model.index)
-                                    treeViewGql.openButtonClicked(model.index);
-                                }
-                                else if(deleg.isOpen){
-                                    //console.log(model.ChildrenCount__, treeViewGql._maxCountToClose)
-                                    let count_ = treeViewGql.getVisibleCountInBranch(model.index);
-                                    //let count_ = model.ChildrenCount__;
-                                    if(count_ <= treeViewGql._maxCountToClose){
-                                        treeViewGql.model.setData("IsOpen__", false, model.index);
-                                        treeViewGql.model.setData("OpenState__", 0, model.index);
-                                        treeViewGql.setVisibleElements(false, model.index)
-                                        treeViewGql.closeBranch(model.index)
-                                    }
-                                    else {
-                                        treeViewGql.deleteBranch(model.index);
-                                        treeViewGql.closeBranch(model.index);
-                                    }
-                                }
-                            }
-
-                        }
                     }
 
                     Image{
@@ -280,36 +265,38 @@ Rectangle{
                         text: model[treeViewGql.nameId] !== undefined ? model[treeViewGql.nameId] : "";
                     }
 
-
-
                     MouseArea{
                         id: delegateMA;
 
-                        anchors.top: parent.top;
-                        anchors.bottom: parent.bottom;
-                        anchors.right: parent.right;
-                        anchors.left: folderImage.left;
+                        anchors.fill: parent;
 
                         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
                         hoverEnabled: visible;
                         cursorShape: Qt.PointingHandCursor;
                         onClicked: {
-                            if (treeViewGql.selectedIndex !== model.index ){
-                                treeViewGql.selectedIndex = model.index
-                                treeViewGql.selectionChanged()
+                            if(openButton.visible && mouse.x < openButton.width + 8){
+                                delegateContainer.openButtonClicked();
                             }
-                            treeViewGql.clicked(model.index);
+                            else {
+                                if (treeViewGql.selectedIndex !== model.index ){
+                                    treeViewGql.selectedIndex = model.index
+                                    treeViewGql.selectionChanged()
+                                }
+                                treeViewGql.clicked(model.index);
 
-                            if (mouse.button === Qt.RightButton) {
-                                console.log("TreeViewGqlDelegate onRightButtonMouseClicked");
+                                if (mouse.button === Qt.RightButton) {
+                                    console.log("TreeViewGqlDelegate onRightButtonMouseClicked");
 
-                                var point = mapToItem(null, this.mouseX, this.mouseY);
-                                treeViewGql.rightButtonMouseClicked(point.x, point.y);
+                                    var point = mapToItem(null, this.mouseX, this.mouseY);
+                                    treeViewGql.rightButtonMouseClicked(point.x, point.y);
+                                }
                             }
                         }
                         onDoubleClicked: {
-                            treeViewGql.doubleClicked(model.index);
+                            if(mouse.x > openButton.width + 8){
+                                treeViewGql.doubleClicked(model.index);
+                            }
                         }
                     }
                 }
