@@ -38,34 +38,39 @@ bool CGqlExtSchemaParser::ProcessDocumentSchema()
 	bool retVal = true;
 
 	QByteArray devNull;
-	retVal = ReadToDelimeter("{",devNull);
+	retVal = ReadToDelimeter("{",devNull) && MoveToNextReadableSymbol();
 	if (!retVal){
 		I_CRITICAL();
 
 		return false;
 	}
 
-	bool atEnd = false;
-
 	// process types
-	while (!atEnd){
-		retVal = retVal && MoveAfterWord(QStringLiteral("type")) && MoveToNextReadableSymbol();
+	while (true){
 
+		char foundDelimiter = ' ';
 		QByteArray typeName;
+		retVal = retVal && ReadToDelimeterOrSpace("{", typeName);
+		if (typeName.trimmed() != QByteArrayLiteral("type")){
+			I_CRITICAL();
+
+			return false;
+		}
+
 		// brgin type entry
 		retVal = retVal && ReadToDelimeter("{", typeName);
 
 		CSdlDocumentType documentType;
 		documentType.SetName(typeName.trimmed());
 		retVal = retVal && ExtractDocumentTypeFromCurrentEntry(documentType);
+		m_documentTypes << documentType;
 
-		// end type entry
-		retVal = retVal && ReadToDelimeter("}", typeName);
-
-		char foundDelimiter = ' ';
 		retVal = retVal && MoveToNextReadableSymbol(&foundDelimiter);
 
-		atEnd = bool(foundDelimiter == '}' || !retVal);
+		// check if we at and of section
+		if (foundDelimiter == '}' || !retVal){
+			break;
+		}
 	}
 
 	return retVal;
@@ -75,59 +80,77 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 {
 	bool retVal = true;
 
-	QByteArray keyword;
-	retVal = retVal && MoveToNextReadableSymbol() && ReadToDelimeter(":{}", keyword);
-	keyword = keyword.trimmed();
+	while (!m_stream.atEnd()){
+		QByteArray keyword;
 
-	// fill reference type
-	if (keyword == QByteArrayLiteral("ref")){
-		QByteArray typeRefName;
-		retVal = retVal && ReadToDelimeterOrSpace("", typeRefName);
-		auto foundIterator = std::find_if(m_sdlTypes.cbegin(), m_sdlTypes.cend(), [&typeRefName](const CSdlType& type){
-			return (type.GetName() == typeRefName);
-		});
-		if (foundIterator == m_sdlTypes.cend()){
-			I_CRITICAL();
-
-			return false;
-		}
-		documentType.SetReferenceType(*foundIterator);
-	}
-	// extract operations
-	else if (keyword == QByteArrayLiteral("operations")){
 		char foundDelimiter = ' ';
-		retVal = retVal && MoveToNextReadableSymbol(&foundDelimiter) && MoveToNextReadableSymbol();
-		Q_ASSERT(foundDelimiter == '{');
+		retVal = retVal && MoveToNextReadableSymbol() && ReadToDelimeter(":{}", keyword, &foundDelimiter);
 
-		QByteArray operationTypeId;
-		retVal = retVal && ReadToDelimeter(":", operationTypeId);
-		operationTypeId = operationTypeId.trimmed();
-		CSdlDocumentType::OperationType operationType = CSdlDocumentType::OT_LIST;
-		bool isOperationValid = CSdlDocumentType::FromString(operationTypeId, operationType);
-		if (!isOperationValid){
+		// check if we at end of reading
+		if (foundDelimiter == '}'){
+			break;
+		}
+
+		keyword = keyword.trimmed();
+
+		// fill reference type
+		if (keyword == QByteArrayLiteral("ref")){
+			QByteArray typeRefName;
+			retVal = retVal && MoveToNextReadableSymbol() && ReadToDelimeterOrSpace("", typeRefName);
+			Q_ASSERT(!typeRefName.isEmpty());
+
+			auto foundIterator = std::find_if(m_sdlTypes.cbegin(), m_sdlTypes.cend(), [&typeRefName](const CSdlType& type){
+				return (type.GetName() == typeRefName);
+			});
+			if (foundIterator == m_sdlTypes.cend()){
+				I_CRITICAL();
+
+				return false;
+			}
+			documentType.SetReferenceType(*foundIterator);
+		}
+		// extract operations
+		else if (keyword == QByteArrayLiteral("operations")){
+
+			while (!m_stream.atEnd()) {
+				QByteArray operationTypeId;
+				retVal = retVal && ReadToDelimeter(":}", operationTypeId, &foundDelimiter);
+				operationTypeId = operationTypeId.trimmed();
+
+				// check if we at end of operations directive
+				if (foundDelimiter == '}'){
+					break;
+				}
+
+				CSdlDocumentType::OperationType operationType = CSdlDocumentType::OT_LIST;
+				bool isOperationValid = CSdlDocumentType::FromString(operationTypeId, operationType);
+				if (!isOperationValid){
+					I_CRITICAL();
+
+					return false;
+				}
+
+				QByteArray requestName;
+				retVal = retVal && MoveToNextReadableSymbol();
+				retVal = retVal && ReadToDelimeterOrSpace("}", requestName);
+				requestName = requestName.trimmed();
+
+				auto foundIterator = std::find_if(m_requests.cbegin(), m_requests.cend(), [&requestName](const CSdlRequest& request){
+					return (request.GetName() == requestName);
+				});
+				if (foundIterator == m_requests.cend()){
+					I_CRITICAL();
+
+					return false;
+				}
+				documentType.AddOperation(operationType, *foundIterator);
+			}
+		}
+		else {
 			I_CRITICAL();
 
 			return false;
 		}
-
-		QByteArray requestName;
-		retVal = retVal && ReadToDelimeterOrSpace("}", requestName);
-		requestName = requestName.trimmed();
-
-		auto foundIterator = std::find_if(m_requests.cbegin(), m_requests.cend(), [&requestName](const CSdlRequest& request){
-			return (request.GetName() == requestName);
-		});
-		if (foundIterator == m_requests.cend()){
-			I_CRITICAL();
-
-			return false;
-		}
-		documentType.AddOperation(operationType, *foundIterator);
-	}
-	else {
-		I_CRITICAL();
-
-		return false;
 	}
 
 	return retVal;
