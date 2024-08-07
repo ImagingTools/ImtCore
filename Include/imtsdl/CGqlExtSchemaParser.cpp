@@ -111,7 +111,7 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 				SendLogMessage(
 							istd::IInformationProvider::IC_ERROR,
 							0,
-							QString("UUnable to find type '%1' at %2").arg(typeRefName, QString::number(m_lastReadLine + 1)),
+							QString("Unable to find type '%1' at %2").arg(typeRefName, QString::number(m_lastReadLine + 1)),
 							__func__);
 				I_CRITICAL();
 
@@ -158,6 +158,11 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 					return (request.GetName() == requestName);
 				});
 				if (foundIterator == m_requests.cend()){
+					SendLogMessage(
+								istd::IInformationProvider::IC_ERROR,
+								0,
+								QString("Unable to find request '%1' at %2").arg(requestName, QString::number(m_lastReadLine + 1)),
+								__func__);
 					I_CRITICAL();
 
 					return false;
@@ -179,10 +184,10 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 		}
 		else {
 			SendLogMessage(
-				istd::IInformationProvider::IC_ERROR,
-				0,
-				QString("Unexpected directive '%1' at %2").arg(keyword, QString::number(m_lastReadLine + 1)),
-				__func__);
+						istd::IInformationProvider::IC_ERROR,
+						0,
+						QString("Unexpected directive '%1' at %2").arg(keyword, QString::number(m_lastReadLine + 1)),
+						__func__);
 			I_CRITICAL();
 
 			return false;
