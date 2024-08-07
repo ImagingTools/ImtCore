@@ -11,7 +11,7 @@ ControlBase {
     property string text: "";
 
     property int componentWidth: 200;
-    property int tooltipWidth: customTooltip.fitToTextWidth ? forWidthText.width + 2*customTooltip.textMargin : Math.min(customTooltip.componentWidth, forWidthText.width + 2*customTooltip.textMargin);
+    property int tooltipWidth: customTooltip.fitToTextWidth ? forWidthText.width + 2.5*customTooltip.textMargin : Math.min(customTooltip.componentWidth, forWidthText.width + 2.5*customTooltip.textMargin);
 
     property int componentMinHeight: 40;
     property int componentMargin: Style.size_mainMargin;
