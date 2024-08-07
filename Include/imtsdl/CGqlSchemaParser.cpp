@@ -478,10 +478,10 @@ bool CGqlSchemaParser::ProcessCustomSection(const QString& sectionName)
 							  .arg(sectionName, QString::number(m_lastReadLine + 1));
 
 	SendLogMessage(
-		istd::IInformationProvider::InformationCategory::IC_ERROR,
-		0,
-		errorString,
-		"ProcessCustomSection");
+				istd::IInformationProvider::InformationCategory::IC_ERROR,
+				0,
+				errorString,
+				"ProcessCustomSection");
 
 	Q_ASSERT_X(false, __func__, errorString.toLocal8Bit());
 
@@ -504,10 +504,10 @@ bool CGqlSchemaParser::ValidateSchema()
 							QString::number(m_sdlTypes.indexOf(sdlType) + 1));
 
 				SendLogMessage(
-					istd::IInformationProvider::InformationCategory::IC_ERROR,
-					0,
-					errorString,
-					"ValidateSchema");
+							istd::IInformationProvider::InformationCategory::IC_ERROR,
+							0,
+							errorString,
+							"ValidateSchema");
 
 				Q_ASSERT_X(false, __func__, errorString.toLocal8Bit());
 

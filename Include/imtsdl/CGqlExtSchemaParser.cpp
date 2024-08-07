@@ -47,11 +47,15 @@ bool CGqlExtSchemaParser::ProcessDocumentSchema()
 
 	// process types
 	while (true){
-
 		char foundDelimiter = ' ';
 		QByteArray typeName;
 		retVal = retVal && ReadToDelimeterOrSpace("{", typeName);
 		if (typeName.trimmed() != QByteArrayLiteral("type")){
+			SendLogMessage(
+						istd::IInformationProvider::IC_ERROR,
+						0,
+						QString("Unexpected directive '%1' at %2").arg(typeName, QString::number(m_lastReadLine + 1)),
+						__func__);
 			I_CRITICAL();
 
 			return false;
@@ -104,6 +108,11 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 				return (type.GetName() == typeRefName);
 			});
 			if (foundIterator == m_sdlTypes.cend()){
+				SendLogMessage(
+							istd::IInformationProvider::IC_ERROR,
+							0,
+							QString("UUnable to find type '%1' at %2").arg(typeRefName, QString::number(m_lastReadLine + 1)),
+							__func__);
 				I_CRITICAL();
 
 				return false;
@@ -130,6 +139,11 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 				CSdlDocumentType::OperationType operationType = CSdlDocumentType::OT_LIST;
 				bool isOperationValid = CSdlDocumentType::FromString(operationTypeId, operationType);
 				if (!isOperationValid){
+					SendLogMessage(
+								istd::IInformationProvider::IC_ERROR,
+								0,
+								QString("Unexpected operation type :'%1' at %2").arg(operationTypeId, QString::number(m_lastReadLine + 1)),
+								__func__);
 					I_CRITICAL();
 
 					return false;
@@ -164,6 +178,11 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 			}
 		}
 		else {
+			SendLogMessage(
+				istd::IInformationProvider::IC_ERROR,
+				0,
+				QString("Unexpected directive '%1' at %2").arg(keyword, QString::number(m_lastReadLine + 1)),
+				__func__);
 			I_CRITICAL();
 
 			return false;
