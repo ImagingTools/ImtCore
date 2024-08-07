@@ -108,5 +108,11 @@ bool CDoubleMask::GetPreviosItemOffset(quint64& offset, quint64 startOffset)
 	return retVal;
 }
 
+bool CDoubleMask::SetExternalKey(quint64 externalKey)
+{
+	m_externKey = externalKey;
+	return true;
+}
+
 
 }//namespace imtmdbx

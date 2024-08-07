@@ -25,6 +25,9 @@ protected:
 	virtual bool GetNextItemOffset(quint64& offset, qint64 startOffset = -1) override;
 	virtual bool GetPreviosItemOffset(quint64& offset, quint64 startOffset = 0xffffffff) override;
 
+public:
+	bool SetExternalKey(quint64 externalKey);
+
 private:
 	quint64 m_externKey;
 
