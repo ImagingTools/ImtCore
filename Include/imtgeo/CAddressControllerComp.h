@@ -5,9 +5,11 @@
 #include <imtgql/CObjectCollectionControllerCompBase.h>
 #include <imtgeo/IAddressElementInfo.h>
 
+#undef GetObject
 
 namespace imtgeo
 {
+
 
 
 class CAddressControllerComp: public imtgql::CObjectCollectionControllerCompBase
