@@ -195,6 +195,18 @@ bool CDocumentTable::HasRecord(const QByteArray &key)
 
 bool CDocumentTable::UpdateDocument(qint64 key, const QByteArray &data)
 {
+	return UpdateDocument((char*)&key, 8, data);
+}
+
+
+bool CDocumentTable::UpdateDocument(const QByteArray &key, const QByteArray &data)
+{
+	return UpdateDocument(key.data(), key.length(), data);
+}
+
+
+bool CDocumentTable::UpdateDocument(const char *key, int count, const QByteArray &data)
+{
 	qDebug() << "CDocumentTable::UpdateDocument";
 
 	try{
@@ -205,7 +217,7 @@ bool CDocumentTable::UpdateDocument(qint64 key, const QByteArray &data)
 			return false;
 		}
 
-		mdbx::slice keySlice(&key, 8);
+		mdbx::slice keySlice(key, count);
 		mdbx::slice valueSlice(data.data(), data.length());
 
 		mdbx::map_handle mapHandle = m_txn.open_map(m_tableName.toStdString(), mdbx::key_mode::reverse, mdbx::value_mode::single);
@@ -229,7 +241,6 @@ bool CDocumentTable::UpdateDocument(qint64 key, const QByteArray &data)
 
 	return true;
 }
-
 
 qint64 CDocumentTable::GetKey(const QByteArray &value)
 {

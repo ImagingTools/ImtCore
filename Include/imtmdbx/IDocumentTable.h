@@ -19,6 +19,7 @@ public:
 	virtual bool HasRecord(qint64 key) = 0;
 	virtual bool HasRecord(const QByteArray& key) = 0;
 	virtual bool UpdateDocument(qint64 key, const QByteArray& data) = 0;
+	virtual bool UpdateDocument(const QByteArray& key, const QByteArray& data) = 0;
 	virtual qint64 GetKey(const QByteArray& value) = 0;
 	virtual QString GetStringKey(const QByteArray& value) = 0;
 	virtual bool CreateIndex() = 0;

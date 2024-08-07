@@ -28,6 +28,7 @@ public:
 	virtual bool HasRecord(qint64 key) override;
 	virtual bool HasRecord(const QByteArray& key) override;
 	virtual bool UpdateDocument(qint64 key,  const QByteArray& data) override;
+	virtual bool UpdateDocument(const QByteArray& key, const QByteArray& data) override;
 	virtual qint64 GetKey(const QByteArray& value) override;
 	virtual QString GetStringKey(const QByteArray& value) override;
 	virtual bool CreateIndex() override;
@@ -35,6 +36,7 @@ public:
 
 protected:
 	virtual qint64 AddDocument(const char *data, int count, const QByteArray& keyStr = QByteArray());
+	virtual bool UpdateDocument(const char *key, int count, const QByteArray& data);
 	virtual bool Exists(const QString& name);
 
 	QString m_tableName;
