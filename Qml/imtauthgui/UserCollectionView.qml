@@ -39,6 +39,10 @@ RemoteCollectionView {
 
     filterMenu.decorator: filterDecoratorComp;
 
+    function handleSubscription(dataModel){
+        userCollectionViewContainer.doUpdateGui();
+    }
+
     Component {
         id: filterDecoratorComp;
 

@@ -16,14 +16,17 @@ namespace imtguigql
 
 // reimplemented (imtgql::CGqlRepresentationControllerCompBase)
 
-imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
+imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	QString theme;
-	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
-	if (!paramsPtr.isEmpty()){
-		theme = paramsPtr.at(0).GetFieldArgumentValue("theme").toString();
+	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParam("input");
+	if (gqlInputParamPtr == nullptr){
+		errorMessage = QString("Unable to get style. GraphQL input params is invalid.");
+		SendErrorMessage(0, errorMessage, "CGetStyleDataControllerComp");
+
+		return nullptr;
 	}
 
+	QString theme = gqlInputParamPtr->GetFieldArgumentValue("theme").toString();
 	if(theme.isEmpty()){
 		if (m_selectionParamCompPtr.IsValid()){
 			const iprm::IOptionsList* optionList = m_selectionParamCompPtr->GetSelectionConstraints();
@@ -37,12 +40,11 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(con
 	}
 
 	if(theme.isEmpty()){
+		errorMessage = QString("Unable to get style. Theme is empty.");
+		SendErrorMessage(0, errorMessage, "CGetStyleDataControllerComp");
+
 		return nullptr;
 	}
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	dataModelPtr->SetData("theme", theme);
 
 	QString prefix;
 	if (m_prefixFileNameAttrPtr.IsValid() && !(*m_prefixFileNameAttrPtr).isEmpty()){
@@ -51,14 +53,25 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(con
 
 	QString pathToTheme = prefix + theme.toLower() + ".theme";
 	QFile resource(":/Style/" + pathToTheme);
-	if (resource.open(QIODevice::ReadOnly)){
-		imtbase::CTreeItemModel* sourceModelPtr = dataModelPtr->AddTreeModel("source");
+	if (!resource.open(QIODevice::ReadOnly)){
+		errorMessage = QString("Unable to open the style file. Error: '%1'.").arg(resource.errorString());
+		SendErrorMessage(0, errorMessage, "CGetStyleDataControllerComp");
 
-		QByteArray resources = resource.readAll();
-		sourceModelPtr->CreateFromJson(resources);
-
-		resource.close();
+		return nullptr;
 	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	imtbase::CTreeItemModel* sourceModelPtr = dataModelPtr->AddTreeModel("source");
+
+	dataModelPtr->SetData("theme", theme);
+
+	QByteArray resources = resource.readAll();
+	if (!sourceModelPtr->CreateFromJson(resources)){
+		SendWarningMessage(0, QString("Unable to create style model from file: '%1'").arg(pathToTheme), "CGetStyleDataControllerComp");
+	}
+
+	resource.close();
 
 	return rootModelPtr.PopPtr();
 }

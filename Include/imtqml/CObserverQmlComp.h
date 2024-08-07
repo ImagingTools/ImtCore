@@ -12,8 +12,8 @@
 #include <imtbase/IApplicationInfoRepresentation.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtbase/IRepresentationController.h>
-#include <imtqml/IQuickObject.h>
 #include <imtbase/TModelUpdateBinder.h>
+#include <imtqml/IQuickObject.h>
 
 
 namespace imtqml

@@ -92,7 +92,7 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 		}
 	}
 
-	errorMessage = QString("Unable to create internal response with command %1").arg(qPrintable(commandId));
+	errorMessage = QString("Unable to create internal response for command '%1'").arg(qPrintable(commandId));
 
 	SendErrorMessage(0, errorMessage);
 
@@ -123,15 +123,15 @@ iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(cons
 			paramsPtr->SetEditableParameter("UserInfo", userInfoParamPtr.PopPtr(), true);
 		}
 
-		istd::TDelPtr<iprm::IIdParam> languageIdParam = new iprm::CIdParam();
-		languageIdParam->SetId(gqlRequest.GetRequestContext()->GetLanguageId());
+		iprm::CIdParam* languageIdParamPtr = new iprm::CIdParam();
+		languageIdParamPtr->SetId(gqlRequest.GetRequestContext()->GetLanguageId());
 
-		paramsPtr->SetEditableParameter("LanguageParam", languageIdParam.PopPtr(), true);
+		paramsPtr->SetEditableParameter("LanguageParam", languageIdParamPtr, true);
 
-		istd::TDelPtr<iprm::IIdParam> productIdParam = new iprm::CIdParam();
-		productIdParam->SetId(productId);
+		iprm::CIdParam* productIdParamPtr = new iprm::CIdParam();
+		productIdParamPtr->SetId(productId);
 
-		paramsPtr->SetEditableParameter("ProductId", productIdParam.PopPtr(), true);
+		paramsPtr->SetEditableParameter("ProductId", productIdParamPtr, true);
 	}
 
 	return paramsPtr.PopPtr();

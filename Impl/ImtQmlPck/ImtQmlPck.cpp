@@ -30,16 +30,6 @@ I_EXPORT_COMPONENT(
 			"Quick QML");
 
 I_EXPORT_COMPONENT(
-			CommandDataProvider,
-			"Command item based data provider",
-			"Command item based data provider");
-
-I_EXPORT_COMPONENT(
-			PageDataProvider,
-			"Page item based data provider",
-			"Page item based data provider");
-
-I_EXPORT_COMPONENT(
 			HeadersDataProvider,
 			"Headers data provider",
 			"Headers data provider");

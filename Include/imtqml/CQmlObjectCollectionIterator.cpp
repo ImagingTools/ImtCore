@@ -1,10 +1,15 @@
 #include <imtqml/CQmlObjectCollectionIterator.h>
+
+
+// ImtCore includes
 #include <imtdb/CSqlDatabaseObjectCollectionIterator.h>
 
 
 namespace imtqml
 {
 
+
+// public methods
 
 CQmlObjectCollectionIterator::CQmlObjectCollectionIterator(imtbase::IObjectCollectionIterator* iterator)
 {

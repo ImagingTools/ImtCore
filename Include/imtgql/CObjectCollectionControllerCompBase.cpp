@@ -265,7 +265,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	QByteArray objectId;
 	istd::IChangeable* newObjectPtr = CreateObject(gqlRequest, objectId, name, description, errorMessage);
 	if (newObjectPtr == nullptr){
-		errorMessage = QString("Unable to create object from GraphQL request");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return nullptr;

@@ -32,9 +32,11 @@ public:
 private:
 	iprm::CParamsSet* GetFilters(QString filterParams);
 
+private:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 };
 
 
 } // namespace imtqml
+
 

@@ -22,6 +22,12 @@ RemoteCollectionView {
                 additionalFieldIds.push("ProductId");
                 additionalFieldIds.push("ParentRoles");
             }
+
+            function getAdditionalInputParams(){
+                let obj = {}
+                obj["ProductId"] = roleCollectionViewContainer.productId;
+                return obj;
+            }
         }
     }
 
@@ -37,6 +43,10 @@ RemoteCollectionView {
 
     function onLocalizationChanged(language){
         roleCollectionViewContainer.dataController.updateHeaders();
+    }
+
+    function handleSubscription(dataModel){
+        roleCollectionViewContainer.doUpdateGui();
     }
 
     Component.onDestruction: {

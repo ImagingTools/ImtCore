@@ -51,7 +51,7 @@ Item {
     function updateModel(){
         updateHeaders();
 
-        updateObjectEditorInfo();
+//        updateObjectEditorInfo();
     }
 
     function updateObjectEditorInfo(){

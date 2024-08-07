@@ -1,7 +1,8 @@
 #pragma once
 
 
-#include <QObject>
+// Qt includes
+#include <QtCore/QObject>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -17,22 +18,19 @@ namespace imtqml
 
 class CQmlObjectCollectionIterator : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    CQmlObjectCollectionIterator(imtbase::IObjectCollectionIterator* iterator);
+	CQmlObjectCollectionIterator(imtbase::IObjectCollectionIterator* iterator);
 	Q_INVOKABLE virtual bool next();
 	Q_INVOKABLE virtual bool previous();
 	Q_INVOKABLE virtual QString getData(QString fieldName);
 
-
 private:
-    imtbase::IObjectCollectionIterator *m_objectCollectionIterator;
-
+	imtbase::IObjectCollectionIterator* m_objectCollectionIterator;
 };
 
 
 }
-
 
 

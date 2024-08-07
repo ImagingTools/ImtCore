@@ -37,11 +37,13 @@ ViewBase {
             }
         }
 
-        for (let i = 0; i < systemInfosModel.getItemsCount(); i++){
-            let systemId = systemInfosModel.getData("Id", i);
-            if (systemId !== ""){
-                usernameInput.readOnly = true;
-                break;
+        if (systemInfosModel){
+            for (let i = 0; i < systemInfosModel.getItemsCount(); i++){
+                let systemId = systemInfosModel.getData("Id", i);
+                if (systemId !== ""){
+                    usernameInput.readOnly = true;
+                    break;
+                }
             }
         }
 

@@ -17,6 +17,8 @@ namespace imtqml
 {
 
 
+// private methods
+
 iprm::CParamsSet* CQmlObjectCollectionComp::GetFilters(QString filterParams)
 {
 	if (!filterParams.isEmpty()){
@@ -120,10 +122,11 @@ imtqml::CQmlObjectCollectionIterator* CQmlObjectCollectionComp::CreateObjectColl
 			return new CQmlObjectCollectionIterator(iterator);
 		}
 	}
+
 	return nullptr;
 }
 
 
-
-
 }
+
+

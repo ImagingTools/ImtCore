@@ -8,7 +8,6 @@
 #include <iprm/IOptionsList.h>
 
 // ImtCore includes
-#include <imtbase/IObjectCollection.h>
 #include <imtauth/IUserSettings.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
@@ -32,7 +31,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	int errorPosition = -1;
 	QByteArray requestBody = request.GetBody();
 	if (!m_lastRequest.ParseQuery(requestBody, errorPosition)){
-		qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: %1; Error position: %2")
+		qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: '%1'; Error position: '%2'")
 						.arg(qPrintable(request.GetBody()))
 						.arg(errorPosition);
 	}

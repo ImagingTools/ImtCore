@@ -37,6 +37,10 @@ RemoteCollectionView {
         }
     }
 
+    function handleSubscription(dataModel){
+        userGroupCollectionViewContainer.doUpdateGui();
+    }
+
     property TreeItemModel usersModel: CachedUserCollection.collectionModel;
     property TreeItemModel rolesModel: CachedRoleCollection.collectionModel;
     property TreeItemModel groupsModel: CachedGroupCollection.collectionModel;
