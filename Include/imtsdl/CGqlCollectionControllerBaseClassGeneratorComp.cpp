@@ -241,6 +241,8 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::CloseFiles()
 
 bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessFiles(const CSdlDocumentType& sdlDocumentType, bool addDependenciesInclude, bool addSelfHeaderInclude)
 {
+	/// \todo add checks for duplicates of subtypes
+
 	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
 		SendErrorMessage(0,
 					QString("Unable to open file: '%1'. Error: %2")
@@ -276,6 +278,8 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	// preprocessor's section
 	ifStream << QStringLiteral("#pragma once");
 	FeedStream(ifStream, 3, false);
+
+	/// \todo add required includes here
 
 	// namespace begin
 	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
@@ -325,8 +329,17 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 
 	// protected section
 	// definition of pure virtual methods (to be reimplemented)
+	FeedStream(ifStream, 1, false);
+	ifStream << QStringLiteral("protected:");
+	FeedStream(ifStream, 1, false);
 
-
+	AddMethodsForDocument(ifStream, sdlDocumentType, 1);
+	const SdlDocumentTypeList subtypesList = sdlDocumentType.GetSubtypes();
+	FeedStream(ifStream, 1, false);
+	for (const CSdlDocumentType& subtype: subtypesList){
+		AddMethodsForDocument(ifStream, subtype, 1);
+		FeedStream(ifStream, 1, false);
+	}
 
 	// class end
 	ifStream << QStringLiteral("};");
@@ -392,6 +405,38 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AbortCurrentProcessing()
 
 	m_headerFilePtr->remove();
 	m_sourceFilePtr->remove();
+}
+
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("// ");
+	stream << sdlDocumentType.GetName();
+	stream << QStringLiteral(" methods");
+	FeedStream(stream, 1, false);
+
+	const QMap<CSdlDocumentType::OperationType, CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
+	for (auto operationIter = operationsList.cbegin(); operationIter != operationsList.cend(); ++operationIter){
+		AddMethodForDocument(stream, operationIter.value(), operationIter.key(), hIndents);
+	}
+}
+
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream, const CSdlRequest& sdlRequest, CSdlDocumentType::OperationType operationType, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("virtual C");
+	stream << GetCapitalizedValue(sdlRequest.GetOutputArgument().GetType()); /// < \todo include it
+	stream << QStringLiteral(" On");
+	stream << GetCapitalizedValue(sdlRequest.GetName());
+	stream << QStringLiteral("(const C");
+	stream << GetCapitalizedValue(sdlRequest.GetName());
+	stream << QStringLiteral("GqlRequest& "); /// < \todo include it
+	stream << GetDecapitalizedValue(sdlRequest.GetName());
+	stream << QStringLiteral("Request, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;");
+
+	FeedStream(stream, 1, false);
 }
 
 

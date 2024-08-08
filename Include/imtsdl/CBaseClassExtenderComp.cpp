@@ -267,6 +267,8 @@ bool CBaseClassExtenderComp::ProcessHeaderClassFile(
 	/// indicates if we inside public section of class
 	bool inPublicSection = false;
 
+	QString className;
+
 	while (!ifStream.atEnd()){
 		const QString readLine = ifStream.readLine();
 		QRegularExpressionMatch includeRemarkMatch = s_includeRemarkRegExp.match(readLine);
@@ -322,6 +324,7 @@ bool CBaseClassExtenderComp::ProcessHeaderClassFile(
 			}
 		}
 
+		/// \todo FINISH IT!
 		if (inPublicSection && inClass && addCompMacro){
 			if (!hasPublicSection){
 				ofStream << QStringLiteral("public:");

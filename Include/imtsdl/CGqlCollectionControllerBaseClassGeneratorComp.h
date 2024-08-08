@@ -51,10 +51,14 @@ private:
 
 private:
 	bool CloseFiles();
-	bool ProcessFiles(const CSdlDocumentType& sdlRequest, bool addDependenciesInclude, bool addSelfHeaderInclude);
-	bool ProcessHeaderClassFile(const CSdlDocumentType& sdlRequest, bool addDependenciesInclude);
-	bool ProcessSourceClassFile(const CSdlDocumentType& sdlRequest, bool addSelfHeaderInclude);
+	bool ProcessFiles(const CSdlDocumentType& sdlDocumentType, bool addDependenciesInclude, bool addSelfHeaderInclude);
+	bool ProcessHeaderClassFile(const CSdlDocumentType& sdlDocumentType, bool addDependenciesInclude);
+	bool ProcessSourceClassFile(const CSdlDocumentType& sdlDocumentType, bool addSelfHeaderInclude);
 	void AbortCurrentProcessing();
+
+	// comfort methods
+	void AddMethodsForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
+	void AddMethodForDocument(QTextStream& stream, const CSdlRequest& sdlRequest, CSdlDocumentType::OperationType operationType, uint hIndents = 0);
 
 
 private:
