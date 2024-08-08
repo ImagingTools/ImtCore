@@ -44,6 +44,7 @@ TextInputElementView {
 
     Component.onCompleted: {
         root.textInputValidator = doubleValidator;
+        valueChanged()
     }
 
     Component {
