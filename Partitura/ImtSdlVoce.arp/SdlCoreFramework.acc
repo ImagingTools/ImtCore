@@ -10,6 +10,24 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="BaseClassExtender" PackageId="ImtSdlPck" ComponentId="BaseClassExtender">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="GqlSchemaParser" PackageId="ImtSdlPck" ComponentId="GqlSchemaParser">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -73,5 +91,7 @@
         <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="GqlSchemaParser"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SdlCodeCreatorProcessorsController"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="BaseClassExtender" ComponentId="BaseClassExtender"/>
+    </ExportedComponents>
 </Acf>
