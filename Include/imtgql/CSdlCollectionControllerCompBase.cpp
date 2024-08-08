@@ -115,10 +115,20 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
 
 		istd::TDelPtr<imtbase::ITreeModelWrittable> substrateWrittablePtr(CreateSdlItem(gqlRequest,objectId, dataPtr, errorMessage));
 
-		if (!substrateWrittablePtr.IsValid() || !substrateWrittablePtr->WriteToModel(*dataModelPtr)){
+		if (!substrateWrittablePtr.IsValid()){
+			if (errorMessage.isEmpty()){
+				errorMessage = "Failed to read object";
+			}
+
+			SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
+			return nullptr;
+		}
+
+		if(!substrateWrittablePtr->WriteToModel(*dataModelPtr)){
 			errorMessage = QString("Unable to setup GraphQL-item. Unable to write model");
 			SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 			Q_ASSERT(0);
+			return nullptr;
 		}
 
 		return rootModelPtr.PopPtr();
