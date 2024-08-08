@@ -304,6 +304,9 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 				ifStream << QStringLiteral("''");
 			}
 		}
+		else if (!sdlField.IsArray()) {
+			ifStream << ':' << ' ' << convertedType << '{' << '}';
+		}
 	}
 	FeedStream(ifStream, 1, false);
 
