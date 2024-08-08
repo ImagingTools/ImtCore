@@ -272,6 +272,12 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	// Base QML
 	ifStream << QStringLiteral("BaseClass {");
 
+	// add id
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("id :") << GetDecapitalizedValue(sdlType.GetName());
+
+
 	// container's props
 	for (const CSdlField& sdlField: sdlType.GetFields()) {
 		FeedStream(ifStream, 1, false);
@@ -305,7 +311,10 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 			}
 		}
 		else if (!sdlField.IsArray()) {
-			ifStream << ':' << ' ' << convertedType << '{' << '}';
+			ifStream << ':' << ' ' << convertedType << ' ' << '{';
+			ifStream << QStringLiteral("owner: ");
+			ifStream << GetDecapitalizedValue(sdlType.GetName());
+			ifStream << '}';
 		}
 	}
 	FeedStream(ifStream, 1, false);
