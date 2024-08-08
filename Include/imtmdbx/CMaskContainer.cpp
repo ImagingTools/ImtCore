@@ -59,6 +59,71 @@ void CMaskContainer::Clear()
 {
 	m_maskList.clear();
 	m_maskListInv.clear();
+	m_maskList.squeeze();
+	m_maskListInv.squeeze();
+}
+
+bool CMaskContainer::RemoveLastMask(bool isInversion)
+{
+	bool ok = true;
+	if(!isInversion){
+		if(!m_maskList.isEmpty()){
+			m_maskList.removeLast();
+			m_maskList.squeeze();
+		}
+		else {
+			ok = false;
+		}
+	}
+	else {
+		if(!m_maskListInv.isEmpty()){
+			m_maskListInv.removeLast();
+			m_maskListInv.squeeze();
+		}
+		else {
+			ok = false;
+		}
+	}
+
+	return ok;
+}
+
+bool CMaskContainer::RemoveMask(int index, bool isInversion)
+{
+	bool ok = true;
+	if(!isInversion){
+		if(!m_maskList.isEmpty() && index < m_maskList.length()){
+			m_maskList.remove(index);
+			m_maskList.squeeze();
+		}
+		else {
+			ok = false;
+		}
+	}
+	else {
+		if(!m_maskListInv.isEmpty() && index < m_maskListInv.length()){
+			m_maskListInv.remove(index);
+			m_maskListInv.squeeze();
+		}
+		else {
+			ok = false;
+		}
+
+	}
+
+	return ok;
+}
+
+int CMaskContainer::GetMaskCount(bool isInversion)
+{
+	int count = 0;
+	if(!isInversion){
+		count = m_maskList.length();
+	}
+	else {
+		count = m_maskListInv.length();
+	}
+	return count;
 }
 
 void CMaskContainer::SetDocumentTable(IDocumentTable* documentTable)
