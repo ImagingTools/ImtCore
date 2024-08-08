@@ -42,10 +42,8 @@ public:
 	/**
 		Adds inheritance to class files
 		\param paramsPtr (required)
-			- (optional) [IncludePaths]		of \c iprm::IOptionsList		- [id] - directory to lookup source files
-			- (required) [HeaderFile]		of \c ifile::IFileNameParam		- header file to modify
-			- (optional) [SourceFile]		of \c ifile::IFileNameParam		- source file to modify
-			- (optional) [Override]			of \c iprm::IEnableableParam -	- if enabled add override of all virtual methods if SourceFile is set - adds in SourceFile and in HeaderFile otherwise
+			- (required) [HeaderFile]				of \c ifile::IFileNameParam		- header file to modify
+			- (optional) [AddBaseComponentMacro]	of \c iprm::IEnableableParam	-- if enabled adds 'I_BEGIN_BASE_COMPONENT' and 'I_END_COMPONENT' in HeaderFile
 		\param inputPtr - \c iprm::IOptionsList (required)
 							- [id] - class name
 							- [name] - include directive
