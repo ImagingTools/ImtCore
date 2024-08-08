@@ -101,8 +101,6 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
 		return nullptr;
 	}
 
-	QByteArray commandId = gqlRequest.GetCommandId();
-
 	QByteArray objectId;
 
 	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");

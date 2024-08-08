@@ -14,6 +14,8 @@ class CSdlCollectionControllerCompBase : public imtgql::CObjectCollectionControl
 {
 public:
 	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
+	I_BEGIN_BASE_COMPONENT(CSdlCollectionControllerCompBase)
+	I_END_COMPONENT
 
 protected:
 	virtual imtbase::CTreeItemModel* ListObjects(

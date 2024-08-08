@@ -29,7 +29,7 @@ class CObjectCollectionControllerCompBase:
 public:
 	typedef imtgql::CPermissibleGqlRequestHandlerComp BaseClass;
 
-	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
+	I_BEGIN_BASE_COMPONENT(CObjectCollectionControllerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_documentChangeGeneratorCompPtr, "DocumentChangeGenerator", "Change generator for the collection object", false, "DocumentChangeGenerator");
