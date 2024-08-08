@@ -175,7 +175,7 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 			QByteArray subtypeName;
 			retVal = retVal && ReadToDelimeter("{", subtypeName);
 			CSdlDocumentType documentSubtype;
-			documentType.SetName(subtypeName.trimmed());
+			documentSubtype.SetName(subtypeName.trimmed());
 
 			retVal = retVal && ExtractDocumentTypeFromCurrentEntry(documentSubtype);
 			if (retVal){
