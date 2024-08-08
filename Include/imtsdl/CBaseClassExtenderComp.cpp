@@ -25,6 +25,7 @@ namespace imtsdl
 
 static QRegularExpression s_includeRemarkRegExp(QStringLiteral("\\/\\/(.*)includes"));
 static QRegularExpression s_includeDirectiveRegExp(QStringLiteral("\\#\\s*include\\s*[<\"]{1}(.*)[>\"]{1}"));
+static QRegularExpression s_publicSectionDirectiveRegExp(QStringLiteral("\\s*public\\s*\\:"));
 
 // static help methods
 
@@ -209,11 +210,14 @@ int CBaseClassExtenderComp::DoProcessing(
 
 
 bool CBaseClassExtenderComp::ProcessHeaderClassFile(
-			const iprm::IParamsSet& /*paramsPtr*/,
+			const iprm::IParamsSet& paramsPtr,
 			const iprm::IOptionsList& baseClassList)
 {
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
 	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
+
+	iprm::TParamsPtr<iprm::IEnableableParam> addMacroParamPtr(&paramsPtr, QByteArrayLiteral("AddBaseComponentMacro"), false);
+	const bool addCompMacro = addMacroParamPtr.IsValid() && addMacroParamPtr->IsEnabled();
 
 
 	// fill include directives /remarks
@@ -228,9 +232,15 @@ bool CBaseClassExtenderComp::ProcessHeaderClassFile(
 		classList << QString(baseClassList.GetOptionId(i));
 	}
 
+	/// indicates if the class has a public section
+	bool hasPublicSection = false;
+
 	if (!necessaryDireciveIncludeMap.isEmpty()){
 		while (!ifStream.atEnd()){
 			const QString readLine = ifStream.readLine();
+			if (!hasPublicSection && s_publicSectionDirectiveRegExp.match(readLine).hasMatch()){
+				hasPublicSection = true;
+			}
 
 			// check if any of included directives already added
 			if (s_includeDirectiveRegExp.match(readLine).hasMatch()){
@@ -250,6 +260,13 @@ bool CBaseClassExtenderComp::ProcessHeaderClassFile(
 
 	// read file from start
 	ifStream.seek(0);
+
+	/// indicates if we inside class
+	bool inClass = false;
+
+	/// indicates if we inside public section of class
+	bool inPublicSection = false;
+
 	while (!ifStream.atEnd()){
 		const QString readLine = ifStream.readLine();
 		QRegularExpressionMatch includeRemarkMatch = s_includeRemarkRegExp.match(readLine);
@@ -301,7 +318,18 @@ bool CBaseClassExtenderComp::ProcessHeaderClassFile(
 				ofStream << readLine;
 				ofStream.flush();
 				AddInheritance(ifStream, ofStream, classList);
+				inClass = true;
 			}
+		}
+
+		if (inPublicSection && inClass && addCompMacro){
+			if (!hasPublicSection){
+				ofStream << QStringLiteral("public:");
+				FeedStream(ofStream, 1, false);
+			}
+			ofStream << QStringLiteral("typedef ");
+
+			ofStream << QStringLiteral(" BaseClass");
 		}
 		if (writeLine){
 			ofStream << readLine;
