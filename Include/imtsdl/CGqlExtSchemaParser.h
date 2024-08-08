@@ -21,7 +21,7 @@ namespace imtsdl
 
 /**
 	Extend class for \class CGqlSchemaParser allows to process documentSchema
-	documentSchema - is an IMT special derictive for generation base classes for GraphQL handlers
+	\c documentSchema - is an IMT special derictive for generation base classes for GraphQL handlers
  */
 class CGqlExtSchemaParser:
 			public CGqlSchemaParser,
@@ -41,7 +41,7 @@ public:
 	virtual SdlDocumentTypeList GetDocumentTypes() const override;
 
 protected:
-	virtual bool ProcessDocumentSchema();
+	virtual bool ProcessCollectionSchema();
 	bool ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& documentType);
 
 	// reimplemented (CGqlSchemaParser)

@@ -33,7 +33,7 @@ SdlDocumentTypeList CGqlExtSchemaParser::GetDocumentTypes() const
 
 // protected methods
 
-bool CGqlExtSchemaParser::ProcessDocumentSchema()
+bool CGqlExtSchemaParser::ProcessCollectionSchema()
 {
 	bool retVal = true;
 
@@ -202,8 +202,8 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 
 bool CGqlExtSchemaParser::ProcessCustomSection(const QString& sectionName)
 {
-	if (sectionName == QStringLiteral("documentSchema")){
-		return ProcessDocumentSchema();
+	if (sectionName == QStringLiteral("collectionSchema")){
+		return ProcessCollectionSchema();
 	}
 
 	return BaseClass::ProcessCustomSection(sectionName);

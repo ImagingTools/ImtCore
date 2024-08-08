@@ -20,7 +20,8 @@ namespace imtsdl
 {
 
 /**
-	The CGqlSchemaParser class
+	Class for parsing a GraphQL schema
+	\details used schema definition, discribed at \link https://graphql.com/learn/schema/ or \link https://www.apollographql.com/docs/apollo-server/schema/schema/
  */
 class CGqlSchemaParser:
 			virtual public istd::IPolymorphic,

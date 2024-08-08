@@ -13,6 +13,7 @@
 
 // imtsdl includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
+#include <imtsdl/ISdlDocumentTypeListProvider.h>
 #include <imtsdl/CGqlExtSchemaParser.h>
 
 
@@ -34,6 +35,7 @@ public:
 		I_REGISTER_INTERFACE(iproc::IProcessor)
 		I_REGISTER_INTERFACE(ISdlTypeListProvider)
 		I_REGISTER_INTERFACE(ISdlRequestListProvider)
+		I_REGISTER_INTERFACE(ISdlDocumentTypeListProvider)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 	I_END_COMPONENT;
 
