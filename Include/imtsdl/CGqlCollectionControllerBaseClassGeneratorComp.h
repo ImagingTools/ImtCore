@@ -35,7 +35,9 @@ public:
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
 		I_ASSIGN(m_sdlRequestListCompPtr, "SdlRequestListProvider", "SDL requests used to create a GraphQL wrap code", true, "SdlRequestListProvider")
 		I_ASSIGN(m_sdlDocumentListCompPtr, "SdlDocumentListProvider", "SDL documents used to create a GraphQL wrap code", true, "SdlDocumentListProvider")
+		I_ASSIGN(m_baseClassExtenderCompPtr, "BaseClassExtender", "Compoment, used to add base class inherits", true, "BaseClassExtender")
 		I_ASSIGN(m_filesJoinerCompPtr, "FilesJoiner", "Compoment, used to join files into a single", false, "FilesJoiner")
+
 	I_END_COMPONENT;
 
 	//reimplemented(iproc::IProcessor)
@@ -60,6 +62,7 @@ private:
 	I_REF(ISdlTypeListProvider, m_sdlTypeListCompPtr);
 	I_REF(ISdlRequestListProvider, m_sdlRequestListCompPtr);
 	I_REF(ISdlDocumentTypeListProvider, m_sdlDocumentListCompPtr);
+	I_REF(iproc::IProcessor, m_baseClassExtenderCompPtr);
 	I_REF(iproc::IProcessor, m_filesJoinerCompPtr);
 
 	istd::TDelPtr<QFile> m_headerFilePtr;

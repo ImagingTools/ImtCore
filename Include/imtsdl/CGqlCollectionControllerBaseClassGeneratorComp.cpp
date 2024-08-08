@@ -32,6 +32,7 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlRequestListCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
+	Q_ASSERT(m_baseClassExtenderCompPtr.IsValid());
 	Q_ASSERT(m_sdlDocumentListCompPtr.IsValid());
 
 	if (!m_argumentParserCompPtr->IsGqlEnabled()){
@@ -90,6 +91,25 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 
 		if (!CloseFiles()){
 			SendErrorMessage(0, QString("Unable to finalize files"));
+			I_CRITICAL();
+
+			return TS_INVALID;
+		}
+
+		// add extending for base class
+		iprm::CParamsSet paramsSet;
+		ifile::CFileNameParam headerFileNameParam;
+		headerFileNameParam.SetPath(m_headerFilePtr->fileName());
+		paramsSet.SetEditableParameter(QByteArrayLiteral("HeaderFile"), &headerFileNameParam);
+		iprm::CEnableableParam enableCompMacroParam(true);
+		paramsSet.SetEditableParameter(QByteArrayLiteral("AddBaseComponentMacro"), &enableCompMacroParam);
+
+		iprm::COptionsManager baseClassDirectivesList;
+		baseClassDirectivesList.InsertOption(QStringLiteral("imtgql/CObjectCollectionControllerCompBase.h"), QByteArrayLiteral("imtgql::CObjectCollectionControllerCompBase"));
+
+		int extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
+		if (extendResult != TS_OK){
+			SendErrorMessage(0, QString("Unable to extend file'%1'").arg(m_headerFilePtr->fileName()));
 			I_CRITICAL();
 
 			return TS_INVALID;
@@ -267,41 +287,50 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 		FeedStream(ifStream, 1, false);
 	}
 
+	// class begin
+	FeedStream(ifStream, 2, false);
+	ifStream << QStringLiteral("class C") << sdlDocumentType.GetName() << QStringLiteral("CollectionControllerCompBase");
+	FeedStream(ifStream, 1, false);
+	ifStream << QStringLiteral("{");
+	FeedStream(ifStream, 1, false);
+
 	// public section
 	ifStream << QStringLiteral("public:");
 	FeedStream(ifStream, 1, false);
-	FeedStreamHorizontally(ifStream, 1);
 
 	// base class methods override definition
+	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("// reimplemented (imtgql::CObjectCollectionControllerCompBase)");
 	FeedStream(ifStream, 1, false);
-	FeedStreamHorizontally(ifStream, 1);
 
+	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
 	FeedStream(ifStream, 1, false);
-	FeedStreamHorizontally(ifStream, 1);
 
+	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
 	FeedStream(ifStream, 1, false);
-	FeedStreamHorizontally(ifStream, 1);
 
+	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("virtual imtbase::CTreeItemModel* UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
 	FeedStream(ifStream, 1, false);
-	FeedStreamHorizontally(ifStream, 1);
 
+	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("virtual imtbase::CTreeItemModel* DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
 	FeedStream(ifStream, 1, false);
-	FeedStreamHorizontally(ifStream, 1);
 
+	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
 	FeedStream(ifStream, 1, false);
-	FeedStreamHorizontally(ifStream, 1);
 
 	// protected section
 	// definition of pure virtual methods (to be reimplemented)
 
 
 
+	// class end
+	ifStream << QStringLiteral("};");
+	FeedStream(ifStream, 1, false);
 
 	// end of namespace
 	FeedStream(ifStream, 2, false);
