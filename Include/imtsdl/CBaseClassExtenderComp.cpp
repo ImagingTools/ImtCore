@@ -287,7 +287,7 @@ bool CBaseClassExtenderComp::ProcessHeaderClassFile(
 		}
 		else if (!necessaryDireciveIncludeMap.isEmpty()){
 			// add remaining includes
-			static QRegularExpression namespaceRegExp(QStringLiteral("\\s*namespace"));
+			static QRegularExpression namespaceRegExp(QStringLiteral("^\\s*namespace"));
 			if (namespaceRegExp.match(readLine).hasMatch()){
 				// remove extra line
 				ofStream.seek(ofStream.pos() - 1);
