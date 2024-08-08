@@ -596,13 +596,12 @@ class TreeItemModel extends JSONListModel {
                         modelObject[keys[index]] = retModel
                     }
 
-                    if(Object.keys(retVal).length) {
-                        if (Array.isArray(retVal)){
-                            retModel.setIsArray(true)
-                        }
-
-                        retModel.append(retVal)
+                    if (Array.isArray(retVal)){
+                        retModel.setIsArray(true)
                     }
+
+                    retModel.append(retVal)
+
                     retVal = retModel
                     retVal.updateTreeItemJSONModel()
                 }
