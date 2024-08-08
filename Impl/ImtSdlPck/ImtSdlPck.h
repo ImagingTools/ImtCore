@@ -15,6 +15,7 @@
 #include <imtsdl/CSdlClassJsonModificatorComp.h>
 #include <imtsdl/CQmlCodeGeneratorComp.h>
 #include <imtsdl/CGqlWrapClassCodeGeneratorComp.h>
+#include <imtsdl/CGqlCollectionControllerBaseClassGeneratorComp.h>
 
 
 /**
@@ -34,6 +35,7 @@ typedef imtsdl::CSdlClassGqlModificatorComp SdlClassGqlModificator;
 typedef imtsdl::CSdlClassJsonModificatorComp SdlClassJsonModificator;
 typedef imtsdl::CQmlCodeGeneratorComp QmlCodeGenerator;
 typedef imtsdl::CGqlWrapClassCodeGeneratorComp GqlWrapClassCodeGenerator;
+typedef imtsdl::CGqlCollectionControllerBaseClassGeneratorComp GqlCollectionControllerBaseClassGenerator;
 
 
 } // namespace ImtSdlPck

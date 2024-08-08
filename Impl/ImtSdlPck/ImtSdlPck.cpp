@@ -15,54 +15,59 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools") IM_AUTHOR("Sergey Zastrovnyh"));
 
 I_EXPORT_COMPONENT(
-		SdlGeneralManager,
-		"The manager of SDL processors and argument paresrs",
-		"Schema Definition Language SDL Parser Argument General Manager")
+			SdlGeneralManager,
+			"The manager of SDL processors and argument paresrs",
+			"Schema Definition Language SDL Parser Argument General Manager")
 
 I_EXPORT_COMPONENT(
-		SdlProcessArgumentsParser,
-		"The command line argument parser for processors",
-		"Schema Definition Language SDL Argument Parser")
+			SdlProcessArgumentsParser,
+			"The command line argument parser for processors",
+			"Schema Definition Language SDL Argument Parser")
 
 I_EXPORT_COMPONENT(
-		GqlSchemaParser,
-		"The parser for a human-readable GraphQL schema definition language (SDL)",
-		"GQL GraphQL Schema Definition Language SDL Parser")
+			GqlSchemaParser,
+			"The parser for a human-readable GraphQL schema definition language (SDL)",
+			"GQL GraphQL Schema Definition Language SDL Parser")
 
 I_EXPORT_COMPONENT(
-		SdlClassCodeGenerator,
-		"The C++ class generator of SDL types",
-		"Schema Definition Language SDL Class Generator")
+			SdlClassCodeGenerator,
+			"The C++ class generator of SDL types",
+			"Schema Definition Language SDL Class Generator")
 
 I_EXPORT_COMPONENT(
-	BaseClassExtender,
-	"The C++ class extender adds inheritance to class files",
-	"Schema Definition Language Class Generator Base Class")
+			BaseClassExtender,
+			"The C++ class extender adds inheritance to class files",
+			"Schema Definition Language Class Generator Base Class")
 
 I_EXPORT_COMPONENT(
-	QmlCodeGenerator,
-	"The QML generator of SDL types",
-	"Schema Definition Language SDL QML Class Generator")
+		QmlCodeGenerator,
+		"The QML generator of SDL types",
+		"Schema Definition Language SDL QML Class Generator")
 
 I_EXPORT_COMPONENT(
-		SdlClassTreeModelModificator,
-		"The C++ class modificator, adds saving and loading generated SDL types to TreeItemModel",
-		"Schema Definition Language SDL Class Generator Tree Item Model")
+			SdlClassTreeModelModificator,
+			"The C++ class modificator, adds saving and loading generated SDL types to TreeItemModel",
+			"Schema Definition Language SDL Class Generator Tree Item Model")
 
 I_EXPORT_COMPONENT(
-		SdlClassGqlModificator,
-		"The C++ class modificator, adds loading generated SDL types from GraphQL request",
-		"Schema Definition Language SDL Class Generator GraphQL GQL")
+			SdlClassGqlModificator,
+			"The C++ class modificator, adds loading generated SDL types from GraphQL request",
+			"Schema Definition Language SDL Class Generator GraphQL GQL")
 
 I_EXPORT_COMPONENT(
-	GqlWrapClassCodeGenerator,
-	"The C++ class generator of GraphQL wrap for SDL requests",
-	"Schema Definition Language SDL Class Generator GraphQL GQL")
+			GqlWrapClassCodeGenerator,
+			"The C++ class generator of GraphQL wrap for SDL requests",
+			"Schema Definition Language SDL Class Generator GraphQL GQL")
 
 I_EXPORT_COMPONENT(
-	SdlClassJsonModificator,
-	"The C++ class modificator, adds loading generated SDL types from JSON value",
-	"Schema Definition Language SDL Class Generator JSON")
+			SdlClassJsonModificator,
+			"The C++ class modificator, adds loading generated SDL types from JSON value",
+			"Schema Definition Language SDL Class Generator JSON")
+
+I_EXPORT_COMPONENT(
+			GqlCollectionControllerBaseClassGenerator,
+			"A C++ class generator of GraphQL Collection controllers for SDL requests",
+			"Schema Definition Language SDL Class Generator JSON GraphQL GQL Request")
 
 } // namespace ImtSdlPck
 
