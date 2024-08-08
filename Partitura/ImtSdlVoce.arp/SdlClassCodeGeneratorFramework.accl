@@ -8,7 +8,6 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="BaseClassExtender" X="586" Y="278" Note=""/>
         <Element ComponentName="CRemarkSeparator" X="375" Y="650" Note=""/>
         <Element ComponentName="CSdlClassGqlModificatorComp" X="875" Y="600" Note=""/>
         <Element ComponentName="SdlClassCodeGenerator" X="575" Y="425" Note=""/>

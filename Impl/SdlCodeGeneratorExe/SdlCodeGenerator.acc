@@ -34,6 +34,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="BaseClassExtender" PackageId="ImtSdlPck" ComponentId="BaseClassExtender">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ConsoleApplication" PackageId="BasePck" ComponentId="ConsoleApplication">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -56,6 +74,33 @@
         <Element Id="ConsoleLog" PackageId="BasePck" ComponentId="ConsoleLog">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="GqlCollectionControllerBaseClassGenerator" PackageId="ImtSdlPck" ComponentId="GqlCollectionControllerBaseClassGenerator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="BaseClassExtender"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FilesJoiner" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlClassCodeGenerator/SimpleFileJoiner"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="GqlWrapClassCodeGenerator" PackageId="ImtSdlPck" ComponentId="GqlWrapClassCodeGenerator">
@@ -99,6 +144,9 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="BaseClassExtender"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
