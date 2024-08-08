@@ -185,6 +185,7 @@
                                             <Value>SdlClassCodeGenerator</Value>
                                             <Value>QmlCodeGenerator</Value>
                                             <Value>SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator</Value>
+                                            <Value>SdlGqlCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
