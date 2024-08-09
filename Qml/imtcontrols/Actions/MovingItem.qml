@@ -9,7 +9,7 @@ MouseArea{
     preventStealing: true;
     cursorShape: containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
-    property Item globalParent: null;
+    property Item globalParent: ModalDialogManager.activeView;
     property Item containerItem: null;
     property Item movingItem: null;
 

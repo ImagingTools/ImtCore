@@ -3,7 +3,7 @@
 
 // Qt includes
 #include <QtCore/QObject>
-#include <QtCore/QString>
+#include <QtCore/QByteArray>
 
 
 namespace imtqml
@@ -14,19 +14,19 @@ class FileIO : public QObject
 {
 	Q_OBJECT
 
-	Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged)
+	Q_PROPERTY(QByteArray source READ source WRITE setSource NOTIFY sourceChanged)
 
 public:
-	QString source();
-	void setSource(QString source);
-	Q_INVOKABLE QString read();
-	Q_INVOKABLE bool write(QString text);
+	QByteArray source();
+	void setSource(QByteArray source);
+	Q_INVOKABLE QByteArray read();
+	Q_INVOKABLE bool write(QByteArray data);
 
 Q_SIGNALS:
 	void sourceChanged();
 
 private:
-	QString m_source;
+	QByteArray m_source;
 };
 
 

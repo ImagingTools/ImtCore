@@ -34,7 +34,7 @@ ControlBase {
     property string backgroundColor: Style.dialogBackgroundColor;
     property int radius: 0;
 
-    property bool canMove: false;
+    property bool canMove: true;
     property bool decoratorVisible: !decorator_ ? true: decorator_.visible;
 
     property bool closeAfterPause: false;

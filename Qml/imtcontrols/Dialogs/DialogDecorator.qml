@@ -113,7 +113,6 @@ DecoratorBase {
             MovingItem {
                 visible: !dialogContainer.baseElement ? false : dialogContainer.baseElement.canMove;
                 containerItem: topPanelContainer;
-                globalParent: !dialogContainer.baseElement ? null : !dialogContainer.baseElement.root ? null : dialogContainer.baseElement.root;
                 movingItem: !dialogContainer.baseElement ? null : dialogContainer.baseElement;
             }
 

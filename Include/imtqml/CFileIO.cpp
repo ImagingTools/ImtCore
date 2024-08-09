@@ -2,7 +2,6 @@
 
 // Qt includes
 #include <QtCore/QFile>
-#include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 
 
@@ -10,48 +9,46 @@ namespace imtqml
 {
 
 
-QString FileIO::source()
+QByteArray FileIO::source()
 {
 	return m_source;
 }
 
 
-void FileIO::setSource(QString source)
+void FileIO::setSource(QByteArray source)
 {
 	m_source = source;
 }
 
 
-QString FileIO::read()
+QByteArray FileIO::read()
 {
 	if(m_source.isEmpty()) {
-		return QString();
+		return QByteArray();
 	}
 	QFile file(m_source);
 	if(!file.exists()) {
 		qWarning() << "Does not exits: " << m_source;
-		return QString();
+		return QByteArray();
 	}
 
-	QString text;
+	QByteArray data;
 	if(file.open(QIODevice::ReadOnly)) {
-		QTextStream stream(&file);
-		text = stream.readAll();
+		data = file.readAll();
 	}
 
-	return text;
+	return data;
 }
 
 
-bool FileIO::write(QString text)
+bool FileIO::write(QByteArray data)
 {
 	if(m_source.isEmpty()) {
 		return false;
 	}
 	QFile file(m_source);
 	if(file.open(QIODevice::WriteOnly)) {
-		QTextStream stream(&file);
-		stream << text;
+		file.write(data);
 
 		return true;
 	}
