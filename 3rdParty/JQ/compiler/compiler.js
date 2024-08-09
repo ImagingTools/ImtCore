@@ -274,7 +274,7 @@ class Instruction {
                     result.push(key)
                     if(name === key) return result.join('.')
 
-                    if((typeof target[key] === 'object' && typeof target[key] !== 'function' && !(target[key] instanceof QmlFile || target[key] instanceof JSFile))){
+                    if((typeof target[key] === 'object' && typeof target[key] !== 'function' && !(target[key] instanceof QmlFile || target[key] instanceof JSFile || target[key] === QtQml.Screen))){
                         if(recursive(result, name, target[key])) {
                             // console.log(target[key][name])
                             if(target[key][name] instanceof JSFile || target[key][name] instanceof QmlFile){
