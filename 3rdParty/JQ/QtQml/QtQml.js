@@ -25,6 +25,8 @@ module.exports = {
     list: require("./List"),
 
     Signal: require("./Signal"),
+    
+    Screen: require("./Screen"),
 
     Models: require("./Models/Models"),
 

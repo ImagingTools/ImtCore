@@ -3,6 +3,11 @@ const os = require('os')
 const path = require('path')
 const parser = require('./parser')
 
+// for compatibility with web
+global.window = {
+    addEventListener: function(){}
+}
+
 const BaseObject = require('../QtBase/BaseObject')
 const Qt = require('../Qt/Qt')
 const QtQml = require('../QtQml/QtQml')
@@ -460,7 +465,7 @@ class Instruction {
                             path = null
                             stat.dotObj = null
                         }
-                        if(!path){
+                        if(path === undefined || path === null){
                             console.log(`${this.qmlFile.fileName}:${tree.info.line+1}:${tree.info.col+1}: warning: ${tree[2]} is not founded`)
                         }
                     }
