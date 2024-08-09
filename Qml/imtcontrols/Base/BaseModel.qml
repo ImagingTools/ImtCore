@@ -6,20 +6,20 @@ ListModel {
         if(Qt.platform.os === 'web'){
             for(let key in item.$properties){
                 if(
-                    key.indexOf('m_') >= 0
-                    && typeof item[key] !== "function"
-                    && item[key] !== undefined
-                    && item[key] !== null){
+                        key.indexOf('m_') >= 0
+                        && typeof item[key] !== "function"
+                        && item[key] !== undefined
+                        && item[key] !== null){
                     list.push(key)
                 }
             }
         } else {
             for(let key in item){
                 if(
-                    key.indexOf('m_') >= 0
-                    && typeof item[key] !== "function"
-                    && item[key] !== undefined
-                    && item[key] !== null){
+                        key.indexOf('m_') >= 0
+                        && typeof item[key] !== "function"
+                        && item[key] !== undefined
+                        && item[key] !== null){
                     list.push(key)
                 }
             }
@@ -90,4 +90,49 @@ ListModel {
         graphQL +=']'
         return graphQL
     }
+
+    function isEqualWithModel(model){
+        if (typeof this != typeof model){
+            return false;
+        }
+
+        if (count !== model.count){
+            return false;
+        }
+
+        for(let i = 0; i < count; i++){
+            let item1 = get(i).item
+            let item2 = model.get(i).item
+
+            let list1 = getProperties(item1)
+            let list2 = model.getProperties(item2)
+
+            for(let j = 0; j < list1.length; j++){
+                let key = list1[j]
+
+                if (!list2.includes(key)){
+                    return false;
+                }
+
+                if(typeof item1[key] !== typeof item2[key]){
+                    return false;
+                }
+
+                if(typeof item1[key] === 'object'){
+                    let ok = item1[key].isEqualWithModel(item2[key])
+                    if (!ok){
+                        return false
+                    }
+                } else {
+                    if (item1[key] !== item2[key]){
+                        return false
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
 }
+
+

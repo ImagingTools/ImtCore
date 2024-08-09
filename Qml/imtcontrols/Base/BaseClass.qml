@@ -150,6 +150,8 @@ QtObject {
     function copyMe(){
         let obj = createMe()
         obj.fromJSON(toJson())
+        obj.connectProperties();
+
         return obj
     }
 
