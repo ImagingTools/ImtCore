@@ -10,7 +10,7 @@ const QtQuick = require('../QtQuick/QtQuick')
 const Qt5Compat = require('../Qt5Compat/Qt5Compat')
 const QtWebSockets = require('../QtWebSockets/QtWebSockets')
 
-const configFilePath = process.argv.slice(2)[0]
+const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\jq.json'//process.argv.slice(2)[0]
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 const config = JSON.parse(fs.readFileSync(configFilePath, {encoding:'utf8', flag:'r'}))
 
@@ -86,10 +86,17 @@ class Instruction {
         this.defineProperties.push({
             name: meta[1],
             type: 'alias',
+            signalName: meta[1]+'Changed',
         })
         this.assignProperties.push({
             name: meta[1],
-            value: meta,//meta[meta.length - 1] === '.' ? meta.slice(2, meta.length - 1) : meta.slice(2),
+            type: 'alias',
+            value: meta,
+        })
+        this.defineSignals.push({
+            name: meta[1]+'Changed',
+            slotName: 'on'+ meta[1][0].toUpperCase() + meta[1].slice(1) +'Changed',
+            args: []
         })
     }
     qmlpropdef(meta){
@@ -112,6 +119,7 @@ class Instruction {
                 name: meta[2],
                 type: meta[3],
                 value: type.defaultValue,
+                signalName: meta[2]+'Changed',
             }) 
 
             this.assignProperties.push({
@@ -785,42 +793,37 @@ class Instruction {
                     return 'continue;'
                 }
                 case 'qmlaliasdef': {
+                    //let path = this.resolve(tree[1], stat.thisKey)
                     stat.isCompute = true
                     let obj = null
-                    let path = ''
-                    for(let p of tree.info){
-                        if(!p.value) continue
 
-                        if(obj){
-                            stat.value += '.'
-                            let isExists = obj.resolve(p.value)
-                            if(!isExists){
-                                console.log(`${this.qmlFile.fileName}:${p.line+1}:${p.col+1}: warning: ${p.value} is not founded in ${path}`)
-                            }
-        
-                            stat.value += p.value
-                            path += '.' + p.value
-                        } else {
-                            path += p.value
-                            if(this.qmlFile.context[p.value]) {  // context !!!
-                                stat.value += `__context['${p.value}']`
-                                obj = this.qmlFile.context[p.value]
-                                continue
-                            }
-                            if(p.value === 'parent') {
-                                stat.value += stat.thisKey + '.' +p.value
-                                continue
-                            }
-        
-                            let isExists = this.resolve(p.value, stat.thisKey)
-                            if(!isExists){
-                                console.log(`${this.qmlFile.fileName}:${p.line+1}:${p.col+1}: warning: ${p.value} is not founded`)
-                            }
-        
-                            stat.value += stat.thisKey + '.' + p.value 
-                        }
-                        
+                    if(this.qmlFile.context[tree.info[0].value]) {
+                        stat.value += `__context['${tree.info[0].value}']`
+                        obj = this.qmlFile.context[tree.info[0].value]
+                    } else if(tree.info[0].value === 'parent') {
+                        stat.value += stat.thisKey + '.' +tree.info[0].value
                     }
+
+                    if(obj){
+                        for(let i = 1; i < tree.info.length; i++){
+                            if(obj){
+                                let path = obj.resolve(tree.info[i].value, '')
+
+                                if(path){
+                                    stat.value += path.source
+
+                                    obj = path.obj
+                                } else {
+                                    console.log(`${this.qmlFile.fileName}:${tree.info[i].line+1}:${tree.info[i].col+1}: warning: ${tree.info[i].value} is not founded in ${tree.info[i-1].value}`)
+                                }
+                            } else {
+                                stat.value += tree.info[i].value
+                            }
+                        }
+                    } else {
+                        console.log(`${this.qmlFile.fileName}:${tree.info[0].line+1}:${tree.info[0].col+1}: warning: ${tree.info[0].value} is not founded`)
+                    }
+
                     return stat
                 }
                 default: {
@@ -1025,13 +1028,18 @@ class Instruction {
         if(this.id) code.push(`__context['${this.id}']=self`)  // context !!!
 
         for(let assignProperty of this.assignProperties){
+            let path = this.resolve(assignProperty.name.split('.')[0], 'self')
+
             if(assignProperty.value instanceof Instruction) {
                 code.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false)}).create()`)
             } else {
                 let stat = this.prepare(assignProperty.value, {isCompute:false, thisKey: 'self', value:'', local:[]})
                 if(stat.isCompute){
-                    code.push(`self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},__updateList)`)
-                    // code.push(`__updateList.push(self.${assignProperty.name})`) // property update !!!
+                    if(assignProperty.type === 'alias'){
+                        code.push(`self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},__updateList)`)
+                    } else {
+                        code.push(`self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},__updateList)`)
+                    }
                 } else {
                     code.push(`self.${assignProperty.name}=${stat.value}`)
                 }

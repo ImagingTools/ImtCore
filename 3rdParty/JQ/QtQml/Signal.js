@@ -47,23 +47,23 @@ class Signal {
     disconnect(...args){
         if(!this.__connections) return
 
+        let i = 0
         if(args.length === 1){
-            for(let i = 0; i < this.__connections.length; i++){
-                if(this.__connections[i].slot === args[0]){
+            while(i < this.__connections.length){
+                if(!this.__connections[i].target && this.__connections[i].slot === args[0]){
                     this.__connections.splice(i, 1)
-                    if(this.__connections.length === 0) delete this.__connections
-                    return
+                } else {
+                    i++
                 }
             }
         } else if(args.length === 2){
-            for(let i = 0; i < this.__connections.length; i++){
+            while(i < this.__connections.length){
                 if(this.__connections[i].target === args[0] && this.__connections[i].slot === args[1]){
                     this.__connections.splice(i, 1)
-                    if(this.__connections.length === 0) delete this.__connections
-                    return
                 }
             }
         }
+        if(this.__connections.length === 0) delete this.__connections
     }
 
     emit(...args){
