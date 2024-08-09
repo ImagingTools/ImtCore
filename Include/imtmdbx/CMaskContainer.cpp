@@ -44,6 +44,282 @@ CMaskContainer::CMaskContainer(OperationType operationType):
 	}
 }
 
+//reimplemented (IMask)
+bool CMaskContainer::GetUnit(quint64 position)
+{
+	if(m_maskList.isEmpty() && m_maskListInv.isEmpty()){
+		return false;
+	}
+	bool firstUnit  = m_operationType == OT_AND ? true : false;
+
+	bool retUnit = firstUnit;
+
+	for(int i = 0; i < m_maskList.length(); i++){
+		bool currUnit = m_maskList.at(i)->GetUnit(position);
+		if(m_operationType == OT_AND){
+			retUnit = retUnit & currUnit;
+		}
+		else if(m_operationType == OT_OR){
+			retUnit = retUnit | currUnit;
+		}
+
+	}
+	for(int i = 0; i < m_maskListInv.length(); i++){
+		bool currUnit = m_maskListInv.at(i)->GetUnit(position);
+		if(m_operationType == OT_AND){
+			retUnit = retUnit & currUnit;
+		}
+		else if(m_operationType == OT_OR){
+			retUnit = retUnit | currUnit;
+		}
+
+	}
+
+	return retUnit;
+}
+
+
+bool CMaskContainer::SetUnit(quint64 position, bool unit)
+{
+	return false;
+}
+
+
+bool CMaskContainer::GetItem(quint64 offset, quint64 &item)
+{
+	if(m_maskList.isEmpty() && m_maskListInv.isEmpty()){
+		return false;
+	}
+
+	quint64 firstItem;
+	firstItem = m_operationType == OT_AND ? 0xffffffffffffff : 0;
+
+	quint64 retItem = firstItem;
+
+	for(int i = 0; i < m_maskList.length(); i++){
+		quint64 currItem;
+		bool okCurr = m_maskList.at(i)->GetItem(offset, currItem);
+		if(!okCurr){
+			if(m_operationType == OT_AND){
+				return false;
+			}
+			else if(m_operationType == OT_OR){
+				continue;
+			}
+		}
+		if(m_operationType == OT_AND){
+			retItem = retItem & currItem;
+		}
+		else if(m_operationType == OT_OR){
+			retItem = retItem | currItem;
+		}
+	}
+	for(int i = 0; i < m_maskListInv.length(); i++){
+		quint64 currItem;
+		bool okCurr = m_maskListInv.at(i)->GetItem(offset, currItem);
+		if(!okCurr){
+			if(m_operationType == OT_AND){
+				return false;
+			}
+			else if(m_operationType == OT_OR){
+				continue;
+			}
+		}
+		if(m_operationType == OT_AND){
+			retItem = retItem & currItem;
+		}
+		else if(m_operationType == OT_OR){
+			retItem = retItem | currItem;
+		}
+	}
+
+	item = retItem;
+
+	return true;
+}
+
+
+bool CMaskContainer::SetItem(quint64 offset, quint64 item)
+{
+	return false;
+}
+
+
+bool CMaskContainer::GetNearestOffset(quint64 &offset, quint64 startOffset)
+{
+	if(m_maskList.isEmpty() && m_maskListInv.isEmpty()){
+		return false;
+	}
+
+	quint64 retOffset = 0;
+	for(int i = 0; i < m_maskList.length(); i++){
+		quint64 currOffset;
+		bool okCurr = m_maskList.at(i)->GetNearestOffset(currOffset, startOffset);
+		if(!okCurr){
+			if(m_operationType == OT_AND){
+				return false;
+			}
+			else if(m_operationType == OT_OR){
+				continue;
+			}
+		}
+		if(m_operationType == OT_AND){
+			if(currOffset > retOffset){
+				retOffset = currOffset;
+			}
+		}
+		else if(m_operationType == OT_OR){
+			if(currOffset < retOffset){
+				retOffset = currOffset;
+			}
+		}
+	}
+	for(int i = 0; i < m_maskListInv.length(); i++){
+		quint64 currOffset;
+		bool okCurr = m_maskListInv.at(i)->GetNearestOffset(currOffset, startOffset);
+		if(!okCurr){
+			if(m_operationType == OT_AND){
+				return false;
+			}
+			else if(m_operationType == OT_OR){
+				continue;
+			}
+		}
+		if(m_operationType == OT_AND){
+			if(currOffset > retOffset){
+				retOffset = currOffset;
+			}
+		}
+		else if(m_operationType == OT_OR){
+			if(currOffset < retOffset){
+				retOffset = currOffset;
+			}
+		}
+	}
+
+	offset = retOffset;
+
+	return true;
+}
+
+
+bool CMaskContainer::GetNextItemOffset(quint64 &offset, qint64 startOffset)
+{
+	if(m_maskList.isEmpty() && m_maskListInv.isEmpty()){
+		return false;
+	}
+
+	quint64 retOffset = 0;
+	for(int i = 0; i < m_maskList.length(); i++){
+		quint64 currOffset;
+		bool okCurr = m_maskList.at(i)->GetNextItemOffset(currOffset, startOffset);
+		if(!okCurr){
+			if(m_operationType == OT_AND){
+				return false;
+			}
+			else if(m_operationType == OT_OR){
+				continue;
+			}
+		}
+		if(m_operationType == OT_AND){
+			if(currOffset > retOffset){
+				retOffset = currOffset;
+			}
+		}
+		else if(m_operationType == OT_OR){
+			if(currOffset < retOffset){
+				retOffset = currOffset;
+			}
+		}
+	}
+	for(int i = 0; i < m_maskListInv.length(); i++){
+		quint64 currOffset;
+		bool okCurr = m_maskListInv.at(i)->GetNextItemOffset(currOffset, startOffset);
+		if(!okCurr){
+			if(m_operationType == OT_AND){
+				return false;
+			}
+			else if(m_operationType == OT_OR){
+				continue;
+			}
+		}
+		if(m_operationType == OT_AND){
+			if(currOffset > retOffset){
+				retOffset = currOffset;
+			}
+		}
+		else if(m_operationType == OT_OR){
+			if(currOffset < retOffset){
+				retOffset = currOffset;
+			}
+		}
+	}
+
+
+	offset = retOffset;
+
+	return true;
+}
+
+
+bool CMaskContainer::GetPreviosItemOffset(quint64 &offset, quint64 startOffset)
+{
+	if(m_maskList.isEmpty() && m_maskListInv.isEmpty()){
+		return false;
+	}
+
+	quint64 retOffset = 0;
+	for(int i = 0; i < m_maskList.length(); i++){
+		quint64 currOffset;
+		bool okCurr = m_maskList.at(i)->GetPreviosItemOffset(currOffset, startOffset);
+		if(!okCurr){
+			if(m_operationType == OT_AND){
+				return false;
+			}
+			else if(m_operationType == OT_OR){
+				continue;
+			}
+		}
+		if(m_operationType == OT_AND){
+			if(currOffset < retOffset){
+				retOffset = currOffset;
+			}
+		}
+		else if(m_operationType == OT_OR){
+			if(currOffset > retOffset){
+				retOffset = currOffset;
+			}
+		}
+	}
+	for(int i = 0; i < m_maskListInv.length(); i++){
+		quint64 currOffset;
+		bool okCurr = m_maskListInv.at(i)->GetPreviosItemOffset(currOffset, startOffset);
+		if(!okCurr){
+			if(m_operationType == OT_AND){
+				return false;
+			}
+			else if(m_operationType == OT_OR){
+				continue;
+			}
+		}
+		if(m_operationType == OT_AND){
+			if(currOffset < retOffset){
+				retOffset = currOffset;
+			}
+		}
+		else if(m_operationType == OT_OR){
+			if(currOffset > retOffset){
+				retOffset = currOffset;
+			}
+		}
+	}
+
+	offset = retOffset;
+
+	return true;
+}
+//reimplemented (IMask)
+
 
 void CMaskContainer::AddMask(IMask *mask, bool isInversion)
 {
@@ -88,12 +364,12 @@ bool CMaskContainer::RemoveLastMask(bool isInversion)
 	return ok;
 }
 
-bool CMaskContainer::RemoveMask(int index, bool isInversion)
+bool CMaskContainer::RemoveMask(int index, int n, bool isInversion)
 {
 	bool ok = true;
 	if(!isInversion){
-		if(!m_maskList.isEmpty() && index < m_maskList.length()){
-			m_maskList.remove(index);
+		if(!m_maskList.isEmpty() && index + n -1  < m_maskList.length()){
+			m_maskList.remove(index, n);
 			m_maskList.squeeze();
 		}
 		else {
@@ -101,8 +377,8 @@ bool CMaskContainer::RemoveMask(int index, bool isInversion)
 		}
 	}
 	else {
-		if(!m_maskListInv.isEmpty() && index < m_maskListInv.length()){
-			m_maskListInv.remove(index);
+		if(!m_maskListInv.isEmpty() && index + n -1 < m_maskListInv.length()){
+			m_maskListInv.remove(index, n);
 			m_maskListInv.squeeze();
 		}
 		else {
@@ -134,6 +410,7 @@ void CMaskContainer::SetDocumentTable(IDocumentTable* documentTable)
 
 quint64 CMaskContainer::GetUnitCount()
 {
+
 	quint64 activeOffset = 0;
 	quint64 unitCount = 0;
 	bool isStart = true;
@@ -233,16 +510,33 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 {
 	qint64 maxOffset = activeOffset;
 	activeItem = 0xffffffffffffffff;
+	bool isLast = true;
 	for(int i = 0; i < m_maskList.length(); i++){
 		quint64 offset = 0;
 		if (isStart){
 			if (!m_maskList.at(i)->GetNearestOffset(offset, activeOffset)){
-				return false;
+				if(m_operationType == OT_AND){
+					return false;
+				}
+				else if(m_operationType == OT_OR){
+					continue;
+				}
+			}
+			else {
+				isLast = false;
 			}
 		}
 		else{
 			if (!m_maskList.at(i)->GetNextItemOffset(offset, activeOffset)){
-				return false;
+				if(m_operationType == OT_AND){
+					return false;
+				}
+				else if(m_operationType == OT_OR){
+					continue;
+				}
+			}
+			else {
+				isLast = false;
 			}
 		}
 		qint64 offset_ = offset;
@@ -254,18 +548,38 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 		quint64 offset = 0;
 		if (isStart){
 			if (!m_maskListInv.at(i)->GetNearestOffset(offset, activeOffset)){
-				return false;
+				if(m_operationType == OT_AND){
+					return false;
+				}
+				else if(m_operationType == OT_OR){
+					continue;
+				}
+			}
+			else {
+				isLast = false;
 			}
 		}
 		else{
 			if(!m_maskListInv.at(i)->GetNextItemOffset(offset, activeOffset)){
-				return false;
+				if(m_operationType == OT_AND){
+					return false;
+				}
+				else if(m_operationType == OT_OR){
+					continue;
+				}
+			}
+			else {
+				isLast = false;
 			}
 		}
 		qint64 offset_ = offset;
 		if(offset_ > maxOffset){
 			maxOffset = offset;
 		}
+	}
+
+	if(isLast){
+		return false;
 	}
 
 	activeOffset = maxOffset;

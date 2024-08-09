@@ -4,6 +4,7 @@
 namespace imtmdbx
 {
 
+int getItemCount = 0;
 
 CMask::CMask(const QString &name, mdbx::txn_managed &txn, mdbx::key_mode keyMode, mdbx::value_mode valueMode, bool hasIndex):
 	CDocumentTable(name, txn, keyMode, valueMode, hasIndex)
@@ -60,6 +61,7 @@ bool CMask::SetUnit(quint64 position, bool unit)
 
 bool CMask::GetItem(quint64 offset, quint64& item)
 {
+	getItemCount++;
 	try{
 		mdbx::slice keySlice(&offset, 8);
 
@@ -97,9 +99,18 @@ bool CMask::SetItem(quint64 offset, quint64 item)
 bool CMask::GetNearestOffset(quint64& offset, quint64 startOffset)
 {
 	try{
+//		if(startOffset == 0){
+//			mdbx::cursor::move_result result  = m_cursor.to_first(false);
+//			if(!result.done){
+//				return false;
+//			}
+//		}
 		mdbx::slice keySlice(&startOffset, 8);
 
-		mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice);
+		mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice, false);
+		if(!result.done){
+			return false;
+		}
 
 		offset = result.key.as_uint64();
 
@@ -117,9 +128,15 @@ bool CMask::GetNextItemOffset(quint64& offset, qint64 startOffset)
 	try{
 		mdbx::slice keySlice(&startOffset, 8);
 
-		mdbx::cursor::move_result result = m_cursor.find(keySlice);
-		if(result.done){
-			result = m_cursor.to_next(true);
+		mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
+		if (result.done){
+//			if (m_cursor.eof()){
+//				return false;
+//			}
+			result = m_cursor.to_next(false);
+			if (!result.done){
+				return false;
+			}
 		}
 		else{
 			return false;

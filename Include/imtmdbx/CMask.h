@@ -8,6 +8,7 @@
 namespace imtmdbx
 {
 
+extern int getItemCount;
 
 class CMask: virtual public IMask, public CDocumentTable
 {
