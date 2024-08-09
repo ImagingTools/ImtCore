@@ -795,6 +795,7 @@ var Qt = {
                 for(let update of updateList.splice(0, updateList.length)){
                     update()
                 }
+                TransactionController.add(obj)
                 return obj
             }
         }
