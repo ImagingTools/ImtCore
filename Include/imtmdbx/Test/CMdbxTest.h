@@ -36,7 +36,7 @@ public:
 	void test_mdbx();
 	void test_mdbxfind();
 	void test_mdbxcursor();
-	void test_read_write();
+	//void test_read_write();
 
 private slots:
 	void test_read_all_units();

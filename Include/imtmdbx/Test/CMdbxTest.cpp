@@ -8,7 +8,7 @@
 #include <imtmdbx/CDoubleMask.h>
 
 #include <iostream>
-#include <QThread>
+//#include <QThread>
 #include <QCoreApplication>
 
 
@@ -707,133 +707,133 @@ void CMdbxTest::test_update_doc(){
 
 
 
-class ThreadTest: public QObject
-{
-	Q_OBJECT
+//class ThreadTest: public QObject
+//{
+//	Q_OBJECT
 
-public Q_SLOTS:
-	void on_WriteRequest() {
+//public Q_SLOTS:
+//	void on_WriteRequest() {
 
-		qDebug() << "ThreadTest";
+//		qDebug() << "ThreadTest";
 
-		QString tableName = "Units10";
+//		QString tableName = "Units10";
 
-		qint64 key = 3;
-		std::string data = "NEW_VALUE!!!";
-		mdbx::slice keySlice(&key, 8);
-		mdbx::slice valueSlice(data.data(), data.length());
+//		qint64 key = 3;
+//		std::string data = "NEW_VALUE!!!";
+//		mdbx::slice keySlice(&key, 8);
+//		mdbx::slice valueSlice(data.data(), data.length());
 
-		imtmdbx::CDatabaseEngine engineWrite = imtmdbx::CDatabaseEngine(tableName + ".mdb");
-		mdbx::env_managed envWrite = engineWrite.GetEnv();
-		mdbx::txn_managed txnWrite = envWrite.start_write();
-		mdbx::map_handle mapHandleWrite = txnWrite.open_map(tableName.toStdString(), mdbx::key_mode::reverse, mdbx::value_mode::single);
-		//mdbx::cursor_managed cursor = txnWrite.open_cursor(mapHandleWrite);
-		//mdbx::cursor::move_result result = cursor.to_last(false);
+//		imtmdbx::CDatabaseEngine engineWrite = imtmdbx::CDatabaseEngine(tableName + ".mdb");
+//		mdbx::env_managed envWrite = engineWrite.GetEnv();
+//		mdbx::txn_managed txnWrite = envWrite.start_write();
+//		mdbx::map_handle mapHandleWrite = txnWrite.open_map(tableName.toStdString(), mdbx::key_mode::reverse, mdbx::value_mode::single);
+//		//mdbx::cursor_managed cursor = txnWrite.open_cursor(mapHandleWrite);
+//		//mdbx::cursor::move_result result = cursor.to_last(false);
 
-		//txnWrite.put(mapHandleWrite, keySlice, valueSlice, mdbx::put_mode::upsert);
-		txnWrite.update(mapHandleWrite, keySlice, valueSlice);
-		txnWrite.commit();
-	}
-};
+//		//txnWrite.put(mapHandleWrite, keySlice, valueSlice, mdbx::put_mode::upsert);
+//		txnWrite.update(mapHandleWrite, keySlice, valueSlice);
+//		txnWrite.commit();
+//	}
+//};
 
-class ThreadController: public QObject
-{
-	Q_OBJECT
-	QThread thread;
-public:
-	ThreadController()
-	{
-		ThreadTest *testObject = new ThreadTest;
-		connect(&thread, &QThread::finished, testObject, &QObject::deleteLater);
-		connect(this, &ThreadController::write, testObject, &ThreadTest::on_WriteRequest);
+//class ThreadController: public QObject
+//{
+//	Q_OBJECT
+//	QThread thread;
+//public:
+//	ThreadController()
+//	{
+//		ThreadTest *testObject = new ThreadTest;
+//		connect(&thread, &QThread::finished, testObject, &QObject::deleteLater);
+//		connect(this, &ThreadController::write, testObject, &ThreadTest::on_WriteRequest);
 
-		testObject->moveToThread(&thread);
-		thread.start();
-	}
+//		testObject->moveToThread(&thread);
+//		thread.start();
+//	}
 
-signals:
-	void write();
+//signals:
+//	void write();
 
-};
+//};
 
-void CMdbxTest::test_read_write(){
+//void CMdbxTest::test_read_write(){
 
-	return;
+//	return;
 
-	std::cout << "TEST_TEST!!!";
+//	std::cout << "TEST_TEST!!!";
 
-	/*************************************************************/
-	QString tableName = "Units10";
+//	/*************************************************************/
+//	QString tableName = "Units10";
 
-	imtmdbx::CDatabaseEngine engineRead = imtmdbx::CDatabaseEngine(tableName + ".mdb");
-	//imtmdbx::CDatabaseEngine engineWrite = imtmdbx::CDatabaseEngine(tableName + ".mdb");
+//	imtmdbx::CDatabaseEngine engineRead = imtmdbx::CDatabaseEngine(tableName + ".mdb");
+//	//imtmdbx::CDatabaseEngine engineWrite = imtmdbx::CDatabaseEngine(tableName + ".mdb");
 
-	mdbx::env_managed envRead = engineRead.GetEnv();
-	mdbx::txn_managed txnRead = envRead.start_read();
-
-
-	//thread
-	int argc = 0; char *argv = {};
-	QCoreApplication app(argc, &argv);
-
-	ThreadController controller;
-	emit controller.write();
-
-	//waiting
-	QDateTime currTime = QDateTime::currentDateTime();
-	QDateTime time = QDateTime::currentDateTime();
-	QDateTime add30Sec = currTime;
-	add30Sec = add30Sec.addSecs(5);
-
-	while(time < add30Sec){
-		time = QDateTime::currentDateTime();
-	}
-	qDebug() << "Time:: " << time.toString();
-
-	//reading
-	qint64 key = 3;
-	mdbx::slice keySlice(&key, 8);
-	std::string data = "newNew";
-
-	mdbx::map_handle mapHandleRead = txnRead.open_map(tableName.toStdString(), mdbx::key_mode::reverse, mdbx::value_mode::single);
-	mdbx::cursor_managed cursorRead = txnRead.open_cursor(mapHandleRead);
-
-	mdbx::cursor::move_result resultRead = cursorRead.find(keySlice);
-	std::string value = resultRead.value.as_string();
-
-	qDebug() << "VALUE:: " << value;
+//	mdbx::env_managed envRead = engineRead.GetEnv();
+//	mdbx::txn_managed txnRead = envRead.start_read();
 
 
+//	//thread
+//	int argc = 0; char *argv = {};
+//	QCoreApplication app(argc, &argv);
 
-	/*************************************************************/
-//		imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine(tableName + ".mdb");
-//		imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable(tableName, engine, false);
+//	ThreadController controller;
+//	emit controller.write();
 
-//		documentTable.UpdateDocument(3, "unitNEW");
-//		documentTable.SetIsRead(true);
-//		QByteArray newVal = documentTable.GetDocument(3);
-//		qDebug() << "NEW_VALUE:: " << newVal;
+//	//waiting
+//	QDateTime currTime = QDateTime::currentDateTime();
+//	QDateTime time = QDateTime::currentDateTime();
+//	QDateTime add30Sec = currTime;
+//	add30Sec = add30Sec.addSecs(5);
 
-}
+//	while(time < add30Sec){
+//		time = QDateTime::currentDateTime();
+//	}
+//	qDebug() << "Time:: " << time.toString();
 
-class TreadMask: public QThread
-{
-	Q_OBJECT
-public:
-	TreadMask(imtmdbx::CDatabaseEngine& engine):
-		m_engine(engine)
-	{
-		start();
-	}
+//	//reading
+//	qint64 key = 3;
+//	mdbx::slice keySlice(&key, 8);
+//	std::string data = "newNew";
 
-protected:
-	void run() override
-	{
+//	mdbx::map_handle mapHandleRead = txnRead.open_map(tableName.toStdString(), mdbx::key_mode::reverse, mdbx::value_mode::single);
+//	mdbx::cursor_managed cursorRead = txnRead.open_cursor(mapHandleRead);
 
-	}
+//	mdbx::cursor::move_result resultRead = cursorRead.find(keySlice);
+//	std::string value = resultRead.value.as_string();
 
-	imtmdbx::CDatabaseEngine& m_engine;
-};
+//	qDebug() << "VALUE:: " << value;
+
+
+
+//	/*************************************************************/
+////		imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine(tableName + ".mdb");
+////		imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable(tableName, engine, false);
+
+////		documentTable.UpdateDocument(3, "unitNEW");
+////		documentTable.SetIsRead(true);
+////		QByteArray newVal = documentTable.GetDocument(3);
+////		qDebug() << "NEW_VALUE:: " << newVal;
+
+//}
+
+//class TreadMask: public QThread
+//{
+//	Q_OBJECT
+//public:
+//	TreadMask(imtmdbx::CDatabaseEngine& engine):
+//		m_engine(engine)
+//	{
+//		start();
+//	}
+
+//protected:
+//	void run() override
+//	{
+
+//	}
+
+//	imtmdbx::CDatabaseEngine& m_engine;
+//};
 
 void CMdbxTest::test_write_masks(){
 
@@ -912,10 +912,10 @@ void CMdbxTest::test_write_masks(){
 //		quint64 unit =  mask1mln.GetUnit(2);
 		bool unit = doubleMask.GetUnit(5);
 
-		imtmdbx::CMaskContainer container(imtmdbx::CMaskContainer::OT_AND);
+		imtmdbx::CMaskContainer container(imtmdbx::CMaskContainer::OT_OR);
 		container.AddMask(&mask1mln, false);
-		container.AddMask(&doubleMask, false);
-		//container.AddMask(&mask1000, false);
+//		container.AddMask(&doubleMask, false);
+		container.AddMask(&mask1000, false);
 
 		QElapsedTimer time;
 		time.start();
