@@ -241,8 +241,6 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::CloseFiles()
 
 bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessFiles(const CSdlDocumentType& sdlDocumentType, bool addDependenciesInclude, bool addSelfHeaderInclude)
 {
-	/// \todo add checks for duplicates of subtypes
-
 	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
 		SendErrorMessage(0,
 					QString("Unable to open file: '%1'. Error: %2")
@@ -279,7 +277,16 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	ifStream << QStringLiteral("#pragma once");
 	FeedStream(ifStream, 3, false);
 
-	/// \todo add required includes here
+	const SdlDocumentTypeList subtypesList = sdlDocumentType.GetSubtypes();
+	if (addDependenciesInclude){
+		AddRequiredIncludesForDocument(ifStream, sdlDocumentType);
+		FeedStream(ifStream, 1, false);
+		for (const CSdlDocumentType& subtype: subtypesList){
+			AddRequiredIncludesForDocument(ifStream, subtype);
+			FeedStream(ifStream, 1, false);
+		}
+		FeedStream(ifStream, 1, false);
+	}
 
 	// namespace begin
 	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
@@ -334,7 +341,6 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	FeedStream(ifStream, 1, false);
 
 	AddMethodsForDocument(ifStream, sdlDocumentType, 1);
-	const SdlDocumentTypeList subtypesList = sdlDocumentType.GetSubtypes();
 	FeedStream(ifStream, 1, false);
 	for (const CSdlDocumentType& subtype: subtypesList){
 		AddMethodsForDocument(ifStream, subtype, 1);
@@ -408,6 +414,26 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AbortCurrentProcessing()
 }
 
 
+void CGqlCollectionControllerBaseClassGeneratorComp::AddRequiredIncludesForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("// ");
+	stream << sdlDocumentType.GetName();
+	stream << QStringLiteral(" includes");
+	FeedStream(stream, 1, false);
+
+	const QMap<CSdlDocumentType::OperationType, CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
+	for (auto operationIter = operationsList.cbegin(); operationIter != operationsList.cend(); ++operationIter){
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("#include \"C");
+		stream << GetCapitalizedValue(operationIter->GetName());
+		stream << QStringLiteral("GqlRequest.h\"");
+
+		FeedStream(stream, 1, false);
+	}
+}
+
+
 void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
@@ -427,12 +453,12 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 {
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("virtual C");
-	stream << GetCapitalizedValue(sdlRequest.GetOutputArgument().GetType()); /// < \todo include it
+	stream << GetCapitalizedValue(sdlRequest.GetOutputArgument().GetType());
 	stream << QStringLiteral(" On");
 	stream << GetCapitalizedValue(sdlRequest.GetName());
 	stream << QStringLiteral("(const C");
 	stream << GetCapitalizedValue(sdlRequest.GetName());
-	stream << QStringLiteral("GqlRequest& "); /// < \todo include it
+	stream << QStringLiteral("GqlRequest& ");
 	stream << GetDecapitalizedValue(sdlRequest.GetName());
 	stream << QStringLiteral("Request, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;");
 

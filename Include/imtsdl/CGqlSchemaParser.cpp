@@ -491,6 +491,7 @@ bool CGqlSchemaParser::ProcessCustomSection(const QString& sectionName)
 
 bool CGqlSchemaParser::ValidateSchema()
 {
+	/// \todo add checks for duplicates of types
 	for (const CSdlType& sdlType: m_sdlTypes){
 		for (const CSdlField& sdlField: sdlType.GetFields()){
 			bool isCustom = false;

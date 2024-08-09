@@ -210,6 +210,13 @@ bool CGqlExtSchemaParser::ProcessCustomSection(const QString& sectionName)
 }
 
 
+bool CGqlExtSchemaParser::ValidateSchema()
+{
+	/// \todo add checks for duplicates of types and subtypes inside each type
+	return BaseClass::ValidateSchema();
+}
+
+
 
 } // namespace imtsdl
 

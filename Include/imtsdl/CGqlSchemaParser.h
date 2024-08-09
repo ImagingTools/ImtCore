@@ -72,7 +72,6 @@ protected:
 	 */
 	virtual bool ProcessCustomSection(const QString& sectionName);
 
-
 	virtual bool ValidateSchema();
 
 	void SetDevice(QIODevice& device);

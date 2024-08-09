@@ -46,6 +46,7 @@ protected:
 
 	// reimplemented (CGqlSchemaParser)
 	virtual bool ProcessCustomSection(const QString& sectionName) override;
+	virtual bool ValidateSchema() override;
 
 protected:
 	SdlDocumentTypeList m_documentTypes;
