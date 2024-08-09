@@ -167,12 +167,6 @@ int CBaseClassExtenderComp::DoProcessing(
 	m_originalHeaderFilePtr.SetPtr(new QFile(headerFilePathPtr->GetPath()));
 	m_headerFilePtr.SetPtr(new QFile(tempPath + QDir::separator() + QFileInfo(*m_originalHeaderFilePtr).fileName()));
 
-	iprm::TParamsPtr<ifile::IFileNameParam> sourceFilePathPtr(paramsPtr, QByteArrayLiteral("SourceFile"), false);
-	if (sourceFilePathPtr.IsValid()){
-		m_originalSourceFilePtr.SetPtr(new QFile(sourceFilePathPtr->GetPath()));
-		m_sourceFilePtr.SetPtr(new QFile(tempPath + QDir::separator() + QFileInfo(*m_originalSourceFilePtr).fileName()));
-	}
-
 	bool isOk = BeginClassFiles();
 	if (!isOk){
 		AbortCurrentProcessing();
@@ -181,13 +175,6 @@ int CBaseClassExtenderComp::DoProcessing(
 	}
 
 	isOk = isOk && ProcessHeaderClassFile(*paramsPtr, *baseClassOptionListPtr);
-	if (!isOk){
-		AbortCurrentProcessing();
-
-		return iproc::IProcessor::TS_INVALID;
-	}
-
-	isOk = isOk && ProcessSourceClassFile(*paramsPtr, *baseClassOptionListPtr);
 	if (!isOk){
 		AbortCurrentProcessing();
 
@@ -267,6 +254,9 @@ bool CBaseClassExtenderComp::ProcessHeaderClassFile(
 	/// indicates if we inside public section of class
 	bool inPublicSection = false;
 
+	/// indicates if we added Component MACRO
+	bool componentMacroAdded = false;
+
 	QString className;
 
 	while (!ifStream.atEnd()){
@@ -314,46 +304,60 @@ bool CBaseClassExtenderComp::ProcessHeaderClassFile(
 		bool writeLine = true;
 		if (!classList.isEmpty()){
 			// add inheritance if we found a class
-			static QRegularExpression classRegExp(QStringLiteral("\\s*class"));
-			if (classRegExp.match(readLine).hasMatch()){
+			static QRegularExpression classRegExp(QStringLiteral("^\\s*class\\s*([^\\s\\:]+)"));
+			QRegularExpressionMatch classRegExpMatch = classRegExp.match(readLine);
+			if (classRegExpMatch.hasMatch()){
 				writeLine = false;
 				ofStream << readLine;
 				ofStream.flush();
 				AddInheritance(ifStream, ofStream, classList);
 				inClass = true;
+				className = classRegExpMatch.capturedTexts().constLast();
 			}
 		}
 
-		/// \todo FINISH IT!
-		if (inPublicSection && inClass && addCompMacro){
+		// if we found public section
+		if (inClass && s_publicSectionDirectiveRegExp.match(readLine).hasMatch()){
+			inPublicSection = true;
+		}
+
+		if (inPublicSection && inClass && addCompMacro && !componentMacroAdded){
+			writeLine = false;
+			ofStream << readLine;
+			FeedStream(ofStream, 1, false);
+
 			if (!hasPublicSection){
 				ofStream << QStringLiteral("public:");
 				FeedStream(ofStream, 1, false);
 			}
-			ofStream << QStringLiteral("typedef ");
+			Q_ASSERT(!className.isEmpty());
+			Q_ASSERT(baseListCount > 0);
 
-			ofStream << QStringLiteral(" BaseClass");
+			// define BaseClass
+			FeedStreamHorizontally(ofStream, 1);
+			ofStream << QStringLiteral("typedef ");
+			ofStream << QString(baseClassList.GetOptionId(0));
+			ofStream << QStringLiteral(" BaseClass;");
+
+			// add Comp MACRO
+			FeedStream(ofStream, 2, false);
+			FeedStreamHorizontally(ofStream, 1);
+			ofStream << QStringLiteral("I_BEGIN_BASE_COMPONENT(");
+			ofStream << className;
+			ofStream << ')';
+			FeedStream(ofStream, 1, false);
+
+			FeedStreamHorizontally(ofStream, 1);
+			ofStream << QStringLiteral("I_END_COMPONENT");
+			FeedStream(ofStream, 2, true);
+
+			componentMacroAdded = true;
 		}
 		if (writeLine){
 			ofStream << readLine;
 			FeedStream(ofStream);
 		}
 	}
-
-	return true;
-}
-
-
-bool CBaseClassExtenderComp::ProcessSourceClassFile(
-			const iprm::IParamsSet& /*paramsPtr*/,
-			const iprm::IOptionsList& /*baseClassList*/)
-{
-	if (!m_sourceFilePtr.IsValid() || !m_originalSourceFilePtr.IsValid()){
-		return true;
-	}
-
-	/// \todo implement it. Add overrided methods
-	I_CRITICAL();
 
 	return true;
 }
@@ -372,33 +376,11 @@ bool CBaseClassExtenderComp::BeginClassFiles()
 		return false;
 	}
 
-	// source file is optional
-	if (m_sourceFilePtr.IsValid() && !m_sourceFilePtr->open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
-						QString("Unable to open file: '%1'. Error: %2")
-							.arg(m_sourceFilePtr->fileName(), m_sourceFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
-	}
-
 	// Open original files to read data
 	if (!m_originalHeaderFilePtr->open(QIODevice::ReadOnly)){
 		SendErrorMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 						 .arg(m_originalHeaderFilePtr->fileName(), m_originalHeaderFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
-	}
-
-	// source file is optional
-	if (m_originalSourceFilePtr.IsValid() && !m_originalSourceFilePtr->open(QIODevice::ReadOnly)){
-		SendErrorMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
-						 .arg(m_originalSourceFilePtr->fileName(), m_originalSourceFilePtr->errorString()));
 
 		AbortCurrentProcessing();
 
@@ -430,18 +412,6 @@ bool CBaseClassExtenderComp::CloseFiles()
 	retVal = retVal && istd::CSystem::FileMove(m_headerFilePtr->fileName(), originalHeaderFilePath, true);
 	Q_ASSERT(retVal);
 
-	if (m_sourceFilePtr.IsValid() && m_originalSourceFilePtr.IsValid()){
-		retVal = m_sourceFilePtr->flush() && retVal;
-		Q_ASSERT(retVal);
-
-		m_sourceFilePtr->close();
-		m_originalSourceFilePtr->close();
-
-		const QString originalSourceFilePath = QFileInfo(*m_originalSourceFilePtr).absolutePath();
-		retVal = retVal && istd::CSystem::FileMove(m_sourceFilePtr->fileName(), originalSourceFilePath, true);
-		Q_ASSERT(retVal);
-	}
-
 	return retVal;
 }
 
@@ -449,12 +419,10 @@ bool CBaseClassExtenderComp::CloseFiles()
 void CBaseClassExtenderComp::AbortCurrentProcessing()
 {
 	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
 
 	I_CRITICAL();
 
 	m_headerFilePtr->remove();
-	m_sourceFilePtr->remove();
 }
 
 

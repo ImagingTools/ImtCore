@@ -25,7 +25,7 @@ namespace imtsdl
 
 
 /**
-	The base class extender
+	Extends the class (file) by adding inheritance
 */
 class CBaseClassExtenderComp:
 			public iproc::CSyncProcessorCompBase,
@@ -44,6 +44,7 @@ public:
 		\param paramsPtr (required)
 			- (required) [HeaderFile]				of \c ifile::IFileNameParam		- header file to modify
 			- (optional) [AddBaseComponentMacro]	of \c iprm::IEnableableParam	-- if enabled adds 'I_BEGIN_BASE_COMPONENT' and 'I_END_COMPONENT' in HeaderFile
+						\note if enabled - base class - is FIRST in \c inputPtr
 		\param inputPtr - \c iprm::IOptionsList (required)
 							- [id] - class name
 							- [name] - include directive
@@ -60,9 +61,6 @@ protected:
 	virtual bool ProcessHeaderClassFile(
 				const iprm::IParamsSet& paramsPtr,
 				const iprm::IOptionsList& baseClassList);
-	virtual bool ProcessSourceClassFile(
-				const iprm::IParamsSet& paramsPtr,
-				const iprm::IOptionsList& baseClassList);
 	virtual bool BeginClassFiles();
 	virtual bool EndClassFiles();
 	virtual bool CloseFiles();
@@ -73,10 +71,7 @@ protected:
 
 protected:
 	istd::TDelPtr<QFile> m_headerFilePtr;
-	istd::TDelPtr<QFile> m_sourceFilePtr;
-
 	istd::TDelPtr<QFile> m_originalHeaderFilePtr;
-	istd::TDelPtr<QFile> m_originalSourceFilePtr;
 };
 
 
