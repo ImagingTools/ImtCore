@@ -384,7 +384,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(cons
 		ifStream << sdlNamespace;
 		FeedStream(ifStream, 1, false);
 		ifStream << '{';
-		FeedStream(ifStream, 1, false);
+		FeedStream(ifStream, 3, false);
 	}
 
 	AddCollectionMethodsImplForDocument(ifStream, sdlDocumentType);
@@ -471,9 +471,21 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplFor
 	for (const CSdlDocumentType& documentType: sdlDocumentType.GetSubtypes()){
 		requestMultiMap += QMultiMap<CSdlDocumentType::OperationType, CSdlRequest>(documentType.GetOperationsList());
 	}
+	QList<CSdlDocumentType::OperationType> remainingOperations({
+				CSdlDocumentType::OT_GET,
+				CSdlDocumentType::OT_INSERT,
+				CSdlDocumentType::OT_UPDATE,
+				CSdlDocumentType::OT_DELETE,
+				CSdlDocumentType::OT_LIST});
+
 	for (CSdlDocumentType::OperationType operationType: requestMultiMap.uniqueKeys()){
 		SdlRequestList requestList = requestMultiMap.values(operationType);
-		AddImplCodeForRequests(stream, operationType, requestList, className, 1);
+		AddImplCodeForRequests(stream, operationType, requestList, className);
+		remainingOperations.removeAll(operationType);
+	}
+
+	for (CSdlDocumentType::OperationType operationType: remainingOperations){
+		AddImplCodeForRequests(stream, operationType, SdlRequestList(), className);
 	}
 }
 
@@ -484,11 +496,205 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 			const QString& className,
 			uint hIndents)
 {
+	// declare method
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("imtbase::CTreeItemModel* ");
+	stream << className;
+	stream << ':' << ':';
+	switch (operationType) {
+	case CSdlDocumentType::OT_GET:
+		stream << QStringLiteral("GetObject");
+		break;
+	case CSdlDocumentType::OT_INSERT:
+		stream << QStringLiteral("InsertObject");
+		break;
+	case CSdlDocumentType::OT_UPDATE:
+		stream << QStringLiteral("UpdateObject");
+		break;
+	case CSdlDocumentType::OT_DELETE:
+		stream << QStringLiteral("DeleteObject");
+		break;
+	case CSdlDocumentType::OT_LIST:
+		stream << QStringLiteral("ListObjects");
+		break;
+	default:
+		SendCriticalMessage(0, QString("Unexpected type: %1").arg(QString::number(operationType)));
+		I_CRITICAL();
+		break;
+	}
+	stream << QStringLiteral("(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const");
+	FeedStream(stream, 1, false);
+
+	// method's body
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	// call base class method if no expected requests for method
+	if (requestList.isEmpty()){
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("return BaseClass::");
+
+		switch (operationType) {
+		case CSdlDocumentType::OT_GET:
+			stream << QStringLiteral("GetObject");
+			break;
+		case CSdlDocumentType::OT_INSERT:
+			stream << QStringLiteral("InsertObject");
+			break;
+		case CSdlDocumentType::OT_UPDATE:
+			stream << QStringLiteral("UpdateObject");
+			break;
+		case CSdlDocumentType::OT_DELETE:
+			stream << QStringLiteral("DeleteObject");
+			break;
+		case CSdlDocumentType::OT_LIST:
+			stream << QStringLiteral("ListObjects");
+			break;
+		default:
+			SendCriticalMessage(0, QString("Unexpected type: %1").arg(QString::number(operationType)));
+			I_CRITICAL();
+			break;
+		}
+
+		stream << QStringLiteral("(gqlRequest, errorMessage);");
+		FeedStream(stream, 1, false);
+	}
+	else {
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("const QByteArray commandId = gqlRequest.GetCommandId();");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("istd::TDelPtr<imtbase::CTreeItemModel> modelPtr(new imtbase::CTreeItemModel);");
+		FeedStream(stream, 2, false);
+
+		// create sections for expected command IDs
+		for (const CSdlRequest& sdlRequest: requestList){
+			AddImplCodeForRequest(stream, sdlRequest, hIndents + 1);
+		}
+
+		// create default section
+		// add error message
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command id '%1'\").arg(commandId);");
+		FeedStream(stream, 1, false);
+
+		// send log message
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
+		FeedStream(stream, 2, false);
+
+		// return
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("return nullptr;");
+		FeedStream(stream, 1, false);
+	}
+
+	// end of method
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 3, false);
+
 }
 
 void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& stream, const CSdlRequest& sdlRequest, uint hIndents)
 {
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '/' << '/' << sdlRequest.GetName();
+	FeedStream(stream, 1, false);
 
+	const QString requestClassName = sdlRequest.GetName() + QStringLiteral("GqlRequest");
+
+	// [1] command ID check
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (commandId == C");
+	stream << requestClassName;
+	stream << QStringLiteral("::GetCommandId()){");
+	FeedStream(stream, 1, false);
+
+	// [1] create SDL request variable
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << 'C' <<  requestClassName;
+	stream << ' ' << GetDecapitalizedValue(requestClassName);
+	stream << QStringLiteral("(gqlRequest);");
+	FeedStream(stream, 1, false);
+
+	// [1->2] SDL request validate
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (!");
+	stream << GetDecapitalizedValue(requestClassName);
+	stream << QStringLiteral(".IsValid()){");
+	FeedStream(stream, 1, false);
+
+	// [2] add error message if SDL request is not valid
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected request for command id '%1'\").arg(commandId);");
+	FeedStream(stream, 1, false);
+
+	// [2] add log message
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
+	FeedStream(stream, 2, false);
+
+	// [2] return
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("return nullptr;");
+	FeedStream(stream, 1, false);
+
+	// [2->1] end of SDL request validate
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	// [1] create payload variable by calling reimplemented method
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << 'C' << sdlRequest.GetOutputArgument().GetType();
+	stream << QStringLiteral(" replyPayload = On");
+	stream << sdlRequest.GetName() << '(';
+	stream << GetDecapitalizedValue(requestClassName);
+	stream << QStringLiteral(", gqlRequest, errorMessage);");
+	FeedStream(stream, 1, false);
+
+	// [1] write payload variable in model and create variable, to check if it success
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("const bool isModelCreated = replyPayload.WriteToModel(*modelPtr);");
+	FeedStream(stream, 1, false);
+
+	// [1->2] check if payload write to TreeModel is failed
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (!isModelCreated){");
+	FeedStream(stream, 1, false);
+
+	// [2] set error message
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("errorMessage = QString(\"Internal error. Unable to create response for command id '%1'\").arg(commandId);");
+	FeedStream(stream, 1, false);
+
+	// [2] add log message
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("SendCriticalMessage(0, errorMessage);;");
+	FeedStream(stream, 2, false);
+
+	// [2] return
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("return nullptr;");
+	FeedStream(stream, 1, false);
+
+	// [2->1] end of payload write to TreeModel checks
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+	FeedStream(stream, 2, false);
+
+	// [1] return pop ptr
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return modelPtr.PopPtr();");
+	FeedStream(stream, 1, false);
+
+	// end of section
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 2, false);
 }
 
 
