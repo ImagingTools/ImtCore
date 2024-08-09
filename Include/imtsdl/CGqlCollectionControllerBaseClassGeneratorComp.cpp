@@ -278,6 +278,8 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	FeedStream(ifStream, 3, false);
 
 	const SdlDocumentTypeList subtypesList = sdlDocumentType.GetSubtypes();
+
+	// add generated includes
 	if (addDependenciesInclude){
 		AddRequiredIncludesForDocument(ifStream, sdlDocumentType);
 		FeedStream(ifStream, 1, false);
@@ -385,10 +387,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(cons
 		FeedStream(ifStream, 1, false);
 	}
 
-	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
-	// implementation of methods
-
-
+	AddCollectionMethodsImplForDocument(ifStream, sdlDocumentType);
 
 	// end of namespace
 	FeedStream(ifStream, 2, false);
@@ -463,6 +462,33 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 	stream << QStringLiteral("Request, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;");
 
 	FeedStream(stream, 1, false);
+}
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType)
+{
+	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
+	QMultiMap<CSdlDocumentType::OperationType, CSdlRequest> requestMultiMap(sdlDocumentType.GetOperationsList());
+	for (const CSdlDocumentType& documentType: sdlDocumentType.GetSubtypes()){
+		requestMultiMap += QMultiMap<CSdlDocumentType::OperationType, CSdlRequest>(documentType.GetOperationsList());
+	}
+	for (CSdlDocumentType::OperationType operationType: requestMultiMap.uniqueKeys()){
+		SdlRequestList requestList = requestMultiMap.values(operationType);
+		AddImplCodeForRequests(stream, operationType, requestList, className, 1);
+	}
+}
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
+			QTextStream& stream,
+			CSdlDocumentType::OperationType operationType,
+			const SdlRequestList& requestList,
+			const QString& className,
+			uint hIndents)
+{
+}
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& stream, const CSdlRequest& sdlRequest, uint hIndents)
+{
+
 }
 
 

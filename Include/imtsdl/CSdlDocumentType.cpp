@@ -49,6 +49,24 @@ QMap<CSdlDocumentType::OperationType, CSdlRequest> CSdlDocumentType::GetOperatio
 }
 
 
+bool CSdlDocumentType::HasRequest(OperationType operationType) const
+{
+	return m_operationsList.contains(operationType);
+}
+
+
+CSdlRequest CSdlDocumentType::GetRequest(OperationType operationType) const
+{
+	if (m_operationsList.contains(operationType)){
+		return m_operationsList[operationType];
+	}
+
+	Q_ASSERT_X(false, __func__, "Request for operationType is not exists. Did you check it with HasRequest()?");
+
+	return CSdlRequest();
+}
+
+
 void CSdlDocumentType::SetOperationsList(const QMap<OperationType, CSdlRequest>& operationsList)
 {
 	if (m_operationsList != operationsList){

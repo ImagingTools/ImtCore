@@ -61,6 +61,14 @@ private:
 	void AddMethodsForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
 	void AddMethodForDocument(QTextStream& stream, const CSdlRequest& sdlRequest, CSdlDocumentType::OperationType operationType, uint hIndents = 0);
 
+	/**
+		Creates method implementations for all document's (and subtype's) operation types
+	 */
+	void AddCollectionMethodsImplForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType);
+	void AddImplCodeForRequests(QTextStream& stream, CSdlDocumentType::OperationType operationType, const SdlRequestList& requestList, const QString& className, uint hIndents = 0);
+	void AddImplCodeForRequest(QTextStream& stream, const CSdlRequest& sdlRequest, uint hIndents = 0);
+
+
 
 private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);

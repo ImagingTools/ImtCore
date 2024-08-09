@@ -41,6 +41,8 @@ public:
 	void SetReferenceType(const CSdlType& referenceType);
 
 	QMap<OperationType, CSdlRequest> GetOperationsList() const;
+	bool HasRequest(OperationType operationType) const;
+	CSdlRequest GetRequest(OperationType operationType) const;
 	void SetOperationsList(const QMap<OperationType, CSdlRequest>& operationsList);
 	void AddOperation(OperationType type, const CSdlRequest& operation);
 
