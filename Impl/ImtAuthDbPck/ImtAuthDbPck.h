@@ -8,7 +8,6 @@
 #include <imtauthdb/CUsersSessionsDatabaseDelegateComp.h>
 #include <imtauthdb/CUsersSettingsDatabaseDelegateComp.h>
 #include <imtauthdb/CSuperuserProviderComp.h>
-#include <imtauthdb/CRemoteSuperuserProviderComp.h>
 #include <imtauthdb/CSqliteUserGroupDatabaseDelegateComp.h>
 #include <imtauthdb/CSqliteUserDatabaseDelegateComp.h>
 #include <imtauthdb/TRoleDatabaseDelegateComp.h>
@@ -30,7 +29,6 @@ typedef imtauthdb::CSqliteUserGroupDatabaseDelegateComp SqliteUserGroupDatabaseD
 typedef imtauthdb::CUsersSessionsDatabaseDelegateComp UsersSessionsDatabaseDelegate;
 typedef imtauthdb::CUsersSettingsDatabaseDelegateComp UsersSettingsDatabaseDelegate;
 typedef imtauthdb::CSuperuserProviderComp SuperuserProvider;
-typedef imtauthdb::CRemoteSuperuserProviderComp RemoteSuperuserProvider;
 typedef imtauthdb::TRoleDatabaseDelegateComp<imtdb::CSqlJsonDatabaseDelegateComp> SqlJsonRoleDatabaseDelegate;
 typedef imtauthdb::TRoleDatabaseDelegateComp<imtdb::CSqliteJsonDatabaseDelegateComp> SqliteJsonRoleDatabaseDelegate;
 

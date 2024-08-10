@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5229" Description="ACF"/>
+            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -75,7 +75,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Constraints" Type="Reference" ExportId="LanguageConstraints">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="LanguageOptions"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>

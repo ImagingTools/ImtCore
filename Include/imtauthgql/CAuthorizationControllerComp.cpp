@@ -74,6 +74,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
+	QByteArray activeSystemId;
 	bool ok = false;
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
 		if (systemInfo.enabled){
@@ -85,6 +86,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 
 			if (credentialControllerPtr->CheckCredential(login, password)){
 				ok = true;
+				activeSystemId = systemInfo.systemId;
 				break;
 			}
 		}
@@ -102,7 +104,8 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 	dataModelPtr->SetData("Token", tokenValue);
 	dataModelPtr->SetData("Login", login);
 	dataModelPtr->SetData("UserId", userObjectId);
-//	dataModelPtr->SetData("PasswordHash", passwordHash);
+	dataModelPtr->SetData("PasswordHash", userInfoPtr->GetPasswordHash());
+	dataModelPtr->SetData("SystemId", activeSystemId);
 
 	imtauth::IUserInfo::FeatureIds permissionIds = userInfoPtr->GetPermissions(productId);
 	dataModelPtr->SetData("Permissions", permissionIds.join(';'));

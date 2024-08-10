@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5229" Description="ACF"/>
+            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="GeneralSettingsFactory" PackageId="ImtCoreVoce" ComponentId="GeneralPageDataModel">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PageViewParamSet" PackageId="ImtServerVoce" ComponentId="PageViewParamSet">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TableViewParamController" PackageId="ImtGqlPck" ComponentId="TableViewParamController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GetTableViewParams</Value>
+                                <Value>SetTableViewParams</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageViewParamsKey" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="PageViewParams"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamSetFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="PageViewParamSet"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TableViewParamRepresentationController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TableViewParamRepresentationController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserSettingsFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserSettings"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TableViewParamRepresentationController" PackageId="ImtCorePck" ComponentId="TableViewParamRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ModelId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TableViewParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserSettings" PackageId="ImtAuthPck" ComponentId="UserSettings">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SettingsFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="GeneralSettingsFactory"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="TableViewParamController"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="TableViewParamController"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

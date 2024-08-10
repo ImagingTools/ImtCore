@@ -22,5 +22,6 @@
 	<file alias="imtguigql/GqlRequestDocumentDataController.qml">GqlRequestDocumentDataController.qml</file>
 	<file alias="imtguigql/CommandsPanelController.qml">CommandsPanelController.qml</file>
 	<file alias="imtguigql/TableViewParamController.qml">TableViewParamController.qml</file>
+	<file alias="imtguigql/GqlRequestSender.qml">GqlRequestSender.qml</file>
     </qresource>
 </RCC>

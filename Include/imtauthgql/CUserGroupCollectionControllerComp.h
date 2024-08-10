@@ -16,9 +16,9 @@ public:
 	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserGroupCollectionControllerComp);
-		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider", true, "RoleInfoProvider");
-		I_ASSIGN(m_userInfoProviderCompPtr, "UserInfoProvider", "User info provider", true, "UserInfoProvider");
-		I_ASSIGN(m_userGroupInfoProviderCompPtr, "UserGroupInfoProvider", "User group info provider", true, "UserGroupInfoProvider");
+		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider", false, "RoleInfoProvider");
+		I_ASSIGN(m_userInfoProviderCompPtr, "UserInfoProvider", "User info provider", false, "UserInfoProvider");
+		I_ASSIGN(m_userGroupInfoProviderCompPtr, "UserGroupInfoProvider", "User group info provider", false, "UserGroupInfoProvider");
 	I_END_COMPONENT;
 
 protected:

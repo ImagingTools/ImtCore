@@ -48,21 +48,16 @@ Item {
 
     Component.onCompleted: {
         setDecorators()
-
-        Events.subscribeEvent("UpdateModels", application.updateAllModels);
-        Events.subscribeEvent("Logout", application.onLogout);
         Events.subscribeEvent("Reconnect", application.reconnect);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("UpdateModels", application.updateAllModels);
-        Events.unSubscribeEvent("Logout", application.onLogout);
         Events.unSubscribeEvent("Reconnect", application.reconnect);
     }
 
     onUpdatingModelChanged: {
         if (updatingModel){
-            Events.sendEvent("UpdateModels");
+            application.updateAllModels();
         }
     }
 
@@ -291,13 +286,6 @@ Item {
         settingsObserver: application.settingsObserver;
     }
 
-    function onLogout(){
-        settingsProvider.serverModel = null;
-
-        subscriptionManager_.clear();
-        NavigationController.clear();
-    }
-
     function updateAllModels(){
         thumbnailDecorator.updateModels();
         applicationInfoProvider.updateModel();
@@ -370,20 +358,21 @@ Item {
         function onLoginSuccessful(){
             thumbnailDecorator.drawingContainer.content = Style.drawingContainerDecorator;
             thumbnailDecorator.showPage(undefined)
-            Events.sendEvent("UpdateSettings");
+            application.settingsProvider.updateModel();
         }
 
         function onLogoutSignal(){
             application.firstModelsInit();
+            NavigationController.clear();
+            application.settingsProvider.serverModel = null;
+            subscriptionManager_.clear();
         }
     }
 
     property Timer timer: Timer{
         interval: 3000;
-
         repeat: true;
         running: application.useWebSocketSubscription && webSocketPortProvider.port == -1;
-
         onTriggered: {
             if (!application.useWebSocketSubscription){
                 return;

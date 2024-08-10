@@ -3,7 +3,7 @@ import Acf 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 
-Item {
+QtObject {
     id: container;
 
     property TreeItemModel collectionModel: TreeItemModel {};
@@ -11,7 +11,7 @@ Item {
     property string commandId;
     property string subscriptionCommandId;
 
-    // Property indicating whether the model is ready for use
+    // Property indicating whether the model is already requested from server
     property bool completed: false;
 
     // Fields to get from server
@@ -25,82 +25,36 @@ Item {
     property int offset: 0;
     property int count: -1;
 
-    property bool hasRemoteChanges: false;
-
-    property TreeItemModel filterModel: TreeItemModel {};
+    property CollectionFilter filter: CollectionFilter {}
 
     signal modelUpdated();
     signal failed();
 
     function updateModel(){
-        if (collectionModel && collectionModel.getItemsCount() === 0){
-            container.itemsInfoModel.updateModel(container.fields);
+        if (completed){
+            console.warn("Collection data already loaded")
             return;
         }
 
-        if (!completed || hasRemoteChanges){
-            if (container.commandId == ""){
-                console.log( "ERROR: Collection data provider Command-ID is empty!");
-
-                return;
-            }
-
-            container.itemsInfoModel.updateModel(container.fields);
-        }
-
-        container.updateSubscription();
+        container.itemsInfoModel.send();
     }
 
     function clearModel(){
         collectionModel.clear();
+        completed = false;
     }
 
     Component.onCompleted: {
-        let sortModel = filterModel.getTreeItemModel("Sort");
-        if (!sortModel){
-            sortModel = filterModel.addTreeModel("Sort")
-        }
-
-        sortModel.setData("SortOrder", orderType);
-        sortModel.setData("HeaderId", sortByField);
+        filter.setSortingOrder(orderType);
+        filter.setSortingInfoId(sortByField);
     }
 
     onOrderTypeChanged: {
-        let sortModel = filterModel.getTreeItemModel("Sort");
-        if (!sortModel){
-            sortModel = filterModel.addTreeModel("Sort")
-        }
-
-        sortModel.setData("SortOrder", orderType);
+        filter.setSortingOrder(orderType);
     }
 
     onSortByFieldChanged: {
-        let sortModel = filterModel.getTreeItemModel("Sort");
-        if (!sortModel){
-            sortModel = filterModel.addTreeModel("Sort")
-        }
-
-        sortModel.setData("HeaderId", sortByField);
-    }
-
-    onHasRemoteChangesChanged: {
-        if (hasRemoteChanges){
-            updateModel();
-        }
-    }
-
-    function setSortingHeader(headerId){
-        container.sortByField = headerId;
-    }
-
-    function setOrderType(orderType){
-        container.orderType = orderType;
-    }
-
-    function onModelUpdated(){
-        if (!container.completed){
-            container.completed = true;
-        }
+        filter.setSortingInfoId(sortByField);
     }
 
     function getData(objectId, value){
@@ -122,15 +76,16 @@ Item {
         return {};
     }
 
-    property GqlModel itemsInfoModel: GqlModel {
-        function updateModel(fields) {
-            var query = Gql.GqlRequest("query", container.commandId);
+    property GqlRequestSender itemsInfoModel: GqlRequestSender {
+        requestType: 0; // Query
+        gqlCommandId: container.commandId;
 
+        function createQueryParams(query){
             var viewParams = Gql.GqlObject("viewParams");
             viewParams.InsertField("Offset", container.offset);
             viewParams.InsertField("Count", container.count);
 
-            var jsonString = container.filterModel.toJson();
+            var jsonString = container.filter.filterModel.toJson();
             viewParams.InsertField("FilterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");
@@ -148,57 +103,20 @@ Item {
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
-            for (let key of fields){
+            for (let key of container.fields){
                 queryFields.InsertField(key);
             }
             query.AddField(queryFields);
-
-            var gqlData = query.GetQuery();
-
-            container.completed = false;
-            this.setGqlQuery(gqlData);
         }
 
-        onStateChanged: {
-            if (this.state === "Ready"){
-                var dataModelLocal;
-                if (container.itemsInfoModel.containsKey("errors")){
-                    return;
-                }
+        function onResult(data){
+            container.collectionModel = data.getData("items");
+            container.completed = true;
+            container.modelUpdated();
+        }
 
-                if (container.itemsInfoModel.containsKey("data")){
-                    dataModelLocal = container.itemsInfoModel.getData("data");
-                    if (dataModelLocal.containsKey(container.commandId)){
-                        dataModelLocal = dataModelLocal.getData(container.commandId);
-                        if (dataModelLocal.containsKey("items")){
-                            container.collectionModel = dataModelLocal.getData("items");
-                        }
-                        else{
-                            console.error("Unable to parsing data: tag 'items' not found!");
-                        }
-
-                        if (dataModelLocal.containsKey("notification")){
-                            dataModelLocal = dataModelLocal.getData("notification");
-                            if (dataModelLocal.containsKey("PagesCount")){
-                                dataModelLocal = dataModelLocal.getData("PagesCount");
-                            }
-                        }
-                        else{
-                            console.warn("Unable to get notification info for collection model.");
-                        }
-
-                        container.modelUpdated();
-
-                        container.completed = true;
-                        container.hasRemoteChanges = false;
-                    }
-                }
-            }
-            else if (this.state === "Error"){
-                container.failed();
-
-                container.completed = true;
-            }
+        function onError(message, type){
+            console.warn(message);
         }
     }
 
@@ -208,8 +126,7 @@ Item {
             return;
         }
 
-        let subscriptionRequestId = container.subscriptionCommandId;
-        var query = Gql.GqlRequest("subscription", subscriptionRequestId);
+        var query = Gql.GqlRequest("subscription", container.subscriptionCommandId);
         var queryFields = Gql.GqlObject("notification");
         queryFields.InsertField("Id");
         query.AddField(queryFields);
@@ -217,9 +134,7 @@ Item {
         Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
     }
 
-    SubscriptionClient {
-        id: subscriptionClient;
-
+    property SubscriptionClient subscriptionClient: SubscriptionClient {
         property bool ok: container.subscriptionCommandId !== "" && subscriptionClient.subscriptionId !== "";
         onOkChanged: {
             if (ok){
@@ -229,8 +144,7 @@ Item {
 
         onStateChanged: {
             if (state === "Ready"){
-                console.log("SubscriptionClient", subscriptionClient.toJson());
-                container.hasRemoteChanges = true;
+                container.itemsInfoModel.send();
             }
         }
     }

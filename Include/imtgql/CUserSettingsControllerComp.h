@@ -4,8 +4,8 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IRepresentationController.h>
-#include <imtgql/CGqlRepresentationDataControllerCompBase.h>
 #include <imtauth/IUserSettings.h>
+#include <imtgql/CGqlRepresentationDataControllerCompBase.h>
 
 
 namespace imtgql

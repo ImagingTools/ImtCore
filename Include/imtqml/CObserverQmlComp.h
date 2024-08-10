@@ -46,7 +46,6 @@ protected:
 	void UpdateSettingsRepresentation();
 	void UpdateApplicationInfoRepresentation();
 
-	void OnSettingsChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::IParamsSet* objectPtr);
 	void OnLanguageChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::ISelectionParam* objectPtr);
 	void OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IUrlParam* urlParamPtr);
 

@@ -120,6 +120,7 @@ WebSocket {
                 payload["data"] = query.GetQuery()
                 request["payload"] = payload
 
+                subscriptionModel[index]["status"] = "waiting";
                 container.sendTextMessage(JSON.stringify(request))
             }
         }

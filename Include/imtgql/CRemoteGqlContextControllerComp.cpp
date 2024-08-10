@@ -26,9 +26,9 @@ CRemoteGqlContextControllerComp::CRemoteGqlContextControllerComp()
 // reimplemented (imtgql::IGqlContextController)
 
 imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
-			const imtgql::CGqlRequest& gqlRequest,
-			const QByteArray& token,
-			QString& errorMessage) const
+		const imtgql::CGqlRequest& gqlRequest,
+		const QByteArray& token,
+		QString& errorMessage) const
 {
 	if (m_cacheMap.contains(token)){
 		istd::TDelPtr<imtgql::IGqlContext> gqlContextPtr;
@@ -40,6 +40,7 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 	QMutexLocker lock(&s_mutex);
 
 	if (!m_gqlRequestHandlerCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'm_gqlRequestHandlerCompPtr' was not set", "CRemoteGqlContextControllerComp");
 		return nullptr;
 	}
 
@@ -55,8 +56,9 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 
 	sessionGqlRequest.SetGqlContext(sessionGqlContextPtr);
 
-	imtbase::CTreeItemModel* userSessionModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(sessionGqlRequest, errorMessage);
-	if (userSessionModelPtr == nullptr){
+	istd::TDelPtr<imtbase::CTreeItemModel> userSessionModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(sessionGqlRequest, errorMessage);
+	if (!userSessionModelPtr.IsValid()){
+		SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
 		return nullptr;
 	}
 
@@ -68,11 +70,17 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 
 			istd::TDelPtr<imtauth::ISession> sessionInstancePtr = m_sessionInfoFactCompPtr.CreateInstance();
 			if (!sessionInstancePtr.IsValid()){
+				errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session factory created an invalid object.").arg(token);
+				SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
+
 				return nullptr;
 			}
 
 			iser::CJsonMemReadArchive archive(sessionJson);
 			if (!sessionInstancePtr->Serialize(archive)){
+				errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session JSON '%2' cannot be serialized.").arg(token).arg(sessionJson);
+				SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
+
 				return nullptr;
 			}
 
@@ -80,56 +88,66 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 		}
 	}
 
-	if (!userId.isEmpty()){
-		imtgql::CGqlRequest gqlUserRequest(imtgql::CGqlRequest::RT_QUERY, "GetUserInfo");
-		imtgql::CGqlObject userInputParams("input");
-		userInputParams.InsertField(QByteArray("Id"), QVariant(userId));
-		gqlUserRequest.AddParam(userInputParams);
+	if (userId.isEmpty()){
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User-ID cannot be found.");
+		SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
 
-		imtgql::CGqlContext* userGqlContextPtr = new imtgql::CGqlContext();
-		userGqlContextPtr->SetToken(token);
-
-		gqlUserRequest.SetGqlContext(userGqlContextPtr);
-
-		imtbase::CTreeItemModel* userModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(gqlUserRequest, errorMessage);
-		if (userModelPtr == nullptr){
-			return nullptr;
-		}
-
-		if (!userModelPtr->ContainsKey("data")){
-			return nullptr;
-		}
-
-		imtbase::CTreeItemModel* dataModelPtr = userModelPtr->GetTreeItemModel("data");
-		if (dataModelPtr == nullptr){
-			return nullptr;
-		}
-
-		QByteArray userJson = dataModelPtr->ToJson().toUtf8();
-
-		istd::TDelPtr<imtauth::IUserInfo> userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
-		if (!userInstancePtr.IsValid()){
-			return nullptr;
-		}
-
-		iser::CJsonMemReadArchive archive(userJson);
-		if (!userInstancePtr->Serialize(archive)){
-			return nullptr;
-		}
-
-		istd::TDelPtr<imtgql::CGqlContext> gqlContextPtr = new imtgql::CGqlContext();
-		gqlContextPtr->SetToken(token);
-		gqlContextPtr->SetUserInfo(userInstancePtr.PopPtr());
-
-		m_cacheMap.insert(token, gqlContextPtr.PopPtr());
-
-		istd::TDelPtr<imtgql::IGqlContext> retValPtr;
-		retValPtr.SetCastedOrRemove(m_cacheMap[token]->CloneMe());
-
-		return retValPtr.PopPtr();
+		return nullptr;
 	}
 
-	return nullptr;
+	imtgql::CGqlRequest gqlUserRequest(imtgql::CGqlRequest::RT_QUERY, "GetUserInfo");
+	imtgql::CGqlObject userInputParams("input");
+	userInputParams.InsertField(QByteArray("Id"), QVariant(userId));
+	gqlUserRequest.AddParam(userInputParams);
+
+	imtgql::CGqlContext* userGqlContextPtr = new imtgql::CGqlContext();
+	userGqlContextPtr->SetToken(token);
+
+	gqlUserRequest.SetGqlContext(userGqlContextPtr);
+
+	istd::TDelPtr<imtbase::CTreeItemModel> userModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(gqlUserRequest, errorMessage);
+	if (!userModelPtr.IsValid()){
+		SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
+
+		return nullptr;
+	}
+
+	imtbase::CTreeItemModel* dataModelPtr = userModelPtr->GetTreeItemModel("data");
+	if (dataModelPtr == nullptr){
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: The user's response model does not contain 'data'.");
+		SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
+
+		return nullptr;
+	}
+
+	QByteArray userJson = dataModelPtr->ToJson().toUtf8();
+
+	istd::TDelPtr<imtauth::IUserInfo> userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
+	if (!userInstancePtr.IsValid()){
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User factory created an invalid object.").arg(token);
+		SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
+
+		return nullptr;
+	}
+
+	iser::CJsonMemReadArchive archive(userJson);
+	if (!userInstancePtr->Serialize(archive)){
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User JSON '%2' cannot be serialized.").arg(token).arg(userJson);
+		SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
+
+		return nullptr;
+	}
+
+	istd::TDelPtr<imtgql::CGqlContext> gqlContextPtr = new imtgql::CGqlContext();
+	gqlContextPtr->SetToken(token);
+	gqlContextPtr->SetUserInfo(userInstancePtr.PopPtr());
+
+	m_cacheMap.insert(token, gqlContextPtr.PopPtr());
+
+	istd::TDelPtr<imtgql::IGqlContext> retValPtr;
+	retValPtr.SetCastedOrRemove(m_cacheMap[token]->CloneMe());
+
+	return retValPtr.PopPtr();
 }
 
 

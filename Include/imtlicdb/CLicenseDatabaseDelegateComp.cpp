@@ -79,6 +79,9 @@ bool CLicenseDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::ICollect
 			if (filteringColumnIds[i] == "ProductId"){
 				textFilterQuery += QString("%1 ILIKE '%%2%'").arg(R"((SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = root."Document"->>'ProductId' AND pr."IsActive" = true))").arg(textFilter);
 			}
+			else{
+				textFilterQuery += QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(filteringColumnIds[i]).arg(textFilter);
+			}
 		}
 	}
 

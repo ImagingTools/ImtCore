@@ -24,6 +24,7 @@ public:
 		I_REGISTER_INTERFACE(istd::IChangeable);
 		I_REGISTER_INTERFACE(imtgui::IGuiElementContainer);
 		I_ASSIGN_MULTI_0(m_guiElementModelsCompPtr, "GuiElementModels", "List of gui element models", false);
+		I_ASSIGN(m_slaveGuiElementContainerCompPtr, "SlaveGuiElementContainer", "Slave GUI element container", false, "");
 	I_END_COMPONENT;
 
 protected:
@@ -32,6 +33,7 @@ protected:
 
 protected:
 	I_MULTIREF(imtgui::IGuiElementModel, m_guiElementModelsCompPtr);
+	I_REF(imtgui::IGuiElementContainer, m_slaveGuiElementContainerCompPtr);
 };
 
 

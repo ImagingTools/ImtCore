@@ -92,8 +92,11 @@ Item {
                 panelDelegate.logout();
             }
             else{
+                contextMenuModel.fillModel();
+
                 var point = mapToItem(null, x - width, y + height);
                 point.x = point.x - 200;
+
                 ModalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": contextMenuModel});
             }
         }
@@ -125,9 +128,9 @@ Item {
 
         function fillModel(){
             contextMenuModel.clear();
-            contextMenuModel.append({"Id": "ChangePassword", "Name": qsTr("Change Password"), "Icon": "Icons/Empty"});
+            contextMenuModel.append({"Id": "ChangePassword", "Name": qsTr("Change Password"), "Icon": "Icons/Empty", "IsEnabled": AuthorizationController.getSystemId() === ""});
             contextMenuModel.append({"Id": "", "Name": "", "Icon": ""});
-            contextMenuModel.append({"Id": "Logout", "Name": qsTr("Logout"), "Icon": "Icons/Exit"});
+            contextMenuModel.append({"Id": "Logout", "Name": qsTr("Logout"), "Icon": "Icons/Exit", "IsEnabled": true});
         }
     }
 

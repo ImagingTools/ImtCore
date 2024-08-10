@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5229" Description="ACF"/>
+            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -12,7 +12,7 @@
         <Element ComponentName="DesignOptions" X="350" Y="475" Note=""/>
         <Element ComponentName="General" X="576" Y="75" Note=""/>
         <Element ComponentName="Language" X="600" Y="250" Note=""/>
-        <Element ComponentName="LanguageOptions" X="400" Y="650" Note=""/>
+        <Element ComponentName="LanguageOptions" X="600" Y="475" Note=""/>
         <Element ComponentName="PageViewParamSet" X="900" Y="475" Note=""/>
         <Element ComponentName="PageViewParams" X="900" Y="250" Note=""/>
     </PositionMap>

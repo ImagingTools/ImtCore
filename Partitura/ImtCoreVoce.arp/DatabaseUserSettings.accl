@@ -2,12 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5104" Description="ACF"/>
-            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5229" Description="ACF"/>
+            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="GeneralSettingsFactory" X="675" Y="700" Note=""/>
+        <Element ComponentName="UserSettings" X="675" Y="550" Note=""/>
         <Element ComponentName="UserSettingsRepository" X="675" Y="275" Note=""/>
         <Element ComponentName="UsersSettingsDatabaseDelegate" X="675" Y="425" Note=""/>
     </PositionMap>

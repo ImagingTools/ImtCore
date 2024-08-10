@@ -65,6 +65,10 @@ QtObject {
         return userTokenProvider.permissions;
     }
 
+    function getSystemId(){
+        return userTokenProvider.systemId;
+    }
+
     function userLogout(param){
         userTokenProvider.login = ""
         userTokenProvider.userId = ""

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5229" Description="ACF"/>
+            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ApplicationInfoController" PackageId="ImtGqlPck" ComponentId="ApplicationInfoController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfoRepresentation" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfoRepresentation"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GetApplicationInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ApplicationInfoRepresentation" PackageId="ImtCorePck" ComponentId="ApplicationInfoRepresentation">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="ServerVersion"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Server Version"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Source" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsTextLabel.qml"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtbase::IApplicationInfoRepresentation" ComponentId="ApplicationInfoRepresentation"/>
+        <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="ApplicationInfoController"/>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="ApplicationInfoController"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

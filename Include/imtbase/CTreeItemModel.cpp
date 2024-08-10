@@ -12,7 +12,7 @@ namespace imtbase
 {
 
 
-CTreeItemModel::CTreeItemModel(QObject *parent)
+CTreeItemModel::CTreeItemModel(QObject* parent)
 	:QAbstractListModel(parent),
 	m_isArray(false),
 	m_isUpdateEnabled(true)
@@ -34,7 +34,7 @@ const QString& CTreeItemModel::State() const
 }
 
 
-void CTreeItemModel::SetState(const QString &newState)
+void CTreeItemModel::SetState(const QString& newState)
 {
 	if (m_state != newState){
 		m_state = newState;
@@ -232,7 +232,7 @@ void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap& m
 
 		Item* itemPtr = m_items[index];
 		if (itemPtr != nullptr){
-			itemPtr->SetValue(key, *value);
+			itemPtr->SetValue(key,* value);
 		}
 	}
 
@@ -308,7 +308,7 @@ int CTreeItemModel::RemoveItem(int index)
 }
 
 
-imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int index)
+imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray& key, int index)
 {
 	BeginChanges();
 
@@ -340,7 +340,7 @@ imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int
 }
 
 
-bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *externTreeModel, int index)
+bool CTreeItemModel::SetExternTreeModel(const QByteArray& key, CTreeItemModel* externTreeModel, int index)
 {
 	BeginChanges();
 
@@ -367,7 +367,7 @@ bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *e
 }
 
 
-bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTreeModel, int externIndex)
+bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel* externTreeModel, int externIndex)
 {
 	const CTreeItemModel* constExternTreeModel = externTreeModel;
 
@@ -375,7 +375,7 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTree
 }
 
 
-bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *externTreeModel, int externIndex)
+bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel* externTreeModel, int externIndex)
 {
 	BeginChanges();
 
@@ -412,7 +412,7 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *exte
 }
 
 
-bool CTreeItemModel::CopyItemDataToModel(int index, CTreeItemModel *externTreeModel, int externIndex) const
+bool CTreeItemModel::CopyItemDataToModel(int index, CTreeItemModel* externTreeModel, int externIndex) const
 {
 	bool retVal = false;
 	QList<QByteArray> keys;
@@ -432,9 +432,9 @@ bool CTreeItemModel::CopyItemDataToModel(int index, CTreeItemModel *externTreeMo
 
 
 bool CTreeItemModel::SetData(
-			const QByteArray& key,
-			const QVariant& value,
-			int index)
+		const QByteArray& key,
+		const QVariant& value,
+		int index)
 {
 	BeginChanges();
 
@@ -503,7 +503,7 @@ bool CTreeItemModel::RemoveData(const QByteArray& key, int index)
 }
 
 
-QVariant CTreeItemModel::GetData(const QByteArray &key, int index) const
+QVariant CTreeItemModel::GetData(const QByteArray& key, int index) const
 {
 	if (index < 0 || index > m_items.count() - 1){
 		return QVariant();
@@ -513,19 +513,19 @@ QVariant CTreeItemModel::GetData(const QByteArray &key, int index) const
 }
 
 
-imtbase::CTreeItemModel *CTreeItemModel::GetParent() const
+imtbase::CTreeItemModel* CTreeItemModel::GetParent() const
 {
 	return dynamic_cast<CTreeItemModel*>(this->parent());
 }
 
 
-bool CTreeItemModel::IsTreeModel(const QByteArray &key, int index) const
+bool CTreeItemModel::IsTreeModel(const QByteArray& key, int index) const
 {
 	return GetTreeItemModel(key,index) != nullptr;
 }
 
 
-bool CTreeItemModel::ContainsKey(const QByteArray &key, int index) const
+bool CTreeItemModel::ContainsKey(const QByteArray& key, int index) const
 {
 	bool retVal = false;
 
@@ -537,7 +537,7 @@ bool CTreeItemModel::ContainsKey(const QByteArray &key, int index) const
 }
 
 
-bool CTreeItemModel::IsValidData(const QByteArray &key, int index) const
+bool CTreeItemModel::IsValidData(const QByteArray& key, int index) const
 {
 	return GetData(key, index) != QVariant();
 }
@@ -621,7 +621,7 @@ bool CTreeItemModel::IsArray()
 }
 
 
-void CTreeItemModel::SetIsArray(const bool &isArray)
+void CTreeItemModel::SetIsArray(const bool& isArray)
 {
 	m_isArray = isArray;
 }
@@ -662,25 +662,25 @@ bool CTreeItemModel::CreateFromJson(const QByteArray& jsonContent)
 }
 
 
-void CTreeItemModel::SetQueryParam(const QByteArray &key, const QByteArray &value)
+void CTreeItemModel::SetQueryParam(const QByteArray& key, const QByteArray& value)
 {
 	m_queryParams.insert(key, value);
 }
 
 
-QByteArray CTreeItemModel::GetQueryParam(const QByteArray &key)
+QByteArray CTreeItemModel::GetQueryParam(const QByteArray& key)
 {
 	return m_queryParams.value(key);
 }
 
 
-QByteArray CTreeItemModel::TakeQueryParam(const QByteArray &key)
+QByteArray CTreeItemModel::TakeQueryParam(const QByteArray& key)
 {
 	return m_queryParams.take(key);
 }
 
 
-QMap<QByteArray, QByteArray> &CTreeItemModel::GetQueryParams()
+QMap<QByteArray, QByteArray>& CTreeItemModel::GetQueryParams()
 {
 	return m_queryParams;
 }
@@ -698,7 +698,7 @@ void CTreeItemModel::SetUpdateEnabled(bool updateEnabled)
 }
 
 
-void  CTreeItemModel::OnModelChanged()
+void CTreeItemModel::OnModelChanged()
 {
 	if (m_countTransaction > 0){
 		m_countChanges++;
@@ -766,7 +766,7 @@ QVariant CTreeItemModel::data(const QModelIndex& index, int role) const
 }
 
 
-bool CTreeItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool CTreeItemModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
 	if (!m_roleNames.contains(role)){
 		return false;
@@ -823,7 +823,7 @@ bool CTreeItemModel::EndChanges()
 
 // protected methods
 
-bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArray& tagName)
+bool CTreeItemModel::SerializeRecursive(iser::IArchive& archive, const QByteArray& tagName)
 {
 	bool retVal = true;
 	int countSize = m_items.count();
@@ -851,7 +851,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	}
 
 	for (int i = 0; i < countSize; i++){
-		Item *item = m_items[i];
+		Item* item = m_items[i];
 		QList<QByteArray> itemKeys;
 		item->GetKeys(itemKeys);
 		if (isMultiTag == true && !itemKeys.isEmpty() && itemKeys[0] != ""){

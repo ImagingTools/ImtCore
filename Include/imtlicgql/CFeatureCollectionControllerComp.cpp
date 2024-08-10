@@ -45,13 +45,16 @@ bool CFeatureCollectionControllerComp::SetupGqlItem(
 				if(informationId == "Id"){
 					elementInformation = objectId;
 				}
+				else if(informationId == "TypeId"){
+					elementInformation = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+				}
 				else if(informationId == "FeatureId"){
 					elementInformation = featureInfoPtr->GetFeatureId();
 				}
-				else if(informationId == "FeatureName"){
+				else if(informationId == "FeatureName" || informationId == "Name"){
 					elementInformation = featureInfoPtr->GetFeatureName();
 				}
-				else if(informationId == "FeatureDescription"){
+				else if(informationId == "FeatureDescription" || informationId == "Description"){
 					elementInformation = featureInfoPtr->GetFeatureDescription();
 				}
 				else if(informationId == "Optional"){

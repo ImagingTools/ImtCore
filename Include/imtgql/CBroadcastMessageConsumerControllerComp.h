@@ -19,7 +19,7 @@ public:
 	typedef CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CBroadcastMessageConsumerControllerComp);
-		I_ASSIGN(m_messageConsumerCompPtr, "MessageConsumer", "MessageConsumer sender", true, "MessageConsumer")
+		I_ASSIGN(m_messageConsumerCompPtr, "MessageConsumer", "MessageConsumer sender", false, "MessageConsumer")
 	I_END_COMPONENT;
 
 protected:

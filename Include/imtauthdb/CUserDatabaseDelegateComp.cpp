@@ -20,12 +20,12 @@ namespace imtauthdb
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::CreateNewObjectQuery(
-			const QByteArray& /*typeId*/,
-			const QByteArray& proposedObjectId,
-			const QString& objectName,
-			const QString& /*objectDescription*/,
-			const istd::IChangeable* valuePtr,
-			const imtbase::IOperationContext* operationContextPtr) const
+		const QByteArray& /*typeId*/,
+		const QByteArray& proposedObjectId,
+		const QString& objectName,
+		const QString& /*objectDescription*/,
+		const istd::IChangeable* valuePtr,
+		const imtbase::IOperationContext* operationContextPtr) const
 {
 	NewObjectQuery retVal;
 
@@ -86,11 +86,11 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 
 
 QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const istd::IChangeable& object,
-			const imtbase::IOperationContext* operationContextPtr,
-			bool useExternDelegate) const
+		const imtbase::IObjectCollection& collection,
+		const QByteArray& objectId,
+		const istd::IChangeable& object,
+		const imtbase::IOperationContext* operationContextPtr,
+		bool useExternDelegate) const
 {
 	const imtauth::IUserInfo* oldObjectPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
@@ -169,12 +169,14 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 		}
 	}
 
-	QByteArray documentContent;
-	if (WriteDataToMemory("DocumentInfo", *userInfoPtr, documentContent)){
-		if (oldObjectPtr->GetLastConnection() != userInfoPtr->GetLastConnection()){
-			retVal += QString(R"(UPDATE "Users" SET "Document" = '%1' WHERE "DocumentId" = '%2' AND "IsActive" = true;)").arg(SqlEncode(documentContent)).arg(objectId).toUtf8();
-		}
-		else{
+	if (oldObjectPtr->GetLastConnection() != userInfoPtr->GetLastConnection()){
+		retVal += QString(R"(UPDATE "Users" SET "Document" = jsonb_set("Document", '{LastConnection}', '"%1"', true) WHERE "DocumentId" ='%2' AND "IsActive" = true;)")
+				.arg(userInfoPtr->GetLastConnection().toString(Qt::ISODate))
+				.arg(objectId).toUtf8();
+	}
+	else{
+		QByteArray documentContent;
+		if (WriteDataToMemory("DocumentInfo", *userInfoPtr, documentContent)){
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 			retVal += QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );")
 					.arg(qPrintable(*m_tableNameAttrPtr))
@@ -192,9 +194,9 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 
 QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+		const imtbase::IObjectCollection& collection,
+		const QByteArray& objectId,
+		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
@@ -211,10 +213,10 @@ QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
 	}
 
 	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';")
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(*m_objectIdColumnAttrPtr))
-				.arg(qPrintable(objectId))
-				.toUtf8();
+			.arg(qPrintable(*m_tableNameAttrPtr))
+			.arg(qPrintable(*m_objectIdColumnAttrPtr))
+			.arg(qPrintable(objectId))
+			.toUtf8();
 
 	return retVal;
 }

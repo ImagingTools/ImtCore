@@ -52,13 +52,16 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 				if(informationId == "Id"){
 					elementInformation = collectionId;
 				}
+				else if(informationId == "TypeId"){
+					elementInformation = m_objectCollectionCompPtr->GetObjectTypeId(collectionId);
+				}
 				if(informationId == "ProductId"){
 					elementInformation = productLicensingInfoPtr->GetProductId();
 				}
-				else if(informationId == "ProductName"){
+				else if(informationId == "ProductName" || informationId == "Name"){
 					elementInformation = productLicensingInfoPtr->GetName();
 				}
-				else if(informationId == "ProductDescription"){
+				else if(informationId == "ProductDescription" || informationId == "Description"){
 					elementInformation = productLicensingInfoPtr->GetProductDescription();
 				}
 				else if(informationId == "Added"){

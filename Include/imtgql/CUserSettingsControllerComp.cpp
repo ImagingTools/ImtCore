@@ -18,17 +18,20 @@ namespace imtgql
 
 imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
-			QString& /*errorMessage*/) const
+			QString& errorMessage) const
 {
 	if (!m_userSettingsRepresentationControllerCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'm_userSettingsRepresentationControllerCompPtr' was not set", "CUserSettingsControllerComp");
 		return nullptr;
 	}
 
 	if (!m_userSettingsCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'm_userSettingsCollectionCompPtr' was not set", "CUserSettingsControllerComp");
 		return nullptr;
 	}
 
 	if (!m_userSettingsInfoFactCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'm_userSettingsInfoFactCompPtr' was not set", "CUserSettingsControllerComp");
 		return nullptr;
 	}
 
@@ -48,12 +51,9 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 
 	istd::TDelPtr<iprm::CParamsSet> paramsPtr = new imod::TModelWrap<iprm::CParamsSet>();
 
-	istd::TDelPtr<iprm::IIdParam> languageIdParam = new iprm::CIdParam();
-	languageIdParam->SetId(languageId);
-	paramsPtr->SetEditableParameter("LanguageParam", languageIdParam.PopPtr(), true);
-
-	istd::TDelPtr<imtbase::CTreeItemModel> userSettingsRepresentation(new imtbase::CTreeItemModel);
-	imtbase::CTreeItemModel* dataModelPtr = userSettingsRepresentation->AddTreeModel("data");
+	iprm::CIdParam* languageIdParamPtr = new iprm::CIdParam();
+	languageIdParamPtr->SetId(languageId);
+	paramsPtr->SetEditableParameter("LanguageParam", languageIdParamPtr, true);
 
 	istd::TOptDelPtr<imtauth::IUserSettings> userSettingsPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -67,6 +67,9 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 		userSettingsPtr.SetPtr(m_userSettingsInfoFactCompPtr.CreateInstance(), true);
 		Q_ASSERT(userSettingsPtr.IsValid());
 		if (!userSettingsPtr.IsValid()){
+			errorMessage = QString("Unable to create representation for user settings. Error: User settings is invalid.");
+			SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
+
 			return nullptr;
 		}
 
@@ -76,11 +79,20 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	Q_ASSERT(paramSetPtr != nullptr);
 	if (paramSetPtr == nullptr){
+		errorMessage = QString("Unable to create representation for user settings. Error: Params set from user settings is invalid.");
+		SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
+
 		return nullptr;
 	}
 
+	istd::TDelPtr<imtbase::CTreeItemModel> userSettingsRepresentation(new imtbase::CTreeItemModel);
+	imtbase::CTreeItemModel* dataModelPtr = userSettingsRepresentation->AddTreeModel("data");
+
 	bool result = m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*paramSetPtr, *dataModelPtr, paramsPtr.GetPtr());
 	if (!result){
+		errorMessage = QString("Unable to create representation for user settings.");
+		SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
+
 		return nullptr;
 	}
 
@@ -93,20 +105,17 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 			imtbase::CTreeItemModel* representationPtr) const
 {
 	if (!m_userSettingsRepresentationControllerCompPtr.IsValid()){
-		SendErrorMessage(0, QString("Internal error. m_userSettingsRepresentationControllerCompPtr is invalid."));
-
+		Q_ASSERT_X(false, "Attribute 'm_userSettingsRepresentationControllerCompPtr' was not set", "CUserSettingsControllerComp");
 		return false;
 	}
 
 	if (!m_userSettingsCollectionCompPtr.IsValid()){
-		SendErrorMessage(0, QString("Internal error. m_userSettingsCollectionCompPtr is invalid."));
-
+		Q_ASSERT_X(false, "Attribute 'm_userSettingsCollectionCompPtr' was not set", "CUserSettingsControllerComp");
 		return false;
 	}
 
 	if (!m_userSettingsInfoFactCompPtr.IsValid()){
-		SendErrorMessage(0, QString("Internal error. m_userSettingsInfoFactCompPtr is invalid."));
-
+		Q_ASSERT_X(false, "Attribute 'm_userSettingsInfoFactCompPtr' was not set", "CUserSettingsControllerComp");
 		return false;
 	}
 

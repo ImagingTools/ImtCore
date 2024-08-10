@@ -105,6 +105,13 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 		}
 	}
 
+	if (m_slaveRepresentationControllerCompPtr.IsValid()){
+		bool ok = m_slaveRepresentationControllerCompPtr->GetRepresentationFromDataModel(*guiElementContainerPtr, representation, paramsPtr);
+		if (!ok){
+			return false;
+		}
+	}
+
 	return true;
 }
 

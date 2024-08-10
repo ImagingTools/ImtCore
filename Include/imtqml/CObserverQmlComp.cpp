@@ -75,8 +75,6 @@ void CObserverQmlComp::UpdateLanguage() const
 					QString langId =  m_translationManagerCompPtr->GetLanguagesInfo().GetOptionId(index);
 
 					SendInfoMessage(0, QString("Localization changed to %1").arg(langId));
-
-					QMetaObject::invokeMethod(quickItem, "onLocalizationChanged", Qt::AutoConnection, Q_ARG(QVariant, langId));
 				}
 			}
 		}
@@ -135,13 +133,9 @@ void CObserverQmlComp::UpdateApplicationInfoRepresentation()
 }
 
 
-void CObserverQmlComp::OnSettingsChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IParamsSet* /*objectPtr*/)
-{
-}
-
-
 void CObserverQmlComp::OnLanguageChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::ISelectionParam* /*objectPtr*/)
 {
+	UpdateLanguage();
 	UpdateApplicationInfoRepresentation();
 	UpdateSettingsRepresentation();
 }
@@ -162,10 +156,6 @@ void CObserverQmlComp::OnComponentCreated()
 	if (m_quickObjectCompPtr.IsValid()){
 		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
 		if (quickItem != nullptr){
-			if (m_settingsCompPtr.IsValid()){
-				m_settingsObserver.RegisterObject(m_settingsCompPtr.GetPtr(), &CObserverQmlComp::OnSettingsChanged);
-			}
-
 			if (m_languageParamPtr.IsValid()){
 				m_languageParamObserver.RegisterObject(m_languageParamPtr.GetPtr(), &CObserverQmlComp::OnLanguageChanged);
 			}
@@ -174,11 +164,9 @@ void CObserverQmlComp::OnComponentCreated()
 				m_urlParamObserver.RegisterObject(m_urlParamPtr.GetPtr(), &CObserverQmlComp::OnUrlParamChanged);
 			}
 
-			UpdateLanguage();
-			UpdateApplicationInfoRepresentation();
 			UpdateSettingsRepresentation();
-
 			ApplyUrl();
+			UpdateApplicationInfoRepresentation();
 
 			bool isConnected = connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnGuiChanged()));
 			Q_ASSERT(isConnected);

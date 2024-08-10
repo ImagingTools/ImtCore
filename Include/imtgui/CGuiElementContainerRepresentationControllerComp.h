@@ -22,6 +22,7 @@ public:
 		I_ASSIGN_MULTI_0(m_representationControllersCompPtr, "RepresentationControllers", "Representation of the controllers", false);
 		I_ASSIGN(m_commandPermissionsProviderCompPtr, "CommandPermissionsProvider", "Command permissions provider", false, "CommandPermissionsProvider");
 		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
+		I_ASSIGN(m_slaveRepresentationControllerCompPtr, "SlaveRepresentationController", "Slave representation controller", false, "");
 	I_END_COMPONENT;
 
 protected:
@@ -42,6 +43,7 @@ protected:
 	I_MULTIREF(imtbase::IRepresentationController, m_representationControllersCompPtr);
 	I_REF(imtbase::ICommandPermissionsProvider, m_commandPermissionsProviderCompPtr);
 	I_REF(imtauth::IPermissionChecker, m_checkPermissionCompPtr);
+	I_REF(imtbase::IRepresentationController, m_slaveRepresentationControllerCompPtr);
 };
 
 

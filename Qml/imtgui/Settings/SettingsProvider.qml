@@ -12,14 +12,6 @@ QtObject {
 
     property var applicationInfoProvider;
 
-    Component.onCompleted: {
-        Events.subscribeEvent("UpdateSettings", container.updateModel);
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("UpdateSettings", container.updateModel);
-    }
-
     onApplicationInfoProviderChanged: {
         if (container.applicationInfoProvider){
             container.aboutApplicationProvider.applicationInfoProvider = container.applicationInfoProvider;
@@ -202,6 +194,11 @@ QtObject {
                                 for (let k = 0; k < languageParametersModel.getItemsCount(); k++){
                                     let langId = languageParametersModel.getData("Id", k);
                                     if (String(langId) == String(schema)){
+                                        let currentValue = parametersModel.getData("Value", j)
+                                        if (currentValue === k){
+                                            return;
+                                        }
+
                                         parametersModel.setData("Value", k, j);
                                         break;
                                     }
@@ -246,6 +243,11 @@ QtObject {
                                     for (let k = 0; k < languageParametersModel.getItemsCount(); k++){
                                         let langId = languageParametersModel.getData("Id", k);
                                         if (String(langId) == String(language)){
+                                            let currentValue = parametersModel.getData("Value", j)
+                                            if (currentValue === k){
+                                                return;
+                                            }
+
                                             parametersModel.setData("Value", k, j);
                                             break;
                                         }
@@ -348,6 +350,7 @@ QtObject {
         onStateChanged: {
             if (this.state === "Ready") {
                 var dataModelLocal;
+                console.log("GetSettings", this.toJson());
 
                 if (container.settingsQuery.containsKey("errors")){
                     dataModelLocal = container.settingsQuery.getData("errors");

@@ -55,7 +55,13 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 	if (gqlRequestProviderPtr != nullptr){
 		const imtgql::IGqlRequest* gqlRequestPtr = gqlRequestProviderPtr->GetGqlRequest();
 		if (gqlRequestPtr != nullptr){
-			gqlRequest.SetGqlContext(gqlRequestPtr->GetRequestContext());
+			istd::TDelPtr<imtgql::IGqlContext> gqlContextPtr;
+			gqlContextPtr.SetCastedOrRemove(gqlRequestPtr->GetRequestContext()->CloneMe());
+			if (!gqlContextPtr.IsValid()){
+				return nullptr;
+			}
+
+			gqlRequest.SetGqlContext(gqlContextPtr.PopPtr());
 		}
 	}
 

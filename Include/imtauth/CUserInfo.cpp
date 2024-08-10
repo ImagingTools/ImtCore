@@ -207,28 +207,7 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 		retVal = retVal && archive.EndTag(lastConnectionTag);
 	}
 
-	if (imtCoreVersion >= 10541 && imtCoreVersion <= 10570){
-		SystemInfo systemInfo;
-
-		if (archive.IsStoring() && m_systemInfos.count() > 0){
-			systemInfo = m_systemInfos[0];
-		}
-
-		iser::CArchiveTag systemIdTag("SystemId", "System-ID", iser::CArchiveTag::TT_LEAF);
-		retVal = retVal && archive.BeginTag(systemIdTag);
-		retVal = retVal && archive.Process(systemInfo.systemId);
-		retVal = retVal && archive.EndTag(systemIdTag);
-
-		iser::CArchiveTag systemNameTag("SystemName", "System Name", iser::CArchiveTag::TT_LEAF);
-		retVal = retVal && archive.BeginTag(systemNameTag);
-		retVal = retVal && archive.Process(systemInfo.systemName);
-		retVal = retVal && archive.EndTag(systemNameTag);
-
-		if (!archive.IsStoring()){
-			m_systemInfos << systemInfo;
-		}
-	}
-	else if (imtCoreVersion > 10570){
+	if (imtCoreVersion > 10734){
 		int count = m_systemInfos.count();
 
 		if (!archive.IsStoring()){

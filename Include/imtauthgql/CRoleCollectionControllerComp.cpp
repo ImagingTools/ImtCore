@@ -215,10 +215,17 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 	}
 
 	QByteArray productId = inputParamObjectPtr->GetFieldArgumentValue("ProductId").toByteArray();
-	iprm::CTextParam* textParam = new iprm::CTextParam;
-	textParam->SetText(productId);
+	if (productId.isEmpty()){
+		const imtgql::CGqlObject* additionalParamsPtr = inputParamObjectPtr->GetFieldArgumentObjectPtr("addition");
+		if (additionalParamsPtr != nullptr) {
+			productId = additionalParamsPtr->GetFieldArgumentValue("ProductId").toByteArray();
+		}
+	}
 
-	objectParamSetPtr->SetEditableParameter("ProductId", textParam, true);
+	iprm::CTextParam* textParamPtr = new iprm::CTextParam;
+	textParamPtr->SetText(productId);
+
+	objectParamSetPtr->SetEditableParameter("ProductId", textParamPtr, true);
 }
 
 

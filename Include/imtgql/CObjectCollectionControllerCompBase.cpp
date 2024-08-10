@@ -263,8 +263,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	}
 
 	QByteArray objectId;
-	istd::IChangeable* newObjectPtr = CreateObject(gqlRequest, objectId, name, description, errorMessage);
-	if (newObjectPtr == nullptr){
+	istd::TDelPtr<istd::IChangeable> newObjectPtr = CreateObject(gqlRequest, objectId, name, description, errorMessage);
+	if (!newObjectPtr.IsValid()){
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return nullptr;
@@ -284,7 +284,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_CREATE, gqlRequest);
 	}
 
-	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr, objectId, nullptr, nullptr, operationContextPtr.GetPtr());
+	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (newObjectId.isEmpty()){
 		errorMessage = QString("Error when creating a new object. Object-ID: '%1'.").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -407,8 +407,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 			QString name;
 			QString description;
 
-			istd::IChangeable* savedObjectPtr = CreateObject(gqlRequest, objectId, name, description, errorMessage);
-			if (savedObjectPtr != nullptr){
+			istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObject(gqlRequest, objectId, name, description, errorMessage);
+			if (savedObjectPtr.IsValid()){
 				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr)){
 					errorMessage += QString("Could not update object: '%1'; ").arg(qPrintable(objectId));
 					objectIdsModel.SetData("Failed", true, i);
@@ -531,14 +531,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamsPtr = gqlRequest.GetParam("input");
-	if (inputParamsPtr == nullptr){
-		errorMessage = QString("GraphQL input params is invalid");
-		SendCriticalMessage(0, errorMessage);
-
-		return nullptr;
-	}
-
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
@@ -547,7 +539,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 	int offset = 0;
 	int count = -1;
 
-	const imtgql::CGqlObject* viewParamsPtr = inputParamsPtr->GetFieldArgumentObjectPtr("viewParams");
+	const imtgql::CGqlObject* viewParamsPtr = nullptr;
+	const imtgql::CGqlObject* inputParamsPtr = gqlRequest.GetParam("input");
+	if (inputParamsPtr != nullptr){
+		viewParamsPtr = inputParamsPtr->GetFieldArgumentObjectPtr("viewParams");
+	}
+
 	if (viewParamsPtr != nullptr){
 		offset = viewParamsPtr->GetFieldArgumentValue("Offset").toInt();
 		count = viewParamsPtr->GetFieldArgumentValue("Count").toInt();

@@ -16,8 +16,8 @@ public:
 	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlSearchControllerComp);
-		I_ASSIGN_MULTI_0(m_searchControllersCompPtr, "SearchControllers", "Search controllers", true);
-		I_ASSIGN(m_optionListCompPtr, "SearchControllersInfos", "Search controllers infos", true, "SearchControllersInfos");
+		I_ASSIGN_MULTI_0(m_searchControllersCompPtr, "SearchControllers", "Search controllers", false);
+		I_ASSIGN(m_optionListCompPtr, "SearchControllersInfos", "Search controllers infos", false, "SearchControllersInfos");
 	I_END_COMPONENT;
 
 protected:

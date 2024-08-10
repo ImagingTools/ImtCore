@@ -55,11 +55,6 @@ I_EXPORT_COMPONENT(
 			"SQL User su Superuser SuperUser admin");
 
 I_EXPORT_COMPONENT(
-			RemoteSuperuserProvider,
-			"Remote Superuser provider",
-			"Remote Puma SQL User su Superuser SuperUser admin");
-
-I_EXPORT_COMPONENT(
 			SqlJsonRoleDatabaseDelegate,
 			"Role object json delegate for SQL table",
 			"SQL JSON Role Delegate");

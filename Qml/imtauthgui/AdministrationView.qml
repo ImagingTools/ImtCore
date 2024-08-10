@@ -12,13 +12,20 @@ Item {
     property alias multiPageView: multiPageView;
     signal multiPageUpdated();
 
-
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+
+        CachedGroupCollection.updateModel();
+        CachedUserCollection.updateModel();
+        CachedRoleCollection.updateModel();
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+
+        CachedGroupCollection.clearModel();
+        CachedUserCollection.clearModel();
+        CachedRoleCollection.clearModel();
     }
 
     function onLocalizationChanged(language){

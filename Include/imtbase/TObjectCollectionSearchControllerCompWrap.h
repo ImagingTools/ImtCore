@@ -27,7 +27,7 @@ public:
 
 	I_BEGIN_COMPONENT(TObjectCollectionSearchControllerCompWrap);
 		I_REGISTER_INTERFACE(imtbase::ISearchController);
-		I_ASSIGN_MULTI_0(m_headersIdsAttrPtr, "SearchableHeadersIds", "Searchable header-IDs", true);
+		I_ASSIGN_MULTI_0(m_headersIdsAttrPtr, "SearchableHeadersIds", "Fields of the collection for which the global search is looking for data", true);
 	I_END_COMPONENT;
 
 	// reimplemented (ISearchController)
@@ -64,8 +64,6 @@ const imtbase::ISearchResults* TObjectCollectionSearchControllerCompWrap<ObjectC
 
 	iprm::CParamsSet paramsSet;
 	paramsSet.SetEditableParameter("Filter", &collectionFilter);
-
-	imtbase::ICollectionInfo::Ids elementIds = BaseClass::GetElementIds(0, -1, &paramsSet);
 
 	imtbase::CSearchResults* searchResultsPtr = new imtbase::CSearchResults();
 

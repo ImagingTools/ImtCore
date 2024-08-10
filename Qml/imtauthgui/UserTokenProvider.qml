@@ -10,6 +10,7 @@ QtObject {
     property string login: "";
     property string userId: "";
     property string passwordHash: "";
+    property string systemId: "";
     property var permissions: [];
 
     signal accepted();
@@ -96,6 +97,11 @@ QtObject {
                         if (dataModelLocal.containsKey("PasswordHash")){
                             let userPasswordHash = dataModelLocal.getData("PasswordHash");
                             container.passwordHash = userPasswordHash;
+                        }
+
+                        if (dataModelLocal.containsKey("SystemId")){
+                            let systemId = dataModelLocal.getData("SystemId");
+                            container.systemId = systemId;
                         }
 
                         if (dataModelLocal.containsKey("Permissions")){

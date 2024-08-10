@@ -41,13 +41,13 @@ public:
 	virtual const imtqml::IQuickObject* GetApplicationItem() const;
 
 	// reimplemented (ibase::IApplication)
-	virtual bool InitializeApplication(int argc, char** argv);
-	virtual int Execute(int argc, char** argv);
-	virtual QString GetHelpText() const;
+	virtual bool InitializeApplication(int argc, char** argv) override;
+	virtual int Execute(int argc, char** argv) override;
+	virtual QString GetHelpText() const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentDestroyed();
+	virtual void OnComponentDestroyed() override;
 
 private:
 	void UpdateMainWidgetDecorations();

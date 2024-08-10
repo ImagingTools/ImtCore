@@ -62,6 +62,5 @@ TreeItemModelObserver {
     }
 
     function onDatabaseAccessSettingsChanged(){
-        Events.sendEvent("UpdateModels");
     }
 }

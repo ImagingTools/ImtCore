@@ -20,6 +20,10 @@ QByteArrayList CGuiElementContainerComp::GetElementIds() const
 		}
 	}
 
+	if (m_slaveGuiElementContainerCompPtr.IsValid()){
+		retVal << m_slaveGuiElementContainerCompPtr->GetElementIds();
+	}
+
 	return retVal;
 }
 
@@ -38,6 +42,10 @@ const imtgui::IGuiElementModel* CGuiElementContainerComp::GetGuiElementModel(con
 				return guiElementPtr;
 			}
 		}
+	}
+
+	if (m_slaveGuiElementContainerCompPtr.IsValid()){
+		return m_slaveGuiElementContainerCompPtr->GetGuiElementModel(elementId);
 	}
 
 	return nullptr;

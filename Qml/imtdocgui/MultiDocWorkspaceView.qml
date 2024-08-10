@@ -28,6 +28,15 @@ Item {
 
         function onDocumentAdded(documentIndex, documentId){
             workspaceView.tabPanel.selectedIndex = documentIndex;
+//            let viewComp = workspaceView.documentManager.documentsModel.get(documentIndex).DocumentViewComp;
+//            let view = viewComp.createObject(viewsPanel);
+//            view.anchors.fill = viewsPanel;
+//            viewsPanel.updateVisibleItems();
+
+//            let documentData = workspaceView.documentManager.documentsModel.get(documentIndex).DocumentData
+//            if (documentData){
+//                documentData.views.push(view);
+//            }
         }
 
         function onDocumentClosed(documentIndex, documentId){
@@ -46,6 +55,10 @@ Item {
         if (!index){
             index = workspaceView.documentManager.documentsModel.count;
         }
+
+//        let view = viewComp.createObject(viewsPanel);
+//        view.anchors.fill = viewsPanel;
+//        viewsPanel.updateVisibleItems();
 
          workspaceView.documentManager.documentsModel.insert(index, {
                                   "Uuid": UuidGenerator.generateUUID(),
@@ -90,6 +103,10 @@ Item {
                 tabPanel_.selectedIndex--;
             }
         }
+
+//        onSelectedIndexChanged: {
+//            viewsPanel.updateVisibleItems();
+//        }
     }
 
     Loader {
@@ -100,6 +117,21 @@ Item {
         height: visible ? 40: 0;
         visible: alertPanel.item != null && alertPanel.item !== undefined;
     }
+
+//    Item {
+//        id: viewsPanel;
+
+//        anchors.top: alertPanel.bottom;
+//        anchors.left: parent.left;
+//        anchors.right: parent.right;
+//        anchors.bottom: parent.bottom;
+
+//        function updateVisibleItems(){
+//            for (let i = 0; i < viewsPanel.children.length; i++){
+//                viewsPanel.children[i].visible = tabPanel_.selectedIndex == i;
+//            }
+//        }
+//    }
 
     Repeater {
         id: documentRepeater;
@@ -125,14 +157,6 @@ Item {
 
                     if (model.Fixed !== undefined && model.Fixed){
                         return;
-                    }
-
-                    if (model.Properties){
-                        for (let key in model.Properties){
-                            if (item[key] !== undefined){
-                                item[key] = model.Properties[key];
-                            }
-                        }
                     }
 
                     let documentData = workspaceView.documentManager.documentsModel.get(model.index).DocumentData;

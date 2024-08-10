@@ -1,9 +1,6 @@
 #include <imtauthgql/CRoleControllerComp.h>
 
 
-// ACF includes
-#include <iser/CJsonMemWriteArchive.h>
-
 // ImtCore includes
 #include <imtauth/CRole.h>
 
@@ -15,89 +12,63 @@ namespace imtauthgql
 imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		errorMessage = QString("Unable to get role object. Error: Attribute 'm_objectCollectionCompPtr' was not set").toUtf8();
+		SendErrorMessage(0, errorMessage, "CRoleControllerComp");
 
 		return nullptr;
 	}
 
-	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
-
-	QByteArray productId;
-	QByteArray objectId;
-	bool isJsonSerialized = false;
 	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
-	if (inputParamPtr != nullptr){
-		objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
-		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
-		isJsonSerialized = inputParamPtr->GetFieldArgumentValue("IsJsonSerialized").toBool();
+	if (inputParamPtr == nullptr){
+		errorMessage = QString("Unable to get role object. Error: GraphQL input params is invalid.").toUtf8();
+		SendErrorMessage(0, errorMessage, "CRoleControllerComp");
+
+		return nullptr;
 	}
 
-	dataModelPtr->SetData("Id", "");
-	dataModelPtr->SetData("Name", "");
+	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	QByteArray productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
 
+	imtauth::IRole* roleInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		imtauth::IRole* roleInfoPtr = dynamic_cast<imtauth::IRole*>(dataPtr.GetPtr());
-		if (roleInfoPtr == nullptr){
-			errorMessage = QT_TR_NOOP("Unable to get a role info");
+		roleInfoPtr = dynamic_cast<imtauth::IRole*>(dataPtr.GetPtr());
+	}
 
-			return nullptr;
-		}
+	if (roleInfoPtr == nullptr){
+		errorMessage = QString("Unable to get role with ID: '%1'. The role does not exist.").arg(objectId);
+		SendErrorMessage(0, errorMessage, "CRoleControllerComp");
 
-		if (isJsonSerialized){
-			QByteArray roleJson;
-			{
-				iser::CJsonMemWriteArchive archive(roleJson);
-				if (!roleInfoPtr->Serialize(archive)){
-					return nullptr;
-				}
-			}
-
-			if (!dataModelPtr->CreateFromJson(roleJson)){
-				return nullptr;
-			}
-		}
-		else{
-			QByteArray objectUuid = objectId;
-			QByteArray roleId = roleInfoPtr->GetRoleId();
-			QString roleName = roleInfoPtr->GetRoleName();
-			QString roleDescription = roleInfoPtr->GetRoleDescription();
-			QByteArray roleProductId = roleInfoPtr->GetProductId();
-
-			dataModelPtr->SetData("Id", objectUuid);
-			dataModelPtr->SetData("RoleId", roleId);
-			dataModelPtr->SetData("ProductId", roleProductId);
-			dataModelPtr->SetData("Name", roleName);
-
-			dataModelPtr->SetData("Description", roleDescription);
-
-			QByteArrayList parentsRolesIds = roleInfoPtr->GetIncludedRoles();
-
-			std::sort(parentsRolesIds.begin(), parentsRolesIds.end());
-
-			dataModelPtr->SetData("ParentRoles", parentsRolesIds.join(';'));
-
-			imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
-
-			std::sort(permissions.begin(), permissions.end());
-
-			dataModelPtr->SetData("Permissions", permissions.join(';'));
-		}
+		return nullptr;
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+
+	dataModelPtr->SetData("Id", objectId);
+	dataModelPtr->SetData("RoleId", roleInfoPtr->GetRoleId());
+	dataModelPtr->SetData("ProductId", roleInfoPtr->GetProductId());
+	dataModelPtr->SetData("Name", roleInfoPtr->GetRoleName());
+	dataModelPtr->SetData("Description", roleInfoPtr->GetRoleDescription());
+
+	QByteArrayList parentsRolesIds = roleInfoPtr->GetIncludedRoles();
+	std::sort(parentsRolesIds.begin(), parentsRolesIds.end());
+	dataModelPtr->SetData("ParentRoles", parentsRolesIds.join(';'));
+
+	imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
+	std::sort(permissions.begin(), permissions.end());
+	dataModelPtr->SetData("Permissions", permissions.join(';'));
 
 	return rootModelPtr.PopPtr();
 }
 
 
 istd::IChangeable* CRoleControllerComp::CreateObject(
-			const imtgql::CGqlRequest& gqlRequest,
-			QByteArray& objectId,
-			QString& name,
-			QString& description,
-			QString& errorMessage) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QByteArray& objectId,
+		QString& name,
+		QString& description,
+		QString& errorMessage) const
 {
 	if (!m_roleFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT(false);
@@ -105,17 +76,19 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 		return nullptr;
 	}
 
-	QByteArray itemData;
-	QByteArray productId;
 	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
-	if (inputParamPtr != nullptr){
-		objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
-		itemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
+	if (inputParamPtr == nullptr){
+		errorMessage = QString("Unable to create a role object. Error: GraphQL input params is invalid.").toUtf8();
+		SendErrorMessage(0, errorMessage, "CRoleControllerComp");
 
-		const imtgql::CGqlObject* additionalParamsPtr = inputParamPtr->GetFieldArgumentObjectPtr("addition");
-		if (additionalParamsPtr != nullptr) {
-			productId = additionalParamsPtr->GetFieldArgumentValue("ProductId").toByteArray();
-		}
+		return nullptr;
+	}
+
+	objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	QByteArray productId;
+	const imtgql::CGqlObject* additionalParamsPtr = inputParamPtr->GetFieldArgumentObjectPtr("addition");
+	if (additionalParamsPtr != nullptr) {
+		productId = additionalParamsPtr->GetFieldArgumentValue("ProductId").toByteArray();
 	}
 
 	if (objectId.isEmpty()){
@@ -123,99 +96,99 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 	}
 
 	if (productId.isEmpty()){
-		errorMessage = QT_TR_NOOP("Product-ID can't be empty!");
+		errorMessage = QString("Unable to create a role object for empty product.").toUtf8();
+		SendErrorMessage(0, errorMessage, "CRoleControllerComp");
+
 		return nullptr;
 	}
 
-	if (!itemData.isEmpty()){
-		imtauth::IRole* roleInstancePtr = m_roleFactCompPtr.CreateInstance();
-		if (roleInstancePtr == nullptr){
-			return nullptr;
-		}
+	QByteArray itemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
+	imtbase::CTreeItemModel itemModel;
+	if (!itemModel.CreateFromJson(itemData)){
+		errorMessage = QString("Unable to create a role object. Error: Failed to create a tree model from json '%1'").arg(itemData);
+		SendErrorMessage(0, errorMessage, "CRoleControllerComp");
 
-		imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(roleInstancePtr);
-		if (roleInfoPtr == nullptr){
-			errorMessage = QT_TR_NOOP("Unable to get a role!");
-			return nullptr;
-		}
+		return nullptr;
+	}
 
-		imtbase::CTreeItemModel itemModel;
-		itemModel.CreateFromJson(itemData);
+	istd::TDelPtr<imtauth::CIdentifiableRoleInfo> roleInfoPtr;
+	roleInfoPtr.SetCastedOrRemove(m_roleFactCompPtr.CreateInstance());
+	if (!roleInfoPtr.IsValid()){
+		errorMessage = QString("Unable to create a role instance.").toUtf8();
+		SendErrorMessage(0, errorMessage, "CRoleControllerComp");
 
-		roleInfoPtr->SetObjectUuid(objectId);
+		return nullptr;
+	}
 
-		QByteArray roleId;
-		if (itemModel.ContainsKey("RoleId")){
-			roleId = itemModel.GetData("RoleId").toByteArray();
-			if (roleId.isEmpty()){
-				errorMessage = QT_TR_NOOP("Role-ID can't be empty!");
-				return nullptr;
-			}
-		}
+	roleInfoPtr->SetObjectUuid(objectId);
 
-		roleInfoPtr->SetProductId(productId);
+	QByteArray roleId = itemModel.GetData("RoleId").toByteArray();
 
-		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-		for (imtbase::ICollectionInfo::Id collectionId : collectionIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-				imtauth::IRole* currentRoleInfoPtr = dynamic_cast<imtauth::IRole*>(dataPtr.GetPtr());
-				if (currentRoleInfoPtr != nullptr){
-					if (collectionId != objectId){
-						QByteArray currentRoleId = currentRoleInfoPtr->GetRoleId();
-						QByteArray currentProductId = currentRoleInfoPtr->GetProductId();
+	if (roleId.isEmpty()){
+		errorMessage = QString("Role-ID can't be empty!");
+		return nullptr;
+	}
 
-						if (currentRoleId == roleId && currentProductId == productId){
-							errorMessage = QT_TR_NOOP("Role already exists");
-							return nullptr;
-						}
-					}
-				}
-			}
-		}
+	roleInfoPtr->SetProductId(productId);
 
-		roleInfoPtr->SetRoleId(roleId);
+	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+	for (const imtbase::ICollectionInfo::Id& collectionId : collectionIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
+			imtauth::IRole* currentRoleInfoPtr = dynamic_cast<imtauth::IRole*>(dataPtr.GetPtr());
+			if (currentRoleInfoPtr != nullptr){
+				if (collectionId != objectId){
+					QByteArray currentRoleId = currentRoleInfoPtr->GetRoleId();
+					QByteArray currentProductId = currentRoleInfoPtr->GetProductId();
 
-		if (itemModel.ContainsKey("Name")){
-			name = itemModel.GetData("Name").toString();
-			roleInfoPtr->SetRoleName(name);
-		}
-
-		if (itemModel.ContainsKey("Description")){
-			description = itemModel.GetData("Description").toString();
-			roleInfoPtr->SetRoleDescription(description);
-		}
-
-		if (itemModel.ContainsKey("ParentRoles")){
-			QByteArray parentRoles = itemModel.GetData("ParentRoles").toByteArray();
-			if (!parentRoles.isEmpty()){
-				QByteArrayList parentRoleIds = parentRoles.split(';');
-				parentRoleIds.removeAll("");
-
-				for (const QByteArray& parentRoleId : parentRoleIds){
-					if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
-						errorMessage = QT_TR_NOOP(QString("Unable include role %1 to the role %2. Check the dependencies between them.")
-									.arg(qPrintable(parentRoleId))
-									.arg(qPrintable(roleId)));
-
+					if (currentRoleId == roleId && currentProductId == productId){
+						errorMessage = QString("Role with ID: '%1' already exists").arg(currentRoleId);
 						return nullptr;
 					}
 				}
 			}
 		}
-
-		if (itemModel.ContainsKey("Permissions")){
-			QByteArray permissions = itemModel.GetData("Permissions").toByteArray();
-			QByteArrayList permissionIds = permissions.split(';');
-			permissionIds.removeAll("");
-
-			roleInfoPtr->SetLocalPermissions(permissionIds);
-		}
-
-		return roleInfoPtr;
 	}
 
-	return nullptr;
+	roleInfoPtr->SetRoleId(roleId);
+
+	if (itemModel.ContainsKey("Name")){
+		name = itemModel.GetData("Name").toString();
+		roleInfoPtr->SetRoleName(name);
+	}
+
+	if (itemModel.ContainsKey("Description")){
+		description = itemModel.GetData("Description").toString();
+		roleInfoPtr->SetRoleDescription(description);
+	}
+
+	if (itemModel.ContainsKey("ParentRoles")){
+		QByteArray parentRoles = itemModel.GetData("ParentRoles").toByteArray();
+		if (!parentRoles.isEmpty()){
+			QByteArrayList parentRoleIds = parentRoles.split(';');
+			parentRoleIds.removeAll("");
+
+			for (const QByteArray& parentRoleId : parentRoleIds){
+				if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
+					errorMessage = QT_TR_NOOP(QString("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
+												.arg(qPrintable(parentRoleId))
+												.arg(qPrintable(roleId)));
+
+					return nullptr;
+				}
+			}
+		}
+	}
+
+	if (itemModel.ContainsKey("Permissions")){
+		QByteArray permissions = itemModel.GetData("Permissions").toByteArray();
+		QByteArrayList permissionIds = permissions.split(';');
+		permissionIds.removeAll("");
+
+		roleInfoPtr->SetLocalPermissions(permissionIds);
+	}
+
+	return roleInfoPtr.PopPtr();
 }
 
 

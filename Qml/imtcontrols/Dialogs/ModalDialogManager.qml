@@ -85,7 +85,11 @@ Item {
     }
 
     function showCriticalDialog(message){
-        openDialog(criticalDialog, {"message": message});
+        openDialog(warningDialog, {"message": message});
+    }
+
+    function showErrorDialog(message){
+        openDialog(warningDialog, {"message": message});
     }
 
     property Component infoDialog: Component{

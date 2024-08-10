@@ -51,13 +51,6 @@ DecoratorBase {
         visible: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected: false;
     }
 
-    TooltipArea {
-        id: tooltipArea;
-
-        mouseArea: !tabPanelDecorator.baseElement ? null : tabPanelDecorator.baseElement.mouseArea;
-        text: (!tabPanelDecorator.baseElement || !tabPanelDecorator.textIsCropped) ? "" : tabPanelDecorator.baseElement.text;
-    }
-
     Row {
         id: content;
 
@@ -149,7 +142,6 @@ DecoratorBase {
             }
 
             onClicked: {
-                tooltipArea.tooltip.closeTooltip();
                 tabPanelDecorator.baseElement.closeSignal();
             }
         }

@@ -20,14 +20,16 @@ void CDatabaseAutomaticBackupComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	QObject::connect(&m_timer, &QTimer::timeout, this, &CDatabaseAutomaticBackupComp::OnTimeout);
+	if (m_backupSettingsCompPtr.IsValid()){
+		QObject::connect(&m_timer, &QTimer::timeout, this, &CDatabaseAutomaticBackupComp::OnTimeout);
 
-	if (*m_backupOnStartAttrPtr){
-		Backup();
+		if (*m_backupOnStartAttrPtr){
+			Backup();
+		}
+
+		int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr : 60000;
+		m_timer.start(interval);
 	}
-
-	int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr : 60000;
-	m_timer.start(interval);
 }
 
 
@@ -71,11 +73,11 @@ bool CDatabaseAutomaticBackupComp::Backup()
 	QString fileName = dbName + "_" + QDateTime::currentDateTime().toString(fmt);
 
 	QString pgDumpCommand = QString("pg_dump -h %1 -U %2 -p %3 -b -v -f \"%4\" \"%5\"")
-				.arg(host)
-				.arg(userName)
-				.arg(QString::number(port))
-				.arg(backupFolderPath + "/" + fileName)
-				.arg(dbName);
+			.arg(host)
+			.arg(userName)
+			.arg(QString::number(port))
+			.arg(backupFolderPath + "/" + fileName)
+			.arg(dbName);
 
 	QProcess process;
 
@@ -99,37 +101,48 @@ bool CDatabaseAutomaticBackupComp::Backup()
 
 void CDatabaseAutomaticBackupComp::OnTimeout()
 {
-	if (m_databaseLoginSettingsCompPtr.IsValid() && m_backupSettingsCompPtr.IsValid()){
-		iprm::TParamsPtr<imtapp::ISchedulerParams> schedulerParamPtr(m_backupSettingsCompPtr.GetPtr(), "SchedulerParams");
-		if (schedulerParamPtr.IsValid()){
-			QDateTime currentDateTime = QDateTime::currentDateTime();
-			QDateTime startTime = schedulerParamPtr->GetStartTime();
-			if (startTime.isValid()){
-				if (currentDateTime >= startTime){
-					bool ok = false;
-					if (m_lastBackupDateTime.isValid()){
-						int interval = schedulerParamPtr->GetInterval();
-						int secs = m_lastBackupDateTime.secsTo(currentDateTime);
-						if (secs >= interval){
-							ok = true;
-						}
-					}
-					else{
-						ok = true;
-					}
+	if (!m_backupSettingsCompPtr.IsValid()){
+		return;
+	}
 
-					if (ok){
-						Backup();
-					}
-				}
-			}
-			else{
-				SendErrorMessage(0, "time is not valid", "Database automatic backup");
+	iprm::TParamsPtr<imtapp::ISchedulerParams> schedulerParamPtr(m_backupSettingsCompPtr.GetPtr(), "SchedulerParams");
+	if (!schedulerParamPtr.IsValid()){
+		SendErrorMessage(0, QString("Error when trying to backup the database. Error: Backup settings is invalid."), "CDatabaseAutomaticBackupComp");
+		return;
+	}
+
+	QDateTime currentDateTime = QDateTime::currentDateTime();
+	QDateTime startTime = schedulerParamPtr->GetStartTime();
+	if (!startTime.isValid()){
+		SendErrorMessage(0, QString("Error when trying to backup the database. Error: Start time from backup settings is invalid."), "CDatabaseAutomaticBackupComp");
+
+		return;
+	}
+
+	if (currentDateTime >= startTime){
+		bool ok = false;
+		if (m_lastBackupDateTime.isValid()){
+			int interval = schedulerParamPtr->GetInterval();
+			int secs = m_lastBackupDateTime.secsTo(currentDateTime);
+			if (secs >= interval){
+				ok = true;
 			}
 		}
-	}
-	else{
-		SendErrorMessage(0, "m_databaseLoginSettingsCompPtr is not valid", "Database automatic backup");
+		else{
+			ok = true;
+		}
+
+		if (ok){
+			SendInfoMessage(0, QString("Attempt to create a backup of the database ..."), "CDatabaseAutomaticBackupComp");
+
+			bool result = Backup();
+			if (result){
+				SendInfoMessage(0, QString("The database backup was completed successfully"), "CDatabaseAutomaticBackupComp");
+			}
+			else{
+				SendInfoMessage(0, QString("Error when trying to make a database backup"), "CDatabaseAutomaticBackupComp");
+			}
+		}
 	}
 }
 

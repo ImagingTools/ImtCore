@@ -47,13 +47,16 @@ bool CLicenseCollectionControllerComp::SetupGqlItem(
 			if(informationId == "Id"){
 				elementInformation = collectionId;
 			}
+			else if(informationId == "TypeId"){
+				elementInformation = m_objectCollectionCompPtr->GetObjectTypeId(collectionId);
+			}
 			else if(informationId == "LicenseId"){
 				elementInformation = licenseInfoPtr->GetLicenseId();
 			}
-			else if(informationId == "LicenseName"){
+			else if(informationId == "LicenseName" || informationId == "Name"){
 				elementInformation = licenseInfoPtr->GetLicenseName();
 			}
-			else if(informationId == "LicenseDescription"){
+			else if(informationId == "LicenseDescription"|| informationId == "Description"){
 				elementInformation = licenseInfoPtr->GetLicenseDescription();
 			}
 			else if(informationId == "Added"){
