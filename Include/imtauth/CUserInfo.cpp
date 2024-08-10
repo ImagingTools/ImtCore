@@ -207,7 +207,7 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 		retVal = retVal && archive.EndTag(lastConnectionTag);
 	}
 
-	if (imtCoreVersion > 10734){
+	if (imtCoreVersion >= 10734){
 		int count = m_systemInfos.count();
 
 		if (!archive.IsStoring()){
