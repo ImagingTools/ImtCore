@@ -131,7 +131,7 @@ class Property extends BaseObject {
         let signal = this.__getSignal()
         if(!this.__subscribers || !signal) return
 
-        signal.disconnect(target, target.update)
+        signal.disconnect(target, target.__update)
         let index = this.__subscribers.indexOf(target)
         if(index >= 0){
             this.__subscribers.splice(index, 1)
@@ -163,7 +163,7 @@ class Property extends BaseObject {
                     this.__depends.push(target)
                 }
         
-                target.__addSubscriber(this)
+                target.__addSubscriber(this.__proxy)
             }
             
         }

@@ -3,6 +3,7 @@ const QtObject = require("../QtQml/QtObject")
 const Real = require("../QtQml/Real")
 const Int = require("../QtQml/Int")
 const Bool = require("../QtQml/Bool")
+const LinkedBool = require("../QtQml/LinkedBool")
 const Signal = require("../QtQml/Signal")
 const KeyNavigation = require("../QtQml/KeyNavigation")
 const Anchors = require("../QtQml/Anchors")
@@ -30,8 +31,8 @@ class Item extends QtObject {
         transformOrigin: { type: Real, value: Item.Center, signalName: 'transformOriginChanged' },
         scale: { type: Real, value: 1, signalName: 'scaleChanged' },
         opacity: { type: Real, value: 1, signalName: 'opacityChanged' },
-        visible: { type: Bool, value: true, signalName: 'visibleChanged' },
-        enabled: { type: Bool, value: true, signalName: 'enabledChanged' },
+        visible: { type: LinkedBool, link: 'visible', value: true, signalName: 'visibleChanged' },
+        enabled: { type: LinkedBool, link: 'enabled', value: true, signalName: 'enabledChanged' },
         focus: { type: Bool, value: false, signalName: 'focusChanged' },
         activeFocus: { type: Bool, value: false, signalName: 'activeFocusChanged' },
         clip: { type: Bool, value: false, signalName: 'clipChanged' },
@@ -166,7 +167,17 @@ class Item extends QtObject {
         })
     }
 
+    onEnabledChanged(){
+        for(let child of this.children){
+            if(child.__has('enabled')) child.__self.enabled.__update()
+        }
+    }
+
     onVisibleChanged(){
+        for(let child of this.children){
+            if(child.__has('visible')) child.__self.visible.__update()
+        }
+
         this.__checkVisibility()
         JQApplication.updateLater(this.parent)
     }

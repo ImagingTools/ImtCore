@@ -60,6 +60,8 @@ class Signal {
             while(i < this.__connections.length){
                 if(this.__connections[i].target === args[0] && this.__connections[i].slot === args[1]){
                     this.__connections.splice(i, 1)
+                } else {
+                    i++
                 }
             }
         }

@@ -4,6 +4,7 @@ module.exports = {
     Anchors: require("./Anchors"),
     Border: require("./Border"),
     Font: require("./Font"),
+    LinkedBool: require("./LinkedBool"),
     point: require("./Point"),
 
     QObject: require("./QObject"),
@@ -25,7 +26,7 @@ module.exports = {
     list: require("./List"),
 
     Signal: require("./Signal"),
-    
+
     Screen: require("./Screen"),
 
     Models: require("./Models/Models"),

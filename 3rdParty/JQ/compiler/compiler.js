@@ -1107,8 +1107,14 @@ class Instruction {
                 connectedSignal.args.push(arg.replaceAll('`', ''))
             }
 
+            let callSuper = ''
+            if(names.length === 1){
+                callSuper = `if(super.${connectedSignal.slotName})super.${connectedSignal.slotName}(${connectedSignal.args.join(',')});`
+            } else {
+                callSuper = `if(super${connectedSignal.slotName})super${connectedSignal.slotName}(${connectedSignal.args.join(',')});`
+            }
 
-            code.push(`${connectedSignal.slotName}(${connectedSignal.args.join(',')}){try{JQApplication.beginUpdate();`)
+            code.push(`${connectedSignal.slotName}(${connectedSignal.args.join(',')}){${callSuper}try{JQApplication.beginUpdate();`)
             
             let stat = this.prepare(connectedSignal.source, {isCompute:false, thisKey: 'this', value:'', local:[connectedSignal.args]}) 
             code.push(stat.value)
