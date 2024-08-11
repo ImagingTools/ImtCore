@@ -20,12 +20,15 @@ class Row extends Item {
         this.__setDOMStyle({
             gap: this.spacing + 'px'
         })
+        this.__updateGeometry()
     }
 
     __updateGeometry(){
         this.__setDOMStyle({
-            width: 'unset',
-            height: 'unset',
+            width: 'fit-content',
+            minWidth: 'fit-content',
+            height: 'fit-content',
+            minHeight: 'fit-content',
         })
 
         let rect = this.__DOM.getBoundingClientRect()
@@ -34,7 +37,9 @@ class Row extends Item {
 
         this.__setDOMStyle({
             width: this.width + 'px',
+            minWidth: this.width + 'px',
             height: this.height + 'px',
+            minHeight: this.height + 'px',
         })
     }
 
