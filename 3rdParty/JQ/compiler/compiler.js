@@ -425,6 +425,7 @@ class Instruction {
                     let path = this.resolve(tree[1], stat.thisKey)
 
                     if(path){
+                        stat.isCompute = true
                         stat.dotObj = path.obj
                         stat.value += path.source
                     } else {
