@@ -28,10 +28,6 @@ class QtObject extends QObject {
             proxy.model = model
         }
 
-        if(parent){
-            proxy.parent.children.push(proxy)
-        }
-
         return proxy
     }
 
@@ -44,6 +40,33 @@ class QtObject extends QObject {
         }
         
         this['Component.completed']()
+    }
+
+    __removeChild(child){
+        let index = -1
+
+        index = this.data.indexOf(child)
+        if(index >= 0) this.data.splice(index, 1)
+
+        index = this.resources.indexOf(child)
+        if(index >= 0) this.resources.splice(index, 1)
+    }
+
+    __addChild(child){
+        this.data.push(child)
+        this.resources.push(child)
+    }
+
+    onParentChanged(){
+        if(this.__parent){
+            this.__parent.__removeChild(this)
+        }
+
+        this.__parent = this.parent
+
+        if(this.__parent) {
+            this.__parent.__addChild(this)
+        }
     }
 }
 

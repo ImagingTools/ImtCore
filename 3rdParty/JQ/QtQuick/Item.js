@@ -107,16 +107,47 @@ class Item extends QtObject {
         let proxy = super.create(parent, model, ...args)
         let self = proxy.__self 
 
-        self.__DOM = self.__createDOM()
-        self.__DOM.classList.add('Item')
-        self.__DOM.qml = proxy
+        let dom = self.__getDOM()
+        dom.classList.add('Item')
+        dom.qml = proxy
         self.__connectDOM(parent)
 
         return proxy
     }
 
-    __createDOM(){
-        return document.createElement('div')
+    __removeChild(child){
+        let index = -1
+
+        index = this.data.indexOf(child)
+        if(index >= 0) this.data.splice(index, 1)
+
+        if(child instanceof Item){
+            index = this.children.indexOf(child)
+            if(index >= 0) this.children.splice(index, 1)
+        } else {
+            index = this.resources.indexOf(child)
+            if(index >= 0) this.resources.splice(index, 1)
+        }
+    }
+
+    __addChild(child){
+        this.data.push(child)
+
+        if(child instanceof Item){
+            this.children.push(child)
+        } else {
+            this.resources.push(child)
+        }
+    }
+
+    __getDOM(){
+        if(this.__DOM) {
+            return this.__DOM
+        } else {
+            let dom = document.createElement('div')
+            this.__DOM = dom
+            return dom
+        }
     }
 
     __setDOMStyle(style){
@@ -128,11 +159,12 @@ class Item extends QtObject {
     }
 
     __connectDOM(target){
-        if(target && this.__DOM){
-            if(target instanceof BaseObject){
-                if(target.__DOM) target.__DOM.appendChild(this.__DOM)
+        let dom = this.__getDOM()
+        if(target && dom){
+            if(target instanceof Item){
+                target.__getDOM().appendChild(dom)
             } else {
-                target.appendChild(this.__DOM)
+                target.appendChild(dom)
             }
         }
     }
@@ -152,6 +184,7 @@ class Item extends QtObject {
     }
 
     onParentChanged(){
+        super.onParentChanged()
         this.__connectDOM(this.parent)
     }
 
