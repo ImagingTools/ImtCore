@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5229" Description="ACF"/>
+            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ApiClient" PackageId="ImtClientGqlPck" ComponentId="ApiClient">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GraphQLClientEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Timeout" Type="Real" ExportId="Timeout">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GraphQLClientEngine" PackageId="ImtClientGqlPck" ComponentId="GraphQLClientEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="/Puma"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LoginStatusSubscriberController" PackageId="ImtAuthGqlPck" ComponentId="LoginStatusSubscriberController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PumaWsConnection</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LoginStatusProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Subscription/WebSocketClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteRepositories" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepositories">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemoteServerUrlParam" Type="Reference" ExportId="UrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketServerAddress" Type="Reference" ExportId="WebSocketUrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteRepresentationController" PackageId="ImtClientGqlPck" ComponentId="PumaGqlRemoteRepresentationController">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GetUserInfo</Value>
+                                <Value>GetRoleInfo</Value>
+                                <Value>GetSessionInfo</Value>
+                                <Value>GetUserGroupInfo</Value>
+                                <Value>GetDatabaseStatus</Value>
+                                <Value>UserToken</Value>
+                                <Value>SessionItem</Value>
+                                <Value>UsersObjectView</Value>
+                                <Value>UsersSetDescription</Value>
+                                <Value>UsersInfo</Value>
+                                <Value>UsersList</Value>
+                                <Value>UserItem</Value>
+                                <Value>UserAdd</Value>
+                                <Value>UserUpdate</Value>
+                                <Value>UsersRemove</Value>
+                                <Value>UsersRename</Value>
+                                <Value>UsersCommands</Value>
+                                <Value>UserCommands</Value>
+                                <Value>RolesList</Value>
+                                <Value>RoleItem</Value>
+                                <Value>RoleAdd</Value>
+                                <Value>RoleUpdate</Value>
+                                <Value>RolesRemove</Value>
+                                <Value>RolesObjectView</Value>
+                                <Value>RolesInfo</Value>
+                                <Value>RolesCommands</Value>
+                                <Value>RoleCommands</Value>
+                                <Value>RolesSetDescription</Value>
+                                <Value>GroupsList</Value>
+                                <Value>GroupsInfo</Value>
+                                <Value>GroupsObjectView</Value>
+                                <Value>GroupsSetDescription</Value>
+                                <Value>GroupItem</Value>
+                                <Value>GroupAdd</Value>
+                                <Value>GroupUpdate</Value>
+                                <Value>GroupsRemove</Value>
+                                <Value>GroupsRename</Value>
+                                <Value>GroupsCommands</Value>
+                                <Value>GroupCommands</Value>
+                                <Value>RolesMetaInfo</Value>
+                                <Value>UsersMetaInfo</Value>
+                                <Value>GroupsMetaInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Subscription" PackageId="ImtClientVoce" ComponentId="SubscriptionManager">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketServerAddress" Type="Reference" ExportId="WebSocketUrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="ApiClient"/>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="RemoteRepresentationController"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="LoginStatusSubscriberController" ComponentId="LoginStatusSubscriberController"/>
+        <Component ExportedId="RoleRepository" ComponentId="RemoteRepositories/RoleRepository"/>
+        <Component ExportedId="RolesSubscriberController" ComponentId="RemoteRepositories/RolesSubscriberController"/>
+        <Component ExportedId="UserGroupRepository" ComponentId="RemoteRepositories/UserGroupRepository"/>
+        <Component ExportedId="UserGroupsSubscriberController" ComponentId="RemoteRepositories/UserGroupsSubscriberController"/>
+        <Component ExportedId="UserRepository" ComponentId="RemoteRepositories/UserRepository"/>
+        <Component ExportedId="UsersSubscriberController" ComponentId="RemoteRepositories/UsersSubscriberController"/>
+    </ExportedComponents>
+</Acf>
