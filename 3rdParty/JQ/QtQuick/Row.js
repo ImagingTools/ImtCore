@@ -23,9 +23,19 @@ class Row extends Item {
     }
 
     __updateGeometry(){
+        this.__setDOMStyle({
+            width: 'unset',
+            height: 'unset',
+        })
+
         let rect = this.__DOM.getBoundingClientRect()
         this.width = rect.width
         this.height = rect.height
+
+        this.__setDOMStyle({
+            width: this.width + 'px',
+            height: this.height + 'px',
+        })
     }
 
     __endUpdate(...args){

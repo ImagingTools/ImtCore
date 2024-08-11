@@ -35,8 +35,8 @@ class QtObject extends QObject {
         if(this.__completed) return
 
         this.__completed = true
-        for(let i = this.children.length-1; i >= 0; i--){
-            this.children[i].__complete()
+        for(let i = this.data.length-1; i >= 0; i--){
+            this.data[i].__complete()
         }
         
         this['Component.completed']()
@@ -53,8 +53,13 @@ class QtObject extends QObject {
     }
 
     __addChild(child){
-        this.data.push(child)
-        this.resources.push(child)
+        let index = -1
+
+        index = this.data.indexOf(child)
+        if(index < 0) this.data.push(child)
+
+        index = this.resources.indexOf(child)
+        if(index < 0) this.resources.push(child)
     }
 
     onParentChanged(){

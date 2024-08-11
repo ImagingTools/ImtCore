@@ -131,12 +131,17 @@ class Item extends QtObject {
     }
 
     __addChild(child){
-        this.data.push(child)
+        let index = -1
+
+        index = this.data.indexOf(child)
+        if(index < 0) this.data.push(child)
 
         if(child instanceof Item){
-            this.children.push(child)
+            index = this.children.indexOf(child)
+            if(index < 0) this.children.push(child)
         } else {
-            this.resources.push(child)
+            index = this.resources.indexOf(child)
+            if(index < 0) this.resources.push(child)
         }
     }
 
@@ -218,7 +223,8 @@ class Item extends QtObject {
     onWidthChanged(){
         this.__checkVisibility()
         this.__setDOMStyle({
-            width: this.width+'px'
+            width: this.width+'px',
+            minWidth: this.width+'px',
         })
         JQApplication.updateLater(this.parent)
     }
@@ -226,7 +232,8 @@ class Item extends QtObject {
     onHeightChanged(){
         this.__checkVisibility()
         this.__setDOMStyle({
-            height: this.height+'px'
+            height: this.height+'px',
+            minHeight: this.height+'px',
         })
         JQApplication.updateLater(this.parent)
     }
