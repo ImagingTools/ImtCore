@@ -41,6 +41,7 @@ public:
 	virtual bool IsGqlEnabled() const override;
 	virtual QMap<QString, QString> GetBaseClassList() const override;
 	virtual QMap<QString, QString> GetJoinRules() const override;
+	virtual QStringList GetIncludePaths() const override;
 
 private:
 	QString m_schemaFilePath;
@@ -58,6 +59,7 @@ private:
 	bool m_gqlEnabled;
 	QMap<QString, QString> m_baseClassList;
 	QMap<QString, QString> m_joinRules;
+	QStringList m_includePaths;
 };
 
 

@@ -44,6 +44,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption allModificatorsOption("use-all-modificators", "Use all modificators to generate code");
 	QCommandLineOption baseClassOption({"B", "base-class"}, "Defines base class of all generated classes with include path CLASS=/include/path", "BaseClassList");
 	QCommandLineOption joinRulesOption({"J", "join"}, "Defines file types, will be joined TYPE(H or CPP)=/Destination/File/Path", "JoinRules");
+	QCommandLineOption includePathOption({"I", "include"}, "Specifies the import directories which should be searched when parsing the schema.", "IncludePathList");
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
 	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)");
@@ -63,7 +64,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 					cppOption,
 					gqlOption,
 					baseClassOption,
-					joinRulesOption
+					joinRulesOption,
+					includePathOption
 				});
 	if (!isOptionsAdded){
 		Q_ASSERT(false);
@@ -134,6 +136,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 			QString destinationPath = joinRule.split('=')[1];
 			m_joinRules.insert(fileType, destinationPath);
 		}
+	}
+
+	if (commandLineParser.isSet(includePathOption)){
+		m_includePaths = commandLineParser.values(includePathOption);
 	}
 
 	// special modes
@@ -246,9 +252,16 @@ QMap<QString, QString> CSdlProcessArgumentsParserComp::GetBaseClassList() const
 	return m_baseClassList;
 }
 
+
 QMap<QString, QString> CSdlProcessArgumentsParserComp::GetJoinRules() const
 {
 	return m_joinRules;
+}
+
+
+QStringList CSdlProcessArgumentsParserComp::GetIncludePaths() const
+{
+	return m_includePaths;
 }
 
 

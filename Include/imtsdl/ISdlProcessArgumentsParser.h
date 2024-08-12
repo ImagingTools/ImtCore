@@ -31,6 +31,7 @@ public:
 	virtual bool IsGqlEnabled() const = 0;
 	virtual QMap<QString/*class name*/, QString/*include directive*/> GetBaseClassList() const = 0;
 	virtual QMap<QString/*File extention*/, QString/*Destination path*/> GetJoinRules() const = 0;
+	virtual QStringList GetIncludePaths() const = 0;
 
 };
 

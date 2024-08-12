@@ -116,6 +116,10 @@ int CGqlSchemaParserComp::DoProcessing(
 	if (processedFilesPtr != nullptr){
 		processedFilesPtr->InsertOption(QFileInfo(inputFile).canonicalFilePath(), QByteArray::number(processedFilesPtr->GetOptionsCount()));
 	}
+
+	m_includePathList = m_argumentParserCompPtr->GetIncludePaths();
+
+	// permanently add current scheme path to scan imports
 	m_includePathList << QFileInfo(inputFile).absoluteDir().absolutePath();
 
 	QTextStream inputStream(&inputFile);
