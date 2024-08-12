@@ -274,7 +274,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	// add id
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("id :") << GetDecapitalizedValue(sdlType.GetName());
+	ifStream << QStringLiteral("id: ") << GetDecapitalizedValue(sdlType.GetName());
 
 
 	// container's props
@@ -309,8 +309,15 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 				ifStream << QStringLiteral("''");
 			}
 		}
-		else if (!sdlField.IsArray()) {
-			ifStream << ':' << ' ' << convertedType << ' ' << '{';
+		else {
+			ifStream << ':' << ' ';
+			if (sdlField.IsArray()){
+				ifStream << QStringLiteral("BaseModel");
+			}
+			else {
+				ifStream << convertedType;
+			}
+			ifStream << ' ' << '{';
 			ifStream << QStringLiteral("owner: ");
 			ifStream << GetDecapitalizedValue(sdlType.GetName());
 			ifStream << '}';

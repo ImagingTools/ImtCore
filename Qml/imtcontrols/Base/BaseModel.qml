@@ -1,138 +1,140 @@
 import QtQuick 2.0
 
 ListModel {
-    function getProperties(item){
-        let list = []
-        if(Qt.platform.os === 'web'){
-            for(let key in item.$properties){
-                if(
-                        key.indexOf('m_') >= 0
-                        && typeof item[key] !== "function"
-                        && item[key] !== undefined
-                        && item[key] !== null){
-                    list.push(key)
-                }
-            }
-        } else {
-            for(let key in item){
-                if(
-                        key.indexOf('m_') >= 0
-                        && typeof item[key] !== "function"
-                        && item[key] !== undefined
-                        && item[key] !== null){
-                    list.push(key)
-                }
-            }
-        }
+	property var owner: null
 
-        return list
-    }
+	function getProperties(item){
+		let list = []
+		if(Qt.platform.os === 'web'){
+			for(let key in item.$properties){
+				if(
+						key.indexOf('m_') >= 0
+						&& typeof item[key] !== "function"
+						&& item[key] !== undefined
+						&& item[key] !== null){
+					list.push(key)
+				}
+			}
+		} else {
+			for(let key in item){
+				if(
+						key.indexOf('m_') >= 0
+						&& typeof item[key] !== "function"
+						&& item[key] !== undefined
+						&& item[key] !== null){
+					list.push(key)
+				}
+			}
+		}
 
-    function toJson(){
-        let json = '['
-        for(let i = 0; i < count; i++){
-            let item = get(i).item
-            let list = getProperties(item)
+		return list
+	}
 
-            json += '{'
-            for(let j = 0; j < list.length; j++){
-                let key = list[j]
-                if(typeof item[key] === 'object'){
-                    if (typeof item[key].toJson === "function"){
-                        json += '"' + item.getJSONKeyForProperty(key) + '":' + item[key].toJson()
-                    }
-                } else {
-                    let value = item[key]
-                    if (value === undefined){
-                        value = null
-                    }
-                    let safeValue = item[key]
-                    if (typeof safeValue === 'string'){
-                        safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
-                        safeValue = safeValue.replace(/\"/g,'\u005C"')
-                    }
-                    json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
-                }
-                if(j < list.length - 1) json += ','
-            }
-            json +='}'
+	function toJson(){
+		let json = '['
+		for(let i = 0; i < count; i++){
+			let item = get(i).item
+			let list = getProperties(item)
 
-            if(i < count - 1) json += ','
-        }
-        json +=']'
-        return json
-    }
+			json += '{'
+			for(let j = 0; j < list.length; j++){
+				let key = list[j]
+				if(typeof item[key] === 'object'){
+					if (typeof item[key].toJson === "function"){
+						json += '"' + item.getJSONKeyForProperty(key) + '":' + item[key].toJson()
+					}
+				} else {
+					let value = item[key]
+					if (value === undefined){
+						value = null
+					}
+					let safeValue = item[key]
+					if (typeof safeValue === 'string'){
+						safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
+						safeValue = safeValue.replace(/\"/g,'\u005C"')
+					}
+					json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
+				}
+				if(j < list.length - 1) json += ','
+			}
+			json +='}'
 
-    function toGraphQL(){
-        let graphQL = '['
-        for(let i = 0; i < count; i++){
-            let item = get(i).item
-            let list = getProperties(item)
+			if(i < count - 1) json += ','
+		}
+		json +=']'
+		return json
+	}
 
-            graphQL += '{'
-            for(let j = 0; j < list.length; j++){
-                let key = list[j]
-                if(typeof item[key] === 'object'){
-                    graphQL += item.getJSONKeyForProperty(key) + ':' + item[key].toGraphQL()
-                } else {
-                    let value = item[key]
-                    if (value === undefined){
-                        value = null
-                    }
-                    graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + item[key] + '"' : value)
-                }
-                if(j < list.length - 1) graphQL += ','
-            }
-            graphQL +='}'
+	function toGraphQL(){
+		let graphQL = '['
+		for(let i = 0; i < count; i++){
+			let item = get(i).item
+			let list = getProperties(item)
 
-            if(i < count - 1) graphQL += ','
-        }
-        graphQL +=']'
-        return graphQL
-    }
+			graphQL += '{'
+			for(let j = 0; j < list.length; j++){
+				let key = list[j]
+				if(typeof item[key] === 'object'){
+					graphQL += item.getJSONKeyForProperty(key) + ':' + item[key].toGraphQL()
+				} else {
+					let value = item[key]
+					if (value === undefined){
+						value = null
+					}
+					graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + item[key] + '"' : value)
+				}
+				if(j < list.length - 1) graphQL += ','
+			}
+			graphQL +='}'
 
-    function isEqualWithModel(model){
-        if (typeof this != typeof model){
-            return false;
-        }
+			if(i < count - 1) graphQL += ','
+		}
+		graphQL +=']'
+		return graphQL
+	}
 
-        if (count !== model.count){
-            return false;
-        }
+	function isEqualWithModel(model){
+		if (typeof this != typeof model){
+			return false;
+		}
 
-        for(let i = 0; i < count; i++){
-            let item1 = get(i).item
-            let item2 = model.get(i).item
+		if (count !== model.count){
+			return false;
+		}
 
-            let list1 = getProperties(item1)
-            let list2 = model.getProperties(item2)
+		for(let i = 0; i < count; i++){
+			let item1 = get(i).item
+			let item2 = model.get(i).item
 
-            for(let j = 0; j < list1.length; j++){
-                let key = list1[j]
+			let list1 = getProperties(item1)
+			let list2 = model.getProperties(item2)
 
-                if (!list2.includes(key)){
-                    return false;
-                }
+			for(let j = 0; j < list1.length; j++){
+				let key = list1[j]
 
-                if(typeof item1[key] !== typeof item2[key]){
-                    return false;
-                }
+				if (!list2.includes(key)){
+					return false;
+				}
 
-                if(typeof item1[key] === 'object'){
-                    let ok = item1[key].isEqualWithModel(item2[key])
-                    if (!ok){
-                        return false
-                    }
-                } else {
-                    if (item1[key] !== item2[key]){
-                        return false
-                    }
-                }
-            }
-        }
+				if(typeof item1[key] !== typeof item2[key]){
+					return false;
+				}
 
-        return true;
-    }
+				if(typeof item1[key] === 'object'){
+					let ok = item1[key].isEqualWithModel(item2[key])
+					if (!ok){
+						return false
+					}
+				} else {
+					if (item1[key] !== item2[key]){
+						return false
+					}
+				}
+			}
+		}
+
+		return true;
+	}
 }
 
 
