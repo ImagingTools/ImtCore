@@ -919,7 +919,13 @@ void CMdbxTest::test_write_masks(){
 
 		QElapsedTimer time;
 		time.start();
-		int count = container.GetUnitCount();
+		imtmdbx::getItemCount = 0;
+		int count = 0;
+		for (int i = 0; i < 10; i++){
+			count += container.GetUnitCount();
+		}
+		std::cout << "Get item count: " << imtmdbx::getItemCount << std::endl;
+
 		QList<quint64> result;
 		result = container.GetUnitPositions(0,10);
 

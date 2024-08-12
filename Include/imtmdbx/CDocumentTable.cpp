@@ -42,22 +42,21 @@ CDocumentTable::CDocumentTable(const QString& name, mdbx::txn_managed &txn,
 	}
 }
 
-//CDocumentTable::~CDocumentTable()
-//{
-//	try{
-//		m_cursor.close();
+CDocumentTable::~CDocumentTable()
+{
+	try{
+		m_cursor.close();
+
+		if(m_hasIndex){
+			m_cursorIndex.close();
+		}
+	}
+	catch(...){
+
+	}
 
 
-//		if(m_hasIndex){
-//			m_cursorIndex.close();
-//		}
-//	}
-//	catch(...){
-
-//	}
-
-
-//}
+}
 
 
 // reimplemented (imtmdbx::IDocumentTable)

@@ -3,6 +3,8 @@
 
 // Qt includes
 #include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QPair>
 
 // std includes
 #include <iostream>
@@ -53,8 +55,8 @@ protected:
 	bool GetActiveItem(quint64& activeOffset, quint64& activeItem, bool isStart);
 
 protected:
-	QList<IMask*> m_maskList;
-	QList<IMask*> m_maskListInv;
+	QList<QPair<IMask*,quint64>> m_maskList; // IMask*, next offset
+	QList<QPair<IMask*,quint64>> m_maskListInv;
 	OperationType m_operationType;
 	IDocumentTable* m_documentTable;
 };
