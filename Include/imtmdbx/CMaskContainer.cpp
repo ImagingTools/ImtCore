@@ -547,6 +547,7 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 	bool isLast = true;
 	for(int i = 0; i < m_maskList.length(); i++){
 		quint64 offset = 0;
+		bool changeOffset = false;
 		if (isStart){
 			if (!m_maskList.at(i).first->GetNearestOffset(offset, activeOffset)){
 				m_maskList[i].second = 0xffffffffffffffff;
@@ -560,6 +561,7 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 			else {
 				m_maskList[i].second = offset;
 				isLast = false;
+				changeOffset = true;
 			}
 		}
 		else{
@@ -577,18 +579,22 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 				else{
 					m_maskList[i].second = offset;
 					isLast = false;
+					changeOffset = true;
 				}
 			}
 		}
-		if(offset > maxOffset){
-			maxOffset = offset;
-		}
-		if(offset < minOffset){
-			minOffset = offset;
+		if (changeOffset){
+			if(offset > maxOffset){
+				maxOffset = offset;
+			}
+			if(offset < minOffset){
+				minOffset = offset;
+			}
 		}
 	}
 	for (int i = 0; i < m_maskListInv.length(); i++){
 		quint64 offset = 0;
+		bool changeOffset = false;
 		if (isStart){
 			if (!m_maskListInv.at(i).first->GetNearestOffset(offset, activeOffset)){
 				m_maskListInv[i].second = 0xffffffffffffffff;
@@ -602,6 +608,7 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 			else {
 				m_maskListInv[i].second = offset;
 				isLast = false;
+				changeOffset = true;
 			}
 		}
 		else{
@@ -619,14 +626,17 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 				else {
 					m_maskListInv[i].second = offset;
 					isLast = false;
+					changeOffset = true;
 				}
 			}
 		}
-		if(offset > maxOffset){
-			maxOffset = offset;
-		}
-		if(offset < minOffset){
-			minOffset = offset;
+		if (changeOffset){
+			if(offset > maxOffset){
+				maxOffset = offset;
+			}
+			if(offset < minOffset){
+				minOffset = offset;
+			}
 		}
 	}
 
