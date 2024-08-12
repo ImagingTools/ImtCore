@@ -38,7 +38,32 @@ class QmlMouseEvent {
 }
 
 class QmlWheelEvent {
-    
+    target = null
+    path = []
+
+    accepted = true
+    angleDelta = {
+        x: 0,
+        y: 0,
+    }
+    x = 0
+    y = 0
+
+    constructor(options = {}){
+        for(let key in options){
+            if(key in this) this[key] = options[key]
+        }
+    }
+
+    getRelativePoint(obj){
+        let rect = obj.__DOM.getBoundingClientRect()
+
+        return {
+            x: this.x - rect.x,
+            y: this.y - rect.y,
+        }
+    }
+
 }
 
 
@@ -133,15 +158,16 @@ module.exports = {
 
         // })
         window.addEventListener('wheel', (e)=>{
-            let elements = document.elementsFromPoint(e.pageX, e.pageY)
+            this.event = new QmlWheelEvent()
+            this.event.x = e.pageX
+            this.event.y = e.pageY
+            this.event.angleDelta.x = e.deltaX / 8
+            this.event.angleDelta.y = e.deltaY / 8
+            this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
 
-            for(el of elements){
-                if(!el.qml) continue
-
-                if(this.pressed.length === 0 || this.pressed.indexOf(el) >= 0) {
-                    let rect = this.getRelativeRect(el, e.pageX, e.pageY)
-                    if(el.qml.__onWheel(rect.x, rect.y, e.deltaX / 8, e.deltaY / 8)) break
-                }
+            for(obj of this.event.path){
+                this.event.target = obj
+                obj.__onWheel(this.event)
             }
         })
     },

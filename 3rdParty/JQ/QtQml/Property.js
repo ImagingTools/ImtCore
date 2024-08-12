@@ -75,7 +75,11 @@ class Property extends BaseObject {
     __set(key, value){
         if(typeof value === 'function' && value.bound){
             this.__setCompute(value)
-            if(value.queue) value.queue.push(this)
+            if(value.queue) {
+                value.queue.push(this)
+            } else {
+                this.__update()
+            }
             return true
         }
 

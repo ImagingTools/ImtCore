@@ -3,10 +3,11 @@ const Var = require("./Var")
 const Int = require("./Int")
 const List = require("./List")
 const Signal = require("./Signal")
+const QtFunctions = require("../Qt/functions")
 
 class QtObject extends QObject {
     static meta = Object.assign({}, QObject.meta, {
-        model: {type:Var, value:undefined, signalName:'modelChanged'},
+        model: {type:Var, auto: true, value:undefined, signalName:'modelChanged'},
         index: {type:Int, value:0, signalName:'indexChanged'},
         children: {type:List, signalName:'childrenChanged'},
         resources: {type:List, signalName:'resourcesChanged'},
@@ -19,13 +20,18 @@ class QtObject extends QObject {
 
         'Component.completed': {type:Signal, slotName:'Component.onCompleted', args:[]},
         'Component.destruction': {type:Signal, slotName:'Component.onDestruction', args:[]},
+
+        JQAbstractModel: {type:Var, value:undefined, signalName:'JQAbstractModelChanged'},
+        JQAbstractModelChanged: {type:Signal, slotName:'onJQAbstractModelChanged', args:[]},
     })  
 
     static create(parent, model, ...args){
         let proxy = super.create(parent, model, ...args)
 
+        proxy.JQAbstractModel = QtFunctions.binding(()=>{return proxy.parent.JQAbstractModel})
+
         if(model){
-            proxy.model = model
+            proxy.JQAbstractModel = model
         }
 
         return proxy
@@ -40,6 +46,12 @@ class QtObject extends QObject {
         }
         
         this['Component.completed']()
+    }
+
+    onJQAbstractModelChanged(){
+        if(this.__self.constructor.meta.model.auto){
+            this.model = this.JQAbstractModel
+        }
     }
 
     __removeChild(child){

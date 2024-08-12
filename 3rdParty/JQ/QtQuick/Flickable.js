@@ -178,6 +178,51 @@ class Flickable extends Item {
             mouse.target = null
         }
     }
+
+    __onWheel(wheel){
+        if(wheel.target === this){
+            let deltaX = wheel.angleDelta.x * 4
+            let deltaY = wheel.angleDelta.y * 4
+
+            if(this.flickableDirection === Flickable.AutoFlickDirection || this.flickableDirection === Flickable.AutoFlickIfNeeded){
+                if(this.contentWidth > 0){
+                    if(deltaX > 0){
+                        if(this.contentX + deltaX < this.contentWidth - this.width) {
+                            this.contentX += deltaX
+                        } else {
+                            this.contentX = this.contentWidth - this.width
+                            wheel.target = null
+                        }
+                    } else {
+                        if(this.contentX + deltaX >= 0) {
+                            this.contentX += deltaX
+                        } else {
+                            this.contentX = 0
+                            wheel.target = null
+                        }
+                    }
+                }
+                if(this.contentHeight > 0){
+                    if(deltaY > 0){
+                        if(this.contentY + deltaY < this.contentHeight - this.height) {
+                            this.contentY += deltaY
+                        } else {
+                            this.contentY = this.contentHeight - this.height
+                            wheel.target = null
+                        }
+                    } else {
+                        if(this.contentY + deltaY >= 0) {
+                            this.contentY += deltaY
+                        } else {
+                            this.contentY = 0
+                            wheel.target = null
+                        }
+                    }
+                }
+                
+            }
+        }
+    }
 }
 
 module.exports = Flickable
