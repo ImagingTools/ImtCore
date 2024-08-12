@@ -66,6 +66,19 @@ bool CGqlExtSchemaParser::ProcessCollectionSchema()
 
 		CSdlDocumentType documentType;
 		documentType.SetName(typeName.trimmed());
+
+		for (const CSdlRequest& aDocumentType: std::as_const(m_requests)){
+			if (aDocumentType.GetName() == documentType.GetName()){
+				SendLogMessage(
+					istd::IInformationProvider::InformationCategory::IC_ERROR,
+					0,
+					QString("Redifinition of '%1' at %2").arg(documentType.GetName(), QString::number(m_lastReadLine)),
+					"CGqlSchemaParser");
+
+				return false;
+			}
+		}
+
 		retVal = retVal && ExtractDocumentTypeFromCurrentEntry(documentType);
 		m_documentTypes << documentType;
 
@@ -212,7 +225,6 @@ bool CGqlExtSchemaParser::ProcessCustomSection(const QString& sectionName)
 
 bool CGqlExtSchemaParser::ValidateSchema()
 {
-	/// \todo add checks for duplicates of types and subtypes inside each type
 	return BaseClass::ValidateSchema();
 }
 

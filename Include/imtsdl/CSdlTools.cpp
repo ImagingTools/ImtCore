@@ -418,7 +418,6 @@ QString CSdlTools::GetFromVariantConversionString(const CSdlField& sdlField)
 		return QStringLiteral("toList()");
 	}
 
-	/// \todo add convert type and add initialization of custom types
 	return "";
 }
 

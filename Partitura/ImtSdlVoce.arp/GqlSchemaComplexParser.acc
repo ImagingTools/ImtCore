@@ -10,11 +10,17 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="BaseClassExtender" PackageId="ImtSdlPck" ComponentId="BaseClassExtender">
+        <Element Id="GqlSchemaParser" PackageId="ImtSdlPck" ComponentId="GqlSchemaParser">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FileSchemaParserFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="GqlSchemaParserFactory"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -28,55 +34,49 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GqlSchemaParser" PackageId="ImtSdlVoce" ComponentId="GqlSchemaComplexParser">
-            <Data IsEnabled="true" Flags="0">
+        <Element Id="GqlSchemaParserFactory" PackageId="ImtSdlPck" ComponentId="GqlSchemaParser">
+            <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlProcessArgumentsParser"/>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FileSchemaParserFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="GqlSchemaParserFactory2"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SdlCodeCreatorProcessorsController" PackageId="ImtSdlPck" ComponentId="SdlGeneralManager">
-            <Data IsEnabled="true" Flags="0">
+        <Element Id="GqlSchemaParserFactory2" PackageId="ImtSdlPck" ComponentId="GqlSchemaParser">
+            <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlProcessorList" Type="Reference[]" ExportId="SdlProcessorList">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlSchemaParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GqlSchemaParser"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SdlProcessArgumentsParser" PackageId="ImtSdlPck" ComponentId="SdlProcessArgumentsParser">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="FileSchemaParserFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="GqlSchemaParserFactory"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -86,12 +86,10 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtsdl::ISdlDocumentTypeListProvider" ComponentId="GqlSchemaParser"/>
-        <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser" ComponentId="SdlProcessArgumentsParser"/>
         <Interface InterfaceId="imtsdl::ISdlRequestListProvider" ComponentId="GqlSchemaParser"/>
         <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="GqlSchemaParser"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SdlCodeCreatorProcessorsController"/>
+        <Interface InterfaceId="iproc::IProcessor" ComponentId="GqlSchemaParser"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="GqlSchemaParser"/>
     </ExportedInterfaces>
-    <ExportedComponents>
-        <Component ExportedId="BaseClassExtender" ComponentId="BaseClassExtender"/>
-    </ExportedComponents>
+    <ExportedComponents/>
 </Acf>

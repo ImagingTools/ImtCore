@@ -31,8 +31,7 @@ public:
 	typedef CGqlSchemaParser BaseClass2;
 
 	I_BEGIN_COMPONENT(CQmlCodeGeneratorComp)
-		I_ASSIGN(m_qmlKeysFilePrefixAttrPtr, "QmlKeysFilePrefix", "QML Keys file prefix for file name", true, "")
-		I_ASSIGN(m_qmlKeysFileSuffixAttrPtr, "QmlKeysFileSuffix", "QML Keys file suffix for file name.\nNote: defauld value is in upper keys to avoid ambiguity", true, "KEYS")
+		I_ASSIGN(m_qmlKeysFileSuffixAttrPtr, "QmlKeysFileSuffix", "QML Keys file suffix for file name.\nNote: default value is in upper keys to avoid ambiguity", true, "KEYS")
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
 		I_ASSIGN_MULTI_0(m_codeGeneratorExtenderListCompPtr, "CodeGeneratorExtenderList", "Extenders, used to generate an additional code", false)

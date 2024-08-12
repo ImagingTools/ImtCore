@@ -69,6 +69,9 @@ bool CGqlSchemaParser::ParseGqlSchema()
 	else if (keyword == QByteArrayLiteral("directive")){
 		retVal = retVal && ProcessDirective();
 	}
+	else if (keyword == QByteArrayLiteral("import")){
+		retVal = retVal && ProcessSchemaImports();
+	}
 	else if (keyword == m_keywordMap[KI_QUERY]){
 		retVal = retVal && ProcessQuery();
 	}
@@ -174,9 +177,6 @@ bool CGqlSchemaParser::ProcessSchema()
 		else if (schemaType == QByteArrayLiteral("subscription")){
 			m_keywordMap[KI_SUBSCRIPTION] = schemaSynonym;
 		}
-		else if (schemaType == QByteArrayLiteral("import")){
-			retVal = retVal && ProcessSchemaImports();
-		}
 		else if (foundDelimiter == '}'){
 			// schema parsing is done nothing to do anymore
 		}
@@ -230,8 +230,21 @@ bool CGqlSchemaParser::ProcessType()
 	}
 
 	// if not, process as common type
-	CSdlType gqlType;
-	gqlType.SetName(QString(typeName.trimmed()));
+	CSdlType sdlType;
+	sdlType.SetName(QString(typeName.trimmed()));
+
+	// look for duplicates
+	for (const CSdlType& aSdlType: std::as_const(m_sdlTypes)){
+		if (aSdlType.GetName() == sdlType.GetName()){
+			SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_ERROR,
+				0,
+				QString("Redifinition of '%1' at %2").arg(sdlType.GetName(), QString::number(m_lastReadLine)),
+				"CGqlSchemaParser");
+
+			return false;
+		}
+	}
 
 	retVal = retVal && MoveToNextReadableSymbol();
 	bool atEnd = false;
@@ -239,8 +252,9 @@ bool CGqlSchemaParser::ProcessType()
 	while (!atEnd){
 		ProcessValue(fieldList, &atEnd);
 	}
-	gqlType.SetFields(fieldList);
-	m_sdlTypes << gqlType;
+	sdlType.SetFields(fieldList);
+
+	m_sdlTypes << sdlType;
 
 	return retVal;
 }
@@ -438,6 +452,18 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 		retVal = retVal && ReadToDelimeter("(", requestName, &foundDelimiter) && MoveToNextReadableSymbol();
 		request.SetName(requestName.trimmed());
 
+		for (const CSdlRequest& aSdlRequest: std::as_const(m_requests)){
+			if (aSdlRequest.GetName() == request.GetName()){
+				SendLogMessage(
+					istd::IInformationProvider::InformationCategory::IC_ERROR,
+					0,
+					QString("Redifinition of '%1' at %2").arg(request.GetName(), QString::number(m_lastReadLine)),
+					"CGqlSchemaParser");
+
+				return false;
+			}
+		}
+
 		// extract input params
 		SdlFieldList inputArguments;
 		bool atEnd = false;
@@ -491,7 +517,6 @@ bool CGqlSchemaParser::ProcessCustomSection(const QString& sectionName)
 
 bool CGqlSchemaParser::ValidateSchema()
 {
-	/// \todo add checks for duplicates of types
 	for (const CSdlType& sdlType: m_sdlTypes){
 		for (const CSdlField& sdlField: sdlType.GetFields()){
 			bool isCustom = false;
@@ -516,7 +541,6 @@ bool CGqlSchemaParser::ValidateSchema()
 			}
 		}
 	}
-
 
 	return true;
 }

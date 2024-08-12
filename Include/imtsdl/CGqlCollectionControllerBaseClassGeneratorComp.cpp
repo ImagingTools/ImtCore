@@ -673,7 +673,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QText
 
 	// [2] add log message
 	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("SendCriticalMessage(0, errorMessage);;");
+	stream << QStringLiteral("SendCriticalMessage(0, errorMessage);");
 	FeedStream(stream, 2, false);
 
 	// [2] return

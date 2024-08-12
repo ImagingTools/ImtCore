@@ -27,7 +27,6 @@ int CQmlCodeGeneratorComp::DoProcessing(
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
-	Q_ASSERT(m_qmlKeysFilePrefixAttrPtr.IsValid());
 	Q_ASSERT(m_qmlKeysFileSuffixAttrPtr.IsValid());
 
 	int retVal = iproc::IProcessor::TS_OK;
@@ -436,7 +435,7 @@ void CQmlCodeGeneratorComp::AbortCurrentProcessing()
 
 QString CQmlCodeGeneratorComp::GetQmlKeysWrappedName(const QString& originalName) const
 {
-	return *m_qmlKeysFilePrefixAttrPtr + originalName + *m_qmlKeysFileSuffixAttrPtr;
+	return originalName + *m_qmlKeysFileSuffixAttrPtr;
 }
 
 

@@ -136,15 +136,10 @@ bool CSdlDocumentType::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
 
-	iser::CArchiveTag referenceTag("Reference", "", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag referenceTag("Reference", "", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(referenceTag);
 	retVal = retVal && m_referenceType.Serialize(archive);
 	retVal = retVal && archive.EndTag(referenceTag);
-
-
-	iser::CArchiveTag outputTag("Operations", "", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(outputTag);
-	retVal = retVal && archive.BeginTag(outputTag);
 
 	retVal = retVal && SerializeOperationsList(archive, m_operationsList, "OperationList", "Operation", "Type", "Request");
 
