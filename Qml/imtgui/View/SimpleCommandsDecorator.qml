@@ -45,6 +45,19 @@ Item {
         }
     }
 
+    function getCommandIndex(commandId){
+        if(!container.commandModel){
+            return;
+        }
+
+        for (let i = 0; i < container.commandModel.getItemsCount(); i++){
+            let currentCommandId = container.commandModel.getData("Id", i);
+            if (currentCommandId == commandId){
+                return i;
+            }
+        }
+    }
+
     Row {
         id: row;
 
@@ -57,7 +70,7 @@ Item {
             id: repeater;
 
             delegate: ToolButton {
-                width: 18;
+                width: visible ? 18 : 0;
                 height: width;
 
                 iconSource: enabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Normal) :
@@ -66,6 +79,8 @@ Item {
                 enabled: model.IsEnabled;
 
                 visible: model.Visible;
+
+                tooltipText: model.TooltipText ? model.TooltipText : "";
 
                 property string commandId: model.Id;
 
