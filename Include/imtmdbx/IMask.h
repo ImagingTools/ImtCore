@@ -1,13 +1,14 @@
 #pragma once
 
 #include "qtypes.h"
+#include <istd/IPolymorphic.h>
 
 
 namespace imtmdbx
 {
 
 
-class IMask
+class IMask: istd::IPolymorphic
 {
 public:
 	virtual bool GetUnit(quint64 position) = 0;

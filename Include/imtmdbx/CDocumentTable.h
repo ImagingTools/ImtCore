@@ -30,9 +30,12 @@ public:
 	virtual bool UpdateDocument(qint64 key,  const QByteArray& data) override;
 	virtual bool UpdateDocument(const QByteArray& key, const QByteArray& data) override;
 	virtual qint64 GetKey(const QByteArray& value) override;
+	virtual qint64 GetFirstKey() override;
+	virtual qint64 GetLastKey() override;
 	virtual QString GetStringKey(const QByteArray& value) override;
 	virtual bool CreateIndex() override;
 	bool CloseTable(mdbx::env_managed& env);
+
 
 protected:
 	virtual qint64 AddDocument(const char *data, int count, const QByteArray& keyStr = QByteArray());

@@ -11,7 +11,7 @@ namespace imtmdbx
 static int BitsSetTable256[256];
 static bool isInit = false;
 
-int BitCount(quint64 n)
+inline int BitCount(quint64 n)
 {
 
 	return (BitsSetTable256[n & 0xff] +
@@ -94,10 +94,7 @@ bool CMaskContainer::GetItem(quint64 offset, quint64 &item)
 		return false;
 	}
 
-	quint64 firstItem;
-	firstItem = m_operationType == OT_AND ? 0xffffffffffffff : 0;
-
-	quint64 retItem = firstItem;
+	quint64 retItem = m_operationType == OT_AND ? 0xffffffffffffff : 0;
 
 	for(int i = 0; i < m_maskList.length(); i++){
 		quint64 currItem = 0;
@@ -162,7 +159,9 @@ bool CMaskContainer::GetNearestOffset(quint64 &offset, quint64 startOffset)
 		return false;
 	}
 
-	quint64 retOffset = 0;
+	bool isLast = true;
+
+	quint64 retOffset = m_operationType == imtmdbx::CMaskContainer::OT_AND ? 0 : 0xffffffffffffffff;
 	for(int i = 0; i < m_maskList.length(); i++){
 		quint64 currOffset;
 		bool okCurr = m_maskList.at(i).first->GetNearestOffset(currOffset, startOffset);
@@ -177,6 +176,7 @@ bool CMaskContainer::GetNearestOffset(quint64 &offset, quint64 startOffset)
 		}
 		else{
 			m_maskList[i].second = currOffset;
+			isLast = false;
 		}
 		if(m_operationType == OT_AND){
 			if(currOffset > retOffset){
@@ -203,6 +203,7 @@ bool CMaskContainer::GetNearestOffset(quint64 &offset, quint64 startOffset)
 		}
 		else{
 			m_maskListInv[i].second = currOffset;
+			isLast = false;
 		}
 		if(m_operationType == OT_AND){
 			if(currOffset > retOffset){
@@ -217,6 +218,10 @@ bool CMaskContainer::GetNearestOffset(quint64 &offset, quint64 startOffset)
 	}
 
 	offset = retOffset;
+
+	if(isLast){
+		return false;
+	}
 
 	return true;
 }
@@ -228,62 +233,83 @@ bool CMaskContainer::GetNextItemOffset(quint64 &offset, qint64 startOffset)
 		return false;
 	}
 
+	bool isLast = true;
+
 	quint64 retOffset = 0;
 	for(int i = 0; i < m_maskList.length(); i++){
 		quint64 currOffset;
-		bool okCurr = m_maskList.at(i).first->GetNextItemOffset(currOffset, startOffset);
-		if(!okCurr){
-			m_maskList[i].second = 0xffffffffffffffff;
+		if (m_maskList.at(i).second <= startOffset){
+			bool okCurr = m_maskList.at(i).first->GetNextItemOffset(currOffset, startOffset);
+			if(!okCurr){
+				m_maskList[i].second = 0xffffffffffffffff;
+				if(m_operationType == OT_AND){
+					return false;
+				}
+				else if(m_operationType == OT_OR){
+					continue;
+				}
+			}
+			else{
+				m_maskList[i].second = currOffset;
+				isLast = false;
+			}
 			if(m_operationType == OT_AND){
-				return false;
+				if(currOffset > retOffset){
+					retOffset = currOffset;
+				}
 			}
 			else if(m_operationType == OT_OR){
-				continue;
+				if(currOffset < retOffset){
+					retOffset = currOffset;
+				}
 			}
+
 		}
-		else{
-			m_maskList[i].second = currOffset;
-		}
-		if(m_operationType == OT_AND){
-			if(currOffset > retOffset){
-				retOffset = currOffset;
-			}
-		}
-		else if(m_operationType == OT_OR){
-			if(currOffset < retOffset){
-				retOffset = currOffset;
-			}
+		else {
+			currOffset = m_maskList[i].second;
+			isLast = false;
 		}
 	}
 	for(int i = 0; i < m_maskListInv.length(); i++){
 		quint64 currOffset;
-		bool okCurr = m_maskListInv.at(i).first->GetNextItemOffset(currOffset, startOffset);
-		if(!okCurr){
-			m_maskListInv[i].second = 0xffffffffffffffff;
+		if (m_maskList.at(i).second <= startOffset){
+			bool okCurr = m_maskListInv.at(i).first->GetNextItemOffset(currOffset, startOffset);
+			if(!okCurr){
+				m_maskListInv[i].second = 0xffffffffffffffff;
+				if(m_operationType == OT_AND){
+					return false;
+				}
+				else if(m_operationType == OT_OR){
+					continue;
+				}
+			}
+			else{
+				m_maskListInv[i].second = currOffset;
+				isLast = false;
+			}
 			if(m_operationType == OT_AND){
-				return false;
+				if(currOffset > retOffset){
+					retOffset = currOffset;
+				}
 			}
 			else if(m_operationType == OT_OR){
-				continue;
+				if(currOffset < retOffset){
+					retOffset = currOffset;
+				}
 			}
+
 		}
-		else{
-			m_maskListInv[i].second = currOffset;
-		}
-		if(m_operationType == OT_AND){
-			if(currOffset > retOffset){
-				retOffset = currOffset;
-			}
-		}
-		else if(m_operationType == OT_OR){
-			if(currOffset < retOffset){
-				retOffset = currOffset;
-			}
+		else {
+			currOffset = m_maskListInv[i].second;
+			isLast = false;
 		}
 	}
 
-
 	offset = retOffset;
+
+	if(isLast || offset == 0xffffffffffffffff){
+		return false;
+	}
 
 	return true;
 }
@@ -358,6 +384,7 @@ void CMaskContainer::AddMask(IMask *mask, bool isInversion)
 	}
 }
 
+
 void CMaskContainer::Clear()
 {
 	m_maskList.clear();
@@ -365,6 +392,22 @@ void CMaskContainer::Clear()
 	m_maskList.squeeze();
 	m_maskListInv.squeeze();
 }
+
+
+void CMaskContainer::Erase()
+{
+	for(int i = 0; i < m_maskList.length(); i++){
+		delete m_maskList.at(i).first;
+	}
+
+	for(int i = 0; i < m_maskListInv.length(); i++){
+		delete m_maskListInv.at(i).first;
+	}
+
+	Clear();
+
+}
+
 
 bool CMaskContainer::RemoveLastMask(bool isInversion)
 {
@@ -447,7 +490,7 @@ quint64 CMaskContainer::GetUnitCount()
 		quint64 activeItem = 0xffffffffffffffff;
 
 		if (GetActiveItem(activeOffset, activeItem, isStart) == false){
-			qDebug() << "whileCount " << whileCount;
+			//qDebug() << "whileCount " << whileCount;
 
 			return unitCount;
 		}
@@ -576,11 +619,16 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 						continue;
 					}
 				}
-				else{
+				else {
 					m_maskList[i].second = offset;
 					isLast = false;
 					changeOffset = true;
 				}
+			}
+			else {
+				offset = m_maskList[i].second;
+				changeOffset = true;
+				isLast = false;
 			}
 		}
 		if (changeOffset){
@@ -609,6 +657,7 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 				m_maskListInv[i].second = offset;
 				isLast = false;
 				changeOffset = true;
+				isLast = false;
 			}
 		}
 		else{
@@ -628,6 +677,11 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 					isLast = false;
 					changeOffset = true;
 				}
+			}
+			else {
+				offset = m_maskListInv[i].second;
+				changeOffset = true;
+				isLast = false;
 			}
 		}
 		if (changeOffset){

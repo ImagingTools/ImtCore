@@ -43,6 +43,7 @@ public:
 	// reimplemented (IMaskContainer)
 	void AddMask(IMask* mask, bool isInversion = false) override;
 	void Clear() override;
+	void Erase();
 	bool RemoveLastMask(bool isInversion = false) override;
 	bool RemoveMask(int index, int n = 1, bool isInversion = false) override;
 	int GetMaskCount(bool isInversion = false) override;
@@ -50,9 +51,8 @@ public:
 	quint64 GetUnitCount() override;
 	QList<quint64> GetUnitPositions(quint64 offset = 0, int limit = -1) override;
 	QList<QByteArray> GetDocuments(quint64 offset = 0, int limit = -1) override;
-
-protected:
 	bool GetActiveItem(quint64& activeOffset, quint64& activeItem, bool isStart);
+
 
 protected:
 	QList<QPair<IMask*,quint64>> m_maskList; // IMask*, next offset

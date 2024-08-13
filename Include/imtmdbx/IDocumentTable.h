@@ -21,6 +21,8 @@ public:
 	virtual bool UpdateDocument(qint64 key, const QByteArray& data) = 0;
 	virtual bool UpdateDocument(const QByteArray& key, const QByteArray& data) = 0;
 	virtual qint64 GetKey(const QByteArray& value) = 0;
+	virtual qint64 GetFirstKey() = 0;
+	virtual qint64 GetLastKey() = 0;
 	virtual QString GetStringKey(const QByteArray& value) = 0;
 	virtual bool CreateIndex() = 0;
 };

@@ -297,6 +297,44 @@ qint64 CDocumentTable::GetKey(const QByteArray &value)
 	return -1;
 }
 
+qint64 CDocumentTable::GetFirstKey()
+{
+	try{
+		qint64 key = -1;
+
+		mdbx::cursor::move_result result = m_cursor.to_first(false);
+		if(result.done){
+			key = result.key.as_int64();
+			return key;
+		}
+	}
+	catch(...){
+		return -1;
+	}
+
+	return -1;
+}
+
+
+qint64 CDocumentTable::GetLastKey()
+{
+	try{
+		qint64 key = -1;
+
+		mdbx::cursor::move_result result = m_cursor.to_last(false);
+		if(result.done){
+			key = result.key.as_int64();
+			return key;
+		}
+
+	}
+	catch(...){
+		return -1;
+	}
+
+	return -1;
+}
+
 
 QString CDocumentTable::GetStringKey(const QByteArray &value)
 {
