@@ -1235,6 +1235,9 @@ class JSFile {
 
 let fullCode = []
 
+let mainData = fs.readFileSync(path.resolve(__dirname, '../dist/main.js'), {encoding:'utf8', flag:'r'})
+fullCode.push(mainData)
+
 if(config.dirs.length) console.log(`JQ: preparation of third party modules`)
 
 let counter = {
@@ -1374,3 +1377,4 @@ if(config.entry){
 }
 
 if(config.output) fs.writeFileSync(path.resolve(configDirPath, config.output), fullCode.join('\n'))
+

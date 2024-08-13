@@ -139,10 +139,12 @@ module.exports = {
             }
         })
         window.addEventListener('mouseup', (e)=>{
-            this.event.x = e.pageX
-            this.event.y = e.pageY
-            
-            if(this.event.target) this.event.target.__onMouseUp(this.event)
+            if(this.event){
+                this.event.x = e.pageX
+                this.event.y = e.pageY
+                
+                if(this.event.target) this.event.target.__onMouseUp(this.event)
+            }
         })
         window.addEventListener('contextmenu', (e)=>{
             e.preventDefault()

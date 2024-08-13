@@ -37,6 +37,8 @@ const AnimationController = {
 }
 
 class Animation extends QtObject {
+    static Infinite = -1
+    
     static meta = Object.assign({}, QtObject.meta, {
         loops: { type: Int, value: 1, signalName: 'loopsChanged' },
         running: { type: Bool, value: false, signalName: 'runningChanged' },
