@@ -259,7 +259,10 @@ class Item extends QtObject {
     mapToItem(item, x, y){}
     forceActiveFocus(){}
 
-
+    __destroy(){
+        if(this.__DOM) this.__DOM.remove()
+        super.__destroy()
+    }
 
     __onMouseCanceled(mouse){}
     __onMouseEnter(mouse){}

@@ -185,6 +185,16 @@ class Property extends BaseObject {
         this.__compute = compute
         this.__completed = false
     }
+
+    __destroy(){
+        super.__destroy()
+        this.__unsubscribe()
+        let self = this.__self
+        delete self.__proxy
+        for(let key in self){
+            delete self[key]
+        }
+    }
 }
 
 module.exports = Property

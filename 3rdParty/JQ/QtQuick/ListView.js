@@ -33,7 +33,6 @@ class ListView extends Flickable {
         contentWidth: {type: Real, value:0, signalName:'contentWidthChanged'},
         contentHeight: {type: Real, value:0, signalName:'contentHeightChanged'},
         
-        spacingChanged: {type:Signal, slotName:'onSpacingChanged', args:[]},
         modelChanged: {type:Signal, slotName:'onModelChanged', args:[]},
         delegateChanged: {type:Signal, slotName:'onDelegateChanged', args:[]},
         contentXChanged: {type:Signal, slotName:'onContentXChanged', args:[]},
@@ -48,6 +47,8 @@ class ListView extends Flickable {
         contentWidthChanged: {type:Signal, slotName:'onContentWidthChanged', args:[]},
         contentHeightChanged: {type:Signal, slotName:'onContentHeightChanged', args:[]},
     })
+
+    __items = []
 
     indexAt(x, y){
 
@@ -100,6 +101,101 @@ class ListView extends Flickable {
 
     }
 
+    onModelChanged(){
+        this.__clear()
+        
+        if(typeof this.model === 'object'){
+            this.model.__addViewListener(this)
+        }
+
+        this.__initView()
+    }
+
+    onDelegateChanged(){
+        this.__clear()
+        this.__initView()
+    }
+
+    __clear(){
+        for(let i = 0; i < this.__items.length; i++){
+            this.__items[i].__destroy()
+        }
+        this.__items = []
+    }
+
+    __initView(){
+        if(this.delegate && this.model){
+            JQApplication.beginUpdate()
+            JQApplication.updateLater(this)
+
+            if(typeof this.model === 'number'){
+                for(let i = 0; i < this.model; i++){
+                    let item = this.delegate.createObject(this.contentItem)
+                    this.__items.push(item)
+                }
+            } else {
+                for(let i = 0; i < this.model.data.length; i++){
+                    let item = this.delegate.createObject(this.contentItem, this.model.data[i])
+                    this.__items.push(item)
+                }
+            }
+
+            JQApplication.endUpdate()
+        }
+    }
+
+    __updateView(changeSet){
+        if(this.delegate && this.model){
+            JQApplication.beginUpdate()
+            JQApplication.updateLater(this)
+
+            for(let change of changeSet){
+                let leftTop = change[0]
+                let bottomRight = change[1]
+                let role = change[2]
+
+                if(role === 'append'){
+                    for(let i = leftTop; i < bottomRight; i++){
+                        let item = this.delegate.createObject(this.contentItem, this.model.data[i])
+                        this.__items[i] = item
+                    }
+                } else if(role === 'insert'){
+                    for(let i = leftTop; i < bottomRight; i++){
+                        let item = this.delegate.createObject(this.contentItem, this.model.data[i])
+                        this.__items.splice(i, 0, item)
+                    }
+                } else if(role === 'remove'){
+                    let removed = this.__items.splice(leftTop, bottomRight - leftTop)
+                    for(let r of removed){
+                        if(r) r.__destroy()
+                    }
+                }
+            }
+
+            JQApplication.endUpdate()
+        }
+    }
+
+    onSpacingChanged(){
+        JQApplication.updateLater(this)
+    }
+
+    __updateGeometry(){
+        this.contentWidth = this.contentItem.__getDOM().scrollWidth
+        this.contentHeight = this.contentItem.__getDOM().scrollHeight
+    }
+
+    __endUpdate(...args){
+        for(let i = 0; i < this.__items.length; i++){
+            if(i === 0){
+                this.__items[i].y = 0
+            } else {
+                this.__items[i].y = this.__items[i-1].y + this.__items[i-1].height + this.spacing
+            }
+        }
+
+        this.__updateGeometry()
+    }
 }
 
 module.exports = ListView

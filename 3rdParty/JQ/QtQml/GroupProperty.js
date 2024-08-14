@@ -11,6 +11,18 @@ class GroupProperty extends BaseObject {
         return proxy
     }
 
+    __beginProcess(){
+        if(this.__parent) {
+            this.__parent.__beginProcess()
+        }
+    }
+
+    __endProcess(){
+        if(this.__parent) {
+            this.__parent.__endProcess()
+        }
+    }
+
     __toPrimitive(hint){
         return this
     }
@@ -68,6 +80,19 @@ class GroupProperty extends BaseObject {
         }
         this[key] = value
         return true
+    }
+
+    __destroy(){
+        super.__destroy()
+
+        let self = this.__self
+        delete self.__proxy
+        for(let key in self){
+            if(self[key] instanceof Property || self[key] instanceof GroupProperty){
+                self[key].__destroy()
+            }
+            delete self[key]
+        }
     }
 }
 

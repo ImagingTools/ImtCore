@@ -18,6 +18,7 @@ class ListModel extends QtObject {
     })
 
     __views = []
+    __changeSet = []
 
     __addViewListener(obj){
         if(this.__views.indexOf(obj) < 0) this.__views.push(obj)
@@ -38,8 +39,10 @@ class ListModel extends QtObject {
         this.count = this.data.length
 
         for(let obj of this.__views){
-            obj.__updateView()
+            obj.__updateView(this.__changeSet)
         }
+
+        this.__changeSet = []
     }
 
     append(dict){
@@ -48,18 +51,37 @@ class ListModel extends QtObject {
         if (Array.isArray(dict)) {
 			if (dict.length === 0)
 				return
+
+            this.__changeSet.push([this.data.length, this.data.length+dict.length, 'append'])
             for(let i = 0; i < dict.length; i++){
                 this.data.push(dict[i])
             }
 		} else {
+            this.__changeSet.push([this.data.length, this.data.length+1, 'append'])
             this.data.push(dict)
 		}
     }
-    insert(){
+    insert(index, dict){
+        JQApplication.updateLater(this)
 
+        if (Array.isArray(dict)) {
+			if (dict.length === 0)
+				return
+
+            this.__changeSet.push([index, index+dict.length, 'insert'])
+            for(let i = 0; i < dict.length; i++){
+                this.data.splice(i+index, 0, dict[i])
+            }
+		} else {
+            this.__changeSet.push([index, index+1, 'insert'])
+            this.data.splice(index, 0, dict)
+		}
     }
-    remove(){
+    remove(index, count = 1){
+        JQApplication.updateLater(this)
 
+        this.__changeSet.push([index, index+count, 'remove'])
+        this.data.splice(index, count)
     }
     get(){
 
@@ -68,7 +90,14 @@ class ListModel extends QtObject {
         
     }
     clear(){
+        JQApplication.updateLater(this)
 
+        this.__changeSet.push([0, this.data.length, 'remove'])
+        this.data = []
+    }
+
+    __destroy(){
+        
     }
 }
 

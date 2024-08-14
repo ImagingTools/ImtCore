@@ -38,6 +38,16 @@ class BaseObject{
         return proxy
     }
 
+    __processCount = 0
+
+    __beginProcess(){
+        this.__processCount++
+    }
+
+    __endProcess(){
+        this.__processCount--
+    }
+
     __toPrimitive(hint){
 
     }
@@ -55,10 +65,6 @@ class BaseObject{
     }
 
     __destroy(){
-        this.blockSignals(true)
-    }
-
-    __free(){
         
     }
 

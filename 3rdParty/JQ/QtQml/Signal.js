@@ -71,14 +71,14 @@ class Signal {
     emit(...args){
         if(this.__parent) {
             if(this.__parent.signalsBlocked()) return
+            this.__parent.__beginProcess()
 
             if(this.__parent[this.__slotName]){
                 this.__parent[this.__slotName](...args)
             }
         }
 
-        if(!this.__connections) return
-
+        if(this.__connections)
         for(let connection of this.__connections){
             try {
                 if(connection.target){
@@ -89,7 +89,10 @@ class Signal {
             } catch (error) {
                 console.error(error)
             }
-            
+        }
+
+        if(this.__parent) {
+            this.__parent.__endProcess()
         }
     }
 
@@ -99,9 +102,8 @@ class Signal {
 
     __destroy(){
         delete this.__connections
-        // delete this.args
-        delete this.parent
-        delete this.slotName
+        delete this.__parent
+        delete this.__slotName
     }
 }
 

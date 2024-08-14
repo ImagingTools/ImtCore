@@ -1,4 +1,6 @@
 const QObject = require("./QObject")
+const Property = require("./Property")
+const GroupProperty = require("./GroupProperty")
 const Var = require("./Var")
 const Int = require("./Int")
 const List = require("./List")
@@ -84,6 +86,30 @@ class QtObject extends QObject {
         if(this.__parent) {
             this.__parent.__addChild(this)
         }
+    }
+
+    __destroy(){
+        super.__destroy()
+        this.blockSignals(true)
+
+        let data = this.data.slice()
+        for(let i = data.length-1; i >= 0; i--){
+            data[i].__destroy()
+        }
+
+        this['Component.destruction']()
+
+        if(this.parent) this.parent.__removeChild(this)
+
+        let self = this.__self
+        delete self.__proxy
+        for(let key in self){
+            if(self[key] instanceof Property || self[key] instanceof GroupProperty || self[key] instanceof Signal){
+                self[key].__destroy()
+            }
+            delete self[key]
+        }
+
     }
 }
 

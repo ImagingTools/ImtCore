@@ -32,18 +32,28 @@ class Repeater extends Item {
     }
 
     onModelChanged(){
-        this.__updateView()
+        this.__clear()
         
         if(typeof this.model === 'object'){
             this.model.__addViewListener(this)
         }
-    }
 
-    onDelegateChanged(){
         this.__updateView()
     }
 
-    __updateView(options){
+    onDelegateChanged(){
+        this.__clear()
+        this.__updateView()
+    }
+
+    __clear(){
+        for(let i = 0; i < this.__items.length; i++){
+            this.__items[i].__destroy()
+        }
+        this.__items = []
+    }
+
+    __updateView(changeSet){
         if(this.delegate && this.model){
             JQApplication.beginUpdate()
             JQApplication.updateLater(this.parent)
