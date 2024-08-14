@@ -5,10 +5,13 @@
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 
+#include <istd/IPolymorphic.h>
+
+
 namespace imtmdbx
 {
 
-class IDocumentTable
+class IDocumentTable: istd::IPolymorphic
 {
 public:
 	virtual qint64 AddDocument(const QByteArray& data) = 0;
