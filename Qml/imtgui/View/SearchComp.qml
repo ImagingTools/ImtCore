@@ -75,9 +75,11 @@ Rectangle{
         searchContainer.clearModels();
 
         searchTextField.excludeFilterPart = "";
-        searchTextField.currentText = "";
         searchContainer.externalSearchParam = ""
+        searchTextField.currentText = "";
         searchContainer.selectedText = "";
+        searchContainer.previousText = "";
+        searchContainer.parentIds = "";
 
     }
 
@@ -106,6 +108,7 @@ Rectangle{
 
     function clearSearchFunc(){
         console.log("clearSearchFunc")
+
         searchTextField.excludeFilterPart = "";
         searchTextField.currentText = "";
         searchContainer.selectedText = "";
