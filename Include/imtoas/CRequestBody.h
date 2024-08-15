@@ -1,0 +1,50 @@
+#pragma once
+
+
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonValue>
+#include <QtCore/QString>
+#include <QtCore/QList>
+
+// ImtCore includes
+#include <imtoas/CMediaType.h>
+
+
+namespace imtoas
+{
+
+
+class CRequestBody
+{
+public:
+	CRequestBody();
+
+	[[nodiscard]] QString GetDescription() const;
+	void SetDescription(const QString& description);
+
+	[[nodiscard]] QList<CMediaType> GetContent() const;
+	void SetContent(const QList<CMediaType>& content);
+
+	[[nodiscard]] bool IsRequired() const;
+	void SetRequired(bool required = true);
+
+	[[nodiscard]] static bool ReadFromJsonObject(CRequestBody& object, const QJsonObject& jsonObject);
+
+	bool operator==(const CRequestBody& other) const;
+	bool operator!=(const CRequestBody& other) const { return !(operator==(other)); }
+
+private:
+	QString m_description;
+	QList<CMediaType> m_content;
+	bool m_isRequired;
+};
+
+
+} // namespace imtoas
+
+
+Q_DECLARE_METATYPE(imtoas::CRequestBody);
+
+

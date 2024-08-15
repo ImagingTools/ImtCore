@@ -1,0 +1,49 @@
+#pragma once
+
+
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonValue>
+#include <QtCore/QString>
+#include <QtCore/QList>
+
+// ImtCore includes
+#include <imtoas/CMediaType.h>
+#include <imtoas/CHeader.h>
+
+
+namespace imtoas
+{
+
+
+class CResponse
+{
+public:
+	[[nodiscard]] QString GetDescription() const;
+	void SetDescription(const QString& description);
+
+	[[nodiscard]] QList<CHeader> GetHeaders() const;
+	void SetHeaders(const QList<CHeader>& headers);
+
+	[[nodiscard]] QList<CMediaType> GetContentList() const;
+	void SetContentList(const QList<CMediaType>& contentList);
+
+	[[nodiscard]] static bool ReadFromJsonObject(CResponse& object, const QJsonObject& jsonObject);
+
+	bool operator==(const CResponse& other) const;
+	bool operator!=(const CResponse& other) const { return !(operator==(other)); }
+
+private:
+	QString m_description;
+	QList<CHeader> m_headers;
+	QList<CMediaType> m_contentList;
+};
+
+
+} // namespace imtoas
+
+
+Q_DECLARE_METATYPE(imtoas::CResponse);
+
+
