@@ -19,18 +19,23 @@ namespace imtoas
 class CMediaType
 {
 public:
+	[[nodiscard]]QString GetId() const;
+	void SetId(const QString& id);
+
 	[[nodiscard]] CSchema GetSchema() const;
 	void SetSchema(const CSchema& schema);
 
 	[[nodiscard]] QList<CEncoding> GetEncodings() const;
 	void SetEncodings(const QList<CEncoding>& encodings);
 
-	[[nodiscard]] static bool ReadFromJsonObject(CMediaType& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(CMediaType& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CMediaType& other) const;
 	bool operator!=(const CMediaType& other) const { return !(operator==(other)); }
 
+
 private:
+	QString m_id;
 	CSchema m_schema;
 	QList<CEncoding> m_encodings;
 };

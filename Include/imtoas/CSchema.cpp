@@ -61,7 +61,7 @@ void CSchema::SetEnumValues(const QList<QString>& enumValues)
 }
 
 
-bool CSchema::ReadFromJsonObject(CSchema& object, const QJsonObject& jsonObject)
+bool CSchema::ReadFromJsonObject(CSchema& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant typeData = jsonObject.value("type").toVariant();
 	if (typeData.isNull()){
@@ -85,7 +85,7 @@ bool CSchema::ReadFromJsonObject(CSchema& object, const QJsonObject& jsonObject)
 		QList<CProperty> propertiesList;
 		for (int propertiesIndex = 0; propertiesIndex < propertiesCount; ++propertiesIndex){
 			CProperty properties;
-			if (!CProperty::ReadFromJsonObject(properties, propertiesArray[propertiesIndex].toObject())){
+			if (!CProperty::ReadFromJsonObject(properties, propertiesArray[propertiesIndex].toObject(), globalObject)){
 				return false;
 			}
 			propertiesList << properties;

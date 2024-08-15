@@ -33,7 +33,7 @@ public:
 	[[nodiscard]] QString GetOpenIdConnectUrl() const;
 	void SetOpenIdConnectUrl(const QString& openIdConnectUrl);
 
-	[[nodiscard]] static bool ReadFromJsonObject(CSecurityScheme& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(CSecurityScheme& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CSecurityScheme& other) const;
 	bool operator!=(const CSecurityScheme& other) const { return !(operator==(other)); }

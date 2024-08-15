@@ -40,7 +40,7 @@ public:
 	[[nodiscard]] QString GetVersion() const;
 	void SetVersion(const QString& version);
 
-	static bool ReadFromJsonObject(CInfo& object, const QJsonObject& jsonObject);
+	static bool ReadFromJsonObject(CInfo& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CInfo& other) const;
 	bool operator!=(const CInfo& other) const { return !(operator==(other)); }

@@ -29,7 +29,7 @@ public:
 	[[nodiscard]] QList<CMediaType> GetContentList() const;
 	void SetContentList(const QList<CMediaType>& contentList);
 
-	[[nodiscard]] static bool ReadFromJsonObject(CResponse& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(CResponse& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CResponse& other) const;
 	bool operator!=(const CResponse& other) const { return !(operator==(other)); }

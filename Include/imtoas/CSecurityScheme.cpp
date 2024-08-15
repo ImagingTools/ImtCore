@@ -89,7 +89,7 @@ void CSecurityScheme::SetOpenIdConnectUrl(const QString& openIdConnectUrl)
 }
 
 
-bool CSecurityScheme::ReadFromJsonObject(CSecurityScheme& object, const QJsonObject& jsonObject)
+bool CSecurityScheme::ReadFromJsonObject(CSecurityScheme& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant typeData = jsonObject.value("type").toVariant();
 	if (typeData.isNull()){

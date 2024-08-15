@@ -24,7 +24,7 @@ public:
 	[[nodiscard]] QString GetDescription() const;
 	void SetDescription(const QString& description);
 
-	[[nodiscard]] static bool ReadFromJsonObject(CReferenceObject& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(CReferenceObject& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CReferenceObject& other) const;
 	bool operator!=(const CReferenceObject& other) const { return !(operator==(other)); }

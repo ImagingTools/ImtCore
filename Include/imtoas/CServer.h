@@ -28,7 +28,7 @@ public:
 	[[nodiscard]] QList<CServerVariable> GetVariables() const;
 	void SetVariables(const QList<CServerVariable>& variables);
 
-	[[nodiscard]] static bool ReadFromJsonObject(CServer& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(CServer& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CServer& other) const;
 	bool operator!=(const CServer& other) const { return !(operator==(other)); }

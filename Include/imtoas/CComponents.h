@@ -48,7 +48,7 @@ public:
 	[[nodiscard]] QList<CPath> GetPathItems() const;
 	void SetPathItems(const QList<CPath>& pathItems);
 
-	static bool ReadFromJsonObject(CComponents& object, const QJsonObject& jsonObject);
+	static bool ReadFromJsonObject(CComponents& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CComponents& other) const;
 	bool operator!=(const CComponents& other) const { return !(operator==(other)); }

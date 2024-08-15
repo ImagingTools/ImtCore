@@ -47,7 +47,7 @@ void CServerVariable::SetDescription(const QString& description)
 }
 
 
-bool CServerVariable::ReadFromJsonObject(CServerVariable& object, const QJsonObject& jsonObject)
+bool CServerVariable::ReadFromJsonObject(CServerVariable& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	if (jsonObject.contains("enum")){
 		const QJsonArray enumArray = jsonObject["enum"].toArray();

@@ -19,7 +19,7 @@ public:
 	[[nodiscard]] QList<QString> GetNames() const;
 	void SetNames(const QList<QString>& name);
 
-	[[nodiscard]] static bool ReadFromJsonObject(CSecurity& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(CSecurity& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CSecurity& other) const;
 	bool operator!=(const CSecurity& other) const { return !(operator==(other)); }

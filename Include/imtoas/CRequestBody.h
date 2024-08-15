@@ -30,7 +30,7 @@ public:
 	[[nodiscard]] bool IsRequired() const;
 	void SetRequired(bool required = true);
 
-	[[nodiscard]] static bool ReadFromJsonObject(CRequestBody& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(CRequestBody& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CRequestBody& other) const;
 	bool operator!=(const CRequestBody& other) const { return !(operator==(other)); }

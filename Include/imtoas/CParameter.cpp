@@ -169,7 +169,7 @@ void CParameter::SetContent(const CMediaType& content)
 }
 
 
-bool CParameter::ReadFromJsonObject(CParameter& object, const QJsonObject& jsonObject)
+bool CParameter::ReadFromJsonObject(CParameter& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant nameData = jsonObject.value("name").toVariant();
 	if (nameData.isNull()){
@@ -220,7 +220,7 @@ bool CParameter::ReadFromJsonObject(CParameter& object, const QJsonObject& jsonO
 
 	if (jsonObject.contains("schema")){
 		CSchema schema;
-		const bool isSchemaReaded = CSchema::ReadFromJsonObject(schema, jsonObject["schema"].toObject());
+		const bool isSchemaReaded = CSchema::ReadFromJsonObject(schema, jsonObject["schema"].toObject(), globalObject);
 		if (!isSchemaReaded){
 			return false;
 		}
@@ -229,7 +229,7 @@ bool CParameter::ReadFromJsonObject(CParameter& object, const QJsonObject& jsonO
 
 	if (jsonObject.contains("content")){
 		CMediaType content;
-		const bool isContentReaded = CMediaType::ReadFromJsonObject(content, jsonObject["content"].toObject());
+		const bool isContentReaded = CMediaType::ReadFromJsonObject(content, jsonObject["content"].toObject(), globalObject);
 		if (!isContentReaded){
 			return false;
 		}

@@ -55,7 +55,7 @@ public:
 	[[nodiscard]] QList<CServer> GetServers() const;
 	void SetServers(const QList<CServer>& servers);
 
-	[[nodiscard]] static bool ReadFromJsonObject(COperation& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(COperation& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const COperation& other) const;
 	bool operator!=(const COperation& other) const { return !(operator==(other)); }

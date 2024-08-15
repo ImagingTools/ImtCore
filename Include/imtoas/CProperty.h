@@ -21,7 +21,7 @@ public:
 	[[nodiscard]] QString GetFormat() const;
 	void SetFormat(const QString& format);
 
-	[[nodiscard]] static bool ReadFromJsonObject(CProperty& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(CProperty& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CProperty& other) const;
 	bool operator!=(const CProperty& other) const { return !(operator==(other)); }

@@ -5,6 +5,21 @@ namespace imtoas
 {
 
 
+
+QString CPath::GetId() const
+{
+	return m_id;
+}
+
+
+void CPath::SetId(const QString& id)
+{
+	if (id != m_id){
+		m_id = id;
+	}
+}
+
+
 QString CPath::GetReference() const
 {
 	return m_reference;
@@ -187,7 +202,7 @@ void CPath::SetParameters(const QList<CParameter>& parameters)
 }
 
 
-bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject)
+bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant referenceData = jsonObject.value("$ref").toVariant();
 	if (!referenceData.isNull()){
@@ -206,7 +221,7 @@ bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("get")){
 		COperation get;
-		const bool isGetReaded = COperation::ReadFromJsonObject(get, jsonObject["get"].toObject());
+		const bool isGetReaded = COperation::ReadFromJsonObject(get, jsonObject["get"].toObject(), globalObject);
 		if (!isGetReaded){
 			return false;
 		}
@@ -215,7 +230,7 @@ bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("put")){
 		COperation put;
-		const bool isPutReaded = COperation::ReadFromJsonObject(put, jsonObject["put"].toObject());
+		const bool isPutReaded = COperation::ReadFromJsonObject(put, jsonObject["put"].toObject(), globalObject);
 		if (!isPutReaded){
 			return false;
 		}
@@ -224,7 +239,7 @@ bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("post")){
 		COperation post;
-		const bool isPostReaded = COperation::ReadFromJsonObject(post, jsonObject["post"].toObject());
+		const bool isPostReaded = COperation::ReadFromJsonObject(post, jsonObject["post"].toObject(), globalObject);
 		if (!isPostReaded){
 			return false;
 		}
@@ -233,7 +248,7 @@ bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("delete")){
 		COperation deleteOperation;
-		const bool isDeleteReaded = COperation::ReadFromJsonObject(deleteOperation, jsonObject["delete"].toObject());
+		const bool isDeleteReaded = COperation::ReadFromJsonObject(deleteOperation, jsonObject["delete"].toObject(), globalObject);
 		if (!isDeleteReaded){
 			return false;
 		}
@@ -242,7 +257,7 @@ bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("options")){
 		COperation options;
-		const bool isOptionsReaded = COperation::ReadFromJsonObject(options, jsonObject["options"].toObject());
+		const bool isOptionsReaded = COperation::ReadFromJsonObject(options, jsonObject["options"].toObject(), globalObject);
 		if (!isOptionsReaded){
 			return false;
 		}
@@ -251,7 +266,7 @@ bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("head")){
 		COperation head;
-		const bool isHeadReaded = COperation::ReadFromJsonObject(head, jsonObject["head"].toObject());
+		const bool isHeadReaded = COperation::ReadFromJsonObject(head, jsonObject["head"].toObject(), globalObject);
 		if (!isHeadReaded){
 			return false;
 		}
@@ -260,7 +275,7 @@ bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("patch")){
 		COperation patch;
-		const bool isPatchReaded = COperation::ReadFromJsonObject(patch, jsonObject["patch"].toObject());
+		const bool isPatchReaded = COperation::ReadFromJsonObject(patch, jsonObject["patch"].toObject(), globalObject);
 		if (!isPatchReaded){
 			return false;
 		}
@@ -269,7 +284,7 @@ bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("trace")){
 		COperation trace;
-		const bool isTraceReaded = COperation::ReadFromJsonObject(trace, jsonObject["trace"].toObject());
+		const bool isTraceReaded = COperation::ReadFromJsonObject(trace, jsonObject["trace"].toObject(), globalObject);
 		if (!isTraceReaded){
 			return false;
 		}
@@ -282,7 +297,7 @@ bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject)
 		QList<CServer> serversList;
 		for (int serversIndex = 0; serversIndex < serversCount; ++serversIndex){
 			CServer servers;
-			if (!CServer::ReadFromJsonObject(servers, serversArray[serversIndex].toObject())){
+			if (!CServer::ReadFromJsonObject(servers, serversArray[serversIndex].toObject(), globalObject)){
 				return false;
 			}
 			serversList << servers;
@@ -296,7 +311,7 @@ bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject)
 		QList<CParameter> parametersList;
 		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
 			CParameter parameters;
-			if (!CParameter::ReadFromJsonObject(parameters, parametersArray[parametersIndex].toObject())){
+			if (!CParameter::ReadFromJsonObject(parameters, parametersArray[parametersIndex].toObject(), globalObject)){
 				return false;
 			}
 			parametersList << parameters;

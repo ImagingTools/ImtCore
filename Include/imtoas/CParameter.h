@@ -54,7 +54,7 @@ public:
 	[[nodiscard]] CMediaType GetContent() const;
 	void SetContent(const CMediaType& content);
 
-	[[nodiscard]] static bool ReadFromJsonObject(CParameter& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(CParameter& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CParameter& other) const;
 	bool operator!=(const CParameter& other) const { return !(operator==(other)); }

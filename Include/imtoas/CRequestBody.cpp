@@ -53,7 +53,7 @@ void CRequestBody::SetRequired(bool required)
 }
 
 
-bool CRequestBody::ReadFromJsonObject(CRequestBody& object, const QJsonObject& jsonObject)
+bool CRequestBody::ReadFromJsonObject(CRequestBody& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant descriptionData = jsonObject.value("description").toVariant();
 	if (!descriptionData.isNull()){
@@ -63,17 +63,18 @@ bool CRequestBody::ReadFromJsonObject(CRequestBody& object, const QJsonObject& j
 	if (!jsonObject.contains("content")){
 		return false;
 	}
-	const QJsonArray contentArray = jsonObject["content"].toArray();
+	const QJsonObject contentArray = jsonObject["content"].toObject();
 	qsizetype contentCount = contentArray.size();
 	if (contentCount <= 0){
 		return false;
 	}
 	QList<CMediaType> contentList;
-	for (int contentIndex = 0; contentIndex < contentCount; ++contentIndex){
+	for (QJsonObject::const_iterator contentIter = contentArray.constBegin(); contentIter != contentArray.constEnd(); ++contentIter){
 		CMediaType content;
-		if (!CMediaType::ReadFromJsonObject(content, contentArray[contentIndex].toObject())){
+		if (!CMediaType::ReadFromJsonObject(content, contentIter->toObject(), globalObject)){
 			return false;
 		}
+		content.SetId(contentIter.key());
 		contentList << content;
 	}
 	object.SetContent(contentList);

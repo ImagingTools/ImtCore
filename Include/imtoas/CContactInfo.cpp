@@ -48,7 +48,7 @@ void CContactInfo::SetEmail(const QString& email)
 }
 
 
-bool CContactInfo::ReadFromJsonObject(CContactInfo& object, const QJsonObject& jsonObject)
+bool CContactInfo::ReadFromJsonObject(CContactInfo& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant nameData = jsonObject.value("name").toVariant();
 	if (!nameData.isNull()){

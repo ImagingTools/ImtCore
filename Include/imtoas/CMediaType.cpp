@@ -1,8 +1,26 @@
 #include <imtoas/CMediaType.h>
 
 
+// ImtCore includes
+#include <imtoas/COasTools.h>
+
+
 namespace imtoas
 {
+
+
+QString CMediaType::GetId() const
+{
+	return m_id;
+}
+
+
+void CMediaType::SetId(const QString& id)
+{
+	if (id != m_id){
+		m_id = id;
+	}
+}
 
 
 CSchema CMediaType::GetSchema() const
@@ -33,11 +51,16 @@ void CMediaType::SetEncodings(const QList<CEncoding>& encoding)
 }
 
 
-bool CMediaType::ReadFromJsonObject(CMediaType& object, const QJsonObject& jsonObject)
+bool CMediaType::ReadFromJsonObject(CMediaType& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	if (jsonObject.contains("schema")){
 		CSchema schema;
-		const bool isSchemaReaded = CSchema::ReadFromJsonObject(schema, jsonObject["schema"].toObject());
+		QJsonObject schemaObject = jsonObject["schema"].toObject();
+		if (!COasTools::DeReferenceObject(schemaObject, globalObject, schemaObject)){
+			return false;
+		}
+
+		const bool isSchemaReaded = CSchema::ReadFromJsonObject(schema, schemaObject, globalObject);
 		if (!isSchemaReaded){
 			return false;
 		}
@@ -50,7 +73,7 @@ bool CMediaType::ReadFromJsonObject(CMediaType& object, const QJsonObject& jsonO
 		QList<CEncoding> encodingList;
 		for (int encodingIndex = 0; encodingIndex < encodingCount; ++encodingIndex){
 			CEncoding encoding;
-			if (!CEncoding::ReadFromJsonObject(encoding, encodingArray[encodingIndex].toObject())){
+			if (!CEncoding::ReadFromJsonObject(encoding, encodingArray[encodingIndex].toObject(), globalObject)){
 				return false;
 			}
 			encodingList << encoding;

@@ -31,7 +31,7 @@ public:
 	[[nodiscard]] QList<QString> GetEnumValues() const;
 	void SetEnumValues(const QList<QString>& enumValues);
 
-	[[nodiscard]] static bool ReadFromJsonObject(CSchema& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(CSchema& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CSchema& other) const;
 	bool operator!=(const CSchema& other) const { return !(operator==(other)); }

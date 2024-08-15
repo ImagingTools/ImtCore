@@ -117,7 +117,7 @@ void CComponents::SetPathItems(const QList<CPath>& pathItems)
 }
 
 
-bool CComponents::ReadFromJsonObject(CComponents& object, const QJsonObject& jsonObject)
+bool CComponents::ReadFromJsonObject(CComponents& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	if (jsonObject.contains("schemas")){
 		const QJsonArray schemasArray = jsonObject["schemas"].toArray();
@@ -125,7 +125,7 @@ bool CComponents::ReadFromJsonObject(CComponents& object, const QJsonObject& jso
 		QList<CSchema> schemasList;
 		for (int schemasIndex = 0; schemasIndex < schemasCount; ++schemasIndex){
 			CSchema schemas;
-			if (!CSchema::ReadFromJsonObject(schemas, schemasArray[schemasIndex].toObject())){
+			if (!CSchema::ReadFromJsonObject(schemas, schemasArray[schemasIndex].toObject(), globalObject)){
 				return false;
 			}
 			schemasList << schemas;
@@ -139,7 +139,7 @@ bool CComponents::ReadFromJsonObject(CComponents& object, const QJsonObject& jso
 		QList<CResponse> responsesList;
 		for (int responsesIndex = 0; responsesIndex < responsesCount; ++responsesIndex){
 			CResponse responses;
-			if (!CResponse::ReadFromJsonObject(responses, responsesArray[responsesIndex].toObject())){
+			if (!CResponse::ReadFromJsonObject(responses, responsesArray[responsesIndex].toObject(), globalObject)){
 				return false;
 			}
 			responsesList << responses;
@@ -153,7 +153,7 @@ bool CComponents::ReadFromJsonObject(CComponents& object, const QJsonObject& jso
 		QList<CParameter> parametersList;
 		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
 			CParameter parameters;
-			if (!CParameter::ReadFromJsonObject(parameters, parametersArray[parametersIndex].toObject())){
+			if (!CParameter::ReadFromJsonObject(parameters, parametersArray[parametersIndex].toObject(), globalObject)){
 				return false;
 			}
 			parametersList << parameters;
@@ -167,7 +167,7 @@ bool CComponents::ReadFromJsonObject(CComponents& object, const QJsonObject& jso
 		QList<CRequestBody> requestBodiesList;
 		for (int requestBodiesIndex = 0; requestBodiesIndex < requestBodiesCount; ++requestBodiesIndex){
 			CRequestBody requestBodies;
-			if (!CRequestBody::ReadFromJsonObject(requestBodies, requestBodiesArray[requestBodiesIndex].toObject())){
+			if (!CRequestBody::ReadFromJsonObject(requestBodies, requestBodiesArray[requestBodiesIndex].toObject(), globalObject)){
 				return false;
 			}
 			requestBodiesList << requestBodies;
@@ -181,7 +181,7 @@ bool CComponents::ReadFromJsonObject(CComponents& object, const QJsonObject& jso
 		QList<CHeader> headersList;
 		for (int headersIndex = 0; headersIndex < headersCount; ++headersIndex){
 			CHeader headers;
-			if (!CHeader::ReadFromJsonObject(headers, headersArray[headersIndex].toObject())){
+			if (!CHeader::ReadFromJsonObject(headers, headersArray[headersIndex].toObject(), globalObject)){
 				return false;
 			}
 			headersList << headers;
@@ -195,7 +195,7 @@ bool CComponents::ReadFromJsonObject(CComponents& object, const QJsonObject& jso
 		QList<CSecurityScheme> securitySchemesList;
 		for (int securitySchemesIndex = 0; securitySchemesIndex < securitySchemesCount; ++securitySchemesIndex){
 			CSecurityScheme securitySchemes;
-			if (!CSecurityScheme::ReadFromJsonObject(securitySchemes, securitySchemesArray[securitySchemesIndex].toObject())){
+			if (!CSecurityScheme::ReadFromJsonObject(securitySchemes, securitySchemesArray[securitySchemesIndex].toObject(), globalObject)){
 				return false;
 			}
 			securitySchemesList << securitySchemes;
@@ -209,7 +209,7 @@ bool CComponents::ReadFromJsonObject(CComponents& object, const QJsonObject& jso
 		QList<CPath> callbacksList;
 		for (int callbacksIndex = 0; callbacksIndex < callbacksCount; ++callbacksIndex){
 			CPath callbacks;
-			if (!CPath::ReadFromJsonObject(callbacks, callbacksArray[callbacksIndex].toObject())){
+			if (!CPath::ReadFromJsonObject(callbacks, callbacksArray[callbacksIndex].toObject(), globalObject)){
 				return false;
 			}
 			callbacksList << callbacks;
@@ -223,7 +223,7 @@ bool CComponents::ReadFromJsonObject(CComponents& object, const QJsonObject& jso
 		QList<CPath> pathItemsList;
 		for (int pathItemsIndex = 0; pathItemsIndex < pathItemsCount; ++pathItemsIndex){
 			CPath pathItems;
-			if (!CPath::ReadFromJsonObject(pathItems, pathItemsArray[pathItemsIndex].toObject())){
+			if (!CPath::ReadFromJsonObject(pathItems, pathItemsArray[pathItemsIndex].toObject(), globalObject)){
 				return false;
 			}
 			pathItemsList << pathItems;

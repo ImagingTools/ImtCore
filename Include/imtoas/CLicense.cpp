@@ -47,7 +47,7 @@ void CLicense::SetUrl(const QString& url)
 }
 
 
-bool CLicense::ReadFromJsonObject(CLicense& object, const QJsonObject& jsonObject)
+bool CLicense::ReadFromJsonObject(CLicense& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant nameData = jsonObject.value("name").toVariant();
 	if (nameData.isNull()){

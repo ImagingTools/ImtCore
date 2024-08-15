@@ -151,7 +151,7 @@ void COperation::SetServers(const QList<CServer>& servers)
 }
 
 
-bool COperation::ReadFromJsonObject(COperation& object, const QJsonObject& jsonObject)
+bool COperation::ReadFromJsonObject(COperation& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	if (jsonObject.contains("tags")){
 		const QJsonArray tagsArray = jsonObject["tags"].toArray();
@@ -184,7 +184,7 @@ bool COperation::ReadFromJsonObject(COperation& object, const QJsonObject& jsonO
 		QList<CParameter> parametersList;
 		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
 			CParameter parameters;
-			if (!CParameter::ReadFromJsonObject(parameters, parametersArray[parametersIndex].toObject())){
+			if (!CParameter::ReadFromJsonObject(parameters, parametersArray[parametersIndex].toObject(), globalObject)){
 				return false;
 			}
 			parametersList << parameters;
@@ -194,7 +194,7 @@ bool COperation::ReadFromJsonObject(COperation& object, const QJsonObject& jsonO
 
 	if (jsonObject.contains("requestBody")){
 		CRequestBody requestBody;
-		const bool isRequestBodyReaded = CRequestBody::ReadFromJsonObject(requestBody, jsonObject["requestBody"].toObject());
+		const bool isRequestBodyReaded = CRequestBody::ReadFromJsonObject(requestBody, jsonObject["requestBody"].toObject(), globalObject);
 		if (!isRequestBodyReaded){
 			return false;
 		}
@@ -207,7 +207,7 @@ bool COperation::ReadFromJsonObject(COperation& object, const QJsonObject& jsonO
 		QList<CResponse> responsesList;
 		for (int responsesIndex = 0; responsesIndex < responsesCount; ++responsesIndex){
 			CResponse responses;
-			if (!CResponse::ReadFromJsonObject(responses, responsesArray[responsesIndex].toObject())){
+			if (!CResponse::ReadFromJsonObject(responses, responsesArray[responsesIndex].toObject(), globalObject)){
 				return false;
 			}
 			responsesList << responses;
@@ -226,7 +226,7 @@ bool COperation::ReadFromJsonObject(COperation& object, const QJsonObject& jsonO
 		QList<CSecurity> securityList;
 		for (int securityIndex = 0; securityIndex < securityCount; ++securityIndex){
 			CSecurity security;
-			if (!CSecurity::ReadFromJsonObject(security, securityArray[securityIndex].toObject())){
+			if (!CSecurity::ReadFromJsonObject(security, securityArray[securityIndex].toObject(), globalObject)){
 				return false;
 			}
 			securityList << security;
@@ -240,7 +240,7 @@ bool COperation::ReadFromJsonObject(COperation& object, const QJsonObject& jsonO
 		QList<CServer> serversList;
 		for (int serversIndex = 0; serversIndex < serversCount; ++serversIndex){
 			CServer servers;
-			if (!CServer::ReadFromJsonObject(servers, serversArray[serversIndex].toObject())){
+			if (!CServer::ReadFromJsonObject(servers, serversArray[serversIndex].toObject(), globalObject)){
 				return false;
 			}
 			serversList << servers;

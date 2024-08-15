@@ -48,7 +48,7 @@ void CServer::SetVariables(const QList<CServerVariable>& variables)
 }
 
 
-bool CServer::ReadFromJsonObject(CServer& object, const QJsonObject& jsonObject)
+bool CServer::ReadFromJsonObject(CServer& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant urlData = jsonObject.value("url").toVariant();
 	if (urlData.isNull()){
@@ -67,7 +67,7 @@ bool CServer::ReadFromJsonObject(CServer& object, const QJsonObject& jsonObject)
 		QList<CServerVariable> variablesList;
 		for (int variablesIndex = 0; variablesIndex < variablesCount; ++variablesIndex){
 			CServerVariable variables;
-			if (!CServerVariable::ReadFromJsonObject(variables, variablesArray[variablesIndex].toObject())){
+			if (!CServerVariable::ReadFromJsonObject(variables, variablesArray[variablesIndex].toObject(), globalObject)){
 				return false;
 			}
 			variablesList << variables;

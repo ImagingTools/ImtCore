@@ -82,7 +82,7 @@ void CEncoding::SetAllowReserved(bool allowReserved)
 }
 
 
-bool CEncoding::ReadFromJsonObject(CEncoding& object, const QJsonObject& jsonObject)
+bool CEncoding::ReadFromJsonObject(CEncoding& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant contentTypeData = jsonObject.value("contentType").toVariant();
 	if (!contentTypeData.isNull()){
@@ -95,7 +95,7 @@ bool CEncoding::ReadFromJsonObject(CEncoding& object, const QJsonObject& jsonObj
 		QList<CHeader> headersList;
 		for (int headersIndex = 0; headersIndex < headersCount; ++headersIndex){
 			CHeader headers;
-			if (!CHeader::ReadFromJsonObject(headers, headersArray[headersIndex].toObject())){
+			if (!CHeader::ReadFromJsonObject(headers, headersArray[headersIndex].toObject(), globalObject)){
 				return false;
 			}
 			headersList << headers;

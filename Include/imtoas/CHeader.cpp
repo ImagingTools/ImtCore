@@ -33,11 +33,11 @@ void CHeader::SetDescription(const QString& description)
 }
 
 
-bool CHeader::ReadFromJsonObject(CHeader& object, const QJsonObject& jsonObject)
+bool CHeader::ReadFromJsonObject(CHeader& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	if (jsonObject.contains("schema")){
 		CSchema schema;
-		const bool isSchemaReaded = CSchema::ReadFromJsonObject(schema, jsonObject["schema"].toObject());
+		const bool isSchemaReaded = CSchema::ReadFromJsonObject(schema, jsonObject["schema"].toObject(), globalObject);
 		if (!isSchemaReaded){
 			return false;
 		}

@@ -19,7 +19,7 @@ void CSecurity::SetNames(const QList<QString>& name)
 }
 
 
-bool CSecurity::ReadFromJsonObject(CSecurity& object, const QJsonObject& jsonObject)
+bool CSecurity::ReadFromJsonObject(CSecurity& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	if (jsonObject.contains("name")){
 		const QJsonArray nameArray = jsonObject["name"].toArray();

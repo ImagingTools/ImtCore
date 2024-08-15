@@ -24,7 +24,7 @@ public:
 	[[nodiscard]] QString GetEmail() const;
 	void SetEmail(const QString& email);
 
-	static bool ReadFromJsonObject(CContactInfo& object, const QJsonObject& jsonObject);
+	static bool ReadFromJsonObject(CContactInfo& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CContactInfo& other) const;
 	bool operator!=(const CContactInfo& other) const { return !(operator==(other)); }

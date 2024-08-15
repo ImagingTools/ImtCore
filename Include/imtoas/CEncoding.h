@@ -36,7 +36,7 @@ public:
 	[[nodiscard]] bool IsAllowReserved() const;
 	void SetAllowReserved(bool allowReserved = true);
 	
-	static bool ReadFromJsonObject(CEncoding& object, const QJsonObject& jsonObject);
+	static bool ReadFromJsonObject(CEncoding& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CEncoding& other) const;
 	bool operator!=(const CEncoding& other) const { return !(operator==(other)); }

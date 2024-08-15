@@ -24,7 +24,7 @@ public:
 	[[nodiscard]] QString GetUrl() const;
 	void SetUrl(const QString& url);
 
-	static bool ReadFromJsonObject(CLicense& object, const QJsonObject& jsonObject);
+	static bool ReadFromJsonObject(CLicense& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CLicense& other) const;
 	bool operator!=(const CLicense& other) const { return !(operator==(other)); }

@@ -104,7 +104,7 @@ void CInfo::SetVersion(const QString& version)
 }
 
 
-bool CInfo::ReadFromJsonObject(CInfo& object, const QJsonObject& jsonObject)
+bool CInfo::ReadFromJsonObject(CInfo& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant titleData = jsonObject.value("title").toVariant();
 	if (titleData.isNull()){
@@ -129,7 +129,7 @@ bool CInfo::ReadFromJsonObject(CInfo& object, const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("contact")){
 		CContactInfo contact;
-		const bool isContactReaded = CContactInfo::ReadFromJsonObject(contact, jsonObject["contact"].toObject());
+		const bool isContactReaded = CContactInfo::ReadFromJsonObject(contact, jsonObject["contact"].toObject(), globalObject);
 		if (!isContactReaded){
 			return false;
 		}
@@ -138,7 +138,7 @@ bool CInfo::ReadFromJsonObject(CInfo& object, const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("license")){
 		CLicense license;
-		const bool isLicenseReaded = CLicense::ReadFromJsonObject(license, jsonObject["license"].toObject());
+		const bool isLicenseReaded = CLicense::ReadFromJsonObject(license, jsonObject["license"].toObject(), globalObject);
 		if (!isLicenseReaded){
 			return false;
 		}

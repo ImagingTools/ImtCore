@@ -44,7 +44,7 @@ public:
 	[[nodiscard]] CSecurity GetSecurity() const;
 	void SetSecurity(const CSecurity& security);
 
-	[[nodiscard]] static bool ReadFromJsonObject(COpenApiSchema& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(COpenApiSchema& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const COpenApiSchema& other) const;
 	bool operator!=(const COpenApiSchema& other) const { return !(operator==(other)); }

@@ -47,7 +47,7 @@ void CResponse::SetContentList(const QList<CMediaType>& content)
 }
 
 
-bool CResponse::ReadFromJsonObject(CResponse& object, const QJsonObject& jsonObject)
+bool CResponse::ReadFromJsonObject(CResponse& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant descriptionData = jsonObject.value("description").toVariant();
 	if (!descriptionData.isNull()){
@@ -60,7 +60,7 @@ bool CResponse::ReadFromJsonObject(CResponse& object, const QJsonObject& jsonObj
 		QList<CHeader> headersList;
 		for (int headersIndex = 0; headersIndex < headersCount; ++headersIndex){
 			CHeader headers;
-			if (!CHeader::ReadFromJsonObject(headers, headersArray[headersIndex].toObject())){
+			if (!CHeader::ReadFromJsonObject(headers, headersArray[headersIndex].toObject(), globalObject)){
 				return false;
 			}
 			headersList << headers;
@@ -74,7 +74,7 @@ bool CResponse::ReadFromJsonObject(CResponse& object, const QJsonObject& jsonObj
 		QList<CMediaType> contentList;
 		for (int contentIndex = 0; contentIndex < contentCount; ++contentIndex){
 			CMediaType content;
-			if (!CMediaType::ReadFromJsonObject(content, contentArray[contentIndex].toObject())){
+			if (!CMediaType::ReadFromJsonObject(content, contentArray[contentIndex].toObject(), globalObject)){
 				return false;
 			}
 			contentList << content;

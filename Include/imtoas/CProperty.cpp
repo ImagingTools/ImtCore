@@ -33,7 +33,7 @@ void CProperty::SetFormat(const QString& format)
 }
 
 
-bool CProperty::ReadFromJsonObject(CProperty& object, const QJsonObject& jsonObject)
+bool CProperty::ReadFromJsonObject(CProperty& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant typeData = jsonObject.value("type").toVariant();
 	if (typeData.isNull()){

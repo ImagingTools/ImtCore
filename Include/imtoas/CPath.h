@@ -21,6 +21,9 @@ namespace imtoas
 class CPath
 {
 public:
+	[[nodiscard]]QString GetId() const;
+	void SetId(const QString& id);
+
 	[[nodiscard]] QString GetReference() const;
 	void SetReference(const QString& reference);
 
@@ -60,12 +63,14 @@ public:
 	[[nodiscard]] QList<CParameter> GetParameters() const;
 	void SetParameters(const QList<CParameter>& parameters);
 
-	[[nodiscard]] static bool ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject);
+	[[nodiscard]] static bool ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
 	bool operator==(const CPath& other) const;
 	bool operator!=(const CPath& other) const { return !(operator==(other)); }
 
+
 private:
+	QString m_id;
 	QString m_reference;
 	QString m_summary;
 	QString m_description;

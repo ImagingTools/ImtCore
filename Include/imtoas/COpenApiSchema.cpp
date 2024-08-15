@@ -104,7 +104,7 @@ void COpenApiSchema::SetSecurity(const CSecurity& security)
 }
 
 
-bool COpenApiSchema::ReadFromJsonObject(COpenApiSchema& object, const QJsonObject& jsonObject)
+bool COpenApiSchema::ReadFromJsonObject(COpenApiSchema& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant openapiData = jsonObject.value("openapi").toVariant();
 	if (openapiData.isNull()){
@@ -116,7 +116,7 @@ bool COpenApiSchema::ReadFromJsonObject(COpenApiSchema& object, const QJsonObjec
 		return false;
 	}
 	CInfo info;
-	const bool isInfoReaded = CInfo::ReadFromJsonObject(info, jsonObject["info"].toObject());
+	const bool isInfoReaded = CInfo::ReadFromJsonObject(info, jsonObject["info"].toObject(), globalObject);
 	if (!isInfoReaded){
 		return false;
 	}
@@ -136,7 +136,7 @@ bool COpenApiSchema::ReadFromJsonObject(COpenApiSchema& object, const QJsonObjec
 		QList<CServer> serversList;
 		for (int serversIndex = 0; serversIndex < serversCount; ++serversIndex){
 			CServer servers;
-			if (!CServer::ReadFromJsonObject(servers, serversArray[serversIndex].toObject())){
+			if (!CServer::ReadFromJsonObject(servers, serversArray[serversIndex].toObject(), globalObject)){
 				return false;
 			}
 			serversList << servers;
@@ -145,22 +145,22 @@ bool COpenApiSchema::ReadFromJsonObject(COpenApiSchema& object, const QJsonObjec
 	}
 
 	if (jsonObject.contains("paths")){
-		const QJsonArray pathsArray = jsonObject["paths"].toArray();
-		qsizetype pathsCount = pathsArray.size();
+		const QJsonObject pathsArray = jsonObject["paths"].toObject();
 		QList<CPath> pathsList;
-		for (int pathsIndex = 0; pathsIndex < pathsCount; ++pathsIndex){
-			CPath paths;
-			if (!CPath::ReadFromJsonObject(paths, pathsArray[pathsIndex].toObject())){
+		for (QJsonObject::const_iterator pathsIter = pathsArray.constBegin(); pathsIter != pathsArray.constEnd(); ++pathsIter){
+			CPath pathItem;
+			if (!CPath::ReadFromJsonObject(pathItem, pathsIter->toObject(), globalObject)){
 				return false;
 			}
-			pathsList << paths;
+			pathItem.SetId(pathsIter.key());
+			pathsList << pathItem;
 		}
 		object.SetPaths(pathsList);
 	}
 
 	if (jsonObject.contains("components")){
 		CComponents components;
-		const bool isComponentsReaded = CComponents::ReadFromJsonObject(components, jsonObject["components"].toObject());
+		const bool isComponentsReaded = CComponents::ReadFromJsonObject(components, jsonObject["components"].toObject(), globalObject);
 		if (!isComponentsReaded){
 			return false;
 		}
@@ -169,7 +169,7 @@ bool COpenApiSchema::ReadFromJsonObject(COpenApiSchema& object, const QJsonObjec
 
 	if (jsonObject.contains("security")){
 		CSecurity security;
-		const bool isSecurityReaded = CSecurity::ReadFromJsonObject(security, jsonObject["security"].toObject());
+		const bool isSecurityReaded = CSecurity::ReadFromJsonObject(security, jsonObject["security"].toObject(), globalObject);
 		if (!isSecurityReaded){
 			return false;
 		}
