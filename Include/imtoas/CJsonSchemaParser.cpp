@@ -7,7 +7,7 @@ namespace imtoas
 
 bool CJsonSchemaParser::ParseSchema(QIODevice& schemaIoDevice)
 {
-
+	return true;
 }
 
 
