@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5229" Description="ACF"/>
+            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="Application" X="550" Y="350" Note=""/>
+        <Element ComponentName="CodeGenWorker" X="550" Y="525" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="Application">
+            <PositionMap>
+                <Element ComponentName="ApplicationInfo" X="475" Y="475" Note=""/>
+                <Element ComponentName="ConsoleApplication" X="475" Y="350" Note=""/>
+                <Element ComponentName="ConsoleLog" X="750" Y="350" Note=""/>
+                <Element ComponentName="VersionInfo" X="475" Y="600" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="CodeGenWorker">
+            <PositionMap/>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
+</Acf>

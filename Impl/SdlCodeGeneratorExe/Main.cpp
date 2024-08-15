@@ -1,6 +1,3 @@
-// STL includes
-#include <iostream>
-
 // ACF includes
 #include <ibase/IApplication.h>
 

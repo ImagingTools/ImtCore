@@ -58,10 +58,6 @@ add_subdirectory("${INCLUDE_DIR}/imtddl/CMake" "${AUX_INCLUDE_DIR}/imtddl")
 add_subdirectory("${IMPL_DIR}/ImtDdlPck/CMake" "${AUX_INCLUDE_DIR}/ImtDdlPck")
 add_dependencies(ImtDdlPck imtddl)
 
-add_subdirectory("${INCLUDE_DIR}/imtsdl/CMake" "${AUX_INCLUDE_DIR}/imtsdl")
-add_subdirectory("${IMPL_DIR}/ImtSdlPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlPck")
-add_dependencies(ImtSdlPck imtsdl imtfile imtbase)
-
 #------ DesignToken ------
 add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreator")
 add_dependencies(DesignTokenCreator imtbase imtdesign)
@@ -71,8 +67,17 @@ add_subdirectory("${IMPL_DIR}/DdlCodeCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DdlCo
 add_dependencies(DdlCodeCreator imtddl)
 
 #------ SDL ------
+add_subdirectory("${INCLUDE_DIR}/imtsdl/CMake" "${AUX_INCLUDE_DIR}/imtsdl")
+add_subdirectory("${IMPL_DIR}/ImtSdlPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlPck")
+add_dependencies(ImtSdlPck imtsdl imtfile imtbase)
+
 add_subdirectory("${IMPL_DIR}/SdlCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/SdlCodeGenerator")
-add_dependencies(SdlCodeGenerator ImtSdlPck imtsdl)
+add_dependencies(SdlCodeGenerator ImtSdlPck imtsdl imtfile imtbase)
+
+#------ OpenAPI ------
+add_subdirectory("${INCLUDE_DIR}/imtoas/CMake" "${AUX_INCLUDE_DIR}/imtoas")
+add_subdirectory("${IMPL_DIR}/ImtOasPck/CMake" "${AUX_INCLUDE_DIR}/ImtOasPck")
+add_subdirectory("${IMPL_DIR}/OasCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/OasCodeGeneratorExe")
 
 
 if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)

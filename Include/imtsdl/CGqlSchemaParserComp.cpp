@@ -333,7 +333,6 @@ bool CGqlSchemaParserComp::ProcessSchemaImports()
 		}
 	}
 
-
 	return true;
 }
 
