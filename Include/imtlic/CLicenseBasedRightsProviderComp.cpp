@@ -31,14 +31,14 @@ bool CLicenseBasedRightsProviderComp::HasRight(
 		for (const QByteArray& licenseId : licenseIds){
 			const ILicenseInstance* licenseInstancePtr = m_licenseInfoProviderCompPtr->GetLicenseInstance(licenseId);
 			if (licenseInstancePtr != nullptr){
-//				ILicenseDefinition::FeatureInfos features = licenseInstancePtr->GetFeatureInfos();
-//				for (const ILicenseDefinition::FeatureInfo& featureInfo : features){
-//					if (featureInfo.id == operationId){
-//						bool isExpired = (licenseInstancePtr->GetExpiration() >= QDateTime::currentDateTime());
+				ILicenseDefinition::FeatureInfos features = licenseInstancePtr->GetFeatureInfos();
+				for (const ILicenseDefinition::FeatureInfo& featureInfo : features){
+					if (featureInfo.id == operationId){
+						bool isExpired = (licenseInstancePtr->GetExpiration() >= QDateTime::currentDateTime());
 
-//						return !isExpired;
-//					}
-//				}
+						return !isExpired;
+					}
+				}
 			}
 		}
 	}
