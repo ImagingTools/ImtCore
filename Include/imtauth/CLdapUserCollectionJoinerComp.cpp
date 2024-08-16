@@ -87,7 +87,7 @@ void CLdapUserCollectionJoinerComp::OnUpdate(
 
 	istd::CChangeGroup changeGroup(m_userCollectionCompPtr.GetPtr());
 
-	QByteArrayList actualLdapUserIds = m_ldapUserCollectionCompPtr->GetElementIds();
+	imtbase::ICollectionInfo::Ids actualLdapUserIds = m_ldapUserCollectionCompPtr->GetElementIds();
 
 	iprm::CParamsSet filterParam;
 	iprm::CParamsSet paramsSet;

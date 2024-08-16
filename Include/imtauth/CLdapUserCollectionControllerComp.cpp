@@ -153,7 +153,7 @@ void CLdapUserCollectionControllerComp::CheckLdapUsersThread::run()
 
 	while (!isInterruptionRequested()){
 		QByteArrayList expectedUserIds = GetLdapUserIds();
-		QByteArrayList actualUserIds = m_parent.GetElementIds();
+		imtbase::ICollectionInfo::Ids actualUserIds = m_parent.GetElementIds();
 
 		{
 			istd::CChangeGroup changeGroup(&m_parent);
