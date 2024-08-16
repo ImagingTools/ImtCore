@@ -36,7 +36,11 @@ public:
 	bool operator==(const CSchema& other) const;
 	bool operator!=(const CSchema& other) const { return !(operator==(other)); }
 
+	[[nodiscard]] QString GetId() const;
+	void SetId(const QString& id);
+
 private:
+	QString m_id;
 	QString m_type;
 	QList<QString> m_requiredProperties;
 	QList<CProperty> m_properties;

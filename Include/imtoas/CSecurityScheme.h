@@ -7,6 +7,9 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
+// Acf includes
+#include <istd/istd.h>
+
 
 namespace imtoas
 {
@@ -15,8 +18,25 @@ namespace imtoas
 class CSecurityScheme
 {
 public:
-	[[nodiscard]] QString GetType() const;
-	void SetType(const QString& type);
+	enum Type
+	{
+		T_API_KEY,
+		T_HTTP,
+		T_MUTUAL_TLS,
+		T_OAUTH2,
+		T_OPEN_ID_CONNECT
+	};
+	I_DECLARE_ENUM(Type,
+			T_API_KEY,
+			T_HTTP,
+			T_MUTUAL_TLS,
+			T_OAUTH2,
+			T_OPEN_ID_CONNECT)
+
+	CSecurityScheme();
+
+	[[nodiscard]] Type GetType() const;
+	void SetType(Type type);
 
 	[[nodiscard]] QString GetDescription() const;
 	void SetDescription(const QString& description);
@@ -38,8 +58,12 @@ public:
 	bool operator==(const CSecurityScheme& other) const;
 	bool operator!=(const CSecurityScheme& other) const { return !(operator==(other)); }
 
+	[[nodiscard]] QString GetId() const;
+	void SetId(const QString& id);
+
 private:
-	QString m_type;
+	QString m_id;
+	Type m_type;
 	QString m_description;
 	QString m_name;
 	QString m_in;

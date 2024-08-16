@@ -1,6 +1,10 @@
 #include <imtoas/CComponents.h>
 
 
+// ImtCore includes
+#include <imtoas/COasTools.h>
+
+
 namespace imtoas
 {
 
@@ -120,113 +124,73 @@ void CComponents::SetPathItems(const QList<CPath>& pathItems)
 bool CComponents::ReadFromJsonObject(CComponents& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	if (jsonObject.contains("schemas")){
-		const QJsonArray schemasArray = jsonObject["schemas"].toArray();
-		qsizetype schemasCount = schemasArray.size();
+		const QJsonObject schemasArray = jsonObject["schemas"].toObject();
 		QList<CSchema> schemasList;
-		for (int schemasIndex = 0; schemasIndex < schemasCount; ++schemasIndex){
-			CSchema schemas;
-			if (!CSchema::ReadFromJsonObject(schemas, schemasArray[schemasIndex].toObject(), globalObject)){
-				return false;
-			}
-			schemasList << schemas;
+		if (!COasTools::ExtractItemsFromObject(schemasList, schemasArray, globalObject)){
+			return false;
 		}
 		object.SetSchemas(schemasList);
 	}
 
 	if (jsonObject.contains("responses")){
-		const QJsonArray responsesArray = jsonObject["responses"].toArray();
-		qsizetype responsesCount = responsesArray.size();
+		const QJsonObject responsesArray = jsonObject["responses"].toObject();
 		QList<CResponse> responsesList;
-		for (int responsesIndex = 0; responsesIndex < responsesCount; ++responsesIndex){
-			CResponse responses;
-			if (!CResponse::ReadFromJsonObject(responses, responsesArray[responsesIndex].toObject(), globalObject)){
-				return false;
-			}
-			responsesList << responses;
+		if (!COasTools::ExtractItemsFromObject(responsesList, responsesArray, globalObject)){
+			return false;
 		}
 		object.SetResponses(responsesList);
 	}
 
 	if (jsonObject.contains("parameters")){
-		const QJsonArray parametersArray = jsonObject["parameters"].toArray();
-		qsizetype parametersCount = parametersArray.size();
+		const QJsonObject parametersArray = jsonObject["parameters"].toObject();
 		QList<CParameter> parametersList;
-		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
-			CParameter parameters;
-			if (!CParameter::ReadFromJsonObject(parameters, parametersArray[parametersIndex].toObject(), globalObject)){
-				return false;
-			}
-			parametersList << parameters;
+		if (!COasTools::ExtractItemsFromObject(parametersList, parametersArray, globalObject)){
+			return false;
 		}
 		object.SetParameters(parametersList);
 	}
 
 	if (jsonObject.contains("requestBodies")){
-		const QJsonArray requestBodiesArray = jsonObject["requestBodies"].toArray();
-		qsizetype requestBodiesCount = requestBodiesArray.size();
+		const QJsonObject requestBodiesArray = jsonObject["requestBodies"].toObject();
 		QList<CRequestBody> requestBodiesList;
-		for (int requestBodiesIndex = 0; requestBodiesIndex < requestBodiesCount; ++requestBodiesIndex){
-			CRequestBody requestBodies;
-			if (!CRequestBody::ReadFromJsonObject(requestBodies, requestBodiesArray[requestBodiesIndex].toObject(), globalObject)){
-				return false;
-			}
-			requestBodiesList << requestBodies;
+		if (!COasTools::ExtractItemsFromObject(requestBodiesList, requestBodiesArray, globalObject)){
+			return false;
 		}
 		object.SetRequestBodies(requestBodiesList);
 	}
 
 	if (jsonObject.contains("headers")){
-		const QJsonArray headersArray = jsonObject["headers"].toArray();
-		qsizetype headersCount = headersArray.size();
+		const QJsonObject headersArray = jsonObject["headers"].toObject();
 		QList<CHeader> headersList;
-		for (int headersIndex = 0; headersIndex < headersCount; ++headersIndex){
-			CHeader headers;
-			if (!CHeader::ReadFromJsonObject(headers, headersArray[headersIndex].toObject(), globalObject)){
-				return false;
-			}
-			headersList << headers;
+		if (!COasTools::ExtractItemsFromObject(headersList, headersArray, globalObject)){
+			return false;
 		}
 		object.SetHeaders(headersList);
 	}
 
 	if (jsonObject.contains("securitySchemes")){
-		const QJsonArray securitySchemesArray = jsonObject["securitySchemes"].toArray();
-		qsizetype securitySchemesCount = securitySchemesArray.size();
+		const QJsonObject securitySchemesArray = jsonObject["securitySchemes"].toObject();
 		QList<CSecurityScheme> securitySchemesList;
-		for (int securitySchemesIndex = 0; securitySchemesIndex < securitySchemesCount; ++securitySchemesIndex){
-			CSecurityScheme securitySchemes;
-			if (!CSecurityScheme::ReadFromJsonObject(securitySchemes, securitySchemesArray[securitySchemesIndex].toObject(), globalObject)){
-				return false;
-			}
-			securitySchemesList << securitySchemes;
+		if (!COasTools::ExtractItemsFromObject(securitySchemesList, securitySchemesArray, globalObject)){
+			return false;
 		}
 		object.SetSecuritySchemes(securitySchemesList);
 	}
 
 	if (jsonObject.contains("callbacks")){
-		const QJsonArray callbacksArray = jsonObject["callbacks"].toArray();
-		qsizetype callbacksCount = callbacksArray.size();
+		const QJsonObject callbacksArray = jsonObject["callbacks"].toObject();
 		QList<CPath> callbacksList;
-		for (int callbacksIndex = 0; callbacksIndex < callbacksCount; ++callbacksIndex){
-			CPath callbacks;
-			if (!CPath::ReadFromJsonObject(callbacks, callbacksArray[callbacksIndex].toObject(), globalObject)){
-				return false;
-			}
-			callbacksList << callbacks;
+		if (!COasTools::ExtractItemsFromObject(callbacksList, callbacksArray, globalObject)){
+			return false;
 		}
 		object.SetCallbacks(callbacksList);
 	}
 
 	if (jsonObject.contains("pathItems")){
-		const QJsonArray pathItemsArray = jsonObject["pathItems"].toArray();
-		qsizetype pathItemsCount = pathItemsArray.size();
+		const QJsonObject pathItemsArray = jsonObject["pathItems"].toObject();
 		QList<CPath> pathItemsList;
-		for (int pathItemsIndex = 0; pathItemsIndex < pathItemsCount; ++pathItemsIndex){
-			CPath pathItems;
-			if (!CPath::ReadFromJsonObject(pathItems, pathItemsArray[pathItemsIndex].toObject(), globalObject)){
-				return false;
-			}
-			pathItemsList << pathItems;
+		if (!COasTools::ExtractItemsFromObject(pathItemsList, pathItemsArray, globalObject)){
+			return false;
 		}
 		object.SetPathItems(pathItemsList);
 	}

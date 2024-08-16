@@ -15,6 +15,9 @@ namespace imtoas
 class CProperty
 {
 public:
+	[[nodiscard]] QString GetId() const;
+	void SetId(const QString& id);
+
 	[[nodiscard]] QString GetType() const;
 	void SetType(const QString& type);
 
@@ -27,6 +30,7 @@ public:
 	bool operator!=(const CProperty& other) const { return !(operator==(other)); }
 
 private:
+	QString m_id;
 	QString m_type;
 	QString m_format;
 };

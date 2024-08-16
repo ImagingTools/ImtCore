@@ -5,6 +5,20 @@ namespace imtoas
 {
 
 
+QString CServerVariable::GetId() const
+{
+	return m_id;
+}
+
+
+void CServerVariable::SetId(const QString& id)
+{
+	if (id != m_id){
+		m_id = id;
+	}
+}
+
+
 QList<QString> CServerVariable::GetEnumValues() const
 {
 	return m_enumValues;
@@ -86,6 +100,7 @@ bool CServerVariable::operator==(const CServerVariable& other) const
 
 	return retVal;
 }
+
 
 
 } // namespace imtoas

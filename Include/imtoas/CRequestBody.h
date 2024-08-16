@@ -35,7 +35,11 @@ public:
 	bool operator==(const CRequestBody& other) const;
 	bool operator!=(const CRequestBody& other) const { return !(operator==(other)); }
 
+	[[nodiscard]] QString GetId() const;
+	void SetId(const QString& id);
+
 private:
+	QString m_id;
 	QString m_description;
 	QList<CMediaType> m_content;
 	bool m_isRequired;

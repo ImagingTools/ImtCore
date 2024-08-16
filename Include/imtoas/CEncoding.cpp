@@ -1,6 +1,10 @@
 #include <imtoas/CEncoding.h>
 
 
+// ImtCore includes
+#include <imtoas/COasTools.h>
+
+
 namespace imtoas
 {
 
@@ -9,6 +13,19 @@ CEncoding::CEncoding()
 	:	m_isExplode(false),
 	m_allowReserved(false)
 {
+}
+
+
+QString CEncoding::GetId() const
+{
+	return m_id;
+}
+
+void CEncoding::SetId(const QString& id)
+{
+	if (id != m_id){
+		m_id = id;
+	}
 }
 
 
@@ -90,15 +107,10 @@ bool CEncoding::ReadFromJsonObject(CEncoding& object, const QJsonObject& jsonObj
 	}
 
 	if (jsonObject.contains("headers")){
-		const QJsonArray headersArray = jsonObject["headers"].toArray();
-		qsizetype headersCount = headersArray.size();
+		const QJsonObject headersArray = jsonObject["headers"].toObject();
 		QList<CHeader> headersList;
-		for (int headersIndex = 0; headersIndex < headersCount; ++headersIndex){
-			CHeader headers;
-			if (!CHeader::ReadFromJsonObject(headers, headersArray[headersIndex].toObject(), globalObject)){
-				return false;
-			}
-			headersList << headers;
+		if (!COasTools::ExtractItemsFromObject(headersList, headersArray, globalObject)){
+			return false;
 		}
 		object.SetHeaders(headersList);
 	}

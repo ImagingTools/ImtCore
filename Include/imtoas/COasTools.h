@@ -1,6 +1,10 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QList>
+#include <QtCore/QJsonObject>
+
 // forward declaration
 class QJsonObject;
 
@@ -27,8 +31,38 @@ static bool DeReferenceObject(
 			QJsonObject& derefed,
 			bool* isReferencePtr = nullptr);
 
+/**
+	\brief Extracts elements from \c objectsArray as if it were an array and sets the ID value equal to the key of the object and places result in \c container
+	\param container		- List where results will be written
+	\param objectsArray		- Json object to read items
+	\param lookupObject		- Used to find references
+	\return
+ */
+template <class _T>
+static bool ExtractItemsFromObject(QList<_T>& container, const QJsonObject& objectsArray, const QJsonObject& lookupObject);
 
 };
+
+
+
+template<class _T>
+bool COasTools::ExtractItemsFromObject(QList<_T>& container, const QJsonObject& objectsArray, const QJsonObject& lookupObject)
+{
+	for (QJsonObject::const_iterator arrayIter = objectsArray.constBegin(); arrayIter != objectsArray.constEnd(); ++arrayIter){
+		_T item;
+		QJsonObject arrayItemObject = arrayIter->toObject();
+		if (!DeReferenceObject(arrayItemObject, lookupObject, arrayItemObject)){
+			return false;
+		}
+		if (!_T::ReadFromJsonObject(item, arrayItemObject, lookupObject)){
+			return false;
+		}
+		item.SetId(arrayIter.key());
+		container << item;
+	}
+
+	return true;
+}
 
 
 } // namespace imtoas

@@ -1,6 +1,10 @@
 #include <imtoas/CRequestBody.h>
 
 
+// ImtCore includes
+#include <imtoas/COasTools.h>
+
+
 namespace imtoas
 {
 
@@ -8,6 +12,19 @@ namespace imtoas
 CRequestBody::CRequestBody()
 	:	m_isRequired(false)
 {
+}
+
+
+QString CRequestBody::GetId() const
+{
+	return m_id;
+}
+
+void CRequestBody::SetId(const QString& id)
+{
+	if (id != m_id){
+		m_id = id;
+	}
 }
 
 
@@ -69,13 +86,8 @@ bool CRequestBody::ReadFromJsonObject(CRequestBody& object, const QJsonObject& j
 		return false;
 	}
 	QList<CMediaType> contentList;
-	for (QJsonObject::const_iterator contentIter = contentArray.constBegin(); contentIter != contentArray.constEnd(); ++contentIter){
-		CMediaType content;
-		if (!CMediaType::ReadFromJsonObject(content, contentIter->toObject(), globalObject)){
-			return false;
-		}
-		content.SetId(contentIter.key());
-		contentList << content;
+	if (!COasTools::ExtractItemsFromObject(contentList, contentArray, globalObject)){
+		return false;
 	}
 	object.SetContent(contentList);
 

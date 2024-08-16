@@ -59,7 +59,11 @@ public:
 	bool operator==(const CParameter& other) const;
 	bool operator!=(const CParameter& other) const { return !(operator==(other)); }
 
+	[[nodiscard]] QString GetId() const;
+	void SetId(const QString& id);
+
 private:
+	QString m_id;
 	QString m_name;
 	QString m_in;
 	QString m_description;

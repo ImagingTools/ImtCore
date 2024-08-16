@@ -1,6 +1,10 @@
 #include <imtoas/CServer.h>
 
 
+// ImtCore includes
+#include <imtoas/COasTools.h>
+
+
 namespace imtoas
 {
 
@@ -62,15 +66,10 @@ bool CServer::ReadFromJsonObject(CServer& object, const QJsonObject& jsonObject,
 	}
 
 	if (jsonObject.contains("variables")){
-		const QJsonArray variablesArray = jsonObject["variables"].toArray();
-		qsizetype variablesCount = variablesArray.size();
+		const QJsonObject variablesArray = jsonObject["variables"].toObject();
 		QList<CServerVariable> variablesList;
-		for (int variablesIndex = 0; variablesIndex < variablesCount; ++variablesIndex){
-			CServerVariable variables;
-			if (!CServerVariable::ReadFromJsonObject(variables, variablesArray[variablesIndex].toObject(), globalObject)){
-				return false;
-			}
-			variablesList << variables;
+		if (!COasTools::ExtractItemsFromObject(variablesList, variablesArray, globalObject)){
+			return false;
 		}
 		object.SetVariables(variablesList);
 	}

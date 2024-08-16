@@ -5,13 +5,30 @@ namespace imtoas
 {
 
 
-QString CSecurityScheme::GetType() const
+CSecurityScheme::CSecurityScheme()
+	:m_type(T_HTTP)
+{
+}
+
+QString CSecurityScheme::GetId() const
+{
+	return m_id;
+}
+
+
+void CSecurityScheme::SetId(const QString& id)
+{
+	if (id != m_id){
+		m_id = id;
+	}
+}
+CSecurityScheme::Type CSecurityScheme::GetType() const
 {
 	return m_type;
 }
 
 
-void CSecurityScheme::SetType(const QString& type)
+void CSecurityScheme::SetType(Type type)
 {
 	if (type != m_type){
 		m_type = type;
@@ -91,40 +108,52 @@ void CSecurityScheme::SetOpenIdConnectUrl(const QString& openIdConnectUrl)
 
 bool CSecurityScheme::ReadFromJsonObject(CSecurityScheme& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
-	QVariant typeData = jsonObject.value("type").toVariant();
-	if (typeData.isNull()){
+	QByteArray typeId = jsonObject.value("type").toString().toUtf8();
+	if (typeId.isEmpty()){
 		return false;
 	}
-	object.SetType(typeData.toString());
+
+	Type type = T_API_KEY;
+	bool isTypeIdValid = FromString(typeId, type);
+	if (!isTypeIdValid){
+		return false;
+	}
+	object.SetType(type);
 
 	QVariant descriptionData = jsonObject.value("description").toVariant();
 	if (!descriptionData.isNull()){
 		object.SetDescription(descriptionData.toString());
 	}
 
-	QVariant nameData = jsonObject.value("name").toVariant();
-	if (nameData.isNull()){
-		return false;
-	}
-	object.SetName(nameData.toString());
+	if (type == T_API_KEY){
+		QVariant nameData = jsonObject.value("name").toVariant();
+		if (nameData.isNull()){
+			return false;
+		}
+		object.SetName(nameData.toString());
 
-	QVariant inData = jsonObject.value("in").toVariant();
-	if (inData.isNull()){
-		return false;
+		QVariant inData = jsonObject.value("in").toVariant();
+		if (inData.isNull()){
+			return false;
+		}
+		object.SetIn(inData.toString());
 	}
-	object.SetIn(inData.toString());
 
-	QVariant schemeData = jsonObject.value("scheme").toVariant();
-	if (schemeData.isNull()){
-		return false;
+	if (type == T_HTTP){
+		QVariant schemeData = jsonObject.value("scheme").toVariant();
+		if (schemeData.isNull()){
+			return false;
+		}
+		object.SetScheme(schemeData.toString());
 	}
-	object.SetScheme(schemeData.toString());
 
-	QVariant openIdConnectUrlData = jsonObject.value("openIdConnectUrl").toVariant();
-	if (openIdConnectUrlData.isNull()){
-		return false;
+	if (type == T_OPEN_ID_CONNECT){
+		QVariant openIdConnectUrlData = jsonObject.value("openIdConnectUrl").toVariant();
+		if (openIdConnectUrlData.isNull()){
+			return false;
+		}
+		object.SetOpenIdConnectUrl(openIdConnectUrlData.toString());
 	}
-	object.SetOpenIdConnectUrl(openIdConnectUrlData.toString());
 
 	return true;
 }
@@ -142,6 +171,7 @@ bool CSecurityScheme::operator==(const CSecurityScheme& other) const
 
 	return retVal;
 }
+
 
 
 } // namespace imtoas

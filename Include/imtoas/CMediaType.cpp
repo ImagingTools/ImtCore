@@ -68,15 +68,10 @@ bool CMediaType::ReadFromJsonObject(CMediaType& object, const QJsonObject& jsonO
 	}
 
 	if (jsonObject.contains("encoding")){
-		const QJsonArray encodingArray = jsonObject["encoding"].toArray();
-		qsizetype encodingCount = encodingArray.size();
+		const QJsonObject encodingArray = jsonObject["encoding"].toObject();
 		QList<CEncoding> encodingList;
-		for (int encodingIndex = 0; encodingIndex < encodingCount; ++encodingIndex){
-			CEncoding encoding;
-			if (!CEncoding::ReadFromJsonObject(encoding, encodingArray[encodingIndex].toObject(), globalObject)){
-				return false;
-			}
-			encodingList << encoding;
+		if (!COasTools::ExtractItemsFromObject(encodingList, encodingArray, globalObject)){
+			return false;
 		}
 		object.SetEncodings(encodingList);
 	}

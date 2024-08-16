@@ -1,6 +1,10 @@
 #include <imtoas/COperation.h>
 
 
+// ImtCore includes
+#include <imtoas/COasTools.h>
+
+
 namespace imtoas
 {
 
@@ -202,15 +206,10 @@ bool COperation::ReadFromJsonObject(COperation& object, const QJsonObject& jsonO
 	}
 
 	if (jsonObject.contains("responses")){
-		const QJsonArray responsesArray = jsonObject["responses"].toArray();
-		qsizetype responsesCount = responsesArray.size();
+		const QJsonObject responsesArray = jsonObject["responses"].toObject();
 		QList<CResponse> responsesList;
-		for (int responsesIndex = 0; responsesIndex < responsesCount; ++responsesIndex){
-			CResponse responses;
-			if (!CResponse::ReadFromJsonObject(responses, responsesArray[responsesIndex].toObject(), globalObject)){
-				return false;
-			}
-			responsesList << responses;
+		if (!COasTools::ExtractItemsFromObject(responsesList, responsesArray, globalObject)){
+			return false;
 		}
 		object.SetResponses(responsesList);
 	}
@@ -223,6 +222,7 @@ bool COperation::ReadFromJsonObject(COperation& object, const QJsonObject& jsonO
 	if (jsonObject.contains("security")){
 		const QJsonArray securityArray = jsonObject["security"].toArray();
 		qsizetype securityCount = securityArray.size();
+		/// \todo replace it with \c CSecurityScheme and resolve it!!
 		QList<CSecurity> securityList;
 		for (int securityIndex = 0; securityIndex < securityCount; ++securityIndex){
 			CSecurity security;

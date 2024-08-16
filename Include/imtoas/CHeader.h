@@ -18,6 +18,9 @@ namespace imtoas
 class CHeader
 {
 public:
+	[[nodiscard]] QString GetId() const;
+	void SetId(const QString& id);
+
 	[[nodiscard]] CSchema GetSchema() const;
 	void SetSchema(const CSchema& schema);
 	
@@ -29,7 +32,9 @@ public:
 	bool operator==(const CHeader& other) const;
 	bool operator!=(const CHeader& other) const { return !(operator==(other)); }
 
+
 private:
+	QString m_id;
 	CSchema m_schema;
 	QString m_description;
 };

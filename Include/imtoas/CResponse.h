@@ -20,6 +20,9 @@ namespace imtoas
 class CResponse
 {
 public:
+	[[nodiscard]] QString GetId() const;
+	void SetId(const QString& id);
+
 	[[nodiscard]] QString GetDescription() const;
 	void SetDescription(const QString& description);
 
@@ -34,7 +37,9 @@ public:
 	bool operator==(const CResponse& other) const;
 	bool operator!=(const CResponse& other) const { return !(operator==(other)); }
 
+
 private:
+	QString m_id;
 	QString m_description;
 	QList<CHeader> m_headers;
 	QList<CMediaType> m_contentList;

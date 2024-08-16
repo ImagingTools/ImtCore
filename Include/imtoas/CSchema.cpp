@@ -1,8 +1,26 @@
 #include <imtoas/CSchema.h>
 
 
+// ImtCore includes
+#include <imtoas/COasTools.h>
+
+
 namespace imtoas
 {
+
+
+QString CSchema::GetId() const
+{
+	return m_id;
+}
+
+
+void CSchema::SetId(const QString& id)
+{
+	if (id != m_id){
+		m_id = id;
+	}
+}
 
 
 QString CSchema::GetType() const
@@ -79,15 +97,10 @@ bool CSchema::ReadFromJsonObject(CSchema& object, const QJsonObject& jsonObject,
 	}
 
 	if (jsonObject.contains("properties")){
-		const QJsonArray propertiesArray = jsonObject["properties"].toArray();
-		qsizetype propertiesCount = propertiesArray.size();
+		const QJsonObject propertiesArray = jsonObject["properties"].toObject();
 		QList<CProperty> propertiesList;
-		for (int propertiesIndex = 0; propertiesIndex < propertiesCount; ++propertiesIndex){
-			CProperty properties;
-			if (!CProperty::ReadFromJsonObject(properties, propertiesArray[propertiesIndex].toObject(), globalObject)){
-				return false;
-			}
-			propertiesList << properties;
+		if (!COasTools::ExtractItemsFromObject(propertiesList, propertiesArray, globalObject)){
+			return false;
 		}
 		object.SetProperties(propertiesList);
 	}

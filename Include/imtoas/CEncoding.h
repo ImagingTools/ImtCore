@@ -21,6 +21,9 @@ class CEncoding
 public:
 	CEncoding();
 
+	[[nodiscard]] QString GetId() const;
+	void SetId(const QString& id);
+
 	[[nodiscard]] QString GetContentType() const;
 	void SetContentType(const QString& contentType);
 
@@ -42,6 +45,7 @@ public:
 	bool operator!=(const CEncoding& other) const { return !(operator==(other)); }
 
 private:
+	QString m_id;
 	QString m_contentType;
 	QList<CHeader> m_headers;
 	QString m_style;

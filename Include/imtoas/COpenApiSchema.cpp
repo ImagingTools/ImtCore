@@ -1,6 +1,10 @@
 #include <imtoas/COpenApiSchema.h>
 
 
+// ImtCore includes
+#include <imtoas/COasTools.h>
+
+
 namespace imtoas
 {
 
@@ -147,13 +151,8 @@ bool COpenApiSchema::ReadFromJsonObject(COpenApiSchema& object, const QJsonObjec
 	if (jsonObject.contains("paths")){
 		const QJsonObject pathsArray = jsonObject["paths"].toObject();
 		QList<CPath> pathsList;
-		for (QJsonObject::const_iterator pathsIter = pathsArray.constBegin(); pathsIter != pathsArray.constEnd(); ++pathsIter){
-			CPath pathItem;
-			if (!CPath::ReadFromJsonObject(pathItem, pathsIter->toObject(), globalObject)){
-				return false;
-			}
-			pathItem.SetId(pathsIter.key());
-			pathsList << pathItem;
+		if (!COasTools::ExtractItemsFromObject(pathsList, pathsArray, globalObject)){
+			return false;
 		}
 		object.SetPaths(pathsList);
 	}

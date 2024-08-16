@@ -5,6 +5,21 @@ namespace imtoas
 {
 
 
+
+QString CHeader::GetId() const
+{
+	return m_id;
+}
+
+
+void CHeader::SetId(const QString& id)
+{
+	if (id != m_id){
+		m_id = id;
+	}
+}
+
+
 CSchema CHeader::GetSchema() const
 {
 	return m_schema;

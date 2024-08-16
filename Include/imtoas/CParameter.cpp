@@ -6,12 +6,26 @@ namespace imtoas
 
 
 CParameter::CParameter()
-	:	m_isRequired(false),
+	:m_isRequired(false),
 	m_isDeprecated(false),
-	m_isAllowEmptyValue(false),
+	m_isAllowEmptyValue(true),
 	m_isExplode(false),
 	m_isAllowReserved(false)
 {
+}
+
+
+QString CParameter::GetId() const
+{
+	return m_id;
+}
+
+
+void CParameter::SetId(const QString& id)
+{
+	if (id != m_id){
+		m_id = id;
+	}
 }
 
 

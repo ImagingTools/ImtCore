@@ -1,8 +1,26 @@
 #include <imtoas/CResponse.h>
 
 
+// ImtCore includes
+#include <imtoas/COasTools.h>
+
+
 namespace imtoas
 {
+
+
+QString CResponse::GetId() const
+{
+	return m_id;
+}
+
+
+void CResponse::SetId(const QString& id)
+{
+	if (id != m_id){
+		m_id = id;
+	}
+}
 
 
 QString CResponse::GetDescription() const
@@ -55,29 +73,19 @@ bool CResponse::ReadFromJsonObject(CResponse& object, const QJsonObject& jsonObj
 	}
 
 	if (jsonObject.contains("headers")){
-		const QJsonArray headersArray = jsonObject["headers"].toArray();
-		qsizetype headersCount = headersArray.size();
+		const QJsonObject headersArray = jsonObject["headers"].toObject();
 		QList<CHeader> headersList;
-		for (int headersIndex = 0; headersIndex < headersCount; ++headersIndex){
-			CHeader headers;
-			if (!CHeader::ReadFromJsonObject(headers, headersArray[headersIndex].toObject(), globalObject)){
-				return false;
-			}
-			headersList << headers;
+		if (!COasTools::ExtractItemsFromObject(headersList, headersArray, globalObject)){
+			return false;
 		}
 		object.SetHeaders(headersList);
 	}
 
 	if (jsonObject.contains("content")){
-		const QJsonArray contentArray = jsonObject["content"].toArray();
-		qsizetype contentCount = contentArray.size();
+		const QJsonObject contentArray = jsonObject["content"].toObject();
 		QList<CMediaType> contentList;
-		for (int contentIndex = 0; contentIndex < contentCount; ++contentIndex){
-			CMediaType content;
-			if (!CMediaType::ReadFromJsonObject(content, contentArray[contentIndex].toObject(), globalObject)){
-				return false;
-			}
-			contentList << content;
+		if (!COasTools::ExtractItemsFromObject(contentList, contentArray, globalObject)){
+			return false;
 		}
 		object.SetContentList(contentList);
 	}
