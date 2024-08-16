@@ -23,17 +23,25 @@ public:
 	virtual qint64 AddDocument(const QByteArray& data) override;
 	virtual qint64 AddDocument(qint64 data) override;
 	virtual qint64 AddDocument(const QByteArray& key, const QByteArray& data) override;
+	virtual QByteArray GetDocument() override;
 	virtual QByteArray GetDocument(qint64 key) override;
 	virtual QByteArray GetDocument(const QByteArray& key) override;
 	virtual bool HasRecord(qint64 key) override;
 	virtual bool HasRecord(const QByteArray& key) override;
 	virtual bool UpdateDocument(qint64 key,  const QByteArray& data) override;
 	virtual bool UpdateDocument(const QByteArray& key, const QByteArray& data) override;
-	virtual qint64 GetKey(const QByteArray& value) override;
+	virtual qint64 GetKey(const QByteArray& value = QByteArray()) override;
 	virtual qint64 GetFirstKey() override;
 	virtual qint64 GetLastKey() override;
-	virtual QString GetStringKey(const QByteArray& value) override;
+	virtual QString GetStringKey(const QByteArray& value = QByteArray()) override;
 	virtual bool CreateIndex() override;
+	virtual bool MoveTo(qint64 key) override;
+	virtual bool MoveTo(const QByteArray& key) override;
+	virtual bool MoveToFirst() override;
+	virtual bool MoveToLast() override;
+	virtual bool MoveToLowerBound(qint64 key) override;
+	virtual bool MoveToLowerBound(const QByteArray& key) override;
+	virtual bool MoveToNext() override;
 	bool CloseTable(mdbx::env_managed& env);
 
 

@@ -122,6 +122,24 @@ qint64 CDocumentTable::AddDocument(const char *data, int count, const QByteArray
 }
 
 
+QByteArray CDocumentTable::GetDocument()
+{
+	QByteArray doc = QByteArray();
+
+	try{
+		mdbx::cursor::move_result result = m_cursor.current();
+		std::string value = result.value.as_string();
+		doc = QByteArray::fromStdString(value);
+	}
+	catch(...){
+		doc = QByteArray();
+	}
+
+	return doc;
+
+}
+
+
 QByteArray CDocumentTable::GetDocument(qint64 key)
 {
 	QByteArray doc = QByteArray();
@@ -130,7 +148,7 @@ QByteArray CDocumentTable::GetDocument(qint64 key)
 	try{
 		mdbx::cursor::move_result result = m_cursor.find(keySlice);
 		std::string value = result.value.as_string();
-		doc = QByteArray(value.data());
+		doc = QByteArray::fromStdString(value);
 	}
 	catch(...){
 		doc = QByteArray();
@@ -148,7 +166,7 @@ QByteArray CDocumentTable::GetDocument(const QByteArray &key)
 	try{
 		mdbx::cursor::move_result result = m_cursor.find(keySlice);
 		std::string value = result.value.as_string();
-		doc = QByteArray(value.data());
+		doc = QByteArray::fromStdString(value);
 	}
 	catch(...){
 		doc = QByteArray();
@@ -341,7 +359,7 @@ QString CDocumentTable::GetStringKey(const QByteArray &value)
 	//qDebug() << "CDocumentTable::GetKey";
 
 	try{
-		QString key =QString();
+		QString key = QString();
 
 		if(m_hasIndex){
 			mdbx::slice valueSlice(value);
@@ -443,6 +461,138 @@ bool CDocumentTable::CreateIndex()
 }
 
 
+bool CDocumentTable::MoveTo(qint64 key)
+{
+	bool ok = false;
+
+	try{
+		mdbx::slice keySlice(&key, 8);
+		mdbx::cursor::move_result result = m_cursor.find(keySlice);
+		if(result.done){
+			ok = true;
+		}
+	}
+	catch(...){
+		ok = false;
+	}
+
+	return ok;
+}
+
+
+bool CDocumentTable::MoveTo(const QByteArray &key)
+{
+	bool ok = false;
+
+	try{
+		mdbx::slice keySlice(key.data(), key.length());
+		mdbx::cursor::move_result result = m_cursor.find(keySlice);
+		if(result.done){
+			ok = true;
+		}
+	}
+	catch(...){
+		ok = false;
+	}
+
+	return ok;
+}
+
+
+bool CDocumentTable::MoveToFirst()
+{
+	bool ok = false;
+
+	try{
+		mdbx::cursor::move_result result = m_cursor.to_first(false);
+		if(result.done){
+			ok = true;
+		}
+	}
+	catch(...){
+		ok = false;
+	}
+
+	return ok;
+
+}
+
+
+bool CDocumentTable::MoveToLast()
+{
+	bool ok = false;
+
+	try{
+		mdbx::cursor::move_result result = m_cursor.to_last(false);
+		if(result.done){
+			ok = true;
+		}
+	}
+	catch(...){
+		ok = false;
+	}
+
+	return ok;
+}
+
+
+bool CDocumentTable::MoveToLowerBound(qint64 key)
+{
+	bool ok = false;
+
+	try{
+		mdbx::slice keySlice(&key, 8);
+		mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice, false);
+		if(result.done){
+			ok = true;
+		}
+	}
+	catch(...){
+		ok = false;
+	}
+
+	return ok;
+}
+
+
+bool CDocumentTable::MoveToLowerBound(const QByteArray &key)
+{
+	bool ok = false;
+
+	try{
+		mdbx::slice keySlice(key.data(), key.length());
+		mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice, false);
+		if(result.done){
+			ok = true;
+		}
+
+	}
+	catch(...){
+		ok = false;
+	}
+
+	return ok;
+}
+
+
+bool CDocumentTable::MoveToNext()
+{
+	bool ok = false;
+
+	try{
+		mdbx::cursor::move_result result = m_cursor.to_next(false);
+		if(result.done){
+			ok = true;
+		}
+	}
+	catch(...){
+		ok = false;
+	}
+
+	return ok;
+}
+
+
 bool CDocumentTable::Exists(const QString& name)
 {
 	bool ok = true;
@@ -457,6 +607,7 @@ bool CDocumentTable::Exists(const QString& name)
 	return ok;
 
 }
+
 
 bool CDocumentTable::CloseTable(mdbx::env_managed& env)
 {
