@@ -20,7 +20,7 @@
 #include <imtrest/CWorkerManagerComp.h>
 #include <imtrest/CServerLogDataProviderComp.h>
 #include <imtrest/CTcpProtocolEngineComp.h>
-
+#include <imtrest/CDelegatedServletComp.h>
 
 
 /**
@@ -44,7 +44,7 @@ typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtrest::CHttpClientRequ
 typedef imtrest::CWorkerManagerComp WorkerManaqer;
 typedef imtrest::CServerLogDataProviderComp ServerLogDataProvider;
 typedef imtrest::CTcpProtocolEngineComp TcpProtocolEngine;
-
+typedef imtrest::CDelegatedServletComp DelegatedServlet;
 
 
 } // namespace ImtRestPck

@@ -95,10 +95,12 @@ ConstResponsePtr CDelegatedServletComp::ProcessRequest(const IRequest& request, 
 
 	// Print all supported slave handlers of the API to the user:
 	if (slaveCommandId.isEmpty()) {
-		QByteArray body = QByteArray("<html><head><title>API-Info</title></head><body><p>Supported paths are: </p></body></html>");
+		QStringList slavehandlers;
+
+		QByteArray body = QString("<html><head><title>API-Info</title></head><body><p>Supported paths are: %1</p></body></html>").arg(slavehandlers.join("\n")).toUtf8();
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId));
+		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
 
 		return responsePtr;
 	}

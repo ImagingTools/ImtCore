@@ -84,6 +84,11 @@ I_EXPORT_COMPONENT(
 			"General TCP protocol engine",
 			"Tcp Connection Server");
 
+I_EXPORT_COMPONENT(
+			DelegatedServlet,
+			"Delegator of the engine requests",
+			"Delegator Request Communication Slave API");
+
 
 } // namespace ImtRestPck
 
