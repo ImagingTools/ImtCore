@@ -36,7 +36,7 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	}
 
 	if (userId.isEmpty()){
-		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session model is invalid.").arg(token);
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session model is invalid.").arg(qPrintable(token));
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
 
 		return nullptr;
@@ -49,7 +49,8 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User with ID '%1' was not found.").arg(token).arg(userId);
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User with ID '%1' was not found.").arg(qPrintable(token)).arg(qPrintable(userId));
+
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
 
 		return nullptr;
@@ -58,7 +59,8 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	istd::TDelPtr<imtauth::IUserInfo> clonedUserInfoPtr;
 	clonedUserInfoPtr.SetCastedOrRemove(userInfoPtr->CloneMe());
 	if (!clonedUserInfoPtr.IsValid()){
-		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Error when trying to clone an user.").arg(token).arg(userId);
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Error when trying to clone an user.").arg(qPrintable(token)).arg(qPrintable(userId));
+
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
 
 		return nullptr;

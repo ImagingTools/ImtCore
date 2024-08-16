@@ -70,7 +70,8 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 
 			istd::TDelPtr<imtauth::ISession> sessionInstancePtr = m_sessionInfoFactCompPtr.CreateInstance();
 			if (!sessionInstancePtr.IsValid()){
-				errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session factory created an invalid object.").arg(token);
+				errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session factory created an invalid object.").arg(qPrintable(token));
+
 				SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
 
 				return nullptr;
@@ -78,7 +79,10 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 
 			iser::CJsonMemReadArchive archive(sessionJson);
 			if (!sessionInstancePtr->Serialize(archive)){
-				errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session JSON '%2' cannot be serialized.").arg(token).arg(sessionJson);
+				errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session JSON '%2' cannot be serialized.")
+							.arg(qPrintable(token))
+							.arg(qPrintable(sessionJson));
+
 				SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
 
 				return nullptr;
@@ -90,6 +94,7 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 
 	if (userId.isEmpty()){
 		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User-ID cannot be found.");
+
 		SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
 
 		return nullptr;
@@ -115,6 +120,7 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 	imtbase::CTreeItemModel* dataModelPtr = userModelPtr->GetTreeItemModel("data");
 	if (dataModelPtr == nullptr){
 		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: The user's response model does not contain 'data'.");
+
 		SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
 
 		return nullptr;
@@ -124,7 +130,8 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 
 	istd::TDelPtr<imtauth::IUserInfo> userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
 	if (!userInstancePtr.IsValid()){
-		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User factory created an invalid object.").arg(token);
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User factory created an invalid object.").arg(qPrintable(token));
+
 		SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
 
 		return nullptr;
@@ -132,7 +139,8 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 
 	iser::CJsonMemReadArchive archive(userJson);
 	if (!userInstancePtr->Serialize(archive)){
-		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User JSON '%2' cannot be serialized.").arg(token).arg(userJson);
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User JSON '%2' cannot be serialized.").arg(qPrintable(token)).arg(qPrintable(userJson));
+
 		SendErrorMessage(0, errorMessage, "CRemoteGqlContextControllerComp");
 
 		return nullptr;
