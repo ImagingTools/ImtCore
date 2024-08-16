@@ -64,10 +64,9 @@ void CSchema::SetEnumValues(const QList<QString>& enumValues)
 bool CSchema::ReadFromJsonObject(CSchema& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant typeData = jsonObject.value("type").toVariant();
-	if (typeData.isNull()){
-		return false;
+	if (!typeData.isNull()){
+		object.SetType(typeData.toString());
 	}
-	object.SetType(typeData.toString());
 
 	if (jsonObject.contains("required")){
 		const QJsonArray requiredArray = jsonObject["required"].toArray();
