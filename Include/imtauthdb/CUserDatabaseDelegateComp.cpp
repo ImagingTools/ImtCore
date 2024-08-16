@@ -172,7 +172,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	if (oldObjectPtr->GetLastConnection() != userInfoPtr->GetLastConnection()){
 		retVal += QString(R"(UPDATE "Users" SET "Document" = jsonb_set("Document", '{LastConnection}', '"%1"', true) WHERE "DocumentId" ='%2' AND "IsActive" = true;)")
 				.arg(userInfoPtr->GetLastConnection().toString(Qt::ISODate))
-				.arg(objectId).toUtf8();
+				.arg(qPrintable(objectId)).toUtf8();
 	}
 	else{
 		QByteArray documentContent;
