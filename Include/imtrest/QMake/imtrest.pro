@@ -2,7 +2,7 @@ TARGET = imtrest
 
 include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
-include($(IACFDIR)/Config/QMake/zlib.pri)
+include($$PWD/../../../Config/QMake/Quazip.pri)
 
 CONFIG += network
 QT += websockets

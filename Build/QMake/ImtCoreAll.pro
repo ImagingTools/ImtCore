@@ -30,6 +30,14 @@ SUBDIRS += DdlCodeCreator
 DdlCodeCreator.file = ../../Impl/DdlCodeCreatorExe/QMake/DdlCodeCreatorExe.pro
 DdlCodeCreator.depends = imtddl ImtDdlPck
 
+SUBDIRS += ImtSdlPck
+ImtSdlPck.file = ../../Impl/ImtSdlPck/QMake/ImtSdlPck.pro
+ImtSdlPck.depends = imtsdl
+
+SUBDIRS += SdlCodeGenerator
+SdlCodeGenerator.file = ../../Impl/SdlCodeGeneratorExe/QMake/SdlCodeGeneratorExe.pro
+SdlCodeGenerator.depends = imtsdl ImtSdlPck
+
 SUBDIRS += imtdev
 imtdev.file = ../../Include/imtdev/QMake/imtdev.pro
 
@@ -60,10 +68,6 @@ imtauthdb.file = ../../Include/imtauthdb/QMake/imtauthdb.pro
 SUBDIRS += imtauthgql
 imtauthgql.file = ../../Include/imtauthgql/QMake/imtauthgql.pro
 
-SUBDIRS += imtauthgui
-imtauthgui.file = ../../Include/imtauthgui/QMake/imtauthgui.pro
-imtauthgui.depends = DesignTokenCreator imtgui
-
 SUBDIRS += imtcrypt
 imtcrypt.file = ../../Include/imtcrypt/QMake/imtcrypt.pro
 
@@ -85,28 +89,11 @@ imtrepo.file = ../../Include/imtrepo/QMake/imtrepo.pro
 SUBDIRS += imtreport
 imtreport.file = ../../Include/imtreport/QMake/imtreport.pro
 
-SUBDIRS += imtreportgui
-imtreportgui.file = ../../Include/imtreportgui/QMake/imtreportgui.pro
-
 SUBDIRS += imt3d
 imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 
-SUBDIRS += imtgui
-imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
-imtgui.depends = imtstyle imtwidgets DesignTokenCreator DdlCodeCreator
-
-SUBDIRS += imtloggui
-imtloggui.file = ../../Include/imtloggui/QMake/imtloggui.pro
-
 SUBDIRS += imtlog
 imtlog.file = ../../Include/imtlog/QMake/imtlog.pro
-
-SUBDIRS += imt3dview
-imt3dview.file = ../../Include/imt3dview/QMake/imt3dview.pro
-
-SUBDIRS += imt3dgui
-imt3dgui.file = ../../Include/imt3dgui/QMake/imt3dgui.pro
-imt3dgui.depends = DesignTokenCreator
 
 !macx {
 	SUBDIRS += imtfile
@@ -128,24 +115,14 @@ imtlic.file = ../../Include/imtlic/QMake/imtlic.pro
 SUBDIRS += imtlicgql
 imtlicgql.file = ../../Include/imtlicgql/QMake/imtlicgql.pro
 
-SUBDIRS += imtlicgui
-imtlicgui.file = ../../Include/imtlicgui/QMake/imtlicgui.pro
-imtlicgui.depends = DesignTokenCreator
-
 SUBDIRS += imtgql
 imtgql.file = ../../Include/imtgql/QMake/imtgql.pro
-
-SUBDIRS += imtguigql
-imtguigql.file = ../../Include/imtguigql/QMake/imtguigql.pro
 
 SUBDIRS += imtdb
 imtdb.file = ../../Include/imtdb/QMake/imtdb.pro
 
 SUBDIRS += imtlicdb
 imtlicdb.file = ../../Include/imtlicdb/QMake/imtlicdb.pro
-
-SUBDIRS += imtdbgui
-imtdbgui.file = ../../Include/imtdbgui/QMake/imtdbgui.pro
 
 SUBDIRS += imtimg
 imtimg.file = ../../Include/imtimg/QMake/imtimg.pro
@@ -155,6 +132,42 @@ imtclientgql.file = ../../Include/imtclientgql/QMake/imtclientgql.pro
 
 SUBDIRS += imtservice
 imtservice.file = ../../Include/imtservice/QMake/imtservice.pro
+
+# GUI libraries
+SUBDIRS += imtgui
+imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
+imtgui.depends = imtstyle imtwidgets DesignTokenCreator DdlCodeCreator
+
+SUBDIRS += imtauthgui
+imtauthgui.file = ../../Include/imtauthgui/QMake/imtauthgui.pro
+imtauthgui.depends = DesignTokenCreator imtgui
+
+SUBDIRS += imtreportgui
+imtreportgui.file = ../../Include/imtreportgui/QMake/imtreportgui.pro
+imtreportgui.depends = imtgui
+
+SUBDIRS += imtloggui
+imtloggui.file = ../../Include/imtloggui/QMake/imtloggui.pro
+
+SUBDIRS += imt3dgui
+imt3dgui.file = ../../Include/imt3dgui/QMake/imt3dgui.pro
+imt3dgui.depends = DesignTokenCreator
+
+SUBDIRS += imt3dview
+imt3dview.file = ../../Include/imt3dview/QMake/imt3dview.pro
+
+SUBDIRS += imtlicgui
+imtlicgui.file = ../../Include/imtlicgui/QMake/imtlicgui.pro
+imtlicgui.depends = DesignTokenCreator
+
+SUBDIRS += imtguigql
+imtguigql.file = ../../Include/imtguigql/QMake/imtguigql.pro
+imtguigql.depends = DesignTokenCreator
+
+SUBDIRS += imtdbgui
+imtdbgui.file = ../../Include/imtdbgui/QMake/imtdbgui.pro
+imtdbgui.depends = DesignTokenCreator
+
 
 # QML modules
 SUBDIRS += imtguiqml
@@ -319,12 +332,4 @@ ImtServicePck.depends = imtservice
 SUBDIRS += ImtControlsGallery
 ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
 ImtControlsGallery.depends = imtgui imtqml imtstyle imtstylecontrolsqml
-
-SUBDIRS += ImtSdlPck
-ImtSdlPck.file = ../../Impl/ImtSdlPck/QMake/ImtSdlPck.pro
-ImtSdlPck.depends = imtsdl
-
-SUBDIRS += SdlCodeGenerator
-SdlCodeGenerator.file = ../../Impl/SdlCodeGeneratorExe/QMake/SdlCodeGeneratorExe.pro
-SdlCodeGenerator.depends = imtsdl ImtSdlPck
 

@@ -1,7 +1,6 @@
 TARGET = imtcom
 
 include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
-include($(ACFCONFIGDIR)/QMake/AcfStd.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 CONFIG += network
