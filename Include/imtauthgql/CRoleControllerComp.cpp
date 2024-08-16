@@ -36,7 +36,7 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 	}
 
 	if (roleInfoPtr == nullptr){
-		errorMessage = QString("Unable to get role with ID: '%1'. The role does not exist.").arg(objectId);
+		errorMessage = QString("Unable to get role with ID: '%1'. The role does not exist.").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "CRoleControllerComp");
 
 		return nullptr;
@@ -105,7 +105,7 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 	QByteArray itemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
 	imtbase::CTreeItemModel itemModel;
 	if (!itemModel.CreateFromJson(itemData)){
-		errorMessage = QString("Unable to create a role object. Error: Failed to create a tree model from json '%1'").arg(itemData);
+		errorMessage = QString("Unable to create a role object. Error: Failed to create a tree model from json '%1'").arg(qPrintable(itemData));
 		SendErrorMessage(0, errorMessage, "CRoleControllerComp");
 
 		return nullptr;
@@ -142,7 +142,7 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 					QByteArray currentProductId = currentRoleInfoPtr->GetProductId();
 
 					if (currentRoleId == roleId && currentProductId == productId){
-						errorMessage = QString("Role with ID: '%1' already exists").arg(currentRoleId);
+						errorMessage = QString("Role with ID: '%1' already exists").arg(qPrintable(currentRoleId));
 						return nullptr;
 					}
 				}

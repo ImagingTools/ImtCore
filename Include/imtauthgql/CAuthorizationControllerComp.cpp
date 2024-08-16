@@ -18,7 +18,8 @@ namespace imtauthgql
 
 imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const
 {
-	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'.").arg(login));
+	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'.").arg(qPrintable(login)));
+
 	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 
 	return nullptr;
@@ -39,7 +40,8 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 
 	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParam("input");
 	if (gqlInputParamPtr == nullptr){
-		errorMessage = QString("Unable to create response for request with ID: '%1'. Error: GraphQL input params is invalid.").arg(gqlRequest.GetCommandId());
+		errorMessage = QString("Unable to create response for request with ID: '%1'. Error: GraphQL input params is invalid.").arg(qPrintable(gqlRequest.GetCommandId()));
+
 		SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 
 		return nullptr;
@@ -79,7 +81,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
 		if (systemInfo.enabled){
 			int index = m_systemIdsAttrPtr.FindValue(systemInfo.systemId);
-			Q_ASSERT_X(index >= 0, "CAuthorizationControllerComp::CreateInternalResponse", QString("System-ID '%1' cannot found").arg(systemInfo.systemId).toUtf8());
+			Q_ASSERT_X(index >= 0, "CAuthorizationControllerComp::CreateInternalResponse", QString("System-ID '%1' cannot found").arg(qPrintable(systemInfo.systemId)).toUtf8());
 
 			const imtauth::ICredentialController* credentialControllerPtr = m_credentialControllersCompPtr[index];
 			Q_ASSERT_X(credentialControllerPtr != nullptr, "CAuthorizationControllerComp::CreateInternalResponse", "Invalid credential controller");
@@ -123,7 +125,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 	userInfoPtr->SetLastConnection(QDateTime::currentDateTimeUtc());
 
 	if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr)){
-		errorMessage = QString("Unable to set last connection info for user with login: '%1'").arg(login);
+		errorMessage = QString("Unable to set last connection info for user with login: '%1'").arg(qPrintable(login));
 		SendWarningMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 	}
 

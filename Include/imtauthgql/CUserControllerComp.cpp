@@ -45,7 +45,7 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to get an user with ID: '%1'. The user does not exist.").arg(userId);
+		errorMessage = QString("Unable to get an user with ID: '%1'. The user does not exist.").arg(qPrintable(userId));
 		SendErrorMessage(0, errorMessage, "CRoleControllerComp");
 
 		return nullptr;
@@ -149,7 +149,7 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 		if (!userIds.isEmpty()){
 			QByteArray userObjectId = userIds[0];
 			if (userObjectId != objectId){
-				errorMessage = QString("Unable to set username to user. Error: username '%1' already exists").arg(username);
+				errorMessage = QString("Unable to set username to user. Error: username '%1' already exists").arg(qPrintable(username));
 				SendWarningMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 				return nullptr;
@@ -298,7 +298,7 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 	QByteArray itemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
 	imtbase::CTreeItemModel itemModel;
 	if (!itemModel.CreateFromJson(itemData)){
-		errorMessage = QString("Unable to create an user object. Error: Failed to create a tree model from json '%1'").arg(itemData);
+		errorMessage = QString("Unable to create an user object. Error: Failed to create a tree model from json '%1'").arg(qPrintable(itemData));
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
 		return nullptr;
@@ -461,7 +461,7 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to delete an user with ID: '%1'. User does not exist.").arg(objectId);
+		errorMessage = QString("Unable to delete an user with ID: '%1'. User does not exist.").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 		return nullptr;
@@ -476,7 +476,7 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 			if (contextUserInfoPtr != nullptr){
 				QByteArray userId = contextUserInfoPtr->GetId();
 				if (removedUserId == userId){
-					errorMessage = QString("It is impossible to delete yourself. User-ID: '%1'.").arg(userId);
+					errorMessage = QString("It is impossible to delete yourself. User-ID: '%1'.").arg(qPrintable(userId));
 					SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 					return nullptr;
@@ -488,7 +488,7 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
 		if(!systemInfo.systemId.isEmpty()){
-			errorMessage = QString("Unable to delete an user with User-ID: '%1'. The user is on a different system.").arg(removedUserId);
+			errorMessage = QString("Unable to delete an user with User-ID: '%1'. The user is on a different system.").arg(qPrintable(removedUserId));
 			SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 			return nullptr;

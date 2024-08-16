@@ -39,7 +39,7 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 	}
 
 	if (userGroupInfoPtr == nullptr){
-		errorMessage = QString("Unable to get group with ID: '%1'. The group does not exist.").arg(userGroupId);
+		errorMessage = QString("Unable to get group with ID: '%1'. The group does not exist.").arg(qPrintable(userGroupId));
 		SendErrorMessage(0, errorMessage, "CRoleControllerComp");
 
 		return nullptr;
@@ -108,7 +108,7 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 	QByteArray itemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
 	imtbase::CTreeItemModel itemModel;
 	if (!itemModel.CreateFromJson(itemData)){
-		errorMessage = QString("Unable to create a role object. Error: Failed to create a tree model from json '%1'").arg(itemData);
+		errorMessage = QString("Unable to create a role object. Error: Failed to create a tree model from json '%1'").arg(qPrintable(itemData));
 		SendErrorMessage(0, errorMessage, "CRoleControllerComp");
 
 		return nullptr;
