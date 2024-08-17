@@ -15,6 +15,8 @@ class Property extends BaseObject {
         return proxy
     }
 
+    __auto = true
+
     __toPrimitive(hint){
         let value = this.__get()
         switch(hint){
@@ -73,6 +75,8 @@ class Property extends BaseObject {
     }
 
     __set(key, value){
+        this.__auto = false
+
         if(typeof value === 'function' && value.bound){
             this.__setCompute(value)
             if(value.queue) {
@@ -95,6 +99,13 @@ class Property extends BaseObject {
         }
         
         return true
+    }
+
+    __setAuto(newValue){
+        if(this.__auto) {
+            this.__set(undefined, newValue)
+            this.__auto = true
+        }
     }
 
     __typecasting(value){

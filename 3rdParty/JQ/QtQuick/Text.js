@@ -73,12 +73,22 @@ class Text extends Item {
     }
 
     __updateGeometry(){
-        this.width = this.__DOM.scrollWidth
-        this.height = this.__DOM.scrollHeight
+        let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.__self.__getObject('width').__auto ? 0 : this.width, this.wrapMode, this.textFormat)
+        
+        if(textMetrics.isHTML){
+            this.__DOM.innerHTML = this.text.replaceAll('<br>', '\r')
+        } else {
+            this.__DOM.innerText = this.text.replaceAll('<br>', '\r')
+        }
+
+        this.__self.__getObject('width').__setAuto(textMetrics.width)
+        this.__self.__getObject('height').__setAuto(textMetrics.height)
+        this.contentWidth = textMetrics.width
+        this.contentHeight = textMetrics.height
     }
 
     onTextChanged(){
-        this.__DOM.innerHTML = this.text
+        // this.__DOM.innerHTML = this.text
 
         this.__updateGeometry()
     }

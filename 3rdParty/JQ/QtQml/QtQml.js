@@ -3,6 +3,7 @@ module.exports = {
     AnchorLine: require("./AnchorLine"),
     Anchors: require("./Anchors"),
     Border: require("./Border"),
+    SourceSize: require("./SourceSize"),
     Font: require("./Font"),
     LinkedBool: require("./LinkedBool"),
     point: require("./Point"),

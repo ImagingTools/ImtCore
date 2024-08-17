@@ -302,13 +302,13 @@ class Instruction {
     }
     
     resolveInner(name, thisKey){
-        for(let obj of this.assignProperties){
-            let typeInfo = obj.type ? this.getTypeInfo(obj.type) : {}
-            if(name === obj.name) return {
-                // obj: obj.value instanceof Instruction ? obj.value : typeInfo.type, // ====
-                source: `${thisKey}.${name}`,
-            }
-        }
+        // for(let obj of this.assignProperties){
+        //     let typeInfo = obj.type ? this.getTypeInfo(obj.type) : {}
+        //     if(name === obj.name) return {
+        //         // obj: obj.value instanceof Instruction ? obj.value : typeInfo.type, // ====
+        //         source: `${thisKey}.${name}`,
+        //     }
+        // }
         for(let obj of this.defineProperties){
             let typeInfo = obj.type ? this.getTypeInfo(obj.type) : {}
             if(name === obj.name) return {
@@ -336,7 +336,7 @@ class Instruction {
 
         if(typeInfo){
             if(typeInfo.type instanceof QmlFile) {
-                return typeInfo.type.instruction.resolve(name)
+                return typeInfo.type.instruction.resolve(name, thisKey)
             } else {
                 let obj = new typeInfo.type()
                 if(name in typeInfo.type.meta || name in obj){
@@ -1036,6 +1036,10 @@ class Instruction {
         for(let assignProperty of this.assignProperties){
             let path = this.resolve(assignProperty.name.split('.')[0], 'self')
 
+            if(!path){
+                console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line+1}:${assignProperty.value.info.col-assignProperty.name.length-1}: warning: ${assignProperty.name} is not founded`)
+            }
+
             if(assignProperty.value instanceof Instruction) {
                 code.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false)}).create()`)
             } else {
@@ -1335,12 +1339,14 @@ for(let moduleName in JQModules){
                 queue[className] = file
                 continue
             }
-            fullCode.push(`JQModules.${moduleName}.${className}=${file.toCode()}`)
+            fullCode.push(`JQModules.__queue.push(()=>{JQModules.${moduleName}.${className}=${file.toCode()}})`)
+            // fullCode.push(`JQModules.${moduleName}.${className}=${file.toCode()}`)
         }
     }
     for(let className in queue){
         let file = queue[className]
-        fullCode.push(`JQModules.${moduleName}.${className}=JQModules.${moduleName}.${className}_v${file.version}`)
+        fullCode.push(`JQModules.__queue.push(()=>{if(!JQModules.${moduleName}.${className}_v${file.version}) throw ''; JQModules.${moduleName}.${className}=JQModules.${moduleName}.${className}_v${file.version}})`)
+        // fullCode.push(`JQModules.${moduleName}.${className}=JQModules.${moduleName}.${className}_v${file.version}`)
     }
 }
 
@@ -1371,6 +1377,19 @@ for(let className in Singletons){
     console.log(`    > ${className}.qml (Singleton)`)
     fullCode.push(Singletons[className].toCode())
 }
+
+fullCode.push(`while(JQModules.__queue.length){
+    let reg = JQModules.__queue.shift()
+    
+    if(!reg.isError){
+        try {
+            reg()
+        } catch (error) {
+            // reg.isError = true
+            JQModules.__queue.push(reg)
+        }
+    }
+}`)
 
 if(config.entry){
     fullCode.push(`window.addEventListener('load', ()=>{console.time('build');${config.entry.replaceAll('.qml', '')}.create(JQApplication.root);console.timeEnd('build')})`)

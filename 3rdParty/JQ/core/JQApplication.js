@@ -1,4 +1,6 @@
 const MouseController = require('./MouseController')
+const ImageController = require('./ImageController')
+const TextController = require('./TextController')
 
 module.exports = {
     root: null,
@@ -11,7 +13,9 @@ module.exports = {
             QtQuick: require('../QtQuick/QtQuick'),
             Qt5Compat: require('../Qt5Compat/Qt5Compat'),
             QtWebSockets: require('../QtWebSockets/QtWebSockets'),
+            __queue: [],
         }
+       
 
         
         document.head.insertAdjacentHTML("beforeend", `
@@ -55,6 +59,10 @@ module.exports = {
             .TextInput, .TextEdit {
                 flex-direction: column;
             }
+            .Image {
+                background-repeat: no-repeat;
+                background-position: center;
+            }
 
             .Row {
                 flex-direction: row;
@@ -89,6 +97,8 @@ module.exports = {
         })
 
         window.addEventListener('load', ()=>{
+            TextController.init()
+
             this.root.width = window.innerWidth
             this.root.height = window.innerHeight
             this.root.__connectDOM(document.body)
@@ -96,6 +106,10 @@ module.exports = {
 
         MouseController.init()
     },
+
+    ImageController: ImageController,
+    MouseController: MouseController,
+    TextController: TextController,
 
     objectsAwaitingUpdate: new Set(),
     updateLayers: [],

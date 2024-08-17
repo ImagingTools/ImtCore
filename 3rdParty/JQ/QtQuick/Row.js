@@ -32,8 +32,8 @@ class Row extends Item {
         })
 
         let rect = this.__DOM.getBoundingClientRect()
-        this.width = rect.width
-        this.height = rect.height
+        this.__self.__getObject('width').__setAuto(rect.width)
+        this.__self.__getObject('height').__setAuto(rect.height)
 
         this.__setDOMStyle({
             width: this.width + 'px',

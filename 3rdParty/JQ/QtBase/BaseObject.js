@@ -38,6 +38,16 @@ class BaseObject{
         return proxy
     }
 
+    static isAssignableFrom(cls){
+        let prototype = this
+        while(prototype){
+            if(cls === prototype) return true
+
+            prototype = prototype.__proto__
+        }
+        return false
+    }
+
     __processCount = 0
 
     __beginProcess(){

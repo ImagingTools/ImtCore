@@ -33,6 +33,9 @@ class Loader extends Item {
         let component = this.sourceComponent
         let item = component.createObject(this)
         this.item = item
+
+        this.__self.__getObject('width').__setAuto(item.width)
+        this.__self.__getObject('height').__setAuto(item.height)
     }
 }
 
