@@ -36,13 +36,13 @@ class Loader extends Item {
         let item = this.sourceComponent.createObject(this)
         this.item = item
 
-        if(this.__self.__getObject('width').__auto) {
-            this.__self.__getObject('width').__setCompute(()=>{return this.item.width})
-            this.__self.__getObject('width').__update()
+        if(this.__getObject('width').__auto) {
+            this.__getObject('width').__setCompute(()=>{return this.item.width})
+            this.__getObject('width').__update()
         }
-        if(this.__self.__getObject('height').__auto) {
-            this.__self.__getObject('height').__setCompute(()=>{return this.item.height})
-            this.__self.__getObject('height').__update()
+        if(this.__getObject('height').__auto) {
+            this.__getObject('height').__setCompute(()=>{return this.item.height})
+            this.__getObject('height').__update()
         }
 
         this.loaded()

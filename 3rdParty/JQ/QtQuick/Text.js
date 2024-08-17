@@ -73,7 +73,7 @@ class Text extends Item {
     }
 
     __updateGeometry(){
-        let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.__self.__getObject('width').__auto ? 0 : this.width, this.wrapMode, this.textFormat)
+        let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.__getObject('width').__auto ? 0 : this.width, this.wrapMode, this.textFormat)
         
         if(textMetrics.isHTML){
             this.__DOM.innerHTML = this.text.replaceAll('<br>', '\r')
@@ -81,8 +81,8 @@ class Text extends Item {
             this.__DOM.innerText = this.text.replaceAll('<br>', '\r')
         }
 
-        this.__self.__getObject('width').__setAuto(textMetrics.width)
-        this.__self.__getObject('height').__setAuto(textMetrics.height)
+        this.__getObject('width').__setAuto(textMetrics.width)
+        this.__getObject('height').__setAuto(textMetrics.height)
         this.contentWidth = textMetrics.width
         this.contentHeight = textMetrics.height
     }

@@ -1046,7 +1046,8 @@ class Instruction {
                 let stat = this.prepare(assignProperty.value, {isCompute:false, thisKey: 'self', value:'', local:[]})
                 if(stat.isCompute){
                     if(assignProperty.type === 'alias'){
-                        code.push(`self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},__updateList)`)
+                        code.push(`self.__getObject('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val})`)
+                        code.push(`__updateList.push(self.__getObject('${assignProperty.name}'))`)
                     } else {
                         code.push(`self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},__updateList)`)
                     }
