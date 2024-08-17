@@ -20,7 +20,7 @@ class Rectangle extends Item {
 
     static create(parent, model, ...args){
         let proxy = super.create(parent, model, ...args)
-        proxy.__DOM.classList.add('Rectangle')
+        proxy.__getDOM().classList.add('Rectangle')
 
         return proxy
     }

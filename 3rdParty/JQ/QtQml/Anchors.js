@@ -100,17 +100,28 @@ class Anchors extends GroupProperty {
 
     onHorizontalCenterChanged(){
         let target = this.horizontalCenter.__get()
+        let targetFloat = target.__float
+        target = target.__parent
+
         let self = this.__parent
 
         if(self && target){
             let updateList = []
 
             if(self.parent === target){
-                if(target.__float === AnchorLine.HorizontalCenter){
+                if(targetFloat === AnchorLine.Left){
+                    self.x = QtFunctions.binding(()=>{return -self.width / 2},updateList)
+                } else if(targetFloat === AnchorLine.Right){
+                    self.x = QtFunctions.binding(()=>{return target.width - self.width / 2},updateList)
+                } else if(targetFloat === AnchorLine.HorizontalCenter){
                     self.x = QtFunctions.binding(()=>{return target.width / 2 - self.width / 2},updateList)
                 }
             } else {
-                if(target.__float === AnchorLine.HorizontalCenter){
+                if(targetFloat === AnchorLine.Left){
+                    self.x = QtFunctions.binding(()=>{return target.x - self.width / 2},updateList)
+                } else if(targetFloat === AnchorLine.Right){
+                    self.x = QtFunctions.binding(()=>{return target.x + target.width - self.width / 2},updateList)
+                } else if(targetFloat === AnchorLine.HorizontalCenter){
                     self.x = QtFunctions.binding(()=>{return target.x + target.width / 2 - self.width / 2},updateList)
                 }
             }
@@ -123,19 +134,30 @@ class Anchors extends GroupProperty {
 
     onVerticalCenterChanged(){
         let target = this.verticalCenter.__get()
+        let targetFloat = target.__float
+        target = target.__parent
+
         let self = this.__parent
 
         if(self && target){
             let updateList = []
 
             if(self.parent === target){
-                if(target.__float === AnchorLine.VerticalCenter){
+                if(targetFloat === AnchorLine.Top){
+                    self.y = QtFunctions.binding(()=>{return -self.height / 2},updateList)
+                } else if(targetFloat === AnchorLine.Bottom){
+                    self.y = QtFunctions.binding(()=>{return target.height - self.height / 2},updateList)
+                } else if(targetFloat === AnchorLine.VerticalCenter){
                     self.y = QtFunctions.binding(()=>{return target.height / 2 - self.height / 2},updateList)
                 }
             } else {
-                if(target.__float === AnchorLine.VerticalCenter){
+                if(targetFloat === AnchorLine.Top){
+                    self.y = QtFunctions.binding(()=>{return target.y - self.height / 2},updateList)
+                } else if(targetFloat === AnchorLine.Bottom){
+                    self.y = QtFunctions.binding(()=>{return target.y + target.height - self.height / 2},updateList)
+                } else if(targetFloat === AnchorLine.VerticalCenter){
                     self.y = QtFunctions.binding(()=>{return target.y + target.height / 2 - self.height / 2},updateList)
-                }                
+                }               
             }
 
             for(let property of updateList){
@@ -164,13 +186,17 @@ class Anchors extends GroupProperty {
                     self.x = QtFunctions.binding(()=>{return this.leftMargin},updateList)
                 } else if(targetFloat === AnchorLine.Right){
                     self.x = QtFunctions.binding(()=>{return target.width + this.leftMargin},updateList)
+                } else if(targetFloat === AnchorLine.HorizontalCenter){
+                    self.x = QtFunctions.binding(()=>{return target.width / 2 + this.leftMargin},updateList)
                 }
             } else {
                 if(targetFloat === AnchorLine.Left){
                     self.x = QtFunctions.binding(()=>{return target.x + this.leftMargin},updateList)
                 } else if(targetFloat === AnchorLine.Right){
                     self.x = QtFunctions.binding(()=>{return target.x + target.width + this.leftMargin},updateList)
-                }               
+                } else if(targetFloat === AnchorLine.HorizontalCenter){
+                    self.x = QtFunctions.binding(()=>{return target.x + target.width / 2 + this.leftMargin},updateList)
+                }            
             }
 
             for(let property of updateList){
@@ -199,13 +225,17 @@ class Anchors extends GroupProperty {
                     self.x = QtFunctions.binding(()=>{return -self.width - this.rightMargin},updateList)
                 } else if(targetFloat === AnchorLine.Right){
                     self.x = QtFunctions.binding(()=>{return target.width - self.width - this.rightMargin},updateList)
+                } else if(targetFloat === AnchorLine.HorizontalCenter){
+                    self.x = QtFunctions.binding(()=>{return target.width / 2 - self.width - this.rightMargin},updateList)
                 }
             } else {
                 if(targetFloat === AnchorLine.Left){
                     self.x = QtFunctions.binding(()=>{return target.x - self.width - this.rightMargin},updateList)
                 } else if(targetFloat === AnchorLine.Right){
                     self.x = QtFunctions.binding(()=>{return target.x + target.width - self.width - this.rightMargin},updateList)
-                }               
+                } else if(targetFloat === AnchorLine.HorizontalCenter){
+                    self.x = QtFunctions.binding(()=>{return target.x + target.width / 2 - self.width - this.rightMargin},updateList)
+                }              
             }
 
             for(let property of updateList){
@@ -233,12 +263,16 @@ class Anchors extends GroupProperty {
                     self.x = QtFunctions.binding(()=>{return this.leftMargin},updateList)
                 } else if(leftFloat === AnchorLine.Right){
                     self.x = QtFunctions.binding(()=>{return left.width + this.leftMargin},updateList)
+                } else if(leftFloat === AnchorLine.HorizontalCenter){
+                    self.x = QtFunctions.binding(()=>{return left.width / 2 + this.leftMargin},updateList)
                 }
             } else {
                 if(leftFloat === AnchorLine.Left){
                     self.x = QtFunctions.binding(()=>{return left.x + this.leftMargin},updateList)
                 } else if(leftFloat === AnchorLine.Right){
                     self.x = QtFunctions.binding(()=>{return left.x + left.width + this.leftMargin},updateList)
+                } else if(leftFloat === AnchorLine.HorizontalCenter){
+                    self.x = QtFunctions.binding(()=>{return left.x + left.width / 2 + this.leftMargin},updateList)
                 }
             }
 
@@ -247,12 +281,16 @@ class Anchors extends GroupProperty {
                     self.width = QtFunctions.binding(()=>{return -this.rightMargin - self.x},updateList)
                 } else if(rightFloat === AnchorLine.Right){
                     self.width = QtFunctions.binding(()=>{return right.width - this.rightMargin - self.x},updateList)
+                } else if(rightFloat === AnchorLine.HorizontalCenter){
+                    self.width = QtFunctions.binding(()=>{return right.width / 2 - this.rightMargin - self.x},updateList)
                 }
             } else {
                 if(rightFloat === AnchorLine.Left){
                     self.width = QtFunctions.binding(()=>{return right.x - this.rightMargin - self.x},updateList)
                 } else if(rightFloat === AnchorLine.Right){
                     self.width = QtFunctions.binding(()=>{return right.x + right.width - this.rightMargin - self.x},updateList)
+                } else if(rightFloat === AnchorLine.HorizontalCenter){
+                    self.width = QtFunctions.binding(()=>{return right.x + right.width / 2 - this.rightMargin - self.x},updateList)
                 }
             }
 
@@ -284,12 +322,16 @@ class Anchors extends GroupProperty {
                     self.y = QtFunctions.binding(()=>{return this.topMargin},updateList)
                 } else if(targetFloat === AnchorLine.Bottom){
                     self.y = QtFunctions.binding(()=>{return target.height + this.topMargin},updateList)
+                } else if(targetFloat === AnchorLine.VerticalCenter){
+                    self.y = QtFunctions.binding(()=>{return target.height / 2 + this.topMargin},updateList)
                 }
             } else {
                 if(targetFloat === AnchorLine.Top){
                     self.y = QtFunctions.binding(()=>{return target.y + this.topMargin},updateList)
                 } else if(targetFloat === AnchorLine.Bottom){
                     self.y = QtFunctions.binding(()=>{return target.y + target.height + this.topMargin},updateList)
+                } else if(targetFloat === AnchorLine.VerticalCenter){
+                    self.y = QtFunctions.binding(()=>{return target.y + target.height / 2 + this.topMargin},updateList)
                 }               
             }
 
@@ -319,12 +361,16 @@ class Anchors extends GroupProperty {
                     self.y = QtFunctions.binding(()=>{return -self.height - this.bottomMargin},updateList)
                 } else if(targetFloat === AnchorLine.Bottom){
                     self.y = QtFunctions.binding(()=>{return target.height - self.height - this.bottomMargin},updateList)
+                } else if(targetFloat === AnchorLine.VerticalCenter){
+                    self.y = QtFunctions.binding(()=>{return target.height / 2 - self.height - this.bottomMargin},updateList)
                 }
             } else {
                 if(targetFloat === AnchorLine.Top){
                     self.y = QtFunctions.binding(()=>{return target.y - self.height - this.bottomMargin},updateList)
                 } else if(targetFloat === AnchorLine.Bottom){
                     self.y = QtFunctions.binding(()=>{return target.y + target.height - self.height - this.bottomMargin},updateList)
+                } else if(targetFloat === AnchorLine.VerticalCenter){
+                    self.y = QtFunctions.binding(()=>{return target.y + target.height / 2 - self.height - this.bottomMargin},updateList)
                 }               
             }
 
@@ -353,12 +399,16 @@ class Anchors extends GroupProperty {
                     self.y = QtFunctions.binding(()=>{return this.topMargin},updateList)
                 } else if(topFloat === AnchorLine.Bottom){
                     self.y = QtFunctions.binding(()=>{return top.height + this.topMargin},updateList)
+                } else if(topFloat === AnchorLine.VerticalCenter){
+                    self.y = QtFunctions.binding(()=>{return top.height / 2 + this.topMargin},updateList)
                 }
             } else {
                 if(topFloat === AnchorLine.Top){
                     self.y = QtFunctions.binding(()=>{return top.y + this.topMargin},updateList)
                 } else if(topFloat === AnchorLine.Bottom){
                     self.y = QtFunctions.binding(()=>{return top.y + top.height + this.topMargin},updateList)
+                } else if(topFloat === AnchorLine.VerticalCenter){
+                    self.y = QtFunctions.binding(()=>{return top.y + top.height / 2 + this.topMargin},updateList)
                 }
             }
 
@@ -367,12 +417,16 @@ class Anchors extends GroupProperty {
                     self.height = QtFunctions.binding(()=>{return -this.bottomMargin - self.y},updateList)
                 } else if(bottomFloat === AnchorLine.Bottom){
                     self.height = QtFunctions.binding(()=>{return bottom.height - this.bottomMargin - self.y},updateList)
+                } else if(bottomFloat === AnchorLine.VerticalCenter){
+                    self.height = QtFunctions.binding(()=>{return bottom.height / 2 - this.bottomMargin - self.y},updateList)
                 }
             } else {
                 if(bottomFloat === AnchorLine.Top){
                     self.height = QtFunctions.binding(()=>{return bottom.y - this.bottomMargin - self.y},updateList)
                 } else if(bottomFloat === AnchorLine.Bottom){
                     self.height = QtFunctions.binding(()=>{return bottom.y + bottom.height - this.bottomMargin - self.y},updateList)
+                } else if(bottomFloat === AnchorLine.VerticalCenter){
+                    self.height = QtFunctions.binding(()=>{return bottom.y + bottom.height / 2 - this.bottomMargin - self.y},updateList)
                 }
             }
 
