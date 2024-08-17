@@ -30,12 +30,22 @@ class Loader extends Item {
     })
 
     onSourceComponentChanged(){
-        let component = this.sourceComponent
-        let item = component.createObject(this)
+        if(this.item) this.item.__destroy()
+        if(!this.sourceComponent) return
+
+        let item = this.sourceComponent.createObject(this)
         this.item = item
 
-        this.__self.__getObject('width').__setAuto(item.width)
-        this.__self.__getObject('height').__setAuto(item.height)
+        if(this.__self.__getObject('width').__auto) {
+            this.__self.__getObject('width').__setCompute(()=>{return this.item.width})
+            this.__self.__getObject('width').__update()
+        }
+        if(this.__self.__getObject('height').__auto) {
+            this.__self.__getObject('height').__setCompute(()=>{return this.item.height})
+            this.__self.__getObject('height').__update()
+        }
+
+        this.loaded()
     }
 }
 
