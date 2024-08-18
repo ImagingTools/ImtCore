@@ -237,7 +237,7 @@ bool CDocumentTable::UpdateDocument(const char *key, int count, const QByteArray
 		mdbx::slice keySlice(key, count);
 		mdbx::slice valueSlice(data.data(), data.length());
 
-		mdbx::map_handle mapHandle = m_txn.open_map(m_tableName.toStdString(), mdbx::key_mode::reverse, mdbx::value_mode::single);
+		mdbx::map_handle mapHandle = m_txn.open_map(m_tableName.toStdString(), m_keyMode, m_valueMode);
 
 		try{
 			m_txn.update(mapHandle, keySlice, valueSlice);
