@@ -9,6 +9,12 @@ namespace imtoas
 {
 
 
+CSchema::CSchema()
+	:m_combineType(CT_SIMPLE)
+{
+}
+
+
 QString CSchema::GetId() const
 {
 	return m_id;
@@ -79,6 +85,34 @@ void CSchema::SetEnumValues(const QList<QString>& enumValues)
 }
 
 
+CSchema::CombineType CSchema::GetCombineType() const
+{
+	return m_combineType;
+}
+
+
+void CSchema::SetCombineType(CombineType combineType)
+{
+	if (combineType != m_combineType){
+		m_combineType = combineType;
+	}
+}
+
+
+QList<CProperty> CSchema::GetCombineProperties() const
+{
+	return m_combineProperties;
+}
+
+
+void CSchema::SetCombineProperties(const QList<CProperty>& combineProperties)
+{
+	if (combineProperties != m_combineProperties){
+		m_combineProperties = combineProperties;
+	}
+}
+
+
 bool CSchema::ReadFromJsonObject(CSchema& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
 {
 	QVariant typeData = jsonObject.value("type").toVariant();
@@ -115,6 +149,35 @@ bool CSchema::ReadFromJsonObject(CSchema& object, const QJsonObject& jsonObject,
 		object.SetEnumValues(enumList);
 	}
 
+	// maybe the property is a combine
+	QString combineKey;
+	if (jsonObject.contains("oneOf")){
+		combineKey = "oneOf";
+		object.SetCombineType(CT_ONE_OF);
+	}
+	else if (jsonObject.contains("allOf")){
+		combineKey = "allOf";
+		object.SetCombineType(CT_ALL_OF);
+	}
+	else if (jsonObject.contains("anyOf")){
+		combineKey = "anyOf";
+		object.SetCombineType(CT_ANY_OF);
+	}
+	QJsonArray combineData = jsonObject.value(combineKey).toArray();
+	QList<CProperty> combineProperties;
+	for (QJsonArray::const_iterator combineDataIter = combineData.cbegin(); combineDataIter != combineData.cend(); ++combineDataIter){
+		QJsonObject combineObject = combineDataIter->toObject();
+		if (!COasTools::DeReferenceObject(combineObject, globalObject, combineObject)){
+			return false;
+		}
+		CProperty combineProperty;
+		if (!CProperty::ReadFromJsonObject(combineProperty, combineObject, globalObject)){
+			return false;
+		}
+		combineProperties << combineProperty;
+	}
+	object.SetCombineProperties(combineProperties);
+
 	return true;
 }
 
@@ -122,10 +185,13 @@ bool CSchema::ReadFromJsonObject(CSchema& object, const QJsonObject& jsonObject,
 bool CSchema::operator==(const CSchema& other) const
 {
 	bool retVal = true;
+	retVal = retVal && (m_id == other.m_id);
 	retVal = retVal && (m_type == other.m_type);
 	retVal = retVal && (m_requiredProperties == other.m_requiredProperties);
 	retVal = retVal && (m_properties == other.m_properties);
 	retVal = retVal && (m_enumValues == other.m_enumValues);
+	retVal = retVal && (m_combineType == other.m_combineType);
+	retVal = retVal && (m_combineProperties == other.m_combineProperties);
 
 	return retVal;
 }

@@ -257,6 +257,7 @@ bool CParameter::ReadFromJsonObject(CParameter& object, const QJsonObject& jsonO
 bool CParameter::operator==(const CParameter& other) const
 {
 	bool retVal = true;
+	retVal = retVal && (m_id == other.m_id);
 	retVal = retVal && (m_name == other.m_name);
 	retVal = retVal && (m_in == other.m_in);
 	retVal = retVal && (m_description == other.m_description);

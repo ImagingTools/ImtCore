@@ -162,6 +162,7 @@ bool CSecurityScheme::ReadFromJsonObject(CSecurityScheme& object, const QJsonObj
 bool CSecurityScheme::operator==(const CSecurityScheme& other) const
 {
 	bool retVal = true;
+	retVal = retVal && (m_id == other.m_id);
 	retVal = retVal && (m_type == other.m_type);
 	retVal = retVal && (m_description == other.m_description);
 	retVal = retVal && (m_name == other.m_name);

@@ -103,6 +103,7 @@ bool CRequestBody::ReadFromJsonObject(CRequestBody& object, const QJsonObject& j
 bool CRequestBody::operator==(const CRequestBody& other) const
 {
 	bool retVal = true;
+	retVal = retVal && (m_id == other.m_id);
 	retVal = retVal && (m_description == other.m_description);
 	retVal = retVal && (m_content == other.m_content);
 	retVal = retVal && (m_isRequired == other.m_isRequired);

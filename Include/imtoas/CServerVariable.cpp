@@ -94,6 +94,7 @@ bool CServerVariable::ReadFromJsonObject(CServerVariable& object, const QJsonObj
 bool CServerVariable::operator==(const CServerVariable& other) const
 {
 	bool retVal = true;
+	retVal = retVal && (m_id == other.m_id);
 	retVal = retVal && (m_enumValues == other.m_enumValues);
 	retVal = retVal && (m_default == other.m_default);
 	retVal = retVal && (m_description == other.m_description);

@@ -97,6 +97,7 @@ bool CResponse::ReadFromJsonObject(CResponse& object, const QJsonObject& jsonObj
 bool CResponse::operator==(const CResponse& other) const
 {
 	bool retVal = true;
+	retVal = retVal && (m_id == other.m_id);
 	retVal = retVal && (m_description == other.m_description);
 	retVal = retVal && (m_headers == other.m_headers);
 	retVal = retVal && (m_contentList == other.m_contentList);

@@ -326,6 +326,7 @@ bool CPath::ReadFromJsonObject(CPath& object, const QJsonObject& jsonObject, con
 bool CPath::operator==(const CPath& other) const
 {
 	bool retVal = true;
+	retVal = retVal && (m_id == other.m_id);
 	retVal = retVal && (m_reference == other.m_reference);
 	retVal = retVal && (m_summary == other.m_summary);
 	retVal = retVal && (m_description == other.m_description);

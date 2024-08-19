@@ -137,6 +137,7 @@ bool CEncoding::ReadFromJsonObject(CEncoding& object, const QJsonObject& jsonObj
 bool CEncoding::operator==(const CEncoding& other) const
 {
 	bool retVal = true;
+	retVal = retVal && (m_id == other.m_id);
 	retVal = retVal && (m_contentType == other.m_contentType);
 	retVal = retVal && (m_headers == other.m_headers);
 	retVal = retVal && (m_style == other.m_style);

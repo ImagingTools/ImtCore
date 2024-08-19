@@ -71,6 +71,7 @@ bool CHeader::ReadFromJsonObject(CHeader& object, const QJsonObject& jsonObject,
 bool CHeader::operator==(const CHeader& other) const
 {
 	bool retVal = true;
+	retVal = retVal && (m_id == other.m_id);
 	retVal = retVal && (m_schema == other.m_schema);
 	retVal = retVal && (m_description == other.m_description);
 

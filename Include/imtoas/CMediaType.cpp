@@ -83,6 +83,7 @@ bool CMediaType::ReadFromJsonObject(CMediaType& object, const QJsonObject& jsonO
 bool CMediaType::operator==(const CMediaType& other) const
 {
 	bool retVal = true;
+	retVal = retVal && (m_id == other.m_id);
 	retVal = retVal && (m_schema == other.m_schema);
 	retVal = retVal && (m_encodings == other.m_encodings);
 

@@ -133,8 +133,11 @@ bool CProperty::ReadFromJsonObject(CProperty& object, const QJsonObject& jsonObj
 bool CProperty::operator==(const CProperty& other) const
 {
 	bool retVal = true;
+	retVal = retVal && (m_id == other.m_id);
 	retVal = retVal && (m_type == other.m_type);
 	retVal = retVal && (m_format == other.m_format);
+	retVal = retVal && (m_combineType == other.m_combineType);
+	retVal = retVal && (m_combineProperties == other.m_combineProperties);
 
 	return retVal;
 }
