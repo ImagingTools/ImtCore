@@ -127,13 +127,13 @@ void COperation::SetDeprecated(bool deprecated)
 }
 
 
-QList<CSecurity> COperation::GetSecurity() const
+QList<CSecurityScheme> COperation::GetSecurity() const
 {
 	return m_security;
 }
 
 
-void COperation::SetSecurity(const QList<CSecurity>& security)
+void COperation::SetSecurity(const QList<CSecurityScheme>& security)
 {
 	if (security != m_security){
 		m_security = security;
@@ -222,11 +222,20 @@ bool COperation::ReadFromJsonObject(COperation& object, const QJsonObject& jsonO
 	if (jsonObject.contains("security")){
 		const QJsonArray securityArray = jsonObject["security"].toArray();
 		qsizetype securityCount = securityArray.size();
-		/// \todo replace it with \c CSecurityScheme and resolve it!!
-		QList<CSecurity> securityList;
+		QList<CSecurityScheme> securityList;
 		for (int securityIndex = 0; securityIndex < securityCount; ++securityIndex){
-			CSecurity security;
-			if (!CSecurity::ReadFromJsonObject(security, securityArray[securityIndex].toObject(), globalObject)){
+			QJsonObject securityObject = securityArray[securityIndex].toObject();
+			if (securityObject.keys().size() > 1){
+				return false;
+			}
+			else if (securityObject.keys().size() < 1){
+				// empty scheme. skip
+				continue;
+			}
+
+			securityObject = COasTools::FindSecuritySchemeByName(securityObject.keys().constFirst(), globalObject);
+			CSecurityScheme security;
+			if (!CSecurityScheme::ReadFromJsonObject(security, securityObject, globalObject)){
 				return false;
 			}
 			securityList << security;

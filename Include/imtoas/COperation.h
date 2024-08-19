@@ -9,7 +9,7 @@
 #include <QtCore/QList>
 
 // ImtCore includes
-#include <imtoas/CSecurity.h>
+#include <imtoas/CSecurityScheme.h>
 #include <imtoas/CParameter.h>
 #include <imtoas/CRequestBody.h>
 #include <imtoas/CResponse.h>
@@ -49,8 +49,8 @@ public:
 	[[nodiscard]] bool IsDeprecated() const;
 	void SetDeprecated(bool deprecated = true);
 
-	[[nodiscard]] QList<CSecurity> GetSecurity() const;
-	void SetSecurity(const QList<CSecurity>& security);
+	[[nodiscard]] QList<CSecurityScheme> GetSecurity() const;
+	void SetSecurity(const QList<CSecurityScheme>& security);
 
 	[[nodiscard]] QList<CServer> GetServers() const;
 	void SetServers(const QList<CServer>& servers);
@@ -69,7 +69,7 @@ private:
 	CRequestBody m_requestBody;
 	QList<CResponse> m_responses;
 	bool m_isDeprecated;
-	QList<CSecurity> m_security;
+	QList<CSecurityScheme> m_security;
 	QList<CServer> m_servers;
 };
 

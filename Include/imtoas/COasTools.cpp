@@ -59,6 +59,20 @@ bool COasTools::DeReferenceObject(
 }
 
 
+QJsonObject COasTools::FindSecuritySchemeByName(const QString& schemeName, const QJsonObject& lookUpjsonObject)
+{
+	QJsonObject jsonObject = lookUpjsonObject[QStringLiteral("components")].toObject();
+	jsonObject = jsonObject[QStringLiteral("securitySchemes")].toObject();
+	for (QJsonObject::const_iterator schemeIter = jsonObject.constBegin(); schemeIter != jsonObject.constEnd(); ++schemeIter){
+		if (schemeIter.key() == schemeName){
+			return schemeIter->toObject();
+		}
+	}
+
+	return QJsonObject();
+}
+
+
 
 
 } // namespace imtoas
