@@ -565,8 +565,14 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		stream << QStringLiteral("const QByteArray commandId = gqlRequest.GetCommandId();");
 		FeedStream(stream, 1, false);
 
+		/// create a carrier model GQL spec	\link https://spec.graphql.org/draft/#sec-Response-Format
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("istd::TDelPtr<imtbase::CTreeItemModel> modelPtr(new imtbase::CTreeItemModel);");
+		FeedStream(stream, 1, false);
+
+		// create dataModel - child of a carrier model
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel(\"data\");");
 		FeedStream(stream, 2, false);
 
 		// create sections for expected command IDs
@@ -658,7 +664,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QText
 
 	// [1] write payload variable in model and create variable, to check if it success
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("const bool isModelCreated = replyPayload.WriteToModel(*modelPtr);");
+	stream << QStringLiteral("const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);");
 	FeedStream(stream, 1, false);
 
 	// [1->2] check if payload write to TreeModel is failed
