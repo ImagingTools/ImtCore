@@ -570,6 +570,8 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		stream << QStringLiteral("istd::TDelPtr<imtbase::CTreeItemModel> modelPtr(new imtbase::CTreeItemModel);");
 		FeedStream(stream, 1, false);
 
+		/// \todo add errors model and don't forget to fill it	\link https://spec.graphql.org/draft/#sec-Errors
+
 		// create dataModel - child of a carrier model
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel(\"data\");");

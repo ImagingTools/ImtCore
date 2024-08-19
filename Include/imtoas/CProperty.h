@@ -15,6 +15,16 @@ namespace imtoas
 class CProperty
 {
 public:
+	enum CombineType
+	{
+		CT_SIMPLE,	///< NONE: Data MUST be valid for single schema (no alternatives).
+		CT_ALL_OF,	///< AND: Data MUST be valid against ALL subschemas (allOf).
+		CT_ONE_OF,	///< XOR: Data MUST be valid against ONLY one subschema (oneOf).
+		CT_ANY_OF	///< OR: Data MUST be valid against any subschema (anyOf).
+	};
+
+	CProperty();
+
 	[[nodiscard]] QString GetId() const;
 	void SetId(const QString& id);
 
@@ -23,6 +33,12 @@ public:
 
 	[[nodiscard]] QString GetFormat() const;
 	void SetFormat(const QString& format);
+
+	[[nodiscard]] CombineType GetCombineType() const;
+	void SetCombineType(CombineType combineType);
+
+	[[nodiscard]] QList<CProperty> GetCombineProperties() const;
+	void SetCombineProperties(const QList<CProperty>& combineProperties);
 
 	[[nodiscard]] static bool ReadFromJsonObject(CProperty& object, const QJsonObject& jsonObject, const QJsonObject& globalObject);
 
@@ -33,6 +49,8 @@ private:
 	QString m_id;
 	QString m_type;
 	QString m_format;
+	CombineType m_combineType;
+	QList<CProperty> m_combineProperties;
 };
 
 
