@@ -270,7 +270,7 @@ Rectangle{
                             popup.modelFilterAlias.setData("TextFilter", str);
                         }
 
-                        updatePause.restart();
+                        //updatePause.restart();
 
                     }
 
