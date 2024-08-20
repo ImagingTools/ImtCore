@@ -11,6 +11,7 @@
 #include <istd/TDelPtr.h>
 #include <iser/CJsonMemReadArchive.h>
 #include <istd/TSingleFactory.h>
+#include <imeas/CSimpleNumericValue.h>
 
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
@@ -24,6 +25,11 @@
 
 namespace imtgql
 {
+
+
+// public static variables
+const QByteArray CObjectCollectionControllerCompBase::s_offsetFilterParamId = QByteArrayLiteral("Offset");
+const QByteArray CObjectCollectionControllerCompBase::s_limitFilterParamId = QByteArrayLiteral("Count");
 
 
 // reimplemented (icomp::CComponentBase)
@@ -1135,8 +1141,31 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 }
 
 
-void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGqlRequest& /*gqlRequest*/, const imtgql::CGqlObject& /*viewParamsGql*/, iprm::CParamsSet* /*filterParams*/) const
+void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, const imtgql::CGqlObject& /*viewParamsGql*/, iprm::CParamsSet* filterParamsPtr) const
 {
+	if (filterParamsPtr == nullptr){
+		return;
+	}
+
+	// Common filter params from GQL request
+	const imtgql::CGqlObject* viewParamsGql = nullptr;
+	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+	if (inputParams.size() <= 0) {
+		return;
+	}
+	viewParamsGql = inputParams.constFirst().GetFieldArgumentObjectPtr(QByteArrayLiteral("viewParams"));
+	if (viewParamsGql == nullptr){
+		return;
+	}
+	int offset = viewParamsGql->GetFieldArgumentValue(s_offsetFilterParamId).toInt();
+	imeas::CSimpleNumericValue* offsetParamPtr = new imeas::CSimpleNumericValue;
+	offsetParamPtr->SetValues(imath::CVarVector(1, offset));
+	filterParamsPtr->SetEditableParameter(s_offsetFilterParamId, offsetParamPtr, true);
+
+	int count = viewParamsGql->GetFieldArgumentValue(s_limitFilterParamId).toInt();
+	imeas::CSimpleNumericValue* countParamPtr = new imeas::CSimpleNumericValue;
+	countParamPtr->SetValues(imath::CVarVector(1, count));
+	filterParamsPtr->SetEditableParameter(s_limitFilterParamId, countParamPtr, true);
 }
 
 

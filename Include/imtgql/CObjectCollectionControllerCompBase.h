@@ -27,6 +27,9 @@ class CObjectCollectionControllerCompBase:
 			public imtgql::CPermissibleGqlRequestHandlerComp
 {
 public:
+	static const QByteArray s_offsetFilterParamId;
+	static const QByteArray s_limitFilterParamId;
+public:
 	typedef imtgql::CPermissibleGqlRequestHandlerComp BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CObjectCollectionControllerCompBase);
