@@ -308,9 +308,9 @@ bool CGqlSchemaParserComp::ProcessSchemaImports()
 
 		iprm::IParamsSet* documentTypeListParamsPtr = dynamic_cast<iprm::IParamsSet*>(outputParams.GetEditableParameter(s_documentTypeListParamId));
 		if (documentTypeListParamsPtr != nullptr){
-			const iprm::IParamsSet::Ids paramIdList = requestListParamsPtr->GetParamIds();
+			const iprm::IParamsSet::Ids paramIdList = documentTypeListParamsPtr->GetParamIds();
 			for (const QByteArray& paramId: paramIdList){
-				iprm::TParamsPtr<CSdlDocumentType> sdlDocumentTypeParam(requestListParamsPtr, paramId, true);
+				iprm::TParamsPtr<CSdlDocumentType> sdlDocumentTypeParam(documentTypeListParamsPtr, paramId, true);
 				if (!sdlDocumentTypeParam.IsValid()){
 					SendCriticalMessage(0, "Import processing failed.");
 
