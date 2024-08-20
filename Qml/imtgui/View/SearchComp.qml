@@ -252,19 +252,23 @@ Rectangle{
 
                         searchContainer.selectedText = filterText;
 
-                        searchTextField.excludeFilterPart = searchContainer.keepNElements(popup.filterText, keepCount);
-                        searchContainer.parentIds = searchContainer.keepNElements(searchContainer.parentIds, keepCount);
-                        setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
-                        popup.excludeFilterPart = searchTextField.excludeFilterPart;
+                        if(comaDeleted){
+                            searchTextField.excludeFilterPart = searchContainer.keepNElements(popup.filterText, keepCount);
+                            searchContainer.parentIds = searchContainer.keepNElements(searchContainer.parentIds, keepCount);
+                            searchContainer.setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
+                            popup.excludeFilterPart = searchTextField.excludeFilterPart;
+                            //console.log("excludeFilterPart:: ", searchTextField.excludeFilterPart)
 
-                        popup.modelFilterAlias.clear();
-                        popup.modelFilterAlias.addTreeModel("FilterIds");
-                        popup.modelFilterAlias.setData("FilterIds", searchContainer.filterIdsModel)
-                        popup.modelFilterAlias.addTreeModel("Sort");
-                        popup.modelFilterAlias.setData("ParentIds",  searchContainer.parentIds);
 
-                        var str = filterText.replace(popup.excludeFilterPart, "");
-                        popup.modelFilterAlias.setData("TextFilter", str);
+                            popup.modelFilterAlias.clear();
+                            popup.modelFilterAlias.addTreeModel("FilterIds");
+                            popup.modelFilterAlias.setData("FilterIds", searchContainer.filterIdsModel)
+                            popup.modelFilterAlias.addTreeModel("Sort");
+                            popup.modelFilterAlias.setData("ParentIds",  searchContainer.parentIds);
+
+                            var str = filterText.replace(popup.excludeFilterPart, "");
+                            popup.modelFilterAlias.setData("TextFilter", str);
+                        }
 
                         updatePause.restart();
 
@@ -572,6 +576,7 @@ Rectangle{
 
         }
         onFilterTextChanged: {
+            //console.log("TEXT::_ ", filterText)
             searchContainer.textChangeFunc(filterText);
         }
         onSetCurrentText:{
