@@ -701,6 +701,14 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 		retVal += ' ';
 		retVal += GetDecapitalizedValue(sdlField.GetId());
 		retVal += QStringLiteral(");\n");
+
+		// add spectal list insertion method
+		if (sdlField.IsArray()){
+			FeedLineHorizontally(retVal, indents);
+			retVal += QStringLiteral("void AddElement(const C");
+			retVal += sdlField.GetType();
+			retVal += QStringLiteral("& item);\n");
+		}
 	}
 
 	if (generateExistenceChecks){
@@ -834,6 +842,42 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 
 		stream << '}';
 		FeedStream(stream, 3);
+
+		// add spectal list insertion method
+		if (sdlField.IsArray()){
+			FeedStreamHorizontally(stream, indents);
+			stream << QStringLiteral("void");
+			stream << QStringLiteral(" C") + className + QStringLiteral("::");
+			stream << QStringLiteral("AddElement(const C");
+			stream << sdlField.GetType();
+			stream << QStringLiteral("& item)");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, indents);
+			stream << '{';
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, indents + 1);
+			stream << QStringLiteral("m_");
+			stream << GetDecapitalizedValue(sdlField.GetId());
+			stream << QStringLiteral(" << item;");
+			FeedStream(stream, 1, false);
+
+			// update internal storage
+			if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
+				FeedStreamHorizontally(stream, indents + 1);
+				stream << FromVariantMapAccessString(sdlField);
+				stream << QStringLiteral(" = m_");
+				stream << GetDecapitalizedValue(sdlField.GetId()) << ';';
+				FeedStream(stream, 1, false);
+			}
+
+			FeedStreamHorizontally(stream, indents);
+			stream << '}';
+			FeedStream(stream, 3, false);
+
+
+		}
 	}
 
 	if (generateExistenceChecks){
