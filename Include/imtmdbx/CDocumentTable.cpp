@@ -598,7 +598,7 @@ bool CDocumentTable::Exists(const QString& name)
 	bool ok = true;
 
 	try{
-		mdbx::map_handle mapHandle = m_txn.open_map(name.toStdString(), mdbx::key_mode::reverse, mdbx::value_mode::single);
+		mdbx::map_handle mapHandle = m_txn.open_map(name.toStdString(), m_keyMode, m_valueMode);
 	}
 	catch (...){
 		ok = false;
