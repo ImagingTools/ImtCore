@@ -32,6 +32,11 @@ public:
 	virtual QByteArray GetObjectId() const = 0;
 
 	/**
+		Get object type-ID at the current iterator position.
+	*/
+	virtual QByteArray GetObjectTypeId() const = 0;
+
+	/**
 		Get object data instance at the current iterator position.
 	*/
 	virtual bool GetObjectData(IObjectCollection::DataPtr& dataPtr) const = 0;

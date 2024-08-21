@@ -68,7 +68,7 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 }
 
 
-istd::IChangeable* CUserGroupControllerComp::CreateObject(
+istd::IChangeable* CUserGroupControllerComp::CreateObjectFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
 		QByteArray& objectId,
 		QString& name,

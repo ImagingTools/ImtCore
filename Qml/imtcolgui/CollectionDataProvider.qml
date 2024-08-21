@@ -135,7 +135,7 @@ QtObject {
     }
 
     property SubscriptionClient subscriptionClient: SubscriptionClient {
-        property bool ok: container.subscriptionCommandId !== "" && subscriptionClient.subscriptionId !== "";
+        property bool ok: container.subscriptionCommandId !== "" && subscriptionId !== "";
         onOkChanged: {
             if (ok){
                 container.updateSubscription();

@@ -122,14 +122,28 @@ protected:
 	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const;
 
 	/**
-		Create object from the GraphQL
+		Get  object type-Id.
 	*/
-	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const;
+	QByteArray GetObjectTypeIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
+
+	/**
+		Create  representation from the data object.
+	*/
+	bool CreateRepresentationFromObject(
+				const istd::IChangeable& data,
+				const QByteArray& objectTypeId,
+				const imtgql::CGqlRequest& gqlRequest,
+				imtbase::CTreeItemModel& dataModel) const;
 
 	/**
 		Create object from the GraphQL
 	*/
-	virtual istd::IChangeable* CreateObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const;
+	[[deprecated]] virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const;
+
+	/**
+		Create object from the GraphQL
+	*/
+	virtual istd::IChangeable* CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const;
 
 	/**
 		Prepare filters from the GraphQL

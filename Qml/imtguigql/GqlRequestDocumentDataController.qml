@@ -15,6 +15,8 @@ DocumentDataController {
 
     property string subscriptionCommandId;
 
+    property bool ok: subscriptionCommandId != "" && documentId != ""
+
     Component.onDestruction: {
         Events.sendEvent("UnRegisterSubscription", container.subscriptionClient);
     }
@@ -23,7 +25,8 @@ DocumentDataController {
         ModalDialogManager.showWarningDialog(message)
     }
 
-    onDocumentIdChanged: {
+    onOkChanged: {
+        console.log("onOkChanged", documentId, subscriptionCommandId)
         if (documentId !== ""){
             container.subscriptionClient.register();
         }

@@ -13,7 +13,7 @@ namespace imtlicgql
 {
 
 
-istd::IChangeable* CProductControllerComp::CreateObject(
+istd::IChangeable* CProductControllerComp::CreateObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QByteArray& objectId,
 			QString& name,

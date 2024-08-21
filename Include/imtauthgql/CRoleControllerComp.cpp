@@ -27,7 +27,6 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 	}
 
 	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
-	QByteArray productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
 
 	imtauth::IRole* roleInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -63,7 +62,7 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 }
 
 
-istd::IChangeable* CRoleControllerComp::CreateObject(
+istd::IChangeable* CRoleControllerComp::CreateObjectFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
 		QByteArray& objectId,
 		QString& name,

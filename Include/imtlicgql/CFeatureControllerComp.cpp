@@ -17,7 +17,7 @@ namespace imtlicgql
 
 // reimplemented (imtgql::CObjectCollectionControllerCompBase)
 
-istd::IChangeable* CFeatureControllerComp::CreateObject(
+istd::IChangeable* CFeatureControllerComp::CreateObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QByteArray& objectId,
 			QString& name,

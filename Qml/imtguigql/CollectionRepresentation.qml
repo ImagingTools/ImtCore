@@ -26,6 +26,8 @@ Item {
     property alias objectViewGqlModel: objectViewModel;
     property alias headersGqlModel: headersModel;
 
+    property var payloadModel: null
+
     signal beginUpdate();
     signal endUpdate();
 
@@ -503,7 +505,7 @@ Item {
             this.setGqlQuery(gqlData);
         }
 
-        onStateChanged: {
+        onStateChanged: {           
             if (this.state === "Ready"){
                 var dataModelLocal;
                 if (this.containsKey("errors")){
@@ -531,17 +533,34 @@ Item {
                 if (this.containsKey("data")){
                     dataModelLocal = this.getData("data");
                     if (dataModelLocal.containsKey(root.collectionId + "List")){
-                        dataModelLocal = dataModelLocal.getData(root.collectionId + "List");
-                        if (dataModelLocal.containsKey("notification")){
-                            root.notificationModel = dataModelLocal.getData("notification");
+                        if (root.payloadModel){
+                            let responseObj = JSON.parse(this.json)
+                            if (!responseObj){
+                                console.error("Unable convert json ", json, " to object")
+                                return;
+                            }
+                            if ("data" in responseObj){
+                                let dataObject = responseObj["data"];
+                                let dataModelLocal = dataObject[root.collectionId + "List"];
+                                console.log("Load payloadModel")
+                                root.payloadModel.fromObject(dataModelLocal)
+                                root.elementsModel = root.payloadModel.m_items
+                            }
                         }
+                        else{
+                            dataModelLocal = dataModelLocal.getData(root.collectionId + "List");
 
-                        if (!dataModelLocal.containsKey("items")){
-                            dataModelLocal.addTreeModel("items")
-                        }
+                            if (dataModelLocal.containsKey("notification")){
+                                root.notificationModel = dataModelLocal.getData("notification");
+                            }
 
-                        if (dataModelLocal.containsKey("items")){
-                            root.elementsModel = dataModelLocal.getData("items");
+                            if (!dataModelLocal.containsKey("items")){
+                                dataModelLocal.addTreeModel("items")
+                            }
+
+                            if (dataModelLocal.containsKey("items")){
+                                root.elementsModel = dataModelLocal.getData("items");
+                            }
                         }
                     }
                 }

@@ -257,7 +257,7 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 }
 
 
-istd::IChangeable* CUserControllerComp::CreateObject(
+istd::IChangeable* CUserControllerComp::CreateObjectFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
 		QByteArray& objectId,
 		QString& name,

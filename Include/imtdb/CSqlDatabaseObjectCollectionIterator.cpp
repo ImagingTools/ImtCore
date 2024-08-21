@@ -71,6 +71,16 @@ QByteArray CSqlDatabaseObjectCollectionIterator::GetObjectId() const
 }
 
 
+QByteArray CSqlDatabaseObjectCollectionIterator::GetObjectTypeId() const
+{
+	if (m_databaseDelegate == nullptr){
+		return QByteArray();
+	}
+
+	return m_databaseDelegate->GetObjectTypeId(GetObjectId());
+}
+
+
 bool imtdb::CSqlDatabaseObjectCollectionIterator::GetObjectData(imtbase::IObjectCollection::DataPtr& dataPtr) const
 {
 	if (m_databaseDelegate == nullptr || m_currentIndex < 0 || m_currentIndex >= m_records.count()){

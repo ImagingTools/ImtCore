@@ -110,7 +110,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 
 istd::IChangeable* CObjectCollectionControllerCompBase::ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const
 {
-	return CreateObject(gqlRequest, newObjectId, name, description, errorMessage);
+	return CreateObjectFromRequest(gqlRequest, newObjectId, name, description, errorMessage);
 }
 
 
@@ -229,10 +229,47 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
-		const imtgql::CGqlRequest& /*gqlRequest*/,
-		QString& /*errorMessage*/) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
 {
-	return nullptr;
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QString("Unable to get data object. Error: Attribute 'm_objectCollectionCompPtr' was not set").toUtf8();
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
+
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	if (inputParamPtr == nullptr){
+		errorMessage = QString("Unable to get data object. Error: GraphQL input params is invalid.").toUtf8();
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
+
+	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	QByteArray objectTypeId = GetObjectTypeIdFromRequest(gqlRequest);
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+		errorMessage = QString("Unable to get data with ID: '%1'. The object does not exist.").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
+
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+
+	if (!CreateRepresentationFromObject(*dataPtr, objectTypeId, gqlRequest, *dataModelPtr)){
+		errorMessage = QString("Unable create object representation for the object with ID: '%1'.").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
+
+	return rootModelPtr.PopPtr();
 }
 
 
@@ -255,21 +292,16 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		return nullptr;
 	}
 
-	QByteArray typeId = gqlInputParamPtr->GetFieldArgumentValue("typeId").toByteArray();
+	QByteArray typeId = GetObjectTypeIdFromRequest(gqlRequest);
 	QString name = gqlInputParamPtr->GetFieldArgumentValue("name").toString();
 	QString description = gqlInputParamPtr->GetFieldArgumentValue("description").toString();
-
-	const imtgql::CGqlObject* additionalParamsPtr = gqlInputParamPtr->GetFieldArgumentObjectPtr("addition");
-	if (additionalParamsPtr != nullptr){
-		typeId = additionalParamsPtr->GetFieldArgumentValue("typeId").toByteArray();
-	}
 
 	if (typeId.isEmpty()){
 		typeId = "DocumentInfo";
 	}
 
 	QByteArray objectId;
-	istd::TDelPtr<istd::IChangeable> newObjectPtr = CreateObject(gqlRequest, objectId, name, description, errorMessage);
+	istd::TDelPtr<istd::IChangeable> newObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
 	if (!newObjectPtr.IsValid()){
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
@@ -337,7 +369,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	QString description = inputParamPtr->GetFieldArgumentValue("description").toString();
 
 	QByteArray newObjectId;
-	istd::IChangeable* savedObjectPtr = CreateObject(gqlRequest, newObjectId, name, description, errorMessage);
+	istd::IChangeable* savedObjectPtr = CreateObjectFromRequest(gqlRequest, newObjectId, name, description, errorMessage);
 	if (savedObjectPtr == nullptr){
 		errorMessage = QString("Can not create object for update: '%1'").arg(qPrintable(oldObjectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -413,7 +445,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 			QString name;
 			QString description;
 
-			istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObject(gqlRequest, objectId, name, description, errorMessage);
+			istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
 			if (savedObjectPtr.IsValid()){
 				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr)){
 					errorMessage += QString("Could not update object: '%1'; ").arg(qPrintable(objectId));
@@ -1041,6 +1073,36 @@ QVariant CObjectCollectionControllerCompBase::GetObjectInformation(const QByteAr
 }
 
 
+QByteArray CObjectCollectionControllerCompBase::GetObjectTypeIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParam("input");
+	if (gqlInputParamPtr != nullptr){
+		QByteArray typeId = gqlInputParamPtr->GetFieldArgumentValue("typeId").toByteArray();
+
+		if (typeId.isEmpty()){
+			const imtgql::CGqlObject* additionalParamsPtr = gqlInputParamPtr->GetFieldArgumentObjectPtr("addition");
+			if (additionalParamsPtr != nullptr){
+				typeId = additionalParamsPtr->GetFieldArgumentValue("typeId").toByteArray();
+			}
+		}
+
+		return typeId;
+	}
+
+	return QByteArray();
+}
+
+
+bool CObjectCollectionControllerCompBase::CreateRepresentationFromObject(
+			const istd::IChangeable& data,
+			const QByteArray& objectTypeId,
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& dataModel) const
+{
+	return false;
+}
+
+
 istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
 		const QList<imtgql::CGqlObject>& /*inputParams*/,
 		QByteArray& /*objectId*/,
@@ -1052,7 +1114,7 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
 }
 
 
-istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
+istd::IChangeable* CObjectCollectionControllerCompBase::CreateObjectFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
 		QByteArray& newObjectId,
 		QString& name,

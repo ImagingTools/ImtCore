@@ -12,6 +12,7 @@ CollectionView {
 
     property bool hasRemoteChanges: false;
     property bool tableViewParamsStoredServer: true;
+    property var payloadModel: null
 
     // Invisible fields that will be requested for collection
     property var additionalFieldIds: ["Id", "Name"]
@@ -79,6 +80,8 @@ CollectionView {
     dataControllerComp: Component {
         CollectionRepresentation {
             property bool isReady: false;
+
+            payloadModel: root.payloadModel
 
             Component.onCompleted: {
                 Events.subscribeEvent("CommandsGuiReady", commandsIsReady);

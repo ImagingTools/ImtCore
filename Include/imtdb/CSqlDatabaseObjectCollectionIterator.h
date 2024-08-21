@@ -29,6 +29,7 @@ public:
 	virtual bool Next() const override;
 	virtual bool Previous() const override;
 	virtual QByteArray GetObjectId() const override;
+	virtual QByteArray GetObjectTypeId() const override;
 	virtual bool GetObjectData(imtbase::IObjectCollection::DataPtr& dataPtr) const override;
 	virtual idoc::MetaInfoPtr GetDataMetaInfo() const override;
 	virtual QVariant GetElementInfo(QByteArray infoId) const override;

@@ -22,7 +22,7 @@ public:
 
 protected:
 	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual istd::IChangeable* CreateObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& objectId, QString& name, QString& description, QString& errorMessage) const override;
+	virtual istd::IChangeable* CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& objectId, QString& name, QString& description, QString& errorMessage) const override;
 
 private:
 	I_FACT(imtauth::IRole, m_roleFactCompPtr);
