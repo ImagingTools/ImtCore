@@ -89,110 +89,189 @@ class TextInput extends Item {
     static create(parent, ...args){
         let proxy = super.create(parent, ...args)
         proxy.__DOM.classList.add('TextInput')
-        proxy.__DOM.setAttribute('contenteditable', true)
+        proxy.__createImpl()
+        
+        return proxy
+    }
 
-        proxy.__DOM.onmousemove = (e)=>{
+    __createImpl(){
+        let dom = this.__getDOM()
+        let impl = document.createElement('div')
+        impl.classList.add('impl')
+        dom.appendChild(impl)
+        this.__impl = impl
+
+        impl.setAttribute('contenteditable', true)
+
+        impl.onmousemove = (e)=>{
             let selection = document.getSelection()
 
             if(selection.rangeCount){
                 let range = selection.getRangeAt(0)
 
-                proxy.selectionStart = range.startOffset
-                proxy.selectionEnd = range.endOffset
+                this.selectionStart = range.startOffset
+                this.selectionEnd = range.endOffset
             } else {
-                proxy.selectionStart = 0
-                proxy.selectionEnd = 0
+                this.selectionStart = 0
+                this.selectionEnd = 0
             }
             
         }
-        proxy.__DOM.onkeydown = (e)=>{
+        impl.onkeydown = (e)=>{
             let selection = document.getSelection()
 
             if(selection.rangeCount){
                 let range = selection.getRangeAt(0)
 
-                proxy.selectionStart = range.startOffset
-                proxy.selectionEnd = range.endOffset
+                this.selectionStart = range.startOffset
+                this.selectionEnd = range.endOffset
             } else {
-                proxy.selectionStart = 0
-                proxy.selectionEnd = 0
+                this.selectionStart = 0
+                this.selectionEnd = 0
             }
 
             if(e.keyCode === QtEnums.Key_C && e.ctrlKey){
                 e.preventDefault()
-                proxy.copy()
+                this.copy()
             } else if(e.keyCode === QtEnums.Key_V && e.ctrlKey){
                 e.preventDefault()
-                proxy.paste()
+                this.paste()
             } else if(e.keyCode === QtEnums.Key_X && e.ctrlKey){
                 e.preventDefault()
-                proxy.cut()
+                this.cut()
             } else if(e.code === QtEnums.Key_Enter){
                 e.preventDefault()
-                proxy.accepted()
+                this.accepted()
             }
         }
-        proxy.__DOM.oninput = (e)=>{
+        impl.oninput = (e)=>{
             let selection = document.getSelection()
             selection.removeAllRanges()
 
-            let buff = proxy.text.split('') 
+            let buff = this.text.split('') 
             switch(e.inputType){
                 case 'insertText': {
-                    buff.splice(proxy.selectionStart, proxy.selectionEnd-proxy.selectionStart, e.data)
-                    proxy.text = buff.join('')
-                    proxy.select(proxy.selectionEnd+1, proxy.selectionEnd+1)
+                    buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart, e.data)
+                    this.text = buff.join('')
+                    this.select(this.selectionEnd+1, this.selectionEnd+1)
                     break
                 }
                 case 'insertFromPaste': {
-                    proxy.paste()
+                    this.paste()
                     break
                 }
                 case 'deleteByCut': {
-                    proxy.cut()
+                    this.cut()
                     break
                 }
                 case 'deleteContentBackward': {
                     let data = []
-                    if(proxy.selectionStart === proxy.selectionEnd){
-                        data = buff.splice(proxy.selectionStart-1, proxy.selectionEnd-(proxy.selectionStart-1))
+                    if(this.selectionStart === this.selectionEnd){
+                        data = buff.splice(this.selectionStart-1, this.selectionEnd-(this.selectionStart-1))
                     } else {
-                        data = buff.splice(proxy.selectionStart, proxy.selectionEnd-proxy.selectionStart)
+                        data = buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart)
                     }
-                    proxy.text = buff.join('')
-                    proxy.select(proxy.selectionEnd-data.length, proxy.selectionEnd-data.length)
+                    this.text = buff.join('')
+                    this.select(this.selectionEnd-data.length, this.selectionEnd-data.length)
                     break
                 }
                 case 'deleteContentForward': {
                     let data = []
-                    if(proxy.selectionStart === proxy.selectionEnd){
-                        data = buff.splice(proxy.selectionStart, proxy.selectionEnd+1-proxy.selectionStart)
+                    if(this.selectionStart === this.selectionEnd){
+                        data = buff.splice(this.selectionStart, this.selectionEnd+1-this.selectionStart)
                     } else {
-                        data = buff.splice(proxy.selectionStart, proxy.selectionEnd-proxy.selectionStart)
+                        data = buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart)
                     }
-                    proxy.text = buff.join('')
-                    proxy.select(proxy.selectionEnd, proxy.selectionEnd)
+                    this.text = buff.join('')
+                    this.select(this.selectionEnd, this.selectionEnd)
                     break
                 }
             }
 
         }
-        return proxy
+
+        return impl
+    }
+
+    __setImplStyle(style){
+        if(this.__impl) {
+            for(let name in style){
+                this.__impl.style[name] = style[name]
+            }
+        }
+    }
+
+    onHorizontalAlignmentChanged(){
+        switch(this.horizontalAlignment){
+            case TextInput.AlignLeft: {
+                this.__setImplStyle({
+                    alignItems: 'flex-start'
+                })
+                break
+            }
+            case TextInput.AlignRight: {
+                this.__setImplStyle({
+                    alignItems: 'flex-end'
+                })
+                break
+            }
+            case TextInput.AlignHCenter: {
+                this.__setImplStyle({
+                    alignItems: 'center'
+                })
+                break
+            }
+            case TextInput.AlignJustify: {
+                this.__setImplStyle({
+                    alignItems: 'normal'
+                })
+                break
+            }
+        }
+    }
+
+    onVerticalAlignmentChanged(){
+        switch(this.verticalAlignment){
+            case TextInput.AlignTop: {
+                this.__setImplStyle({
+                    justifyContent: 'flex-start'
+                })
+                break
+            }
+            case TextInput.AlignBottom: {
+                this.__setImplStyle({
+                    justifyContent: 'flex-end'
+                })
+                break
+            }
+            case TextInput.AlignVCenter: {
+                this.__setImplStyle({
+                    justifyContent: 'center'
+                })
+                break
+            }
+            case TextInput.AlignJustify: {
+                this.__setImplStyle({
+                    justifyContent: 'normal'
+                })
+                break
+            }
+        }
     }
 
     onEchoModeChanged(){
         if(this.echoMode === TextInput.Password){
-            this.__DOM.innerText = this.text.replaceAll(/./g, '*')
+            this.__impl.innerText = this.text.replaceAll(/./g, '*')
         } else {
-            this.__DOM.innerText = this.text
+            this.__impl.innerText = this.text
         }
     }
 
     onTextChanged(){
         if(this.echoMode === TextInput.Password){
-            this.__DOM.innerText = this.text.replaceAll(/./g, '*')
+            this.__impl.innerText = this.text.replaceAll(/./g, '*')
         } else {
-            this.__DOM.innerText = this.text
+            this.__impl.innerText = this.text
         }
     }
 
@@ -251,12 +330,12 @@ class TextInput extends Item {
         let selection = document.getSelection()
         selection.removeAllRanges()
         let range = new Range()
-        if(this.__DOM.childNodes.length){
-            range.setStart(this.__DOM.childNodes[0], start)
-            range.setEnd(this.__DOM.childNodes[0], end)
+        if(this.__impl.childNodes.length){
+            range.setStart(this.__impl.childNodes[0], start)
+            range.setEnd(this.__impl.childNodes[0], end)
         } else {
-            range.setStart(this.__DOM, 0)
-            range.setEnd(this.__DOM, 0)
+            range.setStart(this.__impl, 0)
+            range.setEnd(this.__impl, 0)
         }
         selection.addRange(range)
         this.selectionStart = start

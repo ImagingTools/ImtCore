@@ -413,6 +413,10 @@ class Instruction {
                         stat.isCompute = true
                         stat.value += stat.thisKey + '.' +tree[1]
                         return stat
+                    } else if(tree[1] === 'Qt'){
+                        stat.isCompute = true
+                        stat.value += 'JQModules.Qt'
+                        return stat
                     }
 
                     try {               
@@ -1076,24 +1080,6 @@ class Instruction {
             code.push(`self.__complete()`)
         }
 
-        code.push('return self')
-        code.push('}')
-
-        let connectionsInfo = {}
-        for(let defineMethod of this.defineMethods){
-            if(defineMethod.name.slice(0, 2) === 'on'){
-                let signalName = defineMethod.name[2].toLowerCase() + defineMethod.name.slice(3)
-                connectionsInfo[signalName] = defineMethod.name
-            }
-            let stat = this.prepare(defineMethod.source, {isCompute:false, thisKey: 'this', value:'', local:[]})
-            code.push(stat.value)
-        }
-
-        if(typeBase === JQModules.QtQml.Connections){
-            code.push(`__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
-        }
-        
-
         for(let connectedSignal of this.connectedSignals){
             let names = connectedSignal.slotName.replaceAll("['", '').replaceAll("']", '').split('.')
             let signalName = ''
@@ -1113,19 +1099,32 @@ class Instruction {
                 connectedSignal.args.push(arg.replaceAll('`', ''))
             }
 
-            let callSuper = ''
-            if(names.length === 1){
-                callSuper = `if(super.${connectedSignal.slotName})super.${connectedSignal.slotName}(${connectedSignal.args.join(',')});`
-            } else {
-                callSuper = `if(super${connectedSignal.slotName})super${connectedSignal.slotName}(${connectedSignal.args.join(',')});`
-            }
-
-            code.push(`${connectedSignal.slotName}(${connectedSignal.args.join(',')}){${callSuper}try{JQApplication.beginUpdate();`)
+            code.push(`self.__addSignalSlot('${names.join('.')}',(${connectedSignal.args.join(',')})=>{try{JQApplication.beginUpdate();`)
             
-            let stat = this.prepare(connectedSignal.source, {isCompute:false, thisKey: 'this', value:'', local:[connectedSignal.args]}) 
+            let stat = this.prepare(connectedSignal.source, {isCompute:false, thisKey: 'self', value:'', local:[connectedSignal.args]}) 
             code.push(stat.value)
-            code.push(`}finally{JQApplication.endUpdate()}}`)
+            code.push(`}finally{JQApplication.endUpdate()}})`)
         }
+
+        code.push('return self')
+        code.push('}')
+
+        let connectionsInfo = {}
+        for(let defineMethod of this.defineMethods){
+            if(defineMethod.name.slice(0, 2) === 'on'){
+                let signalName = defineMethod.name[2].toLowerCase() + defineMethod.name.slice(3)
+                connectionsInfo[signalName] = defineMethod.name
+            }
+            let stat = this.prepare(defineMethod.source, {isCompute:false, thisKey: 'this', value:'', local:[]})
+            code.push(stat.value)
+        }
+
+        if(typeBase === JQModules.QtQml.Connections){
+            code.push(`__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
+        }
+        
+
+        
 
         if(this.qmlFile.singleton && isRoot){
             code.push(`}).create()`)

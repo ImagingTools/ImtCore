@@ -56,8 +56,12 @@ module.exports = {
                 font-size: 14px;
                 font-family: 'Segoe UI';
             }
-            .TextInput, .TextEdit {
+            .TextInput .impl, .TextEdit .impl {
+                display: flex;
+                width: 100%;
+                height: 100%;
                 flex-direction: column;
+                z-index: 1;
             }
             .Image {
                 background-repeat: no-repeat;
