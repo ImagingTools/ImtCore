@@ -132,7 +132,6 @@ Rectangle{
             popup.modelFilterAlias.setData("TextFilter", "");
             popup.excludeFilterPart = searchContainer.currentText;
             popup.filterText = searchContainer.currentText;
-            popup.updateModel();
         }
 
 
@@ -192,8 +191,6 @@ Rectangle{
                 popup.modelFilterAlias.setData("TextFilter", "");
                 popup.excludeFilterPart = searchContainer.currentText;
                 popup.filterText = searchContainer.currentText;
-
-                popup.updateModel();
 
             }
 
@@ -308,7 +305,6 @@ Rectangle{
         if(!searchTextField.openST && searchTextField.currentText == "" ){
             searchTextField.excludeFilterPart = "";
             searchContainer.externalSearchParam = "";
-            //searchContainer.updateModel("");
             searchContainer.accepted("");
         }
         else if(!searchTextField.openST && searchTextField.currentText !== ""){
@@ -323,7 +319,6 @@ Rectangle{
         if(!searchTextField.openST && searchTextField.currentText == "" ){
             searchTextField.excludeFilterPart = "";
             searchContainer.externalSearchParam = "";
-            //searchContainer.updateModel("");
             searchContainer.accepted("");
         }
         else if(!searchTextField.openST && searchTextField.currentText !== ""){
