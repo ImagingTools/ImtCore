@@ -466,10 +466,19 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 
 void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream, const CSdlRequest& sdlRequest, CSdlDocumentType::OperationType operationType, const QString& itemClassName, uint hIndents)
 {
-	if (operationType == CSdlDocumentType::OT_GET)
+	if (operationType == CSdlDocumentType::OT_GET ||
+		operationType == CSdlDocumentType::OT_LIST)
 	{
 		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const C");
+		stream << QStringLiteral("virtual bool CreateRepresentationFromObject(const ");
+
+		if (operationType == CSdlDocumentType::OT_GET){
+			stream << QStringLiteral("istd::IChangeable& data");
+		}
+		else {
+			stream << QStringLiteral("imtbase::IObjectCollectionIterator& objectCollectionIterator");
+		}
+		stream << QStringLiteral(", const C");
 		stream << GetCapitalizedValue(sdlRequest.GetName());
 		stream << QStringLiteral("GqlRequest& ");
 		stream << GetDecapitalizedValue(sdlRequest.GetName());
@@ -477,32 +486,6 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 		stream << itemClassName;
 		stream << QStringLiteral("& representationObject) const = 0;");
 		FeedStream(stream, 1, false);
-	}
-	else if (operationType == CSdlDocumentType::OT_LIST)
-	{
-
-		/**
-		 use
-
-	virtual bool SetupGqlItem(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
-			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-			QString& errorMessage) const;
-
-		*/
-#if 0
-		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const C");
-		stream << GetCapitalizedValue(sdlRequest.GetName());
-		stream << QStringLiteral("& ");
-		stream << GetDecapitalizedValue(sdlRequest.GetName());
-		stream << QStringLiteral("Request, C");
-		stream << itemClassName;
-		stream << QStringLiteral("& representationObject) const = 0;");
-		FeedStream(stream, 1, false);
-#endif
 	}
 	else if (operationType == CSdlDocumentType::OT_UPDATE){
 		FeedStreamHorizontally(stream, hIndents);
