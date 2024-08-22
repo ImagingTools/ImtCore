@@ -585,7 +585,6 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	// method's body
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("const QByteArray commandId = gqlRequest.GetCommandId();");
-	stream << QStringLiteral("const QByteArray objectTypeId = GetObjectTypeIdFromRequest(gqlRequest);");
 	FeedStream(stream, 2, false);
 
 	// create sections for expected command IDs
