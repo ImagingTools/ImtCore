@@ -595,12 +595,12 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	// create default section
 	// add error message
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command id '%1'\").arg(commandId);");
+//	stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command id '%1'\").arg(commandId);");
 	FeedStream(stream, 1, false);
 
 	// send log message
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
+//	stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
 	FeedStream(stream, 2, false);
 
 	// return
