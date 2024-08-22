@@ -222,6 +222,12 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const
 }
 
 
+QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const
+{
+	return GetObjectIdFromInputParams(gqlRequest.GetParams());
+}
+
+
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
 		const imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
