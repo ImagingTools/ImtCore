@@ -50,6 +50,17 @@ private:
 	static QString WrapFileName(const QString& baseName, const QString& ext, const QString& directoryPath = QString());
 
 private:
+	struct ImplGenerationInfo
+	{
+		ImplGenerationInfo(const CSdlRequest& r, const QString& n)
+			:request(r), containerClassName(n)
+		{
+		}
+		CSdlRequest request;
+		QString containerClassName;
+	};
+
+private:
 	bool CloseFiles();
 	bool ProcessFiles(const CSdlDocumentType& sdlDocumentType, bool addDependenciesInclude, bool addSelfHeaderInclude);
 	bool ProcessHeaderClassFile(const CSdlDocumentType& sdlDocumentType, bool addDependenciesInclude);
@@ -65,8 +76,10 @@ private:
 		Creates method implementations for all document's (and subtype's) operation types
 	 */
 	void AddCollectionMethodsImplForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType);
-	void AddImplCodeForRequests(QTextStream& stream, CSdlDocumentType::OperationType operationType, const SdlRequestList& requestList, const QString& className, uint hIndents = 0);
-	void AddImplCodeForRequest(QTextStream& stream, const CSdlRequest& sdlRequest, CSdlDocumentType::OperationType operationType, uint hIndents = 0);
+	void AddImplCodeForRequests(QTextStream& stream, CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, uint hIndents = 0);
+	void AddImplCodeForRequest(QTextStream& stream, const ImplGenerationInfo& sdlRequest, CSdlDocumentType::OperationType operationType, uint hIndents = 0);
+	QString GetInputExtractionStringForTypeName(const CSdlRequest& sdlRequest, const QString typeName) const;
+	bool FindCallChainForField(const CSdlField& sdlRequest, const QString typeName, QString& callChain) const;
 
 
 
