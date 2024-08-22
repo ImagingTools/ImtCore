@@ -308,7 +308,13 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	FeedStream(ifStream, 1, false);
 
 	// public section
+	/// \bug if no public section, base class macro will not be added
+	/// \todo fix it
 	ifStream << QStringLiteral("public:");
+	FeedStream(ifStream, 1, false);
+
+	// protected section (base)
+	ifStream << QStringLiteral("protected:");
 	FeedStream(ifStream, 1, false);
 
 	// base class methods override definition
@@ -317,23 +323,15 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
+	ifStream << QStringLiteral("virtual bool SetupGqlItem(const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& model, int itemIndex,const imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
+	ifStream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel) const override;");
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("virtual imtbase::CTreeItemModel* UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
-	FeedStream(ifStream, 1, false);
-
-	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("virtual imtbase::CTreeItemModel* DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
-	FeedStream(ifStream, 1, false);
-
-	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
+	ifStream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const override;");
 	FeedStream(ifStream, 1, false);
 
 	// protected section
@@ -510,17 +508,22 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplFor
 				CSdlDocumentType::OT_GET,
 				CSdlDocumentType::OT_INSERT,
 				CSdlDocumentType::OT_UPDATE,
-				CSdlDocumentType::OT_DELETE,
 				CSdlDocumentType::OT_LIST});
+
+	// join update and insert. it has same code
+	if (requestMultiMap.contains(CSdlDocumentType::OT_INSERT) && requestMultiMap.contains(CSdlDocumentType::OT_UPDATE)) {
+		remainingOperations.removeAll(CSdlDocumentType::OT_UPDATE);
+		const SdlRequestList requestList = requestMultiMap.values(CSdlDocumentType::OT_UPDATE);
+		for (const CSdlRequest& request: requestList){
+			requestMultiMap.insert(CSdlDocumentType::OT_INSERT, request);
+		}
+		requestMultiMap.remove(CSdlDocumentType::OT_UPDATE);
+	}
 
 	for (CSdlDocumentType::OperationType operationType: requestMultiMap.uniqueKeys()){
 		SdlRequestList requestList = requestMultiMap.values(operationType);
 		AddImplCodeForRequests(stream, operationType, requestList, className);
 		remainingOperations.removeAll(operationType);
-	}
-
-	for (CSdlDocumentType::OperationType operationType: remainingOperations){
-		AddImplCodeForRequests(stream, operationType, SdlRequestList(), className);
 	}
 }
 
@@ -533,106 +536,78 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 {
 	// declare method
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("imtbase::CTreeItemModel* ");
-	stream << className;
-	stream << ':' << ':';
+
+	// a) type
 	switch (operationType) {
 	case CSdlDocumentType::OT_GET:
-		stream << QStringLiteral("GetObject");
-		break;
-	case CSdlDocumentType::OT_INSERT:
-		stream << QStringLiteral("InsertObject");
+	case CSdlDocumentType::OT_LIST:
+		stream << QStringLiteral("bool ");
 		break;
 	case CSdlDocumentType::OT_UPDATE:
-		stream << QStringLiteral("UpdateObject");
+	case CSdlDocumentType::OT_INSERT:
+		stream << QStringLiteral("istd::IChangeable* ");
 		break;
 	case CSdlDocumentType::OT_DELETE:
-		stream << QStringLiteral("DeleteObject");
-		break;
-	case CSdlDocumentType::OT_LIST:
-		stream << QStringLiteral("ListObjects");
+		// nothing todo
 		break;
 	default:
 		SendCriticalMessage(0, QString("Unexpected type: %1").arg(QString::number(operationType)));
 		I_CRITICAL();
 		break;
 	}
-	stream << QStringLiteral("(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const");
+
+	stream << className << ':' << ':';
+
+	// b) name and argset
+	switch (operationType) {
+	case CSdlDocumentType::OT_LIST:
+		stream << QStringLiteral("SetupGqlItem(const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& model, int itemIndex,const imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const");
+		break;
+	case CSdlDocumentType::OT_GET:
+		stream << QStringLiteral("CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel) const");
+		break;
+	case CSdlDocumentType::OT_UPDATE:
+	case CSdlDocumentType::OT_INSERT:
+		stream << QStringLiteral("CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const");
+		break;
+	default:
+		break;
+	}
+
 	FeedStream(stream, 1, false);
 
-	// method's body
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	// call base class method if no expected requests for method
-	if (requestList.isEmpty()){
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("return BaseClass::");
 
-		switch (operationType) {
-		case CSdlDocumentType::OT_GET:
-			stream << QStringLiteral("GetObject");
-			break;
-		case CSdlDocumentType::OT_INSERT:
-			stream << QStringLiteral("InsertObject");
-			break;
-		case CSdlDocumentType::OT_UPDATE:
-			stream << QStringLiteral("UpdateObject");
-			break;
-		case CSdlDocumentType::OT_DELETE:
-			stream << QStringLiteral("DeleteObject");
-			break;
-		case CSdlDocumentType::OT_LIST:
-			stream << QStringLiteral("ListObjects");
-			break;
-		default:
-			SendCriticalMessage(0, QString("Unexpected type: %1").arg(QString::number(operationType)));
-			I_CRITICAL();
-			break;
-		}
 
-		stream << QStringLiteral("(gqlRequest, errorMessage);");
-		FeedStream(stream, 1, false);
+	// method's body
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("const QByteArray commandId = gqlRequest.GetCommandId();");
+	stream << QStringLiteral("const QByteArray objectTypeId = GetObjectTypeIdFromRequest(gqlRequest);");
+	FeedStream(stream, 2, false);
+
+	// create sections for expected command IDs
+	for (const CSdlRequest& sdlRequest: requestList){
+//		AddImplCodeForRequest(stream, sdlRequest, operationType, hIndents + 1);
 	}
-	else {
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("const QByteArray commandId = gqlRequest.GetCommandId();");
-		FeedStream(stream, 1, false);
 
-		/// create a carrier model GQL spec	\link https://spec.graphql.org/draft/#sec-Response-Format
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("istd::TDelPtr<imtbase::CTreeItemModel> modelPtr(new imtbase::CTreeItemModel);");
-		FeedStream(stream, 1, false);
+	// create default section
+	// add error message
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command id '%1'\").arg(commandId);");
+	FeedStream(stream, 1, false);
 
-		/// \todo add errors model and don't forget to fill it	\link https://spec.graphql.org/draft/#sec-Errors
+	// send log message
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
+	FeedStream(stream, 2, false);
 
-		// create dataModel - child of a carrier model
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel(\"data\");");
-		FeedStream(stream, 2, false);
-
-		// create sections for expected command IDs
-		for (const CSdlRequest& sdlRequest: requestList){
-			AddImplCodeForRequest(stream, sdlRequest, hIndents + 1);
-		}
-
-		// create default section
-		// add error message
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command id '%1'\").arg(commandId);");
-		FeedStream(stream, 1, false);
-
-		// send log message
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
-		FeedStream(stream, 2, false);
-
-		// return
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("return nullptr;");
-		FeedStream(stream, 1, false);
-	}
+	// return
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return nullptr;");
+	FeedStream(stream, 1, false);
 
 	// end of method
 	FeedStreamHorizontally(stream, hIndents);
@@ -641,7 +616,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 
 }
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& stream, const CSdlRequest& sdlRequest, uint hIndents)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& stream, const CSdlRequest& sdlRequest, CSdlDocumentType::OperationType operationType, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '/' << '/' << sdlRequest.GetName();
