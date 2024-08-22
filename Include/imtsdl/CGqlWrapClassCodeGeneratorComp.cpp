@@ -561,11 +561,7 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 	[[maybe_unused]]bool isTypeFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(), sdlType);
 	Q_ASSERT(isTypeFound);
 
-	if (sdlType.GetName() == sdlField.GetType()){
-		SendErrorMessage(0, QString("Field '%1' references to itself!").arg(sdlField.GetType()));
-
-		return;
-	}
+	/// \todo add checks to itself
 
 	if (createStructDefinition ){
 		FeedStreamHorizontally(stream, hIndents);
