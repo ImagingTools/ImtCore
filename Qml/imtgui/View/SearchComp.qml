@@ -46,6 +46,7 @@ Rectangle{
     property string parentIds: "";
     property string excludeFilterPart: "";
     property string selectedText: "";
+    property string additionalFilter: "";
 
     property bool isTextIncrease: false;
     property string previousText: "";
@@ -556,6 +557,7 @@ Rectangle{
 
         canClose: true;
         doNotCorrectPosition : true;
+        additionalFilter: searchContainer.additionalFilter;
 
         onCloseEmptySignal:{
             if(searchContainer.isAddressSearch){

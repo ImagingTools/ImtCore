@@ -55,6 +55,7 @@ Item {
 
     property string excludeFilterPart: "";
     property bool canUpdateModel: true;
+    property string additionalFilter: "";
 
     // ID for display in combo box delegates
     property string nameId: "Name";
@@ -160,6 +161,7 @@ Item {
             pauseDuration: comboBoxContainerGql.pauseDuration;
             excludeFilterPart: comboBoxContainerGql.excludeFilterPart;
             canUpdateModel: comboBoxContainerGql.canUpdateModel;
+            additionalFilter: comboBoxContainerGql.additionalFilter;
             // doNotCorrectPosition: comboBoxContainerGql.doNotCorrectPosition; !!!!!!!!!!!!
 
 //            function getCurrentText(index){

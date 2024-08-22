@@ -35,6 +35,7 @@ Item {
     property bool canUpdateModel: true;
     property bool preventFirstLoading: false;
     property bool doNotCorrectPosition : false;
+    property string additionalFilter: "";
 
     property alias modelFilterAlias: modelFilter;
 
@@ -514,6 +515,9 @@ Item {
             viewParams.InsertField("Offset", offsetVar);
             viewParams.InsertField("Count", popupMenuContainer.count);
             viewParams.InsertField("FilterModel");
+            if(popupMenuContainer.additionalFilter != ""){
+                viewParams.InsertField("AdditionalFilter", popupMenuContainer.additionalFilter);
+            }
             var jsonString = modelFilter.toJson();
             //            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
             viewParams.InsertField("FilterModel", jsonString);
