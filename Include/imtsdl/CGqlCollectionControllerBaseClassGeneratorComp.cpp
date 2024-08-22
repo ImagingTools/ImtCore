@@ -491,7 +491,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRepresentation(const C");
 		stream << itemClassName;
-		stream << QStringLiteral("& representationObject, QString& errorMessage) const;");
+		stream << QStringLiteral("& representationObject, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const;");
 		FeedStream(stream, 1, false);
 	}
 	else {
