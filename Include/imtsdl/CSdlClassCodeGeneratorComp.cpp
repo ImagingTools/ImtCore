@@ -800,7 +800,7 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 		stream << QStringLiteral(";");
 		FeedStream(stream, 1, false);
 
-		GenerateListUpdateCode(stream, sdlField, isCustom, indents + 2);
+		GenerateListUpdateCode(stream, sdlField, isCustom, false, indents + 2);
 
 		FeedStreamHorizontally(stream, indents + 1);
 		stream << '}';
@@ -830,7 +830,7 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 			FeedStream(stream, 1, false);
 
 			// update internal storage
-			GenerateListUpdateCode(stream, sdlField, isCustom, indents + 1);
+			GenerateListUpdateCode(stream, sdlField, isCustom, true, indents + 1);
 
 			FeedStreamHorizontally(stream, indents);
 			stream << '}';
@@ -900,7 +900,7 @@ void CSdlClassCodeGeneratorComp::GenerateMetaInfo(
 }
 
 
-void CSdlClassCodeGeneratorComp::GenerateListUpdateCode(QTextStream& stream, const CSdlField& sdlField, bool isCustom, uint indents)
+void CSdlClassCodeGeneratorComp::GenerateListUpdateCode(QTextStream& stream, const CSdlField& sdlField, bool isCustom, bool fromInternal, uint indents)
 {
 	if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
 		FeedStreamHorizontally(stream, indents);
@@ -910,6 +910,9 @@ void CSdlClassCodeGeneratorComp::GenerateListUpdateCode(QTextStream& stream, con
 			FeedStream(stream, 1, false);
 			FeedStreamHorizontally(stream, indents);
 			stream << QStringLiteral("for (const auto& tempValue: std::as_const(");
+			if (fromInternal){
+				stream << QStringLiteral("m_");
+			}
 			stream << GetDecapitalizedValue(sdlField.GetId());
 			stream << QStringLiteral(")){");
 

@@ -75,6 +75,7 @@ private:
 				QTextStream& stream,
 				const CSdlField& sdlField,
 				bool isCustom,
+				bool fromInternal,
 				uint indents = 1);
 
 private:
