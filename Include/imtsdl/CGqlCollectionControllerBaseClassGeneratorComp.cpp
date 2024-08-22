@@ -454,7 +454,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 		CSdlDocumentType::OperationType operationType = operation.key();
 		if (operationType == CSdlDocumentType::OT_GET || operationType == CSdlDocumentType::OT_LIST){
 			if (!implementedGetRequests.contains(sdlRequest)){
-				AddMethodForDocument(stream, operation.value(), operationType, sdlDocumentType.GetName(), hIndents);
+				AddMethodForDocument(stream, operation.value(), operationType, sdlDocumentType.GetReferenceType().GetName(), hIndents);
 				implementedGetRequests << sdlRequest;
 			}
 		}
