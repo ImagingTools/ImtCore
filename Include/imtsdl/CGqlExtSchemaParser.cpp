@@ -225,7 +225,22 @@ bool CGqlExtSchemaParser::ProcessCustomSection(const QString& sectionName)
 
 bool CGqlExtSchemaParser::ValidateSchema()
 {
-	return BaseClass::ValidateSchema();
+	if (!BaseClass::ValidateSchema()){
+		return false;
+	}
+
+	// all document types MUST have a reference
+	for (const CSdlDocumentType& sdlDocumentType: m_documentTypes){
+		if (sdlDocumentType.GetReferenceType().GetName().isEmpty()){
+			SendLogMessage(
+				istd::IInformationProvider::IC_ERROR,
+				0,
+				"Document type '%1' does not have a reference! define 'ref' for it.",
+				"ValidateDocumentSchema");
+			return false;
+		}
+	}
+	return true;
 }
 
 
