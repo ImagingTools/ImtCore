@@ -33,7 +33,7 @@ public:
 	virtual qint64 GetKey(const QByteArray& value = QByteArray()) override;
 	virtual qint64 GetFirstKey() override;
 	virtual qint64 GetLastKey() override;
-	virtual QString GetStringKey(const QByteArray& value = QByteArray()) override;
+	virtual QByteArray GetKeyBA(const QByteArray& value = QByteArray()) override;
 	virtual bool CreateIndex() override;
 	virtual bool MoveTo(qint64 key) override;
 	virtual bool MoveTo(const QByteArray& key) override;

@@ -354,21 +354,21 @@ qint64 CDocumentTable::GetLastKey()
 }
 
 
-QString CDocumentTable::GetStringKey(const QByteArray &value)
+QByteArray CDocumentTable::GetKeyBA(const QByteArray &value)
 {
 	//qDebug() << "CDocumentTable::GetKey";
 
 	try{
-		QString key = QString();
+		QByteArray key = QByteArray();
 
 		if(m_hasIndex){
 			mdbx::slice valueSlice(value);
 			try{
 				mdbx::cursor::move_result result = m_cursorIndex.find(valueSlice);
-				key = QString::fromStdString(result.value.as_string());
+				key = QByteArray::fromStdString(result.value.as_string());
 			}
 			catch(...){
-				return QString();
+				return QByteArray();
 			}
 		}
 
@@ -376,10 +376,10 @@ QString CDocumentTable::GetStringKey(const QByteArray &value)
 			try{
 				mdbx::cursor::move_result result = m_cursor.to_first();
 				while(1){
-					QString keyRead;
+					QByteArray keyRead;
 					std::string valueRead;
 					if (result.done){
-						keyRead = QString::fromStdString(result.key.as_string());
+						keyRead = QByteArray::fromStdString(result.key.as_string());
 						valueRead = result.value.as_string();
 						if(valueRead.data() == value){
 							key = keyRead;
@@ -396,7 +396,7 @@ QString CDocumentTable::GetStringKey(const QByteArray &value)
 				}
 			}
 			catch(...){
-				return QString();
+				return QByteArray();
 			}
 
 		}
@@ -404,10 +404,10 @@ QString CDocumentTable::GetStringKey(const QByteArray &value)
 		return key;
 	}
 	catch(...){
-		return QString();
+		return QByteArray();
 	}
 
-	return QString();
+	return QByteArray();
 
 }
 

@@ -27,7 +27,7 @@ public:
 	virtual qint64 GetKey(const QByteArray& value = QByteArray()) = 0;
 	virtual qint64 GetFirstKey() = 0;
 	virtual qint64 GetLastKey() = 0;
-	virtual QString GetStringKey(const QByteArray& value = QByteArray()) = 0;
+	virtual QByteArray GetKeyBA(const QByteArray& value = QByteArray()) = 0;
 	virtual bool CreateIndex() = 0;
 	virtual bool MoveTo(qint64 key) = 0;
 	virtual bool MoveTo(const QByteArray& key) = 0;
