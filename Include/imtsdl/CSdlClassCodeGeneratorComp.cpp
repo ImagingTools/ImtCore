@@ -800,41 +800,7 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 		stream << QStringLiteral(";");
 		FeedStream(stream, 1, false);
 
-		if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
-			FeedStreamHorizontally(stream, indents + 2);
-			if (isCustom && sdlField.IsArray()){
-				stream << QStringLiteral("QVariantList temp") << GetCapitalizedValue(sdlField.GetId()) << QStringLiteral("List;");
-
-				FeedStream(stream, 1, false);
-				FeedStreamHorizontally(stream, indents + 2);
-				stream << QStringLiteral("for (const auto& tempValue: std::as_const(");
-				stream << GetDecapitalizedValue(sdlField.GetId());
-				stream << QStringLiteral(")){");
-
-				FeedStream(stream, 1, false);
-				FeedStreamHorizontally(stream, indents + 3);
-				stream << QStringLiteral("temp") << GetCapitalizedValue(sdlField.GetId()) << QStringLiteral("List");
-				stream << QStringLiteral(" << QVariant::fromValue(tempValue);");
-
-				FeedStream(stream, 1, false);
-				FeedStreamHorizontally(stream, indents + 2);
-				stream << '}';
-
-				FeedStream(stream, 1, false);
-				FeedStreamHorizontally(stream, indents + 2);
-				stream << FromVariantMapAccessString(sdlField) << QStringLiteral(" = ");
-				stream << QStringLiteral("temp") << GetCapitalizedValue(sdlField.GetId()) << QStringLiteral("List;");
-			}
-			else if (isCustom){
-				stream << FromVariantMapAccessString(sdlField) << QStringLiteral(".setValue(");
-				stream << GetDecapitalizedValue(sdlField.GetId()) << ')' << ';';
-			}
-			else {
-				stream << FromVariantMapAccessString(sdlField) << QStringLiteral(" = ");
-				stream << GetDecapitalizedValue(sdlField.GetId()) << ';';
-			}
-			FeedStream(stream, 1, false);
-		}
+		GenerateListUpdateCode(stream, sdlField, isCustom, indents + 2);
 
 		FeedStreamHorizontally(stream, indents + 1);
 		stream << '}';
@@ -864,13 +830,7 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 			FeedStream(stream, 1, false);
 
 			// update internal storage
-			if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
-				FeedStreamHorizontally(stream, indents + 1);
-				stream << FromVariantMapAccessString(sdlField);
-				stream << QStringLiteral(" = m_");
-				stream << GetDecapitalizedValue(sdlField.GetId()) << ';';
-				FeedStream(stream, 1, false);
-			}
+			GenerateListUpdateCode(stream, sdlField, isCustom, indents + 1);
 
 			FeedStreamHorizontally(stream, indents);
 			stream << '}';
@@ -938,6 +898,47 @@ void CSdlClassCodeGeneratorComp::GenerateMetaInfo(
 	stream << '}' << ';';
 	FeedStream(stream, 1, false);
 }
+
+
+void CSdlClassCodeGeneratorComp::GenerateListUpdateCode(QTextStream& stream, const CSdlField& sdlField, bool isCustom, uint indents)
+{
+	if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
+		FeedStreamHorizontally(stream, indents);
+		if (isCustom && sdlField.IsArray()){
+			stream << QStringLiteral("QVariantList temp") << GetCapitalizedValue(sdlField.GetId()) << QStringLiteral("List;");
+
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream, indents);
+			stream << QStringLiteral("for (const auto& tempValue: std::as_const(");
+			stream << GetDecapitalizedValue(sdlField.GetId());
+			stream << QStringLiteral(")){");
+
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream, indents + 1);
+			stream << QStringLiteral("temp") << GetCapitalizedValue(sdlField.GetId()) << QStringLiteral("List");
+			stream << QStringLiteral(" << QVariant::fromValue(tempValue);");
+
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream, indents);
+			stream << '}';
+
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream, indents);
+			stream << FromVariantMapAccessString(sdlField) << QStringLiteral(" = ");
+			stream << QStringLiteral("temp") << GetCapitalizedValue(sdlField.GetId()) << QStringLiteral("List;");
+		}
+		else if (isCustom){
+			stream << FromVariantMapAccessString(sdlField) << QStringLiteral(".setValue(");
+			stream << GetDecapitalizedValue(sdlField.GetId()) << ')' << ';';
+		}
+		else {
+			stream << FromVariantMapAccessString(sdlField) << QStringLiteral(" = ");
+			stream << GetDecapitalizedValue(sdlField.GetId()) << ';';
+		}
+		FeedStream(stream, 1, false);
+	}
+}
+
 
 } // namespace imtsdl
 

@@ -71,6 +71,11 @@ private:
 				QTextStream& stream,
 				const CSdlType& sdlType,
 				uint indents = 1);
+	void GenerateListUpdateCode(
+				QTextStream& stream,
+				const CSdlField& sdlField,
+				bool isCustom,
+				uint indents = 1);
 
 private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
