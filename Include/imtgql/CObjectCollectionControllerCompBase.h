@@ -126,7 +126,7 @@ protected:
 	/**
 		Create  representation from the data object.
 	*/
-	bool CreateRepresentationFromObject(
+	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const QByteArray& objectTypeId,
 				const imtgql::CGqlRequest& gqlRequest,

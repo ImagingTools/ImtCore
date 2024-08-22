@@ -442,26 +442,78 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 	FeedStream(stream, 1, false);
 
 	const QMap<CSdlDocumentType::OperationType, CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
-	for (auto operationIter = operationsList.cbegin(); operationIter != operationsList.cend(); ++operationIter){
-		AddMethodForDocument(stream, operationIter.value(), operationIter.key(), hIndents);
+
+	if (	operationsList.contains(CSdlDocumentType::OT_UPDATE) ||
+			operationsList.contains(CSdlDocumentType::OT_INSERT))
+	{
+		AddMethodForDocument(stream, CSdlRequest(), CSdlDocumentType::OT_UPDATE, sdlDocumentType.GetName(), hIndents);
+	}
+	QList<CSdlRequest> implementedGetRequests;
+	QMapIterator operationsIter(operationsList);
+	while (operationsIter.hasNext()){
+		auto operation = operationsIter.next();
+		CSdlRequest sdlRequest = operation.value();
+		CSdlDocumentType::OperationType operationType = operation.key();
+		if (operationType == CSdlDocumentType::OT_GET || operationType == CSdlDocumentType::OT_LIST){
+			if (!implementedGetRequests.contains(sdlRequest)){
+				AddMethodForDocument(stream, operation.value(), operationType, sdlDocumentType.GetName(), hIndents);
+				implementedGetRequests << sdlRequest;
+			}
+		}
 	}
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream, const CSdlRequest& sdlRequest, CSdlDocumentType::OperationType operationType, uint hIndents)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream, const CSdlRequest& sdlRequest, CSdlDocumentType::OperationType operationType, const QString& itemClassName, uint hIndents)
 {
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("virtual C");
-	stream << GetCapitalizedValue(sdlRequest.GetOutputArgument().GetType());
-	stream << QStringLiteral(" On");
-	stream << GetCapitalizedValue(sdlRequest.GetName());
-	stream << QStringLiteral("(const C");
-	stream << GetCapitalizedValue(sdlRequest.GetName());
-	stream << QStringLiteral("GqlRequest& ");
-	stream << GetDecapitalizedValue(sdlRequest.GetName());
-	stream << QStringLiteral("Request, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;");
+	if (operationType == CSdlDocumentType::OT_GET)
+	{
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const C");
+		stream << GetCapitalizedValue(sdlRequest.GetName());
+		stream << QStringLiteral("GqlRequest& ");
+		stream << GetDecapitalizedValue(sdlRequest.GetName());
+		stream << QStringLiteral("Request, C");
+		stream << itemClassName;
+		stream << QStringLiteral("& representationObject) const = 0;");
+		FeedStream(stream, 1, false);
+	}
+	else if (operationType == CSdlDocumentType::OT_LIST)
+	{
 
-	FeedStream(stream, 1, false);
+		/**
+		 use
+
+	virtual bool SetupGqlItem(
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+			QString& errorMessage) const;
+
+		*/
+#if 0
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const C");
+		stream << GetCapitalizedValue(sdlRequest.GetName());
+		stream << QStringLiteral("& ");
+		stream << GetDecapitalizedValue(sdlRequest.GetName());
+		stream << QStringLiteral("Request, C");
+		stream << itemClassName;
+		stream << QStringLiteral("& representationObject) const = 0;");
+		FeedStream(stream, 1, false);
+#endif
+	}
+	else if (operationType == CSdlDocumentType::OT_UPDATE){
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRepresentation(const C");
+		stream << itemClassName;
+		stream << QStringLiteral("& representationObject, QString& errorMessage) const;");
+		FeedStream(stream, 1, false);
+	}
+	else {
+		I_CRITICAL();
+	}
 }
 
 void CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType)

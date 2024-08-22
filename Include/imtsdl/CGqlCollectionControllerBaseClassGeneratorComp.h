@@ -59,7 +59,7 @@ private:
 	// comfort methods
 	void AddRequiredIncludesForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
 	void AddMethodsForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
-	void AddMethodForDocument(QTextStream& stream, const CSdlRequest& sdlRequest, CSdlDocumentType::OperationType operationType, uint hIndents = 0);
+	void AddMethodForDocument(QTextStream& stream, const CSdlRequest& sdlRequest, CSdlDocumentType::OperationType operationType, const QString& itemClassName, uint hIndents = 0);
 
 	/**
 		Creates method implementations for all document's (and subtype's) operation types
