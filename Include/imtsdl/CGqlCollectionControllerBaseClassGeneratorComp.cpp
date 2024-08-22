@@ -605,7 +605,18 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 
 	// return
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return nullptr;");
+	switch (operationType) {
+	case CSdlDocumentType::OT_LIST:
+	case CSdlDocumentType::OT_GET:
+		stream << QStringLiteral("return false;");
+		break;
+	case CSdlDocumentType::OT_UPDATE:
+	case CSdlDocumentType::OT_INSERT:
+		stream << QStringLiteral("return nullptr;");
+		break;
+	default:
+		break;
+	}
 	FeedStream(stream, 1, false);
 
 	// end of method
