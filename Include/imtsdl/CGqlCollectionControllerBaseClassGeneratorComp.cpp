@@ -439,12 +439,14 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 	stream << QStringLiteral(" methods");
 	FeedStream(stream, 1, false);
 
+	const QString documentClassName = sdlDocumentType.GetReferenceType().GetName();
+
 	const QMap<CSdlDocumentType::OperationType, CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
 
 	if (	operationsList.contains(CSdlDocumentType::OT_UPDATE) ||
 			operationsList.contains(CSdlDocumentType::OT_INSERT))
 	{
-		AddMethodForDocument(stream, CSdlRequest(), CSdlDocumentType::OT_UPDATE, sdlDocumentType.GetName(), hIndents);
+		AddMethodForDocument(stream, CSdlRequest(), CSdlDocumentType::OT_UPDATE, documentClassName, hIndents);
 	}
 	QList<CSdlRequest> implementedGetRequests;
 	QMapIterator operationsIter(operationsList);
@@ -454,7 +456,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 		CSdlDocumentType::OperationType operationType = operation.key();
 		if (operationType == CSdlDocumentType::OT_GET || operationType == CSdlDocumentType::OT_LIST){
 			if (!implementedGetRequests.contains(sdlRequest)){
-				AddMethodForDocument(stream, operation.value(), operationType, sdlDocumentType.GetReferenceType().GetName(), hIndents);
+				AddMethodForDocument(stream, operation.value(), operationType, documentClassName, hIndents);
 				implementedGetRequests << sdlRequest;
 			}
 		}
