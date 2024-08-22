@@ -491,7 +491,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRepresentation(const C");
 		stream << itemClassName;
-		stream << QStringLiteral("& representationObject, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const;");
+		stream << QStringLiteral("& representationObject, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const = 0;");
 		FeedStream(stream, 1, false);
 	}
 	else {
@@ -594,18 +594,6 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 //		AddImplCodeForRequest(stream, sdlRequest, operationType, hIndents + 1);
 	}
 
-	// create default section
-	// add error message
-	FeedStreamHorizontally(stream, hIndents + 1);
-//	stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command id '%1'\").arg(commandId);");
-	FeedStream(stream, 1, false);
-
-	// send log message
-	FeedStreamHorizontally(stream, hIndents + 1);
-//	stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
-	FeedStream(stream, 2, false);
-
-	// return
 	FeedStreamHorizontally(stream, hIndents + 1);
 	switch (operationType) {
 	case CSdlDocumentType::OT_LIST:
@@ -630,6 +618,10 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 
 void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& stream, const CSdlRequest& sdlRequest, CSdlDocumentType::OperationType operationType, uint hIndents)
 {
+	if (	operationType == CSdlDocumentType::OT_LIST ||
+			operationType == CSdlDocumentType::OT_GET){
+		return;
+	}
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '/' << '/' << sdlRequest.GetName();
 	FeedStream(stream, 1, false);
@@ -724,6 +716,18 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QText
 	// end of section
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
+	FeedStream(stream, 2, false);
+
+
+	// create default section
+	// add error message
+	FeedStreamHorizontally(stream, hIndents + 1);
+	//	stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command id '%1'\").arg(commandId);");
+	FeedStream(stream, 1, false);
+
+	// send log message
+	FeedStreamHorizontally(stream, hIndents + 1);
+	//	stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
 	FeedStream(stream, 2, false);
 }
 
