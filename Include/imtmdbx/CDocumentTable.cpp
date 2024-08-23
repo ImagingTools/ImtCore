@@ -15,10 +15,10 @@ CDocumentTable::CDocumentTable(const QString& name, mdbx::txn_managed &txn,
 							   mdbx::key_mode keyMode,
 							   mdbx::value_mode valueMode,
 							   bool hasIndex):
-			m_tableName(name),
-			m_txn(txn),
-			m_keyMode(keyMode),
-			m_valueMode(valueMode)
+	m_tableName(name),
+	m_txn(txn),
+	m_keyMode(keyMode),
+	m_valueMode(valueMode)
 {
 	m_hasIndex = hasIndex ? hasIndex : Exists(m_tableName + "Index");
 	bool isReadOnly = m_txn.is_readonly();
@@ -263,94 +263,83 @@ qint64 CDocumentTable::GetKey(const QByteArray &value)
 {
 	//qDebug() << "CDocumentTable::GetKey";
 
-	try{
-		qint64 key = -1;
+	qint64 key = -1;
 
+	if(value.isEmpty()){
+		mdbx::cursor::move_result result = m_cursorIndex.current(false);
+		if(result.done){
+			key = result.key.as_int64();
+		}
+	}
+
+	else {//not empty value
 		if(m_hasIndex){
 			mdbx::slice valueSlice(value);
-			try{
-				mdbx::cursor::move_result result = m_cursorIndex.find(valueSlice);
+			mdbx::cursor::move_result result = m_cursorIndex.find(valueSlice, false);
+			if(result.done){
 				key = result.value.as_int64();
 			}
-			catch(...){
-				return -1;
-			}
 		}
-
 		else {
 			try{
-				mdbx::cursor::move_result result = m_cursor.to_first();
-				while(1){
-					qint64 keyRead;
-					std::string valueRead;
-					if (result.done){
-						keyRead = result.key.as_int64();
-						valueRead = result.value.as_string();
-						if(valueRead.data() == value){
-							key = keyRead;
+				mdbx::cursor::move_result result = m_cursor.to_first(false);
+				if(result.done){
+					while(1){
+						qint64 keyRead;
+						std::string valueRead;
+						if (result.done){
+							keyRead = result.key.as_int64();
+							valueRead = result.value.as_string();
+							if(valueRead.data() == value){
+								key = keyRead;
+								break;
+							}
+						}
+						bool onLast = m_cursor.on_last();
+						if(onLast){
 							break;
 						}
-					}
-					bool onLast = m_cursor.on_last();
-					if(onLast){
-						break;
-					}
-					if(!onLast){
-						result = m_cursor.to_next();
+						if(!onLast){
+							result = m_cursor.to_next(false);
+							if(!result.done){
+								break;
+							}
+						}
 					}
 				}
 			}
 			catch(...){
 				return -1;
 			}
-
 		}
-
-		return key;
-	}
-	catch(...){
-		return -1;
 	}
 
-	return -1;
+	return key;
 }
 
 qint64 CDocumentTable::GetFirstKey()
 {
-	try{
-		qint64 key = -1;
+	qint64 key = -1;
 
-		mdbx::cursor::move_result result = m_cursor.to_first(false);
-		if(result.done){
-			key = result.key.as_int64();
-			return key;
-		}
-	}
-	catch(...){
-		return -1;
+	mdbx::cursor::move_result result = m_cursor.to_first(false);
+	if(result.done){
+		key = result.key.as_int64();
 	}
 
-	return -1;
+	return key;
 }
 
 
 qint64 CDocumentTable::GetLastKey()
 {
-	try{
-		qint64 key = -1;
+	qint64 key = -1;
 
-		mdbx::cursor::move_result result = m_cursor.to_last(false);
-		if(result.done){
-			key = result.key.as_int64();
-			return key;
-		}
-
-	}
-	catch(...){
-		return -1;
+	mdbx::cursor::move_result result = m_cursor.to_last(false);
+	if(result.done){
+		key = result.key.as_int64();
 	}
 
-	return -1;
+	return key;
 }
 
 
@@ -358,23 +347,26 @@ QByteArray CDocumentTable::GetKeyBA(const QByteArray &value)
 {
 	//qDebug() << "CDocumentTable::GetKey";
 
-	try{
-		QByteArray key = QByteArray();
 
+	QByteArray key = QByteArray();
+
+	if(value.isEmpty()){
+		mdbx::cursor::move_result result = m_cursor.current(false);
+		if(result.done){
+			key = QByteArray::fromStdString(result.key.as_string());
+		}
+	}
+	else {//not empty value
 		if(m_hasIndex){
 			mdbx::slice valueSlice(value);
-			try{
-				mdbx::cursor::move_result result = m_cursorIndex.find(valueSlice);
+			mdbx::cursor::move_result result = m_cursorIndex.find(valueSlice, false);
+			if(result.done){
 				key = QByteArray::fromStdString(result.value.as_string());
 			}
-			catch(...){
-				return QByteArray();
-			}
 		}
-
 		else {
-			try{
-				mdbx::cursor::move_result result = m_cursor.to_first();
+			mdbx::cursor::move_result result = m_cursor.to_first(false);
+			if(result.done){
 				while(1){
 					QByteArray keyRead;
 					std::string valueRead;
@@ -391,24 +383,17 @@ QByteArray CDocumentTable::GetKeyBA(const QByteArray &value)
 						break;
 					}
 					if(!onLast){
-						result = m_cursor.to_next();
+						result = m_cursor.to_next(false);
+						if(!result.done){
+							break;
+						}
 					}
 				}
 			}
-			catch(...){
-				return QByteArray();
-			}
-
 		}
-
-		return key;
-	}
-	catch(...){
-		return QByteArray();
 	}
 
-	return QByteArray();
-
+	return key;
 }
 
 
@@ -465,15 +450,10 @@ bool CDocumentTable::MoveTo(qint64 key)
 {
 	bool ok = false;
 
-	try{
-		mdbx::slice keySlice(&key, 8);
-		mdbx::cursor::move_result result = m_cursor.find(keySlice);
-		if(result.done){
-			ok = true;
-		}
-	}
-	catch(...){
-		ok = false;
+	mdbx::slice keySlice(&key, 8);
+	mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
+	if(result.done){
+		ok = true;
 	}
 
 	return ok;
@@ -484,15 +464,10 @@ bool CDocumentTable::MoveTo(const QByteArray &key)
 {
 	bool ok = false;
 
-	try{
-		mdbx::slice keySlice(key.data(), key.length());
-		mdbx::cursor::move_result result = m_cursor.find(keySlice);
-		if(result.done){
-			ok = true;
-		}
-	}
-	catch(...){
-		ok = false;
+	mdbx::slice keySlice(key.data(), key.length());
+	mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
+	if(result.done){
+		ok = true;
 	}
 
 	return ok;
@@ -503,14 +478,9 @@ bool CDocumentTable::MoveToFirst()
 {
 	bool ok = false;
 
-	try{
-		mdbx::cursor::move_result result = m_cursor.to_first(false);
-		if(result.done){
-			ok = true;
-		}
-	}
-	catch(...){
-		ok = false;
+	mdbx::cursor::move_result result = m_cursor.to_first(false);
+	if(result.done){
+		ok = true;
 	}
 
 	return ok;
@@ -522,14 +492,9 @@ bool CDocumentTable::MoveToLast()
 {
 	bool ok = false;
 
-	try{
-		mdbx::cursor::move_result result = m_cursor.to_last(false);
-		if(result.done){
-			ok = true;
-		}
-	}
-	catch(...){
-		ok = false;
+	mdbx::cursor::move_result result = m_cursor.to_last(false);
+	if(result.done){
+		ok = true;
 	}
 
 	return ok;
@@ -540,15 +505,10 @@ bool CDocumentTable::MoveToLowerBound(qint64 key)
 {
 	bool ok = false;
 
-	try{
-		mdbx::slice keySlice(&key, 8);
-		mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice, false);
-		if(result.done){
-			ok = true;
-		}
-	}
-	catch(...){
-		ok = false;
+	mdbx::slice keySlice(&key, 8);
+	mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice, false);
+	if(result.done){
+		ok = true;
 	}
 
 	return ok;
@@ -559,16 +519,10 @@ bool CDocumentTable::MoveToLowerBound(const QByteArray &key)
 {
 	bool ok = false;
 
-	try{
-		mdbx::slice keySlice(key.data(), key.length());
-		mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice, false);
-		if(result.done){
-			ok = true;
-		}
-
-	}
-	catch(...){
-		ok = false;
+	mdbx::slice keySlice(key.data(), key.length());
+	mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice, false);
+	if(result.done){
+		ok = true;
 	}
 
 	return ok;
@@ -579,14 +533,9 @@ bool CDocumentTable::MoveToNext()
 {
 	bool ok = false;
 
-	try{
-		mdbx::cursor::move_result result = m_cursor.to_next(false);
-		if(result.done){
-			ok = true;
-		}
-	}
-	catch(...){
-		ok = false;
+	mdbx::cursor::move_result result = m_cursor.to_next(false);
+	if(result.done){
+		ok = true;
 	}
 
 	return ok;
