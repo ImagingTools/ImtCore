@@ -473,18 +473,24 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 		stream << QStringLiteral("virtual bool CreateRepresentationFromObject(const ");
 
 		if (operationType == CSdlDocumentType::OT_GET){
-			stream << QStringLiteral("istd::IChangeable& data");
+			stream << QStringLiteral("istd::IChangeable& data, const C");
+			stream << GetCapitalizedValue(sdlRequest.GetName());
+			stream << QStringLiteral("GqlRequest& ");
+			stream << GetDecapitalizedValue(sdlRequest.GetName());
+			stream << QStringLiteral("Request, C");
+			stream << GetCapitalizedValue(sdlRequest.GetOutputArgument().GetType());
+			stream << QStringLiteral("& representationPayload");
 		}
 		else {
-			stream << QStringLiteral("imtbase::IObjectCollectionIterator& objectCollectionIterator");
+			stream << QStringLiteral("imtbase::IObjectCollectionIterator& objectCollectionIterator, const C");
+			stream << GetCapitalizedValue(sdlRequest.GetName());
+			stream << QStringLiteral("GqlRequest& ");
+			stream << GetDecapitalizedValue(sdlRequest.GetName());
+			stream << QStringLiteral("Request, C");
+			stream << itemClassName;
+			stream << QStringLiteral("& representationObject");
 		}
-		stream << QStringLiteral(", const C");
-		stream << GetCapitalizedValue(sdlRequest.GetName());
-		stream << QStringLiteral("GqlRequest& ");
-		stream << GetDecapitalizedValue(sdlRequest.GetName());
-		stream << QStringLiteral("Request, C");
-		stream << itemClassName;
-		stream << QStringLiteral("& representationObject, QString& errorMessage) const = 0;");
+		stream << QStringLiteral(", QString& errorMessage) const = 0;");
 		FeedStream(stream, 1, false);
 	}
 	else if (operationType == CSdlDocumentType::OT_UPDATE){
@@ -681,9 +687,15 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QText
 			operationType == CSdlDocumentType::OT_LIST)
 	{
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << 'C' << sdlRequestInfo.containerClassName;
+		if (operationType == CSdlDocumentType::OT_GET){
+			stream << 'C' << sdlRequestInfo.request.GetOutputArgument().GetType();
+			stream << QStringLiteral(" representationObject;");
+		}
+		else {
+			stream << 'C' << sdlRequestInfo.containerClassName;
+			stream << QStringLiteral(" representationObject;");
+		}
 
-		stream << QStringLiteral(" representationObject;");
 		FeedStream(stream, 1, false);
 
 		// [1] create check variable
