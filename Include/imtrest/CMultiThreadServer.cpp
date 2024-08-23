@@ -382,7 +382,7 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 		return;
 	}
 
-	qDebug() << socketDescriptor << " Connecting..." << m_rootServer.GetThreadsLimit();
+	qDebug() << socketDescriptor << " Connecting..." << m_rootServer.GetThreadsLimit() << "socket list count:" << m_threadSocketList.count();
 
 	QWriteLocker threadListLock(&m_threadSocketListGuard);
 	AddSocketDescriptor(socketDescriptor);
