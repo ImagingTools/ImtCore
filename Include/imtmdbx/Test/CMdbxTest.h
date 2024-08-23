@@ -48,6 +48,7 @@ private slots:
 
 	void initTestCase();
 	void cleanupTestCase();
+	// void test_mdbxcursor();
 	void test_write_masks();
 };
 

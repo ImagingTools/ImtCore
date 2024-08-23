@@ -70,7 +70,10 @@ imtbase::CTreeItemModel* CStructureControllerComp::GetElements(
 		notificationModel = new imtbase::CTreeItemModel();
 
 		const imtgql::CGqlObject* viewParamsGql = nullptr;
-		viewParamsGql = inputParams.GetFieldArgumentObjectPtr("viewParams");
+		const imtgql::CGqlObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
+		if (inputObject != nullptr){
+			viewParamsGql = inputObject->GetFieldArgumentObjectPtr("viewParams");
+		}
 
 		iprm::CParamsSet filterParams;
 
@@ -81,6 +84,10 @@ imtbase::CTreeItemModel* CStructureControllerComp::GetElements(
 		filterParams.SetEditableParameter("ParentNodeId", &parentNodeIdParams);
 
 		const imtgql::CGqlObject* additionObject = inputParams.GetFieldArgumentObjectPtr("addition");
+		if (inputObject != nullptr){
+			additionObject = inputObject->GetFieldArgumentObjectPtr("addition");
+		}
+
 		if (additionObject != nullptr){
 			parentNodeId = additionObject->GetFieldArgumentValue("nodeId").toByteArray();
 			selectIndex = additionObject->GetFieldArgumentValue("selectIndex").toByteArray();

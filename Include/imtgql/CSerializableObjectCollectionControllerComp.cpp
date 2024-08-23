@@ -290,7 +290,10 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		notificationModel = new imtbase::CTreeItemModel();
 
 		const imtgql::CGqlObject* viewParamsGql = nullptr;
-		viewParamsGql = inputParams.GetFieldArgumentObjectPtr("viewParams");
+		const imtgql::CGqlObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
+		if (inputObject != nullptr){
+			viewParamsGql = inputObject->GetFieldArgumentObjectPtr("viewParams");
+		}
 
 		iprm::CParamsSet filterParams;
 

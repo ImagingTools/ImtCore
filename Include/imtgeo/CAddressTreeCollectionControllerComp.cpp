@@ -70,7 +70,10 @@ imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::ListObjects(const
 
         const imtgql::CGqlObject* viewParamsGql = nullptr;
 		const imtgql::CGqlObject& inputParams = gqlRequest.GetParams();
-		viewParamsGql = inputParams.GetFieldArgumentObjectPtr("viewParams");
+		const imtgql::CGqlObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
+		if (inputObject != nullptr){
+			viewParamsGql = inputObject->GetFieldArgumentObjectPtr("viewParams");
+		}
 
         iprm::CParamsSet filterParams;
         imtbase::CCollectionFilter filter;

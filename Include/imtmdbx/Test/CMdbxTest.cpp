@@ -234,7 +234,7 @@ void CMdbxTest::test_mdbxfind()
 
 void CMdbxTest::test_mdbxcursor()
 {
-	return;
+	// return;
 
 	mdbx::env::operate_parameters operateParameters(100,10);
 	mdbx::env_managed::create_parameters createParameters;
@@ -243,26 +243,51 @@ void CMdbxTest::test_mdbxcursor()
 	mdbx::txn_managed txn = env.start_write(false);
 	QElapsedTimer time;
 
-	mdbx::map_handle testHandle = txn.create_map("fap1", mdbx::key_mode::ordinal, mdbx::value_mode::single);
+	mdbx::map_handle testHandle = txn.create_map("fap1", mdbx::key_mode::usual, mdbx::value_mode::single);
 	mdbx::cursor cursor = txn.open_cursor(testHandle);
-	qint64 key = 5;
-	mdbx::slice keySlice(&key, 8);
-	std::string value("value5");
+	QString name("Иван");
+	QByteArray data;
+	QDataStream ds(&data, QIODeviceBase::WriteOnly);
+	ds << (quint8)0;
+	data += name.toUtf8();
+
+	mdbx::slice keySlice(data.data(), data.size());
+	// qint64 key = 5;
+	// mdbx::slice keySlice(&key, 8);
+
+	std::string value("value0");
+
 	mdbx::slice valueSlice(value.data());
 
 	cursor.upsert(keySlice, valueSlice);
-	key = 3;
-	keySlice = mdbx::slice(&key, 8);
+	// key = 3;
+	// keySlice = mdbx::slice(&key, 8);
+	name = QString("Сергей");
+	data.resize(1);
+	data += name.toUtf8();
+	keySlice = mdbx::slice(data.data(), data.size());
+
 	value = std::string("value3");
 	valueSlice = mdbx::slice(value.data());
+
 	cursor.upsert(keySlice, valueSlice);
-	key = 1;
-	keySlice = mdbx::slice(&key, 8);
+	// key = 1;
+	// keySlice = mdbx::slice(&key, 8);
+	name = QString("Петр");
+	data.resize(1);
+	data += name.toUtf8();
+	keySlice = mdbx::slice(data.data(), data.size());
 	value = std::string("value1");
 	valueSlice = mdbx::slice(value.data());
 	cursor.upsert(keySlice, valueSlice);
-	key = 7;
-	keySlice = mdbx::slice(&key, 8);
+
+	name = QString("Антон");
+	data.resize(1);
+	data += name.toUtf8();
+	keySlice = mdbx::slice(data.data(), data.size());
+
+	// key = 7;
+	// keySlice = mdbx::slice(&key, 8);
 	value = std::string("value7");
 	valueSlice = mdbx::slice(value.data());
 	cursor.upsert(keySlice, valueSlice);
@@ -274,28 +299,34 @@ void CMdbxTest::test_mdbxcursor()
 	txn = env.start_read();
 	cursor = txn.open_cursor(testHandle);
 
-	key = 3;
-	keySlice = mdbx::slice(&key, 8);
-	mdbx::cursor::move_result result = cursor.find(keySlice);
-	key = result.key.as_int64();
-	result = cursor.to_next(false);
-	key = result.key.as_int64();
-	value = result.value.as_string();
-	result = cursor.to_next(false);
-	if (result.done){
-		key = result.key.as_int64();
-		value = result.value.as_string();
-	}
-	result = cursor.to_next(false);
-	if (result.done){
-		key = result.key.as_int64();
-		value = result.value.as_string();
-	}
-	result = cursor.to_previous(false);
-	if (result.done){
-		key = result.key.as_int64();
-		value = result.value.as_string();
-	}
+	mdbx::cursor::move_result result = cursor.to_first();
+	std::string resKey = result.key.as_string();
+
+	result = cursor.to_next();
+	resKey = result.key.as_string();
+
+	// key = 3;
+	// keySlice = mdbx::slice(&key, 8);
+	// mdbx::cursor::move_result result = cursor.find(keySlice);
+	// key = result.key.as_int64();
+	// result = cursor.to_next(false);
+	// key = result.key.as_int64();
+	// value = result.value.as_string();
+	// result = cursor.to_next(false);
+	// if (result.done){
+	// 	key = result.key.as_int64();
+	// 	value = result.value.as_string();
+	// }
+	// result = cursor.to_next(false);
+	// if (result.done){
+	// 	key = result.key.as_int64();
+	// 	value = result.value.as_string();
+	// }
+	// result = cursor.to_previous(false);
+	// if (result.done){
+	// 	key = result.key.as_int64();
+	// 	value = result.value.as_string();
+	// }
 }
 
 
@@ -836,16 +867,28 @@ void CMdbxTest::test_update_doc(){
 //};
 
 void CMdbxTest::test_write_masks(){
-
-	//return;
+	mdbx::env::operate_parameters operateParameters(100,10);
+	mdbx::env_managed::create_parameters createParameters;
+	std::string path = "example.mdb";
+	{
+		mdbx::env_managed env2(path, createParameters, operateParameters);
+		mdbx::txn_managed txn2 = env2.start_write();
+		mdbx::map_handle testHandle2 = txn2.create_map("fap1", mdbx::key_mode::reverse, mdbx::value_mode::single);
+		txn2.commit();
+	}
+	mdbx::env_managed env(path, createParameters, operateParameters);
+	mdbx::txn_managed txn = env.start_write();
+	mdbx::map_handle testHandle = txn.create_map("fap1", mdbx::key_mode::usual, mdbx::value_mode::single);
 
 	std::cout << "TEST_WRITE_MASKS!!!";
+
+	return;
 
 	/*************************************************************/
 	QString tableName = "Masks";
 	imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine(tableName + ".mdb");
-	mdbx::env_managed env = engine.GetEnv();
-	mdbx::txn_managed txn = env.start_write();
+	// mdbx::env_managed env = engine.GetEnv();
+	// mdbx::txn_managed txn = env.start_write();
 	QString maskNameMln = "Mask1mln";
 	QString maskName1000 = "Mask1000";
 	QString doubleMaskName = "DoubleMask";
