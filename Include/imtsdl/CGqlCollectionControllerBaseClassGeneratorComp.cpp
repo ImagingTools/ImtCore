@@ -327,7 +327,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel) const override;");
+	ifStream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel, QString& errorMessage) const override;");
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 1);
@@ -484,7 +484,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 		stream << GetDecapitalizedValue(sdlRequest.GetName());
 		stream << QStringLiteral("Request, C");
 		stream << itemClassName;
-		stream << QStringLiteral("& representationObject) const = 0;");
+		stream << QStringLiteral("& representationObject, QString& errorMessage) const = 0;");
 		FeedStream(stream, 1, false);
 	}
 	else if (operationType == CSdlDocumentType::OT_UPDATE){
@@ -579,7 +579,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		stream << QStringLiteral("SetupGqlItem(const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel, int itemIndex,const imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const");
 		break;
 	case CSdlDocumentType::OT_GET:
-		stream << QStringLiteral("CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel) const");
+		stream << QStringLiteral("CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel, QString& errorMessage) const");
 		break;
 	case CSdlDocumentType::OT_UPDATE:
 	case CSdlDocumentType::OT_INSERT:
@@ -624,7 +624,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	case CSdlDocumentType::OT_LIST:
 	case CSdlDocumentType::OT_GET:
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("return false;");
+		stream << QStringLiteral("return true;");
 		break;
 	case CSdlDocumentType::OT_UPDATE:
 	case CSdlDocumentType::OT_INSERT:
@@ -696,12 +696,12 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QText
 			stream << QStringLiteral("*objectCollectionIterator, ");
 		}
 		stream << GetDecapitalizedValue(sdlRequestInfo.request.GetName());
-		stream << QStringLiteral("GqlRequest, representationObject);");
+		stream << QStringLiteral("GqlRequest, representationObject, errorMessage);");
 		FeedStream(stream, 1, false);
 
 		// [1->2] checks validate
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("if (!isRepresentationCreated)){");
+		stream << QStringLiteral("if (!isRepresentationCreated){");
 		FeedStream(stream, 1, false);
 
 		// [2] return
@@ -726,7 +726,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QText
 
 		// [1->2] checks write validate
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("if (!isRepresentationCreated)){");
+		stream << QStringLiteral("if (!isRepresentationCreated){");
 		FeedStream(stream, 1, false);
 
 		// [2] return
