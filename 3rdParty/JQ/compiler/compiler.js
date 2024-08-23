@@ -15,7 +15,8 @@ const QtQuick = require('../QtQuick/QtQuick')
 const Qt5Compat = require('../Qt5Compat/Qt5Compat')
 const QtWebSockets = require('../QtWebSockets/QtWebSockets')
 
-const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\jq.json'//process.argv.slice(2)[0]
+// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\imtcore.json'//process.argv.slice(2)[0]
+const configFilePath = process.argv.slice(2)[0]
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 const config = JSON.parse(fs.readFileSync(configFilePath, {encoding:'utf8', flag:'r'}))
 
@@ -422,7 +423,7 @@ class Instruction {
                     try {               
                         let obj = eval(tree[1])
                         stat.value += tree[1]
-                        stat.dotObj = obj
+                        stat.dotObj = (typeof obj === 'object' || typeof obj === 'function') ? obj : null
                         return stat
                     } catch {}
 
@@ -430,7 +431,7 @@ class Instruction {
 
                     if(path){
                         stat.isCompute = true
-                        stat.dotObj = path.obj
+                        stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
                         stat.value += path.source
                     } else {
                         console.log(`${this.qmlFile.fileName}:${tree.info.line+1}:${tree.info.col+1}: warning: ${tree[1]} is not founded`)
@@ -449,10 +450,10 @@ class Instruction {
                         let path = ''
                         if(stat.dotObj instanceof QmlFile){
                             path = stat.dotObj.instruction.resolve(tree[2])
-                            if(path) stat.dotObj = path.obj
+                            if(path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
                         } else if(stat.dotObj instanceof Instruction){
                             path = stat.dotObj.resolve(tree[2])
-                            if(path) stat.dotObj = path.obj
+                            if(path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
                         } else if(typeof stat.dotObj === "function" && stat.dotObj.meta){
                             let obj = new stat.dotObj()
                             if(tree[2] in obj || tree[2] in stat.dotObj){
@@ -460,7 +461,7 @@ class Instruction {
                                 path = obj
                             } else if(tree[2] in stat.dotObj.meta){
                                 path = this.resolve(stat.dotObj.meta[tree[2]], stat.thisKey)
-                                if(path) stat.dotObj = path.obj
+                                if(path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
                             }
                             // if(tree[2] in stat.dotObj) stat.dotObj = path.obj
                         } else if(tree[2] in stat.dotObj){
@@ -1364,30 +1365,37 @@ function getFiles (dir, _files){
 
 console.log(`JQ: compilation of single files`)
 
+
+for(let className in Singletons){
+    console.log(`    > ${className}.qml (Singleton)`)
+    // fullCode.push(Singletons[className].toCode())
+    fullCode.push(`JQModules.__queue.push(()=>{${Singletons[className].toCode()};window.${className}=${className}})`)
+}
+
 for(let className in SingleFiles){
     if(SingleFiles[className].singleton) {
         continue
     }
     console.log(`    > ${className}.qml`)
     // console.log(`        > ${SingleFiles[className].fileName}(5)`)
-    fullCode.push(SingleFiles[className].toCode())
+    // fullCode.push(SingleFiles[className].toCode())
+    fullCode.push(`JQModules.__queue.push(()=>{${SingleFiles[className].toCode()};window.${className}=${className}})`)
 }
 
-for(let className in Singletons){
-    console.log(`    > ${className}.qml (Singleton)`)
-    fullCode.push(Singletons[className].toCode())
-}
-
+fullCode.push('const __errors__ = []')
 fullCode.push(`while(JQModules.__queue.length){
     let reg = JQModules.__queue.shift()
     
-    if(!reg.isError){
+    if(!reg.count || reg.count < 5){
         try {
             reg()
         } catch (error) {
-            // reg.isError = true
+            reg.count = reg.count ? reg.count+1 : 1
             JQModules.__queue.push(reg)
         }
+    } else {
+        __errors__.push(reg)
+        // console.log(reg)
     }
 }`)
 

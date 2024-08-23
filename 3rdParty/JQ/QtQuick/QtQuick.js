@@ -1,4 +1,5 @@
 module.exports = {
+    Window: require("./Window"),
     Item: require("./Item"),
     Rectangle: require("./Rectangle"),
     FocusScope: require("./FocusScope"),
