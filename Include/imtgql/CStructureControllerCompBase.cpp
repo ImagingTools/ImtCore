@@ -208,18 +208,16 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewNode(
 		return nullptr;
 	}
 
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
 
 	QByteArray nodeId;
 	QByteArray parentNodeId;
 	QString newName;
 	QString description;
-	if (inputParams.size() > 0){
-		nodeId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
-		parentNodeId = inputParams.at(0).GetFieldArgumentValue("ParentNodeId").toByteArray();
-		newName = inputParams.at(0).GetFieldArgumentValue("NewName").toString();
-		description = inputParams.at(0).GetFieldArgumentValue("Description").toString();
-	}
+	nodeId = inputParams.GetFieldArgumentValue("Id").toByteArray();
+	parentNodeId = inputParams.GetFieldArgumentValue("ParentNodeId").toByteArray();
+	newName = inputParams.GetFieldArgumentValue("NewName").toString();
+	description = inputParams.GetFieldArgumentValue("Description").toString();
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
 
@@ -253,14 +251,13 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeName(
 		return nullptr;
 	}
 
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
 
 	QByteArray nodeId;
 	QString newName;
-	if (inputParams.size() > 0){
-		nodeId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
-		newName = inputParams.at(0).GetFieldArgumentValue("NewName").toString();
-	}
+
+	nodeId = inputParams.GetFieldArgumentValue("Id").toByteArray();
+	newName = inputParams.GetFieldArgumentValue("NewName").toString();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
@@ -325,14 +322,12 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 	QByteArray typeId;
 	QByteArray nodeId;
 	QByteArray selectIndex;
-	const QList<imtgql::CGqlObject> params = gqlRequest.GetParams();
+	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
 
-	if (params.size() > 0){
-		const CGqlObject* additionObject = params.at(0).GetFieldArgumentObjectPtr("addition");
-		if (additionObject != nullptr){
-			nodeId = additionObject->GetFieldArgumentValue("nodeId").toByteArray();
-			selectIndex = additionObject->GetFieldArgumentValue("selectIndex").toByteArray();
-		}
+	const CGqlObject* additionObject = inputParams.GetFieldArgumentObjectPtr("addition");
+	if (additionObject != nullptr){
+		nodeId = additionObject->GetFieldArgumentValue("nodeId").toByteArray();
+		selectIndex = additionObject->GetFieldArgumentValue("selectIndex").toByteArray();
 	}
 
 	if (typeId.isEmpty()){
@@ -444,7 +439,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 		return nullptr;
 	}
 
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
@@ -462,9 +457,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 		notificationModel = new imtbase::CTreeItemModel();
 
 		const imtgql::CGqlObject* viewParamsGql = nullptr;
-		if (inputParams.size() > 0){
-			viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
-		}
+		viewParamsGql = inputParams.GetFieldArgumentObjectPtr("viewParams");
 
 		iprm::CParamsSet filterParams;
 
@@ -546,15 +539,15 @@ bool CStructureControllerCompBase::SetupObjectItem(
 
 QByteArrayList CStructureControllerCompBase::GetInformationIds(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId) const
 {
-	const QList<imtgql::CGqlObject> fieldList = gqlRequest.GetFields();
-	int count = fieldList.count();
-	for (int i = 0; i < count; i++){
-		if (fieldList.at(i).GetId() == objectId){
-			return fieldList.at(i).GetFieldIds();
-		}
+	QByteArrayList retVal;
+
+	const imtgql::CGqlObject fields = gqlRequest.GetFields();
+	const imtgql::CGqlObject* findObject = fields.GetFieldArgumentObjectPtr(objectId);
+	if (findObject != nullptr){
+		retVal= findObject->GetFieldIds();
 	}
 
-	return QByteArrayList();
+	return retVal;
 }
 
 

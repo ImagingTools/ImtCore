@@ -37,9 +37,9 @@ void CSubscriberCompBase::OnComponentCreated()
 	if (m_subscriptionManagerCompPtr.IsValid()){
 		imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, *m_commandAttrPtr);
 
-		imtgql::CGqlObject subscriptionField("data");
+		imtgql::CGqlObject subscriptionField;
 		subscriptionField.InsertField("id");
-		gqlRequest.AddField(subscriptionField);
+		gqlRequest.AddField("data", subscriptionField);
 
 		m_subscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
 	}

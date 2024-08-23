@@ -16,10 +16,10 @@ namespace imtauthgql
 bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& errorMessage) const
 {
 	imtgql::CGqlRequest gqlRequest(imtgql::CGqlRequest::RT_QUERY, "UsersList");
-	imtgql::CGqlObject queryFields("items");
+	imtgql::CGqlObject queryFields;
 	queryFields.InsertField("Id");
 	queryFields.InsertField("UserId");
-	gqlRequest.AddField(queryFields);
+	gqlRequest.AddField("items", queryFields);
 
 	imtbase::CTreeItemModel usersModel;
 	bool ok = SendModelRequest(gqlRequest, usersModel);

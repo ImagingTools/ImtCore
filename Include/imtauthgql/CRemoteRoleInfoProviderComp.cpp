@@ -41,14 +41,14 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& obj
 	imtclientgql::IGqlClient::GqlRequestPtr requestPtr(new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "RoleItem"));
 
 	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "RoleItem");
-	imtgql::CGqlObject inputObject("input");
+	imtgql::CGqlObject inputObject;
 	inputObject.InsertField(QByteArray("Id"), QVariant(objectId));
 	inputObject.InsertField(QByteArray("IsJsonSerialized"), QVariant(true));
-	request.AddParam(inputObject);
+	request.AddParam("input", inputObject);
 
-	imtgql::CGqlObject itemObject("item");
+	imtgql::CGqlObject itemObject;
 	itemObject.InsertField("Id");
-	request.AddField(itemObject);
+	request.AddField("item", itemObject);
 
 	imtbase::CTreeItemModel responseModel;
 	bool retVal = SendModelRequest(request, responseModel);

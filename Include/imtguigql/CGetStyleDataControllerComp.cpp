@@ -18,7 +18,7 @@ namespace imtguigql
 
 imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
 		errorMessage = QString("Unable to get style. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CGetStyleDataControllerComp");

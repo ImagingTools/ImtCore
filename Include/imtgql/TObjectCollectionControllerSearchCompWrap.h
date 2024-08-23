@@ -71,8 +71,8 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 		return nullptr;
 	}
 
-	imtgql::CGqlObject input("input");
-	imtgql::CGqlObject viewParams("viewParams");
+	imtgql::CGqlObject input;
+	imtgql::CGqlObject viewParams;
 	viewParams.InsertField("Offset", 0);
 	viewParams.InsertField("Count", -1);
 
@@ -98,15 +98,15 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 
 	viewParams.InsertField("FilterModel", filterModel.ToJson());
 
-	input.InsertField(viewParams.GetId(), viewParams);
-	gqlRequest.AddParam(input);
+	input.InsertField("viewParams", viewParams);
+	gqlRequest.AddParam("item", input);
 
-	imtgql::CGqlObject items("items");
+	imtgql::CGqlObject items;
 	items.InsertField("Id");
 	items.InsertField("Name");
 	items.InsertField("TypeId");
 	items.InsertField("Description");
-	gqlRequest.AddField(items);
+	gqlRequest.AddField("viewParams", items);
 
 	imtbase::CTreeItemModel* resultModelPtr = BaseClass::ListObjects(gqlRequest, errorMessage);
 	if (resultModelPtr == nullptr){

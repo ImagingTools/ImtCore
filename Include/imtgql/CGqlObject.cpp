@@ -12,16 +12,8 @@ namespace imtgql
 
 // public methods
 
-imtgql::CGqlObject::CGqlObject(const QByteArray& objectId)
+CGqlObject::CGqlObject(): m_parentPtr(nullptr)
 {
-	m_parentPtr = nullptr;
-	m_objectId = objectId;
-}
-
-
-QByteArray CGqlObject::GetId() const
-{
-	return m_objectId;
 }
 
 
@@ -53,7 +45,7 @@ CGqlObject *CGqlObject::CreateFieldObject(const QByteArray& fieldId)
 		return nullptr;
 	}
 
-	CGqlObject gqlObject(fieldId);
+	CGqlObject gqlObject;
 	InsertField(fieldId, gqlObject);
 
 	return m_objectFields[fieldId].GetPtr();
@@ -116,12 +108,8 @@ void CGqlObject::InsertField(const QByteArray &fieldId, const CGqlObject& object
 	istd::TSmartPtr<CGqlObject> objectPtr(new CGqlObject());
 	*objectPtr = object;
 	objectPtr->m_parentPtr = this;
-	QByteArray fieldIdLocal = fieldId;
-	if (fieldId.isEmpty()){
-		fieldIdLocal = objectPtr->GetId();
-	}
-	RemoveField(fieldIdLocal);
-	m_objectFields.insert(fieldIdLocal, objectPtr);
+	RemoveField(fieldId);
+	m_objectFields.insert(fieldId, objectPtr);
 }
 
 
@@ -142,16 +130,11 @@ void CGqlObject::InsertField(const QByteArray &fieldId, const QList<CGqlObject> 
 CGqlObject* CGqlObject::AppendFieldToArray(const QByteArray& fieldId, const CGqlObject& object)
 {
 	CGqlObject* retVal = nullptr;
-
 	if (m_objectFieldsArray.contains(fieldId)){
 		istd::TSmartPtr<CGqlObject> objectPtr(new CGqlObject());
-
 		*objectPtr = object;
-
 		objectPtr->m_parentPtr = this;
-
 		m_objectFieldsArray[fieldId].append(objectPtr);
-
 		retVal = objectPtr.GetPtr();
 	}
 

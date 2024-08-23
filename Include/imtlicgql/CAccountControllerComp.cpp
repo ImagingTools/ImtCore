@@ -93,7 +93,9 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 		return nullptr;
 	}
 
-	objectId = GetObjectIdFromInputParams(inputParams);
+	if (!inputParams.isEmpty()){
+		objectId = GetObjectIdFromInputParams(inputParams.first());
+	}
 	if (objectId.isEmpty()){
 		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}

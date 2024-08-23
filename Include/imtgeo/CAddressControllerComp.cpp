@@ -112,7 +112,8 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 	}
 	else{
 		QByteArray objectId;
-		const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+		QList<imtgql::CGqlObject> inputParams;
+		inputParams.append(gqlRequest.GetParams());
 
 		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 
@@ -240,7 +241,8 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+	QList<imtgql::CGqlObject> inputParams;
+	inputParams.append(gqlRequest.GetParams());
 
 	QByteArray oldObjectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
 	QByteArray newObjectId;

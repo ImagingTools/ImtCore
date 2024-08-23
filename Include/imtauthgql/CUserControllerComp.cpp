@@ -24,7 +24,7 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to get an user object. Error: GraphQL input params is invalid.").toUtf8();
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
@@ -99,7 +99,7 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to update an user object. Error: GraphQL input params is invalid.").toUtf8();
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
@@ -271,7 +271,7 @@ istd::IChangeable* CUserControllerComp::CreateObjectFromRequest(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to create an user object. Error: GraphQL input params is invalid.").toUtf8();
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
@@ -438,7 +438,7 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to delete an user. Error: GraphQL input params is invalid.").toUtf8();
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");

@@ -82,7 +82,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInf
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
-		const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+		imtgql::CGqlObject inputParams = gqlRequest.GetParams();
 
 		QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 		dataModel->SetData("id", objectId);
@@ -118,7 +118,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetInfo(
 	}
 	else{
 		imtbase::CTreeItemModel* infoModelPtr = dataModel->AddTreeModel("info");
-		const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+		const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
 
 		QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 
@@ -157,7 +157,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetDataMet
 	else{
 		//ToDo Serial add
 
-		const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+		const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
 
 		QByteArray Id = GetObjectIdFromInputParams(inputParams);
 		dataModel->SetData("id", Id);
@@ -195,7 +195,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
 		dataModel->SetData("Id", "");
 		//ToDo Serial add
 
-		const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+		const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
 
 		QByteArray Id = GetObjectIdFromInputParams(inputParams);
 
@@ -272,7 +272,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		return nullptr;
 	}
 
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
@@ -290,9 +290,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		notificationModel = new imtbase::CTreeItemModel();
 
 		const imtgql::CGqlObject* viewParamsGql = nullptr;
-		if (inputParams.size() > 0){
-			viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
-		}
+		viewParamsGql = inputParams.GetFieldArgumentObjectPtr("viewParams");
 
 		iprm::CParamsSet filterParams;
 
@@ -356,14 +354,13 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::RenameObje
 		return nullptr;
 	}
 
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId;
 	QString newName;
-	if (inputParams.size() > 0){
-		objectId = inputParams.at(0).GetFieldArgumentValue("id").toByteArray();
-		newName = inputParams.at(0).GetFieldArgumentValue("newName").toString();
-	}
+
+	objectId = inputParams.GetFieldArgumentValue("id").toByteArray();
+	newName = inputParams.GetFieldArgumentValue("newName").toString();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
@@ -388,15 +385,13 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::SetObjectD
 		return nullptr;
 	}
 
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId;
 	QString description;
 
-	if (inputParams.size() > 0){
-		objectId = inputParams.at(0).GetFieldArgumentValue("id").toByteArray();
-		description = inputParams.at(0).GetFieldArgumentValue("description").toString();
-	}
+	objectId = inputParams.GetFieldArgumentValue("id").toByteArray();
+	description = inputParams.GetFieldArgumentValue("description").toString();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");

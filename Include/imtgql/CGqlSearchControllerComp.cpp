@@ -24,7 +24,7 @@ imtbase::CTreeItemModel* CGqlSearchControllerComp::CreateInternalResponse(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("GraphQL input params is invalid");
 		SendErrorMessage(0, errorMessage, "imtgql::CGqlSearchControllerComp");

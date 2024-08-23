@@ -44,10 +44,10 @@ iauth::CUser* CSimpleLoginWrapComp::GetLoggedUser() const
 bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& password)
 {
 	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "UserToken");
-	imtgql::CGqlObject inputObject("input");
+	imtgql::CGqlObject inputObject;
 	inputObject.InsertField("Login", userName);
 	inputObject.InsertField("Password", password);
-	request.AddParam(inputObject);
+	request.AddParam("input", inputObject);
 
 	imtbase::CTreeItemModel responseModel;
 	bool retVal = SendModelRequest(request, responseModel);
@@ -142,15 +142,15 @@ bool CSimpleLoginWrapComp::RetrieveUserInfo(const QByteArray& userObjectId)
 	}
 
 	imtgql::CGqlRequest userRequest(imtgql::CGqlRequest::RT_QUERY, "UserItem");
-	imtgql::CGqlObject userInputObject("input");
+	imtgql::CGqlObject userInputObject;
 	userInputObject.InsertField(QByteArray("ProductId"), QVariant(*m_productIdAttrPtr));
 	userInputObject.InsertField(QByteArray("Id"), QVariant(userObjectId));
 	userInputObject.InsertField(QByteArray("IsJsonSerialized"), QVariant(true));
-	userRequest.AddParam(userInputObject);
+	userRequest.AddParam("input", userInputObject);
 
-	imtgql::CGqlObject queryUserFields("item");
+	imtgql::CGqlObject queryUserFields;
 	queryUserFields.InsertField("Id");
-	userRequest.AddField(queryUserFields);
+	userRequest.AddField("item", queryUserFields);
 
 	imtbase::CTreeItemModel userResponseModel;
 	bool ok = SendModelRequest(userRequest, userResponseModel);

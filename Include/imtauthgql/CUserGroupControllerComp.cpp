@@ -21,7 +21,7 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to get a group. Error: GraphQL input params is invalid.").toUtf8();
 		SendErrorMessage(0, errorMessage, "CUserGroupControllerComp");
@@ -81,7 +81,7 @@ istd::IChangeable* CUserGroupControllerComp::CreateObjectFromRequest(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to create a group object. Error: GraphQL input params is invalid.").toUtf8();
 		SendErrorMessage(0, errorMessage, "CUserGroupControllerComp");
@@ -202,7 +202,7 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::DeleteObject(
 		const imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	const imtgql::CGqlObject* gqlObjectPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* gqlObjectPtr = gqlRequest.GetParamObject("input");
 	if (gqlObjectPtr == nullptr){
 		errorMessage = QString("Unable to delete group. Error: GraphQL input params is invalid.").toUtf8();
 		SendErrorMessage(0, errorMessage, "CUserGroupControllerComp");

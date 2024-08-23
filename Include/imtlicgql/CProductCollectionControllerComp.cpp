@@ -207,7 +207,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const im
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
@@ -265,7 +265,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::SetObjectDescription(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");

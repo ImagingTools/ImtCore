@@ -47,9 +47,9 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 	QByteArray commandId = gqlRequest.GetCommandId();
 
 	imtgql::CGqlRequest sessionGqlRequest(imtgql::CGqlRequest::RT_QUERY, "GetSessionInfo");
-	imtgql::CGqlObject inputParams("input");
+	imtgql::CGqlObject inputParams;
 	inputParams.InsertField(QByteArray("Id"), QVariant(token));
-	sessionGqlRequest.AddParam(inputParams);
+	sessionGqlRequest.AddParam("input", inputParams);
 
 	imtgql::CGqlContext* sessionGqlContextPtr = new imtgql::CGqlContext();
 	sessionGqlContextPtr->SetToken(token);
@@ -101,9 +101,9 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 	}
 
 	imtgql::CGqlRequest gqlUserRequest(imtgql::CGqlRequest::RT_QUERY, "GetUserInfo");
-	imtgql::CGqlObject userInputParams("input");
+	imtgql::CGqlObject userInputParams;
 	userInputParams.InsertField(QByteArray("Id"), QVariant(userId));
-	gqlUserRequest.AddParam(userInputParams);
+	gqlUserRequest.AddParam("input", userInputParams);
 
 	imtgql::CGqlContext* userGqlContextPtr = new imtgql::CGqlContext();
 	userGqlContextPtr->SetToken(token);

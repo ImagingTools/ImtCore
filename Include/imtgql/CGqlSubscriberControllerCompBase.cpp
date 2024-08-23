@@ -20,8 +20,8 @@ namespace imtgql
 
 bool CGqlSubscriberControllerCompBase::IsRequestSupported(const CGqlRequest& gqlRequest) const
 {
-	const QList<CGqlObject> fieldsPtr = gqlRequest.GetFields();
-	if (fieldsPtr.isEmpty()){
+	CGqlObject fieldsPtr = gqlRequest.GetFields();
+	if (fieldsPtr.GetFieldIds().isEmpty()){
 		return false;
 	}
 

@@ -41,7 +41,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	QByteArray clientId;
 	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&subscriptionRequest);
 	if (requestImplPtr != nullptr) {
-		const imtgql::CGqlObject* input = requestImplPtr->GetParam("input");
+		const imtgql::CGqlObject* input = requestImplPtr->GetParamObject("input");
 		if (input != nullptr) {
 			const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
 			if (addition != nullptr) {
@@ -353,7 +353,7 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 
 	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&request);
 	if (requestImplPtr != nullptr){
-		const imtgql::CGqlObject* input = requestImplPtr->GetParam("input");
+		const imtgql::CGqlObject* input = requestImplPtr->GetParamObject("input");
 		if (input != nullptr){
 			const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
 			if (addition != nullptr){

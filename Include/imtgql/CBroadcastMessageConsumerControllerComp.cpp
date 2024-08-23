@@ -35,7 +35,8 @@ imtbase::CTreeItemModel* CBroadcastMessageConsumerControllerComp::CreateInternal
 		return nullptr;
 	}
 
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+	QList<imtgql::CGqlObject> inputParams;
+	inputParams.append(gqlRequest.GetParams());
 
 	QString source;
 	QString messageText;

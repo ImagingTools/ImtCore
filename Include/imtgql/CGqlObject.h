@@ -20,9 +20,10 @@ namespace imtgql
 class CGqlObject: virtual public iser::IObject
 {
 public:
-	CGqlObject(const QByteArray& objectId = QByteArray());
+	// CGqlObject(const QByteArray& objectId = QByteArray());
+	CGqlObject();
 
-	QByteArray GetId() const;
+	// QByteArray GetId() const;
 	QByteArrayList GetFieldIds() const;
 	QVariant GetFieldArgumentValue(const QByteArray& fieldId) const;
 	CGqlObject *CreateFieldObject(const QByteArray& fieldId);

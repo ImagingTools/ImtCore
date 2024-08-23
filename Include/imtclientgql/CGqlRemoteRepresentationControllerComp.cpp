@@ -33,7 +33,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParam = gqlRequestPtr->GetParam("input");
+	const imtgql::CGqlObject* inputParam = gqlRequestPtr->GetParamObject("input");
 	if (inputParam != nullptr){
 		istd::TDelPtr<imtgql::CGqlObject> newInputParamPtr;
 		newInputParamPtr.SetCastedOrRemove(inputParam->CloneMe());
@@ -45,14 +45,12 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		}
 
 		newInputParamPtr->InsertField("ProductId", QVariant(*m_productIdAttrPtr));
-
-		gqlRequestPtr->SetParam(*newInputParamPtr.PopPtr());
 	}
 	else{
-		imtgql::CGqlObject inputGqlObject("input");
+		imtgql::CGqlObject inputGqlObject;
 		inputGqlObject.InsertField("ProductId", QVariant(*m_productIdAttrPtr));
 
-		gqlRequestPtr->AddParam(inputGqlObject);
+		gqlRequestPtr->AddParam("input", inputGqlObject);
 	}
 
 	imtclientgql::IGqlClient::GqlRequestPtr requestPtr(dynamic_cast<imtgql::IGqlRequest*>(gqlRequestPtr->CloneMe()));

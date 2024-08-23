@@ -49,12 +49,10 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 		return nullptr;
 	}
 
-	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
+	const imtgql::CGqlObject paramsPtr = gqlRequest.GetParams();
 
 	QByteArray productId;
-	if (!paramsPtr.empty()){
-		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
-	}
+	productId = paramsPtr.GetFieldArgumentValue("ProductId").toByteArray();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
@@ -120,12 +118,10 @@ bool CUserCollectionControllerComp::SetupGqlItem(
 		return false;
 	}
 
-	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
+	const imtgql::CGqlObject& params = gqlRequest.GetParams();
 
 	QByteArray productId;
-	if (!paramsPtr.empty()){
-		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
-	}
+	productId = params.GetFieldArgumentValue("ProductId").toByteArray();
 
 	bool retVal = true;
 	QByteArray collectionId = objectCollectionIterator->GetObjectId();

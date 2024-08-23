@@ -16,21 +16,22 @@ public:
 	CGqlRequest(RequestType requestType = RT_QUERY, const QByteArray& commandId = QByteArray());
 	~CGqlRequest();
 
-	void AddParam(const CGqlObject& param);
-	void AddField(const CGqlObject& field);
+	void AddParamValue(const QByteArray& paramId, const QVariant& value);
+	void AddParamValue(const QByteArray& paramId, const imtgql::CGqlEnum& value);
+	void AddParam(const QByteArray& paramId, const CGqlObject& param);
+	void AddField(const QByteArray& fieldId, const CGqlObject& field);
 	void AddSimpleField(const QByteArray& fieldId);
 	void SetGqlContext(const imtgql::IGqlContext* gqlContext);
 	void SetRequestType(RequestType requestType);
 	void SetCommandId(const QByteArray& commandId);
 
-	const QList<CGqlObject> GetFields() const;
-	const QList<CGqlObject> GetParams() const;
+	const CGqlObject& GetFields() const;
+	const CGqlObject& GetParams() const;
 
-	const CGqlObject* GetField(const QByteArray& fieldId) const;
-	const CGqlObject* GetParam(const QByteArray& paramId) const;
+	void SetParams(const CGqlObject& params);
 
-	void SetField(const CGqlObject& gqlObject);
-	void SetParam(const CGqlObject& gqlObject);
+	const CGqlObject* GetFieldObject(const QByteArray& fieldId) const;
+	const CGqlObject* GetParamObject(const QByteArray& paramId) const;
 
 	// reimplemented (IGqlRequest)
 	virtual QByteArray GetCommandId() const override;
@@ -69,8 +70,8 @@ private:
 protected:
 	QByteArray m_commandId;
 	RequestType m_requestType;
-	QList<CGqlObject> m_params;
-	QList<CGqlObject> m_fields;
+	CGqlObject m_params;
+	CGqlObject m_fields;
 
 	bool m_startKey;
 	bool m_startValue;

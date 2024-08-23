@@ -19,7 +19,7 @@ namespace imtlicgql
 
 imtbase::CTreeItemModel* CFeatureDependenciesProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
 		errorMessage = QString("Unable to get a feature dependencies. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CFeatureDependenciesProviderComp");

@@ -38,7 +38,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParam("input");
+	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
 		errorMessage = QString("Unable to create response for request with ID: '%1'. Error: GraphQL input params is invalid.").arg(qPrintable(gqlRequest.GetCommandId()));
 

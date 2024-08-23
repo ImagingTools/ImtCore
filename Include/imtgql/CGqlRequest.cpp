@@ -34,22 +34,21 @@ imtgql::CGqlRequest::~CGqlRequest()
 }
 
 
-void CGqlRequest::AddParam(const CGqlObject &param)
+void CGqlRequest::AddParam(const QByteArray &paramId, const CGqlObject &param)
 {
-	m_params.append(param);
+	m_params.InsertField(paramId, param);
 }
 
 
-void CGqlRequest::AddField(const CGqlObject &field)
+void CGqlRequest::AddField(const QByteArray &fieldId, const CGqlObject &field)
 {
-	m_fields.append(field);
+	m_fields.InsertField(fieldId, field);
 }
 
 
 void CGqlRequest::AddSimpleField(const QByteArray &fieldId)
 {
-	CGqlObject gqlObject(fieldId);
-	AddField(gqlObject);
+	m_fields.InsertField(fieldId);
 }
 
 
@@ -75,81 +74,31 @@ void CGqlRequest::SetCommandId(const QByteArray& commandId)
 }
 
 
-const QList<CGqlObject> CGqlRequest::GetFields() const
+const CGqlObject& CGqlRequest::GetFields() const
 {
 	return m_fields;
 }
 
 
-const QList<CGqlObject> CGqlRequest::GetParams() const
+const CGqlObject& CGqlRequest::GetParams() const
 {
 	return m_params;
 }
 
-
-const CGqlObject* CGqlRequest::GetField(const QByteArray& fieldId) const
+void CGqlRequest::SetParams(const CGqlObject& params)
 {
-	for (const CGqlObject& gqlObject : m_fields){
-		QByteArray objectId = gqlObject.GetId();
-		if (objectId == fieldId){
-			return &gqlObject;
-		}
-	}
+	m_params = params;
+}
 
-	return nullptr;
+const CGqlObject* CGqlRequest::GetFieldObject(const QByteArray& fieldId) const
+{
+	return m_fields.GetFieldArgumentObjectPtr(fieldId);
 }
 
 
-const CGqlObject* CGqlRequest::GetParam(const QByteArray& paramId) const
+const CGqlObject* CGqlRequest::GetParamObject(const QByteArray& paramId) const
 {
-	for (const CGqlObject& gqlObject : m_params){
-		QByteArray objectId = gqlObject.GetId();
-		if (objectId == paramId){
-			return &gqlObject;
-		}
-	}
-
-	return nullptr;
-}
-
-
-void CGqlRequest::SetField(const CGqlObject& gqlObject)
-{
-	QByteArray paramId = gqlObject.GetId();
-
-	bool isFound = false;
-	for (int i = 0; i < m_fields.count(); i++){
-		QByteArray objectId = m_fields[i].GetId();
-		if (objectId == paramId){
-			isFound = true;
-			m_fields[i] = gqlObject;
-			break;
-		}
-	}
-
-	if (!isFound){
-		AddField(gqlObject);
-	}
-}
-
-
-void CGqlRequest::SetParam(const CGqlObject& gqlObject)
-{
-	QByteArray paramId = gqlObject.GetId();
-
-	bool isFound = false;
-	for (int i = 0; i < m_params.count(); i++){
-		QByteArray objectId = m_params[i].GetId();
-		if (objectId == paramId){
-			isFound = true;
-			m_params[i] = gqlObject;
-			break;
-		}
-	}
-
-	if (!isFound){
-		AddParam(gqlObject);
-	}
+	return m_params.GetFieldArgumentObjectPtr(paramId);
 }
 
 
@@ -194,7 +143,7 @@ QByteArray CGqlRequest::GetQuery() const
 		params.append(")");
 	}
 
-	QByteArray queryData = "{\"query\": \"" + type + " " + m_commandId + " {" + m_commandId + params + " {" + fields + "}" + "}\"}";
+	QByteArray queryData = "{\"query\": \"" + type + " " + m_commandId + " {" + m_commandId + params + fields + "}\"}";
 
 	return queryData;
 }
@@ -320,6 +269,14 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				text.append(chr);
 			}
 			else{
+				if (!text.isEmpty()) {
+					SetParseText(text);
+					text.clear();
+					startText = false;
+				}
+				if (m_activeGqlObjectPtr != nullptr){
+					m_activeGqlObjectPtr = m_activeGqlObjectPtr->GetParentObject();
+				}
 				if (m_activeGqlObjectPtr == nullptr){
 					if (m_startFields == true){
 						if (!text.isEmpty()){
@@ -332,12 +289,6 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 						return false;
 					}
 				}
-				if (!text.isEmpty()) {
-					SetParseText(text);
-					text.clear();
-					startText = false;
-				}
-				m_activeGqlObjectPtr = m_activeGqlObjectPtr->GetParentObject();
 			}
 			break;
 
@@ -545,8 +496,8 @@ bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_commandId.clear();
-	m_params.clear();
-	m_fields.clear();
+	m_params.ResetData();
+	m_fields.ResetData();
 
 	if (m_gqlContextPtr != nullptr){
 		m_gqlContextPtr->ResetData();
@@ -562,15 +513,7 @@ bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 QByteArray CGqlRequest::CreateQueryFields() const
 {
 	QByteArray retVal;
-
-	for (int i = 0; i < m_fields.count(); ++i){
-		const CGqlObject& object = m_fields[i];
-		retVal += AddObjectFieldPart(object);
-
-		if (i < m_fields.count() - 1){
-			retVal += " ";
-		}
-	}
+	retVal = AddObjectFieldPart(m_fields);
 
 	return retVal;
 }
@@ -579,15 +522,7 @@ QByteArray CGqlRequest::CreateQueryFields() const
 QByteArray CGqlRequest::CreateQueryParams() const
 {
 	QByteArray retVal;
-
-	for (int i = 0; i < m_params.count(); ++i){
-		const CGqlObject& object = m_params[i];
-		retVal += AddObjectParamPart(object);
-
-		if (i < m_fields.count() - 1){
-			retVal += ", ";
-		}
-	}
+	retVal = AddObjectParamPart(m_params);
 
 	return retVal;
 }
@@ -596,7 +531,7 @@ QByteArray CGqlRequest::CreateQueryParams() const
 QByteArray CGqlRequest::AddObjectFieldPart(const CGqlObject &gqlObject) const
 {
 	QByteArray retVal;
-	retVal += gqlObject.GetId();
+	// retVal += gqlObject.GetId();
 
 	QByteArrayList fieldIds = gqlObject.GetFieldIds();
 	if (!fieldIds.isEmpty()){
@@ -604,11 +539,9 @@ QByteArray CGqlRequest::AddObjectFieldPart(const CGqlObject &gqlObject) const
 
 		for (int i = 0; i < fieldIds.count(); ++i){
 			const QByteArray& fieldId = fieldIds[i];
+			retVal += fieldId;
 			if (gqlObject.IsObject(fieldId)){
 				retVal += AddObjectFieldPart(*gqlObject.GetFieldArgumentObjectPtr(fieldId));
-			}
-			else{
-				retVal += fieldId;
 			}
 			if (i < fieldIds.count() - 1){
 				retVal += " ";
@@ -625,19 +558,17 @@ QByteArray CGqlRequest::AddObjectFieldPart(const CGqlObject &gqlObject) const
 QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 {
 	QByteArray retVal;
-	QByteArray objectId = gqlObject.GetId();
 
-	if (objectId.isEmpty() == false) {
-		retVal += objectId;
-		retVal += ": {";
-	}
 
 	QByteArrayList fieldIds = gqlObject.GetFieldIds();
 	for (int i = 0; i < fieldIds.count(); ++i) {
 		const QByteArray& fieldId = fieldIds[i];
 
 		if (gqlObject.IsObject(fieldId)) {
+			retVal += fieldId;
+			retVal += ": {";
 			retVal += AddObjectParamPart(*gqlObject.GetFieldArgumentObjectPtr(fieldId));
+			retVal += "}";
 		}
 		else if (gqlObject.IsObjectList(fieldId)){
 			retVal += fieldId + " :[";
@@ -666,9 +597,6 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 		}
 	}
 
-	if (objectId.isEmpty() == false){
-		retVal += "}";
-	}
 
 	return retVal;
 }
@@ -778,20 +706,21 @@ void CGqlRequest::ParceObjectParamPart(CGqlObject &gqlObject, const QJsonObject 
 void CGqlRequest::SetParseObject(const QByteArray &commandId)
 {
 	if (m_startFields){
-		CGqlObject gqlObject(commandId);
+		CGqlObject gqlObject;
 		if (m_activeGqlObjectPtr == nullptr || m_activeGqlObjectPtr->GetParentObject() == nullptr){
-			m_fields.append(gqlObject);
-			m_activeGqlObjectPtr = &m_fields[m_fields.count() - 1];
+			m_fields.InsertField(commandId, gqlObject);
+			m_activeGqlObjectPtr = const_cast<CGqlObject*>(m_fields.GetFieldArgumentObjectPtr(commandId));
+			// m_activeGqlObjectPtr = &m_fields[m_fields.count() - 1];
 		}
 		else{
 			m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateFieldObject(commandId);
 		}
 	}
 	else if (m_startParams){
-		CGqlObject gqlObject(commandId);
+		CGqlObject gqlObject;
 		if (m_activeGqlObjectPtr == nullptr/* || m_activeGqlObjectPtr->GetParentObject() == nullptr*/){
-			m_params.append(gqlObject);
-			m_activeGqlObjectPtr = &m_params[m_params.count() - 1];
+			m_params.InsertField(commandId, gqlObject);
+			m_activeGqlObjectPtr = const_cast<CGqlObject*>(m_params.GetFieldArgumentObjectPtr(commandId));
 		}
 		else{
 			m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateFieldObject(commandId);

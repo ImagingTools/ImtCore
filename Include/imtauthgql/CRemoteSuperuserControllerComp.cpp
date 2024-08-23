@@ -16,7 +16,7 @@ namespace imtauthgql
 bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& password) const
 {
 	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "UserAdd");
-	imtgql::CGqlObject inputObject("input");
+	imtgql::CGqlObject inputObject;
 	inputObject.InsertField("Id", "su");
 
 	QByteArray json = QString("{\"Username\": \"%1\", \"UserId\": \"%2\", \"Password\": \"%3\", \"Name\": \"%4\"}")
@@ -26,11 +26,11 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 			.arg(qPrintable("username")).toUtf8();
 
 	inputObject.InsertField ("Item", QVariant(json));
-	request.AddParam(inputObject);
+	request.AddParam("input", inputObject);
 
-	imtgql::CGqlObject fieldObject("addedNotification");
+	imtgql::CGqlObject fieldObject;
 	fieldObject.InsertField("Id");
-	request.AddField(fieldObject);
+	request.AddField("addedNotification", fieldObject);
 
 	imtbase::CTreeItemModel responseModel;
 
