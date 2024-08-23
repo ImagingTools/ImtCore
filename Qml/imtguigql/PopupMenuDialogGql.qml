@@ -227,7 +227,7 @@ Item {
     PauseAnimation {
         id: pause;
 
-        duration: 500;
+        duration: 400;
         onFinished:  {
             if(popupMenuContainer.canUpdateModel){
                 popupMenuContainer.updateModel(0);
@@ -610,6 +610,7 @@ Item {
                         }
                     }
                     dataModelLocal.refresh();
+                    //console.log("popupMenuContainer.model.getItemsCount()::", popupMenuContainer.model.getItemsCount())
                 }
 
 

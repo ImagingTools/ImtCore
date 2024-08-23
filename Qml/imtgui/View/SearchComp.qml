@@ -552,7 +552,7 @@ Rectangle{
         backVisible: !openST;
         complexModel: true;
         keepFilterText: true;
-        preventFirstLoading:  searchContainer.externalSearchParam !=="";
+        preventFirstLoading:  filterText !== ""; //searchContainer.externalSearchParam !=="";
         closeEmpty: true;
 
         canClose: true;
