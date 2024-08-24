@@ -308,7 +308,7 @@ Item {
             radius: parent.radius;
             color: parent.color;
 
-            visible: !popupMenuListView.count;
+            visible: false;
 
             Text{
                 id: noDataText;
@@ -609,6 +609,7 @@ Item {
                             }
                         }
                     }
+                    noDataRec.visible = !dataModelLocal.getItemsCount();
                     dataModelLocal.refresh();
                     //console.log("popupMenuContainer.model.getItemsCount()::", popupMenuContainer.model.getItemsCount())
                 }
