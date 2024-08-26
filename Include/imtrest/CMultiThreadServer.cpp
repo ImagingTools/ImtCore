@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMutableListIterator>
+#include <QtNetwork/QSslSocket>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
@@ -19,12 +20,18 @@ namespace imtrest
 {
 
 
-CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, qintptr socketDescriptor)
+CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnection, qintptr socketDescriptor)
 	:QObject(),
 	m_rootSocket(rootSocket),
-	m_socket(new QTcpSocket()),
 	m_requestPtr(request)
 {
+	if (secureConnection){
+		m_socket = new QSslSocket(this);
+	}
+	else {
+		m_socket = new QTcpSocket(this);
+	}
+
 	if (!m_socket->setSocketDescriptor(socketDescriptor)){
 		qDebug() << "Socket error" << m_socket->error();
 
@@ -139,9 +146,10 @@ void CSocket::OnSendResponse(ConstResponsePtr response)
 }
 
 
-CSocketThread::CSocketThread(qintptr socketId, CMultiThreadServer* parent)
+CSocketThread::CSocketThread(qintptr socketId, bool secureConnection, CMultiThreadServer* parent)
 	:QThread(parent),
-	m_status(ST_START)
+	m_status(ST_START),
+	m_isSecureConnection(secureConnection)
 {
 	qRegisterMetaType<ConstResponsePtr>("ConstResponsePtr");
 	this->m_socketDescriptor = socketId;
@@ -192,6 +200,18 @@ imtrest::IRequestServlet* CSocketThread::GetRequestServlet()
 }
 
 
+bool CSocketThread::IsSecureConnection() const
+{
+	return m_isSecureConnection;
+}
+
+
+void CSocketThread::EnableSecureConnection(bool isSecureConnection)
+{
+	m_isSecureConnection = isSecureConnection;
+}
+
+
 void CSocketThread::run()
 {
 	if (m_server == nullptr){
@@ -199,7 +219,7 @@ void CSocketThread::run()
 	}
 
 	imtrest::IRequest* newRequestPtr = m_enginePtr->CreateRequest(*this);
-	m_socket.SetPtr(new CSocket(this, newRequestPtr, m_socketDescriptor));
+	m_socket.SetPtr(new CSocket(this, newRequestPtr, m_isSecureConnection, m_socketDescriptor));
 
 	m_requestId = newRequestPtr->GetRequestId();
 
@@ -257,10 +277,11 @@ IRequest* CSocketThread::CreateRequest()
 
 
 CMultiThreadServer::CMultiThreadServer(CTcpServerComp* rootServer)
-	:QTcpServer((QObject*)rootServer),
+	:QSslServer((QObject*)rootServer),
 	m_rootServer(*rootServer),
 	m_threadSocketListGuard(QReadWriteLock::Recursive),
-	m_isActive(true)
+	m_isActive(true),
+	m_isSecureConnection(false)
 {
 	connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this, &CMultiThreadServer::ShutdownServer, Qt::DirectConnection);
 }
@@ -284,6 +305,38 @@ imtrest::IProtocolEngine* CMultiThreadServer::GetProtocolEngine()
 }
 
 
+bool CMultiThreadServer::IsSecureConnection() const
+{
+	return m_isSecureConnection;
+}
+
+
+void CMultiThreadServer::EnableSecureConnection(bool isSecureConnection)
+{
+	m_isSecureConnection = isSecureConnection;
+}
+
+
+void CMultiThreadServer::SetSslConfiguration(const QSslConfiguration& sslConfiguration)
+{
+	if (!m_isSecureConnection){
+		SendErrorMessage(0, "Unable to set sslconfiguration. Server configured in non secure mode!");
+		I_CRITICAL();
+
+		return;
+	}
+
+	if (BaseClass::isListening()){
+		SendCriticalMessage(0, "Unable to set sslconfiguration. Server is running!");
+		I_CRITICAL();
+
+		return;
+	}
+
+	BaseClass::setSslConfiguration(sslConfiguration);
+}
+
+
 // reimplemented (imtrest::IRequestManager)
 
 const ISender* CMultiThreadServer::GetSender(const QByteArray& requestId) const
@@ -302,10 +355,13 @@ const ISender* CMultiThreadServer::GetSender(const QByteArray& requestId) const
 
 void CMultiThreadServer::Disconnected(QByteArray requestId)
 {
-	qDebug() << __FILE__ << __LINE__;
 	QWriteLocker threadListLock(&m_threadSocketListGuard);
 
-	qDebug() << __FILE__ << __LINE__ << requestId;
+	SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_NONE,
+				__LINE__,
+				QString("Socket '%1' disconnected").arg(requestId),
+				__func__);
 
 	QMutableListIterator threadSocketIterator(m_threadSocketList);
 	while(threadSocketIterator.hasNext()){
@@ -329,7 +385,7 @@ void CMultiThreadServer::Disconnected(QByteArray requestId)
 	}
 
 	qintptr descriptor = GetFirstSocketDescriptor();
-	CSocketThread* threadSocket = new CSocketThread(descriptor, this);
+	CSocketThread* threadSocket = new CSocketThread(descriptor, m_isSecureConnection, this);
 
 	threadSocket->start();
 
@@ -382,7 +438,11 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 		return;
 	}
 
-	qDebug() << socketDescriptor << " Connecting..." << m_rootServer.GetThreadsLimit() << "socket list count:" << m_threadSocketList.count();
+	SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_NONE,
+				__LINE__,
+				QString("New connection. Limit: ").arg(QString::number(m_rootServer.GetThreadsLimit())),
+				__func__);
 
 	QWriteLocker threadListLock(&m_threadSocketListGuard);
 	AddSocketDescriptor(socketDescriptor);
@@ -398,10 +458,14 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 		if (m_threadSocketList.count() < threadsLimit){
 			// Every new connection will be run in a newly created thread
 			qintptr descriptor = GetFirstSocketDescriptor();
-			threadSocket = new CSocketThread(descriptor, this);
+			threadSocket = new CSocketThread(descriptor, m_isSecureConnection, this);
 
 			m_threadSocketList.append(threadSocket);
-			qDebug() << "new socket thread" << m_threadSocketList.count();
+			SendLogMessage(
+						istd::IInformationProvider::InformationCategory::IC_NONE,
+						__LINE__,
+						QString("Starting new socket. Active sockets count: ").arg(QString::number( m_threadSocketList.count())),
+						__func__);
 
 			threadSocket->start();
 
