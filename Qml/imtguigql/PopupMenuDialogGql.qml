@@ -609,7 +609,7 @@ Item {
                             }
                         }
                     }
-                    noDataRec.visible = !dataModelLocal.getItemsCount();
+                    noDataRec.visible = !popupMenuContainer.model.getItemsCount();
                     dataModelLocal.refresh();
                     //console.log("popupMenuContainer.model.getItemsCount()::", popupMenuContainer.model.getItemsCount())
                 }

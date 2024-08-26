@@ -112,6 +112,7 @@ Rectangle{
 
         searchTextField.excludeFilterPart = "";
         searchTextField.currentText = "";
+        searchTextField.filterText = "";
         searchContainer.selectedText = "";
         searchContainer.previousText = "";
         searchContainer.propertiesModel.clear();
@@ -139,6 +140,8 @@ Rectangle{
     }
 
     function setCurrentTextAddressFunc(modelll, index_, addStr_){
+        let noTextChanges = false;
+
         console.log("setCurrentTextAddressFunc")
         if(searchContainer.isAddressSearch){
             //searchTextField.currentIndex = -1;
@@ -149,7 +152,11 @@ Rectangle{
 //                tempStr = tempStr.slice(0, tempStr.length - 1);
 //            }
 
+            if(searchTextField.currentText == tempStr){
+                noTextChanges = true;
+            }
             searchTextField.currentText = tempStr;//modelll.getData(searchContainer.valueName, index_) + addStrNew;
+
 
             var parentIds__ = modelll.getData("ParentIds",index_) !== undefined ? modelll.getData("ParentIds", index_) : "";
             if(parentIds__ !== ""){
@@ -193,10 +200,13 @@ Rectangle{
                 popup.excludeFilterPart = searchContainer.currentText;
                 popup.filterText = searchContainer.currentText;
 
+                if(noTextChanges){
+                    textChangeFunc(searchTextField.currentText);
+                    popup.updateModel()
+                }
             }
 
         }
-
 
     }
 
