@@ -217,12 +217,10 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const
 	if (inputParams.GetFieldIds().contains(QByteArrayLiteral("Id"))){
 		retVal = inputParams.GetFieldArgumentValue(QByteArrayLiteral("Id")).toByteArray();
 	}
-	else{
-		if(inputParams.GetFieldIds().contains(QByteArrayLiteral("input"))){
-			const imtgql::CGqlObject* inputObject = inputParams.GetFieldArgumentObjectPtr(QByteArrayLiteral("input"));
-			if (inputObject != nullptr){
-				return GetObjectIdFromInputParams(*inputObject);
-			}
+	else if(inputParams.GetFieldIds().contains(QByteArrayLiteral("input"))){
+		const imtgql::CGqlObject* inputObject = inputParams.GetFieldArgumentObjectPtr(QByteArrayLiteral("input"));
+		if (inputObject != nullptr){
+			return GetObjectIdFromInputParams(*inputObject);
 		}
 	}
 
