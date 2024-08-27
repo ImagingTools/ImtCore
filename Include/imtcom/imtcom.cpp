@@ -124,7 +124,7 @@ void CreateSslConfiguration(const ISslConfiguration& input, QSslConfiguration& o
 	const ISslConfiguration::SslCertificatePtrList localCertificateChainPtrList = input.GetLocalCertificateChain();
 	QList<QSslCertificate> localCertificateChain;
 	for (const ISslConfiguration::SslCertificatePtr& localSslCertificatePtr: localCertificateChainPtrList){
-		QSharedPointer<QSslCertificate> sslCertificalePtr = CreateSslCertificate(*localCertificatePtr);
+		QSharedPointer<QSslCertificate> sslCertificalePtr = CreateSslCertificate(*localSslCertificatePtr);
 		if (sslCertificalePtr.isNull()){
 			Q_ASSERT_X(false, "Setup Key", "Unable to setup SSL certificate.");
 			return;
