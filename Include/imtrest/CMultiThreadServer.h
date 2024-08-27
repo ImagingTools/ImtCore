@@ -29,7 +29,7 @@ class CSocket: public QObject
 {
 	Q_OBJECT
 public:
-	CSocket(CSocketThread* rootSocket, imtrest::IRequest* request, bool secureConnection, qintptr socketDescriptor);
+	CSocket(CSocketThread* rootSocket, imtrest::IRequest* request, bool secureConnection, const QSslConfiguration& sslConfiguration, qintptr socketDescriptor);
 
 public Q_SLOTS:
 	void HandleReadyRead();
@@ -60,7 +60,7 @@ public:
 		ST_CLOSE
 	};
 
-	explicit CSocketThread(qintptr ID, bool secureConnection, CMultiThreadServer *parent);
+	explicit CSocketThread(qintptr ID, bool secureConnection, const QSslConfiguration& sslConfiguration, CMultiThreadServer *parent);
 	void SetSocketDescriptor(qintptr socketDescriptor);
 	qintptr GetSocketDescriptor();
 	void SetSocketStatus(Status socketStatus);
@@ -100,6 +100,7 @@ private:
 	Status m_status;
 	istd::TDelPtr<CSocket> m_socket;
 	bool m_isSecureConnection;
+	const QSslConfiguration& m_sslConfiguration;
 
 	QByteArray m_requestId;
 };

@@ -5,6 +5,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMutableListIterator>
 #include <QtNetwork/QSslSocket>
+#include <QtNetwork/QSslKey>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
@@ -20,16 +21,16 @@ namespace imtrest
 {
 
 
-CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnection, qintptr socketDescriptor)
+CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnection, const QSslConfiguration& sslConfiguration, qintptr socketDescriptor)
 	:QObject(),
 	m_rootSocket(rootSocket),
 	m_requestPtr(request)
 {
 	if (secureConnection){
-		m_socket = new QSslSocket(this);
+		m_socket = new QSslSocket;
 	}
 	else {
-		m_socket = new QTcpSocket(this);
+		m_socket = new QTcpSocket;
 	}
 
 	if (!m_socket->setSocketDescriptor(socketDescriptor)){
@@ -39,6 +40,27 @@ CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnec
 		Q_EMIT m_rootSocket->Error(m_socket->error());
 
 		return;
+	}
+
+	if (secureConnection){
+		QEventLoop encryptionLoop;
+		QTimer encryptionTimer;
+		connect(&encryptionTimer, &QTimer::timeout, &encryptionLoop, &QEventLoop::quit);
+
+		QSslSocket* socketPtr =m_socket.Cast<QSslSocket*>();
+		Q_ASSERT_X(socketPtr != nullptr, __func__, "Invalid socket!");
+		socketPtr->setLocalCertificate(sslConfiguration.localCertificate());
+		socketPtr->setPrivateKey(sslConfiguration.privateKey());
+		socketPtr->setProtocol(sslConfiguration.protocol());
+
+		socketPtr->startServerEncryption();
+		connect(socketPtr, &QSslSocket::encrypted, &encryptionLoop, &QEventLoop::quit);
+		encryptionTimer.setSingleShot(true);
+		encryptionTimer.start(std::chrono::seconds(30));
+		encryptionLoop.exec();
+		socketPtr->isEncrypted();
+
+		Q_ASSERT_X(socketPtr->isEncrypted(), __func__, "Unable to establish encrypted connection");
 	}
 
 	connect(&m_startTimer, &QTimer::timeout, this, QOverload<>::of(&CSocket::TimeOut));
@@ -146,10 +168,11 @@ void CSocket::OnSendResponse(ConstResponsePtr response)
 }
 
 
-CSocketThread::CSocketThread(qintptr socketId, bool secureConnection, CMultiThreadServer* parent)
+CSocketThread::CSocketThread(qintptr socketId, bool secureConnection, const QSslConfiguration& sslConfiguration, CMultiThreadServer* parent)
 	:QThread(parent),
 	m_status(ST_START),
-	m_isSecureConnection(secureConnection)
+	m_isSecureConnection(secureConnection),
+	m_sslConfiguration(sslConfiguration)
 {
 	qRegisterMetaType<ConstResponsePtr>("ConstResponsePtr");
 	this->m_socketDescriptor = socketId;
@@ -219,7 +242,8 @@ void CSocketThread::run()
 	}
 
 	imtrest::IRequest* newRequestPtr = m_enginePtr->CreateRequest(*this);
-	m_socket.SetPtr(new CSocket(this, newRequestPtr, m_isSecureConnection, m_socketDescriptor));
+	m_socket.SetPtr(new CSocket(this, newRequestPtr, m_isSecureConnection, m_sslConfiguration, m_socketDescriptor));
+
 
 	m_requestId = newRequestPtr->GetRequestId();
 
@@ -385,7 +409,7 @@ void CMultiThreadServer::Disconnected(QByteArray requestId)
 	}
 
 	qintptr descriptor = GetFirstSocketDescriptor();
-	CSocketThread* threadSocket = new CSocketThread(descriptor, m_isSecureConnection, this);
+	CSocketThread* threadSocket = new CSocketThread(descriptor, m_isSecureConnection, BaseClass::sslConfiguration(), this);
 
 	threadSocket->start();
 
@@ -458,7 +482,7 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 		if (m_threadSocketList.count() < threadsLimit){
 			// Every new connection will be run in a newly created thread
 			qintptr descriptor = GetFirstSocketDescriptor();
-			threadSocket = new CSocketThread(descriptor, m_isSecureConnection, this);
+			threadSocket = new CSocketThread(descriptor, m_isSecureConnection, BaseClass::sslConfiguration(), this);
 
 			m_threadSocketList.append(threadSocket);
 			SendLogMessage(
