@@ -93,24 +93,44 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-	if (ExecuteTransaction(objectQuery.query)){
+	QVariantMap bindValues = objectQuery.bindValues;
+	bool transactionSuccess = false;
+
+	if(bindValues.isEmpty()){
+		transactionSuccess = ExecuteTransaction(objectQuery.query);
+	}
+	else{
+		transactionSuccess = ExecuteTransaction(objectQuery.query, bindValues);
+	}
+
+	if (!transactionSuccess){
+		changeNotifier.Abort();
+	}
+	else{
 		if (dataMetaInfoPtr != nullptr){
 			QByteArray metaQuery = m_objectDelegateCompPtr->CreateDataMetaInfoQuery(*this, objectId, dataMetaInfoPtr);
 			if(!metaQuery.isEmpty()){
-				ExecuteTransaction(metaQuery);
+				if(bindValues.isEmpty()){
+					ExecuteTransaction(metaQuery);
+				}
+				else{
+					ExecuteTransaction(metaQuery, bindValues);
+				}
 			}
 		}
 		if (collectionItemMetaInfoPtr != nullptr){
 			QByteArray collectionItemMetaQuery = m_objectDelegateCompPtr->CreateCollectionItemMetaInfoQuery(*this, objectId, collectionItemMetaInfoPtr);
 			if(!collectionItemMetaQuery.isEmpty()){
-				ExecuteTransaction(collectionItemMetaQuery);
+				if(bindValues.isEmpty()){
+					ExecuteTransaction(collectionItemMetaQuery);
+				}
+				else{
+					ExecuteTransaction(collectionItemMetaQuery, bindValues);
+				}
 			}
 		}
 
 		return objectId;
-	}
-	else {
-		changeNotifier.Abort();
 	}
 
 	return QByteArray();
@@ -614,6 +634,35 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 				return false;
 			}
 		}
+	}
+
+	m_dbEngineCompPtr->FinishTransaction();
+
+	return true;
+}
+
+
+bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQuery, const QVariantMap& bindValues) const
+{
+	if (!m_dbEngineCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
+
+		return false;
+	}
+
+	m_dbEngineCompPtr->BeginTransaction();
+	QSqlError error;
+	m_dbEngineCompPtr->ExecSqlQuery(sqlQuery, bindValues, &error);
+
+	if (error.type() != QSqlError::NoError){
+		SendErrorMessage(0, error.text(), "Database collection");
+
+		// qDebug() << "SQL-error: " << singleQuery;
+		qDebug() << "SQL-error: " << sqlQuery;
+
+		m_dbEngineCompPtr->CancelTransaction();
+
+		return false;
 	}
 
 	m_dbEngineCompPtr->FinishTransaction();

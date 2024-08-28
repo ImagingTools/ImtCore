@@ -119,7 +119,7 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 	const CGqlObject fields = gqlRequest.GetFields();
 
 	const QByteArrayList Ids = fields.GetFieldIds();
-	for (const QByteArray fieldId: Ids){
+	for (const QByteArray& fieldId: Ids){
 		if (fieldId == "headers"){
 			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_HEADERS;
@@ -1138,9 +1138,6 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 		const imtgql::CGqlObject& viewParamsGql,
 		iprm::CParamsSet& filterParams) const
 {
-	imtbase::CCollectionFilter* collectionFilterPtr = new imtbase::CCollectionFilter();
-
-	iprm::CParamsSet* objectFilterPtr = new iprm::CParamsSet();
 
 	QByteArray filterBA = viewParamsGql.GetFieldArgumentValue("FilterModel").toByteArray();
 	if (filterBA.isEmpty()){
@@ -1152,7 +1149,10 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 		return;
 	}
 
-	imtbase::CTreeItemModel* filterIdsModelPtr = generalModel.GetTreeItemModel("FilterIds");
+	iprm::CParamsSet* objectFilterPtr				= new iprm::CParamsSet();
+	imtbase::CCollectionFilter* collectionFilterPtr = new imtbase::CCollectionFilter();
+
+	imtbase::CTreeItemModel* filterIdsModelPtr		= generalModel.GetTreeItemModel("FilterIds");
 	if (filterIdsModelPtr != nullptr){
 		QByteArrayList filteringInfoIds;
 		for (int i = 0; i < filterIdsModelPtr->GetItemsCount(); i++){

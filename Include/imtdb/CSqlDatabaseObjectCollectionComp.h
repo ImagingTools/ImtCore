@@ -113,6 +113,7 @@ public:
 
 protected:
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
+	virtual bool ExecuteTransaction(const QByteArray& sqlQuery, const QVariantMap& bindValues) const;
 	QSqlRecord GetObjectRecord(const QByteArray& objectId) const;
 	void OnFilterParamsChanged(
 				const istd::IChangeable::ChangeSet& changeSet,

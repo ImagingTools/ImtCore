@@ -30,6 +30,10 @@ public:
 			Name of the object.
 		*/
 		QString objectName;
+		/**
+			Values to bind to the sql query object.
+		*/
+		QVariantMap bindValues;
 	};
 
 	/**
