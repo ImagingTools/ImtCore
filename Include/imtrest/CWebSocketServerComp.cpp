@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imtrest/CWebSocketRequest.h>
 #include <imtauth/ILoginStatusProvider.h>
+#include <imtcom/imtcom.h>
 
 
 namespace imtrest
@@ -69,12 +70,30 @@ bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 p
 		return false;
 	}
 
-	istd::TDelPtr<QWebSocketServer> webSocketServerPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
+	istd::TDelPtr<QWebSocketServer> webSocketServerPtr;
+
+	if (*m_isSecureModeAttrPtr){
+		webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::SecureMode,this));
+		if (m_sslConfigurationCompPtr.IsValid()){
+			QSslConfiguration sslConfiguration;
+			imtcom::CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration);
+			webSocketServerPtr->setSslConfiguration(sslConfiguration);
+		}
+		else{
+			Q_ASSERT(0);
+		}
+
+	}
+	else{
+		webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
+	}
 	if (webSocketServerPtr->listen(address, port)){
 		SendInfoMessage(0, QString("Web socket server successfully started on port %1").arg(port));
 		qDebug() << QString("Web server successfully started on port %1").arg(port);
 
-		connect(webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections, Qt::UniqueConnection);
+		connect(webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
+		connect(webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
+		connect(webSocketServerPtr.GetPtr(), &QWebSocketServer::sslErrors, this, &CWebSocketServerComp::OnSslErrors);
 
 		m_servers.push_back(webSocketServerPtr.PopPtr());
 
@@ -241,6 +260,31 @@ void CWebSocketServerComp::OnTimeout()
 			}
 		}
 	}
+}
+
+
+void CWebSocketServerComp::OnAcceptError(QAbstractSocket::SocketError socketError)
+{
+	QWebSocketServer* webSocketServerPtr = qobject_cast<QWebSocketServer*>(sender());
+	Q_ASSERT(webSocketServerPtr != nullptr);
+	webSocketServerPtr->resumeAccepting();
+}
+
+
+void CWebSocketServerComp::OnSslErrors(const QList<QSslError> &errors)
+{
+	QString errorMessage;
+
+	for (QSslError error: errors){
+		if (!errorMessage.isEmpty()){
+			errorMessage += " ";
+		}
+		errorMessage += error.errorString();
+	}
+	errorMessage.prepend(QStringLiteral("Web socket server ssl errors: "));
+
+	SendErrorMessage(0, errorMessage, "CWebSocketServerComp");
+	qDebug() << errorMessage << __func__;
 }
 
 
