@@ -8,15 +8,13 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="IsFile" X="625" Y="450" Note=""/>
-        <Element ComponentName="LocalCertificate" X="1025" Y="525" Note=""/>
-        <Element ComponentName="PrivateKey" X="250" Y="525" Note=""/>
-        <Element ComponentName="SslConfiguration" X="625" Y="350" Note=""/>
-        <Element ComponentName="SslEncodingFormatOptionList" X="625" Y="675" Note=""/>
-        <Element ComponentName="SslKeyAlgorithmOptionList" X="125" Y="650" Note=""/>
-        <Element ComponentName="SslKeyTypeOptionList" X="125" Y="400" Note=""/>
-        <Element ComponentName="SslProtocolOptionList" X="250" Y="75" Note=""/>
-        <Element ComponentName="SslVerifyModeOptionList" X="1000" Y="75" Note=""/>
+        <Element ComponentName="CaCertificate" X="900" Y="525" Note=""/>
+        <Element ComponentName="ComposedParamsSet" X="600" Y="400" Note=""/>
+        <Element ComponentName="EnableSsl" X="600" Y="250" Note=""/>
+        <Element ComponentName="LocalCertificateFile" X="600" Y="525" Note=""/>
+        <Element ComponentName="PrivateKey" X="200" Y="525" Note=""/>
+        <Element ComponentName="SslProtocolOptionList" X="200" Y="250" Note=""/>
+        <Element ComponentName="SslVerifyModeOptionList" X="900" Y="250" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

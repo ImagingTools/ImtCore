@@ -9,6 +9,7 @@
 // ACF includes
 #include <istd/TPointerVector.h>
 #include <ilog/TLoggerCompWrap.h>
+#include <iprm/IParamsSet.h>
 
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
@@ -19,7 +20,7 @@
 #include <imtrest/IRequestManager.h>
 #include <imtrest/CWebSocketSender.h>
 #include <imtauth/ILoginStatusProvider.h>
-#include <imtcom/ISslConfiguration.h>
+#include <imtcom/ISslConfigurationManager.h>
 
 
 namespace imtrest
@@ -51,7 +52,6 @@ public:
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
 		I_ASSIGN(m_webSocketServerPortCompPtr, "WebSocketServerPort", "Parameter providing the WebSocket-server port to be listened", false, "WebSocketServerPort");
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
-		I_ASSIGN(m_isSecureModeAttrPtr, "EnableSsl", "Enable secure mode", true, false);
 	I_END_COMPONENT
 
 	// reimplemented (icomp::IRequestManager)
@@ -91,8 +91,8 @@ private:
 	I_REF(ISubscriberEngine, m_subscriberEngineCompPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
 	I_REF(imtbase::IUrlParam, m_webSocketServerPortCompPtr);
-	I_REF(imtcom::ISslConfiguration, m_sslConfigurationCompPtr);
-	I_ATTR(bool, m_isSecureModeAttrPtr);
+	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
+	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
 };
 
 

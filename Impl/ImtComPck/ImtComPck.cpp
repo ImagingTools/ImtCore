@@ -30,19 +30,9 @@ I_EXPORT_COMPONENT(
 			"Async Connection Checker");
 
 I_EXPORT_COMPONENT(
-			SslConfiguration,
-			"The SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the application to control certain features of that connection.",
+			SslConfigurationManager,
+			"The SSL Configuration manager used to create an SSL configuration",
 			"SSL Secure Connection Server Client Network Networking" IM_AUTHOR("Sergey Zastrovnyh"));
-
-I_EXPORT_COMPONENT(
-			SslKey,
-			"The SSL Configuration's key",
-			"SSL Secure Connection Server Client Network Networking Key" IM_AUTHOR("Sergey Zastrovnyh"));
-
-I_EXPORT_COMPONENT(
-			SslCertificate,
-			"The SSL Configuration's certificate",
-			"SSL Secure Connection Server Client Network Networking Certificate" IM_AUTHOR("Sergey Zastrovnyh"));
 
 I_EXPORT_COMPONENT(
 			SslEncodingFormatOptionList,

@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5226" Description="ACF"/>
-            <Version Id="1" Number="2211" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+            <Version Id="0" Number="5229" Description="ACF"/>
+            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>HTTP server framework</Description>
@@ -101,6 +101,9 @@
                     <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="SslConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SslConfigurationManager" Type="Reference" ExportId="SslConfigurationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="StartServerOnCreate">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -128,9 +131,6 @@
         <Element Id="WebSocketServer" PackageId="ImtRestPck" ComponentId="WebSocketServer">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="EnableSsl" Type="Boolean" ExportId="EnableSsl">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -142,9 +142,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RequestServerHandler" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServlet"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="SslConfiguration">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="StartWebSocketServerOnCreate">
                         <Data IsEnabled="false"/>

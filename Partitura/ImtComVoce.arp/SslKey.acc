@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5229" Description="ACF"/>
+            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="FilePath" PackageId="FilePck" ComponentId="FileNameParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="InitialPath" Type="Reference" ExportId="PrivateKeyFilePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="KeyPassword" PackageId="BasePck" ComponentId="IdParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultId" Type="Id" ExportId="PrivateKeyPassPhrase">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SslEncodingFormatOptionList" PackageId="ImtComPck" ComponentId="SslEncodingFormatOptionList">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SslKey" PackageId="BasePck" ComponentId="ComposedParamsSet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SslKeyAlgorithmOptionList</Value>
+                                <Value>SslEncodingFormatOptionList</Value>
+                                <Value>SslKeyTypeOptionList</Value>
+                                <Value>KeyPassword</Value>
+                                <Value>FilePath</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>KeyAlgorithm</Value>
+                                <Value>EncodingFormat</Value>
+                                <Value>KeyType</Value>
+                                <Value>KeyPassword</Value>
+                                <Value>FilePath</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="SslKey"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SslKeyAlgorithmOptionList" PackageId="ImtComPck" ComponentId="SslKeyAlgorithmOptionList">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SslKeyTypeOptionList" PackageId="ImtComPck" ComponentId="SslKeyTypeOptionList">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="SslKey"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="SslKey"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="SslKey"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="SslKey"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SslKey"/>
+        <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="SslKey"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

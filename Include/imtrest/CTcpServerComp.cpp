@@ -5,12 +5,15 @@
 #include <QtCore/QFileInfo>
 #include <QtNetwork/QSslConfiguration>
 
+// ACF includes
+#include <iprm/TParamsPtr.h>
+#include <iprm/IEnableableParam.h>
+
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/ISender.h>
 #include <imtrest/CMultiThreadServer.h>
-#include <imtcom/imtcom.h>
 
 
 namespace imtrest
@@ -73,13 +76,14 @@ void CTcpServerComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	m_serverPtr->SetLogPtr(GetLogPtr());
-	if (*m_isSecureModeAttrPtr){
-		Q_ASSERT_X(m_sslConfigurationCompPtr.IsValid(), "CTcpServerComp setup", "SSL Configuration is not set. Secure mode will NOT be enabled. Set SslConfiguration to fix it.");
-		if (m_sslConfigurationCompPtr.IsValid()){
-			QSslConfiguration sslConfiguration;
-			imtcom::CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration);
-			m_serverPtr->EnableSecureConnection();
-			m_serverPtr->SetSslConfiguration(sslConfiguration);
+	if (m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
+		QSslConfiguration sslConfiguration;
+		iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(m_sslConfigurationCompPtr.GetPtr(), imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
+		if (sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled()){
+			if (m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration)){
+				m_serverPtr->EnableSecureConnection();
+				m_serverPtr->SetSslConfiguration(sslConfiguration);
+			}
 		}
 	}
 

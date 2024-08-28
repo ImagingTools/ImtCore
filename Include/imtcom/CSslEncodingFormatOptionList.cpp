@@ -2,7 +2,7 @@
 
 
 // imtcom includes
-#include <imtcom/ISslKey.h>
+#include <imtcom/ISslConfigurationManager.h>
 
 
 namespace imtcom
@@ -15,8 +15,8 @@ CSslEncodingFormatOptionList::CSslEncodingFormatOptionList(): CStaticOptionList(
 
 	// we should call direct base-method to insert options
 	// clazy:exclude=skipped-base-method
-	COptionsManager::InsertOption("PEM", ISslKey::ToString(ISslKey::EF_PEM));
-	COptionsManager::InsertOption("DER", ISslKey::ToString(ISslKey::EF_DER));
+	COptionsManager::InsertOption("PEM", ISslConfigurationManager::ToString(ISslConfigurationManager::EF_PEM));
+	COptionsManager::InsertOption("DER", ISslConfigurationManager::ToString(ISslConfigurationManager::EF_DER));
 	SetSelectedOptionIndex(0);
 }
 

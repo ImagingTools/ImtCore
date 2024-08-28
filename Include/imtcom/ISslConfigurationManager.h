@@ -2,23 +2,43 @@
 
 
 // Acf includes
-#include <iser/ISerializable.h>
+#include <istd/IPolymorphic.h>
+
+
+// forward declaration
+
+class QSslConfiguration;
+
+namespace iprm
+{
+class IParamsSet;
+}
 
 
 namespace imtcom
 {
 
 
-class ISslCertificate;
-class ISslKey;
-
-
-class ISslConfiguration: virtual public iser::ISerializable
+class ISslConfigurationManager: virtual public istd::IPolymorphic
 {
 public:
-	typedef const ISslCertificate* const SslCertificatePtr;
-	typedef const ISslKey* const SslKeyPtr;
-	typedef QList<const ISslCertificate* const> SslCertificatePtrList;
+	struct ParamKeys
+	{
+		static inline const QByteArray s_enableSslModeParamKey =		QByteArrayLiteral("EnableSsl");
+		static inline const QByteArray s_keyAlgorithmParamKey =			QByteArrayLiteral("KeyAlgorithm");
+		static inline const QByteArray s_encodingFormatParamKey =		QByteArrayLiteral("EncodingFormat");
+		static inline const QByteArray s_keyTypeParamKey =				QByteArrayLiteral("KeyType");
+		static inline const QByteArray s_verifyModeParamKey =			QByteArrayLiteral("VerifyMode");
+		static inline const QByteArray s_protocolParamKey =				QByteArrayLiteral("Protocol");
+		static inline const QByteArray s_keyPasswordParamKey =			QByteArrayLiteral("KeyPassword");
+		static inline const QByteArray s_filePathParamKey =				QByteArrayLiteral("FilePath");
+		static inline const QByteArray s_encodedDataParamKey =			QByteArrayLiteral("EncodedData");
+		static inline const QByteArray s_localCertParamKey =			QByteArrayLiteral("LocalCert");
+		static inline const QByteArray s_localCertChainParamKey =		QByteArrayLiteral("LocalCertChain");
+		static inline const QByteArray s_caCertParamKey =				QByteArrayLiteral("CaCert");
+		static inline const QByteArray s_caChainCertParamKey =			QByteArrayLiteral("CaChainCert");
+		static inline const QByteArray s_privateKeyParamKey =			QByteArrayLiteral("PrivateKey");
+	};
 
 	enum PeerVerifyMode
 	{
@@ -51,7 +71,6 @@ public:
 		SP_TLS_V1_3,			///< TLSv1.3.
 		SP_TLS_V1_3_OR_LATER,	///< TLSv1.3 and later versions.
 	};
-
 	I_DECLARE_ENUM(SslProtocol,
 				SP_UNKNOWN_PROTOCOL,
 				SP_SECURE_PROTOCOLS,
@@ -68,17 +87,41 @@ public:
 				SP_TLS_V1_3,
 				SP_TLS_V1_3_OR_LATER)
 
-	virtual const SslCertificatePtr GetLocalCertificate() const = 0;
+	enum KeyAlgorithm
+	{
+		KA_RSA,		///< The RSA algorithm.
+		KA_DSA,		///< The DSA algorithm.
+		KA_EC,		///< The Elliptic Curve algorithm.
+		KA_DH,		///< The Diffie-Hellman algorithm.
+		KA_OPAQUE	///< A key that should be treated as a 'black box'.
+	};
+	I_DECLARE_ENUM(KeyAlgorithm,
+				KA_RSA,
+				KA_DSA,
+				KA_EC,
+				KA_DH,
+				KA_OPAQUE)
 
-	/// \note if returned list is not empty ALL values MUST be a valid pointer
-	virtual SslCertificatePtrList GetLocalCertificateChain() const = 0;
-	virtual SslCertificatePtr GetCaCertificate() const = 0;
+	enum EncodingFormat
+	{
+		EF_PEM,	///< The PEM format. Used by default.
+		EF_DER	///< The DER format.
+	};
+	I_DECLARE_ENUM(EncodingFormat,
+				EF_PEM,
+				EF_DER)
 
-	/// \note if returned list is not empty ALL values MUST be a valid pointer
-	virtual SslCertificatePtrList GetCaCertificateChain() const = 0;
-	virtual SslKeyPtr GetPrivateKey() const = 0;
-	virtual PeerVerifyMode GetPeerVerifyMode() const = 0;
-	virtual SslProtocol GetProtocol() const = 0;
+	enum KeyType
+	{
+		KT_PRIVATE_KEY,	///< A private key.
+		KT_PUBLIC_KEY	///< A public key.
+	};
+	I_DECLARE_ENUM(KeyType,
+				KT_PRIVATE_KEY,
+				KT_PUBLIC_KEY)
+
+	virtual bool CreateSslConfiguration(const iprm::IParamsSet& params, QSslConfiguration& output) const = 0;
+
 };
 
 

@@ -10,124 +10,76 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="IsFile" PackageId="BasePck" ComponentId="EnableableParam">
+        <Element Id="CaCertificate" PackageId="ImtComVoce" ComponentId="SslCertificateFile">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultEnabled" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="LocalCertificate" PackageId="ImtComPck" ComponentId="SslCertificate">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EncodingFormatSelection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SslEncodingFormatOptionList"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="FilePath" Type="Reference" ExportId="LocalCertificateFilePath">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsFile" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="IsFile"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                    <AttributeInfo Id="CertificateFilePath" Type="Reference" ExportId="CaCertificateFilePath">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PrivateKey" PackageId="ImtComPck" ComponentId="SslKey">
+        <Element Id="ComposedParamsSet" PackageId="BasePck" ComponentId="ComposedParamsSet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>EnableSsl</Value>
+                                <Value>LocalCertificateFile</Value>
+                                <Value>CaCertificate</Value>
+                                <Value>PrivateKey</Value>
+                                <Value>SslVerifyModeOptionList</Value>
+                                <Value>SslProtocolOptionList</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="EncodingFormatSelection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SslEncodingFormatOptionList"/>
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>EnableSsl</Value>
+                                <Value>LocalCert</Value>
+                                <Value>CaCert</Value>
+                                <Value>PrivateKey</Value>
+                                <Value>VerifyMode</Value>
+                                <Value>Protocol</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="FilePath" Type="Reference" ExportId="PrivateKeyFilePath">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="SslConfiguration"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="IsFile" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="IsFile"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="KeyAlgorithmSelection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SslKeyAlgorithmOptionList"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="KeyTypeSelection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SslKeyTypeOptionList"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PassPhrase" Type="Reference" ExportId="PrivateKeyPassPhrase">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="EnableSsl" PackageId="BasePck" ComponentId="EnableableParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultEnabled" Type="Boolean" ExportId="EnableSsl">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SslConfiguration" PackageId="ImtComPck" ComponentId="SslConfiguration">
+        <Element Id="LocalCertificateFile" PackageId="ImtComVoce" ComponentId="SslCertificateFile">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CaCertificate" Type="Reference" ExportId="CaCertificate">
+                    <AttributeInfo Id="CertificateFilePath" Type="Reference" ExportId="LocalCertificateFilePath">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LocalCertificate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LocalCertificate"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PrivateKey" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PrivateKey"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProtocolSelection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SslProtocolOptionList"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VerifyModeSelection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SslVerifyModeOptionList"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SslEncodingFormatOptionList" PackageId="ImtComPck" ComponentId="SslEncodingFormatOptionList">
+        <Element Id="PrivateKey" PackageId="ImtComVoce" ComponentId="SslKey">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="SslKeyAlgorithmOptionList" PackageId="ImtComPck" ComponentId="SslKeyAlgorithmOptionList">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="SslKeyTypeOptionList" PackageId="ImtComPck" ComponentId="SslKeyTypeOptionList">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="PrivateKeyFilePath" Type="Reference" ExportId="PrivateKeyFilePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PrivateKeyPassPhrase" Type="Id" ExportId="PrivateKeyPassPhrase">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="SslProtocolOptionList" PackageId="ImtComPck" ComponentId="SslProtocolOptionList">
@@ -143,10 +95,12 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imod::IModel" ComponentId="SslConfiguration"/>
-        <Interface InterfaceId="imtcom::ISslConfiguration" ComponentId="SslConfiguration"/>
-        <Interface InterfaceId="istd::IChangeable" ComponentId="SslConfiguration"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SslConfiguration"/>
+        <Interface InterfaceId="imod::IModel" ComponentId="ComposedParamsSet"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="ComposedParamsSet"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="ComposedParamsSet"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="ComposedParamsSet"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ComposedParamsSet"/>
+        <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="ComposedParamsSet"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

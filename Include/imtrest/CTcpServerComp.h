@@ -10,6 +10,7 @@
 #include <ibase/TRuntimeStatusHanderCompWrap.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <istd/TDelPtr.h>
+#include <iprm/IParamsSet.h>
 #include <ifile/IFileNameParam.h>
 
 // ImtCore includes
@@ -18,7 +19,7 @@
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/IRequestManager.h>
-#include <imtcom/ISslConfiguration.h>
+#include <imtcom/ISslConfigurationManager.h>
 
 
 namespace imtrest
@@ -49,7 +50,7 @@ public:
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
 		I_ASSIGN(m_serverPortCompPtr, "ServerPort", "Parameter providing the server port to be listened", true, "ServerPort");
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
-		I_ASSIGN(m_isSecureModeAttrPtr, "EnableSsl", "Enable secure mode", true, false);
+		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
 	I_END_COMPONENT
 
 	CTcpServerComp();
@@ -79,12 +80,12 @@ private:
 	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_REF(imtbase::IUrlParam, m_serverPortCompPtr);
-	I_REF(imtcom::ISslConfiguration, m_sslConfigurationCompPtr);
+	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
+	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
 
 	I_ATTR(int, m_threadsLimitAttrPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
 	I_ATTR(bool, m_isMultiThreadingAttrPtr);
-	I_ATTR(bool, m_isSecureModeAttrPtr);
 
 
 	istd::TDelPtr<CMultiThreadServer> m_serverPtr;

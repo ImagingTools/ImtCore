@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5229" Description="ACF"/>
+            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="FilePath" PackageId="FilePck" ComponentId="FileNameParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="InitialPath" Type="Reference" ExportId="CertificateFilePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SslCertificate" PackageId="BasePck" ComponentId="ComposedParamsSet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SslEncodingFormatOptionList</Value>
+                                <Value>FilePath</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>EncodingFormat</Value>
+                                <Value>FilePath</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="SslKey"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SslEncodingFormatOptionList" PackageId="ImtComPck" ComponentId="SslEncodingFormatOptionList">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="SslCertificate"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="SslCertificate"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="SslCertificate"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="SslCertificate"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SslCertificate"/>
+        <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="SslCertificate"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

@@ -1,3 +1,5 @@
+#include "iprm/IEnableableParam.h"
+#include "iprm/TParamsPtr.h"
 #include <imtrest/CWebSocketServerComp.h>
 
 
@@ -7,7 +9,6 @@
 // ImtCore includes
 #include <imtrest/CWebSocketRequest.h>
 #include <imtauth/ILoginStatusProvider.h>
-#include <imtcom/imtcom.h>
 
 
 namespace imtrest
@@ -72,17 +73,21 @@ bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 p
 
 	istd::TDelPtr<QWebSocketServer> webSocketServerPtr;
 
-	if (*m_isSecureModeAttrPtr){
-		webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::SecureMode,this));
-		if (m_sslConfigurationCompPtr.IsValid()){
-			QSslConfiguration sslConfiguration;
-			imtcom::CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration);
-			webSocketServerPtr->setSslConfiguration(sslConfiguration);
+	if (m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
+		QSslConfiguration sslConfiguration;
+		iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(m_sslConfigurationCompPtr.GetPtr(), imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
+		if (sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled()){
+			if (m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration)){
+				webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::SecureMode,this));
+				webSocketServerPtr->setSslConfiguration(sslConfiguration);
+			}
+			else{
+				webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
+			}
 		}
 		else{
-			Q_ASSERT(0);
+			webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
 		}
-
 	}
 	else{
 		webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
