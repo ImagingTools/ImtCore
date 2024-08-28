@@ -120,8 +120,8 @@ Item {
 
         duration: tooltip.waitingDuration;
         onFinished: {
-            //tooltip.openTooltip(ma.mouseX, ma.mouseY);
-            tooltip.openTooltipWithCoord(barChart.barWidth/2 - tooltip.tooltipWidth/2,  barDown.y - tooltip.componentHeight - 5);
+			tooltip.openTooltip(ma.mouseX, ma.mouseY);
+			// tooltip.openTooltipWithCoord(barChart.barWidth/2 - tooltip.tooltipWidth/2,  barDown.y - tooltip.componentHeight - 5);
 
         }
     }
