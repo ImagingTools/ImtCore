@@ -470,34 +470,80 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 		operationType == CSdlDocumentType::OT_LIST)
 	{
 		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("virtual bool CreateRepresentationFromObject(const ");
+		stream << QStringLiteral("virtual bool CreateRepresentationFromObject(");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 3);
+		stream << QStringLiteral("const ");
 
 		if (operationType == CSdlDocumentType::OT_GET){
-			stream << QStringLiteral("istd::IChangeable& data, const C");
+			stream << QStringLiteral("istd::IChangeable& data,");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, hIndents + 3);
+			stream << QStringLiteral("const C");
 			stream << GetCapitalizedValue(sdlRequest.GetName());
 			stream << QStringLiteral("GqlRequest& ");
 			stream << GetDecapitalizedValue(sdlRequest.GetName());
-			stream << QStringLiteral("Request, C");
+			stream << QStringLiteral("Request,");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, hIndents + 3);
+			stream << 'C';
 			stream << GetCapitalizedValue(sdlRequest.GetOutputArgument().GetType());
 			stream << QStringLiteral("& representationPayload");
 		}
 		else {
-			stream << QStringLiteral("imtbase::IObjectCollectionIterator& objectCollectionIterator, const C");
+			stream << QStringLiteral("imtbase::IObjectCollectionIterator& objectCollectionIterator,");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, hIndents + 3);
+			stream << QStringLiteral("const C");
 			stream << GetCapitalizedValue(sdlRequest.GetName());
 			stream << QStringLiteral("GqlRequest& ");
 			stream << GetDecapitalizedValue(sdlRequest.GetName());
-			stream << QStringLiteral("Request, C");
+			stream << QStringLiteral("Request,");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, hIndents + 3);
+			stream << 'C';
 			stream << itemClassName;
 			stream << QStringLiteral("& representationObject");
 		}
-		stream << QStringLiteral(", QString& errorMessage) const = 0;");
+		stream << ',';
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 3);
+		stream << QStringLiteral("QString& errorMessage) const = 0;");
 		FeedStream(stream, 1, false);
 	}
 	else if (operationType == CSdlDocumentType::OT_UPDATE){
 		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRepresentation(const C");
+		stream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRepresentation(");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 3);
+		stream << QStringLiteral("const C");
 		stream << itemClassName;
-		stream << QStringLiteral("& representationObject, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const = 0;");
+		stream << QStringLiteral("& ");
+		stream << GetDecapitalizedValue(itemClassName);
+		stream << QStringLiteral("Representation");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 3);
+		stream << QStringLiteral("QByteArray& newObjectId,");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 3);
+		stream << QStringLiteral("QString& name,");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 3);
+		stream << QStringLiteral("QString& description");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 3);
+		stream << QStringLiteral("QString& errorMessage) const = 0;");
 		FeedStream(stream, 1, false);
 	}
 	else {
