@@ -400,7 +400,7 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 	SendLogMessage(
 				istd::IInformationProvider::InformationCategory::IC_NONE,
 				__LINE__,
-				QString("New connection. Limit: ").arg(QString::number(m_rootServer.GetThreadsLimit())),
+				QString("New connection. Limit: %1").arg(QString::number(m_rootServer.GetThreadsLimit())),
 				__func__);
 
 	QWriteLocker listLock(&m_socketListGuard);
@@ -423,7 +423,7 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 			SendLogMessage(
 						istd::IInformationProvider::InformationCategory::IC_NONE,
 						__LINE__,
-						QString("Starting new socket. Active sockets count: %0").arg(QString::number( m_socketList.count())),
+						QString("Starting new socket. Active sockets count: %1").arg(QString::number( m_socketList.count())),
 						__func__);
 
 			connect(socket, &CSocket::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::QueuedConnection);
