@@ -27,13 +27,14 @@ public:
 
 protected:
 
-    int long2tilex(double lon, int z) const;
-    int lat2tiley(double lat, int z) const;
-    double tilex2long(int x, int z) const;
-    double tiley2lat(int y, int z) const;
+	qint64 long2tilex(double lon, int z) const;
+	qint64 lat2tiley(double lat, int z) const;
+	double tilex2long(qint64 x, int z) const;
+	double tiley2lat(qint64 y, int z) const;
 
-    QList<QPair<QPair<int, int>, int>> getTileSet(QGeoCoordinate coordLeftTop, QGeoCoordinate coordRightBottom, int z) const;
-    QPair<QPair<int, int>, int> getTile(QGeoCoordinate coord, int z) const;
+	QList<QPair<QPair<qint64, qint64>, int>> getTileSet(QGeoCoordinate coordLeftTop, QGeoCoordinate coordRightBottom, int z) const;
+	QPair<QPair<qint64, qint64>, int> getTile(QGeoCoordinate coord, int z) const;
+	qint64 getTileNumber(QGeoCoordinate coord, int z) const;
 
 private:
 

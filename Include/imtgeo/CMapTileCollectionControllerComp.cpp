@@ -75,7 +75,7 @@ imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imt
 		double rightBottomLat = 0;
 		double rightBottomLon = 0;
 
-		QList<QPair<QPair<int, int>, int>> tileList;
+		QList<QPair<QPair<qint64, qint64>, int>> tileList;
 
 		if (viewParamsGql != nullptr){
 			QByteArray filterBA = viewParamsGql->GetFieldArgumentValue("FilterModel").toByteArray();
