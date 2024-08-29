@@ -35,12 +35,9 @@ CSocket::CSocket(qintptr socketDescriptor, bool secureConnection, const QSslConf
 
 	if (!m_socket->setSocketDescriptor(socketDescriptor)){
 		qDebug() << "Socket error" << m_socket->error();
-
-		// something's wrong, we just Q_EMIT a signal
-		Q_EMIT Error(m_socket->error());
-
 		return;
 	}
+
 	m_server = parent;
 	m_enginePtr = m_server->GetProtocolEngine();
 	m_requestHandlerPtr = m_server->GetRequestServlet();
