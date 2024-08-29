@@ -52,7 +52,7 @@ QSsl::KeyAlgorithm CSslConfigurationManagerComp::GetKeyAlgorithmFromParams(const
 		I_CRITICAL();
 	}
 
-	switch (sslKeyAlgorithm) {
+	switch (sslKeyAlgorithm){
 	case KA_RSA:		retVal = QSsl::Rsa;		break;
 	case KA_DSA:		retVal = QSsl::Dsa;		break;
 	case KA_EC:			retVal = QSsl::Ec;		break;
@@ -90,11 +90,11 @@ QSsl::EncodingFormat CSslConfigurationManagerComp::GetEncodingFormatFromParams(c
 			I_CRITICAL();
 		}
 	}
-	else {
-		SendWarningMessage(0, QString("No selection param for SSL EncodingFormat is set. PEM will be setted. Set '%1' param to fix it.").arg(ParamKeys::s_encodingFormatParamKey));
+	else{
+		SendWarningMessage(0, QString("No selection param for SSL EncodingFormat is set. PEM will be setted. Set '%1' param to fix it.").arg(qPrintable(ParamKeys::s_encodingFormatParamKey)));
 	}
 
-	switch (sslEncodingFormat) {
+	switch (sslEncodingFormat){
 	case EF_DER: retVal = QSsl::Der; break;
 	case EF_PEM: retVal = QSsl::Pem; break;
 	default:
@@ -134,7 +134,7 @@ QSsl::KeyType CSslConfigurationManagerComp::GetKeyTypeFromParams(const iprm::IPa
 		I_CRITICAL();
 	}
 
-	switch (sslKeyType) {
+	switch (sslKeyType){
 	case KT_PRIVATE_KEY: retVal = QSsl::PrivateKey; break;
 	case KT_PUBLIC_KEY:  retVal = QSsl::PublicKey;  break;
 	default:
@@ -176,7 +176,7 @@ QSsl::SslProtocol CSslConfigurationManagerComp::GetSslProtocolFromParams(const i
 
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
-	switch (sslProtocol) {
+	switch (sslProtocol){
 	case SP_TLS_V1_0:			retVal = QSsl::TlsV1_0;			break;
 	case SP_TLS_V1_0_OR_LATER:	retVal = QSsl::TlsV1_0OrLater;	break;
 	case SP_TLS_V1_1:			retVal = QSsl::TlsV1_1;			break;
@@ -230,7 +230,7 @@ QSslSocket::PeerVerifyMode CSslConfigurationManagerComp::GetVerifyModeFromParams
 		I_CRITICAL();
 	}
 
-	switch (verifyMode) {
+	switch (verifyMode){
 	case PVM_NONE:			retVal = QSslSocket::VerifyNone;		break;
 	case PVM_QUERY:			retVal = QSslSocket::QueryPeer;			break;
 	case PVM_VERIFY:		retVal = QSslSocket::VerifyPeer;		break;
@@ -272,7 +272,7 @@ QSharedPointer<QSslKey> CSslConfigurationManagerComp::CreateSslKeyFromParams(con
 		const QByteArray encodedData = encodedDataParamPtr->GetName().toUtf8();
 		retVal.reset(new QSslKey(encodedData, qAlgorithm, qFormat, qType, passPhrase));
 	}
-	else {
+	else{
 		SendCriticalMessage(0, "Unable to create SSL key. No file or data for SSL key is provided!");
 		I_CRITICAL();
 	}
@@ -298,11 +298,11 @@ QSharedPointer<QSslCertificate> CSslConfigurationManagerComp::CreateSslCertifica
 		}
 		retVal.reset(new QSslCertificate(&certFile, qFormat));
 	}
-	else if (encodedDataParamPtr.IsValid()) {
+	else if (encodedDataParamPtr.IsValid()){
 		const QByteArray encodedData = encodedDataParamPtr->GetName().toUtf8();
 		retVal.reset(new QSslCertificate(encodedData, qFormat));
 	}
-	else {
+	else{
 		SendCriticalMessage(0, "Unable to create SSL cert. File path and data is not provided", "Setup SSL cert");
 		I_CRITICAL();
 	}
