@@ -294,7 +294,6 @@ QSharedPointer<QSslCertificate> CSslConfigurationManagerComp::CreateSslCertifica
 	if (filePathParamPtr.IsValid()){
 		QFile certFile(filePathParamPtr->GetPath());
 		if (!certFile.open(QIODevice::ReadOnly)){
-			SendErrorMessage(0, QString("Unable to open SSL cert file '%1'.").arg(certFile.fileName()), "Open SSL cert file");
 			return retVal;
 		}
 		retVal.reset(new QSslCertificate(&certFile, qFormat));
@@ -320,11 +319,9 @@ bool CSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet
 	iprm::TParamsPtr<iprm::IParamsSet> localCertificateParamPtr(&params, ParamKeys::s_localCertParamKey, false);
 	if (localCertificateParamPtr.IsValid()){
 		QSharedPointer<QSslCertificate> sslCertificalePtr = CreateSslCertificateFromParams(*localCertificateParamPtr);
-		if (sslCertificalePtr.isNull()){
-			Q_ASSERT_X(false, "Setup Key", "Unable to setup SSL certificate.");
-			return false;
+		if (!sslCertificalePtr.isNull()){
+			output.setLocalCertificate(*sslCertificalePtr);
 		}
-		output.setLocalCertificate(*sslCertificalePtr);
 	}
 
 	// setup local certificate chain
@@ -342,11 +339,9 @@ bool CSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet
 	iprm::TParamsPtr<iprm::IParamsSet> caCertificateParamsPtr(&params, ParamKeys::s_caCertParamKey, false);
 	if (caCertificateParamsPtr != nullptr){
 		QSharedPointer<QSslCertificate> sslCaCertificalePtr = CreateSslCertificateFromParams(*caCertificateParamsPtr);
-		if (sslCaCertificalePtr.isNull()){
-			Q_ASSERT_X(false, "Setup Key", "Unable to setup SSL CA certificate.");
-			return false;
+		if (!sslCaCertificalePtr.isNull()){
+			output.addCaCertificate(*sslCaCertificalePtr);
 		}
-		output.addCaCertificate(*sslCaCertificalePtr);
 	}
 
 	// setup CA certificate chain
@@ -363,11 +358,9 @@ bool CSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet
 	iprm::TParamsPtr<iprm::IParamsSet> privateKeyParamPtr(&params, ParamKeys::s_privateKeyParamKey, false);
 	if (privateKeyParamPtr != nullptr){
 		QSharedPointer<QSslKey> qSslKeyPtr = CreateSslKeyFromParams(*privateKeyParamPtr);
-		if (qSslKeyPtr.isNull()){
-			Q_ASSERT_X(false, "Setup Key", "Unable to setup SSL key.");
-			return false;
+		if (!qSslKeyPtr.isNull()){
+			output.setPrivateKey(*qSslKeyPtr);
 		}
-		output.setPrivateKey(*qSslKeyPtr);
 	}
 
 	// setup verify mode

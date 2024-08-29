@@ -31,7 +31,7 @@ CSslProtocolOptionList::CSslProtocolOptionList(): CStaticOptionList()
 	COptionsManager::InsertOption("TLSv1.3.", ISslConfigurationManager::ToString(ISslConfigurationManager::SP_TLS_V1_3));
 	COptionsManager::InsertOption("TLSv1.3 and later versions.", ISslConfigurationManager::ToString(ISslConfigurationManager::SP_TLS_V1_3_OR_LATER));
 
-	SetSelectedOptionIndex(GetOptionsCount() - 1);
+	SetSelectedOptionIndex(8);
 }
 
 
