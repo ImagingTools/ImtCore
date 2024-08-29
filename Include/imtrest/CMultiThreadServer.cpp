@@ -231,8 +231,11 @@ void CSocket::OnDisconnected()
 
 
 CMultiThreadServer::CMultiThreadServer(CTcpServerComp* rootServer)
-	// :QSslServer((QObject*)rootServer),
+#if QT_VERSION < 0x060400
 	:QTcpServer((QObject*)rootServer),
+#else
+	:QSslServer((QObject*)rootServer),
+#endif
 	m_rootServer(*rootServer),
 	m_socketListGuard(QReadWriteLock::Recursive),
 	m_isActive(true),
