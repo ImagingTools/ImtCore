@@ -65,6 +65,11 @@ I_EXPORT_COMPONENT(
 			"Schema Definition Language SDL Class Generator JSON")
 
 I_EXPORT_COMPONENT(
+			GqlHandlerBaseClassGenerator,
+			"A C++ class generator of GraphQL handlers for SDL requests",
+			"Schema Definition Language SDL Class Generator JSON GraphQL GQL Request")
+
+I_EXPORT_COMPONENT(
 			GqlCollectionControllerBaseClassGenerator,
 			"A C++ class generator of GraphQL Collection controllers for SDL requests",
 			"Schema Definition Language SDL Class Generator JSON GraphQL GQL Request")

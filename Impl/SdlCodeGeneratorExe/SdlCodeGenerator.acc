@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5229" Description="ACF"/>
-            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5231" Description="ACF"/>
+            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -186,6 +186,7 @@
                                             <Value>QmlCodeGenerator</Value>
                                             <Value>SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator</Value>
                                             <Value>SdlGqlCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator</Value>
+                                            <Value>SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
