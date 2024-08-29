@@ -389,9 +389,9 @@ Rectangle{
             treeViewGql.model.setData("ChildrenCount__", model_.getItemsCount(), index);
         }
 
-        // if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
-             // treeViewGql.selectedIndex += counter;
-        // }
+         if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
+              treeViewGql.selectedIndex += counter;
+         }
         treeViewGql.setContentWidth();
 
         treeViewGql.inserted(index);
@@ -401,57 +401,52 @@ Rectangle{
         //console.log("DELETE BRANCH", index);
         if (index < 0){
             treeViewGql.model.clear()
-
             return
         }
+        let deletionCompleted = false;
 
         let innerId = treeViewGql.model.getData("InnerId__", index);
-        let found = false;
-        let foundChangeCount = 0;
         for(let i = index + 1; i < treeViewGql.model.getItemsCount(); i++){
             let branchIds = treeViewGql.model.isValidData("BranchIds__", i) ? treeViewGql.model.getData("BranchIds__", i) : "";
             //console.log("branchIds:: ", branchIds)
             let ok = false;
             let arr = branchIds.split(",");
-            let arrCounter = 0;
             for(let k = 0; k < arr.length; k++){
                 if(arr[k] == innerId){
                     ok = true;
-                    if(!found){
-                        found = true;
-                        foundChangeCount = 1;
-                    }
                     break;
                 }
-                arrCounter++;
-            }
-            if(arrCounter == arr.length && found){
-                foundChangeCount = 2;
-            }
 
-            if(foundChangeCount == 2){
-                //console.log("StopINdex::", i);
-                break;
-            }
-            //
+            }//for k
+
             if(ok){
                 treeViewGql.model.removeItem(i);
                 treeViewGql._deleteCounter++;
                 listFrame.contentHeight -= treeViewGql.delegateHeight;
                 treeViewGql.deleteBranch(index);
+                break;
             }
+            else {
+                deletionCompleted = true;
+                break;
+            }
+
+        }//for i
+
+        if(deletionCompleted){
+            //console.log("deletionCompleted", deletionCompleted)
+            if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
+                treeViewGql.selectedIndex -= treeViewGql._deleteCounter;
+            }
+
+            treeViewGql._deleteCounter = 0;
+
+            treeViewGql.model.setData("IsOpen__", false, index);
+            treeViewGql.model.setData("OpenState__", -1, index);
+            treeViewGql.model.setData("HasBranch__", false, index);
+
+            treeViewGql.setContentWidth();
         }
-        if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
-            treeViewGql.selectedIndex -= treeViewGql._deleteCounter;
-        }
-
-        treeViewGql._deleteCounter = 0;
-
-        treeViewGql.model.setData("IsOpen__", false, index);
-        treeViewGql.model.setData("OpenState__", -1, index);
-        treeViewGql.model.setData("HasBranch__", false, index);
-
-        treeViewGql.setContentWidth();
     }
 
     function setVisibleElements(visible, index){
@@ -544,6 +539,7 @@ Rectangle{
     }
 
     function setContentWidth(){
+        //console.log("setContentWidth")
         let maxWidth = 0;
         let maxLevel_= 0;
         for(let i = 0; i < treeViewGql.model.getItemsCount(); i++){
