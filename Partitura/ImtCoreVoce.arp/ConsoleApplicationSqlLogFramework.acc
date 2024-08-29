@@ -2,29 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+            <Version Id="0" Number="5229" Description="ACF"/>
+            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Base framework for a console application</Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="CollectionBasedMessageConsumer" PackageId="ImtLogPck" ComponentId="CollectionBasedMessageConsumer">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="MessageSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConsoleApplicationFramework/RuntimeStatus"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="SlaveMessageConsumer">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="ConsoleApplicationFramework" PackageId="ImtCoreVoce" ComponentId="ConsoleApplicationFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -62,7 +47,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="CollectionBasedMessageConsumer"/>
+                        <Data IsEnabled="true" Value="Log"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
@@ -70,11 +55,17 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="MessageSqlRepository" PackageId="ImtDatabaseVoce" ComponentId="LogSqlRepository">
+        <Element Id="Log" PackageId="ImtLogPck" ComponentId="CollectionBasedMessageConsumer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SqLiteDatabaseEngine"/>
+                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SqlLogDatabase"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleApplicationFramework/RuntimeStatus"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="SlaveMessageConsumer">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -94,6 +85,15 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SqlLogDatabase" PackageId="ImtDatabaseVoce" ComponentId="LogSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SqLiteDatabaseEngine"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -104,7 +104,7 @@
         <Component ExportedId="DatabaseFilePath" ComponentId="SqLiteDatabaseEngine/DatabaseFilePath"/>
         <Component ExportedId="Log" ComponentId="ConsoleApplicationFramework/Log"/>
         <Component ExportedId="LogFilePath" ComponentId="ConsoleApplicationFramework/LogFilePath"/>
-        <Component ExportedId="MessageSqlRepository" ComponentId="MessageSqlRepository"/>
+        <Component ExportedId="MessageSqlRepository" ComponentId="SqlLogDatabase"/>
         <Component ExportedId="RuntimeStatus" ComponentId="ConsoleApplicationFramework/RuntimeStatus"/>
     </ExportedComponents>
 </Acf>
