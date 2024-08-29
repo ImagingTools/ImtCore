@@ -1,4 +1,6 @@
 const Flickable = require("./Flickable")
+const Component = require("../QtQml/Component")
+const Variant = require("../QtQml/Variant")
 const Var = require("../QtQml/Var")
 const Real = require("../QtQml/Real")
 const Signal = require("../QtQml/Signal")
@@ -20,7 +22,7 @@ class ListView extends Flickable {
 
     static meta = Object.assign({}, Flickable.meta, {
         model: {type: Var, value:undefined, signalName:'modelChanged'},
-        delegate: {type: Var, value:undefined, signalName:'delegateChanged'},
+        delegate: {type:Variant, typeTarget:Component, value:undefined, signalName:'delegateChanged'},
         contentX: {type: Real, value:0, signalName:'contentXChanged'},
         contentY: {type: Real, value:0, signalName:'contentYChanged'},
         orientation: {type: Real, value:ListView.Vertical, signalName:'orientationChanged'},

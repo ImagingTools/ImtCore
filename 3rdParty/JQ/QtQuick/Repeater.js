@@ -1,4 +1,6 @@
 const Item = require("./Item")
+const Component = require("../QtQml/Component")
+const Variant = require("../QtQml/Variant")
 const Var = require("../QtQml/Var")
 const Real = require("../QtQml/Real")
 const Signal = require("../QtQml/Signal")
@@ -7,7 +9,7 @@ const JQApplication = require("../core/JQApplication")
 class Repeater extends Item {
     static meta = Object.assign({}, Item.meta, {
         model: {type: Var, value:undefined, signalName:'modelChanged'},
-        delegate: {type: Var, value:undefined, signalName:'delegateChanged'},
+        delegate: {type:Variant, typeTarget:Component, value:undefined, signalName:'delegateChanged'},
         count: {type: Real, value:0, signalName:'countChanged'},
         
         modelChanged: {type:Signal, slotName:'onModelChanged', args:[]},

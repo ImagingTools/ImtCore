@@ -31,7 +31,7 @@ class Column extends Item {
             minHeight: 'fit-content',
         })
 
-        let rect = this.__DOM.getBoundingClientRect()
+        let rect = this.__getDOM().getBoundingClientRect()
 
         this.__getObject('width').__setAuto(rect.width)
         this.__getObject('height').__setAuto(rect.height)

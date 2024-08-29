@@ -88,7 +88,7 @@ class QObject extends BaseObject {
         let slotSuper = self[name]
         self[name] = (...args)=>{
             if(slotSuper) slotSuper.call(this, ...args)
-            slot(...args)
+            slot.call(this, ...args)
         }
     }
 }

@@ -60,7 +60,7 @@ class Image extends Item {
             return
         }
 
-        let url = this.source
+        let url = '/ControlsGallery/Views/' + this.source
         this.$url = url
 
         this.status = Image.Loading

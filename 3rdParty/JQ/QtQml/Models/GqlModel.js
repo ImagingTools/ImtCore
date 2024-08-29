@@ -6,20 +6,20 @@ class GqlModel extends TreeItemModel {
     }
     
     setGqlQuery(gqlData){
-        this.getProperty('state').reset("Loading")
+        this.state = "Loading"
         let xhr = new XMLHttpRequest
         xhr.open("POST", "../../graphql")
         xhr.send(gqlData)
 
-        xhr.onreadystatechange = function(){
-            if (this.UID && xhr.readyState === XMLHttpRequest.DONE){
-                this.getProperty('json').reset(xhr.responseText)
-                this.getProperty('state').reset("Processing")
+        xhr.onreadystatechange = ()=>{
+            if (xhr.readyState === XMLHttpRequest.DONE){
+                this.json = xhr.responseText
+                this.state = "Processing"
                 this.updateJSONModel()
                 this.updateTreeItemJSONModel()
-                this.getProperty('state').reset("Ready")
+                this.state = "Ready"
             }
-        }.bind(this)
+        }
     }
 }
 

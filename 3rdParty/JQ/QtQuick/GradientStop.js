@@ -18,6 +18,18 @@ class GradientStop extends QtObject {
 
         return proxy
     }
+
+    onColorChanged(){
+        this.__updateGradient()
+    }
+
+    onPositionChanged(){
+        this.__updateGradient()
+    }
+
+    __updateGradient(){
+        this.parent.__updateGradient()
+    }
 }
 
 module.exports = GradientStop

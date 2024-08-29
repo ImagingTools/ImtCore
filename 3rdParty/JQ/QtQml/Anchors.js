@@ -100,12 +100,12 @@ class Anchors extends GroupProperty {
 
     onHorizontalCenterChanged(){
         let target = this.horizontalCenter.__get()
-        let targetFloat = target.__float
-        target = target.__parent
-
-        let self = this.__parent
 
         if(self && target){
+            let targetFloat = target.__float
+            target = target.__parent
+
+            let self = this.__parent
             let updateList = []
 
             if(self.parent === target){
@@ -134,12 +134,12 @@ class Anchors extends GroupProperty {
 
     onVerticalCenterChanged(){
         let target = this.verticalCenter.__get()
-        let targetFloat = target.__float
-        target = target.__parent
-
-        let self = this.__parent
 
         if(self && target){
+            let targetFloat = target.__float
+            target = target.__parent
+
+            let self = this.__parent
             let updateList = []
 
             if(self.parent === target){
@@ -168,10 +168,6 @@ class Anchors extends GroupProperty {
 
     onLeftChanged(){
         let target = this.left.__get()
-        let targetFloat = target.__float
-        target = target.__parent
-
-        let self = this.__parent
 
         if(target && this.right.__get()) {
             this.onLeftRightChanged()
@@ -179,6 +175,10 @@ class Anchors extends GroupProperty {
         }
 
         if(self && target){
+            let targetFloat = target.__float
+            target = target.__parent
+
+            let self = this.__parent
             let updateList = []
 
             if(self.parent === target){
@@ -207,10 +207,6 @@ class Anchors extends GroupProperty {
 
     onRightChanged(){
         let target = this.right.__get()
-        let targetFloat = target.__float
-        target = target.__parent
-
-        let self = this.__parent
 
         if(target && this.left.__get()) {
             this.onLeftRightChanged()
@@ -218,6 +214,10 @@ class Anchors extends GroupProperty {
         }
 
         if(self && target){
+            let targetFloat = target.__float
+            target = target.__parent
+
+            let self = this.__parent
             let updateList = []
 
             if(self.parent === target){
@@ -246,16 +246,16 @@ class Anchors extends GroupProperty {
 
     onLeftRightChanged(){
         let left = this.left.__get()
-        let leftFloat = left.__float
-        left = left.__parent
-
         let right = this.right.__get()
-        let rightFloat = right.__float
-        right = right.__parent
-
         let self = this.__parent
 
         if(self && left && right){
+            let leftFloat = left.__float
+            left = left.__parent
+
+            let rightFloat = right.__float
+            right = right.__parent
+
             let updateList = []
 
             if(self.parent === left){
@@ -304,17 +304,17 @@ class Anchors extends GroupProperty {
 
     onTopChanged(){
         let target = this.top.__get()
-        let targetFloat = target.__float
-        target = target.__parent
-
-        let self = this.__parent
-
+        
         if(target && this.bottom.__get()) {
             this.onTopBottomChanged()
             return
         }
 
         if(self && target){
+            let targetFloat = target.__float
+            target = target.__parent
+
+            let self = this.__parent
             let updateList = []
 
             if(self.parent === target){
@@ -343,10 +343,6 @@ class Anchors extends GroupProperty {
 
     onBottomChanged(){
         let target = this.bottom.__get()
-        let targetFloat = target.__float
-        target = target.__parent
-
-        let self = this.__parent
 
         if(target && this.top.__get()) {
             this.onTopBottomChanged()
@@ -354,6 +350,10 @@ class Anchors extends GroupProperty {
         }
 
         if(self && target){
+            let targetFloat = target.__float
+            target = target.__parent
+
+            let self = this.__parent
             let updateList = []
 
             if(self.parent === target){
@@ -382,16 +382,16 @@ class Anchors extends GroupProperty {
 
     onTopBottomChanged(){
         let top = this.top.__get()
-        let topFloat = top.__float
-        top = top.__parent
-
         let bottom = this.bottom.__get()
-        let bottomFloat = bottom.__float
-        bottom = bottom.__parent
-
         let self = this.__parent
 
         if(self && top && bottom){
+            let topFloat = top.__float
+            top = top.__parent
+
+            let bottomFloat = bottom.__float
+            bottom = bottom.__parent
+
             let updateList = []
 
             if(self.parent === top){

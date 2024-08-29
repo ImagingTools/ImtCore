@@ -25,7 +25,7 @@ class Rectangle extends Item {
         return proxy
     }
 
-    onGradientChanged(){
+    __updateGradient(){
         if(this.gradient) {
             let style = []
             
@@ -43,6 +43,19 @@ class Rectangle extends Item {
             }
         }
     }
+    onGradientChanged(){
+        if(this.__gradient){
+            this.__gradient.__removeListener(this)
+        }
+
+        this.__gradient = this.gradient
+
+        if(this.__gradient){
+            this.__gradient.__addListener(this)
+        }
+
+        this.__updateGradient()
+    }
 
     onColorChanged(){
         this.__setDOMStyle({
@@ -54,6 +67,14 @@ class Rectangle extends Item {
         this.__setDOMStyle({
             borderRadius: `${this.radius}px`
         })
+    }
+
+    __destroy(){
+        if(this.__gradient){
+            this.__gradient.__removeListener(this)
+        }
+        
+        super.__destroy()
     }
 }
 

@@ -25,6 +25,7 @@ module.exports = {
     var: require("./Var"),
     alias: require("./Alias"),
     list: require("./List"),
+    variant: require("./Variant"),
 
     Signal: require("./Signal"),
 

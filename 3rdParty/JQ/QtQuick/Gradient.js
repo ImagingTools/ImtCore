@@ -15,11 +15,36 @@ class Gradient extends QtObject {
         orientationChanged: {type:Signal, slotName:'onOrientationChanged', args:[]},
     })
 
+    __rects = new Set()
+
     static create(parent, model, ...args){
         let proxy = super.create(parent, model, ...args)
         proxy.stops = []
 
         return proxy
+    }
+
+    onStopsChanged(){
+        this.__updateGradient()
+    }
+
+    onOrientationChanged(){
+        this.__updateGradient()
+    }
+
+    __updateGradient(){
+        for(let rect of this.__rects){
+            rect.__updateGradient()
+        }
+        
+    }
+
+    __addListener(obj){
+        this.__rects.add(obj)
+    }
+
+    __removeListener(obj){
+        this.__rects.delete(obj)
     }
 }
 

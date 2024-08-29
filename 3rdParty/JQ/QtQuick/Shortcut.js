@@ -1,13 +1,14 @@
 const QtObject = require("../QtQml/QtObject")
-const Qt = require("../Qt/Qt")
+const QtEnums = require("../Qt/enums")
 const Bool = require("../QtQml/Bool")
 const Var = require("../QtQml/Var")
 const Real = require("../QtQml/Real")
+const String = require("../QtQml/String")
 const Signal = require("../QtQml/Signal")
 
 class Shortcut extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        context: { type: Real, value: Qt.WindowShortcut, signalName: 'contextChanged' },
+        context: { type: Real, value: QtEnums.WindowShortcut, signalName: 'contextChanged' },
         autoRepeat: { type: Bool, value: true, signalName: 'autoRepeatChanged' },
         enabled: { type: Bool, value: true, signalName: 'enabledChanged' },
         nativeText: { type: String, value: '', signalName: 'nativeTextChanged' },

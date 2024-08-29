@@ -87,7 +87,14 @@ class Property extends BaseObject {
             return true
         }
 
-        let safeValue = this.__typecasting(value)
+        let safeValue
+        try {
+            safeValue = this.__typecasting(value)
+        } catch (error) {
+            console.log(error)
+            return false
+        }
+        
 
         if(key){
             if(safeValue !== this.__value[key]){

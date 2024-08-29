@@ -1,4 +1,5 @@
 const JSONListModel = require("./JSONListModel")
+const QtObject = require("../QtObject")
 const Var = require("../../QtQml/Var")
 const String = require("../../QtQml/String")
 const Bool = require("../../QtQml/Bool")
@@ -21,22 +22,22 @@ class TreeItemModel extends JSONListModel {
         modelChanged: {type:Signal, slotName:'onModelChanged', args:['changeset']},
     })
 
-    m_countChanges = 0
-    m_countTransaction = 0
+    __m_countChanges = 0
+    __m_countTransaction = 0
 
-    beginChanges(){
-        this.m_countTransaction++
+    __beginChanges(){
+        this.__m_countTransaction++
 
         return true
     }
 
-    endChanges(){
-        this.m_countTransaction--
+    __endChanges(){
+        this.__m_countTransaction--
 
-        if (this.m_countChanges > 0 && this.m_countTransaction === 0){
-            this.$onModelChanged()
+        if (this.__m_countChanges > 0 && this.__m_countTransaction === 0){
+            this.modelChanged()
 
-            this.m_countChanges = 0
+            this.__m_countChanges = 0
 
             return true
         }
@@ -47,7 +48,7 @@ class TreeItemModel extends JSONListModel {
     $emitDataChanged(topLeft, bottomRight, roles){
         if(this.getPropertyValue('isUpdateEnabled')) super.$emitDataChanged(topLeft, bottomRight, roles)
 
-        this.$onModelChanged()
+        this.modelChanged()
     }
 
     append(dict){
@@ -104,7 +105,7 @@ class TreeItemModel extends JSONListModel {
     }
 
     setUpdateEnabled(flag){
-        this.getProperty('isUpdateEnabled').reset(flag)
+        this.isUpdateEnabled = flag
     }
 
     getItemsCount(){
@@ -121,14 +122,9 @@ class TreeItemModel extends JSONListModel {
             return retVal
 
         if(typeof retVal === 'object' && !(retVal instanceof QtObject)){
-            let retModel = new TreeItemModel(this)
-            if(typeof modelObject === 'object' && modelObject instanceof QModelData){
-                modelObject.$lock = true
-                modelObject[key] = retModel
-                modelObject.$lock = false
-            } else {
-                modelObject[key] = retModel
-            }
+            let retModel = TreeItemModel.create(this)
+
+            modelObject[key] = retModel
 
             if(Object.keys(retVal).length) {
                 if (Array.isArray(retVal)){
@@ -146,9 +142,9 @@ class TreeItemModel extends JSONListModel {
 
 
     setData(key, value, row){
+        JQApplication.updateLater(this)
+        
         if(row === undefined || row === null) row = 0
-
-        this.beginChanges()
 
         if(this.count === 0 && row === 0){
             this.append({})
@@ -158,33 +154,25 @@ class TreeItemModel extends JSONListModel {
 
         if (modelObject[key] === undefined && value === ""){
             if (modelObject[key] != value){
-                this.m_countChanges++
+                this.__m_countChanges++
             }
 
             modelObject[key] = value
 
-            this.endChanges()
+            this.__endChanges()
             return true
         }
 
         if(modelObject[key] !== value){
-            this.m_countChanges++
+            this.__m_countChanges++
 
-            if(typeof modelObject === 'object' && modelObject instanceof QModelData){
-                modelObject.$lock = true
-                modelObject[key] = value
-                modelObject.$lock = false
-            } else {
-                modelObject[key] = value
-            }
+            modelObject[key] = value
+            
 
-            if (this.getPropertyValue('isUpdateEnabled')){
-                let signal = this.getProperty('data').getNotify()
-                if(signal) signal(row, row+1)
+            if(this.isUpdateEnabled){
+                this.dataChanged(row, row+1)
             }
         }
-
-        this.endChanges()
 
         return true
     }
@@ -196,11 +184,10 @@ class TreeItemModel extends JSONListModel {
         let modelObject = this.get(row)
 
         if(key in modelObject){
-            if(modelObject[key] && modelObject[key] instanceof QProperty) modelObject[key].unsubscribe()
             delete modelObject[key]
         }
 
-        this.$onModelChanged()
+        this.modelChanged()
     }
 
     isValidData(key, row){
@@ -210,16 +197,10 @@ class TreeItemModel extends JSONListModel {
     }
 
     setExternTreeModel(key, value, row){
-        this.beginChanges()
-
         this.setData(key, value, row)
-
-        this.endChanges()
     }
 
     copyItemDataFromModel(index, externTreeModel, externIndex){
-        this.beginChanges()
-
         this.removeItem(index)
         this.insertNewItem(index)
 
@@ -242,12 +223,9 @@ class TreeItemModel extends JSONListModel {
             }
         }
 
-        if (this.getPropertyValue('isUpdateEnabled')){
-            let signal = this.getProperty('data').getNotify()
-            if(signal) signal()
+        if (this.isUpdateEnabled){
+            this.dataChanged()
         }
-
-        this.endChanges()
 
         return retVal
     }
@@ -258,8 +236,6 @@ class TreeItemModel extends JSONListModel {
 
     copyFrom(externTreeModel){
         if(externTreeModel){
-            this.beginChanges()
-
             this.clear()
 
             let retVal = true
@@ -286,8 +262,6 @@ class TreeItemModel extends JSONListModel {
                 }
             }
 
-            this.endChanges()
-
             return retVal
         }
 
@@ -309,7 +283,7 @@ class TreeItemModel extends JSONListModel {
         if(this.count <= 0 || index < 0 || index >= this.count) return
 
         let item = this.get(index)
-        let retModel = new TreeItemModel()
+        let retModel = TreeItemModel.create()
         this.copyItemDataToModel(index, retModel, 0)
         return retModel
 
@@ -372,14 +346,10 @@ class TreeItemModel extends JSONListModel {
     copy(obj){
         if(!obj) return false
 
-        this.beginChanges()
-
         this.clear()
         for(let i = 0; i < obj.count; i++){
             this.copyItemDataFromModel(this.insertNewItem(), obj, i)
         }
-
-        this.endChanges()
 
         return true
     }
@@ -482,101 +452,88 @@ class TreeItemModel extends JSONListModel {
     }
 
     addTreeModel(key, row){
-        this.beginChanges()
-
-        let retModel = new TreeItemModel(this)
+        let retModel = TreeItemModel.create(this)
         this.setUpdateEnabled(false)
         this.setData(key, retModel, row)
         this.setUpdateEnabled(true)
-
-        this.endChanges()
 
         return retModel
     }
 
     createFromJson(jsonString){
-        this.beginChanges()
-
         this.clear()
         this.json = jsonString
 
         this.updateJSONModel()
         this.updateTreeItemJSONModel()
-
-        this.endChanges()
     }
 
     toJson(){
-        let retVal = ""
-        if (this.isArray || this.count > 1)
-            retVal += "["
-        else
-            retVal += "{"
-        for (let i = 0; i < this.count; i++){
-            let modelObject = this.get(i)
-            if (i > 0){
-                retVal += ","
-            }
-            if (this.isArray || this.count > 1)
-                if(modelObject && Object.keys(modelObject).indexOf('') < 0) retVal += "{"
+        // let retVal = ""
+        // if (this.isArray || this.count > 1)
+        //     retVal += "["
+        // else
+        //     retVal += "{"
+        // for (let i = 0; i < this.count; i++){
+        //     let modelObject = this.get(i)
+        //     if (i > 0){
+        //         retVal += ","
+        //     }
+        //     if (this.isArray || this.count > 1)
+        //         if(modelObject && Object.keys(modelObject).indexOf('') < 0) retVal += "{"
 
-            let recurciveJSON = function(modelData){
-                if (modelData === null || modelData === undefined) {
-                    retVal += "null"
-                } else if(typeof modelData === 'object'){
-                    if(modelData instanceof QModelData){
-                        let j = 0
-                        for (let property in modelObject) {
-                            if (j > 0) retVal += ","
-                            j++;
-                            if(property !== '') retVal += "\"" + property + "\":"
+        //     let recurciveJSON = function(modelData){
+        //         if (modelData === null || modelData === undefined) {
+        //             retVal += "null"
+        //         } else if(typeof modelData === 'object'){
+        //             if(modelData instanceof QModelData){
+        //                 let j = 0
+        //                 for (let property in modelObject) {
+        //                     if (j > 0) retVal += ","
+        //                     j++;
+        //                     if(property !== '') retVal += "\"" + property + "\":"
 
-                            recurciveJSON(modelData[property])
-                        }
-                    } else if(modelData instanceof TreeItemModel){
-                        retVal += modelData.toJson()
-                    } else if(modelData instanceof QtObject){
-                        retVal += "null"
-                    } else {
-                        retVal += JSON.stringify(modelData)
-                    }
-                } else if(typeof modelData === 'string'){
-                    retVal += "\"" + modelData.replaceAll('\u005C', '\u005C\u005C') + "\""
-                } else {
-                    retVal += modelData
-                }
-            }
+        //                     recurciveJSON(modelData[property])
+        //                 }
+        //             } else if(modelData instanceof TreeItemModel){
+        //                 retVal += modelData.toJson()
+        //             } else if(modelData instanceof QtObject){
+        //                 retVal += "null"
+        //             } else {
+        //                 retVal += JSON.stringify(modelData)
+        //             }
+        //         } else if(typeof modelData === 'string'){
+        //             retVal += "\"" + modelData.replaceAll('\u005C', '\u005C\u005C') + "\""
+        //         } else {
+        //             retVal += modelData
+        //         }
+        //     }
 
-            recurciveJSON(modelObject)
+        //     recurciveJSON(modelObject)
 
-            if (this.isArray || this.count > 1){
-                if(modelObject && Object.keys(modelObject).indexOf('') < 0) retVal += "}"
-            }
+        //     if (this.isArray || this.count > 1){
+        //         if(modelObject && Object.keys(modelObject).indexOf('') < 0) retVal += "}"
+        //     }
                 
-        }
+        // }
 
-        if (this.isArray || this.count > 1)
-            retVal += "]"
-        else
-            retVal += "}"
-        return retVal
+        // if (this.isArray || this.count > 1)
+        //     retVal += "]"
+        // else
+        //     retVal += "}"
+        // return retVal
     }
 
     updateTreeItemJSONModel(){
         for(let row = 0; row < this.getItemsCount(); row++){
             let modelObject = this.get(row)
             let keys = Object.keys(modelObject)
-            for ( let index in keys ) {
+            for(let index in keys){
                 let retVal = modelObject[keys[index]]
                 if(retVal !== null && typeof retVal === 'object' && !(retVal instanceof QtObject)){
-                    let retModel = new TreeItemModel(this)
-                    if(typeof modelObject === 'object' && modelObject instanceof QModelData){
-                        modelObject.$lock = true
-                        modelObject[keys[index]] = retModel
-                        modelObject.$lock = false
-                    } else {
-                        modelObject[keys[index]] = retModel
-                    }
+                    let retModel = TreeItemModel.create(this)
+
+                    modelObject[keys[index]] = retModel
 
                     if(Object.keys(retVal).length) {
                         if (Array.isArray(retVal)){

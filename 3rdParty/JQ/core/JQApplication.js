@@ -94,6 +94,7 @@ module.exports = {
         </style>`)
 
         this.root = JQModules.QtQuick.Item.create()
+        this.root.__complete()
 
         window.addEventListener('resize', ()=>{
             this.root.width = window.innerWidth
@@ -143,7 +144,7 @@ module.exports = {
         if(layer)
         for(let obj of layer){
             this.objectsAwaitingUpdate.delete(obj)
-            obj.__endUpdate()
+            if(!obj.__destroyed) obj.__endUpdate()
         }
     },
 }

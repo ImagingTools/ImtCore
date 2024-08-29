@@ -30,7 +30,7 @@ class QtObject extends QObject {
     static create(parent, model, ...args){
         let proxy = super.create(parent, model, ...args)
 
-        proxy.JQAbstractModel = QtFunctions.binding(()=>{return proxy.parent.JQAbstractModel})
+        proxy.JQAbstractModel = QtFunctions.binding(()=>{return proxy.parent ? proxy.parent.JQAbstractModel : null})
 
         if(model){
             proxy.JQAbstractModel = model
@@ -110,6 +110,7 @@ class QtObject extends QObject {
             delete self[key]
         }
 
+        self.__destroyed = true
     }
 }
 

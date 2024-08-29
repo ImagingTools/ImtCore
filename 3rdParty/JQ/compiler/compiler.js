@@ -16,6 +16,7 @@ const Qt5Compat = require('../Qt5Compat/Qt5Compat')
 const QtWebSockets = require('../QtWebSockets/QtWebSockets')
 
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\imtcore.json'//process.argv.slice(2)[0]
+// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\jq.json'//process.argv.slice(2)[0]
 const configFilePath = process.argv.slice(2)[0]
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 const config = JSON.parse(fs.readFileSync(configFilePath, {encoding:'utf8', flag:'r'}))
@@ -315,6 +316,7 @@ class Instruction {
             if(name === obj.name) return {
                 // obj: obj.value instanceof Instruction ? obj.value : typeInfo.type, // ====
                 source: `${thisKey}.${name}`,
+                type: typeInfo.type,
             }
         }
         for(let obj of this.defineSignals){
@@ -340,7 +342,13 @@ class Instruction {
                 return typeInfo.type.instruction.resolve(name, thisKey)
             } else {
                 let obj = new typeInfo.type()
-                if(name in typeInfo.type.meta || name in obj){
+                if(name in typeInfo.type.meta){
+                    return {
+                        // obj: typeInfo.type, // ====
+                        source: `${thisKey}.${name}`,
+                        type: typeInfo.type.meta[name].typeTarget ? typeInfo.type.meta[name].typeTarget : typeInfo.type.meta[name].type,
+                    }
+                } else if(name in obj){
                     return {
                         // obj: typeInfo.type, // ====
                         source: `${thisKey}.${name}`,
@@ -395,6 +403,7 @@ class Instruction {
                     }
 
                     if(Singletons[tree[1]]) {
+                        // this.qmlFile.dependencies.add(Singletons[tree[1]])
                         stat.value += tree[1]
                         if(stat.wasDot){
                             stat.dotObj = Singletons[tree[1]]
@@ -682,7 +691,7 @@ class Instruction {
                 }
                 case 'defun': {
                     let local = []
-                    stat.value += tree[1] + '('
+                    stat.value += tree[1] + '=function('
                     for(let i = 0; i < tree[2].length; i++){
                         stat.value += tree[2][i]
                         local.push(tree[2][i])
@@ -991,6 +1000,10 @@ class Instruction {
             typeBase = typeBase.instruction.getTypeInfo(typeBase.instruction.extends).typeBase
         }
 
+        if(typeInfo.type instanceof QmlFile){
+            this.qmlFile.dependencies.add(typeInfo.type)
+        }
+
         if(this.qmlFile.singleton && isRoot){
             code.push(`const ${this.className} = (class extends ${typeInfo.path} {`)
         } else {
@@ -1003,20 +1016,33 @@ class Instruction {
                 let _typeInfo
                 try {
                     _typeInfo = this.getTypeInfo(defineProperty.type)
+
+                    if(_typeInfo.type instanceof QmlFile){
+                        this.qmlFile.dependencies.add(_typeInfo.type)
+                    }
                 } catch (error) {
                     throw `${this.qmlFile.fileName}:${defineProperty.info.line+1}:${defineProperty.info.col+1}: error: ${defineProperty.info.value} is not founded`
                 }
                 
 
                 if(typeof defineProperty.value === 'object'){
-                    code.push(`${defineProperty.name}:{type:${_typeInfo.path}, signalName:'${defineProperty.signalName}'},`)
+                    if(_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)){
+                        code.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, signalName:'${defineProperty.signalName}'},`)
+                    } else {
+                        code.push(`${defineProperty.name}:{type:${_typeInfo.path}, signalName:'${defineProperty.signalName}'},`)
+                    }
                     continue
                 }
 
                 if(typeof defineProperty.value === 'string'){
                     code.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:'${defineProperty.value}', signalName:'${defineProperty.signalName}'},`)
                 } else {
-                    code.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}, signalName:'${defineProperty.signalName}'},`)
+                    if(_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)){
+                        code.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, value:${defineProperty.value}, signalName:'${defineProperty.signalName}'},`)
+                    } else {
+                        code.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}, signalName:'${defineProperty.signalName}'},`)
+                    }
+                    
                 }
                 
             }
@@ -1038,6 +1064,20 @@ class Instruction {
 
         if(this.id) code.push(`__context['${this.id}']=self`)  // context !!!
 
+        let connectionsInfo = {}
+        for(let defineMethod of this.defineMethods){
+            if(defineMethod.name.slice(0, 2) === 'on'){
+                let signalName = defineMethod.name[2].toLowerCase() + defineMethod.name.slice(3)
+                connectionsInfo[signalName] = defineMethod.name
+            }
+            let stat = this.prepare(defineMethod.source, {isCompute:false, thisKey: 'self', value:'', local:[]})
+            code.push('self.'+stat.value)
+        }
+
+        if(typeBase === JQModules.QtQml.Connections){
+            code.push(`self.__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
+        }
+
         for(let assignProperty of this.assignProperties){
             let path = this.resolve(assignProperty.name.split('.')[0], 'self')
 
@@ -1046,7 +1086,11 @@ class Instruction {
             }
 
             if(assignProperty.value instanceof Instruction) {
-                code.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false)}).create()`)
+                if((path.type === QtQml.Component) && assignProperty.value.extends !== 'Component'){
+                    code.push(`self.${assignProperty.name}=(class extends JQModules.QtQml.Component {}).create(null,${assignProperty.value.toCode(false)})`)
+                } else {
+                    code.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false)}).create()`)
+                }
             } else {
                 let stat = this.prepare(assignProperty.value, {isCompute:false, thisKey: 'self', value:'', local:[]})
                 if(stat.isCompute){
@@ -1076,10 +1120,6 @@ class Instruction {
             }
             
         }
-        if(isRoot || isComponent) {
-            code.push(`for(let property of __updateList){property.__update()}`) // property update !!!
-            code.push(`self.__complete()`)
-        }
 
         for(let connectedSignal of this.connectedSignals){
             let names = connectedSignal.slotName.replaceAll("['", '').replaceAll("']", '').split('.')
@@ -1100,29 +1140,25 @@ class Instruction {
                 connectedSignal.args.push(arg.replaceAll('`', ''))
             }
 
-            code.push(`self.__addSignalSlot('${names.join('.')}',(${connectedSignal.args.join(',')})=>{try{JQApplication.beginUpdate();`)
+            code.push(`self.__addSignalSlot('${names.join('.')}',function(${connectedSignal.args.join(',')}){try{JQApplication.beginUpdate();`)
             
             let stat = this.prepare(connectedSignal.source, {isCompute:false, thisKey: 'self', value:'', local:[connectedSignal.args]}) 
             code.push(stat.value)
             code.push(`}finally{JQApplication.endUpdate()}})`)
         }
 
+        if(isRoot || isComponent) {
+            code.push(`for(let property of __updateList){property.__update()}`) // property update !!!
+            code.push(`if(!self.parent || self.parent.__completed) self.__complete()`)
+        }
+
+        
+
         code.push('return self')
         code.push('}')
 
-        let connectionsInfo = {}
-        for(let defineMethod of this.defineMethods){
-            if(defineMethod.name.slice(0, 2) === 'on'){
-                let signalName = defineMethod.name[2].toLowerCase() + defineMethod.name.slice(3)
-                connectionsInfo[signalName] = defineMethod.name
-            }
-            let stat = this.prepare(defineMethod.source, {isCompute:false, thisKey: 'this', value:'', local:[]})
-            code.push(stat.value)
-        }
-
-        if(typeBase === JQModules.QtQml.Connections){
-            code.push(`__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
-        }
+        
+        
         
 
         
@@ -1146,6 +1182,7 @@ class QmlFile {
     instruction = null
     updateList = []
     version = 1
+    dependencies = new Set()
 
     constructor(fileName, moduleName, version = 1){
         this.fileName = fileName
@@ -1239,6 +1276,7 @@ class JSFile {
 }
 
 let fullCode = []
+let compiledFiles = []
 
 let mainData = fs.readFileSync(path.resolve(__dirname, '../dist/main.js'), {encoding:'utf8', flag:'r'})
 fullCode.push(mainData)
@@ -1320,6 +1358,33 @@ for(let fileName of getFiles(path.resolve(configDirPath, config.base))){
     SingleFiles[fileName.split(/[\/\\]+/g).pop().replace('.qml', '')] = qmlFile
 }
 
+console.log(`JQ: compilation of single files`)
+
+
+for(let className in Singletons){
+    console.log(`    > ${className}.qml (Singleton)`)
+    // fullCode.push(Singletons[className].toCode())
+    // fullCode.push(`JQModules.__queue.push(()=>{${Singletons[className].toCode()};window.${className}=${className}})`)
+    compiledFiles.push({
+        file: Singletons[className],
+        code: Singletons[className].toCode(),
+    })
+}
+
+for(let className in SingleFiles){
+    if(SingleFiles[className].singleton) {
+        continue
+    }
+    console.log(`    > ${className}.qml`)
+    // console.log(`        > ${SingleFiles[className].fileName}(5)`)
+    // fullCode.push(SingleFiles[className].toCode())
+    // fullCode.push(`JQModules.__queue.push(()=>{${SingleFiles[className].toCode()};window.${className}=${className}})`)
+    compiledFiles.push({
+        file: SingleFiles[className],
+        code: SingleFiles[className].toCode(),
+    })
+}
+
 if(config.dirs.length) console.log(`JQ: compilation of third party modules`)
 for(let moduleName in JQModules){
     if(!BaseModules[moduleName]){
@@ -1340,14 +1405,19 @@ for(let moduleName in JQModules){
                 queue[className] = file
                 continue
             }
-            fullCode.push(`JQModules.__queue.push(()=>{JQModules.${moduleName}.${className}=${file.toCode()}})`)
+            // fullCode.push(`JQModules.__queue.push(()=>{JQModules.${moduleName}.${className}=${file.toCode()}})`)
             // fullCode.push(`JQModules.${moduleName}.${className}=${file.toCode()}`)
+            compiledFiles.push({
+                file: file,
+                code: `JQModules.${moduleName}.${className}=${file.toCode()}`,
+            })
         }
     }
     for(let className in queue){
         let file = queue[className]
-        fullCode.push(`JQModules.__queue.push(()=>{if(!JQModules.${moduleName}.${className}_v${file.version}) throw ''; JQModules.${moduleName}.${className}=JQModules.${moduleName}.${className}_v${file.version}})`)
+        // fullCode.push(`JQModules.__queue.push(()=>{if(!JQModules.${moduleName}.${className}_v${file.version}) throw ''; JQModules.${moduleName}.${className}=JQModules.${moduleName}.${className}_v${file.version}})`)
         // fullCode.push(`JQModules.${moduleName}.${className}=JQModules.${moduleName}.${className}_v${file.version}`)
+        fullCode.push(`Object.defineProperty(JQModules.${moduleName},'${className}',{get:()=>{return JQModules.${moduleName}.${className}_v${file.version}}})`)
     }
 }
 
@@ -1363,41 +1433,43 @@ function getFiles (dir, _files){
     return _files
 }
 
-console.log(`JQ: compilation of single files`)
 
 
-for(let className in Singletons){
-    console.log(`    > ${className}.qml (Singleton)`)
-    // fullCode.push(Singletons[className].toCode())
-    fullCode.push(`JQModules.__queue.push(()=>{${Singletons[className].toCode()};window.${className}=${className}})`)
-}
-
-for(let className in SingleFiles){
-    if(SingleFiles[className].singleton) {
-        continue
-    }
-    console.log(`    > ${className}.qml`)
-    // console.log(`        > ${SingleFiles[className].fileName}(5)`)
-    // fullCode.push(SingleFiles[className].toCode())
-    fullCode.push(`JQModules.__queue.push(()=>{${SingleFiles[className].toCode()};window.${className}=${className}})`)
-}
-
-fullCode.push('const __errors__ = []')
-fullCode.push(`while(JQModules.__queue.length){
-    let reg = JQModules.__queue.shift()
-    
-    if(!reg.count || reg.count < 5){
-        try {
-            reg()
-        } catch (error) {
-            reg.count = reg.count ? reg.count+1 : 1
-            JQModules.__queue.push(reg)
+while(compiledFiles.length){
+    let compiledFile = compiledFiles.shift()
+    if(compiledFile.file instanceof QmlFile && compiledFile.file.dependencies.size){
+        let found = false
+        for(let i = 0; i < compiledFiles.length; i++){
+            if(compiledFile.file.dependencies.has(compiledFiles[i].file)){
+                compiledFiles.splice(i+1, 0, compiledFile)
+                // console.log(compiledFile.file.fileName, 'await', compiledFiles[i].file.fileName)
+                found = true
+                break
+            }
         }
+        if(!found) fullCode.push(compiledFile.code)
     } else {
-        __errors__.push(reg)
-        // console.log(reg)
+        fullCode.push(compiledFile.code)
+        
     }
-}`)
+}
+
+// fullCode.push('const __errors__ = []')
+// fullCode.push(`while(JQModules.__queue.length){
+//     let reg = JQModules.__queue.shift()
+    
+//     if(!reg.count || reg.count < 5){
+//         try {
+//             reg()
+//         } catch (error) {
+//             reg.count = reg.count ? reg.count+1 : 1
+//             JQModules.__queue.push(reg)
+//         }
+//     } else {
+//         __errors__.push(reg)
+//         // console.log(reg)
+//     }
+// }`)
 
 if(config.entry){
     fullCode.push(`window.addEventListener('load', ()=>{console.time('build');${config.entry.replaceAll('.qml', '')}.create(JQApplication.root);console.timeEnd('build')})`)

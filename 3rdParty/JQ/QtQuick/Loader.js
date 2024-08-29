@@ -1,5 +1,7 @@
 const Item = require("./Item")
+const Component = require("../QtQml/Component")
 const Var = require("../QtQml/Var")
+const Variant = require("../QtQml/Variant")
 const Real = require("../QtQml/Real")
 const Bool = require("../QtQml/Bool")
 const String = require("../QtQml/String")
@@ -14,7 +16,7 @@ class Loader extends Item {
     static meta = Object.assign({}, Item.meta, {
         item: {type:Var, value:undefined, signalName:'itemChanged'},
         source: {type:String, value:'', signalName:'sourceChanged'},
-        sourceComponent: {type:Var, value:undefined, signalName:'sourceComponentChanged'},
+        sourceComponent: {type:Variant, typeTarget:Component, value:undefined, signalName:'sourceComponentChanged'},
         status: {type:Real, value:Loader.Null, signalName:'statusChanged'},
         progress: {type:Real, value:0, signalName:'progressChanged'},
         asynchronous: {type:Bool, value:false, signalName:'asynchronousChanged'},
