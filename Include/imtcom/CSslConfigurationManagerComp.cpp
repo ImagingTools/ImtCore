@@ -10,7 +10,7 @@
 // Acf includes
 #include <iprm/TParamsPtr.h>
 #include <iprm/IEnableableParam.h>
-#include <iprm/IIdParam.h>
+#include <iprm/INameParam.h>
 #include <iprm/IOptionsList.h>
 #include <iprm/ISelectionParam.h>
 #include <iprm/IParamsSet.h>
@@ -253,13 +253,13 @@ QSharedPointer<QSslKey> CSslConfigurationManagerComp::CreateSslKeyFromParams(con
 	QSsl::KeyType qType = GetKeyTypeFromParams(params);
 
 	QByteArray passPhrase;
-	iprm::TParamsPtr<iprm::IIdParam> keyPasswordParamPtr(&params, ParamKeys::s_keyPasswordParamKey, false);
+	iprm::TParamsPtr<iprm::INameParam> keyPasswordParamPtr(&params, ParamKeys::s_keyPasswordParamKey, false);
 	if (keyPasswordParamPtr.IsValid()){
-		passPhrase = keyPasswordParamPtr->GetId();
+		passPhrase = keyPasswordParamPtr->GetName().toUtf8();
 	}
 
 	iprm::TParamsPtr<ifile::IFileNameParam> filePathParamPtr(&params, ParamKeys::s_filePathParamKey, false);
-	iprm::TParamsPtr<iprm::IIdParam> encodedDataParamPtr(&params, ParamKeys::s_encodedDataParamKey, false);
+	iprm::TParamsPtr<iprm::INameParam> encodedDataParamPtr(&params, ParamKeys::s_encodedDataParamKey, false);
 	if (filePathParamPtr.IsValid()){
 		QFile keyFile(filePathParamPtr->GetPath());
 		if (!keyFile.open(QIODevice::ReadOnly)){
@@ -269,7 +269,7 @@ QSharedPointer<QSslKey> CSslConfigurationManagerComp::CreateSslKeyFromParams(con
 		retVal.reset(new QSslKey(&keyFile, qAlgorithm, qFormat, qType, passPhrase));
 	}
 	else if (encodedDataParamPtr.IsValid()){
-		const QByteArray encodedData = encodedDataParamPtr->GetId();
+		const QByteArray encodedData = encodedDataParamPtr->GetName().toUtf8();
 		retVal.reset(new QSslKey(encodedData, qAlgorithm, qFormat, qType, passPhrase));
 	}
 	else {
@@ -290,7 +290,7 @@ QSharedPointer<QSslCertificate> CSslConfigurationManagerComp::CreateSslCertifica
 	QSsl::EncodingFormat qFormat = GetEncodingFormatFromParams(params);
 
 	iprm::TParamsPtr<ifile::IFileNameParam> filePathParamPtr(&params, ParamKeys::s_filePathParamKey, false);
-	iprm::TParamsPtr<iprm::IIdParam> encodedDataParamPtr(&params, ParamKeys::s_encodedDataParamKey, false);
+	iprm::TParamsPtr<iprm::INameParam> encodedDataParamPtr(&params, ParamKeys::s_encodedDataParamKey, false);
 	if (filePathParamPtr.IsValid()){
 		QFile certFile(filePathParamPtr->GetPath());
 		if (!certFile.open(QIODevice::ReadOnly)){
@@ -299,7 +299,7 @@ QSharedPointer<QSslCertificate> CSslConfigurationManagerComp::CreateSslCertifica
 		retVal.reset(new QSslCertificate(&certFile, qFormat));
 	}
 	else if (encodedDataParamPtr.IsValid()) {
-		const QByteArray encodedData = encodedDataParamPtr->GetId();
+		const QByteArray encodedData = encodedDataParamPtr->GetName().toUtf8();
 		retVal.reset(new QSslCertificate(encodedData, qFormat));
 	}
 	else {

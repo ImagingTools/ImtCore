@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5229" Description="ACF"/>
-            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5230" Description="ACF"/>
+            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -22,10 +22,10 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="KeyPassword" PackageId="BasePck" ComponentId="IdParam">
+        <Element Id="KeyPassword" PackageId="BasePck" ComponentId="NameParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultId" Type="Id" ExportId="PrivateKeyPassPhrase">
+                    <AttributeInfo Id="DefaultName" Type="Text" ExportId="PrivateKeyPassPhrase">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
