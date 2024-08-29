@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="CaCertificateGui" PackageId="ImtComVoce" ComponentId="SslCertificateGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="EnableSslGui" PackageId="QtGuiPck" ComponentId="EnableableParamGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="LocalCertificateGui" PackageId="ImtComVoce" ComponentId="SslCertificateGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SslConfigurationGui" PackageId="QtGuiPck" ComponentId="ComposedParamsSetGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Editors" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>EnableSslGui</Value>
+                                <Value>LocalCertificateGui</Value>
+                                <Value>CaCertificateGui</Value>
+                                <Value>SslPrivateKeyGui</Value>
+                                <Value>SslVerifyModeOptionsGui</Value>
+                                <Value>SslProtocolOptionsGui</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Ids" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>EnableSsl</Value>
+                                <Value>LocalCert</Value>
+                                <Value>CaCert</Value>
+                                <Value>PrivateKey</Value>
+                                <Value>VerifyMode</Value>
+                                <Value>Protocol</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Names" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Enable SSL</Value>
+                                <Value>Local Certificate</Value>
+                                <Value>CA Certificate</Value>
+                                <Value>Private Key</Value>
+                                <Value>Verification Mode</Value>
+                                <Value>Protocol</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SslPrivateKeyGui" PackageId="ImtComVoce" ComponentId="SslKeyGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SslProtocolOptionsGui" PackageId="QtGuiPck" ComponentId="SelectionParamGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SslVerifyModeOptionsGui" PackageId="QtGuiPck" ComponentId="SelectionParamGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModelEditor" ComponentId="SslConfigurationGui"/>
+        <Interface InterfaceId="imod::IObserver" ComponentId="SslConfigurationGui"/>
+        <Interface InterfaceId="iqt2d::IViewExtender" ComponentId="SslConfigurationGui"/>
+        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="SslConfigurationGui"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SslConfigurationGui"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="VisualStatus" ComponentId="SslConfigurationGui/VisualStatus"/>
+    </ExportedComponents>
+</Acf>
