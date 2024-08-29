@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5230" Description="ACF"/>
+            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CaCertificateGui" X="900" Y="550" Note=""/>
+        <Element ComponentName="EnableSslGui" X="600" Y="250" Note=""/>
+        <Element ComponentName="LocalCertificateGui" X="575" Y="550" Note=""/>
+        <Element ComponentName="SslConfigurationGui" X="575" Y="400" Note=""/>
+        <Element ComponentName="SslPrivateKeyGui" X="250" Y="550" Note=""/>
+        <Element ComponentName="SslProtocolOptionsGui" X="225" Y="250" Note=""/>
+        <Element ComponentName="SslVerifyModeOptionsGui" X="925" Y="250" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

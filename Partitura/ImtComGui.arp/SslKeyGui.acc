@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5230" Description="ACF"/>
+            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="FilePathGui" PackageId="FileGuiPck" ComponentId="FileSystemExplorerGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ShowFileModificationTime" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowFileType" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="KeyPasswordGui" PackageId="QtGuiPck" ComponentId="NameParamGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SslEncodingFormatOptionsGui" PackageId="QtGuiPck" ComponentId="OptionsManagerGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SslKeyAlgorithmOptionsGui" PackageId="QtGuiPck" ComponentId="OptionsManagerGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SslKeyGui" PackageId="QtGuiPck" ComponentId="ComposedParamsSetGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Editors" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SslKeyAlgorithmOptionsGui</Value>
+                                <Value>SslEncodingFormatOptionsGui</Value>
+                                <Value>SslKeyTypeOptionsGui</Value>
+                                <Value>KeyPasswordGui</Value>
+                                <Value>FilePathGui</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Ids" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>KeyAlgorithm</Value>
+                                <Value>EncodingFormat</Value>
+                                <Value>KeyType</Value>
+                                <Value>KeyPassword</Value>
+                                <Value>FilePath</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SslKeyTypeOptionsGui" PackageId="QtGuiPck" ComponentId="OptionsManagerGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModelEditor" ComponentId="SslKeyGui"/>
+        <Interface InterfaceId="imod::IObserver" ComponentId="SslKeyGui"/>
+        <Interface InterfaceId="iqt2d::IViewExtender" ComponentId="SslKeyGui"/>
+        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="SslKeyGui"/>
+        <Interface InterfaceId="iqtgui::IVisualStatus" ComponentId="SslKeyGui/VisualStatus"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SslKeyGui"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>
