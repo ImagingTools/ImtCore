@@ -16,7 +16,6 @@
 #include <imtrest/CHttpRedirectComp.h>
 #include <imtrest/CHttpFileProviderBasedServletComp.h>
 #include <imtrest/CHttpFileControllerServletComp.h>
-#include <imtrest/CHttpClientRequest.h>
 #include <imtrest/CWorkerManagerComp.h>
 #include <imtrest/CServerLogDataProviderComp.h>
 #include <imtrest/CTcpProtocolEngineComp.h>
@@ -40,7 +39,6 @@ typedef imtrest::CHttpHtmlFolderBasedServletComp HttpHtmlFolderBasedServlet;
 typedef imtrest::CHttpRedirectComp HttpRedirectServlet;
 typedef imtrest::CHttpFileProviderBasedServletComp HttpFileProviderBasedServlet;
 typedef imtrest::CHttpFileControllerServletComp HttpFileControllerServlet;
-typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtrest::CHttpClientRequest>> HttpClientRequestFactory;
 typedef imtrest::CWorkerManagerComp WorkerManaqer;
 typedef imtrest::CServerLogDataProviderComp ServerLogDataProvider;
 typedef imtrest::CTcpProtocolEngineComp TcpProtocolEngine;

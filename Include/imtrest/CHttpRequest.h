@@ -36,12 +36,12 @@ public:
 	QByteArrayList GetHeaders() const;
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
 	QUrl GetUrl() const;
-    virtual MethodType GetMethodType() const;
-    virtual QByteArray GetBody() const override;
+	virtual MethodType GetMethodType() const;
+	virtual QByteArray GetBody() const override;
 	QHostAddress GetRemoteAddress() const;
 
 	static int OnStartMessage(http_parser* httpParser);
-	static int OnUrl(http_parser* httpParser, const char *at, size_t length);
+	static int OnUrl(http_parser* httpParser, const char* at, size_t length);
 	static int OnStatus(http_parser* httpParser, const char *at, size_t length);
 	static int OnHeaderField(http_parser* httpParser, const char *at, size_t length);
 	static int OnHeaderValue(http_parser* httpParser, const char *at, size_t length);

@@ -65,11 +65,6 @@ I_EXPORT_COMPONENT(
 		"FileProvider - based HTTP servlet");
 
 I_EXPORT_COMPONENT(
-		HttpClientRequestFactory,
-		"The factory for creting http client requests for 'HttpClientRequestManager'",
-		"REST HTTP Client Request Factory");
-
-I_EXPORT_COMPONENT(
 		WorkerManaqer,
 		"The manager of request handlers factory for multi-thread request server",
 		"REST HTTP Handler Request Factory");

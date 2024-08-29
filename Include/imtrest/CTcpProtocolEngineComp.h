@@ -22,7 +22,7 @@ class CTcpProtocolEngineComp:
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-    I_BEGIN_COMPONENT(CTcpProtocolEngineComp);
+	I_BEGIN_COMPONENT(CTcpProtocolEngineComp);
 		I_REGISTER_INTERFACE(IProtocolEngine)
 	I_END_COMPONENT
 
