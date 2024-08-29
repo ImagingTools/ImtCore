@@ -12,6 +12,7 @@
 #include <istd/TDelPtr.h>
 #include <iprm/IParamsSet.h>
 #include <ifile/IFileNameParam.h>
+#include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
@@ -36,11 +37,13 @@ class CMultiThreadServer;
 class CTcpServerComp:
 			public QObject,
 			public ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase>,
+			private imod::CMultiModelDispatcherBase,
 			virtual public IRequestManager
 {
 	Q_OBJECT
 public:
 	typedef ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase> BaseClass;
+	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CTcpServerComp);
 		I_REGISTER_INTERFACE(IRequestManager)
@@ -50,6 +53,7 @@ public:
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
 		I_ASSIGN(m_serverPortCompPtr, "ServerPort", "Parameter providing the server port to be listened", true, "ServerPort");
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
+		I_ASSIGN_TO(m_sslConfigurationModelCompPtr, m_sslConfigurationCompPtr, false)
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
 	I_END_COMPONENT
 
@@ -61,6 +65,9 @@ public:
 	int GetThreadsLimit();
 
 protected:
+	// reimplemented (imod::CMultiModelDispatcherBase)
+	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+
 	// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
 	virtual void OnSystemShutdown() override;
 
@@ -81,6 +88,7 @@ private:
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_REF(imtbase::IUrlParam, m_serverPortCompPtr);
 	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
+	I_REF(imod::IModel, m_sslConfigurationModelCompPtr);
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
 
 	I_ATTR(int, m_threadsLimitAttrPtr);
