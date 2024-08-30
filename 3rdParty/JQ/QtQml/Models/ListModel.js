@@ -36,13 +36,14 @@ class ListModel extends QtObject {
     __endUpdate(){
         this.blockSignals(false)
 
+        let changeSet = this.__changeSet
+        this.__changeSet = []
+
         // this.count = this.data.length
 
         for(let obj of this.__views){
-            obj.__updateView(this.__changeSet)
-        }
-
-        this.__changeSet = []
+            obj.__updateView(changeSet)
+        } 
     }
 
     append(dict){
@@ -98,8 +99,10 @@ class ListModel extends QtObject {
     clear(){
         JQApplication.updateLater(this)
 
-        this.__changeSet.push([0, this.data.length, 'remove'])
-        this.data = []
+        if(this.data.length) {
+            this.__changeSet.push([0, this.data.length, 'remove'])
+            this.data = []
+        }
 
         this.count = this.data.length
     }

@@ -60,7 +60,7 @@ class Image extends Item {
             return
         }
 
-        let url = '/ControlsGallery/Views/' + this.source
+        let url = '/ControlsGallery/Views/' + this.source.replaceAll('../','')
         this.$url = url
 
         this.status = Image.Loading

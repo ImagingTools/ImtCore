@@ -148,6 +148,7 @@ class ListView extends Flickable {
 
     __updateView(changeSet){
         if(this.delegate && this.model){
+            if(this.model.data.length === this.__items.length) return
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
 

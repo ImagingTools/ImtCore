@@ -3,6 +3,10 @@ const Property = require("./Property")
 class Alias extends Property {
     __getter = null
     __setter = null
+
+    __get(key){
+        return this.__getter(key)
+    }
     
     __set(key, value){
         this.__auto = false
@@ -47,9 +51,12 @@ class Alias extends Property {
         this.__completed = true
     }
 
-    __aliasInit(getter, setter){
+    __aliasInit(getter, setter, queue){
         this.__getter = getter
         this.__setter = setter
+        if(queue){
+            queue.push(this)
+        }
     }
 }
 

@@ -378,7 +378,12 @@ class Instruction {
                 }
                 case 'assign': {
                     this.prepare(tree[2], stat)
-                    stat.value += `=`
+                    if(tree[1] === true) {
+                        stat.value += `=`
+                    } else {
+                        if(tree[1]) stat.value += tree[1]
+                        stat.value += `=`
+                    }
                     this.prepare(tree[3], stat)
                     stat.value += `;`
                     return stat
@@ -1052,14 +1057,14 @@ class Instruction {
             code.push('})')
         }
 
-        code.push('static create(...args){')
-        code.push('let self = super.create(...args)')
+        code.push('static create(parent, model, __queue=[], __isRoot=true, ...args){')
+        code.push('let self = super.create(parent, model, __queue, false, ...args)')
 
         if(isRoot) {
             code.push(`let __context={}`) // context !!!
-            code.push(`let __updateList=[]`) // property update !!!
+            // code.push(`let __updateList=[]`) // property update !!!
         } else if(isComponent){
-            code.push(`let __updateList=[]`) // property update !!!
+            // code.push(`let __updateList=[]`) // property update !!!
         }
 
         if(this.id) code.push(`__context['${this.id}']=self`)  // context !!!
@@ -1089,16 +1094,16 @@ class Instruction {
                 if((path.type === QtQml.Component) && assignProperty.value.extends !== 'Component'){
                     code.push(`self.${assignProperty.name}=(class extends JQModules.QtQml.Component {}).create(null,${assignProperty.value.toCode(false)})`)
                 } else {
-                    code.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false)}).create()`)
+                    code.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false)}).create(null,null,__queue,false)`)
                 }
             } else {
                 let stat = this.prepare(assignProperty.value, {isCompute:false, thisKey: 'self', value:'', local:[]})
                 if(stat.isCompute){
                     if(assignProperty.type === 'alias'){
-                        code.push(`self.__getObject('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val})`)
-                        code.push(`__updateList.push(self.__getObject('${assignProperty.name}'))`)
+                        code.push(`self.__getObject('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},__queue)`)
+                        // code.push(`__updateList.push(self.__getObject('${assignProperty.name}'))`)
                     } else {
-                        code.push(`self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},__updateList)`)
+                        code.push(`self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},__queue)`)
                     }
                 } else {
                     code.push(`self.${assignProperty.name}=${stat.value}`)
@@ -1112,9 +1117,9 @@ class Instruction {
                 code.push(`self.component=` + this.children[i].toCode(false, true))
             } else {
                 if(typeBase === JQModules.QtQuick.Flickable){
-                    code.push(`let child${i}=(` + this.children[i].toCode() + ').create(self.contentItem)')
+                    code.push(`let child${i}=(` + this.children[i].toCode() + ').create(self.contentItem,null,__queue,false)')
                 } else {
-                    code.push(`let child${i}=(` + this.children[i].toCode() + ').create(self)')
+                    code.push(`let child${i}=(` + this.children[i].toCode() + ').create(self,null,__queue,false)')
                 }
                 
             }
@@ -1148,8 +1153,8 @@ class Instruction {
         }
 
         if(isRoot || isComponent) {
-            code.push(`for(let property of __updateList){property.__update()}`) // property update !!!
-            code.push(`if(!self.parent || self.parent.__completed) self.__complete()`)
+            code.push(`if(__isRoot) {for(let property of __queue){property.__update()};self.__complete()}`) // property update !!!
+            // code.push(`if(!self.parent || self.parent.__completed) self.__complete()`)
         }
 
         

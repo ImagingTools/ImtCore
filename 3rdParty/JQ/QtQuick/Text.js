@@ -68,17 +68,34 @@ class Text extends Item {
     static create(parent, ...args){
         let proxy = super.create(parent, ...args)
         proxy.__DOM.classList.add('Text')
+        proxy.__createImpl()
 
         return proxy
     }
 
+    __createImpl(){
+        let dom = this.__getDOM()
+        let impl = document.createElement('div')
+        impl.classList.add('impl')
+        dom.appendChild(impl)
+        this.__impl = impl
+    }
+
+    __setImplStyle(style){
+        if(this.__impl) {
+            for(let name in style){
+                this.__impl.style[name] = style[name]
+            }
+        }
+    }
+
     __updateGeometry(){
         let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.__getObject('width').__auto ? 0 : this.width, this.wrapMode, this.textFormat)
-        
+
         if(textMetrics.isHTML){
-            this.__DOM.innerHTML = this.text.replaceAll('<br>', '\r')
+            this.__impl.innerHTML = this.text.replaceAll('<br>', '\r')
         } else {
-            this.__DOM.innerText = this.text.replaceAll('<br>', '\r')
+            this.__impl.innerText = this.text.replaceAll('<br>', '\r')
         }
 
         this.__getObject('width').__setAuto(textMetrics.width)
@@ -103,6 +120,37 @@ class Text extends Item {
         super.onVisibleChanged()
 
         this.__updateGeometry()
+    }
+
+    onElideChanged(){
+        if(this.elide === Text.ElideRight){
+            this.__setImplStyle({
+                textOverflow: 'ellipsis',
+                overflow: 'auto',
+            })
+        } else {
+            this.__setImplStyle({
+                textOverflow: 'unset',
+                overflow: 'unset',
+            })
+        }
+    }
+
+    onHorizontalAlignmentChanged(){
+        switch(this.horizontalAlignment){
+            case Text.AlignLeft: this.__setDOMStyle({ justifyContent: 'flex-start', textAlign: 'start' }); break;
+            case Text.AlignRight: this.__setDOMStyle({ justifyContent: 'flex-end', textAlign: 'end' }); break;
+            case Text.AlignHCenter: this.__setDOMStyle({ justifyContent: 'center', textAlign: 'center' }); break;
+            case Text.AlignJustify: this.__setDOMStyle({ justifyContent: 'normal', textAlign: 'justify' }); break;
+        }
+    }
+
+    onVerticalAlignmentChanged(){
+        switch(this.verticalAlignment){
+            case Text.AlignTop: this.__setDOMStyle({ alignItems: 'flex-start' }); break;
+            case Text.AlignBottom: this.__setDOMStyle({ alignItems: 'flex-end' }); break;
+            case Text.AlignVCenter: this.__setDOMStyle({ alignItems: 'center' }); break;
+        }
     }
 
     onFontChanged(){
