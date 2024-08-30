@@ -112,7 +112,7 @@ QStringList CGqlSchemaParser::GetTypeNames() const
 {
 	QStringList retVal;
 
-	for (const CSdlType& type: m_sdlTypes){
+	for (const CSdlType& type: std::as_const(m_sdlTypes)){
 		retVal << type.GetName();
 	}
 
@@ -122,7 +122,7 @@ QStringList CGqlSchemaParser::GetTypeNames() const
 
 SdlFieldList CGqlSchemaParser::GetFields(const QString typeName) const
 {
-	for (const CSdlType& type: m_sdlTypes){
+	for (const CSdlType& type: std::as_const(m_sdlTypes)){
 		if (type.GetName() == typeName){
 			return type.GetFields();
 		}
@@ -517,7 +517,7 @@ bool CGqlSchemaParser::ProcessCustomSection(const QString& sectionName)
 
 bool CGqlSchemaParser::ValidateSchema()
 {
-	for (const CSdlType& sdlType: m_sdlTypes){
+	for (const CSdlType& sdlType: std::as_const(m_sdlTypes)){
 		for (const CSdlField& sdlField: sdlType.GetFields()){
 			bool isCustom = false;
 			CSdlTools::ConvertType(sdlField, &isCustom);

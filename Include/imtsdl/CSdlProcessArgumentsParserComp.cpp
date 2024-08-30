@@ -154,6 +154,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	// add VMap implicitly
 	/// \todo add argument to disable it
 	m_usedModificators << CSdlTools::s_variantMapModificatorArgumentName;
+	m_notUseModificators = m_usedModificators.isEmpty();
 
 	// only one mode must be used
 	Q_ASSERT(commandLineParser.isSet(generateOption) ^ commandLineParser.isSet(dependenciesOption));
