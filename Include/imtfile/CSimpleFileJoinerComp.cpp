@@ -148,10 +148,12 @@ int CSimpleFileJoinerComp::DoProcessing(
 	}
 
 	// process files
+	SendVerboseMessage(QString("Joining files. Output: '%1'").arg(tempJoinedFile.fileName()));
 	int filesCount = filesToJoinListPtr->GetOptionsCount();
 	for (int fileNameIndex = 0; fileNameIndex < filesCount; ++fileNameIndex){
 		const QString currentRelativePath = filesToJoinListPtr->GetOptionName(fileNameIndex);
 		const QString currentFilePath = sourceDir.absoluteFilePath(currentRelativePath);
+		SendVerboseMessage(QString("Joining files. [%1]'%2'").arg(QString::number(fileNameIndex), currentFilePath));
 		QFile currentFile(currentFilePath);
 		if (!currentFile.open(QIODevice::ReadOnly)){
 			SendErrorMessage(0, QString("Unable to open processing file: '%1'").arg(currentFilePath));
