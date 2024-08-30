@@ -79,6 +79,7 @@ protected:
 
 private:
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);
+	bool EnsureServerStarted();
 
 private Q_SLOTS:
 	void OnNewThreadConnection(const IRequest* request, const QByteArray& subCommandId);
@@ -100,6 +101,8 @@ private:
 
 	typedef istd::TPointerVector<IRequest> Requests;
 	Requests m_requests;
+
+	bool m_isInitialized = false;
 };
 
 

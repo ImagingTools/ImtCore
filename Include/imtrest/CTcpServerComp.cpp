@@ -64,35 +64,12 @@ int CTcpServerComp::GetThreadsLimit()
 
 void CTcpServerComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
+
 	Q_ASSERT_X(m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid(), "Update server's SSL configuration", "SSL configuration or manager is not set!");
-	if (m_serverPtr->isListening()){
-		SendInfoMessage(0, "SSL configuration updated. Stopping server...");
-		m_serverPtr->close();
+
+	if (m_isInitialized){
+		EnsureServerStarted();
 	}
-
-	QSslConfiguration sslConfiguration;
-	iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(m_sslConfigurationCompPtr.GetPtr(), imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
-	if (sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled()){
-		if (m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration)){
-			m_serverPtr->EnableSecureConnection();
-			m_serverPtr->SetSslConfiguration(sslConfiguration);
-		}
-	}
-
-	if (!m_serverPtr->isListening()){
-		SendInfoMessage(0, "SSL configuration applied. Starting server...");
-		if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
-			if (m_serverPortCompPtr.IsValid()){
-				int port = m_serverPortCompPtr->GetUrl().port();
-
-				StartListening(QHostAddress::Any, port);
-			}
-			else{
-				StartListening();
-			}
-		}
-	}
-
 }
 
 
@@ -116,18 +93,9 @@ void CTcpServerComp::OnComponentCreated()
 		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr());
 	}
 
-	if (!m_serverPtr->isListening()){
-		if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
-			if (m_serverPortCompPtr.IsValid()){
-				int port = m_serverPortCompPtr->GetUrl().port();
+	EnsureServerStarted();
 
-				StartListening(QHostAddress::Any, port);
-			}
-			else{
-				StartListening();
-			}
-		}
-	}
+	m_isInitialized = true;
 }
 
 
@@ -158,6 +126,47 @@ bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 		qDebug() << errorMessage;
 
 		SendErrorMessage(0, errorMessage);
+	}
+
+	return false;
+}
+
+
+bool CTcpServerComp::EnsureServerStarted()
+{
+	if (!m_serverPtr.IsValid()){
+		return false;
+	}
+
+	// If the server is running, stop it:
+	if (m_serverPtr->isListening()){
+		m_serverPtr->close();
+	}
+
+	Q_ASSERT(!m_serverPtr->isListening());
+	if (m_serverPtr->isListening()){
+		return false;
+	}
+
+	QSslConfiguration sslConfiguration;
+	iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(m_sslConfigurationCompPtr.GetPtr(), imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
+	if (sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled()){
+		if (m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration)){
+			m_serverPtr->EnableSecureConnection();
+
+			m_serverPtr->SetSslConfiguration(sslConfiguration);
+		}
+	}
+
+	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
+		if (m_serverPortCompPtr.IsValid()){
+			int port = m_serverPortCompPtr->GetUrl().port();
+
+			return StartListening(QHostAddress::Any, port);
+		}
+		else{
+			return StartListening();
+		}
 	}
 
 	return false;
