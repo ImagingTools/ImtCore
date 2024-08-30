@@ -254,7 +254,10 @@ bool CGqlSchemaParser::ProcessType()
 	}
 	sdlType.SetFields(fieldList);
 
-	m_sdlTypes << sdlType;
+	// maybe already added from another file
+	if (!m_sdlTypes.contains(sdlType)){
+		m_sdlTypes << sdlType;
+	}
 
 	return retVal;
 }

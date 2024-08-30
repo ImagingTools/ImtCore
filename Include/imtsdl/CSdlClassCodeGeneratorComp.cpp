@@ -175,6 +175,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 				filterParams.ResetOptions();
 				for (const CSdlType& sdlType: sdlTypeList){
 					filterParams.InsertOption("C" + sdlType.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
+					SendVerboseMessage(QString("Add join file '%1', %2").arg("C" + sdlType.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
 				}
 
 				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);

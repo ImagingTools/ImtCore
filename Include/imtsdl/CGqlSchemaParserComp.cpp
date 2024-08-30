@@ -165,6 +165,7 @@ int CGqlSchemaParserComp::DoProcessing(
 		for (const CSdlType& sdlType: std::as_const(m_sdlTypes)){
 			CSdlType* sdlTypePtr = new CSdlType(sdlType);
 			typeListParamsPtr->SetEditableParameter(QByteArray::number(typeListParamsPtr->GetParamIds().size()), sdlTypePtr, true);
+			SendVerboseMessage(QString("'%1': Add SDL for import. Name:'%2' [%3]").arg(m_currentSchemaFilePath, sdlType.GetName(), QByteArray::number(typeListParamsPtr->GetParamIds().size() - 1)));
 		}
 	}
 
@@ -256,7 +257,24 @@ bool CGqlSchemaParserComp::ProcessSchemaImports()
 
 		iprm::IParamsSet* typeListParamsPtr = dynamic_cast<iprm::IParamsSet*>(outputParams.GetEditableParameter(s_typeListParamId));
 		if (typeListParamsPtr != nullptr){
-			const iprm::IParamsSet::Ids paramIdList = typeListParamsPtr->GetParamIds();
+			QByteArrayList paramIdList = typeListParamsPtr->GetParamIds().values();
+
+			// sort IDs. We MUST preserve order (by id as int)
+			std::sort(paramIdList.begin(), paramIdList.end(), [](const QByteArray& first, const QByteArray& second){
+				bool isDigit = false;
+				int firstDigit = 0;
+				int secondDigit = 0;
+				firstDigit = first.toInt(&isDigit);
+				if (isDigit){
+					secondDigit = second.toInt(&isDigit);
+				}
+				if (isDigit){
+					return firstDigit < secondDigit;
+				}
+
+				return first < second;
+			});
+
 			for (const QByteArray& paramId: paramIdList){
 				iprm::TParamsPtr<CSdlType> sdlTypeParam(typeListParamsPtr, paramId, true);
 				if (!sdlTypeParam.IsValid()){
@@ -276,7 +294,11 @@ bool CGqlSchemaParserComp::ProcessSchemaImports()
 				}
 
 				CSdlType copiedType(*sdlTypeParam);
-				m_sdlTypes << copiedType;
+				// maybe already imported from another file
+				if (!m_sdlTypes.contains(copiedType)){
+					SendVerboseMessage(QString("'%1': Add SDL from import '%2'. Name:'%3' [%4]").arg(m_currentSchemaFilePath, schemaPath, copiedType.GetName(), paramId));
+					m_sdlTypes << copiedType;
+				}
 			}
 		}
 
