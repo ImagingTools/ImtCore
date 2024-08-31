@@ -1,6 +1,7 @@
 const Item = require("./Item")
 const Real = require("../QtQml/Real")
 const Bool = require("../QtQml/Bool")
+const Variant = require("../QtQml/Variant")
 const Signal = require("../QtQml/Signal")
 const QtFunctions = require("../Qt/functions")
 const MouseArea = require("./MouseArea")
@@ -25,7 +26,7 @@ class Flickable extends Item {
         originX: {type: Real, value:0, signalName:'originXChanged'},
         originY: {type: Real, value:0, signalName:'originYChanged'},
         interactive: {type: Bool, value:true, signalName:'interactiveChanged'},
-        contentItem: {type: Item, signalName:'contentItemChanged'},
+        contentItem: {type: Variant, typeTarget: Item, signalName:'contentItemChanged'},
         flickableDirection: {type: Real, value:Flickable.AutoFlickDirection, signalName:'flickableDirectionChanged'},
         boundsBehavior: {type: Real, value:0, signalName:'boundsBehaviorChanged'},
         
@@ -49,8 +50,13 @@ class Flickable extends Item {
     static create(parent, ...args){
         let proxy = super.create(parent, ...args)
         proxy.__DOM.classList.add('Flickable')
-        // proxy.width = QtFunctions.binding(()=>{return proxy.conte})
+        proxy.contentItem = Item.create()
+        proxy.contentItem.parent = proxy
         return proxy
+    }
+
+    __resolve(){
+        return this.contentItem
     }
 
     onContentXChanged(){

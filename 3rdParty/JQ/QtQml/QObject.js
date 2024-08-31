@@ -71,8 +71,12 @@ class QObject extends BaseObject {
 
     }
 
+    __resolve(){
+        return this
+    }
+
     setParent(parent){
-        this.parent = parent
+        this.parent = parent ? parent.__resolve() : parent
     }
 
     __addSignalSlot(name, slot){

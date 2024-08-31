@@ -1125,12 +1125,7 @@ class Instruction {
             if(this.extends === 'Component'){
                 code.push(`self.component=` + this.children[i].toCode(false, true, level+1))
             } else {
-                if(typeBase === JQModules.QtQuick.Flickable){
-                    code.push(`let child${i}=(` + this.children[i].toCode(false,false,level+1) + ').create(self.contentItem,null,__queue,false)')
-                } else {
-                    code.push(`let child${i}=(` + this.children[i].toCode(false,false,level) + ').create(self,null,__queue,false)')
-                }
-                
+                code.push(`let child${i}=(` + this.children[i].toCode(false,false,level) + ').create(self,null,__queue,false)')
             }
             
         }

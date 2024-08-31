@@ -110,7 +110,7 @@ class Item extends QtObject {
         let dom = self.__getDOM()
         dom.classList.add('Item')
         dom.qml = proxy
-        self.__connectDOM(parent)
+        self.__connectDOM(this.parent)
 
         return proxy
     }
