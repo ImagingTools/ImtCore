@@ -63,9 +63,9 @@ class Property extends BaseObject {
         return this.__parent ? this.__parent.__get(this.__signalName) : undefined
     }
 
-    __emitSignal(){
+    __emitSignal(...args){
         let signal = this.__getSignal()
-        if(signal) signal()
+        if(signal) signal(...args)
     }
 
     __reset(value){

@@ -256,7 +256,21 @@ class Item extends QtObject {
         })
     }
 
-    mapToItem(item, x, y){}
+    mapToItem(item, x, y){
+        let rect1 = this.__getDOM().getBoundingClientRect()
+        let res = {
+            x: rect1.x + x,
+			y: rect1.y + y,
+        }
+        if(item){
+            let rect2 = item.__getDOM().getBoundingClientRect()
+            res.x -= rect2.x
+            res.y -= rect2.y
+            return res
+        } else {
+            return res
+        }
+    }
     forceActiveFocus(){}
 
     __destroy(){

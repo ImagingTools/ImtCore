@@ -9,5 +9,11 @@ module.exports = {
         return {
             decimalPoint: (1.1).toLocaleString().substring(1, 2)
         }
-    }
+    },
+    point(x, y){
+        return {
+            x: x,
+            y: y,
+        }
+    },
 }

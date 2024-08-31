@@ -18,15 +18,68 @@ class Timer extends QtObject {
         triggered: {type:Signal, slotName:'onTriggered', args:[]},
     })
 
+    __timer = null
+
+    __complete(){
+        super.__complete()
+        if(this.triggeredOnStart) this.triggered()
+    }
+
     restart(){
         this.stop()
         this.start()
     }
+    
     start(){
-        if(!this.getPropertyValue('running')) this.getProperty('running').reset(true)
+        if(!this.running) this.running = true
     }
+
     stop(){
-        if(this.getPropertyValue('running')) this.getProperty('running').reset(false)
+        if(this.running) this.running = false
+    }
+
+    onIntervalChanged(){
+        this.__updateTimer()
+    }
+
+    onRepeatChanged(){
+        this.__updateTimer()
+    }
+
+    onRunningChanged(){
+        this.__updateTimer()
+    }
+
+    onTriggeredOnStartChanged(){
+        this.__updateTimer()
+    }
+
+    __triggered(){
+        this.triggered()
+        if(this.repeat && this.running) {
+            if(this.__timer) clearTimeout(this.__timer)
+            this.__timer = setTimeout(()=>{
+                this.__triggered()
+            }, this.interval)
+        } else {
+            this.stop()
+        }
+    }
+
+    __updateTimer(){
+        if(this.__timer) clearTimeout(this.__timer)
+        if(this.triggeredOnStart && this.__completed) this.triggered()
+
+        if(this.running)
+        this.__timer = setTimeout(()=>{
+            this.__triggered()
+        }, this.interval)
+    }
+
+    __destroy(){
+        clearTimeout(this.__timer)
+        delete this.__timer
+        super.destroy()
     }
 }
 

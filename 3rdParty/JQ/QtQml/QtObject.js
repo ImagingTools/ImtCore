@@ -17,7 +17,7 @@ class QtObject extends QObject {
         
         modelChanged: {type:Signal, slotName:'onModelChanged', args:[]},
         childrenChanged: {type:Signal, slotName:'onChildrenChanged', args:[]},
-        resourcesChanged: {type:Signal, slotName:'onresourcesChanged', args:[]},
+        resourcesChanged: {type:Signal, slotName:'onResourcesChanged', args:[]},
         dataChanged: {type:Signal, slotName:'onDataChanged', args:[]},
 
         'Component.completed': {type:Signal, slotName:'Component.onCompleted', args:[]},
@@ -74,6 +74,42 @@ class QtObject extends QObject {
 
         index = this.resources.indexOf(child)
         if(index < 0) this.resources.push(child)
+    }
+
+    onChildrenChanged(leftTop, bottonRight, roles){
+        if(roles === 'append'){
+            for(let i = leftTop; i < bottonRight; i++){
+                this.children[i].setParent(this)
+            }
+        } else {
+            for(let i = 0; i < this.children.length; i++){
+                this.children[i].setParent(this)
+            }
+        }
+    }
+
+    onResourcesChanged(leftTop, bottonRight, roles){
+        if(roles === 'append'){
+            for(let i = leftTop; i < bottonRight; i++){
+                this.resources[i].setParent(this)
+            }
+        } else {
+            for(let i = 0; i < this.resources.length; i++){
+                this.resources[i].setParent(this)
+            }
+        }
+    }
+
+    onDataChanged(leftTop, bottonRight, roles){
+        if(roles === 'append'){
+            for(let i = leftTop; i < bottonRight; i++){
+                this.data[i].setParent(this)
+            }
+        } else {
+            for(let i = 0; i < this.data.length; i++){
+                this.data[i].setParent(this)
+            }
+        }
     }
 
     onParentChanged(){

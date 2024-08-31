@@ -52,7 +52,7 @@ class Anchors extends GroupProperty {
     }
 
     onFillChanged(){
-        let target = this.fill.__get()
+        let target = this.fill
         let self = this.__parent
 
         if(self && target){
@@ -78,7 +78,7 @@ class Anchors extends GroupProperty {
     }
 
     onCenterInChanged(){
-        let target = this.centerIn.__get()
+        let target = this.centerIn
         let self = this.__parent
 
         if(self && target){
@@ -99,7 +99,7 @@ class Anchors extends GroupProperty {
     }
 
     onHorizontalCenterChanged(){
-        let target = this.horizontalCenter.__get()
+        let target = this.horizontalCenter
 
         if(self && target){
             let targetFloat = target.__float
@@ -133,7 +133,7 @@ class Anchors extends GroupProperty {
     }
 
     onVerticalCenterChanged(){
-        let target = this.verticalCenter.__get()
+        let target = this.verticalCenter
 
         if(self && target){
             let targetFloat = target.__float
@@ -167,9 +167,9 @@ class Anchors extends GroupProperty {
     }
 
     onLeftChanged(){
-        let target = this.left.__get()
+        let target = this.left
 
-        if(target && this.right.__get()) {
+        if(target && this.right) {
             this.onLeftRightChanged()
             return
         }
@@ -206,9 +206,9 @@ class Anchors extends GroupProperty {
     }
 
     onRightChanged(){
-        let target = this.right.__get()
+        let target = this.right
 
-        if(target && this.left.__get()) {
+        if(target && this.left) {
             this.onLeftRightChanged()
             return
         }
@@ -245,8 +245,8 @@ class Anchors extends GroupProperty {
     }
 
     onLeftRightChanged(){
-        let left = this.left.__get()
-        let right = this.right.__get()
+        let left = this.left
+        let right = this.right
         let self = this.__parent
 
         if(self && left && right){
@@ -303,9 +303,9 @@ class Anchors extends GroupProperty {
     }
 
     onTopChanged(){
-        let target = this.top.__get()
+        let target = this.top
         
-        if(target && this.bottom.__get()) {
+        if(target && this.bottom) {
             this.onTopBottomChanged()
             return
         }
@@ -342,9 +342,9 @@ class Anchors extends GroupProperty {
     }
 
     onBottomChanged(){
-        let target = this.bottom.__get()
+        let target = this.bottom
 
-        if(target && this.top.__get()) {
+        if(target && this.top) {
             this.onTopBottomChanged()
             return
         }
@@ -381,8 +381,8 @@ class Anchors extends GroupProperty {
     }
 
     onTopBottomChanged(){
-        let top = this.top.__get()
-        let bottom = this.bottom.__get()
+        let top = this.top
+        let bottom = this.bottom
         let self = this.__parent
 
         if(self && top && bottom){
