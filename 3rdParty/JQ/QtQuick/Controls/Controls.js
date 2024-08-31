@@ -5,6 +5,7 @@ module.exports = {
     RoundButton: require("./RoundButton"),    
     Switch: require("./Switch"),    
     Popup: require("./Popup"),    
+    Dialog: require("./Dialog"),    
     ToolTip: require("./ToolTip"),    
     ScrollBar: require("./ScrollBar"),    
 }

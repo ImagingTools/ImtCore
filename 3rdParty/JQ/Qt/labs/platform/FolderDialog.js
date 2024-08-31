@@ -1,7 +1,7 @@
-const Item = require("../../../QtQuick/Item")
+const Dialog = require("./Dialog")
 const Signal = require("../../../QtQml/Signal")
 
-class FolderDialog extends Item {
+class FolderDialog extends Dialog {
     static OpenFile = 0
     static OpenFiles = 1
     static SaveFile = 2
@@ -11,7 +11,7 @@ class FolderDialog extends Item {
     static ReadOnly = 0
     static HideNameFilterDetails = 0
 
-    static meta = Object.assign({}, Item.meta, {
+    static meta = Object.assign({}, Dialog.meta, {
 
     })
 }

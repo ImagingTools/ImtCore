@@ -15,9 +15,9 @@ const QtQuick = require('../QtQuick/QtQuick')
 const Qt5Compat = require('../Qt5Compat/Qt5Compat')
 const QtWebSockets = require('../QtWebSockets/QtWebSockets')
 
-// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\imtcore.json'//process.argv.slice(2)[0]
+const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\imtcore.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\jq.json'//process.argv.slice(2)[0]
-const configFilePath = process.argv.slice(2)[0]
+// const configFilePath = process.argv.slice(2)[0]
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 const config = JSON.parse(fs.readFileSync(configFilePath, {encoding:'utf8', flag:'r'}))
 
@@ -462,7 +462,14 @@ class Instruction {
 
                     if(stat.dotObj){
                         let path = ''
-                        if(stat.dotObj instanceof QmlFile){
+                        if(stat.dotObj instanceof JSFile){
+                            if(stat.dotObj.meta.exports.indexOf(tree[2] >= 0)){
+                                path = {}
+                            } else {
+                                path = null
+                            }
+                            stat.dotObj = null
+                        } else if(stat.dotObj instanceof QmlFile){
                             path = stat.dotObj.instruction.resolve(tree[2])
                             if(path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
                         } else if(stat.dotObj instanceof Instruction){
@@ -997,7 +1004,7 @@ class Instruction {
         
     }
 
-    toCode(isRoot = false, isComponent = false){
+    toCode(isRoot = false, isComponent = false, level = 0){
         let code = []
         let typeInfo = this.getTypeInfo(this.extends)
         let typeBase = typeInfo.type
@@ -1061,10 +1068,12 @@ class Instruction {
         code.push('let self = super.create(parent, model, __queue, false, ...args)')
 
         if(isRoot) {
-            code.push(`let __context={}`) // context !!!
-            // code.push(`let __updateList=[]`) // property update !!!
-        } else if(isComponent){
-            // code.push(`let __updateList=[]`) // property update !!!
+            code.push(`let __rootContext${level}={}`) // context !!!
+            code.push(`let __context=__rootContext${level}`) // context !!!
+        }
+        if(isComponent){
+            code.push(`let __rootContext${level}=Object.assign({},__rootContext${level-1})`) // context !!!
+            code.push(`let __context=__rootContext${level}`) // context !!!
         }
 
         if(this.id) code.push(`__context['${this.id}']=self`)  // context !!!
@@ -1092,9 +1101,9 @@ class Instruction {
 
             if(assignProperty.value instanceof Instruction) {
                 if((path.type === QtQml.Component) && assignProperty.value.extends !== 'Component'){
-                    code.push(`self.${assignProperty.name}=(class extends JQModules.QtQml.Component {}).create(null,${assignProperty.value.toCode(false)})`)
+                    code.push(`self.${assignProperty.name}=(class extends JQModules.QtQml.Component {}).create(null,${assignProperty.value.toCode(false,false,level+1)})`)
                 } else {
-                    code.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false)}).create(null,null,__queue,false)`)
+                    code.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false,false,level)}).create(null,null,__queue,false)`)
                 }
             } else {
                 let stat = this.prepare(assignProperty.value, {isCompute:false, thisKey: 'self', value:'', local:[]})
@@ -1114,12 +1123,12 @@ class Instruction {
         }
         for(let i = 0; i < this.children.length; i++){
             if(this.extends === 'Component'){
-                code.push(`self.component=` + this.children[i].toCode(false, true))
+                code.push(`self.component=` + this.children[i].toCode(false, true, level+1))
             } else {
                 if(typeBase === JQModules.QtQuick.Flickable){
-                    code.push(`let child${i}=(` + this.children[i].toCode() + ').create(self.contentItem,null,__queue,false)')
+                    code.push(`let child${i}=(` + this.children[i].toCode(false,false,level+1) + ').create(self.contentItem,null,__queue,false)')
                 } else {
-                    code.push(`let child${i}=(` + this.children[i].toCode() + ').create(self,null,__queue,false)')
+                    code.push(`let child${i}=(` + this.children[i].toCode(false,false,level) + ').create(self,null,__queue,false)')
                 }
                 
             }

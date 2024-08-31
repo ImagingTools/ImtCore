@@ -1,5 +1,6 @@
 const QtObject = require("../../QtQml/QtObject")
 const Real = require("../../QtQml/Real")
+const Bool = require("../../QtQml/Bool")
 const List = require("../../QtQml/List")
 const Signal = require("../../QtQml/Signal")
 const JQApplication = require("../../core/JQApplication")
@@ -11,9 +12,11 @@ class ModelData {
 class ListModel extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
         count: {type:Real, value:0, signalName:'countChanged'},
+        dynamicRoles: {type:Bool, value:false, signalName:'dynamicRolesChanged'},
         data: {type:List, signalName:'dataChanged'},
 
         countChanged: {type:Signal, slotName:'onCountChanged', args:[]},
+        dynamicRolesChanged: {type:Signal, slotName:'onDynamicRolesChanged', args:[]},
         dataChanged: {type:Signal, slotName:'onDataChanged', args:['topLeft', 'bottomRight', 'roles']},
     })
 
