@@ -67,8 +67,8 @@ class Image extends Item {
 
         JQApplication.ImageController.load(url, (img)=>{
             if(this.$url !== url) return
-            this.sourceSize.width = img.width
-            this.sourceSize.height = img.height
+            this.sourceSize.__getObject('width').__setAuto(img.width)
+            this.sourceSize.__getObject('height').__setAuto(img.height)
 
             this.__setDOMStyle({
                 backgroundImage: `url("${img.data}")`

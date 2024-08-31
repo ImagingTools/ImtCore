@@ -13,7 +13,7 @@ class SourceSize extends GroupProperty {
 
     onChanged(){
         if(this.__parent){
-
+            this.__parent.__updateImage()
         }
     }
 

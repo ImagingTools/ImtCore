@@ -70,6 +70,13 @@ class BaseObject{
 
     }
 
+    __getObject(key){
+        if(this.__has(key)){
+            return this.__self[key]
+        }
+        return undefined
+    }
+
     __set(key, value){
 
     }
