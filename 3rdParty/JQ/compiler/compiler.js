@@ -1101,7 +1101,7 @@ class Instruction {
 
             if(assignProperty.value instanceof Instruction) {
                 if((path.type === QtQml.Component) && assignProperty.value.extends !== 'Component'){
-                    code.push(`self.${assignProperty.name}=(class extends JQModules.QtQml.Component {}).create(null,${assignProperty.value.toCode(false,false,level+1)})`)
+                    code.push(`self.${assignProperty.name}=(class extends JQModules.QtQml.Component {}).create(null,${assignProperty.value.toCode(false,true,level+1)})`)
                 } else {
                     code.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false,false,level)}).create(null,null,__queue,false)`)
                 }

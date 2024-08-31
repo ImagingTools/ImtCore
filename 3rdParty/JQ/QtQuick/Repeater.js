@@ -76,6 +76,8 @@ class Repeater extends Item {
                 }
             }
 
+            this.count = this.__items.length
+
             JQApplication.endUpdate()
         }
     }

@@ -135,11 +135,13 @@ class ListView extends Flickable {
                     let item = this.delegate.createObject(this.contentItem)
                     this.__items.push(item)
                 }
+                this.count = this.model
             } else {
                 for(let i = 0; i < this.model.data.length; i++){
                     let item = this.delegate.createObject(this.contentItem, this.model.data[i])
                     this.__items.push(item)
                 }
+                this.count = this.model.data.length
             }
 
             JQApplication.endUpdate()
@@ -174,6 +176,8 @@ class ListView extends Flickable {
                     }
                 }
             }
+
+            this.count = this.model.data.length
 
             JQApplication.endUpdate()
         }

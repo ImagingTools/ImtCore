@@ -49,6 +49,28 @@ class Loader extends Item {
 
         this.loaded()
     }
+
+    onSourceChanged(){
+        if(this.item) this.item.__destroy()
+        if(!this.source) return
+
+        let source = this.source.split('/').pop().replaceAll('.qml', '')
+        let cls = eval(source)
+
+        let item = cls.create(this)
+        this.item = item
+
+        if(this.__getObject('width').__auto) {
+            this.__getObject('width').__setCompute(()=>{return this.item.width})
+            this.__getObject('width').__update()
+        }
+        if(this.__getObject('height').__auto) {
+            this.__getObject('height').__setCompute(()=>{return this.item.height})
+            this.__getObject('height').__update()
+        }
+
+        this.loaded()
+    }
 }
 
 module.exports = Loader
