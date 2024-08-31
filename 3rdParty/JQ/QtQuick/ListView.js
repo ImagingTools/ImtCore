@@ -132,7 +132,7 @@ class ListView extends Flickable {
 
             if(typeof this.model === 'number'){
                 for(let i = 0; i < this.model; i++){
-                    let item = this.delegate.createObject(this.contentItem)
+                    let item = this.delegate.createObject(this.contentItem, {index: i})
                     this.__items.push(item)
                 }
                 this.count = this.model

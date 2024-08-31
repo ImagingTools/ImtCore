@@ -62,7 +62,7 @@ class Repeater extends Item {
 
             if(typeof this.model === 'number'){
                 for(let i = 0; i < this.model; i++){
-                    let item = this.delegate.createObject(this.parent)
+                    let item = this.delegate.createObject(this.parent, {index: i})
                     this.__items.push(item)
                     // item.__complete()
                     this.itemAdded(item)
