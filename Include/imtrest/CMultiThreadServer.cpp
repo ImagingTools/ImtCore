@@ -222,9 +222,7 @@ void CSocket::OnHandleReadyRead()
 
 void CSocket::OnDisconnected()
 {
-	if (m_requestPtr.IsValid()){
-		Q_EMIT SocketDisconnected(m_requestPtr->GetRequestId());
-	}
+	Q_EMIT SocketDisconnected(m_requestId);
 }
 
 
