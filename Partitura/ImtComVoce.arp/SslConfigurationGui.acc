@@ -10,6 +10,21 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="ActivatorProxy" PackageId="QStdPck" ComponentId="EnableableProxy">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DelegateChanges" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableableList" Type="Reference[]" ExportId="SslActivators">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="CaCertificateGui" PackageId="ImtComVoce" ComponentId="SslCertificateGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
@@ -25,10 +40,22 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="SslConfigurationGui" PackageId="QtGuiPck" ComponentId="ComposedParamsSetGui">
+        <Element Id="SslConfigurationGui" PackageId="QtGuiPck" ComponentId="ExtComposedParamsSetGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Editors" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>EnableSslGui</Value>
+                                <Value>LocalCertificateGui</Value>
+                                <Value>CaCertificateGui</Value>
+                                <Value>SslPrivateKeyGui</Value>
+                                <Value>SslVerifyModeOptionsGui</Value>
+                                <Value>SslProtocolOptionsGui</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Guis" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>EnableSslGui</Value>
@@ -64,6 +91,18 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="PageActivators" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>True</Value>
+                                <Value>ActivatorProxy</Value>
+                                <Value>ActivatorProxy</Value>
+                                <Value>ActivatorProxy</Value>
+                                <Value>ActivatorProxy</Value>
+                                <Value>ActivatorProxy</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -80,6 +119,15 @@
         <Element Id="SslVerifyModeOptionsGui" PackageId="QtGuiPck" ComponentId="SelectionParamGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="True" PackageId="BasePck" ComponentId="EnableableParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
     </ElementsList>

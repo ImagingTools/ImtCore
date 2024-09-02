@@ -8,13 +8,15 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="ActivatorProxy" X="280" Y="700" Note=""/>
         <Element ComponentName="CaCertificateGui" X="900" Y="550" Note=""/>
         <Element ComponentName="EnableSslGui" X="600" Y="250" Note=""/>
-        <Element ComponentName="LocalCertificateGui" X="575" Y="550" Note=""/>
-        <Element ComponentName="SslConfigurationGui" X="580" Y="400" Note=""/>
-        <Element ComponentName="SslPrivateKeyGui" X="250" Y="550" Note=""/>
-        <Element ComponentName="SslProtocolOptionsGui" X="220" Y="260" Note=""/>
+        <Element ComponentName="LocalCertificateGui" X="660" Y="540" Note=""/>
+        <Element ComponentName="SslConfigurationGui" X="640" Y="400" Note=""/>
+        <Element ComponentName="SslPrivateKeyGui" X="160" Y="400" Note=""/>
+        <Element ComponentName="SslProtocolOptionsGui" X="340" Y="240" Note=""/>
         <Element ComponentName="SslVerifyModeOptionsGui" X="900" Y="240" Note=""/>
+        <Element ComponentName="True" X="440" Y="700" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
