@@ -8,11 +8,8 @@
 #include <QtCore/QPointer>
 #include <QtCore/QReadWriteLock>
 #include <QtNetwork/QTcpSocket>
-#include <QtNetwork/QSslConfiguration>
-
-#if QT_VERSION >= 0x060400
 #include <QtNetwork/QSslServer>
-#endif
+#include <QtNetwork/QSslConfiguration>
 
 // ImtCore  includes
 #include <imtrest/CTcpServerComp.h>
@@ -28,19 +25,55 @@ class CMultiThreadServer;
 class CSocketThread;
 
 
-class CSocket: public QObject,
+class CSocket: public QObject
+{
+	Q_OBJECT
+public:
+	CSocket(CSocketThread* rootSocket, imtrest::IRequest* request, bool secureConnection, const QSslConfiguration& sslConfiguration, qintptr socketDescriptor);
+	~CSocket();
+
+public Q_SLOTS:
+	void HandleReadyRead();
+	void Disconnected();
+	void OnSendResponse(ConstResponsePtr response);
+	void Abort();
+	void TimeOut();
+
+private:
+	QTimer m_startTimer;
+	CSocketThread* m_rootSocket;
+	QPointer<QTcpSocket> m_socket;
+	istd::TDelPtr<IRequest> m_requestPtr;
+};
+
+
+class CSocketThread:
+			public QThread,
 			virtual public IRequestServlet,
 			virtual public ISender
 {
 	Q_OBJECT
 public:
-	CSocket(qintptr socketDescriptor, bool secureConnection, const QSslConfiguration& sslConfiguration, CMultiThreadServer *parent);
-	// CSocket(CSocketThread* rootSocket, imtrest::IRequest* request, bool secureConnection, const QSslConfiguration& sslConfiguration, qintptr socketDescriptor);
+	enum Status
+	{
+		ST_START,
+		ST_PROCESS,
+		ST_CLOSE
+	};
+
+	explicit CSocketThread(qintptr ID, bool secureConnection, const QSslConfiguration& sslConfiguration, CMultiThreadServer *parent);
+	void SetSocketDescriptor(qintptr socketDescriptor);
+	qintptr GetSocketDescriptor();
+	void SetSocketStatus(Status socketStatus);
+	Status GetSocketStatus();
 	QByteArray GetRequestId();
 	imtrest::IRequestServlet* GetRequestServlet();
+
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);
-	virtual IRequest* CreateRequest();
+
+	// reimplemented (QThread)
+	void run() override;
 
 	// reimplemented (IRequestHandler)
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
@@ -50,28 +83,23 @@ public:
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
 	virtual bool SendRequest(ConstRequestPtr& reguest) const override;
 
+	virtual IRequest* CreateRequest();
 
 Q_SIGNALS:
 	void Error(QTcpSocket::SocketError socketerror);
 	void SocketDisconnected(QByteArray requestId);
-	// void SendResponse(ConstResponsePtr response);
+	void OnSendResponse(ConstResponsePtr response) const;
 	void Abort();
 
-public Q_SLOTS:
-	void OnHandleReadyRead();
-	void OnDisconnected();
-	void OnAbort();
-	void OnTimeOut();
-
 private:
-	QTimer m_startTimer;
-	istd::TDelPtr<QTcpSocket> m_socket;
-	istd::TDelPtr<IRequest> m_requestPtr;
 	CMultiThreadServer* m_server;
+	qintptr m_socketDescriptor;
 	imtrest::IProtocolEngine* m_enginePtr;
 	imtrest::IRequestServlet* m_requestHandlerPtr;
 	mutable QMutex m_socketDescriptorMutex;
 	mutable QMutex m_statusMutex;
+	Status m_status;
+	istd::TDelPtr<CSocket> m_socket;
 	bool m_isSecureConnection;
 	const QSslConfiguration& m_sslConfiguration;
 
@@ -80,22 +108,13 @@ private:
 
 
 class CMultiThreadServer :
-		#if QT_VERSION < 0x060400
-			public QTcpServer,
-		 #else
 			public QSslServer,
-		 #endif
 			virtual public ilog::CLoggerBase,
 			virtual public IRequestManager
 {
 	Q_OBJECT
 public:
-#if QT_VERSION < 0x060400
-	typedef QTcpServer BaseClass;
- #else
 	typedef QSslServer BaseClass;
- #endif
-
 	typedef ilog::CLoggerBase BaseClass2;
 
 	explicit CMultiThreadServer(CTcpServerComp* rootServer);
@@ -115,7 +134,6 @@ public:
 		\link https://doc.qt.io/qt-6/qsslserver.html#setSslConfiguration
 	 */
 	void SetSslConfiguration(const QSslConfiguration& sslConfiguration);
-	QSslConfiguration& GetSslConfiguration();
 
 	// reimplemented (imtrest::IRequestManager)
 	virtual const ISender* GetSender(const QByteArray& requestId) const override;
@@ -137,11 +155,11 @@ protected:
 	void incomingConnection(qintptr socketDescriptor) override;
 
 protected:
-	QList<QPointer<CSocket>> m_socketList;
+	QList<QPointer<CSocketThread>> m_threadSocketList;
 	CTcpServerComp& m_rootServer;
 	mutable QList<qintptr> m_descriptorList;
 	mutable QMutex m_descriptorListMutex;
-	mutable QReadWriteLock m_socketListGuard;
+	mutable QReadWriteLock m_threadSocketListGuard;
 	bool m_isActive;
 	bool m_isSecureConnection;
 	QSslConfiguration m_sslConfiguration;

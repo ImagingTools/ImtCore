@@ -21,41 +21,29 @@ namespace imtrest
 {
 
 
-CSocket::CSocket(qintptr socketDescriptor, bool secureConnection, const QSslConfiguration& sslConfiguration, CMultiThreadServer *parent)
+CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnection, const QSslConfiguration& sslConfiguration, qintptr socketDescriptor)
 	:QObject(),
-	m_isSecureConnection(secureConnection),
-	m_sslConfiguration(sslConfiguration)
+	m_rootSocket(rootSocket),
+	m_requestPtr(request)
 {
 	if (secureConnection){
-		m_socket = new QSslSocket;
+		m_socket = new QSslSocket();
 	}
 	else {
-		m_socket = new QTcpSocket;
+		m_socket = new QTcpSocket();
 	}
 
 	if (!m_socket->setSocketDescriptor(socketDescriptor)){
 		qDebug() << "Socket error" << m_socket->error();
-		return;
-	}
 
-	m_server = parent;
-	m_enginePtr = m_server->GetProtocolEngine();
-	m_requestHandlerPtr = m_server->GetRequestServlet();
+		// something's wrong, we just Q_EMIT a signal
+		Q_EMIT m_rootSocket->Error(m_socket->error());
 
-	if (m_enginePtr == nullptr){
 		return;
-	}
-	m_requestPtr.SetPtr(m_enginePtr->CreateRequest(*this));
-	if (m_requestPtr.IsValid()){
-		m_requestId = m_requestPtr->GetRequestId();
 	}
 
 	if (secureConnection){
-		QEventLoop encryptionLoop;
-		QTimer encryptionTimer;
-		connect(&encryptionTimer, &QTimer::timeout, &encryptionLoop, &QEventLoop::quit);
-
-		QSslSocket* socketPtr =m_socket.Cast<QSslSocket*>();
+		QSslSocket* socketPtr = dynamic_cast<QSslSocket*>(m_socket.data());
 		Q_ASSERT_X(socketPtr != nullptr, __func__, "Invalid socket!");
 		socketPtr->setLocalCertificate(sslConfiguration.localCertificate());
 		socketPtr->setPrivateKey(sslConfiguration.privateKey());
@@ -64,104 +52,34 @@ CSocket::CSocket(qintptr socketDescriptor, bool secureConnection, const QSslConf
 		socketPtr->startServerEncryption();
 	}
 
-	connect(&m_startTimer, &QTimer::timeout, this, QOverload<>::of(&CSocket::OnTimeOut));
+	connect(&m_startTimer, &QTimer::timeout, this, QOverload<>::of(&CSocket::TimeOut));
 	m_startTimer.setSingleShot(true);
 	m_startTimer.start(5000);
 
-	connect(m_socket.GetPtr(), &QTcpSocket::disconnected, this, &CSocket::OnDisconnected, Qt::DirectConnection);
-	connect(m_socket.GetPtr(), &QTcpSocket::readyRead, this, &CSocket::OnHandleReadyRead, Qt::DirectConnection);
+	connect(m_socket.data(), &QTcpSocket::disconnected, this, &CSocket::Disconnected, Qt::DirectConnection);
+	connect(m_socket.data(), &QTcpSocket::readyRead, this, &CSocket::HandleReadyRead, Qt::DirectConnection);
 }
 
 
-QByteArray CSocket::GetRequestId()
+CSocket::~CSocket()
 {
-	return m_requestId;
-}
-
-
-imtrest::IRequestServlet* CSocket::GetRequestServlet()
-{
-	return m_requestHandlerPtr;
-}
-
-
-bool CSocket::IsSecureConnection() const
-{
-	return m_isSecureConnection;
-}
-
-
-void CSocket::EnableSecureConnection(bool isSecureConnection)
-{
-	m_isSecureConnection = isSecureConnection;
-}
-
-
-IRequest* CSocket::CreateRequest()
-{
-	if (m_enginePtr == nullptr){
-		return nullptr;
-	}
-	imtrest::IRequest* newRequestPtr = m_enginePtr->CreateRequest(*this);
-	if (newRequestPtr != nullptr){
-	}
-
-	return newRequestPtr;
-}
-
-
-// reimplemented (IRequestHandler)
-
-bool CSocket::IsCommandSupported(const QByteArray& /*commandId*/) const
-{
-	return true;
-}
-
-
-ConstResponsePtr CSocket::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
-{
-	Q_EMIT m_server->NewThreadConnection(&request, subCommandId);
-
-	return ConstResponsePtr();
-}
-
-// reimplemented (ISender)
-bool CSocket::SendResponse(ConstResponsePtr& response) const
-{
-	CHttpResponse* httpResponsePtr = const_cast<CHttpResponse*>(dynamic_cast<const CHttpResponse*>(response.GetPtr()));
-	CTcpResponse* tcpResponsePtr = const_cast<CTcpResponse*>(dynamic_cast<const CTcpResponse*>(response.GetPtr()));
-
-	if(httpResponsePtr != nullptr){
-		CHttpSender sender(m_socket.GetPtr());
-
-		sender.SendResponse(response);
-	}
-	else if(tcpResponsePtr != nullptr){
-		CTcpSender sender(m_socket.GetPtr());
-
-		sender.SendResponse(response);
-	}
-
-	return true;
-}
-
-
-bool CSocket::SendRequest(ConstRequestPtr& /*reguest*/) const
-{
-	return false;
-}
-
-
-void CSocket::OnAbort()
-{
-	if (m_socket->isValid()){
+	if (!m_socket.isNull()){
 		m_socket->abort();
-		m_socket.PopPtr()->deleteLater();
+		m_socket->deleteLater();
 	}
 }
 
 
-void CSocket::OnTimeOut()
+void CSocket::Abort()
+{
+	if (!m_socket.isNull() && m_socket->isValid()){
+		m_socket->abort();
+		m_socket->deleteLater();
+	}
+}
+
+
+void CSocket::TimeOut()
 {
 	if (m_socket != nullptr){
 		qDebug() << m_socket->socketDescriptor() << " Time out";
@@ -170,13 +88,17 @@ void CSocket::OnTimeOut()
 }
 
 
-void CSocket::OnHandleReadyRead()
+void CSocket::HandleReadyRead()
 {
-	imtrest::IRequestServlet* requestHandlerPtr = GetRequestServlet();
+	imtrest::IRequestServlet* requestHandlerPtr = m_rootSocket->GetRequestServlet();
 	Q_ASSERT(requestHandlerPtr != nullptr);
 
 	if (requestHandlerPtr == nullptr){
 		return;
+	}
+
+	if (!m_requestPtr.IsValid()){
+		m_requestPtr.SetPtr(m_rootSocket->CreateRequest());
 	}
 
 	if (!m_socket->isOpen()){
@@ -220,20 +142,167 @@ void CSocket::OnHandleReadyRead()
 }
 
 
-void CSocket::OnDisconnected()
+void CSocket::Disconnected()
 {
-	Q_EMIT SocketDisconnected(m_requestId);
+	qDebug() << "Socket disconnect" << sender();
+	Q_EMIT m_rootSocket->SocketDisconnected(m_rootSocket->GetRequestId());
+}
+
+
+void CSocket::OnSendResponse(ConstResponsePtr response)
+{
+	CHttpResponse* httpResponsePtr = const_cast<CHttpResponse*>(dynamic_cast<const CHttpResponse*>(response.GetPtr()));
+	CTcpResponse* tcpResponsePtr = const_cast<CTcpResponse*>(dynamic_cast<const CTcpResponse*>(response.GetPtr()));
+
+	if(httpResponsePtr != nullptr){
+		CHttpSender sender(m_socket.data());
+
+		sender.SendResponse(response);
+	}
+	else if(tcpResponsePtr != nullptr){
+		CTcpSender sender(m_socket.data());
+
+		sender.SendResponse(response);
+	}
+}
+
+
+CSocketThread::CSocketThread(qintptr socketId, bool secureConnection, const QSslConfiguration& sslConfiguration, CMultiThreadServer* parent)
+	:QThread(parent),
+	m_status(ST_START),
+	m_isSecureConnection(secureConnection),
+	m_sslConfiguration(sslConfiguration)
+{
+	qRegisterMetaType<ConstResponsePtr>("ConstResponsePtr");
+	this->m_socketDescriptor = socketId;
+
+	m_server = parent;
+
+	m_enginePtr = m_server->GetProtocolEngine();
+	m_requestHandlerPtr = m_server->GetRequestServlet();
+}
+
+
+void CSocketThread::SetSocketDescriptor(qintptr socketDescriptor)
+{
+	QMutexLocker lock(&m_socketDescriptorMutex);
+
+	m_socketDescriptor = socketDescriptor;
+}
+
+qintptr CSocketThread::GetSocketDescriptor()
+{
+	return m_socketDescriptor;
+}
+
+
+void CSocketThread::SetSocketStatus(Status socketStatus)
+{
+	QMutexLocker lock(&m_statusMutex);
+
+	m_status = socketStatus;
+}
+
+
+CSocketThread::Status CSocketThread::GetSocketStatus()
+{
+	return m_status;
+}
+
+
+QByteArray CSocketThread::GetRequestId()
+{
+	return m_requestId;
+}
+
+
+imtrest::IRequestServlet* CSocketThread::GetRequestServlet()
+{
+	return m_requestHandlerPtr;
+}
+
+
+bool CSocketThread::IsSecureConnection() const
+{
+	return m_isSecureConnection;
+}
+
+
+void CSocketThread::EnableSecureConnection(bool isSecureConnection)
+{
+	m_isSecureConnection = isSecureConnection;
+}
+
+
+void CSocketThread::run()
+{
+	if (m_server == nullptr){
+		return;
+	}
+
+	imtrest::IRequest* newRequestPtr = m_enginePtr->CreateRequest(*this);
+	m_socket.SetPtr(new CSocket(this, newRequestPtr, m_isSecureConnection, m_sslConfiguration, m_socketDescriptor));
+
+
+	m_requestId = newRequestPtr->GetRequestId();
+
+	qDebug() << m_socketDescriptor << connect(this, &CSocketThread::OnSendResponse, m_socket.GetPtr(), &CSocket::OnSendResponse, Qt::QueuedConnection);
+	qDebug() << m_socketDescriptor << connect(this, &CSocketThread::Abort, m_socket.GetPtr(), &CSocket::Abort, Qt::QueuedConnection);
+
+	exec();
+}
+
+
+// reimplemented (IRequestHandler)
+
+bool CSocketThread::IsCommandSupported(const QByteArray& /*commandId*/) const
+{
+	return true;
+}
+
+
+ConstResponsePtr CSocketThread::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
+{
+	Q_EMIT m_server->NewThreadConnection(&request, subCommandId);
+
+	return ConstResponsePtr();
+}
+
+
+// reimplemented (ISender)
+
+bool CSocketThread::SendResponse(ConstResponsePtr& response) const
+{
+	Q_EMIT OnSendResponse(response);
+
+	return true;
+}
+
+
+bool CSocketThread::SendRequest(ConstRequestPtr& /*reguest*/) const
+{
+	return false;
+}
+
+
+IRequest* CSocketThread::CreateRequest()
+{
+	if (m_enginePtr == nullptr){
+		return nullptr;
+	}
+	imtrest::IRequest* newRequestPtr = m_enginePtr->CreateRequest(*this);
+	if (newRequestPtr != nullptr){
+		m_requestId = newRequestPtr->GetRequestId();
+	}
+
+	return newRequestPtr;
 }
 
 
 CMultiThreadServer::CMultiThreadServer(CTcpServerComp* rootServer)
-#if QT_VERSION < 0x060400
-	:QTcpServer((QObject*)rootServer),
-#else
 	:QSslServer((QObject*)rootServer),
-#endif
 	m_rootServer(*rootServer),
-	m_socketListGuard(QReadWriteLock::Recursive),
+	m_threadSocketListGuard(QReadWriteLock::Recursive),
 	m_isActive(true),
 	m_isSecureConnection(false)
 {
@@ -291,19 +360,13 @@ void CMultiThreadServer::SetSslConfiguration(const QSslConfiguration& sslConfigu
 }
 
 
-QSslConfiguration& CMultiThreadServer::GetSslConfiguration()
-{
-	return m_sslConfiguration;
-}
-
-
 // reimplemented (imtrest::IRequestManager)
 
 const ISender* CMultiThreadServer::GetSender(const QByteArray& requestId) const
 {
-	QReadLocker threadListLock(&m_socketListGuard);
+	QReadLocker threadListLock(&m_threadSocketListGuard);
 
-	for (CSocket* socket : m_socketList){
+	for (CSocketThread* socket : m_threadSocketList){
 		if (socket->GetRequestId() == requestId){
 			return socket;
 		}
@@ -315,27 +378,28 @@ const ISender* CMultiThreadServer::GetSender(const QByteArray& requestId) const
 
 void CMultiThreadServer::Disconnected(QByteArray requestId)
 {
-	QWriteLocker threadListLock(&m_socketListGuard);
+	QWriteLocker threadListLock(&m_threadSocketListGuard);
 
 	SendLogMessage(
 				istd::IInformationProvider::InformationCategory::IC_NONE,
 				__LINE__,
-				QString("Socket '%1' disconnected").arg(qPrintable(requestId)),
+				QString("Socket '%1' disconnected").arg(requestId),
 				__func__);
 
-	QMutableListIterator socketIterator(m_socketList);
-	while(socketIterator.hasNext()){
-		QPointer<CSocket>& socketPtr = socketIterator.next();
+	QMutableListIterator threadSocketIterator(m_threadSocketList);
+	while(threadSocketIterator.hasNext()){
+		QPointer<CSocketThread>& socketPtr = threadSocketIterator.next();
 		if(socketPtr.isNull()){
 			// socket is already removed. Stop tracking and go to next
-			socketIterator.remove();
+			threadSocketIterator.remove();
 
 			continue;
 		}
-		QByteArray socketRequestId = socketPtr->GetRequestId();
-		if (requestId.isEmpty() || socketRequestId == requestId){
+		if (socketPtr->GetRequestId() == requestId){
+			socketPtr->quit();
+			socketPtr->wait();
 			socketPtr->deleteLater();
-			socketIterator.remove();
+			threadSocketIterator.remove();
 		}
 	}
 
@@ -344,9 +408,10 @@ void CMultiThreadServer::Disconnected(QByteArray requestId)
 	}
 
 	qintptr descriptor = GetFirstSocketDescriptor();
-	CSocket* threadSocket = new CSocket(descriptor, m_isSecureConnection, GetSslConfiguration(), this);
-
-	connect(threadSocket, &CSocket::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::DirectConnection);
+	CSocketThread* threadSocket = new CSocketThread(descriptor, m_isSecureConnection, m_sslConfiguration, this);
+	m_threadSocketList.append(threadSocket);
+	connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::DirectConnection);
+	threadSocket->start();
 }
 
 
@@ -354,16 +419,18 @@ void CMultiThreadServer::ShutdownServer()
 {
 	m_isActive = false;
 
-	QWriteLocker listLock(&m_socketListGuard);
+	QWriteLocker threadListLock(&m_threadSocketListGuard);
 
-	QMutableListIterator socketIterator(m_socketList);
-	while(socketIterator.hasNext()){
-		QPointer<CSocket>& socketPtr = socketIterator.next();
+	QMutableListIterator threadSocketIterator(m_threadSocketList);
+	while(threadSocketIterator.hasNext()){
+		QPointer<CSocketThread>& socketPtr = threadSocketIterator.next();
 		if(!socketPtr.isNull()){
+			socketPtr->quit();
+			socketPtr->wait();
 			socketPtr->deleteLater();
 		}
 
-		socketIterator.remove();
+		threadSocketIterator.remove();
 	}
 }
 
@@ -396,33 +463,33 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 	SendLogMessage(
 				istd::IInformationProvider::InformationCategory::IC_NONE,
 				__LINE__,
-				QString("New connection. Limit: %1").arg(QString::number(m_rootServer.GetThreadsLimit())),
+				QString("New connection. Limit: %0").arg(QString::number(m_rootServer.GetThreadsLimit())),
 				__func__);
 
-	QWriteLocker listLock(&m_socketListGuard);
+	QWriteLocker threadListLock(&m_threadSocketListGuard);
 	AddSocketDescriptor(socketDescriptor);
 
-	CSocket* socket = nullptr;
+	CSocketThread* threadSocket = nullptr;
 
-	if (socket == nullptr){
+	if (threadSocket == nullptr){
 		int threadsLimit = m_rootServer.GetThreadsLimit();
 		if (threadsLimit < 1){
 			threadsLimit = 1;
 		}
 
-		if (m_socketList.count() < threadsLimit){
+		if (m_threadSocketList.count() < threadsLimit){
 			// Every new connection will be run in a newly created thread
 			qintptr descriptor = GetFirstSocketDescriptor();
-			socket = new CSocket(descriptor, m_isSecureConnection, GetSslConfiguration(), this);
+			threadSocket = new CSocketThread(descriptor, m_isSecureConnection, m_sslConfiguration, this);
 
-			m_socketList.append(socket);
+			m_threadSocketList.append(threadSocket);
 			SendLogMessage(
 						istd::IInformationProvider::InformationCategory::IC_NONE,
 						__LINE__,
-						QString("Starting new socket. Active sockets count: %1").arg(QString::number( m_socketList.count())),
+						QString("Starting new socket. Active sockets count: %0").arg(QString::number( m_threadSocketList.count())),
 						__func__);
-
-			connect(socket, &CSocket::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::QueuedConnection);
+			connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::QueuedConnection);
+			threadSocket->start();
 		}
 	}
 }

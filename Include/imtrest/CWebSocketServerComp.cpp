@@ -94,7 +94,7 @@ bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 p
 	}
 	if (webSocketServerPtr->listen(address, port)){
 		SendInfoMessage(0, QString("Web socket server successfully started on port %1").arg(port));
-		qDebug() << QString("Web server successfully started on port %1").arg(port);
+		qDebug() << QString("Tcp server successfully started on port %1").arg(port);
 
 		connect(webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
 		connect(webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
