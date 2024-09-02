@@ -18,7 +18,7 @@ CTransactionableUndoManagerComp::CTransactionableUndoManagerComp()
 
 bool CTransactionableUndoManagerComp::StartTransaction()
 {
-	if (!m_updateInProgress && !m_transactionInProgress) {
+	if (!m_updateInProgress && !m_transactionInProgress){
 		m_transactionInProgress = true;
 
 		BaseClass::BeforeUpdate(GetObservedModel());
@@ -32,7 +32,7 @@ bool CTransactionableUndoManagerComp::StartTransaction()
 
 bool CTransactionableUndoManagerComp::EndTransaction()
 {
-	if (!m_updateInProgress && m_transactionInProgress) {
+	if (!m_updateInProgress && m_transactionInProgress){
 		BaseClass::AfterUpdate(GetObservedModel(), istd::IChangeable::GetAnyChange());
 
 		m_transactionInProgress = false;
@@ -50,7 +50,7 @@ void CTransactionableUndoManagerComp::BeforeUpdate(imod::IModel* modelPtr)
 {
 	m_updateInProgress = true;
 
-	if (!m_transactionInProgress) {
+	if (!m_transactionInProgress){
 		BaseClass::BeforeUpdate(modelPtr);
 	}
 }
@@ -58,7 +58,7 @@ void CTransactionableUndoManagerComp::BeforeUpdate(imod::IModel* modelPtr)
 
 void CTransactionableUndoManagerComp::AfterUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet)
 {
-	if (!m_transactionInProgress) {
+	if (!m_transactionInProgress){
 		BaseClass::AfterUpdate(modelPtr, changeSet);
 	}
 

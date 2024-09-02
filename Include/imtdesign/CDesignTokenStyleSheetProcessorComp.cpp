@@ -150,7 +150,7 @@ bool CDesignTokenStyleSheetProcessorComp::ProcesCssFile(const QByteArray& fileNa
 	bool hasUnsettedValues = false;
 	static QRegularExpression veriableRegEx(R"(\$\{.{0,}\})");
 	QRegularExpressionMatchIterator variableGlobalMatch = veriableRegEx.globalMatch(fileData);
-	while (variableGlobalMatch.hasNext()) {
+	while (variableGlobalMatch.hasNext()){
 		QRegularExpressionMatch variableMatch = variableGlobalMatch.next();
 		SendErrorMessage(0,
 						 QString("The unsettled variable remains at: '%1' value : '%2'")

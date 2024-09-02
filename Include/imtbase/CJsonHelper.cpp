@@ -94,7 +94,7 @@ bool CJsonHelper::GetStringListValue(const QJsonObject& object, const QString& k
 		if (jsonValue.isArray()){
 			QJsonArray jsonArray = jsonValue.toArray();
 			for(const QJsonValue& arrayValue: ::std::as_const(jsonArray)){
-				if(!arrayValue.isString()) {
+				if(!arrayValue.isString()){
 					return false;
 				}
 				value << arrayValue.toString();

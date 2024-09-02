@@ -81,9 +81,9 @@ int CObjectCollectionBasedPersistenceComp::SaveToFile(
 	//			QByteArray objectId = parts[1].toUtf8();
 
 	//			QString objectName;
-	//			if (uri.hasQuery()) {
+	//			if (uri.hasQuery()){
 	//				QUrlQuery query(uri.query());
-	//				if (query.hasQueryItem("name")) {
+	//				if (query.hasQueryItem("name")){
 	//					objectName = query.queryItemValue("name");
 	//				}
 	//			}

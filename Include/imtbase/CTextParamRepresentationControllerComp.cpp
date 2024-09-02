@@ -37,7 +37,7 @@ bool CTextParamRepresentationControllerComp::GetRepresentationFromValue(
 bool CTextParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(&dataModel);
-	if (textParamPtr != nullptr) {
+	if (textParamPtr != nullptr){
 		return true;
 	}
 

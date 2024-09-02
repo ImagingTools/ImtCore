@@ -32,7 +32,7 @@ QByteArray CTableViewParamRepresentationControllerComp::GetModelId() const
 bool CTableViewParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtbase::ITableViewParam* guiElementPtr = dynamic_cast<const imtbase::ITableViewParam*>(&dataModel);
-	if (guiElementPtr != nullptr) {
+	if (guiElementPtr != nullptr){
 		return true;
 	}
 
@@ -48,7 +48,7 @@ bool CTableViewParamRepresentationControllerComp::GetRepresentationFromDataModel
 	Q_ASSERT(IsModelSupported(dataModel));
 
 	const imtbase::ITableViewParam* tableViewParamPtr = dynamic_cast<const imtbase::ITableViewParam*>(&dataModel);
-	if (tableViewParamPtr == nullptr) {
+	if (tableViewParamPtr == nullptr){
 		return false;
 	}
 
@@ -73,7 +73,7 @@ bool CTableViewParamRepresentationControllerComp::GetDataModelFromRepresentation
 	Q_ASSERT(IsModelSupported(dataModel));
 
 	imtbase::ITableViewParam* tableViewParamPtr = dynamic_cast<imtbase::ITableViewParam*>(&dataModel);
-	if (tableViewParamPtr == nullptr) {
+	if (tableViewParamPtr == nullptr){
 		return false;
 	}
 

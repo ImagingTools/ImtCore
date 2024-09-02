@@ -55,7 +55,7 @@ bool CSelectionParamRepresentationControllerComp::GetRepresentationFromValue(
 bool CSelectionParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const iprm::ISelectionParam* selectionParamPtr = dynamic_cast<const iprm::ISelectionParam*>(&dataModel);
-	if (selectionParamPtr != nullptr) {
+	if (selectionParamPtr != nullptr){
 		return true;
 	}
 

@@ -120,7 +120,7 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 		}
 	}
 
-	if (!LoadAdditionalData(data, tempPath.path())) {
+	if (!LoadAdditionalData(data, tempPath.path())){
 		tempPath.removeRecursively();
 
 		return OS_FAILED;

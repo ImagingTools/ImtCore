@@ -71,7 +71,7 @@ istd::IChangeable* CObjectCollection::CloneMe(CompatibilityMode mode) const
 CObjectCollection::DataPtr CObjectCollection::CreateObjectInstance(const QByteArray& typeId) const
 {
 	istd::IChangeable* objPtr = BaseClass2::CreateInstance(typeId);
-	return DataPtr(DataPtr::RootObjectPtr(objPtr), [objPtr]() {
+	return DataPtr(DataPtr::RootObjectPtr(objPtr), [objPtr](){
 		return objPtr;
 	});
 }

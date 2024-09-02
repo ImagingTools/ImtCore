@@ -28,7 +28,7 @@ int CDesignTokenQrcUpdaterComp::Exec()
 
 	for (const QByteArray& styleName: ::std::as_const(styles)){
 		QStringList dirsForTheme;
-		for(const QString& resType: ::std::as_const(typesOfResources)) {
+		for(const QString& resType: ::std::as_const(typesOfResources)){
 			dirsForTheme << outputDirName  + dirSeparator + "Resources" + dirSeparator + resType + dirSeparator + styleName;
 		}
 		if(!CreateQrcForDirs(dirsForTheme, QByteArray(outputDirName) + dirSeparator + projectName + styleName.toLower() + ".qrc")){

@@ -91,7 +91,7 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromValue(const i
 bool CGuiElementRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtgui::IGuiElementContainer* guiElementPtr = dynamic_cast<const imtgui::IGuiElementContainer*>(&dataModel);
-	if (guiElementPtr != nullptr) {
+	if (guiElementPtr != nullptr){
 		return true;
 	}
 

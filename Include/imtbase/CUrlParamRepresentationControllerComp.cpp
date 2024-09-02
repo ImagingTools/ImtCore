@@ -47,7 +47,7 @@ bool CUrlParamRepresentationControllerComp::GetRepresentationFromValue(
 bool CUrlParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtbase::IUrlParam* urlParamPtr = dynamic_cast<const imtbase::IUrlParam*>(&dataModel);
-	if (urlParamPtr != nullptr) {
+	if (urlParamPtr != nullptr){
 		return true;
 	}
 

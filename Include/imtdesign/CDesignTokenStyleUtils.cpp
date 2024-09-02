@@ -304,7 +304,7 @@ bool CDesignTokenStyleUtils::GetColorRoleGroup(const QString& name, QPalette::Co
 			QRegularExpressionMatch groupRegExMatch;
 			groupRegExMatch = globalMatch.next();
 
-			if(!s_colorGroupNamesMap.contains(groupName)) {
+			if(!s_colorGroupNamesMap.contains(groupName)){
 				return false;
 			}
 
@@ -317,7 +317,7 @@ bool CDesignTokenStyleUtils::GetColorRoleGroup(const QString& name, QPalette::Co
 				roleName.remove(0,1);
 			}
 
-			if(!s_colorRolesNamesMap.contains(roleName)) {
+			if(!s_colorRolesNamesMap.contains(roleName)){
 				return false;
 			}
 
@@ -708,7 +708,7 @@ bool CDesignTokenStyleUtils::CreateCssFont(QByteArray& output, const QFont& font
 	fontStyleString.prepend("font-style: ").append(";\n");
 	output += fontStyleString;
 
-	if(font.weight() > 0) {
+	if(font.weight() > 0){
 		output += "font-weight: ";
 		output += QByteArray::number(font.weight()).append(";\n");
 	}

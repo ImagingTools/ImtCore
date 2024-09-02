@@ -31,7 +31,7 @@ public:
 
 	Q_INVOKABLE inline bool beginChanges(){ return BeginChanges(); }
 	Q_INVOKABLE inline bool endChanges(){ return EndChanges(); }
-	Q_INVOKABLE inline bool copy(const CTreeItemModel* object) { return Copy(object); }
+	Q_INVOKABLE inline bool copy(const CTreeItemModel* object){ return Copy(object); }
 	Q_INVOKABLE inline void setParent(QObject* parent){ SetParent(parent); }
 	Q_INVOKABLE inline imtbase::CTreeItemModel* copyMe(){ return CopyMe(); }
 	Q_INVOKABLE inline bool isEqualWithModel(CTreeItemModel* modelPtr){ return IsEqualWithModel(modelPtr); }
@@ -140,27 +140,27 @@ private:
 	class Item
 	{
 	public:
-		Item() {}
-		~Item() {}
+		Item(){}
+		~Item(){}
 
-		void SetValue(const QByteArray& key, const QVariant& value) {
+		void SetValue(const QByteArray& key, const QVariant& value){
 			if (!m_map.contains(key)){
 				m_keys.append(key);
 			}
 			m_map.insert(key,value);
 		}
-		void RemoveValue(const QByteArray& key) {
+		void RemoveValue(const QByteArray& key){
 			m_map.remove(key); m_keys.removeAll(key);
 		}
-		QVariant Value(const QByteArray& key) {
+		QVariant Value(const QByteArray& key){
 			QVariant res;
 			if(m_map.contains(key))
 				res = m_map.value(key);
 			return res;
 		}
-		void GetKeys(QList<QByteArray>& keys) { keys = m_keys; }
-		bool Contains(const QByteArray& key) { return m_map.contains(key); }
-		bool ContainsKey(const QByteArray& key) { return m_keys.contains(key); }
+		void GetKeys(QList<QByteArray>& keys){ keys = m_keys; }
+		bool Contains(const QByteArray& key){ return m_map.contains(key); }
+		bool ContainsKey(const QByteArray& key){ return m_keys.contains(key); }
 	private:
 		QMap<QByteArray,QVariant> m_map;
 		QList<QByteArray> m_keys;

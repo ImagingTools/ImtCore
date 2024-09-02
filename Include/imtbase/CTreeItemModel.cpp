@@ -64,22 +64,22 @@ bool CTreeItemModel::Copy(const CTreeItemModel* object)
 
 	m_items.clear();
 
-	for (int i = 0; i < object->m_items.count(); i++) {
+	for (int i = 0; i < object->m_items.count(); i++){
 		Item* item = new Item();
 		Item* sourceItem = object->m_items[i];
 
 		QList<QByteArray> keys;
 		sourceItem->GetKeys(keys);
 
-		for (const QByteArray& key : keys) {
+		for (const QByteArray& key : keys){
 			QVariant value = sourceItem->Value(key);
 
 			CTreeItemModel* treeItemModelPtr = nullptr;
-			if (value.isValid()) {
+			if (value.isValid()){
 				treeItemModelPtr = value.value<CTreeItemModel*>();
 			}
 
-			if (treeItemModelPtr != nullptr) {
+			if (treeItemModelPtr != nullptr){
 				CTreeItemModel* subModelPtr = new CTreeItemModel();
 				
 				if (!subModelPtr->Copy(treeItemModelPtr)){
@@ -130,11 +130,11 @@ bool CTreeItemModel::IsEqualWithModel(CTreeItemModel* modelPtr) const
 		return false;
 	}
 
-	if (m_items.size() != modelPtr->m_items.size()) {
+	if (m_items.size() != modelPtr->m_items.size()){
 		return false;
 	}
 
-	for (int i = 0; i < modelPtr->m_items.count(); i++) {
+	for (int i = 0; i < modelPtr->m_items.count(); i++){
 		Item* item = m_items[i];
 		Item* sourceItem = modelPtr->m_items[i];
 
@@ -144,12 +144,12 @@ bool CTreeItemModel::IsEqualWithModel(CTreeItemModel* modelPtr) const
 		QList<QByteArray> keys;
 		sourceItem->GetKeys(keys);
 
-		if (itemKeys.size() != keys.size()) {
+		if (itemKeys.size() != keys.size()){
 			return false;
 		}
 
-		for (const QByteArray& key : keys) {
-			if (!itemKeys.contains(key)) {
+		for (const QByteArray& key : keys){
+			if (!itemKeys.contains(key)){
 				return false;
 			}
 
@@ -157,14 +157,14 @@ bool CTreeItemModel::IsEqualWithModel(CTreeItemModel* modelPtr) const
 			QVariant itemValue = item->Value(key);
 
 			CTreeItemModel* sourceTreeItemModelPtr = sourceValue.value<CTreeItemModel*>();
-			if (sourceTreeItemModelPtr != nullptr) {
+			if (sourceTreeItemModelPtr != nullptr){
 				CTreeItemModel* treeItemModelPtr = itemValue.value<CTreeItemModel*>();
-				if (treeItemModelPtr == nullptr) {
+				if (treeItemModelPtr == nullptr){
 					return false;
 				}
 
 				bool result = sourceTreeItemModelPtr->IsEqualWithModel(treeItemModelPtr);
-				if (!result) {
+				if (!result){
 					return false;
 				}
 			}
@@ -789,7 +789,7 @@ QHash<int, QByteArray> CTreeItemModel::roleNames() const
 
 bool CTreeItemModel::SerializeModel(iser::IArchive& archive)
 {
-	if (!archive.IsStoring()) {
+	if (!archive.IsStoring()){
 		Clear();
 	}
 
@@ -968,14 +968,14 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 {
 	bool retVal = true;
 	QJsonObject::ConstIterator objectIterator = jsonObject.begin();
-	while (objectIterator != jsonObject.end()) {
+	while (objectIterator != jsonObject.end()){
 		QJsonValue jsonValue = objectIterator.value();
 		if (jsonValue.isArray()){
 			CTreeItemModel* treeItemModel = AddTreeModel(objectIterator.key().toUtf8(), index);
 			treeItemModel->SetIsArray(true);
 			QJsonArray jsonArrary = jsonValue.toArray();
 			QJsonArray::ConstIterator arrayIterator = jsonArrary.begin();
-			while (arrayIterator != jsonArrary.end()) {
+			while (arrayIterator != jsonArrary.end()){
 				jsonValue = *arrayIterator;
 				if(jsonValue.isObject()){
 					treeItemModel->InsertNewItem();

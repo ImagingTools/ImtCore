@@ -19,7 +19,7 @@ istd::IFactoryInfo::KeyList CObjectCollectionComp::GetFactoryKeys() const
 {
 	istd::IFactoryInfo::KeyList retVal;
 
-	for (int i = 0; i < m_typeIdsAttrPtr.GetCount(); ++i) {
+	for (int i = 0; i < m_typeIdsAttrPtr.GetCount(); ++i){
 		retVal.insert(m_typeIdsAttrPtr[i]);
 	}
 
@@ -80,7 +80,7 @@ CObjectCollectionComp::DataPtr CObjectCollectionComp::CreateObjectInstance(const
 	if (factoryIndex >= 0){
 		if (factoryIndex < m_objectFactoriesCompPtr.GetCount()){
 			icomp::IComponent* compPtr = m_objectFactoriesCompPtr.CreateComponent(factoryIndex);
-			return DataPtr(DataPtr::RootObjectPtr(compPtr), [compPtr, this]() {
+			return DataPtr(DataPtr::RootObjectPtr(compPtr), [compPtr, this](){
 				return m_objectFactoriesCompPtr.ExtractInterface(compPtr);
 			});
 		}

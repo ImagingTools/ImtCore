@@ -119,7 +119,7 @@ imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds(
 
 	int elementsCount = count >= 0 ? qMin(count, m_references.count()) : m_references.count();
 
-	for (int i = offset; i < elementsCount; ++i) {
+	for (int i = offset; i < elementsCount; ++i){
 		retVal.push_back(m_references[i].id);
 	}
 

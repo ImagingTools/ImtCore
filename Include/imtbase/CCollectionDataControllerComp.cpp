@@ -62,7 +62,7 @@ QByteArray CCollectionDataControllerComp::ImportFile(
 	const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
 	if (persistencePtr != nullptr){
 		imtbase::IObjectCollection::DataPtr dataPtr(CreateObjectInstance(typeId));
-		if (dataPtr.IsValid()) {
+		if (dataPtr.IsValid()){
 			int state= persistencePtr->LoadFromFile(*dataPtr, sourceFilePath);
 			if (state == ifile::IFilePersistence::OS_OK){
 				QFileInfo fileInfo(sourceFilePath);

@@ -27,7 +27,7 @@ template <class PluginInterface, typename CreateFunction, typename DestroyFuncti
 class TPluginManager: public ilog::CLoggerBase
 {
 public:
-	TPluginManager() {}
+	TPluginManager(){}
 	TPluginManager(const QByteArray& createMethodName, const QByteArray& destroyMethodName, imtbase::IPluginStatusMonitor* pluginStatusMonitorPtr);
 
 	virtual bool LoadPluginDirectory(
@@ -140,7 +140,7 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 						statusMessage = QObject::tr("Plug-in instance creation failed");
 					}
 
-					if (m_pluginStatusMonitorPtr != nullptr) {
+					if (m_pluginStatusMonitorPtr != nullptr){
 						m_pluginStatusMonitorPtr->OnPluginStatusChanged(
 									pluginPath.canonicalFilePath(),
 									pluginName,

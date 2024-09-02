@@ -112,10 +112,10 @@ QByteArray CDesignTokenIconProcessorComp::GetFileNameForState(const QByteArray& 
 
 	QString templateName = fileInfo.completeBaseName();
 	QString iconStatesDir = fileInfo.path() + QDir::separator() + templateName;
-	if (QDir(iconStatesDir).exists()) {
+	if (QDir(iconStatesDir).exists()){
 		QString iconStateFileName;
 
-		switch (iconState) {
+		switch (iconState){
 		case IDesignTokenFileParser::IS_OFF_NORMAL:
 			iconStateFileName = CDesignTokenStyleUtils::s_offNormalColorParamName + QString(".") + fileInfo.suffix();
 			break;
@@ -144,7 +144,7 @@ QByteArray CDesignTokenIconProcessorComp::GetFileNameForState(const QByteArray& 
 			break;
 		}
 
-		if (!iconStateFileName.isEmpty()) {
+		if (!iconStateFileName.isEmpty()){
 			QString iconStateFilePath = iconStatesDir + QDir::separator() + iconStateFileName;
 			if (QFileInfo::exists(iconStateFilePath)){
 				return iconStateFilePath.toLocal8Bit();

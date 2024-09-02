@@ -151,7 +151,7 @@ istd::IChangeable* CFilterCollectionProxy::CloneMe(CompatibilityMode mode) const
 CFilterCollectionProxy::DataPtr CFilterCollectionProxy::CreateObjectInstance(const QByteArray& typeId) const
 {
 	istd::IChangeable* objPtr = BaseClass2::CreateInstance(typeId);
-	return DataPtr(DataPtr::RootObjectPtr(objPtr), [objPtr]() {
+	return DataPtr(DataPtr::RootObjectPtr(objPtr), [objPtr](){
 		return objPtr;
 	});
 }
