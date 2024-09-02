@@ -527,7 +527,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 		stream << itemClassName;
 		stream << QStringLiteral("& ");
 		stream << GetDecapitalizedValue(itemClassName);
-		stream << QStringLiteral("Representation");
+		stream << QStringLiteral("Representation,");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents + 3);
@@ -539,7 +539,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents + 3);
-		stream << QStringLiteral("QString& description");
+		stream << QStringLiteral("QString& description,");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents + 3);

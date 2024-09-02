@@ -439,8 +439,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 	stream << QStringLiteral("imtbase::CTreeItemModel* ");
 	stream << className;
 	stream << ':' << ':';
-	stream << className;
-	stream << QStringLiteral("(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const");
+	stream << QStringLiteral("CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const");
 	FeedStream(stream, 1, false);
 
 	// method's body
