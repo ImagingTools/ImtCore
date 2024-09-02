@@ -27,35 +27,29 @@ int CQmlCodeGeneratorComp::DoProcessing(
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
-	Q_ASSERT(m_qmlKeysFileSuffixAttrPtr.IsValid());
 
 	int retVal = iproc::IProcessor::TS_OK;
 
-	if (!m_argumentParserCompPtr->IsQmlEnabled()) {
+	if (!m_argumentParserCompPtr->IsQmlEnabled()){
 		return retVal;
 	}
 
 	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
-	if (outputDirectoryPath.isEmpty()) {
+	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");
 		I_CRITICAL();
 
 		return iproc::IProcessor::TS_INVALID;
 	}
 
-	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)) {
+	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)){
 		SendErrorMessage(0, QString("Unable to create path '%1'").arg(outputDirectoryPath));
 		I_CRITICAL();
 
 		return iproc::IProcessor::TS_INVALID;
 	}
 
-	if (m_argumentParserCompPtr->IsDependenciesMode()) {
-		SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes();
-		for (const CSdlType& sdlType: sdlTypeList) {
-			std::cout << QString(outputDirectoryPath + '/' + sdlType.GetName() + ".qml").toStdString() << std::endl;
-			std::cout << QString(outputDirectoryPath + '/' + GetQmlKeysWrappedName(sdlType.GetName()) + ".qml").toStdString() << std::endl;
-		}
+	if (m_argumentParserCompPtr->IsDependenciesMode()){
 		// qmldir
 		std::cout << QString(outputDirectoryPath + '/' + "qmldir").toStdString() << std::endl;
 		// generated QRC file
@@ -67,11 +61,10 @@ int CQmlCodeGeneratorComp::DoProcessing(
 	SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes();
 
 	// first create all files with basic mathods
-	for (const CSdlType& sdlType: sdlTypeList) {
+	for (const CSdlType& sdlType: sdlTypeList){
 		m_qmlFilePtr.SetPtr(new QFile(outputDirectoryPath + '/' + sdlType.GetName() + ".qml"));
-		m_qmlKeysFilePtr.SetPtr(new QFile(outputDirectoryPath + '/' + GetQmlKeysWrappedName(sdlType.GetName()) + ".qml"));
 
-		if (!BeginQmlFile(sdlType)) {
+		if (!BeginQmlFile(sdlType)){
 			SendErrorMessage(0, QString("Unable to begin files"));
 			I_CRITICAL();
 
@@ -79,7 +72,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 		}
 
 		// Close files so that extenders can make their own changes
-		if (!CloseFiles()) {
+		if (!CloseFiles()){
 			SendErrorMessage(0, QString("Unable to close files"));
 			I_CRITICAL();
 
@@ -89,22 +82,21 @@ int CQmlCodeGeneratorComp::DoProcessing(
 
 	// Then let extenders to make changes
 	const int extendersCount = m_codeGeneratorExtenderListCompPtr.GetCount();
-	for (int i = 0; i < extendersCount; ++i) {
+	for (int i = 0; i < extendersCount; ++i){
 		iproc::IProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
 		Q_ASSERT(extenderPtr != nullptr);
 
 		const int extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
-		if (extenderResult != iproc::IProcessor::TS_OK) {
+		if (extenderResult != iproc::IProcessor::TS_OK){
 			return extenderResult;
 		}
 		retVal = qMax(retVal, extenderResult);
 	}
 
 	// Reopen files to complete processing
-	for (const CSdlType& sdlType: sdlTypeList) {
+	for (const CSdlType& sdlType: sdlTypeList){
 		m_qmlFilePtr.SetPtr(new QFile(outputDirectoryPath + '/' + sdlType.GetName() + ".qml"));
-		m_qmlKeysFilePtr.SetPtr(new QFile(outputDirectoryPath + '/' + GetQmlKeysWrappedName(sdlType.GetName()) + ".qml"));
-		if (!ReOpenFiles()) {
+		if (!ReOpenFiles()){
 			SendErrorMessage(0, QString("Unable to reopen files"));
 			I_CRITICAL();
 
@@ -117,7 +109,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 
 	// then create a qmldir file
 	QFile qmldirFile(outputDirectoryPath + "/qmldir");
-	if (!qmldirFile.open(QIODevice::WriteOnly)) {
+	if (!qmldirFile.open(QIODevice::WriteOnly)){
 		SendErrorMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 							 .arg(qmldirFile.fileName(), qmldirFile.errorString()));
@@ -131,26 +123,18 @@ int CQmlCodeGeneratorComp::DoProcessing(
 	qmldirStream << QStringLiteral("module ");
 	qmldirStream << currentNamespace;
 	FeedStream(qmldirStream, 2, false);
-	for (const CSdlType& sdlType: sdlTypeList) {
+	for (const CSdlType& sdlType: sdlTypeList){
 		// add QML file
 		qmldirStream << sdlType.GetName();
 		qmldirStream << QStringLiteral(" 1.0 ");
 		qmldirStream << sdlType.GetName();
 		qmldirStream << QStringLiteral(".qml");
 		FeedStream(qmldirStream, 1, false);
-
-		// add QML Keys file as singleton
-		qmldirStream << QStringLiteral("singleton ");
-		qmldirStream << GetQmlKeysWrappedName(sdlType.GetName());
-		qmldirStream << QStringLiteral(" 1.0 ");
-		qmldirStream << GetQmlKeysWrappedName(sdlType.GetName());
-		qmldirStream << QStringLiteral(".qml");
-		FeedStream(qmldirStream, 1, false);
 	}
 
 	// and finally create a QRC file
 	QFile qrcFile(outputDirectoryPath + "/" + currentNamespace + ".qrc");
-	if (!qrcFile.open(QIODevice::WriteOnly)) {
+	if (!qrcFile.open(QIODevice::WriteOnly)){
 		SendErrorMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 							 .arg(qrcFile.fileName(), qrcFile.errorString()));
@@ -168,17 +152,11 @@ int CQmlCodeGeneratorComp::DoProcessing(
 	xmlWriter.writeAttribute("prefix", "/qml");
 
 	// add QML files
-	for (const CSdlType& sdlType: sdlTypeList) {
+	for (const CSdlType& sdlType: sdlTypeList){
 		// add QML file
 		xmlWriter.writeStartElement("file");
 		xmlWriter.writeAttribute("alias", currentNamespace + '/' + sdlType.GetName() + ".qml");
 		xmlWriter.writeCharacters(sdlType.GetName() + ".qml");
-		xmlWriter.writeEndElement();
-
-		// add QML Keys file
-		xmlWriter.writeStartElement("file");
-		xmlWriter.writeAttribute("alias", currentNamespace + '/' + GetQmlKeysWrappedName(sdlType.GetName()) + ".qml");
-		xmlWriter.writeCharacters(GetQmlKeysWrappedName(sdlType.GetName()) + ".qml");
 		xmlWriter.writeEndElement();
 	}
 	// also add qmldir file
@@ -202,20 +180,10 @@ int CQmlCodeGeneratorComp::DoProcessing(
 
 bool CQmlCodeGeneratorComp::ReOpenFiles()
 {
-	if (!m_qmlFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)) {
+	if (!m_qmlFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
 		SendErrorMessage(0,
 					QString("Unable to open file: '%1'. Error: %2")
 							 .arg(m_qmlFilePtr->fileName(), m_qmlFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
-	}
-
-	if (!m_qmlKeysFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)) {
-		SendErrorMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
-							 .arg(m_qmlKeysFilePtr->fileName(), m_qmlKeysFilePtr->errorString()));
 
 		AbortCurrentProcessing();
 
@@ -233,29 +201,16 @@ bool CQmlCodeGeneratorComp::CloseFiles()
 	retVal = m_qmlFilePtr->flush();
 	m_qmlFilePtr->close();
 
-	retVal = retVal && m_qmlKeysFilePtr->flush();
-	Q_ASSERT(retVal);
-
-	m_qmlKeysFilePtr->close();
-
 	return retVal;
 }
 
 
 bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 {
-	if (!m_qmlFilePtr->open(QIODevice::WriteOnly)) {
+	if (!m_qmlFilePtr->open(QIODevice::WriteOnly)){
 		SendErrorMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 							 .arg(m_qmlFilePtr->fileName(), m_qmlFilePtr->errorString()));
-
-		return false;
-	}
-
-	if (!m_qmlKeysFilePtr->open(QIODevice::WriteOnly)) {
-		SendErrorMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
-							 .arg(m_qmlKeysFilePtr->fileName(), m_qmlKeysFilePtr->errorString()));
 
 		return false;
 	}
@@ -278,12 +233,12 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 
 
 	// container's props
-	for (const CSdlField& sdlField: sdlType.GetFields()) {
+	for (const CSdlField& sdlField: sdlType.GetFields()){
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 1);
 
 		ifStream << QStringLiteral("property ");
-		if (sdlField.IsArray()) {
+		if (sdlField.IsArray()){
 			ifStream << QStringLiteral("BaseModel");
 		}
 		else {
@@ -293,7 +248,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 		ifStream << QStringLiteral(" m_") << GetDecapitalizedValue(sdlField.GetId());
 		bool isCustom = false;
 		QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
-		if (!isCustom) {
+		if (!isCustom){
 			ifStream << ':' << ' ';
 			if (convertedType == QStringLiteral("int") ||
 				convertedType == QStringLiteral("real") ||
@@ -301,7 +256,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 			{
 				ifStream << QStringLiteral("0");
 			}
-			else if (convertedType == QStringLiteral("bool")) {
+			else if (convertedType == QStringLiteral("bool")){
 				ifStream << QStringLiteral("false");
 			}
 			else if (convertedType == QStringLiteral("string"))
@@ -329,11 +284,11 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	// getJSONKeyForProperty
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("function getJSONKeyForProperty(propertyId) {");
+	ifStream << QStringLiteral("function getJSONKeyForProperty(propertyId){");
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 2);
-	ifStream << QStringLiteral("switch (propertyId) {");
-	for (const CSdlField& sdlField: sdlType.GetFields()) {
+	ifStream << QStringLiteral("switch (propertyId){");
+	for (const CSdlField& sdlField: sdlType.GetFields()){
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 3);
 		ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId());
@@ -349,14 +304,14 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	// createComponent (custom and arrays only)
 	FeedStream(ifStream, 2, false);
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("function createComponent(propertyId) {");
+	ifStream << QStringLiteral("function createComponent(propertyId){");
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 2);
-	ifStream << QStringLiteral("switch (propertyId) {");
-	for (const CSdlField& sdlField: sdlType.GetFields()) {
+	ifStream << QStringLiteral("switch (propertyId){");
+	for (const CSdlField& sdlField: sdlType.GetFields()){
 		bool isCustom = false;
 		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
-		if (!isCustom && !sdlField.IsArray()) {
+		if (!isCustom && !sdlField.IsArray()){
 			// skip simple scalars
 			continue;
 		}
@@ -377,7 +332,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	// createMe
 	FeedStream(ifStream, 2, false);
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("function createMe() {");
+	ifStream << QStringLiteral("function createMe(){");
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 2);
 	ifStream << QStringLiteral("return Qt.createComponent('");
@@ -389,28 +344,6 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 
 	FeedStream(ifStream, 1, false);
 
-	// -----fill QML keys file
-	QTextStream qmlKeyFileStream(m_qmlKeysFilePtr.GetPtr());
-
-	// Begin QtObject
-	qmlKeyFileStream << QStringLiteral("pragma Singleton");
-	FeedStream(qmlKeyFileStream, 2, false);
-	qmlKeyFileStream << QStringLiteral("import QtQuick 2.0");
-	FeedStream(qmlKeyFileStream, 2, false);
-
-	qmlKeyFileStream << QStringLiteral("QtObject {");
-	for (const CSdlField& sdlField: sdlType.GetFields()) {
-		FeedStream(qmlKeyFileStream, 1, false);
-		FeedStreamHorizontally(qmlKeyFileStream, 1);
-
-		// use 's_' prefix to avoid ambiguity
-		qmlKeyFileStream << QStringLiteral("readonly property string s_");
-		qmlKeyFileStream << GetDecapitalizedValue(sdlField.GetId());
-		qmlKeyFileStream << QStringLiteral(": '");
-		qmlKeyFileStream << sdlField.GetId() << '\'';
-	}
-	FeedStream(qmlKeyFileStream, 1, false);
-
 	return true;
 }
 
@@ -421,10 +354,6 @@ bool CQmlCodeGeneratorComp::EndQmlFile(const CSdlType& /*sdlType*/)
 	ifStream << '}';
 	FeedStream(ifStream, 2);
 
-	QTextStream qmlKeyFileStream(m_qmlKeysFilePtr.GetPtr());
-	qmlKeyFileStream << '}';
-	FeedStream(qmlKeyFileStream, 2);
-
 	return true;
 }
 
@@ -432,17 +361,10 @@ bool CQmlCodeGeneratorComp::EndQmlFile(const CSdlType& /*sdlType*/)
 void CQmlCodeGeneratorComp::AbortCurrentProcessing()
 {
 	m_qmlFilePtr->close();
-	m_qmlKeysFilePtr->close();
 
 	I_CRITICAL();
 
 	m_qmlFilePtr->remove();
-	m_qmlKeysFilePtr->remove();
-}
-
-QString CQmlCodeGeneratorComp::GetQmlKeysWrappedName(const QString& originalName) const
-{
-	return originalName + *m_qmlKeysFileSuffixAttrPtr;
 }
 
 

@@ -14,7 +14,7 @@
     <EmbeddedRegistries>
         <EmbededRegistry Id="CodeGenWorker">
             <PositionMap>
-                <Element ComponentName="QmlCodeGenerator" X="550" Y="200" Note=""/>
+                <Element ComponentName="QmlCodeGenFramework" X="550" Y="225" Note=""/>
                 <Element ComponentName="SdlClassCodeGenerator" X="175" Y="425" Note=""/>
                 <Element ComponentName="SdlCoreFramework" X="550" Y="425" Note=""/>
                 <Element ComponentName="SdlGqlCodeGeneratorFramework" X="550" Y="700" Note=""/>

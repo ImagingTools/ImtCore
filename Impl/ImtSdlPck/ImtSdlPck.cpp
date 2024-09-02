@@ -45,6 +45,11 @@ I_EXPORT_COMPONENT(
 		"Schema Definition Language SDL QML Class Generator")
 
 I_EXPORT_COMPONENT(
+			QmlCodeMetaGenerator,
+			"The QML meta info generator of SDL types",
+			"Schema Definition Language SDL QML Class Generator")
+
+I_EXPORT_COMPONENT(
 			SdlClassTreeModelModificator,
 			"The C++ class modificator, adds saving and loading generated SDL types to TreeItemModel",
 			"Schema Definition Language SDL Class Generator Tree Item Model")
