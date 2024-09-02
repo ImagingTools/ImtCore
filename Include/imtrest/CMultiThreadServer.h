@@ -8,7 +8,10 @@
 #include <QtCore/QPointer>
 #include <QtCore/QReadWriteLock>
 #include <QtNetwork/QTcpSocket>
+
+#if QT_VERSION >= 0x060400
 #include <QtNetwork/QSslServer>
+#endif
 #include <QtNetwork/QSslConfiguration>
 
 // ImtCore  includes
@@ -108,13 +111,21 @@ private:
 
 
 class CMultiThreadServer :
-			public QSslServer,
+#if QT_VERSION >= 0x060400
+		public QSslServer,
+#else
+		public QTcpServer,
+#endif
 			virtual public ilog::CLoggerBase,
 			virtual public IRequestManager
 {
 	Q_OBJECT
 public:
+#if QT_VERSION >= 0x060400
 	typedef QSslServer BaseClass;
+#else
+	typedef QTcpServer BaseClass;
+#endif
 	typedef ilog::CLoggerBase BaseClass2;
 
 	explicit CMultiThreadServer(CTcpServerComp* rootServer);

@@ -300,7 +300,11 @@ IRequest* CSocketThread::CreateRequest()
 
 
 CMultiThreadServer::CMultiThreadServer(CTcpServerComp* rootServer)
-	:QSslServer((QObject*)rootServer),
+#if QT_VERSION >= 0x060400
+	:QSslServer(rootServer),
+#else
+	:QTcpServer(rootServer),
+#endif
 	m_rootServer(*rootServer),
 	m_threadSocketListGuard(QReadWriteLock::Recursive),
 	m_isActive(true),
