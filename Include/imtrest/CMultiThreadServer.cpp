@@ -111,7 +111,8 @@ IRequest* CSocket::CreateRequest()
 
 
 // reimplemented (IRequestHandler)
-bool CSocket::IsCommandSupported(const QByteArray& commandId) const
+
+bool CSocket::IsCommandSupported(const QByteArray& /*commandId*/) const
 {
 	return true;
 }
@@ -145,7 +146,7 @@ bool CSocket::SendResponse(ConstResponsePtr& response) const
 }
 
 
-bool CSocket::SendRequest(ConstRequestPtr& reguest) const
+bool CSocket::SendRequest(ConstRequestPtr& /*reguest*/) const
 {
 	return false;
 }
@@ -289,9 +290,6 @@ void CMultiThreadServer::SetSslConfiguration(const QSslConfiguration& sslConfigu
 	}
 
 	m_sslConfiguration = sslConfiguration;
-
-	// BaseClass::setSslConfiguration(sslConfiguration);
-	// SetSslConfiguration(sslConfiguration);
 }
 
 
@@ -324,7 +322,7 @@ void CMultiThreadServer::Disconnected(QByteArray requestId)
 	SendLogMessage(
 				istd::IInformationProvider::InformationCategory::IC_NONE,
 				__LINE__,
-				QString("Socket '%1' disconnected").arg(requestId),
+				QString("Socket '%1' disconnected").arg(qPrintable(requestId)),
 				__func__);
 
 	QMutableListIterator socketIterator(m_socketList);
@@ -336,8 +334,8 @@ void CMultiThreadServer::Disconnected(QByteArray requestId)
 
 			continue;
 		}
-		QByteArray requestId = socketPtr->GetRequestId();
-		if (requestId.isEmpty() || requestId == requestId){
+		QByteArray socketRequestId = socketPtr->GetRequestId();
+		if (requestId.isEmpty() || socketRequestId == requestId){
 			socketPtr->deleteLater();
 			socketIterator.remove();
 		}
