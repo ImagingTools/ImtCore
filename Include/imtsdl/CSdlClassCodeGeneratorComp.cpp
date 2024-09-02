@@ -66,7 +66,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
 		SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes();
 		for (const CSdlType& sdlType: sdlTypeList){
-			if (!joinHeaders) {
+			if (!joinHeaders){
 				std::cout << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h").toStdString() << std::endl;
 			}
 			if (!joinSources){

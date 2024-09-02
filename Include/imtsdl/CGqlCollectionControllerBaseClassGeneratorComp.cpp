@@ -61,7 +61,7 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 	SdlDocumentTypeList sdlDocumentTypeList = m_sdlDocumentListCompPtr->GetDocumentTypes();
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
 		for (const CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){
-			if (!joinHeaders) {
+			if (!joinHeaders){
 				std::cout << WrapFileName(sdlDocumentType.GetName(), QStringLiteral("h"), outputDirectoryPath).toStdString() << std::endl;
 			}
 			if (!joinSources){
@@ -577,7 +577,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplFor
 				CSdlDocumentType::OT_LIST});
 
 	// join update and insert. it has same code
-	if (requestInfoMultiMap.contains(CSdlDocumentType::OT_INSERT) && requestInfoMultiMap.contains(CSdlDocumentType::OT_UPDATE)) {
+	if (requestInfoMultiMap.contains(CSdlDocumentType::OT_INSERT) && requestInfoMultiMap.contains(CSdlDocumentType::OT_UPDATE)){
 		remainingOperations.removeAll(CSdlDocumentType::OT_UPDATE);
 		const QList<ImplGenerationInfo> requestList = requestInfoMultiMap.values(CSdlDocumentType::OT_UPDATE);
 		for (const ImplGenerationInfo& requestInfo: requestList){
@@ -605,7 +605,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	FeedStreamHorizontally(stream, hIndents);
 
 	// a) type
-	switch (operationType) {
+	switch (operationType){
 	case CSdlDocumentType::OT_GET:
 	case CSdlDocumentType::OT_LIST:
 		stream << QStringLiteral("bool ");
@@ -626,7 +626,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	stream << className << ':' << ':';
 
 	// b) name and argset
-	switch (operationType) {
+	switch (operationType){
 	case CSdlDocumentType::OT_LIST:
 		stream << QStringLiteral("SetupGqlItem(const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel, int itemIndex,const imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const");
 		break;
@@ -672,7 +672,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		AddImplCodeForRequest(stream, sdlRequest, operationType, hIndents + 1);
 	}
 
-	switch (operationType) {
+	switch (operationType){
 	case CSdlDocumentType::OT_LIST:
 	case CSdlDocumentType::OT_GET:
 		FeedStreamHorizontally(stream, hIndents + 1);

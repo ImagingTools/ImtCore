@@ -61,7 +61,7 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 	SdlRequestList sdlRequestList = m_sdlRequestListCompPtr->GetRequests();
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
 		for (const CSdlRequest& sdlRequest: sdlRequestList){
-			if (!joinHeaders) {
+			if (!joinHeaders){
 				std::cout << QString(outputDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.h").toStdString() << std::endl;
 			}
 			if (!joinSources){
@@ -599,7 +599,7 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 		// add custom types for nested structs creation
 		bool isCustom = false;
 		ConvertType(fieldFromType, &isCustom);
-		if (isCustom) {
+		if (isCustom){
 			customTypes << fieldFromType;
 		}
 	}

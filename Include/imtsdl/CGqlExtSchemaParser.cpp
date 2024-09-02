@@ -134,7 +134,7 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 		}
 		// extract operations
 		else if (keyword == QByteArrayLiteral("operations")){
-			while (!m_stream.atEnd()) {
+			while (!m_stream.atEnd()){
 				QByteArray operationTypeId;
 				retVal = retVal && ReadToDelimeter(":{}", operationTypeId, &foundDelimiter);
 				operationTypeId = operationTypeId.trimmed();
