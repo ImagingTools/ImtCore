@@ -292,7 +292,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 
 	// class begin
 	FeedStream(ifStream, 2, false);
-	ifStream << QStringLiteral("class C") << GetBaseFileName() << QStringLiteral("CollectionControllerCompBase");
+	ifStream << QStringLiteral("class C") << GetBaseFileName() << QStringLiteral("GraphQlHandlerCompBase");
 	FeedStream(ifStream, 1, false);
 	ifStream << QStringLiteral("{");
 	FeedStream(ifStream, 1, false);
@@ -431,7 +431,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream
 
 void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTextStream& stream, uint hIndents)
 {
-	const QString className = 'C' + GetBaseFileName() + QStringLiteral("CollectionControllerCompBase");
+	const QString className = 'C' + GetBaseFileName() + QStringLiteral("GraphQlHandlerCompBase");
 	const SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests();
 
 	// declare method
