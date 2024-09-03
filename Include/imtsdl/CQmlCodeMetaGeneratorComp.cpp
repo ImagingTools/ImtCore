@@ -98,6 +98,13 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 	}
 
 
+	loadStatus = m_qmldirFilePersistanceCompPtr->SaveToFile(qmldirFileData, outputDirectoryPath + "/qmldir2");
+	if (loadStatus != ifile::IFilePersistence::OS_OK){
+		SendErrorMessage(0, QString("Unable to save qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir2"));
+
+		return TS_INVALID;
+	}
+
 
 
 

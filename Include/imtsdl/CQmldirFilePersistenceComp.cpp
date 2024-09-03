@@ -7,6 +7,7 @@
 #include <QtCore/QRegularExpressionMatch>
 
 // ACF includes
+#include <iprm/TParamsPtr.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/CNameParam.h>
 #include <iprm/CEnableableParam.h>
@@ -172,7 +173,58 @@ int CQmldirFilePersistenceComp::SaveToFile(
 	ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 
-	return OS_FAILED;
+	const iprm::CParamsSet* paramsSetPtr = nullptr;
+
+	try {
+		const iprm::CParamsSet& paramsSetRef = dynamic_cast<const iprm::CParamsSet&>(data);
+		paramsSetPtr = &paramsSetRef;
+	}
+	catch (std::bad_cast& ex){
+		SendCriticalMessage(0, "Unexpected input data", __func__);
+		I_CRITICAL();
+
+		return false;
+	}
+	Q_ASSERT(paramsSetPtr != nullptr);
+
+	QFile saveFile(filePath);
+	if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text)){
+		SendErrorMessage(0, QString("Unable to open file '%1'").arg(saveFile.fileName()), __func__);
+
+		return OS_FAILED;
+	}
+
+	QTextStream fileStream(&saveFile);
+
+	// module name
+	iprm::TParamsPtr<iprm::INameParam> moduleNameParam(paramsSetPtr, s_moduleNameParamId);
+	if (!moduleNameParam.IsValid()){
+		SendErrorMessage(0, QString("Name param '%1' is missing").arg(s_moduleNameParamId));
+		I_CRITICAL();
+
+		return OS_FAILED;
+	}
+	fileStream << QStringLiteral("module ") << moduleNameParam->GetName();
+	fileStream << Qt::endl << Qt::endl;
+
+	// QML objects
+	iprm::TParamsPtr<iprm::IParamsManager> objectEntriesManagerPtr(paramsSetPtr, s_objectsParamId, false);
+	if (objectEntriesManagerPtr.IsValid() && objectEntriesManagerPtr->GetParamsSetsCount() > 0){
+		int objectsCount = objectEntriesManagerPtr->GetParamsSetsCount();
+		for (int objectEntryIndex = 0; objectEntryIndex > objectsCount; ++objectEntryIndex){
+			iprm::IParamsSet* objectEntryParamsSetPtr = objectEntriesManagerPtr->GetParamsSet(objectEntryIndex);
+			if (objectEntryParamsSetPtr == nullptr){
+				SendCriticalMessage(0, "Unable to create params set for entry", __func__);
+				I_CRITICAL();
+
+				return OS_FAILED;
+			}
+
+
+		}
+	}
+
+	return OS_OK;
 }
 
 
