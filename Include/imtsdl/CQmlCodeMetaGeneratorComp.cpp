@@ -8,9 +8,11 @@
 //Acf includes
 #include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
+#include <iprm/IParamsManager.h>
 
 // imtsdl includes
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CQmldirFilePersistenceComp.cpp>
 
 
 namespace imtsdl
@@ -89,59 +91,68 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 		EndQmlFile(sdlType);
 	}
 
-	iprm::CParamsSet qmldirFileData;
-	int loadStatus = m_qmldirFilePersistanceCompPtr->LoadFromFile(qmldirFileData, outputDirectoryPath + "/qmldir");
+	// then update a qmldir file
+	iprm::CParamsSet qmldirDataParams;
+	int loadStatus = m_qmldirFilePersistanceCompPtr->LoadFromFile(qmldirDataParams, outputDirectoryPath + "/qmldir");
 	if (loadStatus != ifile::IFilePersistence::OS_OK){
 		SendErrorMessage(0, QString("Unable to load qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
 
 		return TS_INVALID;
 	}
 
-
-	loadStatus = m_qmldirFilePersistanceCompPtr->SaveToFile(qmldirFileData, outputDirectoryPath + "/qmldir2");
-	if (loadStatus != ifile::IFilePersistence::OS_OK){
-		SendErrorMessage(0, QString("Unable to save qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir2"));
-
-		return TS_INVALID;
-	}
-
-
-
-
-
-
-
-	// then create a qmldir file
-	QFile qmldirFile(outputDirectoryPath + "/qmldir");
-	if (!qmldirFile.open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
-							 .arg(qmldirFile.fileName(), qmldirFile.errorString()));
+	const QString currentNamespace = m_argumentParserCompPtr->GetNamespace();
+	iprm::IParamsManager* objectsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(qmldirDataParams.GetEditableParameter(CQmldirFilePersistenceComp::s_objectsParamId));
+	if (objectsParamsManagerPtr == nullptr){
+		SendCriticalMessage(0, "Invalid params created");
 		I_CRITICAL();
 
 		return TS_INVALID;
 	}
 
-	const QString currentNamespace = m_argumentParserCompPtr->GetNamespace();
-	QTextStream qmldirStream(&qmldirFile);
-	qmldirStream << QStringLiteral("module ");
-	qmldirStream << currentNamespace;
-	FeedStream(qmldirStream, 2, false);
 	for (const CSdlType& sdlType: sdlTypeList){
-		// add QML file
-		qmldirStream << sdlType.GetName();
-		qmldirStream << QStringLiteral(" 1.0 ");
-		qmldirStream << sdlType.GetName();
-		qmldirStream << QStringLiteral(".qml");
-		FeedStream(qmldirStream, 1, false);
+		// create paramsset to store object
+		iprm::CParamsSet qmlObjectParams;
 
-		// add QML Keys file as singleton
-		qmldirStream << QStringLiteral("singleton ");
-		qmldirStream << GetQmlKeysWrappedName(sdlType.GetName());
-		qmldirStream << QStringLiteral(" 1.0 ");
-		qmldirStream << GetQmlKeysWrappedName(sdlType.GetName());
-		qmldirStream << QStringLiteral(".qml");
-		FeedStream(qmldirStream, 1, false);
+		// set singleton
+		iprm::CEnableableParam isSingletonParam(true);
+		qmlObjectParams.SetEditableParameter(CQmldirFilePersistenceComp::s_objectIsSingletonParamId, &isSingletonParam);
+
+		// get object's info
+		// a) type
+		iprm::CNameParam objectNameParam;
+		objectNameParam.SetName(GetQmlKeysWrappedName(sdlType.GetName()));
+		qmlObjectParams.SetEditableParameter(CQmldirFilePersistenceComp::s_objectTypeNameParamId, &objectNameParam);
+		// b) version
+		iprm::CNameParam objectVerionNameParam;
+		objectVerionNameParam.SetName(QStringLiteral(" 1.0 "));
+		qmlObjectParams.SetEditableParameter(CQmldirFilePersistenceComp::s_objectVersionNameParamId, &objectVerionNameParam);
+		// c) file
+		iprm::CNameParam objectFileNameParam;
+		objectFileNameParam.SetName(GetQmlKeysWrappedName(sdlType.GetName()));
+		qmlObjectParams.SetEditableParameter(CQmldirFilePersistenceComp::s_objectFileNameParamId, &objectFileNameParam);
+
+		int indexOfInsertedSet = objectsParamsManagerPtr->InsertParamsSet();
+		iprm::IParamsSet* objectEntryParamsSetPtr = objectsParamsManagerPtr->GetParamsSet(indexOfInsertedSet);
+		if (objectEntryParamsSetPtr == nullptr){
+			SendCriticalMessage(0, "Unable to create params set for entry", __func__);
+			I_CRITICAL();
+
+			return TS_INVALID;
+		}
+		const bool isCopied = objectEntryParamsSetPtr->CopyFrom(qmlObjectParams);
+		if (!isCopied){
+			SendCriticalMessage(0, "Unable to set params set for entry", __func__);
+			I_CRITICAL();
+
+			return TS_INVALID;
+		}
+	}
+
+	int saveStatus = m_qmldirFilePersistanceCompPtr->SaveToFile(qmldirDataParams, outputDirectoryPath + "/qmldir");
+	if (saveStatus != ifile::IFilePersistence::OS_OK){
+		SendErrorMessage(0, QString("Unable to save qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
+
+		return TS_INVALID;
 	}
 
 	// and finally create a QRC file

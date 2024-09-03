@@ -83,7 +83,8 @@ int CQmldirFilePersistenceComp::LoadFromFile(
 
 	QTextStream fileStream(&loadFile);
 
-	istd::TDelPtr<iprm::IParamsManager> objectEntriesManagerPtr(m_paramsManagerFactComp.CreateInstance());
+	iprm::IParamsManager* objectEntriesManagerPtr(m_paramsManagerFactComp.CreateInstance());
+	paramsSetPtr->SetEditableParameter(s_objectsParamId, objectEntriesManagerPtr, true);
 	quint64 lastReadLine = 0;
 	while(!fileStream.atEnd()){
 		QString readLine = fileStream.readLine();
@@ -157,9 +158,6 @@ int CQmldirFilePersistenceComp::LoadFromFile(
 			}
 		}
 	}
-	if (objectEntriesManagerPtr->GetParamsSetsCount() > 0){
-		paramsSetPtr->SetEditableParameter(s_objectsParamId, objectEntriesManagerPtr.PopPtr(), true);
-	}
 
 	return OS_OK;
 }
@@ -180,7 +178,7 @@ int CQmldirFilePersistenceComp::SaveToFile(
 		paramsSetPtr = &paramsSetRef;
 	}
 	catch (std::bad_cast& ex){
-		SendCriticalMessage(0, "Unexpected input data", __func__);
+		SendCriticalMessage(0, QString("Unexpected input data. Error: %1").arg(ex.what()), __func__);
 		I_CRITICAL();
 
 		return false;
@@ -211,16 +209,55 @@ int CQmldirFilePersistenceComp::SaveToFile(
 	iprm::TParamsPtr<iprm::IParamsManager> objectEntriesManagerPtr(paramsSetPtr, s_objectsParamId, false);
 	if (objectEntriesManagerPtr.IsValid() && objectEntriesManagerPtr->GetParamsSetsCount() > 0){
 		int objectsCount = objectEntriesManagerPtr->GetParamsSetsCount();
-		for (int objectEntryIndex = 0; objectEntryIndex > objectsCount; ++objectEntryIndex){
+		for (int objectEntryIndex = 0; objectEntryIndex < objectsCount; ++objectEntryIndex){
 			iprm::IParamsSet* objectEntryParamsSetPtr = objectEntriesManagerPtr->GetParamsSet(objectEntryIndex);
 			if (objectEntryParamsSetPtr == nullptr){
-				SendCriticalMessage(0, "Unable to create params set for entry", __func__);
+				SendCriticalMessage(0, "Unable to get params set for entry", __func__);
 				I_CRITICAL();
 
 				return OS_FAILED;
 			}
 
+			// determine whether an object is a singleton
+			iprm::TParamsPtr<iprm::IEnableableParam> singletonParamPtr(objectEntryParamsSetPtr, s_objectIsSingletonParamId, false);
+			if (singletonParamPtr.IsValid()){
+				bool isSingleton = singletonParamPtr->IsEnabled();
+				// write singleton directive for entry
+				if (isSingleton){
+					fileStream << QStringLiteral("singleton ");
+				}
+			}
 
+			// write object's info
+			// a) type
+			iprm::TParamsPtr<iprm::CNameParam> objectNameParamPtr(objectEntryParamsSetPtr, s_objectTypeNameParamId, true);
+			if (!objectNameParamPtr.IsValid()){
+				SendErrorMessage(0, "Object name param is missing!");
+
+				return OS_FAILED;
+			}
+			fileStream << objectNameParamPtr->GetName() << ' ';
+
+			// b) version
+			iprm::TParamsPtr<iprm::CNameParam> objectVerionNameParamPtr(objectEntryParamsSetPtr, s_objectVersionNameParamId, true);
+			if (!objectVerionNameParamPtr.IsValid()){
+				SendErrorMessage(0, "Object version name param is missing!");
+
+				return OS_FAILED;
+			}
+			fileStream << objectVerionNameParamPtr->GetName() << ' ';
+
+			// c) file
+			iprm::TParamsPtr<iprm::CNameParam> objectFileNameParamPtr(objectEntryParamsSetPtr, s_objectFileNameParamId, true);
+			if (!objectFileNameParamPtr.IsValid()){
+				SendErrorMessage(0, "Object file name param is missing!");
+
+				return OS_FAILED;
+			}
+			fileStream << objectFileNameParamPtr->GetName() << ' ';
+
+			// end of object
+			fileStream << Qt::endl;
 		}
 	}
 
