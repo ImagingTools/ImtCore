@@ -99,7 +99,7 @@ int CQmldirFilePersistenceComp::LoadFromFile(
 		}
 
 		// QML Object
-		static QRegularExpression qmlObjectRegExp("^\\s*(?:singleton)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)");
+		static QRegularExpression qmlObjectRegExp("^\\s*(?:singleton\\s+){0,1}(\\S+)\\s+(\\S+)\\s+(\\S+)");
 		QRegularExpressionMatch qmlObjectRegExpMatch = qmlObjectRegExp.match(readLine);
 		if (qmlObjectRegExpMatch.hasMatch()){
 			// collect all object info
@@ -135,7 +135,7 @@ int CQmldirFilePersistenceComp::LoadFromFile(
 			qmlObjectParams.SetEditableParameter(s_objectVersionNameParamId, &objectVerionNameParam);
 			// c) file
 			iprm::CNameParam objectFileNameParam;
-			objectFileNameParam.SetName(capturedTexts[3]);
+			objectFileNameParam.SetName(capturedTexts[2]);
 			qmlObjectParams.SetEditableParameter(s_objectFileNameParamId, &objectFileNameParam);
 
 			// insert params set to object entries manager
