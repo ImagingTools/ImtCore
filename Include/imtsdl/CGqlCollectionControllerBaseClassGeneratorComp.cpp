@@ -784,7 +784,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QText
 
 		// [1->2] checks write validate
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("if (!isRepresentationCreated){");
+		stream << QStringLiteral("if (!isRepresentationWritted){");
 		FeedStream(stream, 1, false);
 
 		// [2] return
