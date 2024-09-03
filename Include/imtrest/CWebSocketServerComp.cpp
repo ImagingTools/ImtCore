@@ -1,10 +1,10 @@
-#include "iprm/IEnableableParam.h"
-#include "iprm/TParamsPtr.h"
 #include <imtrest/CWebSocketServerComp.h>
 
 
 // ACF includes
 #include <istd/TDelPtr.h>
+#include <iprm/IEnableableParam.h>
+#include <iprm/TParamsPtr.h>
 
 // ImtCore includes
 #include <imtrest/CWebSocketRequest.h>
@@ -93,8 +93,9 @@ bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 p
 		webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
 	}
 	if (webSocketServerPtr->listen(address, port)){
-		SendInfoMessage(0, QString("Web socket server successfully started on port %1").arg(port));
-		qDebug() << QString("Tcp server successfully started on port %1").arg(port);
+		QString message = QString("Web socket server successfully started on port %1").arg(port);
+		SendInfoMessage(0, message);
+		qDebug() << message;
 
 		connect(webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
 		connect(webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
@@ -105,7 +106,7 @@ bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 p
 		return true;
 	}
 	else{
-		SendErrorMessage(0, QString("Server could not be started on port %1").arg(port));
+		SendErrorMessage(0, QString("Web socket server could not be started on port %1").arg(port));
 	}
 
 	return false;

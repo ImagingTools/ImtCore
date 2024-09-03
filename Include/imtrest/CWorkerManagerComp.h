@@ -9,74 +9,13 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtrest/IRequest.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IRequestManager.h>
+#include <imtrest/CWorkerThread.h>
 
 
 namespace imtrest
 {
-
-class CWorkerManagerComp;
-class CWorkerThread;
-
-
-class CWorker: public QObject
-{
-	Q_OBJECT
-public:
-	CWorker(const imtrest::IRequestServlet* requestServletPtr, CWorkerThread* workerThread);
-
-Q_SIGNALS:
-	void FinishProcess(const IRequest* request, const QByteArray& subCommandId);
-
-public Q_SLOTS:
-	void ProcessRequest(const IRequest* request, const QByteArray& subCommandId);
-
-private:
-	const imtrest::IRequestServlet* m_requestServletPtr;
-
-	CWorkerThread* m_workerThread;
-};
-
-
-class CWorkerThread: public QThread
-{
-	Q_OBJECT
-public:
-	CWorkerThread(const CWorkerManagerComp* workerManager, const QByteArray& subCommandId);
-
-	enum Status
-	{
-		ST_PROCESS,
-		ST_CLOSE
-	};
-
-	Status GetStatus();
-	void SetStatus(Status status);
-	void SetRequestPtr(const IRequest* requestPtr);
-	const ISender* GetSender(const QByteArray& requestId);
-
-	//reimplemented (QThread)
-	void run() override;
-
-Q_SIGNALS:
-	void StartProcess(const IRequest* request, const QByteArray& subCommandId);
-	void FinishProcess(const IRequest* request, const QByteArray& subCommandId);
-
-protected Q_SLOTS:
-	void OnStarted();
-	void OnFinishProcess(const IRequest* request, const QByteArray& subCommandId);
-
-private:
-	imtrest::IRequestServlet* m_requestServletPtr;
-	Status m_status;
-	mutable CWorkerManagerComp* m_workerManager;
-	istd::TDelPtr<CWorker> m_workerPtr;
-	const IRequest* m_requestPtr;
-	mutable QMutex m_statusMutex;
-	QByteArray m_subCommandId;
-};
 
 
 class CWorkerManagerComp:

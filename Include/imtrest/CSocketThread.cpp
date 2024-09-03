@@ -1,5 +1,4 @@
-#include <imtrest/CMultiThreadServer.h>
-
+#include <imtrest/CSocketThread.h>
 
 // Qt includes
 #include <QtCore/QCoreApplication>
@@ -8,10 +7,143 @@
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/ISender.h>
+#include <imtrest/CMultiThreadServer.h>
 
 
 namespace imtrest
 {
+
+
+CSocketThread::CSocketThread(qintptr socketId, bool secureConnection, const QSslConfiguration& sslConfiguration, CMultiThreadServer* parent)
+	:QThread(parent),
+	m_status(ST_START),
+	m_isSecureConnection(secureConnection),
+	m_sslConfiguration(sslConfiguration)
+{
+	qRegisterMetaType<ConstResponsePtr>("ConstResponsePtr");
+	this->m_socketDescriptor = socketId;
+
+	m_server = parent;
+
+	m_enginePtr = m_server->GetProtocolEngine();
+	m_requestHandlerPtr = m_server->GetRequestServlet();
+}
+
+
+void CSocketThread::SetSocketDescriptor(qintptr socketDescriptor)
+{
+	QMutexLocker lock(&m_socketDescriptorMutex);
+
+	m_socketDescriptor = socketDescriptor;
+}
+
+qintptr CSocketThread::GetSocketDescriptor()
+{
+	return m_socketDescriptor;
+}
+
+
+void CSocketThread::SetSocketStatus(Status socketStatus)
+{
+	QMutexLocker lock(&m_statusMutex);
+
+	m_status = socketStatus;
+}
+
+
+CSocketThread::Status CSocketThread::GetSocketStatus()
+{
+	return m_status;
+}
+
+
+QByteArray CSocketThread::GetRequestId()
+{
+	return m_requestId;
+}
+
+
+imtrest::IRequestServlet* CSocketThread::GetRequestServlet()
+{
+	return m_requestHandlerPtr;
+}
+
+
+bool CSocketThread::IsSecureConnection() const
+{
+	return m_isSecureConnection;
+}
+
+
+void CSocketThread::EnableSecureConnection(bool isSecureConnection)
+{
+	m_isSecureConnection = isSecureConnection;
+}
+
+
+void CSocketThread::run()
+{
+	if (m_server == nullptr){
+		return;
+	}
+
+	imtrest::IRequest* newRequestPtr = m_enginePtr->CreateRequest(*this);
+	m_socket.SetPtr(new CSocket(this, newRequestPtr, m_isSecureConnection, m_sslConfiguration, m_socketDescriptor));
+
+
+	m_requestId = newRequestPtr->GetRequestId();
+
+	qDebug() << m_socketDescriptor << connect(this, &CSocketThread::OnSendResponse, m_socket.GetPtr(), &CSocket::OnSendResponse, Qt::QueuedConnection);
+	qDebug() << m_socketDescriptor << connect(this, &CSocketThread::Abort, m_socket.GetPtr(), &CSocket::Abort, Qt::QueuedConnection);
+
+	exec();
+}
+
+
+// reimplemented (IRequestHandler)
+
+bool CSocketThread::IsCommandSupported(const QByteArray& /*commandId*/) const
+{
+	return true;
+}
+
+
+ConstResponsePtr CSocketThread::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
+{
+	Q_EMIT m_server->NewThreadConnection(&request, subCommandId);
+
+	return ConstResponsePtr();
+}
+
+
+// reimplemented (ISender)
+
+bool CSocketThread::SendResponse(ConstResponsePtr& response) const
+{
+	Q_EMIT OnSendResponse(response);
+
+	return true;
+}
+
+
+bool CSocketThread::SendRequest(ConstRequestPtr& /*reguest*/) const
+{
+	return false;
+}
+
+
+IRequest* CSocketThread::CreateRequest()
+{
+	if (m_enginePtr == nullptr){
+		return nullptr;
+	}
+	imtrest::IRequest* newRequestPtr = m_enginePtr->CreateRequest(*this);
+	if (newRequestPtr != nullptr){
+		m_requestId = newRequestPtr->GetRequestId();
+	}
+
+	return newRequestPtr;
+}
 
 
 CMultiThreadServer::CMultiThreadServer(CTcpServerComp* rootServer)
