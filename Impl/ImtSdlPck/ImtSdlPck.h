@@ -18,6 +18,7 @@
 #include <imtsdl/CGqlWrapClassCodeGeneratorComp.h>
 #include <imtsdl/CGqlHandlerBaseClassGeneratorComp.h>
 #include <imtsdl/CGqlCollectionControllerBaseClassGeneratorComp.h>
+#include <imtsdl/CQmldirFilePersistenceComp.h>
 
 
 /**
@@ -40,6 +41,7 @@ typedef imtsdl::CQmlCodeMetaGeneratorComp QmlCodeMetaGenerator;
 typedef imtsdl::CGqlWrapClassCodeGeneratorComp GqlWrapClassCodeGenerator;
 typedef imtsdl::CGqlHandlerBaseClassGeneratorComp GqlHandlerBaseClassGenerator;
 typedef imtsdl::CGqlCollectionControllerBaseClassGeneratorComp GqlCollectionControllerBaseClassGenerator;
+typedef imtsdl::CQmldirFilePersistenceComp QmldirFilePersistence;
 
 
 } // namespace ImtSdlPck

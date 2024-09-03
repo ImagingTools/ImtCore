@@ -10,6 +10,15 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="ParamsFactory" PackageId="BasePck" ComponentId="ParamsManager">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ParamsSetFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="QmlEntryFactory"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="QmlCodeGenerator" PackageId="ImtSdlPck" ComponentId="QmlCodeGenerator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -46,6 +55,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QmldirFilePersistence"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -58,8 +70,97 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="QmlEntryFactory" PackageId="" ComponentId="QmlEntryFactory">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="QmldirFilePersistence" PackageId="ImtSdlPck" ComponentId="QmldirFilePersistence">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamsFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="ParamsFactory"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
-    <EmbeddedRegistriesList/>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="QmlEntryFactory">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="ComposedParamsSet" PackageId="BasePck" ComponentId="ComposedParamsSet">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>IsSingleton</Value>
+                                            <Value>TypeName</Value>
+                                            <Value>VersionName</Value>
+                                            <Value>FileName</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>IsSingleton</Value>
+                                            <Value>TypeName</Value>
+                                            <Value>VersionName</Value>
+                                            <Value>FileName</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="FileName" PackageId="BasePck" ComponentId="NameParam">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="IsSingleton" PackageId="BasePck" ComponentId="EnableableParam">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="TypeName" PackageId="BasePck" ComponentId="NameParam">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="VersionName" PackageId="BasePck" ComponentId="NameParam">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="imod::IModel" ComponentId="ComposedParamsSet"/>
+                    <Interface InterfaceId="iprm::IParamsSet" ComponentId="ComposedParamsSet"/>
+                    <Interface InterfaceId="iser::ISerializable" ComponentId="ComposedParamsSet"/>
+                    <Interface InterfaceId="istd::IChangeable" ComponentId="ComposedParamsSet"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="ComposedParamsSet"/>
+                    <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="ComposedParamsSet"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
     <ExportedInterfaces/>
     <ExportedComponents>
         <Component ExportedId="QmlCodeGenerator" ComponentId="QmlCodeGenerator"/>

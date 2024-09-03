@@ -8,8 +8,22 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="QmlCodeGenerator" X="525" Y="250" Note=""/>
-        <Element ComponentName="QmlCodeMetaGenerator" X="600" Y="375" Note=""/>
+        <Element ComponentName="ParamsFactory" X="372" Y="525" Note=""/>
+        <Element ComponentName="QmlCodeGenerator" X="625" Y="250" Note=""/>
+        <Element ComponentName="QmlCodeMetaGenerator" X="625" Y="375" Note=""/>
+        <Element ComponentName="QmlEntryFactory" X="400" Y="650" Note=""/>
+        <Element ComponentName="QmldirFilePersistence" X="375" Y="375" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries/>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="QmlEntryFactory">
+            <PositionMap>
+                <Element ComponentName="ComposedParamsSet" X="475" Y="275" Note=""/>
+                <Element ComponentName="FileName" X="600" Y="475" Note=""/>
+                <Element ComponentName="IsSingleton" X="125" Y="275" Note=""/>
+                <Element ComponentName="TypeName" X="225" Y="475" Note=""/>
+                <Element ComponentName="VersionName" X="400" Y="475" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
 </Acf>

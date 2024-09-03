@@ -1,14 +1,14 @@
-	#pragma once
+#pragma once
 
 
-//Qt includes
+// Qt includes
 #include <QtCore/QFile>
 
 // Acf includes
 #include <istd/TDelPtr.h>
 #include <iproc/TSyncProcessorCompBase.h>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlRequestListProvider.h>
@@ -17,6 +17,7 @@
 
 namespace imtsdl
 {
+
 
 /**
 	A C++ class generator of GraphQL handlers for SDL requests

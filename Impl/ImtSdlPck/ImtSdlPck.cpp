@@ -79,6 +79,12 @@ I_EXPORT_COMPONENT(
 			"A C++ class generator of GraphQL Collection controllers for SDL requests",
 			"Schema Definition Language SDL Class Generator JSON GraphQL GQL Request")
 
+
+I_EXPORT_COMPONENT(
+			QmldirFilePersistence,
+			"A qmldir file persistence",
+			"Qmldir File Persistence")
+
 } // namespace ImtSdlPck
 
 

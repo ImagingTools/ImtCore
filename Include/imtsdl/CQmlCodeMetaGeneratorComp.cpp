@@ -7,6 +7,7 @@
 
 //Acf includes
 #include <istd/CSystem.h>
+#include <iprm/CParamsSet.h>
 
 // imtsdl includes
 #include <imtsdl/CSdlType.h>
@@ -25,6 +26,7 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_qmlKeysFileSuffixAttrPtr.IsValid());
+	Q_ASSERT(m_qmldirFilePersistanceCompPtr.IsValid());
 
 	if (!m_argumentParserCompPtr->IsQmlEnabled()){
 		return TS_OK;
@@ -86,6 +88,21 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 		// And complete the processing
 		EndQmlFile(sdlType);
 	}
+
+	iprm::CParamsSet qmldirFileData;
+	int loadStatus = m_qmldirFilePersistanceCompPtr->LoadFromFile(qmldirFileData, outputDirectoryPath + "/qmldir");
+	if (loadStatus != ifile::IFilePersistence::OS_OK){
+		SendErrorMessage(0, QString("Unable to load qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
+
+		return TS_INVALID;
+	}
+
+
+
+
+
+
+
 
 	// then create a qmldir file
 	QFile qmldirFile(outputDirectoryPath + "/qmldir");
