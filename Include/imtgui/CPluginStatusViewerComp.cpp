@@ -14,7 +14,7 @@ void CPluginStatusViewerComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	SetStatusText("PluginStatusViewer");
-	SetStatusIcon(QIcon(":/Icons/StateOk"));
+	SetStatusIcon(GetIcon(":/Icons/StateOk"));
 }
 
 // reimplemented (iqtgui::TGuiObserverWrap)
@@ -44,19 +44,19 @@ void CPluginStatusViewerComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 			// Status
 			switch (statusPtr->GetInformationCategory()){
 			case istd::IInformationProvider::IC_NONE:
-				Table->setItem(rowIndex, 1, new QTableWidgetItem(QIcon(":/Icons/StateUnknown"), ""));
+				Table->setItem(rowIndex, 1, new QTableWidgetItem(GetIcon(":/Icons/StateUnknown"), ""));
 				break;
 			case istd::IInformationProvider::IC_INFO:
-				Table->setItem(rowIndex, 1, new QTableWidgetItem(QIcon(":/Icons/StateOk"), ""));
+				Table->setItem(rowIndex, 1, new QTableWidgetItem(GetIcon(":/Icons/StateOk"), ""));
 				break;
 			case istd::IInformationProvider::IC_WARNING:
-				Table->setItem(rowIndex, 1, new QTableWidgetItem(QIcon(":/Icons/StateWarning"), ""));
+				Table->setItem(rowIndex, 1, new QTableWidgetItem(GetIcon(":/Icons/StateWarning"), ""));
 				break;
 			case istd::IInformationProvider::IC_ERROR:
-				Table->setItem(rowIndex, 1, new QTableWidgetItem(QIcon(":/Icons/Error"), ""));
+				Table->setItem(rowIndex, 1, new QTableWidgetItem(GetIcon(":/Icons/Error"), ""));
 				break;
 			case istd::IInformationProvider::IC_CRITICAL:
-				Table->setItem(rowIndex, 1, new QTableWidgetItem(QIcon(":/Icons/StateInvalid"), ""));
+				Table->setItem(rowIndex, 1, new QTableWidgetItem(GetIcon(":/Icons/StateInvalid"), ""));
 				break;
 			}
 

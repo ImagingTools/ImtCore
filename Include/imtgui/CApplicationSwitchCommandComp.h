@@ -8,6 +8,7 @@
 #include <ifile/IFileNameParam.h>
 #include <iqtgui/IIconProvider.h>
 #include <iqtgui/CHierarchicalCommand.h>
+#include <iqtgui/TMakeIconProviderCompWrap.h>
 #include <ibase/TLocalizableWrap.h>
 #include <iprm/IEnableableParam.h>
 
@@ -22,13 +23,14 @@ namespace imtgui
 */
 class CApplicationSwitchCommandComp:
 			public QObject,
-			public ibase::TLocalizableWrap<icomp::CComponentBase>,
+			public iqtgui::TMakeIconProviderCompWrap<ibase::TLocalizableWrap<icomp::CComponentBase> >,
 			public imod::CMultiModelDispatcherBase,
 			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
+
 public:
-	typedef ibase::TLocalizableWrap<icomp::CComponentBase> BaseClass;
+	typedef iqtgui::TMakeIconProviderCompWrap<ibase::TLocalizableWrap<icomp::CComponentBase> > BaseClass;
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CApplicationSwitchCommandComp);
@@ -65,6 +67,7 @@ public:
 protected:
 	// reimpemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
+	virtual void OnDesignSchemaChanged(const QByteArray& themeId) override;
 
 private Q_SLOTS:
 	void OnCommandActivated();

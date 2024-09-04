@@ -75,8 +75,8 @@ void CPaginationGuiComp::OnGuiDesignChanged()
 
 void CPaginationGuiComp::UpdateIcons()
 {
-	First->setIcon(QIcon(":/Icons/MoveFirst"));
-	Last->setIcon(QIcon(":/Icons/MoveLast"));
+	First->setIcon(GetIcon(":/Icons/MoveFirst"));
+	Last->setIcon(GetIcon(":/Icons/MoveLast"));
 }
 
 

@@ -28,7 +28,7 @@ void CVirtualKeyboardShowCommandComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	m_mainMenuCommand.SetName(*m_rootMenuNameAttrPtr);
-	m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionAttrPtr, QIcon(*m_actionIconAttrPtr));
+	m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionAttrPtr, GetIcon(*m_actionIconAttrPtr));
 
 	m_rootMenuCommand.InsertChild(&m_mainMenuCommand);
 	m_mainMenuCommand.InsertChild(&m_switchCommand);
@@ -36,6 +36,7 @@ void CVirtualKeyboardShowCommandComp::OnComponentCreated()
 	connect(&m_switchCommand, SIGNAL(triggered()), this, SLOT(OnCommandActivated()));
 
 	EnableLocalization(true);
+	EnableDesignHandler(true);
 
 	SetKeyboardCommandPath();
 }
@@ -47,7 +48,15 @@ void CVirtualKeyboardShowCommandComp::OnComponentCreated()
 
 void CVirtualKeyboardShowCommandComp::OnLanguageChanged()
 {
-	m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionAttrPtr, QIcon(*m_actionIconAttrPtr));
+	m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionAttrPtr, GetIcon(*m_actionIconAttrPtr));
+}
+
+
+void CVirtualKeyboardShowCommandComp::OnDesignSchemaChanged(const QByteArray& themeId)
+{
+	BaseClass::OnDesignSchemaChanged(themeId);
+
+	m_switchCommand.setIcon(GetIcon(*m_actionIconAttrPtr));
 }
 
 

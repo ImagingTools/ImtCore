@@ -11,6 +11,7 @@
 #include <ifile/IFileNameParam.h>
 #include <iqtgui/IIconProvider.h>
 #include <iqtgui/CHierarchicalCommand.h>
+#include <iqtgui/TMakeIconProviderCompWrap.h>
 #include <ibase/TLocalizableWrap.h>
 
 
@@ -23,12 +24,12 @@ namespace imtgui
 */
 class CVirtualKeyboardShowCommandComp:
 			public QObject,
-			public ibase::TLocalizableWrap<icomp::CComponentBase>,
+			virtual public iqtgui::TMakeIconProviderCompWrap<ibase::TLocalizableWrap<icomp::CComponentBase>>,
 			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 public:
-	typedef ibase::TLocalizableWrap<icomp::CComponentBase> BaseClass;
+	typedef iqtgui::TMakeIconProviderCompWrap<ibase::TLocalizableWrap<icomp::CComponentBase>> BaseClass;
 	
 	I_BEGIN_COMPONENT(CVirtualKeyboardShowCommandComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
@@ -41,14 +42,15 @@ public:
 	CVirtualKeyboardShowCommandComp();
 
 	// reimpemented (ibase::ICommandsProvider)
-	virtual const ibase::IHierarchicalCommand* GetCommands() const;
+	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 	// reimpemented (icomp::IComponent)
-	virtual void OnComponentCreated();
+	virtual void OnComponentCreated() override;
 
 protected:
 	// reimpemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
+	virtual void OnDesignSchemaChanged(const QByteArray& themeId) override;
 
 private Q_SLOTS:
 	void OnCommandActivated();
