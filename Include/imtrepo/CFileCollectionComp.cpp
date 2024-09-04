@@ -152,6 +152,14 @@ int CFileCollectionComp::BackupObject(
 						}
 					}
 
+					if (m_versionInfoCompPtr.IsValid()) {
+						quint32 versionNummer = 0;
+						int versionId = *m_productVersionIdAttrPtr;
+						m_versionInfoCompPtr->GetVersionNumber(versionId, versionNummer);
+						QString versionTxt = m_versionInfoCompPtr->GetEncodedVersionName(versionId, versionNummer);
+						revisionItem.softwareVersion = versionTxt;
+					}
+
 					revisionsContents[newRevision] = revisionItem;
 
 					if (SaveRevisionsContents(*collectionPtr, objectId, revisionsContents)){
@@ -1160,7 +1168,24 @@ bool CFileCollectionComp::RevisionsContents::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.Process(revisionsContentsItem.path);
 		retVal = retVal && archive.EndTag(repositoryFileNameTag);
 
-		if (retVal && !archive.IsStoring()){
+		static iser::CArchiveTag appVersionTag("AppVersion", "AppVersion");
+		if (!archive.IsStoring()) {
+			bool isOk = archive.BeginTag(appVersionTag);
+			if (isOk) {
+				retVal = retVal && archive.Process(revisionsContentsItem.softwareVersion);
+				retVal = retVal && archive.EndTag(appVersionTag);
+			}
+			else {
+				revisionsContentsItem.softwareVersion = "";
+			}
+		}
+		else{
+			retVal = retVal && archive.BeginTag(appVersionTag);
+			retVal = retVal && archive.Process(revisionsContentsItem.softwareVersion);
+			retVal = retVal && archive.EndTag(appVersionTag);
+		}
+
+		if (retVal && !archive.IsStoring()) {
 			insert(revisionsContentsItem.revision, revisionsContentsItem);
 		}
 

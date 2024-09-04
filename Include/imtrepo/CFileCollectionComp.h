@@ -31,6 +31,7 @@ public:
 	typedef imtbase::TFilterableCollectionWrap <CFileCollectionCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CFileCollectionComp)
+		I_ASSIGN(m_productVersionIdAttrPtr, "ProductVersionID", "ID of the product version", true, 89107);
 		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);
 		I_ASSIGN(m_restoreRevisionRightIdAttrPtr, "RestoreRevisionRightId", "Restore to revision right id", true, "RestoreObject");
 		I_ASSIGN(m_transformationControllerCompPtr, "TransformationController", "Controller for down- and upgrade of the repository data", false, "TransformationController");
@@ -117,6 +118,7 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
+	I_ATTR(int, m_productVersionIdAttrPtr);
 	/**
 		Enable items changing history
 	*/
