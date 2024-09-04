@@ -68,12 +68,14 @@ void CDepthBitmap::SetReferenceBitmap(const iimg::CGeneralBitmap& referenceBitma
 	EnsureMetaInfoCreated();
 }
 
+
 void CDepthBitmap::ResetReferenceBitmap()
 {
 	m_referenceBitmap.ResetImage();
 
 	EnsureMetaInfoCreated();
 }
+
 
 void CDepthBitmap::SetRobotTrajectory(const IDepthBitmap::RobotTrajectory& robotTrajectory)
 {
@@ -100,7 +102,6 @@ bool CDepthBitmap::ComputeDepthRange(const i2d::IObject2d* aoiPtr, istd::CRange&
 			istd::CIntRange lineRange(0, imageSize.GetX());
 
 #pragma omp parallel for
-
 			for (int y = 0; y < imageSize.GetY(); ++y){
 				const float* oneLinePtr = (float*)this->GetLinePtr(y);
 				const istd::CIntRanges* maskRangesPtr = mask.GetPixelRanges(y);
@@ -143,6 +144,7 @@ bool CDepthBitmap::ComputeDepthRange(const i2d::IObject2d* aoiPtr, istd::CRange&
 	}
 
 	return false;
+
 }
 
 
@@ -171,18 +173,15 @@ bool CDepthBitmap::CreateDepthBitmap(const istd::CRange& depthRange, const istd:
 	return false;
 }
 
-
 const IImage3dCalibration* CDepthBitmap::GetCalibration3d() const
 {
 	return &m_calibration3d;
 }
 
-
 const iimg::IBitmap* CDepthBitmap::GetReferenceBitmap() const
 {
 	return &m_referenceBitmap;
 }
-
 
 const IDepthBitmap::RobotTrajectory* CDepthBitmap::GetRobotTrajectory() const
 {

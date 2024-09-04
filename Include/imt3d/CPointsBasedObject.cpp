@@ -84,10 +84,12 @@ const void* CPointsBasedObject::GetData() const
 	return m_data.data();
 }
 
+
 int CPointsBasedObject::GetPointBytesSize() const
 {
 	return GetPointBytesSize(m_pointFormat);
 }
+
 
 // reimplemented (imt3d::IObject3d)
 
@@ -433,22 +435,35 @@ void CPointsBasedObject::EnsureCuboidCalculated() const
 template <typename PointType>
 void CPointsBasedObject::TEnsureCuboidCalculated() const
 {
-	if (!IsEmpty() && !m_isCuboidCalculationValid){
+	if (!IsEmpty() && !m_isCuboidCalculationValid) {
 		istd::CRange xRange, yRange, zRange;
 		GetBoundingRanges<PointType>(xRange, yRange, zRange);
 
-		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
-			double left = xRange.GetMinValue();
-			double right = xRange.GetMaxValue();
-			double bottom = yRange.GetMinValue();
-			double top = yRange.GetMaxValue();
-			double far = zRange.GetMinValue();
-			double near = zRange.GetMaxValue();
-
-			m_boundingCuboid = CCuboid(left, right, bottom, top, near, far);
-
-			m_isCuboidCalculationValid = true;
+		if (xRange.GetLength() < std::numeric_limits<float>::epsilon()) {
+			xRange.SetMinValue(xRange.GetMinValue() - 0.5);
+			xRange.SetMaxValue(xRange.GetMaxValue() + 0.5);
 		}
+
+		if (yRange.GetLength() < std::numeric_limits<float>::epsilon()) {
+			yRange.SetMinValue(yRange.GetMinValue() - 0.5);
+			yRange.SetMaxValue(yRange.GetMaxValue() + 0.5);
+		}
+
+		if (zRange.GetLength() < std::numeric_limits<float>::epsilon()) {
+			zRange.SetMinValue(zRange.GetMinValue() - 0.5);
+			zRange.SetMaxValue(zRange.GetMaxValue() + 0.5);
+		}
+
+		double left = xRange.GetMinValue();
+		double right = xRange.GetMaxValue();
+		double bottom = yRange.GetMinValue();
+		double top = yRange.GetMaxValue();
+		double far = zRange.GetMinValue();
+		double near = zRange.GetMaxValue();
+
+		m_boundingCuboid = CCuboid(left, right, bottom, top, near, far);
+
+		m_isCuboidCalculationValid = true;
 	}
 }
 
