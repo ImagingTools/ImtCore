@@ -86,19 +86,19 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParams
 
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
-		const QByteArray& objectId,
-		int offset,
-		int count,
-		const iprm::IParamsSet* paramsPtr) const
+			const QByteArray& objectId,
+			int offset,
+			int count,
+			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
 		if (m_tableSchemaAttrPtr.IsValid()){
 			return QString("SELECT * FROM %0.\"%1\" WHERE \"%2\" = '%3'")
-					.arg(qPrintable(*m_tableSchemaAttrPtr))
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(*m_objectIdColumnAttrPtr))
-					.arg(qPrintable(objectId))
-					.toUtf8();
+				.arg(qPrintable(*m_tableSchemaAttrPtr))
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(*m_objectIdColumnAttrPtr))
+				.arg(qPrintable(objectId))
+				.toUtf8();
 		}
 		else{
 			return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
@@ -160,9 +160,9 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectIdFromRecord(const QSqlR
 
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateObjectInfoFromRecord(
-		const QSqlRecord& record,
-		idoc::MetaInfoPtr& objectMetaInfoPtr,
-		idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const
+			const QSqlRecord& record,
+			idoc::MetaInfoPtr& objectMetaInfoPtr,
+			idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const
 {
 	QByteArray typeId = GetObjectTypeId(GetObjectIdFromRecord(record));
 	objectMetaInfoPtr = CreateObjectMetaInfo(typeId);
@@ -211,9 +211,9 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(const imtbase::I
 
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateDataMetaInfoQuery(
-		const imtbase::IObjectCollection& /*collection*/,
-		const QByteArray& /*objectId*/,
-		const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/) const
 {
 	QByteArray retVal;
 
@@ -222,9 +222,9 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateDataMetaInfoQuery(
 
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfoQuery(
-		const imtbase::IObjectCollection& /*collection*/,
-		const QByteArray& /*objectId*/,
-		const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/) const
 {
 	QByteArray retVal;
 
@@ -357,8 +357,8 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
-		const iprm::IParamsSet& filterParams,
-		QString& filterQuery) const
+			const iprm::IParamsSet& filterParams,
+			QString& filterQuery) const
 {
 	QString objectFilterQuery;
 	iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
@@ -388,8 +388,8 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
-		const imtbase::ICollectionFilter& collectionFilter,
-		QString& textFilterQuery) const
+			const imtbase::ICollectionFilter& collectionFilter,
+			QString& textFilterQuery) const
 {
 	QByteArrayList filteringColumnIds = collectionFilter.GetFilteringInfoIds();
 	if (filteringColumnIds.isEmpty()){
@@ -420,8 +420,8 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTimeFilterQuery(const imtbase::IT
 
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(
-		const imtbase::ICollectionFilter& collectionFilter,
-		QString& sortQuery) const
+			const imtbase::ICollectionFilter& collectionFilter,
+			QString& sortQuery) const
 {
 	QByteArray columnId;
 	QByteArray sortOrder;
@@ -459,7 +459,7 @@ QString CSqlDatabaseObjectDelegateCompBase::EncodeTextArgument(const QString& ar
 }
 
 
-QString CSqlDatabaseObjectDelegateCompBase::CreateAdditionalFiltersQuery(const iprm::IParamsSet& /*filterParams*/) const
+QString CSqlDatabaseObjectDelegateCompBase::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
 	return QString();
 }

@@ -463,15 +463,30 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 		if (!record.isEmpty()){
 			idoc::MetaInfoPtr objectMetaInfoPtr;
 			idoc::MetaInfoPtr collectionMetaInfoPtr;
-			bool isOk = m_objectDelegateCompPtr->CreateObjectInfoFromRecord(record, objectMetaInfoPtr, collectionMetaInfoPtr);
-			if (isOk){
-				switch (infoType){
-				case EIT_NAME:
-					return collectionMetaInfoPtr.IsValid() ? collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE).toString() : QString();
+			
+			if (bool isOk = m_objectDelegateCompPtr->CreateObjectInfoFromRecord(record, objectMetaInfoPtr, collectionMetaInfoPtr))
+			{
+				// #10856
+				int metaInfoType = 0;
+				QString result;
 
+				switch (infoType) {
+				case EIT_NAME:
+					metaInfoType = idoc::IDocumentMetaInfo::MIT_TITLE;
+					break;
 				case EIT_DESCRIPTION:
-					return collectionMetaInfoPtr.IsValid() ? collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString() : QString();
+					metaInfoType = idoc::IDocumentMetaInfo::MIT_DESCRIPTION;
+					break;
+				default:
+					return {};
 				}
+
+				if (collectionMetaInfoPtr.IsValid())
+					result = collectionMetaInfoPtr->GetMetaInfo(metaInfoType).toString();
+				if (result.isEmpty() && objectMetaInfoPtr.IsValid())
+					result = objectMetaInfoPtr->GetMetaInfo(metaInfoType).toString();
+
+				return result;
 			}
 		}
 	}

@@ -166,7 +166,7 @@ bool TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFilterQuery(const i
 					if (!filterQuery.isEmpty()){
 						filterQuery += " AND ";
 					}
-					filterQuery += QString("json_extract(\"Document\",'$.Source') != '%1'").arg(key);
+					filterQuery += QString("json_extract(\"Document\",'$.Source') != '%1'").arg(qPrintable(key));
 				}
 			}
 		}

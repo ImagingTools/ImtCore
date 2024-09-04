@@ -55,7 +55,9 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 		if (sqlErrorPtr != nullptr){
 			*sqlErrorPtr = retVal.lastError();
 		}
-	
+
+		SendErrorMessage(0, QObject::tr("Database query failed: %1").arg(retVal.lastError().text()), "Database engine");
+
 		return QSqlQuery();
 	}
 	
@@ -95,9 +97,9 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 
 	retVal.exec();
 
-	if (sqlError){
+	if (sqlError) {
 		*sqlError = databaseConnection.lastError().type() ? databaseConnection.lastError() : retVal.lastError();
-    }
+	}
 
 	if ((databaseConnection.lastError().type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){
 		qCritical() << __FILE__ << __LINE__
@@ -234,20 +236,20 @@ bool CDatabaseEngineComp::OpenDatabase() const
 bool CDatabaseEngineComp::CreateDatabase(int flags) const
 {
 	if (!m_migrationFolderPathCompPtr.IsValid()){
-		SendCriticalMessage(0, QString("Wrong component configuration: 'MigrationFolderPath' component was not set"));
+		SendCriticalMessage(0, QObject::tr("Wrong component configuration: 'MigrationFolderPath' component was not set"));
 
 		return false;
 	}
 
 	QDir migrationsFolder(m_migrationFolderPathCompPtr->GetPath());
 	if (!migrationsFolder.exists()){
-		SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
+		SendErrorMessage(0, QObject::tr("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
 		
 		return false;
 	}
 
 	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()){
-		SendCriticalMessage(0, QString("Maintenance database name not was not set"));
+		SendCriticalMessage(0, QObject::tr("Maintenance database name was not set"));
 
 		return false;
 	}
@@ -287,7 +289,7 @@ bool CDatabaseEngineComp::CreateDatabase(int flags) const
 			}
 		}
 		else {
-			SendErrorMessage(0, QString("\n\t| Database could not be connected""\n\t| Error: %1").arg(databaseConnection.lastError().text()));
+			SendErrorMessage(0, QObject::tr("\n\t| Database could not be connected""\n\t| Error: %1").arg(databaseConnection.lastError().text()));
 		}
 	}
 
@@ -313,7 +315,7 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 								<< "\n\t| Unable to migration database"
 								<< "\n\t| Error: " << sqlError.text();
 
-					SendErrorMessage(0, QString("Migration is failed: %1").arg(sqlError.text()), "Database engine");
+					SendErrorMessage(0, QObject::tr("Migration failed: %1").arg(sqlError.text()), "Database engine");
 					return false;
 				}
 				ExecSqlQueryFromFile(folder.filePath("migration_"+QString::number(index)+".sql"), &sqlError);
@@ -322,7 +324,7 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 								<< "\n\t| Unable to migration database"
 								<< "\n\t| Error: " << sqlError.text();
 
-					SendErrorMessage(0, QString("Migration is failed: %1").arg(sqlError.text()), "Database engine");
+					SendErrorMessage(0, QObject::tr("Migration failed: %1").arg(sqlError.text()), "Database engine");
 
 					return false;
 				}
@@ -333,7 +335,7 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 				ExecSqlQueryFromFile(migrationFilePath.toUtf8(), &sqlError);
 
 				if (sqlError.type() != QSqlError::NoError){
-					SendErrorMessage(0, QString("Execution of %1 is failed: %2").arg(migrationFilePath).arg(sqlError.text()), "Database engine");
+					SendErrorMessage(0, QObject::tr("Execution of %1 failed: %2").arg(migrationFilePath).arg(sqlError.text()), "Database engine");
 
 					return false;
 				}
@@ -342,13 +344,13 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 			valuesRevision.insert(":Revision",index);
 			ExecSqlQueryFromFile(folder.filePath("SetRevision.sql"), valuesRevision, &sqlError);
 			if (sqlError.type() != QSqlError::NoError){
-				SendErrorMessage(0, QString("Execution of SetRevision.sql is failed: %1").arg(sqlError.text()), "Database engine");
+				SendErrorMessage(0, QObject::tr("Execution of SetRevision.sql failed: %1").arg(sqlError.text()), "Database engine");
 			
 				return false;
 			}
 		}
 
-		SendInfoMessage(0, QString("Database was successfully  migrated"), "Database engine");
+		SendInfoMessage(0, QObject::tr("Database was successfully migrated"), "Database engine");
 
 		return true;
 	}
@@ -434,7 +436,7 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 						<< "\n\t| Unable to open database"
 						<< "\n\t| Error: " << databaseConnection.lastError().text();
 
-			SendErrorMessage(0, QString("Database '%1' could not be connected").arg(GetDatabaseName()), "Database engine");
+			SendErrorMessage(0, QObject::tr("Database '%1' could not be connected").arg(GetDatabaseName()), "Database engine");
 		}
 	}
 
@@ -458,7 +460,7 @@ bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 			}
 		}
 		else{
-			SendErrorMessage(0, QString("Database server could not be connected: %1").arg(errorMessage), "Database Engine");
+			SendErrorMessage(0, QObject::tr("Database server could not be connected: %1").arg(errorMessage), "Database Engine");
 
 			return false;
 		}
@@ -492,20 +494,20 @@ bool CDatabaseEngineComp::EnsureDatabaseConsistency() const
 bool CDatabaseEngineComp::CreateDatabaseInstance() const
 {
 	if (!m_migrationFolderPathCompPtr.IsValid()){
-		SendCriticalMessage(0, QString("Wrong component configuration: 'MigrationFolderPath' component was not set"));
+		SendCriticalMessage(0, QObject::tr("Wrong component configuration: 'MigrationFolderPath' component was not set"));
 
 		return false;
 	}
 
 	QDir migrationsFolder(m_migrationFolderPathCompPtr->GetPath());
 	if (!migrationsFolder.exists()){
-		SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
+		SendErrorMessage(0, QObject::tr("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
 
 		return false;
 	}
 
 	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()){
-		SendCriticalMessage(0, QString("Maintenance database name not was not set"));
+		SendCriticalMessage(0, QObject::tr("Maintenance database name was not set"));
 
 		return false;
 	}
@@ -550,7 +552,7 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 				<< "\n\t| Error: " << sqlError
 				<< "\n\t| Query: " << createDatabaseQuery;
 
-			SendErrorMessage(0, QString("\n\t| Database could not be created"
+			SendErrorMessage(0, QObject::tr("\n\t| Database could not be created"
 				"\n\t| Error: %1"
 				"\n\t| Query: %2")
 				.arg(sqlError.text())
@@ -566,7 +568,7 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 		return retVal;
 	}
 	else {
-		SendErrorMessage(0, QString("Maintanance database could not be opened. Error message: '%1'").arg(maintainanceDb.lastError().text()));
+		SendErrorMessage(0, QObject::tr("Maintanance database could not be opened. Error message: '%1'").arg(maintainanceDb.lastError().text()));
 	}
 
 	return false;
@@ -576,14 +578,14 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 {
 	if (!m_migrationFolderPathCompPtr.IsValid()){
-		SendCriticalMessage(0, QString("Wrong component configuration: 'MigrationFolderPath' component was not set"));
+		SendCriticalMessage(0, QObject::tr("Wrong component configuration: 'MigrationFolderPath' component was not set"));
 
 		return false;
 	}
 
 	QDir migrationsFolder(m_migrationFolderPathCompPtr->GetPath());
 	if (!migrationsFolder.exists()){
-		SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
+		SendErrorMessage(0, QObject::tr("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
 
 		return false;
 	}
@@ -593,7 +595,7 @@ bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 	// Create revision table in the database:
 	ExecSqlQueryFromFile(migrationsFolder.filePath("CreateRevision.sql"), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
-		SendErrorMessage(0, QString("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
+		SendErrorMessage(0, QObject::tr("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
 
 		return false;
 	}
@@ -634,7 +636,7 @@ QString CDatabaseEngineComp::GetDatabasePath() const
 	}
 
 	if (!m_dbFilePathCompPtr.IsValid()){
-		SendErrorMessage(0, QString("Database file path incorrected"));
+		SendErrorMessage(0, QObject::tr("Database file path incorrect"));
 
 		return QString();
 	}
@@ -719,7 +721,7 @@ int CDatabaseEngineComp::GetLastMigration() const
 			return avaliableMigration;
 		}
 		else{
-			SendErrorMessage(0, QString("Directory containing SQL-migration files doesn't exist: '%1'").arg(migrationFolder), "Database Migration");
+			SendErrorMessage(0, QObject::tr("Directory containing SQL-migration files doesn't exist: '%1'").arg(migrationFolder), "Database Migration");
 			return -1;
 		}
 	}
