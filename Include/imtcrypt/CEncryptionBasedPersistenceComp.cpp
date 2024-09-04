@@ -130,7 +130,7 @@ int CEncryptionBasedPersistenceComp::LoadFromFile(istd::IChangeable& data, const
 }
 
 
-ifile::IFilePersistence::OperationState CEncryptionBasedPersistenceComp::SaveToFile(
+int CEncryptionBasedPersistenceComp::SaveToFile(
 			const istd::IChangeable& data,
 			const QString & filePath,
 			ibase::IProgressManager* progressManagerPtr) const
