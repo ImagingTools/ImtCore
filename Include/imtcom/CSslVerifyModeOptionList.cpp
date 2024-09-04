@@ -19,7 +19,7 @@ CSslVerifyModeOptionList::CSslVerifyModeOptionList(): CStaticOptionList()
 	COptionsManager::InsertOption("Query", ISslConfigurationManager::ToString(ISslConfigurationManager::PVM_QUERY));
 	COptionsManager::InsertOption("Verify", ISslConfigurationManager::ToString(ISslConfigurationManager::PVM_VERIFY));
 	COptionsManager::InsertOption("Auto", ISslConfigurationManager::ToString(ISslConfigurationManager::PVM_AUTO_VERIFY));
-	SetSelectedOptionIndex(2);
+	SetSelectedOptionIndex(3);
 }
 
 
