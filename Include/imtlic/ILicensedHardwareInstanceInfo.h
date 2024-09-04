@@ -22,7 +22,7 @@ class IProductInfo;
 	Common interface for a hardware product instance. A product instance is the result of the hardware installation by the customer.
 	\ingroup LicenseManagement
 */
-class ILicensedHardwareInstanceInfo : virtual public IPartProductionInfo //, IProductInstanceInfo
+class ILicensedHardwareInstanceInfo: virtual public IPartProductionInfo //, IProductInstanceInfo
 {
 public:
 	enum MetaInfoTypes

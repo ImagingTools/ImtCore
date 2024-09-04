@@ -13,7 +13,7 @@ namespace imtqml
 /**
 	Interface for Qt Quick based application with GUI.
 */
-class IQuickApplication : virtual public ibase::IApplication
+class IQuickApplication: virtual public ibase::IApplication
 {
 public:
 	/**

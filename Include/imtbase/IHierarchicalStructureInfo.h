@@ -20,7 +20,7 @@ namespace imtbase
 class IHierarchicalStructureIterator;
 
 
-class IHierarchicalStructureInfo : virtual public istd::IChangeable
+class IHierarchicalStructureInfo: virtual public istd::IChangeable
 {
 public:
 	typedef QByteArray Id;

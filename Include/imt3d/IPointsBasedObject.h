@@ -25,7 +25,7 @@ namespace imt3d
 /**
 	Common interface describing object of 3d points with specified format
 */
-class IPointsBasedObject : virtual public imt3d::IObject3d
+class IPointsBasedObject: virtual public imt3d::IObject3d
 {
 public:
 	enum ChangeFlags

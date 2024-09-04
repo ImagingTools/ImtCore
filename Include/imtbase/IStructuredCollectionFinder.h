@@ -9,7 +9,7 @@ namespace imtbase
 {
 
 
-class IStructuredCollectionFinder : virtual public istd::IPolymorphic
+class IStructuredCollectionFinder: virtual public istd::IPolymorphic
 {
 public:
 	virtual QByteArrayList FindObjectParentNodes(const QByteArray& objectId) const = 0;

@@ -12,7 +12,7 @@ namespace imtgql
 {
 
 
-class IGqlResponse : virtual public istd::IChangeable
+class IGqlResponse: virtual public istd::IChangeable
 {
 public:
 	typedef QSharedPointer<IGqlRequest> GqlRequestPtr;

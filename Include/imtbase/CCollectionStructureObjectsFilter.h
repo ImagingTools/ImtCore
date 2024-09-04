@@ -9,7 +9,7 @@ namespace imtbase
 {
 
 
-class CCollectionStructureObjectsFilter : virtual public iser::ISerializable
+class CCollectionStructureObjectsFilter: virtual public iser::ISerializable
 {
 public:
 	enum SortingAttribute

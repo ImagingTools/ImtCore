@@ -10,7 +10,7 @@ namespace imtgql
 {
 
 
-class CGqlResponseBase : virtual public IGqlResponse
+class CGqlResponseBase: virtual public IGqlResponse
 {
 public:
 	explicit CGqlResponseBase(GqlRequestPtr originalRequestPtr);
