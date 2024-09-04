@@ -70,22 +70,6 @@ protected:
 		TPluginManagerCompBase& m_parent;
 	};
 
-protected:
-	struct PluginInfo
-	{
-		PluginInfo()
-			:pluginPtr(NULL)
-		{
-		}
-
-		PluginInterface* pluginPtr;
-		QString pluginPath;
-		DestroyFunction destroyFunc;
-	};
-
-	typedef QList<PluginInfo> Plugins;
-	Plugins m_plugins;
-
 private:
 	I_REF(iprm::IParamsSet, m_settingsCompPtr);
 	I_REF(imod::IModel, m_settingsModelCompPtr);
@@ -107,8 +91,7 @@ private:
 
 template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
 TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::TPluginManagerCompBase(const QByteArray& createMethodName, const QByteArray& destroyMethodName)
-	:m_createMethodName(createMethodName),
-	m_destroyMethodName(destroyMethodName),
+	:BaseClass2(createMethodName, destroyMethodName, nullptr),
 	m_settingsObserver(*this)
 {
 }
@@ -170,6 +153,8 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 {
 	BaseClass::OnComponentCreated();
 
+	BaseClass2::SetStatusManager(m_pluginStatusMonitorCompPtr.GetPtr());
+
 	if (m_settingsModelCompPtr.IsValid()){
 		m_settingsModelCompPtr->AttachObserver(&m_settingsObserver);
 	}
@@ -181,11 +166,11 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 {
 	m_settingsObserver.EnsureModelDetached();
 
-	for (typename Plugins::iterator iter = m_plugins.begin(); iter != m_plugins.end(); ++iter){
+	for (auto iter = this->m_plugins.begin(); iter != this->m_plugins.end(); ++iter){
 		iter->destroyFunc(iter->pluginPtr);
 	}
 
-	m_plugins.clear();
+	this->m_plugins.clear();
 
 	BaseClass::OnComponentDestroyed();
 }

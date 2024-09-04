@@ -437,6 +437,7 @@ bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& o
 		if (objectInfo.id == elementId){
 			if (objectInfo.name != objectName){
 				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, objectInfo.name);
 				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
 
 				locker.unlock();
