@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5230" Description="ACF"/>
+            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ComposedParamsSet" X="550" Y="250" Note=""/>
+        <Element ComponentName="PrefixName" X="275" Y="250" Note=""/>
+        <Element ComponentName="QrcObjectList" X="550" Y="375" Note=""/>
+        <Element ComponentName="QtResourcePrefixEntryModel" X="525" Y="525" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

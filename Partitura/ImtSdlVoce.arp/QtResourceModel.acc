@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5230" Description="ACF"/>
+            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="QrcPrefixList" PackageId="BasePck" ComponentId="ParamsManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ParamsSetFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="QtResourcePrefixModel"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="QtResourcePrefixModel" PackageId="ImtSdlVoce" ComponentId="QtResourcePrefixModel">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces/>
+    <ExportedComponents/>
+</Acf>
