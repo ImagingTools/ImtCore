@@ -59,7 +59,7 @@ void CProductInstanceInfoViewComp::OnGuiCreated()
 	NewLicenseRequestButton->setVisible(*m_showLicenseRequestAttrPtr);
 	LicenseRequestDescriptionLabel->setVisible(*m_showLicenseRequestAttrPtr);
 
-	FeatureTree->header()->setSectionResizeMode(QHeaderView::Stretch);
+	FeatureTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
 	m_importLicenseEnablerObserver.RegisterObject(m_importLicenseEnablerCompPtr.GetPtr(), &CProductInstanceInfoViewComp::OnImportLicenseEnabled);
 	m_licenseRequestEnablerObserver.RegisterObject(m_licenseRequestEnablerCompPtr.GetPtr(), &CProductInstanceInfoViewComp::OnLicenseRequestEnabled);
@@ -144,17 +144,17 @@ void CProductInstanceInfoViewComp::UpdateFeatureTree()
 				licenseExpirationText = tr("Unlimited");
 			}
 
-//			imtlic::ILicenseInstance::FeatureInfos features = licenseInstancePtr->GetFeatureInfos();
-//			for (const imtlic::ILicenseInstance::FeatureInfo& feature : features){
-//				QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem();
+			imtlic::ILicenseInstance::FeatureInfos features = licenseInstancePtr->GetFeatureInfos();
+			for (const imtlic::ILicenseInstance::FeatureInfo& feature : features){
+				QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem();
 
-//				featureItemPtr->setText(0, feature.name + " (" + feature.id + ")");
-//				featureItemPtr->setText(0, feature.name + " (" + feature.id + ")");
-//				featureItemPtr->setText(1, licenseNameText);
-//				featureItemPtr->setText(2, licenseExpirationText);
+				featureItemPtr->setText(0, feature.name + " (" + feature.id + ")");
+				featureItemPtr->setText(0, feature.name + " (" + feature.id + ")");
+				featureItemPtr->setText(1, licenseNameText);
+				featureItemPtr->setText(2, licenseExpirationText);
 
-//				FeatureTree->addTopLevelItem(featureItemPtr);
-//			}
+				FeatureTree->addTopLevelItem(featureItemPtr);
+			}
 		}
 	}
 }
