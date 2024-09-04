@@ -20,6 +20,11 @@ public:
 		Import the license file into the system.
 	*/
 	virtual bool ImportLicense(const QString& licenseFilePath, ilog::IMessageConsumer* logPtr = nullptr) const = 0;
+
+	/**
+		Check if license is valid
+	*/
+	virtual bool CheckLicense(const QByteArray& key) const = 0;
 };
 
 

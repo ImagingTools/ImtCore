@@ -14,6 +14,7 @@
 // ImtCore includes
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtcrypt/IEncryptionKeysProvider.h>
+#include <imtcrypt/IEncryptedFilePersistence.h>
 #include <imtlic/IProductInstanceInfo.h>
 #include <imtlic/ILicenseController.h>
 #include <imtlic/ILicenseStatus.h>
@@ -42,17 +43,20 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(LicenseStatus, imod::IModel, ExtractLicenseStatus);
 		I_ASSIGN(m_productInstanceCompPtr, "ProductInstance", "Instance of the product installation", true, "ProductInstance");
 		I_ASSIGN(m_productInstancePersistenceCompPtr, "ProductInstancePersistence", "Encrypted ersistence for the product instance", true, "ProductInstancePersistence");
+		I_ASSIGN_TO(m_encryptedInstancePersistenceCompPtr, m_productInstancePersistenceCompPtr, true);
 		I_ASSIGN(m_fingerprintInstancePersistenceCompPtr, "FingerprintInstancePersistence", "Fingerprint persistence for the product instance", true, "FingerprintPersistence");
 		I_ASSIGN(m_licensePathCompPtr, "LicenseFilePath", "Path to the license file", true, "LicenseFilePath");
 		I_ASSIGN(m_licenseKeysProviderCompPtr, "LicenseKeys", "Provider of license keys", false, "LicenseKeys");
 		I_ASSIGN(m_licenseFingerprintPathCompPtr, "LicenseFingerprintPath", "Folder containing license fingerprint file", false, "LicenseFingerprintPath");
 		I_ASSIGN(m_fingerprintExpirationAttrPtr, "FingerprintExpiration", "Time in days for the license fingerprint expiration", false, 5);
+		I_ASSIGN(m_additionalImportLicenseErrorMessageAttrPtr, "AdditionalImportLicenseErrorMessage", "Additional message for explaining possible license import problems", false, "");
 	I_END_COMPONENT;
 
 	CLicenseControllerComp();
 
 	// reimplemented (ILicenseController)
 	virtual bool ImportLicense(const QString& licenseFilePath, ilog::IMessageConsumer* logPtr = nullptr) const override;
+	virtual bool CheckLicense(const QByteArray& key) const override;
 
 protected:
 	void OnFingeprintCheckTimer() const;
@@ -98,10 +102,12 @@ private:
 	I_REF(imtlic::IProductInstanceInfo, m_productInstanceCompPtr);
 	I_REF(ifile::IFilePersistence, m_fingerprintInstancePersistenceCompPtr);
 	I_REF(ifile::IFilePersistence, m_productInstancePersistenceCompPtr);
+	I_REF(imtcrypt::IEncryptedFilePersistence, m_encryptedInstancePersistenceCompPtr);
 	I_REF(ifile::IFileNameParam, m_licensePathCompPtr);
 	I_REF(ifile::IFileNameParam, m_licenseFingerprintPathCompPtr);
 	I_REF(imtcrypt::IEncryptionKeysProvider, m_licenseKeysProviderCompPtr);
 	I_ATTR(int, m_fingerprintExpirationAttrPtr);
+	I_TEXTATTR(m_additionalImportLicenseErrorMessageAttrPtr);
 
 	QTimer m_checkLicenseTimer;
 
