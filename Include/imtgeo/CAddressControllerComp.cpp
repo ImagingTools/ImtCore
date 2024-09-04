@@ -248,13 +248,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 	QByteArray newObjectId;
 	QString name, description;
 
-	QString splitObjectId;
-	if (m_separatorObjectIdAttrPtr.IsValid()){
-		splitObjectId = oldObjectId;
-
-		QStringList splitData = splitObjectId.split(*m_separatorObjectIdAttrPtr);
-		splitObjectId = splitData[0].toUtf8();
-	}
+	QString splitObjectId = oldObjectId;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();

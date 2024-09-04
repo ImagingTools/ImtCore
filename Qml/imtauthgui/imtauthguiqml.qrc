@@ -6,10 +6,6 @@
         <file alias="imtauthgui/AdministrationUi.qml">AdministrationUi.qml</file>
         <file alias="imtauthgui/AuthorizationPage.qml">AuthorizationPage.qml</file>
 	<file alias="imtauthgui/AuthorizationController.qml">AuthorizationController.qml</file>
-        <file alias="imtauthgui/AccountEditor.qml">AccountEditor.qml</file>
-        <file alias="imtauthgui/AccountCollectionView.qml">AccountCollectionView.qml</file>
-        <file alias="imtauthgui/AccountEditorCommandsDelegate.qml">AccountEditorCommandsDelegate.qml</file>
-        <file alias="imtauthgui/AccountCollectionViewCommandsDelegate.qml">AccountCollectionViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/UserCollectionView.qml">UserCollectionView.qml</file>
         <file alias="imtauthgui/UserCollectionViewCommandsDelegate.qml">UserCollectionViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/UserGroupCollectionView.qml">UserGroupCollectionView.qml</file>

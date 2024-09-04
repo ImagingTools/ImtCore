@@ -76,9 +76,9 @@ Item {
                 iconSource: enabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Normal) :
                                               "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
 
-                enabled: model.IsEnabled;
+                enabled: model.IsEnabled != undefined && model.IsEnabled != null ? model.IsEnabled : false;
 
-                visible: model.Visible;
+                visible: model.Visible != undefined && model.Visible != null ? model.Visible : false;
 
                 tooltipText: model.TooltipText ? model.TooltipText : "";
 

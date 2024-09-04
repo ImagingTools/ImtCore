@@ -68,25 +68,26 @@ Rectangle {
             height: 30;
 
             TreeItemModel {
-                id: colorCommandsModel;
+                id: commandsModel;
 
                 property bool completed: false;
 
                 Component.onCompleted: {
+                    let index = commandsModel.insertNewItem();
+                    commandsModel.setData("Id", "Up", index);
+                    commandsModel.setData("Icon", "Icons/Up", index);
+                    commandsModel.setData("TooltipText", qsTr("Up"), index);
+                    commandsModel.setData("Visible", root.opened, index);
+                    commandsModel.setData("IsEnabled", true, index);
 
-                    let index = colorCommandsModel.insertNewItem();
-                    colorCommandsModel.setData("Id", "Up", index);
-                    colorCommandsModel.setData("Icon", "Icons/Up", index);
-                    colorCommandsModel.setData("TooltipText", qsTr("Up"), index);
-                    colorCommandsModel.setData("Visible", !root.opened, index);
+                    index = commandsModel.insertNewItem();
+                    commandsModel.setData("Id", "Down", index);
+                    commandsModel.setData("Icon", "Icons/Down", index);
+                    commandsModel.setData("TooltipText", qsTr("Down"), index);
+                    commandsModel.setData("Visible", !root.opened, index);
+                    commandsModel.setData("IsEnabled", true, index);
 
-                    index = colorCommandsModel.insertNewItem();
-                    colorCommandsModel.setData("Id", "Down", index);
-                    colorCommandsModel.setData("Icon", "Icons/Down", index);
-                    colorCommandsModel.setData("TooltipText", qsTr("Down"), index);
-                    colorCommandsModel.setData("Visible", root.opened, index);
-
-                    commands.commandModel = colorCommandsModel
+                    commands.commandModel = commandsModel
                 }
             }
 
@@ -113,26 +114,6 @@ Rectangle {
             }
         }
     }
-
-    // ToolButton {
-    //     id: openButton;
-
-    //     anchors.verticalCenter: parent.verticalCenter;
-    //     anchors.right: parent.right;
-    //     anchors.rightMargin: Style.size_mainMargin;
-
-    //     height: 22;
-    //     width: height;
-    //     visible: root.groupView != null
-
-    //     iconSource: root.opened
-    //                 ? "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal)
-    //                 : "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
-
-    //     onClicked: {
-    //         root.opened = !root.opened;
-    //     }
-    // }
 
     Text {
         id: titleText;

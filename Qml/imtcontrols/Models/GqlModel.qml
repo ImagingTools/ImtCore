@@ -4,12 +4,10 @@ TreeItemModel {
     id: container;
 
     function SetGlobalAccessToken(token){
-        console.log("SetGlobalAccessToken",token)
         XMLHttpRequest.QMLAuthToken = token
     }
     
     function setGqlQuery(gqlData){
-        console.log("setGqlQuery",gqlData)
         this.state = "Loading"
         var xhr = new XMLHttpRequest;
         xhr.open("POST", "../../graphql");

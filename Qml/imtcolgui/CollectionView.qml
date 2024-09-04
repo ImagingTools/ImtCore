@@ -156,11 +156,12 @@ Item {
         property var dataController: null;
 
         onDataControllerCompChanged: {
-            if (dataControllerComp){
-                if (dataController){
-                    dataController.destroy();
-                }
+            if (dataController){
+                dataController.destroy();
+                dataController = null;
+            }
 
+            if (dataControllerComp){
                 dataController = dataControllerComp.createObject(container);
             }
         }

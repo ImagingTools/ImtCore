@@ -9,7 +9,6 @@
 #include <imtgql/CGqlRequest.h>
 
 
-
 namespace imtqml
 {
 

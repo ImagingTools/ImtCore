@@ -15,7 +15,7 @@ DocumentDataController {
 
     property string subscriptionCommandId;
 
-    property bool ok: subscriptionCommandId != "" && documentId != ""
+    property bool ok: subscriptionCommandId != "" && documentId != "";
 
     Component.onDestruction: {
         Events.sendEvent("UnRegisterSubscription", container.subscriptionClient);
@@ -26,7 +26,6 @@ DocumentDataController {
     }
 
     onOkChanged: {
-        console.log("onOkChanged", documentId, subscriptionCommandId)
         if (documentId !== ""){
             container.subscriptionClient.register();
         }
@@ -208,12 +207,12 @@ DocumentDataController {
         }
 
         onStateChanged: {
-            let state = container.gqlGetModel.state;
             if (state === "Error"){
                 container.error("Network error", "Critical");
             }
             else if (state === "Ready"){
                 let responseObj = JSON.parse(this.json)
+
                 if (!responseObj){
                     console.error("Unable convert json ", json, " to object")
                     return;

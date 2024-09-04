@@ -376,7 +376,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	istd::IChangeable* savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
 	if (savedObjectPtr == nullptr){
-		errorMessage = QString("Can not create object for update: '%1'").arg(qPrintable(objectId));
+		// errorMessage = QString("Can not create object for update: '%1'").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return nullptr;
@@ -832,24 +832,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetDataMetaInfo(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectView(
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+		const imtgql::CGqlRequest& /*gqlRequest*/,
+		QString& /*errorMessage*/) const
 {
-	if (!m_objectViewProviderCompPtr.IsValid()){
-		errorMessage = QString("Unable to get the object view. Component reference 'ObjectViewProvider' was not set");
-		SendCriticalMessage(0, errorMessage);
-
-		return nullptr;
-	}
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
-	imtbase::CTreeItemModel* objectViewModelPtr = m_objectViewProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
-	if (objectViewModelPtr != nullptr){
-		rootModelPtr->SetExternTreeModel("data", objectViewModelPtr);
-	}
-
-	return rootModelPtr.PopPtr();
+	return nullptr;
 }
 
 

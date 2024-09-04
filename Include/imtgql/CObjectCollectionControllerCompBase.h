@@ -34,9 +34,7 @@ public:
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_documentChangeGeneratorCompPtr, "DocumentChangeGenerator", "Change generator for the collection object", false, "DocumentChangeGenerator");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
-		I_ASSIGN(m_objectViewProviderCompPtr, "ObjectViewProvider", "Object view provider", false, "ObjectViewProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
-		I_ASSIGN(m_separatorObjectIdAttrPtr, "SeparatorObjectId", "Separator of the object ID", false, "");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
 	I_END_COMPONENT;
 
@@ -166,9 +164,7 @@ protected:
 	I_REF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_headersProviderCompPtr);
-	I_REF(imtgql::IGqlRequestHandler, m_objectViewProviderCompPtr);
 	I_REF(imtgql::IOperationContextController, m_operationContextControllerCompPtr);
-	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
 
 	imtbase::CTimeFilterParamRepresentationController m_timeFilterParamRepresentationController;
 };
