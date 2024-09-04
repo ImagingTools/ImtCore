@@ -194,7 +194,7 @@ void CAccountInfoEditorComp::OnGuiDestroyed()
 
 void CAccountInfoEditorComp::OnComponentCreated()
 {
-	QIcon icon = QIcon(":/Icons/Account"); 
+	QIcon icon = GetIcon(":/Icons/Account"); 
 	if (!icon.isNull()){
 		iimg::CBitmap bitmap(icon.pixmap(300, 300).toImage());
 		m_emptyAccountPicture.CopyFrom(bitmap);
