@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtcrypt/IEncryption.h>
 #include <imtcrypt/IEncryptionKeysProvider.h>
+#include <imtcrypt/IEncryptedFilePersistence.h>
 
 
 namespace imtcrypt
@@ -19,13 +20,15 @@ namespace imtcrypt
 	and underlaying data object persistence (see attribute \c BasePersistence).
 	\ingroup Cryptography
 */
-class CEncryptionBasedPersistenceComp: public ilog::CLoggerComponentBase, virtual public ifile::IFilePersistence
+class CEncryptionBasedPersistenceComp: public ilog::CLoggerComponentBase,
+	virtual public imtcrypt::IEncryptedFilePersistence
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CEncryptionBasedPersistenceComp);
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
+		I_REGISTER_INTERFACE(imtcrypt::IEncryptedFilePersistence);
 		I_ASSIGN(m_encryptionCompPtr, "Encryption", "Encrypt/Decrypt instances", true, "Encryption");
 		I_ASSIGN(m_encryptionKeysProviderCompPtr, "EncryptionKeysProvider", "Keys provider instances", true, "EncryptionKeysProvider");
 		I_ASSIGN(m_basePersistenceCompPtr, "BasePersistence", "Base file export instances", true, "BasePersistence");
@@ -35,6 +38,9 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (imtcrypt::IEncryptedFilePersistence)
+	virtual int LoadFromEncryptedFile(const QByteArray& key, const QString& filePath, istd::IChangeable& data) const override;
+
 	// reimplemented (ifile::IFilePersistence)
 	virtual bool IsOperationSupported(
 			const istd::IChangeable* dataObjectPtr,
@@ -53,6 +59,27 @@ protected:
 	// reimplemented (ifile::IFileTypeInfo)
 	virtual bool GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr = NULL, int flags = -1, bool doAppend = false) const;
 	virtual QString GetTypeDescription(const QString* extensionPtr = NULL) const;
+
+
+	class LocalKeyProvider : public imtcrypt::IEncryptionKeysProvider
+	{
+	public:
+		/**
+		* AES: keyFirst = KT_PASSWORD, keySecond = KT_INIT_VECTOR
+		* RSA: keyFirst = KT_PUBLIC, keySecond = KT_PRIVATE
+		*/
+		LocalKeyProvider(const imtcrypt::IEncryption::EncryptionAlgorithm& algorithm, const QByteArray& keyFirst, const QByteArray& keySecond);
+		LocalKeyProvider() {};
+
+		// reimplemented (imtcrypt::IEncryptionKeysProvider)
+		virtual QByteArray GetEncryptionKey(KeyType type) const;
+	private:
+		bool IsRequestOk(KeyType type) const;
+
+		QByteArray m_keyFirst;
+		QByteArray m_keySecond;
+		imtcrypt::IEncryption::EncryptionAlgorithm m_algorithm = imtcrypt::IEncryption::EA_AES;
+	};
 
 private:
 	I_REF(imtcrypt::IEncryption, m_encryptionCompPtr);

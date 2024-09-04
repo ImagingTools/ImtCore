@@ -6,6 +6,12 @@
 #include <QtCore/QTemporaryDir>
 #include <QtCore/QFileInfo>
 
+// imt includes
+#include <imtcrypt/CAesKey.h>
+#include <imtcrypt/CAesEncryption.h>
+#include <imtcrypt/CRsaEncryption.h>
+#include <imtcrypt/CRsaKey.h>
+
 
 namespace imtcrypt
 {
@@ -13,9 +19,60 @@ namespace imtcrypt
 
 // protected methods
 
-// reimplemented (IEncryptionBasePersistence)
+// reimplemented (imtcrypt::IEncryptedFilePersistence)
 
-bool CEncryptionBasedPersistenceComp::IsOperationSupported(const istd::IChangeable *dataObjectPtr, const QString* /*filePathPtr*/, int /*flags*/, bool /*beQuiet*/) const
+int CEncryptionBasedPersistenceComp::LoadFromEncryptedFile(const QByteArray& key, const QString& filePath, istd::IChangeable& data) const
+{
+	if (!filePath.isEmpty() &&
+		m_encryptionKeysProviderCompPtr.IsValid() &&
+		m_encryptionCompPtr.IsValid()){
+		QFileInfo fileInfo(filePath);
+		QFile file(filePath);
+		if (file.open(QIODevice::ReadOnly)){
+			QByteArray decryptedData;
+			QByteArray encryptedData = file.readAll();
+
+			LocalKeyProvider localKeyProvider;
+
+			imtcrypt::IEncryption::EncryptionAlgorithm encryptionAlgorithm = imtcrypt::IEncryption::EA_AES;
+			if (m_encryptionAlgorithm.IsValid()){
+				switch (*m_encryptionAlgorithm){
+				case 0:
+					encryptionAlgorithm = imtcrypt::IEncryption::EA_RSA;
+					localKeyProvider = LocalKeyProvider(encryptionAlgorithm,
+								m_encryptionKeysProviderCompPtr->GetEncryptionKey(IEncryptionKeysProvider::KT_PUBLIC),
+								m_encryptionKeysProviderCompPtr->GetEncryptionKey(IEncryptionKeysProvider::KT_PRIVATE));
+					break;
+				default:
+					localKeyProvider = LocalKeyProvider(encryptionAlgorithm,
+						key,
+						m_encryptionKeysProviderCompPtr->GetEncryptionKey(IEncryptionKeysProvider::KT_INIT_VECTOR));
+					break;
+				}
+			}
+
+			if (!m_encryptionCompPtr->DecryptData(encryptedData,encryptionAlgorithm, *m_encryptionKeysProviderCompPtr, decryptedData)){
+				file.close();
+				return OS_FAILED;
+			}
+
+			file.close();
+			// data.CopyFrom(decryptedData);
+			return OS_OK;
+		}
+	}
+
+	return OS_FAILED;
+}
+
+
+// reimplemented (ifile::IFilePersistence)
+
+bool CEncryptionBasedPersistenceComp::IsOperationSupported(
+			const istd::IChangeable *dataObjectPtr,
+			const QString* /*filePathPtr*/,
+			int /*flags*/,
+			bool /*beQuiet*/) const
 {
 	if (dataObjectPtr != nullptr){
 		return true;
@@ -51,7 +108,7 @@ int CEncryptionBasedPersistenceComp::LoadFromFile(istd::IChangeable& data, const
 			}
 
 			if (!m_encryptionCompPtr->DecryptData(encryptedData,encryptionAlgorithm, *m_encryptionKeysProviderCompPtr, decryptedData)){
-				SendErrorMessage(0, QString("Data decryption was failed. File '%1' could not be loaded").arg(filePath), "Encryption Persistence");
+				SendErrorMessage(0, QString("Encryption Persistence: Data decryption failed. File '%1' could not be loaded").arg(filePath));
 
 				file.close();
 
@@ -73,7 +130,10 @@ int CEncryptionBasedPersistenceComp::LoadFromFile(istd::IChangeable& data, const
 }
 
 
-int CEncryptionBasedPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString & filePath, ibase::IProgressManager* progressManagerPtr) const
+ifile::IFilePersistence::OperationState CEncryptionBasedPersistenceComp::SaveToFile(
+			const istd::IChangeable& data,
+			const QString & filePath,
+			ibase::IProgressManager* progressManagerPtr) const
 {
 	if (m_basePersistenceCompPtr.IsValid() && !filePath.isEmpty()){
 		QFileInfo fileInfo(filePath);
@@ -153,6 +213,51 @@ QString CEncryptionBasedPersistenceComp::GetTypeDescription(const QString *exten
 	}
 
 	return QString();
+}
+
+
+// methods of embedded class LocalKeyProvider
+
+CEncryptionBasedPersistenceComp::LocalKeyProvider::LocalKeyProvider(
+	const imtcrypt::IEncryption::EncryptionAlgorithm& algorithm,
+	const QByteArray& keyFirst,
+	const QByteArray& keySecond)
+	:m_algorithm(algorithm)
+	,m_keyFirst(keyFirst)
+	, m_keySecond(keySecond)
+{
+}
+
+
+// reimplemented (imtcrypt::IEncryptionKeysProvider)
+
+QByteArray CEncryptionBasedPersistenceComp::LocalKeyProvider::GetEncryptionKey(KeyType type) const
+{
+	bool ok = IsRequestOk(type);
+	if (ok){
+		if (type == imtcrypt::IEncryptionKeysProvider::KT_PASSWORD || type == imtcrypt::IEncryptionKeysProvider::KT_PUBLIC)
+			return m_keyFirst;
+		if (type == imtcrypt::IEncryptionKeysProvider::KT_INIT_VECTOR || type == imtcrypt::IEncryptionKeysProvider::KT_PRIVATE)
+			return m_keySecond;
+	}
+
+	return QByteArray();
+}
+
+
+bool CEncryptionBasedPersistenceComp::LocalKeyProvider::IsRequestOk(KeyType type) const
+{
+	if ((m_algorithm == imtcrypt::IEncryption::EA_AES) &&
+		(type == imtcrypt::IEncryptionKeysProvider::KT_PASSWORD || type == IEncryptionKeysProvider::KT_INIT_VECTOR)){
+		return true;
+	}
+	else if ((m_algorithm == imtcrypt::IEncryption::EA_RSA) &&
+		(type == imtcrypt::IEncryptionKeysProvider::KT_PRIVATE || type == IEncryptionKeysProvider::KT_PUBLIC)){
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 
