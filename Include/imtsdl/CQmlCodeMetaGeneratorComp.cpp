@@ -128,7 +128,7 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 		qmlObjectParams.SetEditableParameter(CQmldirFilePersistenceComp::s_objectVersionNameParamId, &objectVerionNameParam);
 		// c) file
 		iprm::CNameParam objectFileNameParam;
-		objectFileNameParam.SetName(GetQmlKeysWrappedName(sdlType.GetName()));
+		objectFileNameParam.SetName(GetQmlKeysWrappedName(sdlType.GetName()) + QStringLiteral(".qml"));
 		qmlObjectParams.SetEditableParameter(CQmldirFilePersistenceComp::s_objectFileNameParamId, &objectFileNameParam);
 
 		int indexOfInsertedSet = objectsParamsManagerPtr->InsertParamsSet();
