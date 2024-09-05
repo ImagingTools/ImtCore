@@ -298,11 +298,6 @@ QString CQmlCodeMetaGeneratorComp::GetQmlKeysWrappedName(const QString& original
 }
 
 
-QString CQmlCodeMetaGeneratorComp::GetQmlCommandIdsWrappedName(const QString& originalName) const
-{
-	return originalName + *m_qmlCommandIdsFileSuffixAttrPtr;
-}
-
 
 } // namespace imtsdl
 

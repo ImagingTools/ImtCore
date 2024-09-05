@@ -443,8 +443,6 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& s
 
 bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& sdlRequest, bool addSelfHeaderInclude)
 {
-	/// \todo SEPARATE IT!!!!!!!!!
-
 	QTextStream ifStream(m_sourceFilePtr.GetPtr());
 
 	// include section

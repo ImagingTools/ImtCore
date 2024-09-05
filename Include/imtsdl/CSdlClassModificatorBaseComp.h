@@ -10,7 +10,7 @@
 
 // imtsdl includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
-#include <imtsdl/CGqlSchemaParser.h>
+#include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/CSdlTools.h>
 
 

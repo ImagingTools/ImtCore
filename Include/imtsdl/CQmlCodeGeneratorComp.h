@@ -10,7 +10,7 @@
 
 // imtsdl includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
-#include <imtsdl/CGqlSchemaParser.h>
+#include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/CSdlTools.h>
 
 
@@ -19,16 +19,15 @@ namespace imtsdl
 
 /**
 	A base QML generator of SDL types
+	\todo make a base class!
 */
 class CQmlCodeGeneratorComp:
 			public iproc::CSyncProcessorCompBase,
-			public CGqlSchemaParser,
 			private CSdlTools
 {
 
 public:
 	typedef iproc::CSyncProcessorCompBase BaseClass;
-	typedef CGqlSchemaParser BaseClass2;
 
 	I_BEGIN_COMPONENT(CQmlCodeGeneratorComp)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
@@ -55,7 +54,6 @@ private:
 	I_REF(ISdlTypeListProvider, m_sdlTypeListCompPtr);
 	I_MULTIREF(iproc::IProcessor, m_codeGeneratorExtenderListCompPtr);
 
-	/// \todo spilt it all!
 	istd::TDelPtr<QFile> m_qmlFilePtr;
 };
 
