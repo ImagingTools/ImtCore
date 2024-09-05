@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5230" Description="ACF"/>
+            <Version Id="0" Number="5231" Description="ACF"/>
             <Version Id="1" Number="2214" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
@@ -26,6 +26,15 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="QrcPrefixList"/>
+        <Interface InterfaceId="iprm::IOptionsList" ComponentId="QrcPrefixList"/>
+        <Interface InterfaceId="iprm::IOptionsManager" ComponentId="QrcPrefixList"/>
+        <Interface InterfaceId="iprm::IParamsManager" ComponentId="QrcPrefixList"/>
+        <Interface InterfaceId="iprm::ISelectionParam" ComponentId="QrcPrefixList"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="QrcPrefixList"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="QrcPrefixList"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="QrcPrefixList"/>
+    </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

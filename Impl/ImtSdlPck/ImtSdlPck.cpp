@@ -42,12 +42,17 @@ I_EXPORT_COMPONENT(
 I_EXPORT_COMPONENT(
 		QmlCodeGenerator,
 		"The QML generator of SDL types",
-		"Schema Definition Language SDL QML Class Generator")
+		"Schema Definition Language SDL QML Generator")
 
 I_EXPORT_COMPONENT(
 			QmlCodeMetaGenerator,
 			"The QML meta info generator of SDL types",
-			"Schema Definition Language SDL QML Class Generator")
+			"Schema Definition Language SDL QML Generator")
+
+I_EXPORT_COMPONENT(
+			QmlCodeCommandIdGenerator,
+			"The QML file with Command ids generator of SDL requests",
+			"Schema Definition Language SDL QML Generator")
 
 I_EXPORT_COMPONENT(
 			SdlClassTreeModelModificator,
@@ -83,7 +88,12 @@ I_EXPORT_COMPONENT(
 I_EXPORT_COMPONENT(
 			QmldirFilePersistence,
 			"A qmldir file persistence",
-			"Qmldir File Persistence")
+			"Qmldir QT QML File Persistence")
+
+I_EXPORT_COMPONENT(
+			QtResourceFilePersistence,
+			"A Qt resource file persistence",
+			"Qt Resource File Persistence")
 
 } // namespace ImtSdlPck
 

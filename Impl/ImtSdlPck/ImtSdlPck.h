@@ -15,10 +15,12 @@
 #include <imtsdl/CSdlClassJsonModificatorComp.h>
 #include <imtsdl/CQmlCodeGeneratorComp.h>
 #include <imtsdl/CQmlCodeMetaGeneratorComp.h>
+#include <imtsdl/CQmlCodeCommandIdGeneratorComp.h>
 #include <imtsdl/CGqlWrapClassCodeGeneratorComp.h>
 #include <imtsdl/CGqlHandlerBaseClassGeneratorComp.h>
 #include <imtsdl/CGqlCollectionControllerBaseClassGeneratorComp.h>
 #include <imtsdl/CQmldirFilePersistenceComp.h>
+#include <imtsdl/CQtResourceFilePersistenceComp.h>
 
 
 /**
@@ -38,10 +40,12 @@ typedef imtsdl::CSdlClassGqlModificatorComp SdlClassGqlModificator;
 typedef imtsdl::CSdlClassJsonModificatorComp SdlClassJsonModificator;
 typedef imtsdl::CQmlCodeGeneratorComp QmlCodeGenerator;
 typedef imtsdl::CQmlCodeMetaGeneratorComp QmlCodeMetaGenerator;
+typedef imtsdl::CQmlCodeCommandIdGeneratorComp QmlCodeCommandIdGenerator;
 typedef imtsdl::CGqlWrapClassCodeGeneratorComp GqlWrapClassCodeGenerator;
 typedef imtsdl::CGqlHandlerBaseClassGeneratorComp GqlHandlerBaseClassGenerator;
 typedef imtsdl::CGqlCollectionControllerBaseClassGeneratorComp GqlCollectionControllerBaseClassGenerator;
 typedef imtsdl::CQmldirFilePersistenceComp QmldirFilePersistence;
+typedef imtsdl::CQtResourceFilePersistenceComp QtResourceFilePersistence;
 
 
 } // namespace ImtSdlPck

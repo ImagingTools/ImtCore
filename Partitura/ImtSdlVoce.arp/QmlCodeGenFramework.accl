@@ -8,11 +8,14 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ParamsFactory" X="372" Y="525" Note=""/>
-        <Element ComponentName="QmlCodeGenerator" X="625" Y="250" Note=""/>
-        <Element ComponentName="QmlCodeMetaGenerator" X="625" Y="375" Note=""/>
-        <Element ComponentName="QmlEntryFactory" X="400" Y="650" Note=""/>
-        <Element ComponentName="QmldirFilePersistence" X="375" Y="375" Note=""/>
+        <Element ComponentName="ParamsFactory" X="650" Y="700" Note=""/>
+        <Element ComponentName="QmlCodeCommandIdGenerator" X="925" Y="375" Note=""/>
+        <Element ComponentName="QmlCodeGenerator" X="525" Y="100" Note=""/>
+        <Element ComponentName="QmlCodeMetaGenerator" X="400" Y="375" Note=""/>
+        <Element ComponentName="QmlEntryFactory" X="650" Y="800" Note=""/>
+        <Element ComponentName="QmldirFilePersistence" X="650" Y="600" Note=""/>
+        <Element ComponentName="QtResourceFilePersistence" X="925" Y="500" Note=""/>
+        <Element ComponentName="QtResourceModel" X="900" Y="150" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="QmlEntryFactory">
