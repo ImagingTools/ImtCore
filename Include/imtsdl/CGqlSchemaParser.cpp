@@ -156,37 +156,39 @@ bool CGqlSchemaParser::ProcessSchema()
 
 	char foundDelimiter = ':';
 	do {
-		QByteArray schemaType;
-		retVal = retVal && ReadToDelimeter(":}", schemaType, &foundDelimiter);
+		QByteArray key;
+		retVal = retVal && ReadToDelimeter(":}", key, &foundDelimiter);
 		if (foundDelimiter == '}'){
 			// we at and of declaration nothing to do
 			break;
 		}
 
-		QByteArray schemaSynonym;
+		QByteArray value;
 		retVal = retVal && MoveToNextReadableSymbol();
-		retVal = retVal && ReadToDelimeterOrSpace("}", schemaSynonym, &foundDelimiter);
-		schemaSynonym = schemaSynonym.trimmed();
+		retVal = retVal && ReadToDelimeterOrSpace("}", value, &foundDelimiter);
+		value = value.trimmed();
 
-		if (schemaType == QByteArrayLiteral("query")){
-			m_keywordMap[KI_QUERY] = schemaSynonym;
+		if (key == QByteArrayLiteral("query")){
+			m_keywordMap[KI_QUERY] = value;
 		}
-		else if (schemaType == QByteArrayLiteral("mutation")){
-			m_keywordMap[KI_MUTATION] = schemaSynonym;
+		else if (key == QByteArrayLiteral("mutation")){
+			m_keywordMap[KI_MUTATION] = value;
 		}
-		else if (schemaType == QByteArrayLiteral("subscription")){
-			m_keywordMap[KI_SUBSCRIPTION] = schemaSynonym;
+		else if (key == QByteArrayLiteral("subscription")){
+			m_keywordMap[KI_SUBSCRIPTION] = value;
+		}
+		else if (key == QByteArrayLiteral("version")){
+			m_schemaVersion = value;
 		}
 		else if (foundDelimiter == '}'){
 			// schema parsing is done nothing to do anymore
 		}
 		else {
 			SendLogMessage(
-						istd::IInformationProvider::InformationCategory::IC_ERROR,
+						istd::IInformationProvider::InformationCategory::IC_WARNING,
 						0,
-						QString("Unexpected derictive '%1' at %2 line").arg(schemaType, QString::number(m_lastReadLine + 1)),
+						QString("Unexpected derictive '%1' at %2 line. It will be ignored.").arg(key, QString::number(m_lastReadLine + 1)),
 						"CGqlSchemaParser");
-			Q_ASSERT(false);
 		}
 	}
 	while(foundDelimiter != '}');

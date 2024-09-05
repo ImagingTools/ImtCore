@@ -99,6 +99,7 @@ protected:
 	qulonglong m_lastReadLine;
 	bool m_useLastReadChar;
 	QMap<KeyId, QByteArray> m_keywordMap;
+	QString m_schemaVersion;
 
 	SdlTypeList m_sdlTypes;
 	SdlRequestList m_requests;

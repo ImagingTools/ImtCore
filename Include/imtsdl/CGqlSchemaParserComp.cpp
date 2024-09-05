@@ -145,7 +145,7 @@ int CGqlSchemaParserComp::DoProcessing(
 
 	// and parse file with removed remarks
 	m_currentInputFilePtr.SetPtr(new QFile(outputFileName));
-	if (!m_currentInputFilePtr->open(QIODevice::ReadOnly)){
+	if (!m_currentInputFilePtr->open(QIODevice::ReadOnly | QIODevice::Text)){
 		SendErrorMessage(0, QString("Unable to open file '%1'").arg(m_currentInputFilePtr->fileName()));
 		I_CRITICAL();
 
@@ -186,15 +186,26 @@ int CGqlSchemaParserComp::DoProcessing(
 	return TS_OK;
 }
 
+
 bool CGqlSchemaParserComp::ProcessSchemaImports()
 {
 	if (!m_fileSchemaParserCompFactPtr.IsValid()){
-		SendErrorMessage(0, "import is detected, but parser is not configured. (FileSchemaParserFactory) is not set");
+		SendCriticalMessage(0, "import is detected, but parser is not configured. (FileSchemaParserFactory) is not set");
 		I_CRITICAL();
 
 		return BaseClass::ProcessSchemaImports();
 	}
 
+	if (*m_useFilesImportAttrPtr){
+		return ProcessFilesImports();
+	}
+
+	return ProcessJavaStyleImports();
+}
+
+
+bool CGqlSchemaParserComp::ProcessFilesImports()
+{
 	QStringList schemaImportList;
 
 	char foundDelimiter = ' ';
@@ -356,6 +367,63 @@ bool CGqlSchemaParserComp::ProcessSchemaImports()
 	}
 
 	return true;
+}
+
+
+bool CGqlSchemaParserComp::ProcessJavaStyleImports()
+{
+	bool retVal = true;
+	QByteArray importedFilesSectionData;
+	retVal = retVal && MoveToNextReadableSymbol();
+	if (m_lastReadChar == '{'){
+		retVal = retVal && MoveToNextReadableSymbol();
+	}
+	retVal = retVal && ReadToDelimeter(QByteArrayLiteral("}"), importedFilesSectionData);
+	QStringList searchPathList = m_argumentParserCompPtr->GetIncludePaths();
+
+	QStringList importedFiles;
+	QStringList importDirectiveList = QString(importedFilesSectionData).split('\n');
+	for (QString importDirective: importDirectiveList){
+		importedFiles << GetPathsFromImportEntry(importDirective);
+	}
+
+
+	return retVal;
+}
+
+QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(const QString& importDirective) const
+{
+	QStringList foundFiles;
+	// get version from directive
+	QString version;
+	if (importDirective[importDirective.length() - 1].isDigit()){
+		for (auto importDirectiveSymbol = importDirective.crbegin(); importDirectiveSymbol != importDirective.crend(); ++importDirectiveSymbol){
+			auto nextSymbol = importDirectiveSymbol + 1;
+			if (nextSymbol == importDirective.crend()){
+				SendErrorMessage(0, QString("Unexpected import directive '%1'").arg(importDirective));
+			}
+			if (!importDirectiveSymbol->isDigit() && *importDirectiveSymbol != '.'){
+				// we are finished version parsing
+				break;
+			}
+			version.prepend(*importDirectiveSymbol);
+		}
+	}
+	qsizetype versionLength = version.length();
+	if(version.startsWith('.')){
+		version.chop(1);
+	}
+	// check if entry is file
+	QStringList pathParts = importDirective.split('.');
+	pathParts.insert(pathParts.size() - 2, version);
+	QString fileEntryPath = pathParts.join('/');
+	fileEntryPath.append(QStringLiteral(".sdl"));
+	QFileInfo entryInfo(fileEntryPath);
+	if (entryInfo.isFile()){
+
+	}
+
+	return foundFiles;
 }
 
 
