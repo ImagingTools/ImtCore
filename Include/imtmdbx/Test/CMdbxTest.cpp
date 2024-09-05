@@ -68,7 +68,7 @@ int bit_count3(int n)
 			BitsSetTable256[n >> 24]);
 }
 
-int bit_count4(qint64 n)
+int bit_count4(quint64 n)
 {
 	return (BitsSetTable256[n & 0xff] +
 			BitsSetTable256[(n >> 8) & 0xff] +
@@ -137,8 +137,8 @@ void CMdbxTest::test_int64()
 {
 	return;
 
-	qint64 k[64];
-	qint64 b[64];
+	quint64 k[64];
+	quint64 b[64];
 	QElapsedTimer time;
 	time.start();
 	QBENCHMARK_ONCE {
@@ -179,7 +179,7 @@ void CMdbxTest::test_mdbxfind()
 	QElapsedTimer time;
 
 	mdbx::map_handle testHandle = txn.create_map("fap1", mdbx::key_mode::ordinal, mdbx::value_mode::single);
-	qint64 key = 5;
+	quint64 key = 5;
 	mdbx::slice keySlice(&key, 8);
 	std::string value("value5");
 	mdbx::slice valueSlice(value.data());
@@ -210,23 +210,23 @@ void CMdbxTest::test_mdbxfind()
 	keySlice = mdbx::slice(&key, 8);
 	mdbx::cursor_managed cursor = txn.open_cursor(testHandle);
 	mdbx::cursor::move_result result = cursor.find(keySlice);
-	key = result.key.as_int64();
+	key = result.key.as_uint64();
 	result = cursor.to_next(false);
-	key = result.key.as_int64();
+	key = result.key.as_uint64();
 	value = result.value.as_string();
 	result = cursor.to_next(false);
 	if (result.done){
-		key = result.key.as_int64();
+		key = result.key.as_uint64();
 		value = result.value.as_string();
 	}
 	result = cursor.to_next(false);
 	if (result.done){
-		key = result.key.as_int64();
+		key = result.key.as_uint64();
 		value = result.value.as_string();
 	}
 	result = cursor.to_previous(false);
 	if (result.done){
-		key = result.key.as_int64();
+		key = result.key.as_uint64();
 		value = result.value.as_string();
 	}
 }
@@ -252,7 +252,7 @@ void CMdbxTest::test_mdbxcursor()
 	data += name.toUtf8();
 
 	mdbx::slice keySlice(data.data(), data.size());
-	// qint64 key = 5;
+	// quint64 key = 5;
 	// mdbx::slice keySlice(&key, 8);
 
 	std::string value("value0");
@@ -308,23 +308,23 @@ void CMdbxTest::test_mdbxcursor()
 	// key = 3;
 	// keySlice = mdbx::slice(&key, 8);
 	// mdbx::cursor::move_result result = cursor.find(keySlice);
-	// key = result.key.as_int64();
+	// key = result.key.as_uint64();
 	// result = cursor.to_next(false);
-	// key = result.key.as_int64();
+	// key = result.key.as_uint64();
 	// value = result.value.as_string();
 	// result = cursor.to_next(false);
 	// if (result.done){
-	// 	key = result.key.as_int64();
+	// 	key = result.key.as_uint64();
 	// 	value = result.value.as_string();
 	// }
 	// result = cursor.to_next(false);
 	// if (result.done){
-	// 	key = result.key.as_int64();
+	// 	key = result.key.as_uint64();
 	// 	value = result.value.as_string();
 	// }
 	// result = cursor.to_previous(false);
 	// if (result.done){
-	// 	key = result.key.as_int64();
+	// 	key = result.key.as_uint64();
 	// 	value = result.value.as_string();
 	// }
 }
@@ -344,7 +344,7 @@ void CMdbxTest::test_mdbxmap()
 
 	mdbx::map_handle testHandle = txn.create_map("map", mdbx::key_mode::ordinal, mdbx::value_mode::single);
 	time.start();
-	for (qint64 i = 1; i < 10000; i++){
+	for (quint64 i = 1; i < 10000; i++){
 
 		//		if (i%100000 == 0){
 		//			std::string mapName = "map" + QString::number(i/100000).toStdString();
@@ -430,7 +430,7 @@ void CMdbxTest::test_mdbx()
 	mdbx::map_handle testHandle = txn.create_map("test", mdbx::key_mode::reverse, mdbx::value_mode::single);
 	QElapsedTimer time;
 	time.start();
-	for (qint64 i = 1000000; i < 1000000; i++){
+	for (quint64 i = 1000000; i < 1000000; i++){
 		std::string key("key");
 		key += std::to_string(i);
 		std::string value("value");
@@ -455,7 +455,7 @@ void CMdbxTest::test_mdbx()
 		}
 	}
 
-	//	for (qint64 i = 0; i < 1000000; i++){
+	//	for (quint64 i = 0; i < 1000000; i++){
 	//		mdbx::slice keySlice(&i, 8);
 	//		txn.erase(testHandle, keySlice);
 	//		if(i%100000 == 0){
@@ -470,7 +470,7 @@ void CMdbxTest::test_mdbx()
 	txn = env.start_read();
 
 	mdbx::cursor_managed cursor = txn.open_cursor(testHandle);
-	qint64 key = 1000;
+	quint64 key = 1000;
 	mdbx::slice keySlice(&key, 8);
 	mdbx::slice valueSlice;
 	//	if (cursor.seek(keySlice)){
@@ -484,15 +484,15 @@ void CMdbxTest::test_mdbx()
 	//	qDebug() << result.value.as_string().data();
 	qDebug() << "Start read masks";
 	time.restart();
-	qint64 b[32];
-	for (qint64 i = 0; i < 48000; i++){
+	quint64 b[32];
+	for (quint64 i = 0; i < 48000; i++){
 		mdbx::slice keySlice(&i, 8);
 		//		cursor.seek(keySlice);
 		//		mdbx::slice result = cursor.txn().get(testHandle, keySlice);
-		//		qint64* k = static_cast<qint64*>(result.data());
+		//		quint64* k = static_cast<quint64*>(result.data());
 
 		mdbx::cursor::move_result result = cursor.find(keySlice);
-		qint64* k = static_cast<qint64*>(result.value.data());
+		quint64* k = static_cast<quint64*>(result.value.data());
 		for (int cursor = 0; cursor < 32; cursor++){
 			k[cursor] = k[cursor] & b[cursor];
 		}
@@ -536,14 +536,14 @@ void CMdbxTest::test_read_all_units(){
 	mdbx::cursor::move_result result = cursorRead.to_first();
 	int count = 0;
 	while(1){
-		qint64 keyRead;
+		quint64 keyRead;
 		std::string valueRead;
 		std::string keyReadIndex;
-		qint64 valueReadIndex;
+		quint64 valueReadIndex;
 
 		if (result.done){
 			if(!isIndex){
-				keyRead = result.key.as_int64();
+				keyRead = result.key.as_uint64();
 				valueRead = result.value.as_string();
 
 				if(count%1 == 0){
@@ -552,7 +552,7 @@ void CMdbxTest::test_read_all_units(){
 			}
 			else {
 				keyReadIndex = result.key.as_string();
-				valueReadIndex = result.value.as_int64();
+				valueReadIndex = result.value.as_uint64();
 				if(count%1 == 0){
 					qDebug() << "Итерация " << count << " READING:INDEX " << keyReadIndex << " " << valueReadIndex << "\n";
 				}
@@ -591,7 +591,7 @@ void CMdbxTest::test_write_units(){
 
 //	documentTable.StartWriteProcess();
 
-	for (qint64 i = 1; i < 1000000; i++){
+	for (quint64 i = 1; i < 1000000; i++){
 		QString data = "unit";
 		data += QString::number(i);
 		documentTable.AddDocument(data.toLocal8Bit());
@@ -622,7 +622,7 @@ void CMdbxTest::test_write_10units(){
 
 //		documentTable.StartWriteProcess();
 
-	for (qint64 i = 1; i < 11; i++){
+	for (quint64 i = 1; i < 11; i++){
 		QString data = "unit";
 		data += QString::number(i);
 		documentTable.AddDocument(data.toLocal8Bit());
@@ -647,7 +647,7 @@ void CMdbxTest::test_write_10unitsInt(){
 
 	//	documentTable.StartWriteProcess();
 
-	for (qint64 i = 1; i < 11; i++){
+	for (quint64 i = 1; i < 11; i++){
 		documentTable.AddDocument(i);
 	}
 	txn.commit();
@@ -689,7 +689,7 @@ void CMdbxTest::test_get_doc(){
 
 	imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable(tableName, txn);
 
-	qint64 key = 2;
+	quint64 key = 2;
 	QByteArray result  = documentTable.GetDocument(key);
 
 	qDebug() << "RESULT:: " << QString(result);
@@ -711,7 +711,8 @@ void CMdbxTest::test_get_key(){
 	imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable(tableName, txn);
 
 	QByteArray value = "unit6";
-	qint64 key  = documentTable.GetKey(value);
+	quint64 key;
+	documentTable.GetKey(key, value);
 
 	qDebug() << "KEY:: " << key;
 
@@ -724,7 +725,7 @@ void CMdbxTest::test_update_doc(){
 	qDebug() << "test_update_doc";
 
 	QString tableName = "Units10";
-	qint64 index = 9;
+	quint64 index = 9;
 
 	imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine(tableName + ".mdb");
 	mdbx::env_managed env = engine.GetEnv();
@@ -749,7 +750,7 @@ void CMdbxTest::test_update_doc(){
 
 //		QString tableName = "Units10";
 
-//		qint64 key = 3;
+//		quint64 key = 3;
 //		std::string data = "NEW_VALUE!!!";
 //		mdbx::slice keySlice(&key, 8);
 //		mdbx::slice valueSlice(data.data(), data.length());
@@ -822,7 +823,7 @@ void CMdbxTest::test_update_doc(){
 //	qDebug() << "Time:: " << time.toString();
 
 //	//reading
-//	qint64 key = 3;
+//	quint64 key = 3;
 //	mdbx::slice keySlice(&key, 8);
 //	std::string data = "newNew";
 

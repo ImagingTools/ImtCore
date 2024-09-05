@@ -58,10 +58,14 @@ bool CDoubleMask::GetNearestOffset(quint64& offset, quint64 startOffset)
 }
 
 
-bool CDoubleMask::GetNextItemOffset(quint64& offset, qint64 startOffset)
+bool CDoubleMask::GetNextItemOffset(quint64& offset, quint64 startOffset)
 {
-	quint64 startLocalOffset = (m_externKey << 32) + startOffset;
+	quint64 externKeyTEST = m_externKey;
+
+	quint64 startLocalOffset = (m_externKey << 32);
+	startLocalOffset += startOffset;
 	quint64 localOffset = 0;
+
 
 	bool retVal = CMask::GetNextItemOffset(localOffset, startLocalOffset);
 	if (retVal){
@@ -77,6 +81,9 @@ bool CDoubleMask::GetNextItemOffset(quint64& offset, qint64 startOffset)
 		retVal = false;
 	}
 
+	if(retVal && offset < startOffset){
+//		Q_ASSERT(0);
+	}
 	return retVal;
 }
 

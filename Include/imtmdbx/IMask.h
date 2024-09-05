@@ -18,7 +18,7 @@ public:
 	virtual bool SetItem(quint64 offset, quint64 item) = 0;
 
 	virtual bool GetNearestOffset(quint64& offset, quint64 startOffset = 0) = 0;
-	virtual bool GetNextItemOffset(quint64& offset, qint64 startOffset = -1) = 0;
+	virtual bool GetNextItemOffset(quint64& offset, quint64 startOffset = -1) = 0;
 	virtual bool GetPreviosItemOffset(quint64& offset, quint64 startOffset = 0xffffffffffffff) = 0;
 };
 

@@ -60,33 +60,33 @@ CDocumentTable::~CDocumentTable()
 
 
 // reimplemented (imtmdbx::IDocumentTable)
-qint64 CDocumentTable::AddDocument(const QByteArray &data)
+quint64 CDocumentTable::AddDocument(const QByteArray &data)
 {
 	return AddDocument(data.data(), data.length());
 }
 
 
-qint64 CDocumentTable::AddDocument(qint64 data)
+quint64 CDocumentTable::AddDocument(quint64 data)
 {
 	return AddDocument((char*)&data, 8);
 }
 
-qint64 CDocumentTable::AddDocument(const QByteArray &key, const QByteArray &data)
+quint64 CDocumentTable::AddDocument(const QByteArray &key, const QByteArray &data)
 {
 	return AddDocument(data.data(), data.length(), key);
 }
 
 
-qint64 CDocumentTable::AddDocument(const char *data, int count, const QByteArray& keyStr)
+quint64 CDocumentTable::AddDocument(const char *data, int count, const QByteArray& keyStr)
 {
 	try{
 		mdbx::cursor::move_result result = m_cursor.to_last(false);
 
-		qint64 key = 0;
+		quint64 key = 0;
 
 
 		if(result.done && keyStr.isEmpty()){
-			key = result.key.as_int64();
+			key = result.key.as_uint64();
 			key++;
 		}
 
@@ -140,7 +140,7 @@ QByteArray CDocumentTable::GetDocument()
 }
 
 
-QByteArray CDocumentTable::GetDocument(qint64 key)
+QByteArray CDocumentTable::GetDocument(quint64 key)
 {
 	QByteArray doc = QByteArray();
 	mdbx::slice keySlice(&key, 8);
@@ -176,7 +176,7 @@ QByteArray CDocumentTable::GetDocument(const QByteArray &key)
 }
 
 
-bool CDocumentTable::HasRecord(qint64 key)
+bool CDocumentTable::HasRecord(quint64 key)
 {
 	bool ok = false;
 	mdbx::slice keySlice(&key, 8);
@@ -210,7 +210,7 @@ bool CDocumentTable::HasRecord(const QByteArray &key)
 }
 
 
-bool CDocumentTable::UpdateDocument(qint64 key, const QByteArray &data)
+bool CDocumentTable::UpdateDocument(quint64 key, const QByteArray &data)
 {
 	return UpdateDocument((char*)&key, 8, data);
 }
@@ -259,16 +259,17 @@ bool CDocumentTable::UpdateDocument(const char *key, int count, const QByteArray
 	return true;
 }
 
-qint64 CDocumentTable::GetKey(const QByteArray &value)
+bool CDocumentTable::GetKey(quint64& key, const QByteArray &value)
 {
 	//qDebug() << "CDocumentTable::GetKey";
 
-	qint64 key = -1;
+	bool ok = false;
 
 	if(value.isEmpty()){
 		mdbx::cursor::move_result result = m_cursorIndex.current(false);
 		if(result.done){
-			key = result.key.as_int64();
+			key = result.key.as_uint64();
+			ok = true;
 		}
 	}
 
@@ -277,7 +278,8 @@ qint64 CDocumentTable::GetKey(const QByteArray &value)
 			mdbx::slice valueSlice(value);
 			mdbx::cursor::move_result result = m_cursorIndex.find(valueSlice, false);
 			if(result.done){
-				key = result.value.as_int64();
+				key = result.value.as_uint64();
+				ok = true;
 			}
 		}
 		else {
@@ -285,13 +287,14 @@ qint64 CDocumentTable::GetKey(const QByteArray &value)
 				mdbx::cursor::move_result result = m_cursor.to_first(false);
 				if(result.done){
 					while(1){
-						qint64 keyRead;
+						quint64 keyRead;
 						std::string valueRead;
 						if (result.done){
-							keyRead = result.key.as_int64();
+							keyRead = result.key.as_uint64();
 							valueRead = result.value.as_string();
 							if(valueRead.data() == value){
 								key = keyRead;
+								ok = true;
 								break;
 							}
 						}
@@ -309,37 +312,37 @@ qint64 CDocumentTable::GetKey(const QByteArray &value)
 				}
 			}
 			catch(...){
-				return -1;
+				return false;
 			}
 		}
 	}
 
-	return key;
+	return ok;
 }
 
-qint64 CDocumentTable::GetFirstKey()
+bool CDocumentTable::GetFirstKey(quint64& key)
 {
-	qint64 key = -1;
-
+	bool ok = false;
 	mdbx::cursor::move_result result = m_cursor.to_first(false);
 	if(result.done){
-		key = result.key.as_int64();
+		key = result.key.as_uint64();
+		ok = true;
 	}
 
-	return key;
+	return ok;
 }
 
 
-qint64 CDocumentTable::GetLastKey()
+bool CDocumentTable::GetLastKey(quint64& key)
 {
-	qint64 key = -1;
-
+	bool ok = false;
 	mdbx::cursor::move_result result = m_cursor.to_last(false);
 	if(result.done){
-		key = result.key.as_int64();
+		key = result.key.as_uint64();
+		ok = true;
 	}
 
-	return key;
+	return ok;
 }
 
 
@@ -417,10 +420,10 @@ bool CDocumentTable::CreateIndex()
 		mdbx::cursor::move_result result = m_cursor.to_first();
 
 		while(1){
-			qint64 keyRead;
+			quint64 keyRead;
 			std::string valueRead;
 			if (result.done){
-				keyRead = result.key.as_int64();
+				keyRead = result.key.as_uint64();
 				valueRead = result.value.as_string();
 				mdbx::slice keyIndex (valueRead.data());
 				mdbx::slice valueIndex (&keyRead, 8);
@@ -446,7 +449,7 @@ bool CDocumentTable::CreateIndex()
 }
 
 
-bool CDocumentTable::MoveTo(qint64 key)
+bool CDocumentTable::MoveTo(quint64 key)
 {
 	bool ok = false;
 
@@ -501,7 +504,7 @@ bool CDocumentTable::MoveToLast()
 }
 
 
-bool CDocumentTable::MoveToLowerBound(qint64 key)
+bool CDocumentTable::MoveToLowerBound(quint64 key)
 {
 	bool ok = false;
 
