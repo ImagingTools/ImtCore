@@ -12,21 +12,15 @@
 #include <iprm/CNameParam.h>
 #include <iprm/CEnableableParam.h>
 
+// ImtCore includes
+#include <imtsdl/imtsdl.h>
+
 
 namespace imtsdl
 {
 
 
-// public static veriables
-const QByteArray CQmldirFilePersistenceComp::s_moduleNameParamId =			QByteArrayLiteral("ModuleName");
-const QByteArray CQmldirFilePersistenceComp::s_objectsParamId =				QByteArrayLiteral("Objects");
-const QByteArray CQmldirFilePersistenceComp::s_objectIsSingletonParamId =	QByteArrayLiteral("IsSingleton");
-const QByteArray CQmldirFilePersistenceComp::s_objectTypeNameParamId =		QByteArrayLiteral("TypeName");
-const QByteArray CQmldirFilePersistenceComp::s_objectVersionNameParamId =	QByteArrayLiteral("VersionName");
-const QByteArray CQmldirFilePersistenceComp::s_objectFileNameParamId =		QByteArrayLiteral("FileName");
-
 // public methods
-
 
 // reimplemented (ifile::IFilePersistence)
 
@@ -84,7 +78,7 @@ int CQmldirFilePersistenceComp::LoadFromFile(
 	QTextStream fileStream(&loadFile);
 
 	iprm::IParamsManager* objectEntriesManagerPtr(m_paramsManagerFactComp.CreateInstance());
-	paramsSetPtr->SetEditableParameter(s_objectsParamId, objectEntriesManagerPtr, true);
+	paramsSetPtr->SetEditableParameter(QmldirModelParamIds::Objects, objectEntriesManagerPtr, true);
 	quint64 lastReadLine = 0;
 	while(!fileStream.atEnd()){
 		QString readLine = fileStream.readLine();
@@ -97,7 +91,7 @@ int CQmldirFilePersistenceComp::LoadFromFile(
 			const QString moduleName = moduleNameMatch.capturedTexts().constLast();
 			iprm::CNameParam* moduleNameParamPtr = new iprm::CNameParam;
 			moduleNameParamPtr->SetName(moduleName);
-			paramsSetPtr->SetEditableParameter(s_moduleNameParamId, moduleNameParamPtr, true);
+			paramsSetPtr->SetEditableParameter(QmldirModelParamIds::ModuleName, moduleNameParamPtr, true);
 		}
 
 		// QML Object
@@ -124,21 +118,21 @@ int CQmldirFilePersistenceComp::LoadFromFile(
 			static QRegularExpression singletonRegExp("^\\s*(singleton)");
 			bool isSingleton = singletonRegExp.match(readLine).hasMatch();
 			iprm::CEnableableParam isSingletonParam(isSingleton);
-			qmlObjectParams.SetEditableParameter(s_objectIsSingletonParamId, &isSingletonParam);
+			qmlObjectParams.SetEditableParameter(QmldirModelParamIds::ObjectIsSingleton, &isSingletonParam);
 
 			// get object's info
 			// a) type
 			iprm::CNameParam objectNameParam;
 			objectNameParam.SetName(capturedTexts[0]);
-			qmlObjectParams.SetEditableParameter(s_objectTypeNameParamId, &objectNameParam);
+			qmlObjectParams.SetEditableParameter(QmldirModelParamIds::ObjectTypeName, &objectNameParam);
 			// b) version
 			iprm::CNameParam objectVerionNameParam;
 			objectVerionNameParam.SetName(capturedTexts[1]);
-			qmlObjectParams.SetEditableParameter(s_objectVersionNameParamId, &objectVerionNameParam);
+			qmlObjectParams.SetEditableParameter(QmldirModelParamIds::ObjectVersionName, &objectVerionNameParam);
 			// c) file
 			iprm::CNameParam objectFileNameParam;
 			objectFileNameParam.SetName(capturedTexts[2]);
-			qmlObjectParams.SetEditableParameter(s_objectFileNameParamId, &objectFileNameParam);
+			qmlObjectParams.SetEditableParameter(QmldirModelParamIds::ObjectFileName, &objectFileNameParam);
 
 			// insert params set to object entries manager
 			int indexOfInsertedSet = objectEntriesManagerPtr->InsertParamsSet();
@@ -195,9 +189,9 @@ int CQmldirFilePersistenceComp::SaveToFile(
 	QTextStream fileStream(&saveFile);
 
 	// module name
-	iprm::TParamsPtr<iprm::INameParam> moduleNameParam(paramsSetPtr, s_moduleNameParamId);
+	iprm::TParamsPtr<iprm::INameParam> moduleNameParam(paramsSetPtr, QmldirModelParamIds::ModuleName);
 	if (!moduleNameParam.IsValid()){
-		SendErrorMessage(0, QString("Name param '%1' is missing").arg(s_moduleNameParamId));
+		SendErrorMessage(0, QString("Name param '%1' is missing").arg(QmldirModelParamIds::ModuleName));
 		I_CRITICAL();
 
 		return OS_FAILED;
@@ -206,7 +200,7 @@ int CQmldirFilePersistenceComp::SaveToFile(
 	fileStream << Qt::endl << Qt::endl;
 
 	// QML objects
-	iprm::TParamsPtr<iprm::IParamsManager> objectEntriesManagerPtr(paramsSetPtr, s_objectsParamId, false);
+	iprm::TParamsPtr<iprm::IParamsManager> objectEntriesManagerPtr(paramsSetPtr, QmldirModelParamIds::Objects, false);
 	if (objectEntriesManagerPtr.IsValid() && objectEntriesManagerPtr->GetParamsSetsCount() > 0){
 		int objectsCount = objectEntriesManagerPtr->GetParamsSetsCount();
 		for (int objectEntryIndex = 0; objectEntryIndex < objectsCount; ++objectEntryIndex){
@@ -219,7 +213,7 @@ int CQmldirFilePersistenceComp::SaveToFile(
 			}
 
 			// determine whether an object is a singleton
-			iprm::TParamsPtr<iprm::IEnableableParam> singletonParamPtr(objectEntryParamsSetPtr, s_objectIsSingletonParamId, false);
+			iprm::TParamsPtr<iprm::IEnableableParam> singletonParamPtr(objectEntryParamsSetPtr, QmldirModelParamIds::ObjectIsSingleton, false);
 			if (singletonParamPtr.IsValid()){
 				bool isSingleton = singletonParamPtr->IsEnabled();
 				// write singleton directive for entry
@@ -230,7 +224,7 @@ int CQmldirFilePersistenceComp::SaveToFile(
 
 			// write object's info
 			// a) type
-			iprm::TParamsPtr<iprm::CNameParam> objectNameParamPtr(objectEntryParamsSetPtr, s_objectTypeNameParamId, true);
+			iprm::TParamsPtr<iprm::CNameParam> objectNameParamPtr(objectEntryParamsSetPtr, QmldirModelParamIds::ObjectTypeName, true);
 			if (!objectNameParamPtr.IsValid()){
 				SendErrorMessage(0, "Object name param is missing!");
 
@@ -239,7 +233,7 @@ int CQmldirFilePersistenceComp::SaveToFile(
 			fileStream << objectNameParamPtr->GetName() << ' ';
 
 			// b) version
-			iprm::TParamsPtr<iprm::CNameParam> objectVerionNameParamPtr(objectEntryParamsSetPtr, s_objectVersionNameParamId, true);
+			iprm::TParamsPtr<iprm::CNameParam> objectVerionNameParamPtr(objectEntryParamsSetPtr, QmldirModelParamIds::ObjectVersionName, true);
 			if (!objectVerionNameParamPtr.IsValid()){
 				SendErrorMessage(0, "Object version name param is missing!");
 
@@ -248,7 +242,7 @@ int CQmldirFilePersistenceComp::SaveToFile(
 			fileStream << objectVerionNameParamPtr->GetName() << ' ';
 
 			// c) file
-			iprm::TParamsPtr<iprm::CNameParam> objectFileNameParamPtr(objectEntryParamsSetPtr, s_objectFileNameParamId, true);
+			iprm::TParamsPtr<iprm::CNameParam> objectFileNameParamPtr(objectEntryParamsSetPtr, QmldirModelParamIds::ObjectFileName, true);
 			if (!objectFileNameParamPtr.IsValid()){
 				SendErrorMessage(0, "Object file name param is missing!");
 

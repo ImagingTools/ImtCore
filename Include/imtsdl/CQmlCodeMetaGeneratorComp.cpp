@@ -103,7 +103,7 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 	}
 
 	const QString currentNamespace = m_argumentParserCompPtr->GetNamespace();
-	iprm::IParamsManager* objectsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(qmldirDataParams.GetEditableParameter(CQmldirFilePersistenceComp::s_objectsParamId));
+	iprm::IParamsManager* objectsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(qmldirDataParams.GetEditableParameter(QmldirModelParamIds::Objects));
 	if (objectsParamsManagerPtr == nullptr){
 		SendCriticalMessage(0, "Invalid params created");
 		I_CRITICAL();
@@ -117,21 +117,21 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 
 		// set singleton
 		iprm::CEnableableParam isSingletonParam(true);
-		qmlObjectParams.SetEditableParameter(CQmldirFilePersistenceComp::s_objectIsSingletonParamId, &isSingletonParam);
+		qmlObjectParams.SetEditableParameter(QmldirModelParamIds::ObjectIsSingleton, &isSingletonParam);
 
 		// get object's info
 		// a) type
 		iprm::CNameParam objectNameParam;
 		objectNameParam.SetName(GetQmlKeysWrappedName(sdlType.GetName()));
-		qmlObjectParams.SetEditableParameter(CQmldirFilePersistenceComp::s_objectTypeNameParamId, &objectNameParam);
+		qmlObjectParams.SetEditableParameter(QmldirModelParamIds::ObjectTypeName, &objectNameParam);
 		// b) version
 		iprm::CNameParam objectVerionNameParam;
 		objectVerionNameParam.SetName(QStringLiteral(" 1.0 "));
-		qmlObjectParams.SetEditableParameter(CQmldirFilePersistenceComp::s_objectVersionNameParamId, &objectVerionNameParam);
+		qmlObjectParams.SetEditableParameter(QmldirModelParamIds::ObjectVersionName, &objectVerionNameParam);
 		// c) file
 		iprm::CNameParam objectFileNameParam;
 		objectFileNameParam.SetName(GetQmlKeysWrappedName(sdlType.GetName()) + QStringLiteral(".qml"));
-		qmlObjectParams.SetEditableParameter(CQmldirFilePersistenceComp::s_objectFileNameParamId, &objectFileNameParam);
+		qmlObjectParams.SetEditableParameter(QmldirModelParamIds::ObjectFileName, &objectFileNameParam);
 
 		int indexOfInsertedSet = objectsParamsManagerPtr->InsertParamsSet();
 		iprm::IParamsSet* objectEntryParamsSetPtr = objectsParamsManagerPtr->GetParamsSet(indexOfInsertedSet);

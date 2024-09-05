@@ -21,21 +21,7 @@ class CQmldirFilePersistenceComp:
 			virtual public ifile::IFilePersistenceInfo
 {
 public:
-	// common param IDs
-	/// defines an ID of the "module name" parameter, represented as \c iprm::INameParam
-	const static QByteArray s_moduleNameParamId;
-	/// defines an ID of the "Objects" parameter, represented as ilst of parameters i.e. \c iprm::IParamsManager of \c iprm::IParamsSet
-	const static QByteArray s_objectsParamId;
 
-	// object param IDs
-	/// defines an ID of the "singleton" parameter, represented as \c ipem::IEnableableParam
-	const static QByteArray s_objectIsSingletonParamId;
-	/// defines an ID of the "type name" parameter, represented as \c iprm::INameParam
-	const static QByteArray s_objectTypeNameParamId;
-	/// defines an ID of the "object version name" parameter, represented as \c iprm::INameParam
-	const static QByteArray s_objectVersionNameParamId;
-	/// defines an ID of the "object file name" parameter - is a relative file path, represented as \c iprm::INameParam
-	const static QByteArray s_objectFileNameParamId;
 
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
