@@ -46,10 +46,9 @@ public:
 				istd::IChangeable* outputPtr,
 				ibase::IProgressManager* progressManagerPtr = NULL) override;
 private:
-	static QString WrapFileName(const QString& baseName, const QString& ext, const QString& directoryPath = QString());
+	static QString WrapFileName(const QString& ext, const QString& directoryPath = QString());
 
 private:
-	QString GetBaseFileName() const;
 	bool CloseFiles();
 	bool ProcessFiles(bool addDependenciesInclude, bool addSelfHeaderInclude);
 	bool ProcessHeaderClassFile(bool addDependenciesInclude);

@@ -56,22 +56,21 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 	const QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
 	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
 	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
-	const QString fileBaseName = GetBaseFileName();
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
 		if (joinHeaders){
 			std::cout << joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType].toStdString() << std::endl;
 			std::cout << joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType].toStdString() << std::endl;
 		}
 		else {
-			std::cout << WrapFileName(fileBaseName, QStringLiteral("h"), outputDirectoryPath).toStdString() << std::endl;
-			std::cout << WrapFileName(fileBaseName, QStringLiteral("cpp"), outputDirectoryPath).toStdString() << std::endl;
+			std::cout << WrapFileName(QStringLiteral("h"), outputDirectoryPath).toStdString() << std::endl;
+			std::cout << WrapFileName(QStringLiteral("cpp"), outputDirectoryPath).toStdString() << std::endl;
 		}
 
 		return TS_OK;
 	}
 
-	m_headerFilePtr.SetPtr(new QFile(WrapFileName(fileBaseName, QStringLiteral("h"), outputDirectoryPath)));
-	m_sourceFilePtr.SetPtr(new QFile(WrapFileName(fileBaseName, QStringLiteral("cpp"), outputDirectoryPath)));
+	m_headerFilePtr.SetPtr(new QFile(WrapFileName(QStringLiteral("h"), outputDirectoryPath)));
+	m_sourceFilePtr.SetPtr(new QFile(WrapFileName(QStringLiteral("cpp"), outputDirectoryPath)));
 
 	if (!ProcessFiles(!joinHeaders, !joinSources)){
 		SendErrorMessage(0, QString("Unable to begin files"));
@@ -123,7 +122,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 
 			if (joinHeaders){
 				filterParams.ResetOptions();
-				filterParams.InsertOption(WrapFileName(fileBaseName, QStringLiteral("h")), QByteArray::number(filterParams.GetOptionsCount()));
+				filterParams.InsertOption(WrapFileName(QStringLiteral("h")), QByteArray::number(filterParams.GetOptionsCount()));
 
 				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
@@ -135,12 +134,12 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 				}
 
 				// cleanup joined files
-				QFile::remove(WrapFileName(fileBaseName, QStringLiteral("h"), outputDirectoryPath));
-
+				QFile::remove(WrapFileName(QStringLiteral("h"), outputDirectoryPath));
 			}
+
 			if (joinSources){
 				filterParams.ResetOptions();
-				filterParams.InsertOption(WrapFileName(fileBaseName, QStringLiteral("cpp")), QByteArray::number(filterParams.GetOptionsCount()));
+				filterParams.InsertOption(WrapFileName(QStringLiteral("cpp")), QByteArray::number(filterParams.GetOptionsCount()));
 
 				const QString sourceFilePath = joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
 				outputFileNameParam.SetPath(sourceFilePath);
@@ -153,7 +152,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 				}
 
 				// cleanup joined files
-				QFile::remove(WrapFileName(fileBaseName, QStringLiteral("cpp"), outputDirectoryPath));
+				QFile::remove(WrapFileName(QStringLiteral("cpp"), outputDirectoryPath));
 
 				// add joined header include directive
 				if (joinHeaders){
@@ -183,7 +182,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 
 // private static methods
 
-QString CGqlHandlerBaseClassGeneratorComp::WrapFileName(const QString& baseName, const QString& ext, const QString& directoryPath)
+QString CGqlHandlerBaseClassGeneratorComp::WrapFileName(const QString& ext, const QString& directoryPath)
 {
 	QString retVal;
 	Q_ASSERT_X(!ext.isEmpty(), __func__, "Extension for file MUST be specified");
@@ -194,9 +193,7 @@ QString CGqlHandlerBaseClassGeneratorComp::WrapFileName(const QString& baseName,
 			retVal.append('/');
 		}
 	}
-	retVal += 'C';
-	retVal.append(baseName);
-	retVal.append(QStringLiteral("GraphQlHandlerCompBase."));
+	retVal.append(QStringLiteral("CGraphQlHandlerCompBase."));
 	retVal.append(ext);
 
 	return retVal;
@@ -204,20 +201,6 @@ QString CGqlHandlerBaseClassGeneratorComp::WrapFileName(const QString& baseName,
 
 
 // private methods
-
-QString CGqlHandlerBaseClassGeneratorComp::GetBaseFileName() const
-{
-	if (!m_argumentParserCompPtr.IsValid()){
-		return QString();
-	}
-
-	QString fileBaseName = m_argumentParserCompPtr->GetNamespace();
-	fileBaseName.replace(QStringLiteral("::"), QStringLiteral(""));
-	fileBaseName = GetCapitalizedValue(fileBaseName);
-
-	return fileBaseName;
-}
-
 
 bool CGqlHandlerBaseClassGeneratorComp::CloseFiles()
 {
@@ -292,7 +275,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 
 	// class begin
 	FeedStream(ifStream, 2, false);
-	ifStream << QStringLiteral("class C") << GetBaseFileName() << QStringLiteral("GraphQlHandlerCompBase");
+	ifStream << QStringLiteral("class CGraphQlHandlerCompBase");
 	FeedStream(ifStream, 1, false);
 	ifStream << QStringLiteral("{");
 	FeedStream(ifStream, 1, false);
@@ -342,7 +325,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessSourceClassFile(bool addSelfHeade
 	// include section
 	if (addSelfHeaderInclude){
 		ifStream << QStringLiteral("#include \"");
-		ifStream << WrapFileName(GetBaseFileName(), QStringLiteral("h")) << '"';
+		ifStream << WrapFileName(QStringLiteral("h")) << '"';
 		FeedStream(ifStream, 2);
 	}
 	FeedStream(ifStream, 1);
@@ -431,7 +414,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream
 
 void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTextStream& stream, uint hIndents)
 {
-	const QString className = 'C' + GetBaseFileName() + QStringLiteral("GraphQlHandlerCompBase");
+	const QString className = QStringLiteral("CGraphQlHandlerCompBase");
 	const SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests();
 
 	// declare method
