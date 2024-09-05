@@ -264,8 +264,6 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
         int index = clusterModel->InsertNewItem();
         clusterModel->SetData("tmp", 0, index);
         clusterModel->SetData("num", 0, index);
-        clusterModel->SetData("numberChilds", 0, index);
-        clusterModel->SetData("clusterState", "offVis", index);
         clusterModel->SetData("ObjectIds", QStringList(), index);
     }
 
@@ -321,8 +319,8 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
                         num = numClaster;
 
                         clusterModel->SetData("tmp", 1, i);
-                        clusterModel->SetData("Latitude", itemsModel->GetData("Latitude", i), i);
-                        clusterModel->SetData("Longitude", itemsModel->GetData("Longitude", i), i);
+						clusterModel->SetData("Latitude", itemsModel->GetData("Latitude", i), i);
+						clusterModel->SetData("Longitude", itemsModel->GetData("Longitude", i), i);
 
                     }
                     if(clusterModel->GetData("tmp", i).toInt() > 0){
@@ -330,7 +328,7 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
                         itemsModel->SetData("numClaster", num, j);
 
                         clusterModel->SetData("num", num, i);
-                        clusterModel->SetData("tmp", clusterModel->GetData("tmp", i).toInt()+1, i);
+						clusterModel->SetData("tmp", clusterModel->GetData("tmp", i).toInt()+1, i);
                     }
 
                     QStringList ids = clusterModel->GetData("ObjectIds",i).toStringList();
@@ -352,41 +350,6 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
 
     }// двойной цикл
 
-    for( int i = 0; i < itemsModel->GetItemsCount(); i++){
-
-        if(itemsModel->GetData("numClaster", i).toInt() > 0){
-
-            if(itemsModel->GetData("isInClaster", i).toBool() == false)
-                itemsModel->SetData("isInClaster", true, i);
-        }
-
-        else {
-
-            if(itemsModel->GetData("isInClaster", i).toBool() == true){
-                itemsModel->SetData("isInClaster", false, i);
-            }
-        }
-    }
-
-    for( int i = 0; i < clusterModel->GetItemsCount(); i++){
-
-        if(clusterModel->GetData("num", i).toInt() > 0){
-
-            if(clusterModel->GetData("clusterState", i).toString() != "onVis"){
-                clusterModel->SetData("clusterState", "onVis", i);
-            }
-            if(clusterModel->GetData("numberChilds", i).toInt() != clusterModel->GetData("tmp", i).toInt()){
-                clusterModel->SetData("numberChilds", clusterModel->GetData("tmp", i).toInt(), i);
-            }
-        }
-
-        else{
-
-            if(clusterModel->GetData("clusterState", i).toString() != "offVis"){
-                clusterModel->SetData("clusterState", "offVis", i);
-            }
-        }
-    }
 
     bool noextraItem = false;
     bool noextraCluster = false;
@@ -395,7 +358,7 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
     while(!noextraItem){
         int whileCount = 0;
         for( int i = 0; i < itemsModel->GetItemsCount(); i++){
-            bool inCluster = itemsModel->GetData("isInClaster", i).toBool();
+			bool inCluster = itemsModel->GetData("numClaster", i).toInt() > 0;
             if(inCluster){
                 itemsModel->RemoveItem(i);
                 whileCount = 0;
@@ -415,8 +378,8 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
     while(!noextraCluster){
         int whileCount = 0;
         for( int i = 0; i < clusterModel->GetItemsCount(); i++){
-            bool offVis = clusterModel->GetData("clusterState", i).toString() == "offVis";
-            if(offVis){
+			bool offVis = clusterModel->GetData("num", i).toInt() <= 0;
+			if(offVis){
                 clusterModel->RemoveItem(i);
                 whileCount = 0;
                 break;
