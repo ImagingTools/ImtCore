@@ -7,12 +7,14 @@
 
 //Acf includes
 #include <istd/CSystem.h>
-#include <iprm/CParamsSet.h>
 #include <iprm/IParamsManager.h>
+#include <iprm/CParamsSet.h>
+#include <iprm/CEnableableParam.h>
+#include <iprm/CNameParam.h>
 
 // imtsdl includes
 #include <imtsdl/CSdlType.h>
-#include <imtsdl/CQmldirFilePersistenceComp.cpp>
+#include <imtsdl/CQmldirFilePersistenceComp.h>
 
 
 namespace imtsdl
