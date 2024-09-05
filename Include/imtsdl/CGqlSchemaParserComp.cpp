@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QDir>
 #include <QtCore/QRegularExpression>
 
 // Acf includes
@@ -383,15 +384,16 @@ bool CGqlSchemaParserComp::ProcessJavaStyleImports()
 
 	QStringList importedFiles;
 	QStringList importDirectiveList = QString(importedFilesSectionData).split('\n');
-	for (QString importDirective: importDirectiveList){
-		importedFiles << GetPathsFromImportEntry(importDirective);
+	for (const QString& importDirective: importDirectiveList){
+		importedFiles << GetPathsFromImportEntry(importDirective, searchPathList);
 	}
 
+	/// \todo extract data from schemas
 
 	return retVal;
 }
 
-QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(const QString& importDirective) const
+QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(QString importDirective, const QStringList& searchPathList) const
 {
 	QStringList foundFiles;
 	// get version from directive
@@ -413,17 +415,49 @@ QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(const QString& importD
 	if(version.startsWith('.')){
 		version.chop(1);
 	}
+	importDirective.resize(importDirective.length() - versionLength);
+
 	// check if entry is file
 	QStringList pathParts = importDirective.split('.');
 	pathParts.insert(pathParts.size() - 2, version);
 	QString fileEntryPath = pathParts.join('/');
 	fileEntryPath.append(QStringLiteral(".sdl"));
-	QFileInfo entryInfo(fileEntryPath);
-	if (entryInfo.isFile()){
-
+	QString foundFilePath = FindFileInList(fileEntryPath, searchPathList);
+	if (!foundFilePath.isEmpty()){
+		return QStringList({foundFilePath});
 	}
 
+	// maybe it is a directory
+	foundFiles = FindFilesFromDir(fileEntryPath, searchPathList);
+
 	return foundFiles;
+}
+
+QString CGqlSchemaParserComp::FindFileInList(const QString& relativePath, const QStringList& searchPathList) const
+{
+	for (const QString& searchPath: searchPathList){
+		QDir baseDir(searchPath);
+		QFileInfo foundFile(baseDir.absoluteFilePath(relativePath));
+		if (foundFile.exists() && foundFile.isFile()){
+			return foundFile.canonicalFilePath();
+		}
+	}
+
+	return QString();
+}
+
+QStringList CGqlSchemaParserComp::FindFilesFromDir(const QString& relativeDirPath, const QStringList& searchPathList) const
+{
+	for (const QString& searchPath: searchPathList){
+		QDir baseDir(searchPath);
+		QFileInfo foundDir(baseDir.absoluteFilePath(relativeDirPath));
+		if (foundDir.exists() && foundDir.isDir()){
+			QDir moduleDir(foundDir.absoluteDir());
+			return moduleDir.entryList(QStringList({QStringLiteral("*.sdl")}), QDir::Files | QDir::Readable);
+		}
+	}
+
+	return QStringList();
 }
 
 

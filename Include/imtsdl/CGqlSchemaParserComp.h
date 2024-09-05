@@ -77,7 +77,9 @@ protected:
 	virtual bool ProcessFilesImports();
 	virtual bool ProcessJavaStyleImports();
 
-	QStringList GetPathsFromImportEntry(const QString& importEntry) const;
+	QStringList GetPathsFromImportEntry(QString importEntry, const QStringList& searchPathList) const;
+	QString FindFileInList(const QString& relativePath, const QStringList& searchPathList) const;
+	QStringList FindFilesFromDir(const QString& relativeDirPath, const QStringList& searchPathList) const;
 
 
 
