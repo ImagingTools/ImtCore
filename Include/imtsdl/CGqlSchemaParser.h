@@ -66,6 +66,13 @@ protected:
 	virtual bool ProcessRequests(CSdlRequest::Type type);
 
 	/**
+		Processing custom schema values
+		\param sectionName - name of a section
+		\warning Base implementation always returns \c false and do nothing
+	 */
+	virtual bool ProcessCustomSchemaValue(const QString& key, const QString& value);
+
+	/**
 		Processing Custom Sections
 		\param sectionName - name of a section
 		\warning Base implementation always returns \c false and generates an error

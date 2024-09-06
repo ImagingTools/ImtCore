@@ -183,7 +183,7 @@ bool CGqlSchemaParser::ProcessSchema()
 		else if (foundDelimiter == '}'){
 			// schema parsing is done nothing to do anymore
 		}
-		else {
+		else if (!ProcessCustomSchemaValue(key, value)){
 			SendLogMessage(
 						istd::IInformationProvider::InformationCategory::IC_WARNING,
 						0,
@@ -524,6 +524,12 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 	while(foundDelimiter != '}');
 
 	return retVal;
+}
+
+
+bool CGqlSchemaParser::ProcessCustomSchemaValue(const QString& /*key*/, const QString& /*value*/)
+{
+	return false;
 }
 
 
