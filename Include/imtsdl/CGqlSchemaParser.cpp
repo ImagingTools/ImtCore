@@ -493,6 +493,30 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 		}
 		request.SetOutputArgument(outputArgument);
 
+		// ensure, all arguments is valid
+		SdlFieldList allArguments = inputArguments;
+		allArguments << outputArgument;
+		for (const CSdlField& argument: allArguments){
+			bool isCustom = false;
+			CSdlTools::ConvertType(argument, &isCustom);
+			CSdlType dummy;
+			if (isCustom && !CSdlTools::GetSdlTypeForField(argument, m_sdlTypes, dummy)){
+				QString errorString = QString("Schema error! Request '%1' has field '%2' with unknown type '%3' at line %4")
+				.arg(request.GetName(),
+					 argument.GetId(),
+					 argument.GetType(),
+					 QString::number(m_lastReadLine + 1));
+
+				SendLogMessage(
+					istd::IInformationProvider::InformationCategory::IC_ERROR,
+					0,
+					errorString,
+					"ProcessRequests");
+
+				return false;
+			}
+		}
+
 		m_requests << request;
 
 		retVal = retVal && MoveToNextReadableSymbol(&foundDelimiter);
@@ -539,8 +563,6 @@ bool CGqlSchemaParser::ValidateSchema()
 							0,
 							errorString,
 							"ValidateSchema");
-
-				Q_ASSERT_X(false, __func__, errorString.toLocal8Bit());
 
 				return false;
 			}
