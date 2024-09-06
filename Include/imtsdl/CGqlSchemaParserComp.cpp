@@ -188,72 +188,83 @@ int CGqlSchemaParserComp::DoProcessing(
 }
 
 
-bool CGqlSchemaParserComp::ProcessSchemaImports()
+QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(QString importDirective, const QStringList& searchPathList) const
 {
-	if (!m_fileSchemaParserCompFactPtr.IsValid()){
-		SendCriticalMessage(0, "import is detected, but parser is not configured. (FileSchemaParserFactory) is not set");
-		I_CRITICAL();
+	QStringList foundFiles;
+	// get version from directive
+	QString version;
+	if (importDirective[importDirective.length() - 1].isDigit()){
+		for (auto importDirectiveSymbol = importDirective.crbegin(); importDirectiveSymbol != importDirective.crend(); ++importDirectiveSymbol){
+			auto nextSymbol = importDirectiveSymbol + 1;
+			if (nextSymbol == importDirective.crend()){
+				SendErrorMessage(0, QString("Unexpected import directive '%1'").arg(importDirective));
+			}
+			if (!importDirectiveSymbol->isDigit() && *importDirectiveSymbol != '.'){
+				// we are finished version parsing
+				break;
+			}
+			version.prepend(*importDirectiveSymbol);
+		}
+	}
+	qsizetype versionLength = version.length();
+	if(version.startsWith('.')){
+		version.removeAt(0);
+	}
+	importDirective.resize(importDirective.length() - versionLength);
 
-		return BaseClass::ProcessSchemaImports();
+	// check if entry is file
+	QStringList pathParts = importDirective.split('.');
+
+	if (!version.isEmpty()){
+		pathParts.insert(pathParts.size() - 1, version);
 	}
 
-	if (*m_useFilesImportAttrPtr){
-		return ProcessFilesImports();
+	QString fileEntryPath = pathParts.join('/');
+	fileEntryPath.append(QStringLiteral(".sdl"));
+	QString foundFilePath = FindFileInList(fileEntryPath, searchPathList);
+	if (!foundFilePath.isEmpty()){
+		return QStringList({foundFilePath});
 	}
 
-	return ProcessJavaStyleImports();
+	// maybe it is a directory
+	foundFiles = FindFilesFromDir(fileEntryPath, searchPathList);
+
+	return foundFiles;
+}
+
+QString CGqlSchemaParserComp::FindFileInList(const QString& relativePath, const QStringList& searchPathList) const
+{
+	for (const QString& searchPath: searchPathList){
+		QDir baseDir(searchPath);
+		QFileInfo foundFile(baseDir.absoluteFilePath(relativePath));
+		if (foundFile.exists() && foundFile.isFile()){
+			return foundFile.canonicalFilePath();
+		}
+	}
+
+	return QString();
+}
+
+QStringList CGqlSchemaParserComp::FindFilesFromDir(const QString& relativeDirPath, const QStringList& searchPathList) const
+{
+	for (const QString& searchPath: searchPathList){
+		QDir baseDir(searchPath);
+		QFileInfo foundDir(baseDir.absoluteFilePath(relativeDirPath));
+		if (foundDir.exists() && foundDir.isDir()){
+			QDir moduleDir(foundDir.absoluteDir());
+			return moduleDir.entryList(QStringList({QStringLiteral("*.sdl")}), QDir::Files | QDir::Readable);
+		}
+	}
+
+	return QStringList();
 }
 
 
-bool CGqlSchemaParserComp::ProcessFilesImports()
+bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFilesList)
 {
-	QStringList schemaImportList;
-
-	char foundDelimiter = ' ';
-	bool retVal = true;
-	do {
-		QByteArray importedFilePath;
-		retVal = retVal && ReadToDelimeter(QByteArrayLiteral("'\"}"), importedFilePath, &foundDelimiter);
-		// we reached end of imports
-		if (foundDelimiter == '}'){
-			break;
-		}
-
-		retVal = retVal && ReadToDelimeter(QByteArray(&foundDelimiter, 1) + '}', importedFilePath);
-		if (foundDelimiter == '}'){
-			SendErrorMessage(0, QString("Syntax error. In '%1' Expected ' or \" at %3").arg(m_currentSchemaFilePath, QString::number(m_lastReadLine + 1)));
-
-			return false;
-		}
-		schemaImportList << importedFilePath;
-
-	} while (retVal);
-
-	schemaImportList.removeDuplicates();
-
-	// resolve paths
-	QStringList foundSchemaFiles;
-	for (const QString& includeDirectoryPath: std::as_const(m_includePathList)){
-		QDir includeDirectory(includeDirectoryPath);
-		QMutableListIterator importsIterator(schemaImportList);
-		while (importsIterator.hasNext())
-		{
-			const QString importFileName = importsIterator.next();
-			const QString absolutePath = includeDirectory.absoluteFilePath(importFileName);
-			if (QFile::exists(absolutePath)){
-				foundSchemaFiles << QFileInfo(absolutePath).canonicalFilePath();
-				importsIterator.remove();
-			}
-		}
-	}
-	if (!schemaImportList.isEmpty()){
-		SendErrorMessage(0, QString("Unable to find import files in '%1' : %2").arg(m_currentSchemaFilePath, schemaImportList.join("; ")));
-
-		return false;
-	}
 
 	// process found files
-	for (const QString& schemaPath: std::as_const(foundSchemaFiles)){
+	for (const QString& schemaPath: std::as_const(importFilesList)){
 		istd::TDelPtr<iproc::IProcessor> newSchemaProcessor(m_fileSchemaParserCompFactPtr.CreateInstance());
 		ifile::CFileNameParam schemaFilePathParam;
 		schemaFilePathParam.SetPath(schemaPath);
@@ -371,6 +382,57 @@ bool CGqlSchemaParserComp::ProcessFilesImports()
 }
 
 
+bool CGqlSchemaParserComp::ProcessFilesImports()
+{
+	QStringList schemaImportList;
+
+	char foundDelimiter = ' ';
+	bool retVal = true;
+	do {
+		QByteArray importedFilePath;
+		retVal = retVal && ReadToDelimeter(QByteArrayLiteral("'\"}"), importedFilePath, &foundDelimiter);
+		// we reached end of imports
+		if (foundDelimiter == '}'){
+			break;
+		}
+
+		retVal = retVal && ReadToDelimeter(QByteArray(&foundDelimiter, 1) + '}', importedFilePath);
+		if (foundDelimiter == '}'){
+			SendErrorMessage(0, QString("Syntax error. In '%1' Expected ' or \" at %3").arg(m_currentSchemaFilePath, QString::number(m_lastReadLine + 1)));
+
+			return false;
+		}
+		schemaImportList << importedFilePath;
+
+	} while (retVal);
+
+	schemaImportList.removeDuplicates();
+
+	// resolve paths
+	QStringList foundSchemaFiles;
+	for (const QString& includeDirectoryPath: std::as_const(m_includePathList)){
+		QDir includeDirectory(includeDirectoryPath);
+		QMutableListIterator importsIterator(schemaImportList);
+		while (importsIterator.hasNext())
+		{
+			const QString importFileName = importsIterator.next();
+			const QString absolutePath = includeDirectory.absoluteFilePath(importFileName);
+			if (QFile::exists(absolutePath)){
+				foundSchemaFiles << QFileInfo(absolutePath).canonicalFilePath();
+				importsIterator.remove();
+			}
+		}
+	}
+	if (!schemaImportList.isEmpty()){
+		SendErrorMessage(0, QString("Unable to find import files in '%1' : %2").arg(m_currentSchemaFilePath, schemaImportList.join("; ")));
+
+		return false;
+	}
+
+	return ExtractTypesFromImport(foundSchemaFiles);
+}
+
+
 bool CGqlSchemaParserComp::ProcessJavaStyleImports()
 {
 	bool retVal = true;
@@ -380,12 +442,11 @@ bool CGqlSchemaParserComp::ProcessJavaStyleImports()
 		retVal = retVal && MoveToNextReadableSymbol();
 	}
 	retVal = retVal && ReadToDelimeter(QByteArrayLiteral("}"), importedFilesSectionData);
-	QStringList searchPathList = m_argumentParserCompPtr->GetIncludePaths();
 
 	QStringList importedFiles;
 	QStringList importDirectiveList = QString(importedFilesSectionData).split('\n');
 	for (const QString& importDirective: importDirectiveList){
-		importedFiles << GetPathsFromImportEntry(importDirective, searchPathList);
+		importedFiles << GetPathsFromImportEntry(importDirective, m_includePathList);
 	}
 
 	/// \todo extract data from schemas
@@ -393,73 +454,25 @@ bool CGqlSchemaParserComp::ProcessJavaStyleImports()
 	return retVal;
 }
 
-QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(QString importDirective, const QStringList& searchPathList) const
+
+
+// reimplemented (CGqlExtSchemaParser)
+
+bool CGqlSchemaParserComp::ProcessSchemaImports()
 {
-	QStringList foundFiles;
-	// get version from directive
-	QString version;
-	if (importDirective[importDirective.length() - 1].isDigit()){
-		for (auto importDirectiveSymbol = importDirective.crbegin(); importDirectiveSymbol != importDirective.crend(); ++importDirectiveSymbol){
-			auto nextSymbol = importDirectiveSymbol + 1;
-			if (nextSymbol == importDirective.crend()){
-				SendErrorMessage(0, QString("Unexpected import directive '%1'").arg(importDirective));
-			}
-			if (!importDirectiveSymbol->isDigit() && *importDirectiveSymbol != '.'){
-				// we are finished version parsing
-				break;
-			}
-			version.prepend(*importDirectiveSymbol);
-		}
-	}
-	qsizetype versionLength = version.length();
-	if(version.startsWith('.')){
-		version.chop(1);
-	}
-	importDirective.resize(importDirective.length() - versionLength);
+	if (!m_fileSchemaParserCompFactPtr.IsValid()){
+		SendCriticalMessage(0, "import is detected, but parser is not configured. (FileSchemaParserFactory) is not set");
+		I_CRITICAL();
 
-	// check if entry is file
-	QStringList pathParts = importDirective.split('.');
-	pathParts.insert(pathParts.size() - 2, version);
-	QString fileEntryPath = pathParts.join('/');
-	fileEntryPath.append(QStringLiteral(".sdl"));
-	QString foundFilePath = FindFileInList(fileEntryPath, searchPathList);
-	if (!foundFilePath.isEmpty()){
-		return QStringList({foundFilePath});
+		return BaseClass::ProcessSchemaImports();
 	}
 
-	// maybe it is a directory
-	foundFiles = FindFilesFromDir(fileEntryPath, searchPathList);
+	if (*m_useFilesImportAttrPtr){
+		return ProcessFilesImports();
+	}
 
-	return foundFiles;
+	return ProcessJavaStyleImports();
 }
-
-QString CGqlSchemaParserComp::FindFileInList(const QString& relativePath, const QStringList& searchPathList) const
-{
-	for (const QString& searchPath: searchPathList){
-		QDir baseDir(searchPath);
-		QFileInfo foundFile(baseDir.absoluteFilePath(relativePath));
-		if (foundFile.exists() && foundFile.isFile()){
-			return foundFile.canonicalFilePath();
-		}
-	}
-
-	return QString();
-}
-
-QStringList CGqlSchemaParserComp::FindFilesFromDir(const QString& relativeDirPath, const QStringList& searchPathList) const
-{
-	for (const QString& searchPath: searchPathList){
-		QDir baseDir(searchPath);
-		QFileInfo foundDir(baseDir.absoluteFilePath(relativeDirPath));
-		if (foundDir.exists() && foundDir.isDir()){
-			QDir moduleDir(foundDir.absoluteDir());
-			return moduleDir.entryList(QStringList({QStringLiteral("*.sdl")}), QDir::Files | QDir::Readable);
-		}
-	}
-
-	return QStringList();
-}
-
 
 } // namespace imtsdl
 

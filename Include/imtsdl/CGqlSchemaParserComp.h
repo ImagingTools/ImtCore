@@ -73,14 +73,16 @@ public:
 				ibase::IProgressManager* progressManagerPtr = NULL) override;
 
 protected:
-	virtual bool ProcessSchemaImports() override;
-	virtual bool ProcessFilesImports();
-	virtual bool ProcessJavaStyleImports();
-
 	QStringList GetPathsFromImportEntry(QString importEntry, const QStringList& searchPathList) const;
 	QString FindFileInList(const QString& relativePath, const QStringList& searchPathList) const;
 	QStringList FindFilesFromDir(const QString& relativeDirPath, const QStringList& searchPathList) const;
+	bool ExtractTypesFromImport(const QStringList& importFilesList);
 
+	virtual bool ProcessFilesImports();
+	virtual bool ProcessJavaStyleImports();
+
+	// reimplemented (CGqlExtSchemaParser)
+	virtual bool ProcessSchemaImports() override;
 
 
 private:
