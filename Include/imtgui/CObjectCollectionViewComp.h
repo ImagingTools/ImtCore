@@ -14,11 +14,9 @@
 #include <QtGui/QShortcut>
 #endif
 
-
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>
 #include <ibase/ICommandsProvider.h>
-#include <ibase/IProgressManager.h>
 #include <iprm/IOptionsList.h>
 #include <iprm/ISelectionParam.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>

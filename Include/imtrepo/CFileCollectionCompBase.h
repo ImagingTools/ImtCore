@@ -11,7 +11,6 @@
 #include <QtCore/QTimer>
 
 // ACF includes
-#include <ibase/IProgressManager.h>
 #include <istd/TSmartPtr.h>
 #include <iser/ISerializable.h>
 #include <imod/TModelWrap.h>
