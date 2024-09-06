@@ -13,7 +13,6 @@ static bool isInit = false;
 
 inline int BitCount(quint64 n)
 {
-
 	return (BitsSetTable256[n & 0xff] +
 			BitsSetTable256[(n >> 8) & 0xff] +
 			BitsSetTable256[(n >> 16) & 0xff] +
@@ -539,7 +538,7 @@ QList<quint64> CMaskContainer::GetUnitPositions(quint64 offset, int limit)
 		}
 	}
 
-    return list;
+	return list;
 }
 
 
@@ -593,47 +592,52 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 		bool changeOffset = false;
 		if (isStart){
 			if (!m_maskList.at(i).first->GetNearestOffset(offset, activeOffset)){
-				m_maskList[i].second = 0xffffffffffffffff;
 				if(m_operationType == OT_AND){
 					return false;
 				}
 				else if(m_operationType == OT_OR){
+					m_maskList[i].second = 0xffffffffffffffff;
 					continue;
 				}
 			}
-			else {
+			else {//found nearest offset
 				m_maskList[i].second = offset;
 				isLast = false;
 				changeOffset = true;
 			}
 		}
-		else{
+		else{//not start
 			if (m_maskList.at(i).second <= activeOffset){
-//				if (!m_maskList.at(i).first->GetNextItemOffset(offset, m_maskList.at(i).second)){
-					if (!m_maskList.at(i).first->GetNextItemOffset(offset, activeOffset)){
-
-					m_maskList[i].second = 0xffffffffffffffff;
-
+				if (!m_maskList.at(i).first->GetNextItemOffset(offset, activeOffset)){
+					//qDebug() << "NOT FOUND!!!";
 					if(m_operationType == OT_AND){
 						return false;
 					}
 					else if(m_operationType == OT_OR){
+						m_maskList[i].second = 0xffffffffffffffff;
 						continue;
 					}
 				}
-				else {
+				else {//found next offset
 					m_maskList[i].second = offset;
 					isLast = false;
 					changeOffset = true;
 				}
 			}
-			else {
+			else {//m_maskList.at(i).second > activeOffset
 				offset = m_maskList[i].second;
 				changeOffset = true;
 				isLast = false;
 			}
-		}
+
+		}//not start
+
+		/****************if (changeOffset)***********/
 		if (changeOffset){
+			if(offset == 0xffffffffffffffff){
+				//qDebug() << "0xffffffffffffffff";
+			}
+
 			if(offset > maxOffset){
 				maxOffset = offset;
 			}
@@ -641,7 +645,8 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 				minOffset = offset;
 			}
 		}
-	}
+	}//for
+
 	for (int i = 0; i < m_maskListInv.length(); i++){
 		quint64 offset = 0;
 		bool changeOffset = false;
@@ -696,32 +701,41 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 		}
 	}
 
+
+	/*******************conditions***************************/
+//	if(maxOffset == 0xffffffffffffffff || minOffset == 0xffffffffffffffff){
+//		isLast = true;
+//	}
+
 	if(isLast){
 		return false;
 	}
 
 	if(m_operationType == OT_AND){
-//		if(maxOffset >= activeOffset){
+		if(maxOffset >= activeOffset){
 			activeOffset = maxOffset;
-//		}
-//		else {
-//			Q_ASSERT(0);
-//		}
+		}
+		else {
+			Q_ASSERT(0);
+		}
 	}
 	else if(m_operationType == OT_OR){
-//		if(minOffset == 0xffffffffffffffff){
-//			qDebug() << "0xffffffffffffffff";
-//		}
-//		if(minOffset >= activeOffset){
+		if(minOffset == 0xffffffffffffffff){
+			//qDebug() << "0xffffffffffffffff";
+		}
+		if(minOffset >= activeOffset){
 			activeOffset = minOffset;
-//		}
-//		else {
-//			Q_ASSERT(0);
-//		}
-	}
+		}
+		else {
+			Q_ASSERT(0);
+		}
+
+	}	/*******************conditions***************************/
 
 
 
+
+	/*******************calculation***************************/
 	for(int i = 0; i < m_maskList.length(); i++){
 		quint64 item = 0;
 		if(m_maskList.at(i).second <= activeOffset){

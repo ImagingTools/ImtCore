@@ -1,5 +1,8 @@
 #include <imtmdbx/CMask.h>
 
+// Qt includes
+#include <QtCore/QDebug>
+
 
 namespace imtmdbx
 {
@@ -107,14 +110,40 @@ bool CMask::GetNextItemOffset(quint64& offset, quint64 startOffset)
 			return false;
 		}
 	}
-//	else {
-//		return false;
-//	}
+	else {
+		return false;
+	}
 
-//	if(offset < startOffset){
-//		Q_ASSERT(0);
-//	}
+	if(offset < startOffset){
+		Q_ASSERT(0);
+	}
 	return true;
+
+
+	/******************************lower_bound*****************************/
+
+//	mdbx::slice keySlice(&startOffset, 8);
+
+//		mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice, false);
+
+//		if (result.done){
+//			if(result.key.as_uint64() == startOffset){
+//				result = m_cursor.to_next(false);
+//				if (!result.done){
+//					return false;
+//				}
+//			}
+//			offset = result.key.as_uint64();
+//		}
+//		else{
+//			return false;
+//		}
+
+//		if(offset < startOffset){
+//			Q_ASSERT(0);
+//		}
+
+//	return true;
 }
 
 

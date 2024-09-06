@@ -81,8 +81,12 @@ bool CDoubleMask::GetNextItemOffset(quint64& offset, quint64 startOffset)
 		retVal = false;
 	}
 
+	if(retVal && offset == 0xffffffffffffffff){
+		Q_ASSERT(0);
+	}
+
 	if(retVal && offset < startOffset){
-//		Q_ASSERT(0);
+		Q_ASSERT(0);
 	}
 	return retVal;
 }

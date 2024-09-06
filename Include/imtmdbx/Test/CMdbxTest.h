@@ -37,8 +37,6 @@ public:
 	void test_mdbxfind();
 	void test_mdbxcursor();
 	//void test_read_write();
-
-private slots:
 	void test_read_all_units();
 	void test_write_10units();
 	void test_create_index();
@@ -50,6 +48,9 @@ private slots:
 	void cleanupTestCase();
 	// void test_mdbxcursor();
 	void test_write_masks();
+
+private slots:
+	void test_cursor();
 };
 
 

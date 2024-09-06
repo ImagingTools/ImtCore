@@ -979,5 +979,48 @@ void CMdbxTest::test_write_masks(){
 
 }
 
+void CMdbxTest::test_cursor()
+{
+	mdbx::env::operate_parameters operateParameters(100,10);
+	mdbx::env_managed::create_parameters createParameters;
+	std::string path = "CursorTest.mdb";
+
+	mdbx::env_managed env(path, createParameters, operateParameters);
+	mdbx::txn_managed txn = env.start_write();
+	mdbx::map_handle handle = txn.create_map("CursorTest", mdbx::key_mode::usual, mdbx::value_mode::single);
+
+	//mdbx::slice keySlice(&i, 8);
+	//mdbx::cursor::move_result result = cursor.find(keySlice);
+	for(int i = 0; i < 10; i++){
+		mdbx::slice keySlice(&i, 4);
+		std::string str = "Test";
+		mdbx::slice valueSlice(str.data(), str.length());
+		if(i != 5){
+			txn.put(handle, keySlice, valueSlice, mdbx::put_mode::upsert);
+		}
+	}
+	txn.commit();
+
+	txn = env.start_read();
+
+
+	handle = txn.open_map("CursorTest", mdbx::key_mode::usual, mdbx::value_mode::single);
+	mdbx::cursor_managed cursor = txn.open_cursor(handle);
+
+	int int_5 = 7;
+	mdbx::slice keySlice(&int_5, 4);
+	mdbx::cursor::move_result result = cursor.lower_bound(keySlice, false);
+	if(result.done){
+		qDebug() << "Found!" << result.key.as_int32();
+	}
+//	if(cursor.seek(keySlice)){
+//		mdbx::cursor::move_result result = cursor.current();
+//		if (result.done){
+//			qDebug() << "Found!";
+//		}
+//	}
+
+}
+
 
 I_ADD_TEST(CMdbxTest);
