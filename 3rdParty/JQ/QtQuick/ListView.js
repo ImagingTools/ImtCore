@@ -31,7 +31,7 @@ class ListView extends Flickable {
         currentItem: {type: Var, value:undefined, signalName:'currentItemChanged'},
         snapMode: {type: Real, value:ListView.NoSnap, signalName:'snapModeChanged'},
         cacheBuffer: {type: Real, value:320, signalName:'cacheBufferChanged'},
-        count: {type: Real, value:0, signalName:'countChanged'},
+        count: {type: Real, value:0 },
         contentWidth: {type: Real, value:0, signalName:'contentWidthChanged'},
         contentHeight: {type: Real, value:0, signalName:'contentHeightChanged'},
         
@@ -130,19 +130,31 @@ class ListView extends Flickable {
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
 
+            let countChanged = false
+
             if(typeof this.model === 'number'){
+                if(this.count !== this.model){
+                    countChanged = true
+                    this.count = this.model
+                }
+
                 for(let i = 0; i < this.model; i++){
                     let item = this.delegate.createObject(this.contentItem, {index: i})
                     this.__items.push(item)
                 }
-                this.count = this.model
             } else {
+                if(this.count !== this.model.data.length){
+                    countChanged = true
+                    this.count = this.model.data.length
+                }
+
                 for(let i = 0; i < this.model.data.length; i++){
                     let item = this.delegate.createObject(this.contentItem, this.model.data[i])
                     this.__items.push(item)
                 }
-                this.count = this.model.data.length
             }
+
+            if(countChanged) this.countChanged()
 
             JQApplication.endUpdate()
         }
@@ -153,6 +165,13 @@ class ListView extends Flickable {
             if(this.model.data.length === this.__items.length) return
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
+
+            let countChanged = false
+
+            if(this.count !== this.model.data.length){
+                countChanged = true
+                this.count = this.model.data.length
+            }
 
             for(let change of changeSet){
                 let leftTop = change[0]
@@ -177,7 +196,7 @@ class ListView extends Flickable {
                 }
             }
 
-            this.count = this.model.data.length
+            if(countChanged) this.countChanged()
 
             JQApplication.endUpdate()
         }

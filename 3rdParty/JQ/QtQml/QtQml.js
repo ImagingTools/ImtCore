@@ -28,6 +28,8 @@ module.exports = {
     variant: require("./Variant"),
 
     Signal: require("./Signal"),
+    SpecialSignal: require("./SpecialSignal"),
+    SpecialProperty: require("./SpecialProperty"),
 
     Screen: require("./Screen"),
 

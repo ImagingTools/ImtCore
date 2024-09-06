@@ -27,8 +27,8 @@ class QtObject extends QObject {
         JQAbstractModelChanged: {type:Signal, slotName:'onJQAbstractModelChanged', args:[]},
     })  
 
-    static create(parent, model, ...args){
-        let proxy = super.create(parent, model, ...args)
+    static create(parent, model, properties=[], ...args){
+        let proxy = super.create(parent, properties, ...args)
 
         proxy.JQAbstractModel = QtFunctions.binding(()=>{return proxy.parent ? proxy.parent.JQAbstractModel : null})
 

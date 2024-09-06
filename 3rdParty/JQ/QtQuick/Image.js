@@ -45,8 +45,8 @@ class Image extends Item {
         paintedHeightChanged: {type:Signal, slotName:'onPaintedHeightChanged', args:[]},
     })
 
-    static create(parent, model, ...args){
-        let proxy = super.create(parent, model, ...args)
+    static create(parent, model, properties=[], ...args){
+        let proxy = super.create(parent, model, properties, ...args)
         proxy.__DOM.classList.add('Image')
 
         return proxy

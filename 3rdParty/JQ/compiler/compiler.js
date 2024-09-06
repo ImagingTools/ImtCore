@@ -15,9 +15,9 @@ const QtQuick = require('../QtQuick/QtQuick')
 const Qt5Compat = require('../Qt5Compat/Qt5Compat')
 const QtWebSockets = require('../QtWebSockets/QtWebSockets')
 
-const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\imtcore.json'//process.argv.slice(2)[0]
+// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\imtcore.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\jq.json'//process.argv.slice(2)[0]
-// const configFilePath = process.argv.slice(2)[0]
+const configFilePath = process.argv.slice(2)[0]
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 const config = JSON.parse(fs.readFileSync(configFilePath, {encoding:'utf8', flag:'r'}))
 
@@ -1064,8 +1064,8 @@ class Instruction {
             code.push('})')
         }
 
-        code.push('static create(parent, model, __queue=[], __isRoot=true, ...args){')
-        code.push('let self = super.create(parent, model, __queue, false, ...args)')
+        code.push('static create(parent, model, properties=[], isRoot=true, ...args){')
+        code.push('let self = super.create(parent, model, properties, false, ...args)')
 
         if(isRoot) {
             code.push(`let __rootContext${level}={}`) // context !!!
@@ -1103,16 +1103,16 @@ class Instruction {
                 if((path.type === QtQml.Component) && assignProperty.value.extends !== 'Component'){
                     code.push(`self.${assignProperty.name}=(class extends JQModules.QtQml.Component {}).create(null,${assignProperty.value.toCode(false,true,level+1)})`)
                 } else {
-                    code.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false,false,level)}).create(null,null,__queue,false)`)
+                    code.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false,false,level)}).create(null,null,properties,false)`)
                 }
             } else {
                 let stat = this.prepare(assignProperty.value, {isCompute:false, thisKey: 'self', value:'', local:[]})
                 if(stat.isCompute){
                     if(assignProperty.type === 'alias'){
-                        code.push(`self.__getObject('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},__queue)`)
+                        code.push(`self.__getObject('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
                         // code.push(`__updateList.push(self.__getObject('${assignProperty.name}'))`)
                     } else {
-                        code.push(`self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},__queue)`)
+                        code.push(`self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},true)`)
                     }
                 } else {
                     code.push(`self.${assignProperty.name}=${stat.value}`)
@@ -1125,7 +1125,7 @@ class Instruction {
             if(this.extends === 'Component'){
                 code.push(`self.component=` + this.children[i].toCode(false, true, level+1))
             } else {
-                code.push(`let child${i}=(` + this.children[i].toCode(false,false,level) + ').create(self,null,__queue,false)')
+                code.push(`let child${i}=(` + this.children[i].toCode(false,false,level) + ').create(self,null,properties,false)')
             }
             
         }
@@ -1157,7 +1157,7 @@ class Instruction {
         }
 
         if(isRoot || isComponent) {
-            code.push(`if(__isRoot) {for(let property of __queue){property.__update()};self.__complete()}`) // property update !!!
+            code.push(`if(isRoot) {while(properties.length){properties.shift().__update()};self.__complete()}`) // property update !!!
             // code.push(`if(!self.parent || self.parent.__completed) self.__complete()`)
         }
 
@@ -1165,7 +1165,6 @@ class Instruction {
 
         code.push('return self')
         code.push('}')
-
         
         
         
@@ -1373,7 +1372,7 @@ console.log(`JQ: compilation of single files`)
 for(let className in Singletons){
     console.log(`    > ${className}.qml (Singleton)`)
     // fullCode.push(Singletons[className].toCode())
-    // fullCode.push(`JQModules.__queue.push(()=>{${Singletons[className].toCode()};window.${className}=${className}})`)
+    // fullCode.push(`JQModules.properties.push(()=>{${Singletons[className].toCode()};window.${className}=${className}})`)
     compiledFiles.push({
         file: Singletons[className],
         code: Singletons[className].toCode(),
@@ -1387,7 +1386,7 @@ for(let className in SingleFiles){
     console.log(`    > ${className}.qml`)
     // console.log(`        > ${SingleFiles[className].fileName}(5)`)
     // fullCode.push(SingleFiles[className].toCode())
-    // fullCode.push(`JQModules.__queue.push(()=>{${SingleFiles[className].toCode()};window.${className}=${className}})`)
+    // fullCode.push(`JQModules.properties.push(()=>{${SingleFiles[className].toCode()};window.${className}=${className}})`)
     compiledFiles.push({
         file: SingleFiles[className],
         code: SingleFiles[className].toCode(),
@@ -1414,7 +1413,7 @@ for(let moduleName in JQModules){
                 queue[className] = file
                 continue
             }
-            // fullCode.push(`JQModules.__queue.push(()=>{JQModules.${moduleName}.${className}=${file.toCode()}})`)
+            // fullCode.push(`JQModules.properties.push(()=>{JQModules.${moduleName}.${className}=${file.toCode()}})`)
             // fullCode.push(`JQModules.${moduleName}.${className}=${file.toCode()}`)
             compiledFiles.push({
                 file: file,
@@ -1424,7 +1423,7 @@ for(let moduleName in JQModules){
     }
     for(let className in queue){
         let file = queue[className]
-        // fullCode.push(`JQModules.__queue.push(()=>{if(!JQModules.${moduleName}.${className}_v${file.version}) throw ''; JQModules.${moduleName}.${className}=JQModules.${moduleName}.${className}_v${file.version}})`)
+        // fullCode.push(`JQModules.properties.push(()=>{if(!JQModules.${moduleName}.${className}_v${file.version}) throw ''; JQModules.${moduleName}.${className}=JQModules.${moduleName}.${className}_v${file.version}})`)
         // fullCode.push(`JQModules.${moduleName}.${className}=JQModules.${moduleName}.${className}_v${file.version}`)
         fullCode.push(`Object.defineProperty(JQModules.${moduleName},'${className}',{get:()=>{return JQModules.${moduleName}.${className}_v${file.version}}})`)
     }
@@ -1464,15 +1463,15 @@ while(compiledFiles.length){
 }
 
 // fullCode.push('const __errors__ = []')
-// fullCode.push(`while(JQModules.__queue.length){
-//     let reg = JQModules.__queue.shift()
+// fullCode.push(`while(JQModules.properties.length){
+//     let reg = JQModules.properties.shift()
     
 //     if(!reg.count || reg.count < 5){
 //         try {
 //             reg()
 //         } catch (error) {
 //             reg.count = reg.count ? reg.count+1 : 1
-//             JQModules.__queue.push(reg)
+//             JQModules.properties.push(reg)
 //         }
 //     } else {
 //         __errors__.push(reg)

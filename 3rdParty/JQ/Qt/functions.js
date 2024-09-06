@@ -1,8 +1,8 @@
 module.exports = {
     qsTr: function(str){return str},
-    binding: function(func, queue){
+    binding: function(func, lazy=false){
         func.bound = true
-        func.queue = queue
+        func.lazy = lazy
         return func
     },
     locale: function(){

@@ -52,6 +52,10 @@ class Property extends BaseObject {
         let caller = Property.queueLink[Property.queueLink.length-1]
         if(caller) caller.__subscribe(this)
 
+        if(!this.__completed){
+            this.__update()
+        } 
+
         if(key && this.__value instanceof BaseObject){
             return this.__value[key]
         }
@@ -70,6 +74,7 @@ class Property extends BaseObject {
 
     __reset(value){
         this.__subscribersReset()
+        if(this.__frozen) return
         this.__unsubscribe()
         this.__set(undefined, value)
     }
@@ -79,8 +84,8 @@ class Property extends BaseObject {
 
         if(typeof value === 'function' && value.bound){
             this.__setCompute(value)
-            if(value.queue) {
-                value.queue.push(this)
+            if(value.lazy) {
+                this.__parent.__properties.push(this)
             } else {
                 this.__update()
             }
@@ -200,8 +205,18 @@ class Property extends BaseObject {
     }
 
     __setCompute(compute){
+        if(this.__frozen) return
+        this.__updating = false
         this.__compute = compute
         this.__completed = false
+    }
+
+    __freeze(){
+        this.__frozen = true
+    }
+
+    __unfreeze(){
+        this.__frozen = false
     }
 
     __destroy(){

@@ -17,8 +17,8 @@ class Gradient extends QtObject {
 
     __rects = new Set()
 
-    static create(parent, model, ...args){
-        let proxy = super.create(parent, model, ...args)
+    static create(parent, model, properties=[], ...args){
+        let proxy = super.create(parent, model, properties, ...args)
         proxy.stops = []
 
         return proxy

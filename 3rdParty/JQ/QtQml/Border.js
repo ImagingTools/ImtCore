@@ -5,7 +5,7 @@ const Signal = require("./Signal")
 
 class Border extends GroupProperty {
     static meta = {
-        width: {type:Real, value:0, signalName:'widthChanged'},
+        width: {type:Real, value:1, signalName:'widthChanged'},
         color: {type:Color, value:'black', signalName:'colorChanged'},
         
         widthChanged: {type:Signal, slotName:'onWidthChanged', args:[]},

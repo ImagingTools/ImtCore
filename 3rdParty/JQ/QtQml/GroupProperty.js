@@ -5,7 +5,7 @@ class GroupProperty extends BaseObject {
     static create(parent, meta){
         let proxy = super.create(parent, meta)
         let self = proxy.__self 
-
+        self.__properties = parent.__properties
         self.__parent = parent.__proxy
 
         return proxy

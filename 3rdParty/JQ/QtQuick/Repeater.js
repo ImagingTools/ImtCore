@@ -10,7 +10,7 @@ class Repeater extends Item {
     static meta = Object.assign({}, Item.meta, {
         model: {type: Var, value:undefined, signalName:'modelChanged'},
         delegate: {type:Variant, typeTarget:Component, value:undefined, signalName:'delegateChanged'},
-        count: {type: Real, value:0, signalName:'countChanged'},
+        count: {type: Real, value:0 },
         
         modelChanged: {type:Signal, slotName:'onModelChanged', args:[]},
         delegateChanged: {type:Signal, slotName:'onDelegateChanged', args:[]},
@@ -60,7 +60,14 @@ class Repeater extends Item {
             JQApplication.beginUpdate()
             JQApplication.updateLater(this.parent)
 
+            let countChanged = false
+
             if(typeof this.model === 'number'){
+                if(this.count !== this.model){
+                    countChanged = true
+                    this.count = this.model
+                }
+                
                 for(let i = 0; i < this.model; i++){
                     let item = this.delegate.createObject(this.parent, {index: i})
                     this.__items.push(item)
@@ -68,6 +75,11 @@ class Repeater extends Item {
                     this.itemAdded(item)
                 }
             } else {
+                if(this.count !== this.model.data.length){
+                    countChanged = true
+                    this.count = this.model.data.length
+                }
+
                 for(let i = 0; i < this.model.data.length; i++){
                     let item = this.delegate.createObject(this.parent, this.model.data[i])
                     this.__items.push(item)
@@ -76,7 +88,7 @@ class Repeater extends Item {
                 }
             }
 
-            this.count = this.__items.length
+            if(countChanged) this.countChanged()
 
             JQApplication.endUpdate()
         }

@@ -1,7 +1,7 @@
 const Item = require("../../QtQuick/Item")
 const Color = require("../../QtQml/Color")
 const Real = require("../../QtQml/Real")
-const Var = require("../../QtQml/Real")
+const Var = require("../../QtQml/Var")
 const Signal = require("../../QtQml/Signal")
 
 class DropShadow extends Item {

@@ -13,8 +13,9 @@ class QObject extends BaseObject {
         parentChanged: {type:Signal, slotName:'onParentChanged', args:[]},
     }
 
-    static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
+    static create(parent, properies=[], ...args){
+        let proxy = super.create(parent, properies, ...args)
+        proxy.__properties = properies
         proxy.setParent(parent)
 
         return proxy

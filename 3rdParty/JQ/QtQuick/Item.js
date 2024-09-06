@@ -5,10 +5,13 @@ const Int = require("../QtQml/Int")
 const Bool = require("../QtQml/Bool")
 const LinkedBool = require("../QtQml/LinkedBool")
 const Signal = require("../QtQml/Signal")
+const SpecialSignal = require("../QtQml/SpecialSignal")
+const SpecialProperty = require("../QtQml/SpecialProperty")
 const KeyNavigation = require("../QtQml/KeyNavigation")
 const Anchors = require("../QtQml/Anchors")
 const AnchorLine = require("../QtQml/AnchorLine")
 const JQApplication = require("../core/JQApplication")
+
 
 class Item extends QtObject {
     static TopLeft = 0
@@ -22,6 +25,11 @@ class Item extends QtObject {
     static Center = 8
 
     static meta = Object.assign({}, QtObject.meta, {
+        AX: {type:SpecialProperty, value:0, signalName:'AXChanged'},
+        AY: {type:SpecialProperty, value:0, signalName:'AYChanged'},
+        AWidth: {type:SpecialProperty, value:0, signalName:'AWidthChanged'},
+        AHeight: {type:SpecialProperty, value:0, signalName:'AHeightChanged'},
+
         x: {type:Real, value:0, signalName:'xChanged'},
         y: {type:Real, value:0, signalName:'yChanged'},
         width: {type:Real, value:0, signalName:'widthChanged'},
@@ -45,6 +53,11 @@ class Item extends QtObject {
         bottom: {type:AnchorLine, value: AnchorLine.Bottom},
         horizontalCenter: {type:AnchorLine, value: AnchorLine.HorizontalCenter},
         verticalCenter: {type:AnchorLine, value: AnchorLine.VerticalCenter},
+
+        AXChanged: {type:SpecialSignal, slotName:'onAXChanged', args:[]},
+        AYChanged: {type:SpecialSignal, slotName:'onAYChanged', args:[]},
+        AWidthChanged: {type:SpecialSignal, slotName:'onAWidthChanged', args:[]},
+        AHeightChanged: {type:SpecialSignal, slotName:'onAHeightChanged', args:[]},
 
         xChanged: {type:Signal, slotName:'onXChanged', args:[]},
         yChanged: {type:Signal, slotName:'onYChanged', args:[]},
@@ -103,8 +116,8 @@ class Item extends QtObject {
         'Keys.yesPressed': {type:Signal, slotName: 'Keys.onYesPressed', args: ['event'] },
     })
 
-    static create(parent, model, ...args){
-        let proxy = super.create(parent, model, ...args)
+    static create(parent, model, properties=[], ...args){
+        let proxy = super.create(parent, model, properties, ...args)
         let self = proxy.__self 
 
         let dom = self.__getDOM()
@@ -188,18 +201,42 @@ class Item extends QtObject {
         
     }
 
+    onAXChanged(){
+        if(this.AX !== this.x) 
+        this.x = this.AX
+    }
+
+    onAYChanged(){
+        if(this.AY !== this.y) 
+        this.y = this.AY
+    }   
+
+    onAWidthChanged(){
+        if(this.AWidth !== this.width) 
+        this.width = this.AWidth
+    }
+
+    onAHeightChanged(){
+        if(this.AHeight !== this.height) 
+        this.height = this.AHeight
+    }
+
     onParentChanged(){
         super.onParentChanged()
         this.__connectDOM(this.parent)
     }
 
     onXChanged(){
+        this.AX = this.x
+        
         this.__setDOMStyle({
             left: this.x+'px'
         })
     }
 
     onYChanged(){
+        this.AY = this.y
+
         this.__setDOMStyle({
             top: this.y+'px'
         })
@@ -221,19 +258,23 @@ class Item extends QtObject {
     }
 
     onWidthChanged(){
+        this.AWidth = this.width
+        
         this.__checkVisibility()
         this.__setDOMStyle({
-            width: this.width+'px',
-            minWidth: this.width+'px',
+            width: this.width > 0 ? this.width + 'px' : '0px',
+            minWidth: this.width > 0 ? this.width + 'px' : '0px',
         })
         JQApplication.updateLater(this.parent)
     }
 
     onHeightChanged(){
+        this.AHeight = this.height
+
         this.__checkVisibility()
         this.__setDOMStyle({
-            height: this.height+'px',
-            minHeight: this.height+'px',
+            height: this.height > 0 ? this.height + 'px' : '0px',
+            minHeight: this.height > 0 ? this.height + 'px' : '0px',
         })
         JQApplication.updateLater(this.parent)
     }

@@ -11,8 +11,8 @@ class Screen extends QObject {
         heightChanged: {type:Signal, slotName:'onHeightChanged', args:[]},
     })
 
-    static create(parent, model, ...args){
-        let proxy = super.create(parent, model, ...args)
+    static create(parent, model, properties=[], ...args){
+        let proxy = super.create(parent, model, properties, ...args)
 
         window.addEventListener('load', ()=>{
             proxy.width = window.innerWidth

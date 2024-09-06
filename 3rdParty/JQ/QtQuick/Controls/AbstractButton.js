@@ -8,8 +8,8 @@ class AbstractButton extends Control {
 
     })
 
-    static create(parent, model, ...args){
-        let proxy = super.create(parent, model, ...args)
+    static create(parent, model, properties=[], ...args){
+        let proxy = super.create(parent, model, properties, ...args)
         proxy.__getDOM().classList.add('AbstractButton')
 
         return proxy
