@@ -33,7 +33,7 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 	Q_ASSERT(m_sdlRequestListCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 
-	int retVal = iproc::IProcessor::TS_OK;
+	iproc::IProcessor::TaskState retVal = iproc::IProcessor::TS_OK;
 
 	if (!m_argumentParserCompPtr->IsGqlEnabled()){
 		return retVal;

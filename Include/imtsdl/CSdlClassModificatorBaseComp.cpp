@@ -33,7 +33,7 @@ int CSdlClassModificatorBaseComp::DoProcessing(
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 
-	int retVal = iproc::IProcessor::TS_OK;
+	iproc::IProcessor::TaskState retVal = iproc::IProcessor::TS_OK;
 	if (!m_argumentParserCompPtr->IsModificatorEnabled(*m_processorModificatorNameAttrPtr)){
 		// nothing todo if our modificator is not exsits
 		return retVal;

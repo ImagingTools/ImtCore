@@ -114,7 +114,7 @@ int CQtResourceFilePersistenceComp::LoadFromFile(
 
 		iprm::INameParam* prefixNameParamPtr = dynamic_cast<iprm::INameParam*>(prefixParamsSet->GetEditableParameter(QtResourceModelParamIds::PrefixName));
 		if (prefixNameParamPtr == nullptr){
-			SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(QtResourceModelParamIds::PrefixName));
+			SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(qPrintable(QtResourceModelParamIds::PrefixName)));
 			I_CRITICAL();
 
 			return OS_FAILED;
@@ -123,7 +123,7 @@ int CQtResourceFilePersistenceComp::LoadFromFile(
 
 		iprm::IParamsManager* objectsManagerPtr = dynamic_cast<iprm::IParamsManager*>(prefixParamsSet->GetEditableParameter(QtResourceModelParamIds::QrcObjects));
 		if (objectsManagerPtr == nullptr){
-			SendCriticalMessage(0, QString("Params manager  '%1' is not valid!").arg(QtResourceModelParamIds::QrcObjects));
+			SendCriticalMessage(0, QString("Params manager  '%1' is not valid!").arg(qPrintable(QtResourceModelParamIds::QrcObjects)));
 			I_CRITICAL();
 
 			return OS_FAILED;
@@ -138,7 +138,7 @@ int CQtResourceFilePersistenceComp::LoadFromFile(
 			const QString fileName = fileElement.text();
 			iprm::INameParam* fileNameParamPtr = dynamic_cast<iprm::INameParam*>(fileParamsSetPtr->GetEditableParameter(QtResourceModelParamIds::QrcFileName));
 			if (fileNameParamPtr == nullptr){
-				SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(QtResourceModelParamIds::QrcFileName));
+				SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(qPrintable(QtResourceModelParamIds::QrcFileName)));
 				I_CRITICAL();
 
 				return OS_FAILED;
@@ -148,7 +148,7 @@ int CQtResourceFilePersistenceComp::LoadFromFile(
 			const QString alias = fileElement.attribute(QStringLiteral("alias"));
 			iprm::INameParam* aliasNameParamPtr = dynamic_cast<iprm::INameParam*>(fileParamsSetPtr->GetEditableParameter(QtResourceModelParamIds::QrcAlias));
 			if (aliasNameParamPtr == nullptr){
-				SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(QtResourceModelParamIds::QrcAlias));
+				SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(qPrintable(QtResourceModelParamIds::QrcAlias)));
 				I_CRITICAL();
 
 				return OS_FAILED;
@@ -208,7 +208,7 @@ int CQtResourceFilePersistenceComp::SaveToFile(
 
 		iprm::TParamsPtr<iprm::INameParam> prefixNameParamPtr (prefixParamsSetPtr, QtResourceModelParamIds::PrefixName);
 		if (!prefixNameParamPtr.IsValid()){
-			SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(QtResourceModelParamIds::PrefixName));
+			SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(qPrintable(QtResourceModelParamIds::PrefixName)));
 			I_CRITICAL();
 
 			return OS_FAILED;
@@ -221,7 +221,7 @@ int CQtResourceFilePersistenceComp::SaveToFile(
 
 		iprm::TParamsPtr<iprm::IParamsManager> objectsManagerPtr(prefixParamsSetPtr, QtResourceModelParamIds::QrcObjects);
 		if (!objectsManagerPtr.IsValid()){
-			SendCriticalMessage(0, QString("Params manager  '%1' is not valid!").arg(QtResourceModelParamIds::QrcObjects));
+			SendCriticalMessage(0, QString("Params manager  '%1' is not valid!").arg(qPrintable(QtResourceModelParamIds::QrcObjects)));
 			I_CRITICAL();
 
 			return OS_FAILED;
@@ -237,7 +237,7 @@ int CQtResourceFilePersistenceComp::SaveToFile(
 
 			iprm::TParamsPtr<iprm::INameParam> aliasNameParamPtr(fileParamsSetPtr, QtResourceModelParamIds::QrcAlias);
 			if (!aliasNameParamPtr.IsValid()){
-				SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(QtResourceModelParamIds::QrcAlias));
+				SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(qPrintable(QtResourceModelParamIds::QrcAlias)));
 				I_CRITICAL();
 
 				return OS_FAILED;
@@ -247,7 +247,7 @@ int CQtResourceFilePersistenceComp::SaveToFile(
 
 			iprm::TParamsPtr<iprm::INameParam> fileNameParamPtr(fileParamsSetPtr, QtResourceModelParamIds::QrcFileName);
 			if (!fileNameParamPtr.IsValid()){
-				SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(QtResourceModelParamIds::QrcFileName));
+				SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(qPrintable(QtResourceModelParamIds::QrcFileName)));
 				I_CRITICAL();
 
 				return OS_FAILED;

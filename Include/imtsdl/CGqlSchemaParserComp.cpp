@@ -137,7 +137,7 @@ int CGqlSchemaParserComp::DoProcessing(
 
 	if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)){
 		qDebug() << "Error: Cannot open output file";
-		return -1;
+		return TS_INVALID;
 	}
 
 	QTextStream outputStream(&outputFile);
@@ -237,7 +237,6 @@ QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(QString importDirectiv
 	return foundFiles;
 }
 
-
 QString CGqlSchemaParserComp::FindFileInList(const QString& relativePath, const QStringList& searchPathList) const
 {
 	for (const QString& searchPath: searchPathList){
@@ -250,7 +249,6 @@ QString CGqlSchemaParserComp::FindFileInList(const QString& relativePath, const 
 
 	return QString();
 }
-
 
 QStringList CGqlSchemaParserComp::FindFilesFromDir(const QString& relativeDirPath, const QStringList& searchPathList) const
 {
@@ -466,6 +464,7 @@ bool CGqlSchemaParserComp::ProcessJavaStyleImports()
 }
 
 
+
 // reimplemented (CGqlExtSchemaParser)
 
 bool CGqlSchemaParserComp::ProcessSchemaImports()
@@ -483,7 +482,6 @@ bool CGqlSchemaParserComp::ProcessSchemaImports()
 
 	return ProcessJavaStyleImports();
 }
-
 
 } // namespace imtsdl
 

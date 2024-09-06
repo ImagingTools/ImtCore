@@ -28,7 +28,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 
-	int retVal = iproc::IProcessor::TS_OK;
+	iproc::IProcessor::TaskState retVal = iproc::IProcessor::TS_OK;
 
 	if (!m_argumentParserCompPtr->IsQmlEnabled()){
 		return retVal;
@@ -86,7 +86,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 		iproc::IProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
 		Q_ASSERT(extenderPtr != nullptr);
 
-		const int extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
+		const iproc::IProcessor::TaskState extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
 		if (extenderResult != iproc::IProcessor::TS_OK){
 			return extenderResult;
 		}

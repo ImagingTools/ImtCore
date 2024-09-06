@@ -64,7 +64,7 @@ int CQmldirFilePersistenceComp::LoadFromFile(
 		SendCriticalMessage(0, "Unexpected input data", __func__);
 		I_CRITICAL();
 
-		return false;
+		return OS_FAILED;
 	}
 	Q_ASSERT(paramsSetPtr != nullptr);
 
@@ -175,8 +175,9 @@ int CQmldirFilePersistenceComp::SaveToFile(
 		SendCriticalMessage(0, QString("Unexpected input data. Error: %1").arg(ex.what()), __func__);
 		I_CRITICAL();
 
-		return false;
+		return OS_FAILED;
 	}
+
 	Q_ASSERT(paramsSetPtr != nullptr);
 
 	QFile saveFile(filePath);
@@ -191,7 +192,7 @@ int CQmldirFilePersistenceComp::SaveToFile(
 	// module name
 	iprm::TParamsPtr<iprm::INameParam> moduleNameParam(paramsSetPtr, QmldirModelParamIds::ModuleName);
 	if (!moduleNameParam.IsValid()){
-		SendErrorMessage(0, QString("Name param '%1' is missing").arg(QmldirModelParamIds::ModuleName));
+		SendErrorMessage(0, QString("Name param '%1' is missing").arg(qPrintable(QmldirModelParamIds::ModuleName)));
 		I_CRITICAL();
 
 		return OS_FAILED;

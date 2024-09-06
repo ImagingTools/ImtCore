@@ -139,7 +139,7 @@ int CBaseClassExtenderComp::DoProcessing(
 			istd::IChangeable* /*outputPtr*/,
 			ibase::IProgressManager* /*progressManagerPtr*/)
 {
-	int retVal = iproc::IProcessor::TS_OK;
+	iproc::IProcessor::TaskState retVal = iproc::IProcessor::TS_OK;
 
 	if (paramsPtr == nullptr){
 		I_CRITICAL();
