@@ -230,93 +230,13 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessFiles(const CSdlRequest& sdlRequest,
 
 bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& sdlRequest, bool addDependenciesInclude)
 {
-	/// \todo SEPARATE IT!!!!!!!!!
-
 	QTextStream ifStream(m_headerFilePtr.GetPtr());
 
 	// preprocessor's section
 	ifStream << QStringLiteral("#pragma once");
 	FeedStream(ifStream, 3, false);
 
-	QSet<QString> complexTypeList;
-	bool hasComplexTypes = m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName);
-	hasComplexTypes = IsTypeHasNonFundamentalTypes(sdlRequest, &complexTypeList) || hasComplexTypes;
-
-	if (hasComplexTypes){
-		bool isQtCommentAdded = false;
-		// Add Qt types
-		if (complexTypeList.contains(QStringLiteral("QByteArray"))){
-			if (!isQtCommentAdded){
-				ifStream << QStringLiteral("// Qt includes");
-				FeedStream(ifStream, 1, false);
-				isQtCommentAdded = true;
-			}
-			ifStream << QStringLiteral("#include <QtCore/QByteArray>");
-			FeedStream(ifStream, 1, false);
-		}
-		if (complexTypeList.contains(QStringLiteral("QString"))){
-			if (!isQtCommentAdded){
-				ifStream << QStringLiteral("// Qt includes");
-				FeedStream(ifStream, 1, false);
-				isQtCommentAdded = true;
-			}
-			ifStream << QStringLiteral("#include <QtCore/QString>");
-			FeedStream(ifStream, 1, false);
-		}
-		if (complexTypeList.contains(QStringLiteral("QList"))){
-			if (!isQtCommentAdded){
-				ifStream << QStringLiteral("// Qt includes");
-				FeedStream(ifStream, 1, false);
-				isQtCommentAdded = true;
-			}
-			ifStream << QStringLiteral("#include <QtCore/QList>");
-			FeedStream(ifStream, 1, false);
-		}
-		// if variant map is enabled we need to add QVariant and QVariantMap
-		if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
-			if (!isQtCommentAdded){
-				ifStream << QStringLiteral("// Qt includes");
-				FeedStream(ifStream, 1, false);
-			}
-			ifStream << QStringLiteral("#include <QtCore/QVariant>");
-			FeedStream(ifStream, 1, false);
-			ifStream << QStringLiteral("#include <QtCore/QVariantMap>");
-			FeedStream(ifStream, 1, false);
-		}
-
-		// remove qt types from list
-		complexTypeList.remove(QStringLiteral("QByteArray"));
-		complexTypeList.remove(QStringLiteral("QString"));
-		complexTypeList.remove(QStringLiteral("QList"));
-		if (!complexTypeList.isEmpty()){
-			FeedStream(ifStream, 1, false);
-		}
-
-		// Add user's custom types
-		if (addDependenciesInclude){
-			// first add include comment
-			if (!complexTypeList.isEmpty()){
-				ifStream << QStringLiteral("// ") << m_argumentParserCompPtr->GetNamespace() << QStringLiteral(" includes");
-				FeedStream(ifStream, 1, false);
-			}
-
-			// then add inclides
-			for (QSet<QString>::const_iterator complexIter = complexTypeList.cbegin(); complexIter != complexTypeList.cend(); ++complexIter){
-				const QString& complexTypeName = *complexIter;
-				ifStream << QStringLiteral("#include \"") << complexTypeName << QStringLiteral(".h\"");
-				FeedStream(ifStream, 1, false);
-			}
-		}
-	}
-
-	// add imtgql includes
-	FeedStream(ifStream, 1, false);
-	ifStream << QStringLiteral("//imtgql includes");
-	FeedStream(ifStream, 1, false);
-	ifStream << QStringLiteral("#include <imtgql/CGqlRequest.h>");
-	FeedStream(ifStream, 1, false);
-	ifStream << QStringLiteral("#include <imtgql/CGqlObject.h>");
-	FeedStream(ifStream, 3, false);
+	AddRequiredIncludesToHeaderFile(ifStream, sdlRequest, addDependenciesInclude);
 
 	// namespace begin
 	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
@@ -377,53 +297,14 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& s
 	ifStream << QStringLiteral("public:");
 	FeedStream(ifStream, 1, false);
 
-	// CommandId method
-	FeedStreamHorizontally(ifStream);
-	ifStream << QStringLiteral("static QByteArray GetCommandId();");
-	FeedStream(ifStream, 2, false);
-
-	// default constructor with GraphQL request
-	FeedStreamHorizontally(ifStream);
-	ifStream << 'C' << sdlRequest.GetName() << QStringLiteral("GqlRequest (const imtgql::CGqlRequest& gqlRequest);");
-	FeedStream(ifStream, 1, false);
-
-	// validation method
-	FeedStreamHorizontally(ifStream);
-	ifStream << QStringLiteral("bool IsValid() const;");
-	FeedStream(ifStream, 1, false);
-
-	// GetRequestedArguments method
-	FeedStreamHorizontally(ifStream);
-	ifStream << GetCapitalizedValue(sdlRequest.GetName());
-	ifStream << QStringLiteral("RequestArguments GetRequestedArguments() const;");
-	FeedStream(ifStream, 1, false);
-
-	// GetRequestInfo method
-	FeedStreamHorizontally(ifStream);
-	ifStream << GetCapitalizedValue(sdlRequest.GetName());
-	ifStream << QStringLiteral("RequestInfo GetRequestInfo() const;");
-
-	FeedStream(ifStream, 1, false);
+	AddMethodDeclarations(ifStream, sdlRequest);
 
 	// private section
 	FeedStream(ifStream, 1, false);
 	ifStream << QStringLiteral("private:");
 	FeedStream(ifStream, 1, false);
 
-	// validation property
-	FeedStreamHorizontally(ifStream);
-	ifStream << QStringLiteral("bool m_isValid;");
-	FeedStream(ifStream, 1, false);
-
-	// Arguments property
-	FeedStreamHorizontally(ifStream);
-	ifStream << GetCapitalizedValue(sdlRequest.GetName()) << QStringLiteral("RequestArguments m_requestedArguments;");
-	FeedStream(ifStream, 1, false);
-
-	// Info property
-	FeedStreamHorizontally(ifStream);
-	ifStream << GetCapitalizedValue(sdlRequest.GetName()) << QStringLiteral("RequestInfo m_requestInfo;");
-	FeedStream(ifStream, 1, false);
+	AddClassProperties(ifStream, sdlRequest);
 
 	// main GQL-wrap end of class
 	ifStream << QStringLiteral("};");
@@ -633,6 +514,141 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("/// implemenatation will be in new version");
+	FeedStream(stream, 1, false);
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AddRequiredIncludesToHeaderFile(QTextStream& stream, const CSdlRequest& sdlRequest, bool addDependenciesInclude) const
+{
+
+	QSet<QString> complexTypeList;
+	bool hasComplexTypes = m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName);
+	hasComplexTypes = IsTypeHasNonFundamentalTypes(sdlRequest, &complexTypeList) || hasComplexTypes;
+
+	if (hasComplexTypes){
+		bool isQtCommentAdded = false;
+		// Add Qt types
+		if (complexTypeList.contains(QStringLiteral("QByteArray"))){
+			if (!isQtCommentAdded){
+				stream << QStringLiteral("// Qt includes");
+				FeedStream(stream, 1, false);
+				isQtCommentAdded = true;
+			}
+			stream << QStringLiteral("#include <QtCore/QByteArray>");
+			FeedStream(stream, 1, false);
+		}
+		if (complexTypeList.contains(QStringLiteral("QString"))){
+			if (!isQtCommentAdded){
+				stream << QStringLiteral("// Qt includes");
+				FeedStream(stream, 1, false);
+				isQtCommentAdded = true;
+			}
+			stream << QStringLiteral("#include <QtCore/QString>");
+			FeedStream(stream, 1, false);
+		}
+		if (complexTypeList.contains(QStringLiteral("QList"))){
+			if (!isQtCommentAdded){
+				stream << QStringLiteral("// Qt includes");
+				FeedStream(stream, 1, false);
+				isQtCommentAdded = true;
+			}
+			stream << QStringLiteral("#include <QtCore/QList>");
+			FeedStream(stream, 1, false);
+		}
+		// if variant map is enabled we need to add QVariant and QVariantMap
+		if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
+			if (!isQtCommentAdded){
+				stream << QStringLiteral("// Qt includes");
+				FeedStream(stream, 1, false);
+			}
+			stream << QStringLiteral("#include <QtCore/QVariant>");
+			FeedStream(stream, 1, false);
+			stream << QStringLiteral("#include <QtCore/QVariantMap>");
+			FeedStream(stream, 1, false);
+		}
+
+		// remove qt types from list
+		complexTypeList.remove(QStringLiteral("QByteArray"));
+		complexTypeList.remove(QStringLiteral("QString"));
+		complexTypeList.remove(QStringLiteral("QList"));
+		if (!complexTypeList.isEmpty()){
+			FeedStream(stream, 1, false);
+		}
+
+		// Add user's custom types
+		if (addDependenciesInclude){
+			// first add include comment
+			if (!complexTypeList.isEmpty()){
+				stream << QStringLiteral("// ") << m_argumentParserCompPtr->GetNamespace() << QStringLiteral(" includes");
+				FeedStream(stream, 1, false);
+			}
+
+			// then add inclides
+			for (QSet<QString>::const_iterator complexIter = complexTypeList.cbegin(); complexIter != complexTypeList.cend(); ++complexIter){
+				const QString& complexTypeName = *complexIter;
+				stream << QStringLiteral("#include \"") << complexTypeName << QStringLiteral(".h\"");
+				FeedStream(stream, 1, false);
+			}
+		}
+	}
+
+	// add imtgql includes
+	FeedStream(stream, 1, false);
+	stream << QStringLiteral("//imtgql includes");
+	FeedStream(stream, 1, false);
+	stream << QStringLiteral("#include <imtgql/CGqlRequest.h>");
+	FeedStream(stream, 1, false);
+	stream << QStringLiteral("#include <imtgql/CGqlObject.h>");
+	FeedStream(stream, 3, false);
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AddMethodDeclarations(QTextStream& stream, const CSdlRequest& sdlRequest) const
+{
+	// CommandId method
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("static QByteArray GetCommandId();");
+	FeedStream(stream, 2, false);
+
+	// default constructor with GraphQL request
+	FeedStreamHorizontally(stream);
+	stream << 'C' << sdlRequest.GetName() << QStringLiteral("GqlRequest (const imtgql::CGqlRequest& gqlRequest);");
+	FeedStream(stream, 1, false);
+
+	// validation method
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("bool IsValid() const;");
+	FeedStream(stream, 1, false);
+
+	// GetRequestedArguments method
+	FeedStreamHorizontally(stream);
+	stream << GetCapitalizedValue(sdlRequest.GetName());
+	stream << QStringLiteral("RequestArguments GetRequestedArguments() const;");
+	FeedStream(stream, 1, false);
+
+	// GetRequestInfo method
+	FeedStreamHorizontally(stream);
+	stream << GetCapitalizedValue(sdlRequest.GetName());
+	stream << QStringLiteral("RequestInfo GetRequestInfo() const;");
+	FeedStream(stream, 1, false);
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AddClassProperties(QTextStream& stream, const CSdlRequest& sdlRequest) const
+{
+	// validation property
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("bool m_isValid;");
+	FeedStream(stream, 1, false);
+
+	// Arguments property
+	FeedStreamHorizontally(stream);
+	stream << GetCapitalizedValue(sdlRequest.GetName()) << QStringLiteral("RequestArguments m_requestedArguments;");
+	FeedStream(stream, 1, false);
+
+	// Info property
+	FeedStreamHorizontally(stream);
+	stream << GetCapitalizedValue(sdlRequest.GetName()) << QStringLiteral("RequestInfo m_requestInfo;");
 	FeedStream(stream, 1, false);
 }
 

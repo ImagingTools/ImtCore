@@ -52,6 +52,11 @@ private:
 	void GenerateRequestParsing(QTextStream& ifStream, const CSdlRequest& sdlRequest, uint hIndents = 1);
 	void AbortCurrentProcessing();
 
+	// header methods
+	void AddRequiredIncludesToHeaderFile(QTextStream& stream, const CSdlRequest& sdlRequest, bool addDependenciesInclude) const;
+	void AddMethodDeclarations(QTextStream& stream, const CSdlRequest& sdlRequest) const;
+	void AddClassProperties(QTextStream& stream, const CSdlRequest& sdlRequest) const;
+
 	// read methods
 	bool AddFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
 	void AddScalarFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
