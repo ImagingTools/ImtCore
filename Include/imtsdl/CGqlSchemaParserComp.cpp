@@ -208,11 +208,7 @@ QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(QString importDirectiv
 	}
 	qsizetype versionLength = version.length();
 	if(version.startsWith('.')){
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-		version.removeAt(0);
-#else
 		version.remove(0, 1);
-#endif
 	}
 	importDirective.resize(importDirective.length() - versionLength);
 
@@ -464,9 +460,7 @@ bool CGqlSchemaParserComp::ProcessJavaStyleImports()
 		importedFiles << GetPathsFromImportEntry(importDirective, m_includePathList);
 	}
 
-	/// \todo extract data from schemas
-
-	return retVal;
+	return ExtractTypesFromImport(importedFiles);
 }
 
 
