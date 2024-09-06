@@ -1000,13 +1000,13 @@ class Item extends QtObject {
     }
 
     destroy(){
+        this.$dom.remove()
+        super.destroy()
+
         let index = mainRoot.$focusedElements.indexOf(this)
         if(index >= 0) mainRoot.$focusedElements.splice(index, 1)
         index = mainRoot.$activeFocusedElements.indexOf(this)
         if(index >= 0) mainRoot.$activeFocusedElements.splice(index, 1)
-
-        this.$dom.remove()
-        super.destroy()
     }
 }
 
