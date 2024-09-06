@@ -29,7 +29,7 @@ public:
 	typedef iproc::CSyncProcessorCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CQmlCodeMetaGeneratorComp)
-		I_ASSIGN(m_qmlKeysFileSuffixAttrPtr, "QmlKeysFileSuffix", "QML Keys file's suffix for file name.\nNote: default value with underscore to avoid ambiguity", true, "MetaInfo")
+		I_ASSIGN(m_qmlKeysFileSuffixAttrPtr, "QmlKeysFileSuffix", "QML Keys file's suffix for file name.\nNote: default value with underscore to avoid ambiguity", true, "TypeMetaInfo")
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
 		I_ASSIGN(m_qmldirFilePersistanceCompPtr, "QmldirFilePersistance", "Qmldir file persistance, used to update qmldir file with new modules", true, "QmldirFilePersistance")
