@@ -31,7 +31,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 
-	iproc::IProcessor::TaskState retVal = iproc::IProcessor::TS_OK;
+	int retVal = iproc::IProcessor::TS_OK;
 
 	if (!m_argumentParserCompPtr->IsCppEnabled()){
 		return retVal;
@@ -121,7 +121,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 				baseClassDirectivesList.InsertOption(iter.value(), iter.key().toUtf8());
 			}
 
-			iproc::IProcessor::TaskState extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
+			int extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
 			if (extendResult != TS_OK){
 				SendErrorMessage(0, "Unable to extend");
 				I_CRITICAL();
@@ -137,7 +137,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 		iproc::IProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
 		Q_ASSERT(extenderPtr != nullptr);
 
-		const iproc::IProcessor::TaskState extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
+		int extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
 		if (extenderResult != iproc::IProcessor::TS_OK){
 			return extenderResult;
 		}
