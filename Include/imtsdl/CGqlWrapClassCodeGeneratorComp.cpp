@@ -388,6 +388,20 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 	ifStream << '}';
 	FeedStream(ifStream, 1, false);
 
+	// GQL context
+	FeedStream(ifStream, 2, false);
+	ifStream << QStringLiteral("const imtgql::IGqlContext* ");
+	ifStream << className << ':' << ':' ;
+	ifStream << QStringLiteral("GetRequestContext() const");
+	FeedStream(ifStream, 1, false);
+	ifStream << '{';
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream);
+	ifStream << "return m_gqlContextPtr;";
+	FeedStream(ifStream, 1, false);
+	ifStream << '}';
+	FeedStream(ifStream, 1, false);
+
 	// GetRequestedArguments
 	FeedStream(ifStream, 2, false);
 	ifStream << GetCapitalizedValue(sdlRequest.GetName());
@@ -502,6 +516,11 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 			const CSdlRequest& sdlRequest,
 			uint hIndents)
 {
+	// Get context
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("m_gqlContextPtr = gqlRequest.GetRequestContext();");
+	FeedStream(stream, 2, false);
+
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("// reading input arguments");
 	FeedStream(stream, 1, false);
@@ -594,7 +613,9 @@ void CGqlWrapClassCodeGeneratorComp::AddRequiredIncludesToHeaderFile(QTextStream
 
 	// add imtgql includes
 	FeedStream(stream, 1, false);
-	stream << QStringLiteral("//imtgql includes");
+	stream << QStringLiteral("// imtgql includes");
+	FeedStream(stream, 1, false);
+	stream << QStringLiteral("#include <imtgql/IGqlContext.h>");
 	FeedStream(stream, 1, false);
 	stream << QStringLiteral("#include <imtgql/CGqlRequest.h>");
 	FeedStream(stream, 1, false);
@@ -631,6 +652,11 @@ void CGqlWrapClassCodeGeneratorComp::AddMethodDeclarations(QTextStream& stream, 
 	stream << GetCapitalizedValue(sdlRequest.GetName());
 	stream << QStringLiteral("RequestInfo GetRequestInfo() const;");
 	FeedStream(stream, 1, false);
+
+	// Get GQL context
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("const imtgql::IGqlContext* GetRequestContext() const;");
+	FeedStream(stream, 1, false);
 }
 
 
@@ -650,6 +676,12 @@ void CGqlWrapClassCodeGeneratorComp::AddClassProperties(QTextStream& stream, con
 	FeedStreamHorizontally(stream);
 	stream << GetCapitalizedValue(sdlRequest.GetName()) << QStringLiteral("RequestInfo m_requestInfo;");
 	FeedStream(stream, 1, false);
+
+	// Gql context
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("const imtgql::IGqlContext* m_gqlContextPtr;");
+	FeedStream(stream, 1, false);
+
 }
 
 
