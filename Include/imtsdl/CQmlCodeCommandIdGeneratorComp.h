@@ -30,9 +30,9 @@ public:
 	typedef iproc::CSyncProcessorCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CQmlCodeCommandIdGeneratorComp)
-		I_ASSIGN(m_qmlCommandIdsFileSuffixAttrPtr, "QmlCommandIdFileSuffix", "QML command IDs file's suffix for file name.\nNote: default value with underscore to avoid ambiguity", true, "_CommandIds")
+		I_ASSIGN(m_qmlCommandIdsFileSuffixAttrPtr, "QmlCommandIdFileSuffix", "QML command IDs file's suffix for file name.\nNote: default value with underscore to avoid ambiguity", true, "CommandIds")
 		/// \todo remove/separate it!
-		I_ASSIGN(m_qmlDocumentTypesFileSuffixAttrPtr, "QmlDocumentTypesFileSuffix", "QML command IDs file's suffix for file name.\nNote: default value with underscore to avoid ambiguity", true, "_DocumentTypes")
+		I_ASSIGN(m_qmlDocumentTypesFileSuffixAttrPtr, "QmlDocumentTypesFileSuffix", "QML command IDs file's suffix for file name.\nNote: default value with underscore to avoid ambiguity", true, "DocumentTypes")
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlRequestListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
 		I_ASSIGN(m_qmldirFilePersistanceCompPtr, "QmldirFilePersistance", "Qmldir file persistance, used to update qmldir file with new modules", true, "QmldirFilePersistance")
