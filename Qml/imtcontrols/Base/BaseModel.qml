@@ -2,6 +2,7 @@ import QtQuick 2.0
 
 ListModel {
 	property var owner: null
+    dynamicRoles: true;
 
 	function getProperties(item){
 		let list = []
@@ -53,6 +54,7 @@ ListModel {
 						safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
 						safeValue = safeValue.replace(/\"/g,'\u005C"')
 					}
+
 					json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
 				}
 				if(j < list.length - 1) json += ','

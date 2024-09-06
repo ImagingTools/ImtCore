@@ -140,6 +140,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.left: parent.left;
                 anchors.right: controlLoader.left;
+                anchors.rightMargin: Style.size_largeMargin;
 
                 color: Style.textColor;
                 font.family: Style.fontFamilyBold;

@@ -277,8 +277,8 @@ QtObject {
             } else {
                 this[_key] = sourceObject[key]
             }
-
         }
+
         finished()
     }
 }

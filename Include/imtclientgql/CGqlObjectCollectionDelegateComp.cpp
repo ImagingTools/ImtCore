@@ -121,6 +121,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectRequest(co
 	requestPtr->AddParam("input", input);
 
 	imtgql::CGqlObject query;
+	query.InsertField("Id");
 	requestPtr->AddField("item", query);
 
 	return requestPtr;

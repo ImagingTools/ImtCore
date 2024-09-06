@@ -374,9 +374,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	QString name = inputParamPtr->GetFieldArgumentValue("name").toString();
 	QString description = inputParamPtr->GetFieldArgumentValue("description").toString();
 
-	istd::IChangeable* savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
+	istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
 	if (savedObjectPtr == nullptr){
-		// errorMessage = QString("Can not create object for update: '%1'").arg(qPrintable(objectId));
+		if (errorMessage.isEmpty()){
+			errorMessage = QString("Can not create object for update: '%1'").arg(qPrintable(objectId));
+		}
+
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return nullptr;
@@ -384,10 +387,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_UPDATE, gqlRequest, objectId, savedObjectPtr);
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_UPDATE, gqlRequest, objectId, savedObjectPtr.GetPtr());
 	}
 
-	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
+	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
 		errorMessage = QString("Can not update object: '%1'").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 

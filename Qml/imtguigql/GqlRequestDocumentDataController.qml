@@ -36,7 +36,7 @@ DocumentDataController {
             container.documentName = documentModel.m_name;
         }
         else{
-            console.error("Unable to set document name. Error: field 'm_name' is not found.");
+            console.warn("Unable to set document name. Error: field 'm_name' is not found.");
         }
     }
 
@@ -45,10 +45,18 @@ DocumentDataController {
     }
 
     function insertDocument(){
+        if (documentModel && documentModel.m_id !== undefined && documentModel.m_id !== null){
+            documentModel.m_id = documentId;
+        }
+
         gqlAddModel.save();
     }
 
     function saveDocument(){
+        if (documentModel && documentModel.m_id !== undefined && documentModel.m_id !== null){
+            documentModel.m_id = documentId;
+        }
+
         gqlUpdateModel.save();
     }
 

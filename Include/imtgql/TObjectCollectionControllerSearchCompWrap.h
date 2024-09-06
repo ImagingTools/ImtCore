@@ -71,11 +71,6 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 		return nullptr;
 	}
 
-	imtgql::CGqlObject input;
-	imtgql::CGqlObject viewParams;
-	viewParams.InsertField("Offset", 0);
-	viewParams.InsertField("Count", -1);
-
 	imtbase::CTreeItemModel* headersResponseModelPtr = BaseClass::GetHeaders(gqlRequest, errorMessage);
 	if (headersResponseModelPtr == nullptr){
 		return nullptr;
@@ -96,17 +91,22 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 	filterModel.SetExternTreeModel("FilterIds", filterSearchModelPtr);
 	filterModel.SetData("TextFilter", text);
 
+	imtgql::CGqlObject input;
+	imtgql::CGqlObject viewParams;
+	viewParams.InsertField("Offset", 0);
+	viewParams.InsertField("Count", -1);
 	viewParams.InsertField("FilterModel", filterModel.ToJson());
 
 	input.InsertField("viewParams", viewParams);
-	gqlRequest.AddParam("item", input);
+
+	gqlRequest.AddParam("input", input);
 
 	imtgql::CGqlObject items;
 	items.InsertField("Id");
 	items.InsertField("Name");
 	items.InsertField("TypeId");
 	items.InsertField("Description");
-	gqlRequest.AddField("viewParams", items);
+	gqlRequest.AddField("items", items);
 
 	imtbase::CTreeItemModel* resultModelPtr = BaseClass::ListObjects(gqlRequest, errorMessage);
 	if (resultModelPtr == nullptr){

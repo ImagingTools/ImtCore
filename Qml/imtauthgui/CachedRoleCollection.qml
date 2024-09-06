@@ -12,15 +12,13 @@ CollectionDataProvider {
 
     sortByField: "Name";
 
-//    property string appName: context.appName ? context.appName : ""
+   property string appName: context.appName ? context.appName : ""
 
-//    function getAdditionalInputParams(){
-//        console.log("CachedRoleCollection.qml getAdditionalInputParams",context.appName);
-
-//        let obj = {}
-//        obj["ProductId"] = appName;
-//        return obj;
-//    }
+   function getAdditionalInputParams(){
+       let obj = {}
+       obj["ProductId"] = appName;
+       return obj;
+   }
 }
 
 
