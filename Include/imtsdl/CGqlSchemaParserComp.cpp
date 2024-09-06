@@ -226,7 +226,12 @@ QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(QString importDirectiv
 		return QStringList({foundFilePath});
 	}
 
-	// maybe it is a directory
+	// maybe it is a directory, so rebuild search path
+	pathParts = importDirective.split('.');
+	if (!version.isEmpty()){
+		pathParts << version;
+	}
+	fileEntryPath = pathParts.join('/');
 	foundFiles = FindFilesFromDir(fileEntryPath, searchPathList);
 
 	return foundFiles;
@@ -248,11 +253,17 @@ QString CGqlSchemaParserComp::FindFileInList(const QString& relativePath, const 
 QStringList CGqlSchemaParserComp::FindFilesFromDir(const QString& relativeDirPath, const QStringList& searchPathList) const
 {
 	for (const QString& searchPath: searchPathList){
-		QDir baseDir(searchPath);
-		QFileInfo foundDir(baseDir.absoluteFilePath(relativeDirPath));
+		const QDir baseDir(searchPath);
+		const QFileInfo foundDir(baseDir.absoluteFilePath(relativeDirPath));
 		if (foundDir.exists() && foundDir.isDir()){
-			QDir moduleDir(foundDir.absoluteDir());
-			return moduleDir.entryList(QStringList({QStringLiteral("*.sdl")}), QDir::Files | QDir::Readable);
+			const QDir moduleDir(foundDir.canonicalFilePath());
+			const QFileInfoList infoList = moduleDir.entryInfoList(QStringList({QStringLiteral("*.sdl")}), QDir::Files | QDir::Readable);
+			QStringList retVal;
+			for (const QFileInfo& fileInfo: infoList){
+				retVal << fileInfo.canonicalFilePath();
+			}
+
+			return retVal;
 		}
 	}
 
