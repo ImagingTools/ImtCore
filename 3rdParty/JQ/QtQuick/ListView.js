@@ -31,7 +31,7 @@ class ListView extends Flickable {
         currentItem: {type: Var, value:undefined, signalName:'currentItemChanged'},
         snapMode: {type: Real, value:ListView.NoSnap, signalName:'snapModeChanged'},
         cacheBuffer: {type: Real, value:320, signalName:'cacheBufferChanged'},
-        count: {type: Real, value:0 },
+        count: {type: Real, value:0, signalName:'countChanged' },
         contentWidth: {type: Real, value:0, signalName:'contentWidthChanged'},
         contentHeight: {type: Real, value:0, signalName:'contentHeightChanged'},
         
@@ -135,7 +135,7 @@ class ListView extends Flickable {
             if(typeof this.model === 'number'){
                 if(this.count !== this.model){
                     countChanged = true
-                    this.count = this.model
+                    this.__getObject('count').__value = this.model
                 }
 
                 for(let i = 0; i < this.model; i++){
@@ -145,7 +145,7 @@ class ListView extends Flickable {
             } else {
                 if(this.count !== this.model.data.length){
                     countChanged = true
-                    this.count = this.model.data.length
+                    this.__getObject('count').__value = this.model.data.length
                 }
 
                 for(let i = 0; i < this.model.data.length; i++){
@@ -170,7 +170,7 @@ class ListView extends Flickable {
 
             if(this.count !== this.model.data.length){
                 countChanged = true
-                this.count = this.model.data.length
+                this.__getObject('count').__value = this.model.data.length
             }
 
             for(let change of changeSet){
@@ -206,20 +206,38 @@ class ListView extends Flickable {
         JQApplication.updateLater(this)
     }
 
+    onOrintationChanged(){
+        this.__updateItemsGeometry()
+        this.__updateGeometry()
+    }
+
+    __updateItemsGeometry(){
+        for(let i = 0; i < this.__items.length; i++){
+            if(this.orientation === ListView.Horizontal){
+                this.__items[i].y = 0
+                if(i === 0){
+                    this.__items[i].x = 0
+                } else {
+                    this.__items[i].x = this.__items[i-1].x + this.__items[i-1].width + this.spacing
+                }
+            } else {
+                this.__items[i].x = 0
+                if(i === 0){
+                    this.__items[i].y = 0
+                } else {
+                    this.__items[i].y = this.__items[i-1].y + this.__items[i-1].height + this.spacing
+                }
+            }
+        }
+    }
+
     __updateGeometry(){
         this.contentWidth = this.contentItem.__getDOM().scrollWidth
         this.contentHeight = this.contentItem.__getDOM().scrollHeight
     }
 
     __endUpdate(...args){
-        for(let i = 0; i < this.__items.length; i++){
-            if(i === 0){
-                this.__items[i].y = 0
-            } else {
-                this.__items[i].y = this.__items[i-1].y + this.__items[i-1].height + this.spacing
-            }
-        }
-
+        this.__updateItemsGeometry()
         this.__updateGeometry()
     }
 }

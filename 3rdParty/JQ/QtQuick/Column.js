@@ -39,7 +39,7 @@ class Column extends Item {
             }
         }
 
-        height += count * this.spacing
+        if(count > 0) height += (count-1) * this.spacing
 
         this.__getObject('width').__setAuto(width)
         this.__getObject('height').__setAuto(height)

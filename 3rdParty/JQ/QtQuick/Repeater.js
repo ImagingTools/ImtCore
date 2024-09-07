@@ -10,7 +10,7 @@ class Repeater extends Item {
     static meta = Object.assign({}, Item.meta, {
         model: {type: Var, value:undefined, signalName:'modelChanged'},
         delegate: {type:Variant, typeTarget:Component, value:undefined, signalName:'delegateChanged'},
-        count: {type: Real, value:0 },
+        count: {type: Real, value:0, signalName:'countChanged'},
         
         modelChanged: {type:Signal, slotName:'onModelChanged', args:[]},
         delegateChanged: {type:Signal, slotName:'onDelegateChanged', args:[]},
@@ -65,7 +65,7 @@ class Repeater extends Item {
             if(typeof this.model === 'number'){
                 if(this.count !== this.model){
                     countChanged = true
-                    this.count = this.model
+                    this.__getObject('count').__value = this.model
                 }
                 
                 for(let i = 0; i < this.model; i++){
@@ -77,7 +77,7 @@ class Repeater extends Item {
             } else {
                 if(this.count !== this.model.data.length){
                     countChanged = true
-                    this.count = this.model.data.length
+                    this.__getObject('count').__value = this.model.data.length
                 }
 
                 for(let i = 0; i < this.model.data.length; i++){

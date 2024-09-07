@@ -39,7 +39,7 @@ class Row extends Item {
             }
         }
 
-        width += count * this.spacing
+        if(count > 0) width += (count-1) * this.spacing
 
         this.__getObject('width').__setAuto(width)
         this.__getObject('height').__setAuto(height)
