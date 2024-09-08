@@ -1,0 +1,86 @@
+import {
+    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	#"../../../../ImtCore/Sdl/ImtCoreSdlAPIv1_0.sdl"
+}
+
+schema {
+    query: Query
+	mutation: Mutation
+	subscription: Subscription
+}
+
+input RolesListInput {
+    ProductId: ID!
+    viewParams: CollectionViewParams
+}
+
+type RoleItem {
+	TypeId: ID!
+	Id: ID!
+	RoleName: String!
+	RoleId: ID
+	ProductId: ID
+	ParentRoles: ID
+	RoleDescription: String
+	Added: String
+	LastModified: String
+}
+
+type RolesListPayload {
+    items: [RoleItem]
+	notification: NotificationItem
+}
+
+type RoleData {
+	Id: ID!
+	Name: String!
+	Description: String
+	RoleId: ID
+	ProductId: ID
+	ParentRoles: ID
+	Permissions: ID
+}
+
+input RoleDataInput {
+	Id: ID!
+	ProductId: ID!
+	Item: RoleData!
+}
+
+type RoleDataPayload {
+    RoleData: RoleData
+}
+
+input RoleItemInput {
+    Id: ID!
+	ProductId: ID!
+}
+
+type Query {
+    RolesList (input:RolesListInput): RolesListPayload!
+	RoleItem (input: RoleItemInput): RoleDataPayload!
+}
+
+type Mutation {
+    RoleUpdate (input: RoleDataInput): UpdatedNotificationPayload!
+	RoleAdd (input: RoleDataInput): AddedNotificationPayload!
+}
+
+collectionSchema {
+    type Role {
+	    ref: RoleItem
+		operations {
+		    list: RolesList
+		}
+		subtype Role {
+		    ref: RoleData
+			operations {
+			    get: RoleItem
+				update: RoleUpdate
+				insert: RoleAdd
+			}
+		}
+	}
+}
+
+

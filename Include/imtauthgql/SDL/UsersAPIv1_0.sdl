@@ -1,0 +1,98 @@
+import {
+    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	#"../../../../ImtCore/Sdl/ImtCoreSdlAPIv1_0.sdl"
+}
+
+schema {
+    query: Query
+	mutation: Mutation
+	subscription: Subscription
+}
+
+input UsersListInput {
+    ProductId: ID!
+    viewParams: CollectionViewParams
+}
+
+type UserItem {
+	Id: ID!
+	UserId: ID
+	Name: String!
+	Description: String
+	Mail: String
+	SystemId: ID
+	SystemName: String
+	Roles: ID
+	Groups: ID
+	Added: String
+	LastModified: String
+	LastConnection: String
+}
+
+type UsersListPayload {
+    items: [UserItem]
+	notification: NotificationItem
+}
+
+type SystemInfo {
+    Id: ID!
+	Name: String!
+	Enabled: Bool!
+}
+
+type UserData {
+	Id: ID!
+	ProductId: ID
+	Name: String!
+	Username: ID!
+	Password: String
+	Email: String
+	Groups: ID
+	Roles: ID
+	Permissions: ID
+	SystemInfos: [SystemInfo]
+}
+
+input UserDataInput {
+	Id: ID!
+	ProductId: ID!
+	Item: UserData!
+}
+
+type UserDataPayload {
+    UserData: UserData
+}
+
+input UserItemInput {
+    Id: ID!
+	ProductId: ID!
+}
+
+type Query {
+    UsersList (input:UsersListInput): UsersListPayload!
+	UserItem (input: UserItemInput): UserDataPayload!
+}
+
+type Mutation {
+    UserUpdate (input: UserDataInput): UpdatedNotificationPayload!
+	UserAdd (input: UserDataInput): AddedNotificationPayload!
+}
+
+collectionSchema {
+    type User {
+	    ref: UserItem
+		operations {
+		    list: UsersList
+		}
+		subtype User {
+		    ref: UserData
+			operations {
+			    get: UserItem
+				update: UserUpdate
+				insert: UserAdd
+			}
+		}
+	}
+}
+
+

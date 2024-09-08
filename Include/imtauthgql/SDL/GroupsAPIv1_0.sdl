@@ -1,0 +1,85 @@
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+import {
+    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	#"../../../../ImtCore/Sdl/ImtCoreSdlAPIv1_0.sdl"
+}
+
+input GroupsListInput {
+    ProductId: ID!
+    viewParams: CollectionViewParams
+}
+
+type GroupItem {
+    Id: ID!
+	Name: String!
+	Description: String
+	Roles: ID
+	Users: ID
+	ParentGroups: ID
+	Added: String
+	LastModified: String
+}
+
+type GroupsListPayload {
+    items: [GroupItem]
+	notification: NotificationItem
+}
+
+type GroupData {
+	Id: ID!
+	ProductId: ID
+	Name: String!
+	Description: String
+	Roles: ID
+	Users: ID
+	ParentGroups: ID
+}
+
+input GroupDataInput {
+	Id: ID!
+	ProductId: ID!
+	Item: GroupData!
+}
+
+type GroupDataPayload {
+    GroupData: GroupData
+}
+
+input GroupItemInput {
+    Id: ID!
+	ProductId: ID!
+}
+
+type Query {
+    GroupsList (input:GroupsListInput): GroupsListPayload!
+	GroupItem (input: GroupItemInput): GroupDataPayload!
+}
+
+type Mutation {
+    GroupUpdate (input: GroupDataInput): UpdatedNotificationPayload!
+	GroupAdd (input: GroupDataInput): AddedNotificationPayload!
+}
+
+collectionSchema {
+    type Group {
+	    ref: GroupItem
+		operations {
+		    list: GroupsList
+		}
+		subtype Group {
+		    ref: GroupData
+			operations {
+			    get: GroupItem
+				update: GroupUpdate
+				insert: GroupAdd
+			}
+		}
+	}
+}
+
+
