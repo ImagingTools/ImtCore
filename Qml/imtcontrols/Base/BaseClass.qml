@@ -246,7 +246,15 @@ QtObject {
     }
 
     function fromJSON(json){
-        return fromObject(JSON.parse(json))
+        let obj;
+        try {
+            obj = JSON.parse(json);
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
+
+        return fromObject(obj)
     }
 
     function fromObject(sourceObject){

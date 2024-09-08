@@ -91,6 +91,15 @@ list(APPEND webdirs ${buildwebdir}/src/imtdocgui)
 list(APPEND webdirs ${IMTCOREDIR}/Qml/imtcontrols)
 list(APPEND webdirs ${buildwebdir}/src/imtcontrols)
 
+list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthgql/SDL/QML/imtCoreGroupsSdl)
+list(APPEND webdirs ${buildwebdir}/src/imtCoreGroupsSdl)
+
+list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthgql/SDL/QML/imtCoreRolesSdl)
+list(APPEND webdirs ${buildwebdir}/src/imtCoreRolesSdl)
+
+list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthgql/SDL/QML/imtCoreUsersSdl)
+list(APPEND webdirs ${buildwebdir}/src/imtCoreUsersSdl)
+
 # copy dist from to
 # list(APPEND webdirs ${CMAKE_CURRENT_LIST_DIR}/../Resources/dist)
 # list(APPEND webdirs ${buildwebdir}/Resources)

@@ -12,13 +12,13 @@ CollectionDataProvider {
 
     sortByField: "Name";
 
-   property string appName: context.appName ? context.appName : ""
+    property string productId;
 
-   function getAdditionalInputParams(){
-       let obj = {}
-       obj["ProductId"] = appName;
-       return obj;
-   }
+    function getAdditionalInputParams(){
+        let obj = {}
+        obj["ProductId"] = productId;
+        return obj;
+    }
 }
 
 

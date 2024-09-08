@@ -17,8 +17,36 @@ DocumentDataController {
 
     property bool ok: subscriptionCommandId != "" && documentId != "";
 
+    property var getRequestInputParam: Gql.GqlObject("input");
+    property var addRequestInputParam: Gql.GqlObject("input");
+    property var updateRequestInputParam: Gql.GqlObject("input");
+
+    Component.onCompleted: {
+        let additionInputParams = container.getAdditionalInputParams();
+        if (Object.keys(additionInputParams).length > 0){
+            let additionParams = Gql.GqlObject("addition");
+            for (let key in additionInputParams){
+                additionParams.InsertField(key, additionInputParams[key]);
+            }
+            getRequestInputParam.InsertFieldObject(additionParams);
+            addRequestInputParam.InsertFieldObject(additionParams);
+            updateRequestInputParam.InsertFieldObject(additionParams);
+        }
+    }
+
     Component.onDestruction: {
         Events.sendEvent("UnRegisterSubscription", container.subscriptionClient);
+    }
+
+    onDocumentModelChanged: {
+        updateRequestInputParam.InsertField ("Item", container.documentModel);
+        addRequestInputParam.InsertField ("Item", container.documentModel);
+    }
+
+    onDocumentIdChanged: {
+        getRequestInputParam.InsertField("Id", container.documentId);
+        addRequestInputParam.InsertField("Id", container.documentId);
+        updateRequestInputParam.InsertField("Id", container.documentId);
     }
 
     onError: {
@@ -71,9 +99,9 @@ DocumentDataController {
         }
     }
 
+    // TODO: ???
     function getAdditionalInputParams(){
-        let obj = {}
-        return obj;
+        return {};
     }
 
     property SubscriptionClient subscriptionClient: SubscriptionClient {
@@ -102,21 +130,7 @@ DocumentDataController {
     property GqlRequest gqlUpdateModel: GqlRequest {
         function save(){
             var query = Gql.GqlRequest("mutation", container.gqlUpdateCommandId);
-
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", container.documentId);
-            inputParams.InsertField ("Item", container.documentModel);
-
-            let additionInputParams = container.getAdditionalInputParams();
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-                inputParams.InsertFieldObject(additionParams);
-            }
-
-            query.AddParam(inputParams);
+            query.AddParam(container.updateRequestInputParam);
 
             var queryFields = Gql.GqlObject("updatedNotification");
             queryFields.InsertField("Id");
@@ -195,19 +209,7 @@ DocumentDataController {
             queryFields.InsertField("Id");
             query.AddField(queryFields);
 
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", container.documentId);
-
-            let additionInputParams = container.getAdditionalInputParams();
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-                inputParams.InsertFieldObject(additionParams);
-            }
-
-            query.AddParam(inputParams);
+            query.AddParam(container.getRequestInputParam);
 
             var gqlData = query.GetQuery();
 
@@ -219,8 +221,8 @@ DocumentDataController {
                 container.error("Network error", "Critical");
             }
             else if (state === "Ready"){
+                console.log("Json", this.json);
                 let responseObj = JSON.parse(this.json)
-
                 if (!responseObj){
                     console.error("Unable convert json ", json, " to object")
                     return;
@@ -261,21 +263,7 @@ DocumentDataController {
     property GqlRequest gqlAddModel: GqlRequest {
         function save(){
             var query = Gql.GqlRequest("mutation", container.gqlAddCommandId);
-
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", container.documentId);
-            inputParams.InsertField ("Item", container.documentModel);
-
-            let additionInputParams = container.getAdditionalInputParams();
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-                inputParams.InsertFieldObject(additionParams);
-            }
-
-            query.AddParam(inputParams);
+            query.AddParam(container.addRequestInputParam);
 
             var queryFields = Gql.GqlObject("addedNotification");
             queryFields.InsertField("Id");

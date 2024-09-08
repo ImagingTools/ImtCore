@@ -22,6 +22,26 @@ type AddedNotificationPayload {
 	addedNotification: NotificationInfo!
 }
 
+type SortingInfoId {
+    Id: ID
+}
+
+type SortingInfoId {
+    Id: ID
+}
+
+type FilteringInfoId {
+    Id: ID
+}
+
+type CollectionFilter {
+    ObjectTypeId: ID
+	Filter: String
+	SortingOrder: String
+	SortingInfoIds: [SortingInfoId]
+	FilteringInfoIds: [FilteringInfoId]
+}
+
 input InputId {
 	Id: ID!
 }

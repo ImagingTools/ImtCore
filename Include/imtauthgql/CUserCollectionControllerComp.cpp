@@ -1,15 +1,14 @@
 #include <imtauthgql/CUserCollectionControllerComp.h>
 
 
-// STL includes
-#include <cmath>
-
 // ACF includes
 #include <idoc/CStandardDocumentMetaInfo.h>
-#include <imtauth/CUserInfo.h>
+#include <iprm/CTextParam.h>
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
+#include <imtauth/CUserInfo.h>
 
 
 namespace imtauthgql
@@ -18,28 +17,344 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (imtgql::CObjectCollectionControllerCompBase)
+// reimplemented (imtcore::sdl::Users::CUserCollectionControllerCompBase)
 
-QVariant CUserCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
+bool CUserCollectionControllerComp::CreateRepresentationFromObject(
+			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
+			const imtcore::sdl::Users::CUsersListGqlRequest& usersListRequest,
+			imtcore::sdl::Users::CUserItem& representationObject,
+			QString& errorMessage) const
 {
-	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
+	imtcore::sdl::Users::UsersListRequestArguments arguments = usersListRequest.GetRequestedArguments();
 
-	if (metaInfo.IsValid()){
-		if (informationId == QByteArray("UserId")){
-//			return metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_USERNAME);
+	QByteArray objectId = objectCollectionIterator.GetObjectId();
+	QByteArray productId = arguments.input.GetProductId();
+
+	const imtauth::IUserInfo* userInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr userDataPtr;
+	if (objectCollectionIterator.GetObjectData(userDataPtr)){
+		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+	}
+
+	if (userInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+		return false;
+	}
+
+	imtcore::sdl::Users::UsersListRequestInfo requestInfo = usersListRequest.GetRequestInfo();
+
+	if (requestInfo.items.isIdRequested){
+		representationObject.SetId(objectId);
+	}
+
+	if (requestInfo.items.isUserIdRequested){
+		representationObject.SetUserId(userInfoPtr->GetId());
+	}
+
+	if (requestInfo.items.isNameRequested){
+		representationObject.SetName(userInfoPtr->GetName());
+	}
+
+	if (requestInfo.items.isDescriptionRequested){
+		representationObject.SetDescription(userInfoPtr->GetDescription());
+	}
+
+	if (requestInfo.items.isMailRequested){
+		representationObject.SetMail(userInfoPtr->GetMail());
+	}
+
+	if (requestInfo.items.isSystemIdRequested){
+		QByteArrayList systemIdList;
+		imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
+		for (imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+			systemIdList << systemInfo.systemId;
 		}
-		else if (informationId == QByteArray("Email")){
-			return metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_EMAIL);
+
+		representationObject.SetSystemId(systemIdList.join(';'));
+	}
+
+	if (requestInfo.items.isSystemNameRequested){
+		QStringList systemNameList;
+		imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
+		for (imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+			if (systemInfo.systemName.isEmpty()){
+				systemNameList << QT_TR_NOOP("Internal");
+			}
+			else{
+				systemNameList << systemInfo.systemName;
+			}
 		}
-		else if (informationId == QByteArray("Added")){
-			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
+
+		representationObject.SetSystemName(systemNameList.join(';'));
+	}
+
+	if (requestInfo.items.isRolesRequested){
+		QByteArrayList resultList;
+		if (m_roleInfoProviderCompPtr.IsValid()){
+			for (const QByteArray& roleId: userInfoPtr->GetRoles(productId)){
+				const imtauth::IRole* roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
+				if (roleInfoPtr != nullptr){
+					QString roleName = roleInfoPtr->GetRoleName();
+					QString roleDescription = roleInfoPtr->GetRoleDescription();
+
+					QString result = roleName;
+					if (!roleDescription.isEmpty()){
+						result += " (" + roleDescription + ")";
+					}
+					resultList << result.toUtf8();
+				}
+			}
 		}
-		else if (informationId == QByteArray("LastModified")){
-			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
+
+		representationObject.SetRoles(resultList.join(';'));
+	}
+
+	if (requestInfo.items.isGroupsRequested){
+		QByteArrayList resultList;
+		if (m_userGroupInfoProviderCompPtr.IsValid()){
+			for (const QByteArray& groupId: userInfoPtr->GetGroups()){
+				const imtauth::IUserGroupInfo* userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
+				if (userGroupInfoPtr != nullptr){
+					QString groupName = userGroupInfoPtr->GetName();
+					QString groupDescription = userGroupInfoPtr->GetDescription();
+
+					QString result = groupName;
+					if (!groupDescription.isEmpty()){
+						result += " (" + groupDescription + ")";
+					}
+
+					resultList << result.toUtf8();
+				}
+			}
+		}
+		representationObject.SetGroups(resultList.join(';'));
+	}
+
+	if (requestInfo.items.isLastConnectionRequested){
+		QDateTime lastConnection = userInfoPtr->GetLastConnection();
+		lastConnection.setTimeSpec(Qt::UTC);
+
+		representationObject.SetLastConnection(lastConnection.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
+	}
+
+	if (requestInfo.items.isAddedRequested){
+		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime();
+		addedTime.setTimeSpec(Qt::UTC);
+
+		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+		representationObject.SetAdded(added);
+	}
+
+	if (requestInfo.items.isLastModifiedRequested){
+		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("LastModified").toDateTime();
+		lastModifiedTime.setTimeSpec(Qt::UTC);
+
+		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+		representationObject.SetLastModified(lastModified);
+	}
+
+	return true;
+}
+
+
+istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation(
+			const imtcore::sdl::Users::CUserData& userDataRepresentation,
+			QByteArray& newObjectId,
+			QString& name,
+			QString& description,
+			QString& errorMessage) const
+{
+	if (!m_userInfoFactCompPtr.IsValid()){
+		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_userInfoFactCompPtr' was not set");
+		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	istd::TDelPtr<imtauth::IUserInfo> userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
+	if (!userInstancePtr.IsValid()){
+		errorMessage = QString("Unable to create user instance. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(userInstancePtr.GetPtr());
+	if (userInfoPtr == nullptr){
+		errorMessage = QString("Unable to cast user instance to identifable object. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	QByteArray productId = userDataRepresentation.GetProductId();
+
+	QByteArray id = userDataRepresentation.GetId();
+	if (id.isEmpty()){
+		id = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
+	newObjectId = id;
+
+	imtauth::IUserInfo* oldUserInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr oldUserdataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(id, oldUserdataPtr)){
+		oldUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(oldUserdataPtr.GetPtr());
+	}
+
+	QByteArray username = userDataRepresentation.GetUsername();
+	if (username.isEmpty()){
+		SendWarningMessage(0, QString("Username can't be empty"), "CUserCollectionControllerComp");
+		errorMessage = QT_TR_NOOP("Username can't be empty!");
+
+		return nullptr;
+	}
+
+	iprm::CParamsSet filterParam;
+	iprm::CParamsSet paramsSet;
+
+	iprm::CTextParam userId;
+	userId.SetText(username);
+
+	paramsSet.SetEditableParameter("Id", &userId);
+	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+
+	imtbase::IObjectCollection::Ids userIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+	if (!userIds.isEmpty()){
+		QByteArray userObjectId = userIds[0];
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
+			const imtauth::CUserInfo* currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
+			if (currentUserInfoPtr != nullptr){
+				if (userObjectId != id){
+					QByteArray currentUsername = currentUserInfoPtr->GetId();
+					if (currentUsername == username){
+						SendWarningMessage(0, QString("Username already exists"), "imtauthgql::CUserControllerComp");
+						errorMessage = QT_TR_NOOP("Username already exists");
+
+						return nullptr;
+					}
+				}
+			}
 		}
 	}
 
-	return QVariant();
+	userInfoPtr->SetId(username);
+
+	name = userDataRepresentation.GetName();
+	userInfoPtr->SetName(name);
+
+	QString password = userDataRepresentation.GetPassword();
+	if (password.isEmpty()){
+		errorMessage = QString("Password cannot be empty");
+
+		return nullptr;
+	}
+
+	if (m_hashCalculatorCompPtr.IsValid()){
+		if (oldUserInfoPtr != nullptr){
+			if (oldUserInfoPtr->GetPasswordHash() != password){
+				password = m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
+			}
+		}
+	}
+
+	// User from internal system
+	imtauth::IUserInfo::SystemInfo systemInfo;
+	userInfoPtr->AddToSystem(systemInfo);
+
+	userInfoPtr->SetPasswordHash(password.toUtf8());
+
+	QString mail = userDataRepresentation.GetEmail();
+	userInfoPtr->SetMail(mail);
+
+	imtauth::IUserInfo::FeatureIds permissions = userDataRepresentation.GetPermissions().split(';');
+	permissions.removeAll("");
+	userInfoPtr->SetLocalPermissions(productId, permissions);
+
+	QByteArrayList roleIds = userDataRepresentation.GetRoles().split(';');
+	if (!roleIds.isEmpty()){
+		roleIds.removeAll("");
+		userInfoPtr->SetRoles(productId, roleIds);
+	}
+	else{
+		userInfoPtr->RemoveProduct(productId);
+	}
+
+	QByteArrayList groupIds = userDataRepresentation.GetGroups().split(';');
+	groupIds.removeAll("");
+	for (const QByteArray& groupId : groupIds){
+		if (!groupId.isEmpty()){
+			userInfoPtr->AddToGroup(groupId);
+		}
+	}
+
+	return userInstancePtr.PopPtr();
+}
+
+
+bool CUserCollectionControllerComp::CreateRepresentationFromObject(
+			const istd::IChangeable& data,
+			const imtcore::sdl::Users::CUserItemGqlRequest& userItemRequest,
+			imtcore::sdl::Users::CUserDataPayload& representationPayload,
+			QString& errorMessage) const
+{
+	const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(&data);
+	if (userInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+		return false;
+	}
+
+	imtcore::sdl::Users::UserItemRequestArguments arguments = userItemRequest.GetRequestedArguments();
+	QByteArray productId = arguments.input.GetProductId();
+	imtcore::sdl::Users::CUserData userData;
+
+	QByteArray objectId = userInfoPtr->GetObjectUuid();
+	userData.SetId(objectId);
+
+	QByteArray userName = userInfoPtr->GetId();
+	userData.SetUsername(userName);
+
+	QString name = userInfoPtr->GetName();
+	userData.SetName(name);
+
+	QByteArray password = userInfoPtr->GetPasswordHash();
+	userData.SetPassword(password);
+
+	QString mail = userInfoPtr->GetMail();
+	userData.SetEmail(mail);
+
+	QByteArrayList groupList = userInfoPtr->GetGroups();
+	std::sort(groupList.begin(), groupList.end());
+	userData.SetGroups(groupList.join(';'));
+
+	QByteArrayList roleList = userInfoPtr->GetRoles(productId);
+	std::sort(roleList.begin(), roleList.end());
+	userData.SetRoles(roleList.join(';'));
+
+	QByteArray permissions = userInfoPtr->GetPermissions(productId).join(';');
+	std::sort(permissions.begin(), permissions.end());
+	userData.SetPermissions(permissions);
+
+	QList<imtcore::sdl::Users::CSystemInfo> list;
+	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+		imtcore::sdl::Users::CSystemInfo info;
+
+		info.SetId(systemInfo.systemId);
+		info.SetName(systemInfo.systemName);
+		info.SetEnabled(systemInfo.enabled);
+
+		list << info;
+	}
+	userData.SetSystemInfos(list);
+
+	representationPayload.SetUserData(userData);
+
+	return true;
 }
 
 
@@ -104,173 +419,6 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 	}
 
 	return rootModelPtr.PopPtr();
-}
-
-
-bool CUserCollectionControllerComp::SetupGqlItem(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
-			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-			QString& /*errorMessage*/) const
-{
-	if (objectCollectionIterator == nullptr){
-		return false;
-	}
-
-	const imtgql::CGqlObject& params = gqlRequest.GetParams();
-
-	QByteArray productId;
-	productId = params.GetFieldArgumentValue("ProductId").toByteArray();
-
-	bool retVal = true;
-	QByteArray collectionId = objectCollectionIterator->GetObjectId();
-	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
-
-	if (!informationIds.isEmpty()){
-		const imtauth::IUserInfo* contextUserInfoPtr = nullptr;
-		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-		if (contextPtr != nullptr){
-			contextUserInfoPtr = contextPtr->GetUserInfo();
-		}
-
-		const imtauth::IUserInfo* userInfoPtr = nullptr;
-		imtbase::IObjectCollection::DataPtr userDataPtr;
-		if (objectCollectionIterator->GetObjectData(userDataPtr)){
-			userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
-		}
-
-		bool ok = false;
-		if (contextUserInfoPtr != nullptr){
-			ok = contextUserInfoPtr->IsAdmin();
-		}
-
-		if (!ok){
-			if (userInfoPtr != nullptr){
-				ok = !userInfoPtr->IsAdmin();
-			}
-		}
-
-		if (contextPtr == nullptr){
-			ok = true;
-		}
-
-		if (ok){
-			idoc::MetaInfoPtr elementMetaInfo = objectCollectionIterator->GetDataMetaInfo();
-			for (QByteArray informationId : informationIds){
-				QVariant elementInformation;
-
-				if(informationId == "Id"){
-					elementInformation = QString(collectionId);
-				}
-				else if(informationId == "UserId"){
-					elementInformation = userInfoPtr->GetId();
-				}
-				else if(informationId == "Name"){
-					elementInformation = userInfoPtr->GetName();
-				}
-				else if(informationId == "Description"){
-					elementInformation = userInfoPtr->GetDescription();
-				}
-				else if(informationId == "Mail"){
-					elementInformation = userInfoPtr->GetMail();
-				}
-				else if(informationId == "SystemId"){
-					QByteArrayList systemIdList;
-					imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
-					for (imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
-						systemIdList << systemInfo.systemId;
-					}
-
-					elementInformation = systemIdList.join(';');
-				}
-				else if(informationId == "SystemName"){
-					QStringList systemNameList;
-					imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
-					for (imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
-						if (systemInfo.systemName.isEmpty()){
-							systemNameList << QT_TR_NOOP("Internal");
-						}
-						else{
-							systemNameList << systemInfo.systemName;
-						}
-					}
-
-					elementInformation = systemNameList.join(';');
-				}
-				else if(informationId == "Roles"){
-					QByteArrayList resultList;
-					if (m_roleInfoProviderCompPtr.IsValid()){
-						for (const QByteArray& roleId: userInfoPtr->GetRoles(productId)){
-							const imtauth::IRole* roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
-							if (roleInfoPtr != nullptr){
-								QString roleName = roleInfoPtr->GetRoleName();
-								QString roleDescription = roleInfoPtr->GetRoleDescription();
-
-								QString result = roleName;
-								if (!roleDescription.isEmpty()){
-									result += " (" + roleDescription + ")";
-								}
-								resultList << result.toUtf8();
-							}
-						}
-					}
-					elementInformation = resultList.join(';');
-				}
-				else if(informationId == "Groups"){
-					QByteArrayList resultList;
-					if (m_userGroupInfoProviderCompPtr.IsValid()){
-						for (const QByteArray& groupId: userInfoPtr->GetGroups()){
-							const imtauth::IUserGroupInfo* userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
-							if (userGroupInfoPtr != nullptr){
-								QString groupName = userGroupInfoPtr->GetName();
-								QString groupDescription = userGroupInfoPtr->GetDescription();
-
-								QString result = groupName;
-								if (!groupDescription.isEmpty()){
-									result += " (" + groupDescription + ")";
-								}
-
-								resultList << result.toUtf8();
-							}
-						}
-					}
-					elementInformation = resultList.join(';');
-				}
-				else if(informationId == "Added"){
-					QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
-					addedTime.setTimeSpec(Qt::UTC);
-
-					elementInformation = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-				}
-				else if(informationId == "LastModified"){
-					QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
-					lastTime.setTimeSpec(Qt::UTC);
-
-					elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-				}
-				else if(informationId == "LastConnection"){
-					QDateTime lastConnection = userInfoPtr->GetLastConnection();
-					lastConnection.setTimeSpec(Qt::UTC);
-
-					elementInformation = lastConnection.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-				}
-
-				if(elementInformation.isNull()){
-					elementInformation = GetObjectInformation(informationId, collectionId);
-				}
-				if (elementInformation.isNull()){
-					elementInformation = "";
-				}
-
-				retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
-			}
-		}
-
-		return true;
-	}
-
-	return false;
 }
 
 

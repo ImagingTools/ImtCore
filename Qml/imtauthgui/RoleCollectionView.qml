@@ -6,6 +6,7 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
+import imtCoreRolesSdl 1.0
 
 RemoteCollectionView {
     id: roleCollectionViewContainer;
@@ -115,10 +116,28 @@ RemoteCollectionView {
     Component {
         id: dataControllerComp;
 
-        GqlDocumentDataController {
-            gqlGetCommandId: "RoleItem";
-            gqlUpdateCommandId: "RoleUpdate";
-            gqlAddCommandId: "RoleAdd";
+        GqlRequestDocumentDataController {
+            id: requestDocumentDataController
+
+            gqlGetCommandId: ImtCoreRolesSdlCommandIds.s_roleItem;
+            gqlUpdateCommandId: ImtCoreRolesSdlCommandIds.s_roleUpdate;
+            gqlAddCommandId: ImtCoreRolesSdlCommandIds.s_roleAdd;
+
+            Component.onCompleted: {
+                getRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
+                addRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
+                updateRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
+            }
+
+            documentModelComp: Component {
+                RoleData {}
+            }
+
+            payloadModel: RoleDataPayload {
+                onFinished: {
+                    requestDocumentDataController.documentModel = m_roleData;
+                }
+            }
 
             function getAdditionalInputParams(){
                 let obj = {}

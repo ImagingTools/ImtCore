@@ -17,24 +17,223 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (imtgql::CObjectCollectionControllerCompBase)
+// reimplemented (imtcore::sdl::Roles::CRoleCollectionControllerCompBase)
 
-QVariant CRoleCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
+bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
+			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
+			const imtcore::sdl::Roles::CRolesListGqlRequest& rolesListRequest,
+			imtcore::sdl::Roles::CRoleItem& representationObject,
+			QString& errorMessage) const
 {
-	if (informationId == QByteArray("Added")){
-		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);;
-		if (metaInfo.IsValid()){
-			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
-		}
+	QByteArray objectId = objectCollectionIterator.GetObjectId();
+
+	const imtauth::IRole* roleInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr roleDataPtr;
+	if (objectCollectionIterator.GetObjectData(roleDataPtr)){
+		roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
 	}
-	else if (informationId == QByteArray("LastModified")){
-		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
-		if (metaInfo.IsValid()){
-			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
+
+	if (roleInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
+
+		return false;
+	}
+
+	imtcore::sdl::Roles::RolesListRequestInfo requestInfo = rolesListRequest.GetRequestInfo();
+
+	if (requestInfo.items.isIdRequested){
+		representationObject.SetId(objectId);
+	}
+
+	if (requestInfo.items.isRoleNameRequested){
+		representationObject.SetRoleName(roleInfoPtr->GetRoleName());
+	}
+
+	if (requestInfo.items.isRoleIdRequested){
+		representationObject.SetRoleId(roleInfoPtr->GetRoleId());
+	}
+
+	if (requestInfo.items.isRoleDescriptionRequested){
+		representationObject.SetRoleDescription(roleInfoPtr->GetRoleDescription());
+	}
+
+	if (requestInfo.items.isParentRolesRequested){
+		representationObject.SetParentRoles(roleInfoPtr->GetIncludedRoles().join(';'));
+	}
+
+	if (requestInfo.items.isProductIdRequested){
+		representationObject.SetProductId(roleInfoPtr->GetProductId());
+	}
+
+	if (requestInfo.items.isTypeIdRequested){
+		representationObject.SetTypeId(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+	}
+
+	if (requestInfo.items.isAddedRequested){
+		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime();
+		addedTime.setTimeSpec(Qt::UTC);
+
+		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+		representationObject.SetAdded(added);
+	}
+
+	if (requestInfo.items.isLastModifiedRequested){
+		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("LastModified").toDateTime();
+		lastModifiedTime.setTimeSpec(Qt::UTC);
+
+		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+		representationObject.SetLastModified(lastModified);
+	}
+
+	return true;
+}
+
+
+istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation(
+			const imtcore::sdl::Roles::CRoleData& roleDataRepresentation,
+			QByteArray& newObjectId,
+			QString& name,
+			QString& description,
+			QString& errorMessage) const
+{
+	if (!m_roleInfoFactCompPtr.IsValid()){
+		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_roleInfoFactCompPtr' was not set");
+		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	istd::TDelPtr<imtauth::IRole> roleInstancePtr = m_roleInfoFactCompPtr.CreateInstance();
+	if (!roleInstancePtr.IsValid()){
+		errorMessage = QString("Unable to create role instance. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(roleInstancePtr.GetPtr());
+	if (roleInfoPtr == nullptr){
+		errorMessage = QString("Unable to cast role instance to identifable object. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	QByteArray id = roleDataRepresentation.GetId();
+	if (id.isEmpty()){
+		id = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
+
+	roleInfoPtr->SetObjectUuid(id);
+	newObjectId = id;
+
+	QByteArray roleId = roleDataRepresentation.GetRoleId();
+	if (roleId.isEmpty()){
+		errorMessage = QString("Role-ID can't be empty!");
+		return nullptr;
+	}
+
+	roleInfoPtr->SetRoleId(roleId);
+
+	QByteArray productId = roleDataRepresentation.GetProductId();
+	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+	for (const imtbase::ICollectionInfo::Id& collectionId : collectionIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
+			imtauth::IRole* currentRoleInfoPtr = dynamic_cast<imtauth::IRole*>(dataPtr.GetPtr());
+			if (currentRoleInfoPtr != nullptr){
+				if (collectionId != id){
+					QByteArray currentRoleId = currentRoleInfoPtr->GetRoleId();
+					QByteArray currentProductId = currentRoleInfoPtr->GetProductId();
+
+					if (currentRoleId == roleId && currentProductId == productId){
+						errorMessage = QString("Role with ID: '%1' already exists").arg(qPrintable(currentRoleId));
+						return nullptr;
+					}
+				}
+			}
 		}
 	}
 
-	return QVariant();
+	roleInfoPtr->SetProductId(productId);
+
+	QString roleName = roleDataRepresentation.GetName();
+	name = roleName;
+	roleInfoPtr->SetRoleName(roleName);
+
+	QString roleDescription = roleDataRepresentation.GetDescription();
+	description = roleDescription;
+	roleInfoPtr->SetRoleDescription(roleDescription);
+
+	QByteArray parentRoles = roleDataRepresentation.GetParentRoles();
+	if (!parentRoles.isEmpty()){
+		QByteArrayList parentRoleIds = parentRoles.split(';');
+		parentRoleIds.removeAll("");
+
+		for (const QByteArray& parentRoleId : parentRoleIds){
+			if (parentRoleId == id || !roleInfoPtr->IncludeRole(parentRoleId)){
+				errorMessage = QT_TR_NOOP(QString("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
+										.arg(qPrintable(parentRoleId))
+										.arg(qPrintable(roleId)));
+
+				return nullptr;
+			}
+		}
+	}
+
+	QByteArray permissions = roleDataRepresentation.GetPermissions();
+	QByteArrayList permissionIds = permissions.split(';');
+	permissionIds.removeAll("");
+	roleInfoPtr->SetLocalPermissions(permissionIds);
+
+	return roleInstancePtr.PopPtr();
+}
+
+
+bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
+			const istd::IChangeable& data,
+			const imtcore::sdl::Roles::CRoleItemGqlRequest& roleItemRequest,
+			imtcore::sdl::Roles::CRoleDataPayload& representationPayload,
+			QString& errorMessage) const
+{
+	const imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<const imtauth::CIdentifiableRoleInfo*>(&data);
+	if (roleInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
+
+		return false;
+	}
+
+	imtcore::sdl::Roles::RoleItemRequestArguments arguments = roleItemRequest.GetRequestedArguments();
+	imtcore::sdl::Roles::CRoleData roleData;
+
+	QByteArray id = roleInfoPtr->GetObjectUuid();
+	roleData.SetId(id);
+
+	QByteArray roleId = roleInfoPtr->GetRoleId();
+	roleData.SetRoleId(roleId);
+
+	QByteArray productId = roleInfoPtr->GetProductId();
+	roleData.SetProductId(productId);
+
+	QString name = roleInfoPtr->GetRoleName();
+	roleData.SetName(name);
+
+	QString description = roleInfoPtr->GetRoleDescription();
+	roleData.SetDescription(description);
+
+	QByteArrayList parentsRolesIds = roleInfoPtr->GetIncludedRoles();
+	std::sort(parentsRolesIds.begin(), parentsRolesIds.end());
+	roleData.SetParentRoles(parentsRolesIds.join(';'));
+
+	imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
+	std::sort(permissions.begin(), permissions.end());
+	roleData.SetPermissions(permissions.join(';'));
+
+	representationPayload.SetRoleData(roleData);
+
+	return true;
 }
 
 
@@ -104,89 +303,6 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
 
 	return rootModelPtr.PopPtr();
-}
-
-
-bool CRoleCollectionControllerComp::SetupGqlItem(
-		const imtgql::CGqlRequest& gqlRequest,
-		imtbase::CTreeItemModel& model,
-		int itemIndex,
-		const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-		QString& errorMessage) const
-{
-	if (objectCollectionIterator == nullptr){
-		errorMessage = QString("Unable to setup GQL item for role");
-		return false;
-	}
-
-	const imtgql::CGqlObject paramsPtr = gqlRequest.GetParams();
-
-	QByteArray productId;
-	productId = paramsPtr.GetFieldArgumentValue("ProductId").toByteArray();
-
-	bool retVal = true;
-	QByteArray collectionId = objectCollectionIterator->GetObjectId();
-	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
-
-	if (!informationIds.isEmpty()){
-		const imtauth::IRole* roleInfoPtr = nullptr;
-		imtbase::IObjectCollection::DataPtr roleDataPtr;
-		if (objectCollectionIterator->GetObjectData(roleDataPtr)){
-			roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
-		}
-
-		idoc::MetaInfoPtr elementMetaInfo = objectCollectionIterator->GetDataMetaInfo();
-		for (QByteArray informationId : informationIds){
-			QVariant elementInformation;
-
-			if(informationId == "Id"){
-				elementInformation = QString(collectionId);
-			}
-			if(informationId == "Name"){
-				elementInformation = roleInfoPtr->GetRoleName();
-			}
-			else if(informationId == "RoleId"){
-				elementInformation = roleInfoPtr->GetRoleId();
-			}
-			else if(informationId == "ProductId"){
-				elementInformation = roleInfoPtr->GetProductId();
-			}
-			else if(informationId == "RoleName"){
-				elementInformation = roleInfoPtr->GetRoleName();
-			}
-			else if(informationId == "ParentRoles"){
-				elementInformation = roleInfoPtr->GetIncludedRoles().join(';');
-			}
-			else if(informationId == "RoleDescription"){
-				elementInformation = roleInfoPtr->GetRoleDescription();
-			}
-			else if(informationId == "Added"){
-				QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
-				addedTime.setTimeSpec(Qt::UTC);
-
-				elementInformation = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-			}
-			else if(informationId == "LastModified"){
-				QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
-				lastTime.setTimeSpec(Qt::UTC);
-
-				elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-			}
-
-			if(elementInformation.isNull()){
-				elementInformation = GetObjectInformation(informationId, collectionId);
-			}
-			if (elementInformation.isNull()){
-				elementInformation = "";
-			}
-
-			retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
-		}
-
-		return true;
-	}
-
-	return false;
 }
 
 

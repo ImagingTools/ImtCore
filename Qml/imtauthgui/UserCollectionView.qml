@@ -6,12 +6,15 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
+import imtCoreUsersSdl 1.0
 
 RemoteCollectionView {
     id: userCollectionViewContainer;
 
     collectionId: "Users";
     visibleMetaInfo: true;
+
+    property string productId: context.appName;
 
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
             collectionView: userCollectionViewContainer;
@@ -123,6 +126,12 @@ RemoteCollectionView {
             collectionId: userCollectionViewContainer.collectionId;
             Component.onCompleted: {
                 additionalFieldIds.push("SystemId");
+            }
+
+            function getAdditionalInputParams(){
+                let obj = {}
+                obj["ProductId"] = userCollectionViewContainer.productId;
+                return obj;
             }
         }
     }
@@ -331,6 +340,7 @@ RemoteCollectionView {
 
             rolesModel: userCollectionViewContainer.rolesModel;
             groupsModel: userCollectionViewContainer.groupsModel;
+            productId: context.appName;
 
             commandsDelegateComp: Component {ViewCommandsDelegateBase {
                     view: userEditor;
@@ -349,10 +359,28 @@ RemoteCollectionView {
     Component {
         id: dataControllerComp;
 
-        GqlDocumentDataController {
-            gqlGetCommandId: "UserItem";
-            gqlUpdateCommandId: "UserUpdate";
-            gqlAddCommandId: "UserAdd";
+        GqlRequestDocumentDataController {
+            id: requestDocumentDataController
+
+            gqlGetCommandId: ImtCoreUsersSdlCommandIds.s_userItem;
+            gqlUpdateCommandId: ImtCoreUsersSdlCommandIds.s_userUpdate;
+            gqlAddCommandId: ImtCoreUsersSdlCommandIds.s_userAdd;
+
+            Component.onCompleted: {
+                getRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, context.appName);
+                addRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, context.appName);
+                updateRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, context.appName);
+            }
+
+            documentModelComp: Component {
+                UserData {}
+            }
+
+            payloadModel: UserDataPayload {
+                onFinished: {
+                    requestDocumentDataController.documentModel = m_userData;
+                }
+            }
 
             function getDocumentName(){
                 let prefixName = qsTr("Users");

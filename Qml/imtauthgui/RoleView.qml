@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtCoreRolesSdl 1.0
 
 ViewBase {
     id: container;
@@ -13,6 +14,8 @@ ViewBase {
 
     property string productId: "";
 
+    property RoleData roleData: model ? model : null;
+
     function updateGui(){
         generalGroup.updateGui();
         permissionsGroup.updateGui()
@@ -21,6 +24,8 @@ ViewBase {
     function updateModel(){
         generalGroup.updateModel();
         permissionsGroup.updateModel()
+
+        roleData.m_productId = container.productId;
     }
 
     property TreeItemModel copiedRolesModel: TreeItemModel {}
@@ -101,7 +106,7 @@ ViewBase {
                     placeHolderText: qsTr("Enter the role name");
 
                     onEditingFinished: {
-                        let oldText = container.model.getData("Name");
+                        let oldText = container.roleData.m_name;
                         if (oldText && oldText !== roleNameInput.text || !oldText && roleNameInput.text !== ""){
                             roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
                             container.doUpdateModel();
@@ -130,7 +135,7 @@ ViewBase {
                     placeHolderText: qsTr("Enter the description");
 
                     onEditingFinished: {
-                        let oldText = container.model.getData("Description");
+                        let oldText = container.roleData.m_description;
                         if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
                             container.doUpdateModel();
                         }
@@ -169,7 +174,7 @@ ViewBase {
 
                         let index = rolesHeadersModel.insertNewItem();
 
-                        rolesHeadersModel.setData("Id", "Name");
+                        rolesHeadersModel.setData("Id", "RoleName");
                         rolesHeadersModel.setData("Name", qsTr("Role Name"));
 
                         rolesHeadersModel.refresh();
@@ -183,33 +188,14 @@ ViewBase {
                 }
 
                 function updateGui(){
-                    if (container.model.containsKey("RoleId")){
-                        roleIdInput.text = container.model.getData("RoleId");
-                    }
-                    else{
-                        roleIdInput.text = "";
-                    }
+                    roleIdInput.text = container.roleData.m_roleId;
+                    roleNameInput.text = container.roleData.m_name;
+                    descriptionInput.text = container.roleData.m_description;
 
-                    if (container.model.containsKey("Name")){
-                        roleNameInput.text = container.model.getData("Name");
-                    }
-                    else{
-                        roleNameInput.text = "";
-                    }
-
-                    if (container.model.containsKey("Description")){
-                        descriptionInput.text = container.model.getData("Description");
-                    }
-                    else{
-                        descriptionInput.text = "";
-                    }
-
-                    let parentRolesIds = []
-                    if (container.model.containsKey("ParentRoles")){
-                        let parentGroups = container.model.getData("ParentRoles");
-                        if (parentGroups !== ""){
-                            parentRolesIds = parentGroups.split(';')
-                        }
+                    let parentRolesIds = [];
+                    let parentGroups = container.roleData.m_parentRoles;
+                    if (parentGroups !== ""){
+                        parentRolesIds = parentGroups.split(';')
                     }
 
                     parentRolesIds.sort();
@@ -231,9 +217,9 @@ ViewBase {
                 }
 
                 function updateModel(){
-                    container.model.setData("RoleId", roleIdInput.text);
-                    container.model.setData("Name", roleNameInput.text);
-                    container.model.setData("Description", descriptionInput.text);
+                    container.roleData.m_roleId = roleIdInput.text;
+                    container.roleData.m_name = roleNameInput.text;
+                    container.roleData.m_description = descriptionInput.text;
 
                     let selectedRoleIds = []
                     let indexes = parentRolesTable.table.getCheckedItems();
@@ -243,8 +229,7 @@ ViewBase {
                     }
 
                     selectedRoleIds.sort();
-
-                    container.model.setData("ParentRoles", selectedRoleIds.join(';'));
+                    container.roleData.m_parentRoles = selectedRoleIds.join(';')
 
                     if (!parentRolesTable.table.elements){
                         updateRolesModel();
@@ -254,21 +239,18 @@ ViewBase {
                 function updateRolesModel(){
                     container.copiedRolesModel.copy(container.rolesModel);
 
-                    let documentId = container.model.getData("Id");
+                    let documentId = container.roleData.m_id;
 
                     // Get all children ID-s
                     let childrenIds = []
                     getAllChildrenRoleIds(documentId, container.copiedRolesModel, childrenIds);
-                    console.log("getAllChildrenRoleIds", childrenIds);
 
                     // Get all parent ID-s
                     let parentIds = []
-                    if (container.model.containsKey("ParentRoles")){
-                        let parentRoles = container.model.getData("ParentRoles")
-                        let parentRolesIds = parentRoles.split(';')
-                        for (let j = 0; j < parentRolesIds.length; j++){
-                            getAllParentRoleIds(parentRolesIds[j], container.copiedRolesModel, parentIds);
-                        }
+                    let parentRoles = container.roleData.m_parentRoles;
+                    let parentRolesIds = parentRoles.split(';')
+                    for (let j = 0; j < parentRolesIds.length; j++){
+                        getAllParentRoleIds(parentRolesIds[j], container.copiedRolesModel, parentIds);
                     }
 
                     // Indexes for deleting
@@ -285,8 +267,6 @@ ViewBase {
                         container.copiedRolesModel.removeItem(removedIndexes[i] - removedCount);
                         removedCount++;
                     }
-
-                    console.log("container.copiedRolesModel", container.copiedRolesModel.toJson());
 
                     parentRolesTable.table.elements = container.copiedRolesModel;
                 }
@@ -346,11 +326,9 @@ ViewBase {
 
                     function updateGui(){
                         let selectedPermissionsIds = [];
-                        if (container.model.containsKey("Permissions")){
-                            let selectedPermissions = container.model.getData("Permissions");
-                            if (selectedPermissions !== ""){
-                                selectedPermissionsIds = selectedPermissions.split(';');
-                            }
+                        let selectedPermissions = container.roleData.m_permissions;
+                        if (selectedPermissions !== ""){
+                            selectedPermissionsIds = selectedPermissions.split(';');
                         }
 
                         selectedPermissionsIds.sort();
@@ -388,8 +366,7 @@ ViewBase {
 
                         selectedPermissionIds.sort();
 
-                        let permissions = container.model.getData("Permissions");
-                        container.model.setData("Permissions", selectedPermissionIds.join(';'));
+                        container.roleData.m_permissions = selectedPermissionIds.join(';')
                     }
 
                     Connections {

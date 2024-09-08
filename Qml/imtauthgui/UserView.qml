@@ -2,6 +2,7 @@ import QtQuick 2.15
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtCoreUsersSdl 1.0
 
 ViewBase {
     id: container;
@@ -10,6 +11,9 @@ ViewBase {
 
     property TreeItemModel rolesModel: TreeItemModel {}
     property TreeItemModel groupsModel: TreeItemModel {}
+
+    property UserData userData: model ? model : null;
+    property string productId;
 
     function updateGui(){
         generalGroup.updateGui();
@@ -23,11 +27,13 @@ ViewBase {
         rolesGroup.updateModel();
         groupsBlock.updateModel();
         systemInfoGroup.updateModel();
+
+        userData.m_productId = container.productId;
     }
 
-    onModelChanged: {
+    onUserDataChanged: {
         setBlockingUpdateModel(true);
-        let systemInfosModel = container.model.getData("SystemInfos");
+        let systemInfosModel = userData.m_systemInfos;
         if (systemInfoTable.table){
             systemInfoTable.table.elements = systemInfosModel;
 
@@ -38,8 +44,8 @@ ViewBase {
         }
 
         if (systemInfosModel){
-            for (let i = 0; i < systemInfosModel.getItemsCount(); i++){
-                let systemId = systemInfosModel.getData("Id", i);
+            for (let i = 0; i < systemInfosModel.count; i++){
+                let systemId = systemInfosModel.get(i).m_id;
                 if (systemId !== ""){
                     usernameInput.readOnly = true;
                     break;
@@ -127,7 +133,7 @@ ViewBase {
                     readOnly: container.readOnly;
 
                     onEditingFinished: {
-                        let oldText = container.model.getData("Username");
+                        let oldText = container.userData.m_username;
                         if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
 
                             container.doUpdateModel();
@@ -149,7 +155,7 @@ ViewBase {
                     readOnly: container.readOnly;
 
                     onEditingFinished: {
-                        let oldText = container.model.getData("Password");
+                        let oldText = container.userData.m_password;
                         if (oldText && oldText !== passwordInput.text || !oldText && passwordInput.text !== ""){
                             container.doUpdateModel();
                         }
@@ -167,7 +173,7 @@ ViewBase {
                     readOnly: container.readOnly;
 
                     onEditingFinished: {
-                        let oldText = container.model.getData("Name");
+                        let oldText = container.userData.m_name;
                         if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
                             container.doUpdateModel();
                         }
@@ -201,40 +207,17 @@ ViewBase {
                 }
 
                 function updateGui(){
-                    if (container.model.containsKey("Username")){
-                        usernameInput.text = container.model.getData("Username");
-                    }
-                    else{
-                        usernameInput.text = "";
-                    }
-
-                    if (container.model.containsKey("Name")){
-                        nameInput.text = container.model.getData("Name");
-                    }
-                    else{
-                        nameInput.text = "";
-                    }
-
-                    if (container.model.containsKey("Email")){
-                        mailInput.text = container.model.getData("Email");
-                    }
-                    else{
-                        mailInput.text = "";
-                    }
-
-                    if (container.model.containsKey("Password")){
-                        passwordInput.text = container.model.getData("Password");
-                    }
-                    else{
-                        passwordInput.text = "";
-                    }
+                    usernameInput.text = container.userData.m_username;
+                    nameInput.text = container.userData.m_name;
+                    mailInput.text = container.userData.m_email;
+                    passwordInput.text = container.userData.m_password;
                 }
 
                 function updateModel(){
-                    container.model.setData("Username", usernameInput.text);
-                    container.model.setData("Name", nameInput.text);
-                    container.model.setData("Email", mailInput.text);
-                    container.model.setData("Password", passwordInput.text);
+                    container.userData.m_username = usernameInput.text;
+                    container.userData.m_name = nameInput.text;
+                    container.userData.m_email = mailInput.text;
+                    container.userData.m_password = passwordInput.text;
                 }
             }
 
@@ -291,11 +274,10 @@ ViewBase {
                 function updateGui(){
                     if (systemInfoTable.table){
                         systemInfoTable.table.uncheckAll();
-                        let systemInfosModel = container.model.getData("SystemInfos");
+                        let systemInfosModel = container.userData.m_systemInfos;
                         if (systemInfosModel){
-                            for (let i = 0; i < systemInfosModel.getItemsCount(); i++){
-                                let enabled = systemInfosModel.getData("Enabled", i);
-
+                            for (let i = 0; i < systemInfosModel.count; i++){
+                                let enabled = systemInfosModel.get(i).item.m_enabled;
                                 if (enabled){
                                     systemInfoTable.table.checkItem(i);
                                 }
@@ -305,12 +287,12 @@ ViewBase {
                 }
 
                 function updateModel(){
-                    let systemInfosModel = container.model.getData("SystemInfos");
+                    let systemInfosModel = container.userData.m_systemInfos;
                     if (systemInfosModel){
                         let indexes = systemInfoTable.table.getCheckedItems();
 
-                        for (let i = 0; i < systemInfosModel.getItemsCount(); i++){
-                            systemInfosModel.setData("Enabled", indexes.includes(i), i);
+                        for (let i = 0; i < systemInfosModel.count; i++){
+                            systemInfosModel.get(i).item.m_enabled = indexes.includes(i)
                         }
                     }
                 }
@@ -351,7 +333,7 @@ ViewBase {
 
                         headersModel.insertNewItem();
 
-                        headersModel.setData("Id", "Name");
+                        headersModel.setData("Id", "RoleName");
                         headersModel.setData("Name", qsTr("Role Name"));
 
                         headersModel.refresh();
@@ -370,11 +352,9 @@ ViewBase {
 
                 function updateGui(){
                     let roleIds = [];
-                    if (container.model.containsKey("Roles")){
-                        let roles = container.model.getData("Roles")
-                        if (roles !== ""){
-                            roleIds = roles.split(';');
-                        }
+                    let roles = container.userData.m_roles;
+                    if (roles !== ""){
+                        roleIds = roles.split(';');
                     }
 
                     if (rolesTable.table){
@@ -403,7 +383,7 @@ ViewBase {
                         selectedRoleIds.sort();
 
                         let result = selectedRoleIds.join(';');
-                        container.model.setData("Roles", result);
+                        container.userData.m_roles = result;
                     }
                 }
             }
@@ -472,11 +452,9 @@ ViewBase {
 
                 function updateGui(){
                     let groupIds = []
-                    if (container.model.containsKey("Groups")){
-                        let parentGroups = container.model.getData("Groups");
-                        if (parentGroups !== ""){
-                            groupIds = parentGroups.split(';')
-                        }
+                    let parentGroups = container.userData.m_groups;
+                    if (parentGroups !== ""){
+                        groupIds = parentGroups.split(';')
                     }
 
                     if (groupsTable.table){
@@ -503,8 +481,7 @@ ViewBase {
                         }
 
                         selectedGroupIds.sort();
-
-                        container.model.setData("Groups", selectedGroupIds.join(';'));
+                        container.userData.m_groups = selectedGroupIds.join(';')
                     }
                 }
             }

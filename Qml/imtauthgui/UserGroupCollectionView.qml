@@ -5,12 +5,15 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
+import imtCoreGroupsSdl 1.0
 
 RemoteCollectionView {
     id: userGroupCollectionViewContainer;
 
     collectionId: "Groups";
     visibleMetaInfo: true;
+
+    property string productId: context.appName;
 
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
         collectionView: userGroupCollectionViewContainer;
@@ -33,7 +36,20 @@ RemoteCollectionView {
             userGroupCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 
             documentManager.registerDocumentView("Group", "GroupEditor", userGroupDocumentComp);
-            documentManager.registerDocumentDataController("Group", dataControllerComp);
+            documentManager.registerDocumentDataController("Group", documentDataControllerComp);
+        }
+    }
+
+    dataControllerComp: Component {
+        CollectionRepresentation {
+            collectionId: userGroupCollectionViewContainer.collectionId;
+            additionalFieldIds: userGroupCollectionViewContainer.additionalFieldIds;
+
+            function getAdditionalInputParams(){
+                let obj = {}
+                obj["ProductId"] = userGroupCollectionViewContainer.productId;
+                return obj;
+            }
         }
     }
 
@@ -55,6 +71,8 @@ RemoteCollectionView {
             rolesModel: userGroupCollectionViewContainer.rolesModel;
             groupsModel: userGroupCollectionViewContainer.groupsModel;
 
+            productId: context.appName;
+
             commandsDelegateComp: Component {ViewCommandsDelegateBase {
                 view: groupEditor;
             }}
@@ -69,12 +87,30 @@ RemoteCollectionView {
     }
 
     Component {
-        id: dataControllerComp;
+        id: documentDataControllerComp;
 
-        GqlDocumentDataController {
-            gqlGetCommandId: "GroupItem";
-            gqlUpdateCommandId: "GroupUpdate";
-            gqlAddCommandId: "GroupAdd";
+        GqlRequestDocumentDataController {
+            id: requestDocumentDataController
+
+            gqlGetCommandId: ImtCoreGroupsSdlCommandIds.s_groupItem;
+            gqlUpdateCommandId: ImtCoreGroupsSdlCommandIds.s_groupUpdate;
+            gqlAddCommandId: ImtCoreGroupsSdlCommandIds.s_groupAdd;
+
+            Component.onCompleted: {
+                getRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, context.appName);
+                addRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, context.appName);
+                updateRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, context.appName);
+            }
+
+            documentModelComp: Component {
+                GroupData {}
+            }
+
+            payloadModel: GroupDataPayload {
+                onFinished: {
+                    requestDocumentDataController.documentModel = m_groupData;
+                }
+            }
 
             function getDocumentName(){
                 let prefixName = qsTr("Groups");

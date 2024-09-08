@@ -11,7 +11,202 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (imtgql::CObjectCollectionControllerCompBase)
+// reimplemented (imtcore::sdl::Groups::CGroupCollectionControllerCompBase)
+
+bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
+			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
+			const imtcore::sdl::Groups::CGroupsListGqlRequest& groupsListRequest,
+			imtcore::sdl::Groups::CGroupItem& representationObject,
+			QString& errorMessage) const
+{
+	QByteArray objectId = objectCollectionIterator.GetObjectId();
+	QByteArray productId = groupsListRequest.GetRequestedArguments().input.GetProductId();
+
+	const imtauth::IUserGroupInfo* userGroupInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr userDataPtr;
+	if (objectCollectionIterator.GetObjectData(userDataPtr)){
+		userGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(userDataPtr.GetPtr());
+	}
+
+	if (userGroupInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
+
+		return false;
+	}
+
+	imtcore::sdl::Groups::GroupsListRequestInfo requestInfo = groupsListRequest.GetRequestInfo();
+
+	if (requestInfo.items.isIdRequested){
+		representationObject.SetId(objectId);
+	}
+
+	if (requestInfo.items.isNameRequested){
+		representationObject.SetName(userGroupInfoPtr->GetName());
+	}
+
+	if (requestInfo.items.isRolesRequested){
+		representationObject.SetRoles(userGroupInfoPtr->GetRoles(productId).join(';'));
+	}
+
+	if (requestInfo.items.isParentGroupsRequested){
+		representationObject.SetParentGroups(userGroupInfoPtr->GetParentGroups().join(';'));
+	}
+
+	if (requestInfo.items.isDescriptionRequested){
+		representationObject.SetDescription(userGroupInfoPtr->GetDescription());
+	}
+
+	if (requestInfo.items.isAddedRequested){
+		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime();
+		addedTime.setTimeSpec(Qt::UTC);
+
+		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+		representationObject.SetAdded(added);
+	}
+
+	if (requestInfo.items.isLastModifiedRequested){
+		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("LastModified").toDateTime();
+		lastModifiedTime.setTimeSpec(Qt::UTC);
+
+		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+		representationObject.SetLastModified(lastModified);
+	}
+
+	return true;
+}
+
+
+istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresentation(
+			const imtcore::sdl::Groups::CGroupData& groupDataRepresentation,
+			QByteArray& newObjectId,
+			QString& name,
+			QString& description,
+			QString& errorMessage) const
+{
+	if (!m_userGroupInfoFactCompPtr.IsValid()){
+		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_userGroupInfoFactCompPtr' was not set");
+		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	istd::TDelPtr<imtauth::IUserGroupInfo> userGroupInstancePtr = m_userGroupInfoFactCompPtr.CreateInstance();
+	if (!userGroupInstancePtr.IsValid()){
+		errorMessage = QString("Unable to create group instance. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(userGroupInstancePtr.GetPtr());
+	if (userGroupInfoPtr == nullptr){
+		errorMessage = QString("Unable to cast user group instance to identifable object. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	newObjectId = groupDataRepresentation.GetId();
+	if (newObjectId.isEmpty()){
+		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
+	userGroupInfoPtr->SetObjectUuid(newObjectId);
+
+	QByteArray productId = groupDataRepresentation.GetProductId();
+
+	name = groupDataRepresentation.GetName();
+	if (name.isEmpty()){
+		errorMessage = QString("Group name cannot be empty");
+		return nullptr;
+	}
+
+	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+	for (imtbase::ICollectionInfo::Id& collectionId : collectionIds){
+		imtbase::IObjectCollection::DataPtr groupDataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(collectionId, groupDataPtr)){
+			imtauth::IUserGroupInfo* currentUserGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
+			if (currentUserGroupInfoPtr != nullptr){
+				if (collectionId != newObjectId){
+					QString currentUserGroupName = currentUserGroupInfoPtr->GetName();
+					if (currentUserGroupName == name){
+						errorMessage = QT_TR_NOOP(QString("Group name '%1' already exists").arg(currentUserGroupName));
+						return nullptr;
+					}
+				}
+			}
+		}
+	}
+
+	userGroupInfoPtr->SetName(name);
+
+	description = groupDataRepresentation.GetDescription();
+	userGroupInfoPtr->SetDescription(description);
+
+	QByteArrayList userIds = groupDataRepresentation.GetUsers().split(';');
+	userIds.removeAll("");
+	userGroupInfoPtr->SetUsers(userIds);
+
+	QByteArrayList roleIds = groupDataRepresentation.GetRoles().split(';');
+	roleIds.removeAll("");
+
+	if (!roleIds.isEmpty()){
+		userGroupInfoPtr->SetRoles(productId, roleIds);
+	}
+	else{
+		userGroupInfoPtr->RemoveProduct(productId);
+	}
+
+	QByteArrayList groupIds = groupDataRepresentation.GetParentGroups().split(';');
+	for (const QByteArray& parentGroupId : groupIds){
+		if (!parentGroupId.isEmpty()){
+			userGroupInfoPtr->AddParentGroup(parentGroupId);
+		}
+	}
+
+	return userGroupInstancePtr.PopPtr();
+}
+
+
+bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
+			const istd::IChangeable& data,
+			const imtcore::sdl::Groups::CGroupItemGqlRequest& groupItemRequest,
+			imtcore::sdl::Groups::CGroupDataPayload& representationPayload,
+			QString& errorMessage) const
+{
+	const imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(&data);
+	if (userGroupInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
+
+		return false;
+	}
+
+	imtcore::sdl::Groups::GroupItemRequestArguments arguments = groupItemRequest.GetRequestedArguments();
+	imtcore::sdl::Groups::CGroupData groupData;
+
+	QByteArray productId = arguments.input.GetProductId();
+
+	groupData.SetId(userGroupInfoPtr->GetObjectUuid());
+	groupData.SetName(userGroupInfoPtr->GetName());
+	groupData.SetDescription(userGroupInfoPtr->GetDescription());
+
+	imtauth::IUserGroupInfo::UserIds userIds = userGroupInfoPtr->GetUsers();
+	std::sort(userIds.begin(), userIds.end());
+	groupData.SetUsers(userIds.join(';'));
+
+	imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
+	std::sort(roleIds.begin(), roleIds.end());
+	groupData.SetRoles(roleIds.join(';'));
+
+	imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
+	std::sort(groupIds.begin(), groupIds.end());
+	groupData.SetParentGroups(groupIds.join(';'));
+
+	representationPayload.SetGroupData(groupData);
+
+	return true;
+}
 
 
 imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
@@ -22,8 +217,7 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 
 	const imtgql::CGqlObject& params = gqlRequest.GetParams();
 
-	QByteArray productId;
-	productId = params.GetFieldArgumentValue("ProductId").toByteArray();
+	QByteArray productId = params.GetFieldArgumentValue("ProductId").toByteArray();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
@@ -88,83 +282,6 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 	}
 
 	return rootModelPtr.PopPtr();
-}
-
-
-bool CUserGroupCollectionControllerComp::SetupGqlItem(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
-			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-			QString& /*errorMessage*/) const
-{
-	const imtgql::CGqlObject& params = gqlRequest.GetParams();
-
-	QByteArray productId;
-	productId = params.GetFieldArgumentValue("ProductId").toByteArray();
-
-	bool retVal = true;
-
-	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
-
-	if (!informationIds.isEmpty() && m_objectCollectionCompPtr.IsValid()){
-		imtauth::IUserGroupInfo* userGroupInfoPtr = nullptr;
-		imtbase::IObjectCollection::DataPtr groupDataPtr;
-		if (objectCollectionIterator->GetObjectData(groupDataPtr)){
-			userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
-		}
-
-		if (userGroupInfoPtr != nullptr){
-			QByteArray collectionId = objectCollectionIterator->GetObjectId();
-			bool ok = true;
-			for (QByteArray informationId : informationIds){
-
-				QVariant elementInformation;
-				if(informationId == "TypeId"){
-					elementInformation = m_objectCollectionCompPtr->GetObjectTypeId(collectionId);
-				}
-				else if(informationId == "Id"){
-					elementInformation = collectionId;
-				}
-				else if(informationId == "Name"){
-					elementInformation = userGroupInfoPtr->GetName();
-				}
-				else if(informationId == "Description"){
-					elementInformation = userGroupInfoPtr->GetDescription();
-				}
-				else if(informationId == "Roles"){
-					elementInformation = userGroupInfoPtr->GetRoles(productId).join(';');
-				}
-				else if(informationId == "ParentGroups"){
-					elementInformation = userGroupInfoPtr->GetParentGroups().join(';');
-				}
-				else if(informationId == "Added"){
-					QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
-					addedTime.setTimeSpec(Qt::UTC);
-
-					elementInformation = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-				}
-				else if(informationId == "LastModified"){
-					QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
-					lastTime.setTimeSpec(Qt::UTC);
-
-					elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-				}
-
-				if (elementInformation.isNull()){
-					elementInformation = "";
-				}
-
-				if (ok){
-					retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
-				}
-			}
-		}
-
-		return true;
-	}
-
-	return false;
 }
 
 

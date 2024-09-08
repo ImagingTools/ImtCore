@@ -59,6 +59,18 @@ DocumentDataController {
         return obj;
     }
 
+    function createGetInputParams(){
+        return {};
+    }
+
+    function createUpdateInputParams(){
+        return {};
+    }
+
+    function createAddInputParams(){
+        return {};
+    }
+
     property SubscriptionClient subscriptionClient: SubscriptionClient {
         function register(){
             if (container.subscriptionCommandId === ""){
@@ -132,6 +144,11 @@ DocumentDataController {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", container.documentId);
+
+            let inputObj = container.createGetInputParams();
+            for (let key in inputObj){
+                inputParams.InsertField(key, inputObj[key]);
+            }
 
             let additionInputParams = container.getAdditionalInputParams();
             if (Object.keys(additionInputParams).length > 0){

@@ -165,6 +165,7 @@ Item {
                 let additionParams = Gql.GqlObject("addition");
                 for (let key in additionInputParams){
                     additionParams.InsertField(key, additionInputParams[key]);
+                    inputParams.InsertField(key, additionInputParams[key]);
                 }
                 inputParams.InsertFieldObject(additionParams);
             }
@@ -315,6 +316,7 @@ Item {
                 let additionParams = Gql.GqlObject("addition");
                 for (let key in additionInputParams){
                     additionParams.InsertField(key, additionInputParams[key]);
+                    inputParams.InsertField(key, additionInputParams[key]);
                 }
                 inputParams.InsertFieldObject(additionParams);
             }
@@ -386,6 +388,7 @@ Item {
                 let additionParams = Gql.GqlObject("addition");
                 for (let key in additionInputParams){
                     additionParams.InsertField(key, additionInputParams[key]);
+                    inputParams.InsertField(key, additionInputParams[key]);
                 }
                 inputParams.InsertFieldObject(additionParams);
             }
@@ -476,6 +479,7 @@ Item {
                 let additionParams = Gql.GqlObject("addition");
                 for (let key in additionInputParams){
                     additionParams.InsertField(key, additionInputParams[key]);
+                    inputParams.InsertField(key, additionInputParams[key]);
                 }
                 inputParams.InsertFieldObject(additionParams);
             }

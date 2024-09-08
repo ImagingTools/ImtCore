@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtCoreGroupsSdl 1.0
 
 ViewBase {
     id: container;
@@ -11,6 +12,10 @@ ViewBase {
     property TreeItemModel usersModel: TreeItemModel {}
 
     property TreeItemModel copiedGroupsModel: TreeItemModel {}
+
+    property GroupData groupData: model ? model : null;
+
+    property string productId;
 
     function updateGui(){
         generalGroup.updateGui();
@@ -22,6 +27,8 @@ ViewBase {
         generalGroup.updateModel();
         usersGroup.updateModel();
         rolesGroup.updateModel();
+
+        groupData.m_productId = productId;
     }
 
     CustomScrollbar {
@@ -162,12 +169,7 @@ ViewBase {
                 function updateGroupsModel(){
                     container.copiedGroupsModel.copy(container.groupsModel);
 
-                    let objectId = "";
-
-                    if (container.model.containsKey("Id")){
-                        objectId = container.model.getData("Id");
-                    }
-
+                    let objectId = container.groupData.m_id;
                     let removedIndexes = []
 
                     let childrenIds = []
@@ -175,12 +177,10 @@ ViewBase {
 
                     // Get all parent ID-s
                     let parentIds = []
-                    if (container.model.containsKey("ParentGroups")){
-                        let parentGroups = container.model.getData("ParentGroups")
-                        let parentGroupIds = parentGroups.split(';')
-                        for (let j = 0; j < parentGroupIds.length; j++){
-                            getAllParentGroupIds(parentGroupIds[j], parentIds);
-                        }
+                    let parentGroups = container.groupData.m_parentGroups;
+                    let parentGroupIds = parentGroups.split(';')
+                    for (let j = 0; j < parentGroupIds.length; j++){
+                        getAllParentGroupIds(parentGroupIds[j], parentIds);
                     }
 
                     for (let i = 0; i < container.copiedGroupsModel.getItemsCount(); i++){
@@ -232,26 +232,13 @@ ViewBase {
                 }
 
                 function updateGui(){
-                    if (container.model.containsKey("Name")){
-                        nameInput.text = container.model.getData("Name");
-                    }
-                    else{
-                        nameInput.text = "";
-                    }
-
-                    if (container.model.containsKey("Description")){
-                        descriptionInput.text = container.model.getData("Description");
-                    }
-                    else{
-                        descriptionInput.text = "";
-                    }
+                    nameInput.text = container.groupData.m_name;
+                    descriptionInput.text = container.groupData.m_description;
 
                     let parentGroupIds = []
-                    if (container.model.containsKey("ParentGroups")){
-                        let parentGroups = container.model.getData("ParentGroups");
-                        if (parentGroups !== ""){
-                            parentGroupIds = parentGroups.split(';')
-                        }
+                    let parentGroups = container.groupData.m_parentGroups;
+                    if (parentGroups !== ""){
+                        parentGroupIds = parentGroups.split(';')
                     }
 
                     if (!parentGroupsTable.table.elements){
@@ -270,8 +257,8 @@ ViewBase {
                 }
 
                 function updateModel(){
-                    container.model.setData("Description", descriptionInput.text);
-                    container.model.setData("Name", nameInput.text);
+                    container.groupData.m_description = descriptionInput.text;
+                    container.groupData.m_name = nameInput.text;
 
                     let selectedGroupIds = []
                     let indexes = parentGroupsTable.table.getCheckedItems();
@@ -282,7 +269,7 @@ ViewBase {
 
                     selectedGroupIds.sort();
 
-                    container.model.setData("ParentGroups", selectedGroupIds.join(';'));
+                    container.groupData.m_parentGroups = selectedGroupIds.join(';');
 
                     if (!parentGroupsTable.table.elements){
                         updateGroupsModel();
@@ -346,11 +333,9 @@ ViewBase {
 
                 function updateGui(){
                     let userIds = [];
-                    if (container.model.containsKey("Users")){
-                        let roles = container.model.getData("Users")
-                        if (roles !== ""){
-                            userIds = roles.split(';');
-                        }
+                    let roles = container.groupData.m_users;
+                    if (roles !== ""){
+                        userIds = roles.split(';');
                     }
 
                     usersTable.table.uncheckAll();
@@ -376,7 +361,7 @@ ViewBase {
                     selectedUserIds.sort()
 
                     let result = selectedUserIds.join(';');
-                    container.model.setData("Users", result);
+                    container.groupData.m_users = result;
                 }
             }
 
@@ -419,7 +404,7 @@ ViewBase {
 
                         rolesHeadersModel.insertNewItem();
 
-                        rolesHeadersModel.setData("Id", "Name");
+                        rolesHeadersModel.setData("Id", "RoleName");
                         rolesHeadersModel.setData("Name", qsTr("Role Name"));
 
                         rolesHeadersModel.refresh();
@@ -436,11 +421,9 @@ ViewBase {
 
                 function updateGui(){
                     let roleIds = [];
-                    if (container.model.containsKey("Roles")){
-                        let roles = container.model.getData("Roles")
-                        if (roles !== ""){
-                            roleIds = roles.split(';');
-                        }
+                    let roles = container.groupData.m_roles;
+                    if (roles !== ""){
+                        roleIds = roles.split(';');
                     }
 
                     rolesTable.table.uncheckAll();
@@ -465,7 +448,7 @@ ViewBase {
                     selectedRoleIds.sort();
 
                     let result = selectedRoleIds.join(';');
-                    container.model.setData("Roles", result);
+                    container.groupData.m_roles = result;
                 }
             }
         }
