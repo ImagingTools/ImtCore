@@ -459,7 +459,7 @@ QString CSqlDatabaseObjectDelegateCompBase::EncodeTextArgument(const QString& ar
 }
 
 
-QString CSqlDatabaseObjectDelegateCompBase::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+QString CSqlDatabaseObjectDelegateCompBase::CreateAdditionalFiltersQuery(const iprm::IParamsSet& /*filterParams*/) const
 {
 	return QString();
 }
