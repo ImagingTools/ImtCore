@@ -23,7 +23,9 @@ CSdlProcessArgumentsParserComp::CSdlProcessArgumentsParserComp()
 	m_useAllModificators(false),
 	m_notUseModificators(true),
 	m_qmlEnabled(false),
-	m_cppEnabled(true)
+	m_cppEnabled(true),
+	m_generatorType(GT_CMAKE),
+	m_autoJoinEnabled(false)
 {
 }
 
@@ -45,6 +47,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption baseClassOption({"B", "base-class"}, "Defines base class of all generated classes with include path CLASS=/include/path", "BaseClassList");
 	QCommandLineOption joinRulesOption({"J", "join"}, "Defines file types, will be joined TYPE(H or CPP)=/Destination/File/Path", "JoinRules");
 	QCommandLineOption includePathOption({"I", "include"}, "Specifies the import directories which should be searched when parsing the schema.", "IncludePathList");
+	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single");
+	QCommandLineOption generatorOption("generator", "{QMake | CMake}. Optional. Only for dependencies mode. Defines a type of output of files to be generated. Default - CMake");
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
 	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)");
@@ -65,7 +69,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 					gqlOption,
 					baseClassOption,
 					joinRulesOption,
-					includePathOption
+					includePathOption,
+					autoJoinOption,
+					generatorOption
 				});
 	if (!isOptionsAdded){
 		Q_ASSERT(false);
@@ -142,6 +148,21 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 		m_includePaths = commandLineParser.values(includePathOption);
 	}
 
+	m_autoJoinEnabled = commandLineParser.isSet(autoJoinOption);
+
+	if (commandLineParser.isSet(generatorOption)){
+		const QString generatorName = commandLineParser.value(generatorOption).toLower();
+		if (generatorName == QStringLiteral("qmake")){
+			m_generatorType = GT_QMAKE;
+		}
+		else if (generatorName == QStringLiteral("cmake")){
+			m_generatorType = GT_CMAKE;
+		}
+		else {
+			SendErrorMessage(0, QString("Unexpected generator option '%1'. Expected: QMake or CMake").arg(generatorName));
+		}
+	}
+
 	// special modes
 	bool isCppInParams = commandLineParser.isSet(cppOption);
 	bool isQmlInParams = commandLineParser.isSet(qmlOption);
@@ -150,6 +171,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_cppEnabled = isCppInParams || (!isQmlInParams && !isGqlInParams);
 	m_qmlEnabled = isQmlInParams;
 	m_gqlEnabled = isGqlInParams;
+
 
 	// add VMap implicitly
 	/// \todo add argument to disable it
@@ -263,6 +285,18 @@ QMap<QString, QString> CSdlProcessArgumentsParserComp::GetJoinRules() const
 QStringList CSdlProcessArgumentsParserComp::GetIncludePaths() const
 {
 	return m_includePaths;
+}
+
+
+ISdlProcessArgumentsParser::GeneratorType CSdlProcessArgumentsParserComp::GetGeneratorType() const
+{
+	return m_generatorType;
+}
+
+
+bool CSdlProcessArgumentsParserComp::IsAutoJoinEnabled() const
+{
+	return m_autoJoinEnabled;
 }
 
 

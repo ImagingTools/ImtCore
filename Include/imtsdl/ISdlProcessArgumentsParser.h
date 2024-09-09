@@ -19,6 +19,12 @@ public:
 	static inline const QString s_headerFileType = QStringLiteral("H");
 
 public:
+	enum GeneratorType
+	{
+		GT_CMAKE,
+		GT_QMAKE
+	};
+
 	virtual bool SetArguments(int argc, char** argv) = 0;
 	virtual QString GetSchemaFilePath() const = 0;
 	virtual QString GetOutputDirectoryPath() const = 0;
@@ -32,6 +38,8 @@ public:
 	virtual QMap<QString/*class name*/, QString/*include directive*/> GetBaseClassList() const = 0;
 	virtual QMap<QString/*File extention*/, QString/*Destination path*/> GetJoinRules() const = 0;
 	virtual QStringList GetIncludePaths() const = 0;
+	virtual GeneratorType GetGeneratorType() const = 0;
+	virtual bool IsAutoJoinEnabled() const = 0;
 
 };
 

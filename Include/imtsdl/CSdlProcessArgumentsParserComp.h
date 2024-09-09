@@ -42,6 +42,8 @@ public:
 	virtual QMap<QString, QString> GetBaseClassList() const override;
 	virtual QMap<QString, QString> GetJoinRules() const override;
 	virtual QStringList GetIncludePaths() const override;
+	virtual GeneratorType GetGeneratorType() const override;
+	virtual bool IsAutoJoinEnabled() const override;
 
 private:
 	QString m_schemaFilePath;
@@ -60,6 +62,8 @@ private:
 	QMap<QString, QString> m_baseClassList;
 	QMap<QString, QString> m_joinRules;
 	QStringList m_includePaths;
+	GeneratorType m_generatorType;
+	bool m_autoJoinEnabled;
 };
 
 
