@@ -99,12 +99,6 @@ void CMultiThreadServer::Disconnected(QByteArray requestId)
 {
 	QWriteLocker threadListLock(&m_threadSocketListGuard);
 
-	SendLogMessage(
-				istd::IInformationProvider::InformationCategory::IC_NONE,
-				__LINE__,
-				QString("Socket '%1' disconnected").arg(requestId),
-				__func__);
-
 	QMutableListIterator threadSocketIterator(m_threadSocketList);
 	while(threadSocketIterator.hasNext()){
 		QPointer<CSocketThread>& socketPtr = threadSocketIterator.next();
@@ -126,10 +120,12 @@ void CMultiThreadServer::Disconnected(QByteArray requestId)
 		return;
 	}
 
-	qintptr descriptor = GetFirstSocketDescriptor();
+	qintptr descriptor = PopSocketDescriptor();
 	CSocketThread* threadSocket = new CSocketThread(descriptor, m_isSecureConnection, m_sslConfiguration, this);
+
 	m_threadSocketList.append(threadSocket);
 	connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::DirectConnection);
+
 	threadSocket->start();
 }
 
@@ -162,12 +158,15 @@ void CMultiThreadServer::AddSocketDescriptor(qintptr socketDescriptor)
 }
 
 
-qintptr CMultiThreadServer::GetFirstSocketDescriptor()
+qintptr CMultiThreadServer::PopSocketDescriptor()
 {
 	QMutexLocker lock(&m_descriptorListMutex);
 
-	qintptr retVal = m_descriptorList[0];
-	m_descriptorList.removeAt(0);
+	Q_ASSERT(!m_descriptorList.isEmpty());
+
+	qintptr retVal = m_descriptorList.front();
+
+	m_descriptorList.pop_front();
 
 	return retVal;
 }
@@ -179,13 +178,8 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 		return;
 	}
 
-	SendLogMessage(
-				istd::IInformationProvider::InformationCategory::IC_NONE,
-				__LINE__,
-				QString("New connection. Limit: %0").arg(QString::number(m_rootServer.GetThreadsLimit())),
-				__func__);
-
 	QWriteLocker threadListLock(&m_threadSocketListGuard);
+
 	AddSocketDescriptor(socketDescriptor);
 
 	CSocketThread* threadSocket = nullptr;
@@ -198,16 +192,13 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 
 		if (m_threadSocketList.count() < threadsLimit){
 			// Every new connection will be run in a newly created thread
-			qintptr descriptor = GetFirstSocketDescriptor();
+			qintptr descriptor = PopSocketDescriptor();
+
 			threadSocket = new CSocketThread(descriptor, m_isSecureConnection, m_sslConfiguration, this);
+			connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::QueuedConnection);
 
 			m_threadSocketList.append(threadSocket);
-			SendLogMessage(
-						istd::IInformationProvider::InformationCategory::IC_NONE,
-						__LINE__,
-						QString("Starting new socket. Active sockets count: %0").arg(QString::number( m_threadSocketList.count())),
-						__func__);
-			connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::QueuedConnection);
+
 			threadSocket->start();
 		}
 	}

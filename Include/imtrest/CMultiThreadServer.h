@@ -69,7 +69,7 @@ protected Q_SLOTS:
 
 protected:
 	void AddSocketDescriptor(qintptr socketDescriptor);
-	qintptr GetFirstSocketDescriptor();
+	qintptr PopSocketDescriptor();
 
 	// reimplemented (QTcpServer)
 	void incomingConnection(qintptr socketDescriptor) override;
