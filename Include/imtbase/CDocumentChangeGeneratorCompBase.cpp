@@ -1,6 +1,4 @@
-#pragma once
-
-#include "imtbase/CDocumentChangeGeneratorCompBase.h"
+#include <imtbase/CDocumentChangeGeneratorCompBase.h>
 
 
 // ImtCore includes

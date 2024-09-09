@@ -18,12 +18,12 @@ public:
 	CSimpleStatus();
 
 	// reimplemented (iinsp::IInformationProvider)
-	virtual QDateTime GetInformationTimeStamp() const;
-	virtual InformationCategory GetInformationCategory() const;
-	virtual int GetInformationId() const;
-	virtual QString GetInformationDescription() const;
-	virtual QString GetInformationSource() const;
-	virtual int GetInformationFlags() const;
+	virtual QDateTime GetInformationTimeStamp() const override;
+	virtual InformationCategory GetInformationCategory() const override;
+	virtual int GetInformationId() const override;
+	virtual QString GetInformationDescription() const override;
+	virtual QString GetInformationSource() const override;
+	virtual int GetInformationFlags() const override;
 
 	// reimplemented (imtbase::IStatusManager)
 	virtual void SetInformationTimeStamp(const QDateTime& timestamp) override;

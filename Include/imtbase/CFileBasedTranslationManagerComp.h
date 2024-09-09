@@ -24,7 +24,7 @@ public:
 
 protected:
 	// reimplemented (CTranslationManagerComp)
-	virtual void LoadTranslations();
+	virtual void LoadTranslations() override;
 };
 
 

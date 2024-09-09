@@ -29,7 +29,7 @@ public:
 
 protected:
 	// reimplemented (imod::IObserver)
-	virtual void BeforeUpdate(imod::IModel* modelPtr);
+	virtual void BeforeUpdate(imod::IModel* modelPtr) override;
 
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;

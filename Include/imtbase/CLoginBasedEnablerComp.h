@@ -32,20 +32,20 @@ public:
 	CLoginBasedEnablerComp();
 
 	// reimplemented (iprm::IEnableableParam)
-	virtual bool IsEnabled() const;
-	virtual bool IsEnablingAllowed() const;
-	virtual bool SetEnabled(bool isEnabled = true);
+	virtual bool IsEnabled() const override;
+	virtual bool IsEnablingAllowed() const override;
+	virtual bool SetEnabled(bool isEnabled = true) override;
 
 	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive);
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
-	virtual void OnComponentDestroyed();
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 	// reimplemented (imod::TSingleModelObserverBase)
-	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
+	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
 	I_REF(iauth::ILogin, m_loginCompPtr);

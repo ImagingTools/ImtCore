@@ -20,7 +20,7 @@ public:
 
 	// reimplemented (IIdentifiable)
 	virtual QByteArray GetObjectUuid() const override;
-	virtual bool SetObjectUuid(const QByteArray& objectUuid);
+	virtual bool SetObjectUuid(const QByteArray& objectUuid) override;
 
 	// reimplemented (iser::IObject)
 	virtual QByteArray GetFactoryId() const override;
