@@ -17,12 +17,12 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (imtcore::sdl::Roles::CRoleCollectionControllerCompBase)
+// reimplemented (sdl::imtauth::Roles::CRoleCollectionControllerCompBase)
 
 bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const imtcore::sdl::Roles::CRolesListGqlRequest& rolesListRequest,
-			imtcore::sdl::Roles::CRoleItem& representationObject,
+			const sdl::imtauth::Roles::CRolesListGqlRequest& rolesListRequest,
+			sdl::imtauth::Roles::CRoleItem& representationObject,
 			QString& errorMessage) const
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
@@ -40,7 +40,7 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	imtcore::sdl::Roles::RolesListRequestInfo requestInfo = rolesListRequest.GetRequestInfo();
+	sdl::imtauth::Roles::RolesListRequestInfo requestInfo = rolesListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.SetId(objectId);
@@ -91,7 +91,7 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation(
-			const imtcore::sdl::Roles::CRoleData& roleDataRepresentation,
+			const sdl::imtauth::Roles::CRoleData& roleDataRepresentation,
 			QByteArray& newObjectId,
 			QString& name,
 			QString& description,
@@ -193,8 +193,8 @@ istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation
 
 bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const imtcore::sdl::Roles::CRoleItemGqlRequest& roleItemRequest,
-			imtcore::sdl::Roles::CRoleDataPayload& representationPayload,
+			const sdl::imtauth::Roles::CRoleItemGqlRequest& roleItemRequest,
+			sdl::imtauth::Roles::CRoleDataPayload& representationPayload,
 			QString& errorMessage) const
 {
 	const imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<const imtauth::CIdentifiableRoleInfo*>(&data);
@@ -205,8 +205,8 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	imtcore::sdl::Roles::RoleItemRequestArguments arguments = roleItemRequest.GetRequestedArguments();
-	imtcore::sdl::Roles::CRoleData roleData;
+	sdl::imtauth::Roles::RoleItemRequestArguments arguments = roleItemRequest.GetRequestedArguments();
+	sdl::imtauth::Roles::CRoleData roleData;
 
 	QByteArray id = roleInfoPtr->GetObjectUuid();
 	roleData.SetId(id);

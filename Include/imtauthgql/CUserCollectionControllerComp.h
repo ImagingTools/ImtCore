@@ -4,17 +4,17 @@
 // ImtCore includes
 #include <imtgql/CObjectCollectionControllerCompBase.h>
 #include <imtcrypt/IHashGenerator.h>
-#include <GeneratedFiles/imtauthgql/SDL/CPP/Users/UsersAPIv1_0.h>
+#include <GeneratedFiles/imtauthsdl/SDL/CPP/Users/Users.h>
 
 
 namespace imtauthgql
 {
 
 
-class CUserCollectionControllerComp: public imtcore::sdl::Users::CUserCollectionControllerCompBase
+class CUserCollectionControllerComp: public sdl::imtauth::Users::CUserCollectionControllerCompBase
 {
 public:
-	typedef imtcore::sdl::Users::CUserCollectionControllerCompBase BaseClass;
+	typedef sdl::imtauth::Users::CUserCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserCollectionControllerComp);
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider", true, "RoleInfoProvider");
@@ -24,24 +24,24 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtcore::sdl::Users::CUserCollectionControllerCompBase)
+	// reimplemented (sdl::imtauth::Users::CUserCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const imtcore::sdl::Users::CUsersListGqlRequest& usersListRequest,
-				imtcore::sdl::Users::CUserItem& representationObject,
+				const sdl::imtauth::Users::CUsersListGqlRequest& usersListRequest,
+				sdl::imtauth::Users::CUserItem& representationObject,
 				QString& errorMessage) const override;
 
 	// User methods
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
-				const imtcore::sdl::Users::CUserData& userDataRepresentation,
+				const sdl::imtauth::Users::CUserData& userDataRepresentation,
 				QByteArray& newObjectId,
 				QString& name,
 				QString& description,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const imtcore::sdl::Users::CUserItemGqlRequest& userItemRequest,
-				imtcore::sdl::Users::CUserDataPayload& representationPayload,
+				const sdl::imtauth::Users::CUserItemGqlRequest& userItemRequest,
+				sdl::imtauth::Users::CUserDataPayload& representationPayload,
 				QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 

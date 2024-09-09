@@ -21,22 +21,22 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtcore::sdl::Roles::CRoleCollectionControllerCompBase)
+	// reimplemented (sdl::imtauth::Roles::CRoleCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const imtcore::sdl::Roles::CRolesListGqlRequest& rolesListRequest,
-				imtcore::sdl::Roles::CRoleItem& representationObject,
+				const sdl::imtauth::Roles::CRolesListGqlRequest& rolesListRequest,
+				sdl::imtauth::Roles::CRoleItem& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
-				const imtcore::sdl::Roles::CRoleData& roleDataRepresentation,
+				const sdl::imtauth::Roles::CRoleData& roleDataRepresentation,
 				QByteArray& newObjectId,
 				QString& name,
 				QString& description,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const imtcore::sdl::Roles::CRoleItemGqlRequest& roleItemRequest,
-				imtcore::sdl::Roles::CRoleDataPayload& representationPayload,
+				const sdl::imtauth::Roles::CRoleItemGqlRequest& roleItemRequest,
+				sdl::imtauth::Roles::CRoleDataPayload& representationPayload,
 				QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual void SetAdditionalFilters(

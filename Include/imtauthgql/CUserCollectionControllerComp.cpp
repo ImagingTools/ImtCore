@@ -17,15 +17,15 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (imtcore::sdl::Users::CUserCollectionControllerCompBase)
+// reimplemented (sdl::imtauth::Users::CUserCollectionControllerCompBase)
 
 bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const imtcore::sdl::Users::CUsersListGqlRequest& usersListRequest,
-			imtcore::sdl::Users::CUserItem& representationObject,
+			const sdl::imtauth::Users::CUsersListGqlRequest& usersListRequest,
+			sdl::imtauth::Users::CUserItem& representationObject,
 			QString& errorMessage) const
 {
-	imtcore::sdl::Users::UsersListRequestArguments arguments = usersListRequest.GetRequestedArguments();
+	sdl::imtauth::Users::UsersListRequestArguments arguments = usersListRequest.GetRequestedArguments();
 
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
 	QByteArray productId = arguments.input.GetProductId();
@@ -43,7 +43,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	imtcore::sdl::Users::UsersListRequestInfo requestInfo = usersListRequest.GetRequestInfo();
+	sdl::imtauth::Users::UsersListRequestInfo requestInfo = usersListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.SetId(objectId);
@@ -160,7 +160,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation(
-			const imtcore::sdl::Users::CUserData& userDataRepresentation,
+			const sdl::imtauth::Users::CUserData& userDataRepresentation,
 			QByteArray& newObjectId,
 			QString& name,
 			QString& description,
@@ -296,8 +296,8 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 
 bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const imtcore::sdl::Users::CUserItemGqlRequest& userItemRequest,
-			imtcore::sdl::Users::CUserDataPayload& representationPayload,
+			const sdl::imtauth::Users::CUserItemGqlRequest& userItemRequest,
+			sdl::imtauth::Users::CUserDataPayload& representationPayload,
 			QString& errorMessage) const
 {
 	const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(&data);
@@ -308,9 +308,9 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	imtcore::sdl::Users::UserItemRequestArguments arguments = userItemRequest.GetRequestedArguments();
+	sdl::imtauth::Users::UserItemRequestArguments arguments = userItemRequest.GetRequestedArguments();
 	QByteArray productId = arguments.input.GetProductId();
-	imtcore::sdl::Users::CUserData userData;
+	sdl::imtauth::Users::CUserData userData;
 
 	QByteArray objectId = userInfoPtr->GetObjectUuid();
 	userData.SetId(objectId);
@@ -339,10 +339,10 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	std::sort(permissions.begin(), permissions.end());
 	userData.SetPermissions(permissions);
 
-	QList<imtcore::sdl::Users::CSystemInfo> list;
+	QList<sdl::imtauth::Users::CSystemInfo> list;
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
-		imtcore::sdl::Users::CSystemInfo info;
+		sdl::imtauth::Users::CSystemInfo info;
 
 		info.SetId(systemInfo.systemId);
 		info.SetName(systemInfo.systemName);
