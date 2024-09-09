@@ -582,6 +582,8 @@ MDBX_DECLARE_EXCEPTION(transaction_full);
 MDBX_DECLARE_EXCEPTION(transaction_overlapping);
 MDBX_DECLARE_EXCEPTION(duplicated_lck_file);
 MDBX_DECLARE_EXCEPTION(dangling_map_id);
+MDBX_DECLARE_EXCEPTION(transaction_ousted);
+MDBX_DECLARE_EXCEPTION(mvcc_retarded);
 #undef MDBX_DECLARE_EXCEPTION
 
 [[noreturn]] LIBMDBX_API void throw_too_small_target_buffer();
@@ -3535,8 +3537,8 @@ enum put_mode {
 /// instances, but does not destroys the represented underlying object from the
 /// own class destructor.
 ///
-/// An environment supports multiple key-value sub-databases (aka key-value
-/// spaces or tables), all residing in the same shared-memory map.
+/// An environment supports multiple key-value tables (aka key-value
+/// maps, spaces or sub-databases), all residing in the same shared-memory map.
 class LIBMDBX_API_TYPE env {
   friend class txn;
 
@@ -3840,6 +3842,9 @@ public:
     /// \brief Returns the maximal write transaction size (i.e. limit for
     /// summary volume of dirty pages) in bytes for specified page size.
     static inline size_t transaction_size_max(intptr_t pagesize);
+
+    /// \brief Returns the maximum opened map handles, aka DBI-handles.
+    static inline size_t max_map_handles(void);
   };
 
   /// \brief Returns the minimal database size in bytes for the environment.
@@ -4096,7 +4101,7 @@ public:
   /// environment is busy by other thread or none of the thresholds are reached.
   bool poll_sync_to_disk() { return sync_to_disk(false, true); }
 
-  /// \brief Close a key-value map (aka sub-database) handle. Normally
+  /// \brief Close a key-value map (aka table) handle. Normally
   /// unnecessary.
   ///
   /// Closing a database handle is not necessary, but lets \ref txn::open_map()
@@ -4353,11 +4358,18 @@ public:
 
   //----------------------------------------------------------------------------
 
-  /// \brief Reset a read-only transaction.
+  /// \brief Reset read-only transaction.
   inline void reset_reading();
 
-  /// \brief Renew a read-only transaction.
+  /// \brief Renew read-only transaction.
   inline void renew_reading();
+
+  /// \brief Park read-only transaction.
+  inline void park_reading(bool autounpark = true);
+
+  /// \brief Resume parked read-only transaction.
+  /// \returns True if transaction was restarted while `restart_if_ousted=true`.
+  inline bool unpark_reading(bool restart_if_ousted = true);
 
   /// \brief Start nested write transaction.
   txn_managed start_nested();
@@ -4384,11 +4396,18 @@ public:
       const ::std::string &name,
       const ::mdbx::key_mode key_mode = ::mdbx::key_mode::usual,
       const ::mdbx::value_mode value_mode = ::mdbx::value_mode::single) const;
+  /// \brief Open existing key-value map.
+  inline map_handle open_map(
+      const ::mdbx::slice &name,
+      const ::mdbx::key_mode key_mode = ::mdbx::key_mode::usual,
+      const ::mdbx::value_mode value_mode = ::mdbx::value_mode::single) const;
 
   /// \brief Open existing key-value map.
   inline map_handle open_map_accede(const char *name) const;
   /// \brief Open existing key-value map.
   inline map_handle open_map_accede(const ::std::string &name) const;
+  /// \brief Open existing key-value map.
+  inline map_handle open_map_accede(const ::mdbx::slice &name) const;
 
   /// \brief Create new or open existing key-value map.
   inline map_handle
@@ -4398,6 +4417,11 @@ public:
   /// \brief Create new or open existing key-value map.
   inline map_handle
   create_map(const ::std::string &name,
+             const ::mdbx::key_mode key_mode = ::mdbx::key_mode::usual,
+             const ::mdbx::value_mode value_mode = ::mdbx::value_mode::single);
+  /// \brief Create new or open existing key-value map.
+  inline map_handle
+  create_map(const ::mdbx::slice &name,
              const ::mdbx::key_mode key_mode = ::mdbx::key_mode::usual,
              const ::mdbx::value_mode value_mode = ::mdbx::value_mode::single);
 
@@ -4411,6 +4435,10 @@ public:
   /// \return `True` if the key-value map existed and was deleted, either
   /// `false` if the key-value map did not exist and there is nothing to delete.
   inline bool drop_map(const ::std::string &name, bool throw_if_absent = false);
+  /// \brief Drop key-value map.
+  /// \return `True` if the key-value map existed and was deleted, either
+  /// `false` if the key-value map did not exist and there is nothing to delete.
+  bool drop_map(const ::mdbx::slice &name, bool throw_if_absent = false);
 
   /// \brief Clear key-value map.
   inline void clear_map(map_handle map);
@@ -4421,11 +4449,16 @@ public:
   /// `false` if the key-value map did not exist and there is nothing to clear.
   inline bool clear_map(const ::std::string &name,
                         bool throw_if_absent = false);
+  /// \return `True` if the key-value map existed and was cleared, either
+  /// `false` if the key-value map did not exist and there is nothing to clear.
+  bool clear_map(const ::mdbx::slice &name, bool throw_if_absent = false);
 
   /// \brief Переименовывает таблицу ключ-значение.
   inline void rename_map(map_handle map, const char *new_name);
   /// \brief Переименовывает таблицу ключ-значение.
   inline void rename_map(map_handle map, const ::std::string &new_name);
+  /// \brief Переименовывает таблицу ключ-значение.
+  inline void rename_map(map_handle map, const ::mdbx::slice &new_name);
   /// \brief Переименовывает таблицу ключ-значение.
   /// \return `True` если таблица существует и была переименована, либо
   /// `false` в случае отсутствия исходной таблицы.
@@ -4436,6 +4469,11 @@ public:
   /// `false` в случае отсутствия исходной таблицы.
   bool rename_map(const ::std::string &old_name, const ::std::string &new_name,
                   bool throw_if_absent = false);
+  /// \brief Переименовывает таблицу ключ-значение.
+  /// \return `True` если таблица существует и была переименована, либо
+  /// `false` в случае отсутствия исходной таблицы.
+  bool rename_map(const ::mdbx::slice &old_name, const ::mdbx::slice &new_name,
+                  bool throw_if_absent = false);
 
 #if defined(DOXYGEN) ||                                                        \
     (defined(__cpp_lib_string_view) && __cpp_lib_string_view >= 201606L)
@@ -4444,21 +4482,29 @@ public:
   inline map_handle open_map(
       const ::std::string_view &name,
       const ::mdbx::key_mode key_mode = ::mdbx::key_mode::usual,
-      const ::mdbx::value_mode value_mode = ::mdbx::value_mode::single) const;
+      const ::mdbx::value_mode value_mode = ::mdbx::value_mode::single) const {
+    return open_map(::mdbx::slice(name), key_mode, value_mode);
+  }
   /// \brief Open existing key-value map.
   inline map_handle open_map_accede(const ::std::string_view &name) const;
   /// \brief Create new or open existing key-value map.
   inline map_handle
   create_map(const ::std::string_view &name,
              const ::mdbx::key_mode key_mode = ::mdbx::key_mode::usual,
-             const ::mdbx::value_mode value_mode = ::mdbx::value_mode::single);
+             const ::mdbx::value_mode value_mode = ::mdbx::value_mode::single) {
+    return create_map(::mdbx::slice(name), key_mode, value_mode);
+  }
   /// \brief Drop key-value map.
   /// \return `True` if the key-value map existed and was deleted, either
   /// `false` if the key-value map did not exist and there is nothing to delete.
-  bool drop_map(const ::std::string_view &name, bool throw_if_absent = false);
+  bool drop_map(const ::std::string_view &name, bool throw_if_absent = false) {
+    return drop_map(::mdbx::slice(name), throw_if_absent);
+  }
   /// \return `True` if the key-value map existed and was cleared, either
   /// `false` if the key-value map did not exist and there is nothing to clear.
-  bool clear_map(const ::std::string_view &name, bool throw_if_absent = false);
+  bool clear_map(const ::std::string_view &name, bool throw_if_absent = false) {
+    return clear_map(::mdbx::slice(name), throw_if_absent);
+  }
   /// \brief Переименовывает таблицу ключ-значение.
   inline void rename_map(map_handle map, const ::std::string_view &new_name);
   /// \brief Переименовывает таблицу ключ-значение.
@@ -4466,17 +4512,19 @@ public:
   /// `false` в случае отсутствия исходной таблицы.
   bool rename_map(const ::std::string_view &old_name,
                   const ::std::string_view &new_name,
-                  bool throw_if_absent = false);
-
+                  bool throw_if_absent = false) {
+    return rename_map(::mdbx::slice(old_name), ::mdbx::slice(new_name),
+                      throw_if_absent);
+  }
 #endif /* __cpp_lib_string_view >= 201606L */
 
   using map_stat = ::MDBX_stat;
-  /// \brief Returns statistics for a sub-database.
+  /// \brief Returns statistics for a table.
   inline map_stat get_map_stat(map_handle map) const;
   /// \brief Returns depth (bitmask) information of nested dupsort (multi-value)
   /// B+trees for given database.
   inline uint32_t get_tree_deepmask(map_handle map) const;
-  /// \brief Returns information about key-value map (aka sub-database) handle.
+  /// \brief Returns information about key-value map (aka table) handle.
   inline map_handle::info get_handle_info(map_handle map) const;
 
   using canary = ::MDBX_canary;
@@ -4488,39 +4536,39 @@ public:
   inline canary get_canary() const;
 
   /// Reads sequence generator associated with a key-value map (aka
-  /// sub-database).
+  /// table).
   inline uint64_t sequence(map_handle map) const;
   /// \brief Reads and increment sequence generator associated with a key-value
-  /// map (aka sub-database).
+  /// map (aka table).
   inline uint64_t sequence(map_handle map, uint64_t increment);
 
   /// \brief Compare two keys according to a particular key-value map (aka
-  /// sub-database).
+  /// table).
   inline int compare_keys(map_handle map, const slice &a,
                           const slice &b) const noexcept;
   /// \brief Compare two values according to a particular key-value map (aka
-  /// sub-database).
+  /// table).
   inline int compare_values(map_handle map, const slice &a,
                             const slice &b) const noexcept;
   /// \brief Compare keys of two pairs according to a particular key-value map
-  /// (aka sub-database).
+  /// (aka table).
   inline int compare_keys(map_handle map, const pair &a,
                           const pair &b) const noexcept;
   /// \brief Compare values of two pairs according to a particular key-value map
-  /// (aka sub-database).
+  /// (aka table).
   inline int compare_values(map_handle map, const pair &a,
                             const pair &b) const noexcept;
 
-  /// \brief Get value by key from a key-value map (aka sub-database).
+  /// \brief Get value by key from a key-value map (aka table).
   inline slice get(map_handle map, const slice &key) const;
   /// \brief Get first of multi-value and values count by key from a key-value
-  /// multimap (aka sub-database).
+  /// multimap (aka table).
   inline slice get(map_handle map, slice key, size_t &values_count) const;
-  /// \brief Get value by key from a key-value map (aka sub-database).
+  /// \brief Get value by key from a key-value map (aka table).
   inline slice get(map_handle map, const slice &key,
                    const slice &value_at_absence) const;
   /// \brief Get first of multi-value and values count by key from a key-value
-  /// multimap (aka sub-database).
+  /// multimap (aka table).
   inline slice get(map_handle map, slice key, size_t &values_count,
                    const slice &value_at_absence) const;
   /// \brief Get value for equal or great key from a database.
@@ -6089,6 +6137,8 @@ inline size_t env::limits::transaction_size_max(intptr_t pagesize) {
   return static_cast<size_t>(result);
 }
 
+inline size_t env::limits::max_map_handles(void) { return MDBX_MAX_DBI; }
+
 inline env::operate_parameters env::get_operation_parameters() const {
   const auto flags = get_flags();
   return operate_parameters(max_maps(), max_readers(),
@@ -6408,6 +6458,14 @@ inline void txn::renew_reading() {
   error::success_or_throw(::mdbx_txn_renew(handle_));
 }
 
+inline void txn::park_reading(bool autounpark) {
+  error::success_or_throw(::mdbx_txn_park(handle_, autounpark));
+}
+
+inline bool txn::unpark_reading(bool restart_if_ousted) {
+  return error::boolean_or_throw(::mdbx_txn_unpark(handle_, restart_if_ousted));
+}
+
 inline txn::info txn::get_info(bool scan_reader_lock_table) const {
   txn::info r;
   error::success_or_throw(::mdbx_txn_info(handle_, &r, scan_reader_lock_table));
@@ -6428,6 +6486,17 @@ inline size_t txn::release_all_cursors(bool unbind) const {
 }
 
 inline ::mdbx::map_handle
+txn::open_map(const ::mdbx::slice &name, const ::mdbx::key_mode key_mode,
+              const ::mdbx::value_mode value_mode) const {
+  ::mdbx::map_handle map;
+  error::success_or_throw(::mdbx_dbi_open2(
+      handle_, name, MDBX_db_flags_t(key_mode) | MDBX_db_flags_t(value_mode),
+      &map.dbi));
+  assert(map.dbi != 0);
+  return map;
+}
+
+inline ::mdbx::map_handle
 txn::open_map(const char *name, const ::mdbx::key_mode key_mode,
               const ::mdbx::value_mode value_mode) const {
   ::mdbx::map_handle map;
@@ -6438,10 +6507,31 @@ txn::open_map(const char *name, const ::mdbx::key_mode key_mode,
   return map;
 }
 
+inline ::mdbx::map_handle
+txn::open_map_accede(const ::mdbx::slice &name) const {
+  ::mdbx::map_handle map;
+  error::success_or_throw(
+      ::mdbx_dbi_open2(handle_, name, MDBX_DB_ACCEDE, &map.dbi));
+  assert(map.dbi != 0);
+  return map;
+}
+
 inline ::mdbx::map_handle txn::open_map_accede(const char *name) const {
   ::mdbx::map_handle map;
   error::success_or_throw(
       ::mdbx_dbi_open(handle_, name, MDBX_DB_ACCEDE, &map.dbi));
+  assert(map.dbi != 0);
+  return map;
+}
+
+inline ::mdbx::map_handle txn::create_map(const ::mdbx::slice &name,
+                                          const ::mdbx::key_mode key_mode,
+                                          const ::mdbx::value_mode value_mode) {
+  ::mdbx::map_handle map;
+  error::success_or_throw(::mdbx_dbi_open2(
+      handle_, name,
+      MDBX_CREATE | MDBX_db_flags_t(key_mode) | MDBX_db_flags_t(value_mode),
+      &map.dbi));
   assert(map.dbi != 0);
   return map;
 }
@@ -6470,108 +6560,38 @@ inline void txn::rename_map(map_handle map, const char *new_name) {
   error::success_or_throw(::mdbx_dbi_rename(handle_, map, new_name));
 }
 
-#if defined(DOXYGEN) ||                                                        \
-    (defined(__cpp_lib_string_view) && __cpp_lib_string_view >= 201606L)
-
-inline ::mdbx::map_handle
-txn::open_map(const ::std::string_view &name, const ::mdbx::key_mode key_mode,
-              const ::mdbx::value_mode value_mode) const {
-  ::mdbx::map_handle map;
-  error::success_or_throw(::mdbx_dbi_open2(
-      handle_, ::mdbx::slice(name),
-      MDBX_db_flags_t(key_mode) | MDBX_db_flags_t(value_mode), &map.dbi));
-  assert(map.dbi != 0);
-  return map;
-}
-
-inline ::mdbx::map_handle
-txn::open_map_accede(const ::std::string_view &name) const {
-  ::mdbx::map_handle map;
-  error::success_or_throw(
-      ::mdbx_dbi_open2(handle_, ::mdbx::slice(name), MDBX_DB_ACCEDE, &map.dbi));
-  assert(map.dbi != 0);
-  return map;
-}
-
-inline ::mdbx::map_handle txn::create_map(const ::std::string_view &name,
-                                          const ::mdbx::key_mode key_mode,
-                                          const ::mdbx::value_mode value_mode) {
-  ::mdbx::map_handle map;
-  error::success_or_throw(::mdbx_dbi_open2(
-      handle_, ::mdbx::slice(name),
-      MDBX_CREATE | MDBX_db_flags_t(key_mode) | MDBX_db_flags_t(value_mode),
-      &map.dbi));
-  assert(map.dbi != 0);
-  return map;
-}
-
-inline void txn::rename_map(map_handle map,
-                            const ::std::string_view &new_name) {
-  error::success_or_throw(
-      ::mdbx_dbi_rename2(handle_, map, ::mdbx::slice(new_name)));
+inline void txn::rename_map(map_handle map, const ::mdbx::slice &new_name) {
+  error::success_or_throw(::mdbx_dbi_rename2(handle_, map, new_name));
 }
 
 inline ::mdbx::map_handle
 txn::open_map(const ::std::string &name, const ::mdbx::key_mode key_mode,
               const ::mdbx::value_mode value_mode) const {
-  return open_map(::std::string_view(name), key_mode, value_mode);
+  return open_map(::mdbx::slice(name), key_mode, value_mode);
 }
 
 inline ::mdbx::map_handle
 txn::open_map_accede(const ::std::string &name) const {
-  return open_map_accede(::std::string_view(name));
+  return open_map_accede(::mdbx::slice(name));
 }
 
 inline ::mdbx::map_handle txn::create_map(const ::std::string &name,
                                           const ::mdbx::key_mode key_mode,
                                           const ::mdbx::value_mode value_mode) {
-  return create_map(::std::string_view(name), key_mode, value_mode);
+  return create_map(::mdbx::slice(name), key_mode, value_mode);
 }
 
 inline bool txn::drop_map(const ::std::string &name, bool throw_if_absent) {
-  return drop_map(::std::string_view(name), throw_if_absent);
+  return drop_map(::mdbx::slice(name), throw_if_absent);
 }
 
 inline bool txn::clear_map(const ::std::string &name, bool throw_if_absent) {
-  return clear_map(::std::string_view(name), throw_if_absent);
+  return clear_map(::mdbx::slice(name), throw_if_absent);
 }
 
 inline void txn::rename_map(map_handle map, const ::std::string &new_name) {
-  return rename_map(map, ::std::string_view(new_name));
+  return rename_map(map, ::mdbx::slice(new_name));
 }
-
-#else
-
-inline ::mdbx::map_handle
-txn::open_map(const ::std::string &name, const ::mdbx::key_mode key_mode,
-              const ::mdbx::value_mode value_mode) const {
-  return open_map(name.c_str(), key_mode, value_mode);
-}
-
-inline ::mdbx::map_handle
-txn::open_map_accede(const ::std::string &name) const {
-  return open_map_accede(name.c_str());
-}
-
-inline ::mdbx::map_handle txn::create_map(const ::std::string &name,
-                                          const ::mdbx::key_mode key_mode,
-                                          const ::mdbx::value_mode value_mode) {
-  return create_map(name.c_str(), key_mode, value_mode);
-}
-
-inline bool txn::drop_map(const ::std::string &name, bool throw_if_absent) {
-  return drop_map(name.c_str(), throw_if_absent);
-}
-
-inline bool txn::clear_map(const ::std::string &name, bool throw_if_absent) {
-  return clear_map(name.c_str(), throw_if_absent);
-}
-
-inline void txn::rename_map(map_handle map, const ::std::string &new_name) {
-  return rename_map(map, new_name.c_str());
-}
-
-#endif /* __cpp_lib_string_view >= 201606L */
 
 inline txn::map_stat txn::get_map_stat(map_handle map) const {
   txn::map_stat r;
@@ -7079,6 +7099,11 @@ inline cursor::move_result cursor::lower_bound(const slice &key,
   return move(key_lowerbound, key, throw_notfound);
 }
 
+inline cursor::move_result cursor::upper_bound(const slice &key,
+                                               bool throw_notfound) {
+  return move(key_greater_than, key, throw_notfound);
+}
+
 inline cursor::move_result cursor::find_multivalue(const slice &key,
                                                    const slice &value,
                                                    bool throw_notfound) {
@@ -7089,6 +7114,12 @@ inline cursor::move_result cursor::lower_bound_multivalue(const slice &key,
                                                           const slice &value,
                                                           bool throw_notfound) {
   return move(multi_exactkey_lowerboundvalue, key, value, throw_notfound);
+}
+
+inline cursor::move_result cursor::upper_bound_multivalue(const slice &key,
+                                                          const slice &value,
+                                                          bool throw_notfound) {
+  return move(multi_exactkey_value_greater, key, value, throw_notfound);
 }
 
 inline bool cursor::seek(const slice &key) {
