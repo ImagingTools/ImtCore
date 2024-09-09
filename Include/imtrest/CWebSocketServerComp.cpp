@@ -269,10 +269,11 @@ void CWebSocketServerComp::OnTimeout()
 }
 
 
-void CWebSocketServerComp::OnAcceptError(QAbstractSocket::SocketError socketError)
+void CWebSocketServerComp::OnAcceptError(QAbstractSocket::SocketError /*socketError*/)
 {
 	QWebSocketServer* webSocketServerPtr = qobject_cast<QWebSocketServer*>(sender());
 	Q_ASSERT(webSocketServerPtr != nullptr);
+
 	webSocketServerPtr->resumeAccepting();
 }
 
