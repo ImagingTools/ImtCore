@@ -45,36 +45,9 @@ int CGqlSchemaParserComp::DoProcessing(
 		\param progressManagerPtr - unused
 	 */
 
-	m_currentSchemaFilePath.clear();
-
-	if (!m_argumentParserCompPtr.IsValid()){
-		SendCriticalMessage(0, "Schema parser was not set");
-
-		return TS_INVALID;
-	}
-
-	if (inputPtr == nullptr) {
-		SendCriticalMessage(0, "Schema path was not provided");
-
-		return TS_INVALID;
-	}
-
-	const ifile::IFileNameParam* schemaFilePathParamPtr = dynamic_cast<const ifile::IFileNameParam*>(inputPtr);
-	if (schemaFilePathParamPtr == nullptr){
-		SendCriticalMessage(0, "Invalid input type");
-
-		return TS_INVALID;
-	}
-
-	if (schemaFilePathParamPtr != nullptr){
-		m_currentSchemaFilePath = schemaFilePathParamPtr->GetPath();
-	}
-	else{
-		m_currentSchemaFilePath = m_argumentParserCompPtr->GetSchemaFilePath();
-	}
-
-	if (m_currentSchemaFilePath.isEmpty()){
-		SendCriticalMessage(0, "Schema path is not provided");
+	if (!SetupSchemaFilePath(inputPtr)){
+		SendCriticalMessage(0, "The schema path parameter is invalid");
+		I_CRITICAL();
 
 		return TS_INVALID;
 	}
@@ -421,6 +394,34 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 	}
 
 	return true;
+}
+
+
+bool CGqlSchemaParserComp::SetupSchemaFilePath(const istd::IPolymorphic* inputPtr)
+{
+	m_currentSchemaFilePath.clear();
+	// First, check the input parameters these are of higher priority
+	const ifile::IFileNameParam* schemaFilePathParamPtr = dynamic_cast<const ifile::IFileNameParam*>(inputPtr);
+	if (schemaFilePathParamPtr != nullptr){
+		m_currentSchemaFilePath = schemaFilePathParamPtr->GetPath();
+	}
+
+	if (!m_currentSchemaFilePath.isEmpty()){
+		return true;
+	}
+
+	// Then, check an argument parser
+	if (m_argumentParserCompPtr.IsValid()){
+		m_currentSchemaFilePath = m_argumentParserCompPtr->GetSchemaFilePath();
+	}
+
+	if (m_currentSchemaFilePath.isEmpty()){
+		SendErrorMessage(0, QString("Unable to setup schema path, because it is empty"));
+		return false;
+	}
+
+	return true;
+
 }
 
 

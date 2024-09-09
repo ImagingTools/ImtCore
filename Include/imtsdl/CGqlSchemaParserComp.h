@@ -56,6 +56,7 @@ protected:
 	QString FindFileInList(const QString& relativePath, const QStringList& searchPathList) const;
 	QStringList FindFilesFromDir(const QString& relativeDirPath, const QStringList& searchPathList) const;
 	bool ExtractTypesFromImport(const QStringList& importFilesList);
+	bool SetupSchemaFilePath(const istd::IPolymorphic* inputPtr);
 
 	virtual bool ProcessFilesImports();
 	virtual bool ProcessJavaStyleImports();
