@@ -5,17 +5,16 @@ schema {
 }
 
 import {
-    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
-	#"../../../../ImtCore/Sdl/ImtCoreSdlAPIv1_0.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
 }
 
 input GroupsListInput {
-    ProductId: ID!
-    viewParams: CollectionViewParams
+	ProductId: ID!
+	viewParams: CollectionViewParams
 }
 
 type GroupItem {
-    Id: ID!
+	Id: ID!
 	Name: String!
 	Description: String
 	Roles: ID
@@ -26,7 +25,7 @@ type GroupItem {
 }
 
 type GroupsListPayload {
-    items: [GroupItem]
+	items: [GroupItem]
 	notification: NotificationItem
 }
 
@@ -47,34 +46,34 @@ input GroupDataInput {
 }
 
 type GroupDataPayload {
-    GroupData: GroupData
+	GroupData: GroupData
 }
 
 input GroupItemInput {
-    Id: ID!
+	Id: ID!
 	ProductId: ID!
 }
 
 type Query {
-    GroupsList (input:GroupsListInput): GroupsListPayload!
+	GroupsList (input:GroupsListInput): GroupsListPayload!
 	GroupItem (input: GroupItemInput): GroupDataPayload!
 }
 
 type Mutation {
-    GroupUpdate (input: GroupDataInput): UpdatedNotificationPayload!
+	GroupUpdate (input: GroupDataInput): UpdatedNotificationPayload!
 	GroupAdd (input: GroupDataInput): AddedNotificationPayload!
 }
 
 collectionSchema {
-    type Group {
-	    ref: GroupItem
+	type Group {
+		ref: GroupItem
 		operations {
-		    list: GroupsList
+			list: GroupsList
 		}
 		subtype Group {
-		    ref: GroupData
+			ref: GroupData
 			operations {
-			    get: GroupItem
+				get: GroupItem
 				update: GroupUpdate
 				insert: GroupAdd
 			}

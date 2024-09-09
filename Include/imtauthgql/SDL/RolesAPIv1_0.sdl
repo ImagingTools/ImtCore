@@ -1,17 +1,16 @@
 import {
-    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
-	#"../../../../ImtCore/Sdl/ImtCoreSdlAPIv1_0.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
 }
 
 schema {
-    query: Query
+	query: Query
 	mutation: Mutation
 	subscription: Subscription
 }
 
 input RolesListInput {
-    ProductId: ID!
-    viewParams: CollectionViewParams
+	ProductId: ID!
+	viewParams: CollectionViewParams
 }
 
 type RoleItem {
@@ -27,7 +26,7 @@ type RoleItem {
 }
 
 type RolesListPayload {
-    items: [RoleItem]
+	items: [RoleItem]
 	notification: NotificationItem
 }
 
@@ -48,34 +47,34 @@ input RoleDataInput {
 }
 
 type RoleDataPayload {
-    RoleData: RoleData
+	RoleData: RoleData
 }
 
 input RoleItemInput {
-    Id: ID!
+	Id: ID!
 	ProductId: ID!
 }
 
 type Query {
-    RolesList (input:RolesListInput): RolesListPayload!
+	RolesList (input:RolesListInput): RolesListPayload!
 	RoleItem (input: RoleItemInput): RoleDataPayload!
 }
 
 type Mutation {
-    RoleUpdate (input: RoleDataInput): UpdatedNotificationPayload!
+	RoleUpdate (input: RoleDataInput): UpdatedNotificationPayload!
 	RoleAdd (input: RoleDataInput): AddedNotificationPayload!
 }
 
 collectionSchema {
-    type Role {
-	    ref: RoleItem
+	type Role {
+		ref: RoleItem
 		operations {
-		    list: RolesList
+			list: RolesList
 		}
 		subtype Role {
-		    ref: RoleData
+			ref: RoleData
 			operations {
-			    get: RoleItem
+				get: RoleItem
 				update: RoleUpdate
 				insert: RoleAdd
 			}

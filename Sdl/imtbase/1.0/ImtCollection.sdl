@@ -23,19 +23,15 @@ type AddedNotificationPayload {
 }
 
 type SortingInfoId {
-    Id: ID
-}
-
-type SortingInfoId {
-    Id: ID
+	Id: ID
 }
 
 type FilteringInfoId {
-    Id: ID
+	Id: ID
 }
 
 type CollectionFilter {
-    ObjectTypeId: ID
+	ObjectTypeId: ID
 	Filter: String
 	SortingOrder: String
 	SortingInfoIds: [SortingInfoId]

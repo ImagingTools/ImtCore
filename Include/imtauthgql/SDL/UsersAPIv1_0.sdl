@@ -1,17 +1,16 @@
 import {
-    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
-	#"../../../../ImtCore/Sdl/ImtCoreSdlAPIv1_0.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
 }
 
 schema {
-    query: Query
+	query: Query
 	mutation: Mutation
 	subscription: Subscription
 }
 
 input UsersListInput {
-    ProductId: ID!
-    viewParams: CollectionViewParams
+	ProductId: ID!
+	viewParams: CollectionViewParams
 }
 
 type UserItem {
@@ -30,12 +29,12 @@ type UserItem {
 }
 
 type UsersListPayload {
-    items: [UserItem]
+	items: [UserItem]
 	notification: NotificationItem
 }
 
 type SystemInfo {
-    Id: ID!
+	Id: ID!
 	Name: String!
 	Enabled: Bool!
 }
@@ -60,34 +59,34 @@ input UserDataInput {
 }
 
 type UserDataPayload {
-    UserData: UserData
+	UserData: UserData
 }
 
 input UserItemInput {
-    Id: ID!
+	Id: ID!
 	ProductId: ID!
 }
 
 type Query {
-    UsersList (input:UsersListInput): UsersListPayload!
+	UsersList (input:UsersListInput): UsersListPayload!
 	UserItem (input: UserItemInput): UserDataPayload!
 }
 
 type Mutation {
-    UserUpdate (input: UserDataInput): UpdatedNotificationPayload!
+	UserUpdate (input: UserDataInput): UpdatedNotificationPayload!
 	UserAdd (input: UserDataInput): AddedNotificationPayload!
 }
 
 collectionSchema {
-    type User {
-	    ref: UserItem
+	type User {
+		ref: UserItem
 		operations {
-		    list: UsersList
+			list: UsersList
 		}
 		subtype User {
-		    ref: UserData
+			ref: UserData
 			operations {
-			    get: UserItem
+				get: UserItem
 				update: UserUpdate
 				insert: UserAdd
 			}
