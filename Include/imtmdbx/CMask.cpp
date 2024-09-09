@@ -95,55 +95,55 @@ bool CMask::GetNearestOffset(quint64& offset, quint64 startOffset)
 
 bool CMask::GetNextItemOffset(quint64& offset, quint64 startOffset)
 {
-	mdbx::slice keySlice(&startOffset, 8);
+    // mdbx::slice keySlice(&startOffset, 8);
 
-	if (m_cursor.seek(keySlice)){
-		mdbx::cursor::move_result result = m_cursor.current();
-		if (result.done){
-			result = m_cursor.to_next(false);
-			if (!result.done){
-				return false;
-			}
-			offset = result.key.as_uint64();
-		}
-		else{
-			return false;
-		}
-	}
-	else {
-		return false;
-	}
+    // if (m_cursor.seek(keySlice)){
+    // 	mdbx::cursor::move_result result = m_cursor.current();
+    // 	if (result.done){
+    // 		result = m_cursor.to_next(false);
+    // 		if (!result.done){
+    // 			return false;
+    // 		}
+    // 		offset = result.key.as_uint64();
+    // 	}
+    // 	else{
+    // 		return false;
+    // 	}
+    // }
+    // else {
+    // 	return false;
+    // }
 
-	if(offset < startOffset){
-		Q_ASSERT(0);
-	}
-	return true;
+    // if(offset < startOffset){
+    // 	Q_ASSERT(0);
+    // }
+    // return true;
 
 
 	/******************************lower_bound*****************************/
 
-//	mdbx::slice keySlice(&startOffset, 8);
+    mdbx::slice keySlice(&startOffset, 8);
 
-//		mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice, false);
+        mdbx::cursor::move_result result = m_cursor.upper_bound(keySlice, false);
 
-//		if (result.done){
-//			if(result.key.as_uint64() == startOffset){
-//				result = m_cursor.to_next(false);
-//				if (!result.done){
-//					return false;
-//				}
-//			}
-//			offset = result.key.as_uint64();
-//		}
-//		else{
-//			return false;
-//		}
+        if (result.done){
+            if(result.key.as_uint64() == startOffset){
+                result = m_cursor.to_next(false);
+                if (!result.done){
+                    return false;
+                }
+            }
+            offset = result.key.as_uint64();
+        }
+        else{
+            return false;
+        }
 
-//		if(offset < startOffset){
-//			Q_ASSERT(0);
-//		}
+        if(offset < startOffset){
+            Q_ASSERT(0);
+        }
 
-//	return true;
+    return true;
 }
 
 

@@ -703,9 +703,10 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 
 
 	/*******************conditions***************************/
-//	if(maxOffset == 0xffffffffffffffff || minOffset == 0xffffffffffffffff){
-//		isLast = true;
-//	}
+    // if(maxOffset == 0xffffffffffffffff || minOffset == 0xffffffffffffffff){
+    //     qDebug() << "isLast";
+    // //     isLast = true;
+    // }
 
 	if(isLast){
 		return false;
@@ -721,7 +722,8 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 	}
 	else if(m_operationType == OT_OR){
 		if(minOffset == 0xffffffffffffffff){
-			//qDebug() << "0xffffffffffffffff";
+            qDebug() << "0xffffffffffffffff";
+            return false;
 		}
 		if(minOffset >= activeOffset){
 			activeOffset = minOffset;

@@ -26,6 +26,8 @@ public:
 	virtual QByteArray GetDocument() override;
 	virtual QByteArray GetDocument(quint64 key) override;
 	virtual QByteArray GetDocument(const QByteArray& key) override;
+    virtual bool GetKey(quint64& key) const override;
+    virtual bool GetKey(QByteArray& key) const override;
 	virtual bool HasRecord(quint64 key) override;
 	virtual bool HasRecord(const QByteArray& key) override;
 	virtual bool UpdateDocument(quint64 key,  const QByteArray& data) override;

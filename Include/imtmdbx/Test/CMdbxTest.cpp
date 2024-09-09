@@ -169,16 +169,23 @@ void CMdbxTest::test_char()
 
 void CMdbxTest::test_mdbxfind()
 {
-	return;
 
 	mdbx::env::operate_parameters operateParameters(100,10);
 	mdbx::env_managed::create_parameters createParameters;
 	std::string path = "example.mdb";
+	{
+	mdbx::env_managed env2(path, createParameters, operateParameters);
+	mdbx::txn_managed txn2 = env2.start_write(false);
+	mdbx::map_handle testHandle2 = txn2.create_map("fap1", mdbx::key_mode::reverse, mdbx::value_mode::single);
+	txn2.commit();
+	}
 	mdbx::env_managed env(path, createParameters, operateParameters);
 	mdbx::txn_managed txn = env.start_write(false);
-	QElapsedTimer time;
+	mdbx::map_handle testHandle = txn.create_map("fap1", mdbx::key_mode::usual, mdbx::value_mode::single);
 
-	mdbx::map_handle testHandle = txn.create_map("fap1", mdbx::key_mode::ordinal, mdbx::value_mode::single);
+
+//	return;
+
 	quint64 key = 5;
 	mdbx::slice keySlice(&key, 8);
 	std::string value("value5");
@@ -883,7 +890,7 @@ void CMdbxTest::test_write_masks(){
 
 	std::cout << "TEST_WRITE_MASKS!!!";
 
-	return;
+    // return;
 
 	/*************************************************************/
 	QString tableName = "Masks";
@@ -899,9 +906,9 @@ void CMdbxTest::test_write_masks(){
 		QElapsedTimer time;
 		time.start();
 		for(int i = 0; i < 1000000; i++){
-//			if (i%10 != 0){
+            if ((i < 250000 || i > 750000)){
 				mask1mln.SetUnit(i,true);
-//			}
+            }
 			if (i%10000 == 0){
 				std::cout << "Write i: " << i / 10000 << " " << time.elapsed() << std::endl;
 			}
@@ -916,7 +923,7 @@ void CMdbxTest::test_write_masks(){
 		QElapsedTimer time;
 		time.start();
 		for(int i = 0; i < 1000000; i++){
-			if (i%1000 == 0){
+            if (i%1000 == 0){
 				mask1000.SetUnit(i,true);
 			}
 			if (i%10000 == 0){
@@ -956,7 +963,7 @@ void CMdbxTest::test_write_masks(){
 //		quint64 unit =  mask1mln.GetUnit(2);
 		bool unit = doubleMask.GetUnit(5);
 
-		imtmdbx::CMaskContainer container(imtmdbx::CMaskContainer::OT_OR);
+        imtmdbx::CMaskContainer container(imtmdbx::CMaskContainer::OT_OR);
 		container.AddMask(&mask1mln, false);
 //		container.AddMask(&doubleMask, false);
 		container.AddMask(&mask1000, false);

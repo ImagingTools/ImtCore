@@ -176,6 +176,35 @@ QByteArray CDocumentTable::GetDocument(const QByteArray &key)
 }
 
 
+bool CDocumentTable::GetKey(quint64& key) const
+{
+    if (m_cursor.eof()){
+        return false;
+    }
+    mdbx::cursor::move_result result = m_cursor.current(false);
+    if (result.done){
+        key = result.key.as_int64();
+    }
+
+    return true;
+}
+
+
+bool CDocumentTable::GetKey(QByteArray& key) const
+{
+    if (m_cursor.eof()){
+        return false;
+    }
+    mdbx::cursor::move_result result = m_cursor.current(false);
+    if (result.done){
+        std::string value = result.key.as_string();
+        key = QByteArray::fromStdString(value);
+    }
+
+    return true;
+}
+
+
 bool CDocumentTable::HasRecord(quint64 key)
 {
 	bool ok = false;
