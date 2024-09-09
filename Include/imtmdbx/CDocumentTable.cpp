@@ -128,7 +128,8 @@ QByteArray CDocumentTable::GetDocument()
 
 	try{
 		mdbx::cursor::move_result result = m_cursor.current();
-		std::string value = result.value.as_string();
+        std::string value;
+        value = result.value.as_string();
 		doc = QByteArray::fromStdString(value);
 	}
 	catch(...){
@@ -147,8 +148,9 @@ QByteArray CDocumentTable::GetDocument(quint64 key)
 
 	try{
 		mdbx::cursor::move_result result = m_cursor.find(keySlice);
-		std::string value = result.value.as_string();
-		doc = QByteArray::fromStdString(value);
+        std::string value;
+        value = result.value.as_string();
+        doc = QByteArray::fromStdString(value);
 	}
 	catch(...){
 		doc = QByteArray();
@@ -165,7 +167,8 @@ QByteArray CDocumentTable::GetDocument(const QByteArray &key)
 
 	try{
 		mdbx::cursor::move_result result = m_cursor.find(keySlice);
-		std::string value = result.value.as_string();
+        std::string value;
+        value = result.value.as_string();
 		doc = QByteArray::fromStdString(value);
 	}
 	catch(...){
@@ -197,7 +200,8 @@ bool CDocumentTable::GetKey(QByteArray& key) const
     }
     mdbx::cursor::move_result result = m_cursor.current(false);
     if (result.done){
-        std::string value = result.key.as_string();
+        std::string value;
+        value = result.value.as_string();
         key = QByteArray::fromStdString(value);
     }
 
@@ -384,8 +388,10 @@ QByteArray CDocumentTable::GetKeyBA(const QByteArray &value)
 
 	if(value.isEmpty()){
 		mdbx::cursor::move_result result = m_cursor.current(false);
-		if(result.done){
-			key = QByteArray::fromStdString(result.key.as_string());
+        if(result.done){
+            std::string valueStr;
+            valueStr = result.value.as_string();
+            key = QByteArray::fromStdString(valueStr);
 		}
 	}
 	else {//not empty value
@@ -393,7 +399,9 @@ QByteArray CDocumentTable::GetKeyBA(const QByteArray &value)
 			mdbx::slice valueSlice(value);
 			mdbx::cursor::move_result result = m_cursorIndex.find(valueSlice, false);
 			if(result.done){
-				key = QByteArray::fromStdString(result.value.as_string());
+                std::string valueStr;
+                valueStr = result.value.as_string();
+                key = QByteArray::fromStdString(valueStr);
 			}
 		}
 		else {
@@ -403,7 +411,9 @@ QByteArray CDocumentTable::GetKeyBA(const QByteArray &value)
 					QByteArray keyRead;
 					std::string valueRead;
 					if (result.done){
-						keyRead = QByteArray::fromStdString(result.key.as_string());
+                        std::string valueStr;
+                        valueStr = result.value.as_string();
+                        keyRead = QByteArray::fromStdString(valueStr);
 						valueRead = result.value.as_string();
 						if(valueRead.data() == value){
 							key = keyRead;
