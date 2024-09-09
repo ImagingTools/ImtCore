@@ -6,7 +6,7 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
-import imtCoreUsersSdl 1.0
+import imtauthUsersSdl 1.0
 
 RemoteCollectionView {
     id: userCollectionViewContainer;

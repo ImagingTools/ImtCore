@@ -6,7 +6,7 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
-import imtCoreRolesSdl 1.0
+import imtauthRolesSdl 1.0
 
 RemoteCollectionView {
     id: roleCollectionViewContainer;
