@@ -222,9 +222,6 @@ public:
 };
 
 
-
-
-
 EjStorageHelper::EjStorageHelper()
 {
 
@@ -262,7 +259,60 @@ QString EjStorageHelper::pathPic()
 }
 
 
-
+QByteArray EjStorageHelper::getPatch(EjDocument* oldDoc, EjDocument* newDoc, quint16 newVer, QString user)
+{
+	QByteArray buffer;
+	QDataStream out(&buffer, QIODevice::WriteOnly);
+	out.setVersion(QDataStream::Qt_4_5);
+	if(!oldDoc || !newDoc || oldDoc->attributes()->key() != newDoc->attributes()->key())
+	{
+		return buffer;
+	}
+	//    Patch patch;
+	EjAttrProp *oldAttr = oldDoc->attributes();
+	//    AttrProp *newAttr = newDoc->getAttributes();
+	QUuid uuid = QUuid::createUuid();
+	qint16 key = uuid.data2;
+	quint32 time = QDateTime::currentDateTime().toSecsSinceEpoch();
+	QByteArray header;
+	QByteArray body = diff(*oldDoc->lBlocks,*newDoc->lBlocks,false);
+	QByteArray attributes;
+	QList<EjBlock*> lEmpty;
+	if(oldDoc->attributes()->m_patchVer == 0)
+		attributes = diff(lEmpty,*newDoc->lPropBlocks,false);
+	else
+		attributes = diff(*oldDoc->lPropBlocks,*newDoc->lPropBlocks,false);
+	quint8 countDop = 1;
+	quint32 k = header.size();
+	IntVarLen2 t(k);
+	quint32 k1 = body.size();
+	IntVarLen2 t1(k);
+	quint32 k2 = attributes.size();
+	IntVarLen2 t2(k2);
+	bool bCompress = false;
+	if(body.size() > 2 || attributes.size() > 2)
+	{
+		//        out.writeRawData("EJ1.0",5);
+		if(body.size() < 3)
+			body.clear();
+		if(attributes.size() < 3)
+			attributes.clear();
+		out << oldAttr->m_patchKey << oldAttr->m_patchVer << key << newVer << time;
+		writeBA(out,header);
+		writeBA(out,body);
+		writeBA(out,attributes);
+		out << countDop;
+		writeSmallString(out,user);
+		if(buffer.count() > 100)
+		{
+			bCompress = true;
+			buffer = qCompress(buffer);
+		}
+		buffer.prepend("EJ1.0_",6);
+		buffer[5] = bCompress;
+	}
+	return buffer;
+}
 
 
 void EjStorageHelper::loadData(EjDocument* doc, QList<QByteArray*>& lData, bool isSaveHistory)
