@@ -36,6 +36,7 @@ endif()
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
 set (QML_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Qml")
+set (SDL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Sdl")
 set (TESTS_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Tests")
 
 set(AUX_INCLUDE_DIR "${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}/GeneratedFiles")
@@ -151,6 +152,11 @@ if(NOT DEFINED USE_QTQML OR USE_QTQML)
 	add_subdirectory("${QML_DIR}/imtcontrols/CMake" "${AUX_INCLUDE_DIR}/imtcontrolsqml")
 	add_subdirectory("${INCLUDE_DIR}/imtqml/CMake" "${AUX_INCLUDE_DIR}/imtqml")
 	add_subdirectory("${INCLUDE_DIR}/imtstylecontrolsqml/CMake" "${AUX_INCLUDE_DIR}/imtstylecontrolsqml")
+endif()
+
+if(NOT DEFINED USE_SDL OR USE_SDL)
+	#-------- Sdl --------
+	add_subdirectory("${SDL_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauthsdl")
 endif()
 
 if(NOT DEFINED USE_QTDB OR USE_QTDB)

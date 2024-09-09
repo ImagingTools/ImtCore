@@ -3,17 +3,17 @@
 
 // ImtCore includes
 #include <imtgql/CObjectCollectionControllerCompBase.h>
-#include <GeneratedFiles/imtauthgql/SDL/CPP/Roles/RolesAPIv1_0.h>
+#include <GeneratedFiles/imtauthsdl/SDL/CPP/Roles/Roles.h>
 
 
 namespace imtauthgql
 {
 
 
-class CRoleCollectionControllerComp: public imtcore::sdl::Roles::CRoleCollectionControllerCompBase
+class CRoleCollectionControllerComp: public sdl::imtauth::Roles::CRoleCollectionControllerCompBase
 {
 public:
-	typedef imtcore::sdl::Roles::CRoleCollectionControllerCompBase BaseClass;
+	typedef sdl::imtauth::Roles::CRoleCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRoleCollectionControllerComp);
 		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID", false, "");
