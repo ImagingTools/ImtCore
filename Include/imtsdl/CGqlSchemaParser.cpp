@@ -87,14 +87,11 @@ bool CGqlSchemaParser::ParseGqlSchema()
 					0,
 					QString("Unexpected derictive '%1' at %2 line").arg(keyword, QString::number(m_lastReadLine + 1)),
 					"CGqlSchemaParser");
-		Q_ASSERT(false);
 
 		return false;
 	}
 
 	retVal = retVal && ParseGqlSchema();
-
-	Q_ASSERT(retVal);
 
 	return retVal;
 }
@@ -132,7 +129,6 @@ SdlFieldList CGqlSchemaParser::GetFields(const QString typeName) const
 				0,
 				QString("Unable to find type name '%1'").arg(typeName),
 				"CGqlSchemaParser");
-	Q_ASSERT(false);
 
 	return {CSdlField()};
 }
@@ -544,8 +540,6 @@ bool CGqlSchemaParser::ProcessCustomSection(const QString& sectionName)
 				errorString,
 				"ProcessCustomSection");
 
-	Q_ASSERT_X(false, __func__, errorString.toLocal8Bit());
-
 	return false;
 }
 
@@ -589,7 +583,6 @@ void CGqlSchemaParser::SetDevice(QIODevice& device)
 					0,
 					"Unable to open device",
 					"CGqlSchemaParser");
-		Q_ASSERT(false);
 
 		return;
 	}

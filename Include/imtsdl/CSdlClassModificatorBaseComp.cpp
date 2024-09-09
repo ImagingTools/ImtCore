@@ -155,10 +155,7 @@ bool CSdlClassModificatorBaseComp::CloseFiles()
 	bool retVal = true;
 
 	retVal = m_headerFilePtr->flush();
-	Q_ASSERT(retVal);
-
 	retVal = m_sourceFilePtr->flush() && retVal;
-	Q_ASSERT(retVal);
 
 	// Close files
 	m_headerFilePtr->close();
@@ -170,10 +167,18 @@ bool CSdlClassModificatorBaseComp::CloseFiles()
 	// Then move modificated files to original location
 	const QString originalPath = QFileInfo(*m_originalHeaderFilePtr).absolutePath();
 	retVal = retVal && istd::CSystem::FileMove(m_headerFilePtr->fileName(), originalPath, true);
-	Q_ASSERT(retVal);
+	if (!retVal){
+		SendErrorMessage(0,
+						QString("Unable to move file: '%1'. Error: %2")
+						.arg(m_headerFilePtr->fileName(), originalPath));
+	}
 
 	retVal = retVal && istd::CSystem::FileMove(m_sourceFilePtr->fileName(), originalPath, true);
-	Q_ASSERT(retVal);
+	if (!retVal){
+		SendErrorMessage(0,
+						QString("Unable to move file: '%1'. Error: %2")
+						.arg(m_sourceFilePtr->fileName(), originalPath));
+	}
 
 	return retVal;
 }
@@ -183,8 +188,6 @@ void CSdlClassModificatorBaseComp::AbortCurrentProcessing()
 {
 	m_headerFilePtr->close();
 	m_sourceFilePtr->close();
-
-	I_CRITICAL();
 
 	m_headerFilePtr->remove();
 	m_sourceFilePtr->remove();

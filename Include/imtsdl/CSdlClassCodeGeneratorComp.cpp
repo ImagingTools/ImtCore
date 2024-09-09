@@ -272,10 +272,7 @@ bool CSdlClassCodeGeneratorComp::CloseFiles()
 	bool retVal = true;
 
 	retVal = m_headerFilePtr->flush();
-	Q_ASSERT(retVal);
-
 	retVal = m_sourceFilePtr->flush() && retVal;
-	Q_ASSERT(retVal);
 
 	m_headerFilePtr->close();
 	m_sourceFilePtr->close();

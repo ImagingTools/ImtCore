@@ -230,7 +230,6 @@ bool CQmlCodeMetaGeneratorComp::CloseFiles()
 	bool retVal = true;
 
 	retVal = retVal && m_qmlKeysFilePtr->flush();
-	Q_ASSERT(retVal);
 
 	m_qmlKeysFilePtr->close();
 

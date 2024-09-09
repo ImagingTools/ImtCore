@@ -402,7 +402,6 @@ bool CBaseClassExtenderComp::CloseFiles()
 	bool retVal = true;
 
 	retVal = m_headerFilePtr->flush();
-	Q_ASSERT(retVal);
 
 	m_headerFilePtr->close();
 
@@ -410,7 +409,6 @@ bool CBaseClassExtenderComp::CloseFiles()
 
 	const QString originalHeaderFilePath = QFileInfo(*m_originalHeaderFilePtr).absolutePath();
 	retVal = retVal && istd::CSystem::FileMove(m_headerFilePtr->fileName(), originalHeaderFilePath, true);
-	Q_ASSERT(retVal);
 
 	return retVal;
 }

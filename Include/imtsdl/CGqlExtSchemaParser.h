@@ -20,7 +20,7 @@ namespace imtsdl
 
 
 /**
-	Extend class for \class CGqlSchemaParser allows to process documentSchema
+	Extend class for \class CGqlSchemaParser allows to process undeclarated directives
 	\c documentSchema - is an IMT special derictive for generation base classes for GraphQL handlers
  */
 class CGqlExtSchemaParser:

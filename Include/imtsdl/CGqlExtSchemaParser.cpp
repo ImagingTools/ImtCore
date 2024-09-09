@@ -115,7 +115,15 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 		if (keyword == QByteArrayLiteral("ref")){
 			QByteArray typeRefName;
 			retVal = retVal && MoveToNextReadableSymbol() && ReadToDelimeterOrSpace("", typeRefName);
-			Q_ASSERT(!typeRefName.isEmpty());
+			if (typeRefName.isEmpty()){
+				SendLogMessage(
+							istd::IInformationProvider::IC_ERROR,
+							0,
+							QString("Reference for '%1' at %2").arg(documentType.GetName(), QString::number(m_lastReadLine + 1)),
+							__func__);
+				
+				return false;
+			}
 
 			auto foundIterator = std::find_if(m_sdlTypes.cbegin(), m_sdlTypes.cend(), [&typeRefName](const CSdlType& type){
 				return (type.GetName() == typeRefName);
@@ -126,7 +134,6 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 							0,
 							QString("Unable to find type '%1' at %2").arg(typeRefName, QString::number(m_lastReadLine + 1)),
 							__func__);
-				I_CRITICAL();
 
 				return false;
 			}

@@ -230,8 +230,6 @@ bool CQmlCodeCommandIdGeneratorComp::CloseFiles()
 	bool retVal = true;
 
 	retVal = retVal && m_qmlCommandsFilePtr->flush();
-	Q_ASSERT(retVal);
-
 	m_qmlCommandsFilePtr->close();
 
 	return retVal;
