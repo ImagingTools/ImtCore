@@ -30,7 +30,9 @@ void CWorker::ProcessRequest(const IRequest* request, const QByteArray& subComma
 			body.resize(100);
 			body += "...";
 		}
+
 		qDebug() << "Start process " << request->GetCommandId() << body;
+
 		ConstResponsePtr responsePtr = m_requestServletPtr->ProcessRequest(*request, subCommandId);
 		if (responsePtr.IsValid()){
 			const ISender* sender = m_workerThread->GetSender(request->GetRequestId());

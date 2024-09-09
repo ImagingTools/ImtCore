@@ -287,7 +287,7 @@ void CWebSocketServerComp::OnSslErrors(const QList<QSslError> &errors)
 		}
 		errorMessage += error.errorString();
 	}
-	errorMessage.prepend(QStringLiteral("Web socket server ssl errors: "));
+	errorMessage.prepend(QStringLiteral("Web socket server SSL-errors: "));
 
 	SendErrorMessage(0, errorMessage, "CWebSocketServerComp");
 	qDebug() << errorMessage << __func__;

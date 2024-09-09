@@ -27,10 +27,10 @@ QByteArray CDesignTokenSplitProcessorComp::GetHelpString() const
 
 int CDesignTokenSplitProcessorComp::Exec()
 {
-	if(m_argumentParserAttrPtr->IsSplitModeRequired())
+	if(m_argumentParserCompPtr->IsSplitModeRequired())
 	{
-		m_designTokenFileParserAttrPtr->SetFile(m_argumentParserAttrPtr->GetDesignTokenFilePath());
-		return bool(int(!m_designTokenFileParserAttrPtr->SplitFile(m_argumentParserAttrPtr->GetOutputDirectoryPath(), m_argumentParserAttrPtr->GetProjectName())));
+		m_designTokenFileParserCompPtr->SetFile(m_argumentParserCompPtr->GetDesignTokenFilePath());
+		return bool(int(!m_designTokenFileParserCompPtr->SplitFile(m_argumentParserCompPtr->GetOutputDirectoryPath(), m_argumentParserCompPtr->GetProjectName())));
 	}
 
 	return 0;

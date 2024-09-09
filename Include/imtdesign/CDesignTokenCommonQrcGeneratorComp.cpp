@@ -15,7 +15,7 @@ namespace imtdesign
 
 int CDesignTokenCommonQrcGeneratorComp::Exec()
 {
-	if(!m_argumentParserAttrPtr->IsCommonGenerateResourceRequired()){
+	if(!m_argumentParserCompPtr->IsCommonGenerateResourceRequired()){
 		return 0;
 	}
 
@@ -23,8 +23,8 @@ int CDesignTokenCommonQrcGeneratorComp::Exec()
 
 	QByteArray dirSeparator = QByteArray(1,QDir::separator().toLatin1());
 
-	QByteArray outputDirPath = m_argumentParserAttrPtr->GetOutputDirectoryPath();
-	QByteArray projectName = m_argumentParserAttrPtr->GetProjectName();
+	QByteArray outputDirPath = m_argumentParserCompPtr->GetOutputDirectoryPath();
+	QByteArray projectName = m_argumentParserCompPtr->GetProjectName();
 	QByteArray resourceDirPath = outputDirPath + dirSeparator + "Resources";
 	QVector<QByteArray> styles;
 

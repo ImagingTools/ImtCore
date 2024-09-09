@@ -26,8 +26,8 @@ public:
 
 	I_BEGIN_COMPONENT(CDesignTokenIconProcessorComp);
 		I_REGISTER_INTERFACE(IDesignTokenProcessor);
-		I_ASSIGN(m_argumentParserAttrPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
-		I_ASSIGN(m_designTokenFileParserAttrPtr, "DesignTokenFileParser", "Design token file parser", true, "IDesignTokenFileParser")
+		I_ASSIGN(m_argumentParserCompPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
+		I_ASSIGN(m_designTokenFileParserCompPtr, "DesignTokenFileParser", "Design token file parser", true, "IDesignTokenFileParser")
 	I_END_COMPONENT;
 
 	// reimplemented (IDesignTokenProcessor)
@@ -45,8 +45,8 @@ private:
 	constexpr static const char* s_suffixOnActive = "_On_Active";
 	constexpr static const char* s_suffixOnSelected = "_On_Selected";
 
-	I_REF(IDesignTokenArgumentsParser, m_argumentParserAttrPtr);
-	I_REF(IDesignTokenFileParser, m_designTokenFileParserAttrPtr);
+	I_REF(IDesignTokenArgumentsParser, m_argumentParserCompPtr);
+	I_REF(IDesignTokenFileParser, m_designTokenFileParserCompPtr);
 	
 	QByteArrayList m_templateIconColorList;
 	QMap<QByteArray/*template color*/,QByteArray> m_normalColor;
@@ -59,29 +59,30 @@ private:
 	QMap<QByteArray/*template color*/,QByteArray> m_onActiveColor;
 	QMap<QByteArray/*template color*/,QByteArray> m_onSelectedColor;
 
-	QByteArray m_inputDirName;
-	QByteArray m_inputFileName;
-	QByteArray m_outputDirName;
-	QByteArray m_projectName;
+	QString m_inputDirName;
+	QString m_inputFileName;
+	QString m_outputDirName;
+	QString m_projectName;
 	QFileInfo m_designTokenFileInfo;
 
-
 private:
-	QByteArray GetFileNameForState(const QByteArray& fileName, IDesignTokenFileParser::IconState iconState) const;
+	QByteArray GetFileNameForState(const QString& fileName, IDesignTokenFileParser::IconState iconState) const;
 
 	/**
 		sets new color in single image
 	*/
-	bool SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor) const;
+	bool SetColor(const QString& fileName, const QString& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor) const;
 
 	/**
 		sets all available colors for single images
 	*/
-	bool SetColorForAllModeState(const QByteArray& fileName, const QByteArray& outputDirName) const;
+	bool SetColorForAllModeState(const QString& fileName, const QString& outputDirName) const;
+
 	/**
 		sets all colors for all images in directory
 	*/
-	bool SetColorAllFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName) const;
+	bool SetColorAllFilesInDir(const QString& inputDirName, const QString& outputDirName) const;
+
 	/**
 		Checks for ignore some files e.g.? if it has suffix
 	*/

@@ -76,7 +76,8 @@ void CSocket::Abort()
 void CSocket::TimeOut()
 {
 	if (m_socket != nullptr){
-		qDebug() << m_socket->socketDescriptor() << " Time out";
+		qDebug() << "Connection time out: " << m_socket->socketDescriptor();
+
 		m_socket->abort();
 	}
 }
@@ -113,7 +114,8 @@ void CSocket::HandleReadyRead()
 
 	// Get state of request data:
 	if (!m_requestPtr->ParseDeviceData(*m_socket)){
-		qDebug() << "ParseDeviceData error";
+		qDebug() << "Data parsing failed";
+
 		m_socket->rollbackTransaction();
 
 		return;
@@ -138,7 +140,6 @@ void CSocket::HandleReadyRead()
 
 void CSocket::Disconnected()
 {
-	qDebug() << "Socket disconnect" << sender();
 	Q_EMIT m_rootSocket->SocketDisconnected(m_rootSocket->GetRequestId());
 }
 

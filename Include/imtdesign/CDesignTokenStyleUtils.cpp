@@ -208,7 +208,7 @@ bool SetVariableColor(QByteArray& data, const QPalette& palette)
 				QColor color = palette.color(colorGroup, colorRole);
 				QByteArray colorHex;
 				if(color.name() == "#000000"){
-					//						colorHex = m_designTokenFileParserAttrPtr->GetRawColor(m_currentTheme, colorGroup, colorRole);
+					//						colorHex = m_designTokenFileParserCompPtr->GetRawColor(m_currentTheme, colorGroup, colorRole);
 					if(!colorHex.length()){
 						colorHex = "#000000";
 					}

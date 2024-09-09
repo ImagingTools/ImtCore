@@ -39,7 +39,7 @@ protected:
 		ibase::IProgressManager* progressManagerPtr = NULL) override;
 
 protected:
-//	I_REF(IDdlCodeCreatorArgumentsParser, m_argumentParserAttrPtr);
+//	I_REF(IDdlCodeCreatorArgumentsParser, m_argumentParserCompPtr);
 };
 
 

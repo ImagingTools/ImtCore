@@ -27,7 +27,7 @@ public:
 	I_BEGIN_COMPONENT(CDesignTokenWebQrcGeneratorComp);
 		I_REGISTER_INTERFACE(IDesignTokenQrcUpdater);
 		I_REGISTER_INTERFACE(IDesignTokenProcessor);
-		I_ASSIGN(m_argumentParserAttrPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
+		I_ASSIGN(m_argumentParserCompPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
 
 	I_END_COMPONENT;
 
@@ -47,7 +47,7 @@ private:
 	QString GetPathOverFile(const QString& dir, const QString& file) const;
 
 private:
-	I_REF(IDesignTokenArgumentsParser, m_argumentParserAttrPtr);
+	I_REF(IDesignTokenArgumentsParser, m_argumentParserCompPtr);
 
 };
 

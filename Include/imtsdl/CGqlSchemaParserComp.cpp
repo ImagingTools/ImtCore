@@ -1,11 +1,11 @@
-#include "CGqlSchemaParserComp.h"
+#include <imtsdl/CGqlSchemaParserComp.h>
 
 
 // Qt includes
 #include <QtCore/QDir>
 #include <QtCore/QRegularExpression>
 
-// Acf includes
+// ACF includes
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
 #include <iprm/TParamsPtr.h>
@@ -18,13 +18,15 @@ namespace imtsdl
 
 // public static variables
 
-const QByteArray CGqlSchemaParserComp::s_processedFilesParamId		= QByteArrayLiteral("ProcessedFiles");
-const QByteArray CGqlSchemaParserComp::s_typeListParamId			= QByteArrayLiteral("TypeList");
-const QByteArray CGqlSchemaParserComp::s_requestListParamId			= QByteArrayLiteral("RequestList");
-const QByteArray CGqlSchemaParserComp::s_documentTypeListParamId	= QByteArrayLiteral("DocumentTypeList");
+const QByteArray CGqlSchemaParserComp::s_processedFilesParamId = QByteArrayLiteral("ProcessedFiles");
+const QByteArray CGqlSchemaParserComp::s_typeListParamId = QByteArrayLiteral("TypeList");
+const QByteArray CGqlSchemaParserComp::s_requestListParamId = QByteArrayLiteral("RequestList");
+const QByteArray CGqlSchemaParserComp::s_documentTypeListParamId = QByteArrayLiteral("DocumentTypeList");
 
 
 // public methods
+
+// reimplemented(iproc::IProcessor)
 
 int CGqlSchemaParserComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
@@ -32,6 +34,17 @@ int CGqlSchemaParserComp::DoProcessing(
 			istd::IChangeable* outputPtr,
 			ibase::IProgressManager* /*progressManagerPtr*/)
 {
+	/**
+		\param paramsPtr - unused
+		\param inputPtr (optional) of \c ifile::IFileNameParam if set, use it to parse schema or from \c ArgumentParser otherwise
+		\param outputPtr - (optional) of \c iprm::CParamsSet
+						- [ProcessedFiles]	(\c s_processedFilesParamId)	of \c iprm::IOptionsManager if set, will contain list of processed files(absolute path list)
+						- [TypeList]		(\c s_typeListParamId)			of \c iprm::CParamsSet of \c CSdlType - SDL type list extracted from schema
+						- [RequestList]		(\c s_requestListParamId)		of \c iprm::CParamsSet of \c CSdlRequest - SDL request list extracted from schema
+						- [DocumentTypeList](\c s_documentTypeListParamId)	of \c iprm::CParamsSet of \c CSdlDocumentType - SDL document type list extracted from schema
+		\param progressManagerPtr - unused
+	 */
+
 	m_currentSchemaFilePath.clear();
 	const ifile::IFileNameParam* schemaFilePathParamPtr = dynamic_cast<const ifile::IFileNameParam*>(inputPtr);
 	if (schemaFilePathParamPtr == nullptr && !m_argumentParserCompPtr.IsValid()){
@@ -97,6 +110,7 @@ int CGqlSchemaParserComp::DoProcessing(
 			}
 		}
 	}
+
 	m_processedFilesPtr = processedFilesPtr;
 
 	Q_ASSERT(!m_currentInputFilePtr.IsValid());
@@ -136,7 +150,8 @@ int CGqlSchemaParserComp::DoProcessing(
 	QFile outputFile(outputFileName);
 
 	if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)){
-		qDebug() << "Error: Cannot open output file";
+		SendErrorMessage(0, QString("Cannot open output file '%1'").arg(outputFileName));
+
 		return TS_INVALID;
 	}
 
@@ -148,7 +163,6 @@ int CGqlSchemaParserComp::DoProcessing(
 	m_currentInputFilePtr.SetPtr(new QFile(outputFileName));
 	if (!m_currentInputFilePtr->open(QIODevice::ReadOnly | QIODevice::Text)){
 		SendErrorMessage(0, QString("Unable to open file '%1'").arg(m_currentInputFilePtr->fileName()));
-		I_CRITICAL();
 
 		return TS_INVALID;
 	}
@@ -187,6 +201,8 @@ int CGqlSchemaParserComp::DoProcessing(
 	return TS_OK;
 }
 
+
+// protected methods
 
 QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(QString importDirective, const QStringList& searchPathList) const
 {
@@ -237,6 +253,7 @@ QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(QString importDirectiv
 	return foundFiles;
 }
 
+
 QString CGqlSchemaParserComp::FindFileInList(const QString& relativePath, const QStringList& searchPathList) const
 {
 	for (const QString& searchPath: searchPathList){
@@ -249,6 +266,7 @@ QString CGqlSchemaParserComp::FindFileInList(const QString& relativePath, const 
 
 	return QString();
 }
+
 
 QStringList CGqlSchemaParserComp::FindFilesFromDir(const QString& relativeDirPath, const QStringList& searchPathList) const
 {
@@ -273,7 +291,6 @@ QStringList CGqlSchemaParserComp::FindFilesFromDir(const QString& relativeDirPat
 
 bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFilesList)
 {
-
 	// process found files
 	for (const QString& schemaPath: std::as_const(importFilesList)){
 		istd::TDelPtr<iproc::IProcessor> newSchemaProcessor(m_fileSchemaParserCompFactPtr.CreateInstance());
@@ -464,7 +481,6 @@ bool CGqlSchemaParserComp::ProcessJavaStyleImports()
 }
 
 
-
 // reimplemented (CGqlExtSchemaParser)
 
 bool CGqlSchemaParserComp::ProcessSchemaImports()
@@ -483,5 +499,7 @@ bool CGqlSchemaParserComp::ProcessSchemaImports()
 	return ProcessJavaStyleImports();
 }
 
+
 } // namespace imtsdl
+
 

@@ -14,16 +14,16 @@ namespace imtdesign
 
 int CDesignTokenWebQrcGeneratorComp::Exec()
 {
-	if(!m_argumentParserAttrPtr->IsWebGenerateResourceRequired()){
+	if(!m_argumentParserCompPtr->IsWebGenerateResourceRequired()){
 		return 0;
 	}
 
 	QStringList typesOfResources = {"Icons"};
 	QByteArray dirSeparator = QByteArray(1,QDir::separator().toLatin1());
 
-	QByteArray outputDirPath = m_argumentParserAttrPtr->GetOutputDirectoryPath();
+	QByteArray outputDirPath = m_argumentParserCompPtr->GetOutputDirectoryPath();
 	QByteArray resourceDirPath = outputDirPath + dirSeparator + "Resources";
-	QByteArray projectName = m_argumentParserAttrPtr->GetProjectName();
+	QByteArray projectName = m_argumentParserCompPtr->GetProjectName();
 	QVector<QByteArray> styles;
 
 	QDir::Filters filters = QDir::Filter::Dirs;

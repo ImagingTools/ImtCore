@@ -25,8 +25,8 @@ public:
 
 	I_BEGIN_COMPONENT(CDesignTokenSplitProcessorComp);
 		I_REGISTER_INTERFACE(IDesignTokenProcessor);
-		I_ASSIGN(m_argumentParserAttrPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
-		I_ASSIGN(m_designTokenFileParserAttrPtr, "DesignTokenFileParser", "Design token file parser", true, "IDesignTokenFileParser")
+		I_ASSIGN(m_argumentParserCompPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
+		I_ASSIGN(m_designTokenFileParserCompPtr, "DesignTokenFileParser", "Design token file parser", true, "IDesignTokenFileParser")
 	I_END_COMPONENT;
 
 	// reimplemented (IDesignTokenProcessor)
@@ -35,8 +35,8 @@ public:
 
 
 private:
-	I_REF(IDesignTokenArgumentsParser, m_argumentParserAttrPtr);
-	I_REF(IDesignTokenFileParser, m_designTokenFileParserAttrPtr);
+	I_REF(IDesignTokenArgumentsParser, m_argumentParserCompPtr);
+	I_REF(IDesignTokenFileParser, m_designTokenFileParserCompPtr);
 
 };
 

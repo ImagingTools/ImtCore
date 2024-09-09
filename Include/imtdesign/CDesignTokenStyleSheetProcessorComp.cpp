@@ -30,25 +30,25 @@ QByteArray CDesignTokenStyleSheetProcessorComp::GetHelpString() const
 
 int CDesignTokenStyleSheetProcessorComp::Exec()
 {
-	if(m_argumentParserAttrPtr->GetStyleSheetsInputDirectoryPath().isEmpty()){
+	if(m_argumentParserCompPtr->GetStyleSheetsInputDirectoryPath().isEmpty()){
 		qDebug() << "Style sheets dir is not set skipping...";
 		return 0;
 	}
 
-	if(!QDir(m_argumentParserAttrPtr->GetStyleSheetsInputDirectoryPath()).isReadable()){
+	if(!QDir(m_argumentParserCompPtr->GetStyleSheetsInputDirectoryPath()).isReadable()){
 		return -1;
 	}
 
-	QByteArrayList designTokenFileMultiPath = m_argumentParserAttrPtr->GetDesignTokenFileMultiPath();
+	QByteArrayList designTokenFileMultiPath = m_argumentParserCompPtr->GetDesignTokenFileMultiPath();
 
 	for (QByteArray designTokenFilePath: designTokenFileMultiPath){
-		m_designTokenFileParserAttrPtr->SetFile(designTokenFilePath);
-		m_designTokenFileParserAttrPtr->ParseFile();
+		m_designTokenFileParserCompPtr->SetFile(designTokenFilePath);
+		m_designTokenFileParserCompPtr->ParseFile();
 	}
 
-	QVector<QByteArray> styles = m_designTokenFileParserAttrPtr->GetDesignSchemaList().GetElementIds();
-	m_outputDirName = m_argumentParserAttrPtr->GetOutputDirectoryPath();
-	m_inputDirName = m_argumentParserAttrPtr->GetStyleSheetsInputDirectoryPath();
+	QVector<QByteArray> styles = m_designTokenFileParserCompPtr->GetDesignSchemaList().GetElementIds();
+	m_outputDirName = m_argumentParserCompPtr->GetOutputDirectoryPath();
+	m_inputDirName = m_argumentParserCompPtr->GetStyleSheetsInputDirectoryPath();
 	if(!m_inputDirName.length()){
 		qInfo() << "Styles dir is not set skipping...";
 		return 0;
@@ -58,19 +58,19 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 		m_currentTheme = styleName;
 		QVariantMap palette;
 		QVariantMap currentBasePalette;
-		m_designTokenFileParserAttrPtr->GetStyleSheetColorPalette(styleName, palette);
-		m_designTokenFileParserAttrPtr->GetBasePalette(styleName, currentBasePalette);
+		m_designTokenFileParserCompPtr->GetStyleSheetColorPalette(styleName, palette);
+		m_designTokenFileParserCompPtr->GetBasePalette(styleName, currentBasePalette);
 		QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Styles") + QDir::separator().toLatin1() + styleName.constData();
 
 		m_currentPalette = palette;
 		m_currentBasePalette = currentBasePalette;
 
 		m_currentFontsCss.clear();
-		QVector<QByteArray> fonts = m_designTokenFileParserAttrPtr->GetFontList(styleName).GetElementIds();
+		QVector<QByteArray> fonts = m_designTokenFileParserCompPtr->GetFontList(styleName).GetElementIds();
 		for(const QByteArray& fontName: ::std::as_const(fonts)){
 			QFont font;
 			QByteArray cssFont;
-			m_designTokenFileParserAttrPtr->GetFont(styleName, fontName,font);
+			m_designTokenFileParserCompPtr->GetFont(styleName, fontName,font);
 			CDesignTokenStyleUtils::CreateCssFont(cssFont, font);
 			m_currentFontsCss[fontName] = cssFont;
 		}
@@ -215,7 +215,7 @@ bool CDesignTokenStyleSheetProcessorComp::SetVariableColor(QByteArray& data, con
 				QColor color = palette.color(colorGroup, colorRole);
 				QByteArray colorHex;
 				if(color.name() == "#000000"){
-					colorHex = m_designTokenFileParserAttrPtr->GetRawColor(m_currentTheme, colorGroup, colorRole);
+					colorHex = m_designTokenFileParserCompPtr->GetRawColor(m_currentTheme, colorGroup, colorRole);
 					if(!colorHex.length()){
 						colorHex = "#000000";
 					}

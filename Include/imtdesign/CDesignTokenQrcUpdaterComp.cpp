@@ -19,12 +19,12 @@ int CDesignTokenQrcUpdaterComp::Exec()
 
 	QByteArray dirSeparator = QByteArray(1,QDir::separator().toLatin1());
 
-	QByteArray outputDirName = m_argumentParserAttrPtr->GetOutputDirectoryPath();
-	QByteArray projectName = m_argumentParserAttrPtr->GetProjectName();
-	QByteArray designTokenFilePath = m_argumentParserAttrPtr->GetDesignTokenFilePath();
-	m_designTokenFileParserAttrPtr->SetFile(designTokenFilePath);
-	m_designTokenFileParserAttrPtr->ParseFile();
-	QVector<QByteArray> styles = m_designTokenFileParserAttrPtr->GetDesignSchemaList().GetElementIds();
+	QByteArray outputDirName = m_argumentParserCompPtr->GetOutputDirectoryPath();
+	QByteArray projectName = m_argumentParserCompPtr->GetProjectName();
+	QByteArray designTokenFilePath = m_argumentParserCompPtr->GetDesignTokenFilePath();
+	m_designTokenFileParserCompPtr->SetFile(designTokenFilePath);
+	m_designTokenFileParserCompPtr->ParseFile();
+	QVector<QByteArray> styles = m_designTokenFileParserCompPtr->GetDesignSchemaList().GetElementIds();
 
 	for (const QByteArray& styleName: ::std::as_const(styles)){
 		QStringList dirsForTheme;

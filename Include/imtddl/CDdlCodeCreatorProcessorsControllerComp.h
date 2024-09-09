@@ -17,7 +17,7 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDdlCodeCreatorProcessorsControllerComp);
-		I_ASSIGN(m_argumentParserAttrPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
+		I_ASSIGN(m_argumentParserCompPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
 		I_ASSIGN_MULTI_0(m_ddlProcessors, "DesignTokenProcessors", "Arguments Parser", true)
 	I_END_COMPONENT;
 
@@ -28,7 +28,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	I_REF(IDdlCodeCreatorArgumentsParser, m_argumentParserAttrPtr);
+	I_REF(IDdlCodeCreatorArgumentsParser, m_argumentParserCompPtr);
 	I_MULTIREF(iproc::IProcessor, m_ddlProcessors);
 };
 

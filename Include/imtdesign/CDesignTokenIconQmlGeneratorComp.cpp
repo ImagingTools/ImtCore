@@ -25,7 +25,7 @@ namespace imtdesign
 int CDesignTokenIconQmlGeneratorComp::Exec()
 {
 
-	if(!m_argumentParserAttrPtr->IsQmlGenerateRequired()){
+	if(!m_argumentParserCompPtr->IsQmlGenerateRequired()){
 		return 0;
 	}
 
@@ -36,8 +36,8 @@ int CDesignTokenIconQmlGeneratorComp::Exec()
 	QByteArray dirSeparator = QByteArray(1,QDir::separator().toLatin1());;
 	QDir::Filters filters = QDir::Filter::Files;
 	QDir::SortFlags sort = QDir::SortFlag::Name;
-	QByteArray outputFilePath = m_argumentParserAttrPtr->GetOutputFilePath();
-	QByteArrayList argumentsDirs = m_argumentParserAttrPtr->GetImagesInputDirectoryMultiPath();
+	QByteArray outputFilePath = m_argumentParserCompPtr->GetOutputFilePath();
+	QByteArrayList argumentsDirs = m_argumentParserCompPtr->GetImagesInputDirectoryMultiPath();
 	QFile outputFile(outputFilePath);
 	if (!outputFile.open(QFile::WriteOnly))
 	{
