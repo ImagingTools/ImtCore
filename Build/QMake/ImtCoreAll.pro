@@ -191,6 +191,10 @@ imtcontrolsqml.file = ../../Qml/imtcontrols/QMake/imtcontrolsqml.pro
 SUBDIRS += imtlicguiqml
 imtlicguiqml.file = ../../Qml/imtlicgui/QMake/imtlicguiqml.pro
 
+# SDL modules
+SUBDIRS += imtauthsdl
+imtauthsdl.file = ../../Sdl/imtauth/QMake/imtauthsdl.pro
+
 ######### Component packages
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
