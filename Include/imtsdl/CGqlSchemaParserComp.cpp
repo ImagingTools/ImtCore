@@ -46,10 +46,22 @@ int CGqlSchemaParserComp::DoProcessing(
 	 */
 
 	m_currentSchemaFilePath.clear();
+
+	if (!m_argumentParserCompPtr.IsValid()){
+		SendCriticalMessage(0, "Schema parser was not set");
+
+		return TS_INVALID;
+	}
+
+	if (inputPtr == nullptr) {
+		SendCriticalMessage(0, "Schema path was not provided");
+
+		return TS_INVALID;
+	}
+
 	const ifile::IFileNameParam* schemaFilePathParamPtr = dynamic_cast<const ifile::IFileNameParam*>(inputPtr);
-	if (schemaFilePathParamPtr == nullptr && !m_argumentParserCompPtr.IsValid()){
-		SendCriticalMessage(0, "Schema path param is not provided");
-		I_CRITICAL();
+	if (schemaFilePathParamPtr == nullptr){
+		SendCriticalMessage(0, "Invalid input type");
 
 		return TS_INVALID;
 	}
@@ -57,12 +69,12 @@ int CGqlSchemaParserComp::DoProcessing(
 	if (schemaFilePathParamPtr != nullptr){
 		m_currentSchemaFilePath = schemaFilePathParamPtr->GetPath();
 	}
-	else {
+	else{
 		m_currentSchemaFilePath = m_argumentParserCompPtr->GetSchemaFilePath();
 	}
+
 	if (m_currentSchemaFilePath.isEmpty()){
 		SendCriticalMessage(0, "Schema path is not provided");
-		I_CRITICAL();
 
 		return TS_INVALID;
 	}
@@ -123,7 +135,6 @@ int CGqlSchemaParserComp::DoProcessing(
 
 	if (!inputFile.open(QIODevice::ReadOnly)){
 		SendErrorMessage(0, QString("Unable to open file '%1'").arg(inputFile.fileName()));
-		I_CRITICAL();
 
 		return TS_INVALID;
 	}
@@ -311,25 +322,28 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 			QByteArrayList paramIdList = typeListParamsPtr->GetParamIds().values();
 
 			// sort IDs. We MUST preserve order (by id as int)
-			std::sort(paramIdList.begin(), paramIdList.end(), [](const QByteArray& first, const QByteArray& second){
-				bool isDigit = false;
+			std::sort(paramIdList.begin(), paramIdList.end(), [](const QByteArray& firstString, const QByteArray& secondString){
 				int firstDigit = 0;
 				int secondDigit = 0;
-				firstDigit = first.toInt(&isDigit);
-				if (isDigit){
-					secondDigit = second.toInt(&isDigit);
-				}
-				if (isDigit){
-					return firstDigit < secondDigit;
+
+				bool isFirstDigit = false;
+				firstDigit = firstString.toInt(&isFirstDigit);
+
+				if (isFirstDigit){
+					bool isSecondDigit = false;
+					secondDigit = secondString.toInt(&isSecondDigit);
+					if (isSecondDigit){
+						return firstDigit < secondDigit;
+					}
 				}
 
-				return first < second;
+				return firstString < secondString;
 			});
 
 			for (const QByteArray& paramId: paramIdList){
 				iprm::TParamsPtr<CSdlType> sdlTypeParam(typeListParamsPtr, paramId, true);
 				if (!sdlTypeParam.IsValid()){
-					SendCriticalMessage(0, "Import processing failed.");
+					SendCriticalMessage(0, "Import processing failed");
 
 					return false;
 				}
@@ -359,7 +373,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 			for (const QByteArray& paramId: paramIdList){
 				iprm::TParamsPtr<CSdlRequest> sdlRequestParam(requestListParamsPtr, paramId, true);
 				if (!sdlRequestParam.IsValid()){
-					SendCriticalMessage(0, "Import processing failed.");
+					SendCriticalMessage(0, "Import processing failed");
 
 					return false;
 				}
@@ -385,7 +399,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 			for (const QByteArray& paramId: paramIdList){
 				iprm::TParamsPtr<CSdlDocumentType> sdlDocumentTypeParam(documentTypeListParamsPtr, paramId, true);
 				if (!sdlDocumentTypeParam.IsValid()){
-					SendCriticalMessage(0, "Import processing failed.");
+					SendCriticalMessage(0, "Import processing failed");
 
 					return false;
 				}
@@ -486,8 +500,7 @@ bool CGqlSchemaParserComp::ProcessJavaStyleImports()
 bool CGqlSchemaParserComp::ProcessSchemaImports()
 {
 	if (!m_fileSchemaParserCompFactPtr.IsValid()){
-		SendCriticalMessage(0, "import is detected, but parser is not configured. (FileSchemaParserFactory) is not set");
-		I_CRITICAL();
+		SendCriticalMessage(0, "Import is detected, but file schema parser component was not configured. 'FileSchemaParserFactory' was not set");
 
 		return BaseClass::ProcessSchemaImports();
 	}
