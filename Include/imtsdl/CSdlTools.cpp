@@ -585,9 +585,9 @@ QString CSdlTools::GetNamespaceFromParamsOrArguments(
 }
 
 
-QStringList CSdlTools::GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName)
+QMap<QString, QString> CSdlTools::GetAutoJoinCppFilesSchema(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName)
 {
-	QStringList retVal;
+	QMap<QString, QString> retVal;
 
 	QString baseFilePath = baseDirPath;
 
@@ -612,10 +612,16 @@ QStringList CSdlTools::GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaP
 		baseFilePath += defaultName;
 	}
 
-	retVal << GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".h"));
-	retVal << GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".cpp"));
+	retVal.insert(ISdlProcessArgumentsParser::s_headerFileType, GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".h")));
+	retVal.insert(ISdlProcessArgumentsParser::s_sourceFileType, GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".cpp")));
 
 	return retVal;
+}
+
+
+QStringList CSdlTools::GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName)
+{
+	return GetAutoJoinCppFilesSchema(schemaParams, baseDirPath, defaultName).values();
 }
 
 

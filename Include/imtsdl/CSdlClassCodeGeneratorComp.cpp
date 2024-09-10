@@ -59,7 +59,11 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	const QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
+	const QString defaultName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
+	QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
+	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
+		joinRules = GetAutoJoinCppFilesSchema(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
+	}
 	const bool joinHeaders = joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType);
 	const bool joinSources = joinRules.contains(ISdlProcessArgumentsParser::s_sourceFileType);
 
@@ -71,7 +75,6 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 				return TS_INVALID;
 			}
 
-			const QString defaultName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
 			QStringList autoJoinFilePaths = GetAutoJoinedCppFilePaths(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
 			PrintFiles(std::cout, autoJoinFilePaths, m_argumentParserCompPtr->GetGeneratorType());
 		}
