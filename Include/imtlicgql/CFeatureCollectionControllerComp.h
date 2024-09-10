@@ -24,7 +24,7 @@ protected:
 	// reimplemented (sdl::imtlic::Features::CFeatureCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtlic::Features::CFeaturesListGqlRequest& featuresListRequest,
+				const sdl::imtlic::Features::CGetFeaturesListGqlRequest& featuresListRequest,
 				sdl::imtlic::Features::CFeatureItem& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
@@ -35,7 +35,7 @@ protected:
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::imtlic::Features::CFeatureItemGqlRequest& featureItemRequest,
+				const sdl::imtlic::Features::CGetFeatureItemGqlRequest& featureItemRequest,
 				sdl::imtlic::Features::CFeatureDataPayload& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool SetupGqlItem(

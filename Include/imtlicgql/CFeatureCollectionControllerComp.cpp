@@ -15,7 +15,7 @@ namespace imtlicgql
 
 bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtlic::Features::CFeaturesListGqlRequest& featuresListRequest,
+			const sdl::imtlic::Features::CGetFeaturesListGqlRequest& featuresListRequest,
 			sdl::imtlic::Features::CFeatureItem& representationObject,
 			QString& errorMessage) const
 {
@@ -43,7 +43,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
 
-	sdl::imtlic::Features::FeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
+	sdl::imtlic::Features::GetFeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.SetId(objectId);
@@ -134,7 +134,7 @@ istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentat
 
 bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const sdl::imtlic::Features::CFeatureItemGqlRequest& featureItemRequest,
+			const sdl::imtlic::Features::CGetFeatureItemGqlRequest& featureItemRequest,
 			sdl::imtlic::Features::CFeatureDataPayload& representationPayload,
 			QString& errorMessage) const
 {
@@ -146,7 +146,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtlic::Features::FeatureItemRequestArguments arguments = featureItemRequest.GetRequestedArguments();
+	sdl::imtlic::Features::GetFeatureItemRequestArguments arguments = featureItemRequest.GetRequestedArguments();
 
 	sdl::imtlic::Features::CFeatureData featureData;
 
