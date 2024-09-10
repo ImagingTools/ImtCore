@@ -173,9 +173,6 @@ bool CGqlSchemaParser::ProcessSchema()
 		else if (key == QByteArrayLiteral("subscription")){
 			m_keywordMap[KI_SUBSCRIPTION] = value;
 		}
-		else if (key == QByteArrayLiteral("version")){
-			m_schemaVersion = value;
-		}
 		else if (foundDelimiter == '}'){
 			// schema parsing is done nothing to do anymore
 		}

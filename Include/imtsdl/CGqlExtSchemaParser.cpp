@@ -1,8 +1,12 @@
 #include <imtsdl/CGqlExtSchemaParser.h>
 
 
-// imtsdl includes
+// ACF includes
+#include <iprm/CNameParam.h>
+
+// ImtCore includes
 #include <imtsdl/CSdlTools.h>
+
 
 
 namespace imtsdl
@@ -248,6 +252,27 @@ bool CGqlExtSchemaParser::ValidateSchema()
 		}
 	}
 	return true;
+}
+
+
+bool CGqlExtSchemaParser::ProcessCustomSchemaValue(const QString& key, const QString& value)
+{
+	static QStringList acceptableKeys = {
+				SdlCustomSchemaKeys::SchemaName,
+				SdlCustomSchemaKeys::SchemaNamespace,
+				SdlCustomSchemaKeys::VersionName
+	};
+
+	if (acceptableKeys.contains(key)){
+		iprm::CNameParam* nameParamPtr = new iprm::CNameParam;
+		nameParamPtr->SetName(value);
+		const bool isSet = m_customSchemaParams.SetEditableParameter(key.toUtf8(), nameParamPtr, true);
+		Q_ASSERT(isSet);
+
+		return isSet;
+	}
+
+	return BaseClass::ProcessCustomSchemaValue(key, value);
 }
 
 

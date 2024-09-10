@@ -26,6 +26,14 @@ enum KeyId
 };
 
 
+struct SdlCustomSchemaKeys
+{
+	static const inline QString SchemaName = QStringLiteral("name");
+	static const inline QString SchemaNamespace = QStringLiteral("namespace");
+	static const inline QString VersionName = QStringLiteral("version");
+};
+
+
 /**
 	\brief The QmldirModelParamIds struct defines param IDs of a QT QML module (qmldir) model
 */

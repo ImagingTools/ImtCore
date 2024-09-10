@@ -9,6 +9,8 @@
 
 // Acf includes
 #include <istd/ILogger.h>
+#include <iprm/CParamsSet.h>
+#include <imod/TModelWrap.h>
 
 // ImtCore includes
 #include <imtsdl/CGqlSchemaParser.h>
@@ -47,11 +49,13 @@ protected:
 	// reimplemented (CGqlSchemaParser)
 	virtual bool ProcessCustomSection(const QString& sectionName) override;
 	virtual bool ValidateSchema() override;
+	virtual bool ProcessCustomSchemaValue(const QString& key, const QString& value) override;
+
 
 protected:
 	SdlDocumentTypeList m_documentTypes;
 
-
+	imod::TModelWrap<iprm::CParamsSet> m_customSchemaParams;
 };
 
 

@@ -39,6 +39,9 @@ public:
 		I_REGISTER_INTERFACE(ISdlTypeListProvider)
 		I_REGISTER_INTERFACE(ISdlRequestListProvider)
 		I_REGISTER_INTERFACE(ISdlDocumentTypeListProvider)
+		I_REGISTER_SUBELEMENT(SchemaCustomParams)
+		I_REGISTER_SUBELEMENT_INTERFACE(SchemaCustomParams, iprm::IParamsSet, ExtractSchemaCustomParams);
+
 		I_ASSIGN(m_useFilesImportAttrPtr, "UseJavaStyleImport", "If enabled, all imports will be procesed by resloving paths in file a system", true, true)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", false, "ArgumentParser")
 		I_ASSIGN(m_fileSchemaParserCompFactPtr, "FileSchemaParserFactory", "Factory used to create shema parser", false, "FileSchemaParserFactory")
@@ -63,6 +66,14 @@ protected:
 
 	// reimplemented (CGqlExtSchemaParser)
 	virtual bool ProcessSchemaImports() override;
+
+private:
+	// static template methods for sub element access
+	template <class InterfaceType>
+	static InterfaceType* ExtractSchemaCustomParams(CGqlSchemaParserComp& component)
+	{
+		return &component.m_customSchemaParams;
+	}
 
 private:
 	I_ATTR(bool, m_useFilesImportAttrPtr);
