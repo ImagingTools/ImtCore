@@ -11,7 +11,7 @@
 //Acf includes
 #include <istd/CSystem.h>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/CSdlType.h>
 
 

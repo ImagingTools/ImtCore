@@ -3,7 +3,7 @@
 // Qt includes
 #include<QtCore/QtDebug>
 
-// Acf includes
+// ACF includes
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 

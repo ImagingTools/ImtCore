@@ -4,7 +4,7 @@
 // Qt includes
 #include <QtPositioning/QGeoCoordinate>
 
-// Acf includes
+// ACF includes
 #include <iser/CPrimitiveTypesSerializer.h>
 
 

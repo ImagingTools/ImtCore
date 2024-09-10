@@ -7,7 +7,7 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/CSdlField.h>
 
 

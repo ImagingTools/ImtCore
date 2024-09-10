@@ -4,7 +4,7 @@
 //Acf includes
 #include <istd/IPolymorphic.h>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/imtsdl.h>
 
 

@@ -4,7 +4,7 @@
 // Qt includes
 #include <QtCore/QList>
 
-// Acf includes
+// ACF includes
 #include <iqt/ITranslationManager.h>
 
 

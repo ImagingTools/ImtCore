@@ -6,7 +6,7 @@
 #include <QtCore/QCommandLineParser>
 #include <QtCore/QCommandLineOption>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/imtsdl.h>
 #include <imtsdl/CSdlTools.h>
 

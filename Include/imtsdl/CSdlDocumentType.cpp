@@ -1,6 +1,6 @@
 #include <imtsdl/CSdlDocumentType.h>
 
-// Acf includes
+// ACF includes
 #include <istd/CChangeNotifier.h>
 #include <iser/CArchiveTag.h>
 #include <iser/IArchive.h>

@@ -14,7 +14,7 @@
 #include <iprm/CNameParam.h>
 
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/imtsdl.h>
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlRequest.h>

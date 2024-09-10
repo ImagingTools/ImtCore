@@ -1,7 +1,7 @@
 #pragma once
 
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/CSdlClassModificatorBaseComp.h>
 
 

@@ -7,7 +7,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QVariant>
 
-// Acf includes
+// ACF includes
 #include <istd/ILogger.h>
 #include <iprm/CParamsSet.h>
 #include <imod/TModelWrap.h>

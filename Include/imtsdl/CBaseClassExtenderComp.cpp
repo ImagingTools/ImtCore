@@ -16,7 +16,7 @@
 // imtbase includes
 #include <imtbase/CTempDir.h>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/CSdlType.h>
 
 

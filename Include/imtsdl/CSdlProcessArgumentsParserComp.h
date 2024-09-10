@@ -1,11 +1,11 @@
 #pragma once
 
 
-// Acf includes
+// ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/IParamsSet.h>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 
 

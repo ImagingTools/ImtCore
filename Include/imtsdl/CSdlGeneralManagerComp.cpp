@@ -1,7 +1,7 @@
 #include "CSdlGeneralManagerComp.h"
 
 
-// Acf includes
+// ACF includes
 #include <iprm/TParamsPtr.h>
 #include <ifile/IFileNameParam.h>
 

@@ -4,11 +4,11 @@
 //Qt includes
 #include <QtCore/QFile>
 
-// Acf includes
+// ACF includes
 #include <istd/TDelPtr.h>
 #include <iproc/TSyncProcessorCompBase.h>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/CSdlTools.h>
 

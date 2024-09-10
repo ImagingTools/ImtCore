@@ -1,6 +1,6 @@
 #include <imtdesign/CDesignTokenSplitProcessorComp.h>
 
-// Acf includes
+// ACF includes
 #include <iprm/IParamsSet.h>
 #include <iprm/IEnableableParam.h>
 #include <iprm/IIdParam.h>

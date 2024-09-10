@@ -1,7 +1,7 @@
 #include "CGqlSchemaParser.h"
 
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/CSdlTools.h>
 
 

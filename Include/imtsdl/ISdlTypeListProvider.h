@@ -1,7 +1,7 @@
 #pragma once
 
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/imtsdl.h>
 #include <imtsdl/CSdlField.h>
 #include <imtsdl/CSdlType.h>

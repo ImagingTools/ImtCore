@@ -7,10 +7,10 @@
 #include <QtCore/QMap>
 #include <QtCore/QVariant>
 
-// Acf includes
+// ACF includes
 #include <istd/ILogger.h>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlRequestListProvider.h>
 #include <imtsdl/CSdlRequest.h>

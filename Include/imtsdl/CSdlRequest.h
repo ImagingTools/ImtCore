@@ -8,7 +8,7 @@
 #include <iser/ISerializable.h>
 #include <imod/CModelUpdateBridge.h>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/imtsdl.h>
 #include <imtsdl/CSdlField.h>
 

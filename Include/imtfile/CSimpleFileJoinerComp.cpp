@@ -8,7 +8,7 @@
 #include <QtCore/QDirIterator>
 #include <QtCore/QLockFile>
 
-// Acf includes
+// ACF includes
 #include <istd/CSystem.h>
 #include <iprm/TParamsPtr.h>
 #include <iprm/IOptionsList.h>

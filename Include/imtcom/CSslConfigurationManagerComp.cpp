@@ -7,7 +7,7 @@
 #include <QtNetwork/QSslKey>
 #include <QtNetwork/QSslCertificate>
 
-// Acf includes
+// ACF includes
 #include <iprm/TParamsPtr.h>
 #include <iprm/IEnableableParam.h>
 #include <iprm/INameParam.h>

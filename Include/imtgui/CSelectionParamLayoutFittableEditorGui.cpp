@@ -4,7 +4,7 @@
 // Qt includes
 #include <QtCore/QStringListModel>
 
-// Acf includes
+// ACF includes
 #include <iprm/IOptionsList.h>
 
 

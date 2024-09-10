@@ -4,7 +4,7 @@
 // Qt includes
 #include <QtCore/QRegularExpression>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/CSdlType.h>
 
 

@@ -14,7 +14,7 @@
 #include <iprm/CEnableableParam.h>
 #include <ifile/CFileNameParam.h>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtfile/CSimpleFileJoinerComp.h>
 #include <imtsdl/CSdlRequest.h>
 

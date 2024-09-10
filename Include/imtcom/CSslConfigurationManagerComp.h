@@ -6,7 +6,7 @@
 #include <QtNetwork/QSsl>
 #include <QtNetwork/QSslSocket>
 
-// Acf includes
+// ACF includes
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes

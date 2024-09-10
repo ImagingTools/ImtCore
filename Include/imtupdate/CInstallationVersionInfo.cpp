@@ -1,7 +1,7 @@
 #include<imtupdate/CInstallationVersionInfo.h>
 
 
-// Acf includes
+// ACF includes
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 

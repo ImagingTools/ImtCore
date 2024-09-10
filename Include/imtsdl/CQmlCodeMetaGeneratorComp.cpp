@@ -12,7 +12,7 @@
 #include <iprm/CEnableableParam.h>
 #include <iprm/CNameParam.h>
 
-// imtsdl includes
+// ImtCore includes
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CQmldirFilePersistenceComp.h>
 
