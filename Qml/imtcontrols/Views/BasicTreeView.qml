@@ -6,7 +6,6 @@ BasicTableView {
     id: treeViewRoot;
 
     property int shiftLevel: 15;
-
     property bool tristate: false;
 
     rowDelegate: Component {

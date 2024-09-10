@@ -5,6 +5,9 @@ import imtlicgui 1.0
 import imtcolgui 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtlicLicensesSdl 1.0
+import imtlicProductsSdl 1.0
+import imtlicFeaturesSdl 1.0
 
 ViewBase {
     id: root;
@@ -12,6 +15,8 @@ ViewBase {
     property TreeItemModel allFeaturesModel: CachedFeatureCollection.collectionModel
     property TreeItemModel featuresModel: TreeItemModel {}
     property TreeItemModel licensesModel: TreeItemModel {}
+
+    property LicenseData licenseData: model ? model : null;
 
     Component.onCompleted: {
         CachedFeatureCollection.updateModel();
@@ -30,135 +35,111 @@ ViewBase {
     }
 
     function updateModel(){
-        root.model.setData("LicenseName", licenseNameInput.text);
-        root.model.setData("LicenseId", licenseIdInput.text);
-        root.model.setData("LicenseDescription", descriptionInput.text);
+        licenseData.m_name = licenseNameInput.text;
+        licenseData.m_licenseId = licenseIdInput.text;
+        licenseData.m_description = descriptionInput.text;
 
         if (productsCB.currentIndex >= 0 && productsCB.model){
-            let productId = productsCB.model.getData("Id", productsCB.currentIndex);
-            root.model.setData("ProductId", productId);
+            let productId = productsCB.model.getData(ProductItemTypeMetaInfo.s_id, productsCB.currentIndex);
+            licenseData.m_productId = productId;
         }
         else{
-            root.model.setData("ProductId", "")
+            licenseData.m_productId = "";
         }
 
         let indexes = featuresTable.getCheckedItems();
         if (indexes.length > 0 && featuresTable.elements){
             let featuresIds = [];
             for (let index of indexes){
-                let featureId = featuresTable.elements.getData("Id", index);
+                let featureId = featuresTable.elements.getData(FeatureItemTypeMetaInfo.s_id, index);
                 featuresIds.push(featureId);
             }
 
-            root.model.setData("Features", featuresIds.join(';'));
+            licenseData.m_features = featuresIds.join(';');
         }
         else{
-            root.model.setData("Features", "");
+            licenseData.m_features = "";
         }
 
         let licensesIndexes = licensesTable.getCheckedItems();
         if (licensesIndexes.length > 0 && licensesTable.elements){
             let licenseIds = [];
             for (let index of licensesIndexes){
-                let id = licensesTable.elements.getData("Id", index);
+                let id = licensesTable.elements.getData(LicenseItemTypeMetaInfo.s_id, index);
                 licenseIds.push(id);
             }
 
-            root.model.setData("ParentLicenses", licenseIds.join(';'));
+            licenseData.m_parentLicenses = licenseIds.join(';');
         }
         else{
-            root.model.setData("ParentLicenses", "");
+            licenseData.m_parentLicenses = "";
         }
     }
 
     function updateGui(){
-        if (root.model.containsKey("LicenseId")){
-            licenseIdInput.text = root.model.getData("LicenseId")
-        }
+        licenseIdInput.text = licenseData.m_licenseId;
+        licenseNameInput.text = licenseData.m_name;
+        descriptionInput.text = licenseData.m_description;
 
-        if (root.model.containsKey("LicenseName")){
-            licenseNameInput.text = root.model.getData("LicenseName")
-        }
+        productsCB.currentIndex = -1;
 
-        if (root.model.containsKey("LicenseDescription")){
-            descriptionInput.text = root.model.getData("LicenseDescription")
-        }
-
-        let productFound = false;
-
-        if (root.model.containsKey("ProductId")){
-            let productId = root.model.getData("ProductId");
-            if (productsCB.model){
-                let productModel = productsCB.model;
-                for (let i = 0; i < productModel.getItemsCount(); i++){
-                    let id = productModel.getData("Id", i);
-                    if (id === productId){
-                        productsCB.currentIndex = i;
-                        productFound = true;
-                        break;
-                    }
+        let productId = licenseData.m_productId;
+        if (productsCB.model){
+            let productModel = productsCB.model;
+            for (let i = 0; i < productModel.getItemsCount(); i++){
+                let id = productModel.getData(ProductItemTypeMetaInfo.s_id, i);
+                if (id === productId){
+                    productsCB.currentIndex = i;
+                    break;
                 }
             }
         }
 
-        if (!productFound){
-            productsCB.currentIndex = -1;
-        }
-        else{
+        if (productsCB.currentIndex >= 0){
             updateFeaturesModel();
             updateLicensesModel();
         }
 
-        if (root.model.containsKey("Features")){
-            let licenseFeatures = root.model.getData("Features");
-            let licenseFeatureIds = licenseFeatures.split(';');
+        let licenseFeatures = licenseData.m_features;
+        let licenseFeatureIds = licenseFeatures.split(';');
 
-            featuresTable.uncheckAll();
+        featuresTable.uncheckAll();
 
-            if (featuresTable.elements){
-                for (let i = 0; i < featuresTable.elements.getItemsCount(); i++){
-                    let id = featuresTable.elements.getData("Id", i);
-                    console.log("id", id);
-
-                    if (licenseFeatureIds.includes(id)){
-                        console.log("ok", id);
-
-                        featuresTable.checkItem(i);
-                    }
+        if (featuresTable.elements){
+            for (let i = 0; i < featuresTable.elements.getItemsCount(); i++){
+                let id = featuresTable.elements.getData(FeatureItemTypeMetaInfo.s_id, i);
+                if (licenseFeatureIds.includes(id)){
+                    featuresTable.checkItem(i);
                 }
             }
         }
 
-        if (root.model.containsKey("ParentLicenses")){
-            let licenses = root.model.getData("ParentLicenses");
-            let licenseIds = licenses.split(';');
+        let licenses = licenseData.m_parentLicenses;
+        let licenseIds = licenses.split(';');
 
-            licensesTable.uncheckAll();
+        licensesTable.uncheckAll();
 
-            if (licensesTable.elements){
-                for (let i = 0; i < licensesTable.elements.getItemsCount(); i++){
-                    let id = licensesTable.elements.getData("Id", i);
-                    if (licenseIds.includes(id)){
-                        licensesTable.checkItem(i);
-                    }
+        if (licensesTable.elements){
+            for (let i = 0; i < licensesTable.elements.getItemsCount(); i++){
+                let id = licensesTable.elements.getData(LicenseItemTypeMetaInfo.s_id, i);
+                if (licenseIds.includes(id)){
+                    licensesTable.checkItem(i);
                 }
             }
         }
     }
 
     function updateLicensesGui(){
-        if (root.model.containsKey("ParentLicenses")){
-            let licenses = root.model.getData("ParentLicenses");
-            let licenseIds = licenses.split(';');
+        let licenses = licenseData.m_parentLicenses;
+        let licenseIds = licenses.split(';');
 
-            licensesTable.uncheckAll();
+        licensesTable.uncheckAll();
 
-            if (licensesTable.elements){
-                for (let i = 0; i < licensesTable.elements.getItemsCount(); i++){
-                    let id = licensesTable.elements.getData("Id", i);
-                    if (licenseIds.includes(id)){
-                        licensesTable.checkItem(i);
-                    }
+        if (licensesTable.elements){
+            for (let i = 0; i < licensesTable.elements.getItemsCount(); i++){
+                let id = licensesTable.elements.getData(LicenseItemTypeMetaInfo.s_id, i);
+                if (licenseIds.includes(id)){
+                    licensesTable.checkItem(i);
                 }
             }
         }
@@ -170,20 +151,18 @@ ViewBase {
         root.licensesModel.clear();
 
         if (productsCB.currentIndex >= 0 && productsCB.model){
-            let productId = productsCB.model.getData("Id", productsCB.currentIndex);
+            let productId = productsCB.model.getData(ProductItemTypeMetaInfo.s_id, productsCB.currentIndex);
 
             for (let i = 0; i < CachedLicenseCollection.collectionModel.getItemsCount(); i++){
-                let id = CachedLicenseCollection.collectionModel.getData("Id", i)
-                let licenses = CachedLicenseCollection.collectionModel.getData("ParentLicenses", i)
+                let id = CachedLicenseCollection.collectionModel.getData(LicenseItemTypeMetaInfo.s_id, i)
+                let licenses = CachedLicenseCollection.collectionModel.getData(LicenseItemTypeMetaInfo.s_parentLicenses, i)
 
-                if (root.model.containsKey("Id")){
-                    let currentObjectId = root.model.getData("Id")
-                    if (id === currentObjectId || licenses.split(';').includes(currentObjectId)){
-                        continue;
-                    }
+                let currentObjectId = licenseData.m_id;
+                if (id === currentObjectId || licenses.split(';').includes(currentObjectId)){
+                    continue;
                 }
 
-                let productUuid = CachedLicenseCollection.collectionModel.getData("ProductUuid", i)
+                let productUuid = CachedLicenseCollection.collectionModel.getData(LicenseItemTypeMetaInfo.s_productUuid, i)
                 if (productUuid === productId){
                     let index = root.licensesModel.insertNewItem();
 
@@ -200,11 +179,11 @@ ViewBase {
         root.featuresModel.clear();
 
         if (productsCB.currentIndex >= 0){
-            let features = productsCB.model.getData("Features", productsCB.currentIndex);
+            let features = productsCB.model.getData(ProductItemTypeMetaInfo.s_features, productsCB.currentIndex);
             let featureIds = features.split(';');
 
             for (let i = 0; i < root.allFeaturesModel.getItemsCount(); i++){
-                let featureId = root.allFeaturesModel.getData("Id", i)
+                let featureId = root.allFeaturesModel.getData(FeatureItemTypeMetaInfo.s_id, i)
                 if (featureIds.includes(featureId)){
                     let index = root.featuresModel.insertNewItem();
 
@@ -217,18 +196,16 @@ ViewBase {
     }
 
     function updateFeaturesGui(){
-        if (root.model.containsKey("Features")){
-            let licenseFeatures = root.model.getData("Features");
-            let licenseFeatureIds = licenseFeatures.split(';');
-            featuresTable.uncheckAll();
+        let licenseFeatures = licenseData.m_features;
+        let licenseFeatureIds = licenseFeatures.split(';');
+        featuresTable.uncheckAll();
 
-            if (featuresTable.elements){
-                for (let i = 0; i < featuresTable.elements.getItemsCount(); i++){
-                    let id = featuresTable.elements.getData("Id", i);
+        if (featuresTable.elements){
+            for (let i = 0; i < featuresTable.elements.getItemsCount(); i++){
+                let id = featuresTable.elements.getData(FeatureItemTypeMetaInfo.s_id, i);
 
-                    if (licenseFeatureIds.includes(id)){
-                        featuresTable.checkItem(i);
-                    }
+                if (licenseFeatureIds.includes(id)){
+                    featuresTable.checkItem(i);
                 }
             }
         }
@@ -480,12 +457,12 @@ ViewBase {
 
         let index = licensesHeaders.insertNewItem();
 
-        licensesHeaders.setData("Id", "LicenseName", index);
+        licensesHeaders.setData("Id", LicenseDataTypeMetaInfo.s_licenseName, index);
         licensesHeaders.setData("Name", qsTr("License Name"), index);
 
         index = licensesHeaders.insertNewItem();
 
-        licensesHeaders.setData("Id", "LicenseId", index);
+        licensesHeaders.setData("Id", LicenseDataTypeMetaInfo.s_licenseId, index);
         licensesHeaders.setData("Name", qsTr("License-ID"), index);
 
         licensesHeaders.refresh();
@@ -498,7 +475,7 @@ ViewBase {
 
         let index = featuresHeaders.insertNewItem();
 
-        featuresHeaders.setData("Id", "FeatureName", index);
+        featuresHeaders.setData("Id", FeatureItemTypeMetaInfo.s_featureName, index);
         featuresHeaders.setData("Name", qsTr("Feature Name"), index);
 
         featuresHeaders.refresh();

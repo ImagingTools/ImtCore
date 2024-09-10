@@ -17,7 +17,7 @@ ElementView {
             id: treeView;
 
             width: root.contentWidth;
-            height: 600;
+            height: contentHeight;
 
             headerVisible: false;
 

@@ -119,9 +119,9 @@ RemoteCollectionView {
         GqlRequestDocumentDataController {
             id: requestDocumentDataController
 
-            gqlGetCommandId: ImtCoreRolesSdlCommandIds.s_roleItem;
-            gqlUpdateCommandId: ImtCoreRolesSdlCommandIds.s_roleUpdate;
-            gqlAddCommandId: ImtCoreRolesSdlCommandIds.s_roleAdd;
+            gqlGetCommandId: ImtauthRolesSdlCommandIds.s_roleItem;
+            gqlUpdateCommandId: ImtauthRolesSdlCommandIds.s_roleUpdate;
+            gqlAddCommandId: ImtauthRolesSdlCommandIds.s_roleAdd;
 
             Component.onCompleted: {
                 getRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);

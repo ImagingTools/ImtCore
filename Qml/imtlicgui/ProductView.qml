@@ -3,6 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtauthgui 1.0
 import imtcontrols 1.0
+import imtlicProductsSdl 1.0
 
 ViewBase {
     id: productViewContainer;
@@ -12,6 +13,8 @@ ViewBase {
     property TreeItemModel productFeaturesViewModel: TreeItemModel {}
 
     property alias tableView: tableView_;
+
+    property ProductData productData: model ? model : null;
 
     Component.onCompleted: {
         CachedFeatureCollection.updateModel();
@@ -60,49 +63,30 @@ ViewBase {
     }
 
     function updateModel(){
-        productViewContainer.model.setData("ProductName", productNameInput.text);
-
-        let productId = productNameInput.text.replace(/\s+/g, '');
-        productViewContainer.model.setData("ProductId", productId);
+        productData.m_productName = productNameInput.text;
+        productData.m_productId = productNameInput.text.replace(/\s+/g, '');
 
         if (categoryComboBox.currentIndex == 0){
-            productViewContainer.model.setData("CategoryId", "Software");
+            productData.m_categoryId = "Software";
         }
         else if (categoryComboBox.currentIndex == 1){
-            productViewContainer.model.setData("CategoryId", "Hardware");
+            productData.m_categoryId = "Hardware";
         }
         else{
-            productViewContainer.model.setData("CategoryId", "");
-        }
-
-        if (!productViewContainer.model.containsKey("Features")){
-            productViewContainer.model.setData("Features", "");
+            productData.m_categoryId = "";
         }
     }
 
     function updateGui(){
-        if (productViewContainer.model.containsKey("ProductName")){
-            productNameInput.text = productViewContainer.model.getData("ProductName")
-        }
-        else{
-            productNameInput.text = "";
-        }
+        productNameInput.text = productData.m_productName;
 
-        let categoryFound = false;
-        if (productViewContainer.model.containsKey("CategoryId")){
-            let categoryId = productViewContainer.model.getData("CategoryId")
-            if (categoryId === "Software"){
-                categoryComboBox.currentIndex = 0;
-                categoryFound = true;
-            }
-            else if (categoryId === "Hardware"){
-                categoryComboBox.currentIndex = 1;
-                categoryFound = true;
-            }
+        categoryComboBox.currentIndex = -1;
+        let categoryId = productData.m_categoryId;
+        if (categoryId === "Software"){
+            categoryComboBox.currentIndex = 0;
         }
-
-        if (!categoryFound){
-            categoryComboBox.currentIndex = -1;
+        else if (categoryId === "Hardware"){
+            categoryComboBox.currentIndex = 1;
         }
 
         updateFeaturesGui();
@@ -111,7 +95,7 @@ ViewBase {
     function updateFeaturesGui(){
         productViewContainer.productFeaturesViewModel.clear();
 
-        let features = productViewContainer.model.getData("Features")
+        let features = productData.m_features;
         if (!features){
             return;
         }
@@ -143,7 +127,7 @@ ViewBase {
     }
 
     function addFeature(featureId){
-        let features = productViewContainer.model.getData("Features")
+        let features = productData.m_features;
 
         let featureIds = []
         if (features !== ""){
@@ -154,11 +138,11 @@ ViewBase {
             featureIds.push(featureId)
         }
 
-        productViewContainer.model.setData("Features", featureIds.join(';'))
+        productData.m_features = featureIds.join(';');
     }
 
     function removeFeature(featureId){
-        let features = productViewContainer.model.getData("Features")
+        let features = productData.m_features;
 
         let featureIds = []
 
@@ -171,7 +155,7 @@ ViewBase {
             featureIds.splice(i, 1);
         }
 
-        productViewContainer.model.setData("Features", featureIds.join(';'))
+        productData.m_features = featureIds.join(';');
     }
 
     TreeItemModel {

@@ -59,58 +59,25 @@ Rectangle {
     }
 
     Component {
-        id: baseControlComp
+        id: baseControlComp;
 
-        Item {
-            id: item;
+        ToolButton {
+            id: openButton;
 
-            width: commands.width + commands.anchors.rightMargin;
-            height: 30;
+            anchors.verticalCenter: parent.verticalCenter;
+            anchors.right: parent.right;
+            anchors.rightMargin: Style.size_mainMargin;
 
-            TreeItemModel {
-                id: commandsModel;
+            height: 22;
+            width: height;
+            visible: root.groupView != null
 
-                property bool completed: false;
+            iconSource: root.opened
+                        ? "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal)
+                        : "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
 
-                Component.onCompleted: {
-                    let index = commandsModel.insertNewItem();
-                    commandsModel.setData("Id", "Up", index);
-                    commandsModel.setData("Icon", "Icons/Up", index);
-                    commandsModel.setData("TooltipText", qsTr("Up"), index);
-                    commandsModel.setData("Visible", root.opened, index);
-                    commandsModel.setData("IsEnabled", true, index);
-
-                    index = commandsModel.insertNewItem();
-                    commandsModel.setData("Id", "Down", index);
-                    commandsModel.setData("Icon", "Icons/Down", index);
-                    commandsModel.setData("TooltipText", qsTr("Down"), index);
-                    commandsModel.setData("Visible", !root.opened, index);
-                    commandsModel.setData("IsEnabled", true, index);
-
-                    commands.commandModel = commandsModel
-                }
-            }
-
-            SimpleCommandsDecorator {
-                id: commands;
-
-                anchors.right: parent.right;
-                height: 30;
-                visible: root.groupView != null
-
-                onCommandActivated: {
-                    if (commandId == "Up"){
-                        root.opened = true
-                        setCommandVisible("Up", false)
-                        setCommandVisible("Down", true)
-                    }
-                    else if (commandId == "Down"){
-                        root.opened = false
-                        setCommandVisible("Up", true)
-                        setCommandVisible("Down", false)
-                    }
-
-                }
+            onClicked: {
+                root.opened = !root.opened;
             }
         }
     }

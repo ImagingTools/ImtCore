@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import imtCoreGroupsSdl 1.0
+import imtauthGroupsSdl 1.0
 
 ViewBase {
     id: container;

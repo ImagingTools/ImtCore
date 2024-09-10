@@ -1,0 +1,85 @@
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+import {
+    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+}
+
+input FeaturesListInput {
+    viewParams: CollectionViewParams
+}
+
+type FeatureItem {
+    Id: ID!
+	Name: String!
+	FeatureName: String!
+	TypeId: ID!
+	FeatureId: ID!
+	Description: String
+	Optional: Bool
+	Dependencies: ID
+	SubFeatures: String
+	Added: String
+	LastModified: String
+}
+
+type FeaturesListPayload {
+    items: [FeatureItem]
+	notification: NotificationItem
+}
+
+type FeatureData {
+	Id: ID!
+	FeatureId: ID!
+	Name: String!
+	FeatureName: String!
+	Description: String
+	Optional: Bool
+	Dependencies: ID
+	SubFeatures: String
+}
+
+input FeatureDataInput {
+	Id: ID!
+	Item: FeatureData!
+}
+
+type FeatureDataPayload {
+    FeatureData: FeatureData
+}
+
+input FeatureItemInput {
+    Id: ID!
+}
+
+type Query {
+    FeaturesList (input:FeaturesListInput): FeaturesListPayload!
+	FeatureItem (input: FeatureItemInput): FeatureDataPayload!
+}
+
+type Mutation {
+    FeatureUpdate (input: FeatureDataInput): UpdatedNotificationPayload!
+	FeatureAdd (input: FeatureDataInput): AddedNotificationPayload!
+}
+
+collectionSchema {
+    type Feature {
+	    ref: FeatureItem
+		operations {
+		    list: FeaturesList
+		}
+		subtype Feature {
+		    ref: FeatureData
+			operations {
+			    get: FeatureItem
+				update: FeatureUpdate
+				insert: FeatureAdd
+			}
+		}
+	}
+}
+
+

@@ -107,7 +107,7 @@ DecoratorBase {
                     ToolButton {
                         id: clearButton;
                         anchors.verticalCenter: parent.verticalCenter;
-                        width: 15;
+                        width: 13;
                         height: width;
                         iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.Off, Icon.Mode.Disabled)
                         visible: rect.filterEnabled;
@@ -120,7 +120,7 @@ DecoratorBase {
                         decorator: Component {
                             ToolButtonDecorator {
                                 color: "transparent";
-                                icon.width: 16;
+                                icon.width: clearButton.width;
                                 textColor: "white";
                             }
                         }
@@ -129,7 +129,7 @@ DecoratorBase {
                     ToolButton {
                         id: downButton;
                         anchors.verticalCenter: parent.verticalCenter;
-                        width: 15;
+                        width: 13;
                         height: width;
                         iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
                         visible: !rect.filterEnabled;
@@ -139,7 +139,7 @@ DecoratorBase {
                         decorator: Component {
                             ToolButtonDecorator {
                                 color: "transparent";
-                                icon.width: 16;
+                                icon.width: downButton.width;
                             }
                         }
                     }

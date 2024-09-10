@@ -3,7 +3,7 @@ import Acf 1.0
 import imtauthgui 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-
+import imtlicFeaturesSdl 1.0
 
 ViewBase {
     id: featureEditor;
@@ -12,6 +12,8 @@ ViewBase {
 
     property string featureId: "";
     property alias tableView: tableView_;
+
+    property FeatureData featureData: model ? model : null;
 
     property Component treeItemModelComp: Component {
         TreeItemModel {}

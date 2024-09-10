@@ -6,6 +6,7 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
+import imtlicLicensesSdl 1.0
 
 RemoteCollectionView {
     id: root;
@@ -24,7 +25,7 @@ RemoteCollectionView {
 
     Component.onCompleted: {
         collectionFilter.setSortingOrder("DESC");
-        collectionFilter.setSortingInfoId("LastModified");
+        collectionFilter.setSortingInfoId(LicenseItemTypeMetaInfo.s_lastModified);
 
         let documentManager = MainDocumentManager.getDocumentManager(root.collectionId);
         if (documentManager){
@@ -58,10 +59,22 @@ RemoteCollectionView {
     Component {
         id: dataControllerComp;
 
-        GqlDocumentDataController {
-            gqlGetCommandId: "LicenseItem";
-            gqlUpdateCommandId: "LicenseUpdate";
-            gqlAddCommandId: "LicenseAdd";
+        GqlRequestDocumentDataController {
+            id: requestDocumentDataController
+
+            gqlGetCommandId: ImtlicLicensesSdlCommandIds.s_licenseItem;
+            gqlUpdateCommandId: ImtlicLicensesSdlCommandIds.s_licenseUpdate;
+            gqlAddCommandId: ImtlicLicensesSdlCommandIds.s_licenseAdd;
+
+            documentModelComp: Component {
+                LicenseData {}
+            }
+
+            payloadModel: LicenseDataPayload {
+                onFinished: {
+                    requestDocumentDataController.documentModel = m_licenseData;
+                }
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
+import imtlicFeaturesSdl 1.0
 
 RemoteCollectionView {
     id: featureCollectionViewContainer;
@@ -24,7 +25,7 @@ RemoteCollectionView {
 
     Component.onCompleted: {
         collectionFilter.setSortingOrder("DESC");
-        collectionFilter.setSortingInfoId("LastModified");
+        collectionFilter.setSortingInfoId(FeatureItemTypeMetaInfo.s_lastModified);
 
         let documentManager = MainDocumentManager.getDocumentManager(featureCollectionViewContainer.collectionId);
         if (documentManager){
@@ -87,10 +88,22 @@ RemoteCollectionView {
     Component {
         id: dataControllerComp;
 
-        GqlDocumentDataController {
-            gqlGetCommandId: "FeatureItem";
-            gqlUpdateCommandId: "FeatureUpdate";
-            gqlAddCommandId: "FeatureAdd";
+        GqlRequestDocumentDataController {
+            id: requestDocumentDataController
+
+            gqlGetCommandId: ImtlicFeaturesSdlCommandIds.s_featureItem;
+            gqlUpdateCommandId: ImtlicFeaturesSdlCommandIds.s_featureUpdate;
+            gqlAddCommandId: ImtlicFeaturesSdlCommandIds.s_featureAdd;
+
+            documentModelComp: Component {
+                FeatureData {}
+            }
+
+            payloadModel: FeatureDataPayload {
+                onFinished: {
+                    requestDocumentDataController.documentModel = m_featureData;
+                }
+            }
         }
     }
 }

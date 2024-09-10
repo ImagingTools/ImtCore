@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import imtCoreRolesSdl 1.0
+import imtauthRolesSdl 1.0
 
 ViewBase {
     id: container;
@@ -149,6 +149,7 @@ ViewBase {
                     id: parentRolesTable;
 
                     name: qsTr("Parent Roles");
+                    visible: parentRolesTable.table ? parentRolesTable.table.elementsCount > 0 : false;
 
                     KeyNavigation.tab: permissionsGroup;
                     KeyNavigation.backtab: descriptionInput;

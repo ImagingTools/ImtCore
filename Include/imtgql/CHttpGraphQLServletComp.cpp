@@ -162,9 +162,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 				errorItemModelPtr->SetData("type", errorType);
 			}
 
-			QString servletErrorMessage = QString("Unable to create a response for the command: '%1'. Info:'%2'.").arg(qPrintable(gqlCommand)).arg(errorMessage);
-			SendErrorMessage(0, servletErrorMessage, "GraphQL - servlet");
-
 			iser::CJsonMemWriteArchive archive(responseData);
 			if (!rootModel.SerializeModel(archive)){
 				isSuccessful = false;

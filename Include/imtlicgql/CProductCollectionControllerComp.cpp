@@ -19,116 +19,274 @@ namespace imtlicgql
 
 // protected methods
 
-// reimplemented (imtgql::CObjectCollectionControllerCompBase)
+// reimplemented (sdl::imtlic::Products::CProductCollectionControllerCompBase)
 
-bool CProductCollectionControllerComp::SetupGqlItem(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
-			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-			QString& /*errorMessage*/) const
+bool CProductCollectionControllerComp::CreateRepresentationFromObject(
+			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
+			const sdl::imtlic::Products::CProductsListGqlRequest& productsListRequest,
+			sdl::imtlic::Products::CProductItem& representationObject,
+			QString& errorMessage) const
 {
-	if (objectCollectionIterator == nullptr){
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QString("Unable to create representation from object. Error: Attribute 'm_objectCollectionCompPtr' was not set");
+		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
+
 		return false;
 	}
 
-	bool retVal = true;
+	QByteArray objectId = objectCollectionIterator.GetObjectId();
 
-	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
-
-	if (!informationIds.isEmpty() && m_objectCollectionCompPtr.IsValid()){
-		imtlic::IProductInfo* productLicensingInfoPtr = nullptr;
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (objectCollectionIterator->GetObjectData(dataPtr)){
-			productLicensingInfoPtr = dynamic_cast<imtlic::IProductInfo*>(dataPtr.GetPtr());
-		}
-
-		QByteArray collectionId = objectCollectionIterator->GetObjectId();
-
-		if (productLicensingInfoPtr != nullptr){
-			for (const QByteArray& informationId : informationIds){
-				QVariant elementInformation;
-
-				if(informationId == "Id"){
-					elementInformation = collectionId;
-				}
-				else if(informationId == "TypeId"){
-					elementInformation = m_objectCollectionCompPtr->GetObjectTypeId(collectionId);
-				}
-				if(informationId == "ProductId"){
-					elementInformation = productLicensingInfoPtr->GetProductId();
-				}
-				else if(informationId == "ProductName" || informationId == "Name"){
-					elementInformation = productLicensingInfoPtr->GetName();
-				}
-				else if(informationId == "ProductDescription" || informationId == "Description"){
-					elementInformation = productLicensingInfoPtr->GetProductDescription();
-				}
-				else if(informationId == "Added"){
-					QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
-					addedTime.setTimeSpec(Qt::UTC);
-
-					elementInformation = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-				}
-				else if(informationId == "LastModified"){
-					QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
-					lastTime.setTimeSpec(Qt::UTC);
-
-					elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-				}
-				else if(informationId == "CategoryId"){
-					elementInformation = productLicensingInfoPtr->GetCategoryId();
-				}
-				else if(informationId == "Features"){
-					QByteArrayList featureList = productLicensingInfoPtr->GetFeatureIds();
-
-					elementInformation = featureList.join(';');
-				}
-				else if(informationId == "Licenses"){
-					if (m_licenseCollectionCompPtr.IsValid()){
-						imtbase::CTreeItemModel* licenseModelPtr = model.AddTreeModel("Licenses", itemIndex);
-
-						iprm::CIdParam idParam;
-						idParam.SetId(collectionId);
-
-						iprm::CParamsSet paramsSet1;
-						paramsSet1.SetEditableParameter("ProductId", &idParam);
-
-						iprm::CParamsSet filterParam;
-						filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
-
-						imtbase::ICollectionInfo::Ids licenseCollectionIds = m_licenseCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-
-						for (const imtbase::ICollectionInfo::Id& licenseCollectionId : licenseCollectionIds){
-							imtbase::IObjectCollection::DataPtr licenseDataPtr;
-							if (m_licenseCollectionCompPtr->GetObjectData(licenseCollectionId, licenseDataPtr)){
-								const imtlic::CLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CLicenseDefinition*>(licenseDataPtr.GetPtr());
-								if (licenseInfoPtr != nullptr){
-									int index = licenseModelPtr->InsertNewItem();
-
-									licenseModelPtr->SetData("Id", licenseCollectionId, index);
-									licenseModelPtr->SetData("LicenseId", licenseInfoPtr->GetLicenseId(), index);
-									licenseModelPtr->SetData("LicenseName", licenseInfoPtr->GetLicenseName(), index);
-								}
-							}
-						}
-					}
-
-					continue;
-				}
-
-				if (elementInformation.isNull()){
-					elementInformation = "";
-				}
-
-				retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
-			}
-		}
-
-		return true;
+	imtlic::CIdentifiableProductInfo* productInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (objectCollectionIterator.GetObjectData(dataPtr)){
+		productInfoPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(dataPtr.GetPtr());
 	}
 
-	return false;
+	if (productInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
+
+		return false;
+	}
+
+	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
+
+	sdl::imtlic::Products::ProductsListRequestInfo requestInfo = productsListRequest.GetRequestInfo();
+
+	if (requestInfo.items.isIdRequested){
+		representationObject.SetId(objectId);
+	}
+
+	if (requestInfo.items.isTypeIdRequested){
+		representationObject.SetTypeId(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+	}
+
+	if (requestInfo.items.isProductIdRequested){
+		representationObject.SetProductId(productInfoPtr->GetProductId());
+	}
+
+	if (requestInfo.items.isNameRequested){
+		representationObject.SetName(productInfoPtr->GetName());
+	}
+
+	if (requestInfo.items.isProductNameRequested){
+		representationObject.SetProductName(productInfoPtr->GetName());
+	}
+
+	if (requestInfo.items.isDescriptionRequested){
+		representationObject.SetDescription(productInfoPtr->GetProductDescription());
+	}
+
+	if (requestInfo.items.isCategoryIdRequested){
+		representationObject.SetCategoryId(productInfoPtr->GetCategoryId());
+	}
+
+	if (requestInfo.items.isFeaturesRequested){
+		representationObject.SetFeatures(productInfoPtr->GetFeatureIds().join(';'));
+	}
+
+	if (requestInfo.items.isLicensesRequested){
+		representationObject.SetLicenses(productInfoPtr->GetFeatureIds().join(';'));
+
+		// if (m_licenseCollectionCompPtr.IsValid()){
+		// 	iprm::CIdParam idParam;
+		// 	idParam.SetId(objectId);
+
+		// 	iprm::CParamsSet paramsSet1;
+		// 	paramsSet1.SetEditableParameter("ProductId", &idParam);
+
+		// 	iprm::CParamsSet filterParam;
+		// 	filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
+
+		// 	imtbase::ICollectionInfo::Ids licenseCollectionIds = m_licenseCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+
+		// 	for (const imtbase::ICollectionInfo::Id& licenseCollectionId : licenseCollectionIds){
+		// 		imtbase::IObjectCollection::DataPtr licenseDataPtr;
+		// 		if (m_licenseCollectionCompPtr->GetObjectData(licenseCollectionId, licenseDataPtr)){
+		// 			const imtlic::CLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CLicenseDefinition*>(licenseDataPtr.GetPtr());
+		// 			if (licenseInfoPtr != nullptr){
+		// 				int index = licenseModelPtr->InsertNewItem();
+
+		// 				licenseModelPtr->SetData("Id", licenseCollectionId, index);
+		// 				licenseModelPtr->SetData("LicenseId", licenseInfoPtr->GetLicenseId(), index);
+		// 				licenseModelPtr->SetData("LicenseName", licenseInfoPtr->GetLicenseName(), index);
+		// 			}
+		// 		}
+		// 	}
+		// }
+	}
+
+	if (requestInfo.items.isAddedRequested){
+		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime();
+		addedTime.setTimeSpec(Qt::UTC);
+
+		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+		representationObject.SetAdded(added);
+	}
+
+	if (requestInfo.items.isLastModifiedRequested){
+		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("LastModified").toDateTime();
+		lastModifiedTime.setTimeSpec(Qt::UTC);
+
+		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+		representationObject.SetLastModified(lastModified);
+	}
+
+	return true;
+}
+
+
+istd::IChangeable* CProductCollectionControllerComp::CreateObjectFromRepresentation(
+			const sdl::imtlic::Products::CProductData& productDataRepresentation,
+			QByteArray& newObjectId,
+			QString& name,
+			QString& description,
+			QString& errorMessage) const
+{
+	if (!m_productInfoFactCompPtr.IsValid()){
+		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_productInfoFactCompPtr' was not set");
+		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	istd::TDelPtr<imtlic::IProductInfo> productInstancePtr = m_productInfoFactCompPtr.CreateInstance();
+	if (!productInstancePtr.IsValid()){
+		errorMessage = QString("Unable to create product instance. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	imtlic::CIdentifiableProductInfo* productInfoPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(productInstancePtr.GetPtr());
+	if (productInfoPtr == nullptr){
+		errorMessage = QString("Unable to cast product instance to identifable object. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	newObjectId = productDataRepresentation.GetId();
+	if (newObjectId.isEmpty()){
+		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
+	productInfoPtr->SetObjectUuid(newObjectId);
+
+	QByteArray productId = productDataRepresentation.GetProductId();
+
+	if (productId.isEmpty()){
+		errorMessage = QT_TR_NOOP("Product name cannot be empty");
+		SendErrorMessage(0, errorMessage, "Product controller");
+
+		return nullptr;
+	}
+
+	iprm::CIdParam idParam;
+	idParam.SetId(productId);
+
+	iprm::CParamsSet paramsSet1;
+	paramsSet1.SetEditableParameter("ProductId", &idParam);
+
+	iprm::CParamsSet filterParam;
+	filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
+
+	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+	if (!collectionIds.isEmpty()){
+		QByteArray id = collectionIds[0];
+		if (newObjectId != id){
+			errorMessage = QT_TR_NOOP(QString("Product '%1' already exists")).arg(qPrintable(productId));
+
+			return nullptr;
+		}
+	}
+
+	productInfoPtr->SetProductId(productId);
+
+	name = productDataRepresentation.GetProductName();
+	if (name.isEmpty()){
+		errorMessage = QT_TR_NOOP("Unable to create product with an empty product name");
+		SendErrorMessage(0, errorMessage, "Product controller");
+
+		return nullptr;
+	}
+
+	iprm::CIdParam nameParam;
+	nameParam.SetId(name.toUtf8());
+
+	iprm::CParamsSet paramsSet2;
+	paramsSet2.SetEditableParameter("ProductName", &nameParam);
+
+	iprm::CParamsSet filterParam2;
+	filterParam2.SetEditableParameter("ObjectFilter", &paramsSet2);
+
+	imtbase::ICollectionInfo::Ids collectionIds2 = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam2);
+	if (!collectionIds2.isEmpty()){
+		QByteArray id = collectionIds2[0];
+		if (newObjectId != id){
+			errorMessage = QT_TR_NOOP(QString("Product name '%1' already exists, please rename")).arg(qPrintable(name));
+
+			return nullptr;
+		}
+	}
+
+	productInfoPtr->SetName(name);
+
+	description = productDataRepresentation.GetDescription();
+	productInfoPtr->SetProductDescription(description);
+
+	QByteArray categoryId = productDataRepresentation.GetCategoryId();
+	productInfoPtr->SetCategoryId(categoryId);
+
+	QByteArray features = productDataRepresentation.GetFeatures();
+	if (!features.isEmpty()){
+		QByteArrayList featureIds = features.split(';');
+		productInfoPtr->SetFeatureIds(featureIds);
+	}
+
+	return productInstancePtr.PopPtr();
+}
+
+
+bool CProductCollectionControllerComp::CreateRepresentationFromObject(
+			const istd::IChangeable& data,
+			const sdl::imtlic::Products::CProductItemGqlRequest& productItemRequest,
+			sdl::imtlic::Products::CProductDataPayload& representationPayload,
+			QString& errorMessage) const
+{
+	const imtlic::CIdentifiableProductInfo* productInfoPtr = dynamic_cast<const imtlic::CIdentifiableProductInfo*>(&data);
+	if (productInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
+
+		return false;
+	}
+
+	sdl::imtlic::Products::ProductItemRequestArguments arguments = productItemRequest.GetRequestedArguments();
+
+	sdl::imtlic::Products::CProductData productData;
+
+	QByteArray id = arguments.input.GetId();
+	productData.SetId(id);
+
+	QByteArray productId = productInfoPtr->GetProductId();
+	productData.SetProductId(productId);
+
+	QString productName = productInfoPtr->GetName();
+	productData.SetName(productName);
+	productData.SetProductName(productName);
+
+	QString description = productInfoPtr->GetProductDescription();
+	productData.SetDescription(description);
+
+	QByteArray categoryId = productInfoPtr->GetCategoryId();
+	productData.SetCategoryId(categoryId);
+
+	QByteArrayList featureIds = productInfoPtr->GetFeatureIds();
+	productData.SetFeatures(featureIds.join(';'));
+
+	representationPayload.SetProductData(productData);
+
+	return true;
 }
 
 
@@ -190,9 +348,9 @@ void CProductCollectionControllerComp::SetObjectFilter(
 	if (objectFilterModel.ContainsKey("CategoryId")){
 		QByteArray filterValue = objectFilterModel.GetData("CategoryId").toByteArray();
 		if (!filterValue.isEmpty()){
-			istd::TDelPtr<iprm::CIdParam> textParamPtr(new iprm::CIdParam());
-			textParamPtr->SetId(filterValue);
-			filterParams.SetEditableParameter("CategoryId", textParamPtr.PopPtr());
+			iprm::CTextParam* textParamPtr = new iprm::CTextParam();
+			textParamPtr->SetText(filterValue);
+			filterParams.SetEditableParameter("CategoryId", textParamPtr, true);
 		}
 	}
 }
@@ -215,8 +373,6 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const im
 		return nullptr;
 	}
 
-	QString oldName;
-
 	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
 	QString newName = inputParamPtr->GetFieldArgumentValue("NewName").toByteArray();
 
@@ -224,18 +380,18 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const im
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		imtlic::CIdentifiableProductInfo* productInfoPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(dataPtr.GetPtr());
 		if (productInfoPtr != nullptr){
-			oldName = productInfoPtr->GetName();
+			QString oldName = productInfoPtr->GetName();
 			if (newName != oldName){
 				productInfoPtr->SetName(newName);
 				productInfoPtr->SetProductId(newName.replace(" ", "").toUtf8());
 
-				imtbase::IOperationContext* operationContextPtr =  nullptr;
+				istd::TDelPtr<imtbase::IOperationContext> operationContextPtr =  nullptr;
 				if (m_operationContextControllerCompPtr.IsValid()){
 					operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_UPDATE, gqlRequest, objectId, productInfoPtr);
 				}
 
-				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *productInfoPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr)){
-					errorMessage = QString("Error when trying rename product with ID %1").arg(qPrintable(objectId));
+				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *productInfoPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
+					errorMessage = QString("Error when trying rename product with ID '%1'").arg(qPrintable(objectId));
 					SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
 					return nullptr;
@@ -243,67 +399,12 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const im
 			}
 		}
 	}
-
-	SendInfoMessage(0, QString("The product %1 successfully renamed to %2").arg(oldName).arg(newName));
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
 	dataModelPtr->SetData("Id", objectId);
 	dataModelPtr->SetData("Name", newName);
-
-	return rootModelPtr.PopPtr();
-}
-
-
-imtbase::CTreeItemModel* CProductCollectionControllerComp::SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Internal error").toUtf8();
-		SendErrorMessage(0, errorMessage, "Product controller");
-
-		return nullptr;
-	}
-
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
-	if (inputParamPtr == nullptr){
-		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
-		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
-
-		return nullptr;
-	}
-
-	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
-	QString description = inputParamPtr->GetFieldArgumentValue("Description").toByteArray();
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		imtlic::CIdentifiableProductInfo* productInfoPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(dataPtr.GetPtr());
-		if (productInfoPtr != nullptr){
-			QString oldDescription = productInfoPtr->GetProductDescription();
-			if (description != oldDescription){
-
-				productInfoPtr->SetProductDescription(description);
-				imtbase::IOperationContext* operationContextPtr =  nullptr;
-				if (m_operationContextControllerCompPtr.IsValid()){
-					operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_UPDATE, gqlRequest, objectId, productInfoPtr);
-				}
-
-				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *productInfoPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr)){
-					errorMessage = QString("Error when trying set description product with ID %1").arg(qPrintable(objectId));
-					SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
-
-					return nullptr;
-				}
-			}
-		}
-	}
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-
-	dataModelPtr->SetData("Id", objectId);
-	dataModelPtr->SetData("Description", description);
 
 	return rootModelPtr.PopPtr();
 }

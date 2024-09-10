@@ -1,0 +1,84 @@
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+import {
+    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+}
+
+input ProductsListInput {
+    viewParams: CollectionViewParams
+}
+
+type ProductItem {
+    Id: ID!
+	Name: String!
+	ProductName: String!
+	TypeId: ID!
+	ProductId: ID!
+	CategoryId: ID!
+	Description: String
+	Features: ID
+	Licenses: ID
+	Added: String
+	LastModified: String
+}
+
+type ProductsListPayload {
+    items: [ProductItem]
+	notification: NotificationItem
+}
+
+type ProductData {
+	Id: ID!
+	Name: String!
+	ProductName: String!
+	Description: String
+	ProductId: ID
+	CategoryId: ID
+	Features: ID
+}
+
+input ProductDataInput {
+	Id: ID!
+	Item: ProductData!
+}
+
+type ProductDataPayload {
+    ProductData: ProductData
+}
+
+input ProductItemInput {
+    Id: ID!
+}
+
+type Query {
+    ProductsList (input:ProductsListInput): ProductsListPayload!
+	ProductItem (input: ProductItemInput): ProductDataPayload!
+}
+
+type Mutation {
+    ProductUpdate (input: ProductDataInput): UpdatedNotificationPayload!
+	ProductAdd (input: ProductDataInput): AddedNotificationPayload!
+}
+
+collectionSchema {
+    type Product {
+	    ref: ProductItem
+		operations {
+		    list: ProductsList
+		}
+		subtype Product {
+		    ref: ProductData
+			operations {
+			    get: ProductItem
+				update: ProductUpdate
+				insert: ProductAdd
+			}
+		}
+	}
+}
+
+

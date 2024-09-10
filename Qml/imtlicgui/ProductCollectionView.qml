@@ -6,6 +6,7 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
+import imtlicProductsSdl 1.0
 
 RemoteCollectionView {
     id: productCollectionViewContainer;
@@ -14,7 +15,7 @@ RemoteCollectionView {
 
     collectionId: "Products";
 
-    additionalFieldIds: ["ProductId"]
+    additionalFieldIds: [ProductItemTypeMetaInfo.s_productId]
 
     commandsDelegateComp: Component {ProductCollectionViewCommandsDelegate {
         collectionView: productCollectionViewContainer;
@@ -57,10 +58,22 @@ RemoteCollectionView {
     Component {
         id: dataControllerComp;
 
-        GqlDocumentDataController {
-            gqlGetCommandId: "ProductItem";
-            gqlUpdateCommandId: "ProductUpdate";
-            gqlAddCommandId: "ProductAdd";
+        GqlRequestDocumentDataController {
+            id: requestDocumentDataController
+
+            gqlGetCommandId: ImtlicProductsSdlCommandIds.s_productItem;
+            gqlUpdateCommandId: ImtlicProductsSdlCommandIds.s_productUpdate;
+            gqlAddCommandId: ImtlicProductsSdlCommandIds.s_productAdd;
+
+            documentModelComp: Component {
+                ProductData {}
+            }
+
+            payloadModel: ProductDataPayload {
+                onFinished: {
+                    requestDocumentDataController.documentModel = m_productData;
+                }
+            }
         }
     }
 }

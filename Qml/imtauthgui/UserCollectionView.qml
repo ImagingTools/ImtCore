@@ -362,9 +362,9 @@ RemoteCollectionView {
         GqlRequestDocumentDataController {
             id: requestDocumentDataController
 
-            gqlGetCommandId: ImtCoreUsersSdlCommandIds.s_userItem;
-            gqlUpdateCommandId: ImtCoreUsersSdlCommandIds.s_userUpdate;
-            gqlAddCommandId: ImtCoreUsersSdlCommandIds.s_userAdd;
+            gqlGetCommandId: ImtauthUsersSdlCommandIds.s_userItem;
+            gqlUpdateCommandId: ImtauthUsersSdlCommandIds.s_userUpdate;
+            gqlAddCommandId: ImtauthUsersSdlCommandIds.s_userAdd;
 
             Component.onCompleted: {
                 getRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, context.appName);

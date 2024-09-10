@@ -5,7 +5,7 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
-import imtCoreGroupsSdl 1.0
+import imtauthGroupsSdl 1.0
 
 RemoteCollectionView {
     id: userGroupCollectionViewContainer;
@@ -92,9 +92,9 @@ RemoteCollectionView {
         GqlRequestDocumentDataController {
             id: requestDocumentDataController
 
-            gqlGetCommandId: ImtCoreGroupsSdlCommandIds.s_groupItem;
-            gqlUpdateCommandId: ImtCoreGroupsSdlCommandIds.s_groupUpdate;
-            gqlAddCommandId: ImtCoreGroupsSdlCommandIds.s_groupAdd;
+            gqlGetCommandId: ImtauthGroupsSdlCommandIds.s_groupItem;
+            gqlUpdateCommandId: ImtauthGroupsSdlCommandIds.s_groupUpdate;
+            gqlAddCommandId: ImtauthGroupsSdlCommandIds.s_groupAdd;
 
             Component.onCompleted: {
                 getRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, context.appName);

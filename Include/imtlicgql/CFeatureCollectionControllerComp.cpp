@@ -11,7 +11,153 @@ namespace imtlicgql
 
 // protected methods
 
-// reimplemented (imtgql::CObjectCollectionControllerCompBase)
+// reimplemented (sdl::imtlic::Features::CFeatureCollectionControllerCompBase)
+
+bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
+			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
+			const sdl::imtlic::Features::CFeaturesListGqlRequest& featuresListRequest,
+			sdl::imtlic::Features::CFeatureItem& representationObject,
+			QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QString("Unable to create representation from object. Error: Attribute 'm_objectCollectionCompPtr' was not set");
+		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
+
+		return false;
+	}
+
+	QByteArray objectId = objectCollectionIterator.GetObjectId();
+
+	imtlic::CIdentifiableFeatureInfo* featureInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (objectCollectionIterator.GetObjectData(dataPtr)){
+		featureInfoPtr = dynamic_cast<imtlic::CIdentifiableFeatureInfo*>(dataPtr.GetPtr());
+	}
+
+	if (featureInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
+
+		return false;
+	}
+
+	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
+
+	sdl::imtlic::Features::FeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
+
+	if (requestInfo.items.isIdRequested){
+		representationObject.SetId(objectId);
+	}
+
+	if (requestInfo.items.isFeatureIdRequested){
+		representationObject.SetFeatureId(featureInfoPtr->GetFeatureId());
+	}
+
+	if (requestInfo.items.isNameRequested){
+		representationObject.SetName(featureInfoPtr->GetFeatureName());
+	}
+
+	if (requestInfo.items.isDescriptionRequested){
+		representationObject.SetDescription(featureInfoPtr->GetFeatureDescription());
+	}
+
+	if (requestInfo.items.isOptionalRequested){
+		representationObject.SetOptional(featureInfoPtr->IsOptional());
+	}
+
+	if (requestInfo.items.isDependenciesRequested){
+		representationObject.SetDependencies(featureInfoPtr->GetDependencies().join(';'));
+	}
+
+	if (requestInfo.items.isAddedRequested){
+		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime();
+		addedTime.setTimeSpec(Qt::UTC);
+
+		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+		representationObject.SetAdded(added);
+	}
+
+	if (requestInfo.items.isLastModifiedRequested){
+		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("LastModified").toDateTime();
+		lastModifiedTime.setTimeSpec(Qt::UTC);
+
+		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+		representationObject.SetLastModified(lastModified);
+	}
+
+	return true;
+}
+
+
+istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentation(
+			const sdl::imtlic::Features::CFeatureData& featureDataRepresentation,
+			QByteArray& newObjectId,
+			QString& name,
+			QString& description,
+			QString& errorMessage) const
+{
+	if (!m_featureInfoFactCompPtr.IsValid()){
+		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_featureInfoFactCompPtr' was not set");
+		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	istd::TDelPtr<imtlic::IFeatureInfo> featureInstancePtr = m_featureInfoFactCompPtr.CreateInstance();
+	if (!featureInstancePtr.IsValid()){
+		errorMessage = QString("Unable to create feature instance. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	imtlic::CIdentifiableFeatureInfo* featureInfoPtr = dynamic_cast<imtlic::CIdentifiableFeatureInfo*>(featureInstancePtr.GetPtr());
+	if (featureInfoPtr == nullptr){
+		errorMessage = QString("Unable to cast feature instance to identifable object. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	newObjectId = featureDataRepresentation.GetId();
+	featureInfoPtr->SetObjectUuid(newObjectId);
+
+	name = featureDataRepresentation.GetName();
+	featureInfoPtr->SetFeatureName(name);
+
+	description = featureDataRepresentation.GetDescription();
+	featureInfoPtr->SetFeatureDescription(description);
+
+	return featureInstancePtr.PopPtr();
+}
+
+
+bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
+			const istd::IChangeable& data,
+			const sdl::imtlic::Features::CFeatureItemGqlRequest& featureItemRequest,
+			sdl::imtlic::Features::CFeatureDataPayload& representationPayload,
+			QString& errorMessage) const
+{
+	const imtlic::CIdentifiableFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CIdentifiableFeatureInfo*>(&data);
+	if (featureInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
+
+		return false;
+	}
+
+	sdl::imtlic::Features::FeatureItemRequestArguments arguments = featureItemRequest.GetRequestedArguments();
+
+	sdl::imtlic::Features::CFeatureData featureData;
+
+	QByteArray id = arguments.input.GetId();
+	featureData.SetId(id);
+
+	representationPayload.SetFeatureData(featureData);
+
+	return true;
+}
+
 
 bool CFeatureCollectionControllerComp::SetupGqlItem(
 			const imtgql::CGqlRequest& gqlRequest,

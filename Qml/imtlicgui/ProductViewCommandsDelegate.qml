@@ -37,7 +37,7 @@ ViewCommandsDelegateBase {
         }
 
         if (commandId === "New"){
-            let features = container.view.model.getData("Features");
+            let features = container.view.model.m_features;
 
             let featureIds = []
             if (features !== ""){
@@ -51,7 +51,7 @@ ViewCommandsDelegateBase {
             if (selectedIndex != null){
                 let index = selectedIndex.index;
 
-                let featureId = container.view.tableView.rowModel.getData("Id", index);
+                let featureId = container.view.model.m_id;
 
                 container.view.removeFeature(featureId);
 

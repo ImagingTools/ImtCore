@@ -1,0 +1,86 @@
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+import {
+    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+}
+
+input LicensesListInput {
+    viewParams: CollectionViewParams
+}
+
+type LicenseItem {
+    Id: ID!
+	TypeId: ID!
+	LicenseId: ID!
+	LicenseName: String!
+	Name: String!
+	Description: String
+	ProductId: ID
+	ProductUuid: ID
+	ParentLicenses: ID
+	Features: ID
+	Added: String
+	LastModified: String
+}
+
+type LicensesListPayload {
+    items: [LicenseItem]
+	notification: NotificationItem
+}
+
+type LicenseData {
+	Id: ID!
+	Name: String!
+	LicenseName: String!
+	Description: String
+	ProductId: ID
+	LicenseId: ID
+	Features: ID
+	ParentLicenses: ID
+}
+
+input LicenseDataInput {
+	Id: ID!
+	Item: LicenseData!
+}
+
+type LicenseDataPayload {
+    LicenseData: LicenseData
+}
+
+input LicenseItemInput {
+    Id: ID!
+}
+
+type Query {
+    LicensesList (input:LicensesListInput): LicensesListPayload!
+	LicenseItem (input: LicenseItemInput): LicenseDataPayload!
+}
+
+type Mutation {
+    LicenseUpdate (input: LicenseDataInput): UpdatedNotificationPayload!
+	LicenseAdd (input: LicenseDataInput): AddedNotificationPayload!
+}
+
+collectionSchema {
+    type License {
+	    ref: LicenseItem
+		operations {
+		    list: LicensesList
+		}
+		subtype License {
+		    ref: LicenseData
+			operations {
+			    get: LicenseItem
+				update: LicenseUpdate
+				insert: LicenseAdd
+			}
+		}
+	}
+}
+
+
