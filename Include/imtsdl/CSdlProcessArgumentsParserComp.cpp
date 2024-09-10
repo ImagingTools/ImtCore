@@ -205,8 +205,6 @@ QString CSdlProcessArgumentsParserComp::GetOutputDirectoryPath() const
 
 QString CSdlProcessArgumentsParserComp::GetNamespace() const
 {
-	Q_ASSERT(!m_namespace.isNull());
-
 	return m_namespace;
 }
 

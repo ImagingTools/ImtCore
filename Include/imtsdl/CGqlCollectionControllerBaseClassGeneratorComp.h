@@ -37,6 +37,7 @@ public:
 		I_ASSIGN(m_sdlDocumentListCompPtr, "SdlDocumentListProvider", "SDL documents used to create a GraphQL wrap code", true, "SdlDocumentListProvider")
 		I_ASSIGN(m_baseClassExtenderCompPtr, "BaseClassExtender", "Compoment, used to add base class inherits", true, "BaseClassExtender")
 		I_ASSIGN(m_filesJoinerCompPtr, "FilesJoiner", "Compoment, used to join files into a single", false, "FilesJoiner")
+		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
 
 	I_END_COMPONENT;
 
@@ -81,8 +82,6 @@ private:
 	QString GetInputExtractionStringForTypeName(const CSdlRequest& sdlRequest, const QString typeName) const;
 	bool FindCallChainForField(const CSdlField& sdlRequest, const QString typeName, QString& callChain) const;
 
-
-
 private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(ISdlTypeListProvider, m_sdlTypeListCompPtr);
@@ -90,6 +89,7 @@ private:
 	I_REF(ISdlDocumentTypeListProvider, m_sdlDocumentListCompPtr);
 	I_REF(iproc::IProcessor, m_baseClassExtenderCompPtr);
 	I_REF(iproc::IProcessor, m_filesJoinerCompPtr);
+	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 
 	istd::TDelPtr<QFile> m_headerFilePtr;
 	istd::TDelPtr<QFile> m_sourceFilePtr;

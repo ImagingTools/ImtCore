@@ -378,7 +378,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType, b
 			bool isCustomGeneratedCommentAdded = false;
 			for (QSet<QString>::const_iterator complexIter = complexTypeList.cbegin(); complexIter != complexTypeList.cend(); ++complexIter){
 				if (!isCustomGeneratedCommentAdded){
-					ifStream << QStringLiteral("// ") << m_argumentParserCompPtr->GetNamespace() << QStringLiteral(" includes");
+					ifStream << QStringLiteral("// ") << GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) << QStringLiteral(" includes");
 					FeedStream(ifStream, 1, false);
 					isCustomGeneratedCommentAdded = true;
 				}
@@ -394,7 +394,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType, b
 
 	// namespace begin
 	QString namespaceString;
-	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	if (!sdlNamespace.isEmpty()){
 		namespaceString = QStringLiteral("namespace ");
 		namespaceString+= sdlNamespace;
@@ -485,7 +485,7 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const CSdlType& sdlType, b
 
 	// namespace begin
 	QString namespaceString;
-	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	if (!sdlNamespace.isEmpty()){
 		namespaceString = QStringLiteral("namespace ");
 		namespaceString+= sdlNamespace;
@@ -599,7 +599,7 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const CSdlType& sdlType)
 
 	// finish header
 	// end of namespace
-	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	if (!sdlNamespace.isEmpty()){
 		namespaceString += QStringLiteral("} // namespace ");
 		namespaceString += sdlNamespace;

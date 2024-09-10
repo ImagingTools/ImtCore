@@ -81,7 +81,7 @@ int CQmlCodeCommandIdGeneratorComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	const QString currentNamespace = m_argumentParserCompPtr->GetNamespace();
+	const QString currentNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	iprm::IParamsManager* objectsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(qmldirDataParams.GetEditableParameter(QmldirModelParamIds::Objects));
 	if (objectsParamsManagerPtr == nullptr){
 		SendCriticalMessage(0, "Invalid params created");
@@ -193,7 +193,7 @@ int CQmlCodeCommandIdGeneratorComp::DoProcessing(
 
 		return TS_INVALID;
 	}
-	aliasNameParam->SetName(m_argumentParserCompPtr->GetNamespace() + '/' + GetQmlCommandIdsFileName() + QStringLiteral(".qml"));
+	aliasNameParam->SetName(GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) + '/' + GetQmlCommandIdsFileName() + QStringLiteral(".qml"));
 
 	const int qrcSaveStatus = m_qrcFilePersistanceCompPtr->SaveToFile(*qrcParamsPtr, outputDirectoryPath + '/' + currentNamespace + QStringLiteral(".qrc"));
 	if (qrcSaveStatus != ifile::IFilePersistence::OS_OK){
@@ -295,7 +295,7 @@ QString CQmlCodeCommandIdGeneratorComp::GetQmlCommandIdsFileName() const
 		return QString();
 	}
 
-	return GetCapitalizedValue(m_argumentParserCompPtr->GetNamespace()) + *m_qmlCommandIdsFileSuffixAttrPtr;
+	return GetCapitalizedValue(GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr)) + *m_qmlCommandIdsFileSuffixAttrPtr;
 }
 
 

@@ -33,7 +33,8 @@ public:
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
 		I_ASSIGN(m_qmldirFilePersistanceCompPtr, "QmldirFilePersistance", "Qmldir file persistance, used to update qmldir file with new modules", true, "QmldirFilePersistance")
-	I_END_COMPONENT;
+
+	I_END_COMPONENT
 
 	//reimplemented(iproc::IProcessor)
 	virtual int DoProcessing(
@@ -55,6 +56,7 @@ private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(ISdlTypeListProvider, m_sdlTypeListCompPtr);
 	I_REF(ifile::IFilePersistence, m_qmldirFilePersistanceCompPtr);
+	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 
 	istd::TDelPtr<QFile> m_qmlKeysFilePtr;
 };

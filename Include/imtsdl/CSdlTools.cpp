@@ -2,8 +2,15 @@
 
 
 // Qt includes
+#include <QtCore/QRegularExpression>
 
-// imtsdl includes
+// ACF includes
+#include <iprm/IParamsSet.h>
+#include <iprm/ITextParam.h>
+#include <iprm/TParamsPtr.h>
+
+// ImtCore includes
+#include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/CSdlField.h>
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlRequest.h>
@@ -492,6 +499,84 @@ void CSdlTools::AddArrayInternalChecksFail(QTextStream& stream, const CSdlField&
 	FeedStreamHorizontally(stream, 2);
 	stream << QStringLiteral("return false;\n\t}");
 	FeedStream(stream, 1, false);
+}
+
+
+QString CSdlTools::GetNamespaceAcceptableString(const QString& originalText)
+{
+	QString retVal = originalText;
+
+	static QRegularExpression nonWordRegexp("[^\\w\\:]");
+
+	retVal.replace(nonWordRegexp, QStringLiteral("_"));
+
+	return retVal;
+}
+
+
+QString CSdlTools::GetFileSystemAcceptableEntryPath(const QString& originalText)
+{
+	QString retVal = originalText;
+
+	retVal.replace('\\', '_');
+	retVal.replace('/', '_');
+	retVal.replace(':', '_');
+	retVal.replace('*', '_');
+	retVal.replace('?', '_');
+	retVal.replace('\"', '_');
+	retVal.replace('<', '_');
+	retVal.replace('>', '_');
+	retVal.replace('|', '_');
+
+	return retVal;
+}
+
+
+QString CSdlTools::BuildNamespaceFromParams(const iprm::IParamsSet& namespaceParams)
+{
+	QString retVal;
+
+	iprm::TParamsPtr<iprm::ITextParam> namespaceParamPtr(&namespaceParams, SdlCustomSchemaKeys::SchemaNamespace.toUtf8(), false);
+	if (namespaceParamPtr.IsValid()){
+		retVal += namespaceParamPtr->GetText();
+	}
+
+	iprm::TParamsPtr<iprm::ITextParam> nameParamPtr(&namespaceParams, SdlCustomSchemaKeys::SchemaName.toUtf8(), false);
+	if (nameParamPtr.IsValid()){
+		if (!retVal.isEmpty()){
+			retVal += QStringLiteral("::");
+		}
+		retVal += nameParamPtr->GetText();
+	}
+
+	iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&namespaceParams, SdlCustomSchemaKeys::VersionName.toUtf8(), false);
+	if (versionNameParamPtr.IsValid()){
+		if (!retVal.isEmpty()){
+			retVal += QStringLiteral("::V");
+		}
+		retVal += versionNameParamPtr->GetText();
+	}
+
+	return GetNamespaceAcceptableString(retVal);
+}
+
+
+QString CSdlTools::GetNamespaceFromParamsOrArguments(
+			const icomp::TReferenceMember<iprm::IParamsSet>& schemaParamsCompPtr,
+			const icomp::TReferenceMember<ISdlProcessArgumentsParser>& argumentParamsCompPtr)
+{
+	QString sdlNamespace;
+	if (schemaParamsCompPtr.IsValid()){
+		sdlNamespace = BuildNamespaceFromParams(*schemaParamsCompPtr);
+	}
+
+	if (sdlNamespace.isEmpty() && argumentParamsCompPtr.IsValid()){
+		sdlNamespace = argumentParamsCompPtr->GetNamespace();
+	}
+
+	Q_ASSERT(!sdlNamespace.isEmpty());
+
+	return sdlNamespace;
 }
 
 

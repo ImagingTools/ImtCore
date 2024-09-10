@@ -12,21 +12,21 @@
         <Element ComponentName="CodeGenWorker" X="550" Y="525" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="CodeGenWorker">
-            <PositionMap>
-                <Element ComponentName="QmlCodeGenFramework" X="550" Y="225" Note=""/>
-                <Element ComponentName="SdlClassCodeGenerator" X="175" Y="425" Note=""/>
-                <Element ComponentName="SdlCoreFramework" X="550" Y="425" Note=""/>
-                <Element ComponentName="SdlGqlCodeGeneratorFramework" X="550" Y="700" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Application">
             <PositionMap>
                 <Element ComponentName="ApplicationInfo" X="475" Y="475" Note=""/>
                 <Element ComponentName="ConsoleApplication" X="475" Y="350" Note=""/>
                 <Element ComponentName="ConsoleLog" X="750" Y="350" Note=""/>
                 <Element ComponentName="VersionInfo" X="475" Y="600" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="CodeGenWorker">
+            <PositionMap>
+                <Element ComponentName="QmlCodeGenFramework" X="550" Y="225" Note=""/>
+                <Element ComponentName="SdlClassCodeGenerator" X="175" Y="425" Note=""/>
+                <Element ComponentName="SdlCoreFramework" X="550" Y="425" Note=""/>
+                <Element ComponentName="SdlGqlCodeGeneratorFramework" X="550" Y="700" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

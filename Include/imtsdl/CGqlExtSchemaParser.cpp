@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <iprm/CNameParam.h>
+#include <iprm/CTextParam.h>
 
 // ImtCore includes
 #include <imtsdl/CSdlTools.h>
@@ -264,8 +264,8 @@ bool CGqlExtSchemaParser::ProcessCustomSchemaValue(const QString& key, const QSt
 	};
 
 	if (acceptableKeys.contains(key)){
-		iprm::CNameParam* nameParamPtr = new iprm::CNameParam;
-		nameParamPtr->SetName(value);
+		iprm::CTextParam* nameParamPtr = new iprm::CTextParam;
+		nameParamPtr->SetText(value);
 		const bool isSet = m_customSchemaParams.SetEditableParameter(key.toUtf8(), nameParamPtr, true);
 		Q_ASSERT(isSet);
 

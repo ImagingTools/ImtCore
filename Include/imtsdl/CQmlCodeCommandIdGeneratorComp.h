@@ -38,8 +38,9 @@ public:
 		I_ASSIGN(m_qmldirFilePersistanceCompPtr, "QmldirFilePersistance", "Qmldir file persistance, used to update qmldir file with new modules", true, "QmldirFilePersistance")
 		I_ASSIGN(m_qrcFilePersistanceCompPtr, "QrcFilePersistance", "QRC file persistance, used to update resource file with new modules", true, "QrcFilePersistance")
 		I_ASSIGN(m_paramsFactComp, "QrcParamsFactory", "Qt resource model, used to update resource file with new modules", true, "QrcParamsFactory")
+		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
 
-	I_END_COMPONENT;
+	I_END_COMPONENT
 
 	//reimplemented(iproc::IProcessor)
 	virtual int DoProcessing(
@@ -65,6 +66,7 @@ private:
 	I_REF(ifile::IFilePersistence, m_qmldirFilePersistanceCompPtr);
 	I_REF(ifile::IFilePersistence, m_qrcFilePersistanceCompPtr);
 	I_FACT(iprm::IParamsManager, m_paramsFactComp);
+	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 
 	istd::TDelPtr<QFile> m_qmlCommandsFilePtr;
 };

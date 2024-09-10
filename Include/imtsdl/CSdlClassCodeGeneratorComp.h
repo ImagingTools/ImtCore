@@ -34,7 +34,9 @@ public:
 		I_ASSIGN(m_baseClassExtenderCompPtr, "BaseClassExtender", "The C++ class extender, that adds inheritance to class files", true, "BaseClassExtender")
 		I_ASSIGN(m_filesJoinerCompPtr, "FilesJoiner", "Compoment, used to join files into a single", false, "FilesJoiner")
 		I_ASSIGN_MULTI_0(m_codeGeneratorExtenderListCompPtr, "CodeGeneratorExtenderList", "Extenders, used to generate an additional code", false)
-	I_END_COMPONENT;
+		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
+
+	I_END_COMPONENT
 
 	//reimplemented(iproc::IProcessor)
 	virtual int DoProcessing(
@@ -84,6 +86,7 @@ private:
 	I_REF(iproc::IProcessor, m_baseClassExtenderCompPtr);
 	I_REF(iproc::IProcessor, m_filesJoinerCompPtr);
 	I_MULTIREF(iproc::IProcessor, m_codeGeneratorExtenderListCompPtr);
+	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 
 	istd::TDelPtr<QFile> m_headerFilePtr;
 	istd::TDelPtr<QFile> m_sourceFilePtr;

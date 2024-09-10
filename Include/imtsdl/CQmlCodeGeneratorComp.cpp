@@ -53,7 +53,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 		// qmldir
 		std::cout << QString(outputDirectoryPath + '/' + "qmldir").toStdString() << std::endl;
 		// generated QRC file
-		std::cout << QString(outputDirectoryPath + "/" + m_argumentParserCompPtr->GetNamespace() + ".qrc").toStdString() << std::endl;
+		std::cout << QString(outputDirectoryPath + "/" + GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) + ".qrc").toStdString() << std::endl;
 
 		return iproc::IProcessor::TS_OK;
 	}
@@ -118,7 +118,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 		return iproc::IProcessor::TS_INVALID;
 	}
 
-	const QString currentNamespace = m_argumentParserCompPtr->GetNamespace();
+	const QString currentNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	QTextStream qmldirStream(&qmldirFile);
 	qmldirStream << QStringLiteral("module ");
 	qmldirStream << currentNamespace;

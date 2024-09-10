@@ -236,7 +236,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& s
 	AddRequiredIncludesToHeaderFile(ifStream, sdlRequest, addDependenciesInclude);
 
 	// namespace begin
-	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	if (!sdlNamespace.isEmpty()){
 		ifStream << QStringLiteral("namespace ");
 		ifStream <<  sdlNamespace;
@@ -332,7 +332,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 	FeedStream(ifStream, 1);
 
 	// namespace begin
-	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	if (!sdlNamespace.isEmpty()){
 		ifStream << QStringLiteral("namespace ");
 		ifStream << sdlNamespace;
@@ -595,7 +595,7 @@ void CGqlWrapClassCodeGeneratorComp::AddRequiredIncludesToHeaderFile(QTextStream
 		if (addDependenciesInclude){
 			// first add include comment
 			if (!complexTypeList.isEmpty()){
-				stream << QStringLiteral("// ") << m_argumentParserCompPtr->GetNamespace() << QStringLiteral(" includes");
+				stream << QStringLiteral("// ") << GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) << QStringLiteral(" includes");
 				FeedStream(stream, 1, false);
 			}
 

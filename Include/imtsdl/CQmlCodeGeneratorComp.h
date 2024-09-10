@@ -33,6 +33,8 @@ public:
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
 		I_ASSIGN_MULTI_0(m_codeGeneratorExtenderListCompPtr, "CodeGeneratorExtenderList", "Extenders, used to generate an additional code", false)
+		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
+
 	I_END_COMPONENT;
 
 	//reimplemented(iproc::IProcessor)
@@ -53,6 +55,7 @@ private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(ISdlTypeListProvider, m_sdlTypeListCompPtr);
 	I_MULTIREF(iproc::IProcessor, m_codeGeneratorExtenderListCompPtr);
+	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 
 	istd::TDelPtr<QFile> m_qmlFilePtr;
 };

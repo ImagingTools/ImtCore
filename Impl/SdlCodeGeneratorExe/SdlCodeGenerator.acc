@@ -125,6 +125,9 @@
                                 <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -151,6 +154,9 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework/BaseClassExtender"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                                     <Data IsEnabled="false"/>
@@ -209,6 +215,9 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework/BaseClassExtender"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                                     <Data IsEnabled="false"/>

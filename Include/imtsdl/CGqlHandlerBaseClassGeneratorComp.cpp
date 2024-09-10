@@ -14,7 +14,7 @@
 #include <iprm/CEnableableParam.h>
 #include <ifile/CFileNameParam.h>
 
-// ImtCore includes
+// imtsdl includes
 #include <imtfile/CSimpleFileJoinerComp.h>
 #include <imtsdl/CSdlRequest.h>
 
@@ -261,7 +261,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 	}
 
 	// namespace begin
-	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	if (!sdlNamespace.isEmpty()){
 		ifStream << QStringLiteral("namespace ");
 		ifStream <<  sdlNamespace;
@@ -328,7 +328,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessSourceClassFile(bool addSelfHeade
 	FeedStream(ifStream, 1);
 
 	// namespace begin
-	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	if (!sdlNamespace.isEmpty()){
 		ifStream << QStringLiteral("namespace ");
 		ifStream << sdlNamespace;

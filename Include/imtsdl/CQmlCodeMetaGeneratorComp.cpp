@@ -102,7 +102,7 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	const QString currentNamespace = m_argumentParserCompPtr->GetNamespace();
+	const QString currentNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	iprm::IParamsManager* objectsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(qmldirDataParams.GetEditableParameter(QmldirModelParamIds::Objects));
 	if (objectsParamsManagerPtr == nullptr){
 		SendCriticalMessage(0, "Invalid params created");

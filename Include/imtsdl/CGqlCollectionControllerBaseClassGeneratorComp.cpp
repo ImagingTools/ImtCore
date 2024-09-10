@@ -289,7 +289,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	}
 
 	// namespace begin
-	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	if (!sdlNamespace.isEmpty()){
 		ifStream << QStringLiteral("namespace ");
 		ifStream <<  sdlNamespace;
@@ -387,7 +387,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(cons
 	FeedStream(ifStream, 1);
 
 	// namespace begin
-	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	if (!sdlNamespace.isEmpty()){
 		ifStream << QStringLiteral("namespace ");
 		ifStream << sdlNamespace;
