@@ -451,8 +451,6 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 	[[maybe_unused]]bool isTypeFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(), sdlType);
 	Q_ASSERT(isTypeFound);
 
-	/// \todo add checks to itself
-
 	if (createStructDefinition ){
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("struct ");
@@ -496,7 +494,9 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 
 	// and finally create all custom types;
 	for (const CSdlField& customType: customTypes){
-		GenerateFieldRequestInfo(stream, customType, hIndents + 1, true);
+		if (customType != sdlField){
+			GenerateFieldRequestInfo(stream, customType, hIndents + 1, true);
+		}
 	}
 
 	if (createStructDefinition ){
