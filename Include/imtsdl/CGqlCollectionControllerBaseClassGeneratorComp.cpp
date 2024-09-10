@@ -315,22 +315,32 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	ifStream << QStringLiteral("protected:");
 	FeedStream(ifStream, 1, false);
 
+	const QMap<CSdlDocumentType::OperationType, CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
+
 	// base class methods override definition
 	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("// reimplemented (imtgql::CObjectCollectionControllerCompBase)");
 	FeedStream(ifStream, 1, false);
 
-	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("virtual bool SetupGqlItem(const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel, int itemIndex,const imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
-	FeedStream(ifStream, 1, false);
+	if (operationsList.contains(CSdlDocumentType::OT_LIST)){
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("virtual bool SetupGqlItem(const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel, int itemIndex,const imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
+		FeedStream(ifStream, 1, false);
+	}
 
-	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel, QString& errorMessage) const override;");
-	FeedStream(ifStream, 1, false);
+	if (operationsList.contains(CSdlDocumentType::OT_GET)){
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel, QString& errorMessage) const override;");
+		FeedStream(ifStream, 1, false);
+	}
 
-	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const override;");
-	FeedStream(ifStream, 1, false);
+	if (	operationsList.contains(CSdlDocumentType::OT_UPDATE) ||
+			operationsList.contains(CSdlDocumentType::OT_INSERT))
+	{
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const override;");
+		FeedStream(ifStream, 1, false);
+	}
 
 	// protected section
 	// definition of pure virtual methods (to be reimplemented)
