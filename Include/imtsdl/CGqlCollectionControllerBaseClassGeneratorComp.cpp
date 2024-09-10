@@ -60,18 +60,7 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 
 	SdlDocumentTypeList sdlDocumentTypeList = m_sdlDocumentListCompPtr->GetDocumentTypes();
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
-		if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
-			if (!m_customSchemaParamsCompPtr.IsValid()){
-				SendErrorMessage(0, "Application is not configured with custom parameters. Auto join is not possible. Please specify paths to join explicitly(use -J option), or disable join.");
-
-				return TS_INVALID;
-			}
-
-			const QString defaultName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
-			QStringList autoJoinFilePaths = GetAutoJoinedCppFilePaths(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
-			PrintFiles(std::cout, autoJoinFilePaths, m_argumentParserCompPtr->GetGeneratorType());
-		}
-		else {
+		if (!m_argumentParserCompPtr->IsAutoJoinEnabled()){
 			QStringList cumulatedFiles;
 			for (const CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){
 				if (!joinHeaders){
@@ -80,12 +69,6 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 				if (!joinSources){
 					cumulatedFiles << WrapFileName(sdlDocumentType.GetName(), QStringLiteral("cpp"), outputDirectoryPath);
 				}
-			}
-			if (joinHeaders){
-				cumulatedFiles << joinRules[ISdlProcessArgumentsParser::s_headerFileType];
-			}
-			if (joinSources){
-				cumulatedFiles << joinRules[ISdlProcessArgumentsParser::s_sourceFileType];
 			}
 
 			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
