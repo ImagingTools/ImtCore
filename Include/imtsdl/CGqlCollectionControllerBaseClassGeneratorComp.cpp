@@ -315,7 +315,10 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	ifStream << QStringLiteral("protected:");
 	FeedStream(ifStream, 1, false);
 
-	const QMap<CSdlDocumentType::OperationType, CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
+	QList<CSdlDocumentType::OperationType> operationsList = sdlDocumentType.GetOperationsList().keys();
+	for (const CSdlDocumentType& subtype : sdlDocumentType.GetSubtypes()){
+		operationsList << subtype.GetOperationsList().keys();
+	}
 
 	// base class methods override definition
 	FeedStreamHorizontally(ifStream, 1);
