@@ -485,7 +485,7 @@ quint64 CMaskContainer::GetUnitCount()
 	bool isStart = true;
 
 	int whileCount = 0;
-	while(1){
+    while(1){
 		quint64 activeItem = 0xffffffffffffffff;
 
 		if (GetActiveItem(activeOffset, activeItem, isStart) == false){
@@ -722,7 +722,7 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 	}
 	else if(m_operationType == OT_OR){
 		if(minOffset == 0xffffffffffffffff){
-            qDebug() << "0xffffffffffffffff";
+            //qDebug() << "0xffffffffffffffff";
             return false;
 		}
 		if(minOffset >= activeOffset){
