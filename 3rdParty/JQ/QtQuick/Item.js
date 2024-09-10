@@ -257,6 +257,16 @@ class Item extends QtObject {
         JQApplication.updateLater(this.parent)
     }
 
+    onOpacityChanged(){
+        this.__setDOMStyle({
+            opacity: this.opacity
+        })
+    }
+
+    onZChanged(){
+        this.__setDOMStyle({ zIndex: this.z })
+    }
+
     onWidthChanged(){
         this.AWidth = this.width
         

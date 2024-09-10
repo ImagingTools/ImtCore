@@ -111,8 +111,18 @@ class Text extends Item {
     }
 
     onColorChanged(){
+        let rgba = this.__getObject('color').__toRGBA()
         this.__setDOMStyle({
-            color: this.color
+            opacity: 1,
+            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+        })
+    }
+
+    onOpacityChanged(){
+        let rgba = this.__getObject('color').__toRGBA()
+        this.__setDOMStyle({
+            opacity: 1,
+            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
         })
     }
 

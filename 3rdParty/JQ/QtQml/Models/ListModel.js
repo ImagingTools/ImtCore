@@ -33,16 +33,19 @@ class ListModel extends QtObject {
     }
 
     __beginUpdate(){
-        this.blockSignals(true)
+        this.dataChanged.blockSignal(true)
     }
 
     __endUpdate(){
-        this.blockSignals(false)
+        this.dataChanged.blockSignal(false)
 
         let changeSet = this.__changeSet
         this.__changeSet = []
 
         // this.count = this.data.length
+        // while(this.__signals.length){
+        //     this.__signals.shift()()
+        // }
 
         for(let obj of this.__views){
             obj.__updateView(changeSet)
@@ -112,6 +115,10 @@ class ListModel extends QtObject {
         }
 
         this.count = this.data.length
+    }
+
+    onDataChanged(){
+
     }
 
     __destroy(){

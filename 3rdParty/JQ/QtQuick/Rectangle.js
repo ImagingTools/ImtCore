@@ -69,6 +69,14 @@ class Rectangle extends Item {
         })
     }
 
+    onOpacityChanged(){
+        let rgba = this.__getObject('color').__toRGBA()
+        this.__setDOMStyle({
+            opacity: this.opacity > 0 ? 1 : 0,
+            backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+        })
+    }
+
     __destroy(){
         if(this.__gradient){
             this.__gradient.__removeListener(this)
