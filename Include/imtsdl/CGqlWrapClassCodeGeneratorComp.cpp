@@ -494,7 +494,7 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 
 	// and finally create all custom types;
 	for (const CSdlField& customType: customTypes){
-		if (customType != sdlField){
+		if (customType.GetType() != sdlField.GetType()){
 			GenerateFieldRequestInfo(stream, customType, hIndents + 1, true);
 		}
 	}
