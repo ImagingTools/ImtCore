@@ -33,7 +33,7 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 	Q_ASSERT(m_sdlRequestListCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 
-	iproc::IProcessor::TaskState retVal = iproc::IProcessor::TS_OK;
+	TaskState retVal = TS_OK;
 
 	if (!m_argumentParserCompPtr->IsGqlEnabled()){
 		return retVal;
@@ -44,38 +44,54 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 		SendCriticalMessage(0, "Output path is not provided");
 		I_CRITICAL();
 
-		return iproc::IProcessor::TS_INVALID;
+		return TS_INVALID;
 	}
 
 	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)){
 		SendErrorMessage(0, QString("Unable to create path '%1'").arg(outputDirectoryPath));
 		I_CRITICAL();
 
-		return iproc::IProcessor::TS_INVALID;
+		return TS_INVALID;
 	}
 
 	const QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
-	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
-	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
+	const bool joinHeaders = joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType);
+	const bool joinSources = joinRules.contains(ISdlProcessArgumentsParser::s_sourceFileType);
 
 	SdlRequestList sdlRequestList = m_sdlRequestListCompPtr->GetRequests();
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
-		for (const CSdlRequest& sdlRequest: sdlRequestList){
-			if (!joinHeaders){
-				std::cout << QString(outputDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.h").toStdString() << std::endl;
+		if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
+			if (!m_customSchemaParamsCompPtr.IsValid()){
+				SendErrorMessage(0, "Application is not configured with custom parameters. Auto join is not possible. Please specify paths to join explicitly(use -J option), or disable join.");
+
+				return TS_INVALID;
 			}
-			if (!joinSources){
-				std::cout << QString(outputDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.cpp").toStdString() << std::endl;
+
+			const QString defaultName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
+			QStringList autoJoinFilePaths = GetAutoJoinedCppFilePaths(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
+			PrintFiles(std::cout, autoJoinFilePaths, m_argumentParserCompPtr->GetGeneratorType());
+		}
+		else {
+			QStringList cumulatedFiles;
+			for (const CSdlRequest& sdlRequest: sdlRequestList){
+				if (!joinHeaders){
+					cumulatedFiles << QString(outputDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.h");
+				}
+				if (!joinSources){
+					cumulatedFiles << QString(outputDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.cpp");
+				}
 			}
-		}
-		if (joinHeaders){
-			std::cout << joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType].toStdString() << std::endl;
-		}
-		if (joinSources){
-			std::cout << joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType].toStdString() << std::endl;
+			if (joinHeaders){
+				cumulatedFiles << joinRules[ISdlProcessArgumentsParser::s_headerFileType];
+			}
+			if (joinSources){
+				cumulatedFiles << joinRules[ISdlProcessArgumentsParser::s_sourceFileType];
+			}
+
+			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		}
 
-		return iproc::IProcessor::TS_OK;
+		return TS_OK;
 	}
 
 	for (const CSdlRequest& sdlRequest: sdlRequestList){
@@ -86,14 +102,14 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 			SendErrorMessage(0, QString("Unable to begin files"));
 			I_CRITICAL();
 
-			return iproc::IProcessor::TS_INVALID;
+			return TS_INVALID;
 		}
 
 		if (!CloseFiles()){
 			SendErrorMessage(0, QString("Unable to finalize files"));
 			I_CRITICAL();
 
-			return iproc::IProcessor::TS_INVALID;
+			return TS_INVALID;
 		}
 	}
 
@@ -118,7 +134,7 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 					filterParams.InsertOption("C" + sdlRequest.GetName() + "GqlRequest.h", QByteArray::number(filterParams.GetOptionsCount()));
 				}
 
-				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
+				outputFileNameParam.SetPath(joinRules[ISdlProcessArgumentsParser::s_headerFileType]);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
 				if (joinProcessResult != TS_OK){
 					SendCriticalMessage(0, "Unable to join header files");
@@ -138,7 +154,7 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 					filterParams.InsertOption("C" + sdlRequest.GetName() + "GqlRequest.cpp", QByteArray::number(filterParams.GetOptionsCount()));
 				}
 
-				const QString sourceFilePath = joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
+				const QString sourceFilePath = joinRules[ISdlProcessArgumentsParser::s_sourceFileType];
 				outputFileNameParam.SetPath(sourceFilePath);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
 				if (joinProcessResult != TS_OK){
@@ -162,7 +178,7 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 
 						return TS_INVALID;
 					}
-					QFileInfo headerFileInfo(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
+					QFileInfo headerFileInfo(joinRules[ISdlProcessArgumentsParser::s_headerFileType]);
 					QByteArray sourceReadData = joinedSourceFile.readAll();
 					joinedSourceFile.seek(0);
 					QByteArray includeDirective = QByteArrayLiteral("#include ");

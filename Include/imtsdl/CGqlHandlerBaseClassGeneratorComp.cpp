@@ -54,16 +54,31 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 	}
 
 	const QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
-	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
-	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
+	const bool joinHeaders = joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType);
+	const bool joinSources = joinRules.contains(ISdlProcessArgumentsParser::s_sourceFileType);
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
-		if (joinHeaders){
-			std::cout << joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType].toStdString() << std::endl;
-			std::cout << joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType].toStdString() << std::endl;
+		if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
+			if (!m_customSchemaParamsCompPtr.IsValid()){
+				SendErrorMessage(0, "Application is not configured with custom parameters. Auto join is not possible. Please specify paths to join explicitly(use -J option), or disable join.");
+
+				return TS_INVALID;
+			}
+
+			const QString defaultName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
+			QStringList autoJoinFilePaths = GetAutoJoinedCppFilePaths(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
+			PrintFiles(std::cout, autoJoinFilePaths, m_argumentParserCompPtr->GetGeneratorType());
 		}
 		else {
-			std::cout << WrapFileName(QStringLiteral("h"), outputDirectoryPath).toStdString() << std::endl;
-			std::cout << WrapFileName(QStringLiteral("cpp"), outputDirectoryPath).toStdString() << std::endl;
+			QStringList cumulatedFiles;
+			if (joinHeaders){
+				cumulatedFiles << joinRules[ISdlProcessArgumentsParser::s_headerFileType];
+				cumulatedFiles << joinRules[ISdlProcessArgumentsParser::s_sourceFileType];
+			}
+			else {
+				cumulatedFiles << WrapFileName(QStringLiteral("h"), outputDirectoryPath);
+				cumulatedFiles << WrapFileName(QStringLiteral("cpp"), outputDirectoryPath);
+			}
+			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		}
 
 		return TS_OK;
@@ -124,7 +139,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 				filterParams.ResetOptions();
 				filterParams.InsertOption(WrapFileName(QStringLiteral("h")), QByteArray::number(filterParams.GetOptionsCount()));
 
-				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
+				outputFileNameParam.SetPath(joinRules[ISdlProcessArgumentsParser::s_headerFileType]);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
 				if (joinProcessResult != TS_OK){
 					SendCriticalMessage(0, "Unable to join header files");
@@ -141,7 +156,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 				filterParams.ResetOptions();
 				filterParams.InsertOption(WrapFileName(QStringLiteral("cpp")), QByteArray::number(filterParams.GetOptionsCount()));
 
-				const QString sourceFilePath = joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
+				const QString sourceFilePath = joinRules[ISdlProcessArgumentsParser::s_sourceFileType];
 				outputFileNameParam.SetPath(sourceFilePath);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
 				if (joinProcessResult != TS_OK){
@@ -163,7 +178,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 
 						return TS_INVALID;
 					}
-					QFileInfo headerFileInfo(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
+					QFileInfo headerFileInfo(joinRules[ISdlProcessArgumentsParser::s_headerFileType]);
 					QByteArray sourceReadData = joinedSourceFile.readAll();
 					joinedSourceFile.seek(0);
 					QByteArray includeDirective = QByteArrayLiteral("#include ");
