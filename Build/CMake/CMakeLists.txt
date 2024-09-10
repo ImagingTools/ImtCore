@@ -157,6 +157,7 @@ endif()
 if(NOT DEFINED USE_SDL OR USE_SDL)
 	#-------- Sdl --------
 	add_subdirectory("${SDL_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauthsdl")
+	add_subdirectory("${SDL_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlicsdl")
 endif()
 
 if(NOT DEFINED USE_QTDB OR USE_QTDB)
