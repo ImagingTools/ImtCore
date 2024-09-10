@@ -260,7 +260,8 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				m_startKey = true;
 				if (m_startParams && endParams && !m_startFields){
 					m_startFields = true;
-				}
+                    m_activeGqlObjectPtr = nullptr;
+                }
 			}
 			break;
 
@@ -733,7 +734,9 @@ void CGqlRequest::SetParseObject(const QByteArray &commandId)
 void CGqlRequest::SetParseText(const QByteArray &text)
 {
 	if (m_activeGqlObjectPtr == nullptr){
-		SetParseObject("");
+        SetParseObject(text);
+
+        return;
 	}
 	QByteArray lastArrayId;
 	if (!m_activeArrayIds.isEmpty()){
