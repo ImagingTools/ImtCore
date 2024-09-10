@@ -719,6 +719,9 @@ bool CGqlSchemaParser::MoveToCharType(
 bool CGqlSchemaParser::MoveToNextReadableSymbol(char* foundDelimeterPtr, bool skipDelimeter)
 {
 	return MoveToCharType(QList<QChar::Category>()
+				<< QChar::Number_DecimalDigit
+				<< QChar::Number_Letter
+				<< QChar::Number_Other
 				<< QChar::Letter_Uppercase
 				<< QChar::Letter_Lowercase
 				<< QChar::Letter_Titlecase
