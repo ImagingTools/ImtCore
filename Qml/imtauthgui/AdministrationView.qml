@@ -12,6 +12,8 @@ Item {
     property alias multiPageView: multiPageView;
     signal multiPageUpdated();
 
+    property string productId: context.appName;
+
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
 
@@ -54,6 +56,7 @@ Item {
         id: roleCollectionComp;
 
         RoleCollectionView {
+            productId: container.productId;
         }
     }
 
@@ -61,6 +64,7 @@ Item {
         id: userCollectionComp;
 
         UserCollectionView {
+            productId: container.productId;
         }
     }
 
@@ -68,6 +72,7 @@ Item {
         id: userGroupCollectionComp;
 
         UserGroupCollectionView {
+            productId: container.productId;
         }
     }
 
@@ -78,7 +83,6 @@ Item {
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
-
 
         Component.onCompleted: {
             updateModel();

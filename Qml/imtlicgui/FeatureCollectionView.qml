@@ -37,9 +37,8 @@ RemoteCollectionView {
     }
 
     Component {
-        id: treeItemModelComp;
-
-        TreeItemModel {}
+        id: featureDataComp;
+        FeatureData {}
     }
 
     Component {
@@ -58,25 +57,28 @@ RemoteCollectionView {
             commandsDelegateComp: Component {ViewCommandsDelegateBase {
                     view: featureEditor;
                     onCommandActivated: {
-                        console.log("onCommandActivated", commandId);
                         let selectedIndex = null;
                         if (featureEditor.tableView.tableSelection.items.length > 0){
                             selectedIndex = featureEditor.tableView.tableSelection.items[0];
                         }
 
                         if (commandId === "InsertFeature"){
+                            let childModel = featureEditor.featureData.m_subFeatures;
                             if (selectedIndex != null){
-                                let childModel = selectedIndex.getData("ChildModel");
-
-                                let emptyModel = treeItemModelComp.createObject(childModel)
-                                childModel.insertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
+                                childModel = selectedIndex.itemData.m_subFeatures;
                             }
+
+                            let newFeatureData = featureDataComp.createObject(childModel)
+                            newFeatureData.m_featureName = qsTr("Feature Name");
+                            childModel.insert(0, {item: newFeatureData})
+                            featureEditor.model.modelChanged([])
                         }
                         else if (commandId === "RemoveFeature"){
                             if (selectedIndex != null){
-                                let parentModel = selectedIndex.getParentModel();
+                                let parentModel = selectedIndex.parentIndex.itemData.m_subFeatures;
+                                parentModel.remove(selectedIndex.index);
 
-                                parentModel.removeItem(selectedIndex.index);
+                                featureEditor.model.modelChanged([])
                             }
                         }
                     }
@@ -91,9 +93,9 @@ RemoteCollectionView {
         GqlRequestDocumentDataController {
             id: requestDocumentDataController
 
-            gqlGetCommandId: ImtlicFeaturesSdlCommandIds.s_featureItem;
-            gqlUpdateCommandId: ImtlicFeaturesSdlCommandIds.s_featureUpdate;
-            gqlAddCommandId: ImtlicFeaturesSdlCommandIds.s_featureAdd;
+            gqlGetCommandId: ImtlicFeaturesSdlCommandIds.s_getFeatureItem;
+            gqlUpdateCommandId: ImtlicFeaturesSdlCommandIds.s_updateFeature;
+            gqlAddCommandId: ImtlicFeaturesSdlCommandIds.s_addFeature;
 
             documentModelComp: Component {
                 FeatureData {}

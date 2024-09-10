@@ -14,7 +14,7 @@ RemoteCollectionView {
     collectionId: "Users";
     visibleMetaInfo: true;
 
-    property string productId: context.appName;
+    property string productId;
 
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
             collectionView: userCollectionViewContainer;
@@ -340,7 +340,7 @@ RemoteCollectionView {
 
             rolesModel: userCollectionViewContainer.rolesModel;
             groupsModel: userCollectionViewContainer.groupsModel;
-            productId: context.appName;
+            productId: userCollectionViewContainer.productId;
 
             commandsDelegateComp: Component {ViewCommandsDelegateBase {
                     view: userEditor;
@@ -367,9 +367,9 @@ RemoteCollectionView {
             gqlAddCommandId: ImtauthUsersSdlCommandIds.s_userAdd;
 
             Component.onCompleted: {
-                getRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, context.appName);
-                addRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, context.appName);
-                updateRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, context.appName);
+                getRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, userCollectionViewContainer.productId);
+                addRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, userCollectionViewContainer.productId);
+                updateRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, userCollectionViewContainer.productId);
             }
 
             documentModelComp: Component {

@@ -40,7 +40,7 @@ RemoteCollectionView {
         }
     }
 
-    property string productId: context.appName;
+    property string productId;
 
     function onLocalizationChanged(language){
         roleCollectionViewContainer.dataController.updateHeaders();
@@ -124,6 +124,11 @@ RemoteCollectionView {
             gqlAddCommandId: ImtauthRolesSdlCommandIds.s_roleAdd;
 
             Component.onCompleted: {
+                if (roleCollectionViewContainer.productId === ""){
+                    console.error("Unable to create an additional GraphQL input parameters. Product-ID is empty:", gqlGetCommandId);
+                    return null;
+                }
+
                 getRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
                 addRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
                 updateRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
@@ -140,6 +145,11 @@ RemoteCollectionView {
             }
 
             function getAdditionalInputParams(){
+                if (roleCollectionViewContainer.productId === ""){
+                    console.error("Unable to get additional parameters. Product-ID is empty");
+                    return null;
+                }
+
                 let obj = {}
                 obj["ProductId"] = roleCollectionViewContainer.productId;
 

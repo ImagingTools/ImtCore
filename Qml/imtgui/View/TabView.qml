@@ -95,9 +95,6 @@ Item {
         anchors.top: tabPanel.bottom;
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
-        // anchors.topMargin: root.mainMargin;
-        // anchors.leftMargin: root.mainMargin;
-        // anchors.rightMargin: root.mainMargin;
 
         color: Style.backgroundColor;
 

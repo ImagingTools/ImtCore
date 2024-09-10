@@ -23,7 +23,6 @@ Item {
     signal descriptionSetted(string objectId, string description);
 
     property alias removeGqlModel: removeModel;
-    property alias objectViewGqlModel: objectViewModel;
     property alias headersGqlModel: headersModel;
 
     property var payloadModel: null
@@ -52,18 +51,6 @@ Item {
 
     function updateModel(){
         updateHeaders();
-
-//        updateObjectEditorInfo();
-    }
-
-    function updateObjectEditorInfo(){
-        if (root.collectionId === ""){
-            console.error("Unable to update object view 'collectionId' is empty!");
-
-            return;
-        }
-
-        objectViewModel.getObjectView();
     }
 
     function updateHeaders(){
@@ -87,7 +74,6 @@ Item {
 
         if (root.collectionId === ""){
             console.error("Unable to update elements 'collectionId' is empty!");
-
             return;
         }
 
@@ -571,73 +557,6 @@ Item {
             }
             if (this.state !== "Loading"){
                 root.endUpdate();
-            }
-        }
-    }
-
-    GqlModel {
-        id: objectViewModel;
-
-        function getObjectView(){
-            var query = Gql.GqlRequest("query", root.collectionId + "ObjectView");
-
-            var inputParams = Gql.GqlObject("input");
-
-            let additionInputParams = root.getAdditionalInputParams();
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-                inputParams.InsertFieldObject(additionParams);
-            }
-
-            query.AddParam(inputParams);
-
-            var queryFields = Gql.GqlObject("objectView");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
-            query.AddField(queryFields);
-
-            var gqlData = query.GetQuery();
-            this.setGqlQuery(gqlData);
-        }
-
-        onStateChanged: {
-            if (this.state === "Ready"){
-                var dataModelLocal;
-
-                if (this.containsKey("errors")){
-                    dataModelLocal = this.getData("errors");
-
-                    if (dataModelLocal.containsKey(root.collectionId + "ObjectView")){
-                        dataModelLocal = dataModelLocal.getData(root.collectionId + "ObjectView");
-                    }
-
-                    let message = ""
-                    if (dataModelLocal.containsKey("message")){
-                        message = dataModelLocal.getData("message");
-                    }
-
-                    let type;
-                    if (dataModelLocal.containsKey("type")){
-                        type = dataModelLocal.getData("type");
-                    }
-
-                    ModalDialogManager.showWarningDialog(message)
-
-                    return;
-                }
-
-                dataModelLocal = this.getData("data");
-                if(!dataModelLocal)
-                    return;
-
-                if (dataModelLocal.containsKey(root.collectionId + "ObjectView")){
-                    dataModelLocal = dataModelLocal.getData(root.collectionId + "ObjectView");
-
-                    root.objectEditorInfoModel = dataModelLocal;
-                }
             }
         }
     }

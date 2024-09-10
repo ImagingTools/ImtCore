@@ -1,6 +1,10 @@
 #include <imtlicgql/CFeatureCollectionControllerComp.h>
 
 
+// ACF includes
+#include <iprm/CIdParam.h>
+#include <iprm/CParamsSet.h>
+
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
 
@@ -11,11 +15,127 @@ namespace imtlicgql
 
 // protected methods
 
+bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
+			const sdl::imtlic::Features::CFeatureData& featureRepresentationData,
+			imtlic::CFeatureInfo& featureInfo,
+			QString& errorMessage) const
+{
+	QByteArray objectId = featureRepresentationData.GetId();
+
+	QByteArray featureId = featureRepresentationData.GetFeatureId();
+	if (featureId.isEmpty()){
+		errorMessage = QString("Unable to create feature with an empty 'Feature-ID'");
+		return false;
+	}
+
+	featureInfo.SetFeatureId(featureId);
+
+	iprm::CIdParam idParam;
+	idParam.SetId(featureId);
+
+	iprm::CParamsSet paramsSet1;
+	paramsSet1.SetEditableParameter("FeatureId", &idParam);
+
+	iprm::CParamsSet filterParam;
+	filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
+
+	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+	if (!collectionIds.isEmpty()){
+		QByteArray id = collectionIds[0];
+		if (!objectId.isEmpty() && objectId != id){
+			errorMessage = QT_TR_NOOP(QString("Feature-ID: '%1' already exists. Please rename")).arg(qPrintable(featureId));
+			return false;
+		}
+	}
+
+	QString featureName = featureRepresentationData.GetFeatureName();
+	if (featureName.isEmpty()){
+		errorMessage = QString("Unable to create feature with an empty 'Feature Name'");
+		return false;
+	}
+
+	featureInfo.SetFeatureName(featureName);
+
+	QString description = featureRepresentationData.GetDescription();
+	featureInfo.SetFeatureDescription(description);
+
+	QByteArray dependencies = featureRepresentationData.GetDependencies();
+	featureInfo.SetDependencies(dependencies.split(';'));
+
+	bool isOptional = featureRepresentationData.GetOptional();
+	featureInfo.SetOptional(isOptional);
+
+	QList<sdl::imtlic::Features::CFeatureData> subFeatureDataList = featureRepresentationData.GetSubFeatures();
+	for (const sdl::imtlic::Features::CFeatureData& subFeatureData : subFeatureDataList){
+		imtlic::CFeatureInfo* subFeatureInfoPtr = new imtlic::CFeatureInfo();
+
+		bool ok = CreateFeatureFromRepresentationModel(subFeatureData, *subFeatureInfoPtr, errorMessage);
+		if (!ok){
+			return false;
+		}
+
+		featureInfo.InsertSubFeature(subFeatureInfoPtr);
+	}
+
+	return true;
+}
+
+
+bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
+			const imtlic::CFeatureInfo& featureInfo,
+			sdl::imtlic::Features::CFeatureData& featureRepresentationData,
+			QString& errorMessage) const
+{
+	QByteArray featureId = featureInfo.GetFeatureId();
+	featureRepresentationData.SetFeatureId(featureId);
+
+	QString featureName = featureInfo.GetFeatureName();
+	featureRepresentationData.SetFeatureName(featureName);
+	featureRepresentationData.SetName(featureName);
+
+	QByteArrayList dependencies = featureInfo.GetDependencies();
+	featureRepresentationData.SetDependencies(dependencies.join(';'));
+
+	QString description = featureInfo.GetFeatureDescription();
+	featureRepresentationData.SetDescription(description);
+
+	bool isOptional = featureInfo.IsOptional();
+	featureRepresentationData.SetOptional(isOptional);
+
+	QList<sdl::imtlic::Features::CFeatureData> subFeatureDataList;
+	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+	if (!subFeatures.IsEmpty()){
+		for (int i = 0; i < subFeatures.GetCount(); i++){
+			const imtlic::IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
+			if (featureInfoPtr == nullptr){
+				return false;
+			}
+
+			const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr);
+			Q_ASSERT(subFeatureInfoPtr != nullptr);
+
+			sdl::imtlic::Features::CFeatureData subfeatureData;
+			imtbase::CTreeItemModel subFeatureRepresentationModel;
+			bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, subfeatureData, errorMessage);
+			if (!ok){
+				return false;
+			}
+
+			subFeatureDataList << subfeatureData;
+		}
+	}
+
+	featureRepresentationData.SetSubFeatures(subFeatureDataList);
+
+	return true;
+}
+
+
 // reimplemented (sdl::imtlic::Features::CFeatureCollectionControllerCompBase)
 
 bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtlic::Features::CGetFeaturesListGqlRequest& featuresListRequest,
+			const sdl::imtlic::Features::CFeaturesListGqlRequest& featuresListRequest,
 			sdl::imtlic::Features::CFeatureItem& representationObject,
 			QString& errorMessage) const
 {
@@ -43,10 +163,14 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
 
-	sdl::imtlic::Features::GetFeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
+	sdl::imtlic::Features::FeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.SetId(objectId);
+	}
+
+	if (requestInfo.items.isTypeIdRequested){
+		representationObject.SetTypeId(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
 	}
 
 	if (requestInfo.items.isFeatureIdRequested){
@@ -55,6 +179,10 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 	if (requestInfo.items.isNameRequested){
 		representationObject.SetName(featureInfoPtr->GetFeatureName());
+	}
+
+	if (requestInfo.items.isFeatureNameRequested){
+		representationObject.SetFeatureName(featureInfoPtr->GetFeatureName());
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
@@ -67,6 +195,14 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 	if (requestInfo.items.isDependenciesRequested){
 		representationObject.SetDependencies(featureInfoPtr->GetDependencies().join(';'));
+	}
+
+	if (requestInfo.items.isSubFeaturesRequested){
+		sdl::imtlic::Features::CFeatureData featureData;
+		bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, featureData, errorMessage);
+		if (ok){
+			representationObject.SetSubFeatures(featureData.GetSubFeatures());
+		}
 	}
 
 	if (requestInfo.items.isAddedRequested){
@@ -120,13 +256,23 @@ istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentat
 	}
 
 	newObjectId = featureDataRepresentation.GetId();
+	if (newObjectId.isEmpty()){
+		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
 	featureInfoPtr->SetObjectUuid(newObjectId);
 
-	name = featureDataRepresentation.GetName();
+	name = featureDataRepresentation.GetFeatureName();
 	featureInfoPtr->SetFeatureName(name);
 
 	description = featureDataRepresentation.GetDescription();
 	featureInfoPtr->SetFeatureDescription(description);
+
+	bool ok = CreateFeatureFromRepresentationModel(featureDataRepresentation, *featureInfoPtr, errorMessage);
+	if (!ok){
+		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
+
+		return nullptr;
+	}
 
 	return featureInstancePtr.PopPtr();
 }
@@ -153,130 +299,13 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 	QByteArray id = arguments.input.GetId();
 	featureData.SetId(id);
 
-	representationPayload.SetFeatureData(featureData);
-
-	return true;
-}
-
-
-bool CFeatureCollectionControllerComp::SetupGqlItem(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
-			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-			QString& /*errorMessage*/) const
-{
-	if (objectCollectionIterator == nullptr){
+	bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, featureData, errorMessage);
+	if (!ok){
+		errorMessage = QString("Unable to create representaion from object");
 		return false;
 	}
 
-	bool retVal = true;
-
-	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
-
-	QByteArray objectId = objectCollectionIterator->GetObjectId();
-
-	if (!informationIds.isEmpty() && m_objectCollectionCompPtr.IsValid()){
-		const imtlic::CFeatureInfo* featureInfoPtr = nullptr;
-
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (objectCollectionIterator->GetObjectData(dataPtr)){
-			featureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(dataPtr.GetPtr());
-		}
-
-		if (featureInfoPtr != nullptr){
-			for (const QByteArray& informationId : informationIds){
-				QVariant elementInformation;
-
-				if(informationId == "Id"){
-					elementInformation = objectId;
-				}
-				else if(informationId == "TypeId"){
-					elementInformation = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
-				}
-				else if(informationId == "FeatureId"){
-					elementInformation = featureInfoPtr->GetFeatureId();
-				}
-				else if(informationId == "FeatureName" || informationId == "Name"){
-					elementInformation = featureInfoPtr->GetFeatureName();
-				}
-				else if(informationId == "FeatureDescription" || informationId == "Description"){
-					elementInformation = featureInfoPtr->GetFeatureDescription();
-				}
-				else if(informationId == "Optional"){
-					elementInformation = featureInfoPtr->IsOptional();
-				}
-				else if(informationId == "Dependencies"){
-					elementInformation = featureInfoPtr->GetDependencies().join(';');
-				}
-				else if(informationId == "ChildModel"){
-					imtbase::CTreeItemModel* representationModelPtr = model.AddTreeModel("ChildModel", itemIndex);
-
-					CreateChildModelRepresentation(*featureInfoPtr, *representationModelPtr);
-
-					continue;
-				}
-				else if(informationId == "Added"){
-					QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
-					addedTime.setTimeSpec(Qt::UTC);
-
-					elementInformation = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-				}
-				else if(informationId == "LastModified"){
-					QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
-					lastTime.setTimeSpec(Qt::UTC);
-
-					elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-				}
-
-				if (elementInformation.isNull()){
-					elementInformation = "";
-				}
-
-				retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
-			}
-
-			return true;
-		}
-	}
-
-	return false;
-}
-
-
-bool CFeatureCollectionControllerComp::CreateChildModelRepresentation(
-			const imtlic::CFeatureInfo& featureInfo,
-			imtbase::CTreeItemModel& representationModel) const
-{
-	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
-
-	for (int i = 0; i < subFeatures.GetCount(); i++){
-		const imtlic::IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
-		if (featureInfoPtr == nullptr){
-			return false;
-		}
-
-		int index = representationModel.InsertNewItem();
-
-		representationModel.SetData("FeatureId", featureInfoPtr->GetFeatureId(), index);
-		representationModel.SetData("FeatureName", featureInfoPtr->GetFeatureName(), index);
-		representationModel.SetData("Optional", featureInfoPtr->IsOptional(), index);
-		representationModel.SetData("FeatureDescription", featureInfoPtr->GetFeatureDescription(), index);
-		representationModel.SetData("Dependencies", featureInfoPtr->GetDependencies().join(';'), index);
-		representationModel.SetData("ChildModel", 0, index);
-
-		const imtlic::FeatureInfoList& features = featureInfoPtr->GetSubFeatures();
-		if (!features.IsEmpty()){
-			const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr);
-			Q_ASSERT(subFeatureInfoPtr != nullptr);
-
-			imtbase::CTreeItemModel* childModelPtr = representationModel.AddTreeModel("ChildModel", index);
-			bool ok = CreateChildModelRepresentation(*subFeatureInfoPtr, *childModelPtr);
-			if (!ok){
-				return false;
-			}
-		}
-	}
+	representationPayload.SetFeatureData(featureData);
 
 	return true;
 }

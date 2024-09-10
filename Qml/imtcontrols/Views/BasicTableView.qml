@@ -159,8 +159,6 @@ FocusScope {
     }
 
     function addChildItem(modelIndex, rowObj){
-        console.log("addChildItem", modelIndex, rowObj);
-
         if (!rowObj){
             return false;
         }
@@ -353,16 +351,11 @@ FocusScope {
 
         Column {
             id: bodyColumn;
-
             width: parent.width;
 
             Repeater {
                 id: listView;
-
-//                anchors.fill: parent;
-
                 model: tableViewRoot.rowModel;
-
                 delegate: TableViewItemDelegateBase {
                     root: tableViewRoot;
                 }

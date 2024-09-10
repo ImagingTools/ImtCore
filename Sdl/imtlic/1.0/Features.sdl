@@ -12,6 +12,17 @@ input FeaturesListInput {
 	viewParams: CollectionViewParams
 }
 
+type FeatureData {
+	Id: ID
+	FeatureId: ID
+	Name: String
+	FeatureName: String
+	Description: String
+	Optional: Bool
+	Dependencies: ID
+	SubFeatures: [FeatureData]
+}
+
 type FeatureItem {
 	Id: ID!
 	Name: String!
@@ -23,22 +34,12 @@ type FeatureItem {
 	Dependencies: ID
 	Added: String
 	LastModified: String
+	SubFeatures: [FeatureData]
 }
 
 type FeaturesListPayload {
 	items: [FeatureItem]
 	notification: NotificationItem
-}
-
-type FeatureData {
-	Id: ID!
-	FeatureId: ID!
-	Name: String!
-	FeatureName: String!
-	Description: String
-	Optional: Bool
-	Dependencies: ID
-	SubFeatures: [FeatureData]
 }
 
 input FeatureDataInput {
@@ -55,7 +56,7 @@ input FeatureItemInput {
 }
 
 type Query {
-	GetFeaturesList (input:FeaturesListInput): FeaturesListPayload!
+	FeaturesList (input:FeaturesListInput): FeaturesListPayload!
 	GetFeatureItem (input: FeatureItemInput): FeatureDataPayload!
 }
 
@@ -68,7 +69,7 @@ collectionSchema {
 	type Feature {
 		ref: FeatureItem
 		operations {
-			list: GetFeaturesList
+			list: FeaturesList
 		}
 		subtype Feature {
 			ref: FeatureData

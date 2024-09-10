@@ -1,9 +1,13 @@
 import QtQuick 2.0
 import Acf 1.0
 import imtcontrols 1.0
+import imtlicFeaturesSdl 1.0
 
 TreeViewItemDelegateBase {
     id: packageTreeItemDelegate;
+
+    property FeatureData featureData: model.item ? model.item : null;
+    itemData: featureData;
 
     rowBodyDelegate: Component{ Row {
             id: row;
@@ -16,34 +20,26 @@ TreeViewItemDelegateBase {
 
             Item {
                 id: nameItem;
-
                 width: packageTreeItemDelegate.root && packageTreeItemDelegate.root.columnCount !== 0 ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount - 20 * packageTreeItemDelegate.level : 0;
                 height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
 
                 Text {
                     anchors.verticalCenter: nameItem.verticalCenter;
-
                     width: parent.width;
-
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
                     color: Style.textColor;
                     elide: Text.ElideRight;
-
                     visible: !inputName.visible;
-
-                    text: model.FeatureName ? model.FeatureName : "";
+                    text: packageTreeItemDelegate.featureData ? packageTreeItemDelegate.featureData.m_featureName : "";
                 }
 
                 MouseArea {
                     anchors.fill: parent;
-
                     visible: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : false;
-
                     onClicked: {
                         packageTreeItemDelegate.mouseArea.clicked(null);
                     }
-
                     onDoubleClicked: {
                         inputName.visible = true;
                         inputName.focus = true;
@@ -52,34 +48,30 @@ TreeViewItemDelegateBase {
 
                 CustomTextField {
                     id: inputName;
-
                     anchors.verticalCenter: nameItem.verticalCenter;
-
                     width: parent.width - 10;
                     height: parent.height - 7;
-
-                    text: model.FeatureName ? model.FeatureName : "";
-
+                    text: packageTreeItemDelegate.featureData ? packageTreeItemDelegate.featureData.m_featureName : "";
                     visible: false;
                     autoEditingFinished: false;
-
                     onCancelled: {
                         inputName.visible = false;
                     }
-
                     onEditingFinished: {
                         inputName.visible = false;
+                        let featureName = packageTreeItemDelegate.featureData.m_featureName;
+                        let featureId = packageTreeItemDelegate.featureData.m_featureId;
 
-                        if (model.FeatureName !== inputName.text){
+                        if (featureName !== inputName.text){
                             let id = inputName.text.replace(/\s+/g, '');
 
-                            model.FeatureName = inputName.text;
+                            packageTreeItemDelegate.featureData.m_featureName = inputName.text;
 
-                            if (model.FeatureId === ""){
-                                let id = model.FeatureName.replace(/\s+/g, '');
+                            if (featureId === ""){
+                                let id = featureName.replace(/\s+/g, '');
                                 let alreadyExists = packageTreeItemDelegate.root.featureIdExists(id);
                                 if (!alreadyExists){
-                                    model.FeatureId = id;
+                                    packageTreeItemDelegate.featureData.m_featureId = id;
                                 }
                             }
                         }
@@ -95,27 +87,21 @@ TreeViewItemDelegateBase {
 
                 Text {
                     anchors.verticalCenter: idItem.verticalCenter;
-
                     width: parent.width;
-
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
                     color: Style.textColor;
                     visible: !inputId.visible;
                     elide: Text.ElideRight;
-
-                    text: model.FeatureId ? model.FeatureId : "";
+                    text: packageTreeItemDelegate.featureData ? packageTreeItemDelegate.featureData.m_featureId : "";
                 }
 
                 MouseArea {
                     anchors.fill: parent;
-
                     visible: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : 0;
-
                     onClicked: {
                         packageTreeItemDelegate.mouseArea.clicked(null);
                     }
-
                     onDoubleClicked: {
                         inputId.visible = true;
                         inputId.focus = true;
@@ -124,14 +110,10 @@ TreeViewItemDelegateBase {
 
                 CustomTextField {
                     id: inputId;
-
                     anchors.verticalCenter: idItem.verticalCenter;
-
                     width: parent.width - 10;
                     height: parent.height - 7;
-
-                    text: model.FeatureId ? model.FeatureId : "";
-
+                    text: packageTreeItemDelegate.featureData ? packageTreeItemDelegate.featureData.m_featureId : "";
                     visible: false;
                     autoEditingFinished: false;
 
@@ -148,12 +130,13 @@ TreeViewItemDelegateBase {
 
                         inputId.visible = false;
 
-                        if (model.FeatureId !== inputId.text){
-                            let canRename = packageTreeItemDelegate.root.canRename(model.FeatureId);
+                        let featureId = packageTreeItemDelegate.featureData.m_featureId;
+                        if (featureId !== inputId.text){
+                            let canRename = packageTreeItemDelegate.root.canRename(featureId);
                             if (canRename){
                                 let alreadyExists = packageTreeItemDelegate.root.featureIdExists(inputId.text);
                                 if (!alreadyExists){
-                                    model.FeatureId = inputId.text;
+                                    packageTreeItemDelegate.featureData.m_featureId = inputId.text;
 
                                     return;
                                 }
@@ -177,27 +160,21 @@ TreeViewItemDelegateBase {
 
                 Text {
                     anchors.verticalCenter: descriptionItem.verticalCenter;
-
                     width: parent.width;
-
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
                     color: Style.textColor;
                     visible: !inputDescription.visible;
                     elide: Text.ElideRight;
-
-                    text: model.FeatureDescription ? model.FeatureDescription : "";
+                    text: packageTreeItemDelegate.featureData ? packageTreeItemDelegate.featureData.m_description : "";
                 }
 
                 MouseArea {
                     anchors.fill: parent;
-
                     visible: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : false;
-
                     onClicked: {
                         packageTreeItemDelegate.mouseArea.clicked(null);
                     }
-
                     onDoubleClicked: {
                         inputDescription.visible = true;
                         inputDescription.focus = true;
@@ -206,14 +183,10 @@ TreeViewItemDelegateBase {
 
                 CustomTextField {
                     id: inputDescription;
-
                     anchors.verticalCenter: descriptionItem.verticalCenter;
-
                     width: parent.width - 10;
                     height: parent.height - 7;
-
-                    text: model.FeatureDescription ? model.FeatureDescription : "";
-
+                    text: packageTreeItemDelegate.featureData ? packageTreeItemDelegate.featureData.m_description : "";
                     visible: false;
                     autoEditingFinished: false;
 
@@ -224,8 +197,9 @@ TreeViewItemDelegateBase {
                     onEditingFinished: {
                         inputDescription.visible = false;
 
-                        if (model.FeatureDescription !== inputDescription.text){
-                            model.FeatureDescription = inputDescription.text;
+                        let description = packageTreeItemDelegate.featureData.m_description;
+                        if (description !== inputDescription.text){
+                            packageTreeItemDelegate.featureData.m_description = inputDescription.text;
                         }
                     }
                 }
@@ -242,15 +216,48 @@ TreeViewItemDelegateBase {
                     anchors.horizontalCenter: parent.horizontalCenter;
 
                     z: 10;
-
-                    checkState: model.Optional ? Qt.Checked : Qt.Unchecked;
-
+                    checkState: packageTreeItemDelegate.featureData.m_optional ? Qt.Checked : Qt.Unchecked;
                     isActive: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : true;
-
-                    visible: packageTreeItemDelegate.level !== 0 && !packageTreeItemDelegate.hasChild;
+                    visible: !packageTreeItemDelegate.hasChild;
 
                     onClicked: {
-                        model.Optional = !model.Optional;
+                        packageTreeItemDelegate.featureData.m_optional = !packageTreeItemDelegate.featureData.m_optional;
+                    }
+                }
+            }
+        }
+    }
+
+    footerDelegate: Component { Column {
+            id: childrenColumn;
+
+            visible: packageTreeItemDelegate.isOpened;
+
+            Repeater {
+                id: childModelRepeater;
+                model: packageTreeItemDelegate.itemData.m_subFeatures ? packageTreeItemDelegate.itemData.m_subFeatures: 0;
+                delegate: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowDelegate : null;
+                onCountChanged: {
+                    packageTreeItemDelegate.hasChild = count > 0;
+                }
+
+                onItemAdded: {
+                    item.parentDelegate = packageTreeItemDelegate;
+                    packageTreeItemDelegate.childrenDelegates.push(item);
+                    item.modelIndex.parentIndex = packageTreeItemDelegate.modelIndex;
+                    packageTreeItemDelegate.modelIndex.childModel.push(item.modelIndex);
+                    item.modelIndex.treeModel = childModelRepeater.model;
+                }
+
+                onItemRemoved: {
+                    let index = packageTreeItemDelegate.childrenDelegates.indexOf(item);
+                    if (index > -1) {
+                        packageTreeItemDelegate.childrenDelegates.splice(index, 1);
+                    }
+
+                    index = packageTreeItemDelegate.modelIndex.childModel.indexOf(item.modelIndex);
+                    if (index > -1) {
+                        packageTreeItemDelegate.modelIndex.childModel.splice(index, 1);
                     }
                 }
             }

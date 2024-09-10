@@ -22,6 +22,11 @@ ViewBase {
     }
 
     function updateModel(){
+        if (container.productId === ""){
+            console.error("Unable to update a role model. Product-ID is empty");
+            return;
+        }
+
         generalGroup.updateModel();
         permissionsGroup.updateModel()
 

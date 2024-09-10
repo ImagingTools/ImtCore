@@ -1,6 +1,5 @@
 module imtlicgui
 
-singleton FeaturesProvider 1.0 FeaturesProvider.qml
 LicensesProvider 1.0 LicensesProvider.qml
 FeaturesDependenciesProvider 1.0 FeaturesDependenciesProvider.qml
 

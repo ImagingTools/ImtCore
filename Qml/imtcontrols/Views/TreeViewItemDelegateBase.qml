@@ -26,7 +26,7 @@ TableViewItemDelegateBase {
     signal parentCheckStateChanged(var delegate);
     signal childrenCheckStateChanged(var delegate);
 
-    property var childModel: model.ChildModel;
+    property string childModelKey: "ChildModel";
 
     Connections {
         id: connections;
@@ -153,14 +153,11 @@ TableViewItemDelegateBase {
 
     footerDelegate: Component { Column {
             id: childrenColumn;
-
             visible: treeDelegateBase.isOpened;
 
             Repeater {
                 id: childModelRepeater;
-
-                model: treeDelegateBase.itemData.ChildModel ? treeDelegateBase.itemData.ChildModel: 0;
-
+                model: treeDelegateBase.itemData[treeDelegateBase.childModelKey] ? treeDelegateBase.itemData[treeDelegateBase.childModelKey]: 0;
                 delegate: treeDelegateBase.root ? treeDelegateBase.root.rowDelegate : null;
 
                 onCountChanged: {

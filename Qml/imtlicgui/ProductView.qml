@@ -4,6 +4,7 @@ import imtgui 1.0
 import imtauthgui 1.0
 import imtcontrols 1.0
 import imtlicProductsSdl 1.0
+import imtlicFeaturesSdl 1.0
 
 ViewBase {
     id: productViewContainer;
@@ -107,16 +108,13 @@ ViewBase {
         for (let featureId of featureIds){
             if (featureId.includes('/')){
                 tableView_.selectedOptionalFeatures.push(featureId);
-
                 continue;
             }
 
             for (let i = 0; i < productViewContainer.allFeaturesModel.getItemsCount(); i++){
                 let id = productViewContainer.allFeaturesModel.getData("Id", i);
-
                 if (featureId === id){
                     let index = productViewContainer.productFeaturesViewModel.insertNewItem();
-
                     productViewContainer.productFeaturesViewModel.copyItemDataFromModel(index, productViewContainer.allFeaturesModel, i);
                 }
             }
@@ -282,10 +280,9 @@ ViewBase {
         rowDelegate: Component {
             TreeViewItemDelegateBase {
                 id: delegate;
-
                 root: tableView_;
-
                 isCheckable: model.Optional ? model.Optional : false;
+                childModelKey: FeatureItemTypeMetaInfo.s_subFeatures;
 
                 onRootDelegateChanged: {
                     if (delegate.rootDelegate !== null){
@@ -306,7 +303,7 @@ ViewBase {
 
                     let id = rootFeatureUuid + "/" + featureId;
 
-                    let features = productViewContainer.model.getData("Features");
+                    let features = productViewContainer.productData.m_features;
 
                     let featureIds = []
                     if (features !== ""){

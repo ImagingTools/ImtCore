@@ -11,9 +11,7 @@ BasicTableView {
     rowDelegate: Component {
         TreeViewItemDelegateBase {
             id: treeViewDeleg;
-
             width: root.width;
-
             root: treeViewRoot;
         }
     }

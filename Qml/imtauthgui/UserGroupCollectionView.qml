@@ -13,7 +13,7 @@ RemoteCollectionView {
     collectionId: "Groups";
     visibleMetaInfo: true;
 
-    property string productId: context.appName;
+    property string productId;
 
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
         collectionView: userGroupCollectionViewContainer;
@@ -71,7 +71,7 @@ RemoteCollectionView {
             rolesModel: userGroupCollectionViewContainer.rolesModel;
             groupsModel: userGroupCollectionViewContainer.groupsModel;
 
-            productId: context.appName;
+            productId: userGroupCollectionViewContainer.productId;
 
             commandsDelegateComp: Component {ViewCommandsDelegateBase {
                 view: groupEditor;
@@ -97,9 +97,9 @@ RemoteCollectionView {
             gqlAddCommandId: ImtauthGroupsSdlCommandIds.s_groupAdd;
 
             Component.onCompleted: {
-                getRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, context.appName);
-                addRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, context.appName);
-                updateRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, context.appName);
+                getRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, userGroupCollectionViewContainer.productId);
+                addRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, userGroupCollectionViewContainer.productId);
+                updateRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, userGroupCollectionViewContainer.productId);
             }
 
             documentModelComp: Component {

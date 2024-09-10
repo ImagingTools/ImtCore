@@ -16,7 +16,7 @@ FocusScope {
     property alias mouseArea: mouseAreaBase;
 
     property ModelIndex modelIndex: ModelIndex {
-        itemData: model;
+        itemData: delegate.itemData;
         index: model.index;
         depth: delegate.level;
         delegateItem: delegate;
@@ -68,6 +68,7 @@ FocusScope {
     }
 
     Component.onCompleted: {
+        console.log("delegate onCompleted", delegate);
         if (delegate.root){
             delegate.root._addItem(delegate);
             delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);
@@ -126,7 +127,6 @@ FocusScope {
 
     Loader {
         id: prefixRowLoaderObj;
-
         anchors.left: delegate.left;
         anchors.leftMargin: delegate.level * 20;
         anchors.top: headerDelegateLoader.bottom;
@@ -134,24 +134,17 @@ FocusScope {
 
     Rectangle {
         anchors.fill: delegate;
-
-//        visible: internal.totalIndex >= 0 ? internal.totalIndex % 2 == 0 : false;
         visible: false;
-
         color: Style.alternatingColor;
-
         opacity: Style.alternatingOpacity;
     }
 
     Loader {
         id: rowLoader;
-
         anchors.left: prefixRowLoaderObj.right;
         anchors.leftMargin: 10;
         anchors.top: headerDelegateLoader.bottom;
-
         focus: true;
-
         sourceComponent: Row {
             id: row;
 
@@ -204,9 +197,7 @@ FocusScope {
 
     MouseArea {
         id: mouseAreaBase;
-
         anchors.fill: parent;
-
         z: -1;
 
         onClicked: {
@@ -220,9 +211,7 @@ FocusScope {
 
     Loader {
         id: footerDelegateLoader;
-
         anchors.top: rowLoader.bottom;
-
         width: parent.width;
     }
 }

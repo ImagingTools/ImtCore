@@ -34,6 +34,12 @@ ViewBase {
         dependenciesHeadersModel.updateHeaders();
     }
 
+    onFeatureDataChanged: {
+        if (featureData){
+            tableView_.rowModel = featureData.m_subFeatures;
+        }
+    }
+
     function getAllParents(selectedIndex){
         let retVal = []
 
@@ -41,7 +47,7 @@ ViewBase {
             let parent = selectedIndex.parentIndex;
 
             while (parent && parent.itemData){
-                let parentId = parent.itemData.FeatureId
+                let parentId = parent.itemData.m_featureId
                 retVal.push(parentId);
                 parent = parent.parentIndex;
             }
@@ -65,14 +71,12 @@ ViewBase {
         let selectedId = "";
 
         if (selectedIndex != null && selectedIndex.itemData){
-            selectedId = selectedIndex.itemData.FeatureId;
+            selectedId = selectedIndex.itemData.m_featureId;
         }
 
         //Список всех зависящих фич для selectedId
         let childrenFeatureList = [];
         tableView.findChildrenFeatureDependencies(selectedId, childrenFeatureList);
-
-        console.log("childrenFeatureList", childrenFeatureList);
 
         //Список всех зависящих фич от selectedId
         let inactiveElements = [];
@@ -94,7 +98,7 @@ ViewBase {
         //Список основных зависящих фич для selectedId
         let dependenciesList = []
 
-        let dependencies = selectedIndex.itemData.Dependencies;
+        let dependencies = selectedIndex.itemData.m_dependencies;
         if (dependencies && dependencies !== ""){
             dependenciesList = dependencies.split(';');
         }
@@ -125,14 +129,22 @@ ViewBase {
     }
 
     function updateGui(){
+        featureNameInput.text = featureData.m_featureName;
+        featureIdInput.text = featureData.m_featureId;
+        descriptionInput.text = featureData.m_description;
+
         featureEditor.updateTreeViewGui();
     }
 
     function updateModel(){
-        if (model.getItemsCount() !== 1){
-            let emptyModel = featureEditor.treeItemModelComp.createObject(model);
-            model.insertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
-        }
+        featureData.m_featureName = featureNameInput.text;
+        featureData.m_featureId = featureIdInput.text;
+        featureData.m_description = descriptionInput.text;
+        // tableView_.rowModel = featureData.m_subFeatures;
+        // if (model.getItemsCount() !== 1){
+        //     let emptyModel = featureEditor.treeItemModelComp.createObject(model);
+        //     model.insertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
+        // }
     }
 
     Rectangle {
@@ -140,59 +152,99 @@ ViewBase {
         color: Style.backgroundColor2;
     }
 
-    Item {
-        id: centerPanel;
-
-        anchors.top: parent.top;
-        anchors.topMargin: Style.size_mainMargin;
+    Row {
+        id: headerPanel;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_mainMargin;
-        anchors.right: rightBlock.left;
+        anchors.leftMargin: Style.size_mainMargin
+        anchors.right: parent.right;
+        anchors.rightMargin: Style.size_mainMargin
+        spacing: Style.size_mainMargin;
+        height: 50;
 
-        height: parent.height;
+        Text {
+            anchors.verticalCenter: parent.verticalCenter;
+            color: Style.buttonText;
+            font.family: Style.fontFamilyBold;
+            font.pixelSize: Style.fontSize_common;
+            text: qsTr("Feature Name");
+        }
 
-        Item {
-            id: headerBlock;
+        CustomTextField {
+            id: featureNameInput;
+            anchors.verticalCenter: parent.verticalCenter;
+            width: 200;
+            height: 30;
+            placeHolderText: qsTr("Enter the feature name");
+            onEditingFinished: {
+                if (featureIdInput.text === ""){
+                    featureIdInput.text = featureNameInput.text.replace(/\s+/g, '');
+                }
 
-            anchors.top: parent.top;
-            anchors.left: parent.left;
-            anchors.leftMargin: 10;
-
-            width: parent.width;
-            height: 0;
-
-            visible: false;
-
-            Text {
-                id: titleTableView;
-
-                anchors.left: parent.left;
-                anchors.verticalCenter: parent.verticalCenter;
-
-                color: Style.textColor;
-                font.family: Style.fontFamilyBold;
-                font.pixelSize: Style.fontSize_common;
-
-                text: qsTr("Subfeatures");
+                featureEditor.doUpdateModel();
             }
         }
 
+        Text {
+            anchors.verticalCenter: parent.verticalCenter;
+            color: Style.buttonText;
+            font.family: Style.fontFamilyBold;
+            font.pixelSize: Style.fontSize_common;
+            text: qsTr("Feature-ID");
+        }
+
+        CustomTextField {
+            id: featureIdInput;
+            anchors.verticalCenter: parent.verticalCenter;
+            width: 200;
+            height: 30;
+            placeHolderText: qsTr("Enter the feature ID");
+            onEditingFinished: {
+                featureEditor.doUpdateModel();
+            }
+        }
+
+        Text {
+            anchors.verticalCenter: parent.verticalCenter;
+            color: Style.buttonText;
+            font.family: Style.fontFamilyBold;
+            font.pixelSize: Style.fontSize_common;
+            text: qsTr("Description");
+        }
+
+        CustomTextField {
+            anchors.verticalCenter: parent.verticalCenter;
+            id: descriptionInput;
+            width: 200;
+            height: 30;
+            placeHolderText: qsTr("Enter the description");
+            onEditingFinished: {
+                featureEditor.doUpdateModel();
+            }
+        }
+    }
+
+    Item {
+        id: centerPanel;
+
+        anchors.top: headerPanel.bottom;
+        anchors.left: parent.left;
+        anchors.leftMargin: Style.size_mainMargin;
+        anchors.right: rightBlock.left;
+        anchors.rightMargin: Style.size_mainMargin;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: Style.size_mainMargin;
+
         BasicTreeView {
             id: tableView_;
-
-            anchors.top: headerBlock.bottom;
+            anchors.top: parent.top;
+            // anchors.topMargin: Style.size_mainMargin
             anchors.left: parent.left;
-            anchors.leftMargin: 10;
-
+            // anchors.leftMargin: Style.size_mainMargin;
+            anchors.bottom: parent.bottom;
+            // anchors.bottomMargin: Style.size_mainMargin;
             width: parent.width;
-            height: parent.height;
-
             readOnly: false;
-
-            rowModel: featureEditor.model;
-
             rowDelegate: Component { PackageViewItemDelegate { root: tableView_; } }
-
             Component.onCompleted: {
                 let ok = PermissionsController.checkPermission("ChangeFeature");
                 tableView_.readOnly = !ok;
@@ -203,10 +255,9 @@ ViewBase {
             }
 
             function featureIdExists(featureId){
-                console.log("featureIdExists", featureId);
                 let delegates = tableView_.getItemsDataAsList();
                 for (let delegate of delegates){
-                    if (delegate.itemData.FeatureId === featureId){
+                    if (delegate.itemData.m_featureId === featureId){
                         return true;
                     }
                 }
@@ -215,8 +266,6 @@ ViewBase {
             }
 
             onSelectionChanged: {
-                console.log("onSelectionChanged", tableSelection.items);
-
                 let featureId = "";
 
                 let selectedIndex =  null;
@@ -225,7 +274,7 @@ ViewBase {
                 }
 
                 if (selectedIndex != null){
-                    featureId = selectedIndex.getData("FeatureId");
+                    featureId = selectedIndex.itemData.m_featureId;
                     if (featureId !== ""){
                         featureEditor.updateTreeViewGui();
                     }
@@ -236,12 +285,8 @@ ViewBase {
                 let newIsEnabled = selectedIndex != null;
                 let removeIsEnabled = selectedIndex != null;
 
-                if (selectedIndex != null){
-                    removeIsEnabled = removeIsEnabled && selectedIndex.depth > 0
-                }
-
                 if (featureEditor.commandsController){
-                    featureEditor.commandsController.setCommandIsEnabled("InsertFeature", newIsEnabled)
+                    // featureEditor.commandsController.setCommandIsEnabled("InsertFeature", newIsEnabled)
                     featureEditor.commandsController.setCommandIsEnabled("RemoveFeature", removeIsEnabled)
                 }
             }
@@ -251,8 +296,8 @@ ViewBase {
                 for (let i = 0; i < itemsDataList.length; i++){
                     let delegateItem = itemsDataList[i]
                     let itemData = delegateItem.getItemData();
-                    let id = itemData.FeatureId;
-                    let dependencies = itemData.Dependencies;
+                    let id = itemData.m_featureId;
+                    let dependencies = itemData.m_dependencies;
                     if (dependencies && dependencies !== ""){
                         let dependencyList = dependencies.split(';');
 
@@ -275,10 +320,10 @@ ViewBase {
                 for (let i = 0; i < itemsDataList.length; i++){
                     let delegateItem = itemsDataList[i]
                     let itemData = delegateItem.getItemData();
-                    let id = itemData.FeatureId;
+                    let id = itemData.m_featureId;
 
                     if (featureId === id){
-                        let dependencies = itemData.Dependencies;
+                        let dependencies = itemData.m_dependencies;
                         if (dependencies && dependencies !== ""){
                             let dependencyList = dependencies.split(';');
 
@@ -300,51 +345,22 @@ ViewBase {
     Item {
         id: rightBlock;
 
-        anchors.top: parent.top;
-        anchors.topMargin: Style.size_mainMargin;
+        anchors.top: headerPanel.bottom;
         anchors.bottom: parent.bottom;
+        anchors.bottomMargin: Style.size_mainMargin;
         anchors.right: parent.right;
         anchors.rightMargin: Style.size_mainMargin;
 
         width: 300;
 
-        Item {
-            id: titleBlock;
-
-            anchors.top: parent.top;
-            anchors.left: parent.left;
-
-            width: parent.width;
-            height: 0;
-
-            visible: false;
-
-            Text {
-                id: titleDependenciesView;
-
-                anchors.left: parent.left;
-                anchors.verticalCenter: parent.verticalCenter;
-
-                color: Style.textColor;
-                font.family: Style.fontFamilyBold;
-                font.pixelSize: Style.fontSize_common;
-
-                text: qsTr("Dependencies");
-            }
-        }
-
         BasicTreeView {
             id: featureDependenciesView;
-
-            anchors.top: titleBlock.bottom;
+            anchors.top: parent.top;
             anchors.bottom: parent.bottom;
             anchors.right: parent.right;
             anchors.left: parent.left;
-
             clip: true;
-
             tristate: true;
-
             contentVisible: false;
 
             property bool delegateUpdatingBlock: false;
@@ -352,17 +368,14 @@ ViewBase {
             Component.onCompleted: {
                 let ok = PermissionsController.checkPermission("ChangeFeature");
                 featureDependenciesView.readOnly = !ok;
-
                 dependenciesHeadersModel.updateHeaders();
-
-                featureEditor.dependenciewViewModel.copy(FeaturesProvider.model);
+                featureEditor.dependenciewViewModel.copy(CachedFeatureCollection.collectionModel);
                 featureDependenciesView.rowModel = featureEditor.dependenciewViewModel;
-
-                FeaturesProvider.modelChanged.connect(featureDependenciesView.onFeaturesProviderModelChanged);
+                CachedFeatureCollection.modelUpdated.connect(featureDependenciesView.onFeaturesProviderModelChanged);
             }
 
             Component.onDestruction: {
-                FeaturesProvider.modelChanged.disconnect(featureDependenciesView.onFeaturesProviderModelChanged);
+                CachedFeatureCollection.modelUpdated.disconnect(featureDependenciesView.onFeaturesProviderModelChanged);
             }
 
             TreeItemModel {
@@ -372,7 +385,7 @@ ViewBase {
                     dependenciesHeadersModel.clear();
 
                     let index = dependenciesHeadersModel.insertNewItem();
-                    dependenciesHeadersModel.setData("Id", "FeatureName", index)
+                    dependenciesHeadersModel.setData("Id", FeatureItemTypeMetaInfo.s_featureName, index)
                     dependenciesHeadersModel.setData("Name", qsTr("Dependencies"), index)
 
                     dependenciesHeadersModel.refresh();
@@ -383,16 +396,14 @@ ViewBase {
 
             function onFeaturesProviderModelChanged(){
                 featureEditor.dependenciewViewModel.copy(FeaturesProvider.model)
-
                 featureEditor.dependenciewViewModel.refresh();
-
                 featureEditor.updateTreeViewGui();
             }
 
             rowDelegate: Component {TreeViewItemDelegateBase {
                     id: delegate;
-
                     root: featureDependenciesView;
+                    childModelKey: FeatureItemTypeMetaInfo.s_subFeatures;
 
                     onCheckStateChanged: {
                         let selectedIndex =  null;
@@ -406,8 +417,8 @@ ViewBase {
                                     let featureId = delegate.itemData.FeatureId;
                                     let state = delegate.checkState;
 
-                                    let selectedId = selectedIndex.itemData.FeatureId;
-                                    let dependencies = selectedIndex.itemData.Dependencies;
+                                    let selectedId = selectedIndex.itemData.m_featureId;
+                                    let dependencies = selectedIndex.itemData.m_dependencies;
 
                                     let dependencyList = []
                                     if (dependencies != ""){
@@ -427,10 +438,10 @@ ViewBase {
                                     }
 
                                     if (dependencyList.length > 0){
-                                        selectedIndex.itemData.Dependencies = dependencyList.join(';')
+                                        selectedIndex.itemData.m_dependencies = dependencyList.join(';')
                                     }
                                     else{
-                                        selectedIndex.itemData.Dependencies = "";
+                                        selectedIndex.itemData.m_dependencies = "";
                                     }
 
                                     featureEditor.updateTreeViewGui();
@@ -442,7 +453,6 @@ ViewBase {
             }
 
             function findParentFeatureDependencies(featureId, retVal){
-
                 let itemsDataList = featureDependenciesView.getItemsDataAsList();
                 for (let i = 0; i < itemsDataList.length; i++){
                     let delegateItem = itemsDataList[i]
@@ -450,11 +460,11 @@ ViewBase {
                     let id = itemData.FeatureId;
                     let dependencies = itemData.Dependencies;
 
-                    let rootId = itemData.RootFeatureId;
+                    // let rootId = itemData.RootFeatureId;
 
-                    if (rootId === featureEditor.featureId){
-                        continue;
-                    }
+                    // if (rootId === featureEditor.featureId){
+                    //     continue;
+                    // }
 
                     if (dependencies && dependencies !== ""){
                         let dependencyList = dependencies.split(';');
@@ -475,11 +485,11 @@ ViewBase {
                 for (let i = 0; i < itemsDataList.length; i++){
                     let delegateItem = itemsDataList[i]
                     let itemData = delegateItem.getItemData();
-                    let rootId = itemData.RootFeatureId;
+                    // let rootId = itemData.RootFeatureId;
 
-                    if (rootId === featureEditor.featureId){
-                        continue;
-                    }
+                    // if (rootId === featureEditor.featureId){
+                    //     continue;
+                    // }
 
                     let id = itemData.FeatureId;
 
@@ -506,19 +516,19 @@ ViewBase {
         headersModel.clear();
 
         let index = headersModel.insertNewItem();
-        headersModel.setData("Id", "FeatureName", index);
+        headersModel.setData("Id", FeatureItemTypeMetaInfo.s_featureName, index);
         headersModel.setData("Name", qsTr("Feature Name"), index);
 
         index = headersModel.insertNewItem();
-        headersModel.setData("Id", "FeatureId", index);
+        headersModel.setData("Id", FeatureItemTypeMetaInfo.s_featureId, index);
         headersModel.setData("Name", qsTr("Feature-ID"), index);
 
         index = headersModel.insertNewItem();
-        headersModel.setData("Id", "FeatureDescription", index);
+        headersModel.setData("Id", FeatureItemTypeMetaInfo.s_description, index);
         headersModel.setData("Name", qsTr("Feature Description"), index);
 
         index = headersModel.insertNewItem();
-        headersModel.setData("Id", "Optional", index);
+        headersModel.setData("Id", FeatureItemTypeMetaInfo.s_optional, index);
         headersModel.setData("Name", qsTr("Optional"), index);
 
         headersModel.refresh();

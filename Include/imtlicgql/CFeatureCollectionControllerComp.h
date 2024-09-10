@@ -21,10 +21,13 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	bool CreateFeatureFromRepresentationModel(const sdl::imtlic::Features::CFeatureData& featureRepresentationData, imtlic::CFeatureInfo& featureInfo, QString& errorMessage) const;
+	bool CreateRepresentationModelFromFeatureInfo(const imtlic::CFeatureInfo& featureInfo, sdl::imtlic::Features::CFeatureData& featureRepresentationData, QString& errorMessage) const;
+
 	// reimplemented (sdl::imtlic::Features::CFeatureCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtlic::Features::CGetFeaturesListGqlRequest& featuresListRequest,
+				const sdl::imtlic::Features::CFeaturesListGqlRequest& featuresListRequest,
 				sdl::imtlic::Features::CFeatureItem& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
@@ -38,14 +41,6 @@ protected:
 				const sdl::imtlic::Features::CGetFeatureItemGqlRequest& featureItemRequest,
 				sdl::imtlic::Features::CFeatureDataPayload& representationPayload,
 				QString& errorMessage) const override;
-	virtual bool SetupGqlItem(
-				const imtgql::CGqlRequest& gqlRequest,
-				imtbase::CTreeItemModel& model,
-				int itemIndex,
-				const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-				QString& errorMessage) const override;
-
-	virtual bool CreateChildModelRepresentation(const imtlic::CFeatureInfo& featureInfo, imtbase::CTreeItemModel& representationModel) const;
 
 private:
 	I_FACT(imtlic::IFeatureInfo, m_featureInfoFactCompPtr);
