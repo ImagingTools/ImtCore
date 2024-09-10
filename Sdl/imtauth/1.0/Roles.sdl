@@ -6,6 +6,9 @@ schema {
 	query: Query
 	mutation: Mutation
 	subscription: Subscription
+	name: Roles
+	namespace: imtauth
+	version: 1.0
 }
 
 input RolesListInput {
