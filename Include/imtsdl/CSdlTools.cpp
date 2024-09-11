@@ -575,8 +575,12 @@ QString CSdlTools::GetNamespaceFromParamsOrArguments(
 		sdlNamespace = BuildNamespaceFromParams(*schemaParamsCompPtr);
 	}
 
-	if (sdlNamespace.isEmpty() && argumentParamsCompPtr.IsValid()){
-		sdlNamespace = argumentParamsCompPtr->GetNamespace();
+	if (argumentParamsCompPtr.IsValid()){
+		// we should override nmespace from agrs if it porvided
+		QString argNamespace = argumentParamsCompPtr->GetNamespace();
+		if (!argNamespace.isEmpty()){
+			sdlNamespace = argNamespace;
+		}
 	}
 
 	Q_ASSERT(!sdlNamespace.isEmpty());
