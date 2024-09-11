@@ -49,7 +49,6 @@ public:
 		Q_INIT_RESOURCE(imtguiqml);
 		Q_INIT_RESOURCE(imtcolguiqml);
 		Q_INIT_RESOURCE(imtdocguiqml);
-		Q_INIT_RESOURCE(imtlicguiqml);
 		Q_INIT_RESOURCE(imtguigqlqml);
 		Q_INIT_RESOURCE(imtauthguiqml);
 
@@ -93,6 +92,10 @@ public:
 		Q_INIT_RESOURCE(imtstyle);
 		Q_INIT_RESOURCE(imtstylelight);
 		Q_INIT_RESOURCE(imtstyledark);
+
+		Q_INIT_RESOURCE(imtauthGroupsSdl);
+		Q_INIT_RESOURCE(imtauthRolesSdl);
+		Q_INIT_RESOURCE(imtauthUsersSdl);
 	}
 
 	static void InitStyle()
