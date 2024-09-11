@@ -21,6 +21,7 @@ namespace imtauthgui
 CRemoteStandardLoginGuiComp::CRemoteStandardLoginGuiComp()
 	:m_loginObserver(*this),
 	m_systemStatusObserver(*this),
+	m_loginStatusProviderObserver(*this),
 	m_loginLog(*this),
 	m_setSuPasswordThread(*this)
 {
@@ -115,8 +116,8 @@ void CRemoteStandardLoginGuiComp::OnGuiCreated()
 		m_loginObserver.RegisterObject(m_loginCompPtr.GetPtr(), &CRemoteStandardLoginGuiComp::OnLoginUpdate);
 	}
 
-	if (m_systemStatusCompPtr.IsValid()){
-		m_systemStatusObserver.RegisterObject(m_systemStatusCompPtr.GetPtr(), &CRemoteStandardLoginGuiComp::OnSystemStatusUpdate);
+	if (m_loginStatusProviderCompPtr.IsValid()){
+		m_loginStatusProviderObserver.RegisterObject(m_loginStatusProviderCompPtr.GetPtr(), &CRemoteStandardLoginGuiComp::OnConnectionStatusUpdate);
 
 		StackedWidget->setCurrentIndex(3);
 	}
@@ -130,7 +131,8 @@ void CRemoteStandardLoginGuiComp::OnGuiCreated()
 void CRemoteStandardLoginGuiComp::OnGuiDestroyed()
 {
 	m_loginObserver.UnregisterAllObjects();
-	m_systemStatusObserver.UnregisterAllObjects();
+	// m_systemStatusObserver.UnregisterAllObjects();
+	m_loginStatusProviderObserver.UnregisterAllObjects();
 
 	BaseClass::OnGuiDestroyed();
 }
@@ -188,8 +190,6 @@ void CRemoteStandardLoginGuiComp::on_LoginButton_clicked()
 			PasswordLabel->setStyleSheet("color: red");
 			PasswordMessage->setStyleSheet("color: red");
 			PasswordMessage->setText(tr("Login failed"));
-
-			m_systemStatusCompPtr->UpdateSystemStatus();
 		}
 
 		StackedWidget->setCurrentIndex(0);
@@ -211,9 +211,6 @@ void CRemoteStandardLoginGuiComp::on_SetPasswordButton_clicked()
 
 void CRemoteStandardLoginGuiComp::on_RefreshButton_clicked()
 {
-	if (m_systemStatusCompPtr.IsValid()){
-		StackedWidget->setCurrentIndex(3);
-	}
 }
 
 
@@ -293,6 +290,29 @@ void CRemoteStandardLoginGuiComp::OnSystemStatusUpdate(
 		NoConnection->setText(error);
 
 		StackedWidget->setCurrentIndex(2);
+	}
+}
+
+
+void CRemoteStandardLoginGuiComp::OnConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtauth::ILoginStatusProvider* objectPtr)
+{
+	int loginStatus = objectPtr->GetLoginStatus();
+	if (loginStatus == 0){
+		// Disconnected
+		NoConnection->setText("No connection to the server");
+		StackedWidget->setCurrentIndex(2);
+	}
+	else if (loginStatus == imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
+		if (m_superuserProviderCompPtr.IsValid()){
+			QString errorMessage;
+			bool superuserExists = m_superuserProviderCompPtr->SuperuserExists(errorMessage);
+			if (superuserExists){
+				StackedWidget->setCurrentIndex(0);
+			}
+			else{
+				StackedWidget->setCurrentIndex(1);
+			}
+		}
 	}
 }
 

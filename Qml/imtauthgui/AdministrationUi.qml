@@ -5,38 +5,39 @@ import imtdocgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
 
-SingleDocumentWorkspaceView {
+SingleDocumentWorkspacePageView {
     id: container;
-
     anchors.fill: parent;
 
-    property string commandId;
+    pageId: "Administration";
+    pageName: qsTr("Administration");
 
-    property Decorators decorators: decorators_
+    property string productId;
 
     signal commandsModelChanged(var commandsModel);
 
     Component.onCompleted: {
-        Style.setDecorators(decorators)
-
-        // startPageObj = {
-        //     "Id": "Administration",
-        //     "Name": "Administration",
-        //     "Source": "../imtauthgui/AdministrationView.qml",
-        //     "CommandId": "Administration"};
-
-        Events.subscribeEvent("CommandsModelChanged", container.onCommandsModelUpdated);
-        Events.subscribeEvent("CommandsEnabledChanged", container.onCommandsEnabledChanged);
+        Style.setDecorators(decorators_)
     }
 
-    Component.onDestruction: {
-        Events.unSubscribeEvent("CommandsModelChanged", container.onCommandsModelUpdated);
-        Events.unSubscribeEvent("CommandsEnabledChanged", container.onCommandsEnabledChanged);
+    Connections {
+        target: AuthorizationController;
+
+        function onLoginSuccessful(){
+            if (productId !== ""){
+                container.startItemSourceComp = administrationViewComp
+            }
+        }
+
+        function onLogoutSignal(){
+        }
     }
 
-    onVisibleChanged: {
-        if (visible){
-            container.updateModels();
+    Component {
+        id: administrationViewComp;
+
+        AdministrationView {
+            productId: container.productId;
         }
     }
 
@@ -48,23 +49,20 @@ SingleDocumentWorkspaceView {
         id: decoratorsQt;
     }
 
-    UserTokenProvider {
-        id: userTokenProvider;
-    }
-
     SubscriptionManager {
         id: subscriptionManager;
     }
 
+    DialogManagerView {
+        anchors.fill: parent;
+        z: topPanel_.z + 1;
+    }
+
     Loading {
         id: loading;
-
         z: 10000;
-
         anchors.fill: parent;
-
         visible: false;
-
         Component.onCompleted: {
             Events.subscribeEvent("StartLoading", loading.start);
             Events.subscribeEvent("StopLoading", loading.stop);
@@ -76,29 +74,14 @@ SingleDocumentWorkspaceView {
         }
     }
 
-    function onCommandsModelUpdated(parameters){
-        let model = parameters["Model"];
-
-        let commandsId = parameters["CommandId"];
-        container.commandId = commandsId;
-
-        container.commandsModelChanged(model);
+    function login(login, password){
+        let param = {"Login": login,"Password": password }
+        AuthorizationController.login(param)
     }
 
-    function onCommandsEnabledChanged(parameters){
-        container.onCommandsModelUpdated(parameters);
+    function logout(){
+        AuthorizationController.userLogout({});
     }
-
-    function onCommandActivated(value){
-        var commandId = String(value);
-        Events.sendEvent(container.commandId + "CommandActivated", commandId);
-    }
-
-    function updateModels(){
-        Events.sendEvent(container.commandId + "_CommandUpdateModel");
-    }
-
-    function firstModelsInit(){}
 }
 
 

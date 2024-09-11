@@ -92,14 +92,15 @@ QtObject {
             inputParams.InsertFieldObject(viewParams);
 
             let additionInputParams = container.getAdditionalInputParams();
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
+            if (additionInputParams){
+                if (Object.keys(additionInputParams).length > 0){
+                    let additionParams = Gql.GqlObject("addition");
+                    for (let key in additionInputParams){
+                        additionParams.InsertField(key, additionInputParams[key]);
+                    }
+                    inputParams.InsertFieldObject(additionParams);
                 }
-                inputParams.InsertFieldObject(additionParams);
             }
-
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");

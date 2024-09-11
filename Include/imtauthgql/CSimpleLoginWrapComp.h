@@ -64,6 +64,7 @@ private:
 
 private:
 	QByteArray m_loggedUserId;
+	QByteArray m_loggedUserPassword;
 	QByteArray m_loggedUserToken;
 	QByteArrayList m_userPermissionIds;
 	istd::TSmartPtr<imtauth::IUserInfo> m_userInfoPtr;

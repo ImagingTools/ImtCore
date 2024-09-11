@@ -18,6 +18,7 @@
 #include <imtauth/ISuperuserController.h>
 #include <imtauth/ISuperuserProvider.h>
 #include <imtbase/TModelUpdateBinder.h>
+#include <imtauth/ILoginStatusProvider.h>
 #include <imtbase/ISystemStatus.h>
 #include <GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h>
 
@@ -41,7 +42,7 @@ public:
 		I_ASSIGN(m_superuserProviderCompPtr, "SuperuserProvider", "Superuser provider", false, "SuperuserProvider");
 		I_ASSIGN(m_settingsProviderCompPtr, "SettingsProvider", "Application settings provider", false, "SettingsProvider");
 		I_ASSIGN(m_superuserControllerCompPtr, "SuperuserController", "Superuser controller", false, "SuperuserController");
-		I_ASSIGN(m_systemStatusCompPtr, "SystemStatus", "System status", true, "SystemStatus");
+		I_ASSIGN(m_loginStatusProviderCompPtr, "ConnectionStatusProvider", "Component for providing server connection status", true, "ConnectionStatusProvider");
 	I_END_COMPONENT;
 
 	CRemoteStandardLoginGuiComp();
@@ -73,6 +74,7 @@ private Q_SLOTS:
 private:
 	void OnLoginUpdate(const istd::IChangeable::ChangeSet& changeSet, const iauth::ILogin* objectPtr);
 	void OnSystemStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtbase::ISystemStatus* objectPtr);
+	void OnConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtauth::ILoginStatusProvider* objectPtr);
 	void UpdateLoginButtonsState();
 	void CheckMatchingPassword();
 
@@ -126,10 +128,11 @@ private:
 	I_REF(imtauth::ISuperuserController, m_superuserControllerCompPtr);
 	I_REF(iauth::ILogin, m_loginCompPtr);
 	I_REF(iqt::ISettingsProvider, m_settingsProviderCompPtr);
-	I_REF(imtbase::ISystemStatus, m_systemStatusCompPtr);
+	I_REF(imtauth::ILoginStatusProvider, m_loginStatusProviderCompPtr);
 
 	imtbase::TModelUpdateBinder<iauth::ILogin, CRemoteStandardLoginGuiComp> m_loginObserver;
 	imtbase::TModelUpdateBinder<imtbase::ISystemStatus, CRemoteStandardLoginGuiComp> m_systemStatusObserver;
+	imtbase::TModelUpdateBinder<imtauth::ILoginStatusProvider, CRemoteStandardLoginGuiComp> m_loginStatusProviderObserver;
 
 	LoginLog m_loginLog;
 	SetSuPasswordThread m_setSuPasswordThread;

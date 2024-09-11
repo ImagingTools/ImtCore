@@ -67,6 +67,10 @@ RemoteCollectionView {
         }
     }
 
+    onProductIdChanged: {
+        console.log("RoleCollection onProductIdChanged", productId);
+    }
+
     onElementsChanged: {
         if(!permissionsProvider) return
 

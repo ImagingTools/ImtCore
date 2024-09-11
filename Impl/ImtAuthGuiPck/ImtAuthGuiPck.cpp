@@ -54,6 +54,11 @@ I_EXPORT_COMPONENT(
 			"Remote Standard login gui",
 			"Remote Login Logout Gui");
 
+I_EXPORT_COMPONENT(
+			AdministrationObserverQml,
+			"Administration observer qml",
+			"Administration Observer Qm");
+
 
 } // namespace ImtAuthGuiPck
 

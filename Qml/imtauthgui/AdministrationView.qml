@@ -15,10 +15,13 @@ Item {
     property string productId: context.appName;
 
     Component.onCompleted: {
+        console.log("AdministrationView.qml onCompleted");
         Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
 
         CachedGroupCollection.updateModel();
         CachedUserCollection.updateModel();
+
+        CachedRoleCollection.productId = container.productId;
         CachedRoleCollection.updateModel();
     }
 
@@ -95,15 +98,24 @@ Item {
             if (ok){
                 multiPageView.addPage("Roles", qsTr("Roles"), roleCollectionComp);
             }
+            else{
+                console.warn("Role collection cannot be displayed. Error: Permission denied");
+            }
 
             ok = PermissionsController.checkPermission("ViewUsers");
             if (ok){
                 multiPageView.addPage("Users", qsTr("Users"), userCollectionComp);
             }
+            else{
+                console.warn("User collection cannot be displayed. Error: Permission denied");
+            }
 
             ok = PermissionsController.checkPermission("ViewGroups");
             if (ok){
                 multiPageView.addPage("Groups", qsTr("Groups"), userGroupCollectionComp);
+            }
+            else{
+                console.warn("Group collection cannot be displayed. Error: Permission denied");
             }
 
             multiPageView.currentIndex = 0;

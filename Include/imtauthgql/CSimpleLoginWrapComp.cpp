@@ -27,12 +27,8 @@ iauth::CUser* CSimpleLoginWrapComp::GetLoggedUser() const
 {
 	if (!m_loggedUserId.isEmpty() && m_userInfoPtr.IsValid()){
 		istd::TDelPtr<iauth::CUser> userPtr(new iauth::CUser);
-
-		QByteArray passwordHash = m_userInfoPtr->GetPasswordHash();
-		userPtr->SetPassword(passwordHash);
-
-		QByteArray username = m_userInfoPtr->GetId();
-		userPtr->SetUserName(username);
+		userPtr->SetUserName(m_loggedUserId);
+		userPtr->SetPassword(m_loggedUserPassword);
 
 		return userPtr.PopPtr();
 	}
@@ -79,6 +75,8 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 
 			m_loggedUserId = dataModelPtr->GetData("Login").toByteArray();
 		}
+
+		m_loggedUserPassword = password.toUtf8();
 
 		return true;
 	}
@@ -145,7 +143,6 @@ bool CSimpleLoginWrapComp::RetrieveUserInfo(const QByteArray& userObjectId)
 	imtgql::CGqlObject userInputObject;
 	userInputObject.InsertField(QByteArray("ProductId"), QVariant(*m_productIdAttrPtr));
 	userInputObject.InsertField(QByteArray("Id"), QVariant(userObjectId));
-	userInputObject.InsertField(QByteArray("IsJsonSerialized"), QVariant(true));
 	userRequest.AddParam("input", userInputObject);
 
 	imtgql::CGqlObject queryUserFields;
@@ -155,7 +152,12 @@ bool CSimpleLoginWrapComp::RetrieveUserInfo(const QByteArray& userObjectId)
 	imtbase::CTreeItemModel userResponseModel;
 	bool ok = SendModelRequest(userRequest, userResponseModel);
 	if (ok){
-		imtbase::CTreeItemModel* userDataModelPtr = userResponseModel.GetTreeItemModel("data");
+		imtbase::CTreeItemModel* dataModelPtr = userResponseModel.GetTreeItemModel("data");
+		if (dataModelPtr == nullptr){
+			return false;
+		}
+
+		imtbase::CTreeItemModel* userDataModelPtr = dataModelPtr->GetTreeItemModel("UserData");
 		if (userDataModelPtr == nullptr){
 			return false;
 		}
@@ -170,10 +172,14 @@ bool CSimpleLoginWrapComp::RetrieveUserInfo(const QByteArray& userObjectId)
 			return false;
 		}
 
-		QByteArray userJson = userDataModelPtr->ToJson().toUtf8();
-		iser::CJsonMemReadArchive archive(userJson);
-		if (!m_userInfoPtr->Serialize(archive)){
-			return false;
+		if (userDataModelPtr->ContainsKey("Id")){
+			QByteArray login = userDataModelPtr->GetData("Id").toByteArray();
+			m_userInfoPtr->SetId(login);
+		}
+
+		if (userDataModelPtr->ContainsKey("Password")){
+			QByteArray password = userDataModelPtr->GetData("Password").toByteArray();
+			m_userInfoPtr->SetPasswordHash(password);
 		}
 
 		m_userPermissionIds = m_userInfoPtr->GetPermissions(*m_productIdAttrPtr);

@@ -120,7 +120,7 @@ StyleComponents {
     property string baseColor: "white";
     property string alternateBaseColor: "#f5f5f5";
     property string backgroundColor: "#e6e6e8";
-    property string backgroundColor2: "#e6e6e8";
+    property string backgroundColor2: "#f7f7f7";
     property string linkColor: "#0078D7";
     property string selectedColor: "#e3eefa";
     // #ddeeff

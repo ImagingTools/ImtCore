@@ -163,7 +163,6 @@ void CQuickObjectCompBase::OnItemCreated()
 
 	m_itemCreated.SetQuickItemCreated(true);
 
-//	QMetaObject::invokeMethod(m_quickItemPtr, "firstModelsInit");
 }
 
 
