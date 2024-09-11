@@ -236,7 +236,7 @@ imtbase::CTreeItemModel *CClusterCreator::createMapClusterModel(imtbase::CTreeIt
     return retModel;
 }
 
-QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel) const
+QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel, double limitInPixels) const
 {
     QList<CCluster*> clusterList;
 
@@ -268,8 +268,6 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
     }
 
     double koeff = std::pow(2, 19 - int(zoomLevel)) * 1.0536710607088955e-8 / 2.15;
-
-    double limitInPixels = 50;
 
     double x_i;
     double x_j;
