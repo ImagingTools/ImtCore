@@ -13,6 +13,8 @@ Item {
     signal itemRemoved(int index, var item);
 
     function push(item){
+        console.log("push",item);
+
         pagesModel.append({"Component": item})
     }
 
@@ -69,16 +71,12 @@ Item {
 
     Repeater {
         id: repeaterView;
-
         anchors.fill: parent;
-
         model: container.pagesModel;
 
         delegate: Loader {
             anchors.fill: parent;
-
             sourceComponent: model.Component;
-
             visible: model.index === container.pagesModel.count - 1;
 
             onLoaded: {
@@ -87,7 +85,7 @@ Item {
 
             onStatusChanged: {
                 if (status === Loader.Error){
-                    console.error("StackView item loading was failed!");
+                    console.error("StackView item loading was failed");
                 }
             }
         }

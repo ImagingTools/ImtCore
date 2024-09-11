@@ -1,5 +1,4 @@
 // Qt includes
-//#include <QtCore/QDir>
 #include <QtCore/QDirIterator>
 #include <QtCore/QCoreApplication>
 #include <QtWidgets/QApplication>
@@ -32,9 +31,8 @@ public:
 
 	static void InitAcfLocalization()
 	{
-		Q_INIT_RESOURCE(AcfLoc);                                                               
+		Q_INIT_RESOURCE(AcfLoc);
 		Q_INIT_RESOURCE(AcfSlnLoc);
-
 	}
 
 	static void InitImtCoreLocalization()
@@ -73,7 +71,6 @@ public:
 		Q_INIT_RESOURCE(imtguiTheme);
 		Q_INIT_RESOURCE(imtauthguiTheme);
 	}
-
 
 	static void InitImtCoreResources()
 	{
@@ -140,7 +137,6 @@ int Run(int argc, char *argv[])
 
 		dirIter2.next();
 	}
-
 
 	ApplicationComposite instance;
 

@@ -42,7 +42,7 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
-		if (!objectId.isEmpty() && objectId != id){
+		if (objectId != id){
 			errorMessage = QT_TR_NOOP(QString("Feature-ID: '%1' already exists. Please rename")).arg(qPrintable(featureId));
 			return false;
 		}

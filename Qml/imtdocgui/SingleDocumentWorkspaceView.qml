@@ -15,6 +15,8 @@ Rectangle {
     property DocumentManager documentManager;
 
     onDocumentManagerChanged: {
+        console.log("onDocumentManagerChanged", documentManager);
+
         if (documentManager){
             if (Qt.platform.os === "web"){
                 documentManager.generateDocumentTitle = root.generateDocumentTitle;
@@ -31,8 +33,9 @@ Rectangle {
 
     Connections {
         id: connections;
-
         function onDocumentAdded(documentIndex, documentId){
+            console.log("onDocumentAdded", documentIndex, documentId);
+
             let documentComp = root.documentManager.documentsModel.get(documentIndex).DocumentViewComp;
             stackView.push(documentComp);
         }
@@ -44,6 +47,8 @@ Rectangle {
 
     function generateDocumentTitle(documentIndex){
         if (documentIndex < 0 || documentIndex >= documentManager.documentsModel.count){
+            console.warn("Unable generate document title. Document index is incorrect");
+
             return "";
         }
 
@@ -70,6 +75,7 @@ Rectangle {
 
     function addInitialItem(viewComp, name){
         if (!documentManager){
+            console.error("Unable to add the initial item to single document view. Error: Document manager is invalid");
             return;
         }
 
@@ -80,7 +86,8 @@ Rectangle {
                                                   "Fixed": true
                                               });
 
-        documentManager.documentAdded(documentManager.documentsModel.count - 1, "");
+        // documentManager.documentAdded(documentManager.documentsModel.count - 1, "");
+        stackView.push(viewComp);
     }
 
     function setAlertPanel(alertPanelComp){
@@ -95,24 +102,18 @@ Rectangle {
 
     Item {
         id: buttonPanel;
-
         anchors.top: alertPanel.bottom;
         anchors.left: parent.left;
         anchors.leftMargin: visible ? Style.size_mainMargin : 0;
-
         width: visible ? closeButton.width: 0;
         height: headersListView.height;
-
         visible: stackView.countPage > 1;
 
         ToolButton {
             id: closeButton;
-
             anchors.centerIn: buttonPanel;
-
             width: visible ? 25: 0;
             height: width;
-
             iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
@@ -128,7 +129,6 @@ Rectangle {
 
     ListView {
         id: headersListView;
-
         anchors.top: alertPanel.bottom;
         anchors.left: buttonPanel.right;
         anchors.leftMargin: Style.size_mainMargin;
@@ -136,9 +136,7 @@ Rectangle {
         height: visible ? 40 : 0;
         orientation: ListView.Horizontal;
         boundsBehavior: Flickable.StopAtBounds;
-
         visible: count === 1 && !root.initialItemTitleVisible ? false : true;
-
         delegate: Item {
             width: visible ? content.width + spacer.width: 0;
             height: headersListView.height;
@@ -148,7 +146,6 @@ Rectangle {
                 id: spacer;
                 anchors.left: parent.left;
                 width: visible ? Style.size_mainMargin : 0;
-
                 visible: model.index === 1 && !root.initialItemTitleVisible ? false : true;
             }
 
@@ -160,47 +157,34 @@ Rectangle {
 
                 Text {
                     id: separator;
-
                     anchors.verticalCenter: content.verticalCenter;
-
                     font.pixelSize: Style.fontSize_title;
                     font.family: Style.fontFamily;
-
                     color: Style.titleColor;
-
                     text: root.titleSeparation;
-
                     visible: model.index === 1 && !root.initialItemTitleVisible ? false : model.index > 0;
                 }
 
                 Text {
                     id: headerText;
-
                     anchors.verticalCenter: content.verticalCenter;
-
                     font.pixelSize: Style.fontSize_title;
                     font.family: Style.fontFamily;
-
                     color: Style.titleColor;
-
                     text: model.Title;
                 }
             }
 
             MouseArea {
                 anchors.fill: parent;
-
-                onClicked: {
-                }
+                onClicked: {}
             }
         }
     }
 
     StackView {
         id: stackView;
-
         z: 10;
-
         anchors.top: headersListView.bottom;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;

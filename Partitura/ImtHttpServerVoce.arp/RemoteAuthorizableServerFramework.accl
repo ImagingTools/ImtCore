@@ -2,13 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5241" Description="ACF"/>
+            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ServerFramework" X="542" Y="116" Note=""/>
+        <Element ComponentName="ServerFramework" X="550" Y="125" Note=""/>
         <Element ComponentName="SessionInfo" X="275" Y="500" Note=""/>
         <Element ComponentName="UserInfo" X="825" Y="500" Note=""/>
         <Element ComponentName="UserSessionContextController" X="550" Y="325" Note="Controller for creating the session information based on user/logon data received from Puma-server"/>
