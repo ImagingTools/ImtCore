@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 		return 2;
 	}
 
-	ibase::IApplication* applicationPtr = instance.GetInterface<ibase::IApplication>();
+    ibase::IApplication* applicationPtr = instance.GetInterface<ibase::IApplication>();
 	if (applicationPtr != NULL){
 		return applicationPtr->Execute(argc, argv);
 	}

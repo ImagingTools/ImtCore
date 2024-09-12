@@ -140,9 +140,6 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 		notificationModel = new imtbase::CTreeItemModel();
 		notificationModel->SetData("Id", newObjectId);
 		notificationModel->SetData("Name", name);
-		if (m_objectCollectionCompPtr->GetObjectData(newObjectId, dataPtr)){
-			const IAddressElementInfo* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(dataPtr.GetPtr());
-		}
 		dataModel->SetExternTreeModel("addedNotification", notificationModel);
 	}
 

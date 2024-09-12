@@ -1087,11 +1087,11 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectTypeIdFromRequest(const
 
 
 bool CObjectCollectionControllerCompBase::CreateRepresentationFromObject(
-			const istd::IChangeable& data,
-			const QByteArray& objectTypeId,
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& dataModel,
-			QString& errorMessage) const
+			const istd::IChangeable& /*data*/,
+			const QByteArray& /*objectTypeId*/,
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			imtbase::CTreeItemModel& /*dataModel*/,
+			QString& /*errorMessage*/) const
 {
 	return false;
 }
@@ -1198,7 +1198,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 }
 
 
-void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, const imtgql::CGqlObject& /*viewParamsGql*/, iprm::CParamsSet* filterParamsPtr) const
+void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGqlRequest& /*gqlRequest*/, const imtgql::CGqlObject& /*viewParamsGql*/, iprm::CParamsSet* /*filterParamsPtr*/) const
 {
 }
 
