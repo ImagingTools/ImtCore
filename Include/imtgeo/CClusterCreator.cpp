@@ -35,7 +35,28 @@ QPair<double, double> CClusterCreator::coordToMercator(const QGeoCoordinate &coo
 }
 
 
-imtbase::CTreeItemModel *CClusterCreator::createMapClusterModel(imtbase::CTreeItemModel *model, double zoomLevel) const
+double CClusterCreator::getDistanceBetweenObjects(const QGeoCoordinate &coord1, const QGeoCoordinate &coord2) const
+{
+    double dist = 0;
+
+    double x_1 = coordToMercator(coord1).first;
+    double y_1 = coordToMercator(coord1).second;
+    double x_2 = coordToMercator(coord2).first;
+    double y_2 = coordToMercator(coord2).second;
+
+    dist = sqrtf((x_1 - x_2)*(x_1 - x_2) + (y_1 - y_2)*(y_1 - y_2));
+
+    return dist;
+}
+
+
+double CClusterCreator::getDistanceLimitCoeff(double zoomLevel) const
+{
+    return std::pow(2, 19 - int(zoomLevel)) * 1.0536710607088955e-8 / 2.15;
+}
+
+
+imtbase::CTreeItemModel *CClusterCreator::createMapClusterModel(imtbase::CTreeItemModel *model, double zoomLevel, double limitInPixels) const
 {
     imtbase::CTreeItemModel* itemsModel = nullptr;
     imtbase::CTreeItemModel* clusterModel = nullptr;
@@ -57,9 +78,8 @@ imtbase::CTreeItemModel *CClusterCreator::createMapClusterModel(imtbase::CTreeIt
         clusterModel->SetData("ObjectIds", QStringList(), index);
     }
 
-    double koeff = std::pow(2, 19 - int(zoomLevel)) * 1.0536710607088955e-8 / 2.15;
+    double koeff = getDistanceLimitCoeff(zoomLevel);
 
-    double limitInPixels = 50;
 
     double x_i;
     double x_j;
@@ -267,7 +287,7 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
         clusterModel->SetData("ObjectIds", QStringList(), index);
     }
 
-    double koeff = std::pow(2, 19 - int(zoomLevel)) * 1.0536710607088955e-8 / 2.15;
+    double koeff = getDistanceLimitCoeff(zoomLevel);
 
     double x_i;
     double x_j;
