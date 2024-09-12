@@ -42,12 +42,19 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
+	QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");
 		I_CRITICAL();
 
 		return TS_INVALID;
+	}
+
+	// get auto defined path if namespace is not provided
+	if (m_argumentParserCompPtr->GetNamespace().isEmpty()){
+		if (m_customSchemaParamsCompPtr.IsValid()){
+			outputDirectoryPath = GetAutoDefinedQmlBasePath(*m_customSchemaParamsCompPtr, outputDirectoryPath);
+		}
 	}
 
 	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)){
@@ -102,7 +109,6 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	const QString currentNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	iprm::IParamsManager* objectsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(qmldirDataParams.GetEditableParameter(QmldirModelParamIds::Objects));
 	if (objectsParamsManagerPtr == nullptr){
 		SendCriticalMessage(0, "Invalid params created");
@@ -158,7 +164,8 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 	}
 
 	// and finally create a QRC file
-	QFile qrcFile(outputDirectoryPath + "/" + currentNamespace + ".qrc");
+	const QString qmlModuleName = GetQmlModuleNameFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	QFile qrcFile(outputDirectoryPath + "/" + qmlModuleName + ".qrc");
 	if (!qrcFile.open(QIODevice::WriteOnly)){
 		SendErrorMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
@@ -180,19 +187,19 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 	for (const CSdlType& sdlType: sdlTypeList){
 		// add QML file
 		xmlWriter.writeStartElement("file");
-		xmlWriter.writeAttribute("alias", currentNamespace + '/' + sdlType.GetName() + ".qml");
+		xmlWriter.writeAttribute("alias", qmlModuleName + '/' + sdlType.GetName() + ".qml");
 		xmlWriter.writeCharacters(sdlType.GetName() + ".qml");
 		xmlWriter.writeEndElement();
 
 		// add QML Keys file
 		xmlWriter.writeStartElement("file");
-		xmlWriter.writeAttribute("alias", currentNamespace + '/' + GetQmlKeysWrappedName(sdlType.GetName()) + ".qml");
+		xmlWriter.writeAttribute("alias", qmlModuleName + '/' + GetQmlKeysWrappedName(sdlType.GetName()) + ".qml");
 		xmlWriter.writeCharacters(GetQmlKeysWrappedName(sdlType.GetName()) + ".qml");
 		xmlWriter.writeEndElement();
 	}
 	// also add qmldir file
 	xmlWriter.writeStartElement("file");
-	xmlWriter.writeAttribute("alias", currentNamespace + "/qmldir");
+	xmlWriter.writeAttribute("alias", qmlModuleName + "/qmldir");
 	xmlWriter.writeCharacters("qmldir");
 	xmlWriter.writeEndElement();
 

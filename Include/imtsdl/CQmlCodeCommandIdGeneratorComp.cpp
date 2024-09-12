@@ -48,12 +48,19 @@ int CQmlCodeCommandIdGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
+	QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");
 		I_CRITICAL();
 
 		return TS_INVALID;
+	}
+
+	// get auto defined path if namespace is not provided
+	if (m_argumentParserCompPtr->GetNamespace().isEmpty()){
+		if (m_customSchemaParamsCompPtr.IsValid()){
+			outputDirectoryPath = GetAutoDefinedQmlBasePath(*m_customSchemaParamsCompPtr, outputDirectoryPath);
+		}
 	}
 
 	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)){
@@ -81,7 +88,6 @@ int CQmlCodeCommandIdGeneratorComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	const QString currentNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	iprm::IParamsManager* objectsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(qmldirDataParams.GetEditableParameter(QmldirModelParamIds::Objects));
 	if (objectsParamsManagerPtr == nullptr){
 		SendCriticalMessage(0, "Invalid params created");
@@ -138,9 +144,10 @@ int CQmlCodeCommandIdGeneratorComp::DoProcessing(
 	istd::TDelPtr<iprm::IParamsManager> qrcParamsPtr(m_paramsFactComp.CreateInstance());
 	Q_ASSERT(qrcParamsPtr != nullptr);
 
-	const int qrcLoadStatus = m_qrcFilePersistanceCompPtr->LoadFromFile(*qrcParamsPtr, outputDirectoryPath + '/' + currentNamespace + QStringLiteral(".qrc"));
+	const QString qmlModuleName = GetQmlModuleNameFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	const int qrcLoadStatus = m_qrcFilePersistanceCompPtr->LoadFromFile(*qrcParamsPtr, outputDirectoryPath + '/' + qmlModuleName + QStringLiteral(".qrc"));
 	if (qrcLoadStatus != ifile::IFilePersistence::OS_OK){
-		SendErrorMessage(0, QString("Unable to load QRC file data from '%1'").arg(outputDirectoryPath + '/' + currentNamespace + QStringLiteral(".qrc")));
+		SendErrorMessage(0, QString("Unable to load QRC file data from '%1'").arg(outputDirectoryPath + '/' + qmlModuleName + QStringLiteral(".qrc")));
 
 		return TS_INVALID;
 	}
@@ -193,11 +200,11 @@ int CQmlCodeCommandIdGeneratorComp::DoProcessing(
 
 		return TS_INVALID;
 	}
-	aliasNameParam->SetName(GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) + '/' + GetQmlCommandIdsFileName() + QStringLiteral(".qml"));
+	aliasNameParam->SetName(GetQmlModuleNameFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) + '/' + GetQmlCommandIdsFileName() + QStringLiteral(".qml"));
 
-	const int qrcSaveStatus = m_qrcFilePersistanceCompPtr->SaveToFile(*qrcParamsPtr, outputDirectoryPath + '/' + currentNamespace + QStringLiteral(".qrc"));
+	const int qrcSaveStatus = m_qrcFilePersistanceCompPtr->SaveToFile(*qrcParamsPtr, outputDirectoryPath + '/' + qmlModuleName + QStringLiteral(".qrc"));
 	if (qrcSaveStatus != ifile::IFilePersistence::OS_OK){
-		SendErrorMessage(0, QString("Unable to save QRC file data to '%1'").arg(outputDirectoryPath + '/' + currentNamespace + QStringLiteral(".qrc")));
+		SendErrorMessage(0, QString("Unable to save QRC file data to '%1'").arg(outputDirectoryPath + '/' + qmlModuleName + QStringLiteral(".qrc")));
 
 		return TS_INVALID;
 	}
@@ -295,7 +302,8 @@ QString CQmlCodeCommandIdGeneratorComp::GetQmlCommandIdsFileName() const
 		return QString();
 	}
 
-	return GetCapitalizedValue(GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr)) + *m_qmlCommandIdsFileSuffixAttrPtr;
+	const QString qmlModuleName = GetQmlModuleNameFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	return GetCapitalizedValue(qmlModuleName) + *m_qmlCommandIdsFileSuffixAttrPtr;
 }
 
 
@@ -307,7 +315,14 @@ QString CQmlCodeCommandIdGeneratorComp::GetQmlCommandIdsFilePath() const
 		return QString();
 	}
 
-	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
+	QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
+
+	// get auto defined path if namespace is not provided
+	if (m_argumentParserCompPtr->GetNamespace().isEmpty()){
+		if (m_customSchemaParamsCompPtr.IsValid()){
+			outputDirectoryPath = GetAutoDefinedQmlBasePath(*m_customSchemaParamsCompPtr, outputDirectoryPath);
+		}
+	}
 
 	return outputDirectoryPath + '/' + GetQmlCommandIdsFileName() + QStringLiteral(".qml");
 }
