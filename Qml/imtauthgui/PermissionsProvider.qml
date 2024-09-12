@@ -3,57 +3,34 @@ import Acf 1.0
 import imtgui 1.0
 import imtguigql 1.0
 
-Item {
+QtObject {
     id: permissionsProvider;
 
-    property TreeItemModel dataModel: TreeItemModel {};
-    property TreeItemModel dependenciesModel: TreeItemModel {};
-
     property string productId: "";
+    property TreeItemModel permissionsModel: TreeItemModel {};
 
     function updateModel(){
         if (permissionsProvider.productId == ""){
-            console.error("Error::PermissionsProvider updateModel(): productId is empty!")
+            console.error("Unable to update model for permissions. Error: Product-ID is empty")
             return;
         }
 
-        permissionModel.updateModel();
+        permissionModel.send();
     }
 
-    GqlModel {
-        id: permissionModel;
+     property GqlRequestSender permissionModel: GqlRequestSender {
+        requestType: 0; // Query
+        gqlCommandId: "ProductPermissions";
 
-        function updateModel() {
-            var query = Gql.GqlRequest("query", "ProductPermissions");
+        function createQueryParams(query){
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("ProductId", permissionsProvider.productId);
             query.AddParam(inputParams);
-
-            var gqlData = query.GetQuery();
-
-            this.setGqlQuery(gqlData);
         }
 
-        onStateChanged: {
-            if (this.state === "Ready"){
-                let dataModelLocal;
-
-                if (permissionModel.containsKey("errors")){
-                    return;
-                }
-
-                if (permissionModel.containsKey("data")){
-                    dataModelLocal = permissionModel.getData("data");
-                    if (dataModelLocal.containsKey("ProductPermissions")){
-                        dataModelLocal = dataModelLocal.getData("ProductPermissions");
-                        permissionsProvider.dataModel = dataModelLocal;
-
-//                        if (dataModelLocal.containsKey("Dependencies")){
-//                            permissionsProvider.dependenciesModel = dataModelLocal.getData("Dependencies");
-//                        }
-                    }
-                }
-            }
+        function onResult(data){
+            console.log("PermissionsProvider.qmlonResult", data.toJson());
+            permissionsProvider.permissionsModel = data;
         }
     }//GqlModel
 }

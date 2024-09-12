@@ -122,6 +122,7 @@ WebSocket {
 
                 subscriptionModel[index]["status"] = "waiting";
                 container.sendTextMessage(JSON.stringify(request))
+                console.log("registerSubscriptionToServer", JSON.stringify(request));
             }
         }
     }

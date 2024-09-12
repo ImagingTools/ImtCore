@@ -16,6 +16,10 @@ ViewBase {
 
     property RoleData roleData: model ? model : null;
 
+    onPermissionsModelChanged: {
+        console.log("Role onPermissionsModelChanged", permissionsModel.toJson());
+    }
+
     function updateGui(){
         generalGroup.updateGui();
         permissionsGroup.updateGui()

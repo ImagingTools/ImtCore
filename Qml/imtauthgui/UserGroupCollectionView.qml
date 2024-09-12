@@ -14,6 +14,7 @@ RemoteCollectionView {
     visibleMetaInfo: true;
 
     property string productId;
+    property var documentManager: null;
 
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
         collectionView: userGroupCollectionViewContainer;
@@ -31,7 +32,7 @@ RemoteCollectionView {
         collectionFilter.setSortingOrder("ASC");
         collectionFilter.setSortingInfoId("Name");
 
-        let documentManager = MainDocumentManager.getDocumentManager("Administration");
+        // let documentManager = MainDocumentManager.getDocumentManager("Administration");
         if (documentManager){
             userGroupCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 

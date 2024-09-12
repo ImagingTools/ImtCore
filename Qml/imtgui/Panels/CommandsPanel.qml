@@ -44,13 +44,10 @@ Item {
     }
 
     function setCommandsModel(params){
-        console.log("setCommandsModel", params)
         clearModel();
 
         let commId = params["ViewId"];
         let model = params["Model"];
-
-        console.log("model", model.toJson())
 
         for (let i = 0; i < model.getItemsCount(); i++){
             let alignment = model.getData("Alignment", i);

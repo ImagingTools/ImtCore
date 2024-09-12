@@ -64,6 +64,11 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			return GenerateError(imtrest::IProtocolEngine::StatusCode::SC_INTERNAL_SERVER_ERROR, "Request incorrected", request);
 		}
 	}
+	else{
+		QString message = QString("There is no authentication token in the HTTP headers. Info: Command: '%1'").arg(qPrintable(gqlCommand));
+		qDebug() << message;
+		SendWarningMessage(0, message, "GraphQL - servlet");
+	}
 
 	QByteArray languageId;
 	QByteArray designSchemeId;

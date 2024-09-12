@@ -34,7 +34,7 @@ CollectionViewCommandsDelegateBase {
             root.documentManager.insertNewDocument(typeId, viewTypeId);
         }
         else{
-            console.error("documentManager undefined!")
+            console.error("Unable to create new object:", typeId, viewTypeId, ". Error: Document manager is invalid")
         }
     }
 
@@ -42,11 +42,15 @@ CollectionViewCommandsDelegateBase {
         if (root.documentManager){
             root.documentManager.openDocument(objectId, typeId, viewTypeId);
         }
+        else{
+            console.error("Unable to open document for editing", typeId, viewTypeId, ". Error: Document manager is invalid");
+        }
     }
 
     function onEdit(){
         let elementsModel = root.collectionView.table.elements;
         if (!elementsModel){
+            console.error("Unable to edit document. Error: Elements for collection view is invalid");
             return;
         }
 

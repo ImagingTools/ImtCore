@@ -43,17 +43,35 @@ ViewBase {
             }
         }
 
-        if (systemInfosModel){
-            for (let i = 0; i < systemInfosModel.count; i++){
-                let systemId = systemInfosModel.get(i).m_id;
-                if (systemId !== ""){
-                    usernameInput.readOnly = true;
-                    break;
-                }
-            }
-        }
+        checkSystemId();
 
         setBlockingUpdateModel(false);
+    }
+
+    function checkSystemId(){
+        if (!userData){
+            console.error("Unable to check system ID for the user. Error: UserData is invalid");
+            return;
+        }
+
+        usernameInput.readOnly = false;
+        passwordInput.readOnly = false;
+
+        for (let i = 0; i < userData.m_systemInfos.count; i++){
+            let systemId = userData.m_systemInfos.get(i).item.m_id;
+            if (systemId !== ""){
+                usernameInput.readOnly = true;
+            }
+
+            let enabled = userData.m_systemInfos.get(i).item.m_enabled;
+            if (enabled && systemId !== ""){
+                usernameInput.readOnly = true;
+                passwordInput.readOnly = true;
+            }
+            else if (enabled && systemId === ""){
+                passwordInput.readOnly = false;
+            }
+        }
     }
 
     CustomScrollbar {
@@ -246,7 +264,7 @@ ViewBase {
                             headersModel2.clear();
 
                             let index = headersModel2.insertNewItem();
-                            headersModel2.setData("Id", "Name", index)
+                            headersModel2.setData("Id", "m_name", index)
                             headersModel2.setData("Name", qsTr("System Name"), index)
 
                             if (systemInfoTable.table){
@@ -258,6 +276,7 @@ ViewBase {
                     onTableChanged: {
                         if (table){
                             table.checkable = true;
+                            table.isMultiCheckable = false;
                         }
                     }
 
@@ -266,10 +285,25 @@ ViewBase {
                         target: systemInfoTable.table;
 
                         function onCheckedItemsChanged(){
+                            if (systemInfoGroup.block){
+                                return;
+                            }
+
+                            let indexes = systemInfoTable.table.getCheckedItems();
+                            if (indexes.length === 0){
+                                systemInfoGroup.block = true;
+                                systemInfoTable.table.checkItem(0);
+                                systemInfoGroup.block = false;
+                                // systemInfoGroup.updateGui()
+                            }
+
                             container.doUpdateModel();
+                            container.checkSystemId();
                         }
                     }
                 }
+
+                property bool block: false;
 
                 function updateGui(){
                     if (systemInfoTable.table){
@@ -287,12 +321,11 @@ ViewBase {
                 }
 
                 function updateModel(){
-                    let systemInfosModel = container.userData.m_systemInfos;
-                    if (systemInfosModel){
-                        let indexes = systemInfoTable.table.getCheckedItems();
+                    let indexes = systemInfoTable.table.getCheckedItems();
 
-                        for (let i = 0; i < systemInfosModel.count; i++){
-                            systemInfosModel.get(i).item.m_enabled = indexes.includes(i)
+                    if (container.userData.m_systemInfos){
+                        for (let i = 0; i < container.userData.m_systemInfos.count; i++){
+                            container.userData.m_systemInfos.get(i).item.m_enabled = indexes.includes(i)
                         }
                     }
                 }

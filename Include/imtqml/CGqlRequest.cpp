@@ -5,6 +5,9 @@
 #include <QtQml/QQmlEngine>
 #include <QtNetwork/QNetworkAccessManager>
 
+// ImtCore includes
+#include <imtqml/CGqlModel.h>
+
 
 namespace imtqml
 {
@@ -36,6 +39,10 @@ bool CGqlRequest::SetGqlQuery(QString query)
 
 		QNetworkRequest networkRequest = QNetworkRequest(requestUrl);
 		networkRequest.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/x-www-form-urlencoded"));
+
+		if (!CGqlModel::s_accessToken.isEmpty()){
+			networkRequest.setRawHeader("X-authentication-token", CGqlModel::s_accessToken.toUtf8());
+		}
 
 		QString message = QString("Post to url '%1' query '%2'").arg(requestUrl.toString()).arg(query);
 		qDebug() << message;

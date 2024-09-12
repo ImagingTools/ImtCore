@@ -6,8 +6,6 @@
 
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlRequest.h>
-
 
 
 namespace imtqml
@@ -37,7 +35,7 @@ public Q_SLOTS:
 
 	static void SetGlobalAccessToken(const QString& accessToken);
 
-private:
+public:
 	static QString s_accessToken;
 };
 

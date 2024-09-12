@@ -41,6 +41,7 @@ RemoteCollectionView {
     }
 
     property string productId;
+    property var documentManager: null;
 
     function onLocalizationChanged(language){
         roleCollectionViewContainer.dataController.updateHeaders();
@@ -58,8 +59,8 @@ RemoteCollectionView {
         Events.subscribeEvent("OnLocalizationChanged", roleCollectionViewContainer.onLocalizationChanged);
         CachedRoleCollection.updateModel();
 
-        let documentManager = MainDocumentManager.getDocumentManager("Administration");
-        if (documentManager){
+        // let documentManager = MainDocumentManager.getDocumentManager("Administration");
+        if (roleCollectionViewContainer.documentManager){
             roleCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 
             documentManager.registerDocumentView("Role", "RoleEditor", roleDocumentComp);
@@ -68,11 +69,7 @@ RemoteCollectionView {
     }
 
     onProductIdChanged: {
-        console.log("RoleCollection onProductIdChanged", productId);
-    }
-
-    onElementsChanged: {
-        if(!permissionsProvider) return
+        console.log("Role Collection onProductIdChanged", productId);
 
         permissionsProvider.updateModel();
     }
@@ -82,13 +79,11 @@ RemoteCollectionView {
 
     PermissionsProvider {
         id: permissionsProvider;
-
-        property bool compl: false;
         productId: roleCollectionViewContainer.productId;
 
-        onDataModelChanged: {
-            if (permissionsProvider.dataModel != null){
-                roleCollectionViewContainer.permissionsModel = permissionsProvider.dataModel;
+        onPermissionsModelChanged: {
+            if (permissionsProvider.permissionsModel != null){
+                roleCollectionViewContainer.permissionsModel = permissionsProvider.permissionsModel;
             }
         }
     }

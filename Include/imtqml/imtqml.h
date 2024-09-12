@@ -3,8 +3,6 @@
 
 namespace imtqml
 {
-
-
 } // namespace imtqml
 
 

@@ -72,7 +72,7 @@ PopupView {
         let index = treeModel.insertNewItem();
         treeModel.setData("Id", "Hour", index);
         treeModel.setData("Name", qsTr("Last hour"), index);
-        treeModel.setData("InterpretationMode", "Last", index);
+        treeModel.setData("InterpretationMode", "For", index);
 
         index = treeModel.insertNewItem();
         treeModel.setData("Id", "Day", index);

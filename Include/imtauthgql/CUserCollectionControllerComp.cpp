@@ -20,10 +20,10 @@ namespace imtauthgql
 // reimplemented (sdl::imtauth::Users::CUserCollectionControllerCompBase)
 
 bool CUserCollectionControllerComp::CreateRepresentationFromObject(
-			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtauth::Users::CUsersListGqlRequest& usersListRequest,
-			sdl::imtauth::Users::CUserItem& representationObject,
-			QString& errorMessage) const
+	const imtbase::IObjectCollectionIterator& objectCollectionIterator,
+	const sdl::imtauth::Users::CUsersListGqlRequest& usersListRequest,
+	sdl::imtauth::Users::CUserItem& representationObject,
+	QString& errorMessage) const
 {
 	sdl::imtauth::Users::UsersListRequestArguments arguments = usersListRequest.GetRequestedArguments();
 
@@ -160,11 +160,11 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation(
-			const sdl::imtauth::Users::CUserData& userDataRepresentation,
-			QByteArray& newObjectId,
-			QString& name,
-			QString& description,
-			QString& errorMessage) const
+	const sdl::imtauth::Users::CUserData& userDataRepresentation,
+	QByteArray& newObjectId,
+	QString& name,
+	QString& description,
+	QString& errorMessage) const
 {
 	if (!m_userInfoFactCompPtr.IsValid()){
 		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_userInfoFactCompPtr' was not set");
@@ -245,26 +245,49 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 	name = userDataRepresentation.GetName();
 	userInfoPtr->SetName(name);
 
-	QString password = userDataRepresentation.GetPassword();
-	if (password.isEmpty()){
-		errorMessage = QString("Password cannot be empty");
-
-		return nullptr;
+	QList<sdl::imtauth::Users::CSystemInfo> systemInfos = userDataRepresentation.GetSystemInfos();
+	if (systemInfos.isEmpty()){
+		// User from internal system
+		imtauth::IUserInfo::SystemInfo systemInfo;
+		userInfoPtr->AddToSystem(systemInfo);
 	}
+	else{
+		for (const sdl::imtauth::Users::CSystemInfo& sdlSystemInfo : systemInfos){
+			QByteArray systemId = sdlSystemInfo.GetId();
+			QString systemName = sdlSystemInfo.GetName();
+			bool enabled = sdlSystemInfo.GetEnabled();
 
-	if (m_hashCalculatorCompPtr.IsValid()){
-		if (oldUserInfoPtr != nullptr){
-			if (oldUserInfoPtr->GetPasswordHash() != password){
-				password = m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
-			}
+			imtauth::IUserInfo::SystemInfo systemInfo;
+			systemInfo.systemId = systemId;
+			systemInfo.systemName = systemName;
+			systemInfo.enabled = enabled;
+
+			userInfoPtr->AddToSystem(systemInfo);
 		}
 	}
 
-	// User from internal system
-	imtauth::IUserInfo::SystemInfo systemInfo;
-	userInfoPtr->AddToSystem(systemInfo);
+	for (imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
+		if (systemInfo.enabled && systemInfo.systemId.isEmpty()){
+			QString password = userDataRepresentation.GetPassword();
+			if (password.isEmpty()){
+				errorMessage = QString("Password cannot be empty");
 
-	userInfoPtr->SetPasswordHash(password.toUtf8());
+				return nullptr;
+			}
+
+			if (m_hashCalculatorCompPtr.IsValid()){
+				if (oldUserInfoPtr != nullptr){
+					if (oldUserInfoPtr->GetPasswordHash() != password){
+						password = m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
+					}
+				}
+			}
+
+			userInfoPtr->SetPasswordHash(password.toUtf8());
+
+			break;
+		}
+	}
 
 	QString mail = userDataRepresentation.GetEmail();
 	userInfoPtr->SetMail(mail);
@@ -295,10 +318,10 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 
 
 bool CUserCollectionControllerComp::CreateRepresentationFromObject(
-			const istd::IChangeable& data,
-			const sdl::imtauth::Users::CUserItemGqlRequest& userItemRequest,
-			sdl::imtauth::Users::CUserDataPayload& representationPayload,
-			QString& errorMessage) const
+	const istd::IChangeable& data,
+	const sdl::imtauth::Users::CUserItemGqlRequest& userItemRequest,
+	sdl::imtauth::Users::CUserDataPayload& representationPayload,
+	QString& errorMessage) const
 {
 	const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(&data);
 	if (userInfoPtr == nullptr){
@@ -345,7 +368,14 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		sdl::imtauth::Users::CSystemInfo info;
 
 		info.SetId(systemInfo.systemId);
-		info.SetName(systemInfo.systemName);
+
+		if (systemInfo.systemId.isEmpty()){
+			info.SetName(QString("Internal"));
+		}
+		else{
+			info.SetName(systemInfo.systemName);
+		}
+
 		info.SetEnabled(systemInfo.enabled);
 
 		list << info;
@@ -366,8 +396,7 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 
 	const imtgql::CGqlObject paramsPtr = gqlRequest.GetParams();
 
-	QByteArray productId;
-	productId = paramsPtr.GetFieldArgumentValue("ProductId").toByteArray();
+	QByteArray productId = paramsPtr.GetFieldArgumentValue("ProductId").toByteArray();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 

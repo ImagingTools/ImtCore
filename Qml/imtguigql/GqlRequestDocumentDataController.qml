@@ -23,7 +23,7 @@ DocumentDataController {
 
     Component.onCompleted: {
         let additionInputParams = container.getAdditionalInputParams();
-        if (Object.keys(additionInputParams).length > 0){
+        if (additionInputParams && Object.keys(additionInputParams).length > 0){
             let additionParams = Gql.GqlObject("addition");
             for (let key in additionInputParams){
                 additionParams.InsertField(key, additionInputParams[key]);

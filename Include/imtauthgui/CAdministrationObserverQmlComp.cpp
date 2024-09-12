@@ -157,6 +157,11 @@ void CAdministrationObserverQmlComp::OnQuickItemCreatedUpdate(const istd::IChang
 
 			bool isConnected = connect(quickItem, SIGNAL(commandsModelChanged(QVariant)), this, SLOT(OnCommandsModelChanged(QVariant)));
 			Q_ASSERT(isConnected);
+
+			if (m_webSocketUrlParamCompPtr.IsValid()){
+				QUrl url = m_webSocketUrlParamCompPtr->GetUrl();
+				quickItem->setProperty("webSocketUrl", url.toString());
+			}
 		}
 	}
 }

@@ -309,8 +309,7 @@ Rectangle {
         }
 
         let indexes = []
-        let count = tableContainer.elements.getItemsCount();
-        for (let i = 0; i < count; i++){
+        for (let i = 0; i < elementsList.count; i++){
             indexes.push(i);
         }
 
@@ -322,8 +321,7 @@ Rectangle {
             return false;
         }
 
-        let count = tableContainer.elements.getItemsCount();
-        for (let i = 0; i < count; i++){
+        for (let i = 0; i < elementsList.count; i++){
             let isChecked = tableContainer.itemIsChecked(i);
             if (!isChecked){
                 return false;

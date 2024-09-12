@@ -35,14 +35,13 @@ Item {
     function getTabById(tabId){
         let index = getIndexById(tabId);
         if (index >= 0){
-            return getgetTabByIdByIndex(index);
+            return getTabByIndex(index);
         }
 
         return null;
     }
 
-    function getgetTabByIdByIndex(index){
-
+    function getTabByIndex(index){
         if (index < 0 || bodyRepeater.count <= index){
             return null;
         }
@@ -64,17 +63,12 @@ Item {
 
     TabPanel {
         id: tabPanel;
-
         anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
-
         model: root.tabModel;
-
         isCloseEnable: false
-
         clip: true;
-
         onRightClicked: {
             if (tabPanel.selectedIndex < root.tabModel.count - 1){
                 tabPanel.selectedIndex++;
@@ -90,30 +84,21 @@ Item {
 
     Rectangle {
         id: bodyTab;
-
+        z: 5;
         anchors.left: parent.left;
         anchors.top: tabPanel.bottom;
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
-
-        color: Style.backgroundColor;
-
-        z: 5;
+        color: Style.backgroundColor2;
 
         Repeater {
             id: bodyRepeater;
-
             anchors.fill: parent;
-
             model: root.tabModel;
-
             delegate: Loader {
                 id: bodyLoader;
-
                 anchors.fill: parent;
-
                 sourceComponent: model.SourceComponent;
-
                 visible: tabPanel.selectedIndex == model.index;
 
                 onLoaded: {

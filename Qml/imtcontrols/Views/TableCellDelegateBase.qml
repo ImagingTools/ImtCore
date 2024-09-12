@@ -54,7 +54,7 @@ Item {
         }
 
         if (delegateContainer.rowDelegate.cellColor !== "transparent"){
-                cellBackground.createObject(delegateContainer)
+            cellBackground.createObject(delegateContainer)
         }
 
         if (delegateContainer.rowDelegate.verticalBorderSize){
@@ -150,8 +150,8 @@ Item {
             z: -1;
             width: delegateContainer.rowDelegate ?
                        delegateContainer.rowDelegate.isRightBorder ? delegateContainer.rowDelegate.verticalBorderSize * delegateContainer.rowDelegate.visibleLeftBorderFirst * (delegateContainer.columnIndex == 0)
-                                                                               : delegateContainer.rowDelegate.visibleLeftBorderFirst ? delegateContainer.rowDelegate.verticalBorderSize : delegateContainer.columnIndex > 0 ? delegateContainer.rowDelegate.verticalBorderSize : 0
-                                                                               :0;
+                                                                   : delegateContainer.rowDelegate.visibleLeftBorderFirst ? delegateContainer.rowDelegate.verticalBorderSize : delegateContainer.columnIndex > 0 ? delegateContainer.rowDelegate.verticalBorderSize : 0
+            :0;
             color:  delegateContainer.rowDelegate ?delegateContainer.rowDelegate.borderColorVertical : "transparent";
         }
     }
@@ -167,7 +167,7 @@ Item {
                        !delegateContainer.rowDelegate.isRightBorder ?
                            delegateContainer.rowDelegate.verticalBorderSize * delegateContainer.rowDelegate.visibleRightBorderLast  * (delegateContainer.columnIndex == (delegateContainer.columnCount -1)) * (delegateContainer.columnCount > 0) :
                            delegateContainer.rowDelegate.visibleRightBorderLast ? delegateContainer.rowDelegate.verticalBorderSize  :
-                                                                                              delegateContainer.rowDelegate.verticalBorderSize * (delegateContainer.columnIndex < (delegateContainer.columnCount -1)) : 0;
+                                                                                  delegateContainer.rowDelegate.verticalBorderSize * (delegateContainer.columnIndex < (delegateContainer.columnCount -1)) : 0;
 
             color: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.borderColorVertical : "transparent";
         }
@@ -183,8 +183,8 @@ Item {
             height: parent.height/2;
             color: parent.color;
             visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-                                                                                                    delegateContainer.rowDelegate.cellDecorator.isValidData("LeftTopRound", delegateContainer.columnIndex) ?
-                                                                                                        !delegateContainer.rowDelegate.cellDecorator.getData("LeftTopRound", delegateContainer.columnIndex) :true : 0;
+                                                                                                              delegateContainer.rowDelegate.cellDecorator.isValidData("LeftTopRound", delegateContainer.columnIndex) ?
+                                                                                                                  !delegateContainer.rowDelegate.cellDecorator.getData("LeftTopRound", delegateContainer.columnIndex) :true : 0;
         }
     }
 
@@ -197,8 +197,8 @@ Item {
             height: parent.height/2;
             color: parent.color;
             visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-                                                                                                    delegateContainer.rowDelegate.cellDecorator.isValidData("RightTopRound", delegateContainer.columnIndex) ?
-                                                                                                        !delegateContainer.rowDelegate.cellDecorator.getData("RightTopRound", delegateContainer.columnIndex) :true : 0;
+                                                                                                              delegateContainer.rowDelegate.cellDecorator.isValidData("RightTopRound", delegateContainer.columnIndex) ?
+                                                                                                                  !delegateContainer.rowDelegate.cellDecorator.getData("RightTopRound", delegateContainer.columnIndex) :true : 0;
         }
     }
 
@@ -212,8 +212,8 @@ Item {
             color: parent.color;
             visible: delegateContainer.rowDelegate ?
                          delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-                                                                              delegateContainer.rowDelegate.cellDecorator.isValidData("LeftBottomRound", delegateContainer.columnIndex) ?
-                                                                                  !delegateContainer.rowDelegate.cellDecorator.getData("LeftBottomRound", delegateContainer.columnIndex) :true : 0;
+                                                                                  delegateContainer.rowDelegate.cellDecorator.isValidData("LeftBottomRound", delegateContainer.columnIndex) ?
+                                                                                      !delegateContainer.rowDelegate.cellDecorator.getData("LeftBottomRound", delegateContainer.columnIndex) :true : 0;
         }
     }
 
@@ -226,29 +226,29 @@ Item {
             height: parent.height/2;
             color: parent.color;
             visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-                                                                                                          delegateContainer.rowDelegate.cellDecorator.isValidData("RightBottomRound", delegateContainer.columnIndex) ?
-                                                                                                              !delegateContainer.rowDelegate.cellDecorator.getData("RightBottomRound", delegateContainer.columnIndex) :true : 0;
+                                                                                                              delegateContainer.rowDelegate.cellDecorator.isValidData("RightBottomRound", delegateContainer.columnIndex) ?
+                                                                                                                  !delegateContainer.rowDelegate.cellDecorator.getData("RightBottomRound", delegateContainer.columnIndex) :true : 0;
         }
     }
 
     function getValue(){
-            if (delegateContainer && delegateContainer.columnIndex >= 0){
-                if(delegateContainer.rowDelegate !== null && delegateContainer.rowDelegate.tableItem !==null && delegateContainer.rowDelegate.dataModel != null){
-                    let val
-                    let key = delegateContainer.rowDelegate.tableItem.headers.getData("Id", delegateContainer.columnIndex)
-                    if ("item" in delegateContainer.rowDelegate.dataModel){
-                        val = delegateContainer.rowDelegate.dataModel.item[key]
-                        console.log("data", key, val)
-                    }
-                    else {
-                        val = delegateContainer.rowDelegate.dataModel[key];
-                    }
-                    return val !== undefined ? val : "";
+        if (delegateContainer && delegateContainer.columnIndex >= 0){
+            if(delegateContainer.rowDelegate !== null && delegateContainer.rowDelegate.tableItem !==null && delegateContainer.rowDelegate.dataModel != null){
+                let val
+                let key = delegateContainer.rowDelegate.tableItem.headers.getData("Id", delegateContainer.columnIndex)
+                if ("item" in delegateContainer.rowDelegate.dataModel){
+                    val = delegateContainer.rowDelegate.dataModel.item[key]
                 }
-            }
+                else {
+                    val = delegateContainer.rowDelegate.dataModel[key];
+                }
 
-            return "";
+                return val !== undefined ? val : "";
+            }
         }
+
+        return "";
+    }
 
     function setCellWidth(){
         if(!delegateContainer || !delegateContainer.rowDelegate){

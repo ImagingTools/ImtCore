@@ -204,7 +204,6 @@ Rectangle {
     }
 
     function setDecorators(){
-        console.log("onTableDecoratorChanged");
         if (!tableContainer.tableDecorator){
             return;
         }
@@ -216,8 +215,6 @@ Rectangle {
         tableContainer.headerDecorator = tableContainer.tableDecorator.getTreeItemModel("Headers");
         tableContainer.cellDecorator = tableContainer.tableDecorator.getTreeItemModel("Cells");
         tableContainer.widthDecorator = tableContainer.tableDecorator.getTreeItemModel("CellWidth");
-
-        console.log("tableContainer.widthDecorator", tableContainer.widthDecorator);
 
         tableContainer.emptyDecor = !tableContainer.tableDecorator.getItemsCount();
 
@@ -1086,10 +1083,6 @@ Rectangle {
             if(tableContainer.isFrameScrolling){
                 elementsBg.contentY = elementsListObj.contentY;
             }
-        }
-
-        onCountChanged: {
-            console.log("onCountChanged");
         }
 
         delegate:

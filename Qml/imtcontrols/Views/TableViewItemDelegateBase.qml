@@ -68,7 +68,6 @@ FocusScope {
     }
 
     Component.onCompleted: {
-        console.log("delegate onCompleted", delegate);
         if (delegate.root){
             delegate.root._addItem(delegate);
             delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);

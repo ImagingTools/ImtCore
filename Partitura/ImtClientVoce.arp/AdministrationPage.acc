@@ -28,6 +28,9 @@
                     <AttributeInfo Id="QuickObject" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="QuickObject"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="WebSocketUrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>

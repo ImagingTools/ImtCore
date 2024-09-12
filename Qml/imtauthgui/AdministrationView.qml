@@ -3,6 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
+import imtdocgui 1.0
 
 Item {
     id: container;
@@ -13,6 +14,7 @@ Item {
     signal multiPageUpdated();
 
     property string productId: context.appName;
+    property var documentManager: MainDocumentManager.getDocumentManager("Administration");
 
     Component.onCompleted: {
         console.log("AdministrationView.qml onCompleted");
@@ -60,6 +62,7 @@ Item {
 
         RoleCollectionView {
             productId: container.productId;
+            documentManager: container.documentManager;
         }
     }
 
@@ -68,6 +71,7 @@ Item {
 
         UserCollectionView {
             productId: container.productId;
+            documentManager: container.documentManager;
         }
     }
 
@@ -76,6 +80,7 @@ Item {
 
         UserGroupCollectionView {
             productId: container.productId;
+            documentManager: container.documentManager;
         }
     }
 

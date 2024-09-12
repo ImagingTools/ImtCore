@@ -13,11 +13,16 @@ SingleDocumentWorkspacePageView {
     pageName: qsTr("Administration");
 
     property string productId;
+    property string webSocketUrl;
 
     signal commandsModelChanged(var commandsModel);
 
     Component.onCompleted: {
         Style.setDecorators(decorators_)
+    }
+
+    onWebSocketUrlChanged: {
+        console.log("onWebSocketUrlChanged", webSocketUrl);
     }
 
     Connections {
@@ -51,11 +56,12 @@ SingleDocumentWorkspacePageView {
 
     SubscriptionManager {
         id: subscriptionManager;
+        url: container.webSocketUrl;
+        // url: "ws://localhost:8112";
     }
 
     DialogManagerView {
         anchors.fill: parent;
-        z: topPanel_.z + 1;
     }
 
     Loading {
