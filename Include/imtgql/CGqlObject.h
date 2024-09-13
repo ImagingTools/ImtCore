@@ -26,8 +26,8 @@ public:
 	// QByteArray GetId() const;
 	QByteArrayList GetFieldIds() const;
 	QVariant GetFieldArgumentValue(const QByteArray& fieldId) const;
-	CGqlObject *CreateFieldObject(const QByteArray& fieldId);
-	const CGqlObject *GetFieldArgumentObjectPtr(const QByteArray& fieldId, int index = 0) const;
+	CGqlObject* CreateFieldObject(const QByteArray& fieldId);
+	const CGqlObject* GetFieldArgumentObjectPtr(const QByteArray& fieldId, int index = 0) const;
 	int GetObjectsCount(const QByteArray& fieldId) const;
 	QList<const CGqlObject*> GetFieldArgumentObjectPtrList(const QByteArray& fieldId) const;
 	CGqlObject* GetParentObject() const;
