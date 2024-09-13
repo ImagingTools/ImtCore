@@ -46,10 +46,14 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 {
 	imtbase::IObjectCollection* documentPtr = dynamic_cast<imtbase::IObjectCollection*>(&data);
 	if (documentPtr == nullptr){
+		SendCriticalMessage(0, QString("Input object has no valid type"));
+
 		return OS_FAILED;
 	}
 
 	if (!m_objectTypeIdsAttrPtr.IsValid() || !m_objectPresistencesCompPtr.IsValid()){
+		SendCriticalMessage(0, QString("Components are not configured"));
+
 		return OS_FAILED;
 	}
 
@@ -57,6 +61,8 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 	QString uuid = QUuid::createUuid().toString();
 
 	if (!tempPath.mkpath(uuid)){
+		SendErrorMessage(0, QString("Temporary directory could not be created: '%1'").arg(tempPath.absolutePath() + "/" + uuid));
+
 		return OS_FAILED;
 	}
 
@@ -64,6 +70,8 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 
 	if (m_fileCompressionCompPtr.IsValid()){
 		if (!m_fileCompressionCompPtr->DecompressFolder(filePath, tempPath.path())){
+			SendErrorMessage(0, QString("Archive could not be decompressed: '%1'").arg(tempPath.path()));
+
 			tempPath.removeRecursively();
 
 			return OS_FAILED;
@@ -73,6 +81,8 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 	const QString contentsFileName = tempPath.path() + QDir::separator() + "Contents.xml";
 	ifile::CCompactXmlFileReadArchive xmlArchive;
 	if (!xmlArchive.OpenFile(contentsFileName)){
+		SendErrorMessage(0, QString("Archive content file could not be loaded: '%1'").arg(contentsFileName));
+
 		tempPath.removeRecursively();
 
 		return OS_FAILED;
@@ -80,6 +90,8 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 
 	QVector<BundleElementInfo> contentMetaInfo;
 	if (!SerializeBundleMetaInfo(contentMetaInfo, xmlArchive)){
+		SendErrorMessage(0, QString("Archive content file could not be read: '%1'").arg(contentsFileName));
+
 		tempPath.removeRecursively();
 
 		return OS_FAILED;
@@ -88,6 +100,8 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 	for (const BundleElementInfo& elementInfo : contentMetaInfo){
 		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(elementInfo.typeId);
 		if (persistencePtr == nullptr){
+			SendErrorMessage(0, QString("No data loader was registered for: '%1'").arg(qPrintable(elementInfo.typeId)));
+
 			tempPath.removeRecursively();
 
 			return OS_FAILED;
@@ -112,18 +126,34 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 			return OS_FAILED;
 		}
 
-		int status = persistencePtr->LoadFromFile(*objectPtr, tempPath.path() + QDir::separator() + elementInfo.fileName);
+		QString elementFilePath = tempPath.path() + QDir::separator() + elementInfo.fileName;
+		int status = persistencePtr->LoadFromFile(*objectPtr, elementFilePath);
 		if (status != ifile::IFilePersistence::OS_OK){
-			tempPath.removeRecursively();
+			if (*m_workingModeAttrPtr != WM_IGNORE_ERRORS){
+				SendErrorMessage(0, QString("Archive element could not be read: '%1'").arg(elementFilePath));
 
-			return OS_FAILED;
+				tempPath.removeRecursively();
+
+				return OS_FAILED;
+			}
+			else{
+				SendWarningMessage(0, QString("Archive element could not be read: '%1'").arg(elementFilePath));
+			}
+
 		}
 	}
 
 	if (!LoadAdditionalData(data, tempPath.path())){
-		tempPath.removeRecursively();
+		if (*m_workingModeAttrPtr != WM_IGNORE_ERRORS){
+			SendErrorMessage(0, QString("Additional data could not be loaded: '%1'").arg(tempPath.path()));
 
-		return OS_FAILED;
+			tempPath.removeRecursively();
+
+			return OS_FAILED;
+		}
+		else{
+			SendWarningMessage(0, QString("Additional data could not be loaded: '%1'").arg(tempPath.path()));
+		}
 	}
 
 	tempPath.removeRecursively();
@@ -195,11 +225,16 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 		QString objectFilePath = QDir::toNativeSeparators(tempPath.path() + QDir::separator() + objectFileName);
 
 		if (persistencePtr->SaveToFile(*objectPtr, objectFilePath) != OS_OK){
-			SendErrorMessage(0, QString("Object could not be saved to: '%1'").arg(objectFilePath));
+			if (*m_workingModeAttrPtr != WM_IGNORE_ERRORS){
+				SendErrorMessage(0, QString("Object could not be saved to: '%1'").arg(objectFilePath));
 
-			tempPath.removeRecursively();
+				tempPath.removeRecursively();
 
-			return OS_FAILED;
+				return OS_FAILED;
+			}
+			else{
+				SendWarningMessage(0, QString("Object could not be saved to: '%1'").arg(objectFilePath));
+			}
 		}
 
 		BundleElementInfo elementInfo;
@@ -218,7 +253,6 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 	xmlArchive.Flush();
 
 	bundleInfoWritten = SaveAdditionalData(data, tempPath.path()) && bundleInfoWritten;
-
 	if (bundleInfoWritten){
 		if (m_fileCompressionCompPtr.IsValid()){
 			bool isCompressOk = m_fileCompressionCompPtr->CompressFolder(tempPath.path(), filePath, true);
@@ -239,7 +273,11 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 
 // reimplemented (ifile::IFileTypeInfo)
 
-bool CCompositeObjectPersistenceComp::GetFileExtensions(QStringList& result, const istd::IChangeable* /*dataObjectPtr*/, int /*flags*/, bool doAppend) const
+bool CCompositeObjectPersistenceComp::GetFileExtensions(
+			QStringList& result,
+			const istd::IChangeable* /*dataObjectPtr*/,
+			int /*flags*/,
+			bool doAppend) const
 {
 	if (!doAppend){
 		result.clear();

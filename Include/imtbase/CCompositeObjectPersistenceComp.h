@@ -21,12 +21,26 @@ class CCompositeObjectPersistenceComp:
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
+	enum WorkingMode
+	{
+		/**
+			Standard logic. The object is only loaded or saved successfully if all the elements it contains have been processed correctly
+		*/
+		WM_DEFAULT,
+
+		/**
+			Element related persistence processing errors will be ignored. Warnings will be generated instead of aborting.
+		*/
+		WM_IGNORE_ERRORS
+	};
+
 	I_BEGIN_COMPONENT(CCompositeObjectPersistenceComp);
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
 		I_REGISTER_INTERFACE(ifile::IFileTypeInfo);
 		I_ASSIGN(m_fileCompressionCompPtr, "FileCompressor", "File compressor", false, "FileCompressor");
 		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIds", "List of type-IDs for corresponding persistences", true);
 		I_ASSIGN_MULTI_0(m_objectPresistencesCompPtr, "ObjectPersistences", "List of registered persistence according to the specified type-IDs", true);
+		I_ASSIGN(m_workingModeAttrPtr, "WorkingMode", "Working mode.\n0 - Default processing\n1 - Ignore processing errors", true, WM_IGNORE_ERRORS);
 	I_END_COMPONENT;
 
 	// reimplemented (ifile::IFilePersistence)
@@ -67,6 +81,7 @@ private:
 	I_REF(imtfile::IFileCompression, m_fileCompressionCompPtr);
 	I_MULTIATTR(QByteArray, m_objectTypeIdsAttrPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_objectPresistencesCompPtr);
+	I_ATTR(bool, m_workingModeAttrPtr);
 };
 
 
