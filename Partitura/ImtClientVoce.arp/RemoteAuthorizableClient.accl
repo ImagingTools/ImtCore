@@ -8,6 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="PumaLoginStatusSubscriber" X="950" Y="400" Note=""/>
         <Element ComponentName="Rights" X="150" Y="400" Note=""/>
         <Element ComponentName="StandardLoginGui" X="550" Y="150" Note=""/>
         <Element ComponentName="Subscription" X="550" Y="400" Note=""/>

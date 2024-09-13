@@ -19,7 +19,6 @@
 #include <imtauth/ISuperuserProvider.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtauth/ILoginStatusProvider.h>
-#include <imtbase/ISystemStatus.h>
 #include <GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h>
 
 
@@ -43,6 +42,7 @@ public:
 		I_ASSIGN(m_settingsProviderCompPtr, "SettingsProvider", "Application settings provider", false, "SettingsProvider");
 		I_ASSIGN(m_superuserControllerCompPtr, "SuperuserController", "Superuser controller", false, "SuperuserController");
 		I_ASSIGN(m_loginStatusProviderCompPtr, "ConnectionStatusProvider", "Component for providing server connection status", true, "ConnectionStatusProvider");
+		I_ASSIGN(m_pumaLoginStatusProviderCompPtr, "PumaConnectionStatusProvider", "Component for providing puma server connection status", true, "PumaConnectionStatusProvider");
 	I_END_COMPONENT;
 
 	CRemoteStandardLoginGuiComp();
@@ -73,8 +73,8 @@ private Q_SLOTS:
 
 private:
 	void OnLoginUpdate(const istd::IChangeable::ChangeSet& changeSet, const iauth::ILogin* objectPtr);
-	void OnSystemStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtbase::ISystemStatus* objectPtr);
 	void OnConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtauth::ILoginStatusProvider* objectPtr);
+	void OnPumaConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtauth::ILoginStatusProvider* objectPtr);
 	void UpdateLoginButtonsState();
 	void CheckMatchingPassword();
 
@@ -129,10 +129,11 @@ private:
 	I_REF(iauth::ILogin, m_loginCompPtr);
 	I_REF(iqt::ISettingsProvider, m_settingsProviderCompPtr);
 	I_REF(imtauth::ILoginStatusProvider, m_loginStatusProviderCompPtr);
+	I_REF(imtauth::ILoginStatusProvider, m_pumaLoginStatusProviderCompPtr);
 
 	imtbase::TModelUpdateBinder<iauth::ILogin, CRemoteStandardLoginGuiComp> m_loginObserver;
-	imtbase::TModelUpdateBinder<imtbase::ISystemStatus, CRemoteStandardLoginGuiComp> m_systemStatusObserver;
 	imtbase::TModelUpdateBinder<imtauth::ILoginStatusProvider, CRemoteStandardLoginGuiComp> m_loginStatusProviderObserver;
+	imtbase::TModelUpdateBinder<imtauth::ILoginStatusProvider, CRemoteStandardLoginGuiComp> m_pumaLoginStatusProviderObserver;
 
 	LoginLog m_loginLog;
 	SetSuPasswordThread m_setSuPasswordThread;

@@ -10,6 +10,21 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="PumaLoginStatusSubscriber" PackageId="ImtClientGqlPck" ComponentId="LoginStatusSubscriber">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Command" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="PumaWsConnection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriptionManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Subscription"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Rights" PackageId="ImtAuthVoce" ComponentId="LoginClient">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -30,6 +45,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="Login" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Rights"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PumaConnectionStatusProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaLoginStatusSubscriber"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
                         <Data IsEnabled="false"/>

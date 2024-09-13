@@ -20,8 +20,8 @@ namespace imtauthgui
 
 CRemoteStandardLoginGuiComp::CRemoteStandardLoginGuiComp()
 	:m_loginObserver(*this),
-	m_systemStatusObserver(*this),
 	m_loginStatusProviderObserver(*this),
+	m_pumaLoginStatusProviderObserver(*this),
 	m_loginLog(*this),
 	m_setSuPasswordThread(*this)
 {
@@ -116,6 +116,10 @@ void CRemoteStandardLoginGuiComp::OnGuiCreated()
 		m_loginObserver.RegisterObject(m_loginCompPtr.GetPtr(), &CRemoteStandardLoginGuiComp::OnLoginUpdate);
 	}
 
+	if (m_pumaLoginStatusProviderCompPtr.IsValid()){
+		m_pumaLoginStatusProviderObserver.RegisterObject(m_pumaLoginStatusProviderCompPtr.GetPtr(), &CRemoteStandardLoginGuiComp::OnPumaConnectionStatusUpdate);
+	}
+
 	if (m_loginStatusProviderCompPtr.IsValid()){
 		m_loginStatusProviderObserver.RegisterObject(m_loginStatusProviderCompPtr.GetPtr(), &CRemoteStandardLoginGuiComp::OnConnectionStatusUpdate);
 
@@ -131,8 +135,8 @@ void CRemoteStandardLoginGuiComp::OnGuiCreated()
 void CRemoteStandardLoginGuiComp::OnGuiDestroyed()
 {
 	m_loginObserver.UnregisterAllObjects();
-	// m_systemStatusObserver.UnregisterAllObjects();
 	m_loginStatusProviderObserver.UnregisterAllObjects();
+	m_pumaLoginStatusProviderObserver.UnregisterAllObjects();
 
 	BaseClass::OnGuiDestroyed();
 }
@@ -268,41 +272,23 @@ void CRemoteStandardLoginGuiComp::OnLoginUpdate(
 }
 
 
-void CRemoteStandardLoginGuiComp::OnSystemStatusUpdate(
-			const istd::IChangeable::ChangeSet& /*changeSet*/,
-			const imtbase::ISystemStatus* objectPtr)
-{
-	QString error;
-	imtbase::ISystemStatus::SystemStatus status = objectPtr->GetSystemStatus(error);
-	if (status == imtbase::ISystemStatus::SystemStatus::SS_NO_ERROR){
-		if (m_superuserProviderCompPtr.IsValid()){
-			QString errorMessage;
-			bool superuserExists = m_superuserProviderCompPtr->SuperuserExists(errorMessage);
-			if (superuserExists){
-				StackedWidget->setCurrentIndex(0);
-			}
-			else{
-				StackedWidget->setCurrentIndex(1);
-			}
-		}
-	}
-	else{
-		NoConnection->setText(error);
-
-		StackedWidget->setCurrentIndex(2);
-	}
-}
-
-
 void CRemoteStandardLoginGuiComp::OnConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtauth::ILoginStatusProvider* objectPtr)
 {
 	int loginStatus = objectPtr->GetLoginStatus();
-	if (loginStatus == 0){
+	if (loginStatus == imtauth::ILoginStatusProvider::LSF_CACHED || loginStatus == 0){
 		// Disconnected
 		NoConnection->setText("No connection to the server");
 		StackedWidget->setCurrentIndex(2);
 	}
 	else if (loginStatus == imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
+		if (m_pumaLoginStatusProviderCompPtr.IsValid()){
+			int loginStatus = m_pumaLoginStatusProviderCompPtr->GetLoginStatus();
+			if (loginStatus != imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
+				OnPumaConnectionStatusUpdate(changeSet, m_pumaLoginStatusProviderCompPtr.GetPtr());
+				return;
+			}
+		}
+
 		if (m_superuserProviderCompPtr.IsValid()){
 			QString errorMessage;
 			bool superuserExists = m_superuserProviderCompPtr->SuperuserExists(errorMessage);
@@ -313,6 +299,20 @@ void CRemoteStandardLoginGuiComp::OnConnectionStatusUpdate(const istd::IChangeab
 				StackedWidget->setCurrentIndex(1);
 			}
 		}
+	}
+}
+
+
+void CRemoteStandardLoginGuiComp::OnPumaConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtauth::ILoginStatusProvider* objectPtr)
+{
+	int loginStatus = objectPtr->GetLoginStatus();
+	if (loginStatus == imtauth::ILoginStatusProvider::LSF_CACHED || loginStatus == 0){
+		// Disconnected
+		NoConnection->setText("No connection to the Puma server");
+		StackedWidget->setCurrentIndex(2);
+	}
+	else if (loginStatus == imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
+		OnConnectionStatusUpdate(changeSet, m_loginStatusProviderCompPtr.GetPtr());
 	}
 }
 
