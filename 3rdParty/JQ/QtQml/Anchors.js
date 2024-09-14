@@ -57,10 +57,10 @@ class Anchors extends GroupProperty {
         let self = this.__parent
 
         if(self){
-            // self.__getObject('x').__unfreeze()
-            // self.__getObject('y').__unfreeze()
-            // self.__getObject('width').__unfreeze()
-            // self.__getObject('height').__unfreeze()
+            self.__getObject('x').__unfreeze()
+            self.__getObject('y').__unfreeze()
+            self.__getObject('width').__unfreeze()
+            self.__getObject('height').__unfreeze()
         }
 
         if(self && target){
@@ -88,10 +88,10 @@ class Anchors extends GroupProperty {
                 self.AHeight = QtFunctions.binding(()=>{return target.AHeight - (this.topMargin + this.bottomMargin)},lazy)
             }
             
-            // self.__getObject('x').__freeze()
-            // self.__getObject('y').__freeze()
-            // self.__getObject('width').__freeze()
-            // self.__getObject('height').__freeze()
+            self.__getObject('x').__freeze()
+            self.__getObject('y').__freeze()
+            self.__getObject('width').__freeze()
+            self.__getObject('height').__freeze()
         }
     }
 
@@ -100,8 +100,8 @@ class Anchors extends GroupProperty {
         let self = this.__parent
 
         if(self){
-            // self.__getObject('x').__unfreeze()
-            // self.__getObject('y').__unfreeze()
+            self.__getObject('x').__unfreeze()
+            self.__getObject('y').__unfreeze()
         }
 
         if(self && target){
@@ -121,8 +121,8 @@ class Anchors extends GroupProperty {
                 self.AY = QtFunctions.binding(()=>{return target.AY + target.AHeight / 2 - self.AHeight / 2},lazy)
             }
 
-            // self.__getObject('x').__freeze()
-            // self.__getObject('y').__freeze()
+            self.__getObject('x').__freeze()
+            self.__getObject('y').__freeze()
         }
     }
 
@@ -131,7 +131,7 @@ class Anchors extends GroupProperty {
         let self = this.__parent
 
         if(self){
-            // self.__getObject('x').__unfreeze()
+            self.__getObject('x').__unfreeze()
         }
 
         if(self && target){
@@ -170,7 +170,7 @@ class Anchors extends GroupProperty {
                 }
             }
 
-            // self.__getObject('x').__freeze()
+            self.__getObject('x').__freeze()
         }
     }
 
@@ -179,7 +179,7 @@ class Anchors extends GroupProperty {
         let self = this.__parent
 
         if(self){
-            // self.__getObject('y').__unfreeze()
+            self.__getObject('y').__unfreeze()
         }
 
         if(self && target){
@@ -218,7 +218,7 @@ class Anchors extends GroupProperty {
                 }               
             }
 
-            // self.__getObject('y').__freeze()
+            self.__getObject('y').__freeze()
         }
     }
 
@@ -232,7 +232,7 @@ class Anchors extends GroupProperty {
         }
 
         if(self){
-            // self.__getObject('x').__unfreeze()
+            self.__getObject('x').__unfreeze()
         }
 
         if(self && target){
@@ -269,7 +269,7 @@ class Anchors extends GroupProperty {
                 }            
             }
 
-            // self.__getObject('x').__freeze()
+            self.__getObject('x').__freeze()
         }
     }
 
@@ -283,7 +283,7 @@ class Anchors extends GroupProperty {
         }
 
         if(self){
-            // self.__getObject('x').__unfreeze()
+            self.__getObject('x').__unfreeze()
         }
 
         if(self && target){
@@ -322,7 +322,7 @@ class Anchors extends GroupProperty {
                 }              
             }
 
-            // self.__getObject('x').__freeze()
+            self.__getObject('x').__freeze()
         }
     }
 
@@ -332,8 +332,8 @@ class Anchors extends GroupProperty {
         let self = this.__parent
 
         if(self){
-            // self.__getObject('x').__unfreeze()
-            // self.__getObject('width').__unfreeze()
+            self.__getObject('x').__unfreeze()
+            self.__getObject('width').__unfreeze()
         }
 
         if(self && left && right){
@@ -403,8 +403,8 @@ class Anchors extends GroupProperty {
                 }
             }
 
-            // self.__getObject('x').__freeze()
-            // self.__getObject('width').__freeze()
+            self.__getObject('x').__freeze()
+            self.__getObject('width').__freeze()
         }
     }
 
@@ -418,7 +418,7 @@ class Anchors extends GroupProperty {
         }
 
         if(self){
-            // self.__getObject('y').__unfreeze()
+            self.__getObject('y').__unfreeze()
         }
 
         if(self && target){
@@ -455,7 +455,7 @@ class Anchors extends GroupProperty {
                 }               
             }
 
-            // self.__getObject('y').__freeze()
+            self.__getObject('y').__freeze()
         }
     }
 
@@ -469,7 +469,7 @@ class Anchors extends GroupProperty {
         }
 
         if(self){
-            // self.__getObject('y').__unfreeze()
+            self.__getObject('y').__unfreeze()
         }
 
         if(self && target){
@@ -508,7 +508,7 @@ class Anchors extends GroupProperty {
                 }               
             }
 
-            // self.__getObject('y').__freeze()
+            self.__getObject('y').__freeze()
         }
     }
 
@@ -518,8 +518,8 @@ class Anchors extends GroupProperty {
         let self = this.__parent
 
         if(self){
-            // self.__getObject('y').__unfreeze()
-            // self.__getObject('height').__unfreeze()
+            self.__getObject('y').__unfreeze()
+            self.__getObject('height').__unfreeze()
         }
 
         if(self && top && bottom){
@@ -589,8 +589,8 @@ class Anchors extends GroupProperty {
                 }
             }
 
-            // self.__getObject('y').__freeze()
-            // self.__getObject('height').__freeze()
+            self.__getObject('y').__freeze()
+            self.__getObject('height').__freeze()
         }
     }
 }

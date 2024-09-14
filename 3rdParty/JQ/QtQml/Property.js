@@ -79,6 +79,12 @@ class Property extends BaseObject {
         this.__set(undefined, value)
     }
 
+    __resetForce(value){
+        this.__subscribersReset()
+        this.__unsubscribe()
+        this.__set(undefined, value)
+    }
+
     __set(key, value){
         this.__auto = false
 

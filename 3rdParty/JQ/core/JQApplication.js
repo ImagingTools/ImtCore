@@ -42,6 +42,7 @@ module.exports = {
                 position: absolute;
                 display: flex;
                 overflow: unset;
+                z-index: 0;
             }
             .Rectangle {
                 background-color: white;

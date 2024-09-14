@@ -4,6 +4,7 @@ const Variant = require("../QtQml/Variant")
 const Var = require("../QtQml/Var")
 const Real = require("../QtQml/Real")
 const Signal = require("../QtQml/Signal")
+const JQApplication = require("../core/JQApplication")
 
 class ListView extends Flickable {
     static Horizontal = 0
@@ -125,6 +126,16 @@ class ListView extends Flickable {
         this.__items = []
     }
 
+    __createItem(model){
+        let item = this.delegate.createObject(this.contentItem, model)
+
+        item.widthChanged.connect(()=>{JQApplication.updateLater(this)})
+        item.heightChanged.connect(()=>{JQApplication.updateLater(this)})
+        item.visibleChanged.connect(()=>{JQApplication.updateLater(this)})
+
+        return item
+    }
+
     __initView(){
         if(this.delegate && this.model){
             JQApplication.beginUpdate()
@@ -139,7 +150,7 @@ class ListView extends Flickable {
                 }
 
                 for(let i = 0; i < this.model; i++){
-                    let item = this.delegate.createObject(this.contentItem, {index: i})
+                    let item = this.__createItem({index: i})
                     this.__items.push(item)
                 }
             } else {
@@ -149,7 +160,7 @@ class ListView extends Flickable {
                 }
 
                 for(let i = 0; i < this.model.data.length; i++){
-                    let item = this.delegate.createObject(this.contentItem, this.model.data[i])
+                    let item = this.__createItem(this.model.data[i])
                     this.__items.push(item)
                 }
             }
@@ -180,12 +191,12 @@ class ListView extends Flickable {
 
                 if(role === 'append'){
                     for(let i = leftTop; i < bottomRight; i++){
-                        let item = this.delegate.createObject(this.contentItem, this.model.data[i])
+                        let item = this.__createItem(this.model.data[i])
                         this.__items[i] = item
                     }
                 } else if(role === 'insert'){
                     for(let i = leftTop; i < bottomRight; i++){
-                        let item = this.delegate.createObject(this.contentItem, this.model.data[i])
+                        let item = this.__createItem(this.model.data[i])
                         this.__items.splice(i, 0, item)
                     }
                 } else if(role === 'remove'){
@@ -232,8 +243,13 @@ class ListView extends Flickable {
     }
 
     __updateGeometry(){
-        this.contentWidth = this.contentItem.__getDOM().scrollWidth
-        this.contentHeight = this.contentItem.__getDOM().scrollHeight
+        if(this.orientation === ListView.Horizontal){
+            this.contentWidth = this.contentItem.__getDOM().scrollWidth
+            this.__getObject('contentHeight').__setAuto(this.height)
+        } else {
+            this.contentHeight = this.contentItem.__getDOM().scrollHeight
+            this.__getObject('contentWidth').__setAuto(this.width)
+        }
     }
 
     __endUpdate(...args){

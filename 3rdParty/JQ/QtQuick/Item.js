@@ -203,22 +203,22 @@ class Item extends QtObject {
 
     onAXChanged(){
         if(this.AX !== this.x) 
-        this.x = this.AX
+        this.__getObject('x').__resetForce(this.AX)
     }
 
     onAYChanged(){
         if(this.AY !== this.y) 
-        this.y = this.AY
+        this.__getObject('y').__resetForce(this.AY)
     }   
 
     onAWidthChanged(){
         if(this.AWidth !== this.width) 
-        this.width = this.AWidth
+        this.__getObject('width').__resetForce(this.AWidth)
     }
 
     onAHeightChanged(){
         if(this.AHeight !== this.height) 
-        this.height = this.AHeight
+        this.__getObject('height').__resetForce(this.AHeight)
     }
 
     onParentChanged(){
