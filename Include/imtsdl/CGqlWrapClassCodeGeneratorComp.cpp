@@ -664,7 +664,7 @@ void CGqlWrapClassCodeGeneratorComp::AddClassProperties(QTextStream& stream, con
 {
 	// validation property
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("bool m_isValid;");
+	stream << QStringLiteral("bool m_isValid = false;");
 	FeedStream(stream, 1, false);
 
 	// Arguments property
@@ -844,6 +844,10 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("m_isValid = true;");
 	FeedStream(stream, 1, false);
 
 	// insert temp GQL object
