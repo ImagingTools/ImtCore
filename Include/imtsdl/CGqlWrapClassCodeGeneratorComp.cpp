@@ -892,6 +892,10 @@ void CGqlWrapClassCodeGeneratorComp::AddDataCheckRequiredValueCode(QTextStream& 
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("m_isValid = true;");
+	FeedStream(stream, 1, false);
 }
 
 
@@ -931,6 +935,10 @@ void CGqlWrapClassCodeGeneratorComp::AddCheckCustomRequiredValueCode(QTextStream
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("m_isValid = true;");
+	FeedStream(stream, 1, false);
 }
 
 
@@ -958,6 +966,10 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& 
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("m_isValid = true;");
+	FeedStream(stream, 1, false);
 }
 
 
