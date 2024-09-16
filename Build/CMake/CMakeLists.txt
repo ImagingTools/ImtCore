@@ -197,7 +197,7 @@ if(NOT DEFINED USE_QTQML OR USE_QTQML)
 	add_dependencies(ImtAuthGuiPck imtbase imtauth imtauthgui)
 endif()
 
-if(NOT DEFINED USE_MDBX OR USE_MDBX)
+if(DEFINED USE_MDBX AND USE_MDBX)
 	add_subdirectory("${IMPL_DIR}/ImtMdbxPck/CMake" "${AUX_INCLUDE_DIR}/ImtMdbxPck")
 	add_dependencies(ImtMdbxPck imtmdbx)
 endif()

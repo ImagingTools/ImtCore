@@ -27,9 +27,17 @@ TextInputElementView {
     }
 
     onTextChanged: {
+        let decimal = Qt.locale().decimalPoint
+        let tempText = text.replace(".", decimal)
+        console.log("tempText", tempText)
+        if (text != tempText){
+            text = tempText
+
+            return
+        }
         if (acceptableInput){
-            let decimal = Qt.locale().decimalPoint
-            let tempText = text.replace(decimal, ".")
+
+            tempText = text.replace(decimal, ".")
 
             value = Number(tempText)
         }

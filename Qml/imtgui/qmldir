@@ -80,3 +80,4 @@ SearchPage 1.0 View/SearchPage.qml
 CommandsView 1.0 View/CommandsView.qml
 PageContainer 1.0 View/PageContainer.qml
 CheckBoxElementView 1.0 View/CheckBoxElementView.qml
+Separator 1.0 View/Separator.qml

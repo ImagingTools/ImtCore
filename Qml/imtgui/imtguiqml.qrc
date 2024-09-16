@@ -78,6 +78,7 @@
         <file alias="imtgui/View/CommandsView.qml">View/CommandsView.qml</file>
         <file alias="imtgui/View/PageContainer.qml">View/PageContainer.qml</file>
 	<file alias="imtgui/View/CheckBoxElementView.qml">View/CheckBoxElementView.qml</file>
+	<file alias="imtgui/View/Separator.qml">View/Separator.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
