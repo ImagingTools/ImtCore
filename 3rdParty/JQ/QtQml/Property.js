@@ -8,7 +8,7 @@ class Property extends BaseObject {
         let proxy = super.create(parent, meta)
         let self = proxy.__self 
 
-        self.__parent = parent.__proxy
+        self.__parent = parent ? parent.__proxy : null
         self.__value = meta.value
         self.__signalName = meta.signalName
 

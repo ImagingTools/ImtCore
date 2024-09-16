@@ -98,7 +98,7 @@ class BaseObject{
     }
 
     destroy(){
-        
+        this.__destroy()
     }
 }
 

@@ -105,7 +105,7 @@ class Animation extends QtObject {
     }
 
     __destroy(){
-        AnimationController.remove(proxy)
+        AnimationController.remove(this)
 
         super.__destroy()
     }

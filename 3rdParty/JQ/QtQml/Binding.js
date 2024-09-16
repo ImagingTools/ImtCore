@@ -51,7 +51,7 @@ class Binding extends QtObject {
     }  
 
     __update(){
-        if(this.target && this.property){
+        if(this.target && !this.target.__destroyed && this.property){
             let path = this.property.split('.')
             let prop = this.target
 

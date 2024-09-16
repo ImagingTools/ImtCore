@@ -3,7 +3,7 @@ class Signal {
         let f = (...args)=>{
             f.emit(...args)
         }
-        f.__parent = parent.__proxy
+        f.__parent = parent ? parent.__proxy : null
         f.__slotName = meta.slotName
         // f.__args = meta.args
         f.__proto__ = Signal.prototype

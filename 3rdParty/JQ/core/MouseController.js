@@ -77,7 +77,7 @@ module.exports = {
     getObjectsFromPoint: function(x, y){
         let result = []
         for(let el of document.elementsFromPoint(x, y)){
-            if(!el.qml) continue
+            if(!el.qml || el.qml.__destroyed) continue
             result.push(el.qml)
         }
         return result
@@ -99,6 +99,11 @@ module.exports = {
 
             let i = 0
             while(i < this.entered.length){
+                if(this.entered[i].__destroyed) {
+                    this.entered.splice(i, 1)
+                    continue
+                }
+
                 let point = event.getRelativePoint(this.entered[i])
                 if(point.x < 0 || point.y < 0 || point.x >= this.entered[i].width || point.y >= this.entered[i].height) {
                     this.entered[i].__onMouseLeave(event)

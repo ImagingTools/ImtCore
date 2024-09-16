@@ -79,7 +79,7 @@ class Timer extends QtObject {
     __destroy(){
         clearTimeout(this.__timer)
         delete this.__timer
-        super.destroy()
+        super.__destroy()
     }
 }
 

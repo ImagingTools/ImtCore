@@ -14,6 +14,9 @@ class AbstractItemModel {
             __endUpdate: ()=>{
                 parent.__endUpdate()
             },
+            __destroy: ()=>{
+                
+            }
         }, data ? data : {})
 
         return new Proxy(model, { 
