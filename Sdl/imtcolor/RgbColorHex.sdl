@@ -1,4 +1,9 @@
-type RgbColorHex
-{
+schema {
+	name: RgbColorHex
+	namespace: imtcolor
+	version: 1.0
+}
+
+type RgbColorHex {
 	Color: String
 }

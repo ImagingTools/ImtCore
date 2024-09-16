@@ -1,19 +1,22 @@
 schema {
-  query: Query
-  mutation: Mutation
-  subscription: Subscription
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	name: Products
+	namespace: imtlic
+	version: 1.0
 }
 
 import {
-    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
 }
 
 input ProductsListInput {
-    viewParams: CollectionViewParams
+	viewParams: CollectionViewParams
 }
 
 type ProductItem {
-    Id: ID!
+	Id: ID!
 	Name: String!
 	ProductName: String!
 	TypeId: ID!
@@ -27,7 +30,7 @@ type ProductItem {
 }
 
 type ProductsListPayload {
-    items: [ProductItem]
+	items: [ProductItem]
 	notification: NotificationItem
 }
 
@@ -47,33 +50,33 @@ input ProductDataInput {
 }
 
 type ProductDataPayload {
-    ProductData: ProductData
+	ProductData: ProductData
 }
 
 input ProductItemInput {
-    Id: ID!
+	Id: ID!
 }
 
 type Query {
-    ProductsList (input:ProductsListInput): ProductsListPayload!
+	ProductsList (input:ProductsListInput): ProductsListPayload!
 	ProductItem (input: ProductItemInput): ProductDataPayload!
 }
 
 type Mutation {
-    ProductUpdate (input: ProductDataInput): UpdatedNotificationPayload!
+	ProductUpdate (input: ProductDataInput): UpdatedNotificationPayload!
 	ProductAdd (input: ProductDataInput): AddedNotificationPayload!
 }
 
 collectionSchema {
-    type Product {
-	    ref: ProductItem
+	type Product {
+		ref: ProductItem
 		operations {
-		    list: ProductsList
+			list: ProductsList
 		}
 		subtype Product {
-		    ref: ProductData
+			ref: ProductData
 			operations {
-			    get: ProductItem
+				get: ProductItem
 				update: ProductUpdate
 				insert: ProductAdd
 			}

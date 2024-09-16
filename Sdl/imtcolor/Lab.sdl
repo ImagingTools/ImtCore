@@ -1,3 +1,9 @@
+schema {
+	name: Lab
+	namespace: imtcolor
+	version: 1.0
+}
+
 type Lab {
 	L: Double
 	a: Double

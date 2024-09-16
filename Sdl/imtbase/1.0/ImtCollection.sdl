@@ -1,3 +1,9 @@
+schema {
+	name: Collection
+	namespace: imtbase
+	version: 1.0
+}
+
 type CollectionViewParams {
 	Count: Int
 	Offset: Int

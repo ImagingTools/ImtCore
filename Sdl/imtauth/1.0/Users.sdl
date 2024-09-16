@@ -1,7 +1,3 @@
-import {
-	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
-}
-
 schema {
 	query: Query
 	mutation: Mutation
@@ -9,6 +5,10 @@ schema {
 	name: Users
 	namespace: imtauth
 	version: 1.0
+}
+
+import {
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
 }
 
 input UsersListInput {

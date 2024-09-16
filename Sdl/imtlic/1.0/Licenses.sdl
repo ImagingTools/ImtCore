@@ -1,19 +1,22 @@
 schema {
-  query: Query
-  mutation: Mutation
-  subscription: Subscription
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	name: Licenses
+	namespace: imtlic
+	version: 1.0
 }
 
 import {
-    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
 }
 
 input LicensesListInput {
-    viewParams: CollectionViewParams
+	viewParams: CollectionViewParams
 }
 
 type LicenseItem {
-    Id: ID!
+	Id: ID!
 	TypeId: ID!
 	LicenseId: ID!
 	LicenseName: String!
@@ -28,7 +31,7 @@ type LicenseItem {
 }
 
 type LicensesListPayload {
-    items: [LicenseItem]
+	items: [LicenseItem]
 	notification: NotificationItem
 }
 
@@ -49,33 +52,33 @@ input LicenseDataInput {
 }
 
 type LicenseDataPayload {
-    LicenseData: LicenseData
+	LicenseData: LicenseData
 }
 
 input LicenseItemInput {
-    Id: ID!
+	Id: ID!
 }
 
 type Query {
-    LicensesList (input:LicensesListInput): LicensesListPayload!
+	LicensesList (input:LicensesListInput): LicensesListPayload!
 	LicenseItem (input: LicenseItemInput): LicenseDataPayload!
 }
 
 type Mutation {
-    LicenseUpdate (input: LicenseDataInput): UpdatedNotificationPayload!
+	LicenseUpdate (input: LicenseDataInput): UpdatedNotificationPayload!
 	LicenseAdd (input: LicenseDataInput): AddedNotificationPayload!
 }
 
 collectionSchema {
-    type License {
-	    ref: LicenseItem
+	type License {
+		ref: LicenseItem
 		operations {
-		    list: LicensesList
+			list: LicensesList
 		}
 		subtype License {
-		    ref: LicenseData
+			ref: LicenseData
 			operations {
-			    get: LicenseItem
+				get: LicenseItem
 				update: LicenseUpdate
 				insert: LicenseAdd
 			}
