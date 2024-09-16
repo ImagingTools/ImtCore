@@ -368,6 +368,11 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 	ifStream << className << ':' << ':' << className;
 	ifStream << QStringLiteral("(const imtgql::CGqlRequest& gqlRequest)");
 	FeedStream(ifStream, 1, false);
+
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral(": m_isValid(false)");
+	FeedStream(ifStream, 1, false);
+
 	ifStream << '{';
 	FeedStream(ifStream, 1, false);
 	GenerateRequestParsing(ifStream, sdlRequest, 1);
@@ -528,6 +533,7 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 		AddFieldReadFromRequestCode(stream, field);
 	}
 
+	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("// reading requested fields");
 	FeedStream(stream, 1, false);
@@ -664,7 +670,7 @@ void CGqlWrapClassCodeGeneratorComp::AddClassProperties(QTextStream& stream, con
 {
 	// validation property
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("bool m_isValid = false;");
+	stream << QStringLiteral("bool m_isValid;");
 	FeedStream(stream, 1, false);
 
 	// Arguments property
@@ -836,7 +842,7 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("m_isValid = false;");
-	FeedStream(stream, 1, false);
+	FeedStream(stream, 2, false);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return;");
@@ -950,26 +956,22 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& 
 	stream << QStringLiteral("m_requestedArguments.") << field.GetId() << QStringLiteral(", *");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr);");
 	FeedStream(stream, 1, false);
+
+	// update validation status
 	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("m_isValid = is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read;");
+	FeedStream(stream, 1, false);
 
 	// check the result of reading...
+	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("if (!is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read){");
 	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, hIndents + 1);
-
-	// ...and exit if it fail
-	stream << QStringLiteral("m_isValid = false;");
-	FeedStream(stream, 2, false);
 	FeedStreamHorizontally(stream, hIndents + 1);
 
 	stream << QStringLiteral("return;");
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
-
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("m_isValid = true;");
-	FeedStream(stream, 1, false);
 }
 
 
