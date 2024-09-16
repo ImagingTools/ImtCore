@@ -104,7 +104,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
-	QByteArray newObjectId, newFullAddressObjectId;
+	QByteArray newObjectId;
 	QString name, description;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -112,10 +112,8 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 	}
 	else{
 		QByteArray objectId;
-		QList<imtgql::CGqlObject> inputParams;
-		inputParams.append(gqlRequest.GetParams());
 
-		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
+		istd::IChangeable* newObject = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
 
 		if (newObject != nullptr){
 			newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject, objectId);
@@ -149,8 +147,8 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 }
 
 
-istd::IChangeable* CAddressControllerComp::CreateObject(
-			const QList<imtgql::CGqlObject>& inputParams,
+istd::IChangeable* CAddressControllerComp::CreateObjectFromRequest(
+			const imtgql::CGqlRequest& gqlRequest,
 			QByteArray& objectId,
 			QString& name,
 			QString& description,
@@ -161,7 +159,21 @@ istd::IChangeable* CAddressControllerComp::CreateObject(
 		return nullptr;
 	}
 
-	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
+	if (inputParamPtr == nullptr){
+		errorMessage = QStringLiteral("Unable to create address object. Error: GraphQL input params is invalid.");
+		SendErrorMessage(0, errorMessage, __FILE__);
+
+		return nullptr;
+	}
+
+	objectId = GetObjectIdFromInputParams(*inputParamPtr);
+
+	if (objectId.isEmpty()){
+		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
+
+	QByteArray itemData = inputParamPtr->GetFieldArgumentValue(QByteArrayLiteral("Item")).toByteArray();
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<CAddressElementInfo> addressInfoPtr = new CAddressElementInfo();
 		if (addressInfoPtr == nullptr){
@@ -171,17 +183,7 @@ istd::IChangeable* CAddressControllerComp::CreateObject(
 
 		imtbase::CTreeItemModel itemModel;
 		itemModel.CreateFromJson(itemData);
-
-		if (itemModel.ContainsKey("AddressId")){
-			QByteArray id = itemModel.GetData("AddressId").toByteArray();
-
-			if (id.isEmpty()){
-				errorMessage = QT_TR_NOOP("AddressId can't be empty!");
-				return nullptr;
-			}
-
-            addressInfoPtr->SetObjectUuid(id);
-		}
+		addressInfoPtr->SetObjectUuid(objectId);
 
 		QByteArray parentId = nullptr;
 		if (itemModel.ContainsKey("ParentId")){
@@ -223,6 +225,7 @@ istd::IChangeable* CAddressControllerComp::CreateObject(
 		return addressInfoPtr.PopPtr();
 	}
 
+
 	errorMessage = QObject::tr("Can not create address: %1").arg(QString(objectId));
 
 	return nullptr;
@@ -238,10 +241,15 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 
-	QList<imtgql::CGqlObject> inputParams;
-	inputParams.append(gqlRequest.GetParams());
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
+	if (inputParamPtr == nullptr){
+		errorMessage = QStringLiteral("Unable to update address object. Error: GraphQL input params is invalid.");
+		SendErrorMessage(0, errorMessage, __FILE__);
 
-	QByteArray oldObjectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
+		return nullptr;
+	}
+
+	QByteArray oldObjectId = GetObjectIdFromInputParams(*inputParamPtr);
 	QByteArray newObjectId;
 	QString name, description;
 
@@ -261,7 +269,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 			filteringOnSerialIdInfoIds << "Indexes";
 			filterOnSerialId.SetFilteringInfoIds(filteringOnSerialIdInfoIds);
 
-			istd::IChangeable* savedObject = CreateObject(inputParams, newObjectId, name, description, errorMessage);
+			istd::IChangeable* savedObject = CreateObjectFromRequest(gqlRequest, newObjectId, name, description, errorMessage);
 			if (savedObject != nullptr){
 				if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
 					errorMessage = QObject::tr("Can not update object: %1").arg(splitObjectId);
