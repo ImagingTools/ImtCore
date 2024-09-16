@@ -103,6 +103,12 @@ class Animation extends QtObject {
     __tick() {
 
     }
+
+    __destroy(){
+        AnimationController.remove(proxy)
+
+        super.__destroy()
+    }
 }
 
 module.exports = Animation

@@ -23,6 +23,47 @@ class DropShadow extends Item {
         sourceChanged: {type:Signal, slotName:'onSourceChanged', args:[]},
     })
 
+    onVisibleChanged(){
+        super.onVisibleChanged()
+        this.__updateShadow()
+    }
+
+    onColorChanged(){
+        this.__updateShadow()
+    }
+
+    onHorizontalOffsetChanged(){
+        this.__updateShadow()
+    }
+
+    onVerticalOffsetChanged(){
+        this.__updateShadow()
+    }
+
+    onRadiusChanged(){
+        this.__updateShadow()
+    }
+
+    onSamplesChanged(){
+        this.__updateShadow()
+    }
+
+    onSpreadChanged(){
+        this.__updateShadow()
+    }
+
+    onSourceChanged(){
+        this.__updateShadow()
+    }
+
+    __updateShadow(){
+        if(this.source && this.visible){
+            let rgba = this.__getObject('color').__toRGBA()
+            this.source.__setDOMStyle({
+                boxShadow: `${this.horizontalOffset}px ${this.verticalOffset}px ${this.radius}px ${this.spread}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+            })
+        }
+    }
 }
 
 module.exports = DropShadow

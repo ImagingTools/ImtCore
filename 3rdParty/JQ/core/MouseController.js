@@ -85,6 +85,8 @@ module.exports = {
 
     init: function(){   
         window.addEventListener('mousemove', (e)=>{
+            JQApplication.setCursor(QtEnums.ArrowCursor)
+
             let event = this.event ? this.event : new QmlMouseEvent({path: this.getObjectsFromPoint(e.pageX, e.pageY)})
             event.moveX = event.x - e.pageX
             event.moveY = event.y - e.pageY

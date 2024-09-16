@@ -5,6 +5,7 @@ const Bool = require("../QtQml/Bool")
 const String = require("../QtQml/String")
 const Signal = require("../QtQml/Signal")
 const QtEnums = require("../Qt/enums")
+const JQApplication = require("../core/JQApplication")
 
 class MouseArea extends Item {
     static meta = Object.assign({}, Item.meta, {
@@ -18,7 +19,7 @@ class MouseArea extends Item {
         pressAndHoldInterval: { type: Real, value: 800, signalName:'pressAndHoldIntervalChanged' },
         mouseX: { type: Real, value: 0, signalName:'mouseXChanged' },
         mouseY: { type: Real, value: 0, signalName:'mouseYChanged' },
-        cursorShape: { type: String, value: 'default', signalName:'cursorShapeChanged' },
+        cursorShape: { type: String, value: QtEnums.ArrowCursor, signalName:'cursorShapeChanged' },
 
         acceptedButtonsChanged: { type:Signal, slotName:'onAcceptedButtonsChanged', args:[] },
         containsMouseChanged: { type:Signal, slotName:'onContainsMouseChanged', args:[] },
@@ -56,31 +57,45 @@ class MouseArea extends Item {
     __timer = null
 
     __onMouseCanceled(mouse){
+        if(!this.enabled || !this.visible) return
+
         this.canceled()
     }
 
     __onMouseEnter(mouse){
+        if(!this.enabled || !this.visible) return
+
         if((this.hoverEnabled && !mouse.target) || (mouse.target === this)){
+            this.containsMouse = true
             this.__entered = true
+            JQApplication.setCursor(this.cursorShape)
             this.entered(mouse)
             return true
         }
     }
 
     __onMouseLeave(mouse){
+        if(!this.enabled || !this.visible) return
+
         if((this.hoverEnabled && !mouse.target) || (mouse.target === this)){
+            this.containsMouse = false
             this.__entered = false
             this.exited(mouse)
         }
     }
 
     __onMouseMove(mouse){
+        if(!this.enabled || !this.visible) return
+
         if((this.hoverEnabled && !mouse.target) || (mouse.target === this && this.__pressed)){
+            JQApplication.setCursor(this.cursorShape)
             this.positionChanged(mouse)
         }
     }
 
     __onMouseDown(mouse){
+        if(!this.enabled || !this.visible) return
+
         if(!mouse.target){
             this.__pressed = true
             if(!this.__entered) this.entered()
@@ -91,12 +106,16 @@ class MouseArea extends Item {
     }
 
     __onMouseUp(mouse){
+        if(!this.enabled || !this.visible) return
+
         if(!mouse.target || mouse.target === this){
             this.released(mouse)
         }
     }
 
     __onMouseClick(mouse){
+        if(!this.enabled || !this.visible) return
+
         if(mouse.target === this && this.__pressed){
             this.clicked(mouse)
         }
@@ -105,6 +124,8 @@ class MouseArea extends Item {
     }
 
     __onMouseDblClick(mouse){
+        if(!this.enabled || !this.visible) return
+
         if(mouse.target === this && this.__pressed){
             this.doubleClicked(mouse)
         }

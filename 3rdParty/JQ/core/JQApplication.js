@@ -120,6 +120,12 @@ module.exports = {
     objectsAwaitingUpdate: new Set(),
     updateLayers: [],
 
+    setCursor(cursorShape){
+        this.root.__setDOMStyle({
+            cursor: cursorShape
+        })
+    },
+
     beginUpdate: function(){
         this.updateLayers.push([])
     },
