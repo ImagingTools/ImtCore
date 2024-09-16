@@ -201,7 +201,7 @@ bool CDocumentTable::GetKey(QByteArray& key) const
     mdbx::cursor::move_result result = m_cursor.current(false);
     if (result.done){
         std::string value;
-        value = result.value.as_string();
+		value = result.key.as_string();
         key = QByteArray::fromStdString(value);
     }
 
@@ -493,10 +493,7 @@ bool CDocumentTable::MoveTo(quint64 key)
 	bool ok = false;
 
 	mdbx::slice keySlice(&key, 8);
-	mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
-	if(result.done){
-		ok = true;
-	}
+	ok = m_cursor.seek(keySlice);
 
 	return ok;
 }
@@ -507,10 +504,7 @@ bool CDocumentTable::MoveTo(const QByteArray &key)
 	bool ok = false;
 
 	mdbx::slice keySlice(key.data(), key.length());
-	mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
-	if(result.done){
-		ok = true;
-	}
+	ok = m_cursor.seek(keySlice);
 
 	return ok;
 }

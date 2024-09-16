@@ -169,6 +169,7 @@ endif()
 
 if(DEFINED USE_MDBX AND USE_MDBX)
 	add_subdirectory("${INCLUDE_DIR}/imtmdbx/CMake" "${AUX_INCLUDE_DIR}/imtmdbx")
+	add_subdirectory("${INCLUDE_DIR}/imtmdbx/Test/CMake" "${AUX_INCLUDE_DIR}/imtmdbx/Test")
 endif()
 
 
@@ -194,6 +195,11 @@ if(NOT ANDROID)
 if(NOT DEFINED USE_QTQML OR USE_QTQML)
 	add_subdirectory("${IMPL_DIR}/ImtAuthGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGuiPck")
 	add_dependencies(ImtAuthGuiPck imtbase imtauth imtauthgui)
+endif()
+
+if(NOT DEFINED USE_MDBX OR USE_MDBX)
+	add_subdirectory("${IMPL_DIR}/ImtMdbxPck/CMake" "${AUX_INCLUDE_DIR}/ImtMdbxPck")
+	add_dependencies(ImtMdbxPck imtmdbx)
 endif()
 
 	add_subdirectory("${IMPL_DIR}/ImtLicensePck/CMake" "${AUX_INCLUDE_DIR}/ImtLicensePck")
@@ -317,7 +323,6 @@ if(NOT UNIX)
 	#	add_dependencies(EagleView Imt3dViewPck Imt3dGuiPck)
 endif()
 
-
 #-------- Tests --------
 if (${BUILD_TESTING})
 	add_subdirectory("${INCLUDE_DIR}/imttest/CMake" "${AUX_INCLUDE_DIR}/imttest")
@@ -328,7 +333,6 @@ if (${BUILD_TESTING})
 	endif()
 
 	add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
-	add_subdirectory("${INCLUDE_DIR}/imtmdbx/Test/CMake" "${AUX_INCLUDE_DIR}/imtmdbx/Test")
 
 	add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
 	add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")

@@ -6,6 +6,7 @@
 #include <imtmdbx/CMask.h>
 #include <imtmdbx/CMaskContainer.h>
 #include <imtmdbx/CDoubleMask.h>
+#include <imtmdbx/CMdbxDatabaseEngine.h>
 
 #include <iostream>
 //#include <QThread>
@@ -411,7 +412,6 @@ void CMdbxTest::test_mdbxmap()
 	qDebug() << "map finish";
 	qDebug() << "Time make elapsed:" << time.elapsed();
 	txn.abort();
-	env.close();
 }
 
 
@@ -511,7 +511,6 @@ void CMdbxTest::test_mdbx()
 	qDebug() << "Time make elapsed:" << time.elapsed();
 	cursor.close();
 	txn.abort();
-	env.close();
 	// }
 }
 
@@ -534,8 +533,8 @@ void CMdbxTest::test_read_all_units(){
 
 	time.start();
 
-	imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine(tableNameBase + ".mdb");
-	mdbx::env_managed env = engine.GetEnv();
+	imtmdbx::CMdbxDatabaseEngine engine = imtmdbx::CMdbxDatabaseEngine(tableNameBase + ".mdb");
+	mdbx::env_managed& env = engine.GetEnv();
 	mdbx::txn_managed txn = env.start_read();
 
 	mdbx::map_handle mapHandleRead = txn.open_map(tableName.toStdString(), mdbx::key_mode::reverse, mdbx::value_mode::single);
@@ -586,9 +585,9 @@ void CMdbxTest::test_write_units(){
 
 	std::cout << "TEST_write_units!!!";
 
-	imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine("Units.mdb");
+	imtmdbx::CMdbxDatabaseEngine engine = imtmdbx::CMdbxDatabaseEngine("Units.mdb");
 
-	mdbx::env_managed env = engine.GetEnv();
+	mdbx::env_managed& env = engine.GetEnv();
 	mdbx::txn_managed txn = env.start_write();
 	imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable("Units", txn);
 
@@ -620,8 +619,8 @@ void CMdbxTest::test_write_10units(){
 
 	std::cout << "TEST_write_10units!!!";
 
-	imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine("Units10.mdb");
-	mdbx::env_managed env = engine.GetEnv();
+	imtmdbx::CMdbxDatabaseEngine engine = imtmdbx::CMdbxDatabaseEngine("Units10.mdb");
+	mdbx::env_managed& env = engine.GetEnv();
 	mdbx::txn_managed txn = env.start_write();
 
 	imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable("Units10", txn);
@@ -646,8 +645,8 @@ void CMdbxTest::test_write_10unitsInt(){
 
 	std::cout << "TEST_write_10unitsInt!!!";
 
-	imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine("Units10Int.mdb");
-	mdbx::env_managed env = engine.GetEnv();
+	imtmdbx::CMdbxDatabaseEngine engine = imtmdbx::CMdbxDatabaseEngine("Units10Int.mdb");
+	mdbx::env_managed& env = engine.GetEnv();
 	mdbx::txn_managed txn = env.start_write();
 
 	imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable("Units10Int", txn);
@@ -670,8 +669,8 @@ void CMdbxTest::test_create_index(){
 
 	QString tableName = "Units10";
 
-	imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine(tableName + ".mdb");
-	mdbx::env_managed env = engine.GetEnv();
+	imtmdbx::CMdbxDatabaseEngine engine = imtmdbx::CMdbxDatabaseEngine(tableName + ".mdb");
+	mdbx::env_managed& env = engine.GetEnv();
 	mdbx::txn_managed txn = env.start_write();
 
 	imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable(tableName, txn);
@@ -690,8 +689,8 @@ void CMdbxTest::test_get_doc(){
 	QString tableName = "Units10";
 	QString dataBaseName = tableName + ".mdb";
 
-	imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine(tableName + ".mdb");
-	mdbx::env_managed env = engine.GetEnv();
+	imtmdbx::CMdbxDatabaseEngine engine = imtmdbx::CMdbxDatabaseEngine(tableName + ".mdb");
+	mdbx::env_managed& env = engine.GetEnv();
 	mdbx::txn_managed txn = env.start_read();
 
 	imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable(tableName, txn);
@@ -711,8 +710,8 @@ void CMdbxTest::test_get_key(){
 
 	QString tableName = "Units10";
 
-	imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine(tableName + ".mdb");
-	mdbx::env_managed env = engine.GetEnv();
+	imtmdbx::CMdbxDatabaseEngine engine = imtmdbx::CMdbxDatabaseEngine(tableName + ".mdb");
+	mdbx::env_managed& env = engine.GetEnv();
 	mdbx::txn_managed txn = env.start_read();
 
 	imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable(tableName, txn);
@@ -734,8 +733,8 @@ void CMdbxTest::test_update_doc(){
 	QString tableName = "Units10";
 	quint64 index = 9;
 
-	imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine(tableName + ".mdb");
-	mdbx::env_managed env = engine.GetEnv();
+	imtmdbx::CMdbxDatabaseEngine engine = imtmdbx::CMdbxDatabaseEngine(tableName + ".mdb");
+	mdbx::env_managed& env = engine.GetEnv();
 	mdbx::txn_managed txn = env.start_write();
 
 	imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable(tableName, txn);
@@ -762,7 +761,7 @@ void CMdbxTest::test_update_doc(){
 //		mdbx::slice keySlice(&key, 8);
 //		mdbx::slice valueSlice(data.data(), data.length());
 
-//		imtmdbx::CDatabaseEngine engineWrite = imtmdbx::CDatabaseEngine(tableName + ".mdb");
+//		imtmdbx::CMdbxDatabaseEngine engineWrite = imtmdbx::CMdbxDatabaseEngine(tableName + ".mdb");
 //		mdbx::env_managed envWrite = engineWrite.GetEnv();
 //		mdbx::txn_managed txnWrite = envWrite.start_write();
 //		mdbx::map_handle mapHandleWrite = txnWrite.open_map(tableName.toStdString(), mdbx::key_mode::reverse, mdbx::value_mode::single);
@@ -804,8 +803,8 @@ void CMdbxTest::test_update_doc(){
 //	/*************************************************************/
 //	QString tableName = "Units10";
 
-//	imtmdbx::CDatabaseEngine engineRead = imtmdbx::CDatabaseEngine(tableName + ".mdb");
-//	//imtmdbx::CDatabaseEngine engineWrite = imtmdbx::CDatabaseEngine(tableName + ".mdb");
+//	imtmdbx::CMdbxDatabaseEngine engineRead = imtmdbx::CMdbxDatabaseEngine(tableName + ".mdb");
+//	//imtmdbx::CMdbxDatabaseEngine engineWrite = imtmdbx::CMdbxDatabaseEngine(tableName + ".mdb");
 
 //	mdbx::env_managed envRead = engineRead.GetEnv();
 //	mdbx::txn_managed txnRead = envRead.start_read();
@@ -845,7 +844,7 @@ void CMdbxTest::test_update_doc(){
 
 
 //	/*************************************************************/
-////		imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine(tableName + ".mdb");
+////		imtmdbx::CMdbxDatabaseEngine engine = imtmdbx::CMdbxDatabaseEngine(tableName + ".mdb");
 ////		imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable(tableName, engine, false);
 
 ////		documentTable.UpdateDocument(3, "unitNEW");
@@ -859,7 +858,7 @@ void CMdbxTest::test_update_doc(){
 //{
 //	Q_OBJECT
 //public:
-//	TreadMask(imtmdbx::CDatabaseEngine& engine):
+//	TreadMask(imtmdbx::CMdbxDatabaseEngine& engine):
 //		m_engine(engine)
 //	{
 //		start();
@@ -871,7 +870,7 @@ void CMdbxTest::test_update_doc(){
 
 //	}
 
-//	imtmdbx::CDatabaseEngine& m_engine;
+//	imtmdbx::CMdbxDatabaseEngine& m_engine;
 //};
 
 void CMdbxTest::test_write_masks(){
@@ -894,7 +893,7 @@ void CMdbxTest::test_write_masks(){
 
 	/*************************************************************/
 	QString tableName = "Masks";
-	imtmdbx::CDatabaseEngine engine = imtmdbx::CDatabaseEngine(tableName + ".mdb");
+	imtmdbx::CMdbxDatabaseEngine engine = imtmdbx::CMdbxDatabaseEngine(tableName + ".mdb");
 	// mdbx::env_managed env = engine.GetEnv();
 	// mdbx::txn_managed txn = env.start_write();
 	QString maskNameMln = "Mask1mln";

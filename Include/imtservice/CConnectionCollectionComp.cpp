@@ -143,6 +143,7 @@ void CConnectionCollectionComp::OnComponentCreated()
 	m_collection.RegisterFactory<FactoryConnectionImpl>("ConnectionInfo");
 
 	if (
+		m_connectionUrlListCompPtr.IsValid() &&
 		m_connectionUsageIds.GetCount() == m_connectionNames.GetCount() &&
 		m_connectionUsageIds.GetCount() == m_connectionServiceTypeNames.GetCount() &&
 		m_connectionUsageIds.GetCount() == m_connectionDescriptions.GetCount() &&

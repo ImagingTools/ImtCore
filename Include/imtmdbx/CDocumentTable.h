@@ -2,7 +2,7 @@
 
 // ImtCore includes
 #include <imtmdbx/IDocumentTable.h>
-#include <imtmdbx/CDatabaseEngine.h>
+#include <imtmdbx/IMdbxDatabaseEngine.h>
 
 // std includes
 #include <iostream>
