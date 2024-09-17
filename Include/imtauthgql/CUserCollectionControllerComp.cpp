@@ -294,10 +294,8 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 			}
 
 			if (m_hashCalculatorCompPtr.IsValid()){
-				if (oldUserInfoPtr != nullptr){
-					if (oldUserInfoPtr->GetPasswordHash() != password){
-						password = m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
-					}
+				if (oldUserInfoPtr == nullptr || (oldUserInfoPtr != nullptr && oldUserInfoPtr->GetPasswordHash() != password)){
+					password = m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
 				}
 			}
 
