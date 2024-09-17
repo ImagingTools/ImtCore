@@ -254,6 +254,11 @@ I_EXPORT_COMPONENT(
 			"Table view param",
 			"Table View Param");
 
+I_EXPORT_COMPONENT(
+			ModelUpdateBridge,
+			"Model update bridge",
+			"Model Update Bridge");
+
 
 } // namespace ImtCorePck
 

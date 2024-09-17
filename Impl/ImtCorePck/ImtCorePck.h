@@ -53,6 +53,7 @@
 #include <imtbase/CSelectionIdBinderComp.h>
 #include <imtbase/CTableViewParamRepresentationControllerComp.h>
 #include <imtbase/CTableViewParam.h>
+#include <imtbase/CModelUpdateBridgeComp.h>
 
 
 /**
@@ -125,6 +126,7 @@ typedef icomp::TModelCompWrap<
 						imtbase::CTableViewParam,
 						imtbase::ITableViewParam,
 						iser::ISerializable>> TableViewParam;
+typedef ibase::TModelObserverCompWrap<imtbase::CModelUpdateBridgeComp> ModelUpdateBridge;
 
 
 } // namespace ImtCorePck
