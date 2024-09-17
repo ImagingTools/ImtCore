@@ -308,7 +308,8 @@ void CMdbxTest::test_mdbxcursor()
 	cursor = txn.open_cursor(testHandle);
 
 	mdbx::cursor::move_result result = cursor.to_first();
-	std::string resKey = result.key.as_string();
+    std::string resKey;
+    resKey = result.key.as_string();
 
 	result = cursor.to_next();
 	resKey = result.key.as_string();
