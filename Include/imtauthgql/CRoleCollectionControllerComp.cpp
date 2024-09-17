@@ -195,8 +195,6 @@ istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation
 	roleInfoPtr->SetDefault(isDefault);
 
 	if (isGuest || isDefault){
-		roleInfoPtr->SetProductId("");
-
 		if (m_gqlRequestProviderCompPtr.IsValid()){
 			const imtgql::IGqlRequest* gqlRequestPtr = m_gqlRequestProviderCompPtr->GetGqlRequest();
 			if (gqlRequestPtr != nullptr){
