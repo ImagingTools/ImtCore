@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
+#include <iprm/ITextParam.h>
 
 // ImtCore includes
 #include <imtbase/IUrlParam.h>

@@ -13,8 +13,7 @@ namespace imtclientgql
 // public methods
 
 CGqlClientEngineComp::CGqlClientEngineComp()
-	:m_urlParamObserver(*this),
-	m_prefixServerParamObserver(*this)
+	:m_urlParamObserver(*this)
 {
 }
 
@@ -31,10 +30,6 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 	QByteArray prefix;
 	if (m_prefixServerAttrPtr.IsValid()){
 		prefix = *m_prefixServerAttrPtr;
-	}
-
-	if (m_prefixServerParamCompPtr.IsValid()){
-		prefix = m_prefixServerParamCompPtr->GetText().toUtf8();
 	}
 
 	if (!prefix.startsWith('/')){
@@ -71,17 +66,6 @@ void CGqlClientEngineComp::OnUrlParamChanged(const istd::IChangeable::ChangeSet&
 }
 
 
-void CGqlClientEngineComp::OnServerPrefixChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::ITextParam* objectPtr)
-{
-	Q_ASSERT(objectPtr != nullptr);
-	if (objectPtr != nullptr){
-		QString text = objectPtr->GetText();
-
-		m_prefixServer = text;
-	}
-}
-
-
 // reimplemented (icomp::CComponentBase)
 
 void CGqlClientEngineComp::OnComponentCreated()
@@ -93,17 +77,12 @@ void CGqlClientEngineComp::OnComponentCreated()
 
 		m_workingUrl = m_urlParamCompPtr->GetUrl();
 	}
-
-	if (m_prefixServerParamCompPtr.IsValid()) {
-		m_prefixServerParamObserver.RegisterObject(m_prefixServerParamCompPtr.GetPtr(), &CGqlClientEngineComp::OnServerPrefixChanged);
-	}
 }
 
 
 void CGqlClientEngineComp::OnComponentDestroyed()
 {
 	m_urlParamObserver.UnregisterAllObjects();
-	m_prefixServerParamObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
 }
