@@ -29,7 +29,7 @@ SingleDocumentWorkspacePageView {
         target: AuthorizationController;
 
         function onLoginSuccessful(){
-            if (productId !== ""){
+            if (container.productId !== ""){
                 container.startItemSourceComp = administrationViewComp
             }
         }

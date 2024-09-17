@@ -70,7 +70,7 @@ RemoteCollectionView {
 
     onProductIdChanged: {
         console.log("Role Collection onProductIdChanged", productId);
-
+        permissionsProvider.productId = productId;
         permissionsProvider.updateModel();
     }
 

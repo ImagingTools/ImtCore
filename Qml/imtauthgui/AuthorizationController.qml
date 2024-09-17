@@ -7,6 +7,8 @@ import imtcontrols 1.0
 QtObject {
     id: root;
 
+    property string productId: "";
+
     signal logoutSignal();
     signal userModeChanged(string userMode);
     signal superuserExistResult(bool exists);
@@ -36,6 +38,7 @@ QtObject {
     }
 
     property UserTokenProvider userTokenProvider: UserTokenProvider {
+        productId: root.productId;
         onAccepted: {
             root.loginSuccessful();
         }

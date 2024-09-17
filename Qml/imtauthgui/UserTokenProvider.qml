@@ -11,6 +11,7 @@ QtObject {
     property string userId: "";
     property string passwordHash: "";
     property string systemId: "";
+    property string productId: "";
     property var permissions: [];
 
     signal accepted();
@@ -43,6 +44,7 @@ QtObject {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField ("Login", login);
             inputParams.InsertField ("Password", password);
+            inputParams.InsertField ("ProductId", container.productId);
             query.AddParam(inputParams);
 
             var gqlData = query.GetQuery();
