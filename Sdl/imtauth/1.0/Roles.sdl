@@ -41,6 +41,8 @@ type RoleData {
 	ProductId: ID
 	ParentRoles: ID
 	Permissions: ID
+	IsDefault: Bool
+	IsGuest: Bool
 }
 
 input RoleDataInput {

@@ -19,19 +19,21 @@ namespace imtauth
 // public methods
 
 CRole::CRole()
-	: m_permissionProviderPtr(nullptr),
+	:m_permissionProviderPtr(nullptr),
+	m_isDefault(false),
+	m_isGuest(false),
 	m_roleInfoProviderPtr(nullptr)
 {
 }
 
 
-void CRole::SetParentRoleProvider(const IRoleInfoProvider *parentRoleProvider)
+void CRole::SetParentRoleProvider(const IRoleInfoProvider* parentRoleProvider)
 {
 	m_roleInfoProviderPtr = parentRoleProvider;
 }
 
 
-const IRoleInfoProvider *CRole::GetParentRolesProvider() const
+const IRoleInfoProvider* CRole::GetParentRolesProvider() const
 {
 	return m_roleInfoProviderPtr;
 }
@@ -94,12 +96,15 @@ void CRole::SetRoleDescription(const QString &description)
 IRole::FeatureIds CRole::GetPermissions() const
 {
 	IRole::FeatureIds allPermissions = m_rolePermissions;
-	for (const QByteArray& roleId : m_parents){
-		istd::TDelPtr<const IRole> roleInfoPtr = m_roleInfoProviderPtr->GetRole(roleId);
-		if (roleInfoPtr != nullptr){
-			for (const QByteArray& parentRoleId : roleInfoPtr->GetPermissions()){
-				if (!allPermissions.contains(parentRoleId)){
-					allPermissions << parentRoleId;
+
+	if (m_roleInfoProviderPtr != nullptr){
+		for (const QByteArray& roleId : m_parents){
+			istd::TDelPtr<const IRole> roleInfoPtr = m_roleInfoProviderPtr->GetRole(roleId);
+			if (roleInfoPtr != nullptr){
+				for (const QByteArray& permissionId : roleInfoPtr->GetPermissions()){
+					if (!allPermissions.contains(permissionId)){
+						allPermissions << permissionId;
+					}
 				}
 			}
 		}
@@ -190,6 +195,38 @@ void CRole::ExcludeRole(const QByteArray& roleId)
 }
 
 
+bool CRole::IsDefault() const
+{
+	return m_isDefault;
+}
+
+
+void CRole::SetDefault(bool isDefault)
+{
+	if (m_isDefault != isDefault){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_isDefault = isDefault;
+	}
+}
+
+
+bool CRole::IsGuest() const
+{
+	return m_isGuest;
+}
+
+
+void CRole::SetGuest(bool isGuest)
+{
+	if (m_isGuest!= isGuest){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_isGuest = isGuest;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CRole::Serialize(iser::IArchive& archive)
@@ -197,6 +234,12 @@ bool CRole::Serialize(iser::IArchive& archive)
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
 	bool retVal = true;
+
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+	quint32 imtCoreVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
+		imtCoreVersion = 0;
+	}
 
 	iser::CArchiveTag roleIdTag("RoleId", "ID of the role", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(roleIdTag);
@@ -221,6 +264,18 @@ bool CRole::Serialize(iser::IArchive& archive)
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_parents, "ParentsRoles", "ParentRole");
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_rolePermissions, "Permissions", "Permission");
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_roleRestrictions, "Restrictions", "Restriction");
+
+	if (imtCoreVersion >= 11122){
+		iser::CArchiveTag isDefaultTag("IsDefault", "Is Default", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(isDefaultTag);
+		retVal = retVal && archive.Process(m_isDefault);
+		retVal = retVal && archive.EndTag(isDefaultTag);
+
+		iser::CArchiveTag isGuestTag("IsGuest", "Is Guest", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(isGuestTag);
+		retVal = retVal && archive.Process(m_isGuest);
+		retVal = retVal && archive.EndTag(isGuestTag);
+	}
 
 	return retVal;
 }
@@ -247,6 +302,8 @@ bool CRole::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 		m_rolePermissions = sourcePtr->m_rolePermissions;
 		m_roleRestrictions = sourcePtr->m_roleRestrictions;
 		m_parents = sourcePtr->m_parents;
+		m_isDefault = sourcePtr->m_isDefault;
+		m_isGuest = sourcePtr->m_isGuest;
 
 		if (mode == CM_WITH_REFS){
 			m_permissionProviderPtr = sourcePtr->m_permissionProviderPtr;
@@ -283,6 +340,8 @@ bool CRole::ResetData(CompatibilityMode /*mode*/)
 	m_rolePermissions.clear();
 	m_roleRestrictions.clear();
 	m_parents.clear();
+	m_isDefault = false;
+	m_isGuest = false;
 
 	return true;
 }

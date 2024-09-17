@@ -21,7 +21,6 @@ public:
 	I_BEGIN_COMPONENT(CUserCollectionAdapterComp);
 		I_REGISTER_INTERFACE(IUserInfoProvider);
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Adapting the collection to the provider", true, "UserCollection");
-		I_ASSIGN(m_separatorObjectIdAttrPtr, "SeparatorObjectId", "Separator of the object ID", false, "");
 	I_END_COMPONENT;
 
 	// reimplemented (IUserInfoProvider)
@@ -30,7 +29,6 @@ public:
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
-	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
 };
 
 

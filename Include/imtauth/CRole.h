@@ -37,6 +37,10 @@ public:
 	virtual void SetProductId(const QByteArray& productId) override;
 	virtual bool IncludeRole(const QByteArray& roleId) override;
 	virtual void ExcludeRole(const QByteArray& roleId) override;
+	virtual bool IsDefault() const override;
+	virtual void SetDefault(bool isDefault) override;
+	virtual bool IsGuest() const override;
+	virtual void SetGuest(bool isGuest) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -62,6 +66,8 @@ private:
 	IRole::FeatureIds m_rolePermissions;
 	IRole::FeatureIds m_roleRestrictions;
 	QByteArrayList m_parents;
+	bool m_isDefault;
+	bool m_isGuest;
 
 	const imtauth::IRoleInfoProvider* m_roleInfoProviderPtr;
 };

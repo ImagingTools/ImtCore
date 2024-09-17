@@ -18,7 +18,10 @@ class CGqlRequestSender: public QObject
 public:
 	static void SetGlobalAccessToken(const QString& accessToken);
 
-	Q_INVOKABLE inline bool setGqlQuery(QString query) { return SetGqlQuery(query); }
+	Q_INVOKABLE inline bool setGqlQuery(QString query)
+	{
+		return SetGqlQuery(query);
+	}
 
 	bool SetGqlQuery(QString query);
 

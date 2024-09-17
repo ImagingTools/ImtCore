@@ -113,7 +113,7 @@ void CLdapUserCollectionJoinerComp::OnUpdate(
 			if (m_ldapUserCollectionCompPtr->GetObjectData(userId, dataPtr)){
 				const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 				if (userInfoPtr != nullptr){
-					m_userCollectionCompPtr->InsertNewObject("", "", "", userInfoPtr);
+					// m_userCollectionCompPtr->InsertNewObject("", "", "", userInfoPtr);
 				}
 			}
 		}
@@ -127,7 +127,7 @@ void CLdapUserCollectionJoinerComp::OnUpdate(
 					systemInfo.systemName = *m_ldapSystemNameAttrPtr;
 
 					if (userInfoPtr->AddToSystem(systemInfo)){
-						m_userCollectionCompPtr->SetObjectData(objectId, *userInfoPtr);
+						// m_userCollectionCompPtr->SetObjectData(objectId, *userInfoPtr);
 					}
 				}
 			}

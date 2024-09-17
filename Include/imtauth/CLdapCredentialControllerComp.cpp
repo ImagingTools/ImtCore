@@ -23,8 +23,18 @@ bool CLdapCredentialControllerComp::CheckCredential(const QByteArray& login, con
 	int result = 0;
 
 #ifdef Q_OS_WIN
+	// Local domain by default
+	QByteArray domain = ".";
+	QByteArray username = login;
+
+	QByteArrayList data = login.split('\\');
+	if (data.size() >= 2){
+		domain = data[0];
+		username = data[1];
+	}
+
 	HANDLE  hUser;
-	result = LogonUser(qUtf16Printable(login), L".", qUtf16Printable(password), LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &hUser);
+	result = LogonUser(qUtf16Printable(username), qUtf16Printable(domain), qUtf16Printable(password), LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &hUser);
 #endif
 
 	return result > 0;

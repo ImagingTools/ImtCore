@@ -17,9 +17,9 @@ input UsersListInput {
 }
 
 type UserItem {
-	Id: ID!
+	Id: ID
 	UserId: ID
-	Name: String!
+	Name: String
 	Description: String
 	Mail: String
 	SystemId: ID
@@ -43,10 +43,10 @@ type SystemInfo {
 }
 
 type UserData {
-	Id: ID!
+	Id: ID
 	ProductId: ID
-	Name: String!
-	Username: ID!
+	Name: String
+	Username: ID
 	Password: String
 	Email: String
 	Groups: ID

@@ -107,6 +107,26 @@ public:
 		Remove parent role.
 	*/
 	virtual void ExcludeRole(const QByteArray& roleId) = 0;
+
+	/**
+		Checking that the role is default.
+	*/
+	virtual bool IsDefault() const = 0;
+
+	/**
+		Set default flag for role.
+	*/
+	virtual void SetDefault(bool isDefault) = 0;
+
+	/**
+		Checking that the role is guest.
+	*/
+	virtual bool IsGuest() const = 0;
+
+	/**
+		Set guest flag for role.
+	*/
+	virtual void SetGuest(bool isGuest) = 0;
 };
 
 

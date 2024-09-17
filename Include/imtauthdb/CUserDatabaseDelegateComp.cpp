@@ -169,7 +169,10 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 		}
 	}
 
-	if (oldObjectPtr->GetLastConnection() != userInfoPtr->GetLastConnection()){
+	QDateTime oldDateTime = oldObjectPtr->GetLastConnection();
+	QDateTime newDateTime = userInfoPtr->GetLastConnection();
+
+	if (!oldDateTime.isNull() && !newDateTime.isNull() && oldDateTime != newDateTime){
 		retVal += QString(R"(UPDATE "Users" SET "Document" = jsonb_set("Document", '{LastConnection}', '"%1"', true) WHERE "DocumentId" ='%2' AND "IsActive" = true;)")
 				.arg(userInfoPtr->GetLastConnection().toString(Qt::ISODate))
 				.arg(qPrintable(objectId)).toUtf8();
@@ -210,6 +213,13 @@ QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
 
 	if (userInfoPtr->IsAdmin()){
 		return QByteArray();
+	}
+
+	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+		if (!systemInfo.systemId.isEmpty()){
+			return QByteArray();
+		}
 	}
 
 	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';")
@@ -272,7 +282,7 @@ bool CUserDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& 
 		filterQuery += QString(R"((('%1' = '' AND NOT root."Document" ? 'SystemInfos') OR EXISTS (SELECT 1 FROM jsonb_array_elements(root."Document"->'SystemInfos') as s WHERE s->>'SystemId' = '%1')))").arg(systemId);
 	}
 	else{
-		BaseClass::CreateObjectFilterQuery(filterParams, filterQuery);
+		return BaseClass::CreateObjectFilterQuery(filterParams, filterQuery);
 	}
 
 	return true;

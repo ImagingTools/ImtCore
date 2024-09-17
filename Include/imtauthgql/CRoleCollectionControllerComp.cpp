@@ -5,6 +5,7 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 #include <iprm/CTextParam.h>
 #include <iprm/TParamsPtr.h>
+#include <iprm/CEnableableParam.h>
 
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
@@ -187,6 +188,29 @@ istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation
 	permissionIds.removeAll("");
 	roleInfoPtr->SetLocalPermissions(permissionIds);
 
+	bool isGuest = roleDataRepresentation.GetIsGuest();
+	roleInfoPtr->SetGuest(isGuest);
+
+	bool isDefault = roleDataRepresentation.GetIsDefault();
+	roleInfoPtr->SetDefault(isDefault);
+
+	if (isGuest || isDefault){
+		roleInfoPtr->SetProductId("");
+
+		if (m_gqlRequestProviderCompPtr.IsValid()){
+			const imtgql::IGqlRequest* gqlRequestPtr = m_gqlRequestProviderCompPtr->GetGqlRequest();
+			if (gqlRequestPtr != nullptr){
+				const imtgql::IGqlContext* gqlContextPtr = gqlRequestPtr->GetRequestContext();
+				if (gqlContextPtr != nullptr){
+					if (!gqlContextPtr->GetUserInfo()->IsAdmin()){
+						errorMessage = QString("Only the admin can change the default/guest role");
+						return nullptr;
+					}
+				}
+			}
+		}
+	}
+
 	return roleInstancePtr.PopPtr();
 }
 
@@ -230,6 +254,9 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 	imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
 	std::sort(permissions.begin(), permissions.end());
 	roleData.SetPermissions(permissions.join(';'));
+
+	roleData.SetIsDefault(roleInfoPtr->IsDefault());
+	roleData.SetIsGuest(roleInfoPtr->IsGuest());
 
 	representationPayload.SetRoleData(roleData);
 

@@ -12,10 +12,6 @@ namespace imtqml
 {
 
 
-/**
-	Universal data controller for UI representations
-	\ingroup LicenseManagement
-*/
 class CGqlModel: public imtbase::CTreeItemModel
 {
 	Q_OBJECT

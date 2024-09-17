@@ -68,7 +68,7 @@ TreeViewItemDelegateBase {
                             packageTreeItemDelegate.featureData.m_featureName = inputName.text;
 
                             if (featureId === ""){
-                                let id = featureName.replace(/\s+/g, '');
+                                let id = inputName.text.replace(/\s+/g, '');
                                 let alreadyExists = packageTreeItemDelegate.root.featureIdExists(id);
                                 if (!alreadyExists){
                                     packageTreeItemDelegate.featureData.m_featureId = id;

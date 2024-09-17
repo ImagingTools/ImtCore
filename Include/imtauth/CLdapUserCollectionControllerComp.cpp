@@ -158,14 +158,14 @@ void CLdapUserCollectionControllerComp::CheckLdapUsersThread::run()
 		{
 			istd::CChangeGroup changeGroup(&m_parent);
 
-			for (const QByteArray& userId : expectedUserIds){
-				if (!actualUserIds.contains(userId)){
-					istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr(GetUserInfoFromLdapUserId(userId));
-					if (userInfoPtr.IsValid()){
-						m_parent.InsertNewObject("User", "", "", userInfoPtr.GetPtr(), userId);
-					}
-				}
-			}
+			// for (const QByteArray& userId : expectedUserIds){
+			// 	if (!actualUserIds.contains(userId)){
+			// 		istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr(GetUserInfoFromLdapUserId(userId));
+			// 		if (userInfoPtr.IsValid()){
+			// 			m_parent.InsertNewObject("User", "", "", userInfoPtr.GetPtr(), userId);
+			// 		}
+			// 	}
+			// }
 
 			for (const QByteArray& userId : actualUserIds){
 				if (!expectedUserIds.contains(userId)){

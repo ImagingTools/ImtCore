@@ -16,7 +16,7 @@ public:
 	typedef CGqlRemoteRepresentationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlRemoteRepresentationControllerComp)
-		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID", true, "");
+		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID", false, "");
 	I_END_COMPONENT;
 
 protected:

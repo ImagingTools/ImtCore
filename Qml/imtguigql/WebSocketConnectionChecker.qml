@@ -23,7 +23,7 @@ SubscriptionClient {
     id: pumaSub;
 
     property int status: -1; // -1 - Unknown, 0 - Connecting, 1 - Connected, 2 - Disconnected
-    property string subscriptionRequestId: "PumaWsConnection";
+    property string subscriptionRequestId;
     property var subscriptionManager: null;
 
     property bool ok: subscriptionManager ? subscriptionManager.status === 1 : false;

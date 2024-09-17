@@ -16,41 +16,27 @@ namespace imtauthgql
 
 // protected methods
 
-imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const
+bool CAuthorizationControllerComp::ParseDataFromGqlRequest(
+			const imtgql::CGqlRequest& gqlRequest,
+			QByteArray& login,
+			QByteArray& password,
+			QByteArray& productId) const
 {
-	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'.").arg(qPrintable(login)));
+	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
+	if (gqlInputParamPtr == nullptr){
+		return false;
+	}
 
-	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
+	login = gqlInputParamPtr->GetFieldArgumentValue("Login").toByteArray();
+	productId = gqlInputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
+	password = gqlInputParamPtr->GetFieldArgumentValue("Password").toByteArray();
 
-	return nullptr;
+	return true;
 }
 
 
-// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
-
-imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login) const
 {
-	if (!m_userCollectionCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	if (!m_sessionCollectionCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
-	if (gqlInputParamPtr == nullptr){
-		errorMessage = QString("Unable to create response for request with ID: '%1'. Error: GraphQL input params is invalid.").arg(qPrintable(gqlRequest.GetCommandId()));
-
-		SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
-
-		return nullptr;
-	}
-
-	QByteArray login = gqlInputParamPtr->GetFieldArgumentValue("Login").toByteArray();
-	QByteArray productId = gqlInputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
-	QByteArray password = gqlInputParamPtr->GetFieldArgumentValue("Password").toByteArray();
-
 	iprm::CParamsSet filterParam;
 	iprm::CParamsSet paramsSet;
 
@@ -62,11 +48,103 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 
 	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 	if (userIds.isEmpty()){
+		return QByteArray();
+	}
+
+	return userIds[0];
+}
+
+
+bool CAuthorizationControllerComp::CheckCredential(const QByteArray& systemId, const QByteArray& login, const QByteArray& password) const
+{
+	int index = m_systemIdsAttrPtr.FindValue(systemId);
+	Q_ASSERT_X(index >= 0, "CAuthorizationControllerComp::CreateInternalResponse", QString("System-ID '%1' cannot found").arg(qPrintable(systemId)).toUtf8());
+
+	const imtauth::ICredentialController* credentialControllerPtr = m_credentialControllersCompPtr[index];
+	Q_ASSERT_X(credentialControllerPtr != nullptr, "CAuthorizationControllerComp::CreateInternalResponse", "Invalid credential controller");
+
+	return credentialControllerPtr->CheckCredential(login, password);
+}
+
+
+imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const
+{
+	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'.").arg(qPrintable(login)));
+	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
+
+	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
+			imtauth::CUserInfo& userInfo,
+			const QByteArray& systemId,
+			const QByteArray& productId,
+			QString& errorMessage) const
+{
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+
+	QByteArray login = userInfo.GetId();
+	QByteArray objectId = GetUserObjectId(login);
+	QByteArray tokenValue = QUuid::createUuid().toByteArray();
+
+	dataModelPtr->SetData("Token", tokenValue);
+	dataModelPtr->SetData("Login", login);
+	dataModelPtr->SetData("UserId", objectId);
+	dataModelPtr->SetData("PasswordHash", userInfo.GetPasswordHash());
+	dataModelPtr->SetData("SystemId", systemId);
+
+	imtauth::IUserInfo::FeatureIds permissionIds = userInfo.GetPermissions(productId);
+	dataModelPtr->SetData("Permissions", permissionIds.join(';'));
+
+	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr;
+	sessionInfoPtr.SetPtr(new imtauth::CSessionInfo());
+
+	sessionInfoPtr->SetUserId(objectId);
+	sessionInfoPtr->SetToken(tokenValue);
+
+	if (m_sessionCollectionCompPtr.IsValid()){
+		m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.PopPtr(), tokenValue);
+	}
+
+	userInfo.SetLastConnection(QDateTime::currentDateTimeUtc());
+
+	if (!m_userCollectionCompPtr->SetObjectData(objectId, userInfo)){
+		errorMessage = QString("Unable to set last connection info for user with login: '%1'").arg(qPrintable(login));
+		SendWarningMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
+	}
+
+	return rootModelPtr.PopPtr();
+}
+
+
+// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+
+imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (!m_userCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
+		return nullptr;
+	}
+
+	if (!m_sessionCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Component 'SessionCollection' was not set", "CAuthorizationControllerComp");
+		return nullptr;
+	}
+
+	QByteArray login;
+	QByteArray productId;
+	QByteArray password;
+
+	ParseDataFromGqlRequest(gqlRequest, login, password, productId);
+
+	QByteArray userObjectId = GetUserObjectId(login);
+	if (userObjectId.isEmpty()){
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
 	imtauth::CUserInfo* userInfoPtr = nullptr;
-	QByteArray userObjectId = userIds[0];
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
 		userInfoPtr = dynamic_cast<imtauth::CUserInfo*>(dataPtr.GetPtr());
@@ -80,13 +158,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 	bool ok = false;
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
 		if (systemInfo.enabled){
-			int index = m_systemIdsAttrPtr.FindValue(systemInfo.systemId);
-			Q_ASSERT_X(index >= 0, "CAuthorizationControllerComp::CreateInternalResponse", QString("System-ID '%1' cannot found").arg(qPrintable(systemInfo.systemId)).toUtf8());
-
-			const imtauth::ICredentialController* credentialControllerPtr = m_credentialControllersCompPtr[index];
-			Q_ASSERT_X(credentialControllerPtr != nullptr, "CAuthorizationControllerComp::CreateInternalResponse", "Invalid credential controller");
-
-			if (credentialControllerPtr->CheckCredential(login, password)){
+			if (CheckCredential(systemInfo.systemId, login, password)){
 				ok = true;
 				activeSystemId = systemInfo.systemId;
 				break;
@@ -98,38 +170,8 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-
-	QByteArray tokenValue = QUuid::createUuid().toByteArray();
-
-	dataModelPtr->SetData("Token", tokenValue);
-	dataModelPtr->SetData("Login", login);
-	dataModelPtr->SetData("UserId", userObjectId);
-	dataModelPtr->SetData("PasswordHash", userInfoPtr->GetPasswordHash());
-	dataModelPtr->SetData("SystemId", activeSystemId);
-
-	imtauth::IUserInfo::FeatureIds permissionIds = userInfoPtr->GetPermissions(productId);
-	dataModelPtr->SetData("Permissions", permissionIds.join(';'));
-
-	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr;
-	sessionInfoPtr.SetPtr(new imtauth::CSessionInfo());
-
-	sessionInfoPtr->SetUserId(userObjectId);
-	sessionInfoPtr->SetToken(tokenValue);
-
-	if (m_sessionCollectionCompPtr.IsValid()){
-		m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.PopPtr(), tokenValue);
-	}
-
-	userInfoPtr->SetLastConnection(QDateTime::currentDateTimeUtc());
-
-	if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr)){
-		errorMessage = QString("Unable to set last connection info for user with login: '%1'").arg(qPrintable(login));
-		SendWarningMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
-	}
-
-	return rootModelPtr.PopPtr();
+	imtbase::CTreeItemModel* succesfulResponsePtr = CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
+	return succesfulResponsePtr;
 }
 
 

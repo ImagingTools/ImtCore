@@ -109,6 +109,11 @@ I_EXPORT_COMPONENT(
 			"Login status subscriber controller",
 			"Login Status Subscriber Controller");
 
+I_EXPORT_COMPONENT(
+			LdapAuthorizationController,
+			"LDAP authorization controller",
+			"LDAP Authorization Controller");
+
 
 } // namespace ImtAuthGqlPck
 

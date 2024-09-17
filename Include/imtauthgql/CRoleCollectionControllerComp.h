@@ -2,7 +2,9 @@
 
 
 // ImtCore includes
+#include <imtauth/CRole.h>
 #include <imtgql/CObjectCollectionControllerCompBase.h>
+#include <imtgql/IGqlRequestProvider.h>
 #include <GeneratedFiles/imtauthsdl/SDL/CPP/Roles/Roles.h>
 
 
@@ -16,6 +18,7 @@ public:
 	typedef sdl::imtauth::Roles::CRoleCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRoleCollectionControllerComp);
+		I_ASSIGN(m_gqlRequestProviderCompPtr, "GqlRequestProvider", "GraphQL request provider", false, "GqlRequestProvider");
 		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID", false, "");
 		I_ASSIGN(m_roleInfoFactCompPtr, "RoleFactory", "Factory used for creation of the new role instance", true, "RoleFactory");
 	I_END_COMPONENT;
@@ -45,6 +48,7 @@ protected:
 				iprm::CParamsSet* filterParams) const override;
 
 protected:
+	I_REF(imtgql::IGqlRequestProvider, m_gqlRequestProviderCompPtr);
 	I_ATTR(QByteArray, m_productIdAttrPtr);
 	I_FACT(imtauth::IRole, m_roleInfoFactCompPtr);
 };

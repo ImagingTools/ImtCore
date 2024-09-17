@@ -25,6 +25,12 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Users::CUserItem& representationObject,
 	QString& errorMessage) const
 {
+	imtauth::IUserInfo* contextUserInfoPtr = nullptr;
+	const imtgql::IGqlContext* gqlContextPtr = usersListRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		contextUserInfoPtr = gqlContextPtr->GetUserInfo();
+	}
+
 	sdl::imtauth::Users::UsersListRequestArguments arguments = usersListRequest.GetRequestedArguments();
 
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
@@ -41,6 +47,18 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
+	}
+
+	bool ok = false;
+
+	if (contextUserInfoPtr != nullptr){
+		if (!contextUserInfoPtr->IsAdmin() && userInfoPtr->IsAdmin()){
+			ok = true;
+		}
+	}
+
+	if (ok){
+		return true;
 	}
 
 	sdl::imtauth::Users::UsersListRequestInfo requestInfo = usersListRequest.GetRequestInfo();
@@ -229,7 +247,7 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 			if (currentUserInfoPtr != nullptr){
 				if (userObjectId != id){
 					QByteArray currentUsername = currentUserInfoPtr->GetId();
-					if (currentUsername == username){
+					if (currentUsername.toLower() == username.toLower()){
 						SendWarningMessage(0, QString("Username already exists"), "imtauthgql::CUserControllerComp");
 						errorMessage = QT_TR_NOOP("Username already exists");
 

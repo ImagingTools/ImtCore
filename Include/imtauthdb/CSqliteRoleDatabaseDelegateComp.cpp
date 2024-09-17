@@ -1,10 +1,9 @@
-#include <imtauthdb/CRoleDatabaseDelegateComp.h>
+#include <imtauthdb/CSqliteRoleDatabaseDelegateComp.h>
 
 
 // ACF includes
-#include <imod/TModelWrap.h>
-#include <istd/CCrcCalculator.h>
 #include <istd/TOptDelPtr.h>
+#include <istd/CCrcCalculator.h>
 
 // ImtCore includes
 #include <imtauth/CRole.h>
@@ -14,11 +13,11 @@ namespace imtauthdb
 {
 
 
-// public methods
+// protected methods
 
-// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
+// reimplemented (imtdb::CSqliteJsonDatabaseDelegateComp)
 
-istd::IChangeable* CRoleDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeable* CSqliteRoleDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -34,8 +33,8 @@ istd::IChangeable* CRoleDatabaseDelegateComp::CreateObjectFromRecord(const QSqlR
 		return nullptr;
 	}
 
-	if (record.contains(*m_documentContentColumnIdAttrPtr)){
-		QByteArray documentContent = record.value(qPrintable(*m_documentContentColumnIdAttrPtr)).toByteArray();
+	if (record.contains("Document")){
+		QByteArray documentContent = record.value(qPrintable("Document")).toByteArray();
 
 		if (ReadDataFromMemory("RoleInfo", documentContent, *documentPtr)){
 			return documentPtr.PopPtr();
@@ -46,15 +45,15 @@ istd::IChangeable* CRoleDatabaseDelegateComp::CreateObjectFromRecord(const QSqlR
 }
 
 
-imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::CreateNewObjectQuery(
-			const QByteArray& /*typeId*/,
-			const QByteArray& proposedObjectId,
-			const QString& objectName,
-			const QString& /*objectDescription*/,
-			const istd::IChangeable* valuePtr,
-			const imtbase::IOperationContext* operationContextPtr) const
+imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqliteRoleDatabaseDelegateComp::CreateNewObjectQuery(
+	const QByteArray& typeId,
+	const QByteArray& proposedObjectId,
+	const QString& objectName,
+	const QString& objectDescription,
+	const istd::IChangeable* valuePtr,
+	const imtbase::IOperationContext* operationContextPtr) const
 {
-	NewObjectQuery retVal;
+	imtdb::IDatabaseObjectDelegate::NewObjectQuery retVal;
 
 	istd::TOptDelPtr<const istd::IChangeable> workingDocumentPtr;
 	if (valuePtr != nullptr){
@@ -69,12 +68,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::Create
 
 			int revisionVersion = 1;
 			retVal.query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);")
-						.arg(qPrintable(*m_tableNameAttrPtr))
-						.arg(qPrintable(objectId))
-						.arg(SqlEncode(documentContent))
-						.arg(revisionVersion)
-						.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
-						.arg(checksum).toUtf8();
+							.arg(qPrintable("Roles"))
+							.arg(qPrintable(objectId))
+							.arg(SqlEncode(documentContent))
+							.arg(revisionVersion)
+							.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
+							.arg(checksum).toUtf8();
 
 			retVal.query += CreateOperationDescriptionQuery(objectId, operationContextPtr);
 
@@ -86,12 +85,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::Create
 }
 
 
-QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& objectId,
-			const istd::IChangeable& object,
-			const imtbase::IOperationContext* operationContextPtr,
-			bool /*useExternDelegate*/) const
+QByteArray CSqliteRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
+	const imtbase::IObjectCollection& collection,
+	const QByteArray& objectId,
+	const istd::IChangeable& object,
+	const imtbase::IOperationContext* operationContextPtr,
+	bool useExternDelegate) const
 {
 	QByteArray retVal;
 
@@ -99,7 +98,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
 	if (WriteDataToMemory("RoleInfo", object, documentContent)){
 		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 		retVal = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );")
-					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable("Roles"))
 					.arg(qPrintable(objectId))
 					.arg(SqlEncode(documentContent))
 					.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
@@ -110,6 +109,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	return retVal;
 }
+
 
 } // namespace imtauthdb
 

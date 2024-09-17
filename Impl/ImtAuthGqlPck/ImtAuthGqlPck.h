@@ -25,6 +25,7 @@
 #include <imtauthgql/CSessionModelObserverComp.h>
 #include <imtauthgql/CSessionModelSubscriberControllerComp.h>
 #include <imtauthgql/CLoginStatusSubscriberControllerComp.h>
+#include <imtauthgql/CLdapAuthorizationControllerComp.h>
 
 
 /**
@@ -53,6 +54,7 @@ typedef imtauthgql::CRemotePermissionCheckerComp RemotePermissionChecker;
 typedef imtauthgql::CSessionModelObserverComp SessionModelObserver;
 typedef imtauthgql::CSessionModelSubscriberControllerComp SessionModelSubscriberController;
 typedef imtauthgql::CLoginStatusSubscriberControllerComp LoginStatusSubscriberController;
+typedef imtauthgql::CLdapAuthorizationControllerComp LdapAuthorizationController;
 
 
 } // namespace ImtAuthGqlPck
