@@ -15,7 +15,7 @@ class MouseArea extends Item {
         hoverEnabled: { type: Bool, value: false, signalName:'hoverEnabledChanged' },
         propagateComposedEvents: { type: Bool, value: false, signalName:'propagateComposedEventsChanged' },
         preventStealing: { type: Bool, value: false, signalName:'preventStealingChanged' },
-        // pressed: { type: Bool, value: false, signalName:'pressedChanged' },
+        pressed: { type: Bool, value: false, signalName:'pressedChanged' },
         pressAndHoldInterval: { type: Real, value: 800, signalName:'pressAndHoldIntervalChanged' },
         mouseX: { type: Real, value: 0, signalName:'mouseXChanged' },
         mouseY: { type: Real, value: 0, signalName:'mouseYChanged' },
@@ -27,7 +27,7 @@ class MouseArea extends Item {
         hoverEnabledChanged: { type:Signal, slotName:'onHoverEnabledChanged', args:[] },
         propagateComposedEventsChanged: { type:Signal, slotName:'onPropagateComposedEventsChanged', args:[] },
         preventStealingChanged: { type:Signal, slotName:'onPreventStealingChanged', args:[] },
-        // pressedChanged: { type:Signal, slotName:'onPressedChanged', args:[] },
+        pressedChanged: { type:Signal, slotName:'onPressedChanged', args:[] },
         pressAndHoldIntervalChanged: { type:Signal, slotName:'onPressAndHoldIntervalChanged', args:[] },
         mouseXChanged: { type:Signal, slotName:'onMouseXChanged', args:[] },
         mouseYChanged: { type:Signal, slotName:'onMouseYChanged', args:[] },
@@ -37,7 +37,7 @@ class MouseArea extends Item {
 		exited: { type:Signal, slotName:'onExited', args:[] },
 		canceled: { type:Signal, slotName:'onCanceled', args:[] },
 		pressAndHold: { type:Signal, slotName:'onPressAndHold', args:['mouse'] },
-		pressed: { type:Signal, slotName:'onPressed', args:['mouse'] },
+		// pressed: { type:Signal, slotName:'onPressed', args:['mouse'] },
 		released: { type:Signal, slotName:'onReleased', args:['mouse'] },
 		wheel: { type:Signal, slotName:'onWheel', args:['wheel'] },
         clicked: { type:Signal, slotName:'onClicked', args:['mouse'] },
@@ -98,8 +98,9 @@ class MouseArea extends Item {
 
         if(!mouse.target){
             this.__pressed = true
+            this.__getObject('pressed').__value = true
             if(!this.__entered) this.entered()
-            this.pressed(mouse)
+            this.pressedChanged(mouse)
 
             if(mouse.accepted) mouse.target = this
         }
@@ -121,6 +122,7 @@ class MouseArea extends Item {
         }
 
         this.__pressed = false
+        this.__getObject('pressed').__value = false
     }
 
     __onMouseDblClick(mouse){
@@ -131,6 +133,7 @@ class MouseArea extends Item {
         }
 
         this.__pressed = false
+        this.__getObject('pressed').__value = false
     }
 }
 

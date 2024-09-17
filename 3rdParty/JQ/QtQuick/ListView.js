@@ -243,11 +243,21 @@ class ListView extends Flickable {
     }
 
     __updateGeometry(){
+        let width = 0
+        let height = 0
+        let count = 0
+        for(let item of this.__items){
+            if(item){
+                count += 1
+                width += item.width
+                height += item.height
+            }
+        }
         if(this.orientation === ListView.Horizontal){
-            this.contentWidth = this.contentItem.__getDOM().scrollWidth
+            this.contentWidth = width + (count ? (count-1)*this.spacing : 0)
             this.__getObject('contentHeight').__setAuto(this.height)
         } else {
-            this.contentHeight = this.contentItem.__getDOM().scrollHeight
+            this.contentHeight = height + (count ? (count-1)*this.spacing : 0)
             this.__getObject('contentWidth').__setAuto(this.width)
         }
     }

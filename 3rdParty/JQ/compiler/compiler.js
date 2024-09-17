@@ -1088,6 +1088,10 @@ class Instruction {
             code.push('self.'+stat.value)
         }
 
+        // if(typeBase === JQModules.QtQuick.Loader){
+        //     code.push(`self.__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
+        // }
+
         if(typeBase === JQModules.QtQml.Connections){
             code.push(`self.__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
         }
@@ -1131,7 +1135,12 @@ class Instruction {
         }
 
         for(let connectedSignal of this.connectedSignals){
+            if(typeBase === JQModules.QtQuick.MouseArea && connectedSignal.slotName === 'pressed'){
+                connectedSignal.slotName = 'pressedChanged'
+            }
+
             let names = connectedSignal.slotName.replaceAll("['", '').replaceAll("']", '').split('.')
+
             let signalName = ''
             if(names.length === 1){
                 signalName = names[0][2].toLowerCase() + names[0].slice(3)

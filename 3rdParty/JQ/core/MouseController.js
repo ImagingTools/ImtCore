@@ -10,6 +10,8 @@ class QmlMouseEvent {
     flags = 0
     modifiers = QtEnums.NoModifier
     wasHeld = false
+    originX = 0
+    originY = 0
     x = 0
     y = 0
 
@@ -35,6 +37,11 @@ class QmlMouseEvent {
         }
     }
 
+    relative(obj){
+        let rect = obj.__DOM.getBoundingClientRect()
+        this.x = this.originX - rect.x
+        this.y = this.originY - rect.y
+    }
 }
 
 class QmlWheelEvent {
@@ -85,15 +92,15 @@ module.exports = {
 
     init: function(){   
         window.addEventListener('mousemove', (e)=>{
-            JQApplication.setCursor(QtEnums.ArrowCursor)
-
             let event = this.event ? this.event : new QmlMouseEvent({path: this.getObjectsFromPoint(e.pageX, e.pageY)})
-            event.moveX = event.x - e.pageX
-            event.moveY = event.y - e.pageY
-            event.x = e.pageX
-            event.y = e.pageY
+            event.moveX = event.originX - e.pageX
+            event.moveY = event.originY - e.pageY
+            event.originX = e.pageX
+            event.originY = e.pageY
 
-            if(event.pressed && (Math.abs(event.startX - event.x) > 15 || Math.abs(event.startY - event.y) > 15)) {
+            if(!event.target) JQApplication.setCursor(QtEnums.ArrowCursor)
+
+            if(event.pressed && (Math.abs(event.startX - event.originX) > 15 || Math.abs(event.startY - event.originY) > 15)) {
                 event.wasDrag = true
             }
 
@@ -104,8 +111,8 @@ module.exports = {
                     continue
                 }
 
-                let point = event.getRelativePoint(this.entered[i])
-                if(point.x < 0 || point.y < 0 || point.x >= this.entered[i].width || point.y >= this.entered[i].height) {
+                event.relative(this.entered[i])
+                if(event.x < 0 || event.y < 0 || event.x >= this.entered[i].width || event.y >= this.entered[i].height) {
                     this.entered[i].__onMouseLeave(event)
                     this.entered.splice(i, 1)
                 } else {
@@ -114,8 +121,8 @@ module.exports = {
             }
 
             for(obj of event.path){
-                let point = event.getRelativePoint(obj)
-                if(point.x >= 0 && point.y >= 0 && point.x < obj.width && point.y < obj.height){
+                event.relative(obj)
+                if(event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height){
                     if(this.entered.indexOf(obj) < 0) {
                         this.entered.push(obj)
                         obj.__onMouseEnter(event)
@@ -134,22 +141,23 @@ module.exports = {
         })
         window.addEventListener('mousedown', (e)=>{
             this.event = new QmlMouseEvent({pressed: true})
-            this.event.x = e.pageX
-            this.event.y = e.pageY
+            this.event.originX = e.pageX
+            this.event.originY = e.pageY
             this.event.startX = e.pageX
             this.event.startY = e.pageY
             this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
 
             for(obj of this.event.path){
                 this.event.accepted = true
-                obj.__onMouseDown(this.event)
+                this.event.relative(obj)
+                obj.__onMouseDown(this.event) 
             }
         })
         window.addEventListener('mouseup', (e)=>{
             if(this.event){
-                this.event.x = e.pageX
-                this.event.y = e.pageY
-                
+                this.event.originX = e.pageX
+                this.event.originY = e.pageY
+                this.event.relative(obj)
                 if(this.event.target) this.event.target.__onMouseUp(this.event)
             }
         })
@@ -168,8 +176,8 @@ module.exports = {
         // })
         window.addEventListener('wheel', (e)=>{
             this.event = new QmlWheelEvent()
-            this.event.x = e.pageX
-            this.event.y = e.pageY
+            this.event.originX = e.pageX
+            this.event.originY = e.pageY
             this.event.angleDelta.x = e.deltaX / 8
             this.event.angleDelta.y = e.deltaY / 8
             this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
@@ -183,9 +191,9 @@ module.exports = {
 
     click: function(e){
         if(this.event && this.event.target){
-            this.event.x = e.pageX
-            this.event.y = e.pageY
-
+            this.event.originX = e.pageX
+            this.event.originY = e.pageY
+            this.event.relative(this.event.target)
             if(e.timeStamp - this.timeStamp > 300){
                 this.timeStamp = e.timeStamp
                 this.event.target.__onMouseClick(this.event)
