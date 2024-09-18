@@ -573,6 +573,15 @@ QString CSdlTools::GetNamespaceFromParamsOrArguments(
 	QString sdlNamespace;
 	if (schemaParamsCompPtr.IsValid()){
 		sdlNamespace = BuildNamespaceFromParams(*schemaParamsCompPtr);
+		if (argumentParamsCompPtr.IsValid()){
+			QString namespacePrefix =argumentParamsCompPtr->GetNamespacePrefix();
+			if (!namespacePrefix.isEmpty()){
+				while (!namespacePrefix.endsWith(QStringLiteral("::"))){
+					namespacePrefix.append(':');
+				}
+				sdlNamespace.prepend(namespacePrefix);
+			}
+		}
 	}
 
 	// we should override nmespace from agrs if it porvided

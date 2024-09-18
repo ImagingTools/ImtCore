@@ -29,6 +29,7 @@ public:
 	virtual QString GetSchemaFilePath() const = 0;
 	virtual QString GetOutputDirectoryPath() const = 0;
 	virtual QString GetNamespace() const = 0;
+	virtual QString GetNamespacePrefix() const = 0;
 	virtual bool IsDependenciesMode() const = 0;
 	virtual bool IsGenerateMode() const = 0;
 	virtual bool IsModificatorEnabled(const QString& modificatorName) const = 0;

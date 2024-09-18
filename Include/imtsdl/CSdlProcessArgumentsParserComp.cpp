@@ -30,6 +30,8 @@ CSdlProcessArgumentsParserComp::CSdlProcessArgumentsParserComp()
 }
 
 
+// reimplemented (ISdlProcessArgumentsParser)
+
 bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 {
 	QStringList arguments;
@@ -40,6 +42,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption schemaFilePathOption({"S","schema-file"}, "SDL schema file path", "SchemaFilePath");
 	QCommandLineOption outputDirectoryPathOption({"O","output-directory"}, "Directory where created files will be created", "OutputDirectoryPath");
 	QCommandLineOption namespaceOption({"N","namespace"}, "Namespace, used in source and header files", "Namespace");
+	QCommandLineOption namespacePrefixOption({"P","namespace-prefix"}, "Source and header files Namespace's prefix, will be added to the namespace in case, if namespace should be resolved from schema", "NamespacePrefix");
 	QCommandLineOption generateOption({"G","generate"}, "Generate code from SDL mode");
 	QCommandLineOption dependenciesOption({"D", "dependencies"}, "Generate a dependencies list to be generated. No code will be generated");
 	QCommandLineOption modificatorsOption({"M", "modificator"}, "Modificator to generate code. You can provide multiple modificators. Note: modifier names are case sensitive.", "ModificatorList");
@@ -60,6 +63,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 					schemaFilePathOption,
 					outputDirectoryPathOption,
 					namespaceOption,
+					namespacePrefixOption,
 					generateOption,
 					dependenciesOption,
 					modificatorsOption,
@@ -88,6 +92,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	}
 	if (commandLineParser.isSet(namespaceOption)){
 		m_namespace = commandLineParser.value(namespaceOption);
+	}
+	if (commandLineParser.isSet(namespacePrefixOption)){
+		m_namespacePrefix = commandLineParser.value(namespacePrefixOption);
 	}
 	if (commandLineParser.isSet(generateOption)){
 		m_isGenerateMode = true;
@@ -206,6 +213,12 @@ QString CSdlProcessArgumentsParserComp::GetOutputDirectoryPath() const
 QString CSdlProcessArgumentsParserComp::GetNamespace() const
 {
 	return m_namespace;
+}
+
+
+QString CSdlProcessArgumentsParserComp::GetNamespacePrefix() const
+{
+	return m_namespacePrefix;
 }
 
 

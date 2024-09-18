@@ -186,14 +186,6 @@ bool CGqlSchemaParser::ProcessSchema()
 	}
 	while(foundDelimiter != '}');
 
-	if (m_keywordMap.isEmpty()){
-		SendLogMessage(
-					istd::IInformationProvider::InformationCategory::IC_WARNING,
-					0,
-					QString("Schema does not contains keywords"),
-					"CGqlSchemaParser");
-	}
-
 	return retVal;
 }
 

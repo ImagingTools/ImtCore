@@ -8,10 +8,10 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="BaseClassExtender" X="350" Y="575" Note=""/>
-        <Element ComponentName="GqlSchemaParser" X="825" Y="425" Note=""/>
-        <Element ComponentName="SdlCodeCreatorProcessorsController" X="550" Y="325" Note=""/>
-        <Element ComponentName="SdlProcessArgumentsParser" X="825" Y="575" Note=""/>
+        <Element ComponentName="BaseClassExtender" X="1000" Y="250" Note=""/>
+        <Element ComponentName="GqlSchemaParser" X="425" Y="500" Note=""/>
+        <Element ComponentName="SdlCodeCreatorProcessorsController" X="575" Y="250" Note=""/>
+        <Element ComponentName="SdlProcessArgumentsParser" X="750" Y="500" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

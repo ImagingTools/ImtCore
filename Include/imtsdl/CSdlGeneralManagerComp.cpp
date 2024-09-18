@@ -1,7 +1,12 @@
 #include "CSdlGeneralManagerComp.h"
 
 
+// Qt includes
+#include <QtCore/QLockFile>
+
+
 // ACF includes
+#include <istd/CSystem.h>
 #include <iprm/TParamsPtr.h>
 #include <ifile/IFileNameParam.h>
 
@@ -15,6 +20,22 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	Q_ASSERT(m_sdlParserCompPtr.IsValid());
+	Q_ASSERT(m_sdlArgumentParserCompPtr.IsValid());
+
+	const QString outputDirPath = m_sdlArgumentParserCompPtr->GetOutputDirectoryPath();
+	const bool isOutputDirExsists = istd::CSystem::EnsurePathExists(outputDirPath);
+	if (!isOutputDirExsists){
+		SendErrorMessage(0, QString("Unable to create output directory '%1'").arg(outputDirPath));
+
+		::exit(-1);
+	}
+
+	QLockFile lockFile(outputDirPath + QStringLiteral("/lock"));
+	const bool isLocked = lockFile.lock();
+	if (!isLocked){
+		SendErrorMessage(0, QString("Unable to lock file '%1'. Perhaps you don't have permissions").arg(lockFile.fileName()));
+	}
+
 
 	// parse schema
 	int parsingResult = m_sdlParserCompPtr->DoProcessing(nullptr, nullptr, nullptr);
@@ -40,6 +61,8 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 			}
 		}
 	}
+
+	lockFile.unlock();
 
 	::exit(0);
 }
