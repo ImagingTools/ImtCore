@@ -120,15 +120,23 @@ module.exports = {
                 }
             }
 
-            for(obj of event.path){
-                event.relative(obj)
-                if(event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height){
-                    if(this.entered.indexOf(obj) < 0) {
-                        this.entered.push(obj)
-                        obj.__onMouseEnter(event)
+            i = 0
+            while(i < event.path.length){
+                if(event.path[i].__destroyed) {
+                    event.path.splice(i, 1)
+                    continue
+                }
+
+                event.relative(event.path[i])
+                if(event.x >= 0 && event.y >= 0 && event.x < event.path[i].width && event.y < event.path[i].height){
+                    if(this.entered.indexOf(event.path[i]) < 0) {
+                        this.entered.push(event.path[i])
+                        event.path[i].__onMouseEnter(event)
                     }
                 } 
-                obj.__onMouseMove(event)
+                event.path[i].__onMouseMove(event)
+
+                i++
             }
         })
 

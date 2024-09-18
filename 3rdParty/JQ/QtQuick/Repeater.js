@@ -40,12 +40,12 @@ class Repeater extends Item {
             this.model.__addViewListener(this)
         }
 
-        this.__updateView()
+        this.__initView()
     }
 
     onDelegateChanged(){
         this.__clear()
-        this.__updateView()
+        this.__initView()
     }
 
     __clear(){
@@ -55,10 +55,16 @@ class Repeater extends Item {
         this.__items = []
     }
 
-    __updateView(changeSet){
+    __createItem(model){
+        let item = this.delegate.createObject(this.parent, model)
+
+        return item
+    }
+
+    __initView(){
         if(this.delegate && this.model){
             JQApplication.beginUpdate()
-            JQApplication.updateLater(this.parent)
+            JQApplication.updateLater(this)
 
             let countChanged = false
 
@@ -67,11 +73,10 @@ class Repeater extends Item {
                     countChanged = true
                     this.__getObject('count').__value = this.model
                 }
-                
+
                 for(let i = 0; i < this.model; i++){
-                    let item = this.delegate.createObject(this.parent, {index: i})
+                    let item = this.__createItem({index: i})
                     this.__items.push(item)
-                    // item.__complete()
                     this.itemAdded(item)
                 }
             } else {
@@ -81,9 +86,8 @@ class Repeater extends Item {
                 }
 
                 for(let i = 0; i < this.model.data.length; i++){
-                    let item = this.delegate.createObject(this.parent, this.model.data[i])
+                    let item = this.__createItem(this.model.data[i])
                     this.__items.push(item)
-                    // item.__complete()
                     this.itemAdded(item)
                 }
             }
@@ -93,6 +97,90 @@ class Repeater extends Item {
             JQApplication.endUpdate()
         }
     }
+
+    __updateView(changeSet){
+        if(this.delegate && this.model){
+            if(this.model.data.length === this.__items.length) return
+            JQApplication.beginUpdate()
+            JQApplication.updateLater(this.parent)
+
+            let countChanged = false
+
+            if(this.count !== this.model.data.length){
+                countChanged = true
+                this.__getObject('count').__value = this.model.data.length
+            }
+
+            for(let change of changeSet){
+                let leftTop = change[0]
+                let bottomRight = change[1]
+                let role = change[2]
+
+                if(role === 'append'){
+                    for(let i = leftTop; i < bottomRight; i++){
+                        let item = this.__createItem(this.model.data[i])
+                        this.__items[i] = item
+                        this.itemAdded(item)
+                    }
+                } else if(role === 'insert'){
+                    for(let i = leftTop; i < bottomRight; i++){
+                        let item = this.__createItem(this.model.data[i])
+                        this.__items.splice(i, 0, item)
+                        this.itemAdded(item)
+                    }
+                } else if(role === 'remove'){
+                    let removed = this.__items.splice(leftTop, bottomRight - leftTop)
+                    for(let r of removed){
+                        this.itemRemoved(r)
+                        if(r) r.__destroy()
+                    }
+                }
+            }
+
+            if(countChanged) this.countChanged()
+
+            JQApplication.endUpdate()
+        }
+    }
+
+    // __updateView(changeSet){
+    //     if(this.delegate && this.model){
+    //         JQApplication.beginUpdate()
+    //         JQApplication.updateLater(this.parent)
+
+    //         let countChanged = false
+
+    //         if(typeof this.model === 'number'){
+    //             if(this.count !== this.model){
+    //                 countChanged = true
+    //                 this.__getObject('count').__value = this.model
+    //             }
+                
+    //             for(let i = 0; i < this.model; i++){
+    //                 let item = this.delegate.createObject(this.parent, {index: i})
+    //                 this.__items.push(item)
+    //                 // item.__complete()
+    //                 this.itemAdded(item)
+    //             }
+    //         } else {
+    //             if(this.count !== this.model.data.length){
+    //                 countChanged = true
+    //                 this.__getObject('count').__value = this.model.data.length
+    //             }
+
+    //             for(let i = 0; i < this.model.data.length; i++){
+    //                 let item = this.delegate.createObject(this.parent, this.model.data[i])
+    //                 this.__items.push(item)
+    //                 // item.__complete()
+    //                 this.itemAdded(item)
+    //             }
+    //         }
+
+    //         if(countChanged) this.countChanged()
+
+    //         JQApplication.endUpdate()
+    //     }
+    // }
 }
 
 module.exports = Repeater
