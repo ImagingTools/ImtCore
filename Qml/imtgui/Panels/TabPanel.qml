@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Rectangle {
     id: tabPanelContainer;
 
-    width: list.contentWidth;
+    width: list.contentWidth + externButtons.width;
     height: 40;
 
     color: Style.tabPanelBackgroundColor;
@@ -50,7 +50,7 @@ Rectangle {
         id: list;
 
         anchors.left: parent.left;
-        anchors.right: externButtons.left;
+        width: externButtons.visible ? tabPanelContainer.width - externButtons.width : contentWidth
 
         height: parent.height;
 
