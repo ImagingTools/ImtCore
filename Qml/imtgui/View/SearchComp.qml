@@ -564,6 +564,7 @@ Rectangle{
         keepFilterText: true;
         preventFirstLoading:  filterText !== ""; //searchContainer.externalSearchParam !=="";
         closeEmpty: true;
+        image.visible: !clearButton.visible;
 
         canClose: true;
         doNotCorrectPosition : true;
@@ -678,7 +679,6 @@ Rectangle{
     }
 
 
-
     Text {
         id: placeHolder;
 
@@ -700,11 +700,12 @@ Rectangle{
         id: clearButton;
 
         anchors.verticalCenter: parent.verticalCenter;
-        anchors.left: parent.right;
-        anchors.leftMargin: 6;
+        anchors.right: parent.right;
+        anchors.rightMargin: 6;
 
         width: height;
-        height: Math.max(parent.height/2, 16);
+        height: 12;//Math.max(parent.height/2, 16);
+
         decorator: Component{IconButtonDecorator{}}
 
         iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
