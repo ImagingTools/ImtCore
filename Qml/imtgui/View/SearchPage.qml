@@ -69,12 +69,12 @@ ViewBase {
                     let name = itemsModel.getData("Name", j);
                     let description = itemsModel.getData("Description", j);
 
-                    let index = allItemsModel.InsertNewItem();
-                    allItemsModel.setData("Id", id);
-                    allItemsModel.setData("TabId", tabId);
-                    allItemsModel.setData("TypeId", typeId);
-                    allItemsModel.setData("Name", name);
-                    allItemsModel.setData("Description", description);
+                    let index = allItemsModel.insertNewItem();
+                    allItemsModel.setData("Id", id, index);
+                    allItemsModel.setData("TabId", tabId, index);
+                    allItemsModel.setData("TypeId", typeId, index);
+                    allItemsModel.setData("Name", name, index);
+                    allItemsModel.setData("Description", description, index);
                 }
             }
         }
