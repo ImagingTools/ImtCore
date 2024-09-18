@@ -15,12 +15,12 @@ namespace imtlicgql
 
 // protected methods
 
-// reimplemented (sdl::imtlic::Licenses::CLicenseCollectionControllerCompBase)
+// reimplemented (sdl::imtlic::Licenses::V1_0::CLicenseCollectionControllerCompBase)
 
 bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-	const sdl::imtlic::Licenses::CLicensesListGqlRequest& licensesListRequest,
-	sdl::imtlic::Licenses::CLicenseItem& representationObject,
+	const sdl::imtlic::Licenses::V1_0::CLicensesListGqlRequest& licensesListRequest,
+	sdl::imtlic::Licenses::V1_0::CLicenseItem& representationObject,
 	QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -47,7 +47,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 
 	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
 
-	sdl::imtlic::Licenses::LicensesListRequestInfo requestInfo = licensesListRequest.GetRequestInfo();
+	sdl::imtlic::Licenses::V1_0::LicensesListRequestInfo requestInfo = licensesListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.SetId(objectId);
@@ -116,7 +116,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentation(
-	const sdl::imtlic::Licenses::CLicenseData& licenseDataRepresentation,
+	const sdl::imtlic::Licenses::V1_0::CLicenseData& licenseDataRepresentation,
 	QByteArray& newObjectId,
 	QString& name,
 	QString& description,
@@ -209,8 +209,8 @@ istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentat
 
 bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	const istd::IChangeable& data,
-	const sdl::imtlic::Licenses::CLicenseItemGqlRequest& licenseItemRequest,
-	sdl::imtlic::Licenses::CLicenseDataPayload& representationPayload,
+	const sdl::imtlic::Licenses::V1_0::CLicenseItemGqlRequest& licenseItemRequest,
+	sdl::imtlic::Licenses::V1_0::CLicenseDataPayload& representationPayload,
 	QString& errorMessage) const
 {
 	const imtlic::CIdentifiableLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CIdentifiableLicenseDefinition*>(&data);
@@ -221,8 +221,8 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtlic::Licenses::LicenseItemRequestArguments arguments = licenseItemRequest.GetRequestedArguments();
-	sdl::imtlic::Licenses::CLicenseData licenseData;
+	sdl::imtlic::Licenses::V1_0::LicenseItemRequestArguments arguments = licenseItemRequest.GetRequestedArguments();
+	sdl::imtlic::Licenses::V1_0::CLicenseData licenseData;
 
 	licenseData.SetId(arguments.input.GetId());
 

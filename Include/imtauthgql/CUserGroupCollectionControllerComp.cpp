@@ -11,12 +11,12 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::imtauth::Groups::CGroupCollectionControllerCompBase)
+// reimplemented (sdl::imtauth::Groups::V1_0::CGroupCollectionControllerCompBase)
 
 bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtauth::Groups::CGroupsListGqlRequest& groupsListRequest,
-			sdl::imtauth::Groups::CGroupItem& representationObject,
+			const sdl::imtauth::Groups::V1_0::CGroupsListGqlRequest& groupsListRequest,
+			sdl::imtauth::Groups::V1_0::CGroupItem& representationObject,
 			QString& errorMessage) const
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
@@ -35,7 +35,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtauth::Groups::GroupsListRequestInfo requestInfo = groupsListRequest.GetRequestInfo();
+	sdl::imtauth::Groups::V1_0::GroupsListRequestInfo requestInfo = groupsListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.SetId(objectId);
@@ -78,7 +78,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresentation(
-			const sdl::imtauth::Groups::CGroupData& groupDataRepresentation,
+			const sdl::imtauth::Groups::V1_0::CGroupData& groupDataRepresentation,
 			QByteArray& newObjectId,
 			QString& name,
 			QString& description,
@@ -170,8 +170,8 @@ istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresent
 
 bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const sdl::imtauth::Groups::CGroupItemGqlRequest& groupItemRequest,
-			sdl::imtauth::Groups::CGroupDataPayload& representationPayload,
+			const sdl::imtauth::Groups::V1_0::CGroupItemGqlRequest& groupItemRequest,
+			sdl::imtauth::Groups::V1_0::CGroupDataPayload& representationPayload,
 			QString& errorMessage) const
 {
 	const imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(&data);
@@ -182,8 +182,8 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtauth::Groups::GroupItemRequestArguments arguments = groupItemRequest.GetRequestedArguments();
-	sdl::imtauth::Groups::CGroupData groupData;
+	sdl::imtauth::Groups::V1_0::GroupItemRequestArguments arguments = groupItemRequest.GetRequestedArguments();
+	sdl::imtauth::Groups::V1_0::CGroupData groupData;
 
 	QByteArray productId = arguments.input.GetProductId();
 

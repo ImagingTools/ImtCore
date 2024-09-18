@@ -2,9 +2,11 @@ project(imtlicsdl LANGUAGES CXX)
 
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
-include(${IMTCOREDIR}/Config/CMake/ImtCoreSdlModuleConfig.cmake)
+include(${IMTCOREDIR}/Config/CMake/ImtCoreSdlAutoConfig.cmake)
 
-ImtCoreModuleConfigureSdlCppQml("1.0/Features" "CPP/Features" "sdl::imtlic::Features" "QML" "imtlicFeaturesSdl")
-ImtCoreModuleConfigureSdlCppQml("1.0/Licenses" "CPP/Licenses" "sdl::imtlic::Licenses" "QML" "imtlicLicensesSdl")
-ImtCoreModuleConfigureSdlCppQml("1.0/Products" "CPP/Products" "sdl::imtlic::Products" "QML" "imtlicProductsSdl")
 
+set(SDL_SOURCES)
+list(APPEND SDL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/../1.0/Features.sdl")
+list(APPEND SDL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/../1.0/Licenses.sdl")
+list(APPEND SDL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/../1.0/Products.sdl")
+ImtCoreAutoConfigureSdlCppQml("${SDL_SOURCES}")
