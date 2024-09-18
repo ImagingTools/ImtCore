@@ -52,7 +52,7 @@ void CGqlRequest::AddSimpleField(const QByteArray &fieldId)
 }
 
 
-void CGqlRequest::SetGqlContext(const IGqlContext *gqlContext)
+void CGqlRequest::SetGqlContext(const IGqlContext* gqlContext)
 {
 	if (m_gqlContextPtr != gqlContext){
 		istd::CChangeNotifier changeNotifier(this);

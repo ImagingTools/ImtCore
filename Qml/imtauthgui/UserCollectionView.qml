@@ -75,7 +75,7 @@ RemoteCollectionView {
 
                         let index = systemInfoModel.insertNewItem();
                         systemInfoModel.setData("Id", "All", index)
-                        systemInfoModel.setData("Name", qsTr("All System"), index)
+                        systemInfoModel.setData("Name", qsTr("All Systems"), index)
 
                         index = systemInfoModel.insertNewItem();
                         systemInfoModel.setData("Id", "Internal", index)
@@ -154,7 +154,6 @@ RemoteCollectionView {
         collectionFilter.setSortingOrder("ASC");
         collectionFilter.setSortingInfoId("Name");
 
-        // let documentManager = MainDocumentManager.getDocumentManager("Administration");
         if (documentManager){
             userCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 
@@ -173,7 +172,6 @@ RemoteCollectionView {
             width: userCollectionViewContainer.table.width;
             minHeight: userCollectionViewContainer.table.itemHeight;
             readOnly: userCollectionViewContainer.table.readOnly;
-            //            color: selected ? Style.selectedColor : model.SystemId !== "" ? "red" : "transparent";
         }
     }
 

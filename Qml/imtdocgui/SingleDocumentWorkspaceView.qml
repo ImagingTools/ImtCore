@@ -15,8 +15,6 @@ Rectangle {
     property DocumentManager documentManager;
 
     onDocumentManagerChanged: {
-        console.log("onDocumentManagerChanged", documentManager);
-
         if (documentManager){
             if (Qt.platform.os === "web"){
                 documentManager.generateDocumentTitle = root.generateDocumentTitle;

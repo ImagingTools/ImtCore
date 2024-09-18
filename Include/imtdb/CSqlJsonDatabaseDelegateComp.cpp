@@ -39,10 +39,15 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetSelectionQuery(
 				.arg(qPrintable(objectId)).toUtf8();
 	}
 
-	iprm::TParamsPtr<iprm::IEnableableParam> enableableParamPtr(paramsPtr, "IsHistory");
-	if (enableableParamPtr.IsValid()){
-		if (enableableParamPtr->IsEnabled()){
-			return CreateObjectHistoryQuery(offset, count, paramsPtr);
+	if (paramsPtr != nullptr){
+		iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
+		if (paramIds.contains("IsHistory")){
+			iprm::TParamsPtr<iprm::IEnableableParam> enableableParamPtr(paramsPtr, "IsHistory");
+			if (enableableParamPtr.IsValid()){
+				if (enableableParamPtr->IsEnabled()){
+					return CreateObjectHistoryQuery(offset, count, paramsPtr);
+				}
+			}
 		}
 	}
 
@@ -345,29 +350,38 @@ bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& fil
 {
 	bool retVal = true;
 	QString objectFilterQuery;
-	iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
-	if (objectFilterParamPtr.IsValid()){
-		retVal = CreateObjectFilterQuery(*objectFilterParamPtr, objectFilterQuery);
-		if (!retVal){
-			return false;
+
+	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+
+	if (paramIds.contains("ObjectFilter")){
+		iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
+		if (objectFilterParamPtr.IsValid()){
+			retVal = CreateObjectFilterQuery(*objectFilterParamPtr, objectFilterQuery);
+			if (!retVal){
+				return false;
+			}
 		}
 	}
 
 	QString textFilterQuery;
-	iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
-	if (collectionFilterParamPtr.IsValid()){
-		retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
-		if (!retVal){
-			return false;
+	if (paramIds.contains("Filter")){
+		iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
+		if (collectionFilterParamPtr.IsValid()){
+			retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
+			if (!retVal){
+				return false;
+			}
 		}
 	}
 
 	QString timeFilterQuery;
-	iprm::TParamsPtr<imtbase::ITimeFilterParam> timeFilterParamPtr(&filterParams, "TimeFilter");
-	if (timeFilterParamPtr.IsValid()){
-		retVal = CreateTimeFilterQuery(*timeFilterParamPtr, timeFilterQuery);
-		if (!retVal){
-			return false;
+	if (paramIds.contains("TimeFilter")){
+		iprm::TParamsPtr<imtbase::ITimeFilterParam> timeFilterParamPtr(&filterParams, "TimeFilter");
+		if (timeFilterParamPtr.IsValid()){
+			retVal = CreateTimeFilterQuery(*timeFilterParamPtr, timeFilterQuery);
+			if (!retVal){
+				return false;
+			}
 		}
 	}
 

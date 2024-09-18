@@ -50,7 +50,6 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User with ID '%1' was not found.").arg(qPrintable(token)).arg(qPrintable(userId));
-
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
 
 		return nullptr;
@@ -60,7 +59,6 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	clonedUserInfoPtr.SetCastedOrRemove(userInfoPtr->CloneMe());
 	if (!clonedUserInfoPtr.IsValid()){
 		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Error when trying to clone an user.").arg(qPrintable(token)).arg(qPrintable(userId));
-
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
 
 		return nullptr;
