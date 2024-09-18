@@ -16,7 +16,7 @@ namespace imtlicgql
 // protected methods
 
 bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
-			const sdl::imtlic::Features::V1_0::CFeatureData& featureRepresentationData,
+			const sdl::imtlic::Features::CFeatureData& featureRepresentationData,
 			imtlic::CFeatureInfo& featureInfo,
 			QString& errorMessage) const
 {
@@ -65,8 +65,8 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	bool isOptional = featureRepresentationData.GetOptional();
 	featureInfo.SetOptional(isOptional);
 
-	QList<sdl::imtlic::Features::V1_0::CFeatureData> subFeatureDataList = featureRepresentationData.GetSubFeatures();
-	for (const sdl::imtlic::Features::V1_0::CFeatureData& subFeatureData : subFeatureDataList){
+	QList<sdl::imtlic::Features::CFeatureData> subFeatureDataList = featureRepresentationData.GetSubFeatures();
+	for (const sdl::imtlic::Features::CFeatureData& subFeatureData : subFeatureDataList){
 		imtlic::CFeatureInfo* subFeatureInfoPtr = new imtlic::CFeatureInfo();
 
 		bool ok = CreateFeatureFromRepresentationModel(subFeatureData, *subFeatureInfoPtr, errorMessage);
@@ -83,7 +83,7 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 
 bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 			const imtlic::CFeatureInfo& featureInfo,
-			sdl::imtlic::Features::V1_0::CFeatureData& featureRepresentationData,
+			sdl::imtlic::Features::CFeatureData& featureRepresentationData,
 			QString& errorMessage) const
 {
 	QByteArray featureId = featureInfo.GetFeatureId();
@@ -102,7 +102,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 	bool isOptional = featureInfo.IsOptional();
 	featureRepresentationData.SetOptional(isOptional);
 
-	QList<sdl::imtlic::Features::V1_0::CFeatureData> subFeatureDataList;
+	QList<sdl::imtlic::Features::CFeatureData> subFeatureDataList;
 	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 	if (!subFeatures.IsEmpty()){
 		for (int i = 0; i < subFeatures.GetCount(); i++){
@@ -114,7 +114,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 			const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr);
 			Q_ASSERT(subFeatureInfoPtr != nullptr);
 
-			sdl::imtlic::Features::V1_0::CFeatureData subfeatureData;
+			sdl::imtlic::Features::CFeatureData subfeatureData;
 			imtbase::CTreeItemModel subFeatureRepresentationModel;
 			bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, subfeatureData, errorMessage);
 			if (!ok){
@@ -131,12 +131,12 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 }
 
 
-// reimplemented (sdl::imtlic::Features::V1_0::CFeatureCollectionControllerCompBase)
+// reimplemented (sdl::imtlic::Features::CFeatureCollectionControllerCompBase)
 
 bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtlic::Features::V1_0::CFeaturesListGqlRequest& featuresListRequest,
-			sdl::imtlic::Features::V1_0::CFeatureItem& representationObject,
+			const sdl::imtlic::Features::CFeaturesListGqlRequest& featuresListRequest,
+			sdl::imtlic::Features::CFeatureItem& representationObject,
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -163,7 +163,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
 
-	sdl::imtlic::Features::V1_0::FeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
+	sdl::imtlic::Features::FeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.SetId(objectId);
@@ -198,7 +198,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isSubFeaturesRequested){
-		sdl::imtlic::Features::V1_0::CFeatureData featureData;
+		sdl::imtlic::Features::CFeatureData featureData;
 		bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, featureData, errorMessage);
 		if (ok){
 			representationObject.SetSubFeatures(featureData.GetSubFeatures());
@@ -226,7 +226,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentation(
-			const sdl::imtlic::Features::V1_0::CFeatureData& featureDataRepresentation,
+			const sdl::imtlic::Features::CFeatureData& featureDataRepresentation,
 			QByteArray& newObjectId,
 			QString& name,
 			QString& description,
@@ -280,8 +280,8 @@ istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentat
 
 bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const sdl::imtlic::Features::V1_0::CGetFeatureItemGqlRequest& featureItemRequest,
-			sdl::imtlic::Features::V1_0::CFeatureDataPayload& representationPayload,
+			const sdl::imtlic::Features::CGetFeatureItemGqlRequest& featureItemRequest,
+			sdl::imtlic::Features::CFeatureDataPayload& representationPayload,
 			QString& errorMessage) const
 {
 	const imtlic::CIdentifiableFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CIdentifiableFeatureInfo*>(&data);
@@ -292,9 +292,9 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtlic::Features::V1_0::GetFeatureItemRequestArguments arguments = featureItemRequest.GetRequestedArguments();
+	sdl::imtlic::Features::GetFeatureItemRequestArguments arguments = featureItemRequest.GetRequestedArguments();
 
-	sdl::imtlic::Features::V1_0::CFeatureData featureData;
+	sdl::imtlic::Features::CFeatureData featureData;
 
 	QByteArray id = arguments.input.GetId();
 	featureData.SetId(id);

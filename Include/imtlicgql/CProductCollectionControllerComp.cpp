@@ -19,12 +19,12 @@ namespace imtlicgql
 
 // protected methods
 
-// reimplemented (sdl::imtlic::Products::V1_0::CProductCollectionControllerCompBase)
+// reimplemented (sdl::imtlic::Products::CProductCollectionControllerCompBase)
 
 bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtlic::Products::V1_0::CProductsListGqlRequest& productsListRequest,
-			sdl::imtlic::Products::V1_0::CProductItem& representationObject,
+			const sdl::imtlic::Products::CProductsListGqlRequest& productsListRequest,
+			sdl::imtlic::Products::CProductItem& representationObject,
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -51,7 +51,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 
 	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
 
-	sdl::imtlic::Products::V1_0::ProductsListRequestInfo requestInfo = productsListRequest.GetRequestInfo();
+	sdl::imtlic::Products::ProductsListRequestInfo requestInfo = productsListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.SetId(objectId);
@@ -137,7 +137,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeable* CProductCollectionControllerComp::CreateObjectFromRepresentation(
-			const sdl::imtlic::Products::V1_0::CProductData& productDataRepresentation,
+			const sdl::imtlic::Products::CProductData& productDataRepresentation,
 			QByteArray& newObjectId,
 			QString& name,
 			QString& description,
@@ -249,8 +249,8 @@ istd::IChangeable* CProductCollectionControllerComp::CreateObjectFromRepresentat
 
 bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const sdl::imtlic::Products::V1_0::CProductItemGqlRequest& productItemRequest,
-			sdl::imtlic::Products::V1_0::CProductDataPayload& representationPayload,
+			const sdl::imtlic::Products::CProductItemGqlRequest& productItemRequest,
+			sdl::imtlic::Products::CProductDataPayload& representationPayload,
 			QString& errorMessage) const
 {
 	const imtlic::CIdentifiableProductInfo* productInfoPtr = dynamic_cast<const imtlic::CIdentifiableProductInfo*>(&data);
@@ -261,9 +261,9 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtlic::Products::V1_0::ProductItemRequestArguments arguments = productItemRequest.GetRequestedArguments();
+	sdl::imtlic::Products::ProductItemRequestArguments arguments = productItemRequest.GetRequestedArguments();
 
-	sdl::imtlic::Products::V1_0::CProductData productData;
+	sdl::imtlic::Products::CProductData productData;
 
 	QByteArray id = arguments.input.GetId();
 	productData.SetId(id);

@@ -4,17 +4,17 @@
 // ImtCore includes
 #include <imtlic/IProductInfo.h>
 #include <imtgql/CObjectCollectionControllerCompBase.h>
-#include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Products.h>
+#include <GeneratedFiles/imtlicsdl/SDL/CPP/Products/Products.h>
 
 
 namespace imtlicgql
 {
 
 
-class CProductCollectionControllerComp: public sdl::imtlic::Products::V1_0::CProductCollectionControllerCompBase
+class CProductCollectionControllerComp: public sdl::imtlic::Products::CProductCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtlic::Products::V1_0::CProductCollectionControllerCompBase BaseClass;
+	typedef sdl::imtlic::Products::CProductCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProductCollectionControllerComp);
 		I_ASSIGN(m_licenseCollectionCompPtr, "LicenseCollection", "License collection", true, "LicenseCollection");
@@ -22,22 +22,22 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtlic::Products::V1_0::CProductCollectionControllerCompBase)
+	// reimplemented (sdl::imtlic::Products::CProductCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtlic::Products::V1_0::CProductsListGqlRequest& productsListRequest,
-				sdl::imtlic::Products::V1_0::CProductItem& representationObject,
+				const sdl::imtlic::Products::CProductsListGqlRequest& productsListRequest,
+				sdl::imtlic::Products::CProductItem& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
-				const sdl::imtlic::Products::V1_0::CProductData& productDataRepresentation,
+				const sdl::imtlic::Products::CProductData& productDataRepresentation,
 				QByteArray& newObjectId,
 				QString& name,
 				QString& description,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::imtlic::Products::V1_0::CProductItemGqlRequest& productItemRequest,
-				sdl::imtlic::Products::V1_0::CProductDataPayload& representationPayload,
+				const sdl::imtlic::Products::CProductItemGqlRequest& productItemRequest,
+				sdl::imtlic::Products::CProductDataPayload& representationPayload,
 				QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual void SetObjectFilter(const imtgql::CGqlRequest& gqlRequest,

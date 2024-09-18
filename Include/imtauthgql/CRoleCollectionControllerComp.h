@@ -5,17 +5,17 @@
 #include <imtauth/CRole.h>
 #include <imtgql/CObjectCollectionControllerCompBase.h>
 #include <imtgql/IGqlRequestProvider.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
+#include <GeneratedFiles/imtauthsdl/SDL/CPP/Roles/Roles.h>
 
 
 namespace imtauthgql
 {
 
 
-class CRoleCollectionControllerComp: public sdl::imtauth::Roles::V1_0::CRoleCollectionControllerCompBase
+class CRoleCollectionControllerComp: public sdl::imtauth::Roles::CRoleCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtauth::Roles::V1_0::CRoleCollectionControllerCompBase BaseClass;
+	typedef sdl::imtauth::Roles::CRoleCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRoleCollectionControllerComp);
 		I_ASSIGN(m_gqlRequestProviderCompPtr, "GqlRequestProvider", "GraphQL request provider", false, "GqlRequestProvider");
@@ -24,22 +24,22 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtauth::Roles::V1_0::CRoleCollectionControllerCompBase)
+	// reimplemented (sdl::imtauth::Roles::CRoleCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtauth::Roles::V1_0::CRolesListGqlRequest& rolesListRequest,
-				sdl::imtauth::Roles::V1_0::CRoleItem& representationObject,
+				const sdl::imtauth::Roles::CRolesListGqlRequest& rolesListRequest,
+				sdl::imtauth::Roles::CRoleItem& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
-				const sdl::imtauth::Roles::V1_0::CRoleData& roleDataRepresentation,
+				const sdl::imtauth::Roles::CRoleData& roleDataRepresentation,
 				QByteArray& newObjectId,
 				QString& name,
 				QString& description,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::imtauth::Roles::V1_0::CRoleItemGqlRequest& roleItemRequest,
-				sdl::imtauth::Roles::V1_0::CRoleDataPayload& representationPayload,
+				const sdl::imtauth::Roles::CRoleItemGqlRequest& roleItemRequest,
+				sdl::imtauth::Roles::CRoleDataPayload& representationPayload,
 				QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual void SetAdditionalFilters(
