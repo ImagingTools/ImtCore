@@ -15,25 +15,19 @@ namespace imtbase
 
 
 bool CDocumentChangeGeneratorCompBase::GenerateDocumentChanges(
-			int operationType,
+			imtbase::IOperationDescription::OperationType operationType,
 			const QByteArray& documentId,
-			const istd::IChangeable* documentPtr,
+			const istd::IChangeable& document,
 			CObjectCollection& documentChangeCollection,
 			QString& errorMessage,
 			const iprm::IParamsSet* /*paramsPtr*/)
 {
-	if (operationType == OperationType::OT_CREATE){
-		documentChangeCollection.InsertNewObject("OperationInfo", "", "", CreateOperationDescription("Create", "", "", "", ""));
+	if (operationType == imtbase::IOperationDescription::OperationType::OT_CREATE){
+		documentChangeCollection.InsertNewObject("OperationInfo", "", "", CreateOperationDescription(operationType, "", "", "", ""));
 	}
-	else if (operationType == OperationType::OT_UPDATE){
+	else if (operationType == imtbase::IOperationDescription::OperationType::OT_UPDATE){
 		if (!m_objectCollectionCompPtr.IsValid()){
 			errorMessage = QString("Unable to generate document changes. Internal error");
-
-			return false;
-		}
-
-		if (documentPtr == nullptr){
-			errorMessage = QString("Unable to generate document changes for invalid document.");
 
 			return false;
 		}
@@ -49,7 +43,8 @@ bool CDocumentChangeGeneratorCompBase::GenerateDocumentChanges(
 					return false;
 				}
 
-				return CompareDocuments(oldDocumentPtr.PopPtr(), documentPtr, documentChangeCollection, errorMessage);
+				bool ok = CompareDocuments(*oldDocumentPtr.GetPtr(), document, documentChangeCollection, errorMessage);
+				return ok;
 			}
 		}
 	}
@@ -69,7 +64,7 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 		if (documentChangeCollection.GetObjectData(elementId, dataPtr)){
 			const imtbase::COperationDescription* operationDescriptionPtr = dynamic_cast<const imtbase::COperationDescription*>(dataPtr.GetPtr());
 			if (operationDescriptionPtr != nullptr){
-				QByteArray typeId = operationDescriptionPtr->GetOperationTypeId();
+				imtbase::IOperationDescription::OperationType typeId = operationDescriptionPtr->GetOperationType();
 				QByteArray key = operationDescriptionPtr->GetKey();
 				QByteArray oldValue = operationDescriptionPtr->GetOldValue();
 				QByteArray newValue = operationDescriptionPtr->GetNewValue();
@@ -77,38 +72,38 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 				QString keyName = operationDescriptionPtr->GetKeyName();
 				keyName = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), keyName.toUtf8(), languageId, "Attribute");
 
-				if (typeId == QByteArray("Create")){
+				if (typeId == imtbase::IOperationDescription::OT_CREATE){
 					QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Created the document"), languageId, "imtbase::CDocumentChangeGeneratorCompBase");
 					retVal += change + "\n";
 				}
-				else if (typeId == QByteArray("Change")){
+				else if (typeId == imtbase::IOperationDescription::OT_CHANGE){
 					QString change = imtbase::GetTranslation(
-								m_translationManagerCompPtr.GetPtr(),
-								QString(QT_TR_NOOP("%1 changed from %2 to %3")).toUtf8(),
-								languageId,
-								"imtbase::CDocumentChangeGeneratorCompBase");
+						m_translationManagerCompPtr.GetPtr(),
+						QString(QT_TR_NOOP("'%1' changed from '%2' to '%3'")).toUtf8(),
+						languageId,
+						"imtbase::CDocumentChangeGeneratorCompBase");
 
 					change = change.arg(keyName).arg(qPrintable(oldValue)).arg(qPrintable(newValue));
 
 					retVal += change + "\n";
 				}
-				else if (typeId == QByteArray("Set")){
+				else if (typeId == imtbase::IOperationDescription::OT_SET){
 					QString change = imtbase::GetTranslation(
-								m_translationManagerCompPtr.GetPtr(),
-								QString(QT_TR_NOOP("%1 was set to %2")).toUtf8(),
-								languageId,
-								"imtbase::CDocumentChangeGeneratorCompBase");
+						m_translationManagerCompPtr.GetPtr(),
+						QString(QT_TR_NOOP("'%1' was set to '%2'")).toUtf8(),
+						languageId,
+						"imtbase::CDocumentChangeGeneratorCompBase");
 
 					change = change.arg(keyName).arg(qPrintable(newValue));
 
 					retVal += change + "\n";
 				}
-				else if (typeId == QByteArray("Clear")){
+				else if (typeId == imtbase::IOperationDescription::OT_CLEAR){
 					QString change = imtbase::GetTranslation(
-								m_translationManagerCompPtr.GetPtr(),
-								QString(QT_TR_NOOP("%1 was cleared")).toUtf8(),
-								languageId,
-								"imtbase::CDocumentChangeGeneratorCompBase");
+						m_translationManagerCompPtr.GetPtr(),
+						QString(QT_TR_NOOP("'%1' was cleared")).toUtf8(),
+						languageId,
+						"imtbase::CDocumentChangeGeneratorCompBase");
 
 					change = change.arg(keyName);
 
@@ -123,7 +118,7 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 
 
 imtbase::COperationDescription* CDocumentChangeGeneratorCompBase::CreateOperationDescription(
-			const QByteArray& operationTypeId,
+			imtbase::IOperationDescription::OperationType operationType,
 			const QByteArray& key,
 			const QString& keyName,
 			const QByteArray& oldValue,
@@ -132,21 +127,21 @@ imtbase::COperationDescription* CDocumentChangeGeneratorCompBase::CreateOperatio
 	istd::TDelPtr<imtbase::COperationDescription> operationDescriptionPtr;
 	operationDescriptionPtr.SetPtr(new imtbase::COperationDescription);
 
-	operationDescriptionPtr->SetOperationTypeId(operationTypeId);
+	operationDescriptionPtr->SetOperationType(operationType);
 	operationDescriptionPtr->SetKey(key);
 	operationDescriptionPtr->SetKeyName(keyName);
 	operationDescriptionPtr->SetOldValue(oldValue);
 	operationDescriptionPtr->SetNewValue(newValue);
 
-	if (operationTypeId.isEmpty()){
+	if (operationType == imtbase::IOperationDescription::OT_UNKNOWN){
 		if (!oldValue.isEmpty() && !newValue.isEmpty()){
-			operationDescriptionPtr->SetOperationTypeId(QByteArray("Change"));
+			operationDescriptionPtr->SetOperationType(imtbase::IOperationDescription::OT_CHANGE);
 		}
 		else if (oldValue.isEmpty() && !newValue.isEmpty()){
-			operationDescriptionPtr->SetOperationTypeId(QByteArray("Set"));
+			operationDescriptionPtr->SetOperationType(imtbase::IOperationDescription::OT_SET);
 		}
 		else if (!oldValue.isEmpty() && newValue.isEmpty()){
-			operationDescriptionPtr->SetOperationTypeId(QByteArray("Clear"));
+			operationDescriptionPtr->SetOperationType(imtbase::IOperationDescription::OT_CLEAR);
 		}
 	}
 

@@ -31,6 +31,7 @@ Item {
     signal endUpdate();
 
     onCollectionIdChanged: {
+        console.log("onCollectionIdChanged", collectionId)
         updateModel();
     }
 

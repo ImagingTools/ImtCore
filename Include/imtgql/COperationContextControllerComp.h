@@ -28,12 +28,10 @@ public:
 protected:
 	// reimplemented (imtbase::IOperationContextController)
 	virtual imtbase::IOperationContext* CreateOperationContext(
-				int operationType,
-				const imtgql::CGqlRequest& gqlRequest = imtgql::CGqlRequest(),
-				const QByteArray& objectId = QByteArray(),
-				const istd::IChangeable* objectDataPtr = nullptr,
-				const iprm::IParamsSet* paramsPtr = nullptr) override;
-
+				imtbase::IOperationDescription::OperationType operationType,
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				const iprm::IParamsSet* paramsPtr) override;
 protected:
 	I_REF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorCompPtr);
 };

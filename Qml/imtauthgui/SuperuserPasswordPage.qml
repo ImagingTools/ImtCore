@@ -2,7 +2,9 @@ import QtQuick 2.12
 import Acf 1.0
 import imtguigql 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 import imtcontrols 1.0
+import imtauthUsersSdl 1.0
 
 Rectangle {
     id: root;
@@ -11,34 +13,37 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property TreeItemModel userModel: TreeItemModel {}
+    property UserData userData: UserData {}
+    property string userId: "su";
 
     signal beforeSetted();
     signal passwordSetted();
     signal failed(string message);
 
     Component.onCompleted: {
-        root.userModel.setData("Username", "su");
-        root.userModel.setData("Name", "superuser");
+        userData.m_username = userId;
+        userData.m_name = "superuser";
     }
 
     function setSuperuserPassword(password){
         root.beforeSetted();
-
-        root.userModel.setData("Password", password);
-
-        documentController.documentModel = root.userModel;
+        userData.m_password = password;
+        documentController.documentModel = root.userData;
         documentController.insertDocument();
     }
 
-    GqlDocumentDataController{
+    GqlRequestDocumentDataController{
         id: documentController;
+        documentId: root.userId;
+        gqlGetCommandId: ImtauthUsersSdlCommandIds.s_userItem;
+        gqlUpdateCommandId: ImtauthUsersSdlCommandIds.s_userUpdate;
+        gqlAddCommandId: ImtauthUsersSdlCommandIds.s_userAdd;
 
-        documentId: "su";
-
-        gqlGetCommandId: "UserItem";
-        gqlAddCommandId: "UserAdd";
-        gqlUpdateCommandId: "UserUpdate";
+        Component.onCompleted: {
+            getRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, AuthorizationController.productId);
+            addRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, AuthorizationController.productId);
+            updateRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, AuthorizationController.productId);
+        }
 
         onSaved: {
             root.passwordSetted();
@@ -78,9 +83,7 @@ Rectangle {
 
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
-
-        spacing: 10;
-
+        spacing: Style.size_mainMargin;
         width: 300;
 
         Item {
@@ -89,9 +92,7 @@ Rectangle {
 
             BaseText {
                 id: title;
-
                 font.family: Style.fontFamilyBold;
-
                 text: qsTr("Please enter the password for system administrator");
             }
         }
@@ -126,7 +127,6 @@ Rectangle {
 
         BaseText {
             id: titleConfirmPassword;
-
             text: qsTr("Confirm Password");
         }
 

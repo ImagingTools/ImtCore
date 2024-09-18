@@ -219,17 +219,11 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewNode(
 	newName = inputParams.GetFieldArgumentValue("NewName").toString();
 	description = inputParams.GetFieldArgumentValue("Description").toString();
 
-	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
-
-	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_CREATE, gqlRequest));
-	}
-
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 
 	if (!nodeId.isEmpty()){
-		nodeId = m_collectionStructureCompPtr->InsertNewNode(newName, description, nodeId, parentNodeId, nullptr, operationContextPtr.GetPtr());
+		nodeId = m_collectionStructureCompPtr->InsertNewNode(newName, description, nodeId, parentNodeId, nullptr);
 		dataModel->SetData("Id", nodeId);
 		dataModel->SetData("ParentNodeId", parentNodeId);
 		dataModel->SetData("successful", !nodeId.isEmpty());
@@ -348,7 +342,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
 
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_CREATE, gqlRequest));
+		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IOperationDescription::OT_CREATE, objectId, *newObjectPtr));
 	}
 
 	imtbase::IStructuredObjectCollectionController* collectionStructureController = nullptr; // connect via I_REF 

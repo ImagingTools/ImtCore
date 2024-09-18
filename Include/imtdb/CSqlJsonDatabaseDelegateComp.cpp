@@ -569,7 +569,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateOperationDescriptionQuery(const Q
 
 			QByteArray json;
 			{
-				iser::CJsonMemWriteArchive archive(json);
+				iser::CJsonMemWriteArchive archive(json, m_versionInfoCompPtr.GetPtr());
 				if (!changeCollectionPtr->Serialize(archive)){
 					qDebug() << QString("Unable to serialize a change object collection");
 				}

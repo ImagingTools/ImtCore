@@ -3,11 +3,11 @@
 
 // ACF includes
 #include <istd/IPolymorphic.h>
+#include <iprm/IParamsSet.h>
 
 // imtbase includes
 #include <imtbase/IOperationContext.h>
-#include <imtbase/IDocumentChangeGenerator.h>
-#include <imtgql/CGqlRequest.h>
+#include <imtbase/IOperationDescription.h>
 
 
 namespace imtgql
@@ -18,10 +18,9 @@ class IOperationContextController: virtual public istd::IPolymorphic
 {
 public:
 	virtual imtbase::IOperationContext* CreateOperationContext(
-				int operationType,
-				const imtgql::CGqlRequest& gqlRequest = imtgql::CGqlRequest(),
-				const QByteArray& objectId = QByteArray(),
-				const istd::IChangeable* objectDataPtr = nullptr,
+				imtbase::IOperationDescription::OperationType operationType,
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
 				const iprm::IParamsSet* paramsPtr = nullptr) = 0;
 };
 

@@ -323,9 +323,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
-
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_CREATE, gqlRequest);
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IOperationDescription::OT_CREATE, objectId, *newObjectPtr.GetPtr());
 	}
 
 	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
@@ -387,7 +386,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_UPDATE, gqlRequest, objectId, savedObjectPtr.GetPtr());
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IOperationDescription::OT_UPDATE, objectId, *savedObjectPtr.GetPtr());
 	}
 
 	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
@@ -511,7 +510,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 	QString newName = inputParamPtr->GetFieldArgumentValue("NewName").toString();
 
 	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
-		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName).arg(qPrintable(objectId));
+		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(qPrintable(newName)).arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return nullptr;
@@ -747,13 +746,15 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 	if (objectId.isEmpty()){
 		errorMessage = QString("No object-ID could not be extracted from the request");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-
 		return nullptr;
 	}
 
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
+
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_REMOVE, gqlRequest);
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IOperationDescription::OT_REMOVE, objectId, *dataPtr.GetPtr());
 	}
 
 	if (!m_objectCollectionCompPtr->RemoveElement(objectId, operationContextPtr.GetPtr())){
@@ -893,7 +894,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(c
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(0, -1, &filterParams));
 	if (objectCollectionIterator == nullptr){
 		errorMessage = QString("Unable to get history for an object with ID: '%1'. Error when trying to create collection iterator.").arg(qPrintable(objectId));
-
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return nullptr;
