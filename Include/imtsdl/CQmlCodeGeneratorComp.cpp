@@ -166,7 +166,11 @@ int CQmlCodeGeneratorComp::DoProcessing(
 	}
 
 	// and finally create a QRC file
-	QFile qrcFile(outputDirectoryPath + "/" + qmlModuleName + ".qrc");
+	QString qrcFilePath = outputDirectoryPath + "/" + qmlModuleName + ".qrc";
+	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
+		qrcFilePath = GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath());
+	}
+	QFile qrcFile(qrcFilePath);
 	if (!qrcFile.open(QIODevice::WriteOnly)){
 		SendErrorMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
