@@ -16,20 +16,14 @@ ViewBase {
                 if (commandId == "Open"){
                     let indexes = table.getSelectedIndexes();
                     if (indexes.length > 0){
-                        let typeId;
-                        let elements = table.elements;
+                        if (tabPanel.selectedIndex >= 0){
+                            let typeId = root.model.getData("Id", tabPanel.selectedIndex);
+                            let elements = table.elements;
+                            let elementId = elements.getData("Id", indexes[0])
+                            let elementTypeId = elements.getData("TypeId", indexes[0])
 
-                        if (tabPanel.selectedIndex == 0){
-                            typeId = root.model.getData("TabId", tabPanel.selectedIndex);
+                            MainDocumentManager.openDocument(typeId, elementId, elementTypeId);
                         }
-                        else if (tabPanel.selectedIndex > 0){
-                            typeId = root.model.getData("Id", tabPanel.selectedIndex);
-                        }
-
-                        let elementId = elements.getData("Id", indexes[0])
-                        let elementTypeId = elements.getData("TypeId", indexes[0])
-
-                        MainDocumentManager.openDocument(typeId, elementId, elementTypeId);
                     }
                 }
             }
@@ -37,9 +31,7 @@ ViewBase {
     }
 
     onModelChanged: {
-        createAllTab();
         tabPanel.visible = model.getItemsCount() > 0;
-        tabPanel.model = model;
     }
 
     Component.onCompleted: {
@@ -49,35 +41,6 @@ ViewBase {
 
     Component.onDestruction: {
         Events.unSubscribeEvent("GlobalSearchActivated", root.update)
-    }
-
-    function createAllTab(){
-        let count = root.model.getItemsCount();
-        if (count > 0){
-            root.model.insertNewItem(0)
-            root.model.setData("Id", "All");
-            root.model.setData("Name", qsTr("All"));
-
-            let allItemsModel = root.model.addTreeModel("Items");
-
-            for (let i = 1; i < count; i++){
-                let tabId = root.model.getData("Id", i);
-                let itemsModel = root.model.getData("Items", i);
-                for (let j = 0; j < itemsModel.getItemsCount(); j++){
-                    let id = itemsModel.getData("Id", j);
-                    let typeId = itemsModel.getData("TypeId", j);
-                    let name = itemsModel.getData("Name", j);
-                    let description = itemsModel.getData("Description", j);
-
-                    let index = allItemsModel.insertNewItem();
-                    allItemsModel.setData("Id", id, index);
-                    allItemsModel.setData("TabId", tabId, index);
-                    allItemsModel.setData("TypeId", typeId, index);
-                    allItemsModel.setData("Name", name, index);
-                    allItemsModel.setData("Description", description, index);
-                }
-            }
-        }
     }
 
     function clearAll(){
@@ -138,6 +101,7 @@ ViewBase {
         anchors.topMargin: Style.size_mainMargin;
         anchors.horizontalCenter: parent.horizontalCenter;
         height: 30;
+        model: root.model;
         displayRoleId: "Name";
         visible: false;
         spacing: Style.size_mainMargin;
