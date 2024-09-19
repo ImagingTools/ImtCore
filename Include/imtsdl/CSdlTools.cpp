@@ -706,7 +706,11 @@ QString CSdlTools::GetAutoDefinedQmlBasePath(const iprm::IParamsSet& schemaParam
 	if (!baseFilePath.endsWith('/')){
 		baseFilePath += '/';
 	}
-	baseFilePath += QStringLiteral("QML");
+	baseFilePath += QStringLiteral("QML/");
+
+	const QString qmlModuleName = GetQmlModuleNameFromParamsOrArguments(&schemaParams, nullptr);
+	baseFilePath += qmlModuleName;
+	baseFilePath += QStringLiteral("Sdl");
 
 	QString retVal;
 	retVal = GetFileSystemAcceptableEntryPath(baseFilePath);

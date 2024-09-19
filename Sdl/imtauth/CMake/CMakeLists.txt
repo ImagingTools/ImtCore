@@ -14,17 +14,17 @@ ImtCoreAutoConfigureSdlCppQml(
 			CUSTOM_TARGETS_DEPS ON
 			CUSTOM_HEADER_DEP "1.0/CPP/Roles.h"
 			CUSTOM_SOURCE_DEP "1.0/CPP/Roles.cpp"
-			CUSTOM_QML_RES_DEP "1.0/QML/imtauthRolesSdl.qrc")
+			CUSTOM_QML_RES_DEP "1.0/QML/imtauthRolesSdl/imtauthRolesSdl.qrc")
 ImtCoreAutoConfigureSdlCppQml(
 			SDL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/../1.0/Users.sdl"
 			CUSTOM_TARGETS_DEPS ON
 			CUSTOM_HEADER_DEP "1.0/CPP/Users.h"
 			CUSTOM_SOURCE_DEP "1.0/CPP/Users.cpp"
-			CUSTOM_QML_RES_DEP "1.0/QML/imtauthUsersSdl.qrc")
+			CUSTOM_QML_RES_DEP "1.0/QML/imtauthUsersSdl/imtauthUsersSdl.qrc")
 ImtCoreAutoConfigureSdlCppQml(
 			SDL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/../1.0/Groups.sdl"
 			CUSTOM_TARGETS_DEPS ON
 			CUSTOM_HEADER_DEP "1.0/CPP/Groups.h"
 			CUSTOM_SOURCE_DEP "1.0/CPP/Groups.cpp"
-			CUSTOM_QML_RES_DEP "1.0/QML/imtauthGroupsSdl.qrc")
+			CUSTOM_QML_RES_DEP "1.0/QML/imtauthGroupsSdl/imtauthGroupsSdl.qrc")
 
