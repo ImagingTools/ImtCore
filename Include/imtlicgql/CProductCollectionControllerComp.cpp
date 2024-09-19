@@ -86,7 +86,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isLicensesRequested){
-		QList<sdl::imtlic::Products::CLicenseData> licenseDataList;
+		QList<sdl::imtlic::Products::V1_0::CLicenseData> licenseDataList;
 
 		if (m_licenseCollectionCompPtr.IsValid()){
 			iprm::CIdParam idParam;
@@ -105,7 +105,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 				if (m_licenseCollectionCompPtr->GetObjectData(licenseCollectionId, licenseDataPtr)){
 					const imtlic::CLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CLicenseDefinition*>(licenseDataPtr.GetPtr());
 					if (licenseInfoPtr != nullptr){
-						sdl::imtlic::Products::CLicenseData licenseData;
+						sdl::imtlic::Products::V1_0::CLicenseData licenseData;
 
 						licenseData.SetId(licenseCollectionId);
 						licenseData.SetLicenseId(licenseInfoPtr->GetLicenseId());
