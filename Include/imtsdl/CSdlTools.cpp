@@ -656,6 +656,7 @@ QString CSdlTools::GetQmlModuleNameFromParamsOrArguments(
 			qrcFileName += nameParamPtr->GetText();
 		}
 		retVal += qrcFileName;
+		retVal += QStringLiteral("Sdl");
 	}
 
 	// we should override it from nmespace from agrs if it porvided
@@ -710,7 +711,6 @@ QString CSdlTools::GetAutoDefinedQmlBasePath(const iprm::IParamsSet& schemaParam
 
 	const QString qmlModuleName = GetQmlModuleNameFromParamsOrArguments(&schemaParams, nullptr);
 	baseFilePath += qmlModuleName;
-	baseFilePath += QStringLiteral("Sdl");
 
 	QString retVal;
 	retVal = GetFileSystemAcceptableEntryPath(baseFilePath);
@@ -729,7 +729,7 @@ QString CSdlTools::GetAutoDefinedQmlQrcFilePath(const iprm::IParamsSet& schemaPa
 	QString qrcFileName = GetQmlModuleNameFromParamsOrArguments(&schemaParamsCompPtr, nullptr);
 
 	QString retVal;
-	retVal = GetFileSystemAcceptableEntryPath(baseFilePath + qrcFileName + QStringLiteral("Sdl.qrc"));
+	retVal = GetFileSystemAcceptableEntryPath(baseFilePath + qrcFileName + QStringLiteral(".qrc"));
 
 	return retVal;
 }
