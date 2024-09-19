@@ -4,17 +4,17 @@
 // ImtCore includes
 #include <imtgql/CObjectCollectionControllerCompBase.h>
 #include <imtauth/IUserGroupInfo.h>
-#include <GeneratedFiles/imtauthsdl/SDL/CPP/Groups/Groups.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
 
 
 namespace imtauthgql
 {
 
 
-class CUserGroupCollectionControllerComp: public sdl::imtauth::Groups::CGroupCollectionControllerCompBase
+class CUserGroupCollectionControllerComp: public sdl::imtauth::Groups::V1_0::CGroupCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtauth::Groups::CGroupCollectionControllerCompBase BaseClass;
+	typedef sdl::imtauth::Groups::V1_0::CGroupCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserGroupCollectionControllerComp);
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider", false, "RoleInfoProvider");
@@ -24,22 +24,22 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtauth::Groups::CGroupCollectionControllerCompBase)
+	// reimplemented (sdl::imtauth::Groups::V1_0::CGroupCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtauth::Groups::CGroupsListGqlRequest& groupsListRequest,
-				sdl::imtauth::Groups::CGroupItem& representationObject,
+				const sdl::imtauth::Groups::V1_0::CGroupsListGqlRequest& groupsListRequest,
+				sdl::imtauth::Groups::V1_0::CGroupItem& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
-				const sdl::imtauth::Groups::CGroupData& groupDataRepresentation,
+				const sdl::imtauth::Groups::V1_0::CGroupData& groupDataRepresentation,
 				QByteArray& newObjectId,
 				QString& name,
 				QString& description,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::imtauth::Groups::CGroupItemGqlRequest& groupItemRequest,
-				sdl::imtauth::Groups::CGroupDataPayload& representationPayload,
+				const sdl::imtauth::Groups::V1_0::CGroupItemGqlRequest& groupItemRequest,
+				sdl::imtauth::Groups::V1_0::CGroupDataPayload& representationPayload,
 				QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 

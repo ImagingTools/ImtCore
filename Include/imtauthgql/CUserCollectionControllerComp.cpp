@@ -17,12 +17,12 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::imtauth::Users::CUserCollectionControllerCompBase)
+// reimplemented (sdl::imtauth::Users::V1_0::CUserCollectionControllerCompBase)
 
 bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-	const sdl::imtauth::Users::CUsersListGqlRequest& usersListRequest,
-	sdl::imtauth::Users::CUserItem& representationObject,
+	const sdl::imtauth::Users::V1_0::CUsersListGqlRequest& usersListRequest,
+	sdl::imtauth::Users::V1_0::CUserItem& representationObject,
 	QString& errorMessage) const
 {
 	imtauth::IUserInfo* contextUserInfoPtr = nullptr;
@@ -31,7 +31,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		contextUserInfoPtr = gqlContextPtr->GetUserInfo();
 	}
 
-	sdl::imtauth::Users::UsersListRequestArguments arguments = usersListRequest.GetRequestedArguments();
+	sdl::imtauth::Users::V1_0::UsersListRequestArguments arguments = usersListRequest.GetRequestedArguments();
 
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
 	QByteArray productId = arguments.input.GetProductId();
@@ -61,7 +61,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		return true;
 	}
 
-	sdl::imtauth::Users::UsersListRequestInfo requestInfo = usersListRequest.GetRequestInfo();
+	sdl::imtauth::Users::V1_0::UsersListRequestInfo requestInfo = usersListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.SetId(objectId);
@@ -178,7 +178,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation(
-	const sdl::imtauth::Users::CUserData& userDataRepresentation,
+	const sdl::imtauth::Users::V1_0::CUserData& userDataRepresentation,
 	QByteArray& newObjectId,
 	QString& name,
 	QString& description,
@@ -263,14 +263,14 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 	name = userDataRepresentation.GetName();
 	userInfoPtr->SetName(name);
 
-	QList<sdl::imtauth::Users::CSystemInfo> systemInfos = userDataRepresentation.GetSystemInfos();
+	QList<sdl::imtauth::Users::V1_0::CSystemInfo> systemInfos = userDataRepresentation.GetSystemInfos();
 	if (systemInfos.isEmpty()){
 		// User from internal system
 		imtauth::IUserInfo::SystemInfo systemInfo;
 		userInfoPtr->AddToSystem(systemInfo);
 	}
 	else{
-		for (const sdl::imtauth::Users::CSystemInfo& sdlSystemInfo : systemInfos){
+		for (const sdl::imtauth::Users::V1_0::CSystemInfo& sdlSystemInfo : systemInfos){
 			QByteArray systemId = sdlSystemInfo.GetId();
 			QString systemName = sdlSystemInfo.GetName();
 			bool enabled = sdlSystemInfo.GetEnabled();
@@ -335,8 +335,8 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 
 bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	const istd::IChangeable& data,
-	const sdl::imtauth::Users::CUserItemGqlRequest& userItemRequest,
-	sdl::imtauth::Users::CUserDataPayload& representationPayload,
+	const sdl::imtauth::Users::V1_0::CUserItemGqlRequest& userItemRequest,
+	sdl::imtauth::Users::V1_0::CUserDataPayload& representationPayload,
 	QString& errorMessage) const
 {
 	const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(&data);
@@ -347,9 +347,9 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtauth::Users::UserItemRequestArguments arguments = userItemRequest.GetRequestedArguments();
+	sdl::imtauth::Users::V1_0::UserItemRequestArguments arguments = userItemRequest.GetRequestedArguments();
 	QByteArray productId = arguments.input.GetProductId();
-	sdl::imtauth::Users::CUserData userData;
+	sdl::imtauth::Users::V1_0::CUserData userData;
 
 	QByteArray objectId = userInfoPtr->GetObjectUuid();
 	userData.SetId(objectId);
@@ -378,10 +378,10 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	std::sort(permissions.begin(), permissions.end());
 	userData.SetPermissions(permissions);
 
-	QList<sdl::imtauth::Users::CSystemInfo> list;
+	QList<sdl::imtauth::Users::V1_0::CSystemInfo> list;
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
-		sdl::imtauth::Users::CSystemInfo info;
+		sdl::imtauth::Users::V1_0::CSystemInfo info;
 
 		info.SetId(systemInfo.systemId);
 
