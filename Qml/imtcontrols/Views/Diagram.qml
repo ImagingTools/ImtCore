@@ -44,7 +44,9 @@ Item {
 
     property alias maxSizeText: sizeText.text;
 
-    onParentYChanged: {console.log("ParentYChanged");}
+    onParentYChanged: {
+        //console.log("ParentYChanged");
+    }
 
 
     onModelChanged: {
