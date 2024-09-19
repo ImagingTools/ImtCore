@@ -237,7 +237,23 @@ QtObject {
                     value = null
                 }
 
-                graphQL += this.getJSONKeyForProperty(key) + ':' + (typeof this[key] === 'string' ? '"' + this[key] + '"' : value)
+                graphQL += this.getJSONKeyForProperty(key) + ':';
+                if (typeof this[key] === 'string'){
+                    let data = this[key];
+
+                    data = data.replace(/\\/g,"\\\\")
+                    data = data.replace(/\"/g,"\\\"")
+                    data = data.replace(/\r/g,"\\\\r")
+                    data = data.replace(/\n/g,"\\\\n")
+                    data = data.replace(/\t/g,"\\\\t")
+
+                    graphQL += '"'
+                    graphQL += data
+                    graphQL += '"'
+                }
+                else{
+                     graphQL += value
+                }
             }
             if(i < list.length - 1) graphQL += ','
         }

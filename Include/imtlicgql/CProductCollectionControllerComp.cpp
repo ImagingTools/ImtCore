@@ -86,34 +86,38 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isLicensesRequested){
-		representationObject.SetLicenses(productInfoPtr->GetFeatureIds().join(';'));
+		QList<sdl::imtlic::Products::CLicenseData> licenseDataList;
 
-		// if (m_licenseCollectionCompPtr.IsValid()){
-		// 	iprm::CIdParam idParam;
-		// 	idParam.SetId(objectId);
+		if (m_licenseCollectionCompPtr.IsValid()){
+			iprm::CIdParam idParam;
+			idParam.SetId(objectId);
 
-		// 	iprm::CParamsSet paramsSet1;
-		// 	paramsSet1.SetEditableParameter("ProductId", &idParam);
+			iprm::CParamsSet paramsSet1;
+			paramsSet1.SetEditableParameter("ProductId", &idParam);
 
-		// 	iprm::CParamsSet filterParam;
-		// 	filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
+			iprm::CParamsSet filterParam;
+			filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
 
-		// 	imtbase::ICollectionInfo::Ids licenseCollectionIds = m_licenseCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+			imtbase::ICollectionInfo::Ids licenseCollectionIds = m_licenseCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 
-		// 	for (const imtbase::ICollectionInfo::Id& licenseCollectionId : licenseCollectionIds){
-		// 		imtbase::IObjectCollection::DataPtr licenseDataPtr;
-		// 		if (m_licenseCollectionCompPtr->GetObjectData(licenseCollectionId, licenseDataPtr)){
-		// 			const imtlic::CLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CLicenseDefinition*>(licenseDataPtr.GetPtr());
-		// 			if (licenseInfoPtr != nullptr){
-		// 				int index = licenseModelPtr->InsertNewItem();
+			for (const imtbase::ICollectionInfo::Id& licenseCollectionId : licenseCollectionIds){
+				imtbase::IObjectCollection::DataPtr licenseDataPtr;
+				if (m_licenseCollectionCompPtr->GetObjectData(licenseCollectionId, licenseDataPtr)){
+					const imtlic::CLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CLicenseDefinition*>(licenseDataPtr.GetPtr());
+					if (licenseInfoPtr != nullptr){
+						sdl::imtlic::Products::CLicenseData licenseData;
 
-		// 				licenseModelPtr->SetData("Id", licenseCollectionId, index);
-		// 				licenseModelPtr->SetData("LicenseId", licenseInfoPtr->GetLicenseId(), index);
-		// 				licenseModelPtr->SetData("LicenseName", licenseInfoPtr->GetLicenseName(), index);
-		// 			}
-		// 		}
-		// 	}
-		// }
+						licenseData.SetId(licenseCollectionId);
+						licenseData.SetLicenseId(licenseInfoPtr->GetLicenseId());
+						licenseData.SetLicenseName(licenseInfoPtr->GetLicenseName());
+
+						licenseDataList << licenseData;
+					}
+				}
+			}
+		}
+
+		representationObject.SetLicenses(licenseDataList);
 	}
 
 	if (requestInfo.items.isAddedRequested){

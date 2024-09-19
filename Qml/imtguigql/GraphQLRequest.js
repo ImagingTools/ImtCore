@@ -152,7 +152,6 @@ var GqlRequest = function(requestType, commandId){
             for (var i = 0; i < fieldIds.length; ++i) {
                 var fieldId = fieldIds[i]
 
-
                 if (gqlObject.IsObject(fieldId)) {
                     retVal += this.AddObjectParamPart(gqlObject.GetFieldArgumentObjectPtr(fieldId))
                 } else {
@@ -160,8 +159,8 @@ var GqlRequest = function(requestType, commandId){
                     retVal += fieldId
                     retVal += ": "
                     var value = gqlObject.GetFieldArgumentValue(fieldId)
+
                     if(Array.isArray(value)){
-                        console.log("VALUE:::", value);
                         retVal+= "[";
                         for(let j = 0; j < value.length; j++){
                             var tempVal = this.AddObjectParamPart(value[j]);
@@ -183,7 +182,21 @@ var GqlRequest = function(requestType, commandId){
                             value = value.replace(/\t/g,"\\\\\\\\t")
                             retVal += "\\\""
                         }
-                        retVal += (typeof value.toGraphQL === "function") ? value.toGraphQL().replace(/\"/g, "\\\"") : value
+
+                        if (typeof value.toGraphQL === "function"){
+                            let data = value.toGraphQL();
+                            data = data.replace(/\\/g,"\\\\")
+                            data = data.replace(/\"/g,"\\\"")
+                            data = data.replace(/\r/g,"\\\\r")
+                            data = data.replace(/\n/g,"\\\\n")
+                            data = data.replace(/\t/g,"\\\\t")
+
+                            retVal += data
+                        }
+                        else{
+                            retVal += value
+                        }
+
                         if (isString) {
                             retVal += "\\\""
                         }

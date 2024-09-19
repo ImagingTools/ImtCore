@@ -2,15 +2,23 @@ pragma Singleton
 
 import QtQuick 2.12
 import imtcolgui 1.0
+import imtauthRolesSdl 1.0
 
 CollectionDataProvider {
     id: container;
 
-    fields: ["Id", "RoleName", "RoleDescription", "ParentRoles", "RoleId", "Name"];
-    commandId: "RolesList";
-    subscriptionCommandId: "OnRolesCollectionChanged"
+    fields: [
+        RoleItemTypeMetaInfo.s_id,
+        RoleItemTypeMetaInfo.s_roleName,
+        RoleItemTypeMetaInfo.s_roleDescription,
+        RoleItemTypeMetaInfo.s_parentRoles,
+        RoleItemTypeMetaInfo.s_roleId,
+        RoleItemTypeMetaInfo.s_productId
+    ];
 
-    sortByField: "Name";
+    commandId: ImtauthRolesSdlCommandIds.s_rolesList;
+    subscriptionCommandId: "OnRolesCollectionChanged"
+    sortByField: RoleItemTypeMetaInfo.s_roleName;
 
     property string productId;
 

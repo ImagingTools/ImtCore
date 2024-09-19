@@ -7,7 +7,6 @@ import imtlicFeaturesSdl 1.0
 
 CollectionDataProvider {
     id: container;
-
     commandId: ImtlicFeaturesSdlCommandIds.s_featuresList;
     subscriptionCommandId: "OnFeaturesCollectionChanged"
 
@@ -19,7 +18,6 @@ CollectionDataProvider {
         FeatureItemTypeMetaInfo.s_optional,
         FeatureItemTypeMetaInfo.s_subFeatures
     ];
-
     sortByField: FeatureItemTypeMetaInfo.s_featureName;
 }
 

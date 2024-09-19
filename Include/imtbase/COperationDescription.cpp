@@ -20,6 +20,12 @@ namespace imtbase
 
 // public methods
 
+COperationDescription::COperationDescription()
+	:m_operationType(imtbase::IOperationDescription::OT_UNKNOWN)
+{
+}
+
+
 void COperationDescription::SetOperationType(OperationType operationType)
 {
 	if (m_operationType != operationType){
@@ -116,7 +122,7 @@ bool COperationDescription::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	if (imtCoreVersion >= 11177){
+	if (imtCoreVersion >= 11170){
 		iser::CArchiveTag operationTypeTag("OperationType", "Operation type", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(operationTypeTag);
 		retVal = retVal && I_SERIALIZE_ENUM(imtbase::IOperationDescription::OperationType, archive, m_operationType);

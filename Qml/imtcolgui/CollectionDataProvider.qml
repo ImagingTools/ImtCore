@@ -31,6 +31,7 @@ QtObject {
     signal failed();
 
     function updateModel(){
+        console.log("updateModel", commandId);
         if (completed){
             console.warn("Collection data already loaded")
             return;
@@ -81,6 +82,8 @@ QtObject {
         gqlCommandId: container.commandId;
 
         function createQueryParams(query){
+            console.log("createQueryParams", query, container.commandId);
+
             var viewParams = Gql.GqlObject("viewParams");
             viewParams.InsertField("Offset", container.offset);
             viewParams.InsertField("Count", container.count);
@@ -108,6 +111,8 @@ QtObject {
                 queryFields.InsertField(key);
             }
             query.AddField(queryFields);
+
+            console.log("createQueryParams end", query, container.commandId);
         }
 
         function onResult(data){

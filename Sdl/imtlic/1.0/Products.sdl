@@ -15,6 +15,12 @@ input ProductsListInput {
 	viewParams: CollectionViewParams
 }
 
+type LicenseData {
+	Id: ID
+	LicenseId: ID
+	LicenseName: String
+}
+
 type ProductItem {
 	Id: ID!
 	Name: String!
@@ -24,7 +30,7 @@ type ProductItem {
 	CategoryId: ID!
 	Description: String
 	Features: ID
-	Licenses: ID
+	Licenses: [LicenseData]
 	Added: String
 	LastModified: String
 }

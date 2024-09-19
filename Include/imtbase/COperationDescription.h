@@ -12,6 +12,8 @@ namespace imtbase
 class COperationDescription: virtual public imtbase::IOperationDescription
 {
 public:
+	COperationDescription();
+
 	void SetOperationType(OperationType operationType);
 	void SetKey(const QByteArray& key);
 	void SetKeyName(const QString& keyName);
