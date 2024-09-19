@@ -24,17 +24,17 @@ bool EjConvertorExcel::readDoc(EjDocument *doc){
 	QList<EjBlock*> *list = doc->lBlocks;
 	EjUtils utils;
     int maxIndexCol = utils.findMaxIndexColumnInDocumentByBlocks(*list);
-    sheet_document.setMaxIndexColForTable(maxIndexCol);
+	sheet_document->setMaxIndexColForTable(maxIndexCol);
 
     for(int i = 0; i < list->size(); i++){
 		EjBlock* block = list->at(i);
 //        qDebug() << block->type;
 		EjExcelDocumentWriter *editor =editors.value(block->type, nullptr);
         if(editor != nullptr){
-            editor->edit(&sheet_document, &sharedStrings_document, &styles_document, list, i);
+			editor->edit(sheet_document, sharedStrings_document, styles_document, list, i);
         }
     }
-    utils.checkUnaddedText(&sheet_document, &sharedStrings_document, &styles_document);
+	utils.checkUnaddedText(sheet_document, sharedStrings_document, styles_document);
     return result;
 }
 
@@ -42,17 +42,17 @@ bool EjConvertorExcel::write() {
     QFile file_worksheets(temp_folder + subfolder + "/xl/worksheets/sheet1.xml");
     bool result = file_worksheets.open(QIODevice::WriteOnly);
     if (result) {
-        result = file_worksheets.write(sheet_document.getDocument().toByteArray()) != -1;
+		result = file_worksheets.write(sheet_document->getDocument().toByteArray()) != -1;
         file_worksheets.close();
     }
     QFile file_sheet(temp_folder + subfolder + "/xl/sharedStrings.xml");
     if ((result &= file_sheet.open(QIODevice::WriteOnly))) {
-        result = file_sheet.write(sharedStrings_document.getDocument().toByteArray()) != -1;
+		result = file_sheet.write(sharedStrings_document->getDocument().toByteArray()) != -1;
         file_sheet.close();
     }
     QFile file_styles(temp_folder + subfolder + "/xl/styles.xml");
     if ((result &= file_styles.open(QIODevice::WriteOnly))) {
-        result = file_styles.write(styles_document.getDocument().toByteArray()) != -1;
+		result = file_styles.write(styles_document->getDocument().toByteArray()) != -1;
         file_styles.close();
     }
     return result;
@@ -64,6 +64,9 @@ void EjConvertorExcel::clear() {
 
 EjConvertorExcel::EjConvertorExcel():
     temp_folder(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + '/'), subfolder(format + "_test/" ){
+	sheet_document = new EjSheetDocument();
+	sharedStrings_document = new EjSharedStringsDocument();
+	styles_document = new EjStylesDocument();
     editors.insert(e_typeBlocks::TEXT, new TextWriterExcel());
     editors.insert(e_typeBlocks::SPACE, new SpaceWriterExcel());
     editors.insert(e_typeBlocks::ENTER, new EnterWriterExcel());
@@ -86,8 +89,11 @@ EjConvertorExcel::~EjConvertorExcel() {
 	for (QMap<quint8, EjExcelDocumentWriter*>::iterator i = editors.begin(); i != editors.end(); ++i) {
         delete *i;
     }
+	delete sheet_document;
+	delete sharedStrings_document;
+	delete styles_document;
 }
 
-EjSheetDocument EjConvertorExcel::getSheetDocument(){
-    return sheet_document;
+EjSheetDocument* EjConvertorExcel::getSheetDocument(){
+	return sheet_document;
 }

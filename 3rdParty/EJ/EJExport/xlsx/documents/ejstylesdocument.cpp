@@ -286,3 +286,23 @@ EjStylesDocument::EjStylesDocument()
 }
 
 
+EjStylesDocument::~EjStylesDocument()
+{
+	document.clear();
+	fonts.clear();
+	fills.clear();
+	borders.clear();
+	cellXfs.clear();
+	cellStyleXfs.clear();
+	cellStyles.clear();
+	dxfs.clear();
+	tableStyles.clear();
+	widthsBorders.clear();
+	aligns.clear();
+	countBorders = 0;
+	countCellXfs = 0;
+	countFills = 1;
+	align = EjParagraphStyle::AlignLeft;
+}
+
+

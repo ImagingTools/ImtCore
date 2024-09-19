@@ -31,6 +31,7 @@ class EjSheetDocument {
 
 public:
 	EjSheetDocument();
+	~EjSheetDocument();
     bool addTextNumber(int number, int numberStyle);
     bool addTextNumberIntoTable(int number, int numberStyle);
     bool newString();

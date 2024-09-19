@@ -67,6 +67,38 @@ EjSheetDocument::EjSheetDocument() {
 }
 
 
+EjSheetDocument::~EjSheetDocument()
+{
+	while (cols.hasChildNodes()){
+		cols.removeChild(cols.lastChild());
+	}
+	cols.clear();
+	while (mergeCells.hasChildNodes()){
+		mergeCells.removeChild(mergeCells.lastChild());
+	}
+	mergeCells.clear();
+	while (worksheet.hasChildNodes()){
+		worksheet.removeChild(worksheet.lastChild());
+	}
+	worksheet.clear();
+	while (document.hasChildNodes()){
+		document.removeChild(document.lastChild());
+	}
+	document.clear();
+
+	index_string = INDEX_STRING;
+	index_column = INDEX_COLUMN;
+	count_cells = 0;
+	alphabet = "0ABCDEFGHIJKLMNOPQ";
+	mergeCellsExist = false;
+	colsExist = false;
+	countColsCurrentTable = - 1;
+	countStrCurrentTable = - 1;
+	activeTable = false;
+	maxIndexColForTable = 1;
+}
+
+
 bool EjSheetDocument::addTextNumber(int number, int numberStyle) {
     /*Здесь будет передаваться number = -1,
        когда будет передана информация из клетки таблицы,

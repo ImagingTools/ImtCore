@@ -17,9 +17,9 @@ class EjConvertorExcel: public Convertor {
     QString temp_folder;
     QString subfolder;
 	QMap<quint8, EjExcelDocumentWriter*> editors;
-	EjSheetDocument sheet_document;
-	EjSharedStringsDocument sharedStrings_document;
-	EjStylesDocument styles_document;
+	EjSheetDocument* sheet_document;
+	EjSharedStringsDocument* sharedStrings_document;
+	EjStylesDocument* styles_document;
 
 
     bool unzip() const;
@@ -32,7 +32,7 @@ public:
     const static QString format;
 	EjConvertorExcel();
     bool convert(EjDocument *doc, const QString &fileName);
-	EjSheetDocument getSheetDocument();
+	EjSheetDocument* getSheetDocument();
 	EjSharedStringsDocument getWorksheetsDocument();
 	virtual ~EjConvertorExcel();
 };

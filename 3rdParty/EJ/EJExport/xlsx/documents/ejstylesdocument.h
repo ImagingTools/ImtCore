@@ -16,7 +16,7 @@ class EjStylesDocument
     QDomElement dxfs;
     QDomElement tableStyles;
     QMap<int, QString> widthsBorders;
-     QMap<int, QDomElement> aligns;
+	QMap<int, QDomElement> aligns;
     int countBorders = 0;
     int countCellXfs = 0/*Здесь по стандарту одна запись*/;
     int countFills = 1;/*1 потому что там по стандарту есть уже 2 записи*/
@@ -28,6 +28,7 @@ public:
     int addXfToCellXfs(int fillId, int borderId);
 
 	EjStylesDocument();
+	~EjStylesDocument();
     QDomDocument getDocument() const;
     void setAlign(int value);
 };

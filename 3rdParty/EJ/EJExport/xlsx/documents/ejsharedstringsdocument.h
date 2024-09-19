@@ -35,6 +35,7 @@ public:
     /*для определения был ли ентер после текста*/
      bool startNewString = false;
 	EjSharedStringsDocument();
+	~EjSharedStringsDocument();
     bool addSpase();
     bool addText(QString new_text, bool isNew);
     bool addTextIntoTable(QString new_text);

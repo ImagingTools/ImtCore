@@ -152,6 +152,27 @@ EjSharedStringsDocument::EjSharedStringsDocument() {
     sst.setAttribute("xmlns", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
 }
 
+
+EjSharedStringsDocument::~EjSharedStringsDocument()
+{
+	document.clear();
+	sst.clear();
+	si.clear();
+	text.clear();
+	index_string = 0;
+	count_words = 0;
+	nameFont = "Calibri";
+	colorText = "FF000000";
+	sizeText = 12;
+	bold = false;
+	underline = false;
+	italic = false;
+	strikeOut = false;
+	first = true;
+	startNewString = false;
+}
+
+
 bool EjSharedStringsDocument::addSpase() {
     return addText(" ", false);
 }

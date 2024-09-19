@@ -15,17 +15,23 @@ bool CReportExport::exportReport(EjDocument* ejDocument, QString const& file_nam
 	if(file_name.endsWith("docx"))
     {
         EjConvertorDocx* docxConvertorPtr = new EjConvertorDocx();
-        return docxConvertorPtr->convert(ejDocument, file_name);
+		bool result = docxConvertorPtr->convert(ejDocument, file_name);
+		delete docxConvertorPtr;
+		return result;
 	}
 	if(file_name.endsWith("pdf"))
     {
         EjConvertorPdf* pdfConvertorPtr = new EjConvertorPdf();
-        return pdfConvertorPtr->convert(ejDocument, file_name);
+		bool result = pdfConvertorPtr->convert(ejDocument, file_name);
+		delete pdfConvertorPtr;
+		return result;
 	}
 	if(file_name.endsWith("xlsx"))
     {
         EjConvertorExcel* excelConvertorPtr = new EjConvertorExcel();
-        return excelConvertorPtr->convert(ejDocument, file_name);
+		bool result = excelConvertorPtr->convert(ejDocument, file_name);
+		delete excelConvertorPtr;
+		return result;
 	}
     return false;
 }
