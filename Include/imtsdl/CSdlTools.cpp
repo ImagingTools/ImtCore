@@ -521,7 +521,6 @@ QString CSdlTools::GetFileSystemAcceptableEntryPath(const QString& originalText)
 {
 	QString retVal = originalText;
 
-	retVal.replace(':', '_');
 	retVal.replace('*', '_');
 	retVal.replace('?', '_');
 	retVal.replace('\"', '_');
