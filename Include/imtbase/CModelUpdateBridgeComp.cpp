@@ -32,11 +32,6 @@ void CModelUpdateBridgeComp::AfterUpdate(imod::IModel* modelPtr, const istd::ICh
 	}
 }
 
-void CModelUpdateBridgeComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-}
-
 
 } // namespace imtbase
 

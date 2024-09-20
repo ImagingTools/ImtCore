@@ -24,8 +24,6 @@ public:
 	virtual void BeforeUpdate(imod::IModel* modelPtr) override;
 	virtual void AfterUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet) override;
 
-	virtual void OnComponentCreated() override;
-
 private:
 	I_MULTIREF(istd::IChangeable, m_slaveModelCompPtr);
 };
