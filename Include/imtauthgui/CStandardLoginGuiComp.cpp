@@ -57,6 +57,7 @@ bool CStandardLoginGuiComp::eventFilter(QObject* watched, QEvent* event)
 void CStandardLoginGuiComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
 	connect(&m_setSuPasswordThread, &QThread::finished, this, &CStandardLoginGuiComp::OnSetSuPasswordFinished, Qt::QueuedConnection);
 }
 
@@ -118,7 +119,7 @@ void CStandardLoginGuiComp::OnGuiCreated()
 		m_connectionObserver.RegisterObject(m_connectionStatusProviderCompPtr.GetPtr(), &CStandardLoginGuiComp::OnConnectionStatusChanged);
 	}
 
-	StackedWidget->setCurrentIndex(3);
+	StackedWidget->setCurrentIndex(US_USER_PASSWORD_LOGIN);
 }
 
 
@@ -188,7 +189,7 @@ void CStandardLoginGuiComp::on_LoginButton_clicked()
 void CStandardLoginGuiComp::on_SetPasswordButton_clicked()
 {
 	if (m_superuserControllerCompPtr.IsValid()){
-		StackedWidget->setCurrentIndex(3);
+		StackedWidget->setCurrentIndex(US_WAIT_INDICATOR);
 
 		QString password = SuPasswordEdit->text();
 
@@ -231,10 +232,10 @@ void CStandardLoginGuiComp::OnSetSuPasswordFinished()
 {
 	CStandardLoginGuiComp::SetSuPasswordThread::ThreadState state = m_setSuPasswordThread.GetState();
 	if (state == CStandardLoginGuiComp::SetSuPasswordThread::ThreadState::TS_OK){
-		StackedWidget->setCurrentIndex(0);
+		StackedWidget->setCurrentIndex(US_USER_PASSWORD_LOGIN);
 	}
 	else if (state == CStandardLoginGuiComp::SetSuPasswordThread::ThreadState::TS_FAILED){
-		StackedWidget->setCurrentIndex(1);
+		StackedWidget->setCurrentIndex(US_ENTER_SU_PASSWORD);
 
 		QMessageBox::critical(GetWidget(), tr("User Management"), tr("Password for the super user could not be set"), QMessageBox::Close);
 	}
@@ -262,15 +263,15 @@ void CStandardLoginGuiComp::OnConnectionStatusChanged(
 				QString errorMessage;
 				bool superuserExists = m_superuserProviderCompPtr->SuperuserExists(errorMessage);
 				if (superuserExists){
-					StackedWidget->setCurrentIndex(0);
+					StackedWidget->setCurrentIndex(US_USER_PASSWORD_LOGIN);
 				}
 				else{
-					StackedWidget->setCurrentIndex(1);
+					StackedWidget->setCurrentIndex(US_ENTER_SU_PASSWORD);
 				}
 			}
 		}
 		else if (connectionStatus == imtcom::IConnectionStatusProvider::CS_DISCONNECTED){
-			StackedWidget->setCurrentIndex(2);
+			StackedWidget->setCurrentIndex(US_NO_CONNECTION_TO_SERVER);
 		}
 	}
 }

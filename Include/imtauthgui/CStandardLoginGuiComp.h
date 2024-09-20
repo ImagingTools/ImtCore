@@ -31,6 +31,15 @@ class CStandardLoginGuiComp: public iqtgui::TRestorableGuiWrap<
 {
 	Q_OBJECT
 public:
+
+	enum UiState
+	{
+		US_USER_PASSWORD_LOGIN,
+		US_ENTER_SU_PASSWORD,
+		US_NO_CONNECTION_TO_SERVER,
+		US_WAIT_INDICATOR
+	};
+
 	typedef iqtgui::TRestorableGuiWrap<
 				iqtgui::TDesignerGuiCompBase<Ui::CStandardLoginGuiComp>> BaseClass;
 
