@@ -144,6 +144,8 @@ class Text extends Item {
                 overflow: 'unset',
             })
         }
+
+        this.__updateGeometry()
     }
 
     onHorizontalAlignmentChanged(){
@@ -153,6 +155,8 @@ class Text extends Item {
             case Text.AlignHCenter: this.__setDOMStyle({ justifyContent: 'center', textAlign: 'center' }); break;
             case Text.AlignJustify: this.__setDOMStyle({ justifyContent: 'normal', textAlign: 'justify' }); break;
         }
+
+        this.__updateGeometry()
     }
 
     onVerticalAlignmentChanged(){
@@ -161,6 +165,16 @@ class Text extends Item {
             case Text.AlignBottom: this.__setDOMStyle({ alignItems: 'flex-end' }); break;
             case Text.AlignVCenter: this.__setDOMStyle({ alignItems: 'center' }); break;
         }
+
+        this.__updateGeometry()
+    }
+
+    onWrapModeChanged(){
+        this.__updateGeometry()
+    }
+
+    onElideChanged(){
+        this.__updateGeometry()
     }
 
     onFontChanged(){

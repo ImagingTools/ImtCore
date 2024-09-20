@@ -136,7 +136,7 @@ class Flickable extends Item {
 
         if(mouse.target === this){
             if(this.flickableDirection === Flickable.AutoFlickDirection || this.flickableDirection === Flickable.AutoFlickIfNeeded){
-                if(this.contentWidth > 0){
+                if(this.contentWidth > 0 && this.contentWidth > this.width){
                     if(mouse.moveX > 0){
                         if(this.contentX + mouse.moveX < this.contentWidth - this.width) {
                             this.contentX += mouse.moveX
@@ -153,7 +153,7 @@ class Flickable extends Item {
                         }
                     }
                 }
-                if(this.contentHeight > 0){
+                if(this.contentHeight > 0 && this.contentHeight > this.height){
                     if(mouse.moveY > 0){
                         if(this.contentY + mouse.moveY < this.contentHeight - this.height) {
                             this.contentY += mouse.moveY

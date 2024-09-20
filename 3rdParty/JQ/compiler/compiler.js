@@ -1068,11 +1068,11 @@ class Instruction {
         code.push('let self = super.create(parent, model, properties, false, ...args)')
 
         if(isRoot) {
-            code.push(`let __rootContext${level}={}`) // context !!!
+            code.push(`let __rootContext${level}=JQContext.create()`) // context !!!
             code.push(`let __context=__rootContext${level}`) // context !!!
         }
         if(isComponent){
-            code.push(`let __rootContext${level}=Object.assign({},__rootContext${level-1})`) // context !!!
+            code.push(`let __rootContext${level}=JQContext.create(__rootContext${level-1})`) // context !!!
             code.push(`let __context=__rootContext${level}`) // context !!!
         }
 
