@@ -3,7 +3,6 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
-#include <iprm/ITextParam.h>
 
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
@@ -25,7 +24,7 @@ public:
 	I_BEGIN_COMPONENT(CGqlClientEngineComp);
 		I_REGISTER_INTERFACE(imtclientgql::IClientProtocolEngine);
 		I_ASSIGN(m_urlParamCompPtr, "UrlParam", "The object holds connection's URL", false, "UrlParam");
-		I_ASSIGN(m_prefixServerAttrPtr, "ServerPrefix", "Prefix Server", true, "/");
+		I_ASSIGN(m_prefixServerAttrPtr, "ServerPrefix", "Prefix Server", false, "/");
 	I_END_COMPONENT;
 
 	CGqlClientEngineComp();

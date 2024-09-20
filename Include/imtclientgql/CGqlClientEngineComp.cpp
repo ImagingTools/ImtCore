@@ -27,16 +27,15 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 
 	QString urlString = m_workingUrl.toString();
 
-	QByteArray prefix;
 	if (m_prefixServerAttrPtr.IsValid()){
-		prefix = *m_prefixServerAttrPtr;
+		QByteArray prefix = *m_prefixServerAttrPtr;
+		if (!prefix.startsWith('/')){
+			prefix.prepend('/');
+		}
+
+		urlString.append(prefix);
 	}
 
-	if (!prefix.startsWith('/')){
-		prefix.prepend('/');
-	}
-
-	urlString.append(prefix);
 	urlString.append("/graphql");
 
 	networkRequest->setUrl(QUrl(urlString));
