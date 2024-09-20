@@ -17,7 +17,6 @@ void CSubscriberCompBase::OnResponseReceived(
 			const QByteArray& subscriptionId,
 			const QByteArray& subscriptionData)
 {
-	qDebug() << "OnResponseReceived" << subscriptionId << subscriptionData;
 }
 
 
@@ -26,7 +25,6 @@ void CSubscriberCompBase::OnSubscriptionStatusChanged(
 			const SubscriptionStatus& /*status*/,
 			const QString& /*message*/)
 {
-	qDebug() << "OnSubscriptionStatusChanged";
 }
 
 
