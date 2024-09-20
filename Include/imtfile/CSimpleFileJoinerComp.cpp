@@ -122,7 +122,7 @@ int CSimpleFileJoinerComp::DoProcessing(
 
 	// lock target file to ensure it will be created
 	QLockFile targetLockFile(targetFilePath);
-	if (!targetLockFile.tryLock(std::chrono::seconds(3))){
+	if (!targetLockFile.tryLock(3000)){
 		SendErrorMessage(0, QString("Unable to lock target file: '%1'").arg(targetFilePath));
 
 		return TS_INVALID;
