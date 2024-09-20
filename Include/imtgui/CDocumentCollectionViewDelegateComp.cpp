@@ -83,6 +83,26 @@ QByteArray CDocumentCollectionViewDelegateComp::CreateNewObject(
 
 QByteArray CDocumentCollectionViewDelegateComp::ImportObject(const QByteArray& typeId, const QString& sourcePath) const
 {
+	QStringList filters;
+	QStringList allExt;
+
+	// add extensions by default importer
+	if (const ifile::IFileTypeInfo* fileTypeInfoPtr = FindFileInfo(typeId, FOT_IMPORT)) {
+		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
+	}
+
+	// zip
+	if (IsBundlePersistenceSupported(ifile::IFileTypeInfo::QF_LOAD)) {
+		allExt += "zip";
+	}
+
+	// older product -> import it "classically"
+	for (const auto& it : allExt) {
+		if (sourcePath.endsWith(it))
+			return BaseClass2::ImportObject(typeId, sourcePath);
+	}
+
+	// #11467
 	if ((m_collectionPtr != nullptr) && m_objectImportPersistenceCompPtr.IsValid()){
 		const imtbase::IObjectCollection::IDataFactory* objectFactorPtr = dynamic_cast<const imtbase::IObjectCollection::IDataFactory*>(m_collectionPtr);
 		if (objectFactorPtr != nullptr){
@@ -123,14 +143,18 @@ bool CDocumentCollectionViewDelegateComp::ExportObject(const QByteArray& objectI
 		imtbase::IObjectCollection::DataPtr objectDataPtr;
 		
 		if (m_collectionPtr->GetObjectData(objectId, objectDataPtr)){
-			int state = m_objectExportPersistenceCompPtr->SaveToFile(*objectDataPtr, targetPath);
-			if (state != ifile::IFilePersistence::OS_OK){
-				QMessageBox::critical(nullptr, "", tr("File \"%1\"could not be exported").arg(targetPath));
+			if (m_objectExportPersistenceCompPtr->IsOperationSupported(
+					objectDataPtr.GetPtr(), &targetPath, ifile::IFileTypeInfo::QF_SAVE | ifile::IFileTypeInfo::QF_FILE, false)) {
 
-				return false;
-			}
-			else{
-				return true;
+				int state = m_objectExportPersistenceCompPtr->SaveToFile(*objectDataPtr, targetPath);
+				if (state != ifile::IFilePersistence::OS_OK) {
+					QMessageBox::critical(nullptr, "", tr("File \"%1\" could not be exported").arg(targetPath));
+
+					return false;
+				}
+				else {
+					return true;
+				}
 			}
 		}
 	}
@@ -145,7 +169,7 @@ void CDocumentCollectionViewDelegateComp::RemoveObjects(const imtbase::ICollecti
 		return;
 	}
 
-	if (QMessageBox::question(nullptr, tr("Remove"), tr("Remove selected document from the collection"), QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes){
+	if (QMessageBox::question(nullptr, tr("Remove"), tr("Remove selected item(s) from the database"), QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes){
 		return;
 	}
 
@@ -164,7 +188,7 @@ void CDocumentCollectionViewDelegateComp::RemoveObjects(const imtbase::ICollecti
 						idoc::IDocumentManager::DocumentInfo documentInfo;
 						if (objectInfoPtr->objectPtr == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)){
 							if (documentInfo.isDirty){
-								QString message = tr("Document \"%1\" is currently being edited and cannot be deleted").arg(objectInfoPtr->name);
+								QString message = tr("Item \"%1\" is currently being edited and cannot be deleted").arg(objectInfoPtr->name);
 								QMessageBox::warning(nullptr, "", message, QMessageBox::Ok);
 								isRemoveAccepted = false;
 							}
@@ -332,7 +356,7 @@ bool CDocumentCollectionViewDelegateComp::OpenDocumentEditor(
 	if (m_collectionPtr != nullptr){
 		QVariant documentName = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
 		if (documentName.isValid()){
-			QMessageBox::critical(nullptr, "", tr("Document \"%1\" could not be opened").arg(documentName.toString()));
+			QMessageBox::critical(nullptr, "", tr("Item \"%1\" could not be opened").arg(documentName.toString()));
 		}
 	}
 
@@ -385,15 +409,24 @@ void CDocumentCollectionViewDelegateComp::AfterRestore(const QByteArray& objectI
 
 const ifile::IFileTypeInfo* CDocumentCollectionViewDelegateComp::FindFileInfo(const QByteArray& typeId, FileOperationType operationType) const
 {
-	switch (operationType){
+	if (typeId.isEmpty()) {
+
+		switch (operationType) {
 		case FOT_EXPORT:
-			if (m_objectExportPersistenceCompPtr.IsValid()){
+			if (m_objectExportPersistenceCompPtr.IsValid()) {
 				return m_objectExportPersistenceCompPtr.GetPtr();
 			}
+			break;
+		
 		case FOT_IMPORT:
-			if (m_objectImportPersistenceCompPtr.IsValid()){
+			if (m_objectImportPersistenceCompPtr.IsValid()) {
 				return m_objectImportPersistenceCompPtr.GetPtr();
 			}
+			break;
+		
+		default:;
+		}
+
 	}
 
 	return BaseClass2::FindFileInfo(typeId, operationType);

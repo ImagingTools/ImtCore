@@ -179,6 +179,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
+	connect(PreferencesButton, &QToolButton::clicked, this, &CThumbnailDecoratorGuiComp::on_PreferencesButton_clicked);
+
 	PreferencesButton->setVisible(m_preferencesDialogCompPtr.IsValid());
 
 	if (*m_hideHomeButtonAttrPtr){
@@ -305,7 +307,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		m_loginObserver.RegisterModel(m_loginModelCompPtr.GetPtr());
 	}
 
-	if (m_rightsModelCompPtr.IsValid()){
+	if (m_rightsModelCompPtr.IsValid() && m_loginModelCompPtr.IsValid()){
 		m_loginObserver.RegisterModel(m_rightsModelCompPtr.GetPtr(), 1);
 	}
 
@@ -839,7 +841,6 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 
 	ExitButton->setEnabled(IsUserActionAllowed(UA_APPLICATION_EXIT));
 
-	LoginControlButton->setVisible(m_loginCompPtr.IsValid() && m_loginCompPtr->GetLoggedUser() != nullptr);
 	LoginControlButton->setEnabled(IsUserActionAllowed(UA_LOGIN_CONTROL_ENABLED));
 
 	HomeButton->setEnabled(IsUserActionAllowed(UA_HOME_ENABLED));
