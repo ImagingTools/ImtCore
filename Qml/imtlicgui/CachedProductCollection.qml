@@ -11,21 +11,13 @@ CollectionDataProvider {
     commandId: ImtlicProductsSdlCommandIds.s_productsList;
     subscriptionCommandId: "OnProductsCollectionChanged"
 
-    // fields: [
-    //     ProductItemTypeMetaInfo.s_id,
-    //     ProductItemTypeMetaInfo.s_productName,
-    //     ProductItemTypeMetaInfo.s_description,
-    //     ProductItemTypeMetaInfo.s_categoryId,
-    //     ProductItemTypeMetaInfo.s_licenses,
-    //     ProductItemTypeMetaInfo.s_features
-    // ];
     fields: [
-        "Id",
-        "ProductName",
-        "Description",
-        "CategoryId",
-        "Licenses",
-        "Features"
+        ProductItemTypeMetaInfo.s_id,
+        ProductItemTypeMetaInfo.s_productName,
+        ProductItemTypeMetaInfo.s_description,
+        ProductItemTypeMetaInfo.s_categoryId,
+        ProductItemTypeMetaInfo.s_licenses,
+        ProductItemTypeMetaInfo.s_features
     ];
     sortByField: ProductItemTypeMetaInfo.s_productName;
 
