@@ -6,17 +6,15 @@
 #include <QtCore/QRegularExpression>
 #include <QtCore/QRegularExpressionMatch>
 
-//Acf includes
+// ACF includes
 #include <istd/CSystem.h>
 #include <iprm/TParamsPtr.h>
 #include <iprm/IEnableableParam.h>
 #include <iprm/IOptionsList.h>
 #include <ifile/IFileNameParam.h>
 
-// imtbase includes
-#include <imtbase/CTempDir.h>
-
 // ImtCore includes
+#include <imtbase/CTempDir.h>
 #include <imtsdl/CSdlType.h>
 
 
