@@ -34,8 +34,10 @@ public:
 		I_REGISTER_INTERFACE(IRightsProvider);
 		I_ASSIGN(m_licenseInfoProviderCompPtr, "LicenseInfoProvider", "License info provider", false, "LicenseInfoProvider");
 		I_ASSIGN_TO(m_licenseInfoProviderModelCompPtr, m_licenseInfoProviderCompPtr, false);
-		I_ASSIGN(m_slaveProviderCompPtr, "SlaveProvider", "Slave rights provider", false, "SlaveProvider");
+		I_ASSIGN(m_slaveProviderCompPtr, "SlaveProvider", "Slave rights provider. Rights of the slave override the license rights", false, "SlaveProvider");
 		I_ASSIGN_TO(m_slaveProviderModelCompPtr, m_slaveProviderCompPtr, false);
+		I_ASSIGN(m_userRightsProviderCompPtr, "UserRightsProvider", "Provider for the user rights", false, "UserRightsProvider");
+		I_ASSIGN_TO(m_userRightsProviderModelCompPtr, m_userRightsProviderCompPtr, false);
 	I_END_COMPONENT;
 
 	CLicenseBasedRightsProviderComp();
@@ -55,6 +57,8 @@ private:
 	I_REF(imod::IModel, m_licenseInfoProviderModelCompPtr);
 	I_REF(iauth::IRightsProvider, m_slaveProviderCompPtr);
 	I_REF(imod::IModel, m_slaveProviderModelCompPtr);
+	I_REF(iauth::IRightsProvider, m_userRightsProviderCompPtr);
+	I_REF(imod::IModel, m_userRightsProviderModelCompPtr);
 
 	imod::CModelUpdateBridge m_updateBridge;
 };

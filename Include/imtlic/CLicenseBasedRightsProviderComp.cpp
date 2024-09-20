@@ -24,6 +24,13 @@ bool CLicenseBasedRightsProviderComp::HasRight(
 			const QByteArray& operationId,
 			bool beQuiet) const
 {
+	if (m_userRightsProviderCompPtr.IsValid()){
+		bool userHasRight = m_userRightsProviderCompPtr->HasRight(operationId);
+		if (!userHasRight) {
+			return false;
+		}
+	}
+
 	if (m_licenseInfoProviderCompPtr.IsValid()){
 		const imtbase::ICollectionInfo& licenseList = m_licenseInfoProviderCompPtr->GetLicenseInstances();
 		
@@ -34,9 +41,14 @@ bool CLicenseBasedRightsProviderComp::HasRight(
 				ILicenseDefinition::FeatureInfos features = licenseInstancePtr->GetFeatureInfos();
 				for (const ILicenseDefinition::FeatureInfo& featureInfo : features){
 					if (featureInfo.id == operationId){
-						bool isExpired = (licenseInstancePtr->GetExpiration() >= QDateTime::currentDateTime());
+						QDateTime expirationDate = licenseInstancePtr->GetExpiration();
+						if (!expirationDate.isNull()){
+							bool isExpired = (QDateTime::currentDateTime() > licenseInstancePtr->GetExpiration());
 
-						return !isExpired;
+							return !isExpired;
+						}
+
+						return true;
 					}
 				}
 			}
