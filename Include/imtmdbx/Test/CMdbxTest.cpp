@@ -886,6 +886,13 @@ void CMdbxTest::test_write_masks(){
 	}
 	mdbx::env_managed env(path, createParameters, operateParameters);
 	mdbx::txn_managed txn = env.start_write();
+
+	mdbx::map_handle mapHandle = txn.open_map(0);
+	mdbx::cursor_managed cursor = txn.open_cursor(mapHandle);
+	mdbx::slice keySlice("fap1");
+	// mdbx::cursor::move_result result = cursor.find(keySlice, false);
+	bool ok = cursor.seek(keySlice);
+
 	mdbx::map_handle testHandle = txn.create_map("fap1", mdbx::key_mode::usual, mdbx::value_mode::single);
 
 	std::cout << "TEST_WRITE_MASKS!!!";

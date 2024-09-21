@@ -126,18 +126,14 @@ QByteArray CDocumentTable::GetDocument()
 {
 	QByteArray doc = QByteArray();
 
-	try{
-		mdbx::cursor::move_result result = m_cursor.current();
-        std::string value;
-        value = result.value.as_string();
+	mdbx::cursor::move_result result = m_cursor.current(false);
+	if (result.done){
+		std::string value;
+		value = result.value.as_string();
 		doc = QByteArray::fromStdString(value);
-	}
-	catch(...){
-		doc = QByteArray();
 	}
 
 	return doc;
-
 }
 
 
@@ -146,14 +142,11 @@ QByteArray CDocumentTable::GetDocument(quint64 key)
 	QByteArray doc = QByteArray();
 	mdbx::slice keySlice(&key, 8);
 
-	try{
-		mdbx::cursor::move_result result = m_cursor.find(keySlice);
-        std::string value;
-        value = result.value.as_string();
-        doc = QByteArray::fromStdString(value);
-	}
-	catch(...){
-		doc = QByteArray();
+	mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
+	if (result.done){
+		std::string value;
+		value = result.value.as_string();
+		doc = QByteArray::fromStdString(value);
 	}
 
 	return doc;
@@ -165,14 +158,11 @@ QByteArray CDocumentTable::GetDocument(const QByteArray &key)
 	QByteArray doc = QByteArray();
 	mdbx::slice keySlice(key.data(), key.length());
 
-	try{
-		mdbx::cursor::move_result result = m_cursor.find(keySlice);
-        std::string value;
-        value = result.value.as_string();
+	mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
+	if (result.done){
+		std::string value;
+		value = result.value.as_string();
 		doc = QByteArray::fromStdString(value);
-	}
-	catch(...){
-		doc = QByteArray();
 	}
 
 	return doc;
@@ -214,13 +204,7 @@ bool CDocumentTable::HasRecord(quint64 key)
 	bool ok = false;
 	mdbx::slice keySlice(&key, 8);
 
-	try{
-		mdbx::cursor::move_result result = m_cursor.find(keySlice);
-		ok = true;
-	}
-	catch(...){
-		ok = false;
-	}
+	ok = m_cursor.seek(keySlice);
 
 	return ok;
 }
@@ -231,13 +215,7 @@ bool CDocumentTable::HasRecord(const QByteArray &key)
 	bool ok = false;
 	mdbx::slice keySlice(key.data(), key.length());
 
-	try{
-		mdbx::cursor::move_result result = m_cursor.find(keySlice);
-		ok = true;
-	}
-	catch(...){
-		ok = false;
-	}
+	ok = m_cursor.seek(keySlice);
 
 	return ok;
 }
@@ -582,15 +560,12 @@ bool CDocumentTable::Exists(const QString& name)
 {
 	bool ok = true;
 
-	try{
-		mdbx::map_handle mapHandle = m_txn.open_map(name.toStdString(), m_keyMode, m_valueMode);
-	}
-	catch (...){
-		ok = false;
-	}
+	mdbx::map_handle mapHandle = m_txn.open_map(0);
+	mdbx::cursor_managed cursor = m_txn.open_cursor(mapHandle);
+	mdbx::slice keySlice(name.toStdString());
+	ok = cursor.seek(keySlice);
 
 	return ok;
-
 }
 
 
