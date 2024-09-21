@@ -75,7 +75,11 @@ RemoteCollectionView {
                         }
                         else if (commandId === "RemoveFeature"){
                             if (selectedIndex != null){
-                                let parentModel = selectedIndex.parentIndex.itemData.m_subFeatures;
+                                let parentModel = featureEditor.featureData.m_subFeatures;
+                                if (selectedIndex.parentIndex != null){
+                                    parentModel = selectedIndex.parentIndex.itemData.m_subFeatures;
+                                }
+
                                 parentModel.remove(selectedIndex.index);
 
                                 featureEditor.model.modelChanged([])

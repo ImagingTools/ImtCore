@@ -17,11 +17,10 @@ namespace imtlicgql
 
 bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 			const sdl::imtlic::Features::V1_0::CFeatureData& featureRepresentationData,
+			const QByteArray& rootFeatureId,
 			imtlic::CFeatureInfo& featureInfo,
 			QString& errorMessage) const
 {
-	QByteArray objectId = featureRepresentationData.GetId();
-
 	QByteArray featureId = featureRepresentationData.GetFeatureId();
 	if (featureId.isEmpty()){
 		errorMessage = QString("Unable to create feature with an empty 'Feature-ID'");
@@ -42,7 +41,7 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
-		if (objectId != id){
+		if (rootFeatureId != id){
 			errorMessage = QT_TR_NOOP(QString("Feature-ID: '%1' already exists. Please rename")).arg(qPrintable(featureId));
 			return false;
 		}
@@ -69,7 +68,7 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	for (const sdl::imtlic::Features::V1_0::CFeatureData& subFeatureData : subFeatureDataList){
 		imtlic::CFeatureInfo* subFeatureInfoPtr = new imtlic::CFeatureInfo();
 
-		bool ok = CreateFeatureFromRepresentationModel(subFeatureData, *subFeatureInfoPtr, errorMessage);
+		bool ok = CreateFeatureFromRepresentationModel(subFeatureData, rootFeatureId, *subFeatureInfoPtr, errorMessage);
 		if (!ok){
 			return false;
 		}
@@ -267,7 +266,7 @@ istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentat
 	description = featureDataRepresentation.GetDescription();
 	featureInfoPtr->SetFeatureDescription(description);
 
-	bool ok = CreateFeatureFromRepresentationModel(featureDataRepresentation, *featureInfoPtr, errorMessage);
+	bool ok = CreateFeatureFromRepresentationModel(featureDataRepresentation, newObjectId, *featureInfoPtr, errorMessage);
 	if (!ok){
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
 

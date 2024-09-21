@@ -28,7 +28,7 @@ protected:
 				sdl::imtlic::Licenses::V1_0::CLicenseItem& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
-				const sdl::imtlic::Licenses::V1_0::CLicenseData& licenseDataRepresentation,
+				const sdl::imtlic::Licenses::V1_0::CLicenseDefinitionData& licenseDataRepresentation,
 				QByteArray& newObjectId,
 				QString& name,
 				QString& description,

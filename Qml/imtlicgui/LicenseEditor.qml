@@ -16,7 +16,7 @@ ViewBase {
     property TreeItemModel featuresModel: TreeItemModel {}
     property TreeItemModel licensesModel: TreeItemModel {}
 
-    property LicenseData licenseData: model ? model : null;
+    property LicenseDefinitionData licenseData: model ? model : null;
 
     Component.onCompleted: {
         CachedFeatureCollection.updateModel();

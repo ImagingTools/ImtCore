@@ -30,8 +30,6 @@ protected:
 				const sdl::imtauth::Users::V1_0::CUsersListGqlRequest& usersListRequest,
 				sdl::imtauth::Users::V1_0::CUserItem& representationObject,
 				QString& errorMessage) const override;
-
-	// User methods
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
 				const sdl::imtauth::Users::V1_0::CUserData& userDataRepresentation,
 				QByteArray& newObjectId,

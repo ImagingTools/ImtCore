@@ -21,8 +21,15 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	bool CreateFeatureFromRepresentationModel(const sdl::imtlic::Features::V1_0::CFeatureData& featureRepresentationData, imtlic::CFeatureInfo& featureInfo, QString& errorMessage) const;
-	bool CreateRepresentationModelFromFeatureInfo(const imtlic::CFeatureInfo& featureInfo, sdl::imtlic::Features::V1_0::CFeatureData& featureRepresentationData, QString& errorMessage) const;
+	bool CreateFeatureFromRepresentationModel(
+				const sdl::imtlic::Features::V1_0::CFeatureData& featureRepresentationData,
+				const QByteArray& rootFeatureId,
+				imtlic::CFeatureInfo& featureInfo,
+				QString& errorMessage) const;
+	bool CreateRepresentationModelFromFeatureInfo(
+				const imtlic::CFeatureInfo& featureInfo,
+				sdl::imtlic::Features::V1_0::CFeatureData& featureRepresentationData,
+				QString& errorMessage) const;
 
 	// reimplemented (sdl::imtlic::Features::V1_0::CFeatureCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(

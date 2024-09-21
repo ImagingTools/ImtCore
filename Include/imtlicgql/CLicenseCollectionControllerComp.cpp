@@ -116,7 +116,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentation(
-	const sdl::imtlic::Licenses::V1_0::CLicenseData& licenseDataRepresentation,
+	const sdl::imtlic::Licenses::V1_0::CLicenseDefinitionData& licenseDataRepresentation,
 	QByteArray& newObjectId,
 	QString& name,
 	QString& description,
@@ -222,7 +222,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	sdl::imtlic::Licenses::V1_0::LicenseItemRequestArguments arguments = licenseItemRequest.GetRequestedArguments();
-	sdl::imtlic::Licenses::V1_0::CLicenseData licenseData;
+	sdl::imtlic::Licenses::V1_0::CLicenseDefinitionData licenseData;
 
 	licenseData.SetId(arguments.input.GetId());
 
@@ -248,7 +248,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	QByteArray dependencies = licenseInfoPtr->GetDependencies().join(';');
 	licenseData.SetParentLicenses(dependencies);
 
-	representationPayload.SetLicenseData(licenseData);
+	representationPayload.SetLicenseDefinitionData(licenseData);
 
 	return true;
 }

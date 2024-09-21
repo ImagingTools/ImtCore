@@ -140,7 +140,7 @@ ViewBase {
         featureData.m_featureName = featureNameInput.text;
         featureData.m_featureId = featureIdInput.text;
         featureData.m_description = descriptionInput.text;
-        // tableView_.rowModel = featureData.m_subFeatures;
+        tableView_.rowModel = featureData.m_subFeatures;
         // if (model.getItemsCount() !== 1){
         //     let emptyModel = featureEditor.treeItemModelComp.createObject(model);
         //     model.insertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
@@ -237,11 +237,8 @@ ViewBase {
         BasicTreeView {
             id: tableView_;
             anchors.top: parent.top;
-            // anchors.topMargin: Style.size_mainMargin
             anchors.left: parent.left;
-            // anchors.leftMargin: Style.size_mainMargin;
             anchors.bottom: parent.bottom;
-            // anchors.bottomMargin: Style.size_mainMargin;
             width: parent.width;
             readOnly: false;
             rowDelegate: Component { PackageViewItemDelegate { root: tableView_; } }
@@ -395,7 +392,7 @@ ViewBase {
             }
 
             function onFeaturesProviderModelChanged(){
-                featureEditor.dependenciewViewModel.copy(FeaturesProvider.model)
+                featureEditor.dependenciewViewModel.copy(CachedFeatureCollection.collectionModel)
                 featureEditor.dependenciewViewModel.refresh();
                 featureEditor.updateTreeViewGui();
             }
@@ -459,12 +456,6 @@ ViewBase {
                     let itemData = delegateItem.getItemData();
                     let id = itemData.FeatureId;
                     let dependencies = itemData.Dependencies;
-
-                    // let rootId = itemData.RootFeatureId;
-
-                    // if (rootId === featureEditor.featureId){
-                    //     continue;
-                    // }
 
                     if (dependencies && dependencies !== ""){
                         let dependencyList = dependencies.split(';');

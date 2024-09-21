@@ -22,23 +22,6 @@ RemoteCollectionView {
 
             documentTypeId: "User";
             viewTypeId: "UserEditor";
-
-            function updateItemSelection(selectedItems){
-                if (userCollectionViewContainer.commandsController){
-                    let isEnabled = selectedItems.length === 1;
-                    if (!isEnabled){
-                        userCollectionViewContainer.commandsController.setCommandIsEnabled("Remove", false);
-                        userCollectionViewContainer.commandsController.setCommandIsEnabled("Edit", false);
-                    }
-                    else{
-                        let index = selectedItems[0];
-                        let systemIds = userCollectionViewContainer.table.elements.getData("SystemId", index);
-
-                        userCollectionViewContainer.commandsController.setCommandIsEnabled("Remove", isEnabled && !systemIds.includes("Ldap"));
-                        userCollectionViewContainer.commandsController.setCommandIsEnabled("Edit", isEnabled);
-                    }
-                }
-            }
         }
     }
 

@@ -11,8 +11,6 @@ DocumentCollectionViewDelegate {
     removeDialogTitle: qsTr("Deleting a product");
     removeMessage: qsTr("Delete the selected product ?");
 
-    descriptionFieldId: "ProductDescription";
-
     function updateItemSelection(selectedItems){
         if (container.collectionView && container.collectionView.commandsController){
             let elementsModel = container.collectionView.table.elements;

@@ -3,6 +3,7 @@ import Acf 1.0
 import imtguigql 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtauthUsersSdl 1.0
 
 Item {
     id: userPanelDelegate;
@@ -10,7 +11,7 @@ Item {
     property string userId;
     property string login;
     property string passwordHash;
-    property TreeItemModel userModel: TreeItemModel {}
+    property UserData userModel: UserData {}
 
     signal userUpdated();
 
@@ -48,8 +49,8 @@ Item {
                     userPanelDelegate.cacheData.login = this.login;
                     userPanelDelegate.cacheData.password = this.password;
 
-                    userPanelDelegate.userModel.setData("Password", this.password)
-                    userPanelDelegate.userModel.setData("Username", this.login)
+                    userPanelDelegate.userModel.m_password = this.password;
+                    userPanelDelegate.userModel.m_username = this.login;
 
                     documentController.documentId = userPanelDelegate.userId;
                     documentController.documentModel = userPanelDelegate.userModel;
@@ -59,12 +60,18 @@ Item {
         }
     }
 
-    GqlDocumentDataController{
+    GqlRequestDocumentDataController{
         id: documentController;
 
-        gqlGetCommandId: "UserItem";
-        gqlAddCommandId: "UserAdd";
-        gqlUpdateCommandId: "UserUpdate";
+        gqlGetCommandId: ImtauthUsersSdlCommandIds.s_userItem;
+        gqlUpdateCommandId: ImtauthUsersSdlCommandIds.s_userUpdate;
+        gqlAddCommandId: ImtauthUsersSdlCommandIds.s_userAdd;
+
+        Component.onCompleted: {
+            getRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, AuthorizationController.productId);
+            addRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, AuthorizationController.productId);
+            updateRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, AuthorizationController.productId);
+        }
 
         onSaved: {
             userPanelDelegate.onResult(id, name);

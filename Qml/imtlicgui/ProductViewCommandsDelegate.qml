@@ -48,11 +48,10 @@ ViewCommandsDelegateBase {
         }
         else if (commandId === "Remove"){
             let selectedIndex = container.view.tableView.selectedIndex;
-            if (selectedIndex != null){
+            if (selectedIndex !== null){
                 let index = selectedIndex.index;
 
-                let featureId = container.view.model.m_id;
-
+                let featureId = container.view.tableView.rowModel.getData("Id", index);
                 container.view.removeFeature(featureId);
 
                 container.view.updateFeaturesGui();

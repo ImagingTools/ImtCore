@@ -35,7 +35,7 @@ type LicensesListPayload {
 	notification: NotificationItem
 }
 
-type LicenseData {
+type LicenseDefinitionData {
 	Id: ID!
 	Name: String!
 	LicenseName: String!
@@ -48,11 +48,11 @@ type LicenseData {
 
 input LicenseDataInput {
 	Id: ID!
-	Item: LicenseData!
+	Item: LicenseDefinitionData!
 }
 
 type LicenseDataPayload {
-	LicenseData: LicenseData
+	LicenseDefinitionData: LicenseDefinitionData
 }
 
 input LicenseItemInput {
@@ -76,7 +76,7 @@ collectionSchema {
 			list: LicensesList
 		}
 		subtype License {
-			ref: LicenseData
+			ref: LicenseDefinitionData
 			operations {
 				get: LicenseItem
 				update: LicenseUpdate

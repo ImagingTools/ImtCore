@@ -168,8 +168,7 @@ void CObserverQmlComp::OnComponentCreated()
 			ApplyUrl();
 			UpdateApplicationInfoRepresentation();
 
-			bool isConnected = connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnGuiChanged()));
-			Q_ASSERT(isConnected);
+			connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnGuiChanged()));
 		}
 	}
 }

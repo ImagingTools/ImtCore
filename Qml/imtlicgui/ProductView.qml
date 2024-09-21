@@ -34,6 +34,7 @@ ViewBase {
     }
 
     function onFeaturesChanged(){
+        console.log("onFeaturesChanged");
         productViewContainer.updateFeaturesGui();
     }
 

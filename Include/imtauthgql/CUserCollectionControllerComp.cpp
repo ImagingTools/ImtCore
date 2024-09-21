@@ -2,12 +2,10 @@
 
 
 // ACF includes
-#include <idoc/CStandardDocumentMetaInfo.h>
 #include <iprm/CTextParam.h>
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
-#include <imtbase/CCollectionFilter.h>
 #include <imtauth/CUserInfo.h>
 
 

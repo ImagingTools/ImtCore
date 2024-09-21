@@ -67,12 +67,12 @@ RemoteCollectionView {
             gqlAddCommandId: ImtlicLicensesSdlCommandIds.s_licenseAdd;
 
             documentModelComp: Component {
-                LicenseData {}
+                LicenseDefinitionData {}
             }
 
             payloadModel: LicenseDataPayload {
                 onFinished: {
-                    requestDocumentDataController.documentModel = m_licenseData;
+                    requestDocumentDataController.documentModel = m_licenseDefinitionData;
                 }
             }
         }

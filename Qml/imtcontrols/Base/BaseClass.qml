@@ -264,13 +264,20 @@ QtObject {
     function fromJSON(json){
         let obj;
         try {
-            obj = JSON.parse(json);
+            obj = JSON.parse(escapeSpecialChars(json));
         } catch (e) {
             console.error(e);
             return null;
         }
 
         return fromObject(obj)
+    }
+
+    function escapeSpecialChars(jsonString){
+        return jsonString.replace(/\n/g, "\\n")
+                         .replace(/\r/g, "\\r")
+                         .replace(/\t/g, "\\t")
+                         .replace(/\f/g, "\\f");
     }
 
     function fromObject(sourceObject){

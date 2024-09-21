@@ -54,7 +54,6 @@ QtObject {
 
         onStateChanged: {
             if (this.state === "Ready"){
-                console.log("UserToken", this.toJson());
                 var dataModelLocal;
 
                 if (container.authorizationGqlModel.containsKey("errors")){

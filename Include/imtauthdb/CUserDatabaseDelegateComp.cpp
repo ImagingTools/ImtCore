@@ -215,13 +215,6 @@ QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
 		return QByteArray();
 	}
 
-	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
-	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
-		if (!systemInfo.systemId.isEmpty()){
-			return QByteArray();
-		}
-	}
-
 	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';")
 			.arg(qPrintable(*m_tableNameAttrPtr))
 			.arg(qPrintable(*m_objectIdColumnAttrPtr))
