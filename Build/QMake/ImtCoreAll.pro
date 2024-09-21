@@ -195,6 +195,9 @@ imtlicguiqml.file = ../../Qml/imtlicgui/QMake/imtlicguiqml.pro
 SUBDIRS += imtauthsdl
 imtauthsdl.file = ../../Sdl/imtauth/QMake/imtauthsdl.pro
 
+SUBDIRS += imtlicsdl
+imtlicsdl.file = ../../Sdl/imtlic/QMake/imtlicsdl.pro
+
 ######### Component packages
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
@@ -286,12 +289,6 @@ Imt3dGuiPck.depends = imt3dview imt3dgui imtgui
 SUBDIRS += ImtZipPck
 ImtZipPck.file = ../../Impl/ImtZipPck/QMake/ImtZipPck.pro
 ImtZipPck.depends = imtzip
-
-!macx {
-#	SUBDIRS += ImtPyPck
-#	ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
-#	ImtPyPck.depends = imtpy
-}
 
 SUBDIRS += ImtGqlPck
 ImtGqlPck.file = ../../Impl/ImtGqlPck/QMake/ImtGqlPck.pro
