@@ -17,6 +17,7 @@ const QtWebSockets = require('../QtWebSockets/QtWebSockets')
 
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\imtcore.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\jq.json'//process.argv.slice(2)[0]
+// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\agentino.json'//process.argv.slice(2)[0]
 const configFilePath = process.argv.slice(2)[0]
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 const config = JSON.parse(fs.readFileSync(configFilePath, {encoding:'utf8', flag:'r'}))
@@ -127,6 +128,7 @@ class Instruction {
                 type: meta[3],
                 value: type.defaultValue,
                 signalName: meta[2]+'Changed',
+                info: meta.info,
             }) 
 
             this.assignProperties.push({
@@ -1310,7 +1312,7 @@ for(let dirPath of config.dirs){
     let lines = fs.readFileSync(absolutePath + '/qmldir', {encoding:'utf8', flag:'r'}).replaceAll('\r', '').split('\n')
     let count = 0
     for(let line of lines){
-        let params = line.split(' ')
+        let params = line.trim().split(' ')
         if(params.length === 2){
             let [type, name] = params
             if(type === 'module'){

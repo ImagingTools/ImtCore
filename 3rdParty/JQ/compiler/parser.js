@@ -1469,6 +1469,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     };
 
     function maybe_conditional(no_in) {
+        var info = S.token
         var expr = expr_ops(no_in);
         if (is("operator", "?")) {
             next();
@@ -1588,18 +1589,20 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
 
   // QML-specific methods
 
-  function as_statement() {
-    var res = slice(arguments);
+  function as_statement(info, ...args) {
+    var res = slice(args);
     S.in_function++;
     var start = S.token.pos;
     res.push(statement());
     var end = S.token.pos;
     S.in_function--;
     res.push(TEXT.substr(start, end - start));
+    res.info = info
     return res;
   }
 
   function maybe_qmlelem(no_in) {
+    var info = S.token
     var expr = maybe_assign(no_in);
     if (is("punc", "{")) {
       var qmlelem_name;
@@ -1696,7 +1699,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     if (is("punc", ":")) {
       next();
       statement.in_qmlprop = true;
-      return as_statement("qmlpropdef", attrs, name, type);
+      return as_statement(info, "qmlpropdef", attrs, name, type);
     } else if (is("punc", ";"))
       next();
     return as_(info, "qmlpropdef", attrs, name, type);
@@ -1749,7 +1752,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
       next();
       if (is("punc", ":")) {
         next();
-        return as_statement("qmlprop", "signal");
+        return as_statement(info, "qmlprop", "signal");
       } else {
         return qmlsignaldef();
       }
@@ -1778,7 +1781,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
       if(LE_FLAG) {
         expect(":");
         statement.in_qmlprop = true;
-        return as_statement("qmlprop", propname);
+        return as_statement(info, "qmlprop", propname);
       }
       if(propname === 'ListElement') LE_FLAG = true
 
@@ -1798,7 +1801,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
         // Evaluatable item
         expect(":");
         statement.in_qmlprop = true;
-        return as_statement("qmlprop", propname);
+        return as_statement(info, "qmlprop", propname);
       }
     } else if (is("keyword", "default")) {
       return qmldefaultprop();
