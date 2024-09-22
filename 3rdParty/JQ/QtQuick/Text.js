@@ -170,10 +170,14 @@ class Text extends Item {
     }
 
     onWrapModeChanged(){
-        this.__updateGeometry()
-    }
+        switch(this.wrapMode){
+            case Text.NoWrap: this.__setDOMStyle({ whiteSpace: 'pre' }); break;
+            case Text.WordWrap: this.__setDOMStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }); break;
+            case Text.WrapAnywhere: this.__setDOMStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }); break;
+            case Text.Wrap: this.__setDOMStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }); break;
+            case Text.WrapAtWordBoundaryOrAnywhere: this.__setDOMStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }); break;
+        }
 
-    onElideChanged(){
         this.__updateGeometry()
     }
 

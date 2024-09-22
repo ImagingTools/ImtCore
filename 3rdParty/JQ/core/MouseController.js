@@ -42,6 +42,14 @@ class QmlMouseEvent {
         this.x = this.originX - rect.x
         this.y = this.originY - rect.y
     }
+
+    fillButton(event){
+        switch(event.button){
+			case 0: this.button = QtEnums.LeftButton; break;
+			case 1: this.button = QtEnums.MiddleButton; break;
+			case 2: this.button = QtEnums.RightButton; break;
+		}	
+    }
 }
 
 class QmlWheelEvent {
@@ -141,14 +149,17 @@ module.exports = {
         })
 
         window.addEventListener('click', (e)=>{
+            this.event.fillButton(e)
             this.click(e)
         })
         window.addEventListener('dblclick', (e)=>{
+            this.event.fillButton(e)
             e.preventDefault()
             this.click(e)
         })
         window.addEventListener('mousedown', (e)=>{
             this.event = new QmlMouseEvent({pressed: true})
+            this.event.fillButton(e)
             this.event.originX = e.pageX
             this.event.originY = e.pageY
             this.event.startX = e.pageX
@@ -163,6 +174,7 @@ module.exports = {
         })
         window.addEventListener('mouseup', (e)=>{
             if(this.event){
+                this.event.fillButton(e)
                 this.event.originX = e.pageX
                 this.event.originY = e.pageY
                 this.event.relative(obj)
@@ -170,6 +182,7 @@ module.exports = {
             }
         })
         window.addEventListener('contextmenu', (e)=>{
+            this.event.fillButton(e)
             e.preventDefault()
             this.click(e)
         })

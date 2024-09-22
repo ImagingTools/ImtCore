@@ -26,6 +26,11 @@ class Binding extends QtObject {
         whenChanged: {type:Signal, slotName:'onWhenChanged', args:[]},
     })
 
+    __complete(){
+        super.__complete()
+        this.__update()
+    }
+
     onDelayedChanged(){
         this.__update()
     }
@@ -51,7 +56,7 @@ class Binding extends QtObject {
     }  
 
     __update(){
-        if(this.target && !this.target.__destroyed && this.property){
+        if(this.__completed && this.target && !this.target.__destroyed && this.property){
             let path = this.property.split('.')
             let prop = this.target
 
@@ -60,7 +65,9 @@ class Binding extends QtObject {
                 prop = prop[propName]
             }
 
-            prop[path.shift()] = this.value
+            let targetProperty = prop.__getObject(path.shift())
+            targetProperty.__setCompute(()=>{return this.value})
+            targetProperty.__update()
         }
     }
 }

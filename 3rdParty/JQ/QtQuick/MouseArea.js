@@ -94,7 +94,7 @@ class MouseArea extends Item {
     }
 
     __onMouseDown(mouse){
-        if(!this.enabled || !this.visible) return
+        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
         if(!mouse.target){
             this.__pressed = true
@@ -107,7 +107,7 @@ class MouseArea extends Item {
     }
 
     __onMouseUp(mouse){
-        if(!this.enabled || !this.visible) return
+        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
         if(!mouse.target || mouse.target === this){
             this.released(mouse)
@@ -115,7 +115,7 @@ class MouseArea extends Item {
     }
 
     __onMouseClick(mouse){
-        if(!this.enabled || !this.visible) return
+        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
         if(mouse.target === this && this.__pressed){
             this.clicked(mouse)
@@ -126,7 +126,7 @@ class MouseArea extends Item {
     }
 
     __onMouseDblClick(mouse){
-        if(!this.enabled || !this.visible) return
+        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
         if(mouse.target === this && this.__pressed){
             this.doubleClicked(mouse)
