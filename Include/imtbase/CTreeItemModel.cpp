@@ -256,7 +256,9 @@ int CTreeItemModel::InsertNewItem()
 
 	endInsertRows();
 
-	OnModelChanged();
+    if(m_isUpdateEnabled){
+        OnModelChanged();
+    }
 
 	return index;
 }
@@ -278,7 +280,9 @@ int CTreeItemModel::InsertNewItem(int index)
 
 	endInsertRows();
 
-	OnModelChanged();
+    if(m_isUpdateEnabled){
+        OnModelChanged();
+    }
 
 	return index;
 }
@@ -436,44 +440,50 @@ bool CTreeItemModel::SetData(
 		const QVariant& value,
 		int index)
 {
-	BeginChanges();
+    if(m_isUpdateEnabled){
+        BeginChanges();
+    }
 
 	if (m_items.isEmpty() && index == 0){
 		InsertNewItem();
 	}
 
 	if (index < 0 || index > m_items.count() - 1){
-		EndChanges();
-
+        if(m_isUpdateEnabled){
+            EndChanges();
+        }
 		return false;
 	}
 
-	QList<QByteArray> roles = m_roleNames.values();
-	if (!roles.contains(key)){
-		m_roleNames.insert(Qt::UserRole + 1 + m_roleNames.count(), key);
-	}
+    QList<QByteArray> roles = m_roleNames.values();
+    if (!roles.contains(key)){
+        m_roleNames.insert(Qt::UserRole + 1 + m_roleNames.count(), key);
+    }
 
 	Item* item = m_items[index];
 
 	if (item->Value(key) == value){
-		EndChanges();
-
+        if(m_isUpdateEnabled){
+            EndChanges();
+        }
 		return true;
 	}
 
 	item->SetValue(key, value);
 
-	int keyRole = GetKeyRole(key);
-	if (keyRole > -1){
-		QVector<int> keyRoles;
-		keyRoles.append(keyRole);
+    if(m_isUpdateEnabled){
+        int keyRole = GetKeyRole(key);
+        if (keyRole > -1){
+            QVector<int> keyRoles;
+            keyRoles.append(keyRole);
 
-		Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), keyRoles);
-	}
+            Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), keyRoles);
+        }
 
-	OnModelChanged();
+        OnModelChanged();
 
-	EndChanges();
+        EndChanges();
+    }
 
 	return true;
 }
