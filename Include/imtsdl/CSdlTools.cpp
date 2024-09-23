@@ -431,6 +431,44 @@ QString CSdlTools::GetFromVariantConversionString(const CSdlField& sdlField)
 	return "";
 }
 
+
+QString CSdlTools::GetFromVariantConversionStringExt(const CSdlField& sdlField, bool singleValue)
+{
+	const QString sdlType = sdlField.GetType();
+
+	if (!singleValue && sdlField.IsArray()){
+		return QStringLiteral("toList()");
+	}
+
+	if (sdlType == QStringLiteral("Int") || sdlType == QStringLiteral("Integer")){
+		return QStringLiteral("toInt()");
+	}
+	if (sdlType == QStringLiteral("Long")){
+		return QStringLiteral("toLongLong()");
+	}
+	if (sdlType == QStringLiteral("LongLong")){
+		return QStringLiteral("toLongLong()");
+	}
+	if (sdlType == QStringLiteral("Float")){
+		return QStringLiteral("toFloat()");
+	}
+	if (sdlType == QStringLiteral("Double")){
+		return QStringLiteral("toDouble()");
+	}
+	if (sdlType == QStringLiteral("String")){
+		return QStringLiteral("toString()");
+	}
+	if (sdlType == QStringLiteral("Boolean") || sdlType == QStringLiteral("Bool")){
+		return QStringLiteral("toBool()");
+	}
+	if (sdlType == QStringLiteral("ID")){
+		return QStringLiteral("toByteArray()");
+	}
+
+	return "";
+}
+
+
 QString CSdlTools::FromVariantMapAccessString(const CSdlField& sdlField)
 {
 	QString retVal = s_variantMapClassMemberName;

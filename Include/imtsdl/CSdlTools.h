@@ -48,7 +48,11 @@ public:
 	static bool IsTypeHasFundamentalTypes(const CSdlRequest& sdlRequest, QSet<QString>* foundTypesPtr =  nullptr);
 	static bool IsTypeHasNonFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr =  nullptr);
 	static bool IsTypeHasNonFundamentalTypes(const CSdlRequest& sdlRequest, QSet<QString>* foundTypesPtr =  nullptr);
-	[[nodiscard]]static QString GetFromVariantConversionString(const CSdlField& sdlField);
+
+	Q_DECL_DEPRECATED_X("Use GetFromVariantConversionStringExt instead")
+		[[nodiscard]]static QString GetFromVariantConversionString(const CSdlField& sdlField);
+
+	[[nodiscard]]static QString GetFromVariantConversionStringExt(const CSdlField& sdlField, bool singleValue = false);
 	[[nodiscard]]static QString FromVariantMapAccessString(const CSdlField& sdlField);
 	static bool GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList& typeList, CSdlType& sdlType);
 	static void AddSelfCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
