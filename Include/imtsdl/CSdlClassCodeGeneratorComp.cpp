@@ -721,10 +721,28 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 
 		// add spectal list insertion method
 		if (sdlField.IsArray()){
+			bool isCustom = false;
+			const QString convertedType = ConvertType(sdlField.GetType(), &isCustom);
+			bool isComplex = sdlField.GetType() == QStringLiteral("String") ||
+							 sdlField.GetType() == QStringLiteral("ID") ||
+							 isCustom;
+
 			FeedLineHorizontally(retVal, indents);
-			retVal += QStringLiteral("void AddElement(const C");
-			retVal += sdlField.GetType();
-			retVal += QStringLiteral("& item);\n");
+			retVal += QStringLiteral("void Add");
+			retVal += GetCapitalizedValue(sdlField.GetId());
+			retVal += QStringLiteral("Element(");
+
+			if (isComplex){
+				retVal += QStringLiteral("const ");
+			}
+
+			retVal += convertedType;
+
+			if (isComplex){
+				retVal += '&';
+			}
+
+			retVal += QStringLiteral(" element);\n");
 		}
 	}
 
@@ -828,12 +846,31 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 
 		// add spectal list insertion method
 		if (sdlField.IsArray()){
+
+			bool isCustom = false;
+			const QString convertedType = ConvertType(sdlField.GetType(), &isCustom);
+			bool isComplex = sdlField.GetType() == QStringLiteral("String") ||
+							 sdlField.GetType() == QStringLiteral("ID") ||
+							 isCustom;
+
 			FeedStreamHorizontally(stream, indents);
 			stream << QStringLiteral("void");
 			stream << QStringLiteral(" C") + className + QStringLiteral("::");
-			stream << QStringLiteral("AddElement(const C");
-			stream << sdlField.GetType();
-			stream << QStringLiteral("& item)");
+			stream << QStringLiteral("Add");
+			stream << GetCapitalizedValue(sdlField.GetId());
+			stream << QStringLiteral("Element(");
+
+			if (isComplex){
+				stream << QStringLiteral("const ");
+			}
+
+			stream << convertedType;
+
+			if (isComplex){
+				stream << '&';
+			}
+
+			stream << QStringLiteral(" element)");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, indents);
@@ -843,7 +880,7 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 			FeedStreamHorizontally(stream, indents + 1);
 			stream << QStringLiteral("m_");
 			stream << GetDecapitalizedValue(sdlField.GetId());
-			stream << QStringLiteral(" << item;");
+			stream << QStringLiteral(" << element;");
 			FeedStream(stream, 1, false);
 
 			// update internal storage
@@ -950,6 +987,10 @@ void CSdlClassCodeGeneratorComp::GenerateListUpdateCode(QTextStream& stream, con
 		else if (isCustom){
 			stream << FromVariantMapAccessString(sdlField) << QStringLiteral(".setValue(");
 			stream << GetDecapitalizedValue(sdlField.GetId()) << ')' << ';';
+		}
+		else if (sdlField.IsArray()){
+			stream << FromVariantMapAccessString(sdlField) << QStringLiteral(" = m_");
+			stream << GetDecapitalizedValue(sdlField.GetId()) << ';';
 		}
 		else {
 			stream << FromVariantMapAccessString(sdlField) << QStringLiteral(" = ");
