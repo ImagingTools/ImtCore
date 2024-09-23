@@ -295,7 +295,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelCode(QTextStr
 		stream << '}';
 		FeedStream(stream, 1, false);
 
-		AddCustomFieldReadToModelImplCode(stream, field);
+		AddCustomFieldReadFromModelImplCode(stream, field);
 		FeedStream(stream, 1, false);
 	}
 	else {
@@ -304,7 +304,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelCode(QTextStr
 		stream << QStringLiteral("DataModelPtr != nullptr){");
 		FeedStream(stream, 1, false);
 
-		AddCustomFieldReadToModelImplCode(stream, field, 2);
+		AddCustomFieldReadFromModelImplCode(stream, field, 2);
 		FeedStreamHorizontally(stream);
 		stream << '}';
 		FeedStream(stream, 1, false);
@@ -312,7 +312,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelCode(QTextStr
 }
 
 
-void CSdlClassTreeModelModificatorComp::AddCustomFieldReadToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents)
+void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
 
@@ -441,14 +441,14 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 		stream << '}';
 		FeedStream(stream, 1, false);
 
-		AddPrimitiveArrayFieldReadToModelImplCode(stream, field);
+		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field);
 		FeedStream(stream, 1, false);
 	}
 	else {
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model != nullptr){");
 		FeedStream(stream, 1, false);
 
-		AddPrimitiveArrayFieldReadToModelImplCode(stream, field, 2);
+		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field, 2);
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
@@ -458,7 +458,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 }
 
 
-void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents)
+void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
 
@@ -624,14 +624,14 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldReadFromModelCode(QTe
 		stream << '}';
 		FeedStream(stream, 1, false);
 
-		AddCustomArrayFieldReadToModelImplCode(stream, field);
+		AddCustomArrayFieldReadFromModelImplCode(stream, field);
 		FeedStream(stream, 1, false);
 	}
 	else {
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model != nullptr){");
 		FeedStream(stream, 1, false);
 
-		AddCustomArrayFieldReadToModelImplCode(stream, field, 2);
+		AddCustomArrayFieldReadFromModelImplCode(stream, field, 2);
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
@@ -640,7 +640,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldReadFromModelCode(QTe
 	}
 }
 
-void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadToModelImplCode(
+void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCode(
 			QTextStream& stream,
 			const CSdlField& field,
 			quint16 hIndents)
