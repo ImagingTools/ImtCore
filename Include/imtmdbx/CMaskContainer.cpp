@@ -703,10 +703,6 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 
 
 	/*******************conditions***************************/
-    // if(maxOffset == 0xffffffffffffffff || minOffset == 0xffffffffffffffff){
-    //     qDebug() << "isLast";
-    // //     isLast = true;
-    // }
 
 	if(isLast){
 		return false;

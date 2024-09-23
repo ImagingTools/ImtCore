@@ -95,32 +95,6 @@ bool CMask::GetNearestOffset(quint64& offset, quint64 startOffset)
 
 bool CMask::GetNextItemOffset(quint64& offset, quint64 startOffset)
 {
-    // mdbx::slice keySlice(&startOffset, 8);
-
-    // if (m_cursor.seek(keySlice)){
-    // 	mdbx::cursor::move_result result = m_cursor.current();
-    // 	if (result.done){
-    // 		result = m_cursor.to_next(false);
-    // 		if (!result.done){
-    // 			return false;
-    // 		}
-    // 		offset = result.key.as_uint64();
-    // 	}
-    // 	else{
-    // 		return false;
-    // 	}
-    // }
-    // else {
-    // 	return false;
-    // }
-
-    // if(offset < startOffset){
-    // 	Q_ASSERT(0);
-    // }
-    // return true;
-
-
-	/******************************lower_bound*****************************/
 
     mdbx::slice keySlice(&startOffset, 8);
 
