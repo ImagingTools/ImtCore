@@ -11,16 +11,18 @@ namespace imtmdbx
 {
 
 
-CDocumentTable::CDocumentTable(const QString& name, mdbx::txn_managed &txn,
+CDocumentTable::CDocumentTable(const QString& name,
+                               mdbx::txn_managed &txn,
 							   mdbx::key_mode keyMode,
 							   mdbx::value_mode valueMode,
 							   bool hasIndex):
 	m_tableName(name),
 	m_txn(txn),
-	m_keyMode(keyMode),
-	m_valueMode(valueMode)
+    m_hasIndex(hasIndex),
+    m_keyMode(keyMode),
+    m_valueMode(valueMode)
+
 {
-	m_hasIndex = hasIndex ? hasIndex : Exists(m_tableName + "Index");
 	bool isReadOnly = m_txn.is_readonly();
 
 	if (isReadOnly){
@@ -239,12 +241,6 @@ bool CDocumentTable::UpdateDocument(const char *key, int count, const QByteArray
 
 	try{
 
-		bool exists =  Exists(m_tableName);
-		if(!exists){
-			qDebug() << "Database does not exist!";
-			return false;
-		}
-
 		mdbx::slice keySlice(key, count);
 		mdbx::slice valueSlice(data.data(), data.length());
 
@@ -423,12 +419,6 @@ bool CDocumentTable::CreateIndex()
 
 	try{
 
-		bool exists = Exists(m_tableName);
-		if(!exists){
-			qDebug() << "Database does not exist!";
-			return false;
-		}
-
 		if(m_hasIndex){
 			qDebug() << "Index exists!";
 			return false;
@@ -560,10 +550,12 @@ bool CDocumentTable::Exists(const QString& name)
 {
 	bool ok = true;
 
-	mdbx::map_handle mapHandle = m_txn.open_map(0);
-	mdbx::cursor_managed cursor = m_txn.open_cursor(mapHandle);
-	mdbx::slice keySlice(name.toStdString());
-	ok = cursor.seek(keySlice);
+    try{
+        mdbx::map_handle mapHandle = m_txn.open_map(name.toStdString(), m_keyMode, m_valueMode);
+    }
+    catch (...){
+        ok = false;
+    }
 
 	return ok;
 }

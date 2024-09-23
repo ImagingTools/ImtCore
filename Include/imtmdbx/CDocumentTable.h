@@ -15,7 +15,13 @@ namespace imtmdbx
 class CDocumentTable: virtual public IDocumentTable
 {
 public:
-	CDocumentTable(const QString& name, mdbx::txn_managed& txn, mdbx::key_mode keyMode = mdbx::key_mode::reverse, mdbx::value_mode valueMode = mdbx::value_mode::single, bool hasIndex = false);
+    CDocumentTable(
+            const QString& name,
+            mdbx::txn_managed& txn,
+            mdbx::key_mode keyMode = mdbx::key_mode::reverse,
+            mdbx::value_mode valueMode = mdbx::value_mode::single,
+            bool hasIndex = false
+            );
 
 	~CDocumentTable();
 
