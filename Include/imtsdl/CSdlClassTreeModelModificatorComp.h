@@ -35,6 +35,10 @@ private:
 	void AddCustomFieldWriteToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
 	void AddCustomFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
 	void AddCustomFieldReadToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
+	void AddPrimitiveArrayFieldWriteToModelCode(QTextStream& stream, const CSdlField& field);
+	void AddPrimitiveArrayFieldWriteToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
+	void AddPrimitiveArrayFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
+	void AddPrimitiveArrayFieldReadToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
 	void AddCustomArrayFieldWriteToModelCode(QTextStream& stream, const CSdlField& field);
 	void AddCustomArrayFieldWriteToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
 	void AddCustomArrayFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
