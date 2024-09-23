@@ -207,15 +207,15 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 
 	QByteArray productId = userDataRepresentation.GetProductId();
 
-	QByteArray id = userDataRepresentation.GetId();
-	if (id.isEmpty()){
-		id = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	newObjectId = userDataRepresentation.GetId();
+	if (newObjectId.isEmpty()){
+		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
-	newObjectId = id;
+	userInfoPtr->SetObjectUuid(newObjectId);
 
 	imtauth::IUserInfo* oldUserInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr oldUserdataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(id, oldUserdataPtr)){
+	if (m_objectCollectionCompPtr->GetObjectData(newObjectId, oldUserdataPtr)){
 		oldUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(oldUserdataPtr.GetPtr());
 	}
 
@@ -243,7 +243,7 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 		if (m_objectCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
 			const imtauth::CUserInfo* currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
 			if (currentUserInfoPtr != nullptr){
-				if (userObjectId != id){
+				if (userObjectId != newObjectId){
 					QByteArray currentUsername = currentUserInfoPtr->GetId();
 					if (currentUsername.toLower() == username.toLower()){
 						SendWarningMessage(0, QString("Username already exists"), "imtauthgql::CUserControllerComp");

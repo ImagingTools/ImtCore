@@ -8,12 +8,5 @@ CollectionViewCommandsDelegateBase {
 
     removeDialogTitle: qsTr("Deleting a feature");
     removeMessage: qsTr("Delete the selected feature ?");
-
-    onRemoved: {
-        FeaturesProvider.updateModel();
-    }
-
-    onRenamed: {
-        FeaturesProvider.updateModel();
-    }
 }
+

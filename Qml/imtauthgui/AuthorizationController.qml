@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
+import imtguigql 1.0
 
 QtObject {
     id: root;
@@ -116,5 +117,28 @@ QtObject {
 
     function isSimpleUserManagement(){
         return userManagementProvider.userMode === "NO_USER_MANAGEMENT" || userManagementProvider.userMode === "OPTIONAL_USER_MANAGEMENT";
+    }
+
+    function changePassword(userId, oldPassword, newPassword){
+        changePasswordGqlSender.inputParam.InsertField("UserId", userId);
+        changePasswordGqlSender.inputParam.InsertField("OldPassword", oldPassword);
+        changePasswordGqlSender.inputParam.InsertField("NewPassword", newPassword);
+
+        changePasswordGqlSender.send();
+    }
+
+    property GqlRequestSender changePasswordGqlSender: GqlRequestSender {
+        requestType: 1; // Mutation
+        gqlCommandId: "ChangePassword";
+
+        property var inputParam: Gql.GqlObject("input");
+
+        function createQueryParams(query){
+            query.AddParam(inputParam);
+        }
+
+        function onResult(data){
+            ModalDialogManager.showInfoDialog(qsTr("Password changed successfully"));
+        }
     }
 }

@@ -9,10 +9,6 @@ Item {
     width: 50;
     height: 30;
 
-    property string username;
-    property string userId;
-    property string passwordHash;
-
     property bool enabled: false;
 
     property alias iconSource: loginButton.iconSource;
@@ -32,18 +28,10 @@ Item {
         target: AuthorizationController;
 
         function onLoginSuccessful(){
-            root.username = AuthorizationController.userTokenProvider.login;
-            root.userId = AuthorizationController.userTokenProvider.userId;
-            root.passwordHash = AuthorizationController.userTokenProvider.passwordHash;
-
             root.enabled = true;
         }
 
         function onLogoutSignal(){
-            root.username = "";
-            root.userId = "";
-            root.passwordHash = "";
-
             root.enabled = false;
         }
     }
@@ -62,16 +50,13 @@ Item {
 
     Text {
         id: usernameText;
-
         anchors.verticalCenter: root.verticalCenter;
         anchors.right: loginButton.left;
         anchors.rightMargin: 5;
-
         color: Style.textColor;
         font.family: Style.fontFamily;
         font.pixelSize: Style.fontSize_common;
-
-        text: root.username;
+        text: AuthorizationController.userTokenProvider.login;
     }
 
     ToolButton {
@@ -136,14 +121,6 @@ Item {
 
     UserPanelDelegate {
         id: panelDelegate;
-
-        userId: root.userId;
-        passwordHash: root.passwordHash;
-        login: root.username;
-
-        onUserUpdated: {
-            root.passwordHash = Qt.md5(cacheData.login + cacheData.password);
-        }
     }
 }
 

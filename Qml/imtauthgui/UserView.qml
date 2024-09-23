@@ -45,6 +45,9 @@ ViewBase {
 
         checkSystemId();
 
+        passwordInput.visible = userData.m_id == "";
+        changePasswordButton.visible = userData.m_id != "";
+
         setBlockingUpdateModel(false);
     }
 
@@ -171,6 +174,7 @@ ViewBase {
                     echoMode: TextInput.Password;
 
                     readOnly: container.readOnly;
+                    visible: false;
 
                     onEditingFinished: {
                         let oldText = container.userData.m_password;
@@ -181,6 +185,35 @@ ViewBase {
 
                     KeyNavigation.tab: nameInput;
                     KeyNavigation.backtab: usernameInput;
+                }
+
+                ElementView {
+                    id: changePasswordButton;
+                    name: qsTr("Change password");
+                    visible: false;
+
+                    controlComp: Component {
+                        Button {
+                            width: 100;
+                            height: 30;
+                            text: qsTr("Change");
+                            onClicked: {
+                                ModalDialogManager.openDialog(changePasswordComp, {});
+                            }
+                        }
+                    }
+
+                    Component {
+                        id: changePasswordComp;
+                        ChangePasswordDialog {
+                            title: qsTr("Change Password");
+                            onFinished: {
+                                if (buttonId == Enums.save){
+                                    AuthorizationController.changePassword(container.userData.m_id, contentItem.oldPassword, contentItem.newPassword);
+                                }
+                            }
+                        }
+                    }
                 }
 
                 TextInputElementView {

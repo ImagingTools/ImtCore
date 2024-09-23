@@ -2,32 +2,34 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5233" Description="ACF"/>
-            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5244" Description="ACF"/>
+            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="CollectionUserInfoProvider" X="150" Y="75" Note=""/>
+        <Element ComponentName="CredentialController" X="300" Y="450" Note=""/>
         <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
         <Element ComponentName="HashCalculator" X="750" Y="550" Note=""/>
         <Element ComponentName="SerializableUserCollectionController" X="200" Y="550" Note=""/>
         <Element ComponentName="UserCommands" X="425" Y="300" Note=""/>
+        <Element ComponentName="UserController" X="150" Y="300" Note=""/>
         <Element ComponentName="UserInfo" X="525" Y="550" Note=""/>
         <Element ComponentName="UserListController" X="1025" Y="300" Note=""/>
         <Element ComponentName="UsersCommands" X="725" Y="300" Note=""/>
         <Element ComponentName="UsersHeadersDataProvider" X="1000" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="UsersCommands">
-            <PositionMap>
-                <Element ComponentName="CollectionCommandsController" X="575" Y="125" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="UserCommands">
             <PositionMap>
                 <Element ComponentName="StandardDocumentCommandsController" X="600" Y="300" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="UsersCommands">
+            <PositionMap>
+                <Element ComponentName="CollectionCommandsController" X="575" Y="125" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

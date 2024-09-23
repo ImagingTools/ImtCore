@@ -264,12 +264,14 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
 		return nullptr;
 	}
 
-
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
 	if (!CreateRepresentationFromObject(*dataPtr, objectTypeId, gqlRequest, *dataModelPtr, errorMessage)){
-		errorMessage = QString("Unable create object representation for the object with ID: '%1'.").arg(qPrintable(objectId));
+		if (errorMessage.isEmpty()){
+			errorMessage = QString("Unable create object representation for the object with ID: '%1'.").arg(qPrintable(objectId));
+		}
+
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return nullptr;
