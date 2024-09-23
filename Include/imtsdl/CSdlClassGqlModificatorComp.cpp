@@ -147,10 +147,32 @@ void CSdlClassGqlModificatorComp::AddScalarFieldReadFromRequestCode(QTextStream&
 }
 
 
-void CSdlClassGqlModificatorComp::AddScalarListFieldReadFromRequestCode(QTextStream& /*stream*/, const CSdlField& /*field*/)
+void CSdlClassGqlModificatorComp::AddScalarListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
 {
-	/// \todo implement it if GQL will be able to store scalar list
-	qFatal("GQL model does not support insert list of scalars(. Change schema or disable GQL modificator");
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = request.GetFieldArgumentValue(");
+	stream << '"' << field.GetId() << '"';
+	stream << QStringLiteral(");");
+	FeedStream(stream, 1, false);
+
+	if (field.IsRequired()){
+		AddCheckScalarListRequiredValueCode(stream, field);
+
+		AddSetScalarListValueToObjectCode(stream, field);
+		FeedStream(stream, 1, false);
+	}
+	else {
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count > 0){");
+		FeedStream(stream, 1, false);
+
+		AddSetScalarListValueToObjectCode(stream, field, 2);
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 1, false);
+	}
 }
 
 
@@ -265,10 +287,10 @@ void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& 
 }
 
 
-void CSdlClassGqlModificatorComp::AddScalarListFieldWriteToRequestCode(QTextStream& /*stream*/, const CSdlField& /*field*/, uint /*hIndents*/)
+void CSdlClassGqlModificatorComp::AddScalarListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
-	/// \todo implement it if GQL will be able to store scalar list
-	qFatal("GQL model does not support insert list of scalars(. Change schema or disable GQL modificator");
+	// Perform the same actions as for a single value.
+	AddScalarFieldWriteToRequestCode(stream, field, hIndents);
 }
 
 
@@ -542,6 +564,78 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 
 	// set value
 	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("object.Set");
+	stream << GetCapitalizedValue(field.GetId()) << '(';
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List");
+	stream << ')' << ';';
+}
+
+
+// general help methods for scalar list
+
+void CSdlClassGqlModificatorComp::AddCheckScalarListRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral(".isNull()){");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream);
+	stream << '}';
+	FeedStream(stream, 1, false);
+}
+
+
+void CSdlClassGqlModificatorComp::AddSetScalarListValueToObjectCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+	// declare list to sotre extracted values
+	FeedStreamHorizontally(stream, hIndents);
+	stream << ConvertType(field)  << ' ' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List;");
+	FeedStream(stream, 1, false);
+
+	// extract values from GQL object
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("QVariantList ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataList = ");
+	stream << GetDecapitalizedValue(field.GetId()) <<  QStringLiteral("Data.toList();");
+	FeedStream(stream, 1, false);
+
+	// Get count of list
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("qsizetype ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count = ");
+	stream << GetDecapitalizedValue(field.GetId()) <<  QStringLiteral("DataList.size();");
+	FeedStream(stream, 1, false);
+
+	// declare 'for(;;)' loop
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("for (qsizetype ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index = 0; ");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index != ");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count ; ++");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index){");
+	FeedStream(stream, 1, false);
+
+	// declare read variable
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << ConvertType(field.GetType());
+	stream << ' ' << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral(" = ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataList[");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index].");
+	stream << GetFromVariantConversionStringExt(field, true) << ';';
+	FeedStream(stream, 1, false);
+
+	// add to temp list
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List");
+	stream << QStringLiteral(" << ");
+	stream << GetDecapitalizedValue(field.GetId()) << ';';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	// set value
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("object.Set");
 	stream << GetCapitalizedValue(field.GetId()) << '(';

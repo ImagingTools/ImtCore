@@ -57,6 +57,11 @@ private:
 	/// \todo add error handling for it. do not forget about arrays and arrays.isEmpty
 	void AddCheckCustomListRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 	void AddSetCustomListValueToObjectCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+
+	// general help methods for scalar list
+	/// \todo add error handling for it. do not forget about arrays and arrays.isEmpty
+	void AddCheckScalarListRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	void AddSetScalarListValueToObjectCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 };
 
 
