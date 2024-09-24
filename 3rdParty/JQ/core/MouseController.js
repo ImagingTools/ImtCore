@@ -83,18 +83,48 @@ class QmlWheelEvent {
 
 
 module.exports = {
+    objects: new Set(),
+
     timeStamp: 0,
     event: null,
 
     entered: [],
     hovered: [],
 
+    add: function(obj){
+        this.objects.add(obj)
+    },
+    remove: function(obj){
+        this.objects.delete(obj)
+        if(this.event){
+            let index = this.event.path.indexOf(obj)
+            while(index >= 0){
+                this.event.path.splice(index, 1)
+                index = this.event.path.indexOf(obj)
+            }
+        }
+    },
+
     getObjectsFromPoint: function(x, y){
         let result = []
-        for(let el of document.elementsFromPoint(x, y)){
-            if(!el.qml || el.qml.__destroyed) continue
-            result.push(el.qml)
+
+        for(let obj of this.objects){
+            let dom = obj.__getDOM()
+            dom.classList.add("pointer")
         }
+
+        for(let el of document.elementsFromPoint(x, y)){
+            if(this.objects.has(el.qml) && !el.qml.__destroyed){
+                result.push(el.qml)
+            }
+            
+        }
+
+        for(let obj of this.objects){
+            let dom = obj.__getDOM()
+            dom.classList.remove("pointer")
+        }
+
         return result
     },
 
@@ -106,7 +136,7 @@ module.exports = {
             event.originX = e.pageX
             event.originY = e.pageY
 
-            if(!event.target) JQApplication.setCursor(QtEnums.ArrowCursor)
+            // if(!event.target) JQApplication.setCursor(QtEnums.ArrowCursor)
 
             if(event.pressed && (Math.abs(event.startX - event.originX) > 15 || Math.abs(event.startY - event.originY) > 15)) {
                 event.wasDrag = true
@@ -149,11 +179,11 @@ module.exports = {
         })
 
         window.addEventListener('click', (e)=>{
-            this.event.fillButton(e)
+            if(this.event) this.event.fillButton(e)
             this.click(e)
         })
         window.addEventListener('dblclick', (e)=>{
-            this.event.fillButton(e)
+            if(this.event) this.event.fillButton(e)
             e.preventDefault()
             this.click(e)
         })
@@ -170,15 +200,18 @@ module.exports = {
                 this.event.accepted = true
                 this.event.relative(obj)
                 obj.__onMouseDown(this.event) 
-            }
+            }  
         })
         window.addEventListener('mouseup', (e)=>{
             if(this.event){
                 this.event.fillButton(e)
                 this.event.originX = e.pageX
                 this.event.originY = e.pageY
-                this.event.relative(obj)
-                if(this.event.target) this.event.target.__onMouseUp(this.event)
+                
+                if(this.event.target) {
+                    this.event.relative(obj)
+                    this.event.target.__onMouseUp(this.event)
+                }
             }
         })
         window.addEventListener('contextmenu', (e)=>{

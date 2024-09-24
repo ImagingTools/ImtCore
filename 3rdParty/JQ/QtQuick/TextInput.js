@@ -8,6 +8,7 @@ const Real = require('../QtQml/Real')
 const Font = require('../QtQml/Font')
 const Signal = require('../QtQml/Signal')
 const QtEnums = require('../Qt/enums')
+const JQApplication = require("../core/JQApplication")
 
 class TextInput extends Item {
     static AlignLeft = 0
@@ -90,7 +91,7 @@ class TextInput extends Item {
         let proxy = super.create(parent, ...args)
         proxy.__DOM.classList.add('TextInput')
         proxy.__createImpl()
-        
+        JQApplication.MouseController.add(proxy)
         return proxy
     }
 
@@ -98,29 +99,25 @@ class TextInput extends Item {
         let dom = this.__getDOM()
         let impl = document.createElement('div')
         impl.classList.add('impl')
+        impl.innerHTML = '&#8203'
         dom.appendChild(impl)
         this.__impl = impl
 
         impl.setAttribute('contenteditable', true)
 
-        impl.onmousemove = (e)=>{
-            let selection = document.getSelection()
-
-            if(selection.rangeCount){
-                let range = selection.getRangeAt(0)
-
-                this.selectionStart = range.startOffset
-                this.selectionEnd = range.endOffset
-            } else {
-                this.selectionStart = 0
-                this.selectionEnd = 0
-            }
-            
+        impl.onfocus = ()=>{
+            this.forceActiveFocus()
         }
+
+        impl.onblur = ()=>{
+            this.activeFocus = false
+            this.focus = false
+        }
+
         impl.onkeydown = (e)=>{
             let selection = document.getSelection()
 
-            if(selection.rangeCount){
+            if(selection.rangeCount && this.text !== ''){
                 let range = selection.getRangeAt(0)
 
                 this.selectionStart = range.startOffset
@@ -153,7 +150,7 @@ class TextInput extends Item {
                 case 'insertText': {
                     buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart, e.data)
                     this.text = buff.join('')
-                    this.select(this.selectionEnd+1, this.selectionEnd+1)
+                    this.select(this.selectionEnd+1-(this.selectionEnd-this.selectionStart), this.selectionEnd+1-(this.selectionEnd-this.selectionStart))
                     break
                 }
                 case 'insertFromPaste': {
@@ -183,7 +180,8 @@ class TextInput extends Item {
                         data = buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart)
                     }
                     this.text = buff.join('')
-                    this.select(this.selectionEnd, this.selectionEnd)
+                    let offset = data.length > 1 ? data.length : 0
+                    this.select(this.selectionEnd-offset, this.selectionEnd-offset)
                     break
                 }
             }
@@ -259,6 +257,19 @@ class TextInput extends Item {
         }
     }
 
+    onFocusChanged(){
+        if(this.focus){
+            this.__impl.focus()
+        }
+    }
+
+    onActiveFocusChanged(){
+        if(this.activeFocus){
+            this.__impl.focus()
+            this.focus = true
+        }
+    }
+
     onEchoModeChanged(){
         if(this.echoMode === TextInput.Password){
             this.__impl.innerText = this.text.replaceAll(/./g, '*')
@@ -272,6 +283,10 @@ class TextInput extends Item {
             this.__impl.innerText = this.text.replaceAll(/./g, '*')
         } else {
             this.__impl.innerText = this.text
+        }
+
+        if(this.text === ''){
+            this.__impl.innerHTML = '&#8203'
         }
     }
 
@@ -349,6 +364,27 @@ class TextInput extends Item {
     }
     undo(){
 
+    }
+
+    // __onMouseMove(){
+    //     if(!this.enabled || !this.visible) return
+
+    //     let selection = document.getSelection()
+
+    //     if(selection.rangeCount && this.text !== ''){
+    //         let range = selection.getRangeAt(0)
+
+    //         this.selectionStart = range.startOffset
+    //         this.selectionEnd = range.endOffset
+    //     } else {
+    //         this.selectionStart = 0
+    //         this.selectionEnd = 0
+    //     }
+    // }
+
+    __destroy(){
+        JQApplication.MouseController.remove(this)
+        super.__destroy()
     }
 }
 

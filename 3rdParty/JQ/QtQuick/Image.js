@@ -60,7 +60,7 @@ class Image extends Item {
             return
         }
 
-        let url = '/ControlsGallery/Views/' + this.source.replaceAll('../','')
+        let url = JQApplication.rootPath + this.source.replaceAll('../','')
         this.$url = url
 
         this.status = Image.Loading

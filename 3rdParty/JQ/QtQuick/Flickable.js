@@ -5,6 +5,7 @@ const Variant = require("../QtQml/Variant")
 const Signal = require("../QtQml/Signal")
 const QtFunctions = require("../Qt/functions")
 const MouseArea = require("./MouseArea")
+const JQApplication = require("../core/JQApplication")
 
 class Flickable extends Item {
     static AutoFlickDirection = 0
@@ -52,6 +53,7 @@ class Flickable extends Item {
         proxy.__DOM.classList.add('Flickable')
         proxy.contentItem = Item.create()
         proxy.contentItem.parent = proxy
+        JQApplication.MouseController.add(proxy)
         return proxy
     }
 
@@ -228,6 +230,11 @@ class Flickable extends Item {
                 
             }
         }
+    }
+
+    __destroy(){
+        JQApplication.MouseController.remove(this)
+        super.__destroy()
     }
 }
 

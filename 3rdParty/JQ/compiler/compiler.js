@@ -1091,7 +1091,7 @@ class Instruction {
         }
 
         // if(typeBase === JQModules.QtQuick.Loader){
-        //     code.push(`self.__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
+        //     code.push(`self.__path = '${path.relative(config.base, this.qmlFile.fileName).replaceAll('/','\\').replaceAll('\\','\\\\')}'`)
         // }
 
         if(typeBase === JQModules.QtQml.Connections){
@@ -1491,7 +1491,7 @@ while(compiledFiles.length){
 // }`)
 
 if(config.entry){
-    fullCode.push(`window.addEventListener('load', ()=>{console.time('build');${config.entry.replaceAll('.qml', '')}.create(JQApplication.root);console.timeEnd('build')})`)
+    fullCode.push(`window.addEventListener('load', ()=>{console.time('build');JQApplication.rootPath='${config.rootPath}';${config.entry.replaceAll('.qml', '')}.create(JQApplication.root);console.timeEnd('build')})`)
 }
 
 if(config.output) fs.writeFileSync(path.resolve(configDirPath, config.output), fullCode.join('\n'))

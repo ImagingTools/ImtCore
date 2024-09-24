@@ -322,7 +322,10 @@ class Item extends QtObject {
             return res
         }
     }
-    forceActiveFocus(){}
+    forceActiveFocus(){
+        this.activeFocus = true
+        this.focus = true
+    }
 
     __destroy(){
         if(this.__DOM) this.__DOM.remove()

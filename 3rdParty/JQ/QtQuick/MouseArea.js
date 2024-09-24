@@ -48,13 +48,19 @@ class MouseArea extends Item {
     static create(parent, ...args){
         let proxy = super.create(parent, ...args)
         proxy.__DOM.classList.add('MouseArea')
-
+        JQApplication.MouseController.add(proxy)
         return proxy
     }
 
     __pressed = false
     __entered = false
     __timer = null
+
+    onCursorShapeChanged(){
+        this.__setDOMStyle({
+            cursor: this.cursorShape
+        })
+    }
 
     __onMouseCanceled(mouse){
         if(!this.enabled || !this.visible) return
@@ -68,7 +74,7 @@ class MouseArea extends Item {
         if((this.hoverEnabled && !mouse.target) || (mouse.target === this)){
             this.containsMouse = true
             this.__entered = true
-            JQApplication.setCursor(this.cursorShape)
+            // JQApplication.setCursor(this.cursorShape) 
             this.entered(mouse)
             return true
         }
@@ -88,7 +94,8 @@ class MouseArea extends Item {
         if(!this.enabled || !this.visible) return
 
         if((this.hoverEnabled && !mouse.target) || (mouse.target === this && this.__pressed)){
-            JQApplication.setCursor(this.cursorShape)
+            // console.log(this)
+            // JQApplication.setCursor(this.cursorShape)
             this.positionChanged(mouse)
         }
     }
@@ -134,6 +141,11 @@ class MouseArea extends Item {
 
         this.__pressed = false
         this.__getObject('pressed').__value = false
+    }
+
+    __destroy(){
+        JQApplication.MouseController.remove(this)
+        super.__destroy()
     }
 }
 

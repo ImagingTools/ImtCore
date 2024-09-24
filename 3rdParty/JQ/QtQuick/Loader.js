@@ -54,8 +54,28 @@ class Loader extends Item {
         if(this.item) this.item.__destroy()
         if(!this.source) return
 
-        let source = this.source.split('/').pop().replaceAll('.qml', '')
-        let cls = eval(source)
+        let path = this.source.replaceAll('qrc:/', '').replaceAll('.qml', '').split('/')
+        let className = path[path.length-1]
+
+        let cls = null
+        try {
+            cls = eval(className)
+        } catch (error) {
+            while(path.length){
+                if(cls){
+                    let name = path.shift()
+                    if(name in cls){
+                        cls = cls[name]
+                    }
+                } else {
+                    cls = JQModules[path.shift()]
+                }
+            }
+        }
+
+        // let source = this.source.split('/').pop().replaceAll('.qml', '')
+
+        // let cls = eval(source)
 
         let item = cls.create(this)
         this.item = item

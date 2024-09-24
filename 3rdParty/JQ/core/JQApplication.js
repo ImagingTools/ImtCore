@@ -20,7 +20,7 @@ module.exports = {
         
         document.head.insertAdjacentHTML("beforeend", `
         <style>
-            *{padding:0;margin:0;border:0;overflow:hidden;-ms-overflow-style:none;scrollbar-width:none;user-select:none;-webkit-user-select: none;}
+            *{padding:0;margin:0;border:0;overflow:hidden;-ms-overflow-style:none;scrollbar-width:none;user-select:none;-webkit-user-select: none;pointer-events: none;}
             *::-webkit-scrollbar{width:0;height:0;}
             *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box;}
             :focus,:active{outline:none;}
@@ -37,6 +37,10 @@ module.exports = {
             img{vertical-align:top;}
             h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;}
             br {}
+
+            .pointer {
+                pointer-events: all;
+            }
 
             .Item {
                 position: absolute;
@@ -63,6 +67,7 @@ module.exports = {
                 height: 100%;
                 flex-direction: column;
                 z-index: 1;
+                pointer-events: all;
             }
             .Image {
                 background-repeat: no-repeat;
