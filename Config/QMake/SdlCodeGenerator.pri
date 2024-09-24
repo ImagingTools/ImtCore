@@ -37,6 +37,7 @@ SDL_GENERATOR_COMMAND_BASE = $$SDL_GENERATOR_BIN $$SDL_GENERATOR_COMMAND_PARAM_M
 defineReplace(CreateSdlTarget) {
 	SDL_GENERATOR_QML_MODULE_NAME = $$1
 	SDL_GENERATOR_SCHEME_PATH = $$2
+
 	SDL_GENERATED_FILES = $$system($${SDL_GENERATOR_COMMAND_BASE} -DS $${SDL_GENERATOR_SCHEME_PATH} --CPP --GQL)
 
 	SDL_COMPILER_NAME = cppSdlCompile$${TARGET}$${SDL_GENERATOR_QML_MODULE_NAME}
@@ -48,7 +49,7 @@ defineReplace(CreateSdlTarget) {
 	$${SDL_COMPILER_NAME}.dependency_type = TYPE_C
 	$${SDL_COMPILER_NAME}.variable_out = SOURCES
 	$${SDL_COMPILER_NAME}.CONFIG = target_predeps
-	$${SDL_COMPILER_NAME}.depends = $${SDL_GENERATOR_SCHEME_PATH}
+	$${SDL_COMPILER_NAME}.depends = $${SDL_GENERATOR_SCHEME_PATH} $${SDL_GENERATOR_BIN}
 
 	export($${SDL_COMPILER_NAME}.name)
 	export($${SDL_COMPILER_NAME}.target)
@@ -90,6 +91,11 @@ defineReplace(CreateQmlSdlTarget) {
 	}
 
 	QRC_WRAP_DIR_PATH = $$split(SDL_OUTPUT_FILES_QML, $${DIR_SEPARATOR})
+
+	isEmpty(QRC_WRAP_DIR_PATH){
+		message("QRC_WRAP_DIR_PATH IS EMPTY!!!")
+	}
+
 	$$take_last(QRC_WRAP_DIR_PATH)
 	QRC_WRAP_DIR_PATH += _qrcWrap
 	QRC_WRAP_DIR_PATH = $$join(QRC_WRAP_DIR_PATH, $${DIR_SEPARATOR})
@@ -113,7 +119,7 @@ defineReplace(CreateQmlSdlTarget) {
 	$${QML_SDL_COMPILER_NAME}.dependency_type = TYPE_C
 	$${QML_SDL_COMPILER_NAME}.variable_out = SOURCES
 	$${QML_SDL_COMPILER_NAME}.CONFIG = target_predeps
-	$${QML_SDL_COMPILER_NAME}.depends = $${SDL_GENERATOR_SCHEME_PATH}
+	$${QML_SDL_COMPILER_NAME}.depends = $${SDL_GENERATOR_SCHEME_PATH} $${SDL_GENERATOR_BIN}
 
 	export($${QML_SDL_COMPILER_NAME}.name)
 	export($${QML_SDL_COMPILER_NAME}.target)
@@ -126,4 +132,31 @@ defineReplace(CreateQmlSdlTarget) {
 	export($${QML_SDL_COMPILER_NAME}.depends)
 
 	return ($${QML_SDL_COMPILER_NAME})
+}
+
+
+defineReplace(CreateCppQmlSdlTarget) {
+
+	SDL_GENERATOR_MODULE_NAME = $$1
+	SDL_GENERATOR_SCHEME_PATH = $$2
+
+	SDL_CPP_QML_COMPILER = $$CreateSdlTarget($$1, $$2)
+	SDL_QML_COMPILER = $$CreateQmlSdlTarget($$1, $$2)
+
+	$${SDL_CPP_QML_COMPILER}.name = SDL-$${SDL_GENERATOR_MODULE_NAME}-Compiler
+	$${SDL_CPP_QML_COMPILER}.target = $${SDL_GENERATOR_SCHEME_PATH}
+	$${SDL_CPP_QML_COMPILER}.commands += && $$eval($${SDL_QML_COMPILER}.commands)
+	$${SDL_CPP_QML_COMPILER}.output += $$eval($${SDL_QML_COMPILER}.output)
+
+	export($${SDL_CPP_QML_COMPILER}.name)
+	export($${SDL_CPP_QML_COMPILER}.target)
+	export($${SDL_CPP_QML_COMPILER}.commands)
+	export($${SDL_CPP_QML_COMPILER}.input)
+	export($${SDL_CPP_QML_COMPILER}.output)
+	export($${SDL_CPP_QML_COMPILER}.dependency_type)
+	export($${SDL_CPP_QML_COMPILER}.variable_out)
+	export($${SDL_CPP_QML_COMPILER}.CONFIG)
+	export($${SDL_CPP_QML_COMPILER}.depends)
+
+	return ($${SDL_CPP_QML_COMPILER})
 }
