@@ -41,10 +41,16 @@ class Loader extends Item {
         if(this.__getObject('width').__auto) {
             this.__getObject('width').__setCompute(()=>{return this.item.width})
             this.__getObject('width').__update()
+        } else {
+            this.item.__getObject('width').__setCompute(()=>{return this.width})
+            this.item.__getObject('width').__update()
         }
         if(this.__getObject('height').__auto) {
             this.__getObject('height').__setCompute(()=>{return this.item.height})
             this.__getObject('height').__update()
+        } else {
+            this.item.__getObject('height').__setCompute(()=>{return this.height})
+            this.item.__getObject('height').__update()
         }
 
         this.loaded()
@@ -83,10 +89,16 @@ class Loader extends Item {
         if(this.__getObject('width').__auto) {
             this.__getObject('width').__setCompute(()=>{return this.item.width})
             this.__getObject('width').__update()
+        } else {
+            this.item.__getObject('width').__setCompute(()=>{return this.width})
+            this.item.__getObject('width').__update()
         }
         if(this.__getObject('height').__auto) {
             this.__getObject('height').__setCompute(()=>{return this.item.height})
             this.__getObject('height').__update()
+        } else {
+            this.item.__getObject('height').__setCompute(()=>{return this.height})
+            this.item.__getObject('height').__update()
         }
 
         this.loaded()

@@ -16,7 +16,13 @@ module.exports = {
             __queue: [],
         }
        
-
+        XMLHttpRequest.querySet = {}
+        let XMLProxy = XMLHttpRequest.prototype.open
+        XMLHttpRequest.prototype.open = function() {  
+            let opened = XMLProxy.apply(this, [].slice.call(arguments))
+            if(XMLHttpRequest.QMLAuthToken) this.setRequestHeader("X-authentication-token", XMLHttpRequest.QMLAuthToken)
+            return opened
+        }
         
         document.head.insertAdjacentHTML("beforeend", `
         <style>

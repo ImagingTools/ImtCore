@@ -6,32 +6,38 @@ const JQApplication = require("../../core/JQApplication")
 
 class AbstractItemModel {
     static create(parent, index, data){
-        let model = Object.assign({
-            index: index,
-            __beginUpdate: ()=>{
-                parent.__beginUpdate()
-            },
-            __endUpdate: ()=>{
-                parent.__endUpdate()
-            },
-            __destroy: ()=>{
-                
-            }
-        }, data ? data : {})
+        let properties = []
 
-        return new Proxy(model, { 
+        let model = Object.assign({}, data ? data : {})
+
+        let proxy
+        proxy = new Proxy(model, { 
             has(target, key){
                 return key in target
             },
             get(target, key){
+                let caller = Property.queueLink[Property.queueLink.length-1]
+                if(caller && properties.indexOf(caller) < 0) {
+                    properties.push(caller)
+                }
+
+                if(key === 'index') {
+                    if(!(key in target)) return parent.data.indexOf(proxy)
+                }
                 return target[key]
             },
             set(target, key, value){
-                JQApplication.updateLater(model)
                 target[key] = value
+
+                for(let property of properties){
+                    property.__update()
+                }
+                
                 return true
             }
         })
+
+        return proxy
     }
 }
 

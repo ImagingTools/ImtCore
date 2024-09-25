@@ -19,6 +19,16 @@ class LinkedBool extends Bool {
     }
 
     __reset(value){
+        if(typeof value === 'function' && value.bound){
+            this.__setCompute(value)
+            if(value.lazy) {
+                this.__parent.__properties.push(this)
+            } else {
+                this.__update()
+            }
+            return true
+        }
+
         let safeValue = this.__typecasting(value)
         this.__originValue = safeValue
 

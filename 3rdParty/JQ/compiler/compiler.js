@@ -1098,6 +1098,8 @@ class Instruction {
             code.push(`self.__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
         }
 
+        let lazyCode = []
+
         for(let assignProperty of this.assignProperties){
             let path = this.resolve(assignProperty.name.split('.')[0], 'self')
 
@@ -1107,9 +1109,9 @@ class Instruction {
 
             if(assignProperty.value instanceof Instruction) {
                 if((path.type === QtQml.Component) && assignProperty.value.extends !== 'Component'){
-                    code.push(`self.${assignProperty.name}=(class extends JQModules.QtQml.Component {}).create(null,${assignProperty.value.toCode(false,true,level+1)})`)
+                    lazyCode.push(`self.${assignProperty.name}=(class extends JQModules.QtQml.Component {}).create(null,${assignProperty.value.toCode(false,true,level+1)})`)
                 } else {
-                    code.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false,false,level)}).create(null,null,properties,false)`)
+                    lazyCode.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false,false,level)}).create(null,null,properties,false)`)
                 }
             } else {
                 let stat = this.prepare(assignProperty.value, {isCompute:false, thisKey: 'self', value:'', local:[]})
@@ -1135,6 +1137,8 @@ class Instruction {
             }
             
         }
+
+        code.push(lazyCode.join('\n'))
 
         for(let connectedSignal of this.connectedSignals){
             if(typeBase === JQModules.QtQuick.MouseArea && connectedSignal.slotName === 'pressed'){

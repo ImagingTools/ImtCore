@@ -139,7 +139,7 @@ class Property extends BaseObject {
         try {
             value = this.__compute()
         } catch (error) {
-            
+            value = this.__value
         } finally {
             Property.queueLink.pop()
         }

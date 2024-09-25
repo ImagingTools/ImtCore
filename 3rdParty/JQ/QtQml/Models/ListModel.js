@@ -48,6 +48,8 @@ class ListModel extends QtObject {
         for(let obj of this.__views){
             obj.__updateView(changeSet)
         } 
+
+        this.dataChanged()
     }
 
     append(dict){

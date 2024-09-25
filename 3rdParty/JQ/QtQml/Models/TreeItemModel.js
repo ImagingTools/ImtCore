@@ -355,7 +355,7 @@ class TreeItemModel extends JSONListModel {
     }
 
     copyMe(){
-        let retModel = new TreeItemModel()
+        let retModel = TreeItemModel.create()
 
         if (!retModel.copy(this)){
             return null

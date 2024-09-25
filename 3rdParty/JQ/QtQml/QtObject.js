@@ -130,7 +130,9 @@ class QtObject extends QObject {
 
         let data = this.data.slice()
         for(let i = data.length-1; i >= 0; i--){
-            data[i].__destroy()
+            if(data[i] instanceof QtObject){
+                data[i].__destroy()
+            }
         }
 
         this['Component.destruction']()

@@ -21,7 +21,7 @@ class Column extends Item {
         this.__setDOMStyle({
             gap: this.spacing + 'px'
         })
-        this.__updateGeometry()
+        JQApplication.updateLater(this)
     }
 
     __updateGeometry(){
