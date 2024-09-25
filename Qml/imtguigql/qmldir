@@ -23,4 +23,4 @@ CommandsPanelController 1.0 CommandsPanelController.qml
 TableViewParamController 1.0 TableViewParamController.qml
 GqlRequestSender 1.0 GqlRequestSender.qml
 WebSocketConnectionChecker 1.0 WebSocketConnectionChecker.qml
-
+GqlSdlRequestSender 1.0 GqlSdlRequestSender.qml

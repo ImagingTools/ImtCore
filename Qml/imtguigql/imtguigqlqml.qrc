@@ -24,5 +24,6 @@
 	<file alias="imtguigql/TableViewParamController.qml">TableViewParamController.qml</file>
 	<file alias="imtguigql/GqlRequestSender.qml">GqlRequestSender.qml</file>
 	<file alias="imtguigql/WebSocketConnectionChecker.qml">WebSocketConnectionChecker.qml</file>
+	<file alias="imtguigql/GqlSdlRequestSender.qml">GqlSdlRequestSender.qml</file>
     </qresource>
 </RCC>

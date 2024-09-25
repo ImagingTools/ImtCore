@@ -737,7 +737,7 @@ Rectangle {
 
         boundsBehavior: Flickable.StopAtBounds;
 
-        cacheBuffer: elementsListObj.count * tableContainer.itemHeight;
+        // cacheBuffer: elementsListObj.count * tableContainer.itemHeight;
 
         clip: true;
 

@@ -36,16 +36,18 @@ QtObject {
         let index;
 
         if (root.applicationInfoProvider != null){
-            if (root.applicationInfoProvider.clientApplicationInfo != null){
-                index = parameters.insertNewItem();
-                parameters.copyItemDataFromModel(index, applicationInfoProvider.clientApplicationInfo)
-                parameters.setData("Name", qsTr("Client Version"), index);
-            }
+            // if (root.applicationInfoProvider.clientApplicationInfo != null){
+            //     index = parameters.insertNewItem();
+            //     parameters.copyItemDataFromModel(index, applicationInfoProvider.clientApplicationInfo)
+            //     parameters.setData("Name", qsTr("Client Version"), index);
+            // }
 
             if (root.applicationInfoProvider.serverApplicationInfo != null){
                 index = parameters.insertNewItem();
-                parameters.copyItemDataFromModel(index, applicationInfoProvider.serverApplicationInfo)
                 parameters.setData("Name", qsTr("Server Version"), index);
+                parameters.setData("Value", root.applicationInfoProvider.serverApplicationInfo.m_version, index);
+                parameters.setData("Source", "qrc:/qml/imtgui/Settings/SettingsTextLabel.qml", index);
+                // parameters.copyItemDataFromModel(index, applicationInfoProvider.serverApplicationInfo)
             }
         }
 

@@ -1,0 +1,151 @@
+import QtQuick 2.12
+import Acf 1.0
+import imtcontrols 1.0
+import imtguigql 1.0
+
+
+/**
+    Usage example:
+
+    GqlRequestSender {
+        id: requestSender;
+        requestType: 0; // Query
+        gqlCommandId: "GetDocumentData";
+
+        function createQueryParams(query){
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("Id", "d1481f7d-d5ce-4a62-9150-8a5cadb62e47");
+            query.AddParam(inputParams);
+
+            var queryFields = Gql.GqlObject("item");
+            queryFields.InsertField("Id");
+            queryFields.InsertField("Name");
+            query.AddField(queryFields);
+        }
+
+        function onError(message, type){
+            // Error handler
+        }
+
+        // Response format: {"data": {"GetDocumentData": { <Internal information> }}}
+
+        // parameter data is <Internal information>
+        function onResult(data){
+            // Result handler
+        }
+    }
+*/
+
+GqlRequest {
+    id: root;
+
+    property string gqlCommandId;
+    property int requestType: 0; // 0 - Query, 1 - Mutation, 2 - Subscription
+
+    property var sdlObject: null;
+    property Component sdlObjectComp: null;
+
+    function onResult(data){
+        if (!sdlObjectComp){
+            console.error("Unable to parse response. Please set SDL Component for creating response instance");
+            return;
+        }
+
+        if (!data){
+            console.error("Unable to parse response. Response data is invalid");
+            return;
+        }
+
+        sdlObject = sdlObjectComp.createObject(root);
+        sdlObject.fromObject(data);
+    }
+
+    function onError(message, type){
+        if (type == "Critical"){
+            ModalDialogManager.showCriticalDialog(message);
+        }
+        else if (type == "Warning"){
+            ModalDialogManager.showWarningDialog(message);
+        }
+        else if (type == "Info"){
+            ModalDialogManager.showInfoDialog(message);
+        }
+        else if (type == "Error"){
+            ModalDialogManager.showErrorDialog(message);
+        }
+    }
+
+    function send(){
+        if (gqlCommandId == "" || gqlCommandId === undefined || gqlCommandId == null ){
+            console.error("Unable to send request. Error: GraphQL command-ID is invalid.");
+            return;
+        }
+
+        let type = "";
+        if (root.requestType == 0){
+            type = "query";
+        }
+        else if (root.requestType == 1){
+            type = "mutation";
+        }
+        else if (root.requestType == 2){
+            type = "subscription";
+        }
+        else{
+            console.error("Unable to send request", root.gqlCommandId ,". Error: Request type is unsupported.");
+            return;
+        }
+
+        var query = Gql.GqlRequest(type, root.gqlCommandId);
+        createQueryParams(query);
+
+        root.setGqlQuery(query.GetQuery());
+    }
+
+    function createQueryParams(query){
+        var inputParams = Gql.GqlObject("input");
+        query.AddParam(inputParams);
+    }
+
+    onStateChanged: {
+        if (state === "Error"){
+            root.onError(qsTr("Network error"), "Critical");
+        }
+        else if (state === "Ready"){
+            console.log("JSON", this.json);
+            let responseObj = JSON.parse(this.json)
+            if (!responseObj){
+                root.onError("Unable convert json ", json, " to object", "Warning");
+                return;
+            }
+
+            if ("errors" in responseObj){
+                let errorsObject = responseObj["errors"];
+                if (root.gqlCommandId in errorsObject){
+                    errorsObject = errorsObject[root.gqlCommandId]
+                }
+
+                let message = ""
+                if ("message" in errorsObject){
+                    message = errorsObject["message"];
+                }
+
+                let type;
+                if ("type" in errorsObject){
+                    type = errorsObject["type"];
+                }
+
+                root.onError(message, type);
+
+                return;
+            }
+
+            if ("data" in responseObj){
+                let dataObject = responseObj["data"];
+                let itemObject = dataObject[root.gqlCommandId];
+
+                root.onResult(itemObject);
+            }
+        }
+    }
+}

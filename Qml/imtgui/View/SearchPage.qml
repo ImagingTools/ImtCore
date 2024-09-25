@@ -20,7 +20,11 @@ ViewBase {
                         let elements = table.elements;
 
                         if (tabPanel.selectedIndex == 0){
-                            typeId = root.model.getData("TabId", tabPanel.selectedIndex);
+                            let indexes = table.getSelectedIndexes();
+                            if (indexes.length > 0){
+                                typeId = elements.getData("TabId", indexes[0]);
+                            }
+
                         }
                         else if (tabPanel.selectedIndex > 0){
                             typeId = root.model.getData("Id", tabPanel.selectedIndex);
