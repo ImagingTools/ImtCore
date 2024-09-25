@@ -43,10 +43,10 @@ ViewBase {
             }
         }
 
-        checkSystemId();
-
         passwordInput.visible = userData.m_id == "";
         changePasswordButton.visible = userData.m_id != "";
+
+        checkSystemId();
 
         setBlockingUpdateModel(false);
     }
@@ -63,6 +63,7 @@ ViewBase {
         for (let i = 0; i < userData.m_systemInfos.count; i++){
             let systemId = userData.m_systemInfos.get(i).item.m_id;
             if (systemId !== ""){
+                changePasswordButton.visible = false;
                 usernameInput.readOnly = true;
             }
 
@@ -70,6 +71,7 @@ ViewBase {
             if (enabled && systemId !== ""){
                 usernameInput.readOnly = true;
                 passwordInput.readOnly = true;
+                changePasswordButton.visible = false;
             }
             else if (enabled && systemId === ""){
                 passwordInput.readOnly = false;
