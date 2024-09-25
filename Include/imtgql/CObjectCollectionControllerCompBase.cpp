@@ -1129,6 +1129,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 		const imtgql::CGqlObject& viewParamsGql,
 		iprm::CParamsSet& filterParams) const
 {
+	this->SetAdditionalFilters(gqlRequest, viewParamsGql, &filterParams);
 
 	QByteArray filterBA = viewParamsGql.GetFieldArgumentValue("FilterModel").toByteArray();
 	if (filterBA.isEmpty()){
@@ -1195,8 +1196,6 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 
 	filterParams.SetEditableParameter("Filter", collectionFilterPtr, true);
 	filterParams.SetEditableParameter("ObjectFilter", objectFilterPtr, true);
-
-	this->SetAdditionalFilters(gqlRequest, viewParamsGql, &filterParams);
 }
 
 
