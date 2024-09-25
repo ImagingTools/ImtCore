@@ -1,0 +1,28 @@
+schema {
+	query: Query
+	name: Application
+	namespace: imtapp
+	version: 1.0
+}
+
+type ApplicationInfo {
+	Version: String
+	CompanyName: String
+	ProductName: String
+	ApplicationName: String
+	ApplicationType: String
+}
+
+input GetApplicationInfoInput {
+	ProductId: ID
+}
+
+type GetApplicationInfoPayload {
+	ApplicationInfo: ApplicationInfo
+}
+
+type Query {
+	GetApplicationInfo (input: GetApplicationInfoInput): ApplicationInfo!
+}
+
+
