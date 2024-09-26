@@ -12,7 +12,7 @@
 #include <imtqml/CGqlModel.h>
 #include <imtqml/CRemoteFileController.h>
 #include <imtqml/CQuickApplicationComp.h>
-
+#include <imtqml/CGqlRequest.h>
 #include <GeneratedFiles/ImtControlsGallery/CImtControlsGallery.h>
 
 
@@ -42,6 +42,10 @@ int main(int argc, char *argv[])
 
 	Q_INIT_RESOURCE(imtguivars);
 
+	//Q_INIT_RESOURCE(imtauthGroupsSdl);
+	//Q_INIT_RESOURCE(imtauthUsersSdl);
+	//Q_INIT_RESOURCE(imtauthRolesSdl);
+
 
 //	Q_INIT_RESOURCE(Webimt3dgui);
 //    Q_INIT_RESOURCE(Webimtauthgui);
@@ -59,6 +63,7 @@ int main(int argc, char *argv[])
 	qmlRegisterType<imtbase::CTreeItemModel>("Acf", 1, 0, "TreeItemModel");
 	qmlRegisterType<imtqml::CGqlModel>("Acf", 1, 0, "GqlModel");
 	qmlRegisterType<imtqml::CRemoteFileController>("Acf", 1, 0, "RemoteFileController");
+	qmlRegisterType<imtqml::CGqlRequest>("Acf", 1, 0, "GqlRequest");
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 	qmlRegisterModule("QtGraphicalEffects", 1, 12);
