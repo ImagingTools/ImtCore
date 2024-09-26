@@ -10,7 +10,6 @@ class Popup extends QtObject {
 
     static create(parent, model, properties=[], ...args){
         let proxy = super.create(parent, model, properties, ...args)
-        proxy.__getDOM().classList.add('Popup')
 
         return proxy
     }

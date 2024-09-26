@@ -27,7 +27,7 @@ class MouseArea extends Item {
         hoverEnabledChanged: { type:Signal, slotName:'onHoverEnabledChanged', args:[] },
         propagateComposedEventsChanged: { type:Signal, slotName:'onPropagateComposedEventsChanged', args:[] },
         preventStealingChanged: { type:Signal, slotName:'onPreventStealingChanged', args:[] },
-        pressedChanged: { type:Signal, slotName:'onPressedChanged', args:[] },
+        pressedChanged: { type:Signal, slotName:'onPressedChanged', args:['mouse'] },
         pressAndHoldIntervalChanged: { type:Signal, slotName:'onPressAndHoldIntervalChanged', args:[] },
         mouseXChanged: { type:Signal, slotName:'onMouseXChanged', args:[] },
         mouseYChanged: { type:Signal, slotName:'onMouseYChanged', args:[] },

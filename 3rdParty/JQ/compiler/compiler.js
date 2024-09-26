@@ -1141,8 +1141,8 @@ class Instruction {
         code.push(lazyCode.join('\n'))
 
         for(let connectedSignal of this.connectedSignals){
-            if(typeBase === JQModules.QtQuick.MouseArea && connectedSignal.slotName === 'pressed'){
-                connectedSignal.slotName = 'pressedChanged'
+            if(typeBase === JQModules.QtQuick.MouseArea && connectedSignal.slotName === 'onPressed'){
+                connectedSignal.slotName = 'onPressedChanged'
             }
 
             let names = connectedSignal.slotName.replaceAll("['", '').replaceAll("']", '').split('.')
