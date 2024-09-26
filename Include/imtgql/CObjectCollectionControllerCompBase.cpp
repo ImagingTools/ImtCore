@@ -625,21 +625,14 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 	imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->AddTreeModel("items");
 	while (objectCollectionIterator->Next()){
 		imtbase::IObjectCollection::DataPtr objectDataPtr;
-		if (objectCollectionIterator->GetObjectData(objectDataPtr)){
-			int itemIndex = itemsModelPtr->InsertNewItem();
-			if (itemIndex >= 0){
-				if (!SetupGqlItem(gqlRequest, *itemsModelPtr, itemIndex, objectCollectionIterator.GetPtr(), errorMessage)){
-					SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		int itemIndex = itemsModelPtr->InsertNewItem();
+		if (itemIndex >= 0){
+			if (!SetupGqlItem(gqlRequest, *itemsModelPtr, itemIndex, objectCollectionIterator.GetPtr(), errorMessage)){
+				errorMessage = QString("Unable to get object data from object collection iterator.");
+				SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-					return nullptr;
-				}
+				return nullptr;
 			}
-		}
-		else{
-			errorMessage = QString("Unable to get object data from object collection iterator.");
-			SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-
-			return nullptr;
 		}
 	}
 
