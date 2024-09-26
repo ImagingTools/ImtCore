@@ -8,6 +8,10 @@ SUBDIRS += imtdesign
 imtdesign.file = ../../Include/imtdesign/QMake/imtdesign.pro
 imtdesign.depends = imtbase
 
+
+SUBDIRS += imtfile
+imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
+
 SUBDIRS += imtddl
 imtddl.file = ../../Include/imtddl/QMake/imtddl.pro
 
@@ -36,7 +40,7 @@ ImtSdlPck.depends = imtsdl
 
 SUBDIRS += SdlCodeGenerator
 SdlCodeGenerator.file = ../../Impl/SdlCodeGeneratorExe/QMake/SdlCodeGeneratorExe.pro
-SdlCodeGenerator.depends = imtsdl ImtSdlPck
+SdlCodeGenerator.depends = ImtCorePck ImtSdlPck ImtFilePck
 
 SUBDIRS += imtdev
 imtdev.file = ../../Include/imtdev/QMake/imtdev.pro
@@ -94,11 +98,6 @@ imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 
 SUBDIRS += imtlog
 imtlog.file = ../../Include/imtlog/QMake/imtlog.pro
-
-!macx {
-	SUBDIRS += imtfile
-	imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
-}
 
 SUBDIRS += imtzip
 imtzip.file = ../../Include/imtzip/QMake/imtzip.pro
@@ -201,7 +200,7 @@ imtlicsdl.file = ../../Sdl/imtlic/QMake/imtlicsdl.pro
 ######### Component packages
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
-ImtCorePck.depends = imtbase
+ImtCorePck.depends = imtbase imtfile
 
 SUBDIRS += ImtAuthPck
 ImtAuthPck.file = ../../Impl/ImtAuthPck/QMake/ImtAuthPck.pro
