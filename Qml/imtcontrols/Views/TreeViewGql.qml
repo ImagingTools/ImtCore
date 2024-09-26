@@ -110,10 +110,16 @@ Rectangle{
                 property bool isHovered: delegateMA.containsMouse;
                 property var selection_ : null;
                 property var hover_ : null;
+                property int addItemWidth: 0;
+                onAddItemWidthChanged: {
+                    //console.log("addItemWidth:: ", addItemWidth)
+                }
 
                 Component.onCompleted: {
                     if(treeViewGql.hasAddDelegInfo){
                         var addItem =  treeViewGql.additionalDelegateComp.createObject(deleg);
+                        deleg.addItemWidth = addItem.width;
+                        //console.log("width::: ",deleg.width, list.width)
                     }
                 }
 
@@ -256,7 +262,10 @@ Rectangle{
                         anchors.verticalCenter: parent.verticalCenter;
                         anchors.left: model.TypeId__ == undefined ? folderImage.left : folderImage.right;
                         anchors.leftMargin: model.TypeId__ == undefined ? 0 : 16;
-                        //anchors.right: parent.right;
+
+                        width: deleg.width - parent.x - x - 20 - deleg.addItemWidth;
+
+                        elide: Text.ElideRight;
 
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_subtitle !==undefined ? Style.fontSize_subtitle : 18;
@@ -265,17 +274,20 @@ Rectangle{
                         text: model[treeViewGql.nameId] !== undefined ? model[treeViewGql.nameId] : "";
                     }
 
-                    MouseArea{
-                        id: delegateMA;
+                }
 
-                        anchors.fill: parent;
+                MouseArea{
+                    id: delegateMA;
 
-                        acceptedButtons: Qt.LeftButton | Qt.RightButton;
+                    anchors.fill: parent;
 
-                        hoverEnabled: visible;
-                        cursorShape: Qt.PointingHandCursor;
-                        onClicked: {
-                            if(openButton.visible && mouse.x < openButton.width + 8){
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton;
+
+                    hoverEnabled: visible;
+                    cursorShape: Qt.PointingHandCursor;
+                    onClicked: {
+                        if(mouse.x > delegateContainer.x){
+                            if(openButton.visible && mouse.x < openButton.width + 8 + delegateContainer.x){
                                 delegateContainer.openButtonClicked();
                             }
                             else {
@@ -293,13 +305,30 @@ Rectangle{
                                 }
                             }
                         }
-                        onDoubleClicked: {
-                            if(mouse.x > openButton.width + 8){
-                                treeViewGql.doubleClicked(model.index);
-                            }
+
+                    }
+                    onDoubleClicked: {
+                        if(mouse.x > openButton.width + 8 + delegateContainer.x){
+                            treeViewGql.doubleClicked(model.index);
                         }
                     }
-                }
+
+                    onContainsMouseChanged: {
+                        if (!containsMouse){
+                            toolTip.closeTooltip();
+                        }
+                        else{
+                            var point = mapToItem(null, mouseX - toolTip.componentWidth/2, -toolTip.componentHeight);
+                            sizeText.toolTipX = point.x;
+                            sizeText.toolTipY = point.y;
+                            sizeText.sourceWidth = nameText.width;
+                            sizeText.text = nameText.text;
+                            toolTipPause.restart();
+
+                        }
+                    }
+
+                }//delegateMA
 
             }//delegate
 
@@ -389,9 +418,9 @@ Rectangle{
             treeViewGql.model.setData("ChildrenCount__", model_.getItemsCount(), index);
         }
 
-         if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
-              treeViewGql.selectedIndex += counter;
-         }
+        if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
+            treeViewGql.selectedIndex += counter;
+        }
         treeViewGql.setContentWidth();
 
         treeViewGql.inserted(index);
@@ -681,6 +710,58 @@ Rectangle{
             }
         }
         return foundIndex;
+    }
+
+    Text{
+        id: sizeText;
+
+        anchors.bottom: parent.bottom;
+
+        visible: false;
+
+        font.family: Style.fontFamily;
+        font.pixelSize: Style.fontSize_subtitle !==undefined ? Style.fontSize_subtitle : 18;
+        color: Style.textColor;
+
+        property real sourceWidth: 0;
+        property real toolTipX: 0;
+        property real toolTipY: 0;
+    }
+
+    PauseAnimation {
+        id: toolTipPause;
+
+        duration: 500;
+
+        onFinished:{
+            if(sizeText.text !== "" && sizeText.width > sizeText.sourceWidth){
+                if (!toolTip.openST){
+                    toolTip.text = sizeText.text;
+                    toolTip.openTooltip(sizeText.toolTipX, sizeText.toolTipY)
+                }
+            }
+        }
+    }
+
+    Timer {
+        id: timerToolTip;
+        interval: 3000;
+        onTriggered: {
+            toolTip.closeTooltip();
+        }
+    }
+
+    CustomTooltip {
+        id: toolTip;
+
+        text: "";
+        componentMinHeight: 30;
+
+        function openTooltip(xX, yY){
+            open(xX, yY)
+
+            timerToolTip.restart();
+        }
     }
 
 }
