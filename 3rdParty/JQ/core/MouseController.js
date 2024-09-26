@@ -61,6 +61,8 @@ class QmlWheelEvent {
         x: 0,
         y: 0,
     }
+    originX = 0
+    originY = 0
     x = 0
     y = 0
 
@@ -68,6 +70,12 @@ class QmlWheelEvent {
         for(let key in options){
             if(key in this) this[key] = options[key]
         }
+    }
+
+    relative(obj){
+        let rect = obj.__DOM.getBoundingClientRect()
+        this.x = this.originX - rect.x
+        this.y = this.originY - rect.y
     }
 
     getRelativePoint(obj){
@@ -238,8 +246,11 @@ module.exports = {
 
             for(obj of this.event.path){
                 this.event.target = obj
+                this.event.relative(obj)
                 obj.__onWheel(this.event)
             }
+
+            this.event = null
         })
     },
 

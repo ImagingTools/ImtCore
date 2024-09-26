@@ -31,6 +31,7 @@ class QtObject extends QObject {
         let proxy = super.create(parent, properties, ...args)
 
         proxy.JQAbstractModel = QtFunctions.binding(()=>{return proxy.parent ? proxy.parent.JQAbstractModel : null})
+        proxy.index = QtFunctions.binding(()=>{return proxy.JQAbstractModel.index})
 
         if(model){
             proxy.JQAbstractModel = model
