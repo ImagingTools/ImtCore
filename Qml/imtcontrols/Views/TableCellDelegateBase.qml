@@ -250,6 +250,19 @@ Item {
         return "";
     }
 
+    function setValue(value){
+        console.log("setValue", value);
+        if (delegateContainer && delegateContainer.columnIndex >= 0){
+            if(rowDelegate !== null && rowDelegate.tableItem !==null){
+                let tableItem = rowDelegate.tableItem;
+                let elements = tableItem.elements;
+                let headerId = delegateContainer.rowDelegate.tableItem.headers.getData("Id", delegateContainer.columnIndex);
+
+                elements.setData(headerId, value, delegateContainer.rowIndex);
+            }
+        }
+    }
+
     function setCellWidth(){
         if(!delegateContainer || !delegateContainer.rowDelegate){
             return;

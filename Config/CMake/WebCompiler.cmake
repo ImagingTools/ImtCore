@@ -164,8 +164,6 @@ function(jqml_compile_web2)
 
 	add_custom_command(
 	        OUTPUT
-		# ${buildwebdir}/__header.h  # fake! ensure we run!
-		${QRC_WEB_FILE}
 		${buildwebdir}/Resources/jqml.${resname}.js
 		PRE_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
@@ -184,7 +182,7 @@ function(jqml_compile_web2)
 		ARGS
 		-name ${PROJECT_NAME}Web ${QRC_WEB_FILE} -o ${QRC_CPP_WEB_FILE}
 		DEPENDS
-		${QRC_WEB_FILE} ${buildwebdir}/Resources/jqml.${resname}.js
+		${buildwebdir}/Resources/jqml.${resname}.js
 		COMMENT
 		"Compile QRC_WEB_FILE"
 	    )

@@ -5,21 +5,14 @@ import imtcontrols 1.0
 Component {
     id: textInputComp;
 
-    Item {
+    TableCellDelegateBase {
         id: item;
 
-        property Item tableCellDelegate: null;
-
-        z: parent.z + 1;
-
-        width: parent.width;
-        height: 25;
-
-        onTableCellDelegateChanged: {
-            if (tableCellDelegate){
-                textInput.text = tableCellDelegate.getValue();
-                textLabel.text = tableCellDelegate.getValue();
-
+        onRowIndexChanged: {
+            if (rowIndex >= 0){
+                let valueModel = getValue();
+                textInput.text = valueModel
+                textLabel.text = valueModel
             }
         }
 
@@ -51,14 +44,11 @@ Component {
             visible: false;
 
             onEditingFinished: {
-                console.log("onEditingFinished")
-
+                let data = textInput.text
+                console.log("onEditingFinished", data)
                 textInput.visible = false;
-
-                if (item.tableCellDelegate){
-                    textLabel.text = textInput.text;
-                    item.tableCellDelegate.setValue(textInput.text);
-                }
+                textLabel.text = textInput.text;
+                item.setValue(textInput.text);
             }
         }
 
