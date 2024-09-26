@@ -1,0 +1,41 @@
+schema {
+	query: Query
+	name: Authorization
+	namespace: imtauth
+	version: 1.0
+}
+
+type AuthorizationPayload {
+	UserId: ID!
+	Username: ID!
+	Token: ID!
+	SystemId: ID!
+	Permissions: ID!
+}
+
+input AuthorizationInput {
+	Login: String!
+	Password: String!
+	ProductId: ID!
+}
+
+type UserMode {
+	NO_USER_MANAGEMENT: String
+	OPTIONAL_USER_MANAGEMENT: String
+	STRONG_USER_MANAGEMENT: String
+}
+
+type UserManagementPayload {
+	UserMode: String
+}
+
+input UserManagementInput {
+	ProductId: ID
+}
+
+type Query {
+	Authorization (input: AuthorizationInput): AuthorizationPayload!
+	GetUserMode (input: UserManagementInput): UserManagementPayload!
+}
+
+

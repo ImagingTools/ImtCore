@@ -5,6 +5,7 @@ include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 CONFIG += network websockets
+QT += websockets
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtgql -limtcom -limtclientgql
 LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc

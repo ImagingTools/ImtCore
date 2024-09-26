@@ -40,7 +40,7 @@ ImtSdlPck.depends = imtsdl
 
 SUBDIRS += SdlCodeGenerator
 SdlCodeGenerator.file = ../../Impl/SdlCodeGeneratorExe/QMake/SdlCodeGeneratorExe.pro
-SdlCodeGenerator.depends = ImtCorePck ImtSdlPck ImtFilePck
+SdlCodeGenerator.depends = ImtCorePck ImtSdlPck
 
 SUBDIRS += imtdev
 imtdev.file = ../../Include/imtdev/QMake/imtdev.pro
@@ -196,6 +196,9 @@ imtauthsdl.file = ../../Sdl/imtauth/QMake/imtauthsdl.pro
 
 SUBDIRS += imtlicsdl
 imtlicsdl.file = ../../Sdl/imtlic/QMake/imtlicsdl.pro
+
+SUBDIRS += imtappsdl
+imtappsdl.file = ../../Sdl/imtapp/QMake/imtappsdl.pro
 
 ######### Component packages
 SUBDIRS += ImtCorePck

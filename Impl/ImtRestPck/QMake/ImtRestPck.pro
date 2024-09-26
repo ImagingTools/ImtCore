@@ -5,9 +5,10 @@ include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 CONFIG += network websockets
+QT += websockets
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtrepo
-LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtrepo -limtcom
+LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc -lidoc -listd
 
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
 include($(ACFCONFIGDIR)/QMake/AcfStd.pri)
@@ -17,3 +18,4 @@ win32-msvc*{
     # copying all Qt DLLs to destination directory
 	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = $(QTDIR)\bin\windeployqt $$DESTDIR\ImtRestPck.arp
 }
+

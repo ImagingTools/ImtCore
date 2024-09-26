@@ -4,6 +4,8 @@ include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
+QT += qml
+
 LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtlic -limtauthgql -limtauth -limtgql -limtdb -limtguigql -liauth -limtqml -limtrest -limtauthsdl
 
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
