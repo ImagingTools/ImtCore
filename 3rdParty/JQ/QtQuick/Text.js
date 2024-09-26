@@ -100,8 +100,8 @@ class Text extends Item {
 
         this.__getObject('width').__setAuto(textMetrics.width)
         this.__getObject('height').__setAuto(textMetrics.height)
-        this.contentWidth = textMetrics.width
-        this.contentHeight = textMetrics.height
+        this.contentWidth = Math.max(textMetrics.width, this.__impl.scrollWidth)
+        this.contentHeight = Math.max(textMetrics.height, this.__impl.scrollHeight)
     }
 
     onTextChanged(){

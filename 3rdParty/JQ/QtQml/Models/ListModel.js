@@ -117,8 +117,12 @@ class ListModel extends QtObject {
         this.count = this.data.length
     }
 
-    onDataChanged(){
+    setProperty(index, property, value){
+        this.data[index][property] = value
+    }
 
+    onDataChanged(){
+        
     }
 
     __destroy(){

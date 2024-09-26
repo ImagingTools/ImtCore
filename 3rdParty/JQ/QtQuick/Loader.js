@@ -103,6 +103,22 @@ class Loader extends Item {
 
         this.loaded()
     }
+
+    onWidthChanged(){
+        super.onWidthChanged()
+
+        if(this.item){
+            this.item.__getObject('width').__setAuto(this.width)
+        }
+    }
+
+    onHeightChanged(){
+        super.onHeightChanged()
+        
+        if(this.item){
+            this.item.__getObject('height').__setAuto(this.height)
+        }
+    }
 }
 
 module.exports = Loader
