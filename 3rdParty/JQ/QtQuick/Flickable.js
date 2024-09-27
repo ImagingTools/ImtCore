@@ -233,6 +233,7 @@ class Flickable extends Item {
     }
 
     __destroy(){
+        this.contentItem.destroy()
         JQApplication.MouseController.remove(this)
         super.__destroy()
     }

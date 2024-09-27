@@ -24,14 +24,31 @@ class Connections extends QtObject {
             if(this.__target){
                 if(this.__target[signalName] instanceof Signal) this.__target[signalName].disconnect(this, this[slotName])
             }
+        }
 
-            this.__target = this.target
+        this.__target = this.target
 
+        for(let signalName in this.__connectionsInfo){
+            let slotName = this.__connectionsInfo[signalName]
+        
             if(this.__target){
                 if(this.__target[signalName] instanceof Signal) this.__target[signalName].connect(this, this[slotName])
             }
-            
         }
+    }
+
+    __destroy(){
+        for(let signalName in this.__connectionsInfo){
+            let slotName = this.__connectionsInfo[signalName]
+        
+            if(this.__target){
+                if(this.__target[signalName] instanceof Signal) this.__target[signalName].disconnect(this, this[slotName])
+            }
+        }
+
+        delete this.__target
+
+        super.__destroy()
     }
 }
 

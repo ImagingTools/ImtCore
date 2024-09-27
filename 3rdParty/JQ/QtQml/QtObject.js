@@ -61,20 +61,20 @@ class QtObject extends QObject {
         let index = -1
 
         index = this.data.indexOf(child)
-        if(index >= 0) this.data.splice(index, 1)
+        if(index >= 0) this.data.osplice(index, 1)
 
         index = this.resources.indexOf(child)
-        if(index >= 0) this.resources.splice(index, 1)
+        if(index >= 0) this.resources.osplice(index, 1)
     }
 
     __addChild(child){
         let index = -1
 
         index = this.data.indexOf(child)
-        if(index < 0) this.data.push(child)
+        if(index < 0) this.data.opush(child)
 
         index = this.resources.indexOf(child)
-        if(index < 0) this.resources.push(child)
+        if(index < 0) this.resources.opush(child)
     }
 
     onChildrenChanged(leftTop, bottonRight, roles){

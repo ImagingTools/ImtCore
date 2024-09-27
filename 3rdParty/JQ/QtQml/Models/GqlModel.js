@@ -12,6 +12,8 @@ class GqlModel extends TreeItemModel {
         xhr.send(gqlData)
 
         xhr.onreadystatechange = ()=>{
+            if(this.__destroyed) return
+            
             if (xhr.readyState === XMLHttpRequest.DONE){
                 this.json = xhr.responseText
                 this.state = "Processing"

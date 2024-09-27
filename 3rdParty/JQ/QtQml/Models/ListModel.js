@@ -62,12 +62,12 @@ class ListModel extends QtObject {
             this.__changeSet.push([this.data.length, this.data.length+dict.length, 'append'])
             for(let i = 0; i < dict.length; i++){
                 // dict[i].index = this.data.length
-                this.data.push(AbstractItemModel.create(this, this.data.length, dict[i]))
+                this.data.opush(AbstractItemModel.create(this, this.data.length, dict[i]))
             }
 		} else {
             this.__changeSet.push([this.data.length, this.data.length+1, 'append'])
             // dict.index = this.data.length
-            this.data.push(AbstractItemModel.create(this, this.data.length, dict))
+            this.data.opush(AbstractItemModel.create(this, this.data.length, dict))
 		}
 
         this.count = this.data.length
@@ -82,12 +82,12 @@ class ListModel extends QtObject {
             this.__changeSet.push([index, index+dict.length, 'insert'])
             for(let i = 0; i < dict.length; i++){
                 // dict[i].index = index
-                this.data.splice(i+index, 0, AbstractItemModel.create(this, i+index, dict[i]))
+                this.data.osplice(i+index, 0, AbstractItemModel.create(this, i+index, dict[i]))
             }
 		} else {
             this.__changeSet.push([index, index+1, 'insert'])
             // dict.index = index
-            this.data.splice(index, 0, AbstractItemModel.create(this, index, dict))
+            this.data.osplice(index, 0, AbstractItemModel.create(this, index, dict))
 		}
 
         this.count = this.data.length
@@ -96,7 +96,7 @@ class ListModel extends QtObject {
         JQApplication.updateLater(this)
 
         this.__changeSet.push([index, index+count, 'remove'])
-        this.data.splice(index, count)
+        this.data.osplice(index, count)
 
         this.count = this.data.length
     }
@@ -122,7 +122,7 @@ class ListModel extends QtObject {
     }
 
     onDataChanged(){
-        
+
     }
 
     __destroy(){

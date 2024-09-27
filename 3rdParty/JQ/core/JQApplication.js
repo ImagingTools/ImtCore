@@ -142,7 +142,7 @@ module.exports = {
     },
 
     updateLater(obj){
-        if(!obj) return
+        if(!obj || obj.__destroyed) return
 
         if(this.updateLayers.length){
             if(!this.objectsAwaitingUpdate.has(obj)){

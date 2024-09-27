@@ -132,14 +132,14 @@ class Item extends QtObject {
         let index = -1
 
         index = this.data.indexOf(child)
-        if(index >= 0) this.data.splice(index, 1)
+        if(index >= 0) this.data.osplice(index, 1)
 
         if(child instanceof Item){
             index = this.children.indexOf(child)
-            if(index >= 0) this.children.splice(index, 1)
+            if(index >= 0) this.children.osplice(index, 1)
         } else {
             index = this.resources.indexOf(child)
-            if(index >= 0) this.resources.splice(index, 1)
+            if(index >= 0) this.resources.osplice(index, 1)
         }
     }
 
@@ -147,14 +147,14 @@ class Item extends QtObject {
         let index = -1
 
         index = this.data.indexOf(child)
-        if(index < 0) this.data.push(child)
+        if(index < 0) this.data.opush(child)
 
         if(child instanceof Item){
             index = this.children.indexOf(child)
-            if(index < 0) this.children.push(child)
+            if(index < 0) this.children.opush(child)
         } else {
             index = this.resources.indexOf(child)
-            if(index < 0) this.resources.push(child)
+            if(index < 0) this.resources.opush(child)
         }
     }
 

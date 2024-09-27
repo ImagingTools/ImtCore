@@ -85,8 +85,13 @@ class QObject extends BaseObject {
 
         let slotSuper = self[name]
         self[name] = (...args)=>{
-            if(slotSuper) slotSuper.call(this, ...args)
-            slot.call(this, ...args)
+            try {
+                if(slotSuper) slotSuper.call(this, ...args)
+                slot.call(this, ...args)
+            } catch (error) {
+                console.error(error)
+            }
+            
         }
     }
 }
