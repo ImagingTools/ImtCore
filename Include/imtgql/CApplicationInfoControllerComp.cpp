@@ -1,48 +1,50 @@
 #include <imtgql/CApplicationInfoControllerComp.h>
 
 
-// ACF includes
-#include <istd/TDelPtr.h>
-
-
 namespace imtgql
 {
 
 
 // protected methods
 
-// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+// reimplemented (sdl::imtapp::Application::V1_0::CGraphQlHandlerCompBase)
 
-imtbase::CTreeItemModel* CApplicationInfoControllerComp::CreateRepresentationFromRequest(
+sdl::imtapp::Application::V1_0::CApplicationInfo CApplicationInfoControllerComp::OnGetApplicationInfo(
+			const sdl::imtapp::Application::V1_0::CGetApplicationInfoGqlRequest& /*getApplicationInfoRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	if (!m_applicationInfoCompPtr.IsValid()){
-		errorMessage = QString("Unable to create representaion for application info. Component attribute 'm_applicationInfoCompPtr' was not set");
+		errorMessage = QString("Unable to get an application info. Error: Component attribute 'm_applicationInfoCompPtr' was not set");
 		SendErrorMessage(0, errorMessage, "CApplicationInfoControllerComp");
 
-		return nullptr;
+		return sdl::imtapp::Application::V1_0::CApplicationInfo();
 	}
 
-	if (!m_applicationInfoRepresentationCompPtr.IsValid()){
-		errorMessage = QString("Unable to create representaion for application info. Component attribute 'm_applicationInfoRepresentationCompPtr' was not set");
-		SendErrorMessage(0, errorMessage, "CApplicationInfoControllerComp");
+	sdl::imtapp::Application::V1_0::CApplicationInfo applicationInfo;
 
-		return nullptr;
+	const iser::IVersionInfo& versionInfo = m_applicationInfoCompPtr->GetVersionInfo();
+	int mainVersion = m_applicationInfoCompPtr->GetMainVersionId();
+
+	quint32 versionNumber;
+	if (versionInfo.GetVersionNumber(mainVersion, versionNumber)){
+		QString version = versionInfo.GetEncodedVersionName(mainVersion, versionNumber);
+		applicationInfo.SetVersion(version);
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	Q_ASSERT(dataModelPtr != nullptr);
+	QString appName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_NAME);
+	applicationInfo.SetApplicationName(appName);
 
-	if (!m_applicationInfoRepresentationCompPtr->GetRepresentationFromApplicationInfo(*m_applicationInfoCompPtr, *dataModelPtr)){
-		errorMessage = QString("Unable to create representaion for application info");
-		SendErrorMessage(0, errorMessage, "CApplicationInfoControllerComp");
+	QString productName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_PRODUCT_NAME);
+	applicationInfo.SetProductName(productName);
 
-		return nullptr;
-	}
+	QString companyName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_COMPANY_NAME);
+	applicationInfo.SetCompanyName(companyName);
 
-	return rootModelPtr.PopPtr();
+	QString type = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_TYPE);
+	applicationInfo.SetApplicationType(type);
+
+	return applicationInfo;
 }
 
 

@@ -67,36 +67,34 @@ bool CAuthorizationControllerComp::CheckCredential(const QByteArray& systemId, c
 }
 
 
-imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const
+sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const
 {
-	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'.").arg(qPrintable(login)));
+	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'").arg(qPrintable(login)));
 	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 
-	return nullptr;
+	return sdl::imtauth::Authorization::V1_0::CAuthorizationPayload();
 }
 
 
-imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
+sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
 			imtauth::CUserInfo& userInfo,
 			const QByteArray& systemId,
 			const QByteArray& productId,
 			QString& errorMessage) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	sdl::imtauth::Authorization::V1_0::CAuthorizationPayload payload;
 
 	QByteArray login = userInfo.GetId();
 	QByteArray objectId = GetUserObjectId(login);
 	QByteArray tokenValue = QUuid::createUuid().toByteArray();
 
-	dataModelPtr->SetData("Token", tokenValue);
-	dataModelPtr->SetData("Login", login);
-	dataModelPtr->SetData("UserId", objectId);
-	dataModelPtr->SetData("PasswordHash", userInfo.GetPasswordHash());
-	dataModelPtr->SetData("SystemId", systemId);
+	payload.SetToken(tokenValue);
+	payload.SetUsername(login);
+	payload.SetUserId(objectId);
+	payload.SetSystemId(systemId);
 
 	imtauth::IUserInfo::FeatureIds permissionIds = userInfo.GetPermissions(productId);
-	dataModelPtr->SetData("Permissions", permissionIds.join(';'));
+	payload.SetPermissions(permissionIds.join(';'));
 
 	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr;
 	sessionInfoPtr.SetPtr(new imtauth::CSessionInfo());
@@ -105,7 +103,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateAuthorizationSucces
 	sessionInfoPtr->SetToken(tokenValue);
 
 	if (m_sessionCollectionCompPtr.IsValid()){
-		m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.PopPtr(), tokenValue);
+		m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.GetPtr(), tokenValue);
 	}
 
 	userInfo.SetLastConnection(QDateTime::currentDateTimeUtc());
@@ -115,29 +113,30 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateAuthorizationSucces
 		SendWarningMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 	}
 
-	return rootModelPtr.PopPtr();
+	return payload;
 }
 
 
-// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+// reimplemented (sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase)
 
-imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CAuthorizationControllerComp::OnAuthorization(
+			const sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest& authorizationRequest,
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
-		return nullptr;
+		return sdl::imtauth::Authorization::V1_0::CAuthorizationPayload();
 	}
 
 	if (!m_sessionCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'SessionCollection' was not set", "CAuthorizationControllerComp");
-		return nullptr;
+		return sdl::imtauth::Authorization::V1_0::CAuthorizationPayload();
 	}
 
-	QByteArray login;
-	QByteArray productId;
-	QByteArray password;
-
-	ParseDataFromGqlRequest(gqlRequest, login, password, productId);
+	QByteArray login = authorizationRequest.GetRequestedArguments().input.GetLogin().toUtf8();
+	QByteArray productId = authorizationRequest.GetRequestedArguments().input.GetProductId();
+	QByteArray password = authorizationRequest.GetRequestedArguments().input.GetPassword().toUtf8();
 
 	QByteArray userObjectId = GetUserObjectId(login);
 	if (userObjectId.isEmpty()){
@@ -170,8 +169,17 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
-	imtbase::CTreeItemModel* succesfulResponsePtr = CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
-	return succesfulResponsePtr;
+	return CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
+}
+
+
+sdl::imtauth::Authorization::V1_0::CUserManagementPayload CAuthorizationControllerComp::OnGetUserMode(
+			const sdl::imtauth::Authorization::V1_0::CGetUserModeGqlRequest& /*getUserModeRequest*/,
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::imtauth::Authorization::V1_0::CUserManagementPayload payload;
+	return payload;
 }
 
 

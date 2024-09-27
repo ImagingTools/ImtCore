@@ -71,8 +71,8 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 		return nullptr;
 	}
 
-	imtbase::CTreeItemModel* headersResponseModelPtr = BaseClass::GetHeaders(gqlRequest, errorMessage);
-	if (headersResponseModelPtr == nullptr){
+	istd::TDelPtr<imtbase::CTreeItemModel> headersResponseModelPtr = BaseClass::GetHeaders(gqlRequest, errorMessage);
+	if (!headersResponseModelPtr.IsValid()){
 		return nullptr;
 	}
 
@@ -108,8 +108,8 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 	items.InsertField("Description");
 	gqlRequest.AddField("items", items);
 
-	imtbase::CTreeItemModel* resultModelPtr = BaseClass::ListObjects(gqlRequest, errorMessage);
-	if (resultModelPtr == nullptr){
+	istd::TDelPtr<imtbase::CTreeItemModel> resultModelPtr = BaseClass::ListObjects(gqlRequest, errorMessage);
+	if (!resultModelPtr.IsValid()){
 		return nullptr;
 	}
 

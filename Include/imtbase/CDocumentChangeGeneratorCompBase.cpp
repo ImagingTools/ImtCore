@@ -15,7 +15,7 @@ namespace imtbase
 
 
 bool CDocumentChangeGeneratorCompBase::GenerateDocumentChanges(
-			imtbase::IOperationDescription::OperationType operationType,
+			int operationType,
 			const QByteArray& documentId,
 			const istd::IChangeable& document,
 			CObjectCollection& documentChangeCollection,
@@ -64,7 +64,7 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 		if (documentChangeCollection.GetObjectData(elementId, dataPtr)){
 			const imtbase::COperationDescription* operationDescriptionPtr = dynamic_cast<const imtbase::COperationDescription*>(dataPtr.GetPtr());
 			if (operationDescriptionPtr != nullptr){
-				imtbase::IOperationDescription::OperationType typeId = operationDescriptionPtr->GetOperationType();
+				int typeId = operationDescriptionPtr->GetOperationType();
 				QByteArray key = operationDescriptionPtr->GetKey();
 				QByteArray oldValue = operationDescriptionPtr->GetOldValue();
 				QByteArray newValue = operationDescriptionPtr->GetNewValue();
@@ -118,7 +118,7 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 
 
 imtbase::COperationDescription* CDocumentChangeGeneratorCompBase::CreateOperationDescription(
-			imtbase::IOperationDescription::OperationType operationType,
+			int operationType,
 			const QByteArray& key,
 			const QString& keyName,
 			const QByteArray& oldValue,

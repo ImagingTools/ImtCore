@@ -45,6 +45,12 @@ GqlRequest {
     property var sdlObject: null;
     property Component sdlObjectComp: null;
 
+    property var inputParams: Gql.GqlObject("input");
+
+    function addInputParam(id, value){
+        inputParams.InsertField(id, value);
+    }
+
     function onResult(data){
         if (!sdlObjectComp){
             console.error("Unable to parse response. Please set SDL Component for creating response instance");
@@ -103,7 +109,6 @@ GqlRequest {
     }
 
     function createQueryParams(query){
-        var inputParams = Gql.GqlObject("input");
         query.AddParam(inputParams);
     }
 

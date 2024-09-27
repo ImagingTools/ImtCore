@@ -69,11 +69,11 @@ Item {
         Events.sendEvent("AppSizeChanged", {"Width": width, "Height": height})
     }
 
-    onApplicationInfoChanged: {
-        if (application.applicationInfo){
-            applicationInfoProvider.clientApplicationInfo = application.applicationInfo;
-        }
-    }
+    // onApplicationInfoChanged: {
+    //     if (application.applicationInfo){
+    //         applicationInfoProvider.clientApplicationInfo = application.applicationInfo;
+    //     }
+    // }
 
     onServerReadyChanged: {
         if (serverReady){
@@ -274,6 +274,7 @@ Item {
             return String(url)
         }
         catch(error){
+            console.error(error);
             return "";
         }
     }

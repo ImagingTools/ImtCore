@@ -31,7 +31,7 @@ bool CHttpRootServletComp::IsCommandSupported(const QByteArray& /*commandId*/) c
 }
 
 
-ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
+imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
 {
 	Q_ASSERT(subCommandId.isEmpty());
 
@@ -43,8 +43,6 @@ ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request, c
 	if (commandId.endsWith('/')){
 		commandId = commandId.remove(commandId.length() - 1, 1);
 	}
-
-	QByteArray bodyRequest = request.GetBody();
 
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 
@@ -58,7 +56,6 @@ ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request, c
 			EncodingType encodingType = ET_NONE;
 			const CHttpRequest* httprequestPtr = dynamic_cast<const CHttpRequest*>(&request);
 			if (httprequestPtr != nullptr){
-				QByteArrayList headers = httprequestPtr->GetHeaders();
 				QByteArray encodingHeader = httprequestPtr->GetHeaderValue("Accept-Encoding");
 				if (encodingHeader.contains("deflate")){
 					encodingType = ET_DEFLATE;

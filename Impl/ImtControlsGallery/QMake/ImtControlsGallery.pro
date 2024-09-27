@@ -10,7 +10,7 @@ QT += quickcontrols2
 
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -liauth -limtauthdb -limtclientgql -limtauthgui
+LIBS += -L../../../Lib/$$COMPILER_DIR -liauth -limtauthdb -limtclientgql -limtauthgui -limtappsdl -limtauthsdl
 LIBS += -limtbase -limtzip -limtrest  -limtstyle -limtqml -limtauth -limtgui
 LIBS += -limtguigqlqml -limtauthguiqml -limtguiqml -limtcolguiqml
 LIBS += -limtstylecontrolsqml -limtcontrolsqml -limtdocguiqml

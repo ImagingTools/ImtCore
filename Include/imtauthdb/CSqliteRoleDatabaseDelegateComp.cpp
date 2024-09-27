@@ -46,10 +46,10 @@ istd::IChangeable* CSqliteRoleDatabaseDelegateComp::CreateObjectFromRecord(const
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqliteRoleDatabaseDelegateComp::CreateNewObjectQuery(
-	const QByteArray& typeId,
+	const QByteArray& /*typeId*/,
 	const QByteArray& proposedObjectId,
 	const QString& objectName,
-	const QString& objectDescription,
+	const QString& /*objectDescription*/,
 	const istd::IChangeable* valuePtr,
 	const imtbase::IOperationContext* operationContextPtr) const
 {
@@ -86,11 +86,11 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqliteRoleDatabaseDelegateComp::
 
 
 QByteArray CSqliteRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
-	const imtbase::IObjectCollection& collection,
+	const imtbase::IObjectCollection& /*collection*/,
 	const QByteArray& objectId,
 	const istd::IChangeable& object,
 	const imtbase::IOperationContext* operationContextPtr,
-	bool useExternDelegate) const
+	bool /*useExternDelegate*/) const
 {
 	QByteArray retVal;
 

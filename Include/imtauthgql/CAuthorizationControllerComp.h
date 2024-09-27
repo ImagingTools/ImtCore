@@ -7,16 +7,17 @@
 #include <imtcrypt/IHashGenerator.h>
 #include <imtauth/ICredentialController.h>
 #include <imtauth/CUserInfo.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
 namespace imtauthgql
 {
 
 
-class CAuthorizationControllerComp: public imtgql::CGqlRequestHandlerCompBase
+class CAuthorizationControllerComp: public sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
+	typedef sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthorizationControllerComp);
 		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection", true, "SessionCollection");
@@ -29,16 +30,22 @@ protected:
 	bool ParseDataFromGqlRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& login, QByteArray& password, QByteArray& productId) const;
 	QByteArray GetUserObjectId(const QByteArray& login) const;
 	bool CheckCredential(const QByteArray& systemId, const QByteArray& login, const QByteArray& password) const;
-	imtbase::CTreeItemModel* CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
-	imtbase::CTreeItemModel* CreateAuthorizationSuccessfulResponse(
+	sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
+	sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
 				imtauth::CUserInfo& userInfo,
 				const QByteArray& systemId,
 				const QByteArray& productId,
 				QString& errorMessage) const;
 
-	// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-
+	// reimplemented (sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase)
+	virtual sdl::imtauth::Authorization::V1_0::CAuthorizationPayload OnAuthorization(
+				const sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest& authorizationRequest,
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Authorization::V1_0::CUserManagementPayload OnGetUserMode(
+				const sdl::imtauth::Authorization::V1_0::CGetUserModeGqlRequest& getUserModeRequest,
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 protected:
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);

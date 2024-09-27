@@ -38,11 +38,14 @@ protected:
 				const QByteArray& productId,
 				bool isDefault,
 				bool isGuest) const;
-
 	const imtauth::CUserInfo* CreateUserInfoFromLdapUser(const QByteArray& ldapUserId) const;
 
-	// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	// reimplemented (CAuthorizationControllerComp)
+	virtual sdl::imtauth::Authorization::V1_0::CAuthorizationPayload OnAuthorization(
+				const sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest& authorizationRequest,
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	// virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	I_REF(iprm::IEnableableParam, m_enableableParamCompPtr);

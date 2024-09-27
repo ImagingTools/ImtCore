@@ -9,7 +9,7 @@ namespace imtbase
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CModelUpdateBridgeComp::BeforeUpdate(imod::IModel* modelPtr)
+void CModelUpdateBridgeComp::BeforeUpdate(imod::IModel* /*modelPtr*/)
 {
 	if (m_slaveModelCompPtr.IsValid()){
 		for (int i = 0; i < m_slaveModelCompPtr.GetCount(); i++){
@@ -21,7 +21,7 @@ void CModelUpdateBridgeComp::BeforeUpdate(imod::IModel* modelPtr)
 }
 
 
-void CModelUpdateBridgeComp::AfterUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet)
+void CModelUpdateBridgeComp::AfterUpdate(imod::IModel* /*modelPtr*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_slaveModelCompPtr.IsValid()){
 		for (int i = 0; i < m_slaveModelCompPtr.GetCount(); i++){

@@ -20,10 +20,10 @@ bool CStaticOptionList::RemoveOption(int /*index*/)
 
 
 bool CStaticOptionList::InsertOption(
-			const QString& optionName,
-			const QByteArray& optionId,
-			const QString& optionDescription,
-			int index)
+			const QString& /*optionName*/,
+			const QByteArray& /*optionId*/,
+			const QString& /*optionDescription*/,
+			int /*index*/)
 {
 	Q_ASSERT(false);
 

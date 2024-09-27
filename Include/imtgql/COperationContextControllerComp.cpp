@@ -15,7 +15,7 @@ namespace imtgql
 // reimplemented (imtbase::IOperationContextController)
 
 imtbase::IOperationContext* COperationContextControllerComp::CreateOperationContext(
-			imtbase::IOperationDescription::OperationType operationType,
+			int operationType,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
 			const iprm::IParamsSet* paramsPtr)

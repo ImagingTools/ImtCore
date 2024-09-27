@@ -8,9 +8,6 @@ import imtauthUsersSdl 1.0
 Item {
     id: userPanelDelegate;
 
-    property string userId;
-    property string login;
-    property string passwordHash;
     property UserData userModel: UserData {}
 
     signal userUpdated();

@@ -21,7 +21,7 @@ namespace imtcrypt
 
 // reimplemented (imtcrypt::IEncryptedFilePersistence)
 
-int CEncryptionBasedPersistenceComp::LoadFromEncryptedFile(const QByteArray& key, const QString& filePath, istd::IChangeable& data) const
+int CEncryptionBasedPersistenceComp::LoadFromEncryptedFile(const QByteArray& key, const QString& filePath, istd::IChangeable& /*data*/) const
 {
 	if (!filePath.isEmpty() &&
 		m_encryptionKeysProviderCompPtr.IsValid() &&

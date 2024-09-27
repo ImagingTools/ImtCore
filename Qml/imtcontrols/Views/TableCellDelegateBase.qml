@@ -20,6 +20,8 @@ Item {
     property int rowIndex: rowDelegate ? rowDelegate.rowIndex : -1;
     property bool ready: rowCount && rowIndex > -1;
 
+    property string cellHeaderId;
+
     Component.onDestruction: {
         if (rowDelegate && rowDelegate.tableItem){
             rowDelegate.tableItem.widthRecalc.disconnect(delegateContainer.setCellWidth)
@@ -33,17 +35,14 @@ Item {
         if (delegateContainer.rowDelegate.horizontalBorderSize){
             if(delegateContainer.rowCount && delegateContainer.rowIndex > 0 && delegateContainer.rowIndex < delegateContainer.rowCount){
                 topBorder.createObject(delegateContainer)
-                //console.log("createTop__")
             }
             else if(delegateContainer.rowDelegate.visibleTopBorderFirst && delegateContainer.rowIndex == 0 && delegateContainer.rowCount){
                 topBorder.createObject(delegateContainer)
-                //console.log("createTop")
             }
         }
         if (delegateContainer.rowDelegate.horizontalBorderSize){
             if(delegateContainer.rowDelegate.visibleBottomBorderLast && delegateContainer.rowIndex == delegateContainer.rowCount -1){
                 bottomBorder.createObject(delegateContainer)
-                //console.log("createBottom")
             }
         }
     }
@@ -70,37 +69,7 @@ Item {
                 rightBorder.createObject(delegateContainer)
             }
         }
-
-        // let emptyDecorCell = delegateContainer.rowDelegate.tableItem.emptyDecorCell
-
-        // let leftTopCornerPatchVisible = emptyDecorCell ? true :
-        //                                             delegateContainer.rowDelegate.cellDecorator.isValidData("LeftTopRound", delegateContainer.columnIndex) ?
-        //                                             !delegateContainer.rowDelegate.cellDecorator.getData("LeftTopRound", delegateContainer.columnIndex) :true
-        // if (leftTopCornerPatchVisible){
-        //     leftTopCornerPatch.createObject(mainRec)
-        // }
-
-        // let rightTopCornerPatchVisible = emptyDecorCell ? true :
-        //                                             delegateContainer.rowDelegate.cellDecorator.isValidData("RightTopRound", delegateContainer.columnIndex) ?
-        //                                             !delegateContainer.rowDelegate.cellDecorator.getData("RightTopRound", delegateContainer.columnIndex) :true
-        // if (rightTopCornerPatchVisible){
-        //     rightTopCornerPatch.createObject(mainRec)
-        // }
-
-
-        // let leftBottomCornerPatchVisible = emptyDecorCell ? true :
-        //                                             delegateContainer.rowDelegate.cellDecorator.isValidData("LeftBottomRound", delegateContainer.columnIndex) ?
-        //                                             !delegateContainer.rowDelegate.cellDecorator.getData("LeftBottomRound", delegateContainer.columnIndex) :true
-        // if (leftBottomCornerPatchVisible){
-        //     leftBottomCornerPatch.createObject(mainRec)
-        // }
-
-        // let rightBottomCornerPatchVisible = emptyDecorCell ? true :
-        //                                             delegateContainer.rowDelegate.cellDecorator.isValidData("RightBottomRound", delegateContainer.columnIndex) ?
-        //                                             !delegateContainer.rowDelegate.cellDecorator.getData("RightBottomRound", delegateContainer.columnIndex) :true
-        // if (rightBottomCornerPatchVisible){
-        //     rightBottomCornerPatch.createObject(mainRec)
-        // }
+        cellHeaderId = delegateContainer.rowDelegate.tableItem.headers.getData("Id", delegateContainer.columnIndex);
 
         delegateContainer.rowDelegate.tableItem.widthRecalc.connect(delegateContainer.setCellWidth)
     }

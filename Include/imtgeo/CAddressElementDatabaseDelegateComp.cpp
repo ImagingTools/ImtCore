@@ -14,7 +14,7 @@ namespace imtgeo
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-QByteArray CAddressElementDatabaseDelegateComp::GetObjectTypeId(const QByteArray& objectId) const
+QByteArray CAddressElementDatabaseDelegateComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
 {
 	return "Address";
 }
@@ -96,10 +96,10 @@ istd::IChangeable* CAddressElementDatabaseDelegateComp::CreateObjectFromRecord(c
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateComp::CreateNewObjectQuery(
 			const QByteArray& /*typeId*/,
 			const QByteArray& proposedObjectId,
-			const QString& objectName,
+			const QString& /*objectName*/,
 			const QString& /*objectDescription*/,
             const istd::IChangeable* valuePtr,
-            const imtbase::IOperationContext* operationContextPtr) const
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(valuePtr);
     if (adrInfoPtr == nullptr){
@@ -140,9 +140,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 
 
 QByteArray CAddressElementDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& collection,
+			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
-			const imtbase::IOperationContext* operationContextPtr) const
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QString("DELETE FROM \"AddressElements\" WHERE \"Id\" = '%1';").arg(qPrintable(objectId)).toUtf8();
 
@@ -154,7 +154,7 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
 	const istd::IChangeable& object,
-	const imtbase::IOperationContext* operationContextPtr,
+	const imtbase::IOperationContext* /*operationContextPtr*/,
 	bool /*useExternDelegate*/) const
 {
 	const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(&object);
@@ -211,10 +211,10 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateRenameObjectQuery(
 
 
 QByteArray CAddressElementDatabaseDelegateComp::CreateDescriptionObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& description,
-			const imtbase::IOperationContext* operationContextPtr) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*description*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
 }
@@ -281,8 +281,6 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 {
 	QString objectFilterQuery;
 
-	bool retVal = true;
-
 	QString textFilterQuery;
 	QString parentIdsFilterQuery;
     QString parentIdFilterQuery;
@@ -292,7 +290,7 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
     iprm::TParamsPtr<imtbase::ICollectionFilter> parentIdFilterParamPtr(&filterParams, "ParentId");
 	iprm::TParamsPtr<imtbase::ICollectionFilter> typeIdFilterParamPtr(&filterParams, "TypeId");
 	if (collectionFilterParamPtr.IsValid()){
-		retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
+		CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
 	}
 
 	if (parentIdsFilterParamPtr.IsValid() && parentIdsFilterParamPtr->GetTextFilter() != ""){

@@ -179,7 +179,7 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 	const sdl::imtauth::Users::V1_0::CUserData& userDataRepresentation,
 	QByteArray& newObjectId,
 	QString& name,
-	QString& description,
+	QString& /*description*/,
 	QString& errorMessage) const
 {
 	if (!m_userInfoFactCompPtr.IsValid()){

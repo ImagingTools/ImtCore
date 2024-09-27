@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtguigql 1.0
+import imtauthUsersSdl 1.0
 
 QtObject {
     id: root;
@@ -10,50 +11,70 @@ QtObject {
     signal modelStateChanged(string state);
 
     function superuserExists(){
-        root.gqlGetModel.getModelData("su", {});
+        request.addInputParam("Id", "su");
+        request.send();
     }
 
-    property GqlModel gqlGetModel: GqlModel {
-        function getModelData(modelId, externInputParams){
-            var query = Gql.GqlRequest("query", "UserItem");
+    property GqlSdlRequestSender request : GqlSdlRequestSender {
+        gqlCommandId: ImtauthUsersSdlCommandIds.s_userItem;
 
+        function createQueryParams(query){
             var queryFields = Gql.GqlObject("item");
             queryFields.InsertField("Id");
             query.AddField(queryFields);
 
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", modelId);
-            if (externInputParams){
-                let keys = Object.keys(externInputParams)
-                for (let key of keys){
-                    inputParams.InsertField(key, externInputParams[key]);
-                }
-            }
             query.AddParam(inputParams);
-
-            var gqlData = query.GetQuery();
-
-            this.setGqlQuery(gqlData);
         }
 
-        onStateChanged: {
-            if (this.state === "Ready"){
-                var dataModelLocal;
-
-                if (root.gqlGetModel.containsKey("errors")){
-                    dataModelLocal = root.gqlGetModel.getData("errors");
-
-                    root.result(false, "");
-
-                    return;
-                }
-
-                if (root.gqlGetModel.containsKey("data")){
-                    root.result(true, "");
-                }
-            }
+        function onResult(){
+            root.result(true, "");
         }
-    }//GqlModel itemModel
+
+        function onError(){
+            root.result(false, "");
+        }
+    }
+    // property GqlModel gqlGetModel: GqlModel {
+    //     function getModelData(modelId, externInputParams){
+    //         var query = Gql.GqlRequest("query", "UserItem");
+
+    //         var queryFields = Gql.GqlObject("item");
+    //         queryFields.InsertField("Id");
+    //         query.AddField(queryFields);
+
+    //         var inputParams = Gql.GqlObject("input");
+    //         inputParams.InsertField("Id", modelId);
+    //         if (externInputParams){
+    //             let keys = Object.keys(externInputParams)
+    //             for (let key of keys){
+    //                 inputParams.InsertField(key, externInputParams[key]);
+    //             }
+    //         }
+    //         query.AddParam(inputParams);
+
+    //         var gqlData = query.GetQuery();
+
+    //         this.setGqlQuery(gqlData);
+    //     }
+
+    //     onStateChanged: {
+    //         if (this.state === "Ready"){
+    //             var dataModelLocal;
+
+    //             if (root.gqlGetModel.containsKey("errors")){
+    //                 dataModelLocal = root.gqlGetModel.getData("errors");
+
+    //                 root.result(false, "");
+
+    //                 return;
+    //             }
+
+    //             if (root.gqlGetModel.containsKey("data")){
+    //                 root.result(true, "");
+    //             }
+    //         }
+    //     }
+    // }//GqlModel itemModel
 }
 
 

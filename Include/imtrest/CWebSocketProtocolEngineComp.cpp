@@ -59,7 +59,7 @@ IRequest *CWebSocketProtocolEngineComp::CreateRequestForSend(
 
 
 IResponse* CWebSocketProtocolEngineComp::CreateResponse(
-			const IRequest& request,
+			const IRequest& /*request*/,
 			int statusCode,
 			const QByteArray& data,
 			const QByteArray& dataTypeId) const

@@ -29,9 +29,9 @@ public:
 		I_ASSIGN(m_compressionLevelAttrPtr, "CompressionLevel", "Compression level for automatic compression", true, 8);
 	I_END_COMPONENT
 
-	// reimplemented (IRequestHandler)
+	// reimplemented (IRequestServlet)
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
-	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
+	virtual imtrest::ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 protected:
 	enum EncodingType

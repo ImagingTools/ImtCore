@@ -2,85 +2,75 @@ import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
 
-Component {
-    id: textInputComp;
+TableCellDelegateBase {
+    id: bodyItem;
+    property var model;
 
-    Item {
-        id: bodyItem;
+    z: parent.z + 1;
 
-        property Item tableCellDelegate: null;
+    width: parent.width;
+    height: parent.height;
 
-        z: parent.z + 1;
+    signal currentIndexChanged(int index);
 
+    onRowIndexChanged: {
+        if (rowIndex >= 0 && model){
+            cb.model = model;
+
+            if (cb.model){
+                for (let i = 0; i < cb.model.getItemsCount(); i++){
+                    let id = cb.model.getData("Id", i);
+                    if (String(id) == bodyItem.cellHeaderId){
+                        cb.currentIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    Text {
+        id: textLabel;
+        anchors.verticalCenter: parent.verticalCenter;
         width: parent.width;
-        height: 25;
+        color: Style.textColor;
+        font.family: Style.fontFamily;
+        font.pixelSize: Style.fontSize_common;
+        text: bodyItem.getValue();
+    }
 
-        onTableCellDelegateChanged: {
-            if (tableCellDelegate){
-                let paramModel = tableCellDelegate.getValue();
+    ComboBox {
+        id: cb;
+        width: parent.width;
+        height: bodyItem.height;
+        visible: false;
+        nameId: bodyItem.cellHeaderId;
 
-                let elementsModel = paramModel.getData("Elements");
-                if (!elementsModel){
-                    return;
-                }
-
-                cb.model = elementsModel;
-
-                if (paramModel.containsKey("CurrentIndex")){
-                    let index = paramModel.getData("CurrentIndex")
-
-                    if (index >= 0){
-                        textLabel.text = elementsModel.getData("Name", index);
-                    }
-                }
-            }
+        onCurrentIndexChanged: {
+            cb.visible = false;
+            bodyItem.currentIndexChanged(cb.currentIndex);
         }
 
-        Text {
-            id: textLabel;
-
-            anchors.verticalCenter: parent.verticalCenter;
-
-            width: parent.width;
-
-            color: Style.textColor;
-            font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
+        onFinished: {
+            cb.visible = false;
         }
 
-        ComboBox {
-            id: cb;
-
-            width: parent.width;
-            height: 25;
-
-            visible: false;
-
-            onCurrentIndexChanged: {
+        onFocusChanged: {
+            if (!focus){
                 cb.visible = false;
-
-                if (bodyItem.tableCellDelegate){
-                    if (cb.model){
-                        let name = cb.model.getData("Name", cb.currentIndex)
-
-                        textLabel.text = name;
-
-                        let valueModel = bodyItem.tableCellDelegate.getValue();
-                        valueModel.setData("CurrentIndex", cb.currentIndex);
-
-                        bodyItem.tableCellDelegate.setValue(valueModel);
-                    }
-                }
             }
         }
+    }
 
-        MouseArea {
-            anchors.fill: parent;
-
-            onDoubleClicked: {
+    MouseArea {
+        id: ma;
+        anchors.fill: parent;
+        onDoubleClicked: {
+            if (cb.model && cb.model.getItemsCount() > 0){
                 cb.visible = true;
-
+                cb.z = ma.z + 1;
                 cb.forceActiveFocus();
+                cb.openPopupMenu();
             }
         }
     }

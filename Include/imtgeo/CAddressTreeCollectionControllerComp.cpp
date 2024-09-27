@@ -39,8 +39,8 @@ QVariant CAddressTreeCollectionControllerComp::GetObjectInformation(
 
 
 imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::GetMetaInfo(
-        const imtgql::CGqlRequest& gqlRequest,
-        QString& errorMessage) const
+		const imtgql::CGqlRequest& /*gqlRequest*/,
+		QString& /*errorMessage*/) const
 {
     istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
     return rootModelPtr.PopPtr();

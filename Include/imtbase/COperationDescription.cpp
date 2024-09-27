@@ -26,7 +26,7 @@ COperationDescription::COperationDescription()
 }
 
 
-void COperationDescription::SetOperationType(OperationType operationType)
+void COperationDescription::SetOperationType(int operationType)
 {
 	if (m_operationType != operationType){
 		istd::CChangeNotifier changeNotifier(this);
@@ -78,7 +78,7 @@ void COperationDescription::SetNewValue(const QByteArray& newValue)
 
 // reimplemented (imtbase::IOperationDescription)
 
-imtbase::IOperationDescription::OperationType COperationDescription::GetOperationType() const
+int COperationDescription::GetOperationType() const
 {
 	return m_operationType;
 }
@@ -125,7 +125,8 @@ bool COperationDescription::Serialize(iser::IArchive& archive)
 	if (imtCoreVersion >= 11170){
 		iser::CArchiveTag operationTypeTag("OperationType", "Operation type", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(operationTypeTag);
-		retVal = retVal && I_SERIALIZE_ENUM(imtbase::IOperationDescription::OperationType, archive, m_operationType);
+		// retVal = retVal && I_SERIALIZE_ENUM(imtbase::IOperationDescription::OperationType, archive, m_operationType);
+		retVal = retVal && archive.Process(m_operationType);
 		retVal = retVal && archive.EndTag(operationTypeTag);
 	}
 	else{

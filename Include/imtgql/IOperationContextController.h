@@ -7,7 +7,6 @@
 
 // imtbase includes
 #include <imtbase/IOperationContext.h>
-#include <imtbase/IOperationDescription.h>
 
 
 namespace imtgql
@@ -18,7 +17,7 @@ class IOperationContextController: virtual public istd::IPolymorphic
 {
 public:
 	virtual imtbase::IOperationContext* CreateOperationContext(
-				imtbase::IOperationDescription::OperationType operationType,
+				int operationType,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
 				const iprm::IParamsSet* paramsPtr = nullptr) = 0;

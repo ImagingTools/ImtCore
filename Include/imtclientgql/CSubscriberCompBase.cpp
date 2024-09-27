@@ -14,8 +14,8 @@ namespace imtclientgql
 // reimplemented (imtgql::IGqlSubscriptionClient)
 
 void CSubscriberCompBase::OnResponseReceived(
-			const QByteArray& subscriptionId,
-			const QByteArray& subscriptionData)
+			const QByteArray& /*subscriptionId*/,
+			const QByteArray& /*subscriptionData*/)
 {
 }
 

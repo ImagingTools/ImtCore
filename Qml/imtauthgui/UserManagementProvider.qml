@@ -3,12 +3,12 @@ import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
+import imtauthAuthorizationSdl 1.0
 
 QtObject {
     id: container;
 
     property string userMode;
-    property bool superuserExists: false;
 
     signal updated();
 
@@ -16,100 +16,24 @@ QtObject {
         Events.sendEvent("UserModeChanged", container.userMode);
     }
 
-    property alias userModeGqlModel: userModeModel;
-
     function isNoUserManagement(){
-        return userMode === "NO_USER_MANAGEMENT";
+        return userMode === UserModeTypeMetaInfo.s_nO_USER_MANAGEMENT;
     }
 
     function updateModel(){
         userMode = "";
-        userModeModel.getUserMode();
+        request.send();
     }
 
-    property Component errorDialog: Component {
-        ErrorDialog {
-            onFinished: {}
-        }
-    }
-
-    property GqlModel saveQuery: GqlModel {
-        id: saveQuery;
-
-        function updateModel(password){
-            var query = Gql.GqlRequest("query", "UserAdd");
-
-            var queryFields = Gql.GqlObject('addedNotification');
-
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", "su");
-
-            let obj = {"Username": "su", "UserId": "su", "Password": password, "Name": "superuser"}
-
-            var jsonString = JSON.stringify(obj);
-
-            inputParams.InsertField ("Item", jsonString);
-
-            query.AddParam(inputParams);
-
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Successed");
-
-            query.AddField(queryFields);
-
-            var gqlData = query.GetQuery();
-
-            this.setGqlQuery(gqlData);
-        }
-    }
-
-    property GqlModel userModeModel: GqlModel{
-        id: userModeModel;
-
-        function getUserMode() {
-            var query = Gql.GqlRequest("query", "UserMode");
-
-            var gqlData = query.GetQuery();
-
-            this.setGqlQuery(gqlData);
-        }
-
-        onStateChanged: {
-            if (this.state === "Ready"){
-                var dataModelLocal;
-
-                if (userModeModel.containsKey("errors")){
-                    dataModelLocal = userModeModel.getData("errors");
-
-                    if (dataModelLocal.containsKey("UserMode")){
-                        dataModelLocal = dataModelLocal.getData("UserMode");
-                    }
-
-                    let message = ""
-                    if (dataModelLocal.containsKey("message")){
-                        message = dataModelLocal.getData("message");
-                    }
-
-                    ModalDialogManager.showWarningDialog(message)
-
-                    return;
+    property GqlSdlRequestSender request : GqlSdlRequestSender {
+        gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_getUserMode;
+        sdlObjectComp:
+            Component {
+            UserManagementPayload {
+                onFinished: {
+                    container.userMode = m_userMode;
+                    container.updated();
                 }
-
-                if (userModeModel.containsKey("data")){
-                    dataModelLocal = userModeModel.getData("data")
-                    if (dataModelLocal.containsKey("UserMode")){
-                        dataModelLocal = dataModelLocal.getData("UserMode");
-                    }
-
-                    if (dataModelLocal.containsKey("Parameters")){
-                        let parameters = dataModelLocal.getData("Parameters");
-                        let value = dataModelLocal.getData("Value");
-                        if (value >= 0){
-                            container.userMode = parameters.getData("Id", value);
-                        }
-                    }
-                }
-                container.updated();
             }
         }
     }

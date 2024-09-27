@@ -57,7 +57,7 @@ bool CGqlRequestSender::SetGqlQuery(QString query)
 }
 
 
-void CGqlRequestSender::OnReplyFinished(const QByteArray& data)
+void CGqlRequestSender::OnReplyFinished(const QByteArray& /*data*/)
 {
 }
 

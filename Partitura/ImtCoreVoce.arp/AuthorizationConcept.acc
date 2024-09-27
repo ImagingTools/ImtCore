@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2210" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395010" Description="Qt Framework"/>
+            <Version Id="0" Number="5248" Description="ACF"/>
+            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -16,7 +16,7 @@
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>UserToken</Value>
+                                <Value>Authorization</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

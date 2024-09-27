@@ -28,7 +28,7 @@ public:
 protected:
 	// reimplemented (imtbase::IOperationContextController)
 	virtual imtbase::IOperationContext* CreateOperationContext(
-				imtbase::IOperationDescription::OperationType operationType,
+				int operationType,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
 				const iprm::IParamsSet* paramsPtr) override;

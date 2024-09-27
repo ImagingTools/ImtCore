@@ -93,6 +93,9 @@ public:
 		Q_INIT_RESOURCE(imtauthGroupsSdl);
 		Q_INIT_RESOURCE(imtauthRolesSdl);
 		Q_INIT_RESOURCE(imtauthUsersSdl);
+		Q_INIT_RESOURCE(imtauthAuthorizationSdl);
+
+		Q_INIT_RESOURCE(imtappApplicationSdl);
 	}
 
 	static void InitStyle()

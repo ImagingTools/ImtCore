@@ -18,7 +18,7 @@ class IDocumentChangeGenerator: virtual public istd::IPolymorphic
 {
 public:
 	virtual bool GenerateDocumentChanges(
-				imtbase::IOperationDescription::OperationType operationType,
+				int operationType,
 				const QByteArray& documentId,
 				const istd::IChangeable& document,
 				CObjectCollection& documentChangeCollection,

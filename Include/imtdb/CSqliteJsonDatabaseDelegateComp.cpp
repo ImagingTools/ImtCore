@@ -28,10 +28,15 @@ QByteArray CSqliteJsonDatabaseDelegateComp::GetSelectionQuery(
 					.arg(qPrintable(objectId)).toUtf8();
 	}
 
-	iprm::TParamsPtr<iprm::IEnableableParam> enableableParamPtr(paramsPtr, "IsHistory");
-	if (enableableParamPtr.IsValid()){
-		if (enableableParamPtr->IsEnabled()){
-			return CreateObjectHistoryQuery(offset, count, paramsPtr);
+	if (paramsPtr != nullptr){
+		iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
+		if (paramIds.contains("IsHistory")){
+			iprm::TParamsPtr<iprm::IEnableableParam> enableableParamPtr(paramsPtr, "IsHistory");
+			if (enableableParamPtr.IsValid()){
+				if (enableableParamPtr->IsEnabled()){
+					return CreateObjectHistoryQuery(offset, count, paramsPtr);
+				}
+			}
 		}
 	}
 
@@ -166,7 +171,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreatePaginationQuery(int offset, int coun
 }
 
 
-bool CSqliteJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const
+bool CSqliteJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& /*timeFilter*/, QString& /*timeFilterQuery*/) const
 {
 	return true;
 }
