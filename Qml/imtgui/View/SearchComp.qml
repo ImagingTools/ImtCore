@@ -40,6 +40,8 @@ Rectangle{
     property TreeItemModel filterIdsModel: TreeItemModel{};
     property TreeItemModel propertiesModel: TreeItemModel{};
 
+    property TreeItemModel additionalFilterModel: TreeItemModel{};
+
     property TreeItemModel returnModel: TreeItemModel{};
     property bool canReturnModel: false;
 
@@ -103,21 +105,45 @@ Rectangle{
             var index = searchContainer.propertiesModel.insertNewItem();
             searchContainer.propertiesModel.setData("Id", id_);
             searchContainer.propertiesModel.setData("Value", value_);
+            searchContainer.setAdditionalFilterParams();
         }
 
     }
 
+    function setAdditionalFilterParams(){
+        let keys = [];
+        keys = searchContainer.additionalFilterModel.getKeys();
+        for(let i = 0; i < keys.length; i++){
+            let index_  = searchContainer.propertiesModel.insertNewItem();
+            let key = keys[i];
+            let value  = searchContainer.additionalFilterModel.getData(key);
+            searchContainer.propertiesModel.setData("Id", key, index_);
+            searchContainer.propertiesModel.setData("Value", value, index_);
+        }
+    }
+
+    function setAdditionalFilterParamsForPopup(model_){
+        let keys = [];
+        keys = searchContainer.additionalFilterModel.getKeys();
+        for(let i = 0; i < keys.length; i++){
+            let key = keys[i];
+            let value  = searchContainer.additionalFilterModel.getData(key);
+            model_.setData(key, value);
+        }
+    }
+
     function clearSearchFunc(){
         console.log("clearSearchFunc")
+
+        searchContainer.propertiesModel.clear();
+        setPropertiesModel(searchContainer.propertyId, "");
 
         searchTextField.excludeFilterPart = "";
         searchTextField.currentText = "";
         searchTextField.filterText = "";
         searchContainer.selectedText = "";
         searchContainer.previousText = "";
-        searchContainer.propertiesModel.clear();
         searchContainer.parentIds = "";
-        setPropertiesModel(searchContainer.propertyId, "");
 
         searchContainer.externalSearchParam = "";
         searchContainer.accepted("");
@@ -130,6 +156,7 @@ Rectangle{
             popup.modelFilterAlias.setData("FilterIds", searchContainer.filterIdsModel)
             popup.modelFilterAlias.addTreeModel("Sort");
             popup.modelFilterAlias.setData("ParentIds",  searchContainer.parentIds);
+            searchContainer.setAdditionalFilterParamsForPopup(popup.modelFilterAlias);
 
             popup.modelFilterAlias.setData("TextFilter", "");
             popup.excludeFilterPart = searchContainer.currentText;
@@ -195,6 +222,7 @@ Rectangle{
                 popup.modelFilterAlias.setData("FilterIds", searchContainer.filterIdsModel)
                 popup.modelFilterAlias.addTreeModel("Sort");
                 popup.modelFilterAlias.setData("ParentIds",  searchContainer.parentIds);
+                searchContainer.setAdditionalFilterParamsForPopup(popup.modelFilterAlias);
 
                 popup.modelFilterAlias.setData("TextFilter", "");
                 popup.excludeFilterPart = searchContainer.currentText;
@@ -273,6 +301,7 @@ Rectangle{
                             popup.modelFilterAlias.setData("FilterIds", searchContainer.filterIdsModel)
                             popup.modelFilterAlias.addTreeModel("Sort");
                             popup.modelFilterAlias.setData("ParentIds",  searchContainer.parentIds);
+                            searchContainer.setAdditionalFilterParamsForPopup(popup.modelFilterAlias);
 
                             var str = filterText.replace(popup.excludeFilterPart, "");
                             popup.modelFilterAlias.setData("TextFilter", str);
@@ -388,7 +417,9 @@ Rectangle{
             for(let k = 0; k < propertiesModel_.getItemsCount(); k++){
                 searchContainer.propertiesModel.insertNewItem();
                 searchContainer.propertiesModel.copyItemDataFromModel(k,propertiesModel_,k);
+
             }
+            searchContainer.setAdditionalFilterParams();
         }
     }
 
@@ -414,6 +445,7 @@ Rectangle{
             searchContainer.propertiesModel.insertNewItem();
             searchContainer.propertiesModel.copyItemDataFromModel(k,propertiesModel_,k);
         }
+        searchContainer.setAdditionalFilterParams();
     }
 
 
