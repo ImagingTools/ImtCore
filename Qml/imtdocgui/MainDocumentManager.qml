@@ -10,6 +10,7 @@ QtObject {
     property var documentManagers: ({})
 
     signal documentOpened(string typeId, string documentId, string documentTypeId);
+    signal tryRegisterDocumentManager(string typeId, var callback);
 
     function clear(){
         root.documentManagers = {};
@@ -54,14 +55,18 @@ QtObject {
             return;
         }
 
-        if (!(typeId in root.documentManagers)){
-            console.error("Unable to open document. Document manager with Type-ID: '" , typeId, "' unregistered!");
-            return;
-        }
-
         let documentManager = root.documentManagers[typeId];
         if (!documentManager){
-            console.error("Unable to open document. Document manager with Type-ID: '" , typeId, "' is invalid!");
+            root.tryRegisterDocumentManager(typeId, function(result){
+                console.log("result", result)
+
+                if (result){
+                    root.openDocument(typeId, documentId, documentTypeId, viewTypeId);
+                }
+                else{
+                    console.error("Unable to open document. Document manager with type-ID: '" , typeId, "' is invalid!");
+                }
+            })
             return;
         }
 

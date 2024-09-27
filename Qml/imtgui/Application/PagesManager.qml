@@ -62,6 +62,13 @@ Item {
         }
     }
 
+    function loadPageContent(index){
+        let page = pagesData.itemAt(index)
+        if (page){
+            page.load();
+        }
+    }
+
     Repeater {
         id: pagesData;
         anchors.fill: parent;
@@ -72,11 +79,15 @@ Item {
             visible: container.activePageIndex === model.index;
 
             Component.onCompleted: {
-                load();
+                if (visible){
+                    load();
+                }
             }
 
             onVisibleChanged: {
-                load();
+                if (visible){
+                    load();
+                }
             }
 
             Loader {
@@ -105,10 +116,8 @@ Item {
             }
 
             function load(){
-                if (pagesDeleg.visible || !container.loadByClick){
-                    if (loader && !loader.item){
-                        loader.source = model.Source;
-                    }
+                if (loader && !loader.item){
+                    loader.source = model.Source;
                 }
             }
         }

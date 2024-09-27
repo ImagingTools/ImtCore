@@ -77,6 +77,25 @@ Rectangle {
         MainDocumentManager.clear();
     }
 
+    Connections {
+        target: MainDocumentManager;
+
+        function onTryRegisterDocumentManager(typeId, callback){
+            console.log("onTryRegisterDocumentManager", typeId, callback)
+            let pageIndex = -1;
+            for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
+                let pageId = menuPanel.model.getData("Id", i);
+                if (pageId === typeId){
+                    pageIndex = i;
+                    pagesManager.loadPageContent(i);
+                    break;
+                }
+            }
+
+            callback(pageIndex >= 0);
+        }
+    }
+
     MenuPanel {
         id: menuPanel;
 
