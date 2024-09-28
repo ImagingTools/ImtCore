@@ -115,7 +115,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 			const QByteArray& typeId,
 			const QByteArray& proposedObjectId,
 			const QString& objectName,
-			const QString& /*objectDescription*/,
+			const QString& objectDescription,
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
@@ -134,21 +134,21 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 
 			int revisionVersion = 1;
 			QString queryStr;
-			if (*m_isMultiTypeAttrPtr){
-				queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', '%6', true, '%0');")
-						.arg(QString(typeId));
-			}
-			else{
-				queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);");
-			}
+			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\"%7%9%11) VALUES('%2', '%3', '%4', '%5', '%6', true%8%10%12);");
 
 			retVal.query = queryStr
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(objectId))
-					.arg(SqlEncode(documentContent))
-					.arg(revisionVersion)
-					.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
-					.arg(checksum).toUtf8();
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(objectId))
+				.arg(SqlEncode(documentContent))
+				.arg(revisionVersion)
+				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
+				.arg(checksum)
+				.arg(*m_isMultiTypeAttrPtr ? ", \"TypeId\"" : "")
+				.arg(*m_isMultiTypeAttrPtr ? QString(", '%1'").arg(typeId) : "")
+				.arg(!objectName.isEmpty() ? ", \"Name\"" : "")
+				.arg(!objectName.isEmpty() ? QString(", '%1'").arg(objectName) : "")
+				.arg(!objectDescription.isEmpty() ? ", \"Description\"" : "")
+				.arg(!objectDescription.isEmpty() ? QString(", '%1'").arg(objectDescription) : "").toUtf8();
 
 			retVal.query += CreateOperationDescriptionQuery(objectId, operationContextPtr);
 			retVal.objectName = objectName;
