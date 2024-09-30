@@ -156,27 +156,27 @@ void CSdlClassJsonModificatorComp::AddFieldWriteToJsonCode(QTextStream& stream, 
 	// Process scalar value
 	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
-		stream << QStringLiteral("if (");
-		stream << FromVariantMapAccessString(field) << QStringLiteral(".isNull()){");
+		stream << QStringLiteral("if (!");
+		stream << FromInternalMapCheckString(field) << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;\n\t}");
 		FeedStream(stream, 1, false);
+
 		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("jsonObject[\"") << field.GetId() << QStringLiteral("\"] = ");
-		stream << QStringLiteral("QJsonValue::fromVariant(");
-		stream << FromVariantMapAccessString(field) << QStringLiteral(");");
+		stream << QStringLiteral("QJsonValue::fromVariant(m_");
+		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral(");");
 	}
 	else {
-		stream << QStringLiteral("if (!");
-		stream << FromVariantMapAccessString(field);
-		stream << QStringLiteral(".isNull()");
+		stream << QStringLiteral("if (");
+		stream << FromInternalMapCheckString(field);
 		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("jsonObject[\"") << field.GetId() << QStringLiteral("\"] = ");
-		stream << QStringLiteral("QJsonValue::fromVariant(");
-		stream << FromVariantMapAccessString(field) << QStringLiteral(");");
+		stream << QStringLiteral("QJsonValue::fromVariant(m_");
+		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral(");");
 		stream << QStringLiteral("\n\t}");
 	}
 }
@@ -250,8 +250,8 @@ void CSdlClassJsonModificatorComp::AddCustomFieldWriteToJsonCode(QTextStream& st
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
-		stream << QStringLiteral("if (");
-		stream << FromVariantMapAccessString(field) << QStringLiteral(".isNull()){");
+		stream << QStringLiteral("if (!");
+		stream << FromInternalMapCheckString(field) << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;\n\t}");
@@ -260,9 +260,9 @@ void CSdlClassJsonModificatorComp::AddCustomFieldWriteToJsonCode(QTextStream& st
 		FeedStream(stream, 1, false);
 	}
 	else {
-		stream << QStringLiteral("if (!");
-		stream << FromVariantMapAccessString(field);
-		stream << QStringLiteral(".isNull()){");
+		stream << QStringLiteral("if (");
+		stream << FromInternalMapCheckString(field);
+		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		AddCustomFieldWriteToJsonImplCode(stream, field, 2);
 		stream << QStringLiteral("\n\t}");
@@ -325,9 +325,9 @@ void CSdlClassJsonModificatorComp::AddArrayFieldWriteToJsonCode(QTextStream& str
 	}
 	else {
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("if (!");
-		stream << FromVariantMapAccessString(field);
-		stream << QStringLiteral(".isNull()){");
+		stream << QStringLiteral("if (");
+		stream << FromInternalMapCheckString(field);
+		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		AddArrayFieldWriteToJsonImplCode(stream, field, 2);
 		stream << QStringLiteral("\n\t}");
@@ -559,9 +559,9 @@ void CSdlClassJsonModificatorComp::AddCustomArrayFieldWriteToJsonCode(QTextStrea
 	}
 	else {
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("if (!");
-		stream << FromVariantMapAccessString(field);
-		stream << QStringLiteral(".isNull()){");
+		stream << QStringLiteral("if (");
+		stream << FromInternalMapCheckString(field);
+		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		AddCustomArrayFieldWriteToJsonImplCode(stream, field, 2);
 		stream << QStringLiteral("\n\t}");

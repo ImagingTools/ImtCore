@@ -163,7 +163,7 @@ void CSdlClassGqlModificatorComp::AddScalarListFieldReadFromRequestCode(QTextStr
 	}
 	else {
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count > 0){");
+		stream << QStringLiteral("if (!") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
 		FeedStream(stream, 1, false);
 
 		AddSetScalarListValueToObjectCode(stream, field, 2);
@@ -278,10 +278,18 @@ void CSdlClassGqlModificatorComp::AddFieldWriteToRequestCode(QTextStream& stream
 
 void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
+	QString tempListVarName;
+	GenerateListTempValueCode(stream, field, tempListVarName, hIndents);
+
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("request.InsertField(");
-	stream << '"' << field.GetId() << '"';
-	stream << ',' << ' ' << FromVariantMapAccessString(field);
+	stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
+	if (field.IsArray()){
+		stream << tempListVarName;
+	}
+	else {
+		stream << QStringLiteral("QVariant(m_") << GetDecapitalizedValue(field.GetId()) << ')';
+	}
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
 }
@@ -577,7 +585,7 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 void CSdlClassGqlModificatorComp::AddCheckScalarListRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral(".isNull()){");
+	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;");

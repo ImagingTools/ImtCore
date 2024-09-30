@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5230" Description="ACF"/>
+            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="Amount" PackageId="MeasPck" ComponentId="NumericParams">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="IntegerConstraints"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DoubleConstraints" PackageId="MeasPck" ComponentId="NumericConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Precision" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="15"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="IntegerConstraints" PackageId="MeasPck" ComponentId="NumericConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Precision" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="0"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Item" PackageId="BasePck" ComponentId="ComposedParamsSet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Name</Value>
+                                <Value>Price</Value>
+                                <Value>Quantity</Value>
+                                <Value>Amount</Value>
+                                <Value>MeasurementUnit</Value>
+                                <Value>PaymentMethod</Value>
+                                <Value>ItemType</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Name</Value>
+                                <Value>Price</Value>
+                                <Value>Quantity</Value>
+                                <Value>Amount</Value>
+                                <Value>MeasurementUnit</Value>
+                                <Value>PaymentMethod</Value>
+                                <Value>ItemType</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="PaymentItem"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ItemType" PackageId="BasePck" ComponentId="SelectionParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TypeConstraints"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MeasurementUnit" PackageId="BasePck" ComponentId="SelectionParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UnitConstraints"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="0"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MethodConstraints" PackageId="BasePck" ComponentId="SelectionConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>fullPrepayment</Value>
+                                <Value>prepayment</Value>
+                                <Value>advance</Value>
+                                <Value>fullPayment</Value>
+                                <Value>partialPayment</Value>
+                                <Value>credit</Value>
+                                <Value>creditPayment</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Name" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="PaymentMethod" PackageId="BasePck" ComponentId="SelectionParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MethodConstraints"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="0"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Price" PackageId="MeasPck" ComponentId="NumericParams">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="IntegerConstraints"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Quantity" PackageId="MeasPck" ComponentId="NumericParams">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DoubleConstraints"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TypeConstraints" PackageId="BasePck" ComponentId="SelectionConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>commodity</Value>
+                                <Value>excise</Value>
+                                <Value>job</Value>
+                                <Value>service</Value>
+                                <Value>gamblingBet</Value>
+                                <Value>gamblingPrize</Value>
+                                <Value>lottery</Value>
+                                <Value>lotteryPrize</Value>
+                                <Value>intellectualActivity</Value>
+                                <Value>payment</Value>
+                                <Value>agentCommission</Value>
+                                <Value>pay</Value>
+                                <Value>another</Value>
+                                <Value>proprietaryLaw</Value>
+                                <Value>nonOperatingIncome</Value>
+                                <Value>otherContributions</Value>
+                                <Value>merchantTax</Value>
+                                <Value>resortFee</Value>
+                                <Value>deposit</Value>
+                                <Value>consumption</Value>
+                                <Value>soleProprietorCPIContributions</Value>
+                                <Value>cpiContributions</Value>
+                                <Value>soleProprietorCMIContributions</Value>
+                                <Value>cmiContributions</Value>
+                                <Value>csiContributions</Value>
+                                <Value>casinoPayment</Value>
+                                <Value>fundsIssuance</Value>
+                                <Value>exciseWithoutMarking</Value>
+                                <Value>exciseWithMarking</Value>
+                                <Value>commodityWithoutMarking</Value>
+                                <Value>commodityWithMarking</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UnitConstraints" PackageId="BasePck" ComponentId="SelectionConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>piece</Value>
+                                <Value>gram</Value>
+                                <Value>kilogram</Value>
+                                <Value>ton</Value>
+                                <Value>centimeter</Value>
+                                <Value>decimeter</Value>
+                                <Value>meter</Value>
+                                <Value>squareCentimeter</Value>
+                                <Value>squareDecimeter</Value>
+                                <Value>squareMeter</Value>
+                                <Value>milliliter</Value>
+                                <Value>liter</Value>
+                                <Value>cubicMeter</Value>
+                                <Value>kilowattHour</Value>
+                                <Value>gkal</Value>
+                                <Value>day</Value>
+                                <Value>hour</Value>
+                                <Value>minute</Value>
+                                <Value>second</Value>
+                                <Value>kilobyte</Value>
+                                <Value>megabyte</Value>
+                                <Value>gigabyte</Value>
+                                <Value>terabyte</Value>
+                                <Value>otherUnits</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="Item"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="Item"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="Item"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="Item"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Item"/>
+        <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="Item"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

@@ -339,8 +339,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType, b
 
 	QSet<QString> complexTypeList;
 	bool isQtCommentAdded = false;
-	bool hasComplexTypes = m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName);
-	hasComplexTypes = IsTypeHasNonFundamentalTypes(sdlType, &complexTypeList) || hasComplexTypes;
+	bool hasComplexTypes = IsTypeHasNonFundamentalTypes(sdlType, &complexTypeList);
 
 	if (hasComplexTypes){
 		// Add Qt types
@@ -371,18 +370,19 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType, b
 			ifStream << QStringLiteral("#include <QtCore/QList>");
 			FeedStream(ifStream, 1, false);
 		}
-		// if variant map is enabled we need to add QVariant and QVariantMap
-		if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
-			if (!isQtCommentAdded){
-				ifStream << QStringLiteral("// Qt includes");
-				FeedStream(ifStream, 1, false);
-				isQtCommentAdded = true;
-			}
-			ifStream << QStringLiteral("#include <QtCore/QVariant>");
+		if (!isQtCommentAdded){
+			ifStream << QStringLiteral("// Qt includes");
 			FeedStream(ifStream, 1, false);
-			ifStream << QStringLiteral("#include <QtCore/QVariantMap>");
-			FeedStream(ifStream, 1, false);
+			isQtCommentAdded = true;
 		}
+
+		// add required types
+		ifStream << QStringLiteral("#include <QtCore/QVariant>");
+		FeedStream(ifStream, 1, false);
+		ifStream << QStringLiteral("#include <QtCore/QVariantMap>");
+		FeedStream(ifStream, 1, false);
+		ifStream << QStringLiteral("#include <QtCore/QSet>");
+		FeedStream(ifStream, 1, false);
 
 		// remove qt types from list
 		complexTypeList.remove(QStringLiteral("QByteArray"));
@@ -481,9 +481,7 @@ bool CSdlClassCodeGeneratorComp::EndHeaderClassFile(const CSdlType& sdlType)
 		FeedStream(ifStream, 1, false);
 	}
 
-	if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
-		ifStream << QStringLiteral("\tQVariantMap ") << s_variantMapClassMemberName << ';';
-	}
+	ifStream << QStringLiteral("\tQSet<QByteArray/*FieldId*/> ") << s_variantMapClassMemberName << ';';
 
 	FeedStream(ifStream);
 
@@ -634,16 +632,15 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const CSdlType& sdlType)
 	}
 
 	// add Q_DECLARE_METATYPE macro to use the type as a custom type in QVariant
-	if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
-		FeedStream(headerStream, 1, false);
-		headerStream << QStringLiteral("Q_DECLARE_METATYPE(");
-		if (sdlNamespace.length() > 0){
-			headerStream << sdlNamespace;
-			headerStream << ':' << ':';
-		}
-		headerStream << 'C' << sdlType.GetName();
-		headerStream << QStringLiteral(");");
+	FeedStream(headerStream, 1, false);
+	headerStream << QStringLiteral("Q_DECLARE_METATYPE(");
+	if (sdlNamespace.length() > 0){
+		headerStream << sdlNamespace;
+		headerStream << ':' << ':';
 	}
+	headerStream << 'C' << sdlType.GetName();
+	headerStream << QStringLiteral(");");
+
 	FeedStream(headerStream, 3, true);
 
 	// finish source
@@ -747,13 +744,10 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 	}
 
 	if (generateExistenceChecks){
-		if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
-			FeedLineHorizontally(retVal, indents);
-
-			retVal += QStringLiteral("[[nodiscard]] bool Has");
-			retVal += GetCapitalizedValue(sdlField.GetId());
-			retVal += QStringLiteral("() const;\n");
-		}
+		FeedLineHorizontally(retVal, indents);
+		retVal += QStringLiteral("[[nodiscard]] bool Has");
+		retVal += GetCapitalizedValue(sdlField.GetId());
+		retVal += QStringLiteral("() const;\n");
 	}
 
 	return retVal;
@@ -817,25 +811,28 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 		FeedStream(stream, 1, false);
 
 		// impl of method
+		// a) check
 		FeedStreamHorizontally(stream, indents + 1);
 		stream << QStringLiteral("if (");
 		stream << GetDecapitalizedValue(sdlField.GetId());
 		stream << QStringLiteral(" != m_");
 		stream << GetDecapitalizedValue(sdlField.GetId());
-		stream << QStringLiteral(" || ");
-		stream << FromVariantMapAccessString(sdlField);
-		stream << QStringLiteral(".isNull()");
+		stream << QStringLiteral(" || !");
+		stream << FromInternalMapCheckString(sdlField);
 		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, indents + 2);
+		// b) set value
 		stream << QStringLiteral("m_");
 		stream << GetDecapitalizedValue(sdlField.GetId());
 		stream << QStringLiteral(" = ");
 		stream << GetDecapitalizedValue(sdlField.GetId());
 		stream << QStringLiteral(";");
 		FeedStream(stream, 1, false);
-
-		GenerateListUpdateCode(stream, sdlField, isCustom, false, indents + 2);
+		// c) set status (isSet)
+		FeedStreamHorizontally(stream, indents + 2);
+		stream << s_variantMapClassMemberName << QStringLiteral(" << ") << '"' << sdlField.GetId() << '"' << ';';
+		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, indents + 1);
 		stream << '}';
@@ -846,7 +843,6 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 
 		// add spectal list insertion method
 		if (sdlField.IsArray()){
-
 			bool isCustom = false;
 			const QString convertedType = ConvertType(sdlField.GetType(), &isCustom);
 			bool isComplex = sdlField.GetType() == QStringLiteral("String") ||
@@ -883,9 +879,6 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 			stream << QStringLiteral(" << element;");
 			FeedStream(stream, 1, false);
 
-			// update internal storage
-			GenerateListUpdateCode(stream, sdlField, isCustom, true, indents + 1);
-
 			FeedStreamHorizontally(stream, indents);
 			stream << '}';
 			FeedStream(stream, 3, false);
@@ -894,31 +887,29 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 		}
 	}
 
-	if (generateExistenceChecks){
-		if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
-			FeedStreamHorizontally(stream, indents);
+if (generateExistenceChecks){
+		FeedStreamHorizontally(stream, indents);
 
-			stream << QStringLiteral("bool");
-			stream << QStringLiteral(" C") + className + QStringLiteral("::");
-			stream << QStringLiteral("Has");
-			stream << GetCapitalizedValue(sdlField.GetId());
-			stream << QStringLiteral("() const");
-			FeedStream(stream, 1, false);
-			FeedStreamHorizontally(stream, indents);
-			stream << '{';
+		stream << QStringLiteral("bool");
+		stream << QStringLiteral(" C") + className + QStringLiteral("::");
+		stream << QStringLiteral("Has");
+		stream << GetCapitalizedValue(sdlField.GetId());
+		stream << QStringLiteral("() const");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, indents);
+		stream << '{';
 
-			FeedStream(stream, 1, false);
-			FeedStreamHorizontally(stream, indents + 1);
-			stream << QStringLiteral("return bool(!");
-			stream << FromVariantMapAccessString(sdlField);
-			stream << QStringLiteral(".isNull());");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, indents + 1);
+		stream << QStringLiteral("return ");
+		stream << FromInternalMapCheckString(sdlField);
+		stream << QStringLiteral(";");
 
-			FeedStream(stream, 1, false);
-			FeedStreamHorizontally(stream, indents);
-			stream << '}';
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, indents);
+		stream << '}';
 
-			FeedStream(stream, 3, false);
-		}
+		FeedStream(stream, 3, false);
 	}
 }
 
@@ -951,53 +942,6 @@ void CSdlClassCodeGeneratorComp::GenerateMetaInfo(
 	FeedStreamHorizontally(stream, indents);
 	stream << '}' << ';';
 	FeedStream(stream, 1, false);
-}
-
-
-void CSdlClassCodeGeneratorComp::GenerateListUpdateCode(QTextStream& stream, const CSdlField& sdlField, bool isCustom, bool fromInternal, uint indents)
-{
-	if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
-		FeedStreamHorizontally(stream, indents);
-		if (isCustom && sdlField.IsArray()){
-			stream << QStringLiteral("QVariantList temp") << GetCapitalizedValue(sdlField.GetId()) << QStringLiteral("List;");
-
-			FeedStream(stream, 1, false);
-			FeedStreamHorizontally(stream, indents);
-			stream << QStringLiteral("for (const auto& tempValue: std::as_const(");
-			if (fromInternal){
-				stream << QStringLiteral("m_");
-			}
-			stream << GetDecapitalizedValue(sdlField.GetId());
-			stream << QStringLiteral(")){");
-
-			FeedStream(stream, 1, false);
-			FeedStreamHorizontally(stream, indents + 1);
-			stream << QStringLiteral("temp") << GetCapitalizedValue(sdlField.GetId()) << QStringLiteral("List");
-			stream << QStringLiteral(" << QVariant::fromValue(tempValue);");
-
-			FeedStream(stream, 1, false);
-			FeedStreamHorizontally(stream, indents);
-			stream << '}';
-
-			FeedStream(stream, 1, false);
-			FeedStreamHorizontally(stream, indents);
-			stream << FromVariantMapAccessString(sdlField) << QStringLiteral(" = ");
-			stream << QStringLiteral("temp") << GetCapitalizedValue(sdlField.GetId()) << QStringLiteral("List;");
-		}
-		else if (isCustom){
-			stream << FromVariantMapAccessString(sdlField) << QStringLiteral(".setValue(");
-			stream << GetDecapitalizedValue(sdlField.GetId()) << ')' << ';';
-		}
-		else if (sdlField.IsArray()){
-			stream << FromVariantMapAccessString(sdlField) << QStringLiteral(" = m_");
-			stream << GetDecapitalizedValue(sdlField.GetId()) << ';';
-		}
-		else {
-			stream << FromVariantMapAccessString(sdlField) << QStringLiteral(" = ");
-			stream << GetDecapitalizedValue(sdlField.GetId()) << ';';
-		}
-		FeedStream(stream, 1, false);
-	}
 }
 
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5230" Description="ACF"/>
+            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="IntegerConstraints" X="600" Y="625" Note=""/>
+        <Element ComponentName="Payment" X="600" Y="375" Note=""/>
+        <Element ComponentName="Sum" X="600" Y="500" Note=""/>
+        <Element ComponentName="Type" X="600" Y="250" Note=""/>
+        <Element ComponentName="TypeConstraints" X="600" Y="125" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

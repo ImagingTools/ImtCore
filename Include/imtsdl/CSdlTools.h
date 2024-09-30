@@ -29,7 +29,6 @@ class ISdlProcessArgumentsParser;
 class CSdlTools
 {
 public:
-	static const QString s_variantMapModificatorArgumentName;
 	static const QString s_variantMapClassMemberName;
 
 public:
@@ -53,7 +52,7 @@ public:
 		[[nodiscard]]static QString GetFromVariantConversionString(const CSdlField& sdlField);
 
 	[[nodiscard]]static QString GetFromVariantConversionStringExt(const CSdlField& sdlField, bool singleValue = false);
-	[[nodiscard]]static QString FromVariantMapAccessString(const CSdlField& sdlField);
+	[[nodiscard]]static QString FromInternalMapCheckString(const CSdlField& sdlField);
 	static bool GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList& typeList, CSdlType& sdlType);
 	static void AddSelfCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 	static void AddBeginSelfCheckNonRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
@@ -76,6 +75,8 @@ public:
 
 	[[nodiscard]]static QString GetAutoDefinedQmlBasePath(const iprm::IParamsSet& schemaParams, const QString& baseDirPath);
 	[[nodiscard]]static QString GetAutoDefinedQmlQrcFilePath(const iprm::IParamsSet& schemaParamsCompPtr, const QString& baseDirPath);
+
+	void GenerateListTempValueCode(QTextStream& stream, const CSdlField& sdlField, QString& tempVariableName, uint indents = 1);
 
 	void PrintFiles(std::ostream& outStream, const QStringList& files, ISdlProcessArgumentsParser::GeneratorType projectCodeGenerator = ISdlProcessArgumentsParser::GT_CMAKE);
 

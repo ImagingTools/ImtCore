@@ -39,14 +39,6 @@ int CSdlClassModificatorBaseComp::DoProcessing(
 		return retVal;
 	}
 
-	if (*m_isVariantMapModificatorRequiredAttrPtr){
-		if (!m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
-			SendErrorMessage(1, QString("Variant map modificator is not enabled. Use -M%1 argument to enable it").arg(s_variantMapModificatorArgumentName));
-
-			return iproc::IProcessor::TS_INVALID;
-		}
-	}
-
 	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");

@@ -545,10 +545,8 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 
 void CGqlWrapClassCodeGeneratorComp::AddRequiredIncludesToHeaderFile(QTextStream& stream, const CSdlRequest& sdlRequest, bool addDependenciesInclude) const
 {
-
 	QSet<QString> complexTypeList;
-	bool hasComplexTypes = m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName);
-	hasComplexTypes = IsTypeHasNonFundamentalTypes(sdlRequest, &complexTypeList) || hasComplexTypes;
+	bool hasComplexTypes = IsTypeHasNonFundamentalTypes(sdlRequest, &complexTypeList);
 
 	if (hasComplexTypes){
 		bool isQtCommentAdded = false;
@@ -581,16 +579,14 @@ void CGqlWrapClassCodeGeneratorComp::AddRequiredIncludesToHeaderFile(QTextStream
 			FeedStream(stream, 1, false);
 		}
 		// if variant map is enabled we need to add QVariant and QVariantMap
-		if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
-			if (!isQtCommentAdded){
-				stream << QStringLiteral("// Qt includes");
-				FeedStream(stream, 1, false);
-			}
-			stream << QStringLiteral("#include <QtCore/QVariant>");
-			FeedStream(stream, 1, false);
-			stream << QStringLiteral("#include <QtCore/QVariantMap>");
+		if (!isQtCommentAdded){
+			stream << QStringLiteral("// Qt includes");
 			FeedStream(stream, 1, false);
 		}
+		stream << QStringLiteral("#include <QtCore/QVariant>");
+		FeedStream(stream, 1, false);
+		stream << QStringLiteral("#include <QtCore/QVariantMap>");
+		FeedStream(stream, 1, false);
 
 		// remove qt types from list
 		complexTypeList.remove(QStringLiteral("QByteArray"));
@@ -814,10 +810,17 @@ bool CGqlWrapClassCodeGeneratorComp::AddFieldWriteToRequestCode(QTextStream& str
 
 void CGqlWrapClassCodeGeneratorComp::AddScalarFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
+	QString tempListVarName;
+	GenerateListTempValueCode(stream, field, tempListVarName, hIndents);
+
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("request.InsertField(");
-	stream << '"' << field.GetId() << '"';
-	stream << ',' << ' ' << FromVariantMapAccessString(field);
+	if (field.IsArray()){
+		stream << tempListVarName;
+	}
+	else {
+		stream << QStringLiteral(", m_") << GetDecapitalizedValue(field.GetId());
+	}
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
 }

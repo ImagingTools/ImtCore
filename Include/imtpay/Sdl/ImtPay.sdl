@@ -1,0 +1,60 @@
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	name: Receipt
+	namespace: imtpay
+	version: 1.0
+}
+
+type Payment {
+	Type: String!
+	Sum: Integer!
+}
+
+type Item {
+	Type: String!
+	Name: String!
+	Price: Integer
+	Quantity: Double!
+	Amount: Integer!
+	MeasurementUnit: String
+	PaymentMethod: String
+}
+
+type Client {
+	Id: String
+	EMail:String
+	PhoneNumber: String
+	Name:String
+	BirthDate: String
+	Citizenship: String
+	IdentityDocumentCode: String
+	IdentityDocumentData: String
+	Address: String
+}
+
+type Operator {
+	Id: String
+	Name: String
+	TaxNumber: String
+}
+
+type Receipt {
+	Type: String
+	PaymentsPlace: String
+	MachineNumber: String
+	OperatorData: Operator
+	Client: Client
+	Items: [Item!]! 
+	Payments: [Payment]
+}
+
+type RegistrationResult {
+	StatusCode: Int
+	StatusString: String
+}
+
+type Mutation {
+	AddReceipt(input: Receipt): RegistrationResult
+}

@@ -23,8 +23,7 @@ namespace imtsdl
 {
 
 // public static variables
-const QString CSdlTools::s_variantMapModificatorArgumentName = QStringLiteral("VMap");
-const QString CSdlTools::s_variantMapClassMemberName = QStringLiteral("_m_fieldsMap"); // add first underscore to avoid ambiguity
+const QString CSdlTools::s_variantMapClassMemberName = QStringLiteral("_m_settedFields"); // add first underscore to avoid ambiguity
 
 
 // public static methods
@@ -469,14 +468,14 @@ QString CSdlTools::GetFromVariantConversionStringExt(const CSdlField& sdlField, 
 }
 
 
-QString CSdlTools::FromVariantMapAccessString(const CSdlField& sdlField)
+QString CSdlTools::FromInternalMapCheckString(const CSdlField& sdlField)
 {
 	QString retVal = s_variantMapClassMemberName;
-	retVal += '[' ;
+	retVal += QStringLiteral(".contains(");
 	retVal += '"';
 	retVal += sdlField.GetId();
 	retVal += '"';
-	retVal += ']';
+	retVal += ')';
 
 	return retVal;
 }
@@ -501,8 +500,8 @@ bool CSdlTools::GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList&
 void CSdlTools::AddSelfCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (!") << FromVariantMapAccessString(field);
-	stream << QStringLiteral(".isNull()){");
+	stream << QStringLiteral("if (!") << FromInternalMapCheckString(field);
+	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -518,8 +517,8 @@ void CSdlTools::AddSelfCheckRequiredValueCode(QTextStream& stream, const CSdlFie
 void CSdlTools::AddBeginSelfCheckNonRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (!") << FromVariantMapAccessString(field);
-	stream << QStringLiteral(".isNull()){");
+	stream << QStringLiteral("if (") << FromInternalMapCheckString(field);
+	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 }
 
@@ -527,9 +526,8 @@ void CSdlTools::AddBeginSelfCheckNonRequiredValueCode(QTextStream& stream, const
 void CSdlTools::AddArrayInternalChecksFail(QTextStream& stream, const CSdlField& field, bool checkEmpty, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (");
-	stream << FromVariantMapAccessString(field);
-	stream  << QStringLiteral(".isNull()");
+	stream << QStringLiteral("if (!");
+	stream << FromInternalMapCheckString(field);
 	if (checkEmpty){
 		stream << QStringLiteral(" || m_");
 		stream << GetDecapitalizedValue(field.GetId());
@@ -537,7 +535,7 @@ void CSdlTools::AddArrayInternalChecksFail(QTextStream& stream, const CSdlField&
 	}
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, 2);
+	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;\n\t}");
 	FeedStream(stream, 1, false);
 }
@@ -769,6 +767,35 @@ QString CSdlTools::GetAutoDefinedQmlQrcFilePath(const iprm::IParamsSet& schemaPa
 	retVal = GetFileSystemAcceptableEntryPath(baseFilePath + qrcFileName + QStringLiteral(".qrc"));
 
 	return retVal;
+}
+
+
+void CSdlTools::GenerateListTempValueCode(QTextStream& stream, const CSdlField& sdlField, QString& tempVariableName, uint indents)
+{
+	if (!sdlField.IsArray()){
+		// nothing todo
+		return;
+	}
+
+	tempVariableName = QStringLiteral("temp") + GetCapitalizedValue(sdlField.GetId()) + QStringLiteral("List");
+
+	FeedStreamHorizontally(stream, indents);
+	stream << QStringLiteral("QVariantList ") << tempVariableName << ';';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, indents);
+	stream << QStringLiteral("for (const auto& tempValue: std::as_const(m_");
+	stream << GetDecapitalizedValue(sdlField.GetId());
+	stream << QStringLiteral(")){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, indents + 1);
+	stream << tempVariableName << QStringLiteral(" << QVariant::fromValue(tempValue);");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, indents);
+	stream << '}';
+	FeedStream(stream, 1, false);
 }
 
 

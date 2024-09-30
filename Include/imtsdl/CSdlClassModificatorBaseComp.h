@@ -31,7 +31,6 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CSdlClassModificatorBaseComp)
 		I_ASSIGN(m_processorModificatorNameAttrPtr, "ProcessModificatorName", "The name, allows to do processing, received from arguments in 'modificators' section", false, "<NEED_TO_SET!>")
-		I_ASSIGN(m_isVariantMapModificatorRequiredAttrPtr, "UseVariantMapModificator", "If enabled, it causes the processor to generate an error if the VariantMap modifier was not enabled", true, false)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
 	I_END_COMPONENT;
@@ -55,7 +54,6 @@ protected:
 
 protected:
 	I_ATTR(QString, m_processorModificatorNameAttrPtr);
-	I_ATTR(bool, m_isVariantMapModificatorRequiredAttrPtr);
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(ISdlTypeListProvider, m_sdlTypeListCompPtr);
 

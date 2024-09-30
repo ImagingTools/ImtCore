@@ -82,8 +82,8 @@ add_subdirectory("${IMPL_DIR}/OasCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/Oas
 
 
 if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
-#-------- Include --------
 
+#-------- Libraries --------
 add_subdirectory("${INCLUDE_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtapp")
 add_subdirectory("${INCLUDE_DIR}/imtdev/CMake" "${AUX_INCLUDE_DIR}/imtdev")
 add_subdirectory("${INCLUDE_DIR}/imtrest/CMake" "${AUX_INCLUDE_DIR}/imtrest")
@@ -115,6 +115,9 @@ add_dependencies(imthttp imtcom)
 add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb")
 add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
 
+add_subdirectory("${INCLUDE_DIR}/imtpay/CMake" "${AUX_INCLUDE_DIR}/imtpay")
+
+
 if(NOT DEFINED USE_GEO OR USE_GEO)
 	add_subdirectory("${INCLUDE_DIR}/imtgeo/CMake" "${AUX_INCLUDE_DIR}/imtgeo")
 endif()
@@ -138,8 +141,8 @@ endif()
 
 #add_subdirectory("${INCLUDE_DIR}/imtpy/CMake" "${AUX_INCLUDE_DIR}/imtpy")
 
+#-------- Qml --------
 if(NOT DEFINED USE_QTQML OR USE_QTQML)
-	#-------- Qml --------
 	add_subdirectory("${INCLUDE_DIR}/imtauthgui/CMake" "${AUX_INCLUDE_DIR}/imtauthgui")
 	add_dependencies(imtauthgui DesignTokenCreator)
 	add_subdirectory("${INCLUDE_DIR}/imtauthgql/CMake" "${AUX_INCLUDE_DIR}/imtauthgql")
@@ -154,8 +157,9 @@ if(NOT DEFINED USE_QTQML OR USE_QTQML)
 	add_subdirectory("${INCLUDE_DIR}/imtstylecontrolsqml/CMake" "${AUX_INCLUDE_DIR}/imtstylecontrolsqml")
 endif()
 
+
+#-------- Sdl --------
 if(NOT DEFINED USE_SDL OR USE_SDL)
-	#-------- Sdl --------
 	add_subdirectory("${SDL_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauthsdl")
 	add_subdirectory("${SDL_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlicsdl")
 	add_subdirectory("${SDL_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtappsdl")
@@ -174,8 +178,7 @@ if(DEFINED USE_MDBX AND USE_MDBX)
 endif()
 
 
-#-------- Impl --------
-
+#-------- Packages --------
 if(NOT ANDROID)
 
 	add_subdirectory("${IMPL_DIR}/ImtCorePck/CMake" "${AUX_INCLUDE_DIR}/ImtCorePck")

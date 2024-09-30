@@ -119,24 +119,44 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& st
 	// Process scalar value
 	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
-		stream << QStringLiteral("if (");
-		stream << FromVariantMapAccessString(field) << QStringLiteral(".isNull()){");
+		stream << QStringLiteral("if (!");
+		stream << FromInternalMapCheckString(field) << QStringLiteral("){");
 		FeedStream(stream, 1, false);
+
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;\n\t}");
 		FeedStream(stream, 1, false);
+
+		QString tempListVarName;
+		GenerateListTempValueCode(stream, field, tempListVarName);
+
 		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
-		stream << FromVariantMapAccessString(field) << QStringLiteral(", modelIndex);");
+		if (field.IsArray()){
+			stream << tempListVarName;
+		}
+		else {
+			stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
+		}
+		stream << QStringLiteral(", modelIndex);");
 	}
 	else {
-		stream << QStringLiteral("if (!");
-		stream << FromVariantMapAccessString(field);
-		stream << QStringLiteral(".isNull()){");
+		stream << QStringLiteral("if (");
+		stream << FromInternalMapCheckString(field);
+		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
+
+		QString tempListVarName;
+		GenerateListTempValueCode(stream, field, tempListVarName, 2);
+
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
-		stream << FromVariantMapAccessString(field);
+		if (field.IsArray()){
+			stream << tempListVarName;
+		}
+		else {
+			stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
+		}
 		stream << QStringLiteral(", modelIndex);\n\t}");
 	}
 
@@ -214,8 +234,8 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelCode(QTextStre
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
-		stream << QStringLiteral("if (");
-		stream << FromVariantMapAccessString(field) << QStringLiteral(".isNull()){");
+		stream << QStringLiteral("if (!");
+		stream << FromInternalMapCheckString(field) << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;\n\t}");
@@ -223,9 +243,9 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelCode(QTextStre
 		AddCustomFieldWriteToModelImplCode(stream, field);
 	}
 	else {
-		stream << QStringLiteral("if (!");
-		stream << FromVariantMapAccessString(field);
-		stream << QStringLiteral(".isNull()){");
+		stream << QStringLiteral("if (");
+		stream << FromInternalMapCheckString(field);
+		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		AddCustomFieldWriteToModelImplCode(stream, field, 2);
 		stream << QStringLiteral("\n\t}");
@@ -358,7 +378,6 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(QTex
 
 void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(QTextStream& stream, const CSdlField& field)
 {
-	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
 		if (field.IsArray() && field.IsNonEmpty()){
 			AddArrayInternalChecksFail(stream, field, true);
@@ -367,14 +386,17 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(Q
 			AddArrayInternalChecksFail(stream, field, false);
 		}
 		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field);
+		FeedStream(stream, 1, false);
 	}
 	else {
-		stream << QStringLiteral("if (!");
-		stream << FromVariantMapAccessString(field);
-		stream << QStringLiteral(".isNull()){");
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("if (");
+		stream << FromInternalMapCheckString(field);
+		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field, 2);
 		stream << QStringLiteral("\n\t}");
+		FeedStream(stream, 1, false);
 	}
 }
 
@@ -383,6 +405,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 {
 	// add a new model,to store list
 	const QString newTreeModelVarName = QStringLiteral("new") + GetCapitalizedValue(field.GetId()) + QStringLiteral("ModelPtr");
+	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("imtbase::CTreeItemModel* ") << newTreeModelVarName;
 	stream << QStringLiteral(" = model.AddTreeModel(");
 	stream << '"' << field.GetId() << '"';
@@ -412,7 +435,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << newTreeModelVarName << QStringLiteral("->SetData(QByteArray(), m_") << GetDecapitalizedValue(field.GetId());
 	stream << '[' << treeModelIndexVarName << ']';
-	stream << QStringLiteral(", ") << treeModelIndexVarName << ')';
+	stream << QStringLiteral(", ") << treeModelIndexVarName << ')' << ';';
 	FeedStream(stream, 1, false);
 
 	// end of loop
@@ -502,7 +525,9 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral(" = ");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetData(QByteArray(), ");
-	stream << indexVariableName << QStringLiteral(");") ;
+	stream << indexVariableName << QStringLiteral(").");
+	stream << GetFromVariantConversionStringExt(field, true);
+	stream << ';';
 	FeedStream(stream, 1, false);
 
 	// inLoop: add variable to tempList
@@ -537,9 +562,10 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldWriteToModelCode(QTex
 		AddCustomArrayFieldWriteToModelImplCode(stream, field);
 	}
 	else {
-		stream << QStringLiteral("if (!");
-		stream << FromVariantMapAccessString(field);
-		stream << QStringLiteral(".isNull()){");
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("if (");
+		stream << FromInternalMapCheckString(field);
+		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		AddCustomArrayFieldWriteToModelImplCode(stream, field, 2);
 		stream << QStringLiteral("\n\t}");

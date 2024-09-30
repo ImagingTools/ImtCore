@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5248" Description="ACF"/>
+            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="Address" X="225" Y="200" Note=""/>
+        <Element ComponentName="BirthDate" X="875" Y="575" Note=""/>
+        <Element ComponentName="Citizenship" X="675" Y="575" Note=""/>
+        <Element ComponentName="Client" X="585" Y="368" Note=""/>
+        <Element ComponentName="EMail" X="575" Y="200" Note=""/>
+        <Element ComponentName="Id" X="125" Y="375" Note=""/>
+        <Element ComponentName="IdentityDocumentCode" X="450" Y="575" Note=""/>
+        <Element ComponentName="IdentityDocumentData" X="225" Y="575" Note=""/>
+        <Element ComponentName="Name" X="1025" Y="375" Note=""/>
+        <Element ComponentName="PhoneNumber" X="850" Y="200" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

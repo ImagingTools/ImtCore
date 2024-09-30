@@ -179,16 +179,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_qmlEnabled = isQmlInParams;
 	m_gqlEnabled = isGqlInParams;
 
-
-	// add VMap implicitly
-	/// \todo add argument to disable it
-	m_usedModificators << CSdlTools::s_variantMapModificatorArgumentName;
 	m_notUseModificators = m_usedModificators.isEmpty();
 
 	// only one mode must be used
 	Q_ASSERT(commandLineParser.isSet(generateOption) ^ commandLineParser.isSet(dependenciesOption));
-
-	Q_ASSERT(!(m_useAllModificators && m_notUseModificators));
 
 	return true;
 }
@@ -236,11 +230,12 @@ bool CSdlProcessArgumentsParserComp::IsDependenciesMode() const
 
 bool CSdlProcessArgumentsParserComp::IsModificatorEnabled(const QString& modificatorName) const
 {
-	if (m_notUseModificators){
-		return false;
-	}
 	if (m_useAllModificators){
 		return true;
+	}
+
+	if (m_notUseModificators){
+		return false;
 	}
 
 	bool retVal = m_usedModificators.contains(modificatorName);
