@@ -15,6 +15,7 @@ module.exports = {
     Binding: require("./Binding"),
     Connections: require("./Connections"),
     Timer: require("./Timer"),
+    GqlRequest: require("./GqlRequest"),
     
     real: require("./Real"),
     double: require("./Double"),

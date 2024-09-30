@@ -15,6 +15,15 @@ module.exports = {
             QtWebSockets: require('../QtWebSockets/QtWebSockets'),
             __queue: [],
         }
+
+        global.context = (class extends JQModules.QtQml.QObject {
+            static meta = {
+                appName: {type:JQModules.QtQml.string, value:''},
+                language: {type:JQModules.QtQml.string, value:''},
+                application: {type:JQModules.QtQml.var, value:[]},
+                location: {type:JQModules.QtQml.var, value:window.location},
+            }
+        }).create()
        
         XMLHttpRequest.querySet = {}
         let XMLProxy = XMLHttpRequest.prototype.open

@@ -360,7 +360,7 @@ class Instruction {
         }
     }
 
-    prepare(tree, stat = {isCompute:false, thisKey: 'self', value: '', local: []}){ 
+    prepare(tree, stat = {isCompute:false, thisKey: '__self', value: '', local: []}){ 
         if(tree){
             switch(tree[0]){
                 case 'return': {
@@ -449,6 +449,8 @@ class Instruction {
                         stat.isCompute = true
                         stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
                         stat.value += path.source
+                    } else if(tree[1] === 'context') {
+                        stat.value += tree[1]
                     } else {
                         console.log(`${this.qmlFile.fileName}:${tree.info.line+1}:${tree.info.col+1}: warning: ${tree[1]} is not founded`)
                         stat.value += stat.thisKey + '.' +tree[1]
@@ -804,9 +806,16 @@ class Instruction {
                     stat.value += `try{`
                     this.prepare(tree[1], stat)
                     if(tree[2][0]){
+                        let local = []
                         stat.ignore += tree[2][0]
                         stat.value += `}catch(${tree[2][0]}){`
+                        if(tree[2][0]) {
+                            local.push(tree[2][0])
+                            stat.local.push(local)
+                        }
                         this.prepare(tree[2][1], stat)
+                        let index = stat.local.indexOf(local)
+                        if(index >= 0) stat.local.splice(index, 1)
                     } else {
                         stat.value += `}catch{`
                         this.prepare(tree[2][1], stat)
@@ -1067,7 +1076,7 @@ class Instruction {
         }
 
         code.push('static create(parent, model, properties=[], isRoot=true, ...args){')
-        code.push('let self = super.create(parent, model, properties, false, ...args)')
+        code.push('let __self = super.create(parent, model, properties, false, ...args)')
 
         if(isRoot) {
             code.push(`let __rootContext${level}=JQContext.create()`) // context !!!
@@ -1078,7 +1087,7 @@ class Instruction {
             code.push(`let __context=__rootContext${level}`) // context !!!
         }
 
-        if(this.id) code.push(`__context['${this.id}']=self`)  // context !!!
+        if(this.id) code.push(`__context['${this.id}']=__self`)  // context !!!
 
         let connectionsInfo = {}
         for(let defineMethod of this.defineMethods){
@@ -1086,22 +1095,22 @@ class Instruction {
                 let signalName = defineMethod.name[2].toLowerCase() + defineMethod.name.slice(3)
                 connectionsInfo[signalName] = defineMethod.name
             }
-            let stat = this.prepare(defineMethod.source, {isCompute:false, thisKey: 'self', value:'', local:[]})
-            code.push('self.'+stat.value)
+            let stat = this.prepare(defineMethod.source, {isCompute:false, thisKey: '__self', value:'', local:[]})
+            code.push('__self.'+stat.value)
         }
 
         // if(typeBase === JQModules.QtQuick.Loader){
-        //     code.push(`self.__path = '${path.relative(config.base, this.qmlFile.fileName).replaceAll('/','\\').replaceAll('\\','\\\\')}'`)
+        //     code.push(`__self.__path = '${path.relative(config.base, this.qmlFile.fileName).replaceAll('/','\\').replaceAll('\\','\\\\')}'`)
         // }
 
         if(typeBase === JQModules.QtQml.Connections){
-            code.push(`self.__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
+            code.push(`__self.__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
         }
 
         let lazyCode = []
 
         for(let assignProperty of this.assignProperties){
-            let path = this.resolve(assignProperty.name.split('.')[0], 'self')
+            let path = this.resolve(assignProperty.name.split('.')[0], '__self')
 
             if(!path){
                 console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line+1}:${assignProperty.value.info.col-assignProperty.name.length-1}: warning: ${assignProperty.name} is not founded`)
@@ -1109,21 +1118,21 @@ class Instruction {
 
             if(assignProperty.value instanceof Instruction) {
                 if((path.type === QtQml.Component) && assignProperty.value.extends !== 'Component'){
-                    lazyCode.push(`self.${assignProperty.name}=(class extends JQModules.QtQml.Component {}).create(null,${assignProperty.value.toCode(false,true,level+1)})`)
+                    lazyCode.push(`__self.${assignProperty.name}=(class extends JQModules.QtQml.Component {}).create(null,${assignProperty.value.toCode(false,true,level+1)})`)
                 } else {
-                    lazyCode.push(`self.${assignProperty.name}=(${assignProperty.value.toCode(false,false,level)}).create(null,null,properties,false)`)
+                    lazyCode.push(`__self.${assignProperty.name}=(${assignProperty.value.toCode(false,false,level)}).create(null,null,properties,false)`)
                 }
             } else {
-                let stat = this.prepare(assignProperty.value, {isCompute:false, thisKey: 'self', value:'', local:[]})
+                let stat = this.prepare(assignProperty.value, {isCompute:false, thisKey: '__self', value:'', local:[]})
                 if(stat.isCompute){
                     if(assignProperty.type === 'alias'){
-                        code.push(`self.__getObject('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
-                        // code.push(`__updateList.push(self.__getObject('${assignProperty.name}'))`)
+                        code.push(`__self.__getObject('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
+                        // code.push(`__updateList.push(__self.__getObject('${assignProperty.name}'))`)
                     } else {
-                        code.push(`self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},true)`)
+                        code.push(`__self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},true)`)
                     }
                 } else {
-                    code.push(`self.${assignProperty.name}=${stat.value}`)
+                    code.push(`__self.${assignProperty.name}=${stat.value}`)
                 }
             }
             
@@ -1131,9 +1140,9 @@ class Instruction {
         }
         for(let i = 0; i < this.children.length; i++){
             if(this.extends === 'Component'){
-                code.push(`self.component=` + this.children[i].toCode(false, true, level+1))
+                code.push(`__self.component=` + this.children[i].toCode(false, true, level+1))
             } else {
-                code.push(`let child${i}=(` + this.children[i].toCode(false,false,level) + ').create(self,null,properties,false)')
+                code.push(`let child${i}=(` + this.children[i].toCode(false,false,level) + ').create(__self,null,properties,false)')
             }
             
         }
@@ -1164,21 +1173,21 @@ class Instruction {
                 connectedSignal.args.push(arg.replaceAll('`', ''))
             }
 
-            code.push(`self.__addSignalSlot('${names.join('.')}',function(${connectedSignal.args.join(',')}){try{JQApplication.beginUpdate();`)
+            code.push(`__self.__addSignalSlot('${names.join('.')}',function(${connectedSignal.args.join(',')}){try{JQApplication.beginUpdate();`)
             
-            let stat = this.prepare(connectedSignal.source, {isCompute:false, thisKey: 'self', value:'', local:[connectedSignal.args]}) 
+            let stat = this.prepare(connectedSignal.source, {isCompute:false, thisKey: '__self', value:'', local:[connectedSignal.args]}) 
             code.push(stat.value)
             code.push(`}finally{JQApplication.endUpdate()}})`)
         }
 
         if(isRoot || isComponent) {
-            code.push(`if(isRoot) {while(properties.length){properties.shift().__update()};self.__complete()}`) // property update !!!
-            // code.push(`if(!self.parent || self.parent.__completed) self.__complete()`)
+            code.push(`if(isRoot) {while(properties.length){properties.shift().__update()};__self.__complete()}`) // property update !!!
+            // code.push(`if(!__self.parent || __self.parent.__completed) __self.__complete()`)
         }
 
         
 
-        code.push('return self')
+        code.push('return __self')
         code.push('}')
         
         
@@ -1313,7 +1322,7 @@ let counter = {
 for(let dirPath of config.dirs){
     let absolutePath = path.resolve(configDirPath, dirPath)
     let moduleName = ''
-    let lines = fs.readFileSync(absolutePath + '/qmldir', {encoding:'utf8', flag:'r'}).replaceAll('\r', '').split('\n')
+    let lines = fs.readFileSync(absolutePath + '/qmldir', {encoding:'utf8', flag:'r'}).replaceAll('\r', '').replaceAll(/[ ]+/g, ' ').split('\n')
     let count = 0
     for(let line of lines){
         let params = line.trim().split(' ')
