@@ -104,9 +104,13 @@ class Text extends Item {
         this.contentHeight = Math.max(textMetrics.height, this.__impl.scrollHeight)
     }
 
-    onTextChanged(){
-        // this.__DOM.innerHTML = this.text
+    onWidthChanged(){
+        super.onWidthChanged()
 
+        this.__updateGeometry()
+    }
+
+    onTextChanged(){
         this.__updateGeometry()
     }
 

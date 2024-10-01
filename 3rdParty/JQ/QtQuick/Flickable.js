@@ -52,6 +52,39 @@ class Flickable extends Item {
         let proxy = super.create(parent, ...args)
         proxy.__DOM.classList.add('Flickable')
         proxy.contentItem = Item.create()
+
+        proxy.contentItem.onXChanged=()=>{
+            if(-proxy.contentItem.x > proxy.contentWidth - proxy.width){
+                proxy.contentItem.__setDOMStyle({
+                    left: (proxy.contentWidth - proxy.width)+'px'
+                })
+            } else if(-proxy.contentItem.x < proxy.originX){
+                proxy.contentItem.__setDOMStyle({
+                    left: proxy.originX+'px'
+                })
+            } else {
+                proxy.contentItem.__setDOMStyle({
+                    left: proxy.contentItem.x+'px'
+                })
+            }
+        }
+    
+        proxy.contentItem.onYChanged=()=>{
+            if(-proxy.contentItem.y > proxy.contentHeight - proxy.height){
+                proxy.contentItem.__setDOMStyle({
+                    top: (proxy.contentHeight - proxy.height)+'px'
+                })
+            } else if(-proxy.contentItem.y < proxy.originY){
+                proxy.contentItem.__setDOMStyle({
+                    top: proxy.originY+'px'
+                })
+            } else {
+                proxy.contentItem.__setDOMStyle({
+                    top: proxy.contentItem.y+'px'
+                })
+            }
+        }
+
         proxy.contentItem.parent = proxy
         JQApplication.MouseController.add(proxy)
         return proxy
