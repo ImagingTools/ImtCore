@@ -16,7 +16,7 @@ const Qt5Compat = require('../Qt5Compat/Qt5Compat')
 const QtWebSockets = require('../QtWebSockets/QtWebSockets')
 
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\imtcore.json'//process.argv.slice(2)[0]
-// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\jq.json'//process.argv.slice(2)[0]
+// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\lisa.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\agentino.json'//process.argv.slice(2)[0]
 const configFilePath = process.argv.slice(2)[0]
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
@@ -108,12 +108,14 @@ class Instruction {
         })
     }
     qmlpropdef(meta){
-        let type = {}
+        let type = {
+            defaultValue: null
+        }
         try {
             let typeInfo = this.getTypeInfo(meta[3])
             type = typeInfo.type
         } catch {
-            
+
         }
         
         if(meta[4] && meta[4][1][0] === 'qmlelem'){
@@ -314,7 +316,12 @@ class Instruction {
         //     }
         // }
         for(let obj of this.defineProperties){
-            let typeInfo = obj.type ? this.getTypeInfo(obj.type) : {}
+            let typeInfo
+            try {
+                typeInfo = obj.type ? this.getTypeInfo(obj.type) : {}
+            } catch (error) {
+                throw `${this.qmlFile.fileName}:${obj.info.line+1}:${obj.info.col+1}: error: ${obj.type} is not founded`
+            }
             if(name === obj.name) return {
                 // obj: obj.value instanceof Instruction ? obj.value : typeInfo.type, // ====
                 source: `${thisKey}.${name}`,

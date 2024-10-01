@@ -2,14 +2,14 @@ const BaseObject = require("../QtBase/BaseObject")
 
 class Property extends BaseObject {
     static queueLink = []
-    static defaultValue = undefined
+    static defaultValue = null
 
     static create(parent, meta){
         let proxy = super.create(parent, meta)
         let self = proxy.__self 
 
         self.__parent = parent ? parent.__proxy : null
-        self.__value = meta.value
+        self.__value = 'value' in meta ? meta.value : this.defaultValue
         self.__signalName = meta.signalName
 
         return proxy
@@ -17,7 +17,7 @@ class Property extends BaseObject {
 
     __auto = true
 
-    __toPrimitive(hint){
+    __toPrimitive(hint){ 
         let value = this.__get()
         switch(hint){
             case 'number': {

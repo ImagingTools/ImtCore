@@ -16,6 +16,7 @@ module.exports = {
     Connections: require("./Connections"),
     Timer: require("./Timer"),
     GqlRequest: require("./GqlRequest"),
+    RemoteFileController: require("./RemoteFileController"),
     
     real: require("./Real"),
     double: require("./Double"),

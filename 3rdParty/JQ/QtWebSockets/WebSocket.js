@@ -5,7 +5,8 @@ const String = require("../QtQml/String")
 const Bool = require("../QtQml/Bool")
 const Signal = require("../QtQml/Signal")
 
-class WebSocket extends QtObject {
+
+class QWebSocket extends QtObject {
     static Connecting = 0
     static Open = 1
     static Closing = 2
@@ -13,7 +14,7 @@ class WebSocket extends QtObject {
     static Error = 4
 
     static meta = Object.assign({}, QtObject.meta, {
-        status: { type: Real, value: WebSocket.Closed, signalName: 'statusChanged' },
+        status: { type: Real, value: QWebSocket.Closed, signalName: 'statusChanged' },
         url: { type: String, value: '', signalName: 'urlChanged' },
         active: { type: Bool, value: false, signalName: 'activeChanged' },
         errorString: { type: String, value: '', signalName: 'errorStringChanged' },
@@ -32,57 +33,66 @@ class WebSocket extends QtObject {
         textMessageReceived: {type:Signal, slotName:'onTextMessageReceived', args:['message']},
     })
 
-    $statusChanged() {
-        if (this.getPropertyValue('status') !== WebSocket.Error) {
-            this.getProperty('errorString').reset('')
+    onStatusChanged() {
+        if (this.status !== QWebSocket.Error) {
+            this.errorString = ''
         }
     }
-    connectSocket() {
-        this.$reconnect = false
 
-        if (!this.getPropertyValue('url') || !this.getPropertyValue('active')) {
+    onUrlChanged(){
+        this.__reconnectSocket()
+    }
+
+    onActiveChanged(){
+        this.__reconnectSocket()
+    }
+
+    connectSocket() {
+        this.__reconnect = false
+
+        if (!this.url || !this.active) {
             return
         }
 
-        this.getProperty('status').reset(WebSocket.Connecting)
-        this.$socket = new OriginWebSocket(this.getPropertyValue('url'))
-        this.$socket.onopen = () => {
-            this.getProperty('status').reset(WebSocket.Open)
+        this.status = QWebSocket.Connecting
+        this.__socket = new WebSocket(this.url)
+        this.__socket.onopen = () => {
+            this.status = QWebSocket.Open
         }
-        this.$socket.onclose = () => {
-            this.getProperty('status').reset(WebSocket.Closed)
-            if (this.$reconnect) {
+        this.__socket.onclose = () => {
+            this.status = QWebSocket.Closed
+            if (this.__reconnect) {
                 this.connectSocket()
             }
         }
-        this.$socket.onerror = error => {
-            this.getProperty('errorString').reset(error.message)
-            this.getProperty('status').reset(WebSocket.Error)
+        this.__socket.onerror = error => {
+            this.errorString = error.message
+            this.status = QWebSocket.Error
         }
-        this.$socket.onmessage = message => {
+        this.__socket.onmessage = message => {
             this.textMessageReceived(message.data)
         }
     }
-    $reconnectSocket() {
-        this.$reconnect = true
-        if (this.getPropertyValue('status') === WebSocket.Open) {
-            this.getProperty('status').reset(WebSocket.Closing)
-            this.$socket.close()
-            delete this.$socket
-        } else if (this.getPropertyValue('status') !== WebSocket.Closing) {
+    __reconnectSocket() {
+        this.__reconnect = true
+        if (this.status === QWebSocket.Open) {
+            this.status = QWebSocket.Closing
+            this.__socket.close()
+            delete this.__socket
+        } else if (this.status !== QWebSocket.Closing) {
             this.connectSocket()
         }
     }
     sendTextMessage(message) {
-        if (this.getPropertyValue('status') === WebSocket.Open) {
-            this.$socket.send(message)
+        if (this.status === QWebSocket.Open) {
+            this.__socket.send(message)
         }
     }
     sendBinaryMessage(message) {
-        if (this.getPropertyValue('status') === WebSocket.Open) {
-            this.$socket.send(message)
+        if (this.status === QWebSocket.Open) {
+            this.__socket.send(message)
         }
     }
 }
 
-module.exports = WebSocket
+module.exports = QWebSocket

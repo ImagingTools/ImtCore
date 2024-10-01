@@ -107,7 +107,7 @@ class ListView extends Flickable {
     onModelChanged(){
         this.__clear()
         
-        if(typeof this.model === 'object'){
+        if(this.model && typeof this.model === 'object'){
             this.model.__addViewListener(this)
         }
 
