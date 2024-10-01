@@ -7,14 +7,8 @@ set path=%path%;%QTDIR%\bin
 
 echo Generating %COMPILER_EXT% projects...
 
-cd %~dp0\
-call BuildTools.bat
-
 cd %~dp0\..\..\Build\QMake
-%QTDIR%\bin\qmake ImtCoreAll.pro -recursive -tp vc
+%QTDIR%\bin\qmake BuildTools.pro -recursive
 
-
-cd %~dp0\..\..
-call %ACFCONFIGDIR%\QMake\CopyVCProjToSubdir.js %COMPILER_EXT%
-
-cd %~dp0\
+nmake debug
+nmake release

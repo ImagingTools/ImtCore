@@ -8,7 +8,6 @@ SUBDIRS += imtdesign
 imtdesign.file = ../../Include/imtdesign/QMake/imtdesign.pro
 imtdesign.depends = imtbase
 
-
 SUBDIRS += imtfile
 imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
 
