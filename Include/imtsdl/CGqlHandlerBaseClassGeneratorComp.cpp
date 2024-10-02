@@ -553,7 +553,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 	// [1->2] ensure, the derived call didn't return an error
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("if (!errorMessage.isEmpty(){");
+	stream << QStringLiteral("if (!errorMessage.isEmpty()){");
 	FeedStream(stream, 1, false);
 
 	// [2] send error message
