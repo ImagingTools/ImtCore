@@ -8,6 +8,3 @@ QT += websockets
 
 SOURCES += $$files($$_PRO_FILE_PWD_/../*.cpp, false)
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtgql
-
-
