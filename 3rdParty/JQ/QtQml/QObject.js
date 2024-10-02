@@ -6,6 +6,8 @@ const String = require("./String")
 const Signal = require("./Signal")
 
 class QObject extends BaseObject {
+    static uid = 0
+
     static meta = {
         parent: {type:Var, signalName:'parentChanged'},
         objectName: {type:String, value:''},
@@ -16,13 +18,14 @@ class QObject extends BaseObject {
     static create(parent, properies=[], ...args){
         let proxy = super.create(parent, properies, ...args)
         proxy.__properties = properies
+        proxy.__uid = this.uid++
         proxy.setParent(parent)
 
         return proxy
     }
 
     __toPrimitive(hint){
-        return this
+        return this.__self.constructor.name + this.__uid
     }
     
     __has(key){

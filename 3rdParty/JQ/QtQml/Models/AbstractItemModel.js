@@ -32,6 +32,8 @@ class AbstractItemModel {
                 for(let property of properties){
                     property.__update()
                 }
+
+                parent.dataChanged()
                 
                 return true
             }

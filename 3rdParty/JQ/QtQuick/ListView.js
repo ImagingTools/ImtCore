@@ -53,6 +53,11 @@ class ListView extends Flickable {
 
     __items = []
 
+    __complete(){
+        this.__initView(true)
+        super.__complete()
+    }
+
     indexAt(x, y){
 
     }
@@ -107,23 +112,31 @@ class ListView extends Flickable {
     onModelChanged(){
         this.__clear()
         
-        if(this.model && typeof this.model === 'object'){
-            this.model.__addViewListener(this)
+        if(this.__model && typeof this.__model === 'object'){
+            this.__model.__removeViewListener(this)
         }
 
-        this.__initView()
+        if(this.model && typeof this.model === 'object'){
+            this.model.__addViewListener(this)
+            this.__model = this.model
+        }
+
+        this.__initView(this.__completed)
     }
 
     onDelegateChanged(){
         this.__clear()
-        this.__initView()
+        this.__initView(this.__completed)
     }
 
     __clear(){
-        for(let i = 0; i < this.__items.length; i++){
-            this.__items[i].__destroy()
-        }
+        let removed = this.__items
         this.__items = []
+
+        for(let r of removed){
+            this.itemRemoved(r)
+            if(r) r.__destroy()
+        }
     }
 
     __createItem(model){
@@ -265,6 +278,14 @@ class ListView extends Flickable {
     __endUpdate(...args){
         this.__updateItemsGeometry()
         this.__updateGeometry()
+    }
+
+    __destroy(){
+        if(this.__model && typeof this.__model === 'object'){
+            this.__model.__removeViewListener(this)
+        }
+        this.__clear()
+        super.__destroy()
     }
 }
 

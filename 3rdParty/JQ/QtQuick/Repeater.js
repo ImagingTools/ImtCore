@@ -29,6 +29,11 @@ class Repeater extends Item {
 
     __items = []
 
+    __complete(){
+        this.__initView(true)
+        super.__complete()
+    }
+
     itemAt(index){
 
     }
@@ -36,23 +41,31 @@ class Repeater extends Item {
     onModelChanged(){
         this.__clear()
         
-        if(this.model && typeof this.model === 'object'){
-            this.model.__addViewListener(this)
+        if(this.__model && typeof this.__model === 'object'){
+            this.__model.__removeViewListener(this)
         }
 
-        this.__initView()
+        if(this.model && typeof this.model === 'object'){
+            this.model.__addViewListener(this)
+            this.__model = this.model
+        }
+
+        this.__initView(this.__completed)
     }
 
     onDelegateChanged(){
         this.__clear()
-        this.__initView()
+        this.__initView(this.__completed)
     }
 
     __clear(){
-        for(let i = 0; i < this.__items.length; i++){
-            this.__items[i].__destroy()
-        }
+        let removed = this.__items
         this.__items = []
+
+        for(let r of removed){
+            this.itemRemoved(r)
+            if(r) r.__destroy()
+        }
     }
 
     __createItem(model){
@@ -61,8 +74,8 @@ class Repeater extends Item {
         return item
     }
 
-    __initView(){
-        if(this.delegate && this.model){
+    __initView(isCompleted){
+        if(this.delegate && this.model && isCompleted){
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
 
@@ -99,7 +112,7 @@ class Repeater extends Item {
     }
 
     __updateView(changeSet){
-        if(this.delegate && this.model){
+        if(this.delegate && this.model && this.__completed){
             if(this.model.data.length === this.__items.length) return
             JQApplication.beginUpdate()
             JQApplication.updateLater(this.parent)
@@ -143,44 +156,13 @@ class Repeater extends Item {
         }
     }
 
-    // __updateView(changeSet){
-    //     if(this.delegate && this.model){
-    //         JQApplication.beginUpdate()
-    //         JQApplication.updateLater(this.parent)
-
-    //         let countChanged = false
-
-    //         if(typeof this.model === 'number'){
-    //             if(this.count !== this.model){
-    //                 countChanged = true
-    //                 this.__getObject('count').__value = this.model
-    //             }
-                
-    //             for(let i = 0; i < this.model; i++){
-    //                 let item = this.delegate.createObject(this.parent, {index: i})
-    //                 this.__items.push(item)
-    //                 // item.__complete()
-    //                 this.itemAdded(item)
-    //             }
-    //         } else {
-    //             if(this.count !== this.model.data.length){
-    //                 countChanged = true
-    //                 this.__getObject('count').__value = this.model.data.length
-    //             }
-
-    //             for(let i = 0; i < this.model.data.length; i++){
-    //                 let item = this.delegate.createObject(this.parent, this.model.data[i])
-    //                 this.__items.push(item)
-    //                 // item.__complete()
-    //                 this.itemAdded(item)
-    //             }
-    //         }
-
-    //         if(countChanged) this.countChanged()
-
-    //         JQApplication.endUpdate()
-    //     }
-    // }
+    __destroy(){
+        if(this.__model && typeof this.__model === 'object'){
+            this.__model.__removeViewListener(this)
+        }
+        this.__clear()
+        super.__destroy()
+    }
 }
 
 module.exports = Repeater
