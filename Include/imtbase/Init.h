@@ -90,12 +90,12 @@ public:
 		Q_INIT_RESOURCE(imtstylelight);
 		Q_INIT_RESOURCE(imtstyledark);
 
-		Q_INIT_RESOURCE(imtauthsdlGroupsSdl);
-		Q_INIT_RESOURCE(imtauthsdlRolesSdl);
-		Q_INIT_RESOURCE(imtauthsdlUsersSdl);
-		Q_INIT_RESOURCE(imtauthsdlAuthorizationSdl);
+		Q_INIT_RESOURCE(imtauthGroupsSdl);
+		Q_INIT_RESOURCE(imtauthRolesSdl);
+		Q_INIT_RESOURCE(imtauthUsersSdl);
+		Q_INIT_RESOURCE(imtauthAuthorizationSdl);
 
-		Q_INIT_RESOURCE(imtappsdlApplicationInfoSdl);
+		Q_INIT_RESOURCE(imtappApplicationSdl);
 	}
 
 	static void InitStyle()
