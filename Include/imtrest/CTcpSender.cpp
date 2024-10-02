@@ -40,11 +40,11 @@ bool CTcpSender::SendResponse(ConstResponsePtr& response) const
 	if (m_tcpSocketPtr != nullptr){
 		if (!m_tcpSocketPtr->isOpen()){
 			return false;
-        }
+		}
 
 		const QByteArray& contentData = response->GetData();
 
-        retVal = retVal && WriteBody(contentData, *m_tcpSocketPtr);
+		retVal = retVal && WriteBody(contentData, *m_tcpSocketPtr);
 
 		return retVal;
 	}
@@ -61,10 +61,9 @@ bool imtrest::CTcpSender::SendRequest(ConstRequestPtr& /*reguest*/) const
 
 // protected methods
 
-
 bool CTcpSender::WriteBody(const QByteArray& data, QAbstractSocket& socket) const
 {
-    socket.write(data);
+	socket.write(data);
 
 	return true;
 }
