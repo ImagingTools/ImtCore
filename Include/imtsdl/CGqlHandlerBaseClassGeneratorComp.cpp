@@ -40,8 +40,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 
 	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
 	if (outputDirectoryPath.isEmpty()){
-		SendCriticalMessage(0, "Output path is not provided");
-		I_CRITICAL();
+		SendErrorMessage(0, "Output path is not provided");
 
 		return TS_INVALID;
 	}
@@ -72,6 +71,13 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 
 			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		}
+
+		return TS_OK;
+	}
+
+	SdlRequestList requests = m_sdlRequestListCompPtr->GetRequests();
+	if (requests.isEmpty()){
+		SendWarningMessage(0, "Requests is not provided. Nothing todo");
 
 		return TS_OK;
 	}
@@ -435,7 +441,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 	FeedStream(stream, 1, false);
 	if (requestList.isEmpty()){
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("return BaseClass::");
+		stream << QStringLiteral("return BaseClass::CreateInternalResponse");
 		stream << QStringLiteral("(gqlRequest, errorMessage);");
 		FeedStream(stream, 1, false);
 	}
@@ -534,7 +540,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 	// [2->1] end of SDL request validate
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << '}';
-	FeedStream(stream, 1, false);
+	FeedStream(stream, 2, false);
 
 	// [1] create payload variable by calling reimplemented method
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -544,6 +550,28 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 	stream << GetDecapitalizedValue(requestClassName);
 	stream << QStringLiteral(", gqlRequest, errorMessage);");
 	FeedStream(stream, 1, false);
+
+	// [1->2] ensure, the derived call didn't return an error
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (!errorMessage.isEmpty(){");
+	FeedStream(stream, 1, false);
+
+	// [2] send error message
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("SendErrorMessage(0, QString(\"The derived call [");
+	stream << QStringLiteral("On") << sdlRequest.GetName();
+	stream << QStringLiteral("] returned an error: %1\").arg(errorMessage));");
+	FeedStream(stream, 2, false);
+
+	// [2] return
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("return nullptr;");
+	FeedStream(stream, 1, false);
+
+	// [2->1] end of derived error checks
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+	FeedStream(stream, 2, false);
 
 	// [1] write payload variable in model and create variable, to check if it success
 	FeedStreamHorizontally(stream, hIndents + 1);
