@@ -1,7 +1,7 @@
 #include <imtgql/CStructureControllerCompBase.h>
 
 
-// std includes
+// STL includes
 #include <cmath>
 
 // ACF includes
@@ -94,14 +94,6 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::CreateInternalResponse(
 	SendErrorMessage(0, errorMessage, "CStructureControllerCompBase");
 
 	return nullptr;
-}
-
-
-// reimplemented (icomp::CComponentBase)
-
-void CStructureControllerCompBase::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
 }
 
 
@@ -550,7 +542,6 @@ QByteArrayList CStructureControllerCompBase::GetInformationIds(const imtgql::CGq
 
 	return retVal;
 }
-
 
 
 } // namespace imtgql

@@ -31,7 +31,7 @@ public:
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_gqlRequestExtractorCompPtr, "GqlRequestExtractor", "GraphQL request extractor", true, "GqlRequestExtractor");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
-		I_ASSIGN(m_structureIdAttrPtr, "StructureId", "Ctructure ID", true, "");
+		I_ASSIGN(m_structureIdAttrPtr, "StructureId", "Structure-ID", true, "");
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -60,9 +60,6 @@ public:
 
 	// reimplemented (imtgql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
 
 protected:
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const;
@@ -117,6 +114,6 @@ protected:
 };
 
 
-} // namespace imtguigql
+} // namespace imtgql
 
 
