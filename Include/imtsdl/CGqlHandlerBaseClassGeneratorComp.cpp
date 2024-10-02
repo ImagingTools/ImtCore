@@ -6,6 +6,7 @@
 
 // Qt includes
 #include <QtCore/QDir>
+#include <QtCore/QTextStream>
 
 //Acf includes
 #include <istd/CSystem.h>
@@ -471,7 +472,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 		// create default section
 		// add error message
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command-ID: '%1'\").arg(commandId);");
+		stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command-ID: '%1'\").arg(qPrintable(commandId));");
 		FeedStream(stream, 1, false);
 
 		// send log message
@@ -524,7 +525,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 	// [2] add error message if SDL request is not valid
 	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected request for command-ID: '%1'\").arg(commandId);");
+	stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected request for command-ID: '%1'\").arg(qPrintable(commandId));");
 	FeedStream(stream, 1, false);
 
 	// [2] add log message
@@ -585,7 +586,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 	// [2] set error message
 	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("errorMessage = QString(\"Internal error. Unable to create response for command-ID: '%1'\").arg(commandId);");
+	stream << QStringLiteral("errorMessage = QString(\"Internal error. Unable to create response for command-ID: '%1'\").arg(qPrintable(commandId));");
 	FeedStream(stream, 1, false);
 
 	// [2] add log message

@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtCore/QDir>
 #include <QtCore/QXmlStreamWriter>
+#include <QtCore/QTextStream>
 
 //Acf includes
 #include <istd/CSystem.h>

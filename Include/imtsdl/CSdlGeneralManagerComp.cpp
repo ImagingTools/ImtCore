@@ -33,9 +33,10 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 	QLockFile lockFile(outputDirPath + QStringLiteral("/lock"));
 	const bool isLocked = lockFile.lock();
 	if (!isLocked){
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 		SendErrorMessage(0, QString("Unable to lock file '%1'. Perhaps you don't have permissions").arg(lockFile.fileName()));
+#endif
 	}
-
 
 	// parse schema
 	int parsingResult = m_sdlParserCompPtr->DoProcessing(nullptr, nullptr, nullptr);

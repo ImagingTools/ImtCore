@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QRegularExpression>
+#include <QtCore/QTextStream>
 
 // ImtCore includes
 #include <imtsdl/CSdlType.h>

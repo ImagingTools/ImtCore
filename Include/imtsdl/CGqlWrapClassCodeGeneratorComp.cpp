@@ -6,8 +6,9 @@
 
 // Qt includes
 #include <QtCore/QDir>
+#include <QtCore/QTextStream>
 
-//Acf includes
+// Acf includes
 #include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
