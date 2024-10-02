@@ -96,7 +96,6 @@ defineReplace(CreateQmlSdlTarget) {
 	}
 
 	$$take_last(QRC_WRAP_DIR_PATH)
-	QRC_WRAP_DIR_PATH += _qrcWrap
 	QRC_WRAP_DIR_PATH = $$join(QRC_WRAP_DIR_PATH, $${DIR_SEPARATOR})
 
 	# add first slash
