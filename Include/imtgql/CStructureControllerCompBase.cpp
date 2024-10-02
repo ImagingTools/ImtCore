@@ -489,7 +489,6 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 
 		itemsModel->SetIsArray(true);
 
-
 		dataModel->SetExternTreeModel("items", itemsModel);
 		dataModel->SetExternTreeModel("notification", notificationModel);
 	}
