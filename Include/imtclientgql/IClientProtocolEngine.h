@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtgql/IGqlRequest.h>
+#include <imtbase/IUrlParam.h>
 
 
 class QNetworkRequest;
@@ -22,7 +23,7 @@ public:
 	/**
 		Create network (transport) request based on the GraphQL-request.
 	*/
-	virtual QNetworkRequest* CreateNetworkRequest(const imtgql::IGqlRequest& request) const = 0;
+	virtual QNetworkRequest* CreateNetworkRequest(const imtgql::IGqlRequest& request, imtbase::IUrlParam* = nullptr) const = 0;
 };
 
 

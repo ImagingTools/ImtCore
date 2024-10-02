@@ -114,9 +114,7 @@ RemoteCollectionView {
             }
 
             function getAdditionalInputParams(){
-                let obj = {}
-                obj["ProductId"] = userCollectionViewContainer.productId;
-                return obj;
+                return userCollectionViewContainer.getAdditionalInputParams();
             }
         }
     }

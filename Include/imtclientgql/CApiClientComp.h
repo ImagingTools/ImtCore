@@ -29,7 +29,7 @@ public:
 	CApiClientComp();
 
 	// reimplemented (IGqlClient)
-	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr) const override;
+	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* = nullptr) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

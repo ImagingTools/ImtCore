@@ -102,6 +102,7 @@ Rectangle {
 
     property TableSelection tableSelection: TableSelection {
         onSelectionChanged: {
+            console.log("TableSelection onSelectionChanged")
             tableContainer.selectionChanged(tableContainer.tableSelection.selectedIndexes);
         }
     }

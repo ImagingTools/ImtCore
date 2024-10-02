@@ -25,9 +25,7 @@ RemoteCollectionView {
             }
 
             function getAdditionalInputParams(){
-                let obj = {}
-                obj["ProductId"] = roleCollectionViewContainer.productId;
-                return obj;
+                return roleCollectionViewContainer.getAdditionalInputParams()
             }
         }
     }
@@ -144,15 +142,7 @@ RemoteCollectionView {
             }
 
             function getAdditionalInputParams(){
-                if (roleCollectionViewContainer.productId === ""){
-                    console.error("Unable to get additional parameters. Product-ID is empty");
-                    return null;
-                }
-
-                let obj = {}
-                obj["ProductId"] = roleCollectionViewContainer.productId;
-
-                return obj;
+                return roleCollectionViewContainer.getAdditionalInputParams()
             }
 
             function getDocumentName(){

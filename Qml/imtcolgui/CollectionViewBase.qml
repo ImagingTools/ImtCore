@@ -192,6 +192,7 @@ ViewBase {
             borderColorVertical: Style.borderColor;
 
             onSelectionChanged: {
+                console.log("Table onSelectionChanged", selection)
                 collectionViewBaseContainer.selectionChanged(selection);
             }
 

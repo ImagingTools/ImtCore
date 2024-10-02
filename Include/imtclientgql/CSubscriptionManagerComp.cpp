@@ -249,7 +249,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 // reimplemented (IGqlClient)
 
-IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::GqlRequestPtr requestPtr) const
+IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::GqlRequestPtr requestPtr, imtbase::IUrlParam*) const
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
 

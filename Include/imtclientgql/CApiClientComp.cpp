@@ -24,7 +24,7 @@ CApiClientComp::CApiClientComp()
 
 // reimplemented (IGqlClient)
 
-IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr) const
+IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam*) const
 {
 	if (requestPtr.isNull()){
 		return IGqlClient::GqlResponsePtr(nullptr);

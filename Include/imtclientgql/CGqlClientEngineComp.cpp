@@ -20,25 +20,33 @@ CGqlClientEngineComp::CGqlClientEngineComp()
 
 // reimplemented (imtclientgql::IClientProtocolEngine)
 
-QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRequest& request) const
+QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRequest& request, imtbase::IUrlParam* urlParam) const
 {
 	QNetworkRequest* networkRequest = new QNetworkRequest();
 	networkRequest->setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/graphql"));
 
-	QString urlString = m_workingUrl.toString();
+	QUrl url;
 
-	if (m_prefixServerAttrPtr.IsValid()){
-		QByteArray prefix = *m_prefixServerAttrPtr;
-		if (!prefix.startsWith('/')){
-			prefix.prepend('/');
+	if (urlParam != nullptr){
+		url = urlParam->GetUrl();
+	}
+	else{
+		QString urlString = m_workingUrl.toString();
+
+		if (m_prefixServerAttrPtr.IsValid()){
+			QByteArray prefix = *m_prefixServerAttrPtr;
+			if (!prefix.startsWith('/')){
+				prefix.prepend('/');
+			}
+
+			urlString.append(prefix);
 		}
 
-		urlString.append(prefix);
+		urlString.append("/graphql");
+		url = QUrl(urlString);
 	}
 
-	urlString.append("/graphql");
-
-	networkRequest->setUrl(QUrl(urlString));
+	networkRequest->setUrl(url);
 
 	imtgql::IGqlContext* contextPtr = request.GetRequestContext();
 	if (contextPtr != nullptr){

@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtgql/IGqlResponse.h>
+#include <imtbase/IUrlParam.h>
 
 
 namespace imtclientgql
@@ -21,7 +22,7 @@ public:
 	/**
 		Send a request to the server.
 	*/
-	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr) const = 0;
+	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* = nullptr) const = 0;
 };
 
 

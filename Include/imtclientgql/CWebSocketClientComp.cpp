@@ -84,7 +84,7 @@ bool CWebSocketClientComp::Logout()
 }
 
 
-IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequestPtr requestPtr) const
+IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequestPtr requestPtr, imtbase::IUrlParam*) const
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
 

@@ -30,7 +30,7 @@ public:
 	CGqlClientEngineComp();
 
 	// reimplemented (imtclientgql::IClientProtocolEngine)
-	virtual QNetworkRequest* CreateNetworkRequest(const imtgql::IGqlRequest& request) const override;
+	virtual QNetworkRequest* CreateNetworkRequest(const imtgql::IGqlRequest& request, imtbase::IUrlParam* = nullptr) const override;
 
 protected:
 	void OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IUrlParam* urlParamPtr);

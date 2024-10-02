@@ -57,7 +57,7 @@ public:
 	CWebSocketClientComp();
 
 	// reimplemented (imtclientgql::IGqlClient)
-	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr) const override;
+	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* = nullptr) const override;
 
 	// reimplemented (imtrest::ISender)
 	virtual bool SendResponse(imtrest::ConstResponsePtr& response) const override;
