@@ -95,15 +95,15 @@ defineReplace(CreateQmlSdlTarget) {
 		message("QRC_WRAP_DIR_PATH IS EMPTY!!!")
 	}
 
-	$$take_last(QRC_WRAP_DIR_PATH)
+	QRC_NAME = $$take_last(QRC_WRAP_DIR_PATH)
+	QRC_NAME = $$split(QRC_NAME, .)
+	QRC_NAME = $$first(QRC_NAME)
 	QRC_WRAP_DIR_PATH = $$join(QRC_WRAP_DIR_PATH, $${DIR_SEPARATOR})
 
 	# add first slash
 	!win32 {
 		QRC_WRAP_DIR_PATH = /$${QRC_WRAP_DIR_PATH}
 	}
-
-	QRC_NAME = $${TARGET}$${SDL_GENERATOR_QML_MODULE_NAME}Sdl
 
 	CPP_SDL_OUTPUT_FILES_QML = $${QRC_WRAP_DIR_PATH}/qrc_$${QRC_NAME}.cpp
 	# Paths-fix for windows
