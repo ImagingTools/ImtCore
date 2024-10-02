@@ -25,7 +25,8 @@ CSdlProcessArgumentsParserComp::CSdlProcessArgumentsParserComp()
 	m_qmlEnabled(false),
 	m_cppEnabled(true),
 	m_generatorType(GT_CMAKE),
-	m_autoJoinEnabled(false)
+	m_autoJoinEnabled(false),
+	m_autolinkLevel(ALL_NONE)
 {
 }
 
@@ -52,6 +53,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption includePathOption({"I", "include"}, "Specifies the import directories which should be searched when parsing the schema.", "IncludePathList");
 	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single");
 	QCommandLineOption generatorOption("generator", "{QMake | CMake}. Optional. Only for dependencies mode. Defines a type of output of files to be generated. Default - CMake", "generator");
+	QCommandLineOption autoLinkOption("auto-link", "Defines the compilation order of the schema files.\n"
+												   "0 - disabled. ALL files will be compiled.\n"
+												   "1 - only those schemas with the same namespace as the original one will be compiled\n"
+												   "2 - only the schema will be compiled. See the 'input parameter' option", "AutiLink", "0");
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
 	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)");
@@ -75,7 +80,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 					joinRulesOption,
 					includePathOption,
 					autoJoinOption,
-					generatorOption
+					generatorOption,
+					autoLinkOption
 				});
 	if (!isOptionsAdded){
 		Q_ASSERT(false);
@@ -156,6 +162,27 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	}
 
 	m_autoJoinEnabled = commandLineParser.isSet(autoJoinOption);
+
+	if (commandLineParser.isSet(autoLinkOption)){
+		bool isDigit = false;
+
+		const QString autoLinkLevelString = commandLineParser.value(autoLinkOption);
+		const int autoLinkLevel =  autoLinkLevelString.toInt(&isDigit);
+		if (!isDigit){
+			SendErrorMessage(0, QString("Unexpected auto link [%1] argument value '%2'. See help for detales").arg(autoLinkOption.names().join('|'), autoLinkLevelString));
+
+			return false;
+		}
+
+		const QList<int> acceptableValues = QList<int>({ALL_NONE, ALL_SAME_NAMESPACE, ALL_ONLY_FILE});
+		if (!acceptableValues.contains(autoLinkLevel)){
+			SendErrorMessage(0, QString("Unexpected auto link [%1] argument value '%2'. See help for detales").arg(autoLinkOption.names().join('|'), autoLinkLevelString));
+
+			return false;
+		}
+
+		m_autolinkLevel = AutoLinkLevel(autoLinkLevel);
+	}
 
 	if (commandLineParser.isSet(generatorOption)){
 		const QString generatorName = commandLineParser.value(generatorOption).toLower();
@@ -303,6 +330,12 @@ ISdlProcessArgumentsParser::GeneratorType CSdlProcessArgumentsParserComp::GetGen
 bool CSdlProcessArgumentsParserComp::IsAutoJoinEnabled() const
 {
 	return m_autoJoinEnabled;
+}
+
+
+ISdlProcessArgumentsParser::AutoLinkLevel CSdlProcessArgumentsParserComp::GetAutoLinkLevel() const
+{
+	return m_autolinkLevel;
 }
 
 

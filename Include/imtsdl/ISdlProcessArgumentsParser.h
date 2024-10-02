@@ -25,6 +25,13 @@ public:
 		GT_QMAKE
 	};
 
+	enum AutoLinkLevel
+	{
+		ALL_NONE = 0,					///< Dasabled. ALL files and deps will be compiled
+		ALL_SAME_NAMESPACE = 1,			///< Compile only files with same namespace
+		ALL_ONLY_FILE = 2,				///< Compile only input file
+	};
+
 	virtual bool SetArguments(int argc, char** argv) = 0;
 	virtual QString GetSchemaFilePath() const = 0;
 	virtual QString GetOutputDirectoryPath() const = 0;
@@ -41,6 +48,7 @@ public:
 	virtual QStringList GetIncludePaths() const = 0;
 	virtual GeneratorType GetGeneratorType() const = 0;
 	virtual bool IsAutoJoinEnabled() const = 0;
+	virtual AutoLinkLevel GetAutoLinkLevel() const = 0;
 
 };
 
