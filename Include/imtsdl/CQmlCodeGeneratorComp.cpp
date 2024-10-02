@@ -276,7 +276,13 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 		FeedStreamHorizontally(ifStream, 1);
 
 		ifStream << QStringLiteral("property ");
-		if (sdlField.IsArray()){
+
+		bool isCustom = false;
+		QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
+		if (sdlField.IsArray() && !isCustom){
+			ifStream << QStringLiteral("var");
+		}
+		else if (sdlField.IsArray()){
 			ifStream << QStringLiteral("BaseModel");
 		}
 		else {
@@ -284,10 +290,11 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 		}
 		// use 'm_' prefix to avoid ambiguity
 		ifStream << QStringLiteral(" m_") << GetDecapitalizedValue(sdlField.GetId());
-		bool isCustom = false;
-		QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
-		if (!isCustom){
-			ifStream << ':' << ' ';
+		ifStream << ':' << ' ';
+		if (sdlField.IsArray() && !isCustom){
+			ifStream << QStringLiteral("[]");
+		}
+		else if (!isCustom){
 			if (convertedType == QStringLiteral("int") ||
 				convertedType == QStringLiteral("real") ||
 				convertedType == QStringLiteral("double"))
@@ -303,7 +310,6 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 			}
 		}
 		else {
-			ifStream << ':' << ' ';
 			if (sdlField.IsArray()){
 				ifStream << QStringLiteral("BaseModel");
 			}
@@ -349,8 +355,8 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 	for (const CSdlField& sdlField: sdlType.GetFields()){
 		bool isCustom = false;
 		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
-		if (!isCustom && !sdlField.IsArray()){
-			// skip simple scalars
+		// skip simple scalars and list of scalars
+		if (!isCustom){
 			continue;
 		}
 
