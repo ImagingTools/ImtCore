@@ -30,7 +30,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PermissionsProvider" PackageId="ImtLicensePck" ComponentId="PermissionsProvider">
+        <Element Id="PermissionsProvider" PackageId="ImtLicenseGqlPck" ComponentId="PermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="">
@@ -48,7 +48,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ProductInfoProvider" PackageId="ImtLicensePck" ComponentId="ProductInfoProvider">
+        <Element Id="ProductInfoProvider" PackageId="ImtLicenseGqlPck" ComponentId="ProductInfoProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">

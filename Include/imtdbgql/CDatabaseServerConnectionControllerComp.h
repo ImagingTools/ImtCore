@@ -6,7 +6,7 @@
 #include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
-namespace imtdb
+namespace imtdbgql
 {
 
 
@@ -28,6 +28,6 @@ private:
 };
 
 
-} // namespace imtdb
+} // namespace imtdbgql
 
 

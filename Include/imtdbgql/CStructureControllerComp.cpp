@@ -1,4 +1,4 @@
-#include <imtgqldb/CStructureControllerComp.h>
+#include <imtdbgql/CStructureControllerComp.h>
 
 
 // ACF includes
@@ -11,7 +11,7 @@
 #include <imtgql/imtgql.h>
 
 
-namespace imtgqldb
+namespace imtdbgql
 {
 
 
@@ -139,6 +139,6 @@ imtbase::CTreeItemModel* CStructureControllerComp::GetElements(
 }
 
 
-} // namespace imtgqldb
+} // namespace imtdbgql
 
 

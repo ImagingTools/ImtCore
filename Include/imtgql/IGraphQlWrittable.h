@@ -12,7 +12,7 @@ namespace imtgql
 {
 
 
-class IGrahpQlWrittable: virtual public istd::IPolymorphic
+class IGraphQlWrittable: virtual public istd::IPolymorphic
 {
 	virtual bool WriteToGraphQlObject(imtgql::CGqlObject& request) const = 0;
 };

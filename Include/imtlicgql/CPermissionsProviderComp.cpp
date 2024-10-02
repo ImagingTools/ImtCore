@@ -1,13 +1,13 @@
-#include <imtlic/CPermissionsProviderComp.h>
+#include <imtlicgql/CPermissionsProviderComp.h>
 
 
-namespace imtlic
+namespace imtlicgql
 {
 
 
 // protected methods
 
-// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+// reimplemented (imtgql::CGqlRequestHandlerCompBase)
 
 bool CPermissionsProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
@@ -29,6 +29,6 @@ imtbase::CTreeItemModel* CPermissionsProviderComp::CreateInternalResponse(const 
 }
 
 
-} // namespace imtlic
+} // namespace imtlicgql
 
 

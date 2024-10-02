@@ -14,69 +14,70 @@ I_EXPORT_PACKAGE(
 		"ImagingTools license management Gql-component package",
 		IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
+I_EXPORT_COMPONENT(
+			ProductCollectionController,
+			"ProductCollectionController",
+			"Product Collection Controller");
 
 I_EXPORT_COMPONENT(
-		ProductCollectionController,
-		"ProductCollectionController",
-		"Product Collection Controller");
-
-
-I_EXPORT_COMPONENT(
-		ProductController,
-		"ProductController",
-		"Product Controller");
-
+			ProductController,
+			"ProductController",
+			"Product Controller");
 
 I_EXPORT_COMPONENT(
-		LicenseController,
-		"LicenseController",
-		"Product License Controller");
-
-
-I_EXPORT_COMPONENT(
-		LicenseCollectionController,
-		"LicenseCollectionController",
-		"Product License Collection Controller");
-
+			LicenseController,
+			"LicenseController",
+			"Product License Controller");
 
 I_EXPORT_COMPONENT(
-		AccountCollectionController,
-		"AccountCollectionController",
-		"Account Collection Controller");
-
-
-I_EXPORT_COMPONENT(
-		AccountController,
-		"AccountController",
-		"Account Controller");
-
+			LicenseCollectionController,
+			"LicenseCollectionController",
+			"Product License Collection Controller");
 
 I_EXPORT_COMPONENT(
-		FeaturesExportProvider,
-		"FeaturesExportProvider",
-		"Features Export Provider");
-
-
-I_EXPORT_COMPONENT(
-		ProductPermissionController,
-		"ProductPermissionController",
-		"Product Permission Controller");
+			AccountCollectionController,
+			"AccountCollectionController",
+			"Account Collection Controller");
 
 I_EXPORT_COMPONENT(
-		FeatureController,
-		"FeatureController",
-		"Feature Controller");
+			AccountController,
+			"AccountController",
+			"Account Controller");
 
 I_EXPORT_COMPONENT(
-		FeatureCollectionController,
-		"FeatureCollectionController",
-		"Feature Collection Controller");
+			FeaturesExportProvider,
+			"FeaturesExportProvider",
+			"Features Export Provider");
 
 I_EXPORT_COMPONENT(
-		FeatureDependenciesProvider,
-		"Feature dependencies provider",
-		"Feature Dependencies Provider");
+			ProductPermissionController,
+			"ProductPermissionController",
+			"Product Permission Controller");
 
+I_EXPORT_COMPONENT(
+			FeatureController,
+			"FeatureController",
+			"Feature Controller");
+
+I_EXPORT_COMPONENT(
+			FeatureCollectionController,
+			"FeatureCollectionController",
+			"Feature Collection Controller");
+
+I_EXPORT_COMPONENT(
+			FeatureDependenciesProvider,
+			"Feature dependencies provider",
+			"Feature Dependencies Provider");
+
+I_EXPORT_COMPONENT(
+			PermissionsProvider,
+			"Permissions provider",
+			"Feature Dependencies Provider Permissions");
+
+I_EXPORT_COMPONENT(
+			ProductInfoProvider,
+			"Product info provider",
+			"Product Info Provider");
 
 } // namespace ImtLicenseGqlPck
 

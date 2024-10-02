@@ -80,19 +80,9 @@ I_EXPORT_COMPONENT(
 			"License Product Instance Controller");
 
 I_EXPORT_COMPONENT(
-			ProductInfoProvider,
-			"Product info provider",
-			"Product Info Provider");
-
-I_EXPORT_COMPONENT(
 			FeatureInfoProvider,
 			"Feature info provider",
 			"Feature Info Provider");
-
-I_EXPORT_COMPONENT(
-			PermissionsProvider,
-			"Permissions provider",
-			"Feature Dependencies Provider Permissions");
 
 I_EXPORT_COMPONENT(
 			ProductInfo,

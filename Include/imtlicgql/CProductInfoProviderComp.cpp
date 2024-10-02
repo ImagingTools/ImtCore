@@ -1,13 +1,13 @@
-#include <imtlic/CProductInfoProviderComp.h>
+#include <imtlicgql/CProductInfoProviderComp.h>
 
 
-namespace imtlic
+namespace imtlicgql
 {
 
 
 // protected methods
 
-// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+// reimplemented (imtgql::CGqlRequestHandlerCompBase)
 
 bool CProductInfoProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
@@ -38,6 +38,6 @@ imtbase::CTreeItemModel* CProductInfoProviderComp::CreateInternalResponse(const 
 }
 
 
-} // namespace imtlic
+} // namespace imtlicgql
 
 

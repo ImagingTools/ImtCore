@@ -26,7 +26,7 @@ class CStructureControllerCompBase: public imtgql::CGqlRequestHandlerCompBase
 public:
 	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
-    I_BEGIN_COMPONENT(CStructureControllerCompBase);
+	I_BEGIN_COMPONENT(CStructureControllerCompBase);
 		I_ASSIGN(m_collectionStructureCompPtr, "CollectionStructure", "Collection structure", true, "CollectionStructure");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_gqlRequestExtractorCompPtr, "GqlRequestExtractor", "GraphQL request extractor", true, "GqlRequestExtractor");

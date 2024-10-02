@@ -1,11 +1,11 @@
-#include <imtdb/CRemoteDatabaseServerConnectionComp.h>
+#include <imtdbgql/CRemoteDatabaseServerConnectionComp.h>
 
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
 
 
-namespace imtdb
+namespace imtdbgql
 {
 
 
@@ -40,6 +40,6 @@ bool CRemoteDatabaseServerConnectionComp::CheckDatabaseConnection(QString& error
 }
 
 
-} // namespace imtdb
+} // namespace imtdbgql
 
 

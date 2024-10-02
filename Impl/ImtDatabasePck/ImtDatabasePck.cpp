@@ -56,16 +56,6 @@ I_EXPORT_COMPONENT(
 			"Database Automatic Backup PostgreSQL SQL");
 
 I_EXPORT_COMPONENT(
-			RemoteDatabaseServerConnection,
-			"Remote database server connection",
-			"Remote Database Server Connection");
-
-I_EXPORT_COMPONENT(
-			DatabaseServerConnectionController,
-			"Database server connection controller",
-			"Database Server Connection Controller");
-
-I_EXPORT_COMPONENT(
 			RestoringDatabaseController,
 			"Restoring database controller",
 			"Restoring Restore Database Controller PostreSQL psql");

@@ -119,6 +119,9 @@ imtgql.file = ../../Include/imtgql/QMake/imtgql.pro
 SUBDIRS += imtdb
 imtdb.file = ../../Include/imtdb/QMake/imtdb.pro
 
+SUBDIRS += imtdbgql
+imtdbgql.file = ../../Include/imtdbgql/QMake/imtdbgql.pro
+
 SUBDIRS += imtlicdb
 imtlicdb.file = ../../Include/imtlicdb/QMake/imtlicdb.pro
 
@@ -211,6 +214,10 @@ ImtAuthPck.depends = imtbase imtauth
 SUBDIRS += ImtDatabasePck
 ImtDatabasePck.file = ../../Impl/ImtDatabasePck/QMake/ImtDatabasePck.pro
 ImtDatabasePck.depends = imtbase imtdb
+
+SUBDIRS += ImtDatabaseGqlPck
+ImtDatabaseGqlPck.file = ../../Impl/ImtDatabaseGqlPck/QMake/ImtDatabaseGqlPck.pro
+ImtDatabaseGqlPck.depends = imtbase imtdb imtdbgql
 
 SUBDIRS += ImtAuthGuiPck
 ImtAuthGuiPck.file = ../../Impl/ImtAuthGuiPck/QMake/ImtAuthGuiPck.pro

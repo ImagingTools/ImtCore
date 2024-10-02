@@ -5,10 +5,10 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtgql/CGqlRepresentationDataControllerComp.h>
+#include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
-namespace imtlic
+namespace imtlicgql
 {
 
 
@@ -23,7 +23,7 @@ public:
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+	// reimplemented (imtgql::CGqlRequestHandlerCompBase)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
@@ -33,6 +33,6 @@ protected:
 };
 
 
-} // namespace imtlic
+} // namespace imtlicgql
 
 

@@ -1,7 +1,7 @@
-#include <imtdb/CDatabaseServerConnectionControllerComp.h>
+#include <imtdbgql/CDatabaseServerConnectionControllerComp.h>
 
 
-namespace imtdb
+namespace imtdbgql
 {
 
 
@@ -34,6 +34,6 @@ imtbase::CTreeItemModel* CDatabaseServerConnectionControllerComp::CreateInternal
 }
 
 
-} // namespace imtdb
+} // namespace imtdbgql
 
 

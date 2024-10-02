@@ -18,10 +18,12 @@
 #include <imtlicgql/CFeatureControllerComp.h>
 #include <imtlicgql/CFeatureCollectionControllerComp.h>
 #include <imtlicgql/CFeatureDependenciesProviderComp.h>
+#include <imtlicgql/CProductInfoProviderComp.h>
+#include <imtlicgql/CPermissionsProviderComp.h>
 
 
 /**
-	ImtLicenseGuiPck package
+	ImtLicenseGqlPck package
 */
 namespace ImtLicenseGqlPck
 {
@@ -38,6 +40,8 @@ typedef imtlicgql::CProductPermissionsControllerComp ProductPermissionController
 typedef imtlicgql::CFeatureControllerComp FeatureController;
 typedef imtgql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CFeatureCollectionControllerComp> FeatureCollectionController;
 typedef imtlicgql::CFeatureDependenciesProviderComp FeatureDependenciesProvider;
+typedef imtlicgql::CProductInfoProviderComp ProductInfoProvider;
+typedef imtlicgql::CPermissionsProviderComp PermissionsProvider;
 
 
 } // namespace ImtLicenseGqlPck

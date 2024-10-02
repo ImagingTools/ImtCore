@@ -22,7 +22,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="DatabaseServerConnectionChecker" PackageId="ImtDatabasePck" ComponentId="RemoteDatabaseServerConnection">
+        <Element Id="DatabaseServerConnectionChecker" PackageId="ImtDatabaseGqlPck" ComponentId="RemoteDatabaseServerConnection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">

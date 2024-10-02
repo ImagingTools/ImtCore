@@ -6,10 +6,10 @@
 
 // ImtCore includes
 #include <imtlic/CProductLicensingInfo.h>
-#include <imtgql/CGqlRepresentationDataControllerComp.h>
+#include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
-namespace imtlic
+namespace imtlicgql
 {
 
 
@@ -36,6 +36,6 @@ protected:
 };
 
 
-} // namespace imtlic
+} // namespace imtlicgql
 
 

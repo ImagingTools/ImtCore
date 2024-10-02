@@ -24,14 +24,10 @@ int main(int argc, char *argv[])
 
 	Q_INIT_RESOURCE(imtguigqlqml);
 	Q_INIT_RESOURCE(imtstyle);
-    Q_INIT_RESOURCE(imtstylecontrolsqml);
+	Q_INIT_RESOURCE(imtstylecontrolsqml);
 	Q_INIT_RESOURCE(imtcontrolsqml);
-	// Q_INIT_RESOURCE(imtgui);
 	Q_INIT_RESOURCE(imtguiqml);
 	Q_INIT_RESOURCE(imtcolguiqml);
-	// Q_INIT_RESOURCE(imtcolguiqml);
-	// Q_INIT_RESOURCE(imtdocgui);
-	// Q_INIT_RESOURCE(imtgui);
 	Q_INIT_RESOURCE(imtdocguiqml);
 	Q_INIT_RESOURCE(imtauthguiqml);
 
@@ -42,23 +38,7 @@ int main(int argc, char *argv[])
 
 	Q_INIT_RESOURCE(imtguivars);
 
-	Q_INIT_RESOURCE(imtauthGroupsSdl);
-	Q_INIT_RESOURCE(imtauthUsersSdl);
-	Q_INIT_RESOURCE(imtauthRolesSdl);
-	Q_INIT_RESOURCE(imtappApplicationSdl);
-	Q_INIT_RESOURCE(imtauthAuthorizationSdl);
-
-
-//	Q_INIT_RESOURCE(Webimt3dgui);
-//    Q_INIT_RESOURCE(Webimtauthgui);
-//    Q_INIT_RESOURCE(Webimtgui);
-//	Q_INIT_RESOURCE(Webimtcontrols);
-//	Q_INIT_RESOURCE(Webimtlicgui);
-
 	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
-	// imtstyle::CImtStyle* imtStylePtr = imtstyle::CImtStyle::GetInstance();
-	// Q_ASSERT(imtStylePtr != nullptr);
 	
 	CImtControlsGallery instance;
 

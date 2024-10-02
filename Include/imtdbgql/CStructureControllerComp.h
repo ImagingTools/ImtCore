@@ -6,7 +6,7 @@
 #include <imtdb/IDatabaseEngine.h>
 
 
-namespace imtgqldb
+namespace imtdbgql
 {
 
 
@@ -30,6 +30,6 @@ protected:
 };
 
 
-} // namespace imtgqldb
+} // namespace imtdbgql
 
 

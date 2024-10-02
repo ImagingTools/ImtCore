@@ -6,19 +6,19 @@
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
 
 
-namespace imtdb
+namespace imtdbgql
 {
 
 
 class CRemoteDatabaseServerConnectionComp:
 			public imtclientgql::CClientRequestManagerCompBase,
-			virtual public IDatabaseServerConnectionChecker
+			virtual public imtdb::IDatabaseServerConnectionChecker
 {
 public:
 	typedef imtclientgql::CClientRequestManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteDatabaseServerConnectionComp);
-		I_REGISTER_INTERFACE(IDatabaseServerConnectionChecker)
+		I_REGISTER_INTERFACE(imtdb::IDatabaseServerConnectionChecker)
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "Request command-ID", false, "GetDatabaseStatus");
 	I_END_COMPONENT;
 
@@ -30,6 +30,6 @@ private:
 };
 
 
-} // namespace imtdb
+} // namespace imtdbgql
 
 

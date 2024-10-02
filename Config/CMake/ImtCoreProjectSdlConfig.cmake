@@ -59,7 +59,7 @@ set(CUSTOM_MODIFICATORS)
 	list(APPEND CUSTOM_MODIFICATORS "--use-all-modificators")
 	list(APPEND CUSTOM_MODIFICATORS "-Bimtbase::IJsonObjectWrittable=imtbase/IJsonObjectWrittable.h")
 	list(APPEND CUSTOM_MODIFICATORS "-Bimtbase::ITreeModelWrittable=imtbase/ITreeModelWrittable.h")
-	list(APPEND CUSTOM_MODIFICATORS "-Bimtgql::IGrahpQlWrittable=imtgql/IGrahpQlWrittable.h")
+	list(APPEND CUSTOM_MODIFICATORS "-Bimtgql::IGraphQlWrittable=imtgql/IGraphQlWrittable.h")
 
 ImtCoreConfigureSdlCpp("${SDL_FILE_NAME}" "${CPP_OUT_SUBFOLDER}" "${CPP_NAMESPACE}" "${CUSTOM_MODIFICATORS}")
 ImtCoreConfigureSdlQml("${SDL_FILE_NAME}" "${QML_OUT_SUBFOLDER}" "${QML_MODULE_NAME}")
