@@ -1,0 +1,54 @@
+#pragma once
+
+
+// ACF includes
+#include <ilog/TLoggerCompWrap.h>
+#include <ifile/IFileNameParam.h>
+
+// ImtCore includes
+#include <imtdb/IMigrationController.h>
+#include <imtdb/IDatabaseEngine.h>
+
+
+namespace imtdb
+{
+
+
+class CCompositeMigrationControllerComp: public ilog::CLoggerComponentBase, virtual public imtdb::IMigrationController
+{
+public:
+	typedef ilog::CLoggerComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CCompositeMigrationControllerComp);
+		I_REGISTER_INTERFACE(imtdb::IMigrationController)
+		I_ASSIGN(m_migrationFolderPathCompPtr, "MigrationFolderPath", "The property holds the folder contains SQL migraton script", false, "MigrationFolderPath");
+		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine", true, "DatabaseEngine");
+		I_ASSIGN_MULTI_0(m_migrationControllersCompPtr, "MigrationControllers", "Database engine", true);
+	I_END_COMPONENT;
+
+	struct MigrationStep
+	{
+		int from = -1;
+		int to = -1;
+		const imtdb::IMigrationController* migrationControllerPtr = nullptr;
+	};
+
+	typedef QVector<MigrationStep> MigrationSteps;
+
+protected:
+	const imtdb::IMigrationController* FindMigrationController(int migrationIndex) const;
+
+	// reimplemented (imtdb::IMigrationController)
+	virtual istd::CIntRange GetMigrationRange() const override;
+	virtual bool DoMigration(const istd::CIntRange& subRange = istd::CIntRange()) const override;
+
+private:
+	I_REF(ifile::IFileNameParam, m_migrationFolderPathCompPtr);
+	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
+	I_MULTIREF(imtdb::IMigrationController, m_migrationControllersCompPtr);
+};
+
+
+} // namespace imtdb
+
+

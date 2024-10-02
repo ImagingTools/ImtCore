@@ -20,6 +20,8 @@
 #include <imtdb/CSqliteJsonDatabaseDelegateComp.h>
 #include <imtdb/TMessageDatabaseDelegateComp.h>
 #include <imtbase/TObjectCollectionSearchControllerCompWrap.h>
+#include <imtdb/CMigrationControllerComp.h>
+#include <imtdb/CCompositeMigrationControllerComp.h>
 
 
 /**
@@ -43,6 +45,8 @@ typedef imtdb::CRestoringDatabaseControllerComp RestoringDatabaseController;
 typedef imtdb::CSqlStructureDelegateComp SqlStructureDelegate;
 typedef imtdb::CSqliteJsonDatabaseDelegateComp SqliteJsonDatabaseDelegate;
 typedef imtdb::TMessageDatabaseDelegateComp<imtdb::CSqliteJsonDatabaseDelegateComp> SqliteJsonMessageDatabaseDelegate;
+typedef imtdb::CMigrationControllerComp MigrationController;
+typedef imtdb::CCompositeMigrationControllerComp CompositeMigrationController;
 
 
 } // namespace ImtDatabasePck

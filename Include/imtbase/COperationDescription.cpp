@@ -21,17 +21,16 @@ namespace imtbase
 // public methods
 
 COperationDescription::COperationDescription()
-	:m_operationType(imtbase::IOperationDescription::OT_UNKNOWN)
 {
 }
 
 
-void COperationDescription::SetOperationType(int operationType)
+void COperationDescription::SetOperationTypeId(const QByteArray& operationTypeId)
 {
-	if (m_operationType != operationType){
+	if (m_operationTypeId != operationTypeId){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_operationType = operationType;
+		m_operationTypeId = operationTypeId;
 	}
 }
 
@@ -78,9 +77,9 @@ void COperationDescription::SetNewValue(const QByteArray& newValue)
 
 // reimplemented (imtbase::IOperationDescription)
 
-int COperationDescription::GetOperationType() const
+QByteArray COperationDescription::GetOperationTypeId() const
 {
-	return m_operationType;
+	return m_operationTypeId;
 }
 
 
@@ -114,28 +113,12 @@ bool COperationDescription::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
-	quint32 imtCoreVersion;
-	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
-		imtCoreVersion = 0;
-	}
-
 	bool retVal = true;
 
-	if (imtCoreVersion >= 11170){
-		iser::CArchiveTag operationTypeTag("OperationType", "Operation type", iser::CArchiveTag::TT_LEAF);
-		retVal = retVal && archive.BeginTag(operationTypeTag);
-		// retVal = retVal && I_SERIALIZE_ENUM(imtbase::IOperationDescription::OperationType, archive, m_operationType);
-		retVal = retVal && archive.Process(m_operationType);
-		retVal = retVal && archive.EndTag(operationTypeTag);
-	}
-	else{
-		QByteArray operationTypeId;
-		iser::CArchiveTag operationTypeTag("OperationTypeId", "Operation type ID", iser::CArchiveTag::TT_LEAF);
-		retVal = retVal && archive.BeginTag(operationTypeTag);
-		retVal = retVal && archive.Process(operationTypeId);
-		retVal = retVal && archive.EndTag(operationTypeTag);
-	}
+	iser::CArchiveTag operationTypeTag("OperationTypeId", "Operation type ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(operationTypeTag);
+	retVal = retVal && archive.Process(m_operationTypeId);
+	retVal = retVal && archive.EndTag(operationTypeTag);
 
 	iser::CArchiveTag keyTag("Key", "Key of the field being modified", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(keyTag);
@@ -177,7 +160,7 @@ bool COperationDescription::CopyFrom(const IChangeable& object, CompatibilityMod
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_operationType = sourcePtr->m_operationType;
+		m_operationTypeId = sourcePtr->m_operationTypeId;
 		m_key = sourcePtr->m_key;
 		m_keyName = sourcePtr->m_keyName;
 		m_oldValue = sourcePtr->m_oldValue;
@@ -203,6 +186,7 @@ istd::IChangeable* COperationDescription::CloneMe(CompatibilityMode mode) const
 
 bool COperationDescription::ResetData(CompatibilityMode /*mode*/)
 {
+	m_operationTypeId.clear();
 	m_key.clear();
 	m_keyName.clear();
 	m_oldValue.clear();

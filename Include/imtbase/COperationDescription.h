@@ -14,14 +14,14 @@ class COperationDescription: virtual public imtbase::IOperationDescription
 public:
 	COperationDescription();
 
-	void SetOperationType(int operationType);
+	void SetOperationTypeId(const QByteArray& operationTypeId);
 	void SetKey(const QByteArray& key);
 	void SetKeyName(const QString& keyName);
 	void SetOldValue(const QByteArray& oldValue);
 	void SetNewValue(const QByteArray& newValue);
 
 	// reimplemented (imtbase::IOperationDescription)
-	virtual int GetOperationType() const override;
+	virtual QByteArray GetOperationTypeId() const override;
 	virtual QByteArray GetKey() const override;
 	virtual QString GetKeyName() const override;
 	virtual QByteArray GetOldValue() const override;
@@ -37,7 +37,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
-	int m_operationType;
+	QByteArray m_operationTypeId;
 	QByteArray m_key;
 	QString m_keyName;
 	QByteArray m_oldValue;

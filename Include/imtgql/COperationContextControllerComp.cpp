@@ -15,7 +15,7 @@ namespace imtgql
 // reimplemented (imtbase::IOperationContextController)
 
 imtbase::IOperationContext* COperationContextControllerComp::CreateOperationContext(
-			int operationType,
+			const QByteArray& operationTypeId,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
 			const iprm::IParamsSet* paramsPtr)
@@ -59,7 +59,7 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 		imtbase::CObjectCollection* changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationContextPtr->GetChangesCollection());
 
 		QString errorMessage;
-		if (!m_documentChangeGeneratorCompPtr->GenerateDocumentChanges(operationType, objectId, object, *changeCollectionPtr, errorMessage, paramsPtr)){
+		if (!m_documentChangeGeneratorCompPtr->GenerateDocumentChanges(operationTypeId, objectId, object, *changeCollectionPtr, errorMessage, paramsPtr)){
 			SendWarningMessage(0, QString("Unable to generate document changes. '%1'").arg(errorMessage), "COperationContextControllerComp");
 		}
 	}

@@ -2,14 +2,39 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5229" Description="ACF"/>
-            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="CompositeMigrationController" PackageId="ImtDatabasePck" ComponentId="CompositeMigrationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PgSqlDatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MigrationControllers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>MigrationController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RelativeFileNameParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="DatabaseAutomaticBackup" PackageId="ImtDatabasePck" ComponentId="DatabaseAutomaticBackup">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
@@ -24,6 +49,30 @@
                     </AttributeInfo>
                     <AttributeInfo Id="Program" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="pg_dump"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MigrationController" PackageId="ImtDatabasePck" ComponentId="MigrationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PgSqlDatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="From" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="-1"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RelativeFileNameParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="To" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="-1"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -57,6 +106,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="MaintainanceDatabase" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="postgres"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MigrationController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CompositeMigrationController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="RelativeFileNameParam"/>

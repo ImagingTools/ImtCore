@@ -1,11 +1,6 @@
 #include <imtdb/CSqlStructureDelegateComp.h>
 
 
-// Qt includes
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-
 // ACF includes
 #include <istd/CCrcCalculator.h>
 #include <iprm/TParamsPtr.h>
@@ -13,10 +8,9 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
-#include <imtdb/imtdb.h>
-#include <imtbase/ICollectionFilter.h>
 #include <imtbase/ICollectionInfo.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtdb

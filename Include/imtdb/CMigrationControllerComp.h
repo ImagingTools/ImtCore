@@ -1,0 +1,50 @@
+#pragma once
+
+
+// ACF includes
+#include <ilog/TLoggerCompWrap.h>
+#include <ifile/IFileNameParam.h>
+
+// ImtCore includes
+#include <imtdb/IMigrationController.h>
+#include <imtdb/IDatabaseEngine.h>
+
+
+namespace imtdb
+{
+
+
+class CMigrationControllerComp: public ilog::CLoggerComponentBase, virtual public imtdb::IMigrationController
+{
+public:
+	typedef ilog::CLoggerComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CMigrationControllerComp);
+		I_REGISTER_INTERFACE(imtdb::IMigrationController)
+		I_ASSIGN(m_rangeFromAttrPtr, "From", "Range of from value", false, -1);
+		I_ASSIGN(m_rangeToAttrPtr, "To", "if value -1, then maximum value in the migration folder", false, -1);
+		I_ASSIGN(m_migrationFolderPathCompPtr, "MigrationFolderPath", "The property holds the folder contains SQL migraton script", false, "MigrationFolderPath");
+		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine", true, "DatabaseEngine");
+	I_END_COMPONENT;
+
+protected:
+	// reimplemented (imtdb::IMigrationController)
+	virtual istd::CIntRange GetMigrationRange() const override;
+	virtual bool DoMigration(const istd::CIntRange& subRange = istd::CIntRange()) const override;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
+private:
+	I_REF(ifile::IFileNameParam, m_migrationFolderPathCompPtr);
+	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
+	I_ATTR(int, m_rangeFromAttrPtr);
+	I_ATTR(int, m_rangeToAttrPtr);
+
+	istd::CIntRange m_range;
+};
+
+
+} // namespace imtdb
+
+

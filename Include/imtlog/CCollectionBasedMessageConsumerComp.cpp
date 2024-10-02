@@ -34,7 +34,7 @@ void CCollectionBasedMessageConsumerComp::WriteMessageToLog(const MessagePtr& me
 			return;
 		}
 		while (!m_startMessages.isEmpty()){
-		const MessagePtr startMessage = m_startMessages.takeFirst();
+			const MessagePtr startMessage = m_startMessages.takeFirst();
 			m_messageCollectionCompPtr->InsertNewObject("MessageInfo", "", "", startMessage.GetPtr());
 		}
 

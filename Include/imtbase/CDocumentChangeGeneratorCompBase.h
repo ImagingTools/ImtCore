@@ -31,7 +31,7 @@ public:
 protected:
 	// reimplemented (imtbase::IDocumentChangeGenerator)
 	virtual bool GenerateDocumentChanges(
-				int operationType,
+				const QByteArray& operationTypeId,
 				const QByteArray& documentId,
 				const istd::IChangeable& document,
 				CObjectCollection& documentChangeCollection,
@@ -39,8 +39,18 @@ protected:
 				const iprm::IParamsSet* paramsPtr) override;
 	virtual QString GetOperationDescription(CObjectCollection& documentChangeCollection, const QByteArray& languageId = QByteArray()) override;
 
-	virtual bool CompareDocuments(const istd::IChangeable& oldDocument, const istd::IChangeable& newDocument, CObjectCollection& documentChangeCollection, QString& errorMessage) = 0;
-	virtual imtbase::COperationDescription* CreateOperationDescription(int operationType, const QByteArray& key, const QString& keyName, const QByteArray& oldValue, const QByteArray& newValue) const;
+	virtual bool CompareDocuments(
+				const istd::IChangeable& oldDocument,
+				const istd::IChangeable& newDocument,
+				CObjectCollection& documentChangeCollection,
+				QString& errorMessage) = 0;
+	virtual imtbase::COperationDescription* CreateOperationDescription(
+				const QByteArray& operationTypeId,
+				const QByteArray& key,
+				const QString& keyName,
+				const QByteArray& oldValue,
+				const QByteArray& newValue) const;
+	virtual QByteArray InsertOperationDescription();
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);

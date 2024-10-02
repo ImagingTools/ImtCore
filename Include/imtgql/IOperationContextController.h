@@ -17,7 +17,7 @@ class IOperationContextController: virtual public istd::IPolymorphic
 {
 public:
 	virtual imtbase::IOperationContext* CreateOperationContext(
-				int operationType,
+				const QByteArray& operationTypeId,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
 				const iprm::IParamsSet* paramsPtr = nullptr) = 0;

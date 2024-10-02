@@ -85,6 +85,16 @@ I_EXPORT_COMPONENT(
 			"Message object json delegate for SQL table",
 			"SQL JSON Message Delegate");
 
+I_EXPORT_COMPONENT(
+			MigrationController,
+			"Migration controller",
+			"Migration Controller");
+
+I_EXPORT_COMPONENT(
+			CompositeMigrationController,
+			"Composite migration controller",
+			"Composite Migration Controller");
+
 
 } // namespace ImtDatabasePck
 
