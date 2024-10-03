@@ -24,7 +24,7 @@ CApiClientComp::CApiClientComp()
 
 // reimplemented (IGqlClient)
 
-IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam*) const
+IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParam) const
 {
 	if (requestPtr.isNull()){
 		return IGqlClient::GqlResponsePtr(nullptr);
@@ -35,7 +35,7 @@ IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr,
 	if (m_protocolEngineCompPtr.IsValid()){
 		imtgql::IGqlRequest::RequestType requestType = requestPtr->GetRequestType();
 		if ((requestType == imtgql::IGqlRequest::RT_QUERY) || (requestType == imtgql::IGqlRequest::RT_MUTATION)){
-			QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(*requestPtr);
+			QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(*requestPtr, urlParam);
 			if (networkRequestPtr != nullptr){
 				QByteArray uuid = QUuid::createUuid().toByteArray();
 

@@ -107,6 +107,10 @@ RemoteCollectionView {
                     commandsView: roleEditor.commandsView;
                 }
             }
+
+            function getAdditionalInputParams(){
+                return roleCollectionViewContainer.getAdditionalInputParams()
+            }
         }
     }
 

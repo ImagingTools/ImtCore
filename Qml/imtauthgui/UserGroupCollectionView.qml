@@ -47,9 +47,7 @@ RemoteCollectionView {
             additionalFieldIds: userGroupCollectionViewContainer.additionalFieldIds;
 
             function getAdditionalInputParams(){
-                let obj = {}
-                obj["ProductId"] = userGroupCollectionViewContainer.productId;
-                return obj;
+                return userGroupCollectionViewContainer.getAdditionalInputParams();
             }
         }
     }

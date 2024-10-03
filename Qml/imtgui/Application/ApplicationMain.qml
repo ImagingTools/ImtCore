@@ -261,6 +261,7 @@ Item {
             }
 
             if (webSocketPortProvider.port >= 0){
+                // url.port = 7770 //webSocketPortProvider.port;
                 url.port = webSocketPortProvider.port;
             }
             else{

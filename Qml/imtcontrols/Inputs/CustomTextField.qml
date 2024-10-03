@@ -224,7 +224,7 @@ FocusScope {
 
     Timer {
         id: editingFinishedTimer;
-        interval: 500;
+        interval: 700;
 
         onTriggered: {
             if (containerTextField.autoEditingFinished){

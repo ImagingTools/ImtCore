@@ -89,6 +89,10 @@ Item {
         UserCollectionView {
             productId: container.productId;
             documentManager: container.documentManager;
+
+            function getAdditionalInputParams(){
+                return container.getAdditionalInputParams()
+            }
         }
     }
 
@@ -98,6 +102,10 @@ Item {
         UserGroupCollectionView {
             productId: container.productId;
             documentManager: container.documentManager;
+
+            function getAdditionalInputParams(){
+                return container.getAdditionalInputParams()
+            }
         }
     }
 

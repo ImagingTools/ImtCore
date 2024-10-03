@@ -13,6 +13,7 @@ QtObject {
     property string systemId: "";
     property string productId: "";
     property var permissions: [];
+    property bool isTokenGlobal: true
 
     signal accepted();
     signal failed(string message);
@@ -33,10 +34,24 @@ QtObject {
         }
     }
 
+    function getAdditionalInputParams(){
+        return {}
+    }
+
     function authorization(loginF, passwordF){
         request.addInputParam(AuthorizationInputTypeMetaInfo.s_login, loginF);
         request.addInputParam(AuthorizationInputTypeMetaInfo.s_password, passwordF);
         request.addInputParam(AuthorizationInputTypeMetaInfo.s_productId, container.productId);
+
+        let additionInputParams = container.getAdditionalInputParams();
+        if (Object.keys(additionInputParams).length > 0){
+            let additionParams = Gql.GqlObject("addition");
+            for (let key in additionInputParams){
+                additionParams.InsertField(key, additionInputParams[key]);
+            }
+            request.inputParams.InsertFieldObject(additionParams);
+        }
+
         request.send();
     }
 
@@ -47,7 +62,9 @@ QtObject {
             AuthorizationPayload {
                 onFinished: {
                     container.token = m_token;
-                    container.authorizationGqlModel.SetGlobalAccessToken(m_token);
+                    if (container.isTokenGlobal){
+                        container.authorizationGqlModel.SetGlobalAccessToken(m_token);
+                    }
 
                     container.userId = m_userId;
                     container.login = m_username;

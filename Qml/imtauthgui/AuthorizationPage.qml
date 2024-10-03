@@ -55,6 +55,10 @@ Rectangle {
         }
     }
 
+    function onLogin(login, password){
+        Events.sendEvent("Login", {"Login": login, "Password": password})
+    }
+
     Rectangle{
         anchors.fill: parent;
         color: "gray";
@@ -373,7 +377,7 @@ Rectangle {
                     text: qsTr("Login");
 
                     onClicked: {
-                        Events.sendEvent("Login", {"Login": loginTextInput.text, "Password": passwordTextInput.text})
+                        authPageContainer.onLogin(loginTextInput.text, passwordTextInput.text)
                     }
                 }
             }//
