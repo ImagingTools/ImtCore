@@ -136,7 +136,9 @@ class QtObject extends QObject {
             }
         }
 
+        this.blockSignals(false)
         this['Component.destruction']()
+        this.blockSignals(true)
 
         if(this.parent) this.parent.__removeChild(this)
 

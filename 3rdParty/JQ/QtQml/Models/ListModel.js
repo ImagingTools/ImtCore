@@ -125,6 +125,10 @@ class ListModel extends QtObject {
 
     }
 
+    __propogate(){
+        
+    }
+
     __destroy(){
         super.__destroy()
     }

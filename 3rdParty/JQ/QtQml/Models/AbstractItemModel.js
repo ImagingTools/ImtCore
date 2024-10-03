@@ -8,7 +8,13 @@ class AbstractItemModel {
     static create(parent, index, data){
         let properties = []
 
-        let model = Object.assign({}, data ? data : {})
+        let model = new this()
+
+        if(data){
+            for(let key in data){
+                model[key] = data[key]
+            }
+        }
 
         let proxy
         proxy = new Proxy(model, { 
@@ -33,7 +39,7 @@ class AbstractItemModel {
                     property.__update()
                 }
 
-                parent.dataChanged()
+                parent.__propogate()
                 
                 return true
             }
