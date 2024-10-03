@@ -36,43 +36,6 @@ const imtdb::IMigrationController* CCompositeMigrationControllerComp::FindMigrat
 
 istd::CIntRange CCompositeMigrationControllerComp::GetMigrationRange() const
 {
-	return istd::CIntRange();
-}
-
-
-bool CCompositeMigrationControllerComp::DoMigration(const istd::CIntRange& subRange) const
-{
-	if (!m_databaseEngineCompPtr.IsValid()){
-		return false;
-	}
-
-	if (!m_migrationFolderPathCompPtr.IsValid()){
-		return false;
-	}
-
-	QString migrationFolder = m_migrationFolderPathCompPtr->GetPath();
-
-	int min = subRange.GetMinValue();
-	int max = subRange.GetMaxValue();
-
-	if (min < 0){
-		min = 0;
-	}
-
-	if (max < 0){
-		QString errorMessage;
-		int lastMigration = imtdb::GetLastMigration(migrationFolder, errorMessage);
-		if (lastMigration < 0){
-			SendErrorMessage(0, errorMessage, "CCompositeMigrationControllerComp");
-
-			return false;
-		}
-
-		max = lastMigration;
-	}
-
-	istd::CIntRange inputRange(min, max);
-
 	istd::CIntRange availableRange(0, 0);
 	for (int i = 0; i < m_migrationControllersCompPtr.GetCount(); i++){
 		const imtdb::IMigrationController* migrationControllerPtr = m_migrationControllersCompPtr[i];
@@ -82,7 +45,26 @@ bool CCompositeMigrationControllerComp::DoMigration(const istd::CIntRange& subRa
 		}
 	}
 
-	if (!availableRange.Contains(inputRange)){
+	return availableRange;
+}
+
+
+bool CCompositeMigrationControllerComp::DoMigration(int& resultRevision, const istd::CIntRange& subRange) const
+{
+	resultRevision = -1;
+
+	istd::CIntRange composedRange = GetMigrationRange();
+
+	istd::CIntRange inputRange = subRange;
+	if (subRange.GetMinValue() < 0){
+		inputRange.SetMinValue(composedRange.GetMinValue());
+	}
+
+	if (subRange.GetMaxValue() < 0){
+		inputRange.SetMaxValue(composedRange.GetMaxValue());
+	}
+
+	if (!composedRange.Contains(inputRange)){
 		return false;
 	}
 
@@ -117,38 +99,16 @@ bool CCompositeMigrationControllerComp::DoMigration(const istd::CIntRange& subRa
 		}
 	}
 
-	m_databaseEngineCompPtr->BeginTransaction();
-
-	int maxStepTo = -1;
+	int currentRevision = -1;
 	for (const MigrationStep& step : steps){
-		if (!step.migrationControllerPtr->DoMigration(istd::CIntRange(step.from, step.to))){
-			m_databaseEngineCompPtr->CancelTransaction();
+		if (!step.migrationControllerPtr->DoMigration(currentRevision, istd::CIntRange(step.from, step.to))){
 			return false;
 		}
 
-		// Calc max revision
-		if (maxStepTo < step.to){
-			maxStepTo = step.to;
-		}
+		Q_ASSERT(step.to == currentRevision);
 	}
 
-	m_databaseEngineCompPtr->FinishTransaction();
-
-	// Set max revision to database
-	if (maxStepTo > 0){
-		QDir folder(m_migrationFolderPathCompPtr->GetPath());
-
-		QSqlError sqlError;
-		QVariantMap valuesRevision;
-		valuesRevision.insert(":Revision", maxStepTo);
-		m_databaseEngineCompPtr->ExecSqlQueryFromFile(folder.filePath("SetRevision.sql"), valuesRevision, &sqlError);
-		if (sqlError.type() != QSqlError::NoError){
-			SendErrorMessage(0, QString("Execution of SetRevision.sql failed: '%1'").arg(sqlError.text()), "CCompositeMigrationControllerComp");
-			m_databaseEngineCompPtr->CancelTransaction();
-
-			return false;
-		}
-	}
+	resultRevision = currentRevision;
 
 	return true;
 }

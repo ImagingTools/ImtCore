@@ -30,10 +30,13 @@ public:
 protected:
 	// reimplemented (imtdb::IMigrationController)
 	virtual istd::CIntRange GetMigrationRange() const override;
-	virtual bool DoMigration(const istd::CIntRange& subRange = istd::CIntRange()) const override;
+	virtual bool DoMigration(int& resultRevision, const istd::CIntRange& subRange = istd::CIntRange()) const override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+
+private:
+	int GetLastMigration(const QString& migrationFolder, QString& errorMessage) const;
 
 private:
 	I_REF(ifile::IFileNameParam, m_migrationFolderPathCompPtr);

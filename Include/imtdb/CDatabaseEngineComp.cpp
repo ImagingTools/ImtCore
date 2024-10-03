@@ -287,12 +287,37 @@ bool CDatabaseEngineComp::CreateDatabase(int flags) const
 bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 {
 	int databaseVersion = GetDatabaseVersion();
+	bool retVal = false;
 
 	if (m_migrationControllerCompPtr.IsValid()){
-		return m_migrationControllerCompPtr->DoMigration(istd::CIntRange(databaseVersion, -1));
+		BeginTransaction();
+		
+		int newRevision;
+		retVal = m_migrationControllerCompPtr->DoMigration(newRevision, istd::CIntRange(databaseVersion, -1));
+		if (!retVal){
+			CancelTransaction();
+		}
+		else{
+			// Set max revision to database
+			QDir folder(m_migrationFolderPathCompPtr->GetPath());
+
+			QSqlError sqlError;
+			QVariantMap valuesRevision;
+			valuesRevision.insert(":Revision", newRevision);
+			ExecSqlQueryFromFile(folder.filePath("SetRevision.sql"), valuesRevision, &sqlError);
+			if (sqlError.type() != QSqlError::NoError){
+				SendErrorMessage(0, QString("Execution of SetRevision.sql failed: '%1'").arg(sqlError.text()), "CDatabaseEngineComp");
+
+				CancelTransaction();
+
+				return false;
+			}
+
+			FinishTransaction();
+		}
 	}
 
-	return false;
+	return retVal;
 }
 
 

@@ -7,9 +7,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QRegularExpression>
 
-// ImtCore includes
-#include <imtdb/imtdb.h>
-
 
 namespace imtdb
 {
@@ -25,8 +22,10 @@ istd::CIntRange CMigrationControllerComp::GetMigrationRange() const
 }
 
 
-bool CMigrationControllerComp::DoMigration(const istd::CIntRange& subRange) const
+bool CMigrationControllerComp::DoMigration(int& resultRevision, const istd::CIntRange& subRange) const
 {
+	resultRevision = -1;
+
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return false;
 	}
@@ -79,6 +78,8 @@ bool CMigrationControllerComp::DoMigration(const istd::CIntRange& subRange) cons
 			return false;
 		}
 
+		resultRevision = endIndex;
+
 		SendInfoMessage(0, QString("Migration '%1' succesfully migrated").arg(i), "CMigrationControllerComp");
 	}
 
@@ -104,11 +105,46 @@ void CMigrationControllerComp::OnComponentCreated()
 			QString migrationFolder = m_migrationFolderPathCompPtr->GetPath();
 
 			QString errorMessage;
-			max = imtdb::GetLastMigration(migrationFolder, errorMessage);
+			max = GetLastMigration(migrationFolder, errorMessage);
 		}
 	}
 
 	m_range = istd::CIntRange(min, max);
+}
+
+
+// private methods
+
+int CMigrationControllerComp::GetLastMigration(const QString& migrationFolder, QString& errorMessage) const
+{
+	QDir folder(migrationFolder);
+	if (folder.exists()){
+		QStringList nameFilter = {"migration_*.sql"};
+		folder.setNameFilters(nameFilter);
+		int avaliableMigration = -1;
+		if (!folder.entryList().isEmpty()){
+			QStringList files = folder.entryList();
+			for (int index = 0; index < files.size(); index++){
+				QString nameFile = files[index];
+				nameFile.remove("migration_").remove(".sql");
+				QRegularExpression re("\\d*");
+				if (re.match(nameFile).hasMatch()){
+					if (avaliableMigration < nameFile.toInt()){
+						avaliableMigration = nameFile.toInt();
+					}
+				}
+			}
+		}
+
+		return avaliableMigration;
+	}
+	else{
+		errorMessage = QString("Directory containing SQL-migration files doesn't exist: '%1'").arg(migrationFolder);
+
+		return -1;
+	}
+
+	return -1;
 }
 
 
