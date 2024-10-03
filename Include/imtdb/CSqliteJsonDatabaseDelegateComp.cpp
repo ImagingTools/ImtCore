@@ -125,7 +125,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParam
 			}
 
 			if (i > 0){
-				filterQuery += " OR ";
+				filterQuery += " AND ";
 			}
 
 			QString value = textParamPtr->GetText();
