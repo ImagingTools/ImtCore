@@ -25,7 +25,7 @@ public:
 	typedef iproc::CSyncProcessorCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSimpleFileJoinerComp)
-		I_ASSIGN(m_emptyStringsAtEndAttrPtr, "EmptyStringsAtEndAttrPtr", "Defines how many lines should be added at end of a file's part", true, 3);
+		I_ASSIGN(m_emptyStringsAtEndAttrPtr, "EmptyStringsAtEnd", "Defines how many lines should be added at end of a file's part", true, 3);
 		I_ASSIGN(m_filePartSeparatorTextCompPtr, "FilePartSeparatorText", "Defines a text at begin of each file.\n$(FilePath) variable is supported - will be replacet to file name.", false, "FilePartSeparatorText");
 	I_END_COMPONENT
 

@@ -21,6 +21,8 @@
 #include <imtsdl/CGqlCollectionControllerBaseClassGeneratorComp.h>
 #include <imtsdl/CQmldirFilePersistenceComp.h>
 #include <imtsdl/CQtResourceFilePersistenceComp.h>
+#include <imtsdl/CFileCleanupProcessorComp.h>
+#include <imtsdl/CFileFinalizerComp.h>
 
 
 /**
@@ -46,6 +48,8 @@ typedef imtsdl::CGqlHandlerBaseClassGeneratorComp GqlHandlerBaseClassGenerator;
 typedef imtsdl::CGqlCollectionControllerBaseClassGeneratorComp GqlCollectionControllerBaseClassGenerator;
 typedef imtsdl::CQmldirFilePersistenceComp QmldirFilePersistence;
 typedef imtsdl::CQtResourceFilePersistenceComp QtResourceFilePersistence;
+typedef imtsdl::CFileCleanupProcessorComp FileCleanupProcessor;
+typedef imtsdl::CFileFinalizerComp FileFinalizer;
 
 
 } // namespace ImtSdlPck

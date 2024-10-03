@@ -68,8 +68,6 @@ private:
 	void AddImplCodeForRequests(QTextStream& stream, const SdlRequestList& requestList, const QString& className, uint hIndents = 0);
 	void AddImplCodeForRequest(QTextStream& stream, const CSdlRequest& sdlRequest, uint hIndents = 0);
 
-
-
 private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(ISdlTypeListProvider, m_sdlTypeListCompPtr);

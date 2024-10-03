@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5231" Description="ACF"/>
-            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5244" Description="ACF"/>
+            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -119,6 +119,51 @@
         <EmbeddedRegistry Id="CodeGenWorker">
             <Data Description="" Keywords="">
                 <ElementsList>
+                    <Element Id="FileCleanupProcessor" PackageId="ImtSdlPck" ComponentId="FileCleanupProcessor">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="FileFinalizer" PackageId="ImtSdlPck" ComponentId="FileFinalizer">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CleanupProcessor" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="FileCleanupProcessor"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                     <Element Id="QmlCodeGenFramework" PackageId="ImtSdlVoce" ComponentId="QmlCodeGenFramework">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -195,6 +240,7 @@
                                             <Value>SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator</Value>
                                             <Value>SdlGqlCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator</Value>
                                             <Value>SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>
+                                            <Value>FileFinalizer</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
