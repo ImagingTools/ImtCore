@@ -1,5 +1,4 @@
 #include <imtqml/CQmlProcess.h>
-#include <qdebug.h>
 
 
 namespace imtqml
@@ -115,8 +114,6 @@ void CQmlProcess::setExitStatus(QProcess::ExitStatus status)
 
 void CQmlProcess::onStateChanged(QProcess::ProcessState newState)
 {
-	qDebug() << "onStateChanged" << newState;
-
 	setState(newState);
 }
 
@@ -124,7 +121,6 @@ void CQmlProcess::onStateChanged(QProcess::ProcessState newState)
 void CQmlProcess::onReadyReadStandardError()
 {
 	QProcess* processPtr = dynamic_cast<QProcess*>(sender());
-	qDebug() << "onReadyReadStandardError" << processPtr->errorString();
 	if (processPtr != nullptr){
 		emit standardError(processPtr->readAllStandardError());
 	}
@@ -134,8 +130,6 @@ void CQmlProcess::onReadyReadStandardError()
 void CQmlProcess::onReadyReadStandardOutput()
 {
 	QProcess* processPtr = dynamic_cast<QProcess*>(sender());
-	qDebug() << "onReadyReadStandardOutput" << processPtr->errorString();
-
 	if (processPtr != nullptr){
 		emit standardOutput(processPtr->readAllStandardOutput());
 	}
@@ -144,8 +138,6 @@ void CQmlProcess::onReadyReadStandardOutput()
 
 void CQmlProcess::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-	qDebug() << "onFinished" << exitCode << exitStatus;
-
 	setExitCode(exitCode);
 	setExitStatus(exitStatus);
 
