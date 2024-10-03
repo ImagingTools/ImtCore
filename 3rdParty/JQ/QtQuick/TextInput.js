@@ -271,6 +271,11 @@ class TextInput extends Item {
     }
 
     onEchoModeChanged(){
+        if(this.text === ''){
+            this.__impl.innerHTML = '&#8203'
+            return
+        }
+        
         if(this.echoMode === TextInput.Password){
             this.__impl.innerText = this.text.replaceAll(/./g, '*')
         } else {
@@ -279,14 +284,15 @@ class TextInput extends Item {
     }
 
     onTextChanged(){
+        if(this.text === ''){
+            this.__impl.innerHTML = '&#8203'
+            return
+        }
+
         if(this.echoMode === TextInput.Password){
             this.__impl.innerText = this.text.replaceAll(/./g, '*')
         } else {
             this.__impl.innerText = this.text
-        }
-
-        if(this.text === ''){
-            this.__impl.innerHTML = '&#8203'
         }
     }
 
