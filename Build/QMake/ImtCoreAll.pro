@@ -41,6 +41,17 @@ SUBDIRS += SdlCodeGenerator
 SdlCodeGenerator.file = ../../Impl/SdlCodeGeneratorExe/QMake/SdlCodeGeneratorExe.pro
 SdlCodeGenerator.depends = ImtCorePck ImtSdlPck
 
+# SDL modules
+SUBDIRS += imtauthsdl
+imtauthsdl.file = ../../Sdl/imtauth/QMake/imtauthsdl.pro
+
+SUBDIRS += imtlicsdl
+imtlicsdl.file = ../../Sdl/imtlic/QMake/imtlicsdl.pro
+
+SUBDIRS += imtappsdl
+imtappsdl.file = ../../Sdl/imtapp/QMake/imtappsdl.pro
+
+
 SUBDIRS += imtdev
 imtdev.file = ../../Include/imtdev/QMake/imtdev.pro
 
@@ -70,6 +81,7 @@ imtauthdb.file = ../../Include/imtauthdb/QMake/imtauthdb.pro
 
 SUBDIRS += imtauthgql
 imtauthgql.file = ../../Include/imtauthgql/QMake/imtauthgql.pro
+imtauthgql.depends = imtauthsdl
 
 SUBDIRS += imtcrypt
 imtcrypt.file = ../../Include/imtcrypt/QMake/imtcrypt.pro
@@ -112,6 +124,7 @@ imtlic.file = ../../Include/imtlic/QMake/imtlic.pro
 
 SUBDIRS += imtlicgql
 imtlicgql.file = ../../Include/imtlicgql/QMake/imtlicgql.pro
+imtlicgql.depends = imtlic imtlicsdl
 
 SUBDIRS += imtgql
 imtgql.file = ../../Include/imtgql/QMake/imtgql.pro
@@ -182,6 +195,7 @@ imtcolguiqml.file = ../../Qml/imtcolgui/QMake/imtcolguiqml.pro
 
 SUBDIRS += imtauthguiqml
 imtauthguiqml.file = ../../Qml/imtauthgui/QMake/imtauthguiqml.pro
+imtauthguiqml.depends = imtauthsdl
 
 SUBDIRS += imtguigqlqml
 imtguigqlqml.file = ../../Qml/imtguigql/QMake/imtguigqlqml.pro
@@ -191,16 +205,7 @@ imtcontrolsqml.file = ../../Qml/imtcontrols/QMake/imtcontrolsqml.pro
 
 SUBDIRS += imtlicguiqml
 imtlicguiqml.file = ../../Qml/imtlicgui/QMake/imtlicguiqml.pro
-
-# SDL modules
-SUBDIRS += imtauthsdl
-imtauthsdl.file = ../../Sdl/imtauth/QMake/imtauthsdl.pro
-
-SUBDIRS += imtlicsdl
-imtlicsdl.file = ../../Sdl/imtlic/QMake/imtlicsdl.pro
-
-SUBDIRS += imtappsdl
-imtappsdl.file = ../../Sdl/imtapp/QMake/imtappsdl.pro
+imtlicguiqml.depends = imtlicsdl
 
 ######### Component packages
 SUBDIRS += ImtCorePck
