@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Item {
     id: root;
 
-    width: 150;
+    width: 700;
     height: column.height;
 
     property int interval: model.Interval;
@@ -20,94 +20,118 @@ Item {
         var h = Math.floor(seconds % (3600*24) / 3600);
         var m = Math.floor(seconds % 3600 / 60);
 
-        console.log("d", d);
-        console.log("h", h);
-        console.log("m", m);
-
         return {'d': d, 'h': h, 'm': m};
     }
 
     Column {
         id: column;
-
         width: root.width;
+        spacing: Style.size_mainMargin;
 
-        spacing: 7;
+        GroupElementView {
+            id: group;
+            width: parent.width;
 
-        Text {
-            text: "Start Time";
+            ElementView {
+                id: timePicker;
+                name: qsTr("Start Time")
+                controlComp: Component {
+                    TimePicker{
+                        id: timePicker;
 
-            color: Style.textColor;
-            font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
-        }
+                        onTimeChanged: {
+                            if (timePicker.ignoringChanging){
+                                return;
+                            }
 
-        TimePicker{
-            id: timePicker;
+                            let hours = timePicker.hours;
+                            let minutes = timePicker.minutes;
 
-            onTimeChanged: {
-                console.log("onTimeChanged");
-                if (timePicker.ignoringChanging){
-                    return;
-                }
+                            var d = new Date();
 
-                let hours = timePicker.hours;
-                let minutes = timePicker.minutes;
+                            d.setHours(hours);
+                            d.setMinutes(minutes);
 
-                var d = new Date();
+                            var datestring = ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+                                    d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
 
-                d.setHours(hours);
-                d.setMinutes(minutes);
+                            let timeStr = "";
+                            if (model.StartTime !== ""){
+                                timeStr = model.StartTime.split(' ')[1];
+                            }
 
-                var datestring = ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
-                        d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+                            let newTimeStr = datestring.split(' ')[1];
+                            if (timeStr !== newTimeStr){
+                                model.StartTime = datestring;
+                            }
+                        }
 
-                let timeStr = "";
-                if (model.StartTime !== ""){
-                    timeStr = model.StartTime.split(' ')[1];
-                }
+                        property bool ignoringChanging: false;
 
-                let newTimeStr = datestring.split(' ')[1];
-                if (timeStr !== newTimeStr){
-                    console.log("model.StartTime = ", datestring);
-                    model.StartTime = datestring;
-                }
-            }
+                        onAllCompletedChanged: {
+                            if (timePicker.allCompleted){
+                                if (model.StartTime !== ""){
+                                    let dateTime = model.StartTime;
 
-            property bool ignoringChanging: false;
+                                    let data = dateTime.split(' ')
+                                    let date = data[0];
+                                    let time = data[1]
 
-            onAllCompletedChanged: {
-                if (timePicker.allCompleted){
-                    console.log("onAllCompletedChanged");
-                    if (model.StartTime !== ""){
-                        let dateTime = model.StartTime;
+                                    let hours = Number(time.split(':')[0])
+                                    let minutes = Number(time.split(':')[1])
 
-                        let data = dateTime.split(' ')
-                        let date = data[0];
-                        let time = data[1]
+                                    timePicker.ignoringChanging = true;
+                                    timePicker.setHours(hours);
+                                    timePicker.ignoringChanging = false;
 
-                        let hours = Number(time.split(':')[0])
-                        let minutes = Number(time.split(':')[1])
-
-                        console.log("hours");
-                        console.log("minutes");
-
-                        timePicker.ignoringChanging = true;
-                        timePicker.setHours(hours);
-                        timePicker.ignoringChanging = false;
-
-                        timePicker.setMinutes(minutes);
+                                    timePicker.setMinutes(minutes);
+                                }
+                            }
+                        }
                     }
                 }
             }
-        }
 
-        Text {
-            text: "Backup Interval";
+            ComboBoxElementView {
+                id: comboBox;
+                name: qsTr("Backup Interval");
+                onCurrentIndexChanged: {
+                    if (comboBox.currentIndex >= 0){
+                        let id = comboBox.model.getData("Id", comboBox.currentIndex);
+                        let secondsInHour = 3600;
 
-            color: Style.textColor;
-            font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+                        let newInterval = -1;
+                        if (id === "Day"){
+                            newInterval = 24 * secondsInHour;
+                        }
+                        else if (id === "Week"){
+                            newInterval = 24 * secondsInHour * 7;
+                        }
+                        else if (id === "Month"){
+                            newInterval = 24 * secondsInHour * 30;
+                        }
+
+                        if (newInterval !== -1 && root.itemData.Interval !== newInterval){
+                            root.itemData.Interval = newInterval;
+                        }
+                    }
+                }
+
+                onModelChanged: {
+                    let seconds = Number(root.itemData.Interval);
+                    var d = Math.floor(seconds / (3600*24));
+
+                    if (d === 1){
+                        comboBox.currentIndex = 0;
+                    }
+                    else if (d === 7){
+                        comboBox.currentIndex = 1;
+                    }
+                    else if (d === 30){
+                        comboBox.currentIndex = 2;
+                    }
+                }
+            }
         }
 
         TreeItemModel{
@@ -117,72 +141,17 @@ Item {
 
                 let index = comboBoxModel.insertNewItem();
                 comboBoxModel.setData("Id", "Day", index)
-                comboBoxModel.setData("Name", "Day", index)
+                comboBoxModel.setData("Name", qsTr("Day"), index)
 
                 index = comboBoxModel.insertNewItem();
                 comboBoxModel.setData("Id", "Week", index)
-                comboBoxModel.setData("Name", "Week", index)
+                comboBoxModel.setData("Name", qsTr("Week"), index)
 
                 index = comboBoxModel.insertNewItem();
                 comboBoxModel.setData("Id", "Month", index)
-                comboBoxModel.setData("Name", "Month", index)
+                comboBoxModel.setData("Name", qsTr("Month"), index)
 
                 comboBox.model = comboBoxModel;
-            }
-        }
-
-        ComboBox {
-            id: comboBox;
-
-            width: parent.width;
-            height: 25;
-
-            radius: 3;
-
-            textCentered: false;
-
-            onCurrentIndexChanged: {
-                console.log("onCurrentIndexChanged", root.itemData.Interval);
-                if (comboBox.currentIndex >= 0){
-                    let id = comboBox.model.getData("Id", comboBox.currentIndex);
-                    let secondsInHour = 3600;
-
-                    let newInterval = -1;
-                    if (id === "Day"){
-                        newInterval = 24 * secondsInHour;
-                    }
-                    else if (id === "Week"){
-                        newInterval = 24 * secondsInHour * 7;
-                    }
-                    else if (id === "Month"){
-                        newInterval = 24 * secondsInHour * 30;
-                    }
-
-                    console.log("itemData.Interval", root.itemData.Interval);
-                    console.log("newInterval", newInterval);
-
-                    if (newInterval !== -1 && root.itemData.Interval !== newInterval){
-                        console.log("itemData.Interval = ", newInterval);
-                        root.itemData.Interval = newInterval;
-                    }
-                }
-            }
-
-            onModelChanged: {
-                let seconds = Number(root.itemData.Interval);
-                console.log("seconds", seconds);
-                var d = Math.floor(seconds / (3600*24));
-                console.log("d", d);
-
-                if (d === 1){
-                    comboBox.currentIndex = 0;
-                }
-                else if (d === 7){
-                    comboBox.currentIndex = 1;
-                }
-                else if (d === 30){
-                    comboBox.currentIndex = 2;
-                }
             }
         }
     }

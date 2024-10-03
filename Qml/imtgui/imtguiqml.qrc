@@ -13,7 +13,7 @@
         <file alias="imtgui/Application/SchedulerParams.qml">Application/SchedulerParams.qml</file>
         <file alias="imtgui/Application/ShortcutManager.qml">Application/ShortcutManager.qml</file>
         <file alias="imtgui/Application/ThumbnailDecorator.qml">Application/ThumbnailDecorator.qml</file>
-	<file alias="imtgui/Application/Application.qml">Application/Application.qml</file>
+        <file alias="imtgui/Application/Application.qml">Application/Application.qml</file>
         <file alias="imtgui/Panels/ButtonPanel.qml">Panels/ButtonPanel.qml</file>
         <file alias="imtgui/Panels/CommandsDecorator.qml">Panels/CommandsDecorator.qml</file>
         <file alias="imtgui/Panels/FilterMenu.qml">Panels/FilterMenu.qml</file>
@@ -35,20 +35,13 @@
         <file alias="imtgui/Panels/TopRightPanel.qml">Panels/TopRightPanel.qml</file>
         <file alias="imtgui/Panels/TopRightPanelDecorator.qml">Panels/TopRightPanelDecorator.qml</file>
         <file alias="imtgui/Panels/CommandsPanel.qml">Panels/CommandsPanel.qml</file>
-        <file alias="imtgui/Settings/DatabaseInput.qml">Settings/DatabaseInput.qml</file>
         <file alias="imtgui/Settings/PageAboutProvider.qml">Settings/PageAboutProvider.qml</file>
         <file alias="imtgui/Settings/Preference.qml">Settings/Preference.qml</file>
         <file alias="imtgui/Settings/PreferenceButton.qml">Settings/PreferenceButton.qml</file>
         <file alias="imtgui/Settings/PreferenceDialog.qml">Settings/PreferenceDialog.qml</file>
         <file alias="imtgui/Settings/ServerLogProvider.qml">Settings/ServerLogProvider.qml</file>
-        <file alias="imtgui/Settings/SettingsComboBox.qml">Settings/SettingsComboBox.qml</file>
-        <file alias="imtgui/Settings/SettingsIntegerInput.qml">Settings/SettingsIntegerInput.qml</file>
         <file alias="imtgui/Settings/SettingsObserver.qml">Settings/SettingsObserver.qml</file>
         <file alias="imtgui/Settings/SettingsProvider.qml">Settings/SettingsProvider.qml</file>
-        <file alias="imtgui/Settings/SettingsTextInput.qml">Settings/SettingsTextInput.qml</file>
-        <file alias="imtgui/Settings/SettingsTextLabel.qml">Settings/SettingsTextLabel.qml</file>
-        <file alias="imtgui/Settings/SettingsTimePicker.qml">Settings/SettingsTimePicker.qml</file>
-        <file alias="imtgui/Settings/UrlParamEditor.qml">Settings/UrlParamEditor.qml</file>
         <file alias="imtgui/View/MultiPageView.qml">View/MultiPageView.qml</file>
         <file alias="imtgui/View/TabView.qml">View/TabView.qml</file>
         <file alias="imtgui/View/Pagination.qml">View/Pagination.qml</file>
@@ -77,8 +70,19 @@
         <file alias="imtgui/View/SearchPage.qml">View/SearchPage.qml</file>
         <file alias="imtgui/View/CommandsView.qml">View/CommandsView.qml</file>
         <file alias="imtgui/View/PageContainer.qml">View/PageContainer.qml</file>
-	<file alias="imtgui/View/CheckBoxElementView.qml">View/CheckBoxElementView.qml</file>
-	<file alias="imtgui/View/Separator.qml">View/Separator.qml</file>
+        <file alias="imtgui/View/CheckBoxElementView.qml">View/CheckBoxElementView.qml</file>
+        <file alias="imtgui/View/Separator.qml">View/Separator.qml</file>
+        <file alias="imtgui/View/ButtonElementView.qml">View/ButtonElementView.qml</file>
+        <file alias="imtgui/View/FilePickerElementView.qml">View/FilePickerElementView.qml</file>
+        <file alias="imtgui/Params/ComposedParamsGui.qml">Params/ComposedParamsGui.qml</file>
+        <file alias="imtgui/Params/TextParamEditor.qml">Params/TextParamEditor.qml</file>
+        <file alias="imtgui/Params/UrlParamEditor.qml">Params/UrlParamEditor.qml</file>
+        <file alias="imtgui/Params/FilePickerParam.qml">Params/FilePickerParam.qml</file>
+        <file alias="imtgui/Params/PasswordParamEditor.qml">Params/PasswordParamEditor.qml</file>
+        <file alias="imtgui/Params/DatabaseParams.qml">Params/DatabaseParams.qml</file>
+	<file alias="imtgui/Params/DatabaseAccessSettingsEditor.qml">Params/DatabaseAccessSettingsEditor.qml</file>
+	<file alias="imtgui/Params/SelectionParamEditor.qml">Params/SelectionParamEditor.qml</file>
+	<file alias="imtgui/Params/TextParamView.qml">Params/TextParamView.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

@@ -5,51 +5,34 @@ import imtgui 1.0
 import imtcontrols 1.0
 import Qt.labs.platform 1.1
 
-Item {
+ButtonElementView {
     id: root;
+    name: qsTr("Server Log");
+    text: qsTr("Download");
 
-    width: 100;
-    height: 30;
-
-    Button {
-        id: button;
-
-        width: root.width;
-        height: root.height;
-
-        text: qsTr("Download");
-
-        onClicked: {
-            fileDialogSave.open();
-        }
+    onClicked: {
+        fileDialogSave.open();
     }
 
     RemoteFileController {
         id: remoteFileController;
-
         prefix: "/files/";
     }
 
     FileDialog {
         id: fileDialogSave;
-
         title: qsTr("Save file");
-
         fileMode: FileDialog.SaveFile;
-
         currentFile: "file:///Log.txt";
-
         nameFilters: ["Text files (*.txt)", "All files (*)"];
-
         onAccepted: {
             var pathDir = fileDialogSave.folder.toString();
             remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
             var fileName = fileDialogSave.file.toString().replace(pathDir + "/", '');
             var id = "GetServerLog";
-
             if (fileName == "") fileName = "ServerLog.txt";
-
             remoteFileController.GetFile(id, fileName);
         }
     }
 }
+

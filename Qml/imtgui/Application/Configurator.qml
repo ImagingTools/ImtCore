@@ -5,13 +5,9 @@ import imtcontrols 1.0
 
 Rectangle {
     id: window;
-
     anchors.fill: parent;
-
-    color: Style.backgroundColor;
-
+    color: Style.backgroundColor2;
     property var localSettings;
-
     signal settingsUpdate();
 
     onLocalSettingsChanged: {
@@ -38,7 +34,6 @@ Rectangle {
 
     MouseArea{
         anchors.fill: parent;
-
         onClicked: {
             preferenceDialog.visible = true;
         }
@@ -62,8 +57,8 @@ Rectangle {
 
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
-        anchors.rightMargin: 20;
-        anchors.bottomMargin: 10;
+        anchors.rightMargin: Style.size_mainMargin;
+        anchors.bottomMargin: Style.size_mainMargin;
 
         Component.onCompleted: {
             buttons.addButton({"Id":Enums.apply, "Name": qsTr("Apply"), "Enabled": false});
@@ -109,15 +104,12 @@ Rectangle {
 
     DialogManagerView {
         anchors.fill: parent;
-
         z: 30;
     }
 
     Loading {
         id: loading;
-
         anchors.fill: parent;
-
         visible: false;
     }
 }

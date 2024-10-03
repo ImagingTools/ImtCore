@@ -11,10 +11,6 @@ namespace imtqml
 {
 
 
-/**
-	Universal data controller for UI representations
-	\ingroup LicenseManagement
-*/
 class CRemoteFileController: public QObject
 {
 	Q_OBJECT

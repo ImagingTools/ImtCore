@@ -34,47 +34,6 @@ QtObject {
             root.result(false, "");
         }
     }
-    // property GqlModel gqlGetModel: GqlModel {
-    //     function getModelData(modelId, externInputParams){
-    //         var query = Gql.GqlRequest("query", "UserItem");
-
-    //         var queryFields = Gql.GqlObject("item");
-    //         queryFields.InsertField("Id");
-    //         query.AddField(queryFields);
-
-    //         var inputParams = Gql.GqlObject("input");
-    //         inputParams.InsertField("Id", modelId);
-    //         if (externInputParams){
-    //             let keys = Object.keys(externInputParams)
-    //             for (let key of keys){
-    //                 inputParams.InsertField(key, externInputParams[key]);
-    //             }
-    //         }
-    //         query.AddParam(inputParams);
-
-    //         var gqlData = query.GetQuery();
-
-    //         this.setGqlQuery(gqlData);
-    //     }
-
-    //     onStateChanged: {
-    //         if (this.state === "Ready"){
-    //             var dataModelLocal;
-
-    //             if (root.gqlGetModel.containsKey("errors")){
-    //                 dataModelLocal = root.gqlGetModel.getData("errors");
-
-    //                 root.result(false, "");
-
-    //                 return;
-    //             }
-
-    //             if (root.gqlGetModel.containsKey("data")){
-    //                 root.result(true, "");
-    //             }
-    //         }
-    //     }
-    // }//GqlModel itemModel
 }
 
 

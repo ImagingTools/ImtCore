@@ -36,20 +36,13 @@ TopRightPanel 1.0 Panels/TopRightPanel.qml
 TopRightPanelDecorator 1.0 Panels/TopRightPanelDecorator.qml
 CommandsPanel 1.0 Panels/CommandsPanel.qml
 
-DatabaseInput 1.0 Settings/DatabaseInput.qml
 PageAboutProvider 1.0 Settings/PageAboutProvider.qml
 Preference 1.0 Settings/Preference.qml
 PreferenceDialog 1.0 Settings/PreferenceDialog.qml
 PreferenceButton 1.0 Settings/PreferenceButton.qml
 ServerLogProvider 1.0 Settings/ServerLogProvider.qml
-SettingsComboBox 1.0 Settings/SettingsComboBox.qml
-SettingsIntegerInput 1.0 Settings/SettingsIntegerInput.qml
 SettingsObserver 1.0 Settings/SettingsObserver.qml
 SettingsProvider 1.0 Settings/SettingsProvider.qml
-SettingsTextInput 1.0 Settings/SettingsTextInput.qml
-SettingsTextLabel 1.0 Settings/SettingsTextLabel.qml
-SettingsTimePicker 1.0 Settings/SettingsTimePicker.qml
-UrlParamEditor 1.0 Settings/UrlParamEditor.qml
 
 MultiPageView 1.0 View/MultiPageView.qml
 TabView 1.0 View/TabView.qml
@@ -81,3 +74,15 @@ CommandsView 1.0 View/CommandsView.qml
 PageContainer 1.0 View/PageContainer.qml
 CheckBoxElementView 1.0 View/CheckBoxElementView.qml
 Separator 1.0 View/Separator.qml
+ButtonElementView 1.0 View/ButtonElementView.qml
+FilePickerElementView 1.0 View/FilePickerElementView.qml
+
+TextParamEditor 1.0 Params/TextParamEditor.qml
+UrlParamEditor 1.0 Params/UrlParamEditor.qml
+FilePickerParam 1.0 Params/FilePickerParam.qml
+ComposedParamsGui 1.0 Params/ComposedParamsGui.qml
+PasswordParamEditor 1.0 Params/PasswordParamEditor.qml
+DatabaseParams 1.0 Params/DatabaseParams.qml
+DatabaseAccessSettingsEditor 1.0 Params/DatabaseAccessSettingsEditor.qml
+SelectionParamEditor 1.0 Params/SelectionParamEditor.qml
+TextParamView 1.0 Params/TextParamView.qml

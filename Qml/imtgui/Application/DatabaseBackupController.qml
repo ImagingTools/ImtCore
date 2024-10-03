@@ -12,45 +12,45 @@ Item {
 
     Column {
         id: content;
-
         width: parent.width;
-
         spacing: Style.size_mainMargin;
 
-        BaseText {
-            text: qsTr("Before performing the operation, check the connection to the server");
+        GroupHeaderView {
+            id: headerView;
+            width: parent.width;
+            title: qsTr("Backup Information");
+            groupView: group;
         }
 
-        Button {
-            id: backupButton;
+        GroupElementView {
+            id: group;
+            width: parent.width;
 
-            width: 70;
-            height: 25;
-
-            text: qsTr("Backup");
-
-            onClicked: {
-                fileDialogSave.open();
+            ButtonElementView {
+                id: backupButton;
+                width: parent.width;
+                name: qsTr("Backup data");
+                description: qsTr("Before performing the operation, check the connection to the server");
+                text: qsTr("Backup");
+                onClicked: {
+                    fileDialogSave.open();
+                }
             }
-        }
 
-        Button {
-            id: restoreButton;
-
-            width: 70;
-            height: 25;
-
-            text: qsTr("Restore");
-
-            onClicked: {
-                fileDialog.open();
+            ButtonElementView {
+                width: parent.width;
+                name: qsTr("Restore data from backup");
+                text: qsTr("Restore");
+                description: backupButton.description;
+                onClicked: {
+                    fileDialog.open();
+                }
             }
         }
     }
 
     RemoteFileController {
         id: remoteFileController;
-
         prefix: "/files/";
 
         onFileUploaded: {
@@ -83,11 +83,8 @@ Item {
 
     FileDialog {
         id: fileDialog;
-
         title: qsTr("Select backup file");
-
         fileMode: FileDialog.OpenFile;
-
         nameFilters: ["All files (*)"];
 
         onAccepted: {

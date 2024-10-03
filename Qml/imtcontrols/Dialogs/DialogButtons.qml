@@ -45,27 +45,20 @@ Item {
 
     Row {
         id: rowButtons;
-
         height: buttonsDialogContainer.height;
-
         spacing: Style.size_mainMargin;
 
         Repeater {
             id: buttonsRepeater;
-
             model: ListModel {
             }
 
             delegate:
-
                 Button{
                 id: buttonContainer;
-
                 enabled: model.Enabled;
                 focus: model.Active !==undefined ? model.Active: false;
-
                 text: model.Name;
-
                 onClicked: {
                     buttonsDialogContainer.buttonClicked(model.Id);
                 }

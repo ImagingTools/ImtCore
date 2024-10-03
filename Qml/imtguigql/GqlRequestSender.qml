@@ -61,7 +61,7 @@ GqlModel {
 
     function send(){
         if (gqlCommandId == "" || gqlCommandId === undefined || gqlCommandId == null ){
-            console.error("Unable to send request. Error: GraphQL command-ID is invalid.");
+            console.error("Unable to send request. Error: GraphQL command-ID is invalid");
             return;
         }
 

@@ -102,10 +102,10 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DesignPathToQml" Type="Id" ExportId="">
-					    <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsComboBox.qml"/>
+					    <Data IsEnabled="true" Value="qrc:/qml/imtgui/Params/SelectionParamEditor.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LanguagePathToQml" Type="Id" ExportId="">
-					    <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsComboBox.qml"/>
+					    <Data IsEnabled="true" Value="qrc:/qml/imtgui/Params/SelectionParamEditor.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>

@@ -12,6 +12,7 @@ Item {
     property string value: model.Value;
 
     onValueChanged: {
+        console.log("onValueChanged", root.value);
         if (root.value !== timePicker.toStr()){
             timePicker.fromString(root.value);
         }
@@ -24,6 +25,8 @@ Item {
         height: 20;
 
         onTimeChanged: {
+            console.log("TimePicker onTimeChanged", timePicker.toStr());
+
             model.Value = timePicker.toStr();
         }
     }

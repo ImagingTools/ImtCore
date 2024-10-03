@@ -44,14 +44,14 @@ Rectangle {
 
     function clearModels(){
         root.settingsModel.clear();
-        bodyPanelRepeater.model = 0;
+        bodyPanel.model = 0;
     }
 
     function updateGui(){
         mainPanel.selectedIndex = 0;
 
         let parametersModel = root.settingsModel.getData("Parameters", 0)
-        bodyPanelRepeater.model = parametersModel
+        bodyPanel.model = parametersModel
     }
 
     function getPageIndexByPageId(pageId){
@@ -105,12 +105,10 @@ Rectangle {
 
                 delegate: ItemDelegate {
                     text: model.Name;
-
                     highlighted: mainPanelRepeater.currentIndex == model.index;
-
                     onClicked: {
                         mainPanelRepeater.currentIndex = model.index;
-                        bodyPanelRepeater.model = model.Parameters;
+                        bodyPanel.model = model.Parameters;
                     }
                 }
             }
@@ -121,102 +119,32 @@ Rectangle {
 
     CustomScrollbar {
         id: scrollbar;
-
         z: 100;
-
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
         anchors.top: parent.top;
-
-        secondSize: 10;
+        secondSize: Style.size_mainMargin;
         targetItem: flickable;
     }
 
     Flickable {
         id: flickable;
-
         anchors.top: parent.top;
-        anchors.topMargin: Style.size_mainMargin;
+        anchors.topMargin: Style.size_largeMargin;
         anchors.left: mainPanelBackground.right;
-        anchors.leftMargin: Style.size_mainMargin;
+        anchors.leftMargin: Style.size_largeMargin;
         anchors.right: parent.right;
-        anchors.rightMargin: Style.size_mainMargin;
+        anchors.rightMargin: Style.size_largeMargin;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: Style.size_mainMargin;
-
+        anchors.bottomMargin: Style.size_largeMargin;
         clip: true;
-
         contentWidth: width;
         contentHeight: bodyPanel.height;
-
         boundsBehavior: Flickable.StopAtBounds;
 
-        Column {
+        ComposedParamsGui {
             id: bodyPanel;
-
             width: parent.width;
-
-            spacing: 15;
-
-            Repeater {
-                id: bodyPanelRepeater;
-
-                delegate: Item {
-                    width: bodyPanel.width;
-
-                    height: titleItem.height + rectSeparator.height + loader.height + 20;
-
-                    visible: loader.item;
-
-                    Text {
-                        id: titleItem;
-
-                        text: model.Name;
-
-                        visible: loader.item;
-
-                        font.pixelSize: root.fontSize;
-                        color: root.fontColor;
-                        font.family: Style.fontFamilyBold;
-                    }
-
-                    Rectangle {
-                        id: rectSeparator;
-
-                        anchors.top: titleItem.bottom;
-                        anchors.topMargin: Style.size_smallMargin;
-
-                        width: parent.width;
-                        height: 1;
-
-                        visible: loader.item;
-
-                        color: Style.buttonBorderColor;
-                    }
-
-                    Loader {
-                        id: loader;
-
-                        anchors.top: rectSeparator.bottom;
-                        anchors.topMargin: Style.size_mainMargin;
-
-                        Component.onCompleted: {
-                            if (model.Source && model.Source !== ""){
-                                loader.source = model.Source;
-                            }
-                        }
-
-                        onLoaded: {
-                            if (loader.item.parameters !== undefined){
-                                loader.item.parameters = model.Parameters;
-                            }
-                            if (loader.item.rootItem !== undefined){
-                                loader.item.rootItem = root;
-                            }
-                        }
-                    }
-                }
-            }
-        }//Column
+        }
     }//Flickable
 }
