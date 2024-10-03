@@ -112,7 +112,7 @@ class ListView extends Flickable {
     onModelChanged(){
         this.__clear()
         
-        if(this.__model && typeof this.__model === 'object'){
+        if(this.__model && typeof this.__model === 'object' && !this.__model.__destroyed){
             this.__model.__removeViewListener(this)
         }
 
@@ -134,7 +134,6 @@ class ListView extends Flickable {
         this.__items = []
 
         for(let r of removed){
-            this.itemRemoved(r)
             if(r) r.__destroy()
         }
     }
@@ -281,7 +280,7 @@ class ListView extends Flickable {
     }
 
     __destroy(){
-        if(this.__model && typeof this.__model === 'object'){
+        if(this.__model && typeof this.__model === 'object' && !this.__model.__destroyed){
             this.__model.__removeViewListener(this)
         }
         this.__clear()

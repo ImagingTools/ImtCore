@@ -41,7 +41,7 @@ class Repeater extends Item {
     onModelChanged(){
         this.__clear()
         
-        if(this.__model && typeof this.__model === 'object'){
+        if(this.__model && typeof this.__model === 'object' && !this.__model.__destroyed){
             this.__model.__removeViewListener(this)
         }
 
@@ -157,7 +157,7 @@ class Repeater extends Item {
     }
 
     __destroy(){
-        if(this.__model && typeof this.__model === 'object'){
+        if(this.__model && typeof this.__model === 'object' && !this.__model.__destroyed){
             this.__model.__removeViewListener(this)
         }
         this.__clear()

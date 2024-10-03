@@ -1,8 +1,8 @@
 const QQmlComponent = require("./QQmlComponent");
 
 class Component extends QQmlComponent {
-    static create(parent, component, ...args){
-        let proxy = super.create(parent, component, ...args)
+    static create(parent, component){
+        let proxy = super.create(parent)
         let self = proxy.__self 
 
         self.component = component

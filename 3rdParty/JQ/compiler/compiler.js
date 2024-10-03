@@ -1083,7 +1083,22 @@ class Instruction {
         }
 
         code.push('static create(parent, model, properties=[], isRoot=true, ...args){')
-        code.push('let __self = super.create(parent, model, properties, false, ...args)')
+        if(this.extends === 'Component'){
+            if(this.children.length < 1) {
+                console.log(`${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: Cannot create empty component specification`)
+                throw -1
+            } 
+            if(this.children.length > 1) {
+                console.log(`${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: Invalid component body specification`)
+                throw -1
+            }
+
+            code.push(`let __self = super.create(parent, ${this.children[0].toCode(false, true, level+1)})`)
+        } else {
+            code.push('let __self = super.create(parent, model, properties, false, ...args)')
+        }
+
+        
 
         if(isRoot) {
             code.push(`let __rootContext${level}=JQContext.create()`) // context !!!
@@ -1134,7 +1149,6 @@ class Instruction {
                 if(stat.isCompute){
                     if(assignProperty.type === 'alias'){
                         code.push(`__self.__getObject('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
-                        // code.push(`__updateList.push(__self.__getObject('${assignProperty.name}'))`)
                     } else {
                         code.push(`__self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},true)`)
                     }
@@ -1147,7 +1161,7 @@ class Instruction {
         }
         for(let i = 0; i < this.children.length; i++){
             if(this.extends === 'Component'){
-                code.push(`__self.component=` + this.children[i].toCode(false, true, level+1))
+                continue
             } else {
                 code.push(`let child${i}=(` + this.children[i].toCode(false,false,level) + ').create(__self,null,properties,false)')
             }
@@ -1169,7 +1183,6 @@ class Instruction {
             } else {
                 signalName = names[0] + '.' + names[1][2].toLowerCase() + names[1].slice(3)
             }
-            // signalName = connectedSignal.slotName[2].toLowerCase() + connectedSignal.slotName.slice(3)
         
             let args = this.getSignalArgs(signalName)
 
@@ -1189,7 +1202,6 @@ class Instruction {
 
         if(isRoot || isComponent) {
             code.push(`if(isRoot) {while(properties.length){properties.shift().__update()};__self.__complete()}`) // property update !!!
-            // code.push(`if(!__self.parent || __self.parent.__completed) __self.__complete()`)
         }
 
         

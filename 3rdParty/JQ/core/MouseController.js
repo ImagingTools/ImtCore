@@ -20,7 +20,9 @@ class QmlMouseEvent {
     pressed = false
     startX = 0
     startY = 0
-    wasDrag = false
+
+    wasDragX = false
+    wasDragY = false
 
     constructor(options = {}){
         for(let key in options){
@@ -146,8 +148,9 @@ module.exports = {
 
             // if(!event.target) JQApplication.setCursor(QtEnums.ArrowCursor)
 
-            if(event.pressed && (Math.abs(event.startX - event.originX) > 15 || Math.abs(event.startY - event.originY) > 15)) {
-                event.wasDrag = true
+            if(event.pressed){
+                if(Math.abs(event.startX - event.originX) > 15) event.wasDragX = true
+                if(Math.abs(event.startY - event.originY) > 15) event.wasDragY = true
             }
 
             let i = 0

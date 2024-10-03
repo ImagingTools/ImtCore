@@ -159,14 +159,15 @@ class Flickable extends Item {
     }
 
     __onMouseMove(mouse){
-        if(mouse.wasDrag) {
+        if((this.contentWidth > 0 && this.contentWidth > this.width && mouse.wasDragX) || this.contentHeight > 0 && this.contentHeight > this.height && mouse.wasDragY){
             if(mouse.target) {
-                if(mouse.target instanceof MouseArea && mouse.target.preventStealing === false) mouse.target = this
-                mouse.target.__onMouseCanceled()
+                if(mouse.target instanceof MouseArea && mouse.target.preventStealing === false) {
+                    mouse.target.__onMouseCanceled()
+                    mouse.target = this
+                }
             } else {
                 mouse.target = this
             }
-            
         }
 
         if(mouse.target === this){
