@@ -96,6 +96,8 @@ public:
 		Q_INIT_RESOURCE(imtauthAuthorizationSdl);
 
 		Q_INIT_RESOURCE(imtappApplicationSdl);
+
+		Q_INIT_RESOURCE(imtdb);
 	}
 
 	static void InitStyle()

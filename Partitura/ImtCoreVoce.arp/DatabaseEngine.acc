@@ -13,9 +13,6 @@
         <Element Id="CompositeMigrationController" PackageId="ImtDatabasePck" ComponentId="CompositeMigrationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PgSqlDatabaseEngine"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -25,9 +22,6 @@
                                 <Value>MigrationController</Value>
                             </Values>
                         </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RelativeFileNameParam"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -109,9 +103,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="MigrationController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CompositeMigrationController"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RelativeFileNameParam"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Pasword" Type="Id" ExportId="Password">
                         <Data IsEnabled="true" Value="root"/>
