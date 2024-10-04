@@ -1,3 +1,4 @@
+include($(ACFDIR)/Config/QMake/GeneralConfig.pri)
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 include($(IACFDIR)/Config/QMake/Iacf.pri)
 
@@ -10,6 +11,7 @@ win32{
 }
 
 IMTCOREDIRBUILD = $$(IMTCOREDIR_BUILD)
+
 !isEmpty(IMTCOREDIRBUILD){
 	INCLUDEPATH += $$(IMTCOREDIRBUILD)/$$AUXINCLUDEDIR
 	LIBS += -L$$(IMTCOREDIRBUILD)/Lib/$$COMPILER_DIR
