@@ -126,7 +126,7 @@ void CRemoteStandardLoginGuiComp::OnGuiCreated()
 		StackedWidget->setCurrentIndex(3);
 	}
 	else{
-		StackedWidget->setCurrentIndex(0);
+		OnConnectionStatusUpdate(istd::IChangeable::GetAnyChange(), nullptr);
 	}
 
 }
@@ -274,16 +274,17 @@ void CRemoteStandardLoginGuiComp::OnLoginUpdate(
 
 void CRemoteStandardLoginGuiComp::OnConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtauth::ILoginStatusProvider* objectPtr)
 {
-	int loginStatus = objectPtr->GetLoginStatus();
+	int loginStatus = (objectPtr != nullptr) ? objectPtr->GetLoginStatus() : imtauth::ILoginStatusProvider::LSF_LOGGED_IN;
+
 	if (loginStatus == imtauth::ILoginStatusProvider::LSF_CACHED || loginStatus == 0){
 		// Disconnected
-		NoConnection->setText("No connection to the server");
+		NoConnection->setText(tr("No connection to the server"));
 		StackedWidget->setCurrentIndex(2);
 	}
 	else if (loginStatus == imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
 		if (m_pumaLoginStatusProviderCompPtr.IsValid()){
-			int loginStatus = m_pumaLoginStatusProviderCompPtr->GetLoginStatus();
-			if (loginStatus != imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
+			int pumaLoginStatus = m_pumaLoginStatusProviderCompPtr->GetLoginStatus();
+			if (pumaLoginStatus != imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
 				OnPumaConnectionStatusUpdate(changeSet, m_pumaLoginStatusProviderCompPtr.GetPtr());
 				return;
 			}
@@ -308,7 +309,7 @@ void CRemoteStandardLoginGuiComp::OnPumaConnectionStatusUpdate(const istd::IChan
 	int loginStatus = objectPtr->GetLoginStatus();
 	if (loginStatus == imtauth::ILoginStatusProvider::LSF_CACHED || loginStatus == 0){
 		// Disconnected
-		NoConnection->setText("No connection to the Puma server");
+		NoConnection->setText(tr("No connection to the authorization server"));
 		StackedWidget->setCurrentIndex(2);
 	}
 	else if (loginStatus == imtauth::ILoginStatusProvider::LSF_LOGGED_IN){

@@ -41,7 +41,7 @@ public:
 		I_ASSIGN(m_superuserProviderCompPtr, "SuperuserProvider", "Superuser provider", false, "SuperuserProvider");
 		I_ASSIGN(m_settingsProviderCompPtr, "SettingsProvider", "Application settings provider", false, "SettingsProvider");
 		I_ASSIGN(m_superuserControllerCompPtr, "SuperuserController", "Superuser controller", false, "SuperuserController");
-		I_ASSIGN(m_loginStatusProviderCompPtr, "ConnectionStatusProvider", "Component for providing server connection status", true, "ConnectionStatusProvider");
+		I_ASSIGN(m_loginStatusProviderCompPtr, "ConnectionStatusProvider", "Component for providing server connection status", false, "ConnectionStatusProvider");
 		I_ASSIGN(m_pumaLoginStatusProviderCompPtr, "PumaConnectionStatusProvider", "Component for providing puma server connection status", true, "PumaConnectionStatusProvider");
 	I_END_COMPONENT;
 

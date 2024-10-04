@@ -18,6 +18,7 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "UserAdd");
 	imtgql::CGqlObject inputObject;
 	inputObject.InsertField("Id", "su");
+	inputObject.InsertField("ProductId", qPrintable(*m_productIdAttrPtr));
 
 	QByteArray json = QString("{\"Username\": \"%1\", \"UserId\": \"%2\", \"Password\": \"%3\", \"Name\": \"%4\"}")
 			.arg(qPrintable("su"))
@@ -35,8 +36,6 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 	imtbase::CTreeItemModel responseModel;
 
 	bool retVal = SendModelRequest(request, responseModel);
-	if (!retVal){
-	}
 
 	return retVal;
 }
