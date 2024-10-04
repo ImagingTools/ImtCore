@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5217" Description="ACF"/>
-            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>ImagingTools application framework</Description>
@@ -55,6 +55,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="FullScreenCommand" PackageId="ImtGuiPck" ComponentId="FullScreenCommand">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ActionFullScreenOffIcon" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/Icons/Collapse"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ActionFullScreenOnIcon" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/Icons/Expand"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GuiObject" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MainGui"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MenuName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Full Screen"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="GuiApplication" PackageId="QtGuiPck" ComponentId="GuiApplication">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -78,6 +96,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="MainGui" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MainGui"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SplashScreen" Type="Reference" ExportId="SplashScreen">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SplashTime" Type="Real" ExportId="SplashTime">
                         <Data IsEnabled="false"/>
@@ -131,9 +152,6 @@
                         <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MainWindowComponents" Type="Reference[]" ExportId="MainWindowComponents">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SettingsDialog" Type="Reference" ExportId="SettingsDialog">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">
@@ -205,8 +223,8 @@
                     <AttributeInfo Id="ExclusiveMessageSources" Type="String[]" ExportId="ExclusiveMessageSources">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="FullscreenCommand" Type="Reference" ExportId="FullscreenCommand">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="FullscreenCommand" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="FullScreenCommand"/>
                     </AttributeInfo>
                     <AttributeInfo Id="HideHomeButton" Type="Boolean" ExportId="HideHomeButton">
                         <Data IsEnabled="false"/>
@@ -230,7 +248,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LoginGui" Type="Reference" ExportId="LoginGui">
-                        <Data IsEnabled="true" Value="StandardLoginGui"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MaximumFrameHeight" Type="Integer" ExportId="MaximumFrameHeight">
                         <Data IsEnabled="false"/>
@@ -346,24 +364,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="StandardLoginGui" PackageId="ImtAuthGuiPck" ComponentId="StandardLoginGui">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Login" Type="Reference" ExportId="Login">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SettingsProvider"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SuperuserController" Type="Reference" ExportId="SuperuserController">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="SuperuserProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -372,7 +372,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ApplicationInfo" ComponentId="ApplicationInfo"/>
-        <Component ExportedId="LoginLog" ComponentId="StandardLoginGui/LoginLog"/>
         <Component ExportedId="MainGui" ComponentId="MainGui"/>
         <Component ExportedId="MenuPanelVisibility" ComponentId="MenuPanelVisibility"/>
         <Component ExportedId="PageCommands" ComponentId="CommandsMultiplexer"/>

@@ -2,22 +2,22 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5217" Description="ACF"/>
-            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfo" X="925" Y="75" Note=""/>
-        <Element ComponentName="CommandsMultiplexer" X="275" Y="475" Note=""/>
+        <Element ComponentName="ApplicationInfo" X="960" Y="60" Note=""/>
+        <Element ComponentName="CommandsMultiplexer" X="200" Y="600" Note=""/>
+        <Element ComponentName="FullScreenCommand" X="200" Y="280" Note=""/>
         <Element ComponentName="GuiApplication" X="575" Y="175" Note=""/>
         <Element ComponentName="MainGui" X="575" Y="275" Note=""/>
-        <Element ComponentName="MenuPanelVisibility" X="575" Y="475" Note=""/>
-        <Element ComponentName="PageNavigationController" X="275" Y="275" Note=""/>
-        <Element ComponentName="Pages" X="575" Y="375" Note=""/>
-        <Element ComponentName="SettingsProvider" X="1025" Y="275" Note=""/>
-        <Element ComponentName="SplashScreen" X="575" Y="75" Note=""/>
-        <Element ComponentName="StandardLoginGui" X="950" Y="475" Note=""/>
+        <Element ComponentName="MenuPanelVisibility" X="480" Y="680" Note=""/>
+        <Element ComponentName="PageNavigationController" X="720" Y="760" Note=""/>
+        <Element ComponentName="Pages" X="580" Y="480" Note=""/>
+        <Element ComponentName="SettingsProvider" X="960" Y="260" Note=""/>
+        <Element ComponentName="SplashScreen" X="960" Y="-60" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
