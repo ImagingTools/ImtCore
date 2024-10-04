@@ -25,11 +25,7 @@ class CDatabaseEngineAttr: public ilog::CLoggerComponentBase
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 	I_BEGIN_COMPONENT(CDatabaseEngineAttr);
-		I_ASSIGN(m_migrationFolderPathCompPtr, "MigrationFolderPath", "The property holds the folder contains SQL migraton script", false, "MigrationFolderPath");
 	I_END_COMPONENT;
-
-protected:
-	I_REF(ifile::IFileNameParam, m_migrationFolderPathCompPtr);
 };
 
 

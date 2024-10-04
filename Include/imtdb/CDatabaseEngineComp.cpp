@@ -56,7 +56,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 			*sqlErrorPtr = retVal.lastError();
 		}
 
-		SendErrorMessage(0, QString("Database query failed: %1").arg(retVal.lastError().text()), "Database engine");
+		SendErrorMessage(0, QString("Database query failed: '%1'").arg(retVal.lastError().text()), "Database engine");
 
 		return QSqlQuery();
 	}
@@ -299,12 +299,10 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 		}
 		else{
 			// Set max revision to database
-			QDir folder(m_migrationFolderPathCompPtr->GetPath());
-
 			QSqlError sqlError;
 			QVariantMap valuesRevision;
 			valuesRevision.insert(":Revision", newRevision);
-			ExecSqlQueryFromFile(folder.filePath("SetRevision.sql"), valuesRevision, &sqlError);
+			ExecSqlQueryFromFile(":/SQL/SetRevision.sql", valuesRevision, &sqlError);
 			if (sqlError.type() != QSqlError::NoError){
 				SendErrorMessage(0, QString("Execution of SetRevision.sql failed: '%1'").arg(sqlError.text()), "CDatabaseEngineComp");
 
@@ -455,19 +453,6 @@ bool CDatabaseEngineComp::EnsureDatabaseConsistency() const
 
 bool CDatabaseEngineComp::CreateDatabaseInstance() const
 {
-	if (!m_migrationFolderPathCompPtr.IsValid()){
-		SendCriticalMessage(0, QString("Wrong component configuration: 'MigrationFolderPath' component was not set"));
-
-		return false;
-	}
-
-	QDir migrationsFolder(m_migrationFolderPathCompPtr->GetPath());
-	if (!migrationsFolder.exists()){
-		SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
-
-		return false;
-	}
-
 	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()){
 		SendCriticalMessage(0, QString("Maintenance database name was not set"));
 
@@ -489,19 +474,10 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 
 	retVal = maintainanceDb.open();
 	if (retVal){
-		QString createDatabaseQuery;
-
-		if (QFile(migrationsFolder.filePath("CreateDatabase.sql")).exists()){
-			QFile scriptFile(migrationsFolder.filePath("CreateDatabase.sql"));
-
-			scriptFile.open(QFile::ReadOnly);
-
-			createDatabaseQuery = scriptFile.readAll();
-
-			createDatabaseQuery.replace(":DatabaseName", GetDatabaseName());
-
-			scriptFile.close();
-		}
+		QFile scriptFile(":/SQL/CreateDatabase.sql");
+		scriptFile.open(QFile::ReadOnly);
+		QString createDatabaseQuery = scriptFile.readAll();
+		createDatabaseQuery.replace(":DatabaseName", GetDatabaseName());
 
 		maintainanceDb.exec(createDatabaseQuery);
 
@@ -515,8 +491,8 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 						<< "\n\t| Query: " << createDatabaseQuery;
 
 			SendErrorMessage(0, QString("\n\t| Database could not be created"
-											"\n\t| Error: %1"
-											"\n\t| Query: %2")
+										"\n\t| Error: %1"
+										"\n\t| Query: %2")
 									.arg(sqlError.text())
 									.arg(createDatabaseQuery));
 
@@ -539,23 +515,10 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 
 bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 {
-	if (!m_migrationFolderPathCompPtr.IsValid()){
-		SendCriticalMessage(0, QString("Wrong component configuration: 'MigrationFolderPath' component was not set"));
-
-		return false;
-	}
-
-	QDir migrationsFolder(m_migrationFolderPathCompPtr->GetPath());
-	if (!migrationsFolder.exists()){
-		SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
-
-		return false;
-	}
-
 	QSqlError sqlError;
 
 	// Create revision table in the database:
-	ExecSqlQueryFromFile(migrationsFolder.filePath("CreateRevision.sql"), &sqlError);
+	ExecSqlQueryFromFile(":/SQL/CreateRevision.sql", &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, QString("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
 
@@ -659,20 +622,19 @@ QString CDatabaseEngineComp::GetPassword() const
 
 int CDatabaseEngineComp::GetDatabaseVersion() const
 {
-	if (m_migrationFolderPathCompPtr.IsValid()){
-		QSqlError sqlError;
-		QDir folder(m_migrationFolderPathCompPtr->GetPath());
-		QSqlQuery queryGetRevision = ExecSqlQueryFromFile(folder.filePath("GetRevision.sql"), &sqlError);
-		if (sqlError.type() != QSqlError::NoError){
-			return -1;
-		}
-		else{
-			if (queryGetRevision.next()){
-				return queryGetRevision.value(0).toInt();
-			}
-			return -1;
-		}
+	QSqlError sqlError;
+	QSqlQuery queryGetRevision = ExecSqlQueryFromFile(":/SQL/GetRevision.sql", &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		return -1;
 	}
+	else{
+		if (queryGetRevision.next()){
+			return queryGetRevision.value(0).toInt();
+		}
+
+		return -1;
+	}
+
 	return -1;
 }
 

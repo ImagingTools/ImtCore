@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/SQL">
+        <file alias="CreateDatabase.sql">Resources/SQL/CreateDatabase.sql</file>
+	<file alias="CreateRevision.sql">Resources/SQL/CreateRevision.sql</file>
+	<file alias="GetRevision.sql">Resources/SQL/GetRevision.sql</file>
+	<file alias="SetRevision.sql">Resources/SQL/SetRevision.sql</file>
+    </qresource>
+</RCC>
