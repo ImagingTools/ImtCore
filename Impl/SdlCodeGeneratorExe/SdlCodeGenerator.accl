@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5244" Description="ACF"/>
-            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -12,6 +12,15 @@
         <Element ComponentName="CodeGenWorker" X="550" Y="525" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="Application">
+            <PositionMap>
+                <Element ComponentName="ApplicationInfo" X="475" Y="475" Note=""/>
+                <Element ComponentName="ConsoleApplication" X="475" Y="350" Note=""/>
+                <Element ComponentName="ConsoleLog" X="750" Y="350" Note=""/>
+                <Element ComponentName="VersionInfo" X="475" Y="600" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="CodeGenWorker">
             <PositionMap>
                 <Element ComponentName="FileCleanupProcessor" X="950" Y="225" Note=""/>
@@ -20,15 +29,6 @@
                 <Element ComponentName="SdlClassCodeGenerator" X="175" Y="425" Note=""/>
                 <Element ComponentName="SdlCoreFramework" X="550" Y="425" Note=""/>
                 <Element ComponentName="SdlGqlCodeGeneratorFramework" X="550" Y="700" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="Application">
-            <PositionMap>
-                <Element ComponentName="ApplicationInfo" X="475" Y="475" Note=""/>
-                <Element ComponentName="ConsoleApplication" X="475" Y="350" Note=""/>
-                <Element ComponentName="ConsoleLog" X="750" Y="350" Note=""/>
-                <Element ComponentName="VersionInfo" X="475" Y="600" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

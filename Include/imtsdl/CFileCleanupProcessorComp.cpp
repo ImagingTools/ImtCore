@@ -149,7 +149,14 @@ int CFileCleanupProcessorComp::DoProcessing(
 	// finalize
 	sourceFile.close();
 	targetFilePtr->close();
-	sourceFile.remove();
+	if (!sourceFile.remove()){
+		SendErrorMessage(0, QString("Unable to remove file: '%1'").arg(sourceFilePath));
+
+		return TS_INVALID;
+	}
+
+	Q_ASSERT(!sourceFile.exists());
+
 	if (targetFilePath == sourceFilePath && sourceFile.fileName() != targetFilePtr->fileName()){
 		SendVerboseMessage(QString("move file: '%1' to '%2'").arg(targetFilePtr->fileName(), sourceFilePath));
 		if (!QFile::rename(targetFilePtr->fileName(), sourceFilePath)){
