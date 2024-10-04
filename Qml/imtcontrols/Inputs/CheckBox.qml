@@ -13,9 +13,12 @@ ControlBase {
     property alias tooltipItem: tooltip;
 
     property string borderColor: "";
+    property int radius: 0;
     property bool isActive: true;
 
     property int checkState: Qt.Unchecked;
+
+    property string checkIndicator: "image";
 
     property string imageSourceActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
     property string imageSourceNotActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.Off, Icon.Mode.Disabled);

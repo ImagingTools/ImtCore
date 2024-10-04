@@ -472,6 +472,8 @@ StyleComponents {
 
                 color: Style.baseColor;
 
+                radius: !checkBoxItem.baseElement ? 0 : checkBoxItem.baseElement.radius;
+
                 border.width: 1;
                 border.color: !checkBoxItem.baseElement ? "transparent" : checkBoxItem.borderColor !=="" ? checkBoxItem.borderColor  : checkBoxItem.baseElement.isActive ? Style.borderColor : Style.disabledInActiveTextColor;
 
@@ -486,7 +488,7 @@ StyleComponents {
                     sourceSize.width: width;
                     sourceSize.height: height;
 
-                    visible: !checkBoxItem.baseElement ? false : checkBoxItem.baseElement.checkState != Qt.PartiallyChecked;
+                    visible: !checkBoxItem.baseElement ? false : checkBoxItem.baseElement.checkIndicator == "rectangle" ? false : checkBoxItem.baseElement.checkState != Qt.PartiallyChecked;
                     source: !checkBoxItem.baseElement ? "" : checkBoxItem.baseElement.isActive ? checkBoxItem.baseElement.checkState == Qt.Checked ? checkBoxItem.baseElement.imageSourceActive : "" :
                     checkBoxItem.baseElement.checkState == Qt.Checked ? checkBoxItem.baseElement.imageSourceNotActive : "";
                 }
@@ -500,9 +502,11 @@ StyleComponents {
                 height: checkRect.height - 4;
                 width: height;
 
+                radius: checkRect.radius;
+
                 color: Style.textColor;
 
-                visible: !checkBoxItem.baseElement ? false : checkBoxItem.baseElement.checkState == Qt.PartiallyChecked;
+                visible: !checkBoxItem.baseElement ? false : checkBoxItem.baseElement.checkIndicator == "rectangle" ? checkBoxItem.baseElement.checkState == Qt.Checked : checkBoxItem.baseElement.checkState == Qt.PartiallyChecked;
             }
 
             Text {
