@@ -88,7 +88,7 @@ bool CSdlClassModificatorBaseComp::BeginClassFiles(const CSdlType& sdlType)
 {
 	// Create new files in temp path
 	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 					QString("Unable to open file: '%1'. Error: %2")
 						.arg(m_headerFilePtr->fileName(), m_headerFilePtr->errorString()));
 
@@ -98,7 +98,7 @@ bool CSdlClassModificatorBaseComp::BeginClassFiles(const CSdlType& sdlType)
 	}
 
 	if (!m_sourceFilePtr->open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						QString("Unable to open file: '%1'. Error: %2")
 							.arg(m_sourceFilePtr->fileName(), m_sourceFilePtr->errorString()));
 
@@ -109,7 +109,7 @@ bool CSdlClassModificatorBaseComp::BeginClassFiles(const CSdlType& sdlType)
 
 	// Open original files to read data
 	if (!m_originalHeaderFilePtr->open(QIODevice::ReadOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 						 .arg(m_originalHeaderFilePtr->fileName(), m_originalHeaderFilePtr->errorString()));
 
@@ -119,7 +119,7 @@ bool CSdlClassModificatorBaseComp::BeginClassFiles(const CSdlType& sdlType)
 	}
 
 	if (!m_originalSourceFilePtr->open(QIODevice::ReadOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 						 .arg(m_originalSourceFilePtr->fileName(), m_originalSourceFilePtr->errorString()));
 
@@ -180,6 +180,8 @@ void CSdlClassModificatorBaseComp::AbortCurrentProcessing()
 {
 	m_headerFilePtr->close();
 	m_sourceFilePtr->close();
+
+	I_CRITICAL();
 
 	m_headerFilePtr->remove();
 	m_sourceFilePtr->remove();

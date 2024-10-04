@@ -219,7 +219,7 @@ int CQmlCodeCommandIdGeneratorComp::DoProcessing(
 bool CQmlCodeCommandIdGeneratorComp::ReOpenFiles()
 {
 	if (!m_qmlCommandsFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 							 .arg(m_qmlCommandsFilePtr->fileName(), m_qmlCommandsFilePtr->errorString()));
 
@@ -246,9 +246,10 @@ bool CQmlCodeCommandIdGeneratorComp::CloseFiles()
 bool CQmlCodeCommandIdGeneratorComp::ProcessQmlFile()
 {
 	if (!m_qmlCommandsFilePtr->open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 							 .arg(m_qmlCommandsFilePtr->fileName(), m_qmlCommandsFilePtr->errorString()));
+		I_CRITICAL();
 
 		return false;
 	}

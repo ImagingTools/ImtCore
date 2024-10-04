@@ -56,7 +56,7 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 			int processResultResult = codeGeneratorPtr->DoProcessing(nullptr, nullptr, nullptr);
 
 			if (processResultResult != iproc::IProcessor::TS_OK){
-				SendErrorMessage(0, "Unable to process");
+				SendCriticalMessage(0, QString("Unable to process schema: '%1'").arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
 
 				::exit(-1);
 			}

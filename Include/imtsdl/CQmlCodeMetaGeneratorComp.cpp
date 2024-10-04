@@ -168,7 +168,7 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 	const QString qmlModuleName = GetQmlModuleNameFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	QFile qrcFile(outputDirectoryPath + "/" + qmlModuleName + ".qrc");
 	if (!qrcFile.open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 							 .arg(qrcFile.fileName(), qrcFile.errorString()));
 		I_CRITICAL();
@@ -220,7 +220,7 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 bool CQmlCodeMetaGeneratorComp::ReOpenFiles()
 {
 	if (!m_qmlKeysFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 							 .arg(m_qmlKeysFilePtr->fileName(), m_qmlKeysFilePtr->errorString()));
 
@@ -248,9 +248,10 @@ bool CQmlCodeMetaGeneratorComp::CloseFiles()
 bool CQmlCodeMetaGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 {
 	if (!m_qmlKeysFilePtr->open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 							 .arg(m_qmlKeysFilePtr->fileName(), m_qmlKeysFilePtr->errorString()));
+		I_CRITICAL();
 
 		return false;
 	}

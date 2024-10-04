@@ -59,18 +59,32 @@ int CFileFinalizerComp::DoProcessing(
 	const QString joinedSourceFilePath = joinRules[ISdlProcessArgumentsParser::s_sourceFileType];
 
 	int retVal = TS_OK;
-	retVal = CleanupFile(joinedHeaderFilePath);
-	if (retVal != TS_OK){
-		return retVal;
+
+	const QFileInfo joinedHeaderFileInfo(joinedHeaderFilePath);
+	if (joinedHeaderFileInfo.exists() && joinedHeaderFileInfo.isFile()){
+		retVal = CleanupFile(joinedHeaderFilePath);
+		if (retVal != TS_OK){
+			return retVal;
+		}
+	}
+	else {
+		SendWarningMessage(0, QString("File '%1' is not exists. Cleanup skipped").arg(joinedHeaderFilePath));
 	}
 
-	retVal = CleanupFile(joinedSourceFilePath);
-	if (retVal != TS_OK){
-		return retVal;
+	const QFileInfo joinedSourceFileInfo(joinedSourceFilePath);
+	if (joinedSourceFileInfo.exists() && joinedSourceFileInfo.isFile()){
+		retVal = CleanupFile(joinedSourceFilePath);
+		if (retVal != TS_OK){
+			return retVal;
+		}
+	}
+	else {
+		SendWarningMessage(0, QString("File '%1' is not exists. Cleanup skipped").arg(joinedSourceFilePath));
 	}
 
 	return TS_OK;
 }
+
 
 int CFileFinalizerComp::CleanupFile(const QString& filePath)
 {

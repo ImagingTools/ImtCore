@@ -244,7 +244,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::CloseFiles()
 bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessFiles(const CSdlDocumentType& sdlDocumentType, bool addDependenciesInclude, bool addSelfHeaderInclude)
 {
 	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 					QString("Unable to open file: '%1'. Error: %2")
 						.arg(m_headerFilePtr->fileName(), m_headerFilePtr->errorString()));
 
@@ -254,7 +254,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessFiles(const CSdlDocu
 	}
 
 	if (!m_sourceFilePtr->open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						QString("Unable to open file: '%1'. Error: %2")
 							.arg(m_sourceFilePtr->fileName(), m_sourceFilePtr->errorString()));
 

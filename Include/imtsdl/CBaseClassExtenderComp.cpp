@@ -365,7 +365,7 @@ bool CBaseClassExtenderComp::BeginClassFiles()
 {
 	// Create new files in temp path
 	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 					QString("Unable to open file: '%1'. Error: %2")
 						.arg(m_headerFilePtr->fileName(), m_headerFilePtr->errorString()));
 
@@ -376,7 +376,7 @@ bool CBaseClassExtenderComp::BeginClassFiles()
 
 	// Open original files to read data
 	if (!m_originalHeaderFilePtr->open(QIODevice::ReadOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 						 .arg(m_originalHeaderFilePtr->fileName(), m_originalHeaderFilePtr->errorString()));
 

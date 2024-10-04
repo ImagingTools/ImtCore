@@ -134,7 +134,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 	// then create a qmldir file
 	QFile qmldirFile(outputDirectoryPath + "/qmldir");
 	if (!qmldirFile.open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 							 .arg(qmldirFile.fileName(), qmldirFile.errorString()));
 		I_CRITICAL();
@@ -172,7 +172,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 	}
 	QFile qrcFile(qrcFilePath);
 	if (!qrcFile.open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 							 .arg(qrcFile.fileName(), qrcFile.errorString()));
 		I_CRITICAL();
@@ -219,7 +219,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 bool CQmlCodeGeneratorComp::ReOpenFiles()
 {
 	if (!m_qmlFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 					QString("Unable to open file: '%1'. Error: %2")
 							 .arg(m_qmlFilePtr->fileName(), m_qmlFilePtr->errorString()));
 
@@ -246,9 +246,10 @@ bool CQmlCodeGeneratorComp::CloseFiles()
 bool CQmlCodeGeneratorComp::BeginQmlFile(const CSdlType& sdlType)
 {
 	if (!m_qmlFilePtr->open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 							 .arg(m_qmlFilePtr->fileName(), m_qmlFilePtr->errorString()));
+		I_CRITICAL();
 
 		return false;
 	}

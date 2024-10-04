@@ -184,7 +184,7 @@ int CQtResourceFilePersistenceComp::SaveToFile(
 
 	QFile qrcFile(filePath);
 	if (!qrcFile.open(QIODevice::WriteOnly)){
-		SendErrorMessage(0,
+		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
 							 .arg(qrcFile.fileName(), qrcFile.errorString()));
 		I_CRITICAL();

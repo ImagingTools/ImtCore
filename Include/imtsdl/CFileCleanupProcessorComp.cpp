@@ -101,20 +101,23 @@ int CFileCleanupProcessorComp::DoProcessing(
 	QFileInfo targetFileInfo(targetFilePath);
 	const QString targetFileDirPath = targetFileInfo.absoluteDir().absolutePath();
 	if (!istd::CSystem::EnsurePathExists(targetFileDirPath)){
-		SendErrorMessage(0, QString("Unable to create directory: '%1'").arg(targetFileDirPath));
+		SendCriticalMessage(0, QString("Unable to create directory: '%1'").arg(targetFileDirPath));
+		I_CRITICAL();
 
 		return TS_INVALID;
 	}
 
 	if (!targetFilePtr->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
-		SendErrorMessage(0, QString("Unable to open file: '%1'. Error: %2").arg(targetFilePath, targetFilePtr->errorString()));
+		SendCriticalMessage(0, QString("Unable to open file: '%1'. Error: %2").arg(targetFilePath, targetFilePtr->errorString()));
+		I_CRITICAL();
 
 		return TS_INVALID;
 	}
 
 	QFile sourceFile(sourceFilePath);
 	if (!sourceFile.open(QIODevice::ReadOnly | QIODevice::Text)){
-		SendErrorMessage(0, QString("Unable to open file: '%1'. Error: %2").arg(sourceFilePath, sourceFile.errorString()));
+		SendCriticalMessage(0, QString("Unable to open file: '%1'. Error: %2").arg(sourceFilePath, sourceFile.errorString()));
+		I_CRITICAL();
 
 		return TS_INVALID;
 	}
