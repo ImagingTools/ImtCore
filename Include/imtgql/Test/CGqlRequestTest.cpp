@@ -9,14 +9,14 @@ const char* testQuery = R"(
 {"query": "mutation TestMutation {
 	TestMutation(
 		input: {
-			intValue: 1,
-			doubleValue: 1.1,
-			stringValue: \"1\",
+			IntValue: 1,
+			DoubleValue: 1.1,
+			StringValue: \"1\",
 
-			objectValue: {
-				intValue: 1,
-				doubleValue: 1.1,
-				stringValue: \"1\",
+			ObjectValue: {
+				IntValue: 1,
+				DoubleValue: 1.1,
+				StringValue: \"1\",
 			}
 
 			ArrayOfInts: [1,2,3],
@@ -24,9 +24,9 @@ const char* testQuery = R"(
 			ArrayOfStrings: [\"1\",\"2\",\"3\"],
 
 			ArrayOfObjects: [
-				{value: 1},
-				{value: 1.1},
-				{value:\"1\"},
+				{Value: 1},
+				{Value: 1.1},
+				{Value:\"1\"},
 			],
 
 			ArrayOfArrays: [
