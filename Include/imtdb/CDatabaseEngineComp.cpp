@@ -56,7 +56,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 			*sqlErrorPtr = retVal.lastError();
 		}
 
-		SendErrorMessage(0, QString("Database query failed: '%1'").arg(retVal.lastError().text()), "Database engine");
+		SendErrorMessage(0, QObject::tr("Database query failed: '%1'").arg(retVal.lastError().text()), "Database engine");
 
 		return QSqlQuery();
 	}
@@ -236,7 +236,7 @@ bool CDatabaseEngineComp::OpenDatabase() const
 bool CDatabaseEngineComp::CreateDatabase(int flags) const
 {
 	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()){
-		SendCriticalMessage(0, QString("Maintenance database name was not set"));
+		SendCriticalMessage(0, QObject::tr("Maintenance database name was not set"));
 
 		return false;
 	}
@@ -298,17 +298,19 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 			CancelTransaction();
 		}
 		else{
-			// Set max revision to database
-			QSqlError sqlError;
-			QVariantMap valuesRevision;
-			valuesRevision.insert(":Revision", newRevision);
-			ExecSqlQueryFromFile(":/SQL/SetRevision.sql", valuesRevision, &sqlError);
-			if (sqlError.type() != QSqlError::NoError){
-				SendErrorMessage(0, QString("Execution of SetRevision.sql failed: '%1'").arg(sqlError.text()), "CDatabaseEngineComp");
+			if (newRevision >= 0){
+				// Set max revision to database
+				QSqlError sqlError;
+				QVariantMap valuesRevision;
+				valuesRevision.insert(":Revision", newRevision);
+				ExecSqlQueryFromFile(":/SQL/SetRevision.sql", valuesRevision, &sqlError);
+				if (sqlError.type() != QSqlError::NoError){
+					SendErrorMessage(0, QString("Execution of SetRevision.sql failed: '%1'").arg(sqlError.text()), "CDatabaseEngineComp");
 
-				CancelTransaction();
+					CancelTransaction();
 
-				return false;
+					return false;
+				}
 			}
 
 			FinishTransaction();
@@ -396,7 +398,7 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 						<< "\n\t| Unable to open database"
 						<< "\n\t| Error: " << databaseConnection.lastError().text();
 
-			SendErrorMessage(0, QString("Database '%1' could not be connected").arg(GetDatabaseName()), "Database engine");
+			SendErrorMessage(0, QObject::tr("Database '%1' could not be connected").arg(GetDatabaseName()), "Database engine");
 		}
 	}
 
@@ -420,7 +422,7 @@ bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 			}
 		}
 		else{
-			SendErrorMessage(0, QString("Database server could not be connected: %1").arg(errorMessage), "Database Engine");
+			SendErrorMessage(0, QObject::tr("Database server could not be connected: %1").arg(errorMessage), "Database Engine");
 
 			return false;
 		}
@@ -454,7 +456,7 @@ bool CDatabaseEngineComp::EnsureDatabaseConsistency() const
 bool CDatabaseEngineComp::CreateDatabaseInstance() const
 {
 	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()){
-		SendCriticalMessage(0, QString("Maintenance database name was not set"));
+		SendCriticalMessage(0, QObject::tr("Maintenance database name was not set"));
 
 		return false;
 	}
@@ -506,7 +508,7 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 		return retVal;
 	}
 	else {
-		SendErrorMessage(0, QString("Maintanance database could not be opened. Error message: '%1'").arg(maintainanceDb.lastError().text()));
+		SendErrorMessage(0, QObject::tr("Maintanance database could not be opened. Error message: '%1'").arg(maintainanceDb.lastError().text()));
 	}
 
 	return false;
@@ -520,7 +522,7 @@ bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 	// Create revision table in the database:
 	ExecSqlQueryFromFile(":/SQL/CreateRevision.sql", &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
-		SendErrorMessage(0, QString("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
+		SendErrorMessage(0, QObject::tr("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
 
 		return false;
 	}
@@ -561,7 +563,7 @@ QString CDatabaseEngineComp::GetDatabasePath() const
 	}
 
 	if (!m_dbFilePathCompPtr.IsValid()){
-		SendErrorMessage(0, QString("Database file path incorrect"));
+		SendErrorMessage(0, QObject::tr("Database file path incorrect"));
 
 		return QString();
 	}
