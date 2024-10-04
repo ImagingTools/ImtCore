@@ -14,7 +14,7 @@ class IMigrationController: virtual public istd::IPolymorphic
 {
 public:
 	virtual istd::CIntRange GetMigrationRange() const = 0;
-	virtual bool DoMigration(const istd::CIntRange& subRange = istd::CIntRange()) const = 0;
+	virtual bool DoMigration(int& resultRevision, const istd::CIntRange& subRange = istd::CIntRange()) const = 0;
 };
 
 
