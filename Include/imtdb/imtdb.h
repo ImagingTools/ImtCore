@@ -3,8 +3,6 @@
 
 // Qt includes
 #include <QtCore/QString>
-#include <QtCore/QDir>
-#include <QtCore/QRegularExpression>
 
 
 /**
@@ -16,7 +14,6 @@ namespace imtdb
 
 
 QString SqlEncode(const QString& sqlQuery);
-int GetLastMigration(const QString& migrationFolder, QString& errorMessage);
 
 
 } // namespace imtdb
