@@ -158,14 +158,14 @@ function(jqml_compile_web2)
 		set(INDEX ${INDEX})
 	endwhile()
 
-	# message("DEPEND_LIST ${DEPEND_LIST}")
+	message("QRC_CPP_WEB_FILE ${QRC_CPP_WEB_FILE}")
 
 	#               COMMAND ${CMAKE_COMMAND} -E rm -rf ${buildwebdir}
 
 	add_custom_command(
 	        OUTPUT
 		${buildwebdir}/Resources/jqml.${resname}.js
-		PRE_BUILD
+		POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQML2/preparesources.py ${webdirs}
 		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQML2
@@ -173,6 +173,7 @@ function(jqml_compile_web2)
 		COMMAND  ${CMAKE_COMMAND} -E copy ${buildwebdir}/src/jqml.full.js  ${buildwebdir}/Resources/jqml.${resname}.js
 		DEPENDS ${DEPEND_LIST} ${sdldependency}
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
+		VERBATIM
 	    )
 
 	add_custom_command(
@@ -191,6 +192,8 @@ function(jqml_compile_web2)
 	        WebCompiler${PROJECT_NAME} ALL
 		DEPENDS ${QRC_CPP_WEB_FILE}
 	    )
+
+	add_dependencies(WebCompiler${PROJECT_NAME} ${PROJECT_NAME})
 
 	set(QRC_QRC_FILES)
 

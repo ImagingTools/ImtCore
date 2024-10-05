@@ -36,16 +36,13 @@ if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
 endif()
 
 target_link_libraries(${PROJECT_NAME} iauth)
-target_link_libraries(${PROJECT_NAME} imtbase imtzip imtrest imtcrypt imtstyle imtqml imtdb imtfile imtguigqlqml imtauthguiqml imtguiqml imtcolguiqml imtauthsdl)
+target_link_libraries(${PROJECT_NAME} imtbase imtzip imtrest imtcrypt imtstyle imtqml imtdb imtfile imtguigqlqml imtauthguiqml imtguiqml imtcolguiqml imtauthsdl imtappsdl)
 target_link_libraries(${PROJECT_NAME} imtlicgql imtguigql imtgql imtclientgql imtauthgui imtauthgql imtauthdb imtapp imtstylecontrolsqml imtcontrolsqml imtdocguiqml imtgui)
-# target_link_libraries(${PROJECT_NAME} lisaqml ImtCoreLoc LisaLoc)
 target_link_libraries(${PROJECT_NAME} iqtgui)
 target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::Quick  Qt${QT_VERSION_MAJOR}::WebSockets)
 target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::QuickControls2)
 
-message("PROJECT_BINARY_DIR ${IMTCOREDIR}/Bin/web")
 set(buildwebdir ${CMAKE_CURRENT_LIST_DIR}/../../../Bin/web)
-message("LASA binary dir ${buildwebdir}")
 
 list(APPEND webdirs ${IMTCOREDIR}/3rdParty/JQML2/core/dist)
 list(APPEND webdirs ${buildwebdir}/Resources)
@@ -53,9 +50,6 @@ list(APPEND webdirs ${buildwebdir}/Resources)
 # copy lisa qml from to
 list(APPEND webdirs ${CMAKE_CURRENT_LIST_DIR}/../Qml)
 list(APPEND webdirs ${buildwebdir}/src)
-
-# list(APPEND webdirs ${LISADIR}/Include/lisaqml/Resources/Translations)
-# list(APPEND webdirs ${buildwebdir}/src)
 
 list(APPEND webdirs ${CMAKE_CURRENT_LIST_DIR}/../Resources/html)
 list(APPEND webdirs ${buildwebdir}/Resources)
@@ -113,6 +107,9 @@ list(APPEND webdirs ${buildwebdir}/src/imtauthAuthorizationSdl)
 
 list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtappsdl/SDL/1.0/QML/imtappApplicationSdl)
 list(APPEND webdirs ${buildwebdir}/src/imtappApplicationSdl)
+
+list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationSdl)
+list(APPEND webdirs ${buildwebdir}/src/imtauthAuthorizationSdl)
 
 if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
