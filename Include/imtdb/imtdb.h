@@ -4,7 +4,7 @@
 // Qt includes
 #include <QtCore/QString>
 #include <QtCore/QDir>
-#include <QtCore/QRegularExpression.h>
+#include <QtCore/QRegularExpression>
 
 
 /**
