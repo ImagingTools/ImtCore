@@ -65,7 +65,7 @@ private:
 	void SetParseObject(const QByteArray& commandId);
 	void SetParseText(const QByteArray& text);
 	void StartArray(const QByteArray& text);
-	void CloseArray();
+	bool CloseArray();
 
 protected:
 	QByteArray m_commandId;
@@ -77,6 +77,8 @@ protected:
 	bool m_startValue;
 	bool m_startParams;
 	bool m_startFields;
+	bool m_startArrayPrimitives;
+	bool m_textString;
 	QByteArray m_currentField;
 
 	CGqlObject* m_activeGqlObjectPtr;

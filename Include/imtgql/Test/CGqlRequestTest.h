@@ -12,7 +12,10 @@ class CGqlRequestTest : public QObject
 private slots:
 	void initTestCase();
 
-	void ParseQueryTest();
+	void ParseArrayOfObjectArraysQuery();
+	void ParseObjectQuery();
+	void ParseArrayQuery();
+	void ParseComplexTest();
 
 	void cleanupTestCase();
 

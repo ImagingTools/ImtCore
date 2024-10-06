@@ -167,7 +167,6 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 	bool startText = false;
 	bool startBigText = false;
 	bool startBackSlash = false;
-	bool startArray = false;
 	QByteArray key;
 	QByteArray value;
 	QByteArray text;
@@ -210,6 +209,8 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 	body = body.remove(0,index);
 	m_activeGqlObjectPtr = nullptr;
 	m_startFields = false;
+	m_startArrayPrimitives = false;
+	m_textString = false;
 
 	for (int i = 0; i < body.length() ; ++i){
 		char chr = body[i];
@@ -221,6 +222,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 			else{
 				m_startParams = true;
 				m_startKey = true;
+				m_textString = false;
 			}
 			break;
 
@@ -258,6 +260,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 					startText = false;
 				}
 				m_startKey = true;
+				m_startArrayPrimitives = false;
 				if (m_startParams && endParams && !m_startFields){
 					m_startFields = true;
                     m_activeGqlObjectPtr = nullptr;
@@ -325,6 +328,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				}
 				else{
 					errorPosition = i + index;
+
 					return false;
 				}
 			}
@@ -355,6 +359,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 					StartArray(text);
 					text.clear();
 				}
+				m_startArrayPrimitives = true;
 				startText = false;
 				m_startKey = true;
 			}
@@ -365,7 +370,16 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				text.append(chr);
 			}
 			else{
-				CloseArray();
+				if (!text.isEmpty()) {
+					SetParseText(text);
+					text.clear();
+				}
+				if (!CloseArray()){
+					errorPosition = i + index;
+
+					return false;
+				}
+				m_startArrayPrimitives = false;
 			}
 
 			break;
@@ -377,10 +391,6 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				break;
 			}
 
-			if (startArray){
-				break;
-			}
-
 			if(!startText) {
 				if (!text.isEmpty()) {
 					SetParseText(text);
@@ -388,15 +398,23 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				}
 				startText = true;
 				startBigText = true;
+				m_textString = true;
 			}
 			else {
 				SetParseText(text);
 				text.clear();
 				startText = false;
 				startBigText = false;
+				m_textString = false;
 			}
 			if (!m_startFields){
 				m_startKey = false;
+			}
+			break;
+
+		case '\n': case '\r': case '\t':
+			if (startBigText){
+				text.append(chr);
 			}
 			break;
 
@@ -515,6 +533,9 @@ QByteArray CGqlRequest::CreateQueryFields() const
 {
 	QByteArray retVal;
 	retVal = AddObjectFieldPart(m_fields);
+	if (retVal.isEmpty()){
+		retVal = "{}";
+	}
 
 	return retVal;
 }
@@ -532,7 +553,6 @@ QByteArray CGqlRequest::CreateQueryParams() const
 QByteArray CGqlRequest::AddObjectFieldPart(const CGqlObject &gqlObject) const
 {
 	QByteArray retVal;
-	// retVal += gqlObject.GetId();
 
 	QByteArrayList fieldIds = gqlObject.GetFieldIds();
 	if (!fieldIds.isEmpty()){
@@ -711,20 +731,30 @@ void CGqlRequest::SetParseObject(const QByteArray &commandId)
 		if (m_activeGqlObjectPtr == nullptr || m_activeGqlObjectPtr->GetParentObject() == nullptr){
 			m_fields.InsertField(commandId, gqlObject);
 			m_activeGqlObjectPtr = const_cast<CGqlObject*>(m_fields.GetFieldArgumentObjectPtr(commandId));
-			// m_activeGqlObjectPtr = &m_fields[m_fields.count() - 1];
 		}
 		else{
 			m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateFieldObject(commandId);
 		}
 	}
 	else if (m_startParams){
-		CGqlObject gqlObject;
-		if (m_activeGqlObjectPtr == nullptr/* || m_activeGqlObjectPtr->GetParentObject() == nullptr*/){
-			m_params.InsertField(commandId, gqlObject);
+		CGqlObject newObject;
+		if (m_activeGqlObjectPtr == nullptr){
+			m_params.InsertField(commandId, newObject);
 			m_activeGqlObjectPtr = const_cast<CGqlObject*>(m_params.GetFieldArgumentObjectPtr(commandId));
 		}
 		else{
-			m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateFieldObject(commandId);
+			QByteArray lastArrayId;
+			if (!m_activeArrayIds.isEmpty()){
+				lastArrayId = m_activeArrayIds.last();
+			}
+			if (!lastArrayId.isEmpty() && m_activeGqlObjectPtr->IsObjectList(lastArrayId)){
+				m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendFieldToArray(lastArrayId, newObject);
+				m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateFieldObject(commandId);
+				m_currentField = commandId;
+			}
+			else {
+				m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateFieldObject(commandId);
+			}
 		}
 	}
 
@@ -742,18 +772,60 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 	if (!m_activeArrayIds.isEmpty()){
 		lastArrayId = m_activeArrayIds.last();
 	}
-	if (!lastArrayId.isEmpty() && m_activeGqlObjectPtr->IsObjectList(lastArrayId)){
+	if (!lastArrayId.isEmpty() && m_startArrayPrimitives){
+
+		QVariant value = m_activeGqlObjectPtr->GetFieldArgumentValue(lastArrayId);
+		QVariantList variantList;
+		if (!value.isNull()){
+			variantList = value.toList();
+		}
+		if (m_textString){
+			QString stringValue = text;
+			variantList.append(stringValue);
+		}
+		else {
+			bool ok;
+			if (text.contains('.')){
+				double doubleValue = text.toDouble(&ok);
+				variantList.append(doubleValue);
+			}
+			else{
+				int intValue = text.toInt(&ok);
+				variantList.append(intValue);
+			}
+		}
+		m_activeGqlObjectPtr->InsertField(lastArrayId, variantList);
+
+		return;
+	}
+	else if (!lastArrayId.isEmpty() && m_activeGqlObjectPtr->IsObjectList(lastArrayId)){
 		CGqlObject newObject;
 		newObject.InsertField(text);
 		m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendFieldToArray(lastArrayId, newObject);
 		m_currentField = text;
 	}
-	if (m_startKey){
+	else if (m_startKey){
 		m_activeGqlObjectPtr->InsertField(text);
 		m_currentField = text;
 	}
 	else{
-		m_activeGqlObjectPtr->InsertField(m_currentField, QVariant(text));
+		QVariant value;
+		if (m_textString){
+			QString stringValue = text;
+			value = stringValue;
+		}
+		else {
+			bool ok;
+			if (text.contains('.')){
+				double doubleValue = text.toDouble(&ok);
+				value = doubleValue;
+			}
+			else{
+				int intValue = text.toInt(&ok);
+				value = intValue;
+			}
+		}
+		m_activeGqlObjectPtr->InsertField(m_currentField, value);
 	}
 
 }
@@ -762,6 +834,14 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 void CGqlRequest::StartArray(const QByteArray& text)
 {
 	if (m_activeGqlObjectPtr != nullptr && m_startKey){
+		QByteArray lastArrayId;
+		if (!m_activeArrayIds.isEmpty()){
+			lastArrayId = m_activeArrayIds.last();
+		}
+		if (!lastArrayId.isEmpty() && !m_startArrayPrimitives && m_activeGqlObjectPtr->IsObjectList(lastArrayId)){
+			CGqlObject newObject;
+			m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendFieldToArray(lastArrayId, newObject);
+		}
 		QList<CGqlObject> objectList;
 		m_activeGqlObjectPtr->InsertField(text, objectList);
 		m_currentField = text;
@@ -770,10 +850,16 @@ void CGqlRequest::StartArray(const QByteArray& text)
 }
 
 
-void CGqlRequest::CloseArray()
+bool CGqlRequest::CloseArray()
 {
-	// m_activeGqlObjectPtr = m_activeGqlObjectPtr->GetParentObject();
-	m_activeArrayIds.removeLast();
+	bool retVal = false;
+
+	if (!m_activeArrayIds.isEmpty()){
+		m_activeArrayIds.removeLast();
+		retVal = true;
+	}
+
+	return retVal;
 }
 
 
