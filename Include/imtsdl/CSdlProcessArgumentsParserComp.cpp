@@ -18,12 +18,13 @@ namespace imtsdl
 // public methods
 
 CSdlProcessArgumentsParserComp::CSdlProcessArgumentsParserComp()
-:	m_isDependenciesMode(false),
+	: m_isDependenciesMode(false),
 	m_isGenerateMode(true),
 	m_useAllModificators(false),
 	m_notUseModificators(true),
 	m_qmlEnabled(false),
 	m_cppEnabled(true),
+	m_schemaDependencyModeEnabled(false),
 	m_generatorType(GT_CMAKE),
 	m_autoJoinEnabled(false),
 	m_autolinkLevel(ALL_NONE)
@@ -51,16 +52,22 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption baseClassOption({"B", "base-class"}, "Defines base class of all generated classes with include path CLASS=/include/path", "BaseClassList");
 	QCommandLineOption joinRulesOption({"J", "join"}, "Defines file types, will be joined TYPE(H or CPP)=/Destination/File/Path", "JoinRules");
 	QCommandLineOption includePathOption({"I", "include"}, "Specifies the import directories which should be searched when parsing the schema.", "IncludePathList");
-	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single");
+
+	/// \todo remove it \deprecated
+	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single. Deprecated.");
 	QCommandLineOption generatorOption("generator", "{QMake | CMake}. Optional. Only for dependencies mode. Defines a type of output of files to be generated. Default - CMake", "generator");
 	QCommandLineOption autoLinkOption("auto-link", "Defines the compilation order of the schema files.\n"
 												   "0 - disabled. ALL files will be compiled.\n"
 												   "1 - only those schemas with the same namespace as the original one will be compiled\n"
-												   "2 - only the schema will be compiled. See the 'input parameter' option", "AutiLink", "0");
+												   "2 - only the schema will be compiled. See the 'input parameter' option", "AutoLink", "0");
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
 	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)");
 	QCommandLineOption gqlOption("GQL", "GraphQL Modificator to generate GrqphQL wrap C++ code . (disables CPP and QML if it not setted explicit)");
+	QCommandLineOption schemaDependencyOption("schema-dependencies",
+				"Schema dependency collection mode: This mode displays a list of all schemas that affect the generated code. "
+						"Only the 'generator', 'include' and 'schema-file (S)' options SHOULD be used in conjunction with this mode. "
+						"You MUST NOT use other options, in this case, the behavior is undefined!");
 
 	QCommandLineParser commandLineParser;
 	bool isOptionsAdded = commandLineParser.addOptions(
@@ -76,6 +83,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 					qmlOption,
 					cppOption,
 					gqlOption,
+					schemaDependencyOption,
 					baseClassOption,
 					joinRulesOption,
 					includePathOption,
@@ -206,10 +214,20 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_qmlEnabled = isQmlInParams;
 	m_gqlEnabled = isGqlInParams;
 
+	// schema dependency mode - is a special mode. Cleanup all unnecessary values
+	if (commandLineParser.isSet(schemaDependencyOption)){
+		m_schemaDependencyModeEnabled = true;
+		m_cppEnabled = false;
+		m_qmlEnabled = false;
+		m_gqlEnabled = false;
+		m_isDependenciesMode = false;
+		m_usedModificators.clear();
+	}
+
 	m_notUseModificators = m_usedModificators.isEmpty();
 
-	// only one mode must be used
-	Q_ASSERT(commandLineParser.isSet(generateOption) ^ commandLineParser.isSet(dependenciesOption));
+	// only one mode MUST be used
+	Q_ASSERT(commandLineParser.isSet(generateOption) ^ commandLineParser.isSet(dependenciesOption) ^ commandLineParser.isSet(schemaDependencyOption));
 
 	return true;
 }
@@ -300,6 +318,12 @@ bool CSdlProcessArgumentsParserComp::IsCppEnabled() const
 bool CSdlProcessArgumentsParserComp::IsGqlEnabled() const
 {
 	return m_gqlEnabled;
+}
+
+
+bool CSdlProcessArgumentsParserComp::IsSchemaDependencyModeEnabled() const
+{
+	return m_schemaDependencyModeEnabled;
 }
 
 

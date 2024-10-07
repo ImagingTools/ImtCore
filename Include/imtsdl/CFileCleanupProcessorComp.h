@@ -44,9 +44,6 @@ public:
 				const istd::IPolymorphic* inputPtr,
 				istd::IChangeable* outputPtr,
 				ibase::IProgressManager* progressManagerPtr = NULL) override;
-
-private:
-	static const QString s_filePathVariable;
 };
 
 

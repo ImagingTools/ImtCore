@@ -1,18 +1,26 @@
 macro(ImtCoreGetSdlDeps)
 
+	set(booleanArgs GET_SCHEMA_DEPS)
 	set(oneValueArgs INPUT OUT_DIR RESULT_VARIABLE)
 	set(multiValueArgs MODIFICATORS)
-	cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+	cmake_parse_arguments(ARG "${booleanArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
 	GetSdlGeneratorPath(SDL_GENERATOR_EXE_PATH)
-	set(SDL_DEPS_FILE_PATH "${ARG_OUT_DIR}/../__SDL__DependsList.txt")
-	set(SDL_ERRORS_FILE_PATH "${ARG_OUT_DIR}/../__SDL__DependsList_errors.txt")
 
-	set(SDL_DEPS_GENERATION_COMMAND "${SDL_GENERATOR_EXE_PATH} -DS ${ARG_INPUT} -O ${ARG_OUT_DIR} ${ARG_MODIFICATORS}")
+	if (ARG_GET_SCHEMA_DEPS)
+		set(SDL_DEPS_GENERATION_COMMAND ${SDL_GENERATOR_EXE_PATH} -S ${ARG_INPUT} --schema-dependencies)
+		set(SDL_DEPS_FILE_PATH "${ARG_OUT_DIR}/__SDL_SCHEMA__DependsList.txt")
+		set(SDL_ERRORS_FILE_PATH "${ARG_OUT_DIR}/__SDL_SCHEMA__DependsList_errors.txt")
+	else()
+		set(SDL_DEPS_GENERATION_COMMAND ${SDL_GENERATOR_EXE_PATH} -DS ${ARG_INPUT} -O ${ARG_OUT_DIR} ${ARG_MODIFICATORS})
+		set(SDL_DEPS_FILE_PATH "${ARG_OUT_DIR}/__SDL__DependsList.txt")
+		set(SDL_ERRORS_FILE_PATH "${ARG_OUT_DIR}/__SDL__DependsList_errors.txt")
+	endif()
+
 	message(STATUS "EXEC: ${SDL_DEPS_GENERATION_COMMAND}")
 	execute_process(
 		COMMAND
-			${SDL_GENERATOR_EXE_PATH} -DS ${ARG_INPUT} -O ${ARG_OUT_DIR} ${ARG_MODIFICATORS}
+			${SDL_DEPS_GENERATION_COMMAND}
 		OUTPUT_FILE
 			${SDL_DEPS_FILE_PATH}
 		ERROR_FILE
@@ -35,7 +43,6 @@ macro(ImtCoreGetSdlDeps)
 	endif()
 
 	file(STRINGS ${SDL_DEPS_FILE_PATH} SDL_FOUND_DEPS)
-
 	set(${ARG_RESULT_VARIABLE} ${SDL_FOUND_DEPS})
 
 	# cleanup on success
@@ -78,7 +85,17 @@ function (ImtCoreAutoConfigureSdlCpp)
 		RESULT_VARIABLE
 			FOUND_DEPS)
 
-	message (STATUS "CPP: FOUND for ${PROJECT_NAME} DEPS: ${FOUND_DEPS}")
+	ImtCoreGetSdlDeps(GET_SCHEMA_DEPS
+		INPUT
+			"${ARG_SCHEMA_PATH}"
+		OUT_DIR
+			"${SDL_OUTPUT_DIRECTORY}"
+		MODIFICATORS
+			"${CUSTOM_MODIFICATORS}"
+		RESULT_VARIABLE
+			FOUND_SCHEMA_DEPS)
+
+	message(VERBOSE "CPP: FOUND for ${PROJECT_NAME} DEPS: ${FOUND_DEPS} SCHEMAS: ${FOUND_SCHEMA_DEPS}")
 
 	GetSdlGeneratorPath(SDL_GENERATOR_EXE_PATH)
 
@@ -90,7 +107,7 @@ function (ImtCoreAutoConfigureSdlCpp)
 		ARGS
 			-GS ${ARG_SCHEMA_PATH} -O "${SDL_OUTPUT_DIRECTORY}" ${CUSTOM_MODIFICATORS}
 		DEPENDS
-			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH}
+			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH} "${FOUND_SCHEMA_DEPS}"
 		COMMENT
 			"[CPP:SDL::${PROJECT_NAME}] Creating classes"
 		VERBATIM)
@@ -125,7 +142,18 @@ function (ImtCoreAutoConfigureSdlQml)
 		RESULT_VARIABLE
 			FOUND_DEPS)
 
-	message(STATUS "QML DEP FOUND for ${PROJECT_NAME} DEPS: ${FOUND_DEPS}")
+
+	ImtCoreGetSdlDeps(GET_SCHEMA_DEPS
+		INPUT
+			"${ARG_SCHEMA_PATH}"
+		OUT_DIR
+			"${SDL_OUTPUT_DIRECTORY}"
+		MODIFICATORS
+			"${CUSTOM_MODIFICATORS}"
+		RESULT_VARIABLE
+			FOUND_SCHEMA_DEPS)
+
+	message(VERBOSE "QML DEP FOUND for ${PROJECT_NAME} DEPS: ${FOUND_DEPS} SCHEMAS: ${FOUND_SCHEMA_DEPS}")
 
 	GetSdlGeneratorPath(SDL_GENERATOR_EXE_PATH)
 	add_custom_command(
@@ -136,7 +164,7 @@ function (ImtCoreAutoConfigureSdlQml)
 		ARGS
 			-GS ${ARG_SCHEMA_PATH} -O "${SDL_OUTPUT_DIRECTORY}" ${MODIFICATORS}
 		DEPENDS
-			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH}
+			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH} "${FOUND_SCHEMA_DEPS}"
 		COMMENT
 			"[QML:SDL::${PROJECT_NAME}] Creating resources"
 		VERBATIM)

@@ -25,10 +25,6 @@ const QByteArray CFileCleanupProcessorComp:: s_sourceFilePathParamId = QByteArra
 const QByteArray CFileCleanupProcessorComp:: s_targetFilePathParamId = QByteArrayLiteral("TargetFilePath");
 
 
-// private static variables
-const QString CFileCleanupProcessorComp::s_filePathVariable = QStringLiteral("$(FilePath)");
-
-
 // public methods
 
 // reimplemented (iproc::IProcessor)
