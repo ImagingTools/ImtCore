@@ -9,21 +9,18 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Licenses.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Products.sdl)
 
-ImtCoreAutoConfigureSdlCppQml(
-			SDL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/../1.0/Features.sdl"
-			CUSTOM_TARGETS_DEPS ON
-			CUSTOM_HEADER_DEP "1.0/CPP/Features.h"
-			CUSTOM_SOURCE_DEP "1.0/CPP/Features.cpp"
-			CUSTOM_QML_RES_DEP "1.0/QML/imtlicFeaturesSdl/imtlicFeaturesSdl.qrc")
-ImtCoreAutoConfigureSdlCppQml(
-			SDL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/../1.0/Licenses.sdl"
-			CUSTOM_TARGETS_DEPS ON
-			CUSTOM_HEADER_DEP "1.0/CPP/Licenses.h"
-			CUSTOM_SOURCE_DEP "1.0/CPP/Licenses.cpp"
-			CUSTOM_QML_RES_DEP "1.0/QML/imtlicLicensesSdl/imtlicLicensesSdl.qrc")
-ImtCoreAutoConfigureSdlCppQml(
-			SDL_SOURCES "${CMAKE_CURRENT_LIST_DIR}/../1.0/Products.sdl"
-			CUSTOM_TARGETS_DEPS ON
-			CUSTOM_HEADER_DEP "1.0/CPP/Products.h"
-			CUSTOM_SOURCE_DEP "1.0/CPP/Products.cpp"
-			CUSTOM_QML_RES_DEP "1.0/QML/imtlicProductsSdl/imtlicProductsSdl.qrc")
+ImtCoreCustomConfigureSdlCppQml(
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Features.sdl"
+			VERSION		"1.0"
+			SOURCE_NAME	"Features"
+			QML_NAME	"imtlicFeaturesSdl")
+ImtCoreCustomConfigureSdlCppQml(
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Licenses.sdl"
+			VERSION		"1.0"
+			SOURCE_NAME	"Licenses"
+			QML_NAME	"imtlicLicensesSdl")
+ImtCoreCustomConfigureSdlCppQml(
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Products.sdl"
+			VERSION		"1.0"
+			SOURCE_NAME	"Products"
+			QML_NAME	"imtlicProductsSdl")
