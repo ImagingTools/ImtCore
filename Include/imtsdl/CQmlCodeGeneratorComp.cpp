@@ -71,8 +71,6 @@ int CQmlCodeGeneratorComp::DoProcessing(
 		}
 		else{
 			QStringList cumulatedFiles;
-			// qmldir
-			cumulatedFiles << QString(outputDirectoryPath + '/' + "qmldir");
 			// generated QRC file
 			cumulatedFiles << QString(outputDirectoryPath + "/" + GetQmlModuleNameFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) + ".qrc");
 
