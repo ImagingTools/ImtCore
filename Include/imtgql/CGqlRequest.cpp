@@ -206,6 +206,8 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 		m_startParams = endParams = true;
 	}
 	m_commandId = m_commandId.replace(" ","");
+	m_commandId = m_commandId.replace("\n","");
+	m_commandId = m_commandId.replace("\t","");
 	body = body.remove(0,index);
 	m_activeGqlObjectPtr = nullptr;
 	m_startFields = false;

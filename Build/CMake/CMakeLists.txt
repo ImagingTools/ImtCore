@@ -174,7 +174,6 @@ endif()
 
 if(DEFINED USE_MDBX AND USE_MDBX)
 	add_subdirectory("${INCLUDE_DIR}/imtmdbx/CMake" "${AUX_INCLUDE_DIR}/imtmdbx")
-	add_subdirectory("${INCLUDE_DIR}/imtmdbx/Test/CMake" "${AUX_INCLUDE_DIR}/imtmdbx/Test")
 endif()
 
 
@@ -328,12 +327,16 @@ if(NOT UNIX)
 endif()
 
 #-------- Tests --------
-if (${BUILD_TESTING})
+if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
 	add_subdirectory("${INCLUDE_DIR}/imttest/CMake" "${AUX_INCLUDE_DIR}/imttest")
 
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
 		add_subdirectory("${IMPL_DIR}/ImtTestPck/CMake" "${AUX_INCLUDE_DIR}/ImtTestPck")
 		add_dependencies(ImtTestPck imtbase imtdb imttest)
+	endif()
+
+	if(DEFINED USE_MDBX AND USE_MDBX)
+		add_subdirectory("${INCLUDE_DIR}/imtmdbx/Test/CMake" "${AUX_INCLUDE_DIR}/imtmdbx/Test")
 	endif()
 
 	add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
