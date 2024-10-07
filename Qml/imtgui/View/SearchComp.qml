@@ -81,6 +81,19 @@ Rectangle{
         searchContainer.externalSearchParam = ""
         searchTextField.currentText = "";
         searchContainer.selectedText = "";
+        searchContainer.searchTextField = "";
+        searchContainer.previousText = "";
+        searchContainer.parentIds = "";
+
+    }
+
+    function clearSearchParamsExeptModels(){
+
+        searchTextField.excludeFilterPart = "";
+        searchContainer.externalSearchParam = ""
+        searchTextField.currentText = "";
+        searchContainer.selectedText = "";
+        searchTextField.filterText = "";
         searchContainer.previousText = "";
         searchContainer.parentIds = "";
 
@@ -162,7 +175,6 @@ Rectangle{
             popup.excludeFilterPart = searchContainer.currentText;
             popup.filterText = searchContainer.currentText;
         }
-
 
     }
 
