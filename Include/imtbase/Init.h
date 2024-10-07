@@ -26,6 +26,7 @@ public:
 		InitImtCoreResources();
 		InitStyle();
 		InitTheme();
+		InitImtCoreSdl();
 		InitQml();
 	}
 
@@ -39,6 +40,15 @@ public:
 	{
 		InitAcfLocalization();
 		Q_INIT_RESOURCE(ImtCoreLoc);
+	}
+
+	static void InitImtCoreSdl()
+	{
+		Q_INIT_RESOURCE(imtauthGroupsSdl);
+		Q_INIT_RESOURCE(imtauthRolesSdl);
+		Q_INIT_RESOURCE(imtauthUsersSdl);
+		Q_INIT_RESOURCE(imtauthAuthorizationSdl);
+		Q_INIT_RESOURCE(imtappApplicationSdl);
 	}
 
 	static void InitQml()
@@ -90,12 +100,7 @@ public:
 		Q_INIT_RESOURCE(imtstylelight);
 		Q_INIT_RESOURCE(imtstyledark);
 
-		Q_INIT_RESOURCE(imtauthGroupsSdl);
-		Q_INIT_RESOURCE(imtauthRolesSdl);
-		Q_INIT_RESOURCE(imtauthUsersSdl);
-		Q_INIT_RESOURCE(imtauthAuthorizationSdl);
 
-		Q_INIT_RESOURCE(imtappApplicationSdl);
 
 		Q_INIT_RESOURCE(imtdb);
 	}
