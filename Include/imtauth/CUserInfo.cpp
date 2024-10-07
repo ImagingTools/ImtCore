@@ -98,8 +98,8 @@ IUserBaseInfo::RoleIds CUserInfo::GetRoles(const QByteArray& productId) const
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_groupIds){
-			const IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
-			if (parentGroupPtr != nullptr){
+			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			if (parentGroupPtr.IsValid()){
 				QByteArrayList groupRoleIds = parentGroupPtr->GetRoles(productId);
 				for (const QByteArray& roleId : groupRoleIds){
 					if (!retVal.contains(roleId)){
@@ -120,8 +120,8 @@ IUserBaseInfo::FeatureIds CUserInfo::GetPermissions(const QByteArray& productId)
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_groupIds){
-			const IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
-			if (parentGroupPtr != nullptr){
+			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			if (parentGroupPtr.IsValid()){
 				allPermissions += parentGroupPtr->GetPermissions(productId);
 			}
 		}

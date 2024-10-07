@@ -9,6 +9,7 @@
 #include <imtbase/CCollectionInfo.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtbase/CTreeItemModel.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 
 
 namespace imtauthgql
@@ -38,9 +39,7 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& obj
 		return nullptr;
 	}
 
-	imtclientgql::IGqlClient::GqlRequestPtr requestPtr(new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "RoleItem"));
-
-	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "RoleItem");
+	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, sdl::imtauth::Roles::V1_0::CRoleItemGqlRequest::GetCommandId());
 	imtgql::CGqlObject inputObject;
 	inputObject.InsertField(QByteArray("Id"), QVariant(objectId));
 	inputObject.InsertField(QByteArray("IsJsonSerialized"), QVariant(true));

@@ -123,7 +123,6 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 	}
 
 	QByteArray userJson = dataModelPtr->ToJson().toUtf8();
-	qDebug() << "userJson" << userJson;
 
 	istd::TDelPtr<imtauth::IUserInfo> userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
 	if (!userInstancePtr.IsValid()){

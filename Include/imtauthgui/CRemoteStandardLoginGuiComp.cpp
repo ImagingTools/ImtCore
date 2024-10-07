@@ -128,7 +128,6 @@ void CRemoteStandardLoginGuiComp::OnGuiCreated()
 	else{
 		OnConnectionStatusUpdate(istd::IChangeable::GetAnyChange(), nullptr);
 	}
-
 }
 
 

@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 
 
 namespace imtauthgql
@@ -15,29 +16,31 @@ namespace imtauthgql
 
 bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& password) const
 {
-	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "UserAdd");
+	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, sdl::imtauth::Users::V1_0::CUserAddGqlRequest::GetCommandId());
+
 	imtgql::CGqlObject inputObject;
-	inputObject.InsertField("Id", "su");
-	inputObject.InsertField("ProductId", qPrintable(*m_productIdAttrPtr));
+	inputObject.InsertField(sdl::imtauth::Users::V1_0::CUserDataInput::Fields::Id.toUtf8(), "su");
+	inputObject.InsertField(sdl::imtauth::Users::V1_0::CUserDataInput::Fields::ProductId.toUtf8(), qPrintable(*m_productIdAttrPtr));
 
-	QByteArray json = QString("{\"Username\": \"%1\", \"UserId\": \"%2\", \"Password\": \"%3\", \"Name\": \"%4\"}")
-			.arg(qPrintable("su"))
-			.arg(qPrintable("su"))
-			.arg(qPrintable(password))
-			.arg(qPrintable("username")).toUtf8();
+	sdl::imtauth::Users::V1_0::CUserData userData;
+	userData.SetId("su");
+	userData.SetUsername("su");
+	userData.SetName("superuser");
+	userData.SetPassword(qPrintable(password));
 
-	inputObject.InsertField ("Item", QVariant(json));
+	imtgql::CGqlObject* userGqlObject = inputObject.CreateFieldObject(sdl::imtauth::Users::V1_0::CUserDataInput::Fields::Item.toUtf8());
+	if (!userData.WriteToGraphQlObject(*userGqlObject)){
+		return false;
+	}
+
 	request.AddParam("input", inputObject);
 
 	imtgql::CGqlObject fieldObject;
 	fieldObject.InsertField("Id");
-	request.AddField("addedNotification", fieldObject);
+	request.AddField(sdl::imtauth::Users::V1_0::CAddedNotificationPayload::Fields::AddedNotification.toUtf8(), fieldObject);
 
 	imtbase::CTreeItemModel responseModel;
-
-	bool retVal = SendModelRequest(request, responseModel);
-
-	return retVal;
+	return SendModelRequest(request, responseModel);
 }
 
 

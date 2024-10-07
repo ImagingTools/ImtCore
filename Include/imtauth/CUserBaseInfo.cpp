@@ -109,8 +109,8 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& produc
 		}
 
 		for (const QByteArray& roleId : roleIds){
-			const IRole* rolePtr = m_roleProviderPtr->GetRole(roleId);
-			if (rolePtr != nullptr){
+			istd::TDelPtr<const IRole> rolePtr = m_roleProviderPtr->GetRole(roleId);
+			if (rolePtr.IsValid()){
 				allPermissions += rolePtr->GetPermissions();
 			}
 		}

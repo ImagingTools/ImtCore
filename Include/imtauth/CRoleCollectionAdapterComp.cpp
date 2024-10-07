@@ -42,9 +42,8 @@ const IRole* CRoleCollectionAdapterComp::GetRole(const QByteArray &objectId) con
 		if (m_roleCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 			const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
 			if (rolePtr != nullptr){
-				istd::IChangeable* clonedPtr = rolePtr->CloneMe();
 				istd::TDelPtr<const imtauth::IRole> clonedUserInfoPtr;
-				clonedUserInfoPtr.SetCastedOrRemove(clonedPtr);
+				clonedUserInfoPtr.SetCastedOrRemove(rolePtr->CloneMe());
 				if (clonedUserInfoPtr.IsValid()){
 					return clonedUserInfoPtr.PopPtr();
 				}

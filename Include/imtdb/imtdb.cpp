@@ -1,7 +1,6 @@
 #include <imtdb/imtdb.h>
 
 
-
 namespace imtdb
 {
 
