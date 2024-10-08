@@ -30,7 +30,6 @@ public:
 		I_ASSIGN(m_tableSchemaAttrPtr, "TableSchema", "Name of the schema containing the object table", false, "");
 		I_ASSIGN(m_tableNameAttrPtr, "TableName", "Name of the object table", true, "");
 		I_ASSIGN(m_objectIdColumnAttrPtr, "ObjectIdColumn", "Name of the column containing ID of the object", true, "Id");
-		I_ASSIGN(m_objectTypeIdColumnAttrPtr, "ObjectTypeIdColumn", "Name of the column containing type-ID of the object", true, "TypeId");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 	I_END_COMPONENT
 
@@ -82,7 +81,6 @@ protected:
 	I_ATTR(QByteArray, m_tableSchemaAttrPtr);
 	I_ATTR(QByteArray, m_tableNameAttrPtr);
 	I_ATTR(QByteArray, m_objectIdColumnAttrPtr);
-	I_ATTR(QByteArray, m_objectTypeIdColumnAttrPtr);
 };
 
 

@@ -15,6 +15,10 @@ namespace imtdb
 {
 
 
+static const QByteArray s_typeIdColumn = QByteArrayLiteral("TypeId");
+static const QByteArray s_documentIdColumn = QByteArrayLiteral("DocumentId");
+
+
 // public methods
 
 QString CSqlDatabaseObjectDelegateCompBase::SqlEncode(const QString& sqlQuery) const
@@ -41,7 +45,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectTypeId(const QByteArray&
 			QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError);
 			if (sqlError.type() == QSqlError::NoError){
 				if (sqlQuery.last()){
-					QString columnId = qPrintable(*m_objectTypeIdColumnAttrPtr);
+					QString columnId = s_typeIdColumn;
 
 					QSqlRecord record = sqlQuery.record();
 					if (record.contains(columnId)){
@@ -96,14 +100,14 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			return QString("SELECT * FROM %0.\"%1\" WHERE \"%2\" = '%3'")
 				.arg(qPrintable(*m_tableSchemaAttrPtr))
 				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(*m_objectIdColumnAttrPtr))
+				.arg(s_documentIdColumn)
 				.arg(qPrintable(objectId))
 				.toUtf8();
 		}
 		else{
 			return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
 					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(*m_objectIdColumnAttrPtr))
+					.arg(s_documentIdColumn)
 					.arg(qPrintable(objectId))
 					.toUtf8();
 		}
@@ -149,7 +153,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectIdFromRecord(const QSqlRecord& record) const
 {
-	QString columnId = qPrintable(*m_objectIdColumnAttrPtr);
+	QString columnId = s_documentIdColumn;
 
 	if (record.contains(columnId)){
 		return record.value(columnId).toByteArray();

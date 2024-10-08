@@ -8,6 +8,7 @@
 #include <imtbase/IRevisionController.h>
 #include <imtdb/IMetaInfoTableDelegate.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
+#include <imtdb/IJsonBasedMetaInfoDelegate.h>
 
 
 namespace imtdb
@@ -25,11 +26,8 @@ public:
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN_MULTI_0(m_documentPersistenceListCompPtr, "DocumentPersistenceList", "List of persistence components for each type of the document", true);
-		I_ASSIGN(m_metaInfoTableDelegateCompPtr, "MetaInfoTableDelegate", "Delegate for the table containing meta-informations for the document type", false, "MetaInfoTableDelegate");
-		I_ASSIGN(m_externalDocumentCollectionCompPtr, "ExternalDocumentCollection", "External document collection used as a storage of the document data", false, "ExternalDocumentCollection");
-		I_ASSIGN(m_documentContentColumnIdAttrPtr, "DocumentContentColumnId", "ID of the column in the table containing document content", true, "Document");
-		I_ASSIGN(m_metaInfoTableNameAttrPtr, "MetaInfoTableName", "Name of the meta-info table", true, "");
-		I_ASSIGN(m_revisionsTableNameAttrPtr, "RevisionsTableName", "Name of the table contained document revisions", true, "");
+		I_ASSIGN(m_metaInfoCreateorCompPtr, "MetaInfoCreator", "Creator of metainformation of object data", false, "MetaInfoCreator");
+		I_ASSIGN(m_jsonBasedMetaInfoDelegateCompPtr, "JsonBasedMetaInfoDelegate", "Delegate for converting document metainfo to JSON representation", false, "JsonBasedMetaInfoDelegate");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -86,20 +84,18 @@ public:
 				const QString& filePath) const override;
 
 protected:
+	virtual QByteArray CreateOperationDescriptionQuery(const QByteArray& objectId, const imtbase::IOperationContext* operationContextPtr) const;
 	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
-	virtual QString GetBaseSelectionQuery() const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateObjectInfoFromRecord(
 				const QByteArray& typeId,
 				const QSqlRecord& record,
 				idoc::MetaInfoPtr& objectMetaInfoPtr,
 				idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const;
-	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
-	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 protected:
 	const ifile::IFilePersistence* FindDocumentPersistence(const QByteArray& typeId) const;
@@ -107,11 +103,8 @@ protected:
 protected:
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_documentPersistenceListCompPtr);
-	I_REF(IMetaInfoTableDelegate, m_metaInfoTableDelegateCompPtr);
-	I_REF(imtbase::IObjectCollection, m_externalDocumentCollectionCompPtr);
-	I_ATTR(QByteArray, m_documentContentColumnIdAttrPtr);
-	I_ATTR(QByteArray, m_metaInfoTableNameAttrPtr);
-	I_ATTR(QByteArray, m_revisionsTableNameAttrPtr);
+	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreateorCompPtr);
+	I_REF(imtdb::IJsonBasedMetaInfoDelegate, m_jsonBasedMetaInfoDelegateCompPtr);
 };
 
 

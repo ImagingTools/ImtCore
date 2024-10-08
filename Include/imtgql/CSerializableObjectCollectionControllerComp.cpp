@@ -239,7 +239,12 @@ istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObject(
 		return nullptr;
 	}
 
-	QByteArray objectData64 = inputParams.at(0).GetFieldArgumentValue("item").toByteArray();
+	const CGqlObject* inputObjectPtr = inputParams.at(0).GetFieldArgumentObjectPtr("input");
+	if (inputObjectPtr == nullptr){
+		return nullptr;
+	}
+
+	QByteArray objectData64 = inputObjectPtr->GetFieldArgumentValue("item").toByteArray();
 	QByteArray objectData = QByteArray::fromBase64(objectData64);
 	if (objectData.isEmpty()){
 		errorMessage = QObject::tr("Can not create object: %1").arg(QString(objectId));
