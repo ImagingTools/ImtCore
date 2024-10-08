@@ -167,8 +167,8 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 	bool startText = false;
 	bool startBigText = false;
 	bool startBackSlash = false;
-	QByteArray key;
-	QByteArray value;
+	// QByteArray key;
+	// QByteArray value;
 	QByteArray text;
 
 	for (int i = 0; i < headersData.count(); ++i){
@@ -265,8 +265,8 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				m_startArrayPrimitives = false;
 				if (m_startParams && endParams && !m_startFields){
 					m_startFields = true;
-                    m_activeGqlObjectPtr = nullptr;
-                }
+					m_activeGqlObjectPtr = nullptr;
+				}
 			}
 			break;
 
@@ -692,7 +692,7 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 void CGqlRequest::ParceObjectFieldPart(CGqlObject &gqlObject, const QJsonObject &object) const
 {
 	QStringList keys = object.keys();
-	for (QString key: keys){
+	for (const QString& key: keys){
 		if (object.value(key).isObject()){
 			CGqlObject* slaveGqlObjectPtr = gqlObject.CreateFieldObject(key.toUtf8());
 			ParceObjectParamPart(*slaveGqlObjectPtr, object.value(key).toObject());
@@ -707,7 +707,7 @@ void CGqlRequest::ParceObjectFieldPart(CGqlObject &gqlObject, const QJsonObject 
 void CGqlRequest::ParceObjectParamPart(CGqlObject &gqlObject, const QJsonObject &object) const
 {
 	QStringList keys = object.keys();
-	for (QString key: keys){
+	for (const QString& key : keys){
 		if (object.value(key).isObject()){
 			CGqlObject* slaveGqlObjectPtr = gqlObject.CreateFieldObject(key.toUtf8());
 			ParceObjectParamPart(*slaveGqlObjectPtr, object.value(key).toObject());
@@ -766,9 +766,9 @@ void CGqlRequest::SetParseObject(const QByteArray &commandId)
 void CGqlRequest::SetParseText(const QByteArray &text)
 {
 	if (m_activeGqlObjectPtr == nullptr){
-        SetParseObject(text);
+		SetParseObject(text);
 
-        return;
+		return;
 	}
 	QByteArray lastArrayId;
 	if (!m_activeArrayIds.isEmpty()){
