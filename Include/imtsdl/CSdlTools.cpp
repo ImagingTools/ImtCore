@@ -801,18 +801,23 @@ void CSdlTools::GenerateListTempValueCode(QTextStream& stream, const CSdlField& 
 
 void CSdlTools::PrintFiles(std::ostream& outStream, const QStringList& files, ISdlProcessArgumentsParser::GeneratorType projectCodeGenerator)
 {
-	for (const QString& file: files){
-		outStream << file.toStdString();
-		if (projectCodeGenerator == ISdlProcessArgumentsParser::GT_CMAKE){
-			outStream << std::endl;
-		}
-		if (projectCodeGenerator == ISdlProcessArgumentsParser::GT_CMAKE_PIPE){
-			outStream << ';';
-		}
-		else {
-			outStream << ' ';
-		}
+	char glue = ' ';
+	if (projectCodeGenerator == ISdlProcessArgumentsParser::GT_CMAKE){
+		glue = '\n';
 	}
+	if (projectCodeGenerator == ISdlProcessArgumentsParser::GT_CMAKE_PIPE){
+		glue = ';';
+	}
+
+	QString outputString = files.join(glue);
+
+	// remove empty elements
+	outputString = outputString.remove(QString("%1%1").arg(glue));
+	while (outputString.endsWith(glue)){
+		outputString.chop(1);
+	}
+
+	outStream << outputString.toStdString();
 
 	outStream.flush();
 }
