@@ -4,77 +4,83 @@ import imtgui 1.0
 import imtcontrols 1.0
 
 Rectangle {
-    id: topPanelDialogContainer;
+	id: topPanelDialogContainer;
 
-    width: 300;
-    height: 40;
+	width: 300;
+	height: 40;
 
-    color: Style.baseColor;
+	color: Style.baseColor;
 
-    property string title;
-    property bool hasIcon: true;
+	property string title;
+	property int titleFontSize: Style.fontSize_subtitle;
+	property string titleFontFamily: Style.fontFamily;
+	property color titleTextColor: Style.textColor;
 
-    signal closeButtonClicked(int buttonId);
+	property bool hasIcon: true;
+	property string iconSource: "../../../../" + Style.getIconPath("Icons/AppIcon", Icon.State.On, Icon.Mode.Normal);
+	property string closeButtonIconSource: "../../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
-    Image {
-        id: iconDialog;
+	signal closeButtonClicked(int buttonId);
 
-        anchors.left: topPanelDialogContainer.left;
-        anchors.leftMargin: 10;
-        anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
+	Image {
+		id: iconDialog;
 
-        width: 20;
-        height: 20;
+		anchors.left: topPanelDialogContainer.left;
+		anchors.leftMargin: 10;
+		anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
 
-        sourceSize.height: height;
-        sourceSize.width: width;
+		width: 20;
+		height: 20;
 
-        source: "../../../../" + Style.getIconPath("Icons/AppIcon", Icon.State.On, Icon.Mode.Normal)
+		sourceSize.height: height;
+		sourceSize.width: width;
 
-        visible: topPanelDialogContainer.hasIcon;
-    }
+		source: topPanelDialogContainer.iconSource;
 
-    Text {
-        id: titleDialog;
+		visible: topPanelDialogContainer.hasIcon;
+	}
 
-        anchors.left: topPanelDialogContainer.hasIcon ? iconDialog.right : parent.left;
-        anchors.leftMargin: topPanelDialogContainer.hasIcon ? 10 : 15;
-        anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
-        anchors.right: closeButton.left;
-        anchors.rightMargin: 10;
+	Text {
+		id: titleDialog;
 
-        color: Style.textColor;
-        font.family: Style.fontFamily;
-        font.pixelSize: Style.fontSize_subtitle;
+		anchors.left: topPanelDialogContainer.hasIcon ? iconDialog.right : parent.left;
+		anchors.leftMargin: topPanelDialogContainer.hasIcon ? 10 : 15;
+		anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
+		anchors.right: closeButton.left;
+		anchors.rightMargin: 10;
 
-        text: topPanelDialogContainer.title;
+		color: topPanelDialogContainer.titleTextColor;
+		font.family: topPanelDialogContainer.titleFontFamily;
+		font.pixelSize: topPanelDialogContainer.titleFontSize;
 
-        elide: Text.ElideRight;
-    }
+		text: topPanelDialogContainer.title;
 
-    Button {
-        id: closeButton;
+		elide: Text.ElideRight;
+	}
 
-        anchors.right: topPanelDialogContainer.right;
-        anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
-        anchors.rightMargin: 15;
+	Button {
+		id: closeButton;
 
-        width: 20;
-        height: 20;
+		anchors.right: topPanelDialogContainer.right;
+		anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
+		anchors.rightMargin: 15;
 
-        iconSource: "../../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+		width: 20;
+		height: 20;
 
-        onClicked: {
-            topPanelDialogContainer.closeButtonClicked(Enums.cancel);
-        }
+		iconSource: topPanelDialogContainer.closeButtonIconSource;
 
-        decorator: Component {
-            id: buttonDecorator;
+		onClicked: {
+			topPanelDialogContainer.closeButtonClicked(Enums.cancel);
+		}
 
-            ButtonDecorator {
-                color: closeButton.hovered ? Style.buttonHoverColor : "transparent";
-                border.width: 0;
-            }
-        }
-    }
+		decorator: Component {
+			id: buttonDecorator;
+
+			ButtonDecorator {
+				color: closeButton.hovered ? Style.buttonHoverColor : "transparent";
+				border.width: 0;
+			}
+		}
+	}
 }
