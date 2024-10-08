@@ -64,7 +64,12 @@ bool CCompositeMigrationControllerComp::DoMigration(int& resultRevision, const i
 		inputRange.SetMaxValue(composedRange.GetMaxValue());
 	}
 
-	if (!composedRange.Contains(inputRange)){
+	if (!composedRange.IsValid() || !inputRange.IsValid()){
+		return false;
+	}
+
+	if (!(	composedRange.GetMinValue() <= inputRange.GetMinValue() &&
+			composedRange.GetMaxValue() >= inputRange.GetMaxValue())){
 		return false;
 	}
 
@@ -78,7 +83,7 @@ bool CCompositeMigrationControllerComp::DoMigration(int& resultRevision, const i
 			int startRevision = inputRange.GetMinValue();
 			int stopRevision = inputRange.GetMaxValue();
 
-			while (startRevision != stopRevision){
+			while (startRevision <= stopRevision){
 				istd::CIntRange checkRange(startRevision, stopRevision);
 
 				if (currentMigrationRange.Contains(checkRange)){

@@ -291,9 +291,9 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 
 	if (m_migrationControllerCompPtr.IsValid()){
 		BeginTransaction();
-		
+
 		int newRevision;
-		retVal = m_migrationControllerCompPtr->DoMigration(newRevision, istd::CIntRange(databaseVersion, -1));
+		retVal = m_migrationControllerCompPtr->DoMigration(newRevision, istd::CIntRange(databaseVersion + 1, -1));
 		if (!retVal){
 			CancelTransaction();
 		}
@@ -322,8 +322,8 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 
 
 void CDatabaseEngineComp::OnDatabaseAccessChanged(
-	const istd::IChangeable::ChangeSet& /*changeSet*/,
-	const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr)
+		const istd::IChangeable::ChangeSet& /*changeSet*/,
+		const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr)
 {
 	EnsureDatabaseCreated();
 

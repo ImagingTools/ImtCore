@@ -62,7 +62,6 @@ public:
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
 
 protected:
-	virtual QByteArray CreateOperationDescriptionQuery(const QByteArray& objectId, const imtbase::IOperationContext* operationContextPtr) const;
 	virtual QByteArray CreateObjectHistoryQuery(
 				int offset = 0,
 				int count = -1,

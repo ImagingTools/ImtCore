@@ -157,6 +157,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 	return retVal;
 }
 
+
 QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
@@ -556,38 +557,6 @@ bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFil
 idoc::MetaInfoPtr CSqlJsonDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
 	return idoc::MetaInfoPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
-}
-
-
-QByteArray CSqlJsonDatabaseDelegateComp::CreateOperationDescriptionQuery(const QByteArray& objectId, const imtbase::IOperationContext* operationContextPtr) const
-{
-	if (operationContextPtr != nullptr){
-		imtbase::IOperationContext* operationPtr = const_cast<imtbase::IOperationContext*>(operationContextPtr);
-		if (operationPtr != nullptr){
-			imtbase::CObjectCollection* changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationPtr->GetChangesCollection());
-
-			QByteArray json;
-			{
-				iser::CJsonMemWriteArchive archive(json, m_versionInfoCompPtr.GetPtr());
-				if (!changeCollectionPtr->Serialize(archive)){
-					qDebug() << QString("Unable to serialize a change object collection");
-				}
-			}
-
-			QString operationDescription = json;
-
-			imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationPtr->GetOperationOwnerId();
-			return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5';)")
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(objectInfo.id))
-					.arg(objectInfo.name)
-					.arg(operationDescription)
-					.arg(qPrintable(objectId))
-					.toUtf8();
-		}
-	}
-
-	return QByteArray();
 }
 
 

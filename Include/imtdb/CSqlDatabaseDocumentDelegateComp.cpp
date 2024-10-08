@@ -41,7 +41,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 		QString baseQuery = GetBaseSelectionQuery();
 
 		return QString(
-			baseQuery + QString(" WHERE \"DocumentId\" = '%1' AND \"IsActive\" = true").arg(qPrintable(objectId))).toUtf8();
+			baseQuery + QString(" AND \"DocumentId\" = '%1'").arg(qPrintable(objectId))).toUtf8();
 	}
 
 	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
@@ -635,7 +635,7 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& type
 QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 {
 	QString query = R"(SELECT "TypeId", "DocumentId", "Name", "Description", "Document", "DataMetaInfo", "CollectionMetaInfo", "Checksum", "LastModified", "IsActive", "RevisionNumber",
-			(SELECT "LastModified" FROM "%2" as t1 WHERE "RevisionNumber" = 1 AND %1"%2"."DocumentId" = t1."DocumentId" LIMIT 1) as "Added" FROM "%2")";
+			(SELECT "LastModified" FROM "%2" as t1 WHERE "RevisionNumber" = 1 AND %1"%2"."DocumentId" = t1."DocumentId" LIMIT 1) as "Added" FROM "%2" WHERE "IsActive" = true)";
 
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
@@ -675,8 +675,37 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const iprm::IPara
 	iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
 	if (collectionFilterParamPtr.IsValid()){
 		QByteArray typeId = collectionFilterParamPtr->GetObjectTypeId();
+		if (!typeId.isEmpty()){
+			filterQuery = QString("\"TypeId\" = '%1'").arg(qPrintable(typeId)).toUtf8();
+		}
+	}
 
-		filterQuery = QString("\"TypeId\" = '%1'").arg(qPrintable(typeId)).toUtf8();
+	return true;
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const
+{
+	QByteArray columnId;
+	QByteArray sortOrder;
+
+	if (!collectionFilter.GetSortingInfoIds().isEmpty()){
+		columnId = collectionFilter.GetSortingInfoIds().first();
+	}
+
+	switch (collectionFilter.GetSortingOrder()){
+	case imtbase::ICollectionFilter::SO_ASC:
+		sortOrder = "ASC";
+		break;
+	case imtbase::ICollectionFilter::SO_DESC:
+		sortOrder = "DESC";
+		break;
+	default:
+		break;
+	}
+
+	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
+		sortQuery = QString("ORDER BY \"DataMetaInfo\"->>\'%1\' %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
 	}
 
 	return true;
