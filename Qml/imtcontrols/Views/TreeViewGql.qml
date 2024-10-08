@@ -18,6 +18,8 @@ Rectangle{
     property bool hasSelection: false;
     property int selectedIndex: -1;
     property int scrollSize: 12;
+    property string scrollBackgroundColor: "";
+    property string scrollIndicatorColor: "";
 
     property string selectionColor: Style.selectedColor !== undefined ? Style.selectedColor : "lightsteelblue";
     property string hoverColor: "lightsteelblue";
@@ -52,8 +54,19 @@ Rectangle{
         list.contentX = list.originX;
     }
 
+    onScrollBackgroundColorChanged: {
+        if(scrollBackgroundColor !== ""){
+            scrollHoriz.backgroundColor = scrollBackgroundColor;
+            scrollVert.backgroundColor = scrollBackgroundColor;
+        }
+    }
+    onScrollIndicatorColorChanged: {
+        if(scrollIndicatorColor !== ""){
+            scrollHoriz.indicatorColor = scrollIndicatorColor;
+            scrollVert.indicatorColor = scrollIndicatorColor;
+        }
 
-
+    }
 
     Rectangle{
         id: listContainer;
@@ -269,7 +282,7 @@ Rectangle{
 
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_subtitle !==undefined ? Style.fontSize_subtitle : 18;
-                        color: Style.textColor;
+                        color: treeViewGql.textColor;
 
                         text: model[treeViewGql.nameId] !== undefined ? model[treeViewGql.nameId] : "";
                     }
@@ -346,6 +359,7 @@ Rectangle{
             targetItem: listFrame;
 
             secondSize: treeViewGql.scrollSize;
+
             radius: secondSize;
             indicatorRadius: secondSize;
             indicatorMargin: 0;
