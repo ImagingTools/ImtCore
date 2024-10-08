@@ -893,43 +893,43 @@ class Item extends QtObject {
 
             if(this.parent === this.getProperty('anchors').getProperty('verticalCenter').get().target){
                 if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.Top){
-                    this.getProperty('y').subscribePrimary(this.getProperty('height'))
+                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenterOffset'))
                         
                     this.getProperty('y').setCompute(()=>{
-                        return -this.getProperty('height').get() / 2
+                        return -this.getProperty('height').get() / 2 + this.getProperty('anchors').getPropertyValue('verticalCenterOffset')
                     })
                 } else if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.Bottom){
-                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'))
+                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenterOffset'))
                         
                     this.getProperty('y').setCompute(()=>{
-                        return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height').get() - this.getProperty('height').get() / 2
+                        return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height').get() - this.getProperty('height').get() / 2 + this.getProperty('anchors').getPropertyValue('verticalCenterOffset')
                     })
                 } else if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.VerticalCenter){
-                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'))
+                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenterOffset'))
                         
                     this.getProperty('y').setCompute(()=>{
-                        return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height').get() / 2 - this.getProperty('height').get() / 2
+                        return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height').get() / 2 - this.getProperty('height').get() / 2 + this.getProperty('anchors').getPropertyValue('verticalCenterOffset')
                     })
                 }
             } else {
                 //
                 if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.Top){
-                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y'))
+                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y'), this.getProperty('anchors').getProperty('verticalCenterOffset'))
                         
                     this.getProperty('y').setCompute(()=>{
-                        return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y').get()-this.getProperty('height').get() / 2
+                        return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y').get()-this.getProperty('height').get() / 2 + this.getProperty('anchors').getPropertyValue('verticalCenterOffset')
                     })
                 } else if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.Bottom){
-                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y'))
+                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y'), this.getProperty('anchors').getProperty('verticalCenterOffset'))
                         
                     this.getProperty('y').setCompute(()=>{
-                        return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y').get()+this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height').get() - this.getProperty('height').get() / 2
+                        return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y').get()+this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height').get() - this.getProperty('height').get() / 2 + this.getProperty('anchors').getPropertyValue('verticalCenterOffset')
                     })
                 } else if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.VerticalCenter){
-                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y'))
+                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y'), this.getProperty('anchors').getProperty('verticalCenterOffset'))
                         
                     this.getProperty('y').setCompute(()=>{
-                        return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y').get()+this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height').get() / 2 - this.getProperty('height').get() / 2
+                        return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y').get()+this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height').get() / 2 - this.getProperty('height').get() / 2 + this.getProperty('anchors').getProperty('verticalCenterOffset')
                     })
                 }
             }
@@ -948,43 +948,43 @@ class Item extends QtObject {
 
             if(this.parent === this.getProperty('anchors').getProperty('horizontalCenter').get().target){
                 if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.Left){
-                    this.getProperty('x').subscribePrimary(this.getProperty('width'))
+                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenterOffset'))
                         
                     this.getProperty('x').setCompute(()=>{
-                        return -this.getProperty('width').get() / 2
+                        return -this.getProperty('width').get() / 2 + this.getProperty('anchors').getPropertyValue('horizontalCenterOffset')
                     })
                 } else if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.Right){
-                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'))
+                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenterOffset'))
                         
                     this.getProperty('x').setCompute(()=>{
-                        return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width').get() - this.getProperty('width').get() / 2
+                        return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width').get() - this.getProperty('width').get() / 2 + this.getProperty('anchors').getPropertyValue('horizontalCenterOffset')
                     })
                 } else if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.HorizontalCenter){
-                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'))
+                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenterOffset'))
                         
                     this.getProperty('x').setCompute(()=>{
-                        return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width').get() / 2 - this.getProperty('width').get() / 2
+                        return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width').get() / 2 - this.getProperty('width').get() / 2 + this.getProperty('anchors').getPropertyValue('horizontalCenterOffset')
                     })
                 }
             } else {
                 //
                 if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.Left){
-                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x'))
+                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x'), this.getProperty('anchors').getProperty('horizontalCenterOffset'))
                         
                     this.getProperty('x').setCompute(()=>{
-                        return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x').get()-this.getProperty('width').get() / 2
+                        return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x').get()-this.getProperty('width').get() / 2 + this.getProperty('anchors').getPropertyValue('horizontalCenterOffset')
                     })
                 } else if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.Right){
-                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x'))
+                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x'), this.getProperty('anchors').getProperty('horizontalCenterOffset'))
                         
                     this.getProperty('x').setCompute(()=>{
-                        return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x').get()+this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width').get() - this.getProperty('width').get() / 2
+                        return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x').get()+this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width').get() - this.getProperty('width').get() / 2 + this.getProperty('anchors').getPropertyValue('horizontalCenterOffset')
                     })
                 } else if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.HorizontalCenter){
-                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x'))
+                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x'), this.getProperty('anchors').getProperty('horizontalCenterOffset'))
                         
                     this.getProperty('x').setCompute(()=>{
-                        return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x').get()+this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width').get() / 2 - this.getProperty('width').get() / 2
+                        return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x').get()+this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width').get() / 2 - this.getProperty('width').get() / 2 + this.getProperty('anchors').getPropertyValue('horizontalCenterOffset')
                     })
                 }
             }
