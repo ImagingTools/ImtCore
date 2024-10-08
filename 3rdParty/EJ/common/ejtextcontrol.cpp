@@ -130,7 +130,7 @@ void EjTextControl::calcInputMethodParams()
 			str = static_cast<EjTextBlock*>(doc->lBlocks->at(activeIndex))->text;
 
             TextBeforeCursor += str.left(position);
-            TextAfterCursor = str.right(str.count() - position) + TextAfterCursor;
+			TextAfterCursor = str.right(str.length() - position) + TextAfterCursor;
         }
     }
     SurroundingText = TextBeforeCursor + TextAfterCursor;
@@ -141,7 +141,6 @@ int EjTextControl::delText(int delta, int count)
     if(activeIndex < 0)
         return 0;
     int start = count + delta;
-    int row = -1, colum = -1, row_new = -1, colum_new = -1;
     int activeBlock_back = activeIndex;
     int position_back;
     bool is_rem = false;
@@ -179,9 +178,7 @@ int EjTextControl::delText(int delta, int count)
 QVariant EjTextControl::inputMethodQuery(Qt::InputMethodQuery property, QVariant argument) const
 {
     Q_UNUSED(argument)
-    int n;
     QString str;
-    QRect rect(0,0,m_width,m_height);
     QString blockTextAfterCursor, blockTextBeforeCursor;
     int maxLength = 1024;
 
@@ -189,7 +186,7 @@ QVariant EjTextControl::inputMethodQuery(Qt::InputMethodQuery property, QVariant
     int length;
     EjBlock *block;
 
-    QString SurroundingText, TextAfterCursor, TextBeforeCursor;
+	QString TextAfterCursor, TextBeforeCursor;
     if(property == Qt::ImTextBeforeCursor || property == Qt::ImTextAfterCursor)
     {
         maxLength = argument.isValid() ? argument.toInt() : 1024;
@@ -258,9 +255,9 @@ QVariant EjTextControl::inputMethodQuery(Qt::InputMethodQuery property, QVariant
 			str = static_cast<EjTextBlock*>(doc->lBlocks->at(activeIndex))->text;
 
             TextBeforeCursor += str.left(position);
-            TextAfterCursor = str.right(str.count() - position) + TextAfterCursor;
+			TextAfterCursor = str.right(str.length() - position) + TextAfterCursor;
             blockTextBeforeCursor += str.left(position);
-            blockTextAfterCursor = str.right(str.count() - position) + blockTextAfterCursor;
+			blockTextAfterCursor = str.right(str.length() - position) + blockTextAfterCursor;
         }
         else if(doc->lBlocks->at(activeIndex)->type == SPACE)
         {
@@ -282,13 +279,13 @@ QVariant EjTextControl::inputMethodQuery(Qt::InputMethodQuery property, QVariant
         return getTextStyle(0)->m_font;
     case Qt::ImCursorPosition:
         // int
-        qWarning() << "ImCursorPosition: " << TextBeforeCursor.count();
-        return blockTextBeforeCursor.count();
+		qWarning() << "ImCursorPosition: " << TextBeforeCursor.length();
+		return blockTextBeforeCursor.length();
 //        return 0;
     case Qt::ImAnchorPosition:
         // int
-        qWarning() << "ImCursorPosition: " << TextBeforeCursor.count();
-        return blockTextBeforeCursor.count();
+		qWarning() << "ImCursorPosition: " << TextBeforeCursor.length();
+		return blockTextBeforeCursor.length();
     case Qt::ImSurroundingText:
         return QVariant(blockTextBeforeCursor + blockTextAfterCursor);
 
@@ -305,7 +302,7 @@ QVariant EjTextControl::inputMethodQuery(Qt::InputMethodQuery property, QVariant
         return QVariant(); // No limit.
 
     case Qt::ImAbsolutePosition:
-        return TextBeforeCursor.count();
+		return TextBeforeCursor.length();
 
     default:
         return QVariant();
@@ -420,7 +417,6 @@ void EjTextControl::inputText(QString text)
 
 void EjTextControl::addImage(QString path)
 {
-    QByteArray full_key;
 }
 
 void EjTextControl::addExtBlock(EjBlock *block)
@@ -649,7 +645,7 @@ void EjTextControl::inputBackSpace()
         }
         if(doc->lBlocks->at(activeIndex)->type == TEXT)
         {
-			position = (dynamic_cast<EjTextBlock*>(doc->lBlocks->at(activeIndex)))->text.count();
+			position = (dynamic_cast<EjTextBlock*>(doc->lBlocks->at(activeIndex)))->text.length();
         }
 
     }
@@ -1031,9 +1027,6 @@ void EjTextControl::setCursor(int x, int y)
 
     if(doc->lBlocks->at(activeIndex)->type == TEXT || doc->lBlocks->at(activeIndex)->type == BASECELL)
     {
-        bool is_remove = false;
-		EjTextBlock *cur_txt = static_cast<EjTextBlock*>(doc->lBlocks->at(activeIndex));
-
         QFontMetrics drawMetrics = getDrawMetrics(activeIndex);
         QString str3;
         position = 0;
@@ -1069,18 +1062,17 @@ void EjTextControl::setCursor(int x, int y)
         else position = cur2;
         if(doc->lBlocks->at(activeIndex)->type == BASECELL && doc->lBlocks->at(activeIndex + 1)->type != BASECELL)
         {
-			EjCellBlock *curCell = (EjCellBlock*)doc->lBlocks->at(activeIndex);
-                while(activeIndex <  doc->lBlocks->count() - 1
-                      && (doc->lBlocks->at(activeIndex + 1)->type != BASECELL
-                          && doc->lBlocks->at(activeIndex + 1)->type != END_GROUP))
-                    activeIndex++;
-                if(doc->lBlocks->at(activeIndex)->type == TEXT)
-                {
-					txt = static_cast<EjTextBlock*>(doc->lBlocks->at(activeIndex))->text;
-                    position = txt.count();
-                }
-                else
-                    position = 0;
+			while(activeIndex <  doc->lBlocks->count() - 1
+				  && (doc->lBlocks->at(activeIndex + 1)->type != BASECELL
+					  && doc->lBlocks->at(activeIndex + 1)->type != END_GROUP))
+				activeIndex++;
+			if(doc->lBlocks->at(activeIndex)->type == TEXT)
+			{
+				txt = static_cast<EjTextBlock*>(doc->lBlocks->at(activeIndex))->text;
+				position = txt.length();
+			}
+			else
+				position = 0;
 //            }
         }
         str3 = txt.left(position);
@@ -1185,7 +1177,6 @@ int EjTextControl::wichBlock(int x, int y)
     int cur1 = 0;
     int cur2 = 0;
     int cur3;
-    int cur4;
     int res = -1;
     EjGroupBlock *cur_block;
 	EjCellBlock *curCell;
@@ -1605,11 +1596,8 @@ void EjTextControl::cursorRight()
             }
             else
                 index++;
-            bool isAllProperty = true;
             while(doc->lBlocks->at(index)->isProperty() && index < doc->lBlocks->count() - 1)
             {
-                isAllProperty = false;
-
                 if(m_statusMode == EDIT_CELL)
                 {
                     if(doc->lBlocks->at(index + 1)->type != BASECELL)
@@ -1743,7 +1731,6 @@ void EjTextControl::cursorDown()
     }
     int index_string = getIndexString(activeIndex);
     JString *cur_string = doc->lStrings->at(index_string);
-    int delta = m_posCursorY - cur_string->y;
     index_string++;
     if(index_string < doc->lStrings->count())
         cur_string = doc->lStrings->at(index_string);
@@ -1787,7 +1774,7 @@ int EjTextControl::setInputMode(bool mode, QString &text, int preeditCursor)
         for(int i = 0; i < ltext.count(); i++)
         {
 
-            if(ltext[i].count() > 0)
+			if(ltext[i].length() > 0)
             {
                 if(i > 0)
                 {
@@ -1811,7 +1798,7 @@ int EjTextControl::setInputMode(bool mode, QString &text, int preeditCursor)
                     position = cur_txt->text.length();
                     cur_txt->width = 0;
                 }
-                if(pos + ltext[i].count() >= preeditCursor && bSendCursor)
+				if(pos + ltext[i].length() >= preeditCursor && bSendCursor)
                 {
                     if(getBlocks()->at(activeIndex)->type == TEXT)
                     {
@@ -1829,7 +1816,7 @@ int EjTextControl::setInputMode(bool mode, QString &text, int preeditCursor)
                     }
                     bSendCursor = false;
                 }
-                pos += ltext[i].count();
+				pos += ltext[i].length();
             }
             else if(i > 0){
                 pos++;
@@ -1928,15 +1915,11 @@ int EjTextControl::setInputMode(bool mode, QString &text, int preeditCursor)
 void EjTextControl::setStatusMode(e_statusMode mode)
 {
 	EjTableBlock *table;
-	EjTextBlock *cur_txtBlock;
-    QString str;
     bool bOk;
-    EjBlock *curBlock = 0;
 	EjCellBlock *curCell = 0;
     int k = activeIndex;
     int row;
     int colum;
-    double res, d;
     EjCalculator calculator(doc);
 
     if(mode != READ_ONLY && !docPrev)
@@ -1950,7 +1933,6 @@ void EjTextControl::setStatusMode(e_statusMode mode)
     if(table)
     {
         cellParams(table,activeIndex,row,colum);
-        curBlock = doc->lBlocks->at(activeIndex);
         while(doc->lBlocks->at(k)->type != BASECELL && k > table->m_index)
             k--;
         if(k == table->m_index)
@@ -2000,7 +1982,7 @@ void EjTextControl::setStatusMode(e_statusMode mode)
             activeIndex++;
         if(doc->lBlocks->at(activeIndex)->type == TEXT)
         {
-			position = ((EjTextBlock*)doc->lBlocks->at(activeIndex))->text.count();
+			position = ((EjTextBlock*)doc->lBlocks->at(activeIndex))->text.length();
         }
         else
             position = 0;
@@ -2136,9 +2118,6 @@ void EjTextControl::setTextStyle(EjTextStyle *textStyle, bool force, bool autoCl
     EjNumStyleBlock *curNumStyle;
 	EjTextStyle *newTextStyle = NULL;
 	EjTableBlock *table;
-    int type;
-    int count;
-    int max_count = -1;
     int endIndex;
 
 	if(activeIndex > 0)
@@ -2601,11 +2580,9 @@ void EjTextControl::delTableString(QList<EjBlock*> *l_blocks, int &active_block)
 {
 	EjCellBlock *curCell;
 	EjTableBlock *curTable = 0;
-	EjTableFragment *curFragment;
     EjSizeProp *sizeProp;
     int row = 0;
     int colum = 0;
-    int frgs_row, frge_row;
     int d = 0;
     int index;
 
@@ -2716,13 +2693,9 @@ void EjTextControl::delTableColum(QList<EjBlock *> *l_blocks, int &active_block)
 {
 	EjCellBlock *curCell;
 	EjTableBlock *curTable = 0;
-	EjTableFragment *curFragment;
-    EjSizeProp *sizeProp;
 	EjTableBlock::ColumProp *columProp;
     int row = 0;
     int colum = 0;
-    int frgs_colum, frge_colum;
-    int d = 0;
     int index;
 
     if(active_block < 0 || active_block > l_blocks->count() - 2)
@@ -2822,7 +2795,7 @@ void EjTextControl::updateFormulas(int fromVal, int toVal, bool isRow, bool isAd
                     list.clear();
                     txt.clear();
                     QString formula = curCell->formula();
-                    for(int i = 0; i < formula.count(); i++)
+					for(int i = 0; i < formula.length(); i++)
                     {
 
                         if(calculator.is_split(formula[i].toLatin1()) )
@@ -2932,22 +2905,22 @@ void EjTextControl::updateFormulas(int fromVal, int toVal, bool isRow, bool isAd
 bool EjTextControl::tableLinkParams(QString txt, EjTableBlock *curTable, EjTableBlock *curTable2, int &numTable, int &numRow, int &numColum)
 {
     bool isFormula = true;
-    if(txt.count() > 1 && curTable == curTable2 && is_value(txt.toLatin1().at(0)))
+	if(txt.length() > 1 && curTable == curTable2 && is_value(txt.toLatin1().at(0)))
     {
         numTable = curTable->key;
-        numRow = txt.right(txt.count()-1).toInt();
+		numRow = txt.right(txt.length()-1).toInt();
         numColum = txt.toLatin1().at(0) - 'A';
     }
-    else if(txt.count() > 2 && is_value(txt.toLatin1().at(1)))
+	else if(txt.length() > 2 && is_value(txt.toLatin1().at(1)))
     {
         numTable = txt.left(1).toInt();
-        numRow = txt.right(txt.count()-2).toInt();
+		numRow = txt.right(txt.length()-2).toInt();
         numColum = txt.toLatin1().at(1) - 'A';
     }
-    else if(txt.count() > 3 && is_value(txt.toLatin1().at(2)))
+	else if(txt.length() > 3 && is_value(txt.toLatin1().at(2)))
     {
         numTable = txt.left(2).toInt();
-        numRow = txt.right(txt.count()-3).toInt();
+		numRow = txt.right(txt.length()-3).toInt();
         numColum = txt.toLatin1().at(2) - 'A';
     }
     else
@@ -3458,7 +3431,6 @@ bool EjTextControl::pasteCells()
 {
 
     int index = activeIndex;
-    EjBlock* curBlock;
 
     int count_cells = 0;
 
@@ -3535,9 +3507,6 @@ bool EjTextControl::menuActivate(QString command, QString data)
     EjBlock *cur_Block;
 	EjTextBlock *cur_textBlock;
     bool res = true;
-    int n_blockEnd = m_endSelectBlock;
-    int n_pos = m_startSelectPos;
-    int n_blockStart = m_startSelectBlock;
     QClipboard *clipboard = QGuiApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
     QString str;
@@ -3714,7 +3683,7 @@ bool EjTextControl::menuActivate(QString command, QString data)
     else if(command == "Call")
     {
         QString tel = isTell();
-        if(tel.count() > 3)
+		if(tel.length() > 3)
             emit ring(tel);
     }
     else if(command == "Copy" || command == "Cut" || command == "Del")
@@ -3737,14 +3706,11 @@ bool EjTextControl::menuActivate(QString command, QString data)
         }
         if(command != "Del")
         {
-            bool res = false;
-            int row_index, colum_index;
             int row_start, colum_start;
             int row_end, colum_end;
 			EjCellBlock *curCell;
 			EjTableBlock *curTable;
             EjBlock *curBlock;
-			EjTableFragment *curFragment;
             int indexStart;
             int indexEnd;
             int startSelect = startSelectBlock;
@@ -3797,14 +3763,12 @@ bool EjTextControl::menuActivate(QString command, QString data)
                     if(curTable->m_counts < 0)
                         curTable->m_counts = 0;
 
-					EjCellBlock *cell_block;
                     for(int j = indexStart; j <= indexEnd; j++)
                     {
                         curBlock = doc->lBlocks->at(j)->makeCopy();
 
                         if(curBlock->type == BASECELL)
                         {
-							cell_block = (EjCellBlock *)curBlock;
 							((EjCellBlock *)curBlock)->m_parent = curTable;
 							int index = doc->lPropBlocks->indexOf(((EjCellBlock *)doc->lBlocks->at(j))->cellStyle);
 							((EjCellBlock *)curBlock)->cellStyle = (EjCellStyle *)(m_clipboardDoc->lPropBlocks->at(index));
@@ -3934,10 +3898,10 @@ bool EjTextControl::menuActivate(QString command, QString data)
                 for (int i = 0; i < str.size(); ++i) {
                     if ((str.at(i) >= QChar('0') && str.at(i) <= QChar('9')) || str.at(i) == QChar('-') || str.at(i) == QChar('+'))
                         tel += str.at(i);
-                    if(tel.count() > 50)
+					if(tel.length() > 50)
                         break;
                 }
-                if(tel.count() > 3)
+				if(tel.length() > 3)
                     emit ring(tel);
             }
             str.clear();
@@ -3990,7 +3954,6 @@ bool EjTextControl::menuActivate(QString command, QString data)
                 case BASECELL:
                     if(curTable)
                     {
-						EjCellBlock *curBlock = (EjCellBlock*)m_clipboardDoc->lBlocks->at(i);
                         int row;
                         int colum;
                         cellParams(curTable,i,row,colum,m_clipboardDoc->lBlocks);
@@ -4087,9 +4050,7 @@ bool EjTextControl::menuActivate(QString command, QString data)
 						EjTableBlock *curTable = (EjTableBlock*)m_clipboardDoc->lBlocks->at(i);
 						EjTableBlock *curActiveTable = ((EjTableBlock*)(curCell->m_parent));
 						EjCellBlock *curCell2;
-						EjTableFragment *curFragment = NULL;
                         int active_row, active_colum;
-                        int activeBlockStart;
                         int nColums = 0;
                         int nRows = 0;
                         int startRow = 0, endRow = 0, startColum = 0, endColum = 0;
@@ -4113,7 +4074,6 @@ bool EjTextControl::menuActivate(QString command, QString data)
                         {
                             curActiveTable->addString(this, curCell);
                         }
-                        activeBlockStart = activeIndex;
                         for(int row = 0; row < curTable->nRows(); row++)
                         {
 
@@ -4136,7 +4096,7 @@ bool EjTextControl::menuActivate(QString command, QString data)
                                     list.clear();
                                     txt.clear();
                                     QString formula = curCell->formula();
-                                    for(int i = 0; i < formula.count(); i++)
+									for(int i = 0; i < formula.length(); i++)
                                     {
 
                                         if(calculator.is_split(formula[i].toLatin1()) )
@@ -4220,10 +4180,7 @@ bool EjTextControl::menuActivate(QString command, QString data)
                                         {
 											EjTextStyle *text_style = (EjTextStyle*)block_style;
                                             block_style->style = text_style;
-                                        }else if (block_style->style->m_vid == e_PropDoc::PARAGRAPH_STYLE)
-                                        {
-											EjParagraphStyle *p_style = (EjParagraphStyle*)block_style;
-                                        }
+										}
                                     }
                                 }
                             }
@@ -4268,7 +4225,7 @@ bool EjTextControl::menuActivate(QString command, QString data)
 
                     txt = mimeData->text();
                     QChar chr;
-                    for(int i = 0; i < txt.count(); i++)
+					for(int i = 0; i < txt.length(); i++)
                     {
                         chr = txt[i];
                         if(chr == QChar::Space)
@@ -4317,7 +4274,6 @@ bool EjTextControl::menuActivate(QString command, QString data)
             int i = 0;
             if(mimeData && mimeData->text() == m_htmlBuffer && !0)
             {
-				EjTableFragment *curFragment;
                 for(i = 0; i < m_clipboardDoc->lBlocks->count(); i++)
                 {
                     cur_Block = m_clipboardDoc->lBlocks->at(i)->makeCopy();
@@ -4413,7 +4369,7 @@ QString EjTextControl::isTell()
                 endSelectBlock = startSelectBlock;
             startSelectPos = 0;
             if(doc->lBlocks->at(endSelectBlock)->type == TEXT)
-				endSelectPos = dynamic_cast<EjTextBlock*>(doc->lBlocks->at(endSelectBlock))->text.count();
+				endSelectPos = dynamic_cast<EjTextBlock*>(doc->lBlocks->at(endSelectBlock))->text.length();
         }
         else
         {
@@ -4426,7 +4382,7 @@ QString EjTextControl::isTell()
             endSelectBlock = startSelectBlock;
             while(endSelectBlock + 1 < m_doc.lBlocks->count() && doc->lBlocks->at(endSelectBlock + 1)->type == TEXT)
                 endSelectBlock++;
-			endSelectPos = dynamic_cast<EjTextBlock*>(doc->lBlocks->at(endSelectBlock))->text.count();
+			endSelectPos = dynamic_cast<EjTextBlock*>(doc->lBlocks->at(endSelectBlock))->text.length();
         }
 
     }
@@ -4445,13 +4401,13 @@ QString EjTextControl::isTell()
             else
                 break;
         }
-        if(str.count() > 50)
+		if(str.length() > 50)
         {
             res = false;
             break;
         }
         start = 0;
-        end = str.count();
+		end = str.length();
         if(i == startSelectBlock && startSelectPos < start)
             start = startSelectPos;
         if(i == endSelectBlock && endSelectPos < end)
@@ -4476,20 +4432,13 @@ QString EjTextControl::isTell()
 
 QList<EjFragmentBlock *> EjTextControl::getActualFragments(int block, EjTableBlock *cur_Table, int row, int colum)
 {
-	EjFragmentBlock *curFragment;
-	EjTableFragment *curTableFragment;
 	QList<EjFragmentBlock*> lActualFragments;
-	QList<EjFragmentBlock*> *cur_lFragments = 0;
-
-    bool bInsert;
-    bool bIsBaseCell = false;
     return lActualFragments;
 
 }
 
 QList<EjFragmentBlock *> EjTextControl::getSelectFragments()
 {
-	EjFragmentBlock *curFragment;
 	QList<EjFragmentBlock*> lActualFragments;
     return lActualFragments;
 
@@ -4603,8 +4552,6 @@ QRect EjTextControl::selectArea()
 
 void EjTextControl::updateFragments(int index, bool is_add, bool posNotNul)
 {
-	EjFragmentBlock *curFragment;
-    int del_index;
 }
 
 void EjTextControl::blockOptimize()
@@ -4739,10 +4686,8 @@ void EjTextControl::calc(int index, bool force)
     calcParams.viewScale = scaleSize;
 
     int right_pos = 0;
-    int back_type = 0;
     bool new_string = false;
     double k_scale;
-    int deltaX = 0;
 
     int x; // + metric.height() / 1.2;
 
@@ -4910,10 +4855,6 @@ void EjTextControl::calc(int index, bool force)
             qWarning() << "Error for string" << __FILE__ << __LINE__ << ": " << doc->lBlocks->count() << i << doc->lStrings->count() << index_string << cur_string->startBlock << cur_string->endBlock;
 
         }
-
-        if(i < doc->lBlocks->count())
-            back_type = cur_Block->type;
-
     }
     cur_string = doc->lStrings->at(index_string);
     calcString(cur_string, cur_page, &calcParams);
@@ -5128,7 +5069,7 @@ bool EjTextControl::isEndText(int index) const
     if(index > -1 && index < doc->lBlocks->count() && doc->lBlocks->at(index)->type == TEXT)
     {
 		EjTextBlock *block = dynamic_cast<EjTextBlock*>(doc->lBlocks->at(index));
-        if(index == activeIndex && block && block->text.count() <= position)
+		if(index == activeIndex && block && block->text.length() <= position)
         {
             res = true;
             index++;

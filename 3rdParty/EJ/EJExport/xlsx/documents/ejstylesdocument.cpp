@@ -1,308 +1,357 @@
 #include "ejstylesdocument.h"
 
-QDomDocument EjStylesDocument::getDocument() const
-{
-    return document;
-}
+#include<QStandardPaths>
+#include <QtCore/QDir>
+
 
 void EjStylesDocument::setAlign(int value)
 {
-    align = value;
+	align = value;
 }
+
 
 void EjStylesDocument::aligns_init()
 {
+	QJsonObject align1, align2, align3, align4, align5, align6, align7, align8, align9, align10, align11, align12, align13, align14, align15, align16;
 
-    QDomElement align1 = document.createElement("alignment");
-    align1.setAttribute("horizontal", "center");
-    aligns.insert(EjParagraphStyle::AlignHCenter, align1);
+	align1["horizontal"] = "center";
+	aligns.insert(EjParagraphStyle::AlignHCenter, align1);
 
-    QDomElement align2 = document.createElement("alignment");
-    align2.setAttribute("horizontal", "left");
-    aligns.insert(EjParagraphStyle::EjParagraphStyle::AlignLeft, align2);
+	align2["horizontal"] = "left";
+	aligns.insert(EjParagraphStyle::AlignLeft, align2);
 
-    QDomElement align3 = document.createElement("alignment");
-    align3.setAttribute("horizontal", "right");
-    aligns.insert(EjParagraphStyle::EjParagraphStyle::AlignRight, align3);
+	align3["horizontal"] = "right";
+	aligns.insert(EjParagraphStyle::AlignRight, align3);
 
-    QDomElement align4 = document.createElement("alignment");
-    align4.setAttribute("horizontal", "center");
-    align4.setAttribute("vertical", "center");
-    aligns.insert(132, align4);
+	align4["horizontal"] = "center";
+	align4["vertical"] = "center";
+	aligns.insert(132, align4);
 
-    QDomElement align5 = document.createElement("alignment");
-    align5.setAttribute("horizontal", "center");
-    align5.setAttribute("vertical", "top");
-    aligns.insert(36, align5);
+	align5["horizontal"] = "center";
+	align5["vertical"] = "top";
+	aligns.insert(36, align5);
 
-    QDomElement align6 = document.createElement("alignment");
-    align6.setAttribute("horizontal", "center");
-    align6.setAttribute("vertical", "bottom");
-    aligns.insert(68, align6);
+	align6["horizontal"] = "center";
+	align6["vertical"] = "bottom";
+	aligns.insert(68, align6);
 
-    QDomElement align7 = document.createElement("alignment");
-    align7.setAttribute("horizontal", "left");
-    align7.setAttribute("vertical", "center");
-    aligns.insert(129, align7);
+	align7["horizontal"] = "left";
+	align7["vertical"] = "center";
+	aligns.insert(129, align7);
 
-    QDomElement align8 = document.createElement("alignment");
-    align8.setAttribute("horizontal", "left");
-    align8.setAttribute("vertical", "top");
-    aligns.insert(33, align8);
+	align8["horizontal"] = "left";
+	align8["vertical"] = "top";
+	aligns.insert(33, align8);
 
-    QDomElement align9 = document.createElement("alignment");
-    align9.setAttribute("horizontal", "left");
-    align9.setAttribute("vertical", "bottom");
-    aligns.insert(65, align9);
+	align9["horizontal"] = "left";
+	align9["vertical"] = "bottom";
+	aligns.insert(65, align9);
 
-    QDomElement align10 = document.createElement("alignment");
-    align10.setAttribute("horizontal", "right");
-    align10.setAttribute("vertical", "bottom");
-    aligns.insert(66, align10);
+	align10["horizontal"] = "right";
+	align10["vertical"] = "bottom";
+	aligns.insert(66, align10);
 
-    QDomElement align11 = document.createElement("alignment");
-    align11.setAttribute("horizontal", "right");
-    align11.setAttribute("vertical", "center");
-    aligns.insert(130, align11);
+	align11["horizontal"] = "right";
+	align11["vertical"] = "center";
+	aligns.insert(130, align11);
 
-    QDomElement align12 = document.createElement("alignment");
-    align12.setAttribute("horizontal", "right");
-    align12.setAttribute("vertical", "top");
-    aligns.insert(34, align12);
+	align12["horizontal"] = "right";
+	align12["vertical"] = "top";
+	aligns.insert(34, align12);
 
-    QDomElement align13 = document.createElement("alignment");
-    align13.setAttribute("vertical", "bottom");
-    aligns.insert(EjParagraphStyle::AlignBottom, align13);
+	align13["vertical"] = "bottom";
+	aligns.insert(EjParagraphStyle::AlignBottom, align13);
 
-    QDomElement align14 = document.createElement("alignment");
-    align14.setAttribute("vertical", "center");
-    aligns.insert(EjParagraphStyle::AlignVCenter, align14);
+	align14["vertical"] = "center";
+	aligns.insert(EjParagraphStyle::AlignVCenter, align14);
 
-    QDomElement align15 = document.createElement("alignment");
-    align15.setAttribute("vertical", "top");
-    aligns.insert(EjParagraphStyle::AlignTop, align15);
+	align15["vertical"] = "top";
+	aligns.insert(EjParagraphStyle::AlignTop, align15);
 }
+
 
 int EjStylesDocument::addBorders(int left, int right, int top, int bottom)
 {
-    QDomElement border = document.createElement("border");
-    borders.appendChild(border);
-    QDomElement l = document.createElement("left");
-    border.appendChild(l);
-    QDomElement r = document.createElement("right");
-    border.appendChild(r);
-    QDomElement t = document.createElement("top");
-    border.appendChild(t);
-    QDomElement b = document.createElement("bottom");
-    border.appendChild(b);
+	QString value;
+	QJsonObject border;
 
-    /*Пока нигде не использовалась*/
-    QDomElement d = document.createElement("diagonal");
-    border.appendChild(d);
-    QString value;
+	if((value = widthsBorders.value(left)) != nullptr){
+		border["left"] = value;
+	}
 
-    if((value = widthsBorders.value(left)) != nullptr){
-        l.setAttribute("style", value);
+	if((value = widthsBorders.value(right)) != nullptr){
+		border["right"] = value;
+	}
 
-       /*Пока что цвет только черный, в дальнейшем возможны изменения*/
-        QDomElement color = document.createElement("color");
-        color.setAttribute("auto", "1");
-        l.appendChild(color);
-    }
-    if((value = widthsBorders.value(right)) != nullptr){
-        r.setAttribute("style", value);
-        QDomElement color = document.createElement("color");
-        color.setAttribute("auto", "1");
-        r.appendChild(color);
-    }
-    if((value = widthsBorders.value(top)) != nullptr){
-        t.setAttribute("style", value);
-        QDomElement color = document.createElement("color");
-        color.setAttribute("auto", "1");
-        t.appendChild(color);
-    }
-    if((value = widthsBorders.value(bottom)) != nullptr){
-        b.setAttribute("style", value);
-        QDomElement color = document.createElement("color");
-        color.setAttribute("auto", "1");
-        b.appendChild(color);
-    }
+	if((value = widthsBorders.value(top)) != nullptr){
+		border["top"] = value;
+	}
 
-    countBorders++;
-    return countBorders;
+	if((value = widthsBorders.value(bottom)) != nullptr){
+		border["bottom"] = value;
+	}
+
+	bordersModel.append(border);
+	countBorders++;
+	return countBorders;
 }
+
 
 int EjStylesDocument::addFill(QString color)
 {
-    QDomElement fill = document.createElement("fill");
-    fills.appendChild(fill);
-
-    QDomElement pf = document.createElement("patternFill");
-    pf.setAttribute("patternType", "solid");
-    fill.appendChild(pf);
-    QDomElement fgColor = document.createElement("fgColor");
-    fgColor.setAttribute("rgb", color);
-    pf.appendChild(fgColor);
-    QDomElement bgColor = document.createElement("bgColor");
-    bgColor.setAttribute("indexed", "64");
-    pf.appendChild(bgColor);
-    countFills++;
-    return countFills;
+	QJsonObject fill;
+	fill["patternType"] = "solid";
+	fill["rgb"] = color;
+	fill["indexed"] = "64";
+	fillsModel.append(fill);
+	countFills++;
+	return countFills;
 }
+
 
 int EjStylesDocument::addXfToCellXfs(int fillId, int borderId)
 {
-     QDomElement xf = document.createElement("xf");
-     xf.setAttribute("numFmtId", 0);
-     xf.setAttribute("fontId", 0);
-     xf.setAttribute("fillId", fillId);
-     if(fillId != 0){
-         xf.setAttribute("applyFill", 1);
-     }
+	QJsonObject cellXfs;
+	cellXfs["numFmtId"] = "0";
+	cellXfs["fontId"] = "0";
+	cellXfs["fillId"] = QString::number(fillId);
 
-     xf.setAttribute("borderId", borderId);
-     if(borderId != 0){
-         xf.setAttribute("applyBorder", 1);
-     }
-     xf.setAttribute("xfId", 0);
+	if(fillId != 0){
+		cellXfs["applyFill"] = QString::number(1);
+	}
 
+	cellXfs["borderId"] = QString::number(borderId);
 
-     QDomElement alignElem = aligns.value(align);
-     if(!alignElem.isNull()){
-         QDomElement newAlign = document.createElement(alignElem.tagName());
-         xf.appendChild(newAlign);
-         auto var = alignElem.attributes();
-         for ( int i = 0; i < var.count(); i++)
-         {
-             QDomAttr attribute = var.item(i).toAttr();
-             newAlign.setAttribute(attribute.name(),attribute.value());
-         }
-         newAlign.setAttribute("wrapText", "1");
-         xf.setAttribute("applyAlignment", 1);
-     }
+	if(borderId != 0){
+		cellXfs["applyBorder"] =  QString::number(1);
+	}
 
+	cellXfs["xfId"] = QString::number(0);
 
-     cellXfs.appendChild(xf);
-     countCellXfs++;
-     return countCellXfs;
+	if (aligns.contains(align)){
+		QJsonObject alignJson = aligns.value(align);
+		QStringList alignKeys = alignJson.keys();
+
+		for (QString alignKey : alignKeys){
+			cellXfs[alignKey] = alignJson[alignKey].toString();
+		}
+
+		cellXfs["wrapText"] = "1";
+		cellXfs["applyAlignment"] = QString::number(1);
+	}
+
+	cellXfsModel.append(cellXfs);
+	countCellXfs++;
+	return countCellXfs;
 }
 
-EjStylesDocument::EjStylesDocument()
+
+EjStylesDocument::EjStylesDocument():
+	streamData(QByteArray())
 {
-    QDomElement styleSheet = document.createElement("styleSheet");
-    document.appendChild(styleSheet);
-    styleSheet.setAttribute("xmlns", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
-    fonts = document.createElement("fonts");
-    fills = document.createElement("fills");
-    borders = document.createElement("borders");
-    cellStyleXfs = document.createElement("cellStyleXfs");
-    cellXfs = document.createElement("cellXfs");
-    cellStyles = document.createElement("cellStyles");
-    dxfs = document.createElement("dxfs");
-    tableStyles = document.createElement("tableStyles");
-    styleSheet.appendChild(fonts);
-    styleSheet.appendChild(fills);
-    styleSheet.appendChild(borders);
-    styleSheet.appendChild(cellStyleXfs);
-    styleSheet.appendChild(cellXfs);
-    styleSheet.appendChild(cellStyles);
-    styleSheet.appendChild(dxfs);
-    styleSheet.appendChild(tableStyles);
-
-    QDomElement font = document.createElement("font");
-    fonts.appendChild(font);
-    QDomElement sz = document.createElement("sz");
-    font.appendChild(sz);
-    sz.setAttribute("val", "11");
-    QDomElement color = document.createElement("color");
-    font.appendChild(color);
-    color.setAttribute("theme", "1");
-    QDomElement name = document.createElement("name");
-    font.appendChild(name);
-    name.setAttribute("val", "Calibri");
-    QDomElement family = document.createElement("family");
-    font.appendChild(family);
-    family.setAttribute("val", "2");
-    QDomElement charset = document.createElement("charset");
-    font.appendChild(charset);
-    charset.setAttribute("val", "204");
-    QDomElement scheme = document.createElement("scheme");
-    font.appendChild(scheme);
-    scheme.setAttribute("val", "minor");
- //---------------------------------------------------------
-    QDomElement fill1 = document.createElement("fill");
-    fills.appendChild(fill1);
-    QDomElement patternFill = document.createElement("patternFill");
-    fill1.appendChild(patternFill);
-    patternFill.setAttribute("patternType", "none");
-    QDomElement fill2 = document.createElement("fill");
-    fills.appendChild(fill2);
-    QDomElement patternFill2 = document.createElement("patternFill");
-    fill2.appendChild(patternFill2);
-    patternFill2.setAttribute("patternType", "gray125");
- //---------------------------------------------------------
-    QDomElement border = document.createElement("border");
-    borders.appendChild(border);
-    QDomElement left = document.createElement("left");
-    QDomElement right = document.createElement("right");
-    QDomElement top = document.createElement("top");
-    QDomElement bottom = document.createElement("bottom");
-    QDomElement diagonal = document.createElement("diagonal");
-    border.appendChild(left);
-    border.appendChild(right);
-    border.appendChild(top);
-    border.appendChild(bottom);
-    border.appendChild(diagonal);
-  //---------------------------------------------------------
-    QDomElement xf = document.createElement("xf");
-    cellStyleXfs.appendChild(xf);
-    xf.setAttribute("numFmtId", 0);
-    xf.setAttribute("fontId", 0);
-    xf.setAttribute("fillId", 0);
-    xf.setAttribute("borderId", 0);
-  //---------------------------------------------------------
-
-    QDomElement xfFromCellXfs = document.createElement("xf");
-    cellXfs.appendChild(xfFromCellXfs);
-    xfFromCellXfs.setAttribute("numFmtId", 0);
-    xfFromCellXfs.setAttribute("fontId", 0);
-    xfFromCellXfs.setAttribute("fillId", 0);
-    xfFromCellXfs.setAttribute("borderId", 0);
-    xfFromCellXfs.setAttribute("xfId", 0);
-  //---------------------------------------------------------
-    QDomElement cellStyle = document.createElement("cellStyle");
-    cellStyles.appendChild(cellStyle);
-    cellStyle.setAttribute("builtinId", 0);
-    cellStyle.setAttribute("xfId", 0);
-    cellStyle.setAttribute("name", "Обычный");
-  //---------------------------------------------------------
-    tableStyles.setAttribute("defaultPivotStyle", "PivotStyleLight16");
-    tableStyles.setAttribute("defaultTableStyle", "TableStyleMedium9");
-
-    widthsBorders.insert(100, "thin");
-    widthsBorders.insert(200, "medium");
-    widthsBorders.insert(300, "thick");
-    aligns_init();
+	documentWriter = new QXmlStreamWriter(&streamData);
+	documentWriter->setAutoFormatting(true);
+	documentWriter->setAutoFormattingIndent(1);
+	QJsonObject fill1, fill2;
+	fill1["patternType"] = "none";
+	fill2["patternType"] = "gray125";
+	fillsModel.append(fill1);
+	fillsModel.append(fill2);
+	QJsonObject border;
+	bordersModel.append(border);
+	QJsonObject cellXfs;
+	cellXfs["numFmtId"] = "0";
+	cellXfs["fontId"] = "0";
+	cellXfs["fillId"] = "0";
+	cellXfs["borderId"] = "0";
+	cellXfs["xfId"] = "0";
+	cellXfsModel.append(cellXfs);
+	widthsBorders.insert(100, "thin");
+	widthsBorders.insert(200, "medium");
+	widthsBorders.insert(300, "thick");
+	aligns_init();
 }
 
 
 EjStylesDocument::~EjStylesDocument()
 {
-	document.clear();
-	fonts.clear();
-	fills.clear();
-	borders.clear();
-	cellXfs.clear();
-	cellStyleXfs.clear();
-	cellStyles.clear();
-	dxfs.clear();
-	tableStyles.clear();
+	delete documentWriter;
+
+	while (fillsModel.size() > 0) {
+		fillsModel.removeLast();
+	}
+
+	while (bordersModel.size() > 0) {
+		bordersModel.removeLast();
+	}
+
+	while (cellXfsModel.size() > 0) {
+		cellXfsModel.removeLast();
+	}
+
 	widthsBorders.clear();
 	aligns.clear();
 	countBorders = 0;
 	countCellXfs = 0;
 	countFills = 1;
 	align = EjParagraphStyle::AlignLeft;
+}
+
+
+QByteArray EjStylesDocument::getDocumentData()
+{
+	documentWriter->writeStartElement("styleSheet"); // style sheet
+	documentWriter->writeAttribute("xmlns", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+	documentWriter->writeStartElement("fonts"); // fonts
+	documentWriter->writeStartElement("font"); // font
+	documentWriter->writeStartElement("sz");
+	documentWriter->writeAttribute("val", "11");
+	documentWriter->writeEndElement();
+	documentWriter->writeStartElement("color");
+	documentWriter->writeAttribute("theme", "1");
+	documentWriter->writeEndElement();
+	documentWriter->writeStartElement("name");
+	documentWriter->writeAttribute("val", "Calibri");
+	documentWriter->writeEndElement();
+	documentWriter->writeStartElement("family");
+	documentWriter->writeAttribute("val", "2");
+	documentWriter->writeEndElement();
+	documentWriter->writeStartElement("charset");
+	documentWriter->writeAttribute("val", "204");
+	documentWriter->writeEndElement();
+	documentWriter->writeStartElement("scheme");
+	documentWriter->writeAttribute("val", "minor");
+	documentWriter->writeEndElement();
+	documentWriter->writeEndElement();
+	documentWriter->writeEndElement();
+	documentWriter->writeStartElement("fills");
+
+	for (int i = 0; i < fillsModel.count(); i++){
+		documentWriter->writeStartElement("fill");
+		documentWriter->writeStartElement("patternFill");
+		documentWriter->writeAttribute("patternType", fillsModel[i].toObject()["patternType"].toString());
+
+		if (fillsModel[i].toObject().contains("rgb")){
+			documentWriter->writeStartElement("fgColor");
+			documentWriter->writeAttribute("rgb", fillsModel[i].toObject()["rgb"].toString());
+			documentWriter->writeEndElement();
+			documentWriter->writeStartElement("bgColor");
+			documentWriter->writeAttribute("indexed", fillsModel[i].toObject()["indexed"].toString());
+			documentWriter->writeEndElement();
+		}
+
+		documentWriter->writeEndElement();
+		documentWriter->writeEndElement();
+	}
+
+	documentWriter->writeEndElement();
+	documentWriter->writeStartElement("borders");
+
+	for (int i = 0; i < bordersModel.count(); i++){
+		documentWriter->writeStartElement("border");
+		documentWriter->writeStartElement("left");
+
+		if (bordersModel[i].toObject().contains("left")){
+			documentWriter->writeAttribute("style", bordersModel[i].toObject()["left"].toString());
+			documentWriter->writeStartElement("color");
+			documentWriter->writeAttribute("auto", "1");
+			documentWriter->writeEndElement();
+		}
+
+		documentWriter->writeEndElement();
+		documentWriter->writeStartElement("right");
+
+		if (bordersModel[i].toObject().contains("right")){
+			documentWriter->writeAttribute("style", bordersModel[i].toObject()["right"].toString());
+			documentWriter->writeStartElement("color");
+			documentWriter->writeAttribute("auto", "1");
+			documentWriter->writeEndElement();
+		}
+
+		documentWriter->writeEndElement();
+		documentWriter->writeStartElement("top");
+
+		if (bordersModel[i].toObject().contains("top")){
+			documentWriter->writeAttribute("style", bordersModel[i].toObject()["top"].toString());
+			documentWriter->writeStartElement("color");
+			documentWriter->writeAttribute("auto", "1");
+			documentWriter->writeEndElement();
+		}
+
+		documentWriter->writeEndElement();
+		documentWriter->writeStartElement("bottom");
+
+		if (bordersModel[i].toObject().contains("bottom")){
+			documentWriter->writeAttribute("style", bordersModel[i].toObject()["bottom"].toString());
+			documentWriter->writeStartElement("color");
+			documentWriter->writeAttribute("auto", "1");
+			documentWriter->writeEndElement();
+		}
+
+		documentWriter->writeEndElement();
+		documentWriter->writeStartElement("diagonal");
+		documentWriter->writeEndElement();
+		documentWriter->writeEndElement();
+	}
+
+	documentWriter->writeEndElement();
+	documentWriter->writeStartElement("cellStyleXfs");
+	documentWriter->writeStartElement("xf");
+	documentWriter->writeAttribute("borderId", "0");
+	documentWriter->writeAttribute("fillId", "0");
+	documentWriter->writeAttribute("fontId", "0");
+	documentWriter->writeAttribute("numFmtId", "0");
+	documentWriter->writeEndElement();
+	documentWriter->writeEndElement();
+	documentWriter->writeStartElement("cellXfs");
+
+	for (int i = 0; i < cellXfsModel.count(); i++){
+		documentWriter->writeStartElement("xf");
+
+		for (QString cellXfsParam : cellXfsModel[i].toObject().keys()){
+
+			if (cellXfsParam != "horizontal" && cellXfsParam != "vertical" && cellXfsParam != "wrapText"){
+				documentWriter->writeAttribute(cellXfsParam, cellXfsModel[i].toObject()[cellXfsParam].toString());
+			}
+		}
+
+		if (cellXfsModel[i].toObject().keys().contains("horizontal") || cellXfsModel[i].toObject().keys().contains("vertical")){
+			documentWriter->writeStartElement("alignment");
+
+			if (cellXfsModel[i].toObject().keys().contains("horizontal")){
+				documentWriter->writeAttribute("horizontal", cellXfsModel[i].toObject()["horizontal"].toString());
+			}
+
+			if (cellXfsModel[i].toObject().keys().contains("vertical")){
+				documentWriter->writeAttribute("vertical", cellXfsModel[i].toObject()["vertical"].toString());
+			}
+
+			if (cellXfsModel[i].toObject().keys().contains("wrapText")){
+				documentWriter->writeAttribute("wrapText", cellXfsModel[i].toObject()["wrapText"].toString());
+			}
+
+			documentWriter->writeEndElement();
+		}
+
+		documentWriter->writeEndElement();
+	}
+
+	documentWriter->writeEndElement();
+	documentWriter->writeStartElement("cellStyles");
+	documentWriter->writeStartElement("cellStyle");
+	documentWriter->writeAttribute("builtinId", "0");
+	documentWriter->writeAttribute("name", QStringLiteral("Обычный"));
+	documentWriter->writeAttribute("xfId", "0");
+	documentWriter->writeEndElement();
+	documentWriter->writeEndElement();
+	documentWriter->writeStartElement("dxfs");
+	documentWriter->writeEndElement();
+	documentWriter->writeStartElement("tableStyles");
+	documentWriter->writeAttribute("defaultPivotStyle", "PivotStyleLight16");
+	documentWriter->writeAttribute("defaultTableStyle", "TableStyleMedium9");
+	documentWriter->writeEndElement();
+	documentWriter->writeEndElement();
+	return streamData;
 }
 
 

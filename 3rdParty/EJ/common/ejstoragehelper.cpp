@@ -21,7 +21,6 @@ struct COMMONSHARED_EXPORT StreamReader<EjBlock>
 	static EjBlock* read(QDataStream &is)
 	{
 		quint8 tid;
-		quint8 isStart;
 		is >> tid;
 		//        case EXT_MAP:  case EXT_DIAGRAM: case EXT_IMAGE: case EXT_TABLE:
 		//        case BASECELL:
@@ -303,7 +302,7 @@ QByteArray EjStorageHelper::getPatch(EjDocument* oldDoc, EjDocument* newDoc, qui
 		writeBA(out,attributes);
 		out << countDop;
 		writeSmallString(out,user);
-		if(buffer.count() > 100)
+		if(buffer.size() > 100)
 		{
 			bCompress = true;
 			buffer = qCompress(buffer);
@@ -317,13 +316,8 @@ QByteArray EjStorageHelper::getPatch(EjDocument* oldDoc, EjDocument* newDoc, qui
 
 void EjStorageHelper::loadData(EjDocument* doc, QList<QByteArray*>& lData, bool isSaveHistory)
 {
-	char ver[6];
 	qint16 oldPatchKey;
 	quint16 oldPatchVer;
-	quint32 time;
-	QByteArray header;
-	QByteArray body;
-	QByteArray attributes;
 	QByteArray buffer;
 	quint8 countDop = 0;
 	PatchDoc *patchDoc;
@@ -338,10 +332,10 @@ void EjStorageHelper::loadData(EjDocument* doc, QList<QByteArray*>& lData, bool 
 		if(!lData.at(i))
 			continue;
 		buffer = *lData.at(i);
-		if(buffer.count() < 17)
+		if(buffer.size() < 17)
 			continue;
 		bCompress = buffer.at(5);
-		buffer = buffer.right(buffer.count() - 6);
+		buffer = buffer.right(buffer.size() - 6);
 		if(bCompress)
 			buffer = qUncompress(buffer);
 		QDataStream in(&buffer, QIODevice::ReadOnly);

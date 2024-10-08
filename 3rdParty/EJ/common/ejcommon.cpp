@@ -66,7 +66,7 @@ QString getDText(double value, int accuracy)
     QString res = locale.toString(value,'f',accuracy);
     if(accuracy == 0)
         return res;
-    int n = res.count() - 1;
+	int n = res.length() - 1;
     int i = 0;
     for(i = 0; i< accuracy; i++)
     {

@@ -1,25 +1,99 @@
 #include "ejsharedstringsdocument.h"
 
+#include <QtCore/QFile>
+#include <QtCore/QDir>
+#include<QStandardPaths>
+
 int EjSharedStringsDocument::getCountWords() const
 {
-    return count_words;
+	return count_words;
 }
 
-QDomDocument EjSharedStringsDocument::getDocument() const
+
+QByteArray EjSharedStringsDocument::getDocumentData()
 {
-    return document;
+	documentWriter->writeStartElement("sst");
+	documentWriter->writeAttribute("xmlns", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+	for(int i = 0; i < siModel.count(); i++){
+		if (siModel[i].toObject()["sz"].toString().isEmpty()){
+			continue;
+		}
+		documentWriter->writeStartElement("si");
+		documentWriter->writeStartElement("r");
+		documentWriter->writeStartElement("rPr");
+		if (siModel[i].toObject().contains("b")){
+			documentWriter->writeStartElement("b");
+			documentWriter->writeEndElement();
+		}
+		if (siModel[i].toObject().contains("i")){
+			documentWriter->writeStartElement("i");
+			documentWriter->writeEndElement();
+		}
+		if (siModel[i].toObject().contains("u")){
+			documentWriter->writeStartElement("u");
+			documentWriter->writeEndElement();
+		}
+		if (siModel[i].toObject().contains("strike")){
+			documentWriter->writeStartElement("strike");
+			documentWriter->writeEndElement();
+		}
+		documentWriter->writeStartElement("sz");
+		documentWriter->writeAttribute("val", siModel[i].toObject()["sz"].toString());
+		documentWriter->writeEndElement();
+
+		documentWriter->writeStartElement("color");
+		if (siModel[i].toObject().contains("theme")){
+			documentWriter->writeAttribute("theme", siModel[i].toObject()["theme"].toString());
+		}
+		else{
+			documentWriter->writeAttribute("rgb", siModel[i].toObject()["rgb"].toString());
+		}
+		documentWriter->writeEndElement();
+
+		documentWriter->writeStartElement("rFont");
+		documentWriter->writeAttribute("val", siModel[i].toObject()["rFont"].toString());
+		documentWriter->writeEndElement();
+
+		documentWriter->writeStartElement("family");
+		documentWriter->writeAttribute("val", siModel[i].toObject()["family"].toString());
+		documentWriter->writeEndElement();
+
+		documentWriter->writeStartElement("charset");
+		documentWriter->writeAttribute("val", siModel[i].toObject()["charset"].toString());
+		documentWriter->writeEndElement();
+
+		documentWriter->writeStartElement("scheme");
+		documentWriter->writeAttribute("val",siModel[i].toObject()["scheme"].toString());
+		documentWriter->writeEndElement();
+
+		documentWriter->writeEndElement();
+		documentWriter->writeStartElement("t");
+		if (siModel[i].toObject().contains("xml:space")){
+			documentWriter->writeAttribute("xml:space", siModel[i].toObject()["xml:space"].toString());
+		}
+		documentWriter->writeCharacters(siModel[i].toObject()["text"].toString());
+		documentWriter->writeEndElement();
+		documentWriter->writeEndElement();
+		documentWriter->writeEndElement();
+	}
+	documentWriter->writeEndElement();
+
+	return streamData;
 }
+
 
 void EjSharedStringsDocument::createSi() {
-    /*Будет принята ранее созданная si,
+	/*Будет принята ранее созданная si,
     и создастся новая*/
-    sst.appendChild(si);
-    si = document.createElement("si");
+	QJsonObject si;
+	siModel.append(si);
+	si_index = siModel.count()-1;
 }
+
 
 void EjSharedStringsDocument::insertIntoSi(QString str)
 {
-    /*Для переданной строки будет создана такая структура
+	/*Для переданной строки будет создана такая структура
             <r>
                 <rPr>
                      <sz val="16"/>
@@ -32,132 +106,132 @@ void EjSharedStringsDocument::insertIntoSi(QString str)
                 <t>HELLO</t>
             </r>
 */
-    QDomElement r = document.createElement("r");
-    QDomElement rPr = document.createElement("rPr");
-    if(bold){
-        QDomElement b = document.createElement("b");
-        rPr.appendChild(b);
-    }
+	QJsonObject selecedSi = siModel[si_index].toObject();
 
-    if(italic){
-        QDomElement i = document.createElement("i");
-        rPr.appendChild(i);
-    }
+	if(bold){
+		selecedSi["b"] = true;
+	}
 
-    if(underline){
-        QDomElement u = document.createElement("u");
-        rPr.appendChild(u);
-    }
+	if(italic){
+		selecedSi["i"] = true;
+	}
 
-    if(strikeOut){
-        QDomElement s = document.createElement("strike");
-        rPr.appendChild(s);
-    }
+	if(underline){
+		selecedSi["u"] = true;
+	}
 
-    QDomElement sz = document.createElement("sz");
-    sz.setAttribute("val", sizeText);
+	if(strikeOut){
+		selecedSi["strike"] = true;
+	}
 
-    QDomElement color = document.createElement("color");
-    if(str == " "){
-        color.setAttribute("theme", 1);
-    }else{
-        color.setAttribute("rgb", colorText);
-    }
+	selecedSi["sz"] = QString::number(sizeText);
 
-    QDomElement rFont = document.createElement("rFont");
-    rFont.setAttribute("val", nameFont);
-    QDomElement family = document.createElement("family");
-    family.setAttribute("val", 2);
-    QDomElement charset = document.createElement("charset");
-    charset.setAttribute("val", 204);
-    QDomElement scheme = document.createElement("scheme");
-    scheme.setAttribute("val", "minor");
+	if(str == " "){
+		selecedSi["theme"] =  QString::number(1);
+	}
+	else{
+		selecedSi["rgb"] =  colorText;
+	}
 
-    rPr.appendChild(sz);
-    rPr.appendChild(color);
-    rPr.appendChild(rFont);
-    rPr.appendChild(family);
-    rPr.appendChild(charset);
-    rPr.appendChild(scheme);
-    r.appendChild(rPr);
-    QDomElement t = document.createElement("t");
-    if(str == " "){
-        t.setAttribute("xml:space", "preserve");
-    }
-    t.appendChild(document.createTextNode(str));
-    r.appendChild(t);
-    si.appendChild(r);
+	selecedSi["rFont"] =  nameFont;
+	selecedSi["family"] =  QString::number(2);
+	selecedSi["charset"] =  QString::number(204);
+	selecedSi["scheme"] =  "minor";
+
+	if(str == " "){
+		selecedSi["xml:space"] =  "preserve";
+	}
+
+	selecedSi["text"] =  str;
+
+	siModel[si_index] = selecedSi;
 }
+
 
 QString EjSharedStringsDocument::getTempTextFromCell() const
 {
-    return tempTextFromCell;
+	return tempTextFromCell;
 }
+
 
 void EjSharedStringsDocument::setTempTextFromCell(const QString &value)
 {
-    tempTextFromCell = value;
+	tempTextFromCell = value;
 }
+
 
 void EjSharedStringsDocument::setSizeText(int value)
 {
-    sizeText = value;
+	sizeText = value;
 }
+
 
 void EjSharedStringsDocument::setBold(bool value)
 {
-    bold = value;
+	bold = value;
 }
+
 
 void EjSharedStringsDocument::setUnderline(bool value)
 {
-    underline = value;
+	underline = value;
 }
+
 
 void EjSharedStringsDocument::setItalic(bool value)
 {
-    italic = value;
+	italic = value;
 }
+
 
 void EjSharedStringsDocument::setStrikeOut(bool value)
 {
-    strikeOut = value;
+	strikeOut = value;
 }
+
 
 void EjSharedStringsDocument::setColorText(const QString &value)
 {
-    colorText = value;
+	colorText = value;
 }
+
 
 void EjSharedStringsDocument::setNameFont(const QString &value)
 {
-    nameFont = value;
+	nameFont = value;
 }
+
 
 void EjSharedStringsDocument::setStylesToDefault()
 {
-    nameFont = "Calibri";
-    colorText = "FF000000";
-    sizeText = 12;
-    bold = false;
-    underline = false;
-    italic = false;
-    strikeOut = false;
+	nameFont = "Calibri";
+	colorText = "FF000000";
+	sizeText = 12;
+	bold = false;
+	underline = false;
+	italic = false;
+	strikeOut = false;
 }
 
-EjSharedStringsDocument::EjSharedStringsDocument() {
-    sst = document.createElement("sst");
-    si = document.createElement("si");
-    document.appendChild(sst);
-    sst.setAttribute("xmlns", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+
+EjSharedStringsDocument::EjSharedStringsDocument():
+	streamData(QByteArray())
+{
+	documentWriter = new QXmlStreamWriter(&streamData);
+	documentWriter->setAutoFormatting(true);
+	documentWriter->setAutoFormattingIndent(1);
+	createSi();
 }
 
 
 EjSharedStringsDocument::~EjSharedStringsDocument()
 {
-	document.clear();
-	sst.clear();
-	si.clear();
+	delete documentWriter;
+
+	while (siModel.size() > 0) {
+		siModel.removeLast();
+	}
+
 	text.clear();
 	index_string = 0;
 	count_words = 0;
@@ -174,26 +248,28 @@ EjSharedStringsDocument::~EjSharedStringsDocument()
 
 
 bool EjSharedStringsDocument::addSpase() {
-    return addText(" ", false);
+	return addText(" ", false);
 }
 
+
 bool EjSharedStringsDocument::addText(QString text, bool isNew) {
-    /* Если isNew будет передан как true, то текущий тег si будет вставлен в документ
+	/* Если isNew будет передан как true, то текущий тег si будет вставлен в документ
        Для текста вне таблицы ожидается, что isNew = true когда будет встречен блок
        переноса строки */
-    if(isNew){
-        createSi();
-        count_words++;
-        return true;
-    }
-    insertIntoSi(text);
-    return true;
+	if(isNew){
+		createSi();
+		count_words++;
+		return true;
+	}
+	insertIntoSi(text);
+	return true;
 }
+
 
 bool EjSharedStringsDocument::addTextIntoTable(QString new_text)
 {
-    insertIntoSi(new_text);
-    count_words++;
-    createSi();
-    return true;
+	insertIntoSi(new_text);
+	count_words++;
+	createSi();
+	return true;
 }

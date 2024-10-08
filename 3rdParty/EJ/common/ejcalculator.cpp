@@ -53,7 +53,7 @@ int EjCalculator::calcTables(bool isReplace)
                                   || curCell->vid == EjCellBlock::CELL_NUMBER))
                    {
                        curBlock = m_doc->lBlocks->at(j);
-                       if(curBlock->type == TEXT && str.count() < limitTxt)
+					   if(curBlock->type == TEXT && str.length() < limitTxt)
 						   str += ((EjTextBlock*)m_doc->lBlocks->at(j))->text;
                        if(curBlock->type == PROP_TXT)
                        {
@@ -70,7 +70,7 @@ int EjCalculator::calcTables(bool isReplace)
                {
                    if(!curCell->text.isEmpty())
                        str = curCell->text;
-                   if(str.count() > 0 && str.at(0).toLatin1() != '=') {
+				   if(str.length() > 0 && str.at(0).toLatin1() != '=') {
                        curCell->value = getDValue(str, &bOk);
                        if(bOk)
                        {
@@ -84,9 +84,9 @@ int EjCalculator::calcTables(bool isReplace)
                {
                    if(!curCell->text.isEmpty() && curCell->text.at(0).toLatin1() == '=')
                    {
-                       if(curCell->text.count() > 6 && !is_contains_operator(curCell->text)/*curCell->text.count() > 4 && !is_contains_operator(curCell->text)*/)
+					   if(curCell->text.length() > 6 && !is_contains_operator(curCell->text)/*curCell->text.count() > 4 && !is_contains_operator(curCell->text)*/)
                        {
-                           str = getStringValue(curCell->text.right(curCell->text.count() - 1),curTable);
+						   str = getStringValue(curCell->text.right(curCell->text.length() - 1),curTable);
                            curCell->value = getDValue(str,&bOk);
                            curCell->setText(str);
                        }
@@ -182,7 +182,7 @@ void EjCalculator::setLinkData(QString str_link, EjBlock *source)
             {
                 curBlock1 = curBlock2->makeCopy();
                 m_doc->lBlocks->insert(i,curBlock1);
-                if(curBlock1->type == TEXT && str.count() < 20)
+				if(curBlock1->type == TEXT && str.length() < 20)
                 {
 					str += ((EjTextBlock*)curBlock1)->text;
                 }
@@ -236,7 +236,7 @@ void EjCalculator::setLinkData(QString str_link, EjBlock *source)
             {
                 int numColum = params.value.toLatin1().at(0) - 'A';
                 EjTableBlock *curTable = curLink->m_extDoc->lTables->at(params.numType - 1);
-                int numRow = params.value.right(params.value.count()-1).toInt();
+				int numRow = params.value.right(params.value.length()-1).toInt();
                 numRow--;
                 if(source->type == EXT_LABEL) {
                     ((LabelBlock*)source)->clear(m_doc->lBlocks);
@@ -291,8 +291,6 @@ int EjCalculator::calcCell(EjCellBlock *cell, EjBlock *table)
   QList<CalcItem>lItems;
   QList<CalcItem>lItems_out;
   bool bOk;
-  int n;
-  bool bFindFunc;
   split(formula,list);
   for(int i = 0; i < list.count(); i++)
   {
@@ -309,7 +307,6 @@ int EjCalculator::calcCell(EjCellBlock *cell, EjBlock *table)
           lItems.append(clItem);
       }
       else {
-          bFindFunc = false;
           if(txt == "SUMM" || txt == "SIN" || txt == "COS" || txt == "MIN" || txt == "MAX")
           {
               clItem.type = CalcItem::FUNC;
@@ -340,7 +337,7 @@ int EjCalculator::calcCell(EjCellBlock *cell, EjBlock *table)
               clItem.type = CalcItem::NUMERIC;
               clItem.text.clear();
 
-              if(is_value(txt.toLatin1().at(0)) || (txt.count() > 1 && is_value(txt.toLatin1().at(1))) || (txt.count() > 2 && is_value(txt.toLatin1().at(2))) )
+			  if(is_value(txt.toLatin1().at(0)) || (txt.length() > 1 && is_value(txt.toLatin1().at(1))) || (txt.length() > 2 && is_value(txt.toLatin1().at(2))) )
               {
                   clItem.value = getValue(txt,table);
               }
@@ -502,7 +499,7 @@ bool EjCalculator::is_split(const char c)
 bool EjCalculator::is_ext_link(QString &txt)
 {
     bool res = false;
-    if(txt.count() > 0 && txt.at(0) == 'r')
+	if(txt.length() > 0 && txt.at(0) == 'r')
         res = true;
     return res;
 }
@@ -512,7 +509,7 @@ bool EjCalculator::is_contains_operator(QString &txt)
     bool res = false;
     QString str;
     char chr;
-    for(int i = 1; i < txt.count(); i++)
+	for(int i = 1; i < txt.length(); i++)
     {
         chr = txt.at(i).toLatin1();
         if(chr != '=')
@@ -537,7 +534,7 @@ void EjCalculator::split(QString &txt, QStringList &lStr)
         return;
     QString cur_txt;
 
-    for(int i = 0; i < txt.count(); i++)
+	for(int i = 0; i < txt.length(); i++)
     {
         if (txt[i] == 't')
         {
@@ -549,7 +546,7 @@ void EjCalculator::split(QString &txt, QStringList &lStr)
 
             cur_txt += 't';
             int j = i + 1;
-            while (j < txt.count() - 1 && is_num(txt[j]))
+			while (j < txt.length() - 1 && is_num(txt[j]))
             {
                 cur_txt += txt[j];
                 j++;
@@ -625,7 +622,6 @@ unsigned int EjCalculator::op_arg_count(const char c)
 bool EjCalculator::shunting_yard(QList<CalcItem> &input, QList<CalcItem> &output)
 {
     int pos = 0;
-    int startPos;
     char c,sc;
     CalcItem curItem, curItem2;
     QList<CalcItem> stack;
@@ -885,8 +881,6 @@ double EjCalculator::getValue(QString txt, EjBlock *source)
 //    char *chr;
     int numRow;
     int numColum;
-	int numTable;
-	int start;
     EjCellBlock *cellBlock;
     double res = 0;
     bool isValue = false;
@@ -925,7 +919,7 @@ double EjCalculator::getValue(QString txt, EjBlock *source)
 
             if(is_value(params.value.toLatin1().at(0)))
             {
-                numRow = params.value.right(params.value.count()-1).toInt();
+				numRow = params.value.right(params.value.length()-1).toInt();
                 numRow--;
                 numColum = params.value.toLatin1().at(0) - 'A';
                 isValue = true;
@@ -971,7 +965,7 @@ double EjCalculator::getValue(QString txt, EjBlock *source)
                 {
                     j++;
                     curBlock = curLink->m_extDoc->lBlocks->at(j);
-                    if(curBlock->type == TEXT && str.count() < 20)
+					if(curBlock->type == TEXT && str.length() < 20)
                     {
 						str += ((EjTextBlock*)curBlock)->text;
                     }
@@ -989,8 +983,6 @@ QString EjCalculator::getStringValue(QString txt, EjBlock *source)
 {
     int numRow = 0;
     int numColum = 0;
-    EjCellBlock *cellBlock;
-    double res = 0;
     bool isValue = false;
     EjTableBlock *curTable = nullptr;
 	EjTextBlock *curTextBlock;
@@ -1000,7 +992,6 @@ QString EjCalculator::getStringValue(QString txt, EjBlock *source)
     EjLinkProp *curLink = NULL;
 	QList<EjBlock*> *lBlocks = m_doc->lBlocks;
 	EjBlock *curBlock;
-    bool bOk;
     QString str;
     if(!attrProp)
         return QString("0");
@@ -1029,7 +1020,7 @@ QString EjCalculator::getStringValue(QString txt, EjBlock *source)
 
             if(is_value(params.value.toLatin1().at(0)))
             {
-                numRow = params.value.right(params.value.count()-1).toInt();
+				numRow = params.value.right(params.value.length()-1).toInt();
                 numRow--;
                 numColum = params.value.toLatin1().at(0) - 'A';
                 isValue = true;
@@ -1040,8 +1031,6 @@ QString EjCalculator::getStringValue(QString txt, EjBlock *source)
                 int i = curTable->cellIndex(numRow,numColum);
                 if(i > -1)
                 {
-                    cellBlock = (EjCellBlock*)lBlocks->at(i);
-                    res = cellBlock->value;
                     while(i < curTable->endBlock() && lBlocks->at(i+1)->type != BASECELL) {
                         i++;
                         curBlock = lBlocks->at(i);
@@ -1058,9 +1047,6 @@ QString EjCalculator::getStringValue(QString txt, EjBlock *source)
                 }
 
             }
-            else {
-                res = getDValue(params.value,&bOk);
-            }
         }
         if(params.type == LINK_LABEL )
         {
@@ -1076,13 +1062,11 @@ QString EjCalculator::getStringValue(QString txt, EjBlock *source)
                 {
                     j++;
                     curBlock = curLink->m_extDoc->lBlocks->at(j);
-                    if(curBlock->type == TEXT && str.count() < 500)
+					if(curBlock->type == TEXT && str.length() < 500)
                     {
 						str += ((EjTextBlock*)curBlock)->text;
                     }
                 }
-
-                res = getDValue(str,&bOk);
             }
         }
     }
@@ -1104,10 +1088,7 @@ bool EjCalculator::getValues(QString txt_from, QString txt_to, QList<CalcItem> &
     EjLinkProp *curLink;
 	QList<EjBlock*> *lBlocks = m_doc->lBlocks;
     int numRow, numColum, numRow_to, numColum_to;
-    bool isValue = false;
     int index;
-    int numTable;
-    int start;
     int row, colum;
     if(!attrProp)
         return false;
@@ -1143,7 +1124,7 @@ bool EjCalculator::getValues(QString txt_from, QString txt_to, QList<CalcItem> &
 
     if(is_value(params.value.toLatin1().at(0)))
     {
-        numRow = txt_from.right(txt_from.count()-1).toInt();
+		numRow = txt_from.right(txt_from.length()-1).toInt();
         numRow--;
         numColum = txt_from.toLatin1().at(0) - 'A';
     }
@@ -1152,7 +1133,7 @@ bool EjCalculator::getValues(QString txt_from, QString txt_to, QList<CalcItem> &
 
     if(is_value(params_to.value.toLatin1().at(0)))
     {
-        numRow_to = txt_to.right(txt_to.count()-1).toInt();
+		numRow_to = txt_to.right(txt_to.length()-1).toInt();
         numRow_to--;
         numColum_to = txt_to.toLatin1().at(0) - 'A';
     }
@@ -1172,7 +1153,6 @@ bool EjCalculator::getValues(QString txt_from, QString txt_to, QList<CalcItem> &
         numRow = numRow_to;
         numRow_to = tmp;
     }
-    start = lBlocks->indexOf(curTable)+1;
 //
     index = curTable->startCell();
     index--;
@@ -1215,7 +1195,7 @@ void EjCalculator::getLinkParams(QString txt, LinkParams &params)
     int i = 0;
     char c;
     QString str;
-    while (i < txt.count()) {
+	while (i < txt.length()) {
         c = txt.at(i).toLatin1();
         if(is_extend(c))
         {
@@ -1235,7 +1215,7 @@ void EjCalculator::getLinkParams(QString txt, LinkParams &params)
             }
             i++;
             str.clear();
-            while (i < txt.count()) {
+			while (i < txt.length()) {
                 c = txt.at(i).toLatin1();
                 if(is_num(c))
                 {
@@ -1250,7 +1230,7 @@ void EjCalculator::getLinkParams(QString txt, LinkParams &params)
             else {
                 params.numType = str.toInt();
             }
-            params.value = txt.right(txt.count() - i);
+			params.value = txt.right(txt.length() - i);
 
         }
         else

@@ -18,11 +18,10 @@ int EjUtils::findMaxIndexColumnInDocumentByBlocks(QList<EjBlock *> blocks)
 bool EjUtils::validateForTextFromTable(EjSheetDocument *sheet_document, EjSharedStringsDocument *sharedStrings_document, EjStylesDocument *styles_document)
 {
     if(sharedStrings_document->first){
-        int styleId = styles_document->addXfToCellXfs(sheet_document->getFillId(),
-                                                      sheet_document->getBorderId());
-        sharedStrings_document->addTextIntoTable(sharedStrings_document->getTempTextFromCell());
-        sheet_document->addTextNumberIntoTable(sharedStrings_document->getCountWords() - 1,
-                                      styleId);
+		int styleId = styles_document->addXfToCellXfs(sheet_document->getFillId(),
+													  sheet_document->getBorderId());
+		sharedStrings_document->addTextIntoTable(sharedStrings_document->getTempTextFromCell());
+		sheet_document->addTextNumberIntoTable(sharedStrings_document->getCountWords() - 1, styleId);
         sharedStrings_document->first = false;
       }
     return sharedStrings_document->first;
