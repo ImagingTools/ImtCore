@@ -10,6 +10,7 @@
 #include <istd/CCrcCalculator.h>
 #include <iprm/TParamsPtr.h>
 #include <iser/CJsonMemWriteArchive.h>
+#include <imod/TModelWrap.h>
 
 // ImtCore includes
 #include <imtbase/ICollectionFilter.h>
@@ -40,7 +41,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 		QString baseQuery = GetBaseSelectionQuery();
 
 		return QString(
-			baseQuery + QString(" AND \"%1\".\"Id\" = '%2'").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(objectId))).toUtf8();
+			baseQuery + QString(" WHERE \"DocumentId\" = '%1' AND \"IsActive\" = true").arg(qPrintable(objectId))).toUtf8();
 	}
 
 	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
@@ -642,6 +643,43 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& type
 
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
+QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
+{
+
+	QString query = R"(SELECT "TypeId", "DocumentId", "Name", "Description", "Document", "DataMetaInfo", "CollectionMetaInfo", "Checksum", "LastModified", "IsActive", "RevisionNumber",
+			(SELECT "LastModified" FROM "%2" as t1 WHERE "RevisionNumber" = 1 AND %1"%2"."DocumentId" = t1."DocumentId" LIMIT 1) as "Added" FROM "%2")";
+
+	QString schemaPrefix;
+	if (m_tableSchemaAttrPtr.IsValid()){
+		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
+	}
+
+	return query.arg(schemaPrefix).arg(*m_tableNameAttrPtr);
+}
+
+
+idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
+{
+	return idoc::MetaInfoPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+{
+	if (record.contains("DataMetaInfo")){
+		QByteArray metaInfoRepresentation = record.value("DataMetaInfo").toByteArray();
+		if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
+			idoc::MetaInfoPtr metaInfoPtr = m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(metaInfoRepresentation);
+			if (metaInfoPtr.IsValid()){
+				metaInfo.CopyFrom(*metaInfoPtr);
+			}
+		}
+	}
+
+	return true;
+}
+
+
 bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
 {
 	filterQuery.clear();
@@ -651,37 +689,6 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const iprm::IPara
 		QByteArray typeId = collectionFilterParamPtr->GetObjectTypeId();
 
 		filterQuery = QString("\"TypeId\" = '%1'").arg(qPrintable(typeId)).toUtf8();
-	}
-
-	return true;
-}
-
-
-bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
-			const QByteArray& typeId,
-			const QSqlRecord& record,
-			idoc::MetaInfoPtr& objectMetaInfoPtr,
-			idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const
-{
-	if (!m_databaseEngineCompPtr.IsValid()){
-		return false;
-	}
-
-
-	if (record.contains("DataMetaInfo")){
-		QByteArray metaInfoRepresentation = record.value("DataMetaInfo").toByteArray();
-		if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
-			objectMetaInfoPtr = m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(metaInfoRepresentation);
-		}
-	}
-
-	collectionItemMetaInfoPtr.SetPtr(CreateCollectionItemMetaInfo(typeId));
-	if (collectionItemMetaInfoPtr.IsValid()){
-		if (!SetCollectionItemMetaInfoFromRecord(record, *collectionItemMetaInfoPtr)){
-			collectionItemMetaInfoPtr.Reset();
-
-			return false;
-		}
 	}
 
 	return true;
