@@ -4,7 +4,9 @@ import imtcontrols 1.0
 
 Rectangle {
     id: menuPanel;
+
     width: buttonWidth;
+
     clip: true;
 
     color: Style.backgroundColor;
@@ -32,6 +34,8 @@ Rectangle {
 
     property int buttonWidth: -1;
     property int buttonHeight: -1;
+
+    property bool centered: false;
 
     Component.onCompleted: {
         Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
@@ -207,6 +211,7 @@ Rectangle {
 
     ListView {
         id: allPages;
+
         anchors.top: menuPanel.top;
         anchors.left: menuPanel.left;
         anchors.right: menuPanel.right;
@@ -218,10 +223,15 @@ Rectangle {
 
     ListView {
         id: topAlignmentPages;
+
         anchors.top: menuPanel.top;
         anchors.left: menuPanel.left;
         anchors.right: menuPanel.right;
+
+        anchors.topMargin: !menuPanel.centered ? 0 : parent.height - bottomAlignmentPages.height - contentHeight > 0 ? (parent.height - bottomAlignmentPages.height - contentHeight)/2 : 0 ;
+
         height: count * menuPanel.buttonHeight;
+
         visible: !allPages.visible;
         boundsBehavior: Flickable.StopAtBounds;
         interactive: false;
@@ -242,10 +252,13 @@ Rectangle {
 
     ListView {
         id: bottomAlignmentPages;
+
         anchors.left: menuPanel.left;
         anchors.right: menuPanel.right;
         anchors.bottom: menuPanel.bottom;
+
         height: count * menuPanel.buttonHeight;
+
         visible: !allPages.visible;
         boundsBehavior: Flickable.StopAtBounds;
         interactive: false;
@@ -263,5 +276,6 @@ Rectangle {
             }
         }
     }
+
 }
 
