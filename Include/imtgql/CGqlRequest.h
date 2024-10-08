@@ -24,6 +24,7 @@ public:
 	void SetGqlContext(const imtgql::IGqlContext* gqlContext);
 	void SetRequestType(RequestType requestType);
 	void SetCommandId(const QByteArray& commandId);
+	QByteArray GetHeader(QByteArray headerId);
 
 	const CGqlObject& GetFields() const;
 	const CGqlObject& GetParams() const;

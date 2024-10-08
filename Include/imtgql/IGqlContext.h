@@ -22,6 +22,8 @@ namespace imtgql
 class IGqlContext: virtual public iser::IObject
 {
 public:
+	typedef QMap<QByteArray,QByteArray> Headers;
+
 	virtual QByteArray GetProductId() const = 0;
 	virtual void SetProductId(const QByteArray& productId) = 0;
 
@@ -36,6 +38,9 @@ public:
 
 	virtual imtauth::IUserInfo* GetUserInfo() const = 0;
 	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) = 0;
+
+	virtual Headers GetHeaders() const = 0;
+	virtual void SetHeaders(const Headers headers) = 0;
 };
 
 

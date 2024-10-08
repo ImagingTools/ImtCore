@@ -27,6 +27,8 @@ public:
 	virtual void SetToken(const QByteArray& token) override;
 	virtual imtauth::IUserInfo* GetUserInfo() const override;
 	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) override;
+	virtual Headers GetHeaders() const override;
+	virtual void SetHeaders(const Headers headers) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -43,6 +45,7 @@ private:
 	QByteArray m_designScheme;
 	QByteArray m_token;
 	imtauth::IUserInfo* m_userInfoPtr;
+	Headers m_headers;
 };
 
 

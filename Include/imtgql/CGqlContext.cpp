@@ -112,6 +112,18 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo *userInfoPtr)
 }
 
 
+IGqlContext::Headers CGqlContext::GetHeaders() const
+{
+	return m_headers;
+}
+
+
+void CGqlContext::SetHeaders(const Headers headers)
+{
+	m_headers = headers;
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CGqlContext::Serialize(iser::IArchive &archive)

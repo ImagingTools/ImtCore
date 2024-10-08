@@ -109,6 +109,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	if (gqlContextPtr != nullptr){
 		gqlContextPtr->SetLanguageId(languageId);
 		gqlContextPtr->SetDesignScheme(designSchemeId);
+		gqlContextPtr->SetHeaders(headers);
 	}
 
 	QByteArray responseData;

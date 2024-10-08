@@ -74,6 +74,18 @@ void CGqlRequest::SetCommandId(const QByteArray& commandId)
 }
 
 
+QByteArray CGqlRequest::GetHeader(QByteArray headerId)
+{
+	IGqlContext* gqlContext = GetRequestContext();
+	if (gqlContext != nullptr){
+		IGqlContext::Headers headers = gqlContext->GetHeaders();
+		return headers.value(headerId);
+	}
+
+	return QByteArray();
+}
+
+
 const CGqlObject& CGqlRequest::GetFields() const
 {
 	return m_fields;
@@ -785,6 +797,12 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 			QString stringValue = text;
 			variantList.append(stringValue);
 		}
+		else if (text == "true"){
+			variantList.append(QVariant(true));
+		}
+		else if (text == "false"){
+			variantList.append(QVariant(false));
+		}
 		else {
 			bool ok;
 			if (text.contains('.')){
@@ -815,6 +833,12 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 		if (m_textString){
 			QString stringValue = text;
 			value = stringValue;
+		}
+		else if (text == "true"){
+			value = true;
+		}
+		else if (text == "false"){
+			value = false;
 		}
 		else {
 			bool ok;
