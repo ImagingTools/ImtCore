@@ -323,8 +323,8 @@ bool CGqlObjectCollectionDelegateComp::GetOperationResult(const imtgql::IGqlResp
 bool CGqlObjectCollectionDelegateComp::GetObjectId(const imtgql::IGqlResponse& response, Id& out) const
 {
 	ResponseData responseData = GetResponseData(response);
-	if (responseData.commandId == "addedNotification"){
-		QJsonObject addedNotification = responseData.data.value("addedNotification").toObject();
+	if (responseData.data.contains("addedNotification")){
+		QJsonObject addedNotification = responseData.data["addedNotification"].toObject();
 		if (addedNotification.contains("Id")){
 			out = addedNotification["Id"].toString().toLatin1();
 
@@ -341,11 +341,14 @@ bool CGqlObjectCollectionDelegateComp::GetObjectInfo(const imtgql::IGqlResponse&
 	ResponseData responseData = GetResponseData(response);
 	if (responseData.data.contains("info")){
 		QJsonObject info = responseData.data["info"].toObject();
-		out.id = info["Id"].toString().toLatin1();
+
+		out.id = info.value("id").toString().toLatin1();
 		out.typeId = info.value("typeId").toString().toUtf8();
 		out.version = info.value("version").toInt();
 		out.name = info.value("name").toString();
 		out.description = info.value("description").toString();
+
+		return true;
 	}
 
 	return false;
@@ -395,7 +398,6 @@ bool CGqlObjectCollectionDelegateComp::GetMetaInfo(const imtgql::IGqlResponse& r
 bool CGqlObjectCollectionDelegateComp::GetItemCount(const imtgql::IGqlResponse& response, int& out) const
 {
 	ResponseData responseData = GetResponseData(response);
-	QJsonValue responseDataValue;
 	if (responseData.data.contains("itemsCount")){
 		QJsonValue itemsCountValue = responseData.data["itemsCount"];
 		if (itemsCountValue.isDouble()){
@@ -417,7 +419,6 @@ bool CGqlObjectCollectionDelegateComp::GetItemCount(const imtgql::IGqlResponse& 
 bool CGqlObjectCollectionDelegateComp::GetItemIds(const imtgql::IGqlResponse& response, Ids& out) const
 {
 	ResponseData responseData = GetResponseData(response);
-	QJsonValue responseDataValue;
 	if (responseData.data.contains("itemIds")){
 		QJsonValue itemsIdsValue = responseData.data["itemIds"];
 		if (itemsIdsValue.isString()){

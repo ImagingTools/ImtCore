@@ -117,6 +117,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 			return retVal;
 		}
 
+		documentContent = documentContent.toBase64();
+
 		checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 	}
 	else{
@@ -202,21 +204,6 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 				.arg(qPrintable(objectId))
 				.toUtf8();
 
-	QSqlError error;
-	QSqlQuery countQuery = m_databaseEngineCompPtr->ExecSqlQuery(countRevisionsQuery, &error);
-
-	quint64 revisionsCount = 0;
-	if (error.type() == QSqlError::NoError){
-		if (countQuery.first()){
-			revisionsCount = countQuery.value(0).toULongLong();
-		}
-	}
-	else{
-		SendErrorMessage(0, "The number of revisions of the document could not be queried", "Database Manager");
-
-		return QByteArray();
-	}
-
 	QByteArray retVal;
 
 	QByteArray typeId = collection.GetObjectTypeId(objectId);
@@ -228,6 +215,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 
 	QByteArray documentContent;
 	if (WriteDataToMemory(typeId, object, documentContent)){
+		documentContent = documentContent.toBase64();
+
 		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
 		// Insert new entry into the document list table:
@@ -645,7 +634,6 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& type
 
 QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 {
-
 	QString query = R"(SELECT "TypeId", "DocumentId", "Name", "Description", "Document", "DataMetaInfo", "CollectionMetaInfo", "Checksum", "LastModified", "IsActive", "RevisionNumber",
 			(SELECT "LastModified" FROM "%2" as t1 WHERE "RevisionNumber" = 1 AND %1"%2"."DocumentId" = t1."DocumentId" LIMIT 1) as "Added" FROM "%2")";
 
