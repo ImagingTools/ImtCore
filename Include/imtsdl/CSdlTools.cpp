@@ -806,6 +806,9 @@ void CSdlTools::PrintFiles(std::ostream& outStream, const QStringList& files, IS
 		if (projectCodeGenerator == ISdlProcessArgumentsParser::GT_CMAKE){
 			outStream << std::endl;
 		}
+		if (projectCodeGenerator == ISdlProcessArgumentsParser::GT_CMAKE_PIPE){
+			outStream << ';';
+		}
 		else {
 			outStream << ' ';
 		}

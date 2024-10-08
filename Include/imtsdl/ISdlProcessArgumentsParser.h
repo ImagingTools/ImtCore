@@ -22,7 +22,8 @@ public:
 	enum GeneratorType
 	{
 		GT_CMAKE,
-		GT_QMAKE
+		GT_QMAKE,
+		GT_CMAKE_PIPE
 	};
 
 	enum AutoLinkLevel

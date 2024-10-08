@@ -55,7 +55,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 
 	/// \todo remove it \deprecated
 	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single. Deprecated.");
-	QCommandLineOption generatorOption("generator", "{QMake | CMake}. Optional. Only for dependencies mode. Defines a type of output of files to be generated. Default - CMake", "generator");
+	QCommandLineOption generatorOption("generator", "{QMake | CMake | CMake-pipe}. Optional. Only for dependencies mode. Defines a type of output of files to be generated. Default - CMake", "generator");
 	QCommandLineOption autoLinkOption("auto-link", "Defines the compilation order of the schema files.\n"
 												   "0 - disabled. ALL files will be compiled.\n"
 												   "1 - only those schemas with the same namespace as the original one will be compiled\n"
@@ -199,6 +199,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 		}
 		else if (generatorName == QStringLiteral("cmake")){
 			m_generatorType = GT_CMAKE;
+		}
+		else if (generatorName == QStringLiteral("cmake-pipe")){
+			m_generatorType = GT_CMAKE_PIPE;
 		}
 		else {
 			SendErrorMessage(0, QString("Unexpected generator option '%1'. Expected: QMake or CMake").arg(generatorName));

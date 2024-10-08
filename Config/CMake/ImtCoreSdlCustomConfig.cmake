@@ -9,31 +9,34 @@ macro(ImtCoreGetSdlDeps)
 
 	if (ARG_GET_SCHEMA_DEPS)
 		set(SDL_DEPS_GENERATION_COMMAND ${SDL_GENERATOR_EXE_PATH} -S ${ARG_INPUT} --schema-dependencies)
-		set(SDL_DEPS_FILE_PATH "${ARG_OUT_DIR}/__SDL_SCHEMA__DependsList.txt")
 		set(SDL_ERRORS_FILE_PATH "${ARG_OUT_DIR}/__SDL_SCHEMA__DependsList_errors.txt")
 	else()
 		set(SDL_DEPS_GENERATION_COMMAND ${SDL_GENERATOR_EXE_PATH} -DS ${ARG_INPUT} -O ${ARG_OUT_DIR} ${ARG_MODIFICATORS})
-		set(SDL_DEPS_FILE_PATH "${ARG_OUT_DIR}/__SDL__DependsList.txt")
 		set(SDL_ERRORS_FILE_PATH "${ARG_OUT_DIR}/__SDL__DependsList_errors.txt")
 	endif()
 
-	message(STATUS "EXEC: ${SDL_DEPS_GENERATION_COMMAND}")
+	message(STATUS "EXEC: ${SDL_DEPS_GENERATION_COMMAND} --generator=CMake-pipe")
+
 	execute_process(
 		COMMAND
-			${SDL_DEPS_GENERATION_COMMAND}
-		OUTPUT_FILE
-			${SDL_DEPS_FILE_PATH}
+			${SDL_DEPS_GENERATION_COMMAND} --generator=CMake-pipe
 		ERROR_FILE
 			${SDL_ERRORS_FILE_PATH}
 		RESULT_VARIABLE
 			SDL_DEPS_GENERATION_RESULT_CODE
+		OUTPUT_VARIABLE
+			SDL_DEPS_VAR
 	)
+
+	# remove empty elements
+	list(JOIN SDL_DEPS_VAR "|" SDL_DEPS_VAR)
+	string(REGEX REPLACE "\\|$" "" SDL_DEPS_VAR "${SDL_DEPS_VAR}")
+	string(REGEX REPLACE "\\|\\|" "|" SDL_DEPS_VAR "${SDL_DEPS_VAR}")
+	string(REPLACE "|" ";" SDL_DEPS_VAR "${SDL_DEPS_VAR}")
 
 	if(NOT SDL_DEPS_GENERATION_RESULT_CODE EQUAL 0)
 		message(WARNING "SDL Can't create dependency list")
-
-		file(STRINGS ${SDL_DEPS_FILE_PATH} ERRORS1_SDL_DEPS_LIST)
-		message(WARNING "${ERRORS1_SDL_DEPS_LIST}")
+		message(WARNING "${SDL_DEPS_VAR}")
 
 		file(STRINGS ${SDL_ERRORS_FILE_PATH} ERRORS2_SDL_DEPS_LIST)
 		message(WARNING "${ERRORS2_SDL_DEPS_LIST}")
@@ -42,11 +45,9 @@ macro(ImtCoreGetSdlDeps)
 		message(FATAL_ERROR "SDL finished unexpected. Error code: [${SDL_DEPS_GENERATION_RESULT_CODE}]")
 	endif()
 
-	file(STRINGS ${SDL_DEPS_FILE_PATH} SDL_FOUND_DEPS)
-	set(${ARG_RESULT_VARIABLE} ${SDL_FOUND_DEPS})
+	set(${ARG_RESULT_VARIABLE} ${SDL_DEPS_VAR})
 
 	# cleanup on success
-	file(REMOVE ${SDL_DEPS_FILE_PATH})
 	file(REMOVE ${SDL_ERRORS_FILE_PATH})
 
 endmacro()
@@ -69,7 +70,6 @@ function (ImtCoreAutoConfigureSdlCpp)
 	list(APPEND CUSTOM_MODIFICATORS "--CPP")
 	list(APPEND CUSTOM_MODIFICATORS "--GQL")
 	list(APPEND CUSTOM_MODIFICATORS "--use-all-modificators")
-	list(APPEND CUSTOM_MODIFICATORS "--generator=CMake")
 	list(APPEND CUSTOM_MODIFICATORS "-Psdl")
 	list(APPEND CUSTOM_MODIFICATORS "-Bistd::IPolymorphic=istd/IPolymorphic.h")
 	list(APPEND CUSTOM_MODIFICATORS "-JCPP=${SDL_OUTPUT_DIRECTORY}/${ARG_SOURCE_NAME}.cpp")
@@ -129,7 +129,6 @@ function (ImtCoreAutoConfigureSdlQml)
 	set(MODIFICATORS)
 	list(APPEND MODIFICATORS "--QML")
 	list(APPEND MODIFICATORS "--use-all-modificators")
-	list(APPEND MODIFICATORS "--generator=CMake")
 	list(APPEND MODIFICATORS "-N=${ARG_QML_NAME}")
 
 	ImtCoreGetSdlDeps(
