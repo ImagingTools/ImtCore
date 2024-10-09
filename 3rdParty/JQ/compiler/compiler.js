@@ -18,6 +18,7 @@ const QtWebSockets = require('../QtWebSockets/QtWebSockets')
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\imtcore.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\lisa.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\agentino.json'//process.argv.slice(2)[0]
+// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\jq.json'
 const configFilePath = process.argv.slice(2)[0]
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 const config = JSON.parse(fs.readFileSync(configFilePath, {encoding:'utf8', flag:'r'}))
@@ -517,6 +518,11 @@ class Instruction {
                         this.prepare(tree[2][i], stat)
                         if(i < tree[2].length-1) stat.value += ','
                     }
+
+                    if(tree[1][0] === 'dot' && tree[1][1][1] === 'Qt' && tree[1][2] === 'createComponent'){
+                        stat.value += ',__currentModule'
+                    }
+
                     stat.value += ')\n'
 
                     stat.dotObj = null
@@ -1083,6 +1089,11 @@ class Instruction {
         }
 
         code.push('static create(parent, model, properties=[], isRoot=true, ...args){')
+
+        if(isRoot) {
+            code.push(`let __currentModule=${this.qmlFile.moduleName ? "JQModules['"+ this.qmlFile.moduleName +"']" : 'null'}`)
+        }
+
         if(this.extends === 'Component'){
             if(this.children.length < 1) {
                 console.log(`${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: Cannot create empty component specification`)

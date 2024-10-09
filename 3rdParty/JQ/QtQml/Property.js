@@ -207,6 +207,7 @@ class Property extends BaseObject {
         if(this.__subscribers)
         for(let subscriber of this.__subscribers){
             subscriber.__updating = false
+            subscriber.__completed = false
         }
     }
 

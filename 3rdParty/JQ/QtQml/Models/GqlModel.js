@@ -5,10 +5,17 @@ class GqlModel extends TreeItemModel {
         XMLHttpRequest.QMLAuthToken = token
     }
     
-    setGqlQuery(gqlData){
+    setGqlQuery(gqlData, headers){
         this.state = "Loading"
         let xhr = new XMLHttpRequest
         xhr.open("POST", "../../graphql")
+
+        if(headers && typeof headers === 'object'){
+            for(let name in headers){
+                xhr.setRequestHeader(name, headers[name])
+            }
+        }
+
         xhr.send(gqlData)
 
         xhr.onreadystatechange = ()=>{

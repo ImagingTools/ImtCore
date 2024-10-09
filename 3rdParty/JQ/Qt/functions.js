@@ -237,11 +237,11 @@ module.exports = {
             y: y,
         }
     },
-    createComponent(source){
+    createComponent(source, currentModule){
         let path = source.replaceAll('qrc:/', '').replaceAll('.qml', '').split('/')
         let className = path[path.length-1]
 
-        let cls = null
+        let cls = currentModule
         try {
             cls = eval(className)
         } catch (error) {
