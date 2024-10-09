@@ -68,6 +68,8 @@ IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr,
 					message = "Response for request-ID " + uuid + "\n" + replyPtr->errorString();
 				}
 
+				replyPtr->deleteLater();
+
 				if (category > istd::IInformationProvider::IC_INFO){
 					SendLogMessage(category, 0, message, "API Client");
 				}
@@ -75,6 +77,8 @@ IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr,
 			else{
 				SendErrorMessage(0, "Failed to create network request", "API Client");
 			}
+
+			delete(networkRequestPtr);
 		}
 		else{
 			SendErrorMessage(0, "Invalid request type", "API Client");
