@@ -150,14 +150,6 @@ Rectangle {
         buttonPanel.compl = true;
     }
 
-    onOpenSTChanged: {
-        if(buttonPanel.openST){
-            Events.subscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked)
-        }
-        else {
-            Events.unSubscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked);
-        }
-    }
 
     onButtonModelChanged: {
         if (!buttonPanel.buttonModel){
@@ -284,13 +276,6 @@ Rectangle {
             }
             buttonPanel.verticalMenuWidth = maxVal;
         }
-    }
-
-    function onBackgroundClicked(){
-        console.log("ButtonPanel onBackgroundClicked");
-
-        ModalDialogManager.closeByComp(vertMenuComp);
-        buttonPanel.openST = false;
     }
 
     function getMaxString(){
@@ -712,11 +697,13 @@ Rectangle {
 
             property Item root: null;
             property bool doNotCorrectPosition: true;
+            property bool hiddenBackground: true;
 
-            onRootChanged: {
-                if(verticalListViewContainer.root){
-                    verticalListViewContainer.root.backgroundItem.opacity = 0;
-                }
+            function onBackgroundClicked(){
+                console.log("ButtonPanel onBackgroundClicked");
+
+                ModalDialogManager.closeByComp(vertMenuComp);
+                buttonPanel.openST = false;
             }
 
             ListView{
