@@ -9,13 +9,7 @@ Item {
     // Main dialog manager reference
     property Item root: null;
     property TreeItemModel model;
-
-    onRootChanged: {
-        if (root){
-            root.backgroundItem.opacity = 0;
-            Events.subscribeEvent("DialogBackgroundClicked", root.closeDialog)
-        }
-    }
+    property bool hiddenBackground: true;
 
     Component.onCompleted: {
         Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
@@ -23,13 +17,16 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged);
-        Events.unSubscribeEvent("DialogBackgroundClicked", root.closeDialog)
     }
 
     function onAppSizeChanged(parameters){
         if (root){
             root.closeDialog();
         }
+    }
+
+    function onBackgroundClicked(){
+        root.closeDialog();
     }
 }
 

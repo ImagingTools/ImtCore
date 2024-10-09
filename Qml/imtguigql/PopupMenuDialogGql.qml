@@ -123,7 +123,6 @@ Item {
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
         destructionSignal();
     }
 
@@ -148,23 +147,6 @@ Item {
 //        popupMenuContainer.rootItem.currentIndex = -1;
 
 //    }
-
-
-
-    onRootChanged: {
-        /**
-            Opacity of the background = 0
-        */
-        if(popupMenuContainer.hiddenBackground){
-            popupMenuContainer.root.backgroundItem.opacity = 0;
-        }
-
-        /**
-            Close the dialog by clicking on the background
-        */
-        Events.subscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
-
-    }
 
 
     onFinished: {

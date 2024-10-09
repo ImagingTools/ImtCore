@@ -132,6 +132,7 @@ FocusScope{
 
             property Item root: null;
             property Item rootItem: null;
+            property bool hiddenBackground: true;
             property TreeItemModel dataModel: TreeItemModel{};
             signal setCheckedSignal();
 
@@ -140,23 +141,6 @@ FocusScope{
                     popupMenuContainer.setAllChecked();
                     popupMenuContainer.setCheckedSignal();
                 }
-            }
-
-            Component.onDestruction: {
-                Events.unSubscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
-            }
-
-            onRootChanged: {
-                //console.log("PopupMenu onRootChanged", root)
-                /**
-                    Opacity of the background = 0
-                */
-                root.backgroundItem.opacity = 0;
-
-                /**
-                    Close the dialog by clicking on the background
-                */
-                Events.subscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
             }
 
             function onBackgroundClicked(){

@@ -70,35 +70,11 @@ ControlBase {
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
         Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged);
     }
 
     onFinished: {
         close();
-    }
-
-    onStarted: {
-        timer.start();
-    }
-
-    Timer {
-        id: timer;
-
-        interval: 100;
-
-        onTriggered: {
-            Events.subscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
-        }
-    }
-
-    onRootChanged: {
-        /**
-            Opacity of the background = 0
-        */
-        if(popupMenuContainer.hiddenBackground){
-            popupMenuContainer.root.backgroundItem.opacity = 0;
-        }
     }
 
     function onAppSizeChanged(parameters){

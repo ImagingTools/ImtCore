@@ -46,7 +46,6 @@ Item {
                         wheel.accepted = true;
                     }
                     onClicked: {
-                        Events.sendEvent("DialogBackgroundClicked");
                         mouse.accepted = true;
                     }
                     onReleased: {}
@@ -122,12 +121,20 @@ Item {
                     ModalDialogManager.backgroundItem = background;
 
                     dialogLoader.item.root = ModalDialogManager;
-                    for (let key in model.Parameters) {
 
+                    if (dialogLoader.item.onBackgroundClicked){
+                        backgroundArea.clicked.connect(dialogLoader.item.onBackgroundClicked);
+                    }
+
+                    if (dialogLoader.item.hiddenBackground != undefined && dialogLoader.item.hiddenBackground){
+                        background.opacity = 0;
+                    }
+
+                    for (let key in model.Parameters) {
                         dialogLoader.item[key] = model.Parameters[key];
                     }
+
                     if (dialogLoader.item.centered){
-                        //dialogLoader.anchors.centerIn = dialogDelegate;
                         dialogLoader.x = container.width/2 - dialogLoader.width/2;
                         dialogLoader.y = container.height/2 - dialogLoader.height/2;
                     }
