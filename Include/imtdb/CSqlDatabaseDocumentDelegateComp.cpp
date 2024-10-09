@@ -11,6 +11,7 @@
 #include <iprm/TParamsPtr.h>
 #include <iser/CJsonMemWriteArchive.h>
 #include <imod/TModelWrap.h>
+#include <iprm/IIdParam.h>
 
 // ImtCore includes
 #include <imtbase/ICollectionFilter.h>
@@ -25,11 +26,34 @@ static const QByteArray s_idColumn = QByteArrayLiteral("Id");
 static const QByteArray s_typeIdColumn = QByteArrayLiteral("TypeId");
 static const QByteArray s_documentIdColumn = QByteArrayLiteral("DocumentId");
 static const QByteArray s_documentColumn = QByteArrayLiteral("Document");
+static const QByteArray s_addedColumn = QByteArrayLiteral("Added");
+static const QByteArray s_lastModifiedColumn = QByteArrayLiteral("LastModified");
 
 
 // public methods
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
+
+QByteArray CSqlDatabaseDocumentDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
+{
+	QString filterQuery;
+	if (paramsPtr != nullptr){
+		if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+			return QByteArray();
+		}
+	}
+
+	if (!m_tableSchemaAttrPtr.IsValid()){
+		return QString("SELECT COUNT(*) FROM \"%1\" WHERE \"IsActive\" = true %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toUtf8();
+	}
+
+	return QString("SELECT COUNT(*) FROM %0.\"%1\" WHERE \"IsActive\" %2")
+				.arg(qPrintable(*m_tableSchemaAttrPtr))
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(filterQuery)
+				.toUtf8();
+}
+
 
 QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 			const QByteArray& objectId,
@@ -44,7 +68,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 			baseQuery + QString(" AND \"DocumentId\" = '%1'").arg(qPrintable(objectId))).toUtf8();
 	}
 
-	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
+	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
+
+	return selectionQuery;
 }
 
 
@@ -127,9 +153,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 
 	// Create the document-ID:
 	QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedObjectId;
-
-	// Create ID for the document data revision:
-	QByteArray revisionUuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	// Insert new entry into the document list table:
 	retVal.query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"%2\" = '%3'")
@@ -301,49 +324,7 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId) const
 {
-	//if (!m_databaseEngineCompPtr.IsValid()){
-	//	return imtbase::IRevisionController::RevisionInfoList();
-	//}
-
-	//if ((*m_revisionsTableNameAttrPtr).isEmpty()){
-	//	return imtbase::IRevisionController::RevisionInfoList();
-	//}
-
-	//QString revisionListQuery = QString("SELECT \"RevisionNumber\", \"LastModified\", \"Comment\" from \"%1\" WHERE \"%2\" = '%3'")
-	//			.arg(qPrintable(*m_revisionsTableNameAttrPtr))
-	//			.arg(qPrintable(s_documentIdColumn))
-	//			.arg(qPrintable(objectId));
-
-	//QSqlError sqlError;
-	//QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(revisionListQuery.toUtf8(), &sqlError);
-	//if (sqlError.type() != QSqlError::NoError){
-	//	SendErrorMessage(0, sqlError.text(), "Database collection");
-
-	//	return imtbase::IRevisionController::RevisionInfoList();
-	//}
-
 	imtbase::IRevisionController::RevisionInfoList revisionInfoList;
-
-	//while (sqlQuery.next()){
-	//	QSqlRecord revisionRecord = sqlQuery.record();
-	//	RevisionInfo revisionInfo;
-
-	//	if (revisionRecord.contains("RevisionNumber")){
-	//		revisionInfo.revision = revisionRecord.value("RevisionNumber").toLongLong();
-	//	}
-
-	//	if (revisionRecord.contains("LastModified")){
-	//		revisionInfo.timestamp = revisionRecord.value("LastModified").toDateTime();
-	//	}
-
-	//	if (revisionRecord.contains("Comment")){
-	//		revisionInfo.comment = revisionRecord.value("Comment").toString();
-	//	}
-
-	//	revisionInfo.isRevisionAvailable = true;
-
-	//	revisionInfoList.push_back(revisionInfo);
-	//}
 
 	return revisionInfoList;
 }
@@ -354,49 +335,6 @@ int CSqlDatabaseDocumentDelegateComp::BackupObject(
 			const imtbase::ICollectionInfo::Id& objectId,
 			const QString& userComment) const
 {
-	//if (!m_databaseEngineCompPtr.IsValid()){
-	//	return -1;
-	//}
-
-	//if ((*m_revisionsTableNameAttrPtr).isEmpty()){
-	//	return -1;
-	//}
-
-	//if (objectId.isEmpty()){
-	//	return -1;
-	//}
-
-	//QByteArray lastRevisionQuery = QString("SELECT \"%1\" from \"%2\" WHERE \"%1\" in (SELECT \"LastRevisionId\" from \"%3\" WHERE \"%1\" = '%4')")
-	//			.arg(qPrintable(s_idColumn))
-	//			.arg(qPrintable(*m_revisionsTableNameAttrPtr))
-	//			.arg(qPrintable(*m_tableNameAttrPtr))
-	//			.arg(qPrintable(objectId))
-	//			.toUtf8();
-
-	//QByteArray lastRevisionNumberQuery = QString("SELECT \"RevisionNumber\" from \"%2\" WHERE \"%1\" in (SELECT \"LastRevisionId\" from \"%3\" WHERE \"%1\" = '%4')")
-	//			.arg(qPrintable(s_idColumn))
-	//			.arg(qPrintable(*m_revisionsTableNameAttrPtr))
-	//			.arg(qPrintable(*m_tableNameAttrPtr))
-	//			.arg(qPrintable(objectId))
-	//			.toUtf8();
-
-	//QByteArray updateCommentQuery = QString("UPDATE \"%1\" SET \"Comment\" = '%2' WHERE \"%3\" in (%4)")
-	//			.arg(qPrintable(*m_revisionsTableNameAttrPtr))
-	//			.arg(userComment)
-	//			.arg(qPrintable(s_idColumn))
-	//			.arg(qPrintable(lastRevisionQuery))
-	//			.toUtf8();
-
-	//m_databaseEngineCompPtr->ExecSqlQuery(updateCommentQuery);
-
-	//QSqlQuery queryResult = m_databaseEngineCompPtr->ExecSqlQuery(lastRevisionNumberQuery);
-	//if (queryResult.next()){
-	//	QSqlRecord record = queryResult.record();
-	//	if (record.contains("RevisionNumber")){
-	//		return record.value("RevisionNumber").toInt();
-	//	}
-	//}
-
 	return -1;
 }
 
@@ -406,48 +344,6 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreObject(
 			const imtbase::ICollectionInfo::Id& objectId,
 			int revision) const
 {
-	//if (!m_databaseEngineCompPtr.IsValid()){
-	//	return false;
-	//}
-
-	//if (!m_documentFactoriesCompPtr.IsValid()){
-	//	return false;
-	//}
-
-	//QString revisionIdQuery  = QString("SELECT \"%5\" from \"%1\" WHERE \"%2\" = '%3' AND \"RevisionNumber\" = %4")
-	//			.arg(qPrintable(*m_revisionsTableNameAttrPtr))
-	//			.arg(qPrintable(s_documentIdColumn))
-	//			.arg(qPrintable(objectId))
-	//			.arg(revision)
-	//			.arg(qPrintable(s_idColumn));
-
-	//QByteArray revisionUuid;
-	//QSqlQuery queryResult = m_databaseEngineCompPtr->ExecSqlQuery(revisionIdQuery.toUtf8());
-	//if (queryResult.next()){
-	//	QSqlRecord record = queryResult.record();
-	//	if (record.contains(qPrintable(s_idColumn))){
-	//		revisionUuid = record.value(qPrintable(s_idColumn)).toByteArray();
-	//	}
-	//}
-
-	//if (revisionUuid.isEmpty()){
-	//	return false;
-	//}
-
-	//QString setActiveRevisionQuery = QString("UPDATE \"%1\" SET \"LastRevisionId\" = '%2' WHERE \"%3\" = '%4';")
-	//			.arg(qPrintable(*m_tableNameAttrPtr))
-	//			.arg(qPrintable(revisionUuid))
-	//			.arg(qPrintable(s_idColumn))
-	//			.arg(qPrintable(objectId))
-	//			.toUtf8();
-
-	//istd::CChangeNotifier changeNotifier(&collection);
-
-	//QSqlError sqlError;
-	//m_databaseEngineCompPtr->ExecSqlQuery(setActiveRevisionQuery.toUtf8(), &sqlError);
-
-	//return sqlError.type() == QSqlError::NoError;
-
 	return false;
 }
 
@@ -536,7 +432,7 @@ bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const QByteArray& typeI
 
 	QString fileName = QUuid::createUuid().toString();
 	QString workingExtension;
-	for (const QString ext : supportedExts){
+	for (const QString& ext : supportedExts){
 		QString filePath = fileName + "." + ext;
 		if (documentPersistencePtr->IsOperationSupported(&object, &filePath, flags, false)){
 			workingExtension = ext;
@@ -594,7 +490,7 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& type
 
 	QString fileName = QUuid::createUuid().toString();
 	QString workingExtension;
-	for (const QString ext : supportedExts){
+	for (const QString& ext : supportedExts){
 		QString filePath = fileName + "." + ext;
 		if (documentPersistencePtr->IsOperationSupported(&object, &filePath, flags, false)){
 			workingExtension = ext;
@@ -705,10 +601,211 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::ICollectio
 	}
 
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
-		sortQuery = QString("ORDER BY \"DataMetaInfo\"->>\'%1\' %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
+		if (columnId == s_lastModifiedColumn || columnId == s_addedColumn){
+			sortQuery = QString("ORDER BY \"%1\" %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
+		}
+		else{
+			sortQuery = QString("ORDER BY \"DataMetaInfo\"->>\'%1\' %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
+		}
 	}
 
 	return true;
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
+{
+	bool retVal = true;
+	QString objectFilterQuery;
+
+	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+
+	if (paramIds.contains("ObjectFilter")){
+		iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
+		if (objectFilterParamPtr.IsValid()){
+			retVal = CreateObjectFilterQuery(*objectFilterParamPtr, objectFilterQuery);
+			if (!retVal){
+				return false;
+			}
+		}
+	}
+
+	QString textFilterQuery;
+	if (paramIds.contains("Filter")){
+		iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
+		if (collectionFilterParamPtr.IsValid()){
+			retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
+			if (!retVal){
+				return false;
+			}
+		}
+	}
+
+	QString timeFilterQuery;
+	if (paramIds.contains("TimeFilter")){
+		iprm::TParamsPtr<imtbase::ITimeFilterParam> timeFilterParamPtr(&filterParams, "TimeFilter");
+		if (timeFilterParamPtr.IsValid()){
+			retVal = CreateTimeFilterQuery(*timeFilterParamPtr, timeFilterQuery);
+			if (!retVal){
+				return false;
+			}
+		}
+	}
+
+	QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
+
+	if (!objectFilterQuery.isEmpty()){
+		filterQuery += " AND (" + objectFilterQuery + ")";
+	}
+
+	if (!textFilterQuery.isEmpty()){
+		filterQuery += " AND (" + textFilterQuery + ")";
+	}
+
+	if (!timeFilterQuery.isEmpty()){
+		filterQuery += " AND (" + timeFilterQuery + ")";
+	}
+
+	if(!additionalFilters.isEmpty()){
+		filterQuery += " AND (" + additionalFilters + ")";
+	}
+
+	return true;
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const
+{
+	QByteArrayList filteringColumnIds = collectionFilter.GetFilteringInfoIds();
+	if (filteringColumnIds.isEmpty()){
+		return true;
+	}
+
+	QString textFilter = collectionFilter.GetTextFilter();
+	if (!textFilter.isEmpty()){
+		textFilterQuery = QString("\"DataMetaInfo\"->>\'%1\' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+
+		for (int i = 1; i < filteringColumnIds.count(); ++i){
+			textFilterQuery += " OR ";
+
+			textFilterQuery += QString("\"DataMetaInfo\"->>\'%1\' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+		}
+	}
+
+	return true;
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const
+{
+	QString addedStrQuery = QString(R"((SELECT "LastModified" FROM "%1" as temp WHERE "RevisionNumber" = 1 AND "%1"."DocumentId" = temp."DocumentId" LIMIT 1))").arg(qPrintable(*m_tableNameAttrPtr));
+
+	switch (timeFilter.GetTimeUnit()){
+	case imtbase::ITimeFilterParam::TU_CUSTOM:
+		break;
+	case imtbase::ITimeFilterParam::TU_HOUR:
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp at time zone 'utc') - interval '1 hour'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 hour' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_DAY:
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp at time zone 'utc') - interval '1 day'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 day' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_WEEK:
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp at time zone 'utc') - interval '1 week'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 week' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_MONTH:
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp at time zone 'utc') - interval '1 month'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 month' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
+
+		break;
+	case imtbase::ITimeFilterParam::TU_YEAR:
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp at time zone 'utc') - interval '1 year'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 year' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	}
+
+	if (timeFilterQuery.isEmpty()){
+		imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
+		if (!timeRange.IsNull()){
+			timeFilterQuery += QString(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
+			.arg(addedStrQuery)
+				.arg(timeRange.GetBeginTime().toString(Qt::ISODateWithMs))
+				.arg(timeRange.GetEndTime().toString(Qt::ISODateWithMs));
+		}
+	}
+
+	return true;
+}
+
+
+QByteArray CSqlDatabaseDocumentDelegateComp::CreateObjectHistoryQuery(
+			int offset,
+			int count,
+			const iprm::IParamsSet* paramsPtr) const
+{
+	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(paramsPtr, "Id");
+	if (idParamPtr.IsValid()){
+		QByteArray objectId = idParamPtr->GetId();
+
+		QByteArray paginationQuery;
+		CreatePaginationQuery(offset, count, paginationQuery);
+
+		return QString(R"((SELECT * FROM "%1" WHERE "%2" = '%3' %4) ORDER BY "RevisionNumber" DESC;)")
+			.arg(qPrintable(*m_tableNameAttrPtr))
+			.arg(qPrintable(*m_objectIdColumnAttrPtr))
+			.arg(qPrintable(objectId))
+			.arg(qPrintable(paginationQuery))
+			.toUtf8();
+	}
+
+	return QByteArray();
 }
 
 
