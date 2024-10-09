@@ -134,69 +134,20 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 		workingDocumentPtr.SetPtr(CreateObject(typeId), true);
 	}
 
-	quint32 checksum = 0;
-	QByteArray documentContent;
-
-	// Even if we use the external document storage, we should write the data to memory for CRC-checksum calculation:
-	if (workingDocumentPtr.IsValid()){
-		if (!WriteDataToMemory(typeId, *workingDocumentPtr, documentContent)){
-			SendCriticalMessage(0, "Document data could not be written to the memory");
-
-			return retVal;
-		}
-
-		documentContent = documentContent.toBase64();
-
-		checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
-	}
-	else{
-		SendCriticalMessage(0, "Document instance is invalid. SQL-query could not be created");
+	if (!workingDocumentPtr.IsValid()){
+		return retVal;
 	}
 
-	// Create the document-ID:
 	QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedObjectId;
 
-	// Insert new entry into the document list table:
-	retVal.query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"%2\" = '%3'")
-		.arg(qPrintable(*m_tableNameAttrPtr))
-		.arg(s_documentIdColumn)
-		.arg(objectId)
-		.toUtf8();
-
-	QByteArray metaInfoRepresentation;
-
-	if (m_metaInfoCreateorCompPtr.IsValid()){
-		idoc::MetaInfoPtr metaInfoPtr;
-		if (m_metaInfoCreateorCompPtr->CreateMetaInfo(valuePtr, typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
-			if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
-				metaInfoRepresentation = m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr());
-			}
-		}
-	}
-
-	if (metaInfoRepresentation.isEmpty()){
-		return NewObjectQuery();
-	}
-
-	retVal.query += QString("; INSERT INTO \"%1\"(\"TypeId\", \"DocumentId\", \"Name\", \"Description\", \"Document\", \"DataMetaInfo\", \"CollectionMetaInfo\", \"Checksum\", \"LastModified\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', '%6', '%7', '%8', %9, '%10', %11, %12)")
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(typeId))
-				.arg(qPrintable(objectId))
-				.arg(objectName)
-				.arg(objectDescription)
-				.arg(documentContent)
-				.arg(metaInfoRepresentation)
-				.arg("{}")
-				.arg(checksum)
-				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
-				.arg("true")
-				.arg(1)
-				.toUtf8();
-
-	QByteArray operationDescriptionQuery = CreateOperationDescriptionQuery(objectId, operationContextPtr);
-	if (!operationDescriptionQuery.isEmpty()){
-		retVal.query += "; " + operationDescriptionQuery;
-	}
+	retVal.query = PrepareInsertNewObjectQuery(
+		typeId,
+		objectId,
+		objectName,
+		objectDescription,
+		*workingDocumentPtr,
+		operationContextPtr,
+		1);
 
 	retVal.objectName = objectName;
 
@@ -238,54 +189,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 		return retVal;
 	}
 
-	QByteArray documentContent;
-	if (WriteDataToMemory(typeId, object, documentContent)){
-		documentContent = documentContent.toBase64();
-
-		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
-
-		// Insert new entry into the document list table:
-		retVal = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"%2\" = '%3'")
-			.arg(qPrintable(*m_tableNameAttrPtr))
-			.arg(s_documentIdColumn)
-			.arg(objectId)
-			.toUtf8();
-
-		QByteArray metaInfoRepresentation;
-
-		if (m_metaInfoCreateorCompPtr.IsValid()){
-			idoc::MetaInfoPtr metaInfoPtr;
-			if (m_metaInfoCreateorCompPtr->CreateMetaInfo(&object, typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
-				if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
-					metaInfoRepresentation = m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr());
-				}
-			}
-		}
-
-		if (metaInfoRepresentation.isEmpty()){
-			return QByteArray();
-		}
-
-		retVal += QString("; INSERT INTO \"%1\"(\"TypeId\", \"DocumentId\", \"Name\", \"Description\", \"Document\", \"DataMetaInfo\", \"CollectionMetaInfo\", \"Checksum\", \"LastModified\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', '%6', '%7', '%8', %9, '%10', %11, %12)")
-			.arg(qPrintable(*m_tableNameAttrPtr))
-			.arg(qPrintable(typeId))
-			.arg(qPrintable(objectId))
-			.arg(objectName)
-			.arg(objectDescription)
-			.arg(documentContent)
-			.arg(metaInfoRepresentation)
-			.arg("{}")
-			.arg(checksum)
-			.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
-			.arg("true")
-			.arg(countRevisionsQuery)
-			.toUtf8();
-
-		QByteArray operationDescriptionQuery = CreateOperationDescriptionQuery(objectId, operationContextPtr);
-		if (!operationDescriptionQuery.isEmpty()){
-			retVal += "; " + operationDescriptionQuery;
-		}
-	}
+	retVal = PrepareInsertNewObjectQuery(
+		typeId, objectId, objectName, objectDescription, object, operationContextPtr, countRevisionsQuery);
 
 	return retVal;
 }
@@ -434,6 +339,78 @@ bool CSqlDatabaseDocumentDelegateComp::ExportObject(
 
 
 // protected methods
+
+QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
+	const QByteArray& typeId,
+	const QByteArray& objectId,
+	const QString& objectName,
+	const QString& objectDescription,
+	const istd::IChangeable& object,
+	const imtbase::IOperationContext* operationContextPtr,
+	const QVariant& revisionArgument) const
+{
+	QByteArray retVal;
+
+	Q_ASSERT(revisionArgument.typeId() == QMetaType::Int || revisionArgument.typeId() == QMetaType::QByteArray);
+
+	QByteArray documentContent;
+	if (!WriteDataToMemory(typeId, object, documentContent)){
+		SendCriticalMessage(0, "Document data could not be written to the memory");
+
+		return retVal;
+	}
+
+	documentContent = documentContent.toBase64();
+
+	quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+
+	// Insert new entry into the document list table:
+	QString query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"%2\" = '%3'")
+		.arg(qPrintable(*m_tableNameAttrPtr))
+		.arg(s_documentIdColumn)
+		.arg(objectId);
+
+	QByteArray metaInfoRepresentation = QByteArrayLiteral("{}");
+
+	if (m_metaInfoCreateorCompPtr.IsValid()){
+		idoc::MetaInfoPtr metaInfoPtr;
+		if (m_metaInfoCreateorCompPtr->CreateMetaInfo(&object, typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
+			if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
+				metaInfoRepresentation = m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr());
+			}
+		}
+	}
+
+	query += QString("; INSERT INTO \"%1\"(\"TypeId\", \"DocumentId\", \"Name\", \"Description\", \"Document\", \"DataMetaInfo\", \"CollectionMetaInfo\", \"Checksum\", \"LastModified\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', '%6', '%7', '%8', %9, '%10', %11, %12)")
+		.arg(qPrintable(*m_tableNameAttrPtr))
+		.arg(qPrintable(typeId))
+		.arg(qPrintable(objectId))
+		.arg(objectName)
+		.arg(objectDescription)
+		.arg(documentContent)
+		.arg(metaInfoRepresentation)
+		.arg("{}")
+		.arg(checksum)
+		.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
+		.arg("true");
+
+	if (revisionArgument.typeId() == QMetaType::Int){
+		query = query.arg(revisionArgument.toInt());
+	}
+	else{
+		query = query.arg(revisionArgument.toByteArray());
+	}
+
+	retVal = query.toUtf8();
+
+	QByteArray operationDescriptionQuery = CreateOperationDescriptionQuery(objectId, operationContextPtr);
+	if (!operationDescriptionQuery.isEmpty()){
+		retVal += "; " + operationDescriptionQuery;
+	}
+
+	return retVal;
+}
+
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateOperationDescriptionQuery(const QByteArray& objectId, const imtbase::IOperationContext* operationContextPtr) const
 {

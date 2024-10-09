@@ -85,6 +85,14 @@ public:
 				const QString& filePath) const override;
 
 protected:
+	virtual QByteArray PrepareInsertNewObjectQuery(
+				const QByteArray& typeId,
+				const QByteArray& objectId,
+				const QString& objectName,
+				const QString& objectDescription,
+				const istd::IChangeable& object,
+				const imtbase::IOperationContext* operationContextPtr,
+				const QVariant& revisionArgument) const;
 	virtual QByteArray CreateOperationDescriptionQuery(const QByteArray& objectId, const imtbase::IOperationContext* operationContextPtr) const;
 	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const;
