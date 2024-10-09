@@ -8,6 +8,8 @@
 #include <istd/TOptDelPtr.h>
 #include <istd/CSystem.h>
 #include <istd/CCrcCalculator.h>
+#include <iprm/CParamsSet.h>
+#include <iprm/CIdParam.h>
 #include <iprm/TParamsPtr.h>
 #include <iser/CJsonMemWriteArchive.h>
 #include <imod/TModelWrap.h>
@@ -326,6 +328,41 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 {
 	imtbase::IRevisionController::RevisionInfoList revisionInfoList;
 
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return imtbase::IRevisionController::RevisionInfoList();
+	}
+
+	iprm::CIdParam idParam;
+	idParam.SetId(objectId);
+	iprm::CParamsSet paramSet;
+	paramSet.SetEditableParameter("Id", &idParam);
+	QByteArray query = CreateObjectHistoryQuery(0, -1, &paramSet);
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		SendErrorMessage(0, sqlError.text(), "Database collection");
+
+		return imtbase::IRevisionController::RevisionInfoList();
+	}
+
+	while (sqlQuery.next()){
+		QSqlRecord revisionRecord = sqlQuery.record();
+		RevisionInfo revisionInfo;
+
+		if (revisionRecord.contains("RevisionNumber")){
+			revisionInfo.revision = revisionRecord.value("RevisionNumber").toInt();
+		}
+
+		if (revisionRecord.contains("LastModified")){
+			revisionInfo.timestamp = revisionRecord.value("LastModified").toDateTime();
+		}
+
+		revisionInfo.isRevisionAvailable = true;
+
+		revisionInfoList.push_back(revisionInfo);
+	}
+
 	return revisionInfoList;
 }
 
@@ -344,6 +381,44 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreObject(
 			const imtbase::ICollectionInfo::Id& objectId,
 			int revision) const
 {
+	Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::RestoreObject", "TODO: Method operation needs to be checked. Method not tested.");
+
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+
+	imtbase::IRevisionController::RevisionInfoList revisionInfoList = GetRevisionInfoList(collection, objectId);
+	for (const imtbase::IRevisionController::RevisionInfo& revisionInfo : revisionInfoList){
+		if (revisionInfo.revision == revision){
+			iprm::CIdParam idParam;
+			idParam.SetId(objectId);
+			iprm::CParamsSet paramSet;
+			paramSet.SetEditableParameter("Id", &idParam);
+			QByteArray query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"%2\" = '%3'")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(s_documentIdColumn)
+				.arg(objectId)
+				.toUtf8();
+
+			query += QString(R"(; UPDATE "%1" SET "IsActive" = true WHERE "%2" = '%3' AND "RevisionNumber" = %4)")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(s_documentIdColumn)
+				.arg(objectId)
+				.arg(revision)
+				.toUtf8();
+
+			QSqlError sqlError;
+			QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+			if (sqlError.type() != QSqlError::NoError){
+				SendErrorMessage(0, sqlError.text(), "Database collection");
+
+				return false;
+			}
+
+			return true;
+		}
+	}
+
 	return false;
 }
 
