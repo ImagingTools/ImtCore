@@ -26,6 +26,8 @@ namespace imtdb
 
 static const QByteArray s_idColumn = QByteArrayLiteral("Id");
 static const QByteArray s_typeIdColumn = QByteArrayLiteral("TypeId");
+static const QByteArray s_nameColumn = QByteArrayLiteral("Name");
+static const QByteArray s_descriptionColumn = QByteArrayLiteral("Description");
 static const QByteArray s_documentIdColumn = QByteArrayLiteral("DocumentId");
 static const QByteArray s_documentColumn = QByteArrayLiteral("Document");
 static const QByteArray s_addedColumn = QByteArrayLiteral("Added");
@@ -380,7 +382,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 			}
 		}
 	}
-
+	
 	query += QString("; INSERT INTO \"%1\"(\"TypeId\", \"DocumentId\", \"Name\", \"Description\", \"Document\", \"DataMetaInfo\", \"CollectionMetaInfo\", \"Checksum\", \"LastModified\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', '%6', '%7', '%8', %9, '%10', %11, %12)")
 		.arg(qPrintable(*m_tableNameAttrPtr))
 		.arg(qPrintable(typeId))
@@ -388,7 +390,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 		.arg(objectName)
 		.arg(objectDescription)
 		.arg(documentContent)
-		.arg(metaInfoRepresentation)
+		.arg(SqlEncode(metaInfoRepresentation))
 		.arg("{}")
 		.arg(checksum)
 		.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
@@ -653,7 +655,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::ICollectio
 	}
 
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
-		if (columnId == s_lastModifiedColumn || columnId == s_addedColumn){
+		if (columnId == s_lastModifiedColumn || columnId == s_addedColumn || columnId == s_nameColumn || columnId == s_descriptionColumn){
 			sortQuery = QString("ORDER BY \"%1\" %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
 		}
 		else{
@@ -718,7 +720,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		filterQuery += " AND (" + timeFilterQuery + ")";
 	}
 
-	if(!additionalFilters.isEmpty()){
+	if (!additionalFilters.isEmpty()){
 		filterQuery += " AND (" + additionalFilters + ")";
 	}
 
@@ -742,6 +744,14 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICol
 
 			textFilterQuery += QString("\"DataMetaInfo\"->>\'%1\' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
 		}
+	}
+
+	if (filteringColumnIds.contains(s_nameColumn)){
+		textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(s_nameColumn).arg(textFilter);
+	}
+
+	if (filteringColumnIds.contains(s_descriptionColumn)){
+		textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(s_descriptionColumn).arg(textFilter);
 	}
 
 	return true;
