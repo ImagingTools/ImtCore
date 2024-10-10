@@ -23,7 +23,7 @@ class CSqlDatabaseObjectCollectionIterator: virtual public imtbase::IObjectColle
 public:
 	CSqlDatabaseObjectCollectionIterator(QSqlQuery& sqlQuery, ISqlDatabaseObjectDelegate* databaseDelegate);
 
-    QSqlRecord GetRecord();
+	QSqlRecord GetRecord();
 
 	// reimplemented (imtbase::IObjectCollectionIterator)
 	virtual bool Next() const override;

@@ -107,7 +107,7 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionIterator::GetDataMetaInfo() const
 
 	m_databaseDelegate->CreateObjectInfoFromRecord(m_records[m_currentIndex], objectMetaInfoPtr, collectionMetaInfoPtr);
 
-	return collectionMetaInfoPtr;
+	return objectMetaInfoPtr;
 }
 
 
