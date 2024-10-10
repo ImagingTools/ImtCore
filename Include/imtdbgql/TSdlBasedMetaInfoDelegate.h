@@ -24,7 +24,7 @@ public:
 	virtual idoc::MetaInfoPtr FromJsonRepresentation(const QByteArray& data) const override;
 
 protected:
-	virtual bool FillRepresentation(MetaInfoRepresentation& m_metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const= 0;
+	virtual bool FillRepresentation(MetaInfoRepresentation& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const= 0;
 	virtual bool FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const MetaInfoRepresentation& metaInfoRepresentation) const= 0;
 };
 
