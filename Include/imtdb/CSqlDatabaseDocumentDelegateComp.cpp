@@ -655,7 +655,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::ICollectio
 	}
 
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
-		if (columnId == s_lastModifiedColumn || columnId == s_addedColumn || columnId == s_nameColumn || columnId == s_descriptionColumn){
+		if (columnId == s_lastModifiedColumn || columnId == s_addedColumn || columnId == s_nameColumn || columnId == s_descriptionColumn || columnId == s_typeIdColumn){
 			sortQuery = QString("ORDER BY \"%1\" %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
 		}
 		else{
@@ -737,21 +737,24 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICol
 
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
-		textFilterQuery = QString("\"DataMetaInfo\"->>\'%1\' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
-
-		for (int i = 1; i < filteringColumnIds.count(); ++i){
-			textFilterQuery += " OR ";
-
-			textFilterQuery += QString("\"DataMetaInfo\"->>\'%1\' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+		if (filteringColumnIds.contains(s_typeIdColumn)){
+			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(s_typeIdColumn).arg(textFilter);
+			filteringColumnIds.removeOne(s_typeIdColumn);
 		}
-	}
 
-	if (filteringColumnIds.contains(s_nameColumn)){
-		textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(s_nameColumn).arg(textFilter);
-	}
+		if (filteringColumnIds.contains(s_nameColumn)){
+			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(s_nameColumn).arg(textFilter);
+			filteringColumnIds.removeOne(s_nameColumn);
+		}
 
-	if (filteringColumnIds.contains(s_descriptionColumn)){
-		textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(s_descriptionColumn).arg(textFilter);
+		if (filteringColumnIds.contains(s_descriptionColumn)){
+			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(s_descriptionColumn).arg(textFilter);
+			filteringColumnIds.removeOne(s_descriptionColumn);
+		}
+
+		for (int i = 0; i < filteringColumnIds.count(); ++i){
+			textFilterQuery += QString("%0\"DataMetaInfo\"->>\'%1\' ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+		}
 	}
 
 	return true;
