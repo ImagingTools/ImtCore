@@ -18,11 +18,19 @@ QtObject {
         request.send();
     }
 
+    function getHeaders(){
+        return {};
+    }
+
     property GqlSdlRequestSender request : GqlSdlRequestSender {
         gqlCommandId: ImtappApplicationSdlCommandIds.s_getApplicationInfo;
         sdlObjectComp: Component { ApplicationInfo{} }
         onSdlObjectChanged: {
             root.serverApplicationInfo = sdlObject;
+        }
+
+        function getHeaders(){
+            return root.getHeaders();
         }
     }
 }

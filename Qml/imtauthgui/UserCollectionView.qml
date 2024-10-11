@@ -113,8 +113,8 @@ RemoteCollectionView {
                 additionalFieldIds.push("SystemId");
             }
 
-            function getAdditionalInputParams(){
-                return userCollectionViewContainer.getAdditionalInputParams();
+            function getHeaders(){
+                return userCollectionViewContainer.getHeaders();
             }
         }
     }
@@ -139,7 +139,7 @@ RemoteCollectionView {
             userCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 
             documentManager.registerDocumentView("User", "UserEditor", userDocumentComp);
-            documentManager.registerDocumentDataController("User", dataControllerComp);
+            documentManager.registerDocumentDataController("User", documentDataControllerComp);
         }
 
         table.rowDelegate = tableRowDelegateBaseComp;
@@ -338,7 +338,7 @@ RemoteCollectionView {
     }
 
     Component {
-        id: dataControllerComp;
+        id: documentDataControllerComp;
 
         GqlRequestDocumentDataController {
             id: requestDocumentDataController
@@ -361,6 +361,10 @@ RemoteCollectionView {
                 onFinished: {
                     requestDocumentDataController.documentModel = m_userData;
                 }
+            }
+
+            function getHeaders(){
+                return userCollectionViewContainer.getHeaders();
             }
 
             function getDocumentName(){

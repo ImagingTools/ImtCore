@@ -47,7 +47,7 @@ CollectionView {
         }
     }
 
-    function getAdditionalInputParams(){
+    function getHeaders(){
         return {};
     }
 
@@ -56,21 +56,21 @@ CollectionView {
         var query = Gql.GqlRequest("subscription", subscriptionRequestId);
         var inputParams = Gql.GqlObject("input");
 
-        let additionInputParams = root.getAdditionalInputParams();
-        if (Object.keys(additionInputParams).length > 0){
-            let additionParams = Gql.GqlObject("addition");
-            for (let key in additionInputParams){
-                additionParams.InsertField(key, additionInputParams[key]);
-            }
-            inputParams.InsertFieldObject(additionParams);
-        }
+        // let additionInputParams = root.getHeaders();
+        // if (Object.keys(additionInputParams).length > 0){
+        //     let additionParams = Gql.GqlObject("addition");
+        //     for (let key in additionInputParams){
+        //         additionParams.InsertField(key, additionInputParams[key]);
+        //     }
+        //     inputParams.InsertFieldObject(additionParams);
+        // }
 
         query.AddParam(inputParams);
         var queryFields = Gql.GqlObject("notification");
         queryFields.InsertField("Id");
         query.AddField(queryFields);
 
-        Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
+        Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient, "Headers": root.getHeaders()});
     }
 
     function unRegisterSubscription(){
@@ -101,6 +101,10 @@ CollectionView {
             collectionId: root.collectionId;
 
             additionalFieldIds: root.additionalFieldIds;
+
+            function getHeaders(){
+                return root.getHeaders();
+            }
         }
     }
 
@@ -273,6 +277,10 @@ CollectionView {
                     root.handleSubscription(dataModelLocal);
                 }
             }
+        }
+
+        function getHeaders(){
+            return root.getHeaders();
         }
     }
 }

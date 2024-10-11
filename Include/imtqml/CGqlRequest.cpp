@@ -24,7 +24,7 @@ CGqlRequest::~CGqlRequest()
 }
 
 
-bool CGqlRequest::SetGqlQuery(QString query)
+bool CGqlRequest::SetGqlQuery(QString query, QVariantMap headers)
 {
 	QQmlEngine* engine = qmlEngine(this);
 	if (engine != nullptr){
@@ -42,6 +42,10 @@ bool CGqlRequest::SetGqlQuery(QString query)
 
 		if (!CGqlModel::s_accessToken.isEmpty()){
 			networkRequest.setRawHeader("X-authentication-token", CGqlModel::s_accessToken.toUtf8());
+			QStringList keys = headers.keys();
+			for (QString& key: keys){
+				networkRequest.setRawHeader(key.toLatin1(), headers.value(key).toByteArray());
+			}
 		}
 
 		QString message = QString("Post to url '%1' query '%2'").arg(requestUrl.toString()).arg(query);

@@ -33,7 +33,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 	}
 
 	QByteArray languageId;
-	imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		languageId = gqlContextPtr->GetLanguageId();
 	}

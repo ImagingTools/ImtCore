@@ -27,7 +27,7 @@ public:
 	explicit CGqlRequest(QObject* parent = nullptr);
 	~CGqlRequest();
 
-	bool SetGqlQuery(QString query);
+	bool SetGqlQuery(QString query, QVariantMap headers = QVariantMap());
 
 public Q_SLOTS:
 	void replyFinished();

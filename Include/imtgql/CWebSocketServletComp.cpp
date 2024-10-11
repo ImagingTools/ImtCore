@@ -11,6 +11,7 @@
 #include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
+#include <imtgql/CGqlContext.h>
 
 
 namespace imtgql
@@ -109,6 +110,22 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 	int errorPosition;
 	gqlRequest.ParseQuery(body, errorPosition);
 
+	IGqlContext* gqlContextPtr = const_cast<IGqlContext*>(gqlRequest.GetRequestContext());
+	IGqlContext::Headers gqlHeaders;
+	if (gqlContextPtr != nullptr){
+		gqlHeaders = gqlContextPtr->GetHeaders();
+	}
+	else{
+		gqlContextPtr = new CGqlContext();
+	}
+	QJsonObject headers = object.value("headers").toObject();
+	for (QString& key: headers.keys()){
+		gqlHeaders.insert(key.toUtf8(), headers.value(key).toString().toUtf8());
+	}
+
+	gqlContextPtr->SetHeaders(gqlHeaders);
+	gqlRequest.SetGqlContext(gqlContextPtr);
+
 	QByteArray commandId = gqlRequest.GetCommandId();
 	if (commandId.isEmpty()){
 		QByteArray errorMessage = "Empty command-ID";
@@ -161,6 +178,22 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 
 	int errorPosition;
 	gqlRequest.ParseQuery(body, errorPosition);
+
+	IGqlContext* gqlContextPtr = const_cast<IGqlContext*>(gqlRequest.GetRequestContext());
+	IGqlContext::Headers gqlHeaders;
+	if (gqlContextPtr != nullptr){
+		gqlHeaders = gqlContextPtr->GetHeaders();
+	}
+	else{
+		gqlContextPtr = new CGqlContext();
+	}
+	QJsonObject headers = object.value("headers").toObject();
+	for (QString& key: headers.keys()){
+		gqlHeaders.insert(key.toUtf8(), headers.value(key).toString().toUtf8());
+	}
+
+	gqlContextPtr->SetHeaders(gqlHeaders);
+	gqlRequest.SetGqlContext(gqlContextPtr);
 
 	QByteArray commandId = gqlRequest.GetCommandId();
 

@@ -84,11 +84,7 @@ istd::IChangeable* CRoleControllerComp::CreateObjectFromRequest(
 	}
 
 	objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
-	QByteArray productId;
-	const imtgql::CGqlObject* additionalParamsPtr = inputParamPtr->GetFieldArgumentObjectPtr("addition");
-	if (additionalParamsPtr != nullptr) {
-		productId = additionalParamsPtr->GetFieldArgumentValue("ProductId").toByteArray();
-	}
+	QByteArray productId = gqlRequest.GetHeader("ProductId");
 
 	if (objectId.isEmpty()){
 		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();

@@ -54,10 +54,10 @@ void CGqlRequest::AddSimpleField(const QByteArray &fieldId)
 
 void CGqlRequest::SetGqlContext(const IGqlContext* gqlContext)
 {
-	if (m_gqlContextPtr != gqlContext){
+	if (m_gqlContextPtr.get() != gqlContext){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_gqlContextPtr = const_cast<IGqlContext*>(gqlContext);
+		m_gqlContextPtr.reset(const_cast<IGqlContext*>(gqlContext));
 	}
 }
 
@@ -74,9 +74,9 @@ void CGqlRequest::SetCommandId(const QByteArray& commandId)
 }
 
 
-QByteArray CGqlRequest::GetHeader(QByteArray headerId)
+QByteArray CGqlRequest::GetHeader(QByteArray headerId) const
 {
-	IGqlContext* gqlContext = GetRequestContext();
+	const IGqlContext* gqlContext = GetRequestContext();
 	if (gqlContext != nullptr){
 		IGqlContext::Headers headers = gqlContext->GetHeaders();
 		return headers.value(headerId);
@@ -161,9 +161,9 @@ QByteArray CGqlRequest::GetQuery() const
 }
 
 
-IGqlContext* CGqlRequest::GetRequestContext() const
+const IGqlContext* CGqlRequest::GetRequestContext() const
 {
-	return m_gqlContextPtr;
+	return m_gqlContextPtr.get();
 }
 
 
@@ -486,24 +486,7 @@ bool CGqlRequest::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 
 			m_params = sourcePtr->m_params;
 			m_fields = sourcePtr->m_fields;
-
-			if (m_gqlContextPtr != nullptr){
-				m_gqlContextPtr->ResetData();
-			}
-
-			bool ok = false;
-			if (sourcePtr->m_gqlContextPtr != nullptr){
-				IChangeable* clonedContextPtr = sourcePtr->m_gqlContextPtr->CloneMe();
-				if (clonedContextPtr != nullptr){
-					m_gqlContextPtr = dynamic_cast<imtgql::IGqlContext*>(clonedContextPtr);
-
-					ok = true;
-				}
-			}
-
-			if (!ok){
-				m_gqlContextPtr = nullptr;
-			}
+			m_gqlContextPtr = sourcePtr->m_gqlContextPtr;
 
 			return true;
 		}

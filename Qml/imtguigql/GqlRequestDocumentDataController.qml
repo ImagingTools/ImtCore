@@ -22,7 +22,7 @@ DocumentDataController {
     property var updateRequestInputParam: Gql.GqlObject("input");
 
     Component.onCompleted: {
-        let additionInputParams = container.getAdditionalInputParams();
+        let additionInputParams = container.getHeaders();
         if (additionInputParams && Object.keys(additionInputParams).length > 0){
             let additionParams = Gql.GqlObject("addition");
             for (let key in additionInputParams){
@@ -100,7 +100,7 @@ DocumentDataController {
     }
 
     // TODO: ???
-    function getAdditionalInputParams(){
+    function getHeaders(){
         return {};
     }
 
@@ -137,7 +137,9 @@ DocumentDataController {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            this.setGqlQuery(gqlData);
+            let headers = container.getHeaders()
+
+            this.setGqlQuery(gqlData, headers);
         }
 
         onStateChanged: {
@@ -212,8 +214,9 @@ DocumentDataController {
             query.AddParam(container.getRequestInputParam);
 
             var gqlData = query.GetQuery();
+            let headers = container.getHeaders()
 
-            this.setGqlQuery(gqlData);
+            this.setGqlQuery(gqlData, headers);
         }
 
         onStateChanged: {
@@ -270,8 +273,9 @@ DocumentDataController {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
+            let headers = container.getHeaders()
 
-            this.setGqlQuery(gqlData);
+            this.setGqlQuery(gqlData, headers);
         }
 
         onStateChanged: {

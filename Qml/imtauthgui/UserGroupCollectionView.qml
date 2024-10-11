@@ -46,8 +46,8 @@ RemoteCollectionView {
             collectionId: userGroupCollectionViewContainer.collectionId;
             additionalFieldIds: userGroupCollectionViewContainer.additionalFieldIds;
 
-            function getAdditionalInputParams(){
-                return userGroupCollectionViewContainer.getAdditionalInputParams();
+            function getHeaders(){
+                return userGroupCollectionViewContainer.getHeaders();
             }
         }
     }
@@ -119,6 +119,10 @@ RemoteCollectionView {
                 }
 
                 return prefixName + " / " + qsTr("New Group");
+            }
+
+            function getHeaders(){
+                return userGroupCollectionViewContainer.getHeaders();
             }
         }
     }

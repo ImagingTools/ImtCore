@@ -14,7 +14,7 @@ ComboBox {
         dataProvider.updateModel();
     }
 
-    function getAdditionalInputParams(){
+    function getHeaders(){
         return {};
     }
 
@@ -25,8 +25,8 @@ ComboBox {
             root.model = dataProvider.collectionModel;
         }
 
-        function getAdditionalInputParams(){
-            return root.getAdditionalInputParams();
+        function getHeaders(){
+            return root.getHeaders();
         }
     }
 }

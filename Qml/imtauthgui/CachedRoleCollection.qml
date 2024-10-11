@@ -22,7 +22,7 @@ CollectionDataProvider {
 
     property string productId;
 
-    function getAdditionalInputParams(){
+    function getHeaders(){
         if (productId === ""){
             console.error("Unable to get additional params for request:", commandId, ". Error: Product-ID is empty");
             return null;

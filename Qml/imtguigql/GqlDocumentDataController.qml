@@ -54,7 +54,7 @@ DocumentDataController {
         gqlUpdateModel.send();
     }
 
-    function getAdditionalInputParams(){
+    function getHeaders(){
         let obj = {}
         return obj;
     }
@@ -103,7 +103,7 @@ DocumentDataController {
             inputParams.InsertField("Id", container.documentId);
             inputParams.InsertField ("Item", container.documentModel.toJson());
 
-            let additionInputParams = container.getAdditionalInputParams();
+            let additionInputParams = container.getHeaders();
             if (Object.keys(additionInputParams).length > 0){
                 let additionParams = Gql.GqlObject("addition");
                 for (let key in additionInputParams){
@@ -117,6 +117,10 @@ DocumentDataController {
             var queryFields = Gql.GqlObject("updatedNotification");
             queryFields.InsertField("Id");
             query.AddField(queryFields);
+        }
+
+        function getHeaders(){
+            return container.getHeaders();
         }
 
         function onError(message, type){
@@ -150,7 +154,7 @@ DocumentDataController {
                 inputParams.InsertField(key, inputObj[key]);
             }
 
-            let additionInputParams = container.getAdditionalInputParams();
+            let additionInputParams = container.getHeaders();
             if (Object.keys(additionInputParams).length > 0){
                 let additionParams = Gql.GqlObject("addition");
                 for (let key in additionInputParams){
@@ -160,6 +164,10 @@ DocumentDataController {
             }
 
             query.AddParam(inputParams);
+        }
+
+        function getHeaders(){
+            return container.getHeaders();
         }
 
         function onError(message, type){
@@ -180,7 +188,7 @@ DocumentDataController {
             inputParams.InsertField("Id", container.documentId);
             inputParams.InsertField ("Item", container.documentModel.toJson());
 
-            let additionInputParams = container.getAdditionalInputParams();
+            let additionInputParams = container.getHeaders();
             if (Object.keys(additionInputParams).length > 0){
                 let additionParams = Gql.GqlObject("addition");
                 for (let key in additionInputParams){
@@ -194,6 +202,10 @@ DocumentDataController {
             var queryFields = Gql.GqlObject("addedNotification");
             queryFields.InsertField("Id");
             query.AddField(queryFields);
+        }
+
+        function getHeaders(){
+            return container.getHeaders();
         }
 
         function onError(message, type){

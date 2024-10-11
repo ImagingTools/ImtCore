@@ -32,7 +32,7 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 		return nullptr;
 	}
 
-	imtgql::IGqlContext* requestContextPtr = gqlRequestPtr->GetRequestContext();
+	const imtgql::IGqlContext* requestContextPtr = gqlRequestPtr->GetRequestContext();
 	if (requestContextPtr == nullptr){
 		SendErrorMessage(0, QString("Unable to create operation context. Error: GraphQL context is invalid"), "COperationContextControllerComp");
 

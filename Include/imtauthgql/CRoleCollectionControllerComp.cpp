@@ -353,10 +353,7 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 
 	QByteArray productId = inputParamObjectPtr->GetFieldArgumentValue("ProductId").toByteArray();
 	if (productId.isEmpty()){
-		const imtgql::CGqlObject* additionalParamsPtr = inputParamObjectPtr->GetFieldArgumentObjectPtr("addition");
-		if (additionalParamsPtr != nullptr) {
-			productId = additionalParamsPtr->GetFieldArgumentValue("ProductId").toByteArray();
-		}
+		productId = gqlRequest.GetHeader("ProductId");
 	}
 
 	iprm::CTextParam* textParamPtr = new iprm::CTextParam;

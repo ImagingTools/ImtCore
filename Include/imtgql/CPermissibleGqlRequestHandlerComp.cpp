@@ -14,7 +14,7 @@ imtbase::CTreeItemModel* CPermissibleGqlRequestHandlerComp::CreateResponse(const
 	}
 
 	QString userName;
-	imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
@@ -35,7 +35,7 @@ bool CPermissibleGqlRequestHandlerComp::CheckPermissions(const imtgql::CGqlReque
 {
 	bool retVal = true;
 
-	imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){

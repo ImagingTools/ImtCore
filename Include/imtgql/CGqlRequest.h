@@ -24,7 +24,7 @@ public:
 	void SetGqlContext(const imtgql::IGqlContext* gqlContext);
 	void SetRequestType(RequestType requestType);
 	void SetCommandId(const QByteArray& commandId);
-	QByteArray GetHeader(QByteArray headerId);
+	QByteArray GetHeader(QByteArray headerId) const;
 
 	const CGqlObject& GetFields() const;
 	const CGqlObject& GetParams() const;
@@ -38,7 +38,7 @@ public:
 	virtual QByteArray GetCommandId() const override;
 	virtual RequestType GetRequestType() const override;
 	virtual QByteArray GetQuery() const override;
-	virtual imtgql::IGqlContext* GetRequestContext() const override;
+	virtual const imtgql::IGqlContext* GetRequestContext() const override;
 	virtual bool ParseQuery(const QByteArray& query, int &errorPosition);
 
 	// reimplemented (iser::IObject)
@@ -83,7 +83,7 @@ protected:
 	QByteArray m_currentField;
 
 	CGqlObject* m_activeGqlObjectPtr;
-	imtgql::IGqlContext* m_gqlContextPtr;
+	std::shared_ptr<imtgql::IGqlContext> m_gqlContextPtr;
 	QList<QByteArray> m_activeArrayIds;
 };
 

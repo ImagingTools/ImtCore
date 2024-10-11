@@ -24,8 +24,8 @@ RemoteCollectionView {
                 additionalFieldIds.push("ParentRoles");
             }
 
-            function getAdditionalInputParams(){
-                return roleCollectionViewContainer.getAdditionalInputParams()
+            function getHeaders(){
+                return roleCollectionViewContainer.getHeaders()
             }
         }
     }
@@ -108,8 +108,8 @@ RemoteCollectionView {
                 }
             }
 
-            function getAdditionalInputParams(){
-                return roleCollectionViewContainer.getAdditionalInputParams()
+            function getHeaders(){
+                return roleCollectionViewContainer.getHeaders()
             }
         }
     }
@@ -145,8 +145,8 @@ RemoteCollectionView {
                 }
             }
 
-            function getAdditionalInputParams(){
-                return roleCollectionViewContainer.getAdditionalInputParams()
+            function getHeaders(){
+                return roleCollectionViewContainer.getHeaders()
             }
 
             function getDocumentName(){

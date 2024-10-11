@@ -97,8 +97,9 @@ WebSocket {
     function registerSubscriptionEvent(parameters){
         let query = parameters["Query"];
         let client = parameters["Client"];
+        let headers = parameters["Headers"];
 
-        registerSubscription(query, client);
+        registerSubscription(query, client, headers);
     }
 
     function clear(){
@@ -114,6 +115,7 @@ WebSocket {
             if (subscriptionModel[index]["status"] === "unregistered"){
                 let request = {}
                 request["id"] = subscriptionModel[index]["subscriptionId"]
+                request["headers"] = subscriptionModel[index]["headers"]
                 request["type"] = "start"
                 let payload = {}
                 let query = subscriptionModel[index]["query"]
@@ -127,7 +129,7 @@ WebSocket {
         }
     }
 
-    function registerSubscription(query, subscriptionClient){
+    function registerSubscription(query, subscriptionClient, headers){
         let commandId = query.GetCommandId()
         if (commandId === ""){
             console.error("Unable to register subscription with empty command-ID")
@@ -146,7 +148,8 @@ WebSocket {
                         "subscriptionId": subscriptionClient.subscriptionId,
                         "query": query,
                         "status": "unregistered",
-                        "subscription": subscriptionClient
+                        "subscription": subscriptionClient,
+                        "headers": headers
                     }
                     )
 

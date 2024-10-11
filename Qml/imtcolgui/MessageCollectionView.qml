@@ -68,9 +68,9 @@ RemoteCollectionView {
             id: messageCollectionRepresentation
             additionalFieldIds: ["Id", "Name", "Category"]
 
-            function getAdditionalInputParams(){
+            function getHeaders(){
                 console.log("LogCollectionView", log.clientId)
-                return log.getAdditionalInputParams()
+                return log.getHeaders()
             }
 
             function updateModel(){

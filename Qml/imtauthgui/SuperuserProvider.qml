@@ -15,6 +15,10 @@ QtObject {
         request.send();
     }
 
+    function getHeaders(){
+        return {};
+    }
+
     property GqlSdlRequestSender request : GqlSdlRequestSender {
         gqlCommandId: ImtauthUsersSdlCommandIds.s_userItem;
 
@@ -24,6 +28,10 @@ QtObject {
             query.AddField(queryFields);
 
             query.AddParam(inputParams);
+        }
+
+        function getHeaders(){
+            return root.getHeaders();
         }
 
         function onResult(){

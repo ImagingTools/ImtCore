@@ -41,13 +41,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	QByteArray clientId;
 	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&subscriptionRequest);
 	if (requestImplPtr != nullptr) {
-		const imtgql::CGqlObject* input = requestImplPtr->GetParamObject("input");
-		if (input != nullptr) {
-			const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
-			if (addition != nullptr) {
-				clientId = addition->GetFieldArgumentValue("clientId").toByteArray();
-			}
-		}
+		clientId = requestImplPtr->GetHeader("clientId");
 	}
 
 	QMutexLocker locker(&m_registeredClientsMutex);
@@ -261,6 +255,16 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 	QJsonObject payloadObject;
 	payloadObject["data"] = QString(requestPtr->GetQuery());
 	dataObject["payload"] = payloadObject;
+	QJsonObject headersObject;
+	const imtgql::IGqlContext* contextPtr = requestPtr->GetRequestContext();
+	if (contextPtr != nullptr){
+		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
+		for (QByteArray headerId: headers.keys()){
+			headersObject[headerId] = QString(headers.value(headerId));
+		}
+	}
+	dataObject["headers"] = headersObject;
+
 	QByteArray queryData = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
 
 	imtrest::ConstRequestPtr constRequestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, ""));
@@ -353,13 +357,14 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 
 	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&request);
 	if (requestImplPtr != nullptr){
-		const imtgql::CGqlObject* input = requestImplPtr->GetParamObject("input");
-		if (input != nullptr){
-			const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
-			if (addition != nullptr){
-				clientId = addition->GetFieldArgumentValue("clientId").toByteArray();
-			}
-		}
+		clientId = requestImplPtr->GetHeader("clientId");
+		// const imtgql::CGqlObject* input = requestImplPtr->GetParamObject("input");
+		// if (input != nullptr){
+		// 	const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
+		// 	if (addition != nullptr){
+		// 		clientId = addition->GetFieldArgumentValue("clientId").toByteArray();
+		// 	}
+		// }
 	}
 
 	if (m_subscriptionSenderCompPtr.IsValid()){

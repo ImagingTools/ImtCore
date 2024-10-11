@@ -126,11 +126,11 @@ Item {
     onCommandIdChanged: {
         console.log("CollectionStructure onCommandsIdChanged", collectionStructureContainer.commandId);
 
-        commandsProviderLocal.additionInputParams = collectionStructureContainer.getAdditionalInputParams();
+        commandsProviderLocal.additionInputParams = collectionStructureContainer.getHeaders();
         commandsProviderLocal.commandId = collectionStructureContainer.commandId;
         commandsProviderLocal.uuid = collectionStructureContainer.commandId;
 
-        collectionStructureBase.commands.additionInputParams = getAdditionalInputParams()
+        collectionStructureBase.commands.additionInputParams = getHeaders()
 
 //        collectionStructureBase.commandId = collectionViewContainer.commandId;
 
@@ -192,7 +192,7 @@ Item {
         contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
     }
 
-    function getAdditionalInputParams(){
+    function getHeaders(){
         let additionalInputParams = {}
         let nodeId = treeView.getData("Id", treeView.selectedIndex)
         additionalInputParams["nodeId"] = ""

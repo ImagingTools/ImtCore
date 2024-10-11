@@ -73,7 +73,7 @@ QtObject {
         return null;
     }
 
-    function getAdditionalInputParams(){
+    function getHeaders(){
         return {};
     }
 
@@ -92,7 +92,7 @@ QtObject {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
 
-            let additionInputParams = container.getAdditionalInputParams();
+            let additionInputParams = container.getHeaders();
             if (additionInputParams){
                 if (Object.keys(additionInputParams).length > 0){
                     let additionParams = Gql.GqlObject("addition");

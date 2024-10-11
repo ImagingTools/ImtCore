@@ -94,6 +94,16 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequ
 	QJsonObject payloadObject;
 	payloadObject["data"] = QString(requestPtr->GetQuery());
 	dataObject["payload"] = payloadObject;
+	QJsonObject headersObject;
+	const imtgql::IGqlContext* contextPtr = requestPtr->GetRequestContext();
+	if (contextPtr != nullptr){
+		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
+		for (QByteArray headerId: headers.keys()){
+			headersObject[headerId] = QString(headers.value(headerId));
+		}
+	}
+	dataObject["headers"] = headersObject;
+
 	QByteArray data = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
 
 	m_webSocket.sendTextMessage(data);

@@ -25,6 +25,10 @@ QtObject {
         request.send();
     }
 
+    function getHeaders(){
+        return {};
+    }
+
     property GqlSdlRequestSender request : GqlSdlRequestSender {
         gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_getUserMode;
         sdlObjectComp:
@@ -35,6 +39,10 @@ QtObject {
                     container.updated();
                 }
             }
+        }
+
+        function getHeaders(){
+            return container.getHeaders();
         }
     }
 }

@@ -13,7 +13,7 @@ ComboBoxElementView {
 
     controlComp: cbComp;
 
-    function getAdditionalInputParams(){
+    function getHeaders(){
         return {};
     }
 
@@ -40,8 +40,8 @@ ComboBoxElementView {
 
             onModelChanged: root.model = model;
 
-            function getAdditionalInputParams(){
-                return root.getAdditionalInputParams();
+            function getHeaders(){
+                return root.getHeaders();
             }
         }
     }

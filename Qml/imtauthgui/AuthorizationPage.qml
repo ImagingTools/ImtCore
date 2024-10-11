@@ -15,6 +15,8 @@ Rectangle {
 
     property bool canRecoveryPassword: true;
 
+    property string appName: context.appName
+
     Component.onCompleted: {
         decoratorPause.start();
         Events.subscribeEvent("OnLocalizationChanged", authPageContainer.onLocalizationChanged);
@@ -127,7 +129,7 @@ Rectangle {
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_title;
 
-                    text: context.appName && context.appName !== "" ? qsTr("Welcome to") + " " + context.appName : qsTr("Welcome");
+                    text: authPageContainer.appName !== "" ? qsTr("Welcome to") + " " + authPageContainer.appName : qsTr("Welcome");
                 }
             }
         }

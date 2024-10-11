@@ -16,7 +16,7 @@ Item {
     property string productId: context.appName;
     property var documentManager: MainDocumentManager.getDocumentManager("Administration");
 
-    function getAdditionalInputParams(){
+    function getHeaders(){
         if (container.productId === ""){
             console.error("Unable to get additional parameters. Product-ID is empty");
             return null;
@@ -76,8 +76,8 @@ Item {
             productId: container.productId;
             documentManager: container.documentManager;
 
-            function getAdditionalInputParams(){
-                return container.getAdditionalInputParams()
+            function getHeaders(){
+                return container.getHeaders()
             }
 
         }
@@ -90,8 +90,8 @@ Item {
             productId: container.productId;
             documentManager: container.documentManager;
 
-            function getAdditionalInputParams(){
-                return container.getAdditionalInputParams()
+            function getHeaders(){
+                return container.getHeaders()
             }
         }
     }
@@ -103,8 +103,8 @@ Item {
             productId: container.productId;
             documentManager: container.documentManager;
 
-            function getAdditionalInputParams(){
-                return container.getAdditionalInputParams()
+            function getHeaders(){
+                return container.getHeaders()
             }
         }
     }

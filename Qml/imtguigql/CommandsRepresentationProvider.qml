@@ -21,14 +21,14 @@ CommandsController {
         commandsProviderContainer.modelCommands.updateModel();
     }
 
-    function getAdditionalInputParams(){
+    function getHeaders(){
         return {};
     }
 
     property GqlModel modelCommands: GqlModel {
         function updateModel() {
             var query = Gql.GqlRequest("query", commandsProviderContainer.commandId + "Commands");
-            let additionInputParams = commandsProviderContainer.getAdditionalInputParams();
+            let additionInputParams = commandsProviderContainer.getHeaders();
             if (Object.keys(additionInputParams).length > 0){
                 let inputParams = Gql.GqlObject("input");
                 let additionParams = Gql.GqlObject("addition");

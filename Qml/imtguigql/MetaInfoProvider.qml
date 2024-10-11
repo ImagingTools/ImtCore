@@ -21,7 +21,7 @@ Item {
         metaInfo.getMetaInfo(objectId);
     }
 
-    function getAdditionalInputParams(){
+    function getHeaders(){
         return {};
     }
 
@@ -34,15 +34,6 @@ Item {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", objectId);
 
-            let additionInputParams = container.getAdditionalInputParams();
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-                inputParams.InsertFieldObject(additionParams);
-            }
-
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("metaInfo");
@@ -50,7 +41,7 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            this.setGqlQuery(gqlData);
+            this.setGqlQuery(gqlData, container.getHeaders());
         }
 
         onStateChanged: {

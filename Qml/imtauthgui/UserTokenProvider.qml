@@ -34,7 +34,7 @@ QtObject {
         }
     }
 
-    function getAdditionalInputParams(){
+    function getHeaders(){
         return {}
     }
 
@@ -42,15 +42,6 @@ QtObject {
         request.addInputParam(AuthorizationInputTypeMetaInfo.s_login, loginF);
         request.addInputParam(AuthorizationInputTypeMetaInfo.s_password, passwordF);
         request.addInputParam(AuthorizationInputTypeMetaInfo.s_productId, container.productId);
-
-        let additionInputParams = container.getAdditionalInputParams();
-        if (Object.keys(additionInputParams).length > 0){
-            let additionParams = Gql.GqlObject("addition");
-            for (let key in additionInputParams){
-                additionParams.InsertField(key, additionInputParams[key]);
-            }
-            request.inputParams.InsertFieldObject(additionParams);
-        }
 
         request.send();
     }
@@ -74,6 +65,10 @@ QtObject {
                     container.accepted();
                 }
             }
+        }
+
+        function getHeaders(){
+            return container.getHeaders();
         }
     }
 
