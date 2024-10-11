@@ -55,9 +55,7 @@ RemoteCollectionView {
 
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", roleCollectionViewContainer.onLocalizationChanged);
-        CachedRoleCollection.updateModel();
 
-        // let documentManager = MainDocumentManager.getDocumentManager("Administration");
         if (roleCollectionViewContainer.documentManager){
             roleCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 
@@ -67,13 +65,15 @@ RemoteCollectionView {
     }
 
     onProductIdChanged: {
-        console.log("Role Collection onProductIdChanged", productId);
         permissionsProvider.productId = productId;
         permissionsProvider.updateModel();
+
+        roleCollectionDataProvider.productId = productId;
+        roleCollectionDataProvider.updateModel();
     }
 
-    property TreeItemModel rolesModel: CachedRoleCollection.collectionModel;
-    property TreeItemModel permissionsModel: TreeItemModel {};
+    property TreeItemModel rolesModel;
+    property TreeItemModel permissionsModel;
 
     PermissionsProvider {
         id: permissionsProvider;
@@ -83,6 +83,13 @@ RemoteCollectionView {
             if (permissionsProvider.permissionsModel != null){
                 roleCollectionViewContainer.permissionsModel = permissionsProvider.permissionsModel;
             }
+        }
+    }
+
+    RoleCollectionDataProvider {
+        id: roleCollectionDataProvider;
+        onModelUpdated: {
+            roleCollectionViewContainer.rolesModel = collectionModel;
         }
     }
 

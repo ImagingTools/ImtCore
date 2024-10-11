@@ -24,3 +24,6 @@ UserView 1.0 UserView.qml
 UserGroupView 1.0 UserGroupView.qml
 
 RoleCollectionViewCommandsDelegate 1.0 RoleCollectionViewCommandsDelegate.qml
+RoleCollectionDataProvider 1.0 RoleCollectionDataProvider.qml
+GroupCollectionDataProvider 1.0 GroupCollectionDataProvider.qml
+UserCollectionDataProvider 1.0 UserCollectionDataProvider.qml

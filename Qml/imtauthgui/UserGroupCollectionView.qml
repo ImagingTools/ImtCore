@@ -25,10 +25,6 @@ RemoteCollectionView {
     }
 
     Component.onCompleted: {
-        CachedUserCollection.updateModel();
-        CachedRoleCollection.updateModel();
-        CachedGroupCollection.updateModel();
-
         collectionFilter.setSortingOrder("ASC");
         collectionFilter.setSortingInfoId("Name");
 
@@ -52,13 +48,44 @@ RemoteCollectionView {
         }
     }
 
+    onProductIdChanged: {
+        roleCollectionDataProvider.productId = productId;
+        roleCollectionDataProvider.updateModel();
+
+        userCollectionDataProvider.updateModel();
+        groupCollectionDataProvider.updateModel();
+    }
+
     function handleSubscription(dataModel){
         userGroupCollectionViewContainer.doUpdateGui();
     }
 
-    property TreeItemModel usersModel: CachedUserCollection.collectionModel;
-    property TreeItemModel rolesModel: CachedRoleCollection.collectionModel;
-    property TreeItemModel groupsModel: CachedGroupCollection.collectionModel;
+    property TreeItemModel usersModel;
+    property TreeItemModel rolesModel;
+    property TreeItemModel groupsModel;
+
+    RoleCollectionDataProvider {
+        id: roleCollectionDataProvider;
+        onModelUpdated: {
+            userGroupCollectionViewContainer.rolesModel = collectionModel;
+        }
+    }
+
+    UserCollectionDataProvider {
+        id: userCollectionDataProvider;
+
+        onModelUpdated: {
+            userGroupCollectionViewContainer.usersModel = collectionModel;
+        }
+    }
+
+    GroupCollectionDataProvider {
+        id: groupCollectionDataProvider;
+
+        onModelUpdated: {
+            userGroupCollectionViewContainer.groupsModel = collectionModel;
+        }
+    }
 
     Component {
         id: userGroupDocumentComp;
