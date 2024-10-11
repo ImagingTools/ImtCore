@@ -331,23 +331,15 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 }
 
 
-void CRoleCollectionControllerComp::SetAdditionalFilters(
+void CRoleCollectionControllerComp::SetObjectFilter(
 			const imtgql::CGqlRequest& gqlRequest,
-			const imtgql::CGqlObject& /*viewParamsGql*/,
-			iprm::CParamsSet* filterParams) const
+			const imtbase::CTreeItemModel& objectFilterModel,
+			iprm::CParamsSet& filterParams) const
 {
+	BaseClass::SetObjectFilter(gqlRequest, objectFilterModel, filterParams);
+
 	const imtgql::CGqlObject* inputParamObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputParamObjectPtr == nullptr){
-		return;
-	}
-
-	iser::ISerializable* objectFilterPtr = filterParams->GetEditableParameter("ObjectFilter");
-	if (objectFilterPtr == nullptr){
-		return;
-	}
-
-	iprm::CParamsSet* objectParamSetPtr = dynamic_cast<iprm::CParamsSet*>(objectFilterPtr);
-	if (objectParamSetPtr == nullptr){
 		return;
 	}
 
@@ -359,7 +351,7 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 	iprm::CTextParam* textParamPtr = new iprm::CTextParam;
 	textParamPtr->SetText(productId);
 
-	objectParamSetPtr->SetEditableParameter("ProductId", textParamPtr, true);
+	filterParams.SetEditableParameter("ProductId", textParamPtr, true);
 }
 
 

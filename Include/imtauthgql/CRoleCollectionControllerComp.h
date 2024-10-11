@@ -42,10 +42,10 @@ protected:
 				sdl::imtauth::Roles::V1_0::CRoleDataPayload& representationPayload,
 				QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual void SetAdditionalFilters(
+	void SetObjectFilter(
 				const imtgql::CGqlRequest& gqlRequest,
-				const imtgql::CGqlObject& viewParamsGql,
-				iprm::CParamsSet* filterParams) const override;
+				const imtbase::CTreeItemModel& objectFilterModel,
+				iprm::CParamsSet& filterParams) const override;
 
 protected:
 	I_REF(imtgql::IGqlRequestProvider, m_gqlRequestProviderCompPtr);

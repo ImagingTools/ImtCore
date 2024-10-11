@@ -38,7 +38,7 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 	}
 
 	QJsonObject rootObject;
-	rootObject["ids"] = idsArray;
+	// rootObject["ids"] = idsArray;
 	rootObject["infoMap"] = changeObj;
 	rootObject["description"] = changeSet.GetDescription();
 

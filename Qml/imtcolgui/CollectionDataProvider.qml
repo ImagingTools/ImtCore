@@ -31,7 +31,6 @@ QtObject {
     signal failed();
 
     function updateModel(){
-        console.log("updateModel", commandId);
         if (completed){
             console.warn("Collection data already loaded")
             return;
@@ -92,16 +91,6 @@ QtObject {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
 
-            let additionInputParams = container.getHeaders();
-            if (additionInputParams){
-                if (Object.keys(additionInputParams).length > 0){
-                    let additionParams = Gql.GqlObject("addition");
-                    for (let key in additionInputParams){
-                        additionParams.InsertField(key, additionInputParams[key]);
-                    }
-                    inputParams.InsertFieldObject(additionParams);
-                }
-            }
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
@@ -109,6 +98,10 @@ QtObject {
                 queryFields.InsertField(key);
             }
             query.AddField(queryFields);
+        }
+
+        function getHeaders(){
+            return container.getHeaders();
         }
 
         function onResult(data){

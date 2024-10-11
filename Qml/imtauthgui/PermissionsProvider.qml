@@ -18,6 +18,10 @@ QtObject {
         permissionModel.send();
     }
 
+    function getHeaders(){
+        return {};
+    }
+
      property GqlRequestSender permissionModel: GqlRequestSender {
         requestType: 0; // Query
         gqlCommandId: "ProductPermissions";
@@ -26,6 +30,10 @@ QtObject {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("ProductId", permissionsProvider.productId);
             query.AddParam(inputParams);
+        }
+
+        function getHeaders(){
+            return permissionsProvider.getHeaders();
         }
 
         function onResult(data){

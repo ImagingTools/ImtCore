@@ -50,6 +50,13 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 
 	const imtgql::IGqlContext* contextPtr = request.GetRequestContext();
 	if (contextPtr != nullptr){
+		imtgql::IGqlContext::Headers headersMap = contextPtr->GetHeaders();
+
+		QByteArray productId = headersMap.value("ProductId");
+		if (!productId.isEmpty()){
+			networkRequest->setRawHeader("ProductId", productId);
+		}
+
 		QByteArray token = contextPtr->GetToken();
 		if (!token.isEmpty()){
 			networkRequest->setRawHeader("X-authentication-token", token);

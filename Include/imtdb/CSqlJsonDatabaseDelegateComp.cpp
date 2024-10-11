@@ -465,6 +465,94 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 }
 
 
+bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const
+{
+	QString addedStrQuery = QString(R"((SELECT "LastModified" FROM "%1" as temp WHERE "RevisionNumber" = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))").arg(qPrintable(*m_tableNameAttrPtr));
+	switch (timeFilter.GetTimeUnit()){
+	case imtbase::ITimeFilterParam::TU_CUSTOM:
+		break;
+	case imtbase::ITimeFilterParam::TU_HOUR:
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp at time zone 'utc') - interval '1 hour'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 hour' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_DAY:
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp at time zone 'utc') - interval '1 day'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 day' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_WEEK:
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp at time zone 'utc') - interval '1 week'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 week' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_MONTH:
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp at time zone 'utc') - interval '1 month'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 month' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
+
+		break;
+	case imtbase::ITimeFilterParam::TU_YEAR:
+		switch(timeFilter.GetInterpretationMode()){
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp at time zone 'utc')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp at time zone 'utc') - interval '1 year'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 year' and %1 <= current_timestamp at time zone 'utc'))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	}
+
+	if (timeFilterQuery.isEmpty()){
+		imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
+		if (!timeRange.IsNull()){
+			timeFilterQuery += QString(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
+			.arg(addedStrQuery)
+				.arg(timeRange.GetBeginTime().toString(Qt::ISODateWithMs))
+				.arg(timeRange.GetEndTime().toString(Qt::ISODateWithMs));
+		}
+	}
+
+	return true;
+}
+
+
 idoc::MetaInfoPtr CSqlJsonDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
 	return idoc::MetaInfoPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);

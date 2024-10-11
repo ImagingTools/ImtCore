@@ -84,6 +84,10 @@ RemoteCollectionView {
                 roleCollectionViewContainer.permissionsModel = permissionsProvider.permissionsModel;
             }
         }
+
+        function getHeaders(){
+            return {"ProductId" : roleCollectionViewContainer.productId};
+        }
     }
 
     RoleCollectionDataProvider {
