@@ -63,11 +63,14 @@ Item {
             }
         }
 
-        widthTimer.restart();
-        buttonTimer.restart();
+        checkCommandsState();
     }
 
     function clearModel(){
+        if (!leftCommands || !centerCommands || !rightCommands){
+            return;
+        }
+
         leftCommands.clear();
         centerCommands.clear();
         rightCommands.clear();
@@ -75,38 +78,30 @@ Item {
 
     Component.onCompleted: {
         widthTimer.restart();
-        buttonTimer.restart();
-    }
-
-    onVisibleChanged: {
-        if (visible){
-            checkCommandsWidth();
-            buttonTimer.restart();
-        }
-    }
-
-    onWidthChanged: {
-        checkCommandsWidth();
-        buttonTimer.restart();
     }
 
     Timer {
         id: widthTimer;
-        interval: 500;
+        interval: 2000;
         onTriggered: {
-            if (commandsItem){
-                commandsItem.checkCommandsWidth();
-            }
+            commandsItem.checkCommandsState();
         }
     }
 
-    Timer {
-        id: buttonTimer;
-        interval: 500;
-        onTriggered: {
-            if (commandsItem){
-                commandsItem.checkButtonVisible();
-            }
+    onVisibleChanged: {
+        if (visible){
+            checkCommandsState()
+        }
+    }
+
+    onWidthChanged: {
+        checkCommandsState();
+    }
+
+    function checkCommandsState(){
+        if (commandsItem){
+            commandsItem.checkCommandsWidth();
+            commandsItem.checkButtonVisible();
         }
     }
 
@@ -125,22 +120,40 @@ Item {
     }
 
     function checkButtonVisible(){
-        button.visible = leftCommands.hasHiddenCommands() || centerCommands.hasHiddenCommands() || rightCommands.hasHiddenCommands();
+        if (!button || !leftCommands || !centerCommands || !rightCommands){
+            return;
+        }
+
+        button.visible = leftCommands.hasHiddenCommands() ||
+                         centerCommands.hasHiddenCommands() ||
+                         rightCommands.hasHiddenCommands();
     }
 
     CommandsView {
         id: leftCommands;
         anchors.left: parent.left;
         anchors.leftMargin: Style.size_mainMargin;
-        maximumWidth: centerCommands.allElements.length > 0 ? centerCommands.x : rightCommands.allElements.length > 0 ? rightCommands.x : commandsItem.width;
+        maximumWidth: centerCommands.allElements.length > 0 ?
+                          centerCommands.x - (button.visible ? button.width : 0):
+                          rightCommands.allElements.length > 0 ? rightCommands.x : commandsItem.width;
         eventCommandPrefix: commandsItem.commandId;
+
+        onMaximumWidthChanged: {
+            leftCommands.checkWidth();
+        }
     }
 
     CommandsView {
         id: centerCommands;
         anchors.horizontalCenter: parent.horizontalCenter;
-        maximumWidth: rightCommands.allElements.length > 0 ? rightCommands.x - centerCommands.x : commandsItem.width - centerCommands.x;
+        maximumWidth: rightCommands.allElements.length > 0 ?
+                          rightCommands.x - centerCommands.x - (button.visible ? button.width : 0):
+                          commandsItem.width - centerCommands.x;
         eventCommandPrefix: commandsItem.commandId;
+
+        onMaximumWidthChanged: {
+            centerCommands.checkWidth();
+        }
     }
 
     CommandsView {
@@ -148,7 +161,11 @@ Item {
         anchors.right: button.left;
         anchors.rightMargin: Style.size_mainMargin;
         eventCommandPrefix: commandsItem.commandId;
-        maximumWidth: commandsItem.width - (centerCommands.x + centerCommands.contentWidth);
+        maximumWidth: commandsItem.width - (centerCommands.x + centerCommands.contentWidth) - (button.visible ? button.width : 0);
+
+        onMaximumWidthChanged: {
+            rightCommands.checkWidth();
+        }
     }
 
     ToolButton {
@@ -166,6 +183,10 @@ Item {
         }
 
         onClicked: {
+            if (!button || !leftCommands || !centerCommands || !rightCommands){
+                return;
+            }
+
             var point = button.mapToItem(null, 0, height);
             let empty = {
                 "Id": "",

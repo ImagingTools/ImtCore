@@ -131,6 +131,11 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr) const = 0;
+
+	/**
+		Get selection query for the listing objects meta information in the collection.
+	*/
+	virtual QByteArray GetSelectionByMetaInfoQuery(const QByteArray& metaInfoId, const QVariant& metaInfoValue) const = 0;
 };
 
 

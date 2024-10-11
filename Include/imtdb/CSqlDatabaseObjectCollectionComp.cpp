@@ -730,6 +730,65 @@ void CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged(const istd::IChan
 }
 
 
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CSqlDatabaseObjectCollectionComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+{
+	if (!m_objectDelegateCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
+
+		return;
+	}
+
+	if (!m_optionsListCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: 'm_optionsListCompPtr'attribute was not set", "Database collection");
+
+		return;
+	}
+
+	if (!changeSet.Contains(imtbase::ICollectionInfo::CF_UPDATED) &&
+		!changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
+		return;
+	}
+
+	QByteArray elementId;
+	if (changeSet.Contains(imtbase::ICollectionInfo::CF_UPDATED)){
+		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_UPDATED).toByteArray();
+	}
+
+	if (changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
+		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_REMOVED).toByteArray();
+	}
+
+	if (elementId.isEmpty()){
+		return;
+	}
+
+	QByteArray metaInfoId = m_optionsListCompPtr->GetOptionId(modelId);
+
+	QByteArray query = m_objectDelegateCompPtr->GetSelectionByMetaInfoQuery(metaInfoId, elementId);
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(query, &sqlError, true);
+
+	while (sqlQuery.next()){
+		QSqlRecord record = sqlQuery.record();
+		QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(record);
+		QByteArray updateMetaInfoQuery = m_objectDelegateCompPtr->CreateUpdateMetaInfoQuery(record);
+
+		istd::IChangeable::ChangeSet objectChangeSet(CF_UPDATED);
+		objectChangeSet.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
+		istd::CChangeNotifier changeNotifier(this, &objectChangeSet);
+
+		if (!ExecuteTransaction(updateMetaInfoQuery)){
+			changeNotifier.Abort();
+
+			return;
+		}
+	}
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
@@ -745,6 +804,13 @@ void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
 	m_databaseAccessObserver.RegisterObject(m_databaseAccessSettingsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged);
 	
 	m_isInitialized = true;
+
+	for (int i = 0; i < m_objectCollectionsCompPtr.GetCount(); i++){
+		imod::IModel* modelPtr = m_objectCollectionsCompPtr[i];
+		if (modelPtr != nullptr){
+			RegisterModel(modelPtr, i);
+		}
+	}
 }
 
 
@@ -752,6 +818,7 @@ void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
 {
 	m_filterParamsObserver.UnregisterAllObjects();
 	m_databaseAccessObserver.UnregisterAllObjects();
+	BaseClass2::UnregisterAllModels();
 
 	BaseClass::OnComponentDestroyed();
 }

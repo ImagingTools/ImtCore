@@ -60,6 +60,9 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr) const override;
+	virtual QByteArray GetSelectionByMetaInfoQuery(const QByteArray& metaInfoId, const QVariant& metaInfoValue) const override;
+	virtual QByteArray CreateUpdateMetaInfoQuery(const QSqlRecord& record) const override;
+
 protected:
 	virtual QString GetBaseSelectionQuery() const;
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;

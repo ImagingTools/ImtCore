@@ -217,13 +217,62 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const QString& /*description*/,
+			const QByteArray& objectId,
+			const QString& description,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	QByteArray retVal;
+	QByteArray retVal = QString("UPDATE \"%1\" SET \"Description\" = '%2' WHERE \"%3\" = '%4';")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(description)
+				.arg(qPrintable(s_idColumn))
+				.arg(qPrintable(objectId))
+				.toUtf8();
 
 	return retVal;
+}
+
+
+QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionByMetaInfoQuery(
+			const QByteArray& metaInfoId,
+			const QVariant& metaInfoValue) const
+{
+	return QString(R"(SELECT * FROM "%1" WHERE "IsActive" = true AND "DataMetaInfo"->>'%2' = '%3')")
+				.arg(*m_tableNameAttrPtr)
+				.arg(qPrintable(metaInfoId))
+				.arg(qPrintable(metaInfoValue.toByteArray())).toUtf8();
+}
+
+
+
+QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSqlRecord& record) const
+{
+	istd::TDelPtr<istd::IChangeable> objectPtr = CreateObjectFromRecord(record);
+	if (objectPtr == nullptr){
+		return QByteArray();
+	}
+
+	QByteArray objectId = record.value(qPrintable(s_documentIdColumn)).toByteArray();
+	QByteArray typeId = record.value(qPrintable(s_typeIdColumn)).toByteArray();
+
+	QByteArray metaInfoRepresentation = QByteArrayLiteral("{}");
+
+	if (m_metaInfoCreatorCompPtr.IsValid()){
+		idoc::MetaInfoPtr metaInfoPtr;
+		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(objectPtr.GetPtr(), typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
+			if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
+				metaInfoRepresentation = m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr());
+			}
+		}
+	}
+
+	QByteArray query = QString(R"(UPDATE "%1" SET "DataMetaInfo" = '%2' WHERE "IsActive" = true AND "%3" = '%4')")
+						.arg(qPrintable(*m_tableNameAttrPtr))
+						.arg(qPrintable(metaInfoRepresentation))
+						.arg(qPrintable(s_documentIdColumn))
+						.arg(objectId)
+						.toUtf8();
+
+	return query;
 }
 
 
@@ -374,9 +423,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 
 	QByteArray metaInfoRepresentation = QByteArrayLiteral("{}");
 
-	if (m_metaInfoCreateorCompPtr.IsValid()){
+	if (m_metaInfoCreatorCompPtr.IsValid()){
 		idoc::MetaInfoPtr metaInfoPtr;
-		if (m_metaInfoCreateorCompPtr->CreateMetaInfo(&object, typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
+		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(&object, typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
 			if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
 				metaInfoRepresentation = m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr());
 			}

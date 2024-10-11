@@ -33,19 +33,7 @@ Item {
     property string negativeAccentColor: Style.errorTextColor;
 
     onVisibleChanged: {
-        if (visible){
-            timer.restart();
-        }
-    }
-
-    Timer {
-        id: timer;
-        interval: 10;
-        onTriggered: {
-            if (commandsItem){
-                commandsItem.checkWidth();
-            }
-        }
+        reset();
     }
 
     function setCommandData(commandId, key, value){
@@ -74,12 +62,17 @@ Item {
         repeater.model = commandsItem.commandsModel;
     }
 
-
     // Clear view
     function clear(){
         commandsModel.clear();
         allElements = []
         priorityElements = []
+    }
+
+    function reset(){
+        for (let j = 0; j < allElements.length; j++){
+            allElements[j].modelData.Visible = false;
+        }
     }
 
     function hasHiddenCommands(){
@@ -99,41 +92,24 @@ Item {
     // The function checks whether the commands fit into the maximum width of this view
     // If they do not fit, then we hide the command with the lowest priority
     function checkWidth(){
-        if (maximumWidth < 0){
-            return;
+        let maxWidth = maximumWidth;
+        if (maxWidth < 0){
+            maxWidth = 0;
         }
 
-        let totalContentWidth = contentWidth + Style.size_mainMargin;
-        if (totalContentWidth > maximumWidth){
-            let tempWidth = totalContentWidth;
-            for (let j = priorityElements.length - 1; j >= 0; j--){
-                if (priorityElements[j].visible){
-                    let elementWidth = priorityElements[j].maxWidth;
-                    tempWidth -= elementWidth;
+        reset();
 
-                    priorityElements[j].modelData.Visible = false;
+        let tempWidth = 0;
+        for (let j = 0; j < priorityElements.length; j++){
+            let elementWidth = priorityElements[j].maxWidth;
+            tempWidth += elementWidth;
 
-                    if (tempWidth < maximumWidth){
-                        break;
-                    }
-                }
+            if (tempWidth + 2 * Style.size_mainMargin < maxWidth){
+                priorityElements[j].modelData.Visible = true;
             }
-        }
-        else{
-            let tempWidth = totalContentWidth;
-            for (let j = 0; j < priorityElements.length; j++){
-                if (!priorityElements[j].visible){
-                    let elementWidth = priorityElements[j].maxWidth;
-                    tempWidth += elementWidth;
 
-                    if (tempWidth < maximumWidth){
-                        priorityElements[j].modelData.Visible = true;
-                    }
-
-                    if (tempWidth >= maximumWidth){
-                        break;
-                    }
-                }
+            if (tempWidth >= maxWidth){
+                continue;
             }
         }
     }
@@ -145,6 +121,7 @@ Item {
 
         Repeater {
             id: repeater;
+
             delegate: Component {
                 Item {
                     id: itemDelegate;
@@ -152,6 +129,7 @@ Item {
                     height: commandsItem.height;
                     property var dataModel: model;
                     property int priority: model.Priority ? model.Priority: -1;
+                    property int commandsCount: repeater2.count;
 
                     Row {
                         id: listView;

@@ -41,6 +41,11 @@ public:
 		Create object meta-information element based on the SQL record.
 	*/
 	virtual QVariant GetElementInfoFromRecord(const QSqlRecord& record, const QByteArray& infoId) const = 0;
+
+	/**
+		Create query for the updating the meta info by SQL record.
+	*/
+	virtual QByteArray CreateUpdateMetaInfoQuery(const QSqlRecord& record) const = 0;
 };
 
 

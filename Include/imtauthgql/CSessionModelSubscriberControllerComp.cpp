@@ -14,7 +14,7 @@ namespace imtauthgql
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const QByteArray& sessionId)
+void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IChangeable::ChangeSet& changeSet, const QByteArray& sessionId)
 {
 	if (!m_requestManagerCompPtr.IsValid()){
 		return;
@@ -24,12 +24,34 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 		return;
 	}
 
+	QSet<int> ids = changeSet.GetIds();
+	QJsonArray idsArray;
+	for (const int id : ids){
+		idsArray.append(QJsonValue(id));
+	}
+
+	QJsonObject changeObj;
+	const istd::IChangeable::ChangeInfoMap changeMap = changeSet.GetChangeInfoMap();
+	for (const QByteArray& key : changeMap.keys()){
+		QByteArray value = changeSet.GetChangeInfo(key).toByteArray();
+		changeObj.insert(key, QJsonValue(QString(value)));
+	}
+
+	QJsonObject rootObject;
+	rootObject["ids"] = idsArray;
+	rootObject["infoMap"] = changeObj;
+	rootObject["description"] = changeSet.GetDescription();
+
+	QJsonDocument changeSetDocument;
+	changeSetDocument.setObject(rootObject);
+
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
-			QByteArray body = QString(R"({"type": "data", "id": "%1","payload":{"data": {"token": "%2"}}})")
+			QByteArray body = QString(R"({"type": "data", "id": "%1","payload":{"data": {"token": "%2", "changeSet": %3}}})")
 								.arg(QString(id))
-								.arg(QString(sessionId)).toUtf8();
+								.arg(QString(sessionId))
+								.arg(qPrintable(changeSetDocument.toJson(QJsonDocument::Compact))).toUtf8();
 			QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
 			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
 

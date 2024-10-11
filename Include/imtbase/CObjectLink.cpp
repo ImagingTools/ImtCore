@@ -75,12 +75,12 @@ bool CObjectLink::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	static iser::CArchiveTag objectUuidTag("ObjectUuid", "Object-UUID", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag objectUuidTag("ObjectUuid", "Object-UUID", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(objectUuidTag);
 	retVal = retVal && archive.Process(m_objectUuid);
 	retVal = retVal && archive.EndTag(objectUuidTag);
 
-	static iser::CArchiveTag objectTypeTag("ObjectType", "Object Type", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag objectTypeTag("ObjectType", "Object Type", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(objectTypeTag);
 	retVal = retVal && archive.Process(m_objectTypeId);
 	retVal = retVal && archive.EndTag(objectTypeTag);

@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
@@ -38,6 +39,27 @@ void CModelSubscriberComp::OnResponseReceived(const QByteArray& subscriptionId, 
 		if (subscriptionObject.contains("token")){
 			QByteArray token = subscriptionObject.value("token").toString().toUtf8();
 			changeSet.SetChangeInfo("token", token);
+		}
+
+		if (subscriptionObject.contains("changeSet")){
+			QJsonObject changeSetObject = subscriptionObject.value("changeSet").toObject();
+
+			if (changeSetObject.contains("ids")){
+				QSet<int> ids;
+				QJsonArray idsArray = changeSetObject.value("ids").toArray();
+				for (const QJsonValue& value : idsArray){
+					ids << value.toInt();
+				}
+
+				changeSet += ids;
+			}
+
+			if (changeSetObject.contains("infoMap")){
+				QJsonObject infoMapObject = changeSetObject.value("infoMap").toObject();
+				for (const QString& key : infoMapObject.keys()){
+					changeSet.SetChangeInfo(key.toUtf8(), infoMapObject[key].toVariant());
+				}
+			}
 		}
 	}
 

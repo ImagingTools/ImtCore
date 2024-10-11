@@ -26,7 +26,7 @@ public:
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN_MULTI_0(m_documentPersistenceListCompPtr, "DocumentPersistenceList", "List of persistence components for each type of the document", true);
-		I_ASSIGN(m_metaInfoCreateorCompPtr, "MetaInfoCreator", "Creator of metainformation of object data", false, "MetaInfoCreator");
+		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Creator of metainformation of object data", false, "MetaInfoCreator");
 		I_ASSIGN(m_jsonBasedMetaInfoDelegateCompPtr, "JsonBasedMetaInfoDelegate", "Delegate for converting document metainfo to JSON representation", false, "JsonBasedMetaInfoDelegate");
 	I_END_COMPONENT
 
@@ -65,6 +65,8 @@ public:
 				const QByteArray& objectId,
 				const QString& description,
 				const imtbase::IOperationContext* operationContextPtr) const override;
+	virtual QByteArray GetSelectionByMetaInfoQuery(const QByteArray& metaInfoId, const QVariant& metaInfoValue) const override;
+	virtual QByteArray CreateUpdateMetaInfoQuery(const QSqlRecord& record) const override;
 
 	// reimplemented (imtbase::IRevisionController)
 	virtual RevisionInfoList GetRevisionInfoList(
@@ -111,13 +113,14 @@ protected:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* paramsPtr = nullptr) const;
+
 protected:
 	const ifile::IFilePersistence* FindDocumentPersistence(const QByteArray& typeId) const;
 
 protected:
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_documentPersistenceListCompPtr);
-	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreateorCompPtr);
+	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_REF(imtdb::IJsonBasedMetaInfoDelegate, m_jsonBasedMetaInfoDelegateCompPtr);
 };
 
