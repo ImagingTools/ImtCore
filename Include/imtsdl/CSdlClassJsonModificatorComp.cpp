@@ -612,6 +612,11 @@ void CSdlClassJsonModificatorComp:: AddCustomArrayFieldWriteToJsonImplCode(
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << '}';
 
+	// write serialized json object to array
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << newJsonArrayVarName << QStringLiteral(" << ") << newJsonObjectVarName << ';';
+
 	// end of loop
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
