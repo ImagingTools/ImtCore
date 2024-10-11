@@ -68,6 +68,7 @@ Rectangle{
     signal accepted(string retVal);
     signal searchPartialAddress(string addressStr);
     signal returnModelSignal();
+    signal clearSignal();
 
     Component.onCompleted: {
     }
@@ -175,7 +176,7 @@ Rectangle{
             popup.excludeFilterPart = searchContainer.currentText;
             popup.filterText = searchContainer.currentText;
         }
-
+        searchContainer.clearSignal();
     }
 
     function setCurrentTextAddressFunc(modelll, index_, addStr_){
