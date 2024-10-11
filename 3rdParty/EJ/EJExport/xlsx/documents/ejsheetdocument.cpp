@@ -93,9 +93,8 @@ EjSheetDocument::~EjSheetDocument()
 		rowsModel.removeLast();
 	}
 
-	while (colsModel.size() > 0) {
-		colsModel.removeLast();
-	}
+	colsModel.clear();
+
 
 	index_string = INDEX_STRING;
 	index_column = INDEX_COLUMN;
@@ -115,7 +114,13 @@ bool EjSheetDocument::addTextNumber(int number, int numberStyle)
 	/*Здесь будет передаваться number = -1,
        когда будет передана информация из клетки таблицы,
        в которой нет текста, но ему нужно добавить стили для бордеров*/
-	QJsonObject row, rowAttributes, cModel, cAttributesModel;
+	QJsonObject row, rowAttributes, cItem, cAttributesModel;
+	QJsonArray cModel;
+	if (rowsModel.last().toObject()["attributes"].toObject()["r"].toString() == QString::number(index_string)){
+		row = rowsModel.last().toObject();
+		rowAttributes = rowsModel.last().toObject()["attributes"].toObject();
+		cModel = rowsModel.last().toObject()["columns"].toArray();
+	}
 	rowAttributes["r"] = QString::number(index_string);
 
 	if(!activeTable){
@@ -136,13 +141,21 @@ bool EjSheetDocument::addTextNumber(int number, int numberStyle)
 
 	if(number != -1){
 		cAttributesModel["t"] = "s";
-		cModel["v"] = QString::number(number);
+		cItem["v"] = QString::number(number);
 	}
 
 	row["attributes"] = rowAttributes;
-	cModel["attributes"] = cAttributesModel;
-	row["c"] = cModel;
-	rowsModel.append(row);
+	cItem["attributes"] = cAttributesModel;
+	cModel.append(cItem);
+
+	row["columns"] = cModel;
+	if (rowsModel.last().toObject()["attributes"].toObject()["r"].toString() == QString::number(index_string)){
+		rowsModel.replace(rowsModel.count()-1, row);
+	}
+	else{
+		rowsModel.append(row);
+	}
+
 
 	if(!activeTable){
 		/*Если в документе нет таблицы то сделаем, какую то стандартную ширину для клетки*/
@@ -159,7 +172,13 @@ bool EjSheetDocument::addTextNumber(int number, int numberStyle)
 
 bool EjSheetDocument::addTextNumberIntoTable(int number, int numberStyle)
 {
-	QJsonObject row, rowAttributes, cModel, cAttributesModel;
+	QJsonObject row, rowAttributes, cItem, cAttributesModel;
+	QJsonArray cModel;
+	if (rowsModel.last().toObject()["attributes"].toObject()["r"].toString() == QString::number(index_string)){
+		row = rowsModel.last().toObject();
+		rowAttributes = rowsModel.last().toObject()["attributes"].toObject();
+		cModel = rowsModel.last().toObject()["columns"].toArray();
+	}
 	rowAttributes["customHeight"] = "1";
 	rowAttributes["ht"] = QString::number(heightCell);
 	rowAttributes["r"] = QString::number(index_string);
@@ -168,13 +187,20 @@ bool EjSheetDocument::addTextNumberIntoTable(int number, int numberStyle)
 
 	if(number != -1){
 		cAttributesModel["t"] = "s";
-		cModel["v"] = QString::number(number);
+		cItem["v"] = QString::number(number);
 	}
 
 	row["attributes"] = rowAttributes;
-	cModel["attributes"] = cAttributesModel;
-	row["c"] = cModel;
-	rowsModel.append(row);
+	cItem["attributes"] = cAttributesModel;
+	cModel.append(cItem);
+	row["columns"] = cModel;
+	if (rowsModel.last().toObject()["attributes"].toObject()["r"].toString() == QString::number(index_string)){
+		rowsModel.replace(rowsModel.count()-1, row);
+	}
+	else{
+		rowsModel.append(row);
+	}
+
 
 	return true;
 }
@@ -195,16 +221,19 @@ void EjSheetDocument::addMergeCells(int rows, int cols)
 void EjSheetDocument::addWidthCell(float width)
 {
 	if(!colsExist){
+		colsModel.insert(index_column, width);
 		colsExist = true;
 	}
-
-	QJsonObject col;
-	col["customWidth"] = "1";
-	col["max"] = QString::number(index_column);
-	col["min"] = QString::number(index_column);
-	col["width"] = QString::number(width);
-
-	colsModel.append(col);
+	else{
+		if (colsModel.contains(index_column)){
+			if (width > colsModel[index_column]){
+				colsModel[index_column] = width;
+			}
+		}
+		else{
+			colsModel.insert(index_column, width);
+		}
+	}
 }
 
 
@@ -245,21 +274,53 @@ void EjSheetDocument::validate()
 
 QByteArray EjSheetDocument::getDocumentData()
 {
+	documentWriter->writeStartDocument("1.0", true);
 	documentWriter->writeStartElement("worksheet");
 	documentWriter->writeAttribute("xmlns", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
 	documentWriter->writeAttribute("xmlns:r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
 
 	if (colsExist){
 		documentWriter->writeStartElement("cols");
-
-		for (int i = 0; i < colsModel.count(); i++){
-			documentWriter->writeStartElement("col");
-			documentWriter->writeAttribute("customWidth", colsModel[i].toObject()["customWidth"].toString());
-			documentWriter->writeAttribute("max", colsModel[i].toObject()["max"].toString());
-			documentWriter->writeAttribute("min", colsModel[i].toObject()["min"].toString());
-			documentWriter->writeAttribute("width", colsModel[i].toObject()["width"].toString());
+		float width = 0;
+		int min = 0, max = 0;
+		for (int key : colsModel.keys()){
+			if (width == 0 && min == 0 && max == 0){
+				documentWriter->writeStartElement("col");
+				documentWriter->writeAttribute("customWidth", "1");
+				documentWriter->writeAttribute("width", QString::number(colsModel[key]));
+				width = colsModel[key];
+				min = key;
+				max = key;
+			}
+			else if (colsModel[key] == width && (key - max) == 1){
+				max = key;
+			}
+			else{
+				documentWriter->writeAttribute("max", QString::number(max));
+				documentWriter->writeAttribute("min", QString::number(min));
+				documentWriter->writeEndElement();
+				documentWriter->writeStartElement("col");
+				documentWriter->writeAttribute("customWidth", "1");
+				documentWriter->writeAttribute("width", QString::number(colsModel[key]));
+				width = colsModel[key];
+				min = key;
+				max = key;
+			}
+		}
+		if (colsModel.count() > 0){
+			documentWriter->writeAttribute("max", QString::number(max));
+			documentWriter->writeAttribute("min", QString::number(min));
 			documentWriter->writeEndElement();
 		}
+
+		// for (int i = 0; i < colsModel.count(); i++){
+		// 	documentWriter->writeStartElement("col");
+		// 	documentWriter->writeAttribute("customWidth", colsModel[i].toObject()["customWidth"].toString());
+		// 	documentWriter->writeAttribute("max", colsModel[i].toObject()["max"].toString());
+		// 	documentWriter->writeAttribute("min", colsModel[i].toObject()["min"].toString());
+		// 	documentWriter->writeAttribute("width", colsModel[i].toObject()["width"].toString());
+		// 	documentWriter->writeEndElement();
+		// }
 
 		documentWriter->writeEndElement();
 	}
@@ -279,25 +340,29 @@ QByteArray EjSheetDocument::getDocumentData()
 			}
 		}
 
-		if (rowsModel[i].toObject().contains("c")){
-			documentWriter->writeStartElement("c");
-			QJsonObject cModel = rowsModel[i].toObject()["c"].toObject();
+		if (rowsModel[i].toObject().contains("columns")){
+			QJsonArray columns = rowsModel[i].toObject()["columns"].toArray();
 
-			if (cModel.contains("attributes")){
-				QJsonObject cAttributesModel = cModel["attributes"].toObject();
-				QList<QString> keys = cAttributesModel.keys();
-				keys.sort();
+			for (int j = 0; j < columns.count(); j++){
+				documentWriter->writeStartElement("c");
+				QJsonObject cModel = columns[j].toObject();
 
-				for (QString key : keys){
-					documentWriter->writeAttribute(key, cAttributesModel[key].toString());
+				if (cModel.contains("attributes")){
+					QJsonObject cAttributesModel = cModel["attributes"].toObject();
+					QList<QString> keys = cAttributesModel.keys();
+					keys.sort();
+
+					for (QString key : keys){
+						documentWriter->writeAttribute(key, cAttributesModel[key].toString());
+					}
 				}
-			}
 
-			if (cModel.contains("v")){
-				documentWriter->writeTextElement("v", cModel["v"].toString());
-			}
+				if (cModel.contains("v")){
+					documentWriter->writeTextElement("v", cModel["v"].toString());
+				}
 
-			documentWriter->writeEndElement();
+				documentWriter->writeEndElement();
+			}
 		}
 
 		documentWriter->writeEndElement();
@@ -318,6 +383,8 @@ QByteArray EjSheetDocument::getDocumentData()
 	}
 
 	documentWriter->writeEndElement();
+	documentWriter->writeEndDocument();
+
 	return streamData;
 }
 

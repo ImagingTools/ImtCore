@@ -62,7 +62,7 @@ void EjConvertorExcel::clear() {
 }
 
 EjConvertorExcel::EjConvertorExcel():
-    temp_folder(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + '/'), subfolder(format + "_test/" ){
+	temp_folder(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + '/' + QUuid::createUuid().toString(QUuid::WithoutBraces) + '/'), subfolder(format + "_test/" ){
 	sheet_document = new EjSheetDocument();
 	sharedStrings_document = new EjSharedStringsDocument();
 	styles_document = new EjStylesDocument();

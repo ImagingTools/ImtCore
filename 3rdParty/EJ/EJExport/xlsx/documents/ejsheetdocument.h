@@ -16,8 +16,9 @@ class EjSheetDocument {
 	QXmlStreamWriter* documentWriter;
 	QJsonArray sheetDataModel;
 	QJsonArray mergeCellsModel;
-	QJsonArray colsModel;
+	// QJsonArray colsModel;
 	QJsonArray rowsModel;
+	QMap<int, float> colsModel;
 	int index_string = INDEX_STRING;
 	int index_column = INDEX_COLUMN;
 	int count_cells = 0;

@@ -91,9 +91,32 @@ int EjStylesDocument::addBorders(int left, int right, int top, int bottom)
 		border["bottom"] = value;
 	}
 
-	bordersModel.append(border);
-	countBorders++;
-	return countBorders;
+	if (!bordersModel.contains(border)){
+		bordersModel.append(border);
+		countBorders++;
+		return countBorders;
+	}
+	else{
+		for (int i = 0; i < bordersModel.count(); i++){
+			QJsonObject selectedBorder = bordersModel.at(i).toObject();
+			if (border.keys() == selectedBorder.keys()){
+				bool isEqual = false;
+				for (QString key : border.keys()){
+					if (border[key] == selectedBorder[key]){
+						isEqual = true;
+					}
+					else{
+						isEqual = false;
+						break;
+					}
+				}
+				if (isEqual){
+					return i;
+				}
+			}
+		}
+	}
+	return 0;
 }
 
 
@@ -140,9 +163,33 @@ int EjStylesDocument::addXfToCellXfs(int fillId, int borderId)
 		cellXfs["applyAlignment"] = QString::number(1);
 	}
 
-	cellXfsModel.append(cellXfs);
-	countCellXfs++;
-	return countCellXfs;
+	if (!cellXfsModel.contains(cellXfs)){
+		cellXfsModel.append(cellXfs);
+		countCellXfs++;
+		return countCellXfs;
+	}
+	else{
+		for (int i = 0; i < cellXfsModel.count(); i++){
+			QJsonObject selectedCellXfs = cellXfsModel.at(i).toObject();
+			if (cellXfs.keys() == selectedCellXfs.keys()){
+				bool isEqual = false;
+				for (QString key : cellXfs.keys()){
+					if (cellXfs[key] == selectedCellXfs[key]){
+						isEqual = true;
+					}
+					else{
+						isEqual = false;
+						break;
+					}
+				}
+				if (isEqual){
+					return i;
+				}
+			}
+		}
+	}
+	return 0;
+
 }
 
 

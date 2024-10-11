@@ -354,6 +354,7 @@ int EjCalculator::calcCell(EjCellBlock *cell, EjBlock *table)
   if(cell->m_parent)
 	  accuracy = ((EjTableBlock*)(cell->m_parent))->accuracy;
   cell->setText(getDText(cell->value,accuracy));
+  return 0;
 }
 
 double EjCalculator::calcFormula(QString formula, EjBlock *source, bool *bOk)

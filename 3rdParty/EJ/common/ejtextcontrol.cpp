@@ -4850,7 +4850,7 @@ void EjTextControl::calc(int index, bool force)
         }
 
         cur_string->endBlock = i;
-        if(cur_string->endBlock - cur_string->startBlock > 1000)
+		if(cur_string->endBlock - cur_string->startBlock > 2000)
         {
             qWarning() << "Error for string" << __FILE__ << __LINE__ << ": " << doc->lBlocks->count() << i << doc->lStrings->count() << index_string << cur_string->startBlock << cur_string->endBlock;
 
