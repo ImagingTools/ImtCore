@@ -234,6 +234,30 @@ Item {
 			yearField.text = year;
 			datePicker.selectedIndexMonth = month;
 			dayField.text = day;
+
+            if(datePicker.hasMonthCombo){
+                monthComboObj.currentIndex = month;
+            }
+            if(datePicker.hasYearCombo){
+                for(let i = 0; i <  yearTreeModel.getItemsCount(); i++){
+                    let id = yearTreeModel.getData("Id");
+                    let name = yearTreeModel.getData("Name");
+                    if(name == year){
+                        yearComboObj.currentIndex = id;
+                        break;
+                    }
+                }
+            }
+            if(datePicker.hasDayCombo){
+                for(let i = 0; i <  dayTreeModel.getItemsCount(); i++){
+                    let id = dayTreeModel.getData("Id");
+                    let name = dayTreeModel.getData("Name");
+                    if(name == day){
+                        dayComboObj.currentIndex = id;
+                        break;
+                    }
+                }
+            }
 		}
 	}
 
