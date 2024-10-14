@@ -53,7 +53,7 @@ type ColumnOperation
 	columnId: ID!
 	operation: ID! # available operations: ==, !=, <, >, >=, <=, LIKE, ILIKE
 	value: String!
-	valueType: ID!
+	valueType: ID! # available types: int, uint, double, string, bool
 }
 
 type GroupOperation
