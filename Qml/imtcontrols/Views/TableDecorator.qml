@@ -15,7 +15,7 @@ TreeItemModel {
         //headers
         headers.setData("Color","#E5E5E5");
         headers.setData("FontSize",16);
-        headers.setData("FontBold",true);
+        headers.setData("FontBold", false);
         headers.setData("FontColor","#686671");
         headers.setData("TextPosition",Text.AlignHCenter);
 

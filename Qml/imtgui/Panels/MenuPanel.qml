@@ -35,7 +35,7 @@ Rectangle {
     property int buttonWidth: -1;
     property int buttonHeight: -1;
 
-    property bool centered: false;
+    property bool centered: Style.menuPanelCentered !== undefined ? Style.menuPanelCentered : false;
 
     Component.onCompleted: {
         Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
@@ -228,7 +228,7 @@ Rectangle {
         anchors.left: menuPanel.left;
         anchors.right: menuPanel.right;
 
-        anchors.topMargin: !menuPanel.centered ? 0 : parent.height - bottomAlignmentPages.height - contentHeight > 0 ? (parent.height - bottomAlignmentPages.height - contentHeight)/2 : 0 ;
+        anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin : !menuPanel.centered ? 0 : parent.height - bottomAlignmentPages.height - contentHeight > 0 ? (parent.height - bottomAlignmentPages.height - contentHeight)/2 : 0 ;
 
         height: count * menuPanel.buttonHeight;
 

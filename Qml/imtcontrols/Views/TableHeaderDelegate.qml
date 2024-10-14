@@ -79,7 +79,7 @@ Item{
         anchors.left: parent.left;
         width: headerDelegate.tableItem.isRightBorder ? headerDelegate.tableItem.verticalBorderSize * headerDelegate.tableItem.visibleLeftBorderFirst * (headerDelegate.columnIndex == 0)
                                                       : headerDelegate.tableItem.visibleLeftBorderFirst ? headerDelegate.tableItem.verticalBorderSize : headerDelegate.columnIndex > 0 ? headerDelegate.tableItem.verticalBorderSize : 0;
-        height: headerDelegate.tableItem.verticalBorderHeight;
+        height: headerDelegate.tableItem.verticalBorderHeight >= 0 ? headerDelegate.tableItem.verticalBorderHeight :parent.height;
         color:  headerDelegate.tableItem.borderColorVertical;
     }
 
