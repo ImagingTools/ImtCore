@@ -237,7 +237,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionByMetaInfoQuery(
 			const QVariant& metaInfoValue) const
 {
 	return QString(R"(SELECT * FROM "%1" WHERE "IsActive" = true AND "DataMetaInfo"->>'%2' = '%3')")
-				.arg(*m_tableNameAttrPtr)
+				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(metaInfoId))
 				.arg(qPrintable(metaInfoValue.toByteArray())).toUtf8();
 }
@@ -269,7 +269,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSq
 						.arg(qPrintable(*m_tableNameAttrPtr))
 						.arg(qPrintable(metaInfoRepresentation))
 						.arg(qPrintable(s_documentIdColumn))
-						.arg(objectId)
+						.arg(qPrintable(objectId))
 						.toUtf8();
 
 	return query;
@@ -325,8 +325,8 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 
 int CSqlDatabaseDocumentDelegateComp::BackupObject(
 			const imtbase::IObjectCollection& /*collection*/,
-			const imtbase::ICollectionInfo::Id& objectId,
-			const QString& userComment) const
+			const imtbase::ICollectionInfo::Id& /*objectId*/,
+			const QString& /*userComment*/) const
 {
 	return -1;
 }
@@ -352,14 +352,14 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreObject(
 			paramSet.SetEditableParameter("Id", &idParam);
 			QByteArray query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"%2\" = '%3'")
 				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(s_documentIdColumn)
-				.arg(objectId)
+				.arg(qPrintable(s_documentIdColumn))
+				.arg(qPrintable(objectId))
 				.toUtf8();
 
 			query += QString(R"(; UPDATE "%1" SET "IsActive" = true WHERE "%2" = '%3' AND "RevisionNumber" = %4)")
 				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(s_documentIdColumn)
-				.arg(objectId)
+				.arg(qPrintable(s_documentIdColumn))
+				.arg(qPrintable(objectId))
 				.arg(revision)
 				.toUtf8();
 
@@ -402,7 +402,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 {
 	QByteArray retVal;
 
-	Q_ASSERT(revisionArgument.typeId() == QMetaType::Int || revisionArgument.typeId() == QMetaType::QByteArray);
+	Q_ASSERT(revisionArgument.type() == QMetaType::Int || revisionArgument.type() == QMetaType::QByteArray);
 
 	QByteArray documentContent;
 	if (!WriteDataToMemory(typeId, object, documentContent)){
@@ -418,8 +418,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 	// Insert new entry into the document list table:
 	QString query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"%2\" = '%3'")
 		.arg(qPrintable(*m_tableNameAttrPtr))
-		.arg(s_documentIdColumn)
-		.arg(objectId);
+		.arg(qPrintable(s_documentIdColumn))
+		.arg(qPrintable(objectId));
 
 	QByteArray metaInfoRepresentation = QByteArrayLiteral("{}");
 
@@ -438,18 +438,18 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 		.arg(qPrintable(objectId))
 		.arg(objectName)
 		.arg(objectDescription)
-		.arg(documentContent)
+		.arg(qPrintable(documentContent))
 		.arg(SqlEncode(metaInfoRepresentation))
 		.arg("{}")
 		.arg(checksum)
 		.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
 		.arg("true");
 
-	if (revisionArgument.typeId() == QMetaType::Int){
+	if (revisionArgument.type() == QMetaType::Int){
 		query = query.arg(revisionArgument.toInt());
 	}
 	else{
-		query = query.arg(revisionArgument.toByteArray());
+		query = query.arg(qPrintable(revisionArgument.toByteArray()));
 	}
 
 	retVal = query.toUtf8();
@@ -641,11 +641,11 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
 
-	return query.arg(schemaPrefix).arg(*m_tableNameAttrPtr);
+	return query.arg(schemaPrefix).arg(qPrintable(*m_tableNameAttrPtr));
 }
 
 
-idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
+idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
 	return idoc::MetaInfoPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
 }
@@ -787,17 +787,17 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICol
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
 		if (filteringColumnIds.contains(s_typeIdColumn)){
-			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(s_typeIdColumn).arg(textFilter);
+			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(qPrintable(s_typeIdColumn)).arg(textFilter);
 			filteringColumnIds.removeOne(s_typeIdColumn);
 		}
 
 		if (filteringColumnIds.contains(s_nameColumn)){
-			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(s_nameColumn).arg(textFilter);
+			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(qPrintable(s_nameColumn)).arg(textFilter);
 			filteringColumnIds.removeOne(s_nameColumn);
 		}
 
 		if (filteringColumnIds.contains(s_descriptionColumn)){
-			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(s_descriptionColumn).arg(textFilter);
+			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ").arg(qPrintable(s_descriptionColumn)).arg(textFilter);
 			filteringColumnIds.removeOne(s_descriptionColumn);
 		}
 
