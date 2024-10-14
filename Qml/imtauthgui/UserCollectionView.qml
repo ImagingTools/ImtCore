@@ -242,8 +242,14 @@ RemoteCollectionView {
 
     RoleCollectionDataProvider {
         id: roleCollectionDataProvider;
+        productId: userCollectionViewContainer.productId;
         onModelUpdated: {
+            console.log("RoleCollectionDataProvider onModelUpdated UserCollectionView", collectionModel)
+
             userCollectionViewContainer.rolesModel = collectionModel;
+        }
+        function getHeaders(){
+            return userCollectionViewContainer.getHeaders();
         }
     }
 
@@ -251,6 +257,9 @@ RemoteCollectionView {
         id: groupCollectionDataProvider;
         onModelUpdated: {
             userCollectionViewContainer.groupsModel = collectionModel;
+        }
+        function getHeaders(){
+            return userCollectionViewContainer.getHeaders();
         }
     }
 

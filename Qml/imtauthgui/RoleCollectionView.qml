@@ -25,7 +25,9 @@ RemoteCollectionView {
             }
 
             function getHeaders(){
-                return roleCollectionViewContainer.getHeaders()
+                let headers = roleCollectionViewContainer.getHeaders()
+                console.log("CollectionRepresentation getHeaders", headers)
+                return headers
             }
         }
     }
@@ -86,14 +88,22 @@ RemoteCollectionView {
         }
 
         function getHeaders(){
-            return {"ProductId" : roleCollectionViewContainer.productId};
+            return roleCollectionViewContainer.getHeaders()
         }
     }
 
     RoleCollectionDataProvider {
         id: roleCollectionDataProvider;
+        productId: roleCollectionViewContainer.productId;
+
         onModelUpdated: {
             roleCollectionViewContainer.rolesModel = collectionModel;
+            console.log("RoleCollectionDataProvider onModelUpdated RoleCollectionView", roleCollectionViewContainer.rolesModel)
+        }
+
+        function getHeaders(){
+            console.log("RoleCollectionDataProvider getHeaders", roleCollectionViewContainer.getHeaders())
+            return roleCollectionViewContainer.getHeaders()
         }
     }
 

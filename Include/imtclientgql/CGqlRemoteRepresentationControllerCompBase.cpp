@@ -13,7 +13,7 @@ namespace imtclientgql
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
+imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!IsRequestSupported(gqlRequest)){
 		return nullptr;
@@ -24,6 +24,9 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInter
 		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
 		if (!responsePtr.isNull()){
 			return CreateTreeItemModelFromResponse(*responsePtr);
+		}
+		else{
+			errorMessage = QString("%1 Remote representation model is null").arg(requestPtr->GetCommandId());
 		}
 	}
 

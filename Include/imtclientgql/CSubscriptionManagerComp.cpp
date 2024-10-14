@@ -260,7 +260,9 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 	if (contextPtr != nullptr){
 		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
 		for (QByteArray headerId: headers.keys()){
-			headersObject[headerId] = QString(headers.value(headerId));
+			if (headerId != "Accept-Encoding"){
+				headersObject[headerId] = QString(headers.value(headerId));
+			}
 		}
 	}
 	dataObject["headers"] = headersObject;
@@ -284,7 +286,7 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 		networkOperation.timer.start();
 		resultCode = networkOperation.connectionLoop.exec();
 		QCoreApplication::processEvents();
-		if (resultCode == 1){
+		if (resultCode == 1 && m_queryDataMap.contains(key)){
 			break;
 		}
 	}

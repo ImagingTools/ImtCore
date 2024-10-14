@@ -66,8 +66,15 @@ RemoteCollectionView {
 
     RoleCollectionDataProvider {
         id: roleCollectionDataProvider;
+        productId: userGroupCollectionViewContainer.productId;
         onModelUpdated: {
+            console.log("RoleCollectionDataProvider onModelUpdated UserGroupCollectionView", collectionModel)
+
             userGroupCollectionViewContainer.rolesModel = collectionModel;
+        }
+
+        function getHeaders(){
+            return userGroupCollectionViewContainer.getHeaders()
         }
     }
 
@@ -77,6 +84,10 @@ RemoteCollectionView {
         onModelUpdated: {
             userGroupCollectionViewContainer.usersModel = collectionModel;
         }
+
+        function getHeaders(){
+            return userGroupCollectionViewContainer.getHeaders()
+        }
     }
 
     GroupCollectionDataProvider {
@@ -84,6 +95,10 @@ RemoteCollectionView {
 
         onModelUpdated: {
             userGroupCollectionViewContainer.groupsModel = collectionModel;
+        }
+
+        function getHeaders(){
+            return userGroupCollectionViewContainer.getHeaders()
         }
     }
 

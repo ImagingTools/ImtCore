@@ -107,26 +107,24 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequ
 	QByteArray data = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
 
 	m_webSocket.sendTextMessage(data);
-	NetworkOperation networkOperation(10000, this);
+	NetworkOperation networkOperation(100, this);
 
 	GqlResponsePtr retVal;
 
-	while(1){
-		int resultCode = networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
-		if(resultCode == 1){
-			if(m_queryDataMap.contains(key)){
-				imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
-				responsePtr->SetResponseData(m_queryDataMap.value(key));
-				retVal.reset(responsePtr);
 
-				m_queryDataMap.remove(key);
+	int resultCode = 0;
+	for (int i = 0; i < 100; i++){
+		networkOperation.timer.start();
+		resultCode = networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
+		QCoreApplication::processEvents();
+		if (resultCode == 1 && m_queryDataMap.contains(key)){
+			imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
+			responsePtr->SetResponseData(m_queryDataMap.value(key));
+			retVal.reset(responsePtr);
 
-				return retVal;
-			}
-			continue;
-		}
-		else{
-			break;
+			m_queryDataMap.remove(key);
+
+			return retVal;
 		}
 	}
 

@@ -22,7 +22,7 @@ QtObject {
         return {};
     }
 
-     property GqlRequestSender permissionModel: GqlRequestSender {
+    property GqlRequestSender permissionModel: GqlRequestSender {
         requestType: 0; // Query
         gqlCommandId: "ProductPermissions";
 
@@ -32,13 +32,13 @@ QtObject {
             query.AddParam(inputParams);
         }
 
-        function getHeaders(){
-            return permissionsProvider.getHeaders();
-        }
-
         function onResult(data){
             console.log("PermissionsProvider.qmlonResult", data.toJson());
             permissionsProvider.permissionsModel = data;
+        }
+
+        function getHeaders(){
+            return permissionsProvider.getHeaders();
         }
     }//GqlModel
 }

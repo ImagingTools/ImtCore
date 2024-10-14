@@ -113,6 +113,10 @@ QtObject {
         function onError(message, type){
             console.warn(message);
         }
+
+        function getHeaders(){
+            return container.getHeaders()
+        }
     }
 
     function updateSubscription(){

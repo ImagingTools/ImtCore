@@ -179,6 +179,10 @@ CollectionView {
                 root.metaInfoView.stopLoading();
             }
         }
+
+        function getHeaders(){
+            return root.getHeaders();
+        }
     }
 
     Component {

@@ -23,7 +23,7 @@ Item {
     signal descriptionSetted(string objectId, string description);
 
     property alias removeGqlModel: removeModel;
-    property alias headersGqlModel: headersModel;
+    property alias headersGqlModel: headersGqlModel;
 
     property var payloadModel: null
 
@@ -65,7 +65,7 @@ Item {
             return;
         }
 
-        headersModel.getHeaders();
+        headersGqlModel.getCollectionHeaders();
     }
 
     function updateElements(count, offset, filterModel){
@@ -147,16 +147,6 @@ Item {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", id);
 
-            // let additionInputParams = root.getHeaders();
-            // if (Object.keys(additionInputParams).length > 0){
-            //     let additionParams = Gql.GqlObject("addition");
-            //     for (let key in additionInputParams){
-            //         additionParams.InsertField(key, additionInputParams[key]);
-            //         inputParams.InsertField(key, additionInputParams[key]);
-            //     }
-            //     inputParams.InsertFieldObject(additionParams);
-            // }
-
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("removedNotification");
@@ -228,15 +218,6 @@ Item {
             inputParams.InsertField("Id", id);
             inputParams.InsertField("NewName", name);
 
-            // let additionInputParams = root.getHeaders();
-            // if (Object.keys(additionInputParams).length > 0){
-            //     let additionParams = Gql.GqlObject("addition");
-            //     for (let key in additionInputParams){
-            //         additionParams.InsertField(key, additionInputParams[key]);
-            //     }
-            //     inputParams.InsertFieldObject(additionParams);
-            // }
-
             query.AddParam(inputParams);
 
             queryFields = Gql.GqlObject("rename");
@@ -301,16 +282,6 @@ Item {
             inputParams.InsertField("Id", id);
             inputParams.InsertField("Description", description);
 
-            // let additionInputParams = root.getHeaders();
-            // if (Object.keys(additionInputParams).length > 0){
-            //     let additionParams = Gql.GqlObject("addition");
-            //     for (let key in additionInputParams){
-            //         additionParams.InsertField(key, additionInputParams[key]);
-            //         inputParams.InsertField(key, additionInputParams[key]);
-            //     }
-            //     inputParams.InsertFieldObject(additionParams);
-            // }
-
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("setDescription");
@@ -368,9 +339,9 @@ Item {
     }
 
     GqlModel {
-        id: headersModel;
+        id: headersGqlModel;
 
-        function getHeaders() {
+        function getCollectionHeaders() {
             var query = Gql.GqlRequest("query", root.collectionId + "Info");
 
             var inputParams = Gql.GqlObject("input");
@@ -455,16 +426,6 @@ Item {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
-
-            // let additionInputParams = root.getHeaders();
-            // if (Object.keys(additionInputParams).length > 0){
-            //     let additionParams = Gql.GqlObject("addition");
-            //     for (let key in additionInputParams){
-            //         additionParams.InsertField(key, additionInputParams[key]);
-            //         inputParams.InsertField(key, additionInputParams[key]);
-            //     }
-            //     inputParams.InsertFieldObject(additionParams);
-            // }
 
             query.AddParam(inputParams);
 

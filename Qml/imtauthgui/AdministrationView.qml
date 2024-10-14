@@ -6,7 +6,7 @@ import imtcontrols 1.0
 import imtdocgui 1.0
 
 Item {
-    id: container;
+    id: administrationContainer;
 
     anchors.fill: parent;
 
@@ -17,34 +17,24 @@ Item {
     property var documentManager: MainDocumentManager.getDocumentManager("Administration");
 
     function getHeaders(){
-        if (container.productId === ""){
+        if (administrationContainer.productId === ""){
             console.error("Unable to get additional parameters. Product-ID is empty");
             return null;
         }
 
         let obj = {}
-        obj["ProductId"] = container.productId;
+        obj["ProductId"] = administrationContainer.productId;
 
         return obj;
     }
 
     Component.onCompleted: {
         console.log("AdministrationView.qml onCompleted");
-        Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
-
-        CachedGroupCollection.updateModel();
-        CachedUserCollection.updateModel();
-
-        CachedRoleCollection.productId = container.productId;
-        CachedRoleCollection.updateModel();
+        Events.subscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
-
-        CachedGroupCollection.clearModel();
-        CachedUserCollection.clearModel();
-        CachedRoleCollection.clearModel();
+        Events.unSubscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
     }
 
     function onLocalizationChanged(language){
@@ -73,11 +63,14 @@ Item {
         id: roleCollectionComp;
 
         RoleCollectionView {
-            productId: container.productId;
-            documentManager: container.documentManager;
+            productId: administrationContainer.productId;
+            documentManager: administrationContainer.documentManager;
+            Component.onCompleted: {
+                console.log("RoleCollectionView in AdministrationView completeds", administrationContainer.getHeaders())
+            }
 
             function getHeaders(){
-                return container.getHeaders()
+                 return administrationContainer.getHeaders()
             }
 
         }
@@ -87,11 +80,11 @@ Item {
         id: userCollectionComp;
 
         UserCollectionView {
-            productId: container.productId;
-            documentManager: container.documentManager;
+            productId: administrationContainer.productId;
+            documentManager: administrationContainer.documentManager;
 
             function getHeaders(){
-                return container.getHeaders()
+                return administrationContainer.getHeaders()
             }
         }
     }
@@ -100,11 +93,16 @@ Item {
         id: userGroupCollectionComp;
 
         UserGroupCollectionView {
-            productId: container.productId;
-            documentManager: container.documentManager;
+            productId: administrationContainer.productId;
+            documentManager: administrationContainer.documentManager;
+            Component.onCompleted: {
+                console.log("UserGroupCollectionView onCompleted", administrationContainer.getHeaders() )
+            }
 
             function getHeaders(){
-                return container.getHeaders()
+                console.log("UserGroupCollectionView getHeaders", administrationContainer.getHeaders())
+
+                return administrationContainer.getHeaders()
             }
         }
     }
@@ -149,7 +147,7 @@ Item {
             }
 
             multiPageView.currentIndex = 0;
-            container.multiPageUpdated();
+            administrationContainer.multiPageUpdated();
         }
     }
 }
