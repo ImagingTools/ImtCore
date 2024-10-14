@@ -34,6 +34,10 @@ imtbase::CTreeItemModel* CCollectionUserInfoProviderComp::CreateInternalResponse
 		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
 	}
 
+	if (productId.isEmpty()){
+		productId = gqlRequest.GetHeader("ProductId");
+	}
+
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		imtauth::IUserInfo* objectInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());

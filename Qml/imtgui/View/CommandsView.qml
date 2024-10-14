@@ -32,9 +32,7 @@ Item {
     property string positiveAccentColor: Style.imaginToolsAccent;
     property string negativeAccentColor: Style.errorTextColor;
 
-    onVisibleChanged: {
-        reset();
-    }
+    property int commandsCount: 0;
 
     function setCommandData(commandId, key, value){
         for (let j = 0; j < allElements.length; j++){
@@ -99,13 +97,14 @@ Item {
 
         reset();
 
+        let visibleCount = 0;
         let tempWidth = 0;
         for (let j = 0; j < priorityElements.length; j++){
             let elementWidth = priorityElements[j].maxWidth;
             tempWidth += elementWidth;
-
-            if (tempWidth + 2 * Style.size_mainMargin < maxWidth){
+            if (tempWidth + visibleCount * Style.size_mainMargin < maxWidth){
                 priorityElements[j].modelData.Visible = true;
+                visibleCount++;
             }
 
             if (tempWidth >= maxWidth){
@@ -206,6 +205,8 @@ Item {
 
                                     return 0;
                                 });
+
+                                commandsItem.commandsCount++;
                             }
                         }
                     }

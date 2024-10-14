@@ -198,11 +198,32 @@ QtObject {
 
     function toJson(){
         let list = getProperties()
+
         let json = '{'
         for(let i = 0; i < list.length; i++){
             let key = list[i]
             if(typeof this[key] === 'object'){
-                if (this[key]){
+                if (Array.isArray(this[key])){
+                    json += '"' + this.getJSONKeyForProperty(key) + '":'
+
+                    json += "["
+
+                    for (let j = 0; j < this[key].length; j++){
+                        if (j != 0){
+                            json += ", "
+                        }
+
+                        if (typeof this[key][j] === "string"){
+                            json += "\"" + this[key][j] + "\""
+                        }
+                        else{
+                            json += this[key][j]
+                        }
+                    }
+
+                    json += "]"
+                }
+                else if (this[key]){
                     json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
                 }
             } else {
@@ -230,7 +251,29 @@ QtObject {
         for(let i = 0; i < list.length; i++){
             let key = list[i]
             if(typeof this[key] === 'object'){
-                graphQL += this.getJSONKeyForProperty(key) + ':' + this[key].toGraphQL()
+                if (Array.isArray(this[key])){
+                    graphQL +=  this.getJSONKeyForProperty(key) + ':'
+
+                    graphQL += "["
+
+                    for (let j = 0; j < this[key].length; j++){
+                        if (j != 0){
+                            graphQL += ", "
+                        }
+
+                        if (typeof this[key][j] === "string"){
+                            graphQL += "\"" + this[key][j] + "\""
+                        }
+                        else{
+                            graphQL += this[key][j]
+                        }
+                    }
+
+                    graphQL += "]"
+                }
+                else{
+                    graphQL += this.getJSONKeyForProperty(key) + ':' + this[key].toGraphQL()
+                }
             } else {
                 let value = this[key]
                 if (value === undefined){
@@ -285,18 +328,30 @@ QtObject {
             let _key = "m_" + key[0].toLowerCase() + key.slice(1,key.length)
             if(typeof sourceObject[key] === "object"){
                 if(Array.isArray(sourceObject[key])){
+                    let component = createComponent(_key)
+
                     if(this[_key]){
-                        this[_key].clear()
+                        if (this[_key].clear){
+                            this[_key].clear()
+                        }
                     } else {
-                        let obj = Qt.createComponent('BaseModel.qml').createObject(this)
-                        this[_key] = obj
+                        if (component){
+                            let obj = Qt.createComponent('BaseModel.qml').createObject(this)
+                            this[_key] = obj
+                        }
                     }
-                    for(let sourceObjectInner of sourceObject[key]){
-                        let obj = createComponent(_key).createObject(this)
-                        obj.fromObject(sourceObjectInner)
-                        this[_key].append({item: obj})
-                        obj.owner = this
-                        obj.connectProperties()
+
+                    if (component){
+                        for(let sourceObjectInner of sourceObject[key]){
+                            let obj = createComponent(_key).createObject(this)
+                            obj.fromObject(sourceObjectInner)
+                            this[_key].append({item: obj})
+                            obj.owner = this
+                            obj.connectProperties()
+                        }
+                    }
+                    else{
+                        this[_key] = sourceObject[key]
                     }
                 } else {
                     let obj = createComponent(_key).createObject(this)

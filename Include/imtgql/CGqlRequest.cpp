@@ -4,7 +4,6 @@
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtCore/QDebug>
 
 // ACF includes
 #include <istd/TDelPtr.h>
@@ -514,11 +513,6 @@ bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 	m_commandId.clear();
 	m_params.ResetData();
 	m_fields.ResetData();
-
-	if (m_gqlContextPtr != nullptr){
-		m_gqlContextPtr->ResetData();
-		m_gqlContextPtr = nullptr;
-	}
 
 	return true;
 }

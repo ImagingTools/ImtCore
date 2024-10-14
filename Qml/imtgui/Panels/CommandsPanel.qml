@@ -76,18 +76,6 @@ Item {
         rightCommands.clear();
     }
 
-    Component.onCompleted: {
-        widthTimer.restart();
-    }
-
-    Timer {
-        id: widthTimer;
-        interval: 2000;
-        onTriggered: {
-            commandsItem.checkCommandsState();
-        }
-    }
-
     onVisibleChanged: {
         if (visible){
             checkCommandsState()
@@ -133,27 +121,19 @@ Item {
         id: leftCommands;
         anchors.left: parent.left;
         anchors.leftMargin: Style.size_mainMargin;
-        maximumWidth: centerCommands.allElements.length > 0 ?
-                          centerCommands.x - (button.visible ? button.width : 0):
-                          rightCommands.allElements.length > 0 ? rightCommands.x : commandsItem.width;
         eventCommandPrefix: commandsItem.commandId;
-
-        onMaximumWidthChanged: {
-            leftCommands.checkWidth();
-        }
+        maximumWidth: (centerCommands.commandsCount > 0 ?
+                                    centerCommands.x :
+                                    rightCommands.commandsCount > 0 ? rightCommands.x : commandsItem.width) - button.width - leftCommands.anchors.leftMargin;
     }
 
     CommandsView {
         id: centerCommands;
         anchors.horizontalCenter: parent.horizontalCenter;
-        maximumWidth: rightCommands.allElements.length > 0 ?
-                          rightCommands.x - centerCommands.x - (button.visible ? button.width : 0):
-                          commandsItem.width - centerCommands.x;
         eventCommandPrefix: commandsItem.commandId;
-
-        onMaximumWidthChanged: {
-            centerCommands.checkWidth();
-        }
+        maximumWidth: (rightCommands.commandsCount > 0 ?
+                          rightCommands.x - centerCommands.x - (button.visible ? button.width : 0):
+                          commandsItem.width - centerCommands.x) - button.width;
     }
 
     CommandsView {
@@ -161,11 +141,7 @@ Item {
         anchors.right: button.left;
         anchors.rightMargin: Style.size_mainMargin;
         eventCommandPrefix: commandsItem.commandId;
-        maximumWidth: commandsItem.width - (centerCommands.x + centerCommands.contentWidth) - (button.visible ? button.width : 0);
-
-        onMaximumWidthChanged: {
-            rightCommands.checkWidth();
-        }
+        maximumWidth: (commandsItem.width - (centerCommands.x + centerCommands.contentWidth)) - button.width;
     }
 
     ToolButton {

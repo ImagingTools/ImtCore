@@ -30,11 +30,19 @@ QtObject {
         onUserModeChanged: {
             root.userModeChanged(userMode);
         }
+
+        function getHeaders(){
+            return root.getHeaders();
+        }
     }
 
     property SuperuserProvider superuserProvider: SuperuserProvider {
         onResult: {
             root.superuserExistResult(exists)
+        }
+
+        function getHeaders(){
+            return root.getHeaders();
         }
     }
 
@@ -47,6 +55,14 @@ QtObject {
         onFailed: {
             root.loginFailed();
         }
+
+        function getHeaders(){
+            return root.getHeaders();
+        }
+    }
+
+    function getHeaders(){
+        return {"ProductId": root.productId}
     }
 
     function updateSuperuserModel(){
@@ -139,6 +155,10 @@ QtObject {
 
         function onResult(data){
             ModalDialogManager.showInfoDialog(qsTr("Password changed successfully"));
+        }
+
+        function getHeaders(){
+            return root.getHeaders();
         }
     }
 }

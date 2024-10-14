@@ -37,13 +37,12 @@ public:
 		I_ASSIGN(m_cacheClearingIntervalParamCompPtr, "CacheClearingIntervalParam", "Param interval for cache clearing", false, "CacheClearingIntervalParam");
 	I_END_COMPONENT;
 
-	CRemoteGqlContextControllerComp();
-
 	// reimplemented (imtgql::IGqlContextController)
 	virtual imtgql::IGqlContext* GetRequestContext(
 				const imtgql::CGqlRequest& gqlRequest,
 				const QByteArray& token,
-				QString &errorMessage) const override;
+				const imtgql::IGqlContext::Headers& headers,
+				QString& errorMessage) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

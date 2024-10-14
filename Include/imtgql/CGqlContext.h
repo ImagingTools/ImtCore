@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtgql/IGqlContext.h>
-#include <imtgql/CGqlObject.h>
 
 
 namespace imtgql
@@ -44,7 +43,7 @@ private:
 	QByteArray m_languageId;
 	QByteArray m_designScheme;
 	QByteArray m_token;
-	imtauth::IUserInfo* m_userInfoPtr;
+	std::shared_ptr<imtauth::IUserInfo> m_userInfoPtr;
 	Headers m_headers;
 };
 

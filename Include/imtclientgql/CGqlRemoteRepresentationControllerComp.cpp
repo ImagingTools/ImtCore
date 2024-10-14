@@ -45,6 +45,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		}
 
 		newInputParamPtr->InsertField("ProductId", QVariant(*m_productIdAttrPtr));
+		gqlRequestPtr->AddParam("input", *newInputParamPtr.GetPtr());
 	}
 	else{
 		imtgql::CGqlObject inputGqlObject;

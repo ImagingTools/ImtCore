@@ -1,17 +1,11 @@
 #include <imtgql/CGqlContext.h>
 
 
-// Qt includes
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
-#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtgql
@@ -98,16 +92,21 @@ void CGqlContext::SetToken(const QByteArray &token)
 
 imtauth::IUserInfo* CGqlContext::GetUserInfo() const
 {
-	return m_userInfoPtr;
+	return m_userInfoPtr.get();
 }
 
 
-void CGqlContext::SetUserInfo(const imtauth::IUserInfo *userInfoPtr)
+void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 {
-	if (m_userInfoPtr != userInfoPtr){
+	if (m_userInfoPtr.get() != userInfoPtr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_userInfoPtr = const_cast<imtauth::IUserInfo*>(userInfoPtr);;
+		if (userInfoPtr != nullptr){
+			IChangeable* clonedUserPtr = userInfoPtr->CloneMe();
+			if (clonedUserPtr != nullptr){
+				m_userInfoPtr.reset(dynamic_cast<imtauth::IUserInfo*>(clonedUserPtr));
+			}
+		}
 	}
 }
 
@@ -120,7 +119,11 @@ IGqlContext::Headers CGqlContext::GetHeaders() const
 
 void CGqlContext::SetHeaders(const Headers headers)
 {
-	m_headers = headers;
+	if (m_headers != headers){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_headers = headers;
+	}
 }
 
 
@@ -152,10 +155,12 @@ bool CGqlContext::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.Process(m_token);
 	retVal = retVal && archive.EndTag(tokenTag);
 
-	iser::CArchiveTag contactTag("UserInfo", "User info", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(contactTag);
-	retVal = retVal && m_userInfoPtr->Serialize(archive);
-	retVal = retVal && archive.EndTag(contactTag);
+	if (m_userInfoPtr != nullptr){
+		iser::CArchiveTag contactTag("UserInfo", "User info", iser::CArchiveTag::TT_GROUP);
+		retVal = retVal && archive.BeginTag(contactTag);
+		retVal = retVal && m_userInfoPtr->Serialize(archive);
+		retVal = retVal && archive.EndTag(contactTag);
+	}
 
 	return retVal;
 }
@@ -179,24 +184,9 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_designScheme = sourcePtr->m_designScheme;
 		m_token = sourcePtr->m_token;
 		m_productId = sourcePtr->m_productId;
+		m_headers = sourcePtr->m_headers;
 
-		if (m_userInfoPtr != nullptr){
-			m_userInfoPtr->ResetData();
-		}
-
-		bool ok = false;
-		if (sourcePtr->m_userInfoPtr != nullptr){
-			IChangeable* clonedUserPtr = sourcePtr->m_userInfoPtr->CloneMe();
-			if (clonedUserPtr != nullptr){
-				m_userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(clonedUserPtr);
-
-				ok = true;
-			}
-		}
-
-		if (!ok){
-			m_userInfoPtr = nullptr;
-		}
+		SetUserInfo(sourcePtr->m_userInfoPtr.get());
 
 		return true;
 	}
@@ -224,11 +214,6 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_productId.clear();
 	m_designScheme.clear();
 	m_token.clear();
-
-	if (m_userInfoPtr != nullptr){
-		m_userInfoPtr->ResetData();
-		m_userInfoPtr = nullptr;
-	}
 
 	return true;
 }

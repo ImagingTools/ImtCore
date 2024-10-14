@@ -18,17 +18,13 @@ QMutex s_mutex;
 
 // public methods
 
-CRemoteGqlContextControllerComp::CRemoteGqlContextControllerComp()
-{
-}
-
-
 // reimplemented (imtgql::IGqlContextController)
 
 imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
-		const imtgql::CGqlRequest& gqlRequest,
-		const QByteArray& token,
-		QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			const QByteArray& token,
+			const imtgql::IGqlContext::Headers& headers,
+			QString& errorMessage) const
 {
 	if (m_cacheMap.contains(token)){
 		istd::TDelPtr<imtgql::IGqlContext> gqlContextPtr;
@@ -53,6 +49,7 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 
 	imtgql::CGqlContext* sessionGqlContextPtr = new imtgql::CGqlContext();
 	sessionGqlContextPtr->SetToken(token);
+	sessionGqlContextPtr->SetHeaders(headers);
 
 	sessionGqlRequest.SetGqlContext(sessionGqlContextPtr);
 
@@ -104,6 +101,7 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 
 	imtgql::CGqlContext* userGqlContextPtr = new imtgql::CGqlContext();
 	userGqlContextPtr->SetToken(token);
+	userGqlContextPtr->SetHeaders(headers);
 
 	gqlUserRequest.SetGqlContext(userGqlContextPtr);
 
@@ -143,6 +141,7 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 	istd::TDelPtr<imtgql::CGqlContext> gqlContextPtr = new imtgql::CGqlContext();
 	gqlContextPtr->SetToken(token);
 	gqlContextPtr->SetUserInfo(userInstancePtr.PopPtr());
+	gqlContextPtr->SetHeaders(headers);
 
 	m_cacheMap.insert(token, gqlContextPtr.PopPtr());
 

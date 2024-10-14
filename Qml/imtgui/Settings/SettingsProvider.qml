@@ -338,20 +338,23 @@ QtObject {
         return "";
     }
 
+
+    function getHeaders(){
+        return {};
+    }
+
     property GqlModel settingsQuery: GqlModel {
         function getSettings() {
             var query = Gql.GqlRequest("query", "GetSettings");
 
             var gqlData = query.GetQuery();
 
-            this.setGqlQuery(gqlData);
+            this.setGqlQuery(gqlData, container.getHeaders());
         }
 
         onStateChanged: {
             if (this.state === "Ready") {
                 var dataModelLocal;
-                console.log("GetSettings", this.toJson());
-
                 if (container.settingsQuery.containsKey("errors")){
                     dataModelLocal = container.settingsQuery.getData("errors");
 
@@ -383,7 +386,7 @@ QtObject {
 
             var gqlData = query.GetQuery();
 
-            this.setGqlQuery(gqlData);
+            this.setGqlQuery(gqlData, container.getHeaders());
         }
 
         onStateChanged: {

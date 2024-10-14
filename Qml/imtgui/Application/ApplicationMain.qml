@@ -111,10 +111,17 @@ Item {
         webSocketPortProvider.port = -1;
     }
 
+    function getHeaders(){
+        return {"ProductId": context.appName};
+    }
+
     property alias thumbnailDecoratorGui: thumbnailDecorator;
 
     property ApplicationInfoProvider applicationInfoProvider : ApplicationInfoProvider
     {
+        function getHeaders(){
+            return application.getHeaders();
+        }
     }
 
     property SettingsObserver settingsObserver : SettingsObserver
@@ -156,6 +163,10 @@ Item {
             if (applyCachedSchema){
                 application.designProvider.applyCachedDesignSchema();
             }
+        }
+
+        function getHeaders(){
+            return application.getHeaders();
         }
     }
 

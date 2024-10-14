@@ -35,6 +35,7 @@ public:
 	virtual imtgql::IGqlContext* GetRequestContext(
 				const imtgql::CGqlRequest& gqlRequest,
 				const QByteArray& token,
+				const imtgql::IGqlContext::Headers& headers,
 				QString& errorMessage) const override;
 
 private:

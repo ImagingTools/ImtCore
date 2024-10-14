@@ -47,7 +47,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	if (!accessToken.isEmpty() && m_gqlContextControllerCompPtr.IsValid()){
 		QString errorMessage;
 
-		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(m_lastRequest, accessToken, errorMessage);
+		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(m_lastRequest, accessToken, headers, errorMessage);
 		if (gqlContextPtr != nullptr){
 			m_lastRequest.SetGqlContext(gqlContextPtr);
 
