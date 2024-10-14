@@ -12,11 +12,8 @@ Dialog {
     signal featureAdded(var modelIndex);
 
     property var selectedIndexes: [];
-
     property TreeItemModel featuresModel: TreeItemModel {}
-
     property TreeItemModel tableModel: TreeItemModel {}
-
     property var excludeFeatureIds: []
 
     Component.onCompleted: {
@@ -41,7 +38,7 @@ Dialog {
 
     onFinished: {
         if (buttonId == Enums.ok){
-            featuresDialog.selectedIndexes = featuresDialog.contentItem.tableView.getSelectedIndexes();
+            featuresDialog.selectedIndexes = featuresDialog.contentItem.tableView.getCheckedItems();
         }
     }
 
@@ -93,21 +90,18 @@ Dialog {
             anchors.verticalCenter: parent.verticalCenter;
             anchors.right: parent.right;
             anchors.left: parent.left;
-            anchors.rightMargin: 10;
-            anchors.leftMargin: 10;
-
+            anchors.rightMargin: Style.size_mainMargin;
+            anchors.leftMargin: Style.size_mainMargin;
             width: featuresDialog.width;
 
             Table {
                 id: tableTreeView;
-
                 width: parent.width;
                 height: 300;
-
                 radius: 0;
-
-                onSelectionChanged: {
-                    let indexes = tableTreeView.getSelectedIndexes();
+                checkable: true;
+                onCheckedItemsChanged: {
+                    let indexes = getCheckedItems();
                     featuresDialog.buttons.setButtonState(Enums.ok, indexes.length > 0);
                 }
             }

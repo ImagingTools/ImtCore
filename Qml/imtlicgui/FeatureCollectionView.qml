@@ -70,7 +70,7 @@ RemoteCollectionView {
 
                             let newFeatureData = featureDataComp.createObject(childModel)
                             newFeatureData.m_featureName = qsTr("Feature Name");
-                            childModel.insert(0, {item: newFeatureData})
+                            childModel.append({item: newFeatureData})
                             featureEditor.model.modelChanged([])
                         }
                         else if (commandId === "RemoveFeature"){

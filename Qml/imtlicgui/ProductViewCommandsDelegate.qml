@@ -62,12 +62,14 @@ ViewCommandsDelegateBase {
     property Component featuresDialogComp: Component {
         FeaturesDialog {
             onFinished: {
-                if (this.selectedIndexes.length > 0){
-                    let index = this.selectedIndexes[0];
+                if (selectedIndexes.length > 0){
+                    container.view.productData.beginChanges();
+                    for (let i = 0; i < selectedIndexes.length; i++){
+                        let featureId = tableModel.getData("Id", i);
+                        container.view.addFeature(featureId);
+                    }
+                    container.view.productData.endChanges();
 
-                    let featureId = tableModel.getData("Id", index);
-
-                    container.view.addFeature(featureId);
                     container.view.updateFeaturesGui();
                 }
             }

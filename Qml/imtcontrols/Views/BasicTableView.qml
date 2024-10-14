@@ -290,6 +290,7 @@ FocusScope {
             id: headerRow;
 
             focus: true;
+            spacing: Style.size_mainMargin;
 
             Repeater {
                 id: repeater;
@@ -306,7 +307,7 @@ FocusScope {
                         id: headerText;
 
                         anchors.left: repeaterItem.left;
-                        anchors.leftMargin: 10;
+                        anchors.leftMargin: Style.size_mainMargin;
                         anchors.verticalCenter: repeaterItem.verticalCenter;
 
                         Component.onCompleted: {
@@ -319,8 +320,6 @@ FocusScope {
                         font.family: Style.fontFamilyBold;
                         font.bold: true;
                         color: Style.textColor;
-
-                        wrapMode: Text.WordWrap;
                         elide: Text.ElideRight;
                     }
                 }
