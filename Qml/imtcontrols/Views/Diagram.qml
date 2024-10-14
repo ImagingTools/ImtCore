@@ -383,6 +383,9 @@ Item {
             orientation: ListView.Horizontal;
             clip: true;
             boundsBehavior: Flickable.StopAtBounds;
+            onContentXChanged: {
+                axeXValuesList.contentX = contentX;
+            }
             model: diagram.model;
             delegate:
                 Item{
