@@ -41,8 +41,9 @@ iauth::CUser* CSimpleLoginWrapComp::GetLoggedUser() const
 
 bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& password)
 {
-	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY,
-								sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest::GetCommandId());
+	imtgql::CGqlRequest request(
+				imtgql::CGqlRequest::RT_QUERY,
+				sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest::GetCommandId());
 
 	imtgql::CGqlObject inputObject;
 	inputObject.InsertField(sdl::imtauth::Authorization::V1_0::CAuthorizationInput::AuthorizationInputFields::Login.toUtf8(), userName);
