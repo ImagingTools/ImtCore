@@ -287,12 +287,6 @@ bool CDatabaseEngineComp::CreateDatabase(int flags) const
 bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 {
 	int databaseVersion = GetDatabaseVersion();
-	if (databaseVersion < 0){
-		SendErrorMessage(0, "Database wasn't created correctly. Database migration could not be executed");
-
-		return false;
-	}
-
 	bool retVal = false;
 
 	if (m_migrationControllerCompPtr.IsValid()){
