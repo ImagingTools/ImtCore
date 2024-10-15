@@ -5,7 +5,6 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtgql/CGqlObject.h>
 #include <ifile/IFilePersistence.h>
 
 // GmgCore includes
@@ -154,6 +153,6 @@ protected:
 };
 
 
-} // namespace imtclientgql
+} // namespace imtdb
 
 
