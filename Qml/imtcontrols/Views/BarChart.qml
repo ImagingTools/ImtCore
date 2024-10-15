@@ -16,7 +16,8 @@ Item {
     property real elementWidth: barWidth;
     property real barWidth:30;
 
-    property int addToValue: 30;
+    property real addToValue: 30;
+    property real minValue: 0;
 
 
     property string color_positive: "#ff8a3d";
@@ -49,7 +50,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter;
         width: barChart.barWidth;
         height: (barChart.positiveValue !==0)?
-                    barChart.maxBarHeight/barChart.maxValue*barChart.positiveValue : 1;
+                    barChart.maxBarHeight/(barChart.maxValue - barChart.minValue) * barChart.positiveValue : 1;
         radius: width;//Math.min(width, height)
         color: barChart.color_positive;
         visible: !barChart.visible ? false : (barChart.positiveValue == 0)? false : barChart.visibleElements;
@@ -76,7 +77,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter;
         width: barChart.barWidth;
         height: (barChart.negativeValue !==0)?
-                    barChart.maxBarHeight/barChart.maxValue*barChart.negativeValue : 1;
+                    barChart.maxBarHeight/(barChart.maxValue - barChart.minValue) * barChart.negativeValue : 1;
         radius: width//Math.min(width, height)
         color: barChart.color_negative;
         visible: !barChart.visible ? false : (barChart.negativeValue == 0)? false : barChart.visibleElements;
@@ -108,11 +109,18 @@ Item {
         fontColor: "#ffffff";
 
         borderColor: Style.color_elementBorder;
-        property string shownValPos: Math.trunc((barChart.positiveValue + barChart.addToValue)*100)/100;
-        property string shownValNeg: Math.trunc((barChart.negativeValue + barChart.addToValue)*100)/100;
+        property string shownValPos: Math.trunc((barChart.positiveValue + barChart.addToValue)*1000)/1000;
+        property string shownValNeg: Math.trunc((barChart.negativeValue + barChart.addToValue)*1000)/1000;
         property string shownVal: barChart.isPositiveTooltip ? shownValPos : barChart.isNegativeTooltip ? shownValNeg : "";
 
         text: shownVal;
+
+        function openTooltip(xX, yY){
+            var point = mapToItem(null, xX, yY);
+
+            open(point.x - tooltipWidth/2, point.y - componentHeight - 4)
+
+        }
     }
 
     PauseAnimation {
@@ -120,7 +128,8 @@ Item {
 
         duration: tooltip.waitingDuration;
         onFinished: {
-			tooltip.openTooltip(ma.mouseX, ma.mouseY);
+            //tooltip.openTooltip(ma.width/2, ma.mouseY);
+            tooltip.openTooltip(ma.width/2, barUp_downRec.y);
 			// tooltip.openTooltipWithCoord(barChart.barWidth/2 - tooltip.tooltipWidth/2,  barDown.y - tooltip.componentHeight - 5);
 
         }
@@ -138,8 +147,7 @@ Item {
         onEntered: {
             if(barChart.hasTooltip){
                 if(tooltip.text !== ""){
-                    pauseTooltip.stop();
-                    pauseTooltip.start();
+                    pauseTooltip.restart();
 
                 }
             }

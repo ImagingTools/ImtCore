@@ -22,7 +22,7 @@ Item {
     property bool visibleAxeY: true;
     property int fontSize: 18;
     property bool hasMinValue: false;
-    property int minValue: 0;
+    property real minValue: 0;
     property real maxValue: 100;
     property real maxAxeYValue: 100;
 
@@ -53,6 +53,14 @@ Item {
         //diagram.setMaxValue();
     }
 
+    function clear(){
+        model.clear();
+        axeYValueModel.clear();
+        axeXValueModel.clear();
+        minValue = 0;
+        maxValue = 100;
+        maxAxeYValue = 100;
+    }
 
     function setMinValue(){
         if(!diagram.hasMinValue){
@@ -71,7 +79,7 @@ Item {
                         minVal = currVal;
                     }
                 }
-                minVal = Math.trunc(minVal);
+                //minVal = Math.trunc(minVal);
             }
 
             diagram.minValue = minVal;
@@ -404,6 +412,7 @@ Item {
 
                     maxBarHeight: barsList.height;
                     maxValue: diagram.maxValue;
+                    minValue: diagram.minValue;
                     barWidth: diagram.barWidth;
                     positiveValue: (model.positive - diagram.minValue) >= 0 ? (model.positive - diagram.minValue) : 0;
                     negativeValue: (model.negative - diagram.minValue) >= 0 ? (model.negative - diagram.minValue) : 0;
