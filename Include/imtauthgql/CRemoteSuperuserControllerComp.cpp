@@ -19,8 +19,8 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, sdl::imtauth::Users::V1_0::CUserAddGqlRequest::GetCommandId());
 
 	imtgql::CGqlObject inputObject;
-	inputObject.InsertField(sdl::imtauth::Users::V1_0::CUserDataInput::Fields::Id.toUtf8(), "su");
-	inputObject.InsertField(sdl::imtauth::Users::V1_0::CUserDataInput::Fields::ProductId.toUtf8(), qPrintable(*m_productIdAttrPtr));
+	inputObject.InsertField(sdl::imtauth::Users::V1_0::CUserDataInput::UserDataInputFields::Id.toUtf8(), "su");
+	inputObject.InsertField(sdl::imtauth::Users::V1_0::CUserDataInput::UserDataInputFields::ProductId.toUtf8(), qPrintable(*m_productIdAttrPtr));
 
 	sdl::imtauth::Users::V1_0::CUserData userData;
 	userData.SetId("su");
@@ -28,7 +28,7 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 	userData.SetName("superuser");
 	userData.SetPassword(qPrintable(password));
 
-	imtgql::CGqlObject* userGqlObject = inputObject.CreateFieldObject(sdl::imtauth::Users::V1_0::CUserDataInput::Fields::Item.toUtf8());
+	imtgql::CGqlObject* userGqlObject = inputObject.CreateFieldObject(sdl::imtauth::Users::V1_0::CUserDataInput::UserDataInputFields::Item.toUtf8());
 	if (!userData.WriteToGraphQlObject(*userGqlObject)){
 		return false;
 	}
@@ -37,7 +37,7 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 
 	imtgql::CGqlObject fieldObject;
 	fieldObject.InsertField("Id");
-	request.AddField(sdl::imtauth::Users::V1_0::CAddedNotificationPayload::Fields::AddedNotification.toUtf8(), fieldObject);
+	request.AddField(sdl::imtauth::Users::V1_0::CAddedNotificationPayload::AddedNotificationPayloadFields::AddedNotification.toUtf8(), fieldObject);
 
 	imtbase::CTreeItemModel responseModel;
 	return SendModelRequest(request, responseModel);

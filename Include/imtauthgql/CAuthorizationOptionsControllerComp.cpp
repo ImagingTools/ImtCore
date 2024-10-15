@@ -35,16 +35,16 @@ sdl::imtauth::Authorization::V1_0::CUserManagementPayload CAuthorizationOptionsC
 
 	switch (index) {
 	case UM_NO_USER_MANAGEMENT:
-		payload.SetUserMode(sdl::imtauth::Authorization::V1_0::CUserMode::Fields::NO_USER_MANAGEMENT);
+		payload.SetUserMode(sdl::imtauth::Authorization::V1_0::CUserMode::UserModeFields::NO_USER_MANAGEMENT);
 		break;
 	case UM_OPTIONAL_USER_MANAGEMENT:
-		payload.SetUserMode(sdl::imtauth::Authorization::V1_0::CUserMode::Fields::OPTIONAL_USER_MANAGEMENT);
+		payload.SetUserMode(sdl::imtauth::Authorization::V1_0::CUserMode::UserModeFields::OPTIONAL_USER_MANAGEMENT);
 		break;
 	case UM_STRONG_USER_MANAGEMENT:
-		payload.SetUserMode(sdl::imtauth::Authorization::V1_0::CUserMode::Fields::STRONG_USER_MANAGEMENT);
+		payload.SetUserMode(sdl::imtauth::Authorization::V1_0::CUserMode::UserModeFields::STRONG_USER_MANAGEMENT);
 		break;
 	default:
-		payload.SetUserMode(sdl::imtauth::Authorization::V1_0::CUserMode::Fields::STRONG_USER_MANAGEMENT);
+		payload.SetUserMode(sdl::imtauth::Authorization::V1_0::CUserMode::UserModeFields::STRONG_USER_MANAGEMENT);
 
 		break;
 	}

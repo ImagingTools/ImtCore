@@ -45,9 +45,9 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 								sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest::GetCommandId());
 
 	imtgql::CGqlObject inputObject;
-	inputObject.InsertField(sdl::imtauth::Authorization::V1_0::CAuthorizationInput::Fields::Login.toUtf8(), userName);
-	inputObject.InsertField(sdl::imtauth::Authorization::V1_0::CAuthorizationInput::Fields::Password.toUtf8(), password);
-	inputObject.InsertField(sdl::imtauth::Authorization::V1_0::CAuthorizationInput::Fields::ProductId.toUtf8(), qPrintable(*m_productIdAttrPtr));
+	inputObject.InsertField(sdl::imtauth::Authorization::V1_0::CAuthorizationInput::AuthorizationInputFields::Login.toUtf8(), userName);
+	inputObject.InsertField(sdl::imtauth::Authorization::V1_0::CAuthorizationInput::AuthorizationInputFields::Password.toUtf8(), password);
+	inputObject.InsertField(sdl::imtauth::Authorization::V1_0::CAuthorizationInput::AuthorizationInputFields::ProductId.toUtf8(), qPrintable(*m_productIdAttrPtr));
 	request.AddParam("input", inputObject);
 
 	imtbase::CTreeItemModel responseModel;
@@ -59,8 +59,8 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 		}
 
 		QByteArray objectId;
-		if (dataModelPtr->ContainsKey(sdl::imtauth::Authorization::V1_0::CAuthorizationPayload::Fields::UserId.toUtf8())){
-			objectId = dataModelPtr->GetData(sdl::imtauth::Authorization::V1_0::CAuthorizationPayload::Fields::UserId.toUtf8()).toByteArray();
+		if (dataModelPtr->ContainsKey(sdl::imtauth::Authorization::V1_0::CAuthorizationPayload::AuthorizationPayloadFields::UserId.toUtf8())){
+			objectId = dataModelPtr->GetData(sdl::imtauth::Authorization::V1_0::CAuthorizationPayload::AuthorizationPayloadFields::UserId.toUtf8()).toByteArray();
 		}
 
 		if (objectId.isEmpty()){
@@ -69,16 +69,16 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 
 		RetrieveUserInfo(objectId);
 
-		if (dataModelPtr->ContainsKey(sdl::imtauth::Authorization::V1_0::CAuthorizationPayload::Fields::Token.toUtf8())){
-			m_loggedUserToken = dataModelPtr->GetData(sdl::imtauth::Authorization::V1_0::CAuthorizationPayload::Fields::Token.toUtf8()).toByteArray();
+		if (dataModelPtr->ContainsKey(sdl::imtauth::Authorization::V1_0::CAuthorizationPayload::AuthorizationPayloadFields::Token.toUtf8())){
+			m_loggedUserToken = dataModelPtr->GetData(sdl::imtauth::Authorization::V1_0::CAuthorizationPayload::AuthorizationPayloadFields::Token.toUtf8()).toByteArray();
 			imtqml::CGqlModel::SetGlobalAccessToken(m_loggedUserToken);
 		}
 
-		if (dataModelPtr->ContainsKey(sdl::imtauth::Authorization::V1_0::CAuthorizationPayload::Fields::Username.toUtf8())){
+		if (dataModelPtr->ContainsKey(sdl::imtauth::Authorization::V1_0::CAuthorizationPayload::AuthorizationPayloadFields::Username.toUtf8())){
 			istd::CChangeNotifier notifier(this);
 			Q_UNUSED(notifier);
 
-			m_loggedUserId = dataModelPtr->GetData(sdl::imtauth::Authorization::V1_0::CAuthorizationPayload::Fields::Username.toUtf8()).toByteArray();
+			m_loggedUserId = dataModelPtr->GetData(sdl::imtauth::Authorization::V1_0::CAuthorizationPayload::AuthorizationPayloadFields::Username.toUtf8()).toByteArray();
 		}
 
 		m_loggedUserPassword = password.toUtf8();
@@ -147,8 +147,8 @@ bool CSimpleLoginWrapComp::RetrieveUserInfo(const QByteArray& userObjectId)
 	imtgql::CGqlRequest userRequest(imtgql::CGqlRequest::RT_QUERY,
 									sdl::imtauth::Users::V1_0::CUserItemGqlRequest::GetCommandId());
 	imtgql::CGqlObject userInputObject;
-	userInputObject.InsertField(QByteArray(sdl::imtauth::Users::V1_0::CUserItemInput::Fields::ProductId.toUtf8()), QVariant(*m_productIdAttrPtr));
-	userInputObject.InsertField(QByteArray(sdl::imtauth::Users::V1_0::CUserItemInput::Fields::Id.toUtf8()), QVariant(userObjectId));
+	userInputObject.InsertField(QByteArray(sdl::imtauth::Users::V1_0::CUserItemInput::UserItemInputFields::ProductId.toUtf8()), QVariant(*m_productIdAttrPtr));
+	userInputObject.InsertField(QByteArray(sdl::imtauth::Users::V1_0::CUserItemInput::UserItemInputFields::Id.toUtf8()), QVariant(userObjectId));
 	userRequest.AddParam("input", userInputObject);
 
 	imtgql::CGqlObject queryUserFields;
@@ -164,7 +164,7 @@ bool CSimpleLoginWrapComp::RetrieveUserInfo(const QByteArray& userObjectId)
 		}
 
 		imtbase::CTreeItemModel* userDataModelPtr = dataModelPtr->GetTreeItemModel(
-			sdl::imtauth::Users::V1_0::CUserDataPayload::Fields::UserData.toUtf8());
+			sdl::imtauth::Users::V1_0::CUserDataPayload::UserDataPayloadFields::UserData.toUtf8());
 		if (userDataModelPtr == nullptr){
 			return false;
 		}
@@ -179,13 +179,13 @@ bool CSimpleLoginWrapComp::RetrieveUserInfo(const QByteArray& userObjectId)
 			return false;
 		}
 
-		if (userDataModelPtr->ContainsKey(sdl::imtauth::Users::V1_0::CUserData::Fields::Id.toUtf8())){
-			QByteArray login = userDataModelPtr->GetData(sdl::imtauth::Users::V1_0::CUserData::Fields::Username.toUtf8()).toByteArray();
+		if (userDataModelPtr->ContainsKey(sdl::imtauth::Users::V1_0::CUserData::UserDataFields::Id.toUtf8())){
+			QByteArray login = userDataModelPtr->GetData(sdl::imtauth::Users::V1_0::CUserData::UserDataFields::Username.toUtf8()).toByteArray();
 			m_userInfoPtr->SetId(login);
 		}
 
-		if (userDataModelPtr->ContainsKey(sdl::imtauth::Users::V1_0::CUserData::Fields::Password.toUtf8())){
-			QByteArray password = userDataModelPtr->GetData(sdl::imtauth::Users::V1_0::CUserData::Fields::Password.toUtf8()).toByteArray();
+		if (userDataModelPtr->ContainsKey(sdl::imtauth::Users::V1_0::CUserData::UserDataFields::Password.toUtf8())){
+			QByteArray password = userDataModelPtr->GetData(sdl::imtauth::Users::V1_0::CUserData::UserDataFields::Password.toUtf8()).toByteArray();
 			m_userInfoPtr->SetPasswordHash(password);
 		}
 
