@@ -101,7 +101,15 @@ Item {
                 }
             }
             diagram.maxValue = maxVal;
+
+            if(diagram.maxValue <= diagram.minValue){
+                diagram.maxValue = diagram.minValue;
+                diagram.minValue = 0;
+            }
+
             diagram.fillAxeYModel();
+
+
         }
 
 
@@ -113,14 +121,14 @@ Item {
         for(var i = 4; i >= 0 ; i--){
             var val;
             if(i == 4){
-                val = diagram.roundDigit((diagram.maxValue/4 * i),true);
-                diagram.maxAxeYValue = val;
+                val = diagram.roundDigit(((diagram.maxValue - diagram.minValue)/4 * i),true);
+                diagram.maxAxeYValue = val + diagram.minValue;
                 let valToModel = val + diagram.minValue;
                 var index = diagram.axeYValueModel.insertNewItem();
                 diagram.axeYValueModel.setData("text", valToModel, index);
             }
             else {
-                val = diagram.roundDigit((diagram.maxValue/4 * i),false);
+                val = diagram.roundDigit(((diagram.maxValue - diagram.minValue)/4 * i),false);
                 let valToModel = Math.trunc((val + diagram.minValue)*100)/100;
                 index = diagram.axeYValueModel.insertNewItem();
                 diagram.axeYValueModel.setData("text", valToModel, index);
@@ -149,36 +157,83 @@ Item {
         var beforeDot = Math.floor((digit/coeff));
         var afterDot = digit/coeff - beforeDot;
 
-        if(ceil){
-            if(afterDot == 0){
-                afterDot = 0;
+        if(digit >= 1){
+            if(ceil){
+                if(afterDot == 0){
+                    afterDot = 0;
+                }
+                else if(afterDot > 0 && afterDot < 0.5){
+                    afterDot = 0.5;
+                }
+                else{
+                    afterDot = 1;
+                }
+
             }
-            else if(afterDot > 0 && afterDot < 0.5){
-                afterDot = 0.5;
+
+            else if(digit > 1){
+                if(afterDot >= 0 && afterDot < 0.25){
+                    afterDot = 0;
+                }
+                else if(afterDot >= 0.25 && afterDot < 0.5){
+                    afterDot = 0.5;
+                }
+                else if(afterDot >= 0.5 && afterDot < 0.75){
+                    afterDot = 0.5;
+                }
+                else{
+                    afterDot = 1;
+                }
             }
-            else{
-                afterDot = 1;
+            retval = (Number(beforeDot) + Number(afterDot)) * coeff;
+        }
+
+        else if(digit > 0){//digit < 1
+            beforeDot = 0;
+
+            let ok = false;
+            while(!ok){
+                //qDebug() << "WHILE";
+                count++;
+                coeff = Math.pow(10, count);
+                let digitCurr = digit *coeff;
+                if(digitCurr > 1){
+                    break;
+                }
             }
+
+            beforeDot = Math.floor((digit*coeff));
+            afterDot = digit*coeff - beforeDot;
+
+            if(ceil){
+                if(afterDot == 0){
+                    afterDot = 0;
+                }
+                else if(afterDot > 0 && afterDot < 0.5){
+                    afterDot = 0.5;
+                }
+                else{
+                    afterDot = 1;
+                }
+            }
+            else {
+                if(afterDot >= 0 && afterDot < 0.25){
+                    afterDot = 0;
+                }
+                else if(afterDot >= 0.25 && afterDot < 0.5){
+                    afterDot = 0.5;
+                }
+                else if(afterDot >= 0.5 && afterDot < 0.75){
+                    afterDot = 0.5;
+                }
+                else{
+                    afterDot = 1;
+                }
+            }
+            retval = (Number(beforeDot) + Number(afterDot)) / coeff;
 
         }
 
-        else if(digit > 1){
-            if(afterDot >= 0 && afterDot < 0.25){
-                afterDot = 0;
-            }
-            else if(afterDot >= 0.25 && afterDot < 0.5){
-                afterDot = 0.5;
-            }
-            else if(afterDot >= 0.5 && afterDot < 0.75){
-                afterDot = 0.5;
-            }
-            else{
-                afterDot = 1;
-            }
-
-        }
-
-        retval = (Number(beforeDot) + Number(afterDot)) * coeff;
         return retval;
     }
 
