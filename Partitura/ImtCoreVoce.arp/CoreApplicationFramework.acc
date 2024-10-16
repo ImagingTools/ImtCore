@@ -112,9 +112,6 @@
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TrayIconToolTip" Type="Text" ExportId="TrayIconToolTip">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="TrayIconsCommands" Type="Reference" ExportId="TrayIconsCommands">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -190,13 +187,7 @@
                     <AttributeInfo Id="AdditionalCommandActivators" Type="Reference[]" ExportId="AdditionalCommandActivators">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="AdditionalCommandIds" Type="Id[]" ExportId="AdditionalCommandIds">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="AdditionalCommands" Type="Reference" ExportId="AdditionalCommands">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="AppLogoPath" Type="String" ExportId="AppLogoPath">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="AutoLogoutMinutes" Type="Integer" ExportId="AutoLogoutMinutes">
@@ -256,7 +247,7 @@
                     <AttributeInfo Id="MaximumFrameWidth" Type="Integer" ExportId="MaximumFrameWidth">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MenuPanelVisibility" Type="Reference" ExportId="MenuPanelVisibility">
+                    <AttributeInfo Id="MenuPanelVisibility" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MenuPanelVisibility"/>
                     </AttributeInfo>
                     <AttributeInfo Id="NavigationController" Type="Reference" ExportId="">

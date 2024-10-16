@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5208" Description="ACF"/>
-            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Client-side license controller for an installation instance of a software product</Description>
@@ -82,11 +82,17 @@
                     <AttributeInfo Id="LicenseInfoProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ProductInstanceInfo"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SlaveProvider" Type="Reference" ExportId="SlaveRights">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserRightsProvider" Type="Reference" ExportId="UserRightsProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="LicenseController" PackageId="ImtLicensePck" ComponentId="LicenseController">
-            <Data IsEnabled="true" Flags="1">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AdditionalImportLicenseErrorMessage" Type="Text" ExportId="AdditionalImportLicenseErrorMessage">
                         <Data IsEnabled="false"/>
@@ -163,6 +169,7 @@
         <Interface InterfaceId="iauth::IRightsProvider" ComponentId="LicenseBasedRights"/>
         <Interface InterfaceId="imod::IModel" ComponentId="LicenseBasedRights"/>
         <Interface InterfaceId="imtlic::ILicenseController" ComponentId="LicenseController"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="LicenseController"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="EncryptedXmlPersistence" ComponentId="EncryptedXmlPersistence"/>

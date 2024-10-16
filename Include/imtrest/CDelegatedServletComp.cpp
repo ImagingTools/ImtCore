@@ -23,32 +23,34 @@ namespace imtrest
 bool CDelegatedServletComp::IsCommandSupported(const QByteArray& commandId) const
 {
 	QByteArray cleanedCommandId = commandId;
-	if (cleanedCommandId.startsWith('/')) {
+	if (cleanedCommandId.startsWith('/')){
 		cleanedCommandId = cleanedCommandId.remove(0, 1);
 	}
 
-	if (cleanedCommandId.endsWith('/')) {
+	if (cleanedCommandId.endsWith('/')){
 		cleanedCommandId = cleanedCommandId.remove(cleanedCommandId.length() - 1, 1);
 	}
 
-	QByteArray myCommand;
-	QByteArray slaveCommandId;
+	QByteArray slaveCommandId = commandId;
 
-	istd::CIdManipBase::SplitId(cleanedCommandId, myCommand, slaveCommandId);
+	QByteArray myCommandId = *m_commandIdAttrPtr;
+	if (!myCommandId.isEmpty()){
+		QByteArray command;
+		istd::CIdManipBase::SplitId(cleanedCommandId, command, slaveCommandId);
+		if (command != myCommandId){
+			return false;
+		}
 
-	if (myCommand != *m_commandIdAttrPtr) {
-		return false;
+		if (slaveCommandId.isEmpty()){
+			return true;
+		}
 	}
 
-	if (slaveCommandId.isEmpty()) {
-		return true;
-	}
-
-	for (int i = 0; i < m_slaveRequestHandlersCompPtr.GetCount(); ++i) {
+	for (int i = 0; i < m_slaveRequestHandlersCompPtr.GetCount(); ++i){
 		IRequestServlet* handlerPtr = m_slaveRequestHandlersCompPtr[i];
-		if (handlerPtr != nullptr) {
+		if (handlerPtr != nullptr){
 			bool isSupported = handlerPtr->IsCommandSupported(slaveCommandId);
-			if (isSupported) {
+			if (isSupported){
 				return true;
 			}
 		}
@@ -65,36 +67,39 @@ ConstResponsePtr CDelegatedServletComp::ProcessRequest(const IRequest& request, 
 	Q_ASSERT(!commandId.isEmpty());
 	Q_ASSERT(IsCommandSupported(commandId));
 
-	if (commandId.startsWith('/')) {
+	if (commandId.startsWith('/')){
 		commandId = commandId.remove(0, 1);
 	}
 
-	if (commandId.endsWith('/')) {
+	if (commandId.endsWith('/')){
 		commandId = commandId.remove(commandId.length() - 1, 1);
 	}
 
-	QByteArray myCommand;
-	QByteArray slaveCommandId;
-
-	istd::CIdManipBase::SplitId(commandId, myCommand, slaveCommandId);
+	QByteArray command;
+	QByteArray slaveCommandId = commandId;
 
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 
-	if (myCommand != *m_commandIdAttrPtr) {
-		QString commandIdSafe = commandId;
-		commandIdSafe = commandIdSafe.replace(QRegularExpression("[<>\":;()= .]"), "_");
-		QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandIdSafe)).toUtf8();
-		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	QByteArray myCommandId = *m_commandIdAttrPtr;
 
-		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
+	if (!myCommandId.isEmpty()){
+		istd::CIdManipBase::SplitId(commandId, command, slaveCommandId);
+		if (command != myCommandId){
+			QString commandIdSafe = commandId;
+			commandIdSafe = commandIdSafe.replace(QRegularExpression("[<>\":;()= .]"), "_");
+			QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandIdSafe)).toUtf8();
+			QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-		SendErrorMessage(0, QString("No request handler found for: '%1'").arg(qPrintable(commandId)));
+			ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
 
-		return responsePtr;
+			SendErrorMessage(0, QString("No request handler found for: '%1'").arg(qPrintable(commandId)));
+
+			return responsePtr;
+		}
 	}
 
 	// Print all supported slave handlers of the API to the user:
-	if (slaveCommandId.isEmpty()) {
+	if (slaveCommandId.isEmpty()){
 		QStringList slavehandlers;
 
 		QByteArray body = QString("<html><head><title>API-Info</title></head><body><p>Supported paths are: %1</p></body></html>").arg(slavehandlers.join("\n")).toUtf8();
@@ -105,11 +110,11 @@ ConstResponsePtr CDelegatedServletComp::ProcessRequest(const IRequest& request, 
 		return responsePtr;
 	}
 
-	for (int i = 0; i < m_slaveRequestHandlersCompPtr.GetCount(); ++i) {
+	for (int i = 0; i < m_slaveRequestHandlersCompPtr.GetCount(); ++i){
 		IRequestServlet* handlerPtr = m_slaveRequestHandlersCompPtr[i];
 		Q_ASSERT(handlerPtr != nullptr);
 
-		if (handlerPtr->IsCommandSupported(slaveCommandId)) {
+		if (handlerPtr->IsCommandSupported(slaveCommandId)){
 			return handlerPtr->ProcessRequest(request, slaveCommandId);
 		}
 	}

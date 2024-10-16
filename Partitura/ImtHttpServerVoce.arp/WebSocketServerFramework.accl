@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="BroadcastMessageConsumerSubscriber" X="40" Y="-20" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="700" Y="-20" Note=""/>
+        <Element ComponentName="SubscriptionManager" X="40" Y="480" Note=""/>
+        <Element ComponentName="WebSocketProtocolEngine" X="360" Y="660" Note=""/>
+        <Element ComponentName="WebSocketServer" X="360" Y="240" Note=""/>
+        <Element ComponentName="WebSocketServlet" X="360" Y="-180" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

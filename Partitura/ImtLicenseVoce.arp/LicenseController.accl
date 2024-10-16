@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5208" Description="ACF"/>
-            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -14,7 +14,7 @@
         <Element ComponentName="Encryption" X="250" Y="250" Note=""/>
         <Element ComponentName="EncryptionKeys" X="900" Y="250" Note=""/>
         <Element ComponentName="LicenseBasedRights" X="175" Y="775" Note=""/>
-        <Element ComponentName="LicenseController" X="525" Y="625" Note=""/>
+        <Element ComponentName="LicenseController" X="520" Y="620" Note=""/>
         <Element ComponentName="LicenseFile" X="525" Y="775" Note=""/>
         <Element ComponentName="ProductInstanceInfo" X="175" Y="625" Note=""/>
         <Element ComponentName="XmlSerializer" X="525" Y="250" Note=""/>

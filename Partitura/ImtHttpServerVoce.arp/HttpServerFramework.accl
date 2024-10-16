@@ -2,21 +2,16 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5226" Description="ACF"/>
-            <Version Id="1" Number="2211" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="BroadcastMessageConsumerSubscriber" X="200" Y="275" Note=""/>
-        <Element ComponentName="HttpProtocolEngine" X="775" Y="100" Note=""/>
-        <Element ComponentName="SlaveSubscriberController" X="400" Y="75" Note=""/>
-        <Element ComponentName="SubscriptionManager" X="150" Y="650" Note=""/>
-        <Element ComponentName="TcpServer" X="900" Y="300" Note=""/>
-        <Element ComponentName="WebSocketProtocolEngine" X="650" Y="650" Note=""/>
-        <Element ComponentName="WebSocketServer" X="400" Y="375" Note=""/>
-        <Element ComponentName="WebSocketServlet" X="475" Y="175" Note=""/>
-        <Element ComponentName="WorkerManager" X="1050" Y="100" Note=""/>
+        <Element ComponentName="HttpProtocolEngine" X="600" Y="280" Note=""/>
+        <Element ComponentName="SslConfigurationManager" X="280" Y="140" Note=""/>
+        <Element ComponentName="TcpServer" X="600" Y="140" Note=""/>
+        <Element ComponentName="WorkerManager" X="860" Y="-60" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5241" Description="ACF"/>
-            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -40,9 +40,6 @@
         <Element Id="StandardLoginGui" PackageId="ImtAuthGuiPck" ComponentId="RemoteStandardLoginGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ConnectionStatusProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Subscription/WebSocketClient"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Login" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Rights"/>
                     </AttributeInfo>
@@ -76,11 +73,16 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="iauth::ILogin" ComponentId="Rights"/>
+        <Interface InterfaceId="iauth::IRightsProvider" ComponentId="Rights"/>
+        <Interface InterfaceId="imod::IModel" ComponentId="Rights"/>
+        <Interface InterfaceId="imtauth::IAccessTokenProvider" ComponentId="Rights"/>
         <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="StandardLoginGui"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="Rights"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Rights"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="RemoteSuperuserController" ComponentId="Rights/RemoteSuperuserController"/>
         <Component ExportedId="RemoteSuperuserProvider" ComponentId="Rights/RemoteSuperuserProvider"/>
-        <Component ExportedId="Rights" ComponentId="Rights"/>
     </ExportedComponents>
 </Acf>
