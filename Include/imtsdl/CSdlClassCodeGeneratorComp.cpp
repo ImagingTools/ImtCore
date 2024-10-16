@@ -922,9 +922,7 @@ void CSdlClassCodeGeneratorComp::GenerateMetaInfo(
 {
 	FeedStreamHorizontally(stream, indents);
 	// create struct to store field id list
-	stream << QStringLiteral("struct ");
-	stream << GetCapitalizedValue(sdlType.GetName());
-	stream << QStringLiteral("Fields");
+	stream << QStringLiteral("struct Fields");
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, indents);
 	stream << '{';
@@ -934,6 +932,11 @@ void CSdlClassCodeGeneratorComp::GenerateMetaInfo(
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, indents + 1);
 		stream << QStringLiteral("static const inline QString ");
+
+		if (sdlField.GetId() == QStringLiteral("Fields")){
+			stream << '_';
+		}
+
 		stream << GetCapitalizedValue(sdlField.GetId());
 		stream << QStringLiteral(" = \"");
 		stream << sdlField.GetId();
