@@ -140,6 +140,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		if (jsonDocument.isNull()){
 			QByteArray errorMessage = QString("Unable to convert message to JSON: '%1'").arg(qPrintable(jsonError.errorString())).toUtf8();
 			qDebug() << errorMessage;
+			locker.unlock();
 
 			return CreateErrorResponse(errorMessage, request);
 		}
@@ -153,7 +154,13 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 			for (QByteArray subscriptionId : m_registeredClients.keys()){
 				if (m_registeredClients[subscriptionId].m_status == imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION){
-					ServiceManagerRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
+					istd::TDelPtr<istd::IChangeable> ichangeablePtr(m_registeredClients[subscriptionId].m_request.CloneMe());
+					locker.unlock();
+					imtgql::CGqlRequest* requestPtr = dynamic_cast<imtgql::CGqlRequest*>(ichangeablePtr.GetPtr());
+					if (requestPtr != nullptr){
+						ServiceManagerRegister(*requestPtr, subscriptionId);
+					}
+					locker.relock();
 				}
 			}
 		break;
@@ -165,7 +172,10 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 				for (imtclientgql::IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
 					if (subscriptionClientPtr != nullptr){
-						subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, m_registeredClients[subscriptionId].m_status, message);
+						imtclientgql::IGqlSubscriptionClient::SubscriptionStatus status = m_registeredClients[subscriptionId].m_status;
+						locker.unlock();
+						subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, status, message);
+						locker.relock();
 					}
 				}
 			}
@@ -192,7 +202,9 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 						QByteArray payload = document.toJson(QJsonDocument::Compact);
 
+						locker.unlock();
 						subscriptionClientPtr->OnResponseReceived(subscriptionId, payload);
+						locker.relock();
 					}
 				}
 			}
@@ -205,6 +217,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			m_queryDataMap.insert(webSocketRequest->GetSubscriptionId(), webSocketRequest->GetBody());
 
 			queryLocker.unlock();
+			locker.unlock();
 
 			Q_EMIT OnQueryDataReceived(1);
 		}
@@ -217,6 +230,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			m_queryDataMap.insert(webSocketRequest->GetSubscriptionId(), webSocketRequest->GetBody());
 
 			queryLocker.unlock();
+			locker.unlock();
 
 			Q_EMIT OnQueryDataReceived(1);
 		}
@@ -360,13 +374,6 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&request);
 	if (requestImplPtr != nullptr){
 		clientId = requestImplPtr->GetHeader("clientId");
-		// const imtgql::CGqlObject* input = requestImplPtr->GetParamObject("input");
-		// if (input != nullptr){
-		// 	const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
-		// 	if (addition != nullptr){
-		// 		clientId = addition->GetFieldArgumentValue("clientId").toByteArray();
-		// 	}
-		// }
 	}
 
 	if (m_subscriptionSenderCompPtr.IsValid()){
