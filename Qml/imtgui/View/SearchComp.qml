@@ -82,7 +82,6 @@ Rectangle{
         searchContainer.externalSearchParam = ""
         searchTextField.currentText = "";
         searchContainer.selectedText = "";
-        searchContainer.searchTextField = "";
         searchContainer.previousText = "";
         searchContainer.parentIds = "";
 
