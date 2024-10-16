@@ -2,16 +2,16 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5262" Description="ACF"/>
+            <Version Id="1" Number="2218" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="HttpProtocolEngine" X="600" Y="280" Note=""/>
-        <Element ComponentName="SslConfigurationManager" X="280" Y="140" Note=""/>
-        <Element ComponentName="TcpServer" X="600" Y="140" Note=""/>
-        <Element ComponentName="WorkerManager" X="860" Y="-60" Note=""/>
+        <Element ComponentName="HttpProtocolEngine" X="600" Y="400" Note=""/>
+        <Element ComponentName="SslConfigurationManager" X="300" Y="125" Note=""/>
+        <Element ComponentName="TcpServer" X="600" Y="225" Note=""/>
+        <Element ComponentName="WorkerManager" X="950" Y="125" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

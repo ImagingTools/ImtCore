@@ -169,19 +169,32 @@ bool CTreeItemModel::IsEqualWithModel(CTreeItemModel* modelPtr) const
 				}
 			}
 			else{
+#if QT_VERSION < 0x060000
+				if (sourceValue.type() == QMetaType::Int && sourceValue.toInt() != itemValue.toInt()){
+#else
 				if (sourceValue.typeId() == QMetaType::Int && sourceValue.toInt() != itemValue.toInt()){
+#endif
 					return false;
 				}
-
+#if QT_VERSION < 0x060000
+				if (sourceValue.type() == QMetaType::QByteArray && sourceValue.toByteArray() != itemValue.toByteArray()){
+#else
 				if (sourceValue.typeId() == QMetaType::QByteArray && sourceValue.toByteArray() != itemValue.toByteArray()){
+#endif
 					return false;
 				}
-
+#if QT_VERSION < 0x060000
+				if (sourceValue.type() == QMetaType::QString && sourceValue.toString() != itemValue.toString()){
+#else
 				if (sourceValue.typeId() == QMetaType::QString && sourceValue.toString() != itemValue.toString()){
+#endif
 					return false;
 				}
-
+#if QT_VERSION < 0x060000
+				if (sourceValue.type() == QMetaType::Bool && sourceValue.toBool() != itemValue.toBool()){
+#else
 				if (sourceValue.typeId() == QMetaType::Bool && sourceValue.toBool() != itemValue.toBool()){
+#endif
 					return false;
 				}
 			}

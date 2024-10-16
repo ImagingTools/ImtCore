@@ -26,7 +26,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInter
 			return CreateTreeItemModelFromResponse(*responsePtr);
 		}
 		else{
-			errorMessage = QString("%1 Remote representation model is null").arg(requestPtr->GetCommandId());
+			errorMessage = QString("%1 Remote representation model is null").arg(qPrintable(requestPtr->GetCommandId()));
 		}
 	}
 

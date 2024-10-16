@@ -2,39 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5262" Description="ACF"/>
+            <Version Id="1" Number="2218" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>HTTP server framework</Description>
     <Keywords>HTTP Server Company='ImagingTools' Project='&quot;Core Framework&quot;'</Keywords>
     <ElementsList>
-        <Element Id="BroadcastMessageConsumerSubscriber" PackageId="ImtGqlPck" ComponentId="BroadcastMessageConsumerSubscriber">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>OnBroadCastMessage</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="WebSocketServer"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="SlaveSubscriberController" PackageId="ImtGqlPck" ComponentId="SlaveSubscriberController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -132,7 +107,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>SlaveSubscriberController</Value>
-                                <Value>BroadcastMessageConsumerSubscriber</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -148,14 +122,14 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtauth::ILoginStatusProvider" ComponentId="WebSocketServer"/>
+        <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="SubscriptionManager"/>
+        <Interface InterfaceId="imtclientgql::IGqlSubscriptionManager" ComponentId="SubscriptionManager"/>
+        <Interface InterfaceId="imtrest::IProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
         <Interface InterfaceId="imtrest::IRequestManager" ComponentId="WebSocketServer"/>
+        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="WebSocketServlet"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="WebSocketServer"/>
     </ExportedInterfaces>
-    <ExportedComponents>
-        <Component ExportedId="BroadcastMessageConsumerSubscriber" ComponentId="BroadcastMessageConsumerSubscriber"/>
-        <Component ExportedId="SubscriptionManager" ComponentId="SubscriptionManager"/>
-        <Component ExportedId="WebSocketProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
-        <Component ExportedId="WebSocketServer" ComponentId="WebSocketServer"/>
-        <Component ExportedId="WebSocketServlet" ComponentId="WebSocketServlet"/>
-    </ExportedComponents>
+    <ExportedComponents/>
 </Acf>
