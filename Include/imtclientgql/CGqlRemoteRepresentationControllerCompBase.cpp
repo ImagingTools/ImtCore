@@ -19,6 +19,12 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInter
 		return nullptr;
 	}
 
+	if (!m_apiClientCompPtr.IsValid()){
+		SendCriticalMessage(0, "Component 'ApiClient' was not set. Check the component configuration");
+
+		return nullptr;
+	}
+
 	imtclientgql::IGqlClient::GqlRequestPtr requestPtr(dynamic_cast<imtgql::IGqlRequest*>(gqlRequest.CloneMe()));
 	if (!requestPtr.isNull()){
 		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
