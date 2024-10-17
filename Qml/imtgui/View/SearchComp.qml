@@ -56,6 +56,7 @@ Rectangle{
     property alias searchDelegate: searchTextField.delegate;
     property alias textField: searchTextField;
     property alias currentText: searchTextField.currentText;
+    property alias placeHolderText: placeHolder.text;
 
     property alias itemHeight: searchTextField.itemHeight;
     property alias textFieldWidth: searchTextField.width;
