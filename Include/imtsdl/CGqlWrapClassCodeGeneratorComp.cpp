@@ -364,6 +364,25 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 	ifStream << '}';
 	FeedStream(ifStream, 1, false);
 
+	// setup GQL method
+	FeedStream(ifStream, 2, false);
+	ifStream << QStringLiteral("bool ");
+	ifStream << className << ':' << ':';
+	ifStream << QStringLiteral("SetupGqlRequest(imtgql::CGqlRequest& gqlRequest, const ");
+	ifStream << GetCapitalizedValue(sdlRequest.GetName());
+	ifStream << QStringLiteral("RequestArguments& requestArguments, const ");
+	ifStream << GetCapitalizedValue(sdlRequest.GetName());
+	ifStream << QStringLiteral("RequestInfo& requestInfo)");
+	FeedStream(ifStream, 1, false);
+
+	ifStream << '{';
+	FeedStream(ifStream, 1, false);
+
+	GenerateRequestSetup(ifStream, sdlRequest);
+	FeedStream(ifStream, 1, false);
+	ifStream << '}';
+	FeedStream(ifStream, 1, false);
+
 	// MAIN CONSTRUCTOR + PARSING
 	FeedStream(ifStream, 2, false);
 	ifStream << className << ':' << ':' << className;
@@ -376,6 +395,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 
 	ifStream << '{';
 	FeedStream(ifStream, 1, false);
+
 	GenerateRequestParsing(ifStream, sdlRequest, 1);
 	ifStream << '}';
 	FeedStream(ifStream, 1, false);
@@ -544,6 +564,38 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 }
 
 
+void CGqlWrapClassCodeGeneratorComp::GenerateRequestSetup(QTextStream& stream, const CSdlRequest& sdlRequest, uint hIndents)
+{
+	// set commandID
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("gqlRequest.SetCommandId(GetCommandId());");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("// writting input arguments");
+	FeedStream(stream, 1, false);
+	for (const CSdlField& field: sdlRequest.GetInputArguments()){
+		AddFieldWriteToRequestCode(stream, field);
+	}
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("return true;");
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AbortCurrentProcessing()
+{
+	m_headerFilePtr->close();
+	m_sourceFilePtr->close();
+
+	I_CRITICAL();
+
+	m_headerFilePtr->remove();
+	m_sourceFilePtr->remove();
+}
+
+
 void CGqlWrapClassCodeGeneratorComp::AddRequiredIncludesToHeaderFile(QTextStream& stream, const CSdlRequest& sdlRequest, bool addDependenciesInclude) const
 {
 	QSet<QString> complexTypeList;
@@ -632,6 +684,18 @@ void CGqlWrapClassCodeGeneratorComp::AddMethodDeclarations(QTextStream& stream, 
 	// CommandId method
 	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("static QByteArray GetCommandId();");
+	FeedStream(stream, 2, false);
+
+	// client-side method (setup GQL request)
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("[[nodiscard]] static bool SetupGqlRequest(imtgql::CGqlRequest& gqlRequest, const ");
+	stream << GetCapitalizedValue(sdlRequest.GetName());
+	stream << QStringLiteral("RequestArguments& requestArguments, const ");
+	stream << GetCapitalizedValue(sdlRequest.GetName());
+	stream << QStringLiteral("RequestInfo& requestInfo = ");
+	stream << GetCapitalizedValue(sdlRequest.GetName());
+	stream << QStringLiteral("RequestInfo()");
+	stream << ')' << ';';
 	FeedStream(stream, 2, false);
 
 	// default constructor with GraphQL request
@@ -784,25 +848,11 @@ bool CGqlWrapClassCodeGeneratorComp::AddFieldWriteToRequestCode(QTextStream& str
 		return false;
 	}
 
-	const bool isFieldRequired = field.IsRequired();
-	if (isFieldRequired){
-		AddSelfCheckRequiredValueCode(stream, field);
-	}
-	else {
-		AddBeginSelfCheckNonRequiredValueCode(stream, field);
-	}
-	const int hIndents = (isFieldRequired ? 1 : 2);
 	if (isCustom){
-		AddCustomFieldWriteToRequestCode(stream, field, hIndents);
+		AddCustomFieldWriteToRequestCode(stream, field);
 	}
 	else {
-		AddScalarFieldWriteToRequestCode(stream, field, hIndents);
-	}
-
-	if (!isFieldRequired){
-		FeedStreamHorizontally(stream);
-		stream << '}';
-		FeedStream(stream, 1, false);
+		AddScalarFieldWriteToRequestCode(stream, field);
 	}
 
 	return true;
@@ -835,9 +885,9 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 	stream << QStringLiteral("imtgql::CGqlObject ") << dataObjectVariableName << ';';
 	FeedStream(stream, 1, false);
 
-	// add me to temt object and checks
+	// add me to temp object and checks
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (!m_");
+	stream << QStringLiteral("if (!requestArguments.");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral(".WriteToGraphQlObject(");
 	stream << dataObjectVariableName;
@@ -845,24 +895,16 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("m_isValid = false;");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return;");
+	stream << QStringLiteral("return false;");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("m_isValid = true;");
-	FeedStream(stream, 1, false);
-
 	// insert temp GQL object
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("request.InsertField(");
+	stream << QStringLiteral("gqlRequest.AddParam(");
 	stream << '"' << field.GetId() << '"';
 	stream << ',' << ' ';
 	stream << dataObjectVariableName;
@@ -978,17 +1020,6 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& 
 	stream << '}';
 }
 
-
-void CGqlWrapClassCodeGeneratorComp::AbortCurrentProcessing()
-{
-	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
-
-	I_CRITICAL();
-
-	m_headerFilePtr->remove();
-	m_sourceFilePtr->remove();
-}
 
 
 } // namespace imtsdl

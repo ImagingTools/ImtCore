@@ -51,7 +51,8 @@ private:
 	bool ProcessHeaderClassFile(const CSdlRequest& sdlRequest, bool addDependenciesInclude);
 	bool ProcessSourceClassFile(const CSdlRequest& sdlRequest, bool addSelfHeaderInclude);
 	void GenerateFieldRequestInfo(QTextStream& stream, const CSdlField& sdlField, uint hIndents = 1, bool createStructDefinition = false);
-	void GenerateRequestParsing(QTextStream& ifStream, const CSdlRequest& sdlRequest, uint hIndents = 1);
+	void GenerateRequestParsing(QTextStream& stream, const CSdlRequest& sdlRequest, uint hIndents = 1);
+	void GenerateRequestSetup(QTextStream& stream, const CSdlRequest& sdlRequest, uint hIndents = 1);
 	void AbortCurrentProcessing();
 
 	// header methods
