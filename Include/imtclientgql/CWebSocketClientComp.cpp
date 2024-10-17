@@ -2,18 +2,14 @@
 
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtCore/QMessageAuthenticationCode>
 #include <QtCore/QUrl>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
 // ImtCore includes
-#include <imtgql/CGqlRequest.h>
 #include <imtgql/CGqlResponse.h>
-#include <imtbase/CTreeItemModel.h>
 #include <imtrest/CWebSocketRequest.h>
-#include <imtrest/CWebSocketSender.h>
 
 
 namespace imtclientgql
@@ -23,68 +19,15 @@ namespace imtclientgql
 // public methods
 
 CWebSocketClientComp::CWebSocketClientComp()
-	:m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
+	:m_connectionStatus(imtcom::IConnectionStatusProvider::CS_UNKNOWN)
 {
 	m_lastSocketError = QAbstractSocket::SocketError::UnknownSocketError;
 }
 
 
-bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) const
-{
-	m_webSocket.sendTextMessage(response->GetData());
+// reimplemented (imtclientgql::IGqlClient)
 
-	return true;
-}
-
-
-bool CWebSocketClientComp::SendRequest(imtrest::ConstRequestPtr& request) const
-{
-	m_webSocket.sendTextMessage(request->GetBody());
-
-	return true;
-}
-
-
-int CWebSocketClientComp::GetLoginStatus(const QByteArray& /*clientId*/) const
-{
-	return m_loginStatus;
-}
-
-
-// reimplemented (imtrest::IRequestManager)
-
-const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& /*requestId*/) const
-{
-	return this;
-}
-
-
-// reimplemented (imtauth::ILogin)
-
-QByteArray CWebSocketClientComp::GetLoggedUserId() const
-{
-	return QByteArray();
-}
-
-
-bool CWebSocketClientComp::Login(const QByteArray& /*userId*/, const QString& /*password*/)
-{
-	EmitStartTimer();
-
-	return true;
-}
-
-
-bool CWebSocketClientComp::Logout()
-{
-	EmitStopTimer();
-	EmitAgentinoDisconnect();
-
-	return true;
-}
-
-
-IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequestPtr requestPtr, imtbase::IUrlParam*) const
+IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
@@ -98,7 +41,7 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequ
 	const imtgql::IGqlContext* contextPtr = requestPtr->GetRequestContext();
 	if (contextPtr != nullptr){
 		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
-		for (QByteArray headerId: headers.keys()){
+		for (const QByteArray& headerId: headers.keys()){
 			headersObject[headerId] = QString(headers.value(headerId));
 		}
 	}
@@ -110,7 +53,6 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequ
 	NetworkOperation networkOperation(100, this);
 
 	GqlResponsePtr retVal;
-
 
 	int resultCode = 0;
 	for (int i = 0; i < 100; i++){
@@ -132,6 +74,59 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequ
 }
 
 
+// reimplemented (imtrest::ISender)
+
+bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) const
+{
+	m_webSocket.sendTextMessage(response->GetData());
+
+	return true;
+}
+
+
+bool CWebSocketClientComp::SendRequest(imtrest::ConstRequestPtr& request) const
+{
+	m_webSocket.sendTextMessage(request->GetBody());
+
+	return true;
+}
+
+
+// reimplemented (imtcom::IConnectionStatusProvider)
+
+imtcom::IConnectionStatusProvider::ConnectionStatus CWebSocketClientComp::GetConnectionStatus() const
+{
+	return m_connectionStatus;
+}
+
+
+// reimplemented (imtrest::IRequestManager)
+
+const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& /*requestId*/) const
+{
+	return this;
+}
+
+
+// reimplemented (imtcom::IConnectionController)
+
+bool CWebSocketClientComp::Connect()
+{
+	EmitStartTimer();
+
+	return true;
+}
+
+
+bool CWebSocketClientComp::Disconnect()
+{
+	EmitStopTimer();
+	EmitWebSocketClose();
+
+	return true;
+}
+
+
 // protected methods
 
 QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArray& key) const
@@ -144,6 +139,8 @@ QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArra
 }
 
 
+// reimplemented (icomp::CComponentBase)
+
 void CWebSocketClientComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
@@ -152,17 +149,17 @@ void CWebSocketClientComp::OnComponentCreated()
 	connect(&m_webSocket, &QWebSocket::disconnected, this, &CWebSocketClientComp::OnWebSocketDisconnected, Qt::QueuedConnection);
 	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &CWebSocketClientComp::OnWebSocketTextMessageReceived);
 	connect(&m_webSocket, &QWebSocket::binaryMessageReceived, this, &CWebSocketClientComp::OnWebSocketBinaryMessageReceived);
-	connect(this, &CWebSocketClientComp::EmitAgentinoDisconnect, &m_webSocket, &QWebSocket::close);
+	connect(this, &CWebSocketClientComp::EmitWebSocketClose, &m_webSocket, &QWebSocket::close);
 	connect(this, SIGNAL(EmitStartTimer()), &m_refreshTimer, SLOT(start()), Qt::QueuedConnection);
 	connect(this, SIGNAL(EmitStopTimer()), &m_refreshTimer, SLOT(stop()), Qt::QueuedConnection);
 	connect(&m_webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnWebSocketError(QAbstractSocket::SocketError)));
 
-	connect(&m_refreshTimer, &QTimer::timeout, this, &CWebSocketClientComp::OnConnectedTimer);
+	connect(&m_refreshTimer, &QTimer::timeout, this, &CWebSocketClientComp::OnTimeout);
 
 	m_refreshTimer.setSingleShot(true);
 	m_refreshTimer.setInterval(4000);
 
-	Connect();
+	EnsureWebSocketConnection();
 }
 
 
@@ -176,16 +173,19 @@ void CWebSocketClientComp::OnComponentDestroyed()
 }
 
 
-void CWebSocketClientComp::OnConnectedTimer()
+// private slots
+
+void CWebSocketClientComp::OnTimeout()
 {
-	Connect();
+	EnsureWebSocketConnection();
 }
 
 
 void CWebSocketClientComp::OnWebSocketConnected()
 {
-	m_loginStatus = imtauth::ILoginStatusProvider::LSF_LOGGED_IN;
-	istd::IChangeable::ChangeSet loginChangeSet(m_loginStatus, QObject::tr("Login"));
+	m_connectionStatus = imtcom::IConnectionStatusProvider::CS_CONNECTED;
+
+	istd::IChangeable::ChangeSet loginChangeSet(m_connectionStatus, QString("Login"));
 	istd::CChangeNotifier notifier(this, &loginChangeSet);
 
 	QString clientId;
@@ -215,8 +215,9 @@ void CWebSocketClientComp::OnWebSocketConnected()
 
 void CWebSocketClientComp::OnWebSocketDisconnected()
 {
-	m_loginStatus = imtauth::ILoginStatusProvider::LSF_CACHED;
-	istd::IChangeable::ChangeSet loginChangeSet(m_loginStatus, QObject::tr("Logout"));
+	m_connectionStatus = imtcom::IConnectionStatusProvider::CS_DISCONNECTED;
+
+	istd::IChangeable::ChangeSet loginChangeSet(m_connectionStatus, QString("Logout"));
 	istd::CChangeNotifier notifier(this, &loginChangeSet);
 
 	m_startQueries.Reset();
@@ -264,9 +265,9 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 		emit EmitQueryDataReceived(1);
 	}
-	else if (methodType == imtrest::CWebSocketRequest::MT_ERROR
-			 || methodType == imtrest::CWebSocketRequest::MT_START_ASK
-			 || methodType == imtrest::CWebSocketRequest::MT_DATA){
+	else if (	methodType == imtrest::CWebSocketRequest::MT_ERROR ||
+				methodType == imtrest::CWebSocketRequest::MT_START_ASK ||
+				methodType == imtrest::CWebSocketRequest::MT_DATA){
 		responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
 	}
 	else{
@@ -290,31 +291,45 @@ void CWebSocketClientComp::OnWebSocketBinaryMessageReceived(const QByteArray& /*
 }
 
 
-void CWebSocketClientComp::Connect()
+// private methods
+
+void CWebSocketClientComp::EnsureWebSocketConnection()
 {
+	QString login;
+	if (m_serverLoginAttrPtr.IsValid()){
+		login = *m_serverLoginAttrPtr;
+	}
+
+	if (m_webSocketServerLoginCompPtr.IsValid()){
+		login = m_webSocketServerLoginCompPtr->GetText();
+	}
+
+	QString password;
+	if (m_serverPasswordAttrPtr.IsValid()){
+		password = *m_serverPasswordAttrPtr;
+	}
+
+	if (m_webSocketServerPasswordCompPtr.IsValid()){
+		password = m_webSocketServerPasswordCompPtr->GetText();
+	}
+
 	QString host;
 	QString path;
 	int port = 0;
-
-	QString login = *m_serverLoginAttrPtr;
-	QString password = *m_serverPasswordAttrPtr;
-	QJsonObject authorization;
 
 	if (m_webSocketServerAddressCompPtr.IsValid()){
 		host = m_webSocketServerAddressCompPtr->GetUrl().host();
 		port = m_webSocketServerAddressCompPtr->GetUrl().port();
 		path = m_webSocketServerAddressCompPtr->GetUrl().path();
 	}
-	if (m_webSocketServerLoginCompPtr.IsValid()){
-		login = m_webSocketServerLoginCompPtr->GetText();
-	}
-	if (m_webSocketServerPasswordCompPtr.IsValid()){
-		password = m_webSocketServerPasswordCompPtr->GetText();
-	}
+
+	QJsonObject authorization;
+
 	authorization["host"] = host;
 	authorization["port"] = QString::number(port);
 	authorization["login"] = login;
 	authorization["password"] = password;
+
 	QByteArray authHeader = QJsonDocument(authorization).toJson(QJsonDocument::Compact);
 
 	QUrl url;

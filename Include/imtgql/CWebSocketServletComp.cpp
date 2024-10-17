@@ -7,8 +7,6 @@
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
-#include <imtrest/ISender.h>
-#include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtgql/CGqlContext.h>
@@ -39,31 +37,25 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 		{
 		case imtrest::CWebSocketRequest::MT_CONNECTION_INIT:
 			return InitConnection(request);
-			break;
 		
 		case imtrest::CWebSocketRequest::MT_START:
 			return RegisterSubscription(request);
-			break;
 
 		case imtrest::CWebSocketRequest::MT_STOP:
 			return UnregisterSubscription(request);
-			break;
 
 		case imtrest::CWebSocketRequest::MT_QUERY:
 			return ProcessGqlRequest(request);
-			break;
 
 		case imtrest::CWebSocketRequest::MT_ERROR:
 			SendErrorMessage(0, "Error request");
 			return imtrest::ConstResponsePtr();
-			break;
 
 		default:{
 			QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
-
 			return CreateErrorResponse(errorMessage, request);
-			}
-			break;
+		}
+		break;
 		}
 	}
 	else{
@@ -76,20 +68,14 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 }
 
 
+// protected methods
+
 imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::IRequest& request) const
 {
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
-
 	if (webSocketRequest != nullptr){
-	QByteArray data = QString(R""(
-{
-"type": "connection_ask",
-"payload": {
-	"connectionTimeoutMs": 300000
-}
-}
-		)"" ).toUtf8();
-	
+		QByteArray data = QString(R"({"type": "connection_ask","payload": {"connectionTimeoutMs": 300000}})").toUtf8();
+
 		return CreateDataResponse(data, request);
 	}
 
@@ -135,8 +121,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 
 	if (m_gqlRequestHandlerCompPtr.IsValid()){
 		QString errorMessage;
-		imtbase::CTreeItemModel* responseDataModel = m_gqlRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
-		if (responseDataModel == nullptr){
+		istd::TDelPtr<imtbase::CTreeItemModel> responseDataModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
+		if (!responseDataModelPtr.IsValid()){
 			if (!errorMessage.isEmpty()){
 				return CreateErrorResponse(errorMessage.toUtf8(), request);
 			}
@@ -144,17 +130,12 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 			return imtrest::ConstResponsePtr();
 		}
 
-		QString responseData = responseDataModel->ToJson();
+		QString responseData = responseDataModelPtr->ToJson();
 
-		QByteArray data = QString(R""(
-{
-"type": "query_data",
-"id": "%1",
-"payload": %2
-}
-			)"" ).arg(object.value("id").toString()).arg(responseData).toUtf8();
+		QByteArray data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
+							.arg(object.value("id").toString()).arg(responseData).toUtf8();
 
-			return CreateDataResponse(data, request);
+		return CreateDataResponse(data, request);
 	}
 	else{
 		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")
@@ -177,7 +158,11 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	body = object.value("payload").toObject().value("data").toString().toUtf8();
 
 	int errorPosition;
-	gqlRequest.ParseQuery(body, errorPosition);
+	if (!gqlRequest.ParseQuery(body, errorPosition)){
+		QString errorMessage = QString("Error when parsing request: '%1'; Error position: '%2'")
+								.arg(qPrintable(body)).arg(errorPosition);
+		return CreateErrorResponse(errorMessage.toUtf8(), request);
+	}
 
 	IGqlContext* gqlContextPtr = const_cast<IGqlContext*>(gqlRequest.GetRequestContext());
 	IGqlContext::Headers gqlHeaders;
@@ -198,8 +183,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	QByteArray commandId = gqlRequest.GetCommandId();
 
 	if (commandId.isEmpty()){
-		QByteArray errorMessage = "Empty command-ID";
-	
+		QByteArray errorMessage = QByteArray("Unable to register subscription with empty command id");
+
 		return CreateErrorResponse(errorMessage, request);
 	}
 
@@ -218,19 +203,15 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	if (subscriberControllerPtr != nullptr){
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscription(webSocketRequest->GetSubscriptionId(), gqlRequest, request, errorMessage)){
-			QByteArray data = QString(R""(
-{
-"type": "start_ask",
-"id": "%1"
-}
-				)"" ).arg(QString(webSocketRequest->GetSubscriptionId())).toUtf8();
+			QByteArray data = QString(R"({"type": "start_ask","id": "%1"})")
+						.arg(QString(webSocketRequest->GetSubscriptionId())).toUtf8();
 			
-				return CreateDataResponse(data, request);
-			}		
+			return CreateDataResponse(data, request);
+		}
 	}
 	else{
 		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")
-					.arg(QString(commandId)).toUtf8();
+		.arg(QString(commandId)).toUtf8();
 		return CreateErrorResponse(errorMessage, request);
 	}
 
@@ -248,22 +229,17 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 	}
 
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){
-		IGqlSubscriberController* controlerPtr = m_gqlSubscriberControllersCompPtr[index];
-		if ((controlerPtr != nullptr) && m_gqlSubscriberControllersCompPtr[index]->UnRegisterSubscription(webSocketRequest->GetSubscriptionId())){
-
-			QByteArray data = QString(R""(
-{
-"type": "stop",
-"id": "%1"
-}
-			)"" ).arg(QString(webSocketRequest->GetSubscriptionId())).toUtf8();
-			
-			return CreateDataResponse(data, request);
-			break;
+		IGqlSubscriberController* controllerPtr = m_gqlSubscriberControllersCompPtr[index];
+		if (controllerPtr != nullptr){
+			QByteArray subscriptionId = webSocketRequest->GetSubscriptionId();
+			if (controllerPtr->UnRegisterSubscription(subscriptionId)){
+				QByteArray data = QString(R"({"type": "stop","id": "%1"})").arg(QString(subscriptionId)).toUtf8();
+				return CreateDataResponse(data, request);
+			}
 		}
 	}
 
-	QByteArray errorMessage = "Subscription Id missing";
+	QByteArray errorMessage = QByteArray("Unable to unregister subscription'. Error: Subscription is unregistered");
 	return CreateErrorResponse(errorMessage, request);
 }
 
@@ -273,6 +249,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(QByteArray d
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 	
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	QByteArray commandId = request.GetCommandId();
 
 	imtrest::ConstResponsePtr responsePtr(
 				engine.CreateResponse(
@@ -287,38 +264,24 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(QByteArray d
 
 imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const
 {
-	qDebug() << "CreateErrorResponse" << errorMessage << request.GetBody();
-	qDebug() << "request.GetRequestId()" << request.GetRequestId();
-
 	QByteArray requestBody = request.GetBody();
 	QJsonDocument document = QJsonDocument::fromJson(requestBody);
 	QJsonObject object = document.object();
 
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
-	QString body = QString(R""(
-{
-	"id": "%1",
-	"type": "error",
-	"payload": {
-		"errors": [
-			{
-				"errorType": "ProcessRequestError",
-				"message": "%2"
-			}
-		]
-	}
-}
-	)"" ).arg(object["id"].toString()).arg(QString(errorMessage));
+	QString body = QString(R"({"id": "%1","type": "error","payload": {"errors": [{"errorType": "ProcessRequestError","message": "%2"}]}})")
+							.arg(object["id"].toString())
+							.arg(QString(errorMessage));
 	
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
 	imtrest::ConstResponsePtr responsePtr(
-				engine.CreateResponse(
-							request,
-							imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
-							body.toUtf8(),
-							reponseTypeId));
+		engine.CreateResponse(
+			request,
+			imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
+			body.toUtf8(),
+			reponseTypeId));
 
 	SendErrorMessage(0, QString(errorMessage));
 

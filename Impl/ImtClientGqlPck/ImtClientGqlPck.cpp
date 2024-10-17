@@ -65,9 +65,9 @@ I_EXPORT_COMPONENT(
 			"GraphQl Hierarchical Structure Delegate");
 
 I_EXPORT_COMPONENT(
-	LoginStatusSubscriber,
-	"Login status subscriber",
-	"Login Status Subscriber");
+			ConnectionStatusSubscriber,
+			"Connection status subscriber",
+			"Connection Status Subscriber");
 
 
 } // namespace ImtClientGqlPck

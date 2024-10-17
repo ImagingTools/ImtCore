@@ -32,7 +32,6 @@ sdl::imtauth::Authorization::V1_0::CUserManagementPayload CAuthorizationOptionsC
 	sdl::imtauth::Authorization::V1_0::CUserManagementPayload payload;
 	int index = m_selectionParamCompPtr->GetSelectedOptionIndex();
 
-
 	switch (index) {
 	case UM_NO_USER_MANAGEMENT:
 		payload.SetUserMode(sdl::imtauth::Authorization::V1_0::CUserMode::UserModeFields::NO_USER_MANAGEMENT);
@@ -48,6 +47,7 @@ sdl::imtauth::Authorization::V1_0::CUserManagementPayload CAuthorizationOptionsC
 
 		break;
 	}
+
 	return payload;
 }
 

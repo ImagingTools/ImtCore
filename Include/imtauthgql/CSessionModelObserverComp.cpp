@@ -19,8 +19,6 @@ namespace imtauthgql
 void CSessionModelObserverComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-	QByteArray contextId = GetComponentContext()->GetContextId();
-
 
 	if (m_modelCompPtr.IsValid()){
 		m_modelCompPtr->AttachObserver(this);

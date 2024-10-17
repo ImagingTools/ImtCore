@@ -20,10 +20,6 @@ bool CBroadcastMessageConsumerSubscriberComp::IsMessageSupported(
 
 void CBroadcastMessageConsumerSubscriberComp::AddMessage(const MessagePtr& messagePtr)
 {
-	if (!m_requestManagerCompPtr.IsValid()){
-		return;
-	}
-
 	if (!m_commandIdsAttrPtr.IsValid() || m_commandIdsAttrPtr.GetCount() <= 0){
 		return;
 	}
@@ -31,7 +27,7 @@ void CBroadcastMessageConsumerSubscriberComp::AddMessage(const MessagePtr& messa
 	QString source = messagePtr->GetInformationSource();
 	QString message = messagePtr->GetInformationDescription();
 
-	QString data = QString("{\"source\": \"%1\", \"message\": \"%2\"}").arg(qPrintable(source)).arg(message);
+	QString data = QString("{\"source\": \"%1\", \"message\": \"%2\"}").arg(source).arg(message);
 
 	SetAllSubscriptions(m_commandIdsAttrPtr[0], data.toUtf8());
 }

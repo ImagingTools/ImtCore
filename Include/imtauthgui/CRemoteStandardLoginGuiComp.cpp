@@ -37,7 +37,7 @@ bool CRemoteStandardLoginGuiComp::eventFilter(QObject* watched, QEvent* event)
 		if (keyEventPtr != nullptr){
 			int pressedKey = keyEventPtr->key();
 
-			if ((pressedKey == Qt::Key_Return || pressedKey == Qt::Key_Enter)){
+			if (pressedKey == Qt::Key_Return || pressedKey == Qt::Key_Enter){
 				if (!isLogged){
 					on_LoginButton_clicked();
 					return true;
@@ -123,7 +123,7 @@ void CRemoteStandardLoginGuiComp::OnGuiCreated()
 	if (m_loginStatusProviderCompPtr.IsValid()){
 		m_loginStatusProviderObserver.RegisterObject(m_loginStatusProviderCompPtr.GetPtr(), &CRemoteStandardLoginGuiComp::OnConnectionStatusUpdate);
 
-		StackedWidget->setCurrentIndex(3);
+		StackedWidget->setCurrentIndex(US_WAIT_INDICATOR);
 	}
 	else{
 		OnConnectionStatusUpdate(istd::IChangeable::GetAnyChange(), nullptr);
@@ -181,7 +181,7 @@ void CRemoteStandardLoginGuiComp::on_LoginButton_clicked()
 	QString password = PasswordEdit->text();
 
 	if (m_loginCompPtr.IsValid()){
-		StackedWidget->setCurrentIndex(3);
+		StackedWidget->setCurrentIndex(US_WAIT_INDICATOR);
 
 		if (m_loginCompPtr->Login(userName, password)){
 			if (RememberMe->isChecked() == false){
@@ -195,7 +195,7 @@ void CRemoteStandardLoginGuiComp::on_LoginButton_clicked()
 			PasswordMessage->setText(tr("Login failed"));
 		}
 
-		StackedWidget->setCurrentIndex(0);
+		StackedWidget->setCurrentIndex(US_USER_PASSWORD_LOGIN);
 	}
 }
 
@@ -203,7 +203,7 @@ void CRemoteStandardLoginGuiComp::on_LoginButton_clicked()
 void CRemoteStandardLoginGuiComp::on_SetPasswordButton_clicked()
 {
 	if (m_superuserControllerCompPtr.IsValid()){
-		StackedWidget->setCurrentIndex(3);
+		StackedWidget->setCurrentIndex(US_WAIT_INDICATOR);
 
 		QString password = SuPasswordEdit->text();
 
@@ -251,10 +251,10 @@ void CRemoteStandardLoginGuiComp::OnSetSuPasswordFinished()
 {
 	CRemoteStandardLoginGuiComp::SetSuPasswordThread::ThreadState state = m_setSuPasswordThread.GetState();
 	if (state == CRemoteStandardLoginGuiComp::SetSuPasswordThread::ThreadState::TS_OK){
-		StackedWidget->setCurrentIndex(0);
+		StackedWidget->setCurrentIndex(US_USER_PASSWORD_LOGIN);
 	}
 	else if (state == CRemoteStandardLoginGuiComp::SetSuPasswordThread::ThreadState::TS_FAILED){
-		StackedWidget->setCurrentIndex(1);
+		StackedWidget->setCurrentIndex(US_ENTER_SU_PASSWORD);
 
 		QMessageBox::critical(GetWidget(), tr("User Management"), tr("Password for the super user could not be set"), QMessageBox::Close);
 	}
@@ -271,19 +271,23 @@ void CRemoteStandardLoginGuiComp::OnLoginUpdate(
 }
 
 
-void CRemoteStandardLoginGuiComp::OnConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtauth::ILoginStatusProvider* objectPtr)
+void CRemoteStandardLoginGuiComp::OnConnectionStatusUpdate(
+			const istd::IChangeable::ChangeSet& changeSet,
+			const imtcom::IConnectionStatusProvider* objectPtr)
 {
-	int loginStatus = (objectPtr != nullptr) ? objectPtr->GetLoginStatus() : imtauth::ILoginStatusProvider::LSF_LOGGED_IN;
+	imtcom::IConnectionStatusProvider::ConnectionStatus loginStatus =
+		(objectPtr != nullptr) ? objectPtr->GetConnectionStatus() : imtcom::IConnectionStatusProvider::CS_CONNECTED;
 
-	if (loginStatus == imtauth::ILoginStatusProvider::LSF_CACHED || loginStatus == 0){
-		// Disconnected
+	switch (loginStatus){
+	case imtcom::IConnectionStatusProvider::CS_UNKNOWN:
+	case imtcom::IConnectionStatusProvider::CS_DISCONNECTED:
 		NoConnection->setText(tr("No connection to the server"));
-		StackedWidget->setCurrentIndex(2);
-	}
-	else if (loginStatus == imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
+		StackedWidget->setCurrentIndex(US_NO_CONNECTION_TO_SERVER);
+		break;
+	case imtcom::IConnectionStatusProvider::CS_CONNECTED:
 		if (m_pumaLoginStatusProviderCompPtr.IsValid()){
-			int pumaLoginStatus = m_pumaLoginStatusProviderCompPtr->GetLoginStatus();
-			if (pumaLoginStatus != imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
+			int pumaLoginStatus = m_pumaLoginStatusProviderCompPtr->GetConnectionStatus();
+			if (pumaLoginStatus != imtcom::IConnectionStatusProvider::CS_CONNECTED){
 				OnPumaConnectionStatusUpdate(changeSet, m_pumaLoginStatusProviderCompPtr.GetPtr());
 				return;
 			}
@@ -293,26 +297,32 @@ void CRemoteStandardLoginGuiComp::OnConnectionStatusUpdate(const istd::IChangeab
 			QString errorMessage;
 			bool superuserExists = m_superuserProviderCompPtr->SuperuserExists(errorMessage);
 			if (superuserExists){
-				StackedWidget->setCurrentIndex(0);
+				StackedWidget->setCurrentIndex(US_USER_PASSWORD_LOGIN);
 			}
 			else{
-				StackedWidget->setCurrentIndex(1);
+				StackedWidget->setCurrentIndex(US_ENTER_SU_PASSWORD);
 			}
 		}
+		break;
 	}
 }
 
 
-void CRemoteStandardLoginGuiComp::OnPumaConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtauth::ILoginStatusProvider* objectPtr)
+void CRemoteStandardLoginGuiComp::OnPumaConnectionStatusUpdate(
+			const istd::IChangeable::ChangeSet& changeSet,
+			const imtcom::IConnectionStatusProvider* objectPtr)
 {
-	int loginStatus = objectPtr->GetLoginStatus();
-	if (loginStatus == imtauth::ILoginStatusProvider::LSF_CACHED || loginStatus == 0){
-		// Disconnected
-		NoConnection->setText(tr("No connection to the authorization server"));
-		StackedWidget->setCurrentIndex(2);
-	}
-	else if (loginStatus == imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
-		OnConnectionStatusUpdate(changeSet, m_loginStatusProviderCompPtr.GetPtr());
+	if (objectPtr != nullptr){
+		switch (objectPtr->GetConnectionStatus()){
+		case imtcom::IConnectionStatusProvider::CS_CONNECTED:
+			OnConnectionStatusUpdate(changeSet, m_loginStatusProviderCompPtr.GetPtr());
+			break;
+		case imtcom::IConnectionStatusProvider::CS_UNKNOWN:
+		case imtcom::IConnectionStatusProvider::CS_DISCONNECTED:
+			NoConnection->setText(tr("No connection to the authorization server"));
+			StackedWidget->setCurrentIndex(US_NO_CONNECTION_TO_SERVER);
+			break;
+		}
 	}
 }
 

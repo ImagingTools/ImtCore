@@ -28,6 +28,7 @@
 #include <imtgql/CSlaveSubscriberControllerComp.h>
 #include <imtgql/CGqlSearchControllerComp.h>
 #include <imtgql/CTableViewParamControllerComp.h>
+#include <imtgql/CConnectionStatusSubscriberControllerComp.h>
 
 
 /**
@@ -59,6 +60,7 @@ typedef imtgql::CBroadcastMessageConsumerSubscriberComp BroadcastMessageConsumer
 typedef imtgql::CSlaveSubscriberControllerComp SlaveSubscriberController;
 typedef imtgql::CGqlSearchControllerComp GqlSearchController;
 typedef imtgql::CTableViewParamControllerComp TableViewParamController;
+typedef imtgql::CConnectionStatusSubscriberControllerComp ConnectionStatusSubscriberController;
 
 
 } // namespace ImtGqlPck

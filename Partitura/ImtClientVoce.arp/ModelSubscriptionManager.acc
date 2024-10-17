@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5137" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394753" Description="Qt Framework"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -13,8 +13,8 @@
         <Element Id="SubscriptionController" PackageId="ImtClientGqlPck" ComponentId="ModelSubscriber">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Command" Type="Id" ExportId="SubscriptionCommandId">
-                        <Data IsEnabled="true" Value=""/>
+                    <AttributeInfo Id="Command" Type="Id[]" ExportId="SubscriptionCommandId">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -38,12 +38,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebSocketServerAddress" Type="Reference" ExportId="WebSocketServerAddress">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerLoginParam" Type="Id" ExportId="WebSocketServerLoginParam">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerPasswordParam" Type="Id" ExportId="WebSocketServerPasswordParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

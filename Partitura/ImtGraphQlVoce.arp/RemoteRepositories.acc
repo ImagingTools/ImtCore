@@ -2,37 +2,62 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5191" Description="ACF"/>
-            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="CachedGroupCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
+        <Element Id="GroupRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserGroupRepository"/>
+                    <AttributeInfo Id="Id" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Group"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="CachedRoleCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RoleRepository"/>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="CachedUserCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserRepository"/>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserGroupInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="/Puma"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriptionCommandId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnGroupsCollectionChanged</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GroupInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Group Info</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="WebSocketUrlParam">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -42,24 +67,9 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="RoleCollectionObserver" PackageId="ImtAuthGqlPck" ComponentId="SessionModelObserver">
-            <Data IsEnabled="true" Flags="1">
+        <Element Id="RoleRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Model" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RoleRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SessionChangeNotifier" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RolesSubscriberController"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="RoleRepository" PackageId="ImtClientVoce" ComponentId="GraphQLObjectCollection">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Id" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Role"/>
                     </AttributeInfo>
@@ -73,14 +83,18 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="/Puma"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerUrl" Type="Reference" ExportId="RemoteServerUrlParam">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SubscriptionCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="OnRolesCollectionChanged"/>
+                    <AttributeInfo Id="SubscriptionCommandId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnRolesCollectionChanged</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
@@ -96,54 +110,35 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerAddress" Type="Reference" ExportId="WebSocketServerAddress">
+                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="WebSocketUrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RolesSubscriberController" PackageId="ImtAuthGqlPck" ComponentId="SessionModelSubscriberController">
+        <Element Id="SessionInfo" PackageId="ImtAuthPck" ComponentId="SessionInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SlaveSubscriberController" PackageId="ImtGqlPck" ComponentId="SlaveSubscriberController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>OnRolesCollectionChanged</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserCollectionObserver" PackageId="ImtAuthGqlPck" ComponentId="SessionModelObserver">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Model" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SessionChangeNotifier" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UsersSubscriberController"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserGroupCollectionObserver" PackageId="ImtAuthGqlPck" ComponentId="SessionModelObserver">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Model" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserGroupRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SessionChangeNotifier" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserGroupsSubscriberController"/>
+                    <AttributeInfo Id="SubscriberController" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RoleRemoteRepository</Value>
+                                <Value>GroupRemoteRepository</Value>
+                                <Value>UserRemoteRepository</Value>
+                                <Value>UserSessionRemoteRepository</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -151,76 +146,6 @@
         <Element Id="UserGroupInfo" PackageId="ImtAuthPck" ComponentId="UserGroupInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="UserGroupRepository" PackageId="ImtClientVoce" ComponentId="GraphQLObjectCollection">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Id" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Group"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>UserGroupInfo</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="/Puma"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerUrl" Type="Reference" ExportId="RemoteServerUrlParam">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SubscriptionCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="OnGroupsCollectionChanged"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Group</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TypeNames" Type="Text[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Group Info</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerAddress" Type="Reference" ExportId="WebSocketServerAddress">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserGroupsSubscriberController" PackageId="ImtAuthGqlPck" ComponentId="SessionModelSubscriberController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>OnGroupsCollectionChanged</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">
@@ -232,12 +157,9 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserRepository" PackageId="ImtClientVoce" ComponentId="GraphQLObjectCollection">
-            <Data IsEnabled="true" Flags="1">
+        <Element Id="UserRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Id" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="User"/>
                     </AttributeInfo>
@@ -251,14 +173,18 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="/Puma"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerUrl" Type="Reference" ExportId="RemoteServerUrlParam">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SubscriptionCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="OnUsersCollectionChanged"/>
+                    <AttributeInfo Id="SubscriptionCommandId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnUsersCollectionChanged</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
@@ -274,29 +200,62 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerAddress" Type="Reference" ExportId="WebSocketServerAddress">
+                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="WebSocketUrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UsersSubscriberController" PackageId="ImtAuthGqlPck" ComponentId="SessionModelSubscriberController">
+        <Element Id="UserSessionRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>OnUsersCollectionChanged</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="Id" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Session"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SessionInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="/Puma"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriptionCommandId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnSessionCollectionChanged</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SessionInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Session Info</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="WebSocketUrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -304,13 +263,12 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>
+    </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="RoleRepository" ComponentId="CachedRoleCollection"/>
-        <Component ExportedId="RolesSubscriberController" ComponentId="RolesSubscriberController"/>
-        <Component ExportedId="UserGroupRepository" ComponentId="CachedGroupCollection"/>
-        <Component ExportedId="UserGroupsSubscriberController" ComponentId="UserGroupsSubscriberController"/>
-        <Component ExportedId="UserRepository" ComponentId="CachedUserCollection"/>
-        <Component ExportedId="UsersSubscriberController" ComponentId="UsersSubscriberController"/>
+        <Component ExportedId="RoleRemoteRepository" ComponentId="RoleRemoteRepository"/>
+        <Component ExportedId="UserRemoteRepository" ComponentId="UserRemoteRepository"/>
+        <Component ExportedId="UserSessionRemoteRepository" ComponentId="UserSessionRemoteRepository"/>
     </ExportedComponents>
 </Acf>

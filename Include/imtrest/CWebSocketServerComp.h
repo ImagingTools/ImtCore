@@ -7,7 +7,6 @@
 #include <QtCore/QSharedPointer>
 
 // ACF includes
-#include <istd/TPointerVector.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/IParamsSet.h>
 
@@ -16,10 +15,10 @@
 #include <imtrest/IRequest.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
-#include <imtrest/ISuscriberEngine.h>
+#include <imtrest/ISubscriberEngine.h>
 #include <imtrest/IRequestManager.h>
 #include <imtrest/CWebSocketSender.h>
-#include <imtauth/ILoginStatusProvider.h>
+#include <imtcom/IConnectionStatusProvider.h>
 #include <imtcom/ISslConfigurationManager.h>
 
 
@@ -35,7 +34,7 @@ class CWebSocketServerComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
 			virtual public IRequestManager,
-			virtual public imtauth::ILoginStatusProvider,
+			virtual public imtcom::IConnectionStatusProvider,
 			virtual public istd::IChangeable
 {
 	Q_OBJECT
@@ -44,7 +43,7 @@ public:
 
 	I_BEGIN_COMPONENT(CWebSocketServerComp);
 		I_REGISTER_INTERFACE(IRequestManager)
-		I_REGISTER_INTERFACE(imtauth::ILoginStatusProvider)
+		I_REGISTER_INTERFACE(imtcom::IConnectionStatusProvider)
 		I_ASSIGN(m_requestServerHandlerCompPtr, "RequestServerHandler", "Request handler registered for the server", true, "RequestServerHandler");
 		I_ASSIGN(m_requestClientHandlerCompPtr, "RequestClientHandler", "Request handler registered for the client", true, "RequestClientHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
@@ -62,8 +61,8 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
-	// reimplemented (imtauth::ILoginStatusProvider)
-	virtual int GetLoginStatus(const QByteArray& clientId = QByteArray()) const override;
+	// reimplemented (imtcom::IConnectionStatusProvider)
+	virtual ConnectionStatus GetConnectionStatus() const override;
 
 private:
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);
@@ -83,7 +82,7 @@ protected:
 	typedef QVector<QWebSocketServer*> Servers;
 	Servers m_servers;
 	QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
-	QMap <QByteArray, imtauth::ILoginStatusProvider::LoginStatusFlags> m_senderLoginStatusMap;
+	QMap <QByteArray, imtcom::IConnectionStatusProvider::ConnectionStatus> m_senderLoginStatusMap;
 
 private:
 	I_REF(imtrest::IRequestServlet, m_requestServerHandlerCompPtr);

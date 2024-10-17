@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5262" Description="ACF"/>
-            <Version Id="1" Number="2218" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>HTTP server framework</Description>
@@ -123,9 +123,9 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imod::IModel" ComponentId="WebSocketServer"/>
-        <Interface InterfaceId="imtauth::ILoginStatusProvider" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="imtclientgql::IGqlSubscriptionManager" ComponentId="SubscriptionManager"/>
+        <Interface InterfaceId="imtcom::IConnectionStatusProvider" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtrest::IProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
         <Interface InterfaceId="imtrest::IRequestManager" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="WebSocketServlet"/>

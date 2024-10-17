@@ -259,6 +259,11 @@ I_EXPORT_COMPONENT(
 			"Model update bridge",
 			"Model Update Bridge");
 
+I_EXPORT_COMPONENT(
+			DelegatedUrlParam,
+			"Delegated url param",
+			"Delegated Url Param");
+
 
 } // namespace ImtCorePck
 

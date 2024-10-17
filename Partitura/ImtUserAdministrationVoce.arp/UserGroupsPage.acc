@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5233" Description="ACF"/>
-            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -124,6 +124,9 @@
         <Element Id="SerializableGroupCollectionController" PackageId="ImtGqlPck" ComponentId="SerializableObjectCollectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Group"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -153,6 +156,9 @@
                         <Data IsEnabled="true" Value="UserGroupInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

@@ -46,6 +46,8 @@ bool CGqlSubscriberControllerCompBase::RegisterSubscription(
 		return false;
 	}
 
+	QByteArray commandId = m_commandIdsAttrPtr[0];
+
 	const imtrest::CWebSocketRequest* constWebSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
 	imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<imtrest::CWebSocketRequest*>(const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));
 	if (webSocketRequest == nullptr){
@@ -90,6 +92,8 @@ bool CGqlSubscriberControllerCompBase::UnRegisterSubscription(const QByteArray& 
 }
 
 
+// reimplemented (imtrest::IRequestEventHandler)
+
 void CGqlSubscriberControllerCompBase::OnRequestDestroyed(imtrest::IRequest* request)
 {
 	imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<imtrest::CWebSocketRequest*>(request);
@@ -108,10 +112,6 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 	}
 
 	if (!m_requestHandlerCompPtr.IsValid()){
-		return false;
-	}
-
-	if (!m_requestManagerCompPtr.IsValid()){
 		return false;
 	}
 
@@ -143,29 +143,7 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];
 			if (networkRequestPtr != nullptr){
-				QByteArray body = QString(R""(
-	{
-		"type": "data",
-		"id": "%1",
-		"payload": {
-			"data": %2
-		}
-	}
-		)"" ).arg(QString(id)).arg(QString(data)).toUtf8();
-				QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
-				const imtrest::IProtocolEngine&  engine = networkRequestPtr->GetProtocolEngine();
-
-				imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequestPtr, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
-				if (responsePtr.IsValid()){
-					const imtrest::ISender* senderPtr = m_requestManagerCompPtr->GetSender(networkRequestPtr->GetRequestId());
-					if (senderPtr != nullptr){
-						senderPtr->SendResponse(responsePtr);
-					}
-				}
-				else{
-					errorMessage = QString("Unable to create a response: '%1").arg(qPrintable(body));
-					SendErrorMessage(0, errorMessage, "CGqlSubscriberControllerCompBase");
-				}
+				SetData(id, "", data, *networkRequestPtr);
 			}
 		}
  	}
@@ -180,6 +158,10 @@ bool CGqlSubscriberControllerCompBase::SetData(
 			const QByteArray& data,
 			const imtrest::IRequest& networkRequest)
 {
+	if (!m_requestManagerCompPtr.IsValid()){
+		return false;
+	}
+
 	QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": {"%2": %3}}})")
 				.arg(qPrintable(id))
 				.arg(qPrintable(subscriptionId))
@@ -188,7 +170,8 @@ bool CGqlSubscriberControllerCompBase::SetData(
 	QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
 	const imtrest::IProtocolEngine& engine = networkRequest.GetProtocolEngine();
 
-	imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(networkRequest, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
+	imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(networkRequest,
+																imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
 	if (responsePtr.IsValid()){
 		const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest.GetRequestId());
 		if (sender != nullptr){
@@ -202,35 +185,15 @@ bool CGqlSubscriberControllerCompBase::SetData(
 
 bool CGqlSubscriberControllerCompBase::SetAllSubscriptions(const QByteArray& subscriptionId, const QByteArray& data)
 {
-	if (!m_requestManagerCompPtr.IsValid()){
-		return false;
-	}
-
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];
 			if (networkRequestPtr != nullptr){
-				QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": {"%2": %3}}})").arg(qPrintable(id)).arg(qPrintable(subscriptionId)).arg(qPrintable(data)).toUtf8();
-				QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
-				const imtrest::IProtocolEngine& engine = networkRequestPtr->GetProtocolEngine();
-
-				imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequestPtr, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
-				if (responsePtr.IsValid()){
-					const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequestPtr->GetRequestId());
-					if (sender != nullptr){
-						sender->SendResponse(responsePtr);
-					}
-				}
+				SetData(id, subscriptionId, data, *networkRequestPtr);
 			}
 		}
 	}
 
-	return true;
-}
-
-
-bool CGqlSubscriberControllerCompBase::StartInternalSubscriber(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/)
-{
 	return true;
 }
 

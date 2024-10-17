@@ -124,6 +124,11 @@ I_EXPORT_COMPONENT(
 			"Table view param controller",
 			"Table View Param Controller");
 
+I_EXPORT_COMPONENT(
+			ConnectionStatusSubscriberController,
+			"Connection status subscriber controller",
+			"Connection Status Subscriber Controller");
+
 
 } // namespace ImtGqlPck
 

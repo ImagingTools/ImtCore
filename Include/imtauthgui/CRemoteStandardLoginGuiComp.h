@@ -6,19 +6,16 @@
 
 // ACF includes
 #include <iauth/ILogin.h>
-#include <iauth/IRightsProvider.h>
 #include <iqt/ISettingsProvider.h>
-#include <iqtgui/IDialog.h>
 #include <iqtgui/TDesignerGuiCompBase.h>
 #include <iqtgui/TRestorableGuiWrap.h>
 #include <ilog/IMessageConsumer.h>
-#include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
+#include <imtbase/TModelUpdateBinder.h>
+#include <imtcom/IConnectionStatusProvider.h>
 #include <imtauth/ISuperuserController.h>
 #include <imtauth/ISuperuserProvider.h>
-#include <imtbase/TModelUpdateBinder.h>
-#include <imtauth/ILoginStatusProvider.h>
 #include <GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h>
 
 
@@ -31,6 +28,14 @@ class CRemoteStandardLoginGuiComp: public iqtgui::TRestorableGuiWrap<
 {
 	Q_OBJECT
 public:
+	enum UiState
+	{
+		US_USER_PASSWORD_LOGIN,
+		US_ENTER_SU_PASSWORD,
+		US_NO_CONNECTION_TO_SERVER,
+		US_WAIT_INDICATOR
+	};
+
 	typedef iqtgui::TRestorableGuiWrap<
 				iqtgui::TDesignerGuiCompBase<Ui::CRemoteStandardLoginGuiComp>> BaseClass;
 
@@ -73,8 +78,8 @@ private Q_SLOTS:
 
 private:
 	void OnLoginUpdate(const istd::IChangeable::ChangeSet& changeSet, const iauth::ILogin* objectPtr);
-	void OnConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtauth::ILoginStatusProvider* objectPtr);
-	void OnPumaConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtauth::ILoginStatusProvider* objectPtr);
+	void OnConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtcom::IConnectionStatusProvider* objectPtr);
+	void OnPumaConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtcom::IConnectionStatusProvider* objectPtr);
 	void UpdateLoginButtonsState();
 	void CheckMatchingPassword();
 
@@ -128,12 +133,12 @@ private:
 	I_REF(imtauth::ISuperuserController, m_superuserControllerCompPtr);
 	I_REF(iauth::ILogin, m_loginCompPtr);
 	I_REF(iqt::ISettingsProvider, m_settingsProviderCompPtr);
-	I_REF(imtauth::ILoginStatusProvider, m_loginStatusProviderCompPtr);
-	I_REF(imtauth::ILoginStatusProvider, m_pumaLoginStatusProviderCompPtr);
+	I_REF(imtcom::IConnectionStatusProvider, m_loginStatusProviderCompPtr);
+	I_REF(imtcom::IConnectionStatusProvider, m_pumaLoginStatusProviderCompPtr);
 
 	imtbase::TModelUpdateBinder<iauth::ILogin, CRemoteStandardLoginGuiComp> m_loginObserver;
-	imtbase::TModelUpdateBinder<imtauth::ILoginStatusProvider, CRemoteStandardLoginGuiComp> m_loginStatusProviderObserver;
-	imtbase::TModelUpdateBinder<imtauth::ILoginStatusProvider, CRemoteStandardLoginGuiComp> m_pumaLoginStatusProviderObserver;
+	imtbase::TModelUpdateBinder<imtcom::IConnectionStatusProvider, CRemoteStandardLoginGuiComp> m_loginStatusProviderObserver;
+	imtbase::TModelUpdateBinder<imtcom::IConnectionStatusProvider, CRemoteStandardLoginGuiComp> m_pumaLoginStatusProviderObserver;
 
 	LoginLog m_loginLog;
 	SetSuPasswordThread m_setSuPasswordThread;

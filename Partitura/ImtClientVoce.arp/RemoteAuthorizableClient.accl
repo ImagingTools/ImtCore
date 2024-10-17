@@ -2,15 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="PumaLoginStatusSubscriber" X="950" Y="400" Note=""/>
-        <Element ComponentName="Rights" X="140" Y="400" Note=""/>
-        <Element ComponentName="StandardLoginGui" X="560" Y="140" Note=""/>
+        <Element ComponentName="Rights" X="150" Y="400" Note=""/>
+        <Element ComponentName="StandardLoginGui" X="575" Y="150" Note=""/>
         <Element ComponentName="Subscription" X="550" Y="400" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

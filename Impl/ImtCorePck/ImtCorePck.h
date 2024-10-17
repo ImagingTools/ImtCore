@@ -54,6 +54,7 @@
 #include <imtbase/CTableViewParamRepresentationControllerComp.h>
 #include <imtbase/CTableViewParam.h>
 #include <imtbase/CModelUpdateBridgeComp.h>
+#include <imtbase/CDelegatedUrlParamComp.h>
 
 
 /**
@@ -127,6 +128,7 @@ typedef icomp::TModelCompWrap<
 						imtbase::ITableViewParam,
 						iser::ISerializable>> TableViewParam;
 typedef ibase::TModelObserverCompWrap<imtbase::CModelUpdateBridgeComp> ModelUpdateBridge;
+typedef icomp::TModelCompWrap<imtbase::CDelegatedUrlParamComp> DelegatedUrlParam;
 
 
 } // namespace ImtCorePck

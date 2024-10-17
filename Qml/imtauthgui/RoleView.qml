@@ -16,10 +16,6 @@ ViewBase {
 
     property RoleData roleData: model ? model : null;
 
-    onPermissionsModelChanged: {
-        console.log("Role onPermissionsModelChanged", permissionsModel.toJson());
-    }
-
     function updateGui(){
         generalGroup.updateGui();
         permissionsGroup.updateGui()
@@ -41,71 +37,53 @@ ViewBase {
 
     CustomScrollbar {
         id: scrollbar;
-
         z: parent.z + 1;
-
         anchors.right: parent.right;
         anchors.top: flickable.top;
         anchors.bottom: flickable.bottom;
-
-        secondSize: 10;
+        secondSize: Style.size_mainMargin;
         targetItem: flickable;
     }
 
     CustomScrollbar{
         id: scrollHoriz;
-
         z: parent.z + 1;
-
         anchors.left: flickable.left;
         anchors.right: flickable.right;
         anchors.bottom: flickable.bottom;
-
-        secondSize: 10;
-
+        secondSize: Style.size_mainMargin;
         vertical: false;
         targetItem: flickable;
     }
 
     Flickable {
         id: flickable;
-
         anchors.top: parent.top;
         anchors.topMargin: Style.size_largeMargin;
-
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: Style.size_largeMargin;
-
         anchors.left: parent.left;
         anchors.leftMargin: Style.size_largeMargin;
-
         anchors.right: scrollbar.left;
         anchors.rightMargin: Style.size_largeMargin;
-
         contentWidth: bodyColumn.width;
         contentHeight: bodyColumn.height + 2 * Style.size_largeMargin;
-
         boundsBehavior: Flickable.StopAtBounds;
-
         clip: true;
 
         Column {
             id: bodyColumn;
-
             width: 700;
-
             spacing: Style.size_largeMargin;
 
             GroupHeaderView {
                 width: parent.width;
-
                 title: qsTr("General");
                 groupView: generalGroup;
             }
 
             GroupElementView {
                 id: generalGroup;
-
                 width: parent.width;
 
                 TextInputElementView {

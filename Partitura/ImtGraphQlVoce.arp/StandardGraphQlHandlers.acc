@@ -2,37 +2,69 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5241" Description="ACF"/>
-            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Server framework for GraphQL-based implementations</Description>
     <Keywords>Web GraphQL Server HTTP</Keywords>
     <ElementsList>
-        <Element Id="BroadcastMessageConsumerController" PackageId="ImtGqlPck" ComponentId="BroadcastMessageConsumerController">
+        <Element Id="DelegatedBinaryDataProviders" PackageId="ImtCorePck" ComponentId="DelegatedBinaryDataProviders">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>BroadCastMessage</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MessageConsumer" Type="Reference" ExportId="MessageConsumer">
+                    <AttributeInfo Id="SlaveBinaryDataProviders" Type="Reference[]" ExportId="BinaryDataProviders">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="DelegatedBinaryDataProviders" PackageId="ImtCorePck" ComponentId="DelegatedBinaryDataProviders">
+        <Element Id="FileAccess" PackageId="ImtRestPck" ComponentId="HttpFileControllerServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="SlaveBinaryDataProviders" Type="Reference[]" ExportId="BinaryDataProviders">
+                    <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="BinaryDataControllers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BinaryDataProviders" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>DelegatedBinaryDataProviders</Value>
+                                <Value>LogFileDataProvider</Value>
+                                <Value>ServerLogDataProvider</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="FileAccessCommandId">
+                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/files/*"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GqlContextController" PackageId="ImtGqlPck" ComponentId="GqlContextController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -47,14 +79,13 @@
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="GqlContextController" Type="Reference" ExportId="GqlContextController">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="GqlContextController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GqlContextController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlRequestHandler" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>SlaveGraphQLDemultiplexer</Value>
-                                <Value>BroadcastMessageConsumerController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -64,7 +95,7 @@
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -81,6 +112,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RedirectToCommandId" Type="Id" ExportId="RedirectToCommandId">
                         <Data IsEnabled="true" Value="&lt;ProductName&gt;/Views/html/index.html?item=Pages/StartPage.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -105,10 +139,13 @@
                             <Values>
                                 <Value>WebResourcesServlet</Value>
                                 <Value>GraphQlRoot</Value>
-                                <Value>ServerLogFileAccess</Value>
+                                <Value>FileAccess</Value>
                                 <Value>HttpRedirect</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -125,6 +162,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -138,6 +178,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -167,6 +210,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -182,31 +228,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ServerLogFileAccess" PackageId="ImtRestPck" ComponentId="HttpFileControllerServlet">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="BinaryDataControllers">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="BinaryDataProviders" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>DelegatedBinaryDataProviders</Value>
-                                <Value>LogFileDataProvider</Value>
-                                <Value>ServerLogDataProvider</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="FileAccessCommandId">
-                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/files/*"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -219,6 +241,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -242,6 +267,9 @@
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

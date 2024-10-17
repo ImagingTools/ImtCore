@@ -8,7 +8,6 @@
 #include <iprm/IOptionsList.h>
 
 // ImtCore includes
-#include <imtauth/IUserSettings.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
 #include <imtrest/IProtocolEngine.h>
@@ -21,19 +20,19 @@ namespace imtgql
 // reimplemented (imtrest::IRequestServlet)
 
 imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
-		const QByteArray& /*commandId*/,
-		const imtrest::IRequest::CommandParams& /*commandParams*/,
-		const HeadersMap& headers,
-		const imtrest::CHttpRequest& request) const
+			const QByteArray& /*commandId*/,
+			const imtrest::IRequest::CommandParams& /*commandParams*/,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
 {
 	m_lastRequest.ResetData();
 
 	int errorPosition = -1;
 	QByteArray requestBody = request.GetBody();
 	if (!m_lastRequest.ParseQuery(requestBody, errorPosition)){
-		qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: '%1'; Error position: '%2'")
-					   .arg(qPrintable(request.GetBody()))
-					   .arg(errorPosition);
+			qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: '%1'; Error position: '%2'")
+						.arg(qPrintable(request.GetBody()))
+						.arg(errorPosition);
 	}
 
 	QByteArray gqlCommand = m_lastRequest.GetCommandId();
@@ -68,48 +67,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		QString message = QString("There is no authentication token in the HTTP headers. Info: Command: '%1'").arg(qPrintable(gqlCommand));
 		qDebug() << message;
 		SendWarningMessage(0, message, "GraphQL - servlet");
-	}
-
-	QByteArray languageId;
-	QByteArray designSchemeId;
-
-	if (m_userSettingsCollectionCompPtr.IsValid()){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
-			imtauth::IUserSettings* userSettingsPtr = dynamic_cast<imtauth::IUserSettings*>(dataPtr.GetPtr());
-			if (userSettingsPtr != nullptr){
-				iprm::IParamsSet* paramsSetPtr = userSettingsPtr->GetSettings();
-				if (paramsSetPtr != nullptr){
-					iprm::TParamsPtr<iprm::ISelectionParam> languageParamPtr(paramsSetPtr, "Language");
-					if (languageParamPtr.IsValid()){
-						const iprm::IOptionsList* optionListPtr = languageParamPtr->GetSelectionConstraints();
-						if (optionListPtr != nullptr){
-							int index = languageParamPtr->GetSelectedOptionIndex();
-							if (index >= 0){
-								languageId = optionListPtr->GetOptionId(index);
-							}
-						}
-					}
-
-					iprm::TParamsPtr<iprm::ISelectionParam> designParamPtr(paramsSetPtr, "DesignSchema");
-					if (designParamPtr.IsValid()){
-						const iprm::IOptionsList* optionListPtr = designParamPtr->GetSelectionConstraints();
-						if (optionListPtr != nullptr){
-							int index = designParamPtr->GetSelectedOptionIndex();
-							if (index >= 0){
-								designSchemeId = optionListPtr->GetOptionId(index);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	if (gqlContextPtr != nullptr){
-		gqlContextPtr->SetLanguageId(languageId);
-		gqlContextPtr->SetDesignScheme(designSchemeId);
-		gqlContextPtr->SetHeaders(headers);
 	}
 
 	QByteArray responseData;
@@ -205,19 +162,19 @@ const IGqlRequest* CHttpGraphQLServletComp::GetGqlRequest() const
 // private methods
 
 imtrest::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
-		const imtrest::IProtocolEngine::StatusCode& statusCode,
-		const QByteArray& payload,
-		const imtrest::IRequest& request,
-		const QByteArray& contentTypeId) const
+			const imtrest::IProtocolEngine::StatusCode& statusCode,
+			const QByteArray& payload,
+			const imtrest::IRequest& request,
+			const QByteArray& contentTypeId) const
 {
 	return imtrest::ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, contentTypeId));
 }
 
 
 imtrest::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
-		const imtrest::IProtocolEngine::StatusCode& errorCode,
-		const QString& /*errorString*/,
-		const imtrest::CHttpRequest& request) const
+			const imtrest::IProtocolEngine::StatusCode& errorCode,
+			const QString& /*errorString*/,
+			const imtrest::CHttpRequest& request) const
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 

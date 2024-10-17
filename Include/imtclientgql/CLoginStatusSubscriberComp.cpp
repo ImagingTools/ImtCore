@@ -26,12 +26,16 @@ void CLoginStatusSubscriberComp::OnResponseReceived(
 			const QByteArray& subscriptionId,
 			const QByteArray& subscriptionData)
 {
+	if (m_commandAttrPtr.GetCount() <= 0){
+		return;
+	}
+
 	if (subscriptionId == m_subscriptionId){
 		QJsonDocument document = QJsonDocument::fromJson(subscriptionData);
 		QJsonObject subscriptionObject = document.object();
 
-		if (subscriptionObject.contains(*m_commandAttrPtr)){
-			QJsonObject dataObject = subscriptionObject.value(*m_commandAttrPtr).toObject();
+		if (subscriptionObject.contains(m_commandAttrPtr[0])){
+			QJsonObject dataObject = subscriptionObject.value(m_commandAttrPtr[0]).toObject();
 			if (dataObject.contains("status")){
 				istd::CChangeNotifier changeNotifier(this);
 

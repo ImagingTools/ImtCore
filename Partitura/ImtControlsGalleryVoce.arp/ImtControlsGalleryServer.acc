@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5134" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -17,9 +17,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LogPath" Type="Reference" ExportId="LogPath">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -39,9 +36,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="StartWebSocketServerOnCreate" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="1"/>

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5229" Description="ACF"/>
-            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -19,10 +19,13 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteContextGQLServerFramework" PackageId="ImtHttpServerVoce" ComponentId="GraphQlServerFramework">
+        <Element Id="RemoteContextGQLServerFramework" PackageId="ImtGraphQlVoce" ComponentId="StandardGraphQlHandlers">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="FileAccessCommandId" Type="Id" ExportId="">

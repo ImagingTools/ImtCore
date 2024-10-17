@@ -22,7 +22,7 @@ public:
 	/**
 		Send a request to the server.
 	*/
-	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* = nullptr) const = 0;
+	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const = 0;
 };
 
 

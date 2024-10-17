@@ -23,7 +23,6 @@ public:
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestProvider);
 		I_ASSIGN_MULTI_0(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "Handler for GraphQL-request", true);
 		I_ASSIGN(m_gqlContextControllerCompPtr, "GqlContextController", "GraphQL-related context controller", false, "GqlContextController");
-		I_ASSIGN(m_userSettingsCollectionCompPtr, "UserSettingsCollection", "User settings collection", false, "UserSettingsCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -32,6 +31,7 @@ protected:
 
 	// reimplemented (imtgql::IGqlRequestProvider)
 	virtual const IGqlRequest* GetGqlRequest() const override;
+
 private:
 	imtrest::ConstResponsePtr CreateResponse(
 				const imtrest::IProtocolEngine::StatusCode& statusCode,
@@ -46,7 +46,6 @@ private:
 private:
 	I_MULTIREF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
 	I_REF(imtgql::IGqlContextController, m_gqlContextControllerCompPtr);
-	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
 
 private:
 	mutable imtgql::CGqlRequest m_lastRequest;

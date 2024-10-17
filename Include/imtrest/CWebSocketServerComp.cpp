@@ -8,7 +8,6 @@
 
 // ImtCore includes
 #include <imtrest/CWebSocketRequest.h>
-#include <imtauth/ILoginStatusProvider.h>
 
 
 namespace imtrest
@@ -57,9 +56,15 @@ void CWebSocketServerComp::OnComponentCreated()
 }
 
 
-int CWebSocketServerComp::GetLoginStatus(const QByteArray& clientId) const
+// IClientConnectionStatus
+
+
+// reimplemented (imtcom::IConnectionStatusProvider)
+
+imtcom::IConnectionStatusProvider::ConnectionStatus CWebSocketServerComp::GetConnectionStatus() const
 {
-	return m_senderLoginStatusMap.value(clientId, imtauth::ILoginStatusProvider::LSF_CACHED);
+	// return m_senderLoginStatusMap.value(clientId, imtauth::ILoginStatusProvider::LSF_CACHED);
+	return imtcom::IConnectionStatusProvider::CS_UNKNOWN;
 }
 
 
@@ -75,7 +80,9 @@ bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 p
 
 	if (m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
 		QSslConfiguration sslConfiguration;
-		iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(m_sslConfigurationCompPtr.GetPtr(), imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
+		iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(
+					m_sslConfigurationCompPtr.GetPtr(),
+					imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
 		if (sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled()){
 			if (m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration)){
 				webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::SecureMode,this));
@@ -150,12 +157,11 @@ void CWebSocketServerComp::OnSocketDisconnected()
 		m_subscriberEngineCompPtr->UnRegisterSubscriber(socketObjectPtr);
 	}
 
-	for (QByteArray key: m_senders.keys()){
+	for (const QByteArray& key: m_senders.keys()){
 		if (socketObjectPtr == m_senders[key]->GetSocket()){
 			m_senders.remove(key);
 
-			int loginStatus = 0;
-			istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QObject::tr("Logout"));
+			istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
 			loginChangeSet.SetChangeInfo("ClientId", key);
 			istd::CChangeNotifier notifier(this, &loginChangeSet);
 			m_senderLoginStatusMap.remove(key);
@@ -181,6 +187,7 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 	}
 
 	QString message = QString("Web socket text message received: %1").arg(textMessage);
+	qDebug() << "OnWebSocketTextMessage" << message;
 	SendVerboseMessage(message, "CWebSocketServerComp");
 
 	istd::TDelPtr<IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(*m_requestServerHandlerCompPtr.GetPtr());
@@ -211,13 +218,13 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 		}
 		else{
 			if (methodType == CWebSocketRequest::MT_CONNECTION_INIT){
-				int loginStatus = imtauth::ILoginStatusProvider::LSF_LOGGED_IN;
+				imtcom::IConnectionStatusProvider::ConnectionStatus loginStatus = imtcom::IConnectionStatusProvider::CS_CONNECTED;
 				QByteArray clientId = webSocketRequest->GetClientId();
-				istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QObject::tr("Login"));
+				istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QString("Login"));
 				loginChangeSet.SetChangeInfo("ClientId", clientId);
 				istd::CChangeNotifier notifier(this, &loginChangeSet);
 
-				m_senderLoginStatusMap.insert(clientId, imtauth::ILoginStatusProvider::LSF_LOGGED_IN);
+				m_senderLoginStatusMap.insert(clientId, loginStatus);
 
 				if (!clientId.isEmpty()){
 					newRequestPtr.PopPtr();
@@ -240,7 +247,7 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 
 void CWebSocketServerComp::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
 {
-	QString message = QString("Web socket binary message received: %1").arg(qPrintable(dataMessage));
+	QString message = QString("Web socket binary message received: '%1'").arg(qPrintable(dataMessage));
 	SendInfoMessage(0, message, "CWebSocketServerComp");
 }
 
@@ -249,7 +256,7 @@ void CWebSocketServerComp::OnError(QAbstractSocket::SocketError /*error*/)
 {
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 	if (webSocketPtr != nullptr){
-		QString errorMessage = QString("Web socket server error: %1").arg(webSocketPtr->errorString());
+		QString errorMessage = QString("Web socket server error: '%1'").arg(webSocketPtr->errorString());
 
 		SendErrorMessage(0, errorMessage, "CWebSocketServerComp");
 	}
@@ -282,7 +289,7 @@ void CWebSocketServerComp::OnSslErrors(const QList<QSslError> &errors)
 {
 	QString errorMessage;
 
-	for (QSslError error: errors){
+	for (const QSslError& error: errors){
 		if (!errorMessage.isEmpty()){
 			errorMessage += " ";
 		}

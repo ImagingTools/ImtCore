@@ -16,17 +16,12 @@
 #include <imtrest/CWebSocketRequest.h>
 #include <imtgql/CGqlResponse.h>
 
+
 namespace imtclientgql
 {
 
 
 // public methods
-
-CSubscriptionManagerComp::CSubscriptionManagerComp()
-	:m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
-{
-}
-
 
 // reimplemented (imtgql::IGqlSubscriptionManager)
 
@@ -34,6 +29,10 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 			const imtgql::IGqlRequest& subscriptionRequest,
 			imtclientgql::IGqlSubscriptionClient* subscriptionClient)
 {
+	if (!m_connectionStatusProviderCompPtr.IsValid()){
+		return QByteArray();
+	}
+
 	if (!subscriptionClient){
 		return QByteArray();
 	}
@@ -65,8 +64,8 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 	locker.unlock();
 
-	if (m_loginStatus == imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
-		ServiceManagerRegister(*requestImplPtr, subscriptionId.toLocal8Bit());
+	if (m_connectionStatusProviderCompPtr->GetConnectionStatus() == imtcom::IConnectionStatusProvider::CS_CONNECTED){
+		SubscriptionRegister(*requestImplPtr, subscriptionId.toLocal8Bit());
 	}
 
 	return subscriptionId.toLocal8Bit();
@@ -89,25 +88,23 @@ bool CSubscriptionManagerComp::UnregisterSubscription(const QByteArray& subscrip
 
 void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	if (!m_loginStatusCompPtr.IsValid()){
+	if (!m_connectionStatusProviderCompPtr.IsValid()){
 		return;
 	}
 
 	QMutexLocker locker(&m_registeredClientsMutex);
 
-	m_loginStatus = (imtauth::ILoginStatusProvider::LoginStatusFlags)m_loginStatusCompPtr->GetLoginStatus();
-
 	QByteArray clientId = changeSet.GetChangeInfo("ClientId").toByteArray();
 
-	for (QByteArray subscriptionId : m_registeredClients.keys()){
-		if (m_loginStatus != imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
+	for (const QByteArray& subscriptionId : m_registeredClients.keys()){
+		if (!changeSet.Contains(imtcom::IConnectionStatusProvider::CS_CONNECTED)){
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
 				m_registeredClients[subscriptionId].m_status = imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION;
 			}
 		}
 		else{
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
-				ServiceManagerRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
+				SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
 			}
 		}
 	}
@@ -132,16 +129,13 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 	if (webSocketRequest != nullptr){
 		QByteArray message = webSocketRequest->GetBody();
 
-		qDebug() << "ProcessRequest: " << message;
-		qDebug() << "MethodType: " << webSocketRequest->GetMethodType();
-
 		QJsonParseError jsonError;
 		QJsonDocument jsonDocument = QJsonDocument::fromJson(message, &jsonError);
 		if (jsonDocument.isNull()){
 			QByteArray errorMessage = QString("Unable to convert message to JSON: '%1'").arg(qPrintable(jsonError.errorString())).toUtf8();
 			qDebug() << errorMessage;
-			locker.unlock();
 
+			locker.unlock();
 			return CreateErrorResponse(errorMessage, request);
 		}
 
@@ -150,15 +144,13 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		switch (webSocketRequest->GetMethodType())
 		{
 		case imtrest::CWebSocketRequest::MT_CONNECTION_ASK:
-			m_loginStatus = imtauth::ILoginStatusProvider::LSF_LOGGED_IN;
-
-			for (QByteArray subscriptionId : m_registeredClients.keys()){
+			for (const QByteArray& subscriptionId : m_registeredClients.keys()){
 				if (m_registeredClients[subscriptionId].m_status == imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION){
-					istd::TDelPtr<istd::IChangeable> ichangeablePtr(m_registeredClients[subscriptionId].m_request.CloneMe());
+					istd::TDelPtr<istd::IChangeable> objectPtr(m_registeredClients[subscriptionId].m_request.CloneMe());
 					locker.unlock();
-					imtgql::CGqlRequest* requestPtr = dynamic_cast<imtgql::CGqlRequest*>(ichangeablePtr.GetPtr());
+					imtgql::CGqlRequest* requestPtr = dynamic_cast<imtgql::CGqlRequest*>(objectPtr.GetPtr());
 					if (requestPtr != nullptr){
-						ServiceManagerRegister(*requestPtr, subscriptionId);
+						SubscriptionRegister(*requestPtr, subscriptionId);
 					}
 					locker.relock();
 				}
@@ -172,10 +164,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 				for (imtclientgql::IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
 					if (subscriptionClientPtr != nullptr){
-						imtclientgql::IGqlSubscriptionClient::SubscriptionStatus status = m_registeredClients[subscriptionId].m_status;
-						locker.unlock();
-						subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, status, message);
-						locker.relock();
+						subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, m_registeredClients[subscriptionId].m_status, message);
 					}
 				}
 			}
@@ -188,8 +177,6 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 				for (imtclientgql::IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
 					if (subscriptionClientPtr != nullptr){
 						if (!rootObject.contains("payload")){
-							qDebug() << "rootObject not contains 'payload'";
-
 							break;
 						}
 
@@ -197,8 +184,6 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 						QJsonDocument document;
 						document.setObject(payloadObject);
-
-						qDebug() << "document" << document.toJson();
 
 						QByteArray payload = document.toJson(QJsonDocument::Compact);
 
@@ -261,8 +246,6 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
-	qDebug() << "SendRequest" << key;
-
 	QJsonObject dataObject;
 	dataObject["type"] = "query";
 	dataObject["id"] = key;
@@ -305,8 +288,6 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 		}
 	}
 
-	qDebug() << "resultCode" << resultCode << key;
-
 	if(resultCode == 1){
 		QMutexLocker queryLocker(&m_queryDataMapMutex);
 
@@ -328,7 +309,7 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 
 // protected methods
 
-void CSubscriptionManagerComp::ServiceManagerRegister(const imtgql::CGqlRequest& subscriptionRequest, QByteArray subscriptionId) const
+void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, QByteArray subscriptionId) const
 {
 	if (!m_engineCompPtr.IsValid()){
 		Q_ASSERT(0);
@@ -396,8 +377,8 @@ void CSubscriptionManagerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_webLoginStatusModelCompPtr.IsValid()){
-		m_webLoginStatusModelCompPtr->AttachObserver(this);
+	if (m_connectionStatusProviderModelCompPtr.IsValid()){
+		m_connectionStatusProviderModelCompPtr->AttachObserver(this);
 	}
 }
 
@@ -410,20 +391,10 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(QByteArr
 
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
-	QString body = QString(R""(
-{
-	"id": "%1",
-	"type": "error",
-	"payload": {
-		"errors": [
-			{
-				"errorType": "ProcessRequestError",
-				"message": "%2"
-			}
-		]
-	}
-}
-	)"" ).arg(object["id"].toString()).arg(QString(errorMessage));
+	QString body =
+		QString(R"({"id": "%1","type": "error","payload": {"errors": [{"errorType": "ProcessRequestError","message": "%2"}]}})")
+						.arg(object["id"].toString())
+						.arg(QString(errorMessage));
 
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 

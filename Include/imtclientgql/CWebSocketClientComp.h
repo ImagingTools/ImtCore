@@ -12,12 +12,12 @@
 
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
-#include <imtauth/ILogin.h>
+#include <imtcom/IConnectionController.h>
+#include <imtcom/IConnectionStatusProvider.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/ISender.h>
 #include <imtrest/IRequestManager.h>
-#include <imtgql/IGqlRequest.h>
 #include <imtclientgql/IGqlClient.h>
 
 
@@ -29,7 +29,8 @@ class CWebSocketClientComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
 			virtual public imtrest::ISender,
-			virtual public imtauth::ILogin,
+			virtual public imtcom::IConnectionController,
+			virtual public imtcom::IConnectionStatusProvider,
 			virtual public imtrest::IRequestManager,
 			virtual public imtclientgql::IGqlClient
 {
@@ -40,16 +41,16 @@ public:
 	I_BEGIN_COMPONENT(CWebSocketClientComp);
 		I_REGISTER_INTERFACE(ISender)
 		I_REGISTER_INTERFACE(IRequestManager)
-		I_REGISTER_INTERFACE(imtauth::ILoginStatusProvider)
-		I_REGISTER_INTERFACE(imtauth::ILogin)
+		I_REGISTER_INTERFACE(imtcom::IConnectionStatusProvider)
+		I_REGISTER_INTERFACE(imtcom::IConnectionController)
 		I_REGISTER_INTERFACE(imtclientgql::IGqlClient)
 		I_ASSIGN(m_serverRequestHandlerCompPtr, "ServerRequestHandler", "Request handler registered for the server", false, "ServerRequestHandler");
 		I_ASSIGN(m_clientRequestHandlerCompPtr, "ClientRequestHandler", "Request handler registered for the client", false, "ClientRequestHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
 		I_ASSIGN(m_connectOnCreateAttrPtr, "ConnectOnCreate", "If enabled, the client will be connect to server on after component creation", true, true);
 		I_ASSIGN(m_webSocketServerAddressCompPtr, "WebSocketServerAddress", "Parameter providing the websocket-server address to be connected", true, "WebSocketServerAddress");
-		I_ASSIGN(m_serverLoginAttrPtr, "ServerLoginParam", "Parameter providing the server login to be connected", false, "ServerLoginParam");
-		I_ASSIGN(m_serverPasswordAttrPtr, "ServerPasswordParam", "Parameter providing the server password to be connected", false, "ServerPasswordParam");
+		I_ASSIGN(m_serverLoginAttrPtr, "ServerLoginParam", "Parameter providing the server login to be connected", false, "");
+		I_ASSIGN(m_serverPasswordAttrPtr, "ServerPasswordParam", "Parameter providing the server password to be connected", false, "");
 		I_ASSIGN(m_clientIdAttrPtr, "ClientId", "ID of the client that needs to be identified on the server", false, "");
 		I_ASSIGN(m_clientIdCompPtr, "ClientIdParam", "Parameter providing the client-ID that needs to be identified on the server", false, "ClientIdParam");
 	I_END_COMPONENT;
@@ -57,22 +58,21 @@ public:
 	CWebSocketClientComp();
 
 	// reimplemented (imtclientgql::IGqlClient)
-	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* = nullptr) const override;
+	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 	// reimplemented (imtrest::ISender)
 	virtual bool SendResponse(imtrest::ConstResponsePtr& response) const override;
 	virtual bool SendRequest(imtrest::ConstRequestPtr& request) const override;
 
-	// reimplemented (imtauth::ILoginStatusProvider)
-	virtual int GetLoginStatus(const QByteArray& clientId = QByteArray()) const override;
+	// reimplemented (imtcom::IConnectionStatusProvider)
+	virtual ConnectionStatus GetConnectionStatus() const override;
 
 	// reimplemented (imtrest::IRequestManager)
 	virtual const imtrest::ISender* GetSender(const QByteArray& requestId) const override;
 
-	// reimplemented (imtauth::ILogin)
-	virtual QByteArray GetLoggedUserId() const override;
-	virtual bool Login(const QByteArray& userId, const QString& password) override;
-	virtual bool Logout() override;
+	// reimplemented (imtcom::IConnectionController)
+	virtual bool Connect() override;
+	virtual bool Disconnect() override;
 
 protected:
 	QByteArray Sign(const QByteArray& message, const QByteArray& key = "") const;
@@ -83,13 +83,13 @@ protected:
 
 Q_SIGNALS:
 	void EmitQueryDataReceived(int resultCode = 1);
-	void EmitAgentinoDisconnect(QWebSocketProtocol::CloseCode closeCode = QWebSocketProtocol::CloseCodeNormal,
+	void EmitWebSocketClose(QWebSocketProtocol::CloseCode closeCode = QWebSocketProtocol::CloseCodeNormal,
 							const QString &reason = QString());
 	void EmitStopTimer();
 	void EmitStartTimer();
 
 private Q_SLOTS:
-	void OnConnectedTimer();
+	void OnTimeout();
 	void OnWebSocketConnected();
 	void OnWebSocketDisconnected();
 	void OnWebSocketError(QAbstractSocket::SocketError error);
@@ -97,6 +97,8 @@ private Q_SLOTS:
 	void OnWebSocketBinaryMessageReceived(const QByteArray& message);
 
 private:
+	virtual void EnsureWebSocketConnection();
+
 	class NetworkOperation
 	{
 	public:
@@ -108,8 +110,6 @@ private:
 		bool timerFlag;
 		QTimer timer;
 	};
-
-	virtual void Connect();
 
 private:
 	I_REF(imtrest::IRequestServlet, m_serverRequestHandlerCompPtr);
@@ -125,7 +125,7 @@ private:
 	I_ATTR(QByteArray, m_clientIdAttrPtr);
 
 	mutable QWebSocket m_webSocket;
-	imtauth::ILoginStatusProvider::LoginStatusFlags m_loginStatus;
+	imtcom::IConnectionStatusProvider::ConnectionStatus m_connectionStatus;
 	QTimer m_refreshTimer;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
 	istd::TPointerVector<imtrest::IRequest> m_startQueries;

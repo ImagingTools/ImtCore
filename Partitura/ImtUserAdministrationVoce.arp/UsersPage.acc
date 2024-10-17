@@ -2,39 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5244" Description="ACF"/>
-            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="CollectionUserInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="CollectionUserInfoProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>GetUserInfo</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="CredentialController" PackageId="ImtAuthPck" ComponentId="CredentialController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -57,7 +32,6 @@
                                 <Value>UsersCommands</Value>
                                 <Value>UserListController</Value>
                                 <Value>UserController</Value>
-                                <Value>CollectionUserInfoProvider</Value>
                                 <Value>SerializableUserCollectionController</Value>
                             </Values>
                         </Data>
@@ -76,27 +50,11 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="SerializableUserCollectionController" PackageId="ImtGqlPck" ComponentId="SerializableObjectCollectionController">
+        <Element Id="SerializableUserCollectionController" PackageId="ImtAuthGqlPck" ComponentId="UserSerializableCollectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>UserInfo</Value>
-                                <Value>UserDataMetaInfo</Value>
-                                <Value>UserMetaInfo</Value>
-                                <Value>UserList</Value>
-                                <Value>UserView</Value>
-                                <Value>UserRemove</Value>
-                                <Value>UserSetDescription</Value>
-                                <Value>UserAdd</Value>
-                                <Value>UserUpdate</Value>
-                                <Value>UserItem</Value>
-                                <Value>UserCount</Value>
-                                <Value>UserIds</Value>
-                                <Value>UserSubCollection</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="User"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -108,6 +66,9 @@
                         <Data IsEnabled="true" Value="UserInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

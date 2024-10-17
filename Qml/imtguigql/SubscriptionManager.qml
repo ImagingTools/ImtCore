@@ -58,6 +58,7 @@ WebSocket {
     }
 
     onTextMessageReceived:{
+        console.log("SubscriptionManager onTextMessageReceived", message);
         let ok = socketModel.createFromJson(message)
 
         if (socketModel.getData("type") === "connection_ask"){

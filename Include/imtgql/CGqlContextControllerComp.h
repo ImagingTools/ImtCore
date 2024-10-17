@@ -29,6 +29,7 @@ public:
 		I_REGISTER_INTERFACE(imtgql::IGqlContextController);
 		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection", true, "SessionCollection");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
+		I_ASSIGN(m_userSettingsCollectionCompPtr, "UserSettingsCollection", "User settings collection", false, "UserSettingsCollection");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlContextController)
@@ -41,6 +42,7 @@ public:
 private:
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
 };
 
 

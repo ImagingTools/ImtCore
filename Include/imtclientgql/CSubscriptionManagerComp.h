@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtWebSockets/QWebSocket>
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>
 
@@ -12,7 +11,7 @@
 #include <imod/CSingleModelObserverBase.h>
 
 // ImtCore includes
-#include <imtauth/ILoginStatusProvider.h>
+#include <imtcom/IConnectionStatusProvider.h>
 #include <imtrest/ISender.h>
 #include <imtrest/IRequestManager.h>
 #include <imtrest/IRequestServlet.h>
@@ -45,11 +44,9 @@ public:
 		I_ASSIGN(m_subscriptionSenderCompPtr, "SubscriptionSender", "Subscription sender", false, "SubscriptionSender");
 		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Request manager for sending a request", false, "RequestManager");
 		I_ASSIGN(m_engineCompPtr, "ProtocolEngine", "Protocol engine for subscription", true, "ProtocolEngine");
-		I_ASSIGN(m_loginStatusCompPtr, "WebLoginStatus", "Web login status", false, "WebLoginStatus");
-		I_ASSIGN_TO(m_webLoginStatusModelCompPtr, m_loginStatusCompPtr, true);
+		I_ASSIGN(m_connectionStatusProviderCompPtr, "WebLoginStatus", "Web login status", false, "WebLoginStatus");
+		I_ASSIGN_TO(m_connectionStatusProviderModelCompPtr, m_connectionStatusProviderCompPtr, true);
 	I_END_COMPONENT;
-
-	CSubscriptionManagerComp();
 
 	// reimplemented (imtclientgql::IGqlSubscriptionManager)
 	virtual QByteArray RegisterSubscription(const imtgql::IGqlRequest& subscriptionRequest, imtclientgql::IGqlSubscriptionClient * subscriptionClientPtr) override;
@@ -66,7 +63,7 @@ public:
 	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* = nullptr) const override;
 
 protected:
-	virtual void ServiceManagerRegister(const imtgql::CGqlRequest& subscriptionRequest, QByteArray subscriptionId) const;
+	virtual void SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, QByteArray subscriptionId) const;
 	virtual bool SendRequestInternal(const imtgql::IGqlRequest& request, imtrest::ConstRequestPtr& requestPtr) const;
 
 	// reimplemented (icomp::CComponentBase)
@@ -81,8 +78,8 @@ private:
 private:
 	I_REF(imtrest::ISender, m_subscriptionSenderCompPtr);
 	I_REF(imtrest::IRequestManager, m_requestManagerCompPtr);
-	I_REF(imtauth::ILoginStatusProvider, m_loginStatusCompPtr);
-	I_REF(imod::IModel, m_webLoginStatusModelCompPtr);
+	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);
+	I_REF(imod::IModel, m_connectionStatusProviderModelCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_engineCompPtr);
 
 	class SubscriptionHelper
@@ -107,7 +104,6 @@ private:
 	};
 
 	mutable QMap <QByteArray, SubscriptionHelper> m_registeredClients;
-	mutable imtauth::ILoginStatusProvider::LoginStatusFlags m_loginStatus;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
 	mutable QMutex m_registeredClientsMutex;
 	mutable QMutex m_queryDataMapMutex;

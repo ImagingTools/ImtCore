@@ -26,8 +26,10 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 
 	QSet<int> ids = changeSet.GetIds();
 	QJsonArray idsArray;
-	for (const int id : ids){
-		idsArray.append(QJsonValue(id));
+	for (int id : ids){
+		QJsonObject obj;
+		obj["id"] = QJsonValue(QString::number(id));
+		idsArray.append(obj);
 	}
 
 	QJsonObject changeObj;
@@ -38,7 +40,7 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 	}
 
 	QJsonObject rootObject;
-	// rootObject["ids"] = idsArray;
+	rootObject["ids"] = idsArray;
 	rootObject["infoMap"] = changeObj;
 	rootObject["description"] = changeSet.GetDescription();
 

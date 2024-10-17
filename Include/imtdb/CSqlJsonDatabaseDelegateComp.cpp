@@ -85,7 +85,7 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 		}
 	}
 	else{
-		if (m_typesCompPtr->GetOptionsCount() > 0){
+		if (m_typesCompPtr.IsValid() && m_typesCompPtr->GetOptionsCount() > 0){
 			typeId = m_typesCompPtr->GetOptionId(0);
 			index = 0;
 		}

@@ -32,6 +32,10 @@ ViewBase {
     }
 
     onUserDataChanged: {
+        if (!userData){
+            return;
+        }
+
         setBlockingUpdateModel(true);
         let systemInfosModel = userData.m_systemInfos;
         if (systemInfoTable.table){
@@ -341,6 +345,10 @@ ViewBase {
                 property bool block: false;
 
                 function updateGui(){
+                    if (!container.userData){
+                        return;
+                    }
+
                     if (systemInfoTable.table){
                         systemInfoTable.table.uncheckAll();
                         let systemInfosModel = container.userData.m_systemInfos;
@@ -356,6 +364,10 @@ ViewBase {
                 }
 
                 function updateModel(){
+                    if (!container.userData){
+                        return;
+                    }
+
                     let indexes = systemInfoTable.table.getCheckedItems();
 
                     if (container.userData.m_systemInfos){

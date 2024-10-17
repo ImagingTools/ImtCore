@@ -2,19 +2,23 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="PumaLoginStatusSubscriber" PackageId="ImtClientGqlPck" ComponentId="LoginStatusSubscriber">
+        <Element Id="PumaLoginStatusSubscriber" PackageId="ImtClientGqlPck" ComponentId="ConnectionStatusSubscriber">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Command" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="PumaWsConnection"/>
+                    <AttributeInfo Id="Command" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PumaWsConnection</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -40,6 +44,9 @@
         <Element Id="StandardLoginGui" PackageId="ImtAuthGuiPck" ComponentId="RemoteStandardLoginGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ConnectionStatusProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Subscription/WebSocketClient"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Login" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Rights"/>
                     </AttributeInfo>

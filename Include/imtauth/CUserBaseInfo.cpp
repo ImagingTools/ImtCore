@@ -140,7 +140,7 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetLocalPermissions(const QByteArray& p
 }
 
 
-void CUserBaseInfo::SetLocalPermissions(const QByteArray& productId, const FeatureIds &permissions)
+void CUserBaseInfo::SetLocalPermissions(const QByteArray& productId, const FeatureIds& permissions)
 {
 	bool ok = true;
 	if (m_permissionsMap.contains(productId)){
@@ -359,51 +359,51 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_restrictions, "Restrictions", "Restriction");
 
-//	if (imtCoreVersion < 6671){
-//		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_roles, "Roles", "Role");
-//	}
-//	else{
-		QByteArrayList keys = m_rolesMap.keys();
-		int count = keys.count();
+	//	if (imtCoreVersion < 6671){
+	//		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_roles, "Roles", "Role");
+	//	}
+	//	else{
+	QByteArrayList keys = m_rolesMap.keys();
+	int count = keys.count();
+
+	if (!archive.IsStoring()){
+		m_rolesMap.clear();
+		keys.clear();
+		count = 0;
+	}
+
+	iser::CArchiveTag productsTag("Products", "Products", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag roleTag("Role", "Role", iser::CArchiveTag::TT_GROUP, &productsTag);
+
+	retVal = retVal && archive.BeginMultiTag(productsTag, roleTag, count);
+
+	for (int index = 0; index < count; index++){
+		retVal = retVal && archive.BeginTag(roleTag);
+
+		QByteArray key;
+		QByteArrayList value;
+
+		if (archive.IsStoring()){
+			key = keys[index];
+			value = m_rolesMap[key];
+		}
+
+		iser::CArchiveTag keyTag("ProductId", "ProductId", iser::CArchiveTag::TT_LEAF, &roleTag);
+		retVal = retVal && archive.BeginTag(keyTag);
+		retVal = retVal && archive.Process(key);
+		retVal = retVal && archive.EndTag(keyTag);
+
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, value, "Roles", "RoleId");
 
 		if (!archive.IsStoring()){
-			m_rolesMap.clear();
-			keys.clear();
-			count = 0;
+			m_rolesMap[key] = value;
 		}
 
-		iser::CArchiveTag productsTag("Products", "Products", iser::CArchiveTag::TT_MULTIPLE);
-		iser::CArchiveTag roleTag("Role", "Role", iser::CArchiveTag::TT_GROUP, &productsTag);
+		retVal = retVal && archive.EndTag(roleTag);
+	}
 
-		retVal = retVal && archive.BeginMultiTag(productsTag, roleTag, count);
-
-		for (int index = 0; index < count; index++){
-			retVal = retVal && archive.BeginTag(roleTag);
-
-			QByteArray key;
-			QByteArrayList value;
-
-			if (archive.IsStoring()){
-				key = keys[index];
-				value = m_rolesMap[key];
-			}
-
-			iser::CArchiveTag keyTag("ProductId", "ProductId", iser::CArchiveTag::TT_LEAF, &roleTag);
-			retVal = retVal && archive.BeginTag(keyTag);
-			retVal = retVal && archive.Process(key);
-			retVal = retVal && archive.EndTag(keyTag);
-
-			retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, value, "Roles", "RoleId");
-
-			if (!archive.IsStoring()){
-				m_rolesMap[key] = value;
-			}
-
-			retVal = retVal && archive.EndTag(roleTag);
-		}
-
-		retVal = retVal && archive.EndTag(productsTag);
-//	}
+	retVal = retVal && archive.EndTag(productsTag);
+	//	}
 
 	return retVal;
 }
@@ -438,19 +438,19 @@ bool CUserBaseInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode
 
 bool CUserBaseInfo::IsEqual(const IChangeable& object) const
 {
-    const CUserBaseInfo* sourcePtr = dynamic_cast<const CUserBaseInfo*>(&object);
-    if (sourcePtr != nullptr){
-        bool retVal = m_restrictions == sourcePtr->m_restrictions;
-        retVal = retVal && m_permissionsMap == sourcePtr->m_permissionsMap;
-        retVal = retVal && m_rolesMap == sourcePtr->m_rolesMap;
-        retVal = retVal && m_name == sourcePtr->m_name;
-        retVal = retVal && m_id == sourcePtr->m_id;
-        retVal = retVal && m_description == sourcePtr->m_description;
+	const CUserBaseInfo* sourcePtr = dynamic_cast<const CUserBaseInfo*>(&object);
+	if (sourcePtr != nullptr){
+		bool retVal = m_restrictions == sourcePtr->m_restrictions;
+		retVal = retVal && m_permissionsMap == sourcePtr->m_permissionsMap;
+		retVal = retVal && m_rolesMap == sourcePtr->m_rolesMap;
+		retVal = retVal && m_name == sourcePtr->m_name;
+		retVal = retVal && m_id == sourcePtr->m_id;
+		retVal = retVal && m_description == sourcePtr->m_description;
 
-        return retVal;
-    }
+		return retVal;
+	}
 
-    return false;
+	return false;
 }
 
 

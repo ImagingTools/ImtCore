@@ -105,14 +105,14 @@ I_EXPORT_COMPONENT(
 			"Session Subscriber Subscription Controller");
 
 I_EXPORT_COMPONENT(
-			LoginStatusSubscriberController,
-			"Login status subscriber controller",
-			"Login Status Subscriber Controller");
-
-I_EXPORT_COMPONENT(
 			LdapAuthorizationController,
 			"LDAP authorization controller",
 			"LDAP Authorization Controller");
+
+I_EXPORT_COMPONENT(
+			UserSerializableCollectionController,
+			"User serializable collection controller",
+			"User Serializable Collection Controller");
 
 
 } // namespace ImtAuthGqlPck

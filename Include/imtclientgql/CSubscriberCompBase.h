@@ -22,7 +22,7 @@ public:
 	I_BEGIN_COMPONENT(CSubscriberCompBase);
 		I_REGISTER_INTERFACE(imtclientgql::IGqlSubscriptionClient);
 		I_ASSIGN(m_subscriptionManagerCompPtr, "SubscriptionManager", "Subscription manager", true, "SubscriptionManager");
-		I_ASSIGN(m_commandAttrPtr, "Command", "Command for subscription", true, "");
+		I_ASSIGN_MULTI_0(m_commandAttrPtr, "Command", "Command for subscription", true);
 	I_END_COMPONENT;
 
 protected:
@@ -43,7 +43,7 @@ protected:
 
 protected:
 	I_REF(imtclientgql::IGqlSubscriptionManager, m_subscriptionManagerCompPtr);
-	I_ATTR(QByteArray, m_commandAttrPtr);
+	I_MULTIATTR(QByteArray, m_commandAttrPtr);
 };
 
 

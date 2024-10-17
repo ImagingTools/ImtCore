@@ -14,13 +14,12 @@ namespace imtgql
 
 bool CSlaveSubscriberControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
-	if (!m_subscriberControllerListCompPtr.IsValid()){
-		return false;
-	}
-
 	for (int index = 0; index < m_subscriberControllerListCompPtr.GetCount(); index++){
-		if (m_subscriberControllerListCompPtr[index]->IsRequestSupported(gqlRequest)){
-			return true;
+		imtgql::IGqlSubscriberController* subscriberControllerPtr = m_subscriberControllerListCompPtr[index];
+		if (subscriberControllerPtr != nullptr){
+			if (subscriberControllerPtr->IsRequestSupported(gqlRequest)){
+				return true;
+			}
 		}
 	}
 
@@ -29,20 +28,20 @@ bool CSlaveSubscriberControllerComp::IsRequestSupported(const imtgql::CGqlReques
 
 
 bool CSlaveSubscriberControllerComp::RegisterSubscription(
-	const QByteArray& subscriptionId,
-	const imtgql::CGqlRequest& gqlRequest,
-	const imtrest::IRequest& networkRequest,
-	QString& errorMessage)
+			const QByteArray& subscriptionId,
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtrest::IRequest& networkRequest,
+			QString& errorMessage)
 {
-	if (!m_subscriberControllerListCompPtr.IsValid()){
-		return false;
-	}
-
 	for (int index = 0; index < m_subscriberControllerListCompPtr.GetCount(); index++){
-		if (m_subscriberControllerListCompPtr[index]->IsRequestSupported(gqlRequest)
-			&& m_subscriberControllerListCompPtr[index]->RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
-			return true;
+		imtgql::IGqlSubscriberController* subscriberControllerPtr = m_subscriberControllerListCompPtr[index];
+		if (subscriberControllerPtr != nullptr){
+			if (subscriberControllerPtr->IsRequestSupported(gqlRequest)
+				&& subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
+				return true;
+			}
 		}
+
 	}
 
 	return false;
@@ -51,13 +50,12 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 
 bool CSlaveSubscriberControllerComp::UnRegisterSubscription(const QByteArray& subscriptionId)
 {
-	if (!m_subscriberControllerListCompPtr.IsValid()){
-		return false;
-	}
-
 	for (int index = 0; index < m_subscriberControllerListCompPtr.GetCount(); index++){
-		if (m_subscriberControllerListCompPtr[index]->UnRegisterSubscription(subscriptionId)){
-			return true;
+		imtgql::IGqlSubscriberController* subscriberControllerPtr = m_subscriberControllerListCompPtr[index];
+		if (subscriberControllerPtr != nullptr){
+			if (subscriberControllerPtr->UnRegisterSubscription(subscriptionId)){
+				return true;
+			}
 		}
 	}
 
