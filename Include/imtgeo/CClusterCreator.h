@@ -32,6 +32,7 @@ protected:
     double getDistanceLimitCoeff(double zoomLevel) const;
     imtbase::CTreeItemModel* createMapClusterModel(imtbase::CTreeItemModel* model, double zoomLevel, double limitInPixels = 50)const;
     QList<CCluster*> createMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel, double limitInPixels = 50)const;
+    QList<CCluster*> convertToMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel)const;
 
 private:
 
