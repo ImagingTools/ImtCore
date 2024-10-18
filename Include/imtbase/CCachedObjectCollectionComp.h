@@ -113,7 +113,7 @@ protected:
 		istd::TDelPtr<IObjectCollection> cachePtr;
 	};
 
-	FilteredCollection* CheckCache(
+	FilteredCollection* GetFilteredCollection(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const;
@@ -127,7 +127,7 @@ private:
 	I_ATTR(int, m_metaInfoCacheLimitAttrPtr);
 	I_ATTR(int, m_objectCacheLimitAttrPtr);
 
-	mutable istd::TPointerVector<FilteredCollection> m_collectionCacheItems;
+	mutable istd::TPointerVector<FilteredCollection> m_cachedCollections;
 
 	struct CacheItem
 	{
@@ -139,6 +139,7 @@ private:
 	mutable CacheItemMap m_cacheItems;
 
 	int m_operationFlags;
+	mutable QReadWriteLock m_lock;
 };
 
 
