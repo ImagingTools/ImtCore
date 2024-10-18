@@ -103,8 +103,9 @@ int CFileFinalizerComp::CleanupFile(const QString& filePath)
 
 	iprm::COptionsManager regExpList;
 	regExpList.InsertOption(QStringLiteral("^\\s*\\#\\s*include\\s\\<.*\\>$"), "1");
-	regExpList.InsertOption(QStringLiteral("^\\s*\\#\\s*pragma\\s+once$"), "2");
-	regExpList.InsertOption(QStringLiteral("^.*includes\\s*$"), "3");
+	regExpList.InsertOption(QStringLiteral("^\\s*\\#\\s*include\\s\\\".*\\\"$"), "2");
+	regExpList.InsertOption(QStringLiteral("^\\s*\\#\\s*pragma\\s+once$"), "3");
+	regExpList.InsertOption(QStringLiteral("^.*includes\\s*$"), "4");
 
 	int result = m_filesCleanupProcessorComp->DoProcessing(&params, &regExpList, nullptr);
 

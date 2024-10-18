@@ -145,24 +145,40 @@ int CFileCleanupProcessorComp::DoProcessing(
 	// finalize
 	sourceFile.close();
 	targetFilePtr->close();
-	if (!sourceFile.remove()){
-		SendErrorMessage(0, QString("Unable to remove file: '%1'").arg(sourceFilePath));
-
-		return TS_INVALID;
-	}
-
-	Q_ASSERT(!sourceFile.exists());
 
 	if (targetFilePath == sourceFilePath && sourceFile.fileName() != targetFilePtr->fileName()){
-		SendVerboseMessage(QString("move file: '%1' to '%2'").arg(targetFilePtr->fileName(), sourceFilePath));
-		if (!QFile::rename(targetFilePtr->fileName(), sourceFilePath)){
-			SendErrorMessage(0, QString("Unable to move file: '%1' to '%2'").arg(targetFilePtr->fileName(), sourceFilePath));
-
+		/// \bug window systems can't correctly close file to copy
+		if (!MoveFileByContent (targetFilePtr->fileName(), sourceFilePath)){
 			return TS_INVALID;
 		}
+
 	}
 
 	return TS_OK;
+}
+
+
+bool CFileCleanupProcessorComp::MoveFileByContent(const QString& sourceFilePath, const QString& targetFilePath) const
+{
+	QFile sourceFile(sourceFilePath);
+	if (!sourceFile.open(QIODevice::ReadOnly)){
+		SendErrorMessage(0, QString("Unable to open file'%1'").arg(sourceFilePath));
+
+		return false;
+	}
+
+	const QByteArray readData = sourceFile.readAll();
+
+	QFile targetFile(targetFilePath);
+	if (!targetFile.open(QIODevice::WriteOnly | QIODevice::Truncate)){
+		SendErrorMessage(0, QString("Unable to open file'%1'").arg(targetFilePath));
+
+		return false;
+	}
+
+	targetFile.write(readData);
+
+	return true;
 }
 
 

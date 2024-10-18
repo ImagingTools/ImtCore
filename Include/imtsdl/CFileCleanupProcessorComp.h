@@ -44,6 +44,8 @@ public:
 				const istd::IPolymorphic* inputPtr,
 				istd::IChangeable* outputPtr,
 				ibase::IProgressManager* progressManagerPtr = NULL) override;
+
+	bool MoveFileByContent(const QString& sourceFilePath, const QString& targetFilePath) const;
 };
 
 
