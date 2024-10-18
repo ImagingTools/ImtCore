@@ -407,6 +407,11 @@ void CMaskContainer::Erase()
 
 }
 
+bool CMaskContainer::isEmpty()
+{
+    return (m_maskList.isEmpty() && m_maskListInv.isEmpty());
+}
+
 
 bool CMaskContainer::RemoveLastMask(bool isInversion)
 {

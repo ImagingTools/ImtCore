@@ -44,6 +44,7 @@ public:
 	void AddMask(IMask* mask, bool isInversion = false) override;
 	void Clear() override;
 	void Erase();
+    bool isEmpty();
 	bool RemoveLastMask(bool isInversion = false) override;
 	bool RemoveMask(int index, int n = 1, bool isInversion = false) override;
 	int GetMaskCount(bool isInversion = false) override;
