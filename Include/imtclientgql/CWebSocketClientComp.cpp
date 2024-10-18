@@ -19,7 +19,6 @@ namespace imtclientgql
 // public methods
 
 CWebSocketClientComp::CWebSocketClientComp()
-	:m_connectionStatus(imtcom::IConnectionStatusProvider::CS_UNKNOWN)
 {
 	m_lastSocketError = QAbstractSocket::SocketError::UnknownSocketError;
 }
@@ -89,14 +88,6 @@ bool CWebSocketClientComp::SendRequest(imtrest::ConstRequestPtr& request) const
 	m_webSocket.sendTextMessage(request->GetBody());
 
 	return true;
-}
-
-
-// reimplemented (imtcom::IConnectionStatusProvider)
-
-imtcom::IConnectionStatusProvider::ConnectionStatus CWebSocketClientComp::GetConnectionStatus() const
-{
-	return m_connectionStatus;
 }
 
 
@@ -183,10 +174,7 @@ void CWebSocketClientComp::OnTimeout()
 
 void CWebSocketClientComp::OnWebSocketConnected()
 {
-	m_connectionStatus = imtcom::IConnectionStatusProvider::CS_CONNECTED;
-
-	istd::IChangeable::ChangeSet loginChangeSet(m_connectionStatus, QString("Login"));
-	istd::CChangeNotifier notifier(this, &loginChangeSet);
+	m_connectionStatusProvider.SetConnectionStatus(imtcom::IConnectionStatusProvider::CS_CONNECTED);
 
 	QString clientId;
 	if (m_clientIdAttrPtr.IsValid()){
@@ -215,13 +203,8 @@ void CWebSocketClientComp::OnWebSocketConnected()
 
 void CWebSocketClientComp::OnWebSocketDisconnected()
 {
-	m_connectionStatus = imtcom::IConnectionStatusProvider::CS_DISCONNECTED;
-
-	istd::IChangeable::ChangeSet loginChangeSet(m_connectionStatus, QString("Logout"));
-	istd::CChangeNotifier notifier(this, &loginChangeSet);
-
+	m_connectionStatusProvider.SetConnectionStatus(imtcom::IConnectionStatusProvider::CS_DISCONNECTED);
 	m_startQueries.Reset();
-
 	m_refreshTimer.start();
 }
 
@@ -372,6 +355,28 @@ CWebSocketClientComp::NetworkOperation::NetworkOperation(int timeout, const CWeb
 CWebSocketClientComp::NetworkOperation::~NetworkOperation()
 {
 	timer.stop();
+}
+
+
+// public methods of embedded class ConnectionStatusProvider
+
+void CWebSocketClientComp::ConnectionStatusProvider::SetConnectionStatus(
+			imtcom::IConnectionStatusProvider::ConnectionStatus status)
+{
+	if (m_connectionStatus != status){
+		istd::IChangeable::ChangeSet changeSet(m_connectionStatus);
+		istd::CChangeNotifier notifier(this, &changeSet);
+
+		m_connectionStatus = status;
+	}
+}
+
+
+// reimplemented (imtcom::IConnectionStatusProvider)
+
+imtcom::IConnectionStatusProvider::ConnectionStatus CWebSocketClientComp::ConnectionStatusProvider::GetConnectionStatus() const
+{
+	return m_connectionStatus;
 }
 
 

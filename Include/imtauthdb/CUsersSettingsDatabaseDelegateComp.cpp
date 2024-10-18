@@ -63,7 +63,7 @@ istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(co
 		if (record.contains("Settings")){
 			data = record.value("Settings").toByteArray();
 
-			iser::CJsonMemReadArchive archive(data.constData(), data.size());
+			iser::CJsonMemReadArchive archive(data);
 
 			if (!paramSetPtr->Serialize(archive)){
 				return nullptr;

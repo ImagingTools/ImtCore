@@ -34,7 +34,7 @@ typedef icomp::TModelCompWrap<imtclientgql::CGqlObjectCollectionComp> GqlObjectC
 typedef imtclientgql::CGqlRemoteRepresentationControllerCompBase GraphQLRemoteRepresentationController;
 typedef imtclientgql::CGqlRemoteRepresentationControllerComp PumaGqlRemoteRepresentationController;
 typedef imtclientgql::CSubscriptionManagerComp SubscriptionManager;
-typedef icomp::TModelCompWrap<imtclientgql::CWebSocketClientComp> WebSocketClient;
+typedef imtclientgql::CWebSocketClientComp WebSocketClient;
 typedef imtclientgql::CModelSubscriberComp ModelSubscriber;
 typedef imtclientgql::CGqlHierarchicalStructureDelegateComp GqlHierarchicalStructureDelegate;
 typedef icomp::TModelCompWrap<imtclientgql::CConnectionStatusSubscriberComp> ConnectionStatusSubscriber;

@@ -9,6 +9,7 @@
 #include <ilog/TLoggerCompWrap.h>
 #include <istd/TPointerVector.h>
 #include <iprm/ITextParam.h>
+#include <imod/TModelWrap.h>
 
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
@@ -30,7 +31,6 @@ class CWebSocketClientComp:
 			public ilog::CLoggerComponentBase,
 			virtual public imtrest::ISender,
 			virtual public imtcom::IConnectionController,
-			virtual public imtcom::IConnectionStatusProvider,
 			virtual public imtrest::IRequestManager,
 			virtual public imtclientgql::IGqlClient
 {
@@ -41,9 +41,12 @@ public:
 	I_BEGIN_COMPONENT(CWebSocketClientComp);
 		I_REGISTER_INTERFACE(ISender)
 		I_REGISTER_INTERFACE(IRequestManager)
-		I_REGISTER_INTERFACE(imtcom::IConnectionStatusProvider)
 		I_REGISTER_INTERFACE(imtcom::IConnectionController)
 		I_REGISTER_INTERFACE(imtclientgql::IGqlClient)
+		I_REGISTER_SUBELEMENT(ConnectionStatusProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE_T(ConnectionStatusProvider, imtcom::IConnectionStatusProvider, ExtractConnectionStatusProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE_T(ConnectionStatusProvider, istd::IChangeable, ExtractConnectionStatusProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE_T(ConnectionStatusProvider, imod::IModel, ExtractConnectionStatusProvider);
 		I_ASSIGN(m_serverRequestHandlerCompPtr, "ServerRequestHandler", "Request handler registered for the server", false, "ServerRequestHandler");
 		I_ASSIGN(m_clientRequestHandlerCompPtr, "ClientRequestHandler", "Request handler registered for the client", false, "ClientRequestHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
@@ -63,9 +66,6 @@ public:
 	// reimplemented (imtrest::ISender)
 	virtual bool SendResponse(imtrest::ConstResponsePtr& response) const override;
 	virtual bool SendRequest(imtrest::ConstRequestPtr& request) const override;
-
-	// reimplemented (imtcom::IConnectionStatusProvider)
-	virtual ConnectionStatus GetConnectionStatus() const override;
 
 	// reimplemented (imtrest::IRequestManager)
 	virtual const imtrest::ISender* GetSender(const QByteArray& requestId) const override;
@@ -96,7 +96,7 @@ private Q_SLOTS:
 	void OnWebSocketTextMessageReceived(const QString& message);
 	void OnWebSocketBinaryMessageReceived(const QByteArray& message);
 
-private:
+protected:
 	virtual void EnsureWebSocketConnection();
 
 	class NetworkOperation
@@ -110,6 +110,25 @@ private:
 		bool timerFlag;
 		QTimer timer;
 	};
+
+	class ConnectionStatusProvider:
+				virtual public imtcom::IConnectionStatusProvider
+	{
+	public:
+		virtual void SetConnectionStatus(ConnectionStatus status);
+
+		// reimplemented (imtcom::IConnectionStatusProvider)
+		virtual ConnectionStatus GetConnectionStatus() const override;
+
+	private:
+		ConnectionStatus m_connectionStatus;
+	};
+
+	template <typename InterfaceType>
+	static InterfaceType* ExtractConnectionStatusProvider(CWebSocketClientComp& component)
+	{
+		return &component.m_connectionStatusProvider;
+	}
 
 private:
 	I_REF(imtrest::IRequestServlet, m_serverRequestHandlerCompPtr);
@@ -125,11 +144,12 @@ private:
 	I_ATTR(QByteArray, m_clientIdAttrPtr);
 
 	mutable QWebSocket m_webSocket;
-	imtcom::IConnectionStatusProvider::ConnectionStatus m_connectionStatus;
 	QTimer m_refreshTimer;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
 	istd::TPointerVector<imtrest::IRequest> m_startQueries;
 	QAbstractSocket::SocketError m_lastSocketError;
+
+	imod::TModelWrap<ConnectionStatusProvider> m_connectionStatusProvider;
 };
 
 

@@ -29,7 +29,7 @@
                         <Data IsEnabled="true" Value="WebSocketClient"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebLoginStatus" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="WebSocketClient"/>
+                        <Data IsEnabled="true" Value="WebSocketClient/ConnectionStatusProvider"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -82,6 +82,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SubscriptionManager"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="ConnectionStatusProvider" ComponentId="WebSocketClient/ConnectionStatusProvider"/>
         <Component ExportedId="WebSocketClient" ComponentId="WebSocketClient"/>
     </ExportedComponents>
 </Acf>
