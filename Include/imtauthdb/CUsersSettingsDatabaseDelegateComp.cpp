@@ -2,8 +2,8 @@
 
 
 // ACF includes
-#include <iser/CMemoryWriteArchive.h>
-#include <iser/CMemoryReadArchive.h>
+#include <iser/CJsonMemReadArchive.h>
+#include <iser/CJsonMemWriteArchive.h>
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
@@ -61,9 +61,9 @@ istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(co
 	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	if (paramSetPtr != nullptr){
 		if (record.contains("Settings")){
-			data = QByteArray::fromBase64(record.value("Settings").toByteArray());
+			data = record.value("Settings").toByteArray();
 
-			iser::CMemoryReadArchive archive(data.constData(), data.size());
+			iser::CJsonMemReadArchive archive(data.constData(), data.size());
 
 			if (!paramSetPtr->Serialize(archive)){
 				return nullptr;
@@ -98,14 +98,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 
 	QByteArray data;
 	{
-		iser::CMemoryWriteArchive archive(m_versionInfoCompPtr.GetPtr());
+		iser::CJsonMemWriteArchive archive(data, m_versionInfoCompPtr.GetPtr());
 
 		bool retVal = settingsPtr->Serialize(archive);
 		if (!retVal){
 			return NewObjectQuery();
 		}
-
-		data = QByteArray((const char*) archive.GetBuffer(), archive.GetBufferSize()).toBase64();
 	}
 
 	NewObjectQuery retVal;
@@ -149,14 +147,12 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	QByteArray data;
 	{
-		iser::CMemoryWriteArchive archive(m_versionInfoCompPtr.GetPtr());
+		iser::CJsonMemWriteArchive archive(data, m_versionInfoCompPtr.GetPtr());
 
 		bool retVal = settingsPtr->Serialize(archive);
 		if (!retVal){
 			return QByteArray();
 		}
-
-		data = QByteArray((const char*) archive.GetBuffer(), archive.GetBufferSize()).toBase64();
 	}
 
 	QByteArray retVal = QString("UPDATE \"UserSettings\" SET \"UserId\" ='%1', \"Settings\" = '%2' WHERE \"UserId\" ='%3';")
