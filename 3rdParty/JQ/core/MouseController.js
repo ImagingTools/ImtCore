@@ -194,9 +194,7 @@ module.exports = {
             this.click(e)
         })
         window.addEventListener('dblclick', (e)=>{
-            if(this.event) this.event.fillButton(e)
             e.preventDefault()
-            this.click(e)
         })
         window.addEventListener('mousedown', (e)=>{
             this.event = new QmlMouseEvent({pressed: true})

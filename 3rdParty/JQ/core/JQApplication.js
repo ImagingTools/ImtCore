@@ -140,6 +140,27 @@ module.exports = {
     objectsAwaitingUpdate: new Set(),
     updateLayers: [],
 
+    focusTree: [],
+    setFocusTree(tree){
+        this.root.__setFocusTree(tree)
+
+        let unionTree = []
+        while(this.focusTree.length || tree.length){
+            let origin = this.focusTree.pop()
+            let current = tree.pop()
+
+            if(origin === current){
+                unionTree.unshift(current)
+            } else if(current){
+                unionTree.unshift(current)
+            } else if(origin){
+                unionTree.unshift(origin)
+            }
+        }
+
+        this.focusTree = unionTree
+    },
+
     setCursor(cursorShape){
         this.root.__setDOMStyle({
             cursor: cursorShape

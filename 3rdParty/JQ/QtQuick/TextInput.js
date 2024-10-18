@@ -111,7 +111,6 @@ class TextInput extends Item {
 
         impl.onblur = ()=>{
             this.activeFocus = false
-            this.focus = false
         }
 
         impl.onkeydown = (e)=>{
@@ -257,16 +256,9 @@ class TextInput extends Item {
         }
     }
 
-    onFocusChanged(){
-        if(this.focus){
-            this.__impl.focus()
-        }
-    }
-
     onActiveFocusChanged(){
-        if(this.activeFocus){
-            this.__impl.focus()
-            this.focus = true
+        if(!this.activeFocus){
+            this.__impl.blur()
         }
     }
 
@@ -275,7 +267,7 @@ class TextInput extends Item {
             this.__impl.innerHTML = '&#8203'
             return
         }
-        
+
         if(this.echoMode === TextInput.Password){
             this.__impl.innerText = this.text.replaceAll(/./g, '*')
         } else {

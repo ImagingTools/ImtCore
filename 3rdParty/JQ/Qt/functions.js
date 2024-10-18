@@ -245,18 +245,36 @@ module.exports = {
         try {
             cls = eval(className)
         } catch (error) {
-            while(path.length){
+            for(let i = 0; i < path.length; i++){
                 if(cls){
-                    let name = path.shift()
+                    let name = path[i]
                     if(name in cls){
                         cls = cls[name]
                     }
                 } else {
-                    cls = JQModules[path.shift()]
+                    cls = JQModules[path[i]]
                 }
             }
         }
 
-        return JQModules.QtQml.Component.create(null, cls)
+        if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)) return JQModules.QtQml.Component.create(null, cls)
+
+        cls = null
+        try {
+            cls = eval(className)
+        } catch (error) {
+            for(let i = 0; i < path.length; i++){
+                if(cls){
+                    let name = path[i]
+                    if(name in cls){
+                        cls = cls[name]
+                    }
+                } else {
+                    cls = JQModules[path[i]]
+                }
+            }
+        }
+
+        if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)) return JQModules.QtQml.Component.create(null, cls)
     },
 }

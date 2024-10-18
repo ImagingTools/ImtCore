@@ -136,6 +136,7 @@ class MouseArea extends Item {
         if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
         if(mouse.target === this && this.__pressed){
+            this.clicked(mouse)
             this.doubleClicked(mouse)
         }
 

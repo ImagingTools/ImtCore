@@ -201,6 +201,64 @@ class Item extends QtObject {
         
     }
 
+    onFocusChanged(){
+        if(this.focus){
+            let tree = this.__getTree()
+            JQApplication.setFocusTree(tree)
+
+            if(this.parent instanceof JQModules.QtQuick.FocusScope && this.parent.focus){
+                this.activeFocus = true
+            }
+        } else {
+            this.activeFocus = false
+        }
+    }
+
+    onActiveFocusChanged(){
+        if(this.activeFocus){
+            if(this.parent instanceof JQModules.QtQuick.FocusScope){
+                this.parent.activeFocus = true
+            }
+        }
+    }
+
+    forceActiveFocus(){
+        if(this.parent instanceof JQModules.QtQuick.FocusScope){
+            this.parent.focus = true
+        }
+
+        this.focus = true
+
+        if(this.parent instanceof JQModules.QtQuick.FocusScope){
+            this.parent.activeFocus = true
+        }
+
+        this.activeFocus = true
+    }
+
+    __getTree(){
+        let tree = [this]
+        let parent = this.parent
+
+        while(parent){
+            tree.push(parent)
+            parent = parent.parent
+        }
+
+        return tree
+    }
+
+    __setFocusTree(tree){
+        for(let child of this.children){
+            if(tree.indexOf(child) < 0){
+                child.focus = false
+                
+            }
+
+            child.__setFocusTree(tree)
+        }
+    }
+
     onAXChanged(){
         if(this.AX !== this.x) 
         this.__getObject('x').__resetForce(this.AX)
@@ -322,10 +380,7 @@ class Item extends QtObject {
             return res
         }
     }
-    forceActiveFocus(){
-        this.activeFocus = true
-        this.focus = true
-    }
+    
 
     __destroy(){
         if(this.__DOM) this.__DOM.remove()
