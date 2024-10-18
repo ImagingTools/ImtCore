@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5229" Description="ACF"/>
-            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -28,19 +28,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GraphQLClientEngine" PackageId="ImtClientGqlPck" ComponentId="GraphQLClientEngine">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="/Puma"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="LoginStatusSubscriberController" PackageId="ImtAuthGqlPck" ComponentId="LoginStatusSubscriberController">
+        <Element Id="ConnectionStatusSubscriberController" PackageId="ImtGqlPck" ComponentId="ConnectionStatusSubscriberController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
@@ -54,13 +42,37 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LoginStatusProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Subscription/WebSocketClient"/>
+                        <Data IsEnabled="true" Value="Subscription/ConnectionStatusProvider"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GraphQLClientEngine" PackageId="ImtClientGqlPck" ComponentId="GraphQLClientEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="/Puma"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="HttpUrlParam"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="HttpUrlParam" PackageId="ImtCorePck" ComponentId="UrlParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="localhost"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="7788"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultScheme" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="http"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -71,17 +83,14 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RemoteServerUrlParam" Type="Reference" ExportId="UrlParam">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="HttpUrlParam"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerAddress" Type="Reference" ExportId="WebSocketUrlParam">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketUrlParam"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -137,6 +146,8 @@
                                 <Value>RolesMetaInfo</Value>
                                 <Value>UsersMetaInfo</Value>
                                 <Value>GroupsMetaInfo</Value>
+                                <Value>ChangePassword</Value>
+                                <Value>Authorization</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -158,17 +169,46 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SlaveSubscriberController" PackageId="ImtGqlPck" ComponentId="SlaveSubscriberController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriberController" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ConnectionStatusSubscriberController</Value>
+                                <Value>RemoteRepositories</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Subscription" PackageId="ImtClientVoce" ComponentId="SubscriptionManager">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="WebSocketServerAddress" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketUrlParam"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerAddress" Type="Reference" ExportId="WebSocketUrlParam">
-                        <Data IsEnabled="false"/>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="WebSocketUrlParam" PackageId="ImtCorePck" ComponentId="UrlParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="localhost"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="8788"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultScheme" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="ws"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -178,14 +218,13 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="ApiClient"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="RemoteRepresentationController"/>
+        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="LoginStatusSubscriberController" ComponentId="LoginStatusSubscriberController"/>
-        <Component ExportedId="RoleRepository" ComponentId="RemoteRepositories/RoleRepository"/>
-        <Component ExportedId="RolesSubscriberController" ComponentId="RemoteRepositories/RolesSubscriberController"/>
-        <Component ExportedId="UserGroupRepository" ComponentId="RemoteRepositories/UserGroupRepository"/>
-        <Component ExportedId="UserGroupsSubscriberController" ComponentId="RemoteRepositories/UserGroupsSubscriberController"/>
-        <Component ExportedId="UserRepository" ComponentId="RemoteRepositories/UserRepository"/>
-        <Component ExportedId="UsersSubscriberController" ComponentId="RemoteRepositories/UsersSubscriberController"/>
+        <Component ExportedId="HttpUrlParam" ComponentId="HttpUrlParam"/>
+        <Component ExportedId="RoleRemoteRepository" ComponentId="RemoteRepositories/RoleRemoteRepository"/>
+        <Component ExportedId="UserRemoteRepository" ComponentId="RemoteRepositories/UserRemoteRepository"/>
+        <Component ExportedId="UserSessionRemoteRepository" ComponentId="RemoteRepositories/UserSessionRemoteRepository"/>
+        <Component ExportedId="WebSocketUrlParam" ComponentId="WebSocketUrlParam"/>
     </ExportedComponents>
 </Acf>

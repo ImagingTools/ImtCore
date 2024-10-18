@@ -2,18 +2,21 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5229" Description="ACF"/>
-            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApiClient" X="550" Y="300" Note=""/>
-        <Element ComponentName="GraphQLClientEngine" X="550" Y="450" Note=""/>
-        <Element ComponentName="LoginStatusSubscriberController" X="925" Y="450" Note=""/>
-        <Element ComponentName="RemoteRepositories" X="550" Y="575" Note=""/>
-        <Element ComponentName="RemoteRepresentationController" X="575" Y="175" Note=""/>
+        <Element ComponentName="ApiClient" X="225" Y="300" Note=""/>
+        <Element ComponentName="ConnectionStatusSubscriberController" X="975" Y="150" Note=""/>
+        <Element ComponentName="GraphQLClientEngine" X="225" Y="475" Note=""/>
+        <Element ComponentName="HttpUrlParam" X="550" Y="475" Note=""/>
+        <Element ComponentName="RemoteRepositories" X="650" Y="675" Note=""/>
+        <Element ComponentName="RemoteRepresentationController" X="225" Y="150" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="600" Y="150" Note=""/>
         <Element ComponentName="Subscription" X="925" Y="300" Note=""/>
+        <Element ComponentName="WebSocketUrlParam" X="750" Y="475" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
