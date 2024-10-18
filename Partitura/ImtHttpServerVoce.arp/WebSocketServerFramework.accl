@@ -2,17 +2,17 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5253" Description="ACF"/>
-            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="SlaveSubscriberController" X="975" Y="200" Note=""/>
-        <Element ComponentName="SubscriptionManager" X="225" Y="300" Note=""/>
-        <Element ComponentName="WebSocketProtocolEngine" X="525" Y="575" Note=""/>
-        <Element ComponentName="WebSocketServer" X="700" Y="400" Note=""/>
-        <Element ComponentName="WebSocketServlet" X="625" Y="100" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="560" Y="200" Note=""/>
+        <Element ComponentName="SubscriptionManager" X="920" Y="620" Note=""/>
+        <Element ComponentName="WebSocketProtocolEngine" X="280" Y="620" Note=""/>
+        <Element ComponentName="WebSocketServer" X="580" Y="440" Note=""/>
+        <Element ComponentName="WebSocketServlet" X="560" Y="320" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
