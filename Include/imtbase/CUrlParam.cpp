@@ -39,6 +39,33 @@ bool CUrlParam::IsReadOnly() const
 }
 
 
+// reimplemented (ifile::IFileNameParam)
+
+int CUrlParam::GetPathType() const
+{
+	return PT_URL;
+}
+
+
+const QString& CUrlParam::GetPath() const
+{
+	m_textRep = m_url.toString();
+
+	return m_textRep;
+}
+
+
+void CUrlParam::SetPath(const QString& path)
+{
+	QUrl newUrl(path);
+	if (newUrl.isValid() && m_url != newUrl){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_url = newUrl;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CUrlParam::Serialize(iser::IArchive& archive)

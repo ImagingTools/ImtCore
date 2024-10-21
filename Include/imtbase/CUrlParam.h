@@ -1,6 +1,9 @@
 #pragma once
 
 
+// ACF includes
+#include <ifile/IFileNameParam.h>
+
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
 
@@ -9,13 +12,18 @@ namespace imtbase
 {
 
 
-class CUrlParam: virtual public IUrlParam
+class CUrlParam: virtual public IUrlParam, virtual public ifile::IFileNameParam
 {
 public:
 	// reimplemented (IUrlParam)
 	virtual const QUrl& GetUrl() const override;
 	virtual bool SetUrl(const QUrl& url) override;
 	virtual bool IsReadOnly() const override;
+
+	// reimplemented (ifile::IFileNameParam)
+	virtual int GetPathType() const override;
+	virtual const QString& GetPath() const  override;
+	virtual void SetPath(const QString& path)  override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive);
@@ -29,6 +37,7 @@ public:
 
 protected:
 	QUrl m_url;
+	mutable QString m_textRep;
 };
 
 

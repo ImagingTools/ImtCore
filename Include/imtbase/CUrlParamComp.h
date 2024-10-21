@@ -25,6 +25,7 @@ public:
 
 	I_BEGIN_COMPONENT(CUrlParamComp);
 		I_REGISTER_INTERFACE(IUrlParam);
+		I_REGISTER_INTERFACE(ifile::IFileNameParam);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(istd::IChangeable);
 		I_ASSIGN(m_defaultSchemeAttrPtr, "DefaultScheme", "Default scheme", true, "http");
