@@ -797,12 +797,12 @@ QString CSdlTools::GetAutoDefinedQmlQrcFilePath(const iprm::IParamsSet& schemaPa
 QString CSdlTools::GetEscapedNamespace(const QString& aNamespace, const QString& relatedNamespace)
 {
 	static QRegularExpression imtbaseNamespaceRegExp("\\s*(?:\\:\\:){0,}\\s*imtbase\\s*(?:\\:\\:){0,}\\s*");
-	if (aNamespace == QStringLiteral("imtbase") && imtbaseNamespaceRegExp.match(relatedNamespace).hasMatch()){
+	if (aNamespace == QStringLiteral("imtbase") && (relatedNamespace.isEmpty() || imtbaseNamespaceRegExp.match(relatedNamespace).hasMatch())){
 		return (QStringLiteral("::") + aNamespace);
 	}
 
 	static QRegularExpression imtgqlNamespaceRegExp("\\s*(?:\\:\\:){0,}\\s*imtgql\\s*(?:\\:\\:){0,}\\s*");
-	if(aNamespace == QStringLiteral("imtgql") && imtgqlNamespaceRegExp.match(relatedNamespace).hasMatch()){
+	if(aNamespace == QStringLiteral("imtgql") && (relatedNamespace.isEmpty() || imtgqlNamespaceRegExp.match(relatedNamespace).hasMatch())){
 		return (QStringLiteral("::") + aNamespace);
 	}
 
