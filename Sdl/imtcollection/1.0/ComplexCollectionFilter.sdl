@@ -1,0 +1,39 @@
+schema {
+	name: CollectionFilter
+	namespace: imtcollection
+	version: 1.0
+}
+
+import {
+	"../../imtbase/1.0/ImtBaseTypes.sdl"
+}
+
+type FieldSortingInfo
+{
+	fieldId: String!
+	sortingOrder: String!
+}
+
+type FieldFilter
+{
+	fieldId: ID!
+	filterValue: String!
+	filterValueType: ID! # available types: signed, unsigned, floatingPoint, string, bool
+	filterOperation: ID! # available operations: ==, !=, <, >, >=, <=, CONTAINS
+}
+
+type GroupFilter
+{
+	fieldFilters: [FieldFilter]
+	groupFilters: [GroupFilter]
+
+	logicalOperation: ID! # available operations: AND, OR
+}
+
+type ComplexCollectionFilter {
+	sortingInfo: [FieldSortingInfo]
+	fieldsFilter: GroupFilter
+	timeFilter: TimeFilter
+}
+
+

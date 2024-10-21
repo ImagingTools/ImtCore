@@ -4,6 +4,10 @@ schema {
 	version: 1.0
 }
 
+import {
+	"../../imtbase/1.0/ComplexCollectionFilter.sdl"
+}
+
 type CollectionViewParams {
 	Count: Int
 	Offset: Int
@@ -48,19 +52,6 @@ input InputId {
 	Id: ID!
 }
 
-type ColumnOperation
-{
-	columnId: ID!
-	operation: ID! # available operations: ==, !=, <, >, >=, <=, LIKE, ILIKE
-	value: String!
-	valueType: ID! # available types: int, uint, double, string, bool
-}
 
-type GroupOperation
-{
-	columnOperations: [ColumnOperation]
-	groupOperations: [GroupOperation]
 
-	operation: ID! # available operations: AND, OR
-}
 
