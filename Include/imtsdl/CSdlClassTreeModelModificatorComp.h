@@ -29,19 +29,19 @@ protected:
 
 private:
 	/// \todo add error handling for it
-	void AddFieldWriteToModelCode(QTextStream& stream, const CSdlField& field);
-	void AddFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
-	void AddCustomFieldWriteToModelCode(QTextStream& stream, const CSdlField& field);
-	void AddCustomFieldWriteToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
-	void AddCustomFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
-	void AddCustomFieldReadFromModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
-	void AddPrimitiveArrayFieldWriteToModelCode(QTextStream& stream, const CSdlField& field);
-	void AddPrimitiveArrayFieldWriteToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
-	void AddPrimitiveArrayFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
+	void AddFieldWriteToModelCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType);
+	void AddFieldReadFromModelCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType);
+	void AddCustomFieldWriteToModelCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType);
+	void AddCustomFieldWriteToModelImplCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType, quint16 hIndents = 1);
+	void AddCustomFieldReadFromModelCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType);
+	void AddCustomFieldReadFromModelImplCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType, quint16 hIndents = 1);
+	void AddPrimitiveArrayFieldWriteToModelCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType);
+	void AddPrimitiveArrayFieldWriteToModelImplCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType, quint16 hIndents = 1);
+	void AddPrimitiveArrayFieldReadFromModelCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType);
 	void AddPrimitiveArrayFieldReadFromModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
-	void AddCustomArrayFieldWriteToModelCode(QTextStream& stream, const CSdlField& field);
-	void AddCustomArrayFieldWriteToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
-	void AddCustomArrayFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
+	void AddCustomArrayFieldWriteToModelCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType);
+	void AddCustomArrayFieldWriteToModelImplCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType, quint16 hIndents = 1);
+	void AddCustomArrayFieldReadFromModelCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType);
 	void AddCustomArrayFieldReadFromModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
 
 };
