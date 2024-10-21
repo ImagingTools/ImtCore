@@ -21,7 +21,8 @@
 #include <imtbase/CObjectCollection.h>
 #include <imtbase/COperationDescription.h>
 #include <imtgql/imtgql.h>
-#include <GeneratedFiles/imtcollectionsdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
+#include <imtbase/ComplexCollectionFilterConverter.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
 
 namespace imtgql
@@ -1134,12 +1135,12 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 		}
 
 		bool isComplexFilterOk = false;
-		sdl::imtcollection::CollectionFilter::V1_0::CComplexCollectionFilter complexFilterSdl;
+		sdl::imtbase::ComplexCollectionFilter::V1_0::CComplexCollectionFilter complexFilterSdl;
 		isComplexFilterOk = complexFilterSdl.ReadFromModel(complexFilterSdl, complexFilterModel);
 
-		if (isComplexFilterOk && m_complexCollectionFilterProcessorCompPtr.IsValid()){
+		if (isComplexFilterOk){
 			istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
-			if (m_complexCollectionFilterProcessorCompPtr->DoProcessing(nullptr, &complexFilterSdl, complexFilterPtr.GetPtr()) == iproc::IProcessor::TS_OK){
+			if (imtbasesdl::CreateComplexCollectionFilterFromRepresentation(complexFilterSdl, *complexFilterPtr)){
 				filterParams.SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
 			}
 		}

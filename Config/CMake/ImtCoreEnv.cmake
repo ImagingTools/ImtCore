@@ -39,5 +39,6 @@ endif()
 include_directories("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}")
 include_directories("${IMTCOREDIR}/Include")
 include_directories("${IMTCOREDIR}/Impl")
+include_directories("${IMTCOREDIR}/Sdl")
 
 link_directories("${BUILDDIR}/ImtCore/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")

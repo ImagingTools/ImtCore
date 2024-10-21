@@ -5,5 +5,5 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 QT += network websockets qml quick quickwidgets sql
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtcom
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtcom -limtbasesdl
 

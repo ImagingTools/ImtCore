@@ -4,6 +4,7 @@ include($(IACFDIR)/Config/QMake/Iacf.pri)
 
 INCLUDEPATH += $$PWD/../../Include
 INCLUDEPATH += $$PWD/../../Impl
+INCLUDEPATH += $$PWD/../../Sdl
 INCLUDEPATH += $$PWD/../../$$AUXINCLUDEDIR
 
 win32{

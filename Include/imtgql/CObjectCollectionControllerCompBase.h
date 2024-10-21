@@ -37,7 +37,6 @@ public:
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
-		I_ASSIGN(m_complexCollectionFilterProcessorCompPtr, "ComplexCollectionFilterProcessor", "Complex collection filter processor", false, "ComplexCollectionFilterProcessor");
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -167,7 +166,6 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_headersProviderCompPtr);
 	I_REF(imtgql::IOperationContextController, m_operationContextControllerCompPtr);
-	I_REF(iproc::IProcessor, m_complexCollectionFilterProcessorCompPtr);
 
 	imtbase::CTimeFilterParamRepresentationController m_timeFilterParamRepresentationController;
 };

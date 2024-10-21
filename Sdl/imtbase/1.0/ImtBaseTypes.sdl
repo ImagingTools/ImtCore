@@ -1,13 +1,13 @@
+schema {
+	name: ImtBaseTypes
+	namespace: imtbase
+	version: 1.0
+}
+
+
 type TimeRange
 {
 	Begin: String
 	End: String
 }
 
-type TimeFilter
-{
-	timeRange: TimeRange
-	timeUnit: String
-	interpretationMode: String
-	unitMultiplier: Integer
-}

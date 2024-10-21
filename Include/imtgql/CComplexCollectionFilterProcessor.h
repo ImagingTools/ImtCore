@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtbase/IComplexCollectionFilter.h>
-#include <GeneratedFiles/imtcollectionsdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
 
 namespace imtgql
@@ -30,11 +30,11 @@ public:
 
 private:
 	bool ProcessGroupFilter(
-		const sdl::imtcollection::CollectionFilter::V1_0::CGroupFilter& source,
+		const sdl::imtbase::ComplexCollectionFilter::V1_0::CGroupFilter& source,
 		imtbase::IComplexCollectionFilter::GroupFilter& target);
 
 	bool ProcessFieldFilter(
-		const sdl::imtcollection::CollectionFilter::V1_0::CFieldFilter& source,
+		const sdl::imtbase::ComplexCollectionFilter::V1_0::CFieldFilter& source,
 		imtbase::IComplexCollectionFilter::FieldFilter& target);
 };
 

@@ -1,12 +1,20 @@
 schema {
-	name: CollectionFilter
-	namespace: imtcollection
+	name: ComplexCollectionFilter
+	namespace: imtbase
 	version: 1.0
 }
 
 
 import {
-	"../../imtbase/1.0/ImtBaseTypes.sdl"
+	"ImtBaseTypes.sdl"
+}
+
+type TimeFilter
+{
+	timeRange: TimeRange
+	timeUnit: String
+	interpretationMode: String
+	unitMultiplier: Integer
 }
 
 type FieldSortingInfo
