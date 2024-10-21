@@ -40,9 +40,28 @@ class QmlMouseEvent {
     }
 
     relative(obj){
+        let rotation = 0
+        let parent = obj
+        while(parent){
+            rotation += parent.rotation
+            parent = parent.parent
+        }
+
+        let rad = -rotation*Math.PI/180
+
         let rect = obj.__DOM.getBoundingClientRect()
-        this.x = this.originX - rect.x
-        this.y = this.originY - rect.y
+
+        let x = this.originX - rect.x
+        let y = this.originY - rect.y
+
+        if(rad !== 0){
+            this.x = x*Math.cos(rad) - (y - rect.height / 2)*Math.sin(rad)
+            this.y = x*Math.sin(rad) + (y + rect.height / 2)*Math.cos(rad)
+        } else {
+            this.x = x
+            this.y = y
+        }
+        
     }
 
     fillButton(event){

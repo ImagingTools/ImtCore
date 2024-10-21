@@ -1033,7 +1033,7 @@ class Instruction {
         let typeInfo = this.getTypeInfo(this.extends)
         let typeBase = typeInfo.type
         while(typeBase instanceof QmlFile){
-            typeBase = typeBase.instruction.getTypeInfo(typeBase.instruction.extends).typeBase
+            typeBase = typeBase.instruction.getTypeInfo(typeBase.instruction.extends).type
         }
 
         if(typeInfo.type instanceof QmlFile){
@@ -1204,7 +1204,7 @@ class Instruction {
                 connectedSignal.args.push(arg.replaceAll('`', ''))
             }
 
-            code.push(`__self.__addSignalSlot('${names.join('.')}',function(${connectedSignal.args.join(',')}){try{JQApplication.beginUpdate();`)
+            code.push(`__self['${signalName}'].extendSlot(function(${connectedSignal.args.join(',')}){try{JQApplication.beginUpdate();`)
             
             let stat = this.prepare(connectedSignal.source, {isCompute:false, thisKey: '__self', value:'', local:[connectedSignal.args]}) 
             code.push(stat.value)

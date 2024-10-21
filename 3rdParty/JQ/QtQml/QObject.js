@@ -82,21 +82,6 @@ class QObject extends BaseObject {
     setParent(parent){
         this.parent = parent ? parent.__resolve() : parent
     }
-
-    __addSignalSlot(name, slot){
-        let self = this.__self
-
-        let slotSuper = self[name]
-        self[name] = (...args)=>{
-            try {
-                if(slotSuper) slotSuper.call(this, ...args)
-                slot.call(this, ...args)
-            } catch (error) {
-                console.error(error)
-            }
-            
-        }
-    }
 }
 
 module.exports = QObject

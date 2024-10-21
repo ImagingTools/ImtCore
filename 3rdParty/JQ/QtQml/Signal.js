@@ -4,7 +4,7 @@ class Signal {
             f.emit(...args)
         }
         f.__parent = parent ? parent.__proxy : null
-        f.__slotName = meta.slotName
+        f.__slot = parent ? parent[meta.slotName] : null
         // f.__args = meta.args
         f.__proto__ = Signal.prototype
         return f
@@ -81,8 +81,8 @@ class Signal {
             if(this.signalBlocked() || this.__parent.signalsBlocked()) return
             this.__parent.__beginProcess()
 
-            if(this.__parent[this.__slotName]){
-                this.__parent[this.__slotName](...args)
+            if(this.__slot){
+                this.__slot.call(this.__parent, ...args)
             }
         }
 
@@ -104,6 +104,19 @@ class Signal {
         }
     }
 
+    extendSlot(slot){
+        let slotSuper = this.__slot
+        this.__slot = (...args)=>{
+            try {
+                if(slotSuper) slotSuper.call(this.__parent, ...args)
+                slot.call(this.__parent, ...args)
+            } catch (error) {
+                console.error(error)
+            }
+            
+        }
+    }
+
     __free(){
 
     }
@@ -111,7 +124,7 @@ class Signal {
     __destroy(){
         delete this.__connections
         delete this.__parent
-        delete this.__slotName
+        delete this.__slot
     }
 }
 
