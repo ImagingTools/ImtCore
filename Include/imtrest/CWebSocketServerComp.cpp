@@ -56,14 +56,10 @@ void CWebSocketServerComp::OnComponentCreated()
 }
 
 
-// IClientConnectionStatus
-
-
 // reimplemented (imtcom::IConnectionStatusProvider)
 
 imtcom::IConnectionStatusProvider::ConnectionStatus CWebSocketServerComp::GetConnectionStatus() const
 {
-	// return m_senderLoginStatusMap.value(clientId, imtauth::ILoginStatusProvider::LSF_CACHED);
 	return imtcom::IConnectionStatusProvider::CS_UNKNOWN;
 }
 

@@ -115,6 +115,7 @@ protected:
 				virtual public imtcom::IConnectionStatusProvider
 	{
 	public:
+		ConnectionStatusProvider();
 		virtual void SetConnectionStatus(ConnectionStatus status);
 
 		// reimplemented (imtcom::IConnectionStatusProvider)

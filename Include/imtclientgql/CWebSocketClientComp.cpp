@@ -360,11 +360,17 @@ CWebSocketClientComp::NetworkOperation::~NetworkOperation()
 
 // public methods of embedded class ConnectionStatusProvider
 
+CWebSocketClientComp::ConnectionStatusProvider::ConnectionStatusProvider()
+	:m_connectionStatus(imtcom::IConnectionStatusProvider::CS_UNKNOWN)
+{
+}
+
+
 void CWebSocketClientComp::ConnectionStatusProvider::SetConnectionStatus(
 			imtcom::IConnectionStatusProvider::ConnectionStatus status)
 {
 	if (m_connectionStatus != status){
-		istd::IChangeable::ChangeSet changeSet(m_connectionStatus);
+		istd::IChangeable::ChangeSet changeSet(status);
 		istd::CChangeNotifier notifier(this, &changeSet);
 
 		m_connectionStatus = status;
