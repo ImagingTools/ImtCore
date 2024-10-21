@@ -422,7 +422,12 @@ Item {
             var viewParams = Gql.GqlObject("viewParams");
             viewParams.InsertField("Count", count);
             viewParams.InsertField("Offset", offset);
-            viewParams.InsertField("FilterModel", filterModel.toJson());
+            if (filterModel.toGraphQL){
+                viewParams.InsertField("ComplexFilterModel", filterModel.toJson());
+            }
+            else{
+                viewParams.InsertField("FilterModel", filterModel.toJson());
+            }
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
@@ -453,7 +458,7 @@ Item {
             this.setGqlQuery(gqlData, headers);
         }
 
-        onStateChanged: {           
+        onStateChanged: {
             if (this.state === "Ready"){
                 var dataModelLocal;
                 if (this.containsKey("errors")){

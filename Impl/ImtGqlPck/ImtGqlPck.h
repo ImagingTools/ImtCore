@@ -29,6 +29,7 @@
 #include <imtgql/CGqlSearchControllerComp.h>
 #include <imtgql/CTableViewParamControllerComp.h>
 #include <imtgql/CConnectionStatusSubscriberControllerComp.h>
+#include <imtgql/CComplexCollectionFilterProcessor.h>
 
 
 /**
@@ -61,6 +62,7 @@ typedef imtgql::CSlaveSubscriberControllerComp SlaveSubscriberController;
 typedef imtgql::CGqlSearchControllerComp GqlSearchController;
 typedef imtgql::CTableViewParamControllerComp TableViewParamController;
 typedef imtgql::CConnectionStatusSubscriberControllerComp ConnectionStatusSubscriberController;
+typedef imtgql::CComplexCollectionFilterProcessor ComplexCollectionFilterProcessor;
 
 
 } // namespace ImtGqlPck

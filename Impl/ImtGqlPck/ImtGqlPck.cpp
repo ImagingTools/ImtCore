@@ -129,6 +129,11 @@ I_EXPORT_COMPONENT(
 			"Connection status subscriber controller",
 			"Connection Status Subscriber Controller");
 
+I_EXPORT_COMPONENT(
+			ComplexCollectionFilterProcessor,
+			"Complex collection filter processor",
+			"Collection Filter Processor");
+
 
 } // namespace ImtGqlPck
 

@@ -3,6 +3,8 @@
 
 // Qt includes
 #include <QtCore/QFile>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QRegularExpressionMatch>
 
 // ACF includes
 #include <istd/TOptDelPtr.h>
@@ -16,8 +18,8 @@
 #include <iprm/IIdParam.h>
 
 // ImtCore includes
-#include <imtbase/ICollectionFilter.h>
 #include <imtbase/CObjectCollection.h>
+#include <imtbase/ICollectionFilter.h>
 
 
 namespace imtdb
@@ -32,6 +34,8 @@ static const QByteArray s_documentIdColumn = QByteArrayLiteral("DocumentId");
 static const QByteArray s_documentColumn = QByteArrayLiteral("Document");
 static const QByteArray s_addedColumn = QByteArrayLiteral("Added");
 static const QByteArray s_lastModifiedColumn = QByteArrayLiteral("LastModified");
+
+static QSet<QString> s_filterableColumns = { s_typeIdColumn, s_nameColumn, s_descriptionColumn, s_addedColumn, s_lastModifiedColumn};
 
 
 // public methods
@@ -716,6 +720,16 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::ICollectio
 }
 
 
+bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const
+{
+	bool retVal = BaseClass::CreateSortQuery(collectionFilter, sortQuery);
+
+	SubstituteFieldIds(sortQuery);
+
+	return retVal;
+}
+
+
 bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
 {
 	bool retVal = true;
@@ -723,39 +737,61 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
 
-	if (paramIds.contains("ObjectFilter")){
-		iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
-		if (objectFilterParamPtr.IsValid()){
-			retVal = CreateObjectFilterQuery(*objectFilterParamPtr, objectFilterQuery);
-			if (!retVal){
-				return false;
-			}
-		}
-	}
-
 	QString textFilterQuery;
-	if (paramIds.contains("Filter")){
-		iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
-		if (collectionFilterParamPtr.IsValid()){
-			retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
-			if (!retVal){
-				return false;
-			}
-		}
-	}
-
 	QString timeFilterQuery;
-	if (paramIds.contains("TimeFilter")){
-		iprm::TParamsPtr<imtbase::ITimeFilterParam> timeFilterParamPtr(&filterParams, "TimeFilter");
-		if (timeFilterParamPtr.IsValid()){
-			retVal = CreateTimeFilterQuery(*timeFilterParamPtr, timeFilterQuery);
+	QString additionalFilters;
+
+	if (paramIds.contains("ComplexFilter")){
+		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(&filterParams, "ComplexFilter");
+		if (complexFilterParamPtr.IsValid()){
+			retVal = CreateTextFilterQuery(*complexFilterParamPtr, textFilterQuery);
+
+			if (!retVal){
+				return false;
+			}
+
+			SubstituteFieldIds(textFilterQuery);
+
+			retVal = CreateTimeFilterQuery(complexFilterParamPtr->GetTimeFilter(), timeFilterQuery);
 			if (!retVal){
 				return false;
 			}
 		}
 	}
+	else{
+		if (paramIds.contains("ObjectFilter")){
+			iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
+			if (objectFilterParamPtr.IsValid()){
+				retVal = CreateObjectFilterQuery(*objectFilterParamPtr, objectFilterQuery);
+				if (!retVal){
+					return false;
+				}
+			}
+		}
 
-	QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
+		if (paramIds.contains("Filter")){
+			iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
+			if (collectionFilterParamPtr.IsValid()){
+				retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
+				if (!retVal){
+					return false;
+				}
+			}
+		}
+
+		if (paramIds.contains("TimeFilter")){
+			iprm::TParamsPtr<imtbase::ITimeFilterParam> timeFilterParamPtr(&filterParams, "TimeFilter");
+			if (timeFilterParamPtr.IsValid()){
+				retVal = CreateTimeFilterQuery(*timeFilterParamPtr, timeFilterQuery);
+				if (!retVal){
+					return false;
+				}
+			}
+		}
+
+		additionalFilters = CreateAdditionalFiltersQuery(filterParams);
+	}
+
 
 	if (!objectFilterQuery.isEmpty()){
 		filterQuery += " AND (" + objectFilterQuery + ")";
@@ -925,6 +961,14 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateObjectHistoryQuery(
 
 // protected methods
 
+bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
+{
+	textFilterQuery = imtbase::CreateDefaultSqlFilterQuery(collectionFilter);
+
+	return true;
+}
+
+
 const ifile::IFilePersistence* CSqlDatabaseDocumentDelegateComp::FindDocumentPersistence(const QByteArray& typeId) const
 {
 	int persistenceIndex = -1;
@@ -943,6 +987,28 @@ const ifile::IFilePersistence* CSqlDatabaseDocumentDelegateComp::FindDocumentPer
 	}
 
 	return nullptr;
+}
+
+
+void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query) const
+{
+	static QRegularExpression regexp("(\\\"[^\\\"]{1,}\\\")");
+
+	QStringList list;
+	for (const QRegularExpressionMatch& match : regexp.globalMatch(query)){
+		QStringList capturedList = match.capturedTexts();
+		list.append(capturedList.first());
+	}
+
+	for (const QString& item : list){
+		QString substitute = item;
+		substitute.replace("\"", "");
+
+		if (!s_filterableColumns.contains(substitute)){
+			substitute = QString("\"DataMetaInfo\"->>'%1'").arg(substitute);
+			query.replace(item, substitute);
+		}
+	}
 }
 
 

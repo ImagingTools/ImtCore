@@ -120,8 +120,14 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 				return QByteArray();
 			}
 
+			iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
 			iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
-			if (collectionFilterParamPtr.IsValid()){
+			if (complexFilterParamPtr.IsValid()){
+				if (!CreateSortQuery(*complexFilterParamPtr, sortQuery)){
+					return QByteArray();
+				}
+			}
+			else if (collectionFilterParamPtr.IsValid()){
 				if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
 					return QByteArray();
 				}
@@ -459,6 +465,14 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
 		sortQuery = QString("ORDER BY \"%1\" %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
 	}
+
+	return true;
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const
+{
+	sortQuery = imtbase::CreateDefaultSqlSortingQuery(collectionFilter);
 
 	return true;
 }

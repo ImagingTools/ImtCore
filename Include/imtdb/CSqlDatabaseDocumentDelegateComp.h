@@ -5,6 +5,7 @@
 #include <ifile/IFilePersistence.h>
 
 // ImtCore includes
+#include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/IRevisionController.h>
 #include <imtdb/IMetaInfoTableDelegate.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
@@ -106,6 +107,7 @@ protected:
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const override;
+	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const override;
 	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const override;
@@ -115,7 +117,9 @@ protected:
 				const iprm::IParamsSet* paramsPtr = nullptr) const;
 
 protected:
+	virtual bool CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const;
 	const ifile::IFilePersistence* FindDocumentPersistence(const QByteArray& typeId) const;
+	void SubstituteFieldIds(QString& query) const;
 
 protected:
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);

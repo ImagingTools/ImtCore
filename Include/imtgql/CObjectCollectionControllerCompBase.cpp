@@ -14,12 +14,14 @@
 
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
+#include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/COperationContext.h>
 #include <imtbase/CTimeFilterParam.h>
 #include <imtbase/CObjectCollection.h>
 #include <imtbase/COperationDescription.h>
 #include <imtgql/imtgql.h>
+#include <GeneratedFiles/imtcollectionsdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
 
 namespace imtgql
@@ -1124,10 +1126,28 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 {
 	this->SetAdditionalFilters(gqlRequest, viewParamsGql, &filterParams);
 
-	QByteArray filterBA = viewParamsGql.GetFieldArgumentValue("FilterModel").toByteArray();
-	if (filterBA.isEmpty()){
+	QByteArray filterBA = viewParamsGql.GetFieldArgumentValue("ComplexFilterModel").toByteArray();
+	if (!filterBA.isEmpty()){
+		imtbase::CTreeItemModel complexFilterModel;
+		if (!complexFilterModel.CreateFromJson(filterBA)){
+			return;
+		}
+
+		bool isComplexFilterOk = false;
+		sdl::imtcollection::CollectionFilter::V1_0::CComplexCollectionFilter complexFilterSdl;
+		isComplexFilterOk = complexFilterSdl.ReadFromModel(complexFilterSdl, complexFilterModel);
+
+		if (isComplexFilterOk && m_complexCollectionFilterProcessorCompPtr.IsValid()){
+			istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
+			if (m_complexCollectionFilterProcessorCompPtr->DoProcessing(nullptr, &complexFilterSdl, complexFilterPtr.GetPtr()) == iproc::IProcessor::TS_OK){
+				filterParams.SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
+			}
+		}
+
 		return;
 	}
+
+	filterBA = viewParamsGql.GetFieldArgumentValue("FilterModel").toByteArray();
 
 	imtbase::CTreeItemModel generalModel;
 	if (!generalModel.CreateFromJson(filterBA)){
@@ -1137,7 +1157,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	iprm::CParamsSet* objectFilterPtr				= new iprm::CParamsSet();
 	imtbase::CCollectionFilter* collectionFilterPtr = new imtbase::CCollectionFilter();
 
-	imtbase::CTreeItemModel* filterIdsModelPtr		= generalModel.GetTreeItemModel("FilterIds");
+	imtbase::CTreeItemModel* filterIdsModelPtr = generalModel.GetTreeItemModel("FilterIds");
 	if (filterIdsModelPtr != nullptr){
 		QByteArrayList filteringInfoIds;
 		for (int i = 0; i < filterIdsModelPtr->GetItemsCount(); i++){

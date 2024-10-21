@@ -21,7 +21,7 @@ ViewBase {
     property alias pagination: pagination_;
     property alias elementsCount: tableInternal.elementsCount;
 
-    property CollectionFilter collectionFilter: CollectionFilter {}
+    property var collectionFilter: CollectionFilter {}
 
     signal selectedIndexChanged(int index);
     signal tableViewParamsAccepted();

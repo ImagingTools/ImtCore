@@ -6,6 +6,7 @@
 #include <iprm/IOptionsList.h>
 
 // ImtCore includes
+#include <imtbase/ComplexCollectionFilterHelper.h>
 #include <imtbase/ICollectionFilter.h>
 #include <imtbase/ITimeFilterParam.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
@@ -76,6 +77,7 @@ protected:
 	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const;
 	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const;
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const;
+	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual QString EncodeTextArgument(const QString& argument) const;
 
 protected:
