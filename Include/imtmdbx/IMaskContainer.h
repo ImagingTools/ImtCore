@@ -21,8 +21,8 @@ public:
 	virtual int GetMaskCount(bool isInversion = false) = 0;
 	virtual void SetDocumentTable(IDocumentTable* documentTable) = 0;
 	virtual quint64 GetUnitCount() = 0;
-	virtual QList<quint64> GetUnitPositions(quint64 offset = 0, int limit = -1) = 0;
-	virtual QList<QByteArray> GetDocuments(quint64 offset = 0, int limit = -1) = 0;
+    virtual QList<quint64> GetUnitPositions(quint64 offset = 0, quint64 limit = -1) = 0;
+    virtual QList<QByteArray> GetDocuments(quint64 offset = 0, quint64 limit = -1) = 0;
 
 };
 

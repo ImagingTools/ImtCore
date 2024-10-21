@@ -50,8 +50,8 @@ public:
 	int GetMaskCount(bool isInversion = false) override;
 	void SetDocumentTable(IDocumentTable* documentTable) override;
 	quint64 GetUnitCount() override;
-	QList<quint64> GetUnitPositions(quint64 offset = 0, int limit = -1) override;
-	QList<QByteArray> GetDocuments(quint64 offset = 0, int limit = -1) override;
+    QList<quint64> GetUnitPositions(quint64 offset = 0, quint64 limit = -1) override;
+    QList<QByteArray> GetDocuments(quint64 offset = 0, quint64 limit = -1) override;
 	bool GetActiveItem(quint64& activeOffset, quint64& activeItem, bool isStart);
 
 

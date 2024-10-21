@@ -512,7 +512,7 @@ quint64 CMaskContainer::GetUnitCount()
 }
 
 
-QList<quint64> CMaskContainer::GetUnitPositions(quint64 offset, int limit)
+QList<quint64> CMaskContainer::GetUnitPositions(quint64 offset, quint64 limit)
 {
 	QList<quint64> list;
 	quint64 activeOffset = 0;
@@ -535,9 +535,9 @@ QList<quint64> CMaskContainer::GetUnitPositions(quint64 offset, int limit)
 				if (unitCount > offset){
 					int position = activeOffset * 64 + i;
 					list.append(position);
-					if(list.length() >= limit){
-						return list;
-					}
+                    if(list.length() >= limit){
+                        return list;
+                    }
 				}
 			}
 		}
@@ -547,7 +547,7 @@ QList<quint64> CMaskContainer::GetUnitPositions(quint64 offset, int limit)
 }
 
 
-QList<QByteArray> CMaskContainer::GetDocuments(quint64 offset, int limit)
+QList<QByteArray> CMaskContainer::GetDocuments(quint64 offset, quint64 limit)
 {
 	QList<QByteArray> list;
 	quint64 activeOffset = 0;
