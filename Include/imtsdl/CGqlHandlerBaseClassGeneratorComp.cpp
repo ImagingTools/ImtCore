@@ -109,7 +109,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 	paramsSet.SetEditableParameter(QByteArrayLiteral("AddBaseComponentMacro"), &enableCompMacroParam);
 
 	iprm::COptionsManager baseClassDirectivesList;
-	baseClassDirectivesList.InsertOption(QStringLiteral("imtgql/CPermissibleGqlRequestHandlerComp.h"), QByteArrayLiteral("imtgql::CPermissibleGqlRequestHandlerComp"));
+	baseClassDirectivesList.InsertOption(QStringLiteral("imtgql/CPermissibleGqlRequestHandlerComp.h"), QByteArrayLiteral("::imtgql::CPermissibleGqlRequestHandlerComp"));
 
 	int extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
 	if (extendResult != TS_OK){
@@ -297,11 +297,11 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 
 	// base class methods override definition
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("// reimplemented (imtgql::CPermissibleGqlRequestHandlerComp)");
+	ifStream << QStringLiteral("// reimplemented (::imtgql::CPermissibleGqlRequestHandlerComp)");
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
+	ifStream << QStringLiteral("virtual ::imtbase::CTreeItemModel* CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
 	FeedStream(ifStream, 1, false);
 
 	// protected section
@@ -418,7 +418,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream
 	stream << GetCapitalizedValue(sdlRequest.GetName());
 	stream << QStringLiteral("GqlRequest& ");
 	stream << GetDecapitalizedValue(sdlRequest.GetName());
-	stream << QStringLiteral("Request, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;");
+	stream << QStringLiteral("Request, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;");
 
 	FeedStream(stream, 1, false);
 }
@@ -430,10 +430,10 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 
 	// declare method
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("imtbase::CTreeItemModel* ");
+	stream << QStringLiteral("::imtbase::CTreeItemModel* ");
 	stream << className;
 	stream << ':' << ':';
-	stream << QStringLiteral("CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const");
+	stream << QStringLiteral("CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const");
 	FeedStream(stream, 1, false);
 
 	// method's body
@@ -454,14 +454,14 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 
 		/// create a carrier model GQL spec	\link https://spec.graphql.org/draft/#sec-Response-Format
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("istd::TDelPtr<imtbase::CTreeItemModel> modelPtr(new imtbase::CTreeItemModel);");
+		stream << QStringLiteral("istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);");
 		FeedStream(stream, 1, false);
 
 		/// \todo add errors model and don't forget to fill it	\link https://spec.graphql.org/draft/#sec-Errors
 
 		// create dataModel - child of a carrier model
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel(\"data\");");
+		stream << QStringLiteral("::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel(\"data\");");
 		FeedStream(stream, 2, false);
 
 		// create sections for expected command IDs

@@ -40,11 +40,11 @@ bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const CSdlType& sdlType
 	// add read method definition
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromGraphQlObject(C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("& object, const imtgql::CGqlObject& request);");
+	ofStream << QStringLiteral("& object, const ::imtgql::CGqlObject& request);");
 	FeedStream(ofStream, 1, false);
 
 	// add write method definition
-	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToGraphQlObject(imtgql::CGqlObject& request) const;");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlObject& request) const;");
 
 	FeedStream(ofStream, 2);
 
@@ -66,7 +66,7 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const CSdlType& sdlType
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("::ReadFromGraphQlObject(C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("& object, const imtgql::CGqlObject& request)\n{");
+	ofStream << QStringLiteral("& object, const ::imtgql::CGqlObject& request)\n{");
 	FeedStream(ofStream, 1, false);
 
 	for (const CSdlField& field: sdlType.GetFields()){
@@ -79,7 +79,7 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const CSdlType& sdlType
 	// write method implementation
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::WriteToGraphQlObject(imtgql::CGqlObject& request) const");
+	ofStream << QStringLiteral("::WriteToGraphQlObject(::imtgql::CGqlObject& request) const");
 	FeedStream(ofStream, 1, false);
 	ofStream << '{';
 	FeedStream(ofStream, 1, false);
@@ -308,7 +308,7 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 	FeedStreamHorizontally(stream, hIndents);
 	// declare temp GQL object
 	const QString dataObjectVariableName = field.GetId() + QStringLiteral("DataObject");
-	stream << QStringLiteral("imtgql::CGqlObject ") << dataObjectVariableName << ';';
+	stream << QStringLiteral("::imtgql::CGqlObject ") << dataObjectVariableName << ';';
 	FeedStream(stream, 1, false);
 
 	// add me to temp object and checks
@@ -345,7 +345,7 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStre
 	// declare temp GQL object list
 	const QString dataObjectVariableName = field.GetId() + QStringLiteral("DataObject");
 	const QString dataObjectListVariableName = dataObjectVariableName + QStringLiteral("List");
-	stream << QStringLiteral("QList<imtgql::CGqlObject> ") << dataObjectListVariableName << ';';
+	stream << QStringLiteral("QList<::imtgql::CGqlObject> ") << dataObjectListVariableName << ';';
 	FeedStream(stream, 1, false);
 
 	// loop declaration
@@ -357,7 +357,7 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStre
 
 	// inLoop: declare temp object (inserted to list)
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("imtgql::CGqlObject ") << dataObjectVariableName << ';';
+	stream << QStringLiteral("::imtgql::CGqlObject ") << dataObjectVariableName << ';';
 	FeedStream(stream, 1, false);
 
 	// inLoop: add me to temp object and checks
@@ -438,7 +438,7 @@ void CSdlClassGqlModificatorComp::AddSetValueToObjectCode(QTextStream& stream, c
 void CSdlClassGqlModificatorComp::AddExtractCustomValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const imtgql::CGqlObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
+	stream << QStringLiteral("const ::imtgql::CGqlObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
@@ -523,7 +523,7 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 	FeedStreamHorizontally(stream, hIndents + 1);
 
 	// declare iteration var
-	stream << QStringLiteral("const imtgql::CGqlObject* ");
+	stream << QStringLiteral("const ::imtgql::CGqlObject* ");
 	stream <<GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
 	stream << '"' << field.GetId() << '"' << ',' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index);");
 	FeedStream(stream, 1, false);

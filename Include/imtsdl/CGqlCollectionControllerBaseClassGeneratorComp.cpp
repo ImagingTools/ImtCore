@@ -109,7 +109,7 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 		paramsSet.SetEditableParameter(QByteArrayLiteral("AddBaseComponentMacro"), &enableCompMacroParam);
 
 		iprm::COptionsManager baseClassDirectivesList;
-		baseClassDirectivesList.InsertOption(QStringLiteral("imtgql/CObjectCollectionControllerCompBase.h"), QByteArrayLiteral("imtgql::CObjectCollectionControllerCompBase"));
+		baseClassDirectivesList.InsertOption(QStringLiteral("imtgql/CObjectCollectionControllerCompBase.h"), QByteArrayLiteral("::imtgql::CObjectCollectionControllerCompBase"));
 
 		int extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
 		if (extendResult != TS_OK){
@@ -326,18 +326,18 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 
 	// base class methods override definition
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("// reimplemented (imtgql::CObjectCollectionControllerCompBase)");
+	ifStream << QStringLiteral("// reimplemented (::imtgql::CObjectCollectionControllerCompBase)");
 	FeedStream(ifStream, 1, false);
 
 	if (operationsList.contains(CSdlDocumentType::OT_LIST)){
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << QStringLiteral("virtual bool SetupGqlItem(const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel, int itemIndex,const imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
+		ifStream << QStringLiteral("virtual bool SetupGqlItem(const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
 		FeedStream(ifStream, 1, false);
 	}
 
 	if (operationsList.contains(CSdlDocumentType::OT_GET)){
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel, QString& errorMessage) const override;");
+		ifStream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, QString& errorMessage) const override;");
 		FeedStream(ifStream, 1, false);
 	}
 
@@ -345,7 +345,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 			operationsList.contains(CSdlDocumentType::OT_INSERT))
 	{
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const override;");
+		ifStream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const override;");
 		FeedStream(ifStream, 1, false);
 	}
 
@@ -509,7 +509,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 			stream << QStringLiteral("& representationPayload");
 		}
 		else {
-			stream << QStringLiteral("imtbase::IObjectCollectionIterator& objectCollectionIterator,");
+			stream << QStringLiteral("::imtbase::IObjectCollectionIterator& objectCollectionIterator,");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, hIndents + 3);
@@ -643,14 +643,14 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	// b) name and argset
 	switch (operationType){
 	case CSdlDocumentType::OT_LIST:
-		stream << QStringLiteral("SetupGqlItem(const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel, int itemIndex,const imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const");
+		stream << QStringLiteral("SetupGqlItem(const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const");
 		break;
 	case CSdlDocumentType::OT_GET:
-		stream << QStringLiteral("CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const imtgql::CGqlRequest& gqlRequest, imtbase::CTreeItemModel& dataModel, QString& errorMessage) const");
+		stream << QStringLiteral("CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, QString& errorMessage) const");
 		break;
 	case CSdlDocumentType::OT_UPDATE:
 	case CSdlDocumentType::OT_INSERT:
-		stream << QStringLiteral("CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const");
+		stream << QStringLiteral("CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const");
 		break;
 	default:
 		break;

@@ -368,7 +368,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 	FeedStream(ifStream, 2, false);
 	ifStream << QStringLiteral("bool ");
 	ifStream << className << ':' << ':';
-	ifStream << QStringLiteral("SetupGqlRequest(imtgql::CGqlRequest& gqlRequest, const ");
+	ifStream << QStringLiteral("SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const ");
 	ifStream << GetCapitalizedValue(sdlRequest.GetName());
 	ifStream << QStringLiteral("RequestArguments& requestArguments, const ");
 	ifStream << GetCapitalizedValue(sdlRequest.GetName());
@@ -386,7 +386,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 	// MAIN CONSTRUCTOR + PARSING
 	FeedStream(ifStream, 2, false);
 	ifStream << className << ':' << ':' << className;
-	ifStream << QStringLiteral("(const imtgql::CGqlRequest& gqlRequest)");
+	ifStream << QStringLiteral("(const ::imtgql::CGqlRequest& gqlRequest)");
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream);
@@ -416,7 +416,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const CSdlRequest& s
 
 	// GQL context
 	FeedStream(ifStream, 2, false);
-	ifStream << QStringLiteral("const imtgql::IGqlContext* ");
+	ifStream << QStringLiteral("const ::imtgql::IGqlContext* ");
 	ifStream << className << ':' << ':' ;
 	ifStream << QStringLiteral("GetRequestContext() const");
 	FeedStream(ifStream, 1, false);
@@ -688,7 +688,7 @@ void CGqlWrapClassCodeGeneratorComp::AddMethodDeclarations(QTextStream& stream, 
 
 	// client-side method (setup GQL request)
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("[[nodiscard]] static bool SetupGqlRequest(imtgql::CGqlRequest& gqlRequest, const ");
+	stream << QStringLiteral("[[nodiscard]] static bool SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const ");
 	stream << GetCapitalizedValue(sdlRequest.GetName());
 	stream << QStringLiteral("RequestArguments& requestArguments, const ");
 	stream << GetCapitalizedValue(sdlRequest.GetName());
@@ -700,7 +700,7 @@ void CGqlWrapClassCodeGeneratorComp::AddMethodDeclarations(QTextStream& stream, 
 
 	// default constructor with GraphQL request
 	FeedStreamHorizontally(stream);
-	stream << 'C' << sdlRequest.GetName() << QStringLiteral("GqlRequest (const imtgql::CGqlRequest& gqlRequest);");
+	stream << 'C' << sdlRequest.GetName() << QStringLiteral("GqlRequest (const ::imtgql::CGqlRequest& gqlRequest);");
 	FeedStream(stream, 1, false);
 
 	// validation method
@@ -722,7 +722,7 @@ void CGqlWrapClassCodeGeneratorComp::AddMethodDeclarations(QTextStream& stream, 
 
 	// Get GQL context
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("const imtgql::IGqlContext* GetRequestContext() const;");
+	stream << QStringLiteral("const ::imtgql::IGqlContext* GetRequestContext() const;");
 	FeedStream(stream, 1, false);
 }
 
@@ -746,7 +746,7 @@ void CGqlWrapClassCodeGeneratorComp::AddClassProperties(QTextStream& stream, con
 
 	// Gql context
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("const imtgql::IGqlContext* m_gqlContextPtr;");
+	stream << QStringLiteral("const ::imtgql::IGqlContext* m_gqlContextPtr;");
 	FeedStream(stream, 1, false);
 
 }
@@ -882,7 +882,7 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 	FeedStreamHorizontally(stream, hIndents);
 	// declare temp GQL object
 	const QString dataObjectVariableName = field.GetId() + QStringLiteral("DataObject");
-	stream << QStringLiteral("imtgql::CGqlObject ") << dataObjectVariableName << ';';
+	stream << QStringLiteral("::imtgql::CGqlObject ") << dataObjectVariableName << ';';
 	FeedStream(stream, 1, false);
 
 	// add me to temp object and checks
@@ -964,7 +964,7 @@ void CGqlWrapClassCodeGeneratorComp::AddSetValueToObjectCode(QTextStream& stream
 void CGqlWrapClassCodeGeneratorComp::AddExtractCustomValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const imtgql::CGqlObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = gqlRequest.GetParamObject(");
+	stream << QStringLiteral("const ::imtgql::CGqlObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = gqlRequest.GetParamObject(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
