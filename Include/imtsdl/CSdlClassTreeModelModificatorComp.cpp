@@ -39,13 +39,13 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const CSdlType& s
 
 	// add method definitions
 	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToModel(");
-	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), sdlType.GetNamespace());
+	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex = 0) const;");
 	FeedStream(ofStream, 1, false);
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromModel(C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("& object, const ");
-	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), sdlType.GetNamespace());
+	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << ("::CTreeItemModel& model, int modelIndex = 0);");
 	FeedStream(ofStream, 2);
 
@@ -66,7 +66,7 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const CSdlType& s
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("::WriteToModel(");
-	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), sdlType.GetNamespace());
+	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex) const\n{");
 	FeedStream(ofStream, 1, false);
 
@@ -84,7 +84,7 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const CSdlType& s
 	ofStream << QStringLiteral("::ReadFromModel(C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("& object, const ");
-	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), sdlType.GetNamespace());
+	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex)\n{");
 	FeedStream(ofStream, 1, false);
 
@@ -267,7 +267,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelImplCode(QText
 	FeedStreamHorizontally(stream, hIndents);
 
 	// Create a new model
-	stream << GetEscapedNamespace(QStringLiteral("imtbase"), sdlType.GetNamespace());
+	stream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	stream << QStringLiteral("::CTreeItemModel* ");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral("NewModelPtr = model.AddTreeModel(");
@@ -305,7 +305,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelCode(QTextStr
 {
 	FeedStreamHorizontally(stream);
 
-	stream << GetEscapedNamespace(QStringLiteral("imtbase"), sdlType.GetNamespace());
+	stream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	stream << QStringLiteral("::CTreeItemModel* ");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral("DataModelPtr = model.GetTreeItemModel(");
@@ -417,7 +417,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 	// add a new model,to store list
 	const QString newTreeModelVarName = QStringLiteral("new") + GetCapitalizedValue(field.GetId()) + QStringLiteral("ModelPtr");
 	FeedStreamHorizontally(stream, hIndents);
-	stream << GetEscapedNamespace(QStringLiteral("imtbase"), sdlType.GetNamespace());
+	stream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	stream << QStringLiteral("::CTreeItemModel* ") << newTreeModelVarName;
 	stream << QStringLiteral(" = model.AddTreeModel(");
 	stream << '"' << field.GetId() << '"';
@@ -459,7 +459,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType)
 {
 	FeedStreamHorizontally(stream, 1);
-	stream << GetEscapedNamespace(QStringLiteral("imtbase"), sdlType.GetNamespace());
+	stream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	stream << QStringLiteral("::CTreeItemModel* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model = model.GetTreeItemModel(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(", modelIndex);");
@@ -597,7 +597,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 	// add a new model,to store list
 	const QString newTreeModelVarName = QStringLiteral("new") + GetCapitalizedValue(field.GetId()) + QStringLiteral("ModelPtr");
 
-	stream << GetEscapedNamespace(QStringLiteral("imtbase"), sdlType.GetNamespace());
+	stream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	stream << QStringLiteral("::CTreeItemModel* ") << newTreeModelVarName;
 	stream << QStringLiteral(" = model.AddTreeModel(");
 	stream << '"' << field.GetId() << '"';
@@ -649,7 +649,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldReadFromModelCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType)
 {
 	FeedStreamHorizontally(stream, 1);
-	stream << GetEscapedNamespace(QStringLiteral("imtbase"), sdlType.GetNamespace());
+	stream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	stream << QStringLiteral("::CTreeItemModel* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model = model.GetTreeItemModel(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(", modelIndex);");
