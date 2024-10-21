@@ -46,6 +46,14 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequ
 	}
 	dataObject["headers"] = headersObject;
 
+	QString clientId;
+	if (m_clientIdCompPtr.IsValid()){
+		clientId = m_clientIdCompPtr->GetText();
+	}
+	if (!clientId.isEmpty()){
+		dataObject["clientId"] = clientId;
+	}
+
 	QByteArray data = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
 
 	m_webSocket.sendTextMessage(data);
@@ -150,6 +158,14 @@ void CWebSocketClientComp::OnComponentCreated()
 	m_refreshTimer.setSingleShot(true);
 	m_refreshTimer.setInterval(4000);
 
+	if (m_clientIdCompPtr.IsValid()){
+		QString clientId = m_clientIdCompPtr->GetText();
+		if (clientId.isEmpty()){
+			clientId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+			m_clientIdCompPtr->SetText(clientId);
+		}
+	}
+
 	EnsureWebSocketConnection();
 }
 
@@ -183,10 +199,6 @@ void CWebSocketClientComp::OnWebSocketConnected()
 
 	if (m_clientIdCompPtr.IsValid()){
 		clientId = m_clientIdCompPtr->GetText();
-		if (clientId.isEmpty()){
-			clientId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
-			m_clientIdCompPtr->SetText(clientId);
-		}
 	}
 
 	QString body = "{ \"type\": \"connection_init\" %1}";

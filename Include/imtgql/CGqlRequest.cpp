@@ -514,6 +514,8 @@ bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 	m_params.ResetData();
 	m_fields.ResetData();
 
+	m_gqlContextPtr.reset();
+
 	return true;
 }
 

@@ -164,6 +164,11 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
+	imtrest::CWebSocketRequest* webSocketRequestPtr = const_cast<imtrest::CWebSocketRequest*>(dynamic_cast<const imtrest::CWebSocketRequest*>(&request));
+	if (webSocketRequestPtr != nullptr){
+		webSocketRequestPtr->SetCommandId(gqlRequest.GetCommandId());
+	}
+
 	IGqlContext* gqlContextPtr = const_cast<IGqlContext*>(gqlRequest.GetRequestContext());
 	IGqlContext::Headers gqlHeaders;
 	if (gqlContextPtr != nullptr){

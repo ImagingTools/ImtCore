@@ -58,6 +58,7 @@ public:
 	MethodType GetMethodType() const;
 	QByteArray GetSubscriptionId() const;
 	void RegisterRequestEventHandler(IRequestEventHandler* requestEventHandler);
+	void SetCommandId(const QByteArray& commandId);
 
 	// reimplemented (IRequest)
 	virtual RequestState GetState() const override;
@@ -81,6 +82,7 @@ private:
 	QByteArray m_clientId;
 	QByteArray m_subscriptionId;
 	MethodType m_type;
+	QByteArray m_commandId;
 
 	const IRequestServlet* m_requestHandlerPtr;
 	const IProtocolEngine& m_engine;

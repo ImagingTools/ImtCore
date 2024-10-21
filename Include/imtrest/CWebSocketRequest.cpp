@@ -19,7 +19,7 @@ namespace imtrest
 // public methods
 
 CWebSocketRequest::CWebSocketRequest(const IProtocolEngine& engine)
-	:m_engine(engine)
+	: m_requestHandlerPtr(nullptr), m_engine(engine)
 {
 	m_requestId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 }
@@ -162,6 +162,11 @@ void CWebSocketRequest::RegisterRequestEventHandler(IRequestEventHandler* reques
 	m_requestEventHandlers.append(requestEventHandler);
 }
 
+void CWebSocketRequest::SetCommandId(const QByteArray& commandId)
+{
+	m_commandId = commandId;
+}
+
 
 // reimplemented (IRequest)
 
@@ -173,7 +178,7 @@ IRequest::RequestState CWebSocketRequest::GetState() const
 
 QByteArray CWebSocketRequest::GetCommandId() const
 {
-	return m_url.path().toUtf8();
+	return m_commandId;
 }
 
 

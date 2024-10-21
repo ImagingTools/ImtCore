@@ -213,17 +213,19 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 			responsePtr = m_requestClientHandlerCompPtr->ProcessRequest(*webSocketRequest);
 		}
 		else{
+			QByteArray clientId = webSocketRequest->GetClientId();
 			if (methodType == CWebSocketRequest::MT_CONNECTION_INIT){
 				imtcom::IConnectionStatusProvider::ConnectionStatus loginStatus = imtcom::IConnectionStatusProvider::CS_CONNECTED;
-				QByteArray clientId = webSocketRequest->GetClientId();
 				istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QString("Login"));
 				loginChangeSet.SetChangeInfo("ClientId", clientId);
 				istd::CChangeNotifier notifier(this, &loginChangeSet);
 
 				m_senderLoginStatusMap.insert(clientId, loginStatus);
+			}
 
-				if (!clientId.isEmpty()){
-					newRequestPtr.PopPtr();
+			if (!clientId.isEmpty()){
+				newRequestPtr.PopPtr();
+				if (!m_senders.contains(clientId)){
 					QSharedPointer<CWebSocketSender> socketSender(new CWebSocketSender(webSocketPtr));
 					m_senders.insert(clientId, socketSender);
 					QObject::connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);

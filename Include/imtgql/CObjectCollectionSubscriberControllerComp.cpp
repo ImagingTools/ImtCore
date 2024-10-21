@@ -81,7 +81,7 @@ void CObjectCollectionSubscriberControllerComp::OnUpdate(const istd::IChangeable
 			jsonDocument.setObject(dataObject);
 			data = jsonDocument.toJson(QJsonDocument::Compact);
 
-			SetData(id, networkRequest->GetRequestId(), data, *networkRequest);
+			SetData(id, networkRequest->GetCommandId(), data, *networkRequest);
 		}
 	}
 }

@@ -53,11 +53,11 @@ defineTest(compyleWeb) {
 		jqmldir ~= s,/,\\,g
 
         PATH += $(IMTCOREDIR)/3rdParty/nodejs
-		npmexe = $(IMTCOREDIR)/3rdParty/nodejs/npm_acf.cmd
+		npmexe = $(IMTCOREDIR)/3rdParty/nodejs/jqml2compiler.bat
 		npmexe ~= s,/,\\,g
 	}
 
-    WEB_COMMAND += && cd $$shell_quote($$jqmldir) && $$npmexe run compile  $$shell_quote($$dir)
+WEB_COMMAND += && cd $$shell_quote($$buildwebdir) && $$npmexe  $$shell_quote($$dir)
 
     copyFile($$buildwebdir/src/jqml.full.js, $$buildwebdir/Resources/jqml.$${resname}.js)
 
