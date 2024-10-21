@@ -88,7 +88,7 @@ bool CSdlType::Serialize(iser::IArchive& archive)
 
 bool CSdlType::operator==(const CSdlType& other) const
 {
-	return 	m_name == other.m_name && m_fields == other.m_fields;
+	return 	m_name == other.m_name && m_fields == other.m_fields && m_namespace == other.m_namespace;
 }
 
 
