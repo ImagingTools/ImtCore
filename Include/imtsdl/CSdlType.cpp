@@ -47,6 +47,21 @@ void CSdlType::SetFields(const SdlFieldList& fields)
 }
 
 
+QString CSdlType::GetNamespace() const
+{
+	return m_namespace;
+}
+
+
+void CSdlType::SetNamespace(const QString& aNamespace)
+{
+	if (m_namespace != aNamespace){
+		istd::CChangeNotifier notifier(this);
+		m_namespace = aNamespace;
+	}
+}
+
+
 // reimplemented(iser::ISerializable)
 
 bool CSdlType::Serialize(iser::IArchive& archive)
@@ -59,6 +74,11 @@ bool CSdlType::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(nameTag);
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
+
+	iser::CArchiveTag namespaceTag("Namespace", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(namespaceTag);
+	retVal = retVal && archive.Process(m_namespace);
+	retVal = retVal && archive.EndTag(namespaceTag);
 
 	retVal = retVal && CSdlField::SerializeSdlFieldList(archive, m_fields, "Fields", "Field");
 
