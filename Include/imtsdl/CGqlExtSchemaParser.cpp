@@ -251,6 +251,13 @@ bool CGqlExtSchemaParser::ValidateSchema()
 			return false;
 		}
 	}
+
+	const QString fieldsNamespace = CSdlTools::BuildNamespaceFromParams(m_customSchemaParams);
+	// set namespace for all types
+	for (CSdlType& sdlType: m_sdlTypes){
+		sdlType.SetNamespace(fieldsNamespace);
+	}
+
 	return true;
 }
 
