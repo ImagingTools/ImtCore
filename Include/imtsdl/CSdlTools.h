@@ -59,6 +59,7 @@ public:
 	static void AddArrayInternalChecksFail(QTextStream& stream, const CSdlField& field, bool checkEmpty = false, uint hIndents = 1);
 	[[nodiscard]]static QString GetNamespaceAcceptableString(const QString& originalText);
 	[[nodiscard]]static QString GetFileSystemAcceptableEntryPath(const QString& originalText);
+	[[nodiscard]]static QString BuildNamespaceFromComponents(const QString& schemaNamespace, const QString& schemaName, const QString& versionName);
 	[[nodiscard]]static QString BuildNamespaceFromParams(const iprm::IParamsSet& schemaParams);
 	[[nodiscard]]static QString GetNamespaceFromParamsOrArguments(
 				const SchemaParamsCompPtr& schemaParamsCompPtr,
@@ -75,6 +76,7 @@ public:
 
 	[[nodiscard]]static QString GetAutoDefinedQmlBasePath(const iprm::IParamsSet& schemaParams, const QString& baseDirPath);
 	[[nodiscard]]static QString GetAutoDefinedQmlQrcFilePath(const iprm::IParamsSet& schemaParamsCompPtr, const QString& baseDirPath);
+	[[nodiscard]]static QString GetEscapedNamespace(const QString& aNamespace, const QString& relatedNamespace);
 
 	static void GenerateListTempValueCode(QTextStream& stream, const CSdlField& sdlField, QString& tempVariableName, uint indents = 1);
 

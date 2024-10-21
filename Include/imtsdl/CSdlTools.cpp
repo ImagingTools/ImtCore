@@ -572,30 +572,54 @@ QString CSdlTools::GetFileSystemAcceptableEntryPath(const QString& originalText)
 }
 
 
+QString CSdlTools::BuildNamespaceFromComponents(const QString& schemaNamespace, const QString& schemaName, const QString& versionName)
+{
+	QString retVal;
+	if (!schemaNamespace.isEmpty()){
+		retVal += schemaNamespace;
+	}
+
+	if (!schemaName.isEmpty()){
+		if (!retVal.isEmpty()){
+			retVal += QStringLiteral("::");
+		}
+		retVal += schemaName;
+	}
+
+	if (!versionName.isEmpty()){
+		if (!retVal.isEmpty()){
+			retVal += QStringLiteral("::V");
+		}
+		retVal += versionName;
+	}
+
+	return retVal;
+}
+
+
 QString CSdlTools::BuildNamespaceFromParams(const iprm::IParamsSet& schemaParams)
 {
 	QString retVal;
 
+	QString schemaNamespace;
 	iprm::TParamsPtr<iprm::ITextParam> namespaceParamPtr(&schemaParams, SdlCustomSchemaKeys::SchemaNamespace.toUtf8(), false);
 	if (namespaceParamPtr.IsValid()){
-		retVal += namespaceParamPtr->GetText();
+		schemaNamespace = namespaceParamPtr->GetText();
 	}
 
+	QString schemaName;
 	iprm::TParamsPtr<iprm::ITextParam> nameParamPtr(&schemaParams, SdlCustomSchemaKeys::SchemaName.toUtf8(), false);
 	if (nameParamPtr.IsValid()){
-		if (!retVal.isEmpty()){
-			retVal += QStringLiteral("::");
-		}
-		retVal += nameParamPtr->GetText();
+		schemaName = nameParamPtr->GetText();
 	}
 
+	QString versionName;
 	iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&schemaParams, SdlCustomSchemaKeys::VersionName.toUtf8(), false);
 	if (versionNameParamPtr.IsValid()){
-		if (!retVal.isEmpty()){
-			retVal += QStringLiteral("::V");
-		}
-		retVal += versionNameParamPtr->GetText();
+		versionName = versionNameParamPtr->GetText();
 	}
+
+	retVal = BuildNamespaceFromComponents(schemaNamespace, schemaName, versionName);
 
 	return GetNamespaceAcceptableString(retVal);
 }
@@ -767,6 +791,22 @@ QString CSdlTools::GetAutoDefinedQmlQrcFilePath(const iprm::IParamsSet& schemaPa
 	retVal = GetFileSystemAcceptableEntryPath(baseFilePath + qrcFileName + QStringLiteral(".qrc"));
 
 	return retVal;
+}
+
+
+QString CSdlTools::GetEscapedNamespace(const QString& aNamespace, const QString& relatedNamespace)
+{
+	static QRegularExpression imtbaseNamespaceRegExp("\\s*(?:\\:\\:){0,}\\s*imtbase\\s*(?:\\:\\:){0,}\\s*");
+	if (aNamespace == QStringLiteral("imtbase") && imtbaseNamespaceRegExp.match(relatedNamespace).hasMatch()){
+		return (QStringLiteral("::") + aNamespace);
+	}
+
+	static QRegularExpression imtgqlNamespaceRegExp("\\s*(?:\\:\\:){0,}\\s*imtgql\\s*(?:\\:\\:){0,}\\s*");
+	if(aNamespace == QStringLiteral("imtgql") && imtgqlNamespaceRegExp.match(relatedNamespace).hasMatch()){
+		return (QStringLiteral("::") + aNamespace);
+	}
+
+	return aNamespace;
 }
 
 
