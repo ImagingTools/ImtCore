@@ -63,6 +63,12 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 	const QString defaultName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
 	QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
 	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
+		if (!m_customSchemaParamsCompPtr.IsValid()){
+			SendErrorMessage(0, "Application is not configured with custom parameters. Auto join is not possible. Please specify paths to join explicitly(use -J option), or disable join.");
+
+			return TS_INVALID;
+		}
+
 		joinRules = GetAutoJoinCppFilesSchema(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
 	}
 	const bool joinHeaders = joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType);
