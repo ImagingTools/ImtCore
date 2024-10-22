@@ -4,7 +4,7 @@ import Acf 1.0
 TableCellDelegateBase {
     id: delegateContainer
 
-
+    signal clicked();
 
     TableCellText {
         id: tableCellText;
@@ -34,7 +34,7 @@ TableCellDelegateBase {
         onClicked: {
             if(tableItem && tableItem.elements.getItemsCount() && delegateContainer.rowIndex > -1){
                 tableItem.tableSelection.singleSelect(delegateContainer.rowIndex)
-
+                delegateContainer.clicked();
             }
         }
     }
