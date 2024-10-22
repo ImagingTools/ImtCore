@@ -52,7 +52,7 @@ void CWebSocketServerComp::OnComponentCreated()
 
 	connect(&m_timer, &QTimer::timeout, this, &CWebSocketServerComp::OnTimeout);
 
-	m_timer.start(10000);
+	m_timer.start(5000);
 }
 
 
