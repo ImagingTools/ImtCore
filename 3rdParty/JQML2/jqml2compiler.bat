@@ -1,1 +1,1 @@
-%~dp0\..\nodejs\node run compiler %~dp0\compiler\compiler.js source=%1
+%~dp0\..\nodejs\node %~dp0\compiler\compiler.js run compiler source=%1
