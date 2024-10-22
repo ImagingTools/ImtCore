@@ -30,10 +30,6 @@ QByteArrayList CGuiElementContainerComp::GetElementIds() const
 
 const imtgui::IGuiElementModel* CGuiElementContainerComp::GetGuiElementModel(const QByteArray& elementId) const
 {
-	if (!m_guiElementModelsCompPtr.IsValid()){
-		return nullptr;
-	}
-
 	for (int i = 0; i < m_guiElementModelsCompPtr.GetCount(); i++){
 		imtgui::IGuiElementModel* guiElementPtr = m_guiElementModelsCompPtr[i];
 		if (guiElementPtr != nullptr){
