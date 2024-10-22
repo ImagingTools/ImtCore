@@ -66,6 +66,8 @@ protected:
 
 	// reimplemented (CGqlExtSchemaParser)
 	virtual bool ProcessSchemaImports() override;
+	bool ValidateSchema() override;
+
 
 private:
 	// static template methods for sub element access
@@ -75,9 +77,11 @@ private:
 		return &component.m_customSchemaParams;
 	}
 
+protected:
+	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
+
 private:
 	I_ATTR(bool, m_useFilesImportAttrPtr);
-	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_FACT(iproc::IProcessor, m_fileSchemaParserCompFactPtr);
 
 	istd::TDelPtr<QFile> m_currentInputFilePtr;

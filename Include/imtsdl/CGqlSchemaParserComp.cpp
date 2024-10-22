@@ -11,6 +11,9 @@
 #include <iprm/TParamsPtr.h>
 #include <ifile/CFileNameParam.h>
 
+// ImtCore includes
+#include <imtsdl/CSdlTools.h>
+
 
 namespace imtsdl
 {
@@ -486,6 +489,12 @@ bool CGqlSchemaParserComp::ProcessJavaStyleImports()
 	}
 	retVal = retVal && ReadToDelimeter(QByteArrayLiteral("}"), importedFilesSectionData);
 
+	if (!retVal){
+		SendErrorMessage(0, QString("Unable to process schema's imports. File: '%1'").arg(m_currentSchemaFilePath));
+
+		return false;
+	}
+
 	QStringList importedFiles;
 	QStringList importDirectiveList = QString(importedFilesSectionData).split('\n');
 	for (const QString& importDirective: importDirectiveList){
@@ -511,6 +520,26 @@ bool CGqlSchemaParserComp::ProcessSchemaImports()
 	}
 
 	return ProcessJavaStyleImports();
+}
+
+bool CGqlSchemaParserComp::ValidateSchema()
+{
+	if (!BaseClass::ValidateSchema()){
+		return false;
+	}
+
+	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled() && !m_argumentParserCompPtr->IsDependenciesMode()){
+		for (CSdlType& sdlType: m_sdlTypes){
+			const bool isSet = CSdlTools::SetOutputFilesForType(sdlType, &m_customSchemaParams, m_argumentParserCompPtr.GetPtr());
+			if (!isSet){
+				SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlType.GetName(), m_currentSchemaFilePath));
+
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 
