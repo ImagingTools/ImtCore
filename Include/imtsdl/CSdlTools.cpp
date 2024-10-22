@@ -5,6 +5,8 @@
 #include <ostream>
 
 // Qt includes
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <QtCore/QRegularExpression>
 
 // ACF includes
@@ -688,6 +690,34 @@ QMap<QString, QString> CSdlTools::GetAutoJoinCppFilesSchema(const iprm::IParamsS
 	retVal.insert(ISdlProcessArgumentsParser::s_sourceFileType, GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".cpp")));
 
 	return retVal;
+}
+
+
+bool CSdlTools::SetOutputFilesForType(CSdlType& sdlType, const iprm::IParamsSet* schemaParamsPtr, const ISdlProcessArgumentsParser* argumentParserPtr)
+{
+	if (argumentParserPtr == nullptr){
+		return false;
+	}
+	QMap<QString, QString> joinRules = argumentParserPtr->GetJoinRules();
+	const QString outputDirectoryPath = QDir::cleanPath(argumentParserPtr->GetOutputDirectoryPath());
+	if (argumentParserPtr->IsAutoJoinEnabled()){
+		if (schemaParamsPtr == nullptr){
+			return false;
+		}
+
+		const QString defaultName = QFileInfo(argumentParserPtr->GetSchemaFilePath()).fileName();
+		joinRules = GetAutoJoinCppFilesSchema(*schemaParamsPtr, outputDirectoryPath, defaultName);
+	}
+	else {
+		if(joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType)){
+			sdlType.SetTargetHeaderFile(joinRules[ISdlProcessArgumentsParser::s_headerFileType]);
+		}
+		else {
+			sdlType.SetTargetHeaderFile(QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
+		}
+	}
+
+	return true;
 }
 
 

@@ -65,7 +65,10 @@ public:
 				const SchemaParamsCompPtr& schemaParamsCompPtr,
 				const ArgumentParserCompPtr& argumentParamsCompPtr);
 
+	/// \sa ISdlProcessArgumentsParser::s_headerFileType ISdlProcessArgumentsParser::s_sourceFileType
 	[[nodiscard]]static QMap<QString/*type*/, QString/*path*/> GetAutoJoinCppFilesSchema(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
+	static bool SetOutputFilesForType(CSdlType& sdlType, const iprm::IParamsSet* schemaParamsPtr, const ISdlProcessArgumentsParser* argumentParamsPtr);
+
 	[[nodiscard]]static QStringList GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
 	[[nodiscard]]static QString GetQmlModuleNameFromParamsOrArguments(
 				const iprm::IParamsSet* schemaParamsPtr,
