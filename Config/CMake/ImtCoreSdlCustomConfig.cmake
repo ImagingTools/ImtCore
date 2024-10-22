@@ -55,7 +55,7 @@ endmacro()
 
 #! \param CUSTOM_TARGETS_DEPS - if enabled, dependencies will NOT be soved, using the SDL generator \warning if enabled, you MUST provide CUSTOM_HEADER_DEP CUSTOM_SOURCE_DEP!
 #! \param CUSTOM_SOURCE_DEP - source file dependency				\note this param make sence only if \c CUSTOM_TARGETS_DEPS is enabled
-function (ImtCoreAutoConfigureSdlCpp)
+function (ImtCoreCustomConfigureSdlCpp)
 	include (${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ImtSdlConfig.cmake)
 
 	set(oneValueArgs
@@ -117,7 +117,7 @@ function (ImtCoreAutoConfigureSdlCpp)
 endfunction()
 
 
-function (ImtCoreAutoConfigureSdlQml)
+function (ImtCoreCustomConfigureSdlQml)
 	include (${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ImtSdlConfig.cmake)
 
 	set(oneValueArgs SCHEMA_PATH VERSION QML_NAME)
@@ -190,7 +190,7 @@ function (ImtCoreCustomConfigureSdlCppQml)
 	cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
 
 	if (ARG_SOURCE_NAME)
-		ImtCoreAutoConfigureSdlCpp(
+		ImtCoreCustomConfigureSdlCpp(
 			SCHEMA_PATH "${ARG_SCHEMA_PATH}"
 			VERSION "${ARG_VERSION}"
 			SOURCE_NAME	"${ARG_SOURCE_NAME}")
@@ -198,7 +198,7 @@ function (ImtCoreCustomConfigureSdlCppQml)
 
 	if (ARG_QML_NAME)
 		message(STATUS "Additing SDL for QML compile source '${ARG_SCHEMA_PATH}' for ${PROJECT_NAME}")
-		ImtCoreAutoConfigureSdlQml(SCHEMA_PATH "${ARG_SCHEMA_PATH}" VERSION "${ARG_VERSION}" QML_NAME "${ARG_QML_NAME}")
+		ImtCoreCustomConfigureSdlQml(SCHEMA_PATH "${ARG_SCHEMA_PATH}" VERSION "${ARG_VERSION}" QML_NAME "${ARG_QML_NAME}")
 	endif()
 
 endfunction()
