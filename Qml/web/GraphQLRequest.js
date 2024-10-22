@@ -22,6 +22,13 @@ var GqlObject = function(objectId){
             return retVal
         },
 
+        fromJson: function(json) {
+            let dataJson = JSON.parse(json)
+            for (let key in dataJson){
+                this.InsertField(key, dataJson[key])
+            }
+        },
+
         GetFieldIds: function() {
             var keys = []
     
