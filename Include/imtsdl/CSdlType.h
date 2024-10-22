@@ -30,6 +30,9 @@ public:
 	QString GetNamespace() const;
 	void SetNamespace(const QString& aNamespace);
 
+	QString GetTargetHeaderFile() const;
+	void SetTargetHeaderFile(const QString& schemaFile);
+
 	// reimplemented(iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
@@ -37,10 +40,10 @@ public:
 	bool operator==(const CSdlType& other) const;
 	bool operator!=(const CSdlType& other) const { return !(operator==(other)); }
 
-
 private:
 	QString m_name;
 	QString m_namespace;
+	QString m_targetHeaderFile;
 	SdlFieldList m_fields;
 };
 

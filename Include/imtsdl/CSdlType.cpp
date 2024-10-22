@@ -62,6 +62,21 @@ void CSdlType::SetNamespace(const QString& aNamespace)
 }
 
 
+QString CSdlType::GetTargetHeaderFile() const
+{
+	return m_targetHeaderFile;
+}
+
+
+void CSdlType::SetTargetHeaderFile(const QString& schemaFile)
+{
+	if (m_targetHeaderFile != schemaFile){
+		istd::CChangeNotifier notifier(this);
+		m_targetHeaderFile = schemaFile;
+	}
+}
+
+
 // reimplemented(iser::ISerializable)
 
 bool CSdlType::Serialize(iser::IArchive& archive)
@@ -80,6 +95,11 @@ bool CSdlType::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_namespace);
 	retVal = retVal && archive.EndTag(namespaceTag);
 
+	iser::CArchiveTag targetHeaderFileTag("TargetHeaderFile", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(targetHeaderFileTag);
+	retVal = retVal && archive.Process(m_targetHeaderFile);
+	retVal = retVal && archive.EndTag(targetHeaderFileTag);
+
 	retVal = retVal && CSdlField::SerializeSdlFieldList(archive, m_fields, "Fields", "Field");
 
 	return retVal;
@@ -88,7 +108,12 @@ bool CSdlType::Serialize(iser::IArchive& archive)
 
 bool CSdlType::operator==(const CSdlType& other) const
 {
-	return 	m_name == other.m_name && m_fields == other.m_fields && m_namespace == other.m_namespace;
+	bool retVal = m_name == other.m_name;
+	retVal = retVal && m_fields == other.m_fields;
+	retVal = retVal && m_namespace == other.m_namespace;
+	retVal = retVal && m_targetHeaderFile == other.m_targetHeaderFile;
+
+	return retVal;
 }
 
 
