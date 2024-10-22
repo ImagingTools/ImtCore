@@ -273,7 +273,7 @@ bool CDocumentTable::GetKey(quint64& key, const QByteArray &value)
 	bool ok = false;
 
 	if(value.isEmpty()){
-		mdbx::cursor::move_result result = m_cursorIndex.current(false);
+        mdbx::cursor::move_result result = m_cursor.current(false);
 		if(result.done){
 			key = result.key.as_uint64();
 			ok = true;
