@@ -1,5 +1,5 @@
 schema {
-	name: Collection
+	name: ImtCollection
 	namespace: imtbase
 	version: 1.0
 }
