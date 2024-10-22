@@ -53,7 +53,7 @@ defineTest(compyleWeb) {
 		jqmldir ~= s,/,\\,g
 
         PATH += $(IMTCOREDIR)/3rdParty/nodejs
-		npmexe = $(IMTCOREDIR)/3rdParty/nodejs/jqml2compiler.bat
+		npmexe = $(IMTCOREDIR)/3rdParty/JQML2/jqml2compiler.bat
 		npmexe ~= s,/,\\,g
 	}
 
