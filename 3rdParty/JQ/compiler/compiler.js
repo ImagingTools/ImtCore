@@ -19,9 +19,32 @@ const QtWebSockets = require('../QtWebSockets/QtWebSockets')
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\lisa.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\agentino.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\jq.json'
-const configFilePath = process.argv.slice(2)[0]
+const argv = process.argv
+const env = process.env
+const configFilePath = argv.slice(2)[0]
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
-const config = JSON.parse(fs.readFileSync(configFilePath, {encoding:'utf8', flag:'r'}))
+
+function envFill(source){
+    let result = source
+    for(let key in env){
+        result = result.replaceAll('${'+key+'}', env[key].replaceAll('\\','\\\\').trim())
+    }
+    return result
+}
+
+function includeFiles(sourceFile){
+    if(sourceFile.includes)
+    for(let filePath of sourceFile.includes){
+        let file = JSON.parse(envFill(fs.readFileSync(filePath, {encoding:'utf8', flag:'r'})))
+        includeFiles(file)
+        for(let dirPath of file.dirs){
+            sourceFile.dirs.unshift(dirPath)
+        }
+    }
+}
+
+const config = JSON.parse(envFill(fs.readFileSync(configFilePath, {encoding:'utf8', flag:'r'})))
+includeFiles(config)
 
 const BaseModules = {
     Qt,
