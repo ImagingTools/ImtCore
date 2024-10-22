@@ -7,31 +7,15 @@ import imtguigql 1.0
 /**
     Usage example:
 
-    GqlRequestSender {
-        id: requestSender;
-        requestType: 0; // Query
-        gqlCommandId: "GetDocumentData";
-
-        function createQueryParams(query){
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", "d1481f7d-d5ce-4a62-9150-8a5cadb62e47");
-            query.AddParam(inputParams);
-
-            var queryFields = Gql.GqlObject("item");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
-            query.AddField(queryFields);
-        }
-
-        function onError(message, type){
-            // Error handler
-        }
-
-        // Response format: {"data": {"GetDocumentData": { <Internal information> }}}
-
-        // parameter data is <Internal information>
-        function onResult(data){
-            // Result handler
+    GqlSdlRequestSender {
+        gqlCommandId: <GQL-command>;
+        sdlObjectComp:
+            Component {
+            AuthorizationPayload {
+                onFinished: {
+                    // processing ...
+                }
+            }
         }
     }
 */
@@ -42,7 +26,14 @@ GqlRequest {
     property string gqlCommandId;
     property int requestType: 0; // 0 - Query, 1 - Mutation, 2 - Subscription
 
+    /**
+        SDL object created from sdlObjectComp
+    */
     property var sdlObject: null;
+
+    /**
+        SDL structure that will come from the server
+    */
     property Component sdlObjectComp: null;
 
     property var inputParams: Gql.GqlObject("input");
