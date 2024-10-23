@@ -423,7 +423,7 @@ Item {
             viewParams.InsertField("Count", count);
             viewParams.InsertField("Offset", offset);
             if (filterModel.toGraphQL){
-                viewParams.InsertField("ComplexFilterModel", filterModel.toJson());
+                viewParams.InsertField("ComplexFilterModel", filterModel);
             }
             else{
                 viewParams.InsertField("FilterModel", filterModel.toJson());

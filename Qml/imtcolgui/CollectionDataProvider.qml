@@ -86,7 +86,7 @@ QtObject {
             viewParams.InsertField("Count", container.count);
 
             if (container.filter.filterModel.toGraphQL){
-                viewParams.InsertField("ComplexFilterModel", container.filter.filterModel.toJson());
+                viewParams.InsertField("ComplexFilterModel", container.filter.filterModel);
             }
             else{
                 viewParams.InsertField("FilterModel", container.filter.filterModel.toJson());

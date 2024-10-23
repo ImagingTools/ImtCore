@@ -1127,16 +1127,10 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 {
 	this->SetAdditionalFilters(gqlRequest, viewParamsGql, &filterParams);
 
-	QByteArray filterBA = viewParamsGql.GetFieldArgumentValue("ComplexFilterModel").toByteArray();
-	if (!filterBA.isEmpty()){
-		imtbase::CTreeItemModel complexFilterModel;
-		if (!complexFilterModel.CreateFromJson(filterBA)){
-			return;
-		}
-
-		bool isComplexFilterOk = false;
+	const imtgql::CGqlObject* complexFilterModelPtr = viewParamsGql.GetFieldArgumentObjectPtr("ComplexFilterModel");
+	if (complexFilterModelPtr != nullptr){
 		sdl::imtbase::ComplexCollectionFilter::V1_0::CComplexCollectionFilter complexFilterSdl;
-		isComplexFilterOk = complexFilterSdl.ReadFromModel(complexFilterSdl, complexFilterModel);
+		bool isComplexFilterOk = complexFilterSdl.ReadFromGraphQlObject(complexFilterSdl, *complexFilterModelPtr);
 
 		if (isComplexFilterOk){
 			istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
@@ -1148,7 +1142,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 		return;
 	}
 
-	filterBA = viewParamsGql.GetFieldArgumentValue("FilterModel").toByteArray();
+	QByteArray filterBA = viewParamsGql.GetFieldArgumentValue("FilterModel").toByteArray();
 
 	imtbase::CTreeItemModel generalModel;
 	if (!generalModel.CreateFromJson(filterBA)){
