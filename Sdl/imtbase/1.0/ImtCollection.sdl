@@ -11,7 +11,7 @@ import {
 type CollectionViewParams {
 	Count: Int
 	Offset: Int
-	FilterModel: String
+	FilterModel: ComplexCollectionFilter
 }
 
 type NotificationItem {
