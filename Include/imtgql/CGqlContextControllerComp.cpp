@@ -31,16 +31,16 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 		return nullptr;
 	}
 
-	QByteArray userId;
+	QByteArray userObjectId;
 	imtbase::IObjectCollection::DataPtr sessionDataPtr;
 	if (m_sessionCollectionCompPtr->GetObjectData(token, sessionDataPtr)){
 		const imtauth::ISession* sessionInfoPtr = dynamic_cast<const imtauth::ISession*>(sessionDataPtr.GetPtr());
 		if (sessionInfoPtr != nullptr){
-			userId = sessionInfoPtr->GetUserId();
+			userObjectId = sessionInfoPtr->GetUserId();
 		}
 	}
 
-	if (userId.isEmpty()){
+	if (userObjectId.isEmpty()){
 		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session model is invalid.").arg(qPrintable(token));
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
 
@@ -49,16 +49,18 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr userDataPtr;
-	if (m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
+	if (m_userCollectionCompPtr->GetObjectData(userObjectId, userDataPtr)){
 		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User with ID '%2' was not found.").arg(qPrintable(token)).arg(qPrintable(userId));
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User with ID '%2' was not found.").arg(qPrintable(token)).arg(qPrintable(userObjectId));
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
 
 		return nullptr;
 	}
+
+	QByteArray userId = userInfoPtr->GetId();
 
 	imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
 
