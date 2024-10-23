@@ -25,7 +25,7 @@ QtObject {
     property int offset: 0;
     property int count: -1;
 
-    property CollectionFilter filter: CollectionFilter {}
+    property var filter: CollectionFilter {}
 
     signal modelUpdated();
     signal failed();
@@ -85,8 +85,12 @@ QtObject {
             viewParams.InsertField("Offset", container.offset);
             viewParams.InsertField("Count", container.count);
 
-            var jsonString = container.filter.filterModel.toJson();
-            viewParams.InsertField("FilterModel", jsonString);
+            if (container.filter.filterModel.toGraphQL){
+                viewParams.InsertField("ComplexFilterModel", container.filter.filterModel.toJson());
+            }
+            else{
+                viewParams.InsertField("FilterModel", container.filter.filterModel.toJson());
+            }
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);

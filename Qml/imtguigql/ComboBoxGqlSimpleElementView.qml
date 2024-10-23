@@ -10,6 +10,7 @@ ComboBoxElementView {
     property string gqlCommandId;
     property string subscriptionCommandId;
     property var fields;
+    property var filter;
 
     controlComp: cbComp;
 
@@ -29,6 +30,7 @@ ComboBoxElementView {
             gqlCommandId: root.gqlCommandId;
             fields: root.fields;
             subscriptionCommandId: root.subscriptionCommandId;
+            filter: root.filter;
 
             Component.onCompleted: {
                 if (root.delegate){

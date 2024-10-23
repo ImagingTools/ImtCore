@@ -9,6 +9,7 @@ ComboBox {
     property alias gqlCommandId: dataProvider.commandId;
     property alias subscriptionCommandId: dataProvider.subscriptionCommandId;
     property alias fields: dataProvider.fields;
+    property alias filter: dataProvider.filter;
 
     Component.onCompleted: {
         dataProvider.updateModel();
