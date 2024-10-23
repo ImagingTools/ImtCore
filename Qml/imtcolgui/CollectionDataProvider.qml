@@ -33,7 +33,7 @@ QtObject {
     function updateModel(){
         if (completed){
             console.warn("Collection data already loaded")
-            return;
+            //return;
         }
 
         container.itemsInfoModel.send();

@@ -15,6 +15,10 @@ ComboBox {
         dataProvider.updateModel();
     }
 
+    function updateModel(){
+        dataProvider.updateModel();
+    }
+
     function getHeaders(){
         return {};
     }
