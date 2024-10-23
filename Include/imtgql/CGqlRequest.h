@@ -83,6 +83,7 @@ protected:
 	QByteArray m_currentField;
 
 	CGqlObject* m_activeGqlObjectPtr;
+	QList<CGqlObject*> m_objectArrayList;
 	std::shared_ptr<imtgql::IGqlContext> m_gqlContextPtr;
 	QList<QByteArray> m_activeArrayIds;
 };

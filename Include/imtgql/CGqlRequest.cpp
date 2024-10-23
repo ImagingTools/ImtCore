@@ -740,7 +740,7 @@ void CGqlRequest::SetParseObject(const QByteArray &commandId)
 			if (!m_activeArrayIds.isEmpty()){
 				lastArrayId = m_activeArrayIds.last();
 			}
-			if (!lastArrayId.isEmpty() && m_activeGqlObjectPtr->IsObjectList(lastArrayId)){
+			if (!lastArrayId.isEmpty() && !m_objectArrayList.isEmpty() && m_objectArrayList.last() == m_activeGqlObjectPtr){
 				m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendFieldToArray(lastArrayId, newObject);
 				m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateFieldObject(commandId);
 				m_currentField = commandId;
@@ -797,7 +797,7 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 
 		return;
 	}
-	else if (!lastArrayId.isEmpty() && m_activeGqlObjectPtr->IsObjectList(lastArrayId)){
+	else if (!lastArrayId.isEmpty() &&  !m_objectArrayList.isEmpty() && m_objectArrayList.last() == m_activeGqlObjectPtr){
 		CGqlObject newObject;
 		newObject.InsertField(text);
 		m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendFieldToArray(lastArrayId, newObject);
@@ -851,6 +851,7 @@ void CGqlRequest::StartArray(const QByteArray& text)
 		m_activeGqlObjectPtr->InsertField(text, objectList);
 		m_currentField = text;
 		m_activeArrayIds.append(text);
+		m_objectArrayList.append(m_activeGqlObjectPtr);
 	}
 }
 
@@ -861,6 +862,7 @@ bool CGqlRequest::CloseArray()
 
 	if (!m_activeArrayIds.isEmpty()){
 		m_activeArrayIds.removeLast();
+		m_objectArrayList.removeLast();
 		retVal = true;
 	}
 
