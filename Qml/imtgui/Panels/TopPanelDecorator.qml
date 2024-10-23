@@ -24,7 +24,7 @@ DecoratorBase {
     TopLeftPanel {
         id: topLeftPanel;
         anchors.left: parent.left;
-        width: 100;
+        widthFromDecorator: true;
         height: topPanelDecorator.height;
     }
 
