@@ -110,7 +110,7 @@ QMap<IComplexCollectionFilter::FieldOperation, QString> numericOperations({
 	{IComplexCollectionFilter::FO_NOT_LESS, ">="},
 	{IComplexCollectionFilter::FO_NOT_GREATER, "<="}});
 
-QSet<int> stringTypes({ QMetaType::QString});
+QSet<int> stringTypes({ QMetaType::QString, QMetaType::QByteArray });
 QMap<IComplexCollectionFilter::FieldOperation, QString> stringOperations({
 	{IComplexCollectionFilter::FO_EQUAL, "="},
 	{IComplexCollectionFilter::FO_NOT_EQUAL, "!="},
