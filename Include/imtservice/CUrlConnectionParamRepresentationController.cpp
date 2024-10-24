@@ -146,6 +146,12 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 					externalUrl.setPort(port);
 				}
 
+				if (externPortsModelPtr->ContainsKey("Scheme", i)){
+					QString scheme = externPortsModelPtr->GetData("Scheme", i).toString();
+
+					externalUrl.setScheme(scheme);
+				}
+
 				incomingConnection.url = externalUrl;
 
 				urlConnectionParamPtr->AddExternConnection(incomingConnection);

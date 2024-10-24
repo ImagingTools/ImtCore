@@ -65,7 +65,7 @@ ViewCommandsDelegateBase {
                 if (selectedIndexes.length > 0){
                     container.view.productData.beginChanges();
                     for (let i = 0; i < selectedIndexes.length; i++){
-                        let featureId = tableModel.getData("Id", i);
+                        let featureId = tableModel.getData("Id", selectedIndexes[i]);
                         container.view.addFeature(featureId);
                     }
                     container.view.productData.endChanges();

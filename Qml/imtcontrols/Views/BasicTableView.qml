@@ -372,6 +372,7 @@ FocusScope {
 
         secondSize: 10;
         targetItem: flick;
+        visible: flick.visible;
     }
 
     function addRow(row){

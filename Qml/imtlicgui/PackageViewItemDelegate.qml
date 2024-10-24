@@ -9,6 +9,16 @@ TreeViewItemDelegateBase {
     property FeatureData featureData: model.item ? model.item : null;
     itemData: featureData;
 
+    signal error(string message);
+
+    function featureIsValid(featureId, featureName){
+        return true;
+    }
+
+    function canRename(featureId){
+        return true;
+    }
+
     rowBodyDelegate: Component{ Row {
             id: row;
 
@@ -64,16 +74,17 @@ TreeViewItemDelegateBase {
 
                         if (featureName !== inputName.text){
                             let id = inputName.text.replace(/\s+/g, '');
-
-                            packageTreeItemDelegate.featureData.m_featureName = inputName.text;
-
                             if (featureId === ""){
                                 let id = inputName.text.replace(/\s+/g, '');
-                                let alreadyExists = packageTreeItemDelegate.root.featureIdExists(id);
-                                if (!alreadyExists){
-                                    packageTreeItemDelegate.featureData.m_featureId = id;
+                                let isValid = packageTreeItemDelegate.featureIsValid(id, inputName.text);
+                                if (!isValid){
+                                    return;
                                 }
+
+                                packageTreeItemDelegate.featureData.m_featureId = id;
                             }
+
+                            packageTreeItemDelegate.featureData.m_featureName = inputName.text;
                         }
                     }
                 }
@@ -132,20 +143,20 @@ TreeViewItemDelegateBase {
 
                         let featureId = packageTreeItemDelegate.featureData.m_featureId;
                         if (featureId !== inputId.text){
-                            let canRename = packageTreeItemDelegate.root.canRename(featureId);
+                            let canRename = packageTreeItemDelegate.canRename(featureId);
                             if (canRename){
-                                let alreadyExists = packageTreeItemDelegate.root.featureIdExists(inputId.text);
-                                if (!alreadyExists){
+                                let isValid = packageTreeItemDelegate.featureIsValid(inputId.text, inputName.text);
+                                if (isValid){
                                     packageTreeItemDelegate.featureData.m_featureId = inputId.text;
 
                                     return;
                                 }
                                 else{
-                                    packageTreeItemDelegate.root.openFeatureErrorDialog(qsTr("Feature-ID already exists (In this or another package)"));
+                                    packageTreeItemDelegate.error(qsTr("Feature-ID already exists (In this or another package)"));
                                 }
                             }
                             else{
-                                packageTreeItemDelegate.root.openFeatureErrorDialog(qsTr("It is impossible to rename the feature, please remove all dependencies"));
+                                packageTreeItemDelegate.error(qsTr("It is impossible to rename the feature, please remove all dependencies"));
                             }
                         }
                     }

@@ -40,12 +40,12 @@ Component {
 
             width: parent.width;
             height: 25;
+            autoEditingFinished: false;
 
             visible: false;
 
             onEditingFinished: {
                 let data = textInput.text
-                console.log("onEditingFinished", data)
                 textInput.visible = false;
                 textLabel.text = textInput.text;
                 item.setValue(textInput.text);
@@ -64,7 +64,6 @@ Component {
             }
 
             onDoubleClicked: {
-                console.log("ma onDoubleClicked");
                 mouse.accepted = true;
 
                 textInput.visible = true;

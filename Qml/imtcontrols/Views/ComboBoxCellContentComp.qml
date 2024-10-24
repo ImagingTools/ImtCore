@@ -19,8 +19,8 @@ TableCellDelegateBase {
 
             if (cb.model){
                 for (let i = 0; i < cb.model.getItemsCount(); i++){
-                    let id = cb.model.getData("Id", i);
-                    if (String(id) == bodyItem.cellHeaderId){
+                    let value = cb.model.getData(bodyItem.cellHeaderId, i);
+                    if (value == bodyItem.getValue()){
                         cb.currentIndex = i;
                         break;
                     }
@@ -52,7 +52,16 @@ TableCellDelegateBase {
         }
 
         onFinished: {
+            console.log("onFinished", index);
             cb.visible = false;
+
+            if (index >= 0){
+                let value = cb.model.getData(bodyItem.cellHeaderId, index);
+
+                console.log("value", value);
+
+                bodyItem.setValue(value);
+            }
         }
 
         onFocusChanged: {

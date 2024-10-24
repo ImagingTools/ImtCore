@@ -241,25 +241,38 @@ ViewBase {
             anchors.bottom: parent.bottom;
             width: parent.width;
             readOnly: false;
-            rowDelegate: Component { PackageViewItemDelegate { root: tableView_; } }
+            rowDelegate: Component { PackageViewItemDelegate {
+                    root: tableView_;
+
+                    function canRename(id){
+                        return true;
+                    }
+
+                    function featureIsValid(featureId, featureName){
+                        console.log("featureIsValid", featureId, featureName);
+                        console.log("featureEditor.featureData.m_featureId", featureEditor.featureData.m_featureId);
+                        if (featureEditor.featureData.m_featureId === featureId){
+                            return false;
+                        }
+
+                        let delegates = tableView_.getItemsDataAsList();
+                        for (let delegate of delegates){
+                            if (delegate.itemData.m_featureId === featureId){
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    }
+
+                    onError: {
+                        ModalDialogManager.showWarningDialog(message);
+                    }
+                } }
+
             Component.onCompleted: {
                 let ok = PermissionsController.checkPermission("ChangeFeature");
                 tableView_.readOnly = !ok;
-            }
-
-            function canRename(id){
-                return true;
-            }
-
-            function featureIdExists(featureId){
-                let delegates = tableView_.getItemsDataAsList();
-                for (let delegate of delegates){
-                    if (delegate.itemData.m_featureId === featureId){
-                        return true;
-                    }
-                }
-
-                return false;
             }
 
             onSelectionChanged: {
@@ -283,7 +296,6 @@ ViewBase {
                 let removeIsEnabled = selectedIndex != null;
 
                 if (featureEditor.commandsController){
-                    // featureEditor.commandsController.setCommandIsEnabled("InsertFeature", newIsEnabled)
                     featureEditor.commandsController.setCommandIsEnabled("RemoveFeature", removeIsEnabled)
                 }
             }
