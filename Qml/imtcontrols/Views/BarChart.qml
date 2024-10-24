@@ -26,12 +26,16 @@ Item {
     property bool hasTooltip: true;
     property bool isPositiveTooltip: true;
     property bool isNegativeTooltip: false;
+    property bool hasBottomRounding: false;
+    property bool hasColorFilling: true;
 
     property alias toolTipColor: tooltip.color;
     property alias toolTipFontColor: tooltip.fontColor;
     property alias toolTipFontSize: tooltip.fontPixelSize;
 
     property real parentY: 0;
+
+    signal clicked();
 
     onParentYChanged: {
         if(tooltip.openST){
@@ -52,8 +56,20 @@ Item {
         height: (barChart.positiveValue !==0)?
                     barChart.maxBarHeight/(barChart.maxValue - barChart.minValue) * barChart.positiveValue : 1;
         radius: width;//Math.min(width, height)
-        color: barChart.color_positive;
+        color: barChart.hasColorFilling ? barChart.color_positive : "transparent";
         visible: !barChart.visible ? false : (barChart.positiveValue == 0)? false : barChart.visibleElements;
+
+    }
+
+    Rectangle{
+        id: barDownPatch;//positive
+
+        anchors.bottom:  parent.bottom;
+        anchors.horizontalCenter: parent.horizontalCenter;
+        width: barChart.barWidth;
+        height: width;
+        color: barChart.hasColorFilling ? barChart.color_positive : "transparent";
+        visible: !barChart.hasBottomRounding;
 
     }
 
@@ -65,7 +81,7 @@ Item {
         width: barChart.barWidth;
         height: (barChart.positiveValue !==0)? barDown.height/2 : 1;
                     //Math.min(barChart.maxBarHeight/barChart.maxValue*barChart.positiveValue, width/2) : 1
-        color: barChart.color_positive;
+        color: barChart.hasColorFilling ? barChart.color_positive : "transparent";
         visible: !barChart.visible ? false : (barChart.positiveValue == 0)? false : (barChart.negativeValue == 0) ? false : barChart.visibleElements;
 
     }
@@ -79,7 +95,7 @@ Item {
         height: (barChart.negativeValue !==0)?
                     barChart.maxBarHeight/(barChart.maxValue - barChart.minValue) * barChart.negativeValue : 1;
         radius: width//Math.min(width, height)
-        color: barChart.color_negative;
+        color: barChart.hasColorFilling ? barChart.color_negative : "transparent";
         visible: !barChart.visible ? false : (barChart.negativeValue == 0)? false : barChart.visibleElements;
 
     }
@@ -92,7 +108,7 @@ Item {
         width: barChart.barWidth;
         height: (barChart.negativeValue !==0)? barUp.height/2 : 1;
                     //Math.min(barChart.maxBarHeight/barChart.maxValue*barChart.negativeValue, width/2) : 1
-        color: barChart.color_negative;
+        color: barChart.hasColorFilling ? barChart.color_negative : "transparent";
         visible: !barChart.visible ? false : (barChart.negativeValue == 0) ? false : (barChart.positiveValue == 0) ? false : barChart.visibleElements;
 
     }
@@ -143,6 +159,10 @@ Item {
         visible: true;
         hoverEnabled: visible;
         cursorShape: Qt.PointingHandCursor;
+
+        onClicked: {
+            barChart.clicked();
+        }
 
         onEntered: {
             if(barChart.hasTooltip){
