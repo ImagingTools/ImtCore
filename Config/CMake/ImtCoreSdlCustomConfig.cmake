@@ -15,6 +15,8 @@ macro(ImtCoreGetSdlDeps)
 		set(SDL_ERRORS_FILE_PATH "${ARG_OUT_DIR}/__SDL__DependsList_errors.txt")
 	endif()
 
+	file(MAKE_DIRECTORY ${ARG_OUT_DIR})
+
 	message(STATUS "EXEC: ${SDL_DEPS_GENERATION_COMMAND} --generator=CMake-pipe")
 
 	execute_process(
@@ -41,7 +43,7 @@ macro(ImtCoreGetSdlDeps)
 		file(STRINGS ${SDL_ERRORS_FILE_PATH} ERRORS2_SDL_DEPS_LIST)
 		message(WARNING "${ERRORS2_SDL_DEPS_LIST}")
 
-		message(STAUTS"EXEC: ${SDL_DEPS_GENERATION_COMMAND}")
+		message(STATUS "EXEC: ${SDL_DEPS_GENERATION_COMMAND}")
 		message(FATAL_ERROR "SDL finished unexpected. Error code: [${SDL_DEPS_GENERATION_RESULT_CODE}]")
 	endif()
 
