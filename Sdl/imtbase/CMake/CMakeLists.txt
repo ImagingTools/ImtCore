@@ -14,16 +14,16 @@ ImtCoreCustomConfigureSdlCppQml(
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ComplexCollectionFilter.sdl"
 			VERSION		"1.0"
 			SOURCE_NAME	"ComplexCollectionFilter"
-			QML_NAME	"ComplexCollectionFilterSdl")
+			QML_NAME	"imtbaseComplexCollectionFilterSdl")
 
 ImtCoreCustomConfigureSdlCppQml(
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ImtBaseTypes.sdl"
 			VERSION		"1.0"
 			SOURCE_NAME	"ImtBaseTypes"
-			QML_NAME	"ImtBaseTypesSdl")
+			QML_NAME	"imtbaseImtBaseTypesSdl")
 
 ImtCoreCustomConfigureSdlCppQml(
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ImtCollection.sdl"
 			VERSION		"1.0"
 			SOURCE_NAME	"ImtCollection"
-			QML_NAME	"ImtCollectionSdl")
+			QML_NAME	"imtbaseImtCollectionSdl")
