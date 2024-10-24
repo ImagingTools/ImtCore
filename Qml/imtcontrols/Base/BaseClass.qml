@@ -272,7 +272,7 @@ QtObject {
                     graphQL += "]"
                 }
                 else{
-                    graphQL += this.getJSONKeyForProperty(key) + ':' + this[key].toGraphQL()
+                    graphQL += this.getJSONKeyForProperty(key) + ':' + ((this[key] !== null) ? this[key].toGraphQL() : "null")
                 }
             } else {
                 let value = this[key]
