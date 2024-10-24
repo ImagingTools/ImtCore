@@ -18,6 +18,10 @@ else()
 	set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreator")
 endif()
 
+if (APPLE)
+	# set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreator.app/Contents/MacOS/DesignTokenCreator")
+endif()
+
 #  Setting the executable absolutely file path for specific OS
 if(ANDROID)
 		set(DESIGN_TOKEN_CREATOR_EXE_BIN "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../Bin/${CMAKE_BUILD_TYPE}_$ENV{ARXCHOST}/${DESIGN_TOKEN_CREATOR_EXE}")
