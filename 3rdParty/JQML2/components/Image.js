@@ -33,19 +33,6 @@ class Image extends Item {
         })
     }
 
-    $updateShadow(){
-        if(this.$shadows){
-            for(let shadow of this.$shadows){
-                if(shadow.getPropertyValue('visible')){
-                    let rgba = shadow.getProperty('color').toRGBA()
-                    this.setStyle({
-                        filter: `drop-shadow(${shadow.getPropertyValue('horizontalOffset')}px ${shadow.getPropertyValue('verticalOffset')}px ${shadow.getPropertyValue('radius')}px rgba(${rgba.r},${rgba.g},${rgba.b},${shadow.getPropertyValue('color') === 'transparent' ? 0 : rgba.a * shadow.getPropertyValue('opacity')}))`
-                    })
-                }
-            }
-        }
-    }
-
     $sourceChanged(){
         if(!this.getPropertyValue('source')) {
             this.setStyle({
