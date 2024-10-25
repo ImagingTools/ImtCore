@@ -7,7 +7,6 @@
 namespace imtmdbx
 {
 
-int getItemCount = 0;
 
 CMemoryMask::CMemoryMask()
 {

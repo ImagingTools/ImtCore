@@ -11,7 +11,6 @@
 namespace imtmdbx
 {
 
-extern int getItemCount;
 
 class CMemoryMask: virtual public IMask
 {
