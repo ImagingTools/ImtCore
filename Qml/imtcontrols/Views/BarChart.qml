@@ -35,6 +35,9 @@ Item {
 
     property real parentY: 0;
 
+	property bool isFilled: true;
+	property bool isSelected: false;
+
     signal clicked();
 
     onParentYChanged: {
