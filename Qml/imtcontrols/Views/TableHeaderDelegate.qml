@@ -250,23 +250,30 @@ Item{
         id: headerMa;
         anchors.fill: parent;
         hoverEnabled: true;
-        visible: headerDelegate.tableItem.hasSort;
+        visible: headerDelegate.tableItem.hasSort || headerDelegate.textIsCropped;
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
+
         onReleased: {
-            headerDelegate.scale = 1;
+            if(headerDelegate.tableItem.hasSort){
+                headerDelegate.scale = 1;
+            }
         }
 
         onPressed: {
-            headerDelegate.scale = 0.985;
+            if(headerDelegate.tableItem.hasSort){
+                headerDelegate.scale = 0.985;
+            }
         }
 
         onClicked: {
-            if (mouse.button === Qt.LeftButton) {
-                headerDelegate.tableItem.headerClicked(model.Id);
-            }
-            else if (mouse.button === Qt.RightButton){
-                headerDelegate.tableItem.headerRightMouseClicked(model.Id);
+            if(headerDelegate.tableItem.hasSort){
+                if (mouse.button === Qt.LeftButton) {
+                    headerDelegate.tableItem.headerClicked(model.Id);
+                }
+                else if (mouse.button === Qt.RightButton){
+                    headerDelegate.tableItem.headerRightMouseClicked(model.Id);
+                }
             }
         }
     }
