@@ -65,8 +65,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	}
 	else{
 		QString message = QString("There is no authentication token in the HTTP headers. Info: Command: '%1'").arg(qPrintable(gqlCommand));
-		qDebug() << message;
-		// SendWarningMessage(0, message, "GraphQL - servlet");
 	}
 
 	QByteArray responseData;
