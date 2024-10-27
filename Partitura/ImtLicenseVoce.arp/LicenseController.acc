@@ -36,6 +36,9 @@
                     <AttributeInfo Id="Encryption" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Encryption"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="EncryptionAlgorithm" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="EncryptionKeysProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="EncryptionKeys"/>
                     </AttributeInfo>
@@ -101,6 +104,9 @@
                         <Data IsEnabled="true" Value="10"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FingerprintInstancePersistence" Type="Reference" ExportId="FingerprintInstancePersistence">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="KeyRing" Type="Reference" ExportId="KeyRing">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LicenseFilePath" Type="Reference" ExportId="">

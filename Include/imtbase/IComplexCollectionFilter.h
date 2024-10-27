@@ -62,7 +62,7 @@ public:
 		QByteArray fieldId;
 		SortingOrder sortingOrder;
 	};
-	typedef QList<FieldSortingInfo> FieldSortingInfoList;
+	typedef QVector<FieldSortingInfo> FieldSortingInfoList;
 
 	struct FieldFilter
 	{
@@ -79,8 +79,8 @@ public:
 		bool operator==(const GroupFilter& other) const;
 		bool operator!=(const GroupFilter& other) const;
 
-		QList<FieldFilter> fieldFilters;
-		QList<GroupFilter> groupFilters;
+		QVector<FieldFilter> fieldFilters;
+		QVector<GroupFilter> groupFilters;
 		LogicalOperation logicalOperation;
 	};
 

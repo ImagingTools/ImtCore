@@ -2,40 +2,28 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5211" Description="ACF"/>
-            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Connection parameters for the server side</Description>
     <Keywords>Port Host Server</Keywords>
     <ElementsList>
-        <Element Id="PumaUrl" PackageId="ImtCorePck" ComponentId="UrlParam">
+        <Element Id="PumaUrl" PackageId="ImtCorePck" ComponentId="DelegatedUrlParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="DefaultPumaHost">
-                        <Data IsEnabled="true" Value="localhost"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="DefaultPumaPort">
-                        <Data IsEnabled="true" Value="7788"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultScheme" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="http"/>
+                    <AttributeInfo Id="DelegateUrlParam" Type="Reference" ExportId="PumaUrl">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PumaWebSocketUrlParam" PackageId="ImtCorePck" ComponentId="UrlParam">
+        <Element Id="PumaWebSocketPort" PackageId="ImtCorePck" ComponentId="DelegatedUrlParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="localhost"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="8788"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultScheme" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="ws"/>
+                    <AttributeInfo Id="DelegateUrlParam" Type="Reference" ExportId="PumaWebSocketUrl">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -49,7 +37,7 @@
                                 <Value>ServerPort</Value>
                                 <Value>WebSocketServerPort</Value>
                                 <Value>PumaUrl</Value>
-                                <Value>PumaWebSocketUrlParam</Value>
+                                <Value>PumaWebSocketPort</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -105,7 +93,7 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="PumaUrl" ComponentId="PumaUrl"/>
-        <Component ExportedId="PumaWebSocketUrlParam" ComponentId="PumaWebSocketUrlParam"/>
+        <Component ExportedId="PumaWebSocketPort" ComponentId="PumaWebSocketPort"/>
         <Component ExportedId="ServerPort" ComponentId="ServerPort"/>
         <Component ExportedId="WebSocketServerPort" ComponentId="WebSocketServerPort"/>
     </ExportedComponents>
