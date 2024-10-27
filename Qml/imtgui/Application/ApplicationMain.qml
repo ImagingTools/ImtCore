@@ -112,15 +112,20 @@ Item {
     }
 
     function getHeaders(){
-        return {"ProductId": context.appName};
+        return {"ProductId": context.appId};
     }
 
     property alias thumbnailDecoratorGui: thumbnailDecorator;
 
     property ApplicationInfoProvider applicationInfoProvider : ApplicationInfoProvider
     {
-        function getHeaders(){
-            return application.getHeaders();
+        onUpdated: {
+            if (serverApplicationInfo){
+                context.appId = serverApplicationInfo.m_applicationId;
+                context.appName = serverApplicationInfo.m_applicationName;
+
+                AuthorizationController.productId = serverApplicationInfo.m_applicationId
+            }
         }
     }
 
@@ -279,8 +284,8 @@ Item {
                 console.error("WebSocket port provider has invalid port!");
             }
 
-            if (context.appName && context.appName !== ""){
-                url.pathname = "/" + context.appName + "/wssub";
+            if (context.appId && context.appId !== ""){
+                url.pathname = "/" + context.appId + "/wssub";
             }
 
             return String(url)
@@ -302,7 +307,7 @@ Item {
 
     function updateAllModels(){
         thumbnailDecorator.updateModels();
-        applicationInfoProvider.updateModel();
+        // applicationInfoProvider.updateModel();
     }
 
     function onSimpleUserManagement(){
@@ -322,6 +327,8 @@ Item {
     }
 
     function firstModelsInit(){
+        applicationInfoProvider.updateModel();
+
         if (AuthorizationController.isStrongUserManagement() && !authorizationServerConnected){
             checkStatus(5);
 

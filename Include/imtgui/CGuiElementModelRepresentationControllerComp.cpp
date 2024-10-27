@@ -115,6 +115,7 @@ bool CGuiElementModelRepresentationControllerComp::GetRepresentationFromDataMode
 	representation.SetData("Status", elementStatus);
 	representation.SetData("Priority", priority);
 	representation.SetData("Alignment", alignment);
+	representation.SetData("IsToggled", false);
 
 	const imtgui::IGuiElementContainer* subElementsPtr = guiElementPtr->GetSubElements();
 	if (subElementsPtr != nullptr && m_representationControllerCompPtr.IsValid()){

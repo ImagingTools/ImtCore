@@ -35,7 +35,7 @@
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

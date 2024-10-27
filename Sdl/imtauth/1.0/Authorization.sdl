@@ -6,11 +6,11 @@ schema {
 }
 
 type AuthorizationPayload {
-	UserId: ID!
-	Username: ID!
-	Token: ID!
-	SystemId: ID!
-	Permissions: ID!
+	UserId: ID
+	Username: ID
+	Token: ID
+	SystemId: ID
+	Permissions: ID
 }
 
 input AuthorizationInput {

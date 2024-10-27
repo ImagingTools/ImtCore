@@ -87,9 +87,8 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			bool isError = false;
 			imtbase::CTreeItemModel rootModel;
 			if(sourceItemModelPtr.IsValid()){
-				QString json = sourceItemModelPtr->ToJson();
-				if (sourceItemModelPtr->ContainsKey("errors")){
-					imtbase::CTreeItemModel* errorsModelPtr = sourceItemModelPtr->GetTreeItemModel("errors");
+				imtbase::CTreeItemModel* errorsModelPtr = sourceItemModelPtr->GetTreeItemModel("errors");
+				if (errorsModelPtr != nullptr){
 					if (errorsModelPtr->ContainsKey("message")){
 						errorMessage = errorsModelPtr->GetData("message").toString();
 					}
@@ -100,14 +99,15 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 					isError = true;
 				}
-				else if (sourceItemModelPtr->ContainsKey("data")){
+				else{
 					imtbase::CTreeItemModel* dataModelPtr = rootModel.AddTreeModel("data");
 
-					if (sourceItemModelPtr->ContainsKey("data")){
-						dataModelPtr->SetExternTreeModel(gqlCommand, sourceItemModelPtr->GetTreeItemModel("data")->CopyMe());
+					imtbase::CTreeItemModel* sourceDataModelPtr = sourceItemModelPtr->GetTreeItemModel("data");
+					if (sourceDataModelPtr != nullptr){
+						dataModelPtr->SetExternTreeModel(gqlCommand, sourceDataModelPtr->CopyMe());
 					}
 					else{
-						dataModelPtr->SetExternTreeModel(gqlCommand, sourceItemModelPtr.GetPtr()->CopyMe());
+						dataModelPtr->SetExternTreeModel(gqlCommand, sourceItemModelPtr->CopyMe());
 					}
 				}
 			}

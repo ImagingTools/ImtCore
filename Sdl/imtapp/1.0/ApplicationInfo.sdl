@@ -9,6 +9,7 @@ type ApplicationInfo {
 	Version: String
 	CompanyName: String
 	ProductName: String
+	ApplicationId: String
 	ApplicationName: String
 	ApplicationType: String
 }

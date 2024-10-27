@@ -7,7 +7,12 @@ import imtguigql 1.0
 /**
     Usage example:
 
+    Component.onCompleted: {
+        requestSender.send();
+    }
+
     GqlSdlRequestSender {
+        id: requestSender;
         gqlCommandId: <GQL-command>;
         sdlObjectComp:
             Component {
@@ -35,8 +40,11 @@ GqlRequest {
         SDL structure that will come from the server
     */
     property Component sdlObjectComp: null;
+    property Component inputObjectComp: null;
 
     property var inputParams: Gql.GqlObject("input");
+
+    signal finished();
 
     function addInputParam(id, value){
         inputParams.InsertField(id, value);
@@ -55,6 +63,8 @@ GqlRequest {
 
         sdlObject = sdlObjectComp.createObject(root);
         sdlObject.fromObject(data);
+
+        root.finished();
     }
 
     function onError(message, type){
@@ -73,8 +83,7 @@ GqlRequest {
     }
 
     function getHeaders(){
-        let obj = {}
-        return obj;
+        return {};
     }
 
     function send(){
@@ -99,9 +108,22 @@ GqlRequest {
         }
 
         var query = Gql.GqlRequest(type, root.gqlCommandId);
-        createQueryParams(query);
 
-        root.setGqlQuery(query.GetQuery(), root.getHeaders());
+        if (inputObjectComp != null){
+            let inputObject = inputObjectComp.createObject(root);
+
+            let gqlObject = Gql.GqlObject("input")
+            gqlObject.fromJson(inputObject.toJson())
+            query.AddParam(gqlObject);
+
+            root.setGqlQuery(query.GetQuery(), root.getHeaders());
+
+            inputObject.destroy()
+        }
+        else{
+            createQueryParams(query);
+            root.setGqlQuery(query.GetQuery(), root.getHeaders());
+        }
     }
 
     function createQueryParams(query){

@@ -63,7 +63,7 @@ Item {
                 let path = modelIcon === "" ? "" : isEnabled ? Style.getIconPath(modelIcon, Icon.State.On, Icon.Mode.Normal) :
                                                                Style.getIconPath(modelIcon, Icon.State.Off, Icon.Mode.Disabled)
                 if (path !== ""){
-                    path = "/" + context.appName + "/Views/" + path
+                    path = "/" + context.appId + "/Views/" + path
                     loadImages++;
 
                     ImageController.load(path, counterImage, counterImage);

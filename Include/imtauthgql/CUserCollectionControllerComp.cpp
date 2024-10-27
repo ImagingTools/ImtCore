@@ -183,9 +183,12 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 	QString& errorMessage) const
 {
 	if (!m_userInfoFactCompPtr.IsValid()){
-		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_userInfoFactCompPtr' was not set");
-		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
+		Q_ASSERT_X(false, "Attribute 'UserFactory' was not set", "CUserCollectionControllerComp");
+		return nullptr;
+	}
 
+	if (!m_hashCalculatorCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'HashCalculator' was not set", "CUserCollectionControllerComp");
 		return nullptr;
 	}
 
@@ -291,10 +294,11 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 				return nullptr;
 			}
 
-			if (m_hashCalculatorCompPtr.IsValid()){
-				if (oldUserInfoPtr == nullptr || (oldUserInfoPtr != nullptr && oldUserInfoPtr->GetPasswordHash() != password)){
-					password = m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
-				}
+			if (oldUserInfoPtr == nullptr){
+				password = m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
+			}
+			else{
+				password = oldUserInfoPtr->GetPasswordHash();
 			}
 
 			userInfoPtr->SetPasswordHash(password.toUtf8());

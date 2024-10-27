@@ -32,6 +32,9 @@ sdl::imtapp::Application::V1_0::CApplicationInfo CApplicationInfoControllerComp:
 		applicationInfo.SetVersion(version);
 	}
 
+	QString appId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID);
+	applicationInfo.SetApplicationId(appId);
+
 	QString appName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_NAME);
 	applicationInfo.SetApplicationName(appName);
 

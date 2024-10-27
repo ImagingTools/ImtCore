@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 
 
 namespace imtauthgql
@@ -15,33 +16,28 @@ namespace imtauthgql
 
 bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& /*errorMessage*/) const
 {
-	imtgql::CGqlRequest gqlRequest(imtgql::CGqlRequest::RT_QUERY, "UsersList");
-	imtgql::CGqlObject queryFields;
-	queryFields.InsertField("Id");
-	queryFields.InsertField("UserId");
-	gqlRequest.AddField("items", queryFields);
+	namespace userssdl = sdl::imtauth::Users::V1_0;
 
-	imtbase::CTreeItemModel usersModel;
-	bool ok = SendModelRequest(gqlRequest, usersModel);
-	if (ok){
-		imtbase::CTreeItemModel* dataModelPtr = usersModel.GetTreeItemModel("data");
-		if (dataModelPtr == nullptr){
+	userssdl::UserItemRequestArguments arguments;
+	arguments.input.SetId(*m_superuserIdAttrPtr);
+
+	if (m_applicationInfoCompPtr.IsValid()){
+		arguments.input.SetProductId(m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8());
+	}
+
+	imtgql::CGqlRequest gqlRequest;
+	if (userssdl::CUserItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		// TODO: remove !!!
+		imtgql::CGqlObject itemObject;
+		itemObject.InsertField("id");
+		gqlRequest.AddField("item", itemObject);
+
+		userssdl::CUserDataPayload response;
+		if (!SendModelRequest(gqlRequest, response)){
 			return false;
 		}
 
-		imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->GetTreeItemModel("items");
-		if (itemsModelPtr == nullptr){
-			return false;
-		}
-
-		for (int i = 0; i < itemsModelPtr->GetItemsCount(); i++){
-			if (itemsModelPtr->ContainsKey("UserId", i)){
-				QByteArray username = itemsModelPtr->GetData("UserId", i).toByteArray();
-				if (*m_superuserIdAttrPtr == username){
-					return true;
-				}
-			}
-		}
+		return true;
 	}
 
 	return false;

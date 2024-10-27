@@ -31,29 +31,57 @@ CommandsRepresentationProvider {
         return false;
     }
 
+    function isToggled(commandId){
+        if (container.commandsView){
+            return container.commandsView.getCommandData(commandId, "IsToggled");
+        }
+
+        return false;
+    }
+
+    function setToggled(commandId, toggled){
+        setCommandProperty(commandId, "IsToggled", toggled);
+        if (container.commandsView){
+            container.commandsView.setCommandData(commandId, "IsToggled", toggled);
+        }
+    }
+
+    function setCommandIcon(commandId, icon){
+        setCommandProperty(commandId, "Icon", icon);
+        if (container.commandsView){
+            container.commandsView.setCommandData(commandId, "Icon", icon);
+        }
+    }
+
+    function setCommandName(commandId, commandName){
+        setCommandProperty(commandId, "Name", commandName);
+        if (container.commandsView){
+            container.commandsView.setCommandData(commandId, "Name", commandName);
+        }
+    }
+
     function setCommandIsEnabled(commandId, isEnabled){
+        setCommandProperty(commandId, "IsEnabled", isEnabled);
+        if (container.commandsView){
+            container.commandsView.setCommandData(commandId, "IsEnabled", isEnabled);
+        }
+    }
+
+    function setCommandProperty(commandId, key, value){
         for (let i = 0; i < commandsModel.getItemsCount(); i++){
-            let found = false;
             let subElements = commandsModel.getData("SubElements", i)
             if (subElements){
                 for (let j = 0; j < subElements.getItemsCount(); j++){
                     let id = subElements.getData("Id", j)
                     if (id === commandId){
-                        subElements.setData("IsEnabled", isEnabled, j)
-                        found = true;
-                        break;
+                        subElements.setData(key, value, j)
+                        return true;
                     }
                 }
             }
-
-            if (found){
-                break;
-            }
         }
 
-        if (container.commandsView){
-            container.commandsView.setCommandData(commandId, "IsEnabled", isEnabled);
-        }
+        return false;
     }
 }
 

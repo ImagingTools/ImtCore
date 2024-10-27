@@ -12,7 +12,7 @@ import {
 }
 
 input UsersListInput {
-	ProductId: ID!
+	ProductId: ID
 	viewParams: CollectionViewParams
 }
 

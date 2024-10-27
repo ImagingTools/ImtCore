@@ -16,11 +16,16 @@ namespace imtauthgql
 
 bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& password) const
 {
-	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, sdl::imtauth::Users::V1_0::CUserAddGqlRequest::GetCommandId());
+	if (!m_applicationInfoCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'ApplicationInfo' was not set", "CRemoteSuperuserControllerComp");
+		return false;
+	}
 
-	imtgql::CGqlObject inputObject;
-	inputObject.InsertField(sdl::imtauth::Users::V1_0::CUserDataInput::UserDataInputFields::Id.toUtf8(), "su");
-	inputObject.InsertField(sdl::imtauth::Users::V1_0::CUserDataInput::UserDataInputFields::ProductId.toUtf8(), qPrintable(*m_productIdAttrPtr));
+	namespace userssdl = sdl::imtauth::Users::V1_0;
+
+	userssdl::UserAddRequestArguments arguments;
+	arguments.input.SetId("su");
+	arguments.input.SetProductId(m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8());
 
 	sdl::imtauth::Users::V1_0::CUserData userData;
 	userData.SetId("su");
@@ -28,19 +33,17 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 	userData.SetName("superuser");
 	userData.SetPassword(qPrintable(password));
 
-	imtgql::CGqlObject* userGqlObject = inputObject.CreateFieldObject(sdl::imtauth::Users::V1_0::CUserDataInput::UserDataInputFields::Item.toUtf8());
-	if (!userData.WriteToGraphQlObject(*userGqlObject)){
-		return false;
+	arguments.input.SetItem(userData);
+
+	imtgql::CGqlRequest gqlRequest;
+	if (userssdl::CUserAddGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		userssdl::CAddedNotificationPayload response;
+		if (SendModelRequest(gqlRequest, response)){
+			return true;
+		}
 	}
 
-	request.AddParam("input", inputObject);
-
-	imtgql::CGqlObject fieldObject;
-	fieldObject.InsertField("Id");
-	request.AddField(sdl::imtauth::Users::V1_0::CAddedNotificationPayload::AddedNotificationPayloadFields::AddedNotification.toUtf8(), fieldObject);
-
-	imtbase::CTreeItemModel responseModel;
-	return SendModelRequest(request, responseModel);
+	return false;
 }
 
 

@@ -5,6 +5,7 @@
 #include <QtCore/QThread>
 
 // ACF includes
+#include <ibase/IApplicationInfo.h>
 #include <icomp/CComponentBase.h>
 #include <iauth/ILogin.h>
 #include <iauth/IRightsProvider.h>
@@ -41,7 +42,7 @@ public:
 		I_ASSIGN(m_userInfoFactCompPtr, "UserFactory", "Factory used for creation of the new user", true, "UserFactory");
 		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
 		I_ASSIGN(m_superuserProviderCompPtr, "SuperuserProvider", "Superuser provider", false, "SuperuserProvider");
-		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product-ID", true, "");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application Info", true, "");
 	I_END_COMPONENT;
 
 	CSimpleLoginWrapComp();
@@ -73,7 +74,7 @@ protected:
 	I_FACT(imtauth::IUserInfo, m_userInfoFactCompPtr);
 	I_REF(imtauth::IPermissionChecker, m_checkPermissionCompPtr);
 	I_REF(imtauth::ISuperuserProvider, m_superuserProviderCompPtr);
-	I_ATTR(QByteArray, m_productIdAttrPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 };
 
 

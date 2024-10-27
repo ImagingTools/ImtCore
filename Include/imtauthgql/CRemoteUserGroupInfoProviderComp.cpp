@@ -9,6 +9,7 @@
 #include <imtbase/CCollectionInfo.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtbase/CTreeItemModel.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
 
 
 namespace imtauthgql
@@ -32,26 +33,20 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 		return nullptr;
 	}
 
-	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "GroupItem");
-	imtgql::CGqlObject inputObject;
-	inputObject.InsertField(QByteArray("Id"), QVariant(groupId));
-	inputObject.InsertField(QByteArray("IsJsonSerialized"), QVariant(true));
-	request.AddParam("input", inputObject);
+	namespace groupssdl = sdl::imtauth::Groups::V1_0;
 
-	imtgql::CGqlObject itemObject;
-	itemObject.InsertField("Id");
-	request.AddField("item", itemObject);
+	groupssdl::GroupItemRequestArguments arguments;
+	arguments.input.SetId(groupId);
 
-	imtbase::CTreeItemModel responseModel;
+	imtgql::CGqlRequest gqlRequest;
+	if (groupssdl::CGroupItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		groupssdl::CGroupDataPayload response;
 
-	bool retVal = SendModelRequest(request, responseModel);
-	if (retVal){
-		imtbase::CTreeItemModel* roleDataModelPtr = responseModel.GetTreeItemModel("data");
-		if (roleDataModelPtr == nullptr){
+		if (!SendModelRequest(gqlRequest, response)){
 			return nullptr;
 		}
 
-		QByteArray json = roleDataModelPtr->ToJson().toUtf8();
+		groupssdl::CGroupData groupData = response.GetGroupData();
 
 		istd::TDelPtr<imtauth::IUserGroupInfo> groupInfoPtr;
 		groupInfoPtr.SetPtr(m_userGroupInfoFactCompPtr.CreateInstance());
@@ -59,7 +54,17 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 			return nullptr;
 		}
 
-		iser::CJsonMemReadArchive archive(json);
+		QJsonObject object;
+		if (!groupData.WriteToJsonObject(object)){
+			return nullptr;
+		}
+
+		QJsonDocument document(object);
+		if (document.isNull()){
+			return nullptr;
+		}
+
+		iser::CJsonMemReadArchive archive(document.toJson());
 		if (!groupInfoPtr->Serialize(archive)){
 			return nullptr;
 		}

@@ -10,10 +10,6 @@ QtObject {
     property ApplicationInfo serverApplicationInfo: null;
     signal updated();
 
-    onServerApplicationInfoChanged: {
-        root.updated();
-    }
-
     function updateModel(){
         request.send();
     }
@@ -24,9 +20,13 @@ QtObject {
 
     property GqlSdlRequestSender request : GqlSdlRequestSender {
         gqlCommandId: ImtappApplicationSdlCommandIds.s_getApplicationInfo;
-        sdlObjectComp: Component { ApplicationInfo{} }
-        onSdlObjectChanged: {
+        sdlObjectComp: Component { ApplicationInfo {
+            } }
+
+        onFinished: {
             root.serverApplicationInfo = sdlObject;
+
+            root.updated();
         }
 
         function getHeaders(){

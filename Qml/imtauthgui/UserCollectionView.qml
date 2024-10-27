@@ -14,8 +14,15 @@ RemoteCollectionView {
     collectionId: "Users";
     visibleMetaInfo: true;
 
+    additionalFieldIds: ["SystemId"]
+    filterMenu.decorator: filterDecoratorComp;
+
     property string productId;
     property var documentManager: null;
+    property TreeItemModel rolesModel;
+    property TreeItemModel groupsModel;
+
+    signal saved();
 
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
             collectionView: userCollectionViewContainer;
@@ -24,8 +31,6 @@ RemoteCollectionView {
             viewTypeId: "UserEditor";
         }
     }
-
-    filterMenu.decorator: filterDecoratorComp;
 
     onProductIdChanged: {
         roleCollectionDataProvider.productId = productId;
@@ -112,19 +117,19 @@ RemoteCollectionView {
         }
     }
 
-    dataControllerComp:
-        Component {
-        CollectionRepresentation {
-            collectionId: userCollectionViewContainer.collectionId;
-            Component.onCompleted: {
-                additionalFieldIds.push("SystemId");
-            }
+    // dataControllerComp:
+    //     Component {
+    //     CollectionRepresentation {
+    //         collectionId: userCollectionViewContainer.collectionId;
+    //         Component.onCompleted: {
+    //             additionalFieldIds.push("SystemId");
+    //         }
 
-            function getHeaders(){
-                return userCollectionViewContainer.getHeaders();
-            }
-        }
-    }
+    //         function getHeaders(){
+    //             return userCollectionViewContainer.getHeaders();
+    //         }
+    //     }
+    // }
 
     function onLocalizationChanged(language){
         userCollectionViewContainer.dataController.updateHeaders();
@@ -244,8 +249,6 @@ RemoteCollectionView {
         id: roleCollectionDataProvider;
         productId: userCollectionViewContainer.productId;
         onModelUpdated: {
-            console.log("RoleCollectionDataProvider onModelUpdated UserCollectionView", collectionModel)
-
             userCollectionViewContainer.rolesModel = collectionModel;
         }
         function getHeaders(){
@@ -337,9 +340,6 @@ RemoteCollectionView {
         }
     }
 
-    property TreeItemModel rolesModel;
-    property TreeItemModel groupsModel;
-
     Component {
         id: userDocumentComp;
 
@@ -349,6 +349,10 @@ RemoteCollectionView {
             rolesModel: userCollectionViewContainer.rolesModel;
             groupsModel: userCollectionViewContainer.groupsModel;
             productId: userCollectionViewContainer.productId;
+
+            Component.onCompleted: {
+                userCollectionViewContainer.saved.connect(userEditor.onSaved);
+            }
 
             commandsDelegateComp: Component {ViewCommandsDelegateBase {
                     view: userEditor;
@@ -360,6 +364,10 @@ RemoteCollectionView {
                     uuid: userEditor.viewId;
                     commandsView: userEditor.commandsView;
                 }
+            }
+
+            function onSaved(){
+                userEditor.checkChangePasswordLogic();
             }
         }
     }
@@ -388,6 +396,10 @@ RemoteCollectionView {
                 onFinished: {
                     requestDocumentDataController.documentModel = m_userData;
                 }
+            }
+
+            onSaved: {
+                userCollectionViewContainer.saved();
             }
 
             function getHeaders(){

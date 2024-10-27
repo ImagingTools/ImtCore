@@ -63,7 +63,7 @@ Item {
             }
         }
 
-        checkCommandsState();
+        timer.restart();
     }
 
     function clearModel(){
@@ -78,12 +78,20 @@ Item {
 
     onVisibleChanged: {
         if (visible){
-            checkCommandsState()
+            commandsItem.checkCommandsState()
         }
     }
 
     onWidthChanged: {
-        checkCommandsState();
+        timer.restart();
+    }
+
+    Timer {
+        id: timer;
+        interval: 500;
+        onTriggered: {
+            commandsItem.checkCommandsState()
+        }
     }
 
     function checkCommandsState(){

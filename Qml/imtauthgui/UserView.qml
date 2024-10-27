@@ -47,12 +47,16 @@ ViewBase {
             }
         }
 
-        passwordInput.visible = userData.m_id == "";
-        changePasswordButton.visible = userData.m_id != "";
+        checkChangePasswordLogic();
 
         checkSystemId();
 
         setBlockingUpdateModel(false);
+    }
+
+    function checkChangePasswordLogic(){
+        passwordInput.visible = userData.m_id == "";
+        changePasswordButton.visible = userData.m_id != "";
     }
 
     function checkSystemId(){

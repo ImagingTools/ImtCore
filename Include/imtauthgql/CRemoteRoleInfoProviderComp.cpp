@@ -8,7 +8,6 @@
 // ImtCore includes
 #include <imtbase/CCollectionInfo.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtbase/CTreeItemModel.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 
 
@@ -39,25 +38,29 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& obj
 		return nullptr;
 	}
 
-	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, sdl::imtauth::Roles::V1_0::CRoleItemGqlRequest::GetCommandId());
-	imtgql::CGqlObject inputObject;
-	inputObject.InsertField(QByteArray("Id"), QVariant(objectId));
-	inputObject.InsertField(QByteArray("IsJsonSerialized"), QVariant(true));
-	request.AddParam("input", inputObject);
+	namespace rolessdl = sdl::imtauth::Roles::V1_0;
 
-	imtgql::CGqlObject itemObject;
-	itemObject.InsertField("Id");
-	request.AddField("item", itemObject);
+	rolessdl::RoleItemRequestArguments arguments;
+	arguments.input.SetId(objectId);
 
-	imtbase::CTreeItemModel responseModel;
-	bool retVal = SendModelRequest(request, responseModel);
-	if (retVal){
-		imtbase::CTreeItemModel* roleDataModelPtr = responseModel.GetTreeItemModel("data");
-		if (roleDataModelPtr == nullptr){
+	imtgql::CGqlRequest gqlRequest;
+	if (rolessdl::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		rolessdl::CRoleDataPayload response;
+		if (!SendModelRequest(gqlRequest, response)){
 			return nullptr;
 		}
 
-		QByteArray roleJson = roleDataModelPtr->ToJson().toUtf8();
+		rolessdl::CRoleData roleData = response.GetRoleData();
+
+		QJsonObject object;
+		if (!roleData.WriteToJsonObject(object)){
+			return nullptr;
+		}
+
+		QJsonDocument document(object);
+		if (document.isNull()){
+			return nullptr;
+		}
 
 		istd::TDelPtr<imtauth::IRole> roleInfoPtr;
 		roleInfoPtr.SetPtr(m_roleInfoFactCompPtr.CreateInstance());
@@ -65,7 +68,7 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& obj
 			return nullptr;
 		}
 
-		iser::CJsonMemReadArchive archive(roleJson);
+		iser::CJsonMemReadArchive archive(document.toJson());
 		if (!roleInfoPtr->Serialize(archive)){
 			return nullptr;
 		}

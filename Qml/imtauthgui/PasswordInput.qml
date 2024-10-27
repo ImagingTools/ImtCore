@@ -93,61 +93,6 @@ Column {
             KeyNavigation.backtab: newPasswordInput1;
         }
     }
-
-    // BaseText {
-    //     id: titlePassword;
-
-    //     text: qsTr("Password");
-    // }
-
-    // CustomTextField {
-    //     id: passwordTextInput;
-
-    //     width: root.width;
-    //     height: 30;
-
-    //     placeHolderText: qsTr("Enter the password");
-    //     echoMode: TextInput.Password;
-    //     KeyNavigation.tab: confirmPasswordInput;
-
-    //     readOnly: root.readOnly;
-    // }
-
-    // BaseText {
-    //     id: titleConfirmPassword;
-
-    //     text: qsTr("Confirm Password");
-    // }
-
-    // CustomTextField {
-    //     id: confirmPasswordInput;
-
-    //     width: root.width;
-    //     height: 30;
-
-    //     placeHolderText: qsTr("Confirm password");
-    //     echoMode: TextInput.Password;
-
-    //     readOnly: root.readOnly;
-    // }
-
-    // Item {
-    //     width: root.width;
-    //     height: 30;
-
-    //     BaseText {
-    //         id: textError;
-
-    //         anchors.left: parent.left;
-    //         anchors.verticalCenter: parent.verticalCenter;
-
-    //         color: Style.errorTextColor;
-
-    //         visible: false;
-
-    //         text: qsTr("Passwords don't match");
-    //     }
-    // }
 }
 
 

@@ -145,6 +145,8 @@ Item {
                                     text: model.Name;
                                     widthFromDecorator: true;
                                     heightFromDecorator: true;
+                                    checkable: model.IsToggled !== undefined;
+                                    checked: model.IsToggled !== undefined ? model.IsToggled : false;
                                     iconSource: model.Icon === "" ? "" : model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
                                                                                            "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
                                     decorator: Component {
