@@ -85,7 +85,7 @@ void SetTextFilter(imtbase::IComplexCollectionFilter& filter, const QByteArrayLi
 {
 	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
 
-	QList<imtbase::IComplexCollectionFilter::FieldFilter> fieldFilters;
+	QVector<imtbase::IComplexCollectionFilter::FieldFilter> fieldFilters;
 	for (const QByteArray& fieldId : fieldIds){
 		imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
 
@@ -132,12 +132,12 @@ QString processColumn(const IComplexCollectionFilter::FieldFilter& filter)
 
 	bool isOk = false;
 
-	if (numericTypes.contains(filter.filterValue.typeId()) && numericOperations.contains(filter.filterOperation)){
+	if (numericTypes.contains(filter.filterValue.type()) && numericOperations.contains(filter.filterOperation)){
 		bool isValid = false;
 
 		QString filterValue;
 
-		switch (filter.filterValue.typeId()){
+		switch (filter.filterValue.type()){
 		case QMetaType::LongLong:
 			filterValue = QString::number(filter.filterValue.toLongLong(&isOk));
 			break;
@@ -152,21 +152,21 @@ QString processColumn(const IComplexCollectionFilter::FieldFilter& filter)
 		}
 
 		if (isOk){
-			retVal = QString("\"%1\" %2 %3").arg(filter.fieldId).arg(numericOperations[filter.filterOperation]).arg(filterValue);
+			retVal = QString("\"%1\" %2 %3").arg(qPrintable(filter.fieldId)).arg(numericOperations[filter.filterOperation]).arg(filterValue);
 		}
 	}
-	else if (stringTypes.contains(filter.filterValue.typeId()) && stringOperations.contains(filter.filterOperation)){
+	else if (stringTypes.contains(filter.filterValue.type()) && stringOperations.contains(filter.filterOperation)){
 		QString filterValue = filter.filterValue.toString();
 		if (filter.filterOperation == IComplexCollectionFilter::FO_CONTAINS){
 			filterValue.prepend("%");
 			filterValue.append("%");
 		}
-		retVal = QString("\"%1\" %2 '%3'").arg(filter.fieldId).arg(stringOperations[filter.filterOperation]).arg(filterValue);
+		retVal = QString("\"%1\" %2 '%3'").arg(qPrintable(filter.fieldId)).arg(stringOperations[filter.filterOperation]).arg(filterValue);
 	}
-	else if (boolTypes.contains(filter.filterValue.typeId()) && boolOperations.contains(filter.filterOperation)){
+	else if (boolTypes.contains(filter.filterValue.type()) && boolOperations.contains(filter.filterOperation)){
 		bool value = filter.filterValue.toBool();
 
-		retVal = QString("\"%1\" %2 %3").arg(filter.fieldId).arg(filter.filterOperation).arg(value ? "true" : "false");
+		retVal = QString("\"%1\" %2 %3").arg(qPrintable(filter.fieldId)).arg(filter.filterOperation).arg(value ? "true" : "false");
 	}
 
 	return retVal;
@@ -219,7 +219,7 @@ QString processGroup(const IComplexCollectionFilter::GroupFilter& filter)
 
 QString CreateDefaultSqlSortingQuery(const imtbase::IComplexCollectionFilter& filter)
 {
-	QList<IComplexCollectionFilter::FieldSortingInfo> infoList = filter.GetSortingInfo();
+	QVector<IComplexCollectionFilter::FieldSortingInfo> infoList = filter.GetSortingInfo();
 	QString retVal = !infoList.isEmpty() ? "ORDER BY" : "";
 
 	for (int i = 0; i < infoList.count(); i++){
@@ -244,7 +244,7 @@ QString CreateDefaultSqlSortingQuery(const imtbase::IComplexCollectionFilter& fi
 			return QString();
 		}
 
-		retVal += QString("%0 \"%1\" %2").arg(i > 0 ? "," : "").arg(info.fieldId).arg(order);
+		retVal += QString("%0 \"%1\" %2").arg(i > 0 ? "," : "").arg(qPrintable(info.fieldId)).arg(order);
 	}
 
 	return retVal;
