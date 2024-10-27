@@ -18,6 +18,7 @@
 #include <imtlic/IProductInstanceInfo.h>
 #include <imtlic/ILicenseController.h>
 #include <imtlic/ILicenseStatus.h>
+#include <imtlic/IKeyRing.h>
 
 
 namespace imtlic
@@ -47,6 +48,7 @@ public:
 		I_ASSIGN(m_fingerprintInstancePersistenceCompPtr, "FingerprintInstancePersistence", "Fingerprint persistence for the product instance", true, "FingerprintPersistence");
 		I_ASSIGN(m_licensePathCompPtr, "LicenseFilePath", "Path to the license file", true, "LicenseFilePath");
 		I_ASSIGN(m_licenseKeysProviderCompPtr, "LicenseKeys", "Provider of license keys", false, "LicenseKeys");
+		I_ASSIGN(m_keyRingCompPtr, "KeyRing", "Provider/keeper of multiple Keys", false, "KeyRing");
 		I_ASSIGN(m_licenseFingerprintPathCompPtr, "LicenseFingerprintPath", "Folder containing license fingerprint file", false, "LicenseFingerprintPath");
 		I_ASSIGN(m_fingerprintExpirationAttrPtr, "FingerprintExpiration", "Time in days for the license fingerprint expiration", false, 5);
 		I_ASSIGN(m_additionalImportLicenseErrorMessageAttrPtr, "AdditionalImportLicenseErrorMessage", "Additional message for explaining possible license import problems", false, "");
@@ -57,6 +59,7 @@ public:
 	// reimplemented (ILicenseController)
 	virtual bool ImportLicense(const QString& licenseFilePath, ilog::IMessageConsumer* logPtr = nullptr) const override;
 	virtual bool CheckLicense(const QByteArray& key) const override;
+	virtual bool CheckLicense(const QByteArray& key, const QString& licensePath) const override;
 
 protected:
 	void OnFingeprintCheckTimer() const;
@@ -106,6 +109,7 @@ private:
 	I_REF(ifile::IFileNameParam, m_licensePathCompPtr);
 	I_REF(ifile::IFileNameParam, m_licenseFingerprintPathCompPtr);
 	I_REF(imtcrypt::IEncryptionKeysProvider, m_licenseKeysProviderCompPtr);
+	I_REF(imtlic::IKeyRing, m_keyRingCompPtr);
 	I_ATTR(int, m_fingerprintExpirationAttrPtr);
 	I_TEXTATTR(m_additionalImportLicenseErrorMessageAttrPtr);
 

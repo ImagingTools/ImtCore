@@ -57,6 +57,11 @@ bool CLicenseControllerComp::ImportLicense(const QString& licenseFilePath, ilog:
 			}
 
 			if (istd::CSystem::FileCopy(licenseFilePath, targetFilePath, true)){
+				// if multiple keys are defined, select the correct one, before trying to load the license
+				if (m_keyRingCompPtr.IsValid()){
+					m_keyRingCompPtr->SelectKeyFor(licenseFilePath);
+				}
+
 				int licenseState = m_productInstancePersistenceCompPtr->LoadFromFile(*m_productInstanceCompPtr, targetFilePath);
 				if (licenseState == ifile::IFilePersistence::OS_OK){
 					OnFingeprintCheckTimer();
@@ -112,26 +117,26 @@ bool CLicenseControllerComp::ImportLicense(const QString& licenseFilePath, ilog:
 bool CLicenseControllerComp::CheckLicense(const QByteArray& key) const
 {
 	if (!m_licensePathCompPtr.IsValid()) {
-		SendCriticalMessage(0, "No license path component was set. Please check component configuration", "CLicenseControllerComp::ReadLicenseFile");
+		SendCriticalMessage(0, "No license path component was set. Please check component configuration", "CLicenseControllerComp::CheckLicense");
 
 		return false;
 	}
 
 	if (!m_productInstancePersistenceCompPtr.IsValid()) {
-		SendCriticalMessage(0, "No product instance persistence component was set. Please check component configuration", "CLicenseControllerComp::ReadLicenseFile");
+		SendCriticalMessage(0, "No product instance persistence component was set. Please check component configuration", "CLicenseControllerComp::CheckLicense");
 
 		return false;
 	}
 
 	if (!m_encryptedInstancePersistenceCompPtr.IsValid()) {
-		SendCriticalMessage(0, "No encrypted instance persistence component was set. Please check component configuration", "CLicenseControllerComp::ReadLicenseFile");
+		SendCriticalMessage(0, "No encrypted instance persistence component was set. Please check component configuration", "CLicenseControllerComp::CheckLicense");
 
 		return false;
 	}
 
 	QString licenseFilePath = m_licensePathCompPtr->GetPath();
 	if (licenseFilePath.isEmpty()) {
-		SendCriticalMessage(0, "License file path is empty. Please check component configuration", "CLicenseControllerComp::ReadLicenseFile");
+		SendCriticalMessage(0, "License file path is empty. Please check component configuration", "CLicenseControllerComp::CheckLicense");
 
 		m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID | imtlic::ILicenseStatus::LSF_NO_LICENSE);
 
@@ -149,6 +154,38 @@ bool CLicenseControllerComp::CheckLicense(const QByteArray& key) const
 
 	imtlic::CProductInstanceInfo tempLicense;
 	int state = m_encryptedInstancePersistenceCompPtr->LoadFromEncryptedFile(key, licenseFilePath, tempLicense);
+
+	return (state == ifile::IFilePersistence::OS_OK);
+}
+
+
+bool CLicenseControllerComp::CheckLicense(const QByteArray& key, const QString& licensePath) const
+{
+	if (!m_productInstancePersistenceCompPtr.IsValid()) {
+		SendCriticalMessage(0, "No product instance persistence component was set. Please check component configuration", "CLicenseControllerComp::CheckLicense");
+
+		return false;
+	}
+
+	if (!m_encryptedInstancePersistenceCompPtr.IsValid()) {
+		SendCriticalMessage(0, "No encrypted instance persistence component was set. Please check component configuration", "CLicenseControllerComp::CheckLicense");
+
+		return false;
+	}
+
+	if (licensePath.isEmpty()) {
+		SendWarningMessage(0, "License file path is empty, nothing to check", "CLicenseControllerComp::CheckLicense");
+		return false;
+	}
+
+	QFileInfo licenseFileInfo(licensePath);
+	if (!licenseFileInfo.exists()) {
+		SendWarningMessage(0, QString(QObject::tr("License file '%1' doesn't exist")).arg(licensePath), "CLicenseControllerComp::CheckLicense");
+		return false;
+	}
+
+	imtlic::CProductInstanceInfo tempLicense;
+	int state = m_encryptedInstancePersistenceCompPtr->LoadFromEncryptedFile(key, licensePath, tempLicense);
 
 	return (state == ifile::IFilePersistence::OS_OK);
 }

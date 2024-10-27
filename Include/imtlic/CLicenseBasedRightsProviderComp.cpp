@@ -24,13 +24,6 @@ bool CLicenseBasedRightsProviderComp::HasRight(
 			const QByteArray& operationId,
 			bool beQuiet) const
 {
-	if (m_userRightsProviderCompPtr.IsValid()){
-		bool userHasRight = m_userRightsProviderCompPtr->HasRight(operationId);
-		if (!userHasRight) {
-			return false;
-		}
-	}
-
 	if (m_licenseInfoProviderCompPtr.IsValid()){
 		const imtbase::ICollectionInfo& licenseList = m_licenseInfoProviderCompPtr->GetLicenseInstances();
 		

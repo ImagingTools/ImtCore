@@ -25,6 +25,11 @@ public:
 		Check if license is valid
 	*/
 	virtual bool CheckLicense(const QByteArray& key) const = 0;
+
+	/**
+		Check if provided license is valid
+	*/
+	virtual bool CheckLicense(const QByteArray& key, const QString& licensePath) const = 0;
 };
 
 
