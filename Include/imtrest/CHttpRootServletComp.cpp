@@ -25,16 +25,14 @@ namespace imtrest
 
 // reimplemented (IRequestHandler)
 
-bool CHttpRootServletComp::IsCommandSupported(const QByteArray& /*commandId*/) const
+bool CHttpRootServletComp::IsCommandSupported(const QByteArray& commandId) const
 {
-	return true;
+	return FindRequestHandler(commandId) != nullptr;
 }
 
 
 imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
 {
-	Q_ASSERT(subCommandId.isEmpty());
-
 	QByteArray commandId = request.GetCommandId();
 	if (commandId.startsWith('/')){
 		commandId = commandId.remove(0, 1);
