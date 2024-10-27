@@ -39,6 +39,36 @@ bool CDelegatedUrlParamComp::IsReadOnly() const
 }
 
 
+// reimplemented (ifile::IFileNameParam)
+
+int CDelegatedUrlParamComp::GetPathType() const
+{
+	return ifile::IFileNameParam::PT_URL;
+}
+
+
+const QString& CDelegatedUrlParamComp::GetPath() const
+{
+	const ifile::IFileNameParam* pathPtr = dynamic_cast<const ifile::IFileNameParam*>(m_urlParamCompPtr.GetPtr());
+	if (pathPtr != nullptr){
+		return pathPtr->GetPath();
+	}
+
+	static QString empty;
+
+	return empty;
+}
+
+
+void CDelegatedUrlParamComp::SetPath(const QString& path)
+{
+	ifile::IFileNameParam* pathPtr = dynamic_cast<ifile::IFileNameParam*>(m_urlParamCompPtr.GetPtr());
+	if (pathPtr != nullptr){
+		pathPtr->SetPath(path);
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CDelegatedUrlParamComp::Serialize(iser::IArchive& archive)
