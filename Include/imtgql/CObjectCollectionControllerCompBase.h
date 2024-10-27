@@ -3,7 +3,6 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
-#include <iproc/IProcessor.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
