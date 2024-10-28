@@ -130,6 +130,10 @@ Item {
                         background.opacity = 0;
                     }
 
+					if(dialogLoader.item.noMouseArea != undefined && dialogLoader.item.noMouseArea){
+						backgroundArea.visible = false;
+					}
+
                     for (let key in model.Parameters) {
                         dialogLoader.item[key] = model.Parameters[key];
                     }
