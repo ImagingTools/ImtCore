@@ -15,6 +15,7 @@
 #include <imtqml/CCommandsObserverQmlComp.h>
 #include <imtqml/CClientMainWindowQmlComp.h>
 #include <imtqml/CQmlObjectCollectionComp.h>
+#include <imtqml/CObjectViewDataProviderComp.h>
 
 
 /**
@@ -33,6 +34,7 @@ typedef imtqml::CPageGuiElementModelComp PageGuiElementModel;
 typedef imtqml::CClientMainWindowQmlComp ClientMainWindowQml;
 typedef icomp::TModelCompWrap<imtqml::CCommandsObserverQmlComp> CommandsObserverQml;
 typedef imtqml::CQmlObjectCollectionComp QmlObjectCollection;
+typedef imtqml::CObjectViewDataProviderComp ObjectViewDataProvider;
 
 
 } // namespace ImtQmlPck
