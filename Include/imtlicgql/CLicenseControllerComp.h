@@ -2,17 +2,17 @@
 
 
 // ImtCore includes
-#include <imtgql/CObjectCollectionControllerCompBase.h>
+#include <imtservergql/CObjectCollectionControllerCompBase.h>
 
 
 namespace imtlicgql
 {
 
 
-class CLicenseControllerComp: public imtgql::CObjectCollectionControllerCompBase
+class CLicenseControllerComp: public imtservergql::CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtservergql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CLicenseControllerComp);
 	I_END_COMPONENT;

@@ -2,9 +2,7 @@
 
 
 // Qt includes
-#include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>

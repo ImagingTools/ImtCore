@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtlic/IProductInfo.h>
-#include <imtgql/CObjectCollectionControllerCompBase.h>
+#include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Products.h>
 
 

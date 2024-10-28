@@ -7,7 +7,7 @@ namespace imtlicgql
 
 // public methods
 
-// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+// reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
 imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {

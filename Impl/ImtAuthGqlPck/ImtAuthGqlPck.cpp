@@ -114,6 +114,11 @@ I_EXPORT_COMPONENT(
 			"User serializable collection controller",
 			"User Serializable Collection Controller");
 
+I_EXPORT_COMPONENT(
+			UserSettingsController,
+			"Client settings controller",
+			"GraphQL Controller Model Client User");
+
 
 } // namespace ImtAuthGqlPck
 

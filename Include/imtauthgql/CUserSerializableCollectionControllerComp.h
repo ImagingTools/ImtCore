@@ -2,17 +2,17 @@
 
 
 // ImtCore includes
-#include <imtgql/CSerializableObjectCollectionControllerComp.h>
+#include <imtservergql/CSerializableObjectCollectionControllerComp.h>
 
 
 namespace imtauthgql
 {
 
 
-class CUserSerializableCollectionControllerComp: public imtgql::CSerializableObjectCollectionControllerComp
+class CUserSerializableCollectionControllerComp: public imtservergql::CSerializableObjectCollectionControllerComp
 {
 public:
-	typedef imtgql::CSerializableObjectCollectionControllerComp BaseClass;
+	typedef imtservergql::CSerializableObjectCollectionControllerComp BaseClass;
 
 	I_BEGIN_COMPONENT(CUserSerializableCollectionControllerComp);
 	I_END_COMPONENT;

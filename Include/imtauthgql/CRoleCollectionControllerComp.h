@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtauth/CRole.h>
-#include <imtgql/CObjectCollectionControllerCompBase.h>
+#include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtgql/IGqlRequestProvider.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 

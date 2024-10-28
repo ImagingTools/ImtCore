@@ -215,7 +215,7 @@ sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CLdapAuthorizationContr
 }
 
 
-// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+// reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
 
 // imtbase::CTreeItemModel* CLdapAuthorizationControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 // {

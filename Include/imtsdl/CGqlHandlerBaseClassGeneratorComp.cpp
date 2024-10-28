@@ -109,7 +109,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 	paramsSet.SetEditableParameter(QByteArrayLiteral("AddBaseComponentMacro"), &enableCompMacroParam);
 
 	iprm::COptionsManager baseClassDirectivesList;
-	baseClassDirectivesList.InsertOption(QStringLiteral("imtgql/CPermissibleGqlRequestHandlerComp.h"), QByteArrayLiteral("::imtgql::CPermissibleGqlRequestHandlerComp"));
+	baseClassDirectivesList.InsertOption(QStringLiteral("imtservergql/CPermissibleGqlRequestHandlerComp.h"), QByteArrayLiteral("::imtservergql::CPermissibleGqlRequestHandlerComp"));
 
 	int extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
 	if (extendResult != TS_OK){
@@ -297,7 +297,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 
 	// base class methods override definition
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("// reimplemented (::imtgql::CPermissibleGqlRequestHandlerComp)");
+	ifStream << QStringLiteral("// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)");
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 1);

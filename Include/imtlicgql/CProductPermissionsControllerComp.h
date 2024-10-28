@@ -2,23 +2,23 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRequestHandlerCompBase.h>
+#include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtlicgql
 {
 
 
-class CProductPermissionsControllerComp: public imtgql::CGqlRequestHandlerCompBase
+class CProductPermissionsControllerComp: public imtservergql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
+	typedef imtservergql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProductPermissionsControllerComp);
 		I_ASSIGN(m_productProviderCompPtr, "ProductProvider", "Product provider", true, "ProductProvider");
 	I_END_COMPONENT;
 
-	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+	// reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:

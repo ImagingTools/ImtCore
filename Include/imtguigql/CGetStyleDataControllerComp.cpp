@@ -14,7 +14,7 @@ namespace imtguigql
 
 // protected methods
 
-// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+// reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
 
 imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {

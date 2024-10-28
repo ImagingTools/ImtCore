@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtgql/CObjectCollectionControllerCompBase.h>
+#include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtgeo/IAddressElementInfo.h>
 
 #undef GetObject
@@ -12,10 +12,10 @@ namespace imtgeo
 
 
 
-class CAddressControllerComp: public imtgql::CObjectCollectionControllerCompBase
+class CAddressControllerComp: public imtservergql::CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtservergql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAddressControllerComp);
         I_ASSIGN(m_addressInfoFactCompPtr, "AddressFactory", "Factory used for creation of the new address element", true, "AddressFactory");

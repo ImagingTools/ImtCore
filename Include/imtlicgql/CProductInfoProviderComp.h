@@ -6,17 +6,17 @@
 
 // ImtCore includes
 #include <imtlic/CProductLicensingInfo.h>
-#include <imtgql/CGqlRequestHandlerCompBase.h>
+#include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtlicgql
 {
 
 
-class CProductInfoProviderComp: public imtgql::CGqlRequestHandlerCompBase
+class CProductInfoProviderComp: public imtservergql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
+	typedef imtservergql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProductInfoProviderComp)
 		I_ASSIGN_MULTI_0(m_productIdsAttrPtr, "ProductIds", "List of product-IDs for data provider", true);
@@ -25,7 +25,7 @@ public:
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+	// reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 

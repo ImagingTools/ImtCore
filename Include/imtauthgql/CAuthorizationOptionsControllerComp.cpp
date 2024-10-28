@@ -7,7 +7,7 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+// reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
 sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CAuthorizationOptionsControllerComp::OnAuthorization(
 			const sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest& /*authorizationRequest*/,

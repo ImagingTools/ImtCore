@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtgql/CObjectCollectionControllerCompBase.h>
+#include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtcrypt/IHashGenerator.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 

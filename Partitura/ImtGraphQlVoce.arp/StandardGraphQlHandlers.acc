@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5253" Description="ACF"/>
-            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5270" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -49,7 +49,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GqlContextController" PackageId="ImtGqlPck" ComponentId="GqlContextController">
+        <Element Id="GqlContextController" PackageId="ImtServerGqlPck" ComponentId="GqlContextController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -70,7 +70,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GraphQlRoot" PackageId="ImtGqlPck" ComponentId="GraphQLServlet">
+        <Element Id="GraphQlRoot" PackageId="ImtServerGqlPck" ComponentId="GraphQLServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="GraphQlCommandId">
@@ -234,7 +234,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SlaveGraphQLDemultiplexer" PackageId="ImtGqlPck" ComponentId="GraphQLDemultiplexer">
+        <Element Id="SlaveGraphQLDemultiplexer" PackageId="ImtServerGqlPck" ComponentId="GraphQLDemultiplexer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="GqlRequestHandler">

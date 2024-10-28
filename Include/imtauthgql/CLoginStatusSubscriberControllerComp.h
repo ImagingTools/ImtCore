@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtauth/ILoginStatusProvider.h>
-#include <imtgql/CGqlSubscriberControllerCompBase.h>
+#include <imtservergql/CGqlSubscriberControllerCompBase.h>
 
 
 namespace imtauthgql
@@ -14,11 +14,11 @@ namespace imtauthgql
 
 
 class CLoginStatusSubscriberControllerComp:
-			public imtgql::CGqlSubscriberControllerCompBase,
+			public imtservergql::CGqlSubscriberControllerCompBase,
 			public imod::TSingleModelObserverBase<istd::IChangeable>
 {
 public:
-	typedef imtgql::CGqlSubscriberControllerCompBase BaseClass;
+	typedef imtservergql::CGqlSubscriberControllerCompBase BaseClass;
 	typedef imod::TSingleModelObserverBase<istd::IChangeable> BaseClass2;
 
 	I_BEGIN_COMPONENT(CLoginStatusSubscriberControllerComp);
@@ -27,7 +27,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtgql::CGqlSubscriberControllerCompBase)
+	// reimplemented (imtservergql::CGqlSubscriberControllerCompBase)
 	virtual bool RegisterSubscription(
 				const QByteArray& subscriptionId,
 				const imtgql::CGqlRequest& gqlRequest,

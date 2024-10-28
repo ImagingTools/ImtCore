@@ -2,22 +2,19 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5270" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Settings controller for entire application</Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ApplicationInfoController" PackageId="ImtGqlPck" ComponentId="ApplicationInfoController">
+        <Element Id="ApplicationInfoController" PackageId="ImtServerGqlPck" ComponentId="ApplicationInfoController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ApplicationInfoRepresentation" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationInfoRepresentation"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
@@ -41,25 +38,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ApplicationInfoRepresentation" PackageId="ImtCorePck" ComponentId="ApplicationInfoRepresentation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="ServerVersion"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Server Version"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Source" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Params/TextParamView.qml"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="Demultiplexer" PackageId="ImtGqlPck" ComponentId="GraphQLDemultiplexer">
+        <Element Id="Demultiplexer" PackageId="ImtServerGqlPck" ComponentId="GraphQLDemultiplexer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
@@ -114,7 +93,7 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="SettingsController" PackageId="ImtGqlPck" ComponentId="GqlRepresentationJoiner">
+        <Element Id="SettingsController" PackageId="ImtServerGqlPck" ComponentId="GqlRepresentationJoiner">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
@@ -137,7 +116,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TableViewParamController" PackageId="ImtGqlPck" ComponentId="TableViewParamController">
+        <Element Id="TableViewParamController" PackageId="ImtServerGqlPck" ComponentId="TableViewParamController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">

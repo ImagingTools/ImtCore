@@ -7,7 +7,7 @@ namespace imtlicgql
 
 // protected methods
 
-// reimplemented (imtgql::CGqlRequestHandlerCompBase)
+// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 
 bool CProductInfoProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {

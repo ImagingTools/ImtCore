@@ -2,23 +2,23 @@
 
 
 // ImtCore includes
-#include <imtgql/CObjectCollectionControllerCompBase.h>
+#include <imtservergql/CObjectCollectionControllerCompBase.h>
 
 
 namespace imtlicgql
 {
 
 
-class CAccountCollectionControllerComp: public imtgql::CObjectCollectionControllerCompBase
+class CAccountCollectionControllerComp: public imtservergql::CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtservergql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAccountCollectionControllerComp);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtgql::CObjectCollectionControllerCompBase)
+	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool SetupGqlItem(

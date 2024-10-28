@@ -6,8 +6,8 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 CONFIG += network
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtgql -limtdbgql -limtcom -limtbasesdl
 LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtgql -limtdbgql -limtcom -limtbasesdl -limtservergql
 
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
 include($(ACFCONFIGDIR)/QMake/AcfStd.pri)

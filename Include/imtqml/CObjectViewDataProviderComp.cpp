@@ -7,7 +7,7 @@ namespace imtqml
 
 // protected methods
 
-// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+// reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
 bool CObjectViewDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {

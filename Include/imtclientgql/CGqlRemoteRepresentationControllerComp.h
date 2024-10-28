@@ -20,7 +20,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+	// reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:

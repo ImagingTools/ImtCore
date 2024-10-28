@@ -7,7 +7,7 @@ namespace imtdbgql
 
 // protected methods
 
-// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+// reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
 
 imtbase::CTreeItemModel* CDatabaseServerConnectionControllerComp::CreateInternalResponse(
 			const imtgql::CGqlRequest& /*gqlRequest*/,

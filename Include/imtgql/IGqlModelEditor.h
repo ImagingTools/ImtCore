@@ -9,7 +9,7 @@ namespace imtgql
 {
 
 
-class IGqlModelEditor: virtual public imtgql::CGqlRepresentationDataControllerComp
+class IGqlModelEditor: virtual public imtservergql::CGqlRepresentationDataControllerComp
 {
 public:
 	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* modelPtr) = 0;

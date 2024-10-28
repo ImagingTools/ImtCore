@@ -12,7 +12,7 @@ namespace imtlicgql
 
 // protected methods
 
-// reimplemented (imtgql::CObjectCollectionControllerCompBase)
+// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 
 QVariant CAccountCollectionControllerComp::GetObjectInformation(
 			const QByteArray& /*informationId*/,

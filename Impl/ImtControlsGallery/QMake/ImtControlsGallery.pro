@@ -4,17 +4,12 @@ include($(ACFCONFIGDIR)/QMake/ApplicationConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
-QT += xml network sql quick qml
-
+QT += xml network sql quick qml websockets
 QT += quickcontrols2
 
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -liauth -limtauthdb -limtclientgql -limtauthgui -limtappsdl -limtauthsdl
-LIBS += -limtbase -limtzip -limtrest  -limtstyle -limtqml -limtauth -limtgui
-LIBS += -limtguigqlqml -limtauthguiqml -limtguiqml -limtcolguiqml
-LIBS += -limtstylecontrolsqml -limtcontrolsqml -limtdocguiqml
-LIBS += -limtlicgql -limtguigql -limtgql -limtauthgql -limtauthdb -limtcom -limtapp
+LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtauthdb -limtclientgql -limtauthgui -limtappsdl -limtauthsdl -limtservergql -limtbase -limtzip -limtrest  -limtstyle -limtqml -limtauth -limtgui -limtguigqlqml -limtauthguiqml -limtguiqml -limtcolguiqml -limtstylecontrolsqml -limtcontrolsqml -limtdocguiqml -limtlicgql -limtguigql -limtgql -limtauthgql -limtauthdb -limtcom -limtapp
 
 # Set OS-specific build options:
 win32-msvc*{

@@ -248,13 +248,13 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::DeleteObject(
 		for (const imtbase::ICollectionInfo::Id& elementId: elementIds){
 			imtbase::IObjectCollection::DataPtr groupDataPtr;
 			if (m_objectCollectionCompPtr->GetObjectData(elementId, groupDataPtr)){
-				imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
-				if (userGroupInfoPtr != nullptr){
-					QByteArrayList parentGroupIds = userGroupInfoPtr->GetParentGroups();
+				imtauth::IUserGroupInfo* userGroupDataInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
+				if (userGroupDataInfoPtr != nullptr){
+					QByteArrayList parentGroupIds = userGroupDataInfoPtr->GetParentGroups();
 					if (parentGroupIds.contains(userGroupId)){
-						userGroupInfoPtr->RemoveParentGroup(userGroupId);
+						userGroupDataInfoPtr->RemoveParentGroup(userGroupId);
 
-						if (!m_objectCollectionCompPtr->SetObjectData(elementId, *userGroupInfoPtr)){
+						if (!m_objectCollectionCompPtr->SetObjectData(elementId, *userGroupDataInfoPtr)){
 							SendWarningMessage(0, QString("Unable to update a group"));
 						}
 					}

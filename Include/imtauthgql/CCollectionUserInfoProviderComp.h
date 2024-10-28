@@ -6,17 +6,17 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtgql/CGqlRequestHandlerCompBase.h>
+#include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtauthgql
 {
 
 
-class CCollectionUserInfoProviderComp: public imtgql::CGqlRequestHandlerCompBase
+class CCollectionUserInfoProviderComp: public imtservergql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
+	typedef imtservergql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionUserInfoProviderComp);
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");

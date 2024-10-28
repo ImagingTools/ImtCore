@@ -2,14 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5270" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApplicationInfoController" X="425" Y="275" Note=""/>
-        <Element ComponentName="ApplicationInfoRepresentation" X="450" Y="375" Note=""/>
         <Element ComponentName="Demultiplexer" X="550" Y="100" Note=""/>
         <Element ComponentName="GeneralSettingsFactory" X="625" Y="650" Note=""/>
         <Element ComponentName="GetStyleDataController" X="175" Y="275" Note=""/>

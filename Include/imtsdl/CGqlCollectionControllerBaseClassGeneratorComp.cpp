@@ -109,7 +109,7 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 		paramsSet.SetEditableParameter(QByteArrayLiteral("AddBaseComponentMacro"), &enableCompMacroParam);
 
 		iprm::COptionsManager baseClassDirectivesList;
-		baseClassDirectivesList.InsertOption(QStringLiteral("imtgql/CObjectCollectionControllerCompBase.h"), QByteArrayLiteral("::imtgql::CObjectCollectionControllerCompBase"));
+		baseClassDirectivesList.InsertOption(QStringLiteral("imtservergql/CObjectCollectionControllerCompBase.h"), QByteArrayLiteral("::imtservergql::CObjectCollectionControllerCompBase"));
 
 		int extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
 		if (extendResult != TS_OK){
@@ -326,7 +326,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 
 	// base class methods override definition
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("// reimplemented (::imtgql::CObjectCollectionControllerCompBase)");
+	ifStream << QStringLiteral("// reimplemented (::imtservergql::CObjectCollectionControllerCompBase)");
 	FeedStream(ifStream, 1, false);
 
 	if (operationsList.contains(CSdlDocumentType::OT_LIST)){

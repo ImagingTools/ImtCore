@@ -4,23 +4,23 @@
 
 
 // ImtCore includes
-#include <imtgql/CObjectCollectionControllerCompBase.h>
+#include <imtservergql/CObjectCollectionControllerCompBase.h>
 
 
 namespace imtgeo
 {
 
 
-class CDeviceMapClusterCollectionControllerComp: public imtgql::CObjectCollectionControllerCompBase
+class CDeviceMapClusterCollectionControllerComp: public imtservergql::CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtservergql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDeviceMapClusterCollectionControllerComp);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtgql::CObjectCollectionControllerCompBase)
+	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;

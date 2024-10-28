@@ -2,18 +2,18 @@
 
 
 // ImtCore includes
-#include <imtgql/CStructureControllerCompBase.h>
 #include <imtdb/IDatabaseEngine.h>
+#include <imtservergql/CStructureControllerCompBase.h>
 
 
 namespace imtdbgql
 {
 
 
-class CStructureControllerComp: public imtgql::CStructureControllerCompBase
+class CStructureControllerComp: public imtservergql::CStructureControllerCompBase
 {
 public:
-	typedef imtgql::CStructureControllerCompBase BaseClass;
+	typedef imtservergql::CStructureControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CStructureControllerComp);
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine for SQL queries", true, "DatabaseEngine");
@@ -23,7 +23,7 @@ protected:
 	QByteArray GetElementsQuery(iprm::IParamsSet* filterParams) const;
 
 	// reimpemented (CStructureControllerCompBase)
-	virtual imtbase::CTreeItemModel* GetElements(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* GetElements(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);

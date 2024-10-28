@@ -5,17 +5,17 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtgql/CGqlRequestHandlerCompBase.h>
+#include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtlicgql
 {
 
 
-class CPermissionsProviderComp: public imtgql::CGqlRequestHandlerCompBase
+class CPermissionsProviderComp: public imtservergql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
+	typedef imtservergql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CPermissionsProviderComp)
 		I_ASSIGN(m_featurePackageRepresentationCompPtr, "PackageRepresentation", "Representation for feature package", true, "PackageRepresentation");
@@ -23,7 +23,7 @@ public:
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (imtgql::CGqlRequestHandlerCompBase)
+	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 

@@ -8,7 +8,7 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtgeo imtbase imtdb imtguigql imtgql)
+target_link_libraries(${PROJECT_NAME} imtgeo imtbase imtdb imtguigql imtgql imtservergql)
 
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 

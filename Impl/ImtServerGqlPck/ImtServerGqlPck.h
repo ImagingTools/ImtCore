@@ -1,0 +1,68 @@
+#pragma once
+
+
+// ACF includes
+#include <icomp/TModelCompWrap.h>
+#include <icomp/TMakeComponentWrap.h>
+
+// ImtCore includes
+#include <imtservergql/CHttpGraphQLServletComp.h>
+#include <imtservergql/CGqlDemultiplexerComp.h>
+#include <imtservergql/CGqlRepresentationDataControllerComp.h>
+#include <imtservergql/CUserSettingsControllerComp.h>
+#include <imtservergql/CGqlRepresentationJoinerComp.h>
+#include <imtservergql/CApplicationInfoControllerComp.h>
+#include <imtservergql/CSerializableObjectCollectionControllerComp.h>
+#include <imtservergql/CGqlContextControllerComp.h>
+#include <imtservergql/CObjectProviderComp.h>
+#include <imtservergql/CWebSocketServletComp.h>
+#include <imtservergql/CCollectionObjectProviderComp.h>
+#include <imtservergql/CGqlControllerComp.h>
+#include <imtservergql/COperationContextControllerComp.h>
+#include <imtservergql/CObjectCollectionSubscriberControllerComp.h>
+#include <imtservergql/CModelSubscriberControllerComp.h>
+#include <imtservergql/CStructureSubscriberControllerComp.h>
+#include <imtservergql/CBroadcastMessageConsumerControllerComp.h>
+#include <imtservergql/CBroadcastMessageConsumerSubscriberComp.h>
+#include <imtservergql/CSlaveSubscriberControllerComp.h>
+#include <imtservergql/CGqlSearchControllerComp.h>
+#include <imtservergql/CTableViewParamControllerComp.h>
+#include <imtservergql/CConnectionStatusSubscriberControllerComp.h>
+#include <imtservergql/CHeadersDataProviderComp.h>
+
+
+/**
+	ImtServerGqlPck package
+*/
+namespace ImtServerGqlPck
+{
+
+
+typedef imtservergql::CHttpGraphQLServletComp GraphQLServlet;
+typedef imtservergql::CWebSocketServletComp WebSocketServlet;
+typedef imtservergql::CGqlDemultiplexerComp GraphQLDemultiplexer;
+typedef imtservergql::CGqlRepresentationDataControllerComp GqlRepresentationDataController;
+typedef imtservergql::CUserSettingsControllerComp UserSettingsController;
+typedef imtservergql::CGqlRepresentationJoinerComp GqlRepresentationJoiner;
+typedef imtservergql::CApplicationInfoControllerComp ApplicationInfoController;
+typedef imtservergql::CGqlContextControllerComp GqlContextController;
+typedef imtservergql::CObjectProviderComp ObjectProvider;
+typedef imtservergql::CCollectionObjectProviderComp CollectionObjectProvider;
+typedef imtservergql::CGqlControllerComp GqlController;
+typedef imtservergql::CSerializableObjectCollectionControllerComp SerializableObjectCollectionController;
+typedef imtservergql::COperationContextControllerComp OperationContextController;
+typedef imtservergql::CObjectCollectionSubscriberControllerComp ObjectCollectionSubscriberController;
+typedef imtservergql::CModelSubscriberControllerComp ModelSubscriberController;
+typedef imtservergql::CStructureSubscriberControllerComp StructureSubscriberController;
+typedef imtservergql::CBroadcastMessageConsumerControllerComp BroadcastMessageConsumerController;
+typedef imtservergql::CBroadcastMessageConsumerSubscriberComp BroadcastMessageConsumerSubscriber;
+typedef imtservergql::CSlaveSubscriberControllerComp SlaveSubscriberController;
+typedef imtservergql::CGqlSearchControllerComp GqlSearchController;
+typedef imtservergql::CTableViewParamControllerComp TableViewParamController;
+typedef imtservergql::CConnectionStatusSubscriberControllerComp ConnectionStatusSubscriberController;
+typedef imtservergql::CHeadersDataProviderComp HeadersDataProvider;
+
+
+} // namespace ImtServerGqlPck
+
+

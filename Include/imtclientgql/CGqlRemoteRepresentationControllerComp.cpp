@@ -10,7 +10,7 @@ namespace imtclientgql
 
 // protected methods
 
-// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+// reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
 imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalResponse(
 			const imtgql::CGqlRequest& gqlRequest,

@@ -5,7 +5,7 @@ include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liauth
-LIBS += -limtbase -limtauth -limtlic -limtrest -limtgql -limtlicgql -limtlicgui -limtguigql -limtcrypt -limtgui -limtwidgets -limtlicsdl -limtbasesdl
+LIBS += -limtbase -limtauth -limtlic -limtrest -limtgql -limtlicgql -limtlicgui -limtguigql -limtcrypt -limtgui -limtwidgets -limtlicsdl -limtbasesdl -limtservergql
 
 
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)

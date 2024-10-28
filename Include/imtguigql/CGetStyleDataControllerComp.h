@@ -5,17 +5,17 @@
 #include <iprm/ISelectionParam.h>
 
 // ImtCore includes
-#include <imtgql/CGqlRequestHandlerCompBase.h>
+#include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtguigql
 {
 
 
-class CGetStyleDataControllerComp: public imtgql::CGqlRequestHandlerCompBase
+class CGetStyleDataControllerComp: public imtservergql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
+	typedef imtservergql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGetStyleDataControllerComp);
 		I_ASSIGN(m_selectionParamCompPtr, "SelectionParam", "Selection param for the get current design schema", false, "SelectionParam");
@@ -23,7 +23,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+	// reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:

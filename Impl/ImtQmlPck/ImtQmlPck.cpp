@@ -30,11 +30,6 @@ I_EXPORT_COMPONENT(
 			"Quick QML");
 
 I_EXPORT_COMPONENT(
-			HeadersDataProvider,
-			"Headers data provider",
-			"Headers data provider");
-
-I_EXPORT_COMPONENT(
 			ObserverQml,
 			"Observer QuickObject",
 			"Observer qml quickobject");
@@ -43,21 +38,6 @@ I_EXPORT_COMPONENT(
 			ClientUserContext,
 			"Client-specific context for control global properties of QML engine",
 			"Client Localization QML-Engine");
-
-I_EXPORT_COMPONENT(
-			ApplicationInfoDataProvider,
-			"Application info data provider",
-			"Application info data provider");
-
-I_EXPORT_COMPONENT(
-			ObjectViewDataProvider,
-			"Object view data provider",
-			"Object view data provider");
-
-I_EXPORT_COMPONENT(
-			CommandPermissionsFilter,
-			"Command Permissions Filter",
-			"Command permissions filter");
 
 I_EXPORT_COMPONENT(
 			PageGuiElementModel,

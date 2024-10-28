@@ -132,6 +132,9 @@ imtlicgql.depends = imtlic imtlicsdl
 SUBDIRS += imtgql
 imtgql.file = ../../Include/imtgql/QMake/imtgql.pro
 
+SUBDIRS += imtservergql
+imtservergql.file = ../../Include/imtservergql/QMake/imtservergql.pro
+
 SUBDIRS += imtdb
 imtdb.file = ../../Include/imtdb/QMake/imtdb.pro
 
@@ -280,7 +283,7 @@ ImtGuiPck.depends = imt3d imtgui
 
 SUBDIRS += ImtGuiGqlPck
 ImtGuiGqlPck.file = ../../Impl/ImtGuiGqlPck/QMake/ImtGuiGqlPck.pro
-ImtGuiGqlPck.depends = imtgui imtguigql imtgql
+ImtGuiGqlPck.depends = imtgui imtguigql imtgql imtservergql
 
 SUBDIRS += ImtQmlPck
 ImtQmlPck.file = ../../Impl/ImtQmlPck/QMake/ImtQmlPck.pro
@@ -309,6 +312,10 @@ ImtZipPck.depends = imtzip
 SUBDIRS += ImtGqlPck
 ImtGqlPck.file = ../../Impl/ImtGqlPck/QMake/ImtGqlPck.pro
 ImtGqlPck.depends = imtgql
+
+SUBDIRS += ImtServerGqlPck
+ImtServerGqlPck.file = ../../Impl/ImtServerGqlPck/QMake/ImtServerGqlPck.pro
+ImtServerGqlPck.depends = imtservergql
 
 SUBDIRS += ImtLicenseDbPck
 ImtLicenseDbPck.file = ../../Impl/ImtLicenseDbPck/QMake/ImtLicenseDbPck.pro

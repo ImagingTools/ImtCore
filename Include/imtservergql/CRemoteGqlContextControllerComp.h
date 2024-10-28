@@ -1,0 +1,73 @@
+#pragma once
+
+
+// Qt includes
+#include <QtCore/QTimer>
+#include <QtCore/QMutex>
+
+// ACF includes
+#include <ilog/TLoggerCompWrap.h>
+#include <iprm/ITextParam.h>
+
+// ImtCore includes
+#include <imtauth/ISession.h>
+#include <imtgql/IGqlContextController.h>
+#include <imtgql/IGqlRequestHandler.h>
+
+
+namespace imtservergql
+{
+
+
+class CRemoteGqlContextControllerComp:
+			public QObject,
+			public ilog::CLoggerComponentBase,
+			virtual public imtgql::IGqlContextController
+{
+	Q_OBJECT
+public:
+	typedef ilog::CLoggerComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CRemoteGqlContextControllerComp);
+		I_REGISTER_INTERFACE(imtgql::IGqlContextController);
+		I_ASSIGN(m_userInfoFactCompPtr, "UserFactory", "Factory used for creation of the new user", true, "UserFactory");
+		I_ASSIGN(m_sessionInfoFactCompPtr, "SessionFactory", "Factory used for creation of the new session", true, "SessionFactory");
+		I_ASSIGN(m_gqlRequestHandlerCompPtr, "GqlRequest", "GraphQL request handler", false, "GqlRequest");
+		I_ASSIGN(m_cacheClearingIntervalAttrPtr, "CacheClearingInterval", "Interval for cache clearing (in seconds)", false, 60.0);
+		I_ASSIGN(m_cacheClearingIntervalParamCompPtr, "CacheClearingIntervalParam", "Param interval for cache clearing", false, "CacheClearingIntervalParam");
+	I_END_COMPONENT;
+
+	// reimplemented (imtgql::IGqlContextController)
+	virtual imtgql::IGqlContext* GetRequestContext(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& token,
+				const imtgql::IGqlContext::Headers& headers,
+				QString& errorMessage) const override;
+
+protected:
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
+
+private:
+	void ClearCache();
+
+private Q_SLOTS:
+	void OnTimeout();
+
+private:
+	mutable QMap<QByteArray, imtgql::IGqlContext*> m_cacheMap;
+	QTimer m_timer;
+
+private:
+	I_FACT(imtauth::IUserInfo, m_userInfoFactCompPtr);
+	I_FACT(imtauth::ISession, m_sessionInfoFactCompPtr);
+	I_REF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
+	I_ATTR(int, m_cacheClearingIntervalAttrPtr);
+	I_REF(iprm::ITextParam, m_cacheClearingIntervalParamCompPtr);
+};
+
+
+} // namespace imtservergql
+
+

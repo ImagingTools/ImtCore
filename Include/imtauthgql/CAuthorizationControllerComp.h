@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRequestHandlerCompBase.h>
+#include <imtservergql/CGqlRequestHandlerCompBase.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtcrypt/IHashGenerator.h>
 #include <imtauth/ICredentialController.h>

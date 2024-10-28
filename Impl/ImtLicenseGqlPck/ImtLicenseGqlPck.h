@@ -6,7 +6,7 @@
 #include <icomp/TModelCompWrap.h>
 
 // ImtCore includes
-#include <imtgql/TObjectCollectionControllerSearchCompWrap.h>
+#include <imtservergql/TObjectCollectionControllerSearchCompWrap.h>
 #include <imtlicgql/CProductCollectionControllerComp.h>
 #include <imtlicgql/CAccountCollectionControllerComp.h>
 #include <imtlicgql/CProductControllerComp.h>
@@ -29,16 +29,16 @@ namespace ImtLicenseGqlPck
 {
 
 
-typedef imtgql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CProductCollectionControllerComp> ProductCollectionController;
+typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CProductCollectionControllerComp> ProductCollectionController;
 typedef imtlicgql::CProductControllerComp ProductController;
 typedef imtlicgql::CLicenseControllerComp LicenseController;
-typedef imtgql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CLicenseCollectionControllerComp> LicenseCollectionController;
-typedef imtgql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CAccountCollectionControllerComp> AccountCollectionController;
+typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CLicenseCollectionControllerComp> LicenseCollectionController;
+typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CAccountCollectionControllerComp> AccountCollectionController;
 typedef imtlicgql::CAccountControllerComp AccountController;
 typedef imtlicgql::CFeaturesExportProviderComp FeaturesExportProvider;
 typedef imtlicgql::CProductPermissionsControllerComp ProductPermissionController;
 typedef imtlicgql::CFeatureControllerComp FeatureController;
-typedef imtgql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CFeatureCollectionControllerComp> FeatureCollectionController;
+typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CFeatureCollectionControllerComp> FeatureCollectionController;
 typedef imtlicgql::CFeatureDependenciesProviderComp FeatureDependenciesProvider;
 typedef imtlicgql::CProductInfoProviderComp ProductInfoProvider;
 typedef imtlicgql::CPermissionsProviderComp PermissionsProvider;

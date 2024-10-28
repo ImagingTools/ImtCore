@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRequestHandlerCompBase.h>
+#include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtqml
@@ -12,10 +12,10 @@ namespace imtqml
 /**
 	Returns object view path for a collection of objects.
 */
-class CObjectViewDataProviderComp: public imtgql::CGqlRequestHandlerCompBase
+class CObjectViewDataProviderComp: public imtservergql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
+	typedef imtservergql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectViewDataProviderComp);
 		I_ASSIGN(m_objectViewModelIdAttrPtr, "CommandId", "Command ID for the object view", true, "CommandId");
@@ -23,7 +23,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+	// reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 

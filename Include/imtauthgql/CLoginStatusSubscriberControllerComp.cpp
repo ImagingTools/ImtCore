@@ -11,7 +11,7 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (imtgql::CGqlSubscriberControllerCompBase)
+// reimplemented (imtservergql::CGqlSubscriberControllerCompBase)
 
 bool CLoginStatusSubscriberControllerComp::RegisterSubscription(
 			const QByteArray& subscriptionId,

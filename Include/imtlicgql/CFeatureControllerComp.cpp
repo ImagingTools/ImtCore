@@ -15,7 +15,7 @@ namespace imtlicgql
 
 // pretected methods
 
-// reimplemented (imtgql::CObjectCollectionControllerCompBase)
+// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 
 istd::IChangeable* CFeatureControllerComp::CreateObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,

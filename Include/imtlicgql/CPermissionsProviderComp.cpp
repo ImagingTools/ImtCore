@@ -7,7 +7,7 @@ namespace imtlicgql
 
 // protected methods
 
-// reimplemented (imtgql::CGqlRequestHandlerCompBase)
+// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 
 bool CPermissionsProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {

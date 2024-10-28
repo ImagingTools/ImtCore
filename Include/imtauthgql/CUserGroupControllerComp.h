@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtgql/CObjectCollectionControllerCompBase.h>
+#include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtauth/IUserGroupInfo.h>
 
 
@@ -10,10 +10,10 @@ namespace imtauthgql
 {
 
 
-class CUserGroupControllerComp: public imtgql::CObjectCollectionControllerCompBase
+class CUserGroupControllerComp: public imtservergql::CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtservergql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserGroupControllerComp);
 		I_ASSIGN(m_userGroupInfoFactCompPtr, "UserGroupFactory", "Factory used for creation of the new group", true, "UserGroupFactory");

@@ -4,24 +4,24 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtlic/IFeatureDependenciesProvider.h>
-#include <imtgql/CGqlRequestHandlerCompBase.h>
+#include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtlicgql
 {
 
 
-class CFeatureDependenciesProviderComp: public imtgql::CGqlRequestHandlerCompBase, virtual public imtlic::IFeatureDependenciesProvider
+class CFeatureDependenciesProviderComp: public imtservergql::CGqlRequestHandlerCompBase, virtual public imtlic::IFeatureDependenciesProvider
 {
 public:
-	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
+	typedef imtservergql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFeatureDependenciesProviderComp);
 		I_ASSIGN(m_featureCollectionCompPtr, "FeatureCollection", "Feature collection", true, "FeatureCollection");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+	// reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	// reimplemented (imtlic::IFeatureDependenciesProvider)

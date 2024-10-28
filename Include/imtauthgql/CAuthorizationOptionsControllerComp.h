@@ -8,7 +8,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 #include <imtauth/ISuperuserProvider.h>
-#include <imtgql/CGqlRepresentationDataControllerComp.h>
+#include <imtservergql/CGqlRepresentationDataControllerComp.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
