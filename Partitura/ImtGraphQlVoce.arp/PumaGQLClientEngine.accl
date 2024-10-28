@@ -2,21 +2,19 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5274" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApiClient" X="225" Y="300" Note=""/>
         <Element ComponentName="ConnectionStatusSubscriberController" X="975" Y="150" Note=""/>
         <Element ComponentName="GraphQLClientEngine" X="225" Y="475" Note=""/>
-        <Element ComponentName="HttpUrlParam" X="220" Y="680" Note=""/>
         <Element ComponentName="RemoteRepositories" X="620" Y="680" Note=""/>
         <Element ComponentName="RemoteRepresentationController" X="225" Y="150" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="600" Y="150" Note=""/>
         <Element ComponentName="Subscription" X="1020" Y="380" Note=""/>
-        <Element ComponentName="WebSocketUrlParam" X="1040" Y="680" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

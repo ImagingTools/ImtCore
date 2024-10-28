@@ -2,14 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5274" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="PumaUrl" X="380" Y="520" Note=""/>
-        <Element ComponentName="PumaWebSocketPort" X="120" Y="520" Note=""/>
+        <Element ComponentName="PumaUrl" X="375" Y="500" Note=""/>
+        <Element ComponentName="PumaWebSocketPort" X="150" Y="500" Note=""/>
         <Element ComponentName="ServerConnectionParams" X="550" Y="225" Note=""/>
         <Element ComponentName="ServerPort" X="580" Y="520" Note=""/>
         <Element ComponentName="WebSocketServerPort" X="825" Y="525" Note=""/>
