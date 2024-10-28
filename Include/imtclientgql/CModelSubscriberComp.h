@@ -19,7 +19,7 @@ public:
 	typedef CSubscriberCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CModelSubscriberComp);
-		I_ASSIGN(m_changeableModelCompPtr, "Model", "Model", true, "Model");
+		I_ASSIGN(m_changeableModelCompPtr, "Model", "Data model to be synchronized with the changes on the server side", true, "Model");
 	I_END_COMPONENT;
 
 protected:
