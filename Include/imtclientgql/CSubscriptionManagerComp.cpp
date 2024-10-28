@@ -64,9 +64,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 	locker.unlock();
 
-	if (m_connectionStatusProviderCompPtr->GetConnectionStatus() == imtcom::IConnectionStatusProvider::CS_CONNECTED){
-		SubscriptionRegister(*requestImplPtr, subscriptionId.toLocal8Bit());
-	}
+	SubscriptionRegister(*requestImplPtr, subscriptionId.toLocal8Bit());
 
 	return subscriptionId.toLocal8Bit();
 }
@@ -338,6 +336,18 @@ void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 	registerSubscription["id"] = QString(subscriptionId);
 	registerSubscription["type"] = "start";
 	registerSubscription["payload"] = payload;
+
+	QJsonObject headersObject;
+	const imtgql::IGqlContext* contextPtr = subscriptionRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
+		for (QByteArray headerId: headers.keys()){
+			if (headerId != "Accept-Encoding"){
+				headersObject[headerId] = QString(headers.value(headerId));
+			}
+		}
+	}
+	registerSubscription["headers"] = headersObject;
 
 	QByteArray queryData = QJsonDocument(registerSubscription).toJson(QJsonDocument::Compact);
 

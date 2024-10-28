@@ -159,9 +159,23 @@ WebSocket {
 
     function unRegisterSubscription(subscriptionClient){
         let index
+        console.log("unregisterSubscriptionToServer");
+
         for (index = 0; index < subscriptionModel.length; index++){
             if (subscriptionModel[index]["subscription"] === subscriptionClient){
+                let request = {}
+                request["id"] = subscriptionModel[index]["subscriptionId"]
+                request["headers"] = subscriptionModel[index]["headers"]
+                request["type"] = "stop"
+                let payload = {}
+                request["payload"] = payload
+
+                subscriptionModel[index]["status"] = "waiting";
+                container.sendTextMessage(JSON.stringify(request))
+                console.log("unregisterSubscriptionToServer", JSON.stringify(request));
+
                 subscriptionModel.splice(index, 1)
+
                 return;
             }
         }

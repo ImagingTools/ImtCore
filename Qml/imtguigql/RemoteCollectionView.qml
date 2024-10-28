@@ -56,15 +56,6 @@ CollectionView {
         var query = Gql.GqlRequest("subscription", subscriptionRequestId);
         var inputParams = Gql.GqlObject("input");
 
-        // let additionInputParams = root.getHeaders();
-        // if (Object.keys(additionInputParams).length > 0){
-        //     let additionParams = Gql.GqlObject("addition");
-        //     for (let key in additionInputParams){
-        //         additionParams.InsertField(key, additionInputParams[key]);
-        //     }
-        //     inputParams.InsertFieldObject(additionParams);
-        // }
-
         query.AddParam(inputParams);
         var queryFields = Gql.GqlObject("notification");
         queryFields.InsertField("Id");
