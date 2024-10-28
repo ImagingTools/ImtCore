@@ -3,177 +3,198 @@ import Acf 1.0
 import imtcontrols 1.0
 
 DecoratorBase {
-    id: commonButtonDecorator
+	id: commonButtonDecorator
 
-    width: Math.max(contentWidth + Style.size_mainMargin * 2, widthDefault)
-    height: Style.buttonHeight;
+	width: Math.max(contentWidth + Style.size_mainMargin * 2, widthDefault)
+	height: Style.buttonHeight;
 
-    clip: true;
+	clip: true;
 
-    property int maxTextWidth: 100;
-    property int minTextWidth: 20;
-    property int iconSize: Style.size_mainMargin;
-    property int contentSpacing: Style.size_mainMargin;
-    property alias contentWidth: content.width;
+	property int maxTextWidth: 100;
+	property int minTextWidth: 20;
+	property int iconSize: Style.size_mainMargin;
+	property int contentSpacing: Style.size_mainMargin;
+	property int contentLeftMargin: Style.size_mainMargin;
+	property alias contentWidth: content.width;
 
-    property int widthDefault: 0;
-    property alias icon: iconObj
-    property alias font: textObj.font
-    property alias textColor: textObj.color
-    property alias color: background.color
-    property alias radius: background.radius
-    property alias border: background.border
+	property int widthDefault: 0;
+	property alias icon: iconObj
+	property alias font: textObj.font
+	property alias textColor: textObj.color
+	property alias color: background.color
+	property alias radius: background.radius
+	property alias border: background.border
 
-    property alias backgroundItem: background
+	property alias backgroundItem: background
 
-    property bool contentCentered: true;
-    property bool textIsCropped: textObj.text !== "" && helperText.width > textObj.width;
+	property bool contentCentered: true;
+	property bool textIsCropped: textObj.text !== "" && helperText.width > textObj.width;
+	property real maxContentWidth: helperText.width + 2*Style.size_mainMargin;
 
-    property string tooltipText: baseElement && baseElement.tooltipText !== "" ? baseElement.tooltipText : (textIsCropped ? textObj.text : "");
-    property bool enabled: baseElement ? baseElement.enabled : false;
+	property string tooltipText: baseElement && baseElement.tooltipText !== "" ? baseElement.tooltipText : (textIsCropped ? textObj.text : "");
+	property bool enabled: baseElement ? baseElement.enabled : false;
 
-    signal mouseEntered(real mouseX, real mouseY);
-    signal mouseExited(real mouseX, real mouseY);
-    signal mousePositionChanged(real mouseX, real mouseY);
+	signal mouseEntered(real mouseX, real mouseY);
+	signal mouseExited(real mouseX, real mouseY);
+	signal mousePositionChanged(real mouseX, real mouseY);
 
-    onContentCenteredChanged: {
-        if (contentCentered){
-            content.anchors.left = undefined;
-            content.anchors.horizontalCenter = commonButtonDecorator.horizontalCenter;
-        }
-        else{
-            content.anchors.horizontalCenter = undefined;
-            content.anchors.left = commonButtonDecorator.left;
-            content.anchors.leftMargin = Style.size_mainMargin;
-        }
-    }
+	onContentCenteredChanged: {
+		setAnchors();
+	}
 
-    onBaseElementChanged: {
-        if(baseElement){
-            baseElement.exited.connect(commonButtonDecorator.mouseExited);
-            baseElement.entered.connect(commonButtonDecorator.mouseEntered);
-            baseElement.positionChanged.connect(commonButtonDecorator.mousePositionChanged);
-            baseElement.closeTooltip.connect(commonButtonDecorator.closeTooltip);
-        }
-    }
+	function setAnchors(){
+		if (contentCentered){
+			content.anchors.left = undefined;
+			content.anchors.horizontalCenter = commonButtonDecorator.horizontalCenter;
+		}
+		else{
+			content.anchors.horizontalCenter = undefined;
+			content.anchors.left = commonButtonDecorator.left;
+			content.anchors.leftMargin = commonButtonDecorator.contentLeftMargin;
+		}
+	}
 
-    onMousePositionChanged: {
-        if(tooltip.text !== "" && enabled){
-            if(mouseX >= 0 && mouseX <= baseElement.width && mouseY >= 0 && mouseY <= baseElement.height){
-                tooltip.show(mouseX, mouseY);
-            }
-            else{
-                closeTooltip();
-            }
-        }
-    }
+	onBaseElementChanged: {
+		if(baseElement){
+			baseElement.exited.connect(commonButtonDecorator.mouseExited);
+			baseElement.entered.connect(commonButtonDecorator.mouseEntered);
+			baseElement.positionChanged.connect(commonButtonDecorator.mousePositionChanged);
+			baseElement.closeTooltip.connect(commonButtonDecorator.closeTooltip);
+		}
+	}
 
-    onMouseExited: {
-        closeTooltip();
-    }
+	onMousePositionChanged: {
+		if(tooltip.text !== "" && enabled){
+			if(mouseX >= 0 && mouseX <= baseElement.width && mouseY >= 0 && mouseY <= baseElement.height){
+				tooltip.show(mouseX, mouseY);
+			}
+			else{
+				closeTooltip();
+			}
+		}
+	}
 
-    onEnabledChanged: {
-        if (!enabled){
-            closeTooltip()
-        }
-    }
+	onMouseExited: {
+		closeTooltip();
+	}
 
-    Rectangle {
-        id: background
+	onEnabledChanged: {
+		if (!enabled){
+			closeTooltip()
+		}
+	}
 
-        anchors.fill: parent
-        radius: Style.buttonRadius
-        color: !commonButtonDecorator.baseElement ? "transparent" :
-                                                    commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
-                                                    Style.baseColor : commonButtonDecorator.baseElement.hovered ?
-                                                    Style.baseColor : Style.backgroundColor2
-        border.width: Style.buttonBorderWidth
-        border.color: !commonButtonDecorator.baseElement ? "transparent" :
-                                                    commonButtonDecorator.baseElement.focus ? Style.buttonBorderFocusColor :
-                                                    Style.borderColor
-    }
+	Rectangle {
+		id: background
 
-    Item {
-        id: content;
-        anchors.verticalCenter: commonButtonDecorator.verticalCenter;
-        anchors.horizontalCenter: commonButtonDecorator.horizontalCenter;
-        width: iconObj.width + textItem.width + Style.size_mainMargin;
-        height: Math.max(iconObj.height, textItem.height)
+		anchors.fill: parent
+		radius: Style.buttonRadius
+		color: !commonButtonDecorator.baseElement ? "transparent" :
+													commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
+														Style.baseColor : commonButtonDecorator.baseElement.hovered ?
+															Style.baseColor : Style.backgroundColor2
+		border.width: Style.buttonBorderWidth
+		border.color: !commonButtonDecorator.baseElement ? "transparent" :
+														   commonButtonDecorator.baseElement.focus ? Style.buttonBorderFocusColor :
+																									 Style.borderColor
+	}
 
-        Image {
-            id: iconObj
-            anchors.verticalCenter: content.verticalCenter;
-            anchors.left: parent.left;
-            width: !visible ? 0 : Style.iconSizeSmall
-            height: width
-            sourceSize.width: width
-            sourceSize.height: height
-            source: commonButtonDecorator.baseElement &&  commonButtonDecorator.baseElement.iconSource ? commonButtonDecorator.baseElement.iconSource: "";
-            visible: source != "";
-        }
+	Item {
+		id: content;
 
-        Item {
-            id: textItem;
-            anchors.centerIn: iconObj && iconObj.visible ? undefined : content;
-            anchors.verticalCenter: content.verticalCenter;
-            anchors.left: iconObj && iconObj.visible ? iconObj.right : undefined;
-            anchors.leftMargin: iconObj && iconObj.visible ? commonButtonDecorator.contentSpacing : 0;
-            width: visible ? helperText.width > commonButtonDecorator.maxTextWidth ? commonButtonDecorator.maxTextWidth : helperText.width : -Style.size_mainMargin;
-            height: textObj.height;
-            visible: textObj.text !== "";
+		anchors.verticalCenter: commonButtonDecorator.verticalCenter;
+		anchors.horizontalCenter: commonButtonDecorator.horizontalCenter;
 
-            Text {
-                id: textObj
+		width: iconObj.width + textItem.width + Style.size_mainMargin;
+		height: Math.max(iconObj.height, textItem.height)
 
-                width: parent.width;
 
-                color: !commonButtonDecorator.baseElement ? "transparent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
+		Image {
+			id: iconObj
 
-                font.pixelSize: Style.fontSize_common
-                font.family: Style.fontFamily
+			anchors.verticalCenter: content.verticalCenter;
+			anchors.left: parent.left;
 
-                text: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.text
-                elide: Text.ElideRight;
-            }
+			width: !visible ? 0 : Style.iconSizeSmall
+			height: width
 
-            Text {
-                id: helperText;
+			sourceSize.width: width
+			sourceSize.height: height
+			source: commonButtonDecorator.baseElement &&  commonButtonDecorator.baseElement.iconSource ? commonButtonDecorator.baseElement.iconSource: "";
+			visible: source != "" && source != undefined;
+		}
 
-                font.pixelSize: Style.fontSize_common
-                font.family: Style.fontFamily
 
-                text: textObj.text;
 
-                visible: false;
-            }
-        }
-    }
+		Item {
+			id: textItem;
 
-    function closeTooltip(){
-        if(tooltip && tooltip.openST){
-            tooltip.closeTooltip();
-        }
-    }
+			anchors.centerIn: iconObj && iconObj.visible ? undefined : content;
+			anchors.verticalCenter: content.verticalCenter;
+			anchors.left: iconObj && iconObj.visible ? iconObj.right : undefined;
+			anchors.leftMargin: iconObj && iconObj.visible ? commonButtonDecorator.contentSpacing : 0;
 
-    CustomTooltip {
-        id: tooltip;
+			width: visible ? helperText.width > commonButtonDecorator.maxTextWidth ? commonButtonDecorator.maxTextWidth : helperText.width : -Style.size_mainMargin;
+			height: textObj.height;
 
-        text: commonButtonDecorator.tooltipText;
-        fitToTextWidth: false;
-        componentMinHeight: 30;
+			visible: textObj.text !== "";
 
-        fitToHCenter: true;
 
-        function hide(){
-            closeTooltip();
-        }
 
-        function show(xX, yY){
-            if (text !== ""){
-                openTooltip(xX, yY);
-            }
-        }
-    }
+			Text {
+				id: textObj
+
+				width: parent.width;
+
+				color: !commonButtonDecorator.baseElement ? "transparent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
+
+				font.pixelSize: Style.fontSize_common
+				font.family: Style.fontFamily
+
+				text: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.text
+				elide: Text.ElideRight;
+			}
+
+			Text {
+				id: helperText;
+
+				font.pixelSize: Style.fontSize_common
+				font.family: Style.fontFamily
+
+				text: textObj.text;
+
+				visible: false;
+			}
+		}
+	}
+
+	function closeTooltip(){
+		if(tooltip && tooltip.openST){
+			tooltip.closeTooltip();
+		}
+	}
+
+	CustomTooltip {
+		id: tooltip;
+
+		text: commonButtonDecorator.tooltipText;
+		fitToTextWidth: false;
+		componentMinHeight: 30;
+
+		fitToHCenter: true;
+
+		function hide(){
+			closeTooltip();
+		}
+
+		function show(xX, yY){
+			if (text !== ""){
+				openTooltip(xX, yY);
+			}
+		}
+	}
+
+
 }
 
 

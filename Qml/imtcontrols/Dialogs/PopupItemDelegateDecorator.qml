@@ -5,27 +5,27 @@ import Acf 1.0
 import imtcontrols 1.0
 
 ItemDelegateDecorator {
-    id: root;
+	id: root;
 
-    contentCentered: false;
+	contentCentered: false;
 
-    color: !baseElement ? "transparent" :
-                              baseElement.highlighted ? Style.selectedColor :
-                              baseElement.down || baseElement.checked ?
-                                   Style.buttonPressedColor : root.selected ?
-                                       Style.buttonHoverColor : "transparent";
+	color: !baseElement ? "transparent" :
+						  baseElement.highlighted ? Style.selectedColor :
+													baseElement.down || baseElement.checked ?
+														Style.buttonPressedColor : root.selected ?
+															Style.buttonHoverColor : "transparent";
+	border.width: 0;
 
-    border.width: 0;
+	property bool isSeparator: !root.baseElement ? false : root.baseElement.isSeparator;
+	property bool selected: !root.baseElement ? false : root.baseElement.selected;
 
-    property bool isSeparator: !root.baseElement ? false : root.baseElement.isSeparator;
-    property bool selected: !root.baseElement ? false : root.baseElement.selected;
+	Rectangle {
+		id: separator;
+		anchors.verticalCenter: root.verticalCenter;
+		width: root.width;
+		height: 1;
+		color: Style.borderColor;
+		visible: root.isSeparator;
+	}
 
-    Rectangle {
-        id: separator;
-        anchors.verticalCenter: root.verticalCenter;
-        width: root.width;
-        height: 1;
-        color: Style.borderColor;
-        visible: root.isSeparator;
-    }
 }
