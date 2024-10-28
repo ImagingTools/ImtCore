@@ -204,6 +204,10 @@ QtObject {
             let key = list[i]
             if(typeof this[key] === 'object'){
                 if (Array.isArray(this[key])){
+                    if(i > 0){
+                        json += ','
+                    }
+
                     json += '"' + this.getJSONKeyForProperty(key) + '":'
 
                     json += "["
@@ -224,6 +228,10 @@ QtObject {
                     json += "]"
                 }
                 else if (this[key]){
+                    if(i > 0){
+                        json += ','
+                    }
+
                     json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
                 }
             } else {
@@ -236,9 +244,13 @@ QtObject {
                     safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
                     safeValue = safeValue.replace(/\"/g,'\u005C"')
                 }
+
+                if(i > 0){
+                    json += ','
+                }
+
                 json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + safeValue + '"' : value)
             }
-            if(i < list.length - 1) json += ','
         }
         json +='}'
         return json
@@ -354,9 +366,17 @@ QtObject {
                         this[_key] = sourceObject[key]
                     }
                 } else {
-                    let obj = createComponent(_key).createObject(this)
+                    let obj
+                    if (!this[_key]){
+                        obj = createComponent(_key).createObject(this)
+                    }
+                    else{
+                        obj = this[_key]
+                    }
+
                     obj.fromObject(sourceObject[key])
                     this[_key] = obj
+
                     obj.owner = this
                     obj.connectProperties()
                 }
