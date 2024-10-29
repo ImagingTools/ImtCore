@@ -1,9 +1,10 @@
 #pragma once
 
 
+// ACF includes
+#include <ibase/IApplicationInfo.h>
+
 // ImtCore includes
-#include <imtbase/IApplicationInfoRepresentation.h>
-#include <imtservergql/CGqlRepresentationDataControllerCompBase.h>
 #include <GeneratedFiles/imtappsdl/SDL/1.0/CPP/Application.h>
 
 

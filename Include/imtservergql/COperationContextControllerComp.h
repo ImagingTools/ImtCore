@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtbase/IDocumentChangeGenerator.h>
-#include <imtgql/IOperationContextController.h>
+#include <imtbase/IOperationContextController.h>
 
 
 namespace imtservergql
@@ -15,13 +15,13 @@ namespace imtservergql
 
 class COperationContextControllerComp:
 			public ilog::CLoggerComponentBase,
-			virtual public imtgql::IOperationContextController
+			virtual public imtbase::IOperationContextController
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(COperationContextControllerComp)
-		I_REGISTER_INTERFACE(imtgql::IOperationContextController);
+		I_REGISTER_INTERFACE(imtbase::IOperationContextController);
 		I_ASSIGN(m_documentChangeGeneratorCompPtr, "DocumentChangeGenerator", "Change generator for the collection object", true, "DocumentChangeGenerator");
 	I_END_COMPONENT;
 

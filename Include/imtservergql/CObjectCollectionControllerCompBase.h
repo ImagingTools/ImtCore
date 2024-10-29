@@ -9,10 +9,10 @@
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/IOperationContext.h>
 #include <imtbase/IDocumentChangeGenerator.h>
-#include <imtgql/IOperationContextController.h>
+#include <imtbase/IOperationContextController.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
-#include <imtgql/IGqlRequestExtractor.h>
 #include <imtbase/CTimeFilterParamRepresentationController.h>
+#include <imtgql/IGqlRequestExtractor.h>
 
 
 #undef GetObject
@@ -164,7 +164,7 @@ protected:
 	I_REF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_headersProviderCompPtr);
-	I_REF(imtgql::IOperationContextController, m_operationContextControllerCompPtr);
+	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);
 
 	imtbase::CTimeFilterParamRepresentationController m_timeFilterParamRepresentationController;
 };

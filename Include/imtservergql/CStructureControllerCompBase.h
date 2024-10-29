@@ -10,7 +10,7 @@
 #include <imtbase/IOperationContext.h>
 #include <imtbase/IDocumentChangeGenerator.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
-#include <imtgql/IOperationContextController.h>
+#include <imtbase/IOperationContextController.h>
 #include <imtgql/IGqlRequestExtractor.h>
 
 
@@ -109,7 +109,7 @@ protected:
 	I_REF(imtbase::IHierarchicalStructure, m_collectionStructureCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtgql::IGqlRequestExtractor, m_gqlRequestExtractorCompPtr);
-	I_REF(imtgql::IOperationContextController, m_operationContextControllerCompPtr);
+	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);
 	I_ATTR(QByteArray, m_structureIdAttrPtr);
 };
 

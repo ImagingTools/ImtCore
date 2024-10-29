@@ -9,10 +9,7 @@ namespace imtservergql
 {
 
 
-// reimplemented (imtgql::IGqlRepresentationDataController)
-
 // public methods
-
 
 // reimplemented (imtgql::IGqlRequestHandler)
 
@@ -21,29 +18,28 @@ imtbase::CTreeItemModel* CBroadcastMessageConsumerControllerComp::CreateInternal
 	Q_ASSERT(IsRequestSupported(gqlRequest));
 
 	if (!IsRequestSupported(gqlRequest)){
-		SendErrorMessage(0, QString("GQL handler is not supported GQL Request with command %1").arg(qPrintable(gqlRequest.GetCommandId())));
+		SendErrorMessage(0, QString("GQL handler is not supported GQL Request with command '%1'").arg(qPrintable(gqlRequest.GetCommandId())));
 
 		return nullptr;
 	}
 
-
 	if (!m_messageConsumerCompPtr.IsValid()){
 		errorMessage = QString("Unable to send broadcast message. Component reference 'MessageConsumer' was not set");
-
 		SendCriticalMessage(0, errorMessage);
 
 		return nullptr;
 	}
 
-	QList<imtgql::CGqlObject> inputParams;
-	inputParams.append(gqlRequest.GetParams());
+	const imtgql::CGqlObject* inputObjectPtr = gqlRequest.GetParamObject("input");
+	if (inputObjectPtr == nullptr){
+		errorMessage = QString("Unable to send broadcast message. GraphQL input params is invalid");
+		SendErrorMessage(0, errorMessage);
 
-	QString source;
-	QString messageText;
-	if (inputParams.size() > 0){
-		source = inputParams.at(0).GetFieldArgumentValue("source").toByteArray();
-		messageText = inputParams.at(0).GetFieldArgumentValue("message").toString();
+		return nullptr;
 	}
+
+	QString source = inputObjectPtr->GetFieldArgumentValue("source").toByteArray();
+	QString messageText = inputObjectPtr->GetFieldArgumentValue("message").toString();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");

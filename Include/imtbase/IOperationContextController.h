@@ -9,7 +9,7 @@
 #include <imtbase/IOperationContext.h>
 
 
-namespace imtgql
+namespace imtbase
 {
 
 
@@ -24,6 +24,6 @@ public:
 };
 
 
-} // namespace imtgql
+} // namespace imtbase
 
 

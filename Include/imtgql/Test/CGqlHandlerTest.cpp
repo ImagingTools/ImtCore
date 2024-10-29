@@ -1,4 +1,4 @@
-#include <imtgql/CGqlHandlerTest.h>
+#include <imtgql/Test/CGqlHandlerTest.h>
 
 
 // Qt includes

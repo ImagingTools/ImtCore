@@ -16,9 +16,7 @@ imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Internal error").toUtf8();
-		SendErrorMessage(0, errorMessage);
-
+		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CCollectionObjectProviderComp");
 		return nullptr;
 	}
 
@@ -58,7 +56,6 @@ imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
 
 		if (!dataModelPtr->CreateFromJson(json)){
 			errorMessage = QString("Tree item model creation from JSON failed").toUtf8();
-
 			SendErrorMessage(0, errorMessage);
 
 			return nullptr;
@@ -66,7 +63,6 @@ imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
 	}
 	else{
 		errorMessage = QString("Object with the ID '%1' doesn't exist").arg(qPrintable(objectId)).toUtf8();
-
 		SendErrorMessage(0, errorMessage);
 
 		return nullptr;

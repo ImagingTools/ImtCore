@@ -4,6 +4,9 @@
 // ACF includes
 #include <iqtgui/TMakeIconProviderCompWrap.h>
 
+// ImtCore includes
+#include <imtbase/CTreeItemModel.h>
+
 
 namespace imtqml
 {

@@ -16,31 +16,28 @@ imtbase::CTreeItemModel* CObjectProviderComp::CreateInternalResponse(
 			QString& errorMessage) const
 {
 	if (!m_objectCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error. Object is invalid").toUtf8();
-
+		Q_ASSERT_X(false, "Attribute 'Object' was not set", "CObjectProviderComp");
 		return nullptr;
 	}
-
-	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
 
 	QByteArray json;
 	{
 		iser::CJsonMemWriteArchive archive(json);
 		if (!m_objectCompPtr->Serialize(archive)){
-			errorMessage = QObject::tr("Failed to perform serialization to the archive from the object").toUtf8();
+			errorMessage = QString("Failed to perform serialization to the archive from the object").toUtf8();
 
 			return nullptr;
 		}
 	}
 
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+
 	if (!dataModelPtr->CreateFromJson(json)){
-		errorMessage = QObject::tr("Failed to convert to a tree model from json").toUtf8();
+		errorMessage = QString("Failed to convert to a tree model from json").toUtf8();
 
 		return nullptr;
 	}
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
 
 	return rootModelPtr.PopPtr();
 }

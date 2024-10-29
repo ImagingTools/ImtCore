@@ -10,7 +10,6 @@
 #include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
-#include <imtbase/CTreeItemModel.h>
 #include <imtqml/IQuickObject.h>
 
 
