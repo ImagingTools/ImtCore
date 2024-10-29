@@ -699,24 +699,27 @@ Item {
 			width: 0;
 			height: width * coeff;
 			color: "transparent";
-			//border.color: "red"
 
 			property Item root: null;
 			property Item rootItem: null;
+			property Item diagramItem: null;
 			property bool hiddenBackground: true;
 			property bool noMouseArea: true;
 			property real barX: 0;
 			property real barY: 0;
-			property real rootItemX: !rootItem ? 0 : rootItem.x;
 			property string text: "";
+
 			property real coeff: 600/468;
+			property real textVerticalOffset: -((1-52/134) * iconBigIndicator.height - iconBigIndicator.height/2) ;
+			property int mainMarginVertical: diagram.bigIndicatorMargin;
+			property int textMargin: 3*Style.size_mainMargin;
 
 			Component.onCompleted: {
 				Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
 				diagram.bigIndicatorItem = bigIndicatorContainer;
 				if(rootItem){
 					x = barX - width/2;
-					y = barY - height - diagram.bigIndicatorMargin;
+					y = barY - height - mainMarginVertical;
 				}
 			}
 
@@ -734,7 +737,7 @@ Item {
 				if(rootItem){
 					//console.log("ROOT_ITEM_CHANGED", barX, width)
 					x = barX - width/2;
-					y = barY - height - diagram.bigIndicatorMargin;
+					y = barY - height - mainMarginVertical;
 				}
 			}
 			onBarXChanged: {
@@ -747,11 +750,11 @@ Item {
 			}
 
 			onBarYChanged: {
-				y = barY - height - diagram.bigIndicatorMargin;
+				y = barY - height - mainMarginVertical;
 			}
 
 			onHeightChanged: {
-				y = barY - height - diagram.bigIndicatorMargin;
+				y = barY - height - mainMarginVertical;
 			}
 
 			Image{
@@ -775,15 +778,15 @@ Item {
 
 				anchors.horizontalCenter: parent.horizontalCenter;
 				anchors.verticalCenter:  parent.verticalCenter;
-				anchors.verticalCenterOffset: -((1-52/134) * iconBigIndicator.height - iconBigIndicator.height/2) ;
+				anchors.verticalCenterOffset: bigIndicatorContainer.textVerticalOffset;
 
 				font.family: Style.fontFamily;
 				font.pixelSize: Style.fontSize_subtitle;
 				color: Style.color_first;
 				text: bigIndicatorContainer.text;
 				onWidthChanged: {
-					if(width + 3*Style.size_mainMargin > bigIndicatorContainer.width){
-						bigIndicatorContainer.width = width + 3*Style.size_mainMargin;
+					if(width + bigIndicatorContainer.textMargin > bigIndicatorContainer.width){
+						bigIndicatorContainer.width = width + bigIndicatorContainer.textMargin;
 					}
 				}
 			}

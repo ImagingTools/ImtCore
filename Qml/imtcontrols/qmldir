@@ -125,6 +125,9 @@ CustomScrollbar 1.0 ./Views/CustomScrollbar.qml
 ScrollIndicator 1.0 ./Views/ScrollIndicator.qml
 CustomTooltip 1.0 ./Views/CustomTooltip.qml
 Diagram 1.0 ./Views/Diagram.qml
+DiagramIndicator 1.0 ./Views/DiagramIndicator.qml
+IntervalBar 1.0 ./Views/IntervalBar.qml
+ValueLevelIndicator 1.0 ./Views/ValueLevelIndicator.qml
 BusyIndicator 1.0 ./Views/BusyIndicator.qml
 Loading 1.0 ./Views/Loading.qml
 PaintedCorner 1.0 ./Views/PaintedCorner.qml

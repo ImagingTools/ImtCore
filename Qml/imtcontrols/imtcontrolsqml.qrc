@@ -113,6 +113,9 @@
         <file alias="imtcontrols/Views/ScrollIndicator.qml">Views/ScrollIndicator.qml</file>
         <file alias="imtcontrols/Views/CustomTooltip.qml">Views/CustomTooltip.qml</file>
         <file alias="imtcontrols/Views/Diagram.qml">Views/Diagram.qml</file>
+		<file alias="imtcontrols/Views/DiagramIndicator.qml">Views/DiagramIndicator.qml</file>
+		<file alias="imtcontrols/Views/IntervalBar.qml">Views/IntervalBar.qml</file>
+		<file alias="imtcontrols/Views/ValueLevelIndicator.qml">Views/ValueLevelIndicator.qml</file>
         <file alias="imtcontrols/Views/BusyIndicator.qml">Views/BusyIndicator.qml</file>
         <file alias="imtcontrols/Views/Loading.qml">Views/Loading.qml</file>
         <file alias="imtcontrols/Views/PaintedCorner.qml">Views/PaintedCorner.qml</file>
