@@ -34,7 +34,6 @@ typedef imtqml::CPageGuiElementModelComp PageGuiElementModel;
 typedef imtqml::CClientMainWindowQmlComp ClientMainWindowQml;
 typedef icomp::TModelCompWrap<imtqml::CCommandsObserverQmlComp> CommandsObserverQml;
 typedef imtqml::CQmlObjectCollectionComp QmlObjectCollection;
-typedef imtqml::CObjectViewDataProviderComp ObjectViewDataProvider;
 
 
 } // namespace ImtQmlPck

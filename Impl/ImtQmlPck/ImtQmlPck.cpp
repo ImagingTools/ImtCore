@@ -59,12 +59,6 @@ I_EXPORT_COMPONENT(
 			"Qml Object Collection",
 			"Qml Object Collection");
 
-I_EXPORT_COMPONENT(
-	ObjectViewDataProvider,
-	"Object view data provider",
-	"Object view data provider");
-
-
 } // namespace ImtQmlPck
 
 
