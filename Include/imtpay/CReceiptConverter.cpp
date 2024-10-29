@@ -66,7 +66,7 @@ bool SetDigitValueForParamsSet(iprm::IParamsSet& params, const QByteArray& param
 
 bool SelectOptionByIdForParamsSet(iprm::IParamsSet& params, const QByteArray& paramId, const QByteArray& selectionId)
 {
-	iprm::ISelectionParam* selectionParamPtr = dynamic_cast<iprm::ISelectionParam*>(params.GetEditableParameter(ReceiptPaymentKeys::Type));
+	iprm::ISelectionParam* selectionParamPtr = dynamic_cast<iprm::ISelectionParam*>(params.GetEditableParameter(paramId));
 	if (selectionParamPtr == nullptr){
 		qWarning() << "Unable to find selection param with id: " << paramId;
 
@@ -337,25 +337,22 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 	istd::CChangeGroup paramsChangeGroup(&params);
 	// set type
 	const QByteArray receiptTypeId = receipt.GetType().toUtf8();
-	if (!receipt.HasType() || receiptTypeId.isEmpty()){
-		/// \todo add message
+	if (receipt.HasType() && !receiptTypeId.isEmpty()){
+		iprm::ISelectionParam* receiptTypeSelectionParamPtr = dynamic_cast<iprm::ISelectionParam*>(params.GetEditableParameter(ReceiptParamKeys::Type));
+		Q_ASSERT(receiptTypeSelectionParamPtr != nullptr);
 
-		return false;
+		const iprm::IOptionsList* receiptTypeSelectionConstraintsPtr = receiptTypeSelectionParamPtr->GetSelectionConstraints();
+		Q_ASSERT(receiptTypeSelectionConstraintsPtr != nullptr);
+
+		const int indexOfType = iprm::FindOptionIndexById(receiptTypeId, *receiptTypeSelectionConstraintsPtr);
+		if (indexOfType < 0){
+			qWarning() << "CReceiptConverter:: Unexpected receipt type id";
+
+			return false;
+		}
+		receiptTypeSelectionParamPtr->SetSelectedOptionIndex(indexOfType);
+
 	}
-
-	iprm::ISelectionParam* receiptTypeSelectionParamPtr = dynamic_cast<iprm::ISelectionParam*>(params.GetEditableParameter(ReceiptParamKeys::Type));
-	Q_ASSERT(receiptTypeSelectionParamPtr != nullptr);
-
-	const iprm::IOptionsList* receiptTypeSelectionConstraintsPtr = receiptTypeSelectionParamPtr->GetSelectionConstraints();
-	Q_ASSERT(receiptTypeSelectionConstraintsPtr != nullptr);
-
-	const int indexOfType = iprm::FindOptionIndexById(receiptTypeId, *receiptTypeSelectionConstraintsPtr);
-	if (indexOfType < 0){
-		/// \todo adde message
-
-		return false;
-	}
-	receiptTypeSelectionParamPtr->SetSelectedOptionIndex(indexOfType);
 
 	// set place
 	const QString paymentPlace = receipt.GetPaymentsPlace();
@@ -394,9 +391,9 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 			Q_ASSERT(typeSelectionConstraints != nullptr);
 
 			const QByteArray paymentTypeId = receiptPayment.GetType().toUtf8();
-			const int indexOfType = iprm::FindOptionIndexById(paymentTypeId, *receiptTypeSelectionConstraintsPtr);
+			const int indexOfType = iprm::FindOptionIndexById(paymentTypeId, *typeSelectionConstraints);
 			if (indexOfType < 0){
-				/// \todo adde message
+				qWarning() << "CReceiptConverter:: Unexpected payment type id";
 
 				return false;
 			}
