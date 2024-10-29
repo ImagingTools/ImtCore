@@ -108,7 +108,11 @@ const imtauth::CUserInfo* CLdapAuthorizationControllerComp::CreateUserInfoFromLd
 		username = data[1];
 	}
 
-	NetUserGetInfo(NULL, qUtf16Printable(username), 3, (LPBYTE *) & userInfo3BufPtr);
+	// Get the computer name of a DC for the specified domain.
+	LPBYTE computerName;
+	NetGetDCName(NULL, qUtf16Printable(domain), &computerName);
+
+	NetUserGetInfo((LPWSTR)computerName, qUtf16Printable(ldapUserId), 3, (LPBYTE *)&userInfo3BufPtr);
 
 	if (userInfo3BufPtr != nullptr){
 		istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
@@ -176,10 +180,20 @@ sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CLdapAuthorizationContr
 				istd::TDelPtr<imtauth::CUserInfo> userInfoPtr;
 				if (userObjectId.isEmpty()){
 					userInfoPtr.SetCastedOrRemove(const_cast<imtauth::CUserInfo*>(CreateUserInfoFromLdapUser(login)));
-					if (userInfoPtr.IsValid()){
-						userInfoPtr->AddRole(productId, defaultRoleId);
-						m_userCollectionCompPtr->InsertNewObject("User", "", "", userInfoPtr.GetPtr(), login);
+					if (!userInfoPtr.IsValid()){
+						userInfoPtr.SetPtr(new imtauth::CIdentifiableUserInfo);
+
+						userInfoPtr->SetId(login);
 					}
+
+					imtauth::IUserInfo::SystemInfo systemInfo;
+					systemInfo.systemId = *m_systemIdAttrPtr;
+					systemInfo.systemName = "LDAP";
+					userInfoPtr->AddToSystem(systemInfo);
+
+					userInfoPtr->AddRole(productId, defaultRoleId);
+
+					m_userCollectionCompPtr->InsertNewObject("User", "", "", userInfoPtr.GetPtr(), login);
 				}
 				else{
 					imtbase::IObjectCollection::DataPtr dataPtr;
@@ -213,76 +227,6 @@ sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CLdapAuthorizationContr
 
 	return BaseClass::OnAuthorization(authorizationRequest, gqlRequest, errorMessage);
 }
-
-
-// reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
-
-// imtbase::CTreeItemModel* CLdapAuthorizationControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-// {
-// 	if (m_enableableParamCompPtr.IsValid()){
-// 		bool enabled = m_enableableParamCompPtr->IsEnabled();
-// 		if (enabled){
-// 			QByteArray login;
-// 			QByteArray productId;
-// 			QByteArray password;
-
-// 			ParseDataFromGqlRequest(gqlRequest, login, password, productId);
-
-// 			QByteArray userObjectId = GetUserObjectId(login);
-
-// 			bool ok = CheckCredential(*m_systemIdAttrPtr, login, password);
-// 			if (ok){
-// 				QByteArray guestRoleId = CheckExistsRole(productId, RT_GUEST);
-// 				if (guestRoleId.isEmpty()){
-// 					InsertNewIdentifiableRoleInfo("Guest", "Guest", "Guest role", productId, false, true);
-// 				}
-
-// 				QByteArray defaultRoleId = CheckExistsRole(productId, RT_DEFAULT);
-// 				if (defaultRoleId.isEmpty()){
-// 					defaultRoleId = InsertNewIdentifiableRoleInfo("Default", "Default", "Default role", productId, true, false);
-// 				}
-
-// 				istd::TDelPtr<imtauth::CUserInfo> userInfoPtr;
-// 				if (userObjectId.isEmpty()){
-// 					userInfoPtr.SetCastedOrRemove(const_cast<imtauth::CUserInfo*>(CreateUserInfoFromLdapUser(login)));
-// 					if (userInfoPtr.IsValid()){
-// 						userInfoPtr->AddRole(productId, defaultRoleId);
-// 						m_userCollectionCompPtr->InsertNewObject("User", "", "", userInfoPtr.GetPtr(), login);
-// 					}
-// 				}
-// 				else{
-// 					imtbase::IObjectCollection::DataPtr dataPtr;
-// 					if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
-// 						userInfoPtr.SetCastedOrRemove(dataPtr.GetPtr()->CloneMe());
-// 						if (userInfoPtr.IsValid()){
-// 							QByteArrayList products = userInfoPtr->GetProducts();
-// 							if (!products.contains(productId)){
-// 								userInfoPtr->AddRole(productId, defaultRoleId);
-// 								if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr.GetPtr())){
-// 									SendWarningMessage(
-// 												0,
-// 												QString("Unable to set product '%1' for user '%2'").arg(qPrintable(productId)).arg(qPrintable(userObjectId)),
-// 												"CLdapAuthorizationControllerComp");
-// 								}
-// 							}
-// 						}
-// 					}
-// 				}
-
-// 				if (userInfoPtr.IsValid()){
-// 					userInfoPtr->SetId(login);
-// 					imtbase::CTreeItemModel* succesfulResponsePtr = CreateAuthorizationSuccessfulResponse(*userInfoPtr.GetPtr(), *m_systemIdAttrPtr, productId, errorMessage);
-// 					return succesfulResponsePtr;
-// 				}
-// 				else{
-// 					return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
-// }
 
 
 } // namespace imtauthgql

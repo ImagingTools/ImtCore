@@ -12,6 +12,9 @@ namespace imtclientgql
 {
 
 
+/**
+	Interface for the subscription client.
+*/
 class IGqlSubscriptionClient: virtual public istd::IChangeable
 {
 public:
@@ -23,9 +26,21 @@ public:
 		SS_REGISTERED
 	};
 
+	/**
+		Handling the incomming data for a given subscription
+		\param subscriptionId	ID of the subscription the client is listening
+		\param subscriptionData	Related data
+	*/
 	virtual void OnResponseReceived(
 				const QByteArray& subscriptionId,
 				const QByteArray& subscriptionData) = 0;
+
+	/**
+		Handling the incomming notification about the change of the subscription status.
+		\param subscriptionId	ID of the subscription the client is listening
+		\param status	New subscription status
+		\param message	
+	*/
 	virtual void OnSubscriptionStatusChanged(
 				const QByteArray& subscriptionId,
 				const SubscriptionStatus& status,
@@ -33,6 +48,6 @@ public:
 };
 
 
-} // namespace imtgql
+} // namespace imtclientgql
 
 
