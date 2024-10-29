@@ -26,13 +26,7 @@ const imtbase::ICollectionInfo& CRemoteRoleInfoProviderComp::GetRoleList() const
 }
 
 
-const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& /*roleId*/, const QByteArray& /*productId*/) const
-{
-	return nullptr;
-}
-
-
-const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& objectId) const
+const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& roleId, const QByteArray& productId) const
 {
 	if (!m_roleInfoFactCompPtr.IsValid()){
 		return nullptr;
@@ -41,26 +35,21 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& obj
 	namespace rolessdl = sdl::imtauth::Roles::V1_0;
 
 	rolessdl::RoleItemRequestArguments arguments;
-	arguments.input.SetId(objectId);
+	arguments.input.SetId(roleId);
+	arguments.input.SetProductId(productId);
 
 	imtgql::CGqlRequest gqlRequest;
 	if (rolessdl::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		rolessdl::CRoleDataPayload response;
+		// TODO: remove !!!
+		imtgql::CGqlObject itemObject;
+		itemObject.InsertField("id");
+		gqlRequest.AddField("item", itemObject);
 		if (!SendModelRequest(gqlRequest, response)){
 			return nullptr;
 		}
 
 		rolessdl::CRoleData roleData = response.GetRoleData();
-
-		QJsonObject object;
-		if (!roleData.WriteToJsonObject(object)){
-			return nullptr;
-		}
-
-		QJsonDocument document(object);
-		if (document.isNull()){
-			return nullptr;
-		}
 
 		istd::TDelPtr<imtauth::IRole> roleInfoPtr;
 		roleInfoPtr.SetPtr(m_roleInfoFactCompPtr.CreateInstance());
@@ -68,15 +57,24 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& obj
 			return nullptr;
 		}
 
-		iser::CJsonMemReadArchive archive(document.toJson());
-		if (!roleInfoPtr->Serialize(archive)){
-			return nullptr;
-		}
+		roleInfoPtr->SetDefault(roleData.GetIsDefault());
+		roleInfoPtr->SetGuest(roleData.GetIsGuest());
+		roleInfoPtr->SetLocalPermissions(roleData.GetPermissions().split(';'));
+		roleInfoPtr->SetProductId(roleData.GetProductId());
+		roleInfoPtr->SetRoleDescription(roleData.GetDescription());
+		roleInfoPtr->SetRoleId(roleData.GetRoleId());
+		roleInfoPtr->SetRoleName(roleData.GetName());
 
 		return roleInfoPtr.PopPtr();
 	}
 
 	return nullptr;
+}
+
+
+const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& objectId) const
+{
+	return GetRole(objectId, "");
 }
 
 
