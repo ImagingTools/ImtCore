@@ -3,190 +3,242 @@ import Acf 1.0
 
 Item {
 
-    id: barChart;
+	id: barChart;
 
-    height: 250;
-    width: visibleElements ? elementWidth : 0;
+	height: maxBarHeight;
+	width: visibleElements ? elementWidth : 0;
 
-    property bool visibleElements: true;
-    property real maxBarHeight: 90;
-    property real maxValue: 100;
-    property real negativeValue;
-    property real positiveValue;
-    property real elementWidth: barWidth;
-    property real barWidth:30;
+	property bool visibleElements: true;
+	property real maxBarHeight: 90;
+	property real maxValue: 100;
+	property real negativeValue;
+	property real positiveValue;
+	property real elementWidth: barWidth;
+	property real barWidth: 30;
+	property real borderWidth: 2;
 
-    property real addToValue: 30;
-    property real minValue: 0;
+	property real addToValue: 30;
+	property real minValue: 0;
 
 
-    property string color_positive: "#ff8a3d";
-    property string color_negative: "#000000";
+	property string color_positive: "#ff8a3d";
+	property string color_negative: "#000000";
+	property string backgroundColor: "#000000";
 
-    property bool hasTooltip: true;
-    property bool isPositiveTooltip: true;
-    property bool isNegativeTooltip: false;
-    property bool hasBottomRounding: false;
-    property bool hasColorFilling: true;
+	property bool hasTooltip: true;
+	property bool isPositiveTooltip: true;
+	property bool isNegativeTooltip: false;
+	property bool hasBottomRounding: false;
 
-    property alias toolTipColor: tooltip.color;
-    property alias toolTipFontColor: tooltip.fontColor;
-    property alias toolTipFontSize: tooltip.fontPixelSize;
+	property alias toolTipColor: tooltip.color;
+	property alias toolTipFontColor: tooltip.fontColor;
+	property alias toolTipFontSize: tooltip.fontPixelSize;
+	property alias shownVal: tooltip.shownVal;
+	property alias positiveBarHeight: barDown.height;
+	property alias negativeBarHeight: barUp.height;
 
-    property real parentY: 0;
 
+	property real parentY: 0;
+
+	property bool canChangeFilling: false;
 	property bool isFilled: true;
 	property bool isSelected: false;
 
-    signal clicked();
+	signal clicked();
 
-    onParentYChanged: {
-        if(tooltip.openST){
-            tooltip.closeTooltip();
-        }
-    }
+	onParentYChanged: {
+		if(tooltip.openST){
+			tooltip.closeTooltip();
+		}
+	}
 
-    //Rectangle{anchors.fill: parent;color: "red"; opacity: 0.2}
+	//Rectangle{anchors.fill: parent;color: "red"; opacity: 0.2}
 
 
 
-    Rectangle{
-        id: barDown;//positive
+	Rectangle{
+		id: barDown;//positive
 
-        anchors.bottom:  parent.bottom;
-        anchors.horizontalCenter: parent.horizontalCenter;
-        width: barChart.barWidth;
-        height: (barChart.positiveValue !==0)?
-                    barChart.maxBarHeight/(barChart.maxValue - barChart.minValue) * barChart.positiveValue : 1;
-        radius: width;//Math.min(width, height)
-        color: barChart.hasColorFilling ? barChart.color_positive : "transparent";
-        visible: !barChart.visible ? false : (barChart.positiveValue == 0)? false : barChart.visibleElements;
+		anchors.bottom:  parent.bottom;
+		anchors.horizontalCenter: parent.horizontalCenter;
+		width: barChart.barWidth;
+		height: (barChart.positiveValue !==0)?
+					barChart.maxBarHeight/(barChart.maxValue - barChart.minValue) * barChart.positiveValue : 1;
+		radius: width;//Math.min(width, height)
+		color: barChart.isFilled ? barChart.color_positive : "transparent";
+		visible: !barChart.visible ? false : (barChart.positiveValue == 0)? false : barChart.visibleElements;
+		border.color: barChart.color_positive;
+		border.width: barChart.isFilled ? 0 : barChart.borderWidth;
+	}
 
-    }
+	Rectangle{
+		id: barDownPatch;//positive
 
-    Rectangle{
-        id: barDownPatch;//positive
+		anchors.bottom:  parent.bottom;
+		anchors.horizontalCenter: parent.horizontalCenter;
+		width: barChart.barWidth;
+		height: Math.min(width, barDown.height);
+		color: barChart.isFilled ? barChart.color_positive : "transparent";
+		visible: !barChart.hasBottomRounding;
+		border.color: barChart.color_positive;
+		border.width: barChart.isFilled ? 0 : barChart.borderWidth;
 
-        anchors.bottom:  parent.bottom;
-        anchors.horizontalCenter: parent.horizontalCenter;
-        width: barChart.barWidth;
-        height: width;
-        color: barChart.hasColorFilling ? barChart.color_positive : "transparent";
-        visible: !barChart.hasBottomRounding;
+	}
 
-    }
+	Rectangle{
+		id: barDownBorderPatch;//positive
 
-    Rectangle{
-        id: barDown_topRec;//positive
+		anchors.bottom:  parent.bottom;
+		anchors.horizontalCenter: parent.horizontalCenter;
+		anchors.top: barDown_topRec.bottom;
+		width: barChart.barWidth - 2*barDown.border.width;
+		height: 2*width;
+		color: barChart.backgroundColor;
+		visible: !barChart.isFilled;
 
-        anchors.top:  barDown.top;
-        anchors.horizontalCenter: parent.horizontalCenter;
-        width: barChart.barWidth;
-        height: (barChart.positiveValue !==0)? barDown.height/2 : 1;
-                    //Math.min(barChart.maxBarHeight/barChart.maxValue*barChart.positiveValue, width/2) : 1
-        color: barChart.hasColorFilling ? barChart.color_positive : "transparent";
-        visible: !barChart.visible ? false : (barChart.positiveValue == 0)? false : (barChart.negativeValue == 0) ? false : barChart.visibleElements;
+	}
 
-    }
 
-    Rectangle{
-        id: barUp;//negative
+	Rectangle{
+		id: barDown_topRec;//positive
 
-        anchors.bottom: barDown.top;
-        anchors.horizontalCenter: parent.horizontalCenter;
-        width: barChart.barWidth;
-        height: (barChart.negativeValue !==0)?
-                    barChart.maxBarHeight/(barChart.maxValue - barChart.minValue) * barChart.negativeValue : 1;
-        radius: width//Math.min(width, height)
-        color: barChart.hasColorFilling ? barChart.color_negative : "transparent";
-        visible: !barChart.visible ? false : (barChart.negativeValue == 0)? false : barChart.visibleElements;
+		anchors.top:  barDown.top;
+		anchors.horizontalCenter: parent.horizontalCenter;
+		width: barChart.barWidth;
+		height: (barChart.positiveValue !==0)? barDown.height/2 : 1;
+		//Math.min(barChart.maxBarHeight/barChart.maxValue*barChart.positiveValue, width/2) : 1
+		color: barChart.isFilled ? barChart.color_positive : "transparent";
+		visible: !barChart.visible ? false : (barChart.positiveValue == 0)? false : (barChart.negativeValue == 0) ? false : barChart.visibleElements;
 
-    }
+	}
 
-    Rectangle{
-        id: barUp_downRec;//negative
+	Rectangle{
+		id: barUp;//negative
 
-        anchors.bottom: barUp.bottom;
-        anchors.horizontalCenter: parent.horizontalCenter;
-        width: barChart.barWidth;
-        height: (barChart.negativeValue !==0)? barUp.height/2 : 1;
-                    //Math.min(barChart.maxBarHeight/barChart.maxValue*barChart.negativeValue, width/2) : 1
-        color: barChart.hasColorFilling ? barChart.color_negative : "transparent";
-        visible: !barChart.visible ? false : (barChart.negativeValue == 0) ? false : (barChart.positiveValue == 0) ? false : barChart.visibleElements;
+		anchors.bottom: barDown.top;
+		anchors.horizontalCenter: parent.horizontalCenter;
+		width: barChart.barWidth;
+		height: (barChart.negativeValue !==0)?
+					barChart.maxBarHeight/(barChart.maxValue - barChart.minValue) * barChart.negativeValue : 1;
+		radius: width//Math.min(width, height)
+		color: barChart.isFilled ? barChart.color_negative : "transparent";
+		visible: !barChart.visible ? false : (barChart.negativeValue == 0)? false : barChart.visibleElements;
+		border.color: barChart.color_negative;
+		border.width: barChart.isFilled ? 0 : barChart.borderWidth;
 
-    }
+	}
 
-    CustomTooltip{
-        id: tooltip;
+	Rectangle{
+		id: barUp_downRec;//negative
 
-        fitToTextWidth: true;
+		anchors.bottom: barUp.bottom;
+		anchors.horizontalCenter: parent.horizontalCenter;
+		width: barChart.barWidth;
+		height: (barChart.negativeValue !==0)? barUp.height/2 : 1;
+		//Math.min(barChart.maxBarHeight/barChart.maxValue*barChart.negativeValue, width/2) : 1
+		color: barChart.isFilled ? barChart.color_negative : "transparent";
+		visible: !barChart.visible ? false : (barChart.negativeValue == 0) ? false : (barChart.positiveValue == 0) ? false : barChart.visibleElements;
+		border.color: barChart.color_negative;
+		border.width: barChart.isFilled ? 0 : barChart.borderWidth;
 
-        componentHeight: 30;
-        fontPixelSize:  Style.fontSize_common;
+	}
 
-        color: Style.color_buttonText;
-        fontColor: "#ffffff";
+	Rectangle{
+		id: barUpBorderPatch;//positive
 
-        borderColor: Style.color_elementBorder;
-        property string shownValPos: Math.trunc((barChart.positiveValue + barChart.addToValue)*1000)/1000;
-        property string shownValNeg: Math.trunc((barChart.negativeValue + barChart.addToValue)*1000)/1000;
-        property string shownVal: barChart.isPositiveTooltip ? shownValPos : barChart.isNegativeTooltip ? shownValNeg : "";
+		anchors.bottom:  barUp.bottom;
+		anchors.horizontalCenter: parent.horizontalCenter;
+		anchors.top: barUp.top;
+		anchors.topMargin: barUp.width;
+		width: barChart.barWidth - 2*barDown.border.width;
+		height: 2*width;
+		color: barChart.backgroundColor;
+		visible: !barChart.isFilled;
 
-        text: shownVal;
+	}
 
-        function openTooltip(xX, yY){
-            var point = mapToItem(null, xX, yY);
+	CustomTooltip{
+		id: tooltip;
 
-            open(point.x - tooltipWidth/2, point.y - componentHeight - 4)
+		fitToTextWidth: true;
 
-        }
-    }
+		componentHeight: 30;
+		fontPixelSize:  Style.fontSize_common;
 
-    PauseAnimation {
-        id: pauseTooltip;
+		color: Style.color_buttonText;
+		fontColor: "#ffffff";
 
-        duration: tooltip.waitingDuration;
-        onFinished: {
-            //tooltip.openTooltip(ma.width/2, ma.mouseY);
-            tooltip.openTooltip(ma.width/2, barUp_downRec.y);
+		borderColor: Style.color_elementBorder;
+		property string shownValPos: Math.trunc((barChart.positiveValue + barChart.addToValue)*1000)/1000;
+		property string shownValNeg: Math.trunc((barChart.negativeValue + barChart.addToValue)*1000)/1000;
+		property string shownVal: barChart.isPositiveTooltip ? shownValPos : barChart.isNegativeTooltip ? shownValNeg : "";
+
+		text: shownVal;
+
+		function openTooltip(xX, yY){
+			if(barChart.isSelected && barChart.canChangeFilling){
+				return;
+			}
+			var point = mapToItem(null, xX, yY);
+
+			open(point.x - tooltipWidth/2, point.y - componentHeight - 4)
+
+		}
+	}
+
+	PauseAnimation {
+		id: pauseTooltip;
+
+		duration: tooltip.waitingDuration;
+		onFinished: {
+			//tooltip.openTooltip(ma.width/2, ma.mouseY);
+			tooltip.openTooltip(ma.width/2, barUp_downRec.y);
 			// tooltip.openTooltipWithCoord(barChart.barWidth/2 - tooltip.tooltipWidth/2,  barDown.y - tooltip.componentHeight - 5);
 
-        }
-    }
+		}
+	}
 
-    MouseArea{
-        id: ma;
+	MouseArea{
+		id: ma;
 
-        anchors.fill: parent;
+		anchors.fill: parent;
 
-        visible: true;
-        hoverEnabled: visible;
-        cursorShape: Qt.PointingHandCursor;
+		visible: true;
+		hoverEnabled: visible;
+		cursorShape: Qt.PointingHandCursor;
 
-        onClicked: {
-            barChart.clicked();
-        }
+		onClicked: {
+			barChart.clicked();
+		}
 
-        onEntered: {
-            if(barChart.hasTooltip){
-                if(tooltip.text !== ""){
-                    pauseTooltip.restart();
+		onEntered: {
+			if(barChart.hasTooltip){
+				if(tooltip.text !== ""){
+					pauseTooltip.restart();
 
-                }
-            }
-        }
+				}
+			}
+		}
 
-        onExited: {
-            if(barChart.hasTooltip){
-                if(tooltip.text !== ""){
-                    pauseTooltip.stop();
-                    tooltip.closeTooltip();
-                }
-            }
-        }
+		onExited: {
+			if(barChart.hasTooltip){
+				if(tooltip.text !== ""){
+					pauseTooltip.stop();
+					tooltip.closeTooltip();
+				}
+			}
+		}
 
-    }
+	}
 
+	function closeTooltip(){
+		if(barChart.hasTooltip){
+			if(tooltip.text !== ""){
+				pauseTooltip.stop();
+				tooltip.closeTooltip();
+			}
+		}
+	}
 
 }
 

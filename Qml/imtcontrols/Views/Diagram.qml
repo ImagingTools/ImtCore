@@ -37,6 +37,9 @@ Item {
 	property string valueColor: Style.color_text_common;
 
 	property bool hasMiddleLine: false;
+	property bool hasBarFillingChange: false;
+	property bool hasBigIndicator: false;
+	property real bigIndicatorMargin: 20
 	property string middleLineColor: "orange";
 
 	property int spacingX: 25;
@@ -48,6 +51,22 @@ Item {
 	property alias maxSizeText: sizeText.text;
 
 	property int selectedIndex: -1;
+
+	property bool compl: false;
+
+	property var indicatorLimits: [];
+
+
+	property Component bigIndicatorComp: bigIndicatorComponent;
+	property Item bigIndicatorItem: null;
+
+	Component.onCompleted: {
+		compl = true;
+	}
+
+	Component.onDestruction: {
+		clear();
+	}
 
 	onParentYChanged: {
 		//console.log("ParentYChanged");
@@ -65,6 +84,11 @@ Item {
 		minValue = 0;
 		maxValue = 100;
 		maxAxeYValue = 100;
+		selectedIndex = -1;
+		if(bigIndicatorItem){
+			ModalDialogManager.closeByComp(diagram.bigIndicatorComp)
+			diagram.bigIndicatorItem = null;
+		}
 	}
 
 	function setMinValue(){
@@ -242,6 +266,13 @@ Item {
 		return retval;
 	}
 
+	onSelectedIndexChanged: {
+		if(diagram.hasBigIndicator && selectedIndex < 0){
+			if(diagram.bigIndicatorItem){
+				ModalDialogManager.closeByComp(diagram.bigIndicatorComp)
+			}
+		}
+	}
 
 	ListModel{
 		id: axeXValueModel;
@@ -457,11 +488,14 @@ Item {
 			model: diagram.model;
 			delegate:
 				Item{
+				id: barDelegate;
+
 				//anchors.bottom: parent.bottom;
 
 				width: diagram.barWidth + diagram.spacingX;
 				//height: barChart.height;
 				height: barsList.height;
+
 				BarChart{
 					id: barChart;
 
@@ -478,14 +512,82 @@ Item {
 					negativeValue: (model.negative - diagram.minValue) >= 0 ? (model.negative - diagram.minValue) : 0;
 					color_positive: diagram.colorPositive;
 					color_negative: diagram.colorNegative;
+					backgroundColor: diagram.backgroundColor;
 
 					addToValue: diagram.minValue;
+					isSelected: diagram.selectedIndex == model.index;
 
 					parentY: diagram.parentY;
-					onClicked: {
-						isSelected = !isSelected;
-						diagram.selectedIndex = model.index;
+					canChangeFilling: diagram.hasBarFillingChange;
+					isFilled: !diagram.hasBarFillingChange ? true : isSelected;
+					property real barListContentX: barsList.contentX;
+					property var indicatorLimits: diagram.indicatorLimits;
+					property bool compl: false
+					property bool diagramCompl: diagram.compl;
+					property bool ready: compl && diagram.compl;
+					Component.onCompleted: {
+						compl = true;
 					}
+					onReadyChanged: {
+						if(ready){
+						}
+					}
+					onClicked: {
+						if(diagram.selectedIndex == model.index){
+							diagram.selectedIndex = -1;
+						}
+						else {
+							diagram.selectedIndex = model.index;
+						}
+					}
+					onIsSelectedChanged: {
+						if(diagram.visible && diagram.hasBigIndicator){
+							if(isSelected){
+								closeTooltip();
+								let point = mapToItem(null, barChart.x - barChart.width/2, barChart.height - barChart.positiveBarHeight);
+								if(!diagram.bigIndicatorItem){
+									ModalDialogManager.openDialog(diagram.bigIndicatorComp, { "barY": point.y,"barX" : point.x , "rootItem" : barChart, "text": shownVal});
+								}
+								else {
+									diagram.bigIndicatorItem.y = point.y
+									diagram.bigIndicatorItem.barX = point.x
+									diagram.bigIndicatorItem.barY = point.y
+									diagram.bigIndicatorItem.rootItem = barChart;
+									diagram.bigIndicatorItem.text =  shownVal;
+								}
+							}
+						}
+					}
+					onBarListContentXChanged: {
+						if(diagram.visible && diagram.hasBigIndicator && isSelected && diagram.selectedIndex >= 0 && diagram.bigIndicatorItem){
+							let point = mapToItem(null, barChart.x - barChart.width/2, 0);
+							diagram.bigIndicatorItem.barX = point.x;
+							let pointToBarList = mapToItem(barsList, barChart.x - barChart.width/2 , diagram.bigIndicatorMargin);
+							if((pointToBarList.x - diagram.bigIndicatorItem.width/2 < 0)||
+									pointToBarList.x + diagram.bigIndicatorItem.width/2 > barsList.width){
+								diagram.bigIndicatorItem.visible = false;
+							}
+							else {
+								diagram.bigIndicatorItem.visible = true;
+							}
+						}
+					}
+					onIndicatorLimitsChanged: {
+						if(diagram && diagram.visible && diagram.hasBigIndicator && isSelected && diagram.selectedIndex >= 0 && diagram.bigIndicatorItem){
+							let point = mapToItem(null, 0, barChart.height - barChart.positiveBarHeight);
+							diagram.bigIndicatorItem.barY = point.y;
+							if(indicatorLimits.length > 0){
+								if(diagram.bigIndicatorItem.y < indicatorLimits[0] || diagram.bigIndicatorItem.y + diagram.bigIndicatorItem.height > indicatorLimits[1]){
+									diagram.bigIndicatorItem.visible = false;
+								}
+								else {
+									diagram.bigIndicatorItem.visible = true;
+								}
+							}
+						}
+
+					}
+
 				}
 			}
 
@@ -588,7 +690,106 @@ Item {
 
 	}
 
+	Component{
+		id: bigIndicatorComponent;
 
+		Rectangle{
+			id: bigIndicatorContainer;
+
+			width: 0;
+			height: width * coeff;
+			color: "transparent";
+			//border.color: "red"
+
+			property Item root: null;
+			property Item rootItem: null;
+			property bool hiddenBackground: true;
+			property bool noMouseArea: true;
+			property real barX: 0;
+			property real barY: 0;
+			property real rootItemX: !rootItem ? 0 : rootItem.x;
+			property string text: "";
+			property real coeff: 600/468;
+
+			Component.onCompleted: {
+				Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
+				diagram.bigIndicatorItem = bigIndicatorContainer;
+				if(rootItem){
+					x = barX - width/2;
+					y = barY - height - diagram.bigIndicatorMargin;
+				}
+			}
+
+			Component.onDestruction: {
+				Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged);
+			}
+
+			function onAppSizeChanged(parameters){
+				ModalDialogManager.closeByComp(diagram.bigIndicatorComp)
+				diagram.bigIndicatorItem = null;
+				diagram.selectedIndex = -1;
+			}
+
+			onRootItemChanged: {
+				if(rootItem){
+					//console.log("ROOT_ITEM_CHANGED", barX, width)
+					x = barX - width/2;
+					y = barY - height - diagram.bigIndicatorMargin;
+				}
+			}
+			onBarXChanged: {
+				x = barX - width/2;
+			}
+
+
+			onWidthChanged: {
+				x = barX - width/2;
+			}
+
+			onBarYChanged: {
+				y = barY - height - diagram.bigIndicatorMargin;
+			}
+
+			onHeightChanged: {
+				y = barY - height - diagram.bigIndicatorMargin;
+			}
+
+			Image{
+				id: iconBigIndicator;
+
+				anchors.horizontalCenter: parent.horizontalCenter;
+				anchors.verticalCenter:  parent.verticalCenter;
+				anchors.horizontalCenterOffset: 5;
+				anchors.verticalCenterOffset: 2;
+
+				width: parent.width;
+				height: parent.height;
+
+				sourceSize.width: width;
+				sourceSize.height: height;
+
+				source: "/" +  Style.getIconPath("Icons/BarInfoChr", Icon.State.On, Icon.Mode.Normal);
+			}
+			Text{
+				id: bigIndicatorText;
+
+				anchors.horizontalCenter: parent.horizontalCenter;
+				anchors.verticalCenter:  parent.verticalCenter;
+				anchors.verticalCenterOffset: -((1-52/134) * iconBigIndicator.height - iconBigIndicator.height/2) ;
+
+				font.family: Style.fontFamily;
+				font.pixelSize: Style.fontSize_subtitle;
+				color: Style.color_first;
+				text: bigIndicatorContainer.text;
+				onWidthChanged: {
+					if(width + 3*Style.size_mainMargin > bigIndicatorContainer.width){
+						bigIndicatorContainer.width = width + 3*Style.size_mainMargin;
+					}
+				}
+			}
+
+		}
+	}
 
 }
 
