@@ -578,7 +578,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
 	stream << QStringLiteral("bool ");
 	stream << className << ':' << ':';
-	stream << QStringLiteral("GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlObject& /*gqlObject*/, QString& errorMessage, int& operationType) const");
+	stream << QStringLiteral("GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const");
 	FeedStream(stream, 1, false);
 
 	stream << '{';
@@ -596,7 +596,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 	}
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("return false;");
+	stream << QStringLiteral("return BaseClass::GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType);");
 	FeedStream(stream, 1, false);
 
 	stream << '}';
