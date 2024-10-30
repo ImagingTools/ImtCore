@@ -23,7 +23,7 @@ public:
 	typedef Base BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(TClientRequestManagerCompWrap);
-	I_ASSIGN(m_apiClientCompPtr, "ApiClient", "API Client", true, "ApiClient");
+		I_ASSIGN(m_apiClientCompPtr, "ApiClient", "API Client", true, "ApiClient");
 	I_END_COMPONENT;
 
 protected:
