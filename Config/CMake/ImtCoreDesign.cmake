@@ -19,7 +19,7 @@ else()
 endif()
 
 if (APPLE)
-	# set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreator.app/Contents/MacOS/DesignTokenCreator")
+	set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreator.app/Contents/MacOS/DesignTokenCreator")
 endif()
 
 #  Setting the executable absolutely file path for specific OS
