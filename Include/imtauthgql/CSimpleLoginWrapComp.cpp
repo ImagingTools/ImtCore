@@ -174,6 +174,12 @@ bool CSimpleLoginWrapComp::RetrieveUserInfo(const QByteArray& userObjectId)
 		m_userInfoPtr->SetId(userData.GetUsername());
 		m_userInfoPtr->SetPasswordHash(userData.GetPassword().toUtf8());
 
+		QByteArrayList roles = userData.GetRoles().split(';');
+		m_userInfoPtr->SetRoles(productId, roles);
+
+		QByteArrayList localPermissions = userData.GetPermissions().split(';');
+		m_userInfoPtr->SetLocalPermissions(productId, localPermissions);
+
 		m_userPermissionIds = m_userInfoPtr->GetPermissions(productId);
 
 		return true;
