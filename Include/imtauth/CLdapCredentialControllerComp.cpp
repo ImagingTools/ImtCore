@@ -21,7 +21,6 @@ namespace imtauth
 bool CLdapCredentialControllerComp::CheckCredential(const QByteArray& login, const QByteArray& password) const
 {
 	int result = 0;
-#if QT_VERSION > 0x060000
 #ifdef Q_OS_WIN
 	// Local domain by default
 	QByteArray domain = ".";
@@ -35,7 +34,6 @@ bool CLdapCredentialControllerComp::CheckCredential(const QByteArray& login, con
 
 	HANDLE  hUser;
 	result = LogonUser(qUtf16Printable(username), qUtf16Printable(domain), qUtf16Printable(password), LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &hUser);
-#endif
 #endif
 
 	return result > 0;

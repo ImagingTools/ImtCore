@@ -105,34 +105,6 @@ void CLdapUserCollectionJoinerComp::OnUpdate(
 			m_userCollectionCompPtr->RemoveElement(userUuid);
 		}
 	}
-
-	for (const QByteArray& userId : actualLdapUserIds){
-		QByteArray objectId = GetUserUuidByLogin(userId);
-		if (objectId.isEmpty()){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_ldapUserCollectionCompPtr->GetObjectData(userId, dataPtr)){
-				const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
-				if (userInfoPtr != nullptr){
-					// m_userCollectionCompPtr->InsertNewObject("", "", "", userInfoPtr);
-				}
-			}
-		}
-		else{
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_userCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-				imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
-				if (userInfoPtr != nullptr){
-					imtauth::IUserInfo::SystemInfo systemInfo;
-					systemInfo.systemId = *m_ldapSystemIdAttrPtr;
-					systemInfo.systemName = *m_ldapSystemNameAttrPtr;
-
-					if (userInfoPtr->AddToSystem(systemInfo)){
-						// m_userCollectionCompPtr->SetObjectData(objectId, *userInfoPtr);
-					}
-				}
-			}
-		}
-	}
 }
 
 
