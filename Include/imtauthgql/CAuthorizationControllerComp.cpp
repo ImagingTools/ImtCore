@@ -93,8 +93,10 @@ sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CAuthorizationControlle
 	payload.SetUserId(objectId);
 	payload.SetSystemId(systemId);
 
-	imtauth::IUserInfo::FeatureIds permissionIds = userInfo.GetPermissions(productId);
-	payload.SetPermissions(permissionIds.join(';'));
+	if (!productId.isEmpty()){
+		imtauth::IUserInfo::FeatureIds permissionIds = userInfo.GetPermissions(productId);
+		payload.SetPermissions(permissionIds.join(';'));
+	}
 
 	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr;
 	sessionInfoPtr.SetPtr(new imtauth::CSessionInfo());

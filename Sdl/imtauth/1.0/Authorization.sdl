@@ -16,7 +16,7 @@ type AuthorizationPayload {
 input AuthorizationInput {
 	Login: String!
 	Password: String!
-	ProductId: ID!
+	ProductId: ID
 }
 
 type UserMode {
