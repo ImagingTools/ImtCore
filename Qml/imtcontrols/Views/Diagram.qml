@@ -546,7 +546,7 @@ Item {
 								closeTooltip();
 								let point = mapToItem(null, barChart.x - barChart.width/2, barChart.height - barChart.positiveBarHeight);
 								if(!diagram.bigIndicatorItem){
-									ModalDialogManager.openDialog(diagram.bigIndicatorComp, { "barY": point.y,"barX" : point.x , "rootItem" : barChart, "text": shownVal});
+									ModalDialogManager.openDialog(diagram.bigIndicatorComp, {"diagramItem": diagram, "barY": point.y,"barX" : point.x , "rootItem" : barChart, "text": shownVal});
 								}
 								else {
 									diagram.bigIndicatorItem.y = point.y
@@ -693,69 +693,10 @@ Item {
 	Component{
 		id: bigIndicatorComponent;
 
-		Rectangle{
-			id: bigIndicatorContainer;
-
-			width: 0;
-			height: width * coeff;
-			color: "transparent";
-
-			property Item root: null;
-			property Item rootItem: null;
-			property Item diagramItem: null;
-			property bool hiddenBackground: true;
-			property bool noMouseArea: true;
-			property real barX: 0;
-			property real barY: 0;
-			property string text: "";
-
-			property real coeff: 600/468;
-			property real textVerticalOffset: -((1-52/134) * iconBigIndicator.height - iconBigIndicator.height/2) ;
-			property int mainMarginVertical: diagram.bigIndicatorMargin;
-			property int textMargin: 3*Style.size_mainMargin;
-
-			Component.onCompleted: {
-				Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
-				diagram.bigIndicatorItem = bigIndicatorContainer;
-				if(rootItem){
-					x = barX - width/2;
-					y = barY - height - mainMarginVertical;
-				}
-			}
-
-			Component.onDestruction: {
-				Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged);
-			}
-
-			function onAppSizeChanged(parameters){
-				ModalDialogManager.closeByComp(diagram.bigIndicatorComp)
-				diagram.bigIndicatorItem = null;
-				diagram.selectedIndex = -1;
-			}
-
-			onRootItemChanged: {
-				if(rootItem){
-					//console.log("ROOT_ITEM_CHANGED", barX, width)
-					x = barX - width/2;
-					y = barY - height - mainMarginVertical;
-				}
-			}
-			onBarXChanged: {
-				x = barX - width/2;
-			}
-
-
-			onWidthChanged: {
-				x = barX - width/2;
-			}
-
-			onBarYChanged: {
-				y = barY - height - mainMarginVertical;
-			}
-
-			onHeightChanged: {
-				y = barY - height - mainMarginVertical;
-			}
+		DiagramIndicator{
+			textVerticalOffset: -((1-52/134) * iconBigIndicator.height - iconBigIndicator.height/2) ;
+			coeff: 600/468;
+			mainMarginVertical: diagram.bigIndicatorMargin;
 
 			Image{
 				id: iconBigIndicator;
@@ -773,25 +714,8 @@ Item {
 
 				source: "/" +  Style.getIconPath("Icons/BarInfoChr", Icon.State.On, Icon.Mode.Normal);
 			}
-			Text{
-				id: bigIndicatorText;
-
-				anchors.horizontalCenter: parent.horizontalCenter;
-				anchors.verticalCenter:  parent.verticalCenter;
-				anchors.verticalCenterOffset: bigIndicatorContainer.textVerticalOffset;
-
-				font.family: Style.fontFamily;
-				font.pixelSize: Style.fontSize_subtitle;
-				color: Style.color_first;
-				text: bigIndicatorContainer.text;
-				onWidthChanged: {
-					if(width + bigIndicatorContainer.textMargin > bigIndicatorContainer.width){
-						bigIndicatorContainer.width = width + bigIndicatorContainer.textMargin;
-					}
-				}
-			}
-
 		}
+
 	}
 
 }
