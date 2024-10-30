@@ -8,6 +8,10 @@ SUBDIRS += imtdesign
 imtdesign.file = ../../Include/imtdesign/QMake/imtdesign.pro
 imtdesign.depends = imtbase
 
+SUBDIRS += imtcol
+imtcol.file = ../../Include/imtcol/QMake/imtcol.pro
+imtcol.depends = imtbase imtbasesdl
+
 SUBDIRS += imtfile
 imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
 
@@ -134,6 +138,7 @@ imtgql.file = ../../Include/imtgql/QMake/imtgql.pro
 
 SUBDIRS += imtservergql
 imtservergql.file = ../../Include/imtservergql/QMake/imtservergql.pro
+imtservergql.depends = imtgql imtcol
 
 SUBDIRS += imtdb
 imtdb.file = ../../Include/imtdb/QMake/imtdb.pro

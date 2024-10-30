@@ -6,7 +6,7 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 QT += qml
 
-LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtbase -limtlic -limtauthgql -limtauth -limtgql -limtdb -limtguigql -liauth -limtqml -limtrest -limtauthsdl -limtbasesdl -limtservergql
+LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtbase -limtlic -limtauthgql -limtauth -limtgql -limtdb -limtguigql -liauth -limtqml -limtrest -limtauthsdl -limtbasesdl -limtservergql -limtcol -limtbasesdl
 
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
 include($(ACFCONFIGDIR)/QMake/AcfStd.pri)

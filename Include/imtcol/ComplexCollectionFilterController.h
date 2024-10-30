@@ -6,7 +6,7 @@
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
 
-namespace imtbasesdl
+namespace imtcol
 {
 
 

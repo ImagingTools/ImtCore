@@ -1,4 +1,4 @@
-#include <imtbase/ComplexCollectionFilterController.h>
+#include <imtcol/ComplexCollectionFilterController.h>
 
 
 
@@ -6,7 +6,7 @@
 #include <imtbase/CTimeFilterParam.h>
 
 
-namespace imtbasesdl
+namespace imtcol
 {
 
 
@@ -225,6 +225,6 @@ bool ComplexCollectionFilterRepresentationToModel(
 }
 
 
-} // namespace imtbasesdl
+} // namespace imtcol
 
 
