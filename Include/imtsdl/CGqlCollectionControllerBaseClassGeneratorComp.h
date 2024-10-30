@@ -76,6 +76,8 @@ private:
 	/**
 		Creates method implementations for all document's (and subtype's) operation types
 	 */
+	void AddOperationRequestMethodImplForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType);
+	void AddOperationRequestCheck(QTextStream& stream, const CSdlDocumentType& sdlDocumentType);
 	void AddCollectionMethodsImplForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType);
 	void AddImplCodeForRequests(QTextStream& stream, CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, uint hIndents = 0);
 	void AddImplCodeForRequest(QTextStream& stream, const ImplGenerationInfo& sdlRequest, CSdlDocumentType::OperationType operationType, uint hIndents = 0);

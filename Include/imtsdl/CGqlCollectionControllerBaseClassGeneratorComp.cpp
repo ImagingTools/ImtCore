@@ -329,6 +329,10 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	ifStream << QStringLiteral("// reimplemented (::imtservergql::CObjectCollectionControllerCompBase)");
 	FeedStream(ifStream, 1, false);
 
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("virtual bool GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const override;");
+	FeedStream(ifStream, 1, false);
+
 	if (operationsList.contains(CSdlDocumentType::OT_LIST)){
 		FeedStreamHorizontally(ifStream, 1);
 		ifStream << QStringLiteral("virtual bool SetupGqlItem(const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
@@ -399,6 +403,8 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(cons
 		ifStream << '{';
 		FeedStream(ifStream, 3, false);
 	}
+
+	AddOperationRequestMethodImplForDocument(ifStream, sdlDocumentType);
 
 	AddCollectionMethodsImplForDocument(ifStream, sdlDocumentType);
 
@@ -563,6 +569,75 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 	}
 	else {
 		I_CRITICAL();
+	}
+}
+
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodImplForDocument(QTextStream& stream, const CSdlDocumentType& sdlDocumentType)
+{
+	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
+	stream << QStringLiteral("bool ");
+	stream << className << ':' << ':';
+	stream << QStringLiteral("GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlObject& /*gqlObject*/, QString& errorMessage, int& operationType) const");
+	FeedStream(stream, 1, false);
+
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("const QByteArray commandId = gqlRequest.GetCommandId();");
+	FeedStream(stream, 2, false);
+
+	AddOperationRequestCheck(stream, sdlDocumentType);
+
+	SdlDocumentTypeList subtypes = sdlDocumentType.GetSubtypes();
+	for (const CSdlDocumentType& documentSubtype: subtypes){
+		AddOperationRequestCheck(stream, documentSubtype);
+	}
+
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	stream << '}';
+	FeedStream(stream, 3, false);
+}
+
+
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestCheck(QTextStream& stream, const CSdlDocumentType& sdlDocumentType)
+{
+	static QMap<CSdlDocumentType::OperationType, QString> operationsALiasList({
+						std::make_pair(CSdlDocumentType::OT_GET, QStringLiteral("OT_GET")),
+						std::make_pair(CSdlDocumentType::OT_INSERT, QStringLiteral("OT_NEW")),
+						std::make_pair(CSdlDocumentType::OT_UPDATE, QStringLiteral("OT_UPDATE")),
+						std::make_pair(CSdlDocumentType::OT_LIST, QStringLiteral("OT_LIST"))
+	});
+
+	QMap<CSdlDocumentType::OperationType, CSdlRequest> operations = sdlDocumentType.GetOperationsList();
+
+	for (auto operationsIter = operations.cbegin(); operationsIter != operations.cend(); ++operationsIter){
+		const QString requestClassName = operationsIter->GetName() + QStringLiteral("GqlRequest");
+
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("if (commandId == C");
+		stream << requestClassName;
+		stream << QStringLiteral("::GetCommandId()){");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("operationType =  ");
+		stream << operationsALiasList[operationsIter.key()];
+		stream << ';';
+		FeedStream(stream, 2, false);
+
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("return true;");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 2, false);
 	}
 }
 
