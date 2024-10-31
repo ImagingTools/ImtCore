@@ -102,13 +102,17 @@ class Text extends Item {
         } else {
             this.impl.innerText = this.getPropertyValue('text').replaceAll('<br>', '\r')
         }
-        
-
 
         this.getProperty('width').setAuto(textMetrics.width)
         this.getProperty('height').setAuto(textMetrics.height)
-        this.getProperty('contentWidth').reset(textMetrics.width)
-        this.getProperty('contentHeight').reset(textMetrics.height)
+        
+        if(this.getProperty('width').auto){
+            this.getProperty('contentWidth').reset(Math.max(textMetrics.width, this.impl.scrollWidth))
+            this.getProperty('contentHeight').reset(Math.max(textMetrics.height, this.impl.scrollHeight))
+        } else {
+            this.getProperty('contentWidth').reset(textMetrics.width)
+            this.getProperty('contentHeight').reset(textMetrics.height)
+        }
     }
 
     $lineHeightChanged(){

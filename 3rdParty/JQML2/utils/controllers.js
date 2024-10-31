@@ -785,6 +785,10 @@ class TextFontController {
         this.container.style.display = 'inline'
         this.container.style.opacity = 0
         this.container.style.lineHeight = 'normal'
+        
+        this.content = document.createElement('span')
+        this.container.appendChild(this.content)
+
         document.body.appendChild(this.container)
     }
 
@@ -831,12 +835,12 @@ class TextFontController {
         }
 
         if(isHTML){
-            this.container.innerHTML = text
+            this.content.innerHTML = text
         } else {
-            this.container.innerText = text
+            this.content.innerText = text
         }
         
-        let rect = this.container.getBoundingClientRect()
+        let rect = this.content.getBoundingClientRect()
         rect.isHTML = isHTML
         return rect
     }
