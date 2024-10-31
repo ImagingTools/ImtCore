@@ -24,6 +24,8 @@ Rectangle{
 	property int mainMarginVertical: 40;
 	property int textMargin: 3*Style.size_mainMargin;
 
+	property alias textObj: bigIndicatorText;
+
 	Component.onCompleted: {
 		Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
 		if(rootItem){
