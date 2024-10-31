@@ -2,6 +2,7 @@ module imtcontrols
 
 singleton Events 1.0 ./Base/Events.qml
 singleton Enums 1.0 ./Base/Enums.qml
+singleton Functions 1.0 ./Base/Functions.qml
 
 Icon 1.0 ./Base/Icon.js
 ButtonType 1.0 ./Base/ButtonType.js

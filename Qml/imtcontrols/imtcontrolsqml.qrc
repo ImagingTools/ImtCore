@@ -11,6 +11,7 @@
         <file alias="imtcontrols/Base/Decorators.qml">Base/Decorators.qml</file>
         <file alias="imtcontrols/Base/Events.qml">Base/Events.qml</file>
         <file alias="imtcontrols/Base/Enums.qml">Base/Enums.qml</file>
+		<file alias="imtcontrols/Base/Functions.qml">Base/Functions.qml</file>
         <file alias="imtcontrols/Base/ButtonType.js">Base/ButtonType.js</file>
         <file alias="imtcontrols/Base/IconTest.qml">Base/IconTest.qml</file>
         <file alias="imtcontrols/Base/Icon.js">Base/Icon.js</file>
