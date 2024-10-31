@@ -32,9 +32,20 @@ class Alias extends Property {
         this.__updating = true
         Property.queueLink.push(this)
         let value = this.__value
+        let leftValue = this.__leftValue
+        let rightValue = this.__rightValue
         try {
-            value = this.__getter()
-            if(this.__compute) value = this.__compute()
+            rightValue = this.__getter()
+            if(this.__rightValue !== rightValue){
+                this.__rightValue = rightValue
+                value = rightValue
+            }
+
+            if(this.__compute) leftValue = this.__compute()
+            if(this.__leftValue !== leftValue){
+                this.__leftValue = leftValue
+                value = leftValue
+            }
         } catch (error) {
             
         } finally {
