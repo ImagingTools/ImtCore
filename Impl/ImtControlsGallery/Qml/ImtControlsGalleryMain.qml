@@ -10,7 +10,6 @@ ApplicationMain{
     Component {
         id: topPanelDecoratorCustom
         TopPanelDecoratorCustom {
-
         }
     }
 
@@ -22,7 +21,7 @@ ApplicationMain{
         id: decoratorsQt
     }
 
-    onServerReadyChanged: {
+    Component.onCompleted: {
         firstModelsInit();
     }
 
