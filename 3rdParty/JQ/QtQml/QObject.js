@@ -17,12 +17,19 @@ class QObject extends BaseObject {
 
     static create(parent, properies=[], ...args){
         let proxy = super.create(parent, properies, ...args)
+        
         proxy.__properties = properies
         proxy.__uid = this.uid++
-        proxy.setParent(parent)
+
+        if(parent) {
+            parent.__children.push(proxy)
+            proxy.setParent(parent)
+        }
 
         return proxy
     }
+
+    __children = []
 
     __toPrimitive(hint){
         return this.__self.constructor.name + this.__uid

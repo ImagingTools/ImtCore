@@ -1,6 +1,7 @@
 const MouseController = require('./MouseController')
 const ImageController = require('./ImageController')
 const TextController = require('./TextController')
+const MemoryController = require('./MemoryController')
 
 module.exports = {
     root: null,
@@ -136,14 +137,13 @@ module.exports = {
     ImageController: ImageController,
     MouseController: MouseController,
     TextController: TextController,
+    MemoryController: MemoryController,
 
     objectsAwaitingUpdate: new Set(),
     updateLayers: [],
 
     focusTree: [],
     setFocusTree(tree){
-        this.root.__setFocusTree(tree)
-
         let unionTree = []
         while(this.focusTree.length || tree.length){
             let origin = this.focusTree.pop()
@@ -157,7 +157,8 @@ module.exports = {
                 unionTree.unshift(origin)
             }
         }
-
+        
+        this.root.__setFocusTree(unionTree)
         this.focusTree = unionTree
     },
 

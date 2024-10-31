@@ -198,6 +198,36 @@ class TextInput extends Item {
         }
     }
 
+    __updateGeometry(){
+        // let text = this.text
+        // if(text){
+        //     if(text[text.length-1] === '\n') text += '.'
+        // } else {
+        //     text = '.'
+        // }
+
+        // let textMetrics = JQApplication.TextController.measureText(text, this.font, this.__getObject('width').__auto ? 0 : this.width, this.wrapMode, 0)
+        
+        // // let textMetrics = this.__impl.getBoundingClientRect()
+
+        // this.__getObject('width').__setAuto(this.__impl.scrollWidth)
+        // this.__getObject('height').__setAuto(this.__impl.scrollHeight)
+
+        // this.contentWidth = textMetrics.width
+        // this.contentHeight = textMetrics.height
+        // this.paintedWidth = textMetrics.width
+        // this.paintedHeight = textMetrics.height
+    }
+
+    onFocusChanged(){
+        super.onFocusChanged()
+        if(this.focus){
+            if(!(this.parent instanceof JQModules.QtQuick.FocusScope)){
+                this.activeFocus = true
+            }
+        }
+    }
+
     onHorizontalAlignmentChanged(){
         switch(this.horizontalAlignment){
             case TextInput.AlignLeft: {
@@ -286,6 +316,19 @@ class TextInput extends Item {
         } else {
             this.__impl.innerText = this.text
         }
+
+        this.__updateGeometry()
+    }
+
+    onFontChanged(){
+        this.__setDOMStyle({
+            fontWeight: this.font.bold == true ? 'bold' : 'normal',
+            fontSize: this.font.pixelSize+'px',
+            fontFamily: `'${this.font.family}'`,
+            textDecoration: this.font.underline == true ? 'underline' : 'unset',
+        })
+
+        this.__updateGeometry()
     }
 
     clear(){
@@ -363,22 +406,6 @@ class TextInput extends Item {
     undo(){
 
     }
-
-    // __onMouseMove(){
-    //     if(!this.enabled || !this.visible) return
-
-    //     let selection = document.getSelection()
-
-    //     if(selection.rangeCount && this.text !== ''){
-    //         let range = selection.getRangeAt(0)
-
-    //         this.selectionStart = range.startOffset
-    //         this.selectionEnd = range.endOffset
-    //     } else {
-    //         this.selectionStart = 0
-    //         this.selectionEnd = 0
-    //     }
-    // }
 
     __destroy(){
         JQApplication.MouseController.remove(this)

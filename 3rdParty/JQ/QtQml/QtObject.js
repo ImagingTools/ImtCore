@@ -126,14 +126,15 @@ class QtObject extends QObject {
     }
 
     __destroy(){
+        if(this.__destroyed) return
+        JQApplication.MemoryController.delete(this)
         super.__destroy()
+
         this.blockSignals(true)
 
-        let data = this.data.slice()
-        for(let i = data.length-1; i >= 0; i--){
-            if(data[i] instanceof QtObject){
-                data[i].__destroy()
-            }
+        if(this.__children)
+        for(let i = this.__children.length-1; i >= 0; i--){
+            this.__children[i].__destroy()
         }
 
         this.blockSignals(false)

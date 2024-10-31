@@ -6,7 +6,7 @@
   "scripts": {
     "build-core": "webpack --mode production --config webpack.config.js",
     "build-core-dev": "webpack --mode development --config webpack.config.js",
-    "compile": "webpack --mode development --config webpack.config.js && node ./compiler/compiler.js"
+    "compile": "node ./compiler/compiler.js"
   },
   "author": "Artur Menshikov",
   "license": "ISC",

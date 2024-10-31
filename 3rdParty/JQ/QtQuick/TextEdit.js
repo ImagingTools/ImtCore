@@ -84,12 +84,27 @@ class TextEdit extends Item {
 
     __createImpl(){
         let dom = this.__getDOM()
-        let impl = document.createElement('div')
+        let impl = document.createElement('textarea')
         impl.classList.add('impl')
-        dom.appendChild(impl)
         this.__impl = impl
 
-        impl.setAttribute('contenteditable', true)
+        this.__setImplStyle({
+            outline: 'none',
+            border: 'none',
+            background: 'none',
+            width: '100%',
+            maxHeight: '100%',
+            height: '100%',
+            font: 'inherit',
+            color: 'inherit',
+            zIndex: 'inherit',
+            resize: 'none',
+            cursor: 'unset',
+        })
+        
+        impl.setAttribute('spellcheck', "false")
+        impl.setAttribute('rows', "1")
+        dom.appendChild(impl)
 
         impl.onfocus = ()=>{
             this.forceActiveFocus()
@@ -97,81 +112,10 @@ class TextEdit extends Item {
 
         impl.onblur = ()=>{
             this.activeFocus = false
-            this.focus = false
         }
 
-        impl.onkeydown = (e)=>{
-            let selection = document.getSelection()
-
-            if(selection.rangeCount){
-                let range = selection.getRangeAt(0)
-
-                this.selectionStart = range.startOffset
-                this.selectionEnd = range.endOffset
-            } else {
-                this.selectionStart = 0
-                this.selectionEnd = 0
-            }
-
-            if(e.keyCode === QtEnums.Key_C && e.ctrlKey){
-                e.preventDefault()
-                this.copy()
-            } else if(e.keyCode === QtEnums.Key_V && e.ctrlKey){
-                e.preventDefault()
-                this.paste()
-            } else if(e.keyCode === QtEnums.Key_X && e.ctrlKey){
-                e.preventDefault()
-                this.cut()
-            } else if(e.code === QtEnums.Key_Enter){
-                // e.preventDefault()
-                // this.text += '\n\r'
-            }
-        }
         impl.oninput = (e)=>{
-            let selection = document.getSelection()
-            selection.removeAllRanges()
-
-            let buff = this.text.split('') 
-            switch(e.inputType){
-                case 'insertText': {
-                    buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart, e.data)
-                    this.text = buff.join('')
-                    this.select(this.selectionEnd+1, this.selectionEnd+1)
-                    break
-                }
-                case 'insertFromPaste': {
-                    this.paste()
-                    break
-                }
-                case 'deleteByCut': {
-                    this.cut()
-                    break
-                }
-                case 'deleteContentBackward': {
-                    let data = []
-                    if(this.selectionStart === this.selectionEnd){
-                        data = buff.splice(this.selectionStart-1, this.selectionEnd-(this.selectionStart-1))
-                    } else {
-                        data = buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart)
-                    }
-                    this.text = buff.join('')
-                    this.select(this.selectionEnd-data.length, this.selectionEnd-data.length)
-                    break
-                }
-                case 'deleteContentForward': {
-                    let data = []
-                    if(this.selectionStart === this.selectionEnd){
-                        data = buff.splice(this.selectionStart, this.selectionEnd+1-this.selectionStart)
-                    } else {
-                        data = buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart)
-                    }
-                    this.text = buff.join('')
-                    let offset = data.length > 1 ? data.length : 0
-                    this.select(this.selectionEnd-offset, this.selectionEnd-offset)
-                    break
-                }
-            }
-
+            this.text = impl.value
         }
 
         return impl
@@ -181,6 +125,20 @@ class TextEdit extends Item {
         if(this.__impl) {
             for(let name in style){
                 this.__impl.style[name] = style[name]
+            }
+        }
+    }
+
+    __complete(){
+        super.__complete()
+        this.__updateGeometry()
+    }
+
+    onFocusChanged(){
+        super.onFocusChanged()
+        if(this.focus){
+            if(!(this.parent instanceof JQModules.QtQuick.FocusScope)){
+                this.activeFocus = true
             }
         }
     }
@@ -243,31 +201,53 @@ class TextEdit extends Item {
         }
     }
 
-    onFocusChanged(){
-        if(this.focus){
-            this.__impl.focus()
+    onActiveFocusChanged(){
+        if(!this.activeFocus){
+            this.__impl.blur()
         }
     }
 
-    onActiveFocusChanged(){
-        if(this.activeFocus){
-            this.__impl.focus()
-            this.focus = true
+    __updateGeometry(){
+        let text = this.text
+        if(text){
+            if(text[text.length-1] === '\n') text += '.'
+        } else {
+            text = '.'
         }
+
+        let textMetrics = JQApplication.TextController.measureText(text, this.font, this.__getObject('width').__auto ? 0 : this.width, this.wrapMode, 0)
+        
+        // let textMetrics = this.__impl.getBoundingClientRect()
+
+        this.__getObject('width').__setAuto(this.__impl.scrollWidth)
+        this.__getObject('height').__setAuto(this.__impl.scrollHeight)
+
+        this.contentWidth = textMetrics.width
+        this.contentHeight = textMetrics.height
+        this.paintedWidth = textMetrics.width
+        this.paintedHeight = textMetrics.height
+    }
+
+    onVisibleChanged(){
+        super.onVisibleChanged()
+        this.__updateGeometry()
     }
 
     onTextChanged(){
-        this.__impl.innerHTML = this.text
+        this.__impl.value = this.text
 
-        let rect = this.__impl.getBoundingClientRect()
+        this.__updateGeometry()
+    }
 
-        this.__getObject('width').__setAuto(rect.width)
-        this.__getObject('height').__setAuto(rect.height)
+    onFontChanged(){
+        this.__setDOMStyle({
+            fontWeight: this.font.bold == true ? 'bold' : 'normal',
+            fontSize: this.font.pixelSize+'px',
+            fontFamily: `'${this.font.family}'`,
+            textDecoration: this.font.underline == true ? 'underline' : 'unset',
+        })
 
-        this.contentWidth = rect.width
-        this.contentHeight = rect.height
-        this.paintedWidth = rect.width
-        this.paintedHeight = rect.height
+        this.__updateGeometry()
     }
 
     clear(){
