@@ -61,9 +61,6 @@ public:
 	virtual QByteArray GetToken(const QByteArray& userId) const override;
 
 private:
-	bool RetrieveUserInfo(const QByteArray& userObjectId);
-
-private:
 	QByteArray m_loggedUserId;
 	QByteArray m_loggedUserPassword;
 	QByteArray m_loggedUserToken;

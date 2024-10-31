@@ -1,32 +1,14 @@
 #include <imtqml/CQuickApplicationComp.h>
 
+
 // Qt includes
 #include <QtCore/QString>
 #include <QtCore/QTimer>
-#include <QtCore/QtGlobal>
-#include <QtGui/QIcon>
-#include <QtQml/QQmlEngine>
 #include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QJSEngine>
-#include <QtQml/QQmlPropertyMap>
-#include <QtQuick/QQuickView>
-#include <QtQml/QQmlContext>
-#include <QtQuickWidgets/QQuickWidget>
-
-#if defined (Q_OS_WIN)
-#if QT_VERSION >= 0x050500 && QT_VERSION < 0x060000
-#include <QtPlatformHeaders/QWindowsWindowFunctions>
-#endif
-#endif
+#include <QtQuick/QQuickWindow>
 
 // ACF includes
-#include <istd/CSystem.h>
 #include <istd/TDelPtr.h>
-#include <iqtgui/CCommandTools.h>
-#include <iqtgui/CHierarchicalCommand.h>
-
-// ImtCore includes
-#include <imtqml/CClientUserContextComp.h>
 
 
 #if defined(Q_OS_MACX) && (QT_VERSION >= 0x040000) && (QT_VERSION < 0x050000)
@@ -95,24 +77,11 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 			engine->addImportPath("qrc:/");
 			engine->addImportPath("qrc:/qml");
 
-			QQmlContext* roolContextPtr = engine->rootContext();
-			if (roolContextPtr != nullptr){
-				if (m_contextCompPtr.IsValid()){
-					imtqml::CClientUserContextComp* contextPtr = dynamic_cast<imtqml::CClientUserContextComp*>(m_contextCompPtr.GetPtr());
-					if (contextPtr != nullptr){
-						contextPtr->SetQmlEngine(engine.GetPtr());
-
-						roolContextPtr->setContextProperty("context", contextPtr);
-					}
-				}
-			}
-
 			QObject::connect(engine.GetPtr(), &QQmlApplicationEngine::quit, &QGuiApplication::quit);
 			engine->load(QUrl("qrc:/qml/MainWindow.qml"));
 
-			imtqml::IQuickObject *quickObjectPtr = m_mainQuickCompPtr.GetPtr();
+			imtqml::IQuickObject* quickObjectPtr = m_mainQuickCompPtr.GetPtr();
 			if (quickObjectPtr != nullptr){
-
 				QList<QObject*> rootObjects = engine->rootObjects();
 				if (!rootObjects.isEmpty()){
 					QObject* root = rootObjects[0];

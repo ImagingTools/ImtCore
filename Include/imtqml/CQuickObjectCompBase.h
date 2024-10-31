@@ -5,12 +5,15 @@
 #include <QtQuick/QQuickItem>
 
 // ACF includes
+#include <ibase/IApplicationInfo.h>
 #include <icomp/CComponentBase.h>
 #include <iprm/IEnableableParam.h>
 #include <imod/TModelWrap.h>
 
 // ImtCore includes
+#include <imtbase/IUrlParam.h>
 #include <imtbase/CTreeItemModel.h>
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtqml/IQuickObject.h>
 
 
@@ -38,6 +41,8 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(QuickItemCreated, istd::IChangeable, ExtractEnableableParam);
 		I_ASSIGN(m_pathToQmlAttrPtr, "QmlFilePath", "This path used for load QML file", true, GetPathToQml());
 		I_ASSIGN(m_baseUrlAttrPtr, "BaseUrl", "BaseUrl for AccessManager", false, "");
+		I_ASSIGN(m_urlParamPtr, "BaseUrlParam", "Server URL param", false, "BaseUrlParam");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", true, "ApplicationInfo");
 		I_ASSIGN_MULTI_0(m_modelIdsAttrPtr, "ModelIdsAttr", "If enabled, this Id's used for register models", false);
 		I_ASSIGN_MULTI_0(m_modelQueriesAttrPtr, "ModelQueries", "If enabled, this Queries used for get datas", false);
 	I_END_COMPONENT;
@@ -45,13 +50,14 @@ public:
 	CQuickObjectCompBase();
 
 	static QString GetPathToQml();
+	void OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IUrlParam* urlParamPtr);
+	virtual void SetBaseUrl(QQmlEngine& qmlEngine) const;
 
 	// reimplemented (imtgui::IQuickObject)
 	virtual bool IsItemCreated() const override;
 	virtual bool CreateQuickItem(QQuickItem* parentPtr) override;
 	virtual bool DestroyQuickItem() override;
 	virtual QQuickItem* GetQuickItem() const override;
-	virtual void SetBaseUrl(const QString& baseUrl) const override;
 	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
 
 protected:
@@ -79,6 +85,7 @@ protected:
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 public Q_SLOTS:
 	void OnModelNeedsReload(imtbase::CTreeItemModel *itemModelPtr = nullptr);
@@ -121,6 +128,10 @@ protected:
 	I_ATTR(QString, m_baseUrlAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelIdsAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelQueriesAttrPtr);
+	I_REF(imtbase::IUrlParam, m_urlParamPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
+
+	imtbase::TModelUpdateBinder<imtbase::IUrlParam, CQuickObjectCompBase> m_urlParamObserver;
 };
 
 

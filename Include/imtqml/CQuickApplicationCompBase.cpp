@@ -5,12 +5,8 @@
 #include <QtCore/QString>
 #include <QtCore/QTimer>
 #include <QtCore/QEventLoop>
-#include <QtCore/QTextStream>
-#include <QtCore/QFile>
 #include <QtGui/QIcon>
 #include <QtGui/QGuiApplication>
-
-#include <QTranslator>
 
 
 namespace imtqml
@@ -19,7 +15,6 @@ namespace imtqml
 
 static int s_argc = 0;
 
-QTranslator m_translatorTest;
 
 CQuickApplicationCompBase::CQuickApplicationCompBase()
 :	m_useSplashScreen(false)

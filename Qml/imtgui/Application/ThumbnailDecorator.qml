@@ -54,15 +54,6 @@ Rectangle {
         clearModels();
         Events.sendEvent("DrawerSetVisible", false);
         drawingContainer.content = null;
-// soon...
-//        let exists = mainDocumentManager.dirtyDocumentsExists();
-//        if (exists){
-//            ModalDialogManager.openDialog(saveDialog, {});
-//        }
-//        else{
-//            clearModels();
-//            authorizationPage.logout();
-//        }
     }
 
     function clearModels(){

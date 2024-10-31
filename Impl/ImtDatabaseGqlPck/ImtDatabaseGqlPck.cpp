@@ -19,16 +19,6 @@ I_EXPORT_COMPONENT(
 			"GraphQL-structure base controller",
 			"GQL GraphQL Structure Controller");
 
-I_EXPORT_COMPONENT(
-			RemoteDatabaseServerConnection,
-			"Remote database server connection",
-			"Remote Database Server Connection");
-
-I_EXPORT_COMPONENT(
-			DatabaseServerConnectionController,
-			"Database server connection controller",
-			"Database Server Connection Controller");
-
 
 } // namespace ImtDatabaseGqlPck
 

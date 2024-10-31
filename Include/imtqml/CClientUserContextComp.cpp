@@ -1,6 +1,10 @@
 #include <imtqml/CClientUserContextComp.h>
 
 
+// Qt includes
+#include <QtQml/QQmlContext>
+
+
 namespace imtqml
 {
 
@@ -8,7 +12,52 @@ namespace imtqml
 // public methods
 
 CClientUserContextComp::CClientUserContextComp()
+	:m_qmlEngine(nullptr),
+	m_languageParamObserver(*this),
+	m_quickObjectCreatedObserver(*this)
 {
+}
+
+
+void CClientUserContextComp::OnLanguageChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::ISelectionParam* objectPtr)
+{
+	if (!m_translationManagerCompPtr.IsValid()){
+		return;
+	}
+
+	if (objectPtr != nullptr){
+		int languageIndex = iprm::FindOptionIndexById(m_language.toUtf8(), *objectPtr->GetSelectionConstraints());
+		if (languageIndex >= 0){
+			m_translationManagerCompPtr->SwitchLanguage(languageIndex);
+
+			if (m_qmlEngine != nullptr){
+				m_qmlEngine->retranslate();
+			}
+		}
+	}
+}
+
+
+void CClientUserContextComp::OnQuickObjectCreatedChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IEnableableParam* objectPtr)
+{
+	if (!m_quickObjectCompPtr.IsValid()){
+		return;
+	}
+
+	if (objectPtr != nullptr){
+		bool isEnabled = objectPtr->IsEnabled();
+		if (isEnabled){
+			QQuickItem* quickObjectPtr = m_quickObjectCompPtr->GetQuickItem();
+			if (quickObjectPtr != nullptr){
+				m_qmlEngine = qmlEngine(quickObjectPtr);
+
+				QQmlContext* roolContextPtr = m_qmlEngine->rootContext();
+				if (roolContextPtr != nullptr){
+					roolContextPtr->setContextProperty("context", this);
+				}
+			}
+		}
+	}
 }
 
 
@@ -25,26 +74,32 @@ void CClientUserContextComp::OnComponentCreated()
 			m_language = optionsList.GetOptionId(languageIndex);
 		}
 	}
+
+	if (m_languageParamPtr.IsValid()){
+		m_languageParamObserver.RegisterObject(m_languageParamPtr.GetPtr(), &CClientUserContextComp::OnLanguageChanged);
+	}
+
+	if (m_quickObjectCreatedCompPtr.IsValid()){
+		m_quickObjectCreatedObserver.RegisterObject(m_quickObjectCreatedCompPtr.GetPtr(), &CClientUserContextComp::OnQuickObjectCreatedChanged);
+	}
+}
+
+
+void CClientUserContextComp::OnComponentDestroyed()
+{
+	m_languageParamObserver.UnregisterAllObjects();
+	m_quickObjectCreatedObserver.UnregisterAllObjects();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 
 void CClientUserContextComp::SetLanguage(QString translation)
 {
-	if (m_translationManagerCompPtr.IsValid()){
-		if (!translation.isEmpty()){
-			int languageIndex = iprm::FindOptionIndexById(translation.toUtf8(), m_translationManagerCompPtr->GetLanguagesInfo());
-			if (languageIndex >= 0){
-				m_translationManagerCompPtr->SwitchLanguage(languageIndex);
+	if (m_language != translation){
+		m_language = translation;
 
-				if (m_enginePtr != nullptr){
-					m_enginePtr->retranslate();
-				}
-
-				m_language = translation;
-
-				Q_EMIT LanguageChanged();
-			}
-		}
+		Q_EMIT LanguageChanged();
 	}
 }
 
@@ -52,14 +107,6 @@ void CClientUserContextComp::SetLanguage(QString translation)
 QString CClientUserContextComp::GetLanguage() const
 {
 	return m_language;
-}
-
-
-void CClientUserContextComp::SetQmlEngine(QQmlEngine *engine)
-{
-	if (engine != nullptr){
-		m_enginePtr = engine;
-	}
 }
 
 

@@ -6,6 +6,7 @@ import imtcontrols 1.0
 TextInputElementView {
     name: model.Name;
     text: model.Value;
+    controlWidth: 300;
     onEditingFinished: {
          model.Value = text;
     }

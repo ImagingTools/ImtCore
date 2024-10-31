@@ -5,6 +5,7 @@
 #include <QtCore/QtGlobal>
 #include <QtQuick/QQuickItem>
 
+
 // ACF includes
 #include <istd/IPolymorphic.h>
 
@@ -40,11 +41,6 @@ public:
 		Get access to internal QQuickItem object.
 	*/
 	virtual QQuickItem* GetQuickItem() const = 0;
-
-	/**
-		Set BaseUrl for NetworkAccessManager.
-	*/
-	virtual void SetBaseUrl(const QString& baseUrl) const = 0;
 
 	/**
 		Called on trying to close application.

@@ -34,24 +34,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ApplicationInfoRepresentation" PackageId="ImtCorePck" ComponentId="ApplicationInfoRepresentation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TextFileLog"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="ClientVersion"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Client Version"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Source" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Params/TextParamView.qml"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="ApplicationLocalization" PackageId="ImtClientVoce" ComponentId="ApplicationLocalization">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -74,8 +56,17 @@
             </Data>
         </Element>
         <Element Id="Context" PackageId="ImtQmlPck" ComponentId="ClientUserContext">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="LanguageParam" Type="Reference" ExportId="LanguageParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QuickObject" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MainWindow"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QuickObjectCreated" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MainWindow/QuickItemCreated"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationLocalization"/>
                     </AttributeInfo>
@@ -112,7 +103,13 @@
         <Element Id="MainWindow" PackageId="ImtQmlPck" ComponentId="QuickObject">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="BaseUrl" Type="String" ExportId="BaseUrl">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BaseUrlParam" Type="Reference" ExportId="BaseUrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="QmlFilePath" Type="String" ExportId="MainQmlPath">
@@ -124,34 +121,16 @@
         <Element Id="ObserverQml" PackageId="ImtQmlPck" ComponentId="ObserverQml">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationInfo"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ApplicationInfoRepresentation" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationInfoRepresentation"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LanguageParam" Type="Reference" ExportId="LanguageParam">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TextFileLog"/>
                     </AttributeInfo>
                     <AttributeInfo Id="QuickObject" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MainWindow"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Settings" Type="Reference" ExportId="Settings">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsRepresentationController" Type="Reference" ExportId="SettingsRepresentationController">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationLocalization"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -169,9 +148,6 @@
                                 <Value>ObserverQml</Value>
                             </Values>
                         </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Context" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Context"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MainQuickWindow" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MainWindow"/>

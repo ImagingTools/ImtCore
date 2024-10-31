@@ -13,7 +13,6 @@
 #include <imtqml/CClientUserContextComp.h>
 #include <imtqml/CPageGuiElementModelComp.h>
 #include <imtqml/CCommandsObserverQmlComp.h>
-#include <imtqml/CClientMainWindowQmlComp.h>
 #include <imtqml/CQmlObjectCollectionComp.h>
 #include <imtqml/CObjectViewDataProviderComp.h>
 
@@ -31,7 +30,6 @@ typedef imtqml::CGuiQuickWrapComp GuiQuickWrap;
 typedef imtqml::CObserverQmlComp ObserverQml;
 typedef imtqml::CClientUserContextComp ClientUserContext;
 typedef imtqml::CPageGuiElementModelComp PageGuiElementModel;
-typedef imtqml::CClientMainWindowQmlComp ClientMainWindowQml;
 typedef icomp::TModelCompWrap<imtqml::CCommandsObserverQmlComp> CommandsObserverQml;
 typedef imtqml::CQmlObjectCollectionComp QmlObjectCollection;
 

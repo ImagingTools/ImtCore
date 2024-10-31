@@ -8,7 +8,7 @@ QtObject {
 
     property SettingsProvider settingsProvider: null;
     property TreeItemModel languagesModel: TreeItemModel {}
-    property string currentLanguage: context.language;
+    property string currentLanguage//: context.language;
     property bool localizationChanged: false;
 
     Component.onDestruction: {

@@ -88,7 +88,7 @@ Item {
 
     Timer {
         id: timer;
-        interval: 500;
+        interval: 0;
         onTriggered: {
             commandsItem.checkCommandsState()
         }

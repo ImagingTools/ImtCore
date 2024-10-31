@@ -20,7 +20,7 @@ Item {
     property string applicationId;
     property var applicationInfo;
 
-    property bool serverReady: false;
+    property bool serverReady: true;
     property bool authorizationServerConnected: false;
     property bool useWebSocketSubscription: false;
 
@@ -29,36 +29,18 @@ Item {
     property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
     property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
 
-    property bool start: serverReady && application.settingsProvider.localModel != null && webSocketPortProvider.port != -1;
-    onStartChanged: {
-        if (start){
-            connectToWebSocketServer();
+    onAuthorizationServerConnectedChanged: {
+        if (authorizationServerConnected){
+            application.firstModelsInit();
         }
     }
 
-    property bool updatingModel: serverReady && application.settingsProvider.serverModel != null;
-
-    onAuthorizationServerConnectedChanged: {
-        application.firstModelsInit();
-    }
-
-    signal updateSystemStatus();
     signal settingsUpdate();
     signal localSettingsUpdated();
 
     Component.onCompleted: {
         setDecorators()
-        Events.subscribeEvent("Reconnect", application.reconnect);
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("Reconnect", application.reconnect);
-    }
-
-    onUpdatingModelChanged: {
-        if (updatingModel){
-            application.updateAllModels();
-        }
+        timer.onTriggeredFunc();
     }
 
     onWidthChanged: {
@@ -67,22 +49,6 @@ Item {
 
     onHeightChanged: {
         Events.sendEvent("AppSizeChanged", {"Width": width, "Height": height})
-    }
-
-    // onApplicationInfoChanged: {
-    //     if (application.applicationInfo){
-    //         applicationInfoProvider.clientApplicationInfo = application.applicationInfo;
-    //     }
-    // }
-
-    onServerReadyChanged: {
-        if (serverReady){
-            webSocketPortProvider.updateModel();
-        }
-    }
-
-    onLocalSettingsUpdated: {
-        application.updateAllModels();
     }
 
     Decorators {
@@ -134,6 +100,11 @@ Item {
         designProvider: application.designProvider;
         languageProvider: application.languageProvider;
         settingsProvider: application.settingsProvider;
+
+        onUrlChanged: {
+            AuthorizationController.userLogout();
+            application.reconnect();
+        }
     }
 
     property SettingsProvider settingsProvider : SettingsProvider
@@ -153,7 +124,7 @@ Item {
             application.settingsUpdate();
         }
 
-        property bool applyCachedLanguage: application.serverReady && application.settingsProvider.serverModel != null;
+        property bool applyCachedLanguage: application.settingsProvider.serverModel != null;
         onApplyCachedLanguageChanged: {
             if (applyCachedLanguage){
                 let lang = application.languageProvider.getLanguage();
@@ -163,7 +134,7 @@ Item {
             }
         }
 
-        property bool applyCachedSchema: application.serverReady && application.settingsProvider.localModel != null;
+        property bool applyCachedSchema: application.settingsProvider.localModel != null;
         onApplyCachedSchemaChanged: {
             if (applyCachedSchema){
                 application.designProvider.applyCachedDesignSchema();
@@ -277,7 +248,6 @@ Item {
             }
 
             if (webSocketPortProvider.port >= 0){
-                // url.port = 7770 //webSocketPortProvider.port;
                 url.port = webSocketPortProvider.port;
             }
             else{
@@ -306,8 +276,8 @@ Item {
     }
 
     function updateAllModels(){
+        settingsProvider.updateModel();
         thumbnailDecorator.updateModels();
-        // applicationInfoProvider.updateModel();
     }
 
     function onSimpleUserManagement(){
@@ -327,6 +297,7 @@ Item {
     }
 
     function firstModelsInit(){
+        console.log("firstModelsInit");
         applicationInfoProvider.updateModel();
 
         if (AuthorizationController.isStrongUserManagement() && !authorizationServerConnected){
@@ -379,7 +350,8 @@ Item {
         function onLoginSuccessful(){
             thumbnailDecorator.drawingContainer.content = Style.drawingContainerDecorator;
             thumbnailDecorator.showPage(undefined)
-            application.settingsProvider.updateModel();
+
+            application.updateAllModels();
         }
 
         function onLogoutSignal(){
@@ -395,6 +367,10 @@ Item {
         repeat: true;
         running: application.useWebSocketSubscription && webSocketPortProvider.port == -1;
         onTriggered: {
+            onTriggeredFunc();
+        }
+
+        function onTriggeredFunc(){
             if (!application.useWebSocketSubscription){
                 return;
             }
@@ -402,9 +378,7 @@ Item {
             if (webSocketPortProvider.port == -1){
                 application.checkStatus(4)
 
-                if (application.serverReady){
-                    webSocketPortProvider.updateModel();
-                }
+                webSocketPortProvider.updateModel();
             }
         }
     }

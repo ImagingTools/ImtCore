@@ -13,7 +13,8 @@ namespace imtqml
 // public methods
 
 CQuickObjectCompBase::CQuickObjectCompBase()
-	:m_quickItemPtr(nullptr)
+	:m_quickItemPtr(nullptr),
+	m_urlParamObserver(*this)
 {
 }
 
@@ -21,6 +22,23 @@ CQuickObjectCompBase::CQuickObjectCompBase()
 QString CQuickObjectCompBase::GetPathToQml()
 {
 	return "QmlFilePath";
+}
+
+
+void CQuickObjectCompBase::OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IUrlParam* urlParamPtr)
+{
+	if (!m_applicationInfoCompPtr.IsValid()){
+		return;
+	}
+
+	if (urlParamPtr != nullptr){
+		if (m_quickItemPtr != nullptr){
+			QQmlEngine* qmlEnginePtr = qmlEngine(m_quickItemPtr);
+			if (qmlEnginePtr != nullptr){
+				SetBaseUrl(*qmlEnginePtr);
+			}
+		}
+	}
 }
 
 
@@ -48,15 +66,14 @@ bool CQuickObjectCompBase::CreateQuickItem(QQuickItem* parentPtr)
 		return false;
 	}
 
-	QQmlEngine *engine = qmlEngine(parentPtr);
+	QQmlEngine* engine = qmlEngine(parentPtr);
 	if (engine != nullptr){
-		if (m_baseUrlAttrPtr.IsValid() && *m_baseUrlAttrPtr != ""){
-			QString baseUrl = *m_baseUrlAttrPtr;
-			engine->setBaseUrl(baseUrl);
-		}
+		SetBaseUrl(*engine);
 		m_quickItemPtr = CreateItem(engine);
 		if (m_quickItemPtr != nullptr){
 			m_quickItemPtr->setParentItem(parentPtr);
+
+			m_itemCreated.SetQuickItemCreated(true);
 
 			OnItemCreated();
 
@@ -90,12 +107,22 @@ QQuickItem* CQuickObjectCompBase::GetQuickItem() const
 }
 
 
-void CQuickObjectCompBase::SetBaseUrl(const QString &baseUrl) const
+void CQuickObjectCompBase::SetBaseUrl(QQmlEngine& qmlEngine) const
 {
-	if (m_quickItemPtr != nullptr){
-		QQmlEngine *engine = qmlEngine(m_quickItemPtr);
-		engine->setBaseUrl(baseUrl);
+	QString baseUrl;
+	if (m_urlParamPtr.IsValid()){
+		baseUrl = m_urlParamPtr->GetUrl().toString();
 	}
+	else if (m_baseUrlAttrPtr.IsValid()){
+		baseUrl = *m_baseUrlAttrPtr;
+	}
+
+	QString appId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID);
+	if (!appId.isEmpty() && !baseUrl.isEmpty()){
+		baseUrl += "/" + appId;
+	}
+
+	qmlEngine.setBaseUrl(baseUrl);
 }
 
 
@@ -161,8 +188,9 @@ void CQuickObjectCompBase::OnItemCreated()
 		m_quickItemPtr->setProperty(modelId, QVariant::fromValue(modelPtr));
 	}
 
-	m_itemCreated.SetQuickItemCreated(true);
-
+	if (m_urlParamPtr.IsValid()){
+		OnUrlParamChanged(istd::IChangeable::GetAnyChange(), m_urlParamPtr.GetPtr());
+	}
 }
 
 
@@ -177,6 +205,18 @@ void CQuickObjectCompBase::OnItemDestroyed()
 void CQuickObjectCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	if (m_urlParamPtr.IsValid()){
+		m_urlParamObserver.RegisterObject(m_urlParamPtr.GetPtr(), &CQuickObjectCompBase::OnUrlParamChanged);
+	}
+}
+
+
+void CQuickObjectCompBase::OnComponentDestroyed()
+{
+	m_urlParamObserver.UnregisterAllObjects();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 

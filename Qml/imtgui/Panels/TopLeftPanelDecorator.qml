@@ -23,7 +23,7 @@ DecoratorBase {
             font.family: Style.fontFamilyBold;
             font.pixelSize: Style.fontSize_title;
             color: Style.textColor;
-            text: context.appName && context.appName !== "" ? context.appName : "";
+            text: context && context.appName && context.appName !== "" ? context.appName : "";
             elide: Text.ElideRight;
         }
     }

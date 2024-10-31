@@ -10,6 +10,8 @@ TreeItemModelObserver {
     property LanguageProvider languageProvider: null;
     property SettingsProvider settingsProvider: null;
 
+    signal urlChanged(string newUrl);
+
     onModelChanged: {
         for (let i = 0; i < changeList.length; i++){
             let changeObj = changeList[i]
@@ -48,8 +50,8 @@ TreeItemModelObserver {
     function onServerUrlChanged(newVal){
         if (container.settingsProvider != null){
             container.settingsProvider.setServerUrl(newVal);
-            Events.sendEvent("Logout");
-            Events.sendEvent("Reconnect");
+
+            container.urlChanged(newVal);
         }
     }
 
