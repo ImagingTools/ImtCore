@@ -218,7 +218,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 	requestPtr->AddParam("input", input);
 
 	imtgql::CGqlObject query;
-	requestPtr->AddField("input", query);
+	requestPtr->AddField("itemIds", query);
 
 	return requestPtr;
 }

@@ -5,6 +5,7 @@
 #include <imtbase/CCollectionInfo.h>
 #include <imtauth/IRole.h>
 
+
 namespace imtauth
 {
 
@@ -23,19 +24,13 @@ const imtbase::ICollectionInfo& CRoleCollectionAdapterComp::GetRoleList() const
 }
 
 
-const IRole* CRoleCollectionAdapterComp::GetRole(const QByteArray& roleId, const QByteArray& productId) const
+const IRole* CRoleCollectionAdapterComp::GetRole(const QByteArray& roleId, const QByteArray& /*productId*/) const
 {
-	if (m_roleCollectionCompPtr.IsValid()){
-		QByteArray objectId = roleId + *m_separatorObjectIdAttrPtr + productId;
-
-		return GetRole(objectId);
-	}
-
-	return nullptr;
+	return GetRole(roleId);
 }
 
 
-const IRole* CRoleCollectionAdapterComp::GetRole(const QByteArray &objectId) const
+const IRole* CRoleCollectionAdapterComp::GetRole(const QByteArray& objectId) const
 {
 	if (m_roleCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;

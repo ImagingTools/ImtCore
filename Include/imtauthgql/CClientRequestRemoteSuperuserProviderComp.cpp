@@ -27,11 +27,6 @@ bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& /*error
 
 	imtgql::CGqlRequest gqlRequest;
 	if (userssdl::CUserItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		// TODO: remove !!!
-		imtgql::CGqlObject itemObject;
-		itemObject.InsertField("id");
-		gqlRequest.AddField("item", itemObject);
-
 		userssdl::CUserDataPayload response;
 		if (!SendModelRequest(gqlRequest, response)){
 			return false;

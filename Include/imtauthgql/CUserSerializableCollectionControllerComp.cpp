@@ -37,16 +37,10 @@ void CUserSerializableCollectionControllerComp::CustomProcessObject(
 	imtauth::IUserInfo* objectInfoPtr = dynamic_cast<imtauth::IUserInfo*>(&object);
 	if (objectInfoPtr != nullptr){
 		if (!objectInfoPtr->IsAdmin()){
-			QByteArrayList productPermissions = objectInfoPtr->GetPermissions(productId);
-
 			QByteArrayList products = objectInfoPtr->GetProducts();
 			for (const QByteArray& currentProduct : products){
-				if (currentProduct != productId){
-					objectInfoPtr->RemoveProduct(currentProduct);
-				}
+				objectInfoPtr->SetLocalPermissions(currentProduct, objectInfoPtr->GetPermissions(currentProduct));
 			}
-
-			objectInfoPtr->SetLocalPermissions(productId, productPermissions);
 		}
 	}
 }

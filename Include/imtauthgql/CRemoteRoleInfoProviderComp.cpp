@@ -41,10 +41,6 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& rol
 	imtgql::CGqlRequest gqlRequest;
 	if (rolessdl::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		rolessdl::CRoleDataPayload response;
-		// TODO: remove !!!
-		imtgql::CGqlObject itemObject;
-		itemObject.InsertField("id");
-		gqlRequest.AddField("item", itemObject);
 		if (!SendModelRequest(gqlRequest, response)){
 			return nullptr;
 		}

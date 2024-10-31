@@ -23,7 +23,6 @@ public:
 	I_BEGIN_COMPONENT(CRoleCollectionAdapterComp);
 		I_REGISTER_INTERFACE(IRoleInfoProvider);
 		I_ASSIGN(m_roleCollectionCompPtr, "RoleCollection", "Adapting the collection to the provider", true, "RoleCollection");
-		I_ASSIGN(m_separatorObjectIdAttrPtr, "SeparatorObjectId", "Separator of the object ID", false, "");
 	I_END_COMPONENT;
 
 	// reimplemented (IRoleInfoProvider)
@@ -33,7 +32,6 @@ public:
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
-	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
 };
 
 
