@@ -114,6 +114,22 @@ class TextEdit extends Item {
             this.activeFocus = false
         }
 
+        impl.onkeydown = (e)=>{
+            if(e.code === QtEnums.Key_C && e.ctrlKey){
+                e.stopPropagation()
+            } else if(e.code === QtEnums.Key_V && e.ctrlKey){
+                e.stopPropagation()
+            } else if(e.code === QtEnums.Key_X && e.ctrlKey){
+                e.stopPropagation()
+            } else if(e.code === QtEnums.Key_A && e.ctrlKey){
+                e.stopPropagation()
+                this.selectAll()
+            } else if(e.key === QtEnums.Key_Enter || e.key === QtEnums.Key_Tab){
+                e.preventDefault()
+                e.stopPropagation()
+            }
+        }
+
         impl.oninput = (e)=>{
             this.text = impl.value
         }

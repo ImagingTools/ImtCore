@@ -30,12 +30,15 @@ class Shortcut extends QtObject {
 
     static create(parent, model, properties=[], ...args){
         let proxy = super.create(parent, model, properties, ...args)
-        let self = proxy.__self 
+        JQApplication.KeyboardController.add(proxy)
 
         return proxy
     }
 
- 
+    __destroy(){
+        JQApplication.KeyboardController.remove(this)
+        super.__destroy()
+    }
 }
 
 module.exports = Shortcut

@@ -1,4 +1,5 @@
 const MouseController = require('./MouseController')
+const KeyboardController = require('./KeyboardController')
 const ImageController = require('./ImageController')
 const TextController = require('./TextController')
 const MemoryController = require('./MemoryController')
@@ -132,10 +133,12 @@ module.exports = {
         })
 
         MouseController.init()
+        KeyboardController.init()
     },
 
     ImageController: ImageController,
     MouseController: MouseController,
+    KeyboardController: KeyboardController,
     TextController: TextController,
     MemoryController: MemoryController,
 

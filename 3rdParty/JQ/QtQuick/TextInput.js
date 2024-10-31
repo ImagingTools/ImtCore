@@ -126,17 +126,25 @@ class TextInput extends Item {
                 this.selectionEnd = 0
             }
 
-            if(e.keyCode === QtEnums.Key_C && e.ctrlKey){
+            if(e.code === QtEnums.Key_C && e.ctrlKey){
                 e.preventDefault()
+                e.stopPropagation()
                 this.copy()
-            } else if(e.keyCode === QtEnums.Key_V && e.ctrlKey){
+            } else if(e.code === QtEnums.Key_V && e.ctrlKey){
                 e.preventDefault()
+                e.stopPropagation()
                 this.paste()
-            } else if(e.keyCode === QtEnums.Key_X && e.ctrlKey){
+            } else if(e.code === QtEnums.Key_X && e.ctrlKey){
                 e.preventDefault()
+                e.stopPropagation()
                 this.cut()
-            } else if(e.code === QtEnums.Key_Enter){
+            } else if(e.code === QtEnums.Key_A && e.ctrlKey){
                 e.preventDefault()
+                e.stopPropagation()
+                this.selectAll()
+            } else if(e.key === QtEnums.Key_Enter){
+                e.preventDefault()
+                e.stopPropagation()
                 this.accepted()
             }
         }
