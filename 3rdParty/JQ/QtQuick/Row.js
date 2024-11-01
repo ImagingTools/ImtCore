@@ -89,8 +89,9 @@ class Row extends Item {
         this.positioningComplete()
     }
 
-    __endUpdate(...args){
+    __endUpdate(){
         this.__updateGeometry()
+        super.__endUpdate()
     }
 
     forceLayout(){

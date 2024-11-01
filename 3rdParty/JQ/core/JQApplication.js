@@ -144,6 +144,7 @@ module.exports = {
 
     objectsAwaitingUpdate: new Set(),
     updateLayers: [],
+    deleteObjects: [],
 
     focusTree: [],
     setFocusTree(tree){
@@ -175,6 +176,16 @@ module.exports = {
         this.updateLayers.push([])
     },
 
+    deleteLater: function(obj){
+        if(!obj || obj.__destroyed) return
+
+        if(this.updateLayers.length){
+            if(this.deleteObjects.indexOf(obj) < 0) this.deleteObjects.push(obj)
+        } else {
+            obj.deleteLater()
+        }
+    },
+
     updateLater(obj){
         if(!obj || obj.__destroyed) return
 
@@ -193,11 +204,21 @@ module.exports = {
     endUpdate: function(){
         let layer = this.updateLayers.pop()
 
-        if(layer)
-        for(let obj of layer){
-            this.objectsAwaitingUpdate.delete(obj)
-            if(!obj.__destroyed) obj.__endUpdate()
+        if(layer){
+            for(let obj of layer){
+                this.objectsAwaitingUpdate.delete(obj)
+                if(!obj.__destroyed) obj.__endUpdate()
+            }
+        } 
+        
+        if(this.updateLayers.length === 0){
+            let objects = this.deleteObjects.slice()
+            this.deleteObjects = []
+            for(let obj of objects){
+                obj.deleteLater()
+            }
         }
+        
     },
 }
 

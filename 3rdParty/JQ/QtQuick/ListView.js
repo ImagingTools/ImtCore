@@ -134,7 +134,7 @@ class ListView extends Flickable {
         this.__items = []
 
         for(let r of removed){
-            if(r) r.__destroy()
+            if(r) r.destroy()
         }
     }
 
@@ -214,7 +214,7 @@ class ListView extends Flickable {
                 } else if(role === 'remove'){
                     let removed = this.__items.splice(leftTop, bottomRight - leftTop)
                     for(let r of removed){
-                        if(r) r.__destroy()
+                        if(r) r.destroy()
                     }
                 }
             }
@@ -274,9 +274,10 @@ class ListView extends Flickable {
         }
     }
 
-    __endUpdate(...args){
+    __endUpdate(){
         this.__updateItemsGeometry()
         this.__updateGeometry()
+        super.__endUpdate()
     }
 
     __destroy(){

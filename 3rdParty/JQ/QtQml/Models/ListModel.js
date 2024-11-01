@@ -32,6 +32,7 @@ class ListModel extends QtObject {
 
     __beginUpdate(){
         this.dataChanged.blockSignal(true)
+        super.__beginUpdate()
     }
 
     __endUpdate(){
@@ -50,6 +51,7 @@ class ListModel extends QtObject {
         } 
 
         this.dataChanged()
+        super.__endUpdate()
     }
 
     append(dict){

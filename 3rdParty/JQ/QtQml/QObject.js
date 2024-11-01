@@ -74,14 +74,6 @@ class QObject extends BaseObject {
         return true
     }
 
-    __beginUpdate(...args){
-
-    }
-
-    __endUpdate(...args){
-
-    }
-
     __resolve(){
         return this
     }

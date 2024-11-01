@@ -85,6 +85,15 @@ class BaseObject{
         
     }
 
+    
+    __beginUpdate(){
+
+    }
+
+    __endUpdate(){
+        
+    }
+
     blockSignals(flag){
         this.__blockedSignals = flag
     }
@@ -98,7 +107,7 @@ class BaseObject{
     }
 
     destroy(){
-        this.__destroy()
+        JQApplication.deleteLater(this)
     }
 }
 

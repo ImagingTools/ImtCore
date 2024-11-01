@@ -32,7 +32,7 @@ class Loader extends Item {
     })
 
     onSourceComponentChanged(){
-        if(this.item) this.item.__destroy()
+        if(this.item) this.item.destroy()
         if(!this.sourceComponent) return
 
         let item = this.sourceComponent.createObject(this)
@@ -57,7 +57,7 @@ class Loader extends Item {
     }
 
     onSourceChanged(){
-        if(this.item) this.item.__destroy()
+        if(this.item) this.item.destroy()
         if(!this.source) return
 
         let path = this.source.replaceAll('qrc:/', '').replaceAll('.qml', '').split('/')

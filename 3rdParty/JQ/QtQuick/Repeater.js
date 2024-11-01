@@ -64,7 +64,7 @@ class Repeater extends Item {
 
         for(let r of removed){
             this.itemRemoved(r)
-            if(r) r.__destroy()
+            if(r) r.destroy()
         }
     }
 
@@ -145,7 +145,7 @@ class Repeater extends Item {
                     let removed = this.__items.splice(leftTop, bottomRight - leftTop)
                     for(let r of removed){
                         this.itemRemoved(r)
-                        if(r) r.__destroy()
+                        if(r) r.destroy()
                     }
                 }
             }
