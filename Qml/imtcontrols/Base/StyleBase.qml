@@ -30,17 +30,18 @@ StyleComponents {
 	property int fontSizeSmall: 8
 	property int fontSizeTiny: 4
 
-	// property int fontSizeHuge: 64
-	// property int fontSizeXXXLarge: 48
-	// property int fontSizeXXLarge: 32
-	// property int fontSizeXLarge: 24
-	// property int fontSizeLarge: 20
-	// property int fontSizeNormal: 18
-	// property int fontSizeSmall: 16
-	// property int fontSizeXSmall: 12
-	// property int fontSizeXXSmall: 10
-	// property int fontSizeXXXSmall: 8
-	// property int fontSizeTiny: 4
+	//new fonts
+	property int fontSize_Huge: 64
+	property int fontSize_XXXLarge: 48
+	property int fontSize_XXLarge: 32
+	property int fontSize_XLarge: 24
+	property int fontSize_Large: 20
+	property int fontSize_Normal: 18
+	property int fontSize_Small: 16
+	property int fontSize_XSmall: 12
+	property int fontSize_XXSmall: 10
+	property int fontSize_XXXSmall: 8
+	property int fontSize_Tiny: 4
 
 	property int buttonWidthExtraSmall: 4
 	property int buttonWidthLarge: 32
@@ -87,6 +88,9 @@ StyleComponents {
 	property color secondaryColor: secondColor
 	property color secondaryHighlightColor: linkColor
 	property color imaginToolsAccent: "#2a82da"
+
+	property string positiveAccentColor: "#00FFD1";
+	property string negativeAccentColor: "#FF5449";
 
 	//------------------------------------------for basic components
 

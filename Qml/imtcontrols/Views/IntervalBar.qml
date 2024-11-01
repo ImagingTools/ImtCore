@@ -18,8 +18,8 @@ Rectangle {
 	property int barHeight: 8;
 	property int spacing: 8;
 
-	property string positiveColor: "lightgreen";
-	property string negativeColor: "salmon";
+	property string positiveColor: Style.positiveAccentColor;
+	property string negativeColor: Style.negativeAccentColor;
 	property string textColor: Style.textColor;
 
 	property int count: 0;
@@ -27,6 +27,10 @@ Rectangle {
 
 	property int percent: 0;
 	property int percentCritical: 100;
+	property int percentMax: 100;
+
+	property real percentCoeff: percentMax/100;
+
 	property real value: 0;
 	property string valueName: "";
 
@@ -41,8 +45,9 @@ Rectangle {
 	}
 
 	function setCount(){
-		count = Math.ceil((percent * maxColumnHeight)/ 100/(barHeight + spacing))
-		maxCount = Math.ceil((100 * maxColumnHeight)/ 100/(barHeight + spacing))
+		count = Math.ceil((percent * maxColumnHeight)/ percentMax/(barHeight + spacing))
+		maxCount = Math.ceil(maxColumnHeight/(barHeight + spacing))
+
 	}
 
 	Text{
@@ -94,8 +99,9 @@ Rectangle {
 						height: indicator.barHeight;
 
 						color: isCritical ? indicator.negativeColor : indicator.positiveColor;
-						property real barPercent: (1/indicator.maxCount *(model.index + 1) * 100);
-						property bool isCritical: barPercent > indicator.roundPercent(indicator.percentCritical) ;
+
+						property real barPercent: (indicator.percentCoeff/indicator.maxCount *(model.index + 1) *100);
+						property bool isCritical: barPercent  > indicator.percentCritical;
 
 					}
 				}
