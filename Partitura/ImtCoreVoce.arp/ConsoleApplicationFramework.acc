@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
+            <Version Id="0" Number="5274" Description="ACF"/>
             <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="395011" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Base framework for a console application</Description>
@@ -116,10 +116,10 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UseCategory" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
+                        <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UseCode" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
+                        <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UseTimeStamp" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
