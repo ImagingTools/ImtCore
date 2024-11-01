@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imtauthGroupsSdl);
 	Q_INIT_RESOURCE(imtauthUsersSdl);
 	Q_INIT_RESOURCE(imtauthRolesSdl);
+	Q_INIT_RESOURCE(imtauthProfileSdl);
 
 	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	

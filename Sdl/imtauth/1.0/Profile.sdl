@@ -1,0 +1,61 @@
+schema {
+	query: Query
+	mutation: Mutation
+	name: Profile
+	namespace: imtauth
+	version: 1.0
+}
+
+type RoleInfo {
+	id: ID
+	name: String
+	description: String
+}
+
+type GroupInfo {
+	id: ID
+	name: String
+	description: String
+}
+
+type PermissionInfo {
+	id: ID
+	name: String
+	description: String
+}
+
+type ProfileData {
+	id: ID
+	systemId: ID
+	username: String
+	name: String
+	email: String
+	roles: [RoleInfo]
+	groups: [GroupInfo]
+	permissions: [PermissionInfo]
+}
+
+type SetProfileResponse {
+	status: Boolean
+}
+
+type GetProfileInput {
+	id: ID!
+	productId: ID!
+}
+
+type SetProfileInput {
+	id: ID!
+	name: String
+	email: String
+}
+
+type Query {
+	GetProfile (input: GetProfileInput): ProfileData!
+}
+
+type Mutation {
+	SetProfile (input: SetProfileInput): SetProfileResponse!
+}
+
+

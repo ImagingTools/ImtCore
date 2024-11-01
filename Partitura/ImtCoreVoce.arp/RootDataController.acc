@@ -50,6 +50,7 @@
                                 <Value>PermissionsController</Value>
                                 <Value>WebSocketController</Value>
                                 <Value>PagesController</Value>
+                                <Value>ProfileController</Value>
                                 <Value>ApplicationInfoController</Value>
                                 <Value>UserSettings</Value>
                                 <Value>SlaveDemultiplexer</Value>
@@ -115,6 +116,30 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ProfileController" PackageId="ImtGraphQlVoce" ComponentId="ProfileController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FeatureCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PermissionsController/FeatureContainer"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GroupCollection" Type="Reference" ExportId="GroupCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -336,6 +361,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="FeatureContainer" ComponentId="PermissionsController/FeatureContainer"/>
         <Component ExportedId="UserSettingsRepository" ComponentId="UserSettings/UserSettingsRepository"/>
     </ExportedComponents>
 </Acf>

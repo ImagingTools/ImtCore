@@ -3,7 +3,6 @@ import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
 
-
 ControlBase {
     id: dialogContainer;
 
@@ -13,7 +12,6 @@ ControlBase {
     decorator: Style.dialogDecorator;
     property var decoratorItem: null;
 
-    property string dialogId;
     property string title;
     property string bodySource;
     property string topPanelSource;
@@ -94,12 +92,6 @@ ControlBase {
         finished(Enums.cancel)
     }
 
-    onDecoratorVisibleChanged: {
-//        if(!decoratorVisible && root){
-//            root.closeDialog();
-//        }
-    }
-
     onDecoratorChanged: {
         if(decorator_){
             if(decorator_.accepted !==undefined){
@@ -148,7 +140,6 @@ ControlBase {
             dialogContainer.finished(Enums.cancel)
         }
     }
-
 
     PauseAnimation {
         id: closeAnim;

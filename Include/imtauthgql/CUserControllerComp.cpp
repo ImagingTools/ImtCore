@@ -78,6 +78,16 @@ sdl::imtauth::Users::V1_0::CChangePasswordPayload CUserControllerComp::OnChangeP
 		return sdl::imtauth::Users::V1_0::CChangePasswordPayload();
 	}
 
+	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+		if (systemInfo.enabled && !systemInfo.systemId.isEmpty()){
+			errorMessage = QString("Unable to change password for user '%1'. Error: A user from an external system").arg(qPrintable(login));
+			SendErrorMessage(0, errorMessage, "CUserControllerComp");
+
+			return sdl::imtauth::Users::V1_0::CChangePasswordPayload();
+		}
+	}
+
 	bool ok = false;
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();

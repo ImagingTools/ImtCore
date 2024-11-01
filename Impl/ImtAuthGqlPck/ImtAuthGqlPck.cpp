@@ -119,6 +119,11 @@ I_EXPORT_COMPONENT(
 			"Client settings controller",
 			"GraphQL Controller Model Client User");
 
+I_EXPORT_COMPONENT(
+			ProfileController,
+			"Profile controller",
+			"Profile Controller");
+
 
 } // namespace ImtAuthGqlPck
 

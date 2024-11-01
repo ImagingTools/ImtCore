@@ -25,6 +25,6 @@
 	<file alias="imtguigql/GqlRequestSender.qml">GqlRequestSender.qml</file>
 	<file alias="imtguigql/WebSocketConnectionChecker.qml">WebSocketConnectionChecker.qml</file>
 	<file alias="imtguigql/GqlSdlRequestSender.qml">GqlSdlRequestSender.qml</file>
-	<file alias="imtguigql/SdlObjectProvider.qml">SdlObjectProvider.qml</file>
+	<file alias="imtguigql/GqlSdlDocumentDataController.qml">GqlSdlDocumentDataController.qml</file>
     </qresource>
 </RCC>

@@ -97,8 +97,8 @@ Item {
                 if (commandId == "Logout"){
                     panelDelegate.logout();
                 }
-                else if (commandId == "ChangePassword"){
-                    panelDelegate.changePassword();
+                else if (commandId == "Profile"){
+                    ModalDialogManager.openDialog(profileViewComp, {});
                 }
             }
         }
@@ -113,7 +113,7 @@ Item {
 
         function fillModel(){
             contextMenuModel.clear();
-            contextMenuModel.append({"Id": "ChangePassword", "Name": qsTr("Change Password"), "Icon": "Icons/Empty", "IsEnabled": AuthorizationController.getSystemId() === ""});
+            contextMenuModel.append({"Id": "Profile", "Name": qsTr("Profile"), "Icon": "Icons/Account", "IsEnabled": true});
             contextMenuModel.append({"Id": "", "Name": "", "Icon": ""});
             contextMenuModel.append({"Id": "Logout", "Name": qsTr("Logout"), "Icon": "Icons/Exit", "IsEnabled": true});
         }
@@ -121,6 +121,24 @@ Item {
 
     UserPanelDelegate {
         id: panelDelegate;
+    }
+
+    Component {
+        id: profileViewComp;
+
+        Dialog {
+            id: dialog;
+            width: 800;
+            height: ModalDialogManager.activeView.height - 100;
+            title: qsTr("Profile");
+            canMove: false;
+            contentComp: Component {
+                ProfileView {
+                    width: dialog.width;
+                    height: dialog.height - 40;
+                }
+            }
+        }
     }
 }
 

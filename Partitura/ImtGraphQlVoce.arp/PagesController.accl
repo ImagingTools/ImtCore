@@ -8,13 +8,13 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AdministrationPage" X="550" Y="725" Note=""/>
+        <Element ComponentName="AdministrationPage" X="575" Y="700" Note=""/>
         <Element ComponentName="BasePages" X="325" Y="575" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="125" Note=""/>
         <Element ComponentName="PagesContainer" X="300" Y="425" Note=""/>
         <Element ComponentName="PagesController" X="300" Y="275" Note=""/>
         <Element ComponentName="SearchController" X="850" Y="275" Note=""/>
-        <Element ComponentName="SearchPage" X="125" Y="725" Note=""/>
+        <Element ComponentName="SearchPage" X="100" Y="700" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

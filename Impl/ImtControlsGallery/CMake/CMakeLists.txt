@@ -111,6 +111,9 @@ list(APPEND webdirs ${buildwebdir}/src/imtappApplicationSdl)
 list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationSdl)
 list(APPEND webdirs ${buildwebdir}/src/imtauthAuthorizationSdl)
 
+list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthProfileSdl)
+list(APPEND webdirs ${buildwebdir}/src/imtauthProfileSdl)
+
 if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
 	set(resname "controlsgallery")

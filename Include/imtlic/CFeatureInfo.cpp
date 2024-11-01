@@ -126,7 +126,7 @@ QByteArrayList CFeatureInfo::GetSubFeatureIds(int maxDepth) const
 }
 
 
-const IFeatureInfo *CFeatureInfo::GetSubFeature(const QByteArray &subfeatureId, int maxDepth) const
+const IFeatureInfo *CFeatureInfo::GetSubFeature(const QByteArray& subfeatureId, int maxDepth) const
 {
 	return GetSubFeatureRecursive(m_subFeatures, subfeatureId, maxDepth);
 }

@@ -7,6 +7,7 @@ ElementView {
     id: elementView;
     property string text;
     property Button button;
+    property bool buttonEnabled: true;
     signal clicked();
 
     controlComp: Component {
@@ -15,6 +16,7 @@ ElementView {
             width: 100;
             height: 30;
             text: elementView.text;
+            enabled: elementView.buttonEnabled;
             Component.onCompleted: {
                 elementView.button = buttonControl
             }

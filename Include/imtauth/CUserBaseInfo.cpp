@@ -359,10 +359,6 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_restrictions, "Restrictions", "Restriction");
 
-	//	if (imtCoreVersion < 6671){
-	//		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_roles, "Roles", "Role");
-	//	}
-	//	else{
 	QByteArrayList keys = m_rolesMap.keys();
 	int count = keys.count();
 
@@ -403,7 +399,6 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 	}
 
 	retVal = retVal && archive.EndTag(productsTag);
-	//	}
 
 	return retVal;
 }

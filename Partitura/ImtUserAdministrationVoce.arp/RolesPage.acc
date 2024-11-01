@@ -45,9 +45,6 @@
                     <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -186,26 +183,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Role"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>RoleInfo</Value>
-                                <Value>RoleDataMetaInfo</Value>
-                                <Value>RoleMetaInfo</Value>
-                                <Value>RoleList</Value>
-                                <Value>RoleView</Value>
-                                <Value>RoleRemove</Value>
-                                <Value>RoleSetDescription</Value>
-                                <Value>RoleAdd</Value>
-                                <Value>RoleUpdate</Value>
-                                <Value>RoleItem</Value>
-                                <Value>RoleCount</Value>
-                                <Value>RoleIds</Value>
-                                <Value>RoleSubCollection</Value>
-                            </Values>
-                        </Data>
+                        <Data IsEnabled="true" Value="RoleItem"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>

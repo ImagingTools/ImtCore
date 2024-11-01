@@ -91,5 +91,7 @@
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="ProductInfoProvider"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="ProductInfoProvider"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="FeatureContainer" ComponentId="FeatureContainer"/>
+    </ExportedComponents>
 </Acf>

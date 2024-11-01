@@ -8,7 +8,9 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Roles.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Users.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Groups.sdl
-			${CMAKE_CURRENT_LIST_DIR}/../1.0/Authorization.sdl)
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/Authorization.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/Profile.sdl
+			)
 
 ImtCoreCustomConfigureSdlCppQml(
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Roles.sdl"
@@ -30,4 +32,10 @@ ImtCoreCustomConfigureSdlCppQml(
 			VERSION		"1.0"
 			SOURCE_NAME	"Authorization"
 			QML_NAME	"imtauthAuthorizationSdl")
+
+ImtCoreCustomConfigureSdlCppQml(
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Profile.sdl"
+			VERSION		"1.0"
+			SOURCE_NAME	"Profile"
+			QML_NAME	"imtauthProfileSdl")
 

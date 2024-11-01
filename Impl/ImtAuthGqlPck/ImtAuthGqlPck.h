@@ -27,6 +27,7 @@
 #include <imtauthgql/CLdapAuthorizationControllerComp.h>
 #include <imtauthgql/CUserSerializableCollectionControllerComp.h>
 #include <imtauthgql/CUserSettingsControllerComp.h>
+#include <imtauthgql/CProfileControllerComp.h>
 
 
 /**
@@ -57,6 +58,7 @@ typedef imtauthgql::CSessionModelSubscriberControllerComp SessionModelSubscriber
 typedef imtauthgql::CLdapAuthorizationControllerComp LdapAuthorizationController;
 typedef imtauthgql::CUserSerializableCollectionControllerComp UserSerializableCollectionController;
 typedef imtauthgql::CUserSettingsControllerComp UserSettingsController;
+typedef imtauthgql::CProfileControllerComp ProfileController;
 
 
 } // namespace ImtAuthGqlPck

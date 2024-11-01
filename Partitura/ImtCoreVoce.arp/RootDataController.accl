@@ -11,8 +11,9 @@
         <Element ComponentName="ApplicationInfoController" X="150" Y="525" Note=""/>
         <Element ComponentName="AuthorizationOptions" X="350" Y="375" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="125" Note=""/>
-        <Element ComponentName="PagesController" X="825" Y="375" Note=""/>
+        <Element ComponentName="PagesController" X="824" Y="379" Note=""/>
         <Element ComponentName="PermissionsController" X="125" Y="375" Note=""/>
+        <Element ComponentName="ProfileController" X="850" Y="524" Note=""/>
         <Element ComponentName="SlaveDemultiplexer" X="1050" Y="375" Note=""/>
         <Element ComponentName="UserSettings" X="475" Y="525" Note=""/>
         <Element ComponentName="WebSocketController" X="600" Y="375" Note=""/>

@@ -14,7 +14,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Id" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Group"/>
+                        <Data IsEnabled="true" Value="GroupItem"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -71,7 +71,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Id" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Role"/>
+                        <Data IsEnabled="true" Value="RoleItem"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -161,7 +161,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Id" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="User"/>
+                        <Data IsEnabled="true" Value="UserItem"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -267,6 +267,7 @@
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="GroupRemoteRepository" ComponentId="GroupRemoteRepository"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="RoleRemoteRepository"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="UserSessionRemoteRepository"/>
