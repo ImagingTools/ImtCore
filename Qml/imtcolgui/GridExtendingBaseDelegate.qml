@@ -12,6 +12,8 @@ Item {
 
     property Item rootItem: null;
 
+	property int minHeight: !rootItem ? 0 : rootItem.gridCellHeightMin;
+
     property bool selected: !rootItem ? false : rootItem.selectedIndex === model.index;
 
     property int rowNumber: !rootItem ? 0 : Math.trunc(model.index/rootItem.gridCountInLine);
