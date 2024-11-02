@@ -39,7 +39,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 protected:
-	QByteArray m_subscriptionId;
+	QByteArrayList m_subscriptionIds;
 
 protected:
 	I_REF(imtclientgql::IGqlSubscriptionManager, m_subscriptionManagerCompPtr);

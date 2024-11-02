@@ -7,7 +7,6 @@ import imtauthProfileSdl 1.0
 
 ViewBase {
     id: container;
-
     property ProfileData profileData: model ? model : null;
 
     Connections {

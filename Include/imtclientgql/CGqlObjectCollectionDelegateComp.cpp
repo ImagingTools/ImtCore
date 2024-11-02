@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QDebug>
 
@@ -566,9 +565,8 @@ CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp:
 
 bool CGqlObjectCollectionDelegateComp::SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const
 {
-	objectData.clear();
-
 	if (object == nullptr){
+		SendErrorMessage(0, QString("Unable to serialize object. Error: Object is invalid"));
 		return false;
 	}
 
@@ -576,20 +574,26 @@ bool CGqlObjectCollectionDelegateComp::SerializeObject(const istd::IPolymorphic*
 	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(const_cast<iser::ISerializable*>(objectConst));
 
 	if (serializableObject == nullptr){
-		QByteArray errorMessage = QObject::tr("Object data metainfo is not Serializable").toUtf8();
-		SendErrorMessage(0, errorMessage);
-
+		SendErrorMessage(0, QString("Unable to serialize object. Error: Object is not serializable"));
 		return false;
 	}
-	iser::CMemoryWriteArchive archive;
-	if (!serializableObject->Serialize(archive)){
-		QByteArray errorMessage = QObject::tr("Error when serializing an object").toUtf8();
-		SendErrorMessage(0, errorMessage);
 
+	objectData.clear();
+
+	istd::TDelPtr<iser::CMemoryWriteArchive> archivePtr;
+	if (m_versionInfoCompPtr.IsValid()){
+		archivePtr.SetPtr(new iser::CMemoryWriteArchive(m_versionInfoCompPtr.GetPtr()));
+	}
+	else{
+		archivePtr.SetPtr(new iser::CMemoryWriteArchive());
+	}
+
+	if (!serializableObject->Serialize(*archivePtr.GetPtr())){
+		SendErrorMessage(0, QString("Unable to serialize object. Error: Serialization failed"));
 		return false;
 	}
 	else{
-		objectData = QByteArray((char*)archive.GetBuffer(), archive.GetBufferSize());
+		objectData = QByteArray((char*)archivePtr->GetBuffer(), archivePtr->GetBufferSize());
 	}
 
 	return true;
@@ -599,21 +603,21 @@ bool CGqlObjectCollectionDelegateComp::SerializeObject(const istd::IPolymorphic*
 bool CGqlObjectCollectionDelegateComp::DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const
 {
 	if (object == nullptr){
+		SendErrorMessage(0, QString("Unable to deserialize object. Error: Object is invalid"));
+
 		return false;
 	}
 
-	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(object);
-	if (serializableObject == nullptr){
-		QByteArray errorMessage = QString("Object data metainfo is not serializable").toUtf8();
-		SendErrorMessage(0, errorMessage);
+	iser::ISerializable* serializableObjectPtr = dynamic_cast<iser::ISerializable*>(object);
+	if (serializableObjectPtr == nullptr){
+		SendErrorMessage(0, QString("Unable to deserialize object. Error: Object is not serializable"));
 
 		return false;
 	}
 
 	iser::CMemoryReadArchive archive(objectData.data(), objectData.count());
-	if (!serializableObject->Serialize(archive)){
-		QByteArray errorMessage = QString("Error when serializing an object").toUtf8();
-		SendErrorMessage(0, errorMessage);
+	if (!serializableObjectPtr->Serialize(archive)){
+		SendErrorMessage(0, QString("Unable to deserialize object. Error: Deserialization failed"));
 
 		return false;
 	}

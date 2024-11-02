@@ -17,29 +17,5 @@ Item {
     function logout(){
         Events.sendEvent("Logout");
     }
-
-    function changePassword(){
-        userPanelDelegate.dialogManager.openDialog(changePasswordComp, {});
-    }
-
-    function onResult(id, name){
-        userPanelDelegate.dialogManager.openDialog(savingErrorDialog, {"message" : qsTr("Password changed successfully")});
-
-        userPanelDelegate.userUpdated();
-    }
-
-    Component {
-        id: changePasswordComp;
-
-        ChangePasswordDialog {
-            title: qsTr("Change Password");
-
-            onFinished: {
-                if (buttonId == Enums.save){
-                    AuthorizationController.changePassword(AuthorizationController.userTokenProvider.userId, contentItem.oldPassword, contentItem.newPassword);
-                }
-            }
-        }
-    }
 }
 

@@ -120,10 +120,8 @@ Rectangle {
 
         Loader {
             id: topLoader;
-
             width: parent.width;
-
-            visible: item;
+            visible: rootElement.topComp != null && rootElement.topComp != undefined;
         }
 
         Item {
@@ -185,7 +183,7 @@ Rectangle {
         Loader {
             id: bottomLoader;
             width: parent.width;
-            visible: item;
+            visible: rootElement.bottomComp != null && rootElement.bottomComp != undefined;
         }
     }
 }

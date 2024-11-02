@@ -48,7 +48,6 @@ protected:
 
 private:
 	I_FACT(iser::ISerializable, m_objectFactCompPtr);
-	I_FACT(iprm::IParamsSet, m_paramSetFactoyCompPtr);
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 

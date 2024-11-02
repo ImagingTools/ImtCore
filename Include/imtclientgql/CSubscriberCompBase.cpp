@@ -35,14 +35,14 @@ void CSubscriberCompBase::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (m_subscriptionManagerCompPtr.IsValid()){
-		if (m_commandAttrPtr.GetCount() > 0){
-			imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, m_commandAttrPtr[0]);
+		for (int i = 0; i < m_commandAttrPtr.GetCount(); i++){
+			imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, m_commandAttrPtr[i]);
 
 			imtgql::CGqlObject subscriptionField;
 			subscriptionField.InsertField("id");
 			gqlRequest.AddField("data", subscriptionField);
 
-			m_subscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
+			m_subscriptionIds << m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
 		}
 	}
 }

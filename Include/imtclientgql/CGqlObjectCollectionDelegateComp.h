@@ -27,6 +27,7 @@ public:
 		I_REGISTER_INTERFACE(IGqlObjectCollectionDelegate);
 		I_ASSIGN(m_clientCompPtr, "ApiClient", "GraphQL API client", true, "ApiClient");
 		I_ASSIGN(m_collectionIdAttrPtr, "Id", "Collection-ID", false, "");
+		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 	I_END_COMPONENT;
 
 	virtual imtgql::IGqlRequest* CreateGetObjectInfoRequest(const QByteArray& objectId) const override;
@@ -104,6 +105,7 @@ private:
 private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_REF(IGqlClient, m_clientCompPtr);
+	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 };
 
 

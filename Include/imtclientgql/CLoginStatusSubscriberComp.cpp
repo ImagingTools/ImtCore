@@ -30,7 +30,7 @@ void CLoginStatusSubscriberComp::OnResponseReceived(
 		return;
 	}
 
-	if (subscriptionId == m_subscriptionId){
+	if (m_subscriptionIds.contains(subscriptionId)){
 		QJsonDocument document = QJsonDocument::fromJson(subscriptionData);
 		QJsonObject subscriptionObject = document.object();
 

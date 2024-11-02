@@ -128,7 +128,7 @@ Item {
 
         Dialog {
             id: dialog;
-            width: 800;
+            width: 760;
             height: ModalDialogManager.activeView.height - 100;
             title: qsTr("Profile");
             canMove: false;

@@ -56,6 +56,9 @@
                     <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="WebSocketUrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -111,6 +114,9 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="WebSocketUrlParam">
@@ -183,6 +189,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>OnUsersCollectionChanged</Value>
+                                <Value>OnRolesCollectionChanged</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -201,6 +208,9 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="WebSocketUrlParam">
@@ -253,6 +263,9 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="WebSocketUrlParam">

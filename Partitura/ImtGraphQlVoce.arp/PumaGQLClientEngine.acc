@@ -89,6 +89,9 @@
                     <AttributeInfo Id="UrlParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="HttpUrlParam"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketUrlParam"/>
                     </AttributeInfo>

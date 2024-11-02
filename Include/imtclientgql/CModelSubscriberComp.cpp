@@ -30,7 +30,7 @@ void CModelSubscriberComp::OnResponseReceived(const QByteArray& subscriptionId, 
 		subscriptionObject = subscriptionObject.value("data").toObject();
 	}
 
-	if (subscriptionId == m_subscriptionId){
+	if (m_subscriptionIds.contains(subscriptionId)){
 		if (subscriptionObject.contains("id")){
 			notifierInfo.elementId = subscriptionObject.value("id").toString().toUtf8();
 			changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ALL_CHANGED, QVariant::fromValue(notifierInfo));
