@@ -106,6 +106,8 @@ SimpleTableDelegate 1.0 ./Views/SimpleTableDelegate.qml
 TableRowViewer 1.0 ./Views/TableRowViewer.qml
 TableCellText 1.0 ./Views/TableCellText.qml
 
+TableHeaderParamComp 1.0 ./Views/TableHeaderParamComp.qml
+
 TableTreeView 1.0 ./Views/TableTreeView.qml
 TableDecorator 1.0 ./Views/TableDecorator.qml
 TableTreeDecorator 1.0 ./Views/TableTreeDecorator.qml
