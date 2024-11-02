@@ -175,6 +175,60 @@ sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CAuthorizationControlle
 }
 
 
+sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CAuthorizationControllerComp::OnUserToken(
+            const sdl::imtauth::Authorization::V1_0::CUserTokenGqlRequest& userTokenRequest,
+            const ::imtgql::CGqlRequest& gqlRequest,
+            QString& errorMessage) const
+{
+    if (!m_userCollectionCompPtr.IsValid()){
+        Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
+        return sdl::imtauth::Authorization::V1_0::CAuthorizationPayload();
+    }
+
+    if (!m_sessionCollectionCompPtr.IsValid()){
+        Q_ASSERT_X(false, "Component 'SessionCollection' was not set", "CAuthorizationControllerComp");
+        return sdl::imtauth::Authorization::V1_0::CAuthorizationPayload();
+    }
+
+    QByteArray login = userTokenRequest.GetRequestedArguments().input.GetLogin().toUtf8();
+    QByteArray productId = userTokenRequest.GetRequestedArguments().input.GetProductId();
+    QByteArray password = userTokenRequest.GetRequestedArguments().input.GetPassword().toUtf8();
+
+    QByteArray userObjectId = GetUserObjectId(login);
+    if (userObjectId.isEmpty()){
+        return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+    }
+
+    imtauth::CUserInfo* userInfoPtr = nullptr;
+    imtbase::IObjectCollection::DataPtr dataPtr;
+    if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
+        userInfoPtr = dynamic_cast<imtauth::CUserInfo*>(dataPtr.GetPtr());
+    }
+
+    if (userInfoPtr == nullptr){
+        return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+    }
+
+    QByteArray activeSystemId;
+    bool ok = false;
+    for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
+        if (systemInfo.enabled){
+            if (CheckCredential(systemInfo.systemId, login, password)){
+                ok = true;
+                activeSystemId = systemInfo.systemId;
+                break;
+            }
+        }
+    }
+
+    if (!ok){
+        return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+    }
+
+    return CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
+}
+
+
 sdl::imtauth::Authorization::V1_0::CUserManagementPayload CAuthorizationControllerComp::OnGetUserMode(
 			const sdl::imtauth::Authorization::V1_0::CGetUserModeGqlRequest& /*getUserModeRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,

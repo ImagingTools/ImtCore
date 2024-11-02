@@ -38,6 +38,10 @@ protected:
 				const sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest& authorizationRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+    virtual sdl::imtauth::Authorization::V1_0::CAuthorizationPayload OnUserToken(
+                const sdl::imtauth::Authorization::V1_0::CUserTokenGqlRequest& userTokenRequest,
+                const ::imtgql::CGqlRequest& gqlRequest,
+                QString& errorMessage) const override;
 	virtual sdl::imtauth::Authorization::V1_0::CUserManagementPayload OnGetUserMode(
 				const sdl::imtauth::Authorization::V1_0::CGetUserModeGqlRequest& getUserModeRequest,
 				const imtgql::CGqlRequest& gqlRequest,

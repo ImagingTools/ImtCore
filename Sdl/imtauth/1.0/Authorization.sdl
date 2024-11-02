@@ -35,6 +35,7 @@ input UserManagementInput {
 
 type Query {
 	Authorization (input: AuthorizationInput): AuthorizationPayload!
+	UserToken (input: AuthorizationInput): AuthorizationPayload!
 	GetUserMode (input: UserManagementInput): UserManagementPayload!
 }
 
