@@ -827,7 +827,13 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 			}
 			else{
 				int intValue = text.toInt(&ok);
-				value = intValue;
+				if (QString::number(intValue) == text){
+					value = intValue;
+				}
+				else {
+					value = text;
+				}
+
 			}
 		}
 		m_activeGqlObjectPtr->InsertField(m_currentField, value);
