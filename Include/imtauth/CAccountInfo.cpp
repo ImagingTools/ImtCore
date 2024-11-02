@@ -168,7 +168,7 @@ bool CAccountInfo::Serialize(iser::IArchive& archive)
 	}
 
 	iser::CArchiveTag accountNameTag("AccountName", "Account name", iser::CArchiveTag::TT_LEAF);
-	retVal = archive.BeginTag(accountNameTag);
+	retVal = retVal && archive.BeginTag(accountNameTag);
 	retVal = retVal && archive.Process(m_accountName);
 	retVal = retVal && archive.EndTag(accountNameTag);
 
@@ -216,6 +216,22 @@ bool CAccountInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 
 		retVal = retVal && m_accountPicture.CopyFrom(sourcePtr->GetAccountPicture());
 //		retVal = retVal && m_contact.CopyFrom(sourcePtr->m_contact);
+
+		return retVal;
+	}
+
+	return false;
+}
+
+
+bool CAccountInfo::IsEqual(const IChangeable& object) const
+{
+	const CAccountInfo* sourcePtr = dynamic_cast<const CAccountInfo*>(&object);
+	if (sourcePtr != nullptr){
+		bool retVal = m_accountType == sourcePtr->m_accountType;
+		retVal = retVal && m_accountName == sourcePtr->m_accountName;
+		retVal = retVal && m_accountDescription == sourcePtr->m_accountDescription;
+		// retVal = retVal && m_accountPicture.IsEqual(sourcePtr->m_accountPicture);
 
 		return retVal;
 	}
