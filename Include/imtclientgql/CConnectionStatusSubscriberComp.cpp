@@ -26,7 +26,7 @@ void CConnectionStatusSubscriberComp::OnResponseReceived(
 			const QByteArray& subscriptionId,
 			const QByteArray& subscriptionData)
 {
-	if (m_subscriptionIds.contains(subscriptionId)){
+	if (!m_subscriptionIds.contains(subscriptionId)){
 		return;
 	}
 
