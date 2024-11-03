@@ -79,6 +79,7 @@ imtstylecontrolsqml.file = ../../Include/imtstylecontrolsqml/QMake/imtstylecontr
 
 SUBDIRS += imtapp
 imtapp.file = ../../Include/imtapp/QMake/imtapp.pro
+imtapp.depends = imtappsdl
 
 SUBDIRS += imtauth
 imtauth.file = ../../Include/imtauth/QMake/imtauth.pro
@@ -138,7 +139,7 @@ imtgql.file = ../../Include/imtgql/QMake/imtgql.pro
 
 SUBDIRS += imtservergql
 imtservergql.file = ../../Include/imtservergql/QMake/imtservergql.pro
-imtservergql.depends = imtgql imtcol
+imtservergql.depends = imtgql imtcol imtappsdl
 
 SUBDIRS += imtdb
 imtdb.file = ../../Include/imtdb/QMake/imtdb.pro
