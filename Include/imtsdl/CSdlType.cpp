@@ -17,6 +17,12 @@ namespace imtsdl
 
 // public methods
 
+CSdlType::CSdlType()
+	:m_isExternal(false)
+{
+}
+
+
 QString CSdlType::GetName() const
 {
 	return m_name;
@@ -77,6 +83,36 @@ void CSdlType::SetTargetHeaderFile(const QString& schemaFile)
 }
 
 
+QString CSdlType::GetSchemaFile() const
+{
+	return m_schemaFile;
+}
+
+
+void CSdlType::SetSchemaFile(const QString& schemaFile)
+{
+	if (m_schemaFile != schemaFile){
+		istd::CChangeNotifier notifier(this);
+		m_schemaFile = schemaFile;
+	}
+}
+
+
+bool CSdlType::IsExternal() const
+{
+	return m_isExternal;
+}
+
+
+void CSdlType::SetExternal(bool isExternal)
+{
+	if (m_isExternal != isExternal){
+		istd::CChangeNotifier notifier(this);
+		m_isExternal = isExternal;
+	}
+}
+
+
 // reimplemented(iser::ISerializable)
 
 bool CSdlType::Serialize(iser::IArchive& archive)
@@ -100,6 +136,16 @@ bool CSdlType::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_targetHeaderFile);
 	retVal = retVal && archive.EndTag(targetHeaderFileTag);
 
+	iser::CArchiveTag schemaFileTag("SchemaFile", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(schemaFileTag);
+	retVal = retVal && archive.Process(m_schemaFile);
+	retVal = retVal && archive.EndTag(schemaFileTag);
+
+	iser::CArchiveTag externalTag("IsExternal", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(externalTag);
+	retVal = retVal && archive.Process(m_isExternal);
+	retVal = retVal && archive.EndTag(externalTag);
+
 	retVal = retVal && CSdlField::SerializeSdlFieldList(archive, m_fields, "Fields", "Field");
 
 	return retVal;
@@ -112,6 +158,8 @@ bool CSdlType::operator==(const CSdlType& other) const
 	retVal = retVal && m_fields == other.m_fields;
 	retVal = retVal && m_namespace == other.m_namespace;
 	retVal = retVal && m_targetHeaderFile == other.m_targetHeaderFile;
+	retVal = retVal && m_schemaFile == other.m_schemaFile;
+	retVal = retVal && m_isExternal == other.m_isExternal;
 
 	return retVal;
 }

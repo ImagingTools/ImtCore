@@ -19,32 +19,42 @@ namespace imtsdl
 class CSdlType: public iser::ISerializable
 {
 
-
 public:
-	QString GetName() const;
+	CSdlType();
+
+	[[nodiscard]] QString GetName() const;
 	void SetName(const QString& name);
 
-	SdlFieldList GetFields() const;
+	[[nodiscard]] SdlFieldList GetFields() const;
 	void SetFields(const SdlFieldList& fields);
 
-	QString GetNamespace() const;
+	[[nodiscard]] QString GetNamespace() const;
 	void SetNamespace(const QString& aNamespace);
 
-	QString GetTargetHeaderFile() const;
+	[[nodiscard]] QString GetTargetHeaderFile() const;
 	void SetTargetHeaderFile(const QString& schemaFile);
+
+	[[nodiscard]] QString GetSchemaFile() const;
+	void SetSchemaFile(const QString& schemaFile);
+
+	[[nodiscard]] bool IsExternal() const;
+	void SetExternal(bool isExternal);
 
 	// reimplemented(iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// operators
-	bool operator==(const CSdlType& other) const;
-	bool operator!=(const CSdlType& other) const { return !(operator==(other)); }
+	[[nodiscard]] bool operator==(const CSdlType& other) const;
+	[[nodiscard]] bool operator!=(const CSdlType& other) const { return !(operator==(other)); }
+
 
 private:
 	QString m_name;
+	SdlFieldList m_fields;
 	QString m_namespace;
 	QString m_targetHeaderFile;
-	SdlFieldList m_fields;
+	QString m_schemaFile;
+	bool m_isExternal;
 };
 
 

@@ -65,7 +65,7 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes();
+	SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
 
 	// first create all files with basic mathods
 	for (const CSdlType& sdlType: sdlTypeList){

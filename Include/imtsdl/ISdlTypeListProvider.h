@@ -16,7 +16,11 @@ class ISdlTypeListProvider: virtual public istd::IPolymorphic
 
 public:
 	virtual QStringList GetTypeNames() const = 0;
-	virtual SdlTypeList GetSdlTypes() const = 0;
+	/**
+	   \returns available types
+	   \param onlyLocal - if true - external types will be excluded
+	 */
+	virtual SdlTypeList GetSdlTypes(bool onlyLocal) const = 0;
 	virtual SdlFieldList GetFields(const QString typeName) const = 0;
 
 };

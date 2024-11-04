@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtsdl/imtsdl.h>
 #include <imtsdl/ISdlProcessArgumentsParser.h>
+#include <imtsdl/ISdlTypeListProvider.h>
 
 
 class QTextStream;
@@ -34,6 +35,25 @@ public:
 public:
 	typedef icomp::TReferenceMember<iprm::IParamsSet> SchemaParamsCompPtr;
 	typedef icomp::TReferenceMember<ISdlProcessArgumentsParser> ArgumentParserCompPtr;
+
+	static void WrapTypeToList(QString& text);
+
+	static QString ConvertTypeWithNamespace(
+				const CSdlField& sdlField,
+				const QString& relatedNamespace,
+				ISdlTypeListProvider& listProvider,
+				bool* isCustomPtr = nullptr,
+				bool* isComplexPtr = nullptr,
+				bool* isArrayPtr = nullptr);
+
+	static QString OptListConvertTypeWithNamespace(
+				const CSdlField& sdlField,
+				const QString& relatedNamespace,
+				ISdlTypeListProvider& listProvider,
+				bool listWrap,
+				bool* isCustomPtr = nullptr,
+				bool* isComplexPtr = nullptr,
+				bool* isArrayPtr = nullptr);
 
 	static QString ConvertType(const CSdlField& sdlField, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr);
 	static QString ConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr);
@@ -64,10 +84,13 @@ public:
 	[[nodiscard]]static QString GetNamespaceFromParamsOrArguments(
 				const SchemaParamsCompPtr& schemaParamsCompPtr,
 				const ArgumentParserCompPtr& argumentParamsCompPtr);
+	[[nodiscard]]static QString GetNamespaceFromParamsOrArguments(
+				const iprm::IParamsSet* schemaParamsCompPtr,
+				const ArgumentParserCompPtr& argumentParamsCompPtr);
 
 	/// \sa ISdlProcessArgumentsParser::s_headerFileType ISdlProcessArgumentsParser::s_sourceFileType
 	[[nodiscard]]static QMap<QString/*type*/, QString/*path*/> GetAutoJoinCppFilesSchema(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
-	static bool SetOutputFilesForType(CSdlType& sdlType, const iprm::IParamsSet* schemaParamsPtr, const ISdlProcessArgumentsParser* argumentParamsPtr);
+	static bool UpdateTypeInfo(CSdlType& sdlType, const iprm::IParamsSet* schemaParamsPtr, const ISdlProcessArgumentsParser* argumentParamsPtr);
 
 	[[nodiscard]]static QStringList GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
 	[[nodiscard]]static QString GetQmlModuleNameFromParamsOrArguments(
@@ -84,6 +107,7 @@ public:
 	static void GenerateListTempValueCode(QTextStream& stream, const CSdlField& sdlField, QString& tempVariableName, uint indents = 1);
 
 	static void PrintFiles(std::ostream& outStream, const QStringList& files, ISdlProcessArgumentsParser::GeneratorType projectCodeGenerator = ISdlProcessArgumentsParser::GT_CMAKE);
+	static QString ResolveRelativeHeaderFileForType(const CSdlType& sdlType, const QStringList& lookupPaths);
 
 };
 

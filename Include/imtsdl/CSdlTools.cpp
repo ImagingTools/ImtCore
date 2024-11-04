@@ -5,8 +5,9 @@
 #include <ostream>
 
 // Qt includes
-#include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QDir>
+#include <QtCore/QDirIterator>
 #include <QtCore/QRegularExpression>
 
 // ACF includes
@@ -29,6 +30,78 @@ const QString CSdlTools::s_variantMapClassMemberName = QStringLiteral("_m_setted
 
 
 // public static methods
+
+
+void CSdlTools::WrapTypeToList(QString& text)
+{
+	text.prepend(QStringLiteral("QList<"));
+	text.append('>');
+}
+
+
+QString CSdlTools::ConvertTypeWithNamespace(
+			const CSdlField& sdlField,
+			const QString& relatedNamespace,
+			ISdlTypeListProvider& listProvider,
+			bool* isCustomPtr,
+			bool* isComplexPtr,
+			bool* isArrayPtr)
+{
+	return OptListConvertTypeWithNamespace(
+				sdlField,
+				relatedNamespace,
+				listProvider,
+				true,
+				isCustomPtr,
+				isComplexPtr,
+				isArrayPtr);
+}
+
+
+QString CSdlTools::OptListConvertTypeWithNamespace(const CSdlField& sdlField, const QString& relatedNamespace, ISdlTypeListProvider& listProvider, bool listWrap, bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
+{
+	bool _isCustom = false;
+	QString retVal = ConvertType(sdlField.GetType(), &_isCustom, isComplexPtr);
+	if (isCustomPtr != nullptr){
+		*isCustomPtr = _isCustom;
+	}
+	if (isArrayPtr != nullptr){
+		*isArrayPtr = sdlField.IsArray();
+	}
+
+	if (!_isCustom){
+		// we can define namespace only for custom types
+		if (listWrap && sdlField.IsArray()){
+			WrapTypeToList(retVal);
+		}
+
+		return retVal;
+	}
+
+	if (!relatedNamespace.isEmpty()){
+		CSdlType typeForField;
+		const bool isFound = GetSdlTypeForField(sdlField, listProvider.GetSdlTypes(false), typeForField);
+		Q_ASSERT(isFound);
+		QString typeNamespace = typeForField.GetNamespace();
+		while (!typeNamespace.endsWith(QStringLiteral("::"))){
+			typeNamespace.append(':');
+		}
+		if (typeNamespace != relatedNamespace){
+			retVal.prepend(typeNamespace);
+			// use global namespace
+			if (!retVal.startsWith(QStringLiteral("::"))){
+				retVal.prepend(QStringLiteral("::"));
+			}
+		}
+	}
+
+	if (listWrap && sdlField.IsArray()){
+		WrapTypeToList(retVal);
+	}
+
+	return retVal;
+}
+
 
 QString CSdlTools::ConvertType(const CSdlField& sdlField, bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
 {
@@ -487,8 +560,7 @@ bool CSdlTools::GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList&
 {
 	for (const CSdlType& type: typeList){
 		if (type.GetName() == sdlField.GetType()){
-			sdlType.SetFields(type.GetFields());
-			sdlType.SetName(type.GetName());
+			sdlType = type;
 
 			return true;
 		}
@@ -631,8 +703,16 @@ QString CSdlTools::GetNamespaceFromParamsOrArguments(
 			const SchemaParamsCompPtr& schemaParamsCompPtr,
 			const ArgumentParserCompPtr& argumentParamsCompPtr)
 {
+	return GetNamespaceFromParamsOrArguments(
+				(schemaParamsCompPtr.IsValid() ? schemaParamsCompPtr.GetPtr() : nullptr),
+				argumentParamsCompPtr);
+}
+
+
+QString CSdlTools::GetNamespaceFromParamsOrArguments(const iprm::IParamsSet* schemaParamsCompPtr, const ArgumentParserCompPtr& argumentParamsCompPtr)
+{
 	QString sdlNamespace;
-	if (schemaParamsCompPtr.IsValid()){
+	if (schemaParamsCompPtr != nullptr){
 		sdlNamespace = BuildNamespaceFromParams(*schemaParamsCompPtr);
 		if (argumentParamsCompPtr.IsValid()){
 			QString namespacePrefix =argumentParamsCompPtr->GetNamespacePrefix();
@@ -693,11 +773,12 @@ QMap<QString, QString> CSdlTools::GetAutoJoinCppFilesSchema(const iprm::IParamsS
 }
 
 
-bool CSdlTools::SetOutputFilesForType(CSdlType& sdlType, const iprm::IParamsSet* schemaParamsPtr, const ISdlProcessArgumentsParser* argumentParserPtr)
+bool CSdlTools::UpdateTypeInfo(CSdlType& sdlType, const iprm::IParamsSet* schemaParamsPtr, const ISdlProcessArgumentsParser* argumentParserPtr)
 {
 	if (argumentParserPtr == nullptr){
 		return false;
 	}
+
 	QMap<QString, QString> joinRules = argumentParserPtr->GetJoinRules();
 	const QString outputDirectoryPath = QDir::cleanPath(argumentParserPtr->GetOutputDirectoryPath());
 	if (argumentParserPtr->IsAutoJoinEnabled()){
@@ -710,7 +791,7 @@ bool CSdlTools::SetOutputFilesForType(CSdlType& sdlType, const iprm::IParamsSet*
 	}
 	else {
 		if(joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType)){
-			sdlType.SetTargetHeaderFile(joinRules[ISdlProcessArgumentsParser::s_headerFileType]);
+			sdlType.SetTargetHeaderFile(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_headerFileType]));
 		}
 		else {
 			sdlType.SetTargetHeaderFile(QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
@@ -890,6 +971,61 @@ void CSdlTools::PrintFiles(std::ostream& outStream, const QStringList& files, IS
 	outStream << outputString.toStdString();
 
 	outStream.flush();
+}
+
+
+QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, const QStringList& lookupPaths)
+{
+	const QString typeNamspace = sdlType.GetNamespace();
+	const QString typeClassName = 'C' + GetCapitalizedValue(sdlType.GetName());
+
+	for (const QString& path: lookupPaths){
+		QDir currentDir(path);
+		QDirIterator it(path, QStringList() << "*.h", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+		while (it.hasNext()) {
+			it.next();
+
+			QFile file(it.filePath());
+			if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+				qDebug() << "Unable to open file. Continuing...";
+
+				continue;
+			}
+
+			static QRegularExpression nsRegex("namespace\\s+((?:\\w|::)+)\\s*\\{?");
+			static QRegularExpression classRegex("class\\s+(\\w+)");
+
+			QString currentNamespace;
+
+			while (!file.atEnd()) {
+				QString line = file.readLine().trimmed();
+
+				if (nsRegex.match(line).hasMatch()) {
+					currentNamespace = nsRegex.match(line).capturedTexts()[1];
+				}
+
+				if (line.contains("}")) {
+					// we reached and of namespace. reset
+					currentNamespace.clear();
+				}
+
+				if (currentNamespace != typeNamspace){
+					continue;
+				}
+
+				if (classRegex.match(line).hasMatch()) {
+					QString className = classRegex.match(line).capturedTexts()[1];
+					if (typeClassName == className){
+						return currentDir.dirName() + '/' + currentDir.relativeFilePath(it.filePath());
+					}
+				}
+			}
+
+			file.close();
+		}
+	}
+
+	return QString();
 }
 
 

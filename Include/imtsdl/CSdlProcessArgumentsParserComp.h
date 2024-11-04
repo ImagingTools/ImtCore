@@ -47,6 +47,7 @@ public:
 	virtual GeneratorType GetGeneratorType() const override;
 	virtual bool IsAutoJoinEnabled() const override;
 	virtual AutoLinkLevel GetAutoLinkLevel() const override;
+	virtual QStringList GetHeadersIncludePaths() const override;
 
 private:
 	QString m_schemaFilePath;
@@ -70,6 +71,7 @@ private:
 	GeneratorType m_generatorType;
 	bool m_autoJoinEnabled;
 	AutoLinkLevel m_autolinkLevel;
+	QStringList m_headersIncludePaths;
 };
 
 

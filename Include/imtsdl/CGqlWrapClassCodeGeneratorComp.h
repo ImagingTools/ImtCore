@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <istd/TDelPtr.h>
+#include <iprm/ITextParam.h>
 #include <iproc/TSyncProcessorCompBase.h>
 
 // ImtCore includes
@@ -35,6 +36,7 @@ public:
 		I_ASSIGN(m_sdlRequestListCompPtr, "SdlRequestListProvider", "SDL requests used to create a GraphQL wrap code", true, "SdlRequestListProvider")
 		I_ASSIGN(m_filesJoinerCompPtr, "FilesJoiner", "Compoment, used to join files into a single", false, "FilesJoiner")
 		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
+		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
 
 	I_END_COMPONENT;
 
@@ -88,6 +90,7 @@ private:
 	I_REF(ISdlRequestListProvider, m_sdlRequestListCompPtr);
 	I_REF(iproc::IProcessor, m_filesJoinerCompPtr);
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
+	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);
 
 	istd::TDelPtr<QFile> m_headerFilePtr;
 	istd::TDelPtr<QFile> m_sourceFilePtr;

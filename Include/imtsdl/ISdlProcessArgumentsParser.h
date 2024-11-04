@@ -51,6 +51,7 @@ public:
 	virtual GeneratorType GetGeneratorType() const = 0;
 	virtual bool IsAutoJoinEnabled() const = 0;
 	virtual AutoLinkLevel GetAutoLinkLevel() const = 0;
+	virtual QStringList GetHeadersIncludePaths() const = 0;
 
 };
 

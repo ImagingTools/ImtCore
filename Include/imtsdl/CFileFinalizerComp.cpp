@@ -6,7 +6,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QTemporaryFile>
 #include <QtCore/QDir>
-#include <QtCore/QDirIterator>
 #include <QtCore/QLockFile>
 #include <QtCore/QRegularExpression>
 #include <QtCore/QRegularExpressionMatch>

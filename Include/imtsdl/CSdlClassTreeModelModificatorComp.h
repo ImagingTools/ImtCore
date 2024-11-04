@@ -44,6 +44,7 @@ private:
 	void AddCustomArrayFieldReadFromModelCode(QTextStream& stream, const CSdlField& field, const CSdlType& sdlType);
 	void AddCustomArrayFieldReadFromModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
 
+private:
 };
 
 

@@ -52,14 +52,15 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption baseClassOption({"B", "base-class"}, "Defines base class of all generated classes with include path CLASS=/include/path", "BaseClassList");
 	QCommandLineOption joinRulesOption({"J", "join"}, "Defines file types, will be joined TYPE(H or CPP)=/Destination/File/Path", "JoinRules");
 	QCommandLineOption includePathOption({"I", "include"}, "Specifies the import directories which should be searched when parsing the schema.", "IncludePathList");
-
-	/// \todo remove it \deprecated
-	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single. Deprecated.");
 	QCommandLineOption generatorOption("generator", "{QMake | CMake | CMake-pipe}. Optional. Only for dependencies mode. Defines a type of output of files to be generated. Default - CMake", "generator");
 	QCommandLineOption autoLinkOption("auto-link", "Defines the compilation order of the schema files.\n"
 												   "0 - disabled. ALL files will be compiled.\n"
 												   "1 - only those schemas with the same namespace as the original one will be compiled\n"
 												   "2 - only the schema will be compiled. See the 'input parameter' option", "AutoLink", "0");
+	QCommandLineOption includeHeadersOption({"H","include-headers"}, "List of directories to search for generated header files", "HeadersIncludes");
+
+	/// \todo remove it \deprecated
+	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single. Deprecated.");
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
 	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)");
@@ -70,6 +71,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 						"You MUST NOT use other options, in this case, the behavior is undefined!");
 
 	QCommandLineParser commandLineParser;
+	commandLineParser.addHelpOption();
+
 	bool isOptionsAdded = commandLineParser.addOptions(
 				{
 					schemaFilePathOption,
@@ -89,7 +92,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 					includePathOption,
 					autoJoinOption,
 					generatorOption,
-					autoLinkOption
+					autoLinkOption,
+					includeHeadersOption
 				});
 	if (!isOptionsAdded){
 		Q_ASSERT(false);
@@ -206,6 +210,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 		else {
 			SendErrorMessage(0, QString("Unexpected generator option '%1'. Expected: QMake or CMake").arg(generatorName));
 		}
+	}
+
+	if (commandLineParser.isSet(includeHeadersOption)){
+		m_headersIncludePaths = commandLineParser.values(includeHeadersOption);
 	}
 
 	// special modes
@@ -363,6 +371,12 @@ bool CSdlProcessArgumentsParserComp::IsAutoJoinEnabled() const
 ISdlProcessArgumentsParser::AutoLinkLevel CSdlProcessArgumentsParserComp::GetAutoLinkLevel() const
 {
 	return m_autolinkLevel;
+}
+
+
+QStringList CSdlProcessArgumentsParserComp::GetHeadersIncludePaths() const
+{
+	return m_headersIncludePaths;
 }
 
 

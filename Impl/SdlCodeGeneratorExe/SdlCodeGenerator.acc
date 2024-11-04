@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
+            <Version Id="0" Number="5274" Description="ACF"/>
             <Version Id="1" Number="2220" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
@@ -53,7 +53,7 @@
                                     <Data IsEnabled="true" Value="? Imaging tools"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ProductName" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Design token generator"/>
+                                    <Data IsEnabled="true" Value="SDL code generator"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="VersionInfo"/>
@@ -209,6 +209,9 @@
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework/OriginalNamespace"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
@@ -273,6 +276,9 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework/OriginalNamespace"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>

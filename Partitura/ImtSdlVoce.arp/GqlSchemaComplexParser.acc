@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5231" Description="ACF"/>
-            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5274" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -24,6 +24,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SchemaNamespace" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="OriginalNamespace"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                         <Data IsEnabled="false"/>
@@ -82,6 +85,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="OriginalNamespace" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -92,6 +100,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="GqlSchemaParser"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="OriginalNamespace" ComponentId="OriginalNamespace"/>
         <Component ExportedId="SchemaCustomParams" ComponentId="GqlSchemaParser/SchemaCustomParams"/>
     </ExportedComponents>
 </Acf>

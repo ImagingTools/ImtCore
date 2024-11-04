@@ -57,7 +57,7 @@ int CSdlClassModificatorBaseComp::DoProcessing(
 	imtbase::CTempDir tempDir;
 	const QString tempPath = tempDir.Path();
 
-	SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes();
+	SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
 	for (const CSdlType& sdlType: sdlTypeList){
 		m_headerFilePtr.SetPtr(new QFile(tempPath + "/C" + sdlType.GetName() + ".h"));
 		m_sourceFilePtr.SetPtr(new QFile(tempPath + "/C" + sdlType.GetName() + ".cpp"));

@@ -162,6 +162,11 @@ int CGqlSchemaParserComp::DoProcessing(
 		return TS_INVALID;
 	}
 
+	if (m_schemaNamespaceCompPtr.IsValid()){
+		const QString curretNamespace = CSdlTools::GetNamespaceFromParamsOrArguments(&m_customSchemaParams, m_argumentParserCompPtr);
+		m_schemaNamespaceCompPtr->SetText(curretNamespace);
+	}
+
 	// add output params values
 	if (typeListParamsPtr != nullptr){
 		for (const CSdlType& sdlType: std::as_const(m_sdlTypes)){
@@ -410,12 +415,15 @@ bool CGqlSchemaParserComp::SetupSchemaFilePath(const istd::IPolymorphic* inputPt
 	}
 
 	if (!m_currentSchemaFilePath.isEmpty()){
+		BaseClass::m_originalSchemaFile = m_currentSchemaFilePath;
+
 		return true;
 	}
 
 	// Then, check an argument parser
 	if (m_argumentParserCompPtr.IsValid()){
 		m_currentSchemaFilePath = m_argumentParserCompPtr->GetSchemaFilePath();
+		BaseClass::m_originalSchemaFile = m_currentSchemaFilePath;
 	}
 
 	if (m_currentSchemaFilePath.isEmpty()){
@@ -528,13 +536,51 @@ bool CGqlSchemaParserComp::ValidateSchema()
 		return false;
 	}
 
+	ISdlProcessArgumentsParser::AutoLinkLevel autoLinkLevel = m_argumentParserCompPtr->GetAutoLinkLevel();
+
 	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled() && !m_argumentParserCompPtr->IsDependenciesMode()){
 		for (CSdlType& sdlType: m_sdlTypes){
-			const bool isSet = CSdlTools::SetOutputFilesForType(sdlType, &m_customSchemaParams, m_argumentParserCompPtr.GetPtr());
-			if (!isSet){
-				SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlType.GetName(), m_currentSchemaFilePath));
+			bool isExternal = sdlType.IsExternal();
 
-				return false;
+			// add namespace prefix to all types
+			const QString namespacePrefix = m_argumentParserCompPtr->GetNamespacePrefix() + QStringLiteral("::");
+			if (!namespacePrefix.isEmpty()){
+				const QString originalTypeNamespace = sdlType.GetNamespace();
+				if (!originalTypeNamespace.isEmpty() && !originalTypeNamespace.startsWith(namespacePrefix)){
+					sdlType.SetNamespace(namespacePrefix + originalTypeNamespace);
+				}
+			}
+
+			if (isExternal){
+				// if external, that mean, it is already processed
+				continue;
+			}
+
+			if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_ONLY_FILE){
+				isExternal = bool(m_currentSchemaFilePath != m_argumentParserCompPtr->GetSchemaFilePath());
+			}
+			else if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_SAME_NAMESPACE){
+				const QString typeNamespace = sdlType.GetNamespace();
+				if (!typeNamespace.isEmpty()){
+					const QString currentNamespace = namespacePrefix + CSdlTools::BuildNamespaceFromParams(m_customSchemaParams);
+					isExternal = bool(currentNamespace != typeNamespace);
+				}
+			}
+
+			sdlType.SetExternal(isExternal);
+			if (!isExternal){
+				if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_NONE){
+					// set same namespace for all types if generate all schemas in single file
+					const QString typeNamespace = CSdlTools::GetNamespaceFromParamsOrArguments(&m_customSchemaParams, m_argumentParserCompPtr);
+					sdlType.SetNamespace(typeNamespace);
+				}
+
+				const bool isSet = CSdlTools::UpdateTypeInfo(sdlType, &m_customSchemaParams, m_argumentParserCompPtr.GetPtr());
+				if (!isSet){
+					SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlType.GetName(), m_currentSchemaFilePath));
+
+					return false;
+				}
 			}
 		}
 	}

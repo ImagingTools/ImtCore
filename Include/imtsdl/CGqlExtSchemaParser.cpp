@@ -255,7 +255,9 @@ bool CGqlExtSchemaParser::ValidateSchema()
 	const QString fieldsNamespace = CSdlTools::BuildNamespaceFromParams(m_customSchemaParams);
 	// set namespace for all types
 	for (CSdlType& sdlType: m_sdlTypes){
-		sdlType.SetNamespace(fieldsNamespace);
+		if (!sdlType.IsExternal() || sdlType.GetNamespace().isEmpty()){
+			sdlType.SetNamespace(fieldsNamespace);
+		}
 	}
 
 	return true;

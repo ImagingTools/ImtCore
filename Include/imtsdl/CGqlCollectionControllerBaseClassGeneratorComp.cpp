@@ -968,7 +968,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 	}
 
 	CSdlType sdlType;
-	bool isTypeExsists = GetSdlTypeForField(aSdlField, m_sdlTypeListCompPtr->GetSdlTypes(), sdlType);
+	bool isTypeExsists = GetSdlTypeForField(aSdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), sdlType);
 	Q_ASSERT(isTypeExsists);
 
 	for (const CSdlField& sdlField: sdlType.GetFields()){

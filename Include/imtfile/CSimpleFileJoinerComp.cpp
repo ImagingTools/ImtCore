@@ -5,7 +5,6 @@
 #include <QtCore/QString>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
-#include <QtCore/QDirIterator>
 #include <QtCore/QLockFile>
 
 // ACF includes

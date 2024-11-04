@@ -2,15 +2,16 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5231" Description="ACF"/>
-            <Version Id="1" Number="2214" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5274" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GqlSchemaParser" X="750" Y="300" Note=""/>
+        <Element ComponentName="GqlSchemaParser" X="775" Y="300" Note=""/>
         <Element ComponentName="GqlSchemaParserFactory" X="750" Y="425" Note=""/>
         <Element ComponentName="GqlSchemaParserFactory2" X="750" Y="550" Note=""/>
+        <Element ComponentName="OriginalNamespace" X="475" Y="300" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

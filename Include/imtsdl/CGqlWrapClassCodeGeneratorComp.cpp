@@ -278,7 +278,8 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const CSdlRequest& s
 	SdlFieldList requestArguments = sdlRequest.GetInputArguments();
 	for (const CSdlField& sdlField: requestArguments){
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << ConvertType(sdlField) << ' ' << sdlField.GetId() << ';';
+		ifStream << ConvertTypeWithNamespace(sdlField, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr);
+		ifStream << ' ' << sdlField.GetId() << ';';
 		FeedStream(ifStream, 1, false);
 	}
 
@@ -477,7 +478,7 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 			bool createStructDefinition)
 {
 	CSdlType sdlType;
-	[[maybe_unused]]bool isTypeFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(), sdlType);
+	[[maybe_unused]]bool isTypeFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), sdlType);
 	Q_ASSERT(isTypeFound);
 
 	if (createStructDefinition ){

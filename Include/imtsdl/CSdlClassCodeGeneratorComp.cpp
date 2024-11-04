@@ -31,6 +31,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
+	Q_ASSERT(m_originalSchemaNamespaceCompPtr.IsValid());
 
 	int retVal = TS_OK;
 
@@ -87,7 +88,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 		}
 		else {
 			QStringList cumulatedFiles;
-			SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes();
+			SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
 			for (const CSdlType& sdlType: sdlTypeList){
 				if (!joinHeaders){
 					cumulatedFiles << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h");
@@ -109,14 +110,16 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes();
+	SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
 
 	// first create all files with basic mathods
 	for (const CSdlType& sdlType: sdlTypeList){
 		m_headerFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
 		m_sourceFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
 
-		if (!BeginClassFiles(sdlType, !joinHeaders, !joinSources)){
+		const bool hasExtDeps = m_argumentParserCompPtr->GetAutoLinkLevel() != ISdlProcessArgumentsParser::ALL_NONE;
+
+		if (!BeginClassFiles(sdlType, hasExtDeps || !joinHeaders, hasExtDeps || !joinSources)){
 			SendErrorMessage(0, QString("Unable to begin files"));
 			I_CRITICAL();
 
@@ -399,8 +402,41 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType, b
 			FeedStream(ifStream, 1, false);
 		}
 
+		// save already included files, to avoid duplicates
+		QSet<QString> customIncluded;
+
 		// Add user custom types
 		if (addDependenciesInclude){
+			SdlFieldList relatedFields = sdlType.GetFields();
+			for (const CSdlField& field: relatedFields){
+				bool isCustom = false;
+				ConvertType(field, &isCustom);
+				if (!isCustom){
+					continue;
+				}
+
+				CSdlType foundType;
+				bool isFound = GetSdlTypeForField(field, m_sdlTypeListCompPtr->GetSdlTypes(false), foundType);
+				if (!isFound){
+					SendCriticalMessage(0, QString("Unable to find type for %1 of %2").arg(field.GetId(), sdlType.GetName()));
+					I_CRITICAL();
+
+					return TS_INVALID;
+				}
+
+				const QString relativeIncludePath = ResolveRelativeHeaderFileForType(foundType, m_argumentParserCompPtr->GetHeadersIncludePaths());
+				if (!relativeIncludePath.isEmpty() && !customIncluded.contains(relativeIncludePath)){
+					ifStream << QStringLiteral("#include <");
+					ifStream << relativeIncludePath << '>';
+					FeedStream(ifStream, 1, false);
+					customIncluded << relativeIncludePath;
+				}
+			}
+
+
+
+/// \todo REMOVE IT!
+#if 0
 			bool isCustomGeneratedCommentAdded = false;
 			for (QSet<QString>::const_iterator complexIter = complexTypeList.cbegin(); complexIter != complexTypeList.cend(); ++complexIter){
 				if (!isCustomGeneratedCommentAdded){
@@ -413,6 +449,8 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType, b
 				ifStream << QStringLiteral("#include \"") << complexTypeName << QStringLiteral(".h\"");
 				FeedStream(ifStream, 1, false);
 			}
+#endif
+
 		}
 	}
 
@@ -484,7 +522,8 @@ bool CSdlClassCodeGeneratorComp::EndHeaderClassFile(const CSdlType& sdlType)
 	FeedStream(ifStream, 1, false);
 
 	for (const CSdlField& sdlField: sdlType.GetFields()){
-		ifStream << '\t' << ConvertType(sdlField) << " m_" << GetDecapitalizedValue(sdlField.GetId()) << ";";
+		ifStream << '\t' << ConvertTypeWithNamespace(sdlField, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr);
+		ifStream << " m_" << GetDecapitalizedValue(sdlField.GetId()) << ";";
 		FeedStream(ifStream, 1, false);
 	}
 
@@ -690,7 +729,7 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 		FeedLineHorizontally(retVal, indents);
 
 		retVal += QStringLiteral("[[nodiscard]] ");
-		retVal += ConvertType(sdlField);
+		retVal += ConvertTypeWithNamespace(sdlField, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr);;
 		retVal += QStringLiteral(" Get") + GetCapitalizedValue(sdlField.GetId());
 		retVal += QStringLiteral("() const;\n");
 	}
@@ -702,7 +741,12 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 		retVal += '(';
 
 		bool isCustom = false;
-		const QString convertedType = ConvertType(sdlField, &isCustom);
+		const QString originalSchemaNamespace = m_originalSchemaNamespaceCompPtr->GetText();
+		const QString convertedType = ConvertTypeWithNamespace(
+					sdlField,
+					originalSchemaNamespace,
+					*m_sdlTypeListCompPtr,
+					&isCustom);
 
 		bool isComplex = sdlField.IsArray() ||
 					sdlField.GetType() == QStringLiteral("String") ||
@@ -726,7 +770,21 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 		// add spectal list insertion method
 		if (sdlField.IsArray()){
 			bool isCustom = false;
-			const QString convertedType = ConvertType(sdlField.GetType(), &isCustom);
+			QString convertedArrayType = ConvertType(sdlField.GetType(), &isCustom);
+			if (!originalSchemaNamespace.isEmpty()){
+				CSdlType typeForField;
+				const bool isFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), typeForField);
+				Q_ASSERT(isFound);
+				const QString typeNamespace = typeForField.GetNamespace();
+				if (typeNamespace != originalSchemaNamespace){
+					convertedArrayType.prepend(typeNamespace);
+					// use global namespace
+					if (!convertedArrayType.startsWith(QStringLiteral("::"))){
+						convertedArrayType.prepend(QStringLiteral("::"));
+					}
+				}
+			}
+
 			bool isComplex = sdlField.GetType() == QStringLiteral("String") ||
 							 sdlField.GetType() == QStringLiteral("ID") ||
 							 isCustom;
@@ -740,7 +798,7 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 				retVal += QStringLiteral("const ");
 			}
 
-			retVal += convertedType;
+			retVal += convertedArrayType;
 
 			if (isComplex){
 				retVal += '&';
@@ -773,7 +831,11 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 	if (generateGetter){
 		FeedStreamHorizontally(stream, indents);
 
-		stream << ConvertType(sdlField);
+		stream << ConvertTypeWithNamespace(
+					sdlField,
+					m_originalSchemaNamespaceCompPtr->GetText(),
+					*m_sdlTypeListCompPtr);
+
 		stream << QStringLiteral(" C") + className + QStringLiteral("::");
 		stream << QStringLiteral("Get") + GetCapitalizedValue(sdlField.GetId());
 		stream << QStringLiteral("() const\n{");
@@ -795,7 +857,11 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 		stream << '(';
 
 		bool isCustom = false;
-		const QString convertedType = ConvertType(sdlField, &isCustom);
+		const QString convertedType = ConvertTypeWithNamespace(
+			sdlField,
+			m_originalSchemaNamespaceCompPtr->GetText(),
+			*m_sdlTypeListCompPtr,
+			&isCustom);
 
 		bool isComplex = sdlField.IsArray() ||
 					sdlField.GetType() == QStringLiteral("String") ||
@@ -851,7 +917,22 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 		// add spectal list insertion method
 		if (sdlField.IsArray()){
 			bool isCustom = false;
-			const QString convertedType = ConvertType(sdlField.GetType(), &isCustom);
+			QString convertedArrayType = ConvertType(sdlField.GetType(), &isCustom);
+			const QString originalSchemaNamespace = m_originalSchemaNamespaceCompPtr->GetText();
+			if (!originalSchemaNamespace.isEmpty()){
+				CSdlType typeForField;
+				const bool isFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), typeForField);
+				Q_ASSERT(isFound);
+				const QString typeNamespace = typeForField.GetNamespace();
+				if (typeNamespace != originalSchemaNamespace){
+					convertedArrayType.prepend(typeNamespace);
+					// use global namespace
+					if (!convertedArrayType.startsWith(QStringLiteral("::"))){
+						convertedArrayType.prepend(QStringLiteral("::"));
+					}
+				}
+			}
+
 			bool isComplex = sdlField.GetType() == QStringLiteral("String") ||
 							 sdlField.GetType() == QStringLiteral("ID") ||
 							 isCustom;
@@ -867,7 +948,7 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 				stream << QStringLiteral("const ");
 			}
 
-			stream << convertedType;
+			stream << convertedArrayType;
 
 			if (isComplex){
 				stream << '&';

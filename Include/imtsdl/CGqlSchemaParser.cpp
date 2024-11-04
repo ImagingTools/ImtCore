@@ -1,6 +1,9 @@
 #include "CGqlSchemaParser.h"
 
 
+// Qt includes
+#include <QtCore/QDir>
+
 // ImtCore includes
 #include <imtsdl/CSdlTools.h>
 
@@ -99,9 +102,21 @@ bool CGqlSchemaParser::ParseGqlSchema()
 
 // reimplemented (ISdlTypeListProvider)
 
-SdlTypeList CGqlSchemaParser::GetSdlTypes() const
+SdlTypeList CGqlSchemaParser::GetSdlTypes(bool onlyLocal) const
 {
-	return m_sdlTypes;
+	SdlTypeList retVal = m_sdlTypes;
+
+	if (onlyLocal){
+		QMutableListIterator typesIter(retVal);
+		while (typesIter.hasNext()){
+			CSdlType type = typesIter.next();
+			if (type.IsExternal()){
+				typesIter.remove();
+			}
+		}
+	}
+
+	return retVal;
 }
 
 
@@ -240,6 +255,7 @@ bool CGqlSchemaParser::ProcessType()
 		ProcessValue(fieldList, &atEnd);
 	}
 	sdlType.SetFields(fieldList);
+	sdlType.SetSchemaFile(m_originalSchemaFile);
 
 	// maybe already added from another file
 	if (!m_sdlTypes.contains(sdlType)){

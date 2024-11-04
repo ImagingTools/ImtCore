@@ -7,6 +7,7 @@
 // ACF includes
 #include <iproc/TSyncProcessorCompBase.h>
 #include <iprm/IOptionsManager.h>
+#include <iprm/ITextParam.h>
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
@@ -43,7 +44,8 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(SchemaCustomParams, iprm::IParamsSet, ExtractSchemaCustomParams);
 
 		I_ASSIGN(m_useFilesImportAttrPtr, "UseJavaStyleImport", "If enabled, all imports will be procesed by resloving paths in file a system", true, true)
-		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", false, "ArgumentParser")
+		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
+		I_ASSIGN(m_schemaNamespaceCompPtr, "SchemaNamespace", "The namespace of the schema being processed", false, "SchemaNamespace")
 		I_ASSIGN(m_fileSchemaParserCompFactPtr, "FileSchemaParserFactory", "Factory used to create shema parser", false, "FileSchemaParserFactory")
 	I_END_COMPONENT;
 
@@ -82,6 +84,7 @@ protected:
 
 private:
 	I_ATTR(bool, m_useFilesImportAttrPtr);
+	I_REF(iprm::ITextParam, m_schemaNamespaceCompPtr);
 	I_FACT(iproc::IProcessor, m_fileSchemaParserCompFactPtr);
 
 	istd::TDelPtr<QFile> m_currentInputFilePtr;

@@ -42,7 +42,7 @@ public:
 
 	// reimplemented (ISdlTypeListProvider)
 	virtual QStringList GetTypeNames() const override;
-	virtual SdlTypeList GetSdlTypes() const override;
+	virtual SdlTypeList GetSdlTypes(bool onlyLocal) const override;
 	virtual SdlFieldList GetFields(const QString typeName) const override;
 
 	// reimplemented (ISdlRequestListProvider)
@@ -106,6 +106,7 @@ protected:
 	qulonglong m_lastReadLine;
 	bool m_useLastReadChar;
 	QMap<KeyId, QByteArray> m_keywordMap;
+	QString m_originalSchemaFile;
 
 	SdlTypeList m_sdlTypes;
 	SdlRequestList m_requests;
