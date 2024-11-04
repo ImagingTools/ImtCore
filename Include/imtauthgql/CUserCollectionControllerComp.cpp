@@ -131,8 +131,8 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		QByteArrayList resultList;
 		if (m_userGroupInfoProviderCompPtr.IsValid()){
 			for (const QByteArray& groupId: userInfoPtr->GetGroups()){
-				const imtauth::IUserGroupInfo* userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
-				if (userGroupInfoPtr != nullptr){
+				istd::TDelPtr<const imtauth::IUserGroupInfo> userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
+				if (userGroupInfoPtr.IsValid()){
 					QString groupName = userGroupInfoPtr->GetName();
 					QString groupDescription = userGroupInfoPtr->GetDescription();
 
@@ -406,19 +406,23 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 }
 
 
-imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
+imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'm_objectCollectionCompPtr' was not set", "CUserCollectionControllerComp");
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject paramsPtr = gqlRequest.GetParams();
+	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
+	if (gqlInputParamPtr == nullptr){
+		errorMessage = QString("Unable to get a meta info. Error: GraphQL params is invalid");
+		return nullptr;
+	}
 
-	QByteArray productId = paramsPtr.GetFieldArgumentValue("ProductId").toByteArray();
+	QByteArray userId = gqlInputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	QByteArray productId = gqlInputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
-	QByteArray userId = GetObjectIdFromInputParams(paramsPtr);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
@@ -432,9 +436,9 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 
 			if (m_roleInfoProviderCompPtr.IsValid()){
 				imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles(productId);
-				for (const QByteArray& productRoleId : rolesIds){
-					const imtauth::IRole* rolePtr = m_roleInfoProviderCompPtr->GetRole(productRoleId);
-					if (rolePtr != nullptr){
+				for (const QByteArray& productRoleId: rolesIds){
+					istd::TDelPtr<const imtauth::IRole> rolePtr = m_roleInfoProviderCompPtr->GetRole(productRoleId);
+					if (rolePtr.IsValid()){
 						QByteArray roleId = rolePtr->GetRoleId();
 						QString roleName = rolePtr->GetRoleName();
 						QByteArray roleProductId = rolePtr->GetProductId();
@@ -453,8 +457,8 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 			if (m_userGroupInfoProviderCompPtr.IsValid()){
 				QByteArrayList groupIds = userInfoPtr->GetGroups();
 				for (const QByteArray& groupId : groupIds){
-					const imtauth::IUserGroupInfo* userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
-					if (userGroupInfoPtr != nullptr){
+					istd::TDelPtr<const imtauth::IUserGroupInfo> userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
+					if (userGroupInfoPtr.IsValid()){
 						QString groupName = userGroupInfoPtr->GetName();
 
 						int childrenIndex = children->InsertNewItem();

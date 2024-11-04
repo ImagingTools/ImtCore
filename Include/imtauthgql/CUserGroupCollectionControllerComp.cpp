@@ -235,8 +235,8 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 			if (m_userGroupInfoProviderCompPtr.IsValid()){
 				imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
 				for (const QByteArray& groupId : groupIds){
-					const imtauth::IUserGroupInfo* parentGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
-					if (parentGroupInfoPtr != nullptr){
+					istd::TDelPtr<const imtauth::IUserGroupInfo> parentGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
+					if (parentGroupInfoPtr.IsValid()){
 						QString groupName = parentGroupInfoPtr->GetName();
 
 						int childrenIndex = children->InsertNewItem();

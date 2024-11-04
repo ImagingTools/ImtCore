@@ -359,7 +359,7 @@ SUBDIRS += ImtServicePck
 ImtServicePck.file = ../../Impl/ImtServicePck/QMake/ImtServicePck.pro
 ImtServicePck.depends = imtservice
 
-SUBDIRS += ImtControlsGallery
-ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
-ImtControlsGallery.depends = imtgui imtqml imtstyle imtstylecontrolsqml
+# SUBDIRS += ImtControlsGallery
+# ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
+# ImtControlsGallery.depends = imtgui imtqml imtstyle imtstylecontrolsqml
 
