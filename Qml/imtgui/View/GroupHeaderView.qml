@@ -15,6 +15,8 @@ Rectangle {
     property GroupElementView groupView: null;
     property alias title: titleText.text;
     property int topPadding: 0
+    property int leftPadding: 0
+    property int rightPadding: Style.size_mainMargin
     property int bottomPadding: 0
     property Component controlComp: baseControlComp
 
@@ -66,7 +68,7 @@ Rectangle {
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.right: parent.right;
-            anchors.rightMargin: Style.size_mainMargin;
+            anchors.rightMargin: root.rightPadding;
 
             height: 22;
             width: height;
@@ -88,6 +90,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.topMargin: root.topPadding
         anchors.left: parent.left;
+        anchors.leftMargin: root.leftPadding
 
         color: Style.textColor;
         font.family: Style.fontFamilyBold;

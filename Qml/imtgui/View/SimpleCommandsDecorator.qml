@@ -12,6 +12,7 @@ Item {
 
     signal commandActivated(string commandId);
     signal commandAdded(int index, string commandId);
+    property int buttonSize: 18
 
     onCommandModelChanged: {
         if (container.commandModel != null){
@@ -70,7 +71,7 @@ Item {
             id: repeater;
 
             delegate: ToolButton {
-                width: visible ? 18 : 0;
+                width: visible ? container.buttonSize : 0;
                 height: width;
 
                 iconSource: enabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Normal) :
