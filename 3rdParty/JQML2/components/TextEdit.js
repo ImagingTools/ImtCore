@@ -1,5 +1,5 @@
 const { Item } = require('./Item')
-const { QColor, QBool, QReal, QFont, QVar, QString } = require('../utils/properties')
+const { QColor, QBool, QReal, QFont, QVar, QString, QInt } = require('../utils/properties')
 
 class TextEdit extends Item {
     static AlignLeft = 0
@@ -30,6 +30,8 @@ class TextEdit extends Item {
         paintedHeight: { type: QReal, value: 0 },
         paintedWidth: { type: QReal, value: 0 },
         cursorRectangle: { type: QVar, value: undefined },
+        selectionStart: { type: QInt, value: 0 },
+        selectionEnd: { type: QInt, value: 0 },
     }
 
     static defaultSignals = {
@@ -79,6 +81,7 @@ class TextEdit extends Item {
 
         this.$input.oninput = (e)=>{
             this.getProperty('text').reset(this.$input.value)
+            this.$updateSelection()
         }
 
         this.getProperty('width').setCompute(()=>{return this.getProperty('contentWidth').get()})
@@ -119,6 +122,12 @@ class TextEdit extends Item {
 
     selectAll(){
         this.$input.select()
+        this.$updateSelection()
+    }
+
+    $updateSelection(){
+        this.getProperty('selectionStart').reset(this.$input.selectionStart)
+        this.getProperty('selectionEnd').reset(this.$input.selectionEnd)
     }
 
     $colorChanged(){
@@ -174,6 +183,7 @@ class TextEdit extends Item {
     $textChanged(){
         this.$input.value = this.getPropertyValue('text')
         this.applyMetrics()
+        this.$updateSelection()
     }
 
     $fontChanged(){

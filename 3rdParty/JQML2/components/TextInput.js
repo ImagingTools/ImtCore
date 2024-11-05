@@ -38,6 +38,8 @@ class TextInput extends Item {
         contentWidth: { type: QReal, value: 0 },
         inputMask: { type: QString, value: '' },
         maximumLength: { type: QInt, value: 32767, changed: '$maximumLengthChanged' },
+        selectionStart: { type: QInt, value: 0 },
+        selectionEnd: { type: QInt, value: 0 },
     }
 
     static defaultSignals = {
@@ -103,7 +105,14 @@ class TextInput extends Item {
                 this.getProperty('acceptableInput').reset(true)
                 if(this.$signals.textEdited) this.$signals.textEdited()
             }
+
+            this.$updateSelection()
         }
+    }
+
+    $updateSelection(){
+        this.getProperty('selectionStart').reset(this.$input.selectionStart)
+        this.getProperty('selectionEnd').reset(this.$input.selectionEnd)
     }
 
     $colorChanged(){
@@ -189,6 +198,7 @@ class TextInput extends Item {
         this.$input.value = this.getPropertyValue('text')
         this.$validatorChanged()
         this.applyMetrics()
+        this.$updateSelection()
     }
 
     $fontChanged(){
@@ -267,6 +277,7 @@ class TextInput extends Item {
 
     selectAll(){
         this.$input.select()
+        this.$updateSelection()
     }
 
     onKeyDown(key){

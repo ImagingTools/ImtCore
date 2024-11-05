@@ -188,6 +188,7 @@ class MouseController {
         if(button === 0 && inner[0] && (inner[0] instanceof TextInput || inner[0] instanceof TextEdit || inner[0] instanceof Map)){
             if(inner[0].getPropertyValue('enabled') && inner[0].getPropertyValue('visible')) {
                 this.target = inner[0]
+                if(this.target.$updateSelection) this.target.$updateSelection()
                 return
             }
         } 
@@ -196,6 +197,7 @@ class MouseController {
             if(button === 0 && (inner[i] instanceof TextInput || inner[i] instanceof TextEdit)){
                 if(inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].getPropertyValue('activeFocus')) {
                     this.target = inner[i]
+                    this.target.$updateSelection()
                     return
                 }
             }
@@ -327,6 +329,7 @@ class MouseController {
                 this.timestamp = 0
                 for(let i = 0; i < this.pressed.length; i++){
                     if(button === 0 && (this.pressed[i] instanceof TextInput || this.pressed[i] instanceof TextEdit)){
+                        this.pressed[i].$updateSelection()
                         break
                     } else if(this.pressed[i] instanceof MouseArea && this.pressed[i].availableButton(button)){
                         if(this.pressed[i].$signals.doubleClicked){
@@ -341,6 +344,7 @@ class MouseController {
             if(!wasDblClicked){
                 for(let i = 0; i < this.pressed.length; i++){
                     if(button === 0 && (this.pressed[i] instanceof TextInput || this.pressed[i] instanceof TextEdit)){
+                        this.pressed[i].$updateSelection()
                         break
                     } else if(this.pressed[i] instanceof MouseArea && this.pressed[i].availableButton(button)){
                         if(this.pressed[i].$signals.clicked){
@@ -432,6 +436,7 @@ class MouseController {
             for(let i = this.list.length-1; i >= 0; i--){
                 if(!wasCursor && this.list[i].UID && (this.list[i] instanceof TextInput || this.list[i] instanceof TextEdit)){
                     if(inner.indexOf(this.list[i]) >= 0){
+                        this.list[i].$updateSelection()
                         if(!this.list[i].getPropertyValue('readOnly')) document.body.style.cursor = 'text'
                         wasCursor = true
                     }
