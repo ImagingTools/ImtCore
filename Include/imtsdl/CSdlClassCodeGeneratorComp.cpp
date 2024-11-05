@@ -119,7 +119,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 		const bool hasExtDeps = m_argumentParserCompPtr->GetAutoLinkLevel() != ISdlProcessArgumentsParser::ALL_NONE;
 
-		if (!BeginClassFiles(sdlType, hasExtDeps || !joinHeaders, hasExtDeps || !joinSources)){
+		if (!BeginClassFiles(sdlType, hasExtDeps || !joinHeaders, !joinSources)){
 			SendErrorMessage(0, QString("Unable to begin files"));
 			I_CRITICAL();
 
@@ -424,12 +424,14 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType, b
 					return TS_INVALID;
 				}
 
-				const QString relativeIncludePath = ResolveRelativeHeaderFileForType(foundType, m_argumentParserCompPtr->GetHeadersIncludePaths());
-				if (!relativeIncludePath.isEmpty() && !customIncluded.contains(relativeIncludePath)){
-					ifStream << QStringLiteral("#include <");
-					ifStream << relativeIncludePath << '>';
-					FeedStream(ifStream, 1, false);
-					customIncluded << relativeIncludePath;
+				if (foundType.IsExternal()){
+					const QString relativeIncludePath = ResolveRelativeHeaderFileForType(foundType, m_argumentParserCompPtr->GetHeadersIncludePaths());
+					if (!relativeIncludePath.isEmpty() && !customIncluded.contains(relativeIncludePath)){
+						ifStream << QStringLiteral("#include <");
+						ifStream << relativeIncludePath << '>';
+						FeedStream(ifStream, 1, false);
+						customIncluded << relativeIncludePath;
+					}
 				}
 			}
 		}

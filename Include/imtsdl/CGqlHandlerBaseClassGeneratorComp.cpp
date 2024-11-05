@@ -409,9 +409,11 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodsForDocument(QTextStream& strea
 
 void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream, const CSdlRequest& sdlRequest, uint hIndents)
 {
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("virtual C");
-	stream << GetCapitalizedValue(sdlRequest.GetOutputArgument().GetType());
+	stream << QStringLiteral("virtual ");
+	stream << OptListConvertTypeWithNamespace(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
 	stream << QStringLiteral(" On");
 	stream << GetCapitalizedValue(sdlRequest.GetName());
 	stream << QStringLiteral("(const C");
@@ -497,9 +499,10 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& stream, const CSdlRequest& sdlRequest, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << '/' << '/' << sdlRequest.GetName();
+	stream << '/' << '/' << ' ' << sdlRequest.GetName();
 	FeedStream(stream, 1, false);
 
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	const QString requestClassName = sdlRequest.GetName() + QStringLiteral("GqlRequest");
 
 	// [1] command ID check
@@ -544,8 +547,8 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 	FeedStream(stream, 2, false);
 
 	// [1] create payload variable by calling reimplemented method
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << 'C' << sdlRequest.GetOutputArgument().GetType();
+	FeedStreamHorizontally(stream, hIndents + 1);	
+	stream << OptListConvertTypeWithNamespace(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
 	stream << QStringLiteral(" replyPayload = On");
 	stream << sdlRequest.GetName() << '(';
 	stream << GetDecapitalizedValue(requestClassName);

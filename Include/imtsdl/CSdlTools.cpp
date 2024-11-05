@@ -976,6 +976,7 @@ void CSdlTools::PrintFiles(std::ostream& outStream, const QStringList& files, IS
 
 QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, const QStringList& lookupPaths)
 {
+	/// \todo cleanup it. use correct names, add checks
 	const QString typeNamspace = sdlType.GetNamespace();
 	const QString typeClassName = 'C' + GetCapitalizedValue(sdlType.GetName());
 

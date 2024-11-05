@@ -50,7 +50,7 @@ public:
 				const CSdlField& sdlField,
 				const QString& relatedNamespace,
 				ISdlTypeListProvider& listProvider,
-				bool listWrap,
+				bool listWrap = false,
 				bool* isCustomPtr = nullptr,
 				bool* isComplexPtr = nullptr,
 				bool* isArrayPtr = nullptr);
