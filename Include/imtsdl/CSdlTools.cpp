@@ -992,19 +992,21 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, con
 				continue;
 			}
 
-			static QRegularExpression nsRegex("namespace\\s+((?:\\w|::)+)\\s*\\{?");
+			static QRegularExpression namespaceRegex("namespace\\s+((?:\\w|::)+)\\s*\\{?");
 			static QRegularExpression classRegex("class\\s+(\\w+)");
+			static QRegularExpression namespaceEndRegex("\\s*\\}\\s*");
+
 
 			QString currentNamespace;
 
 			while (!file.atEnd()) {
 				QString line = file.readLine().trimmed();
 
-				if (nsRegex.match(line).hasMatch()) {
-					currentNamespace = nsRegex.match(line).capturedTexts()[1];
+				if (namespaceRegex.match(line).hasMatch()) {
+					currentNamespace = namespaceRegex.match(line).capturedTexts()[1];
 				}
 
-				if (line.contains("}")) {
+				if (namespaceEndRegex.match(line).hasMatch()) {
 					// we reached and of namespace. reset
 					currentNamespace.clear();
 				}

@@ -432,25 +432,6 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType, b
 					customIncluded << relativeIncludePath;
 				}
 			}
-
-
-
-/// \todo REMOVE IT!
-#if 0
-			bool isCustomGeneratedCommentAdded = false;
-			for (QSet<QString>::const_iterator complexIter = complexTypeList.cbegin(); complexIter != complexTypeList.cend(); ++complexIter){
-				if (!isCustomGeneratedCommentAdded){
-					ifStream << QStringLiteral("// ") << GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) << QStringLiteral(" includes");
-					FeedStream(ifStream, 1, false);
-					isCustomGeneratedCommentAdded = true;
-				}
-
-				const QString& complexTypeName = *complexIter;
-				ifStream << QStringLiteral("#include \"") << complexTypeName << QStringLiteral(".h\"");
-				FeedStream(ifStream, 1, false);
-			}
-#endif
-
 		}
 	}
 
@@ -772,15 +753,17 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 			bool isCustom = false;
 			QString convertedArrayType = ConvertType(sdlField.GetType(), &isCustom);
 			if (!originalSchemaNamespace.isEmpty()){
-				CSdlType typeForField;
-				const bool isFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), typeForField);
-				Q_ASSERT(isFound);
-				const QString typeNamespace = typeForField.GetNamespace();
-				if (typeNamespace != originalSchemaNamespace){
-					convertedArrayType.prepend(typeNamespace);
-					// use global namespace
-					if (!convertedArrayType.startsWith(QStringLiteral("::"))){
-						convertedArrayType.prepend(QStringLiteral("::"));
+				if (isCustom){
+					CSdlType typeForField;
+					const bool isFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), typeForField);
+					Q_ASSERT(isFound);
+					const QString typeNamespace = typeForField.GetNamespace();
+					if (typeNamespace != originalSchemaNamespace){
+						convertedArrayType.prepend(typeNamespace);
+						// use global namespace
+						if (!convertedArrayType.startsWith(QStringLiteral("::"))){
+							convertedArrayType.prepend(QStringLiteral("::"));
+						}
 					}
 				}
 			}
@@ -920,15 +903,17 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 			QString convertedArrayType = ConvertType(sdlField.GetType(), &isCustom);
 			const QString originalSchemaNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 			if (!originalSchemaNamespace.isEmpty()){
-				CSdlType typeForField;
-				const bool isFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), typeForField);
-				Q_ASSERT(isFound);
-				const QString typeNamespace = typeForField.GetNamespace();
-				if (typeNamespace != originalSchemaNamespace){
-					convertedArrayType.prepend(typeNamespace);
-					// use global namespace
-					if (!convertedArrayType.startsWith(QStringLiteral("::"))){
-						convertedArrayType.prepend(QStringLiteral("::"));
+				if (isCustom){
+					CSdlType typeForField;
+					const bool isFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), typeForField);
+					Q_ASSERT(isFound);
+					const QString typeNamespace = typeForField.GetNamespace();
+					if (typeNamespace != originalSchemaNamespace){
+						convertedArrayType.prepend(typeNamespace);
+						// use global namespace
+						if (!convertedArrayType.startsWith(QStringLiteral("::"))){
+							convertedArrayType.prepend(QStringLiteral("::"));
+						}
 					}
 				}
 			}
