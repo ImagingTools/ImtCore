@@ -34,6 +34,14 @@ QVariant CGqlObject::GetFieldArgumentValue(const QByteArray &fieldId) const
 	if (m_simpleFields.contains(fieldId)){
 		retVal = m_simpleFields[fieldId];
 	}
+	else if (m_objectFieldsArray.contains(fieldId)){
+		QVariantList objectList;
+		for (int i = 0; i < m_objectFieldsArray[fieldId].count(); i++){
+			const CGqlObject* gqlObject = m_objectFieldsArray[fieldId][i].GetPtr();
+			objectList.append(gqlObject);
+		}
+		retVal = objectList;
+	}
 
 	return retVal;
 }
