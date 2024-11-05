@@ -83,10 +83,10 @@ QString CSdlTools::OptListConvertTypeWithNamespace(const CSdlField& sdlField, co
 		const bool isFound = GetSdlTypeForField(sdlField, listProvider.GetSdlTypes(false), typeForField);
 		Q_ASSERT(isFound);
 		QString typeNamespace = typeForField.GetNamespace();
-		while (!typeNamespace.endsWith(QStringLiteral("::"))){
-			typeNamespace.append(':');
-		}
 		if (typeNamespace != relatedNamespace){
+			while (!typeNamespace.endsWith(QStringLiteral("::"))){
+				typeNamespace.append(':');
+			}
 			retVal.prepend(typeNamespace);
 			// use global namespace
 			if (!retVal.startsWith(QStringLiteral("::"))){
