@@ -125,9 +125,17 @@ QtObject {
             }
 
             if(typeof this[key] === 'object'){
-                let ok = this[key].isEqualWithModel(model[key]);
-                if (!ok){
-                    return false;
+                if (this[key].isEqualWithModel){
+                    let ok = this[key].isEqualWithModel(model[key]);
+                    if (!ok){
+                        return false;
+                    }
+                }
+                else{
+                    let ok = (this[key] === model[key]);
+                    if (!ok){
+                        return false;
+                    }
                 }
             }
             else{
