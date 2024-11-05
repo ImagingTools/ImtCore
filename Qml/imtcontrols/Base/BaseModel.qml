@@ -179,6 +179,22 @@ ListModel {
 
         return true;
     }
+
+    function addElement(element){
+        element.owner = this.owner
+        element.connectProperties()
+        this.append({item: element})
+        if (owner){
+            owner.modelChanged([])
+        }
+    }
+
+    function removeElement(index){
+        this.remove(index)
+        if (owner){
+            owner.modelChanged([])
+        }
+    }
 }
 
 
