@@ -484,7 +484,8 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 	if (createStructDefinition ){
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("struct ");
-		stream << sdlField.GetType();
+		stream << sdlField.GetId();
+		stream << QStringLiteral("RequestInfo");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, hIndents);
 		stream << '{';
