@@ -107,6 +107,7 @@ class BaseObject{
     }
 
     destroy(){
+        this.__destroying = true
         JQApplication.deleteLater(this)
     }
 }

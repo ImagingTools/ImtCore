@@ -47,6 +47,10 @@ class QtObject extends QObject {
         for(let i = this.data.length-1; i >= 0; i--){
             this.data[i].__complete()
         }
+
+        while(this.__properties.length){
+            this.__properties.shift().__update()
+        }
         
         this['Component.completed']()
     }

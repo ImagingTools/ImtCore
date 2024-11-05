@@ -148,8 +148,8 @@ class ListView extends Flickable {
         return item
     }
 
-    __initView(){
-        if(this.delegate && this.model){
+    __initView(isCompleted){
+        if(this.delegate && this.model && isCompleted){
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
 
@@ -184,7 +184,7 @@ class ListView extends Flickable {
     }
 
     __updateView(changeSet){
-        if(this.delegate && this.model){
+        if(this.delegate && this.model && this.__completed){
             if(this.model.data.length === this.__items.length) return
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)

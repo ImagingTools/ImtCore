@@ -98,7 +98,11 @@ class ListModel extends QtObject {
         JQApplication.updateLater(this)
 
         this.__changeSet.push([index, index+count, 'remove'])
-        this.data.osplice(index, count)
+        let removed = this.data.osplice(index, count)
+
+        for(let r of removed){
+            JQApplication.MemoryController.delete(r)
+        }
 
         this.count = this.data.length
     }
@@ -111,10 +115,7 @@ class ListModel extends QtObject {
     clear(){
         JQApplication.updateLater(this)
 
-        if(this.data.length) {
-            this.__changeSet.push([0, this.data.length, 'remove'])
-            this.data = []
-        }
+        this.remove(0, this.count)
 
         this.count = this.data.length
     }
@@ -132,6 +133,7 @@ class ListModel extends QtObject {
     }
 
     __destroy(){
+        this.clear()
         super.__destroy()
     }
 }

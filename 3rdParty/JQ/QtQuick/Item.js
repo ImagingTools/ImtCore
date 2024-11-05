@@ -380,7 +380,6 @@ class Item extends QtObject {
             return res
         }
     }
-    
 
     __destroy(){
         if(this.__DOM) this.__DOM.remove()

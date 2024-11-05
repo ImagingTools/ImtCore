@@ -23,7 +23,7 @@ class List extends Property {
             }
             let splice = value.splice
             value.osplice = (...args)=>{
-                splice.call(value, ...args)
+                return splice.call(value, ...args)
             }
             value.splice = ()=>{
                 throw `List doesn't define a Replace function`

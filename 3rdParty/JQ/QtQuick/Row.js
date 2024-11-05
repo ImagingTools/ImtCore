@@ -68,6 +68,8 @@ class Row extends Item {
 
         for(let i = 0; i < children.length; i++){
             if(!(children[i] instanceof Repeater) && children[i].visible && children[i].width > 0 && children[i].height > 0){
+                if(children[i].__destroying) continue
+
                 height = Math.max(height, children[i].height)
                 width += children[i].width
                 count += 1
