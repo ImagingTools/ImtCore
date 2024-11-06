@@ -1,3 +1,5 @@
+include (${CMAKE_CURRENT_LIST_DIR}/ImtSdlConfig.cmake)
+
 macro(ImtCoreGetSdlDeps)
 
 	set(booleanArgs GET_SCHEMA_DEPS)
@@ -82,13 +84,13 @@ endfunction()
 
 #! \param CUSTOM_TARGETS_DEPS - if enabled, dependencies will NOT be soved, using the SDL generator \warning if enabled, you MUST provide CUSTOM_HEADER_DEP CUSTOM_SOURCE_DEP!
 #! \param CUSTOM_SOURCE_DEP - source file dependency				\note this param make sence only if \c CUSTOM_TARGETS_DEPS is enabled
-function (ImtCoreCustomConfigureSdlCpp)
-	include (${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ImtSdlConfig.cmake)
-
+macro (ImtCoreCustomConfigureSdlCpp)
 	set(oneValueArgs
 				SCHEMA_PATH
 				VERSION
-				SOURCE_NAME)
+				SOURCE_NAME
+				EXTRA_DEPS
+				FOUND_DEPS)
 	cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
 
 	set(SDL_OUTPUT_DIRECTORY "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP")
@@ -122,6 +124,8 @@ function (ImtCoreCustomConfigureSdlCpp)
 		RESULT_VARIABLE
 			FOUND_DEPS)
 
+	set(${ARG_FOUND_DEPS} "${FOUND_DEPS}")
+
 	ImtCoreGetSdlDeps(GET_SCHEMA_DEPS
 		INPUT
 			"${ARG_SCHEMA_PATH}"
@@ -144,7 +148,7 @@ function (ImtCoreCustomConfigureSdlCpp)
 		ARGS
 			-GS ${ARG_SCHEMA_PATH} -O "${SDL_OUTPUT_DIRECTORY}" ${CUSTOM_MODIFICATORS}
 		DEPENDS
-			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH} "${FOUND_SCHEMA_DEPS}"
+			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH} "${FOUND_SCHEMA_DEPS}" "${ARG_EXTRA_DEPS}"
 		COMMENT
 			"[CPP:SDL::${PROJECT_NAME}] Creating classes"
 		VERBATIM)
@@ -153,13 +157,11 @@ function (ImtCoreCustomConfigureSdlCpp)
 
 	message(VERBOSE "EXEC: ${SDL_GENERATOR_EXE_PATH} -GS ${ARG_SCHEMA_PATH} -O ${SDL_OUTPUT_DIRECTORY} ${CUSTOM_MODIFICATORS}")
 
-endfunction()
+endmacro()
 
 
-function (ImtCoreCustomConfigureSdlQml)
-	include (${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ImtSdlConfig.cmake)
-
-	set(oneValueArgs SCHEMA_PATH VERSION QML_NAME)
+macro (ImtCoreCustomConfigureSdlQml)
+	set(oneValueArgs SCHEMA_PATH VERSION QML_NAME EXTRA_DEPS FOUND_DEPS)
 	cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
 
 	# "${ARG_QML_NAME}"
@@ -180,6 +182,7 @@ function (ImtCoreCustomConfigureSdlQml)
 		RESULT_VARIABLE
 			FOUND_DEPS)
 
+	set(${ARG_FOUND_DEPS} "${FOUND_DEPS}")
 
 	ImtCoreGetSdlDeps(GET_SCHEMA_DEPS
 		INPUT
@@ -202,7 +205,7 @@ function (ImtCoreCustomConfigureSdlQml)
 		ARGS
 			-GS ${ARG_SCHEMA_PATH} -O "${SDL_OUTPUT_DIRECTORY}" ${MODIFICATORS}
 		DEPENDS
-			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH} "${FOUND_SCHEMA_DEPS}"
+			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH} "${FOUND_SCHEMA_DEPS}" "${ARG_EXTRA_DEPS}"
 		COMMENT
 			"[QML:SDL::${PROJECT_NAME}] Creating resources"
 		VERBATIM)
@@ -211,33 +214,51 @@ function (ImtCoreCustomConfigureSdlQml)
 		${PROJECT_NAME}
 		"${FOUND_DEPS}"
 	)
-endfunction()
+endmacro()
 
 
-# CPP+QML+GQL WARNING this function enables ALL modificators
-
-#! \param SCHEMA_PATH	- The absolute path to the schema file to be compiled.
-#! \param VERSION		- Defines the schema's version (also part of the OUTPUT directory path)
-#! \param SOURCE_NAME	- The output source filename, should be provided without an extension, and the function automatically adds the appropriate extension(.cpp).
-#! \param QML_NAME		- The QML module name. Also part of the OUTPUT directory path and filename of QRC file
-function (ImtCoreCustomConfigureSdlCppQml)
+#! CPP+QML+GQL \NOTE this function enables ALL modificators
+#! \param SCHEMA_PATH		- The absolute path to the schema file to be compiled.
+#! \param VERSION			- Defines the schema's version (also part of the OUTPUT directory path)
+#! \param SOURCE_NAME		- The output source filename, should be provided without an extension, and the function automatically adds the appropriate extension(.cpp).
+#! \param QML_NAME			- The QML module name. Also part of the OUTPUT directory path and filename of QRC file
+#! \param CPP_EXTRA_DEPS	- A list of additional dependencies for cpp generator
+#! \param QML_EXTRADEPS		- A list of additional dependencies for QML generator
+#! \param FOUND_CPP_EXTRA_DEPS_OUT_VAR - [OUT] A list of dependencies, to be created by a cpp generator
+#! \param FOUND_QML_EXTRA_DEPS_OUT_VAR - [OUT] A list of dependencies, to be created by a QML generator
+macro (ImtCoreCustomConfigureSdlCppQml)
 	set(oneValueArgs
 		SCHEMA_PATH
 		VERSION
 		SOURCE_NAME
-		QML_NAME)
+		QML_NAME
+		CPP_EXTRA_DEPS
+		QML_EXTRADEPS
+		FOUND_CPP_EXTRA_DEPS_OUT_VAR
+		FOUND_QML_EXTRA_DEPS_OUT_VAR)
 	cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
 
 	if (ARG_SOURCE_NAME)
 		ImtCoreCustomConfigureSdlCpp(
 			SCHEMA_PATH "${ARG_SCHEMA_PATH}"
 			VERSION "${ARG_VERSION}"
-			SOURCE_NAME	"${ARG_SOURCE_NAME}")
+			SOURCE_NAME	"${ARG_SOURCE_NAME}"
+			EXTRA_DEPS "${ARG_CPP_EXTRA_DEPS}"
+			FOUND_DEPS CPP_FOUND_DEPS)
+
+		set (${ARG_FOUND_CPP_EXTRA_DEPS_OUT_VAR} "${CPP_FOUND_DEPS}")
 	endif()
 
 	if (ARG_QML_NAME)
 		message(VERBOSE "Additing SDL for QML compile source '${ARG_SCHEMA_PATH}' for ${PROJECT_NAME}")
-		ImtCoreCustomConfigureSdlQml(SCHEMA_PATH "${ARG_SCHEMA_PATH}" VERSION "${ARG_VERSION}" QML_NAME "${ARG_QML_NAME}")
+		ImtCoreCustomConfigureSdlQml(
+			SCHEMA_PATH "${ARG_SCHEMA_PATH}"
+			VERSION "${ARG_VERSION}"
+			QML_NAME "${ARG_QML_NAME}"
+			EXTRA_DEPS "${ARG_QML_EXTRA_DEPS}"
+			FOUND_DEPS QML_FOUND_DEPS)
+
+		set (${ARG_FOUND_QML_EXTRA_DEPS_OUT_VAR} "${QML_FOUND_DEPS}")
 	endif()
 
-endfunction()
+endmacro()
