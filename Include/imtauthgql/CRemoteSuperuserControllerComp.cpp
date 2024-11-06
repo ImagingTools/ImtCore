@@ -37,7 +37,7 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 
 	imtgql::CGqlRequest gqlRequest;
 	if (userssdl::CUserAddGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		userssdl::CAddedNotificationPayload response;
+		sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload response;
 		if (SendModelRequest(gqlRequest, response)){
 			return true;
 		}

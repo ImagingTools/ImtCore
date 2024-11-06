@@ -32,11 +32,11 @@ protected:
 				const sdl::imtauth::Users::V1_0::CUserItemGqlRequest& userItemRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::V1_0::CUpdatedNotificationPayload OnUserUpdate(
+	virtual sdl::imtbase::ImtCollection::V1_0::CUpdatedNotificationPayload OnUserUpdate(
 				const sdl::imtauth::Users::V1_0::CUserUpdateGqlRequest& userUpdateRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::V1_0::CAddedNotificationPayload OnUserAdd(
+	virtual sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload OnUserAdd(
 				const sdl::imtauth::Users::V1_0::CUserAddGqlRequest& userAddRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;

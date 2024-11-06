@@ -142,7 +142,16 @@ if(NOT DEFINED USE_QT3D OR USE_QT3D)
 	add_dependencies(imt3dgui DesignTokenCreator)
 endif()
 
-#add_subdirectory("${INCLUDE_DIR}/imtpy/CMake" "${AUX_INCLUDE_DIR}/imtpy")
+if(NOT DEFINED USE_QTDB OR USE_QTDB)
+	add_subdirectory("${INCLUDE_DIR}/imtdb/CMake" "${AUX_INCLUDE_DIR}/imtdb")
+	add_subdirectory("${INCLUDE_DIR}/imtdbgui/CMake" "${AUX_INCLUDE_DIR}/imtdbgui")
+	add_subdirectory("${INCLUDE_DIR}/imtlicdb/CMake" "${AUX_INCLUDE_DIR}/imtlicdb")
+	add_subdirectory("${INCLUDE_DIR}/imtdbgql/CMake" "${AUX_INCLUDE_DIR}/imtdbgql")
+endif()
+
+if(DEFINED USE_MDBX AND USE_MDBX)
+	add_subdirectory("${INCLUDE_DIR}/imtmdbx/CMake" "${AUX_INCLUDE_DIR}/imtmdbx")
+endif()
 
 #-------- Qml --------
 if(NOT DEFINED USE_QTQML OR USE_QTQML)
@@ -163,21 +172,19 @@ endif()
 
 #-------- Sdl --------
 if(NOT DEFINED USE_SDL OR USE_SDL)
+	include("${CMAKE_CURRENT_LIST_DIR}/../../../ImtCore/Config/CMake/ImtCoreSdlCustomConfig.cmake")
+	ImtCoreAddSdlSearchPath("${AUX_INCLUDE_DIR}")
+
 	add_subdirectory("${SDL_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbasesdl")
+
 	add_subdirectory("${SDL_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauthsdl")
+	add_dependencies(imtauthsdl imtbasesdl)
+
 	add_subdirectory("${SDL_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlicsdl")
+	add_dependencies(imtlicsdl imtbasesdl)
+
 	add_subdirectory("${SDL_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtappsdl")
-endif()
-
-if(NOT DEFINED USE_QTDB OR USE_QTDB)
-	add_subdirectory("${INCLUDE_DIR}/imtdb/CMake" "${AUX_INCLUDE_DIR}/imtdb")
-	add_subdirectory("${INCLUDE_DIR}/imtdbgui/CMake" "${AUX_INCLUDE_DIR}/imtdbgui")
-	add_subdirectory("${INCLUDE_DIR}/imtlicdb/CMake" "${AUX_INCLUDE_DIR}/imtlicdb")
-	add_subdirectory("${INCLUDE_DIR}/imtdbgql/CMake" "${AUX_INCLUDE_DIR}/imtdbgql")
-endif()
-
-if(DEFINED USE_MDBX AND USE_MDBX)
-	add_subdirectory("${INCLUDE_DIR}/imtmdbx/CMake" "${AUX_INCLUDE_DIR}/imtmdbx")
+	add_dependencies(imtappsdl imtbasesdl)
 endif()
 
 

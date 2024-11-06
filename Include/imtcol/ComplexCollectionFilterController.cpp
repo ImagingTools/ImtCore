@@ -166,7 +166,7 @@ bool ComplexCollectionFilterRepresentationToModel(
 	if (filterRepresentaion.HasTimeFilter()){
 		sdl::imtbase::ComplexCollectionFilter::V1_0::CTimeFilter timeFilterSdl = filterRepresentaion.GetTimeFilter();
 		if (timeFilterSdl.HasTimeRange()){
-			sdl::imtbase::ComplexCollectionFilter::V1_0::CTimeRange timeRangeSdl = timeFilterSdl.GetTimeRange();
+			sdl::imtbase::ImtBaseTypes::V1_0::CTimeRange timeRangeSdl = timeFilterSdl.GetTimeRange();
 
 			timeFilter.SetTimeRange(imtbase::CTimeRange(
 				QDateTime::fromString(timeRangeSdl.GetBegin(), "dd.MM.yyyy hh:mm:ss"),

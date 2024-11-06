@@ -17,7 +17,7 @@ macro(ImtCoreGetSdlDeps)
 
 	file(MAKE_DIRECTORY ${ARG_OUT_DIR})
 
-	message(STATUS "EXEC: ${SDL_DEPS_GENERATION_COMMAND} --generator=CMake-pipe")
+	message(VERBOSE "EXEC: ${SDL_DEPS_GENERATION_COMMAND} --generator=CMake-pipe")
 
 	execute_process(
 		COMMAND
@@ -31,9 +31,13 @@ macro(ImtCoreGetSdlDeps)
 	)
 
 	# remove empty elements
+	# join a|b|c
 	list(JOIN SDL_DEPS_VAR "|" SDL_DEPS_VAR)
-	string(REGEX REPLACE "\\|$" "" SDL_DEPS_VAR "${SDL_DEPS_VAR}")
+	# remove a||c -> a|c
 	string(REGEX REPLACE "\\|\\|" "|" SDL_DEPS_VAR "${SDL_DEPS_VAR}")
+	# remove last empty a|c| -> a|c
+	string(REGEX REPLACE "\\|$" "" SDL_DEPS_VAR "${SDL_DEPS_VAR}")
+	# transform into a list
 	string(REPLACE "|" ";" SDL_DEPS_VAR "${SDL_DEPS_VAR}")
 
 	if(NOT SDL_DEPS_GENERATION_RESULT_CODE EQUAL 0)
@@ -53,6 +57,27 @@ macro(ImtCoreGetSdlDeps)
 	file(REMOVE ${SDL_ERRORS_FILE_PATH})
 
 endmacro()
+
+
+function(ImtCoreAddSdlSearchPath ARG_SDL_PATH)
+	if (NOT GLOBAL_SDL_SEARCH_PATHS)
+		set(GLOBAL_SDL_SEARCH_PATHS ${ARG_SDL_PATH}
+			CACHE
+			STRING "List of directories to search for generated header files, used by SDL code generator"
+			FORCE
+		)
+
+	else()
+		list(APPEND GLOBAL_SDL_SEARCH_PATHS ${ARG_SDL_PATH})
+		list(REMOVE_DUPLICATES GLOBAL_SDL_SEARCH_PATHS)
+		set(GLOBAL_SDL_SEARCH_PATHS ${GLOBAL_SDL_SEARCH_PATHS}
+			CACHE
+			STRING "List of directories to search for generated header files, used by SDL code generator"
+			FORCE
+		)
+	endif()
+
+endfunction()
 
 
 #! \param CUSTOM_TARGETS_DEPS - if enabled, dependencies will NOT be soved, using the SDL generator \warning if enabled, you MUST provide CUSTOM_HEADER_DEP CUSTOM_SOURCE_DEP!
@@ -76,6 +101,16 @@ function (ImtCoreCustomConfigureSdlCpp)
 	list(APPEND CUSTOM_MODIFICATORS "-Bistd::IPolymorphic=istd/IPolymorphic.h")
 	list(APPEND CUSTOM_MODIFICATORS "-JCPP=${SDL_OUTPUT_DIRECTORY}/${ARG_SOURCE_NAME}.cpp")
 	list(APPEND CUSTOM_MODIFICATORS "-JH=${SDL_OUTPUT_DIRECTORY}/${ARG_SOURCE_NAME}.h")
+	list(APPEND CUSTOM_MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
+
+	list(LENGTH GLOBAL_SDL_SEARCH_PATHS SDL_PATHS_COUNT)
+	if (SDL_PATHS_COUNT GREATER 0)
+		foreach(SDL_SEARCH_PATH ${GLOBAL_SDL_SEARCH_PATHS})
+			list(APPEND CUSTOM_MODIFICATORS "-H${SDL_SEARCH_PATH}")
+		endforeach()
+	else()
+		message(FATAL_ERROR "SDL PATHS is empty!!!!")
+	endif()
 
 	ImtCoreGetSdlDeps(
 		INPUT
@@ -115,6 +150,8 @@ function (ImtCoreCustomConfigureSdlCpp)
 		VERBATIM)
 
 	target_sources(${PROJECT_NAME} PRIVATE ${FOUND_DEPS})
+
+	message(VERBOSE "EXEC: ${SDL_GENERATOR_EXE_PATH} -GS ${ARG_SCHEMA_PATH} -O ${SDL_OUTPUT_DIRECTORY} ${CUSTOM_MODIFICATORS}")
 
 endfunction()
 
@@ -199,7 +236,7 @@ function (ImtCoreCustomConfigureSdlCppQml)
 	endif()
 
 	if (ARG_QML_NAME)
-		message(STATUS "Additing SDL for QML compile source '${ARG_SCHEMA_PATH}' for ${PROJECT_NAME}")
+		message(VERBOSE "Additing SDL for QML compile source '${ARG_SCHEMA_PATH}' for ${PROJECT_NAME}")
 		ImtCoreCustomConfigureSdlQml(SCHEMA_PATH "${ARG_SCHEMA_PATH}" VERSION "${ARG_VERSION}" QML_NAME "${ARG_QML_NAME}")
 	endif()
 

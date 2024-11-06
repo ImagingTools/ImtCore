@@ -31,21 +31,21 @@ sdl::imtauth::Users::V1_0::CUserDataPayload CUserControllerComp::OnUserItem(
 }
 
 
-sdl::imtauth::Users::V1_0::CUpdatedNotificationPayload CUserControllerComp::OnUserUpdate(
+sdl::imtbase::ImtCollection::V1_0::CUpdatedNotificationPayload CUserControllerComp::OnUserUpdate(
 			const sdl::imtauth::Users::V1_0::CUserUpdateGqlRequest& /*userUpdateRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return sdl::imtauth::Users::V1_0::CUpdatedNotificationPayload();
+	return sdl::imtbase::ImtCollection::V1_0::CUpdatedNotificationPayload();
 }
 
 
-sdl::imtauth::Users::V1_0::CAddedNotificationPayload CUserControllerComp::OnUserAdd(
+sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload CUserControllerComp::OnUserAdd(
 			const sdl::imtauth::Users::V1_0::CUserAddGqlRequest& /*userAddRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return sdl::imtauth::Users::V1_0::CAddedNotificationPayload();
+	return sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload();
 }
 
 
