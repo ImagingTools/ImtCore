@@ -113,44 +113,49 @@ class Repeater extends Item {
 
     __updateView(changeSet){
         if(this.delegate && this.model && this.__completed){
-            if(this.model.data.length === this.__items.length) return
             JQApplication.beginUpdate()
             JQApplication.updateLater(this.parent)
 
-            let countChanged = false
+            if(this.model.data.length === this.__items.length) {
+                for(let i = 0; i < this.model.data.length; i++){
+                    this.__items[i].JQAbstractModel = this.model.data[i]
+                }
+            } else {
+                let countChanged = false
 
-            if(this.count !== this.model.data.length){
-                countChanged = true
-                this.__getObject('count').__value = this.model.data.length
-            }
+                if(this.count !== this.model.data.length){
+                    countChanged = true
+                    this.__getObject('count').__value = this.model.data.length
+                }
 
-            for(let change of changeSet){
-                let leftTop = change[0]
-                let bottomRight = change[1]
-                let role = change[2]
+                for(let change of changeSet){
+                    let leftTop = change[0]
+                    let bottomRight = change[1]
+                    let role = change[2]
 
-                if(role === 'append'){
-                    for(let i = leftTop; i < bottomRight; i++){
-                        let item = this.__createItem(this.model.data[i])
-                        this.__items[i] = item
-                        this.itemAdded(item)
-                    }
-                } else if(role === 'insert'){
-                    for(let i = leftTop; i < bottomRight; i++){
-                        let item = this.__createItem(this.model.data[i])
-                        this.__items.splice(i, 0, item)
-                        this.itemAdded(item)
-                    }
-                } else if(role === 'remove'){
-                    let removed = this.__items.splice(leftTop, bottomRight - leftTop)
-                    for(let r of removed){
-                        this.itemRemoved(r)
-                        if(r) r.destroy()
+                    if(role === 'append'){
+                        for(let i = leftTop; i < bottomRight; i++){
+                            let item = this.__createItem(this.model.data[i])
+                            this.__items[i] = item
+                            this.itemAdded(item)
+                        }
+                    } else if(role === 'insert'){
+                        for(let i = leftTop; i < bottomRight; i++){
+                            let item = this.__createItem(this.model.data[i])
+                            this.__items.splice(i, 0, item)
+                            this.itemAdded(item)
+                        }
+                    } else if(role === 'remove'){
+                        let removed = this.__items.splice(leftTop, bottomRight - leftTop)
+                        for(let r of removed){
+                            this.itemRemoved(r)
+                            if(r) r.destroy()
+                        }
                     }
                 }
-            }
 
-            if(countChanged) this.countChanged()
+                if(countChanged) this.countChanged()
+            }
 
             JQApplication.endUpdate()
         }
