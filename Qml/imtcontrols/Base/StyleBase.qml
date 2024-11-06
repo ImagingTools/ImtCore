@@ -91,6 +91,7 @@ StyleComponents {
 
 	property string positiveAccentColor: "#00FFD1";
 	property string negativeAccentColor: "#FF5449";
+	property string middleAccentColor: "yellow";
 
 	//------------------------------------------for basic components
 
