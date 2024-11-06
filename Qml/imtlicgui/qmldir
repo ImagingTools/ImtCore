@@ -8,6 +8,7 @@ FeatureEditor 1.0 FeatureEditor.qml
 PackageCollectionViewCommandsDelegate 1.0 PackageCollectionViewCommandsDelegate.qml
 
 FeatureEditorCommandsDelegate 1.0 FeatureEditorCommandsDelegate.qml
+PackageViewItemDelegate 1.0 PackageViewItemDelegate.qml
 
 singleton CachedProductCollection 1.0 CachedProductCollection.qml
 singleton CachedLicenseCollection 1.0 CachedLicenseCollection.qml

@@ -26,26 +26,5 @@ DocumentDataController {
     function createDocumentModel(){
 
     }
-
-    GqlSdlRequestSender {
-        id: getRequest;
-        gqlCommandId: container.gqlGetCommandId;
-        sdlObjectComp: Component { ProfileData {}}
-        inputObjectComp: container.getInputObjectComp;
-        onFinished: {
-            container.model = sdlObject;
-        }
-    }
-
-    GqlSdlRequestSender {
-        id: setRequest;
-        gqlCommandId: container.gqlUpdateCommandId;
-        sdlObjectComp: Component { SetProfileResponse {}}
-        inputObjectComp: container.updateInputObjectComp;
-
-        onFinished: {
-            container.model = sdlObject;
-        }
-    }
 }
 

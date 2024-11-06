@@ -201,3 +201,82 @@ function(jqml_compile_web2)
 	target_sources(${PROJECT_NAME} PRIVATE ${QRC_CPP_WEB_FILE})
 
 endfunction(jqml_compile_web2)
+
+function(jq_compile_web)
+
+	set(QRC_WEB_FILE ${buildwebdir}/Resources/${PROJECT_NAME}JsWeb.qrc)
+	set(QRC_CPP_WEB_FILE ${buildwebdir}/Resources/qrc_${PROJECT_NAME}Web.cpp)
+
+	set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
+	if (NOT WIN32)
+		set(PYTHONEXE python3)
+	endif()
+
+	message("buildwebdir ${buildwebdir}")
+
+	if(NOT NODE_EXE)
+		if(${MSVC})
+			set(NODE_EXE  ${IMTCOREDIR}/3rdParty/nodejs/node.exe)
+		else()
+			set(NODE_EXE node)
+		endif()
+	endif()
+
+	list(LENGTH webdirs DIRS_COUNT)
+
+	set(INDEX 0)
+	set(DEPEND_LIST)
+
+	message("DIRS_COUNT ${DIRS_COUNT}")
+
+	while(INDEX LESS DIRS_COUNT)
+		list(GET webdirs ${INDEX} _FOLDER)
+		file(GLOB_RECURSE FOUND_FILES "${_FOLDER}/*.qml")
+		# message("_FOLDER ${_FOLDER}/*.qml")
+		list(APPEND DEPEND_LIST ${FOUND_FILES})
+		math(EXPR INDEX "${INDEX} + 2")
+		set(INDEX ${INDEX})
+	endwhile()
+
+	message("QRC_CPP_WEB_FILE ${QRC_CPP_WEB_FILE}")
+
+	#               COMMAND ${CMAKE_COMMAND} -E rm -rf ${buildwebdir}
+
+	add_custom_command(
+		OUTPUT
+		${buildwebdir}/Resources/jqml.${resname}.js
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
+		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQML2/preparesources.py ${webdirs}
+		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQ
+		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQ/compiler/compiler.js ${inputjs}
+		DEPENDS ${DEPEND_LIST} ${sdldependency}
+		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
+		VERBATIM
+	)
+
+	add_custom_command(
+		OUTPUT ${QRC_CPP_WEB_FILE}
+		COMMAND
+		Qt${QT_VERSION_MAJOR}::rcc
+		ARGS
+		-name ${PROJECT_NAME}Web ${QRC_WEB_FILE} -o ${QRC_CPP_WEB_FILE}
+		DEPENDS
+		${buildwebdir}/Resources/jqml.${resname}.js
+		COMMENT
+		"Compile QRC_WEB_FILE"
+	)
+
+	add_custom_target(
+		WebCompiler${PROJECT_NAME} ALL
+		DEPENDS ${QRC_CPP_WEB_FILE}
+	)
+
+	add_dependencies(WebCompiler${PROJECT_NAME} ${PROJECT_NAME})
+
+	set(QRC_QRC_FILES)
+
+	set_property(SOURCE ${QRC_CPP_WEB_FILE} PROPERTY SKIP_AUTOMOC ON)
+	target_sources(${PROJECT_NAME} PRIVATE ${QRC_CPP_WEB_FILE})
+
+endfunction(jq_compile_web)

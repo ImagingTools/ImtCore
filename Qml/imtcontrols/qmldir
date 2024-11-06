@@ -115,7 +115,6 @@ TableViewItemDelegateBase 1.0 ./Views/TableViewItemDelegateBase.qml
 TreeViewCommandsDelegateBase 1.0 ./Views/TreeViewCommandsDelegateBase.qml
 TreeViewItemDelegateBase 1.0 ./Views/TreeViewItemDelegateBase.qml
 
-TableTreeItemDelegate 1.0 ./Views/TableTreeItemDelegate.qml
 TreeItemDelegate 1.0 ./Views/TreeItemDelegate.qml
 TreeViewGql 1.0 ./Views/TreeViewGql.qml
 TreeViewSelection 1.0 ./Views/TreeViewSelection.qml
@@ -158,4 +157,5 @@ InputView 1.0 ./Views/InputView.qml
 PopupDetailedDelegateDecorator 1.0 ./Views/PopupDetailedDelegateDecorator.qml
 TooltipArea 1.0 ./Views/TooltipArea.qml
 TableViewParams 1.0 ./Views/TableViewParams.qml
+TableHeaderDelegate 1.0 ./Views/TableHeaderDelegate.qml
 
