@@ -154,7 +154,7 @@ Rectangle {
 
 		let retVal;
 		for (let i = 1; i <= indicator.maxCount; i++){
-			let val = (100/indicator.maxCount)*i ;
+			let val = Math.ceil((100/indicator.maxCount)*i);
 			if(percent_ <= val){
 				retVal = val;
 				break;

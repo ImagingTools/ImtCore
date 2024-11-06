@@ -79,7 +79,7 @@ Item {
         id: cellBackground;
         Rectangle{
             anchors.fill: parent;
-            z:-3;
+			z:-4;
             color:  !delegateContainer.rowDelegate ? "transparent" : delegateContainer.rowDelegate.selected ? delegateContainer.rowDelegate.selectedColor: delegateContainer.rowDelegate.cellColor;
 
         }

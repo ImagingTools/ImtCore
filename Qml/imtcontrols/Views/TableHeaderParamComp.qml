@@ -7,7 +7,6 @@ Dialog {
 	id: dialog;
 
 	width: 300;
-	height: 400
 
 	title: qsTr("Table configuration");
 	property TableViewParams tableViewParamsCopied: TableViewParams {};

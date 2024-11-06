@@ -12,28 +12,32 @@ Rectangle {
 	color: "transparent";
 
 	property int count: 5;
-	property int barWidth: 4;
+	property int barWidth: continuous ? 8 : 4;
 	property alias spacing: row.spacing;
 	property int percent: 0;
 
 	property string colorActive: "red";
 	property string colorDefault: "lightgray";
 
+	property bool constantHeight: continuous;
+	property bool continuous: false;
+	property string constantColor: "";
+
 	Row{
 		id: row;
 
 		height: parent.height;
-		spacing: 4;
+		spacing: indicator.continuous ? 0 : 4;
 
 		Repeater{
 			model: indicator.count;
 			delegate: Rectangle{
 				anchors.bottom: parent.bottom;
 				width: indicator.barWidth;
-				height: (indicator.height/indicator.count) * (model.index + 1);
-				color: isActive ? indicator.colorActive : indicator.colorDefault;
-
-				property bool isActive: indicator.roundPercent(indicator.percent) >= (1/indicator.count *(model.index + 1) * 100);
+				height: indicator.constantHeight ? indicator.height : (indicator.height/indicator.count) * (model.index + 1);
+				color: indicator.constantColor !== "" ? indicator.constantColor : isActive ? indicator.colorActive : indicator.colorDefault;
+				property real barPercent: Math.floor(1/indicator.count *(model.index + 1) * 100);
+				property bool isActive: indicator.roundPercent(indicator.percent) >= barPercent;
 			}
 		}
 	}
@@ -48,7 +52,7 @@ Rectangle {
 
 		let retVal;
 		for (let i = 1; i <= indicator.count; i++){
-			let val = (100/indicator.count)*i ;
+			let val = Math.ceil((100/indicator.count)*i) ;
 			if(percent_ <= val){
 				retVal = val;
 				break;
