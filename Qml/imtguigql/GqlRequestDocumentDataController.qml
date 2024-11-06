@@ -1,4 +1,6 @@
 import QtQuick 2.12
+import Qt.labs.platform
+
 import Acf 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
@@ -341,9 +343,7 @@ DocumentDataController {
 	}
 
 
-	FileDialog {
-		id: fileDialog
-
+	property FileDialog fileDialog: FileDialog {
 		title: container.importTitle
 
 		fileMode: FileDialog.OpenFile
@@ -392,9 +392,7 @@ DocumentDataController {
 		}
 	}
 
-	GqlModel {
-		id: gqlImportModel
-
+	property GqlModel gqlImportModel: GqlModel {
 		function importFile(){
 			let query = Gql.GqlRequest("mutation", container.gqlImportCommandId)
 
@@ -472,7 +470,6 @@ DocumentDataController {
 				}
 			}
 		}
-
 	}
 
 }
