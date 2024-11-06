@@ -41,11 +41,6 @@ class ListModel extends QtObject {
         let changeSet = this.__changeSet
         this.__changeSet = []
 
-        // this.count = this.data.length
-        // while(this.__signals.length){
-        //     this.__signals.shift()()
-        // }
-
         for(let obj of this.__views){
             obj.__updateView(changeSet)
         } 
@@ -95,7 +90,7 @@ class ListModel extends QtObject {
         this.count = this.data.length
     }
     remove(index, count = 1){
-        JQApplication.updateLater(this)
+        this.__beginUpdate()
 
         this.__changeSet.push([index, index+count, 'remove'])
         let removed = this.data.osplice(index, count)
@@ -105,6 +100,8 @@ class ListModel extends QtObject {
         }
 
         this.count = this.data.length
+
+        this.__endUpdate()
     }
     get(index){
         return this.data[index]
@@ -113,8 +110,6 @@ class ListModel extends QtObject {
         
     }
     clear(){
-        JQApplication.updateLater(this)
-
         this.remove(0, this.count)
 
         this.count = this.data.length
