@@ -17,9 +17,12 @@ Item {
     property TreeItemModel filterableHeadersModel: TreeItemModel {}
 
     property var additionalFieldIds: []
+    property string importTitle
+    property string importFilter
 
     signal removed(string objectId);
     signal renamed(string objectId, string newName);
+    signal imported(string objectId);
     signal descriptionSetted(string objectId, string description);
 
     property alias removeGqlModel: removeModel;
@@ -29,6 +32,15 @@ Item {
 
     signal beginUpdate();
     signal endUpdate();
+
+    onVisibleChanged: {
+        console.log("onVisibleChanged", visible)
+    }
+
+    function importDocument(){
+        console.log("importDocument()", visible)
+        fileDialog.open()
+    }
 
     onCollectionIdChanged: {
         console.log("onCollectionIdChanged", collectionId)
@@ -45,6 +57,7 @@ Item {
         property string removeGqlCommand: root.collectionId + "Remove";
         property string renameGqlCommand: root.collectionId + "Rename";
         property string setDescriptionGqlCommand: root.collectionId + "SetDescription";
+        property string importGqlCommand: root.collectionId + "Import";
 
         property bool elementsUpdatingBlock: false;
         property bool headersUpdatingBlock: false;
@@ -523,4 +536,123 @@ Item {
             }
         }
     }
+
+
+    FileDialog {
+        id: fileDialog
+
+        title: root.importTitle
+
+        fileMode: FileDialog.OpenFile
+
+        property string dialogFilter: root.importFilter
+
+        nameFilters: [dialogFilter]
+
+        onAccepted: {
+            let filePath;
+            if (Qt.platform.os == "web"){
+                filePath = fileDialog.file.toString()
+            }
+            else{
+                filePath = fileDialog.selectedFile.toString()
+            }
+
+            filePath = filePath.replace('file:///', '')
+
+            if (Qt.platform.os == "web"){
+                let reader = new FileReader()
+
+                reader.readAsDataURL(filePath)
+
+                reader.onload = function(){
+                    let encodedContentWithHeader = reader.result
+                    let encodedContent = encodedContentWithHeader.replace(/^.{0,}base64,/, '')
+                    gqlAddModel.importFile(filePath.name, encodedContent)
+                }.bind(this)
+            }
+            else {
+                fileIO.source = filePath
+                let encodedContentWithHeader = reader.result
+                let encodedContent = encodedContentWithHeader.replace(/^.{0,}base64,/, '')
+                gqlAddModel.importFile(filePath.name, encodedContent)
+            }
+        }
+
+        FileIO {
+            id: fileIO
+        }
+    }
+
+    GqlModel {
+        id: gqlAddModel
+
+        function importFile(fileName, b64encoded){
+            let query = Gql.GqlRequest("mutation", internal.importGqlCommand)
+
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("FileName", fileName);
+            inputParams.InsertField("FileContent", b64encoded);
+
+            query.AddParam(inputParams);
+
+            var gqlData = query.GetQuery();
+
+            this.setGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("onResult", gqlAddModel.state)
+            let state = gqlAddModel.state
+            if (state === "Error"){
+                console.log("Network error")
+                ModalDialogManager.showWarningDialog("Network error")
+            }
+            if (state === "Ready"){
+                let dataModelLocal
+                if (gqlAddModel.containsKey("errors")){
+                    dataModelLocal = gqlAddModel.getData("errors")
+
+                    if (dataModelLocal.containsKey(internal.importGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(internal.importGqlCommand)
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.containsKey("message")){
+                        message = dataModelLocal.getData("message")
+                    }
+
+                    let type
+                    if (dataModelLocal.containsKey("type")){
+                        type = dataModelLocal.getData("type")
+                    }
+                    console.log(message)
+                    ModalDialogManager.showWarningDialog(message)
+                }
+                else if (gqlAddModel.containsKey("data")){
+                    dataModelLocal = gqlAddModel.getData("data")
+                    console.log("onResult data", dataModelLocal.toJson())
+
+                    let documentId = ""
+
+                    if (dataModelLocal.containsKey(internal.importGqlCommand)){
+                        dataModelLocal = dataModelLocal.getData(internal.importGqlCommand)
+                        dataModelLocal = dataModelLocal.getData("addedNotification")
+
+                        if (dataModelLocal){
+                            documentId = dataModelLocal.getData("Id")
+                        }
+                    }
+
+                    root.imported(documentId)
+
+                    let message
+                    message = qsTr("File import successful")
+
+                    ModalDialogManager.showInfoDialog(message)
+                }
+            }
+        }
+    }
+
 }

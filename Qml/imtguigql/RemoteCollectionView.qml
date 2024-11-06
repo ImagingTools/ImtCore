@@ -13,6 +13,8 @@ CollectionView {
     property bool hasRemoteChanges: false;
     property bool tableViewParamsStoredServer: true;
     property var payloadModel: null
+    property string importTitle: qsTr("Select file")
+    property string importFilter: qsTr("Text files (*.txt)")
 
     // Invisible fields that will be requested for collection
     property var additionalFieldIds: ["Id", "Name"]
@@ -73,6 +75,8 @@ CollectionView {
             property bool isReady: false;
 
             payloadModel: root.payloadModel
+            importTitle: root.importTitle
+            importFilter: root.importFilter
 
             Component.onCompleted: {
                 Events.subscribeEvent("CommandsGuiReady", commandsIsReady);

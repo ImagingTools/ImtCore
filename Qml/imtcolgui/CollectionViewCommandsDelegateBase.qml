@@ -158,6 +158,9 @@ ViewCommandsDelegateBase {
     function onEdit(){
     }
 
+    function onImport(){
+    }
+
     function onRemove(){
         ModalDialogManager.openDialog(removeDialog, {});
     }
@@ -211,6 +214,11 @@ ViewCommandsDelegateBase {
                 console.log("onEdit", commandId);
 
                 collectionViewCommandsDelegate.onEdit();
+            }
+            else if (commandId === "Import"){
+                console.log("onImport", commandId);
+
+                collectionViewCommandsDelegate.onImport();
             }
         }
 
