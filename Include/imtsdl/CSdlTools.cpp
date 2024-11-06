@@ -1019,7 +1019,7 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, con
 				if (classRegex.match(line).hasMatch()) {
 					QString className = classRegex.match(line).capturedTexts()[1];
 					if (typeClassName == className){
-						return currentDir.dirName() + '/' + currentDir.relativeFilePath(it.filePath());
+						return currentDir.relativeFilePath(it.filePath());
 					}
 				}
 			}

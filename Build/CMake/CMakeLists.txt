@@ -173,7 +173,7 @@ endif()
 #-------- Sdl --------
 if(NOT DEFINED USE_SDL OR USE_SDL)
 	include("${CMAKE_CURRENT_LIST_DIR}/../../../ImtCore/Config/CMake/ImtCoreSdlCustomConfig.cmake")
-	ImtCoreAddSdlSearchPath("${AUX_INCLUDE_DIR}")
+	ImtCoreAddSdlSearchPath("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}")
 
 	add_subdirectory("${SDL_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbasesdl")
 
