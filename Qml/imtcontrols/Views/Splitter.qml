@@ -12,6 +12,10 @@ Rectangle {
     property int leftLimit: 0;
     property int rightLimit: 1000000;
 
+	property bool isClickMode: false;
+
+	signal clicked();
+
     MouseArea {
         id: splitterMA;
 
@@ -20,17 +24,18 @@ Rectangle {
         enabled: parent.enabled
         hoverEnabled: enabled;
         acceptedButtons: Qt.LeftButton;
-        cursorShape: Qt.SplitHCursor;
+		cursorShape: splitterContainer.isClickMode ? Qt.PointingHandCursor : Qt.SplitHCursor;
 
         onPressed: {
             splitterContainer.isPressed = true;
         }
         onReleased: {
             splitterContainer.isPressed = false;
+			splitterContainer.clicked();
         }
 
         onMouseXChanged: {
-            if (splitterContainer.type !== 0x1){
+			if (splitterContainer.type !== 0x1 || splitterContainer.isClickMode){
                 return;
             }
 
