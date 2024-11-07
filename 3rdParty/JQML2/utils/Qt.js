@@ -800,6 +800,9 @@ var Qt = {
             }
         }
     },
+
+    atob: atob,
+    btoa: btoa,
 }
 
 module.exports.Qt = Qt

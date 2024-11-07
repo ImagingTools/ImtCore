@@ -21,7 +21,12 @@ class FileIO extends QtObject {
     }
 
     write(data){
-
+        let a = document.createElement("a")
+        let file = new Blob([data], {type: 'text/plain'})
+        a.href = URL.createObjectURL(file)
+        a.download = this.getPropertyValue('source')
+        a.click()
+        a.remove()
     }
 
     setSource(source){

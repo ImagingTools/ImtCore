@@ -268,11 +268,13 @@ class TextInput extends Item {
     }
 
     remove(start, end){
-
+        this.text = this.text.slice(0, start) + this.text.slice(end, this.text.length)
     }
 
     select(start, end){
-
+        this.$input.setSelectionRange(start, end)
+        this.getProperty('selectionStart').reset(start)
+        this.getProperty('selectionEnd').reset(end)
     }
 
     selectAll(){
