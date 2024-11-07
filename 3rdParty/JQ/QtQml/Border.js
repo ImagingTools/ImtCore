@@ -12,6 +12,19 @@ class Border extends GroupProperty {
         colorChanged: {type:Signal, slotName:'onColorChanged', args:[]},
     }
 
+    __has(key){
+        if(key in this){
+            return true
+        } else if(key in this.constructor.meta){
+            let meta = this.constructor.meta[key]
+            this[key] = meta.type.create(this, meta)
+            this.onChanged()
+            return true
+        }
+
+        return false
+    }
+
     onChanged(){
         if(this.__parent)
         this.__parent.__setDOMStyle({
