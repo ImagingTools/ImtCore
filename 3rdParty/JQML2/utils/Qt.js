@@ -801,8 +801,12 @@ var Qt = {
         }
     },
 
-    atob: atob,
-    btoa: btoa,
+    atob: function(data){
+        return atob(data)
+    },
+    btoa: function(data){
+        return btoa(data)
+    },
 }
 
 module.exports.Qt = Qt
