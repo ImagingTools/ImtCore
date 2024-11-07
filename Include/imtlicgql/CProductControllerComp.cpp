@@ -13,193 +13,59 @@ namespace imtlicgql
 {
 
 
-istd::IChangeable* CProductControllerComp::CreateObjectFromRequest(
-			const imtgql::CGqlRequest& gqlRequest,
-			QByteArray& objectId,
-			QString& name,
-			QString& description,
-			QString& errorMessage) const
+// protected methods
+
+sdl::imtlic::Products::V1_0::CProductsListPayload CProductControllerComp::OnProductsList(
+	const sdl::imtlic::Products::V1_0::CProductsListGqlRequest& /*productsListRequest*/,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QT_TR_NOOP("Internal error.");
-		SendErrorMessage(0, errorMessage, "Product controller");
-
-		return nullptr;
-	}
-
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
-	if (inputParamPtr == nullptr){
-		errorMessage = QT_TR_NOOP("Unable to create object. GQL input params is invalid.");
-		SendErrorMessage(0, errorMessage, "Product controller");
-
-		return nullptr;
-	}
-
-	objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
-	if (objectId.isEmpty()){
-		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
-	}
-
-	QByteArray jsonItemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
-	if (jsonItemData.isEmpty()){
-		errorMessage = QT_TR_NOOP("Unable to create object from empty json.");
-		SendErrorMessage(0, errorMessage, "Product controller");
-
-		return nullptr;
-	}
-
-	imtbase::CTreeItemModel productModel;
-	if (!productModel.CreateFromJson(jsonItemData)){
-		errorMessage = QT_TR_NOOP(QString("Unable to create tree item model from json: %1.").arg(qPrintable(jsonItemData)));
-		SendErrorMessage(0, errorMessage, "Product controller");
-
-		return nullptr;
-	}
-
-	istd::TDelPtr<imtlic::CIdentifiableProductInfo> productInfoPtr;
-	productInfoPtr.SetPtr(new imtlic::CIdentifiableProductInfo);
-
-	productInfoPtr->SetObjectUuid(objectId);
-
-	QByteArray productId;
-	if (productModel.ContainsKey("ProductId")){
-		productId = productModel.GetData("ProductId").toByteArray().trimmed();
-	}
-
-	if (productId.isEmpty()){
-		errorMessage = QT_TR_NOOP("Product name cannot be empty");
-		SendErrorMessage(0, errorMessage, "Product controller");
-
-		return nullptr;
-	}
-
-	iprm::CIdParam idParam;
-	idParam.SetId(productId);
-
-	iprm::CParamsSet paramsSet1;
-	paramsSet1.SetEditableParameter("ProductId", &idParam);
-
-	iprm::CParamsSet filterParam;
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
-
-	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (!collectionIds.isEmpty()){
-		QByteArray id = collectionIds[0];
-		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Product '%1' already exists")).arg(qPrintable(productId));
-
-			return nullptr;
-		}
-	}
-
-	productInfoPtr->SetProductId(productId);
-
-	if (productModel.ContainsKey("ProductName")){
-		name = productModel.GetData("ProductName").toString().trimmed();
-	}
-
-	if (name.isEmpty()){
-		errorMessage = QT_TR_NOOP("Unable to create product with an empty product name.");
-		SendErrorMessage(0, errorMessage, "Product controller");
-
-		return nullptr;
-	}
-
-	iprm::CIdParam nameParam;
-	nameParam.SetId(name.toUtf8());
-
-	iprm::CParamsSet paramsSet2;
-	paramsSet2.SetEditableParameter("ProductName", &nameParam);
-
-	iprm::CParamsSet filterParam2;
-	filterParam2.SetEditableParameter("ObjectFilter", &paramsSet2);
-
-	imtbase::ICollectionInfo::Ids collectionIds2 = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam2);
-	if (!collectionIds2.isEmpty()){
-		QByteArray id = collectionIds2[0];
-		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Product name '%1' already exists. Please rename.")).arg(qPrintable(name));
-
-			return nullptr;
-		}
-	}
-
-	productInfoPtr->SetName(name);
-
-	if (productModel.ContainsKey("Description")){
-		description = productModel.GetData("Description").toString();
-	}
-
-	QByteArray categoryId;
-	if (productModel.ContainsKey("CategoryId")){
-		categoryId = productModel.GetData("CategoryId").toByteArray();
-	}
-
-	productInfoPtr->SetCategoryId(categoryId);
-
-	if (productModel.ContainsKey("Features")){
-		QByteArray features = productModel.GetData("Features").toByteArray();
-		if (!features.isEmpty()){
-			QByteArrayList featureIds = features.split(';');
-
-			productInfoPtr->SetFeatureIds(featureIds);
-		}
-	}
-
-	return productInfoPtr.PopPtr();
+	return sdl::imtlic::Products::V1_0::CProductsListPayload();
 }
 
 
-imtbase::CTreeItemModel* CProductControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+sdl::imtlic::Products::V1_0::CProductDataPayload CProductControllerComp::OnProductItem(
+	const sdl::imtlic::Products::V1_0::CProductItemGqlRequest& /*productItemRequest*/,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
-		SendErrorMessage(0, errorMessage, "Product controller");
+	return sdl::imtlic::Products::V1_0::CProductDataPayload();
+}
 
-		return nullptr;
-	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
-	if (inputParamPtr == nullptr){
-		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
-		SendErrorMessage(0, errorMessage, "Product controller");
+sdl::imtlic::Products::V1_0::CProductExportResponse CProductControllerComp::OnProductsExport(
+	const sdl::imtlic::Products::V1_0::CProductsExportGqlRequest& productsExportRequest,
+	const ::imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
+{
+	return sdl::imtlic::Products::V1_0::CProductExportResponse();
+}
 
-		return nullptr;
-	}
 
-	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+::sdl::imtbase::ImtCollection::V1_0::CUpdatedNotificationPayload CProductControllerComp::OnProductUpdate(
+	const sdl::imtlic::Products::V1_0::CProductUpdateGqlRequest& /*productUpdateRequest*/,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
+{
+	return ::sdl::imtbase::ImtCollection::V1_0::CUpdatedNotificationPayload();
+}
 
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		const imtlic::IProductInfo* productInfoPtr = dynamic_cast<const imtlic::IProductInfo*>(dataPtr.GetPtr());
-		if (productInfoPtr != nullptr){
-			istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-			imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
-			dataModelPtr->SetData("Id", objectId);
+::sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload CProductControllerComp::OnProductAdd(
+	const sdl::imtlic::Products::V1_0::CProductAddGqlRequest& /*productAddRequest*/,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
+{
+	return ::sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload();
+}
 
-			QByteArray productId = productInfoPtr->GetProductId();
-			dataModelPtr->SetData("ProductId", productId);
 
-			QString productName = productInfoPtr->GetName();
-			dataModelPtr->SetData("ProductName", productName);
-
-			dataModelPtr->SetData("Name", productName);
-
-			QByteArray categoryId = productInfoPtr->GetCategoryId();
-			dataModelPtr->SetData("CategoryId", categoryId);
-
-			QByteArrayList featureIds = productInfoPtr->GetFeatureIds();
-			dataModelPtr->SetData("Features", featureIds.join(';'));
-
-			return rootModelPtr.PopPtr();
-		}
-	}
-
-	errorMessage = QT_TR_NOOP(QString("Unable to get product by ID: %1.").arg(qPrintable(objectId)));
-	SendErrorMessage(0, errorMessage, "Product controller");
-
-	return nullptr;
+sdl::imtlic::Products::V1_0:: CProductImportResponse CProductControllerComp::OnProductsImport(
+	const sdl::imtlic::Products::V1_0::CProductsImportGqlRequest& productsImportRequest,
+	const ::imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
+{
+	return sdl::imtlic::Products::V1_0:: CProductImportResponse();
 }
 
 

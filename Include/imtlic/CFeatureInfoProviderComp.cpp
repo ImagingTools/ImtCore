@@ -17,7 +17,7 @@ const IFeatureInfo* CFeatureInfoProviderComp::GetFeatureInfo(const QByteArray& f
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_featureCollectionCompPtr->GetObjectData(featureId, dataPtr)){
-		return dynamic_cast<const IFeatureInfo*>(dataPtr.GetPtr());
+		return dynamic_cast<const IFeatureInfo*>(dataPtr.GetPtr()->CloneMe());
 	}
 
 	return nullptr;

@@ -7,6 +7,7 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 import imtlicFeaturesSdl 1.0
+import Qt.labs.platform 1.0
 
 RemoteCollectionView {
     id: featureCollectionViewContainer;
@@ -21,6 +22,12 @@ RemoteCollectionView {
             documentTypeId: "Feature";
             viewTypeId: "FeatureEditor";
         }
+    }
+
+    Component {
+        id: messageDialog;
+
+        ErrorDialog {}
     }
 
     Component.onCompleted: {
@@ -69,6 +76,7 @@ RemoteCollectionView {
                             }
 
                             let newFeatureData = featureDataComp.createObject(childModel)
+                            newFeatureData.m_isPermission = true;
                             newFeatureData.m_featureName = qsTr("Feature Name");
                             childModel.append({item: newFeatureData})
                             featureEditor.model.modelChanged([])

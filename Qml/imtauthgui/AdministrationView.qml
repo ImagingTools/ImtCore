@@ -13,7 +13,7 @@ Item {
     property alias multiPageView: multiPageView;
     signal multiPageUpdated();
 
-    property string productId: context.appName;
+    property string productId: context.appId;
     property var documentManager: MainDocumentManager.getDocumentManager("Administration");
 
     function getHeaders(){

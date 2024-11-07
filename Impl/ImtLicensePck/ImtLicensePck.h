@@ -18,7 +18,8 @@
 #include <imtlic/CLicenseControllerComp.h>
 #include <imtlic/CFeatureContainer.h>
 #include <imtlic/CFeatureInfoProviderComp.h>
-#include <imtlic/CProductInfo.h>
+#include <imtlic/CProductInfoComp.h>
+#include <imtlic/CProductControllerComp.h>
 
 
 /**
@@ -55,12 +56,7 @@ typedef imtlic::CProductLicensingInfoMetaInfoCreatorComp ProductLicensingInfoMet
 typedef imtlic::CProductInstanceMetaInfoCreatorComp ProductInstanceMetaInfoCreator;
 typedef imtlic::CLicenseControllerComp LicenseController;
 typedef imtlic::CFeatureInfoProviderComp FeatureInfoProvider;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtlic::CProductInfo,
-						imtlic::IProductInfo,
-						iprm::INameParam,
-						iser::ISerializable>> ProductInfo;
+typedef imtlic::CProductInfoComp ProductInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtlic::CIdentifiableProductInfo,
@@ -98,6 +94,8 @@ typedef icomp::TModelCompWrap<
 						imtbase::IObjectCollection,
 						imtlic::IFeatureInfoProvider,
 						iser::ISerializable>> FeatureContainer;
+typedef imtlic::CProductControllerComp ProductController;
+
 
 } // namespace ImtLicensePck
 

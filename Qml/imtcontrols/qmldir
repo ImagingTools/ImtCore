@@ -80,6 +80,7 @@ TextArea 1.0 ./Inputs/TextArea.qml
 SpinBox 1.0 ./Inputs/SpinBox.qml
 SpinBoxComp 1.0 ./Inputs/SpinBoxComp.qml
 BarControl 1.0 ./Inputs/BarControl.qml
+DateTimePicker 1.0 ./Inputs/DateTimePicker.qml
 
 singleton UuidGenerator 1.0 Models/UuidGenerator.qml
 singleton NavigationController 1.0 Models/NavigationController.qml

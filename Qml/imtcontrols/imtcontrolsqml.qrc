@@ -77,6 +77,7 @@
         <file alias="imtcontrols/Inputs/SpinBox.qml">Inputs/SpinBox.qml</file>
         <file alias="imtcontrols/Inputs/SpinBoxComp.qml">Inputs/SpinBoxComp.qml</file>
         <file alias="imtcontrols/Inputs/BarControl.qml">Inputs/BarControl.qml</file>
+	<file alias="imtcontrols/Inputs/DateTimePicker.qml">Inputs/DateTimePicker.qml</file>
         <file alias="imtcontrols/Models/ModelIndex.qml">Models/ModelIndex.qml</file>
         <file alias="imtcontrols/Models/UuidGenerator.qml">Models/UuidGenerator.qml</file>
         <file alias="imtcontrols/Models/SortController.qml">Models/SortController.qml</file>

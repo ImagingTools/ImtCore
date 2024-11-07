@@ -99,6 +99,10 @@ I_EXPORT_COMPONENT(
 			"Feature container",
 			"Feature Container Subfeature");
 
+I_EXPORT_COMPONENT(
+			ProductController,
+			"Product controller",
+			"Product Controller");
 
 } // namespace ImtLicensePck
 

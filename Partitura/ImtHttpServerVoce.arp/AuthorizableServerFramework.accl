@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5270" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="DatabaseEngine" X="200" Y="475" Note=""/>
+        <Element ComponentName="HttpServerFramework" X="600" Y="102" Note=""/>
+        <Element ComponentName="IdentifiableProductInfo" X="600" Y="625" Note=""/>
+        <Element ComponentName="PumaGQLClientEngine" X="600" Y="475" Note=""/>
+        <Element ComponentName="QtResourceLoaderComp" X="975" Y="625" Note=""/>
+        <Element ComponentName="ServerSettings" X="200" Y="250" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="975" Y="250" Note=""/>
+        <Element ComponentName="WebSocketServerFramework" X="600" Y="250" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

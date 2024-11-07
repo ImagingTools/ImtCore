@@ -18,6 +18,7 @@ public:
 
 	I_BEGIN_COMPONENT(CProductCollectionControllerComp);
 		I_ASSIGN(m_licenseCollectionCompPtr, "LicenseCollection", "License collection", true, "LicenseCollection");
+		I_ASSIGN(m_featureCollectionCompPtr, "FeatureCollection", "Feature collection", true, "FeatureCollection");
 		I_ASSIGN(m_productInfoFactCompPtr, "ProductFactory", "Factory used for creation of the new product instance", true, "ProductFactory");
 	I_END_COMPONENT;
 
@@ -44,9 +45,11 @@ protected:
 								 const imtbase::CTreeItemModel& objectFilterModel,
 								 iprm::CParamsSet& filterParams) const override;
 	virtual imtbase::CTreeItemModel* RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual imtbase::CTreeItemModel* ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_licenseCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_featureCollectionCompPtr);
 	I_FACT(imtlic::IProductInfo, m_productInfoFactCompPtr);
 };
 

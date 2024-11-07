@@ -8,8 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="PermissionController" X="575" Y="175" Note=""/>
-        <Element ComponentName="SingleProductPermission" X="575" Y="400" Note=""/>
+        <Element ComponentName="PermissionsProvider" X="525" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

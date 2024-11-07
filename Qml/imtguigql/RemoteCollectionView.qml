@@ -75,9 +75,6 @@ CollectionView {
             property bool isReady: false;
 
             payloadModel: root.payloadModel
-            importTitle: root.importTitle
-            importFilter: root.importFilter
-
             Component.onCompleted: {
                 Events.subscribeEvent("CommandsGuiReady", commandsIsReady);
             }

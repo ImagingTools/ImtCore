@@ -45,11 +45,6 @@ I_EXPORT_COMPONENT(
 			"Account Controller");
 
 I_EXPORT_COMPONENT(
-			FeaturesExportProvider,
-			"FeaturesExportProvider",
-			"Features Export Provider");
-
-I_EXPORT_COMPONENT(
 			ProductPermissionController,
 			"ProductPermissionController",
 			"Product Permission Controller");

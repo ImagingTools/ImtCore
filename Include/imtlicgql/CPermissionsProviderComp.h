@@ -1,10 +1,9 @@
 #pragma once
 
 
-// ACF includes
-#include <icomp/CComponentBase.h>
-
 // ImtCore includes
+#include <imtlic/IProductInfo.h>
+#include <imtlic/CFeatureInfo.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
@@ -18,18 +17,17 @@ public:
 	typedef imtservergql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CPermissionsProviderComp)
-		I_ASSIGN(m_featurePackageRepresentationCompPtr, "PackageRepresentation", "Representation for feature package", true, "PackageRepresentation");
-		I_ASSIGN(m_featureContainerCompPtr, "FeatureContainer", "FeatureContainer", true, "FeatureContainer");
+		I_ASSIGN(m_productInfoCompPtr, "FeatureContainer", "Feature container", true, "FeatureContainer");
 	I_END_COMPONENT
 
 protected:
+	bool CreateRepresentationModelFromFeatureInfo(const imtlic::CFeatureInfo& featureInfo, imtbase::CTreeItemModel& representationModel, QString& errorMessage) const;
+
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
-	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
-	I_REF(imtbase::IRepresentationController, m_featurePackageRepresentationCompPtr);
-	I_REF(istd::IChangeable, m_featureContainerCompPtr);
+	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
 };
 
 

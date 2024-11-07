@@ -135,10 +135,6 @@ TreeViewItemDelegateBase {
                     property bool block: false
 
                     onEditingFinished: {
-                        if (ModalDialogManager.count > 0){
-                            return;
-                        }
-
                         inputId.visible = false;
 
                         let featureId = packageTreeItemDelegate.featureData.m_featureId;
@@ -233,6 +229,27 @@ TreeViewItemDelegateBase {
 
                     onClicked: {
                         packageTreeItemDelegate.featureData.m_optional = !packageTreeItemDelegate.featureData.m_optional;
+                    }
+                }
+            }
+
+            Item {
+                id: permissionItem;
+
+                width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount : 0;
+                height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
+
+                CheckBox {
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.horizontalCenter: parent.horizontalCenter;
+
+                    z: 10;
+                    checkState: packageTreeItemDelegate.featureData.m_isPermission ? Qt.Checked : Qt.Unchecked;
+                    isActive: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : true;
+                    visible: !packageTreeItemDelegate.hasChild;
+
+                    onClicked: {
+                        packageTreeItemDelegate.featureData.m_isPermission = !packageTreeItemDelegate.featureData.m_isPermission;
                     }
                 }
             }

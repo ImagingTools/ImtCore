@@ -3,7 +3,9 @@ import Acf 1.0
 import imtgui 1.0
 import imtdocgui 1.0
 import imtcolgui 1.0
+import imtcontrols 1.0 as ImtControls
 import imtcontrols 1.0
+import Qt.labs.platform 1.1
 
 ViewCommandsDelegateBase {
     id: collectionViewCommandsDelegate;
@@ -19,6 +21,8 @@ ViewCommandsDelegateBase {
 
     property alias renameDialogComp: renameDialog;
     property alias removeDialogComp: removeDialog;
+    property alias importFileDialog: importFileDialog_;
+    property alias exportFileDialog: fileDialogSave;
     property alias setDescriptionDialogComp: setDescriptionDialog;
 
     property bool canRename: false;
@@ -27,6 +31,7 @@ ViewCommandsDelegateBase {
     signal renamed(string id, string newName);
     signal descriptionSetted(string id, string description);
     signal removed(string id);
+    signal selectionChanged(var selection)
 
     Component.onDestruction: {
         if (collectionViewCommandsDelegate.collectionView){
@@ -39,6 +44,7 @@ ViewCommandsDelegateBase {
             commandsControllerConn.target = collectionView.commandsController
             collectionConnections.target = collectionView;
             elementsConnections.target = collectionView.table;
+            controllerConnections.target = collectionView.dataController;
         }
     }
 
@@ -56,6 +62,8 @@ ViewCommandsDelegateBase {
         function onSelectionChanged(selection){
             collectionViewCommandsDelegate.updateBaseCommandsAccent();
             collectionViewCommandsDelegate.updateItemSelection(selection);
+
+            collectionViewCommandsDelegate.selectionChanged(selection);
         }
     }
 
@@ -65,6 +73,19 @@ ViewCommandsDelegateBase {
         function onElementsChanged(){
             let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
             collectionViewCommandsDelegate.updateItemSelection(indexes);
+        }
+    }
+
+    Connections {
+        id: controllerConnections;
+
+        function onImported(){
+            ModalDialogManager.showInfoDialog(qsTr("The object has been successfully imported"));
+        }
+
+        function onExported(data){
+            let encodedStr = Qt.atob(data);
+            exportFileIO.write(encodedStr);
         }
     }
 
@@ -155,10 +176,102 @@ ViewCommandsDelegateBase {
         }
     }
 
+    // for reimplemented
     function onEdit(){
     }
 
     function onImport(){
+        importFileDialog_.open();
+    }
+
+    function onExport(){
+        fileDialogSave.open();
+    }
+
+    function onImportDialogResult(fileName, fileData){
+        if (collectionView && collectionView.dataController){
+            collectionView.dataController.importObject(fileName, fileData);
+        }
+    }
+
+    function onExportDialogResult(objectId){
+        if (collectionView && collectionView.dataController){
+            collectionView.dataController.exportObject(objectId);
+        }
+    }
+
+    FileDialog {
+        id: importFileDialog_
+        title: qsTr("Import file")
+        fileMode: FileDialog.OpenFile
+        nameFilters: ["All files (*)"]
+
+        onAccepted: {
+            let filePath;
+            if (Qt.platform.os == "web"){
+                filePath = importFileDialog_.file.toString()
+            }
+            else{
+                filePath = importFileDialog_.file.toString()
+            }
+
+            filePath = filePath.replace('file:///', '')
+
+            if (Qt.platform.os == "web"){
+                let reader = new FileReader()
+
+                reader.readAsDataURL(filePath)
+
+                reader.onload = function(){
+                    let encodedContentWithHeader = reader.result
+                    let encodedContent = encodedContentWithHeader.replace(/^.{0,}base64,/, '')
+
+                    collectionViewCommandsDelegate.onImportDialogResult(encodedContentWithHeader, encodedContent);
+                }.bind(this)
+            }
+            else {
+                fileIO.source = filePath
+                let fileData = fileIO.read()
+                let decodedData = Qt.btoa(fileData);
+                collectionViewCommandsDelegate.onImportDialogResult(filePath, decodedData);
+            }
+        }
+
+        FileIO {
+            id: fileIO
+        }
+    }
+
+    FileDialog {
+        id: fileDialogSave;
+        title: qsTr("Save file");
+        nameFilters: ["All files (*)"];
+        fileMode: FileDialog.SaveFile;
+        currentFile: "Default"
+        onAccepted: {
+            let filePath = fileDialogSave.file.toString();
+
+            if (Qt.platform.os == "web"){
+                exportFileIO.source = fileDialogSave.currentFile;
+            }
+            else{
+                filePath = filePath.replace('file:///', '')
+                exportFileIO.source = filePath;
+            }
+
+            let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
+            if (indexes.length > 0){
+                let index = indexes[0];
+                let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("Id", index);
+                if (selectedId !== ""){
+                    collectionViewCommandsDelegate.onExportDialogResult(selectedId);
+                }
+            }
+        }
+
+        FileIO {
+            id: exportFileIO
+        }
     }
 
     function onRemove(){
@@ -211,14 +324,13 @@ ViewCommandsDelegateBase {
                 collectionViewCommandsDelegate.onRemove();
             }
             else if (commandId === "Edit"){
-                console.log("onEdit", commandId);
-
                 collectionViewCommandsDelegate.onEdit();
             }
             else if (commandId === "Import"){
-                console.log("onImport", commandId);
-
                 collectionViewCommandsDelegate.onImport();
+            }
+            else if (commandId === "Export"){
+                collectionViewCommandsDelegate.onExport();
             }
         }
 
@@ -237,14 +349,14 @@ ViewCommandsDelegateBase {
 
     Component {
         id: errorDialog;
-        ErrorDialog {
+        ImtControls.ErrorDialog {
         }
     }
 
     Component {
         id: setDescriptionDialog;
 
-        InputDialog {
+        ImtControls.InputDialog {
             width: 300;
             title: qsTr("Set description");
             placeHolderText: qsTr("Enter the description")
@@ -266,7 +378,7 @@ ViewCommandsDelegateBase {
 
     Component {
         id: renameDialog;
-        InputDialog {
+        ImtControls.InputDialog {
             width: 300;
             title: qsTr("Rename document");
             placeHolderText: qsTr("Enter the name")
@@ -288,7 +400,7 @@ ViewCommandsDelegateBase {
 
     Component {
         id: removeDialog;
-        MessageDialog {
+        ImtControls.MessageDialog {
             width: 400;
             title: collectionViewCommandsDelegate.removeDialogTitle;
             message: collectionViewCommandsDelegate.removeMessage;

@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtlic/IProductInfo.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Profile.h>
 
 
@@ -20,7 +21,7 @@ public:
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", false, "UserCollection");
 		I_ASSIGN(m_roleCollectionCompPtr, "RoleCollection", "Role collection", false, "RoleCollection");
 		I_ASSIGN(m_groupCollectionCompPtr, "GroupCollection", "Group collection", false, "GroupCollection");
-		I_ASSIGN(m_featureCollectionCompPtr, "FeatureCollection", "Feature collection", false, "FeatureCollection");
+		I_ASSIGN(m_productInfoCompPtr, "ProductInfo", "Product feature container", false, "ProductInfo");
 	I_END_COMPONENT;
 
 protected:
@@ -37,7 +38,7 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_groupCollectionCompPtr);
-	I_REF(imtbase::IObjectCollection, m_featureCollectionCompPtr);
+	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
 };
 
 

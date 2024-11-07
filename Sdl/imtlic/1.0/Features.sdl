@@ -22,6 +22,7 @@ type FeatureData {
 	FeatureName: String
 	Description: String
 	Optional: Bool
+	IsPermission: Bool
 	Dependencies: ID
 	SubFeatures: [FeatureData]
 }

@@ -68,11 +68,4 @@ CollectionViewCommandsDelegateBase {
     function onNew(){
         root.createNewObject(documentTypeId, viewTypeId);
     }
-
-    function onImport(){
-        console.log("DocumentCollectionViewDelegate onImport()")
-        if (collectionView && collectionView.dataController){
-            collectionView.dataController.importDocument();
-        }
-    }
 }

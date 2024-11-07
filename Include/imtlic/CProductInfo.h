@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
+#include <imtbase/CObjectCollection.h>
 #include <imtlic/IProductInfo.h>
 
 
@@ -23,9 +24,9 @@ public:
 	virtual void SetProductDescription(const QString& description) override;
 	virtual QByteArray GetCategoryId() const override;
 	virtual void SetCategoryId(const QByteArray& categoryId) override;
-	virtual QByteArrayList GetFeatureIds() const override;
-	virtual void SetFeatureIds(QByteArrayList featureIds) override;
-	virtual IFeatureInfoProvider* GetFeatureInfoProvider() const override;
+	virtual imtbase::IObjectCollection* GetFeatures() override;
+	virtual bool AddFeature(const QByteArray& featureId, const IFeatureInfo& featureInfo) override;
+	virtual bool RemoveFeature(const QByteArray& featureId) override;
 
 	// reimplemented (iprm::INameParam)
 	virtual const QString& GetName() const override;
@@ -45,9 +46,9 @@ protected:
 	QString m_productName;
 	QString m_productDescription;
 	QByteArray m_categoryId;
-	QByteArrayList m_featureIds;
 
-	IFeatureInfoProvider* m_featureInfoProviderPtr;
+	imtbase::CObjectCollection m_featureCollection;
+	const imtlic::IFeatureInfoProvider* m_featureInfoProviderPtr;
 };
 
 

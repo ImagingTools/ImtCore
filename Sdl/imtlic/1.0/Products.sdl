@@ -63,14 +63,34 @@ input ProductItemInput {
 	Id: ID!
 }
 
+input ProductImportInput {
+	fileName: String!
+	fileContent: ID!
+}
+
+type ProductImportResponse {
+	status: ID
+}
+
+input ProductExportInput {
+	fileName: String!
+	fileContent: ID!
+}
+
+type ProductExportResponse {
+	status: ID
+}
+
 type Query {
 	ProductsList (input:ProductsListInput): ProductsListPayload!
 	ProductItem (input: ProductItemInput): ProductDataPayload!
+	ProductsExport (input: ProductExportInput): ProductExportResponse!
 }
 
 type Mutation {
 	ProductUpdate (input: ProductDataInput): UpdatedNotificationPayload!
 	ProductAdd (input: ProductDataInput): AddedNotificationPayload!
+	ProductsImport (input: ProductImportInput): ProductImportResponse!
 }
 
 collectionSchema {

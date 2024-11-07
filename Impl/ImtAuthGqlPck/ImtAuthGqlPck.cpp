@@ -124,6 +124,11 @@ I_EXPORT_COMPONENT(
 			"Profile controller",
 			"Profile Controller");
 
+I_EXPORT_COMPONENT(
+			RoleMetaInfoControllerProxy,
+			"Role meta info controller proxy",
+			"Role Meta Info Controller Proxy");
+
 
 } // namespace ImtAuthGqlPck
 

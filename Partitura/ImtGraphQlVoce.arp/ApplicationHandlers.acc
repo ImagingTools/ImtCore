@@ -19,6 +19,9 @@
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GroupCollection" Type="Reference" ExportId="GroupCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -35,15 +38,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Pages" Type="Reference[]" ExportId="Pages">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathToPermissionsFile" Type="Id" ExportId="PathToPermissionsFile">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductId" Type="Id[]" ExportId="ProductId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductName" Type="String[]" ExportId="ProductName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleCollection">
@@ -129,5 +123,7 @@
         <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="ServerFramework"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="ServerFramework"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="FeatureContainer" ComponentId="RootDataController/FeatureContainer"/>
+    </ExportedComponents>
 </Acf>

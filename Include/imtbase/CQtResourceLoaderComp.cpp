@@ -7,9 +7,6 @@
 // ACF includes
 #include <iser/CCompactXmlMemReadArchive.h>
 
-// ImtCore includes
-#include <imtlic/CFeatureContainer.h>
-
 
 namespace imtbase
 {

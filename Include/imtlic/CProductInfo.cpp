@@ -3,9 +3,13 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
+#include <istd/TSingleFactory.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
+
+// ImtCore includes
+#include <imtlic/CFeatureInfo.h>
 
 
 namespace imtlic
@@ -17,6 +21,8 @@ namespace imtlic
 CProductInfo::CProductInfo()
 	:m_featureInfoProviderPtr(nullptr)
 {
+	typedef istd::TSingleFactory<istd::IChangeable, CIdentifiableFeatureInfo> FactoryFeatureInfoImpl;
+	m_featureCollection.RegisterFactory<FactoryFeatureInfoImpl>("Feature");
 }
 
 
@@ -76,25 +82,23 @@ void CProductInfo::SetCategoryId(const QByteArray& categoryId)
 }
 
 
-QByteArrayList CProductInfo::GetFeatureIds() const
+imtbase::IObjectCollection* CProductInfo::GetFeatures()
 {
-	return m_featureIds;
+	return &m_featureCollection;
 }
 
 
-void CProductInfo::SetFeatureIds(QByteArrayList featureIds)
+bool CProductInfo::AddFeature(const QByteArray& featureId, const IFeatureInfo& featureInfo)
 {
-	if (m_featureIds != featureIds){
-		istd::CChangeNotifier notifier(this);
+	QByteArray retVal = m_featureCollection.InsertNewObject("Feature", "", "", &featureInfo, featureId);
 
-		m_featureIds = featureIds;
-	}
+	return !retVal.isEmpty();
 }
 
 
-IFeatureInfoProvider* CProductInfo::GetFeatureInfoProvider() const
+bool CProductInfo::RemoveFeature(const QByteArray& featureId)
 {
-	return m_featureInfoProviderPtr;
+	return m_featureCollection.RemoveElement(featureId);
 }
 
 
@@ -128,6 +132,13 @@ bool CProductInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+
+	quint32 imtCoreVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
+		imtCoreVersion = 0;
+	}
+
 	bool retVal = true;
 
 	iser::CArchiveTag productIdTag("ProductId", "ID of the product", iser::CArchiveTag::TT_LEAF);
@@ -150,7 +161,26 @@ bool CProductInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_categoryId);
 	retVal = retVal && archive.EndTag(categoryIdTag);
 
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_featureIds, "Features", "Feature");
+	if (imtCoreVersion >= 11786){
+		retVal = retVal && m_featureCollection.Serialize(archive);
+	}
+	else{
+		if (!archive.IsStoring()){
+			m_featureCollection.ResetData();
+
+			QByteArrayList featureIds;
+			retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, featureIds, "Features", "Feature");
+
+			if (m_featureInfoProviderPtr != nullptr){
+				for (const QByteArray& featureId : featureIds){
+					istd::TDelPtr<const IFeatureInfo> featureInfoPtr = m_featureInfoProviderPtr->GetFeatureInfo(featureId);
+					if (featureInfoPtr.IsValid()){
+						AddFeature(featureId, *featureInfoPtr.GetPtr());
+					}
+				}
+			}
+		}
+	}
 
 	return retVal;
 }
@@ -168,7 +198,7 @@ bool CProductInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 		m_productName = sourcePtr->m_productName;
 		m_productDescription = sourcePtr->m_productDescription;
 		m_categoryId = sourcePtr->m_categoryId;
-		m_featureIds = sourcePtr->m_featureIds;
+		m_featureCollection.CopyFrom(sourcePtr->m_featureCollection);
 
 		return true;
 	}
@@ -185,20 +215,20 @@ bool CProductInfo::IsEqual(const IChangeable& object) const
 				m_productName == sourcePtr->m_productName &&
 				m_productDescription == sourcePtr->m_productDescription &&
 				m_categoryId == sourcePtr->m_categoryId &&
-                m_featureIds == sourcePtr->m_featureIds;
+				m_featureCollection.IsEqual(sourcePtr->m_featureCollection);
 	}
 
 	return false;
 }
 
 
-bool CProductInfo::ResetData(CompatibilityMode /*mode*/)
+bool CProductInfo::ResetData(CompatibilityMode mode)
 {
 	m_productId.clear();
 	m_productName.clear();
 	m_productDescription.clear();
 	m_categoryId.clear();
-	m_featureIds.clear();
+	m_featureCollection.ResetData(mode);
 
 	return true;
 }

@@ -96,23 +96,10 @@
         <Element Id="PermissionsController" PackageId="ImtGraphQlVoce" ComponentId="PermissionsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="GqlCommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ProductPermissions</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathToPermissionsFile" Type="Id" ExportId="PathToPermissionsFile">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductId" Type="Id[]" ExportId="ProductId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductName" Type="String[]" ExportId="ProductName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -124,8 +111,8 @@
         <Element Id="ProfileController" PackageId="ImtGraphQlVoce" ComponentId="ProfileController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="FeatureCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PermissionsController/FeatureContainer"/>
+                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GroupCollection" Type="Reference" ExportId="GroupCollection">
                         <Data IsEnabled="false"/>

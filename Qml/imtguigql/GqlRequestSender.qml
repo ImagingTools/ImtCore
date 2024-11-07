@@ -12,9 +12,9 @@ import imtguigql 1.0
         requestType: 0; // Query
         gqlCommandId: "GetDocumentData";
 
-        function createQueryParams(query){
+        function createQueryParams(query, params){
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", "d1481f7d-d5ce-4a62-9150-8a5cadb62e47");
+            inputParams.InsertField("Id", params["id"]);
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("item");
@@ -64,7 +64,7 @@ GqlModel {
         return obj;
     }
 
-    function send(){
+    function send(params){
         if (gqlCommandId == "" || gqlCommandId === undefined || gqlCommandId == null ){
             console.error("Unable to send request. Error: GraphQL command-ID is invalid");
             return;
@@ -86,12 +86,12 @@ GqlModel {
         }
 
         var query = Gql.GqlRequest(type, root.gqlCommandId);
-        createQueryParams(query);
+        createQueryParams(query, params);
 
         root.setGqlQuery(query.GetQuery(), root.getHeaders());
     }
 
-    function createQueryParams(query){}
+    function createQueryParams(query, params){}
 
     onStateChanged: {
         if (state === "Error"){

@@ -4,7 +4,7 @@
 // ACF includes
 #include <istd/TPointerVector.h>
 #include <istd/TDelPtr.h>
-#include <iser/ISerializable.h>
+#include <iser/IObject.h>
 
 //ImtCore includes
 #include <imtlic/IFeatureInfoProvider.h>
@@ -17,7 +17,7 @@ namespace imtlic
 /**
 	Common information about a feature.
 */
-class IFeatureInfo: virtual public iser::ISerializable
+class IFeatureInfo: virtual public iser::IObject
 {
 public:
 	typedef QSet<QByteArray> FeatureIds;
@@ -38,9 +38,14 @@ public:
 	virtual QString GetFeatureDescription() const = 0;
 
 	/**
-		Get the feature ID.
+		Feature is optional.
 	*/
 	virtual bool IsOptional() const = 0;
+
+	/**
+		Feature is permission.
+	*/
+	virtual bool IsPermission() const = 0;
 
 	/**
 		Get the parent feature pointer.

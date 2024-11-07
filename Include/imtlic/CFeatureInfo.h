@@ -22,12 +22,14 @@ public:
 	void SetOptional(bool optional);
 	void SetParentFeature(const IFeatureInfo* parentFeaturePtr);
 	void SetDependencies(QByteArrayList dependencies);
+	void SetIsPermission(bool isPermission);
 
 	// reimplemented (IFeatureInfo)
 	virtual QByteArray GetFeatureId() const override;
 	virtual QString GetFeatureName() const override;
 	virtual QString GetFeatureDescription() const override;
 	virtual bool IsOptional() const override;
+	virtual bool IsPermission() const override;
 	virtual const IFeatureInfo* GetParentFeature() const override;
 	virtual QByteArrayList GetSubFeatureIds(int maxDepth = -1) const override;
 	virtual const IFeatureInfo* GetSubFeature(const QByteArray& subfeatureId, int maxDepth = -1) const override;
@@ -35,6 +37,9 @@ public:
 	virtual bool InsertSubFeature(const IFeatureInfo* subFeatureInfo) override;
 	virtual void DeleteSubFeature(const QByteArray &subFeatureId) override;
 	virtual QByteArrayList GetDependencies() const override;
+
+	// reimplemented (iser::IObject)
+	virtual QByteArray GetFactoryId() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -55,6 +60,7 @@ protected:
 	QString m_name;
 	QString m_description;
 	bool m_optional;
+	bool m_isPermission;
 	QByteArrayList m_dependencies;
 	FeatureInfoList m_subFeatures;
 	const IFeatureInfo* m_parentFeaturePtr;

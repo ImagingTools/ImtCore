@@ -36,6 +36,8 @@ public:
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
+		I_ASSIGN(m_filePersistenceCompPtr, "FilePersistence", "File persistence for the import/export object", false, "FilePersistence");
+		I_ASSIGN(m_objectInfoFactCompPtr, "ObjectFactory", "Object factory", false, "ObjectFactory");
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -58,6 +60,8 @@ public:
 		OT_ELEMENTS_COUNT,
 		OT_ELEMENT_IDS,
 		OT_ELEMENT_HISTORY,
+		OT_IMPORT,
+		OT_EXPORT,
 		OT_USER_OPERATION = 1000
 	};
 
@@ -89,6 +93,8 @@ protected:
 	virtual imtbase::CTreeItemModel* GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetObjectView(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetObjectHistory(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 	/**
 		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.
@@ -165,6 +171,8 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_headersProviderCompPtr);
 	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);
+	I_REF(ifile::IFilePersistence, m_filePersistenceCompPtr);
+	I_FACT(istd::IChangeable, m_objectInfoFactCompPtr);
 
 	imtbase::CTimeFilterParamRepresentationController m_timeFilterParamRepresentationController;
 };

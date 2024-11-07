@@ -8,11 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="FeatureContainer" X="550" Y="375" Note=""/>
-        <Element ComponentName="FeatureContainerRepresentationController" X="925" Y="250" Note=""/>
-        <Element ComponentName="PermissionsProvider" X="550" Y="250" Note=""/>
-        <Element ComponentName="ProductInfoProvider" X="550" Y="75" Note=""/>
-        <Element ComponentName="QtResourceLoaderComp" X="550" Y="500" Note=""/>
+        <Element ComponentName="FeatureContainer" X="550" Y="350" Note=""/>
+        <Element ComponentName="PermissionsProvider" X="550" Y="100" Note=""/>
+        <Element ComponentName="QtResourceLoaderComp" X="550" Y="600" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

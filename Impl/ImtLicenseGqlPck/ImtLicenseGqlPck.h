@@ -13,7 +13,6 @@
 #include <imtlicgql/CLicenseControllerComp.h>
 #include <imtlicgql/CLicenseCollectionControllerComp.h>
 #include <imtlicgql/CAccountControllerComp.h>
-#include <imtlicgql/CFeaturesExportProviderComp.h>
 #include <imtlicgql/CProductPermissionsControllerComp.h>
 #include <imtlicgql/CFeatureControllerComp.h>
 #include <imtlicgql/CFeatureCollectionControllerComp.h>
@@ -35,7 +34,6 @@ typedef imtlicgql::CLicenseControllerComp LicenseController;
 typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CLicenseCollectionControllerComp> LicenseCollectionController;
 typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CAccountCollectionControllerComp> AccountCollectionController;
 typedef imtlicgql::CAccountControllerComp AccountController;
-typedef imtlicgql::CFeaturesExportProviderComp FeaturesExportProvider;
 typedef imtlicgql::CProductPermissionsControllerComp ProductPermissionController;
 typedef imtlicgql::CFeatureControllerComp FeatureController;
 typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CFeatureCollectionControllerComp> FeatureCollectionController;

@@ -63,6 +63,10 @@ FocusScope {
         textField.text = text;// for web TEMP!!!
     }
 
+    function select(from, to) {
+        textField.select(from, to)
+    }
+
     function setFocus(value) {
         textField.focus = value;
     }

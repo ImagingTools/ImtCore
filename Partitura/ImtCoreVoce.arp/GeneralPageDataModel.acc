@@ -98,7 +98,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PageViewParamSet" PackageId="ImtServerVoce" ComponentId="PageViewParamSet">
+        <Element Id="PageViewParamSet" PackageId="ImtHttpServerVoce" ComponentId="PageViewParamSet">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
             </Data>

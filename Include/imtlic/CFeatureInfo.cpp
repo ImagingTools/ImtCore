@@ -17,6 +17,7 @@ namespace imtlic
 // public methods
 
 CFeatureInfo::CFeatureInfo() :
+	m_isPermission(true),
 	m_parentFeaturePtr(nullptr)
 {
 }
@@ -82,6 +83,16 @@ void CFeatureInfo::SetDependencies(QByteArrayList dependencies)
 }
 
 
+void CFeatureInfo::SetIsPermission(bool isPermission)
+{
+	if (m_isPermission != isPermission){
+		istd::CChangeNotifier notifier(this);
+
+		m_isPermission = isPermission;
+	}
+}
+
+
 // reimplemented (IFeatureInfo)
 
 QByteArray CFeatureInfo::GetFeatureId() const
@@ -108,7 +119,13 @@ bool CFeatureInfo::IsOptional() const
 }
 
 
-const IFeatureInfo *CFeatureInfo::GetParentFeature() const
+bool CFeatureInfo::IsPermission() const
+{
+	return m_isPermission;
+}
+
+
+const IFeatureInfo* CFeatureInfo::GetParentFeature() const
 {
 	return m_parentFeaturePtr;
 }
@@ -126,13 +143,13 @@ QByteArrayList CFeatureInfo::GetSubFeatureIds(int maxDepth) const
 }
 
 
-const IFeatureInfo *CFeatureInfo::GetSubFeature(const QByteArray& subfeatureId, int maxDepth) const
+const IFeatureInfo* CFeatureInfo::GetSubFeature(const QByteArray& subfeatureId, int maxDepth) const
 {
 	return GetSubFeatureRecursive(m_subFeatures, subfeatureId, maxDepth);
 }
 
 
-const istd::TPointerVector<const IFeatureInfo> &CFeatureInfo::GetSubFeatures() const
+const istd::TPointerVector<const IFeatureInfo>& CFeatureInfo::GetSubFeatures() const
 {
 	return m_subFeatures;
 }
@@ -153,7 +170,7 @@ bool CFeatureInfo::InsertSubFeature(const IFeatureInfo* subFeatureInfo)
 }
 
 
-void CFeatureInfo::DeleteSubFeature(const QByteArray &subFeatureId)
+void CFeatureInfo::DeleteSubFeature(const QByteArray& subFeatureId)
 {
 	for (int i = 0; i < m_subFeatures.GetCount(); i++){
 		const IFeatureInfo* subFeatureInfoPtr = m_subFeatures.GetAt(i);
@@ -176,11 +193,25 @@ QByteArrayList CFeatureInfo::GetDependencies() const
 }
 
 
+// reimplemented (iser::IObject)
+
+QByteArray CFeatureInfo::GetFactoryId() const
+{
+	return QByteArray("Feature");
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CFeatureInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
+
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+	quint32 imtCoreVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
+		imtCoreVersion = 0;
+	}
 
 	iser::CArchiveTag featureIdTag("FeatureId", "ID of the feature", iser::CArchiveTag::TT_LEAF);
 	bool retVal = archive.BeginTag(featureIdTag);
@@ -201,6 +232,13 @@ bool CFeatureInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(featureOptionalTag);
 	retVal = retVal && archive.Process(m_optional);
 	retVal = retVal && archive.EndTag(featureOptionalTag);
+
+	if (imtCoreVersion >= 11828){
+		iser::CArchiveTag permissionTag("IsPermission", "Is permission", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(permissionTag);
+		retVal = retVal && archive.Process(m_isPermission);
+		retVal = retVal && archive.EndTag(permissionTag);
+	}
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_dependencies, "Dependencies", "Dependency");
 

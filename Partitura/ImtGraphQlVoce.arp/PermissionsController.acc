@@ -10,41 +10,20 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="PermissionController" PackageId="ImtLicenseGqlPck" ComponentId="ProductPermissionController">
+        <Element Id="PermissionsProvider" PackageId="ImtLicenseGqlPck" ComponentId="PermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="GqlCommandIds">
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ProductPermissions</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SingleProductPermission"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SingleProductPermission" PackageId="ImtCoreVoce" ComponentId="SingleProductPermission">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathToPermissionsFile" Type="Id" ExportId="PathToPermissionsFile">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductId" Type="Id[]" ExportId="ProductId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductName" Type="String[]" ExportId="ProductName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -56,7 +35,8 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="PermissionController"/>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="PermissionsProvider"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="PermissionsProvider"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="FeatureContainer" ComponentId="SingleProductPermission/FeatureContainer"/>

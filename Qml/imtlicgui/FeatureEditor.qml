@@ -534,6 +534,10 @@ ViewBase {
         headersModel.setData("Id", FeatureItemTypeMetaInfo.s_optional, index);
         headersModel.setData("Name", qsTr("Optional"), index);
 
+        index = headersModel.insertNewItem();
+        headersModel.setData("Id", FeatureItemTypeMetaInfo.s_isPermission, index);
+        headersModel.setData("Name", qsTr("Is Permission"), index);
+
         headersModel.refresh();
 
         tableView_.columnModel = headersModel;

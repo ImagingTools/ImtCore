@@ -107,24 +107,27 @@ sdl::imtauth::Profile::V1_0::CProfileData CProfileControllerComp::OnGetProfile(
 
 	QList<sdl::imtauth::Profile::V1_0::CPermissionInfo> permissionList;
 
-	if (m_featureCollectionCompPtr.IsValid()){
-		QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
-		for (imtbase::ICollectionInfo::Id& elementId : m_featureCollectionCompPtr->GetElementIds()){
-			imtbase::IObjectCollection::DataPtr groupDataPtr;
-			if (m_featureCollectionCompPtr->GetObjectData(elementId, groupDataPtr)){
-				const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(groupDataPtr.GetPtr());
-				if (featureInfoPtr != nullptr){
-					for (imtbase::ICollectionInfo::Id& subFeatureId : featureInfoPtr->GetSubFeatureIds()){
-						if (permissions.contains(subFeatureId)){
-							const imtlic::IFeatureInfo* subFeatureInfoPtr = featureInfoPtr->GetSubFeature(subFeatureId);
-							if (subFeatureInfoPtr != nullptr){
-								sdl::imtauth::Profile::V1_0::CPermissionInfo info;
+	if (m_productInfoCompPtr.IsValid()){
+		imtbase::IObjectCollection* featureCollectionPtr = m_productInfoCompPtr->GetFeatures();
+		if (featureCollectionPtr != nullptr){
+			QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
+			for (imtbase::ICollectionInfo::Id& elementId : featureCollectionPtr->GetElementIds()){
+				imtbase::IObjectCollection::DataPtr permissionDataPtr;
+				if (featureCollectionPtr->GetObjectData(elementId, permissionDataPtr)){
+					const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(permissionDataPtr.GetPtr());
+					if (featureInfoPtr != nullptr){
+						for (imtbase::ICollectionInfo::Id& subFeatureId : featureInfoPtr->GetSubFeatureIds()){
+							if (permissions.contains(subFeatureId)){
+								const imtlic::IFeatureInfo* subFeatureInfoPtr = featureInfoPtr->GetSubFeature(subFeatureId);
+								if (subFeatureInfoPtr != nullptr){
+									sdl::imtauth::Profile::V1_0::CPermissionInfo info;
 
-								info.SetId(subFeatureInfoPtr->GetFeatureId());
-								info.SetName(subFeatureInfoPtr->GetFeatureName());
-								info.SetDescription(subFeatureInfoPtr->GetFeatureDescription());
+									info.SetId(subFeatureInfoPtr->GetFeatureId());
+									info.SetName(subFeatureInfoPtr->GetFeatureName());
+									info.SetDescription(subFeatureInfoPtr->GetFeatureDescription());
 
-								permissionList << info;
+									permissionList << info;
+								}
 							}
 						}
 					}

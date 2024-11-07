@@ -110,8 +110,8 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		QByteArrayList resultList;
 		if (m_roleInfoProviderCompPtr.IsValid()){
 			for (const QByteArray& roleId: userInfoPtr->GetRoles(productId)){
-				const imtauth::IRole* roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
-				if (roleInfoPtr != nullptr){
+				istd::TDelPtr<const imtauth::IRole> roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
+				if (roleInfoPtr.IsValid()){
 					QString roleName = roleInfoPtr->GetRoleName();
 					QString roleDescription = roleInfoPtr->GetRoleDescription();
 
@@ -436,15 +436,20 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 
 			if (m_roleInfoProviderCompPtr.IsValid()){
 				imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles(productId);
-				for (const QByteArray& productRoleId: rolesIds){
-					istd::TDelPtr<const imtauth::IRole> rolePtr = m_roleInfoProviderCompPtr->GetRole(productRoleId);
-					if (rolePtr.IsValid()){
-						QByteArray roleId = rolePtr->GetRoleId();
-						QString roleName = rolePtr->GetRoleName();
-						QByteArray roleProductId = rolePtr->GetProductId();
+				if (rolesIds.isEmpty()){
+					children->SetData("Value", "No roles");
+				}
+				else{
+					for (const QByteArray& productRoleId: rolesIds){
+						istd::TDelPtr<const imtauth::IRole> rolePtr = m_roleInfoProviderCompPtr->GetRole(productRoleId);
+						if (rolePtr.IsValid()){
+							QByteArray roleId = rolePtr->GetRoleId();
+							QString roleName = rolePtr->GetRoleName();
+							QByteArray roleProductId = rolePtr->GetProductId();
 
-						int childrenIndex = children->InsertNewItem();
-						children->SetData("Value", roleName + " (" + roleProductId + ")", childrenIndex);
+							int childrenIndex = children->InsertNewItem();
+							children->SetData("Value", roleName + " (" + roleProductId + ")", childrenIndex);
+						}
 					}
 				}
 			}
@@ -456,13 +461,18 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 
 			if (m_userGroupInfoProviderCompPtr.IsValid()){
 				QByteArrayList groupIds = userInfoPtr->GetGroups();
-				for (const QByteArray& groupId : groupIds){
-					istd::TDelPtr<const imtauth::IUserGroupInfo> userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
-					if (userGroupInfoPtr.IsValid()){
-						QString groupName = userGroupInfoPtr->GetName();
+				if (groupIds.isEmpty()){
+					children->SetData("Value", "No groups");
+				}
+				else{
+					for (const QByteArray& groupId : groupIds){
+						istd::TDelPtr<const imtauth::IUserGroupInfo> userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
+						if (userGroupInfoPtr.IsValid()){
+							QString groupName = userGroupInfoPtr->GetName();
 
-						int childrenIndex = children->InsertNewItem();
-						children->SetData("Value", groupName, childrenIndex);
+							int childrenIndex = children->InsertNewItem();
+							children->SetData("Value", groupName, childrenIndex);
+						}
 					}
 				}
 			}

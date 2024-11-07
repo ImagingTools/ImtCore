@@ -4,6 +4,12 @@
 // std includes
 #include <cmath>
 
+// Qt includes
+#include <QtCore/QFile>
+#include <QtCore/QUuid>
+#include <QtCore/QTemporaryDir>
+#include <QtCore/QFileInfo>
+
 // ACF includes
 #include <iprm/CTextParam.h>
 #include <iprm/CIdParam.h>
@@ -13,6 +19,7 @@
 #include <istd/TSingleFactory.h>
 
 // ImtCore includes
+#include <imtbase/IIdentifiable.h>
 #include <imtbase/CCollectionFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IObjectCollectionIterator.h>
@@ -90,6 +97,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 		return GetElementsCount(gqlRequest, errorMessage);
 	case OT_ELEMENT_IDS:
 		return GetElementIds(gqlRequest, errorMessage);
+	case OT_IMPORT:
+		return ImportObject(gqlRequest, errorMessage);
+	case OT_EXPORT:
+		return ExportObject(gqlRequest, errorMessage);
 	case OT_USER_OPERATION + 1:
 		return GetTreeItemModel(gqlRequest, errorMessage);
 	case OT_USER_OPERATION + 2:
@@ -201,6 +212,16 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 		if (fieldId == "itemHistory"){
 			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_ELEMENT_HISTORY;
+			return true;
+		}
+		if (fieldId == "import"){
+			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
+			operationType = OT_IMPORT;
+			return true;
+		}
+		if (fieldId == "export"){
+			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
+			operationType = OT_EXPORT;
 			return true;
 		}
 	}
@@ -924,6 +945,157 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(c
 			}
 		}
 	}
+
+	return rootModelPtr.PopPtr();
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+
+	if (!m_filePersistenceCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'FilePersistence' was not set", "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+
+	if (!m_objectInfoFactCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'ObjectFactory' was not set", "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	if (inputParamPtr == nullptr){
+		errorMessage = QT_TR_NOOP("Unable to import the object. GQL input params is invalid.");
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+
+	QByteArray objectData = inputParamPtr->GetFieldArgumentValue("fileData").toByteArray();
+	QByteArray data = QByteArray::fromBase64(objectData);
+
+	istd::TDelPtr<istd::IChangeable> objectInstancePtr = m_objectInfoFactCompPtr.CreateInstance();
+	if (!objectInstancePtr.IsValid()){
+		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
+
+	QTemporaryDir tempDir;
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + ".xml";
+
+	QFile file(filePathTmp);
+	if (!file.open(QIODevice::WriteOnly)){
+		SendErrorMessage(0, QString("Unable to open file with name '%1'").arg(filePathTmp), "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+
+	file.write(data);
+	file.close();
+
+	if (m_filePersistenceCompPtr->LoadFromFile(*objectInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
+		errorMessage = QString("Unable to import object to the collection");
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		QFile::remove(filePathTmp);
+
+		return nullptr;
+	}
+
+	QByteArray objectUuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	imtbase::IIdentifiable* identifiableObjectPtr = dynamic_cast<imtbase::IIdentifiable*>(objectInstancePtr.GetPtr());
+	if (identifiableObjectPtr != nullptr){
+		objectUuid = identifiableObjectPtr->GetObjectUuid();
+	}
+
+	if (m_objectCollectionCompPtr->GetElementIds().contains(objectUuid)){
+		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(qPrintable(objectUuid));
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		QFile::remove(filePathTmp);
+
+		return nullptr;
+	}
+
+	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject("", "", "", objectInstancePtr.GetPtr(), objectUuid);
+	if (retVal.isEmpty()){
+		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(qPrintable(objectUuid));
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		QFile::remove(filePathTmp);
+
+		return nullptr;
+	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	rootModelPtr->SetData("id", objectUuid);
+	rootModelPtr->SetData("status", "ok");
+	QFile::remove(filePathTmp);
+
+	return rootModelPtr.PopPtr();
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+
+	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+
+	if (!m_filePersistenceCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'FilePersistence' was not set", "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	if (inputParamPtr == nullptr){
+		errorMessage = QT_TR_NOOP("Unable to import the object. GQL input params is invalid.");
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+
+	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
+
+	QTemporaryDir tempDir;
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + ".xml";
+
+	if (m_filePersistenceCompPtr->SaveToFile(*dataPtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
+		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(qPrintable(objectId)).arg(filePathTmp);
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
+
+	QFile file(filePathTmp);
+	if (!file.open(QIODevice::ReadOnly)){
+		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Unable to open file with name '%1'").arg(qPrintable(objectId)).arg(filePathTmp);
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		QFile::remove(filePathTmp);
+
+		return nullptr;
+	}
+
+	QByteArray data = file.readAll();
+	file.close();
+	QFile::remove(filePathTmp);
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	rootModelPtr->SetData("fileContent", data.toBase64());
 
 	return rootModelPtr.PopPtr();
 }

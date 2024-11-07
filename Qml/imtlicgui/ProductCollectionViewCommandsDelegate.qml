@@ -4,12 +4,18 @@ import imtgui 1.0
 import Qt.labs.platform 1.1
 import imtcolgui 1.0
 import imtdocgui 1.0
+import imtcontrols 1.0
 
 DocumentCollectionViewDelegate {
     id: container;
 
     removeDialogTitle: qsTr("Deleting a product");
     removeMessage: qsTr("Delete the selected product ?");
+
+    exportFileDialog.nameFilters: ["Xml files (*.xml)"];
+    exportFileDialog.title: qsTr("Select product");
+
+    property bool force: false;
 
     function updateItemSelection(selectedItems){
         if (container.collectionView && container.collectionView.commandsController){
@@ -29,17 +35,47 @@ DocumentCollectionViewDelegate {
         }
     }
 
-    onCommandActivated: {
-        if (commandId === "Export"){
-            let indexes = container.collectionView.table.getSelectedIndexes();
-            if (indexes.length > 0){
-                let index = indexes[0];
-                let productId = container.collectionView.table.elements.getData("ProductId", index);
-                let fileName = productId + "Features"
+    onSelectionChanged: {
+        if (selection.length > 0){
+            let index = selection[0];
+            let productId = container.collectionView.table.elements.getData("ProductId", index);
+            let fileName = productId + "Features"
 
-                fileDialogSave.currentFile = 'file:///' + fileName + ".xml";
-                fileDialogSave.open();
+            exportFileDialog.currentFile = fileName + ".xml";
+        }
+    }
+
+    Component {
+        id: messageErrorDialog;
+
+        ErrorDialog {}
+    }
+
+    Component {
+        id: messageDialogComp;
+
+        MessageDialog {
+            title: qsTr("Feature overwriting");
+            message: qsTr("Overwrite features ?");
+
+            onFinished: {
+                container.force = false;
+                if (buttonId == Enums.yes){
+                    container.force = true;
+                }
+
+                container.importFileDialog.open()
             }
+        }
+    }
+
+    function onImport(){
+        ModalDialogManager.openDialog(messageDialogComp, {});
+    }
+
+    function onImportDialogResult(fileName, fileData){
+        if (collectionView && collectionView.dataController){
+            collectionView.dataController.importObject(fileName, fileData, {"force":container.force});
         }
     }
 
@@ -53,9 +89,43 @@ DocumentCollectionViewDelegate {
 
     RemoteFileController {
         id: remoteFileController;
-
         prefix: "/files/";
+
+        onFileUploaded: {
+            ModalDialogManager.openDialog(messageErrorDialog, {"title" : qsTr("Import successful"),"message": qsTr("The product has been successfully imported")});
+        }
+
+        onFileUploadFailed: {
+            ModalDialogManager.openDialog(messageErrorDialog, {"message": qsTr("Error when trying to import a product")});
+        }
+
+        onFileDownloadFailed: {
+            ModalDialogManager.openDialog(messageErrorDialog, {"message": qsTr("Error when trying to export a product")});
+        }
+
+        onStateChanged: {
+            if (remoteFileController.state === "Loading"){
+                Events.sendEvent("StartLoading");
+            }
+            else{
+                Events.sendEvent("StopLoading");
+            }
+        }
     }
+
+    // FileDialog {
+    //     id: fileDialogOpen;
+    //     title: qsTr("Select file");
+    //     fileMode: FileDialog.OpenFile;
+    //     nameFilters: ["*.xml"];
+
+    //     onAccepted: {
+    //         let filePath = fileDialogOpen.file.toString();
+    //         filePath = filePath.replace('file:///', '')
+
+    //         remoteFileController.SendFile(filePath);
+    //     }
+    // }
 
     FileDialog {
         id: fileDialogSave;

@@ -64,6 +64,9 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	bool isOptional = featureRepresentationData.GetOptional();
 	featureInfo.SetOptional(isOptional);
 
+	bool isPermission = featureRepresentationData.GetIsPermission();
+	featureInfo.SetIsPermission(isPermission);
+
 	QList<sdl::imtlic::Features::V1_0::CFeatureData> subFeatureDataList = featureRepresentationData.GetSubFeatures();
 	for (const sdl::imtlic::Features::V1_0::CFeatureData& subFeatureData : subFeatureDataList){
 		imtlic::CFeatureInfo* subFeatureInfoPtr = new imtlic::CFeatureInfo();
@@ -100,6 +103,9 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 
 	bool isOptional = featureInfo.IsOptional();
 	featureRepresentationData.SetOptional(isOptional);
+
+	bool isPermission = featureInfo.IsPermission();
+	featureRepresentationData.SetIsPermission(isPermission);
 
 	QList<sdl::imtlic::Features::V1_0::CFeatureData> subFeatureDataList;
 	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();

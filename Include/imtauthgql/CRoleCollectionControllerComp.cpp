@@ -274,14 +274,13 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 	productId = paramsPtr.GetFieldArgumentValue("ProductId").toByteArray();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
 	QByteArray roleObjectId = GetObjectIdFromInputParams(paramsPtr);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(roleObjectId, dataPtr)){
 		const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
-
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role info");
 			return nullptr;
@@ -292,40 +291,50 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 		QByteArray roleProductId = roleInfoPtr->GetProductId();
 
 		int index = dataModelPtr->InsertNewItem();
+		dataModelPtr->SetData("Id", "ParentRoles", index);
 		dataModelPtr->SetData("Name", "Parent Roles", index);
 		imtbase::CTreeItemModel* children = dataModelPtr->AddTreeModel("Children", index);
 
 		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
 
-		for (const QByteArray& parentRoleId : parentRolesIds){
-			imtbase::IObjectCollection::DataPtr parentDataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(parentRoleId, parentDataPtr)){
-				const imtauth::IRole* parentRoleInfoPtr = dynamic_cast<const imtauth::IRole*>(parentDataPtr.GetPtr());
-				if (parentRoleInfoPtr != nullptr){
-					QString parentRoleName = parentRoleInfoPtr->GetRoleName();
+		if (parentRolesIds.isEmpty()){
+			children->SetData("Value", "No parent roles");
+		}
+		else{
+			for (const QByteArray& parentRoleId : parentRolesIds){
+				imtbase::IObjectCollection::DataPtr parentDataPtr;
+				if (m_objectCollectionCompPtr->GetObjectData(parentRoleId, parentDataPtr)){
+					const imtauth::IRole* parentRoleInfoPtr = dynamic_cast<const imtauth::IRole*>(parentDataPtr.GetPtr());
+					if (parentRoleInfoPtr != nullptr){
+						QString parentRoleName = parentRoleInfoPtr->GetRoleName();
 
-					int childrenIndex = children->InsertNewItem();
+						int childrenIndex = children->InsertNewItem();
 
-					children->SetData("Value", parentRoleName, childrenIndex);
+						children->SetData("Value", parentRoleName, childrenIndex);
+					}
 				}
 			}
 		}
 
 		index = dataModelPtr->InsertNewItem();
 
+		dataModelPtr->SetData("Id", "Permissions", index);
 		dataModelPtr->SetData("Name", "Permissions", index);
 		children = dataModelPtr->AddTreeModel("Children", index);
 
 		imtauth::IRole::FeatureIds permissionsIds = roleInfoPtr->GetPermissions();
 
-		for (const QByteArray& permissionId : permissionsIds){
-			int childrenIndex = children->InsertNewItem();
+		if (permissionsIds.isEmpty()){
+			children->SetData("Value", "No permissions");
+		}
+		else{
+			for (const QByteArray& permissionId : permissionsIds){
+				int childrenIndex = children->InsertNewItem();
 
-			children->SetData("Value", permissionId, childrenIndex);
+				children->SetData("Value", permissionId, childrenIndex);
+			}
 		}
 	}
-
-	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
 
 	return rootModelPtr.PopPtr();
 }

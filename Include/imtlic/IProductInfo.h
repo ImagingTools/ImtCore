@@ -5,7 +5,7 @@
 #include <iprm/INameParam.h>
 
 // ImtCore includes
-#include <imtlic/ILicenseInfoProvider.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtlic/IFeatureInfoProvider.h>
 
 
@@ -79,19 +79,19 @@ public:
 	virtual void SetCategoryId(const QByteArray& categoryId) = 0;
 
 	/**
-		Get features includes in this product.
+		Get feature collection.
 	*/
-	virtual QByteArrayList GetFeatureIds() const = 0;
+	virtual imtbase::IObjectCollection* GetFeatures() = 0;
 
 	/**
-		Set features.
+		Insert sub feature.
 	*/
-	virtual void SetFeatureIds(QByteArrayList featureIds) = 0;
+	virtual bool AddFeature(const QByteArray& featureId, const IFeatureInfo& featureInfo) = 0;
 
 	/**
-		Get feature info provider.
+		Remove sub feature.
 	*/
-	virtual IFeatureInfoProvider* GetFeatureInfoProvider() const = 0;
+	virtual bool RemoveFeature(const QByteArray& featureId) = 0;
 };
 
 
