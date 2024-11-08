@@ -329,16 +329,6 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 					return false;
 				}
 
-				// look for duplicates
-				const QString sdlTypeName = sdlTypeParam->GetName();
-				for (const CSdlType& sdlType: std::as_const(m_sdlTypes)){
-					if (sdlType.GetName() == sdlTypeName){
-						SendErrorMessage(0, QString("Redifinition of '%1' in '%2'").arg(sdlTypeName, schemaPath));
-
-						return false;
-					}
-				}
-
 				CSdlType copiedType(*sdlTypeParam);
 				// maybe already imported from another file
 				if (!m_sdlTypes.contains(copiedType)){
@@ -583,6 +573,19 @@ bool CGqlSchemaParserComp::ValidateSchema()
 				}
 			}
 		}
+	}
+
+	QList<CSdlType> uniqueTypes;
+	QMutableListIterator typesIter(m_sdlTypes);
+	while(typesIter.hasNext()){
+		const CSdlType& sdlType = typesIter.next();
+		if (uniqueTypes.contains(sdlType)) {
+			typesIter.remove();
+
+			continue;
+		}
+
+		uniqueTypes << sdlType;
 	}
 
 	return true;
