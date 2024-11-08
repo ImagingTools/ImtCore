@@ -750,7 +750,7 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 		retVal += GetDecapitalizedValue(sdlField.GetId());
 		retVal += QStringLiteral(");\n");
 
-		// add spectal list insertion method
+		// declare list insertion method
 		if (sdlField.IsArray()){
 			bool isCustom = false;
 			QString convertedArrayType = ConvertType(sdlField.GetType(), &isCustom);
@@ -791,6 +791,12 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 
 			retVal += QStringLiteral(" element);\n");
 		}
+
+		// declare reset metod
+		FeedLineHorizontally(retVal, indents);
+		retVal += QStringLiteral("void Reset");
+		retVal += GetCapitalizedValue(sdlField.GetId());
+		retVal += QStringLiteral("();\n");
 	}
 
 	if (generateExistenceChecks){
@@ -833,9 +839,8 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 	}
 
 	if (generateSetter){
-		FeedStreamHorizontally(stream, indents);
-
 		// name of method
+		FeedStreamHorizontally(stream, indents);
 		stream << QStringLiteral("void");
 		stream << QStringLiteral(" C") + className + QStringLiteral("::");
 		stream << QStringLiteral("Set") + GetCapitalizedValue(sdlField.GetId());
@@ -957,35 +962,119 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 			FeedStreamHorizontally(stream, indents);
 			stream << '}';
 			FeedStream(stream, 3, false);
-
-
 		}
+
+		GenerateResetMethodImpl(stream, className, sdlField, indents);
 	}
 
-if (generateExistenceChecks){
+	if (generateExistenceChecks){
 		FeedStreamHorizontally(stream, indents);
-
 		stream << QStringLiteral("bool");
 		stream << QStringLiteral(" C") + className + QStringLiteral("::");
 		stream << QStringLiteral("Has");
 		stream << GetCapitalizedValue(sdlField.GetId());
 		stream << QStringLiteral("() const");
 		FeedStream(stream, 1, false);
+
 		FeedStreamHorizontally(stream, indents);
 		stream << '{';
-
 		FeedStream(stream, 1, false);
+
 		FeedStreamHorizontally(stream, indents + 1);
 		stream << QStringLiteral("return ");
 		stream << FromInternalMapCheckString(sdlField);
 		stream << QStringLiteral(";");
-
 		FeedStream(stream, 1, false);
+
 		FeedStreamHorizontally(stream, indents);
 		stream << '}';
-
 		FeedStream(stream, 3, false);
 	}
+}
+
+
+
+void CSdlClassCodeGeneratorComp::GenerateResetMethodImpl(
+			QTextStream& stream,
+			const QString className,
+			const CSdlField& sdlField,
+			uint indents)
+{
+	FeedStreamHorizontally(stream, indents);
+	stream << QStringLiteral("void C");
+	stream << className;
+	stream << QStringLiteral("::Reset") << GetCapitalizedValue(sdlField.GetId());
+	stream << QStringLiteral("()");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, indents);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	// first remove value from used values
+	FeedStreamHorizontally(stream, indents + 1);
+	stream << s_variantMapClassMemberName << QStringLiteral(".remove(") << '"' << sdlField.GetId() << '"' << ')' << ';';
+	FeedStream(stream, 1, false);
+
+	// and reset a value
+	FeedStreamHorizontally(stream, indents + 1);
+	bool isCustom = false;
+	bool isComplex = false;
+	bool isArray = false;
+	const QString originalSchemaNamespace = m_originalSchemaNamespaceCompPtr->GetText();
+	const QString convertedType = ConvertTypeWithNamespace(
+					sdlField,
+					originalSchemaNamespace,
+					*m_sdlTypeListCompPtr,
+					&isCustom,
+					&isComplex,
+					&isArray);
+	// list, string, byte has a 'clear' method
+	if (isArray || convertedType == QStringLiteral("QString") || convertedType == QStringLiteral("QByteArray")){
+		stream << QStringLiteral("m_");
+		stream << GetDecapitalizedValue(sdlField.GetId());
+		stream << QStringLiteral(".clear();");
+	}
+	// if suctom - just reset with a defaul constructor
+	else if (isCustom){
+		stream << QStringLiteral("m_");
+		stream << GetDecapitalizedValue(sdlField.GetId());
+		stream << QStringLiteral(" = ");
+		stream << convertedType;
+		stream << QStringLiteral("();");
+	}
+	// set default value to scalar types
+	else if (!isComplex){
+		stream << QStringLiteral("m_");
+		stream << GetDecapitalizedValue(sdlField.GetId());
+		stream << QStringLiteral(" = ");
+		if (convertedType == QStringLiteral("int") ||
+			convertedType == QStringLiteral("long") ||
+			convertedType == QStringLiteral("long long"))
+		{
+			stream << QStringLiteral("0");
+		}
+		else if (convertedType == QStringLiteral("float")){
+			stream << QStringLiteral("0.00f");
+		}
+		else if (convertedType == QStringLiteral("double")){
+			stream << QStringLiteral("0.00");
+		}
+		else if (convertedType == QStringLiteral("bool")){
+			stream << QStringLiteral("false");
+		}
+		else {
+			I_CRITICAL();
+		}
+		stream << ';';
+	}
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, indents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	FeedStream(stream, 3, false);
 }
 
 

@@ -71,6 +71,11 @@ private:
 				bool generateGetter = true,
 				bool generateSetter = true,
 				bool generateExistenceChecks = true);
+	void GenerateResetMethodImpl(
+				QTextStream& stream,
+				const QString className,
+				const CSdlField& sdlField,
+				uint indents = 0);
 	void GenerateMetaInfo(
 				QTextStream& stream,
 				const CSdlType& sdlType,
