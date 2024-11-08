@@ -455,7 +455,12 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 
 		// get name
 		QByteArray requestName;
-		retVal = retVal && ReadToDelimeter("(", requestName, &foundDelimiter) && MoveToNextReadableSymbol();
+		QByteArray expectedDelimiters = "(";
+		// Queries might not have arguments
+		if (type == CSdlRequest::T_QUERY){
+			expectedDelimiters.append(':');
+		}
+		retVal = retVal && ReadToDelimeter(expectedDelimiters, requestName, &foundDelimiter) && MoveToNextReadableSymbol();
 		request.SetName(requestName.trimmed());
 
 		for (const CSdlRequest& aSdlRequest: std::as_const(m_requests)){
@@ -470,17 +475,36 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 			}
 		}
 
-		// extract input params
+
 		SdlFieldList inputArguments;
-		bool atEnd = false;
-		while (!atEnd){
-			retVal = retVal && ProcessValue(inputArguments, &atEnd);
-			Q_ASSERT(m_lastReadChar != '}');
+		if (foundDelimiter != ':'){
+			// extract input params
+			bool atEnd = false;
+			while (!atEnd){
+				retVal = retVal && ProcessValue(inputArguments, &atEnd);
+				Q_ASSERT(m_lastReadChar != '}');
+			}
+			request.SetInputArguments(inputArguments);
 		}
-		request.SetInputArguments(inputArguments);
+		else if (type != CSdlRequest::T_QUERY){
+			QString errorString = QString("Schema error! Request '%1' is not a Query and has not arguments at line %2")
+			.arg(request.GetName(),
+				 QString::number(m_lastReadLine + 1));
+
+			SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_ERROR,
+				0,
+				errorString,
+				"ProcessRequests");
+
+			return false;
+		}
 
 		// set output
-		retVal = retVal && ReadToDelimeter(":",devNull) && MoveToNextReadableSymbol(&foundDelimiter);
+		if (foundDelimiter != ':'){
+			retVal = retVal && ReadToDelimeter(":",devNull) && MoveToNextReadableSymbol(&foundDelimiter);
+		}
+
 		Q_ASSERT(foundDelimiter != '[');
 
 		CSdlField outputArgument;
