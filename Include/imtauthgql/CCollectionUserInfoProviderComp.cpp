@@ -63,13 +63,15 @@ imtbase::CTreeItemModel* CCollectionUserInfoProviderComp::CreateInternalResponse
 
 		QByteArray json;
 		{
-			iser::CJsonMemWriteArchive archive(json, m_versionInfoCompPtr.GetPtr());
+			iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
 			if (!objectInfoPtr->Serialize(archive)){
 				errorMessage = QString("Error when serializing an object").toUtf8();
 				SendErrorMessage(0, errorMessage, "CCollectionUserInfoProviderComp");
 
 				return nullptr;
 			}
+
+			json = archive.GetData();
 		}
 
 		if (!dataModelPtr->CreateFromJson(json)){

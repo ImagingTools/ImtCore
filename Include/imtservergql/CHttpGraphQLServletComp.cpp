@@ -123,8 +123,11 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 				errorItemModelPtr->SetData("type", errorType);
 			}
 
-			iser::CJsonMemWriteArchive archive(responseData);
-			if (!rootModel.SerializeModel(archive)){
+			iser::CJsonMemWriteArchive archive;
+			if (rootModel.SerializeModel(archive)){
+				responseData = archive.GetData();
+			}
+			else{
 				isSuccessful = false;
 			}
 

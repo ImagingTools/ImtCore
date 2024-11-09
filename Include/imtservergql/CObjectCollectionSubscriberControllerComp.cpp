@@ -63,6 +63,7 @@ void CObjectCollectionSubscriberControllerComp::OnUpdate(const istd::IChangeable
 				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_UPDATED).toByteArray();
 				dataObject.insert("typeOperation", "updated");
 			}
+
 			dataObject.insert("itemId", QString(itemId));
 
 			if (itemId.isEmpty() && m_isSendItemSource.IsValid() && m_objectCollectionCompPtr.IsValid() && *m_isSendItemSource == true){
@@ -71,8 +72,14 @@ void CObjectCollectionSubscriberControllerComp::OnUpdate(const istd::IChangeable
 				QByteArray representationData;
 				iser::ISerializable* objectPtr = dynamic_cast<iser::ISerializable*>(dataPtr.GetPtr());
 				if (objectPtr != nullptr){
-					iser::CJsonMemWriteArchive archive(representationData);
-					objectPtr->Serialize(archive);
+					iser::CJsonMemWriteArchive archive;
+					
+					if (objectPtr->Serialize(archive)){
+						representationData = archive.GetData();
+					}
+					else{
+						Q_ASSERT(false);
+					}
 				}
 				dataObject.insert("item", QString(representationData));
 			}

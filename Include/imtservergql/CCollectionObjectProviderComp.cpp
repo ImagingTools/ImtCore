@@ -44,7 +44,7 @@ imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
 
 		QByteArray json;
 		{
-			iser::CJsonMemWriteArchive archive(json);
+			iser::CJsonMemWriteArchive archive;
 			if (!objectInfoPtr->Serialize(archive)){
 				errorMessage = QString("Object serialization failed").toUtf8();
 
@@ -52,6 +52,8 @@ imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
 
 				return nullptr;
 			}
+
+			json = archive.GetData();
 		}
 
 		if (!dataModelPtr->CreateFromJson(json)){

@@ -22,12 +22,14 @@ imtbase::CTreeItemModel* CObjectProviderComp::CreateInternalResponse(
 
 	QByteArray json;
 	{
-		iser::CJsonMemWriteArchive archive(json);
+		iser::CJsonMemWriteArchive archive;
 		if (!m_objectCompPtr->Serialize(archive)){
 			errorMessage = QString("Failed to perform serialization to the archive from the object").toUtf8();
 
 			return nullptr;
 		}
+
+		json = archive.GetData();
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());

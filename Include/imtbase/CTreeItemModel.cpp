@@ -754,9 +754,14 @@ QString CTreeItemModel::ToJson()
 	QByteArray representationData;
 
 	{
-		iser::CJsonMemWriteArchive archive(representationData);
+		iser::CJsonMemWriteArchive archive;
 
-		SerializeModel(archive);
+		if (SerializeModel(archive)){
+			representationData = archive.GetData();
+		}
+		else{
+			Q_ASSERT(false);
+		}
 	}
 
 	if (representationData.length() > 2 && representationData[1] == '['){

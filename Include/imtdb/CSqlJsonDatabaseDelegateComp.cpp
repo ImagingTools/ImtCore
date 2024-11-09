@@ -594,11 +594,12 @@ bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(
 		return false;
 	}
 
-	iser::CJsonMemWriteArchive archive(data, m_versionInfoCompPtr.GetPtr());
-
+	iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
 	if (!serializableObjectPtr->Serialize(archive)){
 		return false;
 	}
+
+	data = archive.GetData();
 	
 	return true;
 }
