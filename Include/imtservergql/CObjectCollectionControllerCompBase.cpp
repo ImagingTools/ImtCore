@@ -975,7 +975,11 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 	}
 
 	QByteArray objectData = inputParamPtr->GetFieldArgumentValue("fileData").toByteArray();
+	QByteArray typeId = inputParamPtr->GetFieldArgumentValue("typeId").toByteArray();
 	QByteArray data = QByteArray::fromBase64(objectData);
+
+	QString name = inputParamPtr->GetFieldArgumentValue("name").toString();
+	QString description = inputParamPtr->GetFieldArgumentValue("description").toString();
 
 	istd::TDelPtr<istd::IChangeable> objectInstancePtr = m_objectInfoFactCompPtr.CreateInstance();
 	if (!objectInstancePtr.IsValid()){
@@ -1019,7 +1023,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 		return nullptr;
 	}
 
-	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject("", "", "", objectInstancePtr.GetPtr(), objectUuid);
+	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, objectInstancePtr.GetPtr(), objectUuid);
 	if (retVal.isEmpty()){
 		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(qPrintable(objectUuid));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");

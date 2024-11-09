@@ -4,49 +4,72 @@ import imtcontrols 1.0
 
 CustomTextField {
     id: root;
-    placeHolderText: "dd.MM.yyyy hh:mm"
-    textInputMask: "00.00.0000 00:00"
-    textInputValidator: RegularExpressionValidator {
+    placeHolderText: displayFormat
+    textInputMask: timeEdit ? "00.00.0000 00:00" : "00.00.0000"
+    maximumLength: timeEdit ? 16 : 10;
+    // textInputValidator: timeEdit ? dateTimeRegexp : dateRegexp;
+
+    RegularExpressionValidator {
+        id: dateRegexp;
+        regularExpression: /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.\d{4}/;
+    }
+
+    RegularExpressionValidator {
+        id: dateTimeRegexp;
         regularExpression: /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.\d{4} ([01]\d|2[0-3]):([0-5]\d)$/;
     }
 
     property bool calendarPopup: false;
+    property bool timeEdit: true;
     property date maximumDate: new Date("9999-12-30");
     property date minimumDate: new Date("1752-09-14");
-    property string displayFormat: "dd.MM.yyyy H:mm";
+    property string displayFormat: timeEdit ? "dd.MM.yyyy hh:mm" : "dd.MM.yyyy"
 
     property string iconUpSource: readOnly ? "../../../" + Style.getIconPath("Icons/Up", Icon.State.Off, Icon.Mode.Disabled)
                                            : "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal);
     property string iconDownSource: readOnly ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled)
                                              : "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
 
-    property var selectedDate: new Date("01.01.2000 00:00");
+    property var selectedDate: timeEdit ? new Date("01.01.2000 00:00") : new Date("01.01.2000");
 
     signal dateChanged();
-
-    Keys.onUpPressed: {
-        upButton.clicked();
-    }
-
-    Keys.onDownPressed: {
-        downButton.clicked();
-    }
 
     Component.onCompleted: {
         let dateStr = dateToString(root.selectedDate);
         root.text = dateStr;
-
-    }
-
-    onSelectionEndChanged: {
-        console.log("onSelectionEndChanged", selectionEnd);
     }
 
     onDateChanged: {
         let dateStr = dateToString(root.selectedDate);
         root.text = dateStr;
-
         root.select(internal.selectionStart, internal.selectionEnd);
+    }
+
+    Timer {
+        id: timer;
+
+        onTriggered: {
+            root.editingFinished();
+        }
+    }
+
+    onFocusChanged: {
+        root.select(internal.selectionStart, internal.selectionEnd);
+    }
+
+    onSelectionEndChanged: {
+        console.log("onSelectionEndChanged", root.selectionEnd)
+        if (root.selectionStart === root.selectionEnd){
+            // if (root.selectionEnd <= 2){
+            //     root.select(0, 2);
+            // }
+            // else if (root.selectionEnd > 2 && root.selectionEnd <= 5){
+            //     root.select(3, 5);
+            // }
+            // else if (root.selectionEnd > 5 && root.selectionEnd <= 10){
+            //     root.select(6, 10);
+            // }
+        }
     }
 
     QtObject {
@@ -54,11 +77,80 @@ CustomTextField {
 
         property int selectionStart: root.selectionStart;
         property int selectionEnd: root.selectionEnd;
+        property string text: root.text;
+        property string prevText: "";
+        property bool block: false;
+        onTextChanged: {
+            if (block){
+                return;
+            }
+
+            console.log("onTextChanged", text, internal.selectionStart, internal.selectionEnd);
+
+            if (prevText.length < text.length){
+                block = true;
+
+                root.text = internal.convert(root.text);
+                if (root.text.length === root.maximumLength){
+                    let newDate = new Date(root.text);
+
+                    root.selectedDate = newDate;
+                }
+
+                block = false;
+            }
+
+            prevText = text;
+        }
+
+        // 11.11.1222 22:22
+        // 11 11 1222 2222
+        function convert(text){
+            let date = text
+            let len = date.length;
+            let maxLen = 16;
+            let currentPos = root.selectionEnd;
+
+            while(!(date.indexOf(":") < 0)){
+                date = date.replace(":", "")
+                currentPos--;
+            }
+
+            while(!(date.indexOf(".") < 0)){
+                date = date.replace(".", "")
+                currentPos--;
+            }
+
+            while(!(date.indexOf(" ") < 0)){
+                date = date.replace(" ", "")
+                currentPos--;
+            }
+
+            let result = ""
+            for (let i = 1; i <= date.length; i++){
+                result += date[i - 1]
+                if (i != 0 && i % 2 == 0 && i < 5){
+                    result += ".";
+                }
+
+                if (root.timeEdit){
+                    if (i == 8){
+                        result += " ";
+                    }
+                    else if (i == 10){
+                        result += ":";
+                    }
+                }
+                console.log("result", i, result)
+            }
+
+            return result;
+        }
     }
 
     MouseArea {
+        id: ma;
         anchors.fill: parent;
-
         onWheel: {
             if(wheel.angleDelta.y >= 0){
                 upButton.clicked();
@@ -67,13 +159,23 @@ CustomTextField {
                 downButton.clicked();
             }
         }
+
+        Keys.onUpPressed: {
+            upButton.clicked();
+        }
+
+        Keys.onDownPressed: {
+            downButton.clicked();
+        }
     }
 
     Column {
         anchors.right: root.right;
         anchors.rightMargin: Style.size_smallMargin;
         anchors.verticalCenter: root.verticalCenter;
-        width: Style.size_mainMargin;
+        width: Style.size_largeMargin;
+        z: root.parent.z + 1;
+
         Button {
             id: upButton;
             width: parent.width;
@@ -85,6 +187,7 @@ CustomTextField {
                     border.width: 0;
                 }}
             onClicked: {
+                console.log("onClicked", internal.selectionStart, internal.selectionEnd)
                 let tempStart = root.selectionStart
                 internal.selectionStart = tempStart;
 
@@ -145,6 +248,24 @@ CustomTextField {
         }
     }
 
+    function dateIsValid(){
+        return true;
+    }
+
+    function setDate(date){
+        root.selectedDate = date;
+        root.dateChanged();
+    }
+
+    function setDateAsString(dateStr){
+        root.selectedDate = new Date(dateStr);
+        root.dateChanged();
+    }
+
+    function getDateAsString(){
+        return dateToString(selectedDate);
+    }
+
     // Return string in format dd.MM.yyyy H:mm
     function dateToString(date){
         let monthStr = String(date.getMonth() + 1)
@@ -167,7 +288,12 @@ CustomTextField {
             minutesStr = "0" + minutesStr;
         }
 
-        return dayStr + "." + monthStr + "." + date.getFullYear() + " " + hoursStr + ":" + minutesStr;
+        if (root.timeEdit){
+            return dayStr + "." + monthStr + "." + date.getFullYear() + " " + hoursStr + ":" + minutesStr;
+        }
+        else{
+            return dayStr + "." + monthStr + "." + date.getFullYear();
+        }
     }
 
     function dayIncrement(){

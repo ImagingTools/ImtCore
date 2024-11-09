@@ -33,12 +33,15 @@ Item {
     signal beginUpdate();
     signal endUpdate();
 
-    function importObject(fileName, b64encoded, additionalParamsObj){
-        console.log("importObject", fileName, b64encoded);
+
+    function importObject(typeId, name, description, b64encoded, additionalParamsObj){
+        console.log("importObject", typeId, name, description, b64encoded);
 
         let params = {}
-        params["fileName"] = fileName
-        params["fileData"] = b64encoded
+        params["typeId"] = typeId;
+        params["name"] = name;
+        params["description"] = description;
+        params["fileData"] = b64encoded;
 
         if (additionalParamsObj){
             for (let key in additionalParamsObj){
@@ -560,7 +563,6 @@ Item {
     GqlRequestSender {
         id: importObjectRequestSender;
         gqlCommandId: internal.importGqlCommand;
-
         requestType: 1;
 
         function createQueryParams(query, params){
@@ -578,7 +580,7 @@ Item {
         }
 
         function onResult(data){
-            root.imported();
+            root.imported("");
             // Result handler
         }
     }

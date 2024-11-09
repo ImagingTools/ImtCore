@@ -188,9 +188,10 @@ ViewCommandsDelegateBase {
         fileDialogSave.open();
     }
 
-    function onImportDialogResult(fileName, fileData){
+    // importObject(typeId, name, description, b64encoded, additionalParamsObj) - signature in dataController
+    function onImportDialogResult(name, fileData){
         if (collectionView && collectionView.dataController){
-            collectionView.dataController.importObject(fileName, fileData);
+            collectionView.dataController.importObject("", name, "", fileData);
         }
     }
 
@@ -217,6 +218,7 @@ ViewCommandsDelegateBase {
 
             filePath = filePath.replace('file:///', '')
 
+            console.log("filePath", filePath);
             if (Qt.platform.os == "web"){
                 let reader = new FileReader()
 
@@ -226,14 +228,33 @@ ViewCommandsDelegateBase {
                     let encodedContentWithHeader = reader.result
                     let encodedContent = encodedContentWithHeader.replace(/^.{0,}base64,/, '')
 
-                    collectionViewCommandsDelegate.onImportDialogResult(encodedContentWithHeader, encodedContent);
+                    let fileName = filePath.name
+                    let data = filePath.name.split('.')
+                    if (data.length > 1){
+                        fileName = data[0]
+                    }
+
+                    collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedContent);
                 }.bind(this)
             }
             else {
                 fileIO.source = filePath
                 let fileData = fileIO.read()
-                let decodedData = Qt.btoa(fileData);
-                collectionViewCommandsDelegate.onImportDialogResult(filePath, decodedData);
+                let encodedData = Qt.btoa(fileData);
+
+                let fileName = filePath
+
+                let parts = filePath.split('/')
+                if (parts.length > 0){
+                    let data = parts[parts.length - 1].split('.')
+                    if (data.length > 0){
+                        fileName = data[0]
+                    }
+                }
+
+                console.log("fileName", fileName)
+
+                collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedData);
             }
         }
 

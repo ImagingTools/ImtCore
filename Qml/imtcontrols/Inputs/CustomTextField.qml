@@ -19,6 +19,8 @@ FocusScope {
     property alias leftPadding: textField.leftPadding;
 
     property alias maximumLength: textField.maximumLength;
+    property alias selectionStart: textField.selectionStart;
+    property alias selectionEnd: textField.selectionEnd;
 
     property string placeHolderText;
     property string focusColor: Style.textSelected;

@@ -73,9 +73,9 @@ DocumentCollectionViewDelegate {
         ModalDialogManager.openDialog(messageDialogComp, {});
     }
 
-    function onImportDialogResult(fileName, fileData){
+    function onImportDialogResult(name, fileData){
         if (collectionView && collectionView.dataController){
-            collectionView.dataController.importObject(fileName, fileData, {"force":container.force});
+            collectionView.dataController.importObject("", name, "", fileData, {"force":container.force});
         }
     }
 
