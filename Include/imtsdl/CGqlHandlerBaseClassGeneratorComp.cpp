@@ -159,7 +159,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 				outputFileNameParam.SetPath(sourceFilePath);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
 				if (joinProcessResult != TS_OK){
-					SendCriticalMessage(0, "Unable to join cource  files");
+					SendCriticalMessage(0, "Unable to join source  files");
 					I_CRITICAL();
 
 					return TS_INVALID;

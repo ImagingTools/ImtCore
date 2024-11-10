@@ -133,8 +133,6 @@ QString processColumn(const IComplexCollectionFilter::FieldFilter& filter)
 	bool isOk = false;
 
 	if (numericTypes.contains(filter.filterValue.type()) && numericOperations.contains(filter.filterOperation)){
-		bool isValid = false;
-
 		QString filterValue;
 
 		switch (filter.filterValue.type()){

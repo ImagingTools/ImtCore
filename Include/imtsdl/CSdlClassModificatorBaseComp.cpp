@@ -181,8 +181,6 @@ void CSdlClassModificatorBaseComp::AbortCurrentProcessing()
 	m_headerFilePtr->close();
 	m_sourceFilePtr->close();
 
-	I_CRITICAL();
-
 	m_headerFilePtr->remove();
 	m_sourceFilePtr->remove();
 }

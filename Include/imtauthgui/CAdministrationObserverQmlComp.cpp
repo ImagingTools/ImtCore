@@ -146,7 +146,7 @@ void CAdministrationObserverQmlComp::OnLoginUpdate(const istd::IChangeable::Chan
 }
 
 
-void CAdministrationObserverQmlComp::OnQuickItemCreatedUpdate(const istd::IChangeable::ChangeSet& changeSet, const iprm::IEnableableParam* objectPtr)
+void CAdministrationObserverQmlComp::OnQuickItemCreatedUpdate(const istd::IChangeable::ChangeSet& changeSet, const iprm::IEnableableParam* /*objectPtr*/)
 {
 	if (m_quickObjectCompPtr.IsValid()){
 		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
