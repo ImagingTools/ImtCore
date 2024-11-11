@@ -32,7 +32,8 @@ public:
 	const imtbase::IObjectCollection* GetSourceCollection() const;
 
 	// reimplemented (IReferenceCollection)
-	virtual bool InsertReference(const Id& objectId) override;
+	virtual ICollectionObjectLinkPtr GetObjectLink(const Id& objectId, const QByteArray& repositoryId = QByteArray()) const override;
+	virtual bool InsertReference(const Id& objectId, const QByteArray& repositoryId = QByteArray()) override;
 	virtual bool RemoveReference(const Id& objectId) override;
 	virtual bool RemoveAllReferences() override;
 
@@ -81,10 +82,11 @@ private:
 		QString name;
 		QString description;
 		QByteArray typeId;
+		QByteArray repositoryId;
 
 		bool operator ==(const Reference& other) const
 		{
-			return (id == other.id) && (name == other.name) && (description == other.description) && (typeId == other.typeId);
+			return (id == other.id) && (name == other.name) && (description == other.description) && (typeId == other.typeId) && (repositoryId == other.typeId);
 		}
 		
 		bool operator !=(const Reference& other) const

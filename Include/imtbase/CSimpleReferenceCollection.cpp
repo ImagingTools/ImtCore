@@ -7,6 +7,8 @@
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 
+// ImtCore includes
+#include <imtbase/CObjectLink.h>
 
 namespace imtbase
 {
@@ -34,12 +36,38 @@ const imtbase::IObjectCollection* CSimpleReferenceCollection::GetSourceCollectio
 
 // reimplemented (IReferenceCollection)
 
-bool CSimpleReferenceCollection::InsertReference(const Id& objectId)
+IReferenceCollection::ICollectionObjectLinkPtr CSimpleReferenceCollection::GetObjectLink(const Id& objectId, const QByteArray& repositoryId) const
+{
+	if (m_sourceCollectionInfoPtr == nullptr){
+		return nullptr;
+	}
+
+	int referencesCount = m_references.count();
+	for (int i = 0; i < referencesCount; ++i){
+		const Reference& ref = m_references[i];
+		if (ref.id == objectId && (repositoryId.isEmpty() || (ref.repositoryId == repositoryId))){
+			istd::TDelPtr<imtbase::CObjectLink> linkImplPtr = new imtbase::CObjectLink;
+			linkImplPtr->SetCollectionPtr(m_sourceCollectionInfoPtr);
+			linkImplPtr->SetObjectUuid(objectId);
+
+			ICollectionObjectLinkPtr retVal;
+			retVal.reset(linkImplPtr.PopPtr());
+
+			return retVal;
+		}
+	}
+	
+	return ICollectionObjectLinkPtr();
+}
+
+
+bool CSimpleReferenceCollection::InsertReference(const Id& objectId, const QByteArray& repositoryId)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
 	Reference reference;
 	reference.id = objectId;
+	reference.repositoryId = repositoryId;
 
 	if (m_sourceCollectionInfoPtr != nullptr){
 		reference.description = m_sourceCollectionInfoPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();

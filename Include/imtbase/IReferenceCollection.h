@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionInfo.h>
+#include <imtbase/ICollectionObjectLink.h>
 
 
 namespace imtbase
@@ -13,7 +14,7 @@ namespace imtbase
 
 
 /**
-	Interface for collection of references to objects that can be identified (e.g. in some abstract storage) using their IDs.
+	Interface for collection of references to the objects that can be identified (e.g. in some abstract storage) using their IDs.
 	\ingroup Collection
 */
 class IReferenceCollection:
@@ -21,10 +22,16 @@ class IReferenceCollection:
 			virtual public iser::ISerializable
 {
 public:
+	typedef std::shared_ptr<const ICollectionObjectLink> ICollectionObjectLinkPtr;
+
+	virtual ICollectionObjectLinkPtr GetObjectLink(const Id& objectId, const QByteArray& repositoryId = QByteArray()) const = 0;
+
 	/**
 		Insert a new reference into the collection.
+		\param objectId			unique ID of the object in the related repository to be referenced
+		\param repositoryId		Repository identifier
 	*/
-	virtual bool InsertReference(const Id& objectId) = 0;
+	virtual bool InsertReference(const Id& objectId, const QByteArray& repositoryId = QByteArray()) = 0;
 
 	/**
 		Remove a given reference from the collection.
