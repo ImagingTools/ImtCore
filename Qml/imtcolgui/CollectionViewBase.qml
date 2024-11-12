@@ -223,21 +223,32 @@ ViewBase {
 				collectionViewBaseContainer.doubleClicked(id, index);
 			}
 
-			onHeaderClicked: {
-				if (collectionViewBaseContainer.collectionFilter.getSortingInfoId() !== headerId){
-					collectionViewBaseContainer.collectionFilter.setSortingInfoId(headerId);
-					collectionViewBaseContainer.collectionFilter.setSortingOrder("ASC");
-				}
-				else{
-					collectionViewBaseContainer.collectionFilter.setSortingInfoId(headerId);
+            onCurrentHeaderIdChanged: {
+                collectionViewBaseContainer.collectionFilter.setSortingInfoId(currentHeaderId);
 
-					let currentSortingOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
-					collectionViewBaseContainer.collectionFilter.setSortingOrder(currentSortingOrder == "ASC" ? "DESC" : "ASC");
-				}
+                collectionViewBaseContainer.doUpdateGui();
+            }
 
-				collectionViewBaseContainer.doUpdateGui();
-			}
+            onCurrentSortOrderChanged: {
+                collectionViewBaseContainer.collectionFilter.setSortingOrder(currentSortOrder);
 
+                collectionViewBaseContainer.doUpdateGui();
+            }
+
+            // onHeaderClicked: {
+            // 	if (collectionViewBaseContainer.collectionFilter.getSortingInfoId() !== headerId){
+            // 		collectionViewBaseContainer.collectionFilter.setSortingInfoId(headerId);
+            // 		collectionViewBaseContainer.collectionFilter.setSortingOrder("ASC");
+            // 	}
+            // 	else{
+            // 		collectionViewBaseContainer.collectionFilter.setSortingInfoId(headerId);
+
+            // 		let currentSortingOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
+            // 		collectionViewBaseContainer.collectionFilter.setSortingOrder(currentSortingOrder == "ASC" ? "DESC" : "ASC");
+            // 	}
+
+            // 	collectionViewBaseContainer.doUpdateGui();
+            // }
 		}
 
 		Item {
