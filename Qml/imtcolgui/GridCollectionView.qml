@@ -70,6 +70,8 @@ Item {
     property alias commandsProvider: commandsProvider;
     property alias paginationCurrentIndex: gridCollectionViewBase.paginationCurrentIndex;
     property alias paginationPageSize: gridCollectionViewBase.paginationPageSize;
+	property alias paginationCountElements: gridCollectionViewBase.paginationCountElements;
+	property alias paginationCountElementsInit: gridCollectionViewBase.paginationCountElementsInit;
     property alias hasPagination: gridCollectionViewBase.hasPagination;
 
     property string backgroundColor: Style.baseColor;

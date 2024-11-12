@@ -52,6 +52,8 @@ Item {
 	property alias pagination: paginationObj;
 	property alias paginationCurrentIndex: paginationObj.currentIndex;
 	property alias paginationPageSize: paginationObj.pagesSize;
+	property alias paginationCountElements: paginationObj.countElements;
+	property int paginationCountElementsInit: paginationObj.countElements;
 	property string commandsId;
 
 	property alias grid: gridInternal;
@@ -65,6 +67,9 @@ Item {
 	signal selectedIndexChangedSignal(int index);
 	signal elementsChanged();
 
+	onPaginationCountElementsInitChanged: {
+		 paginationObj.countElements = paginationCountElementsInit;
+	}
 
 	Component.onCompleted: {
 		console.log("CollectionViewBase onCompleted");
@@ -440,6 +445,14 @@ Item {
 
 		onCurrentValueChanged: {
 			console.log("Pagination onCurrentValueChanged", paginationObj.currentValue);
+			gridInternal.selectedIndex = -1;
+			if(this.commandsId){
+				baseCommands.updateModels();
+			}
+			collectionViewBaseContainer.openST = false;
+		}
+		onCountElementsChanged: {
+			console.log("PAGINATION::Pagination onCountElementsChanged", paginationObj.countElements);
 			gridInternal.selectedIndex = -1;
 			if(this.commandsId){
 				baseCommands.updateModels();
