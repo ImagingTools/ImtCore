@@ -17,18 +17,21 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if (!argumentsParserPtr->SetArguments(argc, argv)){
-		qFatal("SdlProcessArgumentsParser can't parse arcuments");
+	ibase::IApplication* applicationPtr = instance.GetInterface<ibase::IApplication>();
+	if (applicationPtr == nullptr){
+		qFatal("Component configuration error: IApplication component is not provided/exported");
 
 		return 2;
 	}
+	applicationPtr->InitializeApplication(argc, argv);
 
-    ibase::IApplication* applicationPtr = instance.GetInterface<ibase::IApplication>();
-	if (applicationPtr != NULL){
-		return applicationPtr->Execute(argc, argv);
+	if (!argumentsParserPtr->SetArguments(argc, argv)){
+		qFatal("SdlProcessArgumentsParser can't parse arcuments");
+
+		return 3;
 	}
 
-	return -1;
+	return applicationPtr->Execute(argc, argv);
 }
 
 
