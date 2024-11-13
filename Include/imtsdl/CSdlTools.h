@@ -88,14 +88,14 @@ public:
 				const iprm::IParamsSet* schemaParamsCompPtr,
 				const ArgumentParserCompPtr& argumentParamsCompPtr);
 
-	/// \sa ISdlProcessArgumentsParser::s_headerFileType ISdlProcessArgumentsParser::s_sourceFileType
+	/// \sa imtsdlgen::ISdlProcessArgumentsParser::s_headerFileType imtsdlgen::ISdlProcessArgumentsParser::s_sourceFileType
 	[[nodiscard]]static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
-	static bool UpdateTypeInfo(CSdlType& sdlType, const iprm::IParamsSet* schemaParamsPtr, const ISdlProcessArgumentsParser* argumentParamsPtr);
+	static bool UpdateTypeInfo(CSdlType& sdlType, const iprm::IParamsSet* schemaParamsPtr, const imtsdl::ISdlProcessArgumentsParser* argumentParamsPtr);
 
 	[[nodiscard]]static QStringList GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
 	[[nodiscard]]static QString GetQmlModuleNameFromParamsOrArguments(
 				const iprm::IParamsSet* schemaParamsPtr,
-				const ISdlProcessArgumentsParser* argumentParamsPtr);
+				const imtsdl::ISdlProcessArgumentsParser* argumentParamsPtr);
 	[[nodiscard]]static QString GetQmlModuleNameFromParamsOrArguments(
 				const SchemaParamsCompPtr& schemaParamsCompPtr,
 				const ArgumentParserCompPtr& argumentParamsCompPtr);
@@ -106,7 +106,7 @@ public:
 
 	static void GenerateListTempValueCode(QTextStream& stream, const CSdlField& sdlField, QString& tempVariableName, uint indents = 1);
 
-	static void PrintFiles(std::ostream& outStream, const QStringList& files, ISdlProcessArgumentsParser::GeneratorType projectCodeGenerator = ISdlProcessArgumentsParser::GT_CMAKE);
+	static void PrintFiles(std::ostream& outStream, const QStringList& files, imtsdl::ISdlProcessArgumentsParser::GeneratorType projectCodeGenerator = imtsdl::ISdlProcessArgumentsParser::GT_CMAKE);
 	static QString ResolveRelativeHeaderFileForType(const CSdlType& sdlType, const QStringList& lookupPaths);
 
 };

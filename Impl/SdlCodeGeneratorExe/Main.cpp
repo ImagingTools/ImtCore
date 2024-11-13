@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
 	imtsdl::ISdlProcessArgumentsParser* argumentsParserPtr = instance.GetInterface<imtsdl::ISdlProcessArgumentsParser>();
 	if (argumentsParserPtr == nullptr){
-		qFatal("Component configuration error: ISdlProcessArgumentsParser component is not provided/exported");
+		qFatal("Component configuration error: imtsdlgen::ISdlProcessArgumentsParser component is not provided/exported");
 
 		return 1;
 	}

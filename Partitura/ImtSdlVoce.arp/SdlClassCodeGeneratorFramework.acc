@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5274" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5300" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -22,7 +22,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CSdlClassGqlModificatorComp" PackageId="ImtSdlPck" ComponentId="SdlClassGqlModificator">
+        <Element Id="CSdlClassGqlModificatorComp" PackageId="ImtSdlGenPck" ComponentId="SdlClassGqlModificator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
@@ -52,7 +52,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SdlClassCodeGenerator" PackageId="ImtSdlPck" ComponentId="SdlClassCodeGenerator">
+        <Element Id="SdlClassCodeGenerator" PackageId="ImtSdlGenPck" ComponentId="SdlClassCodeGenerator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
@@ -97,7 +97,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SdlClassJsonModificator" PackageId="ImtSdlPck" ComponentId="SdlClassJsonModificator">
+        <Element Id="SdlClassJsonModificator" PackageId="ImtSdlGenPck" ComponentId="SdlClassJsonModificator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
@@ -127,7 +127,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SdlClassTreeModelModificator" PackageId="ImtSdlPck" ComponentId="SdlClassTreeModelModificator">
+        <Element Id="SdlClassTreeModelModificator" PackageId="ImtSdlGenPck" ComponentId="SdlClassTreeModelModificator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">

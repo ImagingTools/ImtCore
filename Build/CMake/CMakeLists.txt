@@ -72,8 +72,12 @@ add_subdirectory("${INCLUDE_DIR}/imtsdl/CMake" "${AUX_INCLUDE_DIR}/imtsdl")
 add_subdirectory("${IMPL_DIR}/ImtSdlPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlPck")
 add_dependencies(ImtSdlPck imtsdl imtfile imtbase)
 
+add_subdirectory("${INCLUDE_DIR}/imtsdlgen/CMake" "${AUX_INCLUDE_DIR}/imtsdlgen")
+add_subdirectory("${IMPL_DIR}/ImtSdlGenPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenPck")
+add_dependencies(ImtSdlGenPck imtsdl imtfile imtbase)
+
 add_subdirectory("${IMPL_DIR}/SdlCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/SdlCodeGenerator")
-add_dependencies(SdlCodeGenerator ImtSdlPck imtsdl imtfile imtbase)
+add_dependencies(SdlCodeGenerator ImtSdlPck ImtSdlGenPck imtsdlgen imtsdl imtfile imtbase)
 
 #------ OpenAPI ------
 add_subdirectory("${INCLUDE_DIR}/imtoas/CMake" "${AUX_INCLUDE_DIR}/imtoas")
