@@ -123,7 +123,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 				errorItemModelPtr->SetData("type", errorType);
 			}
 
-			iser::CJsonMemWriteArchive archive;
+			iser::CJsonMemWriteArchive archive(nullptr, false);
 			if (rootModel.SerializeModel(archive)){
 				responseData = archive.GetData();
 			}
@@ -142,7 +142,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	}
 	else{
 		if (!responseData.isEmpty()){
-			return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_OK, responseData, request);
+			return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_OK, responseData, request, "application/json; charset=utf-8");
 		}
 	}
 
