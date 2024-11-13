@@ -739,7 +739,7 @@ QString CSdlTools::GetNamespaceFromParamsOrArguments(const iprm::IParamsSet* sch
 }
 
 
-QMap<QString, QString> CSdlTools::GetAutoJoinCppFilesSchema(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName)
+QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName)
 {
 	QMap<QString, QString> retVal;
 
@@ -787,7 +787,7 @@ bool CSdlTools::UpdateTypeInfo(CSdlType& sdlType, const iprm::IParamsSet* schema
 		}
 
 		const QString defaultName = QFileInfo(argumentParserPtr->GetSchemaFilePath()).fileName();
-		joinRules = GetAutoJoinCppFilesSchema(*schemaParamsPtr, outputDirectoryPath, defaultName);
+		joinRules = CalculateTargetCppFilesFromSchemaParams(*schemaParamsPtr, outputDirectoryPath, defaultName);
 	}
 	else {
 		if(joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType)){
@@ -804,7 +804,7 @@ bool CSdlTools::UpdateTypeInfo(CSdlType& sdlType, const iprm::IParamsSet* schema
 
 QStringList CSdlTools::GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName)
 {
-	return GetAutoJoinCppFilesSchema(schemaParams, baseDirPath, defaultName).values();
+	return CalculateTargetCppFilesFromSchemaParams(schemaParams, baseDirPath, defaultName).values();
 }
 
 
@@ -982,13 +982,13 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, con
 
 	for (const QString& path: lookupPaths){
 		QDir currentDir(path);
-		QDirIterator it(path, QStringList() << "*.h", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-		while (it.hasNext()) {
-			it.next();
+		QDirIterator dirIterator(path, QStringList() << "*.h", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+		while (dirIterator.hasNext()) {
+			dirIterator.next();
 
-			QFile file(it.filePath());
+			QFile file(dirIterator.filePath());
 			if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-				qDebug() << "Unable to open file. Continuing...";
+				qDebug() << "Unable to open file. Continuing..." << file.fileName();
 
 				continue;
 			}
@@ -997,17 +997,17 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, con
 			static QRegularExpression classRegex("class\\s+(\\w+)");
 			static QRegularExpression namespaceEndRegex("\\s*\\}\\s*");
 
-
 			QString currentNamespace;
-
 			while (!file.atEnd()) {
 				QString line = file.readLine().trimmed();
 
-				if (namespaceRegex.match(line).hasMatch()) {
-					currentNamespace = namespaceRegex.match(line).capturedTexts()[1];
+				QRegularExpressionMatch namespaceRegexMatch = namespaceRegex.match(line);
+				if (namespaceRegexMatch.hasMatch()) {
+					currentNamespace = namespaceRegexMatch.capturedTexts()[1];
 				}
 
-				if (namespaceEndRegex.match(line).hasMatch()) {
+				QRegularExpressionMatch namespaceEndRegexMatch = namespaceEndRegex.match(line);
+				if (namespaceEndRegexMatch.hasMatch()) {
 					// we reached and of namespace. reset
 					currentNamespace.clear();
 				}
@@ -1016,17 +1016,31 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, con
 					continue;
 				}
 
-				if (classRegex.match(line).hasMatch()) {
-					QString className = classRegex.match(line).capturedTexts()[1];
+				QRegularExpressionMatch classRegexMatch = classRegex.match(line);
+				if (classRegexMatch.hasMatch()) {
+					QString className = classRegexMatch.capturedTexts()[1];
 					if (typeClassName == className){
-						return currentDir.relativeFilePath(it.filePath());
+						return currentDir.relativeFilePath(dirIterator.filePath());
 					}
 				}
 			}
-
 			file.close();
 		}
 	}
+
+	const QString targetPath = sdlType.GetTargetHeaderFile();
+	if (!targetPath.isEmpty()){
+		for (const QString& path: lookupPaths){
+			const QString cleanPath = QDir::cleanPath(path);
+			const QString cleanTargetPath = QDir::cleanPath(targetPath);
+			if (cleanTargetPath.startsWith(cleanPath)){
+				QDir currentDir(path);
+				return currentDir.relativeFilePath(cleanTargetPath);
+			}
+		}
+	}
+
+
 
 	return QString();
 }

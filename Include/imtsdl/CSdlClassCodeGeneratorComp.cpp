@@ -70,7 +70,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 			return TS_INVALID;
 		}
 
-		joinRules = GetAutoJoinCppFilesSchema(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
+		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
 	}
 	const bool joinHeaders = joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType);
 	const bool joinSources = joinRules.contains(ISdlProcessArgumentsParser::s_sourceFileType);

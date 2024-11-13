@@ -52,7 +52,7 @@ int CFileFinalizerComp::DoProcessing(
 	const QString defaultName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
 	QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
 	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
-		joinRules = CSdlTools::GetAutoJoinCppFilesSchema(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
+		joinRules = CSdlTools::CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
 	}
 	const QString joinedHeaderFilePath = joinRules[ISdlProcessArgumentsParser::s_headerFileType];
 	const QString joinedSourceFilePath = joinRules[ISdlProcessArgumentsParser::s_sourceFileType];

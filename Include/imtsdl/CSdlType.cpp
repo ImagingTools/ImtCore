@@ -74,11 +74,11 @@ QString CSdlType::GetTargetHeaderFile() const
 }
 
 
-void CSdlType::SetTargetHeaderFile(const QString& schemaFile)
+void CSdlType::SetTargetHeaderFile(const QString& headerFile)
 {
-	if (m_targetHeaderFile != schemaFile){
+	if (m_targetHeaderFile != headerFile){
 		istd::CChangeNotifier notifier(this);
-		m_targetHeaderFile = schemaFile;
+		m_targetHeaderFile = headerFile;
 	}
 }
 

@@ -32,7 +32,7 @@ public:
 	void SetNamespace(const QString& aNamespace);
 
 	[[nodiscard]] QString GetTargetHeaderFile() const;
-	void SetTargetHeaderFile(const QString& schemaFile);
+	void SetTargetHeaderFile(const QString& headerFile);
 
 	[[nodiscard]] QString GetSchemaFile() const;
 	void SetSchemaFile(const QString& schemaFile);

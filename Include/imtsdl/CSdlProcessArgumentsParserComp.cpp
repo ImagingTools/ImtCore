@@ -72,6 +72,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 
 	QCommandLineParser commandLineParser;
 	commandLineParser.addHelpOption();
+	commandLineParser.addVersionOption();
 
 	bool isOptionsAdded = commandLineParser.addOptions(
 				{

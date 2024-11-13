@@ -15,6 +15,7 @@
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlDocumentTypeListProvider.h>
 #include <imtsdl/CGqlExtSchemaParser.h>
+#include <imtsdl/CSdlTools.h>
 
 
 namespace imtsdl
@@ -23,7 +24,8 @@ namespace imtsdl
 
 class CGqlSchemaParserComp:
 			public ilog::TLoggerCompWrap<icomp::TMakeComponentWrap<CGqlExtSchemaParser>>,
-			public iproc::TSyncProcessorWrap<iproc::IProcessor>
+			public iproc::TSyncProcessorWrap<iproc::IProcessor>,
+			private CSdlTools
 {
 public:
 	static const QByteArray s_processedFilesParamId;
