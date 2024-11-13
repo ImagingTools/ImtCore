@@ -231,8 +231,8 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 		return false;
 	}
 
-	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
+	istd::IChangeable::ChangeSet changeSet(CF_OBJECT_DATA_CHANGED);
+	changeSet.SetChangeInfo(CN_OBJECT_DATA_CHANGED, objectId);
 
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
@@ -543,8 +543,8 @@ bool CSqlDatabaseObjectCollectionComp::SetElementName(const Id& elementId, const
 		return false;
 	}
 
-	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_RENAMED);
+	changeSet.SetChangeInfo(CN_ELEMENT_RENAMED, elementId);
 
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
@@ -573,8 +573,8 @@ bool CSqlDatabaseObjectCollectionComp::SetElementDescription(const Id& elementId
 		return false;
 	}
 
-	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_DESCRIPTION_CHANGED);
+	changeSet.SetChangeInfo(CN_ELEMENT_DESCRIPTION_CHANGED, elementId);
 
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
@@ -746,17 +746,28 @@ void CSqlDatabaseObjectCollectionComp::OnModelChanged(int modelId, const istd::I
 		return;
 	}
 
-	if (!changeSet.Contains(imtbase::ICollectionInfo::CF_UPDATED) &&
+	if (!changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_DESCRIPTION_CHANGED) &&
+		!changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_RENAMED) &&
+		!changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_STATE) &&
+		!changeSet.Contains(imtbase::IObjectCollection::CF_OBJECT_DATA_CHANGED) &&
 		!changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
 		return;
 	}
 
 	QByteArray elementId;
-	if (changeSet.Contains(imtbase::ICollectionInfo::CF_UPDATED)){
-		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_UPDATED).toByteArray();
+	if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_DESCRIPTION_CHANGED)){
+		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_DESCRIPTION_CHANGED).toByteArray();
 	}
-
-	if (changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
+	else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_RENAMED)){
+		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_RENAMED).toByteArray();
+	}
+	else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_STATE)){
+		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_STATE).toByteArray();
+	}
+	else if (changeSet.Contains(imtbase::IObjectCollection::CF_OBJECT_DATA_CHANGED)){
+		elementId = changeSet.GetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED).toByteArray();
+	}
+	else if (changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
 		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_REMOVED).toByteArray();
 	}
 
@@ -776,8 +787,8 @@ void CSqlDatabaseObjectCollectionComp::OnModelChanged(int modelId, const istd::I
 		QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(record);
 		QByteArray updateMetaInfoQuery = m_objectDelegateCompPtr->CreateUpdateMetaInfoQuery(record);
 
-		istd::IChangeable::ChangeSet objectChangeSet(CF_UPDATED);
-		objectChangeSet.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
+		istd::IChangeable::ChangeSet objectChangeSet(changeSet);
+		objectChangeSet.SetChangeInfoMap(changeSet.GetChangeInfoMap());
 		istd::CChangeNotifier changeNotifier(this, &objectChangeSet);
 
 		if (!ExecuteTransaction(updateMetaInfoQuery)){

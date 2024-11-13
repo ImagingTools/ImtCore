@@ -330,8 +330,8 @@ bool CFileCollectionCompBase::UpdateFile(
 
 		locker.relock();
 
-		static ChangeSet changes(CF_UPDATED);
-		changes.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
+		ChangeSet changes(CF_OBJECT_DATA_CHANGED);
+		changes.SetChangeInfo(CN_OBJECT_DATA_CHANGED, objectId);
 		istd::CChangeNotifier changeNotifier(this, &changes);
 
 		m_files[fileIndex].CopyFrom(collectionItem);
@@ -779,8 +779,8 @@ bool CFileCollectionCompBase::SetElementDescription(const Id& elementId, const Q
 		QString oldDescription = item.GetCollectionMetaInfo().GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
 
 		if (oldDescription != description){
-			static ChangeSet changes(CF_UPDATED);
-			changes.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+			ChangeSet changes(CF_ELEMENT_DESCRIPTION_CHANGED);
+			changes.SetChangeInfo(CN_ELEMENT_DESCRIPTION_CHANGED, elementId);
 			istd::CChangeNotifier changeNotifier(this, &changes);
 
 			item.SetCollectionMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, description);

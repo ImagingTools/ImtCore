@@ -185,8 +185,8 @@ int CFileCollectionComp::BackupObject(
 
 						writeLocker.unlock();
 
-						static ChangeSet changes(CF_UPDATED);
-						changes.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
+						ChangeSet changes(CF_OBJECT_DATA_CHANGED);
+						changes.SetChangeInfo(CN_OBJECT_DATA_CHANGED, objectId);
 						istd::CChangeNotifier changeNotifier(const_cast<CFileCollectionComp*>(this), &changes);
 
 						tempDir.removeRecursively();
@@ -275,8 +275,8 @@ bool CFileCollectionComp::RestoreObject(
 
 									writeLocker.unlock();
 
-									static ChangeSet changes(CF_UPDATED);
-									changes.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
+									ChangeSet changes(CF_OBJECT_DATA_CHANGED);
+									changes.SetChangeInfo(CN_OBJECT_DATA_CHANGED, objectId);
 									istd::CChangeNotifier changeNotifier(const_cast<CFileCollectionComp*>(this), &changes);
 
 									bool result = const_cast<CFileCollectionComp*>(this)->UpdateFile(newObjectDataFilePath, objectId);
@@ -478,8 +478,9 @@ bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& nam
 					return false;
 				}
 			}
-			static ChangeSet changes(CF_UPDATED);
-			changes.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+
+			ChangeSet changes(CF_ELEMENT_RENAMED);
+			changes.SetChangeInfo(CN_ELEMENT_RENAMED, elementId);
 			istd::CChangeNotifier changeNotifier(this, &changes);
 
 			QFileInfo fileInfo(item.GetFilePath());

@@ -271,8 +271,8 @@ bool CFileRepositoryComp::UpdateFile(
 			SendErrorMessage(0, QObject::tr("Permissions for the file '%1' could not be set").arg(targetFilePath));
 		}
 
-		static ChangeSet changes(CF_UPDATED);
-		changes.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
+		static ChangeSet changes(CF_OBJECT_DATA_CHANGED);
+		changes.SetChangeInfo(CN_OBJECT_DATA_CHANGED, objectId);
 		istd::CChangeNotifier changeNotifier(this, &changes);
 
 		if (!WriteItemInfo(fileItemInfo)){

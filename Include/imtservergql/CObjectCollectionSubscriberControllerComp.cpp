@@ -59,8 +59,24 @@ void CObjectCollectionSubscriberControllerComp::OnUpdate(const istd::IChangeable
 				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_REMOVED).toByteArray();
 				dataObject.insert("typeOperation", "removed");
 			}
-			else if (changeSet.Contains(imtbase::ICollectionInfo::CF_UPDATED)){
-				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_UPDATED).toByteArray();
+			else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_DESCRIPTION_CHANGED)){
+				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_DESCRIPTION_CHANGED).toByteArray();
+
+				dataObject.insert("typeOperation", "updated");
+			}
+			else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_RENAMED)){
+				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_RENAMED).toByteArray();
+
+				dataObject.insert("typeOperation", "updated");
+			}
+			else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_STATE)){
+				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_STATE).toByteArray();
+
+				dataObject.insert("typeOperation", "updated");
+			}
+			else if (changeSet.Contains(imtbase::IObjectCollection::CF_OBJECT_DATA_CHANGED)){
+				itemId = changeSet.GetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED).toByteArray();
+
 				dataObject.insert("typeOperation", "updated");
 			}
 

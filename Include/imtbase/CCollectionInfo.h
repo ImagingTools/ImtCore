@@ -30,7 +30,8 @@ public:
 
 	virtual QByteArray InsertItem(const QByteArray& id, const QString& name, const QString& description, int position = -1);
 	virtual void RemoveItem(const QByteArray& id);
-	virtual void UpdateItem(const QByteArray& id, const QString& name, const QString& description);
+	virtual void SetItemName(const QByteArray& id, const QString& name);
+	virtual void SetItemDescription(const QByteArray& id, const QString& description);
 
 	// reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(

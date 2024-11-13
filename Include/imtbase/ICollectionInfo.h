@@ -38,8 +38,14 @@ public:
 	static const QByteArray CN_ELEMENT_INSERTED;
 	typedef NotifierInfo ElementInsertInfo;
 
-	static const QByteArray CN_ELEMENT_UPDATED;
-	typedef NotifierInfo ElementUpdateInfo;
+	static const QByteArray CN_ELEMENT_RENAMED;
+	typedef NotifierInfo ElementRenamedInfo;
+
+	static const QByteArray CN_ELEMENT_DESCRIPTION_CHANGED;
+	typedef NotifierInfo ElementDescriptionChangedInfo;
+
+	static const QByteArray CN_ELEMENT_STATE;
+	typedef NotifierInfo ElementStateChangeInfo;
 
 	static const QByteArray CN_ELEMENT_REMOVED;
 	typedef NotifierInfo ElementRemoveInfo;
@@ -55,14 +61,26 @@ public:
 		CF_ADDED = 10000,
 
 		/**
-			Element was changed.
+			Element was renamed.
 		*/
-		CF_UPDATED,
+		CF_ELEMENT_RENAMED,
+
+		/**
+			Element was renamed.
+		*/
+		CF_ELEMENT_DESCRIPTION_CHANGED,
+
+		/**
+			Element was enabled/disabled.
+		*/
+		CF_ELEMENT_STATE,
 
 		/**
 			Element was removed.
 		*/
-		CF_REMOVED
+		CF_REMOVED,
+
+		CF_LAST
 	};
 
 	/**

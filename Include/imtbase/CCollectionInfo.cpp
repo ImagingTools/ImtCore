@@ -72,18 +72,39 @@ void CCollectionInfo::RemoveItem(const QByteArray& id)
 }
 
 
-void CCollectionInfo::UpdateItem(const QByteArray& id, const QString& name, const QString& description)
+void CCollectionInfo::SetItemName(const QByteArray& id, const QString& name)
 {
 	for (Item& item : m_items){
 		if (item.id == id){
-			if (item.name != name || item.description != description){
-				ElementUpdateInfo info;
+			if (item.name != name){
+				ElementRenamedInfo info;
 				info.elementId = id;
-				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, QVariant::fromValue<ElementUpdateInfo>(info));
+
+				istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_RENAMED);
+				changeSet.SetChangeInfo(CN_ELEMENT_RENAMED, QVariant::fromValue<ElementRenamedInfo>(info));
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 				item.name = name;
+			}
+
+			break;
+		}
+	}
+}
+
+
+void CCollectionInfo::SetItemDescription(const QByteArray& id, const QString& description)
+{
+	for (Item& item : m_items){
+		if (item.id == id){
+			if (item.description != description){
+				ElementDescriptionChangedInfo info;
+				info.elementId = id;
+
+				istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_DESCRIPTION_CHANGED);
+				changeSet.SetChangeInfo(CN_ELEMENT_DESCRIPTION_CHANGED, QVariant::fromValue<ElementDescriptionChangedInfo>(info));
+				istd::CChangeNotifier changeNotifier(this, &changeSet);
+
 				item.description = description;
 			}
 

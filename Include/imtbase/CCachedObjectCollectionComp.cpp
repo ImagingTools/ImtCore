@@ -193,8 +193,8 @@ bool CCachedObjectCollectionComp::SetObjectData(
 		return false;
 	}
 
-	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
+	istd::IChangeable::ChangeSet changeSet(CF_OBJECT_DATA_CHANGED);
+	changeSet.SetChangeInfo(CN_OBJECT_DATA_CHANGED, objectId);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	QWriteLocker locker(&m_lock);
@@ -343,8 +343,8 @@ bool CCachedObjectCollectionComp::SetElementName(const Id& elementId, const QStr
 	m_cachedCollections.Reset();
 	locker.unlock();
 
-	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_RENAMED);
+	changeSet.SetChangeInfo(CN_ELEMENT_RENAMED, elementId);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	bool retVal =  m_objectCollectionCompPtr->SetElementName(elementId, name);
@@ -366,8 +366,8 @@ bool CCachedObjectCollectionComp::SetElementDescription(const Id& elementId, con
 	m_cachedCollections.Reset();
 	locker.unlock();
 
-	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_DESCRIPTION_CHANGED);
+	changeSet.SetChangeInfo(CN_ELEMENT_DESCRIPTION_CHANGED, elementId);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	bool retVal = m_objectCollectionCompPtr->SetElementDescription(elementId, description, logPtr);
@@ -389,8 +389,8 @@ bool CCachedObjectCollectionComp::SetElementEnabled(const Id& elementId, bool is
 	m_cachedCollections.Reset();
 	locker.unlock();
 
-	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_STATE);
+	changeSet.SetChangeInfo(CN_ELEMENT_STATE, elementId);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	bool retVal = m_objectCollectionCompPtr->SetElementEnabled(elementId, isEnabled);

@@ -27,6 +27,14 @@ class IHierarchicalStructure;
 class IObjectCollection: virtual public IObjectCollectionInfo
 {
 public:
+	static const QByteArray CN_OBJECT_DATA_CHANGED;
+	typedef NotifierInfo ObjectDataChanged;
+
+	enum ChangeFlags
+	{
+		CF_OBJECT_DATA_CHANGED = CF_LAST
+	};
+
 	/**
 		Flags for describing operational constraints on the collection items or the collection itself.
 	*/

@@ -186,9 +186,9 @@ bool CGqlObjectCollectionComp::SetObjectData(
 				if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
 					if (retVal){
 						istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
-						imtbase::ICollectionInfo::ElementUpdateInfo updateInfo;
+						imtbase::IObjectCollection::ObjectDataChanged updateInfo;
 						updateInfo.elementId = objectId;
-						changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_UPDATED, QVariant::fromValue(updateInfo));
+						changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED, QVariant::fromValue(updateInfo));
 						istd::CChangeNotifier notifier(this, &changeSet);
 					}
 				}

@@ -247,8 +247,8 @@ bool CObjectCollectionBase::SetObjectData(
 
 	for (ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
-			istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-			changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
+			istd::IChangeable::ChangeSet changeSet(CF_OBJECT_DATA_CHANGED);
+			changeSet.SetChangeInfo(CN_OBJECT_DATA_CHANGED, objectId);
 
 			locker.unlock();
 
@@ -436,9 +436,9 @@ bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& o
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.name != objectName){
-				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, objectInfo.name);
-				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+				istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_RENAMED);
+				changeSet.SetChangeInfo(CN_ELEMENT_RENAMED, objectInfo.name);
+				changeSet.SetChangeInfo(CN_ELEMENT_RENAMED, elementId);
 
 				locker.unlock();
 
@@ -466,8 +466,9 @@ bool CObjectCollectionBase::SetElementDescription(const Id& elementId, const QSt
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.description != objectDescription){
-				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+				istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_DESCRIPTION_CHANGED);
+				changeSet.SetChangeInfo(CN_ELEMENT_DESCRIPTION_CHANGED, objectInfo.description);
+				changeSet.SetChangeInfo(CN_ELEMENT_DESCRIPTION_CHANGED, elementId);
 
 				locker.unlock();
 
@@ -495,8 +496,9 @@ bool CObjectCollectionBase::SetElementEnabled(const Id& elementId, bool isEnable
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.isEnabled != isEnabled){
-				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+				istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_STATE);
+				changeSet.SetChangeInfo(CN_ELEMENT_STATE, objectInfo.isEnabled);
+				changeSet.SetChangeInfo(CN_ELEMENT_STATE, elementId);
 
 				locker.unlock();
 
