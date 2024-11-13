@@ -1,4 +1,4 @@
-TARGET = imtsdlgengen
+TARGET = imtsdlgen
 
 include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
