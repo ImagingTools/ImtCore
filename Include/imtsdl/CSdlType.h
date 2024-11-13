@@ -40,6 +40,9 @@ public:
 	[[nodiscard]] bool IsExternal() const;
 	void SetExternal(bool isExternal);
 
+	[[nodiscard]] QString GetQmlImportDeclaration() const;
+	void SetQmlImportDeclaration(const QString& qmlImportDeclaration);
+
 	// reimplemented(iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
@@ -55,6 +58,7 @@ private:
 	QString m_targetHeaderFile;
 	QString m_schemaFile;
 	bool m_isExternal;
+	QString m_qmlImportDeclaration;
 };
 
 

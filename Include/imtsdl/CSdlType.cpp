@@ -113,6 +113,21 @@ void CSdlType::SetExternal(bool isExternal)
 }
 
 
+QString CSdlType::GetQmlImportDeclaration() const
+{
+	return m_qmlImportDeclaration;
+}
+
+
+void CSdlType::SetQmlImportDeclaration(const QString& qmlImportDeclaration)
+{
+	if (m_qmlImportDeclaration != qmlImportDeclaration) {
+		istd::CChangeNotifier notifier(this);
+		m_qmlImportDeclaration = qmlImportDeclaration;
+	}
+}
+
+
 // reimplemented(iser::ISerializable)
 
 bool CSdlType::Serialize(iser::IArchive& archive)
@@ -146,6 +161,11 @@ bool CSdlType::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_isExternal);
 	retVal = retVal && archive.EndTag(externalTag);
 
+	iser::CArchiveTag qmlDeclarationTag("QmlImportDeclaration", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(qmlDeclarationTag);
+	retVal = retVal && archive.Process(m_qmlImportDeclaration);
+	retVal = retVal && archive.EndTag(qmlDeclarationTag);
+
 	retVal = retVal && CSdlField::SerializeSdlFieldList(archive, m_fields, "Fields", "Field");
 
 	return retVal;
@@ -160,6 +180,7 @@ bool CSdlType::operator==(const CSdlType& other) const
 	retVal = retVal && m_targetHeaderFile == other.m_targetHeaderFile;
 	retVal = retVal && m_schemaFile == other.m_schemaFile;
 	retVal = retVal && m_isExternal == other.m_isExternal;
+	retVal = retVal && m_qmlImportDeclaration == other.m_qmlImportDeclaration;
 
 	return retVal;
 }
