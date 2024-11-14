@@ -19,6 +19,7 @@ Dialog {
 
 			property var checkedIndexes: [];
 			property bool block: true;
+
 			spacing: Style.size_mainMargin;
 
 			function updateGui(){
@@ -43,9 +44,12 @@ Dialog {
 
 			Table {
 				id: leftTable;
+
 				anchors.left: parent.left;
+
 				width: parent.width;
-				height: itemHeight * elementsCount + headerHeight;
+				height: Math.min(ModalDialogManager.activeView.height - 200, itemHeight * elementsCount + headerHeight);
+
 				checkable: true;
 				onCheckedItemsChanged: {
 					item.checkedIndexes = getCheckedItems();
