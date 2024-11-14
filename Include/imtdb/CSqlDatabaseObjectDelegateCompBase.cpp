@@ -10,6 +10,9 @@
 #include <iprm/ITextParam.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 
+// ImtCore includes
+#include <imtdb/CComplexCollectionFilterConverter.h>
+
 
 namespace imtdb
 {
@@ -472,7 +475,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const
 {
-	sortQuery = imtbase::CreateDefaultSqlSortingQuery(collectionFilter);
+	sortQuery = CComplexCollectionFilterConverter::CreateSqlSortQuery(collectionFilter);
 
 	return true;
 }

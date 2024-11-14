@@ -28,7 +28,7 @@
 #include <imtbase/CObjectCollection.h>
 #include <imtbase/COperationDescription.h>
 #include <imtgql/imtgql.h>
-#include <imtcol/ComplexCollectionFilterController.h>
+#include <imtcol/CComplexCollectionFilterRepresentationController.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
 
@@ -1310,7 +1310,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 
 		if (isComplexFilterOk){
 			istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
-			if (imtcol::ComplexCollectionFilterRepresentationToModel(complexFilterSdl, *complexFilterPtr)){
+			if (imtcol::CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRepresentationToModel(complexFilterSdl, *complexFilterPtr, GetLogPtr())){
 				filterParams.SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
 			}
 		}

@@ -50,6 +50,7 @@ public:
 		Q_INIT_RESOURCE(imtauthProfileSdl);
 		Q_INIT_RESOURCE(imtauthAuthorizationSdl);
 		Q_INIT_RESOURCE(imtappApplicationSdl);
+		Q_INIT_RESOURCE(imtbaseComplexCollectionFilterSdl);
 	}
 
 	static void InitQml()

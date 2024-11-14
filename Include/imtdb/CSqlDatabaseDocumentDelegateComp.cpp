@@ -20,6 +20,7 @@
 // ImtCore includes
 #include <imtbase/CObjectCollection.h>
 #include <imtbase/ICollectionFilter.h>
+#include <imtdb/CComplexCollectionFilterConverter.h>
 
 
 namespace imtdb
@@ -966,7 +967,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateObjectHistoryQuery(
 
 bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
 {
-	textFilterQuery = imtbase::CreateDefaultSqlFilterQuery(collectionFilter);
+	textFilterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter);
 
 	return true;
 }

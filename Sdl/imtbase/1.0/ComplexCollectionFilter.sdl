@@ -9,6 +9,30 @@ import {
 	"ImtBaseTypes.sdl"
 }
 
+type ValueType
+{
+	signedNumber: Bool
+	unsignedNumber: Bool
+	floatingPoint: Bool
+	stringValue: Bool
+	boolValue: Bool
+}
+
+type FilterOperations
+{
+	notOp: Bool
+	equalOp: Bool
+	lessOp: Bool
+	greaterOp: Bool
+	containsOp: Bool
+}
+
+type LogicalOperation
+{
+	andOp: Bool
+	orOp: Bool
+}
+
 type TimeFilter
 {
 	timeRange: TimeRange
@@ -27,8 +51,8 @@ type FieldFilter
 {
 	fieldId: ID!
 	filterValue: String!
-	filterValueType: ID! # available types: signed, unsigned, floatingPoint, string, bool
-	filterOperation: ID! # available operations: ==, !=, <, >, >=, <=, CONTAINS
+	filterValueType: ValueType!
+	filterOperation: FilterOperations!
 }
 
 type GroupFilter
@@ -36,7 +60,7 @@ type GroupFilter
 	fieldFilters: [FieldFilter]
 	groupFilters: [GroupFilter]
 
-	logicalOperation: ID! # available operations: AND, OR
+	logicalOperation: LogicalOperation!
 }
 
 type ComplexCollectionFilter {

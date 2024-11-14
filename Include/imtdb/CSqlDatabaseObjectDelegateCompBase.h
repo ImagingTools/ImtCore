@@ -6,8 +6,8 @@
 #include <iprm/IOptionsList.h>
 
 // ImtCore includes
-#include <imtbase/ComplexCollectionFilterHelper.h>
 #include <imtbase/ICollectionFilter.h>
+#include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/ITimeFilterParam.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseEngine.h>

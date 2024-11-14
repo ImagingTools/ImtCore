@@ -1,0 +1,51 @@
+#pragma once
+
+
+// ACF includes
+#include <ilog/IMessageConsumer.h>
+
+// ImtCore includes
+#include <imtbase/IComplexCollectionFilter.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
+
+
+namespace imtcol
+{
+
+
+class CComplexCollectionFilterRepresentationController
+{
+public:
+	static bool ComplexCollectionFilterRepresentationToModel(
+		sdl::imtbase::ComplexCollectionFilter::V1_0::CComplexCollectionFilter& filterRepresentaion,
+		imtbase::IComplexCollectionFilter& filter,
+		ilog::IMessageConsumer* messageConsumerPtr);
+
+private:
+	enum FilterOperationFlags
+	{
+		FOF_NOT = 1,
+		FOF_EQUAL = 2,
+		FOF_LESS = 4,
+		FOF_GREATER = 8,
+		FOF_CONTAINS = 16
+	};
+
+private:
+	static bool ProcessFieldFilter(
+		const sdl::imtbase::ComplexCollectionFilter::V1_0::CFieldFilter& source,
+		imtbase::IComplexCollectionFilter::FieldFilter& target,
+		ilog::IMessageConsumer* messageConsumerPtr);
+
+	static bool ProcessGroupFilter(
+		const sdl::imtbase::ComplexCollectionFilter::V1_0::CGroupFilter& source,
+		imtbase::IComplexCollectionFilter::GroupFilter& target,
+		ilog::IMessageConsumer* messageConsumerPtr);
+
+	static void SendErrorMessage(const QString& message, ilog::IMessageConsumer* messageConsumerPtr);
+};
+
+
+} // namespace imtgql
+
+
