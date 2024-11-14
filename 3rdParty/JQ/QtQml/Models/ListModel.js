@@ -41,11 +41,6 @@ class ListModel extends QtObject {
         let changeSet = this.__changeSet
         this.__changeSet = []
 
-        // this.count = this.data.length
-        // while(this.__signals.length){
-        //     this.__signals.shift()()
-        // }
-
         for(let obj of this.__views){
             obj.__updateView(changeSet)
         } 
@@ -63,12 +58,10 @@ class ListModel extends QtObject {
 
             this.__changeSet.push([this.data.length, this.data.length+dict.length, 'append'])
             for(let i = 0; i < dict.length; i++){
-                // dict[i].index = this.data.length
                 this.data.opush(AbstractItemModel.create(this, this.data.length, dict[i]))
             }
 		} else {
             this.__changeSet.push([this.data.length, this.data.length+1, 'append'])
-            // dict.index = this.data.length
             this.data.opush(AbstractItemModel.create(this, this.data.length, dict))
 		}
 
@@ -83,12 +76,10 @@ class ListModel extends QtObject {
 
             this.__changeSet.push([index, index+dict.length, 'insert'])
             for(let i = 0; i < dict.length; i++){
-                // dict[i].index = index
                 this.data.osplice(i+index, 0, AbstractItemModel.create(this, i+index, dict[i]))
             }
 		} else {
             this.__changeSet.push([index, index+1, 'insert'])
-            // dict.index = index
             this.data.osplice(index, 0, AbstractItemModel.create(this, index, dict))
 		}
 
@@ -98,11 +89,7 @@ class ListModel extends QtObject {
         JQApplication.updateLater(this)
 
         this.__changeSet.push([index, index+count, 'remove'])
-        let removed = this.data.osplice(index, count)
-
-        for(let r of removed){
-            JQApplication.MemoryController.delete(r)
-        }
+        this.data.osplice(index, count)
 
         this.count = this.data.length
     }

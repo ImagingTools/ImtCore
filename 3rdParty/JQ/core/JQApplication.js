@@ -182,7 +182,7 @@ module.exports = {
         if(this.updateLayers.length){
             if(this.deleteObjects.indexOf(obj) < 0) this.deleteObjects.push(obj)
         } else {
-            obj.deleteLater()
+            obj.__destroy()
         }
     },
 
@@ -215,7 +215,7 @@ module.exports = {
             let objects = this.deleteObjects.slice()
             this.deleteObjects = []
             for(let obj of objects){
-                obj.deleteLater()
+                obj.__destroy()
             }
         }
         

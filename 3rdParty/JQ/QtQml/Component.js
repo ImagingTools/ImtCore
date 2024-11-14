@@ -11,7 +11,13 @@ class Component extends QQmlComponent {
     } 
 
     createObject(parent, model){
-        return this.component.create(parent, model)
+        let obj = this.component.create(parent, model)
+        
+        if(!parent){
+            JQApplication.MemoryController.observe(obj, this.__proxy)
+        }
+
+        return obj
     }
 }
 

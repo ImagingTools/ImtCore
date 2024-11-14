@@ -79,7 +79,6 @@ class Signal {
     emit(...args){
         if(this.__parent) {
             if(this.signalBlocked() || this.__parent.signalsBlocked()) return
-            this.__parent.__beginProcess()
 
             if(this.__slot){
                 this.__slot.call(this.__parent, ...args)
@@ -97,10 +96,6 @@ class Signal {
             } catch (error) {
                 console.error(error)
             }
-        }
-
-        if(this.__parent) {
-            this.__parent.__endProcess()
         }
     }
 

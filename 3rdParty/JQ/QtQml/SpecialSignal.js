@@ -71,7 +71,6 @@ class Signal {
     emit(...args){
         if(this.__parent) {
             if(this.__parent.signalsBlocked()) return
-            this.__parent.__beginProcess()
 
             if(this.__connections)
             for(let connection of this.__connections){
@@ -89,8 +88,6 @@ class Signal {
             if(this.__slot){
                 this.__slot.call(this.__parent, ...args)
             }
-
-            this.__parent.__endProcess()
         }
     }
 

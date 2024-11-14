@@ -112,9 +112,9 @@ class Property extends BaseObject {
                 this.__value[key] = safeValue
             }
         } else if(safeValue !== this.__value){
-            JQApplication.MemoryController.removeLink(this.__value, this)
-            JQApplication.MemoryController.addLink(safeValue, this)
+            JQApplication.MemoryController.removeLink(this.__value, this.__proxy)
             this.__value = safeValue
+            JQApplication.MemoryController.addLink(safeValue, this.__proxy)
             this.__emitSignal()
         }
         
@@ -230,6 +230,8 @@ class Property extends BaseObject {
 
     __destroy(){
         super.__destroy()
+        JQApplication.MemoryController.removeLink(this.__value, this)
+
         this.__unsubscribe()
         let self = this.__self
         delete self.__proxy

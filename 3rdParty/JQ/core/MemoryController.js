@@ -1,40 +1,53 @@
 const Property = require("../QtQml/Property")
+const List = require("../QtQml/List")
+const QObject = require("../QtQml/QObject")
 
 module.exports = {
-    links: new Map(),
+    objects: new Map(),
+
+    observe: function(target){
+        if(!this.objects.has(target)) this.objects.set(target, [])
+    },
 
     addLink: function(target, source){
-        if(target && typeof target === 'object' && source instanceof Property){
-            if(this.links.has(target)){
-                let list = this.links.get(target)
+        if(target instanceof QObject && source instanceof Property){
+            if(this.objects.has(target)){
+                let list = this.objects.get(target)
                 list.push(source)
-            } else {
-                this.links.set(target, [source])
             }
         }
     },
 
     removeLink: function(target, source){
-        if(target && typeof target === 'object' && source instanceof Property){
-            if(this.links.has(target)){
-                let list = this.links.get(target)
+        if(target instanceof QObject && source instanceof Property){
+            if(this.objects.has(target)){
+                let list = this.objects.get(target)
                 let index = list.indexOf(source)
 
                 if(index >= 0){
                     list.splice(index, 1)
+                }
+
+                if(list.length === 0){
+                    target.destroy()
                 }
             }
         }
     },
 
     delete: function(target){
-        if(target && typeof target === 'object'){
-            if(this.links.has(target)){
-                let list = this.links.get(target)
+        if(target instanceof QObject){
+            if(this.objects.has(target)){
+                let list = this.objects.get(target)
                 for(let property of list){
-                    property.__value = null
+                    if(property instanceof List){
+                        property.__removeObject(target)
+                    } else {
+                        property.__value = null
+                    }
+                    
                 }
-                this.links.delete(target)
+                this.objects.delete(target)
             }
         }
     }

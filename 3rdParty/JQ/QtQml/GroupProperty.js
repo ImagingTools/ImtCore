@@ -11,18 +11,6 @@ class GroupProperty extends BaseObject {
         return proxy
     }
 
-    __beginProcess(){
-        if(this.__parent) {
-            this.__parent.__beginProcess()
-        }
-    }
-
-    __endProcess(){
-        if(this.__parent) {
-            this.__parent.__endProcess()
-        }
-    }
-
     __toPrimitive(hint){
         return this
     }
@@ -64,8 +52,8 @@ class GroupProperty extends BaseObject {
     __get(key){
         if(this.__has(key)){
             if(this[key] instanceof Property){
-                let caller = Property.queueLink[Property.queueLink.length-1]
-                if(caller) caller.__subscribe(this[key])
+                // let caller = Property.queueLink[Property.queueLink.length-1]
+                // if(caller) caller.__subscribe(this[key])
                 return this[key].__get()
             }
             return this[key]
