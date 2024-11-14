@@ -699,6 +699,34 @@ QString CSdlTools::BuildNamespaceFromParams(const iprm::IParamsSet& schemaParams
 }
 
 
+QString CSdlTools::BuildQmlImportDeclarationFromParams(const iprm::IParamsSet& schemaParams, const QString& suffix)
+{
+	QString retVal;
+
+	QString schemaNamespace;
+	iprm::TParamsPtr<iprm::ITextParam> namespaceParamPtr(&schemaParams, SdlCustomSchemaKeys::SchemaNamespace.toUtf8(), false);
+	if (namespaceParamPtr.IsValid()){
+		schemaNamespace = namespaceParamPtr->GetText();
+	}
+
+	QString schemaName;
+	iprm::TParamsPtr<iprm::ITextParam> nameParamPtr(&schemaParams, SdlCustomSchemaKeys::SchemaName.toUtf8(), false);
+	if (nameParamPtr.IsValid()){
+		schemaName = nameParamPtr->GetText();
+	}
+
+	QString versionName;
+	iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&schemaParams, SdlCustomSchemaKeys::VersionName.toUtf8(), false);
+	if (versionNameParamPtr.IsValid()){
+		versionName = versionNameParamPtr->GetText();
+	}
+
+	retVal = schemaNamespace + schemaName + suffix + ' ' + versionName;
+
+	return retVal;
+}
+
+
 QString CSdlTools::GetNamespaceFromParamsOrArguments(
 			const SchemaParamsCompPtr& schemaParamsCompPtr,
 			const ArgumentParserCompPtr& argumentParamsCompPtr)
