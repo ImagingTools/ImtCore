@@ -24,6 +24,13 @@ class QObject extends BaseObject {
         if(parent) {
             parent.__children.push(proxy)
             proxy.setParent(parent)
+        } else {
+            try {
+                JQApplication.MemoryController.observe(proxy)
+            } catch (error) {
+                
+            }
+            
         }
 
         return proxy

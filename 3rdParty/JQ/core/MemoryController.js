@@ -11,6 +11,12 @@ module.exports = {
 
     addLink: function(target, source){
         if(target instanceof QObject && source instanceof Property){
+            let parent = source.__parent
+            while(parent){
+                if(target === parent) return
+                parent = parent.parent
+            }
+            
             if(this.objects.has(target)){
                 let list = this.objects.get(target)
                 list.push(source)
