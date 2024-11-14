@@ -252,13 +252,48 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		return false;
 	}
 
+	// add imports for external types
+	QSet<QString> requiredImports;
+	const imtsdl::SdlTypeList allTypes = m_sdlTypeListCompPtr->GetSdlTypes(false);
+	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
+		bool isCustom = false;
+		ConvertType(field, &isCustom);
+		if (!isCustom){
+			// imports is required only for custom types
+			continue;
+		}
+
+		imtsdl::CSdlType type;
+		const bool exists = GetSdlTypeForField(field, allTypes, type);
+		if (!exists){
+			SendCriticalMessage(0, QString("Unable to find type for %1:%2").arg(field.GetId(), field.GetType()));
+			I_CRITICAL();
+
+			return false;
+		}
+
+		if (type.IsExternal()){
+			QString qmlImportDeclaration = type.GetQmlImportDeclaration();
+			if (!qmlImportDeclaration.isEmpty())
+				requiredImports << qmlImportDeclaration;
+		}
+	}
+
 	QTextStream ifStream(m_qmlFilePtr.GetPtr());
 
 	// import section
 	ifStream << QStringLiteral("import QtQuick");
 	FeedStream(ifStream, 1, false);
 	ifStream << QStringLiteral("import imtcontrols 1.0");
-	FeedStream(ifStream, 2, false);
+	FeedStream(ifStream, 1, false);
+
+	// add required Imports for external types
+	for (const QString& importDeclaration: std::as_const(requiredImports)){
+		ifStream << QStringLiteral("import ");
+		ifStream << importDeclaration;
+		FeedStream(ifStream, 1, false);
+	}
+	FeedStream(ifStream, 1, false);
 
 	// Base QML
 	ifStream << QStringLiteral("BaseClass {");
