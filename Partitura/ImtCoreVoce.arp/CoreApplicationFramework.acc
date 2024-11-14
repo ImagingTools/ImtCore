@@ -26,7 +26,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CompanyName" Type="Text" ExportId="CompanyName">
-                        <Data IsEnabled="true" Value="ImagingTools GmbH"/>
+                        <Data IsEnabled="true" Value="ImagingTools"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LegalCopyright" Type="Text" ExportId="LegalCopyright">
                         <Data IsEnabled="true" Value="(C) 2018 ImagingTools GmbH. All rights reserved."/>

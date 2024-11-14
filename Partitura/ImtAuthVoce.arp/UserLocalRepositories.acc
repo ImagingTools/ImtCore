@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5204" Description="ACF"/>
-            <Version Id="1" Number="2203" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+            <Version Id="0" Number="5270" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -451,9 +451,6 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="Types"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="TableName" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Users"/>

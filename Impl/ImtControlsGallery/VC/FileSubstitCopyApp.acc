@@ -17,10 +17,10 @@
                         <Data IsEnabled="true" Value="Lisa"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CompanyName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="ImagingTools GmbH"/>
+                        <Data IsEnabled="true" Value="ImagingTools"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LegalCopyright" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Copyright 2021 ImagingTools GmbH"/>
+                        <Data IsEnabled="true" Value="Copyright 2024 ImagingTools GmbH"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ReplaceEmbeddedVariables" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>

@@ -596,6 +596,7 @@ bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(
 
 	iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
 	if (!serializableObjectPtr->Serialize(archive)){
+		SendErrorMessage(0, "Unable to write data to memory. Error: Serialization failed", "CSqlJsonDatabaseDelegateComp");
 		return false;
 	}
 
@@ -615,9 +616,11 @@ bool CSqlJsonDatabaseDelegateComp::ReadDataFromMemory(
 		Q_ASSERT(0);
 		return false;
 	}
+
 	iser::CJsonMemReadArchive archive(data);
 
 	if (!serializableObjectPtr->Serialize(archive)){
+		SendErrorMessage(0, "Unable to read data from memory. Error: Serialization failed", "CSqlJsonDatabaseDelegateComp");
 		return false;
 	}
 
