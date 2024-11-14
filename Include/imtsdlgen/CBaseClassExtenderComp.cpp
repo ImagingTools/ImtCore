@@ -137,8 +137,6 @@ int CBaseClassExtenderComp::DoProcessing(
 			istd::IChangeable* /*outputPtr*/,
 			ibase::IProgressManager* /*progressManagerPtr*/)
 {
-	iproc::IProcessor::TaskState retVal = iproc::IProcessor::TS_OK;
-
 	if (paramsPtr == nullptr){
 		I_CRITICAL();
 
@@ -169,25 +167,24 @@ int CBaseClassExtenderComp::DoProcessing(
 	if (!isOk){
 		AbortCurrentProcessing();
 
-		return iproc::IProcessor::TS_INVALID;
+		return TS_INVALID;
 	}
 
 	isOk = isOk && ProcessHeaderClassFile(*paramsPtr, *baseClassOptionListPtr);
 	if (!isOk){
 		AbortCurrentProcessing();
 
-		return iproc::IProcessor::TS_INVALID;
+		return TS_INVALID;
 	}
 
 	isOk = isOk && EndClassFiles();
 	if (!isOk){
 		AbortCurrentProcessing();
 
-		return iproc::IProcessor::TS_INVALID;
+		return TS_INVALID;
 	}
 
-
-	return retVal;
+	return TS_OK;
 }
 
 
@@ -406,7 +403,13 @@ bool CBaseClassExtenderComp::CloseFiles()
 	m_originalHeaderFilePtr->close();
 
 	const QString originalHeaderFilePath = QFileInfo(*m_originalHeaderFilePtr).absolutePath();
-	retVal = retVal && istd::CSystem::FileMove(m_headerFilePtr->fileName(), originalHeaderFilePath, true);
+	const QString sourceFile = m_headerFilePtr->fileName();
+	bool isMoved = istd::CSystem::FileMove(sourceFile, originalHeaderFilePath, true);
+	if (!isMoved){
+		SendErrorMessage(0, QString("Unable to move file '%1' to '%2'").arg(sourceFile, originalHeaderFilePath));
+	}
+
+	retVal = retVal && isMoved;
 
 	return retVal;
 }

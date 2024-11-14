@@ -141,8 +141,9 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 		for (const imtsdl::CSdlType& sdlType: sdlTypeList){
 			iprm::CParamsSet paramsSet;
 
+			const QString filePath = outputDirectoryPath + "/C" + sdlType.GetName() + ".h";
 			ifile::CFileNameParam headerFileNameParam;
-			headerFileNameParam.SetPath(outputDirectoryPath + "/C" + sdlType.GetName() + ".h");
+			headerFileNameParam.SetPath(filePath);
 			paramsSet.SetEditableParameter(QByteArrayLiteral("HeaderFile"), &headerFileNameParam);
 
 			iprm::COptionsManager baseClassDirectivesList;
@@ -152,7 +153,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 			int extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
 			if (extendResult != TS_OK){
-				SendErrorMessage(0, "Unable to extend");
+				SendErrorMessage(0, QString("Unable to extend file: '%1'").arg(filePath));
 				I_CRITICAL();
 
 				return extendResult;
