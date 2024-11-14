@@ -52,6 +52,7 @@ Item {
 	property alias pagination: paginationObj;
 	property alias paginationCurrentIndex: paginationObj.currentIndex;
 	property alias paginationPageSize: paginationObj.pagesSize;
+	property alias paginationCountAllElements: paginationObj.countAllElements;
 	property alias paginationCountElements: paginationObj.countElements;
 	property int paginationCountElementsInit: paginationObj.countElements;
 	property string commandsId;
