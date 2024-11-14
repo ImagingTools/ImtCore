@@ -250,12 +250,12 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::imtpay::Receipt::V1_0::CReceipt
 		iprm::IParamsSet* paymentItemParamsSetPtr = itemsParamsManagerPtr->GetParamsSet(intmIndex);
 		Q_ASSERT(paymentItemParamsSetPtr != nullptr);
 
-		iprm::TParamsPtr<iprm::ITextParam> itemNameParamPtr(&*clientParamsPtr, ReceiptItemKeys::Name, false);
+		iprm::TParamsPtr<iprm::ITextParam> itemNameParamPtr(&*paymentItemParamsSetPtr, ReceiptItemKeys::Name, false);
 		Q_ASSERT(itemNameParamPtr.IsValid());
 		paymentItem.SetName(itemNameParamPtr->GetText());
 
 		// price
-		iprm::TParamsPtr<imeas::INumericValue> priceNumericParamPtr(&params, ReceiptItemKeys::Price);
+		iprm::TParamsPtr<imeas::INumericValue> priceNumericParamPtr(&*paymentItemParamsSetPtr, ReceiptItemKeys::Price);
 		Q_ASSERT(priceNumericParamPtr.IsValid());
 
 		imath::CVarVector priceList = priceNumericParamPtr->GetValues();
@@ -265,7 +265,7 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::imtpay::Receipt::V1_0::CReceipt
 		paymentItem.SetPrice(price);
 
 		// amount
-		iprm::TParamsPtr<imeas::INumericValue> amountNumericParamPtr(&params, ReceiptItemKeys::Amount);
+		iprm::TParamsPtr<imeas::INumericValue> amountNumericParamPtr(&*paymentItemParamsSetPtr, ReceiptItemKeys::Amount);
 		Q_ASSERT(amountNumericParamPtr.IsValid());
 
 		imath::CVarVector amountList = amountNumericParamPtr->GetValues();
@@ -275,7 +275,7 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::imtpay::Receipt::V1_0::CReceipt
 		paymentItem.SetAmount(amount);
 
 		// quantity
-		iprm::TParamsPtr<imeas::INumericValue> quantityNumericParamPtr(&params, ReceiptItemKeys::Quantity);
+		iprm::TParamsPtr<imeas::INumericValue> quantityNumericParamPtr(&*paymentItemParamsSetPtr, ReceiptItemKeys::Quantity);
 		Q_ASSERT(quantityNumericParamPtr.IsValid());
 
 		imath::CVarVector quantityList = quantityNumericParamPtr->GetValues();
@@ -285,7 +285,7 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::imtpay::Receipt::V1_0::CReceipt
 		paymentItem.SetQuantity(quantity);
 
 		// ItemType
-		iprm::TParamsPtr<iprm::ISelectionParam> typeSelectionParamPtr(&params, ReceiptItemKeys::ItemType);
+		iprm::TParamsPtr<iprm::ISelectionParam> typeSelectionParamPtr(&*paymentItemParamsSetPtr, ReceiptItemKeys::ItemType);
 		Q_ASSERT(typeSelectionParamPtr.IsValid());
 
 		const iprm::IOptionsList* typeSelectionConstraints = typeSelectionParamPtr->GetSelectionConstraints();
@@ -298,7 +298,7 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::imtpay::Receipt::V1_0::CReceipt
 		paymentItem.SetType(selectedTypeId);
 
 		// PaymentMethod
-		iprm::TParamsPtr<iprm::ISelectionParam> paymentMethodSelectionParamPtr(&params, ReceiptItemKeys::PaymentMethod);
+		iprm::TParamsPtr<iprm::ISelectionParam> paymentMethodSelectionParamPtr(&*paymentItemParamsSetPtr, ReceiptItemKeys::PaymentMethod);
 		Q_ASSERT(paymentMethodSelectionParamPtr.IsValid());
 
 		const iprm::IOptionsList* paymentMethodSelectionConstraints = paymentMethodSelectionParamPtr->GetSelectionConstraints();
@@ -311,7 +311,7 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::imtpay::Receipt::V1_0::CReceipt
 		paymentItem.SetPaymentMethod(selectedPaymentMethodId);
 
 		// MeasurementUnit
-		iprm::TParamsPtr<iprm::ISelectionParam> measurementUnitSelectionParamPtr(&params, ReceiptItemKeys::MeasurementUnit);
+		iprm::TParamsPtr<iprm::ISelectionParam> measurementUnitSelectionParamPtr(&*paymentItemParamsSetPtr, ReceiptItemKeys::MeasurementUnit);
 		Q_ASSERT(measurementUnitSelectionParamPtr.IsValid());
 
 		const iprm::IOptionsList* measurementUnitSelectionConstraints = measurementUnitSelectionParamPtr->GetSelectionConstraints();
@@ -459,9 +459,15 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 			SetDigitValueForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::Price, receiptItem.GetPrice());
 			SetDigitValueForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::Amount, receiptItem.GetAmount());
 			SetDigitValueForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::Quantity, receiptItem.GetQuantity());
-			SelectOptionByIdForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::ItemType, receiptItem.GetType());
-			SelectOptionByIdForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::PaymentMethod, receiptItem.GetPaymentMethod());
-			SelectOptionByIdForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::MeasurementUnit, receiptItem.GetMeasurementUnit());
+			if (!receiptItem.GetType().isEmpty()){
+				SelectOptionByIdForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::ItemType, receiptItem.GetType());
+			}
+			if (!receiptItem.GetPaymentMethod().isEmpty()){
+				SelectOptionByIdForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::PaymentMethod, receiptItem.GetPaymentMethod());
+			}
+			if (!receiptItem.GetMeasurementUnit().isEmpty()){
+				SelectOptionByIdForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::MeasurementUnit, receiptItem.GetMeasurementUnit());
+			}
 		}
 	}
 
