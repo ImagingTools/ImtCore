@@ -252,11 +252,17 @@ bool CGqlExtSchemaParser::ValidateSchema()
 		}
 	}
 
-	const QString fieldsNamespace = CSdlTools::BuildNamespaceFromParams(m_customSchemaParams);
-	// set namespace for all types
+	const QString fieldNamespace = CSdlTools::BuildNamespaceFromParams(m_customSchemaParams);
+	/// \todo don't use a suffix. Instead, define it elsewhere...
+	const QString fieldQmlImportDeclaration = CSdlTools::BuildQmlImportDeclarationFromParams(m_customSchemaParams, QStringLiteral("Sdl"));
+	// set namespace and QML import for all types
 	for (CSdlType& sdlType: m_sdlTypes){
 		if (!sdlType.IsExternal() || sdlType.GetNamespace().isEmpty()){
-			sdlType.SetNamespace(fieldsNamespace);
+			sdlType.SetNamespace(fieldNamespace);
+		}
+
+		if (!sdlType.IsExternal() || sdlType.GetQmlImportDeclaration().isEmpty()){
+			sdlType.SetQmlImportDeclaration(fieldQmlImportDeclaration);
 		}
 	}
 

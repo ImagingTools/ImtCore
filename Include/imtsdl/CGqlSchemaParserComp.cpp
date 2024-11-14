@@ -567,6 +567,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 			if (!isExternal){
 				if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_NONE){
 					// set same namespace for all types if generate all schemas in single file
+					/// \todo change it to \c BuildNamespaceFromParams afterwards
 					const QString typeNamespace = GetNamespaceFromParamsOrArguments(&m_customSchemaParams, m_argumentParserCompPtr);
 					sdlType.SetNamespace(typeNamespace);
 				}
