@@ -4,250 +4,247 @@ import imtgui 1.0
 import imtcontrols 1.0
 
 Row {
-    id: paginationContainer;
+	id: paginationContainer;
 
-    height: visible ? 20 : 0;
-    spacing: 15;
+	height: visible ? 20 : 0;
+	spacing: 15;
 
-    property int pagesSize: 1;
-    property int currentValue: currentIndex + 1;
-    property int currentIndex: 0;
+	property int pagesSize: 1;
+	property int currentValue: currentIndex + 1;
+	property int currentIndex: 0;
 
-    // The number of elements on the page
-    property int countElements: 25;
+	// The number of elements on the page
+	property int countElements: 25;
 
-    property int countAllElements: 0;
+	property int countAllElements: 0;
 
-    property alias pageCount: listModel.count;
+	property alias pageCount: listModel.count;
 
-    Component.onCompleted: {
-        paginationContainer.refreshBtn();
-    }
+	Component.onCompleted: {
+		paginationContainer.refreshBtn();
+	}
 
-    onPagesSizeChanged: {
-        if (paginationContainer.currentIndex > paginationContainer.pagesSize - 1){
-            paginationContainer.currentIndex = 0;
-        }
+	onPagesSizeChanged: {
+		if (paginationContainer.currentIndex > paginationContainer.pagesSize - 1){
+			paginationContainer.currentIndex = 0;
+		}
 
-        paginationContainer.refreshBtn();
-    }
+		paginationContainer.refreshBtn();
+	}
 
-    Component {
-        id: buttonDecorator;
+	onCurrentIndexChanged: {
+		if (paginationContainer.pagesSize >= props.maxElementCount){
+			paginationContainer.refreshBtn();
+		}
+	}
 
-        ButtonDecorator {
-            color: "transparent";
-            border.width: 0;
-        }
-    }
+	Component {
+		id: buttonDecorator;
 
-    ListModel {
-        id: listModel;
-    }
+		ButtonDecorator {
+			color: "transparent";
+			border.width: 0;
+		}
+	}
 
-    QtObject {
-        id: props;
+	ListModel {
+		id: listModel;
+	}
 
-        property int maxElementCount: 6;
-    }
+	QtObject {
+		id: props;
 
-    function refreshBtn(){
-        listModel.clear();
-         if (paginationContainer.pagesSize < props.maxElementCount){
-             for (var i = 0; i < paginationContainer.pagesSize; i++){
-                 listModel.append({number: i+1, selected: paginationContainer.currentIndex + 1 === i + 1});
-             }
-         }
-         else {
-             for (let i = 1; i <= 2; i++){
-                 listModel.append({number: i, selected: paginationContainer.currentIndex + 1 === i})
-             }
+		property int maxElementCount: 6;
+	}
 
-             listModel.append({number: paginationContainer.currentIndex + 1 - 2 > 1 + 3 ? -1 : 1 + 2, selected: paginationContainer.currentIndex + 1 === 3});
-             for (var k = Math.max(1 + 3, paginationContainer.currentIndex + 1 - 2); k <= Math.min(paginationContainer.pagesSize - 3, paginationContainer.currentIndex + 1 + 2); k++){
-                 listModel.append({number: k, selected: paginationContainer.currentIndex + 1 === k});
-             }
+	function refreshBtn(){
+		listModel.clear();
+		if (paginationContainer.pagesSize < props.maxElementCount){
+			for (var i = 0; i < paginationContainer.pagesSize; i++){
+				listModel.append({number: i+1, selected: paginationContainer.currentIndex + 1 === i + 1});
+			}
+		}
+		else {
+			for (let i = 1; i <= 2; i++){
+				listModel.append({number: i, selected: paginationContainer.currentIndex + 1 === i})
+			}
 
-             listModel.append({number: paginationContainer.currentIndex + 1 + 2 < paginationContainer.pagesSize - 3 ? -1 : paginationContainer.pagesSize - 2, selected: paginationContainer.currentIndex + 1 === paginationContainer.pagesSize - 2});
+			listModel.append({number: paginationContainer.currentIndex + 1 - 2 > 1 + 3 ? -1 : 1 + 2, selected: paginationContainer.currentIndex + 1 === 3});
+			for (var k = Math.max(1 + 3, paginationContainer.currentIndex + 1 - 2); k <= Math.min(paginationContainer.pagesSize - 3, paginationContainer.currentIndex + 1 + 2); k++){
+				listModel.append({number: k, selected: paginationContainer.currentIndex + 1 === k});
+			}
 
-             for (let i = paginationContainer.pagesSize - 1; i <= paginationContainer.pagesSize; i++){
-                 listModel.append({number: i, selected: paginationContainer.currentIndex + 1 === i})
-             }
-         }
-        repeaterPagination.model = listModel;
-    }
+			listModel.append({number: paginationContainer.currentIndex + 1 + 2 < paginationContainer.pagesSize - 3 ? -1 : paginationContainer.pagesSize - 2, selected: paginationContainer.currentIndex + 1 === paginationContainer.pagesSize - 2});
 
-    BaseText {
-        anchors.verticalCenter: parent.verticalCenter;
+			for (let i = paginationContainer.pagesSize - 1; i <= paginationContainer.pagesSize; i++){
+				listModel.append({number: i, selected: paginationContainer.currentIndex + 1 === i})
+			}
+		}
+		repeaterPagination.model = listModel;
+	}
 
-        text: "(" + (paginationContainer.currentIndex * paginationContainer.countElements + 1) + "-" +
-              ((paginationContainer.pagesSize - 1 != paginationContainer.currentIndex) ?
-                   paginationContainer.currentValue * paginationContainer.countElements :
-                   paginationContainer.countAllElements) + "/" + paginationContainer.countAllElements + ")"
-    }
+	BaseText {
+		anchors.verticalCenter: parent.verticalCenter;
 
-    Button {
-        id: buttonDecr;
+		text: "(" + (paginationContainer.currentIndex * paginationContainer.countElements + 1) + "-" +
+			  ((paginationContainer.pagesSize - 1 != paginationContainer.currentIndex) ?
+				   paginationContainer.currentValue * paginationContainer.countElements :
+				   paginationContainer.countAllElements) + "/" + paginationContainer.countAllElements + ")"
+	}
 
-        anchors.verticalCenter: parent.verticalCenter;
+	Button {
+		id: buttonDecr;
 
-        height: 20;
-        width: 24;
+		anchors.verticalCenter: parent.verticalCenter;
 
-        enabled: listModel.count > 1 && paginationContainer.currentIndex != 0;
+		height: 20;
+		width: 24;
 
-        iconSource: buttonDecr.enabled ? "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal):
-                                         "../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled);
+		enabled: listModel.count > 1 && paginationContainer.currentIndex != 0;
 
-        decorator: buttonDecorator;
+		iconSource: buttonDecr.enabled ? "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal):
+										 "../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled);
 
-        onClicked: {
-            if (paginationContainer.currentIndex >= 1){
-                paginationContainer.currentIndex--;
-                if (paginationContainer.pagesSize >= props.maxElementCount){
-                    paginationContainer.refreshBtn();
-                }
-            }
-        }
-    }
+		decorator: buttonDecorator;
 
-    Row{
-        anchors.verticalCenter: parent.verticalCenter;
+		onClicked: {
+			if (paginationContainer.currentIndex >= 1){
+				paginationContainer.currentIndex--;
+			}
+		}
+	}
 
-        spacing: Style.size_smallMargin;
+	Row{
+		anchors.verticalCenter: parent.verticalCenter;
 
-        Repeater {
-            id: repeaterPagination;
+		spacing: Style.size_smallMargin;
 
-            delegate: Component {Button {
-                id: buttonDelegate;
+		Repeater {
+			id: repeaterPagination;
 
-                width: Math.max(24, helperText.width + 8);
-                height: 20;
+			delegate: Component {Button {
+					id: buttonDelegate;
 
-                decorator: buttonDecorator;
+					width: Math.max(24, helperText.width + 8);
+					height: 20;
 
-                enabled: model.number !== -1 && paginationContainer.currentIndex !== model.number - 1;
-                text: model.number === -1 ? "..." : model.number;
+					decorator: buttonDecorator;
 
-                onClicked: {
-                    paginationContainer.currentIndex = model.number - 1;
-                    if (paginationContainer.pagesSize >= props.maxElementCount){
-                        paginationContainer.refreshBtn();
-                    }
-                }
+					enabled: model.number !== -1 && paginationContainer.currentIndex !== model.number - 1;
+					text: model.number === -1 ? "..." : model.number;
 
-                Rectangle {
-                    anchors.top: buttonDelegate.bottom;
-                    width: parent.width;
-                    height: 2;
+					onClicked: {
+						paginationContainer.currentIndex = model.number - 1;
+					}
 
-                    color: Style.tabSelectedColor;
-                    visible: (model.index == undefined ||  model.selected == undefined) ? false : paginationContainer.pagesSize < props.maxElementCount ? model.index === paginationContainer.currentIndex : model.selected;
-                }
+					Rectangle {
+						anchors.top: buttonDelegate.bottom;
+						width: parent.width;
+						height: 2;
 
-                BaseText {
-                    id: helperText;
-                    text: buttonDelegate.text;
-                    visible: false;
-                }
-            }
-            }
-        }
-    }
+						color: Style.tabSelectedColor;
+						visible: (model.index == undefined ||  model.selected == undefined) ? false : paginationContainer.pagesSize < props.maxElementCount ? model.index === paginationContainer.currentIndex : model.selected;
+					}
 
-    Button {
-        id: buttonIncr;
+					BaseText {
+						id: helperText;
+						text: buttonDelegate.text;
+						visible: false;
+					}
+				}
+			}
+		}
+	}
 
-        anchors.verticalCenter: parent.verticalCenter;
+	Button {
+		id: buttonIncr;
 
-        width: 24;
-        height: 20;
+		anchors.verticalCenter: parent.verticalCenter;
 
-        decorator: buttonDecorator;
+		width: 24;
+		height: 20;
 
-        enabled: listModel.count > 1 && paginationContainer.currentIndex != paginationContainer.pagesSize - 1;
+		decorator: buttonDecorator;
 
-        iconSource: buttonIncr.enabled ? "../../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal):
-                                         "../../../../" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled);
+		enabled: listModel.count > 1 && paginationContainer.currentIndex != paginationContainer.pagesSize - 1;
 
-        onClicked: {
-            if (paginationContainer.currentIndex < paginationContainer.pagesSize - 1){
-                paginationContainer.currentIndex++;
-                if (paginationContainer.pagesSize >= props.maxElementCount){
-                    paginationContainer.refreshBtn();
-                }
-            }
-        }
-    }
+		iconSource: buttonIncr.enabled ? "../../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal):
+										 "../../../../" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled);
 
-    Row {
-        anchors.verticalCenter: parent.verticalCenter;
+		onClicked: {
+			if (paginationContainer.currentIndex < paginationContainer.pagesSize - 1){
+				paginationContainer.currentIndex++;
+			}
+		}
+	}
 
-        spacing: 4;
+	Row {
+		anchors.verticalCenter: parent.verticalCenter;
 
-        BaseText {
-            anchors.verticalCenter: parent.verticalCenter;
-            text: qsTr("Per page: ")
-        }
+		spacing: 4;
 
-        Button {
-            id: count25;
+		BaseText {
+			anchors.verticalCenter: parent.verticalCenter;
+			text: qsTr("Per page: ")
+		}
 
-            anchors.verticalCenter: parent.verticalCenter;
+		Button {
+			id: count25;
 
-            width: 25;
-            height: 20;
+			anchors.verticalCenter: parent.verticalCenter;
 
-            decorator: buttonDecorator;
+			width: 25;
+			height: 20;
 
-            enabled: paginationContainer.countElements != 25;
+			decorator: buttonDecorator;
 
-            text: "25";
+			enabled: paginationContainer.countElements != 25;
 
-            onClicked: {
-                paginationContainer.countElements = 25;
-            }
-        }
+			text: "25";
 
-        Button {
-            id: count50;
+			onClicked: {
+				paginationContainer.countElements = 25;
+			}
+		}
 
-            anchors.verticalCenter: parent.verticalCenter;
+		Button {
+			id: count50;
 
-            width: 25;
-            height: 20;
+			anchors.verticalCenter: parent.verticalCenter;
 
-            decorator: buttonDecorator;
+			width: 25;
+			height: 20;
 
-            enabled: paginationContainer.countElements != 50;
+			decorator: buttonDecorator;
 
-            text: "50";
+			enabled: paginationContainer.countElements != 50;
 
-            onClicked: {
-                paginationContainer.countElements = 50;
-            }
-        }
+			text: "50";
 
-        Button {
-            id: count100;
+			onClicked: {
+				paginationContainer.countElements = 50;
+			}
+		}
 
-            anchors.verticalCenter: parent.verticalCenter;
+		Button {
+			id: count100;
 
-            width: 25;
-            height: 20;
+			anchors.verticalCenter: parent.verticalCenter;
 
-            decorator: buttonDecorator;
+			width: 25;
+			height: 20;
 
-            enabled: paginationContainer.countElements != 100;
+			decorator: buttonDecorator;
 
-            text: "100";
+			enabled: paginationContainer.countElements != 100;
 
-            onClicked: {
-                paginationContainer.countElements = 100;
-            }
-        }
-    }
+			text: "100";
+
+			onClicked: {
+				paginationContainer.countElements = 100;
+			}
+		}
+	}
 }
 
 

@@ -50,11 +50,10 @@ Item {
 	property alias gridDecoratorPath: loaderTableDecorator.source;
 	property alias modelFilter: modelFilterObj;
 	property alias pagination: paginationObj;
-	property alias paginationCurrentIndex: paginationObj.currentIndex;
+	property int paginationCurrentIndex: paginationObj.currentIndex;
 	property alias paginationPageSize: paginationObj.pagesSize;
 	property alias paginationCountAllElements: paginationObj.countAllElements;
-	property alias paginationCountElements: paginationObj.countElements;
-	property int paginationCountElementsInit: paginationObj.countElements;
+	property int paginationCountElements: paginationObj.countElements;
 	property string commandsId;
 
 	property alias grid: gridInternal;
@@ -68,9 +67,6 @@ Item {
 	signal selectedIndexChangedSignal(int index);
 	signal elementsChanged();
 
-	onPaginationCountElementsInitChanged: {
-		 paginationObj.countElements = paginationCountElementsInit;
-	}
 
 	Component.onCompleted: {
 		console.log("CollectionViewBase onCompleted");
@@ -112,6 +108,16 @@ Item {
 
 		}
 	}
+
+	onPaginationCurrentIndexChanged: {
+		paginationObj.currentIndex = paginationCurrentIndex;
+	}
+
+	onPaginationCountElementsChanged: {
+		 paginationObj.countElements = paginationCountElements;
+	}
+
+
 
 	Rectangle {
 		id: backgroundTable;
@@ -444,6 +450,11 @@ Item {
 
 		visible: collectionViewBaseContainer.hasPagination && pagesSize > 1;
 
+
+		onCurrentIndexChanged: {
+			collectionViewBaseContainer.paginationCurrentIndex = currentIndex;
+		}
+
 		onCurrentValueChanged: {
 			console.log("Pagination onCurrentValueChanged", paginationObj.currentValue);
 			gridInternal.selectedIndex = -1;
@@ -453,6 +464,8 @@ Item {
 			collectionViewBaseContainer.openST = false;
 		}
 		onCountElementsChanged: {
+			collectionViewBaseContainer.paginationCountElements = countElements;
+
 			console.log("PAGINATION::Pagination onCountElementsChanged", paginationObj.countElements);
 			gridInternal.selectedIndex = -1;
 			if(this.commandsId){
