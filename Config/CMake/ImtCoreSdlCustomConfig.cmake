@@ -156,7 +156,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 
 	target_sources(${PROJECT_NAME} PRIVATE ${FOUND_DEPS})
 
-	message(STATUS "EXEC: ${SDL_GENERATOR_EXE_PATH} -GS ${ARG_SCHEMA_PATH} -O ${SDL_OUTPUT_DIRECTORY} ${CUSTOM_MODIFICATORS}")
+	message(VERBOSE "EXEC: ${SDL_GENERATOR_EXE_PATH} -GS ${ARG_SCHEMA_PATH} -O ${SDL_OUTPUT_DIRECTORY} ${CUSTOM_MODIFICATORS}")
 
 endmacro()
 
@@ -172,6 +172,7 @@ macro (ImtCoreCustomConfigureSdlQml)
 	list(APPEND MODIFICATORS "--QML")
 	list(APPEND MODIFICATORS "--use-all-modificators")
 	list(APPEND MODIFICATORS "-N=${ARG_QML_NAME}")
+	list(APPEND MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
 
 	ImtCoreGetSdlDeps(
 		INPUT
@@ -210,6 +211,8 @@ macro (ImtCoreCustomConfigureSdlQml)
 		COMMENT
 			"[QML:SDL::${PROJECT_NAME}] Creating resources"
 		VERBATIM)
+
+	message(VERBOSE "EXEC: ${SDL_GENERATOR_EXE_PATH} -GS ${ARG_SCHEMA_PATH} -O ${SDL_OUTPUT_DIRECTORY} ${MODIFICATORS}")
 
 	ImtFutureResourceWrap (
 		${PROJECT_NAME}
