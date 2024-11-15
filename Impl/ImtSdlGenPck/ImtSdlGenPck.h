@@ -10,11 +10,11 @@
 #include <imtsdlgen/CSdlClassCodeGeneratorComp.h>
 #include <imtsdlgen/CBaseClassExtenderComp.h>
 #include <imtsdlgen/CSdlClassTreeModelModificatorComp.h>
-#include <imtsdlgen/CSdlClassGqlModificatorComp.h>
 #include <imtsdlgen/CSdlClassJsonModificatorComp.h>
 #include <imtsdlgen/CQmlCodeGeneratorComp.h>
 #include <imtsdlgen/CQmlCodeMetaGeneratorComp.h>
 #include <imtsdlgen/CQmlCodeCommandIdGeneratorComp.h>
+#include <imtsdlgen/CSdlClassGqlModificatorComp.h>
 #include <imtsdlgen/CGqlWrapClassCodeGeneratorComp.h>
 #include <imtsdlgen/CGqlHandlerBaseClassGeneratorComp.h>
 #include <imtsdlgen/CGqlCollectionControllerBaseClassGeneratorComp.h>
@@ -36,11 +36,11 @@ typedef imtsdlgen::CSdlProcessArgumentsParserComp SdlProcessArgumentsParser;
 typedef imtsdlgen::CSdlClassCodeGeneratorComp SdlClassCodeGenerator;
 typedef imtsdlgen::CBaseClassExtenderComp BaseClassExtender;
 typedef imtsdlgen::CSdlClassTreeModelModificatorComp SdlClassTreeModelModificator;
-typedef imtsdlgen::CSdlClassGqlModificatorComp SdlClassGqlModificator;
 typedef imtsdlgen::CSdlClassJsonModificatorComp SdlClassJsonModificator;
 typedef imtsdlgen::CQmlCodeGeneratorComp QmlCodeGenerator;
 typedef imtsdlgen::CQmlCodeMetaGeneratorComp QmlCodeMetaGenerator;
 typedef imtsdlgen::CQmlCodeCommandIdGeneratorComp QmlCodeCommandIdGenerator;
+typedef imtsdlgen::CSdlClassGqlModificatorComp SdlClassGqlModificator;
 typedef imtsdlgen::CGqlWrapClassCodeGeneratorComp GqlWrapClassCodeGenerator;
 typedef imtsdlgen::CGqlHandlerBaseClassGeneratorComp GqlHandlerBaseClassGenerator;
 typedef imtsdlgen::CGqlCollectionControllerBaseClassGeneratorComp GqlCollectionControllerBaseClassGenerator;
