@@ -1,0 +1,94 @@
+#pragma once
+
+
+// Qt includes
+#include <QtCore/QThread>
+#include <QtCore/QMutex>
+
+// ACF includes
+#include <istd/TDelPtr.h>
+
+// ImtCore includes
+#include <imtrest/IRequestServlet.h>
+#include <imtrest/ISender.h>
+
+// Qt includes
+#include <QtWebSockets/QWebSocket>
+#include <QtCore/QPointer>
+
+
+namespace imtrest
+{
+
+class CWebSocketServerComp;
+
+class CWebSocket: public QObject
+{
+	Q_OBJECT
+public:
+	CWebSocket(imtrest::CWebSocketServerComp *parent);
+public Q_SLOTS:
+	void OnWebSocketTextMessage(const QString& textMessage);
+Q_SIGNALS:
+	void SendTextMessage(const QByteArray& data) const;
+	void RegisterSender(const QByteArray& clientId, QWebSocket* webSocketPtr);
+private:
+	CWebSocketServerComp* m_server;
+	imtrest::IProtocolEngine* m_enginePtr;
+	imtrest::IProtocolEngine* m_httpEnginePtr;
+	imtrest::IRequestServlet* m_requestServerHandlerPtr;
+	imtrest::IRequestServlet* m_requestClientHandlerPtr;
+};
+
+
+class CWebSocketThread:
+			public QThread
+{
+	Q_OBJECT
+public:
+	enum Status
+	{
+		ST_START,
+		ST_PROCESS,
+		ST_CLOSE
+	};
+
+	explicit CWebSocketThread(imtrest::CWebSocketServerComp *parent);
+	void SetWebSocket(QWebSocket* webSocketPtr);
+	void SetSocketStatus(Status socketStatus);
+	Status GetSocketStatus();
+	QByteArray GetRequestId();
+	// imtrest::IRequestServlet* GetRequestServlet();
+
+	[[nodiscard]] bool IsSecureConnection() const;
+	void EnableSecureConnection(bool isSecureConnection = true);
+
+	// reimplemented (QThread)
+	void run() override;
+
+private Q_SLOTS:
+	void OnSocketDisconnected();
+	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
+	void OnError(QAbstractSocket::SocketError error);
+	void OnTimeout();
+	void OnAcceptError(QAbstractSocket::SocketError socketError);
+	void OnSslErrors(const QList<QSslError> &errors);
+	void OnSendTextMessage(const QByteArray& data) const;
+
+private:
+	CWebSocketServerComp* m_server;
+	imtrest::IProtocolEngine* m_enginePtr;
+	mutable QMutex m_socketDescriptorMutex;
+	mutable QMutex m_statusMutex;
+	Status m_status;
+	QPointer<QWebSocket> m_socket;
+	bool m_isSecureConnection;
+	istd::TDelPtr<CWebSocket> m_webSocket;
+
+	QByteArray m_requestId;
+};
+
+
+} // namespace imtrest
+
+

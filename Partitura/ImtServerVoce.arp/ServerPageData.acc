@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5274" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ConnectionCollection" PackageId="ImtServicePck" ComponentId="ConnectionCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionDescriptions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Server tcp port to be listened</Value>
+                                <Value>Server websocket port to be listened</Value>
+                                <Value>Server tcp port to be connected to Puma</Value>
+                                <Value>Server websocket port to be connected to Puma</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionNames" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Lisa main HTTP</Value>
+                                <Value>Lisa main WebSocket</Value>
+                                <Value>Puma main HTTP</Value>
+                                <Value>Puma main WebSocket</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionServiceTypeNames" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Lisa</Value>
+                                <Value>Lisa</Value>
+                                <Value>Puma</Value>
+                                <Value>Puma</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionTypes" Type="Integer[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>0</Value>
+                                <Value>0</Value>
+                                <Value>1</Value>
+                                <Value>1</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionUrlListCompPtr" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Server/ServerPort</Value>
+                                <Value>Server/WebSocketServerPort</Value>
+                                <Value>Server/PumaUrl</Value>
+                                <Value>Server/PumaWebSocketPort</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionUsageIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>LisaUrlTcp</Value>
+                                <Value>LisaUrlWs</Value>
+                                <Value>PumaUrlTcp</Value>
+                                <Value>PumaUrlWs</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServiceTypeName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Lisa"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LoggingParams/TracingConfiguration"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="FileAutoPersistence" PackageId="ImtCoreVoce" ComponentId="FileAutoPersistence">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="DefaultPath">
+                        <Data IsEnabled="true" Value="LisaServerSettings.xml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="LocationType">
+                        <Data IsEnabled="true" Value="105"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Object" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Preferences"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="FileBasedSslConfiguration" PackageId="ImtComVoce" ComponentId="FileBasedSslConfiguration">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableSsl" Type="Boolean" ExportId="EnableSsl">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LoggingParams" PackageId="ImtCoreVoce" ComponentId="LoggingParams">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="Preferences" PackageId="BasePck" ComponentId="ComposedParamsSet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Server</Value>
+                                <Value>LoggingParams</Value>
+                                <Value>FileBasedSslConfiguration</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Database</Value>
+                                <Value>Server</Value>
+                                <Value>Backup</Value>
+                                <Value>Log</Value>
+                                <Value>SslConfiguration</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Default"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Server" PackageId="ImtHttpServerVoce" ComponentId="AuthorizableServerConnectionParams">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="7776"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketDefaultPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="8776"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtservice::IConnectionCollection" ComponentId="ConnectionCollection"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="Preferences"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="Preferences"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="AutoPersistence" ComponentId="FileAutoPersistence/AutoPersistence"/>
+        <Component ExportedId="FileBasedSslConfiguration" ComponentId="FileBasedSslConfiguration"/>
+        <Component ExportedId="PumaUrl" ComponentId="Server/PumaUrl"/>
+        <Component ExportedId="PumaWebSocketPort" ComponentId="Server/PumaWebSocketPort"/>
+        <Component ExportedId="ServerPort" ComponentId="Server/ServerPort"/>
+        <Component ExportedId="TracingConfiguration" ComponentId="LoggingParams/TracingConfiguration"/>
+        <Component ExportedId="WebSocketServerPort" ComponentId="Server/WebSocketServerPort"/>
+    </ExportedComponents>
+</Acf>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5274" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="Demultiplexer" X="1000" Y="200" Note=""/>
+        <Element ComponentName="RootDataController" X="600" Y="375" Note=""/>
+        <Element ComponentName="StandardGraphQlHandlers" X="600" Y="200" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="Observers">
+            <PositionMap>
+                <Element ComponentName="FeatureCollectionObserver" X="575" Y="75" Note=""/>
+                <Element ComponentName="LicenseCollectionObserver" X="575" Y="200" Note=""/>
+                <Element ComponentName="ProductCollectionObserver" X="575" Y="325" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
+</Acf>

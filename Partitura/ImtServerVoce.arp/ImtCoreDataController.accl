@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5274" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApplicationController" X="450" Y="125" Note=""/>
+        <Element ComponentName="AuthorizationManagementController" X="225" Y="300" Note=""/>
+        <Element ComponentName="PermissionController" X="1000" Y="275" Note=""/>
+        <Element ComponentName="SingleProductPermission" X="1000" Y="400" Note=""/>
+        <Element ComponentName="UrlParamRepresentationController" X="650" Y="375" Note=""/>
+        <Element ComponentName="WebSocketPortController" X="650" Y="275" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
