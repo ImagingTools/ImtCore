@@ -85,6 +85,18 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 		::exit(3);
 	}
 
+	const bool isCodeCreated = CreateCode();
+	lockFile.unlock();
+
+	if (!isCodeCreated){
+		::exit(4);
+	}
+
+	::exit(0);
+}
+
+bool CSdlGeneralManagerComp::CreateCode()
+{
 	// create code
 	const int sdlProcessorsCount = m_sdlProcessorsCompListPtr.GetCount();
 	for (int i = 0; i < sdlProcessorsCount; ++i){
@@ -97,14 +109,12 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 			if (processResultResult != iproc::IProcessor::TS_OK){
 				SendCriticalMessage(0, QString("Unable to process schema: '%1'").arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
 
-				::exit(4);
+				return false;
 			}
 		}
 	}
 
-	lockFile.unlock();
-
-	::exit(0);
+	return true;
 }
 
 

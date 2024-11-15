@@ -31,9 +31,12 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	virtual bool CreateCode();
+
+	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
-private:
+protected:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_sdlArgumentParserCompPtr);
 	I_REF(iproc::IProcessor, m_sdlParserCompPtr);
 	I_REF(iproc::IProcessor, m_sdlSchemaDependenciesCollectorCompPtr);
