@@ -82,8 +82,6 @@ function(ImtCoreAddSdlSearchPath ARG_SDL_PATH)
 endfunction()
 
 
-#! \param CUSTOM_TARGETS_DEPS - if enabled, dependencies will NOT be soved, using the SDL generator \warning if enabled, you MUST provide CUSTOM_HEADER_DEP CUSTOM_SOURCE_DEP!
-#! \param CUSTOM_SOURCE_DEP - source file dependency				\note this param make sence only if \c CUSTOM_TARGETS_DEPS is enabled
 macro (ImtCoreCustomConfigureSdlCpp)
 	set(oneValueArgs
 				SCHEMA_PATH
@@ -102,9 +100,15 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	list(APPEND CUSTOM_MODIFICATORS "--use-all-modificators")
 	list(APPEND CUSTOM_MODIFICATORS "-Psdl")
 	list(APPEND CUSTOM_MODIFICATORS "-Bistd::IPolymorphic=istd/IPolymorphic.h")
-	list(APPEND CUSTOM_MODIFICATORS "-JCPP=${SDL_CPP_OUTPUT_DIRECTORY}/${ARG_SOURCE_NAME}.cpp")
-	list(APPEND CUSTOM_MODIFICATORS "-JH=${SDL_CPP_OUTPUT_DIRECTORY}/${ARG_SOURCE_NAME}.h")
 	list(APPEND CUSTOM_MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
+
+	if (ARG_SOURCE_NAME)
+		set(SDL_CPP_OUTPUT_DIRECTORY "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP")
+		list(APPEND CUSTOM_MODIFICATORS "-JCPP=${SDL_CPP_OUTPUT_DIRECTORY}/${ARG_SOURCE_NAME}.cpp")
+		list(APPEND CUSTOM_MODIFICATORS "-JH=${SDL_CPP_OUTPUT_DIRECTORY}/${ARG_SOURCE_NAME}.h")
+	else()
+		list(APPEND CUSTOM_MODIFICATORS "--auto-join")
+	endif()
 
 	list(LENGTH GLOBAL_SDL_SEARCH_PATHS SDL_PATHS_COUNT)
 	if (SDL_PATHS_COUNT GREATER 0)
@@ -171,8 +175,13 @@ macro (ImtCoreCustomConfigureSdlQml)
 	set(MODIFICATORS)
 	list(APPEND MODIFICATORS "--QML")
 	list(APPEND MODIFICATORS "--use-all-modificators")
-	list(APPEND MODIFICATORS "-N=${ARG_QML_NAME}")
 	list(APPEND MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
+
+	if (ARG_QML_NAME)
+		list(APPEND MODIFICATORS "-N=${ARG_QML_NAME}")
+	else()
+		list(APPEND MODIFICATORS "--auto-join")
+	endif()
 
 	ImtCoreGetSdlDeps(
 		INPUT
@@ -192,7 +201,7 @@ macro (ImtCoreCustomConfigureSdlQml)
 		OUT_DIR
 			"${SDL_OUTPUT_DIRECTORY}"
 		MODIFICATORS
-			"${CUSTOM_MODIFICATORS}"
+			"${MODIFICATORS}"
 		RESULT_VARIABLE
 			FOUND_SCHEMA_DEPS)
 
@@ -223,23 +232,12 @@ endmacro()
 
 #! CPP+QML+GQL \NOTE this function enables ALL modificators
 #! \param SCHEMA_PATH		- The absolute path to the schema file to be compiled.
-#! \param VERSION			- Defines the schema's version (also part of the OUTPUT directory path)
-#! \param SOURCE_NAME		- The output source filename, should be provided without an extension, and the function automatically adds the appropriate extension(.cpp).
-#! \param QML_NAME			- The QML module name. Also part of the OUTPUT directory path and filename of QRC file
-#! \param CPP_EXTRA_DEPS	- A list of additional dependencies for cpp generator
-#! \param QML_EXTRADEPS		- A list of additional dependencies for QML generator
-#! \param FOUND_CPP_EXTRA_DEPS_OUT_VAR - [OUT] A list of dependencies, to be created by a cpp generator
-#! \param FOUND_QML_EXTRA_DEPS_OUT_VAR - [OUT] A list of dependencies, to be created by a QML generator
 macro (ImtCoreCustomConfigureSdlCppQml)
 	set(oneValueArgs
 		SCHEMA_PATH
 		VERSION
 		SOURCE_NAME
-		QML_NAME
-		CPP_EXTRA_DEPS
-		QML_EXTRADEPS
-		FOUND_CPP_EXTRA_DEPS_OUT_VAR
-		FOUND_QML_EXTRA_DEPS_OUT_VAR)
+		QML_NAME)
 	cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
 
 	if (ARG_SOURCE_NAME)
