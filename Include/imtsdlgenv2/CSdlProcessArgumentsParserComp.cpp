@@ -41,9 +41,9 @@ QList<QCommandLineOption> CSdlProcessArgumentsParserComp::PrepareCommandLineOpti
 	QList<QCommandLineOption> retVal;
 
 	m_generationCommandLinePtr.reset(new QCommandLineOption(
-		{"G", "generation"},
+		{"GG", "generation"},
 		"{1|2} Defines the version of the generator",
-		"V2Option_Generation",
+		"Generation",
 		"0"));
 
 	retVal << *m_generationCommandLinePtr;
