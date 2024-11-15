@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5302" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="GqlCollectionControllerBaseClassGenerator" X="450" Y="425" Note=""/>
+        <Element ComponentName="GqlHandlerBaseClassGenerator" X="425" Y="300" Note=""/>
+        <Element ComponentName="GqlWrapClassCodeGenerator" X="800" Y="425" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
