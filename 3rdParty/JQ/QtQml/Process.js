@@ -1,0 +1,15 @@
+const QtObject = require("./QtObject")
+const String = require("./String")
+const Signal = require("./Signal")
+
+class RemoteFileController extends QtObject {
+    static meta = Object.assign({}, QtObject.meta, {
+        finished: {type:Signal, slotName:'onFinished', args:[]},
+    })
+
+
+    start(...args){}
+    setEnviroment(...args){}
+}
+
+module.exports = RemoteFileController

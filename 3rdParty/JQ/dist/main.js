@@ -159,6 +159,16 @@ eval("const QtObject = __webpack_require__(/*! ./QtObject */ \"./QtQml/QtObject.
 
 /***/ }),
 
+/***/ "./QtQml/Date.js":
+/*!***********************!*\
+  !*** ./QtQml/Date.js ***!
+  \***********************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("const Property = __webpack_require__(/*! ./Property */ \"./QtQml/Property.js\")\r\n\r\nclass Date extends Property {\r\n    __typecasting(value){\r\n        if(typeof value === 'object') {\r\n            if(value instanceof Property) return value[Symbol.toPrimitive]()\r\n        }\r\n        return value\r\n    }\r\n}\r\n\r\nmodule.exports = Date\n\n//# sourceURL=webpack://jq/./QtQml/Date.js?");
+
+/***/ }),
+
 /***/ "./QtQml/Double.js":
 /*!*************************!*\
   !*** ./QtQml/Double.js ***!
@@ -166,6 +176,16 @@ eval("const QtObject = __webpack_require__(/*! ./QtObject */ \"./QtQml/QtObject.
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 eval("const Property = __webpack_require__(/*! ./Property */ \"./QtQml/Property.js\")\r\n\r\nclass Double extends Property {\r\n    static defaultValue = 0\r\n    \r\n    __typecasting(value){\r\n        if(typeof value === 'object') {\r\n            if(value instanceof Property) return value[Symbol.toPrimitive]('number')\r\n        }\r\n        return value\r\n    }\r\n}\r\n\r\nmodule.exports = Double\n\n//# sourceURL=webpack://jq/./QtQml/Double.js?");
+
+/***/ }),
+
+/***/ "./QtQml/FileIO.js":
+/*!*************************!*\
+  !*** ./QtQml/FileIO.js ***!
+  \*************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("const QtObject = __webpack_require__(/*! ./QtObject */ \"./QtQml/QtObject.js\")\r\nconst String = __webpack_require__(/*! ./String */ \"./QtQml/String.js\")\r\nconst Signal = __webpack_require__(/*! ./Signal */ \"./QtQml/Signal.js\")\r\nconst QtFunctions = __webpack_require__(/*! ../Qt/functions */ \"./Qt/functions.js\")\r\n\r\nclass RemoteFileController extends QtObject {\r\n    static meta = Object.assign({}, QtObject.meta, {\r\n        source: { type: String, value: '', signalName: 'sourceChanged' },\r\n\r\n        sourceChanged: {type:Signal, slotName:'onSourceChanged', args:[]},\r\n    })\r\n\r\n\r\n    read(){\r\n\r\n    }\r\n\r\n    write(data){\r\n        let a = document.createElement(\"a\")\r\n        let file = new Blob([data], {type: 'text/plain'})\r\n        a.href = URL.createObjectURL(file)\r\n        a.download = this.source\r\n        a.click()\r\n        a.remove()\r\n    }\r\n\r\n    setSource(source){\r\n        this.source = source\r\n    }\r\n}\r\n\r\nmodule.exports = RemoteFileController\n\n//# sourceURL=webpack://jq/./QtQml/FileIO.js?");
 
 /***/ }),
 
@@ -319,6 +339,16 @@ eval("const GroupProperty = __webpack_require__(/*! ./GroupProperty */ \"./QtQml
 
 /***/ }),
 
+/***/ "./QtQml/Process.js":
+/*!**************************!*\
+  !*** ./QtQml/Process.js ***!
+  \**************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("const QtObject = __webpack_require__(/*! ./QtObject */ \"./QtQml/QtObject.js\")\r\nconst String = __webpack_require__(/*! ./String */ \"./QtQml/String.js\")\r\nconst Signal = __webpack_require__(/*! ./Signal */ \"./QtQml/Signal.js\")\r\n\r\nclass RemoteFileController extends QtObject {\r\n    static meta = Object.assign({}, QtObject.meta, {\r\n        finished: {type:Signal, slotName:'onFinished', args:[]},\r\n    })\r\n\r\n\r\n    start(...args){}\r\n    setEnviroment(...args){}\r\n}\r\n\r\nmodule.exports = RemoteFileController\n\n//# sourceURL=webpack://jq/./QtQml/Process.js?");
+
+/***/ }),
+
 /***/ "./QtQml/Property.js":
 /*!***************************!*\
   !*** ./QtQml/Property.js ***!
@@ -365,7 +395,7 @@ eval("const QObject = __webpack_require__(/*! ./QObject */ \"./QtQml/QObject.js\
   \************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("module.exports = {\r\n    GroupProperty: __webpack_require__(/*! ./GroupProperty */ \"./QtQml/GroupProperty.js\"),\r\n    AnchorLine: __webpack_require__(/*! ./AnchorLine */ \"./QtQml/AnchorLine.js\"),\r\n    Anchors: __webpack_require__(/*! ./Anchors */ \"./QtQml/Anchors.js\"),\r\n    Border: __webpack_require__(/*! ./Border */ \"./QtQml/Border.js\"),\r\n    SourceSize: __webpack_require__(/*! ./SourceSize */ \"./QtQml/SourceSize.js\"),\r\n    Font: __webpack_require__(/*! ./Font */ \"./QtQml/Font.js\"),\r\n    LinkedBool: __webpack_require__(/*! ./LinkedBool */ \"./QtQml/LinkedBool.js\"),\r\n    point: __webpack_require__(/*! ./Point */ \"./QtQml/Point.js\"),\r\n\r\n    QObject: __webpack_require__(/*! ./QObject */ \"./QtQml/QObject.js\"),\r\n    QQmlComponent: __webpack_require__(/*! ./QQmlComponent */ \"./QtQml/QQmlComponent.js\"),\r\n    Component: __webpack_require__(/*! ./Component */ \"./QtQml/Component.js\"),\r\n    QtObject: __webpack_require__(/*! ./QtObject */ \"./QtQml/QtObject.js\"),\r\n    Binding: __webpack_require__(/*! ./Binding */ \"./QtQml/Binding.js\"),\r\n    Connections: __webpack_require__(/*! ./Connections */ \"./QtQml/Connections.js\"),\r\n    Timer: __webpack_require__(/*! ./Timer */ \"./QtQml/Timer.js\"),\r\n    GqlRequest: __webpack_require__(/*! ./GqlRequest */ \"./QtQml/GqlRequest.js\"),\r\n    RemoteFileController: __webpack_require__(/*! ./RemoteFileController */ \"./QtQml/RemoteFileController.js\"),\r\n    \r\n    real: __webpack_require__(/*! ./Real */ \"./QtQml/Real.js\"),\r\n    double: __webpack_require__(/*! ./Double */ \"./QtQml/Double.js\"),\r\n    int: __webpack_require__(/*! ./Int */ \"./QtQml/Int.js\"),\r\n    string: __webpack_require__(/*! ./String */ \"./QtQml/String.js\"),\r\n    color: __webpack_require__(/*! ./Color */ \"./QtQml/Color.js\"),\r\n    bool: __webpack_require__(/*! ./Bool */ \"./QtQml/Bool.js\"),\r\n    var: __webpack_require__(/*! ./Var */ \"./QtQml/Var.js\"),\r\n    alias: __webpack_require__(/*! ./Alias */ \"./QtQml/Alias.js\"),\r\n    list: __webpack_require__(/*! ./List */ \"./QtQml/List.js\"),\r\n    variant: __webpack_require__(/*! ./Variant */ \"./QtQml/Variant.js\"),\r\n\r\n    Signal: __webpack_require__(/*! ./Signal */ \"./QtQml/Signal.js\"),\r\n    SpecialSignal: __webpack_require__(/*! ./SpecialSignal */ \"./QtQml/SpecialSignal.js\"),\r\n    SpecialProperty: __webpack_require__(/*! ./SpecialProperty */ \"./QtQml/SpecialProperty.js\"),\r\n\r\n    Screen: __webpack_require__(/*! ./Screen */ \"./QtQml/Screen.js\"),\r\n\r\n    Models: __webpack_require__(/*! ./Models/Models */ \"./QtQml/Models/Models.js\"),\r\n\r\n    XMLHttpRequest: {\r\n        UNSENT: 0,\r\n        OPENED: 1,\r\n        HEADERS_RECEIVED: 2,\r\n        LOADING: 3,\r\n        DONE: 4,\r\n    },\r\n    FileReader: {\r\n        EMPTY: 0,\r\n        LOADING: 1,\r\n        DONE: 2,\r\n    },\r\n}\n\n//# sourceURL=webpack://jq/./QtQml/QtQml.js?");
+eval("module.exports = {\r\n    GroupProperty: __webpack_require__(/*! ./GroupProperty */ \"./QtQml/GroupProperty.js\"),\r\n    AnchorLine: __webpack_require__(/*! ./AnchorLine */ \"./QtQml/AnchorLine.js\"),\r\n    Anchors: __webpack_require__(/*! ./Anchors */ \"./QtQml/Anchors.js\"),\r\n    Border: __webpack_require__(/*! ./Border */ \"./QtQml/Border.js\"),\r\n    SourceSize: __webpack_require__(/*! ./SourceSize */ \"./QtQml/SourceSize.js\"),\r\n    Font: __webpack_require__(/*! ./Font */ \"./QtQml/Font.js\"),\r\n    LinkedBool: __webpack_require__(/*! ./LinkedBool */ \"./QtQml/LinkedBool.js\"),\r\n    point: __webpack_require__(/*! ./Point */ \"./QtQml/Point.js\"),\r\n    date: __webpack_require__(/*! ./Date */ \"./QtQml/Date.js\"),\r\n\r\n    QObject: __webpack_require__(/*! ./QObject */ \"./QtQml/QObject.js\"),\r\n    QQmlComponent: __webpack_require__(/*! ./QQmlComponent */ \"./QtQml/QQmlComponent.js\"),\r\n    Component: __webpack_require__(/*! ./Component */ \"./QtQml/Component.js\"),\r\n    QtObject: __webpack_require__(/*! ./QtObject */ \"./QtQml/QtObject.js\"),\r\n    Binding: __webpack_require__(/*! ./Binding */ \"./QtQml/Binding.js\"),\r\n    Connections: __webpack_require__(/*! ./Connections */ \"./QtQml/Connections.js\"),\r\n    Timer: __webpack_require__(/*! ./Timer */ \"./QtQml/Timer.js\"),\r\n    GqlRequest: __webpack_require__(/*! ./GqlRequest */ \"./QtQml/GqlRequest.js\"),\r\n    RemoteFileController: __webpack_require__(/*! ./RemoteFileController */ \"./QtQml/RemoteFileController.js\"),\r\n    FileIO: __webpack_require__(/*! ./FileIO */ \"./QtQml/FileIO.js\"),\r\n    Process: __webpack_require__(/*! ./Process */ \"./QtQml/Process.js\"),\r\n    \r\n    real: __webpack_require__(/*! ./Real */ \"./QtQml/Real.js\"),\r\n    double: __webpack_require__(/*! ./Double */ \"./QtQml/Double.js\"),\r\n    int: __webpack_require__(/*! ./Int */ \"./QtQml/Int.js\"),\r\n    string: __webpack_require__(/*! ./String */ \"./QtQml/String.js\"),\r\n    color: __webpack_require__(/*! ./Color */ \"./QtQml/Color.js\"),\r\n    bool: __webpack_require__(/*! ./Bool */ \"./QtQml/Bool.js\"),\r\n    var: __webpack_require__(/*! ./Var */ \"./QtQml/Var.js\"),\r\n    alias: __webpack_require__(/*! ./Alias */ \"./QtQml/Alias.js\"),\r\n    list: __webpack_require__(/*! ./List */ \"./QtQml/List.js\"),\r\n    variant: __webpack_require__(/*! ./Variant */ \"./QtQml/Variant.js\"),\r\n\r\n    Signal: __webpack_require__(/*! ./Signal */ \"./QtQml/Signal.js\"),\r\n    SpecialSignal: __webpack_require__(/*! ./SpecialSignal */ \"./QtQml/SpecialSignal.js\"),\r\n    SpecialProperty: __webpack_require__(/*! ./SpecialProperty */ \"./QtQml/SpecialProperty.js\"),\r\n\r\n    Screen: __webpack_require__(/*! ./Screen */ \"./QtQml/Screen.js\"),\r\n\r\n    Models: __webpack_require__(/*! ./Models/Models */ \"./QtQml/Models/Models.js\"),\r\n\r\n    XMLHttpRequest: {\r\n        UNSENT: 0,\r\n        OPENED: 1,\r\n        HEADERS_RECEIVED: 2,\r\n        LOADING: 3,\r\n        DONE: 4,\r\n    },\r\n    FileReader: {\r\n        EMPTY: 0,\r\n        LOADING: 1,\r\n        DONE: 2,\r\n    },\r\n}\n\n//# sourceURL=webpack://jq/./QtQml/QtQml.js?");
 
 /***/ }),
 

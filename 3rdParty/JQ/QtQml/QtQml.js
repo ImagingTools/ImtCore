@@ -7,6 +7,7 @@ module.exports = {
     Font: require("./Font"),
     LinkedBool: require("./LinkedBool"),
     point: require("./Point"),
+    date: require("./Date"),
 
     QObject: require("./QObject"),
     QQmlComponent: require("./QQmlComponent"),
@@ -17,6 +18,8 @@ module.exports = {
     Timer: require("./Timer"),
     GqlRequest: require("./GqlRequest"),
     RemoteFileController: require("./RemoteFileController"),
+    FileIO: require("./FileIO"),
+    Process: require("./Process"),
     
     real: require("./Real"),
     double: require("./Double"),
