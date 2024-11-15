@@ -13,6 +13,7 @@
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 #include <imtbase/CTimeFilterParamRepresentationController.h>
 #include <imtgql/IGqlRequestExtractor.h>
+#include <imtbase/IComplexCollectionFilter.h>
 
 
 #undef GetObject
@@ -31,6 +32,8 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CObjectCollectionControllerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)
+		I_ASSIGN_MULTI_0(m_replaceableFieldsAttrPtr, "ReplaceableFilterFields", "List of filter fields to be replaced", false);
+		I_ASSIGN_MULTI_0(m_replacementFieldsAttrPtr, "ReplacementFilterFields", "List of filter fields to replace with", false);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_documentChangeGeneratorCompPtr, "DocumentChangeGenerator", "Change generator for the collection object", false, "DocumentChangeGenerator");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
@@ -71,6 +74,8 @@ public:
 	virtual istd::IChangeable* ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const override;
 
 protected:
+	void ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const;
+
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const;
 	virtual QByteArray GetObjectIdFromInputParams(const imtgql::CGqlObject &inputParams) const;
 	virtual QByteArray GetObjectIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
@@ -167,6 +172,11 @@ protected:
 	virtual void OnComponentCreated() override;
 
 protected:
+	QMap<QByteArray, QByteArray> m_fieldReplacementMap;
+
+protected:
+	I_MULTIATTR(QByteArray, m_replaceableFieldsAttrPtr);
+	I_MULTIATTR(QByteArray, m_replacementFieldsAttrPtr);
 	I_REF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_headersProviderCompPtr);

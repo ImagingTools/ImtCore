@@ -46,6 +46,18 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 	if (!m_objectCollectionCompPtr.EnsureInitialized()){
 		qDebug() << "Invalid object collection component";
 	}
+
+
+	int count = m_replaceableFieldsAttrPtr.GetCount();
+	count = qMax(count, m_replacementFieldsAttrPtr.GetCount());
+
+	for (int i = 0; i < count; i++){
+		QByteArray replaceableField = m_replaceableFieldsAttrPtr[i];
+		QByteArray replacementField = m_replacementFieldsAttrPtr[i];
+		if (!replaceableField.isEmpty() && ! replacementField.isEmpty()){
+			m_fieldReplacementMap[replaceableField] = replacementField;
+		}
+	}
 }
 
 
@@ -123,6 +135,30 @@ istd::IChangeable* CObjectCollectionControllerCompBase::ExtractObject(const imtg
 
 
 // protected methods
+
+void CObjectCollectionControllerCompBase::ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const
+{
+	for (imtbase::IComplexCollectionFilter::FieldSortingInfo& fieldSortingInfo : filter.GetSortingInfo()){
+		if (m_fieldReplacementMap.contains(fieldSortingInfo.fieldId)){
+			fieldSortingInfo.fieldId = m_fieldReplacementMap[fieldSortingInfo.fieldId];
+		}
+	}
+
+	std::function<void (imtbase::IComplexCollectionFilter::GroupFilter&)> ProcessGroupFilter = [&](imtbase::IComplexCollectionFilter::GroupFilter& groupFilter){
+		for (imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : groupFilter.fieldFilters){
+			if (m_fieldReplacementMap.contains(fieldFilter.fieldId)){
+				fieldFilter.fieldId = m_fieldReplacementMap[fieldFilter.fieldId];
+			}
+		}
+
+		for (imtbase::IComplexCollectionFilter::GroupFilter& groupFilterItem : groupFilter.groupFilters){
+			ProcessGroupFilter(groupFilterItem);
+		}
+	};
+
+	ProcessGroupFilter(filter.GetFieldsFilter());
+}
+
 
 bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
@@ -1311,6 +1347,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 		if (isComplexFilterOk){
 			istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
 			if (imtcol::CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRepresentationToModel(complexFilterSdl, *complexFilterPtr, GetLogPtr())){
+				ReplaceComplexFilterFields(*complexFilterPtr);
 				filterParams.SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
 			}
 		}
