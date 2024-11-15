@@ -377,11 +377,11 @@ graphqlclient.depends = DesignTokenCreator
 
 
 SUBDIRS += GraphQlServerTest
-GraphQlServerTest.file +=  ../../Include/GraphQlServerTest/QMake/GraphQlServerTest.pro
+GraphQlServerTest.file +=  ../../Tests/GraphQlServerTest/QMake/GraphQlServerTest.pro
 GraphQlServerTest.depends = DesignTokenCreator
 
 SUBDIRS += GraphQlClientTest
-GraphQlClientTest.file +=  ../../Include/GraphQlClientTest/QMake/GraphQlClientTest.pro
+GraphQlClientTest.file +=  ../../Tests/GraphQlClientTest/QMake/GraphQlClientTest.pro
 GraphQlClientTest.depends = DesignTokenCreator
 
 

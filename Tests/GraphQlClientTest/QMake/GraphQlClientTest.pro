@@ -5,9 +5,9 @@ include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR
-LIBS += -limtbase -graphqlclient -graphqlserver
+LIBS += -limtbase -lgraphqlclient -lgraphqlserver
 
-QT += core gui
+QT += core gui network
 
 CONFIG += console
 
@@ -20,14 +20,5 @@ win32-msvc*{
 }
 
 
-# Set configuration of custom builds:
-# ARX Compiler:
-ARXC_CONFIG = $$PWD/../../../Config/ImtCore.awc
-ARXC_FILES += $$PWD/../GraphQlClientTest.acc
-ARXC_OUTDIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 
-
-include($(ACFDIR)/Config/QMake/AcfQt.pri)
-include($(ACFDIR)/Config/QMake/AcfStd.pri)
-include($(ACFDIR)/Config/QMake/CustomBuild.pri)
 
