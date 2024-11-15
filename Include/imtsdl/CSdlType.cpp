@@ -5,6 +5,7 @@
 #include <iser/CArchiveTag.h>
 #include <iser/IArchive.h>
 #include <iser/CPrimitiveTypesSerializer.h>
+#include <iprm/CParamsSet.h>
 
 
 // ImtCore includes
@@ -128,6 +129,33 @@ void CSdlType::SetQmlImportDeclaration(const QString& qmlImportDeclaration)
 }
 
 
+const iprm::IParamsSet& CSdlType::GetSchemaParams() const
+{
+	if (m_schemaParamsPtr == nullptr){
+		static const iprm::CParamsSet dummyParams;
+
+		return dummyParams;
+	}
+
+	return *m_schemaParamsPtr;
+}
+
+
+void CSdlType::SetSchemaParamsPtr(const std::shared_ptr<iprm::IParamsSet>& schemaParamsPtr)
+{
+	m_schemaParamsPtr = schemaParamsPtr;
+
+	// ensure, params is comparable
+	if (schemaParamsPtr != nullptr){
+		const bool isEqual = schemaParamsPtr->IsEqual(*schemaParamsPtr);
+		if (!isEqual){
+			Q_ASSERT_X(false, "Initializing incomparable paras!", __func__);
+			qFatal("Initializing incomparable paras!");
+		}
+	}
+}
+
+
 // reimplemented(iser::ISerializable)
 
 bool CSdlType::Serialize(iser::IArchive& archive)
@@ -181,6 +209,8 @@ bool CSdlType::operator==(const CSdlType& other) const
 	retVal = retVal && m_schemaFile == other.m_schemaFile;
 	retVal = retVal && m_isExternal == other.m_isExternal;
 	retVal = retVal && m_qmlImportDeclaration == other.m_qmlImportDeclaration;
+	retVal = retVal && GetSchemaParams().IsEqual(other.GetSchemaParams());
+
 
 	return retVal;
 }

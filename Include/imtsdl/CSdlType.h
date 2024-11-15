@@ -1,12 +1,15 @@
 #pragma once
 
 
+// std includes
+#include <memory>
+
 // Qt includes
 #include <QtCore/QString>
 
 //Acf includes
 #include <iser/ISerializable.h>
-#include <imod/CModelUpdateBridge.h>
+#include <iprm/IParamsSet.h>
 
 // ImtCore includes
 #include <imtsdl/imtsdl.h>
@@ -16,7 +19,7 @@ namespace imtsdl
 {
 
 
-class CSdlType: public iser::ISerializable
+class CSdlType: virtual public iser::ISerializable
 {
 
 public:
@@ -43,13 +46,15 @@ public:
 	[[nodiscard]] QString GetQmlImportDeclaration() const;
 	void SetQmlImportDeclaration(const QString& qmlImportDeclaration);
 
+	[[nodiscard]] const iprm::IParamsSet& GetSchemaParams() const;
+	void SetSchemaParamsPtr(const std::shared_ptr<iprm::IParamsSet>& schemaParamsPtr);
+
 	// reimplemented(iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// operators
 	[[nodiscard]] bool operator==(const CSdlType& other) const;
 	[[nodiscard]] bool operator!=(const CSdlType& other) const { return !(operator==(other)); }
-
 
 private:
 	QString m_name;
@@ -59,6 +64,7 @@ private:
 	QString m_schemaFile;
 	bool m_isExternal;
 	QString m_qmlImportDeclaration;
+	std::shared_ptr<iprm::IParamsSet> m_schemaParamsPtr;
 };
 
 
