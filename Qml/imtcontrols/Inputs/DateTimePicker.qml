@@ -7,6 +7,8 @@ CustomTextField {
     placeHolderText: displayFormat
     textInputMask: timeEdit ? "00.00.0000 00:00" : "00.00.0000"
     maximumLength: timeEdit ? 16 : 10;
+    hasActionMenu: false;
+
     // textInputValidator: timeEdit ? dateTimeRegexp : dateRegexp;
 
     RegularExpressionValidator {
@@ -35,19 +37,22 @@ CustomTextField {
     signal dateChanged();
 
     Component.onCompleted: {
-        let dateStr = dateToString(root.selectedDate);
-        root.text = dateStr;
+        internal.updateTextFromSelectedDate();
+    }
+
+    onSelectedDateChanged: {
+        internal.updateTextFromSelectedDate();
     }
 
     onDateChanged: {
-        let dateStr = dateToString(root.selectedDate);
-        root.text = dateStr;
+        internal.updateTextFromSelectedDate();
         root.select(internal.selectionStart, internal.selectionEnd);
+        timer.restart();
     }
 
     Timer {
         id: timer;
-
+        interval: 500;
         onTriggered: {
             root.editingFinished();
         }
@@ -55,21 +60,6 @@ CustomTextField {
 
     onFocusChanged: {
         root.select(internal.selectionStart, internal.selectionEnd);
-    }
-
-    onSelectionEndChanged: {
-        console.log("onSelectionEndChanged", root.selectionEnd)
-        if (root.selectionStart === root.selectionEnd){
-            // if (root.selectionEnd <= 2){
-            //     root.select(0, 2);
-            // }
-            // else if (root.selectionEnd > 2 && root.selectionEnd <= 5){
-            //     root.select(3, 5);
-            // }
-            // else if (root.selectionEnd > 5 && root.selectionEnd <= 10){
-            //     root.select(6, 10);
-            // }
-        }
     }
 
     QtObject {
@@ -85,26 +75,42 @@ CustomTextField {
                 return;
             }
 
-            console.log("onTextChanged", text, internal.selectionStart, internal.selectionEnd);
+            root.text = root.getDateAsString();
 
-            if (prevText.length < text.length){
-                block = true;
+            // soon
+//            return;
 
-                root.text = internal.convert(root.text);
-                if (root.text.length === root.maximumLength){
-                    let newDate = new Date(root.text);
+//            if (prevText.length < text.length){
+//                block = true;
 
-                    root.selectedDate = newDate;
-                }
+//                let tempText = internal.convert(root.text);
+//                if (root.text.length === root.maximumLength){
+//                    let newDate = new Date(tempText);
+//                    console.log("newDate", newDate);
 
-                block = false;
-            }
+//                    if (!isNaN(newDate)){
+//                        root.selectedDate = newDate;
+//                    }
+//                    else{
+//                        block = false;
+////                        text = prevText;
+//                        return;
+//                    }
+//                }
 
-            prevText = text;
+//                root.text = tempText;
+
+//                block = false;
+//            }
+
+//            prevText = text;
         }
 
-        // 11.11.1222 22:22
-        // 11 11 1222 2222
+        function updateTextFromSelectedDate(){
+            let dateStr = root.dateToString(root.selectedDate);
+            root.text = dateStr;
+        }
+
         function convert(text){
             let date = text
             let len = date.length;
@@ -141,7 +147,6 @@ CustomTextField {
                         result += ":";
                     }
                 }
-                console.log("result", i, result)
             }
 
             return result;
@@ -187,7 +192,10 @@ CustomTextField {
                     border.width: 0;
                 }}
             onClicked: {
-                console.log("onClicked", internal.selectionStart, internal.selectionEnd)
+                if (!enabled){
+                    return;
+                }
+
                 let tempStart = root.selectionStart
                 internal.selectionStart = tempStart;
 
@@ -223,6 +231,10 @@ CustomTextField {
                     border.width: 0;
                 }}
             onClicked: {
+                if (!enabled){
+                    return;
+                }
+
                 let tempStart = root.selectionStart
                 internal.selectionStart = tempStart;
 
@@ -248,18 +260,35 @@ CustomTextField {
         }
     }
 
-    function dateIsValid(){
-        return true;
-    }
-
     function setDate(date){
         root.selectedDate = date;
-        root.dateChanged();
+        root.editingFinished();
     }
 
     function setDateAsString(dateStr){
-        root.selectedDate = new Date(dateStr);
-        root.dateChanged();
+        var data = dateStr.split(' ');
+
+        if (data.length > 0){
+            let datePartStr = data[0];
+
+            var parts = datePartStr.split('.');
+            let date = new Date(parts[2], parts[1] - 1, parts[0]);
+
+            if (data.length > 1 && root.timeEdit){
+                let timePartStr = data[1];
+
+                if (timePartStr.split(';').length == 2){
+                    let hours = timePartStr.split(';')[0]
+                    let minutes = timePartStr.split(';')[1]
+
+                    date.setHours(hours);
+                    date.setMinutes(minutes);
+                }
+            }
+
+            root.selectedDate = date;
+            root.editingFinished();
+        }
     }
 
     function getDateAsString(){
@@ -297,51 +326,82 @@ CustomTextField {
     }
 
     function dayIncrement(){
+        if (root.readOnly){
+            return;
+        }
+
         root.selectedDate.setDate(root.selectedDate.getDate() + 1);
         root.dateChanged();
     }
 
     function dayDecrement(){
+        if (root.readOnly){
+            return;
+        }
         root.selectedDate.setDate(root.selectedDate.getDate() - 1);
         root.dateChanged();
     }
 
     function monthIncrement(){
+        if (root.readOnly){
+            return;
+        }
         root.selectedDate.setMonth(root.selectedDate.getMonth() + 1)
         root.dateChanged();
     }
 
     function monthDecrement(){
+        if (root.readOnly){
+            return;
+        }
         root.selectedDate.setMonth(root.selectedDate.getMonth() - 1)
         root.dateChanged();
     }
 
     function yearIncrement(){
+        if (root.readOnly){
+            return;
+        }
         root.selectedDate.setFullYear(root.selectedDate.getFullYear() + 1)
         root.dateChanged();
     }
 
     function yearDecrement(){
+        if (root.readOnly){
+            return;
+        }
         root.selectedDate.setFullYear(root.selectedDate.getFullYear() - 1)
         root.dateChanged();
     }
 
     function hourIncrement(){
+        if (root.readOnly){
+            return;
+        }
         root.selectedDate.setHours(root.selectedDate.getHours() + 1)
         root.dateChanged();
     }
 
     function hourDecrement(){
+        if (root.readOnly){
+            return;
+        }
         root.selectedDate.setHours(root.selectedDate.getHours() - 1)
         root.dateChanged();
     }
 
     function minutesIncrement(){
+        if (root.readOnly){
+            return;
+        }
         root.selectedDate.setMinutes(root.selectedDate.getMinutes() + 1)
         root.dateChanged();
     }
 
     function minutesDecrement(){
+        if (root.readOnly){
+            return;
+        }
         root.selectedDate.setMinutes(root.selectedDate.getMinutes() - 1)
         root.dateChanged();
     }

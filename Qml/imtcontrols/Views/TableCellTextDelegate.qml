@@ -14,7 +14,7 @@ TableCellDelegateBase {
         anchors.rightMargin: delegateContainer && delegateContainer.rowDelegate ? delegateContainer.rowDelegate.textRightMargin : 0
         anchors.verticalCenter: parent.verticalCenter
 
-        rowDelegate: delegateContainer.rowDelegate
+        rowDelegate: delegateContainer ? delegateContainer.rowDelegate : null;
         text: delegateContainer ? delegateContainer.getValue() : ""
         columnIndex: delegateContainer ? delegateContainer.columnIndex : -1
     }

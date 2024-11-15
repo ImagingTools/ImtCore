@@ -36,8 +36,8 @@ ControlBase {
     QtObject {
         id: _private
         function onClicked(){
-            baseButton.focus = true;
-            baseButton.forceActiveFocus();
+            // baseButton.focus = true;
+            // baseButton.forceActiveFocus();
             if (baseButton.checkable){
                 baseButton.checked = !baseButton.checked
                 baseButton.toggled()
