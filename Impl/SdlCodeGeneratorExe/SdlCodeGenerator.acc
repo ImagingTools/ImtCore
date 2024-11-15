@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5300" Description="ACF"/>
+            <Version Id="0" Number="5302" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
@@ -119,6 +119,45 @@
         <EmbeddedRegistry Id="CodeGenWorker">
             <Data Description="" Keywords="">
                 <ElementsList>
+                    <Element Id="CppCodeGeneratorFramework" PackageId="ImtSdlVoce" ComponentId="CppCodeGeneratorFramework">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework/BaseClassExtender"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework/OriginalNamespace"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                     <Element Id="FileCleanupProcessor" PackageId="ImtSdlGenPck" ComponentId="FileCleanupProcessor">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -191,39 +230,6 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="SdlClassCodeGenerator" PackageId="ImtSdlVoce" ComponentId="SdlClassCodeGeneratorFramework">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/BaseClassExtender"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/OriginalNamespace"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
                     <Element Id="SdlCoreFramework" PackageId="ImtSdlVoce" ComponentId="SdlCoreFramework">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -236,58 +242,16 @@
                                 <AttributeInfo Id="SdlProcessorList" Type="Reference[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>SdlClassCodeGenerator</Value>
+                                            <Value>CppCodeGeneratorFramework/SdlClassCodeGenerator</Value>
+                                            <Value>CppCodeGeneratorFramework/GqlWrapClassCodeGenerator</Value>
+                                            <Value>CppCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator</Value>
+                                            <Value>CppCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>
                                             <Value>QmlCodeGenFramework/QmlCodeGenerator</Value>
                                             <Value>QmlCodeGenFramework/QmlCodeMetaGenerator</Value>
                                             <Value>QmlCodeGenFramework/QmlCodeCommandIdGenerator</Value>
-                                            <Value>SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator</Value>
-                                            <Value>SdlGqlCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator</Value>
-                                            <Value>SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>
                                             <Value>FileFinalizer</Value>
                                         </Values>
                                     </Data>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="SdlGqlCodeGeneratorFramework" PackageId="ImtSdlVoce" ComponentId="SdlGqlCodeGeneratorFramework">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/BaseClassExtender"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="FilesJoiner" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlClassCodeGenerator/SimpleFileJoiner"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/OriginalNamespace"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                                     <Data IsEnabled="false"/>

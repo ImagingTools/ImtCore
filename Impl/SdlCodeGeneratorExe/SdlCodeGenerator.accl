@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5300" Description="ACF"/>
+            <Version Id="0" Number="5302" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
@@ -23,12 +23,11 @@
         </EmbededRegistry>
         <EmbededRegistry Id="CodeGenWorker">
             <PositionMap>
+                <Element ComponentName="CppCodeGeneratorFramework" X="550" Y="550" Note=""/>
                 <Element ComponentName="FileCleanupProcessor" X="950" Y="225" Note=""/>
                 <Element ComponentName="FileFinalizer" X="950" Y="425" Note=""/>
                 <Element ComponentName="QmlCodeGenFramework" X="550" Y="225" Note=""/>
-                <Element ComponentName="SdlClassCodeGenerator" X="175" Y="425" Note=""/>
                 <Element ComponentName="SdlCoreFramework" X="550" Y="425" Note=""/>
-                <Element ComponentName="SdlGqlCodeGeneratorFramework" X="550" Y="700" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
