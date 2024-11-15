@@ -40,7 +40,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 		arguments << QString(argv[i]);
 	}
 
-	QList<QCommandLineOption> allOptions = PrepareCommandLineOptions();
+	QCommandLineParser commandLineParser;
+	commandLineParser.addHelpOption();
+	commandLineParser.addVersionOption();
 
 	QCommandLineOption schemaFilePathOption({"S","schema-file"}, "SDL schema file path", "SchemaFilePath");
 	QCommandLineOption outputDirectoryPathOption({"O","output-directory"}, "Directory where created files will be created", "OutputDirectoryPath");
@@ -59,8 +61,6 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 												   "1 - only those schemas with the same namespace as the original one will be compiled\n"
 												   "2 - only the schema will be compiled. See the 'input parameter' option", "AutoLink", "0");
 	QCommandLineOption includeHeadersOption({"H","include-headers"}, "List of directories to search for generated header files", "HeadersIncludes");
-
-	/// \todo remove it \deprecated
 	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single. Deprecated.");
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
@@ -71,10 +71,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 						"Only the 'generator', 'include' and 'schema-file (S)' options SHOULD be used in conjunction with this mode. "
 						"You MUST NOT use other options, in this case, the behavior is undefined!");
 
-	QCommandLineParser commandLineParser;
-	commandLineParser.addHelpOption();
-	commandLineParser.addVersionOption();
 
+	QList<QCommandLineOption> allOptions = PrepareCommandLineOptions();
 	allOptions << QList<QCommandLineOption>({
 				schemaFilePathOption,
 				outputDirectoryPathOption,
