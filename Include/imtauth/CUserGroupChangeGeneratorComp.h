@@ -1,0 +1,43 @@
+#pragma once
+
+
+// ImtCore includes
+#include <imtbase/CDocumentChangeGeneratorCompBase.h>
+
+
+namespace imtauth
+{
+
+
+class CUserGroupChangeGeneratorComp: public imtbase::CDocumentChangeGeneratorCompBase
+{
+public:
+	typedef imtbase::CDocumentChangeGeneratorCompBase BaseClass;
+
+	I_BEGIN_COMPONENT(CUserGroupChangeGeneratorComp);
+		I_ASSIGN(m_roleCollectionCompPtr, "RoleCollection", "Role collection", true, "RoleCollection");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
+	I_END_COMPONENT;
+
+protected:
+	QString GetRoleName(const QByteArray& roleId) const;
+	QString GetUserName(const QByteArray& userId) const;
+	QString GetGroupName(const QByteArray& groupId) const;
+
+	// reimplemented (imtbase::CDocumentChangeGeneratorCompBase)
+	virtual bool CompareDocuments(
+				const istd::IChangeable& oldDocument,
+				const istd::IChangeable& newDocument,
+				imtbase::CObjectCollection& documentChangeCollection,
+				QString& errorMessage) override;
+	virtual QString CreateCustomOperationDescription(const imtbase::COperationDescription& operationDescription, const QByteArray& languageId = QByteArray()) const override;
+
+protected:
+	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
+};
+
+
+} // namespace imtauth
+
+

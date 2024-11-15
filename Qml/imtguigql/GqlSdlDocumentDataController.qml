@@ -16,15 +16,12 @@ DocumentDataController {
     property Component addInputObjectComp;
 
     function updateDocumentModel(){
-        getRequest.send();
     }
 
     function saveDocument(){
-        setRequest.send();
     }
 
     function createDocumentModel(){
-
     }
 }
 

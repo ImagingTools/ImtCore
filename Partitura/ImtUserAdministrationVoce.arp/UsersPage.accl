@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5302" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -11,7 +11,9 @@
         <Element ComponentName="CredentialController" X="300" Y="450" Note=""/>
         <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
         <Element ComponentName="HashCalculator" X="750" Y="550" Note=""/>
+        <Element ComponentName="OperationContextController" X="1050" Y="200" Note=""/>
         <Element ComponentName="SerializableUserCollectionController" X="200" Y="550" Note=""/>
+        <Element ComponentName="UserChangeGenerator" X="750" Y="200" Note=""/>
         <Element ComponentName="UserCommands" X="425" Y="300" Note=""/>
         <Element ComponentName="UserController" X="150" Y="300" Note=""/>
         <Element ComponentName="UserInfo" X="525" Y="550" Note=""/>
@@ -20,15 +22,15 @@
         <Element ComponentName="UsersHeadersDataProvider" X="1000" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="UserCommands">
-            <PositionMap>
-                <Element ComponentName="StandardDocumentCommandsController" X="600" Y="300" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="UsersCommands">
             <PositionMap>
                 <Element ComponentName="CollectionCommandsController" X="575" Y="125" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="UserCommands">
+            <PositionMap>
+                <Element ComponentName="StandardDocumentCommandsController" X="600" Y="300" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

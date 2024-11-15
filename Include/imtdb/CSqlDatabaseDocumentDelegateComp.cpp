@@ -489,7 +489,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateOperationDescriptionQuery(con
 			QString operationDescription = json;
 
 			imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationPtr->GetOperationOwnerId();
-			return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5')")
+			return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5';)")
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(objectInfo.id))
 				.arg(objectInfo.name)

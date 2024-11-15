@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5302" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -12,21 +12,23 @@
         <Element ComponentName="GroupCommands" X="425" Y="350" Note=""/>
         <Element ComponentName="GroupsCommands" X="725" Y="350" Note=""/>
         <Element ComponentName="GroupsListController" X="1000" Y="350" Note=""/>
+        <Element ComponentName="OperationContextController" X="1050" Y="200" Note=""/>
         <Element ComponentName="SerializableGroupCollectionController" X="175" Y="550" Note=""/>
+        <Element ComponentName="UserGroupChangeGenerator" X="775" Y="200" Note=""/>
         <Element ComponentName="UserGroupInfo" X="475" Y="550" Note=""/>
         <Element ComponentName="UserGroupProvider" X="150" Y="75" Note=""/>
         <Element ComponentName="UserGroupsHeadersDataProvider" X="775" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="UserCommands">
-            <PositionMap>
-                <Element ComponentName="StandardDocumentCommandsController" X="600" Y="325" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="UsersCommands">
             <PositionMap>
                 <Element ComponentName="CollectionCommandsController" X="550" Y="275" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="UserCommands">
+            <PositionMap>
+                <Element ComponentName="StandardDocumentCommandsController" X="600" Y="325" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

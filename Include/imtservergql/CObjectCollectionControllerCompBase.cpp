@@ -907,6 +907,11 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(c
 		return nullptr;
 	}
 
+	if (!m_documentChangeGeneratorCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'DocumentChangeGenerator' was not set", "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+
 	const imtgql::CGqlObject* gqlInputParamsPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamsPtr == nullptr){
 		errorMessage = QString("Unable to get object history: GraphQL-parameters not set");

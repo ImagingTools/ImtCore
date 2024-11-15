@@ -50,7 +50,19 @@ protected:
 				const QString& keyName,
 				const QByteArray& oldValue,
 				const QByteArray& newValue) const;
-	virtual QByteArray InsertOperationDescription();
+	virtual QByteArray InsertOperationDescription(
+				imtbase::CObjectCollection& documentChangeCollection,
+				const QByteArray& operationTypeId,
+				const QByteArray& key,
+				const QString& keyName,
+				const QByteArray& oldValue = QByteArray(),
+				const QByteArray& newValue = QByteArray()) const;
+	virtual void GenerateChanges(
+				const QByteArrayList& oldValueList,
+				const QByteArrayList& newValueList,
+				QByteArrayList& addedValueList,
+				QByteArrayList& removedValueList) const;
+	virtual QString CreateCustomOperationDescription(const imtbase::COperationDescription& operationDescription, const QByteArray& languageId = QByteArray()) const;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);

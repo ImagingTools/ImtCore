@@ -418,6 +418,7 @@ bool CUserBaseInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode
 
 		m_id = sourcePtr->m_id;
 		m_name = sourcePtr->m_name;
+		m_description = sourcePtr->m_description;
 		m_permissionsMap = sourcePtr->m_permissionsMap;
 		m_restrictions = sourcePtr->m_restrictions;
 		m_rolesMap = sourcePtr->m_rolesMap;
@@ -466,6 +467,7 @@ bool CUserBaseInfo::ResetData(CompatibilityMode /*mode*/)
 
 	m_id.clear();
 	m_name.clear();
+	m_description.clear();
 	m_permissionsMap.clear();
 	m_restrictions.clear();
 	m_rolesMap.clear();

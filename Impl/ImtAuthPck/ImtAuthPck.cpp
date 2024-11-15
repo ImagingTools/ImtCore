@@ -144,6 +144,20 @@ I_EXPORT_COMPONENT(
 			"Ldap user collection joiner",
 			"Ldap User Collection Joiner");
 
+I_EXPORT_COMPONENT(
+			UserChangeGenerator,
+			"User change generator",
+			"User Change Generator");
+
+I_EXPORT_COMPONENT(
+			RoleChangeGenerator,
+			"Role change generator",
+			"Role Change Generator");
+
+I_EXPORT_COMPONENT(
+			UserGroupChangeGenerator,
+			"User group change generator",
+			"User Group Change Generator");
 
 } // namespace ImtAuthPck
 

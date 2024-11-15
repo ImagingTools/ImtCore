@@ -34,6 +34,9 @@
 #include <imtauth/CLdapCredentialControllerComp.h>
 #include <imtauth/CCredentialControllerComp.h>
 #include <imtauth/CLdapUserCollectionJoinerComp.h>
+#include <imtauth/CUserChangeGeneratorComp.h>
+#include <imtauth/CRoleChangeGeneratorComp.h>
+#include <imtauth/CUserGroupChangeGeneratorComp.h>
 
 
 namespace ImtAuthPck
@@ -91,6 +94,9 @@ typedef imtauth::CLdapUserCollectionControllerComp LdapUserCollectionController;
 typedef imtauth::CCredentialControllerComp CredentialController;
 typedef imtauth::CLdapCredentialControllerComp LdapCredentialController;
 typedef imtauth::CLdapUserCollectionJoinerComp LdapUserCollectionJoiner;
+typedef imtauth::CUserChangeGeneratorComp UserChangeGenerator;
+typedef imtauth::CRoleChangeGeneratorComp RoleChangeGenerator;
+typedef imtauth::CUserGroupChangeGeneratorComp UserGroupChangeGenerator;
 
 
 } // namespace ImtAuthPck
