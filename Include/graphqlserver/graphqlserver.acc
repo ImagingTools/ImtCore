@@ -162,9 +162,11 @@
         <Interface InterfaceId="imtrest::IServer" ComponentId="ImtCoreServerBase"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="HttpServerFramework" ComponentId="ImtCoreServerBase/HttpServerFramework"/>
         <Component ExportedId="PumaUrl" ComponentId="ImtCoreServerBase/PumaUrl"/>
         <Component ExportedId="PumaWebSocketPort" ComponentId="ImtCoreServerBase/PumaWebSocketPort"/>
         <Component ExportedId="ServerPort" ComponentId="ImtCoreServerBase/ServerPort"/>
+        <Component ExportedId="WebSocketServerFramework" ComponentId="ImtCoreServerBase/WebSocketServerFramework"/>
         <Component ExportedId="WebSocketServerPort" ComponentId="ImtCoreServerBase/WebSocketServerPort"/>
     </ExportedComponents>
 </Acf>

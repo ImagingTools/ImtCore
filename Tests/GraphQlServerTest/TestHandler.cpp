@@ -1,28 +1,23 @@
-// ImtCore includes
-#include <graphqlserver/graphqlserver.h>
+#include "TestHandler.h"
 
 // Qt includes
 #include <QtCore/QJsonObject>
 
 
-class TestHandler: virtual public graphqlserver::IGqlRequestHandler
+QJsonObject TestHandler::CreateResponse(
+	const QByteArray& commandId,
+	const graphqlserver::RequestType requestType,
+	const QJsonObject& inputParams,
+	const graphqlserver::ResultKeys& resultKeys,
+	QString& errorMessage) const
 {
-protected:
-	virtual bool IsRequestSupported(const graphqlserver::IGqlRequest& gqlRequest) const override
-	{
-		return true;
-	}
+	QJsonObject retVal;
+	QJsonObject data;
+	data.insert("message", "hellow world!");
+	retVal.insert("data", data);
 
-	virtual QJsonObject CreateResponse(const graphqlserver::IGqlRequest& gqlRequest, QString& errorMessage) const override
-	{
-		QJsonObject retVal;
-		QJsonObject data;
-		data.insert("message", "hellow world!");
-		retVal.insert("data", data);
-
-		return retVal;
-	}
-};
+	return retVal;
+}
 
 
 

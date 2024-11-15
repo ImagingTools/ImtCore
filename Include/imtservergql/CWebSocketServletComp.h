@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtrest/CHttpRootServletComp.h>
+#include <imtrest/IRequestManager.h>
 #include <imtgql/IGqlSubscriberController.h>
 #include <imtgql/IGqlRequestHandler.h>
 
@@ -13,7 +14,8 @@ namespace imtservergql
 
 class CWebSocketServletComp:
 			public ilog::CLoggerComponentBase,
-			virtual public imtrest::IRequestServlet
+			virtual public imtrest::IRequestServlet,
+			virtual public imtrest::IRequestManager
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
@@ -22,11 +24,15 @@ public:
 		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN_MULTI_0(m_gqlSubscriberControllersCompPtr, "GqlSubscriberControllers", "List of gql subscriber controller for corresponding command-IDs", false);
 		I_ASSIGN(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "GraphQl request handler to create to create the response body", false, "GqlRequestHandler");
+		I_ASSIGN(m_workerManagerCompPtr, "WorkerManager", "GraphQl multithread worker manager", false, "WorkerManager");
 	I_END_COMPONENT
 
-	// reimplemented (IRequestServlet)
+	// reimplemented (imtrest::IRequestServlet)
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
+
+	// reimplemented (imtrest::IRequestManager)
+	virtual const imtrest::ISender* GetSender(const QByteArray& requestId) const override;
 
 protected:
 	virtual imtrest::ConstResponsePtr InitConnection(const imtrest::IRequest& request) const;
@@ -39,6 +45,7 @@ protected:
 private:
 	I_MULTIREF(imtgql::IGqlSubscriberController, m_gqlSubscriberControllersCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
+	I_REF(imtrest::IRequestServlet, m_workerManagerCompPtr);
 
 	typedef QMap<QByteArray, imtgql::IGqlSubscriberController*> SubscriberControllersMap;
 

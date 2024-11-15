@@ -18,6 +18,7 @@
 #include <imtrest/ISubscriberEngine.h>
 #include <imtrest/IRequestManager.h>
 #include <imtrest/CWebSocketSender.h>
+#include <imtrest/IServer.h>
 #include <imtcom/IConnectionStatusProvider.h>
 #include <imtcom/ISslConfigurationManager.h>
 
@@ -25,6 +26,7 @@
 namespace imtrest
 {
 
+class CWebSocketThread;
 
 /**
 	TCP-based communication server.
@@ -35,7 +37,8 @@ class CWebSocketServerComp:
 			public ilog::CLoggerComponentBase,
 			virtual public IRequestManager,
 			virtual public imtcom::IConnectionStatusProvider,
-			virtual public istd::IChangeable
+			virtual public istd::IChangeable,
+			virtual public IServer
 {
 	Q_OBJECT
 public:
@@ -44,15 +47,41 @@ public:
 	I_BEGIN_COMPONENT(CWebSocketServerComp);
 		I_REGISTER_INTERFACE(IRequestManager)
 		I_REGISTER_INTERFACE(imtcom::IConnectionStatusProvider)
-		I_ASSIGN(m_requestServerHandlerCompPtr, "RequestServerHandler", "Request handler registered for the server", true, "RequestServerHandler");
-		I_ASSIGN(m_requestClientHandlerCompPtr, "RequestClientHandler", "Request handler registered for the client", true, "RequestClientHandler");
+		I_REGISTER_INTERFACE(IServer)
+		I_ASSIGN(m_requestServerHandlerCompPtr, "RequestServerHandler", "Request handler registered for the server", false, "RequestServerHandler");
+		I_ASSIGN(m_requestClientHandlerCompPtr, "RequestClientHandler", "Request handler registered for the client", false, "RequestClientHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
+		I_ASSIGN(m_httpProtocolEngineCompPtr, "HttpProtocolEngine", "Http Protocol engine used in the server", false, "HttpProtocolEngine");
 		I_ASSIGN(m_subscriberEngineCompPtr, "SubscriberEngine", "Subscriber engine used in the server", false, "SubscriberEngine");
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
 		I_ASSIGN(m_webSocketServerPortCompPtr, "WebSocketServerPort", "Parameter providing the WebSocket-server port to be listened", false, "WebSocketServerPort");
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
 	I_END_COMPONENT
+
+	IProtocolEngine* GetProtocolEngine();
+	IProtocolEngine* GetHttpProtocolEngine();
+	imtrest::IRequestServlet* GetRequestServerServlet();
+	imtrest::IRequestServlet* GetRequestClientServlet();
+	void SetConnectionStatus(const QByteArray& clientId);
+
+	// reimplemented (ilog::CLoggerComponentBase)
+	bool SendInfoMessage(
+				int id,
+				const QString& message,
+				const QString& messageSource = QString(),
+				int flags = 0) const;
+
+	bool SendErrorMessage(
+				int id,
+				const QString& message,
+				const QString& messageSource = QString(),
+				int flags = 0) const;
+
+	void SendVerboseMessage(const QString& message, const QString& messageSource = QString()) const;
+public Q_SLOTS:
+	void RegisterSender(const QByteArray& clientId, QWebSocket* webSocketPtr);
+
 
 	// reimplemented (icomp::IRequestManager)
 	virtual const ISender* GetSender(const QByteArray& requestId) const override;
@@ -64,23 +93,29 @@ protected:
 	// reimplemented (imtcom::IConnectionStatusProvider)
 	virtual ConnectionStatus GetConnectionStatus() const override;
 
+	// reimplemented (imtrest::IServer)
+	virtual bool StartServer() override;
+	virtual bool StopServer() override;
+	virtual ServerStatus GetServerStatus() const override;
+
 private:
+	bool EnsureServerStarted();
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);
 
 private Q_SLOTS:
 	void HandleNewConnections();
 	void OnSocketDisconnected();
-	void OnWebSocketTextMessage(const QString& textMessage);
-	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
-	void OnError(QAbstractSocket::SocketError error);
+	// void OnWebSocketTextMessage(const QString& textMessage);
+	// void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
+	// void OnError(QAbstractSocket::SocketError error);
 	void OnTimeout();
 	void OnAcceptError(QAbstractSocket::SocketError socketError);
 	void OnSslErrors(const QList<QSslError> &errors);
 
 protected:
 	QTimer m_timer;
-	typedef QVector<QWebSocketServer*> Servers;
-	Servers m_servers;
+	istd::TDelPtr<QWebSocketServer> m_webSocketServerPtr;
+	QList<CWebSocketThread*> m_webSocketThreadList;
 	QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
 	QMap <QByteArray, imtcom::IConnectionStatusProvider::ConnectionStatus> m_senderLoginStatusMap;
 
@@ -93,6 +128,8 @@ private:
 	I_REF(imtbase::IUrlParam, m_webSocketServerPortCompPtr);
 	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
+	I_REF(IProtocolEngine, m_httpProtocolEngineCompPtr);
+
 };
 
 

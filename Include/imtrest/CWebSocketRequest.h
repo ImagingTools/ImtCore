@@ -49,6 +49,7 @@ public:
 	~CWebSocketRequest();
 
 	QByteArrayList GetHeaders() const;
+	void SetHeader(const QByteArray &headerId, const QByteArray &headerData);
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
 	QUrl GetUrl() const;
 	QByteArray GetClientId() const;
@@ -56,6 +57,7 @@ public:
 	void SetBody(const QByteArray& body);
 	void SetRequestHandler(const IRequestServlet* requestHandlerPtr);
 	MethodType GetMethodType() const;
+	void SetMethodType(MethodType methodType);
 	QByteArray GetSubscriptionId() const;
 	void RegisterRequestEventHandler(IRequestEventHandler* requestEventHandler);
 	void SetCommandId(const QByteArray& commandId);

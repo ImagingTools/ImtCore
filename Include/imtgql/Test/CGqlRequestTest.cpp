@@ -4,6 +4,59 @@
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
 
+
+const char* emptyQuery = R"(
+{"query": "query TestQuery {
+		TestQuery {}
+	}
+"}
+)";
+
+static const QByteArray emptyQueryResult = R"({"query": "query TestQuery {TestQuery{}}"})";
+
+
+const char* simpleQuery = R"(
+{"query": "query TestQuery {
+		TestQuery
+		{
+			RootField
+		}
+	}
+"}
+)";
+
+
+static const QByteArray simpleQueryResult = R"({"query": "query TestQuery {TestQuery {RootField}}"})";
+
+
+const char* fieldsQuery = R"(
+{"query": "query TestQuery {
+		TestQuery
+		{
+			FirstField
+			SecondField ThirdField
+		}
+	}
+"}
+)";
+
+static const QByteArray fieldsQueryResult = R"({"query": "query TestQuery {TestQuery {FirstField SecondField ThirdField}}"})";
+
+
+const char* complexFieldsQuery = R"(
+{"query": "query TestQuery {
+		TestQuery
+		{
+			FirstField {first second {first2 second2}}
+			SecondField {first3 second3}
+		}
+	}
+"}
+)";
+
+static const QByteArray complexFieldsQueryResult = R"({"query": "query TestQuery {TestQuery {FirstField {first second {first2 second2}} SecondField {first3 second3}}}"})";
+
+
 const char* arrayQuery = R"(
 {"query": "mutation TestMutation {
 	TestMutation(
@@ -230,6 +283,58 @@ static const QByteArray substratQueryResult = R"({"query": "query SubstratesList
 void CGqlRequestTest::initTestCase()
 {
 
+}
+
+
+void CGqlRequestTest::ParseEmpty()
+{
+	int errorPosition = -1;
+
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(emptyQuery, errorPosition);
+	QByteArray resultQuery = request.GetQuery();
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+	QCOMPARE(resultQuery, emptyQueryResult);
+}
+
+
+void CGqlRequestTest::ParseSimple()
+{
+	int errorPosition = -1;
+
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(simpleQuery, errorPosition);
+	QByteArray resultQuery = request.GetQuery();
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+	QCOMPARE(resultQuery, simpleQueryResult);
+}
+
+
+void CGqlRequestTest::ParseFields()
+{
+	int errorPosition = -1;
+
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(fieldsQuery, errorPosition);
+	QByteArray resultQuery = request.GetQuery();
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+	QCOMPARE(resultQuery, fieldsQueryResult);
+}
+
+
+void CGqlRequestTest::ParseComplexFields()
+{
+	int errorPosition = -1;
+
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(complexFieldsQuery, errorPosition);
+	QByteArray resultQuery = request.GetQuery();
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+	QCOMPARE(resultQuery, complexFieldsQueryResult);
 }
 
 void CGqlRequestTest::ParseSubstrateTest()

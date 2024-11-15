@@ -8,20 +8,12 @@
 class TestHandler: virtual public graphqlserver::IGqlRequestHandler
 {
 protected:
-	virtual bool IsRequestSupported(const graphqlserver::IGqlRequest& gqlRequest) const override
-	{
-		return true;
-	}
-
-	virtual QJsonObject CreateResponse(const graphqlserver::IGqlRequest& gqlRequest, QString& errorMessage) const override
-	{
-		QJsonObject retVal;
-		QJsonObject data;
-		data.insert("message", "hellow world!");
-		retVal.insert("data", data);
-
-		return retVal;
-	}
+	virtual QJsonObject CreateResponse(
+				const QByteArray& commandId,
+				const graphqlserver::RequestType requestType,
+				const QJsonObject& inputParams,
+				const graphqlserver::ResultKeys& resultKeys,
+				QString& errorMessage) const override;
 };
 
 

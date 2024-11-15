@@ -10,6 +10,15 @@
     <Description>Lisa server application</Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="ExternSubscriber" PackageId="ImtClientGqlPck" ComponentId="ExternSubscriber">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SubscriptionManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SubscriptionManager"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SubscriptionManager" PackageId="ImtClientGqlPck" ComponentId="SubscriptionManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -25,6 +34,9 @@
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="WebLoginStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketClient/ConnectionStatusProvider"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -33,6 +45,9 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="ClientId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="1111"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ClientRequestHandler" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SubscriptionManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -78,6 +93,12 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces/>
-    <ExportedComponents/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtclientgql::IGqlSubscriptionClient" ComponentId="ExternSubscriber"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="ConnectionStatusProvider" ComponentId="WebSocketClient/ConnectionStatusProvider"/>
+        <Component ExportedId="WebSocketClient" ComponentId="WebSocketClient"/>
+        <Component ExportedId="WebSocketServerPort" ComponentId="WebSocketServerPort"/>
+    </ExportedComponents>
 </Acf>

@@ -67,7 +67,7 @@ void CTcpServerComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::Ch
 
 	Q_ASSERT_X(m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid(), "Update server's SSL configuration", "SSL configuration or manager is not set!");
 
-	if (m_isInitialized){
+	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr && m_isInitialized){
 		EnsureServerStarted();
 	}
 }
@@ -93,7 +93,9 @@ void CTcpServerComp::OnComponentCreated()
 		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr());
 	}
 
-	EnsureServerStarted();
+	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
+		EnsureServerStarted();
+	}
 
 	m_isInitialized = true;
 }
@@ -104,6 +106,29 @@ const ISender* CTcpServerComp::GetSender(const QByteArray& requestId) const
 	const ISender* senderPtr = m_serverPtr->GetSender(requestId);
 
 	return senderPtr;
+}
+
+
+// reimplemented (imtrest::IServer)
+bool CTcpServerComp::StartServer()
+{
+	return EnsureServerStarted();
+}
+
+bool CTcpServerComp::StopServer()
+{
+	m_serverPtr->close();
+
+	return true;
+}
+
+IServer::ServerStatus CTcpServerComp::GetServerStatus() const
+{
+	if (m_serverPtr->isListening()){
+		return SS_LISTENING;
+	}
+
+	return SS_NOT_STARTED;
 }
 
 
@@ -158,15 +183,13 @@ bool CTcpServerComp::EnsureServerStarted()
 		}
 	}
 
-	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
-		if (m_serverPortCompPtr.IsValid()){
-			int port = m_serverPortCompPtr->GetUrl().port();
+	if (m_serverPortCompPtr.IsValid()){
+		int port = m_serverPortCompPtr->GetUrl().port();
 
-			return StartListening(QHostAddress::Any, port);
-		}
-		else{
-			return StartListening();
-		}
+		return StartListening(QHostAddress::Any, port);
+	}
+	else{
+		return StartListening();
 	}
 
 	return false;

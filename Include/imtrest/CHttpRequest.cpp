@@ -101,6 +101,24 @@ QHostAddress CHttpRequest::GetRemoteAddress() const
 }
 
 
+void CHttpRequest::SetHeader(const QByteArray& headerId, const QByteArray& value)
+{
+	m_headers.insert(headerId, value);
+}
+
+
+void CHttpRequest::SetMethodType(const MethodType& methodType)
+{
+	m_httpParser.method = methodType;
+}
+
+
+void CHttpRequest::SetBody(const QByteArray& body)
+{
+	m_body = body;
+}
+
+
 // public static methods
 
 int CHttpRequest::OnStartMessage(http_parser* httpParser)

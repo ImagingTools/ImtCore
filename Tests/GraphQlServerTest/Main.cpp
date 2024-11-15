@@ -1,4 +1,5 @@
 #include "TestHandler.h"
+#include "TestPublisher.h"
 
 // ImtCore includes
 #include <graphqlserver/graphqlserver.h>
@@ -15,15 +16,16 @@ int main(int argc, char *argv[])
 {
 	QCoreApplication app(argc, argv);
 	TestHandler testHandler;
+	TestPublisher testPublisher;
 	QString errorMessage;
 	graphqlserver::ServerSettings settings;
-	settings.ProductName = "Test";
+	settings.productId = "Test";
 	settings.tcpPort = 4444;
 	settings.webSocketPort = 4445;
 
 	graphqlserver::RegisterGqlHandler("TestHandler", testHandler, errorMessage);
-	graphqlserver::InitServer(settings, errorMessage);
-	graphqlserver::StartServer(errorMessage);
+	graphqlserver::RegisterGqlPublisher("OnCurrentData", testPublisher, errorMessage);
+	graphqlserver::StartServer(settings, errorMessage);
 
 	return app.exec();
 }

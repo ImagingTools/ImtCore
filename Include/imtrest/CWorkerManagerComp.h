@@ -39,7 +39,7 @@ public:
 	IRequestServlet* CreateServlet();
 	const ISender* GetSender(const QByteArray& requestId);
 
-	// reimplemented (IRequestHandler)
+	// reimplemented (imtrest::IRequestServlet)
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 

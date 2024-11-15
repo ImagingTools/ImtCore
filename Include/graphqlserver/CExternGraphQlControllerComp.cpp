@@ -30,8 +30,16 @@ imtbase::CTreeItemModel* CExternGraphQlControllerComp::CreateInternalResponse(co
 {
 	QByteArray commandId = gqlRequest.GetCommandId();
 	if (m_gqlRequestHandlers.contains(commandId)){
-		graphqlserver::CGqlRequest externRequest = ConvertRequest(gqlRequest);
-		QJsonObject jsonData = m_gqlRequestHandlers.value(commandId)->CreateResponse(externRequest, errorMessage);
+		// graphqlserver::CGqlRequest externRequest = ConvertRequest(gqlRequest);
+		QJsonObject inputParams;
+		const imtgql::CGqlObject& gqlParams = gqlRequest.GetParams();
+		CreateParams(gqlParams, inputParams);
+		const imtgql::CGqlObject& gqlResultKeys = gqlRequest.GetFields();
+		graphqlserver::ResultKeys resultKeys;
+		CreateResultKeys(gqlResultKeys, resultKeys);
+		graphqlserver::RequestType requestType = static_cast<graphqlserver::RequestType>(gqlRequest.GetRequestType());
+
+		QJsonObject jsonData = m_gqlRequestHandlers.value(commandId)->CreateResponse(commandId, requestType, inputParams, resultKeys, errorMessage);
 		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 		QJsonDocument jsonDocument;
 		jsonDocument.setObject(jsonData);
@@ -42,18 +50,6 @@ imtbase::CTreeItemModel* CExternGraphQlControllerComp::CreateInternalResponse(co
 	}
 
 	return nullptr;
-}
-
-
-// private methods
-graphqlserver::CGqlRequest CExternGraphQlControllerComp::ConvertRequest(const imtgql::CGqlRequest& gqlRequest) const
-{
-	graphqlserver::CGqlRequest retVal;
-	retVal.SetCommandId(gqlRequest.GetCommandId());
-	retVal.SetRequestType((graphqlserver::CGqlRequest::RequestType)gqlRequest.GetRequestType());
-	retVal.SetQuery(gqlRequest.GetQuery());
-
-	return retVal;
 }
 
 

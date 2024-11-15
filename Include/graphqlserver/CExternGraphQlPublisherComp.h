@@ -23,7 +23,7 @@ public:
 	I_END_COMPONENT;
 
 	bool RegisterGqlPublisher(const QByteArray& commandId, IGqlPublisher& gqlPublisher, QString& errorMessage);
-	bool SendSubscription(const QByteArray& subscriptionId, const QJsonObject& subscriptionData);
+	bool PublishData(const QByteArray& subscriptionId, const QJsonObject& subscriptionData);
 protected:
 	// reimplemented (imtgql::IGqlSubscriberController)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;

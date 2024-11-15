@@ -5,9 +5,12 @@
 #include <QtCore/QJsonObject>
 
 
-TestPublisher::TestPublisher()
+TestPublisher::TestPublisher(): QObject()
 {
 	connect(&m_dateTimer, &QTimer::timeout, this, &TestPublisher::slotTimer);
+	connect(this, &TestPublisher::signalStartTimer, &m_dateTimer, QOverload<>::of(&QTimer::start), Qt::QueuedConnection);
+	connect(this, &TestPublisher::signalStopTimer, &m_dateTimer, &QTimer::stop, Qt::QueuedConnection);
+	m_dateTimer.setInterval(5000);
 }
 
 
@@ -17,25 +20,19 @@ void TestPublisher::slotTimer()
 		QJsonObject jsonData;
 		jsonData.insert("currentData", QDateTime::currentDateTime().toString());
 
-		graphqlserver::SendSubscription(subscriptionId, jsonData);
+		graphqlserver::PublishData(subscriptionId, jsonData);  //
 	}
-}
-
-
-bool TestPublisher::IsRequestSupported(const graphqlserver::IGqlRequest& gqlRequest) const
-{
-	return true;
 }
 
 
 bool TestPublisher::RegisterSubscription(
 			const QByteArray& subscriptionId,
-			const graphqlserver::IGqlRequest& gqlRequest,
+			const graphqlserver::ResultKeys& resultKeys,
 			QString& errorMessage)
 {
 	m_subscriptionIdList.append(subscriptionId);
 	if (!m_dateTimer.isActive()){
-		m_dateTimer.start();
+		signalStartTimer();
 	}
 
 	return true;
@@ -46,7 +43,7 @@ bool TestPublisher::UnRegisterSubscription(const QByteArray& subscriptionId, QSt
 {
 	m_subscriptionIdList.removeAll(subscriptionId);
 	if (m_subscriptionIdList.isEmpty()){
-		m_dateTimer.stop();
+		signalStopTimer();
 	}
 
 	return true;

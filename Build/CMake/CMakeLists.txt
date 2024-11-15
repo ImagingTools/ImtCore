@@ -123,6 +123,8 @@ add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb"
 add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
 
 add_subdirectory("${INCLUDE_DIR}/imtpay/CMake" "${AUX_INCLUDE_DIR}/imtpay")
+add_subdirectory("${INCLUDE_DIR}/graphqlserver/CMake" "${AUX_INCLUDE_DIR}/graphqlserver")
+add_subdirectory("${INCLUDE_DIR}/graphqlclient/CMake" "${AUX_INCLUDE_DIR}/graphqlclient")
 
 
 if(NOT DEFINED USE_GEO OR USE_GEO)
@@ -194,7 +196,6 @@ endif()
 
 #-------- Packages --------
 if(NOT ANDROID)
-
 	add_subdirectory("${IMPL_DIR}/ImtCorePck/CMake" "${AUX_INCLUDE_DIR}/ImtCorePck")
 	add_dependencies(ImtCorePck imtbase)
 
@@ -360,6 +361,8 @@ if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
 	add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
 	add_subdirectory("${INCLUDE_DIR}/imtgql/Test/CMake" "${AUX_INCLUDE_DIR}/imtgql/Test")
 
+	add_subdirectory("${TESTS_DIR}/GraphQlServerTest/CMake" "${AUX_INCLUDE_DIR}/GraphQlServerTest")
+	add_subdirectory("${TESTS_DIR}/GraphQlClientTest/CMake" "${AUX_INCLUDE_DIR}/GraphQlClientTest")
 	add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
 	add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")
 	add_subdirectory("${TESTS_DIR}/RevisionControllerTest/CMake" "${AUX_INCLUDE_DIR}/RevisionControllerTest")

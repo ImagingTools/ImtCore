@@ -26,7 +26,7 @@ public:
 	I_END_COMPONENT;
 
 public:
-	QByteArray RegisterSubscribtion(const graphqlserver::IGqlRequest& subscriptionRequest, graphqlclient::ISubscriber& subscriber, QString& errorMessage);
+	QByteArray RegisterSubscribtion(const QByteArray& queryData, ISubscriber& subscriber,QString& errorMessage);
 	bool UnregisterSubscription(const QByteArray& subscriptionId, QString& errorMessage);
 protected:
 	// reimplemented (imtgql::IGqlSubscriptionClient)

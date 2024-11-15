@@ -46,8 +46,6 @@ bool CGqlSubscriberControllerCompBase::RegisterSubscription(
 		return false;
 	}
 
-	QByteArray commandId = m_commandIdsAttrPtr[0];
-
 	const imtrest::CWebSocketRequest* constWebSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
 	imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<imtrest::CWebSocketRequest*>(const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));
 	if (webSocketRequest == nullptr){

@@ -49,7 +49,8 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE_T(ConnectionStatusProvider, imod::IModel, ExtractConnectionStatusProvider);
 		I_ASSIGN(m_serverRequestHandlerCompPtr, "ServerRequestHandler", "Request handler registered for the server", false, "ServerRequestHandler");
 		I_ASSIGN(m_clientRequestHandlerCompPtr, "ClientRequestHandler", "Request handler registered for the client", false, "ClientRequestHandler");
-		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
+		I_ASSIGN(m_httpProtocolEngineCompPtr, "HttpProtocolEngine", "Http Protocol engine used in the http client", false, "ProtocolEngine");
+		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the client", true, "ProtocolEngine");
 		I_ASSIGN(m_connectOnCreateAttrPtr, "ConnectOnCreate", "If enabled, the client will be connect to server on after component creation", true, true);
 		I_ASSIGN(m_webSocketServerAddressCompPtr, "WebSocketServerAddress", "Parameter providing the websocket-server address to be connected", true, "WebSocketServerAddress");
 		I_ASSIGN(m_serverLoginAttrPtr, "ServerLoginParam", "Parameter providing the server login to be connected", false, "");
@@ -135,6 +136,7 @@ private:
 	I_REF(imtrest::IRequestServlet, m_serverRequestHandlerCompPtr);
 	I_REF(imtrest::IRequestServlet, m_clientRequestHandlerCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_protocolEngineCompPtr);
+	I_REF(imtrest::IProtocolEngine, m_httpProtocolEngineCompPtr);
 	I_REF(imtbase::IUrlParam, m_webSocketServerAddressCompPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerLoginCompPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerPasswordCompPtr);
@@ -148,6 +150,7 @@ private:
 	QTimer m_refreshTimer;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
 	istd::TPointerVector<imtrest::IRequest> m_startQueries;
+	istd::TPointerVector<imtrest::IRequest> m_cacheQueries;
 	QAbstractSocket::SocketError m_lastSocketError;
 
 	imod::TModelWrap<ConnectionStatusProvider> m_connectionStatusProvider;

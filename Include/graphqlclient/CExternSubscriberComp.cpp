@@ -11,19 +11,14 @@ namespace graphqlclient
 
 // public methods
 
-QByteArray CExternSubscriberComp::RegisterSubscribtion(
-			const graphqlserver::IGqlRequest& subscriptionRequest,
-			graphqlclient::ISubscriber& subscriber,
-			QString& errorMessage)
+QByteArray CExternSubscriberComp::RegisterSubscribtion(const QByteArray& queryData,  ISubscriber& subscriber, QString& errorMessage)
 {
 	QByteArray retVal;
-
 	if (m_subscriptionManagerCompPtr.IsValid()){
 		imtgql::CGqlRequest gqlRequest;
-		//(imtgql::IGqlRequest::RT_SUBSCRIPTION, subscriptionRequest.GetCommandId());
-		// "{\"query\": \"subscription OnAddressCollectionChanged {OnAddressCollectionChanged(input: {}) {notification {Id}}}\"}"
 		int errorPosition;
-		if (gqlRequest.ParseQuery(subscriptionRequest.GetQuery(), errorPosition)){
+
+		if (gqlRequest.ParseQuery(queryData, errorPosition)){
 			retVal = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
 			m_subscribtions.insert(retVal, &subscriber);
 		}

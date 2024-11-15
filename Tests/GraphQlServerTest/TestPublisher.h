@@ -17,24 +17,19 @@ public:
 
 protected:
 	// reimplemented (graphqlserver::IGqlPublisher)
-	virtual bool IsRequestSupported(const graphqlserver::IGqlRequest& gqlRequest) const override;
 	virtual bool RegisterSubscription(
 				const QByteArray& subscriptionId,
-				const graphqlserver::IGqlRequest& gqlRequest,
+				const graphqlserver::ResultKeys& resultKeys,
 				QString& errorMessage) override;
 	virtual bool UnRegisterSubscription(const QByteArray& subscriptionId, QString& errorMessage) override;
 
 protected Q_SLOTS:
 	void slotTimer();
-	// void slotTimer()
-	// {
-	// 	for (const QByteArray& subscriptionId: m_subscriptionIdList){
-	// 		QJsonObject jsonData;
-	// 		jsonData.insert("currentData", QDateTime::currentDateTime().toString());
 
-	// 		graphqlserver::SendSubscription(subscriptionId, jsonData);
-	// 	}
-	// }
+Q_SIGNALS:
+	void signalStartTimer();
+	void signalStopTimer();
+
 private:
 	QList<QByteArray> m_subscriptionIdList;
 	QTimer m_dateTimer;

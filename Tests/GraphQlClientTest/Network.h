@@ -1,36 +1,20 @@
+#include <graphqlclient/graphqlclient.h>
+
 // Qt includes
 #include <QtCore/QDebug>
-#include <QtCore/QCoreApplication>
-#include <QtCore/QJsonObject>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
 
 
-class Network: public QObject
+class Network: public graphqlclient::GraphQlRequestManager
 {
-	Q_OBJECT
-public Q_SLOTS:
-	void slotReadyRead()
-	{
-		QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
-		if (reply != nullptr){
-			QByteArray data = reply->readAll();
-			qDebug() << "Reply data: " << data;
-		}
-	}
+public:
+	Network(const graphqlclient::ConnectionSettings& connectionSettings):
+				graphqlclient::GraphQlRequestManager(connectionSettings){};
 
-	void slotError(QNetworkReply::NetworkError error)
+protected:
+	virtual void OnResponse(const QByteArray& data) override
 	{
-		qDebug() << "Network error: " << error;
+			qDebug() << "OnResponse data: " << data;
 	}
-
-	void slotSslErrors(const QList<QSslError> &errors)
-	{
-		for (const QSslError& sslError: errors){
-			qDebug() << "Ssl error: " << sslError.errorString();
-		}
-	}
-
 };
 
 

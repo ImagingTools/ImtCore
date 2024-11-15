@@ -12,7 +12,7 @@ namespace graphqlserver {
 enum ServerStatus
 {
 	SS_NOT_STARTED,
-	SS_LISTEN
+	SS_LISTENING
 };
 
 
@@ -20,8 +20,7 @@ struct ServerSettings
 {
 	quint16 tcpPort;
 	quint16 webSocketPort;
-	QUrl pathToLog;
-	QByteArray ProductName;
+	QByteArray productId;
 };
 
 
@@ -129,102 +128,88 @@ public:
 	virtual void SetHeaders(const Headers& headers) = 0;
 };
 
-/**
-	Common interface for a GraphQL request.
-*/
-class IGqlRequest
+
+enum RequestType
 {
-public:
-	enum RequestType
-	{
-		/**
+	/**
 			Query request.
 		*/
-		RT_QUERY,
+	RT_QUERY,
 
-		/**
+	/**
 			Mutation request.
 		*/
-		RT_MUTATION,
+	RT_MUTATION,
 
-		/**
+	/**
 			Subscription request.
 		*/
-		RT_SUBSCRIPTION
-	};
-
-	virtual QByteArray GetCommandId() const = 0;
-	virtual RequestType GetRequestType() const = 0;
-	virtual QByteArray GetQuery() const = 0;
-	virtual const IGqlContext* GetRequestContext() const = 0;
+	RT_SUBSCRIPTION
 };
+
+
+class ResultKeys
+{
+public:
+	QByteArrayList GetKeys() const { return m_simpleKes + m_childs.keys(); }
+	const ResultKeys* GetChild(const QByteArray& key)
+	{
+		if (m_childs.contains(key)){
+			return &m_childs[key];
+		}
+
+		return nullptr;
+	};
+	void AppendSimpleKey(const QByteArray& key) { m_simpleKes.append(key); }
+	void InsertChild(const QByteArray& key, const ResultKeys& child) { m_childs.insert(key, child); }
+	bool IsChild(const QByteArray& key) const { return m_childs.contains(key); }
+
+private:
+	QByteArrayList m_simpleKes;
+	QMap<QByteArray, ResultKeys> m_childs;
+};
+
+void CreateResultData(const ResultKeys* resultKeys, QByteArray& resultData);
 
 
 class IGqlRequestHandler
 {
 public:
 	/**
-		Get IDs of the supported commands.
-	*/
-	virtual bool IsRequestSupported(const IGqlRequest& gqlRequest) const = 0;
-
-	/**
 		Create response for a GraphQL-based request.
 	*/
-	virtual QJsonObject CreateResponse(const IGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+	virtual QJsonObject CreateResponse(
+				const QByteArray& commandId,
+				const RequestType requestType,
+				const QJsonObject& inputParams,
+				const ResultKeys& resultKeys,
+				QString& errorMessage) const = 0;
 };
 
-
-
-// /**
-// 	Common interface for a subscriber object.
-// */
-// class ISubscriber
-// {
-// public:
-// 	enum SubscriberState
-// 	{
-// 		SS_NON_AUTHORIZED,
-// 		SS_AUTHORIZED
-// 	};
-
-// 	virtual SubscriberState GetState() const = 0;
-// 	virtual void SetState(const SubscriberState& subscriberState) = 0;
-// 	virtual QByteArray GetTokenId() const = 0;
-// 	virtual QByteArray GetSubscriberId() const = 0;
-// 	virtual const IRequestServlet& GetRequestHandler() const = 0;
-// };
-
-// IPublisher
 
 class IGqlPublisher
 {
 public:
-	/**
-		Get IDs of the supported commands.
-	*/
-	virtual bool IsRequestSupported(const IGqlRequest& gqlRequest) const = 0;
 
 	/**
 		Register subscriprion for a GraphQL-based request.
 	*/
 	virtual bool RegisterSubscription(
 				const QByteArray& subscriptionId,
-				const IGqlRequest& gqlRequest,
+				const ResultKeys& resultKeys,
 				QString& errorMessage) = 0;
 	virtual bool UnRegisterSubscription(const QByteArray& subscriptionId, QString& errorMessage) = 0;
 };
 
 
-bool InitServer(const ServerSettings& serverSettings, QString& errorMessage);
-bool StartServer(QString& errorMessage);
+bool StartServer(const ServerSettings &serverSettings, QString& errorMessage);
 bool StopServer(QString& errorMessage);
 ServerStatus GetServerStatus();
 
 bool RegisterHttpHandler(const QByteArray& commandId, IHttpRequestHandler& httpRequestHandler, QString& errorMessage);
 bool RegisterGqlHandler(const QByteArray& commandId, graphqlserver::IGqlRequestHandler& gqlRequestHandler, QString& errorMessage);
 bool RegisterGqlPublisher(const QByteArray& commandId, IGqlPublisher& gqlPublisher, QString& errorMessage);
-bool SendSubscription(const QByteArray& subscriptionId, const QJsonObject& subscriptionData);
+bool PublishData(const QByteArray& subscriptionId, const QJsonObject& subscriptionData);
 
 
 } //namespace graphqlserver

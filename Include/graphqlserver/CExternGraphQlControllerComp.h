@@ -3,8 +3,8 @@
 
 // ImtCore includes
 #include <graphqlserver/graphqlserver.h>
-#include <graphqlserver/CGqlRequest.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
+#include <graphqlserver/CExternGraphQl.h>
 
 
 namespace graphqlserver
@@ -12,7 +12,8 @@ namespace graphqlserver
 
 
 class CExternGraphQlControllerComp:
-			public imtservergql::CPermissibleGqlRequestHandlerComp
+			public imtservergql::CPermissibleGqlRequestHandlerComp,
+			public CExternGraphQl
 {
 public:
 	typedef imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
@@ -31,8 +32,6 @@ protected:
 
 private:
 	QMap<QByteArray, graphqlserver::IGqlRequestHandler*> m_gqlRequestHandlers;
-
-	graphqlserver::CGqlRequest ConvertRequest(const imtgql::CGqlRequest& gqlRequest) const;
 };
 
 

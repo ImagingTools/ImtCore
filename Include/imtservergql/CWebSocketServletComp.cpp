@@ -48,7 +48,11 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 			return ProcessGqlRequest(request);
 
 		case imtrest::CWebSocketRequest::MT_ERROR:
-			SendErrorMessage(0, "Error request");
+			SendErrorMessage(0, "Error request", "CWebSocketServletComp");
+			return imtrest::ConstResponsePtr();
+
+		case imtrest::CWebSocketRequest::MT_DATA:
+			SendErrorMessage(0, "Data request", "CWebSocketServletComp");
 			return imtrest::ConstResponsePtr();
 
 		default:{
@@ -68,6 +72,12 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 }
 
 
+	// reimplemented (imtrest::IRequestManager)
+const imtrest::ISender* CWebSocketServletComp::GetSender(const QByteArray& requestId) const
+{
+	return nullptr;
+}
+
 // protected methods
 
 imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::IRequest& request) const
@@ -85,63 +95,69 @@ imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::I
 
 imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest::IRequest& request) const
 {
-	imtgql::CGqlRequest gqlRequest;
-
-	QByteArray body = request.GetBody();
-	QJsonDocument document = QJsonDocument::fromJson(body);
-	QJsonObject object = document.object();
-
-	body = object.value("payload").toObject().value("data").toString().toUtf8();
-
-	int errorPosition;
-	gqlRequest.ParseQuery(body, errorPosition);
-
-	imtgql::IGqlContext* gqlContextPtr = const_cast<imtgql::IGqlContext*>(gqlRequest.GetRequestContext());
-	imtgql::IGqlContext::Headers gqlHeaders;
-	if (gqlContextPtr != nullptr){
-		gqlHeaders = gqlContextPtr->GetHeaders();
-	}
-	else{
-		gqlContextPtr = new imtgql::CGqlContext();
-	}
-	QJsonObject headers = object.value("headers").toObject();
-	for (QString& key: headers.keys()){
-		gqlHeaders.insert(key.toUtf8(), headers.value(key).toString().toUtf8());
+	if (m_workerManagerCompPtr.IsValid()){
+		m_workerManagerCompPtr->ProcessRequest(request);
 	}
 
-	gqlContextPtr->SetHeaders(gqlHeaders);
-	gqlRequest.SetGqlContext(gqlContextPtr);
+	// imtgql::CGqlRequest gqlRequest;
 
-	QByteArray commandId = gqlRequest.GetCommandId();
-	if (commandId.isEmpty()){
-		QByteArray errorMessage = "Empty command-ID";
+	// QByteArray body = request.GetBody();
+	// QJsonDocument document = QJsonDocument::fromJson(body);
+	// QJsonObject object = document.object();
 
-		return CreateErrorResponse(errorMessage, request);
-	}
+	// body = object.value("payload").toObject().value("data").toString().toUtf8();
 
-	if (m_gqlRequestHandlerCompPtr.IsValid()){
-		QString errorMessage;
-		istd::TDelPtr<imtbase::CTreeItemModel> responseDataModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
-		if (!responseDataModelPtr.IsValid()){
-			if (!errorMessage.isEmpty()){
-				return CreateErrorResponse(errorMessage.toUtf8(), request);
-			}
+	// int errorPosition;
+	// gqlRequest.ParseQuery(body, errorPosition);
 
-			return imtrest::ConstResponsePtr();
-		}
+	// imtgql::IGqlContext* gqlContextPtr = const_cast<imtgql::IGqlContext*>(gqlRequest.GetRequestContext());
+	// imtgql::IGqlContext::Headers gqlHeaders;
+	// if (gqlContextPtr != nullptr){
+	// 	gqlHeaders = gqlContextPtr->GetHeaders();
+	// }
+	// else{
+	// 	gqlContextPtr = new imtgql::CGqlContext();
+	// }
+	// QJsonObject headers = object.value("headers").toObject();
+	// for (QString& key: headers.keys()){
+	// 	gqlHeaders.insert(key.toUtf8(), headers.value(key).toString().toUtf8());
+	// }
 
-		QString responseData = responseDataModelPtr->ToJson();
+	// gqlContextPtr->SetHeaders(gqlHeaders);
+	// gqlRequest.SetGqlContext(gqlContextPtr);
 
-		QByteArray data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
-							.arg(object.value("id").toString()).arg(responseData).toUtf8();
+	// QByteArray commandId = gqlRequest.GetCommandId();
+	// if (commandId.isEmpty()){
+	// 	QByteArray errorMessage = "Empty command-ID";
 
-		return CreateDataResponse(data, request);
-	}
-	else{
-		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")
-					.arg(QString(commandId)).toUtf8();
-		return CreateErrorResponse(errorMessage, request);
-	}
+	// 	return CreateErrorResponse(errorMessage, request);
+	// }
+
+
+
+	// if (m_gqlRequestHandlerCompPtr.IsValid()){
+	// 	QString errorMessage;
+		// istd::TDelPtr<imtbase::CTreeItemModel> responseDataModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
+		// if (!responseDataModelPtr.IsValid()){
+		// 	if (!errorMessage.isEmpty()){
+		// 		return CreateErrorResponse(errorMessage.toUtf8(), request);
+		// 	}
+
+		// 	return imtrest::ConstResponsePtr();
+		// }
+
+		// QString responseData = responseDataModelPtr->ToJson();
+
+		// QByteArray data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
+		// 					.arg(object.value("id").toString()).arg(responseData).toUtf8();
+
+		// return CreateDataResponse(data, request);
+	// }
+	// else{
+	// 	QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")
+	// 				.arg(QString(commandId)).toUtf8();
+	// 	return CreateErrorResponse(errorMessage, request);
+	// }
 
 	return imtrest::ConstResponsePtr();
 }

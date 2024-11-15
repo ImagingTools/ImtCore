@@ -49,6 +49,11 @@ QByteArrayList CWebSocketRequest::GetHeaders() const
 }
 
 
+void CWebSocketRequest::SetHeader(const QByteArray& headerId, const QByteArray& headerData)
+{
+	m_headers.insert(headerId, headerData);
+}
+
 QByteArray CWebSocketRequest::GetHeaderValue(const QByteArray& headerType) const
 {
 	if (m_headers.contains(headerType)){
@@ -146,6 +151,11 @@ void CWebSocketRequest::SetRequestHandler(const IRequestServlet* requestHandlerP
 CWebSocketRequest::MethodType CWebSocketRequest::GetMethodType() const
 {
 	return m_type;
+}
+
+void CWebSocketRequest::SetMethodType(MethodType methodType)
+{
+	m_type = methodType;
 }
 
 

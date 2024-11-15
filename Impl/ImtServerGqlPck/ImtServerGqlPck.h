@@ -29,6 +29,8 @@
 #include <imtservergql/CTableViewParamControllerComp.h>
 #include <imtservergql/CConnectionStatusSubscriberControllerComp.h>
 #include <imtservergql/CHeadersDataProviderComp.h>
+#include <graphqlserver/CExternGraphQlControllerComp.h>
+#include <graphqlserver/CExternGraphQlPublisherComp.h>
 
 
 /**
@@ -61,6 +63,8 @@ typedef imtservergql::CGqlSearchControllerComp GqlSearchController;
 typedef imtservergql::CTableViewParamControllerComp TableViewParamController;
 typedef imtservergql::CConnectionStatusSubscriberControllerComp ConnectionStatusSubscriberController;
 typedef imtservergql::CHeadersDataProviderComp HeadersDataProvider;
+typedef graphqlserver::CExternGraphQlControllerComp ExternGraphQlController;
+typedef graphqlserver::CExternGraphQlPublisherComp ExternGraphQlPublisher;
 
 
 } // namespace ImtServerGqlPck

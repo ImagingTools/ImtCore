@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <graphqlserver/CGqlRequest.h>
+// #include <graphqlserver/CGqlRequest.h>
 
 
 
@@ -20,16 +20,8 @@ bool CExternGraphQlPublisherComp::RegisterGqlPublisher(const QByteArray& command
 }
 
 
-bool CExternGraphQlPublisherComp::SendSubscription(const QByteArray& subscriptionId, const QJsonObject& subscriptionData)
+bool CExternGraphQlPublisherComp::PublishData(const QByteArray& subscriptionId, const QJsonObject& subscriptionData)
 {
-	if (*m_requestHandlerCommandIdAtrPtr == ""){
-		return false;
-	}
-
-	if (!m_requestHandlerCompPtr.IsValid()){
-		return false;
-	}
-
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		QByteArrayList keys = requestNetworks.networkRequests.keys();
 		if (keys.contains(subscriptionId)){
@@ -69,8 +61,10 @@ bool CExternGraphQlPublisherComp::RegisterSubscription(
 {
 	QByteArray commandId = gqlRequest.GetCommandId();
 	if (m_gqlPublishers.contains(commandId)){
-		graphqlserver::CGqlRequest externGqlRequest = ConvertRequest(gqlRequest);
-		if (m_gqlPublishers.value(commandId)->RegisterSubscription(subscriptionId, externGqlRequest, errorMessage)){
+		const imtgql::CGqlObject& gqlResultKeys = gqlRequest.GetFields();
+		graphqlserver::ResultKeys resultKeys;
+		CreateResultKeys(gqlResultKeys, resultKeys);
+		if (m_gqlPublishers.value(commandId)->RegisterSubscription(subscriptionId, resultKeys, errorMessage)){
 			m_gqlSubscriptions.insert(subscriptionId, m_gqlPublishers.value(commandId));
 			return BaseClass::RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage);
 		}

@@ -5,6 +5,7 @@
 
 // Qt includes
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
 
 
 namespace imtrest
@@ -28,6 +29,7 @@ public Q_SLOTS:
 
 private:
 	const imtrest::IRequestServlet* m_requestServletPtr;
+	mutable QMutex m_processMutex;
 
 	CWorkerThread* m_workerThread;
 };

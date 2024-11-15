@@ -24,9 +24,35 @@ Cgraphqlserver& GetInstance()
 	return instance;
 }
 
-
-bool InitServer(const graphqlserver::ServerSettings& serverSettings, QString& errorMessage)
+void CreateResultData(const ResultKeys* resultKeys, QByteArray& resultData)
 {
+	if (resultKeys == nullptr){
+		return;
+	}
+
+	resultData += "{";
+	QByteArrayList keys = resultKeys->GetKeys();
+	for (int index = 0; index < keys.count(); index++){
+		if (index > 0){
+			resultData += " ";
+		}
+		const QByteArray key = keys[index];
+		resultData += key;
+		if (resultKeys->IsChild(key)){
+			ResultKeys* resultKeysNoConst = const_cast<ResultKeys*>(resultKeys);
+			if (resultKeysNoConst != nullptr){
+				CreateResultData(resultKeysNoConst->GetChild(key), resultData);
+			}
+		}
+	}
+	resultData += "}";
+}
+
+
+bool StartServer(const graphqlserver::ServerSettings& serverSettings, QString& errorMessage)
+{
+	bool retVal = false;
+
 	Cgraphqlserver& instance = GetInstance();
 	imtbase::IUrlParam* serverPortUrlParamPtr = instance.GetInterface<imtbase::IUrlParam>("ServerPort");
 	if (serverPortUrlParamPtr != nullptr){
@@ -34,22 +60,47 @@ bool InitServer(const graphqlserver::ServerSettings& serverSettings, QString& er
 		url.setPort(serverSettings.tcpPort);
 		serverPortUrlParamPtr->SetUrl(url);
 
-		return true;
+		retVal = true;
+	}
+	else{
+		retVal = false;
 	}
 
-	return false;
-}
+	imtbase::IUrlParam* webSocketPortUrlParamPtr = instance.GetInterface<imtbase::IUrlParam>("WebSocketServerPort");
+	if (webSocketPortUrlParamPtr != nullptr){
+		QUrl url = webSocketPortUrlParamPtr->GetUrl();
+		url.setPort(serverSettings.webSocketPort);
+		webSocketPortUrlParamPtr->SetUrl(url);
 
+		retVal = true;
+	}
+	else{
+		retVal = false;
+	}
 
-bool StartServer(QString& errorMessage)
-{
-	Cgraphqlserver& instance = GetInstance();
-	imtrest::IServer* serverPtr = instance.GetInterface<imtrest::IServer>();
+	if (!retVal){
+		return false;
+	}
+
+	imtrest::IServer* serverPtr = instance.GetInterface<imtrest::IServer>("HttpServerFramework");
 	if (serverPtr != nullptr){
-		return serverPtr->StartServer();
+		serverPtr->StartServer();
+		retVal = true;
+	}
+	else{
+		retVal = false;
 	}
 
-	return false;
+	serverPtr = instance.GetInterface<imtrest::IServer>("WebSocketServerFramework");
+	if (serverPtr != nullptr){
+		serverPtr->StartServer();
+		retVal = true;
+	}
+	else{
+		retVal = false;
+	}
+
+	return retVal;
 }
 
 
@@ -71,8 +122,8 @@ graphqlserver::ServerStatus GetServerStatus()
 	imtrest::IServer* serverPtr = instance.GetInterface<imtrest::IServer>();
 	if (serverPtr != nullptr){
 		imtrest::IServer::ServerStatus status = serverPtr->GetServerStatus();
-		if (status == imtrest::IServer::SS_LISTEN){
-			return graphqlserver::SS_LISTEN;
+		if (status == imtrest::IServer::SS_LISTENING){
+			return graphqlserver::SS_LISTENING;
 		}
 	}
 
@@ -107,13 +158,13 @@ bool RegisterGqlPublisher(const QByteArray& commandId, IGqlPublisher& gqlPublish
 }
 
 
-bool SendSubscription(const QByteArray& subscriptionId, const QJsonObject& subscriptionData)
+bool PublishData(const QByteArray& subscriptionId, const QJsonObject& subscriptionData)
 {
 	Cgraphqlserver& instance = GetInstance();
 	imtgql::IGqlSubscriberController* gqlPublisherPtr = instance.GetInterface<imtgql::IGqlSubscriberController>();
 	graphqlserver::CExternGraphQlPublisherComp* externGraphQlPublisherPtr = dynamic_cast<graphqlserver::CExternGraphQlPublisherComp*>(gqlPublisherPtr);
 	if (externGraphQlPublisherPtr != nullptr){
-		return externGraphQlPublisherPtr->SendSubscription(subscriptionId, subscriptionData);
+		return externGraphQlPublisherPtr->PublishData(subscriptionId, subscriptionData);
 	}
 
 	return false;

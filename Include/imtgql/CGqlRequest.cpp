@@ -276,7 +276,8 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				m_startArrayPrimitives = false;
 				if (m_startParams && endParams && !m_startFields){
 					m_startFields = true;
-					m_activeGqlObjectPtr = nullptr;
+					// m_activeGqlObjectPtr = nullptr;
+					m_activeGqlObjectPtr = &m_fields;
 				}
 			}
 			break;
@@ -428,6 +429,10 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 		case '\n': case '\r': case '\t':
 			if (startBigText){
 				text.append(chr);
+			}
+			if (!text.isEmpty() && m_startFields){
+				SetParseText(text);
+				text.clear();
 			}
 			break;
 
@@ -720,12 +725,15 @@ void CGqlRequest::ParceObjectParamPart(CGqlObject &gqlObject, const QJsonObject 
 void CGqlRequest::SetParseObject(const QByteArray &commandId)
 {
 	if (m_startFields){
-		CGqlObject gqlObject;
-		if (m_activeGqlObjectPtr == nullptr || m_activeGqlObjectPtr->GetParentObject() == nullptr){
-			m_fields.InsertField(commandId, gqlObject);
-			m_activeGqlObjectPtr = const_cast<CGqlObject*>(m_fields.GetFieldArgumentObjectPtr(commandId));
-		}
-		else{
+		// CGqlObject gqlObject;
+		// if (m_activeGqlObjectPtr == nullptr || m_activeGqlObjectPtr->GetParentObject() == nullptr){
+		// 	m_fields.InsertField(commandId, gqlObject);
+		// 	m_activeGqlObjectPtr = const_cast<CGqlObject*>(m_fields.GetFieldArgumentObjectPtr(commandId));
+		// }
+		// else{
+		// 	m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateFieldObject(commandId);
+		// }
+		if (m_activeGqlObjectPtr != nullptr){
 			m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateFieldObject(commandId);
 		}
 	}

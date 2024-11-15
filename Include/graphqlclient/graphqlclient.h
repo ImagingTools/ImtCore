@@ -6,18 +6,25 @@
 // Qt includes
 #include <QtCore/QSharedPointer>
 #include <QtCore/QUrl>
+#include <QtCore/QObject>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
 
 
 namespace graphqlclient {
 
 
-struct ClientSettings
+enum ClientStatus
+{
+	CS_NOT_CONNECTED,
+	CS_CONNECTED
+};
+
+struct ConnectionSettings
 {
 	QUrl serverUrl;
 	QUrl webSocketServerUrl;
-	quint16 webSocketPort;
-	QUrl pathToLog;
-	QByteArray ProductName;
+	QByteArray productId;
 };
 
 /**
@@ -56,8 +63,37 @@ public:
 };
 
 
-QByteArray RegisterSubscribtion(const graphqlserver::IGqlRequest& subscriptionRequest, ISubscriber& subscriber, QString& errorMessage);
+class GraphQlRequestManager: public QObject
+{
+	Q_OBJECT
+public:
+	GraphQlRequestManager(const ConnectionSettings& connectionSettings);
+	void SendRequest(
+				const QByteArray& commandId,
+				const graphqlserver::RequestType requestType,
+				const QJsonObject& inputParams,
+				const graphqlserver::ResultKeys& resultKeys,
+				QString& errorMessage);
+
+protected:
+	virtual void OnResponse(const QByteArray& data) = 0;
+
+	ConnectionSettings m_connectionSettings;
+	QNetworkAccessManager m_manager;
+
+private Q_SLOTS:
+	void OnDataReceived();
+	void OnNetworkError(QNetworkReply::NetworkError error);
+	void OnSslErrors(const QList<QSslError> &errors);
+};
+
+
+bool ConnectToServer(const ConnectionSettings& connectionSettings, QString& errorMessage);
+bool DisconnectFromServer(QString& errorMessage);
+ClientStatus GetConnectionStatus();
+
+QByteArray RegisterSubscription(const QByteArray& commantId, const graphqlserver::ResultKeys& resultKeys, ISubscriber& subscriber, QString& errorMessage);
 bool UnregisterSubscription(const QByteArray& subscriptionId, QString& errorMessage);
 
 
-} //namespace graphqlserver
+} //namespace graphqlclient

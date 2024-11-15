@@ -40,6 +40,10 @@ public:
 	virtual QByteArray GetBody() const override;
 	QHostAddress GetRemoteAddress() const;
 
+	void SetHeader(const QByteArray& headerId, const QByteArray& value);
+	void SetMethodType(const MethodType& methodType);
+	void SetBody(const QByteArray& body);
+
 	static int OnStartMessage(http_parser* httpParser);
 	static int OnUrl(http_parser* httpParser, const char* at, size_t length);
 	static int OnStatus(http_parser* httpParser, const char *at, size_t length);

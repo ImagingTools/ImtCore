@@ -9,7 +9,9 @@
 
 // ImtCore includes
 #include <imtgql/CGqlResponse.h>
+#include <imtgql/CGqlRequest.h>
 #include <imtrest/CWebSocketRequest.h>
+#include <imtrest/CHttpRequest.h>
 
 
 namespace imtclientgql
@@ -85,7 +87,18 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequ
 
 bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) const
 {
-	m_webSocket.sendTextMessage(response->GetData());
+	QByteArray data = response->GetData();
+	// QJsonDocument document = QJsonDocument::fromJson(data);
+	// QJsonObject object = document.object();
+	// QByteArray body = object.value("payload").toObject().value("data").toString().toUtf8();
+
+	// 	// QString responseData = responseDataModelPtr->ToJson();
+	// if (!body.isEmpty() && object.value("type").toString() != "data"){
+	// 	data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
+	// 	.arg(object.value("id").toString()).arg(body).toUtf8();
+	// }
+
+	m_webSocket.sendTextMessage(data);
 
 	return true;
 }
@@ -166,7 +179,9 @@ void CWebSocketClientComp::OnComponentCreated()
 		}
 	}
 
-	EnsureWebSocketConnection();
+	if (m_connectOnCreateAttrPtr.IsValid() && *m_connectOnCreateAttrPtr){
+		EnsureWebSocketConnection();
+	}
 }
 
 
@@ -190,7 +205,6 @@ void CWebSocketClientComp::OnTimeout()
 
 void CWebSocketClientComp::OnWebSocketConnected()
 {
-	m_connectionStatusProvider.SetConnectionStatus(imtcom::IConnectionStatusProvider::CS_CONNECTED);
 
 	QString clientId;
 	if (m_clientIdAttrPtr.IsValid()){
@@ -210,6 +224,7 @@ void CWebSocketClientComp::OnWebSocketConnected()
 	}
 
 	m_webSocket.sendTextMessage(body);
+	m_connectionStatusProvider.SetConnectionStatus(imtcom::IConnectionStatusProvider::CS_CONNECTED);
 }
 
 
@@ -235,6 +250,10 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError error)
 
 void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message)
 {
+	if (!message.contains("keep_alive")){
+		qDebug() << "OnWebSocketTextMessageReceived" << message;
+	}
+
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 
 	if (webSocketPtr == nullptr){
@@ -266,7 +285,41 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 		responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
 	}
 	else{
-		responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
+		if (methodType == imtrest::CWebSocketRequest::MT_QUERY){
+			// webSocketRequest.PopPtr();
+			// QJsonDocument document = QJsonDocument::fromJson(webSocketRequest->GetBody());
+			// QJsonObject object = document.object();
+			// QByteArray body = object.value("payload").toObject().value("data").toString().toUtf8();
+			// QJsonObject headers = object.value("headers").toObject();
+			// // QString productId = headers.value("ProductId").toString();
+			// for (QString& key: headers.keys()){
+			// 	webSocketRequest->SetHeader(key.toUtf8(), headers.value(key).toString().toUtf8());
+			// }
+			// webSocketRequest->SetCommandId("Agent/graphql");
+			// webSocketRequest->SetBody(body);
+			// webSocketRequest->SetMethodType(imtrest::CWebSocketRequest::MT_QUERY);
+
+			// responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
+
+			imtrest::IRequest* requestPtr = m_httpProtocolEngineCompPtr->CreateRequest(*m_serverRequestHandlerCompPtr);
+			imtrest::CHttpRequest* newHttpRequestPtr = dynamic_cast<imtrest::CHttpRequest*>(requestPtr);
+			if (newHttpRequestPtr != nullptr){
+				QByteArray clientId = webSocketRequest->GetClientId();
+
+				QJsonDocument document = QJsonDocument::fromJson(message.toUtf8());
+				QJsonObject object = document.object();
+				QByteArray body = object.value("payload").toObject().value("data").toString().toUtf8();
+				QJsonObject headers = object.value("headers").toObject();
+				for (QString& key: headers.keys()){
+					newHttpRequestPtr->SetHeader(key.toUtf8(), headers.value(key).toString().toUtf8());
+				}
+				newHttpRequestPtr->SetBody(body);
+				newHttpRequestPtr->SetMethodType(imtrest::CHttpRequest::MT_POST);
+
+				responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(*newHttpRequestPtr);
+			}
+		}
+
 	}
 
 	if (responsePtr.IsValid()){

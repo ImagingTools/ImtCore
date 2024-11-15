@@ -20,6 +20,7 @@
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/IRequestManager.h>
+#include <imtrest/IServer.h>
 #include <imtcom/ISslConfigurationManager.h>
 
 
@@ -38,7 +39,8 @@ class CTcpServerComp:
 			public QObject,
 			public ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase>,
 			private imod::CMultiModelDispatcherBase,
-			virtual public IRequestManager
+			virtual public IRequestManager,
+			virtual public IServer
 {
 	Q_OBJECT
 public:
@@ -47,6 +49,7 @@ public:
 
 	I_BEGIN_COMPONENT(CTcpServerComp);
 		I_REGISTER_INTERFACE(IRequestManager)
+		I_REGISTER_INTERFACE(IServer)
 		I_ASSIGN(m_requestHandlerCompPtr, "RequestHandler", "Request handler registered for the server", true, "RequestHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
 		I_ASSIGN(m_threadsLimitAttrPtr, "ThreadsLimit", "Limit of threads", true, 5);
@@ -76,6 +79,11 @@ protected:
 
 	// reimplemented (icomp::IRequestManager)
 	virtual const ISender* GetSender(const QByteArray& requestId) const override;
+
+	// reimplemented (imtrest::IServer)
+	virtual bool StartServer() override;
+	virtual bool StopServer() override;
+	virtual ServerStatus GetServerStatus() const override;
 
 private:
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);

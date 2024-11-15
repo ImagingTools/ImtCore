@@ -14,6 +14,7 @@
 namespace imtrest
 {
 
+class CMultiThreadServer;
 
 class CSocketThread:
 			public QThread,
