@@ -13,6 +13,7 @@ class Canvas extends Item {
     static meta = Object.assign({}, Item.meta, {
         available: {type: Bool, value: true, signalName: 'availableChanged' },
         canvasSize: {type: Bool, value: true, signalName: 'canvasSizeChanged' },
+        antialiasing: {type: Bool, value: false, signalName: 'antialiasingChanged' },
         context: {type: Var, value: undefined, signalName: 'contextChanged' },
         renderStrategy: {type: Real, value: Canvas.Immediate, signalName: 'renderStrategyChanged' },
         renderTarget: {type: Real, value: Canvas.Image, signalName: 'renderTargetChanged' },
@@ -20,6 +21,7 @@ class Canvas extends Item {
 
         availableChanged: {type:Signal, slotName:'onAvailableChanged', args:[]},
         canvasSizeChanged: {type:Signal, slotName:'onCanvasSizeChanged', args:[]},
+        antialiasingChanged: {type:Signal, slotName:'onAntialiasingChanged', args:[]},
         contextChanged: {type:Signal, slotName:'onContextChanged', args:[]},
         renderStrategyChanged: {type:Signal, slotName:'onRenderStrategyChanged', args:[]},
         renderTargetChanged: {type:Signal, slotName:'onRenderTargetChanged', args:[]},

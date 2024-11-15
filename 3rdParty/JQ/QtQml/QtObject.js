@@ -30,11 +30,11 @@ class QtObject extends QObject {
     static create(parent, model, properties=[], ...args){
         let proxy = super.create(parent, properties, ...args)
 
-        proxy.JQAbstractModel = QtFunctions.binding(()=>{return proxy.parent ? proxy.parent.JQAbstractModel : null})
-        proxy.index = QtFunctions.binding(()=>{return proxy.JQAbstractModel.index})
-
         if(model){
             proxy.JQAbstractModel = model
+        } else {
+            proxy.JQAbstractModel = QtFunctions.binding(()=>{return proxy.parent.JQAbstractModel})
+            // proxy.index = QtFunctions.binding(()=>{return proxy.JQAbstractModel.index})
         }
 
         return proxy
@@ -56,6 +56,8 @@ class QtObject extends QObject {
     }
 
     onJQAbstractModelChanged(){
+        this.index = this.JQAbstractModel.index
+
         if(this.__self.constructor.meta.model.auto){
             this.model = this.JQAbstractModel
         }

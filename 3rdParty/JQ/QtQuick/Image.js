@@ -36,6 +36,8 @@ class Image extends Item {
         status: {type: Real, value:Image.Null, signalName:'statusChanged'},
         paintedWidth: {type:Real, value:0, signalName:'paintedWidthChanged'},
         paintedHeight: {type:Real, value:0, signalName:'paintedHeightChanged'},
+        horizontalAlignment: {type:Real, value:Image.AlignHCenter, signalName:'horizontalAlignmentChanged'},
+        verticalAlignment: {type:Real, value:Image.AlignVCenter, signalName:'verticalAlignmentChanged'},
         
         progressChanged: {type:Signal, slotName:'onProgressChanged', args:[]},
         sourceChanged: {type:Signal, slotName:'onSourceChanged', args:[]},
@@ -43,6 +45,8 @@ class Image extends Item {
         statusChanged: {type:Signal, slotName:'onStatusChanged', args:[]},
         paintedWidthChanged: {type:Signal, slotName:'onPaintedWidthChanged', args:[]},
         paintedHeightChanged: {type:Signal, slotName:'onPaintedHeightChanged', args:[]},
+        horizontalAlignmentChanged: {type:Signal, slotName:'onHorizontalAlignmentChanged', args:[]},
+        verticalAlignmentChanged: {type:Signal, slotName:'onVerticalAlignmentChanged', args:[]},
     })
 
     static create(parent, model, properties=[], ...args){

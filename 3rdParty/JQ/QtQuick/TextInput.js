@@ -55,6 +55,7 @@ class TextInput extends Item {
         rightPadding: { type: Real, value: 0, signalName: 'rightPaddingChanged' },
         bottomPadding: { type: Real, value: 0, signalName: 'bottomPaddingChanged' },
         selectedText: { type: String, value: '', signalName: 'selectedTextChanged' },
+        selectByMouse: { type: Bool, value: true, signalName: 'selectByMouseChanged' },
 
         textChanged: {type:Signal, slotName:'onTextChanged', args:[]},
         colorChanged: {type:Signal, slotName:'onColorChanged', args:[]},
@@ -81,6 +82,7 @@ class TextInput extends Item {
         rightPaddingChanged: {type:Signal, slotName:'onRightPaddingChanged', args:[]},
         bottomPaddingChanged: {type:Signal, slotName:'onBottomPaddingChanged', args:[]},
         selectedTextChanged: {type:Signal, slotName:'onSelectedTextChanged', args:[]},
+        selectByMouseChanged: {type:Signal, slotName:'onSelectByMouseChanged', args:[]},
 
         accepted: {type:Signal, slotName:'onAccepted', args:[]},
         editingFinished: {type:Signal, slotName:'onEditingFinished', args:[]},
