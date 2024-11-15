@@ -266,7 +266,7 @@ CustomTextField {
         return dateToString(selectedDate);
     }
 
-    // Return string in format dd.MM.yyyy H:mm
+    // Return string in format dd.MM.yyyy HH:mm
     function dateToString(date){
         let monthStr = String(date.getMonth() + 1)
         if (monthStr.length == 1){
