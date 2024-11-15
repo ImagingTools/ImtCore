@@ -57,7 +57,7 @@ Item {
 	property string commandsId;
 
 	property alias grid: gridInternal;
-	property alias selectedIndex: gridInternal.selectedIndex;
+	property int selectedIndex: gridInternal.selectedIndex;
 
 	property bool hasPagination: true;
 
@@ -117,7 +117,9 @@ Item {
 		 paginationObj.countElements = paginationCountElements;
 	}
 
-
+	onSelectedIndexChanged: {
+		gridInternal.selectedIndex = selectedIndex;
+	}
 
 	Rectangle {
 		id: backgroundTable;
@@ -235,6 +237,7 @@ Item {
 			onSelectedIndexChanged: {
 				console.log("CollectionView GridView onSelectedIndexChanged");
 				collectionViewBaseContainer.selectedIndexChangedSignal(gridInternal.selectedIndex);
+				collectionViewBaseContainer.selectedIndex = selectedIndex;
 			}
 
 			//            onElementsChanged: {

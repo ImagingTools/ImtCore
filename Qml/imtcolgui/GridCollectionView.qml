@@ -60,7 +60,7 @@ Item {
 	property alias gridElementsDelegate: gridCollectionViewBase.gridElementsDelegate;
 	property alias gridElementsModel: gridCollectionViewBase.gridElementsModel;
 	//property alias selectedIndex: gridCollectionViewBase.grid.selectedIndex;
-	property alias selectedIndex: gridCollectionViewBase.selectedIndex;
+	property int selectedIndex: gridCollectionViewBase.selectedIndex;
 	//    property alias elementsList: gridCollectionViewBase.elementsList;
 	//    property alias gridMinWidth: gridCollectionViewBase.gridMinWidth;
 	property alias gridDecoratorPath: gridCollectionViewBase.gridDecoratorPath;
@@ -75,7 +75,6 @@ Item {
 	property alias hasPagination: gridCollectionViewBase.hasPagination;
 
 	property string backgroundColor: Style.baseColor;
-
 
 	//    Component.onCompleted: {
 	//        itemId = documentsData.getData("Id", model.index);
@@ -118,6 +117,9 @@ Item {
 	}
 	onPaginationCountElementsChanged: {
 		gridCollectionViewBase.paginationCountElements = paginationCountElements;
+	}
+	onSelectedIndexChanged: {
+		gridCollectionViewBase.selectedIndex = selectedIndex;
 	}
 
 	function updateGui(){
@@ -234,6 +236,10 @@ Item {
 			if(gridCollectionViewContainer.hasMetaInfo){
 				//collectionMetaInfo.getMetaInfo(); // в collectionMetaInfo нет getMetaInfo
 			}
+		}
+
+		onSelectedIndexChanged: {
+			gridCollectionViewContainer.selectedIndex = selectedIndex;
 		}
 
 		onSelectedItem: {
