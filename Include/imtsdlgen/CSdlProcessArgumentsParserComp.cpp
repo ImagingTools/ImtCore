@@ -98,8 +98,11 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	});
 
 	bool isOptionsAcceptable = true;
+
 	QSet<QString> optionNames;
+	QSet<QString> optionValueNames;
 	for (const QCommandLineOption& option: allOptions){
+		// check option names
 		for (const QString& optionName: option.names()){
 			if (optionNames.contains(optionName)){
 				SendCriticalMessage(0, QString("Duplication of option '%1' is detected. All option IDs MUST be unique! Select another name for this option").arg(optionName));
@@ -107,12 +110,23 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 			}
 			optionNames << optionName;
 		}
+
+		// check option value names. Empty names can be duplicated
+		const QString optinValueName = option.valueName();
+		if (!optinValueName.isEmpty()){
+			if (optionValueNames.contains(optinValueName)){
+				SendCriticalMessage(0, QString("Duplication of option value ID '%1' is detected. All option value's IDs MUST be unique! Select another name for this option").arg(optinValueName));
+				isOptionsAcceptable = false;
+			}
+			optionValueNames << optinValueName;
+		}
 	}
 	if (!isOptionsAcceptable){
-		Q_ASSERT_X(false, "Options duplicates has been detected!", __func__);
+		Q_ASSERT_X(false, "Unacceptable options!", __func__);
 
 		return false;
 	}
+
 
 	bool isOptionsAdded = commandLineParser.addOptions(allOptions);
 
