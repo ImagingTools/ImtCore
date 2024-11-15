@@ -4,7 +4,6 @@
 //Qt includes
 #include <QtCore/QRegularExpression>
 #include <QtCore/QCommandLineParser>
-#include <QtCore/QCommandLineOption>
 
 // ImtCore includes
 #include <imtsdlgen/imtsdlgen.h>
@@ -41,6 +40,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 		arguments << QString(argv[i]);
 	}
 
+	QList<QCommandLineOption> allOptions = PrepareCommandLineOptions();
+
 	QCommandLineOption schemaFilePathOption({"S","schema-file"}, "SDL schema file path", "SchemaFilePath");
 	QCommandLineOption outputDirectoryPathOption({"O","output-directory"}, "Directory where created files will be created", "OutputDirectoryPath");
 	QCommandLineOption namespaceOption({"N","namespace"}, "Namespace, used in source and header files", "Namespace");
@@ -74,35 +75,54 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	commandLineParser.addHelpOption();
 	commandLineParser.addVersionOption();
 
-	bool isOptionsAdded = commandLineParser.addOptions(
-				{
-					schemaFilePathOption,
-					outputDirectoryPathOption,
-					namespaceOption,
-					namespacePrefixOption,
-					generateOption,
-					dependenciesOption,
-					modificatorsOption,
-					allModificatorsOption,
-					qmlOption,
-					cppOption,
-					gqlOption,
-					schemaDependencyOption,
-					baseClassOption,
-					joinRulesOption,
-					includePathOption,
-					autoJoinOption,
-					generatorOption,
-					autoLinkOption,
-					includeHeadersOption
-				});
-	if (!isOptionsAdded){
-		Q_ASSERT(false);
+	allOptions << QList<QCommandLineOption>({
+				schemaFilePathOption,
+				outputDirectoryPathOption,
+				namespaceOption,
+				namespacePrefixOption,
+				generateOption,
+				dependenciesOption,
+				modificatorsOption,
+				allModificatorsOption,
+				qmlOption,
+				cppOption,
+				gqlOption,
+				schemaDependencyOption,
+				baseClassOption,
+				joinRulesOption,
+				includePathOption,
+				autoJoinOption,
+				generatorOption,
+				autoLinkOption,
+				includeHeadersOption
+	});
+
+	bool isOptionsAcceptable = true;
+	QSet<QString> optionNames;
+	for (const QCommandLineOption& option: allOptions){
+		for (const QString& optionName: option.names()){
+			if (optionNames.contains(optionName)){
+				SendCriticalMessage(0, QString("Duplication of option '%1' is detected. All option IDs MUST be unique! Select another name for this option").arg(optionName));
+				isOptionsAcceptable = false;
+			}
+			optionNames << optionName;
+		}
+	}
+	if (!isOptionsAcceptable){
+		Q_ASSERT_X(false, "Options duplicates has been detected!", __func__);
 
 		return false;
 	}
 
+	bool isOptionsAdded = commandLineParser.addOptions(allOptions);
+
+	if (!isOptionsAdded){
+		I_CRITICAL();
+
+		return false;
+	}
 	commandLineParser.process(arguments);
+
 	if (commandLineParser.isSet(schemaFilePathOption)){
 		m_schemaFilePath = commandLineParser.value(schemaFilePathOption);
 	}
@@ -209,7 +229,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 			m_generatorType = GT_CMAKE_PIPE;
 		}
 		else {
-			SendErrorMessage(0, QString("Unexpected generator option '%1'. Expected: QMake or CMake").arg(generatorName));
+			SendErrorMessage(0, QString("Unexpected generator option '%1'. See %2 help for detales").arg(generatorName, generatorOption.names().join('/')));
 		}
 	}
 
@@ -241,7 +261,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	// only one mode MUST be used
 	Q_ASSERT(commandLineParser.isSet(generateOption) ^ commandLineParser.isSet(dependenciesOption) ^ commandLineParser.isSet(schemaDependencyOption));
 
-	return true;
+	bool retVal = ProcessCommandLineOptions(commandLineParser);
+
+	return retVal;
 }
 
 
@@ -378,6 +400,19 @@ imtsdl::ISdlProcessArgumentsParser::AutoLinkLevel CSdlProcessArgumentsParserComp
 QStringList CSdlProcessArgumentsParserComp::GetHeadersIncludePaths() const
 {
 	return m_headersIncludePaths;
+}
+
+
+// pseudo-implemented (protected) methods
+
+QList<QCommandLineOption> CSdlProcessArgumentsParserComp::PrepareCommandLineOptions()
+{
+	return QList<QCommandLineOption>();
+}
+
+bool CSdlProcessArgumentsParserComp::ProcessCommandLineOptions(const QCommandLineParser& /*commandLineParser*/)
+{
+	return true;
 }
 
 

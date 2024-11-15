@@ -1,12 +1,18 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QCommandLineOption>
+
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/IParamsSet.h>
 
 // ImtCore includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
+
+
+class QCommandLineParser;
 
 
 namespace imtsdlgen
@@ -48,6 +54,22 @@ public:
 	virtual bool IsAutoJoinEnabled() const override;
 	virtual AutoLinkLevel GetAutoLinkLevel() const override;
 	virtual QStringList GetHeadersIncludePaths() const override;
+
+protected:
+	/**
+		\brief Prepares command line options
+		\note This method will be invoked PRIOR to the options being parsed.
+		\returns a list of all acceptable options
+		\note inherits classes SHOULD NOT call base method. Default implementation returns nothing.
+	 */
+	virtual QList<QCommandLineOption> PrepareCommandLineOptions();
+
+	/**
+		\brief Processing parsed options
+		\note This method will be invoked AFTER a commandLineParser process the input parameters.
+		\note inherits classes SHOULD NOT call base method. Default implementation does nothing.
+	 */
+	virtual bool ProcessCommandLineOptions(const QCommandLineParser& commandLineParser);
 
 private:
 	QString m_schemaFilePath;
