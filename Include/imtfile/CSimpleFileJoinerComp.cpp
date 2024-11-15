@@ -6,6 +6,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QDir>
 #include <QtCore/QLockFile>
+#include <QtCore/QTemporaryDir>
 
 // ACF includes
 #include <istd/CSystem.h>
@@ -99,7 +100,7 @@ int CSimpleFileJoinerComp::DoProcessing(
 
 	// define temp workspace
 	imtbase::CTempDir tempDir;
-	QFile tempJoinedFile(tempDir.Path() + targetFileInfo.fileName());
+	QFile tempJoinedFile(tempDir.Path() + '/' + targetFileInfo.fileName());
 
 	// save original file if append is enabled
 	if (appendDataToFile){
