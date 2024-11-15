@@ -11,7 +11,11 @@ namespace imtbase
 
 CTempDir::CTempDir(const QString& tempSubDir, bool autoRemove)
 {
-	QString path = QDir::tempPath() + "/" + tempSubDir + "/" + QUuid::createUuid().toString();
+	QString path = QDir::tempPath();
+	if (!tempSubDir.isEmpty()){
+		path += '/' + tempSubDir;
+	}
+	path += '/' + QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 	m_autoRemove = false;
 	if (m_dir.mkpath(path)){
