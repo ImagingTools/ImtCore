@@ -44,7 +44,7 @@ QList<QCommandLineOption> CSdlProcessArgumentsParserComp::PrepareCommandLineOpti
 		{"GG", "generation"},
 		"{1|2} Defines the version of the generator",
 		"Generation",
-		"0"));
+		"1"));
 
 	retVal << *m_generationCommandLinePtr;
 
