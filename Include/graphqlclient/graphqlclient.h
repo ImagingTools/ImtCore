@@ -1,5 +1,6 @@
 #pragma once
 
+
 // QtCore includes
 #include <graphqlserver/graphqlserver.h>
 
@@ -11,14 +12,17 @@
 #include <QtNetwork/QNetworkReply>
 
 
-namespace graphqlclient {
+namespace graphqlclient
+{
 
 
 enum ClientStatus
 {
+	CS_UNKNOWN,
 	CS_NOT_CONNECTED,
 	CS_CONNECTED
 };
+
 
 struct ConnectionSettings
 {
@@ -76,15 +80,18 @@ public:
 				QString& errorMessage);
 
 protected:
+	/**
+		Abstract method for handling the answers from server.
+	*/
 	virtual void OnResponse(const QByteArray& data) = 0;
 
 	ConnectionSettings m_connectionSettings;
 	QNetworkAccessManager m_manager;
 
 private Q_SLOTS:
-	void OnDataReceived();
-	void OnNetworkError(QNetworkReply::NetworkError error);
-	void OnSslErrors(const QList<QSslError> &errors);
+	virtual void OnDataReceived();
+	virtual void OnNetworkError(QNetworkReply::NetworkError error);
+	virtual void OnSslErrors(const QList<QSslError> &errors);
 };
 
 

@@ -39,7 +39,7 @@ protected:
 				const QString& message) override;
 
 protected:
-	QMap<QByteArray, graphqlclient::ISubscriber*> m_subscribtions; // <SubscriptionId, ISubscriberPtr>
+	QMap<QByteArray, graphqlclient::ISubscriber*> m_subscriptions; // <SubscriptionId, ISubscriberPtr>
 
 protected:
 	I_REF(imtclientgql::IGqlSubscriptionManager, m_subscriptionManagerCompPtr);

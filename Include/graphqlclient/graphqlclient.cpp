@@ -52,20 +52,19 @@ void CreateParamsData(const QJsonObject& queryObject, QByteArray& result)
 
 // public methods
 
-GraphQlRequestManager::GraphQlRequestManager(const ConnectionSettings& connectionSettings):
-	m_connectionSettings(connectionSettings)
+GraphQlRequestManager::GraphQlRequestManager(const ConnectionSettings& connectionSettings)
+	:m_connectionSettings(connectionSettings)
 {
-
 }
 
 
-void GraphQlRequestManager::SendRequest(const QByteArray& commandId,
-										const graphqlserver::RequestType requestType,
-										const QJsonObject& inputParams,
-										const graphqlserver::ResultKeys& resultKeys,
-										QString &errorMessage)
+void GraphQlRequestManager::SendRequest(
+			const QByteArray& commandId,
+			const graphqlserver::RequestType requestType,
+			const QJsonObject& inputParams,
+			const graphqlserver::ResultKeys& resultKeys,
+			QString &errorMessage)
 {
-
 	QNetworkRequest request;
 	QUrl url = m_connectionSettings.serverUrl;
 	url.setPath("/" + m_connectionSettings.productId + "/graphql");
@@ -79,7 +78,9 @@ void GraphQlRequestManager::SendRequest(const QByteArray& commandId,
 		data += "mutation";
 	}
 	else {
-		errorMessage = "Incorrected request type";
+		errorMessage = "Incorrect request type";
+
+		Q_ASSERT_X(false, "GraphQlRequestManager::SendRequest", "GraphQL Client: Invalid request type");
 
 		return;
 	}
@@ -100,12 +101,21 @@ void GraphQlRequestManager::SendRequest(const QByteArray& commandId,
 	data += fieldsData;
 	data += "}\"}";
 
-	QNetworkReply *reply = m_manager.post(request, data);
-	QObject::connect(reply, &QIODevice::readyRead, this, &GraphQlRequestManager::OnDataReceived);
-	QObject::connect(reply, &QNetworkReply::errorOccurred,
-					 this, &GraphQlRequestManager::OnNetworkError);
-	QObject::connect(reply, &QNetworkReply::sslErrors,
-					 this, &GraphQlRequestManager::OnSslErrors);
+	QNetworkReply* networkReplyPtr = m_manager.post(request, data);
+
+	QObject::connect(networkReplyPtr, &QIODevice::readyRead, this, &GraphQlRequestManager::OnDataReceived);
+
+	QObject::connect(
+				networkReplyPtr,
+				&QNetworkReply::errorOccurred,
+				this,
+				&GraphQlRequestManager::OnNetworkError);
+
+	QObject::connect(
+				networkReplyPtr,
+				&QNetworkReply::sslErrors,
+				this,
+				&GraphQlRequestManager::OnSslErrors);
 }
 
 
@@ -114,7 +124,7 @@ void GraphQlRequestManager::OnDataReceived()
 	QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
 	if (reply != nullptr){
 		QByteArray data = reply->readAll();
-		qDebug() << "Reply data: " << data;
+
 		OnResponse(data);
 	}
 }
@@ -122,46 +132,54 @@ void GraphQlRequestManager::OnDataReceived()
 
 void GraphQlRequestManager::OnNetworkError(QNetworkReply::NetworkError error)
 {
-		qDebug() << "Network error: " << error;
+	qDebug() << "[GraphQL-Client] Network error: " << error;
 }
 
 
 void GraphQlRequestManager::OnSslErrors(const QList<QSslError> &errors)
 {
 	for (const QSslError& sslError: errors){
-		qDebug() << "Ssl error: " << sslError.errorString();
+		qDebug() << "[GraphQL-Client] SSL-error: " << sslError.errorString();
 	}
 }
 
 
 bool ConnectToServer(const ConnectionSettings& connectionSettings, QString& errorMessage)
 {
-	bool retVal = false;
-
 	Cgraphqlclient& instance = GetInstance();
 
 	imtbase::IUrlParam* webSocketPortUrlParamPtr = instance.GetInterface<imtbase::IUrlParam>("WebSocketServerPort");
 	if (webSocketPortUrlParamPtr != nullptr){
-		webSocketPortUrlParamPtr->SetUrl(connectionSettings.webSocketServerUrl);
+		bool retVal = webSocketPortUrlParamPtr->SetUrl(connectionSettings.webSocketServerUrl);
+		if (!retVal){
+			errorMessage = QString("Server URL could not be set");
 
-		retVal = true;
+			return false;
+		}
 	}
 	else{
-		retVal = false;
+		errorMessage = QString("Internal error: wrong component configuration");
+
+		Q_ASSERT(false);
+
+		return false;
 	}
 
 	imtcom::IConnectionController* connectionControllerPtr = instance.GetInterface<imtcom::IConnectionController>("WebSocketClient");
 	if (connectionControllerPtr != nullptr){
-		connectionControllerPtr->Connect();
+		bool retVal = connectionControllerPtr->Connect();
+		if (!retVal) {
+			errorMessage = QString("Server could not be connected. Server-URL: '%1'").arg(webSocketPortUrlParamPtr->GetUrl().toString());
 
-		retVal = true;
+			return false;
+		}
 	}
 
-	return retVal;
+	return true;
 }
 
 
-bool DisconnectClient(QString& errorMessage)
+bool DisconnectFromServer(QString& errorMessage)
 {
 	bool retVal = false;
 
@@ -173,6 +191,13 @@ bool DisconnectClient(QString& errorMessage)
 
 		retVal = true;
 	}
+	else {
+		errorMessage = QString("Internal error: wrong component configuration");
+
+		Q_ASSERT(false);
+
+		return false;
+	}
 
 	return retVal;
 }
@@ -180,7 +205,7 @@ bool DisconnectClient(QString& errorMessage)
 
 graphqlclient::ClientStatus GetConnectionStatus()
 {
-	ClientStatus retVal = CS_NOT_CONNECTED;
+	ClientStatus retVal = CS_UNKNOWN;
 
 	Cgraphqlclient& instance = GetInstance();
 
@@ -190,13 +215,23 @@ graphqlclient::ClientStatus GetConnectionStatus()
 		if (connectionStatus == imtcom::IConnectionStatusProvider::CS_CONNECTED){
 			retVal = CS_CONNECTED;
 		}
+		else if (connectionStatus == imtcom::IConnectionStatusProvider::CS_DISCONNECTED){
+			retVal = CS_NOT_CONNECTED;
+		}
+		else if (connectionStatus == imtcom::IConnectionStatusProvider::CS_UNKNOWN) {
+			retVal = CS_UNKNOWN;
+		}
 	}
 
 	return retVal;
 }
 
 
-QByteArray RegisterSubscription(const QByteArray& commantId, const graphqlserver::ResultKeys& resultKeys, ISubscriber& subscriber, QString& errorMessage)
+QByteArray RegisterSubscription(
+			const QByteArray& commantId,
+			const graphqlserver::ResultKeys& resultKeys,
+			ISubscriber& subscriber,
+			QString& errorMessage)
 {
 	QByteArray fieldData;
 	graphqlserver::CreateResultData(&resultKeys, fieldData);
@@ -220,8 +255,22 @@ QByteArray RegisterSubscription(const QByteArray& commantId, const graphqlserver
 
 bool UnregisterSubscription(const QByteArray& subscriptionId, QString& errorMessage)
 {
+	Cgraphqlclient& instance = GetInstance();
+	imtclientgql::IGqlSubscriptionClient* gqlSubscriptionClientPtr = instance.GetInterface<imtclientgql::IGqlSubscriptionClient>();
+	graphqlclient::CExternSubscriberComp* externSubscriberPtr = dynamic_cast<graphqlclient::CExternSubscriberComp*>(gqlSubscriptionClientPtr);
+	if (externSubscriberPtr != nullptr) {
+		return externSubscriberPtr->UnregisterSubscription(subscriptionId, errorMessage);
+	}
+	else{
+		errorMessage = "Internal error";
+
+		Q_ASSERT(false);
+	}
+
 	return false;
 }
 
 
 } //namespace graphqlclient
+
+

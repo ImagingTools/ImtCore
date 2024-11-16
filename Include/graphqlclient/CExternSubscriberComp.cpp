@@ -11,7 +11,7 @@ namespace graphqlclient
 
 // public methods
 
-QByteArray CExternSubscriberComp::RegisterSubscribtion(const QByteArray& queryData,  ISubscriber& subscriber, QString& errorMessage)
+QByteArray CExternSubscriberComp::RegisterSubscribtion(const QByteArray& queryData,  ISubscriber& subscriber, QString& /*errorMessage*/)
 {
 	QByteArray retVal;
 	if (m_subscriptionManagerCompPtr.IsValid()){
@@ -20,7 +20,7 @@ QByteArray CExternSubscriberComp::RegisterSubscribtion(const QByteArray& queryDa
 
 		if (gqlRequest.ParseQuery(queryData, errorPosition)){
 			retVal = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
-			m_subscribtions.insert(retVal, &subscriber);
+			m_subscriptions.insert(retVal, &subscriber);
 		}
 	}
 
@@ -28,10 +28,10 @@ QByteArray CExternSubscriberComp::RegisterSubscribtion(const QByteArray& queryDa
 }
 
 
-bool CExternSubscriberComp::UnregisterSubscription(const QByteArray& subscriptionId, QString& errorMessage)
+bool CExternSubscriberComp::UnregisterSubscription(const QByteArray& subscriptionId, QString& /*errorMessage*/)
 {
-	if (m_subscribtions.contains(subscriptionId)){
-		m_subscribtions.remove(subscriptionId);
+	if (m_subscriptions.contains(subscriptionId)){
+		m_subscriptions.remove(subscriptionId);
 		m_subscriptionManagerCompPtr->UnregisterSubscription(subscriptionId);
 
 		return true;
@@ -49,8 +49,8 @@ void CExternSubscriberComp::OnResponseReceived(
 			const QByteArray& subscriptionId,
 			const QByteArray& subscriptionData)
 {
-	if (m_subscribtions.contains(subscriptionId)){
-		m_subscribtions.value(subscriptionId)->OnSubscriptionReceived(subscriptionId, subscriptionData);
+	if (m_subscriptions.contains(subscriptionId)){
+		m_subscriptions.value(subscriptionId)->OnSubscriptionReceived(subscriptionId, subscriptionData);
 	}
 }
 
@@ -60,9 +60,9 @@ void CExternSubscriberComp::OnSubscriptionStatusChanged(
 			const SubscriptionStatus& status,
 			const QString& message)
 {
-	if (m_subscribtions.contains(subscriptionId)){
+	if (m_subscriptions.contains(subscriptionId)){
 		graphqlclient::ISubscriber::SubscriptionStatus externStatus = static_cast<graphqlclient::ISubscriber::SubscriptionStatus>(status);
-		m_subscribtions.value(subscriptionId)->OnSubscriptionStatusChanged(subscriptionId, externStatus, message);
+		m_subscriptions.value(subscriptionId)->OnSubscriptionStatusChanged(subscriptionId, externStatus, message);
 	}
 }
 
