@@ -34,9 +34,9 @@ sdl::imtlic::Products::V1_0::CProductDataPayload CProductControllerComp::OnProdu
 
 
 sdl::imtlic::Products::V1_0::CProductExportResponse CProductControllerComp::OnProductsExport(
-	const sdl::imtlic::Products::V1_0::CProductsExportGqlRequest& productsExportRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const sdl::imtlic::Products::V1_0::CProductsExportGqlRequest& /*productsExportRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	return sdl::imtlic::Products::V1_0::CProductExportResponse();
 }
@@ -52,18 +52,18 @@ sdl::imtlic::Products::V1_0::CProductExportResponse CProductControllerComp::OnPr
 
 
 ::sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload CProductControllerComp::OnProductAdd(
-	const sdl::imtlic::Products::V1_0::CProductAddGqlRequest& /*productAddRequest*/,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+			const sdl::imtlic::Products::V1_0::CProductAddGqlRequest& /*productAddRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	return ::sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload();
 }
 
 
 sdl::imtlic::Products::V1_0:: CProductImportResponse CProductControllerComp::OnProductsImport(
-	const sdl::imtlic::Products::V1_0::CProductsImportGqlRequest& productsImportRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const sdl::imtlic::Products::V1_0::CProductsImportGqlRequest& /*productsImportRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	return sdl::imtlic::Products::V1_0:: CProductImportResponse();
 }

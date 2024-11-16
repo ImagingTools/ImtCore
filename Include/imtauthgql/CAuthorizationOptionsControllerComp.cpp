@@ -19,11 +19,11 @@ sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CAuthorizationOptionsCo
 
 
 sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CAuthorizationOptionsControllerComp::OnUserToken(
-            const sdl::imtauth::Authorization::V1_0::CUserTokenGqlRequest& userTokenRequest,
-            const ::imtgql::CGqlRequest& /*gqlRequest*/,
-            QString& /*errorMessage*/) const
+			const sdl::imtauth::Authorization::V1_0::CUserTokenGqlRequest& /*userTokenRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
-    return sdl::imtauth::Authorization::V1_0::CAuthorizationPayload();
+	return sdl::imtauth::Authorization::V1_0::CAuthorizationPayload();
 }
 
 
