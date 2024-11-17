@@ -16,9 +16,6 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ServerSettings/TracingConfiguration"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -27,6 +24,24 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServerFramework"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="FileAccessCommandIdParam" PackageId="BasePck" ComponentId="IdParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/files/*"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GraphQlCommandIdParam" PackageId="BasePck" ComponentId="IdParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/graphql"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -41,10 +56,7 @@
                         <Data IsEnabled="true" Value="ImtCoreHandlers"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerPort" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ServerSettings/ServerPort"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ServerSettings/FileBasedSslConfiguration"/>
+                        <Data IsEnabled="true" Value="ServerPort"/>
                     </AttributeInfo>
                     <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="false"/>
@@ -52,15 +64,15 @@
                     <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ServerSettings/TracingConfiguration"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="ImtCoreHandlers" PackageId="ImtGraphQlVoce" ComponentId="StandardGraphQlHandlers">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="FileAccessCommandIdParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="FileAccessCommandIdParam"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlRequestHandler" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -68,8 +80,8 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="GraphQlCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Test/graphql"/>
+                    <AttributeInfo Id="GraphQlCommandIdParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GraphQlCommandIdParam"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -77,29 +89,29 @@
                     <AttributeInfo Id="LogPath" Type="Reference" ExportId="LogPath">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="WebCommandIdParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebCommandIdParam"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServerSettings" PackageId="ImtServerVoce" ComponentId="ServerPageData">
+        <Element Id="ServerPort" PackageId="ImtCorePck" ComponentId="UrlParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="DefaultPort">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="DefaultScheme" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="http"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PumaUrl" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaGQLClientEngine/HttpUrlParam"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PumaWebSocketUrl" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaGQLClientEngine/WebSocketUrlParam"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="WebCommandIdParam" PackageId="BasePck" ComponentId="IdParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/Views/*"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -282,12 +294,14 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="HttpServerFramework"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="FileAccessCommandIdParam" ComponentId="FileAccessCommandIdParam"/>
         <Component ExportedId="FileBasedSslConfiguration" ComponentId="ServerSettings/FileBasedSslConfiguration"/>
+        <Component ExportedId="GraphQlCommandIdParam" ComponentId="GraphQlCommandIdParam"/>
         <Component ExportedId="HttpServerFramework" ComponentId="HttpServerFramework"/>
         <Component ExportedId="PumaUrl" ComponentId="ServerSettings/PumaUrl"/>
         <Component ExportedId="PumaWebSocketPort" ComponentId="ServerSettings/PumaWebSocketPort"/>
-        <Component ExportedId="ServerPageData" ComponentId="ServerSettings"/>
-        <Component ExportedId="ServerPort" ComponentId="ServerSettings/ServerPort"/>
+        <Component ExportedId="ServerPort" ComponentId="ServerPort"/>
+        <Component ExportedId="WebCommandIdParam" ComponentId="WebCommandIdParam"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
         <Component ExportedId="WebSocketServerPort" ComponentId="WebSocketServerPort"/>
     </ExportedComponents>

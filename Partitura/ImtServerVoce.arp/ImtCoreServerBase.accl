@@ -8,11 +8,14 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ExternGraphQlController" X="350" Y="300" Note=""/>
+        <Element ComponentName="ExternGraphQlController" X="200" Y="275" Note=""/>
         <Element ComponentName="ExternGraphQlPublisher" X="400" Y="650" Note=""/>
+        <Element ComponentName="FileAccessCommandIdParam" X="825" Y="225" Note=""/>
+        <Element ComponentName="GraphQlCommandIdParam" X="700" Y="75" Note=""/>
         <Element ComponentName="HttpServerFramework" X="700" Y="375" Note=""/>
-        <Element ComponentName="ImtCoreHandlers" X="525" Y="175" Note=""/>
-        <Element ComponentName="ServerSettings" X="125" Y="75" Note=""/>
+        <Element ComponentName="ImtCoreHandlers" X="475" Y="175" Note=""/>
+        <Element ComponentName="ServerPort" X="1000" Y="400" Note=""/>
+        <Element ComponentName="WebCommandIdParam" X="825" Y="150" Note=""/>
         <Element ComponentName="WebSocketServerFramework" X="375" Y="500" Note=""/>
         <Element ComponentName="WebSocketServerPort" X="125" Y="400" Note=""/>
     </PositionMap>

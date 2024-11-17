@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5288" Description="ACF"/>
-            <Version Id="1" Number="2223" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5303" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394754" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -13,14 +13,8 @@
         <Element Id="ImtCoreServerBase" PackageId="ImtServerVoce" ComponentId="ImtCoreServerBase">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Log"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Log"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="VersionInfo"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -162,10 +156,13 @@
         <Interface InterfaceId="imtrest::IServer" ComponentId="ImtCoreServerBase"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="FileAccessCommandIdParam" ComponentId="ImtCoreServerBase/FileAccessCommandIdParam"/>
+        <Component ExportedId="GraphQlCommandIdParam" ComponentId="ImtCoreServerBase/GraphQlCommandIdParam"/>
         <Component ExportedId="HttpServerFramework" ComponentId="ImtCoreServerBase/HttpServerFramework"/>
         <Component ExportedId="PumaUrl" ComponentId="ImtCoreServerBase/PumaUrl"/>
         <Component ExportedId="PumaWebSocketPort" ComponentId="ImtCoreServerBase/PumaWebSocketPort"/>
         <Component ExportedId="ServerPort" ComponentId="ImtCoreServerBase/ServerPort"/>
+        <Component ExportedId="WebCommandIdParam" ComponentId="ImtCoreServerBase/WebCommandIdParam"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="ImtCoreServerBase/WebSocketServerFramework"/>
         <Component ExportedId="WebSocketServerPort" ComponentId="ImtCoreServerBase/WebSocketServerPort"/>
     </ExportedComponents>

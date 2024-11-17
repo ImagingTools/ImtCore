@@ -7,6 +7,7 @@
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <ifile/IFileNameParam.h>
+#include <iprm/IIdParam.h>
 
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
@@ -33,6 +34,7 @@ public:
 	I_BEGIN_BASE_COMPONENT(CHttpServletCompBase)
 		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "List of command-ID used with corresponded handlers", true, "");
+		I_ASSIGN(m_commandIdCompPtr, "CommandIdParam", "Component provided list of command-ID used with corresponded handlers", false, "CommandIdParam");
 	I_END_COMPONENT
 
 	// reimplemented (IRequestHandler)
@@ -99,6 +101,7 @@ protected:
 
 protected:
 	I_ATTR(QByteArray, m_commandIdAttrPtr);
+	I_REF(iprm::IIdParam, m_commandIdCompPtr);
 };
 
 

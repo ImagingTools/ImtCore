@@ -43,6 +43,11 @@ bool CHttpServletCompBase::IsCommandSupported(const QByteArray& commandId) const
 
 	QByteArrayList inputCommandList = clearCommandId.split('/');
 	QByteArray localCommandId = *m_commandIdAttrPtr;
+
+	if (m_commandIdCompPtr.IsValid()){
+		localCommandId = m_commandIdCompPtr->GetId();
+	}
+
 	QByteArrayList localCommandList = localCommandId.split('/');
 
 	bool retVal = true;

@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5303" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Server framework for GraphQL-based implementations</Description>
@@ -36,6 +36,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="FileAccessCommandId">
                         <Data IsEnabled="true" Value="&lt;ProductName&gt;/files/*"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIdParam" Type="Reference" ExportId="FileAccessCommandIdParam">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
@@ -75,6 +78,9 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="GraphQlCommandId">
                         <Data IsEnabled="true" Value="&lt;ProductName&gt;/graphql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIdParam" Type="Reference" ExportId="GraphQlCommandIdParam">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
@@ -262,6 +268,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="WebCommandId">
                         <Data IsEnabled="true" Value="&lt;ProductName&gt;/Views/*"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIdParam" Type="Reference" ExportId="WebCommandIdParam">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>

@@ -1,3 +1,5 @@
+// ACF includes
+#include <iprm/IIdParam.h>
 
 // ImtCore includes
 #include <imtbase/Init.h>
@@ -71,6 +73,32 @@ bool StartServer(const graphqlserver::ServerSettings& serverSettings, QString& e
 		QUrl url = webSocketPortUrlParamPtr->GetUrl();
 		url.setPort(serverSettings.webSocketPort);
 		webSocketPortUrlParamPtr->SetUrl(url);
+
+		retVal = true;
+	}
+	else{
+		retVal = false;
+	}
+
+	iprm::IIdParam* gqlCommandIdParamPtr = instance.GetInterface<iprm::IIdParam>("GraphQlCommandIdParam");
+	if (gqlCommandIdParamPtr != nullptr){
+		QByteArray commandId = serverSettings.productId + "/graphql";
+		gqlCommandIdParamPtr->SetId(commandId);
+
+		retVal = true;
+	}
+	else{
+		retVal = false;
+	}
+
+	if (!retVal){
+		return false;
+	}
+
+	iprm::IIdParam* fileAccessCommandIdParamPtr = instance.GetInterface<iprm::IIdParam>("FileAccessCommandIdParam");
+	if (fileAccessCommandIdParamPtr != nullptr){
+		QByteArray commandId = serverSettings.productId + "/files/*";
+		fileAccessCommandIdParamPtr->SetId(commandId);
 
 		retVal = true;
 	}
