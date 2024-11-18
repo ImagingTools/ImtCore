@@ -161,14 +161,14 @@ bool CSdlClassModificatorBaseComp::CloseFiles()
 	retVal = retVal && istd::CSystem::FileMove(m_headerFilePtr->fileName(), originalPath, true);
 	if (!retVal){
 		SendErrorMessage(0,
-						QString("Unable to move file: '%1'. Error: %2")
+						QString("Unable to move file: '%1' to '%2'.")
 						.arg(m_headerFilePtr->fileName(), originalPath));
 	}
 
 	retVal = retVal && istd::CSystem::FileMove(m_sourceFilePtr->fileName(), originalPath, true);
 	if (!retVal){
 		SendErrorMessage(0,
-						QString("Unable to move file: '%1'. Error: %2")
+						QString("Unable to move file: '%1' to '%2'.")
 						.arg(m_sourceFilePtr->fileName(), originalPath));
 	}
 
