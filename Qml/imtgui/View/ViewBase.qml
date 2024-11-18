@@ -10,7 +10,7 @@ Item {
     property string clearCommandsGuiEventCommandId: "ClearCommandsGui";
 
     property string viewId;
-    property var model;
+    property var model: null;
 
     property Component commandsControllerComp: null;
     property CommandsController commandsController: null;
