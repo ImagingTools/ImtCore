@@ -82,7 +82,7 @@ QString CSdlGenTools::GetTypeVerstion(const imtsdl::CSdlType& type)
 QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, imtsdl::ISdlTypeListProvider& listProvider, bool listWrap,  bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
 {
 	bool isCustom = false;
-	QString retVal = imtsdl::CSdlTools::OptListConvertTypeWithNamespace(sdlField, relatedNamespace, listProvider, listWrap, &isCustom, isComplexPtr, isArrayPtr);
+	QString retVal = imtsdl::CSdlTools::OptListConvertTypeWithNamespace(sdlField, relatedNamespace, listProvider, false, &isCustom, isComplexPtr, isArrayPtr);
 	if (isCustomPtr != nullptr){
 		*isCustomPtr = isCustom;
 	}
@@ -96,6 +96,21 @@ QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlFi
 	if (listWrap && sdlField.IsArray()){
 		imtsdl::CSdlTools::WrapTypeToList(retVal);
 	}
+
+	return retVal;
+}
+
+QString CSdlGenTools::GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull)
+{
+	QString retVal = sdlField.GetId() + ' ';
+	if (checkNull){
+		retVal += '=';
+	}
+	else {
+		retVal += '!';
+	}
+
+	retVal += QStringLiteral("= nullptr");
 
 	return retVal;
 }
