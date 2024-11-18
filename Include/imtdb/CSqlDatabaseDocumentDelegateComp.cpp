@@ -27,7 +27,6 @@ namespace imtdb
 {
 
 
-static const QByteArray s_idColumn = QByteArrayLiteral("Id");
 static const QByteArray s_typeIdColumn = QByteArrayLiteral("TypeId");
 static const QByteArray s_nameColumn = QByteArrayLiteral("Name");
 static const QByteArray s_descriptionColumn = QByteArrayLiteral("Description");
@@ -212,7 +211,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"Name\" = '%2' WHERE \"%3\" = '%4';")
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(newObjectName)
-				.arg(qPrintable(s_idColumn))
+				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(objectId))
 				.toUtf8();
 
@@ -229,7 +228,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"Description\" = '%2' WHERE \"%3\" = '%4';")
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(description)
-				.arg(qPrintable(s_idColumn))
+				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(objectId))
 				.toUtf8();
 
