@@ -58,10 +58,13 @@ private:
 	bool BeginHeaderClassFile(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude);
 	bool EndHeaderClassFile(const imtsdl::CSdlType& sdlType);
 	bool BeginSourceClassFile(const imtsdl::CSdlType& sdlType, bool addSelfHeaderInclude);
-	bool EndSourceClassFile(const imtsdl::CSdlType& sdlType);
 	bool EndClassFiles(const imtsdl::CSdlType& sdlType);
 	void AbortCurrentProcessing();
 	void GenerateMetaInfo(
+				QTextStream& stream,
+				const imtsdl::CSdlType& sdlType,
+				uint indents = 1);
+	void GenerateVersionStruct(
 				QTextStream& stream,
 				const imtsdl::CSdlType& sdlType,
 				uint indents = 1);

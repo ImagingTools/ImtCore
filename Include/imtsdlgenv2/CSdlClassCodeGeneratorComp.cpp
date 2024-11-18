@@ -343,64 +343,71 @@ bool CSdlClassCodeGeneratorComp::BeginClassFiles(const imtsdl::CSdlType& sdlType
 
 bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude)
 {
-	QTextStream ifStream(m_headerFilePtr.GetPtr());
+	QTextStream stream(m_headerFilePtr.GetPtr());
 
-	ifStream << QStringLiteral("#pragma once");
-	FeedStream(ifStream, 3, false);
+	stream << QStringLiteral("#pragma once");
+	FeedStream(stream, 3, false);
 
 	QSet<QString> complexTypeList;
 	bool isQtCommentAdded = false;
 	bool hasComplexTypes = IsTypeHasNonFundamentalTypes(sdlType, &complexTypeList);
 
+	// add STD includes for unique_ptr
+	stream << QStringLiteral("// STD includes");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("#include <memory>");
+	FeedStream(stream, 2, false);
+
 	if (hasComplexTypes){
 		// Add Qt types
 		if (complexTypeList.contains(QStringLiteral("QByteArray"))){
 			if (!isQtCommentAdded){
-				ifStream << QStringLiteral("// Qt includes");
-				FeedStream(ifStream, 1, false);
+				stream << QStringLiteral("// Qt includes");
+				FeedStream(stream, 1, false);
 				isQtCommentAdded = true;
 			}
-			ifStream << QStringLiteral("#include <QtCore/QByteArray>");
-			FeedStream(ifStream, 1, false);
+			stream << QStringLiteral("#include <QtCore/QByteArray>");
+			FeedStream(stream, 1, false);
 		}
 		if (complexTypeList.contains(QStringLiteral("QString"))){
 			if (!isQtCommentAdded){
-				ifStream << QStringLiteral("// Qt includes");
-				FeedStream(ifStream, 1, false);
+				stream << QStringLiteral("// Qt includes");
+				FeedStream(stream, 1, false);
 				isQtCommentAdded = true;
 			}
-			ifStream << QStringLiteral("#include <QtCore/QString>");
-			FeedStream(ifStream, 1, false);
+			stream << QStringLiteral("#include <QtCore/QString>");
+			FeedStream(stream, 1, false);
 		}
 		if (complexTypeList.contains(QStringLiteral("QList"))){
 			if (!isQtCommentAdded){
-				ifStream << QStringLiteral("// Qt includes");
-				FeedStream(ifStream, 1, false);
+				stream << QStringLiteral("// Qt includes");
+				FeedStream(stream, 1, false);
 				isQtCommentAdded = true;
 			}
-			ifStream << QStringLiteral("#include <QtCore/QList>");
-			FeedStream(ifStream, 1, false);
+			stream << QStringLiteral("#include <QtCore/QList>");
+			FeedStream(stream, 1, false);
 		}
 		if (!isQtCommentAdded){
-			ifStream << QStringLiteral("// Qt includes");
-			FeedStream(ifStream, 1, false);
+			stream << QStringLiteral("// Qt includes");
+			FeedStream(stream, 1, false);
 			isQtCommentAdded = true;
 		}
 
 		// add required types
-		ifStream << QStringLiteral("#include <QtCore/QVariant>");
-		FeedStream(ifStream, 1, false);
-		ifStream << QStringLiteral("#include <QtCore/QVariantMap>");
-		FeedStream(ifStream, 1, false);
-		ifStream << QStringLiteral("#include <QtCore/QSet>");
-		FeedStream(ifStream, 1, false);
+		stream << QStringLiteral("#include <QtCore/QVariant>");
+		FeedStream(stream, 1, false);
+		stream << QStringLiteral("#include <QtCore/QVariantMap>");
+		FeedStream(stream, 1, false);
+		stream << QStringLiteral("#include <QtCore/QSet>");
+		FeedStream(stream, 1, false);
 
 		// remove qt types from list
 		complexTypeList.remove(QStringLiteral("QByteArray"));
 		complexTypeList.remove(QStringLiteral("QString"));
 		complexTypeList.remove(QStringLiteral("QList"));
 		if (!complexTypeList.isEmpty()){
-			FeedStream(ifStream, 1, false);
+			FeedStream(stream, 1, false);
 		}
 
 		// save already included files, to avoid duplicates
@@ -428,9 +435,9 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 				if (foundType.IsExternal()){
 					const QString relativeIncludePath = ResolveRelativeHeaderFileForType(foundType, m_argumentParserCompPtr->GetHeadersIncludePaths());
 					if (!relativeIncludePath.isEmpty() && !customIncluded.contains(relativeIncludePath)){
-						ifStream << QStringLiteral("#include <");
-						ifStream << relativeIncludePath << '>';
-						FeedStream(ifStream, 1, false);
+						stream << QStringLiteral("#include <");
+						stream << relativeIncludePath << '>';
+						FeedStream(stream, 1, false);
 						customIncluded << relativeIncludePath;
 					}
 				}
@@ -438,7 +445,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 		}
 	}
 
-	FeedStream(ifStream, 2, false);
+	FeedStream(stream, 2, false);
 
 	// namespace begin
 	QString namespaceString;
@@ -450,29 +457,21 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 	}
 
 	if (!namespaceString.isEmpty()){
-		ifStream << namespaceString;
-		FeedStream(ifStream, 3, false);
+		stream << namespaceString;
+		FeedStream(stream, 3, false);
 	}
 
 	// class begin
-	ifStream << QStringLiteral("class C") << sdlType.GetName() << '\n';
-	ifStream << QStringLiteral("{");
-	FeedStream(ifStream, 1, false);
+	stream << QStringLiteral("class C") << sdlType.GetName() << '\n';
+	stream << QStringLiteral("{");
+	FeedStream(stream, 1, false);
 
-	ifStream << QStringLiteral("public:");
-	FeedStream(ifStream, 1, false);
+	stream << QStringLiteral("public:");
+	FeedStream(stream, 1, false);
 
-	// add metainfo
-	GenerateMetaInfo(ifStream, sdlType);
-	FeedStream(ifStream, 1);
+	GenerateVersionStruct(stream, sdlType);
 
-	// default constructor for defining primitive types
-	if (IsTypeHasFundamentalTypes(sdlType)){
-		ifStream << QStringLiteral("\tC") << sdlType.GetName() << QStringLiteral("();");
-		FeedStream(ifStream, 2);
-	}
-
-	ifStream.flush();
+	stream.flush();
 
 	return true;
 }
@@ -480,35 +479,57 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 
 bool CSdlClassCodeGeneratorComp::EndHeaderClassFile(const imtsdl::CSdlType& sdlType)
 {
-	QTextStream ifStream(m_headerFilePtr.GetPtr());
+	QTextStream stream(m_headerFilePtr.GetPtr());
 
-	// Add compare operator
-	FeedStreamHorizontally(ifStream);
-	ifStream << QStringLiteral("bool operator==(const ");
-	ifStream << 'C' << sdlType.GetName();
-	ifStream << QStringLiteral("& other) const;");
-	FeedStream(ifStream, 1, false);
+	FeedStream(stream, 1 , false);
 
-	// Add invrted compare operator
-	FeedStreamHorizontally(ifStream);
-	ifStream << QStringLiteral("bool operator!=(const ");
-	ifStream << 'C' << sdlType.GetName();
-	ifStream << QStringLiteral("& other) const { return !(operator==(other)); }");
-	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("// help methods");
+	FeedStream(stream, 1 , false);
 
-	// defining class members
-	ifStream << QStringLiteral("private:");
-	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("template <class T>");
+	FeedStream(stream, 1 , false);
 
-	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
-		ifStream << '\t' << ConvertTypeWithNamespace(sdlField, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr);
-		ifStream << " m_" << GetDecapitalizedValue(sdlField.GetId()) << ";";
-		FeedStream(ifStream, 1, false);
-	}
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("[[nodiscard]] static bool ComparePointers(const std::unique_ptr<T>& p1, const std::unique_ptr<T>& p2)");
+	FeedStream(stream, 1 , false);
 
-	ifStream << QStringLiteral("\tQSet<QByteArray/*FieldId*/> ") << s_variantMapClassMemberName << ';';
+	FeedStreamHorizontally(stream);
+	stream << '{';
+	FeedStream(stream, 1 , false);
 
-	FeedStream(ifStream);
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("if (p1 == nullptr && p2 == nullptr){");
+	FeedStream(stream, 1 , false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("return true;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << '}';
+	FeedStream(stream, 1 , false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("else if (p1 != nullptr && p2 != nullptr){");
+	FeedStream(stream, 1 , false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("return *p1 == *p2;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << '}';
+	FeedStream(stream, 2 , false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream);
+	stream << '}';
+	FeedStream(stream, 1 , false);
 
 	return true;
 }
@@ -516,13 +537,13 @@ bool CSdlClassCodeGeneratorComp::EndHeaderClassFile(const imtsdl::CSdlType& sdlT
 
 bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sdlType, bool addSelfHeaderInclude)
 {
-	QTextStream ifStream(m_sourceFilePtr.GetPtr());
+	QTextStream stream(m_sourceFilePtr.GetPtr());
 
 	// include section
 	if (addSelfHeaderInclude){
-		ifStream << QStringLiteral("#include \"C");
-		ifStream << sdlType.GetName() << QStringLiteral(".h\"");
-		FeedStream(ifStream, 3);
+		stream << QStringLiteral("#include \"C");
+		stream << sdlType.GetName() << QStringLiteral(".h\"");
+		FeedStream(stream, 3);
 	}
 
 	// namespace begin
@@ -535,96 +556,44 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 	}
 
 	if (!namespaceString.isEmpty()){
-		ifStream << namespaceString;
-		FeedStream(ifStream, 3);
+		stream << namespaceString;
+		FeedStream(stream, 3);
 	}
-
-	// default constructor implementation
-	if (IsTypeHasFundamentalTypes(sdlType)){
-		ifStream << ConvertType(sdlType.GetName()) << QStringLiteral("::") << ConvertType(sdlType.GetName());
-		ifStream << QStringLiteral("()\n:");
-		bool isAdded = false;
-
-		imtsdl::SdlFieldList sdlFieldList = sdlType.GetFields();
-
-		for (int i = 0; i < sdlFieldList.count(); ++i){
-			imtsdl::CSdlField& sdlField = sdlFieldList[i];
-			bool isComplex = true;
-			bool isArray = true;
-			const QString convertedType = ConvertType(sdlField, nullptr, &isComplex, &isArray);
-			if (isComplex || isArray){
-				// we need to initialize only fundamental types
-				continue;
-			}
-
-			if (isAdded){
-				ifStream << ',';
-				FeedStream(ifStream, 1, false);
-			}
-
-			ifStream << '\t' << "m_" << GetDecapitalizedValue(sdlField.GetId()) << '(';
-
-			if (convertedType == QStringLiteral("int") ||
-				convertedType == QStringLiteral("long") ||
-				convertedType == QStringLiteral("long long"))
-			{
-				ifStream << QStringLiteral("0");
-			}
-			else if (convertedType == QStringLiteral("float")){
-				ifStream << QStringLiteral("0.00f");
-			}
-			else if (convertedType == QStringLiteral("double")){
-				ifStream << QStringLiteral("0.00");
-			}
-			else if (convertedType == QStringLiteral("bool")){
-				ifStream << QStringLiteral("false");
-			}
-			ifStream << (')');
-			isAdded = true;
-		}
-
-		ifStream << QStringLiteral("\n{\n}");
-		FeedStream(ifStream, 2);
-	}
-
-	return true;
-}
-
-
-bool CSdlClassCodeGeneratorComp::EndSourceClassFile(const imtsdl::CSdlType& sdlType)
-{
-	QTextStream ifStream(m_sourceFilePtr.GetPtr());
 
 	// Add compare operator
+	const QString sdlVersion = GetTypeVerstion(sdlType);
+
 	// a)declare
-	ifStream << QStringLiteral("bool ");
-	ifStream << 'C' << sdlType.GetName();
-	ifStream << QStringLiteral("::operator==(const ");
-	ifStream << 'C' << sdlType.GetName();
-	ifStream << QStringLiteral("& other) const\n{");
-	FeedStream(ifStream, 1, false);
+	stream << QStringLiteral("bool ");
+	stream << 'C' << sdlType.GetName() << ':' << ':';
+	stream << sdlVersion;
+	stream << QStringLiteral("::operator==(const ");
+	stream << 'C' << sdlType.GetName() << ':' << ':';
+	stream << sdlVersion;
+	stream << QStringLiteral("& other) const\n{");
+	FeedStream(stream, 1, false);
 
 	// b)implement
-	FeedStreamHorizontally(ifStream);
-	ifStream << QStringLiteral("bool retVal = true;");
-	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("bool retVal = true;");
+	FeedStream(stream, 1, false);
 	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
-		FeedStreamHorizontally(ifStream);
-		ifStream << QStringLiteral("retVal = retVal && (m_");
-		ifStream << GetDecapitalizedValue(sdlField.GetId());
-		ifStream << QStringLiteral(" == other.m_");
-		ifStream << GetDecapitalizedValue(sdlField.GetId());
-		ifStream << QStringLiteral(");");
-		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("retVal = retVal && ComparePointers(");
+		stream << sdlField.GetId();
+		stream << QStringLiteral(", other.");
+		stream << sdlField.GetId();
+		stream << QStringLiteral(");");
+		FeedStream(stream, 1, false);
 	}
 
 	// c)complete
-	FeedStream(ifStream, 1, false);
-	FeedStreamHorizontally(ifStream);
-	ifStream << QStringLiteral("return retVal;");
-	FeedStream(ifStream, 1, false);
-	ifStream << '}';
-	FeedStream(ifStream, 3);
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("return retVal;");
+	FeedStream(stream, 1, false);
+	stream << '}';
+	FeedStream(stream, 3);
 
 	return true;
 }
@@ -659,12 +628,13 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 		headerStream << ':' << ':';
 	}
 	headerStream << 'C' << sdlType.GetName();
+	headerStream << ':' << ':';
+	headerStream << GetTypeVerstion(sdlType);
 	headerStream << QStringLiteral(");");
 
 	FeedStream(headerStream, 3, true);
 
 	// finish source
-	EndSourceClassFile(sdlType);
 	QTextStream sourceStream(m_sourceFilePtr.GetPtr());
 	if (!namespaceString.isEmpty()){
 		sourceStream << namespaceString;
@@ -717,6 +687,67 @@ void CSdlClassCodeGeneratorComp::GenerateMetaInfo(
 
 	// finish struct
 	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, indents);
+	stream << '}' << ';';
+	FeedStream(stream, 1, false);
+}
+
+
+void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
+			QTextStream& stream,
+			const imtsdl::CSdlType& sdlType,
+			uint indents)
+{
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
+
+	// main struct begin
+	const QString sdlVersion = GetTypeVerstion(sdlType);
+	FeedStreamHorizontally(stream, indents);
+	stream << QStringLiteral("// ");
+	stream << sdlVersion;
+	stream << QStringLiteral(" struct");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, indents);
+	stream << QStringLiteral("struct ");
+	stream << sdlVersion;
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, indents);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	// add metainfo
+	GenerateMetaInfo(stream, sdlType, indents + 1);
+	FeedStream(stream, 1, false);
+
+	// add types members
+	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
+		const QString convertedType = OptListConvertTypeWithNamespaceStruct(field, sdlNamespace, *m_sdlTypeListCompPtr, true);
+		FeedStreamHorizontally(stream, indents + 1);
+		stream << QStringLiteral("std::unique_ptr<");
+		stream << convertedType;
+		stream << QStringLiteral("> ");
+		stream << field.GetId() << ';';
+		FeedStream(stream, 1, false);
+	}
+	FeedStream(stream, 1, false);
+
+	// Add compare operator
+	FeedStreamHorizontally(stream, indents + 1);
+	stream << QStringLiteral("bool operator==(const ");
+	stream << sdlVersion;
+	stream << QStringLiteral("& other) const;");
+	FeedStream(stream, 1, false);
+
+	// Add invrted compare operator
+	FeedStreamHorizontally(stream, indents + 1);
+	stream << QStringLiteral("bool operator!=(const ");
+	stream << sdlVersion;
+	stream << QStringLiteral("& other) const { return !(operator==(other)); }");
+	FeedStream(stream, 1, false);
+
+	// end of struct
 	FeedStreamHorizontally(stream, indents);
 	stream << '}' << ';';
 	FeedStream(stream, 1, false);

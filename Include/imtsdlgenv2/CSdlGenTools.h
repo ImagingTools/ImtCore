@@ -41,6 +41,16 @@ public:
 	 */
 	[[nodiscard]] static QString GetNamespaceFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& prefix = "sdl");
 
+	[[nodiscard]] static QString GetTypeVerstion(const imtsdl::CSdlType& type);
+	[[nodiscard]] static QString OptListConvertTypeWithNamespaceStruct(
+		const imtsdl::CSdlField& sdlField,
+		const QString& relatedNamespace,
+		imtsdl::ISdlTypeListProvider& listProvider,
+		bool listWrap = false,
+		bool* isCustomPtr = nullptr,
+		bool* isComplexPtr = nullptr,
+		bool* isArrayPtr = nullptr);
+
 };
 
 

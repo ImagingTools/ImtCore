@@ -58,5 +58,47 @@ QString CSdlGenTools::GetNamespaceFromSchemaParams(const iprm::IParamsSet& schem
 	return imtsdl::CSdlTools::GetNamespaceAcceptableString(retVal);
 }
 
+QString CSdlGenTools::GetTypeVerstion(const imtsdl::CSdlType& type)
+{
+	QString retVal = QStringLiteral("V");
+
+	const iprm::IParamsSet& schemaParams = type.GetSchemaParams();
+	QString versionName;
+	iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&schemaParams, imtsdl::SdlCustomSchemaKeys::VersionName.toUtf8());
+	if (versionNameParamPtr.IsValid()){
+		versionName = versionNameParamPtr->GetText();
+		retVal += versionName;
+	}
+	else {
+		retVal += QStringLiteral("0");
+	}
+
+	static QRegularExpression nonWordRegexp("[^\\w]");
+	retVal.replace(nonWordRegexp, QStringLiteral("_"));
+
+	return retVal;
+}
+
+QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, imtsdl::ISdlTypeListProvider& listProvider, bool listWrap,  bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
+{
+	bool isCustom = false;
+	QString retVal = imtsdl::CSdlTools::OptListConvertTypeWithNamespace(sdlField, relatedNamespace, listProvider, listWrap, &isCustom, isComplexPtr, isArrayPtr);
+	if (isCustomPtr != nullptr){
+		*isCustomPtr = isCustom;
+	}
+	if (isCustom){
+		imtsdl::CSdlType typeForField;
+		const bool isFound = imtsdl::CSdlTools::GetSdlTypeForField(sdlField, listProvider.GetSdlTypes(false), typeForField);
+		Q_ASSERT(isFound);
+		retVal += QStringLiteral("::") + GetTypeVerstion(typeForField);
+	}
+
+	if (listWrap && sdlField.IsArray()){
+		imtsdl::CSdlTools::WrapTypeToList(retVal);
+	}
+
+	return retVal;
+}
+
 
 } // namespace imtsdlgenv2
