@@ -48,7 +48,9 @@ Rectangle {
 	}
 
 	onActivePageIdChanged: {
-		Events.sendEvent("ActivePageIdChanged", menuPanel.activePageId);
+		if(menuPanel.activePageId !== ""){
+			Events.sendEvent("ActivePageIdChanged", menuPanel.activePageId);
+		}
 	}
 
 	Keys.onPressed: {
@@ -147,6 +149,7 @@ Rectangle {
 		topAlignmentPages.model = 0;
 		bottomAlignmentPages.model = 0;
 		menuPanel.activePageIndex = 0;
+		menuPanel.activePageId = "";
 
 		for (let i = 0; i < model.getItemsCount(); i++){
 			if (model.containsKey("Alignment", i)){
