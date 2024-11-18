@@ -44,84 +44,13 @@ target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::QuickControls2)
 
 set(buildwebdir ${CMAKE_CURRENT_LIST_DIR}/../../../Bin/web)
 
-list(APPEND webdirs ${IMTCOREDIR}/3rdParty/JQML2/core/dist)
-list(APPEND webdirs ${buildwebdir}/Resources)
-
-# copy lisa qml from to
 list(APPEND webdirs ${CMAKE_CURRENT_LIST_DIR}/../Qml)
 list(APPEND webdirs ${buildwebdir}/src)
 
 list(APPEND webdirs ${CMAKE_CURRENT_LIST_DIR}/../Resources/html)
 list(APPEND webdirs ${buildwebdir}/Resources)
 
-list(APPEND webdirs ${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml/Fonts)
-list(APPEND webdirs ${buildwebdir}/Resources)
-
-list(APPEND webdirs ${IMTCOREDIR}/Qml/web)
-list(APPEND webdirs ${buildwebdir}/Resources)
-
-list(APPEND webdirs ${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml/Acf)
-list(APPEND webdirs ${buildwebdir}/src/Acf)
-
-list(APPEND webdirs ${IMTCOREDIR}/Qml/imtgui)
-list(APPEND webdirs ${buildwebdir}/src/imtgui)
-
-list(APPEND webdirs ${IMTCOREDIR}/Qml/imtguigql)
-list(APPEND webdirs ${buildwebdir}/src/imtguigql)
-
-list(APPEND webdirs ${IMTCOREDIR}/Qml/imtauthgui)
-list(APPEND webdirs ${buildwebdir}/src/imtauthgui)
-
-list(APPEND webdirs ${IMTCOREDIR}/Qml/imtlicgui)
-list(APPEND webdirs ${buildwebdir}/src/imtlicgui)
-
-list(APPEND webdirs ${IMTCOREDIR}/Qml/imtcolgui)
-list(APPEND webdirs ${buildwebdir}/src/imtcolgui)
-
-list(APPEND webdirs ${IMTCOREDIR}/Qml/imtdocgui)
-list(APPEND webdirs ${buildwebdir}/src/imtdocgui)
-
-list(APPEND webdirs ${IMTCOREDIR}/Qml/imtcontrols)
-list(APPEND webdirs ${buildwebdir}/src/imtcontrols)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseComplexCollectionFilterSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtbaseComplexCollectionFilterSdl)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtBaseTypesSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtbaseImtBaseTypesSdl)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtCollectionSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtbaseImtCollectionSdl)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthGroupsSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtauthGroupsSdl)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRolesSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtauthRolesSdl)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthUsersSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtauthUsersSdl)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicFeaturesSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtlicFeaturesSdl)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicLicensesSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtlicLicensesSdl)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicProductsSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtlicProductsSdl)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtauthAuthorizationSdl)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtappsdl/SDL/1.0/QML/imtappApplicationSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtappApplicationSdl)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtauthAuthorizationSdl)
-
-list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthProfileSdl)
-list(APPEND webdirs ${buildwebdir}/src/imtauthProfileSdl)
+getImtCoreQmlWebDirs(webdirs "${buildwebdir}")
 
 if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)

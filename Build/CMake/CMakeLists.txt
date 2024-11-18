@@ -136,7 +136,7 @@ if(DEFINED USE_MONGODB AND USE_MONGODB)
 endif()
 
 if(NOT DEFINED USE_EJ OR USE_EJ)
-	add_subdirectory("${INCLUDE_DIR}/imtej/CMake" "${AUX_INCLUDE_DIR}/imtej")
+	# add_subdirectory("${INCLUDE_DIR}/imtej/CMake" "${AUX_INCLUDE_DIR}/imtej")
 endif()
 
 if(NOT DEFINED USE_QT3D OR USE_QT3D)
@@ -177,7 +177,7 @@ endif()
 
 
 #-------- Sdl --------
-if(NOT DEFINED USE_SDL OR USE_SDL)
+# if(NOT DEFINED USE_SDL OR USE_SDL)
 	include("${CMAKE_CURRENT_LIST_DIR}/../../../ImtCore/Config/CMake/ImtCoreSdlCustomConfig.cmake")
 	ImtCoreAddSdlSearchPath("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}")
 
@@ -191,7 +191,7 @@ if(NOT DEFINED USE_SDL OR USE_SDL)
 
 	add_subdirectory("${SDL_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtappsdl")
 	add_dependencies(imtappsdl imtbasesdl)
-endif()
+# endif()
 
 
 #-------- Packages --------
@@ -282,8 +282,8 @@ endif()
 	endif()
 
 	if(NOT DEFINED USE_EJ OR USE_EJ)
-		add_subdirectory("${IMPL_DIR}/ImtEjPck/CMake" "${AUX_INCLUDE_DIR}/ImtEjPck")
-		add_dependencies(ImtEjPck imtej)
+		# add_subdirectory("${IMPL_DIR}/ImtEjPck/CMake" "${AUX_INCLUDE_DIR}/ImtEjPck")
+		# add_dependencies(ImtEjPck imtej)
 	endif()
 
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
