@@ -23,7 +23,7 @@ namespace imtsdlgenv2
 bool CSdlGeneralManagerComp::CreateCode()
 {
 	// old code generation
-	if (!m_sdlArgumentParserV2CompPtr.IsValid() || m_sdlArgumentParserV2CompPtr->GetGeneratorType() < 2){
+	if (!m_sdlArgumentParserV2CompPtr.IsValid() || m_sdlArgumentParserV2CompPtr->GetGenerationVersion() < 2){
 		return BaseClass::CreateCode();
 	}
 

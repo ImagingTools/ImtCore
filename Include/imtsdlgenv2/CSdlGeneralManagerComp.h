@@ -9,7 +9,7 @@
 #include <iproc/IProcessor.h>
 
 // ImtCore includes
-#include <imtsdl/ISdlProcessArgumentsParser.h>
+#include <imtsdlgenv2/ISdlProcessArgumentsParser.h>
 #include <imtsdlgen/CSdlGeneralManagerComp.h>
 
 
@@ -34,7 +34,7 @@ protected:
 	bool CreateCode() override;
 
 private:
-	I_REF(imtsdl::ISdlProcessArgumentsParser, m_sdlArgumentParserV2CompPtr);
+	I_REF(imtsdlgenv2::ISdlProcessArgumentsParser, m_sdlArgumentParserV2CompPtr);
 	I_MULTIREF(iproc::IProcessor, m_sdlV2ProcessorsCompListPtr);
 };
 
