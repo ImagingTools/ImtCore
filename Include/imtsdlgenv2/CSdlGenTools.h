@@ -36,9 +36,10 @@ public:
 
 
 public:
-	typedef icomp::TReferenceMember<iprm::IParamsSet> SchemaParamsCompPtr;
-	typedef icomp::TReferenceMember<imtsdl::ISdlProcessArgumentsParser> ArgumentParserCompPtr;
-
+	/**
+		\returns namespace from \c schemaParams, accorging to V2 Generation
+	 */
+	[[nodiscard]] static QString GetNamespaceFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& prefix = "sdl");
 
 };
 

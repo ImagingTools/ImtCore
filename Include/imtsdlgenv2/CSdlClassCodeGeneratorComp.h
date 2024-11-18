@@ -13,6 +13,7 @@
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/CSdlTools.h>
+#include <imtsdlgenv2/CSdlGenTools.h>
 
 
 namespace imtsdlgenv2
@@ -23,11 +24,14 @@ namespace imtsdlgenv2
 */
 class CSdlClassCodeGeneratorComp:
 			public iproc::CSyncProcessorCompBase,
-			private imtsdl::CSdlTools
+			private imtsdl::CSdlTools,
+			private CSdlGenTools
 {
 
 public:
 	typedef iproc::CSyncProcessorCompBase BaseClass;
+	typedef imtsdl::CSdlTools BaseClass2;
+	typedef CSdlGenTools BaseClass3;
 
 	I_BEGIN_COMPONENT(CSdlClassCodeGeneratorComp)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
@@ -57,25 +61,6 @@ private:
 	bool EndSourceClassFile(const imtsdl::CSdlType& sdlType);
 	bool EndClassFiles(const imtsdl::CSdlType& sdlType);
 	void AbortCurrentProcessing();
-	QString GenerateAccessMethods(
-				const imtsdl::CSdlField& sdlField,
-				uint indents = 1,
-				bool generateGetter = true,
-				bool generateSetter = true,
-				bool generateExistenceChecks = true);
-	void GenerateAccessMethodsImpl(
-				QTextStream& stream,
-				const QString className,
-				const imtsdl::CSdlField& sdlField,
-				uint indents = 0,
-				bool generateGetter = true,
-				bool generateSetter = true,
-				bool generateExistenceChecks = true);
-	void GenerateResetMethodImpl(
-				QTextStream& stream,
-				const QString className,
-				const imtsdl::CSdlField& sdlField,
-				uint indents = 0);
 	void GenerateMetaInfo(
 				QTextStream& stream,
 				const imtsdl::CSdlType& sdlType,
