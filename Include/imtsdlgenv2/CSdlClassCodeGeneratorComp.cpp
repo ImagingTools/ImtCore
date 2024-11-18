@@ -470,6 +470,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 	FeedStream(stream, 1, false);
 
 	GenerateVersionStruct(stream, sdlType);
+	FeedStream(stream, 1, false);
 
 	stream.flush();
 
@@ -480,8 +481,6 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 bool CSdlClassCodeGeneratorComp::EndHeaderClassFile(const imtsdl::CSdlType& sdlType)
 {
 	QTextStream stream(m_headerFilePtr.GetPtr());
-
-	FeedStream(stream, 1 , false);
 
 	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("// help methods");
