@@ -77,7 +77,7 @@ class QmlWheelEvent {
     target = null
     path = []
 
-    accepted = true
+    accepted = false
     angleDelta = {
         x: 0,
         y: 0,
@@ -224,7 +224,7 @@ module.exports = {
             this.event.startY = e.pageY
             this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
 
-            for(obj of this.event.path){
+            for(let obj of this.event.path){
                 this.event.accepted = true
                 this.event.relative(obj)
                 obj.__onMouseDown(this.event) 
@@ -237,7 +237,7 @@ module.exports = {
                 this.event.originY = e.pageY
                 
                 if(this.event.target) {
-                    this.event.relative(obj)
+                    this.event.relative(this.event.target)
                     this.event.target.__onMouseUp(this.event)
                 }
             }
@@ -264,10 +264,11 @@ module.exports = {
             this.event.angleDelta.y = e.deltaY / 8
             this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
 
-            for(obj of this.event.path){
-                this.event.target = obj
-                this.event.relative(obj)
-                obj.__onWheel(this.event)
+            for(let obj of this.event.path){
+                if(!this.event.accepted || !this.event.target){
+                    this.event.relative(obj)
+                    obj.__onWheel(this.event)
+                }
             }
 
             this.event = null

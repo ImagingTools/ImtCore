@@ -159,9 +159,16 @@ class Flickable extends Item {
     }
 
     __onMouseMove(mouse){
+        if(!this.interactive || !this.enabled || !this.visible) return
+
         if((this.contentWidth > 0 && this.contentWidth > this.width && mouse.wasDragX) || this.contentHeight > 0 && this.contentHeight > this.height && mouse.wasDragY){
             if(mouse.target) {
-                if(mouse.target instanceof MouseArea && mouse.target.preventStealing === false) {
+                let parent = mouse.target
+                while(parent && parent !== this){
+                    parent = parent.parent
+                }
+
+                if(parent === this && mouse.target instanceof MouseArea && mouse.target.preventStealing === false) {
                     mouse.target.__onMouseCanceled()
                     mouse.target = this
                 }
@@ -211,18 +218,24 @@ class Flickable extends Item {
         }
     }
     __onMouseDown(mouse){
+        if(!this.interactive || !this.enabled || !this.visible) return
+
         if(!mouse.target){
             mouse.target = this
         }
     }
     __onMouseUp(mouse){
+        if(!this.interactive || !this.enabled || !this.visible) return
+
         if(mouse.target === this){
             mouse.target = null
         }
     }
 
     __onWheel(wheel){
-        if(wheel.target === this){
+        if(!this.interactive || !this.enabled || !this.visible) return
+        
+        if(!wheel.target){
             let deltaX = wheel.angleDelta.x * 4
             let deltaY = wheel.angleDelta.y * 4
 

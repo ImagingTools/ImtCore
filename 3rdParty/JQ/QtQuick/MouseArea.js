@@ -144,6 +144,16 @@ class MouseArea extends Item {
         this.__getObject('pressed').__value = false
     }
 
+    __onWheel(wheel){
+        if(!this.enabled || !this.visible) return
+
+        if(!wheel.target){
+            this.wheel(wheel)
+
+            if(wheel.accepted) wheel.target = this
+        }
+    }
+
     __destroy(){
         JQApplication.MouseController.remove(this)
         super.__destroy()
