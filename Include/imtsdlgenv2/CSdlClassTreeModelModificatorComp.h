@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtsdlgen/CSdlClassModificatorBaseComp.h>
+#include <imtsdlgenv2/CSdlGenTools.h>
 
 
 namespace imtsdlgenv2
@@ -13,7 +14,7 @@ namespace imtsdlgenv2
 	The C++ class modificator, adds saving and loading generated SDL types to TreeItemModel
 	Extends generated classes by add methods, allows to save and load it from/to \c imtbase::CTreeItemModel
  */
-class CSdlClassTreeModelModificatorComp: public imtsdlgen::CSdlClassModificatorBaseComp
+class CSdlClassTreeModelModificatorComp: public imtsdlgen::CSdlClassModificatorBaseComp, protected CSdlGenTools
 {
 
 public:

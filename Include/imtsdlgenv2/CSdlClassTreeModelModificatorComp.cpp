@@ -38,12 +38,14 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSd
 	}
 
 	// add method definitions
-	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToModel(");
+	ofStream << QStringLiteral("\t[[nodiscard]] static bool WriteToModel(const ");
+	ofStream << GetTypeVerstion(sdlType);
+	ofStream << QStringLiteral("& object, ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
-	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex = 0) const;");
+	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex = 0);");
 	FeedStream(ofStream, 1, false);
-	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromModel(C");
-	ofStream << sdlType.GetName();
+	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromModel(");
+	ofStream << GetTypeVerstion(sdlType);
 	ofStream << QStringLiteral("& object, const ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << ("::CTreeItemModel& model, int modelIndex = 0);");
@@ -65,7 +67,9 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 	// add method implementation
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::WriteToModel(");
+	ofStream << QStringLiteral("::WriteToModel(const ");
+	ofStream << GetTypeVerstion(sdlType);
+	ofStream << QStringLiteral("& object, ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex) const\n{");
 	FeedStream(ofStream, 1, false);
@@ -81,8 +85,8 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 	// read method implementation
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::ReadFromModel(C");
-	ofStream << sdlType.GetName();
+	ofStream << QStringLiteral("::ReadFromModel(");
+	ofStream << GetTypeVerstion(sdlType);
 	ofStream << QStringLiteral("& object, const ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex)\n{");
@@ -128,8 +132,8 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& st
 	// Process scalar value
 	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
-		stream << QStringLiteral("if (!");
-		stream << FromInternalMapCheckString(field) << QStringLiteral("){");
+		stream << QStringLiteral("if (");
+		stream << GetNullCheckString(field) << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, 2);
@@ -145,13 +149,13 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& st
 			stream << tempListVarName;
 		}
 		else {
-			stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
+			stream << QStringLiteral("*object.") << field.GetId();
 		}
 		stream << QStringLiteral(", modelIndex);");
 	}
 	else {
 		stream << QStringLiteral("if (");
-		stream << FromInternalMapCheckString(field);
+		stream << GetNullCheckString(field, false);
 		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 
@@ -164,7 +168,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& st
 			stream << tempListVarName;
 		}
 		else {
-			stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
+			stream << QStringLiteral("*object.") << field.GetId();
 		}
 		stream << QStringLiteral(", modelIndex);\n\t}");
 	}
@@ -243,8 +247,8 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelCode(QTextStre
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
-		stream << QStringLiteral("if (!");
-		stream << FromInternalMapCheckString(field) << QStringLiteral("){");
+		stream << QStringLiteral("if (");
+		stream << GetNullCheckString(field) << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;\n\t}");
@@ -253,7 +257,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelCode(QTextStre
 	}
 	else {
 		stream << QStringLiteral("if (");
-		stream << FromInternalMapCheckString(field);
+		stream << GetNullCheckString(field, false);
 		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		AddCustomFieldWriteToModelImplCode(stream, field, sdlType, 2);
@@ -279,9 +283,9 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelImplCode(QText
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("const bool is");
 	stream << GetCapitalizedValue(field.GetId());
-	stream << QStringLiteral("Added = m_");
-	stream << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral(".WriteToModel(*");
+	stream << QStringLiteral("Added = ");
+	stream << field.GetId();
+	stream << QStringLiteral("->WriteToModel(*");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral("NewModelPtr, 0);");
 	FeedStream(stream, 1, false);
@@ -345,10 +349,11 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelCode(QTextStr
 
 void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(QTextStream& stream, const imtsdl::CSdlField& field, const imtsdl::CSdlType& sdlType, quint16 hIndents)
 {
-	FeedStreamHorizontally(stream, hIndents);
+	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 
 	// define readed container
-	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << ConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr);
 	stream << ' ' << GetDecapitalizedValue(field.GetId()) << ';';
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
@@ -357,7 +362,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(QTex
 	stream << QStringLiteral("const bool is");
 	stream << GetCapitalizedValue(field.GetId());
 	stream << QStringLiteral("Readed = ");
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
 	stream << QStringLiteral("::ReadFromModel(");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << ',' << ' ' << QStringLiteral("*");
@@ -402,7 +407,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(Q
 	else {
 		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("if (");
-		stream << FromInternalMapCheckString(field);
+		stream << GetNullCheckString(field, false);
 		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field, sdlType, 2);
@@ -433,8 +438,8 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 	const QString treeModelIndexVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index");
 	stream << QStringLiteral("for (qsizetype ") << treeModelIndexVarName;
 	stream << QStringLiteral(" = 0; ") << treeModelIndexVarName;
-	stream << QStringLiteral(" < m_") << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral(".size(); ++") << treeModelIndexVarName;
+	stream << QStringLiteral(" < ") << field.GetId();
+	stream << QStringLiteral("->size(); ++") << treeModelIndexVarName;
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
@@ -445,7 +450,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 
 	// inLoop: add item and check
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << newTreeModelVarName << QStringLiteral("->SetData(QByteArray(), m_") << GetDecapitalizedValue(field.GetId());
+	stream << newTreeModelVarName << QStringLiteral("->SetData(QByteArray(), *") << field.GetId();
 	stream << '[' << treeModelIndexVarName << ']';
 	stream << QStringLiteral(", ") << treeModelIndexVarName << ')' << ';';
 	FeedStream(stream, 1, false);
@@ -496,10 +501,11 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 
 void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplCode(QTextStream& stream, const imtsdl::CSdlField& field, quint16 hIndents)
 {
-	FeedStreamHorizontally(stream, hIndents);
-
+	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	const QString countVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Count");
+
 	// declare count value
+	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("int ") << countVariableName << QStringLiteral(" = ");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetItemsCount();");
 	FeedStream(stream, 1, false);
@@ -520,7 +526,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 	// declare temp list var
 	const QString listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("List");
 	FeedStreamHorizontally(stream, hIndents);
-	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr);
+	stream << ConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr);
 	stream << ' ' << listVariableName << ';';
 	FeedStream(stream, 1, false);
 
@@ -534,7 +540,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 
 	// inLoop: declare temp var
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
 	stream << ' ' << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral(" = ");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetData(QByteArray(), ");
@@ -577,7 +583,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldWriteToModelCode(QTex
 	else {
 		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("if (");
-		stream << FromInternalMapCheckString(field);
+		stream << GetNullCheckString(field, false);
 		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 		AddCustomArrayFieldWriteToModelImplCode(stream, field, sdlType, 2);
@@ -613,8 +619,8 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 	const QString treeModelIndexVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index");
 	stream << QStringLiteral("for (qsizetype ") << treeModelIndexVarName;
 	stream << QStringLiteral(" = 0; ") << treeModelIndexVarName;
-	stream << QStringLiteral(" < m_") << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral(".size(); ++") << treeModelIndexVarName;
+	stream << QStringLiteral(" < ") << field.GetId();
+	stream << QStringLiteral("->size(); ++") << treeModelIndexVarName;
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
@@ -625,9 +631,9 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 
 	// inLoop: add item and check
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("if (!m_") << GetDecapitalizedValue(field.GetId());
-	stream << '[' << treeModelIndexVarName << ']';
-	stream << QStringLiteral(".WriteToModel(*") << newTreeModelVarName;
+	stream << QStringLiteral("if (!(*") << field.GetId();
+	stream << ')' << '[' << treeModelIndexVarName << ']';
+	stream << QStringLiteral("->WriteToModel(*") << newTreeModelVarName;
 	stream << QStringLiteral(", ") << treeModelIndexVarName;
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
@@ -688,6 +694,8 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 			const imtsdl::CSdlField& field,
 			quint16 hIndents)
 {
+	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
+
 	FeedStreamHorizontally(stream, hIndents);
 
 	const QString countVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Count");
@@ -712,7 +720,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 	// declare temp list var
 	const QString listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("List");
 	FeedStreamHorizontally(stream, hIndents);
-	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr);
+	stream << ConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr);
 	stream << ' ' << listVariableName << ';';
 	FeedStream(stream, 1, false);
 
@@ -726,14 +734,14 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 
 	// inLoop: declare temp var
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
 	stream << ' ' << GetDecapitalizedValue(field.GetId()) << ';';
 	FeedStream(stream, 1, false);
 
 	// inLoop: read and checks
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("if (!");
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
 	stream << QStringLiteral("::ReadFromModel(");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral(", *");
@@ -761,9 +769,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 
 	// set value list to object
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("object.Set");
-	stream << GetCapitalizedValue(field.GetId());
-	stream << '(' << listVariableName << ')' << ';';
+	stream << GetSettingValueString(field, sdlNamespace, *m_sdlTypeListCompPtr, listVariableName);
 	FeedStream(stream, 1, false);
 }
 
