@@ -84,6 +84,15 @@ list(APPEND webdirs ${buildwebdir}/src/imtdocgui)
 list(APPEND webdirs ${IMTCOREDIR}/Qml/imtcontrols)
 list(APPEND webdirs ${buildwebdir}/src/imtcontrols)
 
+list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseComplexCollectionFilterSdl)
+list(APPEND webdirs ${buildwebdir}/src/imtbaseComplexCollectionFilterSdl)
+
+list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtBaseTypesSdl)
+list(APPEND webdirs ${buildwebdir}/src/imtbaseImtBaseTypesSdl)
+
+list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtCollectionSdl)
+list(APPEND webdirs ${buildwebdir}/src/imtbaseImtCollectionSdl)
+
 list(APPEND webdirs ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthGroupsSdl)
 list(APPEND webdirs ${buildwebdir}/src/imtauthGroupsSdl)
 
