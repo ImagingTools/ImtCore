@@ -442,7 +442,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 
 	// namespace begin
 	QString namespaceString;
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
 	if (!sdlNamespace.isEmpty()){
 		namespaceString = QStringLiteral("namespace ");
 		namespaceString+= sdlNamespace;
@@ -472,11 +472,6 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 		FeedStream(ifStream, 2);
 	}
 
-	// defining member's access methods
-	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
-		ifStream << GenerateAccessMethods(sdlField);
-		FeedStream(ifStream);
-	}
 	ifStream.flush();
 
 	return true;
@@ -532,7 +527,7 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 
 	// namespace begin
 	QString namespaceString;
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
 	if (!sdlNamespace.isEmpty()){
 		namespaceString = QStringLiteral("namespace ");
 		namespaceString+= sdlNamespace;
@@ -592,11 +587,6 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 		FeedStream(ifStream, 2);
 	}
 
-	// access methods implementation
-	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
-		GenerateAccessMethodsImpl(ifStream, sdlType.GetName(), sdlField);
-	}
-
 	return true;
 }
 
@@ -646,7 +636,7 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 
 	// finish header
 	// end of namespace
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
 	if (!sdlNamespace.isEmpty()){
 		namespaceString += QStringLiteral("} // namespace ");
 		namespaceString += sdlNamespace;
@@ -697,385 +687,6 @@ void CSdlClassCodeGeneratorComp::AbortCurrentProcessing()
 
 	m_headerFilePtr->remove();
 	m_sourceFilePtr->remove();
-}
-
-
-QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
-			const imtsdl::CSdlField& sdlField,
-			uint indents,
-			bool generateGetter,
-			bool generateSetter,
-			bool generateExistenceChecks)
-{
-	QString retVal;
-
-	if (generateGetter){
-		FeedLineHorizontally(retVal, indents);
-
-		retVal += QStringLiteral("[[nodiscard]] ");
-		retVal += ConvertTypeWithNamespace(sdlField, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr);;
-		retVal += QStringLiteral(" Get") + GetCapitalizedValue(sdlField.GetId());
-		retVal += QStringLiteral("() const;\n");
-	}
-
-	if (generateSetter){
-		FeedLineHorizontally(retVal, indents);
-
-		retVal += QStringLiteral("void Set") + GetCapitalizedValue(sdlField.GetId());
-		retVal += '(';
-
-		bool isCustom = false;
-		const QString originalSchemaNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-		const QString convertedType = ConvertTypeWithNamespace(
-					sdlField,
-					originalSchemaNamespace,
-					*m_sdlTypeListCompPtr,
-					&isCustom);
-
-		bool isComplex = sdlField.IsArray() ||
-					sdlField.GetType() == QStringLiteral("String") ||
-					sdlField.GetType() == QStringLiteral("ID") ||
-					isCustom;
-
-		if (isComplex){
-			retVal += QStringLiteral("const ");
-		}
-
-		retVal += convertedType;
-
-		if (isComplex){
-			retVal += '&';
-		}
-
-		retVal += ' ';
-		retVal += GetDecapitalizedValue(sdlField.GetId());
-		retVal += QStringLiteral(");\n");
-
-		// declare list insertion method
-		if (sdlField.IsArray()){
-			bool isCustom = false;
-			QString convertedArrayType = ConvertType(sdlField.GetType(), &isCustom);
-			if (!originalSchemaNamespace.isEmpty()){
-				if (isCustom){
-					imtsdl::CSdlType typeForField;
-					const bool isFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), typeForField);
-					Q_ASSERT(isFound);
-					const QString typeNamespace = typeForField.GetNamespace();
-					if (typeNamespace != originalSchemaNamespace){
-						convertedArrayType.prepend(typeNamespace);
-						// use global namespace
-						if (!convertedArrayType.startsWith(QStringLiteral("::"))){
-							convertedArrayType.prepend(QStringLiteral("::"));
-						}
-					}
-				}
-			}
-
-			bool isComplex = sdlField.GetType() == QStringLiteral("String") ||
-							 sdlField.GetType() == QStringLiteral("ID") ||
-							 isCustom;
-
-			FeedLineHorizontally(retVal, indents);
-			retVal += QStringLiteral("void Add");
-			retVal += GetCapitalizedValue(sdlField.GetId());
-			retVal += QStringLiteral("Element(");
-
-			if (isComplex){
-				retVal += QStringLiteral("const ");
-			}
-
-			retVal += convertedArrayType;
-
-			if (isComplex){
-				retVal += '&';
-			}
-
-			retVal += QStringLiteral(" element);\n");
-		}
-
-		// declare reset metod
-		FeedLineHorizontally(retVal, indents);
-		retVal += QStringLiteral("void Reset");
-		retVal += GetCapitalizedValue(sdlField.GetId());
-		retVal += QStringLiteral("();\n");
-	}
-
-	if (generateExistenceChecks){
-		FeedLineHorizontally(retVal, indents);
-		retVal += QStringLiteral("[[nodiscard]] bool Has");
-		retVal += GetCapitalizedValue(sdlField.GetId());
-		retVal += QStringLiteral("() const;\n");
-	}
-
-	return retVal;
-}
-
-
-void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
-			QTextStream& stream,
-			const QString className,
-			const imtsdl::CSdlField& sdlField,
-			uint indents,
-			bool generateGetter,
-			bool generateSetter,
-			bool generateExistenceChecks)
-{
-	if (generateGetter){
-		FeedStreamHorizontally(stream, indents);
-
-		stream << ConvertTypeWithNamespace(
-					sdlField,
-					m_originalSchemaNamespaceCompPtr->GetText(),
-					*m_sdlTypeListCompPtr);
-
-		stream << QStringLiteral(" C") + className + QStringLiteral("::");
-		stream << QStringLiteral("Get") + GetCapitalizedValue(sdlField.GetId());
-		stream << QStringLiteral("() const\n{");
-		FeedStream(stream, 1, false);
-		FeedStreamHorizontally(stream, indents + 1);
-		stream << QStringLiteral("return m_");
-		stream << GetDecapitalizedValue(sdlField.GetId());
-		stream << QStringLiteral(";\n}");
-		FeedStream(stream, 3, false);
-	}
-
-	if (generateSetter){
-		// name of method
-		FeedStreamHorizontally(stream, indents);
-		stream << QStringLiteral("void");
-		stream << QStringLiteral(" C") + className + QStringLiteral("::");
-		stream << QStringLiteral("Set") + GetCapitalizedValue(sdlField.GetId());
-		stream << '(';
-
-		bool isCustom = false;
-		const QString convertedType = ConvertTypeWithNamespace(
-			sdlField,
-			m_originalSchemaNamespaceCompPtr->GetText(),
-			*m_sdlTypeListCompPtr,
-			&isCustom);
-
-		bool isComplex = sdlField.IsArray() ||
-					sdlField.GetType() == QStringLiteral("String") ||
-					sdlField.GetType() == QStringLiteral("ID") ||
-					isCustom;
-
-		if (isComplex){
-			stream << QStringLiteral("const ");
-		}
-
-		stream << convertedType;
-
-		if (isComplex){
-			stream << '&';
-		}
-
-		stream << ' ';
-		stream << GetDecapitalizedValue(sdlField.GetId());
-		stream << QStringLiteral(")\n{");
-		FeedStream(stream, 1, false);
-
-		// impl of method
-		// a) check
-		FeedStreamHorizontally(stream, indents + 1);
-		stream << QStringLiteral("if (");
-		stream << GetDecapitalizedValue(sdlField.GetId());
-		stream << QStringLiteral(" != m_");
-		stream << GetDecapitalizedValue(sdlField.GetId());
-		stream << QStringLiteral(" || !");
-		stream << FromInternalMapCheckString(sdlField);
-		stream << QStringLiteral("){");
-		FeedStream(stream, 1, false);
-		FeedStreamHorizontally(stream, indents + 2);
-		// b) set value
-		stream << QStringLiteral("m_");
-		stream << GetDecapitalizedValue(sdlField.GetId());
-		stream << QStringLiteral(" = ");
-		stream << GetDecapitalizedValue(sdlField.GetId());
-		stream << QStringLiteral(";");
-		FeedStream(stream, 1, false);
-		// c) set status (isSet)
-		FeedStreamHorizontally(stream, indents + 2);
-		stream << s_variantMapClassMemberName << QStringLiteral(" << ") << '"' << sdlField.GetId() << '"' << ';';
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, indents + 1);
-		stream << '}';
-		FeedStream(stream, 1, false);
-
-		stream << '}';
-		FeedStream(stream, 3);
-
-		// add spectal list insertion method
-		if (sdlField.IsArray()){
-			bool isCustom = false;
-			QString convertedArrayType = ConvertType(sdlField.GetType(), &isCustom);
-			const QString originalSchemaNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-			if (!originalSchemaNamespace.isEmpty()){
-				if (isCustom){
-					imtsdl::CSdlType typeForField;
-					const bool isFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), typeForField);
-					Q_ASSERT(isFound);
-					const QString typeNamespace = typeForField.GetNamespace();
-					if (typeNamespace != originalSchemaNamespace){
-						convertedArrayType.prepend(typeNamespace);
-						// use global namespace
-						if (!convertedArrayType.startsWith(QStringLiteral("::"))){
-							convertedArrayType.prepend(QStringLiteral("::"));
-						}
-					}
-				}
-			}
-
-			bool isComplex = sdlField.GetType() == QStringLiteral("String") ||
-							 sdlField.GetType() == QStringLiteral("ID") ||
-							 isCustom;
-
-			FeedStreamHorizontally(stream, indents);
-			stream << QStringLiteral("void");
-			stream << QStringLiteral(" C") + className + QStringLiteral("::");
-			stream << QStringLiteral("Add");
-			stream << GetCapitalizedValue(sdlField.GetId());
-			stream << QStringLiteral("Element(");
-
-			if (isComplex){
-				stream << QStringLiteral("const ");
-			}
-
-			stream << convertedArrayType;
-
-			if (isComplex){
-				stream << '&';
-			}
-
-			stream << QStringLiteral(" element)");
-			FeedStream(stream, 1, false);
-
-			FeedStreamHorizontally(stream, indents);
-			stream << '{';
-			FeedStream(stream, 1, false);
-
-			FeedStreamHorizontally(stream, indents + 1);
-			stream << QStringLiteral("m_");
-			stream << GetDecapitalizedValue(sdlField.GetId());
-			stream << QStringLiteral(" << element;");
-			FeedStream(stream, 1, false);
-
-			FeedStreamHorizontally(stream, indents);
-			stream << '}';
-			FeedStream(stream, 3, false);
-		}
-
-		GenerateResetMethodImpl(stream, className, sdlField, indents);
-	}
-
-	if (generateExistenceChecks){
-		FeedStreamHorizontally(stream, indents);
-		stream << QStringLiteral("bool");
-		stream << QStringLiteral(" C") + className + QStringLiteral("::");
-		stream << QStringLiteral("Has");
-		stream << GetCapitalizedValue(sdlField.GetId());
-		stream << QStringLiteral("() const");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, indents);
-		stream << '{';
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, indents + 1);
-		stream << QStringLiteral("return ");
-		stream << FromInternalMapCheckString(sdlField);
-		stream << QStringLiteral(";");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, indents);
-		stream << '}';
-		FeedStream(stream, 3, false);
-	}
-}
-
-
-
-void CSdlClassCodeGeneratorComp::GenerateResetMethodImpl(
-			QTextStream& stream,
-			const QString className,
-			const imtsdl::CSdlField& sdlField,
-			uint indents)
-{
-	FeedStreamHorizontally(stream, indents);
-	stream << QStringLiteral("void C");
-	stream << className;
-	stream << QStringLiteral("::Reset") << GetCapitalizedValue(sdlField.GetId());
-	stream << QStringLiteral("()");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, indents);
-	stream << '{';
-	FeedStream(stream, 1, false);
-
-	// first remove value from used values
-	FeedStreamHorizontally(stream, indents + 1);
-	stream << s_variantMapClassMemberName << QStringLiteral(".remove(") << '"' << sdlField.GetId() << '"' << ')' << ';';
-	FeedStream(stream, 1, false);
-
-	// and reset a value
-	FeedStreamHorizontally(stream, indents + 1);
-	bool isCustom = false;
-	bool isComplex = false;
-	bool isArray = false;
-	const QString originalSchemaNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	const QString convertedType = ConvertTypeWithNamespace(
-					sdlField,
-					originalSchemaNamespace,
-					*m_sdlTypeListCompPtr,
-					&isCustom,
-					&isComplex,
-					&isArray);
-	// list, string, byte has a 'clear' method
-	if (isArray || convertedType == QStringLiteral("QString") || convertedType == QStringLiteral("QByteArray")){
-		stream << QStringLiteral("m_");
-		stream << GetDecapitalizedValue(sdlField.GetId());
-		stream << QStringLiteral(".clear();");
-	}
-	// if suctom - just reset with a defaul constructor
-	else if (isCustom){
-		stream << QStringLiteral("m_");
-		stream << GetDecapitalizedValue(sdlField.GetId());
-		stream << QStringLiteral(" = ");
-		stream << convertedType;
-		stream << QStringLiteral("();");
-	}
-	// set default value to scalar types
-	else if (!isComplex){
-		stream << QStringLiteral("m_");
-		stream << GetDecapitalizedValue(sdlField.GetId());
-		stream << QStringLiteral(" = ");
-		if (convertedType == QStringLiteral("int") ||
-			convertedType == QStringLiteral("long") ||
-			convertedType == QStringLiteral("long long"))
-		{
-			stream << QStringLiteral("0");
-		}
-		else if (convertedType == QStringLiteral("float")){
-			stream << QStringLiteral("0.00f");
-		}
-		else if (convertedType == QStringLiteral("double")){
-			stream << QStringLiteral("0.00");
-		}
-		else if (convertedType == QStringLiteral("bool")){
-			stream << QStringLiteral("false");
-		}
-		else {
-			I_CRITICAL();
-		}
-		stream << ';';
-	}
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, indents);
-	stream << '}';
-	FeedStream(stream, 1, false);
-
-	FeedStream(stream, 3, false);
 }
 
 
