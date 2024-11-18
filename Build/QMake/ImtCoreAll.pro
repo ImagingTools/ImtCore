@@ -366,24 +366,6 @@ SUBDIRS += ImtServicePck
 ImtServicePck.file = ../../Impl/ImtServicePck/QMake/ImtServicePck.pro
 ImtServicePck.depends = imtservice
 
-# Extern graphQl server
-SUBDIRS += graphqlserver
-graphqlserver.file +=  ../../Include/graphqlserver/QMake/graphqlserver.pro
-graphqlserver.depends = DesignTokenCreator
-
-SUBDIRS += graphqlclient
-graphqlclient.file +=  ../../Include/graphqlclient/QMake/graphqlclient.pro
-graphqlclient.depends = DesignTokenCreator
-
-
-SUBDIRS += GraphQlServerTest
-GraphQlServerTest.file +=  ../../Tests/GraphQlServerTest/QMake/GraphQlServerTest.pro
-GraphQlServerTest.depends = DesignTokenCreator
-
-SUBDIRS += GraphQlClientTest
-GraphQlClientTest.file +=  ../../Tests/GraphQlClientTest/QMake/GraphQlClientTest.pro
-GraphQlClientTest.depends = DesignTokenCreator
-
 
 # SUBDIRS += ImtControlsGallery
 # ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro

@@ -18,7 +18,6 @@
 #include <imtclientgql/CGqlHierarchicalStructureDelegateComp.h>
 #include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
 #include <imtclientgql/CConnectionStatusSubscriberComp.h>
-#include <graphqlclient/CExternSubscriberComp.h>
 
 
 /**
@@ -39,7 +38,6 @@ typedef imtclientgql::CWebSocketClientComp WebSocketClient;
 typedef imtclientgql::CModelSubscriberComp ModelSubscriber;
 typedef imtclientgql::CGqlHierarchicalStructureDelegateComp GqlHierarchicalStructureDelegate;
 typedef icomp::TModelCompWrap<imtclientgql::CConnectionStatusSubscriberComp> ConnectionStatusSubscriber;
-typedef graphqlclient::CExternSubscriberComp ExternSubscriber;
 
 
 } // namespace ImtClientGqlPck

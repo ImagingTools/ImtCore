@@ -69,11 +69,6 @@ I_EXPORT_COMPONENT(
 			"Connection status subscriber",
 			"Connection Status Subscriber");
 
-I_EXPORT_COMPONENT(
-			ExternSubscriber,
-			"GraphQL subscriber for extern client",
-			"GraphQL Subscriber");
-
 
 } // namespace ImtClientGqlPck
 

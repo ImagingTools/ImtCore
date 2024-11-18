@@ -129,17 +129,6 @@ I_EXPORT_COMPONENT(
 			"Headers data provider",
 			"Headers Data Provider");
 
-I_EXPORT_COMPONENT(
-			ExternGraphQlController,
-			"GraphQL controller for extern server",
-			"GraphQL Controller");
-
-
-I_EXPORT_COMPONENT(
-			ExternGraphQlPublisher,
-			"GraphQL subscription publisher for extern server",
-			"GraphQL Subscription Publisher");
-
 
 } // namespace ImtServerGqlPck
 
