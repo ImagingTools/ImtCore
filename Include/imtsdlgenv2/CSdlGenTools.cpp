@@ -115,5 +115,24 @@ QString CSdlGenTools::GetNullCheckString(const imtsdl::CSdlField& sdlField, bool
 	return retVal;
 }
 
+QString CSdlGenTools::GetSettingValueString(
+			const imtsdl::CSdlField& sdlField,
+			const QString& relatedNamespace,
+			imtsdl::ISdlTypeListProvider& listProvider,
+			const QString& variableName,
+			const QString& objectName)
+{
+	QString retVal = objectName;
+
+	retVal += '.' + sdlField.GetId();
+	retVal += QStringLiteral(" = std::make_unique<");
+	retVal += OptListConvertTypeWithNamespaceStruct(sdlField, relatedNamespace, listProvider, true);
+	retVal += QStringLiteral(">(");
+	retVal += variableName;
+	retVal += QStringLiteral(");");
+
+	return retVal;
+}
+
 
 } // namespace imtsdlgenv2

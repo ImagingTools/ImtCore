@@ -53,6 +53,13 @@ public:
 
 	[[nodiscard]] static QString GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull = true);
 
+	[[nodiscard]] static QString GetSettingValueString(
+				const imtsdl::CSdlField& sdlField,
+				const QString& relatedNamespace,
+				imtsdl::ISdlTypeListProvider& listProvider,
+				const QString& variableName,
+				const QString& objectName = "object");
+
 };
 
 
