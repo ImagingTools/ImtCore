@@ -48,6 +48,7 @@ Item {
 	property alias gridAddHeight: gridCollectionViewBase.gridAddHeight;
 	property alias gridCellHeightMin: gridCollectionViewBase.gridCellHeightMin;
 	property alias gridCellHeightMax: gridCollectionViewBase.gridCellHeightMax;
+	property alias gridCacheBuffer: gridCollectionViewBase.gridCacheBuffer;
 
 	property alias extendingInfoComp: gridCollectionViewBase.extendingInfoComp;
 	property alias gridDelegateMargin: gridCollectionViewBase.gridDelegateMargin;

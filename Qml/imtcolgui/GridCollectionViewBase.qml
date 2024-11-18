@@ -23,6 +23,7 @@ Item {
 	property alias gridCellWidth: gridInternal.cellWidth;
 	property alias gridCellHeight: collectionViewBaseContainer.gridCellHeightMin;
 	property alias gridContentHeight: gridInternal.contentHeight;
+	property alias gridCacheBuffer: gridInternal.cacheBuffer;
 	property alias gridContentY: gridInternal.contentY;
 	property alias gridBottomMargin: backgroundTable.anchors.bottomMargin;
 
@@ -208,7 +209,6 @@ Item {
 			anchors.fill: parent;
 
 			boundsBehavior: Flickable.StopAtBounds;
-			cacheBuffer: contentHeight + collectionViewBaseContainer.gridAddHeight;
 			clip: true;
 			//cacheBuffer: collectionViewBaseContainer.gridRowCount * collectionViewBaseContainer.gridCellHeightMin + collectionViewBaseContainer.gridAddHeight;
 			cellWidth: collectionViewBaseContainer.gridCellHeightMin;
