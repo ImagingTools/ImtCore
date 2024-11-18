@@ -208,6 +208,7 @@ Item {
 			anchors.fill: parent;
 
 			boundsBehavior: Flickable.StopAtBounds;
+			cacheBuffer: contentHeight + collectionViewBaseContainer.gridAddHeight;
 			clip: true;
 			//cacheBuffer: collectionViewBaseContainer.gridRowCount * collectionViewBaseContainer.gridCellHeightMin + collectionViewBaseContainer.gridAddHeight;
 			cellWidth: collectionViewBaseContainer.gridCellHeightMin;
