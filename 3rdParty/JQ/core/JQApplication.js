@@ -18,12 +18,66 @@ module.exports = {
             __queue: [],
         }
 
+        let XMLParser = new DOMParser()
+
         global.context = (class extends JQModules.QtQml.QObject {
             static meta = {
                 appName: {type:JQModules.QtQml.string, value:''},
-                language: {type:JQModules.QtQml.string, value:''},
+                language: {type:JQModules.QtQml.string, value:'', signalName:'languageChanged'},
                 application: {type:JQModules.QtQml.var, value:[]},
                 location: {type:JQModules.QtQml.var, value:window.location},
+
+                languageChanged: {type:JQModules.QtQml.Signal, slotName:'onLanguageChanged', args:[]},
+            }
+
+            static create(...args){
+                let proxy = super.create(...args)
+                proxy.__languages = {}
+                return proxy
+            }
+
+            translate(sourceText){
+                let translatedText = this.__languages[this.language]
+                let result = translatedText ? translatedText[sourceText] : sourceText
+                return result ? result : sourceText
+            }
+
+            onLanguageChanged(){
+                if(this.application && this.language && !this.__languages[this.language]){
+                    let langPrefixList = []
+                    if(typeof this.application === 'string'){
+                        langPrefixList.push(this.application)
+                    } else if(Array.isArray(this.application)){
+                        langPrefixList = this.application
+                    }
+                    for(let langPrefix of langPrefixList){
+                        let xhr = new XMLHttpRequest()
+                        if(langPrefix){
+                            xhr.open('GET', `../Translations/${langPrefix}_${this.language}.ts`, false)
+                        } else {
+                            xhr.open('GET', `../Translations/${this.language}.ts`, false)
+                        }
+                        xhr.onload = ()=>{
+                            if (xhr.readyState === XMLHttpRequest.DONE){
+                                let xml = XMLParser.parseFromString(xhr.responseText, 'text/xml')
+                                let messages = xml.getElementsByTagName('message')
+                                let dict = {}
+                                for(let message of messages){
+                                    let source = message.getElementsByTagName('source')[0]
+                                    let translation = message.getElementsByTagName('translation')[0]
+                                    dict[source.innerHTML] = translation.innerHTML
+                                }
+                                if(!this.__languages[this.language]){
+                                    this.__languages[this.language] = dict
+                                } else {
+                                    Object.assign(this.__languages[this.language], dict)
+                                }
+                            }
+                        }
+                        xhr.send()
+                    }
+                    
+                }
             }
         }).create()
        

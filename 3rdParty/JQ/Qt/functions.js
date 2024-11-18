@@ -220,7 +220,9 @@ module.exports = {
     openUrlExternally: function(url){
         return window.open(url, '_blank')
     },
-    qsTr: function(str){return str},
+    qsTr: function(sourceText){
+        return global.context.translate(sourceText)
+    },
     binding: function(func, lazy=false){
         func.bound = true
         func.lazy = lazy
