@@ -55,7 +55,7 @@ protected:
 protected:
 	SdlDocumentTypeList m_documentTypes;
 
-	imod::TModelWrap<iprm::CParamsSet> m_customSchemaParams;
+	std::shared_ptr<iprm::CParamsSet> m_customSchemaParamsPtr;
 };
 
 

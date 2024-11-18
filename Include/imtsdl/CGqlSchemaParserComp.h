@@ -78,7 +78,7 @@ private:
 	template <class InterfaceType>
 	static InterfaceType* ExtractSchemaCustomParams(CGqlSchemaParserComp& component)
 	{
-		return &component.m_customSchemaParams;
+		return component.m_customSchemaParamsPtr.get();
 	}
 
 protected:
