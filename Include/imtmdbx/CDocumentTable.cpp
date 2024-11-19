@@ -546,6 +546,19 @@ bool CDocumentTable::MoveToNext()
 }
 
 
+bool CDocumentTable::MoveToPrevious()
+{
+	bool ok = false;
+
+	mdbx::cursor::move_result result = m_cursor.to_previous(false);
+	if(result.done){
+		ok = true;
+	}
+
+	return ok;
+}
+
+
 bool CDocumentTable::Exists(const QString& name)
 {
 	bool ok = true;

@@ -50,6 +50,7 @@ public:
 	virtual bool MoveToLowerBound(quint64 key) override;
 	virtual bool MoveToLowerBound(const QByteArray& key) override;
 	virtual bool MoveToNext() override;
+	virtual bool MoveToPrevious() override;
 	bool CloseTable(mdbx::env_managed& env);
 
 
