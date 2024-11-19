@@ -45,7 +45,7 @@ public:
 		bool addVersion = false;
 		bool cleanNamespace = true;
 		const imtsdl::CSdlField* sdlFieldPtr = nullptr;
-		QString GetString() const;
+		[[nodiscard]] QString GetString() const;
 	};
 
 	/**
