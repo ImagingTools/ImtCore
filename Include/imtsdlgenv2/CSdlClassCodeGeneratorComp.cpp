@@ -559,9 +559,54 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 		FeedStream(stream, 3);
 	}
 
-	// Add compare operator
 	const QString sdlVersion = GetTypeVerstion(sdlType);
 
+	// implement constructors
+	// a) default; does nothing
+	stream << 'C' << sdlType.GetName() << ':' << ':';
+	stream << sdlVersion << ':' << ':';
+	stream << sdlVersion;
+	stream << QStringLiteral("()\n{\n}");
+	FeedStream(stream, 3, false);
+
+	// b) Implement copy assignment operator (non copy-and-swap idiom)
+	stream << 'C' << sdlType.GetName() << ':' << ':';
+	stream << sdlVersion;
+	stream << ' ' << 'C' << sdlType.GetName() << ':' << ':';
+	stream << sdlVersion << ':' << ':';
+	stream << QStringLiteral("operator=(const ");
+	stream << sdlVersion;
+	stream << QStringLiteral("& other)");
+	FeedStream(stream, 1, false);
+
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	const imtsdl::SdlFieldList fields = sdlType.GetFields();
+	for (int i = 0; i < fields.size(); ++i){
+		const imtsdl::CSdlField& field = fields[i];
+		const QString convertedType = OptListConvertTypeWithNamespaceStruct(field, sdlNamespace, *m_sdlTypeListCompPtr, true);
+		FeedStreamHorizontally(stream, 1);
+		stream << field.GetId();
+		stream << QStringLiteral(" = std::unique_ptr<");
+		stream << convertedType;
+		stream << QStringLiteral(">(new ");
+		stream << convertedType;
+		stream << QStringLiteral("(*other.");
+		stream << field.GetId();
+		stream << QStringLiteral("))");
+		stream << ';';
+		FeedStream(stream, 1, false);
+	}
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("return *this;");
+	FeedStream(stream, 1, false);
+
+	stream << '}';
+	FeedStream(stream, 3, false);
+
+	// Add compare operator
 	// a)declare
 	stream << QStringLiteral("bool ");
 	stream << 'C' << sdlType.GetName() << ':' << ':';
@@ -720,6 +765,20 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 	GenerateMetaInfo(stream, sdlType, indents + 1);
 	FeedStream(stream, 1, false);
 
+	// declare constructors
+	// a) default
+	FeedStreamHorizontally(stream, indents + 1);
+	stream << sdlVersion;
+	stream << QStringLiteral("();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, indents + 1);
+	stream << sdlVersion;
+	stream << QStringLiteral("(const ");
+	stream << sdlVersion;
+	stream << QStringLiteral("& other) { *this = other; }");
+	FeedStream(stream, 2, false);
+
 	// add types members
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
 		const QString convertedType = OptListConvertTypeWithNamespaceStruct(field, sdlNamespace, *m_sdlTypeListCompPtr, true);
@@ -732,14 +791,22 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 	}
 	FeedStream(stream, 1, false);
 
-	// Add compare operator
+	// Declare copy assignment operator (non copy-and-swap idiom)
+	FeedStreamHorizontally(stream, indents + 1);
+	stream << sdlVersion;
+	stream << QStringLiteral(" operator=(const ");
+	stream << sdlVersion;
+	stream << QStringLiteral("& other);");
+	FeedStream(stream, 1, false);
+
+	// Declare compare operator
 	FeedStreamHorizontally(stream, indents + 1);
 	stream << QStringLiteral("bool operator==(const ");
 	stream << sdlVersion;
 	stream << QStringLiteral("& other) const;");
 	FeedStream(stream, 1, false);
 
-	// Add invrted compare operator
+	// Declare invrted compare operator
 	FeedStreamHorizontally(stream, indents + 1);
 	stream << QStringLiteral("bool operator!=(const ");
 	stream << sdlVersion;
