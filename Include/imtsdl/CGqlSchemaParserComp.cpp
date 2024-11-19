@@ -531,7 +531,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled() && !m_argumentParserCompPtr->IsDependenciesMode()){
 		for (CSdlType& sdlType: m_sdlTypes){
 			bool isExternal = sdlType.IsExternal();
-			const bool isSameSchema = bool(m_currentSchemaFilePath == m_argumentParserCompPtr->GetSchemaFilePath());
+			const bool isSameSchema = bool(QDir::cleanPath(m_currentSchemaFilePath) == QDir::cleanPath(sdlType.GetSchemaFile()));
 
 			// update schema params
 			if (isSameSchema){
@@ -559,7 +559,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 					sdlType.SetTargetHeaderFile(headerFilePath);
 				}
 
-				isExternal = !isSameSchema;
+				isExternal =  bool(QDir::cleanPath(m_currentSchemaFilePath) != QDir::cleanPath(m_argumentParserCompPtr->GetSchemaFilePath()));
 			}
 			else if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_SAME_NAMESPACE){
 				const QString typeNamespace = sdlType.GetNamespace();
