@@ -998,16 +998,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 		return nullptr;
 	}
 
-	if (!m_filePersistenceCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Attribute 'FilePersistence' was not set", "CObjectCollectionControllerCompBase");
-		return nullptr;
-	}
-
-	if (!m_objectInfoFactCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Attribute 'ObjectFactory' was not set", "CObjectCollectionControllerCompBase");
-		return nullptr;
-	}
-
 	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to import the object. GQL input params is invalid.");
@@ -1017,21 +1007,26 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 
 	QByteArray objectData = inputParamPtr->GetFieldArgumentValue("fileData").toByteArray();
 	QByteArray typeId = inputParamPtr->GetFieldArgumentValue("typeId").toByteArray();
+	QString extension = inputParamPtr->GetFieldArgumentValue("extension").toString();
 	QByteArray data = QByteArray::fromBase64(objectData);
 
 	QString name = inputParamPtr->GetFieldArgumentValue("name").toString();
 	QString description = inputParamPtr->GetFieldArgumentValue("description").toString();
 
-	istd::TDelPtr<istd::IChangeable> objectInstancePtr = m_objectInfoFactCompPtr.CreateInstance();
-	if (!objectInstancePtr.IsValid()){
-		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
+	int index = GetFilePersistenceIndex(extension);
+
+	Q_ASSERT_X(index >= 0, "File persistence is invalid", "CObjectCollectionControllerCompBase");
+
+	istd::TDelPtr<istd::IChangeable> objectPersistenceInstancePtr = m_persistenseObjectFactCompPtr.CreateInstance(index);
+	if (!objectPersistenceInstancePtr.IsValid()){
+		errorMessage = QString("Unable to import object to the collection. Error: Object persistence instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return nullptr;
 	}
 
 	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + ".xml";
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
@@ -1042,7 +1037,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 	file.write(data);
 	file.close();
 
-	if (m_filePersistenceCompPtr->LoadFromFile(*objectInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
+	if (m_filePersistencesCompPtr[index]->LoadFromFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
 		errorMessage = QString("Unable to import object to the collection");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
@@ -1051,7 +1046,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 	}
 
 	QByteArray objectUuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	imtbase::IIdentifiable* identifiableObjectPtr = dynamic_cast<imtbase::IIdentifiable*>(objectInstancePtr.GetPtr());
+	imtbase::IIdentifiable* identifiableObjectPtr = dynamic_cast<imtbase::IIdentifiable*>(objectPersistenceInstancePtr.GetPtr());
 	if (identifiableObjectPtr != nullptr){
 		objectUuid = identifiableObjectPtr->GetObjectUuid();
 	}
@@ -1064,7 +1059,20 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 		return nullptr;
 	}
 
-	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, objectInstancePtr.GetPtr(), objectUuid);
+	int typeIdIndex = GetObjectTypeIdIndex(typeId);
+	istd::TDelPtr<istd::IChangeable> collectionObjectInstancePtr = m_collectionObjectFactCompPtr.CreateInstance(typeIdIndex);
+	if (!collectionObjectInstancePtr.IsValid()){
+		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
+
+	if (!ConvertObject(*objectPersistenceInstancePtr.GetPtr(), *collectionObjectInstancePtr.GetPtr())){
+		return nullptr;
+	}
+
+	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
 	if (retVal.isEmpty()){
 		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(qPrintable(objectUuid));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -1089,16 +1097,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 		return nullptr;
 	}
 
-	if (!m_objectCollectionCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return nullptr;
-	}
-
-	if (!m_filePersistenceCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Attribute 'FilePersistence' was not set", "CObjectCollectionControllerCompBase");
-		return nullptr;
-	}
-
 	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to import the object. GQL input params is invalid.");
@@ -1107,6 +1105,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 	}
 
 	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
+	QByteArray extension = inputParamPtr->GetFieldArgumentValue("extension").toByteArray();
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -1116,10 +1115,25 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 		return nullptr;
 	}
 
-	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + ".xml";
+	int index = GetFilePersistenceIndex(extension);
+	Q_ASSERT_X(index >= 0, "File persistence is invalid", "CObjectCollectionControllerCompBase");
 
-	if (m_filePersistenceCompPtr->SaveToFile(*dataPtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
+	QTemporaryDir tempDir;
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
+
+	istd::TDelPtr<istd::IChangeable> objectPersistenceInstancePtr = m_persistenseObjectFactCompPtr.CreateInstance(index);
+	if (!objectPersistenceInstancePtr.IsValid()){
+		errorMessage = QString("Unable to import object to the collection. Error: Object persistence instance is invalid");
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
+
+	if (!ConvertObject(*dataPtr.GetPtr(), *objectPersistenceInstancePtr.GetPtr())){
+		return nullptr;
+	}
+
+	if (m_filePersistencesCompPtr[index]->SaveToFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
 		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(qPrintable(objectId)).arg(filePathTmp);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
@@ -1143,6 +1157,42 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 	rootModelPtr->SetData("fileContent", data.toBase64());
 
 	return rootModelPtr.PopPtr();
+}
+
+
+bool CObjectCollectionControllerCompBase::ConvertObject(const istd::IChangeable& object1, istd::IChangeable& object2) const
+{
+	return object2.CopyFrom(object1);
+}
+
+
+int CObjectCollectionControllerCompBase::GetFilePersistenceIndex(const QString& extension) const
+{
+	for (int i = 0; i < m_filePersistencesCompPtr.GetCount(); i++){
+		const ifile::IFilePersistence* filePersistencePtr = m_filePersistencesCompPtr[i];
+		if (filePersistencePtr != nullptr){
+			QStringList extensions;
+			if (filePersistencePtr->GetFileExtensions(extensions)){
+				if (extensions.contains(extension)){
+					return i;
+				}
+			}
+		}
+	}
+
+	return -1;
+}
+
+
+int CObjectCollectionControllerCompBase::GetObjectTypeIdIndex(const QByteArray& typeId) const
+{
+	for (int i = 0; i < m_objectTypeIdsAttrPtr.GetCount(); i++){
+		if (m_objectTypeIdsAttrPtr[i] == typeId){
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 
