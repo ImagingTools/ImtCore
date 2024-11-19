@@ -23,6 +23,108 @@
 namespace imtsdlgenv2
 {
 
+// public methods of embedded CStructNamespaceConverter class
+
+
+CSdlGenTools::CStructNamespaceConverter::CStructNamespaceConverter()
+{
+}
+
+
+CSdlGenTools::CStructNamespaceConverter::CStructNamespaceConverter(
+			const imtsdl::CSdlField& aSdlField,
+			const QString& aRelatedNamespace,
+			const imtsdl::ISdlTypeListProvider& aListProvider,
+			bool aListWrap):
+	typeListProviderPtr(&aListProvider),
+	relatedNamespace(aRelatedNamespace),
+	listWrap(aListWrap),
+	sdlFieldPtr(&aSdlField)
+{
+}
+
+
+QString CSdlGenTools::CStructNamespaceConverter::GetString() const
+{
+	if (typeListProviderPtr == nullptr){
+		I_CRITICAL();
+
+		return QString();
+	}
+	if (sdlFieldPtr == nullptr){
+		I_CRITICAL();
+
+		return QString();
+	}
+
+	QString retVal;
+	if (!relatedNamespace.isEmpty()){
+		imtsdl::CSdlType typeForField;
+		const bool isFound = imtsdl::CSdlTools::GetSdlTypeForField(*sdlFieldPtr, typeListProviderPtr->GetSdlTypes(false), typeForField);
+		Q_ASSERT(isFound);
+		QString typeNamespace = GetNamespaceFromSchemaParams(typeForField.GetSchemaParams());
+		typeNamespace += QStringLiteral("::");
+		typeNamespace += 'C' + imtsdl::CSdlTools::GetCapitalizedValue(typeForField.GetName());
+		if (typeNamespace != relatedNamespace){
+			if (addVersion){
+				typeNamespace += QStringLiteral("::");
+				typeNamespace += GetTypeVerstion(typeForField);
+			}
+
+			bool namespaceCleaned = false;
+			// clean namespace
+			if (cleanNamespace){
+				QStringList relatedNamespaceParts = relatedNamespace.split(QStringLiteral("::"));
+				QMutableListIterator relatedNamespacePartsIter(relatedNamespaceParts);
+				while (relatedNamespacePartsIter.hasNext()){
+					QString& value = relatedNamespacePartsIter.next();
+					if (value.isEmpty()){
+						relatedNamespacePartsIter.remove();
+					}
+				}
+
+				QStringList typeNamespaceParts = typeNamespace.split(QStringLiteral("::"));
+				QMutableListIterator typeNamespacePartsIter(typeNamespaceParts);
+				while (typeNamespacePartsIter.hasNext()){
+					QString& value = typeNamespacePartsIter.next();
+					if (value.isEmpty()){
+						typeNamespacePartsIter.remove();
+					}
+				}
+
+				// lookup for same parts from begin
+				relatedNamespacePartsIter.toFront();
+				typeNamespacePartsIter.toFront();
+				while (relatedNamespacePartsIter.hasNext() && typeNamespacePartsIter.hasNext()) {
+					QString relatedNamespacePart = relatedNamespacePartsIter.next();
+					QString typeNamespacePart = typeNamespacePartsIter.next();
+					if (relatedNamespacePart != typeNamespacePart) {
+						// ALL parts in same order MUST be equal
+						break;
+					}
+					namespaceCleaned = true;
+					typeNamespacePartsIter.remove();
+				}
+				typeNamespace = typeNamespaceParts.join(QStringLiteral("::"));
+
+				retVal = typeNamespace;
+			}
+			// use global namespace
+			if (!namespaceCleaned && !retVal.startsWith(QStringLiteral("::"))){
+				retVal.prepend(QStringLiteral("::"));
+			}
+		}
+	}
+
+	if (listWrap && sdlFieldPtr->IsArray()){
+		imtsdl::CSdlTools::WrapTypeToList(retVal);
+	}
+
+	return retVal;
+}
+
+
+// public static methods
 
 QString CSdlGenTools::GetNamespaceFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& prefix)
 {
@@ -79,7 +181,7 @@ QString CSdlGenTools::GetTypeVerstion(const imtsdl::CSdlType& type)
 	return retVal;
 }
 
-QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, imtsdl::ISdlTypeListProvider& listProvider, bool listWrap,  bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
+QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider, bool listWrap,  bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
 {
 	bool _isCustom = false;
 	QString retVal = imtsdl::CSdlTools::ConvertType(sdlField.GetType(), &_isCustom, isComplexPtr);
@@ -99,29 +201,10 @@ QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlFi
 		return retVal;
 	}
 
-	if (!relatedNamespace.isEmpty()){
-		imtsdl::CSdlType typeForField;
-		const bool isFound = imtsdl::CSdlTools::GetSdlTypeForField(sdlField, listProvider.GetSdlTypes(false), typeForField);
-		Q_ASSERT(isFound);
-		QString typeNamespace = GetNamespaceFromSchemaParams(typeForField.GetSchemaParams());
-		typeNamespace += QStringLiteral("::");
-		typeNamespace += 'C' + imtsdl::CSdlTools::GetCapitalizedValue(typeForField.GetName());
-		if (typeNamespace != relatedNamespace){
-			typeNamespace += QStringLiteral("::");
-			typeNamespace += GetTypeVerstion(typeForField);
-			retVal = typeNamespace;
-			// use global namespace
-			if (!retVal.startsWith(QStringLiteral("::"))){
-				retVal.prepend(QStringLiteral("::"));
-			}
-		}
-	}
+	CStructNamespaceConverter converter(sdlField, relatedNamespace, listProvider, listWrap);
+	converter.addVersion = true;
 
-	if (listWrap && sdlField.IsArray()){
-		imtsdl::CSdlTools::WrapTypeToList(retVal);
-	}
-
-	return retVal;
+	return converter.GetString();
 }
 
 QString CSdlGenTools::GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull, const QString& objectName)
@@ -147,7 +230,7 @@ QString CSdlGenTools::GetNullCheckString(const imtsdl::CSdlField& sdlField, bool
 QString CSdlGenTools::GetSettingValueString(
 			const imtsdl::CSdlField& sdlField,
 			const QString& relatedNamespace,
-			imtsdl::ISdlTypeListProvider& listProvider,
+			const imtsdl::ISdlTypeListProvider& listProvider,
 			const QString& variableName,
 			const QString& objectName)
 {

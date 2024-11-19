@@ -33,9 +33,21 @@ namespace imtsdlgenv2
 class CSdlGenTools
 {
 public:
+	class CStructNamespaceConverter
+	{
+	public:
+		CStructNamespaceConverter();
+		CStructNamespaceConverter(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider, bool listWrap);
 
+		const imtsdl::ISdlTypeListProvider* typeListProviderPtr = nullptr;
+		QString relatedNamespace;
+		bool listWrap = false;
+		bool addVersion = false;
+		bool cleanNamespace = true;
+		const imtsdl::CSdlField* sdlFieldPtr = nullptr;
+		QString GetString() const;
+	};
 
-public:
 	/**
 		\returns namespace from \c schemaParams, accorging to V2 Generation
 	 */
@@ -45,7 +57,7 @@ public:
 	[[nodiscard]] static QString OptListConvertTypeWithNamespaceStruct(
 		const imtsdl::CSdlField& sdlField,
 		const QString& relatedNamespace,
-		imtsdl::ISdlTypeListProvider& listProvider,
+		const imtsdl::ISdlTypeListProvider& listProvider,
 		bool listWrap = false,
 		bool* isCustomPtr = nullptr,
 		bool* isComplexPtr = nullptr,
@@ -56,7 +68,7 @@ public:
 	[[nodiscard]] static QString GetSettingValueString(
 				const imtsdl::CSdlField& sdlField,
 				const QString& relatedNamespace,
-				imtsdl::ISdlTypeListProvider& listProvider,
+				const imtsdl::ISdlTypeListProvider& listProvider,
 				const QString& variableName,
 				const QString& objectName = "object");
 
