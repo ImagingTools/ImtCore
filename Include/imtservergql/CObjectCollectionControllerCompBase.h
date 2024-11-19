@@ -152,7 +152,7 @@ protected:
 	/**
 		Create object from the GraphQL
 	*/
-	[[deprecated]] virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const;
+	[[deprecated]] virtual istd::IChangeable* CreateObjectFromInputParams(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const;
 
 	/**
 		Create object from the GraphQL
@@ -176,6 +176,8 @@ protected:
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+
+	virtual istd::IChangeable* CreateObject(const QByteArray& typeId);
 
 protected:
 	QMap<QByteArray, QByteArray> m_fieldReplacementMap;

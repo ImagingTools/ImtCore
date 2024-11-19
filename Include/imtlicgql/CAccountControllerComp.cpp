@@ -79,7 +79,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 }
 
 
-istd::IChangeable* CAccountControllerComp::CreateObject(
+istd::IChangeable* CAccountControllerComp::CreateObjectFromInputParams(
 			const QList<imtgql::CGqlObject>& inputParams,
 			QByteArray& objectId,
 			QString& name,

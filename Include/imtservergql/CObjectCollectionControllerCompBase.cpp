@@ -1364,7 +1364,7 @@ bool CObjectCollectionControllerCompBase::CreateRepresentationFromObject(
 }
 
 
-istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
+istd::IChangeable* CObjectCollectionControllerCompBase::CreateObjectFromInputParams(
 		const QList<imtgql::CGqlObject>& /*inputParams*/,
 		QByteArray& /*objectId*/,
 		QString& /*name*/,
@@ -1385,7 +1385,7 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObjectFromRequest(
 	QList<imtgql::CGqlObject> inputParams;
 	inputParams.append(gqlRequest.GetParams());
 
-	return CreateObject(inputParams, newObjectId, name, description, errorMessage);
+	return CreateObjectFromInputParams(inputParams, newObjectId, name, description, errorMessage);
 }
 
 
@@ -1497,6 +1497,12 @@ void CObjectCollectionControllerCompBase::SetObjectFilter(
 
 		filterParams.SetEditableParameter(key.toUtf8(), idParamPtr, true);
 	}
+}
+
+
+istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(const QByteArray& typeId)
+{
+	return nullptr;
 }
 
 

@@ -22,7 +22,7 @@ public:
 protected:
 	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const override;
+	virtual istd::IChangeable* CreateObjectFromInputParams(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const override;
 
 private:
 	I_FACT(imtauth::ICompanyInfo, m_accountInfoFactCompPtr);
