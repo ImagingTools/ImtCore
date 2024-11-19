@@ -51,7 +51,7 @@ public:
 		bool* isComplexPtr = nullptr,
 		bool* isArrayPtr = nullptr);
 
-	[[nodiscard]] static QString GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull = true);
+	[[nodiscard]] static QString GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull = true, const QString& objectName = "object");
 
 	[[nodiscard]] static QString GetSettingValueString(
 				const imtsdl::CSdlField& sdlField,

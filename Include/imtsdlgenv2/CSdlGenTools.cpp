@@ -100,9 +100,14 @@ QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlFi
 	return retVal;
 }
 
-QString CSdlGenTools::GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull)
+QString CSdlGenTools::GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull, const QString& objectName)
 {
-	QString retVal = sdlField.GetId() + ' ';
+	QString retVal;
+	if (!objectName.isEmpty()){
+		retVal = objectName + '.';
+	}
+
+	retVal += sdlField.GetId() + ' ';
 	if (checkNull){
 		retVal += '=';
 	}
