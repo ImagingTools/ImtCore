@@ -81,16 +81,40 @@ QString CSdlGenTools::GetTypeVerstion(const imtsdl::CSdlType& type)
 
 QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, imtsdl::ISdlTypeListProvider& listProvider, bool listWrap,  bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
 {
-	bool isCustom = false;
-	QString retVal = imtsdl::CSdlTools::OptListConvertTypeWithNamespace(sdlField, relatedNamespace, listProvider, false, &isCustom, isComplexPtr, isArrayPtr);
+	bool _isCustom = false;
+	QString retVal = imtsdl::CSdlTools::ConvertType(sdlField.GetType(), &_isCustom, isComplexPtr);
 	if (isCustomPtr != nullptr){
-		*isCustomPtr = isCustom;
+		*isCustomPtr = _isCustom;
 	}
-	if (isCustom){
+	if (isArrayPtr != nullptr){
+		*isArrayPtr = sdlField.IsArray();
+	}
+
+	if (!_isCustom){
+		// we can define namespace only for custom types
+		if (listWrap && sdlField.IsArray()){
+			imtsdl::CSdlTools::WrapTypeToList(retVal);
+		}
+
+		return retVal;
+	}
+
+	if (!relatedNamespace.isEmpty()){
 		imtsdl::CSdlType typeForField;
 		const bool isFound = imtsdl::CSdlTools::GetSdlTypeForField(sdlField, listProvider.GetSdlTypes(false), typeForField);
 		Q_ASSERT(isFound);
-		retVal += QStringLiteral("::") + GetTypeVerstion(typeForField);
+		QString typeNamespace = GetNamespaceFromSchemaParams(typeForField.GetSchemaParams());
+		typeNamespace += QStringLiteral("::");
+		typeNamespace += 'C' + imtsdl::CSdlTools::GetCapitalizedValue(typeForField.GetName());
+		if (typeNamespace != relatedNamespace){
+			typeNamespace += QStringLiteral("::");
+			typeNamespace += GetTypeVerstion(typeForField);
+			retVal = typeNamespace;
+			// use global namespace
+			if (!retVal.startsWith(QStringLiteral("::"))){
+				retVal.prepend(QStringLiteral("::"));
+			}
+		}
 	}
 
 	if (listWrap && sdlField.IsArray()){
