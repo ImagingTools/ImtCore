@@ -15,6 +15,8 @@ DocumentCollectionViewDelegate {
     exportFileDialog.nameFilters: ["Xml files (*.xml)"];
     exportFileDialog.title: qsTr("Select product");
 
+    importObjectTypeId: "Product";
+
     property bool force: false;
 
     function updateItemSelection(selectedItems){
@@ -73,9 +75,9 @@ DocumentCollectionViewDelegate {
         ModalDialogManager.openDialog(messageDialogComp, {});
     }
 
-    function onImportDialogResult(name, fileData){
+    function onImportDialogResult(name, fileData, extension){
         if (collectionView && collectionView.dataController){
-            collectionView.dataController.importObject("", name, "", fileData, {"force":container.force});
+            collectionView.dataController.importObject(importObjectTypeId, name, "", fileData, extension, {"force":container.force});
         }
     }
 

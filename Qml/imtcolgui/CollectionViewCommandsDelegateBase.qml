@@ -25,6 +25,8 @@ ViewCommandsDelegateBase {
     property alias exportFileDialog: fileDialogSave;
     property alias setDescriptionDialogComp: setDescriptionDialog;
 
+    property string importObjectTypeId;
+
     property bool canRename: false;
     property bool canSetDescription: false;
 
@@ -46,6 +48,10 @@ ViewCommandsDelegateBase {
             elementsConnections.target = collectionView.table;
             controllerConnections.target = collectionView.dataController;
         }
+    }
+
+    ListModel {
+        id: extensionModel;
     }
 
     Connections {
@@ -86,6 +92,18 @@ ViewCommandsDelegateBase {
         function onExported(data){
             let encodedStr = Qt.atob(data);
             exportFileIO.write(encodedStr);
+        }
+    }
+
+    function setupExtensionsModel(){
+        extensionModel.clear();
+
+        for (let i = 0; i < fileDialogSave.nameFilters.length; i++){
+            let nameFilter = fileDialogSave.nameFilters[i];
+
+            let name = nameFilter.split("(*.")[0];
+            let result = nameFilter.split("*.")[1].split(")")[0];
+            extensionModel.append({"Id": result, "Name": name})
         }
     }
 
@@ -176,6 +194,19 @@ ViewCommandsDelegateBase {
         }
     }
 
+    Component {
+        id: extensionsPopupMenuDialog;
+
+        PopupMenuDialog {
+            onFinished: {
+                if (commandId !== ''){
+                    fileDialogSave.fileExt = commandId;
+                    fileDialogSave.open();
+                }
+            }
+        }
+    }
+
     // for reimplemented
     function onEdit(){
     }
@@ -185,19 +216,33 @@ ViewCommandsDelegateBase {
     }
 
     function onExport(){
-        fileDialogSave.open();
-    }
+        if (Qt.platform.os == "web"){
+            setupExtensionsModel();
 
-    // importObject(typeId, name, description, b64encoded, additionalParamsObj) - signature in dataController
-    function onImportDialogResult(name, fileData){
-        if (collectionView && collectionView.dataController){
-            collectionView.dataController.importObject("", name, "", fileData);
+            if (extensionModel.count === 1){
+                fileDialogSave.fileExt = extensionModel.get(0).Id;;
+                fileDialogSave.open();
+            }
+            else{
+                ModalDialogManager.openDialog(extensionsPopupMenuDialog, {"x": ModalDialogManager.activeView.width / 2, "y": ModalDialogManager.activeView.height / 2, "model": extensionModel});
+            }
+        }
+        else{
+            fileDialogSave.open();
         }
     }
 
-    function onExportDialogResult(objectId){
+    // importObject(typeId, name, description, b64encoded, ext, additionalParamsObj) - signature in dataController
+    function onImportDialogResult(name, fileData, extension){
         if (collectionView && collectionView.dataController){
-            collectionView.dataController.exportObject(objectId);
+            collectionView.dataController.importObject(importObjectTypeId, name, "", fileData, extension);
+        }
+    }
+
+    // exportObject(objectId, extension, additionalParamsObj) - signature in dataController
+    function onExportDialogResult(objectId, extension){
+        if (collectionView && collectionView.dataController){
+            collectionView.dataController.exportObject(objectId, extension);
         }
     }
 
@@ -230,11 +275,17 @@ ViewCommandsDelegateBase {
 
                     let fileName = filePath.name
                     let data = filePath.name.split('.')
+                    let ext = "";
+                    console.log("fileName", fileName);
                     if (data.length > 1){
                         fileName = data[0]
+                        ext = data[1]
+
+                        console.log("fileName", fileName);
+                        console.log("ext", ext);
                     }
 
-                    collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedContent);
+                    collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedContent, ext);
                 }.bind(this)
             }
             else {
@@ -247,14 +298,17 @@ ViewCommandsDelegateBase {
                 let parts = filePath.split('/')
                 if (parts.length > 0){
                     let data = parts[parts.length - 1].split('.')
+                    let ext = "";
                     if (data.length > 0){
                         fileName = data[0]
+                        ext = data[1]
                     }
                 }
 
                 console.log("fileName", fileName)
+                console.log("ext", ext)
 
-                collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedData);
+                collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedData, ext);
             }
         }
 
@@ -269,13 +323,18 @@ ViewCommandsDelegateBase {
         nameFilters: ["All files (*)"];
         fileMode: FileDialog.SaveFile;
         currentFile: "Default"
+        property string fileExt;
         onAccepted: {
             let filePath = fileDialogSave.file.toString();
+            console.log("filePath", filePath);
 
             if (Qt.platform.os == "web"){
                 exportFileIO.source = fileDialogSave.currentFile;
             }
             else{
+                let extension = filePath.substring(filePath.lastIndexOf('.') + 1);
+                fileDialogSave.fileExt = extension;
+
                 filePath = filePath.replace('file:///', '')
                 exportFileIO.source = filePath;
             }
@@ -285,7 +344,7 @@ ViewCommandsDelegateBase {
                 let index = indexes[0];
                 let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("Id", index);
                 if (selectedId !== ""){
-                    collectionViewCommandsDelegate.onExportDialogResult(selectedId);
+                    collectionViewCommandsDelegate.onExportDialogResult(selectedId, fileDialogSave.fileExt);
                 }
             }
         }

@@ -1060,6 +1060,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 	}
 
 	int typeIdIndex = GetObjectTypeIdIndex(typeId);
+	Q_ASSERT_X(typeIdIndex >= 0, "Type ID is invalid", "CObjectCollectionControllerCompBase");
+
 	istd::TDelPtr<istd::IChangeable> collectionObjectInstancePtr = m_collectionObjectFactCompPtr.CreateInstance(typeIdIndex);
 	if (!collectionObjectInstancePtr.IsValid()){
 		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");

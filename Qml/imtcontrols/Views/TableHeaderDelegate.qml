@@ -231,12 +231,12 @@ Item{
 
 		anchors.verticalCenter: mainRec.verticalCenter;
 		anchors.right: mainRec.right;
-		anchors.rightMargin: Style.size_mainMargin;
+        anchors.rightMargin: headerDelegate.columnIndex == headerDelegate.columnCount - 1 ? 3 * Style.size_mainMargin : Style.size_mainMargin;
 
 		width: visible ? 12 : 0;
 		height: width;
 
-		visible: headerDelegate.tableItem.currentHeaderId === model.Id && headerDelegate.tableItem.hasSort;
+        visible: headerDelegate.tableItem.currentHeaderId === model.Id && headerDelegate.tableItem.hasSort;
 		rotation: headerDelegate.tableItem.currentSortOrder == "ASC" ? 180 : 0
 
 		sourceSize.width: width;
@@ -320,94 +320,6 @@ Item{
 
 		return -1;
 	}
-
-	//    MouseArea{
-	//        id: movingRight;
-
-	//        anchors.right:  parent.right;
-
-	//        width: 15;
-	//        height: parent.height;
-
-	//        visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex < headerDelegate.columnCount -1 && headerDelegate.visible;
-	//        enabled: visible;
-
-	//        hoverEnabled: true;
-	//        cursorShape: pressed ?  Qt.SplitHCursor : isWithinBorder ? Qt.SplitHCursor : Qt.ArrowCursor;
-
-	//        property bool isWithinBorder: mouseX >= width - splitterWidth //&& mouseX <= width/2 + splitterWidth/2;
-	//        property int splitterWidth: 6;
-	//        property var coord: mapToItem(movingRight,0,0);
-	//        property bool  blocked: false;
-
-	//        onPressed: {
-	//            movingRight.coord = mapToItem(movingRight,mouse.x,mouse.y)
-	//        }
-
-	//        onPositionChanged: {
-	//            if(pressed){
-	//                console.log("movingRight onPositionChanged");
-
-	//                var newCoords = mapToItem(movingRight,mouse.x,mouse.y);
-	//                var deltaX = Math.trunc(newCoords.x - movingRight.coord.x);
-	//                var width_ = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex);
-
-	//                let nextIndex = headerDelegate.getNextHeaderIndex();
-
-	//                var width_next = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", nextIndex);
-	//                var width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
-	//                var width_next_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", nextIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", nextIndex) : headerDelegate.tableItem.minCellWidth;
-
-	//                width_ += deltaX;
-	//                width_next -= deltaX;
-
-	//                let currentPercent = (width_ / headerDelegate.tableItem.width) * 100;
-	//                let nextPercent = (width_next / headerDelegate.tableItem.width) * 100;
-
-	//                if(width_ > width_min && width_next > width_next_min){
-	//                    headerDelegate.tableItem.widthDecorator.setData("Width", width_, headerDelegate.columnIndex);
-	//                    headerDelegate.tableItem.widthDecorator.setData("Width", width_next, nextIndex);
-
-	//                    if (headerDelegate.tableItem.width > 0){
-	//                        headerDelegate.tableItem.widthDecorator.setData("WidthPercent", currentPercent, headerDelegate.columnIndex);
-	//                        headerDelegate.tableItem.widthDecorator.setData("WidthPercent", nextPercent, nextIndex);
-	//                    }
-
-	//                    headerDelegate.tableItem.setWidth();
-
-	//                    headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, currentPercent)
-	//                    let nextHeaderId = headerDelegate.tableItem.headers.getData("Id", nextIndex);
-	//                    headerDelegate.tableItem.tableViewParams.setHeaderSize(nextHeaderId, nextPercent)
-	//                }
-	//            }
-
-	//            blocked = true;
-	//            blockmovingRightPause.restart();
-	//        }
-
-	//        onReleased: {
-	//            headerDelegate.tableItem.saveWidth();
-	//        }
-
-	//        onClicked: {
-	//            if(blocked){
-	//                mouse.accepted = true;
-	//            }
-	//            else {
-	//                mouse.accepted = false;
-	//            }
-	//        }
-	//    }
-
-	// PauseAnimation {
-	//     id: blockmovingRightPause;
-
-	//     duration: 200
-
-	//     onFinished: {
-	//         movingRight.blocked = false;
-	//     }
-	// }
 
 	MouseArea{
 		id: movingLeft;

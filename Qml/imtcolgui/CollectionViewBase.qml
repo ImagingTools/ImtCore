@@ -192,7 +192,6 @@ ViewBase {
 			borderColorVertical: Style.borderColor;
 
 			onSelectionChanged: {
-				console.log("Table onSelectionChanged", selection)
 				collectionViewBaseContainer.selectionChanged(selection);
 			}
 
@@ -225,30 +224,15 @@ ViewBase {
 
             onCurrentHeaderIdChanged: {
                 collectionViewBaseContainer.collectionFilter.setSortingInfoId(currentHeaderId);
-
-                collectionViewBaseContainer.doUpdateGui();
             }
 
             onCurrentSortOrderChanged: {
                 collectionViewBaseContainer.collectionFilter.setSortingOrder(currentSortOrder);
-
-                collectionViewBaseContainer.doUpdateGui();
             }
 
-            // onHeaderClicked: {
-            // 	if (collectionViewBaseContainer.collectionFilter.getSortingInfoId() !== headerId){
-            // 		collectionViewBaseContainer.collectionFilter.setSortingInfoId(headerId);
-            // 		collectionViewBaseContainer.collectionFilter.setSortingOrder("ASC");
-            // 	}
-            // 	else{
-            // 		collectionViewBaseContainer.collectionFilter.setSortingInfoId(headerId);
-
-            // 		let currentSortingOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
-            // 		collectionViewBaseContainer.collectionFilter.setSortingOrder(currentSortingOrder == "ASC" ? "DESC" : "ASC");
-            // 	}
-
-            // 	collectionViewBaseContainer.doUpdateGui();
-            // }
+            onHeaderClicked: {
+                collectionViewBaseContainer.doUpdateGui();
+            }
 		}
 
 		Item {

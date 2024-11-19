@@ -19,7 +19,7 @@ Row {
         delegate: Item {
             id: cell
             property bool compl: false;
-            property bool complCompl: dataList.compl && dataList.rowDelegate.tableItem.columnCount;
+            property bool complCompl: dataList.compl && dataList && dataList.rowDelegate.tableItem.columnCount;
             width: 20
             height: dataList.height;
 
@@ -28,13 +28,13 @@ Row {
             }
 
             Component.onDestruction: {
-                if (dataList.rowDelegate && dataList.rowDelegate.tableItem){
+                if (dataList && dataList.rowDelegate && dataList.rowDelegate.tableItem){
                     dataList.rowDelegate.tableItem.widthRecalc.disconnect(cell.setCellWidth)
                 }
             }
 
             onComplComplChanged: {
-                if(cell.complCompl){
+                if(cell.complCompl && dataList){
                     loader.sourceComponent = dataList.rowDelegate.tableItem.columnContentComps[model.index] !== null ?
                                 dataList.rowDelegate.tableItem.columnContentComps[model.index] : dataList.rowDelegate.tableItem.cellDelegate;
 
@@ -44,7 +44,7 @@ Row {
             }
 
             function setCellWidth(){
-                if(!dataList.rowDelegate || !dataList.rowDelegate.tableItem){
+                if(!dataList.rowDelegate || !dataList.rowDelegate.tableItem || !dataList){
                     return;
                 }
 
@@ -69,7 +69,7 @@ Row {
                 id: loader;
                 anchors.fill: parent
                 onItemChanged: {
-                    if (item){
+                    if (item && dataList){
                         item.columnIndex = model.index
                         item.rowDelegate = dataList.rowDelegate
                     }
