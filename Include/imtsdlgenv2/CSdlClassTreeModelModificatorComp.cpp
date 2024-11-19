@@ -459,9 +459,10 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 
 	// inLoop: add item and check
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << newTreeModelVarName << QStringLiteral("->SetData(QByteArray(), *") << field.GetId();
-	stream << '[' << treeModelIndexVarName << ']';
-	stream << QStringLiteral(", ") << treeModelIndexVarName << ')' << ';';
+	stream << newTreeModelVarName << QStringLiteral("->SetData(QByteArray(), object.");
+	stream << field.GetId();
+	stream << QStringLiteral("->at(") << treeModelIndexVarName;
+	stream << QStringLiteral("), ") << treeModelIndexVarName << ')' << ';';
 	FeedStream(stream, 1, false);
 
 	// end of loop
@@ -492,14 +493,12 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 		FeedStream(stream, 1, false);
 
 		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field);
-		FeedStream(stream, 1, false);
 	}
 	else {
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model != nullptr){");
 		FeedStream(stream, 1, false);
 
 		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field, 2);
-		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
 		stream << '}';
@@ -572,9 +571,8 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 
 	// set value list to object
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("object.Set");
-	stream << GetCapitalizedValue(field.GetId());
-	stream << '(' << listVariableName << ')' << ';';
+	stream << GetSettingValueString(field, sdlNamespace, *m_sdlTypeListCompPtr, listVariableName);
+	FeedStream(stream, 1, false);
 }
 
 
@@ -645,10 +643,10 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 	stream << QStringLiteral("if (!(");
 	structNameConverter.addVersion = false;
 	stream << structNameConverter.GetString();
-	stream << QStringLiteral("::WriteToModel((*object.");
+	stream << QStringLiteral("::WriteToModel(object.");
 	stream << field.GetId();
-	stream << ')' << '[' << treeModelIndexVarName << ']';
-	stream << QStringLiteral(", *") << newTreeModelVarName;
+	stream << QStringLiteral("->at(") << treeModelIndexVarName;
+	stream << QStringLiteral("), *") << newTreeModelVarName;
 	stream << QStringLiteral(", ") << treeModelIndexVarName;
 	stream << QStringLiteral("))){");
 	FeedStream(stream, 1, false);
@@ -689,14 +687,12 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldReadFromModelCode(QTe
 		FeedStream(stream, 1, false);
 
 		AddCustomArrayFieldReadFromModelImplCode(stream, field);
-		FeedStream(stream, 1, false);
 	}
 	else {
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model != nullptr){");
 		FeedStream(stream, 1, false);
 
 		AddCustomArrayFieldReadFromModelImplCode(stream, field, 2);
-		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
 		stream << '}';
@@ -777,6 +773,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 	// inLoop: add variable to tempList
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << listVariableName;
+
 	stream << QStringLiteral(" << ");
 	stream << GetDecapitalizedValue(field.GetId()) << ';';
 	FeedStream(stream, 1, false);
