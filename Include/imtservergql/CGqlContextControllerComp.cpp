@@ -27,7 +27,13 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 			const imtgql::IGqlContext::Headers& headers,
 			QString& errorMessage) const
 {
-	if (!m_sessionCollectionCompPtr.IsValid() || !m_userCollectionCompPtr.IsValid()){
+	if (!m_sessionCollectionCompPtr.IsValid()){
+		Q_ASSERT(false);
+		return nullptr;
+	}
+
+	if (!m_userCollectionCompPtr.IsValid()){
+		Q_ASSERT(false);
 		return nullptr;
 	}
 

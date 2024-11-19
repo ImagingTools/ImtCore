@@ -768,6 +768,28 @@ Rectangle {
 
 
 	function updateWidthFromViewParams(){
+        let headersTemp = tableContainer.headers.copyMe();
+        let widthTemp = tableContainer.widthDecorator.copyMe();
+
+        for (let i = 0; i < tableContainer.tableViewParams.getItemsCount(); i++){
+            let headerViewParamId = tableContainer.tableViewParams.getData("HeaderId", i);
+
+            for (let j = 0; j < headersTemp.getItemsCount(); j++){
+                let headerId = headersTemp.getData("Id", j);
+                if (headerViewParamId === headerId){
+                    widthTemp.swapItems(i, j);
+                    headersTemp.swapItems(i, j);
+                    break;
+                }
+            }
+        }
+
+        headersList.model = 0;
+        tableContainer.headers.copy(headersTemp);
+        headersList.model = tableContainer.headers;
+
+        tableContainer.widthDecorator.copy(widthTemp);
+
 		for (let i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
 			let headerId = tableContainer.headers.getData("Id", i);
 			for (let j = 0; j < tableContainer.tableViewParams.getItemsCount(); j++){

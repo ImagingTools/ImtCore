@@ -34,6 +34,10 @@ TreeItemModel {
         internal.setHeaderInfo(headerId, "Visible", visible);
     }
 
+    function setHeaderOrder(headerId, order){
+        internal.setHeaderInfo(headerId, "Order", order);
+    }
+
     function setHeaderSize(headerId, size){
         internal.setHeaderInfo(headerId, "Size", size);
     }
@@ -47,6 +51,15 @@ TreeItemModel {
         return -1;
     }
 
+    function getHeaderOrder(headerId){
+        let index = root.getHeaderIndex(headerId);
+        if (index >= 0){
+            return root.getData("Order", index);
+        }
+
+        return 0;
+    }
+
     function headerIsVisible(headerId){
         let index = root.getHeaderIndex(headerId);
 
@@ -57,6 +70,10 @@ TreeItemModel {
         }
 
         return false;
+    }
+
+    function swapHeaders(index1, index2){
+        root.swapItems(index1, index2);
     }
 
     function headerIsExists(headerId){
@@ -84,6 +101,7 @@ TreeItemModel {
         for (let i = 0; i < headerIds.length; i++){
             setHeaderVisible(headerIds[i], obj.headerIsVisible(headerIds[i]));
             setHeaderSize(headerIds[i], obj.getHeaderSize(headerIds[i]));
+            setHeaderOrder(headerIds[i], obj.getHeaderOrder(headerIds[i]));
         }
 
         return true;

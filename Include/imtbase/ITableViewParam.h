@@ -16,12 +16,14 @@ public:
 	{
 		QByteArray headerId;
 		int size;
-		bool visible;
+		bool visible = false;
+		int order = 0;
 
 		bool operator == (const HeaderInfo& other) const
 		{
 			return (headerId == other.headerId) &&
 					(size == other.size) &&
+					(order == other.order) &&
 					(visible == other.visible);
 		}
 	};

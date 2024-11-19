@@ -22,7 +22,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 {
 	if (!m_tableViewParamRepresentationControllerCompPtr.IsValid() || !m_userSettingsCollectionCompPtr.IsValid()){
 		errorMessage = QString("Internal error");
-		SendErrorMessage(0, errorMessage, "imtgql::CTableViewParamControllerComp");
+		SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
 
 		return nullptr;
 	}
@@ -32,7 +32,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr == nullptr){
 		errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'. Invalid GraphQL context.").arg(qPrintable(commandId));
-		SendErrorMessage(0, errorMessage, "imtgql::CTableViewParamControllerComp");
+		SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
 
 		return nullptr;
 	}
@@ -40,7 +40,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 	imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'. User info from GraphQL context is invalid").arg(qPrintable(commandId));
-		SendErrorMessage(0, errorMessage, "imtgql::CTableViewParamControllerComp");
+		SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
 
 		return nullptr;
 	}
@@ -50,7 +50,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
 		errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'. Invalid GraphQL input params.").arg(qPrintable(commandId));
-		SendErrorMessage(0, errorMessage, "imtgql::CTableViewParamControllerComp");
+		SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
 
 		return nullptr;
 	}
@@ -71,7 +71,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 	iprm::IParamsSet* settingsPtr = userSettingsPtr->GetSettings();
 	if (settingsPtr == nullptr){
 		errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'. Settings for user with ID: '%2' is invalid.").arg(qPrintable(commandId)).arg(qPrintable(userId));
-		SendErrorMessage(0, errorMessage, "imtgql::CTableViewParamControllerComp");
+		SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
 
 		return nullptr;
 	}
@@ -113,7 +113,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 		imtbase::CTreeItemModel tableViewParamRepresentation;
 		if (!tableViewParamRepresentation.CreateFromJson(tableViewParamsJson)){
 			errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'. Invalid table view params json.").arg(qPrintable(commandId));
-			SendErrorMessage(0, errorMessage, "imtgql::CTableViewParamControllerComp");
+			SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
 
 			return nullptr;
 		}
@@ -125,14 +125,14 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 		imtbase::ITableViewParam* tableViewParamPtr =  dynamic_cast<imtbase::ITableViewParam*>(paramSetPtr->GetEditableParameter("TableViewParam"));
 		if (tableViewParamPtr == nullptr){
 			errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'.").arg(qPrintable(commandId));
-			SendErrorMessage(0, errorMessage, "imtgql::CTableViewParamControllerComp");
+			SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
 
 			return nullptr;
 		}
 
 		if (!m_tableViewParamRepresentationControllerCompPtr->GetDataModelFromRepresentation(tableViewParamRepresentation, *tableViewParamPtr)){
 			errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'. Error then trying to get a data model from representation model for table view param.").arg(qPrintable(commandId));
-			SendErrorMessage(0, errorMessage, "imtgql::CTableViewParamControllerComp");
+			SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
 
 			return nullptr;
 		}
@@ -140,7 +140,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 		if (pageViewParamCollectionPtr->GetElementIds().contains(tableId)){
 			if (!pageViewParamCollectionPtr->SetObjectData(tableId, *paramSetPtr)){
 				errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'.").arg(qPrintable(commandId));
-				SendErrorMessage(0, errorMessage, "imtgql::CTableViewParamControllerComp");
+				SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
 
 				return nullptr;
 			}
@@ -152,7 +152,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 		if (m_userSettingsCollectionCompPtr->GetElementIds().contains(userId)){
 			if (!m_userSettingsCollectionCompPtr->SetObjectData(userId, *userSettingsPtr.GetPtr())){
 				errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'. Settings cannot be saved.").arg(qPrintable(commandId));
-				SendErrorMessage(0, errorMessage, "imtgql::CTableViewParamControllerComp");
+				SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
 
 				return nullptr;
 			}

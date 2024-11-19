@@ -38,9 +38,16 @@ Dialog {
 				if(dialog.tableItem){
 					dialog.tableViewParamsCopied.copyFrom(dialog.tableItem.tableViewParams)
 					leftTable.headers = availableHeadersModel;
-					leftTable.elements = dialog.tableItem.headers;
+                    leftTable.elements = dialog.tableItem.headers.copyMe();
 				}
 			}
+
+            function updateHeadersOrder(){
+                for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
+                    let id = leftTable.elements.getData("Id", i)
+                    dialog.tableViewParamsCopied.setHeaderOrder(id, i);
+                }
+            }
 
 			Table {
 				id: leftTable;
@@ -71,6 +78,20 @@ Dialog {
 				onElementsChanged: {
 					item.updateGui();
 				}
+
+                onSelectionChanged: {
+                    if (selection.length !== 1){
+                        upButton.enabled = false;
+                        downButton.enabled = false;
+                    }
+                    else{
+                        upButton.enabled = selection[0] > 0;
+
+                        console.log("1", selection[selection.length - 1]);
+                        console.log("2", leftTable.elementsCount);
+                        downButton.enabled = selection[selection.length - 1] < leftTable.elementsCount - 1;
+                    }
+                }
 			}
 
 			BaseText {
@@ -80,6 +101,67 @@ Dialog {
 				text: qsTr("Select at least one column");
 				visible: false;
 			}
+
+            Row {
+                anchors.left: parent.left;
+                anchors.leftMargin: Style.size_mainMargin;
+                height: 25;
+                spacing: Style.size_smallMargin
+                ToolButton {
+                    id: upButton;
+                    enabled: false;
+                    width: 25;
+                    height: 25;
+                    iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal):
+                                          "../../../" + Style.getIconPath("Icons/Up", Icon.State.Off, Icon.Mode.Disabled)
+
+                    onClicked: {
+                        let indexes = leftTable.getSelectedIndexes();
+                        if (indexes.length == 1 && indexes[0] > 0){
+                            let index = indexes[0];
+
+                            let elements = leftTable.elements;
+                            leftTable.elementsList.model = 0;
+                            elements.swapItems(index, index - 1);
+                            dialog.tableViewParamsCopied.swapHeaders(index, index - 1);
+                            leftTable.elements = elements;
+
+                            dialog.buttonsModel.setProperty(0, 'Enabled', true)
+
+                            item.updateHeadersOrder();
+
+                            leftTable.select(index - 1)
+                        }
+                    }
+                }
+
+                ToolButton {
+                    id: downButton;
+                    enabled: false;
+                    width: 25;
+                    height: 25;
+                    iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal):
+                                          "../../../" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled)
+                    onClicked: {
+                        let indexes = leftTable.getSelectedIndexes();
+                        if (indexes.length == 1 && indexes[indexes.length - 1] < leftTable.elementsCount - 1){
+                            let index = indexes[0];
+
+                            let elements = leftTable.elements;
+                            leftTable.elementsList.model = 0;
+                            elements.swapItems(index, index + 1);
+                            dialog.tableViewParamsCopied.swapHeaders(index, index + 1);
+
+                            leftTable.elements = elements;
+
+                            dialog.buttonsModel.setProperty(0, 'Enabled', true)
+
+                            item.updateHeadersOrder();
+                            leftTable.select(index + 1)
+                        }
+                    }
+                }
+            }
 
 			TreeItemModel {
 				id: availableHeadersModel;

@@ -17,7 +17,7 @@ namespace imtrest
 
 // protected methods
 
-// reimplemented (imtrest::IRepresentationController)
+// reimplemented (imtbase::IRepresentationController)
 
 QByteArray CTableViewParamRepresentationControllerComp::GetModelId() const
 {
@@ -41,9 +41,9 @@ bool CTableViewParamRepresentationControllerComp::IsModelSupported(const istd::I
 
 
 bool CTableViewParamRepresentationControllerComp::GetRepresentationFromDataModel(
-			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
-			const iprm::IParamsSet* /*paramsPtr*/) const
+		const istd::IChangeable& dataModel,
+		imtbase::CTreeItemModel& representation,
+		const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	Q_ASSERT(IsModelSupported(dataModel));
 
@@ -53,6 +53,25 @@ bool CTableViewParamRepresentationControllerComp::GetRepresentationFromDataModel
 	}
 
 	QByteArrayList headerList = tableViewParamPtr->GetHeaderIds();
+
+	// sort headerList by order
+	for (int i = 0; i < headerList.size(); i++){
+		bool flag = true;
+		for (int j = 0; j < headerList.size() - (i + 1); j++){
+			imtbase::ITableViewParam::HeaderInfo headerInfo1 = tableViewParamPtr->GetHeaderInfo(headerList[j]);
+			imtbase::ITableViewParam::HeaderInfo headerInfo2 = tableViewParamPtr->GetHeaderInfo(headerList[j + 1]);
+			if (headerInfo1.order > headerInfo2.order) {
+				flag = false;
+
+				headerList.swapItemsAt(j, j + 1);
+			}
+		}
+
+		if (flag) {
+			break;
+		}
+	}
+
 	for (const QByteArray& headerId : headerList){
 		imtbase::ITableViewParam::HeaderInfo headerInfo = tableViewParamPtr->GetHeaderInfo(headerId);
 
@@ -60,6 +79,7 @@ bool CTableViewParamRepresentationControllerComp::GetRepresentationFromDataModel
 		representation.SetData("HeaderId", headerInfo.headerId, index);
 		representation.SetData("Size", headerInfo.size, index);
 		representation.SetData("Visible", headerInfo.visible, index);
+		representation.SetData("Order", headerInfo.order, index);
 	}
 
 	return true;
@@ -67,8 +87,8 @@ bool CTableViewParamRepresentationControllerComp::GetRepresentationFromDataModel
 
 
 bool CTableViewParamRepresentationControllerComp::GetDataModelFromRepresentation(
-			const imtbase::CTreeItemModel& representation,
-			istd::IChangeable& dataModel) const
+		const imtbase::CTreeItemModel& representation,
+		istd::IChangeable& dataModel) const
 {
 	Q_ASSERT(IsModelSupported(dataModel));
 
@@ -93,6 +113,11 @@ bool CTableViewParamRepresentationControllerComp::GetDataModelFromRepresentation
 		if (representation.ContainsKey("Visible", i)){
 			bool visible = representation.GetData("Visible", i).toBool();
 			headerInfo.visible = visible;
+		}
+
+		if (representation.ContainsKey("Order", i)){
+			int order = representation.GetData("Order", i).toInt();
+			headerInfo.order = order;
 		}
 
 		tableViewParamPtr->SetHeaderInfo(headerInfo.headerId, headerInfo);

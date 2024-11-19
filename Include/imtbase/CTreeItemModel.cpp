@@ -324,6 +324,26 @@ int CTreeItemModel::RemoveItem(int index)
 	return true;
 }
 
+bool CTreeItemModel::SwapItems(int index1, int index2)
+{
+	if (index1 < 0 || index1 >= m_items.count() || index2 < 0 || index2 >= m_items.count()){
+		return false;
+	}
+
+	if (index1 == index2){
+		return true;
+	}
+
+//	beginMoveRows(QModelIndex(), index1, index1, QModelIndex(), index2);
+
+	beginResetModel();
+	m_items.swapItemsAt(index1, index2);
+//	endMoveRows();
+	endResetModel();
+
+	return true;
+}
+
 
 imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray& key, int index)
 {
@@ -754,7 +774,7 @@ QString CTreeItemModel::ToJson()
 	QByteArray representationData;
 
 	{
-		iser::CJsonMemWriteArchive archive;
+		iser::CJsonMemWriteArchive archive(nullptr, false);
 
 		if (SerializeModel(archive)){
 			representationData = archive.GetData();

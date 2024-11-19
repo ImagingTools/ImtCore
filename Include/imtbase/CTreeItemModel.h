@@ -39,6 +39,7 @@ public:
 	Q_INVOKABLE inline int insertNewItem(){ return InsertNewItem(); }
 	Q_INVOKABLE inline int insertNewItem(int index){ return InsertNewItem(index); }
 	Q_INVOKABLE inline int removeItem(int index){ return RemoveItem(index); }
+	Q_INVOKABLE inline bool swapItems(int index1, int index2){ return SwapItems(index1, index2); }
 	Q_INVOKABLE inline imtbase::CTreeItemModel* addTreeModel(const QByteArray& key, int index = 0){ return AddTreeModel(key, index); }
 	Q_INVOKABLE inline bool setExternTreeModel(const QByteArray& key, CTreeItemModel* externTreeModel, int index = 0){ return SetExternTreeModel(key, externTreeModel, index); }
 	Q_INVOKABLE inline bool copyItemDataFromModel(int index, const CTreeItemModel* externTreeModel, int externIndex = 0){ return CopyItemDataFromModel(index, externTreeModel, externIndex); }
@@ -89,6 +90,7 @@ public:
 	int InsertNewItem();
 	int InsertNewItem(int index);
 	int RemoveItem(int index);
+	bool SwapItems(int index1, int index2);
 	imtbase::CTreeItemModel* AddTreeModel(const QByteArray& key, int index = 0);
 	bool SetExternTreeModel(const QByteArray& key, CTreeItemModel* externTreeModel, int index = 0);
 	bool CopyItemDataFromModel(int index, const CTreeItemModel* externTreeModel, int externIndex = 0);

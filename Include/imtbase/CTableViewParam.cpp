@@ -7,6 +7,9 @@
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 
+// ImtCore includes
+#include <imtcore/Version.h>
+
 
 namespace imtbase
 {
@@ -45,6 +48,12 @@ bool CTableViewParam::Serialize(iser::IArchive& archive)
 	bool retVal = true;
 
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+	quint32 imtCoreVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
+		imtCoreVersion = 0;
+	}
 
 	QByteArrayList keys = m_headerInfoMap.keys();
 	int count = keys.count();
@@ -85,6 +94,13 @@ bool CTableViewParam::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.BeginTag(sizeTag);
 		retVal = retVal && archive.Process(value.size);
 		retVal = retVal && archive.EndTag(sizeTag);
+
+		if (imtCoreVersion >= 11983){
+			iser::CArchiveTag orderTag("Order", "Order", iser::CArchiveTag::TT_LEAF, &infoTag);
+			retVal = retVal && archive.BeginTag(orderTag);
+			retVal = retVal && archive.Process(value.order);
+			retVal = retVal && archive.EndTag(orderTag);
+		}
 
 		if (!archive.IsStoring()){
 			m_headerInfoMap[value.headerId] = value;
