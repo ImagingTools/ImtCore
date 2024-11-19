@@ -251,7 +251,7 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError error)
 void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message)
 {
 	if (!message.contains("keep_alive")){
-		qDebug() << "OnWebSocketTextMessageReceived" << message;
+		SendInfoMessage(0, message, "OnWebSocketTextMessageReceived");
 	}
 
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
