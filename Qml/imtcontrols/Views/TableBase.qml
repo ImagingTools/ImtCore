@@ -98,6 +98,7 @@ Rectangle {
 
 	property string currentHeaderId;
 	property string currentSortOrder: "ASC";
+	property var nonSortableColumns: [];
 
 	property alias isMultiSelect: tableContainer.tableSelection.isMultiSelect;
 

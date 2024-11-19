@@ -269,18 +269,20 @@ Item{
 		onClicked: {
 			if(headerDelegate.tableItem.hasSort || headerDelegate.tableItem.editableHeaderParams){
 				if (mouse.button === Qt.LeftButton) {
-                    let currentHeaderId = headerDelegate.tableItem.currentHeaderId;
-                    let currentSortOrder = headerDelegate.tableItem.currentSortOrder;
+					if(!headerDelegate.tableItem.nonSortableColumns.includes(model.Id)){
+						let currentHeaderId = headerDelegate.tableItem.currentHeaderId;
+						let currentSortOrder = headerDelegate.tableItem.currentSortOrder;
 
-                    headerDelegate.tableItem.currentHeaderId = model.Id;
-                    if (currentHeaderId !== model.Id){
-                        headerDelegate.tableItem.currentSortOrder = "ASC";
-                    }
-                    else{
-                        headerDelegate.tableItem.currentSortOrder = currentSortOrder == "ASC" ? "DESC" : "ASC";
-                    }
+						headerDelegate.tableItem.currentHeaderId = model.Id;
+						if (currentHeaderId !== model.Id){
+							headerDelegate.tableItem.currentSortOrder = "ASC";
+						}
+						else{
+							headerDelegate.tableItem.currentSortOrder = currentSortOrder == "ASC" ? "DESC" : "ASC";
+						}
 
-					headerDelegate.tableItem.headerClicked(model.Id);
+						headerDelegate.tableItem.headerClicked(model.Id);
+					}
 				}
 				else if (mouse.button === Qt.RightButton){
 					headerDelegate.tableItem.headerRightMouseClicked(model.Id);
