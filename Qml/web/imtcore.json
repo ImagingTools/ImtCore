@@ -1,0 +1,27 @@
+{
+    "appName": "ImtControlsGallery",
+    "rootPath": "/ControlsGallery/Views/",
+    "entry": "ImtControlsGalleryWeb.qml",
+    "base": "${IMTCOREDIR}\\Impl\\ImtControlsGallery\\Qml",
+    "includes": [],
+    "dirs": [
+        "${IMTCOREDIR}\\Include\\imtstylecontrolsqml\\Qml\\Acf",
+        "${IMTCOREDIR}\\Qml\\imtauthgui",
+        "${IMTCOREDIR}\\Qml\\imtcolgui",
+        "${IMTCOREDIR}\\Qml\\imtcontrols",
+        "${IMTCOREDIR}\\Qml\\imtdocgui",
+        "${IMTCOREDIR}\\Qml\\imtgui",
+        "${IMTCOREDIR}\\Qml\\imtguigql",
+        "${IMTCOREDIR}\\Qml\\imtlicgui",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtappsdl\\SDL\\1.0\\QML\\imtappApplicationSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtlicsdl\\SDL\\1.0\\QML\\imtlicFeaturesSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthGroupsSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthRolesSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthUsersSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtlicsdl\\SDL\\1.0\\QML\\imtlicProductsSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtlicsdl\\SDL\\1.0\\QML\\imtlicLicensesSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthAuthorizationSdl",
+	"${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthProfileSdl"
+    ],
+    "output": "${IMTCOREDIR}\\Bin\\web\\Resources\\jqml.controlsgallery.js"
+}
