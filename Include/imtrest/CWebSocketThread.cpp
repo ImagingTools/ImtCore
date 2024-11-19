@@ -170,19 +170,19 @@ void CWebSocketThread::run()
 	QWebSocket* webSocketPtr = m_socket.get();
 	if (!m_webSocket.IsValid()){
 		m_webSocket.SetPtr(new CWebSocket(m_server));
-	}
+		connect(m_webSocket.GetPtr(), &CWebSocket::SendTextMessage, this, &CWebSocketThread::OnSendTextMessage);
+		connect(m_webSocket.GetPtr(), &CWebSocket::RegisterSender, m_server, &CWebSocketServerComp::RegisterSender);
 
-	connect(webSocketPtr, &QWebSocket::textMessageReceived, m_webSocket.GetPtr(), &CWebSocket::OnWebSocketTextMessage);
-	connect(m_webSocket.GetPtr(), &CWebSocket::SendTextMessage, this, &CWebSocketThread::OnSendTextMessage);
-	connect(m_webSocket.GetPtr(), &CWebSocket::RegisterSender, m_server, &CWebSocketServerComp::RegisterSender);
-
-	connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
-	connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
+		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
+		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
 #if (QT_VERSION >= 0x060500)
-	connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError);
+		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError);
 #else
 //	connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CWebSocketServerComp::OnError);
 #endif
+	}
+
+	connect(webSocketPtr, &QWebSocket::textMessageReceived, m_webSocket.GetPtr(), &CWebSocket::OnWebSocketTextMessage);
 
 	exec();
 }
