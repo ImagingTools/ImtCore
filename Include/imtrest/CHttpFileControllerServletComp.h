@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/IBinaryDataController.h>
+#include <imtrest/IBinaryDataController.h>
 #include <imtrest/CHttpFileProviderBasedServletComp.h>
 
 
@@ -34,7 +34,7 @@ protected:
 				const CHttpRequest& request) const override;
 
 private:
-	I_MULTIREF(imtbase::IBinaryDataController, m_binaryDataControllersCompPtr);
+	I_MULTIREF(imtrest::IBinaryDataController, m_binaryDataControllersCompPtr);
 };
 
 

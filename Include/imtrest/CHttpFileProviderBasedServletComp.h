@@ -6,7 +6,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtbase/IBinaryDataProvider.h>
+#include <imtrest/IBinaryDataProvider.h>
 #include <imtrest/CHttpServletCompBase.h>
 
 
@@ -42,7 +42,7 @@ protected:
 	I_ATTR(QString, m_fileIdCommandParamAttrPtr);
 	I_ATTR(QString, m_limitIdCommandParamAttrPtr);
 	I_ATTR(QString, m_offsetIdCommandParamAttrPtr);
-	I_MULTIREF(imtbase::IBinaryDataProvider, m_binaryDataProvidersCompPtr);
+	I_MULTIREF(imtrest::IBinaryDataProvider, m_binaryDataProvidersCompPtr);
 
 private:
 	QByteArray m_beginOfMessage;

@@ -15,7 +15,7 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="ContainerRepresentationController" PackageId="ImtGuiPck" ComponentId="GuiElementContainerRepresentationController">
+        <Element Id="ContainerRepresentationController" PackageId="ImtRestPck" ComponentId="GuiElementContainerRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -66,7 +66,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GroupCommands" PackageId="ImtGuiPck" ComponentId="GuiElementContainer">
+        <Element Id="GroupCommands" PackageId="ImtRestPck" ComponentId="GuiElementContainer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="GuiElementModels" Type="Reference[]" ExportId="Commands">
@@ -75,7 +75,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GroupPermissions" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="GroupPermissions" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="GroupId">
@@ -127,10 +127,10 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtbase::ICommandGroup" ComponentId="Group"/>
-        <Interface InterfaceId="imtbase::ICommandPermissionsProvider" ComponentId="GroupPermissions"/>
-        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="GroupRepresentationController"/>
-        <Interface InterfaceId="imtgui::IGuiElementContainer" ComponentId="GroupCommands"/>
-        <Interface InterfaceId="imtgui::IGuiElementModel" ComponentId="Group"/>
+        <Interface InterfaceId="imtrest::ICommandPermissionsProvider" ComponentId="GroupPermissions"/>
+        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="GroupRepresentationController"/>
+        <Interface InterfaceId="imtrest::IGuiElementContainer" ComponentId="GroupCommands"/>
+        <Interface InterfaceId="imtrest::IGuiElementModel" ComponentId="Group"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="Group"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="GroupRepresentationController"/>
     </ExportedInterfaces>

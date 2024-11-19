@@ -11,7 +11,7 @@ namespace imtfile
 
 // protected methods
 
-// reimplemented (imtbase::CObjectRepresentationControllerCompBase)
+// reimplemented (imtrest::CObjectRepresentationControllerCompBase)
 
 bool CFileNameParamRepresentationControllerComp::GetRepresentationFromValue(
 			const istd::IChangeable& dataModel,

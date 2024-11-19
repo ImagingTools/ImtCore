@@ -68,7 +68,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserModeRepresentation" PackageId="ImtCorePck" ComponentId="SelectionParamRepresentationController">
+        <Element Id="UserModeRepresentation" PackageId="ImtRestPck" ComponentId="SelectionParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>

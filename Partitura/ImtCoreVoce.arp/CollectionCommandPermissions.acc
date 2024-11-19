@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="CommandsJoiner" PackageId="ImtCorePck" ComponentId="CommandPermissionsProviderJoiner">
+        <Element Id="CommandsJoiner" PackageId="ImtRestPck" ComponentId="CommandPermissionsProviderJoiner">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandPermissionsProvider" Type="Reference[]" ExportId="">
@@ -29,7 +29,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Edit" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="Edit" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -47,7 +47,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Export" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="Export" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -65,7 +65,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Import" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="Import" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -83,7 +83,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="New" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="New" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -101,7 +101,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Remove" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="Remove" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -119,7 +119,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Rename" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="Rename" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -137,7 +137,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SetDescription" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="SetDescription" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -158,7 +158,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::ICommandPermissionsProvider" ComponentId="CommandsJoiner"/>
+        <Interface InterfaceId="imtrest::ICommandPermissionsProvider" ComponentId="CommandsJoiner"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="CommandsJoiner"/>
     </ExportedInterfaces>
     <ExportedComponents/>

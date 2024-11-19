@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="NetworkSettings" PackageId="ImtCorePck" ComponentId="ParamSetRepresentationController">
+        <Element Id="NetworkSettings" PackageId="ImtRestPck" ComponentId="ParamSetRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -36,7 +36,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServerUrl" PackageId="ImtCorePck" ComponentId="UrlParamRepresentationController">
+        <Element Id="ServerUrl" PackageId="ImtRestPck" ComponentId="UrlParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -57,7 +57,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketServerUrl" PackageId="ImtCorePck" ComponentId="UrlParamRepresentationController">
+        <Element Id="WebSocketServerUrl" PackageId="ImtRestPck" ComponentId="UrlParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -81,7 +81,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="NetworkSettings"/>
+        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="NetworkSettings"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

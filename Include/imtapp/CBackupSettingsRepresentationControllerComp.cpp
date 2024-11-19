@@ -14,7 +14,7 @@ namespace imtapp
 
 // protected methods
 
-// reimplemented (imtbase::CObjectRepresentationControllerCompBase)
+// reimplemented (imtrest::CObjectRepresentationControllerCompBase)
 
 bool CBackupSettingsRepresentationControllerComp::GetRepresentationFromValue(
 		const istd::IChangeable& dataModel,

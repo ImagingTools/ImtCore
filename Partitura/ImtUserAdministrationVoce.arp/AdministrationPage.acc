@@ -96,7 +96,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PagesContainer" PackageId="ImtGuiPck" ComponentId="GuiElementContainer">
+        <Element Id="PagesContainer" PackageId="ImtRestPck" ComponentId="GuiElementContainer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="GuiElementModels" Type="Reference[]" ExportId="">
@@ -119,7 +119,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PagesRepresentation" PackageId="ImtCorePck" ComponentId="PageBasedGuiRepresentationController">
+        <Element Id="PagesRepresentation" PackageId="ImtRestPck" ComponentId="PageBasedGuiRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandPermissionsProvider" Type="Reference" ExportId="">
@@ -314,7 +314,7 @@
         <EmbeddedRegistry Id="PagesPermissions">
             <Data Description="" Keywords="">
                 <ElementsList>
-                    <Element Id="CommandPermissionsProviderJoiner" PackageId="ImtCorePck" ComponentId="CommandPermissionsProviderJoiner">
+                    <Element Id="CommandPermissionsProviderJoiner" PackageId="ImtRestPck" ComponentId="CommandPermissionsProviderJoiner">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="CommandPermissionsProvider" Type="Reference[]" ExportId="">
@@ -328,7 +328,7 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="RolesPermissions" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+                    <Element Id="RolesPermissions" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -347,7 +347,7 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="UsersPermissions" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+                    <Element Id="UsersPermissions" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -369,7 +369,7 @@
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
-                    <Interface InterfaceId="imtbase::ICommandPermissionsProvider" ComponentId="CommandPermissionsProviderJoiner"/>
+                    <Interface InterfaceId="imtrest::ICommandPermissionsProvider" ComponentId="CommandPermissionsProviderJoiner"/>
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="CommandPermissionsProviderJoiner"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>

@@ -5,23 +5,23 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtbase/CBinaryDataProviderComp.h>
+#include <imtrest/CBinaryDataProviderComp.h>
 
 
 namespace imtrest
 {
 
 
-class CServerLogDataProviderComp: public imtbase::CBinaryDataProviderComp
+class CServerLogDataProviderComp: public imtrest::CBinaryDataProviderComp
 {
 public:
-	typedef imtbase::CBinaryDataProviderComp BaseClass;
+	typedef imtrest::CBinaryDataProviderComp BaseClass;
 
 	I_BEGIN_COMPONENT(CServerLogDataProviderComp);
 		I_ASSIGN(m_commandIdAttrPtr, "Command-ID", "Command ID", true, "");
 	I_END_COMPONENT;
 
-	// reimplemented (imtbase::IBinaryDataProvider)
+	// reimplemented (imtrest::IBinaryDataProvider)
 	virtual bool GetData(
 				QByteArray& data,
 				const QByteArray& dataId,

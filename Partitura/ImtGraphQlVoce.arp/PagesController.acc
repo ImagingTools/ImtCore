@@ -203,9 +203,9 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="PagesContainer"/>
+        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="PagesContainer"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
-        <Interface InterfaceId="imtgui::IGuiElementContainer" ComponentId="PagesContainer"/>
+        <Interface InterfaceId="imtrest::IGuiElementContainer" ComponentId="PagesContainer"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="PagesContainer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>

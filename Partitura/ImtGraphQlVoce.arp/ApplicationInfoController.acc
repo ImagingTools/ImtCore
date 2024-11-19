@@ -38,7 +38,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ApplicationInfoRepresentation" PackageId="ImtCorePck" ComponentId="ApplicationInfoRepresentation">
+        <Element Id="ApplicationInfoRepresentation" PackageId="ImtRestPck" ComponentId="ApplicationInfoRepresentation">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -59,7 +59,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::IApplicationInfoRepresentation" ComponentId="ApplicationInfoRepresentation"/>
+        <Interface InterfaceId="imtrest::IApplicationInfoRepresentation" ComponentId="ApplicationInfoRepresentation"/>
         <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="ApplicationInfoController"/>
     </ExportedInterfaces>

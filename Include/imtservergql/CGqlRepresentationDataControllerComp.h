@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/IRepresentationController.h>
+#include <imtrest/IRepresentationController.h>
 #include <imtgql/IGqlRepresentationController.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
@@ -36,7 +36,7 @@ protected:
 
 protected:
 	I_REF(istd::IChangeable, m_dataModelCompPtr);
-	I_REF(imtbase::IRepresentationController, m_representationControllerCompPtr);
+	I_REF(imtrest::IRepresentationController, m_representationControllerCompPtr);
 };
 
 

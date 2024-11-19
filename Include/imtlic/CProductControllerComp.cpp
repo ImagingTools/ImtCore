@@ -22,7 +22,7 @@ namespace imtlic
 
 // public methods
 
-// reimplemented (imtbase::IBinaryDataProvider)
+// reimplemented (imtrest::IBinaryDataProvider)
 
 bool CProductControllerComp::GetData(
 			QByteArray& data,
@@ -74,7 +74,7 @@ bool CProductControllerComp::GetData(
 }
 
 
-// reimplemented (imtbase::IBinaryDataController)
+// reimplemented (imtrest::IBinaryDataController)
 
 bool CProductControllerComp::SetData(const QByteArray& data, QByteArray& dataId) const
 {

@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtbase/IRepresentationController.h>
+#include <imtrest/IRepresentationController.h>
 #include <imtauth/IUserSettings.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 
@@ -33,7 +33,7 @@ protected:
 	I_ATTR(QByteArray, m_pageViewParamsKeyAttrPtr);
 	I_FACT(iprm::IParamsSet, m_paramSetFactCompPtr);
 	I_FACT(imtauth::IUserSettings, m_userSettingsFactCompPtr);
-	I_REF(imtbase::IRepresentationController, m_tableViewParamRepresentationControllerCompPtr);
+	I_REF(imtrest::IRepresentationController, m_tableViewParamRepresentationControllerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
 };
 

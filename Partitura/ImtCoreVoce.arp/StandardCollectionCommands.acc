@@ -214,9 +214,9 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtauth::IPermissionChecker" ComponentId="Group"/>
-        <Interface InterfaceId="imtbase::ICommandPermissionsProvider" ComponentId="Group"/>
-        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="Group"/>
-        <Interface InterfaceId="imtgui::IGuiElementModel" ComponentId="Group"/>
+        <Interface InterfaceId="imtrest::ICommandPermissionsProvider" ComponentId="Group"/>
+        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="Group"/>
+        <Interface InterfaceId="imtrest::IGuiElementModel" ComponentId="Group"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="Group"/>
     </ExportedInterfaces>
     <ExportedComponents>

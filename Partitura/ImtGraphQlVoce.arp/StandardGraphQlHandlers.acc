@@ -10,7 +10,7 @@
     <Description>Server framework for GraphQL-based implementations</Description>
     <Keywords>Web GraphQL Server HTTP</Keywords>
     <ElementsList>
-        <Element Id="DelegatedBinaryDataProviders" PackageId="ImtCorePck" ComponentId="DelegatedBinaryDataProviders">
+        <Element Id="DelegatedBinaryDataProviders" PackageId="ImtRestPck" ComponentId="DelegatedBinaryDataProviders">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="SlaveBinaryDataProviders" Type="Reference[]" ExportId="BinaryDataProviders">
@@ -156,7 +156,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="IconDataProvider" PackageId="ImtGuiPck" ComponentId="IconDataProvider">
+        <Element Id="IconDataProvider" PackageId="ImtRestPck" ComponentId="IconDataProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
@@ -174,7 +174,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="LogFileDataProvider" PackageId="ImtCorePck" ComponentId="BinaryDataProvider">
+        <Element Id="LogFileDataProvider" PackageId="ImtRestPck" ComponentId="BinaryDataProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
@@ -204,7 +204,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RessourcesProvider" PackageId="ImtCorePck" ComponentId="BinaryDataProvider">
+        <Element Id="RessourcesProvider" PackageId="ImtRestPck" ComponentId="BinaryDataProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">

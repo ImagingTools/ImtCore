@@ -142,10 +142,10 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="GuiElementContainer"/>
+        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="GuiElementContainer"/>
         <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="GqlCommandsController"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="GqlCommandsController"/>
-        <Interface InterfaceId="imtgui::IGuiElementContainer" ComponentId="GuiElementContainer"/>
+        <Interface InterfaceId="imtrest::IGuiElementContainer" ComponentId="GuiElementContainer"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="GuiElementContainer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="GqlCommandsController"/>
     </ExportedInterfaces>

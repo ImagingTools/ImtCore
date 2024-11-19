@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/IRepresentationController.h>
+#include <imtrest/IRepresentationController.h>
 #include <imtservice/CUrlConnectionParam.h>
 
 
@@ -10,10 +10,10 @@ namespace imtservice
 {
 
 
-class CUrlConnectionParamRepresentationController: public imtbase::IRepresentationController
+class CUrlConnectionParamRepresentationController: public imtrest::IRepresentationController
 {
 public:
-	// reimplemented (imtbase::IRepresentationController)
+	// reimplemented (imtrest::IRepresentationController)
 	virtual QByteArray GetModelId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetRepresentationFromDataModel(

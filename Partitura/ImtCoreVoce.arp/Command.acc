@@ -15,7 +15,7 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="Command" PackageId="ImtGuiPck" ComponentId="GuiElementModel">
+        <Element Id="Command" PackageId="ImtRestPck" ComponentId="GuiElementModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Alignment" Type="Integer" ExportId="Alignment">
@@ -51,7 +51,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CommandPermissions" PackageId="ImtCorePck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="CommandPermissions" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="CommandId">
@@ -72,7 +72,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CommandRepresentationController" PackageId="ImtGuiPck" ComponentId="GuiElementModelRepresentationController">
+        <Element Id="CommandRepresentationController" PackageId="ImtRestPck" ComponentId="GuiElementModelRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandPermissionsProvider" Type="Reference" ExportId="">
@@ -99,7 +99,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SubCommands" PackageId="ImtGuiPck" ComponentId="GuiElementContainer">
+        <Element Id="SubCommands" PackageId="ImtRestPck" ComponentId="GuiElementContainer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="GuiElementModels" Type="Reference[]" ExportId="SubCommands">
@@ -108,7 +108,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SubElementsRepresentationController" PackageId="ImtGuiPck" ComponentId="GuiElementContainerRepresentationController">
+        <Element Id="SubElementsRepresentationController" PackageId="ImtRestPck" ComponentId="GuiElementContainerRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -127,9 +127,9 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtauth::IPermissionChecker" ComponentId="CheckPermissionOr"/>
-        <Interface InterfaceId="imtbase::ICommandPermissionsProvider" ComponentId="CommandPermissions"/>
-        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="CommandRepresentationController"/>
-        <Interface InterfaceId="imtgui::IGuiElementModel" ComponentId="Command"/>
+        <Interface InterfaceId="imtrest::ICommandPermissionsProvider" ComponentId="CommandPermissions"/>
+        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="CommandRepresentationController"/>
+        <Interface InterfaceId="imtrest::IGuiElementModel" ComponentId="Command"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="Command"/>
     </ExportedInterfaces>
     <ExportedComponents/>

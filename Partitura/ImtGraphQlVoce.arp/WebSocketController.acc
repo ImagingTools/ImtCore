@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="UrlParamRepresentationController" PackageId="ImtCorePck" ComponentId="UrlParamRepresentationController">
+        <Element Id="UrlParamRepresentationController" PackageId="ImtRestPck" ComponentId="UrlParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -50,7 +50,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="UrlParamRepresentationController"/>
+        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="UrlParamRepresentationController"/>
         <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="WebSocketPortController"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="WebSocketPortController"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="WebSocketPortController"/>

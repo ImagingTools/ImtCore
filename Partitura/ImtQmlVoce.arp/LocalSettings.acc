@@ -122,7 +122,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SettingsRepresentation" PackageId="ImtCorePck" ComponentId="ParamSetRepresentationController">
+        <Element Id="SettingsRepresentation" PackageId="ImtRestPck" ComponentId="ParamSetRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -152,7 +152,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imod::IModel" ComponentId="Settings"/>
-        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="SettingsRepresentation"/>
+        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="SettingsRepresentation"/>
         <Interface InterfaceId="iprm::IParamsSet" ComponentId="Settings"/>
         <Interface InterfaceId="iser::ISerializable" ComponentId="Settings"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="Settings"/>

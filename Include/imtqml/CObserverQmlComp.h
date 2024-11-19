@@ -10,7 +10,7 @@
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
 #include <imtbase/CTreeItemModel.h>
-#include <imtbase/IRepresentationController.h>
+#include <imtrest/IRepresentationController.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtqml/IQuickObject.h>
 
@@ -46,7 +46,7 @@ private Q_SLOTS:
 
 private:
 	I_REF(iprm::IParamsSet, m_settingsCompPtr);
-	I_REF(imtbase::IRepresentationController, m_settingsRepresentationControllerCompPtr);
+	I_REF(imtrest::IRepresentationController, m_settingsRepresentationControllerCompPtr);
 	I_REF(imtqml::IQuickObject, m_quickObjectCompPtr);
 
 private:

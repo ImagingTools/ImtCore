@@ -58,9 +58,9 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::ICommandPermissionsProvider" ComponentId="Page"/>
-        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="Page"/>
-        <Interface InterfaceId="imtgui::IGuiElementModel" ComponentId="Page"/>
+        <Interface InterfaceId="imtrest::ICommandPermissionsProvider" ComponentId="Page"/>
+        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="Page"/>
+        <Interface InterfaceId="imtrest::IGuiElementModel" ComponentId="Page"/>
         <Interface InterfaceId="imtqml::IPageGuiElementModel" ComponentId="Page"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="Page"/>
     </ExportedInterfaces>

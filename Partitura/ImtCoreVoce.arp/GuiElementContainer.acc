@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ElementContainer" PackageId="ImtGuiPck" ComponentId="GuiElementContainer">
+        <Element Id="ElementContainer" PackageId="ImtRestPck" ComponentId="GuiElementContainer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="GuiElementModels" Type="Reference[]" ExportId="GuiElementModels">
@@ -22,7 +22,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ElementContainerRepresentationController" PackageId="ImtGuiPck" ComponentId="GuiElementContainerRepresentationController">
+        <Element Id="ElementContainerRepresentationController" PackageId="ImtRestPck" ComponentId="GuiElementContainerRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -43,8 +43,8 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="ElementContainerRepresentationController"/>
-        <Interface InterfaceId="imtgui::IGuiElementContainer" ComponentId="ElementContainer"/>
+        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="ElementContainerRepresentationController"/>
+        <Interface InterfaceId="imtrest::IGuiElementContainer" ComponentId="ElementContainer"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="ElementContainer"/>
     </ExportedInterfaces>
     <ExportedComponents/>

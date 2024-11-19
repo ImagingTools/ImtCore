@@ -11,7 +11,7 @@ namespace imtauth
 
 // public methods
 
-// reimplemented (imtbase::CObjectRepresentationControllerCompBase)
+// reimplemented (imtrest::CObjectRepresentationControllerCompBase)
 
 bool CFeaturePackageRepresentationControllerComp::GetRepresentationFromValue(
 			const istd::IChangeable& dataModel,

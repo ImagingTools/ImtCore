@@ -1,7 +1,7 @@
 project(ImtServerGqlPck LANGUAGES CXX)
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
-target_link_libraries(${PROJECT_NAME} imtrepo imtcom imtrest imtfile imtservergql graphqlserver imtgql imtcol imtbasesdl imtbase)
+target_link_libraries(${PROJECT_NAME} imtrepo imtcom imtrest imtfile imtservergq imtgql imtcol imtbasesdl imtbase)
 
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)

@@ -17,7 +17,7 @@ namespace imtdb
 
 // public methods
 
-// reimplemented (imtbase::IBinaryDataController)
+// reimplemented (imtrest::IBinaryDataController)
 
 bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArray& /*dataId*/) const
 {
@@ -146,7 +146,7 @@ bool CRestoringDatabaseControllerComp::EnsureDataExists(const QByteArray& /*data
 }
 
 
-// reimplemented (imtbase::IBinaryDataProvider)
+// reimplemented (imtrest::IBinaryDataProvider)
 
 bool CRestoringDatabaseControllerComp::GetData(
 			QByteArray& data,

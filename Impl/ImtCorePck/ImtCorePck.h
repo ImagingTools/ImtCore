@@ -22,9 +22,7 @@
 #include <imtbase/CCollectionObjectContext.h>
 #include <imtbase/CFileBasedTranslationManagerComp.h>
 #include <imtbase/CParamSetSummaryRepresentationControllerComp.h>
-#include <imtbase/CNumericParamSummaryRepresentationControllerComp.h>
 #include <imtbase/CTextParamSummaryRepresentationControllerComp.h>
-#include <imtbase/CBinaryDataProviderComp.h>
 #include <imtbase/CParameterLinkControllerComp.h>
 #include <imtbase/CTimeFilterParam.h>
 #include <imtbase/CCollectionDataControllerComp.h>
@@ -34,27 +32,16 @@
 #include <imtbase/CLoginBasedEnablerComp.h>
 #include <imtbase/CCommandLineParamsAdapterComp.h>
 #include <imtbase/CTransactionableUndoManagerComp.h>
-#include <imtbase/CParamSetRepresentationControllerComp.h>
-#include <imtbase/CSelectionParamRepresentationControllerComp.h>
-#include <imtbase/CTextParamRepresentationControllerComp.h>
-#include <imtbase/CUrlParamRepresentationControllerComp.h>
-#include <imtbase/CDatabaseAccessSettingsRepresentationControllerComp.h>
-#include <imtbase/CGuiElementRepresentationControllerComp.h>
-#include <imtbase/CPageBasedGuiRepresentationControllerComp.h>
-#include <imtbase/CSingleCommandPermissionsProviderComp.h>
-#include <imtbase/CCommandPermissionsProviderJoinerComp.h>
-#include <imtbase/CApplicationInfoRepresentationComp.h>
 #include <imtbase/CSelectionComp.h>
 #include <imtbase/CSelectionAdapterComp.h>
 #include <imtbase/CSelectionParamAdapterComp.h>
 #include <imtbase/CSystemStatusComp.h>
 #include <imtbase/CCachedObjectCollectionComp.h>
-#include <imtbase/CDelegatedBinaryDataProviderComp.h>
 #include <imtbase/CSelectionIdBinderComp.h>
-#include <imtbase/CTableViewParamRepresentationControllerComp.h>
 #include <imtbase/CTableViewParam.h>
 #include <imtbase/CModelUpdateBridgeComp.h>
 #include <imtbase/CDelegatedUrlParamComp.h>
+#include <imtbase/CNumericParamSummaryRepresentationControllerComp.h>
 
 
 /**
@@ -66,7 +53,6 @@ namespace ImtCorePck
 
 typedef imtbase::TComponentFactoryComp<iinsp::ISupplier> SupplierFactory;
 typedef imtbase::TComponentFactoryComp<iprm::IParamsSet> ParamsSetFactory;
-typedef imtbase::TComponentFactoryComp<imtbase::IRepresentationController> RepresentationControllerFactory;
 typedef icomp::TModelCompWrap<imtbase::CObjectCollectionComp> ObjectCollection;
 typedef icomp::TModelCompWrap<imtbase::CCachedObjectCollectionComp> CachedObjectCollection;
 typedef icomp::TModelCompWrap<imtbase::CDelegatedObjectContainerSupplierComp> DelegatedObjectContainerSupplier;
@@ -91,7 +77,6 @@ typedef icomp::TModelCompWrap<imtbase::CFileBasedTranslationManagerComp> FileBas
 typedef imtbase::CParamSetSummaryRepresentationControllerComp ParamSetSummaryRepresentationController;
 typedef imtbase::CNumericParamSummaryRepresentationControllerComp NumericParamSummaryRepresentationController;
 typedef imtbase::CTextParamSummaryRepresentationControllerComp TextParamSummaryRepresentationController;
-typedef imtbase::CBinaryDataProviderComp BinaryDataProvider;
 typedef ibase::TModelObserverCompWrap<imtbase::CParameterLinkControllerComp> ParameterLinkController;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
@@ -105,23 +90,11 @@ typedef imtbase::CMessageFilterComp MessageFilter;
 typedef icomp::TModelCompWrap<imtbase::CLoginBasedEnablerComp> LoginBasedEnabler;
 typedef icomp::TModelCompWrap<imtbase::CCommandLineParamsAdapterComp> CommandLineParamsAdapter;
 typedef ibase::TModelObserverCompWrap<icomp::TModelCompWrap<imtbase::CTransactionableUndoManagerComp>> TransactionableUndoManager;
-typedef imtbase::CParamSetRepresentationControllerComp ParamSetRepresentationController;
-typedef imtbase::CSelectionParamRepresentationControllerComp SelectionParamRepresentationController;
-typedef imtbase::CTextParamRepresentationControllerComp TextParamRepresentationController;
-typedef imtbase::CUrlParamRepresentationControllerComp UrlParamRepresentationController;
-typedef imtbase::CDatabaseAccessSettingsRepresentationControllerComp DatabaseAccessSettingsRepresentationController;
-typedef imtbase::CPageBasedGuiRepresentationControllerComp PageBasedGuiRepresentationController;
-typedef imtbase::CGuiElementRepresentationControllerComp GuiElementRepresentationController;
-typedef imtbase::CSingleCommandPermissionsProviderComp SingleCommandPermissionsProvider;
-typedef imtbase::CCommandPermissionsProviderJoinerComp CommandPermissionsProviderJoiner;
-typedef imtbase::CApplicationInfoRepresentationComp ApplicationInfoRepresentation;
 typedef icomp::TModelCompWrap<imtbase::CSelectionComp> Selection;
 typedef icomp::TModelCompWrap<imtbase::CSelectionAdapterComp> SelectionAdapter;
 typedef icomp::TModelCompWrap<imtbase::CSelectionParamAdapterComp> SelectionParamAdapter;
 typedef icomp::TModelCompWrap<imtbase::CSystemStatusComp> SystemStatus;
-typedef imtbase::CDelegatedBinaryDataProviderComp DelegatedBinaryDataProviders;
 typedef icomp::TModelCompWrap<imtbase::CSelectionIdBinderComp> SelectionIdBinder;
-typedef imtbase::CTableViewParamRepresentationControllerComp TableViewParamRepresentationController;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtbase::CTableViewParam,

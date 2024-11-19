@@ -39,15 +39,9 @@
 #include <imtgui/CPopupTestGuiComp.h>
 #include <imtgui/CStandardClientAreaProviderComp.h>
 #include <imtgui/TPopupControllerCompWrap.h>
-#include <imtgui/CGuiElementModelComp.h>
-#include <imtgui/CGuiElementContainerComp.h>
 #include <imtgui/CMultiParamsSetGuiComp.h>
-#include <imtgui/CIconDataProviderComp.h>
 #include <imtgui/CMultiSelectionEditorComp.h>
 #include <imtgui/CButtonBasedSelectionGuiComp.h>
-#include <imtgui/CGuiElementModelRepresentationControllerComp.h>
-#include <imtgui/CGuiElementContainerRepresentationControllerComp.h>
-#include <imtgui/CPageGuiElementModelRepresentationControllerComp.h>
 
 
 /**
@@ -90,15 +84,9 @@ typedef imtgui::CPopupControllerComp PopupController;
 typedef imtgui::CStandardPopupWidgetFactoryComp StandardPopupWidgetFactory;
 typedef imtgui::CPopupTestGuiComp PopupTestGui;
 typedef icomp::TModelCompWrap<imtgui::CStandardClientAreaProviderComp> StandardClientAreaProvider;
-typedef imtgui::CGuiElementModelComp GuiElementModel;
-typedef imtgui::CGuiElementContainerComp GuiElementContainer;
 typedef imtgui::CMultiParamsSetGuiComp MultiParamsSetGui;
-typedef imtgui::CIconDataProviderComp IconDataProvider;
 typedef imtgui::CMultiSelectionEditorComp MultiSelectionEditor;
 typedef imtgui::CButtonBasedSelectionGuiComp ButtonBasedSelectionGui;
-typedef imtgui::CGuiElementModelRepresentationControllerComp GuiElementModelRepresentationController;
-typedef imtgui::CGuiElementContainerRepresentationControllerComp GuiElementContainerRepresentationController;
-typedef imtgui::CPageGuiElementModelRepresentationControllerComp PageGuiElementModelRepresentationController;
 
 
 } // namespace ImtGuiPck

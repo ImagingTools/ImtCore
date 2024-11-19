@@ -6,6 +6,7 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
+#include <imtbase/TComponentFactoryComp.h>
 #include <imtrest/CWebSocketServerComp.h>
 #include <imtrest/CWebSocketProtocolEngineComp.h>
 #include <imtrest/CTcpServerComp.h>
@@ -20,6 +21,25 @@
 #include <imtrest/CServerLogDataProviderComp.h>
 #include <imtrest/CTcpProtocolEngineComp.h>
 #include <imtrest/CDelegatedServletComp.h>
+#include <imtrest/CIconDataProviderComp.h>
+#include <imtrest/CGuiElementModelComp.h>
+#include <imtrest/CGuiElementContainerComp.h>
+#include <imtrest/CGuiElementModelRepresentationControllerComp.h>
+#include <imtrest/CGuiElementContainerRepresentationControllerComp.h>
+#include <imtrest/CPageGuiElementModelRepresentationControllerComp.h>
+#include <imtrest/CParamSetRepresentationControllerComp.h>
+#include <imtrest/CSelectionParamRepresentationControllerComp.h>
+#include <imtrest/CTextParamRepresentationControllerComp.h>
+#include <imtrest/CUrlParamRepresentationControllerComp.h>
+#include <imtrest/CDatabaseAccessSettingsRepresentationControllerComp.h>
+#include <imtrest/CGuiElementRepresentationControllerComp.h>
+#include <imtrest/CPageBasedGuiRepresentationControllerComp.h>
+#include <imtrest/CSingleCommandPermissionsProviderComp.h>
+#include <imtrest/CCommandPermissionsProviderJoinerComp.h>
+#include <imtrest/CApplicationInfoRepresentationComp.h>
+#include <imtrest/CDelegatedBinaryDataProviderComp.h>
+#include <imtrest/CTableViewParamRepresentationControllerComp.h>
+#include <imtrest/CBinaryDataProviderComp.h>
 
 
 /**
@@ -43,6 +63,26 @@ typedef imtrest::CWorkerManagerComp WorkerManaqer;
 typedef imtrest::CServerLogDataProviderComp ServerLogDataProvider;
 typedef imtrest::CTcpProtocolEngineComp TcpProtocolEngine;
 typedef imtrest::CDelegatedServletComp DelegatedServlet;
+typedef imtrest::CIconDataProviderComp IconDataProvider;
+typedef imtbase::TComponentFactoryComp<imtrest::IRepresentationController> RepresentationControllerFactory;
+typedef imtrest::CBinaryDataProviderComp BinaryDataProvider;
+typedef imtrest::CParamSetRepresentationControllerComp ParamSetRepresentationController;
+typedef imtrest::CSelectionParamRepresentationControllerComp SelectionParamRepresentationController;
+typedef imtrest::CTextParamRepresentationControllerComp TextParamRepresentationController;
+typedef imtrest::CUrlParamRepresentationControllerComp UrlParamRepresentationController;
+typedef imtrest::CDatabaseAccessSettingsRepresentationControllerComp DatabaseAccessSettingsRepresentationController;
+typedef imtrest::CPageBasedGuiRepresentationControllerComp PageBasedGuiRepresentationController;
+typedef imtrest::CGuiElementRepresentationControllerComp GuiElementRepresentationController;
+typedef imtrest::CSingleCommandPermissionsProviderComp SingleCommandPermissionsProvider;
+typedef imtrest::CCommandPermissionsProviderJoinerComp CommandPermissionsProviderJoiner;
+typedef imtrest::CApplicationInfoRepresentationComp ApplicationInfoRepresentation;
+typedef imtrest::CDelegatedBinaryDataProviderComp DelegatedBinaryDataProviders;
+typedef imtrest::CTableViewParamRepresentationControllerComp TableViewParamRepresentationController;
+typedef imtrest::CGuiElementModelComp GuiElementModel;
+typedef imtrest::CGuiElementContainerComp GuiElementContainer;
+typedef imtrest::CGuiElementModelRepresentationControllerComp GuiElementModelRepresentationController;
+typedef imtrest::CGuiElementContainerRepresentationControllerComp GuiElementContainerRepresentationController;
+typedef imtrest::CPageGuiElementModelRepresentationControllerComp PageGuiElementModelRepresentationController;
 
 
 } // namespace ImtRestPck

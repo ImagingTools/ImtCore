@@ -2,23 +2,23 @@
 
 
 // ImtCore includes
-#include <imtbase/CObjectRepresentationControllerCompBase.h>
+#include <imtrest/CObjectRepresentationControllerCompBase.h>
 
 
 namespace imtapp
 {
 
 
-class CSchedulerParamsRepresentationControllerComp: public imtbase::CObjectRepresentationControllerCompBase
+class CSchedulerParamsRepresentationControllerComp: public imtrest::CObjectRepresentationControllerCompBase
 {
 public:
-	typedef imtbase::CObjectRepresentationControllerCompBase BaseClass;
+	typedef imtrest::CObjectRepresentationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSchedulerParamsRepresentationControllerComp)
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtbase::CObjectRepresentationControllerCompBase)
+	// reimplemented (imtrest::CObjectRepresentationControllerCompBase)
 	virtual bool GetRepresentationFromValue(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 	// reimplemented (IRepresentationController)

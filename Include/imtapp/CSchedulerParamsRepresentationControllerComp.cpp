@@ -14,7 +14,7 @@ namespace imtapp
 
 // protected methods
 
-// reimplemented (imtbase::CObjectRepresentationControllerCompBase)
+// reimplemented (imtrest::CObjectRepresentationControllerCompBase)
 
 bool CSchedulerParamsRepresentationControllerComp::GetRepresentationFromValue(
 		const istd::IChangeable& dataModel,

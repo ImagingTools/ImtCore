@@ -7,7 +7,7 @@ namespace imtrest
 
 // public methods
 
-// reimplemented (imtbase::IBinaryDataProvider)
+// reimplemented (imtrest::IBinaryDataProvider)
 
 bool CServerLogDataProviderComp::GetData(
 			QByteArray& data,

@@ -70,7 +70,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="UserRelatedSettingsController"/>
+        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="UserRelatedSettingsController"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="UserSettings" ComponentId="UserSettings"/>

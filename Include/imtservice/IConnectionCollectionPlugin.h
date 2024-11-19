@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/IPluginInfo.h>
-#include <imtbase/IRepresentationController.h>
+#include <imtrest/IRepresentationController.h>
 #include <imtservice/IConnectionCollection.h>
 
 

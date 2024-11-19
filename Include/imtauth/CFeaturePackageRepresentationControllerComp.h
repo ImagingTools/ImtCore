@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/CObjectRepresentationControllerCompBase.h>
+#include <imtrest/CObjectRepresentationControllerCompBase.h>
 #include <imtlic/CFeatureInfo.h>
 
 
@@ -10,19 +10,19 @@ namespace imtauth
 {
 
 
-class CFeaturePackageRepresentationControllerComp: public imtbase::CObjectRepresentationControllerCompBase
+class CFeaturePackageRepresentationControllerComp: public imtrest::CObjectRepresentationControllerCompBase
 {
 public:
-	typedef imtbase::CObjectRepresentationControllerCompBase BaseClass;
+	typedef imtrest::CObjectRepresentationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFeaturePackageRepresentationControllerComp);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtbase::CObjectRepresentationControllerCompBase)
+	// reimplemented (imtrest::CObjectRepresentationControllerCompBase)
 	virtual bool GetRepresentationFromValue(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
-	// reimplemented (imtbase::IRepresentationController)
+	// reimplemented (imtrest::IRepresentationController)
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const override;
 	virtual bool GetRepresentationFromDataModel(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;

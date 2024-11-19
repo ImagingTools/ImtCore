@@ -9,8 +9,8 @@
 #include <iprm/IParamsSet.h>
 
 // ImtCore includes
-#include <imtbase/IBinaryDataController.h>
-#include <imtbase/IBinaryDataProvider.h>
+#include <imtrest/IBinaryDataController.h>
+#include <imtrest/IBinaryDataProvider.h>
 #include <imtdb/IDatabaseLoginSettings.h>
 
 
@@ -20,8 +20,8 @@ namespace imtdb
 
 class CRestoringDatabaseControllerComp:
 			public ilog::CLoggerComponentBase,
-			public imtbase::IBinaryDataController,
-			public imtbase::IBinaryDataProvider
+			public imtrest::IBinaryDataController,
+			public imtrest::IBinaryDataProvider
 
 {
 public:
@@ -36,12 +36,12 @@ public:
 		I_ASSIGN(m_commandIdAttrPtr, "Command-ID", "Command ID", true, "");
 	I_END_COMPONENT;
 
-	// reimplemented (imtbase::IBinaryDataController)
+	// reimplemented (imtrest::IBinaryDataController)
 	virtual bool SetData(const QByteArray& data, QByteArray& dataId) const override;
 	virtual bool RemoveData(const QByteArray& dataId) const override;
 	virtual bool EnsureDataExists(const QByteArray& dataId) const override;
 
-	// reimplemented (imtbase::IBinaryDataProvider)
+	// reimplemented (imtrest::IBinaryDataProvider)
 	virtual bool GetData(
 				QByteArray& data,
 				const QByteArray& dataId,

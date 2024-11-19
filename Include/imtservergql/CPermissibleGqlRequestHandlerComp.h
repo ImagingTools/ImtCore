@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/ICommandPermissionsProvider.h>
+#include <imtrest/ICommandPermissionsProvider.h>
 #include <imtauth/IPermissionChecker.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 
@@ -31,7 +31,7 @@ protected:
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
-	I_REF(imtbase::ICommandPermissionsProvider, m_commandPermissionsCompPtr);
+	I_REF(imtrest::ICommandPermissionsProvider, m_commandPermissionsCompPtr);
 	I_REF(imtauth::IPermissionChecker, m_checkPermissionCompPtr);
 };
 

@@ -59,7 +59,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TableViewParamRepresentationController" PackageId="ImtCorePck" ComponentId="TableViewParamRepresentationController">
+        <Element Id="TableViewParamRepresentationController" PackageId="ImtRestPck" ComponentId="TableViewParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">

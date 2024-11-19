@@ -178,24 +178,9 @@ I_EXPORT_COMPONENT(
 			"Client Area Provider");
 
 I_EXPORT_COMPONENT(
-			GuiElementModel,
-			"Based gui model",
-			"Gui Model");
-
-I_EXPORT_COMPONENT(
-			GuiElementContainer,
-			"Gui element container",
-			"Gui Model Container Joiner");
-
-I_EXPORT_COMPONENT(
 			MultiParamsSetGui,
 			"The Ui, that combines different editors for model",
 			"Multi Parameters Editor Gui Observer" IM_CATEGORY(I_GUI) IM_AUTHOR("\"Sergey Zastrovnyh\""));
-
-I_EXPORT_COMPONENT(
-			IconDataProvider,
-			"Component for providing icons",
-			"Icon Provider");
 
 I_EXPORT_COMPONENT(
 			MultiSelectionEditor,
@@ -206,21 +191,6 @@ I_EXPORT_COMPONENT(
 			ButtonBasedSelectionGui,
 			"Button based selection gui",
 			"Selection Param Gui");
-
-I_EXPORT_COMPONENT(
-			GuiElementModelRepresentationController,
-			"Gui element model representation controller",
-			"Gui Element Model Representation Controller");
-
-I_EXPORT_COMPONENT(
-			GuiElementContainerRepresentationController,
-			"Gui element container representation controller",
-			"Gui Element Container Representation Controller");
-
-I_EXPORT_COMPONENT(
-			PageGuiElementModelRepresentationController,
-			"Page gui element model representation controller",
-			"Page Gui Element Model Representation Controller");
 
 
 } // namespace ImtGuiPck
