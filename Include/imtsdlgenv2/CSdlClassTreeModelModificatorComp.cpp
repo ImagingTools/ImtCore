@@ -71,7 +71,7 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 	ofStream << GetTypeVerstion(sdlType);
 	ofStream << QStringLiteral("& object, ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
-	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex) const\n{");
+	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex) \n{");
 	FeedStream(ofStream, 1, false);
 
 	// add write logic for each field
@@ -179,6 +179,8 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& st
 
 void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& stream, const imtsdl::CSdlField& field, const imtsdl::CSdlType& sdlType)
 {
+	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
+
 	bool isArray = false;
 	bool isCustom = false;
 	ConvertType(field, &isCustom, nullptr, &isArray);
@@ -220,9 +222,11 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
-		stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		stream << GetSettingValueString(
+					field,
+					sdlNamespace,
+					*m_sdlTypeListCompPtr,
+					GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data.") + GetFromVariantConversionStringExt(field));
 		FeedStream(stream, 1, false);
 	}
 	else {
@@ -230,9 +234,11 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
-		stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		stream << GetSettingValueString(
+					field,
+					sdlNamespace,
+					*m_sdlTypeListCompPtr,
+					GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data.") + GetFromVariantConversionStringExt(field));
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
