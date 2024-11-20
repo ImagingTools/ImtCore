@@ -16,6 +16,7 @@ namespace imtsdlgenv2
  */
 class CSdlClassTreeModelModificatorComp: public imtsdlgen::CSdlClassModificatorBaseComp, protected CSdlGenTools
 {
+	using CSdlGenTools::AddArrayInternalChecksFail;
 
 public:
 	typedef imtsdlgen::CSdlClassModificatorBaseComp BaseClass;
