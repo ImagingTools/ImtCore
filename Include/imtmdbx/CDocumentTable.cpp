@@ -305,15 +305,10 @@ bool CDocumentTable::GetKey(quint64& key, const QByteArray &value)
 								break;
 							}
 						}
-						bool onLast = m_cursor.on_last();
-						if(onLast){
+
+						result = m_cursor.to_next(false);
+						if(!result.done){
 							break;
-						}
-						if(!onLast){
-							result = m_cursor.to_next(false);
-							if(!result.done){
-								break;
-							}
 						}
 					}
 				}
@@ -396,16 +391,12 @@ QByteArray CDocumentTable::GetKeyBA(const QByteArray &value)
 							break;
 						}
 					}
-					bool onLast = m_cursor.on_last();
-					if(onLast){
+
+					result = m_cursor.to_next(false);
+					if(!result.done){
 						break;
 					}
-					if(!onLast){
-						result = m_cursor.to_next(false);
-						if(!result.done){
-							break;
-						}
-					}
+
 				}
 			}
 		}
@@ -439,13 +430,12 @@ bool CDocumentTable::CreateIndex()
 				mdbx::map_handle mapHandleIndex = m_txn.create_map(m_tableName.toStdString() + "Index", m_keyMode, m_valueMode);
 				m_txn.put(mapHandleIndex, keyIndex, valueIndex, mdbx::put_mode::upsert);
 			}
-			bool onLast = m_cursor.on_last();
-			if(onLast){
+
+			result = m_cursor.to_next();
+			if(!result.done){
 				break;
 			}
-			if(!onLast){
-				result = m_cursor.to_next();
-			}
+
 		}
 
 
@@ -558,6 +548,146 @@ bool CDocumentTable::MoveToPrevious()
 	}
 
 	return ok;
+}
+
+bool CDocumentTable::MoveToValue(const QByteArray& value)
+{
+	bool ok = false;
+	mdbx::slice valueSlice(value.data(), value.length());
+	if(m_hasIndex){
+		mdbx::cursor::move_result result = m_cursorIndex.find(valueSlice, false);
+		if(result.done){
+			mdbx::slice valueSliceIndex = result.value;
+
+			if(m_valueMode == mdbx::value_mode::multi){
+				ok = m_cursor.find_multivalue(valueSliceIndex, valueSlice, false);
+			}
+			else {
+				ok = m_cursor.find(valueSliceIndex, false);
+			}
+		}
+
+	}//has index
+
+	else {//has not index
+		try{
+			mdbx::cursor::move_result result = m_cursor.to_first(false);
+			if(result.done){
+				while(1){
+					std::string valueRead;
+					if (result.done){
+						valueRead = result.value.as_string();
+						if(valueRead.data() == value){
+							ok = true;
+							break;
+						}
+					}
+
+					result = m_cursor.to_next(false);
+					if(!result.done){
+						break;
+					}
+				}
+			}
+		}
+		catch(...){
+			return false;
+		}
+	}
+
+	return ok;
+
+}
+
+bool CDocumentTable::Remove()
+{
+	bool ok = false;
+
+	mdbx::slice valueSlice;
+	mdbx::cursor::move_result result = m_cursor.current(false);
+
+	if (result.done){
+		valueSlice = result.value;
+		ok = m_cursor.erase();
+	}
+
+	if(m_hasIndex){
+		mdbx::cursor::move_result resultIndex = m_cursorIndex.find(valueSlice, false);
+		if(resultIndex.done){
+			ok = ok && m_cursorIndex.erase();
+		}
+	}
+
+	return ok;
+
+}
+
+bool CDocumentTable::Remove(quint64 key, const QByteArray& value)
+{
+	bool ok = false;
+
+	mdbx::slice keySlice(&key, 8);
+	mdbx::slice valueSlice(value.data(), value.length());
+
+	mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
+	if (result.done){
+		if(value.isEmpty()){
+			valueSlice = result.value;
+			ok = m_cursor.erase();
+		}
+		else {
+			ok = m_cursor.erase(keySlice, valueSlice);
+		}
+	}
+
+	if(m_hasIndex){
+		mdbx::cursor::move_result resultIndex = m_cursorIndex.find(valueSlice, false);
+		if(resultIndex.done){
+			if(value.isEmpty()){
+				ok = ok && m_cursorIndex.erase();
+			}
+			else {
+				ok = ok && m_cursorIndex.erase(valueSlice, keySlice);
+			}
+		}
+	}
+
+	return ok;
+
+}
+
+bool CDocumentTable::Remove(const QByteArray& key, const QByteArray& value)
+{
+	bool ok = false;
+
+	mdbx::slice keySlice(key.data(), key.length());
+	mdbx::slice valueSlice(value.data(), value.length());
+
+	mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
+	if (result.done){
+		if(value.isEmpty()){
+			valueSlice = result.value;
+			ok = m_cursor.erase();
+		}
+		else {
+			ok = m_cursor.erase(keySlice, valueSlice);
+		}
+	}
+
+	if(m_hasIndex){
+		mdbx::cursor::move_result resultIndex = m_cursorIndex.find(valueSlice, false);
+		if(resultIndex.done){
+			if(value.isEmpty()){
+				ok = ok && m_cursorIndex.erase();
+			}
+			else {
+				ok = ok && m_cursorIndex.erase(valueSlice, keySlice);
+			}
+		}
+	}
+
+	return ok;
+
 }
 
 

@@ -39,6 +39,10 @@ public:
 	virtual bool MoveToLowerBound(const QByteArray& key) = 0;
 	virtual bool MoveToNext() = 0;
 	virtual bool MoveToPrevious() = 0;
+	virtual bool MoveToValue(const QByteArray& value) = 0;
+	virtual bool Remove() = 0;
+	virtual bool Remove(quint64 key, const QByteArray& value = QByteArray()) = 0;
+	virtual bool Remove(const QByteArray& key, const QByteArray& value = QByteArray()) = 0;
 
 };
 
