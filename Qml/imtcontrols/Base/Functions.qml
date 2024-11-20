@@ -62,26 +62,29 @@ QtObject {
 		return Math.round(parseFloat(digit) * Math.pow(10,precision)) / Math.pow(10,precision)
 	}
 
-	// function dateToStr(date, format = ''){
-	// 	if(!date) return format
+	function dateToStr(date, format){
+		if(!date || !format) {
+			console.log('date and format must be required')
+			return ''
+		}
 
-	// 	let _date = date
+		let _date = date
 
-	// 	if(typeof _date === 'number'){
-	// 		_date = new Date(date)
-	// 	}
+		if(typeof _date === 'number'){
+			_date = new Date(date)
+		}
 
-	// 	let day = _date.getDate()
-	// 	if(day < 10) day = '0'+day
-	// 	let month = _date.getMonth()+1
-	// 	if(month < 10) month = '0'+month
-	// 	let fullYear = _date.getFullYear()
-	// 	let year = fullYear.toString().slice(2)
+		let day = _date.getDate()
+		if(day < 10) day = '0'+day
+		let month = _date.getMonth()+1
+		if(month < 10) month = '0'+month
+		let fullYear = _date.getFullYear()
+		let year = fullYear.toString().slice(2)
 
-	// 	let seconds = _date.getSeconds()
-	// 	let minutes = _date.getMinutes()
-	// 	let hours = _date.getHours()
+		let seconds = _date.getSeconds()
+		let minutes = _date.getMinutes()
+		let hours = _date.getHours()
 
-	// 	return format.replace('YYYY',fullYear).replace('YY',year).replace('MM',month).replace('DD',day).replace('HH',hours).replace('MM',minutes).replace('SS',seconds)
-	// }
+		return format.replace('yyyy',fullYear).replace('yy',year).replace('MM',month).replace('dd',day).replace('hh',hours).replace('mm',minutes).replace('ss',seconds)
+	}
 }
