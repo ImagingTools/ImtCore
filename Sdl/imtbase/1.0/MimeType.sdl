@@ -1,0 +1,15 @@
+schema {
+	name: MimeType
+	namespace: imtbase
+	version: 1.0
+}
+
+type MimeType
+{
+	type: String!
+	tree: [String]
+	subType: String!
+	suffix: String
+	parameters: [String]
+}
+

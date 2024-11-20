@@ -158,16 +158,19 @@ QString CMimeType::ToString()
 
 bool CMimeType::FromString(const QString& string)
 {
-	static QRegularExpression mimeRegExp("(?<type>\\w*)\\/(?<subtype>[\\w\\.-]*)(?:\\+(?<typeext>[\\w\\.-]*))?(?:;(?:(?<key>.+)=(?<value>.*))*)");
-	const QString mimeString("application/aaa.bbb.ccc.svg+xml;charset=ascii;xxx=zzz");
+	static QRegularExpression mimeRegExp("(?<type>\\w*)\\/(?<subtype>[\\w\\.-]*)(?:\\+(?<typeext>[\\w\\.-]*))?(?:;(?:(?<key>.+)=(?<value>.*))*)?");
 
-	QRegularExpressionMatch mimeRegExpMatch = mimeRegExp.match(mimeString);
+	QRegularExpressionMatch mimeRegExpMatch = mimeRegExp.match(string);
 	if (mimeRegExpMatch.hasMatch()){
-		qDebug() << "type" << " = " << mimeRegExpMatch.captured("type");
-		qDebug() << "subtype" << " = " << mimeRegExpMatch.captured("subtype");
-		qDebug() << "typeext" << " = " << mimeRegExpMatch.captured("typeext");
-		qDebug() << "key" << " = " << mimeRegExpMatch.captured("key").trimmed();
-		qDebug() << "value" << " = " << mimeRegExpMatch.captured("value").trimmed();
+		m_type = mimeRegExpMatch.captured("type");
+		m_subType = mimeRegExpMatch.captured("subtype");
+		m_suffix = mimeRegExpMatch.captured("typeext");
+
+		QString key = mimeRegExpMatch.captured("key").trimmed();
+		QString value = mimeRegExpMatch.captured("value").trimmed();
+		if (!key.isEmpty() && !value.isEmpty()){
+			m_parameters[key] = value;
+		}
 
 		return true;
 	}

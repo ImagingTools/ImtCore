@@ -1014,9 +1014,18 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 	QString description = inputParamPtr->GetFieldArgumentValue("description").toString();
 
 	int index = GetMimeTypeIndex(mimeType);
-	Q_ASSERT_X(index >= 0, "Mime type is invalid", "CObjectCollectionControllerCompBase");
-	Q_ASSERT_X(index < m_importExportObjectFactCompPtr.GetCount(), "Import/Export object factory index out of range", "CObjectCollectionControllerCompBase");
-	Q_ASSERT_X(index < m_filePersistenceCompPtr.GetCount(), "File persistence index out of range", "CObjectCollectionControllerCompBase");
+	if (index < 0){
+		errorMessage = "Mime type is invalid", "CObjectCollectionControllerCompBase";
+		return nullptr;
+	}
+	if (index >= m_importExportObjectFactCompPtr.GetCount()){
+		errorMessage = "Import/Export object factory index out of range", "CObjectCollectionControllerCompBase";
+		return nullptr;
+	}
+	if (index >= m_filePersistenceCompPtr.GetCount()){
+		errorMessage = "File persistence index out of range", "CObjectCollectionControllerCompBase";
+		return nullptr;
+	}
 
 	istd::TDelPtr<istd::IChangeable> objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
@@ -1119,6 +1128,11 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 
 	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
 	QString mimeType = inputParamPtr->GetFieldArgumentValue("mimeType").toString();
+	QString objectName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
+	if (objectName.isEmpty()){
+		objectName = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -1129,12 +1143,21 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 	}
 
 	int index = GetMimeTypeIndex(mimeType);
-	Q_ASSERT_X(index >= 0, "Mime type is invalid", "CObjectCollectionControllerCompBase");
-	Q_ASSERT_X(index < m_importExportObjectFactCompPtr.GetCount(), "Import/Export object factory index out of range", "CObjectCollectionControllerCompBase");
-	Q_ASSERT_X(index < m_filePersistenceCompPtr.GetCount(), "File persistence index out of range", "CObjectCollectionControllerCompBase");
+	if (index < 0){
+		errorMessage = "Mime type is invalid", "CObjectCollectionControllerCompBase";
+		return nullptr;
+	}
+	if (index >= m_importExportObjectFactCompPtr.GetCount()){
+		errorMessage = "Import/Export object factory index out of range", "CObjectCollectionControllerCompBase";
+		return nullptr;
+	}
+	if (index >= m_filePersistenceCompPtr.GetCount()){
+		errorMessage = "File persistence index out of range", "CObjectCollectionControllerCompBase";
+		return nullptr;
+	}
 
 	imtbase::CMimeType mime;
-	if (mime.FromString(mimeType)){
+	if (!mime.FromString(mimeType)){
 		errorMessage = QString("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
@@ -1144,7 +1167,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 	QString extension = mime.GetSuffix();
 
 	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
+	QString fileName = objectName + "." + extension;
+	QString filePathTmp = tempDir.path() + "/" + fileName;
 
 	istd::TDelPtr<istd::IChangeable> objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
@@ -1180,6 +1204,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	rootModelPtr->SetData("fileData", data.toBase64());
+	rootModelPtr->SetData("fileName", fileName);
 
 	return rootModelPtr.PopPtr();
 }
