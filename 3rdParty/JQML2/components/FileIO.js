@@ -21,8 +21,15 @@ class FileIO extends QtObject {
     }
 
     write(data){
+        let byteNumbers = new Array(data.length)
+        for (let i = 0; i < data.length; i++) {
+            byteNumbers[i] = data.charCodeAt(i)
+        }
+
+        let byteArray = new Uint8Array(byteNumbers)
+
         let a = document.createElement("a")
-        let file = new Blob([data], {type: 'text/plain'})
+        let file = new Blob([byteArray])
         a.href = URL.createObjectURL(file)
         a.download = this.getPropertyValue('source')
         a.click()
