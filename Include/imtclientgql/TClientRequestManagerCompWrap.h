@@ -9,6 +9,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
+#include <imtgql/CGqlRequest.h>
 #include <imtclientgql/IGqlClient.h>
 
 
@@ -67,6 +68,22 @@ protected:
 		}
 
 		return false;
+	}
+
+	template <typename Request, typename Arguments, typename ResponseData, typename Retval>
+	void SendRequest(Arguments arguments, Retval& retVal) const
+	{
+		imtgql::CGqlRequest gqlRequest;
+
+		bool ok = Request::SetupGqlRequest(gqlRequest, arguments);
+		if (ok){
+			ResponseData response;
+			if (!SendModelRequest(gqlRequest, response)){
+				return;
+			}
+
+			retVal = response.GetResult();
+		}
 	}
 
 protected:

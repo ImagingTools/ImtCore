@@ -1,0 +1,502 @@
+#include <imtclientgql/CRemoteGqlCollectionController.h>
+
+
+// ACF includes
+#include <idoc/CStandardDocumentMetaInfo.h>
+#include <imod/TModelWrap.h>
+#include <istd/CChangeNotifier.h>
+
+// ImtCore includes
+#include <imtgql/IGqlResponse.h>
+
+
+namespace imtclientgql
+{
+
+
+typedef QSharedPointer<imtgql::IGqlRequest> GqlRequestPtr;
+typedef QSharedPointer<imtgql::IGqlResponse> GqlResponsePtr;
+
+
+// public methods
+
+CRemoteGqlCollectionController::CRemoteGqlCollectionController()
+	:m_gqlClientPtr(nullptr),
+	m_gqlObjectCollectionDelegatePtr(nullptr)
+{
+}
+
+
+// reimplemented (IObjectCollection)
+
+const imtbase::IRevisionController* CRemoteGqlCollectionController::GetRevisionController() const
+{
+	return nullptr;
+}
+
+
+const imtbase::ICollectionDataController* CRemoteGqlCollectionController::GetDataController() const
+{
+	return nullptr;
+}
+
+
+int CRemoteGqlCollectionController::GetOperationFlags(const Id& elementId) const
+{
+	if (!elementId.isEmpty()){
+		return OF_SUPPORT_DELETE | OF_SUPPORT_EDIT;
+	}
+
+	return OF_SUPPORT_INSERT | OF_SUPPORT_DELETE | OF_SUPPORT_EDIT | OF_SUPPORT_PAGINATION;
+}
+
+
+imtbase::ICollectionInfo::Id CRemoteGqlCollectionController::InsertNewObject(
+			const QByteArray& typeId,
+			const QString& name,
+			const QString& description,
+			DataPtr defaultValuePtr,
+			const QByteArray& proposedObjectId,
+			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
+			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
+			const imtbase::IOperationContext* operationContextPtr)
+{
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return Id();
+	}
+
+	Id retVal;
+
+	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateInsertObjectRequest(
+				typeId,
+				name,
+				description,
+				defaultValuePtr.GetPtr(),
+				"", // uploadUrl
+				proposedObjectId,
+				"", // nodeId,
+				dataMetaInfoPtr,
+				collectionItemMetaInfoPtr,
+				operationContextPtr));
+
+	if (!requestPtr.isNull()){
+		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			if (m_gqlObjectCollectionDelegatePtr->GetObjectId(*responsePtr, retVal)){
+				imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
+				insertInfo.elementId = retVal;
+				istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
+				changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(insertInfo));
+				istd::CChangeNotifier notifier(this, &changeSet);
+			}
+		}
+	}
+
+	return retVal;
+}
+
+
+bool CRemoteGqlCollectionController::RemoveElement(const Id& elementId, const imtbase::IOperationContext* operationContextPtr)
+{
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return false;
+	}
+
+	bool retVal = false;
+
+	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateRemoveObjectRequest(elementId, -1, operationContextPtr));
+
+	if (!requestPtr.isNull()){
+		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			m_gqlObjectCollectionDelegatePtr->GetOperationResult(*responsePtr, retVal);
+		}
+	}
+
+	return retVal;
+}
+
+
+const istd::IChangeable* CRemoteGqlCollectionController::GetObjectPtr(const Id& /*objectId*/) const
+{
+	return nullptr;
+}
+
+
+bool CRemoteGqlCollectionController::GetObjectData(const Id& objectId, DataPtr& dataPtr) const
+{
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return false;
+	}
+
+	QByteArray typeId = GetObjectTypeId(objectId);
+
+	DataPtr retVal = CreateObjectInstance(typeId);
+	if (retVal.IsValid()){
+		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectRequest(objectId));
+		if (!requestPtr.isNull()){
+			GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+			if (!responsePtr.isNull()){
+				if (m_gqlObjectCollectionDelegatePtr->GetObjectData(*responsePtr, *retVal)){
+					dataPtr = retVal;
+
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+
+bool CRemoteGqlCollectionController::SetObjectData(
+			const Id& objectId,
+			const istd::IChangeable& object,
+			CompatibilityMode /*mode*/,
+			const imtbase::IOperationContext* operationContextPtr)
+{
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return false;
+	}
+	
+	bool retVal = false;
+
+	imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo info;
+	if (GetObjectInfo(objectId, info)){
+		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateSetObjectRequest(
+					objectId,
+					&object,
+					"",
+					nullptr,
+					nullptr,
+					info.version,
+					operationContextPtr));
+
+		if (!requestPtr.isNull()){
+			GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+			if (!responsePtr.isNull()){
+				if (m_gqlObjectCollectionDelegatePtr->GetOperationResult(*responsePtr, retVal)){
+					if (retVal){
+						istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
+						imtbase::IObjectCollection::ObjectDataChanged updateInfo;
+						updateInfo.elementId = objectId;
+						changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED, QVariant::fromValue(updateInfo));
+						istd::CChangeNotifier notifier(this, &changeSet);
+					}
+				}
+			}
+		}
+	}
+
+	return retVal;
+}
+
+
+imtbase::IObjectCollection* CRemoteGqlCollectionController::CreateSubCollection(
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
+{
+	imtbase::IObjectCollection* retVal = nullptr;
+
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return retVal;
+	}
+
+	imtbase::IObjectCollection* collectionPtr = const_cast<imtbase::IObjectCollection*>(dynamic_cast<const imtbase::IObjectCollection*>(this));
+	Q_ASSERT(collectionPtr != nullptr);
+
+	if (collectionPtr != nullptr){
+		QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList;
+		if (m_metaInfoCreatorPtr != nullptr){
+			metaInfoCreatorList.append(m_metaInfoCreatorPtr);
+		}
+
+		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetSubCollectionRequest(offset, count, selectionParamsPtr));
+		if (!requestPtr.isNull()){
+			GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+			if (!responsePtr.isNull()){
+				retVal = m_gqlObjectCollectionDelegatePtr->GetSubCollection(*collectionPtr, *responsePtr, metaInfoCreatorList);
+			}
+		}
+	}
+
+	return retVal;
+}
+
+
+imtbase::IObjectCollectionIterator* CRemoteGqlCollectionController::CreateObjectCollectionIterator(
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+{
+	return nullptr;
+}
+
+
+// reimplemented (IObjectCollectionInfo)
+
+const iprm::IOptionsList* CRemoteGqlCollectionController::GetObjectTypesInfo() const
+{
+	return nullptr;
+}
+
+
+QByteArray CRemoteGqlCollectionController::GetObjectTypeId(const Id& /*objectId*/) const
+{
+	return QByteArray();
+}
+
+
+idoc::MetaInfoPtr CRemoteGqlCollectionController::GetDataMetaInfo(const Id& objectId) const
+{
+	idoc::MetaInfoPtr retVal;
+
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return retVal;
+	}
+
+	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectDataMetaInfoRequest(objectId));
+	if (!requestPtr.isNull()){
+		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			idoc::MetaInfoPtr metaInfoPtr;
+			if (m_metaInfoCreatorPtr != nullptr){
+				QByteArray typeId = GetObjectTypeId(objectId);
+				m_metaInfoCreatorPtr->CreateMetaInfo(nullptr, typeId, metaInfoPtr);
+			}
+			else{
+				metaInfoPtr.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
+			}
+
+			if (m_gqlObjectCollectionDelegatePtr->GetMetaInfo(*responsePtr, *metaInfoPtr)){
+				retVal = metaInfoPtr;
+			}
+		}
+	}
+
+	return retVal;
+}
+
+
+// reimplemented (ICollectionInfo)
+
+int CRemoteGqlCollectionController::GetElementsCount(const iprm::IParamsSet* selectionParamsPtr, ilog::IMessageConsumer* /*logPtr*/) const
+{
+	int retVal = -1;
+
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return retVal;
+	}
+
+	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetElementCountRequest(selectionParamsPtr));
+	if (!requestPtr.isNull()){
+		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			int count;
+			if (m_gqlObjectCollectionDelegatePtr->GetItemCount(*responsePtr, count)){
+				retVal = count;
+			}
+		}
+	}
+
+	return retVal;
+}
+
+
+imtbase::ICollectionInfo::Ids CRemoteGqlCollectionController::GetElementIds(
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* /*logPtr*/) const
+{
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return Ids();
+	}
+
+	Ids retVal;
+
+	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetElementListRequest(offset, count, selectionParamsPtr));
+	if (!requestPtr.isNull()){
+		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			IGqlObjectCollectionDelegate::Ids ids;
+			if (m_gqlObjectCollectionDelegatePtr->GetItemIds(*responsePtr, ids)){
+				std::copy(ids.begin(), ids.end(), std::back_inserter(retVal));
+			}
+		}
+	}
+
+	return retVal;
+}
+
+
+bool CRemoteGqlCollectionController::GetSubsetInfo(
+			ICollectionInfo& /*subsetInfo*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
+{
+	return false;
+}
+
+
+QVariant CRemoteGqlCollectionController::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* /*logPtr*/) const
+{
+	imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo info;
+
+	if (GetObjectInfo(elementId, info)){
+		switch (infoType)
+		{
+		case EIT_NAME:
+			return info.name;
+
+		case EIT_DESCRIPTION:
+			return info.description;
+
+		case EIT_ENABLED:
+			return true;
+		}
+	}
+
+	return QVariant();
+}
+
+
+idoc::MetaInfoPtr CRemoteGqlCollectionController::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* /*logPtr*/) const
+{
+	idoc::MetaInfoPtr metaInfoPtr;
+
+	imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo info;
+
+	if (GetObjectInfo(elementId, info)){
+		if (!info.dataMetaInfoPtr.isNull()){
+			metaInfoPtr.SetCastedOrRemove(info.dataMetaInfoPtr->CloneMe());
+		}
+	}
+	else{
+		if (!GetObjectMetaInfo(elementId, metaInfoPtr)){
+			metaInfoPtr.Reset();
+		}
+	}
+
+	return metaInfoPtr;
+}
+
+
+bool CRemoteGqlCollectionController::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* /*logPtr*/)
+{
+	bool retVal = false;
+
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return retVal;
+	}
+
+	imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo info;
+	if (GetObjectInfo(elementId, info)){
+		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateSetObjectNameRequest(elementId, name, info.version));
+		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			m_gqlObjectCollectionDelegatePtr->GetOperationResult(*responsePtr, retVal);
+		}
+	}
+
+	return retVal;
+}
+
+
+bool CRemoteGqlCollectionController::SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* /*logPtr*/)
+{
+	bool retVal = false;
+
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return retVal;
+	}
+
+	imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo info;
+	if (GetObjectInfo(elementId, info)){
+		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateSetObjectDescriptionRequest(elementId, description, info.version));
+		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			m_gqlObjectCollectionDelegatePtr->GetOperationResult(*responsePtr, retVal);
+		}
+	}
+
+	return retVal;
+}
+
+
+bool CRemoteGqlCollectionController::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
+{
+	return false;
+}
+
+
+// protected methods
+
+imtbase::IObjectCollection::DataPtr CRemoteGqlCollectionController::CreateObjectInstance(const QByteArray& typeId) const
+{
+	istd::IChangeable* objPtr = BaseClass::CreateInstance(typeId);
+	return DataPtr(DataPtr::RootObjectPtr(objPtr), [objPtr](){
+		return objPtr;
+	});
+}
+
+
+// private methods
+
+bool CRemoteGqlCollectionController::GetObjectInfo(
+			const QByteArray& objectId,
+			imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo& valueOut) const
+{
+	bool retVal = false;
+
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return retVal;
+	}
+
+	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectInfoRequest(objectId));
+	if (!requestPtr.isNull()){
+		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			retVal = m_gqlObjectCollectionDelegatePtr->GetObjectInfo(*responsePtr, valueOut);
+			if (retVal){
+				retVal = valueOut.id == objectId;
+			}
+		}
+	}
+
+	return retVal;
+}
+
+
+bool CRemoteGqlCollectionController::GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const
+{
+	bool retVal = false;
+
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return retVal;
+	}
+
+	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectMetaInfoRequest(objectId));
+	if (!requestPtr.isNull()){
+		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			idoc::MetaInfoPtr metaInfoPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
+			if (m_gqlObjectCollectionDelegatePtr->GetMetaInfo(*responsePtr, *metaInfoPtr)){
+				valueOut = metaInfoPtr;
+
+				retVal = true;
+			}
+		}
+	}
+
+	return retVal;
+}
+
+
+} // namespace imtclientgql
+
+
