@@ -133,7 +133,7 @@ if(DEFINED USE_MONGODB AND USE_MONGODB)
 endif()
 
 if(NOT DEFINED USE_EJ OR USE_EJ)
-	# add_subdirectory("${INCLUDE_DIR}/imtej/CMake" "${AUX_INCLUDE_DIR}/imtej")
+	add_subdirectory("${INCLUDE_DIR}/imtej/CMake" "${AUX_INCLUDE_DIR}/imtej")
 endif()
 
 if(NOT DEFINED USE_QT3D OR USE_QT3D)
