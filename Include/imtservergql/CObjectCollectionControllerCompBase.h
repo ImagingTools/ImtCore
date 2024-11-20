@@ -65,8 +65,7 @@ public:
 		OT_ELEMENT_IDS,
 		OT_ELEMENT_HISTORY,
 		OT_IMPORT,
-		OT_EXPORT,
-		OT_USER_OPERATION = 1000
+		OT_EXPORT
 	};
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)

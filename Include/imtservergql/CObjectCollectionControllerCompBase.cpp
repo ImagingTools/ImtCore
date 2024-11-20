@@ -112,10 +112,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 		return ImportObject(gqlRequest, errorMessage);
 	case OT_EXPORT:
 		return ExportObject(gqlRequest, errorMessage);
-	case OT_USER_OPERATION + 1:
-		return GetTreeItemModel(gqlRequest, errorMessage);
-	case OT_USER_OPERATION + 2:
-		return GetDependencies(gqlRequest, errorMessage);
+	default:
+		Q_ASSERT(false);
+		break;
 	}
 
 	errorMessage = QString("Unable to create internal response. Operation is not supported");
