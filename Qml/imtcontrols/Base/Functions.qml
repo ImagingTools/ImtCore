@@ -42,8 +42,8 @@ QtObject {
 		}
 
 		//округление до сотых
-//        if(afterDot !== "")
-//            afterDot = String(Math.round(parseFloat(afterDot) * 100) / 100).match(/\.\d{0,}/)[0]
+		//        if(afterDot !== "")
+		//            afterDot = String(Math.round(parseFloat(afterDot) * 100) / 100).match(/\.\d{0,}/)[0]
 
 
 		retVal += afterDot
@@ -60,5 +60,28 @@ QtObject {
 
 	function roundToPrecision(digit, precision){
 		return Math.round(parseFloat(digit) * Math.pow(10,precision)) / Math.pow(10,precision)
+	}
+
+	function dateToStr(date, format = ''){
+		if(!date) return format
+
+		let _date = date
+
+		if(typeof _date === 'number'){
+			_date = new Date(date)
+		}
+
+		let day = _date.getDate()
+		if(day < 10) day = '0'+day
+		let month = _date.getMonth()+1
+		if(month < 10) month = '0'+month
+		let fullYear = _date.getFullYear()
+		let year = fullYear.toString().slice(2)
+
+		let seconds = _date.getSeconds()
+		let minutes = _date.getMinutes()
+		let hours = _date.getHours()
+
+		return format.replace('YYYY',fullYear).replace('YY',year).replace('MM',month).replace('DD',day).replace('HH',hours).replace('MM',minutes).replace('SS',seconds)
 	}
 }
