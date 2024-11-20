@@ -567,7 +567,45 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 		stream << QStringLiteral("QString& errorMessage) const = 0;");
 		FeedStream(stream, 1, false);
 	}
+	else if (		operationType == imtsdl::CSdlDocumentType::OT_UPDATE_COLLECTION ||
+					operationType == imtsdl::CSdlDocumentType::OT_RENAME ||
+					operationType == imtsdl::CSdlDocumentType::OT_SET_DESCRIPTION ||
+					operationType == imtsdl::CSdlDocumentType::OT_HEADERS ||
+					operationType == imtsdl::CSdlDocumentType::OT_INFO ||
+					operationType == imtsdl::CSdlDocumentType::OT_METAINFO ||
+					operationType == imtsdl::CSdlDocumentType::OT_DATAMETAINFO ||
+					operationType == imtsdl::CSdlDocumentType::OT_ELEMENTS_COUNT ||
+					operationType == imtsdl::CSdlDocumentType::OT_ELEMENT_IDS ||
+					operationType == imtsdl::CSdlDocumentType::OT_ELEMENT_HISTORY ||
+					operationType == imtsdl::CSdlDocumentType::OT_IMPORT ||
+					operationType == imtsdl::CSdlDocumentType::OT_EXPORT)
+	{
+		QString requestCalssName = sdlRequest.GetName();
+		requestCalssName[0].toUpper();
+		QString functionName = imtsdl::CSdlDocumentType::ToString(operationType);
+		functionName[0].toUpper();
+		functionName.prepend(QStringLiteral("On"));
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("virtual ");
+		stream << 'C' << sdlRequest.GetOutputArgument().GetType();
+		stream << functionName;
+
+		FeedStreamHorizontally(stream, hIndents + 3);
+		stream << QStringLiteral("const C");
+		stream << requestCalssName;
+		stream << QStringLiteral("& ");
+		stream << GetDecapitalizedValue(requestCalssName);
+		stream << QStringLiteral(", ");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 3);
+		stream << QStringLiteral("QString& errorMessage) const = 0;");
+		FeedStream(stream, 1, false);
+	}
+
 	else {
+		SendCriticalMessage(0, "Unexpected request method");
 		I_CRITICAL();
 	}
 }
