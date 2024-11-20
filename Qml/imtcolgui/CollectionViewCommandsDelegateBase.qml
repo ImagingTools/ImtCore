@@ -144,6 +144,7 @@ ViewCommandsDelegateBase {
             if(commandsController){
                 commandsController.setCommandIsEnabled("Remove", isEnabled);
                 commandsController.setCommandIsEnabled("Edit", isEnabled);
+                commandsController.setCommandIsEnabled("Export", isEnabled);
             }
         }
     }
@@ -200,7 +201,7 @@ ViewCommandsDelegateBase {
         PopupMenuDialog {
             onFinished: {
                 if (commandId !== ''){
-                    fileDialogSave.fileExt = commandId;
+                    fileDialogSave.fileExt = collectionViewCommandsDelegate.getFormatFromMimeType(commandId);
                     fileDialogSave.open();
                 }
             }
@@ -220,7 +221,8 @@ ViewCommandsDelegateBase {
             setupExtensionsModel();
 
             if (extensionModel.count === 1){
-                fileDialogSave.fileExt = extensionModel.get(0).Id;;
+                fileDialogSave.fileExt = collectionViewCommandsDelegate.getFormatFromMimeType(extensionModel.get(0).Id);
+
                 fileDialogSave.open();
             }
             else{
@@ -340,6 +342,10 @@ ViewCommandsDelegateBase {
         }
     }
 
+    function getFormatFromMimeType(mimeType) {
+        return mimeType.split('/').pop();
+    }
+
     FileDialog {
         id: fileDialogSave;
         title: qsTr("Save file");
@@ -356,6 +362,14 @@ ViewCommandsDelegateBase {
             let mimeType = ""
             if (Qt.platform.os == "web"){
                 exportFileIO.source = fileDialogSave.currentFile;
+
+                let index = collectionViewCommandsDelegate.getDialogNameFilterIndex(fileDialogSave.nameFilters, fileDialogSave.fileExt)
+                if (index < 0){
+                    console.error("Extension not found in name filters");
+                    return;
+                }
+
+                mimeType = mimeTypes[index]
             }
             else{
                 let extension = filePath.substring(filePath.lastIndexOf('.') + 1);
@@ -366,7 +380,7 @@ ViewCommandsDelegateBase {
 
                 let index = collectionViewCommandsDelegate.getDialogNameFilterIndex(fileDialogSave.nameFilters, fileDialogSave.fileExt)
                 if (index < 0){
-                    console.error("Extension not found in namefilters");
+                    console.error("Extension not found in name filters");
                     return;
                 }
 
