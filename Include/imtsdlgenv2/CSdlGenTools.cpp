@@ -246,5 +246,27 @@ QString CSdlGenTools::GetSettingValueString(
 	return retVal;
 }
 
+void CSdlGenTools::AddArrayInternalChecksFail(QTextStream& stream, const imtsdl::CSdlField& field, bool checkEmpty, const QString& objectName, uint hIndents)
+{
+	imtsdl::CSdlTools::FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (");
+	stream << GetNullCheckString(field, false);
+	if (checkEmpty){
+		stream << QStringLiteral(" || ");
+		if (!objectName.isEmpty()){
+			stream << objectName;
+			stream << '.';
+		}
+		stream << field.GetId();
+		stream << QStringLiteral("->isEmpty()");
+	}
+	stream << QStringLiteral("){");
+	imtsdl::CSdlTools::FeedStream(stream, 1, false);
+
+	imtsdl::CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return false;\n\t}");
+	imtsdl::CSdlTools::FeedStream(stream, 1, false);
+}
+
 
 } // namespace imtsdlgenv2

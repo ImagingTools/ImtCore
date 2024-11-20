@@ -63,6 +63,12 @@ public:
 		bool* isComplexPtr = nullptr,
 		bool* isArrayPtr = nullptr);
 
+	/**
+		\brief Generates a string, checks, if a field of object, named \c objectName, defined or not
+		\param sdlField - field to be checked
+		\param checkNull - if true - null expect (== nullptr); if false - NON null expected (!= nullptr)
+		\param objectName - name of oject, holds a property
+	 */
 	[[nodiscard]] static QString GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull = true, const QString& objectName = "object");
 
 	[[nodiscard]] static QString GetSettingValueString(
@@ -71,6 +77,8 @@ public:
 				const imtsdl::ISdlTypeListProvider& listProvider,
 				const QString& variableName,
 				const QString& objectName = "object");
+
+	static void AddArrayInternalChecksFail(QTextStream& stream, const imtsdl::CSdlField& field, bool checkEmpty, const QString& objectName = "object", uint hIndents = 1);
 
 };
 
