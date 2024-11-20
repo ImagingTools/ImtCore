@@ -20,6 +20,7 @@
 
 // ImtCore includes
 #include <imtbase/IIdentifiable.h>
+#include <imtbase/CMimeType.h>
 #include <imtbase/CCollectionFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IObjectCollectionIterator.h>
@@ -1006,24 +1007,34 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 	}
 
 	QByteArray objectData = inputParamPtr->GetFieldArgumentValue("fileData").toByteArray();
-	QByteArray typeId = inputParamPtr->GetFieldArgumentValue("typeId").toByteArray();
-	QString extension = inputParamPtr->GetFieldArgumentValue("extension").toString();
 	QByteArray data = QByteArray::fromBase64(objectData);
-
+	QByteArray typeId = inputParamPtr->GetFieldArgumentValue("typeId").toByteArray();
+	QString mimeType = inputParamPtr->GetFieldArgumentValue("mimeType").toString();
 	QString name = inputParamPtr->GetFieldArgumentValue("name").toString();
 	QString description = inputParamPtr->GetFieldArgumentValue("description").toString();
 
-	int index = GetFilePersistenceIndex(extension);
+	int index = GetMimeTypeIndex(mimeType);
+	Q_ASSERT_X(index >= 0, "Mime type is invalid", "CObjectCollectionControllerCompBase");
+	Q_ASSERT_X(index < m_importExportObjectFactCompPtr.GetCount(), "Import/Export object factory index out of range", "CObjectCollectionControllerCompBase");
+	Q_ASSERT_X(index < m_filePersistenceCompPtr.GetCount(), "File persistence index out of range", "CObjectCollectionControllerCompBase");
 
-	Q_ASSERT_X(index >= 0, "File persistence is invalid", "CObjectCollectionControllerCompBase");
-
-	istd::TDelPtr<istd::IChangeable> objectPersistenceInstancePtr = m_persistenseObjectFactCompPtr.CreateInstance(index);
+	istd::TDelPtr<istd::IChangeable> objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
-		errorMessage = QString("Unable to import object to the collection. Error: Object persistence instance is invalid");
+		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return nullptr;
 	}
+
+	imtbase::CMimeType mime;
+	if (mime.FromString(mimeType)){
+		errorMessage = QString("Unable to parse mime type");
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
+
+	QString extension = mime.GetSuffix();
 
 	QTemporaryDir tempDir;
 	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
@@ -1037,7 +1048,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 	file.write(data);
 	file.close();
 
-	if (m_filePersistencesCompPtr[index]->LoadFromFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
+	if (m_filePersistenceCompPtr[index]->LoadFromFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
 		errorMessage = QString("Unable to import object to the collection");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
@@ -1062,7 +1073,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 	int typeIdIndex = GetObjectTypeIdIndex(typeId);
 	Q_ASSERT_X(typeIdIndex >= 0, "Type ID is invalid", "CObjectCollectionControllerCompBase");
 
-	istd::TDelPtr<istd::IChangeable> collectionObjectInstancePtr = m_collectionObjectFactCompPtr.CreateInstance(typeIdIndex);
+	istd::TDelPtr<istd::IChangeable> collectionObjectInstancePtr = m_objectFactCompPtr.CreateInstance(typeIdIndex);
 	if (!collectionObjectInstancePtr.IsValid()){
 		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -1107,7 +1118,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 	}
 
 	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
-	QByteArray extension = inputParamPtr->GetFieldArgumentValue("extension").toByteArray();
+	QString mimeType = inputParamPtr->GetFieldArgumentValue("mimeType").toString();
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -1117,13 +1128,25 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 		return nullptr;
 	}
 
-	int index = GetFilePersistenceIndex(extension);
-	Q_ASSERT_X(index >= 0, "File persistence is invalid", "CObjectCollectionControllerCompBase");
+	int index = GetMimeTypeIndex(mimeType);
+	Q_ASSERT_X(index >= 0, "Mime type is invalid", "CObjectCollectionControllerCompBase");
+	Q_ASSERT_X(index < m_importExportObjectFactCompPtr.GetCount(), "Import/Export object factory index out of range", "CObjectCollectionControllerCompBase");
+	Q_ASSERT_X(index < m_filePersistenceCompPtr.GetCount(), "File persistence index out of range", "CObjectCollectionControllerCompBase");
+
+	imtbase::CMimeType mime;
+	if (mime.FromString(mimeType)){
+		errorMessage = QString("Unable to parse mime type");
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
+
+	QString extension = mime.GetSuffix();
 
 	QTemporaryDir tempDir;
 	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
 
-	istd::TDelPtr<istd::IChangeable> objectPersistenceInstancePtr = m_persistenseObjectFactCompPtr.CreateInstance(index);
+	istd::TDelPtr<istd::IChangeable> objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
 		errorMessage = QString("Unable to import object to the collection. Error: Object persistence instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -1135,7 +1158,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 		return nullptr;
 	}
 
-	if (m_filePersistencesCompPtr[index]->SaveToFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
+	if (m_filePersistenceCompPtr[index]->SaveToFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
 		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(qPrintable(objectId)).arg(filePathTmp);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
@@ -1156,29 +1179,23 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 	QFile::remove(filePathTmp);
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	rootModelPtr->SetData("fileContent", data.toBase64());
+	rootModelPtr->SetData("fileData", data.toBase64());
 
 	return rootModelPtr.PopPtr();
 }
 
 
-bool CObjectCollectionControllerCompBase::ConvertObject(const istd::IChangeable& object1, istd::IChangeable& object2) const
+bool CObjectCollectionControllerCompBase::ConvertObject(const istd::IChangeable& source, istd::IChangeable& target) const
 {
-	return object2.CopyFrom(object1);
+	return target.CopyFrom(source);
 }
 
 
-int CObjectCollectionControllerCompBase::GetFilePersistenceIndex(const QString& extension) const
+int CObjectCollectionControllerCompBase::GetObjectTypeIdIndex(const QByteArray& typeId) const
 {
-	for (int i = 0; i < m_filePersistencesCompPtr.GetCount(); i++){
-		const ifile::IFilePersistence* filePersistencePtr = m_filePersistencesCompPtr[i];
-		if (filePersistencePtr != nullptr){
-			QStringList extensions;
-			if (filePersistencePtr->GetFileExtensions(extensions)){
-				if (extensions.contains(extension)){
-					return i;
-				}
-			}
+	for (int i = 0; i < m_objectTypeIdAttrPtr.GetCount(); i++){
+		if (m_objectTypeIdAttrPtr[i] == typeId){
+			return i;
 		}
 	}
 
@@ -1186,10 +1203,10 @@ int CObjectCollectionControllerCompBase::GetFilePersistenceIndex(const QString& 
 }
 
 
-int CObjectCollectionControllerCompBase::GetObjectTypeIdIndex(const QByteArray& typeId) const
+int CObjectCollectionControllerCompBase::GetMimeTypeIndex(const QString& mimeType) const
 {
-	for (int i = 0; i < m_objectTypeIdsAttrPtr.GetCount(); i++){
-		if (m_objectTypeIdsAttrPtr[i] == typeId){
+	for (int i = 0; i < m_mimeTypeAttrPtr.GetCount(); i++){
+		if (m_mimeTypeAttrPtr[i] == mimeType){
 			return i;
 		}
 	}
@@ -1502,6 +1519,11 @@ void CObjectCollectionControllerCompBase::SetObjectFilter(
 
 istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(const QByteArray& typeId)
 {
+	int index = GetObjectTypeIdIndex(typeId);
+	if (m_objectFactCompPtr.IsValid() && index < m_objectFactCompPtr.GetCount()){
+		return m_objectFactCompPtr.CreateInstance(index);
+	}
+
 	return nullptr;
 }
 

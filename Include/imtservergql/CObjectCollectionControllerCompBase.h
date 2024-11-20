@@ -39,11 +39,12 @@ public:
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
-		I_ASSIGN_MULTI_0(m_collectionObjectFactCompPtr, "CollectionObjectFactory", "Collection object factories", false);
-		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIds", "Object type IDs", false);
-		I_ASSIGN_MULTI_0(m_filePersistencesCompPtr, "FilePersistences", "File persistences for the import/export object", false);
-		I_ASSIGN_MULTI_0(m_persistenseObjectFactCompPtr, "PersistenceObjectFactory", "Object factories for file file persistences", false);
-	I_END_COMPONENT;
+		I_ASSIGN_MULTI_0(m_objectTypeIdAttrPtr, "ObjectTypeIds", "Object type IDs", false);
+		I_ASSIGN_MULTI_0(m_objectFactCompPtr, "CollectionObjectFactory", "Collection object factories", false);
+		I_ASSIGN_MULTI_0(m_mimeTypeAttrPtr, "MimeType", "Mime type for the import/export object", false);
+		I_ASSIGN_MULTI_0(m_importExportObjectFactCompPtr, "ImportExportObjectFactory", "Object factory for the import/export object", false);
+		I_ASSIGN_MULTI_0(m_filePersistenceCompPtr, "FilePersistence", "File persistence for the import/export object", false);
+		I_END_COMPONENT;
 
 	enum OperationType
 	{
@@ -103,9 +104,9 @@ protected:
 	virtual imtbase::CTreeItemModel* ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
-	virtual bool ConvertObject(const istd::IChangeable& object1, istd::IChangeable& object2) const;
-	virtual int GetFilePersistenceIndex(const QString& extension) const;
+	virtual bool ConvertObject(const istd::IChangeable& source, istd::IChangeable& target) const;
 	virtual int GetObjectTypeIdIndex(const QByteArray& typeId) const;
+	virtual int GetMimeTypeIndex(const QString& mimeType) const;
 
 	/**
 		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.
@@ -189,10 +190,13 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_headersProviderCompPtr);
 	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);
-	I_MULTIATTR(QByteArray, m_objectTypeIdsAttrPtr);
-	I_MULTIFACT(istd::IChangeable, m_collectionObjectFactCompPtr);
-	I_MULTIFACT(istd::IChangeable, m_persistenseObjectFactCompPtr);
-	I_MULTIREF(ifile::IFilePersistence, m_filePersistencesCompPtr);
+
+	I_MULTIATTR(QByteArray, m_objectTypeIdAttrPtr);
+	I_MULTIFACT(istd::IChangeable, m_objectFactCompPtr);
+
+	I_MULTIATTR(QString, m_mimeTypeAttrPtr);
+	I_MULTIFACT(istd::IChangeable, m_importExportObjectFactCompPtr);
+	I_MULTIREF(ifile::IFilePersistence, m_filePersistenceCompPtr);
 
 	imtrest::CTimeFilterParamRepresentationController m_timeFilterParamRepresentationController;
 };
