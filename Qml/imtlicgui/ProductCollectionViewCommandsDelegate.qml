@@ -13,6 +13,7 @@ DocumentCollectionViewDelegate {
     removeMessage: qsTr("Delete the selected product ?");
 
     exportFileDialog.nameFilters: ["Xml files (*.xml)"];
+    exportDialogMimeTypes: ["application/xml"]
     exportFileDialog.title: qsTr("Select product");
 
     importObjectTypeId: "Product";

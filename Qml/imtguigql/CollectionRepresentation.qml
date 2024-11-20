@@ -34,7 +34,7 @@ Item {
     signal endUpdate();
 
 
-    function importObject(typeId, name, description, b64encoded, extension, additionalParamsObj){
+    function importObject(typeId, name, description, b64encoded, mimeType, additionalParamsObj){
         console.log("importObject", typeId, name, description, extension);
 
         let params = {}
@@ -42,7 +42,7 @@ Item {
         params["name"] = name;
         params["description"] = description;
         params["fileData"] = b64encoded;
-        params["extension"] = extension;
+        params["mimeType"] = extension;
 
         if (additionalParamsObj){
             for (let key in additionalParamsObj){
@@ -53,10 +53,10 @@ Item {
         importObjectRequestSender.send(params)
     }
 
-    function exportObject(objectId, extension, additionalParamsObj){
+    function exportObject(objectId, mimeType, additionalParamsObj){
         let params = {}
         params["id"] = objectId
-        params["extension"] = extension
+        params["mimeType"] = extension
 
         if (additionalParamsObj){
             for (let key in additionalParamsObj){

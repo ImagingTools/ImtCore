@@ -30,6 +30,9 @@ ViewCommandsDelegateBase {
     property bool canRename: false;
     property bool canSetDescription: false;
 
+    property var importDialogMimeTypes: []
+    property var exportDialogMimeTypes: []
+
     signal renamed(string id, string newName);
     signal descriptionSetted(string id, string description);
     signal removed(string id);
@@ -98,12 +101,9 @@ ViewCommandsDelegateBase {
     function setupExtensionsModel(){
         extensionModel.clear();
 
-        for (let i = 0; i < fileDialogSave.nameFilters.length; i++){
-            let nameFilter = fileDialogSave.nameFilters[i];
-
-            let name = nameFilter.split("(*.")[0];
-            let result = nameFilter.split("*.")[1].split(")")[0];
-            extensionModel.append({"Id": result, "Name": name})
+        for (let i = 0; i < fileDialogSave.mimeTypes.length; i++){
+            let mimeType = fileDialogSave.mimeTypes[i];
+            extensionModel.append({"Id": mimeType, "Name": mimeType})
         }
     }
 
@@ -233,17 +233,29 @@ ViewCommandsDelegateBase {
     }
 
     // importObject(typeId, name, description, b64encoded, ext, additionalParamsObj) - signature in dataController
-    function onImportDialogResult(name, fileData, extension){
+    function onImportDialogResult(name, fileData, mimeType){
         if (collectionView && collectionView.dataController){
-            collectionView.dataController.importObject(importObjectTypeId, name, "", fileData, extension);
+            collectionView.dataController.importObject(importObjectTypeId, name, "", fileData, mimeType);
         }
     }
 
     // exportObject(objectId, extension, additionalParamsObj) - signature in dataController
-    function onExportDialogResult(objectId, extension){
+    function onExportDialogResult(objectId, mimeType){
         if (collectionView && collectionView.dataController){
-            collectionView.dataController.exportObject(objectId, extension);
+            collectionView.dataController.exportObject(objectId, mimeType);
         }
+    }
+
+    function getDialogNameFilterIndex(nameFilters, fileExt){
+        for (let i = 0; i < nameFilters.length; i++){
+            let nameFilter = nameFilters[i];
+            let filterExt = nameFilter.split("*.")[1].split(")")[0];
+            if (filterExt === fileExt){
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     FileDialog {
@@ -251,6 +263,8 @@ ViewCommandsDelegateBase {
         title: qsTr("Import file")
         fileMode: FileDialog.OpenFile
         nameFilters: ["All files (*)"]
+
+        property var mimeTypes: collectionViewCommandsDelegate.importDialogMimeTypes;
 
         onAccepted: {
             let filePath;
@@ -285,7 +299,13 @@ ViewCommandsDelegateBase {
                         console.log("ext", ext);
                     }
 
-                    collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedContent, ext);
+                    let index = collectionViewCommandsDelegate.getDialogNameFilterIndex(importFileDialog_.nameFilters, ext)
+                    if (index < 0){
+                        console.error("Extension not found in namefilters");
+                        return;
+                    }
+
+                    collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedContent, mimeTypes[index]);
                 }.bind(this)
             }
             else {
@@ -305,10 +325,13 @@ ViewCommandsDelegateBase {
                     }
                 }
 
-                console.log("fileName", fileName)
-                console.log("ext", ext)
+                let index = collectionViewCommandsDelegate.getDialogNameFilterIndex(importFileDialog_.nameFilters, ext)
+                if (index < 0){
+                    console.error("Extension not found in namefilters");
+                    return;
+                }
 
-                collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedData, ext);
+                collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedData, mimeTypes[index]);
             }
         }
 
@@ -322,12 +345,15 @@ ViewCommandsDelegateBase {
         title: qsTr("Save file");
         nameFilters: ["All files (*)"];
         fileMode: FileDialog.SaveFile;
-        currentFile: "Default"
+        currentFile: "Default";
         property string fileExt;
+        property var mimeTypes: collectionViewCommandsDelegate.exportDialogMimeTypes;
+
         onAccepted: {
             let filePath = fileDialogSave.file.toString();
             console.log("filePath", filePath);
 
+            let mimeType = ""
             if (Qt.platform.os == "web"){
                 exportFileIO.source = fileDialogSave.currentFile;
             }
@@ -337,6 +363,14 @@ ViewCommandsDelegateBase {
 
                 filePath = filePath.replace('file:///', '')
                 exportFileIO.source = filePath;
+
+                let index = collectionViewCommandsDelegate.getDialogNameFilterIndex(fileDialogSave.nameFilters, fileDialogSave.fileExt)
+                if (index < 0){
+                    console.error("Extension not found in namefilters");
+                    return;
+                }
+
+                mimeType = mimeTypes[index]
             }
 
             let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
@@ -344,7 +378,7 @@ ViewCommandsDelegateBase {
                 let index = indexes[0];
                 let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("Id", index);
                 if (selectedId !== ""){
-                    collectionViewCommandsDelegate.onExportDialogResult(selectedId, fileDialogSave.fileExt);
+                    collectionViewCommandsDelegate.onExportDialogResult(selectedId, mimeType);
                 }
             }
         }
