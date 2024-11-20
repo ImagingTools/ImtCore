@@ -161,7 +161,7 @@ void CLegacyObjectCollectionControllerCompBase::ReplaceComplexFilterFields(imtba
 
 bool CLegacyObjectCollectionControllerCompBase::GetOperationFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
-		imtgql::CGqlObject& gqlObject,
+		imtgql::CGqlObject& /*gqlObject*/,
 		QString& errorMessage,
 		int& operationType) const
 {
@@ -170,87 +170,70 @@ bool CLegacyObjectCollectionControllerCompBase::GetOperationFromRequest(
 	const QByteArrayList Ids = fields.GetFieldIds();
 	for (const QByteArray& fieldId: Ids){
 		if (fieldId == "headers"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_HEADERS;
 			return true;
 		}
 		if (fieldId == "items"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_LIST;
 			return true;
 		}
 		if (fieldId == "itemsCount"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_ELEMENTS_COUNT;
 			return true;
 		}
 		if (fieldId == "itemIds"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_ELEMENT_IDS;
 			return true;
 		}
 		if (fieldId == "item"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_GET;
 			return true;
 		}
 		if (fieldId == "addedNotification"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_NEW;
 			return true;
 		}
 		if (fieldId == "updatedNotification"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_UPDATE;
 			return true;
 		}
 		if (fieldId == "updatedCollectionNotification"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_UPDATE_COLLECTION;
 			return true;
 		}
 		if (fieldId == "removedNotification"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_DELETE;
 			return true;
 		}
 		if (fieldId == "rename"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_RENAME;
 			return true;
 		}
 		if (fieldId == "setDescription"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_SET_DESCRIPTION;
 			return true;
 		}
 		if (fieldId == "info"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_INFO;
 			return true;
 		}
 		if (fieldId == "metaInfo"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_METAINFO;
 			return true;
 		}
 		if (fieldId == "dataMetaInfo"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_DATAMETAINFO;
 			return true;
 		}
 		if (fieldId == "itemHistory"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_ELEMENT_HISTORY;
 			return true;
 		}
 		if (fieldId == "import"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_IMPORT;
 			return true;
 		}
 		if (fieldId == "export"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_EXPORT;
 			return true;
 		}
