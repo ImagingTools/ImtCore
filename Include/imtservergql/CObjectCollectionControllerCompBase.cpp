@@ -102,8 +102,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 		return GetInfo(gqlRequest, errorMessage);
 	case OT_DATAMETAINFO:
 		return GetDataMetaInfo(gqlRequest, errorMessage);
-	case OT_OBJECT_VIEW:
-		return GetObjectView(gqlRequest, errorMessage);
 	case OT_ELEMENT_HISTORY:
 		return GetObjectHistory(gqlRequest, errorMessage);
 	case OT_ELEMENTS_COUNT:
@@ -239,11 +237,6 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 		if (fieldId == "dataMetaInfo"){
 			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
 			operationType = OT_DATAMETAINFO;
-			return true;
-		}
-		if (fieldId == "objectView"){
-			gqlObject = *fields.GetFieldArgumentObjectPtr(fieldId);
-			operationType = OT_OBJECT_VIEW;
 			return true;
 		}
 		if (fieldId == "itemHistory"){
@@ -891,14 +884,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetDataMetaInfo(
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectView(
-		const imtgql::CGqlRequest& /*gqlRequest*/,
-		QString& /*errorMessage*/) const
-{
-	return nullptr;
-}
-
-
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -1036,7 +1021,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 	}
 
 	imtbase::CMimeType mime;
-	if (mime.FromString(mimeType)){
+	if (!mime.FromString(mimeType)){
 		errorMessage = QString("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 

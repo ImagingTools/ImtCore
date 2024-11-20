@@ -44,7 +44,7 @@ public:
 		I_ASSIGN_MULTI_0(m_mimeTypeAttrPtr, "MimeType", "Mime type for the import/export object", false);
 		I_ASSIGN_MULTI_0(m_importExportObjectFactCompPtr, "ImportExportObjectFactory", "Object factory for the import/export object", false);
 		I_ASSIGN_MULTI_0(m_filePersistenceCompPtr, "FilePersistence", "File persistence for the import/export object", false);
-		I_END_COMPONENT;
+	I_END_COMPONENT;
 
 	enum OperationType
 	{
@@ -58,11 +58,9 @@ public:
 		OT_SET_DESCRIPTION,
 		OT_LIST,
 		OT_HEADERS,
-		OT_COMMANDS,
 		OT_INFO,
 		OT_METAINFO,
 		OT_DATAMETAINFO,
-		OT_OBJECT_VIEW,
 		OT_ELEMENTS_COUNT,
 		OT_ELEMENT_IDS,
 		OT_ELEMENT_HISTORY,
@@ -99,7 +97,6 @@ protected:
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetObjectView(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetObjectHistory(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
