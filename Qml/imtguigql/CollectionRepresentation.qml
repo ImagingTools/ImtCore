@@ -22,7 +22,7 @@ Item {
     signal removed(string objectId);
     signal renamed(string objectId, string newName);
     signal imported(string objectId);
-    signal exported(string data);
+    signal exported(string fileName, string data);
     signal descriptionSetted(string objectId, string description);
 
     property alias removeGqlModel: removeModel;
@@ -35,14 +35,14 @@ Item {
 
 
     function importObject(typeId, name, description, b64encoded, mimeType, additionalParamsObj){
-        console.log("importObject", typeId, name, description, extension);
+        console.log("importObject", typeId, name, description, mimeType);
 
         let params = {}
         params["typeId"] = typeId;
         params["name"] = name;
         params["description"] = description;
         params["fileData"] = b64encoded;
-        params["mimeType"] = extension;
+        params["mimeType"] = mimeType;
 
         if (additionalParamsObj){
             for (let key in additionalParamsObj){
@@ -54,9 +54,11 @@ Item {
     }
 
     function exportObject(objectId, mimeType, additionalParamsObj){
+        console.log("exportObject", objectId, mimeType);
+
         let params = {}
         params["id"] = objectId
-        params["mimeType"] = extension
+        params["mimeType"] = mimeType
 
         if (additionalParamsObj){
             for (let key in additionalParamsObj){
@@ -601,14 +603,15 @@ Item {
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("export");
-            queryFields.InsertField("fileContent");
+            queryFields.InsertField("fileData");
             query.AddField(queryFields);
         }
 
         function onResult(data){
-            if (data.containsKey("fileContent")){
-                let contentData = data.getData("fileContent");
-                root.exported(contentData);
+            if (data.containsKey("fileData")){
+                let contentData = data.getData("fileData");
+                let fileName = data.getData("fileName");
+                root.exported(fileName, contentData);
             }
         }
     }

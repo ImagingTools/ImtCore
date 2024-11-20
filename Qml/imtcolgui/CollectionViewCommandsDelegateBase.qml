@@ -32,6 +32,7 @@ ViewCommandsDelegateBase {
 
     property var importDialogMimeTypes: []
     property var exportDialogMimeTypes: []
+    property var exportContextMenuItems: []
 
     signal renamed(string id, string newName);
     signal descriptionSetted(string id, string description);
@@ -92,7 +93,9 @@ ViewCommandsDelegateBase {
             ModalDialogManager.showInfoDialog(qsTr("The object has been successfully imported"));
         }
 
-        function onExported(data){
+        function onExported(name, data){
+            exportFileIO.source = name;
+
             let encodedStr = Qt.atob(data);
             exportFileIO.write(encodedStr);
         }
@@ -103,7 +106,17 @@ ViewCommandsDelegateBase {
 
         for (let i = 0; i < fileDialogSave.mimeTypes.length; i++){
             let mimeType = fileDialogSave.mimeTypes[i];
-            extensionModel.append({"Id": mimeType, "Name": mimeType})
+            let name = "";
+
+            if (i < exportContextMenuItems.length){
+               name = exportContextMenuItems[i];
+            }
+
+            if (name === ""){
+                name = mimeType;
+            }
+
+            extensionModel.append({"Id": mimeType, "Name": name})
         }
     }
 
@@ -200,8 +213,8 @@ ViewCommandsDelegateBase {
 
         PopupMenuDialog {
             onFinished: {
-                if (commandId !== ''){
-                    fileDialogSave.fileExt = collectionViewCommandsDelegate.getFormatFromMimeType(commandId);
+                if (index >= 0){
+                    fileDialogSave.fileExt = collectionViewCommandsDelegate.getExtensionFromNameFilter(fileDialogSave.nameFilters, index);
                     fileDialogSave.open();
                 }
             }
@@ -221,7 +234,7 @@ ViewCommandsDelegateBase {
             setupExtensionsModel();
 
             if (extensionModel.count === 1){
-                fileDialogSave.fileExt = collectionViewCommandsDelegate.getFormatFromMimeType(extensionModel.get(0).Id);
+                fileDialogSave.fileExt = collectionViewCommandsDelegate.getExtensionFromNameFilter(fileDialogSave.nameFilters, 0);
 
                 fileDialogSave.open();
             }
@@ -258,6 +271,12 @@ ViewCommandsDelegateBase {
         }
 
         return -1;
+    }
+
+    function getExtensionFromNameFilter(nameFilters, index){
+        let nameFilter = nameFilters[index];
+        let filterExt = nameFilter.split("*.")[1].split(")")[0];
+        return filterExt;
     }
 
     FileDialog {
