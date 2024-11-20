@@ -259,7 +259,7 @@ void CWebSocketThread::OnSslErrors(const QList<QSslError> &errors)
 
 void CWebSocketThread::OnSendTextMessage(const QByteArray& data) const
 {
-	if (m_socket->isValid()){
+	if (!m_socket.isNull()){
 		m_socket->sendTextMessage(data);
 	}
 }
