@@ -12,15 +12,15 @@ namespace imtmdbx
 
 
 CDocumentTable::CDocumentTable(const QString& name,
-                               mdbx::txn_managed &txn,
+							   mdbx::txn_managed &txn,
 							   mdbx::key_mode keyMode,
 							   mdbx::value_mode valueMode,
 							   bool hasIndex):
 	m_tableName(name),
 	m_txn(txn),
-    m_hasIndex(hasIndex),
-    m_keyMode(keyMode),
-    m_valueMode(valueMode)
+	m_hasIndex(hasIndex),
+	m_keyMode(keyMode),
+	m_valueMode(valueMode)
 
 {
 	bool isReadOnly = m_txn.is_readonly();
@@ -173,31 +173,31 @@ QByteArray CDocumentTable::GetDocument(const QByteArray &key)
 
 bool CDocumentTable::GetKey(quint64& key) const
 {
-    if (m_cursor.eof()){
-        return false;
-    }
-    mdbx::cursor::move_result result = m_cursor.current(false);
-    if (result.done){
-        key = result.key.as_int64();
-    }
+	if (m_cursor.eof()){
+		return false;
+	}
+	mdbx::cursor::move_result result = m_cursor.current(false);
+	if (result.done){
+		key = result.key.as_int64();
+	}
 
-    return true;
+	return true;
 }
 
 
 bool CDocumentTable::GetKey(QByteArray& key) const
 {
-    if (m_cursor.eof()){
-        return false;
-    }
-    mdbx::cursor::move_result result = m_cursor.current(false);
-    if (result.done){
-        std::string value;
+	if (m_cursor.eof()){
+		return false;
+	}
+	mdbx::cursor::move_result result = m_cursor.current(false);
+	if (result.done){
+		std::string value;
 		value = result.key.as_string();
-        key = QByteArray::fromStdString(value);
-    }
+		key = QByteArray::fromStdString(value);
+	}
 
-    return true;
+	return true;
 }
 
 
@@ -273,7 +273,7 @@ bool CDocumentTable::GetKey(quint64& key, const QByteArray &value)
 	bool ok = false;
 
 	if(value.isEmpty()){
-        mdbx::cursor::move_result result = m_cursor.current(false);
+		mdbx::cursor::move_result result = m_cursor.current(false);
 		if(result.done){
 			key = result.key.as_uint64();
 			ok = true;
@@ -362,10 +362,10 @@ QByteArray CDocumentTable::GetKeyBA(const QByteArray &value)
 
 	if(value.isEmpty()){
 		mdbx::cursor::move_result result = m_cursor.current(false);
-        if(result.done){
-            std::string valueStr;
-            valueStr = result.value.as_string();
-            key = QByteArray::fromStdString(valueStr);
+		if(result.done){
+			std::string keyStr;
+			keyStr = result.key.as_string();
+			key = QByteArray::fromStdString(keyStr);
 		}
 	}
 	else {//not empty value
@@ -373,9 +373,9 @@ QByteArray CDocumentTable::GetKeyBA(const QByteArray &value)
 			mdbx::slice valueSlice(value);
 			mdbx::cursor::move_result result = m_cursorIndex.find(valueSlice, false);
 			if(result.done){
-                std::string valueStr;
-                valueStr = result.value.as_string();
-                key = QByteArray::fromStdString(valueStr);
+				std::string valueStr;
+				valueStr = result.value.as_string();
+				key = QByteArray::fromStdString(valueStr);
 			}
 		}
 		else {
@@ -383,13 +383,15 @@ QByteArray CDocumentTable::GetKeyBA(const QByteArray &value)
 			if(result.done){
 				while(1){
 					QByteArray keyRead;
-					std::string valueRead;
+					QByteArray valueRead;
 					if (result.done){
-                        std::string valueStr;
-                        valueStr = result.value.as_string();
-                        keyRead = QByteArray::fromStdString(valueStr);
-						valueRead = result.value.as_string();
-						if(valueRead.data() == value){
+						std::string keyStr;
+						std::string valueStr;
+						keyStr = result.key.as_string();
+						valueStr = result.value.as_string();
+						keyRead = QByteArray::fromStdString(keyStr);
+						valueRead = QByteArray::fromStdString(valueStr);
+						if(valueRead == value){
 							key = keyRead;
 							break;
 						}
@@ -563,12 +565,12 @@ bool CDocumentTable::Exists(const QString& name)
 {
 	bool ok = true;
 
-    try{
-        mdbx::map_handle mapHandle = m_txn.open_map(name.toStdString(), m_keyMode, m_valueMode);
-    }
-    catch (...){
-        ok = false;
-    }
+	try{
+		mdbx::map_handle mapHandle = m_txn.open_map(name.toStdString(), m_keyMode, m_valueMode);
+	}
+	catch (...){
+		ok = false;
+	}
 
 	return ok;
 }
