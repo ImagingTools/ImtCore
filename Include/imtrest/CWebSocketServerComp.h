@@ -89,6 +89,7 @@ public Q_SLOTS:
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 	// reimplemented (imtcom::IConnectionStatusProvider)
 	virtual ConnectionStatus GetConnectionStatus() const override;

@@ -114,6 +114,18 @@ void CWebSocketServerComp::OnComponentCreated()
 }
 
 
+void CWebSocketServerComp::OnComponentDestroyed()
+{
+	StopServer();
+
+	m_timer.stop();
+
+	m_webSocketServerPtr.Reset();
+
+	BaseClass::OnComponentDestroyed();
+}
+
+
 // reimplemented (imtcom::IConnectionStatusProvider)
 
 imtcom::IConnectionStatusProvider::ConnectionStatus CWebSocketServerComp::GetConnectionStatus() const
@@ -129,12 +141,14 @@ bool CWebSocketServerComp::StartServer()
 	return EnsureServerStarted();
 }
 
+
 bool CWebSocketServerComp::StopServer()
 {
 	m_webSocketServerPtr->close();
 
 	return true;
 }
+
 
 IServer::ServerStatus CWebSocketServerComp::GetServerStatus() const
 {
