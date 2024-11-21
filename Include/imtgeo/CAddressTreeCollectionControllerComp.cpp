@@ -197,7 +197,8 @@ imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::ListObjects(const
 //            return nullptr;
 //        }
 
-        istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
+        istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
+                    objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 
         if (objectCollectionIterator != nullptr){
             int whileCount = 0;
