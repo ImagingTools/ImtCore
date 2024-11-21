@@ -51,7 +51,7 @@ void CWorker::ProcessRequest(const IRequest* request, const QByteArray& subComma
 				// QString responseData = responseDataModelPtr->ToJson();
 				if (!body.isEmpty() && object.value("type").toString() != "data"){
 					data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
-					.arg(object.value("id").toString()).arg(body).toUtf8();
+					.arg(object.value("id").toString()).arg(qPrintable(body)).toUtf8();
 				}
 				// responsePtr->
 			}
