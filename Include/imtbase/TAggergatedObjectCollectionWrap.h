@@ -60,6 +60,7 @@ public:
 	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
 	virtual imtbase::IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
+				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
@@ -232,11 +233,12 @@ inline imtbase::IObjectCollection* TAggergatedObjectCollectionWrap<BaseInterface
 
 template<class BaseInterface, class ObjectImpl>
 imtbase::IObjectCollectionIterator* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateObjectCollectionIterator(
+			const QByteArray& objectId,
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	return m_collection.CreateObjectCollectionIterator(offset, count, selectionParamsPtr);
+	return m_collection.CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
 }
 
 

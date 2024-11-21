@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
+#include <iqt/iqt.h>
 
 
 namespace imtgql
@@ -43,7 +43,7 @@ QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr,
 
 	QByteArray languageId = gqlContextPtr->GetLanguageId();
 
-	return imtbase::GetTranslation(translationManagerPtr, phrase, languageId, context);
+	return iqt::GetTranslation(translationManagerPtr, phrase, languageId, context);
 }
 
 

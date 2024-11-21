@@ -1,4 +1,4 @@
-#include "imtclientgql/CModelSubscriberComp.h"
+#include <imtclientgql/CModelSubscriberComp.h>
 
 
 // Qt includes

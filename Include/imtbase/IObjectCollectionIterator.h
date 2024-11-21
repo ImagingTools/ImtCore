@@ -46,6 +46,8 @@ public:
 	*/
 	virtual idoc::MetaInfoPtr GetDataMetaInfo() const = 0;
 
+	virtual idoc::MetaInfoPtr GetCollectionMetaInfo() const = 0;
+
 	/**
 		Get object data element meta information at the current iterator position for a given information-ID.
 	*/

@@ -222,6 +222,7 @@ IObjectCollection* CCachedObjectCollectionComp::CreateSubCollection(int offset, 
 
 
 imtbase::IObjectCollectionIterator* CCachedObjectCollectionComp::CreateObjectCollectionIterator(
+			const QByteArray& /*objectId*/,
 			int /*offset*/,
 			int /*count*/,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const

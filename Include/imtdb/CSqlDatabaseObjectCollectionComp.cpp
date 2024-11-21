@@ -426,6 +426,7 @@ bool CSqlDatabaseObjectCollectionComp::GetSubsetInfo(
 
 
 imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObjectCollectionIterator(
+			const QByteArray& objectId,
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
@@ -433,7 +434,7 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
 	if (m_objectDelegateCompPtr.IsValid() && m_dbEngineCompPtr.IsValid()){
-		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
+		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, offset, count, &filterParams);
 		if (objectSelectionQuery.isEmpty()){
 			return nullptr;
 		}

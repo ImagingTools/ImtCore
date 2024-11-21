@@ -116,10 +116,10 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UseCategory" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
+                        <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UseCode" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
+                        <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UseTimeStamp" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>

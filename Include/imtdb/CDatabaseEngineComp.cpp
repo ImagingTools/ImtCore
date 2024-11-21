@@ -477,7 +477,12 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 	retVal = maintainanceDb.open();
 	if (retVal){
 		QFile scriptFile(":/SQL/CreateDatabase.sql");
-		scriptFile.open(QFile::ReadOnly);
+		if (!scriptFile.open(QFile::ReadOnly)){
+			SendErrorMessage(0, QString("Database creation script '%1'could not be loaded").arg(scriptFile.fileName()));
+
+			return false;
+		}
+
 		QString createDatabaseQuery = scriptFile.readAll();
 		createDatabaseQuery.replace(":DatabaseName", GetDatabaseName());
 

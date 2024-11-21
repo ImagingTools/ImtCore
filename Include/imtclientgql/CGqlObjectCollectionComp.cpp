@@ -234,6 +234,7 @@ imtbase::IObjectCollection* CGqlObjectCollectionComp::CreateSubCollection(
 
 
 imtbase::IObjectCollectionIterator* CGqlObjectCollectionComp::CreateObjectCollectionIterator(
+			const QByteArray& /*objectId*/,
 			int /*offset*/,
 			int /*count*/,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const

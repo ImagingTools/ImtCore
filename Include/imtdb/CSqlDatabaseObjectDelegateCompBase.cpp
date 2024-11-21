@@ -169,12 +169,25 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectIdFromRecord(const QSqlR
 }
 
 
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectTypeIdFromRecord(const QSqlRecord& record) const
+{
+	QString columnId = qPrintable(*m_objectTypeIdColumnAttrPtr);
+
+	if (record.contains(columnId)){
+		return record.value(columnId).toByteArray();
+	}
+
+	return QByteArray();
+}
+
+
+
 bool CSqlDatabaseObjectDelegateCompBase::CreateObjectInfoFromRecord(
 			const QSqlRecord& record,
 			idoc::MetaInfoPtr& objectMetaInfoPtr,
 			idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const
 {
-	QByteArray typeId = GetObjectTypeId(GetObjectIdFromRecord(record));
+	QByteArray typeId = GetObjectTypeIdFromRecord(record);
 	objectMetaInfoPtr = CreateObjectMetaInfo(typeId);
 	if (objectMetaInfoPtr.IsValid()){
 		if (!SetObjectMetaInfoFromRecord(record, *objectMetaInfoPtr)){
@@ -304,6 +317,12 @@ bool CSqlDatabaseObjectDelegateCompBase::SetCollectionItemMetaInfoFromRecord(con
 		qlonglong revisionNumber = record.value("RevisionNumber").toLongLong();
 
 		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::MIT_REVISION, revisionNumber);
+	}
+
+	if (record.contains("Checksum")) {
+		int checksum = record.value("Checksum").toUInt();
+
+		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM, checksum);
 	}
 
 	return true;

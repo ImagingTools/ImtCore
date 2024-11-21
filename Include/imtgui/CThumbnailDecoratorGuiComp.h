@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 
 // Qt includes
@@ -221,6 +221,10 @@ private Q_SLOTS:
 	void on_NextPageButton_clicked();
 	void on_DashboardButton_clicked();
 	void on_PreferencesButton_clicked();
+	void UpdateCommands();
+
+Q_SIGNALS:
+	void EmitUpdateCommands();
 
 private:
 	void ShowLoginPage();
@@ -251,7 +255,6 @@ private:
 	void UpdateMargins();
 	void UpdateMaxSize();
 	void UpdateMinSize();
-	void UpdateCommands();
 	void UpdateAdditionalCommands();
 	int SetupCommandsMenu(const iqtgui::CHierarchicalCommand& command, QMenu& result, int& prevGroupId);
 	void UpdateMenuVisibility();

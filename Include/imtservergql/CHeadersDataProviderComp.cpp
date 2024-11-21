@@ -1,8 +1,8 @@
 #include <imtservergql/CHeadersDataProviderComp.h>
 
 
-// ImtCore includes
-#include <imtbase/imtbase.h>
+// ACF includes
+#include <iqt/iqt.h>
 
 
 namespace imtservergql
@@ -42,7 +42,7 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 
 		if (m_translationManagerCompPtr.IsValid()){
 			QByteArray context = "Attribute";
-			QString headerNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), headerName.toUtf8(), languageId, context);
+			QString headerNameTr = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), headerName.toUtf8(), languageId, context);
 			headerName = headerNameTr;
 		}
 

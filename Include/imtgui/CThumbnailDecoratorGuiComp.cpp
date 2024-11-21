@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QtDebug>
+#include <QtCore/QThread>
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QGuiApplication>
@@ -179,7 +180,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	connect(PreferencesButton, &QToolButton::clicked, this, &CThumbnailDecoratorGuiComp::on_PreferencesButton_clicked);
+	connect(this, &CThumbnailDecoratorGuiComp::EmitUpdateCommands, this, &CThumbnailDecoratorGuiComp::UpdateCommands, Qt::QueuedConnection);
 
 	PreferencesButton->setVisible(m_preferencesDialogCompPtr.IsValid());
 
@@ -669,7 +670,6 @@ void CThumbnailDecoratorGuiComp::OnCheckIsFullScreenTimer()
 	else{
 		ExitButton->setVisible(false);
 	}
-
 }
 
 
@@ -1531,7 +1531,14 @@ CThumbnailDecoratorGuiComp::CommandsObserver::CommandsObserver(CThumbnailDecorat
 
 void CThumbnailDecoratorGuiComp::CommandsObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	m_parent.UpdateCommands();
+	QCoreApplication* applicationPtr = QCoreApplication::instance();
+	bool isMainThread = (applicationPtr == NULL) || (QThread::currentThread() == applicationPtr->thread());
+	if (!isMainThread){
+		Q_EMIT m_parent.EmitUpdateCommands();
+	}
+	else{
+		m_parent.UpdateCommands();
+	}
 }
 
 

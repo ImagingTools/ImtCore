@@ -135,8 +135,8 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInf
 
 
 imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetInfo(
-	const imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CSerializableObjectCollectionControllerComp");
@@ -268,11 +268,11 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
 
 
 istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObjectFromRequest(
-	const imtgql::CGqlRequest& gqlRequest,
-	QByteArray& objectId,
-	QString& /*name*/,
-	QString& /*description*/,
-	QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QByteArray& /*objectId*/,
+			QString& /*name*/,
+			QString& /*description*/,
+			QString& errorMessage) const
 {
 	if (!m_objectFactCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectFactory' was not set", "CSerializableObjectCollectionControllerComp");
@@ -313,8 +313,8 @@ istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObjectFrom
 
 
 imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObjects(
-	const imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'm_objectCollectionCompPtr' was not set", "CSerializableObjectCollectionControllerComp");
@@ -485,7 +485,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElement
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	dataModelPtr->SetData("itemIds", elementIds.join(';'));
+	dataModelPtr->SetData("itemIds", elementIds.toList().join(';'));
 
 	return rootModelPtr.PopPtr();
 }

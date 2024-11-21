@@ -26,11 +26,11 @@ CSqlDatabaseObjectCollectionIterator::CSqlDatabaseObjectCollectionIterator(
 
 QSqlRecord CSqlDatabaseObjectCollectionIterator::GetRecord()
 {
-    if(m_currentIndex > -1){
-        return m_records[m_currentIndex];
-    }
+	if (m_currentIndex > -1){
+		return m_records[m_currentIndex];
+	}
 
-    return QSqlRecord();
+	return QSqlRecord();
 }
 
 
@@ -73,11 +73,11 @@ QByteArray CSqlDatabaseObjectCollectionIterator::GetObjectId() const
 
 QByteArray CSqlDatabaseObjectCollectionIterator::GetObjectTypeId() const
 {
-	if (m_databaseDelegate == nullptr){
-		return QByteArray();
+	if (m_databaseDelegate == nullptr || m_currentIndex < 0 || m_currentIndex >= m_records.count()){
+		return false;
 	}
 
-	return m_databaseDelegate->GetObjectTypeId(GetObjectId());
+	return m_databaseDelegate->GetObjectTypeIdFromRecord(m_records[m_currentIndex]);
 }
 
 
@@ -108,6 +108,21 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionIterator::GetDataMetaInfo() const
 	m_databaseDelegate->CreateObjectInfoFromRecord(m_records[m_currentIndex], objectMetaInfoPtr, collectionMetaInfoPtr);
 
 	return objectMetaInfoPtr;
+}
+
+
+idoc::MetaInfoPtr CSqlDatabaseObjectCollectionIterator::GetCollectionMetaInfo() const
+{
+	if (m_databaseDelegate == nullptr || m_currentIndex < 0 || m_currentIndex >= m_records.count()){
+		return idoc::MetaInfoPtr();
+	}
+
+	idoc::MetaInfoPtr objectMetaInfoPtr;
+	idoc::MetaInfoPtr collectionMetaInfoPtr;
+
+	m_databaseDelegate->CreateObjectInfoFromRecord(m_records[m_currentIndex], objectMetaInfoPtr, collectionMetaInfoPtr);
+
+	return collectionMetaInfoPtr;
 }
 
 

@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMutex>
+
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 
@@ -34,10 +37,17 @@ public:
 				const imtgql::IGqlContext::Headers& headers,
 				QString& errorMessage) const override;
 
+
+protected:
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
 private:
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
+
+	mutable QMutex m_mutex;
 };
 
 

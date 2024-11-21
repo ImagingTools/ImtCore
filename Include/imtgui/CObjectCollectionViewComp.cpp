@@ -26,6 +26,7 @@
 #include <iwidgets/iwidgets.h>
 
 // IntCore includes
+#include <imtbase/IObjectCollectionIterator.h>
 #include <imtgui/ICollectionViewDelegate.h>
 
 
@@ -1379,11 +1380,21 @@ void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjec
 	m_columns = m_parent.GetMetaInfoHeaders(m_parent.m_currentTypeId);
 
 	if (m_totalRowCount > 0){
-		imtbase::IObjectCollection::Ids elementIds = collection.GetElementIds(0, 1, &filterParams);
-		if (!elementIds.isEmpty()){
-			QByteArray itemTypeId = collection.GetObjectTypeId(elementIds.front());
+		istd::TDelPtr<imtbase::IObjectCollectionIterator> collectionIterator = collection.CreateObjectCollectionIterator(QByteArray(), 0, 1, &filterParams);
+		if (collectionIterator.IsValid()){
+			if (collectionIterator->Next()){
+				QByteArray itemTypeId = collectionIterator->GetObjectTypeId();
 
-			m_metaInfo = m_parent.GetMetaInfo(elementIds.front(), itemTypeId);
+				m_metaInfo = m_parent.GetMetaInfo(collectionIterator->GetObjectId(), itemTypeId);
+			}
+		}
+		else{
+			imtbase::IObjectCollection::Ids elementIds = collection.GetElementIds(0, 1, &filterParams);
+			if (!elementIds.isEmpty()){
+				QByteArray itemTypeId = collection.GetObjectTypeId(elementIds.front());
+
+				m_metaInfo = m_parent.GetMetaInfo(elementIds.front(), itemTypeId);
+			}
 		}
 	}
 
@@ -1408,11 +1419,12 @@ void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjec
 
 			beginInsertRows(QModelIndex(), 0, m_batchSize - 1);
 
-			imtbase::ICollectionInfo::Ids fetchedIds = collection.GetElementIds(pageIndex * m_batchSize, m_batchSize, &filterParams);
-			if (!fetchedIds.isEmpty()){
-				m_fetchedRowCount = fetchedIds.count();
+			istd::TDelPtr<imtbase::IObjectCollectionIterator> collectionIterator = collection.CreateObjectCollectionIterator(QByteArray(), pageIndex * m_batchSize, m_batchSize, &filterParams);
+			Q_ASSERT(collectionIterator.IsValid());
 
-				m_ids = fetchedIds;
+			while (collectionIterator->Next()){
+				++m_fetchedRowCount;
+				m_ids += collectionIterator->GetObjectId();
 			}
 
 			Q_ASSERT(m_ids.count() == m_fetchedRowCount);
@@ -1709,11 +1721,21 @@ void CObjectCollectionViewComp::TableModel::fetchMore(const QModelIndex& parent)
 	iprm::CParamsSet filterParams;
 	filterParams.SetEditableParameter("Filter", &m_filter);
 
-	imtbase::ICollectionInfo::Ids fetchedIds = collectionPtr->GetElementIds(start, itemsToFetch, &filterParams);
-	if (!fetchedIds.isEmpty()){
-		m_fetchedRowCount += fetchedIds.count();
+	istd::TDelPtr<imtbase::IObjectCollectionIterator> collectionIterator = collectionPtr->CreateObjectCollectionIterator(QByteArray(), start, itemsToFetch, &filterParams);
+	
+	if (collectionIterator.IsValid()){
+		while (collectionIterator->Next()){
+			++m_fetchedRowCount;
+			m_ids += collectionIterator->GetObjectId();
+		}
+	}
+	else{
+		imtbase::ICollectionInfo::Ids fetchedIds = collectionPtr->GetElementIds(start, itemsToFetch, &filterParams);
+		if (!fetchedIds.isEmpty()){
+			m_fetchedRowCount += fetchedIds.count();
 
-		m_ids += fetchedIds;
+			m_ids += fetchedIds;
+		}
 	}
 
 	Q_ASSERT(m_ids.count() == m_fetchedRowCount);

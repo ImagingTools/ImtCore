@@ -612,6 +612,7 @@ imtbase::IObjectCollection* CFileCollectionCompBase::CreateSubCollection(
 
 
 imtbase::IObjectCollectionIterator* CFileCollectionCompBase::CreateObjectCollectionIterator(
+			const QByteArray& /*objectId*/,
 			int /*offset*/,
 			int /*count*/,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const

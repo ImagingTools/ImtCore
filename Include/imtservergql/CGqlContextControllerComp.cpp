@@ -27,13 +27,11 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 			const imtgql::IGqlContext::Headers& headers,
 			QString& errorMessage) const
 {
-	if (!m_sessionCollectionCompPtr.IsValid()){
-		Q_ASSERT(false);
-		return nullptr;
-	}
+	QMutexLocker lock(&m_mutex);
 
-	if (!m_userCollectionCompPtr.IsValid()){
+	if (!m_sessionCollectionCompPtr.IsValid() || !m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT(false);
+
 		return nullptr;
 	}
 
@@ -114,6 +112,24 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	gqlContextPtr->SetHeaders(headers);
 
 	return gqlContextPtr;
+}
+
+
+// protected methods
+
+// reimplemented (icomp::CComponentBase)
+
+void CGqlContextControllerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	QMutexLocker lock(&m_mutex);
+
+	m_sessionCollectionCompPtr.EnsureInitialized();
+	m_userCollectionCompPtr.EnsureInitialized();
+
+	Q_ASSERT(m_sessionCollectionCompPtr.IsValid());
+	Q_ASSERT(m_userCollectionCompPtr.IsValid());
 }
 
 

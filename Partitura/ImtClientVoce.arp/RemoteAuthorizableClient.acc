@@ -26,6 +26,9 @@
                     <AttributeInfo Id="SubscriptionManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Subscription"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>

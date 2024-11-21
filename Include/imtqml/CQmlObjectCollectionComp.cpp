@@ -117,7 +117,7 @@ imtqml::CQmlObjectCollectionIterator* CQmlObjectCollectionComp::CreateObjectColl
 		if (!selectionParams.isEmpty()){
 			filters = GetFilters(selectionParams);
 		}
-		imtbase::IObjectCollectionIterator* iterator = m_objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, filters);
+		imtbase::IObjectCollectionIterator* iterator = m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, filters);
 		if (iterator != nullptr){
 			return new CQmlObjectCollectionIterator(iterator);
 		}

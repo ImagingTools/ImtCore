@@ -47,6 +47,7 @@ public:
 				int count = -1,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual QByteArray GetObjectIdFromRecord(const QSqlRecord& record) const override;
+	virtual QByteArray GetObjectTypeIdFromRecord(const QSqlRecord& record) const override;
 	virtual bool CreateObjectInfoFromRecord(
 				const QSqlRecord& record,
 				idoc::MetaInfoPtr& objectMetaInfoPtr,

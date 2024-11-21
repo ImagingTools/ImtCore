@@ -78,6 +78,7 @@ public:
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
+				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;

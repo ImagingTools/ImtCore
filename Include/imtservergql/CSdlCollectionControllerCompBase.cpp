@@ -48,7 +48,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 		pagesCount = 1;
 	}
 
-	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
+	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 	if (!objectCollectionIterator.IsValid()){
 		errorMessage = QString("Object collection iterator could not be created");
 

@@ -74,3 +74,6 @@ inline QVariant CGqlObject::operator[](const QByteArray& fieldId) const
 } // namespace imtgql
 
 
+Q_DECLARE_METATYPE(const imtgql::CGqlObject*)
+
+

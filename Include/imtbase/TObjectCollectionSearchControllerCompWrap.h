@@ -67,7 +67,7 @@ const imtbase::ISearchResults* TObjectCollectionSearchControllerCompWrap<ObjectC
 
 	imtbase::CSearchResults* searchResultsPtr = new imtbase::CSearchResults();
 
-	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(BaseClass::CreateObjectCollectionIterator(0, -1, &paramsSet));
+	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(BaseClass::CreateObjectCollectionIterator(QByteArray(), 0, -1, &paramsSet));
 	if (objectCollectionIterator != nullptr){
 		while (objectCollectionIterator->Next()){
 			QByteArray objectId = objectCollectionIterator->GetObjectId();

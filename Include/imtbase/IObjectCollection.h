@@ -199,6 +199,7 @@ public:
 		\param selectionParamsPtr	[optional] Additional parameters for filtering/ordering elements.
 	*/
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
+				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;

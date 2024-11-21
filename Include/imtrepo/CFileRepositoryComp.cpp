@@ -503,12 +503,13 @@ imtbase::IObjectCollection* CFileRepositoryComp::CreateSubCollection(
 
 
 imtbase::IObjectCollectionIterator* CFileRepositoryComp::CreateObjectCollectionIterator(
+			const QByteArray& objectId,
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	if (m_documentInfoCollectionCompPtr.IsValid()){
-		return m_documentInfoCollectionCompPtr->CreateObjectCollectionIterator(offset, count, selectionParamsPtr);
+		return m_documentInfoCollectionCompPtr->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
 	}
 
 	return nullptr;

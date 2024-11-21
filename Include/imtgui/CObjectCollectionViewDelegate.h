@@ -104,7 +104,7 @@ protected:
 		FOT_IMPORT
 	};
 
-	bool IsNameUnique(const QString& name) const;
+	bool IsNameUnique(const QString& name, const QStringList& existingNames) const;
 	QString GetUniqueName(const QString& name) const;
 
 	virtual void SetupSummaryInformation();

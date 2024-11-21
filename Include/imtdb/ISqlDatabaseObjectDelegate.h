@@ -25,6 +25,11 @@ public:
 	virtual QByteArray GetObjectIdFromRecord(const QSqlRecord& record) const = 0;
 
 	/**
+		Get type-ID of the object in the database from the SQL record.
+	*/
+	virtual QByteArray GetObjectTypeIdFromRecord(const QSqlRecord& record) const = 0;
+
+	/**
 		Create object meta-informations based on the SQL record.
 	*/
 	virtual bool CreateObjectInfoFromRecord(
