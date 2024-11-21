@@ -61,11 +61,30 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 		FeedStream(ofStream);
 	}
 
+
+	// add method implementation
+	ofStream << QStringLiteral("bool C");
+	ofStream << sdlType.GetName();
+	ofStream << QStringLiteral("::WriteToGraphQlObject(const ");
+	ofStream << GetTypeVerstion(sdlType);
+	ofStream << ("& object, ::imtgql::CGqlObject& request)\n{");
+	FeedStream(ofStream, 1, false);
+
+	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
+		AddFieldWriteToRequestCode(ofStream, field);
+		FeedStream(ofStream, 1, false);
+	}
+	ofStream << QStringLiteral("\treturn true;\n}");
+	FeedStream(ofStream, 3);
+
+
+
+
 	// read method implementation
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::ReadFromGraphQlObject(C");
-	ofStream << sdlType.GetName();
+	ofStream << QStringLiteral("::ReadFromGraphQlObject(");
+	ofStream << GetTypeVerstion(sdlType);
 	ofStream << QStringLiteral("& object, const ::imtgql::CGqlObject& request)\n{");
 	FeedStream(ofStream, 1, false);
 
@@ -76,21 +95,7 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 	ofStream << QStringLiteral("\treturn true;\n}");
 	FeedStream(ofStream, 3);
 
-	// write method implementation
-	ofStream << QStringLiteral("bool C");
-	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::WriteToGraphQlObject(::imtgql::CGqlObject& request) const");
-	FeedStream(ofStream, 1, false);
-	ofStream << '{';
-	FeedStream(ofStream, 1, false);
 
-	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
-		AddFieldWriteToRequestCode(ofStream, field);
-		FeedStream(ofStream, 1, false);
-	}
-	ofStream << QStringLiteral("\treturn true;\n}");
-
-	FeedStream(ofStream, 3);
 
 	return true;
 }
