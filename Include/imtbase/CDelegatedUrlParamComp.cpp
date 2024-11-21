@@ -15,7 +15,9 @@ const QUrl& CDelegatedUrlParamComp::GetUrl() const
 		return m_urlParamCompPtr->GetUrl();
 	}
 
-	return QUrl();
+	static QUrl emptyUrl;
+
+	return emptyUrl;
 }
 
 
