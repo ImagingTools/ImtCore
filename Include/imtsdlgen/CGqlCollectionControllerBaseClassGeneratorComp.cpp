@@ -24,6 +24,25 @@ namespace imtsdlgen
 {
 
 
+// static variables
+const QMap<imtsdl::CSdlDocumentType::OperationType, QString> CGqlCollectionControllerBaseClassGeneratorComp::s_nonTrivialOperationMethodsMap = {
+	std::make_pair(imtsdl::CSdlDocumentType::OT_UPDATE_COLLECTION,		"UpdateCollection"),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_RENAME,					"RenameObject"),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_SET_DESCRIPTION,		"SetObjectDescription"),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_HEADERS,				"GetHeaders"),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_INFO,					"GetInfo"),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_METAINFO,				"GetMetaInfo"),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_DATAMETAINFO,			"GetDataMetaInfo"),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_ELEMENT_HISTORY,		"GetObjectHistory"),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_IMPORT,					"ImportObject"),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_EXPORT,					"ExportObject")
+};
+
+
+// public methods
+
+// reimplemented(iproc::IProcessor)
+
 int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* /*inputPtr*/,
@@ -337,12 +356,14 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 		FeedStreamHorizontally(ifStream, 1);
 		ifStream << QStringLiteral("virtual bool SetupGqlItem(const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
 		FeedStream(ifStream, 1, false);
+		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_LIST);
 	}
 
 	if (operationsList.contains(imtsdl::CSdlDocumentType::OT_GET)){
 		FeedStreamHorizontally(ifStream, 1);
 		ifStream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, QString& errorMessage) const override;");
 		FeedStream(ifStream, 1, false);
+		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_GET);
 	}
 
 	if (	operationsList.contains(imtsdl::CSdlDocumentType::OT_UPDATE) ||
@@ -351,7 +372,24 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 		FeedStreamHorizontally(ifStream, 1);
 		ifStream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const override;");
 		FeedStream(ifStream, 1, false);
+		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_UPDATE);
+		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_INSERT);
 	}
+
+	// remove all collection trtivial types
+	operationsList.removeAll(imtsdl::CSdlDocumentType::OT_DELETE);
+	operationsList.removeAll(imtsdl::CSdlDocumentType::OT_ELEMENT_IDS);
+	operationsList.removeAll(imtsdl::CSdlDocumentType::OT_ELEMENTS_COUNT);
+
+	// add methods for special cases (non-trivial collection methods)
+	for (const imtsdl::CSdlDocumentType::OperationType& operationType: operationsList){
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("virtual ");
+		AddBaseMethodDeclarationForOperationType(ifStream, operationType);
+		ifStream << QStringLiteral(" override;");
+		FeedStream(ifStream, 1, false);
+	}
+
 
 	// protected section
 	// definition of pure virtual methods (to be reimplemented)
@@ -408,6 +446,9 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(cons
 
 	AddCollectionMethodsImplForDocument(ifStream, sdlDocumentType);
 
+	AddSpecialMethodImplCodeForDocument(ifStream, sdlDocumentType);
+
+
 	// end of namespace
 	FeedStream(ifStream, 2, false);
 	if (!sdlNamespace.isEmpty()){
@@ -429,6 +470,46 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AbortCurrentProcessing()
 
 	m_headerFilePtr->remove();
 	m_sourceFilePtr->remove();
+}
+
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodDeclarationForOperationType(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const imtsdl::CSdlRequest& sdlRequest)
+{
+	if (!s_nonTrivialOperationMethodsMap.contains(operationType)){
+		SendCriticalMessage(0, "Unexpected type");
+		I_CRITICAL();
+
+		return;
+	}
+
+	QString requestCalssName = sdlRequest.GetName();
+	requestCalssName[0] = requestCalssName[0].toUpper();
+	QString functionName = s_nonTrivialOperationMethodsMap[operationType];
+	functionName.prepend(QStringLiteral(" On"));
+
+	stream << 'C' << GetCapitalizedValue(sdlRequest.GetOutputArgument().GetType());
+	stream << functionName;
+
+	stream << QStringLiteral("(const C");
+	stream << requestCalssName;
+	stream << QStringLiteral("GqlRequest& ");
+	stream << GetDecapitalizedValue(requestCalssName);
+	stream << QStringLiteral("GqlRequest, QString& errorMessage) const");
+}
+
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddBaseMethodDeclarationForOperationType(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType)
+{
+	if (!s_nonTrivialOperationMethodsMap.contains(operationType)){
+		SendCriticalMessage(0, "Unexpected type");
+		I_CRITICAL();
+
+		return;
+	}
+
+	stream << QStringLiteral("::imtbase::CTreeItemModel* ");
+	stream << s_nonTrivialOperationMethodsMap[operationType];
+	stream << QStringLiteral("(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const");
 }
 
 
@@ -480,6 +561,16 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 				AddMethodForDocument(stream, operation.value(), operationType, documentClassName, hIndents);
 				implementedGetRequests << sdlRequest;
 			}
+		}
+		else if (	operationType != imtsdl::CSdlDocumentType::OT_UPDATE &&
+					operationType != imtsdl::CSdlDocumentType::OT_INSERT &&
+					operationType != imtsdl::CSdlDocumentType::OT_GET &&
+					operationType != imtsdl::CSdlDocumentType::OT_LIST &&
+					operationType != imtsdl::CSdlDocumentType::OT_DELETE &&
+					operationType != imtsdl::CSdlDocumentType::OT_ELEMENT_IDS &&
+					operationType != imtsdl::CSdlDocumentType::OT_ELEMENTS_COUNT)
+		{
+			AddMethodForDocument(stream, operation.value(), operationType, documentClassName, hIndents);
 		}
 	}
 }
@@ -574,33 +665,14 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 					operationType == imtsdl::CSdlDocumentType::OT_INFO ||
 					operationType == imtsdl::CSdlDocumentType::OT_METAINFO ||
 					operationType == imtsdl::CSdlDocumentType::OT_DATAMETAINFO ||
-					operationType == imtsdl::CSdlDocumentType::OT_ELEMENTS_COUNT ||
-					operationType == imtsdl::CSdlDocumentType::OT_ELEMENT_IDS ||
 					operationType == imtsdl::CSdlDocumentType::OT_ELEMENT_HISTORY ||
 					operationType == imtsdl::CSdlDocumentType::OT_IMPORT ||
 					operationType == imtsdl::CSdlDocumentType::OT_EXPORT)
 	{
-		QString requestCalssName = sdlRequest.GetName();
-		requestCalssName[0].toUpper();
-		QString functionName = imtsdl::CSdlDocumentType::ToString(operationType);
-		functionName[0].toUpper();
-		functionName.prepend(QStringLiteral("On"));
-
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("virtual ");
-		stream << 'C' << sdlRequest.GetOutputArgument().GetType();
-		stream << functionName;
-
-		FeedStreamHorizontally(stream, hIndents + 3);
-		stream << QStringLiteral("const C");
-		stream << requestCalssName;
-		stream << QStringLiteral("& ");
-		stream << GetDecapitalizedValue(requestCalssName);
-		stream << QStringLiteral(", ");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents + 3);
-		stream << QStringLiteral("QString& errorMessage) const = 0;");
+		AddMethodDeclarationForOperationType(stream, operationType, sdlRequest);
+		stream << QStringLiteral(" = 0;");
 		FeedStream(stream, 1, false);
 	}
 
@@ -608,6 +680,129 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 		SendCriticalMessage(0, "Unexpected request method");
 		I_CRITICAL();
 	}
+}
+
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialRequest(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '/' << '/' << ' ' << s_nonTrivialOperationMethodsMap[operationType];
+	FeedStream(stream, 1, false);
+
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	const QString requestClassName = sdlRequest.GetName() + QStringLiteral("GqlRequest");
+
+	// [1] command ID check
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (commandId == C");
+	stream << requestClassName;
+	stream << QStringLiteral("::GetCommandId()){");
+	FeedStream(stream, 1, false);
+
+	// [1] create SDL request variable
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << 'C' <<  requestClassName;
+	stream << ' ' << GetDecapitalizedValue(requestClassName);
+	stream << QStringLiteral("(gqlRequest);");
+	FeedStream(stream, 1, false);
+
+	// [1->2] SDL request validate
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (!");
+	stream << GetDecapitalizedValue(requestClassName);
+	stream << QStringLiteral(".IsValid()){");
+	FeedStream(stream, 1, false);
+
+	// [2] add error message if SDL request is not valid
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected request for command-ID: '%1'\").arg(qPrintable(commandId));");
+	FeedStream(stream, 1, false);
+
+	// [2] add log message
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
+	FeedStream(stream, 2, false);
+
+	// [2] return
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("return nullptr;");
+	FeedStream(stream, 1, false);
+
+	// [2->1] end of SDL request validate
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+	FeedStream(stream, 2, false);
+
+	// [1] create payload variable by calling reimplemented method
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << OptListConvertTypeWithNamespace(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
+	stream << QStringLiteral(" replyPayload = On");
+	stream << s_nonTrivialOperationMethodsMap[operationType] << '(';
+	stream << GetDecapitalizedValue(requestClassName);
+	stream << QStringLiteral(", errorMessage);");
+	FeedStream(stream, 1, false);
+
+	// [1->2] ensure, the derived call didn't return an error
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (!errorMessage.isEmpty()){");
+	FeedStream(stream, 1, false);
+
+	// [2] send error message
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("SendErrorMessage(0, QString(\"The derived call [");
+	stream << QStringLiteral("On") << s_nonTrivialOperationMethodsMap[operationType];
+	stream << QStringLiteral("] returned an error: %1\").arg(errorMessage));");
+	FeedStream(stream, 2, false);
+
+	// [2] return
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("return nullptr;");
+	FeedStream(stream, 1, false);
+
+	// [2->1] end of derived error checks
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+	FeedStream(stream, 2, false);
+
+	// [1] write payload variable in model and create variable, to check if it success
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);");
+	FeedStream(stream, 1, false);
+
+	// [1->2] check if payload write to TreeModel is failed
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (!isModelCreated){");
+	FeedStream(stream, 1, false);
+
+	// [2] set error message
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("errorMessage = QString(\"Internal error. Unable to create response for command-ID: '%1'\").arg(qPrintable(commandId));");
+	FeedStream(stream, 1, false);
+
+	// [2] add log message
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("SendCriticalMessage(0, errorMessage);");
+	FeedStream(stream, 2, false);
+
+	// [2] return
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("return nullptr;");
+	FeedStream(stream, 1, false);
+
+	// [2->1] end of payload write to TreeModel checks
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+	FeedStream(stream, 2, false);
+
+	// [1] return pop ptr
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return modelPtr.PopPtr();");
+	FeedStream(stream, 1, false);
+
+	// end of section
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 2, false);
 }
 
 
@@ -646,10 +841,22 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestCheck(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType)
 {
 	static QMap<imtsdl::CSdlDocumentType::OperationType, QString> operationsALiasList({
-						std::make_pair(imtsdl::CSdlDocumentType::OT_GET, QStringLiteral("OT_GET")),
-						std::make_pair(imtsdl::CSdlDocumentType::OT_INSERT, QStringLiteral("OT_NEW")),
-						std::make_pair(imtsdl::CSdlDocumentType::OT_UPDATE, QStringLiteral("OT_UPDATE")),
-						std::make_pair(imtsdl::CSdlDocumentType::OT_LIST, QStringLiteral("OT_LIST"))
+		std::make_pair(imtsdl::CSdlDocumentType::OT_GET,					QStringLiteral("OT_GET")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_INSERT,					QStringLiteral("OT_NEW")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_UPDATE,					QStringLiteral("OT_UPDATE")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_LIST,					QStringLiteral("OT_LIST")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_UPDATE_COLLECTION,		QStringLiteral("OT_UPDATE_COLLECTION")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_RENAME,					QStringLiteral("OT_RENAME")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_SET_DESCRIPTION,		QStringLiteral("OT_SET_DESCRIPTION")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_HEADERS,				QStringLiteral("OT_HEADERS")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_INFO,					QStringLiteral("OT_INFO")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_METAINFO,				QStringLiteral("OT_METAINFO")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_DATAMETAINFO,			QStringLiteral("OT_DATAMETAINFO")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_ELEMENTS_COUNT,			QStringLiteral("OT_ELEMENTS_COUNT")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_ELEMENT_IDS,			QStringLiteral("OT_ELEMENT_IDS")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_ELEMENT_HISTORY,		QStringLiteral("OT_ELEMENT_HISTORY")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_IMPORT,					QStringLiteral("OT_IMPORT")),
+		std::make_pair(imtsdl::CSdlDocumentType::OT_EXPORT,					QStringLiteral("OT_EXPORT"))
 	});
 
 	QMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operations = sdlDocumentType.GetOperationsList();
@@ -730,20 +937,35 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 			uint hIndents)
 {
 	// declare method
-	FeedStreamHorizontally(stream, hIndents);
 
 	// a) type
 	switch (operationType){
 	case imtsdl::CSdlDocumentType::OT_GET:
 	case imtsdl::CSdlDocumentType::OT_LIST:
+		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("bool ");
 		break;
 	case imtsdl::CSdlDocumentType::OT_UPDATE:
 	case imtsdl::CSdlDocumentType::OT_INSERT:
+		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("istd::IChangeable* ");
 		break;
 	case imtsdl::CSdlDocumentType::OT_DELETE:
-		// nothing todo
+	case imtsdl::CSdlDocumentType::OT_ELEMENT_IDS:
+	case imtsdl::CSdlDocumentType::OT_ELEMENTS_COUNT:
+		// nothing todo (only basic implementation)
+	case imtsdl::CSdlDocumentType::OT_UPDATE_COLLECTION:
+	case imtsdl::CSdlDocumentType::OT_RENAME:
+	case imtsdl::CSdlDocumentType::OT_SET_DESCRIPTION:
+	case imtsdl::CSdlDocumentType::OT_HEADERS:
+	case imtsdl::CSdlDocumentType::OT_INFO:
+	case imtsdl::CSdlDocumentType::OT_METAINFO:
+	case imtsdl::CSdlDocumentType::OT_DATAMETAINFO:
+	case imtsdl::CSdlDocumentType::OT_ELEMENT_HISTORY:
+	case imtsdl::CSdlDocumentType::OT_IMPORT:
+	case imtsdl::CSdlDocumentType::OT_EXPORT:
+		// special non-trivial methods
+		return;
 		break;
 	default:
 		SendCriticalMessage(0, QString("Unexpected type: %1").arg(QString::number(operationType)));
@@ -766,6 +988,8 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		stream << QStringLiteral("CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const");
 		break;
 	default:
+		SendCriticalMessage(0, QString("Unexpected type: %1").arg(QString::number(operationType)));
+		I_CRITICAL();
 		break;
 	}
 
@@ -830,7 +1054,87 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 3, false);
+}
 
+
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCodeForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType)
+{
+	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
+
+	QMultiMap<imtsdl::CSdlDocumentType::OperationType, ImplGenerationInfo> requestInfoMultiMap;
+	QMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> requestMap(sdlDocumentType.GetOperationsList());
+	const QString typeClassName = sdlDocumentType.GetReferenceType().GetName();
+	for (auto mapIter = requestMap.cbegin(); mapIter != requestMap.cend(); ++mapIter){
+		if (s_nonTrivialOperationMethodsMap.contains(mapIter.key())){
+			requestInfoMultiMap.insert(mapIter.key(), ImplGenerationInfo(mapIter.value(), typeClassName));
+		}
+	}
+
+	for (const imtsdl::CSdlDocumentType& documentType: sdlDocumentType.GetSubtypes()){
+		QMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> subtypeRequestMap(documentType.GetOperationsList());
+		const QString subtypeClassName = documentType.GetReferenceType().GetName();
+		for (auto mapIter = subtypeRequestMap.cbegin(); mapIter != subtypeRequestMap.cend(); ++mapIter){
+			if (s_nonTrivialOperationMethodsMap.contains(mapIter.key())){
+			requestInfoMultiMap.insert(mapIter.key(), ImplGenerationInfo(mapIter.value(), subtypeClassName));
+			}
+		}
+	}
+
+	QList<imtsdl::CSdlDocumentType::OperationType> remainingOperations(requestInfoMultiMap.uniqueKeys());
+	QMutableListIterator remainingOperationsIter(remainingOperations);
+	while(remainingOperationsIter.hasNext()){
+		imtsdl::CSdlDocumentType::OperationType operationType = remainingOperationsIter.next();
+		const QList<ImplGenerationInfo> requestList = requestInfoMultiMap.values(operationType);
+		AddSpecialMethodImplCode(stream, operationType, requestList, className);
+		remainingOperationsIter.remove();
+	}
+}
+
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCode(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, uint hIndents)
+{
+	// declare method
+	AddBaseMethodDeclarationForOperationType(stream, operationType);
+	FeedStream(stream, 1, false);
+
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	for (const ImplGenerationInfo& requestInfo: requestList){
+		/// create a carrier model GQL spec	\link https://spec.graphql.org/draft/#sec-Response-Format
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);");
+		FeedStream(stream, 1, false);
+
+		/// \todo add errors model and don't forget to fill it	\link https://spec.graphql.org/draft/#sec-Errors
+
+		// create dataModel - child of a carrier model
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel(\"data\");");
+		FeedStream(stream, 2, false);
+
+		AddImplCodeForSpecialRequest(stream, requestInfo.request, operationType, hIndents);
+	}
+
+	// create default section
+	// add error message
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command-ID: '%1'\").arg(qPrintable(commandId));");
+	FeedStream(stream, 1, false);
+
+	// send log message
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
+	FeedStream(stream, 2, false);
+
+	// return
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("return nullptr;");
+	FeedStream(stream, 1, false);
+
+	stream << '}';
+	FeedStream(stream, 3, false);
 }
 
 

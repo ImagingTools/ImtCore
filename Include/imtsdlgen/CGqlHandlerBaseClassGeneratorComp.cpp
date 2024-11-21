@@ -547,7 +547,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 	FeedStream(stream, 2, false);
 
 	// [1] create payload variable by calling reimplemented method
-	FeedStreamHorizontally(stream, hIndents + 1);	
+	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << OptListConvertTypeWithNamespace(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
 	stream << QStringLiteral(" replyPayload = On");
 	stream << sdlRequest.GetName() << '(';
