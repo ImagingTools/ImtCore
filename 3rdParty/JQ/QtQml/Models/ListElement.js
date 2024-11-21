@@ -4,4 +4,6 @@ class ListElement extends QtObject {
  
 }
 
+ListElement.initialize()
+
 module.exports = ListElement

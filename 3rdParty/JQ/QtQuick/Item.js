@@ -116,16 +116,15 @@ class Item extends QtObject {
         'Keys.yesPressed': {type:Signal, slotName: 'Keys.onYesPressed', args: ['event'] },
     })
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, model, properties, ...args)
-        let self = proxy.__self 
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
 
-        let dom = self.__getDOM()
+        let dom = obj.__getDOM()
         dom.classList.add('Item')
-        dom.qml = proxy
-        self.__connectDOM(this.parent)
+        dom.qml = obj
+        obj.__connectDOM(this.parent)
 
-        return proxy
+        return obj
     }
 
     __removeChild(child){
@@ -261,22 +260,22 @@ class Item extends QtObject {
 
     onAXChanged(){
         if(this.AX !== this.x) 
-        this.__getObject('x').__resetForce(this.AX)
+        this.__getDataQml('x').__resetForce(this.AX)
     }
 
     onAYChanged(){
         if(this.AY !== this.y) 
-        this.__getObject('y').__resetForce(this.AY)
+        this.__getDataQml('y').__resetForce(this.AY)
     }   
 
     onAWidthChanged(){
         if(this.AWidth !== this.width) 
-        this.__getObject('width').__resetForce(this.AWidth)
+        this.__getDataQml('width').__resetForce(this.AWidth)
     }
 
     onAHeightChanged(){
         if(this.AHeight !== this.height) 
-        this.__getObject('height').__resetForce(this.AHeight)
+        this.__getDataQml('height').__resetForce(this.AHeight)
     }
 
     onParentChanged(){
@@ -302,13 +301,13 @@ class Item extends QtObject {
 
     onEnabledChanged(){
         for(let child of this.children){
-            if(child.__has('enabled')) child.__self.enabled.__update()
+            child.__getDataQml('enabled').__update()
         }
     }
 
     onVisibleChanged(){
         for(let child of this.children){
-            if(child.__has('visible')) child.__self.visible.__update()
+            child.__getDataQml('visible').__update()
         }
 
         this.__checkVisibility()
@@ -396,5 +395,7 @@ class Item extends QtObject {
     __onMouseDblClick(mouse){}
     __onWheel(wheel){}
 }
+
+Item.initialize()
 
 module.exports = Item

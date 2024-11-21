@@ -49,11 +49,11 @@ class Image extends Item {
         verticalAlignmentChanged: {type:Signal, slotName:'onVerticalAlignmentChanged', args:[]},
     })
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, model, properties, ...args)
-        proxy.__DOM.classList.add('Image')
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
+        obj.__DOM.classList.add('Image')
 
-        return proxy
+        return obj
     }
 
     onSourceChanged(){
@@ -71,8 +71,8 @@ class Image extends Item {
 
         JQApplication.ImageController.load(url, (img)=>{
             if(this.$url !== url) return
-            this.sourceSize.__getObject('width').__setAuto(img.width)
-            this.sourceSize.__getObject('height').__setAuto(img.height)
+            this.sourceSize.__getDataQml('width').__setAuto(img.width)
+            this.sourceSize.__getDataQml('height').__setAuto(img.height)
 
             this.__setDOMStyle({
                 backgroundImage: `url("${img.data}")`
@@ -144,5 +144,7 @@ class Image extends Item {
         this.__updateImage()
     }
 }
+
+Image.initialize()
 
 module.exports = Image

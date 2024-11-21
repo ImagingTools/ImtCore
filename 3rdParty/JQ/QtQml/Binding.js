@@ -65,11 +65,13 @@ class Binding extends QtObject {
                 prop = prop[propName]
             }
 
-            let targetProperty = prop.__getObject(path.shift())
+            let targetProperty = prop.__getDataQml(path.shift())
             targetProperty.__setCompute(()=>{return this.value})
             targetProperty.__update()
         }
     }
 }
+
+Binding.initialize()
 
 module.exports = Binding

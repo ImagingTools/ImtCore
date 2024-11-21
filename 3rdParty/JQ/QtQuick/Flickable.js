@@ -49,49 +49,48 @@ class Flickable extends Item {
     })
 
     static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
-        proxy.__DOM.classList.add('Flickable')
-        proxy.contentItem = Item.create()
+        let obj = super.create(parent, ...args)
+        obj.__DOM.classList.add('Flickable')
+        obj.contentItem = Item.create(obj)
 
-        proxy.contentItem.onXChanged=()=>{
-            if(-proxy.contentItem.x > proxy.contentWidth - proxy.width){
-                proxy.contentItem.__setDOMStyle({
-                    left: (proxy.contentWidth - proxy.width)+'px'
+        obj.contentItem.onXChanged=()=>{
+            if(-obj.contentItem.x > obj.contentWidth - obj.width){
+                obj.contentItem.__setDOMStyle({
+                    left: (obj.contentWidth - obj.width)+'px'
                 })
-            } else if(-proxy.contentItem.x < proxy.originX){
-                proxy.contentItem.__setDOMStyle({
-                    left: proxy.originX+'px'
+            } else if(-obj.contentItem.x < obj.originX){
+                obj.contentItem.__setDOMStyle({
+                    left: obj.originX+'px'
                 })
             } else {
-                proxy.contentItem.__setDOMStyle({
-                    left: proxy.contentItem.x+'px'
+                obj.contentItem.__setDOMStyle({
+                    left: obj.contentItem.x+'px'
                 })
             }
         }
     
-        proxy.contentItem.onYChanged=()=>{
-            if(-proxy.contentItem.y > proxy.contentHeight - proxy.height){
-                proxy.contentItem.__setDOMStyle({
-                    top: (proxy.contentHeight - proxy.height)+'px'
+        obj.contentItem.onYChanged=()=>{
+            if(-obj.contentItem.y > obj.contentHeight - obj.height){
+                obj.contentItem.__setDOMStyle({
+                    top: (obj.contentHeight - obj.height)+'px'
                 })
-            } else if(-proxy.contentItem.y < proxy.originY){
-                proxy.contentItem.__setDOMStyle({
-                    top: proxy.originY+'px'
+            } else if(-obj.contentItem.y < obj.originY){
+                obj.contentItem.__setDOMStyle({
+                    top: obj.originY+'px'
                 })
             } else {
-                proxy.contentItem.__setDOMStyle({
-                    top: proxy.contentItem.y+'px'
+                obj.contentItem.__setDOMStyle({
+                    top: obj.contentItem.y+'px'
                 })
             }
         }
 
-        proxy.contentItem.parent = proxy
-        JQApplication.MouseController.add(proxy)
-        return proxy
+        JQApplication.MouseController.add(obj)
+        return obj
     }
 
     __resolve(){
-        return this.contentItem
+        return this.contentItem ? this.contentItem : this
     }
 
     onContentXChanged(){
@@ -234,7 +233,7 @@ class Flickable extends Item {
 
     __onWheel(wheel){
         if(!this.interactive || !this.enabled || !this.visible) return
-        
+
         if(!wheel.target){
             let deltaX = wheel.angleDelta.x * 4
             let deltaY = wheel.angleDelta.y * 4
@@ -285,5 +284,7 @@ class Flickable extends Item {
         super.__destroy()
     }
 }
+
+Flickable.initialize()
 
 module.exports = Flickable

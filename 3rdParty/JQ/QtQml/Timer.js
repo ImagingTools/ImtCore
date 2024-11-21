@@ -55,6 +55,11 @@ class Timer extends QtObject {
     }
 
     __triggered(){
+        if(this.__destroying || this.__destroyed){
+            clearTimeout(this.__timer)
+            return
+        }
+
         this.triggered()
         if(this.repeat && this.running) {
             if(this.__timer) clearTimeout(this.__timer)
@@ -82,5 +87,7 @@ class Timer extends QtObject {
         super.__destroy()
     }
 }
+
+Timer.initialize()
 
 module.exports = Timer

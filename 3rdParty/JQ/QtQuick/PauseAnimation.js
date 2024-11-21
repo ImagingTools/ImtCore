@@ -32,4 +32,6 @@ class PauseAnimation extends Animation {
     }
 }
 
+PauseAnimation.initialize()
+
 module.exports = PauseAnimation

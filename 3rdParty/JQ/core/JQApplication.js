@@ -20,7 +20,8 @@ module.exports = {
 
         let XMLParser = new DOMParser()
 
-        global.context = (class extends JQModules.QtQml.QObject {
+        let Context = (class extends JQModules.QtQml.QObject {
+            static singleton = true
             static meta = {
                 appName: {type:JQModules.QtQml.string, value:''},
                 language: {type:JQModules.QtQml.string, value:'', signalName:'languageChanged'},
@@ -31,9 +32,9 @@ module.exports = {
             }
 
             static create(...args){
-                let proxy = super.create(...args)
-                proxy.__languages = {}
-                return proxy
+                let obj = super.create(...args)
+                obj.__languages = {}
+                return obj
             }
 
             translate(sourceText){
@@ -79,7 +80,9 @@ module.exports = {
                     
                 }
             }
-        }).create()
+        })
+        Context.initialize()
+        global.context = Context.create()
        
         XMLHttpRequest.querySet = {}
         let XMLProxy = XMLHttpRequest.prototype.open
@@ -231,7 +234,9 @@ module.exports = {
     },
 
     deleteLater: function(obj){
-        if(!obj || obj.__destroyed) return
+        if(!obj || obj.__destroyed || obj.__destroying) return
+
+        obj.__destroying = true
 
         if(this.updateLayers.length){
             if(this.deleteObjects.indexOf(obj) < 0) this.deleteObjects.push(obj)

@@ -20,4 +20,6 @@ class FontLoader extends QtObject {
     })
 }
 
+FontLoader.initialize()
+
 module.exports = FontLoader

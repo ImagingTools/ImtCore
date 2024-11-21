@@ -5,7 +5,7 @@ class Double extends Property {
     
     __typecasting(value){
         if(typeof value === 'object') {
-            if(value instanceof Property) return value[Symbol.toPrimitive]('number')
+            if(value instanceof Property) return value.__get()
         }
         return value
     }

@@ -57,30 +57,30 @@ class Anchors extends GroupProperty {
         let self = this.__parent
 
         if(self){
-            self.__getObject('x').__unfreeze()
-            self.__getObject('y').__unfreeze()
-            self.__getObject('width').__unfreeze()
-            self.__getObject('height').__unfreeze()
+            self.__getDataQml('x').__unfreeze()
+            self.__getDataQml('y').__unfreeze()
+            self.__getDataQml('width').__unfreeze()
+            self.__getDataQml('height').__unfreeze()
         }
 
         if(self && target){
             let lazy = !self.__completed
 
             if(self.parent === target){
-                self.__getObject('AX').__subscribe(this.__getObject('leftMargin'))
-                self.__getObject('AY').__subscribe(this.__getObject('topMargin'))
-                self.__getObject('AWidth').__subscribe(target.__getObject('AWidth'),this.__getObject('leftMargin'),this.__getObject('rightMargin'))
-                self.__getObject('AHeight').__subscribe(target.__getObject('AHeight'),this.__getObject('topMargin'),this.__getObject('bottomMargin'))
+                self.__getDataQml('AX').__subscribe(this.__getDataQml('leftMargin'))
+                self.__getDataQml('AY').__subscribe(this.__getDataQml('topMargin'))
+                self.__getDataQml('AWidth').__subscribe(target.__getDataQml('AWidth'),this.__getDataQml('leftMargin'),this.__getDataQml('rightMargin'))
+                self.__getDataQml('AHeight').__subscribe(target.__getDataQml('AHeight'),this.__getDataQml('topMargin'),this.__getDataQml('bottomMargin'))
 
                 self.AX = QtFunctions.binding(()=>{return this.leftMargin},lazy)
                 self.AY = QtFunctions.binding(()=>{return this.topMargin},lazy)
                 self.AWidth = QtFunctions.binding(()=>{return target.AWidth - (this.leftMargin + this.rightMargin)},lazy)
                 self.AHeight = QtFunctions.binding(()=>{return target.AHeight - (this.topMargin + this.bottomMargin)},lazy)
             } else {
-                self.__getObject('AX').__subscribe(target.__getObject('AX'),this.__getObject('leftMargin'))
-                self.__getObject('AY').__subscribe(target.__getObject('AY'),this.__getObject('topMargin'))
-                self.__getObject('AWidth').__subscribe(target.__getObject('AWidth'),this.__getObject('leftMargin'),this.__getObject('rightMargin'))
-                self.__getObject('AHeight').__subscribe(target.__getObject('AHeight'),this.__getObject('topMargin'),this.__getObject('bottomMargin'))
+                self.__getDataQml('AX').__subscribe(target.__getDataQml('AX'),this.__getDataQml('leftMargin'))
+                self.__getDataQml('AY').__subscribe(target.__getDataQml('AY'),this.__getDataQml('topMargin'))
+                self.__getDataQml('AWidth').__subscribe(target.__getDataQml('AWidth'),this.__getDataQml('leftMargin'),this.__getDataQml('rightMargin'))
+                self.__getDataQml('AHeight').__subscribe(target.__getDataQml('AHeight'),this.__getDataQml('topMargin'),this.__getDataQml('bottomMargin'))
 
                 self.AX = QtFunctions.binding(()=>{return target.AX + this.leftMargin},lazy)
                 self.AY = QtFunctions.binding(()=>{return target.AY + this.topMargin},lazy)
@@ -88,10 +88,10 @@ class Anchors extends GroupProperty {
                 self.AHeight = QtFunctions.binding(()=>{return target.AHeight - (this.topMargin + this.bottomMargin)},lazy)
             }
             
-            self.__getObject('x').__freeze()
-            self.__getObject('y').__freeze()
-            self.__getObject('width').__freeze()
-            self.__getObject('height').__freeze()
+            self.__getDataQml('x').__freeze()
+            self.__getDataQml('y').__freeze()
+            self.__getDataQml('width').__freeze()
+            self.__getDataQml('height').__freeze()
         }
     }
 
@@ -100,29 +100,29 @@ class Anchors extends GroupProperty {
         let self = this.__parent
 
         if(self){
-            self.__getObject('x').__unfreeze()
-            self.__getObject('y').__unfreeze()
+            self.__getDataQml('x').__unfreeze()
+            self.__getDataQml('y').__unfreeze()
         }
 
         if(self && target){
             let lazy = !self.__completed
 
             if(self.parent === target){
-                self.__getObject('AX').__subscribe(target.__getObject('AWidth'),self.__getObject('AWidth'))
-                self.__getObject('AY').__subscribe(target.__getObject('AHeight'),self.__getObject('AHeight'))
+                self.__getDataQml('AX').__subscribe(target.__getDataQml('AWidth'),self.__getDataQml('AWidth'))
+                self.__getDataQml('AY').__subscribe(target.__getDataQml('AHeight'),self.__getDataQml('AHeight'))
 
                 self.AX = QtFunctions.binding(()=>{return target.AWidth / 2 - self.AWidth / 2},lazy)
                 self.AY = QtFunctions.binding(()=>{return target.AHeight / 2 - self.AHeight / 2},lazy)
             } else {
-                self.__getObject('AX').__subscribe(target.__getObject('AX'),target.__getObject('AWidth'),self.__getObject('AWidth'))
-                self.__getObject('AY').__subscribe(target.__getObject('AY'),target.__getObject('AHeight'),self.__getObject('AHeight'))
+                self.__getDataQml('AX').__subscribe(target.__getDataQml('AX'),target.__getDataQml('AWidth'),self.__getDataQml('AWidth'))
+                self.__getDataQml('AY').__subscribe(target.__getDataQml('AY'),target.__getDataQml('AHeight'),self.__getDataQml('AHeight'))
 
                 self.AX = QtFunctions.binding(()=>{return target.AX + target.AWidth / 2 - self.AWidth / 2},lazy)
                 self.AY = QtFunctions.binding(()=>{return target.AY + target.AHeight / 2 - self.AHeight / 2},lazy)
             }
 
-            self.__getObject('x').__freeze()
-            self.__getObject('y').__freeze()
+            self.__getDataQml('x').__freeze()
+            self.__getDataQml('y').__freeze()
         }
     }
 
@@ -131,7 +131,7 @@ class Anchors extends GroupProperty {
         let self = this.__parent
 
         if(self){
-            self.__getObject('x').__unfreeze()
+            self.__getDataQml('x').__unfreeze()
         }
 
         if(self && target){
@@ -142,35 +142,35 @@ class Anchors extends GroupProperty {
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Left){
-                    self.__getObject('AX').__subscribe(self.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(self.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return -self.AWidth / 2},lazy)
                 } else if(targetFloat === AnchorLine.Right){
-                    self.__getObject('AX').__subscribe(target.__getObject('AWidth'),self.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AWidth'),self.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AWidth - self.AWidth / 2},lazy)
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.__getObject('AX').__subscribe(target.__getObject('AWidth'),self.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AWidth'),self.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AWidth / 2 - self.AWidth / 2},lazy)
                 }
             } else {
                 if(targetFloat === AnchorLine.Left){
-                    self.__getObject('AX').__subscribe(target.__getObject('AX'),self.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AX'),self.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AX - self.AWidth / 2},lazy)
                 } else if(targetFloat === AnchorLine.Right){
-                    self.__getObject('AX').__subscribe(target.__getObject('AX'),target.__getObject('AWidth'),self.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AX'),target.__getDataQml('AWidth'),self.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AX + target.AWidth - self.AWidth / 2},lazy)
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.__getObject('AX').__subscribe(target.__getObject('AX'),target.__getObject('AWidth'),self.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AX'),target.__getDataQml('AWidth'),self.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AX + target.AWidth / 2 - self.AWidth / 2},lazy)
                 }
             }
 
-            self.__getObject('x').__freeze()
+            self.__getDataQml('x').__freeze()
         }
     }
 
@@ -179,7 +179,7 @@ class Anchors extends GroupProperty {
         let self = this.__parent
 
         if(self){
-            self.__getObject('y').__unfreeze()
+            self.__getDataQml('y').__unfreeze()
         }
 
         if(self && target){
@@ -190,35 +190,35 @@ class Anchors extends GroupProperty {
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Top){
-                    self.__getObject('AY').__subscribe(self.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(self.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return -self.AHeight / 2},lazy)
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.__getObject('AY').__subscribe(target.__getObject('AHeight'),self.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AHeight'),self.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AHeight - self.AHeight / 2},lazy)
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.__getObject('AY').__subscribe(target.__getObject('AHeight'),self.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AHeight'),self.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AHeight / 2 - self.AHeight / 2},lazy)
                 }
             } else {
                 if(targetFloat === AnchorLine.Top){
-                    self.__getObject('AY').__subscribe(target.__getObject('AY'),self.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AY'),self.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AY - self.AHeight / 2},lazy)
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.__getObject('AY').__subscribe(target.__getObject('AY'),target.__getObject('AHeight'),self.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AY'),target.__getDataQml('AHeight'),self.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AY + target.AHeight - self.AHeight / 2},lazy)
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.__getObject('AY').__subscribe(target.__getObject('AY'),target.__getObject('AHeight'),self.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AY'),target.__getDataQml('AHeight'),self.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AY + target.AHeight / 2 - self.AHeight / 2},lazy)
                 }               
             }
 
-            self.__getObject('y').__freeze()
+            self.__getDataQml('y').__freeze()
         }
     }
 
@@ -232,7 +232,7 @@ class Anchors extends GroupProperty {
         }
 
         if(self){
-            self.__getObject('x').__unfreeze()
+            self.__getDataQml('x').__unfreeze()
         }
 
         if(self && target){
@@ -245,31 +245,31 @@ class Anchors extends GroupProperty {
                 if(targetFloat === AnchorLine.Left){
                     self.AX = QtFunctions.binding(()=>{return this.leftMargin},lazy)
                 } else if(targetFloat === AnchorLine.Right){
-                    self.__getObject('AX').__subscribe(target.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AWidth + this.leftMargin},lazy)
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.__getObject('AX').__subscribe(target.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AWidth / 2 + this.leftMargin},lazy)
                 }
             } else {
                 if(targetFloat === AnchorLine.Left){
-                    self.__getObject('AX').__subscribe(target.__getObject('AX'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AX'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AX + this.leftMargin},lazy)
                 } else if(targetFloat === AnchorLine.Right){
-                    self.__getObject('AX').__subscribe(target.__getObject('AX'),target.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AX'),target.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AX + target.AWidth + this.leftMargin},lazy)
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.__getObject('AX').__subscribe(target.__getObject('AX'),target.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AX'),target.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AX + target.AWidth / 2 + this.leftMargin},lazy)
                 }            
             }
 
-            self.__getObject('x').__freeze()
+            self.__getDataQml('x').__freeze()
         }
     }
 
@@ -283,7 +283,7 @@ class Anchors extends GroupProperty {
         }
 
         if(self){
-            self.__getObject('x').__unfreeze()
+            self.__getDataQml('x').__unfreeze()
         }
 
         if(self && target){
@@ -294,35 +294,35 @@ class Anchors extends GroupProperty {
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Left){
-                    self.__getObject('AX').__subscribe(self.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(self.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return -self.AWidth - this.rightMargin},lazy)
                 } else if(targetFloat === AnchorLine.Right){
-                    self.__getObject('AX').__subscribe(target.__getObject('AWidth'), self.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AWidth'), self.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AWidth - self.AWidth - this.rightMargin},lazy)
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.__getObject('AX').__subscribe(target.__getObject('AWidth'), self.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AWidth'), self.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AWidth / 2 - self.AWidth - this.rightMargin},lazy)
                 }
             } else {
                 if(targetFloat === AnchorLine.Left){
-                    self.__getObject('AX').__subscribe(target.__getObject('AX'), self.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AX'), self.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AX - self.AWidth - this.rightMargin},lazy)
                 } else if(targetFloat === AnchorLine.Right){
-                    self.__getObject('AX').__subscribe(target.__getObject('AX'), target.__getObject('AWidth'), self.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AX'), target.__getDataQml('AWidth'), self.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AX + target.AWidth - self.AWidth - this.rightMargin},lazy)
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.__getObject('AX').__subscribe(target.__getObject('AX'), target.__getObject('AWidth'), self.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(target.__getDataQml('AX'), target.__getDataQml('AWidth'), self.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return target.AX + target.AWidth / 2 - self.AWidth - this.rightMargin},lazy)
                 }              
             }
 
-            self.__getObject('x').__freeze()
+            self.__getDataQml('x').__freeze()
         }
     }
 
@@ -332,8 +332,8 @@ class Anchors extends GroupProperty {
         let self = this.__parent
 
         if(self){
-            self.__getObject('x').__unfreeze()
-            self.__getObject('width').__unfreeze()
+            self.__getDataQml('x').__unfreeze()
+            self.__getDataQml('width').__unfreeze()
         }
 
         if(self && left && right){
@@ -349,25 +349,25 @@ class Anchors extends GroupProperty {
                 if(leftFloat === AnchorLine.Left){
                     self.AX = QtFunctions.binding(()=>{return this.leftMargin},lazy)
                 } else if(leftFloat === AnchorLine.Right){
-                    self.__getObject('AX').__subscribe(left.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(left.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return left.AWidth + this.leftMargin},lazy)
                 } else if(leftFloat === AnchorLine.HorizontalCenter){
-                    self.__getObject('AX').__subscribe(left.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(left.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return left.AWidth / 2 + this.leftMargin},lazy)
                 }
             } else {
                 if(leftFloat === AnchorLine.Left){
-                    self.__getObject('AX').__subscribe(left.__getObject('AX'))
+                    self.__getDataQml('AX').__subscribe(left.__getDataQml('AX'))
 
                     self.AX = QtFunctions.binding(()=>{return left.AX + this.leftMargin},lazy)
                 } else if(leftFloat === AnchorLine.Right){
-                    self.__getObject('AX').__subscribe(left.__getObject('AX'), left.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(left.__getDataQml('AX'), left.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return left.AX + left.AWidth + this.leftMargin},lazy)
                 } else if(leftFloat === AnchorLine.HorizontalCenter){
-                    self.__getObject('AX').__subscribe(left.__getObject('AX'), left.__getObject('AWidth'))
+                    self.__getDataQml('AX').__subscribe(left.__getDataQml('AX'), left.__getDataQml('AWidth'))
 
                     self.AX = QtFunctions.binding(()=>{return left.AX + left.AWidth / 2 + this.leftMargin},lazy)
                 }
@@ -375,36 +375,36 @@ class Anchors extends GroupProperty {
 
             if(self.parent === right){
                 if(rightFloat === AnchorLine.Left){
-                    self.__getObject('AWidth').__subscribe(self.__getObject('AX'))
+                    self.__getDataQml('AWidth').__subscribe(self.__getDataQml('AX'))
 
                     self.AWidth = QtFunctions.binding(()=>{return -this.rightMargin - self.x},lazy)
                 } else if(rightFloat === AnchorLine.Right){
-                    self.__getObject('AWidth').__subscribe(right.__getObject('AWidth'), self.__getObject('AX'))
+                    self.__getDataQml('AWidth').__subscribe(right.__getDataQml('AWidth'), self.__getDataQml('AX'))
 
                     self.AWidth = QtFunctions.binding(()=>{return right.AWidth - this.rightMargin - self.x},lazy)
                 } else if(rightFloat === AnchorLine.HorizontalCenter){
-                    self.__getObject('AWidth').__subscribe(right.__getObject('AWidth'), self.__getObject('AX'))
+                    self.__getDataQml('AWidth').__subscribe(right.__getDataQml('AWidth'), self.__getDataQml('AX'))
 
                     self.AWidth = QtFunctions.binding(()=>{return right.AWidth / 2 - this.rightMargin - self.x},lazy)
                 }
             } else {
                 if(rightFloat === AnchorLine.Left){
-                    self.__getObject('AWidth').__subscribe(right.__getObject('AX'), self.__getObject('AX'))
+                    self.__getDataQml('AWidth').__subscribe(right.__getDataQml('AX'), self.__getDataQml('AX'))
 
                     self.AWidth = QtFunctions.binding(()=>{return right.AX - this.rightMargin - self.AX},lazy)
                 } else if(rightFloat === AnchorLine.Right){
-                    self.__getObject('AWidth').__subscribe(right.__getObject('AX'), right.__getObject('AWidth'), self.__getObject('AX'))
+                    self.__getDataQml('AWidth').__subscribe(right.__getDataQml('AX'), right.__getDataQml('AWidth'), self.__getDataQml('AX'))
 
                     self.AWidth = QtFunctions.binding(()=>{return right.AX + right.AWidth - this.rightMargin - self.AX},lazy)
                 } else if(rightFloat === AnchorLine.HorizontalCenter){
-                    self.__getObject('AWidth').__subscribe(right.__getObject('AX'), right.__getObject('AWidth'), self.__getObject('AX'))
+                    self.__getDataQml('AWidth').__subscribe(right.__getDataQml('AX'), right.__getDataQml('AWidth'), self.__getDataQml('AX'))
 
                     self.AWidth = QtFunctions.binding(()=>{return right.AX + right.AWidth / 2 - this.rightMargin - self.AX},lazy)
                 }
             }
 
-            self.__getObject('x').__freeze()
-            self.__getObject('width').__freeze()
+            self.__getDataQml('x').__freeze()
+            self.__getDataQml('width').__freeze()
         }
     }
 
@@ -418,7 +418,7 @@ class Anchors extends GroupProperty {
         }
 
         if(self){
-            self.__getObject('y').__unfreeze()
+            self.__getDataQml('y').__unfreeze()
         }
 
         if(self && target){
@@ -431,31 +431,31 @@ class Anchors extends GroupProperty {
                 if(targetFloat === AnchorLine.Top){
                     self.AY = QtFunctions.binding(()=>{return this.topMargin},lazy)
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.__getObject('AY').__subscribe(target.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AHeight + this.topMargin},lazy)
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.__getObject('AY').__subscribe(target.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AHeight / 2 + this.topMargin},lazy)
                 }
             } else {
                 if(targetFloat === AnchorLine.Top){
-                    self.__getObject('AY').__subscribe(target.__getObject('AY'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AY'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AY + this.topMargin},lazy)
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.__getObject('AY').__subscribe(target.__getObject('AY'), target.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AY'), target.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AY + target.AHeight + this.topMargin},lazy)
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.__getObject('AY').__subscribe(target.__getObject('AY'), target.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AY'), target.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AY + target.AHeight / 2 + this.topMargin},lazy)
                 }               
             }
 
-            self.__getObject('y').__freeze()
+            self.__getDataQml('y').__freeze()
         }
     }
 
@@ -469,7 +469,7 @@ class Anchors extends GroupProperty {
         }
 
         if(self){
-            self.__getObject('y').__unfreeze()
+            self.__getDataQml('y').__unfreeze()
         }
 
         if(self && target){
@@ -480,35 +480,35 @@ class Anchors extends GroupProperty {
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Top){
-                    self.__getObject('AY').__subscribe(self.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(self.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return -self.AHeight - this.bottomMargin},lazy)
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.__getObject('AY').__subscribe(target.__getObject('AHeight'), self.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AHeight'), self.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AHeight - self.AHeight - this.bottomMargin},lazy)
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.__getObject('AY').__subscribe(target.__getObject('AHeight'), self.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AHeight'), self.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AHeight / 2 - self.AHeight - this.bottomMargin},lazy)
                 }
             } else {
                 if(targetFloat === AnchorLine.Top){
-                    self.__getObject('AY').__subscribe(target.__getObject('AY'), self.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AY'), self.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AY - self.AHeight - this.bottomMargin},lazy)
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.__getObject('AY').__subscribe(target.__getObject('AY'), target.__getObject('AHeight'), self.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AY'), target.__getDataQml('AHeight'), self.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AY + target.AHeight - self.AHeight - this.bottomMargin},lazy)
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.__getObject('AY').__subscribe(target.__getObject('AY'), target.__getObject('AHeight'), self.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(target.__getDataQml('AY'), target.__getDataQml('AHeight'), self.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return target.AY + target.AHeight / 2 - self.AHeight - this.bottomMargin},lazy)
                 }               
             }
 
-            self.__getObject('y').__freeze()
+            self.__getDataQml('y').__freeze()
         }
     }
 
@@ -518,8 +518,8 @@ class Anchors extends GroupProperty {
         let self = this.__parent
 
         if(self){
-            self.__getObject('y').__unfreeze()
-            self.__getObject('height').__unfreeze()
+            self.__getDataQml('y').__unfreeze()
+            self.__getDataQml('height').__unfreeze()
         }
 
         if(self && top && bottom){
@@ -535,25 +535,25 @@ class Anchors extends GroupProperty {
                 if(topFloat === AnchorLine.Top){
                     self.AY = QtFunctions.binding(()=>{return this.topMargin},lazy)
                 } else if(topFloat === AnchorLine.Bottom){
-                    self.__getObject('AY').__subscribe(top.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(top.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return top.AHeight + this.topMargin},lazy)
                 } else if(topFloat === AnchorLine.VerticalCenter){
-                    self.__getObject('AY').__subscribe(top.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(top.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return top.AHeight / 2 + this.topMargin},lazy)
                 }
             } else {
                 if(topFloat === AnchorLine.Top){
-                    self.__getObject('AY').__subscribe(top.__getObject('AY'))
+                    self.__getDataQml('AY').__subscribe(top.__getDataQml('AY'))
 
                     self.AY = QtFunctions.binding(()=>{return top.AY + this.topMargin},lazy)
                 } else if(topFloat === AnchorLine.Bottom){
-                    self.__getObject('AY').__subscribe(top.__getObject('AY'), top.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(top.__getDataQml('AY'), top.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return top.AY + top.AHeight + this.topMargin},lazy)
                 } else if(topFloat === AnchorLine.VerticalCenter){
-                    self.__getObject('AY').__subscribe(top.__getObject('AY'), top.__getObject('AHeight'))
+                    self.__getDataQml('AY').__subscribe(top.__getDataQml('AY'), top.__getDataQml('AHeight'))
 
                     self.AY = QtFunctions.binding(()=>{return top.AY + top.AHeight / 2 + this.topMargin},lazy)
                 }
@@ -561,38 +561,40 @@ class Anchors extends GroupProperty {
 
             if(self.parent === bottom){
                 if(bottomFloat === AnchorLine.Top){
-                    self.__getObject('AHeight').__subscribe(self.__getObject('AY'))
+                    self.__getDataQml('AHeight').__subscribe(self.__getDataQml('AY'))
 
                     self.AHeight = QtFunctions.binding(()=>{return -this.bottomMargin - self.AY},lazy)
                 } else if(bottomFloat === AnchorLine.Bottom){
-                    self.__getObject('AHeight').__subscribe(bottom.__getObject('AHeight'), self.__getObject('AY'))
+                    self.__getDataQml('AHeight').__subscribe(bottom.__getDataQml('AHeight'), self.__getDataQml('AY'))
 
                     self.AHeight = QtFunctions.binding(()=>{return bottom.AHeight - this.bottomMargin - self.AY},lazy)
                 } else if(bottomFloat === AnchorLine.VerticalCenter){
-                    self.__getObject('AHeight').__subscribe(bottom.__getObject('AHeight'), self.__getObject('AY'))
+                    self.__getDataQml('AHeight').__subscribe(bottom.__getDataQml('AHeight'), self.__getDataQml('AY'))
 
                     self.AHeight = QtFunctions.binding(()=>{return bottom.AHeight / 2 - this.bottomMargin - self.AY},lazy)
                 }
             } else {
                 if(bottomFloat === AnchorLine.Top){
-                    self.__getObject('AHeight').__subscribe(bottom.__getObject('AY'), self.__getObject('AY'))
+                    self.__getDataQml('AHeight').__subscribe(bottom.__getDataQml('AY'), self.__getDataQml('AY'))
 
                     self.AHeight = QtFunctions.binding(()=>{return bottom.AY - this.bottomMargin - self.AY},lazy)
                 } else if(bottomFloat === AnchorLine.Bottom){
-                    self.__getObject('AHeight').__subscribe(bottom.__getObject('AY'), bottom.__getObject('AHeight'), self.__getObject('AY'))
+                    self.__getDataQml('AHeight').__subscribe(bottom.__getDataQml('AY'), bottom.__getDataQml('AHeight'), self.__getDataQml('AY'))
 
                     self.AHeight = QtFunctions.binding(()=>{return bottom.AY + bottom.AHeight - this.bottomMargin - self.AY},lazy)
                 } else if(bottomFloat === AnchorLine.VerticalCenter){
-                    self.__getObject('AHeight').__subscribe(bottom.__getObject('AY'), bottom.__getObject('AHeight'), self.__getObject('AY'))
+                    self.__getDataQml('AHeight').__subscribe(bottom.__getDataQml('AY'), bottom.__getDataQml('AHeight'), self.__getDataQml('AY'))
 
                     self.AHeight = QtFunctions.binding(()=>{return bottom.AY + bottom.AHeight / 2 - this.bottomMargin - self.AY},lazy)
                 }
             }
 
-            self.__getObject('y').__freeze()
-            self.__getObject('height').__freeze()
+            self.__getDataQml('y').__freeze()
+            self.__getDataQml('height').__freeze()
         }
     }
 }
+
+Anchors.initialize()
 
 module.exports = Anchors

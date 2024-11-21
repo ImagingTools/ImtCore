@@ -121,4 +121,6 @@ class ListModel extends QtObject {
     }
 }
 
+ListModel.initialize()
+
 module.exports = ListModel

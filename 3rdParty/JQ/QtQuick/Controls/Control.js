@@ -8,13 +8,15 @@ class Control extends Item {
 
     })
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, model, properties, ...args)
-        proxy.__getDOM().classList.add('Control')
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
+        obj.__getDOM().classList.add('Control')
 
-        return proxy
+        return obj
     }
 
 }
+
+Control.initialize()
 
 module.exports = Control

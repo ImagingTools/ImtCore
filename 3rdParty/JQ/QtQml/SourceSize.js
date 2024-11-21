@@ -26,4 +26,6 @@ class SourceSize extends GroupProperty {
     }
 }
 
+SourceSize.initialize()
+
 module.exports = SourceSize

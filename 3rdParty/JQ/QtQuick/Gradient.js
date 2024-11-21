@@ -17,11 +17,11 @@ class Gradient extends QtObject {
 
     __rects = new Set()
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, model, properties, ...args)
-        proxy.stops = []
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
+        obj.stops = []
 
-        return proxy
+        return obj
     }
 
     onStopsChanged(){
@@ -47,5 +47,7 @@ class Gradient extends QtObject {
         this.__rects.delete(obj)
     }
 }
+
+Gradient.initialize()
 
 module.exports = Gradient

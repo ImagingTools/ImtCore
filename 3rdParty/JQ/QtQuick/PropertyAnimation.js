@@ -22,10 +22,10 @@ class PropertyAnimation extends Animation {
     })
 
     static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
-        proxy.target = parent
+        let obj = super.create(parent, ...args)
+        obj.target = parent
 
-        return proxy
+        return obj
     }
 
     onPropertyChanged(){
@@ -85,5 +85,7 @@ class PropertyAnimation extends Animation {
     }
  
 }
+
+PropertyAnimation.initialize()
 
 module.exports = PropertyAnimation

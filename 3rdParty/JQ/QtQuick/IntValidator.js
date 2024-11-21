@@ -36,4 +36,6 @@ class IntValidator extends QtObject {
     }
 }
 
+IntValidator.initialize()
+
 module.exports = IntValidator

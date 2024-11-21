@@ -3,12 +3,11 @@ const QObject = require("./QObject")
 
 class List extends Property {
     static create(parent, meta){
-        let proxy = super.create(parent, meta)
-        let self = proxy.__self 
+        let obj = super.create(parent, meta)
 
-        self.__value = self.__typecasting([])
+        obj.__value = obj.__typecasting([])
 
-        return proxy
+        return obj
     }
 
     __typecasting(value){

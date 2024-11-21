@@ -14,4 +14,6 @@ class Point extends GroupProperty {
     
 }
 
+Point.initialize()
+
 module.exports = Point

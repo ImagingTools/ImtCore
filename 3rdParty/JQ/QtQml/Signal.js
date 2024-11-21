@@ -1,9 +1,11 @@
-class Signal {
+const BaseObject = require("../QtBase/BaseObject")
+
+class Signal extends BaseObject{
     static create(parent, meta){
         let f = (...args)=>{
             f.emit(...args)
         }
-        f.__parent = parent ? parent.__proxy : null
+        f.__parent = parent ? parent : null
         f.__slot = parent ? parent[meta.slotName] : null
         // f.__args = meta.args
         f.__proto__ = Signal.prototype

@@ -12,11 +12,11 @@ class GradientStop extends QtObject {
         positionChanged: {type:Signal, slotName:'onPositionChanged', args:[]},
     })
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, model, properties, ...args)
-        parent.stops.push(proxy)
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
+        parent.stops.push(obj)
 
-        return proxy
+        return obj
     }
 
     onColorChanged(){
@@ -31,5 +31,7 @@ class GradientStop extends QtObject {
         this.parent.__updateGradient()
     }
 }
+
+GradientStop.initialize()
 
 module.exports = GradientStop

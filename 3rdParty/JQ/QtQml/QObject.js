@@ -1,13 +1,9 @@
-const Property = require("./Property")
-const GroupProperty = require("./GroupProperty")
-const BaseObject = require("../QtBase/BaseObject")
+const QBaseObject = require("../QtBase/QBaseObject")
 const Var = require("../QtQml/Var")
 const String = require("./String")
 const Signal = require("./Signal")
 
-class QObject extends BaseObject {
-    static uid = 0
-
+class QObject extends QBaseObject {
     static meta = {
         parent: {type:Var, signalName:'parentChanged'},
         objectName: {type:String, value:''},
@@ -15,79 +11,31 @@ class QObject extends BaseObject {
         parentChanged: {type:Signal, slotName:'onParentChanged', args:[]},
     }
 
-    static create(parent, properies=[], ...args){
-        let proxy = super.create(parent, properies, ...args)
-        
-        proxy.__properties = properies
-        proxy.__uid = this.uid++
-
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
+ 
         if(parent) {
-            parent.__children.push(proxy)
-            proxy.setParent(parent)
+            parent.__children.push(obj)
+            obj.setParent(parent.__resolve())
         } else {
             try {
-                JQApplication.MemoryController.observe(proxy)
+                if(!this.singleton) JQApplication.MemoryController.observe(obj)
             } catch (error) {
                 
-            }
-            
+            } 
         }
 
-        return proxy
+        return obj
     }
 
     __children = []
 
-    __toPrimitive(hint){
-        return this.__self.constructor.name + this.__uid
-    }
-    
-    __has(key){
-        if(key in this){
-            return true
-        } else if(key in this.constructor.meta){
-            let meta = this.constructor.meta[key]
-            this[key] = meta.type.create(this.__proxy, meta)
-
-            return true
-        }
-
-        return false
-    }
-
-    __get(key){
-        if(this.__has(key)){
-            if(this[key] instanceof Property){
-                // let caller = Property.queueLink[Property.queueLink.length-1]
-                // if(caller) caller.__subscribe(this[key])
-                return this[key].__get()
-            }
-            return this[key]
-        }
-        return undefined
-    }
-
-    __set(key, value){
-        if(this.__has(key)){
-            if(this[key] instanceof Property){
-                this[key].__self.__reset(value)
-                return true
-            } else if(this[key] instanceof GroupProperty){
-                this[key].__self.__assign(value)
-                return true
-            }
-        }
-        this[key] = value
-        return true
-    }
-
-    __resolve(){
-        return this
-    }
-
     setParent(parent){
-        this.parent = parent ? parent.__resolve() : parent
+        this.parent = parent
     }
+  
 }
+
+QObject.initialize()
 
 module.exports = QObject

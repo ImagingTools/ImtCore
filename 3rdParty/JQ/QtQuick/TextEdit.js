@@ -77,11 +77,11 @@ class TextEdit extends Item {
     })
 
     static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
-        proxy.__DOM.classList.add('TextEdit')
-        proxy.__createImpl()
-        JQApplication.MouseController.add(proxy)
-        return proxy
+        let obj = super.create(parent, ...args)
+        obj.__DOM.classList.add('TextEdit')
+        obj.__createImpl()
+        JQApplication.MouseController.add(obj)
+        return obj
     }
 
     __createImpl(){
@@ -233,12 +233,12 @@ class TextEdit extends Item {
             text = '.'
         }
 
-        let textMetrics = JQApplication.TextController.measureText(text, this.font, this.__getObject('width').__auto ? 0 : this.width, this.wrapMode, 0)
+        let textMetrics = JQApplication.TextController.measureText(text, this.font, this.__getDataQml('width').__auto ? 0 : this.width, this.wrapMode, 0)
         
         // let textMetrics = this.__impl.getBoundingClientRect()
 
-        this.__getObject('width').__setAuto(this.__impl.scrollWidth)
-        this.__getObject('height').__setAuto(this.__impl.scrollHeight)
+        this.__getDataQml('width').__setAuto(this.__impl.scrollWidth)
+        this.__getDataQml('height').__setAuto(this.__impl.scrollHeight)
 
         this.contentWidth = textMetrics.width
         this.contentHeight = textMetrics.height
@@ -350,5 +350,7 @@ class TextEdit extends Item {
         super.__destroy()
     }
 }
+
+TextEdit.initialize()
 
 module.exports = TextEdit

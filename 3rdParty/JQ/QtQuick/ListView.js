@@ -158,7 +158,7 @@ class ListView extends Flickable {
             if(typeof this.model === 'number'){
                 if(this.count !== this.model){
                     countChanged = true
-                    this.__getObject('count').__value = this.model
+                    this.__getDataQml('count').__value = this.model
                 }
 
                 for(let i = 0; i < this.model; i++){
@@ -168,7 +168,7 @@ class ListView extends Flickable {
             } else {
                 if(this.count !== this.model.data.length){
                     countChanged = true
-                    this.__getObject('count').__value = this.model.data.length
+                    this.__getDataQml('count').__value = this.model.data.length
                 }
 
                 for(let i = 0; i < this.model.data.length; i++){
@@ -197,7 +197,7 @@ class ListView extends Flickable {
 
                 if(this.count !== this.model.data.length){
                     countChanged = true
-                    this.__getObject('count').__value = this.model.data.length
+                    this.__getDataQml('count').__value = this.model.data.length
                 }
 
                 for(let change of changeSet){
@@ -272,10 +272,10 @@ class ListView extends Flickable {
         }
         if(this.orientation === ListView.Horizontal){
             this.contentWidth = width + (count ? (count-1)*this.spacing : 0)
-            this.__getObject('contentHeight').__setAuto(this.height)
+            this.__getDataQml('contentHeight').__setAuto(this.height)
         } else {
             this.contentHeight = height + (count ? (count-1)*this.spacing : 0)
-            this.__getObject('contentWidth').__setAuto(this.width)
+            this.__getDataQml('contentWidth').__setAuto(this.width)
         }
     }
 
@@ -293,5 +293,7 @@ class ListView extends Flickable {
         super.__destroy()
     }
 }
+
+ListView.initialize()
 
 module.exports = ListView

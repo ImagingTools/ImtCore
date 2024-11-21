@@ -1,4 +1,6 @@
-class AnchorLine {
+const BaseObject = require("../QtBase/BaseObject")
+
+class AnchorLine extends BaseObject{
     static Left = 0
     static Right = 1
     static Top = 2
@@ -7,17 +9,12 @@ class AnchorLine {
     static VerticalCenter = 5
 
     static create(parent, meta){
-        let self = new this(parent, meta.value)
-        return self
-    }
+        let obj = new this()
 
-    constructor(parent, float){
-        this.__parent = parent
-        this.__float = float
-    }
+        obj.__parent = parent
+        obj.__float = meta.value
 
-    get(){
-        return this
+        return obj
     }
 
     destroy(){

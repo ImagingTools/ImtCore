@@ -2,20 +2,19 @@ const Bool = require("./Bool")
 
 class LinkedBool extends Bool {
     static create(parent, meta){
-        let proxy = super.create(parent, meta)
-        let self = proxy.__self 
+        let obj = super.create(parent, meta)
 
-        self.__originValue = meta.value
-        self.__originCompute = ()=>{
-            if(self.__parent && self.__parent.parent && meta.link){
-                return self.__parent.parent[meta.link] && self.__originValue
+        obj.__originValue = meta.value
+        obj.__originCompute = ()=>{
+            if(obj.__parent && obj.__parent.parent && meta.link){
+                return obj.__parent.parent[meta.link] && obj.__originValue
             } else {
-                return self.__originValue
+                return obj.__originValue
             }
         }
-        self.__compute = self.__originCompute
+        obj.__compute = obj.__originCompute
 
-        return proxy
+        return obj
     }
 
     __reset(value){

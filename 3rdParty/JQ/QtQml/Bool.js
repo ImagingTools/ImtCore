@@ -7,7 +7,7 @@ class Bool extends Property {
         if(value === undefined) throw 'Cannot assign [undefined] to Bool'
         
         if(typeof value === 'object') {
-            if(value instanceof Property) return value[Symbol.toPrimitive]() ? true : false
+            if(value instanceof Property) return value.__get() ? true : false
         }
 
         return value ? true : false

@@ -38,19 +38,19 @@ class Loader extends Item {
         let item = this.sourceComponent.createObject(this)
         this.item = item
 
-        if(this.__getObject('width').__auto) {
-            this.__getObject('width').__setCompute(()=>{return this.item.width})
-            this.__getObject('width').__update()
+        if(this.__getDataQml('width').__auto) {
+            this.__getDataQml('width').__setCompute(()=>{return this.item.width})
+            this.__getDataQml('width').__update()
         } else {
-            this.item.__getObject('width').__setCompute(()=>{return this.width})
-            this.item.__getObject('width').__update()
+            this.item.__getDataQml('width').__setCompute(()=>{return this.width})
+            this.item.__getDataQml('width').__update()
         }
-        if(this.__getObject('height').__auto) {
-            this.__getObject('height').__setCompute(()=>{return this.item.height})
-            this.__getObject('height').__update()
+        if(this.__getDataQml('height').__auto) {
+            this.__getDataQml('height').__setCompute(()=>{return this.item.height})
+            this.__getDataQml('height').__update()
         } else {
-            this.item.__getObject('height').__setCompute(()=>{return this.height})
-            this.item.__getObject('height').__update()
+            this.item.__getDataQml('height').__setCompute(()=>{return this.height})
+            this.item.__getDataQml('height').__update()
         }
 
         this.loaded()
@@ -86,19 +86,19 @@ class Loader extends Item {
         let item = cls.create(this)
         this.item = item
 
-        if(this.__getObject('width').__auto) {
-            this.__getObject('width').__setCompute(()=>{return this.item.width})
-            this.__getObject('width').__update()
+        if(this.__getDataQml('width').__auto) {
+            this.__getDataQml('width').__setCompute(()=>{return this.item.width})
+            this.__getDataQml('width').__update()
         } else {
-            this.item.__getObject('width').__setCompute(()=>{return this.width})
-            this.item.__getObject('width').__update()
+            this.item.__getDataQml('width').__setCompute(()=>{return this.width})
+            this.item.__getDataQml('width').__update()
         }
-        if(this.__getObject('height').__auto) {
-            this.__getObject('height').__setCompute(()=>{return this.item.height})
-            this.__getObject('height').__update()
+        if(this.__getDataQml('height').__auto) {
+            this.__getDataQml('height').__setCompute(()=>{return this.item.height})
+            this.__getDataQml('height').__update()
         } else {
-            this.item.__getObject('height').__setCompute(()=>{return this.height})
-            this.item.__getObject('height').__update()
+            this.item.__getDataQml('height').__setCompute(()=>{return this.height})
+            this.item.__getDataQml('height').__update()
         }
 
         this.loaded()
@@ -108,7 +108,7 @@ class Loader extends Item {
         super.onWidthChanged()
 
         if(this.item){
-            this.item.__getObject('width').__setAuto(this.width)
+            this.item.__getDataQml('width').__setAuto(this.width)
         }
     }
 
@@ -116,9 +116,11 @@ class Loader extends Item {
         super.onHeightChanged()
         
         if(this.item){
-            this.item.__getObject('height').__setAuto(this.height)
+            this.item.__getDataQml('height').__setAuto(this.height)
         }
     }
 }
+
+Loader.initialize()
 
 module.exports = Loader

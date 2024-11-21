@@ -41,4 +41,6 @@ class FileDialog extends Dialog {
     })
 }
 
+FileDialog.initialize()
+
 module.exports = FileDialog

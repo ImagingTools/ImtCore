@@ -66,11 +66,11 @@ class Text extends Item {
 
 
     static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
-        proxy.__DOM.classList.add('Text')
-        proxy.__createImpl()
+        let obj = super.create(parent, ...args)
+        obj.__DOM.classList.add('Text')
+        obj.__createImpl()
 
-        return proxy
+        return obj
     }
 
     __createImpl(){
@@ -90,7 +90,7 @@ class Text extends Item {
     }
 
     __updateGeometry(){
-        let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.__getObject('width').__auto ? 0 : this.width, this.wrapMode, this.textFormat)
+        let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.__getDataQml('width').__auto ? 0 : this.width, this.wrapMode, this.textFormat)
 
         if(textMetrics.isHTML){
             this.__impl.innerHTML = this.text.replaceAll('<br>', '\r')
@@ -98,10 +98,10 @@ class Text extends Item {
             this.__impl.innerText = this.text.replaceAll('<br>', '\r')
         }
 
-        this.__getObject('width').__setAuto(textMetrics.width)
-        this.__getObject('height').__setAuto(textMetrics.height)
+        this.__getDataQml('width').__setAuto(textMetrics.width)
+        this.__getDataQml('height').__setAuto(textMetrics.height)
         
-        if(this.__getObject('width').__auto){
+        if(this.__getDataQml('width').__auto){
             this.contentWidth = Math.max(textMetrics.width, this.__impl.scrollWidth)
             this.contentHeight = Math.max(textMetrics.height, this.__impl.scrollHeight)
         } else {
@@ -122,7 +122,7 @@ class Text extends Item {
     }
 
     onColorChanged(){
-        let rgba = this.__getObject('color').__toRGBA()
+        let rgba = this.__getDataQml('color').__toRGBA()
         this.__setDOMStyle({
             opacity: 1,
             color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
@@ -130,7 +130,7 @@ class Text extends Item {
     }
 
     onOpacityChanged(){
-        let rgba = this.__getObject('color').__toRGBA()
+        let rgba = this.__getDataQml('color').__toRGBA()
         this.__setDOMStyle({
             opacity: 1,
             color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
@@ -203,5 +203,7 @@ class Text extends Item {
         this.__updateGeometry()
     }
 }
+
+Text.initialize()
 
 module.exports = Text

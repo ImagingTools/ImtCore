@@ -80,8 +80,12 @@ class Instruction {
     parent = null
 
     children = []
+    name = ''
+    isRoot = false
 
     constructor(parent, className, _extends, meta, on, qmlFile, info){
+        if(qmlFile.elementsCount === 0) this.isRoot = true
+        this.name = '__el'+qmlFile.elementsCount++
         this.parent = parent
         this.className = className
         this.extends = typeof _extends === 'object' ? _extends.slice(1).join('.') : _extends
@@ -332,13 +336,6 @@ class Instruction {
     }
     
     resolveInner(name, thisKey){
-        // for(let obj of this.assignProperties){
-        //     let typeInfo = obj.type ? this.getTypeInfo(obj.type) : {}
-        //     if(name === obj.name) return {
-        //         // obj: obj.value instanceof Instruction ? obj.value : typeInfo.type, // ====
-        //         source: `${thisKey}.${name}`,
-        //     }
-        // }
         for(let obj of this.defineProperties){
             let typeInfo
             try {
@@ -347,20 +344,17 @@ class Instruction {
                 throw `${this.qmlFile.fileName}:${obj.info.line+1}:${obj.info.col+1}: error: ${obj.type} is not founded`
             }
             if(name === obj.name) return {
-                // obj: obj.value instanceof Instruction ? obj.value : typeInfo.type, // ====
                 source: `${thisKey}.${name}`,
                 type: typeInfo.type,
             }
         }
         for(let obj of this.defineSignals){
             if(name === obj.name) return {
-                // obj: obj.source, // ====
                 source: `${thisKey}.${name}`,
             }
         }
         for(let obj of this.defineMethods){
             if(name === obj.name) return {
-                // obj: obj.source, // ====
                 source: `${thisKey}.${name}`,
             }
         }
@@ -377,13 +371,11 @@ class Instruction {
                 let obj = new typeInfo.type()
                 if(name in typeInfo.type.meta){
                     return {
-                        // obj: typeInfo.type, // ====
                         source: `${thisKey}.${name}`,
                         type: typeInfo.type.meta[name].typeTarget ? typeInfo.type.meta[name].typeTarget : typeInfo.type.meta[name].type,
                     }
                 } else if(name in obj){
                     return {
-                        // obj: typeInfo.type, // ====
                         source: `${thisKey}.${name}`,
                     }
                 }
@@ -442,7 +434,12 @@ class Instruction {
 
                     if(Singletons[tree[1]]) {
                         // this.qmlFile.dependencies.add(Singletons[tree[1]])
-                        stat.value += tree[1]
+                        if(Singletons[tree[1]].moduleName){
+                            stat.value += `JQModules.${Singletons[tree[1]].moduleName}.${tree[1]}`
+                        } else {
+                            stat.value += tree[1]
+                        }
+                        
                         if(stat.wasDot){
                             stat.dotObj = Singletons[tree[1]]
                         }
@@ -519,7 +516,6 @@ class Instruction {
                                 path = this.resolve(stat.dotObj.meta[tree[2]], stat.thisKey)
                                 if(path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
                             }
-                            // if(tree[2] in stat.dotObj) stat.dotObj = path.obj
                         } else if(tree[2] in stat.dotObj){
                             path = stat.dotObj[tree[2]]
                             stat.dotObj = typeof stat.dotObj[tree[2]] === 'object' ? stat.dotObj[tree[2]] : null
@@ -872,7 +868,6 @@ class Instruction {
                     return 'continue;'
                 }
                 case 'qmlaliasdef': {
-                    //let path = this.resolve(tree[1], stat.thisKey)
                     stat.isCompute = true
                     let obj = null
 
@@ -896,7 +891,7 @@ class Instruction {
                                     console.log(`${this.qmlFile.fileName}:${tree.info[i].line+1}:${tree.info[i].col+1}: warning: ${tree.info[i].value} is not founded in ${tree.info[i-1].value}`)
                                 }
                             } else {
-                                stat.value += tree.info[i].value
+                                stat.value += '.' + tree.info[i].value
                             }
                         }
                     } else {
@@ -906,61 +901,19 @@ class Instruction {
                     return stat
                 }
                 default: {
-                    // console.log('======', this.qmlFile.filename, Object.keys(tree))
                     for(let t of tree){
                         this.prepare(t, stat)
                         stat.value += '\n'
                     }
                     return stat
-
-                    console.log('default'); return ''
-                    
-                    if(stat.type !== 'QAlias'){
-                        for(let t of tree){
-                            this.prepare(t, compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
-                        }
-                    } else {
-                        stat.compute = true
-                        if(tree.length === 1){
-                            if(compiledFile.context[tree[0]]){
-                                stat.value.push(`inCtx.get('${tree[0]}')`)
-                            } else {
-                                stat.value.push(`${currentInstructions.name}.getStatement('${tree[0]}')`)
-                            }
-                        } else if(tree.length === 2){
-                            if(compiledFile.context[tree[0]]){
-                                if(tree[1]){
-                                    let path = tree[1].split('.')
-                                    for(let i = 0; i < path.length; i++){
-                                        path[i] = `getStatement('${path[i]}')`
-                                    }
-                                    stat.value.push(`inCtx.get('${tree[0]}').${path.join('.')}`)
-                                } else {
-                                    stat.value.push(`inCtx.get('${tree[0]}')`)
-                                }
-                                
-                            } else {
-                                if(tree[1]){
-                                    let path = tree[1].split('.')
-                                    for(let i = 0; i < path.length; i++){
-                                        path[i] = `getStatement('${path[i]}')`
-                                    }
-                                    stat.value.push(`${currentInstructions.name}.getStatement('${tree[0]}').${path.join('.')}`)
-                                } else {
-                                    stat.value.push(`${currentInstructions.name}.getStatement('${tree[0]}')`)
-                                }
-                                
-                            }
-                        }
-                    }
-                    
-                    break
                 }
             }
         }
     }
 
     getTypeInfo(type){
+        if(!type) type = this.extends
+
         let found = false
         let _type = type
         let _path = ''
@@ -1009,7 +962,7 @@ class Instruction {
                     } catch {}
 
                     if(qmlFile){
-                        if(qmlFile instanceof QmlFile){
+                        if(version !== undefined && qmlFile instanceof QmlFile){
                             throw `${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: ${type} version ${version} does not exists in ${path}`
                         } else {
                             _type = qmlFile
@@ -1022,9 +975,14 @@ class Instruction {
         }
 
         if(found){
+            let _typeBase = _type
+            while(_typeBase instanceof QmlFile){
+                _typeBase = _typeBase.instruction.getTypeInfo(_typeBase.instruction.extends).type
+            }
             return {
                 path: _path,
-                type: _type
+                type: _type,
+                typeBase: _typeBase,
             }
         } else {
             throw `${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: ${type} is not founded`
@@ -1051,26 +1009,10 @@ class Instruction {
         
     }
 
-    toCode(isRoot = false, isComponent = false, level = 0){
-        let code = []
-        let typeInfo = this.getTypeInfo(this.extends)
-        let typeBase = typeInfo.type
-        while(typeBase instanceof QmlFile){
-            typeBase = typeBase.instruction.getTypeInfo(typeBase.instruction.extends).type
-        }
-
-        if(typeInfo.type instanceof QmlFile){
-            this.qmlFile.dependencies.add(typeInfo.type)
-        }
-
-        if(this.qmlFile.singleton && isRoot){
-            code.push(`const ${this.className} = (class extends ${typeInfo.path} {`)
-        } else {
-            code.push(`class ${this.className} extends ${typeInfo.path} {`)
-        }
-        
+    getMeta(){
+        let meta = []
+        meta.push(`{`)
         if(this.defineProperties.length || this.defineSignals.length){
-            code.push(`static meta = Object.assign({}, ${typeInfo.path}.meta, {`)
             for(let defineProperty of this.defineProperties){
                 let _typeInfo
                 try {
@@ -1086,173 +1028,279 @@ class Instruction {
 
                 if(typeof defineProperty.value === 'object'){
                     if(_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)){
-                        code.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, signalName:'${defineProperty.signalName}'},`)
+                        meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, signalName:'${defineProperty.signalName}'},`)
                     } else {
-                        code.push(`${defineProperty.name}:{type:${_typeInfo.path}, signalName:'${defineProperty.signalName}'},`)
+                        meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, signalName:'${defineProperty.signalName}'},`)
                     }
                     continue
                 }
 
                 if(typeof defineProperty.value === 'string'){
-                    code.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:'${defineProperty.value}', signalName:'${defineProperty.signalName}'},`)
+                    meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:'${defineProperty.value}', signalName:'${defineProperty.signalName}'},`)
                 } else {
                     if(_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)){
-                        code.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, value:${defineProperty.value}, signalName:'${defineProperty.signalName}'},`)
+                        meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, value:${defineProperty.value}, signalName:'${defineProperty.signalName}'},`)
                     } else {
-                        code.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}, signalName:'${defineProperty.signalName}'},`)
+                        meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}, signalName:'${defineProperty.signalName}'},`)
                     }
                     
                 }
                 
             }
             for(let defineSignal of this.defineSignals){
-                code.push(`${defineSignal.name}:{type:JQModules.QtQml.Signal, slotName:'${defineSignal.slotName}', args:[${defineSignal.args.join(',')}]},`)
-            }
-            code.push('})')
+                meta.push(`${defineSignal.name}:{type:JQModules.QtQml.Signal, slotName:'${defineSignal.slotName}', args:[${defineSignal.args.join(',')}]},`)
+            }   
         }
 
-        code.push('static create(parent, model, properties=[], isRoot=true, ...args){')
+        meta.push('}')
 
-        if(isRoot) {
-            code.push(`let __currentModule=${this.qmlFile.moduleName ? "JQModules['"+ this.qmlFile.moduleName +"']" : 'null'}`)
-        }
+        return meta.join('')
+    }
 
-        if(this.extends === 'Component'){
-            if(this.children.length < 1) {
-                console.log(`${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: Cannot create empty component specification`)
-                throw -1
-            } 
-            if(this.children.length > 1) {
-                console.log(`${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: Invalid component body specification`)
-                throw -1
-            }
-
-            code.push(`let __self = super.create(parent, ${this.children[0].toCode(false, true, level+1)})`)
-        } else {
-            code.push('let __self = super.create(parent, model, properties, false, ...args)')
-        }
-
-        
-
-        if(isRoot) {
-            code.push(`let __rootContext${level}=JQContext.create()`) // context !!!
-            code.push(`let __context=__rootContext${level}`) // context !!!
-        }
-        if(isComponent){
-            code.push(`let __rootContext${level}=JQContext.create(__rootContext${level-1})`) // context !!!
-            code.push(`let __context=__rootContext${level}`) // context !!!
-        }
-
-        if(this.id) code.push(`__context['${this.id}']=__self`)  // context !!!
-
-        let connectionsInfo = {}
-        for(let defineMethod of this.defineMethods){
-            if(defineMethod.name.slice(0, 2) === 'on'){
-                let signalName = defineMethod.name[2].toLowerCase() + defineMethod.name.slice(3)
-                connectionsInfo[signalName] = defineMethod.name
-            }
-            let stat = this.prepare(defineMethod.source, {isCompute:false, thisKey: '__self', value:'', local:[]})
-            code.push('__self.'+stat.value)
-        }
-
-        // if(typeBase === JQModules.QtQuick.Loader){
-        //     code.push(`__self.__path = '${path.relative(config.base, this.qmlFile.fileName).replaceAll('/','\\').replaceAll('\\','\\\\')}'`)
-        // }
-
-        if(typeBase === JQModules.QtQml.Connections){
-            code.push(`__self.__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
-        }
-
+    getProperties(level = 0){
+        let code = []
         let lazyCode = []
 
         for(let assignProperty of this.assignProperties){
-            let path = this.resolve(assignProperty.name.split('.')[0], '__self')
+            let path = this.resolve(assignProperty.name.split('.')[0], this.name)
 
             if(!path){
                 console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line+1}:${assignProperty.value.info.col-assignProperty.name.length-1}: warning: ${assignProperty.name} is not founded`)
             }
 
             if(assignProperty.value instanceof Instruction) {
-                if((path.type === QtQml.Component) && assignProperty.value.extends !== 'Component'){
-                    lazyCode.push(`__self.${assignProperty.name}=(class extends JQModules.QtQml.Component {}).create(null,${assignProperty.value.toCode(false,true,level+1)})`)
+                if(path.type === QtQml.Component && assignProperty.value.extends !== 'Component'){
+                    lazyCode.push(`let ${assignProperty.value.name}=JQModules.QtQml.Component.create(null,`)
+
+                    let childTypeInfo = assignProperty.value.getTypeInfo()
+                    let childMeta = assignProperty.value.getMeta()
+
+                    if(childTypeInfo.type instanceof QmlFile){
+                        this.qmlFile.dependencies.add(childTypeInfo.type)
+                    }
+
+                    lazyCode.push(`(class ${assignProperty.value.className} extends ${childTypeInfo.path} {`)
+                    lazyCode.push(`static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})`)
+                    lazyCode.push('static create(parent,model,meta={},properties=[],isRoot=true){')
+
+                    lazyCode.push(`let __rootContext${level+1}=JQContext.create(__rootContext${level})`)
+                    lazyCode.push(`let __context=__rootContext${level+1}`)
+
+                    lazyCode.push(`let ${assignProperty.value.name} = super.create(parent,model,meta,properties,false)`)
+
+                    if(assignProperty.value.id) lazyCode.push(`__context['${assignProperty.value.id}']=${assignProperty.value.name}`)
+
+                    lazyCode.push(assignProperty.value.getMethods())
+
+                    let properties = assignProperty.value.getProperties(level+1)
+                    lazyCode.push(properties.code)
+
+                    // // children 
+
+                    for(let i = 0; i < assignProperty.value.children.length; i++){
+                        lazyCode.push(`let ${assignProperty.value.children[i].name}=` + assignProperty.value.children[i].toCode(level+1))
+                    }
+
+                    // // children
+
+                    lazyCode.push(properties.lazylazyCode)
+
+                    lazyCode.push(assignProperty.value.getConnectedSignals())
+
+                    lazyCode.push(`if(isRoot) {while(properties.length){properties.shift().__update()};${assignProperty.value.name}.__complete()}`)
+
+                    lazyCode.push(`return ${assignProperty.value.name}`)
+
+                    lazyCode.push('}')
+
+                    lazyCode.push(`})`)
+
+
+                    lazyCode.push(`)`)
+
+                    lazyCode.push(`${this.name}.${assignProperty.name}=${assignProperty.value.name}`)
                 } else {
-                    lazyCode.push(`__self.${assignProperty.name}=(${assignProperty.value.toCode(false,false,level)}).create(null,null,properties,false)`)
+                    lazyCode.push(`let ${assignProperty.value.name}=${assignProperty.value.toCode(level)}`)
+                    lazyCode.push(`${this.name}.${assignProperty.name}=${assignProperty.value.name}`)
+                    lazyCode.push(`${this.name}['Component.completed'].connect(${assignProperty.value.name},()=>{${assignProperty.value.name}.__complete()})`)
                 }
+                
             } else {
-                let stat = this.prepare(assignProperty.value, {isCompute:false, thisKey: '__self', value:'', local:[]})
+                let stat = this.prepare(assignProperty.value, {isCompute:false, thisKey: this.name, value:'', local:[]})
                 if(stat.isCompute){
                     if(assignProperty.type === 'alias'){
-                        code.push(`__self.__getObject('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
+                        code.push(`${this.name}.__getDataQml('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
                     } else {
-                        code.push(`__self.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},true)`)
+                        code.push(`${this.name}.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},true)`)
                     }
                 } else {
-                    code.push(`__self.${assignProperty.name}=${stat.value}`)
+                    code.push(`${this.name}.${assignProperty.name}=${stat.value}`)
                 }
             }
             
             
         }
-        for(let i = 0; i < this.children.length; i++){
-            if(this.extends === 'Component'){
-                continue
-            } else {
-                code.push(`let child${i}=(` + this.children[i].toCode(false,false,level) + ').create(__self,null,properties,false)')
-            }
-            
-        }
 
-        code.push(lazyCode.join('\n'))
+        return {code: code.join('\n'), lazyCode: lazyCode.join('\n')}
+    }
+
+    getConnectedSignals(){
+        let code = []
+        let typeInfo = this.getTypeInfo()
 
         for(let connectedSignal of this.connectedSignals){
-            if(typeBase === JQModules.QtQuick.MouseArea && connectedSignal.slotName === 'onPressed'){
+            if(typeInfo.typeBase.isAssignableFrom(JQModules.QtQuick.MouseArea) && connectedSignal.slotName === 'onPressed'){
                 connectedSignal.slotName = 'onPressedChanged'
             }
-
             let names = connectedSignal.slotName.replaceAll("['", '').replaceAll("']", '').split('.')
-
             let signalName = ''
             if(names.length === 1){
                 signalName = names[0][2].toLowerCase() + names[0].slice(3)
             } else {
                 signalName = names[0] + '.' + names[1][2].toLowerCase() + names[1].slice(3)
             }
-        
             let args = this.getSignalArgs(signalName)
-
             connectedSignal.args = []
-
             if(args)
             for(let arg of args){
                 connectedSignal.args.push(arg.replaceAll('`', ''))
             }
-
-            code.push(`__self['${signalName}'].extendSlot(function(${connectedSignal.args.join(',')}){try{JQApplication.beginUpdate();`)
-            
-            let stat = this.prepare(connectedSignal.source, {isCompute:false, thisKey: '__self', value:'', local:[connectedSignal.args]}) 
+            code.push(`${this.name}['${signalName}'].extendSlot(function(${connectedSignal.args.join(',')}){try{JQApplication.beginUpdate();`)
+         
+            let stat = this.prepare(connectedSignal.source, {isCompute:false, thisKey: this.name, value:'', local:[connectedSignal.args]}) 
             code.push(stat.value)
             code.push(`}finally{JQApplication.endUpdate()}})`)
         }
 
-        if(isRoot || isComponent) {
-            code.push(`if(isRoot) {while(properties.length){properties.shift().__update()};__self.__complete()}`) // property update !!!
+        return code.join('\n')
+    }
+
+    getMethods(){
+        let code = []
+        let connectionsInfo = {}
+        let typeInfo = this.getTypeInfo()
+
+        for(let defineMethod of this.defineMethods){
+            if(defineMethod.name.slice(0, 2) === 'on'){
+                let signalName = defineMethod.name[2].toLowerCase() + defineMethod.name.slice(3)
+                connectionsInfo[signalName] = defineMethod.name
+            }
+            let stat = this.prepare(defineMethod.source, {isCompute:false, thisKey: this.name, value:'', local:[]})
+            code.push(`${this.name}.${stat.value}`)
         }
 
-        
+        if(typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.Connections)){
+            code.push(`${this.name}.__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
+        }
 
-        code.push('return __self')
-        code.push('}')
-        
-        
-        
+        return code.join('\n')
+    }
 
-        
+    toComponentCode(level = 0){
+        if(this.children.length < 1) {
+            throw`${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: Cannot create empty component specification`
+        } 
+        if(this.children.length > 1) {
+            throw`${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: Invalid component body specification`
+        }
 
-        if(this.qmlFile.singleton && isRoot){
-            code.push(`}).create()`)
+        let code = []
+        let typeInfo = this.getTypeInfo()
+
+        if(this.parent){
+            code.push(`${typeInfo.path}.create(${this.parent.name},`)
         } else {
-            code.push(`}`)
+            code.push(`${typeInfo.path}.create(null,`)
         }
+
+        let childTypeInfo = this.children[0].getTypeInfo()
+        let childMeta = this.children[0].getMeta()
+
+        if(childTypeInfo.type instanceof QmlFile){
+            this.qmlFile.dependencies.add(childTypeInfo.type)
+        }
+
+        code.push(`(class ${this.children[0].className} extends ${childTypeInfo.path} {`)
+        code.push(`static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})`)
+        code.push('static create(parent,model,meta={},properties=[],isRoot=true){')
+
+        code.push(`let __rootContext${level}=JQContext.create(__rootContext${level-1})`)
+        code.push(`let __context=__rootContext${level}`)
+
+        code.push(`let ${this.children[0].name} = super.create(parent,model,meta,properties,false)`)
+
+        if(this.children[0].id) code.push(`__context['${this.children[0].id}']=${this.children[0].name}`)
+
+        code.push(this.children[0].getMethods())
+
+        let properties = this.children[0].getProperties(level)
+        code.push(properties.code)
+
+        // // children 
+
+        for(let i = 0; i < this.children[0].children.length; i++){
+            code.push(`let ${this.children[0].children[i].name}=` + this.children[0].children[i].toCode(level))
+        }
+
+        // // children
+
+        code.push(properties.lazyCode)
+
+        code.push(this.children[0].getConnectedSignals())
+
+        code.push(`if(isRoot) {while(properties.length){properties.shift().__update()};${this.children[0].name}.__complete()}`)
+
+        code.push(`return ${this.children[0].name}`)
+
+        code.push('}')
+
+        code.push(`})`)
+
+
+        code.push(`)`)
+
+        if(this.id) code.push(`__context['${this.id}']=${this.name}`)
+
+        return code.join('\n')
+    }
+
+    toCode(level = 0){
+        let code = []
+        let typeInfo = this.getTypeInfo()
+
+        if(typeInfo.type instanceof QmlFile){
+            this.qmlFile.dependencies.add(typeInfo.type)
+        }
+
+        if(typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.Component)) return this.toComponentCode(level+1)
+
+        let meta = this.getMeta()
+
+        if(this.parent){
+            code.push(`${typeInfo.path}.create(${this.parent.name},null,${meta},properties,false)`)
+        } else {
+            code.push(`${typeInfo.path}.create(null,null,${meta},properties,false)`)
+        }
+        
+
+        if(this.id) code.push(`__context['${this.id}']=${this.name}`)
+
+        code.push(this.getMethods())
+
+        let properties = this.getProperties(level)
+        code.push(properties.code)
+
+        // children
+
+        for(let i = 0; i < this.children.length; i++){
+            code.push(`let ${this.children[i].name}=` + this.children[i].toCode(level))
+        }
+
+        // children
+
+        code.push(properties.lazyCode)
+
+        code.push(this.getConnectedSignals())
         
         return code.join('\n')
     }
@@ -1266,8 +1314,9 @@ class QmlFile {
     moduleName = ''
     instruction = null
     updateList = []
-    version = 1
+    version = 1.0
     dependencies = new Set()
+    elementsCount = 0
 
     constructor(fileName, moduleName, version = 1){
         this.fileName = fileName
@@ -1333,7 +1382,68 @@ class QmlFile {
     }
 
     toCode(){
-        return this.instruction.toCode(true)
+        let code = []
+        let typeInfo = this.instruction.getTypeInfo()
+        let meta = this.instruction.getMeta()
+
+        if(typeInfo.type instanceof QmlFile){
+            this.dependencies.add(typeInfo.type)
+        }
+
+        if(this.singleton){
+            if(this.moduleName){
+                code.push(`JQModules.${this.moduleName}.${this.instruction.className} = (class extends ${typeInfo.path} {`)
+            } else {
+                code.push(`const ${this.instruction.className} = (class extends ${typeInfo.path} {`)
+            }
+            
+            code.push(`static singleton = true`)
+        } else {
+            code.push(`class ${this.instruction.className} extends ${typeInfo.path} {`)
+        }
+
+        code.push(`static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})`)
+
+        code.push('static create(parent,model,meta={},properties=[],isRoot=true){')
+
+        code.push(`let __currentModule=${this.moduleName ? "JQModules['"+ this.moduleName +"']" : 'null'}`)
+        code.push(`let __rootContext0=JQContext.create()`)
+        code.push(`let __context=__rootContext0`)
+
+        code.push(`let ${this.instruction.name} = super.create(parent,model,meta,properties,false)`)
+
+        if(this.instruction.id) code.push(`__context['${this.instruction.id}']=${this.instruction.name}`)
+
+        code.push(this.instruction.getMethods())
+
+        let properties = this.instruction.getProperties(0)
+        code.push(properties.code)
+
+        // children
+
+        for(let i = 0; i < this.instruction.children.length; i++){
+            code.push(`let ${this.instruction.children[i].name}=` + this.instruction.children[i].toCode(0))
+        }
+
+        // children
+
+        code.push(properties.lazyCode)
+
+        code.push(this.instruction.getConnectedSignals())
+
+        code.push(`if(isRoot) {while(properties.length){properties.shift().__update()};${this.instruction.name}.__complete()}`)
+
+        code.push(`return ${this.instruction.name}`)
+
+        code.push('}')
+
+        if(this.singleton){
+            code.push(`}).create()`)
+        } else {
+            code.push(`}`)
+        }
+
+        return code.join('\n')
     }
 }
 
@@ -1448,8 +1558,6 @@ console.log(`JQ: compilation of single files`)
 
 for(let className in Singletons){
     console.log(`    > ${className}.qml (Singleton)`)
-    // fullCode.push(Singletons[className].toCode())
-    // fullCode.push(`JQModules.properties.push(()=>{${Singletons[className].toCode()};window.${className}=${className}})`)
     compiledFiles.push({
         file: Singletons[className],
         code: Singletons[className].toCode(),
@@ -1461,12 +1569,10 @@ for(let className in SingleFiles){
         continue
     }
     console.log(`    > ${className}.qml`)
-    // console.log(`        > ${SingleFiles[className].fileName}(5)`)
-    // fullCode.push(SingleFiles[className].toCode())
-    // fullCode.push(`JQModules.properties.push(()=>{${SingleFiles[className].toCode()};window.${className}=${className}})`)
     compiledFiles.push({
         file: SingleFiles[className],
         code: SingleFiles[className].toCode(),
+        path: className,
     })
 }
 
@@ -1490,18 +1596,15 @@ for(let moduleName in JQModules){
                 queue[className] = file
                 continue
             }
-            // fullCode.push(`JQModules.properties.push(()=>{JQModules.${moduleName}.${className}=${file.toCode()}})`)
-            // fullCode.push(`JQModules.${moduleName}.${className}=${file.toCode()}`)
             compiledFiles.push({
                 file: file,
                 code: `JQModules.${moduleName}.${className}=${file.toCode()}`,
+                path: `JQModules.${moduleName}.${className}`,
             })
         }
     }
     for(let className in queue){
         let file = queue[className]
-        // fullCode.push(`JQModules.properties.push(()=>{if(!JQModules.${moduleName}.${className}_v${file.version}) throw ''; JQModules.${moduleName}.${className}=JQModules.${moduleName}.${className}_v${file.version}})`)
-        // fullCode.push(`JQModules.${moduleName}.${className}=JQModules.${moduleName}.${className}_v${file.version}`)
         fullCode.push(`Object.defineProperty(JQModules.${moduleName},'${className}',{get:()=>{return JQModules.${moduleName}.${className}_v${file.version}}})`)
     }
 }
@@ -1527,34 +1630,20 @@ while(compiledFiles.length){
         for(let i = 0; i < compiledFiles.length; i++){
             if(compiledFile.file.dependencies.has(compiledFiles[i].file)){
                 compiledFiles.splice(i+1, 0, compiledFile)
-                // console.log(compiledFile.file.fileName, 'await', compiledFiles[i].file.fileName)
                 found = true
                 break
             }
         }
-        if(!found) fullCode.push(compiledFile.code)
+        if(!found) {
+            fullCode.push(compiledFile.code)
+            if(compiledFile.path) fullCode.push(`${compiledFile.path}.initialize()`)
+        }
     } else {
         fullCode.push(compiledFile.code)
-        
+        if(compiledFile.file instanceof QmlFile && compiledFile.path) fullCode.push(`${compiledFile.path}.initialize()`)
     }
 }
 
-// fullCode.push('const __errors__ = []')
-// fullCode.push(`while(JQModules.properties.length){
-//     let reg = JQModules.properties.shift()
-    
-//     if(!reg.count || reg.count < 5){
-//         try {
-//             reg()
-//         } catch (error) {
-//             reg.count = reg.count ? reg.count+1 : 1
-//             JQModules.properties.push(reg)
-//         }
-//     } else {
-//         __errors__.push(reg)
-//         // console.log(reg)
-//     }
-// }`)
 
 if(config.entry){
     fullCode.push(`window.addEventListener('load', ()=>{console.time('build');JQApplication.rootPath='${config.rootPath}';${config.entry.replaceAll('.qml', '')}.create(JQApplication.root);console.timeEnd('build')})`)

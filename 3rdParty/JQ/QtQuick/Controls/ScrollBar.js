@@ -8,13 +8,15 @@ class ScrollBar extends Control {
 
     })
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, model, properties, ...args)
-        proxy.__getDOM().classList.add('ScrollBar')
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
+        obj.__getDOM().classList.add('ScrollBar')
 
-        return proxy
+        return obj
     }
 
 }
+
+ScrollBar.initialize()
 
 module.exports = ScrollBar

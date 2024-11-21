@@ -22,11 +22,11 @@ class Column extends Item {
         positioningComplete: {type:Signal, slotName:'onPositioningComplete', args:[]},
     })
 
-    static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
-        proxy.__DOM.classList.add('Column')
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
+        obj.__DOM.classList.add('Column')
 
-        return proxy
+        return obj
     }
 
     onPaddingChanged(){
@@ -85,8 +85,8 @@ class Column extends Item {
             paddingBottom: this.bottomPadding+'px',
         })
 
-        this.__getObject('width').__setAuto(width + this.leftPadding + this.rightPadding)
-        this.__getObject('height').__setAuto(height + this.topPadding + this.bottomPadding)
+        this.__getDataQml('width').__setAuto(width + this.leftPadding + this.rightPadding)
+        this.__getDataQml('height').__setAuto(height + this.topPadding + this.bottomPadding)
 
         this.positioningComplete()
     }
@@ -100,5 +100,7 @@ class Column extends Item {
         this.__updateGeometry()
     }
 }
+
+Column.initialize()
 
 module.exports = Column

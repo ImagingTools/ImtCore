@@ -45,4 +45,6 @@ class Font extends GroupProperty {
     }
 }
 
+Font.initialize()
+
 module.exports = Font

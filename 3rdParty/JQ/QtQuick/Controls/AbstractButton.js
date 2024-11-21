@@ -8,13 +8,15 @@ class AbstractButton extends Control {
 
     })
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, model, properties, ...args)
-        proxy.__getDOM().classList.add('AbstractButton')
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
+        obj.__getDOM().classList.add('AbstractButton')
 
-        return proxy
+        return obj
     }
 
 }
+
+AbstractButton.initialize()
 
 module.exports = AbstractButton

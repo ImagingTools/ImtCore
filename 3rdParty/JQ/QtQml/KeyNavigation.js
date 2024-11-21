@@ -17,4 +17,6 @@ class KeyNavigation extends GroupProperty {
 
 }
 
+KeyNavigation.initialize()
+
 module.exports = KeyNavigation

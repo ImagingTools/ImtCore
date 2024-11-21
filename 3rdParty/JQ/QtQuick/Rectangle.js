@@ -18,11 +18,11 @@ class Rectangle extends Item {
         gradientChanged: {type:Signal, slotName:'onGradientChanged', args:[]},
     })
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, model, properties, ...args)
-        proxy.__getDOM().classList.add('Rectangle')
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
+        obj.__getDOM().classList.add('Rectangle')
 
-        return proxy
+        return obj
     }
 
     __updateGradient(){
@@ -70,7 +70,7 @@ class Rectangle extends Item {
     }
 
     onOpacityChanged(){
-        let rgba = this.__getObject('color').__toRGBA()
+        let rgba = this.__getDataQml('color').__toRGBA()
         this.__setDOMStyle({
             opacity: this.opacity > 0 ? 1 : 0,
             backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
@@ -85,5 +85,7 @@ class Rectangle extends Item {
         super.__destroy()
     }
 }
+
+Rectangle.initialize()
 
 module.exports = Rectangle

@@ -36,4 +36,6 @@ class Dialog extends QtObject {
     reject(){}
 }
 
+Dialog.initialize()
+
 module.exports = Dialog

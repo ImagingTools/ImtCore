@@ -90,11 +90,11 @@ class TextInput extends Item {
     })
 
     static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
-        proxy.__DOM.classList.add('TextInput')
-        proxy.__createImpl()
-        JQApplication.MouseController.add(proxy)
-        return proxy
+        let obj = super.create(parent, ...args)
+        obj.__DOM.classList.add('TextInput')
+        obj.__createImpl()
+        JQApplication.MouseController.add(obj)
+        return obj
     }
 
     __createImpl(){
@@ -422,5 +422,7 @@ class TextInput extends Item {
         super.__destroy()
     }
 }
+
+TextInput.initialize()
 
 module.exports = TextInput

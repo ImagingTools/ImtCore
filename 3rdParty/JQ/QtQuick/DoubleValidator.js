@@ -76,4 +76,6 @@ class DoubleValidator extends QtObject {
     }
 }
 
+DoubleValidator.initialize()
+
 module.exports = DoubleValidator

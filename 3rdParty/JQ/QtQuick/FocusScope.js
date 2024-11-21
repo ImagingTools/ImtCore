@@ -16,4 +16,6 @@ class FocusScope extends Item {
     }
 }
 
+FocusScope.initialize()
+
 module.exports = FocusScope

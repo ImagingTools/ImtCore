@@ -6,7 +6,7 @@ class String extends Property {
     __typecasting(value){
         if(typeof value === 'object') {
             if(value instanceof Property) {
-                return value[Symbol.toPrimitive]('string')
+                return value.__get()
             } else {
                 throw 'Cannot assign JSValue to String'
             }

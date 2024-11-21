@@ -37,4 +37,6 @@ class GqlRequest extends QtObject {
     }
 }
 
+GqlRequest.initialize()
+
 module.exports = GqlRequest

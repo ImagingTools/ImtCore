@@ -95,4 +95,6 @@ class RemoteFileController extends QtObject {
     }
 }
 
+RemoteFileController.initialize()
+
 module.exports = RemoteFileController

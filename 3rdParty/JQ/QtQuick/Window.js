@@ -5,13 +5,15 @@ class Window extends QtObject {
 
     })
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, model, properties, ...args)
-        proxy.__getDOM().classList.add('Window')
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
+        obj.__getDOM().classList.add('Window')
 
-        return proxy
+        return obj
     }
 
 }
+
+Window.initialize()
 
 module.exports = Window

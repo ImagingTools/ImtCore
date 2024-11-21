@@ -1,52 +1,20 @@
 const BaseObject = require("../QtBase/BaseObject")
 
-class Property extends BaseObject {
+class Property extends BaseObject{
     static queueLink = []
     static defaultValue = null
 
     static create(parent, meta){
-        let proxy = super.create(parent, meta)
-        let self = proxy.__self 
+        let obj = super.create(parent, meta)
 
-        self.__parent = parent ? parent.__proxy : null
-        self.__value = 'value' in meta ? meta.value : this.defaultValue
-        self.__signalName = meta.signalName
+        obj.__parent = parent
+        obj.__value = 'value' in meta ? meta.value : this.defaultValue
+        obj.__signalName = meta.signalName
 
-        return proxy
+        return obj
     }
 
     __auto = true
-
-    __toPrimitive(hint){ 
-        let value = this.__get()
-        switch(hint){
-            case 'number': {
-                if(value === undefined || value === null) throw `${value} не может быть преобразован в Number`
-                switch(typeof value){
-                    case 'number': return value
-                    case 'string': {
-                        let number = Number(value)
-                        if(isNaN(number)) throw `${value} не может быть преобразован в Number`
-                        return number
-                    }
-                    case 'object': throw `${value} не может быть преобразован в Number`
-                }
-            }
-            case 'string': {
-                if(value === undefined || value === null) throw `${value} не может быть преобразован в String`
-                switch(typeof value){
-                    case 'number': return value.toString()
-                    case 'string': return value
-                    case 'object': throw `${value} не может быть преобразован в String`
-                }
-            }
-            default: return value
-        }
-    }
-    
-    __has(key){
-        return false
-    }
 
     __get(key){
         let caller = Property.queueLink[Property.queueLink.length-1]
@@ -64,7 +32,7 @@ class Property extends BaseObject {
     }
 
     __getSignal(){
-        return this.__signalName && this.__parent ? this.__parent.__get(this.__signalName) : undefined
+        return this.__signalName && this.__parent ? this.__parent[this.__signalName] : undefined
     }
 
     __emitSignal(...args){
@@ -198,7 +166,7 @@ class Property extends BaseObject {
                     this.__depends.push(target)
                 }
         
-                target.__addSubscriber(this.__proxy)
+                target.__addSubscriber(this)
             }
             
         }
@@ -233,10 +201,9 @@ class Property extends BaseObject {
         JQApplication.MemoryController.removeLink(this.__value, this)
 
         this.__unsubscribe()
-        let self = this.__self
-        delete self.__proxy
-        for(let key in self){
-            delete self[key]
+
+        for(let key in this){
+            delete this[key]
         }
     }
 }

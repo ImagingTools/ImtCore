@@ -1,8 +1,10 @@
 const Item = require("./Item")
 const Bool = require("../QtQml/Bool")
 const Real = require("../QtQml/Real")
-const Signal = require("../QtQml/Signal")
+const String = require("../QtQml/String")
 const Var = require("../QtQml/Var")
+const Signal = require("../QtQml/Signal")
+
 
 class Canvas extends Item {
     static Immediate = 0
@@ -33,10 +35,10 @@ class Canvas extends Item {
     })
 
     static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
-        proxy.__DOM.classList.add('Canvas')
+        let obj = super.create(parent, ...args)
+        obj.__DOM.classList.add('Canvas')
 
-        return proxy
+        return obj
     }
 
     __cache = {}
@@ -138,5 +140,7 @@ class Canvas extends Item {
 
     }
 }
+
+Canvas.initialize()
 
 module.exports = Canvas

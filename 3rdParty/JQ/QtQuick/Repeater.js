@@ -21,10 +21,10 @@ class Repeater extends Item {
     })
 
     static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
-        proxy.__DOM.classList.add('Repeater')
+        let obj = super.create(parent, ...args)
+        obj.__DOM.classList.add('Repeater')
 
-        return proxy
+        return obj
     }
 
     __items = []
@@ -84,7 +84,7 @@ class Repeater extends Item {
             if(typeof this.model === 'number'){
                 if(this.count !== this.model){
                     countChanged = true
-                    this.__getObject('count').__value = this.model
+                    this.__getDataQml('count').__value = this.model
                 }
 
                 for(let i = 0; i < this.model; i++){
@@ -95,7 +95,7 @@ class Repeater extends Item {
             } else {
                 if(this.count !== this.model.data.length){
                     countChanged = true
-                    this.__getObject('count').__value = this.model.data.length
+                    this.__getDataQml('count').__value = this.model.data.length
                 }
 
                 for(let i = 0; i < this.model.data.length; i++){
@@ -125,7 +125,7 @@ class Repeater extends Item {
 
                 if(this.count !== this.model.data.length){
                     countChanged = true
-                    this.__getObject('count').__value = this.model.data.length
+                    this.__getDataQml('count').__value = this.model.data.length
                 }
 
                 for(let change of changeSet){
@@ -169,5 +169,7 @@ class Repeater extends Item {
         super.__destroy()
     }
 }
+
+Repeater.initialize()
 
 module.exports = Repeater

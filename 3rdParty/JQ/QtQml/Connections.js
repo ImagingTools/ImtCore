@@ -52,4 +52,6 @@ class Connections extends QtObject {
     }
 }
 
+Connections.initialize()
+
 module.exports = Connections

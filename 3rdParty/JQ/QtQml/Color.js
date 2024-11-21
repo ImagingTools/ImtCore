@@ -21,7 +21,7 @@ class Color extends Property {
     
     __typecasting(value){
         if(typeof value === 'object') {
-            if(value instanceof Property) return value[Symbol.toPrimitive]()
+            if(value instanceof Property) return value.__get()
         }
         return value
     }

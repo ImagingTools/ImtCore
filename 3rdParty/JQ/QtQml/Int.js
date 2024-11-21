@@ -9,7 +9,7 @@ class Int extends Property {
         if(value === null) throw 'Cannot assign std::nullptr_t to int'
 
         if(typeof value === 'object') {
-            if(value instanceof Property) return value[Symbol.toPrimitive]('number')
+            if(value instanceof Property) return value.__get()
             throw 'Cannot assign QJSValue to int'
         }
 

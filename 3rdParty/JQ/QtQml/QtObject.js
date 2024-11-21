@@ -27,41 +27,51 @@ class QtObject extends QObject {
         JQAbstractModelChanged: {type:Signal, slotName:'onJQAbstractModelChanged', args:[]},
     })  
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, properties, ...args)
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
 
         if(model){
-            proxy.JQAbstractModel = model
+            obj.JQAbstractModel = model
         } else {
-            proxy.JQAbstractModel = QtFunctions.binding(()=>{return proxy.parent.JQAbstractModel})
-            // proxy.index = QtFunctions.binding(()=>{return proxy.JQAbstractModel.index})
+            obj.JQAbstractModel = QtFunctions.binding(()=>{return obj.parent.JQAbstractModel})
         }
 
-        return proxy
+        if(!('model' in meta) && this.meta.model.auto){
+            obj.model = QtFunctions.binding(()=>{return obj.JQAbstractModel})
+        }
+        obj.index = QtFunctions.binding(()=>{return obj.JQAbstractModel.index})
+
+        return obj
     }
 
     __complete(){
         if(this.__completed) return
 
         this.__completed = true
-        for(let i = this.data.length-1; i >= 0; i--){
-            this.data[i].__complete()
+        for(let i = this.__children.length-1; i >= 0; i--){
+            this.__children[i].__complete()
         }
 
-        while(this.__properties.length){
-            this.__properties.shift().__update()
-        }
+        // while(this.__properties.length){
+        //     this.__properties.shift().__update()
+        // }
         
         this['Component.completed']()
+
+        // for(let key in this.__dataQml){
+        //     if(this.__dataQml[key] instanceof Property && this.__dataQml[key].__value instanceof QtObject){
+        //         this.__dataQml[key].__value.__complete()
+        //     }
+        // }
     }
 
-    onJQAbstractModelChanged(){
-        this.index = this.JQAbstractModel.index
+    // onJQAbstractModelChanged(){
+    //     this.index = this.JQAbstractModel.index
 
-        if(this.__self.constructor.meta.model.auto){
-            this.model = this.JQAbstractModel
-        }
-    }
+    //     if(this.constructor.meta.model.auto){
+    //         this.model = this.JQAbstractModel
+    //     }
+    // }
 
     __removeChild(child){
         let index = -1
@@ -132,7 +142,8 @@ class QtObject extends QObject {
     }
 
     __destroy(){
-        if(this.__destroyed) return
+        if(this.__destroyed || !this.__destroying) return
+
         JQApplication.MemoryController.delete(this)
         super.__destroy()
 
@@ -140,26 +151,29 @@ class QtObject extends QObject {
 
         if(this.__children)
         for(let i = this.__children.length-1; i >= 0; i--){
-            this.__children[i].__destroy()
+            this.__children[i].destroy()
         }
 
         this.blockSignals(false)
         this['Component.destruction']()
         this.blockSignals(true)
 
-        if(this.parent) this.parent.__removeChild(this)
+        if(this.parent && !this.parent.__destroyed) this.parent.__removeChild(this)
 
-        let self = this.__self
-        delete self.__proxy
-        for(let key in self){
-            if(self[key] instanceof Property || self[key] instanceof GroupProperty || self[key] instanceof Signal){
-                self[key].__destroy()
+        for(let key in this.__dataQml){
+            if(this.__dataQml[key] instanceof Property || this.__dataQml[key] instanceof GroupProperty || this.__dataQml[key] instanceof Signal){
+                this.__dataQml[key].destroy()
             }
-            delete self[key]
         }
 
-        self.__destroyed = true
+        for(let key in this){
+            delete this[key]
+        }
+
+        this.__destroyed = true
     }
 }
+
+QtObject.initialize()
 
 module.exports = QtObject

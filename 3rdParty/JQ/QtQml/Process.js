@@ -2,7 +2,7 @@ const QtObject = require("./QtObject")
 const String = require("./String")
 const Signal = require("./Signal")
 
-class RemoteFileController extends QtObject {
+class Process extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
         finished: {type:Signal, slotName:'onFinished', args:[]},
     })
@@ -12,4 +12,6 @@ class RemoteFileController extends QtObject {
     setEnviroment(...args){}
 }
 
-module.exports = RemoteFileController
+Process.initialize()
+
+module.exports = Process

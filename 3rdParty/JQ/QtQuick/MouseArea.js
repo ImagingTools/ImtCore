@@ -46,10 +46,10 @@ class MouseArea extends Item {
     })
 
     static create(parent, ...args){
-        let proxy = super.create(parent, ...args)
-        proxy.__DOM.classList.add('MouseArea')
-        JQApplication.MouseController.add(proxy)
-        return proxy
+        let obj = super.create(parent, ...args)
+        obj.__DOM.classList.add('MouseArea')
+        JQApplication.MouseController.add(obj)
+        return obj
     }
 
     __pressed = false
@@ -105,7 +105,7 @@ class MouseArea extends Item {
 
         if(!mouse.target){
             this.__pressed = true
-            this.__getObject('pressed').__value = true
+            this.__getDataQml('pressed').__value = true
             if(!this.__entered) this.entered()
             this.pressedChanged(mouse)
 
@@ -124,16 +124,19 @@ class MouseArea extends Item {
     __onMouseClick(mouse){
         if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
+        this.__getDataQml('pressed').__value = false
+
         if(mouse.target === this && this.__pressed){
             this.clicked(mouse)
         }
 
-        this.__pressed = false
-        this.__getObject('pressed').__value = false
+        this.__pressed = false 
     }
 
     __onMouseDblClick(mouse){
         if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
+
+        this.__getDataQml('pressed').__value = false
 
         if(mouse.target === this && this.__pressed){
             this.clicked(mouse)
@@ -141,7 +144,6 @@ class MouseArea extends Item {
         }
 
         this.__pressed = false
-        this.__getObject('pressed').__value = false
     }
 
     __onWheel(wheel){
@@ -159,5 +161,7 @@ class MouseArea extends Item {
         super.__destroy()
     }
 }
+
+MouseArea.initialize()
 
 module.exports = MouseArea

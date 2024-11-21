@@ -95,4 +95,6 @@ class QWebSocket extends QtObject {
     }
 }
 
+QWebSocket.initialize()
+
 module.exports = QWebSocket

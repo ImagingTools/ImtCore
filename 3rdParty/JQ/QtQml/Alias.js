@@ -5,7 +5,7 @@ class Alias extends Property {
     __setter = null
 
     __get(key){
-        return this.__getter(key)
+        return this.__getter ? this.__getter(key) : this.__value
     }
     
     __set(key, value){

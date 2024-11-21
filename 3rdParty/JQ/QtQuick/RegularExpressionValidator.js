@@ -48,4 +48,6 @@ class RegularExpressionValidator extends QtObject {
     }
 }
 
+RegularExpressionValidator.initialize()
+
 module.exports = RegularExpressionValidator

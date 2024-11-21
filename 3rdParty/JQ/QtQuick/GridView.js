@@ -50,4 +50,6 @@ class GridView extends Flickable {
     }
 }
 
+GridView.initialize()
+
 module.exports = GridView

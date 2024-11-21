@@ -32,4 +32,6 @@ class GqlModel extends TreeItemModel {
     }
 }
 
+GqlModel.initialize()
+
 module.exports = GqlModel

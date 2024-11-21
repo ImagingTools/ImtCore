@@ -55,12 +55,12 @@ class Animation extends QtObject {
         finished: { type:Signal, slotName:'onFinished', args:[] },
     })
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, model, properties, ...args)
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
 
-        AnimationController.add(proxy)
+        AnimationController.add(obj)
 
-        return proxy
+        return obj
     }
 
     __loopCounter = 0
@@ -110,5 +110,7 @@ class Animation extends QtObject {
         super.__destroy()
     }
 }
+
+Animation.initialize()
 
 module.exports = Animation

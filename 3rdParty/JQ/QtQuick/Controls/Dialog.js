@@ -3,6 +3,7 @@ const Popup = require("./Popup")
 const Real = require("../../QtQml/Real")
 const Int = require("../../QtQml/Int")
 const Var = require("../../QtQml/Var")
+const String = require("../../QtQml/String")
 const Variant = require("../../QtQml/Variant")
 const Signal = require("../../QtQml/Signal")
 
@@ -56,11 +57,11 @@ class Dialog extends Popup {
         reset: {type:Signal, slotName:'onReset', args:[]},
     })
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, model, properties, ...args)
-        proxy.__getDOM().classList.add('Dialog')
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
+        obj.__getDOM().classList.add('Dialog')
 
-        return proxy
+        return obj
     }
 
     accept(){}
@@ -68,5 +69,7 @@ class Dialog extends Popup {
     reject(){}
     standardButton(button){}
 }
+
+Dialog.initialize()
 
 module.exports = Dialog

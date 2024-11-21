@@ -2,22 +2,91 @@ const BaseObject = require("../QtBase/BaseObject")
 const Property = require("./Property")
 
 class GroupProperty extends BaseObject {
-    static create(parent, meta){
-        let proxy = super.create(parent, meta)
-        let self = proxy.__self 
-        self.__properties = parent.__properties
-        self.__parent = parent.__proxy
+    static meta = {}
 
-        return proxy
+    static initialize(){
+        let meta = this.meta
+
+        for(let key in meta){
+            if(key in this.prototype) continue
+
+            if(meta[key].type.isAssignableFrom(Property)){
+                Object.defineProperty(this.prototype, key, {
+                    get:function(){
+                        if(this.__destroyed) return
+
+                        if(!(key in this.__dataQml)) {
+                            this.__dataQml[key] = meta[key].type.create(this, meta[key])
+                        }
+
+                        return this.__dataQml[key].__get()
+                    },
+                    set:function(value){
+                        if(this.__destroyed) return
+
+                        if(!(key in this.__dataQml)) {
+                            this.__dataQml[key] = meta[key].type.create(this, meta[key])
+                        }
+
+                        this.__dataQml[key].__reset(value)
+                    },
+                })
+            } else if(meta[key].type.isAssignableFrom(GroupProperty)){
+                Object.defineProperty(this.prototype, key, {
+                    get:function(){
+                        if(this.__destroyed) return
+
+                        if(!(key in this.__dataQml)) {
+                            this.__dataQml[key] = meta[key].type.create(this, meta[key])
+                        }
+
+                        return this.__dataQml[key].__get()
+                    },
+                    set:function(value){
+                        if(this.__destroyed) return
+
+                        if(!(key in this.__dataQml)) {
+                            this.__dataQml[key] = meta[key].type.create(this, meta[key])
+                        }
+
+                        this.__dataQml[key].__assign(value)
+                    },
+                })
+            } else {
+                Object.defineProperty(this.prototype, key, {
+                    get:function(){
+                        if(this.__destroyed) return
+
+                        if(!(key in this.__dataQml)) {
+                            this.__dataQml[key] = meta[key].type.create(this, meta[key])
+                        }
+
+                        return this.__dataQml[key]
+                    },
+                })
+            }
+        }
     }
 
-    __toPrimitive(hint){
-        return this
+    static create(parent, meta){
+        let obj = super.create(parent, meta)
+
+        obj.__properties = parent.__properties
+        obj.__parent = parent
+
+        return obj
+    }
+
+    __dataQml = {}
+
+    __getDataQml(key){
+        this[key]
+        return this.__dataQml[key]
     }
 
     __emitSignal(){
         if(this.__parent) {
-            let signal = this.__parent.__get(this.__signalName)
+            let signal = this.__parent[this.__signalName]
             if(signal) signal()
         }
     }
@@ -25,65 +94,38 @@ class GroupProperty extends BaseObject {
     __assign(obj){
         if(obj && typeof obj === 'object'){
             for(let name in obj){
-                if(this.__has(name)) {
-                    this.__set(name, obj[name])
-                } else {
-                    throw `Can not assign ${name} to this group property`
-                }
+                this[name] = obj[name]
             }
         } else {
             throw `Can not assign ${obj} to this group property`
         }
     }
-    
-    __has(key){
-        if(key in this){
-            return true
-        } else if(key in this.constructor.meta){
-            let meta = this.constructor.meta[key]
-            this[key] = meta.type.create(this, meta)
-
-            return true
-        }
-
-        return false
-    }
-
-    __get(key){
-        if(this.__has(key)){
-            if(this[key] instanceof Property){
-                // let caller = Property.queueLink[Property.queueLink.length-1]
-                // if(caller) caller.__subscribe(this[key])
-                return this[key].__get()
-            }
-            return this[key]
-        }
-        
-        return undefined
-    }
-
-    __set(key, value){
-        if(this.__has(key)){
-            if(this[key] instanceof Property){
-                this[key].__reset(value)
-                return true
-            }
-        }
-        this[key] = value
-        return true
-    }
 
     __destroy(){
+        if(this.__destroyed || !this.__destroying) return
+        this.__destroying = true
+
         super.__destroy()
 
-        let self = this.__self
-        delete self.__proxy
-        for(let key in self){
-            if(self[key] instanceof Property || self[key] instanceof GroupProperty){
-                self[key].__destroy()
+        for(let key in this.__dataQml){
+            if(this.__dataQml[key] instanceof Property || this.__dataQml[key] instanceof GroupProperty){
+                this.__dataQml[key].destroy()
             }
-            delete self[key]
         }
+
+        for(let key in this){
+            delete this[key]
+        }
+
+        this.__destroyed = true
+    }
+
+    blockSignals(flag){
+        this.__blockedSignals = flag
+    }
+
+    signalsBlocked(){
+        return this.__blockedSignals
     }
 }
 

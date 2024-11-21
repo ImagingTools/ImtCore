@@ -70,4 +70,6 @@ class JSONListModel extends ListModel {
     }
 }
 
+JSONListModel.initialize()
+
 module.exports = JSONListModel

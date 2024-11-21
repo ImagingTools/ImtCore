@@ -8,13 +8,15 @@ class Button extends AbstractButton {
 
     })
 
-    static create(parent, model, properties=[], ...args){
-        let proxy = super.create(parent, model, properties, ...args)
-        proxy.__getDOM().classList.add('Button')
+    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
+        let obj = super.create(parent, model, meta, properties, isRoot)
+        obj.__getDOM().classList.add('Button')
 
-        return proxy
+        return obj
     }
 
 }
+
+Button.initialize()
 
 module.exports = Button
