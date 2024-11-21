@@ -74,10 +74,14 @@ add_dependencies(ImtSdlPck imtsdl imtfile imtbase)
 
 add_subdirectory("${INCLUDE_DIR}/imtsdlgen/CMake" "${AUX_INCLUDE_DIR}/imtsdlgen")
 add_subdirectory("${IMPL_DIR}/ImtSdlGenPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenPck")
-add_dependencies(ImtSdlGenPck imtsdl imtfile imtbase)
+add_dependencies(ImtSdlGenPck imtsdlgen imtsdl imtfile imtbase)
+
+add_subdirectory("${INCLUDE_DIR}/imtsdlgenv2/CMake" "${AUX_INCLUDE_DIR}/imtsdlgenv2")
+add_subdirectory("${IMPL_DIR}/ImtSdlGenV2Pck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenV2Pck")
+add_dependencies(ImtSdlGenV2Pck imtsdlgenv2 imtsdlgen imtsdl imtfile imtbase)
 
 add_subdirectory("${IMPL_DIR}/SdlCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/SdlCodeGenerator")
-add_dependencies(SdlCodeGenerator ImtSdlPck ImtSdlGenPck imtsdlgen imtsdl imtfile imtbase)
+add_dependencies(SdlCodeGenerator ImtSdlGenV2Pck ImtSdlGenPck ImtSdlPck)
 
 #------ OpenAPI ------
 add_subdirectory("${INCLUDE_DIR}/imtoas/CMake" "${AUX_INCLUDE_DIR}/imtoas")
@@ -86,6 +90,23 @@ add_subdirectory("${IMPL_DIR}/OasCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/Oas
 
 
 if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
+
+#-------- Sdl --------
+if(NOT DEFINED USE_SDL OR USE_SDL)
+	include("${CMAKE_CURRENT_LIST_DIR}/../../../ImtCore/Config/CMake/ImtCoreSdlCustomConfig.cmake")
+	ImtCoreAddSdlSearchPath("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}")
+
+	add_subdirectory("${SDL_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbasesdl")
+
+	add_subdirectory("${SDL_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauthsdl")
+	add_dependencies(imtauthsdl imtbasesdl)
+
+	add_subdirectory("${SDL_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlicsdl")
+	add_dependencies(imtlicsdl imtbasesdl)
+
+	add_subdirectory("${SDL_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtappsdl")
+	add_dependencies(imtappsdl imtbasesdl)
+endif()
 
 #-------- Libraries --------
 add_subdirectory("${INCLUDE_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtapp")
@@ -171,24 +192,6 @@ if(NOT DEFINED USE_QTQML OR USE_QTQML)
 	add_subdirectory("${INCLUDE_DIR}/imtqml/CMake" "${AUX_INCLUDE_DIR}/imtqml")
 	add_subdirectory("${INCLUDE_DIR}/imtstylecontrolsqml/CMake" "${AUX_INCLUDE_DIR}/imtstylecontrolsqml")
 endif()
-
-
-#-------- Sdl --------
-# if(NOT DEFINED USE_SDL OR USE_SDL)
-	include("${CMAKE_CURRENT_LIST_DIR}/../../../ImtCore/Config/CMake/ImtCoreSdlCustomConfig.cmake")
-	ImtCoreAddSdlSearchPath("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}")
-
-	add_subdirectory("${SDL_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbasesdl")
-
-	add_subdirectory("${SDL_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauthsdl")
-	add_dependencies(imtauthsdl imtbasesdl)
-
-	add_subdirectory("${SDL_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlicsdl")
-	add_dependencies(imtlicsdl imtbasesdl)
-
-	add_subdirectory("${SDL_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtappsdl")
-	add_dependencies(imtappsdl imtbasesdl)
-# endif()
 
 
 #-------- Packages --------
