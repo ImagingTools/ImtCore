@@ -245,13 +245,12 @@ Item {
             }
             else{
                 url.protocol = "ws";
-            }
-
-            if (webSocketPortProvider.port >= 0){
-                url.port = webSocketPortProvider.port;
-            }
-            else{
-                console.error("WebSocket port provider has invalid port!");
+                if (webSocketPortProvider.port >= 0){
+                    url.port = webSocketPortProvider.port;
+                }
+                else{
+                    console.error("WebSocket port provider has invalid port!");
+                }
             }
 
             if (context.appId && context.appId !== ""){
