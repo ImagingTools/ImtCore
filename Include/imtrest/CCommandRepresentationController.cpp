@@ -6,7 +6,7 @@
 #include <iprm/IIdParam.h>
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
+#include <iqt/iqt.h>
 #include <imtrest/IGuiElementModel.h>
 
 
@@ -76,7 +76,7 @@ bool CCommandRepresentationController::GetRepresentationFromDataModel(
 
 	if (m_translationManagerPtr != nullptr){
 		QByteArray context = "Attribute";
-		QString elementNameTr = imtbase::GetTranslation(m_translationManagerPtr, elementName.toUtf8(), languageId, context);
+		QString elementNameTr = iqt::GetTranslation(m_translationManagerPtr, elementName.toUtf8(), languageId, context);
 
 		elementName = elementNameTr;
 	}

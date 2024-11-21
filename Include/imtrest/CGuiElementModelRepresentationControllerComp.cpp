@@ -6,7 +6,7 @@
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
+#include <iqt/iqt.h>
 #include <imtrest/IGuiElementContainer.h>
 #include <imtrest/IGuiElementModel.h>
 
@@ -102,7 +102,7 @@ bool CGuiElementModelRepresentationControllerComp::GetRepresentationFromDataMode
 
 	if (m_translationManagerCompPtr.IsValid()){
 		QByteArray context = "Attribute";
-		QString elementNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), elementName.toUtf8(), languageId, context);
+		QString elementNameTr = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), elementName.toUtf8(), languageId, context);
 
 		elementName = elementNameTr;
 	}

@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
+#include <iqt/iqt.h>
 #include <imtauth/CRole.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CUserGroupInfo.h>
@@ -191,22 +191,22 @@ QString CUserGroupChangeGeneratorComp::CreateCustomOperationDescription(
 	QByteArray newValue = operationDescription.GetNewValue();
 
 	if (typeId == "AddParentGroup"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added parent group '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added parent group '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
 		change = change.arg(GetGroupName(newValue));
 		retVal += change;
 	}
 	else if (typeId == "RemoveParentGroup"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed parent group '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed parent group '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
 		change = change.arg(GetGroupName(newValue));
 		retVal += change;
 	}
 	else if (typeId == "RemoveUser"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed user '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed user '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
 		change = change.arg(GetUserName(newValue));
 		retVal += change;
 	}
 	else if (typeId == "AddUser"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added user '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added user '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
 		change = change.arg(GetUserName(newValue));
 		retVal += change;
 	}

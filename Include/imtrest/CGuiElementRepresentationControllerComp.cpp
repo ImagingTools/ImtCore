@@ -6,7 +6,7 @@
 #include <iprm/IIdParam.h>
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
+#include <iqt/iqt.h>
 #include <imtauth/IUserInfo.h>
 #include <imtrest/IGuiElementContainer.h>
 

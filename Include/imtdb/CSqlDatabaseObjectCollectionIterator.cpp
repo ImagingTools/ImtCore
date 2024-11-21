@@ -74,7 +74,7 @@ QByteArray CSqlDatabaseObjectCollectionIterator::GetObjectId() const
 QByteArray CSqlDatabaseObjectCollectionIterator::GetObjectTypeId() const
 {
 	if (m_databaseDelegate == nullptr || m_currentIndex < 0 || m_currentIndex >= m_records.count()){
-		return false;
+		return QByteArray();
 	}
 
 	return m_databaseDelegate->GetObjectTypeIdFromRecord(m_records[m_currentIndex]);

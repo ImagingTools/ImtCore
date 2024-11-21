@@ -6,7 +6,7 @@
 #include <iprm/IIdParam.h>
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
+#include <iqt/iqt.h>
 
 
 namespace imtrest
@@ -73,7 +73,7 @@ bool CObjectRepresentationControllerCompBase::GetRepresentationFromDataModel(con
 	}
 
 	if (m_translationManagerCompPtr.IsValid()){
-		QString elementNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), paramName.toUtf8(), languageId, QByteArray("Attribute"));
+		QString elementNameTr = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), paramName.toUtf8(), languageId, QByteArray("Attribute"));
 
 		paramName = elementNameTr;
 	}

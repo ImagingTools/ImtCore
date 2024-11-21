@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
+#include <iqt/iqt.h>
 #include <imtauth/CRole.h>
 
 
@@ -113,22 +113,22 @@ QString CRoleChangeGeneratorComp::CreateCustomOperationDescription(const imtbase
 	QByteArray newValue = operationDescription.GetNewValue();
 
 	if (typeId == "AddParentRole"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added parent role '%1'"), languageId, "imtauth::CRoleChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added parent role '%1'"), languageId, "imtauth::CRoleChangeGeneratorComp");
 		change = change.arg(GetRoleName(newValue));
 		retVal += change;
 	}
 	else if (typeId == "RemoveParentRole"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed parent role '%1'"), languageId, "imtauth::CRoleChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed parent role '%1'"), languageId, "imtauth::CRoleChangeGeneratorComp");
 		change = change.arg(GetRoleName(newValue));
 		retVal += change;
 	}
 	else if (typeId == "AddPermission"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added permission '%1'"), languageId, "imtauth::CRoleChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added permission '%1'"), languageId, "imtauth::CRoleChangeGeneratorComp");
 		change = change.arg(qPrintable(newValue));
 		retVal += change;
 	}
 	else if (typeId == "RemovePermission"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed permission '%1'"), languageId, "imtauth::CRoleChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed permission '%1'"), languageId, "imtauth::CRoleChangeGeneratorComp");
 		change = change.arg(qPrintable(newValue));
 		retVal += change;
 	}

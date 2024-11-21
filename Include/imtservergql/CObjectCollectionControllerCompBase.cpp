@@ -650,7 +650,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 	notificationModelPtr->SetData("PagesCount", pagesCount);
 	notificationModelPtr->SetData("TotalCount", elementsCount);
 
-	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
+	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
+				m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 	if (objectCollectionIterator == nullptr){
 		errorMessage = QString("Object collection iterator creation failed");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -919,7 +920,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(c
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 	Q_ASSERT(dataModelPtr != nullptr);
 
-	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(0, -1, &filterParams));
+	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
+				m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams));
 	if (objectCollectionIterator == nullptr){
 		errorMessage = QString("Unable to get history for an object with ID: '%1'. Error when trying to create collection iterator.").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");

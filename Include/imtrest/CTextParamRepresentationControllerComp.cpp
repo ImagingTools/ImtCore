@@ -5,7 +5,7 @@
 #include <iprm/ITextParam.h>
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
+#include <iqt/iqt.h>
 
 
 namespace imtrest

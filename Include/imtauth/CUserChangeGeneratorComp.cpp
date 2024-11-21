@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
+#include <iqt/iqt.h>
 #include <imtauth/CRole.h>
 #include <imtauth/CUserInfo.h>
 
@@ -164,32 +164,32 @@ QString CUserChangeGeneratorComp::CreateCustomOperationDescription(const imtbase
 	QByteArray newValue = operationDescription.GetNewValue();
 
 	if (typeId == "AddGroup"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added to group '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added to group '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
 		change = change.arg(GetGroupName(newValue));
 		retVal += change;
 	}
 	else if (typeId == "RemoveGroup"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed from group '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed from group '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
 		change = change.arg(GetGroupName(newValue));
 		retVal += change;
 	}
 	else if (typeId == "AddRole"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added role '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added role '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
 		change = change.arg(GetRoleName(newValue));
 		retVal += change;
 	}
 	else if (typeId == "RemoveRole"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed role '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed role '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
 		change = change.arg(GetRoleName(newValue));
 		retVal += change;
 	}
 	else if (typeId == "AddProduct"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added to product '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added to product '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
 		change = change.arg(qPrintable(newValue));
 		retVal += change;
 	}
 	else if (typeId == "RemoveProduct"){
-		QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed from product '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed from product '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
 		change = change.arg(qPrintable(newValue));
 		retVal += change;
 	}

@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
+#include <iqt/iqt.h>
 #include <imtbase/IUrlParam.h>
 
 

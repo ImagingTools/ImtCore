@@ -6,7 +6,7 @@
 #include <iprm/IOptionsList.h>
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
+#include <iqt/iqt.h>
 
 
 namespace imtrest

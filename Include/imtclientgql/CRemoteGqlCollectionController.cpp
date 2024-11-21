@@ -227,6 +227,7 @@ imtbase::IObjectCollection* CRemoteGqlCollectionController::CreateSubCollection(
 
 
 imtbase::IObjectCollectionIterator* CRemoteGqlCollectionController::CreateObjectCollectionIterator(
+			const QByteArray& /*objectId*/,
 			int /*offset*/,
 			int /*count*/,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const

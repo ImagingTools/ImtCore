@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
+#include <iqt/iqt.h>
 
 
 namespace imtbase
@@ -66,14 +66,14 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 				QByteArray newValue = operationDescriptionPtr->GetNewValue();
 
 				QString keyName = operationDescriptionPtr->GetKeyName();
-				keyName = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), keyName.toUtf8(), languageId, "Attribute");
+				keyName = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), keyName.toUtf8(), languageId, "Attribute");
 
 				if (typeId == "Create"){
-					QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Created the document"), languageId, "imtbase::CDocumentChangeGeneratorCompBase");
+					QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Created the document"), languageId, "imtbase::CDocumentChangeGeneratorCompBase");
 					retVal += change + "\n";
 				}
 				else if (typeId == "Change"){
-					QString change = imtbase::GetTranslation(
+					QString change = iqt::GetTranslation(
 						m_translationManagerCompPtr.GetPtr(),
 						QString(QT_TR_NOOP("'%1' changed from '%2' to '%3'")).toUtf8(),
 						languageId,
@@ -84,7 +84,7 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 					retVal += change + "\n";
 				}
 				else if (typeId == "Set"){
-					QString change = imtbase::GetTranslation(
+					QString change = iqt::GetTranslation(
 						m_translationManagerCompPtr.GetPtr(),
 						QString(QT_TR_NOOP("'%1' was set to '%2'")).toUtf8(),
 						languageId,
@@ -95,7 +95,7 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 					retVal += change + "\n";
 				}
 				else if (typeId == "Clear"){
-					QString change = imtbase::GetTranslation(
+					QString change = iqt::GetTranslation(
 						m_translationManagerCompPtr.GetPtr(),
 						QString(QT_TR_NOOP("'%1' was cleared")).toUtf8(),
 						languageId,
