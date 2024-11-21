@@ -23,8 +23,6 @@ class CSdlRequest: public iser::ISerializable
 
 
 public:
-
-public:
 	enum Type
 	{
 		T_QUERY,
