@@ -93,14 +93,14 @@ bool CMaskContainer::GetItem(quint64 offset, quint64 &item)
 		return false;
 	}
 
-	quint64 retItem = m_operationType == OT_AND ? 0xffffffffffffff : 0;
+	quint64 retItem = m_operationType == OT_AND ? 0xffffffffffffffff : 0;
 
 	for(int i = 0; i < m_maskList.length(); i++){
 		quint64 currItem = 0;
 		bool okCurr = false;
-		if(m_maskList.at(i).second <= offset){
+		//if(m_maskList.at(i).second <= offset){
 			okCurr = m_maskList.at(i).first->GetItem(offset, currItem);
-		}
+		//}
 
 		if(!okCurr){
 			if(m_operationType == OT_AND){

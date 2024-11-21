@@ -524,6 +524,32 @@ bool CDocumentTable::MoveToLowerBound(const QByteArray &key)
 	return ok;
 }
 
+bool CDocumentTable::MoveToUpperBound(quint64 key)
+{
+	bool ok = false;
+
+	mdbx::slice keySlice(&key, 8);
+	mdbx::cursor::move_result result = m_cursor.upper_bound(keySlice, false);
+	if(result.done){
+		ok = true;
+	}
+
+	return ok;
+}
+
+bool CDocumentTable::MoveToUpperBound(const QByteArray& key)
+{
+	bool ok = false;
+
+	mdbx::slice keySlice(key.data(), key.length());
+	mdbx::cursor::move_result result = m_cursor.upper_bound(keySlice, false);
+	if(result.done){
+		ok = true;
+	}
+
+	return ok;
+}
+
 
 bool CDocumentTable::MoveToNext()
 {

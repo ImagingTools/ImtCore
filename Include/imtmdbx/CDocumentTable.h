@@ -49,6 +49,8 @@ public:
 	virtual bool MoveToLast() override;
 	virtual bool MoveToLowerBound(quint64 key) override;
 	virtual bool MoveToLowerBound(const QByteArray& key) override;
+	virtual bool MoveToUpperBound(quint64 key) override;
+	virtual bool MoveToUpperBound(const QByteArray& key) override;
 	virtual bool MoveToNext() override;
 	virtual bool MoveToPrevious() override;
 	virtual bool MoveToValue(const QByteArray& value) override;

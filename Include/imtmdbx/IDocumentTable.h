@@ -37,6 +37,8 @@ public:
 	virtual bool MoveToLast() = 0;
 	virtual bool MoveToLowerBound(quint64 key) = 0;
 	virtual bool MoveToLowerBound(const QByteArray& key) = 0;
+	virtual bool MoveToUpperBound(quint64 key) = 0;
+	virtual bool MoveToUpperBound(const QByteArray& key) = 0;
 	virtual bool MoveToNext() = 0;
 	virtual bool MoveToPrevious() = 0;
 	virtual bool MoveToValue(const QByteArray& value) = 0;
