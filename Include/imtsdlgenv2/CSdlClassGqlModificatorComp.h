@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtsdlgen/CSdlClassModificatorBaseComp.h>
+#include <imtsdlgenv2/CSdlGenTools.h>
 
 
 namespace imtsdlgenv2
@@ -13,8 +14,9 @@ namespace imtsdlgenv2
 	The C++ class modificator, adds saving and loading generated SDL types to/from  GraphQL object
 	Extends generated classes by add methods, allows to save and load it from/to \c imtgql::CGqlObject
  */
-class CSdlClassGqlModificatorComp: public imtsdlgen::CSdlClassModificatorBaseComp
+class CSdlClassGqlModificatorComp: public imtsdlgen::CSdlClassModificatorBaseComp, protected CSdlGenTools
 {
+	using CSdlGenTools::AddArrayInternalChecksFail;
 public:
 	typedef imtsdlgen::CSdlClassModificatorBaseComp BaseClass;
 
