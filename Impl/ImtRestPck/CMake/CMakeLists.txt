@@ -9,7 +9,7 @@ include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 
-target_link_libraries(${PROJECT_NAME} imtrepo imtrest imtcom imtbase idoc)
+target_link_libraries(${PROJECT_NAME} imtrepo imtrest imtcom imtbase idoc i2d)
 target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::WebSockets)
 
 
