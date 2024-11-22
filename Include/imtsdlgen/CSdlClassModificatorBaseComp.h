@@ -27,6 +27,15 @@ class CSdlClassModificatorBaseComp:
 			protected imtsdl::CSdlTools
 {
 
+	/**
+		\todo global + comfort (mb create a base class generator...) \c CSdlClassGqlModificatorComp is most generalized
+		* generalize reset
+		* generalize read
+		* generalize write
+		* generalize set to object
+		* generalize read from object
+	*/
+
 public:
 	typedef iproc::CSyncProcessorCompBase BaseClass;
 

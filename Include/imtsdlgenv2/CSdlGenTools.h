@@ -32,6 +32,7 @@ namespace imtsdlgenv2
 
 class CSdlGenTools
 {
+
 public:
 	class CStructNamespaceConverter
 	{
