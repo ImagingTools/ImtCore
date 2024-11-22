@@ -32,10 +32,10 @@ bool CGqlSubscriberControllerCompBase::IsRequestSupported(const imtgql::CGqlRequ
 
 
 bool CGqlSubscriberControllerCompBase::RegisterSubscription(
-			const QByteArray& subscriptionId,
-			const imtgql::CGqlRequest& gqlRequest,
-			const imtrest::IRequest& networkRequest,
-			QString& errorMessage)
+		const QByteArray& subscriptionId,
+		const imtgql::CGqlRequest& gqlRequest,
+		const imtrest::IRequest& networkRequest,
+		QString& errorMessage)
 {
 	Q_ASSERT(IsRequestSupported(gqlRequest));
 
@@ -144,37 +144,48 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 				SetData(id, "", data, *networkRequestPtr);
 			}
 		}
- 	}
+	}
 
 	return true;
 }
 
 
 bool CGqlSubscriberControllerCompBase::SetData(
-			const QByteArray& id,
-			const QByteArray& subscriptionId,
-			const QByteArray& data,
-			const imtrest::IRequest& networkRequest)
+		const QByteArray& id,
+		const QByteArray& subscriptionId,
+		const QByteArray& data,
+		const imtrest::IRequest& networkRequest)
 {
 	if (!m_requestManagerCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'RequestManager' was not set", "CGqlSubscriberControllerCompBase");
 		return false;
 	}
 
 	QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": {"%2": %3}}})")
-				.arg(qPrintable(id))
-				.arg(qPrintable(subscriptionId))
-				.arg(qPrintable(data)).toUtf8();
+			.arg(qPrintable(id))
+			.arg(qPrintable(subscriptionId))
+			.arg(qPrintable(data)).toUtf8();
 
 	QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
 	const imtrest::IProtocolEngine& engine = networkRequest.GetProtocolEngine();
 
-	imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(networkRequest,
-																imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
-	if (responsePtr.IsValid()){
-		const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest.GetRequestId());
-		if (sender != nullptr){
-			sender->SendResponse(responsePtr);
-		}
+	imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(networkRequest, imtrest::IProtocolEngine::SC_OK, body, reponseTypeId));
+	if (!responsePtr.IsValid()){
+		SendErrorMessage(0, QString("Unable to send response to subscriber. Error: Response is invalid"), "CGqlSubscriberControllerCompBase");
+		return false;
+	}
+
+	const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest.GetRequestId());
+	if (sender == nullptr){
+		SendErrorMessage(0, QString("Unable to send response to subscriber. Error: Cannot found sender for request ID '%1'").arg(qPrintable(networkRequest.GetRequestId())), "CGqlSubscriberControllerCompBase");
+		return false;
+	}
+
+	bool retVal = sender->SendResponse(responsePtr);
+	if (!retVal){
+		QString message = QString("Unable to send response to subscriber. Data: '%1'").arg(qPrintable(data));
+		qDebug() << message;
+		SendErrorMessage(0, message, "CGqlSubscriberControllerCompBase");
 	}
 
 	return true;
@@ -183,11 +194,18 @@ bool CGqlSubscriberControllerCompBase::SetData(
 
 bool CGqlSubscriberControllerCompBase::SetAllSubscriptions(const QByteArray& subscriptionId, const QByteArray& data)
 {
+	qDebug() << "SetAllSubscriptions" << subscriptionId << data;
+
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];
 			if (networkRequestPtr != nullptr){
-				SetData(id, subscriptionId, data, *networkRequestPtr);
+				bool retVal = SetData(id, subscriptionId, data, *networkRequestPtr);
+				if (!retVal){
+					QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(subscriptionId)).arg(qPrintable(data));
+					qDebug() << message;
+					SendErrorMessage(0, message, "CGqlSubscriberControllerCompBase");
+				}
 			}
 		}
 	}

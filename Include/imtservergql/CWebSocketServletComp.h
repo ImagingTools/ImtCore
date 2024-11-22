@@ -23,7 +23,6 @@ public:
 	I_BEGIN_COMPONENT(CWebSocketServletComp);
 		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN_MULTI_0(m_gqlSubscriberControllersCompPtr, "GqlSubscriberControllers", "List of gql subscriber controller for corresponding command-IDs", false);
-		I_ASSIGN(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "GraphQl request handler to create to create the response body", false, "GqlRequestHandler");
 		I_ASSIGN(m_workerManagerCompPtr, "WorkerManager", "GraphQl multithread worker manager", false, "WorkerManager");
 	I_END_COMPONENT
 
@@ -44,7 +43,6 @@ protected:
 
 private:
 	I_MULTIREF(imtgql::IGqlSubscriberController, m_gqlSubscriberControllersCompPtr);
-	I_REF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
 	I_REF(imtrest::IRequestServlet, m_workerManagerCompPtr);
 
 	typedef QMap<QByteArray, imtgql::IGqlSubscriberController*> SubscriberControllersMap;

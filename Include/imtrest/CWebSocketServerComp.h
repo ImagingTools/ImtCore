@@ -57,12 +57,14 @@ public:
 		I_ASSIGN(m_webSocketServerPortCompPtr, "WebSocketServerPort", "Parameter providing the WebSocket-server port to be listened", false, "WebSocketServerPort");
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
+		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded grapgQl requests", false, "");
 	I_END_COMPONENT
 
 	IProtocolEngine* GetProtocolEngine();
 	IProtocolEngine* GetHttpProtocolEngine();
 	imtrest::IRequestServlet* GetRequestServerServlet();
 	imtrest::IRequestServlet* GetRequestClientServlet();
+	QByteArray GetProductId();
 	void SetConnectionStatus(const QByteArray& clientId);
 
 	// reimplemented (ilog::CLoggerComponentBase)
@@ -79,7 +81,6 @@ public:
 				int flags = 0) const;
 
 	void SendVerboseMessage(const QString& message, const QString& messageSource = QString()) const;
-public Q_SLOTS:
 	void RegisterSender(const QByteArray& clientId, QWebSocket* webSocketPtr);
 
 
@@ -119,7 +120,7 @@ protected:
 	QList<CWebSocketThread*> m_webSocketThreadList;
 	QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
 	QMap <QByteArray, imtcom::IConnectionStatusProvider::ConnectionStatus> m_senderLoginStatusMap;
-
+	mutable QReadWriteLock m_sendersLock;
 private:
 	I_REF(imtrest::IRequestServlet, m_requestServerHandlerCompPtr);
 	I_REF(imtrest::IRequestServlet, m_requestClientHandlerCompPtr);
@@ -130,7 +131,7 @@ private:
 	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
 	I_REF(IProtocolEngine, m_httpProtocolEngineCompPtr);
-
+	I_ATTR(QByteArray, m_productId);
 };
 
 

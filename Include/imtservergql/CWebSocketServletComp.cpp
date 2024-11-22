@@ -63,9 +63,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 		}
 	}
 	else{
-		QByteArray errorMessage = "Error request";
-
-		return CreateErrorResponse(errorMessage, request);
+		return ProcessGqlRequest(request);
 	}
 
 	return imtrest::ConstResponsePtr();
@@ -226,7 +224,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		if (subscriberControllerPtr->RegisterSubscription(webSocketRequest->GetSubscriptionId(), gqlRequest, request, errorMessage)){
 			QByteArray data = QString(R"({"type": "start_ask","id": "%1"})")
 						.arg(QString(webSocketRequest->GetSubscriptionId())).toUtf8();
-			
+
 			return CreateDataResponse(data, request);
 		}
 	}

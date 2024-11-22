@@ -98,7 +98,8 @@ bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) con
 	// 	.arg(object.value("id").toString()).arg(body).toUtf8();
 	// }
 
-	m_webSocket.sendTextMessage(data);
+	// m_webSocket.sendTextMessage(data);
+	EmitSendTextMessage(data);
 
 	return true;
 }
@@ -106,7 +107,9 @@ bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) con
 
 bool CWebSocketClientComp::SendRequest(imtrest::ConstRequestPtr& request) const
 {
-	m_webSocket.sendTextMessage(request->GetBody());
+	// m_webSocket.sendTextMessage(request->GetBody());
+	QByteArray message = request->GetBody();
+	EmitSendTextMessage(message);
 
 	return true;
 }
@@ -161,6 +164,7 @@ void CWebSocketClientComp::OnComponentCreated()
 	connect(&m_webSocket, &QWebSocket::disconnected, this, &CWebSocketClientComp::OnWebSocketDisconnected, Qt::QueuedConnection);
 	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &CWebSocketClientComp::OnWebSocketTextMessageReceived);
 	connect(&m_webSocket, &QWebSocket::binaryMessageReceived, this, &CWebSocketClientComp::OnWebSocketBinaryMessageReceived);
+	connect(this, &CWebSocketClientComp::EmitSendTextMessage, this, &CWebSocketClientComp::OnSendTextMessage);
 	connect(this, &CWebSocketClientComp::EmitWebSocketClose, &m_webSocket, &QWebSocket::close);
 	connect(this, SIGNAL(EmitStartTimer()), &m_refreshTimer, SLOT(start()), Qt::QueuedConnection);
 	connect(this, SIGNAL(EmitStopTimer()), &m_refreshTimer, SLOT(stop()), Qt::QueuedConnection);
@@ -285,7 +289,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 		responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
 	}
 	else{
-		if (methodType == imtrest::CWebSocketRequest::MT_QUERY){
+		if (methodType == imtrest::CWebSocketRequest::MT_QUERY && m_httpProtocolEngineCompPtr.IsValid() && m_serverRequestHandlerCompPtr.IsValid()){
 			// webSocketRequest.PopPtr();
 			// QJsonDocument document = QJsonDocument::fromJson(webSocketRequest->GetBody());
 			// QJsonObject object = document.object();
@@ -315,6 +319,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 				}
 				newHttpRequestPtr->SetBody(body);
 				newHttpRequestPtr->SetMethodType(imtrest::CHttpRequest::MT_POST);
+				newHttpRequestPtr->SetCommandId("/" + *m_productId + "/graphql");
 
 				responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(*newHttpRequestPtr);
 			}
@@ -336,6 +341,12 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 void CWebSocketClientComp::OnWebSocketBinaryMessageReceived(const QByteArray& /*message*/)
 {
+}
+
+
+void CWebSocketClientComp::OnSendTextMessage(const QByteArray& message)
+{
+	m_webSocket.sendTextMessage(message);
 }
 
 

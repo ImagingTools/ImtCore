@@ -41,9 +41,28 @@ imtrest::IRequestServlet* CWebSocketServerComp::GetRequestClientServlet()
 }
 
 
+QByteArray CWebSocketServerComp::GetProductId()
+{
+	if (m_productId.IsValid()){
+		return *m_productId;
+	}
+
+	return QByteArray();
+}
+
+
 void CWebSocketServerComp::RegisterSender(const QByteArray& clientId, QWebSocket* webSocketPtr)
 {
+	QWriteLocker locker(&m_sendersLock);
+
 	QSharedPointer<CWebSocketSender> socketSender(new CWebSocketSender(webSocketPtr));
+	QThread* mainThread = QCoreApplication::instance()->thread();
+	if (mainThread == nullptr){
+		Q_ASSERT(false);
+	}
+	socketSender->moveToThread(mainThread);
+
+	qDebug() << "RegisterSender" << clientId;
 	m_senders.insert(clientId, socketSender);
 }
 
@@ -88,6 +107,11 @@ void CWebSocketServerComp::SendVerboseMessage(const QString& message, const QStr
 
 const ISender* CWebSocketServerComp::GetSender(const QByteArray& requestId) const
 {
+	QReadLocker locker(&m_sendersLock);
+
+	QByteArrayList keys = m_senders.keys();
+	qDebug() << "GetSender" << keys;
+
 	CWebSocketSender* sender = m_senders.value(requestId).data();
 	if (sender != nullptr){
 		return sender;
@@ -267,6 +291,8 @@ void CWebSocketServerComp::OnSocketDisconnected()
 
 	for (const QByteArray& key: m_senders.keys()){
 		if (socketObjectPtr == m_senders[key]->GetSocket()){
+			qDebug() << "OnSocketDisconnected" << key;
+
 			m_senders.remove(key);
 
 			istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));

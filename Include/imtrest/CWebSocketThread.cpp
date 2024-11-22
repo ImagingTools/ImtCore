@@ -3,6 +3,7 @@
 // Qt includes
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMutableListIterator>
+#include <QtCore/QCoreApplication>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
@@ -17,12 +18,15 @@ namespace imtrest
 
 CWebSocket::CWebSocket(imtrest::CWebSocketServerComp *parent)
 {
+	Q_ASSERT(parent);
+
 	m_server = parent;
 
 	m_enginePtr = m_server->GetProtocolEngine();
 	m_httpEnginePtr = m_server->GetHttpProtocolEngine();
 	m_requestServerHandlerPtr = m_server->GetRequestServerServlet();
 	m_requestClientHandlerPtr = m_server->GetRequestClientServlet();
+	m_productId = m_server->GetProductId();
 }
 
 
@@ -53,7 +57,9 @@ void CWebSocket::OnWebSocketTextMessage(const QString& textMessage)
 		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
 		if (methodType == CWebSocketRequest::MT_START){
 			newRequestPtr.PopPtr();
-			this->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr);
+			if (m_server != nullptr){
+				m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr);
+			}
 		}
 
 		QByteArray clientId = webSocketRequest->GetClientId();
@@ -82,18 +88,20 @@ void CWebSocket::OnWebSocketTextMessage(const QString& textMessage)
 				CHttpRequest* newHttpRequestPtr = dynamic_cast<CHttpRequest*>(requestPtr);
 				if (newHttpRequestPtr != nullptr){
 					if (!clientId.isEmpty()){
-						emit this->RegisterSender(clientId, webSocketPtr);
+						m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr);
 					}
 
 					QJsonDocument document = QJsonDocument::fromJson(textMessage.toUtf8());
 					QJsonObject object = document.object();
+					QByteArray body = object.value("payload").toObject().value("data").toString().toUtf8();
 
 					QJsonObject headers = object.value("headers").toObject();
 					for (QString& key: headers.keys()){
 						newHttpRequestPtr->SetHeader(key.toUtf8(), headers.value(key).toString().toUtf8());
 					}
-					newHttpRequestPtr->SetBody(textMessage.toUtf8());
+					newHttpRequestPtr->SetBody(body);
 					newHttpRequestPtr->SetMethodType(CHttpRequest::MT_POST);
+					newHttpRequestPtr->SetCommandId("/" + m_productId + "/graphql");
 
 					responsePtr = m_requestServerHandlerPtr->ProcessRequest(*newHttpRequestPtr);
 				}
@@ -171,17 +179,15 @@ void CWebSocketThread::run()
 	if (!m_webSocket.IsValid()){
 		m_webSocket.SetPtr(new CWebSocket(m_server));
 		connect(m_webSocket.GetPtr(), &CWebSocket::SendTextMessage, this, &CWebSocketThread::OnSendTextMessage);
-		connect(m_webSocket.GetPtr(), &CWebSocket::RegisterSender, m_server, &CWebSocketServerComp::RegisterSender);
+	}
 
-		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
-		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
+	connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
+	connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
 #if (QT_VERSION >= 0x060500)
-		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError);
+	connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError);
 #else
 //	connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CWebSocketServerComp::OnError);
 #endif
-	}
-
 	connect(webSocketPtr, &QWebSocket::textMessageReceived, m_webSocket.GetPtr(), &CWebSocket::OnWebSocketTextMessage);
 
 	exec();

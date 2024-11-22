@@ -40,6 +40,8 @@ bool CConnectionStatusSubscriberControllerComp::RegisterSubscription(
 			const imtrest::IRequest& networkRequest,
 			QString& errorMessage)
 {
+	qDebug() << "CConnectionStatusSubscriberControllerComp RegisterSubscription";
+
 	if (m_commandIdsAttrPtr.GetCount() <= 0){
 		return false;
 	}
@@ -57,6 +59,7 @@ bool CConnectionStatusSubscriberControllerComp::RegisterSubscription(
 
 void CConnectionStatusSubscriberControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
+	qDebug() << "CConnectionStatusSubscriberControllerComp OnUpdate";
 	if (m_commandIdsAttrPtr.GetCount() <= 0){
 		return;
 	}

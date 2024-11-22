@@ -31,13 +31,14 @@ public Q_SLOTS:
 	void OnWebSocketTextMessage(const QString& textMessage);
 Q_SIGNALS:
 	void SendTextMessage(const QByteArray& data) const;
-	void RegisterSender(const QByteArray& clientId, QWebSocket* webSocketPtr);
+
 private:
 	CWebSocketServerComp* m_server;
 	imtrest::IProtocolEngine* m_enginePtr;
 	imtrest::IProtocolEngine* m_httpEnginePtr;
 	imtrest::IRequestServlet* m_requestServerHandlerPtr;
 	imtrest::IRequestServlet* m_requestClientHandlerPtr;
+	QByteArray m_productId;
 };
 
 

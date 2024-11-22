@@ -109,7 +109,21 @@ void CHttpRequest::SetHeader(const QByteArray& headerId, const QByteArray& value
 
 void CHttpRequest::SetMethodType(const MethodType& methodType)
 {
-	m_httpParser.method = methodType;
+	int method = 0;
+	switch (methodType) {
+	case MT_POST:
+		method = 3;
+		break;
+	case MT_GET:
+		method = 2;
+		break;
+	case MT_PUT:
+		method = 4;
+		break;
+	default:
+		break;
+	}
+	m_httpParser.method = method;
 }
 
 
@@ -118,6 +132,11 @@ void CHttpRequest::SetBody(const QByteArray& body)
 	m_body = body;
 }
 
+
+void CHttpRequest::SetCommandId(const QByteArray& commandId)
+{
+	m_url.setPath(commandId);
+}
 
 // public static methods
 

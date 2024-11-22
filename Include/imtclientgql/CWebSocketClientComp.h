@@ -57,7 +57,8 @@ public:
 		I_ASSIGN(m_serverPasswordAttrPtr, "ServerPasswordParam", "Parameter providing the server password to be connected", false, "");
 		I_ASSIGN(m_clientIdAttrPtr, "ClientId", "ID of the client that needs to be identified on the server", false, "");
 		I_ASSIGN(m_clientIdCompPtr, "ClientIdParam", "Parameter providing the client-ID that needs to be identified on the server", false, "ClientIdParam");
-	I_END_COMPONENT;
+		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded grapgQl requests", false, "");
+		I_END_COMPONENT;
 
 	CWebSocketClientComp();
 
@@ -88,6 +89,7 @@ Q_SIGNALS:
 							const QString &reason = QString());
 	void EmitStopTimer();
 	void EmitStartTimer();
+	void EmitSendTextMessage(const QByteArray message) const;
 
 private Q_SLOTS:
 	void OnTimeout();
@@ -96,6 +98,7 @@ private Q_SLOTS:
 	void OnWebSocketError(QAbstractSocket::SocketError error);
 	void OnWebSocketTextMessageReceived(const QString& message);
 	void OnWebSocketBinaryMessageReceived(const QByteArray& message);
+	void OnSendTextMessage(const QByteArray& message);
 
 protected:
 	virtual void EnsureWebSocketConnection();
@@ -145,6 +148,7 @@ private:
 	I_ATTR(QByteArray, m_serverLoginAttrPtr);
 	I_ATTR(QByteArray, m_serverPasswordAttrPtr);
 	I_ATTR(QByteArray, m_clientIdAttrPtr);
+	I_ATTR(QByteArray, m_productId);
 
 	mutable QWebSocket m_webSocket;
 	QTimer m_refreshTimer;
