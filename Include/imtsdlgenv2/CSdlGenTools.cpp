@@ -246,6 +246,7 @@ QString CSdlGenTools::GetSettingValueString(
 	return retVal;
 }
 
+
 void CSdlGenTools::AddArrayInternalChecksFail(QTextStream& stream, const imtsdl::CSdlField& field, bool checkEmpty, const QString& objectName, uint hIndents)
 {
 	imtsdl::CSdlTools::FeedStreamHorizontally(stream, hIndents);
