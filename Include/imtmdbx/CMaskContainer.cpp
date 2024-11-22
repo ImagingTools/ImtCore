@@ -121,9 +121,9 @@ bool CMaskContainer::GetItem(quint64 offset, quint64 &item)
 	for(int i = 0; i < m_maskListInv.length(); i++){
 		quint64 currItem = 0;
 		bool okCurr = false;
-		if(m_maskListInv.at(i).second <= offset){
+		//if(m_maskListInv.at(i).second <= offset){
 			okCurr = m_maskListInv.at(i).first->GetItem(offset, currItem);
-		}
+		//}
 		if(!okCurr){
 			if(m_operationType == OT_AND){
 				return false;
