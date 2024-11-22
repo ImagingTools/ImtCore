@@ -275,7 +275,8 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 	}
 
 	// namespace begin
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(*m_customSchemaParamsCompPtr);
 	if (!sdlNamespace.isEmpty()){
 		ifStream << QStringLiteral("namespace ");
 		ifStream <<  sdlNamespace;

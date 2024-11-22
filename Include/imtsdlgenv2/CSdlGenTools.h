@@ -54,6 +54,7 @@ public:
 	 */
 	[[nodiscard]] static QString GetNamespaceFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& prefix = "sdl");
 
+	[[nodiscard]] static QString GetSchemaVerstionString(const iprm::IParamsSet& schemaParams);
 	[[nodiscard]] static QString GetTypeVerstion(const imtsdl::CSdlType& type);
 	[[nodiscard]] static QString OptListConvertTypeWithNamespaceStruct(
 		const imtsdl::CSdlField& sdlField,

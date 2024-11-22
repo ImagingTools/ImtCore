@@ -14,6 +14,7 @@
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlRequestListProvider.h>
 #include <imtsdl/CSdlTools.h>
+#include <imtsdlgenv2/CSdlGenTools.h>
 
 
 namespace imtsdlgenv2
@@ -25,7 +26,8 @@ namespace imtsdlgenv2
 */
 class CGqlHandlerBaseClassGeneratorComp:
 			public iproc::CSyncProcessorCompBase,
-			private imtsdl::CSdlTools
+			private imtsdl::CSdlTools,
+			private CSdlGenTools
 {
 
 public:

@@ -160,11 +160,11 @@ QString CSdlGenTools::GetNamespaceFromSchemaParams(const iprm::IParamsSet& schem
 	return imtsdl::CSdlTools::GetNamespaceAcceptableString(retVal);
 }
 
-QString CSdlGenTools::GetTypeVerstion(const imtsdl::CSdlType& type)
+
+QString CSdlGenTools::GetSchemaVerstionString(const iprm::IParamsSet& schemaParams)
 {
 	QString retVal = QStringLiteral("V");
 
-	const iprm::IParamsSet& schemaParams = type.GetSchemaParams();
 	QString versionName;
 	iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&schemaParams, imtsdl::SdlCustomSchemaKeys::VersionName.toUtf8());
 	if (versionNameParamPtr.IsValid()){
@@ -180,6 +180,13 @@ QString CSdlGenTools::GetTypeVerstion(const imtsdl::CSdlType& type)
 
 	return retVal;
 }
+
+
+QString CSdlGenTools::GetTypeVerstion(const imtsdl::CSdlType& type)
+{
+	return GetSchemaVerstionString(type.GetSchemaParams());
+}
+
 
 QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider, bool listWrap,  bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
 {
@@ -207,6 +214,7 @@ QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlFi
 	return converter.GetString();
 }
 
+
 QString CSdlGenTools::GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull, const QString& objectName)
 {
 	QString retVal;
@@ -226,6 +234,7 @@ QString CSdlGenTools::GetNullCheckString(const imtsdl::CSdlField& sdlField, bool
 
 	return retVal;
 }
+
 
 QString CSdlGenTools::GetSettingValueString(
 			const imtsdl::CSdlField& sdlField,

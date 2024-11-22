@@ -34,10 +34,8 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 	Q_ASSERT(m_sdlRequestListCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 
-	TaskState retVal = TS_OK;
-
 	if (!m_argumentParserCompPtr->IsGqlEnabled()){
-		return retVal;
+		return TS_OK;
 	}
 
 	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
@@ -179,7 +177,7 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 		}
 	}
 
-	return retVal;
+	return TS_OK;
 }
 
 
@@ -240,14 +238,22 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 	AddRequiredIncludesToHeaderFile(ifStream, sdlRequest, addDependenciesInclude);
 
 	// namespace begin
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
-	if (!sdlNamespace.isEmpty()){
-		ifStream << QStringLiteral("namespace ");
-		ifStream <<  sdlNamespace;
-		FeedStream(ifStream, 1, false);
-		ifStream <<  QStringLiteral("{");
-		FeedStream(ifStream, 1, false);
-	}
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(*m_customSchemaParamsCompPtr);
+
+	ifStream << QStringLiteral("namespace ");
+	ifStream <<  sdlNamespace;
+	FeedStream(ifStream, 1, false);
+	ifStream <<  QStringLiteral("{");
+	FeedStream(ifStream, 2, false);
+
+	// ver namespace begin
+	ifStream << QStringLiteral("namespace ");
+	ifStream <<  GetNamespaceAcceptableString(GetSchemaVerstionString(*m_customSchemaParamsCompPtr));
+	FeedStream(ifStream, 1, false);
+
+	ifStream <<  QStringLiteral("{");
+	FeedStream(ifStream, 1, false);
+
 
 	// RequestInfo struct Begin
 	FeedStream(ifStream, 2, false);
@@ -310,15 +316,22 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 
 	// main GQL-wrap end of class
 	ifStream << QStringLiteral("};");
-	FeedStream(ifStream, 1, false);
+	FeedStream(ifStream, 3, false);
+
+	// end of ver namespace
+	if (!sdlNamespace.isEmpty()){
+		ifStream << QStringLiteral("} // namespace ");
+		ifStream << GetSchemaVerstionString(*m_customSchemaParamsCompPtr);
+	}
+	FeedStream(ifStream, 1, true);
 
 	// end of namespace
-	FeedStream(ifStream, 2, false);
 	if (!sdlNamespace.isEmpty()){
 		ifStream << QStringLiteral("} // namespace ");
 		ifStream << sdlNamespace;
 	}
-	FeedStream(ifStream, 1, true);
+	FeedStream(ifStream, 3, true);
+
 
 	return true;
 }
