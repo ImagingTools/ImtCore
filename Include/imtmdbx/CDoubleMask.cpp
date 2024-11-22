@@ -81,7 +81,7 @@ bool CDoubleMask::GetNextItemOffset(quint64& offset, quint64 startOffset)
 		retVal = false;
 	}
 
-	if(retVal && offset == 0xffffffffffffffff){
+	if(retVal && offset == imtmdbx::QUINT64_MAX){
 		Q_ASSERT(0);
 	}
 

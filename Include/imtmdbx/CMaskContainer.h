@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtmdbx/IMaskContainer.h>
+#include <imtmdbx/imtmdbx.h>
 
 
 namespace imtmdbx

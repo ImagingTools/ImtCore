@@ -2,6 +2,7 @@
 
 // ImtCore includes
 #include <imtmdbx/CMask.h>
+#include <imtmdbx/imtmdbx.h>
 
 
 namespace imtmdbx
