@@ -34,9 +34,17 @@ Row {
             }
 
             onComplComplChanged: {
-                if(cell.complCompl && dataList){
-                    loader.sourceComponent = dataList.rowDelegate.tableItem.columnContentComps[model.index] !== null ?
-                                dataList.rowDelegate.tableItem.columnContentComps[model.index] : dataList.rowDelegate.tableItem.cellDelegate;
+                if(cell.complCompl && dataList && dataList.rowDelegate && dataList.rowDelegate.tableItem){
+                    let headerId = dataList.rowDelegate.tableItem.headers.getData("Id", model.index)
+                    let contents = dataList.rowDelegate.tableItem.columnContentComps;
+                    let contentComp = dataList.rowDelegate.tableItem.cellDelegate;
+                    if (Object.keys(contents).includes(headerId)){
+                        if (contents[headerId]){
+                            contentComp = contents[headerId];
+                        }
+                    }
+
+                    loader.sourceComponent = contentComp;
 
                     dataList.rowDelegate.tableItem.widthRecalc.connect(cell.setCellWidth)
                     cell.setCellWidth();

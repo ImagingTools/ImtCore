@@ -22,7 +22,8 @@ typedef QSharedPointer<imtgql::IGqlResponse> GqlResponsePtr;
 
 CRemoteGqlCollectionController::CRemoteGqlCollectionController()
 	:m_gqlClientPtr(nullptr),
-	m_gqlObjectCollectionDelegatePtr(nullptr)
+	m_gqlObjectCollectionDelegatePtr(nullptr),
+	m_metaInfoCreatorPtr(nullptr)
 {
 }
 

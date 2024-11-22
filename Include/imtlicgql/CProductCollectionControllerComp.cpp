@@ -476,6 +476,30 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::ImportObject(const im
 }
 
 
+QString CProductCollectionControllerComp::GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const
+{
+	if (mimeType.GetSubType() == "xml"){
+		return mimeType.GetSubType();
+	}
+
+	return QString();
+}
+
+
+QString CProductCollectionControllerComp::GetExportFileName(const QByteArray& objectId) const
+{
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+		imtlic::IProductInfo* productInfoPtr = dynamic_cast<imtlic::IProductInfo*>(dataPtr.GetPtr());
+		if (productInfoPtr != nullptr){
+			return productInfoPtr->GetProductId() + "Features";
+		}
+	}
+
+	return QString();
+}
+
+
 } // namespace imtlicgql
 
 

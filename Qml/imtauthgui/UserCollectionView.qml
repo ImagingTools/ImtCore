@@ -166,15 +166,8 @@ RemoteCollectionView {
     }
 
     onHeadersChanged: {
-        let rolesIndex = table.getHeaderIndex("Roles");
-        if (rolesIndex >= 0){
-            table.setColumnContentComponent(rolesIndex, dataComp);
-        }
-
-        let groupsIndex = table.getHeaderIndex("Groups");
-        if (groupsIndex >= 0){
-            table.setColumnContentComponent(groupsIndex, groupsContentComp);
-        }
+        table.setColumnContentById("Roles", dataComp);
+        table.setColumnContentById("Groups", groupsContentComp);
     }
 
     Component {

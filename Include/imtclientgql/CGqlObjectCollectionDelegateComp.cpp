@@ -470,8 +470,12 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 									 QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList){
 				idoc::MetaInfoPtr metaInfoPtr;
 				for (int i = 0; i < metaInfoCreatorList.count(); i++){
-					if (metaInfoCreatorList[i] != nullptr && metaInfoCreatorList[i]->GetSupportedTypeIds().contains(typeId)){
-						metaInfoCreatorList[i]->CreateMetaInfo(nullptr, typeId, metaInfoPtr);
+					imtbase::IMetaInfoCreator* metaInfoCreatorPtr = metaInfoCreatorList[i];
+					if (metaInfoCreatorPtr != nullptr){
+						QByteArrayList typeIds = metaInfoCreatorPtr->GetSupportedTypeIds();
+						if (typeIds.contains(typeId)){
+							metaInfoCreatorPtr->CreateMetaInfo(nullptr, typeId, metaInfoPtr);
+						}
 					}
 				}
 

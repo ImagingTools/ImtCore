@@ -94,7 +94,9 @@ ViewCommandsDelegateBase {
         }
 
         function onExported(name, data){
-            exportFileIO.source = name;
+            if (Qt.platform.os == "web"){
+                exportFileIO.source = name;
+            }
 
             let encodedStr = Qt.atob(data);
             exportFileIO.write(encodedStr);
@@ -275,6 +277,7 @@ ViewCommandsDelegateBase {
 
     function getExtensionFromNameFilter(nameFilters, index){
         let nameFilter = nameFilters[index];
+
         let filterExt = nameFilter.split("*.")[1].split(")")[0];
         return filterExt;
     }

@@ -32,6 +32,7 @@ Rectangle {
 	property TableViewParams tableViewParams: TableViewParams {}
 
 	property TreeItemModel headers
+    property TreeItemModel defaultHeadersModel: null;
 
 	property TreeItemModel tableDecorator
 
@@ -142,7 +143,7 @@ Rectangle {
 	property bool emptyDecor: true;
 	property bool emptyDecorHeader: true;
 
-	property var columnContentComps: [];
+    property var columnContentComps: ({});
 
 	property bool compl: false;
 
@@ -197,21 +198,36 @@ Rectangle {
 	}
 
 	onHeadersChanged: {
-		tableContainer.columnContentComps = [];
+        let keys = Object.keys(columnContentComps);
+        for (let i = 0; i < tableContainer.headers.getItemsCount(); i++){
+            let headerId = tableContainer.headers.getData("Id", i)
+            if (!keys.includes(headerId)){
+                tableContainer.columnContentComps[headerId] = null;
+            }
+        }
 
-		for (let i = 0; i < tableContainer.headers.getItemsCount(); i++){
-			tableContainer.columnContentComps.push(null);
-		}
+        console.log("onHeadersChanged", defaultHeadersModel, headers);
+        if (defaultHeadersModel == null && headers){
+            if (headers.getItemsCount() > 0){
+                defaultHeadersModel = headers.copyMe();
+            }
+        }
 
 		tableContainer.setWidth();
 	}
 
+    onDefaultHeadersModelChanged: {
+        console.log("onDefaultHeadersModelChanged", defaultHeadersModel.toJson());
+    }
+
 	onElementsChanged: {
-        // uncheckAll();
+//        uncheckAll();
 		tableContainer.setWidth();
 	}
 
 	onSelectionChanged: {
+        console.log("onSelectionChanged", selection);
+
 		if (selection.length > 0){
 			let maxIndex = selection.sort()[selection.length - 1]
 
@@ -372,8 +388,16 @@ Rectangle {
 	}
 
 	function setColumnContentComponent(columnIndex, comp){
-		tableContainer.columnContentComps[columnIndex] = comp;
+        if (tableContainer.headers && columnIndex >= 0 && columnIndex < tableContainer.headers.getItemsCount()){
+            let headerId = tableContainer.headers.getData("Id", columnIndex);
+
+            setColumnContentById(headerId, comp);
+        }
 	}
+
+    function setColumnContentById(headerId, comp){
+        tableContainer.columnContentComps[headerId] = comp;
+    }
 
 	function setCellHeight(){
 		var maxVal = 0;
@@ -766,6 +790,20 @@ Rectangle {
 		}
 	}//Elements ListView
 
+    function resetViewParams(){
+        tableViewParams.clear();
+
+        if (defaultHeadersModel){
+            for (let i = 0; i < defaultHeadersModel.getItemsCount(); i++){
+                let headerId = defaultHeadersModel.getData("Id", i);
+                tableViewParams.setHeaderSize(headerId, -1);
+                tableViewParams.setHeaderVisible(headerId, true);
+                tableViewParams.setHeaderOrder(headerId, i)
+            }
+        }
+
+        updateWidthFromViewParams();
+    }
 
 	function updateWidthFromViewParams(){
         let headersTemp = tableContainer.headers.copyMe();

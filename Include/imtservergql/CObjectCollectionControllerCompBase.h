@@ -14,6 +14,7 @@
 #include <imtrest/CTimeFilterParamRepresentationController.h>
 #include <imtgql/IGqlRequestExtractor.h>
 #include <imtbase/IComplexCollectionFilter.h>
+#include <imtbase/CMimeType.h>
 
 
 #undef GetObject
@@ -103,6 +104,8 @@ protected:
 	virtual bool ConvertObject(const istd::IChangeable& source, istd::IChangeable& target) const;
 	virtual int GetObjectTypeIdIndex(const QByteArray& typeId) const;
 	virtual int GetMimeTypeIndex(const QString& mimeType) const;
+	virtual QString GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const;
+	virtual QString GetExportFileName(const QByteArray& objectId) const;
 
 	/**
 		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.

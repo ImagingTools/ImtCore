@@ -44,8 +44,15 @@ Item {
 
     onComplComplChanged: {
         if(delegateContainer.complCompl){
-            delegateContainer.contentComp = delegateContainer.pTableDelegateContainer.tableItem.columnContentComps[model.index] !== null ?
-                             delegateContainer.pTableDelegateContainer.tableItem.columnContentComps[model.index] : delegateContainer.defaultContentComp;
+            let contents = delegateContainer.pTableDelegateContainer.tableItem.columnContentComps;
+            let contentComp = delegateContainer.defaultContentComp;
+
+            if (Object.keys(contents).includes(model.Id)){
+                if (contents[model.Id]){
+                    contentComp = contents[model.Id];
+                }
+            }
+            delegateContainer.contentComp = contentComp;
 
             pTableDelegateContainer.tableItem.widthRecalc.connect(delegateContainer.setCellWidth)
             delegateContainer.setCellWidth();

@@ -46,6 +46,8 @@ protected:
 								 iprm::CParamsSet& filterParams) const override;
 	virtual imtbase::CTreeItemModel* RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QString GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const override;
+	virtual QString GetExportFileName(const QByteArray& objectId) const override;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_licenseCollectionCompPtr);

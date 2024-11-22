@@ -279,7 +279,7 @@ ViewBase {
 		TableHeaderParamComp{
 			tableItem: tableInternal;
 			onFinished: {
-				if (buttonId === Enums.apply){
+                if (buttonId === Enums.apply || buttonId === Enums.ok){
 					if (contentItem){
 						collectionViewBaseContainer.tableViewParamsAccepted();
 					}

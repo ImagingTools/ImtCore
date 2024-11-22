@@ -23,14 +23,18 @@ Dialog {
 			spacing: Style.size_mainMargin;
 
 			function updateGui(){
+                console.log("TableHeaderParamComp.qml updateGui")
 				item.block = true;
-				for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
-					let id = leftTable.elements.getData("Id", i)
+                leftTable.uncheckAll();
+                if (leftTable.elements){
+                    for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
+                        let id = leftTable.elements.getData("Id", i)
 
-					if (dialog.tableViewParamsCopied.headerIsVisible(id)){
-						leftTable.checkItem(i);
-					}
-				}
+                        if (dialog.tableViewParamsCopied.headerIsVisible(id)){
+                            leftTable.checkItem(i);
+                        }
+                    }
+                }
 				item.block = false;
 			}
 
@@ -86,9 +90,6 @@ Dialog {
                     }
                     else{
                         upButton.enabled = selection[0] > 0;
-
-                        console.log("1", selection[selection.length - 1]);
-                        console.log("2", leftTable.elementsCount);
                         downButton.enabled = selection[selection.length - 1] < leftTable.elementsCount - 1;
                     }
                 }
@@ -125,11 +126,10 @@ Dialog {
                             elements.swapItems(index, index - 1);
                             dialog.tableViewParamsCopied.swapHeaders(index, index - 1);
                             leftTable.elements = elements;
+                            item.updateHeadersOrder();
+                            item.updateGui();
 
                             dialog.buttonsModel.setProperty(0, 'Enabled', true)
-
-                            item.updateHeadersOrder();
-
                             leftTable.select(index - 1)
                         }
                     }
@@ -151,14 +151,28 @@ Dialog {
                             leftTable.elementsList.model = 0;
                             elements.swapItems(index, index + 1);
                             dialog.tableViewParamsCopied.swapHeaders(index, index + 1);
-
                             leftTable.elements = elements;
+                            item.updateHeadersOrder();
+                            item.updateGui();
 
                             dialog.buttonsModel.setProperty(0, 'Enabled', true)
 
-                            item.updateHeadersOrder();
                             leftTable.select(index + 1)
+
+                            console.log("getSelectedIndexes", leftTable.getSelectedIndexes())
                         }
+                    }
+                }
+
+                ToolButton {
+                    id: resetButton;
+                    enabled: true;
+                    width: 25;
+                    height: 25;
+                    iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Restore", Icon.State.On, Icon.Mode.Normal):
+                                          "../../../" + Style.getIconPath("Icons/Restore", Icon.State.Off, Icon.Mode.Disabled)
+                    onClicked: {
+                        ModalDialogManager.openDialog(resetDialog, {});
                     }
                 }
             }
@@ -192,4 +206,20 @@ Dialog {
 			}
 		}
 	}
+
+    Component {
+        id: resetDialog;
+        MessageDialog {
+            width: 400;
+            title: qsTr("Confirm reset headers");
+            message: qsTr("Reset header settings to default ?");
+            onFinished: {
+                if (buttonId == Enums.yes){
+                    dialog.tableItem.resetViewParams();
+
+                    dialog.accepted();
+                }
+            }
+        }
+    }
 }

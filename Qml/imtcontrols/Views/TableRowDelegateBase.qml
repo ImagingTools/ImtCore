@@ -77,14 +77,12 @@ Rectangle {
 
     Component.onCompleted: {
         tableDelegateContainer.compl = true;
-
-        if (tableItem){
-            tableConnections.target = tableItem;
-        }
     }
 
     Component.onDestruction: {
         if (tableItem){
+            tableItem.selectionChanged.disconnect(tableDelegateContainer.onSelectionChanged);
+            tableItem.elementsChanged.disconnect(tableDelegateContainer.onElementsChanged);
             tableItem.checkedItemsChanged.disconnect(tableDelegateContainer.checkedItemsChanged);
             tableItem.properties.visibleItemsChanged.disconnect(tableDelegateContainer.visibleItemsChanged);
             tableItem.properties.stateItemsChanged.disconnect(tableDelegateContainer.enabledItemsChanged);
@@ -137,11 +135,10 @@ Rectangle {
 
     onTableItemChanged: {
         if (tableItem){
-            tableConnections.target = tableItem;
-
             checkedItemsChanged()
             tableItem.checkedItemsChanged.connect(tableDelegateContainer.checkedItemsChanged);
-
+            tableItem.selectionChanged.connect(tableDelegateContainer.onSelectionChanged);
+            tableItem.elementsChanged.connect(tableDelegateContainer.onElementsChanged);
             tableItem.properties.visibleItemsChanged.connect(tableDelegateContainer.visibleItemsChanged);
             tableItem.properties.stateItemsChanged.connect(tableDelegateContainer.enabledItemsChanged);
             ma.visible = tableItem.hoverEnabled
@@ -160,29 +157,23 @@ Rectangle {
         }
     }
 
-    Connections {
-        id: tableConnections;
-
-        function onSelectionChanged(selection){
-            if (!tableDelegateContainer.tableItem){
-                return;
-            }
-
-            tableDelegateContainer.selected = selection.includes(tableDelegateContainer.rowIndex);
+    function onSelectionChanged(selection){
+        if (!tableDelegateContainer.tableItem){
+            return;
         }
 
-        function onElementsChanged(){
-            if (!tableDelegateContainer.tableItem){
-                return;
-            }
-
-            let selection = tableDelegateContainer.tableItem.tableSelection.selectedIndexes;
-
-            tableDelegateContainer.selected = selection.includes(tableDelegateContainer.rowIndex);
-        }
+        tableDelegateContainer.selected = selection.includes(tableDelegateContainer.rowIndex);
     }
 
+    function onElementsChanged(){
+        if (!tableDelegateContainer.tableItem){
+            return;
+        }
 
+        let selection = tableDelegateContainer.tableItem.tableSelection.selectedIndexes;
+
+        tableDelegateContainer.selected = selection.includes(tableDelegateContainer.rowIndex);
+    }
 
     function getItemData(){
         return model;
@@ -197,7 +188,6 @@ Rectangle {
     }
 
     function setBorderParams(){
-        //console.log("SET_BORDER")
         if(tableDelegateContainer.tableItem.cellDecorator.isValidData("BorderColorHorizontal")){
             tableDelegateContainer.borderColorHorizontal = tableDelegateContainer.tableItem.cellDecorator.getData("BorderColorHorizontal");
         }
@@ -234,7 +224,6 @@ Rectangle {
         if(tableDelegateContainer.tableItem.cellDecorator.isValidData("Color")){
             tableDelegateContainer.cellColor = tableDelegateContainer.tableItem.cellDecorator.getData("Color");
         }
-
     }
 
     function setHeightModelElememt(index_,height_){
@@ -244,7 +233,6 @@ Rectangle {
         if(tableDelegateContainer.tableItem.wrapMode_deleg == Text.NoWrap){
             return;
         }
-        //console.log("table_test::setHeightModelElememt", index_, heightModel.count, height_)
 
         if(index_ < heightModel.count){
             heightModel.setProperty(index_, "cellHeight", height_);
@@ -255,7 +243,6 @@ Rectangle {
     }
 
     function setCellHeightModelDefault(){
-        //console.log("table_test::setCellHeightModelDefault")
         if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
             return;
         }
@@ -266,7 +253,6 @@ Rectangle {
     }
 
     function setCellHeight(){
-        //console.log("table_test::setCellHeight")
         if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
             return;
         }
@@ -284,26 +270,20 @@ Rectangle {
         tableDelegateContainer.height = Math.max(maxVal, tableDelegateContainer.minHeight);
     }
 
-    function selectionChanged(){
-        if (tableItem){
-            selected = tableItem.tableSelection.selectedIndexes.includes(model.index);
-        }
-    }
-
     function checkedItemsChanged(){
-        if (tableItem){
+        if (tableItem && model){
             checkedState = tableItem.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
         }
     }
 
     function visibleItemsChanged(){
-        if (tableItem){
+        if (tableItem && model){
             visible = tableItem.properties.itemIsVisible(model.index);
         }
     }
 
     function enabledItemsChanged(){
-        if (tableItem){
+        if (tableItem && model){
             enabled = tableItem.properties.itemIsEnabled(model.index);
 
             readOnly = !enabled;
@@ -347,8 +327,6 @@ Rectangle {
         anchors.fill: parent;
         hoverEnabled: true;
 
-//        propagateComposedEvents: true;
-
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
         Timer{
@@ -360,26 +338,6 @@ Rectangle {
         }
 
         property int clickCount: 0;
-
-//        onDoubleClicked: {
-//            if (mouse.button === Qt.RightButton) {
-//                return;
-//            }
-
-//            tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
-
-//            mouse.accepted = false;
-//        }
-
-//        onClicked: {
-//            if (mouse.button === Qt.RightButton) {
-//                tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
-//            }
-//            tableDelegateContainer.clicked();
-
-//            mouse.accepted = false;
-//        }
-
         onClicked: {
             clickCount++;
 

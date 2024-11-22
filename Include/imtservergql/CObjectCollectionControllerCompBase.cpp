@@ -20,7 +20,6 @@
 
 // ImtCore includes
 #include <imtbase/IIdentifiable.h>
-#include <imtbase/CMimeType.h>
 #include <imtbase/CCollectionFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IObjectCollectionIterator.h>
@@ -548,7 +547,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 	QString newName = inputParamPtr->GetFieldArgumentValue("NewName").toString();
 
 	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
-		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(qPrintable(newName)).arg(qPrintable(objectId));
+		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName).arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return nullptr;
@@ -984,15 +983,18 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 
 	int index = GetMimeTypeIndex(mimeType);
 	if (index < 0){
-		errorMessage = "Mime type is invalid", "CObjectCollectionControllerCompBase";
+		errorMessage = "Mime type is invalid";
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return nullptr;
 	}
 	if (index >= m_importExportObjectFactCompPtr.GetCount()){
-		errorMessage = "Import/Export object factory index out of range", "CObjectCollectionControllerCompBase";
+		errorMessage = "Import/Export object factory index out of range";
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return nullptr;
 	}
 	if (index >= m_filePersistenceCompPtr.GetCount()){
-		errorMessage = "File persistence index out of range", "CObjectCollectionControllerCompBase";
+		errorMessage = "File persistence index out of range";
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return nullptr;
 	}
 
@@ -1097,11 +1099,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 
 	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
 	QString mimeType = inputParamPtr->GetFieldArgumentValue("mimeType").toString();
-	QString objectName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-
-	if (objectName.isEmpty()){
-		objectName = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -1113,15 +1110,21 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 
 	int index = GetMimeTypeIndex(mimeType);
 	if (index < 0){
-		errorMessage = "Mime type is invalid", "CObjectCollectionControllerCompBase";
+		errorMessage = "Mime type is invalid";
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
 		return nullptr;
 	}
 	if (index >= m_importExportObjectFactCompPtr.GetCount()){
-		errorMessage = "Import/Export object factory index out of range", "CObjectCollectionControllerCompBase";
+		errorMessage = "Import/Export object factory index out of range";
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
 		return nullptr;
 	}
 	if (index >= m_filePersistenceCompPtr.GetCount()){
-		errorMessage = "File persistence index out of range", "CObjectCollectionControllerCompBase";
+		errorMessage = "File persistence index out of range";
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
 		return nullptr;
 	}
 
@@ -1133,7 +1136,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 		return nullptr;
 	}
 
-	QString extension = mime.GetSuffix();
+	QString extension = GetExtensionFromMimeType(mime);;
+	QString objectName = GetExportFileName(objectId);
 
 	QTemporaryDir tempDir;
 	QString fileName = objectName + "." + extension;
@@ -1206,6 +1210,23 @@ int CObjectCollectionControllerCompBase::GetMimeTypeIndex(const QString& mimeTyp
 	}
 
 	return -1;
+}
+
+
+QString CObjectCollectionControllerCompBase::GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const
+{
+	return mimeType.GetSuffix();
+}
+
+
+QString CObjectCollectionControllerCompBase::GetExportFileName(const QByteArray& objectId) const
+{
+	QString objectName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	if (objectName.isEmpty()){
+		objectName = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	}
+
+	return objectName;
 }
 
 
