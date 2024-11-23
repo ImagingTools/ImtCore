@@ -243,11 +243,17 @@ bool CDocumentTable::UpdateDocument(const char *key, int count, const QByteArray
 
 		mdbx::slice keySlice(key, count);
 		mdbx::slice valueSlice(data.data(), data.length());
+		mdbx::slice valueSliceOld;
+		bool oldValueFound = false;
 
-		mdbx::map_handle mapHandle = m_txn.open_map(m_tableName.toStdString(), m_keyMode, m_valueMode);
+		mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
+		if (result.done){
+			valueSliceOld = result.value;
+			oldValueFound = true;
+		}
 
 		try{
-			m_txn.update(mapHandle, keySlice, valueSlice);
+			m_txn.update(m_mapHandle, keySlice, valueSlice);
 		}
 		catch(...){
 			qDebug()<< "Index out of range";
@@ -255,8 +261,16 @@ bool CDocumentTable::UpdateDocument(const char *key, int count, const QByteArray
 		}
 
 		if(m_hasIndex){
-			mdbx::cursor::move_result result = m_cursorIndex.to_last(false);
-			m_txn.put(m_mapHandleIndex, valueSlice, keySlice, mdbx::put_mode::upsert);
+			if(oldValueFound){
+				mdbx::cursor::move_result resultIndex = m_cursorIndex.find(valueSliceOld, false);
+				if(resultIndex.done){
+					m_cursorIndex.erase();
+				}
+				resultIndex = m_cursorIndex.to_last(false);
+				if(resultIndex.done){
+					m_txn.put(m_mapHandleIndex, valueSlice, keySlice, mdbx::put_mode::upsert);
+				}
+			}
 		}
 	}
 	catch(...){
