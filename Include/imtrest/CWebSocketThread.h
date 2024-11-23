@@ -20,25 +20,22 @@
 namespace imtrest
 {
 
+
 class CWebSocketServerComp;
+class CWebSocketThread;
+
 
 class CWebSocket: public QObject
 {
 	Q_OBJECT
 public:
-	CWebSocket(imtrest::CWebSocketServerComp *parent);
+	CWebSocket(CWebSocketThread *parent);
+
 public Q_SLOTS:
 	void OnWebSocketTextMessage(const QString& textMessage);
-Q_SIGNALS:
-	void SendTextMessage(const QByteArray& data) const;
 
 private:
-	CWebSocketServerComp* m_server;
-	imtrest::IProtocolEngine* m_enginePtr;
-	imtrest::IProtocolEngine* m_httpEnginePtr;
-	imtrest::IRequestServlet* m_requestServerHandlerPtr;
-	imtrest::IRequestServlet* m_requestClientHandlerPtr;
-	QByteArray m_productId;
+	CWebSocketThread* m_parent;
 };
 
 
@@ -67,6 +64,9 @@ public:
 	// reimplemented (QThread)
 	void run() override;
 
+public Q_SLOTS:
+	void OnWebSocketTextMessage(const QString& textMessage);
+
 private Q_SLOTS:
 	void OnSocketDisconnected();
 	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
@@ -75,6 +75,8 @@ private Q_SLOTS:
 	void OnAcceptError(QAbstractSocket::SocketError socketError);
 	void OnSslErrors(const QList<QSslError> &errors);
 	void OnSendTextMessage(const QByteArray& data) const;
+Q_SIGNALS:
+	void SendTextMessage(const QByteArray& data) const;
 
 private:
 	CWebSocketServerComp* m_server;
@@ -85,6 +87,11 @@ private:
 	QPointer<QWebSocket> m_socket;
 	bool m_isSecureConnection;
 	istd::TDelPtr<CWebSocket> m_webSocket;
+
+	imtrest::IProtocolEngine* m_httpEnginePtr;
+	imtrest::IRequestServlet* m_requestServerHandlerPtr;
+	imtrest::IRequestServlet* m_requestClientHandlerPtr;
+	QByteArray m_productId;
 
 	QByteArray m_requestId;
 };

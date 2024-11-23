@@ -16,27 +16,121 @@
 namespace imtrest
 {
 
-CWebSocket::CWebSocket(imtrest::CWebSocketServerComp *parent)
+CWebSocket::CWebSocket(CWebSocketThread *parent)
 {
 	Q_ASSERT(parent);
+
+	m_parent = parent;
+}
+
+void CWebSocket::OnWebSocketTextMessage(const QString& textMessage)
+{
+	m_parent->OnWebSocketTextMessage(textMessage);
+}
+
+
+
+CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
+	:QThread(parent),
+	m_status(ST_START)
+{
+	qRegisterMetaType<ConstResponsePtr>("ConstResponsePtr");
 
 	m_server = parent;
 
 	m_enginePtr = m_server->GetProtocolEngine();
+
 	m_httpEnginePtr = m_server->GetHttpProtocolEngine();
 	m_requestServerHandlerPtr = m_server->GetRequestServerServlet();
 	m_requestClientHandlerPtr = m_server->GetRequestClientServlet();
 	m_productId = m_server->GetProductId();
+	connect(this, &CWebSocketThread::SendTextMessage, this, &CWebSocketThread::OnSendTextMessage);
 }
 
 
-void CWebSocket::OnWebSocketTextMessage(const QString& textMessage)
+
+
+void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
+{
+	m_socket = webSocketPtr;
+
+	if (!m_webSocket.IsValid()){
+		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketThread::OnWebSocketTextMessage);
+	}
+
+	start();
+}
+
+
+void CWebSocketThread::SetSocketStatus(Status socketStatus)
+{
+	QMutexLocker lock(&m_statusMutex);
+
+	m_status = socketStatus;
+}
+
+
+CWebSocketThread::Status CWebSocketThread::GetSocketStatus()
+{
+	return m_status;
+}
+
+
+QByteArray CWebSocketThread::GetRequestId()
+{
+	return m_requestId;
+}
+
+
+bool CWebSocketThread::IsSecureConnection() const
+{
+	return m_isSecureConnection;
+}
+
+
+void CWebSocketThread::EnableSecureConnection(bool isSecureConnection)
+{
+	m_isSecureConnection = isSecureConnection;
+}
+
+
+void CWebSocketThread::run()
+{
+	if (m_server == nullptr || !m_socket->isValid()){
+		return;
+	}
+
+	QWebSocket* webSocketPtr = m_socket.get();
+	if (!m_webSocket.IsValid()){
+		m_webSocket.SetPtr(new CWebSocket(this));
+	}
+	else{
+		connect(webSocketPtr, &QWebSocket::textMessageReceived, m_webSocket.GetPtr(), &CWebSocket::OnWebSocketTextMessage, Qt::QueuedConnection);
+	}
+
+	connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
+	connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
+#if (QT_VERSION >= 0x060500)
+	connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError);
+#else
+//	connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CWebSocketServerComp::OnError);
+#endif
+
+	exec();
+}
+
+
+// public slots
+
+
+void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 {
 	if (m_requestServerHandlerPtr == nullptr || m_server == nullptr){
 		return;
 	}
 
-	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
+	// QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
+	QWebSocket* webSocketPtr = m_socket.get();
 
 	if (webSocketPtr == nullptr){
 		return;
@@ -116,81 +210,6 @@ void CWebSocket::OnWebSocketTextMessage(const QString& textMessage)
 			emit SendTextMessage(data);
 		}
 	}
-}
-
-
-CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
-	:QThread(parent),
-	m_status(ST_START)
-{
-	qRegisterMetaType<ConstResponsePtr>("ConstResponsePtr");
-
-	m_server = parent;
-
-	m_enginePtr = m_server->GetProtocolEngine();
-}
-
-void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
-{
-	m_socket = webSocketPtr;
-	start();
-}
-
-
-void CWebSocketThread::SetSocketStatus(Status socketStatus)
-{
-	QMutexLocker lock(&m_statusMutex);
-
-	m_status = socketStatus;
-}
-
-
-CWebSocketThread::Status CWebSocketThread::GetSocketStatus()
-{
-	return m_status;
-}
-
-
-QByteArray CWebSocketThread::GetRequestId()
-{
-	return m_requestId;
-}
-
-
-bool CWebSocketThread::IsSecureConnection() const
-{
-	return m_isSecureConnection;
-}
-
-
-void CWebSocketThread::EnableSecureConnection(bool isSecureConnection)
-{
-	m_isSecureConnection = isSecureConnection;
-}
-
-
-void CWebSocketThread::run()
-{
-	if (m_server == nullptr || !m_socket->isValid()){
-		return;
-	}
-
-	QWebSocket* webSocketPtr = m_socket.get();
-	if (!m_webSocket.IsValid()){
-		m_webSocket.SetPtr(new CWebSocket(m_server));
-		connect(m_webSocket.GetPtr(), &CWebSocket::SendTextMessage, this, &CWebSocketThread::OnSendTextMessage);
-	}
-
-	connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
-	connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
-#if (QT_VERSION >= 0x060500)
-	connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError);
-#else
-//	connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CWebSocketServerComp::OnError);
-#endif
-	connect(webSocketPtr, &QWebSocket::textMessageReceived, m_webSocket.GetPtr(), &CWebSocket::OnWebSocketTextMessage);
-
-	exec();
 }
 
 
