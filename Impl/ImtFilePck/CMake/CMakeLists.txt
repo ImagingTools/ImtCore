@@ -4,7 +4,7 @@ include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 
-target_link_libraries(${PROJECT_NAME} iqt i2d)
-target_link_libraries(${PROJECT_NAME} imtfile imtrest imtbase) # imeas iinsp iproc imtlog iauth)
+target_link_libraries(${PROJECT_NAME} imtfile imtrest imtbase)
+target_link_libraries(${PROJECT_NAME} iqt i2d) # imeas iinsp iproc imtlog iauth)
 
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
