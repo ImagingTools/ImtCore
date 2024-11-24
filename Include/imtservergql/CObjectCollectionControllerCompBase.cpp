@@ -1532,7 +1532,7 @@ void CObjectCollectionControllerCompBase::SetObjectFilter(
 }
 
 
-istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(const QByteArray& typeId)
+istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(const QByteArray& typeId) const
 {
 	int index = GetObjectTypeIdIndex(typeId);
 	if (m_objectFactCompPtr.IsValid() && index < m_objectFactCompPtr.GetCount()){

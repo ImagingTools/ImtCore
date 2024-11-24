@@ -177,7 +177,7 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
-	virtual istd::IChangeable* CreateObject(const QByteArray& typeId);
+	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
 
 protected:
 	QMap<QByteArray, QByteArray> m_fieldReplacementMap;
