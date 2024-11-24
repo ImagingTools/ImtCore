@@ -101,7 +101,7 @@ class Text extends Item {
         this.__getDataQml('width').__setAuto(textMetrics.width)
         this.__getDataQml('height').__setAuto(textMetrics.height)
         
-        if(this.__getDataQml('width').__auto){
+        if(this.elide !== Text.ElideNone){
             this.contentWidth = Math.max(textMetrics.width, this.__impl.scrollWidth)
             this.contentHeight = Math.max(textMetrics.height, this.__impl.scrollHeight)
         } else {

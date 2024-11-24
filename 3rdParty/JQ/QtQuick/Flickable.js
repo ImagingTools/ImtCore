@@ -53,6 +53,11 @@ class Flickable extends Item {
         obj.__DOM.classList.add('Flickable')
         obj.contentItem = Item.create(obj)
 
+        // obj.contentItem.AXChanged.blockSignal(true)
+        // obj.contentItem.AYChanged.blockSignal(true)
+        // obj.contentItem.AWidthChanged.blockSignal(true)
+        // obj.contentItem.AHeightChanged.blockSignal(true)
+
         obj.contentItem.onXChanged=()=>{
             if(-obj.contentItem.x > obj.contentWidth - obj.width){
                 obj.contentItem.__setDOMStyle({
@@ -104,56 +109,56 @@ class Flickable extends Item {
     onWidthChanged(){
         super.onWidthChanged()
         if(this.contentWidth - this.width > 0){
-            if(this.contentX < 0){
-                this.contentX = 0
+            if(this.contentX < this.originX){
+                this.contentX = this.originX
             }
             if(this.contentX > this.contentWidth - this.width){
                 this.contentX = this.contentWidth - this.width
             }
         } else {
-            this.contentX = 0
+            this.contentX = this.originX
         }
     }
 
     onHeightChanged(){
         super.onHeightChanged()
         if(this.contentHeight - this.height > 0){
-            if(this.contentY < 0){
-                this.contentY = 0
+            if(this.contentY < this.originY){
+                this.contentY = this.originY
             }
             if(this.contentY > this.contentHeight - this.height){
                 this.contentY = this.contentHeight - this.height
             }
         } else {
-            this.contentY = 0
+            this.contentY = this.originY
         }
     }
 
     onContentWidthChanged(){
         this.contentItem.width = this.contentWidth
         if(this.contentWidth - this.width > 0){
-            if(this.contentX < 0){
-                this.contentX = 0
+            if(this.contentX < this.originX){
+                this.contentX = this.originX
             }
             if(this.contentX > this.contentWidth - this.width){
                 this.contentX = this.contentWidth - this.width
             }
         } else {
-            this.contentX = 0
+            this.contentX = this.originX
         }
     }
 
     onContentHeightChanged(){
         this.contentItem.height = this.contentHeight
         if(this.contentHeight - this.height > 0){
-            if(this.contentY < 0){
-                this.contentY = 0
+            if(this.contentY < this.originY){
+                this.contentY = this.originY
             }
             if(this.contentY > this.contentHeight - this.height){
                 this.contentY = this.contentHeight - this.height
             }
         } else {
-            this.contentY = 0
+            this.contentY = this.originY
         }
     }
 
@@ -180,34 +185,34 @@ class Flickable extends Item {
             if(this.flickableDirection === Flickable.AutoFlickDirection || this.flickableDirection === Flickable.AutoFlickIfNeeded){
                 if(this.contentWidth > 0 && this.contentWidth > this.width){
                     if(mouse.moveX > 0){
-                        if(this.contentX + mouse.moveX < this.contentWidth - this.width) {
+                        if(this.contentX + mouse.moveX < this.contentWidth - this.width + this.originX) {
                             this.contentX += mouse.moveX
                         } else {
-                            this.contentX = this.contentWidth - this.width
+                            this.contentX = this.contentWidth - this.width + this.originX
                             mouse.target = null
                         }
                     } else {
-                        if(this.contentX + mouse.moveX >= 0) {
+                        if(this.contentX + mouse.moveX >= this.originX) {
                             this.contentX += mouse.moveX
                         } else {
-                            this.contentX = 0
+                            this.contentX = this.originX
                             mouse.target = null
                         }
                     }
                 }
                 if(this.contentHeight > 0 && this.contentHeight > this.height){
                     if(mouse.moveY > 0){
-                        if(this.contentY + mouse.moveY < this.contentHeight - this.height) {
+                        if(this.contentY + mouse.moveY < this.contentHeight - this.height + this.originY) {
                             this.contentY += mouse.moveY
                         } else {
-                            this.contentY = this.contentHeight - this.height
+                            this.contentY = this.contentHeight - this.height + this.originY
                             mouse.target = null
                         }
                     } else {
-                        if(this.contentY + mouse.moveY >= 0) {
+                        if(this.contentY + mouse.moveY >= this.originY) {
                             this.contentY += mouse.moveY
                         } else {
-                            this.contentY = 0
+                            this.contentY = this.originY
                             mouse.target = null
                         }
                     }
@@ -241,34 +246,34 @@ class Flickable extends Item {
             if(this.flickableDirection === Flickable.AutoFlickDirection || this.flickableDirection === Flickable.AutoFlickIfNeeded){
                 if(this.contentWidth > 0){
                     if(deltaX > 0){
-                        if(this.contentX + deltaX < this.contentWidth - this.width) {
+                        if(this.contentX + deltaX < this.contentWidth - this.width + this.originX) {
                             this.contentX += deltaX
                         } else {
-                            this.contentX = this.contentWidth - this.width
+                            this.contentX = this.contentWidth - this.width + this.originX
                             wheel.target = null
                         }
                     } else {
-                        if(this.contentX + deltaX >= 0) {
+                        if(this.contentX + deltaX >= this.originX) {
                             this.contentX += deltaX
                         } else {
-                            this.contentX = 0
+                            this.contentX = this.originX
                             wheel.target = null
                         }
                     }
                 }
                 if(this.contentHeight > 0){
                     if(deltaY > 0){
-                        if(this.contentY + deltaY < this.contentHeight - this.height) {
+                        if(this.contentY + deltaY < this.contentHeight - this.height + this.originY) {
                             this.contentY += deltaY
                         } else {
-                            this.contentY = this.contentHeight - this.height
+                            this.contentY = this.contentHeight - this.height + this.originY
                             wheel.target = null
                         }
                     } else {
-                        if(this.contentY + deltaY >= 0) {
+                        if(this.contentY + deltaY >= this.originY) {
                             this.contentY += deltaY
                         } else {
-                            this.contentY = 0
+                            this.contentY = this.originY
                             wheel.target = null
                         }
                     }

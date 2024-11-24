@@ -70,9 +70,17 @@ class Signal extends BaseObject{
         if(this.__connections.length === 0) delete this.__connections
     }
 
+    blockSignal(flag){
+        this.__blockedSignal = flag
+    }
+
+    signalBlocked(){
+        return this.__blockedSignal
+    }
+
     emit(...args){
         if(this.__parent) {
-            if(this.__parent.signalsBlocked()) return
+            if(this.signalBlocked() || this.__parent.signalsBlocked()) return
 
             if(this.__connections)
             for(let connection of this.__connections){

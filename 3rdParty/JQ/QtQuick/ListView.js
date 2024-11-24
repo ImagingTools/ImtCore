@@ -53,6 +53,9 @@ class ListView extends Flickable {
 
     __items = []
 
+    __middleWidth = 0
+    __middleHeight = 0
+
     __complete(){
         this.__initView(true)
         super.__complete()
@@ -85,21 +88,21 @@ class ListView extends Flickable {
         //     case ListView.Visible: break;
         //     case ListView.Contain: {
         //         if(this.__items[index]){
-        //             if(this.getPropertyValue('orientation') === ListView.Horizontal){
-        //                 if(this.getPropertyValue('contentWidth') <= this.getPropertyValue('width')) return
+        //             if(this.orientation') === ListView.Horizontal){
+        //                 if(this.contentWidth') <= this.width')) return
 
-        //                 if(this.__items[index].getPropertyValue('x') <= this.getPropertyValue('contentX')){
-        //                     this.getProperty('contentX').reset(this.__items[index].getPropertyValue('x'))
-        //                 } else if(this.__items[index].getPropertyValue('x') + this.__items[index].getPropertyValue('width') >= this.getPropertyValue('contentX') + this.getPropertyValue('width')){
-        //                     this.getProperty('contentX').reset(this.__items[index].getPropertyValue('x') + this.__items[index].getPropertyValue('width') - this.getPropertyValue('width'))
+        //                 if(this.__items[index].x') <= this.contentX')){
+        //                     this.getProperty('contentX').reset(this.__items[index].x'))
+        //                 } else if(this.__items[index].x') + this.__items[index].width') >= this.contentX') + this.width')){
+        //                     this.getProperty('contentX').reset(this.__items[index].x') + this.__items[index].width') - this.width'))
         //                 }
         //             } else {
-        //                 if(this.getPropertyValue('contentHeight') <= this.getPropertyValue('height')) return
+        //                 if(this.contentHeight') <= this.height')) return
 
-        //                 if(this.__items[index].getPropertyValue('y') <= this.getPropertyValue('contentY')){
-        //                     this.getProperty('contentY').reset(this.__items[index].getPropertyValue('y'))
-        //                 } else if(this.__items[index].getPropertyValue('y') + this.__items[index].getPropertyValue('height') >= this.getPropertyValue('contentY') + this.getPropertyValue('height')){
-        //                     this.getProperty('contentY').reset(this.__items[index].getPropertyValue('y') + this.__items[index].getPropertyValue('height') - this.getPropertyValue('height'))
+        //                 if(this.__items[index].y') <= this.contentY')){
+        //                     this.getProperty('contentY').reset(this.__items[index].y'))
+        //                 } else if(this.__items[index].y') + this.__items[index].height') >= this.contentY') + this.height')){
+        //                     this.getProperty('contentY').reset(this.__items[index].y') + this.__items[index].height') - this.height'))
         //                 }
         //             }
         //         }
@@ -130,160 +133,420 @@ class ListView extends Flickable {
     }
 
     __clear(){
+        this.blockSignals(true)
+
         let removed = this.__items
         this.__items = []
 
         for(let r of removed){
             if(r) r.destroy()
         }
+
+        // this.__middleWidth = 0
+        // this.__middleHeight = 0
+
+        this.originX = 0
+        this.originY = 0
+        
+        this.contentX = 0
+        this.contentY = 0
+
+        this.blockSignals(false)
     }
 
-    __createItem(model){
+    __getItemInfo(index){
+        let x = 0
+        let y = 0
+        let width = 0
+        let height = 0
+        let exist = false
+        let inner = false
+
+        if(this.__items[index]) {
+            exist = true
+
+            if(this.orientation === ListView.Horizontal){
+                x = this.__items[index].x
+                width = this.__items[index].width
+
+                if(x + width < this.contentX - this.cacheBuffer || x > this.contentX + this.width + this.cacheBuffer) {
+                    inner = false
+                } else {
+                    inner = true
+                }
+            } else {
+                y = this.__items[index].y
+                height = this.__items[index].height
+
+                if(y + height < this.contentY - this.cacheBuffer || y > this.contentY + this.height + this.cacheBuffer) {
+                    inner = false
+                } else {
+                    inner = true
+                }
+            }
+        } else {
+            exist = false
+
+            if(this.orientation === ListView.Horizontal){
+                x = 0
+                if(this.__items[index-1]) {
+                    x = this.__items[index-1].x+this.__items[index-1].width+this.spacing
+                } else if(this.__items[index+1]){
+                    x = this.__items[index+1].x-this.__middleWidth-this.spacing
+                } else {
+                    if(index === 0){
+                        x = this.originX
+                    } else {
+                        x = this.originX + (this.__middleWidth + this.spacing) * index 
+                    }
+                    
+                }
+                width = this.__middleWidth
+
+                if(x + width < this.contentX - this.cacheBuffer || x > this.contentX + this.width + this.cacheBuffer) {
+                    inner = false
+                } else {
+                    inner = true
+                }
+            } else {
+                y = 0
+                if(this.__items[index-1]) {
+                    y = this.__items[index-1].y+this.__items[index-1].height+this.spacing
+                } else if(this.__items[index+1]){
+                    y = this.__items[index+1].y-this.__middleHeight-this.spacing
+                } else {
+                    if(index === 0){
+                        y = this.originY
+                    } else {
+                        y = this.originY + (this.__middleHeight + this.spacing) * index 
+                    }   
+                }
+                height = this.__middleHeight
+
+                if(y + height < this.contentY - this.cacheBuffer || y > this.contentY + this.height + this.cacheBuffer) {
+                    inner = false
+                } else {
+                    inner = true
+                }
+            }
+        }
+
+        return {
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            exist: exist,
+            inner: inner,
+        }
+    }
+
+    __createItem(index, itemInfo){
+        let model
+
+        if(typeof this.model === 'object'){
+            model = this.model.data[index]
+        } else {
+            model = {index:index}
+        }
+
         let item = this.delegate.createObject(this.contentItem, model)
 
-        item.widthChanged.connect(()=>{JQApplication.updateLater(this)})
-        item.heightChanged.connect(()=>{JQApplication.updateLater(this)})
-        item.visibleChanged.connect(()=>{JQApplication.updateLater(this)})
+        this.__items[index] = item
+
+        item.xChanged.connect(()=>{
+            if(this.orientation === ListView.Horizontal){
+                let _index = this.__items.indexOf(item)
+                if(_index >= 0 && this.__items[_index+1]){
+                    this.__items[_index+1].x = this.__items[_index].x+this.__items[_index].width+this.spacing
+                }
+            }
+            // JQApplication.updateLater(this)
+        })
+        item.yChanged.connect(()=>{
+            if(this.orientation === ListView.Vertical){
+                let _index = this.__items.indexOf(item)
+                if(_index >= 0 && this.__items[_index+1]){
+                    this.__items[_index+1].y = this.__items[_index].y+this.__items[_index].height+this.spacing
+                }
+            }
+            // JQApplication.updateLater(this)
+        })
+        item.widthChanged.connect(()=>{
+            if(this.orientation === ListView.Horizontal){
+                let _index = this.__items.indexOf(item)
+                if(_index >= 0 && this.__items[_index+1]){
+                    this.__items[_index+1].x = this.__items[_index].x+this.__items[_index].width+this.spacing
+                }
+            }
+            // JQApplication.updateLater(this)
+        })
+        item.heightChanged.connect(()=>{
+            if(this.orientation === ListView.Vertical){
+                let _index = this.__items.indexOf(item)
+                if(_index >= 0 && this.__items[_index+1]){
+                    this.__items[_index+1].y = this.__items[_index].y+this.__items[_index].height+this.spacing
+                }
+            }
+            // JQApplication.updateLater(this)
+        })
+        // item.visibleChanged.connect(()=>{
+        //     JQApplication.updateLater(this)
+        // })
+
+        item.x = itemInfo.x
+        item.y = itemInfo.y 
 
         return item
     }
 
     __initView(isCompleted){
         if(this.delegate && this.model && isCompleted){
-            JQApplication.beginUpdate()
-            JQApplication.updateLater(this)
+            let length = 0 
+            if(typeof this.model === 'object'){     
+                length = this.model.count
+            } else if(typeof this.model === 'number'){
+                length = this.model
+            } else {
+                return
+            }
+
+            if(length === 0) return
+
+            // JQApplication.beginUpdate()
+            // JQApplication.updateLater(this)
 
             let countChanged = false
 
-            if(typeof this.model === 'number'){
-                if(this.count !== this.model){
-                    countChanged = true
-                    this.__getDataQml('count').__value = this.model
-                }
-
-                for(let i = 0; i < this.model; i++){
-                    let item = this.__createItem({index: i})
-                    this.__items.push(item)
-                }
-            } else {
-                if(this.count !== this.model.data.length){
-                    countChanged = true
-                    this.__getDataQml('count').__value = this.model.data.length
-                }
-
-                for(let i = 0; i < this.model.data.length; i++){
-                    let item = this.__createItem(this.model.data[i])
-                    this.__items.push(item)
+            for(let i = 0; i < length; i++){
+                let itemInfo = this.__getItemInfo(i)
+                if(itemInfo.inner){
+                    if(!itemInfo.exist){
+                        if(this.__createItem(i, itemInfo)) this.__updateGeometry()
+                    }
                 }
             }
 
             if(countChanged) this.countChanged()
 
-            JQApplication.endUpdate()
+            // JQApplication.endUpdate()
         }
     }
 
     __updateView(changeSet){
         if(this.delegate && this.model && this.__completed){
-            JQApplication.beginUpdate()
-            JQApplication.updateLater(this)
-
-            if(this.model.data.length === this.__items.length) {
-                for(let i = 0; i < this.model.data.length; i++){
-                    this.__items[i].JQAbstractModel = this.model.data[i]
-                }
+            let length = 0 
+            if(typeof this.model === 'object'){     
+                length = this.model.count
+            } else if(typeof this.model === 'number'){
+                length = this.model
             } else {
-                let countChanged = false
-
-                if(this.count !== this.model.data.length){
-                    countChanged = true
-                    this.__getDataQml('count').__value = this.model.data.length
-                }
-
-                for(let change of changeSet){
-                    let leftTop = change[0]
-                    let bottomRight = change[1]
-                    let role = change[2]
-
-                    if(role === 'append'){
-                        for(let i = leftTop; i < bottomRight; i++){
-                            let item = this.__createItem(this.model.data[i])
-                            this.__items[i] = item
-                        }
-                    } else if(role === 'insert'){
-                        for(let i = leftTop; i < bottomRight; i++){
-                            let item = this.__createItem(this.model.data[i])
-                            this.__items.splice(i, 0, item)
-                        }
-                    } else if(role === 'remove'){
-                        let removed = this.__items.splice(leftTop, bottomRight - leftTop)
-                        for(let r of removed){
-                            if(r) r.destroy()
-                        }
-                    }
-                }
-
-                if(countChanged) this.countChanged()
+                return
             }
 
-            JQApplication.endUpdate()
+            if(length === 0) return
+            
+            // JQApplication.beginUpdate()
+            // JQApplication.updateLater(this)
+
+            let countChanged = false
+
+            if(this.count !== length){
+                countChanged = true
+                this.__getDataQml('count').__value = length
+            }
+
+            for(let change of changeSet){
+                let leftTop = change[0]
+                let bottomRight = change[1]
+                let role = change[2]
+
+                if(role === 'append'){
+                    for(let i = leftTop; i < bottomRight; i++){
+                        let itemInfo = this.__getItemInfo(i)
+                        if(itemInfo.inner){
+                            if(!itemInfo.exist){
+                                if(this.__createItem(i, itemInfo)) this.__updateGeometry()
+                            }
+                        }
+                    }
+                } else if(role === 'insert'){
+                    for(let i = leftTop; i < bottomRight; i++){
+                        this.__items.splice(i, 0, undefined)
+                        let itemInfo = this.__getItemInfo(i)
+                        if(itemInfo.inner){
+                            if(!itemInfo.exist){
+                                if(this.__createItem(i, itemInfo)) this.__updateGeometry()
+                            }
+                        } 
+                    }
+                } else if(role === 'remove'){
+                    let removed = this.__items.splice(leftTop, bottomRight - leftTop)
+                    for(let r of removed){
+                        if(r) r.destroy()
+                    }
+                }
+            }
+
+            let firstIndex = 0
+            let lastIndex = 0
+
+            for(let i = 0; i < length; i++){
+                if(this.__items[i] && !this.__items[i-1] && !firstIndex) firstIndex = i
+                if(this.__items[i] && !this.__items[i+1] && !lastIndex) lastIndex = i
+            }
+
+            for(let i = firstIndex; i < length; i++){
+                let itemInfo = this.__getItemInfo(i)
+                if(itemInfo.inner){
+                    if(!itemInfo.exist){
+                        if(this.__items[i] = this.__createItem(i, itemInfo)) this.__updateGeometry() 
+                    }
+                } else if(itemInfo.exist){
+                    this.__items[i].destroy()
+                    this.__items[i] = undefined
+                }
+                
+            }
+            for(let i = lastIndex; i >= 0; i--){
+                let itemInfo = this.__getItemInfo(i)
+                if(itemInfo.inner){
+                    if(!itemInfo.exist){
+                        if(this.__items[i] = this.__createItem(i, itemInfo)) this.__updateGeometry()
+                    }
+                } else if(itemInfo.exist){
+                    this.__items[i].destroy()
+                    this.__items[i] = undefined
+                }
+            }
+
+            if(countChanged) this.countChanged()
+
+            // JQApplication.endUpdate()
+        }
+    }
+
+    onCacheBufferChanged(){
+        this.__updateView([])
+    }
+
+    onContentXChanged(){
+        super.onContentXChanged()
+
+        if(this.orientation === ListView.Horizontal){
+            this.__updateView([])
+        }
+    }
+
+    onContentYChanged(){
+        super.onContentYChanged()
+
+        if(this.orientation === ListView.Vertical){
+            this.__updateView([])
+        }
+    }
+
+    onWidthChanged(){
+        super.onWidthChanged()
+
+        if(this.orientation === ListView.Horizontal){
+            this.__updateView([])
+        }
+    }
+
+    onHeightChanged(){
+        super.onHeightChanged()
+
+        if(this.orientation === ListView.Vertical){
+            this.__updateView([])
         }
     }
 
     onSpacingChanged(){
-        JQApplication.updateLater(this)
+        // JQApplication.updateLater(this)
     }
 
-    onOrintationChanged(){
-        this.__updateItemsGeometry()
-        this.__updateGeometry()
-    }
-
-    __updateItemsGeometry(){
+    onOrientationChanged(){
         for(let i = 0; i < this.__items.length; i++){
-            if(this.orientation === ListView.Horizontal){
-                this.__items[i].y = 0
-                if(i === 0){
-                    this.__items[i].x = 0
+            let itemInfo = this.__getItemInfo(i)
+
+            if(itemInfo.exist){
+                if(this.orientation === ListView.Horizontal){
+                    this.originY = 0
                 } else {
-                    this.__items[i].x = this.__items[i-1].x + this.__items[i-1].width + this.spacing
+                    this.originX = 0
                 }
-            } else {
-                this.__items[i].x = 0
-                if(i === 0){
-                    this.__items[i].y = 0
-                } else {
-                    this.__items[i].y = this.__items[i-1].y + this.__items[i-1].height + this.spacing
-                }
+
+                this.__items[i].x = itemInfo.x
+                this.__items[i].y = itemInfo.y
             }
+            
         }
+        this.__updateView([])
     }
 
     __updateGeometry(){
-        let width = 0
-        let height = 0
-        let count = 0
-        for(let item of this.__items){
-            if(item){
-                count += 1
-                width += item.width
-                height += item.height
+        if(!this.__items.length) return 
+
+        let model = this.model
+        if(typeof model === 'object'){     
+            length = model.count
+        } else if(typeof model === 'number'){
+            length = model
+        } else {
+            return
+        }
+        
+        let lastIndex = 0
+        let firstIndex = this.__items.length-1
+        let minX = Infinity
+        let minY = Infinity
+
+        let visibleCount = 0
+        let visibleContentWidth = 0
+        let visibleContentHeight = 0
+
+        for(let i = 0; i < this.__items.length; i++){
+            if(this.__items[i]){
+                visibleCount++
+                visibleContentWidth += this.__items[i].width
+                visibleContentHeight += this.__items[i].height
+
+                let x = this.__items[i].x
+                let y = this.__items[i].y
+
+                if(x < minX) minX = x
+                if(y < minY) minY = y
+
+                if(i < firstIndex) firstIndex = i
+                if(i > lastIndex) lastIndex = i
             }
         }
+
+        let middleWidth = visibleCount ? visibleContentWidth / visibleCount : 0
+        let middleHeight = visibleCount ? visibleContentHeight / visibleCount : 0
+        this.__middleWidth = middleWidth
+        this.__middleHeight = middleHeight
+
         if(this.orientation === ListView.Horizontal){
-            this.contentWidth = width + (count ? (count-1)*this.spacing : 0)
+            this.contentWidth = visibleContentWidth + Math.round(middleWidth)*(length-visibleCount) + this.spacing * (length-1)
+            let originX = (minX - firstIndex*(Math.round(middleWidth+this.spacing)))
+            if(originX !== Infinity && originX !== -Infinity) this.originX = originX
+
             this.__getDataQml('contentHeight').__setAuto(this.height)
         } else {
-            this.contentHeight = height + (count ? (count-1)*this.spacing : 0)
+            this.contentHeight = visibleContentHeight + Math.round(middleHeight)*(length-visibleCount) + this.spacing * (length-1)
+            let originY = (minY - firstIndex*(Math.round(middleHeight+this.spacing)))
+            if(originY !== Infinity && originY !== -Infinity) this.originY = originY
+
             this.__getDataQml('contentWidth').__setAuto(this.width)
-        }
+        }  
     }
 
-    __endUpdate(){
-        this.__updateItemsGeometry()
-        this.__updateGeometry()
-        super.__endUpdate()
-    }
+    // __endUpdate(){
+    //     this.__updateGeometry()
+    //     super.__endUpdate()
+    // }
 
     __destroy(){
         if(this.__model && typeof this.__model === 'object' && !this.__model.__destroyed){

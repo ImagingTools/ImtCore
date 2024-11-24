@@ -239,6 +239,12 @@ module.exports = {
             y: y,
         }
     },
+    atob: function(data){
+        return atob(data)
+    },
+    btoa: function(data){
+        return btoa(data)
+    },
     createComponent(source, currentModule){
         let path = source.replaceAll('qrc:/', '').replaceAll('.qml', '').split('/')
         let className = path[path.length-1]

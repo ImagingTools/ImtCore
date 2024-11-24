@@ -376,6 +376,28 @@ class TreeItemModel extends JSONListModel {
         return keys
     }
 
+    swapItems(index1, index2){
+        if(index1 < 0 || index1 >= this.getItemsCount() || index2 < 0 || index2 >= this.getItemsCount()){
+            return false
+        }
+
+        if(index1 === index2) {
+            return true
+        }
+
+        this.__beginUpdate()
+
+        let data1 = this.data[index1]
+        let data2 = this.data[index2]
+
+        this.data[index1] = data2
+        this.data[index2] = data1
+
+        data1.index = index2
+        data2.index = index1
+
+        this.__endUpdate()
+    }
 
     containsKey(key, row){
         if(row === undefined || row === null) row = 0

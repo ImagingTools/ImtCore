@@ -25,29 +25,23 @@ module.exports = {
         this.container.appendChild(this.content)
 
         document.body.appendChild(this.container)
+
+        this.canvas = document.createElement('canvas')
+        this.ctx = this.canvas.getContext("2d")
+    },
+
+    measureTextFast(text, font){
+        this.ctx.font = `${font.pixelSize}px ${font.family}`
+        let textMetrics = this.ctx.measureText(text)
+        
+        return {
+            width: textMetrics.width,
+            height: textMetrics.fontBoundingBoxAscent + textMetrics.fontBoundingBoxDescent,
+            isHTML: false,
+        }
     },
 
     measureText: function(text, font, maxWidth, wrapMode, textFormat){
-        this.container.style.fontFamily = font.family
-        this.container.style.fontSize = font.pixelSize+'px'
-        this.container.style.fontWeight = font.bold ? 'bold' : 'normal'
-        this.container.style.fontStyle = font.italic ? 'italic' : 'normal'
-        this.container.style.textDecoration = font.underline ? 'underline' : 'unset'
-        if(maxWidth){
-            this.container.style.maxWidth = maxWidth+'px'
-            switch(wrapMode){
-                case NoWrap: this.container.style.whiteSpace = 'pre'; this.container.style.wordBreak = 'unset'; break;
-                case WordWrap: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
-                case WrapAnywhere: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-all'; break;
-                case Wrap: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
-                case WrapAtWordBoundaryOrAnywhere: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
-            }
-        } else {
-            this.container.style.maxWidth = 'unset'
-            this.container.style.whiteSpace = 'pre'; 
-            this.container.style.wordBreak = 'unset';
-        }
-        
         let isHTML = false
         if(textFormat === undefined || textFormat === PlainText){
             isHTML = false
@@ -69,6 +63,30 @@ module.exports = {
             isHTML = true
         }
 
+        if(wrapMode === NoWrap && !isHTML){
+            return this.measureTextFast(text, font)
+        }
+
+        this.container.style.fontFamily = font.family
+        this.container.style.fontSize = font.pixelSize+'px'
+        this.container.style.fontWeight = font.bold ? 'bold' : 'normal'
+        this.container.style.fontStyle = font.italic ? 'italic' : 'normal'
+        this.container.style.textDecoration = font.underline ? 'underline' : 'unset'
+        if(maxWidth){
+            this.container.style.maxWidth = maxWidth+'px'
+            switch(wrapMode){
+                case NoWrap: this.container.style.whiteSpace = 'pre'; this.container.style.wordBreak = 'unset'; break;
+                case WordWrap: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
+                case WrapAnywhere: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-all'; break;
+                case Wrap: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
+                case WrapAtWordBoundaryOrAnywhere: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
+            }
+        } else {
+            this.container.style.maxWidth = 'unset'
+            this.container.style.whiteSpace = 'pre'; 
+            this.container.style.wordBreak = 'unset';
+        }
+ 
         if(isHTML){
             this.content.innerHTML = text
         } else {
