@@ -158,7 +158,7 @@ Rectangle {
     }
 
     function onSelectionChanged(selection){
-        if (!tableDelegateContainer.tableItem){
+		if (!tableDelegateContainer || !tableDelegateContainer.tableItem){
             return;
         }
 
@@ -166,7 +166,7 @@ Rectangle {
     }
 
     function onElementsChanged(){
-        if (!tableDelegateContainer.tableItem){
+		if (!tableDelegateContainer || !tableDelegateContainer.tableItem){
             return;
         }
 
