@@ -63,10 +63,6 @@ module.exports = {
             isHTML = true
         }
 
-        if(wrapMode === NoWrap && !isHTML){
-            return this.measureTextFast(text, font)
-        }
-
         this.container.style.fontFamily = font.family
         this.container.style.fontSize = font.pixelSize+'px'
         this.container.style.fontWeight = font.bold ? 'bold' : 'normal'
