@@ -216,10 +216,6 @@ Rectangle {
 		tableContainer.setWidth();
 	}
 
-    onDefaultHeadersModelChanged: {
-        console.log("onDefaultHeadersModelChanged", defaultHeadersModel.toJson());
-    }
-
 	onElementsChanged: {
 //        uncheckAll();
 		tableContainer.setWidth();

@@ -24,15 +24,16 @@ Item {
     property bool authorizationServerConnected: false;
     property bool useWebSocketSubscription: false;
 
+    property bool firstModelsIsInit: true;
+
     property alias subscriptionManager: subscriptionManager_;
 
     property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
     property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
 
     onAuthorizationServerConnectedChanged: {
-        if (authorizationServerConnected){
-            application.firstModelsInit();
-        }
+        console.log("onAuthorizationServerConnectedChanged", authorizationServerConnected);
+        application.firstModelsInit();
     }
 
     signal settingsUpdate();
@@ -128,7 +129,7 @@ Item {
         onApplyCachedLanguageChanged: {
             if (applyCachedLanguage){
                 let lang = application.languageProvider.getLanguage();
-                application.languageProvider.setLanguage(lang);
+                context.language = lang;
 
                 application.settingsUpdate();
             }
@@ -311,6 +312,8 @@ Item {
         if (loggedUserId === ""){
             AuthorizationController.updateUserManagementModel();
         }
+
+        firstModelsIsInit = true;
     }
 
     function connectToWebSocketServer(){

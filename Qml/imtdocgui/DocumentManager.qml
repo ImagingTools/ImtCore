@@ -357,6 +357,11 @@ QtObject {
 
                 if (document.documentValidator){
                     let data = {}
+
+                    if (document.views.length > 0){
+                        data["editor"] = document.views[0];
+                    }
+
                     let documentIsValid = document.documentValidator.isValid(data);
                     if (!documentIsValid){
                         openErrorDialog(data.message);
