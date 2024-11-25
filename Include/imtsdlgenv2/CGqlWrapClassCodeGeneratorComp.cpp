@@ -284,7 +284,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 	imtsdl::SdlFieldList requestArguments = sdlRequest.GetInputArguments();
 	for (const imtsdl::CSdlField& sdlField: requestArguments){
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << ConvertTypeWithNamespace(sdlField, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr);
+		ifStream << OptListConvertTypeWithNamespaceStruct(sdlField, sdlNamespace, *m_sdlTypeListCompPtr);
 		ifStream << ' ' << sdlField.GetId() << ';';
 		FeedStream(ifStream, 1, false);
 	}
@@ -894,17 +894,22 @@ void CGqlWrapClassCodeGeneratorComp::AddScalarFieldWriteToRequestCode(QTextStrea
 
 void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
 {
-	FeedStreamHorizontally(stream, hIndents);
+	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
+
 	// declare temp GQL object
+	FeedStreamHorizontally(stream, hIndents);
 	const QString dataObjectVariableName = field.GetId() + QStringLiteral("DataObject");
 	stream << QStringLiteral("::imtgql::CGqlObject ") << dataObjectVariableName << ';';
 	FeedStream(stream, 1, false);
 
 	// add me to temp object and checks
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (!requestArguments.");
-	stream << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral(".WriteToGraphQlObject(");
+	stream << QStringLiteral("if (!");
+	stream << structNameConverter.GetString();
+	stream << QStringLiteral("::WriteToGraphQlObject(requestArguments.");
+	stream << field.GetId();
+	stream << QStringLiteral(", ");
 	stream << dataObjectVariableName;
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
