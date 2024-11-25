@@ -319,17 +319,13 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 	FeedStream(ifStream, 3, false);
 
 	// end of ver namespace
-	if (!sdlNamespace.isEmpty()){
-		ifStream << QStringLiteral("} // namespace ");
-		ifStream << GetSchemaVerstionString(*m_customSchemaParamsCompPtr);
-	}
+	ifStream << QStringLiteral("} // namespace ");
+	ifStream << GetSchemaVerstionString(*m_customSchemaParamsCompPtr);
 	FeedStream(ifStream, 1, true);
 
 	// end of namespace
-	if (!sdlNamespace.isEmpty()){
-		ifStream << QStringLiteral("} // namespace ");
-		ifStream << sdlNamespace;
-	}
+	ifStream << QStringLiteral("} // namespace ");
+	ifStream << sdlNamespace;
 	FeedStream(ifStream, 3, true);
 
 

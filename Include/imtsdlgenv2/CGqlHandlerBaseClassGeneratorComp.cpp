@@ -277,18 +277,25 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 	// namespace begin
 
 	const QString sdlNamespace = GetNamespaceFromSchemaParams(*m_customSchemaParamsCompPtr);
-	if (!sdlNamespace.isEmpty()){
-		ifStream << QStringLiteral("namespace ");
-		ifStream <<  sdlNamespace;
-		FeedStream(ifStream, 1, false);
-		ifStream <<  QStringLiteral("{");
-		FeedStream(ifStream, 1, false);
-	}
+	ifStream << QStringLiteral("namespace ");
+	ifStream <<  sdlNamespace;
+	FeedStream(ifStream, 1, false);
+
+	ifStream <<  QStringLiteral("{");
+	FeedStream(ifStream, 2, false);
+
+	// ver namespace begin
+	ifStream << QStringLiteral("namespace ");
+	ifStream <<  GetNamespaceAcceptableString(GetSchemaVerstionString(*m_customSchemaParamsCompPtr));
+	FeedStream(ifStream, 1, false);
+
+	ifStream <<  QStringLiteral("{");
+	FeedStream(ifStream, 3, false);
 
 	// class begin
-	FeedStream(ifStream, 2, false);
 	ifStream << QStringLiteral("class CGraphQlHandlerCompBase");
 	FeedStream(ifStream, 1, false);
+
 	ifStream << QStringLiteral("{");
 	FeedStream(ifStream, 1, false);
 
@@ -303,11 +310,10 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 
 	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("virtual ::imtbase::CTreeItemModel* CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
-	FeedStream(ifStream, 1, false);
+	FeedStream(ifStream, 2, false);
 
 	// protected section
 	// definition of pure virtual methods (to be reimplemented)
-	FeedStream(ifStream, 1, false);
 	ifStream << QStringLiteral("protected:");
 	FeedStream(ifStream, 1, false);
 
@@ -316,14 +322,16 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 
 	// class end
 	ifStream << QStringLiteral("};");
-	FeedStream(ifStream, 1, false);
+	FeedStream(ifStream, 3, false);
+
+	// end of ver namespace
+	ifStream << QStringLiteral("} // namespace ");
+	ifStream << GetSchemaVerstionString(*m_customSchemaParamsCompPtr);
+	FeedStream(ifStream, 1, true);
 
 	// end of namespace
-	FeedStream(ifStream, 2, false);
-	if (!sdlNamespace.isEmpty()){
-		ifStream << QStringLiteral("} // namespace ");
-		ifStream << sdlNamespace;
-	}
+	ifStream << QStringLiteral("} // namespace ");
+	ifStream << sdlNamespace;
 	FeedStream(ifStream, 1, true);
 
 	return true;
@@ -414,7 +422,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream
 
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("virtual ");
-	stream << OptListConvertTypeWithNamespace(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
+	stream << OptListConvertTypeWithNamespaceStruct(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
 	stream << QStringLiteral(" On");
 	stream << GetCapitalizedValue(sdlRequest.GetName());
 	stream << QStringLiteral("(const C");
@@ -505,6 +513,8 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	const QString requestClassName = sdlRequest.GetName() + QStringLiteral("GqlRequest");
+	CStructNamespaceConverter structNameConverter(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
+	structNameConverter.addVersion = true;
 
 	// [1] command ID check
 	FeedStreamHorizontally(stream, hIndents);
@@ -548,8 +558,8 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 	FeedStream(stream, 2, false);
 
 	// [1] create payload variable by calling reimplemented method
-	FeedStreamHorizontally(stream, hIndents + 1);	
-	stream << OptListConvertTypeWithNamespace(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << structNameConverter.GetString();
 	stream << QStringLiteral(" replyPayload = On");
 	stream << sdlRequest.GetName() << '(';
 	stream << GetDecapitalizedValue(requestClassName);
@@ -580,7 +590,10 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 	// [1] write payload variable in model and create variable, to check if it success
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);");
+	stream << QStringLiteral("const bool isModelCreated = ");
+	structNameConverter.addVersion = false;
+	stream << structNameConverter.GetString();
+	stream << QStringLiteral("::WriteToModel(replyPayload, *dataModelPtr);");
 	FeedStream(stream, 1, false);
 
 	// [1->2] check if payload write to TreeModel is failed
