@@ -639,7 +639,7 @@ bool CDocumentTable::MoveToValue(const QByteArray& value)
 
 }
 
-bool CDocumentTable::Remove()
+bool CDocumentTable::RemoveDocument()
 {
 	bool ok = false;
 
@@ -662,7 +662,7 @@ bool CDocumentTable::Remove()
 
 }
 
-bool CDocumentTable::Remove(quint64 key, const QByteArray& value)
+bool CDocumentTable::RemoveDocument(quint64 key, const QByteArray& value)
 {
 	bool ok = false;
 
@@ -696,7 +696,7 @@ bool CDocumentTable::Remove(quint64 key, const QByteArray& value)
 
 }
 
-bool CDocumentTable::Remove(const QByteArray& key, const QByteArray& value)
+bool CDocumentTable::RemoveDocument(const QByteArray& key, const QByteArray& value)
 {
 	bool ok = false;
 

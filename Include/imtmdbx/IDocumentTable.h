@@ -42,9 +42,9 @@ public:
 	virtual bool MoveToNext() = 0;
 	virtual bool MoveToPrevious() = 0;
 	virtual bool MoveToValue(const QByteArray& value) = 0;
-	virtual bool Remove() = 0;
-	virtual bool Remove(quint64 key, const QByteArray& value = QByteArray()) = 0;
-	virtual bool Remove(const QByteArray& key, const QByteArray& value = QByteArray()) = 0;
+	virtual bool RemoveDocument() = 0;
+	virtual bool RemoveDocument(quint64 key, const QByteArray& value = QByteArray()) = 0;
+	virtual bool RemoveDocument(const QByteArray& key, const QByteArray& value = QByteArray()) = 0;
 
 };
 
