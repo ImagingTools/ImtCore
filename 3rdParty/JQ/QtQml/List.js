@@ -18,14 +18,14 @@ class List extends Property {
                 push.call(value, ...args)
 
                 for(let obj of this.__getObjects(args)){
-                    JQApplication.MemoryController.addLink(obj, this.__proxy)
+                    JQApplication.MemoryController.addLink(obj, this)
                 }
             }
             value.push = (...args)=>{
                 push.call(value, ...args)
 
                 for(let obj of this.__getObjects(args)){
-                    JQApplication.MemoryController.addLink(obj, this.__proxy)
+                    JQApplication.MemoryController.addLink(obj, this)
                 }
 
                 this.__emitSignal(value.length-1, value.length, 'append')
@@ -35,7 +35,7 @@ class List extends Property {
                 let removed = splice.call(value, ...args)
 
                 for(let obj of this.__getObjects(removed)){
-                    JQApplication.MemoryController.removeLink(obj, this.__proxy)
+                    JQApplication.MemoryController.removeLink(obj, this)
                 }
 
                 return removed
@@ -85,7 +85,7 @@ class List extends Property {
         super.__destroy()
 
         for(let obj of this.__getObjects()){
-            JQApplication.MemoryController.removeLink(obj, this.__proxy)
+            JQApplication.MemoryController.removeLink(obj, this)
         }
     }
 }

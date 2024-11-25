@@ -80,9 +80,9 @@ class Property extends BaseObject{
                 this.__value[key] = safeValue
             }
         } else if(safeValue !== this.__value){
-            JQApplication.MemoryController.removeLink(this.__value, this.__proxy)
+            JQApplication.MemoryController.removeLink(this.__value, this)
             this.__value = safeValue
-            JQApplication.MemoryController.addLink(safeValue, this.__proxy)
+            JQApplication.MemoryController.addLink(safeValue, this)
             this.__emitSignal()
         }
         
