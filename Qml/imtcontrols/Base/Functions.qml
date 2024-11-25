@@ -82,8 +82,11 @@ QtObject {
 		let year = fullYear.toString().slice(2)
 
 		let seconds = _date.getSeconds()
+		if(seconds < 10) seconds  = '0' + seconds
 		let minutes = _date.getMinutes()
+		if(minutes < 10) minutes = '0' + minutes
 		let hours = _date.getHours()
+		if(hours < 10) hours = '0' + hours
 
 		return format.replace('yyyy',fullYear).replace('yy',year).replace('MM',month).replace('dd',day).replace('hh',hours).replace('mm',minutes).replace('ss',seconds)
 	}

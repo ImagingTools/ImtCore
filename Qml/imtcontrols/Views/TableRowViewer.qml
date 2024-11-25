@@ -23,6 +23,8 @@ Row {
             width: 20
             height: dataList.height;
 
+			clip: true;
+
             Component.onCompleted: {
                 cell.compl = true;
             }
