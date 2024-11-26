@@ -523,6 +523,7 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 			outputArgument.SetIsRequired(true);
 		}
 		request.SetOutputArgument(outputArgument);
+		request.SetSchemaParamsPtr(m_schemaParamsPtr);
 		request.SetSchemaFilePath(m_originalSchemaFile);
 
 		// ensure, all arguments is valid
