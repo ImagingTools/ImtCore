@@ -37,25 +37,6 @@ RemoteCollectionView {
         }
     }
 
-    dataControllerComp: Component {
-        CollectionRepresentation {
-            collectionId: userGroupCollectionViewContainer.collectionId;
-            additionalFieldIds: userGroupCollectionViewContainer.additionalFieldIds;
-
-            function getHeaders(){
-                return userGroupCollectionViewContainer.getHeaders();
-            }
-        }
-    }
-
-    onProductIdChanged: {
-        roleCollectionDataProvider.productId = productId;
-        roleCollectionDataProvider.updateModel();
-
-        userCollectionDataProvider.updateModel();
-        groupCollectionDataProvider.updateModel();
-    }
-
     function handleSubscription(dataModel){
         userGroupCollectionViewContainer.doUpdateGui();
     }
@@ -63,44 +44,6 @@ RemoteCollectionView {
     property TreeItemModel usersModel;
     property TreeItemModel rolesModel;
     property TreeItemModel groupsModel;
-
-    RoleCollectionDataProvider {
-        id: roleCollectionDataProvider;
-        productId: userGroupCollectionViewContainer.productId;
-        onModelUpdated: {
-            console.log("RoleCollectionDataProvider onModelUpdated UserGroupCollectionView", collectionModel)
-
-            userGroupCollectionViewContainer.rolesModel = collectionModel;
-        }
-
-        function getHeaders(){
-            return userGroupCollectionViewContainer.getHeaders()
-        }
-    }
-
-    UserCollectionDataProvider {
-        id: userCollectionDataProvider;
-
-        onModelUpdated: {
-            userGroupCollectionViewContainer.usersModel = collectionModel;
-        }
-
-        function getHeaders(){
-            return userGroupCollectionViewContainer.getHeaders()
-        }
-    }
-
-    GroupCollectionDataProvider {
-        id: groupCollectionDataProvider;
-
-        onModelUpdated: {
-            userGroupCollectionViewContainer.groupsModel = collectionModel;
-        }
-
-        function getHeaders(){
-            return userGroupCollectionViewContainer.getHeaders()
-        }
-    }
 
     Component {
         id: userGroupDocumentComp;

@@ -14,23 +14,7 @@ RemoteCollectionView {
     collectionId: "Roles";
     visibleMetaInfo: true;
 
-    dataControllerComp:
-        Component {
-        CollectionRepresentation {
-            collectionId: roleCollectionViewContainer.collectionId;
-
-            Component.onCompleted: {
-                additionalFieldIds.push("ProductId");
-                additionalFieldIds.push("ParentRoles");
-            }
-
-            function getHeaders(){
-                let headers = roleCollectionViewContainer.getHeaders()
-                console.log("CollectionRepresentation getHeaders", headers)
-                return headers
-            }
-        }
-    }
+    additionalFieldIds: ["ProductId", "ParentRoles"]
 
     commandsDelegateComp: Component {RoleCollectionViewCommandsDelegate {
             collectionView: roleCollectionViewContainer;
@@ -69,9 +53,6 @@ RemoteCollectionView {
     onProductIdChanged: {
         permissionsProvider.productId = productId;
         permissionsProvider.updateModel();
-
-        roleCollectionDataProvider.productId = productId;
-        roleCollectionDataProvider.updateModel();
     }
 
     property TreeItemModel rolesModel;
@@ -88,21 +69,6 @@ RemoteCollectionView {
         }
 
         function getHeaders(){
-            return roleCollectionViewContainer.getHeaders()
-        }
-    }
-
-    RoleCollectionDataProvider {
-        id: roleCollectionDataProvider;
-        productId: roleCollectionViewContainer.productId;
-
-        onModelUpdated: {
-            roleCollectionViewContainer.rolesModel = collectionModel;
-            console.log("RoleCollectionDataProvider onModelUpdated RoleCollectionView", roleCollectionViewContainer.rolesModel)
-        }
-
-        function getHeaders(){
-            console.log("RoleCollectionDataProvider getHeaders", roleCollectionViewContainer.getHeaders())
             return roleCollectionViewContainer.getHeaders()
         }
     }

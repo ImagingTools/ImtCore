@@ -32,13 +32,6 @@ RemoteCollectionView {
         }
     }
 
-    onProductIdChanged: {
-        roleCollectionDataProvider.productId = productId;
-        roleCollectionDataProvider.updateModel();
-
-        groupCollectionDataProvider.updateModel();
-    }
-
     function handleSubscription(dataModel){
         userCollectionViewContainer.doUpdateGui();
     }
@@ -116,20 +109,6 @@ RemoteCollectionView {
             }
         }
     }
-
-    // dataControllerComp:
-    //     Component {
-    //     CollectionRepresentation {
-    //         collectionId: userCollectionViewContainer.collectionId;
-    //         Component.onCompleted: {
-    //             additionalFieldIds.push("SystemId");
-    //         }
-
-    //         function getHeaders(){
-    //             return userCollectionViewContainer.getHeaders();
-    //         }
-    //     }
-    // }
 
     function onLocalizationChanged(language){
         userCollectionViewContainer.dataController.updateHeaders();
@@ -235,27 +214,6 @@ RemoteCollectionView {
                     }
                 }
             }
-        }
-    }
-
-    RoleCollectionDataProvider {
-        id: roleCollectionDataProvider;
-        productId: userCollectionViewContainer.productId;
-        onModelUpdated: {
-            userCollectionViewContainer.rolesModel = collectionModel;
-        }
-        function getHeaders(){
-            return userCollectionViewContainer.getHeaders();
-        }
-    }
-
-    GroupCollectionDataProvider {
-        id: groupCollectionDataProvider;
-        onModelUpdated: {
-            userCollectionViewContainer.groupsModel = collectionModel;
-        }
-        function getHeaders(){
-            return userCollectionViewContainer.getHeaders();
         }
     }
 

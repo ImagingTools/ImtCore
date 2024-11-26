@@ -16,6 +16,10 @@ Item {
     property string productId: context.appId;
     property var documentManager: MainDocumentManager.getDocumentManager("Administration");
 
+    property TreeItemModel rolesModel;
+    property TreeItemModel usersModel;
+    property TreeItemModel groupsModel;
+
     function getHeaders(){
         if (administrationContainer.productId === ""){
             console.error("Unable to get additional parameters. Product-ID is empty");
@@ -29,7 +33,6 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("AdministrationView.qml onCompleted");
         Events.subscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
     }
 
@@ -65,14 +68,11 @@ Item {
         RoleCollectionView {
             productId: administrationContainer.productId;
             documentManager: administrationContainer.documentManager;
-            Component.onCompleted: {
-                console.log("RoleCollectionView in AdministrationView completeds", administrationContainer.getHeaders())
-            }
+            rolesModel: administrationContainer.rolesModel;
 
             function getHeaders(){
                  return administrationContainer.getHeaders()
             }
-
         }
     }
 
@@ -82,6 +82,8 @@ Item {
         UserCollectionView {
             productId: administrationContainer.productId;
             documentManager: administrationContainer.documentManager;
+            rolesModel: administrationContainer.rolesModel;
+            groupsModel: administrationContainer.groupsModel;
 
             function getHeaders(){
                 return administrationContainer.getHeaders()
@@ -95,13 +97,11 @@ Item {
         UserGroupCollectionView {
             productId: administrationContainer.productId;
             documentManager: administrationContainer.documentManager;
-            Component.onCompleted: {
-                console.log("UserGroupCollectionView onCompleted", administrationContainer.getHeaders() )
-            }
+            rolesModel: administrationContainer.rolesModel;
+            groupsModel: administrationContainer.groupsModel;
+            usersModel: administrationContainer.usersModel;
 
             function getHeaders(){
-                console.log("UserGroupCollectionView getHeaders", administrationContainer.getHeaders())
-
                 return administrationContainer.getHeaders()
             }
         }
@@ -124,6 +124,9 @@ Item {
 
             let ok = PermissionsController.checkPermission("ViewRoles");
             if (ok){
+                roleCollectionDataProvider.productId = administrationContainer.productId;
+                roleCollectionDataProvider.updateModel();
+
                 multiPageView.addPage("Roles", qsTr("Roles"), roleCollectionComp);
             }
             else{
@@ -132,6 +135,7 @@ Item {
 
             ok = PermissionsController.checkPermission("ViewUsers");
             if (ok){
+                userCollectionDataProvider.updateModel();
                 multiPageView.addPage("Users", qsTr("Users"), userCollectionComp);
             }
             else{
@@ -140,6 +144,7 @@ Item {
 
             ok = PermissionsController.checkPermission("ViewGroups");
             if (ok){
+                groupCollectionDataProvider.updateModel();
                 multiPageView.addPage("Groups", qsTr("Groups"), userGroupCollectionComp);
             }
             else{
@@ -148,6 +153,41 @@ Item {
 
             multiPageView.currentIndex = 0;
             administrationContainer.multiPageUpdated();
+        }
+    }
+
+    RoleCollectionDataProvider {
+        id: roleCollectionDataProvider;
+        productId: administrationContainer.productId;
+
+        onModelUpdated: {
+            administrationContainer.rolesModel = collectionModel;
+        }
+
+        function getHeaders(){
+            return administrationContainer.getHeaders()
+        }
+    }
+
+    UserCollectionDataProvider {
+        id: userCollectionDataProvider;
+
+        onModelUpdated: {
+            administrationContainer.usersModel = collectionModel;
+        }
+
+        function getHeaders(){
+            return administrationContainer.getHeaders()
+        }
+    }
+
+    GroupCollectionDataProvider {
+        id: groupCollectionDataProvider;
+        onModelUpdated: {
+            administrationContainer.groupsModel = collectionModel;
+        }
+        function getHeaders(){
+            return administrationContainer.getHeaders();
         }
     }
 }
