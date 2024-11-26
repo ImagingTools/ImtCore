@@ -84,6 +84,7 @@ bool CGqlExtSchemaParser::ProcessCollectionSchema()
 		}
 
 		retVal = retVal && ExtractDocumentTypeFromCurrentEntry(documentType);
+		documentType.SetSchemaFile(m_originalSchemaFile);
 		m_documentTypes << documentType;
 
 		retVal = retVal && MoveToNextReadableSymbol(&foundDelimiter);

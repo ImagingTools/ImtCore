@@ -517,6 +517,7 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 			outputArgument.SetIsRequired(true);
 		}
 		request.SetOutputArgument(outputArgument);
+		request.SetSchemaFile(m_originalSchemaFile);
 
 		// ensure, all arguments is valid
 		SdlFieldList allArguments = inputArguments;

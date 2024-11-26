@@ -61,7 +61,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 												   "1 - only those schemas with the same namespace as the original one will be compiled\n"
 												   "2 - only the schema will be compiled. See the 'input parameter' option", "AutoLink", "0");
 	QCommandLineOption includeHeadersOption({"H","include-headers"}, "List of directories to search for generated header files", "HeadersIncludes");
-	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single. Deprecated.");
+	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single.");
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
 	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)");

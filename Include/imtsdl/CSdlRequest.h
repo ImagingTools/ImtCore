@@ -7,6 +7,7 @@
 //Acf includes
 #include <iser/ISerializable.h>
 #include <imod/CModelUpdateBridge.h>
+#include <iprm/IParamsSet.h>
 
 // ImtCore includes
 #include <imtsdl/imtsdl.h>
@@ -39,8 +40,14 @@ public:
 	SdlFieldList GetInputArguments() const;
 	void SetInputArguments(const SdlFieldList& inputArguments);
 
+	[[nodiscard]] QString GetSchemaFile() const;
+	void SetSchemaFile(const QString& schemaFile);
+
 	CSdlField GetOutputArgument() const;
 	void SetOutputArgument(const CSdlField& outputArgument);
+
+	[[nodiscard]] const iprm::IParamsSet& GetSchemaParams() const;
+	void SetSchemaParamsPtr(const std::shared_ptr<iprm::IParamsSet>& schemaParamsPtr);
 
 	// operators
 	bool operator==(const CSdlRequest& other) const;
@@ -52,8 +59,10 @@ public:
 private:
 	Type m_type;
 	QString m_name;
+	QString m_schemaFile;
 	SdlFieldList m_inputArguments;
 	CSdlField m_outputArgument;
+	std::shared_ptr<iprm::IParamsSet> m_schemaParamsPtr;
 };
 
 

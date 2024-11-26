@@ -31,7 +31,7 @@ public:
 	[[nodiscard]] SdlFieldList GetFields() const;
 	void SetFields(const SdlFieldList& fields);
 
-	/// \todo remove it \deprecated. Build namespace from \c m_schemaParamsPtr instead \sa GetSchemaParams
+	/// \todo remove it \deprecated. Build namespace from \c m_schemaParamsPtr instead. \sa GetSchemaParams
 	[[nodiscard]] QString GetNamespace() const;
 	void SetNamespace(const QString& aNamespace);
 
