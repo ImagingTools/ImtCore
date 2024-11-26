@@ -16,6 +16,13 @@
 #include <imtsdl/CSdlRequest.h>
 
 
+namespace iprm {
+
+class CParamsSet;
+
+} // namespace iprm::CParamsSet
+
+
 namespace imtsdl
 {
 
@@ -110,6 +117,13 @@ protected:
 
 	SdlTypeList m_sdlTypes;
 	SdlRequestList m_requests;
+
+	/**
+		\brief saved schema parameters, declarated in .sdl file
+		\note this parameter is NEVER null
+		\code m_schemaParamsPtr != nullptr // = true \endcode
+	 */
+	std::shared_ptr<iprm::CParamsSet> m_schemaParamsPtr;
 };
 
 

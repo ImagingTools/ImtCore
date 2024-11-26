@@ -163,7 +163,7 @@ int CGqlSchemaParserComp::DoProcessing(
 	}
 
 	if (m_schemaNamespaceCompPtr.IsValid()){
-		const QString curretNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsPtr.get(), m_argumentParserCompPtr);
+		const QString curretNamespace = GetNamespaceFromParamsOrArguments(m_schemaParamsPtr.get(), m_argumentParserCompPtr);
 		m_schemaNamespaceCompPtr->SetText(curretNamespace);
 	}
 
@@ -531,12 +531,6 @@ bool CGqlSchemaParserComp::ValidateSchema()
 	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled() && !m_argumentParserCompPtr->IsDependenciesMode()){
 		for (CSdlType& sdlType: m_sdlTypes){
 			bool isExternal = sdlType.IsExternal();
-			const bool isSameSchema = bool(QDir::cleanPath(m_currentSchemaFilePath) == QDir::cleanPath(sdlType.GetSchemaFile()));
-
-			// update schema params
-			if (isSameSchema){
-				sdlType.SetSchemaParamsPtr(m_customSchemaParamsPtr);
-			}
 
 			// add namespace prefix to all types
 			const QString namespacePrefix = m_argumentParserCompPtr->GetNamespacePrefix() + QStringLiteral("::");
@@ -554,7 +548,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 
 			if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_ONLY_FILE){
 				if (sdlType.GetTargetHeaderFile().isEmpty()){
-					const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), QFileInfo(m_currentSchemaFilePath).fileName());
+					const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), QFileInfo(m_currentSchemaFilePath).fileName());
 					const QString headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
 					sdlType.SetTargetHeaderFile(headerFilePath);
 				}
@@ -564,7 +558,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 			else if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_SAME_NAMESPACE){
 				const QString typeNamespace = sdlType.GetNamespace();
 				if (!typeNamespace.isEmpty()){
-					const QString currentNamespace = namespacePrefix + BuildNamespaceFromParams(*m_customSchemaParamsPtr);
+					const QString currentNamespace = namespacePrefix + BuildNamespaceFromParams(*m_schemaParamsPtr);
 					isExternal = bool(currentNamespace != typeNamespace);
 				}
 			}
@@ -574,11 +568,11 @@ bool CGqlSchemaParserComp::ValidateSchema()
 				if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_NONE){
 					// set same namespace for all types if generate all schemas in single file
 					/// \todo change it to \c BuildNamespaceFromParams afterwards
-					const QString typeNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsPtr.get(), m_argumentParserCompPtr);
+					const QString typeNamespace = GetNamespaceFromParamsOrArguments(m_schemaParamsPtr.get(), m_argumentParserCompPtr);
 					sdlType.SetNamespace(typeNamespace);
 				}
 
-				const bool isSet = UpdateTypeInfo(sdlType, m_customSchemaParamsPtr.get(), m_argumentParserCompPtr.GetPtr());
+				const bool isSet = UpdateTypeInfo(sdlType, m_schemaParamsPtr.get(), m_argumentParserCompPtr.GetPtr());
 				if (!isSet){
 					SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlType.GetName(), m_currentSchemaFilePath));
 

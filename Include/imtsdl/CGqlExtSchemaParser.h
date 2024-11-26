@@ -54,8 +54,6 @@ protected:
 
 protected:
 	SdlDocumentTypeList m_documentTypes;
-
-	std::shared_ptr<iprm::CParamsSet> m_customSchemaParamsPtr;
 };
 
 

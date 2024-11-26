@@ -15,7 +15,7 @@ namespace imtsdl
 
 // protected constructor
 
-CGqlExtSchemaParser::CGqlExtSchemaParser(): BaseClass(), m_customSchemaParamsPtr(new imod::TModelWrap<iprm::CParamsSet>)
+CGqlExtSchemaParser::CGqlExtSchemaParser(): BaseClass()
 {
 }
 
@@ -85,6 +85,7 @@ bool CGqlExtSchemaParser::ProcessCollectionSchema()
 
 		retVal = retVal && ExtractDocumentTypeFromCurrentEntry(documentType);
 		documentType.SetSchemaFile(m_originalSchemaFile);
+		documentType.SetSchemaParamsPtr(m_schemaParamsPtr);
 		m_documentTypes << documentType;
 
 		retVal = retVal && MoveToNextReadableSymbol(&foundDelimiter);
@@ -253,9 +254,9 @@ bool CGqlExtSchemaParser::ValidateSchema()
 		}
 	}
 
-	const QString fieldNamespace = CSdlTools::BuildNamespaceFromParams(*m_customSchemaParamsPtr);
+	const QString fieldNamespace = CSdlTools::BuildNamespaceFromParams(*m_schemaParamsPtr);
 	/// \todo don't use a suffix. Instead, define it elsewhere...
-	const QString fieldQmlImportDeclaration = CSdlTools::BuildQmlImportDeclarationFromParams(*m_customSchemaParamsPtr, QStringLiteral("Sdl"));
+	const QString fieldQmlImportDeclaration = CSdlTools::BuildQmlImportDeclarationFromParams(*m_schemaParamsPtr, QStringLiteral("Sdl"));
 	// set namespace and QML import for all types
 	for (CSdlType& sdlType: m_sdlTypes){
 		if (!sdlType.IsExternal() || sdlType.GetNamespace().isEmpty()){
@@ -282,7 +283,7 @@ bool CGqlExtSchemaParser::ProcessCustomSchemaValue(const QString& key, const QSt
 	if (acceptableKeys.contains(key)){
 		iprm::CTextParam* nameParamPtr = new iprm::CTextParam;
 		nameParamPtr->SetText(value);
-		const bool isSet = m_customSchemaParamsPtr->SetEditableParameter(key.toUtf8(), nameParamPtr, true);
+		const bool isSet = m_schemaParamsPtr->SetEditableParameter(key.toUtf8(), nameParamPtr, true);
 		Q_ASSERT(isSet);
 
 		return isSet;

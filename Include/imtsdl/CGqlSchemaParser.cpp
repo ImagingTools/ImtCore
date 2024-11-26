@@ -4,6 +4,10 @@
 // Qt includes
 #include <QtCore/QDir>
 
+// ACF includes
+#include <iprm/CParamsSet.h>
+#include <imod/TModelWrap.h>
+
 // ImtCore includes
 #include <imtsdl/CSdlTools.h>
 
@@ -15,7 +19,8 @@ namespace imtsdl
 CGqlSchemaParser::CGqlSchemaParser():
 	m_lastReadChar(0),
 	m_lastReadLine(0),
-	m_useLastReadChar(false)
+	m_useLastReadChar(false),
+	m_schemaParamsPtr(new imod::TModelWrap<iprm::CParamsSet>)
 {
 }
 
@@ -256,6 +261,7 @@ bool CGqlSchemaParser::ProcessType()
 	}
 	sdlType.SetFields(fieldList);
 	sdlType.SetSchemaFile(m_originalSchemaFile);
+	sdlType.SetSchemaParamsPtr(m_schemaParamsPtr);
 
 	// maybe already added from another file
 	if (!m_sdlTypes.contains(sdlType)){
