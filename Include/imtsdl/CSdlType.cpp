@@ -18,8 +18,7 @@ namespace imtsdl
 
 // public methods
 
-CSdlType::CSdlType()
-	:m_isExternal(false)
+CSdlType::CSdlType() :CSdlEntryBase()
 {
 }
 
@@ -69,93 +68,6 @@ void CSdlType::SetNamespace(const QString& aNamespace)
 }
 
 
-QString CSdlType::GetTargetHeaderFile() const
-{
-	return m_targetHeaderFile;
-}
-
-
-void CSdlType::SetTargetHeaderFile(const QString& headerFile)
-{
-	if (m_targetHeaderFile != headerFile){
-		istd::CChangeNotifier notifier(this);
-		m_targetHeaderFile = headerFile;
-	}
-}
-
-
-QString CSdlType::GetSchemaFile() const
-{
-	return m_schemaFile;
-}
-
-
-void CSdlType::SetSchemaFile(const QString& schemaFile)
-{
-	if (m_schemaFile != schemaFile){
-		istd::CChangeNotifier notifier(this);
-		m_schemaFile = schemaFile;
-	}
-}
-
-
-bool CSdlType::IsExternal() const
-{
-	return m_isExternal;
-}
-
-
-void CSdlType::SetExternal(bool isExternal)
-{
-	if (m_isExternal != isExternal){
-		istd::CChangeNotifier notifier(this);
-		m_isExternal = isExternal;
-	}
-}
-
-
-QString CSdlType::GetQmlImportDeclaration() const
-{
-	return m_qmlImportDeclaration;
-}
-
-
-void CSdlType::SetQmlImportDeclaration(const QString& qmlImportDeclaration)
-{
-	if (m_qmlImportDeclaration != qmlImportDeclaration) {
-		istd::CChangeNotifier notifier(this);
-		m_qmlImportDeclaration = qmlImportDeclaration;
-	}
-}
-
-
-const iprm::IParamsSet& CSdlType::GetSchemaParams() const
-{
-	if (m_schemaParamsPtr == nullptr){
-		static const iprm::CParamsSet dummyParams;
-
-		return dummyParams;
-	}
-
-	return *m_schemaParamsPtr;
-}
-
-
-void CSdlType::SetSchemaParamsPtr(const std::shared_ptr<iprm::IParamsSet>& schemaParamsPtr)
-{
-	m_schemaParamsPtr = schemaParamsPtr;
-
-	// ensure, params is comparable
-	if (schemaParamsPtr != nullptr){
-		const bool isEqual = schemaParamsPtr->IsEqual(*schemaParamsPtr);
-		if (!isEqual){
-			Q_ASSERT_X(false, "Initializing incomparable paras!", __func__);
-			qFatal("Initializing incomparable paras!");
-		}
-	}
-}
-
-
 // reimplemented(iser::ISerializable)
 
 bool CSdlType::Serialize(iser::IArchive& archive)
@@ -176,12 +88,12 @@ bool CSdlType::Serialize(iser::IArchive& archive)
 
 	iser::CArchiveTag targetHeaderFileTag("TargetHeaderFile", "", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(targetHeaderFileTag);
-	retVal = retVal && archive.Process(m_targetHeaderFile);
+	retVal = retVal && archive.Process(m_targetHeaderFilePath);
 	retVal = retVal && archive.EndTag(targetHeaderFileTag);
 
 	iser::CArchiveTag schemaFileTag("SchemaFile", "", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(schemaFileTag);
-	retVal = retVal && archive.Process(m_schemaFile);
+	retVal = retVal && archive.Process(m_schemaFilePath);
 	retVal = retVal && archive.EndTag(schemaFileTag);
 
 	iser::CArchiveTag externalTag("IsExternal", "", iser::CArchiveTag::TT_LEAF);
@@ -205,8 +117,8 @@ bool CSdlType::operator==(const CSdlType& other) const
 	bool retVal = m_name == other.m_name;
 	retVal = retVal && m_fields == other.m_fields;
 	retVal = retVal && m_namespace == other.m_namespace;
-	retVal = retVal && m_targetHeaderFile == other.m_targetHeaderFile;
-	retVal = retVal && m_schemaFile == other.m_schemaFile;
+	retVal = retVal && m_targetHeaderFilePath == other.m_targetHeaderFilePath;
+	retVal = retVal && m_schemaFilePath == other.m_schemaFilePath;
 	retVal = retVal && m_isExternal == other.m_isExternal;
 	retVal = retVal && m_qmlImportDeclaration == other.m_qmlImportDeclaration;
 	retVal = retVal && GetSchemaParams().IsEqual(other.GetSchemaParams());

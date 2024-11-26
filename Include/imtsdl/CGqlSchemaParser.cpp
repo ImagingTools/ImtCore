@@ -260,7 +260,7 @@ bool CGqlSchemaParser::ProcessType()
 		ProcessValue(fieldList, &atEnd);
 	}
 	sdlType.SetFields(fieldList);
-	sdlType.SetSchemaFile(m_originalSchemaFile);
+	sdlType.SetSchemaFilePath(m_originalSchemaFile);
 	sdlType.SetSchemaParamsPtr(m_schemaParamsPtr);
 
 	// maybe already added from another file
@@ -523,7 +523,7 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 			outputArgument.SetIsRequired(true);
 		}
 		request.SetOutputArgument(outputArgument);
-		request.SetSchemaFile(m_originalSchemaFile);
+		request.SetSchemaFilePath(m_originalSchemaFile);
 
 		// ensure, all arguments is valid
 		SdlFieldList allArguments = inputArguments;

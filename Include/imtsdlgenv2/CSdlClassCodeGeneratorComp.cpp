@@ -559,7 +559,7 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 		FeedStream(stream, 3);
 	}
 
-	const QString sdlVersion = GetTypeVerstion(sdlType);
+	const QString sdlVersion = GetSdlEntryVersion(sdlType);
 
 	// implement constructors
 	// a) default; does nothing
@@ -673,7 +673,7 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 	}
 	headerStream << 'C' << sdlType.GetName();
 	headerStream << ':' << ':';
-	headerStream << GetTypeVerstion(sdlType);
+	headerStream << GetSdlEntryVersion(sdlType);
 	headerStream << QStringLiteral(");");
 
 	FeedStream(headerStream, 3, true);
@@ -745,7 +745,7 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
 
 	// main struct begin
-	const QString sdlVersion = GetTypeVerstion(sdlType);
+	const QString sdlVersion = GetSdlEntryVersion(sdlType);
 	FeedStreamHorizontally(stream, indents);
 	stream << QStringLiteral("// ");
 	stream << sdlVersion;

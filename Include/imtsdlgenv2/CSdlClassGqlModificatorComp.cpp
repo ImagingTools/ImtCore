@@ -39,11 +39,11 @@ bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType&
 
 	// add method definitions
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool WriteToGraphQlObject(const ");
-	ofStream << GetTypeVerstion(sdlType);
+	ofStream << GetSdlEntryVersion(sdlType);
 	ofStream << ("& object, ::imtgql::CGqlObject& request);");
 	FeedStream(ofStream, 1, false);
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromGraphQlObject(");
-	ofStream << GetTypeVerstion(sdlType);
+	ofStream << GetSdlEntryVersion(sdlType);
 	ofStream << QStringLiteral("& object, const ::imtgql::CGqlObject& request);");
 	FeedStream(ofStream, 2);
 
@@ -66,7 +66,7 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("::WriteToGraphQlObject(const ");
-	ofStream << GetTypeVerstion(sdlType);
+	ofStream << GetSdlEntryVersion(sdlType);
 	ofStream << ("& object, ::imtgql::CGqlObject& request)\n{");
 	FeedStream(ofStream, 1, false);
 
@@ -84,7 +84,7 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("::ReadFromGraphQlObject(");
-	ofStream << GetTypeVerstion(sdlType);
+	ofStream << GetSdlEntryVersion(sdlType);
 	ofStream << QStringLiteral("& object, const ::imtgql::CGqlObject& request)\n{");
 	FeedStream(ofStream, 1, false);
 

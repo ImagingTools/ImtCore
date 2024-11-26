@@ -54,11 +54,11 @@ bool CSdlClassJsonModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType
 
 	// add method definitions
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool WriteToJsonObject(const ");
-	ofStream << GetTypeVerstion(sdlType);
+	ofStream << GetSdlEntryVersion(sdlType);
 	ofStream << ("& object, QJsonObject& jsonObject);");
 	FeedStream(ofStream, 1, false);
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromJsonObject(");
-	ofStream << GetTypeVerstion(sdlType);
+	ofStream << GetSdlEntryVersion(sdlType);
 	ofStream << QStringLiteral("& object, const QJsonObject& jsonObject);");
 	FeedStream(ofStream, 2);
 
@@ -79,7 +79,7 @@ bool CSdlClassJsonModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("::WriteToJsonObject(const ");
-	ofStream << GetTypeVerstion(sdlType);
+	ofStream << GetSdlEntryVersion(sdlType);
 	ofStream << ("& object, QJsonObject& jsonObject)\n{");
 
 	// add write logic for each field
@@ -96,7 +96,7 @@ bool CSdlClassJsonModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("::ReadFromJsonObject(");
-	ofStream << GetTypeVerstion(sdlType);
+	ofStream << GetSdlEntryVersion(sdlType);
 	ofStream << QStringLiteral("& object, const QJsonObject& jsonObject)\n{");
 
 	// add write logic for each field

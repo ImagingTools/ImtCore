@@ -39,13 +39,13 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSd
 
 	// add method definitions
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool WriteToModel(const ");
-	ofStream << GetTypeVerstion(sdlType);
+	ofStream << GetSdlEntryVersion(sdlType);
 	ofStream << QStringLiteral("& object, ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex = 0);");
 	FeedStream(ofStream, 1, false);
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromModel(");
-	ofStream << GetTypeVerstion(sdlType);
+	ofStream << GetSdlEntryVersion(sdlType);
 	ofStream << QStringLiteral("& object, const ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << ("::CTreeItemModel& model, int modelIndex = 0);");
@@ -68,7 +68,7 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("::WriteToModel(const ");
-	ofStream << GetTypeVerstion(sdlType);
+	ofStream << GetSdlEntryVersion(sdlType);
 	ofStream << QStringLiteral("& object, ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex) \n{");
@@ -86,7 +86,7 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("::ReadFromModel(");
-	ofStream << GetTypeVerstion(sdlType);
+	ofStream << GetSdlEntryVersion(sdlType);
 	ofStream << QStringLiteral("& object, const ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex)\n{");

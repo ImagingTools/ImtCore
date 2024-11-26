@@ -68,7 +68,7 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 		if (typeNamespace != relatedNamespace){
 			if (addVersion){
 				typeNamespace += QStringLiteral("::");
-				typeNamespace += GetTypeVerstion(typeForField);
+				typeNamespace += GetSdlEntryVersion(typeForField);
 			}
 
 			bool namespaceCleaned = false;
@@ -179,12 +179,6 @@ QString CSdlGenTools::GetSchemaVerstionString(const iprm::IParamsSet& schemaPara
 	retVal.replace(nonWordRegexp, QStringLiteral("_"));
 
 	return retVal;
-}
-
-
-QString CSdlGenTools::GetTypeVerstion(const imtsdl::CSdlType& type)
-{
-	return GetSchemaVerstionString(type.GetSchemaParams());
 }
 
 

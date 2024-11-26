@@ -547,10 +547,10 @@ bool CGqlSchemaParserComp::ValidateSchema()
 			}
 
 			if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_ONLY_FILE){
-				if (sdlType.GetTargetHeaderFile().isEmpty()){
+				if (sdlType.GetTargetHeaderFilePath().isEmpty()){
 					const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), QFileInfo(m_currentSchemaFilePath).fileName());
 					const QString headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
-					sdlType.SetTargetHeaderFile(headerFilePath);
+					sdlType.SetTargetHeaderFilePath(headerFilePath);
 				}
 
 				isExternal =  bool(QDir::cleanPath(m_currentSchemaFilePath) != QDir::cleanPath(m_argumentParserCompPtr->GetSchemaFilePath()));

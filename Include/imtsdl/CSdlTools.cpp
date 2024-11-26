@@ -819,10 +819,10 @@ bool CSdlTools::UpdateTypeInfo(CSdlType& sdlType, const iprm::IParamsSet* schema
 	}
 	else {
 		if(joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType)){
-			sdlType.SetTargetHeaderFile(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_headerFileType]));
+			sdlType.SetTargetHeaderFilePath(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_headerFileType]));
 		}
 		else {
-			sdlType.SetTargetHeaderFile(QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
+			sdlType.SetTargetHeaderFilePath(QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
 		}
 	}
 
@@ -1056,7 +1056,7 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, con
 		}
 	}
 
-	const QString targetPath = sdlType.GetTargetHeaderFile();
+	const QString targetPath = sdlType.GetTargetHeaderFilePath();
 	if (!targetPath.isEmpty()){
 		for (const QString& path: lookupPaths){
 			const QString cleanPath = QDir::cleanPath(path);

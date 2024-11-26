@@ -113,48 +113,6 @@ void CSdlDocumentType::AddSubtype(const CSdlDocumentType& subtype)
 }
 
 
-QString CSdlDocumentType::GetSchemaFile() const
-{
-	return m_schemaFile;
-}
-
-
-void CSdlDocumentType::SetSchemaFile(const QString& schemaFile)
-{
-	if (m_schemaFile != schemaFile){
-		istd::CChangeNotifier notifier(this);
-		m_schemaFile = schemaFile;
-	}
-}
-
-
-const iprm::IParamsSet& CSdlDocumentType::GetSchemaParams() const
-{
-	if (m_schemaParamsPtr == nullptr){
-		static const iprm::CParamsSet dummyParams;
-
-		return dummyParams;
-	}
-
-	return *m_schemaParamsPtr;
-}
-
-
-void CSdlDocumentType::SetSchemaParamsPtr(const std::shared_ptr<iprm::IParamsSet>& schemaParamsPtr)
-{
-	m_schemaParamsPtr = schemaParamsPtr;
-
-	// ensure, params is comparable
-	if (schemaParamsPtr != nullptr){
-		const bool isEqual = schemaParamsPtr->IsEqual(*schemaParamsPtr);
-		if (!isEqual){
-			Q_ASSERT_X(false, "Initializing incomparable paras!", __func__);
-			qFatal("Initializing incomparable paras!");
-		}
-	}
-}
-
-
 bool CSdlDocumentType::operator==(const CSdlDocumentType& other) const
 {
 	return

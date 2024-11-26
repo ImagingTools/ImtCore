@@ -13,16 +13,19 @@
 
 // ImtCore includes
 #include <imtsdl/imtsdl.h>
+#include <imtsdl/CSdlEntryBase.h>
 
 
 namespace imtsdl
 {
 
 
-class CSdlType: virtual public iser::ISerializable
+class CSdlType: virtual public CSdlEntryBase
 {
 
 public:
+	typedef CSdlEntryBase BaseClass;
+
 	CSdlType();
 
 	[[nodiscard]] QString GetName() const;
@@ -35,21 +38,6 @@ public:
 	[[nodiscard]] QString GetNamespace() const;
 	void SetNamespace(const QString& aNamespace);
 
-	[[nodiscard]] QString GetTargetHeaderFile() const;
-	void SetTargetHeaderFile(const QString& headerFile);
-
-	[[nodiscard]] QString GetSchemaFile() const;
-	void SetSchemaFile(const QString& schemaFile);
-
-	[[nodiscard]] bool IsExternal() const;
-	void SetExternal(bool isExternal);
-
-	[[nodiscard]] QString GetQmlImportDeclaration() const;
-	void SetQmlImportDeclaration(const QString& qmlImportDeclaration);
-
-	[[nodiscard]] const iprm::IParamsSet& GetSchemaParams() const;
-	void SetSchemaParamsPtr(const std::shared_ptr<iprm::IParamsSet>& schemaParamsPtr);
-
 	// reimplemented(iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
@@ -61,11 +49,6 @@ private:
 	QString m_name;
 	SdlFieldList m_fields;
 	QString m_namespace;
-	QString m_targetHeaderFile;
-	QString m_schemaFile;
-	bool m_isExternal;
-	QString m_qmlImportDeclaration;
-	std::shared_ptr<iprm::IParamsSet> m_schemaParamsPtr;
 };
 
 

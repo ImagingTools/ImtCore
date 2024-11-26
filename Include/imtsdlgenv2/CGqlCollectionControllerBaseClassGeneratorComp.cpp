@@ -1272,7 +1272,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QText
 		FeedStream(stream, 2, false);
 
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("return CreateObjectFromRepresentation(");
+		stream << QStringLiteral("return CreateObjectFromRepresentation(*");
 		stream << GetDecapitalizedValue(requestClassName);
 		stream << GetInputExtractionStringForTypeName(sdlRequestInfo.request, sdlRequestInfo.containerClassName);
 		stream << QStringLiteral(", newObjectId, name, description, errorMessage);");
@@ -1325,9 +1325,8 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 
 	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
 		if (sdlField.GetType() == typeName || FindCallChainForField(sdlField, typeName, callChain)){
-			callChain.append(QStringLiteral(".Get"));
-			callChain.append(GetCapitalizedValue(sdlField.GetId()));
-			callChain.append(QStringLiteral("()"));
+			callChain.append('.');
+			callChain.append(sdlField.GetId());
 
 			return true;
 		}

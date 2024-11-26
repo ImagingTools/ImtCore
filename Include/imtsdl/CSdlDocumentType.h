@@ -17,7 +17,7 @@ namespace imtsdl
 {
 
 
-class CSdlDocumentType: public iser::ISerializable
+class CSdlDocumentType: virtual public CSdlEntryBase
 {
 public:
 	enum OperationType
@@ -76,12 +76,6 @@ public:
 	void SetSubtypes(const SdlDocumentTypeList& subtypes);
 	void AddSubtype(const CSdlDocumentType& subtype);
 
-	[[nodiscard]] QString GetSchemaFile() const;
-	void SetSchemaFile(const QString& schemaFile);
-
-	[[nodiscard]] const iprm::IParamsSet& GetSchemaParams() const;
-	void SetSchemaParamsPtr(const std::shared_ptr<iprm::IParamsSet>& schemaParamsPtr);
-
 	// operators
 	bool operator==(const CSdlDocumentType& other) const;
 	bool operator!=(const CSdlDocumentType& other) const {return !(operator==(other));}
@@ -107,10 +101,8 @@ public:
 private:
 	QString m_name;
 	CSdlType m_referenceType;
-	QString m_schemaFile;
 	QMap<OperationType, CSdlRequest> m_operationsList;
 	SdlDocumentTypeList m_subtypes;
-	std::shared_ptr<iprm::IParamsSet> m_schemaParamsPtr;
 };
 
 

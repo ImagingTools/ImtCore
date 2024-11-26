@@ -95,6 +95,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	set(SDL_CPP_OUTPUT_DIRECTORY "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP")
 
 	set(CUSTOM_MODIFICATORS)
+	# list(APPEND CUSTOM_MODIFICATORS "--GG=2") ##< Compile, using a new version of code generator.
 	list(APPEND CUSTOM_MODIFICATORS "--CPP")
 	list(APPEND CUSTOM_MODIFICATORS "--GQL")
 	list(APPEND CUSTOM_MODIFICATORS "--use-all-modificators")

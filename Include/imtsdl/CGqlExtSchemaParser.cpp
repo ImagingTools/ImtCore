@@ -84,7 +84,7 @@ bool CGqlExtSchemaParser::ProcessCollectionSchema()
 		}
 
 		retVal = retVal && ExtractDocumentTypeFromCurrentEntry(documentType);
-		documentType.SetSchemaFile(m_originalSchemaFile);
+		documentType.SetSchemaFilePath(m_originalSchemaFile);
 		documentType.SetSchemaParamsPtr(m_schemaParamsPtr);
 		m_documentTypes << documentType;
 
