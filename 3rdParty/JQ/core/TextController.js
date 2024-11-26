@@ -10,6 +10,9 @@ const StyledText = 2
 const RichText = 3
 const MarkdownText = 4
 
+const ElideNone = 0
+const ElideRight = 3
+
 module.exports = {
     tags: ['<a>','<abbr>','<address>','<area>','<article>','<aside>','<audio>','<b>','<base>','<bdi>','<bdo>','<blockquote>','<body>','<br>','<button>','<canvas>','<caption>','<cite>','<code>','<col>','<colgroup>','<data>','<datalist>','<dd>','<del>','<details>','<dfn>','<dialog>','<div>','<dl>','<dt>','<em>','<embed>','<fieldset>','<figcaption>','<figure>','<footer>','<form>','<h1>','<h2>','<h3>','<h4>','<h5>','<h6>','<head>','<header>','<hr>','<html>','<i>','<iframe>','<img>','<input>','<ins>','<kbd>','<label>','<legend>','<li>','<link>','<main>','<map>','<mark>','<meta>','<meter>','<nav>','<noscript>','<object>','<ol>','<optgroup>','<option>','<output>','<p>','<param>','<picture>','<pre>','<progress>','<q>','<ruby>','<rb>','<rt>','<rtc>','<rp>','<s>','<samp>','<script>','<section>','<select>','<small>','<source>','<span>','<strong>','<style>','<sub>','<summary>','<sup>','<table>','<tbody>','<td>','<template>','<textarea>','<tfoot>','<th>','<thead>','<time>','<title>','<tr>','<track>','<u>','<ul>','<var>','<video>','<wbr>'],
     regexp: /<[^<>]+>/g,
@@ -41,27 +44,27 @@ module.exports = {
         }
     },
 
-    measureText: function(text, font, maxWidth, wrapMode, textFormat){
-        let isHTML = false
-        if(textFormat === undefined || textFormat === PlainText){
-            isHTML = false
-        } else if(textFormat === AutoText){
-            isHTML = false
-            let result = text.match(this.regexp)
-            if(result){
-                for(let res of result){
-                    if(this.tags.indexOf(res) >= 0){
-                        isHTML = true
-                        break
-                    }
-                }
+    measureText: function(text, font, maxWidth, wrapMode, isHTML, elide){
+        // let isHTML = false
+        // if(textFormat === undefined || textFormat === PlainText){
+        //     isHTML = false
+        // } else if(textFormat === AutoText){
+        //     isHTML = false
+        //     let result = text.match(this.regexp)
+        //     if(result){
+        //         for(let res of result){
+        //             if(this.tags.indexOf(res) >= 0){
+        //                 isHTML = true
+        //                 break
+        //             }
+        //         }
                 
-            } else {
-                isHTML = false
-            }
-        } else {
-            isHTML = true
-        }
+        //     } else {
+        //         isHTML = false
+        //     }
+        // } else {
+        //     isHTML = true
+        // }
 
         this.container.style.fontFamily = font.family
         this.container.style.fontSize = font.pixelSize+'px'
@@ -81,6 +84,14 @@ module.exports = {
             this.container.style.maxWidth = 'unset'
             this.container.style.whiteSpace = 'pre'; 
             this.container.style.wordBreak = 'unset';
+        }
+
+        if(elide === Text.ElideRight){
+            this.content.style.textOverflow = 'ellipsis'
+            this.content.style.overflow = 'auto'
+        } else {
+            this.content.style.textOverflow = 'unset'
+            this.content.style.overflow = 'unset'
         }
  
         if(isHTML){

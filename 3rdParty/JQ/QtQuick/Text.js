@@ -6,6 +6,9 @@ const Real = require('../QtQml/Real')
 const Font = require('../QtQml/Font')
 const Signal = require('../QtQml/Signal')
 
+const tags = ['<a>','<abbr>','<address>','<area>','<article>','<aside>','<audio>','<b>','<base>','<bdi>','<bdo>','<blockquote>','<body>','<br>','<button>','<canvas>','<caption>','<cite>','<code>','<col>','<colgroup>','<data>','<datalist>','<dd>','<del>','<details>','<dfn>','<dialog>','<div>','<dl>','<dt>','<em>','<embed>','<fieldset>','<figcaption>','<figure>','<footer>','<form>','<h1>','<h2>','<h3>','<h4>','<h5>','<h6>','<head>','<header>','<hr>','<html>','<i>','<iframe>','<img>','<input>','<ins>','<kbd>','<label>','<legend>','<li>','<link>','<main>','<map>','<mark>','<meta>','<meter>','<nav>','<noscript>','<object>','<ol>','<optgroup>','<option>','<output>','<p>','<param>','<picture>','<pre>','<progress>','<q>','<ruby>','<rb>','<rt>','<rtc>','<rp>','<s>','<samp>','<script>','<section>','<select>','<small>','<source>','<span>','<strong>','<style>','<sub>','<summary>','<sup>','<table>','<tbody>','<td>','<template>','<textarea>','<tfoot>','<th>','<thead>','<time>','<title>','<tr>','<track>','<u>','<ul>','<var>','<video>','<wbr>']
+const regexp = /<[^<>]+>/g
+
 class Text extends Item {
     static AlignLeft = 0
     static AlignRight = 1
@@ -90,24 +93,62 @@ class Text extends Item {
     }
 
     __updateGeometry(){
-        let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.__getDataQml('width').__auto ? 0 : this.width, this.wrapMode, this.textFormat)
+        let isHTML = false
+        if(this.textFormat === undefined || this.textFormat === Text.PlainText){
+            isHTML = false
+        } else if(this.textFormat === Text.AutoText){
+            isHTML = false
+            let result = this.text.match(regexp)
+            if(result){
+                for(let res of result){
+                    if(tags.indexOf(res) >= 0){
+                        isHTML = true
+                        break
+                    }
+                }
+                
+            } else {
+                isHTML = false
+            }
+        } else {
+            isHTML = true
+        }
 
-        if(textMetrics.isHTML){
+        // let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.__getDataQml('width').__auto ? 0 : this.width, this.wrapMode, this.textFormat, this.elide)
+
+        if(isHTML){
             this.__impl.innerHTML = this.text.replaceAll('<br>', '\r')
         } else {
             this.__impl.innerText = this.text.replaceAll('<br>', '\r')
         }
 
-        this.__getDataQml('width').__setAuto(textMetrics.width)
-        this.__getDataQml('height').__setAuto(textMetrics.height)
-        
-        if(this.__getDataQml('width').__auto){
-            this.contentWidth = Math.max(textMetrics.width, this.__impl.scrollWidth)
-            this.contentHeight = Math.max(textMetrics.height, this.__impl.scrollHeight)
-        } else {
+        if(this.wrapMode === Text.NoWrap && this.elide === Text.ElideNone && !isHTML){
+            let textMetrics = JQApplication.TextController.measureTextFast(this.text, this.font)
+
             this.contentWidth = textMetrics.width
             this.contentHeight = textMetrics.height
+
+            this.__getDataQml('height').__setAuto(textMetrics.height)
+            this.__getDataQml('width').__setAuto(textMetrics.width)
+        } else {
+            let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.__getDataQml('width').__auto ? 0 : this.width, this.wrapMode, isHTML, this.elide)
+
+            this.contentWidth = textMetrics.width
+            this.contentHeight = textMetrics.height
+
+            this.__getDataQml('height').__setAuto(textMetrics.height)
+            this.__getDataQml('width').__setAuto(textMetrics.width)
         }
+
+        
+        
+        // if(this.__getDataQml('width').__auto){
+        //     this.contentWidth = Math.max(textMetrics.width, this.__impl.scrollWidth)
+        //     this.contentHeight = Math.max(textMetrics.height, this.__impl.scrollHeight)
+        // } else {
+        //     this.contentWidth = textMetrics.width
+        //     this.contentHeight = textMetrics.height
+        // }
         
     }
 
