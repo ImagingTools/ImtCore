@@ -558,7 +558,15 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 	if (	operationsList.contains(imtsdl::CSdlDocumentType::OT_UPDATE) ||
 		operationsList.contains(imtsdl::CSdlDocumentType::OT_INSERT))
 	{
-		AddMethodForDocument(stream, imtsdl::CSdlRequest(), imtsdl::CSdlDocumentType::OT_UPDATE, documentClassName, hIndents);
+		imtsdl::CSdlRequest request;
+		if (operationsList.contains(imtsdl::CSdlDocumentType::OT_UPDATE)){
+			request = operationsList[imtsdl::CSdlDocumentType::OT_UPDATE];
+		}
+		else {
+			request = operationsList[imtsdl::CSdlDocumentType::OT_INSERT];
+		}
+
+		AddMethodForDocument(stream, request, imtsdl::CSdlDocumentType::OT_UPDATE, documentClassName, sdlDocumentType, hIndents);
 	}
 	QList<imtsdl::CSdlRequest> implementedGetRequests;
 	QMapIterator operationsIter(operationsList);
@@ -568,7 +576,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 		imtsdl::CSdlDocumentType::OperationType operationType = operation.key();
 		if (operationType == imtsdl::CSdlDocumentType::OT_GET || operationType == imtsdl::CSdlDocumentType::OT_LIST){
 			if (!implementedGetRequests.contains(sdlRequest)){
-				AddMethodForDocument(stream, operation.value(), operationType, documentClassName, hIndents);
+				AddMethodForDocument(stream, operation.value(), operationType, documentClassName, sdlDocumentType, hIndents);
 				implementedGetRequests << sdlRequest;
 			}
 		}
@@ -580,14 +588,26 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 				 operationType != imtsdl::CSdlDocumentType::OT_ELEMENT_IDS &&
 				 operationType != imtsdl::CSdlDocumentType::OT_ELEMENTS_COUNT)
 		{
-			AddMethodForDocument(stream, operation.value(), operationType, documentClassName, hIndents);
+			AddMethodForDocument(stream, operation.value(), operationType, documentClassName, sdlDocumentType, hIndents);
 		}
 	}
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, const QString& itemClassName, uint hIndents)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
+			QTextStream& stream,
+			const imtsdl::CSdlRequest& sdlRequest,
+			imtsdl::CSdlDocumentType::OperationType operationType,
+			const QString& itemClassName,
+			const imtsdl::CSdlDocumentType& sdlDocumentType,
+			uint hIndents)
 {
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlRequest.GetSchemaParams());
+	CStructNamespaceConverter structNameConverter;
+	structNameConverter.relatedNamespace = sdlNamespace;
+	structNameConverter.typeListProviderPtr = &*m_sdlTypeListCompPtr;
+	structNameConverter.addVersion = true;
+
 	if (operationType == imtsdl::CSdlDocumentType::OT_GET ||
 		operationType == imtsdl::CSdlDocumentType::OT_LIST)
 	{
@@ -610,9 +630,12 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 			stream << QStringLiteral("Request,");
 			FeedStream(stream, 1, false);
 
+			imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
+			structNameConverter.sdlFieldPtr = &outputArgument;
+			structNameConverter.sdlEntryPtr = nullptr;
+
 			FeedStreamHorizontally(stream, hIndents + 3);
-			stream << 'C';
-			stream << GetCapitalizedValue(sdlRequest.GetOutputArgument().GetType());
+			stream << structNameConverter.GetString();
 			stream << QStringLiteral("& representationPayload");
 		}
 		else {
@@ -627,9 +650,12 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 			stream << QStringLiteral("Request,");
 			FeedStream(stream, 1, false);
 
+			imtsdl::CSdlType referenceType = sdlDocumentType.GetReferenceType();
+			structNameConverter.sdlEntryPtr = &referenceType;
+			structNameConverter.sdlFieldPtr = nullptr;
+
 			FeedStreamHorizontally(stream, hIndents + 3);
-			stream << 'C';
-			stream << itemClassName;
+			stream << structNameConverter.GetString();
 			stream << QStringLiteral("& representationObject");
 		}
 		stream << ',';
@@ -644,9 +670,14 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 		stream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRepresentation(");
 		FeedStream(stream, 1, false);
 
+		imtsdl::CSdlType referenceType = sdlDocumentType.GetReferenceType();
+		structNameConverter.sdlEntryPtr = &referenceType;
+		structNameConverter.sdlFieldPtr = nullptr;
+		structNameConverter.addVersion = true;
+
 		FeedStreamHorizontally(stream, hIndents + 3);
-		stream << QStringLiteral("const C");
-		stream << itemClassName;
+		stream << QStringLiteral("const ");
+		stream << structNameConverter.GetString();
 		stream << QStringLiteral("& ");
 		stream << GetDecapitalizedValue(itemClassName);
 		stream << QStringLiteral("Representation,");
@@ -669,15 +700,15 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(QTextS
 		FeedStream(stream, 1, false);
 	}
 	else if (		operationType == imtsdl::CSdlDocumentType::OT_UPDATE_COLLECTION ||
-			 operationType == imtsdl::CSdlDocumentType::OT_RENAME ||
-			 operationType == imtsdl::CSdlDocumentType::OT_SET_DESCRIPTION ||
-			 operationType == imtsdl::CSdlDocumentType::OT_HEADERS ||
-			 operationType == imtsdl::CSdlDocumentType::OT_INFO ||
-			 operationType == imtsdl::CSdlDocumentType::OT_METAINFO ||
-			 operationType == imtsdl::CSdlDocumentType::OT_DATAMETAINFO ||
-			 operationType == imtsdl::CSdlDocumentType::OT_ELEMENT_HISTORY ||
-			 operationType == imtsdl::CSdlDocumentType::OT_IMPORT ||
-			 operationType == imtsdl::CSdlDocumentType::OT_EXPORT)
+					operationType == imtsdl::CSdlDocumentType::OT_RENAME ||
+					operationType == imtsdl::CSdlDocumentType::OT_SET_DESCRIPTION ||
+					operationType == imtsdl::CSdlDocumentType::OT_HEADERS ||
+					operationType == imtsdl::CSdlDocumentType::OT_INFO ||
+					operationType == imtsdl::CSdlDocumentType::OT_METAINFO ||
+					operationType == imtsdl::CSdlDocumentType::OT_DATAMETAINFO ||
+					operationType == imtsdl::CSdlDocumentType::OT_ELEMENT_HISTORY ||
+					operationType == imtsdl::CSdlDocumentType::OT_IMPORT ||
+					operationType == imtsdl::CSdlDocumentType::OT_EXPORT)
 	{
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("virtual ");
@@ -933,7 +964,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplFor
 
 	for (imtsdl::CSdlDocumentType::OperationType operationType: requestInfoMultiMap.uniqueKeys()){
 		const QList<ImplGenerationInfo> requestList = requestInfoMultiMap.values(operationType);
-		AddImplCodeForRequests(stream, operationType, requestList, className);
+		AddImplCodeForRequests(stream, operationType, requestList, className, sdlDocumentType);
 		remainingOperations.removeAll(operationType);
 	}
 }
@@ -944,6 +975,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	imtsdl::CSdlDocumentType::OperationType operationType,
 	const QList<ImplGenerationInfo>& requestList,
 	const QString& className,
+	const imtsdl::CSdlDocumentType& sdlDocumentType,
 	uint hIndents)
 {
 	// declare method
@@ -1031,7 +1063,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 
 	// create sections for expected command IDs
 	for (const ImplGenerationInfo& sdlRequest: requestList){
-		AddImplCodeForRequest(stream, sdlRequest, operationType, hIndents + 1);
+		AddImplCodeForRequest(stream, sdlRequest, operationType, sdlDocumentType, hIndents + 1);
 	}
 
 	switch (operationType){
@@ -1148,8 +1180,21 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCode(QT
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& stream, const ImplGenerationInfo& sdlRequestInfo, imtsdl::CSdlDocumentType::OperationType operationType, uint hIndents)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
+			QTextStream& stream,
+			const ImplGenerationInfo& sdlRequestInfo,
+			imtsdl::CSdlDocumentType::OperationType operationType,
+			const imtsdl::CSdlDocumentType& sdlDocumentType,
+			uint hIndents)
 {
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlRequestInfo.request.GetSchemaParams());
+	imtsdl::CSdlType referenceType = sdlDocumentType.GetReferenceType();
+	CStructNamespaceConverter structNameConverter(referenceType, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	structNameConverter.addVersion = true;
+
+	CStructNamespaceConverter getStructNameConverter(sdlRequestInfo.request.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
+	getStructNameConverter.addVersion = true;
+
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '/' << '/' << sdlRequestInfo.request.GetName();
 	FeedStream(stream, 1, false);
@@ -1172,15 +1217,15 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QText
 
 	// GET
 	if (	operationType == imtsdl::CSdlDocumentType::OT_GET ||
-		operationType == imtsdl::CSdlDocumentType::OT_LIST)
+			operationType == imtsdl::CSdlDocumentType::OT_LIST)
 	{
 		FeedStreamHorizontally(stream, hIndents + 1);
 		if (operationType == imtsdl::CSdlDocumentType::OT_GET){
-			stream << 'C' << sdlRequestInfo.request.GetOutputArgument().GetType();
+			stream << getStructNameConverter.GetString();
 			stream << QStringLiteral(" representationObject;");
 		}
 		else {
-			stream << 'C' << sdlRequestInfo.containerClassName;
+			stream << structNameConverter.GetString();
 			stream << QStringLiteral(" representationObject;");
 		}
 
@@ -1216,7 +1261,17 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(QText
 
 		// [1] create write check variable
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("const bool isRepresentationWritted = representationObject.WriteToModel(dataModel");
+		stream << QStringLiteral("const bool isRepresentationWritted = ");
+
+		if (operationType == imtsdl::CSdlDocumentType::OT_GET){
+			getStructNameConverter.addVersion = false;
+			stream << getStructNameConverter.GetString();
+		}
+		else {
+			structNameConverter.addVersion = false;
+			stream << structNameConverter.GetString();
+		}
+		stream << ("::WriteToModel(representationObject, dataModel");
 		// [-||-] add index for list
 		if (operationType == imtsdl::CSdlDocumentType::OT_LIST){
 			stream << QStringLiteral(", itemIndex");

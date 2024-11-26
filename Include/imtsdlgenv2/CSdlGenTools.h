@@ -38,6 +38,7 @@ public:
 	{
 	public:
 		CStructNamespaceConverter();
+		CStructNamespaceConverter(const imtsdl::CSdlEntryBase& sdlEntry, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider, bool listWrap);
 		CStructNamespaceConverter(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider, bool listWrap);
 
 		const imtsdl::ISdlTypeListProvider* typeListProviderPtr = nullptr;
@@ -46,6 +47,7 @@ public:
 		bool addVersion = false;
 		bool cleanNamespace = true;
 		const imtsdl::CSdlField* sdlFieldPtr = nullptr;
+		const imtsdl::CSdlEntryBase* sdlEntryPtr = nullptr;
 		[[nodiscard]] QString GetString() const;
 	};
 

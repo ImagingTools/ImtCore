@@ -18,6 +18,7 @@
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlRequest.h>
 #include <imtsdl/CSdlTools.h>
+#include <imtsdl/CSdlDocumentType.h>
 
 
 namespace imtsdlgenv2
@@ -27,6 +28,19 @@ namespace imtsdlgenv2
 
 
 CSdlGenTools::CStructNamespaceConverter::CStructNamespaceConverter()
+{
+}
+
+
+CSdlGenTools::CStructNamespaceConverter::CStructNamespaceConverter(
+			const imtsdl::CSdlEntryBase& aSdlEntry,
+			const QString& aRelatedNamespace,
+			const imtsdl::ISdlTypeListProvider& aListProvider,
+			bool aListWrap):
+	typeListProviderPtr(&aListProvider),
+	relatedNamespace(aRelatedNamespace),
+	listWrap(aListWrap),
+	sdlEntryPtr(&aSdlEntry)
 {
 }
 
@@ -47,28 +61,62 @@ CSdlGenTools::CStructNamespaceConverter::CStructNamespaceConverter(
 QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 {
 	if (typeListProviderPtr == nullptr){
-		I_CRITICAL();
+		Q_ASSERT_X(false, "typelist is not provided", __func__);
 
 		return QString();
 	}
-	if (sdlFieldPtr == nullptr){
-		I_CRITICAL();
+
+	if (sdlEntryPtr == nullptr && sdlFieldPtr == nullptr){
+		Q_ASSERT_X(false, "sdlEntryPtr or sdlFieldPtr is not provided", __func__);
+
+		return QString();
+	}
+
+	if (!(sdlEntryPtr == nullptr ^ sdlFieldPtr == nullptr)){
+		Q_ASSERT_X(false, "sdlEntryPtr AND sdlFieldPtr are both provided. You MUST provide only ONE!", __func__);
 
 		return QString();
 	}
 
 	QString retVal;
 	if (!relatedNamespace.isEmpty()){
-		imtsdl::CSdlType typeForField;
-		const bool isFound = imtsdl::CSdlTools::GetSdlTypeForField(*sdlFieldPtr, typeListProviderPtr->GetSdlTypes(false), typeForField);
-		Q_ASSERT(isFound);
-		QString typeNamespace = GetNamespaceFromSchemaParams(typeForField.GetSchemaParams());
+
+		const imtsdl::CSdlEntryBase* namespaceEntryPtr = sdlEntryPtr;
+		std::unique_ptr<imtsdl::CSdlType> typeForFieldPtr;
+
+		QString typeNamespace;
+		if (sdlFieldPtr != nullptr){
+			typeForFieldPtr.reset(new imtsdl::CSdlType);
+			const bool isFound = imtsdl::CSdlTools::GetSdlTypeForField(*sdlFieldPtr, typeListProviderPtr->GetSdlTypes(false), *typeForFieldPtr);
+			Q_ASSERT(isFound);
+			namespaceEntryPtr = typeForFieldPtr.get();
+		}
+
+		typeNamespace = GetNamespaceFromSchemaParams(namespaceEntryPtr->GetSchemaParams());
 		typeNamespace += QStringLiteral("::");
-		typeNamespace += 'C' + imtsdl::CSdlTools::GetCapitalizedValue(typeForField.GetName());
+
+		const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<const imtsdl::CSdlType*>(namespaceEntryPtr);
+		if (sdlTypePtr != nullptr){
+			typeNamespace += 'C' + imtsdl::CSdlTools::GetCapitalizedValue(sdlTypePtr->GetName());
+		}
+
+		const imtsdl::CSdlDocumentType* sdlDocumentTypePtr = dynamic_cast<const imtsdl::CSdlDocumentType*>(namespaceEntryPtr);
+		if (sdlDocumentTypePtr != nullptr){
+			typeNamespace += 'C' + imtsdl::CSdlTools::GetCapitalizedValue(sdlDocumentTypePtr->GetName());
+		}
+
+		const imtsdl::CSdlRequest* sdlRequestPtr = dynamic_cast<const imtsdl::CSdlRequest*>(namespaceEntryPtr);
+		if (sdlRequestPtr != nullptr){
+			typeNamespace += 'C' + imtsdl::CSdlTools::GetCapitalizedValue(sdlRequestPtr->GetName());
+			typeNamespace += QStringLiteral("GqlRequest");
+		}
+
+
+
 		if (typeNamespace != relatedNamespace){
 			if (addVersion){
 				typeNamespace += QStringLiteral("::");
-				typeNamespace += GetSdlEntryVersion(typeForField);
+				typeNamespace += GetSdlEntryVersion(*namespaceEntryPtr);
 			}
 
 			bool namespaceCleaned = false;
@@ -116,7 +164,7 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 		}
 	}
 
-	if (listWrap && sdlFieldPtr->IsArray()){
+	if (sdlFieldPtr != nullptr && listWrap && sdlFieldPtr->IsArray()){
 		imtsdl::CSdlTools::WrapTypeToList(retVal);
 	}
 
