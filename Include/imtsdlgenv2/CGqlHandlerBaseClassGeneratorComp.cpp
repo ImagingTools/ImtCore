@@ -282,7 +282,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 	FeedStream(ifStream, 1, false);
 
 	ifStream <<  QStringLiteral("{");
-	FeedStream(ifStream, 2, false);
+	FeedStream(ifStream, 1, false);
 
 	// ver namespace begin
 	ifStream << QStringLiteral("namespace ");
@@ -290,7 +290,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 	FeedStream(ifStream, 1, false);
 
 	ifStream <<  QStringLiteral("{");
-	FeedStream(ifStream, 3, false);
+	FeedStream(ifStream, 2, false);
 
 	// class begin
 	ifStream << QStringLiteral("class CGraphQlHandlerCompBase");
