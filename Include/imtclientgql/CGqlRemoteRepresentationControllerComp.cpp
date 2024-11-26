@@ -58,7 +58,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 	if (!requestPtr.isNull()){
 		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
 		if (!responsePtr.isNull()){
-			return CreateTreeItemModelFromResponse(*responsePtr);
+			return CreateTreeItemModelFromResponse(gqlRequest.GetCommandId(), *responsePtr);
 		}
 	}
 

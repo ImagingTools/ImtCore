@@ -114,7 +114,7 @@ iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(cons
 	istd::TDelPtr<iprm::CParamsSet> paramsPtr = new imod::TModelWrap<iprm::CParamsSet>();
 	if (gqlRequest.GetRequestContext() != nullptr){
 		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetRequestContext()->GetUserInfo();
-		Q_ASSERT(userInfoPtr != nullptr);
+		// Q_ASSERT(userInfoPtr != nullptr);
 		if (userInfoPtr != nullptr){
 			istd::TDelPtr<imtauth::IUserInfo> userInfoParamPtr;
 

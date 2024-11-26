@@ -5,6 +5,7 @@
 #include <imtrest/ISender.h>
 #include <imtrest/CWorkerThread.h>
 #include <imtrest/CWebSocketRequest.h>
+#include <imtclientgql/CWebSocketClientComp.h>
 
 // Qt includes
 #include <QtCore/QDebug>
@@ -40,21 +41,20 @@ void CWorker::ProcessRequest(const IRequest* request, const QByteArray& subComma
 
 		ConstResponsePtr responsePtr = m_requestServletPtr->ProcessRequest(*request, subCommandId);
 		if (responsePtr.IsValid()){
-			const CWebSocketRequest* websocketRequestPrt = dynamic_cast<const CWebSocketRequest*>(request);
-			if (websocketRequestPrt != nullptr){
-				CWebSocketRequest::MethodType methodType = websocketRequestPrt->GetMethodType();
-				QByteArray data = websocketRequestPrt->GetBody();
-				QJsonDocument document = QJsonDocument::fromJson(data);
-				QJsonObject object = document.object();
-				QByteArray body = object.value("payload").toObject().value("data").toString().toUtf8();
+			// const CWebSocketRequest* websocketRequestPrt = dynamic_cast<const CWebSocketRequest*>(request);
+			// if (websocketRequestPrt != nullptr){
+			// 	CWebSocketRequest::MethodType methodType = websocketRequestPrt->GetMethodType();
+			// 	QByteArray data = websocketRequestPrt->GetBody();
+			// 	QJsonDocument document = QJsonDocument::fromJson(data);
+			// 	QJsonObject object = document.object();
+			// 	QByteArray body = object.value("payload").toObject().value("data").toString().toUtf8();
 
-				// QString responseData = responseDataModelPtr->ToJson();
-				if (!body.isEmpty() && object.value("type").toString() != "data"){
-					data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
-					.arg(object.value("id").toString()).arg(qPrintable(body)).toUtf8();
-				}
-				// responsePtr->
-			}
+			// 	// QString responseData = responseDataModelPtr->ToJson();
+			// 	if (!body.isEmpty() && object.value("type").toString() != "data"){
+			// 		data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
+			// 		.arg(object.value("id").toString()).arg(qPrintable(body)).toUtf8();
+			// 	}
+			// }
 			const ISender* sender = m_workerThread->GetSender(request->GetRequestId());
 			if (sender != nullptr){
 				sender->SendResponse(responsePtr);

@@ -29,7 +29,7 @@ protected:
 				QString& errorMessage) const override;
 
 protected:
-	imtbase::CTreeItemModel* CreateTreeItemModelFromResponse(const imtgql::IGqlResponse& response) const;
+	imtbase::CTreeItemModel* CreateTreeItemModelFromResponse(const QByteArray& commandId, const imtgql::IGqlResponse& response) const;
 
 protected:
 	I_REF(imtclientgql::IGqlClient, m_apiClientCompPtr);

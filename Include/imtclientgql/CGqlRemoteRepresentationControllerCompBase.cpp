@@ -29,7 +29,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInter
 	if (!requestPtr.isNull()){
 		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
 		if (!responsePtr.isNull()){
-			return CreateTreeItemModelFromResponse(*responsePtr);
+			return CreateTreeItemModelFromResponse(gqlRequest.GetCommandId(), *responsePtr);
 		}
 		else{
 			errorMessage = QString("Command could not be processed by the remote server: '%1'").arg(qPrintable(requestPtr->GetCommandId()));
@@ -42,7 +42,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInter
 
 // private methods
 
-imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeItemModelFromResponse(const imtgql::IGqlResponse& response) const
+imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeItemModelFromResponse(const QByteArray& commandId, const imtgql::IGqlResponse& response) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> retVal(new imtbase::CTreeItemModel());
 	QByteArray responseData = response.GetResponseData();
@@ -82,11 +82,23 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeI
 			}
 		}
 
-		dataObject = document.object().value("payload").toObject();
-		if (!dataObject.isEmpty()){
-			document.setObject(dataObject);
-			QByteArray parserData = document.toJson(QJsonDocument::Compact);
-			retVal->CreateFromJson(parserData);
+		if (document.object().value("type").toString() == "query_data"){
+			QJsonValue dataValue = document.object().value("payload").toObject().value("data").toObject().value(commandId);
+			if (!dataValue.isNull()){
+				QJsonObject newDataObject;
+				newDataObject.insert("data", dataValue);
+				document.setObject(newDataObject);
+				QByteArray parserData = document.toJson(QJsonDocument::Compact);
+				retVal->CreateFromJson(parserData);
+			}
+		}
+		else{
+			dataObject = document.object().value("payload").toObject();
+			if (!dataObject.isEmpty()){
+				document.setObject(dataObject);
+				QByteArray parserData = document.toJson(QJsonDocument::Compact);
+				retVal->CreateFromJson(parserData);
+			}
 		}
 	}
 

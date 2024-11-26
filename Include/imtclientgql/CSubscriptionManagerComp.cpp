@@ -195,9 +195,9 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		break;
 
 		case imtrest::CWebSocketRequest::MT_QUERY_DATA:{
-			QMutexLocker queryLocker(&m_queryDataMapMutex);
+			QWriteLocker queryLocker(&m_queryDataMapLock);
 
-			m_queryDataMap.insert(webSocketRequest->GetSubscriptionId(), webSocketRequest->GetBody());
+			m_queryDataMap.insert(webSocketRequest->GetQueryId(), webSocketRequest->GetBody());
 
 			queryLocker.unlock();
 			locker.unlock();
@@ -208,9 +208,9 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 		case imtrest::CWebSocketRequest::MT_ERROR:
 		{
-			QMutexLocker queryLocker(&m_queryDataMapMutex);
+			QWriteLocker queryLocker(&m_queryDataMapLock);
 
-			m_queryDataMap.insert(webSocketRequest->GetSubscriptionId(), webSocketRequest->GetBody());
+			m_queryDataMap.insert(webSocketRequest->GetQueryId(), webSocketRequest->GetBody());
 
 			queryLocker.unlock();
 			locker.unlock();
@@ -255,7 +255,7 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 	if (contextPtr != nullptr){
 		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
 		for (QByteArray headerId: headers.keys()){
-			if (headerId != "Accept-Encoding"){
+			if (headerId != "Accept-Encoding" && headerId != "X-authentication-token"){
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
 		}
@@ -281,24 +281,33 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 		networkOperation.timer.start();
 		resultCode = networkOperation.connectionLoop.exec();
 		QCoreApplication::processEvents();
-		if (resultCode == 1 && m_queryDataMap.contains(key)){
+		QReadLocker queryLocker(&m_queryDataMapLock);
+
+		if (m_queryDataMap.contains(key)){
+			resultCode = 1;
+
 			break;
+		}
+		else{
+			resultCode = 0;
 		}
 	}
 
 	if(resultCode == 1){
-		QMutexLocker queryLocker(&m_queryDataMapMutex);
+		QWriteLocker queryLocker(&m_queryDataMapLock);
 
 		if(m_queryDataMap.contains(key)){
+			QByteArray queryData = m_queryDataMap.value(key);
+			m_queryDataMap.remove(key);
+			queryLocker.unlock();
+
 			imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
-			responsePtr->SetResponseData(m_queryDataMap.value(key));
+			responsePtr->SetResponseData(queryData);
 			retVal.reset(responsePtr);
 
-			m_queryDataMap.remove(key);
 
 			return retVal;
 		}
-		queryLocker.unlock();
 	}
 
 	return retVal;
@@ -430,17 +439,17 @@ CSubscriptionManagerComp::NetworkOperation::NetworkOperation(int timeout, const 
 	timerFlag = false;
 
 	// If the network reply is finished, the internal event loop will be finished:
-	QObject::connect(parent, &CSubscriptionManagerComp::OnQueryDataReceived, &connectionLoop, &QEventLoop::exit, Qt::DirectConnection);
+	QObject::connect(parent, &CSubscriptionManagerComp::OnQueryDataReceived, &connectionLoop, &QEventLoop::exit);
 
 	// If the application will be finished, the internal event loop will be also finished:
-	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
+	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit);
 
 	// If a timeout for the request was defined, start the timer:
 	if (timeout > 0){
 		timer.setSingleShot(true);
 
 		// If the timer is running out, the internal event loop will be finished:
-		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
+		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit);
 		timer.setInterval(timeout);
 	}
 }

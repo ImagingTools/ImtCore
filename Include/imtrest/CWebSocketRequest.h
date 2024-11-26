@@ -58,7 +58,7 @@ public:
 	void SetRequestHandler(const IRequestServlet* requestHandlerPtr);
 	MethodType GetMethodType() const;
 	void SetMethodType(MethodType methodType);
-	QByteArray GetSubscriptionId() const;
+	QByteArray GetQueryId() const;
 	void RegisterRequestEventHandler(IRequestEventHandler* requestEventHandler);
 	void SetCommandId(const QByteArray& commandId);
 
@@ -82,7 +82,7 @@ private:
 	RequestState m_state;
 	QByteArray m_body;
 	QByteArray m_clientId;
-	QByteArray m_subscriptionId;
+	QByteArray m_queryId;
 	MethodType m_type;
 	QByteArray m_commandId;
 

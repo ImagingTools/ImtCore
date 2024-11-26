@@ -109,9 +109,6 @@ const ISender* CWebSocketServerComp::GetSender(const QByteArray& requestId) cons
 {
 	QReadLocker locker(&m_sendersLock);
 
-	QByteArrayList keys = m_senders.keys();
-	qDebug() << "GetSender" << keys;
-
 	CWebSocketSender* sender = m_senders.value(requestId).data();
 	if (sender != nullptr){
 		return sender;

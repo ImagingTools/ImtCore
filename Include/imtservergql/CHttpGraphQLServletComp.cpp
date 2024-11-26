@@ -9,7 +9,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
-#include <imtgql/IGqlContext.h>
+#include <imtgql/CGqlContext.h>
 #include <imtrest/IProtocolEngine.h>
 
 
@@ -64,6 +64,11 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 	}
 	else{
+		if (!headers.isEmpty()){
+			imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
+			gqlContextPtr->SetHeaders(headers);
+			m_lastRequest.SetGqlContext(gqlContextPtr);
+		}
 		QString message = QString("There is no authentication token in the HTTP headers. Info: Command: '%1'").arg(qPrintable(gqlCommand));
 	}
 

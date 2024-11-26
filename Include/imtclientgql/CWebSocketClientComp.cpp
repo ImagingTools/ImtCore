@@ -12,6 +12,7 @@
 #include <imtgql/CGqlRequest.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtrest/CHttpRequest.h>
+#include <imtrest/CHttpResponse.h>
 
 
 namespace imtclientgql
@@ -68,7 +69,8 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequ
 		networkOperation.timer.start();
 		resultCode = networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		QCoreApplication::processEvents();
-		if (resultCode == 1 && m_queryDataMap.contains(key)){
+		QWriteLocker writeLock(&m_queryDataMapLock);
+		if (m_queryDataMap.contains(key)){
 			imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
 			responsePtr->SetResponseData(m_queryDataMap.value(key));
 			retVal.reset(responsePtr);
@@ -88,17 +90,15 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequ
 bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) const
 {
 	QByteArray data = response->GetData();
-	// QJsonDocument document = QJsonDocument::fromJson(data);
-	// QJsonObject object = document.object();
-	// QByteArray body = object.value("payload").toObject().value("data").toString().toUtf8();
+	imtrest::CHttpResponse* httpResponsePtr = dynamic_cast<imtrest::CHttpResponse*>(const_cast<imtrest::IResponse*>(response.GetPtr()));
+	if (httpResponsePtr != nullptr && !data.isEmpty()){
+		QByteArray body = data;
+		imtrest::IResponse::Headers headers = response->GetHeaders();
+		data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
+				   .arg(headers.value("id")).arg(body).toUtf8();
+		qDebug() << "SendResponse" << data;
+	}
 
-	// 	// QString responseData = responseDataModelPtr->ToJson();
-	// if (!body.isEmpty() && object.value("type").toString() != "data"){
-	// 	data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
-	// 	.arg(object.value("id").toString()).arg(body).toUtf8();
-	// }
-
-	// m_webSocket.sendTextMessage(data);
 	EmitSendTextMessage(data);
 
 	return true;
@@ -107,7 +107,6 @@ bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) con
 
 bool CWebSocketClientComp::SendRequest(imtrest::ConstRequestPtr& request) const
 {
-	// m_webSocket.sendTextMessage(request->GetBody());
 	QByteArray message = request->GetBody();
 	EmitSendTextMessage(message);
 
@@ -255,7 +254,8 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError error)
 void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message)
 {
 	if (!message.contains("keep_alive")){
-		SendInfoMessage(0, message, "OnWebSocketTextMessageReceived");
+		SendVerboseMessage(message, "OnWebSocketTextMessageReceived");
+		qDebug() << "OnWebSocketTextMessageReceived" << message;
 	}
 
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
@@ -279,32 +279,20 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 			){
 	}
 	else if (methodType == imtrest::CWebSocketRequest::MT_QUERY_DATA){
+		QWriteLocker writeLock(&m_queryDataMapLock);
 		m_queryDataMap.insert(webSocketRequest->GetRequestId(), webSocketRequest->GetBody());
+		writeLock.unlock();
 
 		emit EmitQueryDataReceived(1);
 	}
 	else if (	methodType == imtrest::CWebSocketRequest::MT_ERROR ||
 				methodType == imtrest::CWebSocketRequest::MT_START_ASK ||
+				methodType == imtrest::CWebSocketRequest::MT_START ||
 				methodType == imtrest::CWebSocketRequest::MT_DATA){
 		responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
 	}
 	else{
 		if (methodType == imtrest::CWebSocketRequest::MT_QUERY && m_httpProtocolEngineCompPtr.IsValid() && m_serverRequestHandlerCompPtr.IsValid()){
-			// webSocketRequest.PopPtr();
-			// QJsonDocument document = QJsonDocument::fromJson(webSocketRequest->GetBody());
-			// QJsonObject object = document.object();
-			// QByteArray body = object.value("payload").toObject().value("data").toString().toUtf8();
-			// QJsonObject headers = object.value("headers").toObject();
-			// // QString productId = headers.value("ProductId").toString();
-			// for (QString& key: headers.keys()){
-			// 	webSocketRequest->SetHeader(key.toUtf8(), headers.value(key).toString().toUtf8());
-			// }
-			// webSocketRequest->SetCommandId("Agent/graphql");
-			// webSocketRequest->SetBody(body);
-			// webSocketRequest->SetMethodType(imtrest::CWebSocketRequest::MT_QUERY);
-
-			// responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
-
 			imtrest::IRequest* requestPtr = m_httpProtocolEngineCompPtr->CreateRequest(*m_serverRequestHandlerCompPtr);
 			imtrest::CHttpRequest* newHttpRequestPtr = dynamic_cast<imtrest::CHttpRequest*>(requestPtr);
 			if (newHttpRequestPtr != nullptr){
@@ -317,6 +305,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 				for (QString& key: headers.keys()){
 					newHttpRequestPtr->SetHeader(key.toUtf8(), headers.value(key).toString().toUtf8());
 				}
+				newHttpRequestPtr->SetHeader("id", webSocketRequest->GetRequestId());
 				newHttpRequestPtr->SetBody(body);
 				newHttpRequestPtr->SetMethodType(imtrest::CHttpRequest::MT_POST);
 				newHttpRequestPtr->SetCommandId("/" + *m_productId + "/graphql");
@@ -411,17 +400,17 @@ CWebSocketClientComp::NetworkOperation::NetworkOperation(int timeout, const CWeb
 	timerFlag = false;
 
 	// If the network reply is finished, the internal event loop will be finished:
-	QObject::connect(parent, &CWebSocketClientComp::EmitQueryDataReceived, &connectionLoop, &QEventLoop::exit, Qt::DirectConnection);
+	QObject::connect(parent, &CWebSocketClientComp::EmitQueryDataReceived, &connectionLoop, &QEventLoop::exit);
 
 	// If the application will be finished, the internal event loop will be also finished:
-	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
+	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit);
 
 	// If a timeout for the request was defined, start the timer:
 	if (timeout > 0){
 		timer.setSingleShot(true);
 
 		// If the timer is running out, the internal event loop will be finished:
-		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
+		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit);
 
 		timer.start(timeout);
 	}

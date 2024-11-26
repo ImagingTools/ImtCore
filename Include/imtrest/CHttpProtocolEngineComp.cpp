@@ -167,12 +167,22 @@ IRequest* CHttpProtocolEngineComp::CreateRequestForSend(
 
 
 IResponse* CHttpProtocolEngineComp::CreateResponse(
-			const IRequest& /*request*/,
+			const IRequest& request,
 			int statusCode,
 			const QByteArray& data,
 			const QByteArray& dataTypeId) const
 {
-	return new CHttpResponse(statusCode, data, dataTypeId, *this);
+	CHttpResponse* httpResponsePtr = new CHttpResponse(statusCode, data, dataTypeId, *this);
+	const CHttpRequest* httpRequestPtr = dynamic_cast<const CHttpRequest*>(&request);
+	if (httpRequestPtr != nullptr){
+		QByteArrayList requestHeaders = httpRequestPtr->GetHeaders();
+		if (requestHeaders.contains("id")){
+			CHttpResponse::Headers responseHeaders;
+			responseHeaders.insert("id", httpRequestPtr->GetHeaderValue("id"));
+			httpResponsePtr->SetHeaders(responseHeaders);
+		}
+	}
+	return httpResponsePtr;
 }
 
 

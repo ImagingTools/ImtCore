@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>
+#include <QReadWriteLock>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -106,7 +107,7 @@ private:
 	mutable QMap <QByteArray, SubscriptionHelper> m_registeredClients;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
 	mutable QMutex m_registeredClientsMutex;
-	mutable QMutex m_queryDataMapMutex;
+	mutable QReadWriteLock m_queryDataMapLock;
 };
 
 

@@ -96,7 +96,7 @@ void CGqlSubscriberControllerCompBase::OnRequestDestroyed(imtrest::IRequest* req
 {
 	imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<imtrest::CWebSocketRequest*>(request);
 	if (webSocketRequestPtr != nullptr){
-		UnRegisterSubscription(webSocketRequestPtr->GetSubscriptionId());
+		UnRegisterSubscription(webSocketRequestPtr->GetQueryId());
 	}
 }
 
@@ -194,7 +194,7 @@ bool CGqlSubscriberControllerCompBase::SetData(
 
 bool CGqlSubscriberControllerCompBase::SetAllSubscriptions(const QByteArray& subscriptionId, const QByteArray& data)
 {
-	qDebug() << "SetAllSubscriptions" << subscriptionId << data;
+	qDebug() << "SetAllSubscriptions" << m_registeredSubscribers.count() << subscriptionId << data;
 
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){

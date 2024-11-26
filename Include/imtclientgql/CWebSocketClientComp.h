@@ -1,10 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtWebSockets/QWebSocket>
-#include <QtCore/QTimer>
-
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <istd/TPointerVector.h>
@@ -20,6 +16,11 @@
 #include <imtrest/ISender.h>
 #include <imtrest/IRequestManager.h>
 #include <imtclientgql/IGqlClient.h>
+
+// Qt includes
+#include <QtWebSockets/QWebSocket>
+#include <QtCore/QTimer>
+#include <QtCore/QReadWriteLock>
 
 
 namespace imtclientgql
@@ -156,6 +157,7 @@ private:
 	istd::TPointerVector<imtrest::IRequest> m_startQueries;
 	istd::TPointerVector<imtrest::IRequest> m_cacheQueries;
 	QAbstractSocket::SocketError m_lastSocketError;
+	mutable QReadWriteLock m_queryDataMapLock;
 
 	imod::TModelWrap<ConnectionStatusProvider> m_connectionStatusProvider;
 };

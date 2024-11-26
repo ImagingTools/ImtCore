@@ -135,7 +135,7 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 		m_type = MT_KEEP_ALIVE;
 	}
 
-	m_subscriptionId = object.value("id").toString().toUtf8();
+	m_queryId = m_requestId = object.value("id").toString().toUtf8();
 	m_clientId = object.value("clientId").toString().toUtf8();
 }
 
@@ -159,9 +159,10 @@ void CWebSocketRequest::SetMethodType(MethodType methodType)
 }
 
 
-QByteArray CWebSocketRequest::GetSubscriptionId() const
+QByteArray CWebSocketRequest::GetQueryId() const
 {
-	return m_subscriptionId;
+	// return m_queryId;
+	return m_requestId;
 }
 
 

@@ -125,7 +125,7 @@ void CWebSocketThread::run()
 
 void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 {
-	if (m_requestServerHandlerPtr == nullptr || m_server == nullptr){
+	if (m_requestServerHandlerPtr == nullptr || m_server == nullptr || textMessage.isEmpty()){
 		return;
 	}
 
@@ -174,6 +174,9 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		}
 		else {
 			if (methodType == CWebSocketRequest::MT_CONNECTION_INIT){
+				if (!clientId.isEmpty()){
+					m_server->RegisterSender(clientId, webSocketPtr);
+				}
 				m_server->SetConnectionStatus(clientId);
 			}
 
