@@ -382,7 +382,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRe
 	ifStream << GetCapitalizedValue(sdlRequest.GetName());
 	ifStream << QStringLiteral("RequestArguments& requestArguments, const ");
 	ifStream << GetCapitalizedValue(sdlRequest.GetName());
-	ifStream << QStringLiteral("RequestInfo& requestInfo)");
+	ifStream << QStringLiteral("RequestInfo& /*requestInfo*/)");
 	FeedStream(ifStream, 1, false);
 
 	ifStream << '{';
