@@ -126,7 +126,7 @@ QtObject {
         let registeredViewList = internal.m_registeredView[documentTypeId];
         for (let i = 0; i < registeredViewList.length; i++){
             let registeredViewObj = registeredViewList[i];
-            if (registeredViewObj["ViewTypeId"] == viewTypeId){
+            if (registeredViewObj["ViewTypeId"] === viewTypeId){
                 registeredViewList.splice(i,1)
 
                 return true;
@@ -147,7 +147,7 @@ QtObject {
         let registeredViewList = internal.m_registeredView[documentTypeId];
         for (let i = 0; i < registeredViewList.length; i++){
             let registeredViewObj = registeredViewList[i];
-            if (registeredViewObj["ViewTypeId"] == viewTypeId){
+            if (registeredViewObj["ViewTypeId"] === viewTypeId){
                 return registeredViewObj["ViewComp"];
             }
         }
@@ -179,7 +179,7 @@ QtObject {
             let registeredViewList = internal.m_registeredView[documentTypeId];
             for (let i = 0; i < registeredViewList.length; i++){
                 let registeredViewObj = registeredViewList[i];
-                if (registeredViewObj["ViewTypeId"] == viewTypeId){
+                if (registeredViewObj["ViewTypeId"] === viewTypeId){
                     return true;
                 }
             }
@@ -355,20 +355,13 @@ QtObject {
                     }
                 }
 
-                if (document.documentValidator){
-                    let data = {}
+                let data = {}
+                let documentIsValid = documentManager.documentIsValid(document, data);
+                if (!documentIsValid){
+                    openErrorDialog(data.message);
+                    Events.sendEvent("StopLoading");
 
-                    if (document.views.length > 0){
-                        data["editor"] = document.views[0];
-                    }
-
-                    let documentIsValid = document.documentValidator.isValid(data);
-                    if (!documentIsValid){
-                        openErrorDialog(data.message);
-                        Events.sendEvent("StopLoading");
-
-                        return;
-                    }
+                    return;
                 }
 
                 if (document.documentDataController){
@@ -511,11 +504,11 @@ QtObject {
 
         if (documentData.isDirty && !force){
             let callback = function(result){
-                if (result == Enums.yes){
+                if (result === Enums.yes){
                     internal.m_closingDocuments.push(documentData.documentId);
                     documentManager.saveDocument(documentData.documentId);
                 }
-                else if (result == Enums.no){
+                else if (result === Enums.no){
                     documentData.isDirty = false;
 
                     documentManager.closeDocumentByIndex(documentIndex);
@@ -559,6 +552,23 @@ QtObject {
         }
 
         return viewComp;
+    }
+
+
+    function documentIsValid(documentData, data){
+        if (!documentData){
+            return false;
+        }
+
+        if (!data){
+            data = {}
+        }
+
+        if (documentData.views.length > 0){
+            data["editor"] = documentData.views[0];
+        }
+
+        return documentData.documentValidator.isValid(data);
     }
 
 
@@ -676,7 +686,7 @@ QtObject {
                         return;
                     }
 
-                    singleDocumentData.isDirty = true;
+                    singleDocumentData.isDirty = documentManager.documentIsValid(singleDocumentData);
                 }
             }
 
@@ -754,7 +764,8 @@ QtObject {
                 if (currentStateModel){
                     let documentModel = singleDocumentData.documentDataController.documentModel
                     let isEqual = currentStateModel.isEqualWithModel(documentModel);
-                    isDirty = !isEqual;
+
+                    isDirty = !isEqual && documentManager.documentIsValid(singleDocumentData);
                 }
             }
 
@@ -814,7 +825,6 @@ QtObject {
     property Component saveDialog: Component {
         MessageDialog {
             title: qsTr("Save document");
-
             message: qsTr("Save all changes ?")
 
             Component.onCompleted: {

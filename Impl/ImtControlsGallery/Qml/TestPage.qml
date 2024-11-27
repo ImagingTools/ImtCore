@@ -2,7 +2,6 @@ import QtQuick 2.12
 
 import Acf 1.0
 import imtcontrols 1.0
-import QtQuick.Window 2.2
 import imtgui 1.0
 import imtdocgui 1.0
 
@@ -12,76 +11,63 @@ Rectangle {
     anchors.fill: parent;
     clip: true;
 
-    Button {
-        id: button;
+    property int columnCount: 20
+    property int rowCount: 100
 
-        width: 70;
-        height: 30;
+    Table {
+        id: table;
+        width: parent.width;
+        height: contentHeight;
+        hasFilter: true;
+        hasSort: true;
+        canMoveColumns: true;
 
-        text: "Open";
+        TreeItemModel {
+            id: elementsModel;
 
-        onClicked: {
-            ModalDialogManager.openDialog(dialogComp);
-        }
-    }
+            Component.onCompleted: {
 
-    Component {
-        id: dialogComp;
-        Dialog {
-            id: dialog;
-            width: 300;
+                for (let i = 0; i < testPage.rowCount; i++){
+                    elementsModel.insertNewItem();
 
-            function fillButtons(){
-               buttonsModel.clear();
-               buttonsModel.append({"Id": Enums.ok, "Name": qsTr("Apply"), "Enabled": false});
-               buttonsModel.append({"Id": Enums.cancel, "Name": qsTr("Close"), "Enabled": true});
+                    for (let j = 1; j <= testPage.columnCount; j++){
+                        elementsModel.setData("Test" + j, "Test Data" + j, i);
+                    }
+                }
+
+                table.headers = headersModel;
+                table.elements = elementsModel;
             }
+        }
 
-            contentComp: Component {
-                id: productPairEditor;
+        onHeaderRightMouseClicked: {
+            ModalDialogManager.openDialog(tableHeaderParamComp, {});
+        }
 
-                Table {
-                    id: table;
-                    width: dialog.width;
-                    height: contentHeight;
+        onHeadersChanged: {
+            resetViewParams()
+        }
 
-                    TreeItemModel {
-                        id: headers;
+        Component {
+            id: tableHeaderParamComp;
 
-                        Component.onCompleted: {
-                            let index = headers.insertNewItem();
-                            headers.setData("Id", "Id", index);
-                            headers.setData("Name", "Name", index);
-                        }
-                    }
+            TableHeaderParamComp{
+                tableItem: table;
+                onFinished: {
+                }
+            }
+        }
 
-                    TreeItemModel {
-                        id: elements;
+        TreeItemModel {
+            id: headersModel;
 
-                        Component.onCompleted: {
-                            let index = elements.insertNewItem();
-                            elements.setData("Id", "Test1", index);
-                            elements.setData("Name", "Test1", index);
-
-                            index = elements.insertNewItem();
-                            elements.setData("Id", "Test2", index);
-                            elements.setData("Name", "Test2", index);
-
-                            table.headers = headers;
-                            table.elements = elements;
-                        }
-                    }
-
-                    onDoubleClicked: {
-                        console.log("Table onDoubleClicked");
-                    }
+            Component.onCompleted: {
+                for (let i = 1; i <= testPage.columnCount; i++){
+                    let index = headersModel.insertNewItem();
+                    headersModel.setData("Id", "Test" + i, index);
+                    headersModel.setData("Name", "Test" + i, index);
                 }
             }
         }
     }
-
-    TreeItemModel {
-        id: rootModel;
-    }
-
 }

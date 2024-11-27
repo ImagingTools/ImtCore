@@ -5,8 +5,6 @@ import imtcontrols 1.0
 Dialog {
     id: documentHistoryDialog;
 
-//    width: 500;
-
     property string documentTypeId: "";
     property string documentId: "";
 
