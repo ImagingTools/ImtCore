@@ -90,4 +90,56 @@ QtObject {
 
 		return format.replace('yyyy',fullYear).replace('yy',year).replace('MM',month).replace('dd',day).replace('hh',hours).replace('mm',minutes).replace('ss',seconds)
 	}
+
+
+	function formatPhoneNumber(phone, separator){
+
+		let retVal = ""
+
+		let hasPlus = phone[0] == "+"
+
+		if(hasPlus){
+			phone = phone.replace("+","");
+		}
+
+		let arr = []
+
+		let numberLength = phone.length;
+
+		let count = 0
+		let iteration = 0
+		let step = 3;
+
+		while(count < numberLength){
+			if(iteration == 0){
+				arr[0] = phone[0];
+				count++
+			}
+			else {
+				if(iteration > 2){
+					step = 2;
+				}
+				let end = Math.min(count + step, numberLength)
+				arr[iteration] = phone.slice(count, end)
+				count += step;
+			}
+			iteration++;
+		}
+
+		for(let i = 0; i < arr.length; i++){
+			let str = String(arr[i])
+			if(i !== 0 && str !== ""){
+				retVal += separator;
+			}
+			if(str !== ""){
+				retVal += str
+			}
+		}
+
+		if(hasPlus){
+			retVal = "+" + retVal;
+		}
+
+		return retVal
+	}
 }
