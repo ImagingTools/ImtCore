@@ -137,7 +137,6 @@ Rectangle {
 	}
 
 	function updateGui(){
-
 		if (!model){
 			return;
 		}
@@ -168,7 +167,10 @@ Rectangle {
 		allPages.model = model;
 		topAlignmentPages.model = topPagesModel;
 		bottomAlignmentPages.model = bottomPagesModel;
-		menuPanel.activePageId = model.getData("Id",0);
+
+        if (model.getItemsCount() > 0){
+            menuPanel.activePageId = model.getData("Id",0);
+        }
 	}
 
 	function setActivePage(pageId){

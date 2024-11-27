@@ -50,7 +50,10 @@ ViewCommandsDelegateBase {
             commandsControllerConn.target = collectionView.commandsController
             collectionConnections.target = collectionView;
             elementsConnections.target = collectionView.table;
-            controllerConnections.target = collectionView.dataController;
+
+            if (collectionView.dataController){
+                controllerConnections.target = collectionView.dataController;
+            }
         }
     }
 
@@ -74,6 +77,10 @@ ViewCommandsDelegateBase {
             collectionViewCommandsDelegate.updateItemSelection(selection);
 
             collectionViewCommandsDelegate.selectionChanged(selection);
+        }
+
+        function onDataControllerChanged(){
+            controllerConnections.target = collectionViewCommandsDelegate.collectionView.dataController;
         }
     }
 

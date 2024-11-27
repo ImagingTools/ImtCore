@@ -21,7 +21,7 @@ Item {
         This signal is emitted when finished top level dialog.
         \c finished.
     */
-    signal finished(string result);
+    signal finished(int result);
 
     function openDialog(comp, parameters, mode, callback){
         let dialogMode = mode !== undefined ? mode : Style.dialogMode !== undefined ? Style.dialogMode: "Internal";

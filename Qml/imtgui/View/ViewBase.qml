@@ -87,10 +87,6 @@ Item {
         for (let i = 0; i < viewBase.children.length; i++){
             if (viewBase.children[i].objectName !== "ViewBase"){
                 let element = viewBase.children[i];
-                if (viewBase.children.splice){
-                    viewBase.children.splice(i, 1);
-                }
-                viewContent.children.push(element);
                 element.parent = viewContent;
                 i--;
             }

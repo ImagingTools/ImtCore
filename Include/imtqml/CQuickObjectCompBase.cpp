@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlComponent>
+#include <QtQml/QQmlContext>
 
 
 namespace imtqml
@@ -142,6 +143,8 @@ QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr) const
 		QQmlComponent component(enginePtr, componentUrl);
 
 		QQmlContext* contextPtr = enginePtr->rootContext();
+		contextPtr->setContextProperty("context", nullptr);
+
 		QObject* createdComponentPtr = component.create(contextPtr);
 		QQuickItem* quickItemPtr = qobject_cast<QQuickItem*>(createdComponentPtr);
 

@@ -3,7 +3,7 @@ var Field = function(){
         id: "",
         value: "",
         objectPtr: undefined
-    }  
+    }
 }
 
 var GqlObject = function(objectId){
@@ -22,9 +22,16 @@ var GqlObject = function(objectId){
             return retVal
         },
 
+        fromJson: function(json) {
+            let dataJson = JSON.parse(json)
+            for (let key in dataJson){
+                this.InsertField(key, dataJson[key])
+            }
+        },
+
         GetFieldIds: function() {
             var keys = []
-    
+
             for (var key in this.m_fieldsMap){
                 if (this.m_fieldsMap.hasOwnProperty(key)) {
                     keys.push(key)
@@ -35,13 +42,13 @@ var GqlObject = function(objectId){
 
         GetFieldArgumentObjectPtr: function(fieldId){
             var retVal = ""
-    
+
             if (this.m_fieldsMap.hasOwnProperty(fieldId)){
                 retVal = this.m_fieldsMap[fieldId].objectPtr
             }
             return retVal
         },
-    
+
         GetFieldArgumentValue: function(fieldId){
             var retVal = "";
             if (this.m_fieldsMap.hasOwnProperty(fieldId)){
@@ -49,7 +56,7 @@ var GqlObject = function(objectId){
             }
             return retVal;
         },
-    
+
         InsertField: function(fieldId, value){
             if (!this.m_fieldsMap.hasOwnProperty(fieldId)) {
                   this.m_fieldsMap[fieldId] = fieldId
@@ -65,12 +72,12 @@ var GqlObject = function(objectId){
                 var newField = {}
                 newField.id = fieldId
                 newField.objectPtr = objectPtr
-    
+
                 this.m_fieldsMap[fieldId] = newField
                 objectPtr.m_parentPtr = this
             }
         }
-    }  
+    }
 }
 
 var GqlRequest = function(requestType, commandId){
@@ -259,7 +266,7 @@ var GqlRequest = function(requestType, commandId){
 
             return queryData
         }
-    }  
+    }
 }
 
 var Gql = {

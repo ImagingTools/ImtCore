@@ -19,13 +19,13 @@ class CGqlModel: public imtbase::CTreeItemModel
 public:
 	typedef imtbase::CTreeItemModel BaseClass;
 
-	Q_INVOKABLE inline bool setGqlQuery(QString query){ return SetGqlQuery(query); }
+	Q_INVOKABLE inline bool setGqlQuery(QString query, QVariantMap headers = QVariantMap()){ return SetGqlQuery(query, headers); }
 
 	explicit CGqlModel(QObject* parent = nullptr);
 	~CGqlModel();
 
 public Q_SLOTS:
-	bool SetGqlQuery(QString query);
+	bool SetGqlQuery(QString query, QVariantMap headers = QVariantMap());
 	void replyFinished();
 	void errorOccurred(QNetworkReply::NetworkError code);
 

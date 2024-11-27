@@ -4,22 +4,19 @@ import imtgui 1.0
 
 ComboBoxElementView {
     id: root;
-    name: internal.modelData.Name;
-    model: internal.modelData.Parameters;
-    currentIndex: internal.modelData.Value;
+    name: modelData ? modelData.Name : "";
+    model: modelData ? modelData.Parameters : null;
+    currentIndex: modelData ? modelData.Value : -1;
     controlWidth: 300;
 
     onCurrentIndexChanged: {
-        let modelValue = internal.modelData.Value;
+        let modelValue = modelData.Value;
         if (modelValue !== currentIndex){
-            internal.modelData.Value = currentIndex;
+            modelData.Value = currentIndex;
         }
     }
 
-    QtObject {
-        id: internal;
-        property var modelData: model;
-    }
+    property var modelData: 0;
 }
 
 

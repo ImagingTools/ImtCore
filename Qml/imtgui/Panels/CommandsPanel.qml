@@ -43,27 +43,34 @@ Item {
         rightCommands.setCommandData(commandId, key, value);
     }
 
-    function setCommandsModel(params){
-        clearModel();
+    property TreeItemModel commandsModel;
 
+    function setCommandsModel(params){
         let commId = params["ViewId"];
         let model = params["Model"];
 
-        for (let i = 0; i < model.getItemsCount(); i++){
-            let alignment = model.getData("Alignment", i);
-            let groupModel = model.getModelFromItem(i);
-            if (alignment === 1){
-                leftCommands.addCommandGroup(groupModel);
+        if (commandsModel != model){
+            clearModel();
+
+            for (let i = 0; i < model.getItemsCount(); i++){
+                let alignment = model.getData("Alignment", i);
+                let groupModel = model.getModelFromItem(i);
+                if (alignment === 1){
+                    leftCommands.addCommandGroup(groupModel);
+                }
+                else if (alignment === 2){
+                    rightCommands.addCommandGroup(groupModel);
+                }
+                else if (alignment === 4){
+                    centerCommands.addCommandGroup(groupModel);
+                }
             }
-            else if (alignment === 2){
-                rightCommands.addCommandGroup(groupModel);
-            }
-            else if (alignment === 4){
-                centerCommands.addCommandGroup(groupModel);
-            }
+
+            timer.restart();
+
+            commandsModel = model;
         }
 
-        timer.restart();
     }
 
     function clearModel(){

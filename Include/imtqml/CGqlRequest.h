@@ -22,7 +22,7 @@ class CGqlRequest: public QObject
 public:
 	typedef QObject BaseClass;
 
-	Q_INVOKABLE inline bool setGqlQuery(QString query) { return SetGqlQuery(query); }
+	Q_INVOKABLE inline bool setGqlQuery(QString query, QVariantMap headers = QVariantMap()) { return SetGqlQuery(query, headers); }
 
 	explicit CGqlRequest(QObject* parent = nullptr);
 	~CGqlRequest();

@@ -27,6 +27,10 @@ Column {
 
             onLoaded: {
                 checkWidth();
+
+                if (item.modelData != undefined && item.modelData != null){
+                    item.modelData = model;
+                }
             }
 
             function checkWidth(){

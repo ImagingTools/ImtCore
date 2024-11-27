@@ -46,8 +46,10 @@ Item {
 
     function getCommandData(commandId, key){
         for (let j = 0; j < allElements.length; j++){
-            if (allElements[j].modelData["Id"] === commandId){
-                return allElements[j].modelData[key];
+            if (allElements[j]){
+                if (allElements[j].modelData["Id"] === commandId){
+                    return allElements[j].modelData[key];
+                }
             }
         }
 
@@ -55,9 +57,14 @@ Item {
     }
 
     function addCommandGroup(commands){
-        let index = commandsModel.insertNewItem();
-        commandsModel.copyItemDataFromModel(index, commands);
-        repeater.model = commandsItem.commandsModel;
+        if (commands.containsKey("SubElements")){
+            let subElements = commands.getData("SubElements")
+            if (subElements && subElements.getItemsCount() > 0){
+                let index = commandsModel.insertNewItem();
+                commandsModel.copyItemDataFromModel(index, commands);
+                repeater.model = commandsItem.commandsModel;
+            }
+        }
     }
 
     // Clear view
@@ -69,7 +76,9 @@ Item {
 
     function reset(){
         for (let j = 0; j < allElements.length; j++){
-            allElements[j].modelData.Visible = false;
+            if (allElements[j]){
+                allElements[j].modelData.Visible = false;
+            }
         }
     }
 
@@ -140,13 +149,13 @@ Item {
                             model: itemDelegate.dataModel.SubElements;
                             delegate: Component { Button {
                                     id: button;
-                                    enabled: model.IsEnabled;
-                                    visible: priority < 0 ? false : model.Visible;
-                                    text: model.Name;
+                                    enabled: model ? model.IsEnabled : false;
+                                    visible: priority < 0 || !model ? false : model.Visible;
+                                    text: model ? model.Name : "";
                                     widthFromDecorator: true;
                                     heightFromDecorator: true;
-                                    checkable: model.IsToggled !== undefined;
-                                    checked: model.IsToggled !== undefined ? model.IsToggled : false;
+                                    checkable: model && model.IsToggled !== undefined;
+                                    checked: model && model.IsToggled !== undefined ? model.IsToggled : false;
                                     iconSource: model.Icon === "" ? "" : model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
                                                                                            "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
                                     decorator: Component {
@@ -183,6 +192,10 @@ Item {
                             }
 
                             onItemAdded: {
+                                if (!item || !item.modelData.Id){
+                                    return;
+                                }
+
                                 if (!commandsItem.allElements.includes(item)){
                                     commandsItem.allElements.push(item);
                                 }
