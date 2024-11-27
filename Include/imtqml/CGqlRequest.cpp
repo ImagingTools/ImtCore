@@ -41,7 +41,7 @@ bool CGqlRequest::SetGqlQuery(QString query, QVariantMap headers)
 		networkRequest.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/x-www-form-urlencoded"));
 
 		if (!CGqlModel::s_accessToken.isEmpty()){
-			networkRequest.setRawHeader("X-authentication-token", CGqlModel::s_accessToken.toUtf8());
+			networkRequest.setRawHeader("x-authentication-token", CGqlModel::s_accessToken.toUtf8());
 			QStringList keys = headers.keys();
 			for (QString& key: keys){
 				networkRequest.setRawHeader(key.toLatin1(), headers.value(key).toByteArray());

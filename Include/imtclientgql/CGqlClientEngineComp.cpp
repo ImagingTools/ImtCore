@@ -59,7 +59,7 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 
 		QByteArray token = contextPtr->GetToken();
 		if (!token.isEmpty()){
-			networkRequest->setRawHeader("X-authentication-token", token);
+			networkRequest->setRawHeader("x-authentication-token", token);
 		}
 	}
 

@@ -255,7 +255,7 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 	if (contextPtr != nullptr){
 		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
 		for (QByteArray headerId: headers.keys()){
-			if (headerId != "Accept-Encoding" && headerId != "X-authentication-token"){
+			if (headerId != "accept-encoding" && headerId != "x-authentication-token"){
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
 		}
@@ -351,7 +351,7 @@ void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 	if (contextPtr != nullptr){
 		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
 		for (QByteArray headerId: headers.keys()){
-			if (headerId != "Accept-Encoding"){
+			if (headerId != "accept-encoding"){
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
 		}

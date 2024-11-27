@@ -223,7 +223,7 @@ void CWebSocketClientComp::OnWebSocketConnected()
 		body = body.arg("");
 	}
 	else{
-		body = body.arg(", \"clientId\": \"" + clientId + "\"");
+		body = body.arg(", \"clientid\": \"" + clientId + "\"");
 	}
 
 	m_webSocket.sendTextMessage(body);

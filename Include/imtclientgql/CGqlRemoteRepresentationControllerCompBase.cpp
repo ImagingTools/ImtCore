@@ -83,10 +83,20 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeI
 		}
 
 		if (document.object().value("type").toString() == "query_data"){
-			QJsonValue dataValue = document.object().value("payload").toObject().value("data").toObject().value(commandId);
+			QJsonObject payloadObject = document.object().value("payload").toObject();
+
+			QJsonValue dataValue;
+			QString type = "data";
+			if (payloadObject.contains("data")){
+				dataValue = payloadObject.value("data").toObject().value(commandId);
+			}
+			if (payloadObject.contains("errors")){
+				type = "errors";
+				dataValue = payloadObject.value("errors").toObject().value(commandId);
+			}
 			if (!dataValue.isNull()){
 				QJsonObject newDataObject;
-				newDataObject.insert("data", dataValue);
+				newDataObject.insert(type, dataValue);
 				document.setObject(newDataObject);
 				QByteArray parserData = document.toJson(QJsonDocument::Compact);
 				retVal->CreateFromJson(parserData);

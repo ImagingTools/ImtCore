@@ -40,7 +40,7 @@ bool CGqlRequestSender::SetGqlQuery(QString query)
 		networkRequest.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/x-www-form-urlencoded"));
 
 		if (!s_accessToken.isEmpty()){
-			networkRequest.setRawHeader("X-authentication-token", s_accessToken.toUtf8());
+			networkRequest.setRawHeader("x-authentication-token", s_accessToken.toUtf8());
 		}
 
 		QString message = QString("Post to url '%1' query '%2'").arg(requestUrl.toString()).arg(query);
