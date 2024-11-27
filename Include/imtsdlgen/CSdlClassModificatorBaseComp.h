@@ -74,6 +74,8 @@ protected:
 
 	istd::TDelPtr<QFile> m_originalHeaderFilePtr;
 	istd::TDelPtr<QFile> m_originalSourceFilePtr;
+
+	QString m_logTag;
 };
 
 

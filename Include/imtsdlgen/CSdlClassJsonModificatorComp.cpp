@@ -19,6 +19,8 @@ namespace imtsdlgen
 
 bool CSdlClassJsonModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType)
 {
+	m_logTag = QStringLiteral("JsonModificator");
+
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
 	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
 	bool isIncludesAdded = false;

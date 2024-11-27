@@ -59,6 +59,7 @@ int CSdlClassModificatorBaseComp::DoProcessing(
 
 	imtsdl::SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
 	for (const imtsdl::CSdlType& sdlType: sdlTypeList){
+		/// \todo optimize it. Do not create a temp file for each processor. Do it in \c CSdlClassCodeGeneratorComp instead
 		m_headerFilePtr.SetPtr(new QFile(tempPath + "/C" + sdlType.GetName() + ".h"));
 		m_sourceFilePtr.SetPtr(new QFile(tempPath + "/C" + sdlType.GetName() + ".cpp"));
 		m_originalHeaderFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
@@ -138,7 +139,26 @@ bool CSdlClassModificatorBaseComp::BeginClassFiles(const imtsdl::CSdlType& sdlTy
 
 bool CSdlClassModificatorBaseComp::EndClassFiles(const imtsdl::CSdlType& /*sdlType*/)
 {
-	return CloseFiles();
+	bool retVal = CloseFiles();
+
+	// Move modificated files to original location
+	const QString originalHeaderPath = QFileInfo(*m_originalHeaderFilePtr).absolutePath();
+	retVal = retVal && istd::CSystem::FileMove(m_headerFilePtr->fileName(), originalHeaderPath, true);
+	if (!retVal){
+		SendErrorMessage(0,
+						 QString("C: %3. Unable to move H file: '%1' to '%2'.")
+							 .arg(m_headerFilePtr->fileName(), originalHeaderPath, m_logTag));
+	}
+
+	const QString originaSourcelPath = QFileInfo(*m_originalSourceFilePtr).absolutePath();
+	retVal = retVal && istd::CSystem::FileMove(m_sourceFilePtr->fileName(), originaSourcelPath, true);
+	if (!retVal){
+		SendErrorMessage(0,
+						 QString("C: %3. Unable to move C file: '%1' to '%2'.")
+							 .arg(m_sourceFilePtr->fileName(), originaSourcelPath, m_logTag));
+	}
+
+	return retVal;
 }
 
 
@@ -147,30 +167,24 @@ bool CSdlClassModificatorBaseComp::CloseFiles()
 	bool retVal = true;
 
 	retVal = m_headerFilePtr->flush();
-	retVal = m_sourceFilePtr->flush() && retVal;
+	if (!retVal){
+		SendErrorMessage(0, QString("Unable to write file data. File: '%1'. Error: %2.").arg(m_headerFilePtr->fileName(), m_headerFilePtr->errorString()));
 
-	// Close files
+		return false;
+	}
+
+	retVal = m_sourceFilePtr->flush() && retVal;
+	if (!retVal){
+		SendErrorMessage(0, QString("Unable to write file data. File: '%1'. Error: %2.").arg(m_sourceFilePtr->fileName(), m_sourceFilePtr->errorString()));
+
+		return false;
+	}
+
 	m_headerFilePtr->close();
 	m_sourceFilePtr->close();
 
 	m_originalHeaderFilePtr->close();
 	m_originalSourceFilePtr->close();
-
-	// Then move modificated files to original location
-	const QString originalPath = QFileInfo(*m_originalHeaderFilePtr).absolutePath();
-	retVal = retVal && istd::CSystem::FileMove(m_headerFilePtr->fileName(), originalPath, true);
-	if (!retVal){
-		SendErrorMessage(0,
-						QString("Unable to move file: '%1' to '%2'.")
-						.arg(m_headerFilePtr->fileName(), originalPath));
-	}
-
-	retVal = retVal && istd::CSystem::FileMove(m_sourceFilePtr->fileName(), originalPath, true);
-	if (!retVal){
-		SendErrorMessage(0,
-						QString("Unable to move file: '%1' to '%2'.")
-						.arg(m_sourceFilePtr->fileName(), originalPath));
-	}
 
 	return retVal;
 }

@@ -19,6 +19,8 @@ namespace imtsdlgen
 
 bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType)
 {
+	m_logTag = QStringLiteral("TreeModelModificator");
+
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
 	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
 	while (!ifStream.atEnd()){

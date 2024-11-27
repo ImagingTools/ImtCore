@@ -19,6 +19,8 @@ namespace imtsdlgen
 
 bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType)
 {
+	m_logTag = QStringLiteral("GqlModificator");
+
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
 	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
 	while (!ifStream.atEnd()){
