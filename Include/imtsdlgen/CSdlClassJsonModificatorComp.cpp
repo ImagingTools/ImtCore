@@ -22,37 +22,6 @@ bool CSdlClassJsonModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType
 	m_logTag = QStringLiteral("JsonModificator");
 
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
-	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
-	bool isIncludesAdded = false;
-	while (!ifStream.atEnd()){
-		bool addLine = true;
-		const QString readLine = ifStream.readLine();
-
-		if (!isIncludesAdded){
-			// first lookup for previous include remark
-			if (readLine == QStringLiteral("// Qt includes")){
-				addLine = false;
-				FeedStream(ofStream, 1, false);
-				ofStream << readLine;
-				FeedStream(ofStream, 1, true);
-
-				AddIncludeDirective(ofStream, false);
-				isIncludesAdded = true;
-			}
-			// if we first, check if we reached end of include declaration (namespace begin)
-			static QRegularExpression namespaceRegExp(QStringLiteral("\\s*namespace"));
-			if (namespaceRegExp.match(readLine).hasMatch()){
-				AddIncludeDirective(ofStream, true);
-				isIncludesAdded = true;
-				FeedStream(ofStream, 3, false);
-			}
-		}
-
-		if (addLine){
-			ofStream << readLine;
-		}
-		FeedStream(ofStream);
-	}
 
 	// add method definitions
 	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;");
@@ -69,11 +38,6 @@ bool CSdlClassJsonModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType
 bool CSdlClassJsonModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType)
 {
 	QTextStream ofStream(m_sourceFilePtr.GetPtr());
-	QTextStream ifStream(m_originalSourceFilePtr.GetPtr());
-	while (!ifStream.atEnd()){
-		ofStream << ifStream.readLine();
-		FeedStream(ofStream);
-	}
 
 	// add method implementation
 	ofStream << QStringLiteral("bool C");
@@ -106,7 +70,6 @@ bool CSdlClassJsonModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType
 
 	// finish read implementation
 	ofStream << QStringLiteral("\treturn true;\n}");
-
 	FeedStream(ofStream, 3);
 
 	return true;
@@ -757,6 +720,17 @@ void CSdlClassJsonModificatorComp::AddJsonValueCheckAndConditionBegin(QTextStrea
 	stream << field.GetId();
 	stream << QStringLiteral("\")){");
 	FeedStream(stream, 1, false);
+}
+
+QList<imtsdl::IncludeDirective> CSdlClassJsonModificatorComp::GetIncludeDirectives() const
+{
+	static QList<imtsdl::IncludeDirective> retVal = {
+		CreateQtDirective(QStringLiteral("<QtCore/QJsonObject>")),
+		CreateQtDirective(QStringLiteral("<QtCore/QJsonArray>")),
+		CreateQtDirective(QStringLiteral("<QtCore/QJsonValue>"))
+	};
+
+	return retVal;
 }
 
 

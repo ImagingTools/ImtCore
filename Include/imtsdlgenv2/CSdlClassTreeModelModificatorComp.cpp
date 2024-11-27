@@ -20,23 +20,6 @@ namespace imtsdlgenv2
 bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType)
 {
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
-	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
-	while (!ifStream.atEnd()){
-		const QString readLine = ifStream.readLine();
-
-		// check if we reached end of include declaration (namespace begin)
-		static QRegularExpression namespaceRegExp(QStringLiteral("\\s*namespace"));
-		if (namespaceRegExp.match(readLine).hasMatch()){
-			ofStream.seek(ofStream.pos() - 1); // remove extra new line
-			ofStream << QStringLiteral("// imtbase includes");
-			FeedStream(ofStream, 1, false);
-			ofStream << QStringLiteral("#include <imtbase/CTreeItemModel.h>");
-			FeedStream(ofStream, 3, false);
-		}
-		ofStream << readLine;
-		FeedStream(ofStream);
-	}
-
 	// add method definitions
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool WriteToModel(const ");
 	ofStream << GetSdlEntryVersion(sdlType);
@@ -58,11 +41,6 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSd
 bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType)
 {
 	QTextStream ofStream(m_sourceFilePtr.GetPtr());
-	QTextStream ifStream(m_originalSourceFilePtr.GetPtr());
-	while (!ifStream.atEnd()){
-		ofStream << ifStream.readLine();
-		FeedStream(ofStream);
-	}
 
 	// add method implementation
 	ofStream << QStringLiteral("bool C");
@@ -787,6 +765,13 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 	FeedStreamHorizontally(stream, hIndents);
 	stream << GetSettingValueString(field, sdlNamespace, *m_sdlTypeListCompPtr, listVariableName);
 	FeedStream(stream, 1, false);
+}
+
+QList<imtsdl::IncludeDirective> CSdlClassTreeModelModificatorComp::GetIncludeDirectives() const
+{
+	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("wakawkkawkwaawkwakawk"))};
+
+	return retVal;
 }
 
 

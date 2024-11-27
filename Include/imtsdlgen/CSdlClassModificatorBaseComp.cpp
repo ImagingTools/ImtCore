@@ -64,6 +64,22 @@ int CSdlClassModificatorBaseComp::DoProcessing(
 		m_sourceFilePtr.SetPtr(new QFile(tempPath + "/C" + sdlType.GetName() + ".cpp"));
 		m_originalHeaderFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
 		m_originalSourceFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
+
+		if (!istd::CSystem::FileCopy(m_originalHeaderFilePtr->fileName(), m_headerFilePtr->fileName(), true)){
+			SendErrorMessage(0,
+							 QString("C: %3. Unable to copy H file: '%1' to '%2'.")
+								 .arg(m_originalHeaderFilePtr->fileName(), m_headerFilePtr->fileName(), m_logTag));
+
+			return TS_INVALID;
+		}
+		if (!istd::CSystem::FileCopy(m_originalSourceFilePtr->fileName(), m_sourceFilePtr->fileName(), true)){
+			SendErrorMessage(0,
+							 QString("C: %3. Unable to copy C file: '%1' to '%2'.")
+								 .arg(m_originalSourceFilePtr->fileName(), m_sourceFilePtr->fileName(), m_logTag));
+
+			return TS_INVALID;
+		}
+
 		bool isOk = BeginClassFiles(sdlType);
 		if (!isOk){
 			AbortCurrentProcessing();
@@ -88,7 +104,7 @@ int CSdlClassModificatorBaseComp::DoProcessing(
 bool CSdlClassModificatorBaseComp::BeginClassFiles(const imtsdl::CSdlType& sdlType)
 {
 	// Create new files in temp path
-	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
+	if (!m_headerFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
 		SendCriticalMessage(0,
 					QString("Unable to open file: '%1'. Error: %2")
 						.arg(m_headerFilePtr->fileName(), m_headerFilePtr->errorString()));
@@ -98,31 +114,10 @@ bool CSdlClassModificatorBaseComp::BeginClassFiles(const imtsdl::CSdlType& sdlTy
 		return false;
 	}
 
-	if (!m_sourceFilePtr->open(QIODevice::WriteOnly)){
+	if (!m_sourceFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
 		SendCriticalMessage(0,
 						QString("Unable to open file: '%1'. Error: %2")
 							.arg(m_sourceFilePtr->fileName(), m_sourceFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
-	}
-
-	// Open original files to read data
-	if (!m_originalHeaderFilePtr->open(QIODevice::ReadOnly)){
-		SendCriticalMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
-						 .arg(m_originalHeaderFilePtr->fileName(), m_originalHeaderFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
-	}
-
-	if (!m_originalSourceFilePtr->open(QIODevice::ReadOnly)){
-		SendCriticalMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
-						 .arg(m_originalSourceFilePtr->fileName(), m_originalSourceFilePtr->errorString()));
 
 		AbortCurrentProcessing();
 
@@ -182,9 +177,6 @@ bool CSdlClassModificatorBaseComp::CloseFiles()
 
 	m_headerFilePtr->close();
 	m_sourceFilePtr->close();
-
-	m_originalHeaderFilePtr->close();
-	m_originalSourceFilePtr->close();
 
 	return retVal;
 }

@@ -13,6 +13,7 @@
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/CSdlTools.h>
+#include <imtsdlgen/IIncludeDirectivesProvider.h>
 
 
 namespace imtsdlgen
@@ -24,6 +25,7 @@ namespace imtsdlgen
 */
 class CSdlClassModificatorBaseComp:
 			public iproc::CSyncProcessorCompBase,
+			public IIncludeDirectivesProvider,
 			protected imtsdl::CSdlTools
 {
 
@@ -40,6 +42,7 @@ public:
 	typedef iproc::CSyncProcessorCompBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CSdlClassModificatorBaseComp)
+		I_REGISTER_INTERFACE(IIncludeDirectivesProvider)
 		I_ASSIGN(m_processorModificatorNameAttrPtr, "ProcessModificatorName", "The name, allows to do processing, received from arguments in 'modificators' section", false, "<NEED_TO_SET!>")
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
@@ -72,10 +75,11 @@ protected:
 	istd::TDelPtr<QFile> m_headerFilePtr;
 	istd::TDelPtr<QFile> m_sourceFilePtr;
 
+	QString m_logTag;
+
+private:
 	istd::TDelPtr<QFile> m_originalHeaderFilePtr;
 	istd::TDelPtr<QFile> m_originalSourceFilePtr;
-
-	QString m_logTag;
 };
 
 

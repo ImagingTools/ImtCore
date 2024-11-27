@@ -1074,4 +1074,41 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, con
 }
 
 
+
+IncludeDirective CSdlTools::CreateImtDirective(const QString& path)
+{
+	IncludeDirective retVal;
+	retVal.path = path;
+	retVal.priority = P_IMT;
+	retVal.remark = QStringLiteral("ImtCore includes");
+	retVal.type = T_HEADER;
+
+	return retVal;
+}
+
+
+IncludeDirective CSdlTools::CreateQtDirective(const QString& path)
+{
+	IncludeDirective retVal;
+	retVal.path = path;
+	retVal.priority = P_QT;
+	retVal.remark = QStringLiteral("Qt includes");
+	retVal.type = T_HEADER;
+
+	return retVal;
+}
+
+
+IncludeDirective CSdlTools::CreateCustomDirective(const QString& path)
+{
+	IncludeDirective retVal;
+	retVal.path = path;
+	retVal.priority = P_CUSTOM;
+	retVal.remark = QStringLiteral("custom types includes");
+	retVal.type = T_HEADER;
+
+	return retVal;
+}
+
+
 } // namespace imtsdl

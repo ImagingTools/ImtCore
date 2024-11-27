@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5311" Description="ACF"/>
+            <Version Id="0" Number="5324" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
@@ -343,6 +343,7 @@
                     <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser" ComponentId="SdlCoreFramework"/>
                     <Interface InterfaceId="imtsdl::ISdlRequestListProvider" ComponentId="SdlCoreFramework"/>
                     <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="SdlCoreFramework"/>
+                    <Interface InterfaceId="imtsdlgenv2::ISdlProcessArgumentsParser" ComponentId="SdlCoreFramework"/>
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="SdlCoreFramework"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>

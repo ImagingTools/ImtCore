@@ -24,6 +24,9 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (IIncludeDirectivesProvider)
+	[[nodiscard]] virtual QList<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
+
 	// reimplemented (imtsdlgen::CSdlClassModificatorBaseComp)
 	virtual bool ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType) override;
 	virtual bool ProcessSourceClassFile(const imtsdl::CSdlType& sdlType) override;

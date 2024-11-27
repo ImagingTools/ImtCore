@@ -22,22 +22,6 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSd
 	m_logTag = QStringLiteral("TreeModelModificator");
 
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
-	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
-	while (!ifStream.atEnd()){
-		const QString readLine = ifStream.readLine();
-
-		// check if we reached end of include declaration (namespace begin)
-		static QRegularExpression namespaceRegExp(QStringLiteral("\\s*namespace"));
-		if (namespaceRegExp.match(readLine).hasMatch()){
-			ofStream.seek(ofStream.pos() - 1); // remove extra new line
-			ofStream << QStringLiteral("// imtbase includes");
-			FeedStream(ofStream, 1, false);
-			ofStream << QStringLiteral("#include <imtbase/CTreeItemModel.h>");
-			FeedStream(ofStream, 3, false);
-		}
-		ofStream << readLine;
-		FeedStream(ofStream);
-	}
 
 	// add method definitions
 	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToModel(");
@@ -58,11 +42,6 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSd
 bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType)
 {
 	QTextStream ofStream(m_sourceFilePtr.GetPtr());
-	QTextStream ifStream(m_originalSourceFilePtr.GetPtr());
-	while (!ifStream.atEnd()){
-		ofStream << ifStream.readLine();
-		FeedStream(ofStream);
-	}
 
 	// add method implementation
 	ofStream << QStringLiteral("bool C");
@@ -94,8 +73,8 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 		AddFieldReadFromModelCode(ofStream, field, sdlType);
 		FeedStream(ofStream, 1, false);
 	}
-	ofStream << QStringLiteral("\treturn true;\n}");
 
+	ofStream << QStringLiteral("\treturn true;\n}");
 	FeedStream(ofStream, 3);
 
 	return true;
@@ -767,6 +746,13 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 	stream << GetCapitalizedValue(field.GetId());
 	stream << '(' << listVariableName << ')' << ';';
 	FeedStream(stream, 1, false);
+}
+
+QList<imtsdl::IncludeDirective> CSdlClassTreeModelModificatorComp::GetIncludeDirectives() const
+{
+	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("<imtbase/CTreeItemModel.h>"))};
+
+	return retVal;
 }
 
 

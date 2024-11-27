@@ -13,6 +13,7 @@
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/CSdlTools.h>
+#include <imtsdlgen/IIncludeDirectivesProvider.h>
 
 
 namespace imtsdlgen
@@ -21,7 +22,7 @@ namespace imtsdlgen
 /**
 	A base C++ class generator of SDL types
 */
-class CSdlClassCodeGeneratorComp:
+class  CSdlClassCodeGeneratorComp:
 			public iproc::CSyncProcessorCompBase,
 			private imtsdl::CSdlTools
 {
@@ -37,6 +38,7 @@ public:
 		I_ASSIGN_MULTI_0(m_codeGeneratorExtenderListCompPtr, "CodeGeneratorExtenderList", "Extenders, used to generate an additional code", false)
 		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
 		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
+		I_ASSIGN_MULTI_0(m_includeDirectivesProviderListCompPtr, "IncludeDirectivesProviderList", "Providers of include directives, used to generate C(++) directives", false)
 
 	I_END_COMPONENT
 
@@ -87,6 +89,7 @@ private:
 	I_REF(iproc::IProcessor, m_baseClassExtenderCompPtr);
 	I_REF(iproc::IProcessor, m_filesJoinerCompPtr);
 	I_MULTIREF(iproc::IProcessor, m_codeGeneratorExtenderListCompPtr);
+	I_MULTIREF(IIncludeDirectivesProvider, m_includeDirectivesProviderListCompPtr);
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);
 

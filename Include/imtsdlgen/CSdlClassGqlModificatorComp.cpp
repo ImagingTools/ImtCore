@@ -22,23 +22,6 @@ bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType&
 	m_logTag = QStringLiteral("GqlModificator");
 
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
-	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
-	while (!ifStream.atEnd()){
-		const QString readLine = ifStream.readLine();
-
-		// check if we reached end of include declaration (namespace begin)
-		static QRegularExpression namespaceRegExp(QStringLiteral("\\s*namespace"));
-		if (namespaceRegExp.match(readLine).hasMatch()){
-			ofStream.seek(ofStream.pos() - 1); // remove extra new line
-			ofStream << QStringLiteral("// imtgql includes");
-			FeedStream(ofStream, 1, false);
-			ofStream << QStringLiteral("#include <imtgql/CGqlObject.h>");
-			FeedStream(ofStream, 3, false);
-		}
-		ofStream << readLine;
-		FeedStream(ofStream);
-	}
-
 	// add read method definition
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromGraphQlObject(C");
 	ofStream << sdlType.GetName();
@@ -57,11 +40,6 @@ bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType&
 bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType)
 {
 	QTextStream ofStream(m_sourceFilePtr.GetPtr());
-	QTextStream ifStream(m_originalSourceFilePtr.GetPtr());
-	while (!ifStream.atEnd()){
-		ofStream << ifStream.readLine();
-		FeedStream(ofStream);
-	}
 
 	// read method implementation
 	ofStream << QStringLiteral("bool C");
@@ -655,6 +633,13 @@ void CSdlClassGqlModificatorComp::AddSetScalarListValueToObjectCode(QTextStream&
 	stream << GetCapitalizedValue(field.GetId()) << '(';
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List");
 	stream << ')' << ';';
+}
+
+QList<imtsdl::IncludeDirective> CSdlClassGqlModificatorComp::GetIncludeDirectives() const
+{
+	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("<imtgql/CGqlObject.h>"))};
+
+	return retVal;
 }
 
 

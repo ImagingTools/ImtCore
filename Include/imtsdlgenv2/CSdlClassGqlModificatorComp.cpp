@@ -20,22 +20,6 @@ namespace imtsdlgenv2
 bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType)
 {
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
-	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
-	while (!ifStream.atEnd()){
-		const QString readLine = ifStream.readLine();
-
-		// check if we reached end of include declaration (namespace begin)
-		static QRegularExpression namespaceRegExp(QStringLiteral("\\s*namespace"));
-		if (namespaceRegExp.match(readLine).hasMatch()){
-			ofStream.seek(ofStream.pos() - 1); // remove extra new line
-			ofStream << QStringLiteral("// imtgql includes");
-			FeedStream(ofStream, 1, false);
-			ofStream << QStringLiteral("#include <imtgql/CGqlObject.h>");
-			FeedStream(ofStream, 3, false);
-		}
-		ofStream << readLine;
-		FeedStream(ofStream);
-	}
 
 	// add method definitions
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool WriteToGraphQlObject(const ");
@@ -47,7 +31,6 @@ bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType&
 	ofStream << QStringLiteral("& object, const ::imtgql::CGqlObject& request);");
 	FeedStream(ofStream, 2);
 
-
 	return true;
 }
 
@@ -55,12 +38,6 @@ bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType&
 bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType)
 {
 	QTextStream ofStream(m_sourceFilePtr.GetPtr());
-	QTextStream ifStream(m_originalSourceFilePtr.GetPtr());
-	while (!ifStream.atEnd()){
-		ofStream << ifStream.readLine();
-		FeedStream(ofStream);
-	}
-
 
 	// add method implementation
 	ofStream << QStringLiteral("bool C");
@@ -77,9 +54,6 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 	ofStream << QStringLiteral("\treturn true;\n}");
 	FeedStream(ofStream, 3);
 
-
-
-
 	// read method implementation
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
@@ -94,8 +68,6 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 	}
 	ofStream << QStringLiteral("\treturn true;\n}");
 	FeedStream(ofStream, 3);
-
-
 
 	return true;
 }
@@ -743,6 +715,13 @@ void CSdlClassGqlModificatorComp::AddSetScalarListValueToObjectCode(QTextStream&
 	FeedStreamHorizontally(stream, hIndents);
 	stream << GetSettingValueString(field, sdlNamespace, *m_sdlTypeListCompPtr, GetDecapitalizedValue(field.GetId()) + QStringLiteral("List"));
 	FeedStream(stream, 1, false);
+}
+
+QList<imtsdl::IncludeDirective> CSdlClassGqlModificatorComp::GetIncludeDirectives() const
+{
+	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("wakawkkawkwaawkwakawk"))};
+
+	return retVal;
 }
 
 
