@@ -194,7 +194,7 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 
 					QJsonObject headers = object.value("headers").toObject();
 					for (QString& key: headers.keys()){
-						newHttpRequestPtr->SetHeader(key.toUtf8(), headers.value(key).toString().toUtf8());
+						newHttpRequestPtr->SetHeader(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
 					}
 					newHttpRequestPtr->SetBody(body);
 					newHttpRequestPtr->SetMethodType(CHttpRequest::MT_POST);

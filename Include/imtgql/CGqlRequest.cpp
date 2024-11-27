@@ -78,7 +78,7 @@ QByteArray CGqlRequest::GetHeader(QByteArray headerId) const
 	const IGqlContext* gqlContext = GetRequestContext();
 	if (gqlContext != nullptr){
 		IGqlContext::Headers headers = gqlContext->GetHeaders();
-		return headers.value(headerId);
+		return headers.value(headerId.toLower());
 	}
 
 	return QByteArray();

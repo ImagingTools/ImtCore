@@ -77,7 +77,7 @@ WebSocket {
             for (let index = 0; index < subscriptionModel.length; index++){
                 if (subscriptionModel[index]["subscriptionId"] == socketModel.getData("id")){
                     let subscription = subscriptionModel[index]["subscription"]
-                    if (!subscription){
+                    if (!subscription || subscription === undefined){
                         continue;
                     }
 

@@ -136,7 +136,7 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 	}
 
 	m_queryId = m_requestId = object.value("id").toString().toUtf8();
-	m_clientId = object.value("clientId").toString().toUtf8();
+	m_clientId = object.value("clientid").toString().toUtf8();
 }
 
 

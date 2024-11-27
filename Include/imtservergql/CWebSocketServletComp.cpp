@@ -133,7 +133,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	}
 	QJsonObject headers = object.value("headers").toObject();
 	for (QString& key: headers.keys()){
-		gqlHeaders.insert(key.toUtf8(), headers.value(key).toString().toUtf8());
+		gqlHeaders.insert(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
 	}
 
 	gqlContextPtr->SetHeaders(gqlHeaders);

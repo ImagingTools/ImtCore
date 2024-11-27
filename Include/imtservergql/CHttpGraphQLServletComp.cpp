@@ -42,7 +42,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	bool isSuccessful = false;
 
 	imtgql::IGqlContext* gqlContextPtr = nullptr;
-	QByteArray accessToken = headers.value("X-authentication-token");
+	QByteArray accessToken = headers.value("x-authentication-token");
 	if (!accessToken.isEmpty() && m_gqlContextControllerCompPtr.IsValid()){
 		QString errorMessage;
 

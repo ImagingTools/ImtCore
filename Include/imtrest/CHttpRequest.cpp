@@ -103,7 +103,7 @@ QHostAddress CHttpRequest::GetRemoteAddress() const
 
 void CHttpRequest::SetHeader(const QByteArray& headerId, const QByteArray& value)
 {
-	m_headers.insert(headerId, value);
+	m_headers.insert(headerId.toLower(), value);
 }
 
 
@@ -188,7 +188,7 @@ int CHttpRequest::OnHeaderField(http_parser* httpParser, const char* at, size_t 
 	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
 	Q_ASSERT(requestPtr != nullptr);
 
-	QByteArray headerKey = QByteArray(at, int(length));
+	QByteArray headerKey = QByteArray(at, int(length)).toLower();
 	requestPtr->m_headers[headerKey] = QByteArray();
 
 	requestPtr->m_lastHeader = headerKey;

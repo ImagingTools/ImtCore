@@ -54,7 +54,7 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequ
 		clientId = m_clientIdCompPtr->GetText();
 	}
 	if (!clientId.isEmpty()){
-		dataObject["clientId"] = clientId;
+		dataObject["clientid"] = clientId;
 	}
 
 	QByteArray data = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
@@ -303,7 +303,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 				QByteArray body = object.value("payload").toObject().value("data").toString().toUtf8();
 				QJsonObject headers = object.value("headers").toObject();
 				for (QString& key: headers.keys()){
-					newHttpRequestPtr->SetHeader(key.toUtf8(), headers.value(key).toString().toUtf8());
+					newHttpRequestPtr->SetHeader(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
 				}
 				newHttpRequestPtr->SetHeader("id", webSocketRequest->GetRequestId());
 				newHttpRequestPtr->SetBody(body);

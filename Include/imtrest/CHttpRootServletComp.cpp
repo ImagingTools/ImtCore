@@ -54,7 +54,7 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 			EncodingType encodingType = ET_NONE;
 			const CHttpRequest* httprequestPtr = dynamic_cast<const CHttpRequest*>(&request);
 			if (httprequestPtr != nullptr){
-				QByteArray encodingHeader = httprequestPtr->GetHeaderValue("Accept-Encoding");
+				QByteArray encodingHeader = httprequestPtr->GetHeaderValue("accept-encoding");
 				if (encodingHeader.contains("deflate")){
 					encodingType = ET_DEFLATE;
 				}
@@ -70,7 +70,7 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 				qData.remove(0, 4);
 				httpResponsePtr->SetData(qData);
 				IResponse::Headers headers = responsePtr->GetHeaders();
-				headers.insert("Content-Encoding", "deflate");
+				headers.insert("content-encoding", "deflate");
 				httpResponsePtr->SetHeaders(headers);
 			}
 			if (encodingType == ET_GZIP){
@@ -95,7 +95,7 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 				datastream << qData.length();
 				httpResponsePtr->SetData(outData);
 				IResponse::Headers headers = responsePtr->GetHeaders();
-				headers.insert("Content-Encoding", "gzip");
+				headers.insert("content-encoding", "gzip");
 				httpResponsePtr->SetHeaders(headers);
 			}
 		}

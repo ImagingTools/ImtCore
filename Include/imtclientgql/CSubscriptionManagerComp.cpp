@@ -40,7 +40,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	QByteArray clientId;
 	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&subscriptionRequest);
 	if (requestImplPtr != nullptr) {
-		clientId = requestImplPtr->GetHeader("clientId");
+		clientId = requestImplPtr->GetHeader("clientid");
 	}
 
 	QMutexLocker locker(&m_registeredClientsMutex);
@@ -373,7 +373,7 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 
 	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&request);
 	if (requestImplPtr != nullptr){
-		clientId = requestImplPtr->GetHeader("clientId");
+		clientId = requestImplPtr->GetHeader("clientid");
 	}
 
 	if (m_subscriptionSenderCompPtr.IsValid()){
