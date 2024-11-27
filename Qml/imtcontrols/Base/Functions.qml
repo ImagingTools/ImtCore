@@ -94,6 +94,8 @@ QtObject {
 
 	function formatPhoneNumber(phone, separator){
 
+		phone = phone.replace(" ","");
+
 		let retVal = ""
 
 		let hasPlus = phone[0] == "+"
