@@ -48,6 +48,8 @@ Item {
 
 	property real parentY: 0;
 
+	property real globalX: 0;
+
 	property alias maxSizeText: sizeText.text;
 
 	property int selectedIndex: -1;
@@ -521,6 +523,7 @@ Item {
 					canChangeFilling: diagram.hasBarFillingChange;
 					isFilled: !diagram.hasBarFillingChange ? true : isSelected;
 					property real barListContentX: barsList.contentX;
+					property real diagramGlobalX: diagram.globalX;
 					property var indicatorLimits: diagram.indicatorLimits;
 					property bool compl: false
 					property bool diagramCompl: diagram.compl;
@@ -572,6 +575,15 @@ Item {
 							}
 						}
 					}
+
+					onDiagramGlobalXChanged: {
+						if(diagram.visible && diagram.hasBigIndicator && isSelected && diagram.selectedIndex >= 0 && diagram.bigIndicatorItem){
+							let point = mapToItem(null, barChart.x - barChart.width/2, 0);
+							diagram.bigIndicatorItem.barX = point.x;
+						}
+					}
+
+
 					onIndicatorLimitsChanged: {
 						if(diagram && diagram.visible && diagram.hasBigIndicator && isSelected && diagram.selectedIndex >= 0 && diagram.bigIndicatorItem){
 							let point = mapToItem(null, 0, barChart.height - barChart.positiveBarHeight);
