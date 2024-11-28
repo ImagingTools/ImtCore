@@ -398,6 +398,8 @@ StyleComponents {
                 anchors.right: cbArrowIcon.left;
                 anchors.rightMargin: Style.size_mainMargin;
 
+				horizontalAlignment: !cbMainRect.baseElement ? Text.AlignLeft : cbMainRect.baseElement.textCentered ? Text.AlignHCenter : Text.AlignLeft;
+
                 color: !cbMainRect.baseElement ? "transparent" : cbMainRect.baseElement.fontColorTitle;
                 text: !cbMainRect.baseElement ? "" : cbMainRect.baseElement.currentText !== "" ? cbMainRect.baseElement.currentText : cbMainRect.baseElement.placeHolderText;
                 font.family: Style.fontFamily;
