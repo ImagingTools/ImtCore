@@ -348,67 +348,41 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 	stream << QStringLiteral("#pragma once");
 	FeedStream(stream, 3, false);
 
+	QList<imtsdl::IncludeDirective> includeDirectivesList;
+	for (int i = 0; i < m_includeDirectivesProviderListCompPtr.GetCount(); ++i){
+		imtsdlgen::IIncludeDirectivesProvider* providerPtr = m_includeDirectivesProviderListCompPtr[i];
+		if (providerPtr != nullptr){
+			includeDirectivesList << providerPtr->GetIncludeDirectives();
+		}
+	}
+
+	// add CXX includes for unique_ptr
+	static imtsdl::IncludeDirective memoryIncludeDirective = CreateCxxDirective(QStringLiteral("<memory>"));
+	includeDirectivesList << memoryIncludeDirective;
+
 	QSet<QString> complexTypeList;
-	bool isQtCommentAdded = false;
 	bool hasComplexTypes = IsTypeHasNonFundamentalTypes(sdlType, &complexTypeList);
-
-	// add STD includes for unique_ptr
-	stream << QStringLiteral("// STD includes");
-	FeedStream(stream, 1, false);
-
-	stream << QStringLiteral("#include <memory>");
-	FeedStream(stream, 2, false);
-
 	if (hasComplexTypes){
 		// Add Qt types
 		if (complexTypeList.contains(QStringLiteral("QByteArray"))){
-			if (!isQtCommentAdded){
-				stream << QStringLiteral("// Qt includes");
-				FeedStream(stream, 1, false);
-				isQtCommentAdded = true;
-			}
-			stream << QStringLiteral("#include <QtCore/QByteArray>");
-			FeedStream(stream, 1, false);
+			static imtsdl::IncludeDirective byteArrayDirective = CreateQtDirective(QStringLiteral("<QtCore/QByteArray>"));
+			includeDirectivesList << byteArrayDirective;
 		}
 		if (complexTypeList.contains(QStringLiteral("QString"))){
-			if (!isQtCommentAdded){
-				stream << QStringLiteral("// Qt includes");
-				FeedStream(stream, 1, false);
-				isQtCommentAdded = true;
-			}
-			stream << QStringLiteral("#include <QtCore/QString>");
-			FeedStream(stream, 1, false);
+			static imtsdl::IncludeDirective stringDirective = CreateQtDirective(QStringLiteral("<QtCore/QString>"));
+			includeDirectivesList << stringDirective;
 		}
 		if (complexTypeList.contains(QStringLiteral("QList"))){
-			if (!isQtCommentAdded){
-				stream << QStringLiteral("// Qt includes");
-				FeedStream(stream, 1, false);
-				isQtCommentAdded = true;
-			}
-			stream << QStringLiteral("#include <QtCore/QList>");
-			FeedStream(stream, 1, false);
-		}
-		if (!isQtCommentAdded){
-			stream << QStringLiteral("// Qt includes");
-			FeedStream(stream, 1, false);
-			isQtCommentAdded = true;
+			static imtsdl::IncludeDirective listDirective = CreateQtDirective(QStringLiteral("<QtCore/QList>"));
+			includeDirectivesList << listDirective;
 		}
 
-		// add required types
-		stream << QStringLiteral("#include <QtCore/QVariant>");
-		FeedStream(stream, 1, false);
-		stream << QStringLiteral("#include <QtCore/QVariantMap>");
-		FeedStream(stream, 1, false);
-		stream << QStringLiteral("#include <QtCore/QSet>");
-		FeedStream(stream, 1, false);
-
-		// remove qt types from list
-		complexTypeList.remove(QStringLiteral("QByteArray"));
-		complexTypeList.remove(QStringLiteral("QString"));
-		complexTypeList.remove(QStringLiteral("QList"));
-		if (!complexTypeList.isEmpty()){
-			FeedStream(stream, 1, false);
-		}
+		static imtsdl::IncludeDirective variantDirective = CreateQtDirective(QStringLiteral("<QtCore/QVariant>"));
+		includeDirectivesList << variantDirective;
+		static imtsdl::IncludeDirective variantMapDirective = CreateQtDirective(QStringLiteral("<QtCore/QVariantMap>"));
+		includeDirectivesList << variantMapDirective;
+		static imtsdl::IncludeDirective setDirective = CreateQtDirective(QStringLiteral("<QtCore/QSet>"));
+		includeDirectivesList << setDirective;
 
 		// save already included files, to avoid duplicates
 		QSet<QString> customIncluded;
@@ -433,16 +407,55 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 				}
 
 				if (foundType.IsExternal()){
-					const QString relativeIncludePath = ResolveRelativeHeaderFileForType(foundType, m_argumentParserCompPtr->GetHeadersIncludePaths());
+					const QString relativeIncludePath = '<' + ResolveRelativeHeaderFileForType(foundType, m_argumentParserCompPtr->GetHeadersIncludePaths()) + '>';
 					if (!relativeIncludePath.isEmpty() && !customIncluded.contains(relativeIncludePath)){
-						stream << QStringLiteral("#include <");
-						stream << relativeIncludePath << '>';
-						FeedStream(stream, 1, false);
+						includeDirectivesList << CreateCustomDirective(relativeIncludePath);
 						customIncluded << relativeIncludePath;
 					}
 				}
 			}
 		}
+	}
+
+
+	// add all required includes
+	QList<imtsdl::Priority> orderList = {
+		imtsdl::P_C,
+		imtsdl::P_OS_API,
+		imtsdl::P_QT,
+		imtsdl::P_ACF,
+		imtsdl::P_IMT,
+		imtsdl::P_CUSTOM
+	};
+
+	QMutableListIterator includeIter(includeDirectivesList);
+	while(!orderList.isEmpty()){
+		imtsdl::Priority currentPriority = orderList.takeFirst();
+		bool addRemark = true;
+		bool isAdded = false;
+		while(includeIter.hasNext()){
+			imtsdl::IncludeDirective directive = includeIter.next();
+			if (directive.priority == currentPriority){
+				isAdded = true;
+				if (addRemark){
+					if (!directive.remark.startsWith(QStringLiteral("//"))){
+						stream << QStringLiteral("// ");
+					}
+					stream << directive.remark;
+					FeedStream(stream, 1, false);
+					addRemark = false;
+				}
+				stream << QStringLiteral("#include ");
+				stream << directive.path;
+				FeedStream(stream, 1, false);
+
+				includeIter.remove();
+			}
+		}
+		if (isAdded){
+			FeedStream(stream, 1, false);
+		}
+		includeIter.toFront();
 	}
 
 	FeedStream(stream, 2, false);

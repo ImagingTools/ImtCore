@@ -1073,6 +1073,18 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, con
 	return QString();
 }
 
+IncludeDirective CSdlTools::CreateCxxDirective(const QString& path)
+{
+	IncludeDirective retVal;
+	retVal.path = path;
+	retVal.priority = P_C;
+	retVal.remark = QStringLiteral("C/C++ includes");
+	retVal.type = T_HEADER;
+
+	return retVal;
+
+}
+
 
 
 IncludeDirective CSdlTools::CreateImtDirective(const QString& path)

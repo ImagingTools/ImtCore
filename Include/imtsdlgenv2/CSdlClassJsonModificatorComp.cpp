@@ -755,7 +755,11 @@ void CSdlClassJsonModificatorComp::AddJsonValueCheckAndConditionBegin(QTextStrea
 
 QList<imtsdl::IncludeDirective> CSdlClassJsonModificatorComp::GetIncludeDirectives() const
 {
-	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("wakawkkawkwaawkwakawk"))};
+	static QList<imtsdl::IncludeDirective> retVal = {
+		CreateQtDirective(QStringLiteral("<QtCore/QJsonObject>")),
+		CreateQtDirective(QStringLiteral("<QtCore/QJsonArray>")),
+		CreateQtDirective(QStringLiteral("<QtCore/QJsonValue>"))
+	};
 
 	return retVal;
 }
