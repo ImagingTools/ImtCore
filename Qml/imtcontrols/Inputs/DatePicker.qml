@@ -50,6 +50,7 @@ Item {
 	property bool hasDayCombo: true;
 	property bool hasMonthCombo: true;
 	property bool hasYearCombo: true;
+	property bool hasButtons: true;
 	property int shownItemsCountCombo: 12;
 	property alias monthCombo: monthComboObj;
 	property alias yearCombo: yearComboObj;
@@ -235,29 +236,29 @@ Item {
 			datePicker.selectedIndexMonth = month;
 			dayField.text = day;
 
-            if(datePicker.hasMonthCombo){
-                monthComboObj.currentIndex = month;
-            }
-            if(datePicker.hasYearCombo){
-                for(let i = 0; i <  yearTreeModel.getItemsCount(); i++){
-                    let id = yearTreeModel.getData("Id");
-                    let name = yearTreeModel.getData("Name");
-                    if(name == year){
-                        yearComboObj.currentIndex = id;
-                        break;
-                    }
-                }
-            }
-            if(datePicker.hasDayCombo){
-                for(let i = 0; i <  dayTreeModel.getItemsCount(); i++){
-                    let id = dayTreeModel.getData("Id");
-                    let name = dayTreeModel.getData("Name");
-                    if(name == day){
-                        dayComboObj.currentIndex = id;
-                        break;
-                    }
-                }
-            }
+			if(datePicker.hasMonthCombo){
+				monthComboObj.currentIndex = month;
+			}
+			if(datePicker.hasYearCombo){
+				for(let i = 0; i <  yearTreeModel.getItemsCount(); i++){
+					let id = yearTreeModel.getData("Id");
+					let name = yearTreeModel.getData("Name");
+					if(name == year){
+						yearComboObj.currentIndex = id;
+						break;
+					}
+				}
+			}
+			if(datePicker.hasDayCombo){
+				for(let i = 0; i <  dayTreeModel.getItemsCount(); i++){
+					let id = dayTreeModel.getData("Id");
+					let name = dayTreeModel.getData("Name");
+					if(name == day){
+						dayComboObj.currentIndex = id;
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -461,9 +462,11 @@ Item {
 
 					anchors.verticalCenter: parent.verticalCenter;
 					anchors.left: yearField.right;
-					anchors.leftMargin: datePicker.spinBoxSpacing;
+					anchors.leftMargin: visible ? datePicker.spinBoxSpacing : 0;
 
-					width: datePicker.buttonWidth;
+					width: visible ? datePicker.buttonWidth : 1;
+
+					visible: datePicker.hasButtons;
 
 					Button {
 						id: yearUpButton;
@@ -640,9 +643,11 @@ Item {
 
 					anchors.verticalCenter: parent.verticalCenter;
 					anchors.left: monthField.right;
-					anchors.leftMargin: datePicker.spinBoxSpacing;
+					anchors.leftMargin: visible ? datePicker.spinBoxSpacing : 0;
 
-					width: datePicker.buttonWidth;
+					width: visible ? datePicker.buttonWidth : 1;
+
+					visible: datePicker.hasButtons;
 
 					Button {
 						id: monthUpButton;
@@ -831,11 +836,11 @@ Item {
 
 					anchors.verticalCenter: parent.verticalCenter;
 					anchors.left: dayField.right;
-					anchors.leftMargin: datePicker.spinBoxSpacing;
+					anchors.leftMargin: visible ? datePicker.spinBoxSpacing : 0;
 
-					width: datePicker.buttonWidth;
+					width: visible ? datePicker.buttonWidth : 1;
 
-					visible: datePicker.hasDay;
+					visible: datePicker.hasDay && datePicker.hasButtons;
 
 					Button {
 						id: dayUpButton;
