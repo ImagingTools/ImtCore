@@ -15,6 +15,8 @@ module.exports = {
             QtQuick: require('../QtQuick/QtQuick'),
             Qt5Compat: require('../Qt5Compat/Qt5Compat'),
             QtWebSockets: require('../QtWebSockets/QtWebSockets'),
+            QtPositioning: require('../QtPositioning/QtPositioning'),
+            QtLocation: require('../QtLocation/QtLocation'),
             __queue: [],
         }
 

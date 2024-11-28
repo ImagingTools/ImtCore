@@ -14,6 +14,8 @@ const QtQml = require('../QtQml/QtQml')
 const QtQuick = require('../QtQuick/QtQuick')
 const Qt5Compat = require('../Qt5Compat/Qt5Compat')
 const QtWebSockets = require('../QtWebSockets/QtWebSockets')
+const QtPositioning = require('../QtPositioning/QtPositioning')
+const QtLocation = require('../QtLocation/QtLocation')
 
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\imtcore.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\lisa.json'//process.argv.slice(2)[0]
@@ -52,6 +54,8 @@ const BaseModules = {
     QtQuick,
     Qt5Compat,
     QtWebSockets,
+    QtPositioning,
+    QtLocation,
 }
 
 const JQModules = {
@@ -461,6 +465,10 @@ class Instruction {
                     } else if(tree[1] === 'Qt'){
                         stat.isCompute = true
                         stat.value += 'JQModules.Qt'
+                        return stat
+                    } else if(tree[1] === 'QtPositioning'){
+                        stat.isCompute = true
+                        stat.value += 'JQModules.QtPositioning'
                         return stat
                     }
 
