@@ -11,6 +11,8 @@ Item {
     property TreeItemModel model;
 
     property bool hiddenBackground: true;
+    property bool noMouseArea: false;
+    property bool forceFocus: true;
 
     Component.onCompleted: {
         Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);

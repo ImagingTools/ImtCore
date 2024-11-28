@@ -17,7 +17,6 @@
 	<file alias="imtguigql/RemoteCollectionView.qml">RemoteCollectionView.qml</file>
 	<file alias="imtguigql/MetaInfoProvider.qml">MetaInfoProvider.qml</file>
 	<file alias="imtguigql/WebSocketPortProvider.qml">WebSocketPortProvider.qml</file>
-	<file alias="imtguigql/SystemStatusController.qml">SystemStatusController.qml</file>
 	<file alias="imtguigql/ComboBoxGqlSimpleElementView.qml">ComboBoxGqlSimpleElementView.qml</file>
 	<file alias="imtguigql/GqlRequestDocumentDataController.qml">GqlRequestDocumentDataController.qml</file>
 	<file alias="imtguigql/CommandsPanelController.qml">CommandsPanelController.qml</file>

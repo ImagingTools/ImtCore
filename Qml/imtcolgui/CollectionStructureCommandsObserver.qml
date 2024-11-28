@@ -8,9 +8,7 @@ Item {
     property var commandsProvider: null;
 
     Component.onDestruction: {
-        if (root.orderCommandsProvider != null){
-            root.commandsProvider.modelLoaded.disconnect(root.commandsModelLoaded);
-        }
+        root.commandsProvider.modelLoaded.disconnect(root.commandsModelLoaded);
     }
 
     onCommandsProviderChanged: {

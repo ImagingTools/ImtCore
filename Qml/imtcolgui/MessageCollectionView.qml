@@ -47,7 +47,6 @@ RemoteCollectionView {
     }
 
     Component.onCompleted: {
-        console.log("DEBUG:log Component.onCompleted", collectionId, log.clientId)
         collectionFilter.setSortingOrder("DESC");
         collectionFilter.setSortingInfoId("LastModified");
         filterMenu.decorator = messageCollectionFilterComp;
@@ -69,7 +68,6 @@ RemoteCollectionView {
             additionalFieldIds: ["Id", "Name", "Category"]
 
             function getHeaders(){
-                console.log("LogCollectionView", log.clientId)
                 return log.getHeaders()
             }
 

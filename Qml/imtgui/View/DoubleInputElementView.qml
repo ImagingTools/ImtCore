@@ -8,47 +8,69 @@ TextInputElementView {
 
     property alias topValue: doubleValidator.top;
     property alias bottomValue: doubleValidator.bottom;
+    property alias decimalPlaces: doubleValidator.decimals;
+
     property double value
-    property int decimalPlaces: 1000
+    property bool popupError: false;
+
+    onVisibleChanged: {
+        if (!visible){
+            ModalDialogManager.closeByComp(errorComp1);
+        }
+    }
+
+    QtObject {
+        id: internal;
+
+        property string errorMessage1: qsTr("Please enter a value ranging from") + " " + root.bottomValue + " " + qsTr("to") + " " + root.topValue;
+        property string errorMessage2: qsTr("Please enter a value less than or equal to") + " " + root.topValue;
+        property string errorMessage3: qsTr("Please enter a value greater than or equal to") + " " + root.bottomValue;
+    }
 
     onAcceptableInputChanged: {
-        if (topValue != Number.POSITIVE_INFINITY && bottomValue != Number.NEGATIVE_INFINITY){
-            root.bottomComp = acceptableInput ? undefined : errorComp1;
+        if (popupError){
+            if (topValue != Number.POSITIVE_INFINITY && bottomValue != Number.NEGATIVE_INFINITY){
+                errorText.text = internal.errorMessage1;
+            }
+            else if (topValue == Number.POSITIVE_INFINITY && bottomValue != Number.NEGATIVE_INFINITY){
+                errorText.text = internal.errorMessage2;
+            }
+            else if (topValue != Number.POSITIVE_INFINITY && bottomValue == Number.NEGATIVE_INFINITY){
+                errorText.text = internal.errorMessage3;
+            }
         }
-        else if (topValue == Number.POSITIVE_INFINITY && bottomValue != Number.NEGATIVE_INFINITY){
-            root.bottomComp = acceptableInput ? undefined : errorComp3;
-        }
-        else if (topValue != Number.POSITIVE_INFINITY && bottomValue == Number.NEGATIVE_INFINITY){
-            root.bottomComp = acceptableInput ? undefined : errorComp2;
+        else{
+            if (topValue != Number.POSITIVE_INFINITY && bottomValue != Number.NEGATIVE_INFINITY){
+                root.bottomComp = acceptableInput ? undefined : errorComp1;
+            }
+            else if (topValue == Number.POSITIVE_INFINITY && bottomValue != Number.NEGATIVE_INFINITY){
+                root.bottomComp = acceptableInput ? undefined : errorComp3;
+            }
+            else if (topValue != Number.POSITIVE_INFINITY && bottomValue == Number.NEGATIVE_INFINITY){
+                root.bottomComp = acceptableInput ? undefined : errorComp2;
+            }
         }
     }
 
     DoubleValidator {
         id: doubleValidator;
-        decimals: root.decimalPlaces
     }
 
     onTextChanged: {
-        console.log("!@# OnTextChanged: ", text)
-
         let decimal = Qt.locale().decimalPoint
         let tempText = text.replace(".", decimal)
-        console.log("tempText", tempText)
         if (text != tempText){
             text = tempText
-
             return
         }
+
         if (acceptableInput){
             tempText = text.replace(decimal, ".")
-
             value = Number(tempText)
         }
     }
 
     onValueChanged: {
-        console.log("!@# OnValueChanged: ", value)
-
         let decimal = Qt.locale().decimalPoint
         let tempText = value.toString()
 
@@ -60,11 +82,39 @@ TextInputElementView {
         valueChanged()
     }
 
+    PopupView {
+        id: errorView;
+        x: root.controlItem ? root.width - root.controlItem.width : 0;
+        z: root.z + 1;
+        width: errorText.width + 2*Style.size_mainMargin;
+        height: 30;
+        noMouseArea: true;
+        forceFocus: false;
+        visible: !root.acceptableInput && root.popupError;
+
+        Rectangle {
+            id: background;
+            anchors.fill: parent;
+            color: Style.baseColor;
+            radius: Style.buttonRadius;
+            border.width: 1;
+            border.color: Style.borderColor;
+
+            Text {
+                id: errorText;
+                anchors.centerIn: parent;
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+            }
+        }
+    }
+
     Component {
         id: errorComp1;
 
         Text {
-            text: qsTr("Please enter a value ranging from") + " " + root.bottomValue + " " + qsTr("to") + " " + root.topValue;
+            text: internal.errorMessage1;
             color: Style.errorTextColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
@@ -75,7 +125,7 @@ TextInputElementView {
         id: errorComp2;
 
         Text {
-            text: qsTr("Please enter a value less than or equal to") + " " + root.topValue;
+            text: internal.errorMessage2;
             color: Style.errorTextColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
@@ -86,7 +136,7 @@ TextInputElementView {
         id: errorComp3;
 
         Text {
-            text: qsTr("Please enter a value greater than or equal to") + " " + root.bottomValue;
+            text: internal.errorMessage3;
             color: Style.errorTextColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;

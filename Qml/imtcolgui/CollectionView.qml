@@ -236,11 +236,9 @@ Item {
 
         Component.onCompleted: {
             Events.subscribeEvent("FilterActivated", internal.filterMenuActivate);
-            Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
         }
 
         Component.onDestruction: {
-            Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
             Events.unSubscribeEvent("FilterActivated", internal.filterMenuActivate);
         }
 
@@ -282,11 +280,6 @@ Item {
                     internal.guiUpdateRequired = false;
                     container.doUpdateGui();
                 }
-
-                Events.subscribeEvent("FilterActivated", container.filterMenuActivate);
-            }
-            else{
-                Events.unSubscribeEvent("FilterActivated", container.filterMenuActivate);
             }
         }
 

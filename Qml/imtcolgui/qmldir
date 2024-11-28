@@ -11,7 +11,6 @@ CollectionView 1.0 CollectionView.qml
 CollectionViewBase 1.0 CollectionViewBase.qml
 CollectionViewBaseGqlModels 1.0 CollectionViewBaseGqlModels.qml
 CollectionViewCommandsDelegateBase 1.0 CollectionViewCommandsDelegateBase.qml
-CollectionViewCommandsObserver 1.0 CollectionViewCommandsObserver.qml
 
 GridCollectionView 1.0 GridCollectionView.qml
 GridCollectionViewBase 1.0 GridCollectionViewBase.qml

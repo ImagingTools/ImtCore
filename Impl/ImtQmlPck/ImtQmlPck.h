@@ -14,7 +14,6 @@
 #include <imtqml/CPageGuiElementModelComp.h>
 #include <imtqml/CCommandsObserverQmlComp.h>
 #include <imtqml/CQmlObjectCollectionComp.h>
-#include <imtqml/CObjectViewDataProviderComp.h>
 
 
 /**

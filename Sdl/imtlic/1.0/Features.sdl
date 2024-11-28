@@ -35,6 +35,7 @@ type FeatureItem {
 	FeatureId: ID!
 	Description: String
 	Optional: Bool
+	IsPermission: Bool
 	Dependencies: ID
 	Added: String
 	LastModified: String
