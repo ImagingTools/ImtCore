@@ -26,6 +26,7 @@ FocusScope {
     property string focusColor: Style.textSelected;
 
     property string fontColor: Style.textColor;
+	property alias fontFamily: textField.font.family;
     property string placeHolderFontColor: "#808094";
 
     property color borderColor: containerTextField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;

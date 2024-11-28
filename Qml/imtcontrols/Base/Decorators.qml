@@ -894,10 +894,12 @@ StyleComponents {
             property real position: !baseElement ? 0.0 : baseElement.position;
             property bool indeterminate: !baseElement ? false : baseElement.indeterminate;
 
-            property int barRadius: 4;
+            property int barRadius: !baseElement ? 4 : baseElement.barRadius;
             property string barColor: "lightgreen";
-            property string borderColor: "lightgrey";
-            property string backgroundColor: "#ffffff";
+            property bool barIsGradient: !baseElement ? false : baseElement.barIsGradient;
+            property Gradient gradient: !baseElement ? null : baseElement.gradient;
+            property string borderColor: !baseElement ? "lightgrey" : baseElement.borderColor;
+            property string backgroundColor: !baseElement ? "#ffffff" : baseElement.backgroundColor;
 
             property var baseElement: null;
 
@@ -997,6 +999,7 @@ StyleComponents {
 
                     radius: progressContainer.radius;
                     color: progressBar.barColor;
+                    gradient: progressBar.barIsGradient ? progressBar.gradient : null;
                     visible: !progressBar.indeterminate;
 
                 }

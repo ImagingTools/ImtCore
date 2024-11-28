@@ -20,6 +20,8 @@ DecoratorBase {
 	property int widthDefault: 0;
 	property alias icon: iconObj
 	property alias font: textObj.font
+	property string fontFamily: Style.fontFamily
+	property int fontSize:  Style.fontSize_common
 	property alias textColor: textObj.color
 	property alias color: background.color
 	property alias radius: background.radius
@@ -152,8 +154,8 @@ DecoratorBase {
 
 				color: !commonButtonDecorator.baseElement ? "transparent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
 
-				font.pixelSize: Style.fontSize_common
-				font.family: Style.fontFamily
+				font.pixelSize: commonButtonDecorator.fontSize;
+				font.family: commonButtonDecorator.fontFamily;
 
 				text: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.text
 				elide: Text.ElideRight;
@@ -162,8 +164,8 @@ DecoratorBase {
 			Text {
 				id: helperText;
 
-				font.pixelSize: Style.fontSize_common
-				font.family: Style.fontFamily
+				font.pixelSize: commonButtonDecorator.fontSize;
+				font.family: commonButtonDecorator.fontFamily;
 
 				text: textObj.text;
 

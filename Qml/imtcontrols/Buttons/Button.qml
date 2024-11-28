@@ -9,7 +9,8 @@ ControlBase {
 
     property string text: ""
     property string iconSource: ""
-    property string tooltipText: ""
+	property string tooltipText: "";
+	property color textColor: Style.textColor;
 
     property bool down: false
     property bool hoverEnabled: true

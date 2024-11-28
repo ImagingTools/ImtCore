@@ -21,6 +21,10 @@ ControlBase {
     property real value: 0.0;
     property real position: (value - from)/(to - from);
     property bool indeterminate: false;
-
+    property bool barIsGradient: false;
+    property int barRadius: 4;
+    property string borderColor: "lightgrey";
+    property string backgroundColor: "#ffffff";
+    property Gradient gradient: Gradient{};
 }
 
