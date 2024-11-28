@@ -432,6 +432,8 @@ StyleComponents {
 
                 sourceSize.width: width;
                 sourceSize.height: height;
+
+				visible: !comboBoxDecoratorComp.baseElement ? false : comboBoxDecoratorComp.baseElement.visibleIcon;
             }
 
             TooltipArea {

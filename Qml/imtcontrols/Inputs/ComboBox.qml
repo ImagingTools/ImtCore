@@ -24,10 +24,12 @@ ControlBase {
     property bool openST: false;
 
     property bool visibleScrollBar: true;
+	property bool visibleIcon: true;
     property string compMainColor: "transparent";
     property string compSelectedColor: Style.selectedColor;
     property bool moveToEnd: false;
     property int moveToIndex: currentIndex;
+	property int contentLeftMargin: Style.size_mainMargin;
 
     property int shownItemsCount: 5;
 
@@ -48,6 +50,7 @@ ControlBase {
     property Component delegate: Component {PopupMenuDelegate{
         width: comboBoxContainer.width;
         height: comboBoxContainer.itemHeight;
+		contentLeftMargin: comboBoxContainer.contentLeftMargin;
 
         highlighted: comboBoxContainer.currentIndex == model.index
         text: model[comboBoxContainer.nameId];

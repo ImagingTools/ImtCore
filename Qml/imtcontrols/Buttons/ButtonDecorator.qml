@@ -42,6 +42,10 @@ DecoratorBase {
 		setAnchors();
 	}
 
+	onContentLeftMarginChanged: {
+		setAnchors();
+	}
+
 	function setAnchors(){
 		if (contentCentered){
 			content.anchors.left = undefined;

@@ -23,8 +23,8 @@ Rectangle {
     property bool simpleCalendar: true;
     property bool interactive: true;
 
-    property int startYear: 1900;
-    property int lastYear: 2100;
+	property int startYear: 1900;
+	property int lastYear: 2100;
 
     //read only
     property int selectedIndexMonth: 0;
@@ -707,7 +707,9 @@ Rectangle {
                         borderColor: "transparent";
                         backgroundColor: "transparent";
                         visibleScrollBar: false;
+						visibleIcon: false;
                         isColor: true;
+						contentLeftMargin: 0;
 
                         //titleTxtColor: "transparent";
                         //compTextCentered: true;
@@ -732,7 +734,7 @@ Rectangle {
                     anchors.leftMargin: 20;
 
                     height: topPanelTextYear.height;
-                    width: topPanelTextYear.width;
+					width: topPanelTextYear.width + 30;
 
                     Text {
                         id: topPanelTextYear;
@@ -751,10 +753,14 @@ Rectangle {
                     ComboBox {
                         id: yearComboObj;
 
+						anchors.centerIn:  parent;
+
+						width: parent.width;
+						height: parent.height;
+
                         visible: calendar.hasYearCombo;
                         enabled: visible;
                         model: yearComboModel;
-                        anchors.fill: parent;
 
                         textSize: calendar.fontSize_title -4;
                         fontColor: calendar.fontColor_title;
@@ -764,14 +770,16 @@ Rectangle {
                         borderColor: "transparent";
                         backgroundColor: "transparent";
                         visibleScrollBar: false;
+						visibleIcon: false;
                         isColor:true
+						contentLeftMargin: 0;
 
                         //titleTxtColor: "transparent";
                         //compTextCentered: true;
                         shownItemsCount: calendar.shownItemsCountCombo;
                         //imageVisible: false;
 
-                        moveToIndex : calendar.todayYear - calendar.startYear - calendar.shownItemsCountCombo +1;
+						moveToIndex : calendar.todayYear - calendar.startYear - calendar.shownItemsCountCombo +1;
 
                         onCurrentIndexChanged:{
                             if(yearComboObj.currentIndex >=0){
