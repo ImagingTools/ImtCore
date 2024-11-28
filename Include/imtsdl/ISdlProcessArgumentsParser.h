@@ -52,7 +52,8 @@ public:
 	virtual bool IsAutoJoinEnabled() const = 0;
 	virtual AutoLinkLevel GetAutoLinkLevel() const = 0;
 	virtual QStringList GetHeadersIncludePaths() const = 0;
-
+	virtual QString GetCachePath() = 0;
+	virtual QStringList GetAdditionalCachePaths() = 0;
 };
 
 

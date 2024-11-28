@@ -109,6 +109,8 @@ public:
 	static void PrintFiles(std::ostream& outStream, const QStringList& files, imtsdl::ISdlProcessArgumentsParser::GeneratorType projectCodeGenerator = imtsdl::ISdlProcessArgumentsParser::GT_CMAKE);
 	static QString ResolveRelativeHeaderFileForType(const CSdlType& sdlType, const QStringList& lookupPaths);
 
+	[[nodiscard]] static QString GetHeaderPathFromCache(const CSdlType& sdlType, const std::shared_ptr<QStringList>& cacheFilesListPtr);
+
 	[[nodiscard]] static IncludeDirective CreateCxxDirective(const QString& path);
 	[[nodiscard]] static IncludeDirective CreateQtDirective(const QString& path);
 	[[nodiscard]] static IncludeDirective CreateImtDirective(const QString& path);

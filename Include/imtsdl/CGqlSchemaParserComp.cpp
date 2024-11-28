@@ -546,14 +546,38 @@ bool CGqlSchemaParserComp::ValidateSchema()
 				continue;
 			}
 
+			std::shared_ptr<QStringList> cacheListPtr;
+			/**
+			\todo make a cache provider and move it
+			\code C++
+				const QString cachePath = m_argumentParserCompPtr->GetCachePath();
+				if (!cachePath.isEmpty()){
+					cacheList << cachePath;
+				}
+				cacheList << m_argumentParserCompPtr->GetAdditionalCachePaths();
+			\endcode C++
+			*/
 			if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_ONLY_FILE){
+				isExternal =  bool(QDir::cleanPath(m_currentSchemaFilePath) != QDir::cleanPath(m_argumentParserCompPtr->GetSchemaFilePath()));
+# ifdef IMT_SDL_CACHE_IMPLEMENTED
+				QString headerFilePath;
+				if (sdlType.GetTargetHeaderFilePath().isEmpty()){
+					if (isExternal && cacheListPtr != nullptr && !cacheListPtr->isEmpty()){
+						headerFilePath = GetHeaderPathFromCache(sdlType, cacheListPtr);
+					}
+					else {
+						const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(sdlType.GetSchemaParams(), m_argumentParserCompPtr->GetOutputDirectoryPath(), QFileInfo(m_currentSchemaFilePath).fileName());
+						headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
+					}
+					sdlType.SetTargetHeaderFilePath(headerFilePath);
+				}
+# else
 				if (sdlType.GetTargetHeaderFilePath().isEmpty()){
 					const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), QFileInfo(m_currentSchemaFilePath).fileName());
 					const QString headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
 					sdlType.SetTargetHeaderFilePath(headerFilePath);
 				}
-
-				isExternal =  bool(QDir::cleanPath(m_currentSchemaFilePath) != QDir::cleanPath(m_argumentParserCompPtr->GetSchemaFilePath()));
+# endif
 			}
 			else if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_SAME_NAMESPACE){
 				const QString typeNamespace = sdlType.GetNamespace();

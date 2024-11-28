@@ -1073,6 +1073,15 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, con
 	return QString();
 }
 
+QString CSdlTools::GetHeaderPathFromCache(const CSdlType& sdlType, const std::shared_ptr<QStringList>& cacheFilesListPtr)
+{
+	/// \todo finish it
+	I_CRITICAL();
+
+	return QString();
+}
+
+
 IncludeDirective CSdlTools::CreateCxxDirective(const QString& path)
 {
 	IncludeDirective retVal;

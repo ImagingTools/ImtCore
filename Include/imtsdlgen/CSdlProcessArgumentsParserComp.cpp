@@ -62,6 +62,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 												   "2 - only the schema will be compiled. See the 'input parameter' option", "AutoLink", "0");
 	QCommandLineOption includeHeadersOption({"H","include-headers"}, "List of directories to search for generated header files", "HeadersIncludes");
 	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single.");
+	QCommandLineOption cacheOption({"C", "cache"}, "Specifies the file location where the cache will be created.", "CacheFile");
+	QCommandLineOption cacheListOption({"CC", "additional-cache"}, "Specifies additional location where other cache(s) was created. \nNote: all files MUST exist.", "AdditionalCacheFileList");
+
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
 	QCommandLineOption qmlOption("QML", "QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)");
@@ -92,7 +95,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 				autoJoinOption,
 				generatorOption,
 				autoLinkOption,
-				includeHeadersOption
+				includeHeadersOption,
+				cacheOption,
+				cacheListOption
 	});
 
 	bool isOptionsAcceptable = true;
@@ -247,6 +252,14 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 
 	if (commandLineParser.isSet(includeHeadersOption)){
 		m_headersIncludePaths = commandLineParser.values(includeHeadersOption);
+	}
+
+	if (commandLineParser.isSet(cacheOption)){
+		m_cachePath = commandLineParser.value(cacheOption);
+	}
+
+	if (commandLineParser.isSet(cacheListOption)){
+		m_additionalCacheList = commandLineParser.values(cacheListOption);
 	}
 
 	// special modes
@@ -422,9 +435,22 @@ QList<QCommandLineOption> CSdlProcessArgumentsParserComp::PrepareCommandLineOpti
 	return QList<QCommandLineOption>();
 }
 
+
 bool CSdlProcessArgumentsParserComp::ProcessCommandLineOptions(const QCommandLineParser& /*commandLineParser*/)
 {
 	return true;
+}
+
+
+QString CSdlProcessArgumentsParserComp::GetCachePath()
+{
+	return m_cachePath;
+}
+
+
+QStringList CSdlProcessArgumentsParserComp::GetAdditionalCachePaths()
+{
+	return m_additionalCacheList;
 }
 
 

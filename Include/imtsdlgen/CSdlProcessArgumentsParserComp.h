@@ -54,6 +54,8 @@ public:
 	virtual bool IsAutoJoinEnabled() const override;
 	virtual AutoLinkLevel GetAutoLinkLevel() const override;
 	virtual QStringList GetHeadersIncludePaths() const override;
+	virtual QString GetCachePath() override;
+	virtual QStringList GetAdditionalCachePaths() override;
 
 protected:
 	/**
@@ -94,6 +96,8 @@ private:
 	bool m_autoJoinEnabled;
 	AutoLinkLevel m_autolinkLevel;
 	QStringList m_headersIncludePaths;
+	QString m_cachePath;
+	QStringList m_additionalCacheList;
 };
 
 
