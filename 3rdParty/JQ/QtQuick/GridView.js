@@ -24,7 +24,6 @@ class GridView extends Flickable {
         cellWidth: {type: Real, value:100, signalName:'cellWidthChanged'},
         cellHeight: {type: Real, value:100, signalName:'cellHeightChanged'},
         
-        spacingChanged: {type:Signal, slotName:'onSpacingChanged', args:[]},
         modelChanged: {type:Signal, slotName:'onModelChanged', args:[]},
         delegateChanged: {type:Signal, slotName:'onDelegateChanged', args:[]},
         layoutDirectionChanged: {type:Signal, slotName:'onLayoutDirectionChanged', args:[]},
@@ -36,17 +35,302 @@ class GridView extends Flickable {
         cellHeightChanged: {type:Signal, slotName:'onCellHeightChanged', args:[]},
     })
 
-    itemAtIndex(index){
+    static create(parent, ...args){
+        let obj = super.create(parent, ...args)
+        obj.__DOM.classList.add('GridView')
 
+        obj.contentItem.__endUpdate = ()=>{
+            obj.__endUpdate()
+        }
+
+        return obj
+    }
+
+    __items = []
+
+    __complete(){
+        this.__initView(true)
+        super.__complete()
+    }
+
+    indexAt(x, y){
+
+    }
+    itemAt(x, y){
+
+    }
+
+    itemAtIndex(index){
+        return index >= 0 && index < this.__items.length.get() ? this.__items[index] : undefined
     }
     positionViewAtBeginning(){
-
+        this.positionViewAtIndex(0, GridView.Beginning)
     }
     positionViewAtEnd(){
-        
+        this.positionViewAtIndex(this.__items.length.get()-1, GridView.Beginning)
     }
     positionViewAtIndex(index, mode){
+        // let pos = 'start'
+        // switch(mode){
+        //     case GridView.Beginning: pos = 'start'; break;
+        //     case GridView.Center: pos = 'center'; break;
+        //     case GridView.End: pos = 'end'; break;
+        //     case GridView.Visible: break;
+        //     case GridView.Contain: {
+        //         if(this.__items[index]){
+        //             if(this.orientation') === GridView.Horizontal){
+        //                 if(this.contentWidth') <= this.width')) return
 
+        //                 if(this.__items[index].x') <= this.contentX')){
+        //                     this.getProperty('contentX').reset(this.__items[index].x'))
+        //                 } else if(this.__items[index].x') + this.__items[index].width') >= this.contentX') + this.width')){
+        //                     this.getProperty('contentX').reset(this.__items[index].x') + this.__items[index].width') - this.width'))
+        //                 }
+        //             } else {
+        //                 if(this.contentHeight') <= this.height')) return
+
+        //                 if(this.__items[index].y') <= this.contentY')){
+        //                     this.getProperty('contentY').reset(this.__items[index].y'))
+        //                 } else if(this.__items[index].y') + this.__items[index].height') >= this.contentY') + this.height')){
+        //                     this.getProperty('contentY').reset(this.__items[index].y') + this.__items[index].height') - this.height'))
+        //                 }
+        //             }
+        //         }
+        //         break;
+        //     }
+        // }
+
+    }
+
+    onModelChanged(){
+        this.__clear()
+        
+        if(this.__model && typeof this.__model === 'object' && !this.__model.__destroyed){
+            this.__model.__removeViewListener(this)
+        }
+
+        if(this.model && typeof this.model === 'object'){
+            this.model.__addViewListener(this)
+            this.__model = this.model
+        }
+
+        this.__initView(this.__completed)
+    }
+
+    onDelegateChanged(){
+        this.__clear()
+        this.__initView(this.__completed)
+    }
+
+    __clear(){
+        this.blockSignals(true)
+
+        let removed = this.__items
+        this.__items = []
+
+        for(let r of removed){
+            if(r) r.destroy()
+        }
+
+
+        this.originX = 0
+        this.originY = 0
+        
+        this.contentX = 0
+        this.contentY = 0
+
+        this.blockSignals(false)
+    }
+
+    __createItem(index){
+        let model
+
+        if(typeof this.model === 'object'){
+            model = this.model.data[index]
+        } else {
+            model = {index:index}
+        }
+
+        let item = this.delegate.createObject(this.contentItem, model)
+
+        this.__items[index] = item
+
+        return item
+    }
+
+    __initView(isCompleted){
+        if(this.delegate && this.model && isCompleted){
+            let length = 0 
+            if(typeof this.model === 'object'){     
+                length = this.model.count
+            } else if(typeof this.model === 'number'){
+                length = this.model
+            } else {
+                return
+            }
+
+            if(length === 0) return
+
+            JQApplication.beginUpdate()
+            JQApplication.updateLater(this)
+
+            let countChanged = false
+
+            if(this.count !== length){
+                countChanged = true 
+            }
+
+            this.__getDataQml('count').__value = length
+
+            for(let i = 0; i < length; i++){
+                this.__createItem(i)
+            }
+
+            if(countChanged) this.countChanged()
+
+            JQApplication.endUpdate()
+        }
+    }
+
+    __updateView(changeSet){
+        if(this.delegate && this.model && this.__completed){
+            let length = 0 
+            if(typeof this.model === 'object'){     
+                length = this.model.count
+            } else if(typeof this.model === 'number'){
+                length = this.model
+            } else {
+                return
+            }
+
+            if(length === 0) return
+            
+            JQApplication.beginUpdate()
+            JQApplication.updateLater(this)
+
+            let countChanged = false
+
+            if(this.count !== length){
+                countChanged = true 
+            }
+
+            this.__getDataQml('count').__value = length
+
+            for(let change of changeSet){
+                let leftTop = change[0]
+                let bottomRight = change[1]
+                let role = change[2]
+
+                if(role === 'append'){
+                    for(let i = leftTop; i < bottomRight; i++){
+                        this.__createItem(i)
+                    }
+                } else if(role === 'insert'){
+                    for(let i = leftTop; i < bottomRight; i++){
+                        this.__items.splice(i, 0, undefined)
+                        this.__createItem(i)
+                    }
+                } else if(role === 'remove'){
+                    let removed = this.__items.splice(leftTop, bottomRight - leftTop)
+                    for(let r of removed){
+                        if(r) r.destroy()
+                    }
+                }
+            }
+
+            if(countChanged) this.countChanged()
+
+            JQApplication.endUpdate()
+        }
+    }
+
+    __updateGrid(){
+        let length = 0 
+        if(typeof this.model === 'object'){     
+            length = this.model.count
+        } else if(typeof this.model === 'number'){
+            length = this.model
+        } else {
+            return
+        }
+
+        if(length === 0) return
+
+        let columns = Math.trunc(this.width / this.cellWidth)
+        if(columns <= 0) columns = 1
+        // let rows = Math.trunc(length / columns)
+        // if(rows <= 0) rows = 1
+
+        let index = 0
+        let rowIndex = 0
+        let columnIndex = 0
+
+        while(index < length){
+            if(!this.__items[index]) {
+                index++
+                continue
+            }
+
+            this.__items[index].x = this.cellWidth*columnIndex
+            this.__items[index].y = this.cellHeight*rowIndex
+
+            columnIndex++
+            if(columnIndex >= columns){
+                columnIndex = 0
+                rowIndex++
+            }
+
+            index++
+        }
+
+    }
+
+    onWidthChanged(){
+        super.onWidthChanged()
+
+        JQApplication.updateLater(this)
+    }
+
+    onHeightChanged(){
+        super.onHeightChanged()
+
+        JQApplication.updateLater(this)
+    }
+
+    onCellWidthChanged(){
+        JQApplication.updateLater(this)
+    }
+
+    onCellHeightChanged(){
+        JQApplication.updateLater(this)
+    }
+
+    onContentWidthChanged(){
+        
+    }
+
+    onContentHeightChanged(){
+        
+    }
+
+    __updateGeometry(){
+        this.contentWidth = this.contentItem.__DOM.scrollWidth
+        this.contentHeight = this.contentItem.__DOM.scrollHeight
+      
+    }
+
+    __endUpdate(){
+        this.__updateGrid()
+        this.__updateGeometry()
+        super.__endUpdate()
+    }
+
+    __destroy(){
+        if(this.__model && typeof this.__model === 'object' && !this.__model.__destroyed){
+            this.__model.__removeViewListener(this)
+        }
+        this.__clear()
+        super.__destroy()
     }
 }
 
