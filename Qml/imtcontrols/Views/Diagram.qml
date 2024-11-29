@@ -420,8 +420,8 @@ Item {
 	Text {
 		id: legendYText;
 
-		anchors.top: titleText.bottom;
-		anchors.topMargin: Style.size_mainMargin;
+		anchors.top: titleText.text !== "" ? titleText.bottom : parent.top;
+		anchors.topMargin: Style.size_smallMargin;
 		anchors.horizontalCenter: axeY.horizontalCenter;
 
 		wrapMode: Text.NoWrap;
