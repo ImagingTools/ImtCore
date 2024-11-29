@@ -267,7 +267,6 @@ CollectionView {
 
         onStateChanged: {
             if (state === "Ready"){
-                console.log("RemoteCollectionView", root.collectionId, subscriptionClient.toJson());
                 if (subscriptionClient.containsKey("data")){
                     let dataModelLocal = subscriptionClient.getData("data")
                     root.handleSubscription(dataModelLocal);

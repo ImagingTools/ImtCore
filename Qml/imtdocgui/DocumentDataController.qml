@@ -18,8 +18,6 @@ QtObject {
     signal modelChanged();
 
     onDocumentModelChanged: {
-        console.log("DocumentDataController onDocumentModelChanged");
-
         setupDocumentInfo();
 
         hasRemoteChanges = false;
@@ -44,11 +42,9 @@ QtObject {
     }
 
     function insertDocument(){
-        console.log("DocumentDataController insertDocument", documentModel.toJson());
     }
 
     function saveDocument(){
-        console.log("DocumentDataController saveDocument", documentModel.toJson());
     }
 
     // For setted documentId/documentName from documentModel

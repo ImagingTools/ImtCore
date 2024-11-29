@@ -125,7 +125,6 @@ Rectangle {
     }
 
     function getSelectedId(){
-        console.log("Table delegate getSelectedId", model.Id)
         return model.Id;
     }
 
@@ -317,7 +316,6 @@ Rectangle {
             clickCount++;
 
             if (ma.clickCount == 1){
-                console.log("onClicked2", model["Id"])
                 if (mouse.button === Qt.RightButton) {
                     tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
                 }
@@ -327,7 +325,6 @@ Rectangle {
             }
 
             if (ma.clickCount == 2){
-                console.log("onDoubleClicked2")
                 if (mouse.button === Qt.RightButton) {
                     return;
                 }

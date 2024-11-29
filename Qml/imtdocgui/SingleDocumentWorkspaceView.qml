@@ -32,8 +32,6 @@ Rectangle {
     Connections {
         id: connections;
         function onDocumentAdded(documentIndex, documentId){
-            console.log("onDocumentAdded", documentIndex, documentId);
-
             let documentComp = root.documentManager.documentsModel.get(documentIndex).DocumentViewComp;
             stackView.push(documentComp);
         }

@@ -13,7 +13,7 @@ ViewBase {
     property string featureId: "";
     property alias tableView: tableView_;
 
-    property FeatureData featureData: model ? model : null;
+    property FeatureData featureData: model;
 
     property Component treeItemModelComp: Component {
         TreeItemModel {}
@@ -74,28 +74,22 @@ ViewBase {
             selectedId = selectedIndex.itemData.m_featureId;
         }
 
-        //Список всех зависящих фич для selectedId
         let childrenFeatureList = [];
         tableView.findChildrenFeatureDependencies(selectedId, childrenFeatureList);
 
-        //Список всех зависящих фич от selectedId
         let inactiveElements = [];
         tableView.findParentFeatureDependencies(selectedId, inactiveElements);
 
-        //Запрещаем зависимость от всех родителей
         let parentIds = featureEditor.getAllParents(selectedIndex);
         inactiveElements = inactiveElements.concat(parentIds);
 
         for (let i = 0; i < parentIds.length; i++){
             let parentId = parentIds[i];
-            //Запрещаем зависимость для всех фич которые зависят от родителей
             tableView.findParentFeatureDependencies(parentId, inactiveElements);
 
-            //Автоматом выбираем фичи от которых зависят родители
             tableView.findChildrenFeatureDependencies(parentId, childrenFeatureList);
         }
 
-        //Список основных зависящих фич для selectedId
         let dependenciesList = []
 
         let dependencies = selectedIndex.itemData.m_dependencies;
@@ -118,7 +112,6 @@ ViewBase {
                 delegateItem.isActive = false;
                 delegateItem.checkState = Qt.Checked;
             }
-            //Если содержится во всех фичах и содержится в основном
             else if (childrenFeatureList.includes(itemId) && dependenciesList.includes(itemId)){
                 delegateItem.isActive = true;
                 delegateItem.checkState = Qt.Checked;
@@ -129,22 +122,25 @@ ViewBase {
     }
 
     function updateGui(){
+        console.log("updateGui", featureData.toJson());
+        descriptionInput.text = featureData.m_description;
         featureNameInput.text = featureData.m_featureName;
         featureIdInput.text = featureData.m_featureId;
-        descriptionInput.text = featureData.m_description;
+        console.log("descriptionInput.text", descriptionInput.text);
 
         featureEditor.updateTreeViewGui();
     }
 
     function updateModel(){
+        console.log("updateModel", featureData.toJson());
+
+        featureData.m_description = descriptionInput.text;
         featureData.m_featureName = featureNameInput.text;
         featureData.m_featureId = featureIdInput.text;
-        featureData.m_description = descriptionInput.text;
+
+        console.log("featureData.m_description", featureData.m_description);
+
         tableView_.rowModel = featureData.m_subFeatures;
-        // if (model.getItemsCount() !== 1){
-        //     let emptyModel = featureEditor.treeItemModelComp.createObject(model);
-        //     model.insertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
-        // }
     }
 
     Rectangle {
@@ -175,6 +171,7 @@ ViewBase {
             width: 200;
             height: 30;
             placeHolderText: qsTr("Enter the feature name");
+            autoEditingFinished: false;
             onEditingFinished: {
                 if (featureIdInput.text === ""){
                     featureIdInput.text = featureNameInput.text.replace(/\s+/g, '');
@@ -249,8 +246,6 @@ ViewBase {
                     }
 
                     function featureIsValid(featureId, featureName){
-                        console.log("featureIsValid", featureId, featureName);
-                        console.log("featureEditor.featureData.m_featureId", featureEditor.featureData.m_featureId);
                         if (featureEditor.featureData.m_featureId === featureId){
                             return false;
                         }

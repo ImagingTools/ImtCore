@@ -216,7 +216,7 @@ Item {
             return;
         }
 
-        console.log("doUpdateModel", model);
+        console.debug("doUpdateModel", model);
 
         if (model.beginChanges !== undefined){
             model.beginChanges();
@@ -244,7 +244,7 @@ Item {
             return;
         }
 
-        console.log("doUpdateGui", model);
+        console.debug("doUpdateGui", model);
 
         internal.blockingUpdateModel = true;
 

@@ -58,7 +58,6 @@ WebSocket {
     }
 
     onTextMessageReceived:{
-        console.log("SubscriptionManager onTextMessageReceived", message);
         let ok = socketModel.createFromJson(message)
 
         if (socketModel.getData("type") === "connection_ask"){
@@ -125,7 +124,6 @@ WebSocket {
 
                 subscriptionModel[index]["status"] = "waiting";
                 container.sendTextMessage(JSON.stringify(request))
-                console.log("registerSubscriptionToServer", JSON.stringify(request));
             }
         }
     }
@@ -159,8 +157,6 @@ WebSocket {
 
     function unRegisterSubscription(subscriptionClient){
         let index
-        console.log("unregisterSubscriptionToServer");
-
         for (index = 0; index < subscriptionModel.length; index++){
             if (subscriptionModel[index]["subscription"] === subscriptionClient){
                 let request = {}
@@ -172,7 +168,6 @@ WebSocket {
 
                 subscriptionModel[index]["status"] = "waiting";
                 container.sendTextMessage(JSON.stringify(request))
-                console.log("unregisterSubscriptionToServer", JSON.stringify(request));
 
                 subscriptionModel.splice(index, 1)
 

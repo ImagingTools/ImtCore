@@ -13,7 +13,7 @@ ViewBase {
 
     property TreeItemModel copiedGroupsModel: TreeItemModel {}
 
-    property GroupData groupData: model ? model : null;
+    property GroupData groupData: model;
 
     property string productId;
 

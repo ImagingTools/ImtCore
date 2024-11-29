@@ -23,7 +23,6 @@ Dialog {
 			spacing: Style.size_mainMargin;
 
 			function updateGui(){
-                console.log("TableHeaderParamComp.qml updateGui")
 				item.block = true;
                 leftTable.uncheckAll();
                 if (leftTable.elements){
@@ -158,8 +157,6 @@ Dialog {
                             dialog.buttonsModel.setProperty(0, 'Enabled', true)
 
                             leftTable.select(index + 1)
-
-                            console.log("getSelectedIndexes", leftTable.getSelectedIndexes())
                         }
                     }
                 }

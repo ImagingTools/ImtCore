@@ -308,7 +308,7 @@ ViewCommandsDelegateBase {
 
             filePath = filePath.replace('file:///', '')
 
-            console.log("filePath", filePath);
+            let mimeType = ""
             if (Qt.platform.os == "web"){
                 let reader = new FileReader()
 
@@ -321,13 +321,9 @@ ViewCommandsDelegateBase {
                     let fileName = filePath.name
                     let data = filePath.name.split('.')
                     let ext = "";
-                    console.log("fileName", fileName);
                     if (data.length > 1){
                         fileName = data[0]
                         ext = data[1]
-
-                        console.log("fileName", fileName);
-                        console.log("ext", ext);
                     }
 
                     let index = collectionViewCommandsDelegate.getDialogNameFilterIndex(importFileDialog_.nameFilters, ext)
@@ -336,7 +332,9 @@ ViewCommandsDelegateBase {
                         return;
                     }
 
-                    collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedContent, mimeTypes[index]);
+                    mimeType = mimeTypes[index]
+
+                    collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedContent, mimeType);
                 }.bind(this)
             }
             else {
@@ -362,7 +360,9 @@ ViewCommandsDelegateBase {
                     return;
                 }
 
-                collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedData, mimeTypes[index]);
+                mimeType = mimeTypes[index]
+
+                collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedData, mimeType);
             }
         }
 
@@ -386,7 +386,6 @@ ViewCommandsDelegateBase {
 
         onAccepted: {
             let filePath = fileDialogSave.file.toString();
-            console.log("filePath", filePath);
 
             let mimeType = ""
             if (Qt.platform.os == "web"){

@@ -63,7 +63,7 @@ RemoteCollectionView {
 
                         let index = systemInfoModel.insertNewItem();
                         systemInfoModel.setData("Id", "All", index)
-                        systemInfoModel.setData("Name", qsTr("All Systems"), index)
+                        systemInfoModel.setData("Name", qsTr("All systems"), index)
 
                         index = systemInfoModel.insertNewItem();
                         systemInfoModel.setData("Id", "Internal", index)
@@ -130,6 +130,7 @@ RemoteCollectionView {
             documentManager.registerDocumentDataController("User", documentDataControllerComp);
         }
 
+        userCollectionViewContainer.table.nonSortableColumns = ["Roles", "Groups"]
         table.rowDelegate = tableRowDelegateBaseComp;
     }
 

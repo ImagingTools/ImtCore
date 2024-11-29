@@ -46,12 +46,12 @@ Column {
     }
 
     // Component in CPP from imtqml
-    // Process {
-    //     id: process;
-    //     onFinished: {
-    //         buttonElementView.bottomComp = exitCode != 0 ? errorComp : connectionComp;
-    //     }
-    // }
+    Process {
+        id: process;
+        onFinished: {
+            buttonElementView.bottomComp = exitCode != 0 ? errorComp : connectionComp;
+        }
+    }
 
     Component {
         id: errorComp;

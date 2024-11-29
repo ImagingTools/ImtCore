@@ -5,6 +5,10 @@ import imtcontrols 1.0
 
 ElementView {
     id: comboBoxElementView;
+    bottomComp: isSelectionRequired && currentIndex == -1 ? errorComp : undefined;
+
+    property bool isSelectionRequired: false;
+    property string errorText: qsTr("Please select an item");
 
     property var model: null;
     property bool changeable: true;
@@ -88,6 +92,17 @@ ElementView {
 
                 comboBoxElementView.setupComboBox(cb);
             }
+        }
+    }
+
+    Component {
+        id: errorComp;
+
+        Text {
+            text: comboBoxElementView.errorText;
+            color: Style.errorTextColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
         }
     }
 }

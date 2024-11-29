@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5311" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -11,7 +11,7 @@
     <Keywords></Keywords>
     <ElementsList>
         <Element Id="CachedRemoteCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="RemoteRepository"/>

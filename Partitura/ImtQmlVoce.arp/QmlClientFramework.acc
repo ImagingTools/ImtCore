@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5323" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -43,6 +43,9 @@
                     <AttributeInfo Id="LanguageIds" Type="Id[]" ExportId="LanguageIds">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="LanguageSelection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Language"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TextFileLog"/>
                     </AttributeInfo>
@@ -69,6 +72,18 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationLocalization"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Language" PackageId="BasePck" ComponentId="SelectionParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="0"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

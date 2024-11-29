@@ -284,7 +284,6 @@ StyleComponents {
 
                 onClicked: {
                     let point = mapToItem(null, mouse.x, mouse.y);
-                    console.log("inputActions");
                     if(textFieldItem.baseElement){
                         textFieldItem.baseElement.openInputAction(point.x, point.y)
                     }
@@ -356,7 +355,6 @@ StyleComponents {
 
                 onClicked: {
                     let point = mapToItem(null, mouse.x, mouse.y);
-                    console.log("inputActions");
                     if(textAreaItem.baseElement){
                         textAreaItem.baseElement.openInputAction(point.x, point.y)
                     }
@@ -435,7 +433,7 @@ StyleComponents {
                 sourceSize.width: width;
                 sourceSize.height: height;
 
-				visible: !comboBoxDecoratorComp.baseElement ? false : comboBoxDecoratorComp.baseElement.visibleIcon;
+                visible: !cbMainRect.baseElement ? false : cbMainRect.baseElement.visibleIcon;
             }
 
             TooltipArea {
@@ -808,7 +806,6 @@ StyleComponents {
             property string text: "";
 
             function setHeight(){
-                //console.log("setHeight");
             }
 
             Rectangle {

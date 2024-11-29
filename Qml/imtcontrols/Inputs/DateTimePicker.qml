@@ -266,6 +266,11 @@ CustomTextField {
     }
 
     function setDateAsString(dateStr){
+        if (!validateDateFormat(dateStr)){
+            console.error("Unable to set date in format '",dateStr, "'. Please check valid data or use next format: 'dd.MM.yyyy HH:mm' or 'dd.MM.yyyy'");
+            return;
+        }
+
         var data = dateStr.split(' ');
 
         if (data.length > 0){
@@ -323,6 +328,42 @@ CustomTextField {
         else{
             return dayStr + "." + monthStr + "." + date.getFullYear();
         }
+    }
+
+    function validateDateFormat(dateString) {
+        let formatWithTime = /^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/; // dd.MM.yyyy HH:mm
+        let formatWithoutTime = /^\d{2}\.\d{2}\.\d{4}$/;          // dd.MM.yyyy
+
+        if (formatWithTime.test(dateString)) {
+            return isValidDate(dateString, true); // Проверяем дату с временем
+        } else if (formatWithoutTime.test(dateString)) {
+            return isValidDate(dateString, false); // Проверяем дату без времени
+        }
+        return false; // Строка не соответствует ни одному из форматов
+    }
+
+    function isValidDate(dateString, hasTime) {
+        let parts = dateString.split(/[\s.:]/); // Разделяем по пробелу, точке и двоеточию
+        let day = parts[0];
+        let month = parts[1];
+        let year = parts[2];
+        let hour = parts[3] || "0"; // Устанавливаем "0", если час не указан
+        let minute = parts[4] || "0"; // Устанавливаем "0", если минуты не указаны
+
+        let date = new Date(
+            parseInt(year, 10),
+            parseInt(month, 10) - 1, // Месяц в JavaScript начинается с 0
+            parseInt(day, 10),
+            parseInt(hour, 10),
+            parseInt(minute, 10)
+        );
+
+        return (
+            date.getFullYear() === parseInt(year, 10) &&
+            date.getMonth() === parseInt(month, 10) - 1 &&
+            date.getDate() === parseInt(day, 10) &&
+            (!hasTime || (date.getHours() === parseInt(hour, 10) && date.getMinutes() === parseInt(minute, 10)))
+        );
     }
 
     function dayIncrement(){

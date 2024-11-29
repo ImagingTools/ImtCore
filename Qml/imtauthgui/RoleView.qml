@@ -14,7 +14,7 @@ ViewBase {
 
     property string productId: "";
 
-    property RoleData roleData: model ? model : null;
+    property RoleData roleData: model;
 
     function updateGui(){
         generalGroup.updateGui();

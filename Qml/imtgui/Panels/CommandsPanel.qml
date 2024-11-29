@@ -84,9 +84,7 @@ Item {
     }
 
     onVisibleChanged: {
-        if (visible){
-            commandsItem.checkCommandsState()
-        }
+        timer.restart();
     }
 
     onWidthChanged: {
@@ -95,7 +93,7 @@ Item {
 
     Timer {
         id: timer;
-        interval: 0;
+        interval: 10;
         onTriggered: {
             commandsItem.checkCommandsState()
         }

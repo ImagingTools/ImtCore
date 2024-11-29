@@ -28,7 +28,6 @@ Item {
     signal clicked(int index);
 
     onReadyChanged: {
-        console.log("SegmentedButton children.length:: ", children.length)
         let count  = children.length
         let list = []
         for (let index = 1; index < count; index++){
@@ -67,7 +66,6 @@ Item {
                 if(container.readOnly){
                     return;
                 }
-                console.log("sender", itemIndex, row.children[itemIndex])
                 container.setChecked(itemIndex)
                 container.clicked(itemIndex)
             }
@@ -101,7 +99,6 @@ Item {
         spacing: container.spacing
 
         function setup() {
-            console.log("SegmentedButton row children.length:: ", children.length)
             for (let index = 0; index < children.length; index++){
 
                 container.setDecorator(index)

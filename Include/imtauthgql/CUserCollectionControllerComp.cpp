@@ -314,9 +314,18 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 	permissions.removeAll("");
 	userInfoPtr->SetLocalPermissions(productId, permissions);
 
+	if (oldUserInfoPtr != nullptr){
+		for (const QByteArray& oldProductId : oldUserInfoPtr->GetProducts()){
+			QByteArrayList roles = oldUserInfoPtr->GetRoles(oldProductId);
+			for (const QByteArray& roleId : roles){
+				userInfoPtr->AddRole(oldProductId, roleId);
+			}
+		}
+	}
+
 	QByteArrayList roleIds = userDataRepresentation.GetRoles().split(';');
+	roleIds.removeAll("");
 	if (!roleIds.isEmpty()){
-		roleIds.removeAll("");
 		userInfoPtr->SetRoles(productId, roleIds);
 	}
 	else{

@@ -1014,7 +1014,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 		return nullptr;
 	}
 
-	QString extension = mime.GetSuffix();
+	QString extension = GetExtensionFromMimeType(mime);
 
 	QTemporaryDir tempDir;
 	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
@@ -1136,7 +1136,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 		return nullptr;
 	}
 
-	QString extension = GetExtensionFromMimeType(mime);;
+	QString extension = GetExtensionFromMimeType(mime);
 	QString objectName = GetExportFileName(objectId);
 
 	QTemporaryDir tempDir;

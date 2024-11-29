@@ -202,7 +202,10 @@ TreeViewItemDelegateBase {
                     }
 
                     onEditingFinished: {
+                        console.log("onEditingFinished");
                         inputDescription.visible = false;
+                        console.log("description", packageTreeItemDelegate.featureData.m_description);
+                        console.log("description2", inputDescription.text);
 
                         let description = packageTreeItemDelegate.featureData.m_description;
                         if (description !== inputDescription.text){

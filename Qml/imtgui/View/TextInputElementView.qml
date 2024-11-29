@@ -5,6 +5,7 @@ import imtcontrols 1.0
 
 ElementView {
     id: root;
+    bottomComp: !acceptableInput && showErrorWhenInvalid ? errorComp : undefined;
 
     property string text;
     property bool textInputFocus: false;
@@ -16,6 +17,9 @@ ElementView {
     property string placeHolderText;
     property string borderColor;
     property int echoMode: TextInput.Normal;
+
+    property string errorText: qsTr("Enter the correct value");
+    property bool showErrorWhenInvalid: false;
 
     signal accepted();
     signal cancelled();
@@ -111,6 +115,17 @@ ElementView {
             onAcceptableInputChanged: {
                 root.acceptableInput = acceptableInput;
             }
+        }
+    }
+
+    Component {
+        id: errorComp;
+
+        Text {
+            text: root.errorText;
+            color: Style.errorTextColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
         }
     }
 }

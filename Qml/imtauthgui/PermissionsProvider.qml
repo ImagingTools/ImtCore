@@ -33,7 +33,6 @@ QtObject {
         }
 
         function onResult(data){
-            console.log("PermissionsProvider.qmlonResult", data.toJson());
             permissionsProvider.permissionsModel = data;
         }
 

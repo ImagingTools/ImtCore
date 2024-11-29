@@ -589,10 +589,12 @@ QtObject {
             property UndoRedoManager undoManager: UndoRedoManager {
                 onUndo: {
                     singleDocumentData.checkDocumentModel();
+                    singleDocumentData.updateGui();
                 }
 
                 onRedo: {
                     singleDocumentData.checkDocumentModel()
+                    singleDocumentData.updateGui();
                 }
 
                 onModelChanged: {
@@ -603,8 +605,6 @@ QtObject {
                         if (singleDocumentData.views[i].commandsController){
                             singleDocumentData.views[i].commandsController.setCommandIsEnabled("Undo", undoSteps > 0);
                             singleDocumentData.views[i].commandsController.setCommandIsEnabled("Redo", redoSteps > 0);
-
-                            singleDocumentData.views[i].doUpdateGui();
                         }
                     }
                 }
@@ -612,6 +612,18 @@ QtObject {
 
             property var views: [];
             property bool isDirty: false;
+
+            function updateGui(){
+                for (let i = 0; i < singleDocumentData.views.length; i++){
+                    singleDocumentData.views[i].doUpdateGui();
+                }
+            }
+
+            function updateModel(){
+                for (let i = 0; i < singleDocumentData.views.length; i++){
+                    singleDocumentData.views[i].doUpdateModel();
+                }
+            }
 
             property Connections dataControllerConnections: Connections {
                 target: singleDocumentData.documentDataController;
@@ -648,14 +660,20 @@ QtObject {
 
                     for (let i = 0; i < singleDocumentData.views.length; i++){
                         singleDocumentData.views[i].model = documentModel;
-                        if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
-                            singleDocumentData.views[i].doUpdateModel();
-                        }
 
                         if (singleDocumentData.views[i].commandsDelegate){
                             singleDocumentData.views[i].commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
                         }
                     }
+
+                    let isNew = documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew;
+                    if (isNew){
+                        singleDocumentData.updateModel();
+                    }
+                    else{
+                        singleDocumentData.updateGui();
+                    }
+
                     singleDocumentData.blockingUpdateModel = false;
 
                     documentManager.updateDocumentTitle(singleDocumentData.documentIndex);

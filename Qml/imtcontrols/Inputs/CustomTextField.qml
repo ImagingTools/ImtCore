@@ -201,10 +201,6 @@ FocusScope {
             editingFinishedTimer.restart();
         }
 
-        onAcceptableInputChanged: {
-            console.log("onAcceptableInputChanged", acceptableInput);
-        }
-
         onEditingFinished: {
             containerTextField.editingFinished();
         }

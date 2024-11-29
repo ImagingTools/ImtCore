@@ -12,7 +12,7 @@ ViewBase {
     property TreeItemModel rolesModel: TreeItemModel {}
     property TreeItemModel groupsModel: TreeItemModel {}
 
-    property UserData userData: model ? model : null;
+    property UserData userData: model;
     property string productId;
 
     function updateGui(){

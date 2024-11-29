@@ -220,7 +220,6 @@ Item {
     }
 
     function setValue(value){
-        console.log("setValue", value);
         if (delegateContainer && delegateContainer.columnIndex >= 0){
             if(rowDelegate !== null && rowDelegate.tableItem !==null){
                 let tableItem = rowDelegate.tableItem;

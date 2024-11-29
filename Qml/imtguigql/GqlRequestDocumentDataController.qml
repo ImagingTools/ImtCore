@@ -226,7 +226,6 @@ DocumentDataController {
 				container.error("Network error", "Critical");
 			}
 			else if (state === "Ready"){
-				console.log("Json", this.json);
 				let responseObj = JSON.parse(this.json)
 				if (!responseObj){
 					console.error("Unable convert json ", json, " to object")
@@ -257,7 +256,6 @@ DocumentDataController {
 				if ("data" in responseObj){
 					let dataObject = responseObj["data"];
 					let itemObject = dataObject[container.gqlGetCommandId];
-					console.log("*DEBUG* itemObject", itemObject)
 
 					container.payloadModel.fromObject(itemObject);
 				}
@@ -285,7 +283,6 @@ DocumentDataController {
 				container.error("Network error", "Critical");
 			}
 			if (state === "Ready"){
-				console.log("Add", this.json)
 				let responseObj = JSON.parse(this.json)
 				if (!responseObj){
 					console.error("Unable convert json '", json, "' to object")

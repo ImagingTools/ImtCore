@@ -254,7 +254,6 @@ Item {
     }
 
     function setValue(value){
-        console.log("setValue", value);
         if (delegateContainer.complCompl){
             if (delegateContainer.columnIndex >= 0){
                 if(delegateContainer.pTableDelegateContainer !== null && delegateContainer.pTableDelegateContainer.tableItem !==null){
@@ -263,7 +262,6 @@ Item {
                     let headerId = delegateContainer.pTableDelegateContainer.headers.getData("Id", delegateContainer.columnIndex);
 
                     elements.setData(headerId, value, delegateContainer.rowIndex);
-//                    elements.refresh();
                 }
             }
         }

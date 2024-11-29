@@ -206,7 +206,6 @@ Rectangle {
             }
         }
 
-        console.log("onHeadersChanged", defaultHeadersModel, headers);
         if (defaultHeadersModel == null && headers){
             if (headers.getItemsCount() > 0){
                 defaultHeadersModel = headers.copyMe();
@@ -222,16 +221,12 @@ Rectangle {
 	}
 
 	onSelectionChanged: {
-        console.log("onSelectionChanged", selection);
-
 		if (selection.length > 0){
 			let maxIndex = selection.sort()[selection.length - 1]
 
 			elementsListObj.positionViewAtIndex(maxIndex, ListView.Contain)
 		}
 	}
-
-
 
 	function setDecorators(){
 		if (!tableContainer.tableDecorator){
@@ -802,49 +797,39 @@ Rectangle {
     }
 
 	function updateWidthFromViewParams(){
-        let headersTemp = tableContainer.headers.copyMe();
-        let widthTemp = tableContainer.widthDecorator.copyMe();
-
+        let swappedHeaderIndex = []
         for (let i = 0; i < tableContainer.tableViewParams.getItemsCount(); i++){
             let headerViewParamId = tableContainer.tableViewParams.getData("HeaderId", i);
+            let index = getHeaderIndex(headerViewParamId);
+            if (index >= 0 && i != index && !swappedHeaderIndex.includes(index)){
+                tableContainer.widthDecorator.swapItems(i, index);
+                tableContainer.headers.swapItems(i, index);
+            }
+        }
 
-            for (let j = 0; j < headersTemp.getItemsCount(); j++){
-                let headerId = headersTemp.getData("Id", j);
-                if (headerViewParamId === headerId){
-                    widthTemp.swapItems(i, j);
-                    headersTemp.swapItems(i, j);
+       headersList.model = 0;
+       headersList.model = tableContainer.headers;
+
+        for (let i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
+            let headerId = tableContainer.headers.getData("Id", i);
+            for (let j = 0; j < tableContainer.tableViewParams.getItemsCount(); j++){
+                let id = tableContainer.tableViewParams.getData("HeaderId", j);
+                if (headerId === id){
+                    let visible = tableContainer.tableViewParams.getData("Visible", j);
+                    let size = tableContainer.tableViewParams.getData("Size", j);
+                    if (visible){
+                        tableContainer.widthDecorator.setData("WidthPercent", size, i)
+                        tableContainer.widthDecorator.setData("Width", size, i)
+                    }
+                    else{
+                        tableContainer.widthDecorator.setData("WidthPercent", 0, i)
+                        tableContainer.widthDecorator.setData("Width", 0, i)
+                    }
+
                     break;
                 }
             }
         }
-
-        headersList.model = 0;
-        tableContainer.headers.copy(headersTemp);
-        headersList.model = tableContainer.headers;
-
-        tableContainer.widthDecorator.copy(widthTemp);
-
-		for (let i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
-			let headerId = tableContainer.headers.getData("Id", i);
-			for (let j = 0; j < tableContainer.tableViewParams.getItemsCount(); j++){
-				let id = tableContainer.tableViewParams.getData("HeaderId", j);
-				if (headerId === id){
-					let visible = tableContainer.tableViewParams.getData("Visible", j);
-					let size = tableContainer.tableViewParams.getData("Size", j);
-					if (visible){
-						tableContainer.widthDecorator.setData("WidthPercent", size, i)
-						tableContainer.widthDecorator.setData("Width", size, i)
-					}
-					else{
-						tableContainer.widthDecorator.setData("WidthPercent", 0, i)
-						tableContainer.widthDecorator.setData("Width", 0, i)
-					}
-
-					break;
-				}
-
-			}
-		}
 
 		tableContainer.setWidth();
 	}

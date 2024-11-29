@@ -35,8 +35,6 @@ Item {
 
 
     function importObject(typeId, name, description, b64encoded, mimeType, additionalParamsObj){
-        console.log("importObject", typeId, name, description, mimeType);
-
         let params = {}
         params["typeId"] = typeId;
         params["name"] = name;
@@ -54,8 +52,6 @@ Item {
     }
 
     function exportObject(objectId, mimeType, additionalParamsObj){
-        console.log("exportObject", objectId, mimeType);
-
         let params = {}
         params["id"] = objectId
         params["mimeType"] = mimeType
@@ -492,7 +488,6 @@ Item {
 
             var gqlData = query.GetQuery();
             let headers = root.getHeaders()
-            console.log("Get headers", headers)
             root.beginUpdate();
 
             this.setGqlQuery(gqlData, headers);
@@ -535,7 +530,6 @@ Item {
                             if ("data" in responseObj){
                                 let dataObject = responseObj["data"];
                                 let dataModelLocal = dataObject[root.collectionId + "List"];
-                                console.log("Load payloadModel")
                                 root.payloadModel.fromObject(dataModelLocal)
                                 root.elementsModel = root.payloadModel.m_items
                             }

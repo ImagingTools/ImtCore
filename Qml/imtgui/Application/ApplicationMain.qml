@@ -1,10 +1,9 @@
-import QtQuick 2.12
+import QtQuick 2.15
 import Acf 1.0
 import imtgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
 import imtauthgui 1.0
-
 
 Item {
     id: application;
@@ -32,7 +31,6 @@ Item {
     property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
 
     onAuthorizationServerConnectedChanged: {
-        console.log("onAuthorizationServerConnectedChanged", authorizationServerConnected);
         application.firstModelsInit();
     }
 
@@ -297,7 +295,6 @@ Item {
     }
 
     function firstModelsInit(){
-        console.log("firstModelsInit");
         applicationInfoProvider.updateModel();
 
         if (AuthorizationController.isStrongUserManagement() && !authorizationServerConnected){

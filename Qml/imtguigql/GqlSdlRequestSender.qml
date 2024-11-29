@@ -135,7 +135,6 @@ GqlRequest {
             root.onError(qsTr("Network error"), "Critical");
         }
         else if (state === "Ready"){
-            console.log("JSON", this.json);
             let responseObj = JSON.parse(this.json)
             if (!responseObj){
                 root.onError("Unable convert json ", json, " to object", "Warning");

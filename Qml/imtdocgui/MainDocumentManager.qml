@@ -58,8 +58,6 @@ QtObject {
         let documentManager = root.documentManagers[typeId];
         if (!documentManager){
             root.tryRegisterDocumentManager(typeId, function(result){
-                console.log("result", result)
-
                 if (result){
                     root.openDocument(typeId, documentId, documentTypeId, viewTypeId);
                 }

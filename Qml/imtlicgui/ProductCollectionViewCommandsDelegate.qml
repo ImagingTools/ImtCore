@@ -13,6 +13,8 @@ DocumentCollectionViewDelegate {
     removeMessage: qsTr("Delete the selected product ?");
 
     exportFileDialog.nameFilters: ["Xml files (*.xml)"];
+    importFileDialog.nameFilters: ["Xml files (*.xml)"];
+    importDialogMimeTypes: ["application/xml"]
     exportDialogMimeTypes: ["application/xml"]
     exportFileDialog.title: qsTr("Select product");
 
@@ -76,9 +78,10 @@ DocumentCollectionViewDelegate {
         ModalDialogManager.openDialog(messageDialogComp, {});
     }
 
-    function onImportDialogResult(name, fileData, extension){
+    function onImportDialogResult(name, fileData, mimeType){
+        console.log("onImportDialogResult", name, mimeType)
         if (collectionView && collectionView.dataController){
-            collectionView.dataController.importObject(importObjectTypeId, name, "", fileData, extension, {"force":container.force});
+            collectionView.dataController.importObject(importObjectTypeId, name, "", fileData, mimeType, {"force":container.force});
         }
     }
 

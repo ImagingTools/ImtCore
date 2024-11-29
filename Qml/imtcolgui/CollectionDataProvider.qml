@@ -130,8 +130,6 @@ QtObject {
         queryFields.InsertField("Id");
         query.AddField(queryFields);
 
-        console.log("CollectionDataProvider subscriptionClient updateSubscription", container.getHeaders())
-
         Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient, "Headers": container.getHeaders()});
     }
 
@@ -144,15 +142,12 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("CollectionDataProvider subscriptionClient onStateChanged", container.getHeaders())
             if (state === "Ready"){
                 container.itemsInfoModel.send();
             }
         }
 
         function getHeaders(){
-            console.log("CollectionDataProvider subscriptionClient getHeaders", container.getHeaders())
-
             return container.getHeaders()
         }
     }

@@ -281,7 +281,6 @@ Item {
         sequence: "Ctrl+Z";
         enabled: true;
         onActivated: {
-            console.log("Ctrl+Z")
             let undoSteps = undoRedoManager.getAvailableUndoSteps();
 
             if (undoSteps > 0){
@@ -294,7 +293,6 @@ Item {
         sequence: "Ctrl+Shift+Z";
         enabled: true;
         onActivated: {
-            console.log("Ctrl+Shift+Z")
             let redoSteps = undoRedoManager.getAvailableRedoSteps();
             if (redoSteps > 0){
                 undoRedoManager.commandHandle("Redo");

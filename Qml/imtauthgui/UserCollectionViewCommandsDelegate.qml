@@ -10,8 +10,6 @@ CollectionViewCommandsDelegateBase {
     removeMessage: qsTr("Delete the selected user ?");
 
     function onEdit(){
-        console.log("UserCollectionView onEdit");
-
         let itemIds = container.tableData.getSelectedIds();
         let itemNames = container.tableData.getSelectedNames();
 

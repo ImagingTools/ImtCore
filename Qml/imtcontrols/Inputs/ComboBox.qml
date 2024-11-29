@@ -112,6 +112,7 @@ ControlBase {
 
     onCurrentIndexChanged: {
         if (!comboBoxContainer.model){
+            comboBoxContainer.currentText = "";
             return;
         }
 
