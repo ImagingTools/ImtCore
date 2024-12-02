@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5241" Description="ACF"/>
-            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5323" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -28,6 +28,9 @@
                     <AttributeInfo Id="QuickObject" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="QuickObject"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="WebSocketUrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -49,8 +52,14 @@
         <Element Id="QuickObject" PackageId="ImtQmlPck" ComponentId="QuickObject">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="BaseUrl" Type="String" ExportId="AdministrationBaseURL">
-                        <Data IsEnabled="true" Value="http://localhost:8111/Acula"/>
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BaseUrlParam" Type="Reference" ExportId="BaseUrlParam">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="QmlFilePath" Type="String" ExportId="AdministrationQmlPath">
                         <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/AdministrationUi.qml"/>
