@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5324" Description="ACF"/>
+            <Version Id="0" Number="5311" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
@@ -101,6 +101,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtsdl::ISdlDocumentTypeListProvider" ComponentId="GqlSchemaParser"/>
+        <Interface InterfaceId="imtsdl::ISdlEnumListProvider" ComponentId="GqlSchemaParser"/>
         <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser" ComponentId="SdlProcessArgumentsParser"/>
         <Interface InterfaceId="imtsdl::ISdlRequestListProvider" ComponentId="GqlSchemaParser"/>
         <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="GqlSchemaParser"/>

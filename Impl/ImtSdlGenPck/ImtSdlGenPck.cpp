@@ -35,9 +35,9 @@ I_EXPORT_COMPONENT(
 			"Schema Definition Language Class Generator Base Class")
 
 I_EXPORT_COMPONENT(
-		QmlCodeGenerator,
-		"The QML generator of SDL types",
-		"Schema Definition Language SDL QML Generator")
+			QmlCodeGenerator,
+			"The QML generator of SDL types",
+			"Schema Definition Language SDL QML Generator")
 
 I_EXPORT_COMPONENT(
 			QmlCodeMetaGenerator,
@@ -55,9 +55,9 @@ I_EXPORT_COMPONENT(
 			"Schema Definition Language SDL Class Generator Tree Item Model")
 
 I_EXPORT_COMPONENT(
-	SdlClassJsonModificator,
-	"The C++ class modificator, adds loading generated SDL types from JSON value",
-	"Schema Definition Language SDL Class Generator JSON")
+			SdlClassJsonModificator,
+			"The C++ class modificator, adds loading generated SDL types from JSON value",
+			"Schema Definition Language SDL Class Generator JSON")
 
 I_EXPORT_COMPONENT(
 			SdlClassGqlModificator,
@@ -99,6 +99,11 @@ I_EXPORT_COMPONENT(
 			FileFinalizer,
 			"A processor that finalizes files",
 			"SDL Class File Finalize Generated")
+
+I_EXPORT_COMPONENT(
+			SdlEnumGenerator,
+			"A processor that creating C++ enums from SDL schema",
+			"Schema Definition Language SDL Class Generator Enum")
 
 } // namespace ImtSdlGenPck
 

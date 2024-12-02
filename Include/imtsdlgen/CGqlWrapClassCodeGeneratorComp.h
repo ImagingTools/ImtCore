@@ -33,6 +33,7 @@ public:
 	I_BEGIN_COMPONENT(CGqlWrapClassCodeGeneratorComp)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
+		I_ASSIGN(m_sdlEnumListCompPtr, "SdlEnumListProvider", "SDL enums used to create a code", true, "SdlEnumListProvider")
 		I_ASSIGN(m_sdlRequestListCompPtr, "SdlRequestListProvider", "SDL requests used to create a GraphQL wrap code", true, "SdlRequestListProvider")
 		I_ASSIGN(m_filesJoinerCompPtr, "FilesJoiner", "Compoment, used to join files into a single", false, "FilesJoiner")
 		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
@@ -87,6 +88,7 @@ private:
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(imtsdl::ISdlTypeListProvider, m_sdlTypeListCompPtr);
+	I_REF(imtsdl::ISdlEnumListProvider, m_sdlEnumListCompPtr);
 	I_REF(imtsdl::ISdlRequestListProvider, m_sdlRequestListCompPtr);
 	I_REF(iproc::IProcessor, m_filesJoinerCompPtr);
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);

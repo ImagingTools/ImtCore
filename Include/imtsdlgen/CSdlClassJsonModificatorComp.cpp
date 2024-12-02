@@ -98,16 +98,25 @@ void CSdlClassJsonModificatorComp::AddFieldWriteToJsonCode(QTextStream& stream, 
 {
 	bool isArray = false;
 	bool isCustom = false;
-	ConvertType(field, &isCustom, nullptr, &isArray);
+	bool isEnum = false;
+	const QString convertedType = ConvertTypeWithNamespace(
+		field,
+		m_originalSchemaNamespaceCompPtr->GetText(),
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		&isCustom,
+		nullptr,
+		&isArray,
+		&isEnum);
 	FeedStream(stream, 1, false);
 
-	if (isCustom && isArray){
+	if ((isCustom && !isEnum) && isArray){
 		AddCustomArrayFieldWriteToJsonCode(stream, field);
 
 		return;
 	}
 
-	else if (isCustom){
+	else if (isCustom && !isEnum){
 		AddCustomFieldWriteToJsonCode(stream, field);
 
 		return;
@@ -130,19 +139,62 @@ void CSdlClassJsonModificatorComp::AddFieldWriteToJsonCode(QTextStream& stream, 
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("jsonObject[\"") << field.GetId() << QStringLiteral("\"] = ");
-		stream << QStringLiteral("QJsonValue::fromVariant(m_");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral(");");
+		if (isEnum){
+			const QString enumSourceVarName = QStringLiteral("m_") +  GetDecapitalizedValue(field.GetId());
+			const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+
+			// declare target value, to store value
+			stream << QStringLiteral("QString ");
+			stream << enumConvertedVarName << ';';
+			FeedStream(stream, 1, false);
+
+			imtsdl::CSdlEnum foundEnum;
+			[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+			Q_ASSERT(found);
+
+			WriteConversionFromEnum(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText());
+
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("jsonObject[\"") << field.GetId() << QStringLiteral("\"] = ");
+			stream << enumConvertedVarName << ';';
+		}
+		else {
+			stream << QStringLiteral("jsonObject[\"") << field.GetId() << QStringLiteral("\"] = ");
+			stream << QStringLiteral("QJsonValue::fromVariant(m_");
+			stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral(");");
+		}
 	}
 	else {
 		stream << QStringLiteral("if (");
 		stream << FromInternalMapCheckString(field);
 		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
+
 		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("jsonObject[\"") << field.GetId() << QStringLiteral("\"] = ");
-		stream << QStringLiteral("QJsonValue::fromVariant(m_");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral(");");
+		if (isEnum){
+			const QString enumSourceVarName = QStringLiteral("m_") +  GetDecapitalizedValue(field.GetId());
+			const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+
+			// declare target value, to store value
+			stream << QStringLiteral("QString ");
+			stream << enumConvertedVarName << ';';
+			FeedStream(stream, 1, false);
+
+			imtsdl::CSdlEnum foundEnum;
+			[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+			Q_ASSERT(found);
+
+			WriteConversionFromEnum(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), 2);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("jsonObject[\"") << field.GetId() << QStringLiteral("\"] = ");
+			stream << enumConvertedVarName << ';';
+		}
+		else {
+			stream << QStringLiteral("jsonObject[\"") << field.GetId() << QStringLiteral("\"] = ");
+			stream << QStringLiteral("QJsonValue::fromVariant(m_");
+			stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral(");");
+		}
 		stream << QStringLiteral("\n\t}");
 	}
 }
@@ -152,13 +204,22 @@ void CSdlClassJsonModificatorComp::AddFieldReadFromJsonCode(QTextStream& stream,
 {
 	bool isArray = false;
 	bool isCustom = false;
-	ConvertType(field, &isCustom, nullptr, &isArray);
-	if (isCustom && isArray){
+	bool isEnum = false;
+	const QString convertedType = ConvertTypeWithNamespace(
+		field,
+		m_originalSchemaNamespaceCompPtr->GetText(),
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		&isCustom,
+		nullptr,
+		&isArray,
+		&isEnum);
+	if ((isCustom && !isEnum) && isArray){
 		AddCustomArrayFieldReadFromJsonCode(stream, field);
 		return;
 	}
 
-	else if (isCustom){
+	else if ((isCustom && !isEnum)){
 		AddCustomFieldReadFromJsonCode(stream, field);
 		return;
 	}
@@ -175,6 +236,7 @@ void CSdlClassJsonModificatorComp::AddFieldReadFromJsonCode(QTextStream& stream,
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(").toVariant();");
 	FeedStream(stream, 1, false);
+
 	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
@@ -189,9 +251,39 @@ void CSdlClassJsonModificatorComp::AddFieldReadFromJsonCode(QTextStream& stream,
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
-		stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		if (isEnum){
+			const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
+			const QString enumSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+			const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("EnumValue");
+
+			// declare target value, to store value
+			stream << convertedType << ' ' << enumConvertedVarName << ';';
+			FeedStream(stream, 1, false);
+
+			// declare temp value, to store string equivalent
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("QString ");
+			stream << enumSourceVarName;
+			stream << QStringLiteral(" = ");
+			stream << dataVarName;
+			stream << QStringLiteral(".toString();");
+			FeedStream(stream, 1, false);
+
+			imtsdl::CSdlEnum foundEnum;
+			[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+			Q_ASSERT(found);
+
+			WriteConversionFromString(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText());
+
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
+			stream << enumConvertedVarName << QStringLiteral(");");
+		}
+		else {
+			stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
+			stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
+			stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		}
 		FeedStream(stream, 1, false);
 	}
 	else {
@@ -199,9 +291,39 @@ void CSdlClassJsonModificatorComp::AddFieldReadFromJsonCode(QTextStream& stream,
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
-		stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		if (isEnum){
+			const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
+			const QString enumSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+			const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("EnumValue");
+
+			// declare target value, to store value
+			stream << convertedType << ' ' << enumConvertedVarName << ';';
+			FeedStream(stream, 1, false);
+
+			// declare temp value, to store string equivalent
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("QString ");
+			stream << enumSourceVarName;
+			stream << QStringLiteral(" = ");
+			stream << dataVarName;
+			stream << QStringLiteral(".toString();");
+			FeedStream(stream, 1, false);
+
+			imtsdl::CSdlEnum foundEnum;
+			[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+			Q_ASSERT(found);
+
+			WriteConversionFromString(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), 2);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
+			stream << enumConvertedVarName << QStringLiteral(");");
+		}
+		else {
+			stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
+			stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
+			stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		}
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
@@ -364,7 +486,7 @@ void CSdlClassJsonModificatorComp::AddCustomFieldReadFromJsonImplCode(QTextStrea
 	FeedStreamHorizontally(stream, hIndents);
 
 	// define readed container
-	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr);
+	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
 	stream << ' ' << GetDecapitalizedValue(field.GetId()) << ';';
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
@@ -373,7 +495,7 @@ void CSdlClassJsonModificatorComp::AddCustomFieldReadFromJsonImplCode(QTextStrea
 	stream << QStringLiteral("const bool is");
 	stream << GetCapitalizedValue(field.GetId());
 	stream << QStringLiteral("Readed = ");
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	stream << QStringLiteral("::ReadFromJsonObject(");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral(", jsonObject[\"");
@@ -459,7 +581,7 @@ void CSdlClassJsonModificatorComp::AddArrayFieldReadFromJsonImplCode(QTextStream
 	// declare temp list var
 	const QString listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("List");
 	FeedStreamHorizontally(stream, hIndents);
-	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr);
+	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
 	stream <<  ' ' << listVariableName << ';';
 	FeedStream(stream, 1, false);
 
@@ -655,7 +777,7 @@ void CSdlClassJsonModificatorComp:: AddCustomArrayFieldReadToJsonImplCode(
 	// declare temp list var
 	const QString listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("List");
 	FeedStreamHorizontally(stream, hIndents);
-	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr);
+	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
 	stream << ' ' << listVariableName << ';';
 	FeedStream(stream, 1, false);
 
@@ -669,14 +791,14 @@ void CSdlClassJsonModificatorComp:: AddCustomArrayFieldReadToJsonImplCode(
 
 	// inLoop: declare temp var
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	stream << ' ' << GetDecapitalizedValue(field.GetId()) << ';';
 	FeedStream(stream, 1, false);
 
 	// inLoop: read and checks
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("if (!");
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	stream << QStringLiteral("::ReadFromJsonObject(");
 	stream << GetDecapitalizedValue(field.GetId()) << ',' << ' ';
 	stream << arrayVariableName << '[';

@@ -40,6 +40,7 @@ public:
 	I_BEGIN_COMPONENT(CGqlSchemaParserComp)
 		I_REGISTER_INTERFACE(iproc::IProcessor)
 		I_REGISTER_INTERFACE(ISdlTypeListProvider)
+		I_REGISTER_INTERFACE(ISdlEnumListProvider)
 		I_REGISTER_INTERFACE(ISdlRequestListProvider)
 		I_REGISTER_INTERFACE(ISdlDocumentTypeListProvider)
 		I_REGISTER_SUBELEMENT(SchemaCustomParams)

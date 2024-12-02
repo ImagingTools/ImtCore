@@ -12,7 +12,9 @@
 // ImtCore includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
+#include <imtsdl/ISdlEnumListProvider.h>
 #include <imtsdl/CSdlTools.h>
+#include <imtsdl/CSdlEnumConverter.h>
 #include <imtsdlgen/IIncludeDirectivesProvider.h>
 
 
@@ -26,7 +28,8 @@ namespace imtsdlgen
 class CSdlClassModificatorBaseComp:
 			public iproc::CSyncProcessorCompBase,
 			public IIncludeDirectivesProvider,
-			protected imtsdl::CSdlTools
+			protected imtsdl::CSdlTools,
+			protected imtsdl::CSdlEnumConverter
 {
 
 	/**
@@ -46,6 +49,7 @@ public:
 		I_ASSIGN(m_processorModificatorNameAttrPtr, "ProcessModificatorName", "The name, allows to do processing, received from arguments in 'modificators' section", false, "<NEED_TO_SET!>")
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
+		I_ASSIGN(m_sdlEnumListCompPtr, "SdlEnumListProvider", "SDL enums used to create a code", true, "SdlEnumListProvider")
 		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
 	I_END_COMPONENT;
 
@@ -70,6 +74,7 @@ protected:
 	I_ATTR(QString, m_processorModificatorNameAttrPtr);
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(imtsdl::ISdlTypeListProvider, m_sdlTypeListCompPtr);
+	I_REF(imtsdl::ISdlEnumListProvider, m_sdlEnumListCompPtr);
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);
 
 	istd::TDelPtr<QFile> m_headerFilePtr;

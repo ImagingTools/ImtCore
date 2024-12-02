@@ -1,4 +1,4 @@
-#include <imtsdl/SdlCache.h>
+#include <imtsdl/CSdlCache.h>
 
 
 /// \file CCacheEntry.cpp

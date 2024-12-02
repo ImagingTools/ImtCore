@@ -154,9 +154,31 @@ SdlFieldList CGqlSchemaParser::GetFields(const QString typeName) const
 }
 
 
+// reimplemented (ISdlRequestListProvider)
+
 SdlRequestList CGqlSchemaParser::GetRequests() const
 {
 	return m_requests;
+}
+
+
+// reimplemented (ISdlEnumListProvider)
+
+SdlEnumList CGqlSchemaParser::GetEnums(bool onlyLocal) const
+{
+	SdlEnumList retVal = m_enums;
+
+	if (onlyLocal){
+		QMutableListIterator enumIter(retVal);
+		while (enumIter.hasNext()){
+			CSdlEnum enumType = enumIter.next();
+			if (enumType.IsExternal()){
+				enumIter.remove();
+			}
+		}
+	}
+
+	return retVal;
 }
 
 
@@ -316,13 +338,32 @@ bool CGqlSchemaParser::ProcessScalar()
 
 bool CGqlSchemaParser::ProcessEnum()
 {
-	bool retVal = false;
-		SendLogMessage(
-				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
-				0,
-				QString("Process enum is not implemented yet"),
-				"CGqlSchemaParser");
-	Q_ASSERT(retVal);
+	bool retVal = true;
+
+	CSdlEnum currentEnum;
+	currentEnum.SetSchemaParamsPtr(m_schemaParamsPtr);
+	QByteArray enumName;
+	retVal = ReadToDelimeterOrSpace("{",enumName);
+	currentEnum.SetName(enumName);
+
+	bool atEnd = false;
+	while (!atEnd){
+		retVal = retVal && MoveToNextReadableSymbol();
+		QByteArray enumValue;
+		char foundDelimeter = '}';
+		retVal = retVal && ReadToDelimeterOrSpace("}", enumValue, &foundDelimeter);
+		if (enumValue.isEmpty()){
+			atEnd = bool(!retVal || foundDelimeter == '}');
+			continue;
+		}
+		const QString convertedEnumValue = ConvertEnumValueToStringEquivalent(enumValue);
+
+		currentEnum.AddValue(std::make_pair(QString(enumValue), convertedEnumValue));
+
+		atEnd = bool(!retVal || foundDelimeter == '}');
+	}
+
+	m_enums << currentEnum;
 
 	return retVal;
 }
@@ -532,8 +573,7 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 		for (const CSdlField& argument: allArguments){
 			bool isCustom = false;
 			CSdlTools::ConvertType(argument, &isCustom);
-			CSdlType dummy;
-			if (isCustom && !CSdlTools::GetSdlTypeForField(argument, m_sdlTypes, dummy)){
+			if (isCustom && !CSdlTools::EnsureFieldHasValidType(argument, m_sdlTypes, m_enums)){
 				QString errorString = QString("Schema error! Request '%1' has field '%2' with unknown type '%3' at line %4")
 				.arg(request.GetName(),
 					 argument.GetId(),
@@ -587,8 +627,7 @@ bool CGqlSchemaParser::ValidateSchema()
 		for (const CSdlField& sdlField: sdlType.GetFields()){
 			bool isCustom = false;
 			CSdlTools::ConvertType(sdlField, &isCustom);
-			CSdlType dummy;
-			if (isCustom && !CSdlTools::GetSdlTypeForField(sdlField, m_sdlTypes, dummy)){
+			if (isCustom && !CSdlTools::EnsureFieldHasValidType(sdlField, m_sdlTypes, m_enums)){
 				QString errorString = QString("Schema error! Type '%1' has field '%2' with unknown type '%3' at %4")
 							.arg(sdlType.GetName(),
 							sdlField.GetId(),

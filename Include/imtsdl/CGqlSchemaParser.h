@@ -13,7 +13,10 @@
 // ImtCore includes
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlRequestListProvider.h>
+#include <imtsdl/ISdlEnumListProvider.h>
 #include <imtsdl/CSdlRequest.h>
+#include <imtsdl/CSdlEnumConverter.h>
+#include <imtsdl/CSdlEnum.h>
 
 
 namespace iprm {
@@ -34,7 +37,9 @@ class CGqlSchemaParser:
 			virtual public istd::IPolymorphic,
 			virtual public ISdlTypeListProvider,
 			virtual public ISdlRequestListProvider,
-			virtual protected istd::ILogger
+			virtual public ISdlEnumListProvider,
+			virtual protected istd::ILogger,
+			private CSdlEnumConverter
 {
 
 	Q_DISABLE_COPY(CGqlSchemaParser)
@@ -54,6 +59,9 @@ public:
 
 	// reimplemented (ISdlRequestListProvider)
 	virtual SdlRequestList GetRequests() const override;
+
+	// reimplemented (ISdlEnumListProvider)
+	virtual SdlEnumList GetEnums(bool onlyLocal) const override;
 
 protected:
 	virtual bool ProcessSchema();
@@ -117,10 +125,12 @@ protected:
 
 	SdlTypeList m_sdlTypes;
 	SdlRequestList m_requests;
+	SdlEnumList m_enums;
 
 	/**
 		\brief saved schema parameters, declarated in .sdl file
 		\note this parameter is NEVER null
+		\warning this parameter MUST NOT be setted to nullptr
 		\code m_schemaParamsPtr != nullptr // = true \endcode
 	 */
 	std::shared_ptr<iprm::CParamsSet> m_schemaParamsPtr;

@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5324" Description="ACF"/>
+            <Version Id="0" Number="5311" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
@@ -168,6 +168,9 @@
                                 <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
@@ -205,6 +208,9 @@
                                     <Data IsEnabled="true" Value="SdlCoreFramework/OriginalNamespace"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="">
@@ -307,6 +313,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>CppCodeGeneratorFramework/SdlClassCodeGenerator</Value>
+                                            <Value>CppCodeGeneratorFramework/SdlEnumGenerator</Value>
                                             <Value>CppCodeGeneratorFramework/GqlWrapClassCodeGenerator</Value>
                                             <Value>CppCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator</Value>
                                             <Value>CppCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>

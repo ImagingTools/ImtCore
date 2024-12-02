@@ -47,6 +47,7 @@ private:
 	void AddCustomArrayFieldReadFromJsonCode(QTextStream& stream, const imtsdl::CSdlField& field);
 	void AddCustomArrayFieldReadToJsonImplCode(QTextStream& stream, const imtsdl::CSdlField& field, quint16 hIndents = 1);
 	void AddJsonValueCheckAndConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected = true, quint16 hIndents = 1);
+
 };
 
 

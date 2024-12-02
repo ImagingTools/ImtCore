@@ -40,6 +40,9 @@
                     <AttributeInfo Id="ProcessModificatorName" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="GraphQL"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -124,6 +127,9 @@
                     <AttributeInfo Id="ProcessModificatorName" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="JSON"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -153,6 +159,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ProcessModificatorName" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="TreeModel"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
                         <Data IsEnabled="false"/>

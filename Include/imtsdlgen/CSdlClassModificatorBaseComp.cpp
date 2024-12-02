@@ -32,6 +32,7 @@ int CSdlClassModificatorBaseComp::DoProcessing(
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
+	Q_ASSERT(m_sdlEnumListCompPtr.IsValid());
 
 	iproc::IProcessor::TaskState retVal = iproc::IProcessor::TS_OK;
 	if (!m_argumentParserCompPtr->IsModificatorEnabled(*m_processorModificatorNameAttrPtr)){

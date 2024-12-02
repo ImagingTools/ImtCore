@@ -776,7 +776,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 
 	// [1] create payload variable by calling reimplemented method
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << OptListConvertTypeWithNamespace(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	stream << QStringLiteral(" replyPayload = On");
 	stream << s_nonTrivialOperationMethodsMap[operationType] << '(';
 	stream << GetDecapitalizedValue(requestClassName);

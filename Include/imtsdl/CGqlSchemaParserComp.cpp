@@ -9,6 +9,7 @@
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
 #include <iprm/TParamsPtr.h>
+#include <iprm/CTextParam.h>
 #include <ifile/CFileNameParam.h>
 
 // ImtCore includes
@@ -526,6 +527,16 @@ bool CGqlSchemaParserComp::ValidateSchema()
 		return false;
 	}
 
+	if (!m_schemaParamsPtr->GetParamIds().contains(SdlCustomSchemaKeys::SchemaNamespace.toUtf8())){
+		const QString argumentNamespace = m_argumentParserCompPtr->GetNamespace();
+		if (!argumentNamespace.isEmpty()){
+			iprm::CTextParam* nameParamPtr = new iprm::CTextParam;
+			nameParamPtr->SetText(argumentNamespace);
+			const bool isSet = m_schemaParamsPtr->SetEditableParameter(SdlCustomSchemaKeys::SchemaNamespace.toUtf8(), nameParamPtr, true);
+			Q_ASSERT(isSet);
+		}
+	}
+
 	ISdlProcessArgumentsParser::AutoLinkLevel autoLinkLevel = m_argumentParserCompPtr->GetAutoLinkLevel();
 
 	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled() && !m_argumentParserCompPtr->IsDependenciesMode()){
@@ -599,6 +610,27 @@ bool CGqlSchemaParserComp::ValidateSchema()
 				const bool isSet = UpdateTypeInfo(sdlType, m_schemaParamsPtr.get(), m_argumentParserCompPtr.GetPtr());
 				if (!isSet){
 					SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlType.GetName(), m_currentSchemaFilePath));
+
+					return false;
+				}
+			}
+		}
+	}
+
+	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled() && !m_argumentParserCompPtr->IsDependenciesMode()){
+		for (CSdlEnum& sdlEnum: m_enums){
+			bool isExternal = sdlEnum.IsExternal();
+
+			if (isExternal){
+				// if external, that mean, it is already processed
+				continue;
+			}
+
+			sdlEnum.SetExternal(isExternal);
+			if (!isExternal){
+				const bool isSet = UpdateTypeInfo(sdlEnum, m_schemaParamsPtr.get(), m_argumentParserCompPtr.GetPtr());
+				if (!isSet){
+					SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlEnum.GetName(), m_currentSchemaFilePath));
 
 					return false;
 				}

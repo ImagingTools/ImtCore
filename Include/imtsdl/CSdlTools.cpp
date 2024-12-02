@@ -42,26 +42,39 @@ void CSdlTools::WrapTypeToList(QString& text)
 QString CSdlTools::ConvertTypeWithNamespace(
 			const CSdlField& sdlField,
 			const QString& relatedNamespace,
-			ISdlTypeListProvider& listProvider,
+			const ISdlTypeListProvider& listProvider,
+			const ISdlEnumListProvider& enumProvider,
 			bool* isCustomPtr,
 			bool* isComplexPtr,
-			bool* isArrayPtr)
+			bool* isArrayPtr,
+			bool* isEnumPtr)
 {
 	return OptListConvertTypeWithNamespace(
 				sdlField,
 				relatedNamespace,
 				listProvider,
+				enumProvider,
 				true,
 				isCustomPtr,
 				isComplexPtr,
-				isArrayPtr);
+				isArrayPtr,
+				isEnumPtr);
 }
 
 
-QString CSdlTools::OptListConvertTypeWithNamespace(const CSdlField& sdlField, const QString& relatedNamespace, ISdlTypeListProvider& listProvider, bool listWrap, bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
+QString CSdlTools::OptListConvertTypeWithNamespace(
+			const CSdlField& sdlField,
+			const QString& relatedNamespace,
+			const ISdlTypeListProvider& listProvider,
+			const ISdlEnumListProvider& enumProvider,
+			bool listWrap,
+			bool* isCustomPtr,
+			bool* isComplexPtr,
+			bool* isArrayPtr,
+			bool* isEnumPtr)
 {
 	bool _isCustom = false;
-	QString retVal = ConvertType(sdlField.GetType(), &_isCustom, isComplexPtr);
+	QString retVal = ConvertTypeOrEnum(sdlField, enumProvider.GetEnums(false), &_isCustom, isComplexPtr, isArrayPtr, isEnumPtr);
 	if (isCustomPtr != nullptr){
 		*isCustomPtr = _isCustom;
 	}
@@ -71,18 +84,25 @@ QString CSdlTools::OptListConvertTypeWithNamespace(const CSdlField& sdlField, co
 
 	if (!_isCustom){
 		// we can define namespace only for custom types
-		if (listWrap && sdlField.IsArray()){
-			WrapTypeToList(retVal);
-		}
-
 		return retVal;
 	}
 
 	if (!relatedNamespace.isEmpty()){
 		CSdlType typeForField;
-		const bool isFound = GetSdlTypeForField(sdlField, listProvider.GetSdlTypes(false), typeForField);
-		Q_ASSERT(isFound);
-		QString typeNamespace = typeForField.GetNamespace();
+		CSdlEnum enumForField;
+		const bool isType = GetSdlTypeForField(sdlField, listProvider.GetSdlTypes(false), typeForField);
+		[[maybe_unused]] const bool isEnum = GetSdlEnumForField(sdlField, enumProvider.GetEnums(false), enumForField);
+
+		Q_ASSERT(isType || isEnum);
+
+		QString typeNamespace;
+		if (isType){
+			typeNamespace = typeForField.GetNamespace();
+		}
+		else {
+			typeNamespace = BuildNamespaceFromParams(enumForField.GetSchemaParams()) ;
+			typeNamespace += QStringLiteral("::") + enumForField.GetName();
+		}
 		if (typeNamespace != relatedNamespace){
 			while (!typeNamespace.endsWith(QStringLiteral("::"))){
 				typeNamespace.append(':');
@@ -105,33 +125,14 @@ QString CSdlTools::OptListConvertTypeWithNamespace(const CSdlField& sdlField, co
 
 QString CSdlTools::ConvertType(const CSdlField& sdlField, bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
 {
-	QString retVal;
-	if (sdlField.IsArray()){
-		retVal += QStringLiteral("QList<");
-		if (isArrayPtr != nullptr){
-			*isArrayPtr = true;
-		}
-	}
-	else {
-		if (isArrayPtr != nullptr){
-			*isArrayPtr = false;
-		}
-	}
-
-	retVal += ConvertType(sdlField.GetType(), isCustomPtr, isComplexPtr);
-
-	if (sdlField.IsArray()){
-		retVal += QStringLiteral(">");
-	}
-
-	return retVal;
+	return ConvertTypeOrEnum(sdlField, SdlEnumList(), isCustomPtr, isComplexPtr, isArrayPtr);
 }
 
 
-QString CSdlTools::ConvertType(const QString& sdlType, bool* isCustomPtr, bool* isComplexPtr)
+QString CSdlTools::ConvertType(const QString& sdlTypeName, bool* isCustomPtr, bool* isComplexPtr)
 {
 	// A signed 32‐bit integer
-	if (sdlType == QStringLiteral("Int") || sdlType == QStringLiteral("Integer")){
+	if (sdlTypeName == QStringLiteral("Int") || sdlTypeName == QStringLiteral("Integer")){
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
 		}
@@ -142,7 +143,7 @@ QString CSdlTools::ConvertType(const QString& sdlType, bool* isCustomPtr, bool* 
 		return QStringLiteral("int");
 	}
 
-	if (sdlType == QStringLiteral("Long")){
+	if (sdlTypeName == QStringLiteral("Long")){
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
 		}
@@ -153,7 +154,7 @@ QString CSdlTools::ConvertType(const QString& sdlType, bool* isCustomPtr, bool* 
 		return QStringLiteral("long");
 	}
 
-	if (sdlType == QStringLiteral("LongLong")){
+	if (sdlTypeName == QStringLiteral("LongLong")){
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
 		}
@@ -165,7 +166,7 @@ QString CSdlTools::ConvertType(const QString& sdlType, bool* isCustomPtr, bool* 
 	}
 
 	// A signed double-precision floating-point value
-	if (sdlType == QStringLiteral("Float")){
+	if (sdlTypeName == QStringLiteral("Float")){
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
 		}
@@ -177,7 +178,7 @@ QString CSdlTools::ConvertType(const QString& sdlType, bool* isCustomPtr, bool* 
 	}
 
 	// A signed double-precision floating-point value
-	if (sdlType == QStringLiteral("Double")){
+	if (sdlTypeName == QStringLiteral("Double")){
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
 		}
@@ -189,7 +190,7 @@ QString CSdlTools::ConvertType(const QString& sdlType, bool* isCustomPtr, bool* 
 	}
 
 	// A UTF‐8 character sequence
-	if (sdlType == QStringLiteral("String")){
+	if (sdlTypeName == QStringLiteral("String")){
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
 		}
@@ -201,7 +202,7 @@ QString CSdlTools::ConvertType(const QString& sdlType, bool* isCustomPtr, bool* 
 	}
 
 	// true or false
-	if (sdlType == QStringLiteral("Boolean") || sdlType == QStringLiteral("Bool")){
+	if (sdlTypeName == QStringLiteral("Boolean") || sdlTypeName == QStringLiteral("Bool")){
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
 		}
@@ -213,7 +214,7 @@ QString CSdlTools::ConvertType(const QString& sdlType, bool* isCustomPtr, bool* 
 	}
 
 	// (serialized as a String): A unique identifier that's often used to refetch an object or as the key for a cache.
-	if (sdlType == QStringLiteral("ID")){
+	if (sdlTypeName == QStringLiteral("ID")){
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
 		}
@@ -232,7 +233,52 @@ QString CSdlTools::ConvertType(const QString& sdlType, bool* isCustomPtr, bool* 
 		*isComplexPtr = true;
 	}
 
-	return QStringLiteral("C") + sdlType;
+	return QStringLiteral("C") + sdlTypeName;
+}
+
+
+QString CSdlTools::ConvertTypeOrEnum(const CSdlField& sdlField, const SdlEnumList& enumList, bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr, bool* isEnumPtr)
+{
+	if (isEnumPtr != nullptr){
+		*isEnumPtr = false;
+	}
+
+	QString retVal;
+	if (sdlField.IsArray()){
+		if (isArrayPtr != nullptr){
+			*isArrayPtr = true;
+		}
+	}
+	else {
+		if (isArrayPtr != nullptr){
+			*isArrayPtr = false;
+		}
+	}
+
+	bool isComplex = false;
+
+	QString fieldTypeName = ConvertType(sdlField.GetType(), isCustomPtr, &isComplex);
+
+	// maybe it is a enum
+	if (isComplex && !enumList.isEmpty()){
+		CSdlEnum foundEnum;
+		const bool found = GetSdlEnumForField(sdlField, enumList, foundEnum);
+		if (found){
+			fieldTypeName = foundEnum.GetName();
+			isComplex = false;
+			if (isEnumPtr != nullptr){
+				*isEnumPtr = true;
+			}
+		}
+	}
+
+	retVal += fieldTypeName;
+
+	if (isComplexPtr != nullptr){
+		*isComplexPtr = isComplex;
+	}
+
+	return retVal;
 }
 
 
@@ -556,6 +602,15 @@ QString CSdlTools::FromInternalMapCheckString(const CSdlField& sdlField)
 }
 
 
+bool CSdlTools::EnsureFieldHasValidType(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList)
+{
+	CSdlType dummyType;
+	CSdlEnum dummyEnum;
+
+	return GetSdlTypeForField(sdlField, typeList, dummyType) || GetSdlEnumForField(sdlField, enumList, dummyEnum);
+}
+
+
 bool CSdlTools::GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList& typeList, CSdlType& sdlType)
 {
 	for (const CSdlType& type: typeList){
@@ -567,6 +622,41 @@ bool CSdlTools::GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList&
 	}
 
 	return false;
+}
+
+
+bool CSdlTools::GetSdlEnumForField(const CSdlField& sdlField, const SdlEnumList& enumList, CSdlEnum& sdlEnum)
+{
+	for (const CSdlEnum& enumElement: enumList){
+		if (enumElement.GetName() == sdlField.GetType()){
+			sdlEnum = enumElement;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+std::shared_ptr<CSdlEntryBase> CSdlTools::GetSdlTypeOrEnumForField(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList)
+{
+	std::shared_ptr<CSdlEntryBase> retVal;
+
+	std::shared_ptr<CSdlType> typePtr(new CSdlType);
+	const bool isType = GetSdlTypeForField(sdlField, typeList, *typePtr);
+	if (isType){
+		retVal = typePtr;
+	}
+	else {
+		std::shared_ptr<CSdlEnum> sdlEnumPtr(new CSdlEnum);
+		const bool isEnum = GetSdlEnumForField(sdlField, enumList, *sdlEnumPtr);
+		if (isEnum){
+			retVal = sdlEnumPtr;
+		}
+	}
+
+	return retVal;
 }
 
 
@@ -801,7 +891,7 @@ QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const 
 }
 
 
-bool CSdlTools::UpdateTypeInfo(CSdlType& sdlType, const iprm::IParamsSet* schemaParamsPtr, const ISdlProcessArgumentsParser* argumentParserPtr)
+bool CSdlTools::UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* schemaParamsPtr, const ISdlProcessArgumentsParser* argumentParserPtr)
 {
 	if (argumentParserPtr == nullptr){
 		return false;
@@ -819,10 +909,17 @@ bool CSdlTools::UpdateTypeInfo(CSdlType& sdlType, const iprm::IParamsSet* schema
 	}
 	else {
 		if(joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType)){
-			sdlType.SetTargetHeaderFilePath(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_headerFileType]));
+			sdlEntry.SetTargetHeaderFilePath(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_headerFileType]));
 		}
 		else {
-			sdlType.SetTargetHeaderFilePath(QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
+			CSdlType* sdlTypePtr = dynamic_cast<CSdlType*>(&sdlEntry);
+			if (sdlTypePtr != nullptr){
+				sdlTypePtr->SetTargetHeaderFilePath(QString(outputDirectoryPath + "/C" + sdlTypePtr->GetName() + ".h"));
+			}
+			else {
+				CSdlEnum* sdlEnumPtr = dynamic_cast<CSdlEnum*>(&sdlEntry);
+				sdlEnumPtr->SetTargetHeaderFilePath(QString(outputDirectoryPath + "/" + sdlEnumPtr->GetName() + ".h"));
+			}
 		}
 	}
 
@@ -1002,12 +1099,25 @@ void CSdlTools::PrintFiles(std::ostream& outStream, const QStringList& files, IS
 }
 
 
-QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, const QStringList& lookupPaths)
+QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntry, const QStringList& lookupPaths)
 {
 	/// \todo cleanup it. use correct names, add checks
-	const QString typeNamspace = sdlType.GetNamespace();
-	const QString typeClassName = 'C' + GetCapitalizedValue(sdlType.GetName());
 
+	const CSdlType* sdlTypePtr = dynamic_cast<const CSdlType*>(&sdlEntry);
+	QString typeNamspace;
+	QString typeClassName;
+
+	if (sdlTypePtr != nullptr){
+		typeNamspace = sdlTypePtr->GetNamespace();
+		typeClassName = 'C' + GetCapitalizedValue(sdlTypePtr->GetName());
+	}
+	else {
+		const CSdlEnum* enumPtr = dynamic_cast<const CSdlEnum*>(&sdlEntry);
+		typeNamspace = BuildNamespaceFromParams(enumPtr->GetSchemaParams());
+		typeClassName = GetCapitalizedValue(enumPtr->GetName());
+	}
+
+	/// \todo remove it
 	for (const QString& path: lookupPaths){
 		QDir currentDir(path);
 		QDirIterator dirIterator(path, QStringList() << "*.h", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
@@ -1056,7 +1166,7 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlType& sdlType, con
 		}
 	}
 
-	const QString targetPath = sdlType.GetTargetHeaderFilePath();
+	const QString targetPath = sdlEntry.GetTargetHeaderFilePath();
 	if (!targetPath.isEmpty()){
 		for (const QString& path: lookupPaths){
 			const QString cleanPath = QDir::cleanPath(path);
