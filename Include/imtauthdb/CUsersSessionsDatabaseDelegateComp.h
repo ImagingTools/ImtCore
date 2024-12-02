@@ -46,6 +46,7 @@ public:
 				const QByteArray& objectId,
 				const QString& description,
 				const imtbase::IOperationContext* operationContextPtr) const override;
+	QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 };
 
 

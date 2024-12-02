@@ -108,6 +108,12 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateDescriptionObjectQuery(
 }
 
 
+QByteArray CUsersSessionsDatabaseDelegateComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
+{
+	return QByteArray("Session");
+}
+
+
 } // namespace imtauthdb
 
 
