@@ -59,26 +59,30 @@ int CFileFinalizerComp::DoProcessing(
 
 	int retVal = TS_OK;
 
-	const QFileInfo joinedHeaderFileInfo(joinedHeaderFilePath);
-	if (joinedHeaderFileInfo.exists() && joinedHeaderFileInfo.isFile()){
-		retVal = CleanupFile(joinedHeaderFilePath);
-		if (retVal != TS_OK){
-			return retVal;
+	if (!joinedHeaderFilePath.isEmpty()){
+		const QFileInfo joinedHeaderFileInfo(joinedHeaderFilePath);
+		if (joinedHeaderFileInfo.exists() && joinedHeaderFileInfo.isFile()){
+			retVal = CleanupFile(joinedHeaderFilePath);
+			if (retVal != TS_OK){
+				return retVal;
+			}
 		}
-	}
-	else {
-		SendWarningMessage(0, QString("File '%1' is not exists. Cleanup skipped").arg(joinedHeaderFilePath));
+		else {
+			SendWarningMessage(0, QString("File '%1' is not exists. Cleanup skipped").arg(joinedHeaderFilePath));
+		}
 	}
 
-	const QFileInfo joinedSourceFileInfo(joinedSourceFilePath);
-	if (joinedSourceFileInfo.exists() && joinedSourceFileInfo.isFile()){
-		retVal = CleanupFile(joinedSourceFilePath);
-		if (retVal != TS_OK){
-			return retVal;
+	if (!joinedSourceFilePath.isEmpty()){
+		const QFileInfo joinedSourceFileInfo(joinedSourceFilePath);
+		if (joinedSourceFileInfo.exists() && joinedSourceFileInfo.isFile()){
+			retVal = CleanupFile(joinedSourceFilePath);
+			if (retVal != TS_OK){
+				return retVal;
+			}
 		}
-	}
-	else {
-		SendWarningMessage(0, QString("File '%1' is not exists. Cleanup skipped").arg(joinedSourceFilePath));
+		else {
+			SendWarningMessage(0, QString("File '%1' is not exists. Cleanup skipped").arg(joinedSourceFilePath));
+		}
 	}
 
 	return TS_OK;
