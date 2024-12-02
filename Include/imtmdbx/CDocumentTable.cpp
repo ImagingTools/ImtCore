@@ -643,19 +643,25 @@ bool CDocumentTable::RemoveDocument()
 {
 	bool ok = false;
 
-	mdbx::slice valueSlice;
-	mdbx::cursor::move_result result = m_cursor.current(false);
+	try {
+		mdbx::slice valueSlice;
+		mdbx::cursor::move_result result = m_cursor.current(false);
 
-	if (result.done){
-		valueSlice = result.value;
-		ok = m_cursor.erase();
-	}
-
-	if(m_hasIndex){
-		mdbx::cursor::move_result resultIndex = m_cursorIndex.find(valueSlice, false);
-		if(resultIndex.done){
-			ok = ok && m_cursorIndex.erase();
+		if (result.done){
+			valueSlice = result.value;
+			ok = m_cursor.erase();
 		}
+
+		if(m_hasIndex){
+			mdbx::cursor::move_result resultIndex = m_cursorIndex.find(valueSlice, false);
+			if(resultIndex.done){
+				ok = ok && m_cursorIndex.erase();
+			}
+		}
+
+	}
+	catch (...) {
+		return false;
 	}
 
 	return ok;
@@ -666,30 +672,37 @@ bool CDocumentTable::RemoveDocument(quint64 key, const QByteArray& value)
 {
 	bool ok = false;
 
-	mdbx::slice keySlice(&key, 8);
-	mdbx::slice valueSlice(value.data(), value.length());
+	try {
+		mdbx::slice keySlice(&key, 8);
+		mdbx::slice valueSlice(value.data(), value.length());
 
-	mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
-	if (result.done){
-		if(value.isEmpty()){
-			valueSlice = result.value;
-			ok = m_cursor.erase();
-		}
-		else {
-			ok = m_cursor.erase(keySlice, valueSlice);
-		}
-	}
-
-	if(m_hasIndex){
-		mdbx::cursor::move_result resultIndex = m_cursorIndex.find(valueSlice, false);
-		if(resultIndex.done){
+		mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
+		if (result.done){
 			if(value.isEmpty()){
-				ok = ok && m_cursorIndex.erase();
+				valueSlice = result.value;
+				ok = m_cursor.erase();
 			}
 			else {
-				ok = ok && m_cursorIndex.erase(valueSlice, keySlice);
+				ok = m_cursor.erase(keySlice, valueSlice);
 			}
 		}
+
+		if(m_hasIndex){
+			mdbx::cursor::move_result resultIndex = m_cursorIndex.find(valueSlice, false);
+			if(resultIndex.done){
+				if(value.isEmpty()){
+					ok = ok && m_cursorIndex.erase();
+				}
+				else {
+					ok = ok && m_cursorIndex.erase(valueSlice, keySlice);
+				}
+			}
+		}
+
+	}
+
+	catch (...) {
+		return false;
 	}
 
 	return ok;
@@ -700,30 +713,35 @@ bool CDocumentTable::RemoveDocument(const QByteArray& key, const QByteArray& val
 {
 	bool ok = false;
 
-	mdbx::slice keySlice(key.data(), key.length());
-	mdbx::slice valueSlice(value.data(), value.length());
+	try {
+		mdbx::slice keySlice(key.data(), key.length());
+		mdbx::slice valueSlice(value.data(), value.length());
 
-	mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
-	if (result.done){
-		if(value.isEmpty()){
-			valueSlice = result.value;
-			ok = m_cursor.erase();
-		}
-		else {
-			ok = m_cursor.erase(keySlice, valueSlice);
-		}
-	}
-
-	if(m_hasIndex){
-		mdbx::cursor::move_result resultIndex = m_cursorIndex.find(valueSlice, false);
-		if(resultIndex.done){
+		mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
+		if (result.done){
 			if(value.isEmpty()){
-				ok = ok && m_cursorIndex.erase();
+				valueSlice = result.value;
+				ok = m_cursor.erase();
 			}
 			else {
-				ok = ok && m_cursorIndex.erase(valueSlice, keySlice);
+				ok = m_cursor.erase(keySlice, valueSlice);
 			}
 		}
+
+		if(m_hasIndex){
+			mdbx::cursor::move_result resultIndex = m_cursorIndex.find(valueSlice, false);
+			if(resultIndex.done){
+				if(value.isEmpty()){
+					ok = ok && m_cursorIndex.erase();
+				}
+				else {
+					ok = ok && m_cursorIndex.erase(valueSlice, keySlice);
+				}
+			}
+		}
+	}
+	catch (...) {
+		return false;
 	}
 
 	return ok;
