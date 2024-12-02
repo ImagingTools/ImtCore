@@ -245,8 +245,21 @@ const iprm::IOptionsList* CRemoteGqlCollectionController::GetObjectTypesInfo() c
 }
 
 
-QByteArray CRemoteGqlCollectionController::GetObjectTypeId(const Id& /*objectId*/) const
+QByteArray CRemoteGqlCollectionController::GetObjectTypeId(const Id& objectId) const
 {
+	if (m_gqlObjectCollectionDelegatePtr != nullptr){
+		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectTypeIdRequest(objectId));
+		if (!requestPtr.isNull()){
+			GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+			if (!responsePtr.isNull()){
+				QByteArray typeId;
+				if (m_gqlObjectCollectionDelegatePtr->GetObjectTypeId(*responsePtr, typeId)){
+					return typeId;
+				}
+			}
+		}
+	}
+
 	return QByteArray();
 }
 

@@ -16,9 +16,9 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtgql/CGqlRequest.h>
 #include <imtbase/CFilterCollectionProxy.h>
 #include <imtbase/COperationContext.h>
+#include <imtgql/CGqlRequest.h>
 
 
 namespace imtclientgql
@@ -26,6 +26,23 @@ namespace imtclientgql
 
 
 // public methods
+
+
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectTypeIdRequest(const QByteArray& objectId) const
+{
+	QByteArray commandId = *m_collectionIdAttrPtr + "TypeId";
+
+	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, commandId);
+	imtgql::CGqlObject input;
+	input.InsertField("id", QVariant(objectId));
+	requestPtr->AddParam("input", input);
+
+	imtgql::CGqlObject query;
+	requestPtr->AddField("objectTypeId", query);
+
+	return requestPtr;
+}
+
 
 imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectInfoRequest(const QByteArray& objectId) const
 {
@@ -330,6 +347,20 @@ bool CGqlObjectCollectionDelegateComp::GetObjectId(const imtgql::IGqlResponse& r
 
 			return true;
 		}
+	}
+
+	return false;
+}
+
+
+bool CGqlObjectCollectionDelegateComp::GetObjectTypeId(const imtgql::IGqlResponse& response, Id& out) const
+{
+	ResponseData responseData = GetResponseData(response);
+	if (responseData.data.contains("typeId")){
+		QJsonValue responseDataValue = responseData.data["typeId"];
+		out = responseDataValue.toString().toUtf8();
+
+		return true;
 	}
 
 	return false;

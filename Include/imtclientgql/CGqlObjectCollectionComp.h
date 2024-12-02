@@ -43,9 +43,6 @@ public:
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
 	I_END_COMPONENT;
 
-	// reimplemented (IObjectCollectionInfo)
-	virtual QByteArray GetObjectTypeId(const Id& objectId) const override;
-
 	// reimplemented (imtgql::IGqlSubscriptionClient)
 	virtual void OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData) override;
 	virtual void OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& message) override;

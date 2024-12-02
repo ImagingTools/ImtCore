@@ -111,6 +111,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 		return ImportObject(gqlRequest, errorMessage);
 	case OT_EXPORT:
 		return ExportObject(gqlRequest, errorMessage);
+	case OT_OBJECT_TYPE_ID:
+		return ExportObject(gqlRequest, errorMessage);
 	default:
 		Q_ASSERT(false);
 		break;
@@ -165,8 +167,8 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 {
 	const imtgql::CGqlObject fields = gqlRequest.GetFields();
 
-	const QByteArrayList Ids = fields.GetFieldIds();
-	for (const QByteArray& fieldId: Ids){
+	const QByteArrayList ids = fields.GetFieldIds();
+	for (const QByteArray& fieldId: ids){
 		if (fieldId == "headers"){
 			operationType = OT_HEADERS;
 			return true;
@@ -233,6 +235,10 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 		}
 		if (fieldId == "export"){
 			operationType = OT_EXPORT;
+			return true;
+		}
+		if (fieldId == "objectTypeId"){
+			operationType = OT_OBJECT_TYPE_ID;
 			return true;
 		}
 	}
@@ -955,6 +961,31 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(c
 			}
 		}
 	}
+
+	return rootModelPtr.PopPtr();
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectTypeId(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	if (inputParamPtr == nullptr){
+		errorMessage = QT_TR_NOOP("Unable to import the object. GQL input params is invalid.");
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+
+	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
+
+	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	rootModelPtr->SetData("typeId", typeId);
 
 	return rootModelPtr.PopPtr();
 }

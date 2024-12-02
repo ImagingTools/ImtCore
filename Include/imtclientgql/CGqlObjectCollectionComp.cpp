@@ -7,31 +7,7 @@ namespace imtclientgql
 
 // public methods
 
-// reimplemented (IObjectCollectionInfo)
-
-QByteArray CGqlObjectCollectionComp::GetObjectTypeId(const imtbase::ICollectionInfo::Id& objectId) const
-{
-	QByteArrayList ids;
-	if (m_typeIdsAttrPtr.IsValid()) {
-		for (int i = 0; i < m_typeIdsAttrPtr.GetCount(); i++){
-			QByteArray id = m_typeIdsAttrPtr[i];
-			if (!id.isEmpty()) {
-				if (!ids.contains(id)) {
-					ids.append(id);
-				}
-			}
-		}
-	}
-
-	if (ids.count() == 1){
-		return ids.at(0);
-	}
-
-	return QByteArray();
-}
-
-
-// reimplemented (gmgaws::ISubscriptionClient)
+// reimplemented (imtclientgql::ISubscriptionClient)
 
 void CGqlObjectCollectionComp::OnResponseReceived(const QByteArray& /*subscriptionId*/, const QByteArray& /*subscriptionData*/)
 {

@@ -32,6 +32,7 @@ public:
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 	I_END_COMPONENT;
 
+	virtual imtgql::IGqlRequest* CreateGetObjectTypeIdRequest(const QByteArray& objectId) const override;
 	virtual imtgql::IGqlRequest* CreateGetObjectInfoRequest(const QByteArray& objectId) const override;
 	virtual imtgql::IGqlRequest* CreateGetObjectMetaInfoRequest(const QByteArray& objectId) const override;
 	virtual imtgql::IGqlRequest* CreateGetObjectDataMetaInfoRequest(const QByteArray& objectId) const override;
@@ -82,6 +83,7 @@ public:
 	virtual bool IsValid(const imtgql::IGqlResponse& reqponse) const override;
 	virtual bool GetOperationResult(const imtgql::IGqlResponse& response, bool& out) const override;
 	virtual bool GetObjectId(const imtgql::IGqlResponse& response, Id& out) const override;
+	virtual bool GetObjectTypeId(const imtgql::IGqlResponse& response, Id& out) const override;
 	virtual bool GetObjectInfo(const imtgql::IGqlResponse& response, ObjectInfo& out) const override;
 	virtual bool GetObjectData(const imtgql::IGqlResponse& response, istd::IChangeable& out) const override;
 	virtual bool GetMetaInfo(const imtgql::IGqlResponse& response, idoc::IDocumentMetaInfo& out) const override;

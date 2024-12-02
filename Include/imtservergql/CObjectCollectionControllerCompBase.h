@@ -66,7 +66,8 @@ public:
 		OT_ELEMENT_IDS,
 		OT_ELEMENT_HISTORY,
 		OT_IMPORT,
-		OT_EXPORT
+		OT_EXPORT,
+		OT_OBJECT_TYPE_ID
 	};
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
@@ -98,6 +99,7 @@ protected:
 	virtual imtbase::CTreeItemModel* GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetObjectHistory(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* GetObjectTypeId(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 

@@ -45,6 +45,7 @@ public:
 	};
 	typedef QList<ObjectInfo> ObjectInfoList;
 
+	virtual imtgql::IGqlRequest* CreateGetObjectTypeIdRequest(const QByteArray& objectId) const = 0;
 	virtual imtgql::IGqlRequest* CreateGetObjectInfoRequest(const QByteArray& objectId) const = 0;
 	virtual imtgql::IGqlRequest* CreateGetObjectMetaInfoRequest(const QByteArray& objectId) const = 0;
 	virtual imtgql::IGqlRequest* CreateGetObjectDataMetaInfoRequest(const QByteArray& objectId) const = 0;
@@ -93,17 +94,18 @@ public:
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 
-	virtual bool IsValid(const imtgql::IGqlResponse& reqponse) const = 0;
-	virtual bool GetOperationResult(const imtgql::IGqlResponse& reqponse, bool& out) const = 0;
-	virtual bool GetObjectId(const imtgql::IGqlResponse& reqponse, Id& out) const = 0;
-	virtual bool GetObjectInfo(const imtgql::IGqlResponse& reqponse, ObjectInfo& out) const = 0;
-	virtual bool GetObjectData(const imtgql::IGqlResponse& reqponse, istd::IChangeable& out) const = 0;
-	virtual bool GetMetaInfo(const imtgql::IGqlResponse& reqponse, idoc::IDocumentMetaInfo& out) const = 0;
-	virtual bool GetItemCount(const imtgql::IGqlResponse& reqponse, int& out) const = 0;
-	virtual bool GetItemIds(const imtgql::IGqlResponse& reqponse, Ids& out) const = 0;
+	virtual bool IsValid(const imtgql::IGqlResponse& response) const = 0;
+	virtual bool GetOperationResult(const imtgql::IGqlResponse& response, bool& out) const = 0;
+	virtual bool GetObjectId(const imtgql::IGqlResponse& response, Id& out) const = 0;
+	virtual bool GetObjectTypeId(const imtgql::IGqlResponse& response, Id& out) const = 0;
+	virtual bool GetObjectInfo(const imtgql::IGqlResponse& response, ObjectInfo& out) const = 0;
+	virtual bool GetObjectData(const imtgql::IGqlResponse& response, istd::IChangeable& out) const = 0;
+	virtual bool GetMetaInfo(const imtgql::IGqlResponse& response, idoc::IDocumentMetaInfo& out) const = 0;
+	virtual bool GetItemCount(const imtgql::IGqlResponse& response, int& out) const = 0;
+	virtual bool GetItemIds(const imtgql::IGqlResponse& response, Ids& out) const = 0;
 	virtual imtbase::IObjectCollection* GetSubCollection(
 				imtbase::IObjectCollection& collection,
-				const imtgql::IGqlResponse& reqponse,
+				const imtgql::IGqlResponse& response,
 				QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList) const = 0;
 };
 

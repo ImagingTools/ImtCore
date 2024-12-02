@@ -498,7 +498,6 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElement
 }
 
 
-
 // reimplemented (icomp::CComponentBase)
 
 void CSerializableObjectCollectionControllerComp::OnComponentCreated()
@@ -518,6 +517,7 @@ void CSerializableObjectCollectionControllerComp::OnComponentCreated()
 	m_baseCommandIds << QByteArray("Count");
 	m_baseCommandIds << QByteArray("Ids");
 	m_baseCommandIds << QByteArray("SubCollection");
+	m_baseCommandIds << QByteArray("TypeId");
 }
 
 
