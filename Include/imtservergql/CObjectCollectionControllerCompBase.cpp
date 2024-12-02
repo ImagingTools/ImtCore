@@ -112,7 +112,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 	case OT_EXPORT:
 		return ExportObject(gqlRequest, errorMessage);
 	case OT_OBJECT_TYPE_ID:
-		return ExportObject(gqlRequest, errorMessage);
+		return GetObjectTypeId(gqlRequest, errorMessage);
 	default:
 		Q_ASSERT(false);
 		break;
