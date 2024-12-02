@@ -287,6 +287,7 @@ istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObjectFrom
 		return nullptr;
 	}
 
+	QByteArray typeId = inputObjectPtr->GetFieldArgumentValue("typeId").toByteArray();
 	QByteArray objectData64 = inputObjectPtr->GetFieldArgumentValue("item").toByteArray();
 	QByteArray objectData = QByteArray::fromBase64(objectData64);
 	if (objectData.isEmpty()){
@@ -296,9 +297,15 @@ istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObjectFrom
 		return nullptr;
 	}
 
-	istd::TDelPtr<iser::ISerializable> objectPtr(m_objectFactCompPtr.CreateInstance());
+	int index = GetObjectTypeIdIndex(typeId);
+	if (index < 0){
+		Q_ASSERT_X(false, "Type-ID is not supported", "CSerializableObjectCollectionControllerComp");
+		return nullptr;
+	}
+
+	istd::TDelPtr<istd::IChangeable> objectPtr(m_objectFactCompPtr.CreateInstance(index));
 	if (objectPtr == nullptr){
-		errorMessage = QT_TR_NOOP("Unable to get an Object!");
+		errorMessage = QString("Unable to create object from request. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage);
 
 		return nullptr;

@@ -18,7 +18,6 @@ public:
 	typedef imtservergql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSerializableObjectCollectionControllerComp);
-		I_ASSIGN(m_objectFactCompPtr, "ObjectFactory", "Factory used for creation of the new Object instance", true, "ObjectFactory");
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "ID for according to which GQL commands are generated", true, "");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 	I_END_COMPONENT;
@@ -47,7 +46,6 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	I_FACT(iser::ISerializable, m_objectFactCompPtr);
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 
