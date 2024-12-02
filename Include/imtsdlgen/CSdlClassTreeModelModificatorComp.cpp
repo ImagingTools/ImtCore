@@ -87,8 +87,18 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& st
 {
 	bool isArray = false;
 	bool isCustom = false;
-	ConvertType(field, &isCustom, nullptr, &isArray);
-	if (isCustom && isArray){
+	bool isEnum = false;
+	const QString convertedType = ConvertTypeWithNamespace(
+		field,
+		m_originalSchemaNamespaceCompPtr->GetText(),
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		&isCustom,
+		nullptr,
+		&isArray,
+		&isEnum);
+
+	if ((isCustom && !isEnum) && isArray){
 		AddCustomArrayFieldWriteToModelCode(stream, field, sdlType);
 
 		return;
@@ -100,7 +110,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& st
 		return;
 	}
 
-	else if (isCustom){
+	else if ((isCustom && !isEnum)){
 		AddCustomFieldWriteToModelCode(stream, field, sdlType);
 
 		return;
@@ -121,12 +131,34 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& st
 		GenerateListTempValueCode(stream, field, tempListVarName);
 
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
-		if (field.IsArray()){
-			stream << tempListVarName;
+
+		if (isEnum){
+			const QString enumSourceVarName = QStringLiteral("m_") +  GetDecapitalizedValue(field.GetId());
+			const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+
+			// declare target value, to store value
+			stream << QStringLiteral("QString ");
+			stream << enumConvertedVarName << ';';
+			FeedStream(stream, 1, false);
+
+			imtsdl::CSdlEnum foundEnum;
+			[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+			Q_ASSERT(found);
+
+			WriteConversionFromEnum(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), 1);
+
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
+			stream << enumConvertedVarName;
 		}
 		else {
-			stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
+			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
+			if (field.IsArray()){
+				stream << tempListVarName;
+			}
+			else {
+				stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
+			}
 		}
 		stream << QStringLiteral(", modelIndex);");
 	}
@@ -140,12 +172,33 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& st
 		GenerateListTempValueCode(stream, field, tempListVarName, 2);
 
 		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
-		if (field.IsArray()){
-			stream << tempListVarName;
+		if (isEnum){
+			const QString enumSourceVarName = QStringLiteral("m_") +  GetDecapitalizedValue(field.GetId());
+			const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+
+			// declare target value, to store value
+			stream << QStringLiteral("QString ");
+			stream << enumConvertedVarName << ';';
+			FeedStream(stream, 1, false);
+
+			imtsdl::CSdlEnum foundEnum;
+			[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+			Q_ASSERT(found);
+
+			WriteConversionFromEnum(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), 2);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
+			stream << enumConvertedVarName;
 		}
 		else {
-			stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
+			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
+			if (field.IsArray()){
+				stream << tempListVarName;
+			}
+			else {
+				stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
+			}
 		}
 		stream << QStringLiteral(", modelIndex);\n\t}");
 	}
@@ -158,8 +211,18 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 {
 	bool isArray = false;
 	bool isCustom = false;
-	ConvertType(field, &isCustom, nullptr, &isArray);
-	if (isCustom && isArray){
+	bool isEnum = false;
+	const QString convertedType = ConvertTypeWithNamespace(
+		field,
+		m_originalSchemaNamespaceCompPtr->GetText(),
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		&isCustom,
+		nullptr,
+		&isArray,
+		&isEnum);
+
+	if ((isCustom && !isEnum) && isArray){
 		AddCustomArrayFieldReadFromModelCode(stream, field, sdlType);
 
 		return;
@@ -171,7 +234,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 		return;
 	}
 
-	else if (isCustom){
+	else if (isCustom && !isEnum){
 		AddCustomFieldReadFromModelCode(stream, field, sdlType);
 
 		return;
@@ -197,9 +260,39 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
-		stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		if (isEnum){
+			const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
+			const QString enumSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+			const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("EnumValue");
+
+			// declare target value, to store value
+			stream << convertedType << ' ' << enumConvertedVarName << ';';
+			FeedStream(stream, 1, false);
+
+			// declare temp value, to store string equivalent
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("QString ");
+			stream << enumSourceVarName;
+			stream << QStringLiteral(" = ");
+			stream << dataVarName;
+			stream << QStringLiteral(".toString();");
+			FeedStream(stream, 1, false);
+
+			imtsdl::CSdlEnum foundEnum;
+			[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+			Q_ASSERT(found);
+
+			WriteConversionFromString(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText());
+
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
+			stream << enumConvertedVarName << QStringLiteral(");");
+		}
+		else {
+			stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
+			stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
+			stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		}
 		FeedStream(stream, 1, false);
 	}
 	else {
@@ -207,9 +300,39 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
-		stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		if (isEnum){
+			const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
+			const QString enumSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+			const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("EnumValue");
+
+			// declare target value, to store value
+			stream << convertedType << ' ' << enumConvertedVarName << ';';
+			FeedStream(stream, 1, false);
+
+			// declare temp value, to store string equivalent
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("QString ");
+			stream << enumSourceVarName;
+			stream << QStringLiteral(" = ");
+			stream << dataVarName;
+			stream << QStringLiteral(".toString();");
+			FeedStream(stream, 1, false);
+
+			imtsdl::CSdlEnum foundEnum;
+			[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+			Q_ASSERT(found);
+
+			WriteConversionFromString(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), 2);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
+			stream << enumConvertedVarName << QStringLiteral(");");
+		}
+		else {
+			stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
+			stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
+			stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		}
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
