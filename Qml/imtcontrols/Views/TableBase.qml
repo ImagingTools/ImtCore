@@ -32,7 +32,7 @@ Rectangle {
 	property TableViewParams tableViewParams: TableViewParams {}
 
 	property TreeItemModel headers
-    property TreeItemModel defaultHeadersModel: null;
+	property TreeItemModel defaultHeadersModel: null;
 
 	property TreeItemModel tableDecorator
 
@@ -94,6 +94,7 @@ Rectangle {
 	property bool editableHeaderParams: false;
 	property bool canFitHeight : false;
 	property bool canMoveColumns : false;
+	property bool canSwapColumns : true;
 	property bool isFrameScrolling : false;
 	property int minCellWidth : 30;
 
@@ -143,7 +144,7 @@ Rectangle {
 	property bool emptyDecor: true;
 	property bool emptyDecorHeader: true;
 
-    property var columnContentComps: ({});
+	property var columnContentComps: ({});
 
 	property bool compl: false;
 
@@ -198,25 +199,25 @@ Rectangle {
 	}
 
 	onHeadersChanged: {
-        let keys = Object.keys(columnContentComps);
-        for (let i = 0; i < tableContainer.headers.getItemsCount(); i++){
-            let headerId = tableContainer.headers.getData("Id", i)
-            if (!keys.includes(headerId)){
-                tableContainer.columnContentComps[headerId] = null;
-            }
-        }
+		let keys = Object.keys(columnContentComps);
+		for (let i = 0; i < tableContainer.headers.getItemsCount(); i++){
+			let headerId = tableContainer.headers.getData("Id", i)
+			if (!keys.includes(headerId)){
+				tableContainer.columnContentComps[headerId] = null;
+			}
+		}
 
-        if (defaultHeadersModel == null && headers){
-            if (headers.getItemsCount() > 0){
-                defaultHeadersModel = headers.copyMe();
-            }
-        }
+		if (defaultHeadersModel == null && headers){
+			if (headers.getItemsCount() > 0){
+				defaultHeadersModel = headers.copyMe();
+			}
+		}
 
 		tableContainer.setWidth();
 	}
 
 	onElementsChanged: {
-//        uncheckAll();
+		//        uncheckAll();
 		tableContainer.setWidth();
 	}
 
@@ -379,16 +380,16 @@ Rectangle {
 	}
 
 	function setColumnContentComponent(columnIndex, comp){
-        if (tableContainer.headers && columnIndex >= 0 && columnIndex < tableContainer.headers.getItemsCount()){
-            let headerId = tableContainer.headers.getData("Id", columnIndex);
+		if (tableContainer.headers && columnIndex >= 0 && columnIndex < tableContainer.headers.getItemsCount()){
+			let headerId = tableContainer.headers.getData("Id", columnIndex);
 
-            setColumnContentById(headerId, comp);
-        }
+			setColumnContentById(headerId, comp);
+		}
 	}
 
-    function setColumnContentById(headerId, comp){
-        tableContainer.columnContentComps[headerId] = comp;
-    }
+	function setColumnContentById(headerId, comp){
+		tableContainer.columnContentComps[headerId] = comp;
+	}
 
 	function setCellHeight(){
 		var maxVal = 0;
@@ -781,55 +782,57 @@ Rectangle {
 		}
 	}//Elements ListView
 
-    function resetViewParams(){
-        tableViewParams.clear();
+	function resetViewParams(){
+		tableViewParams.clear();
 
-        if (defaultHeadersModel){
-            for (let i = 0; i < defaultHeadersModel.getItemsCount(); i++){
-                let headerId = defaultHeadersModel.getData("Id", i);
-                tableViewParams.setHeaderSize(headerId, -1);
-                tableViewParams.setHeaderVisible(headerId, true);
-                tableViewParams.setHeaderOrder(headerId, i)
-            }
-        }
+		if (defaultHeadersModel){
+			for (let i = 0; i < defaultHeadersModel.getItemsCount(); i++){
+				let headerId = defaultHeadersModel.getData("Id", i);
+				tableViewParams.setHeaderSize(headerId, -1);
+				tableViewParams.setHeaderVisible(headerId, true);
+				tableViewParams.setHeaderOrder(headerId, i)
+			}
+		}
 
-        updateWidthFromViewParams();
-    }
+		updateWidthFromViewParams();
+	}
 
 	function updateWidthFromViewParams(){
-        let swappedHeaderIndex = []
-        for (let i = 0; i < tableContainer.tableViewParams.getItemsCount(); i++){
-            let headerViewParamId = tableContainer.tableViewParams.getData("HeaderId", i);
-            let index = getHeaderIndex(headerViewParamId);
-            if (index >= 0 && i != index && !swappedHeaderIndex.includes(index)){
-                tableContainer.widthDecorator.swapItems(i, index);
-                tableContainer.headers.swapItems(i, index);
-            }
-        }
 
-       headersList.model = 0;
-       headersList.model = tableContainer.headers;
+		if(tableContainer.canSwapColumns){
+			let swappedHeaderIndex = []
+			for (let i = 0; i < tableContainer.tableViewParams.getItemsCount(); i++){
+				let headerViewParamId = tableContainer.tableViewParams.getData("HeaderId", i);
+				let index = getHeaderIndex(headerViewParamId);
+				if (index >= 0 && i != index && !swappedHeaderIndex.includes(index)){
+					tableContainer.widthDecorator.swapItems(i, index);
+					tableContainer.headers.swapItems(i, index);
+				}
+			}
+			headersList.model = 0;
+			headersList.model = tableContainer.headers;
+		}
 
-        for (let i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
-            let headerId = tableContainer.headers.getData("Id", i);
-            for (let j = 0; j < tableContainer.tableViewParams.getItemsCount(); j++){
-                let id = tableContainer.tableViewParams.getData("HeaderId", j);
-                if (headerId === id){
-                    let visible = tableContainer.tableViewParams.getData("Visible", j);
-                    let size = tableContainer.tableViewParams.getData("Size", j);
-                    if (visible){
-                        tableContainer.widthDecorator.setData("WidthPercent", size, i)
-                        tableContainer.widthDecorator.setData("Width", size, i)
-                    }
-                    else{
-                        tableContainer.widthDecorator.setData("WidthPercent", 0, i)
-                        tableContainer.widthDecorator.setData("Width", 0, i)
-                    }
+		for (let i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
+			let headerId = tableContainer.headers.getData("Id", i);
+			for (let j = 0; j < tableContainer.tableViewParams.getItemsCount(); j++){
+				let id = tableContainer.tableViewParams.getData("HeaderId", j);
+				if (headerId === id){
+					let visible = tableContainer.tableViewParams.getData("Visible", j);
+					let size = tableContainer.tableViewParams.getData("Size", j);
+					if (visible){
+						tableContainer.widthDecorator.setData("WidthPercent", size, i)
+						tableContainer.widthDecorator.setData("Width", size, i)
+					}
+					else{
+						tableContainer.widthDecorator.setData("WidthPercent", 0, i)
+						tableContainer.widthDecorator.setData("Width", 0, i)
+					}
 
-                    break;
-                }
-            }
-        }
+					break;
+				}
+			}
+		}
 
 		tableContainer.setWidth();
 	}

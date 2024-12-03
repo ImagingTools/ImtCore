@@ -24,16 +24,16 @@ Dialog {
 
 			function updateGui(){
 				item.block = true;
-                leftTable.uncheckAll();
-                if (leftTable.elements){
-                    for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
-                        let id = leftTable.elements.getData("Id", i)
+				leftTable.uncheckAll();
+				if (leftTable.elements){
+					for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
+						let id = leftTable.elements.getData("Id", i)
 
-                        if (dialog.tableViewParamsCopied.headerIsVisible(id)){
-                            leftTable.checkItem(i);
-                        }
-                    }
-                }
+						if (dialog.tableViewParamsCopied.headerIsVisible(id)){
+							leftTable.checkItem(i);
+						}
+					}
+				}
 				item.block = false;
 			}
 
@@ -41,16 +41,16 @@ Dialog {
 				if(dialog.tableItem){
 					dialog.tableViewParamsCopied.copyFrom(dialog.tableItem.tableViewParams)
 					leftTable.headers = availableHeadersModel;
-                    leftTable.elements = dialog.tableItem.headers.copyMe();
+					leftTable.elements = dialog.tableItem.headers.copyMe();
 				}
 			}
 
-            function updateHeadersOrder(){
-                for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
-                    let id = leftTable.elements.getData("Id", i)
-                    dialog.tableViewParamsCopied.setHeaderOrder(id, i);
-                }
-            }
+			function updateHeadersOrder(){
+				for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
+					let id = leftTable.elements.getData("Id", i)
+					dialog.tableViewParamsCopied.setHeaderOrder(id, i);
+				}
+			}
 
 			Table {
 				id: leftTable;
@@ -82,16 +82,16 @@ Dialog {
 					item.updateGui();
 				}
 
-                onSelectionChanged: {
-                    if (selection.length !== 1){
-                        upButton.enabled = false;
-                        downButton.enabled = false;
-                    }
-                    else{
-                        upButton.enabled = selection[0] > 0;
-                        downButton.enabled = selection[selection.length - 1] < leftTable.elementsCount - 1;
-                    }
-                }
+				onSelectionChanged: {
+					if (selection.length !== 1){
+						upButton.enabled = false;
+						downButton.enabled = false;
+					}
+					else{
+						upButton.enabled = selection[0] > 0;
+						downButton.enabled = selection[selection.length - 1] < leftTable.elementsCount - 1;
+					}
+				}
 			}
 
 			BaseText {
@@ -102,77 +102,80 @@ Dialog {
 				visible: false;
 			}
 
-            Row {
-                anchors.left: parent.left;
-                anchors.leftMargin: Style.size_mainMargin;
-                height: 25;
-                spacing: Style.size_smallMargin
-                ToolButton {
-                    id: upButton;
-                    enabled: false;
-                    width: 25;
-                    height: 25;
-                    iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal):
-                                          "../../../" + Style.getIconPath("Icons/Up", Icon.State.Off, Icon.Mode.Disabled)
+			Row {
+				anchors.left: parent.left;
+				anchors.leftMargin: Style.size_mainMargin;
+				height: 25;
+				spacing: Style.size_smallMargin
 
-                    onClicked: {
-                        let indexes = leftTable.getSelectedIndexes();
-                        if (indexes.length == 1 && indexes[0] > 0){
-                            let index = indexes[0];
+				visible: !dialog.tableItem ? false : dialog.tableItem.canSwapColumns;
 
-                            let elements = leftTable.elements;
-                            leftTable.elementsList.model = 0;
-                            elements.swapItems(index, index - 1);
-                            dialog.tableViewParamsCopied.swapHeaders(index, index - 1);
-                            leftTable.elements = elements;
-                            item.updateHeadersOrder();
-                            item.updateGui();
+				ToolButton {
+					id: upButton;
+					enabled: false;
+					width: 25;
+					height: 25;
+					iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal):
+										  "../../../" + Style.getIconPath("Icons/Up", Icon.State.Off, Icon.Mode.Disabled)
 
-                            dialog.buttonsModel.setProperty(0, 'Enabled', true)
-                            leftTable.select(index - 1)
-                        }
-                    }
-                }
+					onClicked: {
+						let indexes = leftTable.getSelectedIndexes();
+						if (indexes.length == 1 && indexes[0] > 0){
+							let index = indexes[0];
 
-                ToolButton {
-                    id: downButton;
-                    enabled: false;
-                    width: 25;
-                    height: 25;
-                    iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal):
-                                          "../../../" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled)
-                    onClicked: {
-                        let indexes = leftTable.getSelectedIndexes();
-                        if (indexes.length == 1 && indexes[indexes.length - 1] < leftTable.elementsCount - 1){
-                            let index = indexes[0];
+							let elements = leftTable.elements;
+							leftTable.elementsList.model = 0;
+							elements.swapItems(index, index - 1);
+							dialog.tableViewParamsCopied.swapHeaders(index, index - 1);
+							leftTable.elements = elements;
+							item.updateHeadersOrder();
+							item.updateGui();
 
-                            let elements = leftTable.elements;
-                            leftTable.elementsList.model = 0;
-                            elements.swapItems(index, index + 1);
-                            dialog.tableViewParamsCopied.swapHeaders(index, index + 1);
-                            leftTable.elements = elements;
-                            item.updateHeadersOrder();
-                            item.updateGui();
+							dialog.buttonsModel.setProperty(0, 'Enabled', true)
+							leftTable.select(index - 1)
+						}
+					}
+				}
 
-                            dialog.buttonsModel.setProperty(0, 'Enabled', true)
+				ToolButton {
+					id: downButton;
+					enabled: false;
+					width: 25;
+					height: 25;
+					iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal):
+										  "../../../" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled)
+					onClicked: {
+						let indexes = leftTable.getSelectedIndexes();
+						if (indexes.length == 1 && indexes[indexes.length - 1] < leftTable.elementsCount - 1){
+							let index = indexes[0];
 
-                            leftTable.select(index + 1)
-                        }
-                    }
-                }
+							let elements = leftTable.elements;
+							leftTable.elementsList.model = 0;
+							elements.swapItems(index, index + 1);
+							dialog.tableViewParamsCopied.swapHeaders(index, index + 1);
+							leftTable.elements = elements;
+							item.updateHeadersOrder();
+							item.updateGui();
 
-                ToolButton {
-                    id: resetButton;
-                    enabled: true;
-                    width: 25;
-                    height: 25;
-                    iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Restore", Icon.State.On, Icon.Mode.Normal):
-                                          "../../../" + Style.getIconPath("Icons/Restore", Icon.State.Off, Icon.Mode.Disabled)
-                    onClicked: {
-                        ModalDialogManager.openDialog(resetDialog, {});
-                    }
-                }
-            }
+							dialog.buttonsModel.setProperty(0, 'Enabled', true)
+
+							leftTable.select(index + 1)
+						}
+					}
+				}
+
+				ToolButton {
+					id: resetButton;
+					enabled: true;
+					width: 25;
+					height: 25;
+					iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Restore", Icon.State.On, Icon.Mode.Normal):
+										  "../../../" + Style.getIconPath("Icons/Restore", Icon.State.Off, Icon.Mode.Disabled)
+					onClicked: {
+						ModalDialogManager.openDialog(resetDialog, {});
+					}
+				}
+			}
 
 			TreeItemModel {
 				id: availableHeadersModel;
@@ -204,19 +207,19 @@ Dialog {
 		}
 	}
 
-    Component {
-        id: resetDialog;
-        MessageDialog {
-            width: 400;
-            title: qsTr("Confirm reset headers");
-            message: qsTr("Reset header settings to default ?");
-            onFinished: {
-                if (buttonId == Enums.yes){
-                    dialog.tableItem.resetViewParams();
+	Component {
+		id: resetDialog;
+		MessageDialog {
+			width: 400;
+			title: qsTr("Confirm reset headers");
+			message: qsTr("Reset header settings to default ?");
+			onFinished: {
+				if (buttonId == Enums.yes){
+					dialog.tableItem.resetViewParams();
 
-                    dialog.accepted();
-                }
-            }
-        }
-    }
+					dialog.accepted();
+				}
+			}
+		}
+	}
 }
