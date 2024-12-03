@@ -18,33 +18,94 @@ namespace imtsdl
 
 QString CSdlEnumConverter::ConvertEnumValueToStringEquivalent(const QString& enumValue, ConversionType conversionType)
 {
-	QString retVal;
+	if (conversionType == CT_AS_IS){
+		return enumValue;
+	}
 
+	char separator = ' ';
+	if (enumValue.contains('-')){
+		separator = '-';
+	}
+	else if (enumValue.contains('_')){
+		separator = '_';
+	}
+
+	// check if a single word in upper case
+	bool isAllUpper = true;
+	for (int index = 0; index < enumValue.length(); ++index){
+		QChar symbol = enumValue[index];
+		if (!symbol.isUpper()){
+			isAllUpper = false;
+			break;
+		}
+	}
+
+
+	// split string into words
+	QStringList parts;
+	if (separator == ' ' && !isAllUpper){
+		int position = 0;
+		for (int index = 0; index < enumValue.length(); ++index){
+			QChar symbol = enumValue[index];
+			if(symbol.isUpper() && index != 0){
+				parts << enumValue.mid(position, index - position);
+				position = index;
+			}
+		}
+		// add last word
+		parts << enumValue.mid(position, -1);
+	}
+	else {
+		parts = enumValue.split(separator);
+	}
+
+	// if a single string
+	if (parts.isEmpty()){
+		parts << enumValue;
+	}
+
+	// case correction
+	QMutableListIterator partsIter(parts);
+	while(partsIter.hasNext()){
+		QString& currentString = partsIter.next();
+		switch (conversionType) {
+		case CT_UPPER_SNAKE_CASE:
+		case CT_UPPER_KEBAB_CASE:
+			currentString = currentString.toUpper();
+			break;
+		case CT_LOWER_SNAKE_CASE:
+		case CT_LOWER_KEBAB_CASE:
+			currentString = currentString.toLower();
+			break;
+		case CT_UPPER_CAMEL_CASE:
+		case CT_LOWER_CAMEL_CASE:
+			currentString = currentString.toLower();
+			currentString[0] = currentString[0].toUpper();
+			break;
+		default:
+			Q_ASSERT(false);
+			break;
+		}
+	}
+
+	// and join into a single string
+	QString retVal;
 	switch (conversionType) {
-	case CT_AS_IS:
-		retVal = enumValue;
-		break;
-	case CT_UPPER_CAMEL_CASE:
-		retVal = EncodeToUpperCamelCase(enumValue);
-		break;
-	case CT_LOWER_CAMEL_CASE:
-		retVal = EncodeToLowerCamelCase(enumValue);
-		break;
 	case CT_UPPER_SNAKE_CASE:
-		retVal = EncodeToUpperSnakeCase(enumValue);
-		break;
 	case CT_LOWER_SNAKE_CASE:
-		retVal = EncodeToLowerSnakeCase(enumValue);
-		break;
-	case CT_UPPER_KEBAB_CASE:
-		retVal = EncodeToUpperKebabCase(enumValue);
+		retVal = parts.join('_');
 		break;
 	case CT_LOWER_KEBAB_CASE:
-		retVal = EncodeToLowerKebabCase(enumValue);
+	case CT_UPPER_KEBAB_CASE:
+		retVal = parts.join('-');
 		break;
 	default:
-		Q_ASSERT_X(false, "Unexpected conversionType", __func__);
+		retVal = parts.join("");
 		break;
+	}
+
+	if (conversionType == CT_LOWER_CAMEL_CASE){
+		retVal[0] = retVal[0].toLower();
 	}
 
 	return retVal;
@@ -175,54 +236,6 @@ void CSdlEnumConverter::WriteConversionFromString(
 	}
 }
 
-
-QStringList CSdlEnumConverter::SplitSingleStringIntoWords(const QString& sourceString)
-{
-	Q_ASSERT_X(false, "NOT implemented", __func__);
-	return QStringList();
-}
-
-
-QString CSdlEnumConverter::EncodeToUpperCamelCase(const QString& sourceString)
-{
-	Q_ASSERT_X(false, "NOT implemented", __func__);
-	return QString();
-}
-
-
-QString CSdlEnumConverter::EncodeToLowerCamelCase(const QString& sourceString)
-{
-	Q_ASSERT_X(false, "NOT implemented", __func__);
-	return QString();
-}
-
-
-QString CSdlEnumConverter::EncodeToUpperSnakeCase(const QString& sourceString)
-{
-	Q_ASSERT_X(false, "NOT implemented", __func__);
-	return QString();
-}
-
-
-QString CSdlEnumConverter::EncodeToLowerSnakeCase(const QString& sourceString)
-{
-	Q_ASSERT_X(false, "NOT implemented", __func__);
-	return QString();
-}
-
-
-QString CSdlEnumConverter::EncodeToUpperKebabCase(const QString& sourceString)
-{
-	Q_ASSERT_X(false, "NOT implemented", __func__);
-	return QString();
-}
-
-
-QString CSdlEnumConverter::EncodeToLowerKebabCase(const QString& sourceString)
-{
-	Q_ASSERT_X(false, "NOT implemented", __func__);
-	return QString();
-}
 
 
 } // namespace imtsdl

@@ -50,13 +50,6 @@ public:
 				uint hIndents = 1);
 
 private:
-	[[nodiscard]] static QStringList SplitSingleStringIntoWords(const QString& sourceString);
-	[[nodiscard]] static QString EncodeToUpperCamelCase(const QString& sourceString);
-	[[nodiscard]] static QString EncodeToLowerCamelCase(const QString& sourceString);
-	[[nodiscard]] static QString EncodeToUpperSnakeCase(const QString& sourceString);
-	[[nodiscard]] static QString EncodeToLowerSnakeCase(const QString& sourceString);
-	[[nodiscard]] static QString EncodeToUpperKebabCase(const QString& sourceString);
-	[[nodiscard]] static QString EncodeToLowerKebabCase(const QString& sourceString);
 
 };
 
