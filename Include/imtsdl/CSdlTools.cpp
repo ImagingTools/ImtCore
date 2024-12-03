@@ -84,6 +84,9 @@ QString CSdlTools::OptListConvertTypeWithNamespace(
 
 	if (!_isCustom){
 		// we can define namespace only for custom types
+		if (listWrap && sdlField.IsArray()){
+			WrapTypeToList(retVal);
+		}
 		return retVal;
 	}
 

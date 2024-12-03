@@ -751,11 +751,25 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 {
 	QString retVal;
 
+
+	bool isCustom = false;
+	bool isEnum = false;
+	const QString originalSchemaNamespace = m_originalSchemaNamespaceCompPtr->GetText();
+	const QString convertedType = ConvertTypeWithNamespace(
+		sdlField,
+		originalSchemaNamespace,
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		&isCustom,
+		nullptr,
+		nullptr,
+		&isEnum);
+
 	if (generateGetter){
 		FeedLineHorizontally(retVal, indents);
 
 		retVal += QStringLiteral("[[nodiscard]] ");
-		retVal += ConvertTypeWithNamespace(sdlField, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+		retVal += convertedType;
 		retVal += QStringLiteral(" Get") + GetCapitalizedValue(sdlField.GetId());
 		retVal += QStringLiteral("() const;\n");
 	}
@@ -765,19 +779,6 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 
 		retVal += QStringLiteral("void Set") + GetCapitalizedValue(sdlField.GetId());
 		retVal += '(';
-
-		bool isCustom = false;
-		bool isEnum = false;
-		const QString originalSchemaNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-		const QString convertedType = ConvertTypeWithNamespace(
-					sdlField,
-					originalSchemaNamespace,
-					*m_sdlTypeListCompPtr,
-					*m_sdlEnumListCompPtr,
-					&isCustom,
-					nullptr,
-					nullptr,
-					&isEnum);
 
 		bool isComplex = sdlField.IsArray() ||
 					sdlField.GetType() == QStringLiteral("String") ||

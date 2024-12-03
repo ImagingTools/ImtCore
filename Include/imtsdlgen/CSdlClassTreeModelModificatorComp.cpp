@@ -88,11 +88,9 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& st
 	bool isArray = false;
 	bool isCustom = false;
 	bool isEnum = false;
-	const QString convertedType = ConvertTypeWithNamespace(
+	ConvertTypeOrEnum(
 		field,
-		m_originalSchemaNamespaceCompPtr->GetText(),
-		*m_sdlTypeListCompPtr,
-		*m_sdlEnumListCompPtr,
+		m_sdlEnumListCompPtr->GetEnums(false),
 		&isCustom,
 		nullptr,
 		&isArray,
