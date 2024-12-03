@@ -50,7 +50,7 @@ void CCollectionNumericItemDelegate::setModelData(QWidget* editor, QAbstractItem
 			value = spinbox->value();
 		}
 
-		QByteArray objectId = model->data(index, CObjectCollectionViewComp::DR_OBJECT_ID).toByteArray();
+		QByteArray objectId = model->data(index, ICollectionViewDelegate::DR_OBJECT_ID).toByteArray();
 
 		m_collectionViewDelegate->OnColumnItemDelegateEditFinished(objectId, m_columnId, value);
 	}
