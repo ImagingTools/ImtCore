@@ -86,13 +86,6 @@ public:
 		I_ASSIGN_TO(m_paginationGuiObserverCompPtr, m_paginationGuiCompPtr, false);
 	I_END_COMPONENT;
 
-	enum DataRole
-	{
-		DR_TYPE_ID = Qt::UserRole,
-		DR_OBJECT_ID,
-		DR_SORT_VALUE
-	};
-
 	enum ModelId
 	{
 		MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE = 0,

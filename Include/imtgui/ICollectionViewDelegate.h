@@ -53,6 +53,13 @@ public:
 		CI_USER = 1000
 	};
 
+	enum DataRole
+	{
+		DR_TYPE_ID = Qt::UserRole,
+		DR_OBJECT_ID,
+		DR_SORT_VALUE
+	};
+
 	/**
 		Information about an object from the collection used for editing.
 	*/

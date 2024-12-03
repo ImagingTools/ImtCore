@@ -87,7 +87,7 @@ imtbase::ISelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
 		Q_ASSERT(collectionPtr != nullptr);
 		for (int i = 0; i < selectedIndexes.count(); ++i){
 			QModelIndex mappedIndex = selectedIndexes[i];
-			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
+			QByteArray itemId = m_tableModel.data(mappedIndex, ICollectionViewDelegate::DR_OBJECT_ID).toByteArray();
 			if (!itemId.isEmpty()){
 				selectedIds.insert(itemId);
 			}
@@ -482,7 +482,7 @@ void CObjectCollectionViewComp::UpdateCommands()
 		Q_ASSERT(collectionPtr != nullptr);
 		for (int i = 0; i < selectedIndexes.count(); ++i){
 			QModelIndex mappedIndex = selectedIndexes[i]; //m_proxyModelPtr->mapToSource(selectedIndexes[i]);
-			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
+			QByteArray itemId = m_tableModel.data(mappedIndex, ICollectionViewDelegate::DR_OBJECT_ID).toByteArray();
 			if (!itemId.isEmpty()){
 				itemIds.push_back(itemId);
 			}
@@ -757,7 +757,7 @@ void CObjectCollectionViewComp::UpdateTypeStatus()
 			QByteArray delegateTypeId = delegatePtr->GetSupportedTypeId();
 
 			for (int itemIndex = 0; itemIndex < TypeList->topLevelItemCount(); itemIndex++){
-				QByteArray itemTypeId = TypeList->topLevelItem(itemIndex)->data(0, DR_TYPE_ID).toByteArray();
+				QByteArray itemTypeId = TypeList->topLevelItem(itemIndex)->data(0, ICollectionViewDelegate::DR_TYPE_ID).toByteArray();
 				if (delegateTypeId == itemTypeId){
 					TypeList->topLevelItem(itemIndex)->setIcon(0, delegatePtr->GetDocumentTypeStatus().GetStatusIcon());
 					TypeList->topLevelItem(itemIndex)->setToolTip(0, delegatePtr->GetDocumentTypeStatus().GetStatusText());
@@ -801,7 +801,7 @@ void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selec
 void CObjectCollectionViewComp::OnItemDoubleClick(const QModelIndex &item)
 {
 	int sourceRow = item.row();
-	QByteArray itemId = m_tableModel.data(m_tableModel.index(sourceRow, 0), DR_OBJECT_ID).toByteArray();
+	QByteArray itemId = m_tableModel.data(m_tableModel.index(sourceRow, 0), ICollectionViewDelegate::DR_OBJECT_ID).toByteArray();
 
 	const ICollectionViewDelegate* delegate = GetViewDelegatePtr(m_currentTypeId);
 
@@ -923,7 +923,7 @@ void CObjectCollectionViewComp::OnTypeChanged()
 
 	QList<QTreeWidgetItem*> selectedItems = TypeList->selectedItems();
 	if (!selectedItems.isEmpty()){
-		m_currentTypeId = selectedItems[0]->data(0, DR_TYPE_ID).toByteArray();
+		m_currentTypeId = selectedItems[0]->data(0, ICollectionViewDelegate::DR_TYPE_ID).toByteArray();
 	}
 	
 	QStringList headerLabels;
@@ -1117,7 +1117,7 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 						typeItemPtr->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 						typeItemPtr->setData(0, Qt::DisplayRole, typeName);
 						typeItemPtr->setData(0, Qt::EditRole, typeName);
-						typeItemPtr->setData(0, DR_TYPE_ID, typeId);
+						typeItemPtr->setData(0, ICollectionViewDelegate::DR_TYPE_ID, typeId);
 						TypeList->addTopLevelItem(typeItemPtr);
 
 						if (lastTypeId == typeId){
@@ -1457,7 +1457,7 @@ void CObjectCollectionViewComp::TableModel::UpdateItem(const imtbase::IObjectCol
 
 	int row = -1;
 	for (int i = 0; i < rowCount(); i++){
-		if (data(index(i, 0), DR_OBJECT_ID) == objectId){
+		if (data(index(i, 0), ICollectionViewDelegate::DR_OBJECT_ID) == objectId){
 			row = i;
 			break;
 		}
@@ -1479,7 +1479,7 @@ void CObjectCollectionViewComp::TableModel::UpdateItem(const imtbase::IObjectCol
 void CObjectCollectionViewComp::TableModel::RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId)
 {
 	for (int i = 0; i < rowCount(); i++){
-		if (data(index(i, 0), DR_OBJECT_ID) == objectId){
+		if (data(index(i, 0), ICollectionViewDelegate::DR_OBJECT_ID) == objectId){
 			beginRemoveRows(QModelIndex(), i, i);
 
 			m_totalRowCount -=1;
@@ -1615,15 +1615,15 @@ QVariant CObjectCollectionViewComp::TableModel::data(const QModelIndex& index, i
 		if (metaInfo.count() > index.column()){
 			return metaInfo[index.column()].icon;
 		}
-	case DR_TYPE_ID:
+	case ICollectionViewDelegate::DR_TYPE_ID:
 		if (itemTypeId.isEmpty()){
 			itemTypeId = collectionPtr->GetObjectTypeId(objectId);
 		}
 
 		return itemTypeId;
-	case DR_OBJECT_ID:
+	case ICollectionViewDelegate::DR_OBJECT_ID:
 		return objectId;
-	case DR_SORT_VALUE:
+	case ICollectionViewDelegate::DR_SORT_VALUE:
 		return metaInfo[index.column()].sortValue;
 	}
 
