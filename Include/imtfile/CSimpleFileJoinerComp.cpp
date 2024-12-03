@@ -5,8 +5,7 @@
 #include <QtCore/QString>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
-#include <QtCore/QLockFile>
-#include <QtCore/QTemporaryDir>
+#include <QtCore/QThread>
 
 // ACF includes
 #include <istd/CSystem.h>
@@ -14,9 +13,6 @@
 #include <iprm/IOptionsList.h>
 #include <iprm/IEnableableParam.h>
 #include <ifile/IFileNameParam.h>
-
-// ImtCore includes
-#include <imtbase/CTempDir.h>
 
 
 namespace imtfile
@@ -98,49 +94,33 @@ int CSimpleFileJoinerComp::DoProcessing(
 		appendDataToFile = appendDataToFileParamPtr->IsEnabled();
 	}
 
-	// define temp workspace
-	imtbase::CTempDir tempDir;
-	QFile tempJoinedFile(tempDir.Path() + '/' + targetFileInfo.fileName());
-
-	// save original file if append is enabled
-	if (appendDataToFile){
-		if (!QFile::rename(targetFilePath, tempJoinedFile.fileName())){
-			SendErrorMessage(0, QString("Unable to move target file: '%1' to '%2'").arg(targetFilePath, tempJoinedFile.fileName()));
-
-			return TS_INVALID;
-		}
-	}
-
-	// remove existing file
-	if (targetFileInfo.isFile() && targetFileInfo.exists()){
-		if (!QFile::remove(targetFilePath)){
-			SendErrorMessage(0, QString("Unable to remove target file: '%1'").arg(targetFilePath));
-
-			return TS_INVALID;
-		}
-	}
-
-	// lock target file to ensure it will be created
-	QLockFile targetLockFile(targetFilePath);
-	if (!targetLockFile.tryLock(3000)){
-		SendErrorMessage(0, QString("Unable to lock target file: '%1'").arg(targetFilePath));
-
-		return TS_INVALID;
-	}
-
 	// init temp workspace
-	QIODevice::OpenMode openFlags = QIODevice::ReadWrite;
+	QIODevice::OpenMode openFlags = QIODevice::WriteOnly;
 	if (appendDataToFile){
 		openFlags.setFlag(QIODevice::Append);
 	}
-	if (!tempJoinedFile.open(openFlags)){
-		SendErrorMessage(0, QString("Unable to open temp file: '%1'").arg(tempJoinedFile.fileName()));
+
+	QFile targetFile(targetFilePath);
+	int attempts = 3;
+
+	// A potential (in Windows OS) error may occur if the file system processes the file deletion/closing operation at an inopportune time. Therefore, it is required to wait until the operating system has finished processing all relevant events before continuing.
+	bool isOpen = false;
+	do {
+		isOpen = targetFile.open(openFlags);
+		if (!isOpen){
+			--attempts;
+			SendWarningMessage(0, QString("Unable to open target file: '%1'. Error: %2. Retrying... Remained: %3").arg(targetFilePath, targetFile.errorString(), QString::number(attempts)));
+			QThread::sleep(1);
+		}
+	} while (attempts > 0 && !isOpen);
+
+	if (!targetFile.isOpen()){
+		SendErrorMessage(0, QString("Unable to open target file: '%1'. Error: %2.").arg(targetFilePath, targetFile.errorString()));
 
 		return TS_INVALID;
 	}
 
-	QTextStream tempJoinedFileStream(&tempJoinedFile);
-
+	QTextStream fileStream(&targetFile);
 	// get header text
 	QString headText;
 	if (m_filePartSeparatorTextCompPtr.IsValid()){
@@ -148,7 +128,7 @@ int CSimpleFileJoinerComp::DoProcessing(
 	}
 
 	// process files
-	SendVerboseMessage(QString("Joining files. Output: '%1'").arg(tempJoinedFile.fileName()));
+	SendVerboseMessage(QString("Joining files. Output: '%1'").arg(targetFile.fileName()));
 	int filesCount = filesToJoinListPtr->GetOptionsCount();
 	for (int fileNameIndex = 0; fileNameIndex < filesCount; ++fileNameIndex){
 		const QString currentRelativePath = filesToJoinListPtr->GetOptionName(fileNameIndex);
@@ -164,31 +144,23 @@ int CSimpleFileJoinerComp::DoProcessing(
 		if (!headText.isEmpty()){
 			QString currentFileHeadText(headText);
 			currentFileHeadText.replace(s_filePathVariable, currentRelativePath);
-			tempJoinedFileStream << currentFileHeadText;
-			tempJoinedFileStream << Qt::endl << Qt::endl;
+			fileStream << currentFileHeadText;
+			fileStream << Qt::endl << Qt::endl;
 		}
 
 		const QByteArray readData = currentFile.readAll();
-		tempJoinedFileStream << readData;
+		fileStream << readData;
 
 		for (int i = 0; i < *m_emptyStringsAtEndAttrPtr; ++i){
-			tempJoinedFileStream << Qt::endl;
+			fileStream << Qt::endl;
 		}
 
 		// write data and cleat buffer
-		tempJoinedFileStream.flush();
+		fileStream.flush();
 	}
 
-	// close file and unlock target file
-	tempJoinedFile.close();
-	targetLockFile.unlock();
-
-	// move temp file to target path
-	if (!tempJoinedFile.rename(targetFilePath)){
-		SendErrorMessage(0, QString("Unable to move target file: from '%1' to '%2'").arg(tempJoinedFile.fileName(), targetFilePath));
-
-		return TS_INVALID;
-	}
+	// close file
+	targetFile.close();
 
 	return TS_OK;
 }
