@@ -33,6 +33,7 @@ public:
 	virtual bool GetObjectData(imtbase::IObjectCollection::DataPtr& dataPtr) const override;
 	virtual idoc::MetaInfoPtr GetDataMetaInfo() const override;
 	virtual idoc::MetaInfoPtr GetCollectionMetaInfo() const override;
+	virtual QVariant GetElementInfo(int infoType) const override;
 	virtual QVariant GetElementInfo(QByteArray infoId) const override;
 private:
 	QList<QSqlRecord> m_records;

@@ -126,6 +126,12 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionIterator::GetCollectionMetaInfo() 
 }
 
 
+QVariant CSqlDatabaseObjectCollectionIterator::GetElementInfo(int infoType) const
+{
+	return QVariant();
+}
+
+
 QVariant CSqlDatabaseObjectCollectionIterator::GetElementInfo(QByteArray infoId) const
 {
 	if (m_databaseDelegate == nullptr || m_currentIndex < 0 || m_currentIndex >= m_records.count()){

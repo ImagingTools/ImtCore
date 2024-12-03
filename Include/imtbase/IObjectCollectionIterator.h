@@ -51,6 +51,11 @@ public:
 	/**
 		Get object data element meta information at the current iterator position for a given information-ID.
 	*/
+	virtual QVariant GetElementInfo(int infoType) const = 0;
+
+	/**
+		Get object data element meta information at the current iterator position for a given information-ID.
+	*/
 	virtual QVariant GetElementInfo(QByteArray infoId) const = 0;
 };
 

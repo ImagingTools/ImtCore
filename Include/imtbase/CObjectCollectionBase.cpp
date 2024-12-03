@@ -296,7 +296,7 @@ imtbase::IObjectCollectionIterator* CObjectCollectionBase::CreateObjectCollectio
 			int /*count*/,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
-	return nullptr;
+	return new CollectionIterator(*this);
 }
 
 
@@ -795,6 +795,153 @@ void CObjectCollectionBase::RemoveAllObjects()
 	m_objects.clear();
 
 	locker.unlock();
+}
+
+
+// public methods of the embedded class CollectionIterator
+
+CObjectCollectionBase::CollectionIterator::CollectionIterator(const CObjectCollectionBase& parent)
+	:m_parent(parent),
+	m_index(-1)
+{
+	imod::IModel* modelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(&parent));
+	if (modelPtr != nullptr){
+		modelPtr->AttachObserver(this);
+	}
+}
+
+
+CObjectCollectionBase::CollectionIterator::~CollectionIterator()
+{
+	EnsureModelDetached();
+}
+
+
+void CObjectCollectionBase::CollectionIterator::Reset()
+{
+	m_index = -1;
+}
+
+
+bool CObjectCollectionBase::CollectionIterator::IsValid() const
+{
+	return m_index >= 0 && m_index < m_parent.m_objects.count() /*&& IsModelAttached()*/;
+}
+
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CObjectCollectionBase::CollectionIterator::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+	if (
+		changeSet.Contains(imtbase::ICollectionInfo::CF_ADDED) ||
+		changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED) ||
+		changeSet.Contains(imtbase::ICollectionInfo::CF_ALL_DATA) ||
+		changeSet.Contains(imtbase::ICollectionInfo::CF_ANY)){
+
+		Reset();
+	}
+}
+
+
+// reimplemented (imtbase::IObjectCollectionIterator)
+
+bool CObjectCollectionBase::CollectionIterator::Next() const
+{
+	if (/*IsModelAttached() &&*/ m_index < m_parent.m_objects.count() - 1){
+		m_index++;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CObjectCollectionBase::CollectionIterator::Previous() const
+{
+	if (m_index > 0){
+		m_index--;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+QByteArray CObjectCollectionBase::CollectionIterator::GetObjectId() const
+{
+	if (IsValid()){
+		return m_parent.m_objects[m_index].id;
+	}
+
+	return QByteArray();
+}
+
+
+QByteArray CObjectCollectionBase::CollectionIterator::GetObjectTypeId() const
+{
+	if (IsValid()){
+		return m_parent.m_objects[m_index].typeId;
+	}
+
+	return QByteArray();
+}
+
+
+bool CObjectCollectionBase::CollectionIterator::GetObjectData(IObjectCollection::DataPtr& dataPtr) const
+{
+	if (IsValid()){
+		QByteArray id = m_parent.m_objects[m_index].id;
+		return m_parent.GetObjectData(id, dataPtr);
+	}
+
+	return false;
+}
+
+
+idoc::MetaInfoPtr CObjectCollectionBase::CollectionIterator::GetDataMetaInfo() const
+{
+	if (IsValid()){
+		QByteArray id = m_parent.m_objects[m_index].id;
+		return m_parent.GetDataMetaInfo(id);
+	}
+
+	return idoc::MetaInfoPtr();
+}
+
+
+idoc::MetaInfoPtr CObjectCollectionBase::CollectionIterator::GetCollectionMetaInfo() const
+{
+	if (IsValid()){
+		QByteArray id = m_parent.m_objects[m_index].id;
+		return m_parent.GetElementMetaInfo(id);
+	}
+
+	return idoc::MetaInfoPtr();
+}
+
+
+QVariant CObjectCollectionBase::CollectionIterator::GetElementInfo(int infoType) const
+{
+	if (IsValid()){
+		QByteArray id = m_parent.m_objects[m_index].id;
+		return m_parent.GetElementInfo(id, infoType);
+	}
+
+	return QVariant();
+}
+
+
+QVariant CObjectCollectionBase::CollectionIterator::GetElementInfo(QByteArray infoId) const
+{
+	//if (m_index >= 0 && m_index < m_parent.m_objects.count()){
+	//	QByteArray id = m_parent.m_objects[m_index].id;
+	//	return m_parent.GetElementInfo(id, infoId);
+	//}
+
+	return QVariant();
 }
 
 

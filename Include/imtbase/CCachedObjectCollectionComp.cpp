@@ -222,11 +222,16 @@ IObjectCollection* CCachedObjectCollectionComp::CreateSubCollection(int offset, 
 
 
 imtbase::IObjectCollectionIterator* CCachedObjectCollectionComp::CreateObjectCollectionIterator(
-			const QByteArray& /*objectId*/,
-			int /*offset*/,
-			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const QByteArray& objectId,
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
+	FilteredCollection* collectionChacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
+	if (collectionChacheItemPtr != nullptr){
+		return collectionChacheItemPtr->cachePtr->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
+	}
+
 	return nullptr;
 }
 

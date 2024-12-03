@@ -10,12 +10,14 @@
 #include <istd/TOptDelPtr.h>
 #include <imod/CModelUpdateBridge.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
+#include <imod/CSingleModelObserverBase.h>
 
 // ImtCore includes
 #include <imtbase/CObjectCollectionMetaInfo.h>
 #include <imtbase/ICollectionDataController.h>
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IObjectCollectionIterator.h>
 
 
 namespace imtbase
@@ -105,6 +107,35 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
+	struct CollectionIterator : public imod::CSingleModelObserverBase, virtual public imtbase::IObjectCollectionIterator
+	{
+	public:
+		CollectionIterator() = delete;
+		CollectionIterator(const CObjectCollectionBase& parent);
+		~CollectionIterator();
+
+		void Reset();
+		bool IsValid() const;
+
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
+		// reimplemented (imtbase::IObjectCollectionIterator)
+		virtual bool Next() const override;
+		virtual bool Previous() const override;
+		virtual QByteArray GetObjectId() const override;
+		virtual QByteArray GetObjectTypeId() const override;
+		virtual bool GetObjectData(IObjectCollection::DataPtr& dataPtr) const override;
+		virtual idoc::MetaInfoPtr GetDataMetaInfo() const override;
+		virtual idoc::MetaInfoPtr GetCollectionMetaInfo() const override;
+		virtual QVariant GetElementInfo(int infoType) const override;
+		virtual QVariant GetElementInfo(QByteArray infoId) const override;
+
+	private:
+		const CObjectCollectionBase& m_parent;
+		mutable int m_index;
+	};
+
 	struct ObjectInfo
 	{
 		ObjectInfo()
