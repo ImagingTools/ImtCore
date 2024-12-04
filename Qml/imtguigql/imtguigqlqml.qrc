@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/qml">
+	<file alias="web/GraphQLRequest.js">../web/GraphQLRequest.js</file>
 	<file alias="imtguigql/qmldir">qmldir</file>
-	<file alias="imtguigql/GraphQLRequest.js">GraphQLRequest.js</file>
 	<file alias="imtguigql/GqlModelObserver.qml">GqlModelObserver.qml</file>
 	<file alias="imtguigql/GqlDocumentObserver.qml">GqlDocumentObserver.qml</file>
 	<file alias="imtguigql/GqlDocumentDataController.qml">GqlDocumentDataController.qml</file>

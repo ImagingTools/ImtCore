@@ -1,277 +1,295 @@
 var Field = function(){
-    return {
-        id: "",
-        value: "",
-        objectPtr: undefined
-    }  
+	return {
+		id: "",
+		value: "",
+		objectPtr: undefined
+	}
 }
 
 var GqlObject = function(objectId){
-    return {
-        m_fieldsMap: {},
-        m_objectId: objectId,
-        m_parentPtr: {},
+	return {
+		m_fieldsMap: {},
+		m_objectId: objectId,
+		m_parentPtr: {},
 
-        IsObject: function(fieldId){
-            var retVal = false
-            if (this.m_fieldsMap.hasOwnProperty(fieldId)){
-                if (this.m_fieldsMap[fieldId].objectPtr !== undefined){
-                    retVal = true
-                }
-            }
-            return retVal
-        },
+		IsObject: function(fieldId){
+			var retVal = false
+			if (this.m_fieldsMap.hasOwnProperty(fieldId)){
+				if (this.m_fieldsMap[fieldId].objectPtr !== undefined){
+					retVal = true
+				}
+			}
 
-        fromJson: function(json) {
-            let dataJson = JSON.parse(json)
-            for (let key in dataJson){
-                this.InsertField(key, dataJson[key])
-            }
-        },
+			return retVal
+		},
 
-        GetFieldIds: function() {
-            var keys = []
-    
-            for (var key in this.m_fieldsMap){
-                if (this.m_fieldsMap.hasOwnProperty(key)) {
-                    keys.push(key)
-                }
-            }
-            return keys
-        },
+		fromJson: function(json) {
+			let recursiveFillObject = function(gqlObject, jsonObject){
+				let obj = JSON.parse(jsonObject);
 
-        GetFieldArgumentObjectPtr: function(fieldId){
-            var retVal = ""
-    
-            if (this.m_fieldsMap.hasOwnProperty(fieldId)){
-                retVal = this.m_fieldsMap[fieldId].objectPtr
-            }
-            return retVal
-        },
-    
-        GetFieldArgumentValue: function(fieldId){
-            var retVal = "";
-            if (this.m_fieldsMap.hasOwnProperty(fieldId)){
-                retVal = this.m_fieldsMap[fieldId]; // .value undefined
-            }
-            return retVal;
-        },
-    
-        InsertField: function(fieldId, value){
-            if (!this.m_fieldsMap.hasOwnProperty(fieldId)) {
-                  this.m_fieldsMap[fieldId] = fieldId
-            }
-            if(value !== undefined){
-                this.m_fieldsMap[fieldId] = value;
-            }
-        },
+				for (let key in obj){
+					if (typeof obj[key] === 'object'){
+						if(Array.isArray(obj[key])){
+							// TODO: Array unsupported!
+						}
+						else{
+							var objectParam = Gql.GqlObject(key);
+							recursiveFillObject(objectParam, JSON.stringify(obj[key]));
+							gqlObject.InsertFieldObject(objectParam);
+						}
+					}
+					else{
+						gqlObject.InsertField(key, obj[key]);
+					}
+				}
+			}
 
-        InsertFieldObject: function(objectPtr){
-            var fieldId = objectPtr.m_objectId
-            if (!this.m_fieldsMap.hasOwnProperty(fieldId)){
-                var newField = {}
-                newField.id = fieldId
-                newField.objectPtr = objectPtr
-    
-                this.m_fieldsMap[fieldId] = newField
-                objectPtr.m_parentPtr = this
-            }
-        }
-    }  
+			recursiveFillObject(this, json);
+		},
+
+		GetFieldIds: function() {
+			var keys = []
+
+			for (var key in this.m_fieldsMap){
+				if (this.m_fieldsMap.hasOwnProperty(key)) {
+					keys.push(key)
+				}
+			}
+			return keys
+		},
+
+		GetFieldArgumentObjectPtr: function(fieldId){
+			var retVal = ""
+
+			if (this.m_fieldsMap.hasOwnProperty(fieldId)){
+				retVal = this.m_fieldsMap[fieldId].objectPtr
+			}
+			return retVal
+		},
+
+		GetFieldArgumentValue: function(fieldId){
+			var retVal = "";
+			if (this.m_fieldsMap.hasOwnProperty(fieldId)){
+				retVal = this.m_fieldsMap[fieldId]; // .value undefined
+			}
+			return retVal;
+		},
+
+		InsertField: function(fieldId, value){
+			if (!this.m_fieldsMap.hasOwnProperty(fieldId)) {
+				this.m_fieldsMap[fieldId] = fieldId
+			}
+			if(value !== undefined){
+				this.m_fieldsMap[fieldId] = value;
+			}
+		},
+
+		InsertFieldObject: function(objectPtr){
+			var fieldId = objectPtr.m_objectId
+			if (!this.m_fieldsMap.hasOwnProperty(fieldId)){
+				var newField = {}
+				newField.id = fieldId
+				newField.objectPtr = objectPtr
+
+				this.m_fieldsMap[fieldId] = newField
+				objectPtr.m_parentPtr = this
+			}
+		}
+	}
 }
 
 var GqlRequest = function(requestType, commandId){
-    return {
-        m_requestType: requestType,
-        m_commandId: commandId,
-        m_fields: [],
-        m_params: [],
+	return {
+		m_requestType: requestType,
+		m_commandId: commandId,
+		m_fields: [],
+		m_params: [],
 
-        SetRequestType: function(requestType){
-            this.m_requestType = requestType
-        },
+		SetRequestType: function(requestType){
+			this.m_requestType = requestType
+		},
 
-        GetRequestType: function(){
-            return this.m_requestType
-        },
+		GetRequestType: function(){
+			return this.m_requestType
+		},
 
-        SetCommandId: function(commandId){
-            this.m_commandId = commandId
-        },
+		SetCommandId: function(commandId){
+			this.m_commandId = commandId
+		},
 
-        GetCommandId: function(){
-            return this.m_commandId
-        },
+		GetCommandId: function(){
+			return this.m_commandId
+		},
 
-        AddField: function(field){
-            this.m_fields.push(field)
-        },
+		AddField: function(field){
+			this.m_fields.push(field)
+		},
 
-        AddParam:function (param){
-            this.m_params.push(param)
-        },
+		AddParam:function (param){
+			this.m_params.push(param)
+		},
 
-        AddObjectFieldPart: function(gqlObject){
-            var retVal = ""
-            retVal += gqlObject.m_objectId
+		AddObjectFieldPart: function(gqlObject){
+			var retVal = ""
+			retVal += gqlObject.m_objectId
 
-            var fieldIds = gqlObject.GetFieldIds()
+			var fieldIds = gqlObject.GetFieldIds()
 
-            if (fieldIds.length > 0){
-                retVal += " {"
+			if (fieldIds.length > 0){
+				retVal += " {"
 
-                for (var i = 0; i < fieldIds.length; ++i){
-                    var fieldId = fieldIds[i]
-                    if (gqlObject.IsObject(fieldId)){
-                        retVal += this.AddObjectFieldPart(gqlObject.GetFieldArgumentObjectPtr(fieldId))
-                    } else {
-                        retVal += fieldId
-                    }
-                    if (i < fieldIds.length - 1){
-                        retVal += " "
-                    }
-                }
+				for (var i = 0; i < fieldIds.length; ++i){
+					var fieldId = fieldIds[i]
+					if (gqlObject.IsObject(fieldId)){
+						retVal += this.AddObjectFieldPart(gqlObject.GetFieldArgumentObjectPtr(fieldId))
+					} else {
+						retVal += fieldId
+					}
+					if (i < fieldIds.length - 1){
+						retVal += " "
+					}
+				}
 
-                retVal += "}"
-            }
+				retVal += "}"
+			}
 
-            return retVal
-        },
+			return retVal
+		},
 
-        AddObjectParamPart: function(gqlObject){
-            var retVal = ""
-            if(typeof gqlObject !== "object"){
-                if(typeof gqlObject == "string"){
-                    return "\\\"" + gqlObject + "\\\"";
-                }
-                return gqlObject;
-            }
+		AddObjectParamPart: function(gqlObject){
+			var retVal = ""
+			if(typeof gqlObject !== "object"){
+				if(typeof gqlObject == "string"){
+					return "\\\"" + gqlObject + "\\\"";
+				}
+				return gqlObject;
+			}
 
-            var objectId = gqlObject.m_objectId
-
-
-            if (objectId && objectId.length) {
-                retVal += objectId
-                retVal += ": {"
-            }
-
-            var fieldIds = gqlObject.GetFieldIds()
-            for (var i = 0; i < fieldIds.length; ++i) {
-                var fieldId = fieldIds[i]
-
-                if (gqlObject.IsObject(fieldId)) {
-                    retVal += this.AddObjectParamPart(gqlObject.GetFieldArgumentObjectPtr(fieldId))
-                } else {
-
-                    retVal += fieldId
-                    retVal += ": "
-                    var value = gqlObject.GetFieldArgumentValue(fieldId)
-
-                    if(Array.isArray(value)){
-                        retVal+= "[";
-                        for(let j = 0; j < value.length; j++){
-                            var tempVal = this.AddObjectParamPart(value[j]);
-                            if(j !== value.length - 1){
-                                tempVal += ",";
-                            }
-                            retVal += tempVal;
-                        }
-                        retVal+= "]";
-
-                    }
-                    else {
-                        var isString = (typeof value === 'string' || value instanceof String)
-                        if (isString) {
-                            value = value.replace(/\\/g,"\\\\\\\\")
-                            value = value.replace(/\"/g,"\\\\\\\"")
-                            value = value.replace(/\r/g,"\\\\\\\\r")
-                            value = value.replace(/\n/g,"\\\\\\\\n")
-                            value = value.replace(/\t/g,"\\\\\\\\t")
-                            retVal += "\\\""
-                        }
-
-                        if (typeof value.toGraphQL === "function"){
-                            let data = value.toGraphQL();
-                            data = data.replace(/\\/g,"\\\\")
-                            data = data.replace(/\"/g,"\\\"")
-                            data = data.replace(/\r/g,"\\\\r")
-                            data = data.replace(/\n/g,"\\\\n")
-                            data = data.replace(/\t/g,"\\\\t")
-
-                            retVal += data
-                        }
-                        else{
-                            retVal += value
-                        }
-
-                        if (isString) {
-                            retVal += "\\\""
-                        }
-                    }
+			var objectId = gqlObject.m_objectId
 
 
-                }
-                if (i < fieldIds.length - 1) {
-                    retVal += ", "
-                }
-            }
+			if (objectId && objectId.length) {
+				retVal += objectId
+				retVal += ": {"
+			}
 
-            if (objectId.length > 0) {
-                retVal += "}"
-            }
+			var fieldIds = gqlObject.GetFieldIds()
+			for (var i = 0; i < fieldIds.length; ++i) {
+				var fieldId = fieldIds[i]
 
-            return retVal
-        },
+				if (gqlObject.IsObject(fieldId)) {
+					retVal += this.AddObjectParamPart(gqlObject.GetFieldArgumentObjectPtr(fieldId))
+				} else {
 
-        CreateQueryFields: function() {
-            var retVal = ""
+					retVal += fieldId
+					retVal += ": "
+					var value = gqlObject.GetFieldArgumentValue(fieldId)
 
-            for (var i = 0; i < this.m_fields.length; ++i){
-                this.object = this.m_fields[i]
-                retVal += this.AddObjectFieldPart(this.object)
+					if(Array.isArray(value)){
+						retVal+= "[";
+						for(let j = 0; j < value.length; j++){
+							var tempVal = this.AddObjectParamPart(value[j]);
+							if(j !== value.length - 1){
+								tempVal += ",";
+							}
+							retVal += tempVal;
+						}
+						retVal+= "]";
 
-                if (i < this.m_fields.length - 1){
-                    retVal += " "
-                }
-            }
-            return retVal
-        },
+					}
+					else {
+						var isString = (typeof value === 'string' || value instanceof String)
+						if (isString) {
+							value = value.replace(/\\/g,"\\\\\\\\")
+							value = value.replace(/\"/g,"\\\\\\\"")
+							value = value.replace(/\r/g,"\\\\\\\\r")
+							value = value.replace(/\n/g,"\\\\\\\\n")
+							value = value.replace(/\t/g,"\\\\\\\\t")
+							retVal += "\\\""
+						}
 
-        CreateQueryParams: function() {
-            var retVal = ""
+						if (typeof value.toGraphQL === "function"){
+							let data = value.toGraphQL();
+							data = data.replace(/\\/g,"\\\\")
+							data = data.replace(/\"/g,"\\\"")
+							data = data.replace(/\r/g,"\\\\r")
+							data = data.replace(/\n/g,"\\\\n")
+							data = data.replace(/\t/g,"\\\\t")
 
-            for (var i = 0; i < this.m_params.length; ++i){
-                this.object = this.m_params[i]
-                retVal += this.AddObjectParamPart(this.object)
+							retVal += data
+						}
+						else{
+							retVal += value
+						}
 
-                if (i < this.m_fields - 1){
-                    retVal += ", "
-                }
-            }
-            return retVal
-        },
+						if (isString) {
+							retVal += "\\\""
+						}
+					}
 
-        GetQuery: function(){
-            var fields = this.CreateQueryFields()
-            var params = this.CreateQueryParams()
 
-            var type = this.m_requestType
+				}
+				if (i < fieldIds.length - 1) {
+					retVal += ", "
+				}
+			}
 
-            if (params.length > 0) {
-                params = "(" + params
-                params = params + ")"
-            }
+			if (objectId.length > 0) {
+				retVal += "}"
+			}
 
-            var queryData = "{\"query\": \"" + type + " " + this.m_commandId + " {" + this.m_commandId + params + " {" + fields + "}" + "}\"}"
+			return retVal
+		},
 
-            return queryData
-        }
-    }  
+		CreateQueryFields: function() {
+			var retVal = ""
+
+			for (var i = 0; i < this.m_fields.length; ++i){
+				this.object = this.m_fields[i]
+				retVal += this.AddObjectFieldPart(this.object)
+
+				if (i < this.m_fields.length - 1){
+					retVal += " "
+				}
+			}
+			return retVal
+		},
+
+		CreateQueryParams: function() {
+			var retVal = ""
+
+			for (var i = 0; i < this.m_params.length; ++i){
+				this.object = this.m_params[i]
+				retVal += this.AddObjectParamPart(this.object)
+
+				if (i < this.m_fields - 1){
+					retVal += ", "
+				}
+			}
+			return retVal
+		},
+
+		GetQuery: function(){
+			var fields = this.CreateQueryFields()
+			var params = this.CreateQueryParams()
+
+			var type = this.m_requestType
+
+			if (params.length > 0) {
+				params = "(" + params
+				params = params + ")"
+			}
+
+			var queryData = "{\"query\": \"" + type + " " + this.m_commandId + " {" + this.m_commandId + params + " {" + fields + "}" + "}\"}"
+
+			return queryData
+		}
+	}
 }
 
 var Gql = {
-    Field: Field,
-    GqlObject: GqlObject,
-    GqlRequest: GqlRequest,
+	Field: Field,
+	GqlObject: GqlObject,
+	GqlRequest: GqlRequest,
 }
 
