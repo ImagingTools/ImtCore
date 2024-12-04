@@ -194,6 +194,16 @@ I_EXPORT_COMPONENT(
 			"Delegated url param",
 			"Delegated Url Param");
 
+I_EXPORT_COMPONENT(
+			ComplexCollectionFilter,
+			"Complex collection filter",
+			"Complex Collection Filter");
+
+I_EXPORT_COMPONENT(
+			CollectionFilter,
+			"Collection filter",
+			"Collection Filter");
+
 
 } // namespace ImtCorePck
 

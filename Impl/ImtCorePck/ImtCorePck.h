@@ -42,6 +42,8 @@
 #include <imtbase/CModelUpdateBridgeComp.h>
 #include <imtbase/CDelegatedUrlParamComp.h>
 #include <imtbase/CNumericParamSummaryRepresentationControllerComp.h>
+#include <imtbase/CComplexCollectionFilter.h>
+#include <imtbase/CCollectionFilter.h>
 
 
 /**
@@ -102,6 +104,8 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable>> TableViewParam;
 typedef ibase::TModelObserverCompWrap<imtbase::CModelUpdateBridgeComp> ModelUpdateBridge;
 typedef icomp::TModelCompWrap<imtbase::CDelegatedUrlParamComp> DelegatedUrlParam;
+typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtbase::CComplexCollectionFilter, imtbase::IComplexCollectionFilter, iser::ISerializable>> ComplexCollectionFilter;
+typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtbase::CCollectionFilter, imtbase::ICollectionFilter, iser::ISerializable>> CollectionFilter;
 
 
 } // namespace ImtCorePck
