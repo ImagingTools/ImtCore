@@ -110,7 +110,6 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 	}
 
 	imtsdl::SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
-
 	for (const imtsdl::CSdlType& sdlType: sdlTypeList){
 		m_headerFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
 		m_sourceFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
