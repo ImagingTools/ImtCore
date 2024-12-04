@@ -19,9 +19,16 @@ namespace imtsdlgen
 
 bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType)
 {
+	if (m_headerFilePtr == nullptr){
+		SendCriticalMessage(0, "Unable to process header file. Pointer is not set!");
+		I_CRITICAL();
+
+		return false;
+	}
+
 	m_logTag = QStringLiteral("GqlModificator");
 
-	QTextStream ofStream(m_headerFilePtr.GetPtr());
+	QTextStream ofStream(m_headerFilePtr);
 	// add read method definition
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromGraphQlObject(C");
 	ofStream << sdlType.GetName();
@@ -39,7 +46,14 @@ bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType&
 
 bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType)
 {
-	QTextStream ofStream(m_sourceFilePtr.GetPtr());
+	if (m_sourceFilePtr == nullptr){
+		SendCriticalMessage(0, "Unable to process source file. Pointer is not set!");
+		I_CRITICAL();
+
+		return false;
+	}
+
+	QTextStream ofStream(m_sourceFilePtr);
 
 	// read method implementation
 	ofStream << QStringLiteral("bool C");

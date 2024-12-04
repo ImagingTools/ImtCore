@@ -7,7 +7,7 @@
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <iprm/ITextParam.h>
-#include <iproc/TSyncProcessorCompBase.h>
+#include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
@@ -16,6 +16,7 @@
 #include <imtsdl/CSdlTools.h>
 #include <imtsdl/CSdlEnumConverter.h>
 #include <imtsdlgen/IIncludeDirectivesProvider.h>
+#include <imtsdlgen/ICxxFileProcessor.h>
 
 
 namespace imtsdlgen
@@ -26,8 +27,9 @@ namespace imtsdlgen
 	The base for SDL-C++ class modificators.
 */
 class CSdlClassModificatorBaseComp:
-			public iproc::CSyncProcessorCompBase,
+			public ilog::CLoggerComponentBase,
 			public IIncludeDirectivesProvider,
+			public ICxxFileProcessor,
 			protected imtsdl::CSdlTools,
 			protected imtsdl::CSdlEnumConverter
 {
@@ -42,10 +44,11 @@ class CSdlClassModificatorBaseComp:
 	*/
 
 public:
-	typedef iproc::CSyncProcessorCompBase BaseClass;
+	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CSdlClassModificatorBaseComp)
 		I_REGISTER_INTERFACE(IIncludeDirectivesProvider)
+		I_REGISTER_INTERFACE(ICxxFileProcessor)
 		I_ASSIGN(m_processorModificatorNameAttrPtr, "ProcessModificatorName", "The name, allows to do processing, received from arguments in 'modificators' section", false, "<NEED_TO_SET!>")
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
@@ -53,22 +56,13 @@ public:
 		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
 	I_END_COMPONENT;
 
-	// reimplemented (iproc::IProcessor)
-	virtual int DoProcessing(
-				const iprm::IParamsSet* paramsPtr,
-				const istd::IPolymorphic* inputPtr,
-				istd::IChangeable* outputPtr,
-				ibase::IProgressManager* progressManagerPtr = NULL) override;
+	// reimplemented (ICxxFileProcessor)
+	[[nodiscard]] virtual bool ProcessType(const imtsdl::CSdlType& sdlType, QFile* headerFilePtr, QFile* sourceFilePtr) override;
+
 
 protected: // pure virtual methods
 	virtual bool ProcessSourceClassFile(const imtsdl::CSdlType& sdlType) = 0;
 	virtual bool ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType) = 0;
-
-protected:
-	virtual bool BeginClassFiles(const imtsdl::CSdlType& sdlType);
-	virtual bool EndClassFiles(const imtsdl::CSdlType& sdlType);
-	virtual bool CloseFiles();
-	virtual void AbortCurrentProcessing();
 
 protected:
 	I_ATTR(QString, m_processorModificatorNameAttrPtr);
@@ -77,14 +71,10 @@ protected:
 	I_REF(imtsdl::ISdlEnumListProvider, m_sdlEnumListCompPtr);
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);
 
-	istd::TDelPtr<QFile> m_headerFilePtr;
-	istd::TDelPtr<QFile> m_sourceFilePtr;
+	QFile* m_headerFilePtr;
+	QFile* m_sourceFilePtr;
 
 	QString m_logTag;
-
-private:
-	istd::TDelPtr<QFile> m_originalHeaderFilePtr;
-	istd::TDelPtr<QFile> m_originalSourceFilePtr;
 };
 
 

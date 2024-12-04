@@ -14,6 +14,7 @@
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/CSdlTools.h>
 #include <imtsdlgen/IIncludeDirectivesProvider.h>
+#include <imtsdlgen/ICxxFileProcessor.h>
 
 
 namespace imtsdlgen
@@ -51,8 +52,6 @@ public:
 				ibase::IProgressManager* progressManagerPtr = NULL) override;
 
 private:
-	bool ReOpenFiles();
-	bool CloseFiles();
 	bool BeginClassFiles(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude, bool addSelfHeaderInclude);
 	bool BeginHeaderClassFile(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude);
 	bool EndHeaderClassFile(const imtsdl::CSdlType& sdlType);
@@ -90,7 +89,7 @@ private:
 	I_REF(imtsdl::ISdlEnumListProvider, m_sdlEnumListCompPtr);
 	I_REF(iproc::IProcessor, m_baseClassExtenderCompPtr);
 	I_REF(iproc::IProcessor, m_filesJoinerCompPtr);
-	I_MULTIREF(iproc::IProcessor, m_codeGeneratorExtenderListCompPtr);
+	I_MULTIREF(ICxxFileProcessor, m_codeGeneratorExtenderListCompPtr);
 	I_MULTIREF(IIncludeDirectivesProvider, m_includeDirectivesProviderListCompPtr);
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);

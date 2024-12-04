@@ -24,19 +24,18 @@ namespace imtsdlgen
 
 
 int CSdlClassCodeGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* paramsPtr,
-			const istd::IPolymorphic* inputPtr,
-			istd::IChangeable* outputPtr,
-			ibase::IProgressManager* progressManagerPtr)
+			const iprm::IParamsSet* /*paramsPtr*/,
+			const istd::IPolymorphic* /*inputPtr*/,
+			istd::IChangeable* /*outputPtr*/,
+			ibase::IProgressManager* /*progressManagerPtr*/)
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_originalSchemaNamespaceCompPtr.IsValid());
 
-	int retVal = TS_OK;
-
 	if (!m_argumentParserCompPtr->IsCppEnabled()){
-		return retVal;
+		// nothing todo
+		return TS_OK;
 	}
 
 	if (!m_baseClassExtenderCompPtr.IsValid()){
@@ -112,13 +111,12 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 	imtsdl::SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
 
-	// first create all files with basic mathods
 	for (const imtsdl::CSdlType& sdlType: sdlTypeList){
 		m_headerFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
 		m_sourceFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
-
 		const bool hasExtDeps = m_argumentParserCompPtr->GetAutoLinkLevel() != imtsdl::ISdlProcessArgumentsParser::ALL_NONE;
 
+		// First create all files with basic methods
 		if (!BeginClassFiles(sdlType, hasExtDeps || !joinHeaders, !joinSources)){
 			SendErrorMessage(0, QString("Unable to begin files"));
 			I_CRITICAL();
@@ -126,19 +124,24 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 			return TS_INVALID;
 		}
 
-		// Close files so that extenders can make their own changes
-		if (!CloseFiles()){
-			SendErrorMessage(0, QString("Unable to close files"));
-			I_CRITICAL();
+		// Then let extenders to make changes. Add new transformation methods (JSON, GQL, ...)
+		const int extendersCount = m_codeGeneratorExtenderListCompPtr.GetCount();
+		for (int i = 0; i < extendersCount; ++i){
+			ICxxFileProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
+			Q_ASSERT(extenderPtr != nullptr);
 
-			return TS_INVALID;
+			bool extendSuccess = extenderPtr->ProcessType(sdlType, m_headerFilePtr.GetPtr(), m_sourceFilePtr.GetPtr());
+			if (!extendSuccess){
+				return TS_INVALID;
+			}
 		}
-	}
 
-	QMap<QString, QString> baseClassList = m_argumentParserCompPtr->GetBaseClassList();
-	if (!baseClassList.isEmpty()){
+		// And complete the processing
+		EndClassFiles(sdlType);
 
-		for (const imtsdl::CSdlType& sdlType: sdlTypeList){
+		// Extend with base class if required
+		QMap<QString, QString> baseClassList = m_argumentParserCompPtr->GetBaseClassList();
+		if (!baseClassList.isEmpty()){
 			iprm::CParamsSet paramsSet;
 
 			const QString filePath = outputDirectoryPath + "/C" + sdlType.GetName() + ".h";
@@ -159,34 +162,6 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 				return extendResult;
 			}
 		}
-	}
-
-	// Then let extenders to make changes
-	const int extendersCount = m_codeGeneratorExtenderListCompPtr.GetCount();
-	for (int i = 0; i < extendersCount; ++i){
-		iproc::IProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
-		Q_ASSERT(extenderPtr != nullptr);
-
-		int extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
-		if (extenderResult != TS_OK){
-			return extenderResult;
-		}
-		retVal = qMax(retVal, extenderResult);
-	}
-
-	// Reopen files to complete processing
-	for (const imtsdl::CSdlType& sdlType: sdlTypeList){
-		m_headerFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
-		m_sourceFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
-		if (!ReOpenFiles()){
-			SendErrorMessage(0, QString("Unable to reopen files"));
-			I_CRITICAL();
-
-			return TS_INVALID;
-		}
-
-		// And complete the processing
-		EndClassFiles(sdlType);
 	}
 
 	// join files if required
@@ -265,49 +240,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 		}
 	}
 
-	return retVal;
-}
-
-
-// private methods
-
-bool CSdlClassCodeGeneratorComp::ReOpenFiles()
-{
-	if (!m_headerFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
-		SendCriticalMessage(0,
-					QString("Unable to open file: '%1'. Error: %2")
-						.arg(m_headerFilePtr->fileName(), m_headerFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
-	}
-
-	if (!m_sourceFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
-		SendCriticalMessage(0,
-						QString("Unable to open file: '%1'. Error: %2")
-							.arg(m_sourceFilePtr->fileName(), m_sourceFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
-	}
-
-	return true;
-}
-
-
-bool CSdlClassCodeGeneratorComp::CloseFiles()
-{
-	bool retVal = true;
-
-	retVal = m_headerFilePtr->flush();
-	retVal = m_sourceFilePtr->flush() && retVal;
-
-	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
-
-	return retVal;
+	return TS_OK;
 }
 
 
@@ -400,7 +333,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 					SendCriticalMessage(0, QString("Unable to find type for %1 of %2").arg(field.GetId(), sdlType.GetName()));
 					I_CRITICAL();
 
-					return TS_INVALID;
+					return false;
 				}
 
 				const QString defaultName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
@@ -724,7 +657,11 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 	}
 	sourceStream.flush();
 
-	CloseFiles();
+	m_headerFilePtr->close();
+	m_sourceFilePtr->close();
+
+	m_headerFilePtr.Reset();
+	m_sourceFilePtr.Reset();
 
 	return true;
 }
