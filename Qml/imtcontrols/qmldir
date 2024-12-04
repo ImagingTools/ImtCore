@@ -102,6 +102,7 @@ TableCellTextWithTooltipDelegate 1.0 ./Views/TableCellTextWithTooltipDelegate.qm
 TableCellIconTextDelegate 1.0 ./Views/TableCellIconTextDelegate.qml
 TableDelegate 1.0 ./Views/TableDelegate.qml
 TableRowDelegateBase 1.0 ./Views/TableRowDelegateBase.qml
+TablePainterRowDelegateBase 1.0 ./Views/TablePainterRowDelegateBase.qml
 TableRowDelegate 1.0 ./Views/TableRowDelegate.qml
 SimpleTableDelegate 1.0 ./Views/SimpleTableDelegate.qml
 TableRowViewer 1.0 ./Views/TableRowViewer.qml
