@@ -341,8 +341,6 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		viewParamsGql = inputObject->GetFieldArgumentObjectPtr("viewParams");
 	}
 
-	iprm::CParamsSet filterParams;
-
 	int offset = 0, count = -1;
 
 	if (viewParamsGql != nullptr){
@@ -350,7 +348,19 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		count = viewParamsGql->GetFieldArgumentValue("count").toInt();
 	}
 
-	imtbase::ICollectionInfo::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
+	QByteArray data = inputObject->GetFieldArgumentValue("selectionParams").toByteArray();
+
+	istd::TDelPtr<iprm::IParamsSet> filterParamsPtr;
+	if (m_paramsSetFactCompPtr.IsValid()){
+		filterParamsPtr.SetPtr(m_paramsSetFactCompPtr.CreateInstance());
+	}
+	else{
+		filterParamsPtr.SetPtr(new iprm::CParamsSet);
+	}
+
+	DeSerializeObject(filterParamsPtr.GetPtr(), QByteArray::fromBase64(data));
+
+	imtbase::ICollectionInfo::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, filterParamsPtr.GetPtr());
 	for (const imtbase::ICollectionInfo::Id& id: ids){
 		int itemIndex = itemsModel->InsertNewItem();
 
@@ -485,10 +495,17 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElement
 
 	QByteArray data = inputObjectPtr->GetFieldArgumentValue("selectionParams").toByteArray();
 
-	iprm::CParamsSet paramSet;
-	DeSerializeObject(&paramSet, QByteArray::fromBase64(data));
+	istd::TDelPtr<iprm::IParamsSet> filterParamsPtr;
+	if (m_paramsSetFactCompPtr.IsValid()){
+		filterParamsPtr.SetPtr(m_paramsSetFactCompPtr.CreateInstance());
+	}
+	else{
+		filterParamsPtr.SetPtr(new iprm::CParamsSet);
+	}
 
-	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &paramSet);
+	DeSerializeObject(filterParamsPtr.GetPtr(), QByteArray::fromBase64(data));
+
+	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(offset, count, filterParamsPtr.GetPtr());
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");

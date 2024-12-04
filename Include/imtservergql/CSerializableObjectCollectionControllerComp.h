@@ -20,6 +20,7 @@ public:
 	I_BEGIN_COMPONENT(CSerializableObjectCollectionControllerComp);
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "ID for according to which GQL commands are generated", true, "");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
+		I_ASSIGN(m_paramsSetFactCompPtr, "FilterParamsSet", "Filter parameters", false, "FilterParamsSet");
 	I_END_COMPONENT;
 
 protected:
@@ -48,6 +49,7 @@ protected:
 private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
+	I_FACT(iprm::IParamsSet, m_paramsSetFactCompPtr);
 
 	QByteArrayList m_baseCommandIds;
 };
