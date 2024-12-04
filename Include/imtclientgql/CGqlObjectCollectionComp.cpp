@@ -41,6 +41,14 @@ imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::CreateObjectInstan
 }
 
 
+// reimplemented (IObjectCollectionInfo)
+
+const iprm::IOptionsList* CGqlObjectCollectionComp::GetObjectTypesInfo() const
+{
+	return &m_typeInfos;
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CGqlObjectCollectionComp::OnComponentCreated()
@@ -57,6 +65,13 @@ void CGqlObjectCollectionComp::OnComponentCreated()
 
 	if (m_metaInfoCreatorCompPtr.IsValid()){
 		m_metaInfoCreatorPtr = m_metaInfoCreatorCompPtr.GetPtr();
+	}
+
+	for (int i = 0; i < m_typeIdsAttrPtr.GetCount(); i++){
+		QByteArray typeId = m_typeIdsAttrPtr[i];
+		if (!typeId.isEmpty()){
+			m_typeInfos.InsertOption(typeId, typeId);
+		}
 	}
 }
 

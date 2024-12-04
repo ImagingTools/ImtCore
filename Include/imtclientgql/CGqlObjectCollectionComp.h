@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <iprm/COptionsManager.h>
 
 // ImtCore includes
 #include <imtclientgql/IGqlSubscriptionClient.h>
@@ -47,6 +48,9 @@ public:
 	virtual void OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData) override;
 	virtual void OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& message) override;
 
+	// reimplemented (IObjectCollectionInfo)
+	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
+
 protected:
 	virtual imtbase::IObjectCollection::DataPtr CreateObjectInstance(const QByteArray& typeId) const override;
 
@@ -60,6 +64,8 @@ protected:
 	I_MULTIFACT(istd::IChangeable, m_objectFactoriesCompPtr);
 	I_REF(IGqlClient, m_clientCompPtr);
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
+
+	iprm::COptionsManager m_typeInfos;
 };
 
 

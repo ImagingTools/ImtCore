@@ -936,11 +936,6 @@ QVariant CObjectCollectionBase::CollectionIterator::GetElementInfo(int infoType)
 
 QVariant CObjectCollectionBase::CollectionIterator::GetElementInfo(QByteArray infoId) const
 {
-	//if (m_index >= 0 && m_index < m_parent.m_objects.count()){
-	//	QByteArray id = m_parent.m_objects[m_index].id;
-	//	return m_parent.GetElementInfo(id, infoId);
-	//}
-
 	return QVariant();
 }
 
