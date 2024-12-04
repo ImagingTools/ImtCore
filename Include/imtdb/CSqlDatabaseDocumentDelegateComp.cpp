@@ -108,7 +108,9 @@ istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(cons
 	if (record.contains(s_documentColumn)){
 		QByteArray documentContent = record.value(qPrintable(s_documentColumn)).toByteArray();
 
-		documentContent = QByteArray::fromBase64(documentContent);
+		if (*m_useBase64AttrPtr){
+			documentContent = QByteArray::fromBase64(documentContent);
+		}
 
 		if (ReadDataFromMemory(typeId, documentContent, *documentPtr)){
 			return documentPtr.PopPtr();
@@ -415,7 +417,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 		return retVal;
 	}
 
-	documentContent = documentContent.toBase64();
+	if (*m_useBase64AttrPtr){
+		documentContent = documentContent.toBase64();
+	}
 
 	quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
