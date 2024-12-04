@@ -1418,14 +1418,20 @@ void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjec
 			int pageIndex = m_parent.m_pageSelection.GetSelectedOptionIndex();
 
 			beginInsertRows(QModelIndex(), 0, m_batchSize - 1);
-
+		
 			istd::TDelPtr<imtbase::IObjectCollectionIterator> collectionIterator = collection.CreateObjectCollectionIterator(QByteArray(), pageIndex * m_batchSize, m_batchSize, &filterParams);
 			Q_ASSERT(collectionIterator.IsValid());
 
+			int fetchedCount = 0;
+			imtbase::ICollectionInfo::Ids fetchedIds;
+
 			while (collectionIterator->Next()){
-				++m_fetchedRowCount;
-				m_ids += collectionIterator->GetObjectId();
+				++fetchedCount;
+				fetchedIds += collectionIterator->GetObjectId();
 			}
+
+			m_ids = fetchedIds;
+			m_fetchedRowCount = fetchedCount;
 
 			Q_ASSERT(m_ids.count() == m_fetchedRowCount);
 
