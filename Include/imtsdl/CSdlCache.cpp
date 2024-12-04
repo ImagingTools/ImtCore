@@ -7,6 +7,8 @@ namespace imtsdl
 {
 
 
+// public methods
+
 QString CCacheEntry::GetTypeId() const
 {
 	return m_typeId;
@@ -268,8 +270,11 @@ bool CCacheEntry::operator==(const CCacheEntry& other) const
 	return retVal;
 }
 
+
 /// \file CCache.cpp
 
+
+// public methods
 
 QList<QString> CCache::GetIncludePaths() const
 {

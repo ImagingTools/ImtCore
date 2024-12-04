@@ -27,7 +27,7 @@
 #pragma once
 
 
-//Qt includes
+// Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
@@ -37,7 +37,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QList>
 
-//ImtCore includes
+// ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlObject.h>
 
@@ -106,6 +106,7 @@ private:
 
 
 /// \file CCache.h
+
 
 class CCache
 {
