@@ -111,13 +111,13 @@ bool CComplexCollectionFilter::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.EndTag(sortingFieldListTag);
 
 	// Serialization of the filtering model
-	static iser::CArchiveTag filterTag("FieldsFilter", "Fields filter", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag filterTag("FieldsFilter", "Fields filter", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(filterTag);
 	retVal = retVal && SerializeGroupFilter(m_fieldsFilter, archive);
 	retVal = retVal && archive.EndTag(filterTag);
 
 	// Serialization of the time filter model
-	static iser::CArchiveTag timeFilterTag("TimeFilter", "Time filter", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag timeFilterTag("TimeFilter", "Time filter", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(timeFilterTag);
 	retVal = retVal && m_timeFilter.Serialize(archive);
 	retVal = retVal && archive.EndTag(timeFilterTag);
@@ -222,7 +222,7 @@ bool CComplexCollectionFilter::SerializeFieldFilter(IComplexCollectionFilter::Fi
 	retVal = retVal && archive.Process(object.fieldId);
 	retVal = retVal && archive.EndTag(fieldIdTag);
 
-	static iser::CArchiveTag valueTag("Value", "Value", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag valueTag("Value", "Value", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(valueTag);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeQVariant(archive, object.filterValue);
 	retVal = retVal && archive.EndTag(valueTag);

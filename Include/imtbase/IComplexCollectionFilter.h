@@ -60,7 +60,7 @@ public:
 		bool operator!=(const FieldSortingInfo& other) const;
 
 		QByteArray fieldId;
-		SortingOrder sortingOrder;
+		SortingOrder sortingOrder = SO_ASC;
 	};
 	typedef QVector<FieldSortingInfo> FieldSortingInfoList;
 
@@ -71,7 +71,7 @@ public:
 
 		QByteArray fieldId;
 		QVariant filterValue;
-		FieldOperation filterOperation;
+		FieldOperation filterOperation = FO_EQUAL;
 	};
 
 	struct GroupFilter
@@ -81,7 +81,7 @@ public:
 
 		QVector<FieldFilter> fieldFilters;
 		QVector<GroupFilter> groupFilters;
-		LogicalOperation logicalOperation;
+		LogicalOperation logicalOperation = LO_AND;
 	};
 
 	virtual const FieldSortingInfoList& GetSortingInfo() const = 0;
