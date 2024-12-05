@@ -160,4 +160,4 @@ PopupDetailedDelegateDecorator 1.0 ./Views/PopupDetailedDelegateDecorator.qml
 TooltipArea 1.0 ./Views/TooltipArea.qml
 TableViewParams 1.0 ./Views/TableViewParams.qml
 TableHeaderDelegate 1.0 ./Views/TableHeaderDelegate.qml
-
+TableRowCanvasViewer 1.0 ./Views/TableRowCanvasViewer.qml

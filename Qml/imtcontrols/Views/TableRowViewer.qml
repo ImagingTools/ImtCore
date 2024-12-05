@@ -8,6 +8,7 @@ Row {
     property TableRowDelegateBase rowDelegate: null;
     property bool compl: false;
     property alias model: repeater.model
+	property bool loadDefaultCellDelegate: true;
 
     Repeater {
         id: repeater
@@ -39,14 +40,19 @@ Row {
                 if(cell.complCompl && dataList && dataList.rowDelegate && dataList.rowDelegate.tableItem){
                     let headerId = dataList.rowDelegate.tableItem.headers.getData("Id", model.index)
                     let contents = dataList.rowDelegate.tableItem.columnContentComps;
-                    let contentComp = dataList.rowDelegate.tableItem.cellDelegate;
+					let contentComp = undefined;
+
+					if (dataList.loadDefaultCellDelegate){
+						contentComp = dataList.rowDelegate.tableItem.cellDelegate;
+					}
+
                     if (Object.keys(contents).includes(headerId)){
                         if (contents[headerId]){
                             contentComp = contents[headerId];
                         }
                     }
 
-                    loader.sourceComponent = contentComp;
+					loader.sourceComponent = contentComp;
 
                     dataList.rowDelegate.tableItem.widthRecalc.connect(cell.setCellWidth)
                     cell.setCellWidth();
@@ -72,7 +78,7 @@ Row {
                     cell.width = defaultWidth;
                 }
 
-                cell.visible = cell.width > 0;
+				cell.visible = cell.width > 0;
             }
 
             Loader {

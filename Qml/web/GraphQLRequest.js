@@ -23,6 +23,15 @@ var GqlObject = function(objectId){
 			return retVal
 		},
 
+		fromObject: function(object) {
+			let keys = object.getProperties();
+			for (let key of keys){
+				let jsonKey = object.getJSONKeyForProperty(key)
+
+				this.InsertField(jsonKey, object[key]);
+			}
+		},
+
 		fromJson: function(json) {
 			let recursiveFillObject = function(gqlObject, jsonObject){
 				let obj = JSON.parse(jsonObject);
@@ -31,6 +40,8 @@ var GqlObject = function(objectId){
 					if (typeof obj[key] === 'object'){
 						if(Array.isArray(obj[key])){
 							// TODO: Array unsupported!
+
+							gqlObject.InsertField(key, obj[key]);
 						}
 						else{
 							var objectParam = Gql.GqlObject(key);
@@ -181,8 +192,11 @@ var GqlRequest = function(requestType, commandId){
 					retVal += this.AddObjectParamPart(gqlObject.GetFieldArgumentObjectPtr(fieldId))
 				} else {
 
-					retVal += fieldId
-					retVal += ": "
+					if (fieldId && fieldId.length){
+						retVal += fieldId
+						retVal += ": "
+					}
+
 					var value = gqlObject.GetFieldArgumentValue(fieldId)
 
 					if(Array.isArray(value)){

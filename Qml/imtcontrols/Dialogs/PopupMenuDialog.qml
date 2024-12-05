@@ -81,8 +81,8 @@ ControlBase {
         onBackgroundClicked();
     }
 
-    function onBackgroundClicked(){
-        popupMenuContainer.finished('', -1);
+	function onBackgroundClicked(events){
+		popupMenuContainer.finished('', -1);
     }
 
     function close(){

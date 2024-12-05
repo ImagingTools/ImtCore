@@ -375,12 +375,13 @@ Rectangle{
             property bool dragEnabled: false;
 
             onVisibleChanged: {
-                if(!visible){
-                    dragEnabled = false;
+				if(!visible && scrollMA){
+					scrollMA.dragEnabled = false;
                 }
             }
 
             property var coord: mapToItem(scrollContainer,0,0);
+
             onClicked: {}
             onWheel: {
                 if(scrollContainer.inSideTarget){

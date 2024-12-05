@@ -109,12 +109,11 @@ GqlRequest {
 
         var query = Gql.GqlRequest(type, root.gqlCommandId);
 
-        if (inputObjectComp != null){
+		if (inputObjectComp != null){
             let inputObject = inputObjectComp.createObject(root);
-
-            let gqlObject = Gql.GqlObject("input")
-            gqlObject.fromJson(inputObject.toJson())
-            query.AddParam(gqlObject);
+			let gqlObject = Gql.GqlObject("input")
+			gqlObject.fromObject(inputObject)
+			query.AddParam(gqlObject);
 
             root.setGqlQuery(query.GetQuery(), root.getHeaders());
 

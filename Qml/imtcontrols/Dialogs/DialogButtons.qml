@@ -12,7 +12,7 @@ Item {
     property alias buttons: buttonsRepeater.model;
     property int count: buttonsRepeater.count;
 
-    signal buttonClicked(string buttonId);
+	signal buttonClicked(int buttonId);
 
     function clearButtons(){
         buttonsRepeater.model = 0;
