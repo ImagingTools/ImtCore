@@ -67,33 +67,21 @@ public:
 
 	[[nodiscard]] QString GetTypeId() const;
 	void SetTypeId(const QString& typeId);
-	void ResetTypeId();
-	[[nodiscard]] bool HasTypeId() const;
 
 	[[nodiscard]] QString GetQmlEntryName() const;
 	void SetQmlEntryName(const QString& qmlEntryName);
-	void ResetQmlEntryName();
-	[[nodiscard]] bool HasQmlEntryName() const;
 
 	[[nodiscard]] QString GetTargetHeaderPath() const;
 	void SetTargetHeaderPath(const QString& targetHeaderPath);
-	void ResetTargetHeaderPath();
-	[[nodiscard]] bool HasTargetHeaderPath() const;
 
 	[[nodiscard]] QString GetNamespace() const;
 	void SetNamespace(const QString& aNamespace);
-	void ResetNamespace();
-	[[nodiscard]] bool HasNamespace() const;
 
 	[[nodiscard]] QString GetTargetSourceRelativePath() const;
 	void SetTargetSourceRelativePath(const QString& targetSourceRelativePath);
-	void ResetTargetSourceRelativePath();
-	[[nodiscard]] bool HasTargetSourceRelativePath() const;
 
 	[[nodiscard]] QString GetVersion() const;
 	void SetVersion(const QString& version);
-	void ResetVersion();
-	[[nodiscard]] bool HasVersion() const;
 
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] static bool ReadFromJsonObject(CCacheEntry& object, const QJsonObject& jsonObject);
@@ -114,7 +102,6 @@ private:
 	QString m_namespace;
 	QString m_targetSourceRelativePath;
 	QString m_version;
-	QSet<QByteArray/*FieldId*/> _m_settedFields;
 
 };
 
@@ -136,13 +123,9 @@ public:
 	[[nodiscard]] QList<QString> GetIncludePaths() const;
 	void SetIncludePaths(const QList<QString>& includePaths);
 	void AddIncludePathsElement(const QString& element);
-	void ResetIncludePaths();
-	[[nodiscard]] bool HasIncludePaths() const;
 
 	[[nodiscard]] istd::TPointerVector<CCacheEntry> GetTypes() const;
 	void AddTypesElement(const CCacheEntry& element);
-	void ResetTypes();
-	[[nodiscard]] bool HasTypes() const;
 
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] static bool ReadFromJsonObject(CCache& object, const QJsonObject& jsonObject);
@@ -159,7 +142,6 @@ public:
 private:
 	QList<QString> m_includePaths;
 	istd::TPointerVector<CCacheEntry> m_types;
-	QSet<QByteArray/*FieldId*/> _m_settedFields;
 
 	imod::CModelUpdateBridge m_updateBridge;
 };

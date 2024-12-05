@@ -20,8 +20,11 @@ CCacheController::CCacheController()
 	: m_cachePtr(new imod::TModelWrap<CCache>),
 	m_isAutosaveEnabled(false)
 {
-	BaseClass::SetModelPtr(dynamic_cast<imod::IModel*>(m_cachePtr.get()));
-	Q_ASSERT_X(BaseClass::IsModelAttached(), "Unable to observe model", __func__);
+	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_cachePtr.get());
+	Q_ASSERT(modelPtr != nullptr);
+
+	[[maybe_unused]] const bool attached = modelPtr->AttachObserver(this);
+	Q_ASSERT_X(attached && BaseClass::IsModelAttached(), "Unable to observe model", __func__);
 }
 
 
@@ -29,8 +32,7 @@ CCacheController::CCacheController()
 
 void CCacheController::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	// CF_NO_UNDO added if model is attached
-	if (m_isAutosaveEnabled && !changeSet.Contains(istd::IChangeable::CF_NO_UNDO)){
+	if (m_isAutosaveEnabled){
 		Save();
 	}
 }
@@ -147,9 +149,6 @@ bool CCacheController::Save() const
 
 bool CCacheController::LoadFromData(QIODevice* dataDevicePtr)
 {
-	// reset model, to avoid unnecessary updates
-	BaseClass::SetModelPtr(nullptr);
-
 	QWriteLocker lock(&m_cacheGuard);
 	QWriteLocker devLock(&m_deviceGuard);
 

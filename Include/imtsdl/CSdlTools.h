@@ -78,8 +78,8 @@ public:
 	[[nodiscard]] static bool IsTypeHasNonFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr =  nullptr);
 	[[nodiscard]] static bool IsTypeHasNonFundamentalTypes(const CSdlRequest& sdlRequest, QSet<QString>* foundTypesPtr =  nullptr);
 
-	Q_DECL_DEPRECATED_X("Use GetFromVariantConversionStringExt instead")
-		[[nodiscard]] static QString GetFromVariantConversionString(const CSdlField& sdlField);
+	/// \deprecated \todo REMOVE IT! (later))
+	[[nodiscard]] static QString GetFromVariantConversionString(const CSdlField& sdlField);
 
 	[[nodiscard]] static QString GetFromVariantConversionStringExt(const CSdlField& sdlField, bool singleValue = false);
 	[[nodiscard]] static QString FromInternalMapCheckString(const CSdlField& sdlField);
@@ -125,9 +125,9 @@ public:
 
 	static void PrintFiles(std::ostream& outStream, const QStringList& files, imtsdl::ISdlProcessArgumentsParser::GeneratorType projectCodeGenerator = imtsdl::ISdlProcessArgumentsParser::GT_CMAKE);
 
+	/// \deprecated \todo remove it! all logic will be moved to \c CCacheMultiManager
 	[[nodiscard]] static QString ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntry, const QStringList& lookupPaths);
-
-	[[nodiscard]] static QString GetHeaderPathFromCache(const CSdlType& sdlType, const std::shared_ptr<QStringList>& cacheFilesListPtr);
+	[[nodiscard]] static QString GetTypeVersion(const CSdlType& sdlType);
 
 	[[nodiscard]] static IncludeDirective CreateCxxDirective(const QString& path);
 	[[nodiscard]] static IncludeDirective CreateQtDirective(const QString& path);

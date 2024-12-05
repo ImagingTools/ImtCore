@@ -1,11 +1,13 @@
 #include <imtsdl/CSdlCache.h>
 
 
+/// \file CCacheEntry.cpp
+
+
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 
-/// \file CCacheEntry.cpp
 
 namespace imtsdl
 {
@@ -21,28 +23,11 @@ QString CCacheEntry::GetTypeId() const
 
 void CCacheEntry::SetTypeId(const QString& typeId)
 {
-	if (typeId != m_typeId || !_m_settedFields.contains("TypeId")){
+	if (typeId != m_typeId){
 		istd::CChangeNotifier notifier(this);
 
 		m_typeId = typeId;
-		_m_settedFields << "TypeId";
 	}
-}
-
-
-void CCacheEntry::ResetTypeId()
-{
-	istd::CChangeNotifier notifier(this);
-
-	_m_settedFields.remove("TypeId");
-	m_typeId.clear();
-}
-
-
-
-bool CCacheEntry::HasTypeId() const
-{
-	return _m_settedFields.contains("TypeId");
 }
 
 
@@ -54,28 +39,11 @@ QString CCacheEntry::GetQmlEntryName() const
 
 void CCacheEntry::SetQmlEntryName(const QString& qmlEntryName)
 {
-	if (qmlEntryName != m_qmlEntryName || !_m_settedFields.contains("QmlEntryName")){
+	if (qmlEntryName != m_qmlEntryName){
 		istd::CChangeNotifier notifier(this);
 
 		m_qmlEntryName = qmlEntryName;
-		_m_settedFields << "QmlEntryName";
 	}
-}
-
-
-void CCacheEntry::ResetQmlEntryName()
-{
-	istd::CChangeNotifier notifier(this);
-
-	_m_settedFields.remove("QmlEntryName");
-	m_qmlEntryName.clear();
-}
-
-
-
-bool CCacheEntry::HasQmlEntryName() const
-{
-	return _m_settedFields.contains("QmlEntryName");
 }
 
 
@@ -87,28 +55,11 @@ QString CCacheEntry::GetTargetHeaderPath() const
 
 void CCacheEntry::SetTargetHeaderPath(const QString& targetHeaderPath)
 {
-	if (targetHeaderPath != m_targetHeaderPath || !_m_settedFields.contains("TargetHeaderPath")){
+	if (targetHeaderPath != m_targetHeaderPath){
 		istd::CChangeNotifier notifier(this);
 
 		m_targetHeaderPath = targetHeaderPath;
-		_m_settedFields << "TargetHeaderPath";
 	}
-}
-
-
-void CCacheEntry::ResetTargetHeaderPath()
-{
-	istd::CChangeNotifier notifier(this);
-
-	_m_settedFields.remove("TargetHeaderPath");
-	m_targetHeaderPath.clear();
-}
-
-
-
-bool CCacheEntry::HasTargetHeaderPath() const
-{
-	return _m_settedFields.contains("TargetHeaderPath");
 }
 
 
@@ -120,28 +71,11 @@ QString CCacheEntry::GetNamespace() const
 
 void CCacheEntry::SetNamespace(const QString& aNamespace)
 {
-	if (aNamespace != m_namespace || !_m_settedFields.contains("Namespace")){
+	if (aNamespace != m_namespace){
 		istd::CChangeNotifier notifier(this);
 
 		m_namespace = aNamespace;
-		_m_settedFields << "Namespace";
 	}
-}
-
-
-void CCacheEntry::ResetNamespace()
-{
-	istd::CChangeNotifier notifier(this);
-
-	_m_settedFields.remove("Namespace");
-	m_namespace.clear();
-}
-
-
-
-bool CCacheEntry::HasNamespace() const
-{
-	return _m_settedFields.contains("Namespace");
 }
 
 
@@ -153,28 +87,11 @@ QString CCacheEntry::GetTargetSourceRelativePath() const
 
 void CCacheEntry::SetTargetSourceRelativePath(const QString& targetSourceRelativePath)
 {
-	if (targetSourceRelativePath != m_targetSourceRelativePath || !_m_settedFields.contains("TargetSourceRelativePath")){
+	if (targetSourceRelativePath != m_targetSourceRelativePath){
 		istd::CChangeNotifier notifier(this);
 
 		m_targetSourceRelativePath = targetSourceRelativePath;
-		_m_settedFields << "TargetSourceRelativePath";
 	}
-}
-
-
-void CCacheEntry::ResetTargetSourceRelativePath()
-{
-	istd::CChangeNotifier notifier(this);
-
-	_m_settedFields.remove("TargetSourceRelativePath");
-	m_targetSourceRelativePath.clear();
-}
-
-
-
-bool CCacheEntry::HasTargetSourceRelativePath() const
-{
-	return _m_settedFields.contains("TargetSourceRelativePath");
 }
 
 
@@ -186,60 +103,22 @@ QString CCacheEntry::GetVersion() const
 
 void CCacheEntry::SetVersion(const QString& version)
 {
-	if (version != m_version || !_m_settedFields.contains("Version")){
+	if (version != m_version){
 		istd::CChangeNotifier notifier(this);
 
 		m_version = version;
-		_m_settedFields << "Version";
 	}
-}
-
-
-void CCacheEntry::ResetVersion()
-{
-	istd::CChangeNotifier notifier(this);
-
-	_m_settedFields.remove("Version");
-	m_version.clear();
-}
-
-
-
-bool CCacheEntry::HasVersion() const
-{
-	return _m_settedFields.contains("Version");
 }
 
 
 bool CCacheEntry::WriteToJsonObject(QJsonObject& jsonObject) const
-{
-	if (!_m_settedFields.contains("TypeId")){
-		return false;
-	}
+{	
 	jsonObject["TypeId"] = QJsonValue::fromVariant(m_typeId);
-
-	if (!_m_settedFields.contains("QmlEntryName")){
-		return false;
-	}
 	jsonObject["QmlEntryName"] = QJsonValue::fromVariant(m_qmlEntryName);
-
-	if (!_m_settedFields.contains("TargetHeaderPath")){
-		return false;
-	}
 	jsonObject["TargetHeaderPath"] = QJsonValue::fromVariant(m_targetHeaderPath);
-
-	if (!_m_settedFields.contains("Namespace")){
-		return false;
-	}
 	jsonObject["Namespace"] = QJsonValue::fromVariant(m_namespace);
-
-	if (_m_settedFields.contains("TargetSourceRelativePath")){
-		jsonObject["TargetSourceRelativePath"] = QJsonValue::fromVariant(m_targetSourceRelativePath);
-	}
-
-	if (_m_settedFields.contains("Version")){
-		jsonObject["Version"] = QJsonValue::fromVariant(m_version);
-	}
+	jsonObject["TargetSourceRelativePath"] = QJsonValue::fromVariant(m_targetSourceRelativePath);
+	jsonObject["Version"] = QJsonValue::fromVariant(m_version);
 
 	return true;
 }
@@ -314,14 +193,19 @@ bool CCacheEntry::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 	try {
 		const CCacheEntry& otherObjectRef = dynamic_cast<const CCacheEntry&>(object);
 
-		istd::CChangeGroup changeGroup(this);
-		*this = otherObjectRef;
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_typeId = otherObjectRef.m_typeId;
+		m_qmlEntryName = otherObjectRef.m_qmlEntryName;
+		m_targetHeaderPath = otherObjectRef.m_targetHeaderPath;
+		m_namespace = otherObjectRef.m_namespace;
+		m_targetSourceRelativePath = otherObjectRef.m_targetSourceRelativePath;
+		m_version = otherObjectRef.m_version;
 	}
-	catch (const std::bad_cast&) {
+	catch (const std::bad_cast&){
 		return false;
 	}
 
-	I_CRITICAL();
 	return false;
 }
 
@@ -336,7 +220,6 @@ bool CCacheEntry::IsEqual(const IChangeable& object) const
 		return false;
 	}
 
-	I_CRITICAL();
 	return false;
 }
 
@@ -375,11 +258,10 @@ QList<QString> CCache::GetIncludePaths() const
 
 void CCache::SetIncludePaths(const QList<QString>& includePaths)
 {
-	if (includePaths != m_includePaths || !_m_settedFields.contains("IncludePaths")){
+	if (includePaths != m_includePaths){
 		istd::CChangeNotifier notifier(this);
 
 		m_includePaths = includePaths;
-		_m_settedFields << "IncludePaths";
 	}
 }
 
@@ -389,22 +271,6 @@ void CCache::AddIncludePathsElement(const QString& element)
 	istd::CChangeNotifier notifier(this);
 
 	m_includePaths << element;
-}
-
-
-void CCache::ResetIncludePaths()
-{
-	istd::CChangeNotifier notifier(this);
-
-	_m_settedFields.remove("IncludePaths");
-	m_includePaths.clear();
-}
-
-
-
-bool CCache::HasIncludePaths() const
-{
-	return _m_settedFields.contains("IncludePaths");
 }
 
 
@@ -428,36 +294,14 @@ void CCache::AddTypesElement(const CCacheEntry& element)
 }
 
 
-void CCache::ResetTypes()
-{
-	istd::CChangeNotifier notifier(this);
-
-	_m_settedFields.remove("Types");
-	m_types.Reset();
-}
-
-
-
-bool CCache::HasTypes() const
-{
-	return _m_settedFields.contains("Types");
-}
-
-
 bool CCache::WriteToJsonObject(QJsonObject& jsonObject) const
-{
-	if (!_m_settedFields.contains("IncludePaths") || m_includePaths.isEmpty()){
-		return false;
-	}
+{	
 	QJsonArray newIncludePathsJsonArray;
 	for (qsizetype includePathsIndex = 0; includePathsIndex < m_includePaths.size(); ++includePathsIndex){
 		newIncludePathsJsonArray << QJsonValue::fromVariant(m_includePaths[includePathsIndex]);
 	}
 	jsonObject["IncludePaths"] = newIncludePathsJsonArray;
 
-	if (!_m_settedFields.contains("Types") || m_types.IsEmpty()){
-		return false;
-	}
 	QJsonArray newTypesJsonArray;
 	for (qsizetype typesIndex = 0; typesIndex < m_types.GetCount(); ++typesIndex){
 		QJsonObject newTypesJsonObject;
@@ -557,7 +401,6 @@ bool CCache::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 		return false;
 	}
 
-	I_CRITICAL();
 	return false;
 }
 
@@ -572,7 +415,6 @@ bool CCache::IsEqual(const IChangeable& object) const
 		return false;
 	}
 
-	I_CRITICAL();
 	return false;
 }
 

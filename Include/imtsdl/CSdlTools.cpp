@@ -1186,12 +1186,17 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntr
 	return QString();
 }
 
-QString CSdlTools::GetHeaderPathFromCache(const CSdlType& sdlType, const std::shared_ptr<QStringList>& cacheFilesListPtr)
-{
-	/// \todo finish it
-	I_CRITICAL();
 
-	return QString();
+QString CSdlTools::GetTypeVersion(const CSdlType& sdlType)
+{
+	QString typeVersionName;
+	const iprm::IParamsSet& schemaParams = sdlType.GetSchemaParams();
+	iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&schemaParams, SdlCustomSchemaKeys::VersionName.toUtf8(), false);
+	if (versionNameParamPtr.IsValid()){
+		typeVersionName = versionNameParamPtr->GetText();
+	}
+
+	return typeVersionName;
 }
 
 
