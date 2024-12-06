@@ -19,10 +19,10 @@ namespace imtsdlgenv2
 
 
 int CCacheGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* paramsPtr,
-			const istd::IPolymorphic* inputPtr,
-			istd::IChangeable* outputPtr,
-			ibase::IProgressManager* progressManagerPtr)
+			const iprm::IParamsSet* /*paramsPtr*/,
+			const istd::IPolymorphic* /*inputPtr*/,
+			istd::IChangeable* /*outputPtr*/,
+			ibase::IProgressManager* /*progressManagerPtr*/)
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
@@ -54,10 +54,11 @@ int CCacheGeneratorComp::DoProcessing(
 	const QString schemaFileNameName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
 
 	// guard a cache file, while a cache is generating...
-	QLockFile cacheLockFile(cachePath + QStringLiteral(".lock"));
+	QString lockFilePath = cachePath + QStringLiteral(".lock");
+	QLockFile cacheLockFile(lockFilePath);
 	bool isLocked = cacheLockFile.lock();
 	if (!isLocked){
-		SendErrorMessage(0, QString("Unable to guard cache file at '%1'. ErrorCode: %2").arg(cacheLockFile.fileName(), cacheLockFile.error()));
+		SendErrorMessage(0, QString("Unable to guard cache file at '%1'. ErrorCode: %2").arg(lockFilePath, cacheLockFile.error()));
 
 		return TS_INVALID;
 	}
