@@ -38,6 +38,9 @@ Canvas {
 			return;
 		}
 
+		let fontPixelSize = rowDelegate.tableItem.emptyDecorCell ? Style.fontSize_common : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSize_common
+		ctx.font = '' + fontPixelSize + "px " + Style.fontFamily
+
 		let val = getDefaultCellValue(key);
 		if (val !== undefined){
 			let text = String(val);
@@ -77,8 +80,6 @@ Canvas {
 
 		ctx.stroke();
 		let xCell = Style.size_mainMargin;
-		let fontPixelSize = rowDelegate.tableItem.emptyDecorCell ? Style.fontSize_common : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSize_common
-		ctx.font = '' + fontPixelSize + "px " + Style.fontFamily
 
 		for (let columnIndex = 0; columnIndex < rowDelegate.columnCount; columnIndex++){
 			let defaultWidth = rowDelegate.columnCount == 0 ? 0 : rowDelegate.width/rowDelegate.columnCount;
