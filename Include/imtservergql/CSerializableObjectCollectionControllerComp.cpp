@@ -334,6 +334,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 	imtbase::CTreeItemModel* itemsModel = dataModel->AddTreeModel("items");
+	itemsModel->SetIsArray(true);
 
 	const imtgql::CGqlObject* viewParamsGql = nullptr;
 	const imtgql::CGqlObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
@@ -358,7 +359,13 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		filterParamsPtr.SetPtr(new iprm::CParamsSet);
 	}
 
-	DeSerializeObject(filterParamsPtr.GetPtr(), QByteArray::fromBase64(data));
+	if (!data.isEmpty()){
+		if (!DeSerializeObject(filterParamsPtr.GetPtr(), QByteArray::fromBase64(data))){
+			SendErrorMessage(0, "Unable to deserialize collection filter");
+
+			return nullptr;
+		}
+	}
 
 	imtbase::ICollectionInfo::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, filterParamsPtr.GetPtr());
 	for (const imtbase::ICollectionInfo::Id& id: ids){
@@ -399,6 +406,8 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 			SendWarningMessage(0, QString("Unable to set data meta info for element '%1'. Error: Data meta info serialization failed").arg(qPrintable(id)), "CSerializableObjectCollectionControllerComp");
 		}
 	}
+
+	QString json = rootModelPtr->ToJson();
 
 	return rootModelPtr.PopPtr();
 }

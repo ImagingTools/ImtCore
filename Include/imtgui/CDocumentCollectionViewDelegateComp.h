@@ -150,6 +150,15 @@ private:
 
 	void InitializeVisualStatus();
 
+protected:
+	/**
+		Underlaying document manager used for object operations.
+	*/
+	I_REF(idoc::IDocumentManager, m_documentManagerCompPtr);
+	I_REF(imod::IModel, m_documentManagerModelCompPtr);
+	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> OpenedDocuments;
+	mutable OpenedDocuments m_openedDocuments;
+
 private:
 	/**
 		Label for "Edit"-command.
@@ -192,12 +201,6 @@ private:
 	I_REF(ifile::IFilePersistence, m_objectExportPersistenceCompPtr);
 
 	/**
-		Underlaying document manager used for object operations.
-	*/
-	I_REF(idoc::IDocumentManager, m_documentManagerCompPtr);
-	I_REF(imod::IModel, m_documentManagerModelCompPtr);
-
-	/**
 		View used for showing the information about the currently selected item.
 	*/
 	I_REF(iqtgui::IGuiObject, m_informationViewCompPtr);
@@ -208,9 +211,6 @@ private:
 	ObjectPersistenceProxy m_collectionPersistence;
 
 	DocumentManagerObserver m_documentManagerObserver;
-
-	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> OpenedDocuments;
-	mutable OpenedDocuments m_openedDocuments;
 
 	QByteArray m_closedForRestoreId;
 };

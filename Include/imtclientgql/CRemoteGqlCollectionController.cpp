@@ -163,10 +163,13 @@ bool CRemoteGqlCollectionController::SetObjectData(
 	
 	bool retVal = false;
 
+	QByteArray typeId = GetObjectTypeId(objectId);
+
 	imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo info;
 	if (GetObjectInfo(objectId, info)){
 		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateSetObjectRequest(
 					objectId,
+					typeId,
 					&object,
 					"",
 					nullptr,

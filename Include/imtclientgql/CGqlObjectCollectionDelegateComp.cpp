@@ -147,6 +147,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectRequest(co
 
 imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 			const QByteArray& objectId,
+			const QByteArray& typeId,
 			const istd::IChangeable* objectPtr,
 			const QString& uploadUrl,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
@@ -160,6 +161,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
 	imtgql::CGqlObject input;
 	input.InsertField("Id", QVariant(objectId));
+	input.InsertField("typeId", QVariant(typeId));
 	SerializeObject(objectPtr,data);
 	input.InsertField("item", QVariant(data.toBase64()));
 	input.InsertField("uploadUrl", QVariant(uploadUrl));

@@ -60,6 +60,7 @@ public:
 	virtual imtgql::IGqlRequest* CreateGetObjectRequest(const QByteArray& objectId) const override;
 	virtual imtgql::IGqlRequest* CreateSetObjectRequest(
 				const QByteArray& objectId,
+				const QByteArray& typeId,
 				const istd::IChangeable* objectPtr,
 				const QString& uploadUrl = QString(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,

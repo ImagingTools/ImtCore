@@ -73,6 +73,7 @@ public:
 	virtual imtgql::IGqlRequest* CreateGetObjectRequest(const QByteArray& objectId) const = 0;
 	virtual imtgql::IGqlRequest* CreateSetObjectRequest(
 				const QByteArray& objectId,
+				const QByteArray& typeId,
 				const istd::IChangeable* objectPtr,
 				const QString& uploadUrl = QString(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
