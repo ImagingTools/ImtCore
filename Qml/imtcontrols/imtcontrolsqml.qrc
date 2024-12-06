@@ -110,6 +110,7 @@
         <file alias="imtcontrols/Views/TableProperties.qml">Views/TableProperties.qml</file>
         <file alias="imtcontrols/Views/TableSelection.qml">Views/TableSelection.qml</file>
         <file alias="imtcontrols/Views/BarChart.qml">Views/BarChart.qml</file>
+		<file alias="imtcontrols/Views/BarChartSimple.qml">Views/BarChartSimple.qml</file>
         <file alias="imtcontrols/Views/BasicTableView.qml">Views/BasicTableView.qml</file>
         <file alias="imtcontrols/Views/BasicTreeView.qml">Views/BasicTreeView.qml</file>
         <file alias="imtcontrols/Views/ChangeItemSize.qml">Views/ChangeItemSize.qml</file>
