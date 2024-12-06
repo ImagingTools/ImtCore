@@ -252,6 +252,15 @@ CCache::CCache()
 }
 
 
+CCache::CCache(const CCache& other)
+	:m_updateBridge(this)
+{
+	m_includePaths = other.m_includePaths;
+
+	m_types = other.m_types;
+}
+
+
 QList<QString> CCache::GetIncludePaths() const
 {
 	return m_includePaths;

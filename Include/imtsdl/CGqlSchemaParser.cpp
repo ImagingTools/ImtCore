@@ -356,9 +356,9 @@ bool CGqlSchemaParser::ProcessEnum()
 			atEnd = bool(!retVal || foundDelimeter == '}');
 			continue;
 		}
-		const QString convertedEnumValue = ConvertEnumValueToStringEquivalent(enumValue);
+		QString convertedEnumValue = ConvertEnumValueToStringEquivalent(enumValue);
 
-		currentEnum.AddValue(std::make_pair(QString(enumValue), convertedEnumValue));
+		currentEnum.AddValue(QPair<QString,QString>(QString(qPrintable(enumValue)), convertedEnumValue));
 
 		atEnd = bool(!retVal || foundDelimeter == '}');
 	}

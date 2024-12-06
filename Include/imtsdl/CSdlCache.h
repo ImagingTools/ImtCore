@@ -119,6 +119,7 @@ public:
 	};
 
 	CCache();
+	CCache(const CCache& other);
 
 	[[nodiscard]] QList<QString> GetIncludePaths() const;
 	void SetIncludePaths(const QList<QString>& includePaths);
