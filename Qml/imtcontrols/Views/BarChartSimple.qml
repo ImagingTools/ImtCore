@@ -22,21 +22,17 @@ Item {
 
 
 	property string color_positive: "#ff8a3d";
-	property string color_negative: "#000000";
 	property string backgroundColor: "#000000";
 
 	property bool hasTooltip: true;
-	property bool isPositiveTooltip: true;
-	property bool isNegativeTooltip: false;
+
 	property bool hasBottomRounding: false;
 
 	property alias toolTipColor: tooltip.color;
 	property alias toolTipFontColor: tooltip.fontColor;
 	property alias toolTipFontSize: tooltip.fontPixelSize;
 	property alias shownVal: tooltip.shownVal;
-	property alias positiveBarHeight: barDown.height;
-	property alias negativeBarHeight: barUp.height;
-
+	property alias positiveBarHeight: mainRec.height;
 
 	property real parentY: 0;
 
@@ -53,106 +49,39 @@ Item {
 	}
 
 
-	Rectangle{
-		id: barDown;//positive
+	Item{
+		id: mainRec;
 
 		anchors.bottom:  parent.bottom;
 		anchors.horizontalCenter: parent.horizontalCenter;
 		width: barChart.barWidth;
 		height: (barChart.positiveValue !==0)?
 					barChart.maxBarHeight/(barChart.maxValue - barChart.minValue) * barChart.positiveValue : 1;
-		radius: width;//Math.min(width, height)
-		color: barChart.isFilled ? barChart.color_positive : "transparent";
-		visible: !barChart.visible ? false : (barChart.positiveValue == 0)? false : barChart.visibleElements;
-		border.color: barChart.color_positive;
-		border.width: barChart.isFilled ? 0 : barChart.borderWidth;
-	}
 
-	Rectangle{
-		id: barDownPatch;//positive
+		clip: true;
 
-		anchors.bottom:  parent.bottom;
-		anchors.horizontalCenter: parent.horizontalCenter;
-		width: barChart.barWidth;
-		height: Math.min(width, barDown.height);
-		color: barChart.isFilled ? barChart.color_positive : "transparent";
-		visible: !barChart.hasBottomRounding;
-		border.color: barChart.color_positive;
-		border.width: barChart.isFilled ? 0 : barChart.borderWidth;
 
-	}
+		Rectangle{
+			id: barDown;//positive
 
-	Rectangle{
-		id: barDownBorderPatch;//positive
+			anchors.horizontalCenter: parent.horizontalCenter;
+			anchors.bottom:  parent.bottom;
+			anchors.bottomMargin: -vertOffset;
 
-		anchors.bottom:  parent.bottom;
-		anchors.horizontalCenter: parent.horizontalCenter;
-		anchors.top: barDown_topRec.bottom;
-		width: barChart.barWidth - 2*barDown.border.width;
-		height: 2*width;
-		color: barChart.backgroundColor;
-		visible: !barChart.isFilled;
+			width: parent.width;
+			height: parent.height + vertOffset;
+			radius: width;
+
+			color: barChart.isFilled ? barChart.color_positive : "transparent";
+			visible: !barChart.visible ? false : (barChart.positiveValue == 0) ? false : barChart.visibleElements;
+			border.color: barChart.color_positive;
+			border.width: barChart.isFilled ? 0 : barChart.borderWidth;
+
+			property real vertOffset: mainRec.height > width/2 ? width/2 : 0;
+		}
 
 	}
 
-
-	Rectangle{
-		id: barDown_topRec;//positive
-
-		anchors.top:  barDown.top;
-		anchors.horizontalCenter: parent.horizontalCenter;
-		width: barChart.barWidth;
-		height: (barChart.positiveValue !==0)? barDown.height/2 : 1;
-		//Math.min(barChart.maxBarHeight/barChart.maxValue*barChart.positiveValue, width/2) : 1
-		color: barChart.isFilled ? barChart.color_positive : "transparent";
-		visible: !barChart.visible ? false : (barChart.positiveValue == 0)? false : (barChart.negativeValue == 0) ? false : barChart.visibleElements;
-
-	}
-
-	Rectangle{
-		id: barUp;//negative
-
-		anchors.bottom: barDown.top;
-		anchors.horizontalCenter: parent.horizontalCenter;
-		width: barChart.barWidth;
-		height: (barChart.negativeValue !==0)?
-					barChart.maxBarHeight/(barChart.maxValue - barChart.minValue) * barChart.negativeValue : 1;
-		radius: width//Math.min(width, height)
-		color: barChart.isFilled ? barChart.color_negative : "transparent";
-		visible: !barChart.visible ? false : (barChart.negativeValue == 0)? false : barChart.visibleElements;
-		border.color: barChart.color_negative;
-		border.width: barChart.isFilled ? 0 : barChart.borderWidth;
-
-	}
-
-	Rectangle{
-		id: barUp_downRec;//negative
-
-		anchors.bottom: barUp.bottom;
-		anchors.horizontalCenter: parent.horizontalCenter;
-		width: barChart.barWidth;
-		height: (barChart.negativeValue !==0)? barUp.height/2 : 1;
-		//Math.min(barChart.maxBarHeight/barChart.maxValue*barChart.negativeValue, width/2) : 1
-		color: barChart.isFilled ? barChart.color_negative : "transparent";
-		visible: !barChart.visible ? false : (barChart.negativeValue == 0) ? false : (barChart.positiveValue == 0) ? false : barChart.visibleElements;
-		border.color: barChart.color_negative;
-		border.width: barChart.isFilled ? 0 : barChart.borderWidth;
-
-	}
-
-	Rectangle{
-		id: barUpBorderPatch;//positive
-
-		anchors.bottom:  barUp.bottom;
-		anchors.horizontalCenter: parent.horizontalCenter;
-		anchors.top: barUp.top;
-		anchors.topMargin: barUp.width;
-		width: barChart.barWidth - 2*barDown.border.width;
-		height: 2*width;
-		color: barChart.backgroundColor;
-		visible: !barChart.isFilled;
-
-	}
 
 	CustomTooltip{
 		id: tooltip;
@@ -167,8 +96,7 @@ Item {
 
 		borderColor: Style.color_elementBorder;
 		property string shownValPos: Math.trunc((barChart.positiveValue + barChart.addToValue)*1000)/1000;
-		property string shownValNeg: Math.trunc((barChart.negativeValue + barChart.addToValue)*1000)/1000;
-		property string shownVal: barChart.isPositiveTooltip ? shownValPos : barChart.isNegativeTooltip ? shownValNeg : "";
+		property string shownVal:  shownValPos;
 
 		text: shownVal;
 
@@ -188,9 +116,7 @@ Item {
 
 		duration: tooltip.waitingDuration;
 		onFinished: {
-			//tooltip.openTooltip(ma.width/2, ma.mouseY);
-			tooltip.openTooltip(ma.width/2, barUp_downRec.y);
-			// tooltip.openTooltipWithCoord(barChart.barWidth/2 - tooltip.tooltipWidth/2,  barDown.y - tooltip.componentHeight - 5);
+			tooltip.openTooltip(ma.width/2, mainRec.y);
 
 		}
 	}

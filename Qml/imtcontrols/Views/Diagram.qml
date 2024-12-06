@@ -506,7 +506,7 @@ Item {
 				//height: barChart.height;
 				height: barsList.height;
 
-				BarChart{
+				BarChartSimple{
 					id: barChart;
 
 					anchors.bottom: parent.bottom;
@@ -521,7 +521,7 @@ Item {
 					positiveValue: (model.positive - diagram.minValue) >= 0 ? (model.positive - diagram.minValue) : 0;
 					negativeValue: (model.negative - diagram.minValue) >= 0 ? (model.negative - diagram.minValue) : 0;
 					color_positive: diagram.colorPositive;
-					color_negative: diagram.colorNegative;
+					//color_negative: diagram.colorNegative;
 					backgroundColor: diagram.backgroundColor;
 
 					addToValue: diagram.minValue;
