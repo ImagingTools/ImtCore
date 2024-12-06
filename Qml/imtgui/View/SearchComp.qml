@@ -70,6 +70,7 @@ Rectangle{
 	signal searchPartialAddress(string addressStr);
 	signal returnModelSignal();
 	signal clearSignal();
+	signal closeSignal();
 
 	Component.onCompleted: {
 	}
