@@ -24,8 +24,8 @@ bool CCacheMultiManager::Init(const QList<std::shared_ptr<ICacheController>>& co
 {
 	// ensure, all caches are sxists and has a valid cache
 	for (const std::shared_ptr<ICacheController>& controllerPtr: controllers){
-		if (!controllerPtr || controllerPtr->GetCache() == nullptr){
-			SendCriticalMessage(0, "Uninitializes coltroller provided!");
+		if (!controllerPtr){
+			SendLogMessage(istd::IInformationProvider::IC_CRITICAL, 0, "Uninitialized coltroller provided!", "CCacheMultiManager");
 			I_CRITICAL();
 
 			return false;
@@ -42,10 +42,10 @@ bool CCacheMultiManager::ResolveIncludePathForType(const CSdlType& type, QString
 {
 	// lookup through all cache controllers
 	for (const std::shared_ptr<ICacheController>& controllerPtr: m_controllersPtrList){
-		Q_ASSERT(controllerPtr && controllerPtr->GetCache() != nullptr);
+		Q_ASSERT(controllerPtr);
 
-		const CCache* cachePtr = controllerPtr->GetCache();
-		const istd::TPointerVector<CCacheEntry> entryList = cachePtr->GetTypes();
+		const CCache& cache = controllerPtr->GetCache();
+		const istd::TPointerVector<CCacheEntry> entryList = cache.GetTypes();
 
 		// lookup through all entries
 		for (int index = 0; index < entryList.GetCount(); ++index){
@@ -60,7 +60,7 @@ bool CCacheMultiManager::ResolveIncludePathForType(const CSdlType& type, QString
 					QString typeVersionName = GetTypeVersion(type);
 
 					if (entryPtr->GetVersion() == typeVersionName){
-						const QStringList includePaths = cachePtr->GetIncludePaths();
+						const QStringList includePaths = cache.GetIncludePaths();
 						const QString entryTargetFile = entryPtr->GetTargetHeaderPath();
 
 						for (const QString& includePath: includePaths){

@@ -201,6 +201,8 @@ bool CCacheEntry::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 		m_namespace = otherObjectRef.m_namespace;
 		m_targetSourceRelativePath = otherObjectRef.m_targetSourceRelativePath;
 		m_version = otherObjectRef.m_version;
+
+		return true;
 	}
 	catch (const std::bad_cast&){
 		return false;
@@ -383,6 +385,8 @@ bool CCache::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 		const CCache& otherObjectRef = dynamic_cast<const CCache&>(object);
 		istd::CChangeGroup changeGroup(this);
 
+		ResetData(mode);
+
 		m_includePaths = otherObjectRef.m_includePaths;
 
 		for (int index = 0; index < otherObjectRef.m_types.GetCount(); ++index){
@@ -396,6 +400,8 @@ bool CCache::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 			modelPtr->AttachObserver(&m_updateBridge);
 			m_types.PushBack(clonedPtr);
 		}
+
+		return true;
 	}
 	catch (const std::bad_cast&) {
 		return false;

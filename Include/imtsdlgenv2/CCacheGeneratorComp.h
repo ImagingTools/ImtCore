@@ -33,7 +33,7 @@ public:
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
 		I_ASSIGN(m_schemaParamsCompPtr, "CurrentSchemaParams", "Current schema parameters, that contains additional options", false, "CurrentSchemaParams")
-		I_ASSIGN(m_cacheMultiManagerCompPtr, "CacheMultiManager", "Cache manager, used to create a cache", false, "CacheMultiManager")
+		I_ASSIGN(m_cacheControllerCompPtr, "CacheController", "Cache controller, used to create a cache for current scheme", true, "CacheController")
 
 	I_END_COMPONENT
 
@@ -48,7 +48,7 @@ private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(imtsdl::ISdlTypeListProvider, m_sdlTypeListCompPtr);
 	I_REF(iprm::IParamsSet, m_schemaParamsCompPtr);
-	I_REF(imtsdl::ICacheMultiManager, m_cacheMultiManagerCompPtr);
+	I_REF(imtsdl::ICacheController, m_cacheControllerCompPtr);
 };
 
 

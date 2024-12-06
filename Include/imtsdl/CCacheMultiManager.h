@@ -14,7 +14,7 @@ namespace imtsdl
 
 
 class CCacheMultiManager:
-			public ilog::CLoggerBase,
+			virtual protected istd::ILogger,
 			private CSdlTools,
 			virtual public ICacheMultiManager
 {

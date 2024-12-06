@@ -209,6 +209,12 @@ QString CSdlGenTools::GetNamespaceFromSchemaParams(const iprm::IParamsSet& schem
 }
 
 
+QString CSdlGenTools::GetNamespaceFromTypeSchemaParams(const imtsdl::CSdlType& type, const QString& prefix)
+{
+	return GetNamespaceFromSchemaParams(type.GetSchemaParams(), prefix);
+}
+
+
 QString CSdlGenTools::GetSchemaVerstionString(const iprm::IParamsSet& schemaParams)
 {
 	QString retVal = QStringLiteral("V");

@@ -14,8 +14,15 @@ class ICacheController: virtual public istd::IPolymorphic
 {
 
 public:
-	virtual CCache* GetCache() = 0;
-	virtual const CCache* GetCache() const = 0;
+	enum LoadError {
+		LE_OK,				///< No errors
+		LE_NULL_CACHE,		///< Maybe not an error. Occurs if file is not exsists or does not contain any data
+		LE_DEVICE,			///< IODevice errors. e.g. file is not opened
+		LE_INVALID_DATA		///< File contains invalid data
+	};
+
+	virtual CCache& GetCache() = 0;
+	virtual const CCache& GetCache() const = 0;
 
 	/**
 		Sets an Operational Device, a device for loading and saving a cache
@@ -35,7 +42,7 @@ public:
 		\param dataDevicePtr - [optional] if is not nullptr, the cache will be loaded from provided device, and from an Operational device otherwise
 		\note if a \c dataDevicePtr is provided, the operational device will NOT be changed, even if it is not set. You MUST call \c SetOperationalDevice method, to set an operational device.
 	*/
-	virtual bool LoadFromData(QIODevice* dataDevicePtr = nullptr) = 0;
+	virtual LoadError LoadFromData(QIODevice* dataDevicePtr = nullptr) = 0;
 
 	/**
 		Enables / disables auto saving cache to the Operational device on change

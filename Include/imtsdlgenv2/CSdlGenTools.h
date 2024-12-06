@@ -53,8 +53,14 @@ public:
 
 	/**
 		\returns namespace from \c schemaParams, accorging to V2 Generation
+		\todo remove \param prefix or define it elsewhere
 	 */
 	[[nodiscard]] static QString GetNamespaceFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& prefix = "sdl");
+
+	/**
+		\overload for \c GetNamespaceFromSchemaParams, uses params from \c type
+	 */
+	[[nodiscard]] static QString GetNamespaceFromTypeSchemaParams(const imtsdl::CSdlType& type, const QString& prefix = "sdl");
 
 	[[nodiscard]] static QString GetSchemaVerstionString(const iprm::IParamsSet& schemaParams);
 	[[nodiscard]] static QString OptListConvertTypeWithNamespaceStruct(

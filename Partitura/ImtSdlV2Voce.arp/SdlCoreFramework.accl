@@ -2,16 +2,18 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5311" Description="ACF"/>
+            <Version Id="0" Number="5325" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="BaseClassExtender" X="1000" Y="250" Note=""/>
-        <Element ComponentName="GqlSchemaParser" X="425" Y="500" Note=""/>
+        <Element ComponentName="CacheController" X="575" Y="750" Note=""/>
+        <Element ComponentName="CacheGenerator" X="575" Y="650" Note=""/>
+        <Element ComponentName="GqlSchemaParser" X="275" Y="450" Note=""/>
         <Element ComponentName="SdlCodeCreatorProcessorsController" X="575" Y="250" Note=""/>
-        <Element ComponentName="SdlProcessArgumentsParser" X="750" Y="500" Note=""/>
+        <Element ComponentName="SdlProcessArgumentsParser" X="875" Y="450" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

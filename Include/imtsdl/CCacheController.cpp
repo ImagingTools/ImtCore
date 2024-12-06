@@ -32,27 +32,31 @@ CCacheController::CCacheController()
 
 void CCacheController::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	if (m_isAutosaveEnabled){
-		Save();
+	// NON empty save only
+	const static CCache emptyCache;
+	if (!m_cachePtr->IsEqual(emptyCache)){
+		if (m_isAutosaveEnabled){
+			Save();
+		}
 	}
 }
 
 
 // reimplemented (ICacheController)
 
-CCache* CCacheController::GetCache()
+CCache& CCacheController::GetCache()
 {
 	QWriteLocker lock(&m_cacheGuard);
 
-	return m_cachePtr.get();
+	return *m_cachePtr;
 }
 
 
-const CCache* CCacheController::GetCache() const
+const CCache& CCacheController::GetCache() const
 {
 	QReadLocker lock(&m_cacheGuard);
 
-	return m_cachePtr.get();
+	return *m_cachePtr;
 }
 
 
@@ -75,7 +79,7 @@ bool CCacheController::SetOperationalDevice(const std::shared_ptr<QIODevice>& de
 	}
 
 	if (!devicePtr->isOpen()){
-		const bool isOpen = devicePtr->open(QIODevice::ReadWrite | QIODevice::Text);
+		const bool isOpen = devicePtr->open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate);
 		if (!isOpen) {
 			QFile* filePtr = dynamic_cast<QFile*>(devicePtr.get());
 			QString fileName;
@@ -132,11 +136,17 @@ bool CCacheController::Save() const
 		return false;
 	}
 
-	QByteArray cacheData = QJsonDocument(store).toJson();
+	QByteArray cacheData = QJsonDocument(store).toJson(QJsonDocument::Compact);
 	qsizetype cacheSize = cacheData.size();
 	qint64 writtenBytes = m_operationalDevicePtr->write(cacheData);
 
-	ok = bool(writtenBytes == cacheSize);
+	// we need flush if it is file
+	QFileDevice* fileDevicePtr = dynamic_cast<QFileDevice*>(m_operationalDevicePtr.get());
+	if (fileDevicePtr != nullptr){
+		fileDevicePtr->flush();
+	}
+
+	ok = ok && bool(writtenBytes == cacheSize);
 	if (!ok){
 		SendErrorMessage(0, QString("Unable to write data. Expected: %1. Actual: %2. Error: %3").arg(QString::number(cacheSize), QString::number(writtenBytes), m_operationalDevicePtr->errorString()));
 
@@ -147,7 +157,7 @@ bool CCacheController::Save() const
 }
 
 
-bool CCacheController::LoadFromData(QIODevice* dataDevicePtr)
+ICacheController::LoadError CCacheController::LoadFromData(QIODevice* dataDevicePtr)
 {
 	QWriteLocker lock(&m_cacheGuard);
 	QWriteLocker devLock(&m_deviceGuard);
@@ -160,54 +170,81 @@ bool CCacheController::LoadFromData(QIODevice* dataDevicePtr)
 		readDevicePtr = m_operationalDevicePtr.get();
 	}
 	else {
-		SendCriticalMessage(0, "Unable to load cache. devicePtr is NOT provided, operationalDevice is NOT initialized.");
+		SendCriticalMessage(LE_DEVICE, "Unable to load cache. devicePtr is NOT provided, operationalDevice is NOT initialized.");
 		Q_ASSERT_X(false, "Unable to load cache. devicePtr is NOT provided, operationalDevice is NOT initialized.", __func__);
 
-		return false;
+		return LE_DEVICE;
 	}
 
 	bool ok = readDevicePtr->seek(0);
 	if (!ok){
-		SendErrorMessage(0, "Unable to change position of operational device");
+		SendErrorMessage(LE_DEVICE, "Unable to change position of operational device");
 
-		return false;
+		return LE_DEVICE;
 	}
 
 	QByteArray readData = readDevicePtr->readAll();
+	if (readData.size() < 1){
+		SendLogMessage(istd::IInformationProvider::IC_NONE, LE_NULL_CACHE, "Divece does not contains data.", "CCacheController");
+
+		return LE_NULL_CACHE;
+	}
+
 	QJsonParseError jsonError;
 	QJsonObject cacheObject = QJsonDocument::fromJson(readData, &jsonError).object();
 	if (jsonError.error != QJsonParseError::NoError){
-		SendErrorMessage(0, QString("Unexpected cache data. Expected JSON object. Error: %1 .Position: %2").arg(jsonError.errorString(), QString::number(jsonError.offset)));
+		SendErrorMessage(LE_INVALID_DATA, QString("Unexpected cache data. Expected JSON object. Error: %1 .Position: %2").arg(jsonError.errorString(), QString::number(jsonError.offset)));
 
-		return false;
+		return LE_INVALID_DATA;
 	}
 
-	istd::CChangeGroup changGroup(m_cachePtr.get());
-	ok = m_cachePtr->ResetData();
+	// read data to temp cache, to prevent original cache corruption
+	CCache tempCache;
+	ok = CCache::ReadFromJsonObject(tempCache, cacheObject);
 	if (!ok){
-		SendCriticalMessage(0, "Unable to reset cache.");
+		SendErrorMessage(LE_INVALID_DATA, "Unable to read cache. Unexpected data!");
+
+		return LE_INVALID_DATA;
+	}
+
+	// copy temp cache after successfully reading
+	ok = m_cachePtr->CopyFrom(tempCache);
+	if (!ok){
+		SendCriticalMessage(LE_INVALID_DATA, "Unable to copy cache.");
 		I_CRITICAL();
 
-		return false;
+		return LE_INVALID_DATA;
 	}
 
-	ok = CCache::ReadFromJsonObject(*m_cachePtr, cacheObject);
-	if (!ok){
-		SendErrorMessage(0, "Unable to read cache. Unexpected data!");
-
-		return false;
-	}
-
-	// observe model
-	BaseClass::SetModelPtr(dynamic_cast<imod::IModel*>(m_cachePtr.get()));
-
-	return true;
+	return LE_OK;
 }
 
 
 void CCacheController::EnableAutoSave(bool enableAutosave)
 {
 	m_isAutosaveEnabled = enableAutosave;
+}
+
+// private comfort methods
+
+bool CCacheController::SendInfoMessage(int id, const QString& message) const
+{
+	return SendLogMessage(istd::IInformationProvider::IC_INFO, id, message, QStringLiteral("CCacheController"));
+}
+
+bool CCacheController::SendWarningMessage(int id, const QString& message) const
+{
+	return SendLogMessage(istd::IInformationProvider::IC_WARNING, id, message, QStringLiteral("CCacheController"));
+}
+
+bool CCacheController::SendErrorMessage(int id, const QString& message) const
+{
+	return SendLogMessage(istd::IInformationProvider::IC_ERROR, id, message, QStringLiteral("CCacheController"));
+}
+
+bool CCacheController::SendCriticalMessage(int id, const QString& message) const
+{
+	return SendLogMessage(istd::IInformationProvider::IC_CRITICAL, id, message, QStringLiteral("CCacheController"));
 }
 
 
