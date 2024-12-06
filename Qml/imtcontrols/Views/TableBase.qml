@@ -145,6 +145,7 @@ Rectangle {
 	property bool emptyDecorHeader: true;
 
 	property var columnContentComps: ({});
+	property var registeredDrawCellFunctions: ({});
 
 	property bool compl: false;
 
@@ -377,6 +378,10 @@ Rectangle {
 		}
 
 		return -1;
+	}
+
+	function registerFunctionDrawCellDelegate(columnId, func){
+		registeredDrawCellFunctions[columnId] = func;
 	}
 
 	function setColumnContentComponent(columnIndex, comp){
