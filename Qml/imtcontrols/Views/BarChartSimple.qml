@@ -77,7 +77,7 @@ Item {
 			border.color: barChart.color_positive;
 			border.width: barChart.isFilled ? 0 : barChart.borderWidth;
 
-			property real vertOffset: mainRec.height > width/2 ? width/2 : 0;
+			property real vertOffset: width/2;
 		}
 
 	}
