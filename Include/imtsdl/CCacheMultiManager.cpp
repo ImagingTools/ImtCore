@@ -30,6 +30,12 @@ bool CCacheMultiManager::Init(const QList<std::shared_ptr<ICacheController>>& co
 
 			return false;
 		}
+		ICacheController::LoadError loadError =  controllerPtr->LoadFromData();
+		if (loadError != ICacheController::LE_OK && loadError != ICacheController::LE_NULL_CACHE){
+			SendErrorMessage(0, "Unable to load cache");
+
+			return false;
+		}
 	}
 
 	m_controllersPtrList = controllers;
@@ -45,7 +51,8 @@ bool CCacheMultiManager::ResolveIncludePathForType(const CSdlType& type, QString
 		Q_ASSERT(controllerPtr);
 
 		const CCache& cache = controllerPtr->GetCache();
-		const istd::TPointerVector<CCacheEntry> entryList = cache.GetTypes();
+
+		const istd::TPointerVector<CCacheEntry>& entryList = cache.GetTypes();
 
 		// lookup through all entries
 		for (int index = 0; index < entryList.GetCount(); ++index){
@@ -54,7 +61,7 @@ bool CCacheMultiManager::ResolveIncludePathForType(const CSdlType& type, QString
 
 			if (entryPtr->GetTypeId() == type.GetName()){
 				const iprm::IParamsSet& schemaParams = type.GetSchemaParams();
-				const QString typeNamespace = BuildNamespaceFromParams(schemaParams);
+				const QString typeNamespace = GetNamespaceFromSchemaParams(schemaParams);
 
 				if (entryPtr->GetNamespace() == typeNamespace){
 					QString typeVersionName = GetTypeVersion(type);
@@ -72,6 +79,11 @@ bool CCacheMultiManager::ResolveIncludePathForType(const CSdlType& type, QString
 							}
 						}
 
+						SendLogMessage(
+							istd::IInformationProvider::IC_CRITICAL,
+							0,
+							QString("UNEXPECTED! Unable to find include path for found type. Type: %1").arg(type.GetName()),
+							"CCacheMultiManager");
 						Q_ASSERT_X(false, "UNEXPECTED! Unable to find include path for found type.", __func__);
 					}
 				}
@@ -80,6 +92,41 @@ bool CCacheMultiManager::ResolveIncludePathForType(const CSdlType& type, QString
 	}
 
 	return false;
+}
+
+
+QString CCacheMultiManager::GetNamespaceFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& prefix)
+{
+	QString retVal;
+	if (!prefix.isEmpty()){
+		retVal += prefix;
+		if (!retVal.isEmpty()){
+			retVal += QStringLiteral("::");
+		}
+	}
+
+	QString schemaNamespace;
+	iprm::TParamsPtr<iprm::ITextParam> namespaceParamPtr(&schemaParams, imtsdl::SdlCustomSchemaKeys::SchemaNamespace.toUtf8(), false);
+	if (namespaceParamPtr.IsValid()){
+		schemaNamespace = namespaceParamPtr->GetText();
+	}
+	if (!schemaNamespace.isEmpty()){
+		retVal += schemaNamespace;
+		if (!retVal.isEmpty()){
+			retVal += QStringLiteral("::");
+		}
+	}
+
+	QString schemaName;
+	iprm::TParamsPtr<iprm::ITextParam> nameParamPtr(&schemaParams, imtsdl::SdlCustomSchemaKeys::SchemaName.toUtf8(), false);
+	if (nameParamPtr.IsValid()){
+		schemaName = nameParamPtr->GetText();
+	}
+	if (!schemaName.isEmpty()){
+		retVal += schemaName;
+	}
+
+	return imtsdl::CSdlTools::GetNamespaceAcceptableString(retVal);
 }
 
 

@@ -125,8 +125,10 @@ public:
 	void SetIncludePaths(const QList<QString>& includePaths);
 	void AddIncludePathsElement(const QString& element);
 
-	[[nodiscard]] istd::TPointerVector<CCacheEntry> GetTypes() const;
+	[[nodiscard]] int GetTypesCount() const;
+	[[nodiscard]] const istd::TPointerVector<CCacheEntry>& GetTypes() const;
 	void AddTypesElement(const CCacheEntry& element);
+	[[nodiscard]] bool HasTypesElement(const CCacheEntry& element);
 
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] static bool ReadFromJsonObject(CCache& object, const QJsonObject& jsonObject);

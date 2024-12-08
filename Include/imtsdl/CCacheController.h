@@ -5,7 +5,7 @@
 #include <QtCore/QReadWriteLock>
 
 // ACF includes
-#include <istd/ILogger.h>
+#include <ilog/CLoggerBase.h>
 #include <imod/CSingleModelObserverBase.h>
 
 // ImtCore includes
@@ -19,13 +19,13 @@ namespace imtsdl
 
 class CCacheController:
 			protected imod::CSingleModelObserverBase,
-			protected istd::ILogger,
+			protected ilog::CLoggerBase,
 			virtual public ICacheController
 {
 
 public:
 	typedef imod::CSingleModelObserverBase BaseClass;
-	typedef istd::ILogger BaseClass2;
+	typedef ilog::CLoggerBase BaseClass2;
 
 	CCacheController();
 

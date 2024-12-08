@@ -34,15 +34,6 @@ int CCacheGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	// init cache controller and check required data
-	std::shared_ptr<QFile> cacheFilePtr(new QFile(cachePath));
-	bool deviceSetted = m_cacheControllerCompPtr->SetOperationalDevice(cacheFilePtr);
-	if (!deviceSetted){
-		SendErrorMessage(0, QString("Unable to set operational file for cache controller '%1'").arg(cachePath));
-
-		return TS_INVALID;
-	}
-
 	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");
@@ -50,8 +41,6 @@ int CCacheGeneratorComp::DoProcessing(
 
 		return TS_INVALID;
 	}
-
-	const QString schemaFileNameName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
 
 	// guard a cache file, while a cache is generating...
 	QString lockFilePath = cachePath + QStringLiteral(".lock");
@@ -72,6 +61,7 @@ int CCacheGeneratorComp::DoProcessing(
 		return TS_INVALID;
 	}
 
+	const QString schemaFileNameName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
 	QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
 	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
 		if (!m_schemaParamsCompPtr.IsValid()){
@@ -115,7 +105,9 @@ int CCacheGeneratorComp::DoProcessing(
 		targetHeaderPath = QDir::cleanPath(targetHeaderPath);
 		cacheTypeEntry.SetTargetHeaderPath(targetHeaderPath);
 
-		cache.AddTypesElement(cacheTypeEntry);
+		if (!cache.HasTypesElement(cacheTypeEntry)){
+			cache.AddTypesElement(cacheTypeEntry);
+		}
 	}
 
 	// complete change group

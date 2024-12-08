@@ -14,7 +14,7 @@ namespace imtsdl
 
 
 class CCacheMultiManager:
-			virtual protected istd::ILogger,
+			virtual public ilog::CLoggerBase,
 			private CSdlTools,
 			virtual public ICacheMultiManager
 {
@@ -24,6 +24,8 @@ public:
 	virtual bool Init(const QList<std::shared_ptr<ICacheController>>& controllers) override;
 	virtual bool ResolveIncludePathForType(const CSdlType& type, QString& foundPath) const override;
 
+private:
+	static QString GetNamespaceFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& prefix = "sdl");
 private:
 	QList<std::shared_ptr<ICacheController>> m_controllersPtrList;
 };

@@ -32,6 +32,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_originalSchemaNamespaceCompPtr.IsValid());
+	Q_ASSERT(m_cacheManagerCompPtr.IsValid());
 
 	if (!m_argumentParserCompPtr->IsCppEnabled()){
 		return TS_OK;
@@ -337,7 +338,15 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 				}
 
 				if (foundType.IsExternal()){
-					const QString relativeIncludePath = '<' + ResolveRelativeHeaderFileForType(foundType, m_argumentParserCompPtr->GetHeadersIncludePaths()) + '>';
+					QString resolvedPath;
+					bool resolved = false;
+					if (m_cacheManagerCompPtr.IsValid()){
+						resolved = m_cacheManagerCompPtr->ResolveIncludePathForType(foundType, resolvedPath);
+					}
+					if (!resolved || resolvedPath.isEmpty()){
+						resolvedPath = ResolveRelativeHeaderFileForType(foundType, m_argumentParserCompPtr->GetHeadersIncludePaths());
+					}
+					const QString relativeIncludePath = '<' + resolvedPath + '>';
 					if (!relativeIncludePath.isEmpty() && !customIncluded.contains(relativeIncludePath)){
 						includeDirectivesList << CreateCustomDirective(relativeIncludePath);
 						customIncluded << relativeIncludePath;

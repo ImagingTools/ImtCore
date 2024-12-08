@@ -7,7 +7,7 @@
 // ImtCore includes
 #include <imtsdl/CGqlSchemaParserComp.h>
 #include <imtsdl/CCacheController.h>
-#include <imtsdl/CCacheMultiManager.h>
+#include <imtsdl/CCacheMultiManagerComp.h>
 
 
 /**
@@ -22,8 +22,7 @@ typedef imtsdl::CGqlSchemaParserComp GqlSchemaParser;
 typedef icomp::TMakeComponentWrap<
 				imtsdl::CCacheController, imtsdl::ICacheController> CacheController;
 
-typedef icomp::TMakeComponentWrap<
-					imtsdl::CCacheMultiManager, imtsdl::ICacheMultiManager> CacheMultiManager;
+typedef imtsdl::CCacheMultiManagerComp CacheMultiManager;
 
 
 } // namespace ImtSdlPck

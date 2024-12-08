@@ -78,7 +78,35 @@ function(ImtCoreAddSdlSearchPath ARG_SDL_PATH)
 			FORCE
 		)
 	endif()
+endfunction()
 
+
+function(ImtCoreSetSdlMainCacheFile ARG_CACHE_FILE)
+	set(GLOBAL_SDL_CACHE_FILE ${ARG_CACHE_FILE}
+		CACHE
+		STRING "Cache file, used to store information about generated files"
+		FORCE
+	)
+endfunction()
+
+
+function(ImtCoreAddSdlCacheFile ARG_SDL_CACHE_FILE_PATH)
+	if (NOT GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS)
+		set(GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS ${ARG_SDL_CACHE_FILE_PATH}
+			CACHE
+			STRING "List of additional cache files, used to collect information about already generated files"
+			FORCE
+		)
+
+	else()
+		list(APPEND GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS ${ARG_SDL_CACHE_FILE_PATH})
+		list(REMOVE_DUPLICATES GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS)
+		set(GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS ${GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS}
+			CACHE
+			STRING "List of additional cache files, used to collect information about already generated files"
+			FORCE
+		)
+	endif()
 endfunction()
 
 
@@ -102,6 +130,11 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	list(APPEND CUSTOM_MODIFICATORS "-Psdl")
 	list(APPEND CUSTOM_MODIFICATORS "-Bistd::IPolymorphic=istd/IPolymorphic.h")
 	list(APPEND CUSTOM_MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
+
+	# use cache file if provided
+	if (GLOBAL_SDL_CACHE_FILE)
+		list(APPEND CUSTOM_MODIFICATORS "-C${GLOBAL_SDL_CACHE_FILE}")
+	endif()
 
 	if (ARG_SOURCE_NAME)
 		set(SDL_CPP_OUTPUT_DIRECTORY "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP")
@@ -170,13 +203,17 @@ macro (ImtCoreCustomConfigureSdlQml)
 	set(oneValueArgs SCHEMA_PATH VERSION QML_NAME EXTRA_DEPS FOUND_DEPS)
 	cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
 
-	# "${ARG_QML_NAME}"
 	set(SDL_OUTPUT_DIRECTORY "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/QML/${ARG_QML_NAME}")
 
 	set(MODIFICATORS)
 	list(APPEND MODIFICATORS "--QML")
 	list(APPEND MODIFICATORS "--use-all-modificators")
 	list(APPEND MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
+
+	# use cache file if provided
+	if (GLOBAL_SDL_CACHE_FILE)
+		list(APPEND MODIFICATORS "-C${GLOBAL_SDL_CACHE_FILE}")
+	endif()
 
 	if (ARG_QML_NAME)
 		list(APPEND MODIFICATORS "-N=${ARG_QML_NAME}")

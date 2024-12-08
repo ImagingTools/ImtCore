@@ -79,7 +79,7 @@ bool CCacheController::SetOperationalDevice(const std::shared_ptr<QIODevice>& de
 	}
 
 	if (!devicePtr->isOpen()){
-		const bool isOpen = devicePtr->open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate);
+		const bool isOpen = devicePtr->open(QIODevice::ReadWrite | QIODevice::Text);
 		if (!isOpen) {
 			QFile* filePtr = dynamic_cast<QFile*>(devicePtr.get());
 			QString fileName;

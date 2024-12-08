@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5325" Description="ACF"/>
+            <Version Id="0" Number="5324" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
@@ -28,24 +28,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CacheController" PackageId="ImtSdlPck" ComponentId="CacheController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="CacheGenerator" PackageId="ImtSdlGenV2Pck" ComponentId="CacheGenerator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -53,7 +35,7 @@
                         <Data IsEnabled="true" Value="SdlProcessArgumentsParser"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CacheController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="CacheController"/>
+                        <Data IsEnabled="true" Value="CacheMultiManager/CacheController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CurrentSchemaParams" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GqlSchemaParser/SchemaCustomParams"/>
@@ -66,6 +48,27 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GqlSchemaParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CacheMultiManager" PackageId="ImtSdlPck" ComponentId="CacheMultiManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlProcessArgumentsParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                         <Data IsEnabled="false"/>
@@ -151,7 +154,8 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtsdl::ICacheController" ComponentId="CacheController"/>
+        <Interface InterfaceId="imtsdl::ICacheController" ComponentId="CacheMultiManager/CacheController"/>
+        <Interface InterfaceId="imtsdl::ICacheMultiManager" ComponentId="CacheMultiManager/CacheMultiManager"/>
         <Interface InterfaceId="imtsdl::ISdlDocumentTypeListProvider" ComponentId="GqlSchemaParser"/>
         <Interface InterfaceId="imtsdl::ISdlEnumListProvider" ComponentId="GqlSchemaParser"/>
         <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser" ComponentId="SdlProcessArgumentsParser"/>

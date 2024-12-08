@@ -285,7 +285,13 @@ void CCache::AddIncludePathsElement(const QString& element)
 }
 
 
-istd::TPointerVector<CCacheEntry> CCache::GetTypes() const
+int CCache::GetTypesCount() const
+{
+	return m_types.GetCount();
+}
+
+
+const istd::TPointerVector<CCacheEntry>& CCache::GetTypes() const
 {
 	return m_types;
 }
@@ -302,6 +308,17 @@ void CCache::AddTypesElement(const CCacheEntry& element)
 	newElementPtr->AttachObserver(&m_updateBridge);
 
 	m_types.PushBack(newElementPtr);
+}
+
+bool CCache::HasTypesElement(const CCacheEntry& element)
+{
+	for (int index = 0; index < m_types.GetCount(); ++index){
+		if (m_types.GetAt(index)->IsEqual(element)){
+			return true;
+		}
+	}
+
+	return false;
 }
 
 
