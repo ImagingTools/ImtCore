@@ -274,6 +274,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	// schema dependency mode - is a special mode. Cleanup all unnecessary values
 	if (commandLineParser.isSet(schemaDependencyOption)){
 		m_schemaDependencyModeEnabled = true;
+		m_isGenerateMode = false;
 		m_cppEnabled = false;
 		m_qmlEnabled = false;
 		m_gqlEnabled = false;
