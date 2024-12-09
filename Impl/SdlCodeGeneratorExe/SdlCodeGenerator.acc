@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5324" Description="ACF"/>
+            <Version Id="0" Number="5325" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
@@ -13,6 +13,9 @@
         <Element Id="Application" PackageId="" ComponentId="Application">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CodeGenWorker"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -77,7 +80,7 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="ConsoleLog"/>
+                                    <Data IsEnabled="true" Value="FilteredConsoleLog"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                                     <Data IsEnabled="false"/>
@@ -93,6 +96,18 @@
                             <AttributeInfoMap>
                                 <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="SlaveMessageConsumer">
                                     <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="FilteredConsoleLog" PackageId="ImtSdlPck" ComponentId="LogFilter">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="ConsoleLog"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -134,7 +149,7 @@
                     <Interface InterfaceId="ibase::IApplication" ComponentId="ConsoleApplication"/>
                     <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfo"/>
                     <Interface InterfaceId="ibase::IRuntimeStatusProvider" ComponentId="ConsoleApplication/RuntimeStatus"/>
-                    <Interface InterfaceId="ilog::IMessageConsumer" ComponentId="ConsoleLog"/>
+                    <Interface InterfaceId="ilog::IMessageConsumer" ComponentId="FilteredConsoleLog"/>
                     <Interface InterfaceId="iser::IVersionInfo" ComponentId="VersionInfo"/>
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="ConsoleApplication"/>
                 </ExportedInterfaces>

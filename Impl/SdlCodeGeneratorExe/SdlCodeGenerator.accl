@@ -2,13 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5324" Description="ACF"/>
+            <Version Id="0" Number="5325" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Application" X="550" Y="350" Note=""/>
+        <Element ComponentName="Application" X="575" Y="350" Note=""/>
         <Element ComponentName="CodeGenWorker" X="575" Y="525" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
@@ -16,7 +16,8 @@
             <PositionMap>
                 <Element ComponentName="ApplicationInfo" X="475" Y="475" Note=""/>
                 <Element ComponentName="ConsoleApplication" X="475" Y="350" Note=""/>
-                <Element ComponentName="ConsoleLog" X="750" Y="350" Note=""/>
+                <Element ComponentName="ConsoleLog" X="900" Y="350" Note=""/>
+                <Element ComponentName="FilteredConsoleLog" X="700" Y="350" Note=""/>
                 <Element ComponentName="VersionInfo" X="475" Y="600" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
