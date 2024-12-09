@@ -344,12 +344,12 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 
 	int offset = 0, count = -1;
 
+	QByteArray data;
 	if (viewParamsGql != nullptr){
 		offset = viewParamsGql->GetFieldArgumentValue("offset").toInt();
 		count = viewParamsGql->GetFieldArgumentValue("count").toInt();
+		data = viewParamsGql->GetFieldArgumentValue("selectionParams").toByteArray();
 	}
-
-	QByteArray data = inputObject->GetFieldArgumentValue("selectionParams").toByteArray();
 
 	istd::TDelPtr<iprm::IParamsSet> filterParamsPtr;
 	if (m_paramsSetFactCompPtr.IsValid()){
@@ -524,6 +524,48 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElement
 }
 
 
+imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QString("Unable to get the element count. Component reference 'ObjectCollection' was not set");
+		SendCriticalMessage(0, errorMessage);
+
+		return nullptr;
+	}
+
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	if (inputParamPtr == nullptr){
+		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
+		SendErrorMessage(0, errorMessage, "Object collection controller");
+
+		return nullptr;
+	}
+
+	QByteArray data = inputParamPtr->GetFieldArgumentValue("selectionParams").toByteArray();
+
+	istd::TDelPtr<iprm::IParamsSet> filterParamsPtr;
+	if (m_paramsSetFactCompPtr.IsValid()){
+		filterParamsPtr.SetPtr(m_paramsSetFactCompPtr.CreateInstance());
+	}
+	else{
+		filterParamsPtr.SetPtr(new iprm::CParamsSet);
+	}
+
+	if (!DeSerializeObject(filterParamsPtr.GetPtr(), QByteArray::fromBase64(data))){
+		errorMessage = QString("Unable to get elements count. Error: Filter deserialization failed");
+		SendWarningMessage(0, errorMessage, "CSerializableObjectCollectionControllerComp");
+	}
+
+	int elementsCount = m_objectCollectionCompPtr->GetElementsCount(filterParamsPtr.GetPtr());
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	dataModelPtr->SetData("itemsCount", elementsCount);
+
+	return rootModelPtr.PopPtr();
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CSerializableObjectCollectionControllerComp::OnComponentCreated()
@@ -537,6 +579,7 @@ void CSerializableObjectCollectionControllerComp::OnComponentCreated()
 	m_baseCommandIds << QByteArray("View");
 	m_baseCommandIds << QByteArray("Remove");
 	m_baseCommandIds << QByteArray("SetDescription");
+	m_baseCommandIds << QByteArray("SetName");
 	m_baseCommandIds << QByteArray("Add");
 	m_baseCommandIds << QByteArray("Update");
 	m_baseCommandIds << QByteArray("Item");

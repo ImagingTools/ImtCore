@@ -205,11 +205,18 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectRequest
 }
 
 
-imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementCountRequest(const iprm::IParamsSet* /*selectionParamsPtr*/) const
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementCountRequest(const iprm::IParamsSet* selectionParamsPtr) const
 {
 	QByteArray commandId = *m_collectionIdAttrPtr + "Count";
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, commandId);
 	imtgql::CGqlObject input;
+
+	QByteArray data;
+	if (selectionParamsPtr != nullptr){
+		SerializeObject(selectionParamsPtr, data);
+	}
+	input.InsertField("selectionParams", QVariant(data.toBase64()));
+
 	requestPtr->AddParam("input", input);
 
 	imtgql::CGqlObject query;
@@ -231,7 +238,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 	input.InsertField("count", QVariant(count));
 	QByteArray data;
 	if (selectionParamsPtr != nullptr){
-		SerializeObject(selectionParamsPtr,data);
+		SerializeObject(selectionParamsPtr, data);
 	}
 	input.InsertField("selectionParams", QVariant(data.toBase64()));
 	requestPtr->AddParam("input", input);
@@ -577,10 +584,6 @@ CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp:
 	imtgql::IGqlResponse::GqlRequestPtr requestPtr = response.GetOriginalRequest();
 	if (!requestPtr.isNull()){
 		data.commandId = requestPtr->GetCommandId();
-
-		if (!data.data.contains(data.commandId)) {
-			SendErrorMessage(0, "GqlResponse data don't contains " + data.commandId);
-		}
 	}
 
 	QJsonDocument document = QJsonDocument::fromJson(response.GetResponseData());

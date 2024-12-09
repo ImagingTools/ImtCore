@@ -549,8 +549,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 		return nullptr;
 	}
 
-	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
-	QString newName = inputParamPtr->GetFieldArgumentValue("NewName").toString();
+	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
+	QString newName = inputParamPtr->GetFieldArgumentValue("newName").toString();
 
 	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
 		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName).arg(qPrintable(objectId));
@@ -562,8 +562,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 
-	dataModel->SetData("Id", objectId);
-	dataModel->SetData("Name", newName);
+	dataModel->SetData("id", objectId);
+	dataModel->SetData("name", newName);
 
 	return rootModelPtr.PopPtr();
 }

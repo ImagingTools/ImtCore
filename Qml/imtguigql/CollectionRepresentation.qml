@@ -251,13 +251,12 @@ Item {
 
             query = Gql.GqlRequest("mutation", internal.renameGqlCommand);
 
-            inputParams.InsertField("Id", id);
-            inputParams.InsertField("NewName", name);
+			inputParams.InsertField("id", id);
+			inputParams.InsertField("newName", name);
 
             query.AddParam(inputParams);
 
             queryFields = Gql.GqlObject("rename");
-            queryFields.InsertField("NewName");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
@@ -298,8 +297,8 @@ Item {
                     if (dataModelLocal.containsKey(internal.renameGqlCommand)) {
                         dataModelLocal = dataModelLocal.getData(internal.renameGqlCommand);
 
-                        let id = dataModelLocal.getData("Id");
-                        let newName = dataModelLocal.getData("Name");
+						let id = dataModelLocal.getData("id");
+						let newName = dataModelLocal.getData("name");
 
                         root.renamed(id, newName);
                     }

@@ -42,6 +42,7 @@ protected:
 	virtual imtbase::CTreeItemModel* RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetElementIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual imtbase::CTreeItemModel* GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

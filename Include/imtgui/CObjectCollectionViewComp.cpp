@@ -1603,14 +1603,12 @@ QVariant CObjectCollectionViewComp::TableModel::data(const QModelIndex& index, i
 		metaInfo = m_metaInfoMap[objectId];
 	}
 	else{
-		itemTypeId = collectionPtr->GetObjectTypeId(objectId);
+		itemTypeId = m_parent.m_currentTypeId;
 
 		metaInfo = m_parent.GetMetaInfo(objectId, itemTypeId);
 
 		m_metaInfoMap[objectId] = metaInfo;
 	}
-
-	//	qDebug() << QString("CObjectCollectionViewComp::TableModel::data --> Index(%1, %2) Role(%3)").arg(index.row()).arg(index.column()).arg(role);
 
 	switch (role){
 	case Qt::DisplayRole:
