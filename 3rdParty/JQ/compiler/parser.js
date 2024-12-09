@@ -1611,7 +1611,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
       } else {
         qmlelem_name = expr[1];
       }
-      return as_(undefined, "qmlelem", qmlelem_name, undefined, qmlblock());
+      return as_(info, "qmlelem", qmlelem_name, undefined, qmlblock());
     }
     return expr;
   }

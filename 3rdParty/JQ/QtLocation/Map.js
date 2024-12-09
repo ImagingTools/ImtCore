@@ -111,6 +111,12 @@ class Map extends Item {
         }
     }
 
+    onZoomLevelChanged(){
+        if(this.__map){
+            this.__map.getView().setZoom(this.zoomLevel)
+        }
+    }
+
 }
 
 Map.initialize()

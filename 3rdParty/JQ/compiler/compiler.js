@@ -22,6 +22,7 @@ const QtLocation = require('../QtLocation/QtLocation')
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\lisa.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\agentino.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\jq.json'
+// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\Rosa\\rosa.json'
 const argv = process.argv
 const env = process.env
 const configFilePath = argv.slice(2)[0]
@@ -1078,6 +1079,10 @@ class Instruction {
             }
 
             if (assignProperty.value instanceof Instruction) {
+                if (!path) {
+                    throw `${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: error: ${assignProperty.name} is not founded`
+                }
+
                 if (path.type === QtQml.Component && assignProperty.value.extends !== 'Component') {
                     lazyCode.add(`let ${assignProperty.value.name}=JQModules.QtQml.Component.create(null,`)
 

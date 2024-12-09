@@ -1,5 +1,5 @@
 module.exports = {
-    Dialog: require("./Dialog"),
+    // Dialog: require("./Dialog"),
     FileDialog: require("./FileDialog"),
     FolderDialog: require("./FolderDialog"),
 }
