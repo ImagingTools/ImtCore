@@ -8,6 +8,7 @@
 #include <imtsdl/CGqlSchemaParserComp.h>
 #include <imtsdl/CCacheController.h>
 #include <imtsdl/CCacheMultiManagerComp.h>
+#include <imtsdl/CLogFilterComp.h>
 
 
 /**
@@ -17,12 +18,8 @@ namespace ImtSdlPck
 {
 
 typedef imtsdl::CGqlSchemaParserComp GqlSchemaParser;
-
-/// \todo make it loggable
-typedef icomp::TMakeComponentWrap<
-				imtsdl::CCacheController, imtsdl::ICacheController> CacheController;
-
 typedef imtsdl::CCacheMultiManagerComp CacheMultiManager;
+typedef imtsdl::CLogFilterComp LogFilter;
 
 
 } // namespace ImtSdlPck
