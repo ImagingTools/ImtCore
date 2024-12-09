@@ -2,10 +2,11 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const parser = require('./parser')
+const { SourceMapGenerator, SourceNode } = require('source-map-generator')
 
 // for compatibility with web
 global.window = {
-    addEventListener: function(){}
+    addEventListener: function () { }
 }
 
 const BaseObject = require('../QtBase/BaseObject')
@@ -26,26 +27,26 @@ const env = process.env
 const configFilePath = argv.slice(2)[0]
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 
-function envFill(source){
+function envFill(source) {
     let result = source
-    for(let key in env){
-        result = result.replaceAll('${'+key+'}', env[key].replaceAll('\\','\\\\').trim())
+    for (let key in env) {
+        result = result.replaceAll('${' + key + '}', env[key].replaceAll('\\', '\\\\').trim())
     }
     return result
 }
 
-function includeFiles(sourceFile){
-    if(sourceFile.includes)
-    for(let filePath of sourceFile.includes){
-        let file = JSON.parse(envFill(fs.readFileSync(filePath, {encoding:'utf8', flag:'r'})))
-        includeFiles(file)
-        for(let dirPath of file.dirs){
-            sourceFile.dirs.unshift(dirPath)
+function includeFiles(sourceFile) {
+    if (sourceFile.includes)
+        for (let filePath of sourceFile.includes) {
+            let file = JSON.parse(envFill(fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' })))
+            includeFiles(file)
+            for (let dirPath of file.dirs) {
+                sourceFile.dirs.unshift(dirPath)
+            }
         }
-    }
 }
 
-const config = JSON.parse(envFill(fs.readFileSync(configFilePath, {encoding:'utf8', flag:'r'})))
+const config = JSON.parse(envFill(fs.readFileSync(configFilePath, { encoding: 'utf8', flag: 'r' })))
 includeFiles(config)
 
 const BaseModules = {
@@ -87,46 +88,46 @@ class Instruction {
     name = ''
     isRoot = false
 
-    constructor(parent, className, _extends, meta, on, qmlFile, info){
-        if(qmlFile.elementsCount === 0) this.isRoot = true
-        this.name = '__el'+qmlFile.elementsCount++
+    constructor(parent, className, _extends, meta, on, qmlFile, info) {
+        if (qmlFile.elementsCount === 0) this.isRoot = true
+        this.name = '__el' + qmlFile.elementsCount++
         this.parent = parent
         this.className = className
         this.extends = typeof _extends === 'object' ? _extends.slice(1).join('.') : _extends
         this.qmlFile = qmlFile
         this.info = info
 
-        for(let m of meta){
-            if(m) this[m[0]](m)
+        for (let m of meta) {
+            if (m) this[m[0]](m)
         }
     }
 
-    qmlelem(meta){
-        this.children.push(new Instruction(this, '', meta[1], meta[3], meta[2], this.qmlFile, meta.info)) 
+    qmlelem(meta) {
+        this.children.push(new Instruction(this, '', meta[1], meta[3], meta[2], this.qmlFile, meta.info))
     }
-    qmlsignaldef(meta){
+    qmlsignaldef(meta) {
         let args = []
-        for(let arg of meta[2]){
+        for (let arg of meta[2]) {
             args.push(`\`${arg.name}\``)
         }
         this.defineSignals.push({
             name: meta[1],
-            slotName: 'on'+meta[1][0].toUpperCase()+meta[1].slice(1),
+            slotName: 'on' + meta[1][0].toUpperCase() + meta[1].slice(1),
             args: args
         })
     }
-    qmlmethod(meta){
+    qmlmethod(meta) {
         this.defineMethods.push({
             name: meta[1],
             args: meta[2][2],
             source: meta[2]
         })
     }
-    qmlaliasdef(meta){
+    qmlaliasdef(meta) {
         this.defineProperties.push({
             name: meta[1],
             type: 'alias',
-            signalName: meta[1]+'Changed',
+            signalName: meta[1] + 'Changed',
         })
         this.assignProperties.push({
             name: meta[1],
@@ -134,12 +135,12 @@ class Instruction {
             value: meta,
         })
         this.defineSignals.push({
-            name: meta[1]+'Changed',
-            slotName: 'on'+ meta[1][0].toUpperCase() + meta[1].slice(1) +'Changed',
+            name: meta[1] + 'Changed',
+            slotName: 'on' + meta[1][0].toUpperCase() + meta[1].slice(1) + 'Changed',
             args: []
         })
     }
-    qmlpropdef(meta){
+    qmlpropdef(meta) {
         let type = {
             defaultValue: null
         }
@@ -149,21 +150,21 @@ class Instruction {
         } catch {
 
         }
-        
-        if(meta[4] && meta[4][1][0] === 'qmlelem'){
+
+        if (meta[4] && meta[4][1][0] === 'qmlelem') {
             this.defineSignals.push({
-                name: meta[2]+'Changed',
-                slotName: 'on'+ meta[2][0].toUpperCase() + meta[2].slice(1) +'Changed',
+                name: meta[2] + 'Changed',
+                slotName: 'on' + meta[2][0].toUpperCase() + meta[2].slice(1) + 'Changed',
                 args: []
-            }) 
+            })
 
             this.defineProperties.push({
                 name: meta[2],
                 type: meta[3],
                 value: type.defaultValue,
-                signalName: meta[2]+'Changed',
+                signalName: meta[2] + 'Changed',
                 info: meta.info,
-            }) 
+            })
 
             this.assignProperties.push({
                 name: meta[2],
@@ -171,11 +172,11 @@ class Instruction {
             })
         } else {
             let defaultValue = type.defaultValue
-            
-            if(meta[5]){
+
+            if (meta[5]) {
                 try {
                     defaultValue = eval(meta[5])
-                    if(defaultValue && typeof defaultValue === 'object') {
+                    if (defaultValue && typeof defaultValue === 'object') {
                         this.assignProperties.push({
                             name: meta[2],
                             value: meta[4],
@@ -188,36 +189,36 @@ class Instruction {
                     })
                 }
             }
-            
+
             this.defineSignals.push({
-                name: meta[2]+'Changed',
-                slotName: 'on'+ meta[2][0].toUpperCase() + meta[2].slice(1) +'Changed',
+                name: meta[2] + 'Changed',
+                slotName: 'on' + meta[2][0].toUpperCase() + meta[2].slice(1) + 'Changed',
                 args: []
             })
 
             this.defineProperties.push({
                 name: meta[2],
                 type: meta[3],
-                value: defaultValue, 
-                signalName: meta[2]+'Changed',
+                value: defaultValue,
+                signalName: meta[2] + 'Changed',
                 info: meta.info,
-            }) 
+            })
         }
-        
+
     }
-    qmlprop(meta){
-        if(meta[2][0] === "block" || meta[2][1][0] === "assign"){
-            if(meta[1][0] === "dot"){
+    qmlprop(meta) {
+        if (meta[2][0] === "block" || meta[2][1][0] === "assign") {
+            if (meta[1][0] === "dot") {
                 let name = meta[1].slice(1)
-    
-                if(name[1].slice(0, 2) === 'on'){
+
+                if (name[1].slice(0, 2) === 'on') {
                     this.connectedSignals.push({
                         slotName: `['${name.join('.')}']`,
                         args: [],
                         source: meta[2],
                     })
                 } else {
-                    if(meta[2][1][0] === 'qmlelem'){
+                    if (meta[2][1][0] === 'qmlelem') {
                         this.assignProperties.push({
                             name: name.join('.'),
                             value: new Instruction(null, '', meta[2][1][1], meta[2][1][3], meta[2][1][2], this.qmlFile, meta[2][1].info),
@@ -231,8 +232,8 @@ class Instruction {
                 }
             } else {
                 let name = meta[1]
-    
-                if(name.slice(0, 2) === 'on'){
+
+                if (name.slice(0, 2) === 'on') {
                     let signalName = name.slice(2)
                     signalName = signalName[0].toLowerCase() + signalName.slice(1)
                     this.connectedSignals.push({
@@ -241,7 +242,7 @@ class Instruction {
                         source: meta[2],
                     })
                 } else {
-                    if(meta[2][1][0] === 'qmlelem'){
+                    if (meta[2][1][0] === 'qmlelem') {
                         this.assignProperties.push({
                             name: name.join('.'),
                             value: new Instruction(null, '', meta[2][1][1], meta[2][1][3], meta[2][1][2], this.qmlFile, meta[2][1].info),
@@ -253,8 +254,8 @@ class Instruction {
                         })
                     }
                 }
-            } 
-        } else if (meta[1][0] === "dot"){
+            }
+        } else if (meta[1][0] === "dot") {
             let name = meta[1].slice(1).join('.')
             this.assignProperties.push({
                 name: name,
@@ -262,7 +263,7 @@ class Instruction {
             })
         } else {
             let name = meta[1]
-            if(name.slice(0, 2) === 'on'){
+            if (name.slice(0, 2) === 'on') {
                 let signalName = name.slice(2)
                 signalName = signalName[0].toLowerCase() + signalName.slice(1)
                 this.connectedSignals.push({
@@ -271,11 +272,11 @@ class Instruction {
                     source: meta[2],
                 })
             } else {
-                if(name === 'id'){
+                if (name === 'id') {
                     this.id = meta[2][1][1]
-                    this.qmlFile.context[this.id]= this
+                    this.qmlFile.context[this.id] = this
                 } else {
-                    if(meta[2][1][0] === 'qmlelem'){
+                    if (meta[2][1][0] === 'qmlelem') {
                         //console.log('=====', name)
                         this.assignProperties.push({
                             name: name,//.join('.'),
@@ -292,30 +293,30 @@ class Instruction {
                         })
                     }
                 }
-            } 
+            }
         }
     }
-    qmlobj(meta){
-        this.children.push(new Instruction(this, '', meta[1].slice(1).join('.'), meta[2], null, this.qmlFile, meta.info)) 
+    qmlobj(meta) {
+        this.children.push(new Instruction(this, '', meta[1].slice(1).join('.'), meta[2], null, this.qmlFile, meta.info))
     }
-    qmlenumdef(meta){
+    qmlenumdef(meta) {
         //Enums[meta[1]] = meta[2]
     }
 
-    resolve(name, thisKey){
+    resolve(name, thisKey) {
         let res = this.resolveInner(name, thisKey)
-        if(res) {
+        if (res) {
             return res
         } else {
-            let recursive = (result = [], name, target)=>{
-                for(let key in target){
+            let recursive = (result = [], name, target) => {
+                for (let key in target) {
                     result.push(key)
-                    if(name === key) return result.join('.')
+                    if (name === key) return result.join('.')
 
-                    if((typeof target[key] === 'object' && typeof target[key] !== 'function' && !(target[key] instanceof QmlFile || target[key] instanceof JSFile || target[key] === QtQml.Screen))){
-                        if(recursive(result, name, target[key])) {
+                    if ((typeof target[key] === 'object' && typeof target[key] !== 'function' && !(target[key] instanceof QmlFile || target[key] instanceof JSFile || target[key] === QtQml.Screen))) {
+                        if (recursive(result, name, target[key])) {
                             // console.log(target[key][name])
-                            if(target[key][name] instanceof JSFile || target[key][name] instanceof QmlFile){
+                            if (target[key][name] instanceof JSFile || target[key][name] instanceof QmlFile) {
                                 return {
                                     obj: target[key][name],
                                     source: result.join('.'),
@@ -328,37 +329,37 @@ class Instruction {
                                     source: result.join('.'),
                                 }
                             }
-                            
+
                         }
                     }
-                    
+
                     result.pop()
                 }
             }
             return recursive(['JQModules'], name, JQModules)
         }
     }
-    
-    resolveInner(name, thisKey){
-        for(let obj of this.defineProperties){
+
+    resolveInner(name, thisKey) {
+        for (let obj of this.defineProperties) {
             let typeInfo
             try {
                 typeInfo = obj.type ? this.getTypeInfo(obj.type) : {}
             } catch (error) {
-                throw `${this.qmlFile.fileName}:${obj.info.line+1}:${obj.info.col+1}: error: ${obj.type} is not founded`
+                throw `${this.qmlFile.fileName}:${obj.info.line + 1}:${obj.info.col + 1}: error: ${obj.type} is not founded`
             }
-            if(name === obj.name) return {
+            if (name === obj.name) return {
                 source: `${thisKey}.${name}`,
                 type: typeInfo.type,
             }
         }
-        for(let obj of this.defineSignals){
-            if(name === obj.name) return {
+        for (let obj of this.defineSignals) {
+            if (name === obj.name) return {
                 source: `${thisKey}.${name}`,
             }
         }
-        for(let obj of this.defineMethods){
-            if(name === obj.name) return {
+        for (let obj of this.defineMethods) {
+            if (name === obj.name) return {
                 source: `${thisKey}.${name}`,
             }
         }
@@ -366,19 +367,19 @@ class Instruction {
         let typeInfo = null
         try {
             typeInfo = this.getTypeInfo(this.extends)
-        } catch {}
+        } catch { }
 
-        if(typeInfo){
-            if(typeInfo.type instanceof QmlFile) {
+        if (typeInfo) {
+            if (typeInfo.type instanceof QmlFile) {
                 return typeInfo.type.instruction.resolve(name, thisKey)
             } else {
                 let obj = new typeInfo.type()
-                if(name in typeInfo.type.meta){
+                if (name in typeInfo.type.meta) {
                     return {
                         source: `${thisKey}.${name}`,
                         type: typeInfo.type.meta[name].typeTarget ? typeInfo.type.meta[name].typeTarget : typeInfo.type.meta[name].type,
                     }
-                } else if(name in obj){
+                } else if (name in obj) {
                     return {
                         source: `${thisKey}.${name}`,
                     }
@@ -387,152 +388,154 @@ class Instruction {
         }
     }
 
-    prepare(tree, stat = {isCompute:false, thisKey: '__self', value: '', local: []}){ 
-        if(tree){
-            switch(tree[0]){
+    prepare(tree, stat = { isCompute: false, thisKey: '__self', value: new SourceNode(), local: [] }, endSymbol = true) {
+        if (tree) {
+            switch (tree[0]) {
                 case 'return': {
                     stat.isCompute = true
-                    stat.value += 'return '
+                    stat.value.add('return ')
                     this.prepare(tree[1], stat)
-                    stat.value += ';'
+                    stat.value.add(';')
                     return stat
                 }
                 case 'num': {
-                    stat.value += tree[1]
+                    stat.value.add(tree[1].toString())
                     return stat
                 }
                 case 'string': {
-                    stat.value += `\`${tree[1].replaceAll('\u005C', '\u005C\u005C')}\``
+                    stat.value.add(`\`${tree[1].replaceAll('\u005C', '\u005C\u005C')}\``)
                     return stat
                 }
                 case 'assign': {
                     this.prepare(tree[2], stat)
-                    if(tree[1] === true) {
-                        stat.value += `=`
+                    if (tree[1] === true) {
+                        stat.value.add(`=`)
                     } else {
-                        if(tree[1]) stat.value += tree[1]
-                        stat.value += `=`
+                        if (tree[1]) stat.value.add(tree[1])
+                        stat.value.add(`=`)
                     }
                     this.prepare(tree[3], stat)
-                    stat.value += `;`
+                    stat.value.add(`;`)
                     return stat
                 }
                 case 'name': {
-                    for(let local of stat.local){
-                        if(local.indexOf(tree[1]) >= 0){
-                            stat.value += tree[1]
-                            if(stat.wasDot){
+                    for (let local of stat.local) {
+                        if (local.indexOf(tree[1]) >= 0) {
+                            stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,tree[1]))
+                            if (stat.wasDot) {
                                 stat.dotObj = null
                             }
                             return stat
                         }
                     }
 
-                    if(this.qmlFile.context[tree[1]]) {  // context !!!
+                    if (this.qmlFile.context[tree[1]]) {  // context !!!
                         stat.isCompute = true
-                        stat.value += `__context['${tree[1]}']`
+                        // stat.value.add()
+                        stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,[`__context.`, tree[1]]))
                         stat.dotObj = this.qmlFile.context[tree[1]]
-                        
+
                         return stat
                     }
 
-                    if(Singletons[tree[1]]) {
+                    if (Singletons[tree[1]]) {
                         // this.qmlFile.dependencies.add(Singletons[tree[1]])
-                        if(Singletons[tree[1]].moduleName){
-                            stat.value += `JQModules.${Singletons[tree[1]].moduleName}.${tree[1]}`
+                        if (Singletons[tree[1]].moduleName) {
+                            stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,[`JQModules.${Singletons[tree[1]].moduleName}.`, tree[1]]))
                         } else {
-                            stat.value += tree[1]
+                            stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,tree[1]))
                         }
-                        
-                        if(stat.wasDot){
+
+                        if (stat.wasDot) {
                             stat.dotObj = Singletons[tree[1]]
                         }
                         return stat
                     }
 
-                    if(tree[1] === 'parent') {
-                        if(stat.wasDot){
-                            if(!this.parent || this.parent.extends === 'Component'){
+                    if (tree[1] === 'parent') {
+                        if (stat.wasDot) {
+                            if (!this.parent || this.parent.extends === 'Component') {
                                 stat.dotObj = null
                             } else {
                                 stat.dotObj = this.parent
                             }
-                            
+
                         }
                         stat.isCompute = true
-                        stat.value += stat.thisKey + '.' +tree[1]
+                        stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,[stat.thisKey, '.',tree[1]]))
                         return stat
-                    } else if(tree[1] === 'Qt'){
+                    } else if (tree[1] === 'Qt') {
                         stat.isCompute = true
-                        stat.value += 'JQModules.Qt'
+                        stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,'JQModules.Qt'))
                         return stat
-                    } else if(tree[1] === 'QtPositioning'){
+                    } else if (tree[1] === 'QtPositioning') {
                         stat.isCompute = true
-                        stat.value += 'JQModules.QtPositioning'
+                        stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,'JQModules.QtPositioning'))
                         return stat
                     }
 
-                    try {               
+                    try {
                         let obj = eval(tree[1])
-                        stat.value += tree[1]
+                        stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,tree[1]))
                         stat.dotObj = (typeof obj === 'object' || typeof obj === 'function') ? obj : null
                         return stat
-                    } catch {}
+                    } catch { }
 
                     let path = this.resolve(tree[1], stat.thisKey)
 
-                    if(path){
+                    if (path) {
                         stat.isCompute = true
                         stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
-                        stat.value += path.source
-                    } else if(tree[1] === 'context') {
-                        stat.value += tree[1]
+                        stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,path.source))
+                    } else if (tree[1] === 'context') {
+                        stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,tree[1]))
                     } else {
-                        console.log(`${this.qmlFile.fileName}:${tree.info.line+1}:${tree.info.col+1}: warning: ${tree[1]} is not founded`)
-                        stat.value += stat.thisKey + '.' +tree[1]
+                        console.log(`${this.qmlFile.fileName}:${tree.info.line + 1}:${tree.info.col + 1}: warning: ${tree[1]} is not founded`)
+                        stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,[stat.thisKey, '.',tree[1]]))
                     }
-                    
+
                     return stat
                 }
                 case 'dot': {
                     stat.isCompute = true
                     stat.wasDot = true
                     this.prepare(tree[1], stat)
-                    stat.value += '.' + tree[2] 
+                    stat.value.add('.')
+                    stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,tree[2]))
 
-                    if(stat.dotObj){
+                    if (stat.dotObj) {
                         let path = ''
-                        if(stat.dotObj instanceof JSFile){
-                            if(stat.dotObj.meta.exports.indexOf(tree[2] >= 0)){
+                        if (stat.dotObj instanceof JSFile) {
+                            if (stat.dotObj.meta.exports.indexOf(tree[2] >= 0)) {
                                 path = {}
                             } else {
                                 path = null
                             }
                             stat.dotObj = null
-                        } else if(stat.dotObj instanceof QmlFile){
+                        } else if (stat.dotObj instanceof QmlFile) {
                             path = stat.dotObj.instruction.resolve(tree[2])
-                            if(path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
-                        } else if(stat.dotObj instanceof Instruction){
+                            if (path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
+                        } else if (stat.dotObj instanceof Instruction) {
                             path = stat.dotObj.resolve(tree[2])
-                            if(path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
-                        } else if(typeof stat.dotObj === "function" && stat.dotObj.meta){
+                            if (path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
+                        } else if (typeof stat.dotObj === "function" && stat.dotObj.meta) {
                             let obj = new stat.dotObj()
-                            if(tree[2] in obj || tree[2] in stat.dotObj){
+                            if (tree[2] in obj || tree[2] in stat.dotObj) {
                                 stat.dotObj = null
                                 path = obj
-                            } else if(tree[2] in stat.dotObj.meta){
+                            } else if (tree[2] in stat.dotObj.meta) {
                                 path = this.resolve(stat.dotObj.meta[tree[2]], stat.thisKey)
-                                if(path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
+                                if (path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
                             }
-                        } else if(tree[2] in stat.dotObj){
+                        } else if (tree[2] in stat.dotObj) {
                             path = stat.dotObj[tree[2]]
                             stat.dotObj = typeof stat.dotObj[tree[2]] === 'object' ? stat.dotObj[tree[2]] : null
                         } else {
                             path = null
                             stat.dotObj = null
                         }
-                        if(path === undefined || path === null){
-                            console.log(`${this.qmlFile.fileName}:${tree.info.line+1}:${tree.info.col+1}: warning: ${tree[2]} is not founded`)
+                        if (path === undefined || path === null) {
+                            console.log(`${this.qmlFile.fileName}:${tree.info.line + 1}:${tree.info.col + 1}: warning: ${tree[2]} is not founded`)
                         }
                     }
                     stat.wasDot = false
@@ -540,238 +543,236 @@ class Instruction {
                 }
                 case 'call': {
                     this.prepare(tree[1], stat)
-                    stat.value += '('
-                    for(let i = 0; i < tree[2].length; i++){
+                    stat.value.add('(')
+                    for (let i = 0; i < tree[2].length; i++) {
                         this.prepare(tree[2][i], stat)
-                        if(i < tree[2].length-1) stat.value += ','
+                        if (i < tree[2].length - 1) stat.value.add(',')
                     }
 
-                    if(tree[1][0] === 'dot' && tree[1][1][1] === 'Qt' && tree[1][2] === 'createComponent'){
-                        stat.value += ',__currentModule'
+                    if (tree[1][0] === 'dot' && tree[1][1][1] === 'Qt' && tree[1][2] === 'createComponent') {
+                        stat.value.add(',__currentModule')
                     }
 
-                    stat.value += ')\n'
+                    stat.value.add(')\n')
 
                     stat.dotObj = null
-                    
+
                     return stat
                 }
                 case 'conditional': {
                     stat.isCompute = true
-                    stat.value += '('
+                    stat.value.add('(')
                     this.prepare(tree[1], stat)
-                    stat.value += ' ? '
+                    stat.value.add(' ? ')
                     this.prepare(tree[2], stat)
-                    stat.value += ' : '
+                    stat.value.add(' : ')
                     this.prepare(tree[3], stat)
-                    stat.value += ')'
+                    stat.value.add(')')
                     return stat
                 }
                 case 'binary': {
                     stat.isCompute = true
-                    stat.value += `(`
+                    stat.value.add(`(`)
                     this.prepare(tree[2], stat)
-                    stat.value += ` ${tree[1]} `
+                    stat.value.add(` ${tree[1]} `)
                     this.prepare(tree[3], stat)
-                    stat.value += `)`
-                    stat.value += `\n`
+                    stat.value.add(`)`)
+                    stat.value.add(`\n`)
                     return stat
                 }
                 case 'let': {
                     let name = tree[1][0][0]
                     let local = []
-                    if(stat.local.length){
-                        local = stat.local[stat.local.length-1]
+                    if (stat.local.length) {
+                        local = stat.local[stat.local.length - 1]
                         local.push(name)
                     } else {
                         local.push(name)
                         stat.local.push(local)
                     }
 
-                    stat.value += `let ${name}`
-                    if(tree[1][0][1]){
-                        stat.value += `=`
+                    stat.value.add(`let ${name}`)
+                    if (tree[1][0][1]) {
+                        stat.value.add(`=`)
                         this.prepare(tree[1][0][1], stat)
                     }
-                    stat.value += `;`
+                    if(endSymbol) stat.value.add(`;`)
 
                     return stat
                 }
                 case 'var': {
                     let name = tree[1][0][0]
                     let local = []
-                    if(stat.local.length){
-                        local = stat.local[stat.local.length-1]
+                    if (stat.local.length) {
+                        local = stat.local[stat.local.length - 1]
                         local.push(name)
                     } else {
                         local.push(name)
                         stat.local.push(local)
                     }
 
-                    stat.value += `var ${name}`
-                    if(tree[1][0][1]){
-                        stat.value += `=`
+                    stat.value.add(`var ${name}`)
+                    if (tree[1][0][1]) {
+                        stat.value.add(`=`)
                         this.prepare(tree[1][0][1], stat)
                     }
-                    stat.value += `;`
-                    
+                    if(endSymbol) stat.value.add(`;`)
+
                     return stat
                 }
                 case 'const': {
                     let name = tree[1][0][0]
                     let local = []
-                    if(stat.local.length){
-                        local = stat.local[stat.local.length-1]
+                    if (stat.local.length) {
+                        local = stat.local[stat.local.length - 1]
                         local.push(name)
                     } else {
                         local.push(name)
                         stat.local.push(local)
                     }
 
-                    stat.value += `const ${name}`
-                    if(tree[1][0][1]){
-                        stat.value += `=`
+                    stat.value.add(`const ${name}`)
+                    if (tree[1][0][1]) {
+                        stat.value.add(`=`)
                         this.prepare(tree[1][0][1], stat)
                     }
-                    stat.value += `;`
+                    if(endSymbol) stat.value.add(`;`)
 
                     return stat
                 }
                 case 'unary-prefix': {
-                    if(tree[1] === 'typeof' || tree[1] === 'delete'){
-                        stat.value += tree[1] + ' '
-                    } else{
-                        stat.value += tree[1]
+                    if (tree[1] === 'typeof' || tree[1] === 'delete') {
+                        stat.value.add(tree[1] + ' ')
+                    } else {
+                        stat.value.add(tree[1])
                     }
-                    
-                    this.prepare(tree[2], stat)  
-        
-                    stat.value += '\n'
+
+                    this.prepare(tree[2], stat)
+
+                    stat.value.add('\n')
                     return stat
                 }
                 case 'unary-postfix': {
                     this.prepare(tree[2], stat)
-                    stat.value += tree[1]
-                    stat.value += '\n'
+                    stat.value.add(tree[1])
+                    stat.value.add('\n')
                     return stat
                 }
                 case 'if': {
-                    stat.value += 'if('
+                    stat.value.add('if(')
                     this.prepare(tree[1], stat)
-                    stat.value += '){'
+                    stat.value.add('){')
                     this.prepare(tree[2], stat)
-                    stat.value += '}'
-                    if(tree[3]){
-                        stat.value += 'else{'
+                    stat.value.add('}')
+                    if (tree[3]) {
+                        stat.value.add('else{')
                         this.prepare(tree[3], stat)
-                        stat.value += '}'
+                        stat.value.add('}')
                     }
-                    
+
                     return stat
                 }
                 case 'while': {
                     stat.isCompute = true
-                    stat.value += `while(`
+                    stat.value.add(`while(`)
                     this.prepare(tree[1], stat)
-                    stat.value += `){`
+                    stat.value.add(`){`)
                     this.prepare(tree[2], stat)
-                    stat.value += `};`
+                    stat.value.add(`};`)
                     return stat
                 }
                 case 'for': {
                     stat.isCompute = true
-                    stat.value += `for(`
+                    stat.value.add(`for(`)
                     this.prepare(tree[1], stat)
                     this.prepare(tree[2], stat)
-                    stat.value += `;`
+                    stat.value.add(`;`)
                     this.prepare(tree[3], stat)
-                    if(stat.value[stat.value.length-1] === ';') stat.value.pop()
-                    stat.value += `){`
+                    if (stat.value[stat.value.length - 1] === ';') stat.value.pop()
+                    stat.value.add(`){`)
                     this.prepare(tree[4], stat)
-                    stat.value += `};`
+                    stat.value.add(`};`)
                     return stat
                 }
                 case 'for-of': {
                     stat.isCompute = true
-                    stat.value += `for(`
-                    this.prepare(tree[1], stat)
-                    stat.value = stat.value.slice(0, stat.value.length - 1)
-                    stat.value += ` of `
+                    stat.value.add(`for(`)
+                    this.prepare(tree[1], stat, false)
+                    stat.value.add(` of `)
                     this.prepare(tree[3], stat)
-                    stat.value += `){`
+                    stat.value.add(`){`)
                     this.prepare(tree[4], stat)
-                    stat.value += `};`
+                    stat.value.add(`};`)
                     return stat
                 }
                 case 'for-in': {
                     stat.isCompute = true
-                    stat.value += `for(`
-                    this.prepare(tree[1], stat)
-                    stat.value = stat.value.slice(0, stat.value.length - 1)
-                    stat.value += ` in `
+                    stat.value.add(`for(`)
+                    this.prepare(tree[1], stat, false)
+                    stat.value.add(` in `)
                     this.prepare(tree[3], stat)
-                    stat.value += `){`
+                    stat.value.add(`){`)
                     this.prepare(tree[4], stat)
-                    stat.value += `};`
+                    stat.value.add(`};`)
                     return stat
                 }
                 case 'function': {
                     let local = []
 
-                    stat.value += `function`
-                    if(tree[1]){
-                        if(stat.local.length){
-                            stat.local[stat.local.length-1].push(tree[1])
+                    stat.value.add(`function`)
+                    if (tree[1]) {
+                        if (stat.local.length) {
+                            stat.local[stat.local.length - 1].push(tree[1])
                         } else {
                             stat.local.push([tree[1]])
                         }
-                        stat.value += ` ${tree[1]}`
+                        stat.value.add(` ${tree[1]}`)
                     }
 
                     stat.local.push(local)
 
-                    stat.value += `(`
-                    for(let i = 0; i < tree[2].length; i++){
-                        stat.value += tree[2][i]
+                    stat.value.add(`(`)
+                    for (let i = 0; i < tree[2].length; i++) {
+                        stat.value.add(tree[2][i])
                         local.push(tree[2][i])
-                        if(i < tree[2].length-1) stat.value += ','
+                        if (i < tree[2].length - 1) stat.value.add(',')
                     }
-                    stat.value += `){`
+                    stat.value.add(`){`)
                     this.prepare(tree[3], stat)
-                    stat.value += `}`
+                    stat.value.add(`}`)
 
                     let index = stat.local.indexOf(local)
-                    if(index >= 0) stat.local.splice(index, 1)
+                    if (index >= 0) stat.local.splice(index, 1)
 
                     return stat
                 }
                 case 'defun': {
                     let local = []
-                    stat.value += tree[1] + '=function('
-                    for(let i = 0; i < tree[2].length; i++){
-                        stat.value += tree[2][i]
+                    stat.value.add([tree[1], '=function('])
+                    for (let i = 0; i < tree[2].length; i++) {
+                        stat.value.add(tree[2][i])
                         local.push(tree[2][i])
-                        if(i < tree[2].length - 1) stat.value += ','
+                        if (i < tree[2].length - 1) stat.value.add(',')
                     }
-                    
-                    stat.value += ')'
-                    stat.value += '{try{JQApplication.beginUpdate();'
+
+                    stat.value.add(')')
+                    stat.value.add('{try{JQApplication.beginUpdate();')
                     stat.local.push(local)
                     this.prepare(tree[3], stat)
                     let index = stat.local.indexOf(local)
-                    if(index >= 0) stat.local.splice(index, 1)
-                    stat.value += '}finally{JQApplication.endUpdate()}}'
+                    if (index >= 0) stat.local.splice(index, 1)
+                    stat.value.add('}finally{JQApplication.endUpdate()}}')
                     return stat
                 }
                 case 'object': {
 
-                    stat.value += `{`
-                    for(let d of tree[1]){
-                        stat.value += `${d[0]}:`
+                    stat.value.add(`{`)
+                    for (let d of tree[1]) {
+                        stat.value.add(`${d[0]}:`)
                         this.prepare(d[1], stat)
-                        stat.value += `,`
+                        stat.value.add(`,`)
                     }
-                    stat.value += `}`
+                    stat.value.add(`}`)
                     return stat
                 }
                 case 'block': {
@@ -783,90 +784,90 @@ class Instruction {
                     return stat
                 }
                 case 'new': {
-                    stat.value += ` new `
+                    stat.value.add(` new `)
                     this.prepare(tree[1], stat)
-                    stat.value += `(`
-                    for(let i = 0; i < tree[2].length; i++){
+                    stat.value.add(`(`)
+                    for (let i = 0; i < tree[2].length; i++) {
                         this.prepare(tree[2][i], stat)
-                        if(i < tree[2].length-1) stat.value += ','
+                        if (i < tree[2].length - 1) stat.value.add(',')
                     }
-                    stat.value += `)`
+                    stat.value.add(`)`)
                     return stat
                 }
                 case 'sub': {
                     this.prepare(tree[1], stat)
-                    stat.value += `[`
+                    stat.value.add(`[`)
                     this.prepare(tree[2], stat)
-                    stat.value += `]\n`
+                    stat.value.add(`]\n`)
                     return stat
                 }
                 case 'array': {
-                    stat.value += `[`
-                    for(let i = 0; i < tree[1].length; i++){
+                    stat.value.add(`[`)
+                    for (let i = 0; i < tree[1].length; i++) {
                         this.prepare(tree[1][i], stat)
-                        if(i < tree[1].length-1) stat.value += ','
+                        if (i < tree[1].length - 1) stat.value.add(',')
                     }
-                    stat.value += `]`
+                    stat.value.add(`]`)
                     return stat
                 }
                 case 'regexp': {
-                    stat.value += `/${tree[1]}/${tree[2]}`
+                    stat.value.add(`/${tree[1]}/${tree[2]}`)
                     return
                 }
                 case 'switch': {
-                    stat.value += `switch(`
+                    stat.value.add(`switch(`)
                     this.prepare(tree[1], stat)
-                    stat.value += `){`
-                    for(let i = 0; i < tree[2].length; i++){
-                        if(tree[2][i][0] === null){
-                            stat.value += `default: `
+                    stat.value.add(`){`)
+                    for (let i = 0; i < tree[2].length; i++) {
+                        if (tree[2][i][0] === null) {
+                            stat.value.add(`default: `)
                             this.prepare(tree[2][i][1], stat)
                         } else {
-                            stat.value += `case `
+                            stat.value.add(`case `)
                             this.prepare(tree[2][i][0], stat)
-                            stat.value += `:`
+                            stat.value.add(`:`)
                             this.prepare(tree[2][i][1], stat)
-                            
+
                         }
-                        
+
                     }
-                    stat.value += `}`
+                    stat.value.add(`}`)
                     return stat
                 }
                 case 'seq': {
-                    stat.value += `(`
-                    for(let i = 1; i < tree.length; i++){
+                    stat.value.add(`(`)
+                    for (let i = 1; i < tree.length; i++) {
                         this.prepare(tree[i], stat)
-                        if(i < tree.length-1) stat.value += ','
+                        if (i < tree.length - 1) stat.value.add(',')
                     }
-                    stat.value += `)`
+                    stat.value.add(`)`)
                     return stat
                 }
                 case 'try': {
-                    stat.value += `try{`
+                    stat.value.add(`try{`)
                     this.prepare(tree[1], stat)
-                    if(tree[2][0]){
+                    if (tree[2][0]) {
                         let local = []
                         stat.ignore += tree[2][0]
-                        stat.value += `}catch(${tree[2][0]}){`
-                        if(tree[2][0]) {
+                        stat.value.add(`}catch(${tree[2][0]}){`)
+                        if (tree[2][0]) {
                             local.push(tree[2][0])
                             stat.local.push(local)
                         }
                         this.prepare(tree[2][1], stat)
                         let index = stat.local.indexOf(local)
-                        if(index >= 0) stat.local.splice(index, 1)
+                        if (index >= 0) stat.local.splice(index, 1)
                     } else {
-                        stat.value += `}catch{`
+                        stat.value.add(`}catch{`)
                         this.prepare(tree[2][1], stat)
                     }
-                    stat.value += `}`
-                    if(tree[3] && tree[3].length){
-                        stat.value += `finally{`
+                    stat.value.add(`}`)
+                    if (tree[3] && tree[3].length) {
+                        stat.value.add(`finally{`)
                         this.prepare(tree[3], stat)
-                        stat.value += `}`
+                        stat.value.add(`}`)
                     }
-        
+
                     break
                 }
                 case 'break': {
@@ -879,39 +880,39 @@ class Instruction {
                     stat.isCompute = true
                     let obj = null
 
-                    if(this.qmlFile.context[tree.info[0].value]) {
-                        stat.value += `__context['${tree.info[0].value}']`
+                    if (this.qmlFile.context[tree.info[0].value]) {
+                        stat.value.add(`__context.${tree.info[0].value}`)
                         obj = this.qmlFile.context[tree.info[0].value]
-                    } else if(tree.info[0].value === 'parent') {
-                        stat.value += stat.thisKey + '.' +tree.info[0].value
+                    } else if (tree.info[0].value === 'parent') {
+                        stat.value.add(stat.thisKey + '.' + tree.info[0].value)
                     }
 
-                    if(obj){
-                        for(let i = 1; i < tree.info.length; i++){
-                            if(obj){
+                    if (obj) {
+                        for (let i = 1; i < tree.info.length; i++) {
+                            if (obj) {
                                 let path = obj.resolve(tree.info[i].value, '')
 
-                                if(path){
-                                    stat.value += path.source
+                                if (path) {
+                                    stat.value.add(path.source)
 
                                     obj = path.obj
                                 } else {
-                                    console.log(`${this.qmlFile.fileName}:${tree.info[i].line+1}:${tree.info[i].col+1}: warning: ${tree.info[i].value} is not founded in ${tree.info[i-1].value}`)
+                                    console.log(`${this.qmlFile.fileName}:${tree.info[i].line + 1}:${tree.info[i].col + 1}: warning: ${tree.info[i].value} is not founded in ${tree.info[i - 1].value}`)
                                 }
                             } else {
-                                stat.value += '.' + tree.info[i].value
+                                stat.value.add('.' + tree.info[i].value)
                             }
                         }
                     } else {
-                        console.log(`${this.qmlFile.fileName}:${tree.info[0].line+1}:${tree.info[0].col+1}: warning: ${tree.info[0].value} is not founded`)
+                        console.log(`${this.qmlFile.fileName}:${tree.info[0].line + 1}:${tree.info[0].col + 1}: warning: ${tree.info[0].value} is not founded`)
                     }
 
                     return stat
                 }
                 default: {
-                    for(let t of tree){
+                    for (let t of tree) {
                         this.prepare(t, stat)
-                        stat.value += '\n'
+                        stat.value.add('\n')
                     }
                     return stat
                 }
@@ -919,59 +920,59 @@ class Instruction {
         }
     }
 
-    getTypeInfo(type){
-        if(!type) type = this.extends
+    getTypeInfo(type) {
+        if (!type) type = this.extends
 
         let found = false
         let _type = type
         let _path = ''
 
-        if(SingleFiles[type]){
+        if (SingleFiles[type]) {
             found = true
             _path = type
             _type = SingleFiles[type]
-        } else if(this.qmlFile.moduleName && JQModules[this.qmlFile.moduleName][type]) {
+        } else if (this.qmlFile.moduleName && JQModules[this.qmlFile.moduleName][type]) {
             found = true
             _path = `JQModules.${this.qmlFile.moduleName}.${type}`
             _type = JQModules[this.qmlFile.moduleName][type]
-        } else if(JQModules.QtQml[type]) {
+        } else if (JQModules.QtQml[type]) {
             found = true
             _path = `JQModules.QtQml.${type}`
             _type = JQModules.QtQml[type]
-        } else if(JQModules.QtQml.Models[type]) {
+        } else if (JQModules.QtQml.Models[type]) {
             found = true
             _path = `JQModules.QtQml.Models.${type}`
             _type = JQModules.QtQml.Models[type]
         } else {
-            for(let i = this.qmlFile.imports.length - 1; i >= 0; i--){
+            for (let i = this.qmlFile.imports.length - 1; i >= 0; i--) {
                 let path = this.qmlFile.imports[i].path
                 let as = this.qmlFile.imports[i].as
                 let version = this.qmlFile.imports[i].version
-                if(as && type.indexOf(as) >= 0){
+                if (as && type.indexOf(as) >= 0) {
                     _path = 'JQModules.' + type.replace(as, path)
                 } else {
                     _path = 'JQModules.' + path + '.' + type
                 }
 
-                if(!found && version){
+                if (!found && version) {
                     try {
-                        _type = eval(_path+'_v'+version)
-                        if(_type){
-                            _path += '_v'+version
+                        _type = eval(_path + '_v' + version)
+                        if (_type) {
+                            _path += '_v' + version
                             found = true
                             break
                         }
-                    } catch {}
+                    } catch { }
                 }
-                if(!found){
+                if (!found) {
                     let qmlFile = null
                     try {
                         qmlFile = eval(_path)
-                    } catch {}
+                    } catch { }
 
-                    if(qmlFile){
-                        if(version !== undefined && qmlFile instanceof QmlFile){
-                            throw `${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: ${type} version ${version} does not exists in ${path}`
+                    if (qmlFile) {
+                        if (version !== undefined && qmlFile instanceof QmlFile) {
+                            throw `${this.qmlFile.fileName}:${this.info.line + 1}:${this.info.col + 1}: error: ${type} version ${version} does not exists in ${path}`
                         } else {
                             _type = qmlFile
                             found = true
@@ -982,9 +983,9 @@ class Instruction {
             }
         }
 
-        if(found){
+        if (found) {
             let _typeBase = _type
-            while(_typeBase instanceof QmlFile){
+            while (_typeBase instanceof QmlFile) {
                 _typeBase = _typeBase.instruction.getTypeInfo(_typeBase.instruction.extends).type
             }
             return {
@@ -993,49 +994,49 @@ class Instruction {
                 typeBase: _typeBase,
             }
         } else {
-            throw `${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: ${type} is not founded`
+            throw `${this.qmlFile.fileName}:${this.info.line + 1}:${this.info.col + 1}: error: ${type} is not founded`
         }
     }
 
-    getSignalArgs(name){
-        for(let defineSignal of this.defineSignals){
-            if(defineSignal.name === name){
+    getSignalArgs(name) {
+        for (let defineSignal of this.defineSignals) {
+            if (defineSignal.name === name) {
                 return defineSignal.args
             }
         }
 
         try {
             let typeInfo = this.getTypeInfo(this.extends)
-            if(typeInfo.type instanceof QmlFile){
+            if (typeInfo.type instanceof QmlFile) {
                 return typeInfo.type.instruction.getSignalArgs(name)
             } else {
                 return typeInfo.type.meta[name].args ? typeInfo.type.meta[name].args : []
             }
         } catch {
-            
+
         }
-        
+
     }
 
-    getMeta(){
+    getMeta() {
         let meta = []
         meta.push(`{`)
-        if(this.defineProperties.length || this.defineSignals.length){
-            for(let defineProperty of this.defineProperties){
+        if (this.defineProperties.length || this.defineSignals.length) {
+            for (let defineProperty of this.defineProperties) {
                 let _typeInfo
                 try {
                     _typeInfo = this.getTypeInfo(defineProperty.type)
 
-                    if(_typeInfo.type instanceof QmlFile){
+                    if (_typeInfo.type instanceof QmlFile) {
                         this.qmlFile.dependencies.add(_typeInfo.type)
                     }
                 } catch (error) {
-                    throw `${this.qmlFile.fileName}:${defineProperty.info.line+1}:${defineProperty.info.col+1}: error: ${defineProperty.info.value} is not founded`
+                    throw `${this.qmlFile.fileName}:${defineProperty.info.line + 1}:${defineProperty.info.col + 1}: error: ${defineProperty.info.value} is not founded`
                 }
-                
 
-                if(typeof defineProperty.value === 'object'){
-                    if(_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)){
+
+                if (typeof defineProperty.value === 'object') {
+                    if (_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)) {
                         meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, signalName:'${defineProperty.signalName}'},`)
                     } else {
                         meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, signalName:'${defineProperty.signalName}'},`)
@@ -1043,21 +1044,21 @@ class Instruction {
                     continue
                 }
 
-                if(typeof defineProperty.value === 'string'){
+                if (typeof defineProperty.value === 'string') {
                     meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:'${defineProperty.value}', signalName:'${defineProperty.signalName}'},`)
                 } else {
-                    if(_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)){
+                    if (_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)) {
                         meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, value:${defineProperty.value}, signalName:'${defineProperty.signalName}'},`)
                     } else {
                         meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}, signalName:'${defineProperty.signalName}'},`)
                     }
-                    
+
                 }
-                
+
             }
-            for(let defineSignal of this.defineSignals){
+            for (let defineSignal of this.defineSignals) {
                 meta.push(`${defineSignal.name}:{type:JQModules.QtQml.Signal, slotName:'${defineSignal.slotName}', args:[${defineSignal.args.join(',')}]},`)
-            }   
+            }
         }
 
         meta.push('}')
@@ -1065,251 +1066,254 @@ class Instruction {
         return meta.join('')
     }
 
-    getProperties(level = 0){
-        let code = []
-        let lazyCode = []
+    getProperties(level = 0) {
+        let code = new SourceNode()
+        let lazyCode = new SourceNode()
 
-        for(let assignProperty of this.assignProperties){
+        for (let assignProperty of this.assignProperties) {
             let path = this.resolve(assignProperty.name.split('.')[0], this.name)
 
-            if(!path){
-                console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line+1}:${assignProperty.value.info.col-assignProperty.name.length-1}: warning: ${assignProperty.name} is not founded`)
+            if (!path) {
+                console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: warning: ${assignProperty.name} is not founded`)
             }
 
-            if(assignProperty.value instanceof Instruction) {
-                if(path.type === QtQml.Component && assignProperty.value.extends !== 'Component'){
-                    lazyCode.push(`let ${assignProperty.value.name}=JQModules.QtQml.Component.create(null,`)
+            if (assignProperty.value instanceof Instruction) {
+                if (path.type === QtQml.Component && assignProperty.value.extends !== 'Component') {
+                    lazyCode.add(`let ${assignProperty.value.name}=JQModules.QtQml.Component.create(null,`)
 
                     let childTypeInfo = assignProperty.value.getTypeInfo()
                     let childMeta = assignProperty.value.getMeta()
 
-                    if(childTypeInfo.type instanceof QmlFile){
+                    if (childTypeInfo.type instanceof QmlFile) {
                         this.qmlFile.dependencies.add(childTypeInfo.type)
                     }
 
-                    lazyCode.push(`(class ${assignProperty.value.className} extends ${childTypeInfo.path} {`)
-                    lazyCode.push(`static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})`)
-                    lazyCode.push('static create(parent,model,meta={},properties=[],isRoot=true){')
+                    lazyCode.add(`(class ${assignProperty.value.className} extends ${childTypeInfo.path} {`)
+                    lazyCode.add(`static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})`)
+                    lazyCode.add('static create(parent,model,meta={},properties=[],isRoot=true){')
 
-                    lazyCode.push(`let __rootContext${level+1}=JQContext.create(__rootContext${level})`)
-                    lazyCode.push(`let __context=__rootContext${level+1}`)
+                    lazyCode.add(`let __rootContext${level + 1}=JQContext.create(__rootContext${level})`)
+                    lazyCode.add(`let __context=__rootContext${level + 1}`)
 
-                    lazyCode.push(`let ${assignProperty.value.name} = super.create(parent,model,meta,properties,false)`)
+                    lazyCode.add(`let ${assignProperty.value.name} = super.create(parent,model,meta,properties,false)`)
 
-                    if(assignProperty.value.id) lazyCode.push(`__context['${assignProperty.value.id}']=${assignProperty.value.name}`)
+                    if (assignProperty.value.id) lazyCode.add(`__context.${assignProperty.value.id}=${assignProperty.value.name}`)
 
-                    lazyCode.push(assignProperty.value.getMethods())
+                    lazyCode.add(assignProperty.value.getMethods())
 
-                    let properties = assignProperty.value.getProperties(level+1)
-                    lazyCode.push(properties.code)
+                    let properties = assignProperty.value.getProperties(level + 1)
+                    lazyCode.add(properties.code)
 
                     // // children 
 
-                    for(let i = 0; i < assignProperty.value.children.length; i++){
-                        lazyCode.push(`let ${assignProperty.value.children[i].name}=` + assignProperty.value.children[i].toCode(level+1))
+                    for (let i = 0; i < assignProperty.value.children.length; i++) {
+                        lazyCode.add(`let ${assignProperty.value.children[i].name}=`)
+                        lazyCode.add(assignProperty.value.children[i].toCode(level + 1))
                     }
 
                     // // children
 
-                    lazyCode.push(properties.lazylazyCode)
+                    lazyCode.add(properties.lazyCode)
 
-                    lazyCode.push(assignProperty.value.getConnectedSignals())
+                    lazyCode.add(assignProperty.value.getConnectedSignals())
 
-                    lazyCode.push(`if(isRoot) {while(properties.length){properties.shift().__update()};${assignProperty.value.name}.__complete()}`)
+                    lazyCode.add(`if(isRoot) {while(properties.length){properties.shift().__update()};${assignProperty.value.name}.__complete()}`)
 
-                    lazyCode.push(`return ${assignProperty.value.name}`)
+                    lazyCode.add(`return ${assignProperty.value.name}`)
 
-                    lazyCode.push('}')
+                    lazyCode.add('}')
 
-                    lazyCode.push(`})`)
+                    lazyCode.add(`})`)
 
 
-                    lazyCode.push(`)`)
+                    lazyCode.add(`)`)
 
-                    lazyCode.push(`${this.name}.${assignProperty.name}=${assignProperty.value.name}`)
+                    lazyCode.add(`${this.name}.${assignProperty.name}=${assignProperty.value.name}`)
                 } else {
-                    lazyCode.push(`let ${assignProperty.value.name}=${assignProperty.value.toCode(level)}`)
-                    lazyCode.push(`${this.name}.${assignProperty.name}=${assignProperty.value.name}`)
-                    lazyCode.push(`${this.name}['Component.completed'].connect(${assignProperty.value.name},()=>{${assignProperty.value.name}.__complete()})`)
+                    lazyCode.add(`let ${assignProperty.value.name}=${assignProperty.value.toCode(level)}`)
+                    lazyCode.add(`${this.name}.${assignProperty.name}=${assignProperty.value.name}`)
+                    lazyCode.add(`${this.name}['Component.completed'].connect(${assignProperty.value.name},()=>{${assignProperty.value.name}.__complete()})`)
                 }
-                
+
             } else {
-                let stat = this.prepare(assignProperty.value, {isCompute:false, thisKey: this.name, value:'', local:[]})
-                if(stat.isCompute){
-                    if(assignProperty.type === 'alias'){
-                        code.push(`${this.name}.__getDataQml('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
+                let stat = this.prepare(assignProperty.value, { isCompute: false, thisKey: this.name, value: new SourceNode(), local: [] })
+                if (stat.isCompute) {
+                    if (assignProperty.type === 'alias') {
+                        code.add(`${this.name}.__getDataQml('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
                     } else {
-                        code.push(`${this.name}.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},true)`)
+                        code.add(`${this.name}.${assignProperty.name} = JQModules.Qt.binding(()=>{return ${stat.value}},true)`)
                     }
                 } else {
-                    code.push(`${this.name}.${assignProperty.name}=${stat.value}`)
+                    code.add(`${this.name}.${assignProperty.name}=${stat.value}`)
                 }
             }
-            
-            
+
+
         }
 
-        return {code: code.join('\n'), lazyCode: lazyCode.join('\n')}
+        return { code: code.join('\n'), lazyCode: lazyCode.join('\n') }
     }
 
-    getConnectedSignals(){
-        let code = []
+    getConnectedSignals() {
+        let code = new SourceNode()
         let typeInfo = this.getTypeInfo()
 
-        for(let connectedSignal of this.connectedSignals){
-            if(typeInfo.typeBase.isAssignableFrom(JQModules.QtQuick.MouseArea) && connectedSignal.slotName === 'onPressed'){
+        for (let connectedSignal of this.connectedSignals) {
+            if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQuick.MouseArea) && connectedSignal.slotName === 'onPressed') {
                 connectedSignal.slotName = 'onPressedChanged'
             }
             let names = connectedSignal.slotName.replaceAll("['", '').replaceAll("']", '').split('.')
             let signalName = ''
-            if(names.length === 1){
+            if (names.length === 1) {
                 signalName = names[0][2].toLowerCase() + names[0].slice(3)
             } else {
                 signalName = names[0] + '.' + names[1][2].toLowerCase() + names[1].slice(3)
             }
             let args = this.getSignalArgs(signalName)
             connectedSignal.args = []
-            if(args)
-            for(let arg of args){
-                connectedSignal.args.push(arg.replaceAll('`', ''))
-            }
-            code.push(`${this.name}['${signalName}'].extendSlot(function(${connectedSignal.args.join(',')}){try{JQApplication.beginUpdate();`)
-         
-            let stat = this.prepare(connectedSignal.source, {isCompute:false, thisKey: this.name, value:'', local:[connectedSignal.args]}) 
-            code.push(stat.value)
-            code.push(`}finally{JQApplication.endUpdate()}})`)
+            if (args)
+                for (let arg of args) {
+                    connectedSignal.args.push(arg.replaceAll('`', ''))
+                }
+            code.add(`${this.name}['${signalName}'].extendSlot(function(${connectedSignal.args.join(',')}){try{JQApplication.beginUpdate();`)
+
+            let stat = this.prepare(connectedSignal.source, { isCompute: false, thisKey: this.name, value: new SourceNode(), local: [connectedSignal.args] })
+            code.add(stat.value)
+            code.add(`}finally{JQApplication.endUpdate()}})`)
         }
 
         return code.join('\n')
     }
 
-    getMethods(){
-        let code = []
+    getMethods() {
+        let code = new SourceNode()
         let connectionsInfo = {}
         let typeInfo = this.getTypeInfo()
 
-        for(let defineMethod of this.defineMethods){
-            if(defineMethod.name.slice(0, 2) === 'on'){
+        for (let defineMethod of this.defineMethods) {
+            if (defineMethod.name.slice(0, 2) === 'on') {
                 let signalName = defineMethod.name[2].toLowerCase() + defineMethod.name.slice(3)
                 connectionsInfo[signalName] = defineMethod.name
             }
-            let stat = this.prepare(defineMethod.source, {isCompute:false, thisKey: this.name, value:'', local:[]})
-            code.push(`${this.name}.${stat.value}`)
+            let stat = this.prepare(defineMethod.source, { isCompute: false, thisKey: this.name, value: new SourceNode(), local: [] })
+            code.add(new SourceNode(null, null, null, [this.name,'.',stat.value]))
         }
 
-        if(typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.Connections)){
-            code.push(`${this.name}.__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
+        if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.Connections)) {
+            code.add(`${this.name}.__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
         }
 
         return code.join('\n')
     }
 
-    toComponentCode(level = 0){
-        if(this.children.length < 1) {
-            throw`${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: Cannot create empty component specification`
-        } 
-        if(this.children.length > 1) {
-            throw`${this.qmlFile.fileName}:${this.info.line+1}:${this.info.col+1}: error: Invalid component body specification`
+    toComponentCode(level = 0) {
+        if (this.children.length < 1) {
+            throw `${this.qmlFile.fileName}:${this.info.line + 1}:${this.info.col + 1}: error: Cannot create empty component specification`
+        }
+        if (this.children.length > 1) {
+            throw `${this.qmlFile.fileName}:${this.info.line + 1}:${this.info.col + 1}: error: Invalid component body specification`
         }
 
-        let code = []
+        let code = new SourceNode()
         let typeInfo = this.getTypeInfo()
 
-        if(this.parent){
-            code.push(`${typeInfo.path}.create(${this.parent.name},`)
+        if (this.parent) {
+            code.add(`${typeInfo.path}.create(${this.parent.name},`)
         } else {
-            code.push(`${typeInfo.path}.create(null,`)
+            code.add(`${typeInfo.path}.create(null,`)
         }
 
         let childTypeInfo = this.children[0].getTypeInfo()
         let childMeta = this.children[0].getMeta()
 
-        if(childTypeInfo.type instanceof QmlFile){
+        if (childTypeInfo.type instanceof QmlFile) {
             this.qmlFile.dependencies.add(childTypeInfo.type)
         }
 
-        code.push(`(class ${this.children[0].className} extends ${childTypeInfo.path} {`)
-        code.push(`static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})`)
-        code.push('static create(parent,model,meta={},properties=[],isRoot=true){')
+        code.add(`(class ${this.children[0].className} extends ${childTypeInfo.path} {`)
+        code.add(`static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})`)
+        code.add('static create(parent,model,meta={},properties=[],isRoot=true){')
 
-        code.push(`let __rootContext${level}=JQContext.create(__rootContext${level-1})`)
-        code.push(`let __context=__rootContext${level}`)
+        code.add(`let __rootContext${level}=JQContext.create(__rootContext${level - 1})`)
+        code.add(`let __context=__rootContext${level}`)
 
-        code.push(`let ${this.children[0].name} = super.create(parent,model,meta,properties,false)`)
+        code.add(`let ${this.children[0].name} = super.create(parent,model,meta,properties,false)`)
 
-        if(this.children[0].id) code.push(`__context['${this.children[0].id}']=${this.children[0].name}`)
+        if (this.children[0].id) code.add(`__context.${this.children[0].id}=${this.children[0].name}`)
 
-        code.push(this.children[0].getMethods())
+        code.add(this.children[0].getMethods())
 
         let properties = this.children[0].getProperties(level)
-        code.push(properties.code)
+        code.add(properties.code)
 
         // // children 
 
-        for(let i = 0; i < this.children[0].children.length; i++){
-            code.push(`let ${this.children[0].children[i].name}=` + this.children[0].children[i].toCode(level))
+        for (let i = 0; i < this.children[0].children.length; i++) {
+            code.add(`let ${this.children[0].children[i].name}=`)
+            code.add(this.children[0].children[i].toCode(level))
         }
 
         // // children
 
-        code.push(properties.lazyCode)
+        code.add(properties.lazyCode)
 
-        code.push(this.children[0].getConnectedSignals())
+        code.add(this.children[0].getConnectedSignals())
 
-        code.push(`if(isRoot) {while(properties.length){properties.shift().__update()};${this.children[0].name}.__complete()}`)
+        code.add(`if(isRoot) {while(properties.length){properties.shift().__update()};${this.children[0].name}.__complete()}`)
 
-        code.push(`return ${this.children[0].name}`)
+        code.add(`return ${this.children[0].name}`)
 
-        code.push('}')
+        code.add('}')
 
-        code.push(`})`)
+        code.add(`})`)
 
 
-        code.push(`)`)
+        code.add(`)`)
 
-        if(this.id) code.push(`__context['${this.id}']=${this.name}`)
+        if (this.id) code.add(`__context.${this.id}=${this.name}`)
 
         return code.join('\n')
     }
 
-    toCode(level = 0){
-        let code = []
+    toCode(level = 0) {
+        let code = new SourceNode()
         let typeInfo = this.getTypeInfo()
 
-        if(typeInfo.type instanceof QmlFile){
+        if (typeInfo.type instanceof QmlFile) {
             this.qmlFile.dependencies.add(typeInfo.type)
         }
 
-        if(typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.Component)) return this.toComponentCode(level+1)
+        if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.Component)) return this.toComponentCode(level + 1)
 
         let meta = this.getMeta()
 
-        if(this.parent){
-            code.push(`${typeInfo.path}.create(${this.parent.name},null,${meta},properties,false)`)
+        if (this.parent) {
+            code.add(`${typeInfo.path}.create(${this.parent.name},null,${meta},properties,false)`)
         } else {
-            code.push(`${typeInfo.path}.create(null,null,${meta},properties,false)`)
+            code.add(`${typeInfo.path}.create(null,null,${meta},properties,false)`)
         }
-        
 
-        if(this.id) code.push(`__context['${this.id}']=${this.name}`)
 
-        code.push(this.getMethods())
+        if (this.id) code.add(`__context.${this.id}=${this.name}`)
+
+        code.add(this.getMethods())
 
         let properties = this.getProperties(level)
-        code.push(properties.code)
+        code.add(properties.code)
 
         // children
 
-        for(let i = 0; i < this.children.length; i++){
-            code.push(`let ${this.children[i].name}=` + this.children[i].toCode(level))
+        for (let i = 0; i < this.children.length; i++) {
+            code.add(`let ${this.children[i].name}=`)
+            code.add(this.children[i].toCode(level))
         }
 
         // children
 
-        code.push(properties.lazyCode)
+        code.add(properties.lazyCode)
 
-        code.push(this.getConnectedSignals())
-        
+        code.add(this.getConnectedSignals())
+
         return code.join('\n')
     }
 }
@@ -1326,58 +1330,58 @@ class QmlFile {
     dependencies = new Set()
     elementsCount = 0
 
-    constructor(fileName, moduleName, version = 1){
+    constructor(fileName, moduleName, version = 1) {
         this.fileName = fileName
         this.version = version
         this.moduleName = moduleName
-        let data = fs.readFileSync(fileName, {encoding:'utf8', flag:'r'})
+        let data = fs.readFileSync(fileName, { encoding: 'utf8', flag: 'r' })
 
         parser.parse.nowParsingFile = fileName
 
         let meta = parser.parse(data)
 
-        if(meta[3]) this.qmlpragma(meta[3])
+        if (meta[3]) this.qmlpragma(meta[3])
         this.qmlimport(meta[1])
 
         let className = fileName.split(/[\/\\]+/g).pop().replace('.qml', '')
-        if(this.singleton) Singletons[className] = this
+        if (this.singleton) Singletons[className] = this
 
-        if(meta[2] && meta[2][0] === 'qmlelem'){
+        if (meta[2] && meta[2][0] === 'qmlelem') {
             this.instruction = new Instruction(null, className, meta[2][1], meta[2][3], meta[2][2], this, meta[2].info)
-        } else if(meta[2] && meta[2][0] === 'qmlobj'){
+        } else if (meta[2] && meta[2][0] === 'qmlobj') {
             this.instruction = new Instruction(null, className, meta[2][1].slice(1).join('.'), meta[2][2], null, this, meta[2].info)
         }
     }
 
-    qmlpragma(meta){
-        for(let pragma of meta){
-            if(pragma[0] === 'qmlpragma'){
-                if(pragma[1] === 'Singleton') {
+    qmlpragma(meta) {
+        for (let pragma of meta) {
+            if (pragma[0] === 'qmlpragma') {
+                if (pragma[1] === 'Singleton') {
                     this.singleton = true
-                    
+
                 }
             }
         }
     }
 
-    qmlimport(meta){
-        for(let imp of meta){
-            if(imp[0] === 'qmlimport'){
-                if(imp[1].indexOf('js') >= 0){
+    qmlimport(meta) {
+        for (let imp of meta) {
+            if (imp[0] === 'qmlimport') {
+                if (imp[1].indexOf('js') >= 0) {
                     // jsName = imp[1]
                     // jsAs = imp[3]
                     // let path = file.split('/')
                     // path = path.slice(0, path.length-1).join('/') + '/' + jsName
-    
+
                     // if(fs.existsSync(path)){
                     //     let content = fs.readFileSync(path, encoding='utf-8')
                     //     let meta = parser.jsparse(content)
-                        
+
                     //     instructions.js[jsName] = meta.source.replaceAll(/(?<=[^\\])[`]/g, '\\`') + (jsAs ? `\r\nvar ${jsAs} = {${meta.exports.join(',')}}\r\n` : '')
                     // } else {
                     //     console.log(`WARNING ${path} does not exist`)
                     // }
-                    
+
                 } else {
                     this.imports.push({
                         path: imp[1],
@@ -1389,66 +1393,67 @@ class QmlFile {
         }
     }
 
-    toCode(){
-        let code = []
+    toCode() {
+        let code = new SourceNode()
         let typeInfo = this.instruction.getTypeInfo()
         let meta = this.instruction.getMeta()
 
-        if(typeInfo.type instanceof QmlFile){
+        if (typeInfo.type instanceof QmlFile) {
             this.dependencies.add(typeInfo.type)
         }
 
-        if(this.singleton){
-            if(this.moduleName){
-                code.push(`JQModules.${this.moduleName}.${this.instruction.className} = (class extends ${typeInfo.path} {`)
+        if (this.singleton) {
+            if (this.moduleName) {
+                code.add(`JQModules.${this.moduleName}.${this.instruction.className} = (class extends ${typeInfo.path} {`)
             } else {
-                code.push(`const ${this.instruction.className} = (class extends ${typeInfo.path} {`)
+                code.add(`const ${this.instruction.className} = (class extends ${typeInfo.path} {`)
             }
-            
-            code.push(`static singleton = true`)
+
+            code.add(`static singleton = true`)
         } else {
-            code.push(`class ${this.instruction.className} extends ${typeInfo.path} {`)
+            code.add(`class ${this.instruction.className} extends ${typeInfo.path} {`)
         }
 
-        code.push(`static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})`)
+        code.add(`static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})`)
 
-        code.push('static create(parent,model,meta={},properties=[],isRoot=true){')
+        code.add('static create(parent,model,meta={},properties=[],isRoot=true){')
 
-        code.push(`let __currentModule=${this.moduleName ? "JQModules['"+ this.moduleName +"']" : 'null'}`)
-        code.push(`let __rootContext0=JQContext.create()`)
-        code.push(`let __context=__rootContext0`)
+        code.add(`let __currentModule=${this.moduleName ? "JQModules['" + this.moduleName + "']" : 'null'}`)
+        code.add(`let __rootContext0=JQContext.create()`)
+        code.add(`let __context=__rootContext0`)
 
-        code.push(`let ${this.instruction.name} = super.create(parent,model,meta,properties,false)`)
+        code.add(`let ${this.instruction.name} = super.create(parent,model,meta,properties,false)`)
 
-        if(this.instruction.id) code.push(`__context['${this.instruction.id}']=${this.instruction.name}`)
+        if (this.instruction.id) code.add(`__context.${this.instruction.id}=${this.instruction.name}`)
 
-        code.push(this.instruction.getMethods())
+        code.add(this.instruction.getMethods())
 
         let properties = this.instruction.getProperties(0)
-        code.push(properties.code)
+        code.add(properties.code)
 
         // children
 
-        for(let i = 0; i < this.instruction.children.length; i++){
-            code.push(`let ${this.instruction.children[i].name}=` + this.instruction.children[i].toCode(0))
+        for (let i = 0; i < this.instruction.children.length; i++) {
+            code.add(`let ${this.instruction.children[i].name}=`)
+            code.add(this.instruction.children[i].toCode(0))
         }
 
         // children
 
-        code.push(properties.lazyCode)
+        code.add(properties.lazyCode)
 
-        code.push(this.instruction.getConnectedSignals())
+        code.add(this.instruction.getConnectedSignals())
 
-        code.push(`if(isRoot) {while(properties.length){properties.shift().__update()};${this.instruction.name}.__complete()}`)
+        code.add(`if(isRoot) {while(properties.length){properties.shift().__update()};${this.instruction.name}.__complete()}`)
 
-        code.push(`return ${this.instruction.name}`)
+        code.add(`return ${this.instruction.name}`)
 
-        code.push('}')
+        code.add('}')
 
-        if(this.singleton){
-            code.push(`}).create()`)
+        if (this.singleton) {
+            code.add(`}).create()`)
         } else {
-            code.push(`}`)
+            code.add(`}`)
         }
 
         return code.join('\n')
@@ -1462,52 +1467,52 @@ class JSFile {
     version = 1
     compiled = null
 
-    constructor(fileName, moduleName, version = 1){
+    constructor(fileName, moduleName, version = 1) {
         this.fileName = fileName
         this.version = version
         this.moduleName = moduleName
-        let data = fs.readFileSync(fileName, {encoding:'utf8', flag:'r'})
+        let data = fs.readFileSync(fileName, { encoding: 'utf8', flag: 'r' })
 
         parser.parse.nowParsingFile = fileName
 
         this.meta = parser.jsparse(data)
     }
 
-    toCode(){
+    toCode() {
         return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
     }
 }
 
-let fullCode = []
+let fullCode = new SourceNode()
 let compiledFiles = []
 
-let mainData = fs.readFileSync(path.resolve(__dirname, '../dist/main.js'), {encoding:'utf8', flag:'r'})
-fullCode.push(mainData)
+let mainData = fs.readFileSync(path.resolve(__dirname, '../dist/main.js'), { encoding: 'utf8', flag: 'r' })
+fullCode.add(mainData)
 
-if(config.dirs.length) console.log(`JQ: preparation of third party modules`)
+if (config.dirs.length) console.log(`JQ: preparation of third party modules`)
 
 let counter = {
 
 }
 
-for(let dirPath of config.dirs){
+for (let dirPath of config.dirs) {
     let absolutePath = path.resolve(configDirPath, dirPath)
     let moduleName = ''
-    let lines = fs.readFileSync(absolutePath + '/qmldir', {encoding:'utf8', flag:'r'}).replaceAll('\r', '').replaceAll(/[ ]+/g, ' ').split('\n')
+    let lines = fs.readFileSync(absolutePath + '/qmldir', { encoding: 'utf8', flag: 'r' }).replaceAll('\r', '').replaceAll(/[ ]+/g, ' ').split('\n')
     let count = 0
-    for(let line of lines){
+    for (let line of lines) {
         let params = line.trim().split(' ')
-        if(params.length === 2){
+        if (params.length === 2) {
             let [type, name] = params
-            if(type === 'module'){
+            if (type === 'module') {
                 moduleName = name
 
-                if(JQModules[name]) throw `module ${name} already exists`
+                if (JQModules[name]) throw `module ${name} already exists`
                 console.log(`    > ${name}`)
 
                 JQModules[name] = {}
             }
-        } else if(params.length === 3){
+        } else if (params.length === 3) {
             count += 1
             let [className, version, filePath] = params
 
@@ -1516,39 +1521,39 @@ for(let dirPath of config.dirs){
             let extension = filePath.split('.').pop()
             let file = null
 
-            if(extension === 'qml'){
+            if (extension === 'qml') {
                 file = new QmlFile(absoluteFilePath, moduleName, version)
-            } else if(extension === 'js'){
+            } else if (extension === 'js') {
                 file = new JSFile(absoluteFilePath, moduleName, version)
             }
-            
-            if(JQModules[moduleName][className]) {
-                if(JQModules[moduleName][className].version < file.version) JQModules[moduleName][className] = file
+
+            if (JQModules[moduleName][className]) {
+                if (JQModules[moduleName][className].version < file.version) JQModules[moduleName][className] = file
             } else {
                 JQModules[moduleName][className] = file
             }
-            JQModules[moduleName][className+'_v'+version] = file
-        }  else if(params.length === 4){
+            JQModules[moduleName][className + '_v' + version] = file
+        } else if (params.length === 4) {
             count += 1
             let [singleton, className, version, filePath] = params
 
-            if(filePath.split('.').pop() !== 'qml') continue
+            if (filePath.split('.').pop() !== 'qml') continue
 
             version = parseFloat(version)
             let absoluteFilePath = path.resolve(absolutePath, filePath)
-            
+
             let qmlFile = new QmlFile(absoluteFilePath, moduleName, version)
-            
-            if(!qmlFile.singleton && singleton){
+
+            if (!qmlFile.singleton && singleton) {
                 throw `${absoluteFilePath}:1:1: error: pragma Singleton is not defined`
             }
 
-            if(JQModules[moduleName][className]) {
-                if(JQModules[moduleName][className].version < qmlFile.version) JQModules[moduleName][className] = qmlFile
+            if (JQModules[moduleName][className]) {
+                if (JQModules[moduleName][className].version < qmlFile.version) JQModules[moduleName][className] = qmlFile
             } else {
                 JQModules[moduleName][className] = qmlFile
             }
-            JQModules[moduleName][className+'_v'+version] = qmlFile
+            JQModules[moduleName][className + '_v' + version] = qmlFile
         }
     }
 
@@ -1556,7 +1561,7 @@ for(let dirPath of config.dirs){
 }
 
 console.log(`JQ: preparation of single files`)
-for(let fileName of getFiles(path.resolve(configDirPath, config.base))){
+for (let fileName of getFiles(path.resolve(configDirPath, config.base))) {
     let qmlFile = new QmlFile(fileName)
     SingleFiles[fileName.split(/[\/\\]+/g).pop().replace('.qml', '')] = qmlFile
 }
@@ -1564,7 +1569,7 @@ for(let fileName of getFiles(path.resolve(configDirPath, config.base))){
 console.log(`JQ: compilation of single files`)
 
 
-for(let className in Singletons){
+for (let className in Singletons) {
     console.log(`    > ${className}.qml (Singleton)`)
     compiledFiles.push({
         file: Singletons[className],
@@ -1572,8 +1577,8 @@ for(let className in Singletons){
     })
 }
 
-for(let className in SingleFiles){
-    if(SingleFiles[className].singleton) {
+for (let className in SingleFiles) {
+    if (SingleFiles[className].singleton) {
         continue
     }
     console.log(`    > ${className}.qml`)
@@ -1584,46 +1589,51 @@ for(let className in SingleFiles){
     })
 }
 
-if(config.dirs.length) console.log(`JQ: compilation of third party modules`)
-for(let moduleName in JQModules){
-    if(!BaseModules[moduleName]){
+if (config.dirs.length) console.log(`JQ: compilation of third party modules`)
+for (let moduleName in JQModules) {
+    if (!BaseModules[moduleName]) {
         console.log(`    > ${moduleName} (${counter[moduleName] + ' files'})`)
-        fullCode.push(`JQModules.${moduleName}={},`)
+        fullCode.add(`JQModules.${moduleName}={},`)
     }
 }
 
-for(let moduleName in JQModules){
+for (let moduleName in JQModules) {
     let queue = {}
-    for(let className in JQModules[moduleName]){
+    for (let className in JQModules[moduleName]) {
         let file = JQModules[moduleName][className]
-        if(file instanceof QmlFile || file instanceof JSFile){
-            if(file.singleton) {
+        if (file instanceof QmlFile || file instanceof JSFile) {
+            if (file.singleton) {
                 continue
             }
-            if(JQModules[moduleName][className+'_v'+file.version]) {
+            if (JQModules[moduleName][className + '_v' + file.version]) {
                 queue[className] = file
                 continue
             }
+
+            let code = new SourceNode()
+            code.add(`JQModules.${moduleName}.${className}=`)
+            code.add(file.toCode())
+
             compiledFiles.push({
                 file: file,
-                code: `JQModules.${moduleName}.${className}=${file.toCode()}`,
+                code: code,
                 path: `JQModules.${moduleName}.${className}`,
             })
         }
     }
-    for(let className in queue){
+    for (let className in queue) {
         let file = queue[className]
-        fullCode.push(`Object.defineProperty(JQModules.${moduleName},'${className}',{get:()=>{return JQModules.${moduleName}.${className}_v${file.version}}})`)
+        fullCode.add(`Object.defineProperty(JQModules.${moduleName},'${className}',{get:()=>{return JQModules.${moduleName}.${className}_v${file.version}}})`)
     }
 }
 
-function getFiles (dir, _files){
+function getFiles(dir, _files) {
     _files = _files || []
     let files = fs.readdirSync(dir)
-    for (var i in files){
+    for (var i in files) {
         let name = dir + '/' + files[i]
-        if (!(fs.statSync(name).isDirectory())){
-            if(path.extname(name) === '.qml') _files.push(name.replaceAll(/\\+/g, '/'))
+        if (!(fs.statSync(name).isDirectory())) {
+            if (path.extname(name) === '.qml') _files.push(name.replaceAll(/\\+/g, '/'))
         }
     }
     return _files
@@ -1631,31 +1641,38 @@ function getFiles (dir, _files){
 
 
 
-while(compiledFiles.length){
+while (compiledFiles.length) {
     let compiledFile = compiledFiles.shift()
-    if(compiledFile.file instanceof QmlFile && compiledFile.file.dependencies.size){
+    if (compiledFile.file instanceof QmlFile && compiledFile.file.dependencies.size) {
         let found = false
-        for(let i = 0; i < compiledFiles.length; i++){
-            if(compiledFile.file.dependencies.has(compiledFiles[i].file)){
-                compiledFiles.splice(i+1, 0, compiledFile)
+        for (let i = 0; i < compiledFiles.length; i++) {
+            if (compiledFile.file.dependencies.has(compiledFiles[i].file)) {
+                compiledFiles.splice(i + 1, 0, compiledFile)
                 found = true
                 break
             }
         }
-        if(!found) {
-            fullCode.push(compiledFile.code)
-            if(compiledFile.path) fullCode.push(`${compiledFile.path}.initialize()`)
+        if (!found) {
+            fullCode.add(compiledFile.code)
+            if (compiledFile.path) fullCode.add(`${compiledFile.path}.initialize()`)
         }
     } else {
-        fullCode.push(compiledFile.code)
-        if(compiledFile.file instanceof QmlFile && compiledFile.path) fullCode.push(`${compiledFile.path}.initialize()`)
+        fullCode.add(compiledFile.code)
+        if (compiledFile.file instanceof QmlFile && compiledFile.path) fullCode.add(`${compiledFile.path}.initialize()`)
     }
 }
 
 
-if(config.entry){
-    fullCode.push(`window.addEventListener('load', ()=>{console.time('build');JQApplication.rootPath='${config.rootPath}';${config.entry.replaceAll('.qml', '')}.create(JQApplication.root);console.timeEnd('build')})`)
+if (config.entry) {
+    fullCode.add(`window.addEventListener('load', ()=>{console.time('build');JQApplication.rootPath='${config.rootPath}';${config.entry.replaceAll('.qml', '')}.create(JQApplication.root);console.timeEnd('build')})`)
 }
 
-if(config.output) fs.writeFileSync(path.resolve(configDirPath, config.output), fullCode.join('\n'))
+if (config.output) {
+    fullCode.add(`//# sourceMappingURL=${path.resolve(configDirPath, config.output)+'.map'}`)
+    let result = fullCode.join('\n').toStringWithSourceMap({ file: path.resolve(configDirPath, config.output) })
+
+    fs.writeFileSync(path.resolve(configDirPath, config.output), result.code)
+
+    fs.writeFileSync(path.resolve(configDirPath, config.output)+'.map', result.map.toString())
+}
 
