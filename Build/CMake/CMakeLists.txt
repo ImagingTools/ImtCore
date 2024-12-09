@@ -95,6 +95,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 if(NOT DEFINED USE_SDL OR USE_SDL)
 	include("${CMAKE_CURRENT_LIST_DIR}/../../../ImtCore/Config/CMake/ImtCoreSdlCustomConfig.cmake")
 	ImtCoreAddSdlSearchPath("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}")
+	make_directory("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}/SDL_CACHE")
+	ImtCoreSetSdlMainCacheFile("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}/SDL_CACHE/cache.jcache")
 
 	add_subdirectory("${SDL_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbasesdl")
 
