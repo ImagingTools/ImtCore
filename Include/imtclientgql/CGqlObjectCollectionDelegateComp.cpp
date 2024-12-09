@@ -455,7 +455,11 @@ bool CGqlObjectCollectionDelegateComp::GetItemIds(const imtgql::IGqlResponse& re
 	if (responseData.data.contains("itemIds")){
 		QJsonValue itemsIdsValue = responseData.data["itemIds"];
 		if (itemsIdsValue.isString()){
-			QStringList itemIds = itemsIdsValue.toString().split(";");
+			QStringList itemIds;
+			QString itemsIdsValueStr = itemsIdsValue.toString();
+			if (!itemsIdsValueStr.isEmpty()){
+				itemIds = itemsIdsValueStr.split(";");
+			}
 			Ids retVal;
 			for (QString itemId : itemIds){
 				retVal.append(itemId.toLatin1());
