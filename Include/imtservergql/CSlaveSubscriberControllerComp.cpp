@@ -41,7 +41,6 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 				return true;
 			}
 		}
-
 	}
 
 	return false;

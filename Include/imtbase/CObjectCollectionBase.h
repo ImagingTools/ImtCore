@@ -64,7 +64,11 @@ public:
 	virtual bool RemoveElement(const Id& elementId, const IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const override;
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const override;
-	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool SetObjectData(
+				const Id& objectId,
+				const istd::IChangeable& object,
+				CompatibilityMode mode = CM_WITHOUT_REFS,
+				const IOperationContext* operationContextPtr = nullptr) override;
 	virtual IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				const QByteArray& objectId = QByteArray(),
@@ -98,7 +102,7 @@ public:
 	virtual bool SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* logPtr = nullptr) override;
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) override;
 
-	// (reimplemented from ISerializable)
+	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive & archive) override;
 
 	// reimplemented (istd::IChangeable)

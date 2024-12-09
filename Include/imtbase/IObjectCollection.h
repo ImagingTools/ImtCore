@@ -84,24 +84,56 @@ public:
 		typedef std::shared_ptr<istd::IPolymorphic> RootObjectPtr;
 		typedef std::function<istd::IChangeable*()> ExtractInterfaceFunc;
 
-		DataPtr() : m_objectPtr(nullptr) {}
+		DataPtr()
+			:m_objectPtr(nullptr)
+		{
+		}
 
-		DataPtr(const istd::IChangeable* ptr) : m_objectPtr(ptr) {}// pure pointer
+		DataPtr(const istd::IChangeable* ptr)
+			:m_objectPtr(ptr)
+		{
+		}
 
 		DataPtr(const RootObjectPtr& rootObjPtr, const ExtractInterfaceFunc& extractInterface)
-			: m_rootPtr(rootObjPtr),
+			:m_rootPtr(rootObjPtr),
 			m_objectPtr(extractInterface())
 		{
 		}
 
-		bool IsValid() const { return m_objectPtr != nullptr; }
-		const istd::IChangeable* GetPtr() const { return m_objectPtr; }
-		const istd::IChangeable* operator->() const { return m_objectPtr; }
-		const istd::IChangeable& operator*() const { return *m_objectPtr; }
+		bool IsValid() const
+		{
+			return m_objectPtr != nullptr;
+		}
+		
+		const istd::IChangeable* GetPtr() const
+		{
+			return m_objectPtr;
+		}
+		
+		const istd::IChangeable* operator->() const
+		{
+			return m_objectPtr;
+		}
+		
+		const istd::IChangeable& operator*() const
+		{
+			return *m_objectPtr;
+		}
 
-		istd::IChangeable* GetPtr() { return const_cast<istd::IChangeable*>(m_objectPtr); }
-		istd::IChangeable& operator*() { return *const_cast<istd::IChangeable*>(m_objectPtr); }
-		istd::IChangeable* operator->() { return const_cast<istd::IChangeable*>(m_objectPtr); }
+		istd::IChangeable* GetPtr()
+		{
+			return const_cast<istd::IChangeable*>(m_objectPtr);
+		}
+		
+		istd::IChangeable& operator*()
+		{
+			return *const_cast<istd::IChangeable*>(m_objectPtr);
+		}
+		
+		istd::IChangeable* operator->()
+		{
+			return const_cast<istd::IChangeable*>(m_objectPtr);
+		}
 
 	private:
 		RootObjectPtr m_rootPtr;
