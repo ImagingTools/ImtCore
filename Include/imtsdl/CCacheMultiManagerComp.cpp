@@ -60,7 +60,7 @@ void CCacheMultiManagerComp::OnComponentCreated()
 
 		ICacheController::LoadError loadError = m_mainCacheControllerPtr->LoadFromData();
 		if (loadError != ICacheController::LE_OK){
-			SendWarningMessage(0, QString("Unable to load additional cache from file '%1'").arg(cachePath));
+			SendWarningMessage(0, QString("Unable to load cache from file '%1'").arg(cachePath));
 		}
 
 		m_additionalCacheControllerPtrList << m_mainCacheControllerPtr;
