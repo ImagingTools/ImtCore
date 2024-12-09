@@ -41,7 +41,9 @@ bool CLogFilterComp::IsMessageSupported(
 void CLogFilterComp::AddMessage(const MessagePtr& messagePtr)
 {
 	if (m_logCompPtr.IsValid()){
-		m_logCompPtr->AddMessage(messagePtr);
+		if (IsMessageSupported(messagePtr->GetInformationCategory(), messagePtr->GetInformationId(), nullptr)){
+			m_logCompPtr->AddMessage(messagePtr);
+		}
 	}
 }
 
