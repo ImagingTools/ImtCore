@@ -9,7 +9,7 @@ macx*{
 }
 
 #  Set the executable absolutely file path for specific OS
-DDL_CODE_CREATOR_EXE_BIN = $$PWD/../../Bin/$$COMPILER_DIR/$$DDL_CODE_CREATOR_EXE
+DDL_CODE_CREATOR_EXE_BIN = $$PWD/../../Bin/TOOLS_Qt$${QT_MAJOR_VERSION}_$$COMPILER_CODE/$$DDL_CODE_CREATOR_EXE
 
 win32{
 	QMAKE_RCC = rcc.exe

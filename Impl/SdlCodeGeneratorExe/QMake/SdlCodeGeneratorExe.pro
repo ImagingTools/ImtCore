@@ -1,6 +1,6 @@
 TARGET = SdlCodeGenerator
 
-include($(ACFCONFIGDIR)/QMake/ApplicationConfig.pri)
+include($$PWD/../../../Config/QMake/ToolApplicationConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
