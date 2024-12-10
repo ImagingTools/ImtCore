@@ -524,6 +524,9 @@ var Qt = {
     Horizontal: 0,
     Vertical: 1,
 
+    LeftToRight: 0,
+    RightToLeft: 1,
+
     platform: {
         os: 'web',
     },
