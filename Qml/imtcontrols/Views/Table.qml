@@ -8,7 +8,6 @@ TableBase {
     rowDelegate: Component {
         TableRowDelegate {
             tableItem: tableContainer
-            width: tableContainer.width
             minHeight: tableContainer.itemHeight
 
             readOnly: tableContainer.readOnly;

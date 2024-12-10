@@ -15,6 +15,8 @@ Item{
 
 	property bool textIsCropped: helperText.width > name.width;
 
+	property var rightMA: null;
+
 	Component.onCompleted: {
 		headerDelegate.compl = true;
 	}
@@ -32,12 +34,29 @@ Item{
 		}
 	}
 
+	function createRightMA(){
+		if(headerDelegate.columnIndex == getLastHeaderIndex()){
+			if(headerDelegate.rightMA == null){
+				headerDelegate.rightMA = movingRightComp.createObject(headerDelegate);
+				headerDelegate.rightMA.z = 30;
+			}
+		}
+		else if(headerDelegate.columnIndex !== getLastHeaderIndex()){
+			if(headerDelegate.rightMA){
+				headerDelegate.rightMA.destroy();
+				headerDelegate.rightMA = null;
+			}
+		}
+	}
+
 	function setCellWidth(){
 		if (!headerDelegate || headerDelegate.columnCount === 0){
 			return
 		}
 
-		var defaultWidth = (headerDelegate.width)/headerDelegate.columnCount;
+		let isFlickableTable = headerDelegate.tableItem.isFlickable;
+
+		var defaultWidth = !isFlickableTable ? (headerDelegate.width)/headerDelegate.columnCount : headerDelegate.tableItem.defaultColumnWidth;
 		var widthFromModel = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("Width", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex) : -1;
 
 		if(!headerDelegate.tableItem.widthDecoratorDynamic.getItemsCount()){
@@ -51,6 +70,8 @@ Item{
 		}
 
 		visible = width > 0;
+
+		createRightMA();
 	}
 	//borders
 
@@ -231,12 +252,12 @@ Item{
 
 		anchors.verticalCenter: mainRec.verticalCenter;
 		anchors.right: mainRec.right;
-        anchors.rightMargin: headerDelegate.columnIndex == headerDelegate.columnCount - 1 ? 3 * Style.size_mainMargin : Style.size_mainMargin;
+		anchors.rightMargin: headerDelegate.columnIndex == headerDelegate.columnCount - 1 ? 3 * Style.size_mainMargin : Style.size_mainMargin;
 
 		width: visible ? 12 : 0;
 		height: width;
 
-        visible: headerDelegate.tableItem.currentHeaderId === model.Id && headerDelegate.tableItem.hasSort;
+		visible: headerDelegate.tableItem.currentHeaderId === model.Id && headerDelegate.tableItem.hasSort;
 		rotation: headerDelegate.tableItem.currentSortOrder == "ASC" ? 180 : 0
 
 		sourceSize.width: width;
@@ -248,7 +269,9 @@ Item{
 	////
 	MouseArea {
 		id: headerMa;
+
 		anchors.fill: parent;
+
 		hoverEnabled: true;
 		visible: headerDelegate.tableItem.hasSort || headerDelegate.textIsCropped || headerDelegate.tableItem.editableHeaderParams;
 		acceptedButtons: Qt.LeftButton | Qt.RightButton;
@@ -323,10 +346,22 @@ Item{
 		return -1;
 	}
 
-	MouseArea{
-		id: movingLeft;
+	function getLastHeaderIndex(){
+		for (let i = headerDelegate.tableItem.widthDecoratorDynamic.getItemsCount() - 1; i >= 0; i--){
+			let width = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", i);
+			if (width > 0){
+				return i;
+			}
+		}
 
-		anchors.left:  parent.left;
+		return -1;
+	}
+
+
+	MouseArea{
+		id: moving;
+
+		anchors.left: parent.left;
 
 		height: parent.height;
 		width: 15;
@@ -338,50 +373,72 @@ Item{
 		cursorShape: pressed ?  Qt.SplitHCursor : isWithinBorder ? Qt.SplitHCursor : Qt.ArrowCursor;
 		property bool isWithinBorder:  mouseX <= splitterWidth;
 		property int splitterWidth: 6;
-		property var coord: mapToItem(movingLeft,0,0);
+		property var coord: mapToItem(moving,0,0);
 		property bool  blocked: false;
 
 		onPressed: {
-			movingLeft.coord = mapToItem(movingLeft,mouse.x,mouse.y)
+			moving.coord = mapToItem(moving,mouse.x,mouse.y)
 		}
 
 		onPositionChanged: {
 			if(pressed){
-				var newCoords = mapToItem(movingLeft,mouse.x,mouse.y);
-				var deltaX = Math.trunc(newCoords.x - movingLeft.coord.x);
+				let isFlickableTable = headerDelegate.tableItem.isFlickable;
 
-				var width_ = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex);
-				var width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
+				let newCoords = mapToItem(moving,mouse.x,mouse.y);
+				let deltaX = Math.trunc(newCoords.x - moving.coord.x);
 
-				let prevIndex = headerDelegate.getPrevHeaderIndex();
-				var width_prev = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", prevIndex);
-				var width_prev_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", prevIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", prevIndex) : headerDelegate.tableItem.minCellWidth;
+				let width_ = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex);
+				let width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
 
 				width_ = width_ - deltaX;
-				width_prev = width_prev + deltaX;
 
-				let currentPercent = (width_ / headerDelegate.tableItem.width) * 100;
-				let prevPercent = (width_prev / headerDelegate.tableItem.width) * 100;
+				let prevIndex; let width_prev; let width_prev_min;let prevPercent;
 
-				if(width_ > width_min && width_prev > width_prev_min){
-					headerDelegate.tableItem.widthDecorator.setData("Width", width_, headerDelegate.columnIndex);
-					headerDelegate.tableItem.widthDecorator.setData("Width", width_prev, prevIndex);
+				prevIndex = headerDelegate.getPrevHeaderIndex();
+				if(prevIndex >=0){
+					width_prev = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", prevIndex);
+					width_prev_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", prevIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", prevIndex) : headerDelegate.tableItem.minCellWidth;
+					width_prev = width_prev + deltaX;
+					prevPercent = (width_prev / headerDelegate.tableItem.elementsList.width) * 100;
+				}
 
-					if (headerDelegate.tableItem.width > 0){
-						headerDelegate.tableItem.widthDecorator.setData("WidthPercent", currentPercent, headerDelegate.columnIndex);
-						headerDelegate.tableItem.widthDecorator.setData("WidthPercent", prevPercent, prevIndex);
+				let currentPercent = (width_ / headerDelegate.tableItem.elementsList.width) * 100;
+
+				let widthOk = isFlickableTable ? width_prev > width_prev_min : width_ > width_min && width_prev > width_prev_min;
+
+				if(widthOk){
+					if(!isFlickableTable){
+						headerDelegate.tableItem.widthDecorator.setData("Width", width_, headerDelegate.columnIndex);
+					}
+					if(prevIndex >=0){
+						headerDelegate.tableItem.widthDecorator.setData("Width", width_prev, prevIndex);
+					}
+
+					if (headerDelegate.tableItem.elementsList.width > 0){
+						if(!isFlickableTable){
+							headerDelegate.tableItem.widthDecorator.setData("WidthPercent", currentPercent, headerDelegate.columnIndex);
+						}
+						if(prevIndex >=0){
+							headerDelegate.tableItem.widthDecorator.setData("WidthPercent", prevPercent, prevIndex);
+						}
 					}
 
 					headerDelegate.tableItem.setWidth();
 
-					headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, currentPercent)
-					let prevHeaderId = headerDelegate.tableItem.headers.getData("Id", prevIndex);
-					headerDelegate.tableItem.tableViewParams.setHeaderSize(prevHeaderId, prevPercent)
+					if(!isFlickableTable){
+						headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, currentPercent)
+					}
+
+					if(prevIndex >=0){
+						let prevHeaderId = headerDelegate.tableItem.headers.getData("Id", prevIndex);
+						headerDelegate.tableItem.tableViewParams.setHeaderSize(prevHeaderId, prevPercent)
+					}
+
 				}
 			}
 
 			blocked = true;
-			blockmovingLeftPause.restart();
+			blockmovingPause.restart();
 		}
 
 		onReleased: {
@@ -399,13 +456,90 @@ Item{
 	}
 
 	PauseAnimation {
-		id: blockmovingLeftPause;
+		id: blockmovingPause;
 
 		duration: 200
 
 		onFinished: {
-			movingLeft.blocked = false;
+			moving.blocked = false;
 		}
 	}
+
+	Component{
+		id: movingRightComp
+		MouseArea{
+			id: movingRight;
+
+			anchors.right: parent.right;
+
+			height: parent.height;
+			width: 15;
+
+			visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex > 0 && headerDelegate.visible;
+			enabled: visible;
+
+			hoverEnabled: true;
+			cursorShape: pressed ?  Qt.SplitHCursor : isWithinBorder ? Qt.SplitHCursor : Qt.ArrowCursor;
+			property bool isWithinBorder:  mouseX >=  width - splitterWidth;
+			property int splitterWidth: 6;
+			property var coord: mapToItem(movingRight,0,0);
+			property bool  blocked: moving.blocked;
+
+			onPressed: {
+				movingRight.coord = mapToItem(movingRight,mouse.x,mouse.y)
+			}
+
+			onPositionChanged: {
+				if(pressed){
+					let isFlickableTable = headerDelegate.tableItem.isFlickable;
+					if(!isFlickableTable){
+						return;
+					}
+					let newCoords = mapToItem(movingRight,mouse.x,mouse.y);
+					let deltaX = Math.trunc(newCoords.x - movingRight.coord.x);
+
+					let width_ = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex);
+					let width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
+
+					width_ = width_ + deltaX;
+
+					let currentPercent = (width_ / headerDelegate.tableItem.elementsList.width) * 100;
+
+					let widthOk =  width_ > width_min;
+
+					if(widthOk){
+						headerDelegate.tableItem.widthDecorator.setData("Width", width_, headerDelegate.columnIndex);
+
+						if (headerDelegate.tableItem.elementsList.width > 0){
+							headerDelegate.tableItem.widthDecorator.setData("WidthPercent", currentPercent, headerDelegate.columnIndex);
+						}
+
+						headerDelegate.tableItem.setWidth();
+
+						headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, currentPercent)
+					}
+				}
+
+				moving.blocked = true;
+				blockmovingPause.restart();
+			}
+
+			onReleased: {
+				headerDelegate.tableItem.saveWidth();
+			}
+
+			onClicked: {
+				if(blocked){
+					mouse.accepted = true;
+				}
+				else {
+					mouse.accepted = false;
+				}
+			}
+
+		}
+
+	}
+
 }//delegate
 

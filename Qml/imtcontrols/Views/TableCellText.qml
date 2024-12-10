@@ -5,7 +5,7 @@ import imtcontrols 1.0
 Text {
     id: name
 
-    property TableRowDelegateBase rowDelegate
+	property TableRowDelegateBase rowDelegate: null
     property int columnIndex: -1;
     verticalAlignment: Text.AlignVCenter
     horizontalAlignment: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Text.AlignLeft : rowDelegate.tableItem.cellDecorator.isValidData("TextPosition", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("TextPosition", name.columnIndex) : Text.AlignLeft : Text.AlignLeft
@@ -42,4 +42,6 @@ Text {
             rowDelegate.setHeightModelElememt(name.columnIndex, height_)
         }
     }
+
+
 }

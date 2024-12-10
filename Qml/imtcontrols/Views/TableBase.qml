@@ -50,7 +50,7 @@ Rectangle {
 	property alias elementsList: elementsListObj;
 	property alias cacheBuffer: elementsListObj.cacheBuffer;
 	property alias contentHeight: elementsListObj.contentHeight;
-	property alias contentWidth: elementsListObj.contentWidth;
+	property real contentWidth: elementsListObj.contentWidth;
 	property alias originX: elementsListObj.originX;
 	property alias originY: elementsListObj.originY;
 	property alias contentX: elementsListObj.contentX;
@@ -149,6 +149,9 @@ Rectangle {
 
 	property bool compl: false;
 
+	property bool isFlickable: false;
+	property int defaultColumnWidth: 200;
+
 	property  Component cellDelegate
 
 	signal checkedItemsChanged();
@@ -222,11 +225,18 @@ Rectangle {
 		tableContainer.setWidth();
 	}
 
+
 	onSelectionChanged: {
 		if (selection.length > 0){
 			let maxIndex = selection.sort()[selection.length - 1]
 
 			elementsListObj.positionViewAtIndex(maxIndex, ListView.Contain)
+		}
+	}
+
+	onContentWidthChanged: {
+		if(tableContainer.isFlickable){
+			elementsListObj.contentWidth = contentWidth;
 		}
 	}
 
@@ -411,14 +421,15 @@ Rectangle {
 		if (!tableContainer.widthDecorator || !tableContainer.headers || !tableContainer.widthDecoratorDynamic){
 			return;
 		}
+		let totalWidth = 0;
 
-		var headersCount = tableContainer.headers.getItemsCount();
-		var tableWidth_ = tableContainer.width;
+		let headersCount = tableContainer.headers.getItemsCount();
+		let tableWidth_ = elementsListObj.width;
 		//        var tableWidth_ = Math.max(tableContainer.width, tableContainer.contentWidth)
 
 		if(tableContainer.widthDecorator.getItemsCount() === 0 && headersCount !== 0){
-			for(var ind = 0; ind < headersCount ; ind++){
-				var index = tableContainer.widthDecorator.insertNewItem();
+			for(let ind = 0; ind < headersCount ; ind++){
+				let index = tableContainer.widthDecorator.insertNewItem();
 				tableContainer.widthDecorator.setData("Width",-1,index);
 				tableContainer.widthDecorator.setData("WidthPercent",-1,index);
 			}
@@ -427,11 +438,11 @@ Rectangle {
 		tableContainer.widthDecoratorDynamic.clear();
 		tableContainer.widthDecoratorDynamic.copy(tableContainer.widthDecorator);
 
-		var count_ = 0; // Count column with auto width
-		var visibleColumnCount = 0;
-		var lengthMinus = 0; // Total column width without automatic width
+		let count_ = 0; // Count column with auto width
+		let visibleColumnCount = 0;
+		let lengthMinus = 0; // Total column width without automatic width
 
-		for(var i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
+		for(let i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
 			var width_ = tableContainer.widthDecorator.isValidData("Width",i) ? tableContainer.widthDecorator.getData("Width",i): -1;
 			var widthPercent_ = tableContainer.widthDecorator.isValidData("WidthPercent",i) ? tableContainer.widthDecorator.getData("WidthPercent",i): -1;
 
@@ -452,6 +463,7 @@ Rectangle {
 					newWidth = width_;
 				}
 				lengthMinus += newWidth;
+
 			}
 		}
 
@@ -465,7 +477,9 @@ Rectangle {
 					tableContainer.widthDecoratorDynamic.setData("Width", 0, index);
 				}
 				else{
-					tableContainer.widthDecoratorDynamic.setData("Width", tableWidth_/visibleColumnCount, index);
+					let defWidth = tableContainer.isFlickable ? tableContainer.defaultColumnWidth : tableWidth_/visibleColumnCount;
+					tableContainer.widthDecoratorDynamic.setData("Width", defWidth, index);
+					totalWidth += defWidth;
 				}
 			}
 		}
@@ -476,16 +490,21 @@ Rectangle {
 
 				if (widthPercent_ >= 0 || width_ < 0  && widthPercent_ >= 0){
 					tableContainer.widthDecoratorDynamic.setData("Width", widthPercent_*tableWidth_/100,i);
-				}
+					}
 				else if(width_ < 0  && widthPercent_ < 0 ){
-					tableContainer.widthDecoratorDynamic.setData("Width",(tableWidth_ - lengthMinus)/count_,i);
+					let defWidth = tableContainer.isFlickable ? tableContainer.defaultColumnWidth : (tableWidth_ - lengthMinus)/count_;
+					tableContainer.widthDecoratorDynamic.setData("Width",defWidth,i);
 				}
 				else if(width_ >= 0  && widthPercent_ < 0 || width_ >= 0  && widthPercent_ >= 0){
 					tableContainer.widthDecoratorDynamic.setData("Width", width_,i);
 				}
+				totalWidth += tableContainer.widthDecoratorDynamic.getData("Width", i);
+
 			}
 		}
-
+		if(tableContainer.isFlickable){
+			tableContainer.contentWidth = totalWidth;
+		}
 		tableContainer.widthRecalc();
 	}
 
@@ -685,6 +704,11 @@ Rectangle {
 			Component.onCompleted: {
 				headersList.compl = true;
 			}
+			onContentXChanged: {
+				if(tableContainer.isFlickable){
+					elementsListObj.contentX = headersList.contentX + elementsListObj.originX
+				}
+			}
 
 		}//Headers ListView
 
@@ -768,8 +792,23 @@ Rectangle {
 
 		clip: true;
 
+		property bool scrollVisible: scrollbar.visible;
+		onScrollVisibleChanged: {
+			if(tableContainer.isFlickable){
+				tableContainer.setWidth();
+			}
+		}
+
 		onContentXChanged: {
-			headersList.contentX = contentX + headersList.originX
+			if(tableContainer.isFlickable){
+				headersList.contentX = elementsListObj.contentX + headersList.originX
+			}
+		}
+
+		onContentWidthChanged: {
+			if(tableContainer.isFlickable){
+				tableContainer.contentWidth = contentWidth;
+			}
 		}
 
 		Keys.onUpPressed: {
