@@ -41,20 +41,20 @@ Canvas {
 		let fontPixelSize = rowDelegate.tableItem.emptyDecorCell ? Style.fontSize_common : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSize_common
 		ctx.font = '' + fontPixelSize + "px " + Style.fontFamily
 
-		let val = getDefaultCellValue(key);
+        let val = getCellValue(key);
 		if (val !== undefined){
 			let text = String(val);
-			let maxTextWidth = cellWidth - Style.size_mainMargin;
+            let maxTextWidth = cellWidth - Style.size_smallMargin * 2;
 			let trimmedText = trimTextToFit(ctx, text, maxTextWidth);
 
 			ctx.textBaseline = "middle";
 			ctx.textAlign = "left";
 
-			ctx.fillText(trimmedText, x + 2, cellHeight / 2);
+            ctx.fillText(trimmedText, x + 2 + Style.size_smallMargin, cellHeight / 2);
 		}
 	}
 
-	function getDefaultCellValue(key){
+    function getCellValue(key){
 		let val = ''
 
 		if(rowDelegate.tableItem !==null && rowDelegate.dataModel != null){
@@ -76,10 +76,31 @@ Canvas {
 
 		var ctx = canvas.getContext('2d');
 		ctx.reset();
-		ctx.clearRect(0, 0, rowDelegate.width, rowDelegate.height);
+        ctx.clearRect(0, 0, rowDelegate.width, rowDelegate.height);
 
-		ctx.stroke();
-		let xCell = Style.size_mainMargin;
+        let color = (containsMouse || rowDelegate.selected) ? Style.selectedColor :
+                rowDelegate.tableItem.enableAlternating ? rowDelegate.tableItem.alternatingColor : 'white';
+        ctx.fillStyle = color
+        ctx.fillRect(x, y, rowDelegate.width, rowDelegate.height)
+
+        // ctx.beginPath()
+        ctx.strokeStyle =  rowDelegate.tableItem.borderColorHorizontal
+        // ctx.fillStyle = "red" //rowDelegate.selected ? Style.selectedColor : "transparent";
+
+        ctx.moveTo(0, 0);
+        ctx.lineWidth = (rowDelegate.rowIndex > 0 && rowDelegate.rowIndex < rowCount) ? rowDelegate.horizontalBorderSize :
+                                                                                                                                      (rowDelegate.rowIndex == 0 && rowDelegate.visibleTopBorderFirst) ? rowDelegate.horizontalBorderSize : 0;
+        ctx.lineTo(rowDelegate.width, 0);
+
+        ctx.lineWidth =  rowDelegate.visibleBottomBorderLast  ? rowDelegate.horizontalBorderSize : 0;
+
+        ctx.moveTo(0, rowDelegate.height);
+        ctx.lineTo(rowDelegate.width, rowDelegate.height);
+
+        // ctx.stroke();
+        ctx.strokeStyle =  rowDelegate.tableItem.borderColorVertical
+
+        let xCell = 0; // Style.size_mainMargin;
 
 		for (let columnIndex = 0; columnIndex < rowDelegate.columnCount; columnIndex++){
 			let defaultWidth = rowDelegate.columnCount == 0 ? 0 : rowDelegate.width/rowDelegate.columnCount;
@@ -96,6 +117,28 @@ Canvas {
 			else{
 				cellWidth = defaultWidth;
 			}
+
+            let lineWidth = rowDelegate.isRightBorder ? rowDelegate.verticalBorderSize * rowDelegate.visibleLeftBorderFirst * (columnIndex == 0)
+                                                                 : rowDelegate.visibleLeftBorderFirst ? rowDelegate.verticalBorderSize : columnIndex > 0 ? rowDelegate.verticalBorderSize : 0;
+
+            if (lineWidth > 0){
+                ctx.lineWidth = lineWidth
+                ctx.moveTo(xCell, 0);
+                ctx.lineTo(xCell, rowDelegate.height)
+            }
+
+            lineWidth = !rowDelegate.isRightBorder ?
+                            rowDelegate.verticalBorderSize * rowDelegate.visibleRightBorderLast  * (columnIndex == (rowDelegate.columnCount -1)) * (rowDelegate.columnCount > 0) :
+                            rowDelegate.visibleRightBorderLast ? rowDelegate.verticalBorderSize  :
+                            rowDelegate.verticalBorderSize * (columnIndex < (rowDelegate.columnCount -1));
+
+
+            if (lineWidth > 0){
+                ctx.lineWidth = lineWidth
+                ctx.moveTo(xCell, 0);
+                ctx.lineTo(xCell, rowDelegate.height)
+            }
+            // ctx.moveTo(0, 0);
 
 			ctx.fillStyle = rowDelegate.tableItem.emptyDecorCell ? Style.textColor : rowDelegate.tableItem.cellDecorator.isValidData("FontColor", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontColor", columnIndex) : Style.textColor
 
