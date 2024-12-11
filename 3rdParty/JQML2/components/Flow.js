@@ -48,12 +48,18 @@ class Flow extends Item {
     }
 
     $widthChanged(){
-        super.$widthChanged()
+        this.setStyle({
+            maxWidth: this.getPropertyValue('width')+'px',
+        })
+
         this.updateGeometry()
     }
 
     $heightChanged(){
-        super.$heightChanged()
+        this.setStyle({
+            maxHeight: this.getPropertyValue('height')+'px',
+        })
+
         this.updateGeometry()
     }
 
@@ -67,34 +73,20 @@ class Flow extends Item {
                 if(children[i] instanceof Repeater) continue
 
                 if(children[i].getPropertyValue('width') > 0 && children[i].getPropertyValue('height') > 0){
-                    let find = false
-                    for(let k = i + 1; k < children.length; k++){
-                        if(children[k] instanceof Repeater) continue
-                        if(children[k].getPropertyValue('width') > 0 && children[k].getPropertyValue('height') > 0){
-                            find = true
-                        }
-                    }
-                    if(i < children.length - 1 && find){
-                        children[i].setStyle({
-                            marginRight: `${this.getPropertyValue('spacing')}px`,
-                            marginBottom: `${this.getPropertyValue('spacing')}px`
-                        })
-                    } else {
-                        children[i].setStyle({
-                            marginRight: `0`,
-                            marginBottom: `0`
-                        })
-                    }
+                    children[i].setStyle({
+                        marginLeft: 0,
+                        marginTop: 0,
+                    })
+                } else {
+                    children[i].setStyle({
+                        marginLeft: -this.getPropertyValue('spacing')+'px',
+                        marginTop: -this.getPropertyValue('spacing')+'px',
+                    })
                 }
             }
         }
 
         this.setStyle({
-            minWidth: !this.getProperty('width').auto ? this.getPropertyValue('width')+'px' : 0,
-            minHeight: !this.getProperty('height').auto ? this.getPropertyValue('height')+'px' : 0,
-            width: !this.getProperty('width').auto ? this.getPropertyValue('width')+'px' : 0,
-            height: !this.getProperty('height').auto ? this.getPropertyValue('height')+'px' : 0,
-
             paddingLeft: this.$properties.leftPadding ? this.getPropertyValue('leftPadding')+'px' : this.getPropertyValue('padding')+'px',
             paddingRight: this.$properties.rightPadding ? this.getPropertyValue('rightPadding')+'px' : this.getPropertyValue('padding')+'px',
             paddingTop: this.$properties.topPadding ? this.getPropertyValue('topPadding')+'px' : this.getPropertyValue('padding')+'px',
@@ -103,13 +95,6 @@ class Flow extends Item {
 
         this.getProperty('width').setAuto(this.$dom.scrollWidth)
         this.getProperty('height').setAuto(this.$dom.scrollHeight)
-
-        this.setStyle({
-            minWidth: this.getPropertyValue('width')+'px',
-            minHeight: this.getPropertyValue('height')+'px',
-            width: this.getPropertyValue('width')+'px',
-            height: this.getPropertyValue('height')+'px',
-        })
     }
 
     addChild(child){
@@ -128,6 +113,10 @@ class Flow extends Item {
     }
 
     $spacingChanged(){
+        this.setStyle({
+            gap: this.getPropertyValue('spacing')+'px',
+        })
+
         this.updateGeometry()
     }
 }
