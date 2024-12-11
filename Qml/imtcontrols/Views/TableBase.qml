@@ -864,9 +864,10 @@ Rectangle {
 				if (headerId === id){
 					let visible = tableContainer.tableViewParams.getData("Visible", j);
 					let size = tableContainer.tableViewParams.getData("Size", j);
+
 					if (visible){
 						tableContainer.widthDecorator.setData("WidthPercent", size, i)
-						tableContainer.widthDecorator.setData("Width", size, i) //(size / 100) * elementsListObj.width ??
+						tableContainer.widthDecorator.setData("Width", (size / 100) * elementsListObj.width, i) //(size / 100) * elementsListObj.width ??
 					}
 					else{
 						tableContainer.widthDecorator.setData("WidthPercent", 0, i)
@@ -874,6 +875,7 @@ Rectangle {
 					}
 
 					break;
+
 				}
 			}
 		}
@@ -894,42 +896,35 @@ Rectangle {
 		let headersCount = tableContainer.headers.getItemsCount();
 		let tableWidth_ = elementsListObj.width;
 
-		tableContainer.widthDecoratorDynamic.clear();
-		tableContainer.widthDecoratorDynamic.copy(tableContainer.widthDecorator);
-
 		let visibleColumnCount = 0;
 
-		for(let i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
-			let width_ = tableContainer.widthDecorator.isValidData("Width",i) ? tableContainer.widthDecorator.getData("Width",i): -1;
-			let widthPercent_ = tableContainer.widthDecorator.isValidData("WidthPercent",i) ? tableContainer.widthDecorator.getData("WidthPercent",i): -1;
-
-			if (width_ !== 0 && widthPercent_ !== 0){
+		for(let i = 0; i < tableContainer.widthDecoratorDynamic.getItemsCount(); i++){
+			let width_ = tableContainer.widthDecoratorDynamic.isValidData("Width",i) ? tableContainer.widthDecoratorDynamic.getData("Width",i): -1;
+			if (width_ !== 0){
 				visibleColumnCount++;
 				let headerId__ = tableContainer.headers.getData("Id", i);
 				if(headerId__ == "№"){
-					rowNumberColumnWidth = Math.max(width_, tableWidth_ * (widthPercent_ / 100))
+					rowNumberColumnWidth = width_;
 				}
 			}
 		}
 
-		tableContainer.widthDecoratorDynamic.clear();
 		for(let ind = 0; ind < headersCount; ind++){
-			let index = tableContainer.widthDecoratorDynamic.insertNewItem();
 
-			let columnWidth = tableContainer.widthDecorator.getData("Width", ind);
-			if (columnWidth === 0){
-				tableContainer.widthDecoratorDynamic.setData("Width", 0, index);
-				tableContainer.widthDecorator.setData("Width", 0, index);
-				tableContainer.widthDecoratorDynamic.setData("WidthPercent", 0, index);
-				tableContainer.widthDecorator.setData("WidthPercent", 0, index);
+			let columnWidth = tableContainer.widthDecoratorDynamic.getData("Width", ind);
+
+			if(columnWidth <= 0){
+				tableContainer.widthDecoratorDynamic.setData("Width", 0, ind);
+				tableContainer.widthDecorator.setData("Width", 0, ind);
+				tableContainer.widthDecorator.setData("WidthPercent", 0, ind);
 			}
-			else{
+			else {
 				isVisibleRowNumberColumn = rowNumberColumnWidth > 0;
 
 				let isGeneralWidthForNumberColumn = !isVisibleRowNumberColumn ? true : (tableWidth_ - rowNumberColumnWidth)/(visibleColumnCount-1) < rowNumberColumnWidth
 
 				let defWidth = isGeneralWidthForNumberColumn ? tableWidth_/visibleColumnCount :
-								  (tableWidth_ - rowNumberColumnWidth)/(visibleColumnCount -1);
+															   (tableWidth_ - rowNumberColumnWidth)/(visibleColumnCount -1);
 
 				let percent = (defWidth/tableWidth_) * 100;
 
@@ -939,19 +934,17 @@ Rectangle {
 					if(isVisibleRowNumberColumn){
 						rowNumberColumnWidth  = isGeneralWidthForNumberColumn ? tableWidth_/visibleColumnCount : rowNumberColumnWidth;
 						rowNumberColumnPercent = (rowNumberColumnWidth/tableWidth_) * 100;
-						tableContainer.widthDecoratorDynamic.setData("Width", rowNumberColumnWidth, index);
-						tableContainer.widthDecorator.setData("Width", rowNumberColumnWidth, index);
-						tableContainer.widthDecoratorDynamic.setData("WidthPercent", rowNumberColumnPercent, index);
-						tableContainer.widthDecorator.setData("WidthPercent", rowNumberColumnPercent, index);
+						tableContainer.widthDecoratorDynamic.setData("Width", rowNumberColumnWidth, ind);
+						tableContainer.widthDecorator.setData("Width", rowNumberColumnWidth, ind);
+						tableContainer.widthDecorator.setData("WidthPercent", rowNumberColumnPercent, ind);
 
 						tableViewParams.setHeaderSize(headerId, rowNumberColumnPercent)
 					}
 				}
 				else {
-					tableContainer.widthDecoratorDynamic.setData("Width", defWidth, index);
-					tableContainer.widthDecorator.setData("Width", defWidth, index);
-					tableContainer.widthDecoratorDynamic.setData("WidthPercent", percent, index);
-					tableContainer.widthDecorator.setData("WidthPercent", percent, index);
+					tableContainer.widthDecoratorDynamic.setData("Width", defWidth, ind);
+					tableContainer.widthDecorator.setData("Width", defWidth, ind);
+					tableContainer.widthDecorator.setData("WidthPercent", percent, ind);
 
 					tableViewParams.setHeaderSize(headerId, percent)
 
@@ -962,18 +955,10 @@ Rectangle {
 
 		}//for
 
-		if(isVisibleRowNumberColumn){
-			if(restPercent + rowNumberColumnPercent > 100){
-				rowNumberColumnPercent = 100 - restPercent;
-				tableViewParams.setHeaderSize("№", rowNumberColumnPercent)
-			}
-		}
-
 		tableContainer.saveWidth();
 
-		if(tableContainer.isFlickable){
-			tableContainer.contentWidth = tableWidth_;
-		}
+		tableContainer.contentWidth = tableWidth_;
+
 		tableContainer.widthRecalc();
 
 	}
