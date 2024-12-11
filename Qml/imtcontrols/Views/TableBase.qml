@@ -939,6 +939,7 @@ Rectangle {
 						tableContainer.widthDecorator.setData("Width", rowNumberColumnWidth, index);
 						tableContainer.widthDecoratorDynamic.setData("WidthPercent", (rowNumberColumnWidth/tableWidth_) * 100, index);
 						tableContainer.widthDecorator.setData("WidthPercent", (rowNumberColumnWidth/tableWidth_) * 100, index);
+						tableViewParams.setHeaderSize(headerId, (rowNumberColumnWidth/tableWidth_) * 100)
 					}
 				}
 				else {
@@ -946,13 +947,15 @@ Rectangle {
 					tableContainer.widthDecorator.setData("Width", defWidth, index);
 					tableContainer.widthDecoratorDynamic.setData("WidthPercent", percent, index);
 					tableContainer.widthDecorator.setData("WidthPercent", percent, index);
+					tableViewParams.setHeaderSize(headerId, percent)
 				}
 
-				tableViewParams.setHeaderSize(headerId, percent)
 
 			}
-			tableContainer.saveWidth();
+
 		}
+
+		tableContainer.saveWidth();
 
 		if(tableContainer.isFlickable){
 			tableContainer.contentWidth = tableWidth_;
