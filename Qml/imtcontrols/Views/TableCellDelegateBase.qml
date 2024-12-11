@@ -25,6 +25,13 @@ Item {
 	property bool widthIsCalculated: false;
 	property bool compl: false;
 
+	property Item backgroundItem: null;
+	property Item leftBorderItem: null;
+	property Item rightBorderItem: null;
+	property Item topBorderItem: null;
+	property Item bottomBorderItem: null;
+
+
 	Component.onCompleted: {
 		compl = true;
 	}
@@ -40,37 +47,49 @@ Item {
 			return;
 		}
 
-		if (delegateContainer.rowDelegate.horizontalBorderSize){
-			if(delegateContainer.rowCount && delegateContainer.rowIndex > 0 && delegateContainer.rowIndex < delegateContainer.rowCount){
-				topBorder.createObject(delegateContainer)
-			}
-			else if(delegateContainer.rowDelegate.visibleTopBorderFirst && delegateContainer.rowIndex == 0 && delegateContainer.rowCount){
-				topBorder.createObject(delegateContainer)
-			}
-		}
-		if (delegateContainer.rowDelegate.horizontalBorderSize){
-			if(delegateContainer.rowDelegate.visibleBottomBorderLast && delegateContainer.rowIndex == delegateContainer.rowCount -1){
-				bottomBorder.createObject(delegateContainer)
-			}
-		}
-
 		if (delegateContainer.rowDelegate.cellColor !== "transparent"){
-			cellBackground.createObject(delegateContainer)
+			if(!delegateContainer.backgroundItem){
+				delegateContainer.backgroundItem = cellBackground.createObject(delegateContainer)
+			}
 		}
 
 		if (delegateContainer.rowDelegate.verticalBorderSize){
-			if(delegateContainer.columnIndex > 0){
-				leftBorder.createObject(delegateContainer)
-			}
-			else if(columnIndex == 0 && delegateContainer.rowDelegate.visibleLeftBorderFirst){
-				leftBorder.createObject(delegateContainer)
+			if(!delegateContainer.leftBorderItem){
+				if(delegateContainer.columnIndex > 0){
+					delegateContainer.leftBorderItem = leftBorder.createObject(delegateContainer)
+				}
+				else if(columnIndex == 0 && delegateContainer.rowDelegate.visibleLeftBorderFirst){
+					delegateContainer.leftBorderItem = leftBorder.createObject(delegateContainer)
+				}
 			}
 		}
 		if (delegateContainer.rowDelegate.verticalBorderSize){
 			if((delegateContainer.columnIndex == delegateContainer.columnCount -1) && delegateContainer.rowDelegate.visibleRightBorderLast){
-				rightBorder.createObject(delegateContainer)
+				if(!delegateContainer.rightBorderItem){
+					delegateContainer.rightBorderItem = rightBorder.createObject(delegateContainer)
+				}
 			}
 		}
+
+		if (delegateContainer.rowDelegate.horizontalBorderSize){
+			if(!delegateContainer.topBorderItem){
+				if(delegateContainer.rowCount && delegateContainer.rowIndex > 0 && delegateContainer.rowIndex < delegateContainer.rowCount){
+					delegateContainer.topBorderItem = topBorder.createObject(delegateContainer)
+				}
+				else if(delegateContainer.rowDelegate.visibleTopBorderFirst && delegateContainer.rowIndex == 0 && delegateContainer.rowCount){
+					delegateContainer.topBorderItem = topBorder.createObject(delegateContainer)
+				}
+			}
+		}
+
+		if (delegateContainer.rowDelegate.horizontalBorderSize){
+			if(delegateContainer.rowDelegate.visibleBottomBorderLast && delegateContainer.rowIndex == delegateContainer.rowCount -1){
+				if(!delegateContainer.bottomBorderItem){
+					delegateContainer.bottomBorderItem = bottomBorder.createObject(delegateContainer)
+				}
+			}
+		}
+
 		cellHeaderId = delegateContainer.rowDelegate.tableItem.headers.getData("Id", delegateContainer.columnIndex);
 
 		delegateContainer.rowDelegate.tableItem.widthRecalc.connect(delegateContainer.setCellWidth)
@@ -107,6 +126,7 @@ Item {
 			anchors.bottom: parent.bottom;
 			anchors.left: parent.left;
 			anchors.right: parent.right;
+
 			height: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.visibleBottomBorderLast ? delegateContainer.rowDelegate.horizontalBorderSize : 0 : 0;
 			color:  delegateContainer.rowDelegate ? delegateContainer.rowDelegate.borderColorHorizontal : "transparent";
 
@@ -120,11 +140,9 @@ Item {
 			anchors.top: parent.top;
 			anchors.bottom: parent.bottom;
 			z: -1;
-			width: delegateContainer.rowDelegate ?
-					   delegateContainer.rowDelegate.isRightBorder ? delegateContainer.rowDelegate.verticalBorderSize * delegateContainer.rowDelegate.visibleLeftBorderFirst * (delegateContainer.columnIndex == 0)
-																   : delegateContainer.rowDelegate.visibleLeftBorderFirst ? delegateContainer.rowDelegate.verticalBorderSize : delegateContainer.columnIndex > 0 ? delegateContainer.rowDelegate.verticalBorderSize : 0
-			:0;
-			color:  delegateContainer.rowDelegate ?delegateContainer.rowDelegate.borderColorVertical : "transparent";
+
+			width : !delegateContainer.rowDelegate ? 0 : delegateContainer.rowDelegate.verticalBorderSize;
+			color:  delegateContainer.rowDelegate ? delegateContainer.rowDelegate.borderColorVertical : "transparent";
 		}
 	}
 
@@ -135,12 +153,8 @@ Item {
 			anchors.top: parent.top;
 			anchors.bottom: parent.bottom;
 			z: -2;
-			width: delegateContainer.rowDelegate ?
-					   !delegateContainer.rowDelegate.isRightBorder ?
-						   delegateContainer.rowDelegate.verticalBorderSize * delegateContainer.rowDelegate.visibleRightBorderLast  * (delegateContainer.columnIndex == (delegateContainer.columnCount -1)) * (delegateContainer.columnCount > 0) :
-						   delegateContainer.rowDelegate.visibleRightBorderLast ? delegateContainer.rowDelegate.verticalBorderSize  :
-																				  delegateContainer.rowDelegate.verticalBorderSize * (delegateContainer.columnIndex < (delegateContainer.columnCount -1)) : 0;
 
+			width: !delegateContainer.rowDelegate ? 0 : delegateContainer.rowDelegate.verticalBorderSize;
 			color: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.borderColorVertical : "transparent";
 		}
 	}
