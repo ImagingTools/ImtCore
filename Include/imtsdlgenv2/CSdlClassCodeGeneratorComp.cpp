@@ -334,7 +334,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 					SendCriticalMessage(0, QString("Unable to find type for %1 of %2").arg(field.GetId(), sdlType.GetName()));
 					I_CRITICAL();
 
-					return TS_INVALID;
+					return false;
 				}
 
 				if (foundType.IsExternal()){
