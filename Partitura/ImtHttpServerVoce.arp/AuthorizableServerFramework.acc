@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5323" Description="ACF"/>
+            <Version Id="0" Number="5326" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
@@ -42,6 +42,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ServerPort" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ServerSettings/ServerPort"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="ThreadsLimit">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ServerSettings/LoggingParams"/>
@@ -162,6 +165,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestHandler" Type="Factory" ExportId="RequestHandler">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="ThreadsLimit">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
