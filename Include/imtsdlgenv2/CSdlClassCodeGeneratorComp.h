@@ -73,6 +73,9 @@ private:
 				const imtsdl::CSdlType& sdlType,
 				uint indents = 1);
 
+	// comfort methods
+	void WriteTakeOverPropsFromOtherObject(QTextStream& stream, const imtsdl::CSdlType& sdlType) const;
+
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(imtsdl::ISdlTypeListProvider, m_sdlTypeListCompPtr);

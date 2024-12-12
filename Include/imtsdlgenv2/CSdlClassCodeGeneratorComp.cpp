@@ -521,7 +521,24 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 	stream << QStringLiteral("()\n{\n}");
 	FeedStream(stream, 3, false);
 
-	// b) Implement copy assignment operator (non copy-and-swap idiom)
+	// b) Implement copy constructor
+	stream << 'C' << sdlType.GetName() << ':' << ':';
+	stream << sdlVersion << ':' << ':';
+	stream << sdlVersion;
+	stream << QStringLiteral("(const ");
+	stream << sdlVersion;
+	stream << QStringLiteral("& other)");
+	FeedStream(stream, 1, false);
+
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	WriteTakeOverPropsFromOtherObject(stream, sdlType);
+
+	stream << '}';
+	FeedStream(stream, 3, false);
+
+	// c) Implement copy assignment operator (non copy-and-swap idiom)
 	stream << 'C' << sdlType.GetName() << ':' << ':';
 	stream << sdlVersion;
 	stream << ' ' << 'C' << sdlType.GetName() << ':' << ':';
@@ -534,23 +551,9 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	const imtsdl::SdlFieldList fields = sdlType.GetFields();
-	for (int i = 0; i < fields.size(); ++i){
-		const imtsdl::CSdlField& field = fields[i];
-		const QString convertedType = OptListConvertTypeWithNamespaceStruct(field, sdlNamespace, *m_sdlTypeListCompPtr, true);
-		FeedStreamHorizontally(stream, 1);
-		stream << field.GetId();
-		stream << QStringLiteral(" = std::unique_ptr<");
-		stream << convertedType;
-		stream << QStringLiteral(">(new ");
-		stream << convertedType;
-		stream << QStringLiteral("(*other.");
-		stream << field.GetId();
-		stream << QStringLiteral("))");
-		stream << ';';
-		FeedStream(stream, 1, false);
-	}
+	WriteTakeOverPropsFromOtherObject(stream, sdlType);
 	FeedStream(stream, 1, false);
+
 	FeedStreamHorizontally(stream, 1);
 	stream << QStringLiteral("return *this;");
 	FeedStream(stream, 1, false);
@@ -732,7 +735,7 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 	stream << sdlVersion;
 	stream << QStringLiteral("(const ");
 	stream << sdlVersion;
-	stream << QStringLiteral("& other) { *this = other; }");
+	stream << QStringLiteral("& other);");
 	FeedStream(stream, 2, false);
 
 	// add types members
@@ -773,6 +776,27 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 	FeedStreamHorizontally(stream, indents);
 	stream << '}' << ';';
 	FeedStream(stream, 1, false);
+}
+
+void CSdlClassCodeGeneratorComp::WriteTakeOverPropsFromOtherObject(QTextStream& stream, const imtsdl::CSdlType& sdlType) const
+{
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
+	const imtsdl::SdlFieldList fields = sdlType.GetFields();
+	for (int i = 0; i < fields.size(); ++i){
+		const imtsdl::CSdlField& field = fields[i];
+		const QString convertedType = OptListConvertTypeWithNamespaceStruct(field, sdlNamespace, *m_sdlTypeListCompPtr, true);
+		FeedStreamHorizontally(stream, 1);
+		stream << field.GetId();
+		stream << QStringLiteral(" = std::unique_ptr<");
+		stream << convertedType;
+		stream << QStringLiteral(">(new ");
+		stream << convertedType;
+		stream << QStringLiteral("(*other.");
+		stream << field.GetId();
+		stream << QStringLiteral("))");
+		stream << ';';
+		FeedStream(stream, 1, false);
+	}
 }
 
 
