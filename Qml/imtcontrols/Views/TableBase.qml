@@ -881,6 +881,12 @@ Rectangle {
 		}
 
 		tableContainer.setWidth();
+
+		if(tableContainer.isFlickable){
+			if(tableContainer.contentWidth < elementsListObj.width){
+				fitToWidth();
+			}
+		}
 	}
 
 	function fitToWidth(){
