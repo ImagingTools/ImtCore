@@ -1323,6 +1323,9 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 		}
 	}
 
+	if (aSdlField.GetType() == typeName){
+		return true;
+	}
 
 	return false;
 }
