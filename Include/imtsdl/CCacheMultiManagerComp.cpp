@@ -68,7 +68,7 @@ void CCacheMultiManagerComp::OnComponentCreated()
 
 	const QStringList additionalCaches = m_argumentParserCompPtr->GetAdditionalCachePaths();
 	for (const QString& additionalCachePath: additionalCaches){
-		std::shared_ptr<CCacheController> cacheControllerPtr;
+		std::shared_ptr<CCacheController> cacheControllerPtr(new CCacheController);
 		SetLog(*cacheControllerPtr);
 		std::shared_ptr<QFile> additionalCacheFilePtr(new QFile(additionalCachePath));
 		cacheControllerPtr->SetOperationalDevice(additionalCacheFilePtr);
