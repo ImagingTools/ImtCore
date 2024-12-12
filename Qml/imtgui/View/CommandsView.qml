@@ -192,7 +192,7 @@ Item {
                             }
 
                             onItemAdded: {
-                                if (!item || !item.modelData.Id){
+								if (!item || !item.modelData){
                                     return;
                                 }
 
