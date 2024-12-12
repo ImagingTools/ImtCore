@@ -867,7 +867,7 @@ Rectangle {
 
 					if (visible){
 						tableContainer.widthDecorator.setData("WidthPercent", size, i)
-						tableContainer.widthDecorator.setData("Width", (size / 100) * elementsListObj.width, i) //(size / 100) * elementsListObj.width ??
+						tableContainer.widthDecorator.setData("Width", size, i)
 					}
 					else{
 						tableContainer.widthDecorator.setData("WidthPercent", 0, i)
