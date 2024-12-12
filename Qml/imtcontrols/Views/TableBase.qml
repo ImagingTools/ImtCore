@@ -772,7 +772,7 @@ Rectangle {
 		anchors.topMargin: 1;
 
 		secondSize: 10;
-
+		allowableGapHor: 3;
 		vertical: false;
 		targetItem: elementsListObj;
 	}
@@ -882,11 +882,6 @@ Rectangle {
 
 		tableContainer.setWidth();
 
-		if(tableContainer.isFlickable){
-			if(tableContainer.contentWidth < elementsListObj.width){
-				fitToWidth();
-			}
-		}
 	}
 
 	function fitToWidth(){
@@ -967,6 +962,14 @@ Rectangle {
 
 		tableContainer.widthRecalc();
 
+	}
+
+	function fitToWidthOptional(){
+		if(tableContainer.isFlickable){
+			if(tableContainer.contentWidth < elementsListObj.width){
+				fitToWidth();
+			}
+		}
 	}
 }
 

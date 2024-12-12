@@ -237,6 +237,7 @@ Dialog {
 				dialog.tableItem.tableViewParams.copyFrom(dialog.tableViewParamsCopied);
 
 				dialog.tableItem.updateWidthFromViewParams();
+				dialog.tableItem.fitToWidthOptional();
 				dialog.tableItem.tableViewParamsAccepted();
 			}
 		}

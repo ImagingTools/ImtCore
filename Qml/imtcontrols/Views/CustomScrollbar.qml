@@ -9,7 +9,7 @@ Rectangle{
     color: backgroundColor;
     radius: 2;
 
-    visible: vertical ? targetItem.contentHeight > scrollContainer.height : targetItem.contentWidth > scrollContainer.width;
+	visible: vertical ? targetItem.contentHeight - allowableGapVert > scrollContainer.height : targetItem.contentWidth - allowableGapHor > scrollContainer.width;
 
     property var targetItem: null;
 
@@ -54,6 +54,9 @@ Rectangle{
     property real scrollIndicatorX: scrollIndicator.x;
 
     property real secondSizeDecorator: !decorator_ ? 0 : vertical ? decorator_.background.width : decorator_.background.height;
+
+	property real allowableGapHor: 0;
+	property real allowableGapVert: 0;
 
     signal contentXSignal(real contentX);
     signal contentYSignal(real contentY);
@@ -144,10 +147,10 @@ Rectangle{
         }
         if(targetItem){
             if(vertical){
-                visible = targetItem.contentHeight > scrollContainer.height;
+				visible = targetItem.contentHeight - allowableGapVert > scrollContainer.height;
             }
             else {
-                visible = targetItem.contentWidth > scrollContainer.width;
+				visible = targetItem.contentWidth - allowableGapHor > scrollContainer.width;
             }
         }
     }
