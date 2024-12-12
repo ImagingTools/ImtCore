@@ -106,7 +106,7 @@ bool CTableViewParamRepresentationControllerComp::GetDataModelFromRepresentation
 		}
 
 		if (representation.ContainsKey("Size", i)){
-			int size = representation.GetData("Size", i).toInt();
+			double size = representation.GetData("Size", i).toDouble();
 			headerInfo.size = size;
 		}
 

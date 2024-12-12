@@ -15,7 +15,7 @@ public:
 	struct HeaderInfo
 	{
 		QByteArray headerId;
-		int size;
+		double size = 0;
 		bool visible = false;
 		int order = 0;
 
