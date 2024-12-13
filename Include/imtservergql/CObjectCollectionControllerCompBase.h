@@ -108,6 +108,7 @@ protected:
 	virtual int GetMimeTypeIndex(const QString& mimeType) const;
 	virtual QString GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const;
 	virtual QString GetExportFileName(const QByteArray& objectId) const;
+	virtual bool UpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QString& errorMessage) const;
 
 	/**
 		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.

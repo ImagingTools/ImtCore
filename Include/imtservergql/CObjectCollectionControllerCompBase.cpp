@@ -416,13 +416,17 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	QString name = inputParamPtr->GetFieldArgumentValue("name").toString();
 	QString description = inputParamPtr->GetFieldArgumentValue("description").toString();
 
-	istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
-	if (savedObjectPtr == nullptr){
-		if (errorMessage.isEmpty()){
-			errorMessage = QString("Can not create object for update: '%1'").arg(qPrintable(objectId));
-		}
+	imtbase::IObjectCollection::DataPtr savedObjectPtr;
+	if (!m_objectCollectionCompPtr->GetObjectData(objectId, savedObjectPtr)){
+		errorMessage = QString("Can't get object from collection: '%1'").arg(qPrintable(objectId));
 
-		SendErrorMessage(0, errorMessage, "Object collection controller");
+		return nullptr;
+	}
+
+	Q_ASSERT(savedObjectPtr.IsValid());
+
+	if (!UpdateObjectFromRequest(gqlRequest, *savedObjectPtr, errorMessage)){
+		errorMessage = QString("Can't update object in the collection: '%1'. Error: %2").arg(qPrintable(objectId)).arg(errorMessage);
 
 		return nullptr;
 	}
@@ -1263,6 +1267,12 @@ QString CObjectCollectionControllerCompBase::GetExportFileName(const QByteArray&
 	}
 
 	return objectName;
+}
+
+
+bool CObjectCollectionControllerCompBase::UpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QString& errorMessage) const
+{
+	return false;
 }
 
 
