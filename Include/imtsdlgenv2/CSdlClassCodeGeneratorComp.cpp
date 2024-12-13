@@ -778,6 +778,7 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 	FeedStream(stream, 1, false);
 }
 
+
 void CSdlClassCodeGeneratorComp::WriteTakeOverPropsFromOtherObject(QTextStream& stream, const imtsdl::CSdlType& sdlType) const
 {
 	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
@@ -785,7 +786,14 @@ void CSdlClassCodeGeneratorComp::WriteTakeOverPropsFromOtherObject(QTextStream& 
 	for (int i = 0; i < fields.size(); ++i){
 		const imtsdl::CSdlField& field = fields[i];
 		const QString convertedType = OptListConvertTypeWithNamespaceStruct(field, sdlNamespace, *m_sdlTypeListCompPtr, true);
+		// check if a pointer is NOT NULL
 		FeedStreamHorizontally(stream, 1);
+		stream << QStringLiteral("if (other.");
+		stream << field.GetId();
+		stream << QStringLiteral("){");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 2);
 		stream << field.GetId();
 		stream << QStringLiteral(" = std::unique_ptr<");
 		stream << convertedType;
@@ -795,6 +803,10 @@ void CSdlClassCodeGeneratorComp::WriteTakeOverPropsFromOtherObject(QTextStream& 
 		stream << field.GetId();
 		stream << QStringLiteral("))");
 		stream << ';';
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 1);
+		stream << '}';
 		FeedStream(stream, 1, false);
 	}
 }
