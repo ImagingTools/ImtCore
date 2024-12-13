@@ -39,7 +39,7 @@ class CGqlSchemaParser:
 			virtual public ISdlRequestListProvider,
 			virtual public ISdlEnumListProvider,
 			virtual protected istd::ILogger,
-			private CSdlEnumConverter
+			protected CSdlEnumConverter
 {
 
 	Q_DISABLE_COPY(CGqlSchemaParser)

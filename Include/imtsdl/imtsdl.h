@@ -33,6 +33,19 @@ struct SdlCustomSchemaKeys
 	static const inline QString SchemaName = QStringLiteral("name");
 	static const inline QString SchemaNamespace = QStringLiteral("namespace");
 	static const inline QString VersionName = QStringLiteral("version");
+	static const inline QString EnumConversionType = QStringLiteral("enumConversion");
+};
+
+
+struct EnumConversionTypes
+{
+	static const inline QString AsIs = QStringLiteral("asIs");
+	static const inline QString UpperCamel = QStringLiteral("upperCamel");
+	static const inline QString LowerCamel = QStringLiteral("lowerCamel");
+	static const inline QString UpperSnake = QStringLiteral("upperSnake");
+	static const inline QString LowerSnake = QStringLiteral("lowerSnake");
+	static const inline QString UpperKebab = QStringLiteral("upperKebab");
+	static const inline QString LowerKebab = QStringLiteral("lowerKebab");
 };
 
 

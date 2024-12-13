@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtsdl/CSdlTools.h>
+#include <imtsdl/CSdlEnumConverter.h>
 
 
 
@@ -279,6 +280,51 @@ bool CGqlExtSchemaParser::ProcessCustomSchemaValue(const QString& key, const QSt
 				SdlCustomSchemaKeys::SchemaNamespace,
 				SdlCustomSchemaKeys::VersionName
 	};
+
+	// setup default enum conversion
+	if (key == SdlCustomSchemaKeys::EnumConversionType){
+		if (value == EnumConversionTypes::AsIs){
+			CSdlEnumConverter::s_defaultConversionType = CSdlEnumConverter::CT_AS_IS;
+		}
+		else if (value == EnumConversionTypes::UpperCamel){
+			CSdlEnumConverter::s_defaultConversionType = CSdlEnumConverter::CT_UPPER_CAMEL_CASE;
+		}
+		else if (value == EnumConversionTypes::LowerCamel){
+			CSdlEnumConverter::s_defaultConversionType = CSdlEnumConverter::CT_LOWER_CAMEL_CASE;
+		}
+		else if (value == EnumConversionTypes::UpperSnake){
+			CSdlEnumConverter::s_defaultConversionType = CSdlEnumConverter::CT_UPPER_SNAKE_CASE;
+		}
+		else if (value == EnumConversionTypes::LowerSnake){
+			CSdlEnumConverter::s_defaultConversionType = CSdlEnumConverter::CT_LOWER_SNAKE_CASE;
+		}
+		else if (value == EnumConversionTypes::UpperKebab){
+			CSdlEnumConverter::s_defaultConversionType = CSdlEnumConverter::CT_UPPER_KEBAB_CASE;
+		}
+		else if (value == EnumConversionTypes::LowerKebab){
+			CSdlEnumConverter::s_defaultConversionType = CSdlEnumConverter::CT_LOWER_KEBAB_CASE;
+		}
+		else {
+			SendLogMessage(
+				istd::IInformationProvider::IC_ERROR,
+				0,
+				QString("Unexpected enumConversion type. Actual: '%1'. Expected one of: {%2}.").arg(
+							value,
+							QStringList({
+										EnumConversionTypes::AsIs,
+										EnumConversionTypes::UpperCamel,
+										EnumConversionTypes::LowerCamel,
+										EnumConversionTypes::UpperSnake,
+										EnumConversionTypes::LowerSnake,
+										EnumConversionTypes::UpperKebab,
+										EnumConversionTypes::LowerKebab}).join("|")),
+				__func__);
+
+			return false;
+		}
+
+		return true;
+	}
 
 	if (acceptableKeys.contains(key)){
 		iprm::CTextParam* nameParamPtr = new iprm::CTextParam;

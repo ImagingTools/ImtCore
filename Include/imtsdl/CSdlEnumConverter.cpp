@@ -16,6 +16,12 @@ namespace imtsdl
 {
 
 
+// static variables
+CSdlEnumConverter::ConversionType CSdlEnumConverter::s_defaultConversionType = CSdlEnumConverter::CT_AS_IS;
+
+
+// public methods
+
 QString CSdlEnumConverter::ConvertEnumValueToStringEquivalent(const QString& enumValue, ConversionType conversionType)
 {
 	if (conversionType == CT_AS_IS){

@@ -18,6 +18,8 @@ namespace imtsdl
 
 class CSdlEnumConverter
 {
+
+
 public:
 	enum ConversionType
 	{
@@ -30,8 +32,15 @@ public:
 		CT_LOWER_KEBAB_CASE		///< \example lower-kebab-case
 	};
 
+	// static variables
+	/**
+		\brief Defines a default type to conversion.
+		\warning If a change is required, it MUST ONLY be made during the process of parsing the scheme.
+	*/
+	static ConversionType s_defaultConversionType;
+
 	// conversion methods
-	[[nodiscard]] static QString ConvertEnumValueToStringEquivalent(const QString& enumValue, ConversionType conversionType = CT_AS_IS);
+	[[nodiscard]] static QString ConvertEnumValueToStringEquivalent(const QString& enumValue, ConversionType conversionType = s_defaultConversionType);
 
 	// generate methods
 	static void WriteConversionFromEnum(
@@ -48,9 +57,6 @@ public:
 				const QString& targetVariableName,
 				const QString& relatedNamespace,
 				uint hIndents = 1);
-
-private:
-
 };
 
 
