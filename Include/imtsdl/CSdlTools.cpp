@@ -103,8 +103,7 @@ QString CSdlTools::OptListConvertTypeWithNamespace(
 			typeNamespace = typeForField.GetNamespace();
 		}
 		else {
-			typeNamespace = BuildNamespaceFromParams(enumForField.GetSchemaParams()) ;
-			typeNamespace += QStringLiteral("::") + enumForField.GetName();
+			typeNamespace = BuildNamespaceFromParams(enumForField.GetSchemaParams());
 		}
 		if (typeNamespace != relatedNamespace){
 			while (!typeNamespace.endsWith(QStringLiteral("::"))){

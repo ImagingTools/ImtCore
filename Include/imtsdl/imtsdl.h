@@ -58,11 +58,14 @@ enum Priority
 	P_IMT,
 	P_CUSTOM
 };
+
+
 enum Type
 {
 	T_HEADER,
 	T_SOURCE
 };
+
 
 struct IncludeDirective
 {
@@ -71,5 +74,6 @@ struct IncludeDirective
 	QString path;
 	Type type = T_HEADER;
 };
+
 
 } // namespace imtsdl

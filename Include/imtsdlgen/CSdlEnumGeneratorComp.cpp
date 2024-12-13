@@ -96,9 +96,6 @@ int CSdlEnumGeneratorComp::DoProcessing(
 
 		// namespace begin
 		QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
-		// add enum name to end of namespace, toprevent usage for same names in differrent namespaces
-		sdlNamespace += QStringLiteral("::");
-		sdlNamespace += sdlEnum.GetName();
 
 		stream << QStringLiteral("namespace ");
 		stream << sdlNamespace;
@@ -106,7 +103,7 @@ int CSdlEnumGeneratorComp::DoProcessing(
 		FeedStream(stream, 3, false);
 
 		// enum create
-		stream << QStringLiteral("enum ");
+		stream << QStringLiteral("enum class ");
 		stream << sdlEnum.GetName();
 		stream << QStringLiteral(" {");
 		FeedStream(stream, 1, false);
