@@ -1270,8 +1270,13 @@ QString CObjectCollectionControllerCompBase::GetExportFileName(const QByteArray&
 }
 
 
-bool CObjectCollectionControllerCompBase::UpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QString& errorMessage) const
+bool CObjectCollectionControllerCompBase::UpdateObjectFromRequest(
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	istd::IChangeable& /*object*/,
+	QString& /*errorMessage*/) const
 {
+	SendErrorMessage(0, "Unimplemented 'UpdateObjectFromRequest' method call!", "CObjectCollectionControllerCompBase::UpdateObjectFromRequest");
+
 	return false;
 }
 
