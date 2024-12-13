@@ -210,7 +210,6 @@ void CSdlEnumConverter::WriteConversionFromString(
 
 	bool isFirstIteration = true;
 	for (const auto& enumValue: sdlEnum.GetValues()){
-
 		CSdlTools::FeedStreamHorizontally(stream, hIndents);
 		if (!isFirstIteration){
 			stream << QStringLiteral("else ");
@@ -237,6 +236,20 @@ void CSdlEnumConverter::WriteConversionFromString(
 
 		isFirstIteration = false;
 	}
+	// add default exit
+	CSdlTools::FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("else {");
+	CSdlTools::FeedStream(stream, 1, false);
+
+	/// \todo add error message with text here
+
+	CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return false;");
+	CSdlTools::FeedStream(stream, 1, false);
+
+	CSdlTools::FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	CSdlTools::FeedStream(stream, 1, false);
 }
 
 
