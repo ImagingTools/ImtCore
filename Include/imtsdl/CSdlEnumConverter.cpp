@@ -150,9 +150,6 @@ void CSdlEnumConverter::WriteConversionFromEnum(
 	for (const auto& enumValue: sdlEnum.GetValues()){
 		CSdlTools::FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("case ");
-		CSdlTools::FeedStream(stream, 1, false);
-
-		CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
 		stream << completeTypeName;
 		stream << ':' << ':';
 		stream << enumValue.first;
