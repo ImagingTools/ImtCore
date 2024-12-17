@@ -27,12 +27,14 @@ bool CSdlGeneralManagerComp::CreateCode()
 		return BaseClass::CreateCode();
 	}
 
-	Q_ASSERT(m_cacheGeneratorPtr.IsValid());
-	int cacheDenerationResult = m_cacheGeneratorPtr->DoProcessing(nullptr, nullptr, nullptr);
-	if (cacheDenerationResult != iproc::IProcessor::TS_OK){
-		SendErrorMessage(0, "Unable to generate cache");
+	if (!m_sdlArgumentParserV2CompPtr->IsSchemaDependencyModeEnabled()){
+		Q_ASSERT(m_cacheGeneratorPtr.IsValid());
+		int cacheDenerationResult = m_cacheGeneratorPtr->DoProcessing(nullptr, nullptr, nullptr);
+		if (cacheDenerationResult != iproc::IProcessor::TS_OK){
+			SendErrorMessage(0, "Unable to generate cache");
 
-		return false;
+			return false;
+		}
 	}
 
 	// create V2 code

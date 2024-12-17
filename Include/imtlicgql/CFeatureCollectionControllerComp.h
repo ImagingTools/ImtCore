@@ -22,23 +22,23 @@ public:
 
 protected:
 	bool CreateFeatureFromRepresentationModel(
-				const sdl::imtlic::Features::V1_0::CFeatureData& featureRepresentationData,
+				const sdl::imtlic::Features::CFeatureData::V1_0& featureRepresentationData,
 				const QByteArray& rootFeatureId,
 				imtlic::CFeatureInfo& featureInfo,
 				QString& errorMessage) const;
 	bool CreateRepresentationModelFromFeatureInfo(
 				const imtlic::CFeatureInfo& featureInfo,
-				sdl::imtlic::Features::V1_0::CFeatureData& featureRepresentationData,
+				sdl::imtlic::Features::CFeatureData::V1_0& featureRepresentationData,
 				QString& errorMessage) const;
 
 	// reimplemented (sdl::imtlic::Features::V1_0::CFeatureCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 				const sdl::imtlic::Features::V1_0::CFeaturesListGqlRequest& featuresListRequest,
-				sdl::imtlic::Features::V1_0::CFeatureItem& representationObject,
+				sdl::imtlic::Features::CFeatureItem::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
-				const sdl::imtlic::Features::V1_0::CFeatureData& featureDataRepresentation,
+				const sdl::imtlic::Features::CFeatureData::V1_0& featureDataRepresentation,
 				QByteArray& newObjectId,
 				QString& name,
 				QString& description,
@@ -46,7 +46,12 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const sdl::imtlic::Features::V1_0::CGetFeatureItemGqlRequest& featureItemRequest,
-				sdl::imtlic::Features::V1_0::CFeatureDataPayload& representationPayload,
+				sdl::imtlic::Features::CFeatureDataPayload::V1_0& representationPayload,
+				QString& errorMessage) const override;
+	virtual bool UpdateObjectFromRepresentationRequest(
+				const ::imtgql::CGqlRequest& rawGqlRequest,
+				const sdl::imtlic::Features::V1_0::CUpdateFeatureGqlRequest& updateFeatureRequest,
+				istd::IChangeable& object,
 				QString& errorMessage) const override;
 
 private:

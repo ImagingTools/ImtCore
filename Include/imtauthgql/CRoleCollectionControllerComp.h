@@ -28,10 +28,10 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 				const sdl::imtauth::Roles::V1_0::CRolesListGqlRequest& rolesListRequest,
-				sdl::imtauth::Roles::V1_0::CRoleItem& representationObject,
+				sdl::imtauth::Roles::CRoleItem::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
-				const sdl::imtauth::Roles::V1_0::CRoleData& roleDataRepresentation,
+				const sdl::imtauth::Roles::CRoleData::V1_0& roleDataRepresentation,
 				QByteArray& newObjectId,
 				QString& name,
 				QString& description,
@@ -39,7 +39,12 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const sdl::imtauth::Roles::V1_0::CRoleItemGqlRequest& roleItemRequest,
-				sdl::imtauth::Roles::V1_0::CRoleDataPayload& representationPayload,
+				sdl::imtauth::Roles::CRoleDataPayload::V1_0& representationPayload,
+				QString& errorMessage) const override;
+	virtual bool UpdateObjectFromRepresentationRequest(
+				const ::imtgql::CGqlRequest& rawGqlRequest,
+				const sdl::imtauth::Roles::V1_0::CRoleUpdateGqlRequest& roleUpdateRequest,
+				istd::IChangeable& object,
 				QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	void SetObjectFilter(

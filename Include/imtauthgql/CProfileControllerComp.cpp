@@ -19,20 +19,27 @@ namespace imtauthgql
 
 // reimplemented (sdl::imtauth::Profile::V1_0::CGraphQlHandlerCompBase)
 
-sdl::imtauth::Profile::V1_0::CProfileData CProfileControllerComp::OnGetProfile(
+sdl::imtauth::Profile::CProfileData::V1_0 CProfileControllerComp::OnGetProfile(
 			const sdl::imtauth::Profile::V1_0::CGetProfileGqlRequest& getProfileRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Profile::V1_0::CProfileData profileData;
+	sdl::imtauth::Profile::CProfileData::V1_0 profileData;
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CProfileControllerComp");
 		return profileData;
 	}
 
-	QByteArray objectId = getProfileRequest.GetRequestedArguments().input.GetId();
-	QByteArray productId = getProfileRequest.GetRequestedArguments().input.GetProductId();
+	sdl::imtauth::Profile::CGetProfileInput::V1_0 inputArgument = getProfileRequest.GetRequestedArguments().input;
+	QByteArray objectId;
+	if (inputArgument.id){
+		objectId = *inputArgument.id;
+	}
+	QByteArray productId;
+	if (inputArgument.productId){
+		productId = *inputArgument.productId;
+	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -48,17 +55,17 @@ sdl::imtauth::Profile::V1_0::CProfileData CProfileControllerComp::OnGetProfile(
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
 		if (systemInfo.enabled){
-			profileData.SetSystemId(systemInfo.systemId);
+			profileData.systemId.reset(new QByteArray(systemInfo.systemId));
 			break;
 		}
 	}
 
-	profileData.SetId(objectId);
-	profileData.SetName(userInfoPtr->GetName());
-	profileData.SetEmail(userInfoPtr->GetMail());
-	profileData.SetUsername(userInfoPtr->GetId());
+	profileData.id.reset(new QByteArray(objectId));
+	profileData.name.reset(new QString(userInfoPtr->GetName()));
+	profileData.email.reset(new QString(userInfoPtr->GetMail()));
+	profileData.username.reset(new QString(userInfoPtr->GetId()));
 
-	QList<sdl::imtauth::Profile::V1_0::CRoleInfo> roleList;
+	QList<sdl::imtauth::Profile::CRoleInfo::V1_0> roleList;
 
 	if (m_roleCollectionCompPtr.IsValid()){
 		QByteArrayList roles = userInfoPtr->GetRoles(productId);
@@ -68,10 +75,10 @@ sdl::imtauth::Profile::V1_0::CProfileData CProfileControllerComp::OnGetProfile(
 			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){
 				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
 				if (roleInfoPtr != nullptr){
-					sdl::imtauth::Profile::V1_0::CRoleInfo info;
-					info.SetId(roleInfoPtr->GetRoleId());
-					info.SetName(roleInfoPtr->GetRoleName());
-					info.SetDescription(roleInfoPtr->GetRoleDescription());
+					sdl::imtauth::Profile::CRoleInfo::V1_0 info;
+					info.id.reset(new QByteArray(roleInfoPtr->GetRoleId()));
+					info.name.reset(new QString(roleInfoPtr->GetRoleName()));
+					info.description.reset(new QString(roleInfoPtr->GetRoleDescription()));
 
 					roleList << info;
 				}
@@ -79,9 +86,9 @@ sdl::imtauth::Profile::V1_0::CProfileData CProfileControllerComp::OnGetProfile(
 		}
 	}
 
-	profileData.SetRoles(roleList);
+	profileData.roles = std::make_unique<QList<sdl::imtauth::Profile::CRoleInfo::V1_0>>(roleList);
 
-	QList<sdl::imtauth::Profile::V1_0::CGroupInfo> groupList;
+	QList<sdl::imtauth::Profile::CGroupInfo::V1_0> groupList;
 
 	if (m_groupCollectionCompPtr.IsValid()){
 		QByteArrayList groups = userInfoPtr->GetGroups();
@@ -91,11 +98,11 @@ sdl::imtauth::Profile::V1_0::CProfileData CProfileControllerComp::OnGetProfile(
 			if (m_groupCollectionCompPtr->GetObjectData(groupId, groupDataPtr)){
 				const imtauth::IUserGroupInfo* groupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
 				if (groupInfoPtr != nullptr){
-					sdl::imtauth::Profile::V1_0::CGroupInfo info;
+					sdl::imtauth::Profile::CGroupInfo::V1_0 info;
 
-					info.SetId(groupInfoPtr->GetId());
-					info.SetName(groupInfoPtr->GetName());
-					info.SetDescription(groupInfoPtr->GetDescription());
+					info.id.reset(new QByteArray(groupInfoPtr->GetId()));
+					info.name.reset(new QString(groupInfoPtr->GetName()));
+					info.description.reset(new QString(groupInfoPtr->GetDescription()));
 
 					groupList << info;
 				}
@@ -103,9 +110,9 @@ sdl::imtauth::Profile::V1_0::CProfileData CProfileControllerComp::OnGetProfile(
 		}
 	}
 
-	profileData.SetGroups(groupList);
+	profileData.groups = std::make_unique<QList<sdl::imtauth::Profile::CGroupInfo::V1_0>>(groupList);
 
-	QList<sdl::imtauth::Profile::V1_0::CPermissionInfo> permissionList;
+	QList<sdl::imtauth::Profile::CPermissionInfo::V1_0> permissionList;
 
 	if (m_productInfoCompPtr.IsValid()){
 		imtbase::IObjectCollection* featureCollectionPtr = m_productInfoCompPtr->GetFeatures();
@@ -120,11 +127,11 @@ sdl::imtauth::Profile::V1_0::CProfileData CProfileControllerComp::OnGetProfile(
 							if (permissions.contains(subFeatureId)){
 								const imtlic::IFeatureInfo* subFeatureInfoPtr = featureInfoPtr->GetSubFeature(subFeatureId);
 								if (subFeatureInfoPtr != nullptr){
-									sdl::imtauth::Profile::V1_0::CPermissionInfo info;
+									sdl::imtauth::Profile::CPermissionInfo::V1_0 info;
 
-									info.SetId(subFeatureInfoPtr->GetFeatureId());
-									info.SetName(subFeatureInfoPtr->GetFeatureName());
-									info.SetDescription(subFeatureInfoPtr->GetFeatureDescription());
+									info.id.reset(new QByteArray(subFeatureInfoPtr->GetFeatureId()));
+									info.name.reset(new QString(subFeatureInfoPtr->GetFeatureName()));
+									info.description.reset(new QString(subFeatureInfoPtr->GetFeatureDescription()));
 
 									permissionList << info;
 								}
@@ -136,25 +143,29 @@ sdl::imtauth::Profile::V1_0::CProfileData CProfileControllerComp::OnGetProfile(
 		}
 	}
 
-	profileData.SetPermissions(permissionList);
+	profileData.permissions = std::make_unique<QList<sdl::imtauth::Profile::CPermissionInfo::V1_0>>(permissionList);
 
 	return profileData;
 }
 
 
-sdl::imtauth::Profile::V1_0::CSetProfileResponse CProfileControllerComp::OnSetProfile(
+sdl::imtauth::Profile::CSetProfileResponse::V1_0 CProfileControllerComp::OnSetProfile(
 			const sdl::imtauth::Profile::V1_0::CSetProfileGqlRequest& setProfileRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Profile::V1_0::CSetProfileResponse response;
+	sdl::imtauth::Profile::CSetProfileResponse::V1_0 response;
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CProfileControllerComp");
 		return response;
 	}
 
-	QByteArray id = setProfileRequest.GetRequestedArguments().input.GetId();
+	sdl::imtauth::Profile::CSetProfileInput::V1_0 inputArgument = setProfileRequest.GetRequestedArguments().input;
+	QByteArray id;
+	if (inputArgument.id){
+		id = *inputArgument.id;
+	}
 
 	imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -167,8 +178,14 @@ sdl::imtauth::Profile::V1_0::CSetProfileResponse CProfileControllerComp::OnSetPr
 		return response;
 	}
 
-	QString name = setProfileRequest.GetRequestedArguments().input.GetName();
-	QString email = setProfileRequest.GetRequestedArguments().input.GetEmail();
+	QString name;
+	if (inputArgument.name){
+		name = *inputArgument.name;
+	}
+	QString email;
+	if (inputArgument.email){
+		email = *inputArgument.email;
+	}
 
 	userInfoPtr->SetName(name);
 	userInfoPtr->SetMail(email);
@@ -178,7 +195,7 @@ sdl::imtauth::Profile::V1_0::CSetProfileResponse CProfileControllerComp::OnSetPr
 		return response;
 	}
 
-	response.SetStatus(true);
+	response.status.reset(new bool(true));
 
 	return response;
 }

@@ -46,7 +46,7 @@ type Receipt {
 	MachineNumber: String
 	OperatorData: Operator
 	Client: Client
-	Items: [Item!]! 
+	Items: [Item!]!
 	Payments: [Payment]
 }
 
@@ -55,6 +55,40 @@ type RegistrationResult {
 	StatusString: String
 }
 
+input ReceiptRequest {
+	AbonentId: String
+	BeginDate: Integer	#< UNIX TIME
+	EndDate: Integer	#< UNIX TIME
+}
+
+type ReceiptItem {
+	Receipt: Receipt!
+	Date: Integer	#< UNIX TIME
+}
+
+type ReceiptReply {
+	items: [ReceiptItem]
+}
+
+type Query {
+	GetReceipts(input: ReceiptRequest): ReceiptReply
+}
+
 type Mutation {
 	AddReceipt(input: Receipt): RegistrationResult
+}
+
+collectionSchema {
+	type Receipt {
+		ref: ReceiptItem
+		operations {
+			list: GetReceipts
+		}
+		subtype Receipt {
+		ref: Receipt
+			operations {
+				insert: AddReceipt
+			}
+		}
+	}
 }

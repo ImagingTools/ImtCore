@@ -396,7 +396,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRe
 	// MAIN CONSTRUCTOR + PARSING
 	FeedStream(ifStream, 2, false);
 	ifStream << className << ':' << ':' << className;
-	ifStream << QStringLiteral("(const ::imtgql::CGqlRequest& gqlRequest)");
+	ifStream << QStringLiteral("(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)");
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream);
@@ -711,7 +711,7 @@ void CGqlWrapClassCodeGeneratorComp::AddMethodDeclarations(QTextStream& stream, 
 
 	// default constructor with GraphQL request
 	FeedStreamHorizontally(stream);
-	stream << 'C' << sdlRequest.GetName() << QStringLiteral("GqlRequest (const ::imtgql::CGqlRequest& gqlRequest);");
+	stream << 'C' << sdlRequest.GetName() << QStringLiteral("GqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead);");
 	FeedStream(stream, 1, false);
 
 	// validation method

@@ -52,6 +52,14 @@ void CCacheMultiManagerComp::OnComponentCreated()
 
 	const QString cachePath = QDir::cleanPath(m_argumentParserCompPtr->GetCachePath());
 	if (!cachePath.isEmpty()){
+		// Create cache dir
+		QFileInfo cacheFileInfo(cachePath);
+		QDir cacheDir;
+		const bool isCreated = cacheDir.mkpath(cacheFileInfo.absoluteDir().absolutePath());
+		if (!isCreated){
+			SendErrorMessage(0, QString("Unable to create path: '%1'.").arg(cacheFileInfo.absoluteDir().absolutePath()));
+		}
+
 		std::shared_ptr<QFile> cacheFilePtr(new QFile(cachePath));
 		bool deviceSetted = m_mainCacheControllerPtr->SetOperationalDevice(cacheFilePtr);
 		if (!deviceSetted){
@@ -68,6 +76,14 @@ void CCacheMultiManagerComp::OnComponentCreated()
 
 	const QStringList additionalCaches = m_argumentParserCompPtr->GetAdditionalCachePaths();
 	for (const QString& additionalCachePath: additionalCaches){
+		// create a path for all caches
+		QFileInfo cacheFileInfo(additionalCachePath);
+		QDir cacheDir;
+		const bool isCreated = cacheDir.mkpath(cacheFileInfo.absoluteDir().absolutePath());
+		if (!isCreated){
+			SendErrorMessage(0, QString("Unable to create path: '%1'.").arg(cacheFileInfo.absoluteDir().absolutePath()));
+		}
+
 		std::shared_ptr<CCacheController> cacheControllerPtr(new CCacheController);
 		SetLog(*cacheControllerPtr);
 		std::shared_ptr<QFile> additionalCacheFilePtr(new QFile(additionalCachePath));

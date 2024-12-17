@@ -25,10 +25,10 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 				const sdl::imtlic::Licenses::V1_0::CLicensesListGqlRequest& licensesListRequest,
-				sdl::imtlic::Licenses::V1_0::CLicenseItem& representationObject,
+				sdl::imtlic::Licenses::CLicenseItem::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
-				const sdl::imtlic::Licenses::V1_0::CLicenseDefinitionData& licenseDataRepresentation,
+				const sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0& licenseDataRepresentation,
 				QByteArray& newObjectId,
 				QString& name,
 				QString& description,
@@ -36,7 +36,12 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const sdl::imtlic::Licenses::V1_0::CLicenseItemGqlRequest& licenseItemRequest,
-				sdl::imtlic::Licenses::V1_0::CLicenseDataPayload& representationPayload,
+				sdl::imtlic::Licenses::CLicenseDataPayload::V1_0& representationPayload,
+				QString& errorMessage) const override;
+	virtual bool UpdateObjectFromRepresentationRequest(
+				const ::imtgql::CGqlRequest& rawGqlRequest,
+				const sdl::imtlic::Licenses::V1_0::CLicenseUpdateGqlRequest& licenseUpdateRequest,
+				istd::IChangeable& object,
 				QString& errorMessage) const override;
 
 protected:

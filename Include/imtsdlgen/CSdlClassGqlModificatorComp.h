@@ -31,18 +31,18 @@ protected:
 
 private:
 	// read methods
-	void AddFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field);
-	void AddScalarFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field);
-	void AddScalarListFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field);
-	void AddCustomFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field);
-	void AddCustomListFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field);
+	void AddFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
+	void AddScalarFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
+	void AddScalarListFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
+	void AddCustomFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
+	void AddCustomListFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 
 	// write methods
-	void AddFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field);
-	void AddScalarFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
-	void AddScalarListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
-	void AddCustomFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
-	void AddCustomListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
+	void AddFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
+	void AddScalarFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents);
+	void AddScalarListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents);
+	void AddCustomFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents);
+	void AddCustomListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents);
 
 	// general help methods for scalar
 	void AddExtractValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
@@ -54,12 +54,12 @@ private:
 	void AddExtractCustomValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
 	/// \todo add error handling for it.
 	void AddCheckCustomRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
-	void AddSetCustomValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
+	void AddSetCustomValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents = 1);
 
 	// general help methods for custom list
 	/// \todo add error handling for it. do not forget about arrays and arrays.isEmpty
 	void AddCheckCustomListRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
-	void AddSetCustomListValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
+	void AddSetCustomListValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents = 1);
 
 	// general help methods for scalar list
 	/// \todo add error handling for it. do not forget about arrays and arrays.isEmpty

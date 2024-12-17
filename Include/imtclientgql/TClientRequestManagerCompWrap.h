@@ -28,7 +28,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	template<class SdlClass>
+	template<class SdlClass, class SdlReader = SdlClass>
 	bool SendModelRequest(const imtgql::IGqlRequest& request, SdlClass& responseModel) const
 	{
 		if (!m_apiClientCompPtr.IsValid()){
@@ -63,7 +63,7 @@ protected:
 
 				qDebug() << "response" << QJsonDocument(object).toJson();
 
-				return SdlClass::ReadFromJsonObject(responseModel, object);
+				return SdlReader::ReadFromJsonObject(responseModel, object);
 			}
 		}
 
@@ -77,12 +77,12 @@ protected:
 
 		bool ok = Request::SetupGqlRequest(gqlRequest, arguments);
 		if (ok){
-			ResponseData response;
-			if (!SendModelRequest(gqlRequest, response)){
+			typename ResponseData::V1_0 response;
+			if (!SendModelRequest<ResponseData::V1_0, ResponseData>(gqlRequest, response)){
 				return;
 			}
 
-			retVal = response.GetResult();
+			retVal = *response.result;
 		}
 	}
 

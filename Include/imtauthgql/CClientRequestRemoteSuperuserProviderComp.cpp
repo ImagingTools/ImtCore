@@ -16,19 +16,22 @@ namespace imtauthgql
 
 bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& /*errorMessage*/) const
 {
-	namespace userssdl = sdl::imtauth::Users::V1_0;
+	Q_ASSERT(m_superuserIdAttrPtr.IsValid());
+	Q_ASSERT(m_applicationInfoCompPtr.IsValid());
 
-	userssdl::UserItemRequestArguments arguments;
-	arguments.input.SetId(*m_superuserIdAttrPtr);
+	namespace userssdl = sdl::imtauth::Users;
+
+	userssdl::V1_0::UserItemRequestArguments arguments;
+	arguments.input.Id.reset(new QByteArray(*m_superuserIdAttrPtr));
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.SetProductId(m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8());
+		arguments.input.ProductId.reset(new QByteArray(m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8()));
 	}
 
 	imtgql::CGqlRequest gqlRequest;
-	if (userssdl::CUserItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		userssdl::CUserDataPayload response;
-		if (!SendModelRequest(gqlRequest, response)){
+	if (userssdl::V1_0::CUserItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		userssdl::CUserDataPayload::V1_0 response;
+		if (!SendModelRequest<userssdl::CUserDataPayload::V1_0, userssdl::CUserDataPayload>(gqlRequest, response)){
 			return false;
 		}
 

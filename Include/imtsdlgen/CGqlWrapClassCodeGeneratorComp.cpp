@@ -34,10 +34,8 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 	Q_ASSERT(m_sdlRequestListCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 
-	TaskState retVal = TS_OK;
-
 	if (!m_argumentParserCompPtr->IsGqlEnabled()){
-		return retVal;
+		return TS_OK;
 	}
 
 	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
@@ -179,7 +177,7 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 		}
 	}
 
-	return retVal;
+	return TS_OK;
 }
 
 
@@ -387,7 +385,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRe
 	// MAIN CONSTRUCTOR + PARSING
 	FeedStream(ifStream, 2, false);
 	ifStream << className << ':' << ':' << className;
-	ifStream << QStringLiteral("(const ::imtgql::CGqlRequest& gqlRequest)");
+	ifStream << QStringLiteral("(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)");
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream);
@@ -702,7 +700,7 @@ void CGqlWrapClassCodeGeneratorComp::AddMethodDeclarations(QTextStream& stream, 
 
 	// default constructor with GraphQL request
 	FeedStreamHorizontally(stream);
-	stream << 'C' << sdlRequest.GetName() << QStringLiteral("GqlRequest (const ::imtgql::CGqlRequest& gqlRequest);");
+	stream << 'C' << sdlRequest.GetName() << QStringLiteral("GqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead);");
 	FeedStream(stream, 1, false);
 
 	// validation method

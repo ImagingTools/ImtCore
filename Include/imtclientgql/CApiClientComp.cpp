@@ -41,7 +41,6 @@ IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr,
 
 				istd::IInformationProvider::InformationCategory category = istd::IInformationProvider::IC_INFO;
 				QString message = "Send request with ID " + uuid + "\n" + requestPtr->GetQuery();
-
 				SendVerboseMessage(message, "API client");
 
 				imtcom::CRequestSender requestSender;

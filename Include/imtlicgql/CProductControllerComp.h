@@ -21,32 +21,32 @@ public:
 
 protected:
 	// reimplemented (sdl::imtlic::Products::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtlic::Products::V1_0::CProductsListPayload OnProductsList(
+	virtual sdl::imtlic::Products::CProductsListPayload::V1_0 OnProductsList(
 				const sdl::imtlic::Products::V1_0::CProductsListGqlRequest& productsListRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-	virtual sdl::imtlic::Products::V1_0::CProductDataPayload OnProductItem(
+	virtual sdl::imtlic::Products::CProductDataPayload::V1_0 OnProductItem(
 				const sdl::imtlic::Products::V1_0::CProductItemGqlRequest& productItemRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-	virtual sdl::imtlic::Products::V1_0::CProductExportResponse OnProductsExport(
+	virtual sdl::imtlic::Products::CProductExportResponse::V1_0 OnProductsExport(
 				const sdl::imtlic::Products::V1_0::CProductsExportGqlRequest& productsExportRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-	virtual ::sdl::imtbase::ImtCollection::V1_0::CUpdatedNotificationPayload OnProductUpdate(
+	virtual ::sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0 OnProductUpdate(
 				const sdl::imtlic::Products::V1_0::CProductUpdateGqlRequest& productUpdateRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-	virtual ::sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload OnProductAdd(
+	virtual ::sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0 OnProductAdd(
 				const sdl::imtlic::Products::V1_0::CProductAddGqlRequest& productAddRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-	virtual sdl::imtlic::Products::V1_0:: CProductImportResponse OnProductsImport(
+	virtual sdl::imtlic::Products::CProductImportResponse::V1_0 OnProductsImport(
 				const sdl::imtlic::Products::V1_0::CProductsImportGqlRequest& productsImportRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;

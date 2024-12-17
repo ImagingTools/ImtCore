@@ -46,22 +46,25 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 		return false;
 	}
 
-	namespace authsdl = sdl::imtauth::Authorization::V1_0;
+	namespace authsdl = sdl::imtauth::Authorization;
 
 	QByteArray productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
-	authsdl::AuthorizationRequestArguments arguments;
-	arguments.input.SetLogin(userName);
-	arguments.input.SetPassword(password);
-	arguments.input.SetProductId(productId);
+	authsdl::V1_0::AuthorizationRequestArguments arguments;
+	arguments.input.Login.reset(new QString(userName));
+	arguments.input.Password.reset(new QString(password));
+	arguments.input.ProductId.reset(new QByteArray(productId));
 
 	imtgql::CGqlRequest gqlRequest;
-	if (authsdl::CAuthorizationGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		authsdl::CAuthorizationPayload response;
-		if (!SendModelRequest(gqlRequest, response)){
+	if (authsdl::V1_0::CAuthorizationGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		authsdl::CAuthorizationPayload::V1_0 response;
+		if (!SendModelRequest<authsdl::CAuthorizationPayload::V1_0, authsdl::CAuthorizationPayload>(gqlRequest, response)){
 			return false;
 		}
 
-		QByteArray userId = response.GetUserId();
+		QByteArray userId;
+		if (response.UserId){
+			userId = *response.UserId;
+		}
 		if (userId.isEmpty()){
 			return false;
 		}
@@ -71,19 +74,25 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			return false;
 		}
 
-		m_userInfoPtr->SetId(response.GetUsername());
-		m_userInfoPtr->SetLocalPermissions(productId, response.GetPermissions().split(';'));
+		if (response.Username){
+			m_userInfoPtr->SetId(*response.Username);
+		}
+		if (response.Permissions){
+			m_userInfoPtr->SetLocalPermissions(productId, response.Permissions->split(';'));
+		}
 
 		m_userPermissionIds = m_userInfoPtr->GetPermissions(productId);
 
-		m_loggedUserToken = response.GetToken();
+		if (response.Token){
+			m_loggedUserToken = *response.Token;
+		}
 		imtqml::CGqlModel::SetGlobalAccessToken(m_loggedUserToken);
 
-		{
+		if (response.Username){
 			istd::CChangeNotifier notifier(this);
 			Q_UNUSED(notifier);
 
-			m_loggedUserId = response.GetUsername();
+			m_loggedUserId = *response.Username;
 		}
 
 		m_loggedUserPassword = password.toUtf8();

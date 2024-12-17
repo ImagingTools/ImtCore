@@ -226,6 +226,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 						return TS_INVALID;
 					}
+					
 					QFileInfo headerFileInfo(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
 					QByteArray sourceReadData = joinedSourceFile.readAll();
 					joinedSourceFile.seek(0);
@@ -375,7 +376,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 				isAdded = true;
 				if (addRemark){
 					if (!directive.remark.startsWith(QStringLiteral("//"))){
-						stream << QStringLiteral("//");
+						stream << QStringLiteral("// ");
 					}
 					stream << directive.remark;
 					FeedStream(stream, 1, false);

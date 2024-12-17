@@ -16,11 +16,14 @@ namespace imtauthgql
 bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 			const sdl::imtauth::Groups::V1_0::CGroupsListGqlRequest& groupsListRequest,
-			sdl::imtauth::Groups::V1_0::CGroupItem& representationObject,
+			sdl::imtauth::Groups::CGroupItem::V1_0& representationObject,
 			QString& errorMessage) const
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
-	QByteArray productId = groupsListRequest.GetRequestedArguments().input.GetProductId();
+	QByteArray productId;
+	if (groupsListRequest.GetRequestedArguments().input.ProductId){
+		productId = *groupsListRequest.GetRequestedArguments().input.ProductId;
+	}
 
 	const imtauth::IUserGroupInfo* userGroupInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr userDataPtr;
@@ -38,23 +41,23 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Groups::V1_0::GroupsListRequestInfo requestInfo = groupsListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
-		representationObject.SetId(objectId);
+		representationObject.Id.reset(new QByteArray(objectId));
 	}
 
 	if (requestInfo.items.isNameRequested){
-		representationObject.SetName(userGroupInfoPtr->GetName());
+		representationObject.Name.reset(new QString(userGroupInfoPtr->GetName()));
 	}
 
 	if (requestInfo.items.isRolesRequested){
-		representationObject.SetRoles(userGroupInfoPtr->GetRoles(productId).join(';'));
+		representationObject.Roles.reset(new QByteArray(userGroupInfoPtr->GetRoles(productId).join(';')));
 	}
 
 	if (requestInfo.items.isParentGroupsRequested){
-		representationObject.SetParentGroups(userGroupInfoPtr->GetParentGroups().join(';'));
+		representationObject.ParentGroups.reset(new QByteArray(userGroupInfoPtr->GetParentGroups().join(';')));
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		representationObject.SetDescription(userGroupInfoPtr->GetDescription());
+		representationObject.Description.reset(new QString(userGroupInfoPtr->GetDescription()));
 	}
 
 	if (requestInfo.items.isAddedRequested){
@@ -62,7 +65,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		addedTime.setTimeSpec(Qt::UTC);
 
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.SetAdded(added);
+		representationObject.Added.reset(new QString(added));
 	}
 
 	if (requestInfo.items.isLastModifiedRequested){
@@ -70,7 +73,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		lastModifiedTime.setTimeSpec(Qt::UTC);
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.SetLastModified(lastModified);
+		representationObject.LastModified.reset(new QString(lastModified));
 	}
 
 	return true;
@@ -78,7 +81,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresentation(
-			const sdl::imtauth::Groups::V1_0::CGroupData& groupDataRepresentation,
+			const sdl::imtauth::Groups::CGroupData::V1_0& groupDataRepresentation,
 			QByteArray& newObjectId,
 			QString& name,
 			QString& description,
@@ -107,15 +110,22 @@ istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresent
 		return nullptr;
 	}
 
-	newObjectId = groupDataRepresentation.GetId();
+	if (groupDataRepresentation.Id){
+		newObjectId = *groupDataRepresentation.Id;
+	}
 	if (newObjectId.isEmpty()){
 		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
 	userGroupInfoPtr->SetObjectUuid(newObjectId);
 
-	QByteArray productId = groupDataRepresentation.GetProductId();
+	QByteArray productId;
+	if (groupDataRepresentation.ProductId){
+		productId = *groupDataRepresentation.ProductId;
+	}
 
-	name = groupDataRepresentation.GetName();
+	if (groupDataRepresentation.Name){
+		name = *groupDataRepresentation.Name;
+	}
 	if (name.isEmpty()){
 		errorMessage = QString("Group name cannot be empty");
 		return nullptr;
@@ -140,14 +150,22 @@ istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresent
 
 	userGroupInfoPtr->SetName(name);
 
-	description = groupDataRepresentation.GetDescription();
+	if (groupDataRepresentation.Description){
+		description = *groupDataRepresentation.Description;
+	}
 	userGroupInfoPtr->SetDescription(description);
 
-	QByteArrayList userIds = groupDataRepresentation.GetUsers().split(';');
+	QByteArrayList userIds;
+	if (groupDataRepresentation.Users){
+		userIds = groupDataRepresentation.Users->split(';');
+	}
 	userIds.removeAll("");
 	userGroupInfoPtr->SetUsers(userIds);
 
-	QByteArrayList roleIds = groupDataRepresentation.GetRoles().split(';');
+	QByteArrayList roleIds;
+	if (groupDataRepresentation.Roles){
+		roleIds = groupDataRepresentation.Roles->split(';');
+	}
 	roleIds.removeAll("");
 
 	if (!roleIds.isEmpty()){
@@ -157,10 +175,12 @@ istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresent
 		userGroupInfoPtr->RemoveProduct(productId);
 	}
 
-	QByteArrayList groupIds = groupDataRepresentation.GetParentGroups().split(';');
-	for (const QByteArray& parentGroupId : groupIds){
-		if (!parentGroupId.isEmpty()){
-			userGroupInfoPtr->AddParentGroup(parentGroupId);
+	if (groupDataRepresentation.ParentGroups){
+		QByteArrayList groupIds = groupDataRepresentation.ParentGroups->split(';');
+		for (const QByteArray& parentGroupId : groupIds){
+			if (!parentGroupId.isEmpty()){
+				userGroupInfoPtr->AddParentGroup(parentGroupId);
+			}
 		}
 	}
 
@@ -171,7 +191,7 @@ istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresent
 bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
 			const sdl::imtauth::Groups::V1_0::CGroupItemGqlRequest& groupItemRequest,
-			sdl::imtauth::Groups::V1_0::CGroupDataPayload& representationPayload,
+			sdl::imtauth::Groups::CGroupDataPayload::V1_0& representationPayload,
 			QString& errorMessage) const
 {
 	const imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(&data);
@@ -183,27 +203,30 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	sdl::imtauth::Groups::V1_0::GroupItemRequestArguments arguments = groupItemRequest.GetRequestedArguments();
-	sdl::imtauth::Groups::V1_0::CGroupData groupData;
+	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
 
-	QByteArray productId = arguments.input.GetProductId();
+	QByteArray productId;
+	if (arguments.input.ProductId){
+		productId = *arguments.input.ProductId;
+	}
 
-	groupData.SetId(userGroupInfoPtr->GetObjectUuid());
-	groupData.SetName(userGroupInfoPtr->GetName());
-	groupData.SetDescription(userGroupInfoPtr->GetDescription());
+	groupData.Id.reset(new QByteArray(userGroupInfoPtr->GetObjectUuid()));
+	groupData.Name.reset(new QString(userGroupInfoPtr->GetName()));
+	groupData.Description.reset(new QString(userGroupInfoPtr->GetDescription()));
 
 	imtauth::IUserGroupInfo::UserIds userIds = userGroupInfoPtr->GetUsers();
 	std::sort(userIds.begin(), userIds.end());
-	groupData.SetUsers(userIds.join(';'));
+	groupData.Users.reset(new QByteArray(userIds.join(';')));
 
 	imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
 	std::sort(roleIds.begin(), roleIds.end());
-	groupData.SetRoles(roleIds.join(';'));
+	groupData.Roles.reset(new QByteArray(roleIds.join(';')));
 
 	imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
 	std::sort(groupIds.begin(), groupIds.end());
-	groupData.SetParentGroups(groupIds.join(';'));
+	groupData.ParentGroups.reset(new QByteArray(groupIds.join(';')));
 
-	representationPayload.SetGroupData(groupData);
+	representationPayload.GroupData = std::make_unique<sdl::imtauth::Groups::CGroupData::V1_0>(groupData);
 
 	return true;
 }
@@ -297,6 +320,15 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 	}
 
 	return rootModelPtr.PopPtr();
+}
+
+bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(const imtgql::CGqlRequest& rawGqlRequest, const sdl::imtauth::Groups::V1_0::CGroupUpdateGqlRequest& groupUpdateRequest, istd::IChangeable& object, QString& errorMessage) const
+{
+	SendCriticalMessage(0, "Unimplemented method call!", __func__);
+
+	Q_ASSERT_X(false, "Unimplemented method call!", __func__);
+
+	return false;
 }
 
 

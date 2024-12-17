@@ -10,7 +10,7 @@ macro(ImtCoreGetSdlDeps)
 	GetSdlGeneratorPath(SDL_GENERATOR_EXE_PATH)
 
 	if (ARG_GET_SCHEMA_DEPS)
-		set(SDL_DEPS_GENERATION_COMMAND ${SDL_GENERATOR_EXE_PATH} -S ${ARG_INPUT} --schema-dependencies)
+		set(SDL_DEPS_GENERATION_COMMAND ${SDL_GENERATOR_EXE_PATH} -S ${ARG_INPUT} --schema-dependencies --auto-link=2)
 		set(SDL_ERRORS_FILE_PATH "${ARG_OUT_DIR}/__SDL_SCHEMA__DependsList_errors.txt")
 	else()
 		set(SDL_DEPS_GENERATION_COMMAND ${SDL_GENERATOR_EXE_PATH} -DS ${ARG_INPUT} -O ${ARG_OUT_DIR} ${ARG_MODIFICATORS})
@@ -60,7 +60,7 @@ macro(ImtCoreGetSdlDeps)
 
 endmacro()
 
-
+# TODO Rename it to ImtCoreAddSdlHeaderIncludePath
 function(ImtCoreAddSdlSearchPath ARG_SDL_PATH)
 	if (NOT GLOBAL_SDL_SEARCH_PATHS)
 		set(GLOBAL_SDL_SEARCH_PATHS ${ARG_SDL_PATH}
@@ -82,7 +82,11 @@ endfunction()
 
 
 function(ImtCoreSetSdlMainCacheFile ARG_CACHE_FILE)
-	set(GLOBAL_SDL_CACHE_FILE ${ARG_CACHE_FILE}
+	get_filename_component(CACHE_FILE_PATH "${ARG_CACHE_FILE}" ABSOLUTE)
+	if (EXISTS "${CACHE_FILE_PATH}")
+		file(REMOVE "${CACHE_FILE_PATH}")
+	endif()
+	set(GLOBAL_SDL_CACHE_FILE ${CACHE_FILE_PATH}
 		CACHE
 		STRING "Cache file, used to store information about generated files"
 		FORCE
@@ -91,8 +95,10 @@ endfunction()
 
 
 function(ImtCoreAddSdlCacheFile ARG_SDL_CACHE_FILE_PATH)
+	get_filename_component(ABS_SDL_CACHE_FILE_PATH "${ARG_SDL_CACHE_FILE_PATH}" ABSOLUTE)
+
 	if (NOT GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS)
-		set(GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS ${ARG_SDL_CACHE_FILE_PATH}
+		set(GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS ${ABS_SDL_CACHE_FILE_PATH}
 			CACHE
 			STRING "List of additional cache files, used to collect information about already generated files"
 			FORCE
@@ -123,7 +129,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	set(SDL_CPP_OUTPUT_DIRECTORY "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP")
 
 	set(CUSTOM_MODIFICATORS)
-	# list(APPEND CUSTOM_MODIFICATORS "--GG=2") ##< Compile, using a new version of code generator.
+	list(APPEND CUSTOM_MODIFICATORS "--GG=2") ##< Compile, using a new version of code generator.
 	list(APPEND CUSTOM_MODIFICATORS "--CPP")
 	list(APPEND CUSTOM_MODIFICATORS "--GQL")
 	list(APPEND CUSTOM_MODIFICATORS "--use-all-modificators")
@@ -134,6 +140,13 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	# use cache file if provided
 	if (GLOBAL_SDL_CACHE_FILE)
 		list(APPEND CUSTOM_MODIFICATORS "-C${GLOBAL_SDL_CACHE_FILE}")
+	endif()
+
+	list(LENGTH GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS ADDITIONAL_CACHES_COUNT)
+	if (ADDITIONAL_CACHES_COUNT GREATER 0)
+		foreach(ADD_CACHE_FILE ${GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS})
+			list(APPEND CUSTOM_MODIFICATORS "--CC=${ADD_CACHE_FILE}")
+		endforeach()
 	endif()
 
 	if (ARG_SOURCE_NAME)

@@ -17,7 +17,7 @@ class CComplexCollectionFilterRepresentationController
 {
 public:
 	static bool ComplexCollectionFilterRepresentationToModel(
-		sdl::imtbase::ComplexCollectionFilter::V1_0::CComplexCollectionFilter& filterRepresentaion,
+		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& filterRepresentaion,
 		imtbase::IComplexCollectionFilter& filter,
 		ilog::IMessageConsumer* messageConsumerPtr);
 
@@ -33,12 +33,12 @@ private:
 
 private:
 	static bool ProcessFieldFilter(
-		const sdl::imtbase::ComplexCollectionFilter::V1_0::CFieldFilter& source,
+		const sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& source,
 		imtbase::IComplexCollectionFilter::FieldFilter& target,
 		ilog::IMessageConsumer* messageConsumerPtr);
 
 	static bool ProcessGroupFilter(
-		const sdl::imtbase::ComplexCollectionFilter::V1_0::CGroupFilter& source,
+		const sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& source,
 		imtbase::IComplexCollectionFilter::GroupFilter& target,
 		ilog::IMessageConsumer* messageConsumerPtr);
 

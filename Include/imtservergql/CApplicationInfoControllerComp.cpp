@@ -9,7 +9,7 @@ namespace imtservergql
 
 // reimplemented (sdl::imtapp::Application::V1_0::CGraphQlHandlerCompBase)
 
-sdl::imtapp::Application::V1_0::CApplicationInfo CApplicationInfoControllerComp::OnGetApplicationInfo(
+sdl::imtapp::Application::CApplicationInfo::V1_0 CApplicationInfoControllerComp::OnGetApplicationInfo(
 			const sdl::imtapp::Application::V1_0::CGetApplicationInfoGqlRequest& /*getApplicationInfoRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
@@ -18,10 +18,10 @@ sdl::imtapp::Application::V1_0::CApplicationInfo CApplicationInfoControllerComp:
 		errorMessage = QString("Unable to get an application info. Error: Component attribute 'm_applicationInfoCompPtr' was not set");
 		SendErrorMessage(0, errorMessage, "CApplicationInfoControllerComp");
 
-		return sdl::imtapp::Application::V1_0::CApplicationInfo();
+		return sdl::imtapp::Application::CApplicationInfo::V1_0();
 	}
 
-	sdl::imtapp::Application::V1_0::CApplicationInfo applicationInfo;
+	sdl::imtapp::Application::CApplicationInfo::V1_0 applicationInfo;
 
 	const iser::IVersionInfo& versionInfo = m_applicationInfoCompPtr->GetVersionInfo();
 	int mainVersion = m_applicationInfoCompPtr->GetMainVersionId();
@@ -29,23 +29,23 @@ sdl::imtapp::Application::V1_0::CApplicationInfo CApplicationInfoControllerComp:
 	quint32 versionNumber;
 	if (versionInfo.GetVersionNumber(mainVersion, versionNumber)){
 		QString version = versionInfo.GetEncodedVersionName(mainVersion, versionNumber);
-		applicationInfo.SetVersion(version);
+		applicationInfo.Version = std::make_unique<QString>(version);
 	}
 
 	QString appId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID);
-	applicationInfo.SetApplicationId(appId);
+	applicationInfo.ApplicationId = std::make_unique<QString>(appId);
 
 	QString appName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_NAME);
-	applicationInfo.SetApplicationName(appName);
+	applicationInfo.ApplicationName = std::make_unique<QString>(appName);
 
 	QString productName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_PRODUCT_NAME);
-	applicationInfo.SetProductName(productName);
+	applicationInfo.ProductName = std::make_unique<QString>(productName);
 
 	QString companyName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_COMPANY_NAME);
-	applicationInfo.SetCompanyName(companyName);
+	applicationInfo.CompanyName = std::make_unique<QString>(companyName);
 
 	QString type = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_TYPE);
-	applicationInfo.SetApplicationType(type);
+	applicationInfo.ApplicationType = std::make_unique<QString>(type);
 
 	return applicationInfo;
 }

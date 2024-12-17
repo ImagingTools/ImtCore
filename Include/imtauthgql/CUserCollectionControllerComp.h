@@ -28,10 +28,10 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 				const sdl::imtauth::Users::V1_0::CUsersListGqlRequest& usersListRequest,
-				sdl::imtauth::Users::V1_0::CUserItem& representationObject,
+				sdl::imtauth::Users::CUserItem::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
-				const sdl::imtauth::Users::V1_0::CUserData& userDataRepresentation,
+				const sdl::imtauth::Users::CUserData::V1_0& userDataRepresentation,
 				QByteArray& newObjectId,
 				QString& name,
 				QString& description,
@@ -39,7 +39,12 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const sdl::imtauth::Users::V1_0::CUserItemGqlRequest& userItemRequest,
-				sdl::imtauth::Users::V1_0::CUserDataPayload& representationPayload,
+				sdl::imtauth::Users::CUserDataPayload::V1_0& representationPayload,
+				QString& errorMessage) const override;
+	virtual bool UpdateObjectFromRepresentationRequest(
+				const ::imtgql::CGqlRequest& rawGqlRequest,
+				const sdl::imtauth::Users::V1_0::CUserUpdateGqlRequest& userUpdateRequest,
+				istd::IChangeable& object,
 				QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 

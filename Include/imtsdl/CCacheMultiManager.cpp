@@ -80,11 +80,10 @@ bool CCacheMultiManager::ResolveIncludePathForType(const CSdlType& type, QString
 						}
 
 						SendLogMessage(
-							istd::IInformationProvider::IC_CRITICAL,
+							istd::IInformationProvider::IC_ERROR,
 							0,
 							QString("UNEXPECTED! Unable to find include path for found type. Type: %1").arg(type.GetName()),
 							"CCacheMultiManager");
-						Q_ASSERT_X(false, "UNEXPECTED! Unable to find include path for found type.", __func__);
 					}
 				}
 			}

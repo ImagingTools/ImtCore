@@ -7,6 +7,9 @@ INCLUDEPATH += $$PWD/../../Impl
 INCLUDEPATH += $$PWD/../../Sdl
 INCLUDEPATH += $$PWD/../../$$AUXINCLUDEDIR
 
+message("AUXINCLUDEDIR");
+message($$PWD/../../$$AUXINCLUDEDIR);
+
 win32{
 	LIBS += -ladvapi32 -luser32
 }

@@ -20,7 +20,7 @@ namespace imtauthgql
 bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 	const sdl::imtauth::Users::V1_0::CUsersListGqlRequest& usersListRequest,
-	sdl::imtauth::Users::V1_0::CUserItem& representationObject,
+	sdl::imtauth::Users::CUserItem::V1_0& representationObject,
 	QString& errorMessage) const
 {
 	imtauth::IUserInfo* contextUserInfoPtr = nullptr;
@@ -32,7 +32,10 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Users::V1_0::UsersListRequestArguments arguments = usersListRequest.GetRequestedArguments();
 
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
-	QByteArray productId = arguments.input.GetProductId();
+	QByteArray productId;
+	if (arguments.input.ProductId){
+		productId = *arguments.input.ProductId;
+	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr userDataPtr;
@@ -62,23 +65,23 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Users::V1_0::UsersListRequestInfo requestInfo = usersListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
-		representationObject.SetId(objectId);
+		representationObject.Id.reset(new QByteArray(objectId));
 	}
 
 	if (requestInfo.items.isUserIdRequested){
-		representationObject.SetUserId(userInfoPtr->GetId());
+		representationObject.UserId.reset(new QByteArray(userInfoPtr->GetId()));
 	}
 
 	if (requestInfo.items.isNameRequested){
-		representationObject.SetName(userInfoPtr->GetName());
+		representationObject.Name.reset(new QString(userInfoPtr->GetName()));
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		representationObject.SetDescription(userInfoPtr->GetDescription());
+		representationObject.Description.reset(new QString(userInfoPtr->GetDescription()));
 	}
 
 	if (requestInfo.items.isMailRequested){
-		representationObject.SetMail(userInfoPtr->GetMail());
+		representationObject.Mail.reset(new QString(userInfoPtr->GetMail()));
 	}
 
 	if (requestInfo.items.isSystemIdRequested){
@@ -88,7 +91,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 			systemIdList << systemInfo.systemId;
 		}
 
-		representationObject.SetSystemId(systemIdList.join(';'));
+		representationObject.SystemId.reset(new QByteArray(systemIdList.join(';')));
 	}
 
 	if (requestInfo.items.isSystemNameRequested){
@@ -103,7 +106,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 			}
 		}
 
-		representationObject.SetSystemName(systemNameList.join(';'));
+		representationObject.SystemName.reset(new QString(systemNameList.join(';')));
 	}
 
 	if (requestInfo.items.isRolesRequested){
@@ -124,7 +127,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 			}
 		}
 
-		representationObject.SetRoles(resultList.join(';'));
+		representationObject.Roles.reset(new QByteArray(resultList.join(';')));
 	}
 
 	if (requestInfo.items.isGroupsRequested){
@@ -145,14 +148,14 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 				}
 			}
 		}
-		representationObject.SetGroups(resultList.join(';'));
+		representationObject.Groups.reset(new QByteArray(resultList.join(';')));
 	}
 
 	if (requestInfo.items.isLastConnectionRequested){
 		QDateTime lastConnection = userInfoPtr->GetLastConnection();
 		lastConnection.setTimeSpec(Qt::UTC);
 
-		representationObject.SetLastConnection(lastConnection.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
+		representationObject.LastConnection.reset(new QString(lastConnection.toLocalTime().toString("dd.MM.yyyy hh:mm:ss")));
 	}
 
 	if (requestInfo.items.isAddedRequested){
@@ -160,7 +163,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		addedTime.setTimeSpec(Qt::UTC);
 
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.SetAdded(added);
+		representationObject.Added.reset(new QString(added));
 	}
 
 	if (requestInfo.items.isLastModifiedRequested){
@@ -168,7 +171,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		lastModifiedTime.setTimeSpec(Qt::UTC);
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.SetLastModified(lastModified);
+		representationObject.LastModified.reset(new QString(lastModified));
 	}
 
 	return true;
@@ -176,7 +179,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation(
-	const sdl::imtauth::Users::V1_0::CUserData& userDataRepresentation,
+	const sdl::imtauth::Users::CUserData::V1_0& userDataRepresentation,
 	QByteArray& newObjectId,
 	QString& name,
 	QString& /*description*/,
@@ -208,9 +211,14 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 		return nullptr;
 	}
 
-	QByteArray productId = userDataRepresentation.GetProductId();
+	QByteArray productId;
+	if (userDataRepresentation.ProductId){
+		productId = *userDataRepresentation.ProductId;
+	}
 
-	newObjectId = userDataRepresentation.GetId();
+	if (userDataRepresentation.Id){
+		newObjectId = *userDataRepresentation.Id;
+	}
 	if (newObjectId.isEmpty()){
 		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
@@ -222,7 +230,10 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 		oldUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(oldUserdataPtr.GetPtr());
 	}
 
-	QByteArray username = userDataRepresentation.GetUsername();
+	QByteArray username;
+	if (userDataRepresentation.Username){
+		username = *userDataRepresentation.Username;
+	}
 	if (username.isEmpty()){
 		SendWarningMessage(0, QString("Username can't be empty"), "CUserCollectionControllerComp");
 		errorMessage = QT_TR_NOOP("Username can't be empty!");
@@ -261,20 +272,34 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 
 	userInfoPtr->SetId(username);
 
-	name = userDataRepresentation.GetName();
+	if (userDataRepresentation.Name){
+		name = *userDataRepresentation.Name;
+	}
 	userInfoPtr->SetName(name);
 
-	QList<sdl::imtauth::Users::V1_0::CSystemInfo> systemInfos = userDataRepresentation.GetSystemInfos();
+	QList<sdl::imtauth::Users::CSystemInfo::V1_0> systemInfos;
+	if (userDataRepresentation.SystemInfos){
+		systemInfos = *userDataRepresentation.SystemInfos;
+	}
 	if (systemInfos.isEmpty()){
 		// User from internal system
 		imtauth::IUserInfo::SystemInfo systemInfo;
 		userInfoPtr->AddToSystem(systemInfo);
 	}
 	else{
-		for (const sdl::imtauth::Users::V1_0::CSystemInfo& sdlSystemInfo : systemInfos){
-			QByteArray systemId = sdlSystemInfo.GetId();
-			QString systemName = sdlSystemInfo.GetName();
-			bool enabled = sdlSystemInfo.GetEnabled();
+		for (const sdl::imtauth::Users::CSystemInfo::V1_0& sdlSystemInfo : systemInfos){
+			QByteArray systemId;
+			if (sdlSystemInfo.Id){
+				systemId = *sdlSystemInfo.Id;
+			}
+			QString systemName;
+			if (sdlSystemInfo.Name){
+				systemName = *sdlSystemInfo.Name;
+			}
+			bool enabled = false;
+			if (sdlSystemInfo.Enabled){
+				enabled = *sdlSystemInfo.Enabled;
+			}
 
 			imtauth::IUserInfo::SystemInfo systemInfo;
 			systemInfo.systemId = systemId;
@@ -287,8 +312,11 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 
 	for (imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
 		if (systemInfo.enabled && systemInfo.systemId.isEmpty()){
-			QString password = userDataRepresentation.GetPassword();
-			if (password.isEmpty()){
+			QString password;
+			if (userDataRepresentation.Password){
+				password = *userDataRepresentation.Password;
+			}
+			if (password.isEmpty()) {
 				errorMessage = QString("Password cannot be empty");
 
 				return nullptr;
@@ -307,10 +335,16 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 		}
 	}
 
-	QString mail = userDataRepresentation.GetEmail();
+	QString mail;
+	if (userDataRepresentation.Email){
+		mail = *userDataRepresentation.Email;
+	}
 	userInfoPtr->SetMail(mail);
 
-	imtauth::IUserInfo::FeatureIds permissions = userDataRepresentation.GetPermissions().split(';');
+	imtauth::IUserInfo::FeatureIds permissions;
+	if (userDataRepresentation.Permissions){
+		permissions = userDataRepresentation.Permissions->split(';');
+	}
 	permissions.removeAll("");
 	userInfoPtr->SetLocalPermissions(productId, permissions);
 
@@ -323,7 +357,10 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 		}
 	}
 
-	QByteArrayList roleIds = userDataRepresentation.GetRoles().split(';');
+	QByteArrayList roleIds;
+	if (userDataRepresentation.Roles){
+		roleIds = userDataRepresentation.Roles->split(';');
+	}
 	roleIds.removeAll("");
 	if (!roleIds.isEmpty()){
 		userInfoPtr->SetRoles(productId, roleIds);
@@ -332,7 +369,10 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 		userInfoPtr->RemoveProduct(productId);
 	}
 
-	QByteArrayList groupIds = userDataRepresentation.GetGroups().split(';');
+	QByteArrayList groupIds;
+	if (userDataRepresentation.Groups){
+		groupIds = userDataRepresentation.Groups->split(';');
+	}
 	groupIds.removeAll("");
 	for (const QByteArray& groupId : groupIds){
 		if (!groupId.isEmpty()){
@@ -347,7 +387,7 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	const istd::IChangeable& data,
 	const sdl::imtauth::Users::V1_0::CUserItemGqlRequest& userItemRequest,
-	sdl::imtauth::Users::V1_0::CUserDataPayload& representationPayload,
+	sdl::imtauth::Users::CUserDataPayload::V1_0& representationPayload,
 	QString& errorMessage) const
 {
 	const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(&data);
@@ -359,57 +399,60 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	sdl::imtauth::Users::V1_0::UserItemRequestArguments arguments = userItemRequest.GetRequestedArguments();
-	QByteArray productId = arguments.input.GetProductId();
-	sdl::imtauth::Users::V1_0::CUserData userData;
+	QByteArray productId;
+	if (arguments.input.ProductId){
+		productId = *arguments.input.ProductId;
+	}
+	sdl::imtauth::Users::CUserData::V1_0 userData;
 
 	QByteArray objectId = userInfoPtr->GetObjectUuid();
-	userData.SetId(objectId);
+	userData.Id.reset(new QByteArray(objectId));
 
 	QByteArray userName = userInfoPtr->GetId();
-	userData.SetUsername(userName);
+	userData.Username.reset(new QByteArray(userName));
 
 	QString name = userInfoPtr->GetName();
-	userData.SetName(name);
+	userData.Name.reset(new QString(name));
 
 	QByteArray password = userInfoPtr->GetPasswordHash();
-	userData.SetPassword(password);
+	userData.Password.reset(new QString(password));
 
 	QString mail = userInfoPtr->GetMail();
-	userData.SetEmail(mail);
+	userData.Email.reset(new QString(mail));
 
 	QByteArrayList groupList = userInfoPtr->GetGroups();
 	std::sort(groupList.begin(), groupList.end());
-	userData.SetGroups(groupList.join(';'));
+	userData.Groups.reset(new QByteArray(groupList.join(';')));
 
 	QByteArrayList roleList = userInfoPtr->GetRoles(productId);
 	std::sort(roleList.begin(), roleList.end());
-	userData.SetRoles(roleList.join(';'));
+	userData.Roles.reset(new QByteArray(roleList.join(';')));
 
 	QByteArray permissions = userInfoPtr->GetPermissions(productId).join(';');
 	std::sort(permissions.begin(), permissions.end());
-	userData.SetPermissions(permissions);
+	userData.Permissions.reset(new QByteArray(permissions));
 
-	QList<sdl::imtauth::Users::V1_0::CSystemInfo> list;
+	QList<sdl::imtauth::Users::CSystemInfo::V1_0> list;
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
-		sdl::imtauth::Users::V1_0::CSystemInfo info;
+		sdl::imtauth::Users::CSystemInfo::V1_0 info;
 
-		info.SetId(systemInfo.systemId);
+		info.Id.reset(new QByteArray(systemInfo.systemId));
 
 		if (systemInfo.systemId.isEmpty()){
-			info.SetName(QString("Internal"));
+			info.Name.reset(new QString("Internal"));
 		}
 		else{
-			info.SetName(systemInfo.systemName);
+			info.Name.reset(new QString(systemInfo.systemName));
 		}
 
-		info.SetEnabled(systemInfo.enabled);
+		info.Enabled.reset(new bool(systemInfo.enabled));
 
 		list << info;
 	}
-	userData.SetSystemInfos(list);
+	userData.SystemInfos = std::make_unique<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
 
-	representationPayload.SetUserData(userData);
+	representationPayload.UserData = std::make_unique<sdl::imtauth::Users::CUserData::V1_0>(userData);
 
 	return true;
 }
@@ -489,6 +532,15 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 	}
 
 	return rootModelPtr.PopPtr();
+}
+
+bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(const imtgql::CGqlRequest& rawGqlRequest, const sdl::imtauth::Users::V1_0::CUserUpdateGqlRequest& userUpdateRequest, istd::IChangeable& object, QString& errorMessage) const
+{
+	SendCriticalMessage(0, "Unimplemented method call!", __func__);
+
+	Q_ASSERT_X(false, "Unimplemented method call!", __func__);
+
+	return false;
 }
 
 

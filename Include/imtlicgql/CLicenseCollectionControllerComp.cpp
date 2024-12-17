@@ -20,7 +20,7 @@ namespace imtlicgql
 bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 	const sdl::imtlic::Licenses::V1_0::CLicensesListGqlRequest& licensesListRequest,
-	sdl::imtlic::Licenses::V1_0::CLicenseItem& representationObject,
+	sdl::imtlic::Licenses::CLicenseItem::V1_0& representationObject,
 	QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -50,35 +50,35 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtlic::Licenses::V1_0::LicensesListRequestInfo requestInfo = licensesListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
-		representationObject.SetId(objectId);
+		representationObject.Id.reset(new QByteArray(objectId));
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.SetTypeId(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+		representationObject.TypeId.reset(new QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId)));
 	}
 
 	if (requestInfo.items.isLicenseIdRequested){
-		representationObject.SetLicenseId(licenseInfoPtr->GetLicenseId());
+		representationObject.LicenseId.reset(new QByteArray(licenseInfoPtr->GetLicenseId()));
 	}
 
 	if (requestInfo.items.isNameRequested){
-		representationObject.SetName(licenseInfoPtr->GetLicenseName());
+		representationObject.Name.reset(new QString(licenseInfoPtr->GetLicenseName()));
 	}
 
 	if (requestInfo.items.isLicenseNameRequested){
-		representationObject.SetLicenseName(licenseInfoPtr->GetLicenseName());
+		representationObject.LicenseName.reset(new QString(licenseInfoPtr->GetLicenseName()));
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		representationObject.SetDescription(licenseInfoPtr->GetLicenseDescription());
+		representationObject.Description.reset(new QString(licenseInfoPtr->GetLicenseDescription()));
 	}
 
 	if (requestInfo.items.isProductIdRequested){
-		representationObject.SetProductId(objectCollectionIterator.GetElementInfo("ProductId").toByteArray());
+		representationObject.ProductId.reset(new QByteArray(objectCollectionIterator.GetElementInfo("ProductId").toByteArray()));
 	}
 
 	if (requestInfo.items.isProductUuidRequested){
-		representationObject.SetProductUuid(licenseInfoPtr->GetProductId());
+		representationObject.ProductUuid.reset(new QByteArray(licenseInfoPtr->GetProductId()));
 	}
 
 	if (requestInfo.items.isParentLicensesRequested){
@@ -88,11 +88,11 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 			featureIds << featureInfo.id;
 		}
 
-		representationObject.SetParentLicenses(featureIds.join(';'));
+		representationObject.ParentLicenses.reset(new QByteArray(featureIds.join(';')));
 	}
 
 	if (requestInfo.items.isFeaturesRequested){
-		representationObject.SetFeatures(licenseInfoPtr->GetDependencies().join(';'));
+		representationObject.Features.reset(new QByteArray(licenseInfoPtr->GetDependencies().join(';')));
 	}
 
 	if (requestInfo.items.isAddedRequested){
@@ -100,7 +100,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 		addedTime.setTimeSpec(Qt::UTC);
 
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.SetAdded(added);
+		representationObject.Added = std::make_unique<QString>(added);
 	}
 
 	if (requestInfo.items.isLastModifiedRequested){
@@ -108,7 +108,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 		lastModifiedTime.setTimeSpec(Qt::UTC);
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.SetLastModified(lastModified);
+		representationObject.LastModified = std::make_unique<QString>(lastModified);
 	}
 
 	return true;
@@ -116,7 +116,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentation(
-	const sdl::imtlic::Licenses::V1_0::CLicenseDefinitionData& licenseDataRepresentation,
+	const sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0& licenseDataRepresentation,
 	QByteArray& newObjectId,
 	QString& name,
 	QString& description,
@@ -145,13 +145,19 @@ istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentat
 		return nullptr;
 	}
 
-	newObjectId = licenseDataRepresentation.GetId();
+	if (licenseDataRepresentation.Id){
+		newObjectId = *licenseDataRepresentation.Id;
+	}
+
 	if (newObjectId.isEmpty()){
 		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
 	licenseInfoPtr->SetObjectUuid(newObjectId);
 
-	QByteArray licenseId = licenseDataRepresentation.GetLicenseId();
+	QByteArray licenseId;
+	if (licenseDataRepresentation.LicenseId){
+		licenseId = *licenseDataRepresentation.LicenseId;
+	}
 
 	if (licenseId.isEmpty()){
 		errorMessage = QString("Unable to create license with an empty License-ID");
@@ -181,20 +187,34 @@ istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentat
 
 	licenseInfoPtr->SetLicenseId(licenseId);
 
-	name = licenseDataRepresentation.GetName();
+	if (licenseDataRepresentation.Name){
+		name = *licenseDataRepresentation.Name;
+	}
 	licenseInfoPtr->SetLicenseName(name);
 
-	description = licenseDataRepresentation.GetDescription();
+	if (licenseDataRepresentation.Description){
+		description = *licenseDataRepresentation.Description;
+	}
 	licenseInfoPtr->SetLicenseDescription(description);
 
-	QByteArray productId = licenseDataRepresentation.GetProductId();
+	QByteArray productId;
+	if (licenseDataRepresentation.ProductId){
+		productId = *licenseDataRepresentation.ProductId;
+	}
 	licenseInfoPtr->SetProductId(productId);
 
-	QByteArrayList dependencyIds = licenseDataRepresentation.GetParentLicenses().split(';');
+	QByteArrayList dependencyIds;
+	if (licenseDataRepresentation.ParentLicenses){
+		dependencyIds = licenseDataRepresentation.ParentLicenses->split(';');
+	}
 	dependencyIds.removeAll("");
 	licenseInfoPtr->SetDependencies(dependencyIds);
 
-	QByteArrayList featureIds = licenseDataRepresentation.GetFeatures().split(';');
+	QByteArrayList featureIds;
+	if (licenseDataRepresentation.Features){
+		featureIds = licenseDataRepresentation.Features->split(';');
+	}
+
 	imtlic::ILicenseDefinition::FeatureInfos featureInfos;
 	for (const QByteArray& featureUuid : featureIds){
 		imtlic::ILicenseDefinition::FeatureInfo featureInfo;
@@ -210,7 +230,7 @@ istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentat
 bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	const istd::IChangeable& data,
 	const sdl::imtlic::Licenses::V1_0::CLicenseItemGqlRequest& licenseItemRequest,
-	sdl::imtlic::Licenses::V1_0::CLicenseDataPayload& representationPayload,
+	sdl::imtlic::Licenses::CLicenseDataPayload::V1_0& representationPayload,
 	QString& errorMessage) const
 {
 	const imtlic::CIdentifiableLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CIdentifiableLicenseDefinition*>(&data);
@@ -222,35 +242,46 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	sdl::imtlic::Licenses::V1_0::LicenseItemRequestArguments arguments = licenseItemRequest.GetRequestedArguments();
-	sdl::imtlic::Licenses::V1_0::CLicenseDefinitionData licenseData;
+	sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0 licenseData;
 
-	licenseData.SetId(arguments.input.GetId());
+	if (arguments.input.Id){
+		licenseData.Id.reset(new QByteArray(*arguments.input.Id));
+	}
 
 	QString name = licenseInfoPtr->GetLicenseName();
-	licenseData.SetName(name);
-	licenseData.SetLicenseName(name);
+	licenseData.Name.reset(new QString(name));
+	licenseData.LicenseName.reset(new QString(name));
 
 	QByteArray licenseId = licenseInfoPtr->GetLicenseId();
-	licenseData.SetLicenseId(licenseId);
+	licenseData.LicenseId = std::make_unique<QByteArray>(licenseId);
 
 	QString description = licenseInfoPtr->GetLicenseDescription();
-	licenseData.SetDescription(description);
+	licenseData.Description = std::make_unique<QString>(description);
 
 	QByteArray productId = licenseInfoPtr->GetProductId();
-	licenseData.SetProductId(productId);
+	licenseData.ProductId = std::make_unique<QByteArray>(productId);
 
 	QByteArrayList featureUuids;
 	for (const imtlic::ILicenseDefinition::FeatureInfo& featureInfo : licenseInfoPtr->GetFeatureInfos()){
 		featureUuids << featureInfo.id;
 	}
-	licenseData.SetFeatures(featureUuids.join(';'));
+	licenseData.Features.reset(new QByteArray(featureUuids.join(';')));
 
 	QByteArray dependencies = licenseInfoPtr->GetDependencies().join(';');
-	licenseData.SetParentLicenses(dependencies);
+	licenseData.ParentLicenses = std::make_unique<QByteArray>(dependencies);
 
-	representationPayload.SetLicenseDefinitionData(licenseData);
+	representationPayload.LicenseDefinitionData = std::make_unique<sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0>(licenseData);
 
 	return true;
+}
+
+bool CLicenseCollectionControllerComp::UpdateObjectFromRepresentationRequest(const imtgql::CGqlRequest& rawGqlRequest, const sdl::imtlic::Licenses::V1_0::CLicenseUpdateGqlRequest& licenseUpdateRequest, istd::IChangeable& object, QString& errorMessage) const
+{
+	SendCriticalMessage(0, "Unimplemented method call!", __func__);
+
+	Q_ASSERT_X(false, "Unimplemented method call!", __func__);
+
+	return false;
 }
 
 

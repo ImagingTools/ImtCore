@@ -13,50 +13,60 @@ namespace imtauthgql
 {
 
 
-sdl::imtauth::Users::V1_0::CUsersListPayload CUserControllerComp::OnUsersList(
+sdl::imtauth::Users::CUsersListPayload::V1_0 CUserControllerComp::OnUsersList(
 			const sdl::imtauth::Users::V1_0::CUsersListGqlRequest& /*usersListRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return sdl::imtauth::Users::V1_0::CUsersListPayload();
+	return sdl::imtauth::Users::CUsersListPayload::V1_0();
 }
 
 
-sdl::imtauth::Users::V1_0::CUserDataPayload CUserControllerComp::OnUserItem(
+sdl::imtauth::Users::CUserDataPayload::V1_0 CUserControllerComp::OnUserItem(
 			const sdl::imtauth::Users::V1_0::CUserItemGqlRequest& /*userItemRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return sdl::imtauth::Users::V1_0::CUserDataPayload();
+	return sdl::imtauth::Users::CUserDataPayload::V1_0();
 }
 
 
-sdl::imtbase::ImtCollection::V1_0::CUpdatedNotificationPayload CUserControllerComp::OnUserUpdate(
+sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0 CUserControllerComp::OnUserUpdate(
 			const sdl::imtauth::Users::V1_0::CUserUpdateGqlRequest& /*userUpdateRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return sdl::imtbase::ImtCollection::V1_0::CUpdatedNotificationPayload();
+	return sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0();
 }
 
 
-sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload CUserControllerComp::OnUserAdd(
+sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0 CUserControllerComp::OnUserAdd(
 			const sdl::imtauth::Users::V1_0::CUserAddGqlRequest& /*userAddRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload();
+	return sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0();
 }
 
 
-sdl::imtauth::Users::V1_0::CChangePasswordPayload CUserControllerComp::OnChangePassword(
+sdl::imtauth::Users::CChangePasswordPayload::V1_0 CUserControllerComp::OnChangePassword(
 			const sdl::imtauth::Users::V1_0::CChangePasswordGqlRequest& changePasswordRequest,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	QByteArray id = changePasswordRequest.GetRequestedArguments().input.GetUserId();
-	QString oldPassword = changePasswordRequest.GetRequestedArguments().input.GetOldPassword();
-	QString newPassword = changePasswordRequest.GetRequestedArguments().input.GetNewPassword();
+	sdl::imtauth::Users::CChangePasswordInput::V1_0 inputArgument = changePasswordRequest.GetRequestedArguments().input;
+	QByteArray id;
+	if (inputArgument.UserId){
+		id = *inputArgument.UserId;
+	}
+	QString oldPassword;
+	if (inputArgument.OldPassword){
+		oldPassword = *inputArgument.OldPassword;
+	}
+	QString newPassword;
+	if (inputArgument.NewPassword){
+		newPassword = *inputArgument.NewPassword;
+	}
 
 	imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -66,7 +76,7 @@ sdl::imtauth::Users::V1_0::CChangePasswordPayload CUserControllerComp::OnChangeP
 
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to change password for user '%1'. Error: The user does not exist").arg(qPrintable(id));
-		return sdl::imtauth::Users::V1_0::CChangePasswordPayload();
+		return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
 	}
 
 	QByteArray login = userInfoPtr->GetId();
@@ -75,7 +85,7 @@ sdl::imtauth::Users::V1_0::CChangePasswordPayload CUserControllerComp::OnChangeP
 		errorMessage = QString("Unable to change password for user '%1'. Error: The user does not exist").arg(qPrintable(login));
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
-		return sdl::imtauth::Users::V1_0::CChangePasswordPayload();
+		return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
 	}
 
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
@@ -84,7 +94,7 @@ sdl::imtauth::Users::V1_0::CChangePasswordPayload CUserControllerComp::OnChangeP
 			errorMessage = QString("Unable to change password for user '%1'. Error: A user from an external system").arg(qPrintable(login));
 			SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
-			return sdl::imtauth::Users::V1_0::CChangePasswordPayload();
+			return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
 		}
 	}
 
@@ -106,7 +116,7 @@ sdl::imtauth::Users::V1_0::CChangePasswordPayload CUserControllerComp::OnChangeP
 		errorMessage = QString("Unable to change password for user '%1'. Error: Invalid login or password.").arg(qPrintable(login));
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
-		return sdl::imtauth::Users::V1_0::CChangePasswordPayload();
+		return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
 	}
 
 	QByteArray passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + newPassword.toUtf8());
@@ -116,11 +126,11 @@ sdl::imtauth::Users::V1_0::CChangePasswordPayload CUserControllerComp::OnChangeP
 		errorMessage = QString("Unable to change password for user '%1'").arg(qPrintable(login));
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
-		return sdl::imtauth::Users::V1_0::CChangePasswordPayload();
+		return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
 	}
 
-	sdl::imtauth::Users::V1_0::CChangePasswordPayload payload;
-	payload.SetUserId(id);
+	sdl::imtauth::Users::CChangePasswordPayload::V1_0 payload;
+	payload.UserId.reset(new QByteArray(id));
 
 	return payload;
 }

@@ -34,15 +34,15 @@ protected:
 	};
 
 	// reimplemented (sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Authorization::V1_0::CAuthorizationPayload OnAuthorization(
+	virtual sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 OnAuthorization(
 				const sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest& authorizationRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-    virtual sdl::imtauth::Authorization::V1_0::CAuthorizationPayload OnUserToken(
-                const sdl::imtauth::Authorization::V1_0::CUserTokenGqlRequest& userTokenRequest,
-                const ::imtgql::CGqlRequest& gqlRequest,
-                QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::V1_0::CUserManagementPayload OnGetUserMode(
+	virtual sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 OnUserToken(
+				const sdl::imtauth::Authorization::V1_0::CUserTokenGqlRequest& userTokenRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Authorization::CUserManagementPayload::V1_0 OnGetUserMode(
 				const sdl::imtauth::Authorization::V1_0::CGetUserModeGqlRequest& getUserModeRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;

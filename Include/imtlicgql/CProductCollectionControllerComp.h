@@ -27,10 +27,10 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 				const sdl::imtlic::Products::V1_0::CProductsListGqlRequest& productsListRequest,
-				sdl::imtlic::Products::V1_0::CProductItem& representationObject,
+				sdl::imtlic::Products::CProductItem::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
-				const sdl::imtlic::Products::V1_0::CProductData& productDataRepresentation,
+				const sdl::imtlic::Products::CProductData::V1_0& productDataRepresentation,
 				QByteArray& newObjectId,
 				QString& name,
 				QString& description,
@@ -38,8 +38,14 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const sdl::imtlic::Products::V1_0::CProductItemGqlRequest& productItemRequest,
-				sdl::imtlic::Products::V1_0::CProductDataPayload& representationPayload,
+				sdl::imtlic::Products::CProductDataPayload::V1_0& representationPayload,
 				QString& errorMessage) const override;
+	virtual bool UpdateObjectFromRepresentationRequest(
+				const ::imtgql::CGqlRequest& rawGqlRequest,
+				const sdl::imtlic::Products::V1_0::CProductUpdateGqlRequest& productUpdateRequest,
+				istd::IChangeable& object,
+				QString& errorMessage) const override;
+
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual void SetObjectFilter(const imtgql::CGqlRequest& gqlRequest,
 								 const imtbase::CTreeItemModel& objectFilterModel,

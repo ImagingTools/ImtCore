@@ -539,7 +539,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 
 	ISdlProcessArgumentsParser::AutoLinkLevel autoLinkLevel = m_argumentParserCompPtr->GetAutoLinkLevel();
 
-	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled() && !m_argumentParserCompPtr->IsDependenciesMode()){
+	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled()){
 		for (CSdlType& sdlType: m_sdlTypes){
 			bool isExternal = sdlType.IsExternal();
 
@@ -617,7 +617,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 		}
 	}
 
-	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled() && !m_argumentParserCompPtr->IsDependenciesMode()){
+	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled()){
 		for (CSdlEnum& sdlEnum: m_enums){
 			bool isExternal = sdlEnum.IsExternal();
 

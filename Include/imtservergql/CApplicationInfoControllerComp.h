@@ -23,7 +23,7 @@ public:
 
 protected:
 	// reimplemented (sdl::imtapp::Application::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtapp::Application::V1_0::CApplicationInfo OnGetApplicationInfo(
+	virtual sdl::imtapp::Application::CApplicationInfo::V1_0 OnGetApplicationInfo(
 				const sdl::imtapp::Application::V1_0::CGetApplicationInfoGqlRequest& getApplicationInfoRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;

@@ -1481,8 +1481,8 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 
 	const imtgql::CGqlObject* complexFilterModelPtr = viewParamsGql.GetFieldArgumentObjectPtr("ComplexFilterModel");
 	if (complexFilterModelPtr != nullptr){
-		sdl::imtbase::ComplexCollectionFilter::V1_0::CComplexCollectionFilter complexFilterSdl;
-		bool isComplexFilterOk = complexFilterSdl.ReadFromGraphQlObject(complexFilterSdl, *complexFilterModelPtr);
+		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilterSdl;
+		bool isComplexFilterOk = sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::ReadFromGraphQlObject(complexFilterSdl, *complexFilterModelPtr);
 
 		if (isComplexFilterOk){
 			istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();

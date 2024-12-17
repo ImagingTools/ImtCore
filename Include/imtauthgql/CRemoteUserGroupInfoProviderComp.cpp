@@ -33,20 +33,23 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 		return nullptr;
 	}
 
-	namespace groupssdl = sdl::imtauth::Groups::V1_0;
+	namespace groupssdl = sdl::imtauth::Groups;
 
-	groupssdl::GroupItemRequestArguments arguments;
-	arguments.input.SetId(groupId);
+	groupssdl::V1_0::GroupItemRequestArguments arguments;
+	arguments.input.Id.reset(new QByteArray(groupId));
 
 	imtgql::CGqlRequest gqlRequest;
-	if (groupssdl::CGroupItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		groupssdl::CGroupDataPayload response;
+	if (groupssdl::V1_0::CGroupItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		groupssdl::CGroupDataPayload::V1_0 response;
 
-		if (!SendModelRequest(gqlRequest, response)){
+		if (!SendModelRequest<groupssdl::CGroupDataPayload::V1_0, groupssdl::CGroupDataPayload>(gqlRequest, response)){
 			return nullptr;
 		}
 
-		groupssdl::CGroupData groupData = response.GetGroupData();
+		groupssdl::CGroupData::V1_0 groupData;
+		if (response.GroupData){
+			groupData= *response.GroupData;
+		}
 
 		istd::TDelPtr<imtauth::IUserGroupInfo> groupInfoPtr;
 		groupInfoPtr.SetPtr(m_userGroupInfoFactCompPtr.CreateInstance());
@@ -55,7 +58,7 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 		}
 
 		QJsonObject object;
-		if (!groupData.WriteToJsonObject(object)){
+		if (!groupssdl::CGroupData::WriteToJsonObject(groupData, object)){
 			return nullptr;
 		}
 

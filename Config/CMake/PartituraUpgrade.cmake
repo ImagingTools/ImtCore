@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.15)
 
 function (imt_core_upgrade_partitura A_WORKING_DIRECTORY)
 

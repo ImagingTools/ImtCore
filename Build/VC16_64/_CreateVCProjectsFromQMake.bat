@@ -7,8 +7,11 @@ set path=%path%;%QTDIR%\bin
 
 echo Generating %COMPILER_EXT% projects...
 
+cd %~dp0\
+call BuildTools.bat
+
 cd %~dp0\..\..\Build\QMake
-%QTDIR%\bin\qmake -recursive -tp vc
+%QTDIR%\bin\qmake ImtCoreAll.pro -recursive -tp vc
 
 
 cd %~dp0\..\..

@@ -30,23 +30,23 @@ protected:
 	bool ParseDataFromGqlRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& login, QByteArray& password, QByteArray& productId) const;
 	QByteArray GetUserObjectId(const QByteArray& login) const;
 	bool CheckCredential(const QByteArray& systemId, const QByteArray& login, const QByteArray& password) const;
-	sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
-	sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
+	sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
+	sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 CreateAuthorizationSuccessfulResponse(
 				imtauth::CUserInfo& userInfo,
 				const QByteArray& systemId,
 				const QByteArray& productId,
 				QString& errorMessage) const;
 
 	// reimplemented (sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Authorization::V1_0::CAuthorizationPayload OnAuthorization(
+	virtual sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 OnAuthorization(
 				const sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest& authorizationRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-    virtual sdl::imtauth::Authorization::V1_0::CAuthorizationPayload OnUserToken(
-                const sdl::imtauth::Authorization::V1_0::CUserTokenGqlRequest& userTokenRequest,
+	virtual sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 OnUserToken(
+				const sdl::imtauth::Authorization::V1_0::CUserTokenGqlRequest& userTokenRequest,
                 const ::imtgql::CGqlRequest& gqlRequest,
                 QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::V1_0::CUserManagementPayload OnGetUserMode(
+	virtual sdl::imtauth::Authorization::CUserManagementPayload::V1_0 OnGetUserMode(
 				const sdl::imtauth::Authorization::V1_0::CGetUserModeGqlRequest& getUserModeRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;

@@ -32,20 +32,23 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& rol
 		return nullptr;
 	}
 
-	namespace rolessdl = sdl::imtauth::Roles::V1_0;
+	namespace rolessdl = sdl::imtauth::Roles;
 
-	rolessdl::RoleItemRequestArguments arguments;
-	arguments.input.SetId(roleId);
-	arguments.input.SetProductId(productId);
+	rolessdl::V1_0::RoleItemRequestArguments arguments;
+	arguments.input.Id.reset(new QByteArray(roleId));
+	arguments.input.ProductId.reset(new QByteArray(productId));
 
 	imtgql::CGqlRequest gqlRequest;
-	if (rolessdl::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		rolessdl::CRoleDataPayload response;
-		if (!SendModelRequest(gqlRequest, response)){
+	if (rolessdl::V1_0::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		rolessdl::CRoleDataPayload::V1_0 response;
+		if (!SendModelRequest<rolessdl::CRoleDataPayload::V1_0, rolessdl::CRoleDataPayload>(gqlRequest, response)){
 			return nullptr;
 		}
 
-		rolessdl::CRoleData roleData = response.GetRoleData();
+		rolessdl::CRoleData::V1_0 roleData;
+		if (response.RoleData){
+			roleData = *response.RoleData;
+		}
 
 		istd::TDelPtr<imtauth::IRole> roleInfoPtr;
 		roleInfoPtr.SetPtr(m_roleInfoFactCompPtr.CreateInstance());
@@ -53,13 +56,23 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& rol
 			return nullptr;
 		}
 
-		roleInfoPtr->SetDefault(roleData.GetIsDefault());
-		roleInfoPtr->SetGuest(roleData.GetIsGuest());
-		roleInfoPtr->SetLocalPermissions(roleData.GetPermissions().split(';'));
-		roleInfoPtr->SetProductId(roleData.GetProductId());
-		roleInfoPtr->SetRoleDescription(roleData.GetDescription());
-		roleInfoPtr->SetRoleId(roleData.GetRoleId());
-		roleInfoPtr->SetRoleName(roleData.GetName());
+		roleInfoPtr->SetDefault(bool(roleData.IsDefault && *roleData.IsDefault));
+		roleInfoPtr->SetGuest(bool(roleData.IsGuest) && *roleData.IsGuest);
+		if (roleData.Permissions){
+			roleInfoPtr->SetLocalPermissions(roleData.Permissions->split(';'));
+		}
+		if (roleData.ProductId){
+			roleInfoPtr->SetProductId(*roleData.ProductId);
+		}
+		if (roleData.Description){
+			roleInfoPtr->SetRoleDescription(*roleData.Description);
+		}
+		if (roleData.RoleId){
+			roleInfoPtr->SetRoleId(*roleData.RoleId);
+		}
+		if (roleData.Name){
+			roleInfoPtr->SetRoleName(*roleData.Name);
+		}
 
 		return roleInfoPtr.PopPtr();
 	}

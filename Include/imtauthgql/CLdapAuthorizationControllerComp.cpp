@@ -151,7 +151,7 @@ const imtauth::CUserInfo* CLdapAuthorizationControllerComp::CreateUserInfoFromLd
 }
 
 
-sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAuthorization(
+sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 CLdapAuthorizationControllerComp::OnAuthorization(
 			const sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest& authorizationRequest,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
@@ -159,9 +159,20 @@ sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CLdapAuthorizationContr
 	if (m_enableableParamCompPtr.IsValid()){
 		bool enabled = m_enableableParamCompPtr->IsEnabled();
 		if (enabled){
-			QByteArray login = authorizationRequest.GetRequestedArguments().input.GetLogin().toUtf8();
-			QByteArray productId = authorizationRequest.GetRequestedArguments().input.GetProductId();
-			QByteArray password = authorizationRequest.GetRequestedArguments().input.GetPassword().toUtf8();
+			sdl::imtauth::Authorization::CAuthorizationInput::V1_0 inputArgument = authorizationRequest.GetRequestedArguments().input;
+
+			QByteArray login;
+			if (inputArgument.Login){
+				login = inputArgument.Login->toUtf8();
+			}
+			QByteArray productId;
+			if (inputArgument.ProductId){
+				productId = *inputArgument.ProductId;
+			}
+			QByteArray password;
+			if (inputArgument.Password){
+				password = inputArgument.Password->toUtf8();
+			}
 
 			QByteArray userObjectId = GetUserObjectId(login);
 
@@ -206,7 +217,7 @@ sdl::imtauth::Authorization::V1_0::CAuthorizationPayload CLdapAuthorizationContr
 								if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr.GetPtr())){
 									SendWarningMessage(
 										0,
-										QString("Unable to set product '%1' for user '%2'").arg(qPrintable(productId)).arg(qPrintable(userObjectId)),
+										QString("Unable to set product '%1' for user '%2'").arg(qPrintable(productId), qPrintable(userObjectId)),
 										"CLdapAuthorizationControllerComp");
 								}
 							}

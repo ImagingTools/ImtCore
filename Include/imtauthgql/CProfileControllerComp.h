@@ -26,11 +26,11 @@ public:
 
 protected:
 	// reimplemented (sdl::imtauth::Profile::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Profile::V1_0::CProfileData OnGetProfile(
+	virtual sdl::imtauth::Profile::CProfileData::V1_0 OnGetProfile(
 				const sdl::imtauth::Profile::V1_0::CGetProfileGqlRequest& getProfileRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Profile::V1_0::CSetProfileResponse OnSetProfile(
+	virtual sdl::imtauth::Profile::CSetProfileResponse::V1_0 OnSetProfile(
 				const sdl::imtauth::Profile::V1_0::CSetProfileGqlRequest& setProfileRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;

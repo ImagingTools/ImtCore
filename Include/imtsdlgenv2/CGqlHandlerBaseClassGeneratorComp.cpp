@@ -527,7 +527,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << 'C' <<  requestClassName;
 	stream << ' ' << GetDecapitalizedValue(requestClassName);
-	stream << QStringLiteral("(gqlRequest);");
+	stream << QStringLiteral("(gqlRequest, false);");
 	FeedStream(stream, 1, false);
 
 	// [1->2] SDL request validate

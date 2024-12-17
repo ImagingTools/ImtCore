@@ -15,57 +15,57 @@ namespace imtlicgql
 
 // protected methods
 
-sdl::imtlic::Products::V1_0::CProductsListPayload CProductControllerComp::OnProductsList(
+sdl::imtlic::Products::CProductsListPayload::V1_0 CProductControllerComp::OnProductsList(
 	const sdl::imtlic::Products::V1_0::CProductsListGqlRequest& /*productsListRequest*/,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return sdl::imtlic::Products::V1_0::CProductsListPayload();
+	return sdl::imtlic::Products::CProductsListPayload::V1_0();
 }
 
 
-sdl::imtlic::Products::V1_0::CProductDataPayload CProductControllerComp::OnProductItem(
+sdl::imtlic::Products::CProductDataPayload::V1_0 CProductControllerComp::OnProductItem(
 	const sdl::imtlic::Products::V1_0::CProductItemGqlRequest& /*productItemRequest*/,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return sdl::imtlic::Products::V1_0::CProductDataPayload();
+	return sdl::imtlic::Products::CProductDataPayload::V1_0();
 }
 
 
-sdl::imtlic::Products::V1_0::CProductExportResponse CProductControllerComp::OnProductsExport(
+sdl::imtlic::Products::CProductExportResponse::V1_0 CProductControllerComp::OnProductsExport(
 			const sdl::imtlic::Products::V1_0::CProductsExportGqlRequest& /*productsExportRequest*/,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return sdl::imtlic::Products::V1_0::CProductExportResponse();
+	return sdl::imtlic::Products::CProductExportResponse::V1_0();
 }
 
 
-::sdl::imtbase::ImtCollection::V1_0::CUpdatedNotificationPayload CProductControllerComp::OnProductUpdate(
+::sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0 CProductControllerComp::OnProductUpdate(
 	const sdl::imtlic::Products::V1_0::CProductUpdateGqlRequest& /*productUpdateRequest*/,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return ::sdl::imtbase::ImtCollection::V1_0::CUpdatedNotificationPayload();
+	return ::sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0();
 }
 
 
-::sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload CProductControllerComp::OnProductAdd(
+::sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0 CProductControllerComp::OnProductAdd(
 			const sdl::imtlic::Products::V1_0::CProductAddGqlRequest& /*productAddRequest*/,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return ::sdl::imtbase::ImtCollection::V1_0::CAddedNotificationPayload();
+	return ::sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0();
 }
 
 
-sdl::imtlic::Products::V1_0:: CProductImportResponse CProductControllerComp::OnProductsImport(
+sdl::imtlic::Products::CProductImportResponse::V1_0 CProductControllerComp::OnProductsImport(
 			const sdl::imtlic::Products::V1_0::CProductsImportGqlRequest& /*productsImportRequest*/,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return sdl::imtlic::Products::V1_0:: CProductImportResponse();
+	return sdl::imtlic::Products::CProductImportResponse::V1_0();
 }
 
 

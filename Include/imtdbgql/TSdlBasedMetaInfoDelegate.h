@@ -3,12 +3,13 @@
 
 // Qt includes
 #include<QtCore/QJsonDocument>
+#include<QtCore/QJsonObject>
 
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 
-// ACF includes
+// ImtCore includes
 #include <imtdb/IJsonBasedMetaInfoDelegate.h>
 
 
@@ -24,8 +25,8 @@ public:
 	virtual idoc::MetaInfoPtr FromJsonRepresentation(const QByteArray& data) const override;
 
 protected:
-	virtual bool FillRepresentation(MetaInfoRepresentation& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const= 0;
-	virtual bool FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const MetaInfoRepresentation& metaInfoRepresentation) const= 0;
+	virtual bool FillRepresentation(typename MetaInfoRepresentation::V1_0& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const= 0;
+	virtual bool FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const typename MetaInfoRepresentation::V1_0& metaInfoRepresentation) const= 0;
 };
 
 
@@ -34,10 +35,11 @@ QByteArray TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::ToJsonRepresentati
 {
 	QByteArray retVal;
 
-	MetaInfoRepresentation representation;
+	typename MetaInfoRepresentation::V1_0 representation;
 	if (FillRepresentation(representation, metaInfo)){
 		QJsonObject object;
-		if (representation.WriteToJsonObject(object)){
+
+		if (MetaInfoRepresentation::WriteToJsonObject(representation, object)){
 			QJsonDocument document(object);
 			retVal = document.toJson(QJsonDocument::Compact);
 		}
@@ -55,7 +57,7 @@ idoc::MetaInfoPtr TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::FromJsonRep
 	document = document.fromJson(data, &error);
 	if (document.isObject() && error.error == QJsonParseError::NoError){
 		QJsonObject object = document.object();
-		MetaInfoRepresentation representation;
+		typename MetaInfoRepresentation::V1_0 representation;
 		if (MetaInfoRepresentation::ReadFromJsonObject(representation, object)){
 			idoc::MetaInfoPtr retVal(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 			if (FillMetaInfo(*retVal, representation)){

@@ -41,7 +41,7 @@ protected:
 	const imtauth::CUserInfo* CreateUserInfoFromLdapUser(const QByteArray& ldapUserId) const;
 
 	// reimplemented (CAuthorizationControllerComp)
-	virtual sdl::imtauth::Authorization::V1_0::CAuthorizationPayload OnAuthorization(
+	virtual sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 OnAuthorization(
 				const sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest& authorizationRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
