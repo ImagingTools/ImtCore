@@ -65,10 +65,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 
 	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
 
-	QString query;
 
 	if (m_uniqueValuesFieldAttrPtr.IsValid() && *m_uniqueValuesFieldAttrPtr != ""){
-		query = QString("SELECT DISTINCT ON (\"%1\") * FROM (%2)").arg(*m_uniqueValuesFieldAttrPtr).arg(selectionQuery);
+		selectionQuery = QString("SELECT DISTINCT ON (\"%1\") * FROM (%2)").arg(*m_uniqueValuesFieldAttrPtr).arg(selectionQuery).toUtf8();
 	}
 
 	return selectionQuery;
