@@ -44,22 +44,9 @@ static QSet<QString> s_filterableColumns = { s_typeIdColumn, s_nameColumn, s_des
 
 QByteArray CSqlDatabaseDocumentDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
 {
-	QString filterQuery;
-	if (paramsPtr != nullptr){
-		if (!CreateFilterQuery(*paramsPtr, filterQuery)){
-			return QByteArray();
-		}
-	}
+	QString baseQuery = GetSelectionQuery(QByteArray(), 0, -1, paramsPtr);
 
-	if (!m_tableSchemaAttrPtr.IsValid()){
-		return QString("SELECT COUNT(*) FROM \"%1\" WHERE \"IsActive\" = true %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toUtf8();
-	}
-
-	return QString("SELECT COUNT(*) FROM %0.\"%1\" WHERE \"IsActive\" %2")
-				.arg(qPrintable(*m_tableSchemaAttrPtr))
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(filterQuery)
-				.toUtf8();
+	return QString("SELECT COUNT(*) FROM (%1) as t").arg(baseQuery).toUtf8();
 }
 
 
@@ -77,6 +64,12 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 	}
 
 	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
+
+	QString query;
+
+	if (m_uniqueValuesFieldAttrPtr.IsValid() && *m_uniqueValuesFieldAttrPtr != ""){
+		query = QString("SELECT DISTINCT ON (\"%1\") * FROM (%2)").arg(*m_uniqueValuesFieldAttrPtr).arg(selectionQuery);
+	}
 
 	return selectionQuery;
 }
@@ -644,15 +637,42 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& type
 
 QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 {
-	QString query = R"(SELECT "TypeId", "DocumentId", "Name", "Description", "Document", "DataMetaInfo", "CollectionMetaInfo", "Checksum", "LastModified", "IsActive", "RevisionNumber",
-			(SELECT "LastModified" FROM "%2" as t1 WHERE "RevisionNumber" = 1 AND %1"%2"."DocumentId" = t1."DocumentId" LIMIT 1) as "Added" FROM "%2" WHERE "IsActive" = true)";
+	QString query = R"(
+				SELECT *
+				FROM
+				(
+					SELECT
+						"Id",
+						"TypeId",
+						"DocumentId",
+						"Name",
+						"Description",
+						"Document",
+						"DataMetaInfo",
+						"CollectionMetaInfo",
+						"RevisionNumber",
+						"Checksum",
+						"IsActive",
+						"OwnerId",
+						"OwnerName",
+						"OperationDescription",
+						"LastModified", 
+						(SELECT "LastModified" FROM %1"%2" as t1 WHERE "RevisionNumber" = 1 AND root."DocumentId" = t1."DocumentId" LIMIT 1) as "Added"
+					FROM %1"%2" as root
+				) WHERE "IsActive" = true)";
 
-	QString schemaPrefix;
+	QString schema;
 	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
+		schema = qPrintable(*m_tableSchemaAttrPtr);
 	}
 
-	return query.arg(schemaPrefix).arg(qPrintable(*m_tableNameAttrPtr));
+	query = query.arg(schema.isEmpty() ? "" : schema + ".");
+
+	Q_ASSERT(!(*m_tableNameAttrPtr).isEmpty());
+
+	query = query.arg(qPrintable(*m_tableNameAttrPtr));
+
+	return query;
 }
 
 

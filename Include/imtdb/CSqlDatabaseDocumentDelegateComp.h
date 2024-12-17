@@ -26,6 +26,7 @@ public:
 	I_BEGIN_COMPONENT(CSqlDatabaseDocumentDelegateComp)
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
 		I_ASSIGN(m_useBase64AttrPtr, "UseDocumentBase64Encoding", "", true, true);
+		I_ASSIGN(m_uniqueValuesFieldAttrPtr, "UniqueValuesField", "Unique values field", false, "");
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN_MULTI_0(m_documentPersistenceListCompPtr, "DocumentPersistenceList", "List of persistence components for each type of the document", true);
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Creator of metainformation of object data", false, "MetaInfoCreator");
@@ -124,6 +125,7 @@ protected:
 
 protected:
 	I_ATTR(bool, m_useBase64AttrPtr);
+	I_ATTR(QByteArray, m_uniqueValuesFieldAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_documentPersistenceListCompPtr);
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
