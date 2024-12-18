@@ -6,7 +6,7 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 QT += sql
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtdb
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtdb -limtcol
 LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR
 
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
