@@ -324,10 +324,6 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 
 bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(const imtgql::CGqlRequest& rawGqlRequest, const sdl::imtauth::Groups::V1_0::CGroupUpdateGqlRequest& groupUpdateRequest, istd::IChangeable& object, QString& errorMessage) const
 {
-	SendCriticalMessage(0, "Unimplemented method call!", __func__);
-
-	Q_ASSERT_X(false, "Unimplemented method call!", __func__);
-
 	return false;
 }
 

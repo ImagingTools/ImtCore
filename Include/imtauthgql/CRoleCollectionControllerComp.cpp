@@ -385,12 +385,9 @@ void CRoleCollectionControllerComp::SetObjectFilter(
 	filterParams.SetEditableParameter("ProductId", textParamPtr, true);
 }
 
-bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(const imtgql::CGqlRequest& rawGqlRequest, const sdl::imtauth::Roles::V1_0::CRoleUpdateGqlRequest& roleUpdateRequest, istd::IChangeable& object, QString& errorMessage) const
+
+bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(const imtgql::CGqlRequest& /*rawGqlRequest*/, const sdl::imtauth::Roles::V1_0::CRoleUpdateGqlRequest& /*roleUpdateRequest*/, istd::IChangeable& /*object*/, QString& /*errorMessage*/) const
 {
-	SendCriticalMessage(0, "Unimplemented method call!", __func__);
-
-	Q_ASSERT_X(false, "Unimplemented method call!", __func__);
-
 	return false;
 }
 

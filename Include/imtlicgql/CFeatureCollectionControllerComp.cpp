@@ -345,10 +345,6 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 bool CFeatureCollectionControllerComp::UpdateObjectFromRepresentationRequest(const imtgql::CGqlRequest& rawGqlRequest, const sdl::imtlic::Features::V1_0::CUpdateFeatureGqlRequest& updateFeatureRequest, istd::IChangeable& object, QString& errorMessage) const
 {
-	SendCriticalMessage(0, "Unimplemented method call!", __func__);
-
-	Q_ASSERT_X(false, "Unimplemented method call!", __func__);
-
 	return false;
 }
 
