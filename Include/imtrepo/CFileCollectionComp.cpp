@@ -75,7 +75,7 @@ imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionI
 }
 
 
-int CFileCollectionComp::BackupObject(
+int CFileCollectionComp::BackupRevision(
 			const imtbase::IObjectCollection& collection,
 			const Id& objectId,
 			const QString& userComment) const
@@ -214,7 +214,7 @@ int CFileCollectionComp::BackupObject(
 }
 
 
-bool CFileCollectionComp::RestoreObject(
+bool CFileCollectionComp::RestoreRevision(
 			imtbase::IObjectCollection&,
 			const Id& objectId,
 			int revision) const
@@ -303,7 +303,7 @@ bool CFileCollectionComp::RestoreObject(
 }
 
 
-bool CFileCollectionComp::ExportObject(
+bool CFileCollectionComp::ExportRevision(
 			const imtbase::IObjectCollection& collection,
 			const Id& objectId,
 			int revision,
@@ -367,6 +367,13 @@ bool CFileCollectionComp::ExportObject(
 		}
 	}
 
+	return false;
+}
+
+
+bool CFileCollectionComp::DeleteRevision(IObjectCollection& /*collection*/, const ICollectionInfo::Id& /*objectId*/, int /*revision*/) const
+{
+	Q_ASSERT_X(false, "Method not implemented", "CFileCollectionComp");
 	return false;
 }
 
@@ -1007,7 +1014,7 @@ void CFileCollectionComp::OnComponentCreated()
 		if (revisionControllerPtr != nullptr){
 			imtbase::ICollectionInfo::Ids ids = GetElementIds();
 			for (const QByteArray& id : ids){
-				revisionControllerPtr->BackupObject(*this, id, tr("Revision number updated to %1").arg(*m_revisionAttrPtr));
+				revisionControllerPtr->BackupRevision(*this, id, tr("Revision number updated to %1").arg(*m_revisionAttrPtr));
 			}
 		}
 	}

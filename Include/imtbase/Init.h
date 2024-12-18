@@ -44,13 +44,14 @@ public:
 
 	static void InitImtCoreSdl()
 	{
+		Q_INIT_RESOURCE(imtbaseComplexCollectionFilterSdl);
+		Q_INIT_RESOURCE(imtbaseDocumentRevisionSdl);
 		Q_INIT_RESOURCE(imtauthGroupsSdl);
 		Q_INIT_RESOURCE(imtauthRolesSdl);
 		Q_INIT_RESOURCE(imtauthUsersSdl);
 		Q_INIT_RESOURCE(imtauthProfileSdl);
 		Q_INIT_RESOURCE(imtauthAuthorizationSdl);
 		Q_INIT_RESOURCE(imtappApplicationSdl);
-		Q_INIT_RESOURCE(imtbaseComplexCollectionFilterSdl);
 	}
 
 	static void InitQml()

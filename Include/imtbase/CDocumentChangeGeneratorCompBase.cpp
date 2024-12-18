@@ -75,40 +75,40 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 				else if (typeId == "Change"){
 					QString change = iqt::GetTranslation(
 						m_translationManagerCompPtr.GetPtr(),
-						QString(QT_TR_NOOP("'%1' changed from '%2' to '%3'")).toUtf8(),
+						QString(QT_TR_NOOP("%1 changed from '%2' to '%3'")).toUtf8(),
 						languageId,
 						"imtbase::CDocumentChangeGeneratorCompBase");
 
-					change = change.arg(keyName).arg(qPrintable(oldValue)).arg(qPrintable(newValue));
+					change = change.arg("<b>" + keyName + "</b>").arg(qPrintable(oldValue)).arg(qPrintable(newValue));
 
-					retVal += change + "\n";
+					retVal += "<p>" + change + "</p>";
 				}
 				else if (typeId == "Set"){
 					QString change = iqt::GetTranslation(
 						m_translationManagerCompPtr.GetPtr(),
-						QString(QT_TR_NOOP("'%1' was set to '%2'")).toUtf8(),
+						QString(QT_TR_NOOP("%1 was set to '%2'")).toUtf8(),
 						languageId,
 						"imtbase::CDocumentChangeGeneratorCompBase");
 
-					change = change.arg(keyName).arg(qPrintable(newValue));
+					change = change.arg("<b>" + keyName + "</b>").arg(qPrintable(newValue));
 
-					retVal += change + "\n";
+					retVal += "<p>" + change + "</p>";
 				}
 				else if (typeId == "Clear"){
 					QString change = iqt::GetTranslation(
 						m_translationManagerCompPtr.GetPtr(),
-						QString(QT_TR_NOOP("'%1' was cleared")).toUtf8(),
+						QString(QT_TR_NOOP("%1 was cleared")).toUtf8(),
 						languageId,
 						"imtbase::CDocumentChangeGeneratorCompBase");
 
-					change = change.arg(keyName);
+					change = change.arg("<b>" + keyName + "</b>");
 
-					retVal += change + "\n";
+					retVal += "<p>" + change + "</p>";
 				}
 				else{
 					QString change = CreateCustomOperationDescription(*operationDescriptionPtr);
 					if (!change.isEmpty()){
-						retVal += change + "\n";
+						retVal += "<p>" + change + "</p>";
 					}
 				}
 			}

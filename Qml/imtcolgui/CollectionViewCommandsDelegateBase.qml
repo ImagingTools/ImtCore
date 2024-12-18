@@ -167,6 +167,7 @@ ViewCommandsDelegateBase {
                 commandsController.setCommandIsEnabled("Remove", isEnabled);
                 commandsController.setCommandIsEnabled("Edit", isEnabled);
                 commandsController.setCommandIsEnabled("Export", isEnabled);
+				commandsController.setCommandIsEnabled("Revision", isEnabled);
             }
         }
     }
@@ -255,6 +256,9 @@ ViewCommandsDelegateBase {
             fileDialogSave.open();
         }
     }
+
+	function onRevision(){
+	}
 
     // importObject(typeId, name, description, b64encoded, ext, additionalParamsObj) - signature in dataController
     function onImportDialogResult(name, fileData, mimeType){
@@ -488,6 +492,9 @@ ViewCommandsDelegateBase {
             else if (commandId === "Export"){
                 collectionViewCommandsDelegate.onExport();
             }
+			else if (commandId === "Revision"){
+				collectionViewCommandsDelegate.onRevision();
+			}
         }
 
         let editIsEnabled = commandsController.commandIsEnabled("Edit");

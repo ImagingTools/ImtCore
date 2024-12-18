@@ -75,19 +75,23 @@ public:
 	virtual RevisionInfoList GetRevisionInfoList(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId) const override;
-	virtual int BackupObject(
+	virtual int BackupRevision(
 				const imtbase::IObjectCollection& collection,
 				const imtbase::ICollectionInfo::Id& objectId,
 				const QString& userComment = QString()) const override;
-	virtual bool RestoreObject(
+	virtual bool RestoreRevision(
 				imtbase::IObjectCollection& collection,
 				const imtbase::ICollectionInfo::Id& objectId,
 				int revision) const override;
-	virtual bool ExportObject(
+	virtual bool ExportRevision(
 				const imtbase::IObjectCollection& collection,
 				const imtbase::ICollectionInfo::Id& objectId,
 				int revision,
 				const QString& filePath) const override;
+	virtual bool DeleteRevision(
+				imtbase::IObjectCollection& collection,
+				const imtbase::ICollectionInfo::Id& objectId,
+				int revision) const override;
 
 protected:
 	virtual QByteArray PrepareInsertNewObjectQuery(
@@ -109,19 +113,16 @@ protected:
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const override;
-	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const;
+	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const override;
 	virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const override;
 	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const override;
-	virtual QByteArray CreateObjectHistoryQuery(
-				int offset = 0,
-				int count = -1,
-				const iprm::IParamsSet* paramsPtr = nullptr) const;
 
 protected:
 	virtual bool CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const;
 	const ifile::IFilePersistence* FindDocumentPersistence(const QByteArray& typeId) const;
 	void SubstituteFieldIds(QString& query) const;
+	virtual QByteArray GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const;
 
 protected:
 	I_ATTR(bool, m_useBase64AttrPtr);

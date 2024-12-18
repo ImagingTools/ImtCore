@@ -16,6 +16,7 @@
 
 // ImtCore includes
 #include <imtbase/CObjectCollection.h>
+#include <imtcol/IDocumentCollectionFilter.h>
 
 
 namespace imtdb
@@ -25,37 +26,6 @@ namespace imtdb
 // public methods
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
-
-QByteArray CSqlJsonDatabaseDelegateComp::GetSelectionQuery(
-			const QByteArray& objectId,
-			int offset,
-			int count,
-			const iprm::IParamsSet* paramsPtr) const
-{
-	if (!objectId.isEmpty()){
-		return QString("SELECT * FROM \"%1\" WHERE \"IsActive\" = true AND \"%2\" = '%3'")
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(*m_objectIdColumnAttrPtr))
-				.arg(qPrintable(objectId)).toUtf8();
-	}
-
-	if (paramsPtr != nullptr){
-		iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
-		if (paramIds.contains("IsHistory")){
-			iprm::TParamsPtr<iprm::IEnableableParam> enableableParamPtr(paramsPtr, "IsHistory");
-			if (enableableParamPtr.IsValid()){
-				if (enableableParamPtr->IsEnabled()){
-					return CreateObjectHistoryQuery(offset, count, paramsPtr);
-				}
-			}
-		}
-	}
-
-	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
-
-	return selectionQuery;
-}
-
 
 istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
@@ -185,11 +155,11 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 		QString queryStr;
 		if (*m_isMultiTypeAttrPtr){
 			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', true, "
-                               " (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1,"
+							   " (SELECT MAX(\"RevisionNumber\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1,"
                                " (SELECT \"TypeId\" FROM \"%1\" WHERE \"DocumentId\" = '%2' LIMIT 1) );" );
 		}
 		else{
-			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );");
+			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT MAX(\"RevisionNumber\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );");
 		}
 		retVal = queryStr
 				.arg(qPrintable(*m_tableNameAttrPtr))
@@ -556,30 +526,6 @@ bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFil
 idoc::MetaInfoPtr CSqlJsonDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
 	return idoc::MetaInfoPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
-}
-
-
-QByteArray CSqlJsonDatabaseDelegateComp::CreateObjectHistoryQuery(
-			int offset,
-			int count,
-			const iprm::IParamsSet* paramsPtr) const
-{
-	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(paramsPtr, "Id");
-	if (idParamPtr.IsValid()){
-		QByteArray objectId = idParamPtr->GetId();
-
-		QByteArray paginationQuery;
-		CreatePaginationQuery(offset, count, paginationQuery);
-
-		return QString(R"((SELECT * FROM "%1" WHERE "%2" = '%3' %4) ORDER BY "RevisionNumber" DESC;)")
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(*m_objectIdColumnAttrPtr))
-					.arg(qPrintable(objectId))
-					.arg(qPrintable(paginationQuery))
-					.toUtf8();
-	}
-
-	return QByteArray();
 }
 
 

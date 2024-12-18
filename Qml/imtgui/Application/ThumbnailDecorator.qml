@@ -298,10 +298,6 @@ Rectangle {
         }
     }
 
-    ShortcutManager {
-        id: shortcutManager;
-    }
-
     property Component errorDialog: Component {
         ErrorDialog {
             onFinished: {}

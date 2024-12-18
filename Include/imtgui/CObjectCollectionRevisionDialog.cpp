@@ -127,7 +127,7 @@ void CObjectCollectionRevisionDialog::OnExport()
 						m_filter);
 
 			if (!filePath.isEmpty()){
-				if (!m_revisionControllerPtr->ExportObject(*m_collectionPtr, m_objectId, revision, filePath)){
+				if (!m_revisionControllerPtr->ExportRevision(*m_collectionPtr, m_objectId, revision, filePath)){
 					QMessageBox::critical(this, tr("Collection"), tr("Document could not be exported"));
 				}
 			}

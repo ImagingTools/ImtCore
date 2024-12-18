@@ -10,7 +10,7 @@ DecoratorBase {
 
 	clip: true;
 
-	property int maxTextWidth: 100;
+	property int maxTextWidth: 200;
 	property int minTextWidth: 20;
 	property int iconSize: Style.size_mainMargin;
 	property int contentSpacing: Style.size_mainMargin;

@@ -676,7 +676,7 @@ void CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::CreateBackup(c
 						&isOk);
 		}
 
-		revisionControllerPtr->BackupObject(*m_parent.m_collectionPtr, objectId, comment);
+		revisionControllerPtr->BackupRevision(*m_parent.m_collectionPtr, objectId, comment);
 	}
 }
 

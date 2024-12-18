@@ -54,7 +54,7 @@ public:
 		Create backup of the given object in the collection.
 		\return Revision of the saved object if the operation was successfull, or a negative value otherwise.
 	*/
-	virtual int BackupObject(
+	virtual int BackupRevision(
 				const IObjectCollection& collection,
 				const ICollectionInfo::Id& objectId,
 				const QString& userComment = QString()) const = 0;
@@ -62,7 +62,7 @@ public:
 	/**
 		Restore the data of an object in the collection from a given revision.
 	*/
-	virtual bool RestoreObject(
+	virtual bool RestoreRevision(
 				IObjectCollection& collection,
 				const ICollectionInfo::Id& objectId,
 				int revision) const = 0;
@@ -70,11 +70,19 @@ public:
 	/**
 		Exporting object data of a given revision from a collection to a file
 	*/
-	virtual bool ExportObject(
+	virtual bool ExportRevision(
 				const IObjectCollection& collection,
 				const ICollectionInfo::Id& objectId,
 				int revision,
 				const QString& filePath) const = 0;
+
+	/**
+		Deleting object data of a given revision from a collection
+	*/
+	virtual bool DeleteRevision(
+				IObjectCollection& collection,
+				const ICollectionInfo::Id& objectId,
+				int revision) const = 0;
 };
 
 

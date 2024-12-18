@@ -61,8 +61,6 @@ protected:
 					object = object.value(request.GetCommandId()).toObject();
 				}
 
-				qDebug() << "response" << QJsonDocument(object).toJson();
-
 				return SdlReader::ReadFromJsonObject(responseModel, object);
 			}
 		}

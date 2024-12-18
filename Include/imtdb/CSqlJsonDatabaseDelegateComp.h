@@ -20,11 +20,6 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
-	virtual QByteArray GetSelectionQuery(
-				const QByteArray& objectId = QByteArray(),
-				int offset = 0,
-				int count = -1,
-				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual istd::IChangeable* CreateObjectFromRecord(const QSqlRecord& record) const override;
 	virtual NewObjectQuery CreateNewObjectQuery(
 				const QByteArray& typeId,
@@ -62,11 +57,6 @@ public:
 	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const override;
 
 protected:
-	virtual QByteArray CreateObjectHistoryQuery(
-				int offset = 0,
-				int count = -1,
-				const iprm::IParamsSet* paramsPtr = nullptr) const override;
-
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const override;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const override;
 	virtual bool TableIsExists(const QString& tableName) const;

@@ -33,7 +33,7 @@ public:
 	I_BEGIN_COMPONENT(CFileCollectionComp)
 		I_ASSIGN(m_productVersionIdAttrPtr, "ProductVersionID", "ID of the product version", true, 89107);
 		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);
-		I_ASSIGN(m_restoreRevisionRightIdAttrPtr, "RestoreRevisionRightId", "Restore to revision right id", true, "RestoreObject");
+		I_ASSIGN(m_restoreRevisionRightIdAttrPtr, "RestoreRevisionRightId", "Restore to revision right id", true, "RestoreRevision");
 		I_ASSIGN(m_transformationControllerCompPtr, "TransformationController", "Controller for down- and upgrade of the repository data", false, "TransformationController");
 		I_ASSIGN_TO(m_transformationStepsProviderCompPtr, m_transformationControllerCompPtr, true);
 	I_END_COMPONENT;
@@ -42,9 +42,10 @@ public:
 
 	// reimplemented (imtbase::IRevisionController)
 	virtual RevisionInfoList GetRevisionInfoList(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const override;
-	virtual int BackupObject(const imtbase::IObjectCollection& collection, const Id& objectId, const QString& userComment = QString()) const override;
-	virtual bool RestoreObject(imtbase::IObjectCollection& collection, const Id& objectId, int revision) const override;
-	virtual bool ExportObject(const imtbase::IObjectCollection& collection, const Id& objectId, int revision, const QString& filePath) const override;
+	virtual int BackupRevision(const imtbase::IObjectCollection& collection, const Id& objectId, const QString& userComment = QString()) const override;
+	virtual bool RestoreRevision(imtbase::IObjectCollection& collection, const Id& objectId, int revision) const override;
+	virtual bool ExportRevision(const imtbase::IObjectCollection& collection, const Id& objectId, int revision, const QString& filePath) const override;
+	virtual bool DeleteRevision(IObjectCollection& collection, const ICollectionInfo::Id& objectId, int revision) const override;
 
 	// reimplemented (IFileCollectionInfo)
 	virtual FileCollectionLayout GetCollectionFileLayout() const override;

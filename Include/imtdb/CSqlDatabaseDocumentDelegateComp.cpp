@@ -21,6 +21,7 @@
 #include <imtbase/CObjectCollection.h>
 #include <imtbase/ICollectionFilter.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
+#include <imtcol/CDocumentCollectionFilter.h>
 
 
 namespace imtdb
@@ -57,10 +58,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
-		QString baseQuery = GetBaseSelectionQuery();
-
-		return QString(
-			baseQuery + QString(" AND \"DocumentId\" = '%1'").arg(qPrintable(objectId))).toUtf8();
+		return GetObjectSelectionQuery(objectId, paramsPtr);
 	}
 
 	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
@@ -174,7 +172,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 			bool /*useExternDelegate*/) const
 {
 	// Get number of the revisions of the document in the database:
-	QByteArray countRevisionsQuery = QString("(SELECT COUNT(*) FROM \"%1\" WHERE \"%2\" = '%3') + 1")
+	QByteArray countRevisionsQuery = QString("(SELECT MAX(\"RevisionNumber\") FROM \"%1\" WHERE \"%2\" = '%3') + 1")
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(objectId))
@@ -286,11 +284,14 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 		return imtbase::IRevisionController::RevisionInfoList();
 	}
 
-	iprm::CIdParam idParam;
-	idParam.SetId(objectId);
-	iprm::CParamsSet paramSet;
-	paramSet.SetEditableParameter("Id", &idParam);
-	QByteArray query = CreateObjectHistoryQuery(0, -1, &paramSet);
+	iprm::CParamsSet filterParams;
+	imtcol::CDocumentCollectionFilter documentFilter;
+	documentFilter.SetDocumentId(objectId);
+	documentFilter.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_ACTIVE);
+	documentFilter.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_INACTIVE);
+	filterParams.SetEditableParameter("DocumentFilter", &documentFilter);
+
+	QByteArray query = GetSelectionQuery(objectId, 0, -1, &filterParams);
 
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
@@ -304,6 +305,10 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 		QSqlRecord revisionRecord = sqlQuery.record();
 		RevisionInfo revisionInfo;
 
+		if (revisionRecord.contains("OwnerName")){
+			revisionInfo.user = revisionRecord.value("OwnerName").toString();
+		}
+
 		if (revisionRecord.contains("RevisionNumber")){
 			revisionInfo.revision = revisionRecord.value("RevisionNumber").toInt();
 		}
@@ -312,7 +317,13 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 			revisionInfo.timestamp = revisionRecord.value("LastModified").toDateTime();
 		}
 
-		revisionInfo.isRevisionAvailable = true;
+		if (revisionRecord.contains("IsActive")){
+			revisionInfo.isRevisionAvailable = revisionRecord.value("IsActive").toBool();
+		}
+
+		if (revisionRecord.contains("OperationDescription")){
+			revisionInfo.comment = revisionRecord.value("OperationDescription").toString();
+		}
 
 		revisionInfoList.push_back(revisionInfo);
 	}
@@ -321,7 +332,7 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 }
 
 
-int CSqlDatabaseDocumentDelegateComp::BackupObject(
+int CSqlDatabaseDocumentDelegateComp::BackupRevision(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Id& /*objectId*/,
 			const QString& /*userComment*/) const
@@ -330,60 +341,108 @@ int CSqlDatabaseDocumentDelegateComp::BackupObject(
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::RestoreObject(
+bool CSqlDatabaseDocumentDelegateComp::RestoreRevision(
 			imtbase::IObjectCollection& collection,
 			const imtbase::ICollectionInfo::Id& objectId,
 			int revision) const
 {
-	Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::RestoreObject", "TODO: Method operation needs to be checked. Method not tested.");
-
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return false;
 	}
 
-	imtbase::IRevisionController::RevisionInfoList revisionInfoList = GetRevisionInfoList(collection, objectId);
-	for (const imtbase::IRevisionController::RevisionInfo& revisionInfo : revisionInfoList){
-		if (revisionInfo.revision == revision){
-			iprm::CIdParam idParam;
-			idParam.SetId(objectId);
-			iprm::CParamsSet paramSet;
-			paramSet.SetEditableParameter("Id", &idParam);
-			QByteArray query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"%2\" = '%3'")
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(s_documentIdColumn))
-				.arg(qPrintable(objectId))
-				.toUtf8();
+	istd::IChangeable::ChangeSet changeSet(imtbase::IObjectCollection::CF_OBJECT_DATA_CHANGED);
+	changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED, objectId);
 
-			query += QString(R"(; UPDATE "%1" SET "IsActive" = true WHERE "%2" = '%3' AND "RevisionNumber" = %4)")
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(s_documentIdColumn))
-				.arg(qPrintable(objectId))
-				.arg(revision)
-				.toUtf8();
+	istd::CChangeNotifier changeNotifier(&collection, &changeSet);
 
-			QSqlError sqlError;
-			QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
-			if (sqlError.type() != QSqlError::NoError){
-				SendErrorMessage(0, sqlError.text(), "Database collection");
+	QByteArray query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"%2\" = '%3';")
+						.arg(qPrintable(*m_tableNameAttrPtr))
+						.arg(qPrintable(s_documentIdColumn))
+						.arg(qPrintable(objectId))
+						.toUtf8();
 
-				return false;
-			}
+	query += QString(R"(UPDATE "%1" SET "IsActive" = true WHERE "%2" = '%3' AND "RevisionNumber" = %4)")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(s_documentIdColumn))
+					.arg(qPrintable(objectId))
+					.arg(revision)
+					.toUtf8();
 
-			return true;
-		}
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		SendErrorMessage(0, sqlError.text(), "Database collection");
+
+		return false;
 	}
 
-	return false;
+	return true;
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::ExportObject(
+bool CSqlDatabaseDocumentDelegateComp::ExportRevision(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Id& /*objectId*/,
 			int /*revision*/,
 			const QString& /*filePath*/) const
 {
 	return false;
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
+			imtbase::IObjectCollection& collection,
+			const imtbase::ICollectionInfo::Id& objectId,
+			int revision) const
+{
+	QByteArray checkCurrentRevisionQuery = QString("SELECT * FROM \"%1\" WHERE \"DocumentId\" = '%2' AND \"IsActive\" = true;")
+								.arg(qPrintable(*m_tableNameAttrPtr))
+								.arg(qPrintable(objectId))
+								.toUtf8();
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(checkCurrentRevisionQuery, &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		SendErrorMessage(0, sqlError.text(), "Database collection");
+
+		return false;
+	}
+
+	if (!sqlQuery.next()){
+		return false;
+	}
+
+	QSqlRecord revisionRecord = sqlQuery.record();
+
+	int currentRevision = -1;
+	if (revisionRecord.contains("RevisionNumber")){
+		currentRevision = revisionRecord.value("RevisionNumber").toInt();
+	}
+
+	if (currentRevision == revision){
+		SendErrorMessage(0, QString("Unable to delete revision '%1' for document '%2'. Error: Revision '%1' is active").arg(revision).arg(qPrintable(objectId)), "Database collection");
+		return false;
+	}
+
+	QByteArray query = QString("DELETE  FROM \"%1\" WHERE \"DocumentId\" = '%2' AND \"RevisionNumber\" = %3;")
+								.arg(qPrintable(*m_tableNameAttrPtr))
+								.arg(qPrintable(objectId))
+								.arg(revision)
+								.toUtf8();
+
+	sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		SendErrorMessage(0, sqlError.text(), "Database collection");
+
+		return false;
+	}
+
+	istd::IChangeable::ChangeSet changeSet(imtbase::IObjectCollection::CF_OBJECT_DATA_CHANGED);
+	changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED, objectId);
+
+	istd::CChangeNotifier changeNotifier(&collection, &changeSet);
+
+	return true;
 }
 
 
@@ -961,30 +1020,6 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITim
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateObjectHistoryQuery(
-			int offset,
-			int count,
-			const iprm::IParamsSet* paramsPtr) const
-{
-	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(paramsPtr, "Id");
-	if (idParamPtr.IsValid()){
-		QByteArray objectId = idParamPtr->GetId();
-
-		QByteArray paginationQuery;
-		CreatePaginationQuery(offset, count, paginationQuery);
-
-		return QString(R"((SELECT * FROM "%1" WHERE "%2" = '%3' %4) ORDER BY "RevisionNumber" DESC;)")
-			.arg(qPrintable(*m_tableNameAttrPtr))
-			.arg(qPrintable(*m_objectIdColumnAttrPtr))
-			.arg(qPrintable(objectId))
-			.arg(qPrintable(paginationQuery))
-			.toUtf8();
-	}
-
-	return QByteArray();
-}
-
-
 // protected methods
 
 bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
@@ -1035,6 +1070,49 @@ void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query) const
 			query.replace(item, substitute);
 		}
 	}
+}
+
+
+QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const
+{
+	QString stateDocumentFilter;
+	if (paramsPtr != nullptr){
+		iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
+		if (paramIds.contains("DocumentFilter")){
+			iprm::TParamsPtr<imtcol::IDocumentCollectionFilter> documentFilterParamPtr(paramsPtr, "DocumentFilter");
+			if (documentFilterParamPtr.IsValid()){
+				imtcol::IDocumentCollectionFilter::DocumentStates states = documentFilterParamPtr->GetDocumentStates();
+
+				if (states.contains(imtcol::IDocumentCollectionFilter::DS_ACTIVE)){
+					stateDocumentFilter += QString("\"IsActive\" = true");
+				}
+
+				if (states.contains(imtcol::IDocumentCollectionFilter::DS_INACTIVE)){
+					if (!stateDocumentFilter.isEmpty()){
+						stateDocumentFilter += QString(" OR ");
+					}
+
+					stateDocumentFilter += QString("\"IsActive\" = false");
+				}
+			}
+		}
+	}
+
+	if (stateDocumentFilter.isEmpty()){
+		stateDocumentFilter = QString("\"IsActive\" = true");
+	}
+
+	QString schemaPrefix;
+	if (m_tableSchemaAttrPtr.IsValid()){
+		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
+	}
+
+	return QString("(SELECT * FROM %0\"%1\" WHERE (%2) AND \"%3\" = '%4') ORDER BY \"RevisionNumber\" DESC;")
+				.arg(schemaPrefix)
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(stateDocumentFilter)
+				.arg(qPrintable(*m_objectIdColumnAttrPtr))
+				.arg(qPrintable(objectId)).toUtf8();
 }
 
 

@@ -817,7 +817,7 @@ void CObjectCollectionViewDelegate::OnDuplicate()
 
 				const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
 				if (revisionControllerPtr != nullptr){
-					revisionControllerPtr->BackupObject(*m_collectionPtr, objectId, tr("Initial Revision"));
+					revisionControllerPtr->BackupRevision(*m_collectionPtr, objectId, tr("Initial Revision"));
 				}
 			}
 		}
@@ -868,7 +868,7 @@ void CObjectCollectionViewDelegate::OnImport()
 			else{
 				const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
 				if (revisionControllerPtr != nullptr){
-					revisionControllerPtr->BackupObject(*m_collectionPtr, objectId, tr("Importing into collection"));
+					revisionControllerPtr->BackupRevision(*m_collectionPtr, objectId, tr("Importing into collection"));
 				}
 
 				OnImportObject(objectId);
@@ -942,7 +942,7 @@ void CObjectCollectionViewDelegate::OnRestore()
 				if (IsRestoreAllowed(objectId)){
 					BeforeRestore(objectId);
 
-					bool isRestored = revisionControllerPtr->RestoreObject(*m_collectionPtr, objectId, revision);
+					bool isRestored = revisionControllerPtr->RestoreRevision(*m_collectionPtr, objectId, revision);
 
 					AfterRestore(objectId, isRestored);
 				}

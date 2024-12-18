@@ -74,6 +74,7 @@
         <file alias="imtgui/View/ButtonElementView.qml">View/ButtonElementView.qml</file>
         <file alias="imtgui/View/FilePickerElementView.qml">View/FilePickerElementView.qml</file>
 	<file alias="imtgui/View/DateTimePickerElementView.qml">View/DateTimePickerElementView.qml</file>
+	<file alias="imtgui/View/StickerView.qml">View/StickerView.qml</file>
         <file alias="imtgui/Params/ComposedParamsGui.qml">Params/ComposedParamsGui.qml</file>
         <file alias="imtgui/Params/TextParamEditor.qml">Params/TextParamEditor.qml</file>
         <file alias="imtgui/Params/UrlParamEditor.qml">Params/UrlParamEditor.qml</file>

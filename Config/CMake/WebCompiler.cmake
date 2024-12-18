@@ -321,6 +321,9 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtCollectionSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseImtCollectionSdl)
 
+	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentRevisionSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseDocumentRevisionSdl)
+
 	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtappsdl/SDL/1.0/QML/imtappApplicationSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtappApplicationSdl)
 endmacro(getImtBaseQmlWebDirs)

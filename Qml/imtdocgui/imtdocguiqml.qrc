@@ -17,6 +17,7 @@
 	<file alias="imtdocgui/DocumentValidator.qml">DocumentValidator.qml</file>
 	<file alias="imtdocgui/DocumentWorkspacePageView.qml">DocumentWorkspacePageView.qml</file>
 	<file alias="imtdocgui/SingleDocumentWorkspacePageView.qml">SingleDocumentWorkspacePageView.qml</file>
+	<file alias="imtdocgui/DocumentHistoryPanel.qml">DocumentHistoryPanel.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

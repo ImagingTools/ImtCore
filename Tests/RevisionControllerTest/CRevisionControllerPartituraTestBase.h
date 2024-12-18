@@ -23,12 +23,12 @@ protected:
 	virtual void initTestCase() = 0;
 
 private slots:
-	void BackupObjectWithCorrectParamsTest();
-	void BackupObjectWithIncorrectParamsTest_data();
-	void BackupObjectWithIncorrectParamsTest();
-	void RestoreObjectWithCorrectParamsTest();
-	void RestoreObjectWithIncorrectParamsTest_data();
-	void RestoreObjectWithIncorrectParamsTest();
+	void BackupRevisionWithCorrectParamsTest();
+	void BackupRevisionWithIncorrectParamsTest_data();
+	void BackupRevisionWithIncorrectParamsTest();
+	void RestoreRevisionWithCorrectParamsTest();
+	void RestoreRevisionWithIncorrectParamsTest_data();
+	void RestoreRevisionWithIncorrectParamsTest();
 	void ExportObjectWithCorrectParamsTest();
 	void ExportObjectWithIncorrectParamsTest_data();
 	void ExportObjectWithIncorrectParamsTest();

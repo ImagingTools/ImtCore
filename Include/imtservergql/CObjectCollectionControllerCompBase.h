@@ -15,6 +15,7 @@
 #include <imtgql/IGqlRequestExtractor.h>
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/CMimeType.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision.h>
 
 
 #undef GetObject
@@ -26,10 +27,10 @@ namespace imtservergql
 
 class CObjectCollectionControllerCompBase:
 			public imtgql::IGqlRequestExtractor,
-			public imtservergql::CPermissibleGqlRequestHandlerComp
+			public sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase
 {
 public:
-	typedef imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
+	typedef sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CObjectCollectionControllerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)
@@ -64,11 +65,17 @@ public:
 		OT_DATAMETAINFO,
 		OT_ELEMENTS_COUNT,
 		OT_ELEMENT_IDS,
-		OT_ELEMENT_HISTORY,
 		OT_IMPORT,
 		OT_EXPORT,
 		OT_OBJECT_TYPE_ID
 	};
+
+	// reimplemented (sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 OnGetRevisionInfoList(const sdl::imtbase::DocumentRevision::V1_0::CGetRevisionInfoListGqlRequest& getRevisionInfoListRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0 OnBackupRevision(const sdl::imtbase::DocumentRevision::V1_0::CBackupRevisionGqlRequest& backupRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0 OnRestoreRevision(const sdl::imtbase::DocumentRevision::V1_0::CRestoreRevisionGqlRequest& restoreRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual sdl::imtbase::DocumentRevision::CExportRevisionResponse::V1_0 OnExportRevision(const sdl::imtbase::DocumentRevision::V1_0::CExportRevisionGqlRequest& exportRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual sdl::imtbase::DocumentRevision::CDeleteRevisionResponse::V1_0 OnDeleteRevision(const sdl::imtbase::DocumentRevision::V1_0::CDeleteRevisionGqlRequest& deleteRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -98,7 +105,6 @@ protected:
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetObjectHistory(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetObjectTypeId(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;

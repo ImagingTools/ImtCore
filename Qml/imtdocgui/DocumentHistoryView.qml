@@ -1,152 +1,164 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
+import imtguigql 1.0
+import imtgui 1.0
+import imtbaseDocumentRevisionSdl 1.0
 
 Rectangle {
-    id: container;
+	id: container;
 
-    color: Style.backgroundColor2;
+	color: Style.backgroundColor2;
 
-    property TreeItemModel historyModel: TreeItemModel {}
+	property int elementWidth: 450;
+	property string documentId: "";
+	property int activeRevision: 0;
 
-    property int elementHeight: 20;
+	clip: true;
 
-    onHistoryModelChanged: {
-        repeaterColumn.model = container.historyModel;
-    }
+	onDocumentIdChanged: {
+		if (documentId !== ""){
+			request.send();
+		}
+	}
 
-    DocumentHistoryProvider {
-        id: documentHistoryProvider;
+	GqlSdlRequestSender {
+		id: request;
+		gqlCommandId: ImtbaseDocumentRevisionSdlCommandIds.s_getRevisionInfoList;
+		inputObjectComp: Component {
+			GetRevisionInfoListInput {
+				m_documentId: container.documentId;
+			}
+		}
 
-        onHistoryModelChanged: {
-            container.historyModel = documentHistoryProvider.historyModel;
-        }
+		sdlObjectComp: Component { RevisionInfoList {
+				onFinished: {
+					container.activeRevision = m_activeRevision;
+					repeaterColumn.model = m_revisions;
+				}
+			}
+		}
 
-        onStateChanged: {
-            if (state === "Loading"){
-                loading.visible = true;
-            }
-            else{
-                loading.visible = false;
-            }
-        }
-    }
+		onStateChanged: {
+			loading.visible = (state === "Loading");
+		}
+	}
 
-    function updateModel(documentTypeId, documentId){
-        documentHistoryProvider.updateModel(documentTypeId, documentId);
-    }
+	Component {
+		id: delegateComp;
 
-    Component {
-        id: delegateComp;
+		Column {
+			width: column.width;
 
-        Column {
-            width: parent.width;
+			Item {
+				width: parent.width;
+				height: elementView.height + 2*Style.size_mainMargin;
 
-            Item {
-                width: parent.width;
-                height: 30;
+				ElementView {
+					id: elementView;
+					anchors.verticalCenter: parent.verticalCenter;
+					width: parent.width;
+					name: model.item.m_user + ", " + model.item.m_timestamp;
 
-                Text {
-                    id: nameTitle;
+					clip: false;
+					bottomComp: Component {
+						Text {
+							width: parent.width;
+							font.family: Style.fontFamily;
+							font.pixelSize: Style.fontSize_XSmall;
+							color: Style.textColor;
+							wrapMode: Text.WrapAnywhere;
+							text: model.item.m_description;
+						}
+					}
 
-                    width: parent.width;
+					Row {
+						id: row;
+						z: 999;
+						anchors.verticalCenter: parent.top;
+						anchors.left: parent.left;
+						anchors.leftMargin: Style.size_mainMargin;
+						spacing: Style.size_mainMargin;
 
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.left: parent.left;
+						StickerView {
+							anchors.verticalCenter: parent.verticalCenter;
+							color: Style.iconColorOnSelected;
+							text: qsTr("Revision") + ": " + model.item.m_revision;
+						}
 
-                    font.pixelSize: Style.fontSize_common;
-                    font.family: Style.fontFamilyBold;
-                    font.bold: true;
+						StickerView {
+							anchors.verticalCenter: parent.verticalCenter;
+							color: Style.errorColor;
+							text: qsTr("Active");
+							visible: model.item.m_revision == container.activeRevision;
+						}
+					}
+				}
+			}
+		}
+	}
 
-                    color: Style.lightBlueColor;
-                    elide: Text.ElideRight;
-                    wrapMode: Text.WrapAnywhere ;
+	Flickable {
+		id: flickable;
+		anchors.horizontalCenter: parent.horizontalCenter;
+		anchors.top: parent.top;
+		anchors.topMargin: Style.size_mainMargin;
+		anchors.bottom: parent.bottom;
+		anchors.bottomMargin: Style.size_mainMargin;
+		width: container.elementWidth;
 
-                    text: model.OwnerName + ", " + model.Time;
-                }
-            }
+		contentWidth: width;
+		contentHeight: column.height;
 
-            Text {
-                width: parent.width;
+		boundsBehavior: Flickable.StopAtBounds;
 
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_small;
+		clip: true;
 
-                color: Style.textColor;
+		Column {
+			id: column;
 
-                wrapMode: Text.WrapAnywhere;
+			anchors.left: parent.left;
+			anchors.leftMargin: Style.size_mainMargin;
+			anchors.right: parent.right;
+			anchors.rightMargin: Style.size_mainMargin;
 
-                text: model.OperationDescription;
-            }
-        }
-    }
+			spacing: Style.size_mainMargin;
 
-    Flickable {
-        id: flickable;
+			Repeater {
+				id: repeaterColumn;
 
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
+				delegate: delegateComp;
+			}
+		}//Column main
+	}
 
-        width: parent.width;
+	CustomScrollbar {
+		id: scrollbar;
+		anchors.right: parent.right;
+		anchors.rightMargin: Style.size_smallMargin;
+		anchors.top: parent.top;
+		anchors.bottom: parent.bottom;
+		secondSize: Style.size_mainMargin;
+		targetItem: flickable;
+		radius: 2;
+	}
 
-        contentWidth: width;
-        contentHeight: column.height;
+	Text {
+		anchors.centerIn: parent;
+		font.pixelSize: Style.fontSize_common;
+		font.family: Style.fontFamilyBold;
+		font.bold: true;
+		color: Style.textColor;
+		wrapMode: Text.WrapAnywhere;
+		text: qsTr("There is no history for this document");
+		visible: repeaterColumn.count === 0;
+	}
 
-        boundsBehavior: Flickable.StopAtBounds;
-
-        clip: true;
-
-        Column {
-            id: column;
-
-            anchors.left: parent.left;
-            anchors.leftMargin: Style.size_mainMargin;
-            anchors.right: parent.right;
-            anchors.rightMargin: Style.size_mainMargin;
-
-            spacing: 2 * Style.size_mainMargin;
-
-            Repeater {
-                id: repeaterColumn;
-
-                delegate: delegateComp;
-            }
-        }//Column main
-    }
-
-    CustomScrollbar {
-        id: scrollbar;
-
-        anchors.right: flickable.right;
-        anchors.rightMargin: 5;
-        anchors.bottom: flickable.bottom;
-
-        secondSize: 10;
-        targetItem: flickable;
-
-        radius: 2;
-    }
-
-    Text {
-        anchors.centerIn: parent;
-
-        font.pixelSize: Style.fontSize_common;
-        font.family: Style.fontFamilyBold;
-        font.bold: true;
-
-        color: Style.textColor;
-
-        wrapMode: Text.WrapAnywhere;
-
-        text: qsTr("There is no history for this document");
-
-        visible: repeaterColumn.count === 0;
-    }
-
-    Loading {
-        id: loading;
-
-        anchors.fill: parent;
-    }
+	Loading {
+		id: loading;
+		anchors.fill: parent;
+		visible: false;
+		color: Style.backgroundColor2;
+	}
 }
 

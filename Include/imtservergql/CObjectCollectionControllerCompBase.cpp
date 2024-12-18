@@ -27,8 +27,10 @@
 #include <imtbase/CTimeFilterParam.h>
 #include <imtbase/CObjectCollection.h>
 #include <imtbase/COperationDescription.h>
+#include <imtbase/IRevisionController.h>
 #include <imtgql/imtgql.h>
 #include <imtcol/CComplexCollectionFilterRepresentationController.h>
+#include <imtcol/CDocumentCollectionFilter.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
 
@@ -47,7 +49,6 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 		qDebug() << "Invalid object collection component";
 	}
 
-
 	int count = m_replaceableFieldsAttrPtr.GetCount();
 	count = qMax(count, m_replacementFieldsAttrPtr.GetCount());
 
@@ -61,12 +62,171 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 }
 
 
+// reimplemented (sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase)
+
+sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 CObjectCollectionControllerCompBase::OnGetRevisionInfoList(
+			const sdl::imtbase::DocumentRevision::V1_0::CGetRevisionInfoListGqlRequest& getRevisionInfoListRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 response;
+
+	QByteArray documentId = *getRevisionInfoListRequest.GetRequestedArguments().input.DocumentId;
+
+	response.DocumentId = std::make_unique<QByteArray>(documentId);
+
+	const imtbase::IRevisionController* revisionControllerPtr = m_objectCollectionCompPtr->GetRevisionController();
+	if (revisionControllerPtr == nullptr){
+		errorMessage = QString("Unable to get revision list for document '%1'. Error: Revision controller is invalid").arg(qPrintable(documentId));
+		return response;
+	}
+
+	QByteArray languageId;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		languageId = gqlContextPtr->GetLanguageId();
+	}
+
+	imtbase::IRevisionController::RevisionInfoList revisionInfoList = revisionControllerPtr->GetRevisionInfoList(*m_objectCollectionCompPtr, documentId);
+	QList<sdl::imtbase::DocumentRevision::CRevisionItem::V1_0> revisionItemList;
+
+	for (const imtbase::IRevisionController::RevisionInfo& revisionInfo : revisionInfoList){
+		sdl::imtbase::DocumentRevision::CRevisionItem::V1_0 revisionItem;
+
+		if (revisionInfo.isRevisionAvailable){
+			response.ActiveRevision = std::make_unique<int>(revisionInfo.revision);
+		}
+
+		revisionItem.Revision = std::make_unique<int>(revisionInfo.revision);
+		revisionItem.User = std::make_unique<QString>(revisionInfo.user);
+		revisionItem.IsActive = std::make_unique<bool>(revisionInfo.isRevisionAvailable);
+		revisionItem.Timestamp = std::make_unique<QString>(revisionInfo.timestamp.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
+
+		if (!revisionInfo.comment.isEmpty() && m_documentChangeGeneratorCompPtr.IsValid()){
+			imtbase::CObjectCollection changeCollection;
+
+			typedef istd::TSingleFactory<istd::IChangeable, imtbase::COperationDescription> FactoryOperationDescriptionImpl;
+			changeCollection.RegisterFactory<FactoryOperationDescriptionImpl>("OperationInfo");
+
+			iser::CJsonMemReadArchive archive(revisionInfo.comment.toUtf8());
+			if (changeCollection.Serialize(archive)){
+				QString operationDescription = m_documentChangeGeneratorCompPtr->GetOperationDescription(changeCollection, languageId);
+				if (!operationDescription.isEmpty()){
+					revisionItem.Description = std::make_unique<QString>(operationDescription);
+				}
+			}
+		}
+
+		revisionItemList << revisionItem;
+	}
+
+	response.Revisions = std::make_unique<QList<sdl::imtbase::DocumentRevision::CRevisionItem::V1_0>>(revisionItemList);
+
+	return response;
+}
+
+
+sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0 CObjectCollectionControllerCompBase::OnBackupRevision(
+	const sdl::imtbase::DocumentRevision::V1_0::CBackupRevisionGqlRequest& backupRevisionRequest,
+	const ::imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
+{
+	return sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0();
+}
+
+
+sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0 CObjectCollectionControllerCompBase::OnRestoreRevision(
+	const sdl::imtbase::DocumentRevision::V1_0::CRestoreRevisionGqlRequest& restoreRevisionRequest,
+	const ::imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
+{
+	sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0 response;
+	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
+		return response;
+	}
+
+	QByteArray documentId = *restoreRevisionRequest.GetRequestedArguments().input.ObjectId;
+	int revisionNumber = *restoreRevisionRequest.GetRequestedArguments().input.Revision;
+
+	const imtbase::IRevisionController* revisionControllerPtr = m_objectCollectionCompPtr->GetRevisionController();
+	if (revisionControllerPtr == nullptr){
+		errorMessage = QString("Unable to set revision '%1' for document '%2'. Error: Revision controller is invalid").arg(revisionNumber).arg(qPrintable(documentId));
+		return response;
+	}
+
+	bool ok = revisionControllerPtr->RestoreRevision(*m_objectCollectionCompPtr, documentId, revisionNumber);
+	if (!ok){
+		errorMessage = QString("Unable to set revision '%1' for document '%2'. Error: Restoring object failed").arg(revisionNumber).arg(qPrintable(documentId));
+		return response;
+	}
+
+	response.Result = std::make_unique<bool>(ok);
+
+	return response;
+}
+
+
+sdl::imtbase::DocumentRevision::CExportRevisionResponse::V1_0 CObjectCollectionControllerCompBase::OnExportRevision(
+	const sdl::imtbase::DocumentRevision::V1_0::CExportRevisionGqlRequest& /*exportRevisionRequest*/,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
+{
+	return sdl::imtbase::DocumentRevision::CExportRevisionResponse::V1_0();
+}
+
+
+sdl::imtbase::DocumentRevision::CDeleteRevisionResponse::V1_0 CObjectCollectionControllerCompBase::OnDeleteRevision(
+	const sdl::imtbase::DocumentRevision::V1_0::CDeleteRevisionGqlRequest& deleteRevisionRequest,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& errorMessage) const
+{
+	sdl::imtbase::DocumentRevision::CDeleteRevisionResponse::V1_0 response;
+	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
+		return response;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = deleteRevisionRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+		if (userInfoPtr != nullptr){
+			if (!userInfoPtr->IsAdmin()){
+				errorMessage = QString("Unable to delete revision. Error: Invalid permission for user '%1'").arg(userInfoPtr->GetName());
+
+				return response;
+			}
+		}
+	}
+
+	QByteArray documentId = *deleteRevisionRequest.GetRequestedArguments().input.ObjectId;
+	int revisionNumber = *deleteRevisionRequest.GetRequestedArguments().input.Revision;
+
+	const imtbase::IRevisionController* revisionControllerPtr = m_objectCollectionCompPtr->GetRevisionController();
+	if (revisionControllerPtr == nullptr){
+		errorMessage = QString("Unable to delete revision '%1' for document '%2'. Error: Revision controller is invalid").arg(revisionNumber).arg(qPrintable(documentId));
+		return response;
+	}
+
+	bool ok = revisionControllerPtr->DeleteRevision(*m_objectCollectionCompPtr.GetPtr(), documentId, revisionNumber);
+
+	response.Result = std::make_unique<bool>(ok);
+
+	return response;
+}
+
+
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResponse(
 		const imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
+	imtbase::CTreeItemModel* responseModelPtr = BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
+	if (responseModelPtr != nullptr){
+		return responseModelPtr;
+	}
+
 	imtgql::CGqlObject gqlObject;
 
 	int operationType = OT_UNKNOWN;
@@ -101,8 +261,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 		return GetInfo(gqlRequest, errorMessage);
 	case OT_DATAMETAINFO:
 		return GetDataMetaInfo(gqlRequest, errorMessage);
-	case OT_ELEMENT_HISTORY:
-		return GetObjectHistory(gqlRequest, errorMessage);
 	case OT_ELEMENTS_COUNT:
 		return GetElementsCount(gqlRequest, errorMessage);
 	case OT_ELEMENT_IDS:
@@ -223,10 +381,6 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 		}
 		if (fieldId == "dataMetaInfo"){
 			operationType = OT_DATAMETAINFO;
-			return true;
-		}
-		if (fieldId == "itemHistory"){
-			operationType = OT_ELEMENT_HISTORY;
 			return true;
 		}
 		if (fieldId == "import"){
@@ -878,100 +1032,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetDataMetaInfo(
 		QString& /*errorMessage*/) const
 {
 	return nullptr;
-}
-
-
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get the object history. Component reference 'ObjectCollection' was not set");
-		SendCriticalMessage(0, errorMessage);
-
-		return nullptr;
-	}
-
-	if (!m_documentChangeGeneratorCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Attribute 'DocumentChangeGenerator' was not set", "CObjectCollectionControllerCompBase");
-		return nullptr;
-	}
-
-	const imtgql::CGqlObject* gqlInputParamsPtr = gqlRequest.GetParamObject("input");
-	if (gqlInputParamsPtr == nullptr){
-		errorMessage = QString("Unable to get object history: GraphQL-parameters not set");
-		SendErrorMessage(0, errorMessage);
-
-		return nullptr;
-	}
-
-	QByteArray objectId = gqlInputParamsPtr->GetFieldArgumentValue("Id").toByteArray();
-	if (objectId.isEmpty()){
-		errorMessage = QString("Unable to get history for an object with empty ID");
-		SendErrorMessage(0, errorMessage);
-
-		return nullptr;
-	}
-
-	QByteArray languageId;
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr != nullptr){
-		languageId = gqlContextPtr->GetLanguageId();
-	}
-
-	iprm::CParamsSet filterParams;
-
-	iprm::CIdParam idParam;
-	idParam.SetId(objectId);
-
-	filterParams.SetEditableParameter("Id", &idParam);
-
-	iprm::CEnableableParam enableableParam;
-	enableableParam.SetEnabled(true);
-
-	filterParams.SetEditableParameter("IsHistory", &enableableParam);
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	Q_ASSERT(dataModelPtr != nullptr);
-
-	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
-				m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams));
-	if (objectCollectionIterator == nullptr){
-		errorMessage = QString("Unable to get history for an object with ID: '%1'. Error when trying to create collection iterator.").arg(qPrintable(objectId));
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-
-		return nullptr;
-	}
-
-	while (objectCollectionIterator->Next()){
-		QByteArray ownerId = objectCollectionIterator->GetElementInfo("OwnerId").toByteArray();
-		QString ownerName = objectCollectionIterator->GetElementInfo("OwnerName").toString();
-		QByteArray operationsDescriptionJson = objectCollectionIterator->GetElementInfo("OperationDescription").toByteArray();
-		QDateTime lastModified =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
-		lastModified.setTimeSpec(Qt::UTC);
-
-		if (!ownerId.isEmpty() && !operationsDescriptionJson.isEmpty()){
-			imtbase::CObjectCollection changeCollection;
-
-			typedef istd::TSingleFactory<istd::IChangeable, imtbase::COperationDescription> FactoryOperationDescriptionImpl;
-			changeCollection.RegisterFactory<FactoryOperationDescriptionImpl>("OperationInfo");
-
-			iser::CJsonMemReadArchive archive(operationsDescriptionJson);
-			if (changeCollection.Serialize(archive)){
-				QString operationDescription = m_documentChangeGeneratorCompPtr->GetOperationDescription(changeCollection, languageId);
-				if (!operationDescription.isEmpty()){
-					int index = dataModelPtr->InsertNewItem();
-
-					dataModelPtr->SetData("OwnerId", ownerId, index);
-					dataModelPtr->SetData("OwnerName", ownerName, index);
-					dataModelPtr->SetData("OperationDescription", operationDescription, index);
-					dataModelPtr->SetData("Time", lastModified.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"), index);
-				}
-			}
-		}
-	}
-
-	return rootModelPtr.PopPtr();
 }
 
 

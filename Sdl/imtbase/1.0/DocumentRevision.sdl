@@ -1,0 +1,72 @@
+schema {
+	name: DocumentRevision
+	namespace: imtbase
+	version: 1.0
+	query: Query
+	mutation: Mutation
+}
+
+input GetRevisionInfoListInput {
+	DocumentId: ID
+}
+
+input BackupRevisionInput {
+	ObjectId: ID
+	Comment: String
+}
+
+input RestoreRevisionInput {
+	ObjectId: ID
+	Revision: Integer
+}
+
+input ExportRevisionInput {
+	ObjectId: ID
+	Revision: Integer
+	FilePath: String
+}
+
+input DeleteRevisionInput {
+	ObjectId: ID
+	Revision: Integer
+}
+
+type RevisionItem {
+	User: String
+	Revision: Integer
+	IsActive: Boolean
+	Timestamp: String
+	Description: String
+}
+
+type RevisionInfoList {
+	DocumentId: ID
+	ActiveRevision: Integer
+	Revisions: [RevisionItem]
+}
+
+type BackupRevisionResponse {
+	Result: Integer
+}
+
+type RestoreRevisionResponse {
+	Result: Boolean
+}
+
+type ExportRevisionResponse {
+	Result: Boolean
+}
+
+type DeleteRevisionResponse {
+	Result: Boolean
+}
+
+type Query {
+	GetRevisionInfoList (input: GetRevisionInfoListInput): RevisionInfoList!
+	BackupRevision (input: BackupRevisionInput): BackupRevisionResponse
+	RestoreRevision (input: RestoreRevisionInput): RestoreRevisionResponse
+	ExportRevision (input: ExportRevisionInput): ExportRevisionResponse
+	DeleteRevision (input: DeleteRevisionInput): DeleteRevisionResponse
+}
+
+

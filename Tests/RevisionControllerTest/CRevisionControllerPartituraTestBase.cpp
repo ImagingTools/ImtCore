@@ -7,7 +7,7 @@
 #include <imtrepo/CFileCollectionCompBase.h>
 
 
-void CRevisionControllerPartituraTestBase::BackupObjectWithCorrectParamsTest()
+void CRevisionControllerPartituraTestBase::BackupRevisionWithCorrectParamsTest()
 {
 	// get component object collection
 	initTestCase();
@@ -28,7 +28,7 @@ void CRevisionControllerPartituraTestBase::BackupObjectWithCorrectParamsTest()
 
 					// create backup object and check him
 					QString commentForRevision = "my new revision";
-					int revisionOfObject = revisionControllerPtr->BackupObject(*objectCollectionPtr, idInsertObject, commentForRevision);
+					int revisionOfObject = revisionControllerPtr->BackupRevision(*objectCollectionPtr, idInsertObject, commentForRevision);
 					if (revisionOfObject >= 0){
 						imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*objectCollectionPtr, idInsertObject);
 						bool checkExistRevision = false;
@@ -61,7 +61,7 @@ void CRevisionControllerPartituraTestBase::BackupObjectWithCorrectParamsTest()
 }
 
 
-void CRevisionControllerPartituraTestBase::BackupObjectWithIncorrectParamsTest_data()
+void CRevisionControllerPartituraTestBase::BackupRevisionWithIncorrectParamsTest_data()
 {
 	initTestCase();
 
@@ -78,7 +78,7 @@ void CRevisionControllerPartituraTestBase::BackupObjectWithIncorrectParamsTest_d
 }
 
 
-void CRevisionControllerPartituraTestBase::BackupObjectWithIncorrectParamsTest()
+void CRevisionControllerPartituraTestBase::BackupRevisionWithIncorrectParamsTest()
 {
 	// get values from rows
 	QFETCH(bool, isNullPtrObjectCollection);
@@ -106,10 +106,10 @@ void CRevisionControllerPartituraTestBase::BackupObjectWithIncorrectParamsTest()
 					int revisionOfObject = 0;
 					imtbase::IObjectCollection* nullObjectCollectionPtr = nullptr;
 					if (isNullPtrObjectCollection){
-						revisionOfObject = revisionControllerPtr->BackupObject(*nullObjectCollectionPtr, objectId, comment);
+						revisionOfObject = revisionControllerPtr->BackupRevision(*nullObjectCollectionPtr, objectId, comment);
 					}
 					else{
-						revisionOfObject = revisionControllerPtr->BackupObject(*objectCollectionPtr, objectId, comment);
+						revisionOfObject = revisionControllerPtr->BackupRevision(*objectCollectionPtr, objectId, comment);
 					}
 					QVERIFY2((revisionOfObject == -1), "Backup object is failed");
 				}
@@ -131,7 +131,7 @@ void CRevisionControllerPartituraTestBase::BackupObjectWithIncorrectParamsTest()
 }
 
 
-void CRevisionControllerPartituraTestBase::RestoreObjectWithCorrectParamsTest()
+void CRevisionControllerPartituraTestBase::RestoreRevisionWithCorrectParamsTest()
 {
 	// get component object collection
 	initTestCase();
@@ -166,7 +166,7 @@ void CRevisionControllerPartituraTestBase::RestoreObjectWithCorrectParamsTest()
 					// create backup object for first revision
 					QString commentForFirstRevision = "my first revision";
 					QString commentForSecondRevision = "my second revision";
-					int idFirstRevision = revisionControllerPtr->BackupObject(*objectCollectionPtr, idInsertObject, commentForFirstRevision);
+					int idFirstRevision = revisionControllerPtr->BackupRevision(*objectCollectionPtr, idInsertObject, commentForFirstRevision);
 
 					// change data for second revision
 					inputImplPtr->SetAccountName("ChangedName");
@@ -175,11 +175,11 @@ void CRevisionControllerPartituraTestBase::RestoreObjectWithCorrectParamsTest()
 					if (checkSetDataForSecondRevision){
 
 						// create backup object for second revision
-						int idSecondRevision = revisionControllerPtr->BackupObject(*objectCollectionPtr, idInsertObject, commentForSecondRevision);
+						int idSecondRevision = revisionControllerPtr->BackupRevision(*objectCollectionPtr, idInsertObject, commentForSecondRevision);
 						if (idFirstRevision >= 0 && idSecondRevision >= 0){
 
 							// restore object data from first revision and check data
-							bool checkRestoreFirstRevision = revisionControllerPtr->RestoreObject(*objectCollectionPtr, idInsertObject, idFirstRevision);
+							bool checkRestoreFirstRevision = revisionControllerPtr->RestoreRevision(*objectCollectionPtr, idInsertObject, idFirstRevision);
 							if (checkRestoreFirstRevision){
 								objectCollectionPtr->GetObjectData(idInsertObject, referenceDataPtr);
 								imtauth::CAccountInfo* referenceImplPtr = dynamic_cast<imtauth::CAccountInfo*>(referenceDataPtr.GetPtr());
@@ -217,7 +217,7 @@ void CRevisionControllerPartituraTestBase::RestoreObjectWithCorrectParamsTest()
 }
 
 
-void CRevisionControllerPartituraTestBase::RestoreObjectWithIncorrectParamsTest_data()
+void CRevisionControllerPartituraTestBase::RestoreRevisionWithIncorrectParamsTest_data()
 {
 	initTestCase();
 
@@ -235,7 +235,7 @@ void CRevisionControllerPartituraTestBase::RestoreObjectWithIncorrectParamsTest_
 }
 
 
-void CRevisionControllerPartituraTestBase::RestoreObjectWithIncorrectParamsTest()
+void CRevisionControllerPartituraTestBase::RestoreRevisionWithIncorrectParamsTest()
 {
 	// get values from rows
 	QFETCH(QByteArray, objectId);
@@ -274,7 +274,7 @@ void CRevisionControllerPartituraTestBase::RestoreObjectWithIncorrectParamsTest(
 					// create backup object for first revision
 					QString commentForFirstRevision = "my first revision";
 					QString commentForSecondRevision = "my second revision";
-					int idFirstRevision = revisionControllerPtr->BackupObject(*objectCollectionPtr, idInsertObject, commentForFirstRevision);
+					int idFirstRevision = revisionControllerPtr->BackupRevision(*objectCollectionPtr, idInsertObject, commentForFirstRevision);
 
 					// change data for second revision
 					inputImplPtr->SetAccountName("ChangedName");
@@ -283,9 +283,9 @@ void CRevisionControllerPartituraTestBase::RestoreObjectWithIncorrectParamsTest(
 					if (checkSetDataForSecondRevision){
 
 						// create backup object for second revision
-						int idSecondRevision = revisionControllerPtr->BackupObject(*objectCollectionPtr, idInsertObject, commentForSecondRevision);
+						int idSecondRevision = revisionControllerPtr->BackupRevision(*objectCollectionPtr, idInsertObject, commentForSecondRevision);
 						if (idFirstRevision >= 0 && idSecondRevision >= 0){
-							bool checkRestoreFirstRevision = revisionControllerPtr->RestoreObject(*objectCollectionPtr, objectId, revisionId);
+							bool checkRestoreFirstRevision = revisionControllerPtr->RestoreRevision(*objectCollectionPtr, objectId, revisionId);
 							QVERIFY2(checkRestoreFirstRevision == result, "Restore object data from revision don't work");
 						}
 						else{
@@ -352,12 +352,12 @@ void CRevisionControllerPartituraTestBase::ExportObjectWithCorrectParamsTest()
 
 						// create backup object for first revision
 						QString commentForFirstRevision = "my first revision";
-						int idFirstRevision = revisionControllerPtr->BackupObject(*objectCollectionPtr, idInsertObject, commentForFirstRevision);
+						int idFirstRevision = revisionControllerPtr->BackupRevision(*objectCollectionPtr, idInsertObject, commentForFirstRevision);
 						if (idFirstRevision >= 0){
 
 							// export object to file
 							QString pathToExportFile = qEnvironmentVariable("IMTCOREDIR")+"/Tests/RevisionControllerTest/TestData/FileForTestExport.xml";
-							bool checkExportObject = revisionControllerPtr->ExportObject(*objectCollectionPtr, idInsertObject, idFirstRevision, pathToExportFile);
+							bool checkExportObject = revisionControllerPtr->ExportRevision(*objectCollectionPtr, idInsertObject, idFirstRevision, pathToExportFile);
 							if (checkExportObject){
 
 								// read data of file for import
@@ -475,7 +475,7 @@ void CRevisionControllerPartituraTestBase::ExportObjectWithIncorrectParamsTest()
 
 						// create backup object for first revision
 						QString commentForFirstRevision = "my first revision";
-						int idFirstRevision = revisionControllerPtr->BackupObject(*objectCollectionPtr, idInsertObject, commentForFirstRevision);
+						int idFirstRevision = revisionControllerPtr->BackupRevision(*objectCollectionPtr, idInsertObject, commentForFirstRevision);
 						if (idFirstRevision >= 0){
 
 							// export object to file
@@ -483,10 +483,10 @@ void CRevisionControllerPartituraTestBase::ExportObjectWithIncorrectParamsTest()
 							imtbase::IObjectCollection* nullObjectCollectionPtr = nullptr;
 							bool checkExportObject = true;
 							if (isNullPtrObjectCollection){
-								checkExportObject = revisionControllerPtr->ExportObject(*nullObjectCollectionPtr, objectId, revisionId, pathToFile);
+								checkExportObject = revisionControllerPtr->ExportRevision(*nullObjectCollectionPtr, objectId, revisionId, pathToFile);
 							}
 							else{
-								checkExportObject = revisionControllerPtr->ExportObject(*objectCollectionPtr, objectId, revisionId, pathToFile);
+								checkExportObject = revisionControllerPtr->ExportRevision(*objectCollectionPtr, objectId, revisionId, pathToFile);
 							}
 							QVERIFY2(checkExportObject == result, "Export object to file is failed");
 

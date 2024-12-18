@@ -76,6 +76,7 @@ Separator 1.0 View/Separator.qml
 ButtonElementView 1.0 View/ButtonElementView.qml
 FilePickerElementView 1.0 View/FilePickerElementView.qml
 DateTimePickerElementView 1.0 View/DateTimePickerElementView.qml
+StickerView 1.0 View/StickerView.qml
 
 TextParamEditor 1.0 Params/TextParamEditor.qml
 UrlParamEditor 1.0 Params/UrlParamEditor.qml

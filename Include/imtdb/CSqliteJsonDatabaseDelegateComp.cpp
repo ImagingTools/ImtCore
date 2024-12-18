@@ -22,22 +22,7 @@ QByteArray CSqliteJsonDatabaseDelegateComp::GetSelectionQuery(
 			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
-		return QString("SELECT * FROM \"%1\" WHERE \"IsActive\" = true AND \"%2\" = '%3'")
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(*m_objectIdColumnAttrPtr))
-					.arg(qPrintable(objectId)).toUtf8();
-	}
-
-	if (paramsPtr != nullptr){
-		iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
-		if (paramIds.contains("IsHistory")){
-			iprm::TParamsPtr<iprm::IEnableableParam> enableableParamPtr(paramsPtr, "IsHistory");
-			if (enableableParamPtr.IsValid()){
-				if (enableableParamPtr->IsEnabled()){
-					return CreateObjectHistoryQuery(offset, count, paramsPtr);
-				}
-			}
-		}
+		return GetObjectSelectionQuery(objectId, paramsPtr);
 	}
 
 	QString sortQuery;
