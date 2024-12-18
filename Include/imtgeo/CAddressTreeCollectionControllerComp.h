@@ -2,17 +2,17 @@
 
 
 // ImtCore includes
-#include <imtservergql/CObjectCollectionControllerCompBase.h>
+#include <imtservergql/CLegacyObjectCollectionControllerCompBase.h>
 #include "imtdb/IDatabaseEngine.h"
 
 namespace imtgeo
 {
 
 
-class CAddressTreeCollectionControllerComp: public imtservergql::CObjectCollectionControllerCompBase
+class CAddressTreeCollectionControllerComp: public imtservergql::CLegacyObjectCollectionControllerCompBase
 {
 public:
-	typedef imtservergql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtservergql::CLegacyObjectCollectionControllerCompBase BaseClass;
 
     I_BEGIN_COMPONENT(CAddressTreeCollectionControllerComp);
         I_ASSIGN(m_addressTypeCollectionPtr, "AddressTypeComponent", "The string address type collection", true, "AddressTypeCollection");
@@ -24,7 +24,7 @@ protected:
     I_REF(imtdb::IDatabaseEngine, m_engineCompChr3);
 
 
-	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+	// reimplemented (imtservergql::CLegacyObjectCollectionControllerCompBase)
     virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const override;
     virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
     virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
