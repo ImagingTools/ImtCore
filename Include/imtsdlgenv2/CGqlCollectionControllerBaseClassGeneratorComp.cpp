@@ -1239,12 +1239,15 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 
 	const QString requestClassName = sdlRequestInfo.request.GetName() + QStringLiteral("GqlRequest");
 
+	/// \todo fix horizontal/vertical feed
 	// [1] command ID check
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (commandId == C");
-	stream << requestClassName;
-	stream << QStringLiteral("::GetCommandId()){");
-	FeedStream(stream, 1, false);
+	if (operationType != imtsdl::CSdlDocumentType::OT_UPDATE){
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("if (commandId == C");
+		stream << requestClassName;
+		stream << QStringLiteral("::GetCommandId()){");
+		FeedStream(stream, 1, false);
+	}
 
 	// [1] create SDL request variable
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -1387,10 +1390,12 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		FeedStream(stream, 1, false);
 	}
 
-	// [1] end of section
-	FeedStreamHorizontally(stream, hIndents);
-	stream << '}';
-	FeedStream(stream, 2, false);
+	if (operationType != imtsdl::CSdlDocumentType::OT_UPDATE){
+		// [1] end of section
+		FeedStreamHorizontally(stream, hIndents);
+		stream << '}';
+		FeedStream(stream, 2, false);
+	}
 
 
 
