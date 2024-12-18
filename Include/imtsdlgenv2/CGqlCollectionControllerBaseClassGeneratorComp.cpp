@@ -1241,7 +1241,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 
 	/// \todo fix horizontal/vertical feed
 	// [1] command ID check
-	if (operationType != imtsdl::CSdlDocumentType::OT_UPDATE){
+	if (operationType != imtsdl::CSdlDocumentType::OT_INSERT){
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("if (commandId == C");
 		stream << requestClassName;
@@ -1390,7 +1390,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		FeedStream(stream, 1, false);
 	}
 
-	if (operationType != imtsdl::CSdlDocumentType::OT_UPDATE){
+	if (operationType != imtsdl::CSdlDocumentType::OT_INSERT){
 		// [1] end of section
 		FeedStreamHorizontally(stream, hIndents);
 		stream << '}';
