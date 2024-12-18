@@ -408,6 +408,8 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	QByteArray objectId = userInfoPtr->GetObjectUuid();
 	userData.Id.reset(new QByteArray(objectId));
 
+	userData.ProductId.reset(new QByteArray(productId));
+
 	QByteArray userName = userInfoPtr->GetId();
 	userData.Username.reset(new QByteArray(userName));
 
