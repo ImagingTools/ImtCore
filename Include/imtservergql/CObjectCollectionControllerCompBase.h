@@ -188,6 +188,9 @@ protected:
 
 	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
 
+private:
+	virtual bool DoUpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const;
+
 protected:
 	QMap<QByteArray, QByteArray> m_fieldReplacementMap;
 

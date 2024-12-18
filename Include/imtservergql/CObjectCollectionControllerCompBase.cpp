@@ -579,7 +579,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	Q_ASSERT(savedObjectPtr.IsValid());
 
-	if (!UpdateObjectFromRequest(gqlRequest, *savedObjectPtr, errorMessage)){
+	if (!DoUpdateObjectFromRequest(gqlRequest, *savedObjectPtr, objectId, name, description, errorMessage)){
 		errorMessage = QString("Can't update object in the collection: '%1'. Error: %2").arg(qPrintable(objectId)).arg(errorMessage);
 
 		return nullptr;
@@ -1331,12 +1331,10 @@ QString CObjectCollectionControllerCompBase::GetExportFileName(const QByteArray&
 
 
 bool CObjectCollectionControllerCompBase::UpdateObjectFromRequest(
-	const imtgql::CGqlRequest& /*gqlRequest*/,
-	istd::IChangeable& /*object*/,
-	QString& /*errorMessage*/) const
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			istd::IChangeable& /*object*/,
+			QString& /*errorMessage*/) const
 {
-	SendErrorMessage(0, "Unimplemented 'UpdateObjectFromRequest' method call!", "CObjectCollectionControllerCompBase::UpdateObjectFromRequest");
-
 	return false;
 }
 
@@ -1652,6 +1650,36 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(const QByte
 
 	return nullptr;
 }
+
+
+bool CObjectCollectionControllerCompBase::DoUpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QByteArray& objectId, QString& name, QString& description, QString& errorMessage) const
+{
+	if(UpdateObjectFromRequest(gqlRequest, object, errorMessage)){
+		return true;
+	}
+
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	if (inputParamPtr == nullptr){
+		errorMessage = QString("Unable to update an object. GraphQL input params is invalid.");
+		SendErrorMessage(0, errorMessage, "Object collection controller");
+
+		return false;
+	}
+
+	istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
+	if (savedObjectPtr == nullptr){
+		if (errorMessage.isEmpty()){
+			errorMessage = QString("Can not create object for update: '%1'").arg(qPrintable(objectId));
+		}
+
+		SendErrorMessage(0, errorMessage, "Object collection controller");
+
+		return false;
+	}
+
+	return object.CopyFrom(*savedObjectPtr);
+}
+
 
 
 } // namespace imtservergql
