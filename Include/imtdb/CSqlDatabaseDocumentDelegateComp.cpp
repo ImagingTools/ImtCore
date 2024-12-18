@@ -28,15 +28,16 @@ namespace imtdb
 {
 
 
+static const QByteArray s_idColumn = QByteArrayLiteral("Id");
 static const QByteArray s_typeIdColumn = QByteArrayLiteral("TypeId");
+static const QByteArray s_documentIdColumn = QByteArrayLiteral("DocumentId");
 static const QByteArray s_nameColumn = QByteArrayLiteral("Name");
 static const QByteArray s_descriptionColumn = QByteArrayLiteral("Description");
-static const QByteArray s_documentIdColumn = QByteArrayLiteral("DocumentId");
 static const QByteArray s_documentColumn = QByteArrayLiteral("Document");
 static const QByteArray s_addedColumn = QByteArrayLiteral("Added");
 static const QByteArray s_lastModifiedColumn = QByteArrayLiteral("LastModified");
 
-static QSet<QString> s_filterableColumns = { s_typeIdColumn, s_nameColumn, s_descriptionColumn, s_addedColumn, s_lastModifiedColumn};
+static QSet<QString> s_filterableColumns = { s_idColumn, s_typeIdColumn, s_nameColumn, s_descriptionColumn, s_addedColumn, s_lastModifiedColumn};
 
 
 // public methods
@@ -65,7 +66,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 
 
 	if (m_uniqueValuesFieldAttrPtr.IsValid() && *m_uniqueValuesFieldAttrPtr != ""){
-		selectionQuery = QString("SELECT DISTINCT ON (\"%1\") * FROM (%2)").arg(*m_uniqueValuesFieldAttrPtr).arg(selectionQuery).toUtf8();
+		QString valueField = s_filterableColumns.contains(*m_uniqueValuesFieldAttrPtr) ? QString("%1").arg(*m_uniqueValuesFieldAttrPtr) : QString("\"DataMetaInfo\"->>'%1'").arg(*m_uniqueValuesFieldAttrPtr);
+
+		selectionQuery = QString("SELECT DISTINCT ON (%1) * FROM (%2)").arg(valueField).arg(selectionQuery).toUtf8();
 	}
 
 	return selectionQuery;
