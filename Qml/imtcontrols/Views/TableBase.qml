@@ -102,7 +102,7 @@ Rectangle {
 	property string currentSortOrder: "ASC";
 	property var nonSortableColumns: [];
 
-	property alias isMultiSelect: tableContainer.tableSelection.isMultiSelect;
+	property bool isMultiSelect: false;
 
 	property TableSelection tableSelection: TableSelection {
 		onSelectionChanged: {
@@ -176,7 +176,6 @@ Rectangle {
 		tableContainer.headerMinHeight = tableContainer.headerHeight;
 		tableContainer.setWidth();
 
-		tableContainer.tableSelection.tableItem = elementsListObj;
 		tableContainer.compl = true;
 	}
 
@@ -809,14 +808,6 @@ Rectangle {
 			if(tableContainer.isFlickable){
 				tableContainer.contentWidth = contentWidth;
 			}
-		}
-
-		Keys.onUpPressed: {
-			tableContainer.tableSelection.up();
-		}
-
-		Keys.onDownPressed: {
-			tableContainer.tableSelection.down();
 		}
 
 		onContentYChanged: {

@@ -58,8 +58,8 @@ CollectionViewCommandsDelegateBase {
 		}
 
 		let indexes = root.collectionView.table.getSelectedIndexes();
-		if (indexes.length > 0){
-			let index = indexes[0];
+		for (let i = 0; i < indexes.length; i++){
+			let index = indexes[i];
 			if (elementsModel.containsKey("Id", index)){
 				let itemId = elementsModel.getData("Id", index);
 

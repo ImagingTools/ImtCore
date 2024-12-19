@@ -25,6 +25,7 @@
         <file alias="imtcontrols/Actions/ShortcutManager.qml">Actions/ShortcutManager.qml</file>
         <file alias="imtcontrols/Actions/MovingItem.qml">Actions/MovingItem.qml</file>
         <file alias="imtcontrols/Actions/ControlArea.qml">Actions/ControlArea.qml</file>
+	<file alias="imtcontrols/Actions/TableSelectionManager.qml">Actions/TableSelectionManager.qml</file>
         <file alias="imtcontrols/Buttons/Button.qml">Buttons/Button.qml</file>
         <file alias="imtcontrols/Buttons/TextButton.qml">Buttons/TextButton.qml</file>
         <file alias="imtcontrols/Buttons/ButtonDecorator.qml">Buttons/ButtonDecorator.qml</file>

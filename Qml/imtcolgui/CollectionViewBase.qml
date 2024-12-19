@@ -88,6 +88,7 @@ ViewBase {
 			if (!table.tableViewParams.headerIsExists(headerId)){
 				table.tableViewParams.setHeaderSize(headerId, -1);
 				table.tableViewParams.setHeaderVisible(headerId, true);
+				table.tableViewParams.setHeaderOrder(headerId, i);
 			}
 		}
 	}

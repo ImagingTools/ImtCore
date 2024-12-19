@@ -135,7 +135,8 @@ Item {
         function onSelectionChanged(selection){
             root.selectionChanged(selection);
 
-            additionalInformation.visible = root.visibleMetaInfo && root.table.tableSelection.selectedIndexes.length == 0;
+			collectionMetaInfo.contentVisible = selection.length === 1;
+			additionalInformation.visible = root.visibleMetaInfo && selection.length === 0;
         }
 
         function onRightButtonMouseClicked(mouseX, mouseY){

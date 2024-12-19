@@ -25,6 +25,7 @@ FilterableComboBoxDelegate 1.0 ./Actions/FilterableComboBoxDelegate.qml
 ShortcutManager 1.0 ./Actions/ShortcutManager.qml
 MovingItem 1.0 ./Actions/MovingItem.qml
 ControlArea 1.0 ./Actions/ControlArea.qml
+TableSelectionManager 1.0 ./Actions/TableSelectionManager.qml
 
 Button 1.0 ./Buttons/Button.qml
 TextButton 1.0 ./Buttons/TextButton.qml

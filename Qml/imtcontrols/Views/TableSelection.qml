@@ -3,131 +3,62 @@ import Acf 1.0
 import imtcontrols 1.0
 
 QtObject {
-    id: root;
+	id: root;
 
-    property var selectedIndexes: []
+	property var selectedIndexes: []
+	property int lastSelectedIndex: -1;
+	property int firstSelectedIndex: -1;
+	property int focusedIndex: 0;
 
-    property ListView tableItem: null;
-    signal selectionChanged();
+	signal selectionChanged();
 
-    property bool isMultiSelect: true;
+	function resetSelection(){
+		root.selectedIndexes = []
 
-    property int countElements: root.tableItem ? root.tableItem.count : -1;
+		root.selectionChanged();
+	}
 
-    Component.onDestruction: {
-        root.unsubscribeEvents();
-    }
+	function toggleSelect(index){
+		let position = selectedIndexes.indexOf(index);
+		if (position >= 0){
+			selectedIndexes.splice(position, 1)
+		}
+		else{
+			selectedIndexes.push(index)
+		}
 
-    onTableItemChanged: {
-        if (root.tableItem != null){
-            root.subscribeEvents();
-        }
-    }
+		firstSelectedIndex = index;
+		lastSelectedIndex = index;
+		focusedIndex = index;
 
-    function subscribeEvents(){
-//        Events.subscribeEvent("SelectAll", root.selectAll);
-//        Events.subscribeEvent("ShiftUp", root.shiftUp);
-//        Events.subscribeEvent("ShiftDown", root.shiftDown);
-    }
+		selectionChanged();
+	}
 
-    function unsubscribeEvents(){
-//        Events.unSubscribeEvent("SelectAll", root.selectAll);
-//        Events.unSubscribeEvent("ShiftUp", root.shiftUp);
-//        Events.unSubscribeEvent("ShiftDown", root.shiftDown);
-    }
+	function singleSelect(index){
+		root.selectedIndexes = []
+		toggleSelect(index);
+	}
 
-    function resetSelection(){
-        root.selectedIndexes = []
+	function rangeSelect(fromIndex, toIndex) {
+		let range = [];
+		let start = Math.min(fromIndex, toIndex);
+		let end = Math.max(fromIndex, toIndex);
 
-        root.selectionChanged();
-    }
+		for (let i = start; i <= end; i++) {
+			range.push(i);
+		}
 
-    function singleSelect(index){
-        root.selectedIndexes = []
-        root.selectedIndexes.push(index)
+		firstSelectedIndex = fromIndex;
+		selectedIndexes = range;
+		lastSelectedIndex = toIndex;
+		focusedIndex = toIndex;
 
-        root.selectionChanged();
-    }
+		selectionChanged();
+	}
 
-    function selectAll(){
-        if (!root.isMultiSelect){
-            return;
-        }
-
-        selectedIndexes = []
-
-        for (let i = 0; i < root.countElements; i++){
-            root.selectedIndexes.push(i);
-        }
-
-        root.selectionChanged();
-    }
-
-    function isSelected(index){
-        return root.selectedIndexes.includes(index);
-    }
-
-    function up(){
-        if (root.selectedIndexes.length > 0){
-            let lastIndex = root.selectedIndexes[root.selectedIndexes.length - 1];
-            if (lastIndex > 0){
-                root.singleSelect(lastIndex - 1)
-
-                root.selectionChanged();
-            }
-        }
-    }
-
-    function down(){
-        if (root.selectedIndexes.length > 0){
-            let lastIndex = root.selectedIndexes[root.selectedIndexes.length - 1];
-            if (root.countElements - 1 > lastIndex){
-                root.singleSelect(lastIndex + 1)
-
-                root.selectionChanged();
-            }
-        }
-    }
-
-    function shiftUp(){
-        if (!root.isMultiSelect){
-            return;
-        }
-
-        if (root.selectedIndexes.length > 0){
-            let lastIndex = root.selectedIndexes[root.selectedIndexes.length - 1];
-            if (lastIndex > 0){
-                var index = root.selectedIndexes.indexOf(lastIndex - 1);
-                if (index >= 0){
-                    root.selectedIndexes.splice(root.selectedIndexes.indexOf(lastIndex), 1);
-                }
-                else{
-                    root.selectedIndexes.push(lastIndex - 1);
-                }
-
-                root.selectionChanged();
-            }
-        }
-    }
-
-    function shiftDown(){
-        if (!root.isMultiSelect){
-            return;
-        }
-
-        if (root.selectedIndexes.length > 0){
-            let lastIndex = root.selectedIndexes[root.selectedIndexes.length - 1];
-            if (root.countElements - 1 > lastIndex){
-                var index = root.selectedIndexes.indexOf(lastIndex + 1);
-                if (index >= 0){
-                    root.selectedIndexes.splice(root.selectedIndexes.indexOf(lastIndex), 1);
-                }
-                else{
-                    root.selectedIndexes.push(lastIndex + 1);
-                }
-
-                root.selectionChanged();
-            }
-        }
-    }
+	function isSelected(index){
+		return root.selectedIndexes.includes(index);
+	}
 }
+
+
