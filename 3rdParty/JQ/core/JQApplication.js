@@ -162,10 +162,16 @@ module.exports = {
             .Column > * {
                 position: relative;
             }
+            .Flow > * {
+                position: relative;
+            }
             .Row > *[no-view] {
                 display: none;
             }
             .Column > *[no-view] {
+                display: none;
+            }
+            .Flow > *[no-view] {
                 display: none;
             }
 

@@ -33,13 +33,14 @@ class QtObject extends QObject {
         if(model){
             obj.JQAbstractModel = model
         } else {
-            obj.JQAbstractModel = QtFunctions.binding(()=>{return obj.parent.JQAbstractModel})
+            obj.__getDataQml('JQAbstractModel').__setCompute(()=>{return obj.parent.JQAbstractModel})
         }
 
         if(!('model' in meta) && this.meta.model.auto){
-            obj.model = QtFunctions.binding(()=>{return obj.JQAbstractModel})
+            obj.__getDataQml('model').__setCompute(()=>{return obj.JQAbstractModel})
         }
-        obj.index = QtFunctions.binding(()=>{return obj.JQAbstractModel.index})
+
+        obj.__getDataQml('index').__setCompute(()=>{return obj.JQAbstractModel.index})
 
         return obj
     }

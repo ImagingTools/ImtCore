@@ -147,7 +147,20 @@ class TextInput extends Item {
             } else if(e.key === QtEnums.Key_Enter){
                 e.preventDefault()
                 e.stopPropagation()
-                this.accepted()
+
+                if(this.validator){
+                    if(this.validator.validate(this.text)){
+                        this.accepted()
+                        this.editingFinished()
+                        this.acceptableInput = true
+                    } else {
+                        this.acceptableInput = false
+                    }
+                } else {
+                    this.accepted()
+                    this.editingFinished()
+                    this.acceptableInput = true
+                }
             }
         }
         impl.oninput = (e)=>{
@@ -195,6 +208,7 @@ class TextInput extends Item {
                 }
             }
 
+            this.textEdited()
         }
 
         return impl
@@ -299,6 +313,7 @@ class TextInput extends Item {
     onActiveFocusChanged(){
         if(!this.activeFocus){
             this.__impl.blur()
+            this.editingFinished()
         }
     }
 

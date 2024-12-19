@@ -27,6 +27,7 @@ module.exports = {
     TextEdit: require("./TextEdit"),
     Shortcut: require("./Shortcut"),
     Canvas: require("./Canvas"),
+    Flow: require("./Flow"),
 
     Dialogs: require("./Dialogs/Dialogs"),
     Controls: require("./Controls/Controls"),

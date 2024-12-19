@@ -25,10 +25,10 @@ class Item extends QtObject {
     static Center = 8
 
     static meta = Object.assign({}, QtObject.meta, {
-        AX: {type:SpecialProperty, value:0, signalName:'AXChanged'},
-        AY: {type:SpecialProperty, value:0, signalName:'AYChanged'},
-        AWidth: {type:SpecialProperty, value:0, signalName:'AWidthChanged'},
-        AHeight: {type:SpecialProperty, value:0, signalName:'AHeightChanged'},
+        // AX: {type:SpecialProperty, value:0, signalName:'AXChanged'},
+        // AY: {type:SpecialProperty, value:0, signalName:'AYChanged'},
+        // AWidth: {type:SpecialProperty, value:0, signalName:'AWidthChanged'},
+        // AHeight: {type:SpecialProperty, value:0, signalName:'AHeightChanged'},
 
         x: {type:Real, value:0, signalName:'xChanged'},
         y: {type:Real, value:0, signalName:'yChanged'},
@@ -258,25 +258,25 @@ class Item extends QtObject {
         }
     }
 
-    onAXChanged(){
-        if(this.AX !== this.x) 
-        this.__getDataQml('x').__resetForce(this.AX)
-    }
+    // onAXChanged(){
+    //     if(this.AX !== this.x) 
+    //     this.__getDataQml('x').__resetForce(this.AX)
+    // }
 
-    onAYChanged(){
-        if(this.AY !== this.y) 
-        this.__getDataQml('y').__resetForce(this.AY)
-    }   
+    // onAYChanged(){
+    //     if(this.AY !== this.y) 
+    //     this.__getDataQml('y').__resetForce(this.AY)
+    // }   
 
-    onAWidthChanged(){
-        if(this.AWidth !== this.width) 
-        this.__getDataQml('width').__resetForce(this.AWidth)
-    }
+    // onAWidthChanged(){
+    //     if(this.AWidth !== this.width) 
+    //     this.__getDataQml('width').__resetForce(this.AWidth)
+    // }
 
-    onAHeightChanged(){
-        if(this.AHeight !== this.height) 
-        this.__getDataQml('height').__resetForce(this.AHeight)
-    }
+    // onAHeightChanged(){
+    //     if(this.AHeight !== this.height) 
+    //     this.__getDataQml('height').__resetForce(this.AHeight)
+    // }
 
     onParentChanged(){
         super.onParentChanged()
@@ -284,7 +284,7 @@ class Item extends QtObject {
     }
 
     onXChanged(){
-        this.AX = this.x
+        // this.AX = this.x
         
         this.__setDOMStyle({
             left: this.x+'px'
@@ -292,7 +292,7 @@ class Item extends QtObject {
     }
 
     onYChanged(){
-        this.AY = this.y
+        // this.AY = this.y
 
         this.__setDOMStyle({
             top: this.y+'px'
@@ -325,7 +325,7 @@ class Item extends QtObject {
     }
 
     onWidthChanged(){
-        this.AWidth = this.width
+        // this.AWidth = this.width
         
         this.__checkVisibility()
         this.__setDOMStyle({
@@ -336,7 +336,7 @@ class Item extends QtObject {
     }
 
     onHeightChanged(){
-        this.AHeight = this.height
+        // this.AHeight = this.height
 
         this.__checkVisibility()
         this.__setDOMStyle({

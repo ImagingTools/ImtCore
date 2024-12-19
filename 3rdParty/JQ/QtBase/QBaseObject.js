@@ -147,7 +147,10 @@ class QBaseObject extends BaseObject {
     __getDataQml(key){
         if(this.__destroyed) return
 
-        this[key]
+        if(!(key in this.__dataQml)) {
+            this.__dataQml[key] = this.constructor.meta[key].type.create(this, this.constructor.meta[key])
+        }
+
         return this.__dataQml[key]
     }
 
