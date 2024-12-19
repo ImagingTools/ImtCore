@@ -513,7 +513,8 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	const QString requestClassName = sdlRequest.GetName() + QStringLiteral("GqlRequest");
-	CStructNamespaceConverter structNameConverter(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
+	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
+	CStructNamespaceConverter structNameConverter(outputArgument, sdlNamespace, *m_sdlTypeListCompPtr, false);
 	structNameConverter.addVersion = true;
 
 	// [1] command ID check

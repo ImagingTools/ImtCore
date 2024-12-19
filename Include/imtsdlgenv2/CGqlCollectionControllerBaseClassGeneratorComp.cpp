@@ -1230,7 +1230,8 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 	CStructNamespaceConverter structNameConverter(referenceType, sdlNamespace, *m_sdlTypeListCompPtr, false);
 	structNameConverter.addVersion = true;
 
-	CStructNamespaceConverter getStructNameConverter(sdlRequestInfo.request.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
+	imtsdl::CSdlField outputArgument = sdlRequestInfo.request.GetOutputArgument();
+	CStructNamespaceConverter getStructNameConverter(outputArgument, sdlNamespace, *m_sdlTypeListCompPtr, false);
 	getStructNameConverter.addVersion = true;
 
 	FeedStreamHorizontally(stream, hIndents);
