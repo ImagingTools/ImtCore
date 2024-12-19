@@ -320,7 +320,7 @@ Item{
     }
 
     function onModelDataChanged(topLeft, bottomRight, keyRoles){
-        if(ready){
+		if(splitView && splitView.ready){
             correctSize();
         }
     }

@@ -56,11 +56,7 @@ Item {
             index = workspaceView.documentManager.documentsModel.count;
         }
 
-//        let view = viewComp.createObject(viewsPanel);
-//        view.anchors.fill = viewsPanel;
-//        viewsPanel.updateVisibleItems();
-
-         workspaceView.documentManager.documentsModel.insert(index, {
+		workspaceView.documentManager.documentsModel.insert(index, {
                                   "Uuid": UuidGenerator.generateUUID(),
                                   "Title": viewName,
                                   "DocumentViewComp": viewComp,
@@ -103,10 +99,6 @@ Item {
                 tabPanel_.selectedIndex--;
             }
         }
-
-//        onSelectedIndexChanged: {
-//            viewsPanel.updateVisibleItems();
-//        }
     }
 
     Loader {
@@ -118,21 +110,6 @@ Item {
         visible: alertPanel.item != null && alertPanel.item !== undefined;
     }
 
-//    Item {
-//        id: viewsPanel;
-
-//        anchors.top: alertPanel.bottom;
-//        anchors.left: parent.left;
-//        anchors.right: parent.right;
-//        anchors.bottom: parent.bottom;
-
-//        function updateVisibleItems(){
-//            for (let i = 0; i < viewsPanel.children.length; i++){
-//                viewsPanel.children[i].visible = tabPanel_.selectedIndex == i;
-//            }
-//        }
-//    }
-
     Repeater {
         id: documentRepeater;
         anchors.top: alertPanel.bottom;
@@ -142,37 +119,53 @@ Item {
         clip: true;
         delegate: Item {
             anchors.fill: documentRepeater;
+			visible: tabPanel_.selectedIndex === model.index;
+			clip: true;
+			Component.onCompleted: {
+				if (model.Fixed !== undefined && model.Fixed){
+					let item = model.DocumentViewComp.createObject(this);
+					item.anchors.fill = this;
+					return;
+				}
 
-            Loader {
-                id: documentLoader;
-                anchors.fill: parent;
-                sourceComponent: model.DocumentViewComp;
-                clip: true;
-                visible: tabPanel_.selectedIndex === model.index;
+				let documentData = workspaceView.documentManager.getDocumentData(model.index);
+				if (documentData && documentData.views.length > 0){
+					documentData.views[0].parent = this;
+					documentData.views[0].anchors.fill = this;
+					documentData.views[0].visible = true;
+				}
+			}
 
-                onLoaded: {
-                    if (item.viewId !== undefined){
-                        item.viewId = model.Uuid;
-                    }
+	  //       Loader {
+	  //           id: documentLoader;
+	  //           anchors.fill: parent;
+	  //           sourceComponent: model.DocumentViewComp;
+	  //           clip: true;
+	  //           visible: tabPanel_.selectedIndex === model.index;
 
-                    if (model.Fixed !== undefined && model.Fixed){
-                        return;
-                    }
+	  //           onLoaded: {
+	  //               if (item.viewId !== undefined){
+	  //                   item.viewId = model.Uuid;
+	  //               }
 
-                    let documentData = workspaceView.documentManager.documentsModel.get(model.index).DocumentData;
-                    if (documentData){
-                        documentData.views.push(item);
-                    }
+	  //               if (model.Fixed !== undefined && model.Fixed){
+	  //                   return;
+	  //               }
 
-                    workspaceView.documentManager.updateDocumentTitle(model.index);
-                }
+	  //               let documentData = workspaceView.documentManager.documentsModel.get(model.index).DocumentData;
+	  //               if (documentData){
+						// documentData.addView(item);
+	  //               }
 
-                onStatusChanged: {
-                    if (status === Loader.Error){
-                        console.error("Document loading was failed");
-                    }
-                }
-            }
+	  //               workspaceView.documentManager.updateDocumentTitle(model.index);
+	  //           }
+
+	  //           onStatusChanged: {
+	  //               if (status === Loader.Error){
+	  //                   console.error("Document loading was failed");
+	  //               }
+	  //           }
+	  //       }
         }
     }
 }

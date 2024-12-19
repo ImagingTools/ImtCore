@@ -13,10 +13,51 @@ ComboBox {
     itemHeight: 35;
 
     delegate: Component {
-        FilterableComboBoxDelegate {
-            width: comboBoxContainer.width;
-            comboBoxRef: comboBoxContainer;
-        }
+		Item {
+			id: itemDelegate;
+			width: comboBoxContainer.width;
+			height: acceptable ? comboBoxContainer.itemHeight: 0;
+
+			property string displayText: model[comboBoxContainer.nameId];
+			property bool acceptable: true;
+			property string filter: comboBoxContainer ? comboBoxContainer.filter : "";
+
+			onFilterChanged: {
+				if (filter === ""){
+					acceptable = true;
+					return;
+				}
+
+				acceptable = false;
+
+				let keys = comboBoxContainer.model.getKeys(model.index);
+				for (let i = 0; i < comboBoxContainer.filteringFields.length; i++){
+					let id = comboBoxContainer.filteringFields[i];
+					if (keys.includes(id)){
+						let value = model[id];
+						if (value.toLowerCase().indexOf(filter.toLowerCase()) >= 0){
+							acceptable = true;
+							break;
+						}
+					}
+				}
+			}
+
+			Loader {
+				id: loader;
+				anchors.fill: parent;
+				sourceComponent: itemDelegate.acceptable ? delegateComp : undefined;
+			}
+
+			Component {
+				id: delegateComp;
+				FilterableComboBoxDelegate {
+					width: comboBoxContainer.width;
+					comboBoxRef: comboBoxContainer;
+					text: itemDelegate.displayText;
+				}
+			}
+		}
     }
 
     property CustomTextField textInput;
@@ -85,7 +126,7 @@ ComboBox {
 
                                 text: comboBoxContainer.currentText;
 
-                                onTextChanged: {
+								onEditingFinished: {
                                     if (text === "" || text != comboBoxContainer.currentText){
                                         comboBoxContainer.filter = text;
                                     }

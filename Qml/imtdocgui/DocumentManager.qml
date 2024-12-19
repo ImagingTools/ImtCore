@@ -4,855 +4,853 @@ import imtgui 1.0
 import imtcontrols 1.0
 
 QtObject {
-    id: documentManager;
+	id: documentManager;
 
-    property string defaultDocumentName: qsTr("<no name>");
-    property int documentsCount: documentsModel.count;
+	property string defaultDocumentName: qsTr("<no name>");
+	property int documentsCount: documentsModel.count;
 
-    property ListModel documentsModel: ListModel {
-        dynamicRoles: true;
-    }
+	property ListModel documentsModel: ListModel {
+		dynamicRoles: true;
+	}
 
-    signal documentClosed(int documentIndex, string documentId);
-    signal documentAdded(int documentIndex, string documentId);
+	signal documentClosed(int documentIndex, string documentId);
+	signal documentAdded(int documentIndex, string documentId);
 
-    onDocumentsCountChanged: {
-        documentIndexCorrection();
-    }
+	onDocumentsCountChanged: {
+		documentIndexCorrection();
+	}
 
-    function documentIndexCorrection(){
-        for (let i = 0; i < documentsModel.count; i++){
-            let documentData = documentsModel.get(i).DocumentData;
-            if (documentData){
-                documentData.documentIndex = i;
-            }
-        }
-    }
+	function documentIndexCorrection(){
+		for (let i = 0; i < documentsModel.count; i++){
+			let documentData = documentsModel.get(i).DocumentData;
+			if (documentData){
+				documentData.documentIndex = i;
+			}
+		}
+	}
 
 
-    function openErrorDialog(message){
-        ModalDialogManager.openDialog(errorDialogComp, {"message": message});
-    }
+	function openErrorDialog(message){
+		ModalDialogManager.openDialog(errorDialogComp, {"message": message});
+	}
 
 
-    function getDocumentsCount()
-    {
-        return documentsModel.count;
-    }
+	function getDocumentsCount()
+	{
+		return documentsModel.count;
+	}
 
 
-    function getActiveView()
-    {
-        return internal.m_activeViewPtr;
-    }
+	function getActiveView()
+	{
+		return internal.m_activeViewPtr;
+	}
 
 
-    function setActiveView(viewPtr)
-    {
-        if (internal.m_activeViewPtr !== viewPtr){
-            internal.m_activeViewPtr = viewPtr;
-        }
-    }
+	function setActiveView(viewPtr)
+	{
+		if (internal.m_activeViewPtr !== viewPtr){
+			internal.m_activeViewPtr = viewPtr;
+		}
+	}
 
 
-    function getDocumentTypeId(document)
-    {
-        let documentsCount = getDocumentsCount();
-        for (let documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
-            let info = internal.getSingleDocumentData(documentIndex);
-            if (info.documentPtr === document){
-                return info.documentTypeId;
-            }
-        }
+	function getDocumentTypeId(document)
+	{
+		let documentsCount = getDocumentsCount();
+		for (let documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
+			let info = internal.getSingleDocumentData(documentIndex);
+			if (info.documentPtr === document){
+				return info.documentTypeId;
+			}
+		}
 
-        return String();
-    }
+		return String();
+	}
 
 
-    function registerDocumentValidator(documentTypeId, validatorComp){
-        if (!documentIsRegistered(documentTypeId)){
-            console.error("Unable to register validator. Document with documentTypeId: ", documentTypeId, " unregistered!");
+	function registerDocumentValidator(documentTypeId, validatorComp){
+		if (!documentIsRegistered(documentTypeId)){
+			console.error("Unable to register validator. Document with documentTypeId: ", documentTypeId, " unregistered!");
 
-            return false;
-        }
+			return false;
+		}
 
-        internal.m_registeredValidators[documentTypeId] = validatorComp;
+		internal.m_registeredValidators[documentTypeId] = validatorComp;
 
-        return true;
-    }
+		return true;
+	}
 
 
-    function registerDocumentDataController(documentTypeId, dataControllerComp){
-        internal.m_registeredDataControllers[documentTypeId] = dataControllerComp;
+	function registerDocumentDataController(documentTypeId, dataControllerComp){
+		internal.m_registeredDataControllers[documentTypeId] = dataControllerComp;
 
-        return true;
-    }
+		return true;
+	}
 
-    function unRegisterDocumentDataController(documentTypeId){
-        delete internal.m_registeredDataControllers[documentTypeId]
+	function unRegisterDocumentDataController(documentTypeId){
+		delete internal.m_registeredDataControllers[documentTypeId]
 
-        return true;
-    }
+		return true;
+	}
 
 
-    function registerDocumentView(documentTypeId, viewTypeId, viewComp)
-    {
-        if (documentTypeId === "" || viewTypeId === "" || !viewComp){
-            return false;
-        }
+	function registerDocumentView(documentTypeId, viewTypeId, viewComp)
+	{
+		if (documentTypeId === "" || viewTypeId === "" || !viewComp){
+			return false;
+		}
 
-        if (documentIsRegistered(documentTypeId)){
-            if (documentViewIsRegistered(viewTypeId)){
-                console.error("View with type-ID: ", viewTypeId, " already registered!");
+		if (documentIsRegistered(documentTypeId)){
+			if (documentViewIsRegistered(viewTypeId)){
+				console.error("View with type-ID: ", viewTypeId, " already registered!");
 
-                return false;
-            }
+				return false;
+			}
 
-            internal.m_registeredView[documentTypeId].push({"ViewTypeId": viewTypeId, "ViewComp": viewComp});
-        }
-        else{
-            internal.m_registeredView[documentTypeId] = [{"ViewTypeId": viewTypeId, "ViewComp": viewComp}]
-        }
+			internal.m_registeredView[documentTypeId].push({"ViewTypeId": viewTypeId, "ViewComp": viewComp});
+		}
+		else{
+			internal.m_registeredView[documentTypeId] = [{"ViewTypeId": viewTypeId, "ViewComp": viewComp}]
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    function unRegisterDocumentView(documentTypeId, viewTypeId)
-    {
-        if (!documentIsRegistered(documentTypeId)){
-            return false;
-        }
+	function unRegisterDocumentView(documentTypeId, viewTypeId)
+	{
+		if (!documentIsRegistered(documentTypeId)){
+			return false;
+		}
 
-        let registeredViewList = internal.m_registeredView[documentTypeId];
-        for (let i = 0; i < registeredViewList.length; i++){
-            let registeredViewObj = registeredViewList[i];
-            if (registeredViewObj["ViewTypeId"] === viewTypeId){
-                registeredViewList.splice(i,1)
+		let registeredViewList = internal.m_registeredView[documentTypeId];
+		for (let i = 0; i < registeredViewList.length; i++){
+			let registeredViewObj = registeredViewList[i];
+			if (registeredViewObj["ViewTypeId"] === viewTypeId){
+				registeredViewList.splice(i,1)
 
-                return true;
-            }
-        }
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    function getDocumentView(documentTypeId, viewTypeId)
-    {
-        if (!documentViewIsRegistered(documentTypeId, viewTypeId)){
-            console.error("Unable to get a document view. View is unregistered!");
+	function createViewForDocument(documentTypeId, viewTypeId)
+	{
+		let viewComp = getDocumentViewComp(documentTypeId, viewTypeId);
+		if (viewComp){
+			return viewComp.createObject(documentManager);
+		}
 
-            return null;
-        }
+		return null;
+	}
 
-        let registeredViewList = internal.m_registeredView[documentTypeId];
-        for (let i = 0; i < registeredViewList.length; i++){
-            let registeredViewObj = registeredViewList[i];
-            if (registeredViewObj["ViewTypeId"] === viewTypeId){
-                return registeredViewObj["ViewComp"];
-            }
-        }
+	function getDocumentViewComp(documentTypeId, viewTypeId)
+	{
+		if (!documentViewIsRegistered(documentTypeId, viewTypeId)){
+			console.error("Unable to get a document view. View is unregistered!");
 
-        return null;
-    }
-
+			return null;
+		}
 
-    function getDocumentValidator(documentTypeId){
-        if (documentTypeId in internal.m_registeredValidators){
-            let validatorComp = internal.m_registeredValidators[documentTypeId];
+		let registeredViewList = internal.m_registeredView[documentTypeId];
+		for (let i = 0; i < registeredViewList.length; i++){
+			let registeredViewObj = registeredViewList[i];
+			if (registeredViewObj["ViewTypeId"] === viewTypeId){
+				return registeredViewObj["ViewComp"];
+			}
+		}
 
-            return validatorComp.createObject(documentManager);
-        }
+		return null;
+	}
 
-        return null;
-    }
-
-
-    function documentIsRegistered(documentTypeId)
-    {
-        return documentTypeId in internal.m_registeredView;
-    }
 
+	function getDocumentValidator(documentTypeId){
+		if (documentTypeId in internal.m_registeredValidators){
+			let validatorComp = internal.m_registeredValidators[documentTypeId];
+
+			return validatorComp.createObject(documentManager);
+		}
 
-    function documentViewIsRegistered(documentTypeId, viewTypeId)
-    {
-        if (documentIsRegistered(documentTypeId)){
-            let registeredViewList = internal.m_registeredView[documentTypeId];
-            for (let i = 0; i < registeredViewList.length; i++){
-                let registeredViewObj = registeredViewList[i];
-                if (registeredViewObj["ViewTypeId"] === viewTypeId){
-                    return true;
-                }
-            }
-        }
+		return null;
+	}
 
-        return false;
-    }
 
+	function documentIsRegistered(documentTypeId)
+	{
+		return documentTypeId in internal.m_registeredView;
+	}
 
-    function dataControllerIsRegistered(documentTypeId)
-    {
-        return documentTypeId in internal.m_registeredDataControllers;
-    }
 
+	function documentViewIsRegistered(documentTypeId, viewTypeId)
+	{
+		if (documentIsRegistered(documentTypeId)){
+			let registeredViewList = internal.m_registeredView[documentTypeId];
+			for (let i = 0; i < registeredViewList.length; i++){
+				let registeredViewObj = registeredViewList[i];
+				if (registeredViewObj["ViewTypeId"] === viewTypeId){
+					return true;
+				}
+			}
+		}
 
-    function getDocumentDataController(documentTypeId)
-    {
-        if (!dataControllerIsRegistered(documentTypeId)){
-            console.error("Data controller for documents with type-ID: ", documentTypeId, " is unregistered!");
+		return false;
+	}
 
-            return defaultDataController.createObject(documentManager);
-        }
 
-        let dataControllerComp = internal.m_registeredDataControllers[documentTypeId];
-        return dataControllerComp.createObject(documentManager);
-    }
+	function dataControllerIsRegistered(documentTypeId)
+	{
+		return documentTypeId in internal.m_registeredDataControllers;
+	}
 
 
-    function insertNewDocument(documentTypeId, viewTypeId)
-    {
-        let documentData = createTemplateDocument("", documentTypeId);
-        if (!documentData){
-            return false;
-        }
+	function getDocumentDataController(documentTypeId)
+	{
+		if (!dataControllerIsRegistered(documentTypeId)){
+			console.error("Data controller for documents with type-ID: ", documentTypeId, " is unregistered!");
+
+			return defaultDataController.createObject(documentManager);
+		}
 
-        let documentViewComp = getDocumentView(documentTypeId, viewTypeId);
-        if (!documentViewComp){
-            return false;
-        }
-
-        documentData.documentIndex = documentsModel.count;
-        let uuid = UuidGenerator.generateUUID();
-
-        documentsModel.append({
-                                  "Uuid": documentData.uuid,
-                                  "Title": defaultDocumentName,
-                                  "TypeId": documentTypeId,
-                                  "DocumentData": documentData,
-                                  "DocumentViewComp": documentViewComp,
-                                  "IsNew": true
-                              });
-
-        documentAdded(documentsModel.count - 1, "");
-
-        if (documentData.documentDataController){
-            documentData.documentDataController.createDocumentModel();
-        }
-
-        return true;
-    }
-
-
-    function getViewTypeIds(documentTypeId){
-        if (!documentIsRegistered(documentTypeId)){
-            return []
-        }
-
-        let result = []
-        let registeredViewList = internal.m_registeredView[documentTypeId];
-        for (let i = 0; i < registeredViewList.length; i++){
-            let registeredViewObj = registeredViewList[i];
-            let viewTypeId = registeredViewObj["ViewTypeId"];
-            result.push(viewTypeId)
-        }
-
-        return result;
-    }
-
-
-    function createTemplateDocument(documentId, documentTypeId){
-        let singleDocumentData = singleDocumentDataComp.createObject(documentManager);
-        if (singleDocumentData){
-            if (documentId === ""){
-                singleDocumentData.documentId = UuidGenerator.generateUUID();
-            }
-            else{
-                singleDocumentData.documentId = documentId;
-            }
-
-            singleDocumentData.uuid = UuidGenerator.generateUUID();
-
-            let documentDataController = getDocumentDataController(documentTypeId);
-            if (documentDataController){
-                documentDataController.documentId = singleDocumentData.documentId;
-                singleDocumentData.documentDataController = documentDataController;
-            }
-
-            singleDocumentData.documentTypeId = documentTypeId;
-
-            let documentValidator = getDocumentValidator(documentTypeId);
-            if (documentValidator){
-                singleDocumentData.documentValidator = documentValidator;
-            }
-
-            return singleDocumentData;
-        }
-
-        return null;
-    }
-
-
-    function openDocument(documentId, documentTypeId, viewTypeId)
-    {
-        let index = getDocumentIndexByDocumentId(documentId);
-        if (index >= 0){
-            // already opened
-            documentAdded(index, documentId);
-
-            return;
-        }
-
-        Events.sendEvent("StartLoading");
-
-        let documentData = createTemplateDocument(documentId, documentTypeId);
-        if (!documentData){
-            return false;
-        }
-
-        let documentViewComp = getDocumentView(documentTypeId, viewTypeId);
-        if (!documentViewComp){
-            return false;
-        }
-
-        documentData.documentIndex = documentsModel.count;
-        documentsModel.append({
-                                  "Uuid": documentData.uuid,
-                                  "Title": defaultDocumentName,
-                                  "TypeId": documentTypeId,
-                                  "DocumentData": documentData,
-                                  "DocumentViewComp": documentViewComp,
-                                  "IsNew": false
-                              });
-
-        documentAdded(documentsModel.count - 1, documentId);
-
-        if (documentData.documentDataController){
-            documentData.documentDataController.updateDocumentModel();
-        }
-        else{
-            Events.sendEvent("StopLoading");
-        }
-
-        return true;
-    }
-
-    /*!
-        Save document by UUID.
-
-        \param      documentId           UUID of the document
-    */
-    function saveDocument(documentId)
-    {
-        let index = getDocumentIndexByDocumentId(documentId);
-        if (index >= 0){
-            let isNew = documentsModel.get(index).IsNew;
-            let document = documentsModel.get(index).DocumentData;
-            if (document.isDirty){
-                Events.sendEvent("StartLoading");
-
-                for (let i = 0; i < document.views.length; i++){
-                    if (!document.views[i].readOnly){
-                        document.views[i].doUpdateModel();
-                    }
-                }
-
-                let data = {}
-                let documentIsValid = documentManager.documentIsValid(document, data);
-                if (!documentIsValid){
-                    openErrorDialog(data.message);
-                    Events.sendEvent("StopLoading");
-
-                    return;
-                }
-
-                if (document.documentDataController){
-                    if (isNew){
-                        document.documentDataController.insertDocument();
-                    }
-                    else{
-                        document.documentDataController.saveDocument();
-                    }
-                }
-            }
-        }
-    }
-
+		let dataControllerComp = internal.m_registeredDataControllers[documentTypeId];
+		return dataControllerComp.createObject(documentManager);
+	}
 
-    function onDocumentSaved(documentId, documentIndex)
-    {
-        Events.sendEvent("StopLoading");
-
-        if (internal.m_closingDocuments.includes(documentId)){
-            closeDocument(documentId);
-        }
 
-        if (documentIndex >= 0){
-            let documentData = documentsModel.get(documentIndex);
-            if (documentData && documentData.IsNew){
-                documentsModel.setProperty(documentIndex, "IsNew", false);
-            }
-        }
-    }
-
-
-    function getDocumentIndexByDocumentId(documentId){
-        for (let i = 0; i < documentsModel.count; i++){
-            let documentData = documentsModel.get(i).DocumentData;
-            if (documentData && documentData.documentId === documentId){
-                return i;
-            }
-        }
-
-        return -1;
-    }
+	function insertNewDocument(documentTypeId, viewTypeId)
+	{
+		let documentData = createTemplateDocument("", documentTypeId);
+		if (!documentData){
+			return false;
+		}
 
-
-    function getDocumentDataByView(view){
-        for (let i = 0; i < documentsModel.count; i++){
-            let documentData = documentsModel.get(i).DocumentData;
-            if (documentData && documentData.views.includes(view)){
-                return documentData;
-            }
-        }
-
-        return null;
-    }
-
-
-    function getDocumentTitle(documentIndex)
-    {
-        if (documentIndex < 0 || documentIndex >= documentsModel.count){
-            return "";
-        }
-
-        return documentsModel.get(documentIndex).Title;
-    }
-
-
-    function generateDocumentTitle(documentIndex){
-        if (documentIndex < 0 || documentIndex >= documentsModel.count){
-            return "";
-        }
-
-        let title = defaultDocumentName;
+		if (documentData.documentDataController){
+			documentData.documentDataController.createDocumentModel();
+		}
 
-        let documentData = documentsModel.get(documentIndex).DocumentData;
+		addDocumentToModel("", documentTypeId, viewTypeId, documentData);
 
-        let documentName = "";
+		return true;
+	}
 
-        if (documentData){
-            documentName = documentData.getDocumentName();
-        }
+	function getDocumentData(index){
+		if (index < 0 || index >= documentsModel.count){
+			return null;
+		}
 
-        if (documentName && documentName !== ""){
-            title = documentName;
-        }
+		return documentsModel.get(index).DocumentData;
+	}
 
-        if (documentData && documentData.isDirty){
-            title = "* " + title;
-        }
 
-        return title;
-    }
+	function getViewTypeIds(documentTypeId){
+		if (!documentIsRegistered(documentTypeId)){
+			return []
+		}
+
+		let result = []
+		let registeredViewList = internal.m_registeredView[documentTypeId];
+		for (let i = 0; i < registeredViewList.length; i++){
+			let registeredViewObj = registeredViewList[i];
+			let viewTypeId = registeredViewObj["ViewTypeId"];
+			result.push(viewTypeId)
+		}
 
+		return result;
+	}
 
-    function updateDocumentTitle(documentIndex){
-        if (documentIndex < 0 || documentIndex >= documentsModel.count){
-            return;
-        }
 
-        let documentTitle = generateDocumentTitle(documentIndex);
+	function createTemplateDocument(documentId, documentTypeId){
+		let singleDocumentData = singleDocumentDataComp.createObject(documentManager);
+		if (singleDocumentData){
+			if (documentId === ""){
+				singleDocumentData.documentId = UuidGenerator.generateUUID();
+			}
+			else{
+				singleDocumentData.documentId = documentId;
+			}
+
+			singleDocumentData.uuid = UuidGenerator.generateUUID();
+			singleDocumentData.documentIndex = documentsModel.count;
+			singleDocumentData.documentTypeId = documentTypeId;
+
+			let registeredViewIds = getViewTypeIds(documentTypeId);
+
+			for (let i = 0; i < registeredViewIds.length; i++){
+				let viewId = registeredViewIds[i];
+
+				let view = createViewForDocument(documentTypeId, viewId);
+				singleDocumentData.views.push(view);
+			}
+
+			let documentDataController = getDocumentDataController(documentTypeId);
+			if (documentDataController){
+				documentDataController.documentId = singleDocumentData.documentId;
+				singleDocumentData.documentDataController = documentDataController;
+			}
+
+			let documentValidator = getDocumentValidator(documentTypeId);
+			if (documentValidator){
+				singleDocumentData.documentValidator = documentValidator;
+			}
+
+			return singleDocumentData;
+		}
+
+		return null;
+	}
+
+	function openDocument(documentId, documentTypeId, viewTypeId)
+	{
+		let index = getDocumentIndexByDocumentId(documentId);
+		if (index >= 0){
+			// already opened
+			documentAdded(index, documentId);
+
+			return;
+		}
+
+		Events.sendEvent("StartLoading");
+
+		let documentData = createTemplateDocument(documentId, documentTypeId);
+		if (!documentData){
+			return false;
+		}
+
+		documentData.isNew = false;
+
+		let onResult = function(){
+			addDocumentToModel(documentId, documentTypeId, viewTypeId, documentData);
+
+			documentData.documentDataController.modelChanged.disconnect(onResult);
+		}
+
+		if (documentData.documentDataController){
+			documentData.documentDataController.updateDocumentModel();
+
+			documentData.documentDataController.modelChanged.connect(onResult);
+		}
+		else{
+			Events.sendEvent("StopLoading");
+		}
+
+		return true;
+	}
+
+	function addDocumentToModel(documentId, documentTypeId, viewTypeId, documentData)
+	{
+		documentsModel.append({
+								"Uuid": documentData.uuid,
+								"Title": defaultDocumentName,
+								"TypeId": documentTypeId,
+								"DocumentData": documentData,
+								// "DocumentViewComp": documentViewComp,
+								"IsNew": documentData.isNew
+							});
+
+		documentAdded(documentsModel.count - 1, documentId);
+
+		documentManager.updateDocumentTitle(documentsModel.count - 1);
+	}
+
+	/*!
+		Save document by UUID.
+
+		\param      documentId           UUID of the document
+	*/
+	function saveDocument(documentId)
+	{
+		console.log("saveDocument", documentId);
+
+		let index = getDocumentIndexByDocumentId(documentId);
+		if (index >= 0){
+			let isNew = documentsModel.get(index).IsNew;
+			let document = documentsModel.get(index).DocumentData;
+			if (document.isDirty){
+				Events.sendEvent("StartLoading");
+
+				for (let i = 0; i < document.views.length; i++){
+					if (!document.views[i].readOnly){
+						document.views[i].doUpdateModel();
+					}
+				}
+
+				let data = {}
+				let documentIsValid = documentManager.documentIsValid(document, data);
+				if (!documentIsValid){
+					openErrorDialog(data.message);
+					Events.sendEvent("StopLoading");
 
-        setDocumentTitle(documentIndex, documentTitle);
-    }
+					return;
+				}
 
+				if (document.documentDataController){
+					if (isNew){
+						document.documentDataController.insertDocument();
+					}
+					else{
+						document.documentDataController.saveDocument();
+					}
+				}
+			}
+		}
+	}
 
-    function setDocumentTitle(documentIndex, title)
-    {
-        if (documentIndex < 0 || documentIndex >= documentsModel.count){
-            return;
-        }
 
-        documentsModel.setProperty(documentIndex, "Title", title);
-    }
+	function onDocumentSaved(documentId, documentIndex)
+	{
+		Events.sendEvent("StopLoading");
 
+		if (internal.m_closingDocuments.includes(documentId)){
+			closeDocument(documentId);
+		}
 
-    // soon
-    function saveDirtyDocuments(beQuiet, ignoredPtr)
-    {
-    }
+		if (documentIndex >= 0){
+			let documentData = documentsModel.get(documentIndex);
+			if (documentData && documentData.IsNew){
+				documentsModel.setProperty(documentIndex, "IsNew", false);
+			}
+		}
+	}
 
 
-    /*!
-        Close document by document index.
+	function getDocumentIndexByDocumentId(documentId){
+		for (let i = 0; i < documentsModel.count; i++){
+			let documentData = documentsModel.get(i).DocumentData;
+			if (documentData && documentData.documentId === documentId){
+				return i;
+			}
+		}
 
-        \param      documentIndex    index of the document from the model of all open documents
-        \param      force            if true - document will be closed without isDirty checking
-    */
-    function closeDocumentByIndex(documentIndex, force)
-    {
-        if (documentIndex < 0 || documentIndex >= documentsModel.count){
-            console.error("Unable to close document with index: ", documentIndex);
+		return -1;
+	}
 
-            return;
-        }
 
-        if (!force){
-            force = false;
-        }
+	function getDocumentDataByView(view){
+		for (let i = 0; i < documentsModel.count; i++){
+			let documentData = documentsModel.get(i).DocumentData;
+			if (documentData && documentData.views.includes(view)){
+				return documentData;
+			}
+		}
 
-        let documentData = documentsModel.get(documentIndex).DocumentData;
+		return null;
+	}
 
-        if (documentData.isDirty && !force){
-            let callback = function(result){
-                if (result === Enums.yes){
-                    internal.m_closingDocuments.push(documentData.documentId);
-                    documentManager.saveDocument(documentData.documentId);
-                }
-                else if (result === Enums.no){
-                    documentData.isDirty = false;
-
-                    documentManager.closeDocumentByIndex(documentIndex);
-                }
-
-                ModalDialogManager.finished.disconnect(callback);
-            }
-
-            ModalDialogManager.openDialog(saveDialog, {}, "", callback);
-        }
-        else{
-            let index = internal.m_closingDocuments.indexOf(documentData.documentId);
-            if (index !== -1) {
-                internal.m_closingDocuments.splice(index, 1);
-            }
-
-            documentData.destroy();
-
-            documentsModel.remove(documentIndex);
-
-            documentClosed(documentIndex, "");
-        }
-    }
-
-
-    function closeDocument(documentId, force)
-    {
-        let index = getDocumentIndexByDocumentId(documentId);
-
-        closeDocumentByIndex(index, force);
-    }
-
-
-    function createDocumentComponent(documentTypeId)
-    {
-        let viewComp = getDocumentView(documentTypeId);
-        if (!viewComp){
-            console.error("Unable to create a document component. View component is invalid!");
-
-            return false;
-        }
-
-        return viewComp;
-    }
 
+	function getDocumentTitle(documentIndex)
+	{
+		if (documentIndex < 0 || documentIndex >= documentsModel.count){
+			return "";
+		}
 
-    function documentIsValid(documentData, data){
-        if (!documentData){
-            return false;
-        }
+		return documentsModel.get(documentIndex).Title;
+	}
 
-        if (!data){
-            data = {}
-        }
 
-        if (documentData.views.length > 0){
-            data["editor"] = documentData.views[0];
-        }
+	function generateDocumentTitle(documentIndex){
+		if (documentIndex < 0 || documentIndex >= documentsModel.count){
+			return "";
+		}
 
-        return documentData.documentValidator.isValid(data);
-    }
+		let title = defaultDocumentName;
 
+		let documentData = documentsModel.get(documentIndex).DocumentData;
 
-    property Component singleDocumentDataComp: Component{
-        QtObject {
-            id: singleDocumentData;
+		let documentName = "";
 
-            // UUID for unification
-            property string uuid: "";
-            // index of the document in document manager
-            property int documentIndex: -1;
-            property string documentId;
-            property string documentName;
-            property string documentTypeId;
-            property DocumentDataController documentDataController: null;
-            property DocumentValidator documentValidator: DocumentValidator {};
+		if (documentData){
+			documentName = documentData.getDocumentName();
+		}
 
-            property UndoRedoManager undoManager: UndoRedoManager {
-                onUndo: {
-                    singleDocumentData.checkDocumentModel();
-                    singleDocumentData.updateGui();
-                }
+		if (documentName && documentName !== ""){
+			title = documentName;
+		}
 
-                onRedo: {
-                    singleDocumentData.checkDocumentModel()
-                    singleDocumentData.updateGui();
-                }
+		if (documentData && documentData.isDirty){
+			title = "* " + title;
+		}
 
-                onModelChanged: {
-                    let undoSteps = getAvailableUndoSteps();
-                    let redoSteps = getAvailableRedoSteps();
+		return title;
+	}
 
-                    for (let i = 0; i < singleDocumentData.views.length; i++){
-                        if (singleDocumentData.views[i].commandsController){
-                            singleDocumentData.views[i].commandsController.setCommandIsEnabled("Undo", undoSteps > 0);
-                            singleDocumentData.views[i].commandsController.setCommandIsEnabled("Redo", redoSteps > 0);
-                        }
-                    }
-                }
-            };
 
-            property var views: [];
-            property bool isDirty: false;
+	function updateDocumentTitle(documentIndex){
+		console.log("updateDocumentTitle", documentIndex);
 
-            function updateGui(){
-                for (let i = 0; i < singleDocumentData.views.length; i++){
-                    singleDocumentData.views[i].doUpdateGui();
-                }
-            }
+		if (documentIndex < 0 || documentIndex >= documentsModel.count){
+			return;
+		}
 
-            function updateModel(){
-                for (let i = 0; i < singleDocumentData.views.length; i++){
-                    singleDocumentData.views[i].doUpdateModel();
-                }
-            }
+		let documentTitle = generateDocumentTitle(documentIndex);
 
-            property Connections dataControllerConnections: Connections {
-                target: singleDocumentData.documentDataController;
+		setDocumentTitle(documentIndex, documentTitle);
+	}
 
-                function onSaved(documentId, documentName){
-                    singleDocumentData.documentId = documentId;
-                    singleDocumentData.documentName = documentName;
 
-                    singleDocumentData.isDirty = false;
+	function setDocumentTitle(documentIndex, title)
+	{
+		console.log("setDocumentTitle", documentIndex, title);
 
-                    let documentModel = singleDocumentData.documentDataController.documentModel;
-                    if (singleDocumentData.undoManager){
-                        singleDocumentData.undoManager.setStandardModel(documentModel);
-                    }
+		if (documentIndex < 0 || documentIndex >= documentsModel.count){
+			return;
+		}
 
-                    documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
+		documentsModel.setProperty(documentIndex, "Title", title);
+	}
 
-                    documentManager.onDocumentSaved(documentId, singleDocumentData.documentIndex);
-                }
 
-                function onModelChanged(){
-                    if (!singleDocumentData.documentDataController || !singleDocumentData.documentDataController.documentModel){
-                        Events.sendEvent("StopLoading");
+	// soon
+	function saveDirtyDocuments(beQuiet, ignoredPtr)
+	{
+	}
 
-                        return;
-                    }
 
-                    let documentModel = singleDocumentData.documentDataController.documentModel;
+	/*!
+		Close document by document index.
 
-                    singleDocumentData.documentId = singleDocumentData.documentDataController.getDocumentId();
-                    singleDocumentData.documentName = singleDocumentData.documentDataController.getDocumentName();
-
-                    singleDocumentData.blockingUpdateModel = true;
-
-                    for (let i = 0; i < singleDocumentData.views.length; i++){
-                        singleDocumentData.views[i].model = documentModel;
-
-                        if (singleDocumentData.views[i].commandsDelegate){
-                            singleDocumentData.views[i].commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
-                        }
-                    }
-
-                    let isNew = documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew;
-                    if (isNew){
-                        singleDocumentData.updateModel();
-                    }
-                    else{
-                        singleDocumentData.updateGui();
-                    }
-
-                    singleDocumentData.blockingUpdateModel = false;
-
-                    documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
-
-                    singleDocumentData.undoManager.registerModel(documentModel);
-                    singleDocumentData.documentValidator.documentModel = documentModel;
-
-                    singleDocumentData.modelConnections.target = singleDocumentData.documentDataController.documentModel
-                    singleDocumentData.modelConnections.enabled = true;
-
-                    Events.sendEvent("StopLoading");
-                }
-
-                function onError(){
-                    Events.sendEvent("StopLoading");
-                }
-            }
-
-            property Connections modelConnections: Connections {
-                enabled: false;
-
-                function onModelChanged(){
-                    if (singleDocumentData.blockingUpdateModel){
-                        return;
-                    }
-
-                    if (singleDocumentData.undoManager && singleDocumentData.undoManager.isTransaction()){
-                        return;
-                    }
-
-                    singleDocumentData.isDirty = documentManager.documentIsValid(singleDocumentData);
-                }
-            }
-
-            property bool blockingUpdateModel: false;
-
-            onBlockingUpdateModelChanged: {
-                if (undoManager){
-                    undoManager.setBlockingUpdateModel(blockingUpdateModel);
-                }
-            }
-
-            signal viewAdded(var view);
-            signal viewRemoved(var view);
-
-            onDocumentIdChanged: {
-                if (documentDataController){
-                    documentDataController.documentId = documentId;
-                }
-            }
-
-            onIsDirtyChanged: {
-                for (let i = 0; i < singleDocumentData.views.length; i++){
-                    if (singleDocumentData.views[i].commandsController){
-                        singleDocumentData.views[i].commandsController.setCommandIsEnabled("Save", isDirty);
-                    }
-
-                    if (singleDocumentData.views[i].commandsView){
-                        if (singleDocumentData.views[i].commandsView.setPositiveAccentCommandIds !== undefined){
-                            singleDocumentData.views[i].commandsView.setPositiveAccentCommandIds(["Save"]);
-                        }
-                    }
-                }
-
-                documentManager.updateDocumentTitle(documentIndex);
-            }
-
-            function getDocumentName(){
-                if (singleDocumentData.documentDataController){
-                    return singleDocumentData.documentDataController.getDocumentName();
-                }
-
-                return "";
-            }
-
-            // Processing commands that came from the view
-            function viewCommandHandle(commandId){
-                if (singleDocumentData.undoManager){
-                    singleDocumentData.undoManager.commandHandle(commandId);
-                }
-                singleDocumentData.commandHandle(commandId);
-            }
-
-            function commandHandle(commandId){
-                if (!documentManager){
-                    return;
-                }
-
-                if (commandId === "Close"){
-                    documentManager.closeDocument(documentId);
-                }
-                else if (commandId === "Save"){
-                    documentManager.saveDocument(documentId);
-                }
-                else if (commandId === "History"){
-                    ModalDialogManager.openDialog(documentHistoryDialogComp,
-                                                  {
-                                                      "documentId": documentId,
-                                                      "documentTypeId": documentTypeId
-                                                  });
-                }
-            }
-
-            function checkDocumentModel(){
-                let currentStateModel = undoManager.getStandardModel();
-                if (currentStateModel){
-                    let documentModel = singleDocumentData.documentDataController.documentModel
-                    let isEqual = currentStateModel.isEqualWithModel(documentModel);
-
-                    isDirty = !isEqual && documentManager.documentIsValid(singleDocumentData);
-                }
-            }
-
-            property Component documentHistoryDialogComp: Component {
-                DocumentHistoryDialog {
-                    title: qsTr("Document history");
-
-                    onStarted: {
-                        updateModel();
-                    }
-                }
-            }
-        }
-    }
-
-    property Component defaultDataController: Component {
-        DocumentDataController {}
-    }
-
-    property QtObject internal: QtObject {
-        function getSingleDocumentData(index)
-        {
-            if (index < 0 || index >= m_documentInfos.length){
-                return null;
-            }
-
-            return m_documentInfos[index];
-        }
-
-        function getDocumentInfoFromView(view)
-        {
-            let documentsCount = documentManager.getDocumentsCount();
-            for (let documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
-                let info = getSingleDocumentData(documentIndex);
-
-                for (let viewIndex = 0; viewIndex < documentsCount; ++viewIndex){
-
-                }
-            }
-
-            return m_activeViewPtr[index];
-        }
-
-        property var m_registeredView: ({});
-        property var m_registeredDataControllers: ({});
-        property var m_registeredValidators: ({});
-        property var m_documentInfos: [];
-        property var m_activeViewPtr;
-        property var m_closingDocuments: [];
-    }
-
-    property Component errorDialogComp: Component {
-        ErrorDialog {
-        }
-    }
-
-    property Component saveDialog: Component {
-        MessageDialog {
-            title: qsTr("Save document");
-            message: qsTr("Save all changes ?")
-
-            Component.onCompleted: {
-                buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
-            }
-
-            onFinished: {
-                if (buttonId === Enums.yes){
-                }
-            }
-        }
-    }
+		\param      documentIndex    index of the document from the model of all open documents
+		\param      force            if true - document will be closed without isDirty checking
+	*/
+	function closeDocumentByIndex(documentIndex, force)
+	{
+		if (documentIndex < 0 || documentIndex >= documentsModel.count){
+			console.error("Unable to close document with index: ", documentIndex);
+
+			return;
+		}
+
+		if (!force){
+			force = false;
+		}
+
+		let documentData = documentsModel.get(documentIndex).DocumentData;
+
+		if (documentData.isDirty && !force){
+			let callback = function(result){
+				if (result === Enums.yes){
+					internal.m_closingDocuments.push(documentData.documentId);
+					documentManager.saveDocument(documentData.documentId);
+				}
+				else if (result === Enums.no){
+					documentData.isDirty = false;
+
+					documentManager.closeDocumentByIndex(documentIndex);
+				}
+
+				ModalDialogManager.finished.disconnect(callback);
+			}
+
+			ModalDialogManager.openDialog(saveDialog, {}, "", callback);
+		}
+		else{
+			let index = internal.m_closingDocuments.indexOf(documentData.documentId);
+			if (index !== -1) {
+				internal.m_closingDocuments.splice(index, 1);
+			}
+
+			documentData.removeAllViews();
+			documentData.destroy();
+
+			documentsModel.remove(documentIndex);
+
+			documentClosed(documentIndex, "");
+		}
+	}
+
+
+	function closeDocument(documentId, force)
+	{
+		let index = getDocumentIndexByDocumentId(documentId);
+
+		closeDocumentByIndex(index, force);
+	}
+
+
+	function documentIsValid(documentData, data){
+		if (!documentData){
+			return false;
+		}
+
+		if (!data){
+			data = {}
+		}
+
+		if (documentData.views.length > 0){
+			data["editor"] = documentData.views[0];
+		}
+
+		return documentData.documentValidator.isValid(data);
+	}
+
+
+	property Component singleDocumentDataComp: Component{
+		QtObject {
+			id: singleDocumentData;
+
+			// UUID for unification
+			property string uuid: "";
+			// index of the document in document manager
+			property int documentIndex: -1;
+			property bool isNew: true;
+			property string documentId;
+			property string documentName;
+			property string documentTypeId;
+			property DocumentDataController documentDataController: null;
+			property DocumentValidator documentValidator: DocumentValidator {};
+
+			property UndoRedoManager undoManager: UndoRedoManager {
+				onUndo: {
+					singleDocumentData.checkDocumentModel();
+					singleDocumentData.updateGui();
+				}
+
+				onRedo: {
+					singleDocumentData.checkDocumentModel()
+					singleDocumentData.updateGui();
+				}
+
+				onModelChanged: {
+					let undoSteps = getAvailableUndoSteps();
+					let redoSteps = getAvailableRedoSteps();
+
+					for (let i = 0; i < singleDocumentData.views.length; i++){
+						if (singleDocumentData.views[i].commandsController){
+							singleDocumentData.views[i].commandsController.setCommandIsEnabled("Undo", undoSteps > 0);
+							singleDocumentData.views[i].commandsController.setCommandIsEnabled("Redo", redoSteps > 0);
+						}
+					}
+				}
+			};
+
+			property var views: [];
+			property bool isDirty: false;
+
+			Component.onDestruction: {
+				console.log("singleDocumentData onDestruction");
+				if (views.length > 0){
+					removeAllViews();
+				}
+			}
+
+			function removeAllViews(){
+				for (let i = 0; i < views.length; i++){
+					views[i].parent = null;
+					views[i].destroy();
+				}
+
+				views = []
+			}
+
+			function updateGui(){
+				for (let i = 0; i < singleDocumentData.views.length; i++){
+					singleDocumentData.views[i].doUpdateGui();
+				}
+			}
+
+			function updateModel(){
+				for (let i = 0; i < singleDocumentData.views.length; i++){
+					singleDocumentData.views[i].doUpdateModel();
+				}
+			}
+
+			property Connections dataControllerConnections: Connections {
+				target: singleDocumentData.documentDataController;
+
+				function onSaved(documentId, documentName){
+					singleDocumentData.documentId = documentId;
+					singleDocumentData.documentName = documentName;
+
+					singleDocumentData.isDirty = false;
+
+					let documentModel = singleDocumentData.documentDataController.documentModel;
+					if (singleDocumentData.undoManager){
+						singleDocumentData.undoManager.setStandardModel(documentModel);
+					}
+
+					documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
+
+					documentManager.onDocumentSaved(documentId, singleDocumentData.documentIndex);
+				}
+
+				function onModelChanged(){
+					if (!singleDocumentData.documentDataController || !singleDocumentData.documentDataController.documentModel){
+						Events.sendEvent("StopLoading");
+
+						return;
+					}
+
+					let documentModel = singleDocumentData.documentDataController.documentModel;
+
+					singleDocumentData.documentId = singleDocumentData.documentDataController.getDocumentId();
+					singleDocumentData.documentName = singleDocumentData.documentDataController.getDocumentName();
+
+					singleDocumentData.blockingUpdateModel = true;
+
+					for (let i = 0; i < singleDocumentData.views.length; i++){
+						singleDocumentData.views[i].model = documentModel;
+
+						if (singleDocumentData.views[i].commandsDelegate){
+							singleDocumentData.views[i].commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
+						}
+					}
+
+					// let isNew = documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew;
+					if (singleDocumentData.isNew){
+						singleDocumentData.updateModel();
+					}
+					else{
+						singleDocumentData.updateGui();
+					}
+
+					singleDocumentData.blockingUpdateModel = false;
+
+					documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
+
+					singleDocumentData.undoManager.registerModel(documentModel);
+					singleDocumentData.documentValidator.documentModel = documentModel;
+
+					singleDocumentData.modelConnections.target = singleDocumentData.documentDataController.documentModel
+					singleDocumentData.modelConnections.enabled = true;
+
+					Events.sendEvent("StopLoading");
+				}
+
+				function onError(){
+					Events.sendEvent("StopLoading");
+				}
+			}
+
+			property Connections modelConnections: Connections {
+				enabled: false;
+
+				function onModelChanged(){
+					if (singleDocumentData.blockingUpdateModel){
+						return;
+					}
+
+					if (singleDocumentData.undoManager && singleDocumentData.undoManager.isTransaction()){
+						return;
+					}
+
+					singleDocumentData.isDirty = documentManager.documentIsValid(singleDocumentData);
+				}
+			}
+
+			property bool blockingUpdateModel: false;
+
+			onBlockingUpdateModelChanged: {
+				if (undoManager){
+					undoManager.setBlockingUpdateModel(blockingUpdateModel);
+				}
+			}
+
+			signal viewAdded(var view);
+			signal viewRemoved(var view);
+
+			onDocumentIdChanged: {
+				if (documentDataController){
+					documentDataController.documentId = documentId;
+				}
+			}
+
+			onIsDirtyChanged: {
+				for (let i = 0; i < singleDocumentData.views.length; i++){
+					if (singleDocumentData.views[i].commandsController){
+						singleDocumentData.views[i].commandsController.setCommandIsEnabled("Save", isDirty);
+					}
+
+					if (singleDocumentData.views[i].commandsView){
+						if (singleDocumentData.views[i].commandsView.setPositiveAccentCommandIds !== undefined){
+							singleDocumentData.views[i].commandsView.setPositiveAccentCommandIds(["Save"]);
+						}
+					}
+				}
+
+				documentManager.updateDocumentTitle(documentIndex);
+			}
+
+			function getDocumentName(){
+				if (singleDocumentData.documentDataController){
+					return singleDocumentData.documentDataController.getDocumentName();
+				}
+
+				return "";
+			}
+
+			// Processing commands that came from the view
+			function viewCommandHandle(commandId){
+				if (singleDocumentData.undoManager){
+					singleDocumentData.undoManager.commandHandle(commandId);
+				}
+				singleDocumentData.commandHandle(commandId);
+			}
+
+			function commandHandle(commandId){
+				if (!documentManager){
+					return;
+				}
+
+				if (commandId === "Close"){
+					documentManager.closeDocument(documentId);
+				}
+				else if (commandId === "Save"){
+					documentManager.saveDocument(documentId);
+				}
+			}
+
+			function checkDocumentModel(){
+				let currentStateModel = undoManager.getStandardModel();
+				if (currentStateModel){
+					let documentModel = singleDocumentData.documentDataController.documentModel
+					let isEqual = currentStateModel.isEqualWithModel(documentModel);
+
+					isDirty = !isEqual && documentManager.documentIsValid(singleDocumentData);
+				}
+			}
+		}
+	}
+
+	property Component defaultDataController: Component {
+		DocumentDataController {}
+	}
+
+	property QtObject internal: QtObject {
+		function getSingleDocumentData(index)
+		{
+			if (index < 0 || index >= m_documentInfos.length){
+				return null;
+			}
+
+			return m_documentInfos[index];
+		}
+
+		function getDocumentInfoFromView(view)
+		{
+			return null;
+		}
+
+		property var m_registeredView: ({});
+		property var m_registeredDataControllers: ({});
+		property var m_registeredValidators: ({});
+		property var m_documentInfos: [];
+		property var m_activeViewPtr;
+		property var m_closingDocuments: [];
+	}
+
+	property Component errorDialogComp: Component {
+		ErrorDialog {
+		}
+	}
+
+	property Component saveDialog: Component {
+		MessageDialog {
+			title: qsTr("Save document");
+			message: qsTr("Save all changes ?")
+
+			Component.onCompleted: {
+				buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
+			}
+		}
+	}
 }

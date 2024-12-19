@@ -32,12 +32,14 @@ Rectangle {
     Connections {
         id: connections;
         function onDocumentAdded(documentIndex, documentId){
-            let documentComp = root.documentManager.documentsModel.get(documentIndex).DocumentViewComp;
-            stackView.push(documentComp);
+			let documentData = root.documentManager.getDocumentData(documentIndex);
+			if (documentData && documentData.views.length > 0){
+				viewContainer.addTopView(documentData.views[0]);
+			}
         }
 
         function onDocumentClosed(documentIndex, documentId){
-            stackView.pop();
+			viewContainer.showLastChild();
         }
     }
 
@@ -82,8 +84,7 @@ Rectangle {
                                                   "Fixed": true
                                               });
 
-        // documentManager.documentAdded(documentManager.documentsModel.count - 1, "");
-        stackView.push(viewComp);
+		viewContainer.addTopView(viewComp.createObject(root))
     }
 
     function setAlertPanel(alertPanelComp){
@@ -103,7 +104,7 @@ Rectangle {
         anchors.leftMargin: visible ? Style.size_mainMargin : 0;
         width: visible ? closeButton.width: 0;
         height: headersListView.height;
-        visible: stackView.countPage > 1;
+		visible: root.documentManager.documentsModel.count > 1;
 
         ToolButton {
             id: closeButton;
@@ -113,12 +114,7 @@ Rectangle {
             iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
-                let index = root.documentManager.documentsModel.count - 1 ;
-                if (index > 0){
-                    let uuid = root.documentManager.documentsModel.get(index).Uuid;
-
-                    Events.sendEvent(uuid + "CommandActivated", "Close")
-                }
+				root.documentManager.closeDocumentByIndex(root.documentManager.documentsModel.count - 1);
             }
         }
     }
@@ -178,25 +174,29 @@ Rectangle {
         }
     }
 
-    StackView {
-        id: stackView;
-        z: 10;
-        anchors.top: headersListView.bottom;
-        anchors.bottom: parent.bottom;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
+	Item {
+		id: viewContainer;
+		z: 10;
+		anchors.top: headersListView.bottom;
+		anchors.bottom: parent.bottom;
+		anchors.left: parent.left;
+		anchors.right: parent.right;
 
-        onItemAdded: {
-            let documentObj = root.documentManager.documentsModel.get(index);
+		function showLastChild(){
+			for (let i = 0; i < viewContainer.children.length - 1; i++){
+				viewContainer.children[i].visible = false;
+			}
 
-            if (item.viewId !== undefined){
-                item.viewId = documentObj.Uuid;
-            }
+			viewContainer.children[viewContainer.children.length - 1].visible = true;
+		}
 
-            let documentData = documentObj.DocumentData;
-            if (documentData){
-                documentData.views.push(item);
-            }
-        }
-    }
+		function addTopView(view){
+			view.parent = viewContainer;
+			view.anchors.fill  = viewContainer;
+
+			showLastChild();
+		}
+	}
 }
+
+
