@@ -136,12 +136,12 @@ bool CContactInfo::Serialize(iser::IArchive& archive)
 	bool retVal = true;
 
 	iser::CArchiveTag emailTag("Email", "Email", iser::CArchiveTag::TT_LEAF);
-	retVal = archive.BeginTag(emailTag);
+	retVal = retVal && archive.BeginTag(emailTag);
 	retVal = retVal && archive.Process(m_email);
 	retVal = retVal && archive.EndTag(emailTag);
 
 	iser::CArchiveTag genderTypeTag("GenderType", "Gender type", iser::CArchiveTag::TT_LEAF);
-	retVal= archive.BeginTag(genderTypeTag);
+	retVal= retVal && archive.BeginTag(genderTypeTag);
 	retVal = retVal && I_SERIALIZE_ENUM(GenderType, archive, m_genderType);
 	retVal = retVal && archive.EndTag(genderTypeTag);
 
