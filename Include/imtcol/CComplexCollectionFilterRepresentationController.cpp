@@ -21,9 +21,12 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 	bool isOk = true;
 
 	QByteArray targetFieldId;
-	if (source.fieldId){
-		targetFieldId = *source.fieldId;
+	if (!source.fieldId){
+		return false;
 	}
+
+	target.fieldId = *source.fieldId;
+
 	QString value;
 	if (source.filterValue){
 		value = *source.filterValue;
