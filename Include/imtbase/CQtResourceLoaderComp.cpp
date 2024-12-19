@@ -18,7 +18,8 @@ void CQtResourceLoaderComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 	if (m_qrcPathAttrPtr.IsValid() && m_targetObjectCompPtr.IsValid()){
-		QFile resourceFile(m_qrcPathAttrPtr->GetValue());
+		QByteArray path = m_qrcPathAttrPtr->GetValue();
+		QFile resourceFile(path);
 		if (resourceFile.open(QIODevice::ReadOnly)){
 			QByteArray data = resourceFile.readAll();
 			resourceFile.close();
