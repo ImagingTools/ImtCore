@@ -83,6 +83,7 @@ class Repeater extends Item {
         if(typeof model === 'number'){     
             this.$items.length.setCompute(()=>{this.$items.length.subscribe(this.getProperty('model')); return model})
         } else if(Array.isArray(model)){
+            this.getProperty('model').value = model.slice()
             this.$items.length.reset(model.length)
         } else {
             this.$connectModel(model)

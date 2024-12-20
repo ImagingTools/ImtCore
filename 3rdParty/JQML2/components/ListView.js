@@ -202,6 +202,7 @@ class ListView extends Flickable {
             this.$connectModel(model)
             length = model.getPropertyValue('count')
         } else if(Array.isArray(model)){
+            this.getProperty('model').value = model.slice()
             length = model.length
         } else if(typeof model === 'number'){
             length = model
