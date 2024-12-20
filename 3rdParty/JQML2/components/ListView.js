@@ -201,6 +201,8 @@ class ListView extends Flickable {
         if(model instanceof ListModel){     
             this.$connectModel(model)
             length = model.getPropertyValue('count')
+        } else if(Array.isArray(model)){
+            length = model.length
         } else if(typeof model === 'number'){
             length = model
         }
@@ -246,6 +248,8 @@ class ListView extends Flickable {
         let length = 0 
         if(model instanceof ListModel){     
             length = model.getPropertyValue('count')
+        } else if(typeof model === 'object' && Array.isArray(model)){
+            length = model.length
         } else if(typeof model === 'number'){
             length = model
         } else {
@@ -293,6 +297,8 @@ class ListView extends Flickable {
         let model = this.getPropertyValue('model')
         if(model instanceof ListModel){     
             length = model.getPropertyValue('count')
+        } else if(Array.isArray(model)){
+            length = model.length
         } else if(typeof model === 'number'){
             length = model
         } else {
@@ -505,7 +511,11 @@ class ListView extends Flickable {
         let createObject = this.getProperty('delegate').get().createObject
         let cls = this.getProperty('delegate').get().constructor
         
-        if(typeof this.getPropertyValue('model') === 'number'){
+        if(Array.isArray(this.getPropertyValue('model'))){
+            obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, {'$modelData': this.getPropertyValue('model')[index], index: index}, false) : new cls(this.getProperty('contentItem').get(),ctx, {'$modelData': this.getPropertyValue('model')[index], index: index})
+
+            this.$items[index] = obj
+        } else if(typeof this.getPropertyValue('model') === 'number'){
             obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, {index: index}, false) : new cls(this.getProperty('contentItem').get(),ctx, {index: index})
 
             this.$items[index] = obj

@@ -500,7 +500,7 @@ class MouseController {
 
             if(this.target instanceof ListView){
                 let model = this.target.getPropertyValue('model')
-                let length = typeof model === 'object' ? model.getPropertyValue('data').length : model
+                let length = typeof model === 'object' ? (Array.isArray(model) ? model.length : model.getPropertyValue('data').length) : model
                 if(this.target.$items[0]) {
                     left = this.target.$items[0].getPropertyValue('x')
                     top = this.target.$items[0].getPropertyValue('y')

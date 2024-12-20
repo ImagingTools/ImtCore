@@ -244,11 +244,11 @@ global.OpenLayers = {
 
 global.Enums = {}
 
-const listProperties = require('../utils/properties')
-for(let prop in listProperties){
-    global[prop] = listProperties[prop]
-    for(let propName in listProperties[prop].defaultProperties){
-        Object.defineProperty(listProperties[prop].prototype, propName, {
+const __properties = require('../utils/properties')
+for(let prop in __properties){
+    global[prop] = __properties[prop]
+    for(let propName in __properties[prop].defaultProperties){
+        Object.defineProperty(__properties[prop].prototype, propName, {
             get: function(){
                 let property = this.getProperty(propName)
                 let caller = global.queueLink[global.queueLink.length-1]
@@ -260,8 +260,8 @@ for(let prop in listProperties){
             }
         })
     }
-    for(let signalName in listProperties[prop].defaultSignals){
-        Object.defineProperty(listProperties[prop].prototype, signalName, {
+    for(let signalName in __properties[prop].defaultSignals){
+        Object.defineProperty(__properties[prop].prototype, signalName, {
             get: function(){
                 return this.getSignal(signalName)
             }
@@ -282,6 +282,7 @@ const listControllers = require('../utils/controllers')
 
 
 const { listComponents } = require('../components/list')
+const __components = {}
 for(let componentName of listComponents){
     const component = require(`../components/${componentName}`)[componentName]
     for(let propName in component.defaultProperties){
@@ -311,7 +312,60 @@ for(let componentName of listComponents){
             },
         })
     }
+    __components[componentName] = component
     global[componentName] = component
+}
+
+global.JQModules = {
+    Qt: Qt,
+    QtPositioning: QtPositioning,
+    QtQml: {
+        Models: {
+            ListElement: __components.ListElement,        
+            ListModel: __components.ListModel,
+            JSONListModel: __components.JSONListModel,
+            GqlModel: __components.GqlModel,
+            TreeItemModel: __components.TreeItemModel,
+        },
+        point: __properties.QPoint,
+        date: __properties.QVar,
+        int: __properties.QInt,
+        string: __properties.QString,
+        color: __properties.QColor,
+        bool: __properties.QBool,
+        var: __properties.QVar,
+        list: __properties.QList,
+        variant: __properties.QVariant,
+        alias: __properties.QAlias,
+
+        QObject: __components.QObject,
+        QtObject: __components.QtObject,
+        Component: __components.Component,
+    },
+    QtQuick: {
+        Item: __components.Item,
+        Rectangle: __components.Rectangle,
+        Repeater: __components.Repeater,
+        Row: __components.Row,
+        Column: __components.Column,
+        Flow: __components.Flow,
+        MouseArea: __components.MouseArea,
+        Text: __components.Text,
+        IntValidator: __components.IntValidator,
+        DoubleValidator: __components.DoubleValidator,
+        TextInput: __components.TextInput,
+        TextEdit: __components.TextEdit,
+    },
+    Qt5Compat: {
+        GraphicalEffects: {
+            DropShadow: __components.DropShadow,
+            InnerShadow: __components.InnerShadow,
+        }
+    },
+    QtWebSockets: {
+        
+    },
+    __queue: [],
 }
 
 global.updateList = []

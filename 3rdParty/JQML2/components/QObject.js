@@ -8,6 +8,11 @@ class QObject extends ComplexObject {
     static defaultProperties = {
         model: { type: QVar, value: undefined, signalWithout: true },
         model_: { type: QVar, value: undefined, signalWithout: true },
+
+        modelData: { type: QVar, value: undefined, signalWithout: true },
+        modelData_: { type: QVar, value: undefined, signalWithout: true },
+        parentModelData_: { type: QVar, value: undefined, signalWithout: true },
+
         index: { type: QReal, value: 0 },
         context: { type: QVar, value: undefined },
         parent: { type: QVar, value: undefined, changed: '$parentChanged' },
@@ -35,13 +40,19 @@ class QObject extends ComplexObject {
             this.UID = UID++
             UIDList[this.UID] = this
             
-            // console.log(parent.constructor.name)
-            // if(parent.$flickable && this.constructor.name !== 'Component') {
-            //     if(parent.getStatement('contentItem').get()){
-            //         parent = parent.getStatement('contentItem').get()
-            //     }
-                
-            // }
+            Object.defineProperty(this, 'modelData', {
+                get:()=>{
+                    let property = this.getPropertyValue('parentModelData_').getProperty('modelData_')
+                    let caller = global.queueLink[global.queueLink.length-1]
+                    if(caller) caller.subscribe(property)
+
+                    return property.get()
+                },
+                set:(val)=>{
+                    this.getPropertyValue('parentModelData_').getProperty('modelData_').reset(val)
+                },
+                configurable: true,
+            })
 
             if(parent.$flickable && !(this instanceof Component)){
                 if(parent.getStatement('contentItem').get()){
@@ -52,7 +63,11 @@ class QObject extends ComplexObject {
             }
 
             this.getStatement('model_').setCompute(()=>{return this.parent.model_})
-            if(!(this instanceof MapItemView) && !(this instanceof Repeater) && !(this instanceof ListView) && !(this instanceof GridView) && !(this instanceof ListElement)) this.getStatement('model').setCompute(()=>{return this.parent.model_})
+            this.getStatement('parentModelData_').setCompute(()=>{return this.parent})
+
+            if(!(this instanceof MapItemView) && !(this instanceof Repeater) && !(this instanceof ListView) && !(this instanceof GridView) && !(this instanceof ListElement)) {
+                this.getStatement('model').setCompute(()=>{return this.parent.model_})
+            }
 
             if(!(this instanceof ListElement)) {
                 this.getStatement('index').setCompute(()=>{return this.parent.index})
@@ -60,15 +75,19 @@ class QObject extends ComplexObject {
             }
 
             if(exModel){
+                if('$modelData' in exModel){
+                    this.getStatement('modelData_').reset(exModel['$modelData'])
+                    this.getStatement('parentModelData_').reset(this)
+                    
+                } else {
+                    
+                }
+
                 this.getStatement('model').reset(exModel)
                 this.getStatement('model_').reset(exModel)
                 this.getStatement('index').setCompute(()=>{return exModel.index})
                 this.getStatement('index').update()
             }
-            
-            
-
-            
             
             this.setParent(parent)
 

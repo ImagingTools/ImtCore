@@ -78,12 +78,15 @@ class Repeater extends Item {
             }
         }
         if(!this.UID) return
+        let model = this.getPropertyValue('model')
         this.$items.length.reset(0)
-        if(typeof this.getPropertyValue('model') === 'number'){     
-            this.$items.length.setCompute(()=>{this.$items.length.subscribe(this.getProperty('model')); return this.getPropertyValue('model')})
+        if(typeof model === 'number'){     
+            this.$items.length.setCompute(()=>{this.$items.length.subscribe(this.getProperty('model')); return model})
+        } else if(Array.isArray(model)){
+            this.$items.length.reset(model.length)
         } else {
-            this.$connectModel(this.getPropertyValue('model'))
-            this.$items.length.setCompute(()=>{this.$items.length.subscribe(this.getPropertyValue('model').getProperty('data')); return this.getPropertyValue('model').getPropertyValue('data').length}) 
+            this.$connectModel(model)
+            this.$items.length.setCompute(()=>{this.$items.length.subscribe(model.getProperty('data')); return model.getPropertyValue('data').length}) 
         }
         this.$items.length.update()
     }
@@ -110,22 +113,22 @@ class Repeater extends Item {
 
         if(typeof this.getPropertyValue('model') === 'number'){
             let obj = createObject ? createObject(this.parent,ctx, {index: index}, false) : new cls(this.parent,ctx, {index: index})
-            // obj.getStatement('index').reset(index)
-            // obj.getStatement('model').reset({index: index})
+
+            this.$items[index] = obj
+        } else if(Array.isArray(this.getPropertyValue('model'))){
+            let obj = createObject ? createObject(this.parent,ctx, {'$modelData': this.getPropertyValue('model')[index], index: index}, false) : new cls(this.parent,ctx, {'$modelData': this.getPropertyValue('model')[index], index: index})
+
             this.$items[index] = obj
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
             let obj = createObject ? createObject(this.parent,ctx, model, false) : new cls(this.parent,ctx, model)
-            // obj.getStatement('index').setCompute(()=>{return model.index})
-            // obj.getStatement('index').update()
-            // obj.getStatement('model').reset(model)
+
             this.$items[index] = obj   
         }
-        // while(updateList.length){
-            for(let update of updateList.splice(0, updateList.length)){
-                update()
-            }
-        // }
+
+        for(let update of updateList.splice(0, updateList.length)){
+            update()
+        }
         
         this.$items[index].$complete()
         return this.$items[index]
