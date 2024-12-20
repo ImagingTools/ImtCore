@@ -159,7 +159,7 @@ void CSdlClassJsonModificatorComp::AddFieldWriteToJsonCode(QTextStream& stream, 
 	if (!optional && field.IsRequired()){
 
 		stream << QStringLiteral("if (");
-		stream << GetNullCheckString(field, false) << QStringLiteral("){");
+		stream << GetNullCheckString(field, true) << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, 2);

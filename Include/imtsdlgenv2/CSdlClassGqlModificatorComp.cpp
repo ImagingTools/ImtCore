@@ -262,10 +262,10 @@ void CSdlClassGqlModificatorComp::AddFieldWriteToRequestCode(QTextStream& stream
 
 	const bool isFieldRequired = field.IsRequired();
 	if (isFieldRequired){
-		if (field.IsArray() && field.IsNonEmpty()){
-			AddArrayInternalChecksFail(stream, field, true);
+		if (field.IsArray()){
+			AddArrayInternalChecksFail(stream, field, field.IsNonEmpty());
 		}
-		else if (!field.IsArray() || field.IsNonEmpty()){
+		else {
 			AddArrayInternalChecksFail(stream, field, false);
 		}
 	}
@@ -279,16 +279,16 @@ void CSdlClassGqlModificatorComp::AddFieldWriteToRequestCode(QTextStream& stream
 
 	const int hIndents = (isFieldRequired ? 1 : 2);
 	if ((isCustom && !isEnum) && isArray){
-		AddCustomListFieldWriteToRequestCode(stream, field, hIndents, optional);
+		AddCustomListFieldWriteToRequestCode(stream, field, optional, hIndents);
 	}
 	else if ((isCustom && !isEnum) && !isArray){
-		AddCustomFieldWriteToRequestCode(stream, field, hIndents, optional);
+		AddCustomFieldWriteToRequestCode(stream, field, optional, hIndents);
 	}
 	else if ((!isCustom || isEnum) && isArray){
-		AddScalarListFieldWriteToRequestCode(stream, field, hIndents, optional);
+		AddScalarListFieldWriteToRequestCode(stream, field, optional, hIndents);
 	}
 	else {
-		AddScalarFieldWriteToRequestCode(stream, field, hIndents, optional);
+		AddScalarFieldWriteToRequestCode(stream, field, optional, hIndents);
 	}
 
 	if (!isFieldRequired){

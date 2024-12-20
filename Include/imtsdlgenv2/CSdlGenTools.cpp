@@ -308,7 +308,7 @@ void CSdlGenTools::AddArrayInternalChecksFail(QTextStream& stream, const imtsdl:
 {
 	imtsdl::CSdlTools::FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("if (");
-	stream << GetNullCheckString(field, false);
+	stream << GetNullCheckString(field, true);
 	if (checkEmpty){
 		stream << QStringLiteral(" || ");
 		if (!objectName.isEmpty()){
