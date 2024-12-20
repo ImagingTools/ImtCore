@@ -699,28 +699,10 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& type
 QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 {
 	QString query = R"(
-				SELECT *
-				FROM
-				(
-					SELECT
-						"Id",
-						"TypeId",
-						"DocumentId",
-						"Name",
-						"Description",
-						"Document",
-						"DataMetaInfo",
-						"CollectionMetaInfo",
-						"RevisionNumber",
-						"Checksum",
-						"IsActive",
-						"OwnerId",
-						"OwnerName",
-						"OperationDescription",
-						"LastModified", 
-						(SELECT "LastModified" FROM %1"%2" as t1 WHERE "RevisionNumber" = 1 AND root."DocumentId" = t1."DocumentId" LIMIT 1) as "Added"
-					FROM %1"%2" as root
-				) WHERE "IsActive" = true)";
+				SELECT
+					root.*,
+					(SELECT "LastModified" FROM %1"%2" as t1 WHERE "RevisionNumber" = 1 AND root."DocumentId" = t1."DocumentId" LIMIT 1) as "Added"
+				FROM %1"%2" as root WHERE "IsActive" = true)";
 
 	QString schema;
 	if (m_tableSchemaAttrPtr.IsValid()){
