@@ -63,7 +63,7 @@ class QObject extends ComplexObject {
             }
 
             this.getStatement('model_').setCompute(()=>{return this.parent.model_})
-            this.getStatement('parentModelData_').setCompute(()=>{return this.parent})
+            this.getStatement('parentModelData_').setCompute(()=>{return this.parent.parentModelData_ })
 
             if(!(this instanceof MapItemView) && !(this instanceof Repeater) && !(this instanceof ListView) && !(this instanceof GridView) && !(this instanceof ListElement)) {
                 this.getStatement('model').setCompute(()=>{return this.parent.model_})
@@ -77,11 +77,14 @@ class QObject extends ComplexObject {
             if(exModel){
                 if('$modelData' in exModel){
                     this.getStatement('modelData_').reset(exModel['$modelData'])
-                    this.getStatement('parentModelData_').reset(this)
-                    
                 } else {
-                    
+                    let keys = Object.keys(exModel)
+                    if(keys.length === 1){
+                        this.getStatement('modelData_').reset(exModel[keys[0]])
+                    }
                 }
+
+                this.getStatement('parentModelData_').reset(this)
 
                 this.getStatement('model').reset(exModel)
                 this.getStatement('model_').reset(exModel)
