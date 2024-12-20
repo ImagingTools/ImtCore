@@ -3,6 +3,7 @@ import Acf 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
+import imtauthgui 1.0
 import imtbaseDocumentRevisionSdl 1.0
 
 CollectionViewCommandsDelegateBase {
@@ -105,8 +106,14 @@ CollectionViewCommandsDelegateBase {
 			property BaseModel revisionsModel;
 
 			Component.onCompleted: {
-				buttonsModel.append({Id: Enums.save, Name:qsTr("Set this revision"), Enabled: false})
-				buttonsModel.append({Id: Enums.no, Name:qsTr("Delete revision"), Enabled: false})
+				if (PermissionsController.checkPermission("RestoreRevision")){
+					buttonsModel.append({Id: Enums.save, Name:qsTr("Set this revision"), Enabled: false})
+				}
+
+				if (PermissionsController.checkPermission("DeleteRevision")){
+					buttonsModel.append({Id: Enums.no, Name:qsTr("Delete revision"), Enabled: false})
+				}
+
 				buttonsModel.append({Id: Enums.cancel, Name:qsTr("Close"), Enabled: true})
 			}
 

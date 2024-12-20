@@ -2,14 +2,14 @@
 
 
 // ACF includes
-#include <icomp/CComponentBase.h>
+#include <ilog/TLoggerCompWrap.h>
 
 
 namespace imtbase
 {
 
 
-class CQtResourceLoaderComp: public icomp::CComponentBase
+class CQtResourceLoaderComp: public ilog::CLoggerComponentBase
 {
 public:
 	typedef icomp::CComponentBase BaseClass;

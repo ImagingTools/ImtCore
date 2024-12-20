@@ -26,6 +26,7 @@
         <file alias="imtcontrols/Actions/MovingItem.qml">Actions/MovingItem.qml</file>
         <file alias="imtcontrols/Actions/ControlArea.qml">Actions/ControlArea.qml</file>
 	<file alias="imtcontrols/Actions/TableSelectionManager.qml">Actions/TableSelectionManager.qml</file>
+	<file alias="imtcontrols/Actions/LocalizationEvent.qml">Actions/LocalizationEvent.qml</file>
         <file alias="imtcontrols/Buttons/Button.qml">Buttons/Button.qml</file>
         <file alias="imtcontrols/Buttons/TextButton.qml">Buttons/TextButton.qml</file>
         <file alias="imtcontrols/Buttons/ButtonDecorator.qml">Buttons/ButtonDecorator.qml</file>
@@ -92,6 +93,7 @@
         <file alias="imtcontrols/Models/IntValidator.qml">Models/IntValidator.qml</file>
         <file alias="imtcontrols/Models/DoubleValidator.qml">Models/DoubleValidator.qml</file>
         <file alias="imtcontrols/Models/NavigationController.qml">Models/NavigationController.qml</file>
+	<file alias="imtcontrols/Models/PopupMenuModel.qml">Models/PopupMenuModel.qml</file>
         <file alias="imtcontrols/Views/TableRowViewer.qml">Views/TableRowViewer.qml</file>
         <file alias="imtcontrols/Views/TableRowDelegateBase.qml">Views/TableRowDelegateBase.qml</file>
         <file alias="imtcontrols/Views/TablePainterRowDelegateBase.qml">Views/TablePainterRowDelegateBase.qml</file>

@@ -17,6 +17,7 @@ namespace imtbase
 void CQtResourceLoaderComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
 	if (m_qrcPathAttrPtr.IsValid() && m_targetObjectCompPtr.IsValid()){
 		QByteArray path = m_qrcPathAttrPtr->GetValue();
 		QFile resourceFile(path);
@@ -26,7 +27,9 @@ void CQtResourceLoaderComp::OnComponentCreated()
 
 			iser::CCompactXmlMemReadArchive archive(data);
 
-			m_targetObjectCompPtr->Serialize(archive);
+			if (!m_targetObjectCompPtr->Serialize(archive)){
+				SendErrorMessage(0, QString("Unable to load resource '%1'. Error: Serialization failed").arg(qPrintable(path)), QString("CQtResourceLoaderComp"));
+			}
 		}
 	}
 }

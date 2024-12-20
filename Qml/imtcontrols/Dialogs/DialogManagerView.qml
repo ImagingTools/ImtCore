@@ -151,9 +151,11 @@ Item {
                         dialogLoader.item.forceActiveFocus();
                     }
 
-                    if (dialogLoader.item.finished){
-                        dialogLoader.item.finished.connect(ModalDialogManager.finished);
-                    }
+					if (dialogLoader.item.finished && model.Component){
+						if (ModalDialogManager.dialogCallback[model.Component]){
+							dialogLoader.item.finished.connect(ModalDialogManager.dialogCallback[model.Component]);
+						}
+					}
 
                     dialogLoader.mainWindowWidth_prev = container.width;
                     dialogLoader.mainWindowHeight_prev = container.height;

@@ -10,6 +10,8 @@ Item {
     property DocumentManager documentManager;
     property alias tabPanel: tabPanel_;
 
+	property int popupWidth: 200;
+
     onDocumentManagerChanged: {
         if (documentManager){
             connections.target = workspaceView.documentManager;
@@ -28,15 +30,6 @@ Item {
 
         function onDocumentAdded(documentIndex, documentId){
             workspaceView.tabPanel.selectedIndex = documentIndex;
-//            let viewComp = workspaceView.documentManager.documentsModel.get(documentIndex).DocumentViewComp;
-//            let view = viewComp.createObject(viewsPanel);
-//            view.anchors.fill = viewsPanel;
-//            viewsPanel.updateVisibleItems();
-
-//            let documentData = workspaceView.documentManager.documentsModel.get(documentIndex).DocumentData
-//            if (documentData){
-//                documentData.views.push(view);
-//            }
         }
 
         function onDocumentClosed(documentIndex, documentId){
@@ -59,7 +52,7 @@ Item {
 		workspaceView.documentManager.documentsModel.insert(index, {
                                   "Uuid": UuidGenerator.generateUUID(),
                                   "Title": viewName,
-                                  "DocumentViewComp": viewComp,
+								  "ViewComp": viewComp,
                                   "Fixed": true
                               })
 
@@ -75,6 +68,47 @@ Item {
         color: Style.backgroundColor2;
     }
 
+	Component {
+		id: popupMenuDialog;
+
+		PopupMenuDialog {
+			itemWidth: workspaceView.popupWidth;
+			onFinished: {
+				if (commandId === "Close"){
+					if (tabPanel_.selectedIndex > 0){
+						workspaceView.documentManager.closeDocumentByIndex(tabPanel_.selectedIndex);
+					}
+				}
+				else if (commandId === "CloseAll"){
+					let documentIds = workspaceView.documentManager.getOpenedDocumentIds();
+
+					for (let i = 0; i < documentIds.length; i++){
+						workspaceView.documentManager.closeDocument(documentIds[i], true);
+					}
+				}
+			}
+		}
+	}
+
+	LocalizationEvent {
+		onLocalizationChanged: {
+			tabContextMenuModel.fillModel();
+		}
+	}
+
+	PopupMenuModel {
+		id: tabContextMenuModel;
+		Component.onCompleted: {
+			fillModel();
+		}
+
+		function fillModel(){
+			tabContextMenuModel.clear();
+			tabContextMenuModel.addItem("Close", qsTr("Close document"), "", true);
+			tabContextMenuModel.addItem("CloseAll", qsTr("Close all documents"), "", true);
+		}
+	}
+
     TabPanel {
         id: tabPanel_;
 
@@ -83,6 +117,19 @@ Item {
         anchors.right: parent.right;
 
         clip: true;
+
+		onTabClicked: {
+			if (mouse.button === Qt.RightButton){
+				let isFixedView = workspaceView.documentManager.documentsModel.get(index).Fixed;
+				if (isFixedView !== undefined && isFixedView){
+					return;
+				}
+
+				var point = tabItem.mapToItem(this, 0, 0);
+
+				ModalDialogManager.openDialog(popupMenuDialog, {"x": point.x + workspaceView.popupWidth, "y": point.y, "model": tabContextMenuModel});
+			}
+		}
 
         onCloseItem: {
             workspaceView.documentManager.closeDocumentByIndex(index);
@@ -123,7 +170,7 @@ Item {
 			clip: true;
 			Component.onCompleted: {
 				if (model.Fixed !== undefined && model.Fixed){
-					let item = model.DocumentViewComp.createObject(this);
+					let item = model.ViewComp.createObject(this);
 					item.anchors.fill = this;
 					return;
 				}
@@ -135,37 +182,6 @@ Item {
 					documentData.views[0].visible = true;
 				}
 			}
-
-	  //       Loader {
-	  //           id: documentLoader;
-	  //           anchors.fill: parent;
-	  //           sourceComponent: model.DocumentViewComp;
-	  //           clip: true;
-	  //           visible: tabPanel_.selectedIndex === model.index;
-
-	  //           onLoaded: {
-	  //               if (item.viewId !== undefined){
-	  //                   item.viewId = model.Uuid;
-	  //               }
-
-	  //               if (model.Fixed !== undefined && model.Fixed){
-	  //                   return;
-	  //               }
-
-	  //               let documentData = workspaceView.documentManager.documentsModel.get(model.index).DocumentData;
-	  //               if (documentData){
-						// documentData.addView(item);
-	  //               }
-
-	  //               workspaceView.documentManager.updateDocumentTitle(model.index);
-	  //           }
-
-	  //           onStatusChanged: {
-	  //               if (status === Loader.Error){
-	  //                   console.error("Document loading was failed");
-	  //               }
-	  //           }
-	  //       }
         }
     }
 }

@@ -26,7 +26,7 @@ ControlBase {
 
     widthFromDecorator: true;
 
-    signal clicked;
+	signal clicked(var mouse);
     signal closeSignal;
 
     MouseArea {
@@ -34,9 +34,10 @@ ControlBase {
         anchors.fill: tabDelegate;
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
         hoverEnabled: true;
+		acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
         onClicked: {
-            tabDelegate.clicked();
+			tabDelegate.clicked(mouse);
         }
     }
 }

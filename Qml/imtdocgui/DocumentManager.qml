@@ -344,7 +344,6 @@ QtObject {
 								"Title": defaultDocumentName,
 								"TypeId": documentTypeId,
 								"DocumentData": documentData,
-								// "DocumentViewComp": documentViewComp,
 								"IsNew": documentData.isNew
 							});
 
@@ -514,6 +513,7 @@ QtObject {
 	*/
 	function closeDocumentByIndex(documentIndex, force)
 	{
+		console.log("closeDocumentByIndex", documentIndex, force);
 		if (documentIndex < 0 || documentIndex >= documentsModel.count){
 			console.error("Unable to close document with index: ", documentIndex);
 
@@ -528,6 +528,8 @@ QtObject {
 
 		if (documentData.isDirty && !force){
 			let callback = function(result){
+				console.log("callback", result);
+
 				if (result === Enums.yes){
 					internal.m_closingDocuments.push(documentData.documentId);
 					documentManager.saveDocument(documentData.documentId);
@@ -583,6 +585,18 @@ QtObject {
 		return documentData.documentValidator.isValid(data);
 	}
 
+	function getOpenedDocumentIds(){
+		let result = []
+
+		for (let i = 0; i < documentsModel.count; i++){
+			let documentData = documentsModel.get(i).DocumentData;
+			if (documentData && documentData.documentId){
+				result.push(documentData.documentId);
+			}
+		}
+
+		return result;
+	}
 
 	property Component singleDocumentDataComp: Component{
 		QtObject {

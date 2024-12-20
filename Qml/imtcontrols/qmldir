@@ -26,6 +26,7 @@ ShortcutManager 1.0 ./Actions/ShortcutManager.qml
 MovingItem 1.0 ./Actions/MovingItem.qml
 ControlArea 1.0 ./Actions/ControlArea.qml
 TableSelectionManager 1.0 ./Actions/TableSelectionManager.qml
+LocalizationEvent 1.0 ./Actions/LocalizationEvent.qml
 
 Button 1.0 ./Buttons/Button.qml
 TextButton 1.0 ./Buttons/TextButton.qml
@@ -93,6 +94,7 @@ TreeItemModelObserver 1.0 ./Models/TreeItemModelObserver.qml
 CommandsController 1.0 Models/CommandsController.qml
 CommandsProvider 1.0 Models/CommandsProvider.qml
 MacAddressValidator 1.0 Models/MacAddressValidator.qml
+PopupMenuModel 1.0 Models/PopupMenuModel.qml
 
 Table 1.0 ./Views/Table.qml
 TableBase 1.0 ./Views/TableBase.qml

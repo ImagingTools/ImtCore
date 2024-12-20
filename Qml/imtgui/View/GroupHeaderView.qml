@@ -56,6 +56,7 @@ Rectangle {
 
         anchors.verticalCenter: parent.verticalCenter;
         anchors.right: parent.right;
+		anchors.rightMargin: Style.size_mainMargin;
 
         sourceComponent: root.controlComp
     }

@@ -23,6 +23,7 @@ Rectangle {
     property Component tabDelegateDecorator: Style.tabPanelDecorator;
 
     signal closeItem(int index);
+	signal tabClicked(var mouse, var tabItem, int index);
     signal rightClicked();
     signal leftClicked();
 
@@ -80,6 +81,7 @@ Rectangle {
             decorator: tabPanelContainer.tabDelegateDecorator;
 
             onClicked: {
+				tabPanelContainer.tabClicked(mouse, this, model.index);
                 tabPanelContainer.selectedIndex = model.index;
             }
 

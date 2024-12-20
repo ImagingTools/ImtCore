@@ -213,7 +213,7 @@ istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation
 	bool isGuest = bool(roleDataRepresentation.IsGuest && *roleDataRepresentation.IsGuest);
 	roleInfoPtr->SetGuest(isGuest);
 
-	bool isDefault = bool(roleDataRepresentation.IsDefault && roleDataRepresentation.IsDefault);
+	bool isDefault = bool(roleDataRepresentation.IsDefault && *roleDataRepresentation.IsDefault);
 	roleInfoPtr->SetDefault(isDefault);
 
 	if (isGuest || isDefault){

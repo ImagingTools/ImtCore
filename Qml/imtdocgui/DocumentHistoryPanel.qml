@@ -68,9 +68,11 @@ Rectangle {
 				width: height;
 				tooltipText: historyPanel.opened ? qsTr("Hide history") : qsTr("Show history");
 				iconSource: historyPanel.opened
-							? "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
-							: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
+							? "../../../" + Style.getIconPath("Icons/History", Icon.State.On, Icon.Mode.Normal)
+							: "../../../" + Style.getIconPath("Icons/History", Icon.State.On, Icon.Mode.Normal);
 				visible: true;
+				checkable: true;
+				checked: historyPanel.opened;
 				onClicked: {
 					historyPanel.opened = !historyPanel.opened;
 				}

@@ -13,6 +13,8 @@ Item {
     property ListModel modalDialogModels: ListModel {}
     property alias count: container.modalDialogModels.count;
 
+	property var dialogCallback: ({})
+
     Component.onDestruction: {
         modalDialogModels.clear();
     }
@@ -34,6 +36,8 @@ Item {
             modalDialogModels.append({"Component": comp, "Parameters": parameters});
 
             if (callback){
+				dialogCallback[comp] = callback;
+
                 finished.connect(callback);
             }
         }
@@ -49,6 +53,9 @@ Item {
         }
 
         if (index >= 0 && index < modalDialogModels.count){
+			let c = modalDialogModels.get(index).Component;
+			delete dialogCallback[c];
+
             modalDialogModels.remove(index);
         }
     }
@@ -58,6 +65,9 @@ Item {
             let c = modalDialogModels.get(i).Component;
             if (c && c === comp){
                 modalDialogModels.remove(i);
+
+				delete dialogCallback[c];
+
                 return true;
             }
         }
