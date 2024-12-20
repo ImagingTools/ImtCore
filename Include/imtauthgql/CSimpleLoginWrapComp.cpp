@@ -27,12 +27,10 @@ CSimpleLoginWrapComp::CSimpleLoginWrapComp()
 iauth::CUser* CSimpleLoginWrapComp::GetLoggedUser() const
 {
 	if (!m_loggedUserId.isEmpty() && m_userInfoPtr.IsValid()){
-		istd::TDelPtr<iauth::CUser> userPtr(new iauth::CUser);
-		userPtr->SetUserName(m_loggedUserId);
-		userPtr->SetPassword(m_loggedUserPassword);
+		m_loggedUser.SetUserName(m_loggedUserId);
+		m_loggedUser.SetPassword(m_loggedUserPassword);
 
-		// TODO: memory leak!
-		return userPtr.PopPtr();
+		return &m_loggedUser;
 	}
 
 	return nullptr;

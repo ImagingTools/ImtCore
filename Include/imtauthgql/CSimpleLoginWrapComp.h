@@ -61,6 +61,7 @@ public:
 	virtual QByteArray GetToken(const QByteArray& userId) const override;
 
 private:
+	mutable iauth::CUser m_loggedUser;
 	QByteArray m_loggedUserId;
 	QByteArray m_loggedUserPassword;
 	QByteArray m_loggedUserToken;
