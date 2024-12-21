@@ -8,6 +8,7 @@ Item {
     id: root;
 
     property alias viewId: container.viewId;
+	property alias collectionId: container.collectionId;
 
     property alias commandsViewComp: container.commandsViewComp;
     property alias commandsView: container.commandsView;

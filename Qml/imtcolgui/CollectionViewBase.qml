@@ -8,6 +8,8 @@ ViewBase {
 
 	clip: true;
 
+	property string collectionId;
+
 	property alias table: tableInternal;
 	property bool hasPagination: true;
 	property bool hasFilter: true;

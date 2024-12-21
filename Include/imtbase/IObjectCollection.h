@@ -155,7 +155,7 @@ public:
 	virtual const IRevisionController* GetRevisionController() const = 0;
 
 	/**
-		Get access to the revision controller of the collection, if available.
+		Get access to the data controller of the collection, if available.
 	*/
 	virtual const ICollectionDataController* GetDataController() const = 0;
 

@@ -8,7 +8,7 @@ import imtbaseDocumentRevisionSdl 1.0
 Rectangle {
 	id: container;
 
-	color: Style.backgroundColor2;
+	// color: Style.backgroundColor2;
 
 	property int elementWidth: 450;
 	property string documentId: "";

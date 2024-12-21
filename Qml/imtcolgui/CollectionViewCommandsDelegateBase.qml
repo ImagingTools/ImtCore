@@ -13,6 +13,7 @@ ViewCommandsDelegateBase {
 	property Item collectionView: null;
 
 	property string descriptionFieldId: "Description";
+	property string collectionId: collectionView != null ? collectionView.collectionId : "";
 
 	property string removeDialogTitle: qsTr("Deleting a selected element");
 	property string removeMessage: qsTr("Remove selected item from the collection ?");

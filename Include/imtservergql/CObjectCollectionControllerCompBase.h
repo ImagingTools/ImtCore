@@ -27,10 +27,10 @@ namespace imtservergql
 
 class CObjectCollectionControllerCompBase:
 			public imtgql::IGqlRequestExtractor,
-			public sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase
+			virtual public ::imtservergql::CPermissibleGqlRequestHandlerComp
 {
 public:
-	typedef sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase BaseClass;
+	typedef  ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CObjectCollectionControllerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)
@@ -69,13 +69,6 @@ public:
 		OT_EXPORT,
 		OT_OBJECT_TYPE_ID
 	};
-
-	// reimplemented (sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 OnGetRevisionInfoList(const sdl::imtbase::DocumentRevision::V1_0::CGetRevisionInfoListGqlRequest& getRevisionInfoListRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0 OnBackupRevision(const sdl::imtbase::DocumentRevision::V1_0::CBackupRevisionGqlRequest& backupRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0 OnRestoreRevision(const sdl::imtbase::DocumentRevision::V1_0::CRestoreRevisionGqlRequest& restoreRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual sdl::imtbase::DocumentRevision::CExportRevisionResponse::V1_0 OnExportRevision(const sdl::imtbase::DocumentRevision::V1_0::CExportRevisionGqlRequest& exportRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual sdl::imtbase::DocumentRevision::CDeleteRevisionResponse::V1_0 OnDeleteRevision(const sdl::imtbase::DocumentRevision::V1_0::CDeleteRevisionGqlRequest& deleteRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;

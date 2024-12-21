@@ -8,26 +8,31 @@ schema {
 
 input GetRevisionInfoListInput {
 	DocumentId: ID
+	CollectionId: ID
 }
 
 input BackupRevisionInput {
 	ObjectId: ID
+	CollectionId: ID
 	Comment: String
 }
 
 input RestoreRevisionInput {
 	ObjectId: ID
+	CollectionId: ID
 	Revision: Integer
 }
 
 input ExportRevisionInput {
 	ObjectId: ID
+	CollectionId: ID
 	Revision: Integer
 	FilePath: String
 }
 
 input DeleteRevisionInput {
 	ObjectId: ID
+	CollectionId: ID
 	Revision: Integer
 }
 

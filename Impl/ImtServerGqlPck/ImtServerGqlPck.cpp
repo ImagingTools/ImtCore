@@ -129,6 +129,11 @@ I_EXPORT_COMPONENT(
 			"Headers data provider",
 			"Headers Data Provider");
 
+I_EXPORT_COMPONENT(
+			DocumentRevisionController,
+			"Document revision controller",
+			"Document Revision Controller");
+
 
 } // namespace ImtServerGqlPck
 

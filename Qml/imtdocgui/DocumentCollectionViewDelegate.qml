@@ -7,7 +7,7 @@ import imtauthgui 1.0
 import imtbaseDocumentRevisionSdl 1.0
 
 CollectionViewCommandsDelegateBase {
-	id: root;
+	id: collectionViewCommandsDelegateBase;
 
 	property DocumentManager documentManager: null;
 
@@ -24,18 +24,18 @@ CollectionViewCommandsDelegateBase {
 		id: internal;
 
 		function onRemoved(objectId){
-			if (root.documentManager){
-				let index = root.documentManager.getDocumentIndexByDocumentId(objectId);
+			if (collectionViewCommandsDelegateBase.documentManager){
+				let index = collectionViewCommandsDelegateBase.documentManager.getDocumentIndexByDocumentId(objectId);
 				if (index >= 0){
-					root.documentManager.closeDocument(objectId, true);
+					collectionViewCommandsDelegateBase.documentManager.closeDocument(objectId, true);
 				}
 			}
 		}
 	}
 
 	function createNewObject(typeId, viewTypeId){
-		if (root.documentManager){
-			root.documentManager.insertNewDocument(typeId, viewTypeId);
+		if (collectionViewCommandsDelegateBase.documentManager){
+			collectionViewCommandsDelegateBase.documentManager.insertNewDocument(typeId, viewTypeId);
 		}
 		else{
 			console.error("Unable to create new object:", typeId, viewTypeId, ". Error: Document manager is invalid")
@@ -43,8 +43,8 @@ CollectionViewCommandsDelegateBase {
 	}
 
 	function openDocumentEditor(objectId, typeId, viewTypeId){
-		if (root.documentManager){
-			root.documentManager.openDocument(objectId, typeId, viewTypeId);
+		if (collectionViewCommandsDelegateBase.documentManager){
+			collectionViewCommandsDelegateBase.documentManager.openDocument(objectId, typeId, viewTypeId);
 		}
 		else{
 			console.error("Unable to open document for editing", typeId, viewTypeId, ". Error: Document manager is invalid");
@@ -52,31 +52,31 @@ CollectionViewCommandsDelegateBase {
 	}
 
 	function onEdit(){
-		let elementsModel = root.collectionView.table.elements;
+		let elementsModel = collectionViewCommandsDelegateBase.collectionView.table.elements;
 		if (!elementsModel){
 			console.error("Unable to edit document. Error: Elements for collection view is invalid");
 			return;
 		}
 
-		let indexes = root.collectionView.table.getSelectedIndexes();
+		let indexes = collectionViewCommandsDelegateBase.collectionView.table.getSelectedIndexes();
 		for (let i = 0; i < indexes.length; i++){
 			let index = indexes[i];
 			if (elementsModel.containsKey("Id", index)){
 				let itemId = elementsModel.getData("Id", index);
 
-				root.openDocumentEditor(itemId, documentTypeId, viewTypeId);
+				collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeId, viewTypeId);
 			}
 		}
 	}
 
 	function onRevision(){
-		let elementsModel = root.collectionView.table.elements;
+		let elementsModel = collectionViewCommandsDelegateBase.collectionView.table.elements;
 		if (!elementsModel){
 			console.error("Unable to get revisions for document. Error: Elements for collection view is invalid");
 			return;
 		}
 
-		let indexes = root.collectionView.table.getSelectedIndexes();
+		let indexes = collectionViewCommandsDelegateBase.collectionView.table.getSelectedIndexes();
 		if (indexes.length > 0){
 			let index = indexes[0];
 			if (elementsModel.containsKey("Id", index)){
@@ -87,7 +87,7 @@ CollectionViewCommandsDelegateBase {
 	}
 
 	function onNew(){
-		root.createNewObject(documentTypeId, viewTypeId);
+		collectionViewCommandsDelegateBase.createNewObject(documentTypeId, viewTypeId);
 	}
 
 	Component {
@@ -132,6 +132,7 @@ CollectionViewCommandsDelegateBase {
 				inputObjectComp: Component {
 					GetRevisionInfoListInput {
 						m_documentId: documentRevisionDialog.documentId;
+						m_collectionId: collectionViewCommandsDelegateBase.collectionId;
 					}
 				}
 
@@ -156,6 +157,7 @@ CollectionViewCommandsDelegateBase {
 					DeleteRevisionInput {
 						m_objectId: documentRevisionDialog.documentId;
 						m_revision: documentRevisionDialog.selectedRevision;
+						m_collectionId: collectionViewCommandsDelegateBase.collectionId;
 					}
 				}
 
@@ -176,6 +178,7 @@ CollectionViewCommandsDelegateBase {
 					RestoreRevisionInput {
 						m_objectId: documentRevisionDialog.documentId;
 						m_revision: documentRevisionDialog.selectedRevision;
+						m_collectionId: collectionViewCommandsDelegateBase.collectionId;
 					}
 				}
 

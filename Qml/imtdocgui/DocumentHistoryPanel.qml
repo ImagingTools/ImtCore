@@ -7,12 +7,12 @@ Rectangle {
 	id: historyPanel;
 	z: parent.z + 1;
 	anchors.top: parent.top;
-	anchors.topMargin: Style.size_largeMargin;
+	// anchors.topMargin: Style.size_largeMargin;
 	anchors.right: parent.right;
-	anchors.rightMargin: Style.size_largeMargin;
+	// anchors.rightMargin: Style.size_largeMargin;
 	anchors.bottom: parent.bottom;
-	anchors.bottomMargin: Style.size_largeMargin;
-	color: Style.backgroundColor2;
+	// anchors.bottomMargin: Style.size_largeMargin;
+	// color: Style.backgroundColor2;
 
 	width: contentWidth;
 

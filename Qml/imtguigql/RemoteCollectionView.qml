@@ -8,8 +8,6 @@ import imtcolgui 1.0
 CollectionView {
     id: root;
 
-    property string collectionId;
-
     property bool hasRemoteChanges: false;
     property bool tableViewParamsStoredServer: true;
     property var payloadModel: null

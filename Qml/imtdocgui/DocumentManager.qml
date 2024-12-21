@@ -539,8 +539,6 @@ QtObject {
 
 					documentManager.closeDocumentByIndex(documentIndex);
 				}
-
-				ModalDialogManager.finished.disconnect(callback);
 			}
 
 			ModalDialogManager.openDialog(saveDialog, {}, "", callback);

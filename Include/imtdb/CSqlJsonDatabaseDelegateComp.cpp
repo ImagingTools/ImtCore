@@ -205,7 +205,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetCountQuery(const iprm::IParamsSet* p
 QString CSqlJsonDatabaseDelegateComp::GetBaseSelectionQuery() const
 {
 	if (*m_isMultiTypeAttrPtr){
-		return QString("SELECT \"Id\", \"%1\", \"TypeId\", \"Document\", \"RevisionNumber\", \"LastModified\","
+		return QString("SELECT root.*,"
 					   "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND root.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
 					   " as root WHERE \"IsActive\" = true")
 				.arg(qPrintable(*m_objectIdColumnAttrPtr))

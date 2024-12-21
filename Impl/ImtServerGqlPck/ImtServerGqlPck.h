@@ -29,6 +29,7 @@
 #include <imtservergql/CTableViewParamControllerComp.h>
 #include <imtservergql/CConnectionStatusSubscriberControllerComp.h>
 #include <imtservergql/CHeadersDataProviderComp.h>
+#include <imtservergql/CDocumentRevisionControllerComp.h>
 
 
 /**
@@ -61,6 +62,7 @@ typedef imtservergql::CGqlSearchControllerComp GqlSearchController;
 typedef imtservergql::CTableViewParamControllerComp TableViewParamController;
 typedef imtservergql::CConnectionStatusSubscriberControllerComp ConnectionStatusSubscriberController;
 typedef imtservergql::CHeadersDataProviderComp HeadersDataProvider;
+typedef imtservergql::CDocumentRevisionControllerComp DocumentRevisionController;
 
 
 } // namespace ImtServerGqlPck

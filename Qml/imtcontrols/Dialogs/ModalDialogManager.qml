@@ -33,13 +33,11 @@ Item {
             container.openWindow(comp, parameters);
         }
         else {
-            modalDialogModels.append({"Component": comp, "Parameters": parameters});
-
-            if (callback){
+			if (callback){
 				dialogCallback[comp] = callback;
+			}
 
-                finished.connect(callback);
-            }
+            modalDialogModels.append({"Component": comp, "Parameters": parameters});
         }
     }
 
