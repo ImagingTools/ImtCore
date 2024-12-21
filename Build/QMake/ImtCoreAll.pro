@@ -8,10 +8,6 @@ SUBDIRS += imtdesign
 imtdesign.file = ../../Include/imtdesign/QMake/imtdesign.pro
 imtdesign.depends = imtbase
 
-SUBDIRS += imtcol
-imtcol.file = ../../Include/imtcol/QMake/imtcol.pro
-imtcol.depends = imtbase imtbasesdl
-
 SUBDIRS += imtfile
 imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
 
@@ -60,17 +56,26 @@ SdlCodeGenerator.file = ../../Impl/SdlCodeGeneratorExe/QMake/SdlCodeGeneratorExe
 SdlCodeGenerator.depends = ImtCorePck ImtSdlPck ImtSdlGenPck ImtSdlGenV2Pck
 
 # SDL modules
-SUBDIRS += imtauthsdl
-imtauthsdl.file = ../../Sdl/imtauth/QMake/imtauthsdl.pro
-
-SUBDIRS += imtlicsdl
-imtlicsdl.file = ../../Sdl/imtlic/QMake/imtlicsdl.pro
-
-SUBDIRS += imtappsdl
-imtappsdl.file = ../../Sdl/imtapp/QMake/imtappsdl.pro
 
 SUBDIRS += imtbasesdl
 imtbasesdl.file = ../../Sdl/imtbase/QMake/imtbasesdl.pro
+imtbasesdl.depends = SdlCodeGenerator
+
+SUBDIRS += imtcol
+imtcol.file = ../../Include/imtcol/QMake/imtcol.pro
+imtcol.depends = imtbase imtbasesdl
+
+SUBDIRS += imtauthsdl
+imtauthsdl.file = ../../Sdl/imtauth/QMake/imtauthsdl.pro
+imtauthsdl.depends = imtbasesdl
+
+SUBDIRS += imtlicsdl
+imtlicsdl.file = ../../Sdl/imtlic/QMake/imtlicsdl.pro
+imtlicsdl.depends = imtbasesdl
+
+SUBDIRS += imtappsdl
+imtappsdl.file = ../../Sdl/imtapp/QMake/imtappsdl.pro
+imtappsdl.depends = imtbasesdl
 
 SUBDIRS += imtdev
 imtdev.file = ../../Include/imtdev/QMake/imtdev.pro
