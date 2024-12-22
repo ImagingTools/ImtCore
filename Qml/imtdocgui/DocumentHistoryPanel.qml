@@ -7,23 +7,35 @@ Rectangle {
 	id: historyPanel;
 	z: parent.z + 1;
 	anchors.top: parent.top;
-	// anchors.topMargin: Style.size_largeMargin;
 	anchors.right: parent.right;
-	// anchors.rightMargin: Style.size_largeMargin;
 	anchors.bottom: parent.bottom;
-	// anchors.bottomMargin: Style.size_largeMargin;
-	// color: Style.backgroundColor2;
 
 	width: contentWidth;
+	color: Style.baseColor;
 
 	property bool opened: true;
 	property int contentWidth: 500;
+	property alias contentHeight: historyView.contentHeight;
 	property string documentId: "";
+	property alias collectionId: historyView.collectionId;
+	property Flickable editorFlickable;
+
+	Connections {
+		target: historyPanel.editorFlickable;
+
+		function onContentXChanged(){
+			historyView.flickable.contentX = historyPanel.editorFlickable.contentX;
+		}
+
+		function onContentYChanged(){
+			historyView.flickable.contentY = historyPanel.editorFlickable.contentY;
+		}
+	}
 
 	NumberAnimation {
 		id: animation;
 		property: "width";
-		duration: 300;
+		duration: 200;
 		target: historyPanel;
 	}
 
@@ -52,11 +64,13 @@ Rectangle {
 
 	GroupHeaderView {
 		id: historyHeader;
-		anchors.left: historyView.left;
+		anchors.left: parent.left;
+		anchors.leftMargin: Style.size_largeMargin;
 		anchors.top: parent.top;
-		width: parent.width;
+		anchors.topMargin: Style.size_largeMargin;
+		anchors.right: parent.right;
+		anchors.rightMargin: Style.size_largeMargin;
 		title: qsTr("History");
-		// visible: historyPanel.opened;
 
 		controlComp: Component {
 			id: baseControlComp;
@@ -66,7 +80,6 @@ Rectangle {
 
 				height: 22;
 				width: height;
-				tooltipText: historyPanel.opened ? qsTr("Hide history") : qsTr("Show history");
 				iconSource: historyPanel.opened
 							? "../../../" + Style.getIconPath("Icons/History", Icon.State.On, Icon.Mode.Normal)
 							: "../../../" + Style.getIconPath("Icons/History", Icon.State.On, Icon.Mode.Normal);
@@ -82,11 +95,12 @@ Rectangle {
 
 	DocumentHistoryView {
 		id: historyView;
+		anchors.left: parent.left;
+		anchors.leftMargin: Style.size_largeMargin;
 		anchors.top: historyHeader.bottom;
-		anchors.topMargin: Style.size_largeMargin;
-		anchors.horizontalCenter: parent.horizontalCenter;
 		anchors.bottom: parent.bottom;
-		width: parent.width - 2 * Style.size_mainMargin;
+		anchors.right: parent.right;
+		anchors.rightMargin: Style.size_largeMargin;
 		visible: historyPanel.width !== 0;
 		documentId: historyPanel.documentId;
 	}

@@ -8,11 +8,15 @@ import imtbaseDocumentRevisionSdl 1.0
 Rectangle {
 	id: container;
 
-	// color: Style.backgroundColor2;
+	color: Style.baseColor;
 
 	property int elementWidth: 450;
+	property alias contentHeight: column.height;
+	property alias flickable: flickable_;
 	property string documentId: "";
 	property int activeRevision: 0;
+
+	property string collectionId: "";
 
 	clip: true;
 
@@ -28,6 +32,7 @@ Rectangle {
 		inputObjectComp: Component {
 			GetRevisionInfoListInput {
 				m_documentId: container.documentId;
+				m_collectionId: container.collectionId;
 			}
 		}
 
@@ -99,18 +104,19 @@ Rectangle {
 	}
 
 	Flickable {
-		id: flickable;
-		anchors.horizontalCenter: parent.horizontalCenter;
+		id: flickable_;
+		anchors.left: parent.left;
+		anchors.right: parent.right;
 		anchors.top: parent.top;
 		anchors.topMargin: Style.size_mainMargin;
 		anchors.bottom: parent.bottom;
 		anchors.bottomMargin: Style.size_mainMargin;
-		width: container.elementWidth;
 
 		contentWidth: width;
 		contentHeight: column.height;
 
 		boundsBehavior: Flickable.StopAtBounds;
+		interactive: false;
 
 		clip: true;
 
@@ -130,17 +136,6 @@ Rectangle {
 				delegate: delegateComp;
 			}
 		}//Column main
-	}
-
-	CustomScrollbar {
-		id: scrollbar;
-		anchors.right: parent.right;
-		anchors.rightMargin: Style.size_smallMargin;
-		anchors.top: parent.top;
-		anchors.bottom: parent.bottom;
-		secondSize: Style.size_mainMargin;
-		targetItem: flickable;
-		radius: 2;
 	}
 
 	Text {

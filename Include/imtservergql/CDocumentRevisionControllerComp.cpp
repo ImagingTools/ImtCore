@@ -29,7 +29,9 @@ imtbase::IObjectCollection* CDocumentRevisionControllerComp::FindObjectCollectio
 imtbase::IDocumentChangeGenerator* CDocumentRevisionControllerComp::FindDocumentChangeGenerator(const QByteArray& typeId) const
 {
 	int index = m_collectionIdsAttrPtr.FindValue(typeId);
-	Q_ASSERT(index >= 0);
+	if (index < 0 || index >= m_documentChangeGeneratorsCompPtr.GetCount() ){
+		return nullptr;
+	}
 
 	return m_documentChangeGeneratorsCompPtr[index];
 }
