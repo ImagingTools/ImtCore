@@ -110,7 +110,7 @@ defineReplace(CreateQmlSdlTarget) {
 	QRC_WRAP_DIR_PATH = $$split(SDL_OUTPUT_FILES_QML, $${DIR_SEPARATOR})
 
 	isEmpty(QRC_WRAP_DIR_PATH){
-		message("QRC_WRAP_DIR_PATH IS EMPTY!!!")
+		message("QRC_WRAP_DIR_PATH IS EMPTY variable is empty. SDL output files were not defined.")
 	}
 
 	QRC_NAME = $$take_last(QRC_WRAP_DIR_PATH)

@@ -2,7 +2,6 @@ include($(ACFDIR)/Config/QMake/GeneralConfig.pri)
 include($(IMTCOREDIR)/Config/QMake/WebCompiler.pri)
 
 defineTest(prepareWebQml) {
-	message("prepareWebQml")
 	buildwebdir = $$1
 	imtcoredir = $(IMTCOREDIR)
 

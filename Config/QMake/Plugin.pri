@@ -9,7 +9,7 @@ ARXC_OUTDIR = $$OUT_PWD/../$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 
 INCLUDEPATH += $$OUT_PWD/../$$AUXINCLUDEPATH
 
-message(ARXC_OUTDIR $${ARXC_OUTDIR})
+#message(ARXC_OUTDIR $${ARXC_OUTDIR})
 
 include($(ACFDIR)/Config/QMake/AcfQt.pri)
 include($(ACFDIR)/Config/QMake/AcfStd.pri)
