@@ -11,4 +11,3 @@ cd %~dp0\..\..\Build\QMake
 %QTDIR%\bin\qmake BuildTools.pro -recursive
 
 nmake debug
-nmake release
