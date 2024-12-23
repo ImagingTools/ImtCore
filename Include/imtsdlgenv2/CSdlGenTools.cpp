@@ -286,7 +286,6 @@ QString CSdlGenTools::GetSettingValueString(
 			const QString& objectName)
 {
 	QString retVal;
-	retVal.append('*');
 
 	if (!objectName.isEmpty()){
 		retVal += objectName + '.';
