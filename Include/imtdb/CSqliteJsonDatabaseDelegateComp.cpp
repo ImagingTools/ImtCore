@@ -6,6 +6,9 @@
 #include <iprm/ITextParam.h>
 #include <iprm/IEnableableParam.h>
 
+// ImtCore includes
+#include <imtcol/CDocumentCollectionFilter.h>
+
 
 namespace imtdb
 {
@@ -75,6 +78,8 @@ bool CSqliteJsonDatabaseDelegateComp::CreateSortQuery(const imtbase::ICollection
 		break;
 	case imtbase::ICollectionFilter::SO_DESC:
 		sortOrder = "DESC";
+		break;
+	case imtbase::ICollectionFilter::SO_NO_ORDER:
 		break;
 	}
 
@@ -159,6 +164,49 @@ bool CSqliteJsonDatabaseDelegateComp::CreatePaginationQuery(int offset, int coun
 bool CSqliteJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& /*timeFilter*/, QString& /*timeFilterQuery*/) const
 {
 	return true;
+}
+
+
+QByteArray CSqliteJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const
+{
+	QString stateDocumentFilter;
+	if (paramsPtr != nullptr){
+		iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
+		if (paramIds.contains("DocumentFilter")){
+			iprm::TParamsPtr<imtcol::IDocumentCollectionFilter> documentFilterParamPtr(paramsPtr, "DocumentFilter");
+			if (documentFilterParamPtr.IsValid()){
+				imtcol::IDocumentCollectionFilter::DocumentStates states = documentFilterParamPtr->GetDocumentStates();
+
+				if (states.contains(imtcol::IDocumentCollectionFilter::DS_ACTIVE)){
+					stateDocumentFilter += QString("\"IsActive\" = true");
+				}
+
+				if (states.contains(imtcol::IDocumentCollectionFilter::DS_INACTIVE)){
+					if (!stateDocumentFilter.isEmpty()){
+						stateDocumentFilter += QString(" OR ");
+					}
+
+					stateDocumentFilter += QString("\"IsActive\" = false");
+				}
+			}
+		}
+	}
+
+	if (stateDocumentFilter.isEmpty()){
+		stateDocumentFilter = QString("\"IsActive\" = true");
+	}
+
+	QString schemaPrefix;
+	if (m_tableSchemaAttrPtr.IsValid()){
+		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
+	}
+
+	return QString("SELECT * FROM %0\"%1\" WHERE (%2) AND \"%3\" = '%4' ORDER BY \"RevisionNumber\" DESC;")
+		.arg(schemaPrefix)
+		.arg(qPrintable(*m_tableNameAttrPtr))
+		.arg(stateDocumentFilter)
+		.arg(qPrintable(*m_objectIdColumnAttrPtr))
+		.arg(qPrintable(objectId)).toUtf8();
 }
 
 
