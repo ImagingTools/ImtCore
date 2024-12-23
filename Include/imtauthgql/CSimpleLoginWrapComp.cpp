@@ -48,9 +48,9 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 
 	QByteArray productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	authsdl::V1_0::AuthorizationRequestArguments arguments;
-	arguments.input.Login.reset(new QString(userName));
-	arguments.input.Password.reset(new QString(password));
-	arguments.input.ProductId.reset(new QByteArray(productId));
+	arguments.input.Login = QString(userName);
+	arguments.input.Password = QString(password);
+	arguments.input.ProductId = QByteArray(productId);
 
 	imtgql::CGqlRequest gqlRequest;
 	if (authsdl::V1_0::CAuthorizationGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

@@ -59,7 +59,7 @@ sdl::imtauth::Authorization::CUserManagementPayload::V1_0 CAuthorizationOptionsC
 		break;
 	}
 
-	payload.UserMode = std::make_unique<QString>(userMode);
+	payload.UserMode = std::make_optional<QString>(userMode);
 
 	return payload;
 }

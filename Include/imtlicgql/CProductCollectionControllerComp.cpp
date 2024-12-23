@@ -59,35 +59,35 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtlic::Products::V1_0::ProductsListRequestInfo requestInfo = productsListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
-		representationObject.Id.reset(new QByteArray(objectId));
+		representationObject.Id = QByteArray(objectId);
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.TypeId.reset(new QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId)));
+		representationObject.TypeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
 	}
 
 	if (requestInfo.items.isProductIdRequested){
-		representationObject.ProductId.reset(new QByteArray(productInfoPtr->GetProductId()));
+		representationObject.ProductId = QByteArray(productInfoPtr->GetProductId());
 	}
 
 	if (requestInfo.items.isNameRequested){
-		representationObject.Name.reset(new QString(productInfoPtr->GetName()));
+		representationObject.Name = QString(productInfoPtr->GetName());
 	}
 
 	if (requestInfo.items.isProductNameRequested){
-		representationObject.ProductName.reset(new QString(productInfoPtr->GetName()));
+		representationObject.ProductName = QString(productInfoPtr->GetName());
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		representationObject.Description.reset(new QString(productInfoPtr->GetProductDescription()));
+		representationObject.Description = QString(productInfoPtr->GetProductDescription());
 	}
 
 	if (requestInfo.items.isCategoryIdRequested){
-		representationObject.CategoryId.reset(new QByteArray(productInfoPtr->GetCategoryId()));
+		representationObject.CategoryId = QByteArray(productInfoPtr->GetCategoryId());
 	}
 
 	if (requestInfo.items.isFeaturesRequested){
-		representationObject.Features.reset(new QByteArray(productInfoPtr->GetFeatures()->GetElementIds().join(';')));
+		representationObject.Features = QByteArray(productInfoPtr->GetFeatures()->GetElementIds().join(';'));
 	}
 
 	if (requestInfo.items.isLicensesRequested){
@@ -112,9 +112,9 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 					if (licenseInfoPtr != nullptr){
 						sdl::imtlic::Products::CLicenseData::V1_0 licenseData;
 
-						licenseData.Id.reset(new QByteArray(licenseCollectionId));
-						licenseData.LicenseId.reset(new QByteArray(licenseInfoPtr->GetLicenseId()));
-						licenseData.LicenseName.reset(new QString(licenseInfoPtr->GetLicenseName()));
+						licenseData.Id = QByteArray(licenseCollectionId);
+						licenseData.LicenseId = QByteArray(licenseInfoPtr->GetLicenseId());
+						licenseData.LicenseName = QString(licenseInfoPtr->GetLicenseName());
 
 						licenseDataList << licenseData;
 					}
@@ -122,7 +122,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 			}
 		}
 
-		representationObject.Licenses = std::make_unique<QList<sdl::imtlic::Products::CLicenseData::V1_0>>(licenseDataList);
+		representationObject.Licenses = std::make_optional<QList<sdl::imtlic::Products::CLicenseData::V1_0>>(licenseDataList);
 	}
 
 	if (requestInfo.items.isAddedRequested){
@@ -130,7 +130,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 		addedTime.setTimeSpec(Qt::UTC);
 
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.Added.reset(new QString(added));
+		representationObject.Added = QString(added);
 	}
 
 	if (requestInfo.items.isLastModifiedRequested){
@@ -138,7 +138,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 		lastModifiedTime.setTimeSpec(Qt::UTC);
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.LastModified.reset(new QString(lastModified));
+		representationObject.LastModified = QString(lastModified);
 	}
 
 	return true;
@@ -302,24 +302,24 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	if (arguments.input.Id){
 		id = *arguments.input.Id;
 	}
-	productData.Id.reset(new QByteArray(id));
+	productData.Id = QByteArray(id);
 
 	QByteArray productId = productInfoPtr->GetProductId();
-	productData.ProductId.reset(new QByteArray((productId)));
+	productData.ProductId = QByteArray((productId));
 
 	QString productName = productInfoPtr->GetName();
-	productData.Name.reset(new QString((productName)));
-	productData.ProductName.reset(new QString((productName)));
+	productData.Name = QString((productName));
+	productData.ProductName = QString((productName));
 
 	QString description = productInfoPtr->GetProductDescription();
-	productData.Description.reset(new QString((description)));
+	productData.Description = QString((description));
 
 	QByteArray categoryId = productInfoPtr->GetCategoryId();
-	productData.CategoryId.reset(new QByteArray((categoryId)));
+	productData.CategoryId = QByteArray((categoryId));
 
-	productData.Features.reset(new QByteArray((productInfoPtr->GetFeatures()->GetElementIds().join(';'))));
+	productData.Features = QByteArray((productInfoPtr->GetFeatures()->GetElementIds().join(';')));
 
-	representationPayload.ProductData = std::make_unique<sdl::imtlic::Products::CProductData::V1_0>(productData);
+	representationPayload.ProductData = std::make_optional<sdl::imtlic::Products::CProductData::V1_0>(productData);
 
 	return true;
 }

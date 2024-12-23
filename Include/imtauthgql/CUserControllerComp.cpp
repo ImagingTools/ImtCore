@@ -130,7 +130,7 @@ sdl::imtauth::Users::CChangePasswordPayload::V1_0 CUserControllerComp::OnChangeP
 	}
 
 	sdl::imtauth::Users::CChangePasswordPayload::V1_0 payload;
-	payload.UserId.reset(new QByteArray(id));
+	payload.UserId = QByteArray(id);
 
 	return payload;
 }

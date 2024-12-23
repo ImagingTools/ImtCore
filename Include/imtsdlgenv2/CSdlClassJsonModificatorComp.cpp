@@ -439,10 +439,10 @@ void CSdlClassJsonModificatorComp::AddCustomFieldReadFromJsonImplCode(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("object.");
 	stream << field.GetId();
-	stream << QStringLiteral(".reset(new ");
+	stream << QStringLiteral(" = ");
 	structNameConverter.addVersion = true;
 	stream << structNameConverter.GetString();
-	stream << QStringLiteral(");");
+	stream << QStringLiteral("();");
 	FeedStream(stream, 1, false);
 
 	// read from Json

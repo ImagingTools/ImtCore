@@ -41,23 +41,23 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Groups::V1_0::GroupsListRequestInfo requestInfo = groupsListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
-		representationObject.Id.reset(new QByteArray(objectId));
+		representationObject.Id = QByteArray(objectId);
 	}
 
 	if (requestInfo.items.isNameRequested){
-		representationObject.Name.reset(new QString(userGroupInfoPtr->GetName()));
+		representationObject.Name = QString(userGroupInfoPtr->GetName());
 	}
 
 	if (requestInfo.items.isRolesRequested){
-		representationObject.Roles.reset(new QByteArray(userGroupInfoPtr->GetRoles(productId).join(';')));
+		representationObject.Roles = QByteArray(userGroupInfoPtr->GetRoles(productId).join(';'));
 	}
 
 	if (requestInfo.items.isParentGroupsRequested){
-		representationObject.ParentGroups.reset(new QByteArray(userGroupInfoPtr->GetParentGroups().join(';')));
+		representationObject.ParentGroups = QByteArray(userGroupInfoPtr->GetParentGroups().join(';'));
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		representationObject.Description.reset(new QString(userGroupInfoPtr->GetDescription()));
+		representationObject.Description = QString(userGroupInfoPtr->GetDescription());
 	}
 
 	if (requestInfo.items.isAddedRequested){
@@ -65,7 +65,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		addedTime.setTimeSpec(Qt::UTC);
 
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.Added.reset(new QString(added));
+		representationObject.Added = QString(added);
 	}
 
 	if (requestInfo.items.isLastModifiedRequested){
@@ -73,7 +73,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		lastModifiedTime.setTimeSpec(Qt::UTC);
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.LastModified.reset(new QString(lastModified));
+		representationObject.LastModified = QString(lastModified);
 	}
 
 	return true;
@@ -210,23 +210,23 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		productId = *arguments.input.ProductId;
 	}
 
-	groupData.Id.reset(new QByteArray(userGroupInfoPtr->GetObjectUuid()));
-	groupData.Name.reset(new QString(userGroupInfoPtr->GetName()));
-	groupData.Description.reset(new QString(userGroupInfoPtr->GetDescription()));
+	groupData.Id = QByteArray(userGroupInfoPtr->GetObjectUuid());
+	groupData.Name = QString(userGroupInfoPtr->GetName());
+	groupData.Description = QString(userGroupInfoPtr->GetDescription());
 
 	imtauth::IUserGroupInfo::UserIds userIds = userGroupInfoPtr->GetUsers();
 	std::sort(userIds.begin(), userIds.end());
-	groupData.Users.reset(new QByteArray(userIds.join(';')));
+	groupData.Users = QByteArray(userIds.join(';'));
 
 	imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
 	std::sort(roleIds.begin(), roleIds.end());
-	groupData.Roles.reset(new QByteArray(roleIds.join(';')));
+	groupData.Roles = QByteArray(roleIds.join(';'));
 
 	imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
 	std::sort(groupIds.begin(), groupIds.end());
-	groupData.ParentGroups.reset(new QByteArray(groupIds.join(';')));
+	groupData.ParentGroups = QByteArray(groupIds.join(';'));
 
-	representationPayload.GroupData = std::make_unique<sdl::imtauth::Groups::CGroupData::V1_0>(groupData);
+	representationPayload.GroupData = std::make_optional<sdl::imtauth::Groups::CGroupData::V1_0>(groupData);
 
 	return true;
 }

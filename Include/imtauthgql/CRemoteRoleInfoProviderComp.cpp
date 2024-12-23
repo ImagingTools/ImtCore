@@ -35,8 +35,8 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& rol
 	namespace rolessdl = sdl::imtauth::Roles;
 
 	rolessdl::V1_0::RoleItemRequestArguments arguments;
-	arguments.input.Id.reset(new QByteArray(roleId));
-	arguments.input.ProductId.reset(new QByteArray(productId));
+	arguments.input.Id = QByteArray(roleId);
+	arguments.input.ProductId = QByteArray(productId);
 
 	imtgql::CGqlRequest gqlRequest;
 	if (rolessdl::V1_0::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

@@ -55,15 +55,15 @@ sdl::imtauth::Profile::CProfileData::V1_0 CProfileControllerComp::OnGetProfile(
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
 		if (systemInfo.enabled){
-			profileData.systemId.reset(new QByteArray(systemInfo.systemId));
+			profileData.systemId = QByteArray(systemInfo.systemId);
 			break;
 		}
 	}
 
-	profileData.id.reset(new QByteArray(objectId));
-	profileData.name.reset(new QString(userInfoPtr->GetName()));
-	profileData.email.reset(new QString(userInfoPtr->GetMail()));
-	profileData.username.reset(new QString(userInfoPtr->GetId()));
+	profileData.id = QByteArray(objectId);
+	profileData.name = QString(userInfoPtr->GetName());
+	profileData.email = QString(userInfoPtr->GetMail());
+	profileData.username = QString(userInfoPtr->GetId());
 
 	QList<sdl::imtauth::Profile::CRoleInfo::V1_0> roleList;
 
@@ -76,9 +76,9 @@ sdl::imtauth::Profile::CProfileData::V1_0 CProfileControllerComp::OnGetProfile(
 				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
 				if (roleInfoPtr != nullptr){
 					sdl::imtauth::Profile::CRoleInfo::V1_0 info;
-					info.id.reset(new QByteArray(roleInfoPtr->GetRoleId()));
-					info.name.reset(new QString(roleInfoPtr->GetRoleName()));
-					info.description.reset(new QString(roleInfoPtr->GetRoleDescription()));
+					info.id = QByteArray(roleInfoPtr->GetRoleId());
+					info.name = QString(roleInfoPtr->GetRoleName());
+					info.description = QString(roleInfoPtr->GetRoleDescription());
 
 					roleList << info;
 				}
@@ -86,7 +86,7 @@ sdl::imtauth::Profile::CProfileData::V1_0 CProfileControllerComp::OnGetProfile(
 		}
 	}
 
-	profileData.roles = std::make_unique<QList<sdl::imtauth::Profile::CRoleInfo::V1_0>>(roleList);
+	profileData.roles = std::make_optional<QList<sdl::imtauth::Profile::CRoleInfo::V1_0>>(roleList);
 
 	QList<sdl::imtauth::Profile::CGroupInfo::V1_0> groupList;
 
@@ -100,9 +100,9 @@ sdl::imtauth::Profile::CProfileData::V1_0 CProfileControllerComp::OnGetProfile(
 				if (groupInfoPtr != nullptr){
 					sdl::imtauth::Profile::CGroupInfo::V1_0 info;
 
-					info.id.reset(new QByteArray(groupInfoPtr->GetId()));
-					info.name.reset(new QString(groupInfoPtr->GetName()));
-					info.description.reset(new QString(groupInfoPtr->GetDescription()));
+					info.id = QByteArray(groupInfoPtr->GetId());
+					info.name = QString(groupInfoPtr->GetName());
+					info.description = QString(groupInfoPtr->GetDescription());
 
 					groupList << info;
 				}
@@ -110,7 +110,7 @@ sdl::imtauth::Profile::CProfileData::V1_0 CProfileControllerComp::OnGetProfile(
 		}
 	}
 
-	profileData.groups = std::make_unique<QList<sdl::imtauth::Profile::CGroupInfo::V1_0>>(groupList);
+	profileData.groups = std::make_optional<QList<sdl::imtauth::Profile::CGroupInfo::V1_0>>(groupList);
 
 	QList<sdl::imtauth::Profile::CPermissionInfo::V1_0> permissionList;
 
@@ -129,9 +129,9 @@ sdl::imtauth::Profile::CProfileData::V1_0 CProfileControllerComp::OnGetProfile(
 								if (subFeatureInfoPtr != nullptr){
 									sdl::imtauth::Profile::CPermissionInfo::V1_0 info;
 
-									info.id.reset(new QByteArray(subFeatureInfoPtr->GetFeatureId()));
-									info.name.reset(new QString(subFeatureInfoPtr->GetFeatureName()));
-									info.description.reset(new QString(subFeatureInfoPtr->GetFeatureDescription()));
+									info.id = QByteArray(subFeatureInfoPtr->GetFeatureId());
+									info.name = QString(subFeatureInfoPtr->GetFeatureName());
+									info.description = QString(subFeatureInfoPtr->GetFeatureDescription());
 
 									permissionList << info;
 								}
@@ -143,7 +143,7 @@ sdl::imtauth::Profile::CProfileData::V1_0 CProfileControllerComp::OnGetProfile(
 		}
 	}
 
-	profileData.permissions = std::make_unique<QList<sdl::imtauth::Profile::CPermissionInfo::V1_0>>(permissionList);
+	profileData.permissions = std::make_optional<QList<sdl::imtauth::Profile::CPermissionInfo::V1_0>>(permissionList);
 
 	return profileData;
 }
@@ -195,7 +195,7 @@ sdl::imtauth::Profile::CSetProfileResponse::V1_0 CProfileControllerComp::OnSetPr
 		return response;
 	}
 
-	response.status.reset(new bool(true));
+	response.status = true;
 
 	return response;
 }

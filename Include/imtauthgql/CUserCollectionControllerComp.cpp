@@ -65,23 +65,23 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Users::V1_0::UsersListRequestInfo requestInfo = usersListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
-		representationObject.Id.reset(new QByteArray(objectId));
+		representationObject.Id = QByteArray(objectId);
 	}
 
 	if (requestInfo.items.isUserIdRequested){
-		representationObject.UserId.reset(new QByteArray(userInfoPtr->GetId()));
+		representationObject.UserId = QByteArray(userInfoPtr->GetId());
 	}
 
 	if (requestInfo.items.isNameRequested){
-		representationObject.Name.reset(new QString(userInfoPtr->GetName()));
+		representationObject.Name = QString(userInfoPtr->GetName());
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		representationObject.Description.reset(new QString(userInfoPtr->GetDescription()));
+		representationObject.Description = QString(userInfoPtr->GetDescription());
 	}
 
 	if (requestInfo.items.isMailRequested){
-		representationObject.Mail.reset(new QString(userInfoPtr->GetMail()));
+		representationObject.Mail = QString(userInfoPtr->GetMail());
 	}
 
 	if (requestInfo.items.isSystemIdRequested){
@@ -91,7 +91,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 			systemIdList << systemInfo.systemId;
 		}
 
-		representationObject.SystemId.reset(new QByteArray(systemIdList.join(';')));
+		representationObject.SystemId = QByteArray(systemIdList.join(';'));
 	}
 
 	if (requestInfo.items.isSystemNameRequested){
@@ -106,7 +106,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 			}
 		}
 
-		representationObject.SystemName.reset(new QString(systemNameList.join(';')));
+		representationObject.SystemName = QString(systemNameList.join(';'));
 	}
 
 	if (requestInfo.items.isRolesRequested){
@@ -127,7 +127,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 			}
 		}
 
-		representationObject.Roles.reset(new QByteArray(resultList.join(';')));
+		representationObject.Roles = QByteArray(resultList.join(';'));
 	}
 
 	if (requestInfo.items.isGroupsRequested){
@@ -148,14 +148,14 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 				}
 			}
 		}
-		representationObject.Groups.reset(new QByteArray(resultList.join(';')));
+		representationObject.Groups = QByteArray(resultList.join(';'));
 	}
 
 	if (requestInfo.items.isLastConnectionRequested){
 		QDateTime lastConnection = userInfoPtr->GetLastConnection();
 		lastConnection.setTimeSpec(Qt::UTC);
 
-		representationObject.LastConnection.reset(new QString(lastConnection.toLocalTime().toString("dd.MM.yyyy hh:mm:ss")));
+		representationObject.LastConnection = QString(lastConnection.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
 	}
 
 	if (requestInfo.items.isAddedRequested){
@@ -163,7 +163,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		addedTime.setTimeSpec(Qt::UTC);
 
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.Added.reset(new QString(added));
+		representationObject.Added = QString(added);
 	}
 
 	if (requestInfo.items.isLastModifiedRequested){
@@ -171,7 +171,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		lastModifiedTime.setTimeSpec(Qt::UTC);
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.LastModified.reset(new QString(lastModified));
+		representationObject.LastModified = QString(lastModified);
 	}
 
 	return true;
@@ -406,55 +406,55 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Users::CUserData::V1_0 userData;
 
 	QByteArray objectId = userInfoPtr->GetObjectUuid();
-	userData.Id.reset(new QByteArray(objectId));
+	userData.Id = QByteArray(objectId);
 
-	userData.ProductId.reset(new QByteArray(productId));
+	userData.ProductId = QByteArray(productId);
 
 	QByteArray userName = userInfoPtr->GetId();
-	userData.Username.reset(new QByteArray(userName));
+	userData.Username = QByteArray(userName);
 
 	QString name = userInfoPtr->GetName();
-	userData.Name.reset(new QString(name));
+	userData.Name = QString(name);
 
 	QByteArray password = userInfoPtr->GetPasswordHash();
-	userData.Password.reset(new QString(password));
+	userData.Password = QString(password);
 
 	QString mail = userInfoPtr->GetMail();
-	userData.Email.reset(new QString(mail));
+	userData.Email = QString(mail);
 
 	QByteArrayList groupList = userInfoPtr->GetGroups();
 	std::sort(groupList.begin(), groupList.end());
-	userData.Groups.reset(new QByteArray(groupList.join(';')));
+	userData.Groups = QByteArray(groupList.join(';'));
 
 	QByteArrayList roleList = userInfoPtr->GetRoles(productId);
 	std::sort(roleList.begin(), roleList.end());
-	userData.Roles.reset(new QByteArray(roleList.join(';')));
+	userData.Roles = QByteArray(roleList.join(';'));
 
 	QByteArray permissions = userInfoPtr->GetPermissions(productId).join(';');
 	std::sort(permissions.begin(), permissions.end());
-	userData.Permissions.reset(new QByteArray(permissions));
+	userData.Permissions = QByteArray(permissions);
 
 	QList<sdl::imtauth::Users::CSystemInfo::V1_0> list;
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
 		sdl::imtauth::Users::CSystemInfo::V1_0 info;
 
-		info.Id.reset(new QByteArray(systemInfo.systemId));
+		info.Id = QByteArray(systemInfo.systemId);
 
 		if (systemInfo.systemId.isEmpty()){
-			info.Name.reset(new QString("Internal"));
+			info.Name = QString("Internal");
 		}
 		else{
-			info.Name.reset(new QString(systemInfo.systemName));
+			info.Name = QString(systemInfo.systemName);
 		}
 
-		info.Enabled.reset(new bool(systemInfo.enabled));
+		info.Enabled = bool(systemInfo.enabled);
 
 		list << info;
 	}
-	userData.SystemInfos = std::make_unique<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
+	userData.SystemInfos = std::make_optional<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
 
-	representationPayload.UserData = std::make_unique<sdl::imtauth::Users::CUserData::V1_0>(userData);
+	representationPayload.UserData = std::make_optional<sdl::imtauth::Users::CUserData::V1_0>(userData);
 
 	return true;
 }

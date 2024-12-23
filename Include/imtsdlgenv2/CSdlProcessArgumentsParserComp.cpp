@@ -66,6 +66,16 @@ bool CSdlProcessArgumentsParserComp::ProcessCommandLineOptions(const QCommandLin
 		}
 	}
 
+	// additional checks. to be removed in V2
+	if (IsGenerateMode()){
+		if (!GetJoinRules().isEmpty()){
+			SendWarningMessage(0, "-J option is DEPRECATED! WILL NOT BE SUPPORTED LATER!!!! Please avoid to use it.");
+		}
+		if (!GetNamespace().isEmpty()){
+			SendWarningMessage(0, "-N option is DEPRECATED! WILL NOT BE SUPPORTED LATER!!!! Please avoid to use it. Declare namespace in a schema file.");
+		}
+	}
+
 	return true;
 }
 

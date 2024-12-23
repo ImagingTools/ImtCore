@@ -52,7 +52,7 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 CDocumentRevisionControl
 	const imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
 	Q_ASSERT(objectCollectionPtr != nullptr);
 
-	response.DocumentId = std::make_unique<QByteArray>(documentId);
+	response.DocumentId = std::make_optional<QByteArray>(documentId);
 
 	const imtbase::IRevisionController* revisionControllerPtr = objectCollectionPtr->GetRevisionController();
 	if (revisionControllerPtr == nullptr){
@@ -75,13 +75,13 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 CDocumentRevisionControl
 		sdl::imtbase::DocumentRevision::CRevisionItem::V1_0 revisionItem;
 
 		if (revisionInfo.isRevisionAvailable){
-			response.ActiveRevision = std::make_unique<int>(revisionInfo.revision);
+			response.ActiveRevision = std::make_optional<int>(revisionInfo.revision);
 		}
 
-		revisionItem.Revision = std::make_unique<int>(revisionInfo.revision);
-		revisionItem.User = std::make_unique<QString>(revisionInfo.user);
-		revisionItem.IsActive = std::make_unique<bool>(revisionInfo.isRevisionAvailable);
-		revisionItem.Timestamp = std::make_unique<QString>(revisionInfo.timestamp.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
+		revisionItem.Revision = std::make_optional<int>(revisionInfo.revision);
+		revisionItem.User = std::make_optional<QString>(revisionInfo.user);
+		revisionItem.IsActive = std::make_optional<bool>(revisionInfo.isRevisionAvailable);
+		revisionItem.Timestamp = std::make_optional<QString>(revisionInfo.timestamp.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
 
 		if (!revisionInfo.comment.isEmpty() && documentChangeGeneratorPtr != nullptr){
 			imtbase::CObjectCollection changeCollection;
@@ -93,7 +93,7 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 CDocumentRevisionControl
 			if (changeCollection.Serialize(archive)){
 				QString operationDescription = documentChangeGeneratorPtr->GetOperationDescription(changeCollection, languageId);
 				if (!operationDescription.isEmpty()){
-					revisionItem.Description = std::make_unique<QString>(operationDescription);
+					revisionItem.Description = std::make_optional<QString>(operationDescription);
 				}
 			}
 		}
@@ -101,7 +101,7 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 CDocumentRevisionControl
 		revisionItemList << revisionItem;
 	}
 
-	response.Revisions = std::make_unique<QList<sdl::imtbase::DocumentRevision::CRevisionItem::V1_0>>(revisionItemList);
+	response.Revisions = std::make_optional<QList<sdl::imtbase::DocumentRevision::CRevisionItem::V1_0>>(revisionItemList);
 
 	return response;
 }
@@ -142,7 +142,7 @@ sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0 CDocumentRevision
 		return response;
 	}
 
-	response.Result = std::make_unique<bool>(ok);
+	response.Result = std::make_optional<bool>(ok);
 
 	return response;
 }
@@ -191,7 +191,7 @@ sdl::imtbase::DocumentRevision::CDeleteRevisionResponse::V1_0 CDocumentRevisionC
 
 	bool ok = revisionControllerPtr->DeleteRevision(*objectCollectionPtr, documentId, revisionNumber);
 
-	response.Result = std::make_unique<bool>(ok);
+	response.Result = std::make_optional<bool>(ok);
 
 	return response;
 }

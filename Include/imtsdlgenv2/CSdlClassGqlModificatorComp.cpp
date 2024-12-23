@@ -200,17 +200,17 @@ void CSdlClassGqlModificatorComp::AddCustomFieldReadFromRequestCode(QTextStream&
 
 	if (!optional && field.IsRequired()){
 		AddCheckCustomRequiredValueCode(stream, field);
-		FeedStreamHorizontally(stream);
 
 		AddSetCustomValueToObjectCode(stream, field, optional);
+
 		FeedStream(stream, 1, false);
 	}
 	else {
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr != nullptr){");
 		FeedStream(stream, 1, false);
 
-		FeedStreamHorizontally(stream, 2);
 		AddSetCustomValueToObjectCode(stream, field, optional, 2);
+
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
@@ -504,7 +504,7 @@ void CSdlClassGqlModificatorComp::AddSetValueToObjectCode(QTextStream& stream, c
 	// reset pointer for object
 	stream << QStringLiteral("object.");
 	stream << field.GetId();
-	stream << QStringLiteral(".reset(new ");
+	stream << QStringLiteral(" = ");
 	stream << structNameConverter.GetString();
 	stream << field.GetId() << '(';
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
@@ -548,10 +548,10 @@ void CSdlClassGqlModificatorComp::AddSetCustomValueToObjectCode(QTextStream& str
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("object.");
 	stream << field.GetId();
-	stream << QStringLiteral(".reset(new ");
+	stream << QStringLiteral(" = ");
 	structNameConverter.addVersion = true;
 	stream << structNameConverter.GetString();
-	stream << QStringLiteral(");");
+	stream << QStringLiteral("();");
 	FeedStream(stream, 1, false);
 
 	// declare bool variable and read data method
@@ -563,9 +563,9 @@ void CSdlClassGqlModificatorComp::AddSetCustomValueToObjectCode(QTextStream& str
 	stream << field.GetId() << QStringLiteral(", *");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr);");
 	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, hIndents);
 
 	// check the result of reading
+	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("if (!is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read){");
 	FeedStream(stream, 1, false);
 

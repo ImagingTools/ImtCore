@@ -72,7 +72,7 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 		return QString();
 	}
 
-	if (!(sdlEntryPtr == nullptr ^ sdlFieldPtr == nullptr)){
+	if (!((sdlEntryPtr == nullptr) ^ (sdlFieldPtr == nullptr))){
 		Q_ASSERT_X(false, "sdlEntryPtr AND sdlFieldPtr are both provided. You MUST provide only ONE!", __func__);
 
 		return QString();
@@ -266,20 +266,14 @@ QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlFi
 QString CSdlGenTools::GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull, const QString& objectName)
 {
 	QString retVal;
+	if (checkNull){
+		retVal += '!';
+	}
 	if (!objectName.isEmpty()){
 		retVal = objectName + '.';
 	}
 
-	retVal += sdlField.GetId() + ' ';
-	if (checkNull){
-		retVal += '=';
-	}
-	else {
-		retVal += '!';
-	}
-
-	retVal += QStringLiteral("= nullptr");
-
+	retVal += sdlField.GetId();
 	return retVal;
 }
 
@@ -294,11 +288,9 @@ QString CSdlGenTools::GetSettingValueString(
 	QString retVal = objectName;
 
 	retVal += '.' + sdlField.GetId();
-	retVal += QStringLiteral(" = std::make_unique<");
-	retVal += OptListConvertTypeWithNamespaceStruct(sdlField, relatedNamespace, listProvider, true);
-	retVal += QStringLiteral(">(");
+	retVal += QStringLiteral(" = ");
 	retVal += variableName;
-	retVal += QStringLiteral(");");
+	retVal += QStringLiteral(";");
 
 	return retVal;
 }

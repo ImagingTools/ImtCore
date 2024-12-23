@@ -29,23 +29,23 @@ sdl::imtapp::Application::CApplicationInfo::V1_0 CApplicationInfoControllerComp:
 	quint32 versionNumber;
 	if (versionInfo.GetVersionNumber(mainVersion, versionNumber)){
 		QString version = versionInfo.GetEncodedVersionName(mainVersion, versionNumber);
-		applicationInfo.Version = std::make_unique<QString>(version);
+		applicationInfo.Version = std::make_optional<QString>(version);
 	}
 
 	QString appId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID);
-	applicationInfo.ApplicationId = std::make_unique<QString>(appId);
+	applicationInfo.ApplicationId = std::make_optional<QString>(appId);
 
 	QString appName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_NAME);
-	applicationInfo.ApplicationName = std::make_unique<QString>(appName);
+	applicationInfo.ApplicationName = std::make_optional<QString>(appName);
 
 	QString productName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_PRODUCT_NAME);
-	applicationInfo.ProductName = std::make_unique<QString>(productName);
+	applicationInfo.ProductName = std::make_optional<QString>(productName);
 
 	QString companyName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_COMPANY_NAME);
-	applicationInfo.CompanyName = std::make_unique<QString>(companyName);
+	applicationInfo.CompanyName = std::make_optional<QString>(companyName);
 
 	QString type = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_TYPE);
-	applicationInfo.ApplicationType = std::make_unique<QString>(type);
+	applicationInfo.ApplicationType = std::make_optional<QString>(type);
 
 	return applicationInfo;
 }

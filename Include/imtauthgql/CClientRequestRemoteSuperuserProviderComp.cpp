@@ -22,10 +22,10 @@ bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& /*error
 	namespace userssdl = sdl::imtauth::Users;
 
 	userssdl::V1_0::UserItemRequestArguments arguments;
-	arguments.input.Id.reset(new QByteArray(*m_superuserIdAttrPtr));
+	arguments.input.Id = QByteArray(*m_superuserIdAttrPtr);
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.ProductId.reset(new QByteArray(m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8()));
+		arguments.input.ProductId = QByteArray(m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8());
 	}
 
 	imtgql::CGqlRequest gqlRequest;

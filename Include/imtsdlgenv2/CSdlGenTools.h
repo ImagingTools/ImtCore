@@ -75,7 +75,7 @@ public:
 	/**
 		\brief Generates a string, checks, if a field of object, named \c objectName, defined or not
 		\param sdlField - field to be checked
-		\param checkNull - if true - null expect (== nullptr); if false - NON null expected (!= nullptr)
+		\param checkNull - if true - null (NON VALID) expected, (== nullptr); if false - NON null (VALID) expected (!= nullptr)
 		\param objectName - name of oject, holds a property
 	 */
 	[[nodiscard]] static QString GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull = true, const QString& objectName = "object");

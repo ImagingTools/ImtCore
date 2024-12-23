@@ -61,7 +61,6 @@ public:
 private:
 	bool BeginClassFiles(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude, bool addSelfHeaderInclude);
 	bool BeginHeaderClassFile(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude);
-	bool EndHeaderClassFile(const imtsdl::CSdlType& sdlType);
 	bool BeginSourceClassFile(const imtsdl::CSdlType& sdlType, bool addSelfHeaderInclude);
 	bool EndClassFiles(const imtsdl::CSdlType& sdlType);
 	void AbortCurrentProcessing();
@@ -73,9 +72,6 @@ private:
 				QTextStream& stream,
 				const imtsdl::CSdlType& sdlType,
 				uint indents = 1);
-
-	// comfort methods
-	void WriteTakeOverPropsFromOtherObject(QTextStream& stream, const imtsdl::CSdlType& sdlType) const;
 
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
