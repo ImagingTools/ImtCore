@@ -443,9 +443,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		return nullptr;
 	}
 
-	QString currentName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-	if (currentName != name){
-		m_objectCollectionCompPtr->SetElementName(objectId, name);
+	const bool isNameUpdateRquired = inputParamPtr->GetFieldIds().contains("name");
+	if (isNameUpdateRquired){
+		QString currentName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+		if (currentName != name){
+			m_objectCollectionCompPtr->SetElementName(objectId, name);
+		}
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
