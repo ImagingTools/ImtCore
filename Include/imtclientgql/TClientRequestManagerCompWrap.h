@@ -61,7 +61,7 @@ protected:
 					object = object.value(request.GetCommandId()).toObject();
 				}
 
-				return SdlReader::ReadFromJsonObject(responseModel, object);
+				return responseModel.ReadFromJsonObject(object);
 			}
 		}
 

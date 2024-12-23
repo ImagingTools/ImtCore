@@ -1310,15 +1310,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("const bool isRepresentationWritted = ");
 
-		if (operationType == imtsdl::CSdlDocumentType::OT_GET){
-			getStructNameConverter.addVersion = false;
-			stream << getStructNameConverter.GetString();
-		}
-		else {
-			structNameConverter.addVersion = false;
-			stream << structNameConverter.GetString();
-		}
-		stream << ("::WriteToModel(representationObject, dataModel");
+		stream << QStringLiteral("representationObject.WriteToModel(dataModel");
 		// [-||-] add index for list
 		if (operationType == imtsdl::CSdlDocumentType::OT_LIST){
 			stream << QStringLiteral(", itemIndex");

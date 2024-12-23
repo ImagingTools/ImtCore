@@ -902,10 +902,9 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 	// add me to temp object and checks
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("if (!");
-	stream << structNameConverter.GetString();
-	stream << QStringLiteral("::WriteToGraphQlObject(requestArguments.");
+	stream << QStringLiteral("requestArguments.");
 	stream << field.GetId();
-	stream << QStringLiteral(", ");
+	stream << (".WriteToGraphQlObject(");
 	stream << dataObjectVariableName;
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
@@ -1016,9 +1015,8 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& 
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
 	// declare bool variable and read data in private property
 	stream << QStringLiteral("const bool is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read = ");
-	stream << structNameConverter.GetString();
-	stream <<  QStringLiteral("::ReadFromGraphQlObject(");
-	stream << QStringLiteral("m_requestedArguments.") << field.GetId() << QStringLiteral(", *");
+	stream << QStringLiteral("m_requestedArguments.") << field.GetId();
+	stream <<  QStringLiteral(".ReadFromGraphQlObject(*");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr);");
 	FeedStream(stream, 1, false);
 

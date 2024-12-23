@@ -592,9 +592,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 	// [1] write payload variable in model and create variable, to check if it success
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("const bool isModelCreated = ");
-	structNameConverter.addVersion = false;
-	stream << structNameConverter.GetString();
-	stream << QStringLiteral("::WriteToModel(replyPayload, *dataModelPtr);");
+	stream << QStringLiteral("replyPayload.WriteToModel(*dataModelPtr);");
 	FeedStream(stream, 1, false);
 
 	// [1->2] check if payload write to TreeModel is failed

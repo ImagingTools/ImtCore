@@ -285,9 +285,14 @@ QString CSdlGenTools::GetSettingValueString(
 			const QString& variableName,
 			const QString& objectName)
 {
-	QString retVal = objectName;
+	QString retVal;
+	retVal.append('*');
 
-	retVal += '.' + sdlField.GetId();
+	if (!objectName.isEmpty()){
+		retVal += objectName + '.';
+	}
+
+	retVal += sdlField.GetId();
 	retVal += QStringLiteral(" = ");
 	retVal += variableName;
 	retVal += QStringLiteral(";");

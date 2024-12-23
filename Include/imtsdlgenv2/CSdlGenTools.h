@@ -78,16 +78,16 @@ public:
 		\param checkNull - if true - null (NON VALID) expected, (== nullptr); if false - NON null (VALID) expected (!= nullptr)
 		\param objectName - name of oject, holds a property
 	 */
-	[[nodiscard]] static QString GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull = true, const QString& objectName = "object");
+	[[nodiscard]] static QString GetNullCheckString(const imtsdl::CSdlField& sdlField, bool checkNull = true, const QString& objectName = QString());
 
 	[[nodiscard]] static QString GetSettingValueString(
 				const imtsdl::CSdlField& sdlField,
 				const QString& relatedNamespace,
 				const imtsdl::ISdlTypeListProvider& listProvider,
 				const QString& variableName,
-				const QString& objectName = "object");
+				const QString& objectName = QString());
 
-	static void AddArrayInternalChecksFail(QTextStream& stream, const imtsdl::CSdlField& field, bool checkEmpty, const QString& objectName = "object", uint hIndents = 1);
+	static void AddArrayInternalChecksFail(QTextStream& stream, const imtsdl::CSdlField& field, bool checkEmpty, const QString& objectName = QString(), uint hIndents = 1);
 
 	template <class SdlEntryClass>
 	[[nodiscard]] static QString GetSdlEntryVersion(const SdlEntryClass& entry);

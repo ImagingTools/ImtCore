@@ -29,19 +29,13 @@ bool CSdlClassJsonModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType
 	QTextStream ofStream(m_headerFilePtr);
 
 	// add method definitions
-	ofStream << QStringLiteral("\t[[nodiscard]] static bool WriteToJsonObject(const ");
-	ofStream << GetSdlEntryVersion(sdlType);
-	ofStream << ("& object, QJsonObject& jsonObject);");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;");
 	FeedStream(ofStream, 1, false);
 
-	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromJsonObject(");
-	ofStream << GetSdlEntryVersion(sdlType);
-	ofStream << QStringLiteral("& object, const QJsonObject& jsonObject);");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);");
 	FeedStream(ofStream, 1);
 
-	ofStream << QStringLiteral("\t[[nodiscard]] static bool OptReadFromJsonObject(");
-	ofStream << GetSdlEntryVersion(sdlType);
-	ofStream << QStringLiteral("& object, const QJsonObject& jsonObject);");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);");
 	FeedStream(ofStream, 2);
 
 	return true;
@@ -59,14 +53,16 @@ bool CSdlClassJsonModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType
 
 	QTextStream ofStream(m_sourceFilePtr);
 
+	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
+	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	structNameConverter.addVersion = true;
+
 	// add method implementation
 
 	// read method implementation
-	ofStream << QStringLiteral("bool C");
-	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::ReadFromJsonObject(");
-	ofStream << GetSdlEntryVersion(sdlType);
-	ofStream << QStringLiteral("& object, const QJsonObject& jsonObject)\n{");
+	ofStream << QStringLiteral("bool ");
+	ofStream << structNameConverter.GetString();
+	ofStream << QStringLiteral("::ReadFromJsonObject(const QJsonObject& jsonObject)\n{");
 
 	// add write logic for each field
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
@@ -80,11 +76,9 @@ bool CSdlClassJsonModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType
 	FeedStream(ofStream, 3);
 
 	// opt read method implementation
-	ofStream << QStringLiteral("bool C");
-	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::OptReadFromJsonObject(");
-	ofStream << GetSdlEntryVersion(sdlType);
-	ofStream << QStringLiteral("& object, const QJsonObject& jsonObject)\n{");
+	ofStream << QStringLiteral("bool ");
+	ofStream << structNameConverter.GetString();
+	ofStream << QStringLiteral("::OptReadFromJsonObject(const QJsonObject& jsonObject)\n{");
 	FeedStream(ofStream, 1, false);
 
 	// add write logic for each field
@@ -97,11 +91,9 @@ bool CSdlClassJsonModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType
 	ofStream << QStringLiteral("\treturn true;\n}");
 	FeedStream(ofStream, 3);
 
-	ofStream << QStringLiteral("bool C");
-	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::WriteToJsonObject(const ");
-	ofStream << GetSdlEntryVersion(sdlType);
-	ofStream << ("& object, QJsonObject& jsonObject)\n{");
+	ofStream << QStringLiteral("bool ");
+	ofStream << structNameConverter.GetString();
+	ofStream << QStringLiteral("::WriteToJsonObject(QJsonObject& jsonObject) const\n{");
 
 	// add write logic for each field
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
@@ -168,7 +160,7 @@ void CSdlClassJsonModificatorComp::AddFieldWriteToJsonCode(QTextStream& stream, 
 
 		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("jsonObject[\"") << field.GetId() << QStringLiteral("\"] = ");
-		stream << QStringLiteral("QJsonValue::fromVariant(*object.");
+		stream << QStringLiteral("QJsonValue::fromVariant(*");
 		stream << field.GetId() << QStringLiteral(");");
 	}
 	else {
@@ -178,7 +170,7 @@ void CSdlClassJsonModificatorComp::AddFieldWriteToJsonCode(QTextStream& stream, 
 
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("jsonObject[\"") << field.GetId() << QStringLiteral("\"] = ");
-		stream << QStringLiteral("QJsonValue::fromVariant(*object.");
+		stream << QStringLiteral("QJsonValue::fromVariant(*");
 		stream << field.GetId() << QStringLiteral(");");
 		stream << QStringLiteral("\n\t}");
 	}
@@ -310,10 +302,8 @@ void CSdlClassJsonModificatorComp::AddCustomFieldWriteToJsonImplCode(
 	stream << QStringLiteral("const bool is");
 	stream << GetCapitalizedValue(field.GetId());
 	stream << QStringLiteral("Added = ");
-	stream << structNameConverter.GetString();
-	stream << QStringLiteral("::WriteToJsonObject(*object.");
 	stream << field.GetId();
-	stream << QStringLiteral(", ");
+	stream << QStringLiteral("->WriteToJsonObject(");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral("Json);");
 	FeedStream(stream, 1, false);
@@ -382,14 +372,14 @@ void CSdlClassJsonModificatorComp::AddArrayFieldWriteToJsonImplCode(
 	const QString dataIndexVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index");
 	stream << QStringLiteral("for (qsizetype ") << dataIndexVarName;
 	stream << QStringLiteral(" = 0; ") << dataIndexVarName;
-	stream << QStringLiteral(" < object.") << field.GetId();
+	stream << QStringLiteral(" < ") << field.GetId();
 	stream << QStringLiteral("->size(); ++") << dataIndexVarName;
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
 	// inLoop: add item
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << newJsonArrayVarName <<  QStringLiteral(" << QJsonValue::fromVariant(object.") << field.GetId();
+	stream << newJsonArrayVarName <<  QStringLiteral(" << QJsonValue::fromVariant(") << field.GetId();
 	stream << QStringLiteral("->at(") << dataIndexVarName << QStringLiteral("));");
 	FeedStream(stream, 1, false);
 
@@ -437,7 +427,6 @@ void CSdlClassJsonModificatorComp::AddCustomFieldReadFromJsonImplCode(
 
 	// reset pointer for object
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("object.");
 	stream << field.GetId();
 	stream << QStringLiteral(" = ");
 	structNameConverter.addVersion = true;
@@ -450,11 +439,8 @@ void CSdlClassJsonModificatorComp::AddCustomFieldReadFromJsonImplCode(
 	stream << QStringLiteral("const bool is");
 	stream << GetCapitalizedValue(field.GetId());
 	stream << QStringLiteral("Readed = ");
-	structNameConverter.addVersion = false;
-	stream << structNameConverter.GetString();
-	stream << QStringLiteral("::ReadFromJsonObject(*object.");
 	stream << field.GetId();
-	stream << QStringLiteral(", jsonObject[\"");
+	stream << QStringLiteral("->ReadFromJsonObject(jsonObject[\"");
 	stream << field.GetId();
 	stream << QStringLiteral("\"].toObject());");
 	FeedStream(stream, 1, false);
@@ -632,7 +618,7 @@ void CSdlClassJsonModificatorComp:: AddCustomArrayFieldWriteToJsonImplCode(
 	const QString dataIndexVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index");
 	stream << QStringLiteral("for (qsizetype ") << dataIndexVarName;
 	stream << QStringLiteral(" = 0; ") << dataIndexVarName;
-	stream << QStringLiteral(" < object.") << field.GetId();
+	stream << QStringLiteral(" < ") << field.GetId();
 	stream << QStringLiteral("->size(); ++") << dataIndexVarName;
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
@@ -646,13 +632,11 @@ void CSdlClassJsonModificatorComp:: AddCustomArrayFieldWriteToJsonImplCode(
 	// inLoop: add item and check
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("if (!");
-	structNameConverter.addVersion = false;
-	stream << structNameConverter.GetString();
-	stream << QStringLiteral("::WriteToJsonObject(object.");
 	stream << field.GetId();
 	stream << QStringLiteral("->at(");
 	stream << dataIndexVarName;
-	stream << QStringLiteral("), ");
+	stream << QStringLiteral(")");
+	stream << QStringLiteral(".WriteToJsonObject(");
 	stream << newJsonObjectVarName;
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
@@ -771,15 +755,16 @@ void CSdlClassJsonModificatorComp:: AddCustomArrayFieldReadToJsonImplCode(
 	// inLoop: read and checks
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("if (!");
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
-	stream << QStringLiteral("::ReadFromJsonObject(");
-	stream << GetDecapitalizedValue(field.GetId()) << ',' << ' ';
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral(".ReadFromJsonObject(");
 	stream << arrayVariableName << '[';
 	stream << indexVariableName << QStringLiteral("].toObject())){");
 	FeedStream(stream, 1, false);
+
 	FeedStreamHorizontally(stream, hIndents + 2);
 	stream << QStringLiteral("return false;");
 	FeedStream(stream, 1, false);
+
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << '}';
 	FeedStream(stream, 1, false);

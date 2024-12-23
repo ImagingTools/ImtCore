@@ -472,6 +472,11 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 	}
 
 	QTextStream headerStream(m_headerFilePtr.GetPtr());
+	// end of struct
+	FeedStreamHorizontally(headerStream, 1);
+	headerStream << '}' << ';';
+	FeedStream(headerStream, 1, false);
+
 	headerStream << QStringLiteral("};");
 	FeedStream(headerStream, 3, false);
 	if (!namespaceString.isEmpty()){
@@ -594,11 +599,6 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 		stream << field.GetId() << ';';
 		FeedStream(stream, 1, false);
 	}
-	FeedStream(stream, 1, false);
-
-	// end of struct
-	FeedStreamHorizontally(stream, indents);
-	stream << '}' << ';';
 	FeedStream(stream, 1, false);
 }
 

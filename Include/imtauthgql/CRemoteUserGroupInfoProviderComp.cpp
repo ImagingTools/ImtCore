@@ -58,7 +58,7 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 		}
 
 		QJsonObject object;
-		if (!groupssdl::CGroupData::WriteToJsonObject(groupData, object)){
+		if (!groupData.WriteToJsonObject(object)){
 			return nullptr;
 		}
 

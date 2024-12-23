@@ -29,19 +29,16 @@ bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType&
 	QTextStream ofStream(m_headerFilePtr);
 
 	// add method definitions
-	ofStream << QStringLiteral("\t[[nodiscard]] static bool WriteToGraphQlObject(const ");
-	ofStream << GetSdlEntryVersion(sdlType);
-	ofStream << ("& object, ::imtgql::CGqlObject& request);");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToGraphQlObject(");
+	ofStream << ("::imtgql::CGqlObject& request) const;");
 	FeedStream(ofStream, 1, false);
 	
-	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromGraphQlObject(");
-	ofStream << GetSdlEntryVersion(sdlType);
-	ofStream << QStringLiteral("& object, const ::imtgql::CGqlObject& request);");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool ReadFromGraphQlObject(");
+	ofStream << QStringLiteral("const ::imtgql::CGqlObject& request);");
 	FeedStream(ofStream, 1);
 	
-	ofStream << QStringLiteral("\t[[nodiscard]] static bool OptReadFromGraphQlObject(");
-	ofStream << GetSdlEntryVersion(sdlType);
-	ofStream << QStringLiteral("& object, const ::imtgql::CGqlObject& request);");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool OptReadFromGraphQlObject(");
+	ofStream << QStringLiteral("const ::imtgql::CGqlObject& request);");
 	FeedStream(ofStream, 2);
 
 	return true;
@@ -59,12 +56,15 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 
 	QTextStream ofStream(m_sourceFilePtr);
 
+	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
+	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	structNameConverter.addVersion = true;
+
 	// add method implementation
-	ofStream << QStringLiteral("bool C");
-	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::WriteToGraphQlObject(const ");
-	ofStream << GetSdlEntryVersion(sdlType);
-	ofStream << ("& object, ::imtgql::CGqlObject& request)\n{");
+	ofStream << QStringLiteral("bool ");
+	ofStream << structNameConverter.GetString();
+	ofStream << QStringLiteral("::WriteToGraphQlObject(");
+	ofStream << ("::imtgql::CGqlObject& request) const\n{");
 	FeedStream(ofStream, 1, false);
 
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
@@ -75,11 +75,10 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 	FeedStream(ofStream, 2);
 
 	// read method implementation
-	ofStream << QStringLiteral("bool C");
-	ofStream << sdlType.GetName();
+	ofStream << QStringLiteral("bool ");
+	ofStream << structNameConverter.GetString();
 	ofStream << QStringLiteral("::ReadFromGraphQlObject(");
-	ofStream << GetSdlEntryVersion(sdlType);
-	ofStream << QStringLiteral("& object, const ::imtgql::CGqlObject& request)\n{");
+	ofStream << QStringLiteral("const ::imtgql::CGqlObject& request)\n{");
 	FeedStream(ofStream, 1, false);
 
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
@@ -90,11 +89,10 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 	FeedStream(ofStream, 3);
 
 	// Opt read method implementation
-	ofStream << QStringLiteral("bool C");
-	ofStream << sdlType.GetName();
+	ofStream << QStringLiteral("bool ");
+	ofStream << structNameConverter.GetString();
 	ofStream << QStringLiteral("::OptReadFromGraphQlObject(");
-	ofStream << GetSdlEntryVersion(sdlType);
-	ofStream << QStringLiteral("& object, const ::imtgql::CGqlObject& request)\n{");
+	ofStream << QStringLiteral("const ::imtgql::CGqlObject& request)\n{");
 	FeedStream(ofStream, 1, false);
 
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
@@ -304,7 +302,7 @@ void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& 
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("request.InsertField(");
 	stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
-	stream << QStringLiteral("QVariant(*object.") << field.GetId() << ')';
+	stream << QStringLiteral("QVariant(*") << field.GetId() << ')';
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
 }
@@ -326,14 +324,14 @@ void CSdlClassGqlModificatorComp::AddScalarListFieldWriteToRequestCode(QTextStre
 	const QString dataIndexVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index");
 	stream << QStringLiteral("for (qsizetype ") << dataIndexVarName;
 	stream << QStringLiteral(" = 0; ") << dataIndexVarName;
-	stream << QStringLiteral(" < object.") << field.GetId();
+	stream << QStringLiteral(" < ") << field.GetId();
 	stream << QStringLiteral("->size(); ++") << dataIndexVarName;
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << tempListVarName;
-	stream << QStringLiteral(" << object.");
+	stream << QStringLiteral(" << ");
 	stream << field.GetId();
 	stream << QStringLiteral("->at(");
 	stream << dataIndexVarName;
@@ -368,10 +366,8 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 	// add me to temp object and checks
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("if (!");
-	stream << structNameConverter.GetString();
-	stream << QStringLiteral("::WriteToGraphQlObject(*object.");
 	stream << field.GetId();
-	stream << QStringLiteral(", ");
+	stream << QStringLiteral("->WriteToGraphQlObject(");
 	stream << dataObjectVariableName;
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
@@ -413,7 +409,7 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStre
 	const QString dataIndexVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index");
 	stream << QStringLiteral("for (qsizetype ") << dataIndexVarName;
 	stream << QStringLiteral(" = 0; ") << dataIndexVarName;
-	stream << QStringLiteral(" < object.") << field.GetId();
+	stream << QStringLiteral(" < ") << field.GetId();
 	stream << QStringLiteral("->size(); ++") << dataIndexVarName;
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
@@ -426,14 +422,13 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStre
 	// inLoop: add me to temp object and checks
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("if (!");
-	structNameConverter.addVersion = false;
-	stream << structNameConverter.GetString();
-	stream << QStringLiteral("::WriteToGraphQlObject(object.");
 	stream << field.GetId();
 	stream << QStringLiteral("->at(");
 	stream << dataIndexVarName;
-	stream << QStringLiteral("), ");
-	stream << dataObjectVariableName << QStringLiteral(")){");
+	stream << QStringLiteral(")");
+	stream << QStringLiteral(".WriteToGraphQlObject(");
+	stream << dataObjectVariableName;
+	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 2);
@@ -502,7 +497,6 @@ void CSdlClassGqlModificatorComp::AddSetValueToObjectCode(QTextStream& stream, c
 	structNameConverter.addVersion = true;
 
 	// reset pointer for object
-	stream << QStringLiteral("object.");
 	stream << field.GetId();
 	stream << QStringLiteral(" = ");
 	stream << structNameConverter.GetString();
@@ -546,7 +540,6 @@ void CSdlClassGqlModificatorComp::AddSetCustomValueToObjectCode(QTextStream& str
 
 	// reset pointer for object
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("object.");
 	stream << field.GetId();
 	stream << QStringLiteral(" = ");
 	structNameConverter.addVersion = true;
@@ -557,10 +550,14 @@ void CSdlClassGqlModificatorComp::AddSetCustomValueToObjectCode(QTextStream& str
 	// declare bool variable and read data method
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("const bool is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read = ");
-	structNameConverter.addVersion = false;
-	stream << structNameConverter.GetString();
-	stream << QStringLiteral("::ReadFromGraphQlObject(*object.");
-	stream << field.GetId() << QStringLiteral(", *");
+	stream << field.GetId();
+	stream << QStringLiteral("->");
+
+	if (optional){
+		stream << QStringLiteral("Opt");
+	}
+
+	stream << QStringLiteral("ReadFromGraphQlObject(*");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr);");
 	FeedStream(stream, 1, false);
 
@@ -649,12 +646,14 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 	// read
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("if (!");
-	structNameConverter.listWrap = false;
-	structNameConverter.addVersion = false;
-	stream << structNameConverter.GetString();
-	stream << QStringLiteral("::ReadFromGraphQlObject(");
 	stream << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral(", *");
+	stream << QStringLiteral(".");
+
+	if (optional) {
+		stream << QStringLiteral("Opt");
+	}
+
+	stream << QStringLiteral("ReadFromGraphQlObject(*");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr)){");
 	FeedStream(stream, 1, false);
 
