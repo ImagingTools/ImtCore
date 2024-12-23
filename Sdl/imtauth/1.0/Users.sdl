@@ -37,9 +37,9 @@ type UsersListPayload {
 }
 
 type SystemInfo {
-	Id: ID!
-	Name: String!
-	Enabled: Bool!
+	Id: ID
+	Name: String
+	Enabled: Bool
 }
 
 type UserData {
