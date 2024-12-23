@@ -374,16 +374,14 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_GET);
 	}
 
-	if (operationsList.contains(imtsdl::CSdlDocumentType::OT_UPDATE))
-	{
+	if (operationsList.contains(imtsdl::CSdlDocumentType::OT_UPDATE)){
 		FeedStreamHorizontally(ifStream, 1);
 		ifStream << QStringLiteral("virtual bool UpdateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QString& errorMessage) const override;");
 		FeedStream(ifStream, 1, false);
 		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_UPDATE);
 	}
 
-	if (operationsList.contains(imtsdl::CSdlDocumentType::OT_INSERT))
-	{
+	if (operationsList.contains(imtsdl::CSdlDocumentType::OT_INSERT)){
 		FeedStreamHorizontally(ifStream, 1);
 		ifStream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const override;");
 		FeedStream(ifStream, 1, false);
