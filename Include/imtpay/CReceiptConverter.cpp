@@ -414,7 +414,7 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 		iprm::IParamsSet* operatorParamsPtr = dynamic_cast<iprm::IParamsSet*>(params.GetEditableParameter(ReceiptParamKeys::Operator));
 		if (operatorParamsPtr != nullptr){
 			ReceiptV1::COperator receiptOperator = receipt.GetOperatorData();
-			iprm::IIdParam* idParamPtr = dynamic_cast<iprm::IIdParam*>(params.GetEditableParameter( ReceiptClientKeys::Id));
+			iprm::IIdParam* idParamPtr = dynamic_cast<iprm::IIdParam*>(operatorParamsPtr->GetEditableParameter( ReceiptClientKeys::Id));
 			if (idParamPtr != nullptr){
 				idParamPtr->SetId(receiptOperator.GetId().toUtf8());
 			}
@@ -428,7 +428,7 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 	if (receipt.HasClient()){
 		iprm::IParamsSet* clientParamsPtr = dynamic_cast<iprm::IParamsSet*>(params.GetEditableParameter(ReceiptParamKeys::Client));
 		if (clientParamsPtr != nullptr){
-			ReceiptV1::CClient clientInfo;
+			ReceiptV1::CClient clientInfo = receipt.GetClient();
 			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::Address, clientInfo.GetAddress());
 			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::EMail, clientInfo.GetEMail());
 			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::PhoneNumber, clientInfo.GetPhoneNumber());
@@ -438,7 +438,7 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::IdentityDocumentCode, clientInfo.GetIdentityDocumentCode());
 			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::IdentityDocumentData, clientInfo.GetIdentityDocumentData());
 
-			iprm::IIdParam* idParamPtr = dynamic_cast<iprm::IIdParam*>(params.GetEditableParameter( ReceiptClientKeys::Id));
+			iprm::IIdParam* idParamPtr = dynamic_cast<iprm::IIdParam*>(clientParamsPtr->GetEditableParameter( ReceiptClientKeys::Id));
 			if (idParamPtr != nullptr){
 				idParamPtr->SetId(clientInfo.GetId().toUtf8());
 			}
