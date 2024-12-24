@@ -80,42 +80,6 @@ function(ImtCoreAddSdlSearchPath ARG_SDL_PATH)
 	endif()
 endfunction()
 
-
-function(ImtCoreSetSdlMainCacheFile ARG_CACHE_FILE)
-	get_filename_component(CACHE_FILE_PATH "${ARG_CACHE_FILE}" ABSOLUTE)
-	if (EXISTS "${CACHE_FILE_PATH}")
-		file(REMOVE "${CACHE_FILE_PATH}")
-	endif()
-	set(GLOBAL_SDL_CACHE_FILE ${CACHE_FILE_PATH}
-		CACHE
-		STRING "Cache file, used to store information about generated files"
-		FORCE
-	)
-endfunction()
-
-
-function(ImtCoreAddSdlCacheFile ARG_SDL_CACHE_FILE_PATH)
-	get_filename_component(ABS_SDL_CACHE_FILE_PATH "${ARG_SDL_CACHE_FILE_PATH}" ABSOLUTE)
-
-	if (NOT GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS)
-		set(GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS ${ABS_SDL_CACHE_FILE_PATH}
-			CACHE
-			STRING "List of additional cache files, used to collect information about already generated files"
-			FORCE
-		)
-
-	else()
-		list(APPEND GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS ${ARG_SDL_CACHE_FILE_PATH})
-		list(REMOVE_DUPLICATES GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS)
-		set(GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS ${GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS}
-			CACHE
-			STRING "List of additional cache files, used to collect information about already generated files"
-			FORCE
-		)
-	endif()
-endfunction()
-
-
 macro (ImtCoreCustomConfigureSdlCpp)
 	set(oneValueArgs
 				SCHEMA_PATH
@@ -136,18 +100,6 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	list(APPEND CUSTOM_MODIFICATORS "-Psdl")
 	list(APPEND CUSTOM_MODIFICATORS "-Bistd::IPolymorphic=istd/IPolymorphic.h")
 	list(APPEND CUSTOM_MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
-
-	# use cache file if provided
-	if (GLOBAL_SDL_CACHE_FILE)
-		list(APPEND CUSTOM_MODIFICATORS "-C${GLOBAL_SDL_CACHE_FILE}")
-	endif()
-
-	list(LENGTH GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS ADDITIONAL_CACHES_COUNT)
-	if (ADDITIONAL_CACHES_COUNT GREATER 0)
-		foreach(ADD_CACHE_FILE ${GLOBAL_SDL_ADDITIONAL_CACHE_FILE_PATHS})
-			list(APPEND CUSTOM_MODIFICATORS "--CC=${ADD_CACHE_FILE}")
-		endforeach()
-	endif()
 
 	if (ARG_SOURCE_NAME)
 		set(SDL_CPP_OUTPUT_DIRECTORY "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP")

@@ -64,9 +64,6 @@
                     <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="BaseClassExtender">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CacheManager" Type="Reference" ExportId="CacheManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="CodeGeneratorExtenderList" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>

@@ -4,7 +4,6 @@
 // Qt includes
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
-#include <QtCore/QDirIterator>
 #include <QtCore/QRegularExpression>
 
 // ImtCore includes

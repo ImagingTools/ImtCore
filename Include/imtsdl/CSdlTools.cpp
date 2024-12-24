@@ -928,6 +928,115 @@ bool CSdlTools::UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* 
 	return true;
 }
 
+bool CSdlTools::FindHeaderForEntry(
+			CSdlEntryBase& sdlEntry,
+			const QStringList& icludePaths,
+			const QString& outputDirPath,
+			const QString& currentSchemaPath)
+{
+	QString namespaceFromSchema;
+
+	const iprm::IParamsSet& schemaParams = sdlEntry.GetSchemaParams();
+	iprm::TParamsPtr<iprm::ITextParam> namespaceParamPtr(&schemaParams, SdlCustomSchemaKeys::SchemaNamespace.toUtf8(), false);
+	if (namespaceParamPtr.IsValid()){
+		namespaceFromSchema = namespaceParamPtr->GetText();
+	}
+
+	if (namespaceFromSchema.isEmpty()){
+		qWarning() << QString("Schema %1 does not contains namespace!").arg(sdlEntry.GetSchemaFilePath());
+
+		return false;
+	}
+
+	QString schemaName;
+	iprm::TParamsPtr<iprm::ITextParam> nameParamPtr(&schemaParams, SdlCustomSchemaKeys::SchemaName.toUtf8(), false);
+	if (nameParamPtr.IsValid()){
+		schemaName = nameParamPtr->GetText();
+	}
+
+	QString versionName;
+	iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&schemaParams, SdlCustomSchemaKeys::VersionName.toUtf8(), false);
+	if (versionNameParamPtr.IsValid()){
+		versionName = versionNameParamPtr->GetText();
+	}
+
+	const QFileInfo sdlTypeSchemaFileInfo(sdlEntry.GetSchemaFilePath());
+	const QString schemaFileName = sdlTypeSchemaFileInfo.fileName();
+
+	static QString headerSuffix = ".h";
+
+	for (const QString& includeDir: icludePaths){
+		//epect to find a header inside a dir with name of a (sdl?)<namespace>(sdl?)
+		QStringList rootEntryFilters = {
+			namespaceFromSchema,
+			QStringLiteral("sdl") + namespaceFromSchema,
+			namespaceFromSchema + QStringLiteral("sdl")
+		};
+		QDirIterator dirIterator(
+					includeDir,
+					rootEntryFilters,
+					QDir::Dirs | QDir::NoDotAndDotDot,
+					QDirIterator::Subdirectories);
+		while (dirIterator.hasNext()){
+			QFileInfo currentDirEntry = dirIterator.nextFileInfo();
+			QString sdlEntryName;
+			const CSdlType* typePtr = dynamic_cast<const CSdlType*>(&sdlEntry);
+			const CSdlEnum* enumPtr = dynamic_cast<const CSdlEnum*>(&sdlEntry);
+			if (typePtr != nullptr){
+				sdlEntryName = typePtr->GetName();
+			}
+			else if (enumPtr != nullptr){
+				sdlEntryName = enumPtr->GetName();
+			}
+
+			QStringList filters = {
+				// (C)MyType.h
+				sdlEntryName + headerSuffix,
+				'C' + sdlEntryName + headerSuffix,
+				// (C)MySchemaName.h
+				schemaFileName + headerSuffix,
+				'C' + schemaFileName + headerSuffix,
+				// (C)MyTypeSchemaFile.h
+				schemaName + headerSuffix,
+				'C' + schemaName + headerSuffix,
+			};
+			QDirIterator moduleDirIterator(
+				currentDirEntry.absoluteFilePath(),
+				filters,
+				QDir::Files,
+				QDirIterator::Subdirectories);
+			if (moduleDirIterator.hasNext()){
+				const QString foudPath = moduleDirIterator.next();
+				sdlEntry.SetTargetHeaderFilePath(foudPath);
+				if (moduleDirIterator.hasNext()){
+					qWarning() << "One more potential file!!!" << moduleDirIterator.next();
+				}
+
+				return true;
+			}
+		}
+	}
+
+	// fallback for schemas of 'single modules' (i.e. schemas in same directory). Often for all schemas from module, applies same generation rules
+	if (!currentSchemaPath.isEmpty() && !outputDirPath.isEmpty()){
+		QDir currentSchemaDir(currentSchemaPath);
+		QDir sdlTypeSchemaDir(sdlTypeSchemaFileInfo.dir());
+		if (QDir::cleanPath(currentSchemaDir.absolutePath()) == QDir::cleanPath(sdlTypeSchemaDir.absolutePath())){
+			auto targetFiles = CalculateTargetCppFilesFromSchemaParams(schemaParams, outputDirPath, schemaFileName);
+			const QString targetHeaderPath = targetFiles[ISdlProcessArgumentsParser::s_headerFileType];
+			if (!targetHeaderPath.isEmpty()){
+				sdlEntry.SetTargetHeaderFilePath(targetHeaderPath);
+
+				return true;
+			}
+		}
+	}
+
+
+
+	return false;
+}
+
 
 QStringList CSdlTools::GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName)
 {
@@ -1101,70 +1210,72 @@ void CSdlTools::PrintFiles(std::ostream& outStream, const QStringList& files, IS
 }
 
 
-QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntry, const QStringList& lookupPaths)
+QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntry, const QStringList& lookupPaths, bool rawLookup)
 {
 	/// \todo cleanup it. use correct names, add checks
 
-	const CSdlType* sdlTypePtr = dynamic_cast<const CSdlType*>(&sdlEntry);
-	QString typeNamspace;
-	QString typeClassName;
+	if (rawLookup){
+		const CSdlType* sdlTypePtr = dynamic_cast<const CSdlType*>(&sdlEntry);
+		QString typeNamspace;
+		QString typeClassName;
 
-	if (sdlTypePtr != nullptr){
-		typeNamspace = sdlTypePtr->GetNamespace();
-		typeClassName = 'C' + GetCapitalizedValue(sdlTypePtr->GetName());
-	}
-	else {
-		const CSdlEnum* enumPtr = dynamic_cast<const CSdlEnum*>(&sdlEntry);
-		typeNamspace = BuildNamespaceFromParams(enumPtr->GetSchemaParams());
-		typeClassName = GetCapitalizedValue(enumPtr->GetName());
-	}
+		if (sdlTypePtr != nullptr){
+			typeNamspace = sdlTypePtr->GetNamespace();
+			typeClassName = 'C' + GetCapitalizedValue(sdlTypePtr->GetName());
+		}
+		else {
+			const CSdlEnum* enumPtr = dynamic_cast<const CSdlEnum*>(&sdlEntry);
+			typeNamspace = BuildNamespaceFromParams(enumPtr->GetSchemaParams());
+			typeClassName = GetCapitalizedValue(enumPtr->GetName());
+		}
 
-	/// \todo remove it
-	for (const QString& path: lookupPaths){
-		QDir currentDir(path);
-		QDirIterator dirIterator(path, QStringList() << "*.h", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-		while (dirIterator.hasNext()) {
-			dirIterator.next();
+		/// \todo remove it
+		for (const QString& path: lookupPaths){
+			QDir currentDir(path);
+			QDirIterator dirIterator(path, QStringList() << "*.h", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+			while (dirIterator.hasNext()) {
+				dirIterator.next();
 
-			QFile file(dirIterator.filePath());
-			if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-				qDebug() << "Unable to open file. Continuing..." << file.fileName();
+				QFile file(dirIterator.filePath());
+				if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+					qDebug() << "Unable to open file. Continuing..." << file.fileName();
 
-				continue;
-			}
-
-			static QRegularExpression namespaceRegex("namespace\\s+((?:\\w|::)+)\\s*\\{?");
-			static QRegularExpression classRegex("class\\s+(\\w+)");
-			static QRegularExpression namespaceEndRegex("\\s*\\}\\s*");
-
-			QString currentNamespace;
-			while (!file.atEnd()) {
-				QString line = file.readLine().trimmed();
-
-				QRegularExpressionMatch namespaceRegexMatch = namespaceRegex.match(line);
-				if (namespaceRegexMatch.hasMatch()) {
-					currentNamespace = namespaceRegexMatch.capturedTexts()[1];
-				}
-
-				QRegularExpressionMatch namespaceEndRegexMatch = namespaceEndRegex.match(line);
-				if (namespaceEndRegexMatch.hasMatch()) {
-					// we reached and of namespace. reset
-					currentNamespace.clear();
-				}
-
-				if (currentNamespace != typeNamspace){
 					continue;
 				}
 
-				QRegularExpressionMatch classRegexMatch = classRegex.match(line);
-				if (classRegexMatch.hasMatch()) {
-					QString className = classRegexMatch.capturedTexts()[1];
-					if (typeClassName == className){
-						return currentDir.relativeFilePath(dirIterator.filePath());
+				static QRegularExpression namespaceRegex("namespace\\s+((?:\\w|::)+)\\s*\\{?");
+				static QRegularExpression classRegex("class\\s+(\\w+)");
+				static QRegularExpression namespaceEndRegex("\\s*\\}\\s*");
+
+				QString currentNamespace;
+				while (!file.atEnd()) {
+					QString line = file.readLine().trimmed();
+
+					QRegularExpressionMatch namespaceRegexMatch = namespaceRegex.match(line);
+					if (namespaceRegexMatch.hasMatch()) {
+						currentNamespace = namespaceRegexMatch.capturedTexts()[1];
+					}
+
+					QRegularExpressionMatch namespaceEndRegexMatch = namespaceEndRegex.match(line);
+					if (namespaceEndRegexMatch.hasMatch()) {
+						// we reached and of namespace. reset
+						currentNamespace.clear();
+					}
+
+					if (currentNamespace != typeNamspace){
+						continue;
+					}
+
+					QRegularExpressionMatch classRegexMatch = classRegex.match(line);
+					if (classRegexMatch.hasMatch()) {
+						QString className = classRegexMatch.capturedTexts()[1];
+						if (typeClassName == className){
+							return currentDir.relativeFilePath(dirIterator.filePath());
+						}
 					}
 				}
+				file.close();
 			}
-			file.close();
 		}
 	}
 
@@ -1179,8 +1290,6 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntr
 			}
 		}
 	}
-
-
 
 	return QString();
 }

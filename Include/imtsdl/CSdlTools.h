@@ -105,8 +105,14 @@ public:
 				const ArgumentParserCompPtr& argumentParamsCompPtr);
 
 	/// \sa imtsdlgen::ISdlProcessArgumentsParser::s_headerFileType imtsdlgen::ISdlProcessArgumentsParser::s_sourceFileType
-	[[nodiscard]]static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
-	static bool UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* schemaParamsPtr, const imtsdl::ISdlProcessArgumentsParser* argumentParamsPtr);
+	[[nodiscard]] static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
+	[[nodiscard]] static bool UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* schemaParamsPtr, const imtsdl::ISdlProcessArgumentsParser* argumentParamsPtr);
+
+	[[nodiscard]] static bool FindHeaderForEntry(
+				CSdlEntryBase& sdlEntry,
+				const QStringList& icludePaths,
+				const QString& outputDirPath = QString(),
+				const QString& currentSchemaPath = QString());
 
 	[[nodiscard]] static QStringList GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
 	[[nodiscard]] static QString GetQmlModuleNameFromParamsOrArguments(
@@ -125,15 +131,14 @@ public:
 
 	static void PrintFiles(std::ostream& outStream, const QStringList& files, imtsdl::ISdlProcessArgumentsParser::GeneratorType projectCodeGenerator = imtsdl::ISdlProcessArgumentsParser::GT_CMAKE);
 
-	/// \deprecated \todo remove it! all logic will be moved to \c CCacheMultiManager
-	[[nodiscard]] static QString ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntry, const QStringList& lookupPaths);
+	/// \todo remove \param rawLookup - V1 fallback use ONLY for V1 generation!!!!!
+	[[nodiscard]] static QString ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntry, const QStringList& lookupPaths, bool rawLookup = true);
 	[[nodiscard]] static QString GetTypeVersion(const CSdlType& sdlType);
 
 	[[nodiscard]] static IncludeDirective CreateCxxDirective(const QString& path);
 	[[nodiscard]] static IncludeDirective CreateQtDirective(const QString& path);
 	[[nodiscard]] static IncludeDirective CreateImtDirective(const QString& path);
 	[[nodiscard]] static IncludeDirective CreateCustomDirective(const QString& path);
-
 };
 
 

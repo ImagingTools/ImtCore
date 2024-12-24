@@ -11,10 +11,12 @@ imtsdl::CSdlEntryBase::CSdlEntryBase()
 {
 }
 
+
 QString imtsdl::CSdlEntryBase::GetTargetHeaderFilePath() const
 {
 	return m_targetHeaderFilePath;
 }
+
 
 void imtsdl::CSdlEntryBase::SetTargetHeaderFilePath(const QString& headerFilePath)
 {
@@ -24,10 +26,12 @@ void imtsdl::CSdlEntryBase::SetTargetHeaderFilePath(const QString& headerFilePat
 	}
 }
 
+
 QString imtsdl::CSdlEntryBase::GetSchemaFilePath() const
 {
 	return m_schemaFilePath;
 }
+
 
 void imtsdl::CSdlEntryBase::SetSchemaFilePath(const QString& schemaFilePath)
 {
@@ -37,10 +41,12 @@ void imtsdl::CSdlEntryBase::SetSchemaFilePath(const QString& schemaFilePath)
 	}
 }
 
+
 bool imtsdl::CSdlEntryBase::IsExternal() const
 {
 	return m_isExternal;
 }
+
 
 void imtsdl::CSdlEntryBase::SetExternal(bool isExternal)
 {
@@ -50,10 +56,12 @@ void imtsdl::CSdlEntryBase::SetExternal(bool isExternal)
 	}
 }
 
+
 QString imtsdl::CSdlEntryBase::GetQmlImportDeclaration() const
 {
 	return m_qmlImportDeclaration;
 }
+
 
 void imtsdl::CSdlEntryBase::SetQmlImportDeclaration(const QString& qmlImportDeclaration)
 {
@@ -62,6 +70,7 @@ void imtsdl::CSdlEntryBase::SetQmlImportDeclaration(const QString& qmlImportDecl
 		m_qmlImportDeclaration = qmlImportDeclaration;
 	}
 }
+
 
 const iprm::IParamsSet& imtsdl::CSdlEntryBase::GetSchemaParams() const
 {
@@ -73,6 +82,7 @@ const iprm::IParamsSet& imtsdl::CSdlEntryBase::GetSchemaParams() const
 
 	return *m_schemaParamsPtr;
 }
+
 
 void imtsdl::CSdlEntryBase::SetSchemaParamsPtr(const std::shared_ptr<iprm::IParamsSet>& schemaParamsPtr)
 {

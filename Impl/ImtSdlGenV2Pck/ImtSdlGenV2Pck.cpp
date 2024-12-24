@@ -59,11 +59,6 @@ I_EXPORT_COMPONENT(
 			"A C++ class generator of GraphQL Collection controllers for SDL requests",
 			"Schema Definition Language SDL Class Generator JSON GraphQL GQL Request")
 
-I_EXPORT_COMPONENT(
-			CacheGenerator,
-			"A Cache generator of SDL schema",
-			"Schema Definition Language SDL Cache Generator JSON")
-
 
 } // namespace ImtSdlGenV2Pck
 

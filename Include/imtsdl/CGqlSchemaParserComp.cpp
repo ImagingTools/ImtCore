@@ -306,14 +306,13 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 			// sort IDs. We MUST preserve order (by id as int)
 			std::sort(paramIdList.begin(), paramIdList.end(), [](const QByteArray& firstString, const QByteArray& secondString){
 				int firstDigit = 0;
-				int secondDigit = 0;
 
 				bool isFirstDigit = false;
 				firstDigit = firstString.toInt(&isFirstDigit);
 
 				if (isFirstDigit){
 					bool isSecondDigit = false;
-					secondDigit = secondString.toInt(&isSecondDigit);
+					int secondDigit = secondString.toInt(&isSecondDigit);
 					if (isSecondDigit){
 						return firstDigit < secondDigit;
 					}
@@ -543,57 +542,28 @@ bool CGqlSchemaParserComp::ValidateSchema()
 		for (CSdlType& sdlType: m_sdlTypes){
 			bool isExternal = sdlType.IsExternal();
 
-			// add namespace prefix to all types
-			const QString namespacePrefix = m_argumentParserCompPtr->GetNamespacePrefix() + QStringLiteral("::");
-			if (!namespacePrefix.isEmpty()){
-				const QString originalTypeNamespace = sdlType.GetNamespace();
-				if (!originalTypeNamespace.isEmpty() && !originalTypeNamespace.startsWith(namespacePrefix)){
-					sdlType.SetNamespace(namespacePrefix + originalTypeNamespace);
-				}
-			}
-
 			if (isExternal){
 				// if external, that mean, it is already processed
 				continue;
 			}
 
-			std::shared_ptr<QStringList> cacheListPtr;
-			/**
-			\todo make a cache provider and move it
-			\code C++
-				const QString cachePath = m_argumentParserCompPtr->GetCachePath();
-				if (!cachePath.isEmpty()){
-					cacheList << cachePath;
-				}
-				cacheList << m_argumentParserCompPtr->GetAdditionalCachePaths();
-			\endcode C++
-			*/
 			if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_ONLY_FILE){
 				isExternal =  bool(QDir::cleanPath(m_currentSchemaFilePath) != QDir::cleanPath(m_argumentParserCompPtr->GetSchemaFilePath()));
-# ifdef IMT_SDL_CACHE_IMPLEMENTED
-				QString headerFilePath;
-				if (sdlType.GetTargetHeaderFilePath().isEmpty()){
-					if (isExternal && cacheListPtr != nullptr && !cacheListPtr->isEmpty()){
-						headerFilePath = GetHeaderPathFromCache(sdlType, cacheListPtr);
-					}
-					else {
-						const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(sdlType.GetSchemaParams(), m_argumentParserCompPtr->GetOutputDirectoryPath(), QFileInfo(m_currentSchemaFilePath).fileName());
-						headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
-					}
-					sdlType.SetTargetHeaderFilePath(headerFilePath);
-				}
-# else
 				if (sdlType.GetTargetHeaderFilePath().isEmpty()){
 					const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), QFileInfo(m_currentSchemaFilePath).fileName());
 					const QString headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
 					sdlType.SetTargetHeaderFilePath(headerFilePath);
 				}
-# endif
 			}
 			else if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_SAME_NAMESPACE){
 				const QString typeNamespace = sdlType.GetNamespace();
 				if (!typeNamespace.isEmpty()){
-					const QString currentNamespace = namespacePrefix + BuildNamespaceFromParams(*m_schemaParamsPtr);
+					const QString namespacePrefix = m_argumentParserCompPtr->GetNamespacePrefix();
+					QString currentNamespace;
+					if (!namespacePrefix.isEmpty()){
+						currentNamespace = namespacePrefix + QStringLiteral("::");
+					}
+					currentNamespace += BuildNamespaceFromParams(*m_schemaParamsPtr);
 					isExternal = bool(currentNamespace != typeNamespace);
 				}
 			}
@@ -607,11 +577,27 @@ bool CGqlSchemaParserComp::ValidateSchema()
 					sdlType.SetNamespace(typeNamespace);
 				}
 
-				const bool isSet = UpdateTypeInfo(sdlType, m_schemaParamsPtr.get(), m_argumentParserCompPtr.GetPtr());
-				if (!isSet){
-					SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlType.GetName(), m_currentSchemaFilePath));
 
-					return false;
+				const QString typeSchemaPath = QDir::cleanPath(sdlType.GetSchemaFilePath());
+				const bool isTypeSchema = bool (typeSchemaPath == QDir::cleanPath(m_currentSchemaFilePath));
+				if (isTypeSchema){
+					const bool isSet = UpdateTypeInfo(sdlType, m_schemaParamsPtr.get(), m_argumentParserCompPtr.GetPtr());
+					if (!isSet){
+						SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlType.GetName(), m_currentSchemaFilePath));
+
+						return false;
+					}
+				}
+			}
+			else {
+				// Upgrade external types. Set header files from schema. Only when generation mode. Because when deps generating, they might not exsist.
+				if (m_argumentParserCompPtr->IsGenerateMode() && m_argumentParserCompPtr->IsCppEnabled()){
+					const bool isFound = FindHeaderForEntry(sdlType, m_argumentParserCompPtr->GetHeadersIncludePaths());
+					if (!isFound){
+						SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlType.GetName(), m_currentSchemaFilePath));
+
+						return false;
+					}
 				}
 			}
 		}
