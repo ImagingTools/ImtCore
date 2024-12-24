@@ -918,7 +918,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICol
 
 bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const
 {
-	QString addedStrQuery = QString(R"((SELECT "LastModified" FROM "%1" as temp WHERE "RevisionNumber" = 1 AND "%1"."DocumentId" = temp."DocumentId" LIMIT 1))").arg(qPrintable(*m_tableNameAttrPtr));
+	QString addedStrQuery = QString(R"((SELECT "LastModified" FROM "%1" as temp WHERE "RevisionNumber" = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))").arg(qPrintable(*m_tableNameAttrPtr));
 
 	switch (timeFilter.GetTimeUnit()){
 	case imtbase::ITimeFilterParam::TU_CUSTOM:
