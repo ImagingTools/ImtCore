@@ -147,7 +147,7 @@ void CPageNavigationControllerComp::CreatePageList(const iprm::ISelectionParam& 
 			const iprm::ISelectionParam* subSelectionPtr = selection.GetSubselection(pageIndex);
 
 			if (parentId.isEmpty()){
-				if ((subSelectionPtr == nullptr)){
+				if (subSelectionPtr == nullptr){
 					m_pages.push_back(pageId);
 				}
 			}

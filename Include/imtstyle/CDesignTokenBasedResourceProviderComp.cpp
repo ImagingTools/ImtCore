@@ -276,7 +276,7 @@ bool CDesignTokenBasedResourceProviderComp::StringToColor(const QString& colorSt
 		return true;
 	}
 #else
-	QRegularExpression stdFormat("^#[0-9A-Fa-f]{6,6}$");
+	static QRegularExpression stdFormat("^#[0-9A-Fa-f]{6,6}$");
 	if (stdFormat.match(tempColorString).hasMatch()){
 		color = QColor(tempColorString);
 
@@ -285,7 +285,7 @@ bool CDesignTokenBasedResourceProviderComp::StringToColor(const QString& colorSt
 #endif
 
 	if (tempColorString.startsWith("rgba(") && tempColorString.endsWith(")")){
-		QStringList values = tempColorString.mid(5, tempColorString.count() - 6).split(QChar(','));
+		QStringList values = tempColorString.mid(5, tempColorString.length() - 6).split(QChar(','));
 		if (values.count() == 4){
 			bool isOkR, isOkG, isOkB, isOkA;
 

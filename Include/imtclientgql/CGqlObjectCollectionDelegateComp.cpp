@@ -660,7 +660,7 @@ bool CGqlObjectCollectionDelegateComp::DeSerializeObject(istd::IPolymorphic* obj
 		return false;
 	}
 
-	iser::CMemoryReadArchive archive(objectData.data(), objectData.count());
+	iser::CMemoryReadArchive archive(objectData.data(), objectData.length());
 	if (!serializableObjectPtr->Serialize(archive)){
 		SendErrorMessage(0, QString("Unable to deserialize object. Error: Deserialization failed"));
 

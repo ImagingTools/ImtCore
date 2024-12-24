@@ -1,6 +1,3 @@
-#pragma once
-
-
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 

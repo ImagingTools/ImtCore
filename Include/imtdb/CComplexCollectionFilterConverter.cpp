@@ -52,6 +52,9 @@ QString CComplexCollectionFilterConverter::CreateSqlSortQuery(const imtbase::ICo
 		case imtbase::IComplexCollectionFilter::SO_DESC:
 			order = "DESC";
 			break;
+		default:
+			qWarning() << "Unexpected sortingOrder" << imtbase::IComplexCollectionFilter::ToString(info.sortingOrder);
+			break;
 		}
 
 		if (order.isEmpty()){
@@ -69,7 +72,7 @@ QString CComplexCollectionFilterConverter::CreateSqlFilterQuery(const imtbase::I
 {
 	QString retVal = ProcessGroup(filter.GetFieldsFilter());
 
-	retVal = retVal.mid(1, retVal.count() - 2);
+	retVal = retVal.mid(1, retVal.length() - 2);
 
 	return retVal;
 }

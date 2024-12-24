@@ -17,7 +17,9 @@ namespace imtlic
 
 const imtbase::ICollectionInfo& CLicenseInfoProviderComp::GetLicenseList() const
 {
-	return imtbase::CCollectionInfo();
+	static imtbase::CCollectionInfo retVal;
+
+	return retVal;
 }
 
 
@@ -30,7 +32,6 @@ const imtlic::ILicenseDefinition* CLicenseInfoProviderComp::GetLicenseInfo(const
 			const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
 			if (productPtr != nullptr){
 				const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
-				const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
 
 				const imtlic::ILicenseDefinition* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
 				if (licenseInfoPtr != nullptr){

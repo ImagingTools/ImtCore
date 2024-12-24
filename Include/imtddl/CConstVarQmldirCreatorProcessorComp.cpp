@@ -76,7 +76,7 @@ bool CConstVarQmldirCreatorProcessorComp::CreateBody(const QString moduleName, c
 		QString lineData = textStream.readLine();
 		QString dataName = lineData.left(lineData.indexOf(" "));
 		if (dataName == "singleton"){
-			lineData = lineData.right(lineData.count() - lineData.indexOf(" ") - 1);
+			lineData = lineData.right(lineData.length() - lineData.indexOf(" ") - 1);
 			dataName = lineData.left(lineData.indexOf(" "));
 		}
 		if (dataName == name){

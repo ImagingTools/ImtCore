@@ -985,15 +985,15 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::ImportObject
 
 	int index = GetMimeTypeIndex(mimeType);
 	if (index < 0){
-		errorMessage = "Mime type is invalid", "CLegacyObjectCollectionControllerCompBase";
+		errorMessage = "Mime type is invalid at CLegacyObjectCollectionControllerCompBase";
 		return nullptr;
 	}
 	if (index >= m_importExportObjectFactCompPtr.GetCount()){
-		errorMessage = "Import/Export object factory index out of range", "CLegacyObjectCollectionControllerCompBase";
+		errorMessage = "Import/Export object factory index out of range at CLegacyObjectCollectionControllerCompBase";
 		return nullptr;
 	}
 	if (index >= m_filePersistenceCompPtr.GetCount()){
-		errorMessage = "File persistence index out of range", "CLegacyObjectCollectionControllerCompBase";
+		errorMessage = "File persistence index out of range at CLegacyObjectCollectionControllerCompBase";
 		return nullptr;
 	}
 
@@ -1114,15 +1114,15 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::ExportObject
 
 	int index = GetMimeTypeIndex(mimeType);
 	if (index < 0){
-		errorMessage = "Mime type is invalid", "CLegacyObjectCollectionControllerCompBase";
+		errorMessage = "Mime type is invalid at CLegacyObjectCollectionControllerCompBase";
 		return nullptr;
 	}
 	if (index >= m_importExportObjectFactCompPtr.GetCount()){
-		errorMessage = "Import/Export object factory index out of range", "CLegacyObjectCollectionControllerCompBase";
+		errorMessage = "Import/Export object factory index out of range at CLegacyObjectCollectionControllerCompBase";
 		return nullptr;
 	}
 	if (index >= m_filePersistenceCompPtr.GetCount()){
-		errorMessage = "File persistence index out of range", "CLegacyObjectCollectionControllerCompBase";
+		errorMessage = "File persistence index out of range at CLegacyObjectCollectionControllerCompBase";
 		return nullptr;
 	}
 

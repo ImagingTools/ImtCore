@@ -74,6 +74,10 @@ void CTimeFilterParamEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /
 			TimeCombo->setCurrentIndex(9);
 		}
 		break;
+
+	default:
+		qWarning() << "Unexpected timeUnit" << imtbase::ITimeFilterParam::ToString(timeUnit);
+		break;
 	}
 }
 

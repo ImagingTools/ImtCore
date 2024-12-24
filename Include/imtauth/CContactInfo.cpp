@@ -117,6 +117,9 @@ void CContactInfo::SetNameField(NameFieldType fieldType, const QString& value)
 			m_nickName = value;
 		}
 		break;
+	default:
+		qWarning() << "Unexpected field type" << ToString(fieldType);
+		break;
 	};
 }
 

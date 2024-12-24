@@ -467,16 +467,21 @@ bool CSqlStructureDelegateComp::CreateSortQuery(
 	QByteArray columnId;
 	QByteArray sortOrder;
 
-	if (!collectionFilter.GetSortingInfoIds().isEmpty()){
-		columnId = collectionFilter.GetSortingInfoIds().first();
+	const QList<QByteArray> Ids = collectionFilter.GetSortingInfoIds();
+	if (!Ids.isEmpty()){
+		columnId = Ids.constFirst();
 	}
 
-	switch (collectionFilter.GetSortingOrder()){
+	imtbase::ICollectionFilter::SortingOrder sortingOrder = collectionFilter.GetSortingOrder();
+	switch (sortingOrder){
 	case imtbase::ICollectionFilter::SO_ASC:
 		sortOrder = "ASC";
 		break;
 	case imtbase::ICollectionFilter::SO_DESC:
 		sortOrder = "DESC";
+		break;
+	default:
+		qWarning() << "Unexpected sortingOrder" << imtbase::ICollectionFilter::ToString(sortingOrder);
 		break;
 	}
 
