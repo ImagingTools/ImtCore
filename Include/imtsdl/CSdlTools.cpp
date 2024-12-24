@@ -978,7 +978,12 @@ bool CSdlTools::FindHeaderForEntry(
 					QDir::Dirs | QDir::NoDotAndDotDot,
 					QDirIterator::Subdirectories);
 		while (dirIterator.hasNext()){
+#if QT_VERSION > QT_VERSION_CHECK(6, 3, 0)
 			QFileInfo currentDirEntry = dirIterator.nextFileInfo();
+#else
+			QString dirEntryPath = dirIterator.next();
+			QFileInfo currentDirEntry(dirEntryPath);
+#endif
 			QString sdlEntryName;
 			const CSdlType* typePtr = dynamic_cast<const CSdlType*>(&sdlEntry);
 			const CSdlEnum* enumPtr = dynamic_cast<const CSdlEnum*>(&sdlEntry);
