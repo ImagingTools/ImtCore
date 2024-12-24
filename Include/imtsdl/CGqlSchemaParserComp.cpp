@@ -592,7 +592,11 @@ bool CGqlSchemaParserComp::ValidateSchema()
 			else {
 				// Upgrade external types. Set header files from schema. Only when generation mode. Because when deps generating, they might not exsist.
 				if (m_argumentParserCompPtr->IsGenerateMode() && m_argumentParserCompPtr->IsCppEnabled()){
-					const bool isFound = FindHeaderForEntry(sdlType, m_argumentParserCompPtr->GetHeadersIncludePaths());
+					const bool isFound = FindHeaderForEntry(
+						sdlType,
+						m_argumentParserCompPtr->GetHeadersIncludePaths(),
+						m_argumentParserCompPtr->GetOutputDirectoryPath(),
+						m_currentSchemaFilePath);
 					if (!isFound){
 						SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlType.GetName(), m_currentSchemaFilePath));
 

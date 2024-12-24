@@ -961,7 +961,7 @@ bool CSdlTools::FindHeaderForEntry(
 	}
 
 	const QFileInfo sdlTypeSchemaFileInfo(sdlEntry.GetSchemaFilePath());
-	const QString schemaFileName = sdlTypeSchemaFileInfo.fileName();
+	const QString schemaFileName = sdlTypeSchemaFileInfo.completeBaseName();
 
 	static QString headerSuffix = ".h";
 
@@ -1024,7 +1024,8 @@ bool CSdlTools::FindHeaderForEntry(
 
 	// fallback for schemas of 'single modules' (i.e. schemas in same directory). Often for all schemas from module, applies same generation rules
 	if (!currentSchemaPath.isEmpty() && !outputDirPath.isEmpty()){
-		QDir currentSchemaDir(currentSchemaPath);
+		QFileInfo currentSchemaDirFileInfo(currentSchemaPath);
+		QDir currentSchemaDir(currentSchemaDirFileInfo.dir());
 		QDir sdlTypeSchemaDir(sdlTypeSchemaFileInfo.dir());
 		if (QDir::cleanPath(currentSchemaDir.absolutePath()) == QDir::cleanPath(sdlTypeSchemaDir.absolutePath())){
 			auto targetFiles = CalculateTargetCppFilesFromSchemaParams(schemaParams, outputDirPath, schemaFileName);
