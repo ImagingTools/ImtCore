@@ -67,7 +67,7 @@ bool CSdlProcessArgumentsParserComp::ProcessCommandLineOptions(const QCommandLin
 	}
 
 	// additional checks. to be removed in V2
-	if (IsGenerateMode()){
+	if (IsGenerateMode() && m_generationVersion > 1){
 		if (!GetJoinRules().isEmpty()){
 			SendWarningMessage(0, "-J option is DEPRECATED! WILL NOT BE SUPPORTED LATER!!!! Please avoid to use it.");
 		}
