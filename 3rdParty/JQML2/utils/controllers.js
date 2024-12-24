@@ -176,6 +176,16 @@ class MouseController {
         this.pressed = inner
         let view = null
 
+        let modifiers = Qt.NoModifier
+        if(e.shiftKey) {
+            modifiers |= Qt.ShiftModifier
+        }
+        if(e.altKey) {
+            modifiers |= Qt.AltModifier
+        }
+        if(e.ctrlKey) {
+            modifiers |= Qt.ControlModifier
+        }
 
         for(let i = 0; i < this.oldList.length; i++){
             if(this.oldList[i] instanceof MouseArea){
@@ -214,6 +224,7 @@ class MouseController {
                     let norm = inner[i].normalizeXY(x - rect.x, y - rect.y)
                     inner[i].mouse.x = norm.x
                     inner[i].mouse.y = norm.y
+                    inner[i].mouse.modifiers = modifiers
                     
                     inner[i].getStatement('mouseX').reset(norm.x)
                     inner[i].getStatement('mouseY').reset(norm.y)
@@ -261,6 +272,17 @@ class MouseController {
     onMouseUp(x, y, button, e){
         global['TransactionController'].begin()
 
+        let modifiers = Qt.NoModifier
+        if(e.shiftKey) {
+            modifiers |= Qt.ShiftModifier
+        }
+        if(e.altKey) {
+            modifiers |= Qt.AltModifier
+        }
+        if(e.ctrlKey) {
+            modifiers |= Qt.ControlModifier
+        }
+
         for(let i = 0; i < this.pressed.length; i++){
             if(this.pressed[i] instanceof MouseArea) this.pressed[i].getProperty('pressed').value = false
         }
@@ -273,6 +295,7 @@ class MouseController {
                 let norm = this.target.normalizeXY(x - rect.x, y - rect.y)
                 this.target.mouse.x = norm.x
                 this.target.mouse.y = norm.y
+                this.target.mouse.modifiers = modifiers
                 this.target.getStatement('mouseX').reset(norm.x)
                 this.target.getStatement('mouseY').reset(norm.y)
                 
@@ -294,6 +317,7 @@ class MouseController {
                         for(let i = 1; i < this.pressedMouseArea.length; i++){
                             if(this.pressedMouseArea[i].$signals.doubleClicked){
                                 this.pressedMouseArea[i].mouse.accepted = false
+                                this.pressedMouseArea[i].mouse.modifiers = modifiers
                                 this.pressedMouseArea[i].$signals.doubleClicked()
                                 wasDblClicked = true
                                 if(!this.pressedMouseArea[i].getPropertyValue('propagateComposedEvents') || this.pressedMouseArea[i].mouse.accepted) break
@@ -310,6 +334,7 @@ class MouseController {
                         for(let i = 1; i < this.pressedMouseArea.length; i++){
                             if(this.pressedMouseArea[i].$signals.clicked){
                                 this.pressedMouseArea[i].mouse.accepted = true
+                                this.pressedMouseArea[i].mouse.modifiers = modifiers
                                 this.pressedMouseArea[i].$signals.clicked()
                                 if(!this.pressedMouseArea[i].getPropertyValue('propagateComposedEvents') || this.pressedMouseArea[i].mouse.accepted) break
                             }
@@ -334,6 +359,7 @@ class MouseController {
                     } else if(this.pressed[i] instanceof MouseArea && this.pressed[i].availableButton(button)){
                         if(this.pressed[i].$signals.doubleClicked){
                             this.pressed[i].mouse.accepted = true
+                            this.pressed[i].mouse.modifiers = modifiers
                             this.pressed[i].$signals.doubleClicked()
                             wasDblClicked = true
                             if(!this.pressed[i].getPropertyValue('propagateComposedEvents') || this.pressed[i].mouse.accepted) break
@@ -349,6 +375,7 @@ class MouseController {
                     } else if(this.pressed[i] instanceof MouseArea && this.pressed[i].availableButton(button)){
                         if(this.pressed[i].$signals.clicked){
                             this.pressed[i].mouse.accepted = true
+                            this.pressed[i].mouse.modifiers = modifiers
                             this.pressed[i].$signals.clicked()
                             if(!this.pressed[i].getPropertyValue('propagateComposedEvents') || this.pressed[i].mouse.accepted) break
                         }
@@ -372,7 +399,16 @@ class MouseController {
 
         let inner = this.get(x, y)
 
-        
+        let modifiers = Qt.NoModifier
+        if(e.shiftKey) {
+            modifiers |= Qt.ShiftModifier
+        }
+        if(e.altKey) {
+            modifiers |= Qt.AltModifier
+        }
+        if(e.ctrlKey) {
+            modifiers |= Qt.ControlModifier
+        }
 
         if(this.target){
             if(this.target instanceof Map){
@@ -383,6 +419,9 @@ class MouseController {
                 let norm = this.target.normalizeXY(x - rect.x, y - rect.y)
                 this.target.mouse.x = norm.x
                 this.target.mouse.y = norm.y
+
+                this.target.mouse.modifiers = modifiers
+
                 this.target.getStatement('mouseX').reset(norm.x)
                 this.target.getStatement('mouseY').reset(norm.y)
     
@@ -447,6 +486,7 @@ class MouseController {
                     let norm = this.list[i].normalizeXY(x - rect.x, y - rect.y)
                     this.list[i].mouse.x = norm.x
                     this.list[i].mouse.y = norm.y
+                    this.list[i].mouse.modifiers = modifiers
                     this.list[i].getStatement('mouseX').reset(norm.x)
                     this.list[i].getStatement('mouseY').reset(norm.y)
     
@@ -641,6 +681,18 @@ class KeyboardController {
                                 }
                             }
                         }
+
+                        e.modifiers = Qt.NoModifier
+                        if(e.shiftKey) {
+                            e.modifiers |= Qt.ShiftModifier
+                        }
+                        if(e.altKey) {
+                            e.modifiers |= Qt.AltModifier
+                        }
+                        if(e.ctrlKey) {
+                            e.modifiers |= Qt.ControlModifier
+                        }
+
                         if(ignore.indexOf(parent) < 0 && parent.$signals['Keys.pressed']){
                             ignore.push(parent)
                             e.accepted = false
