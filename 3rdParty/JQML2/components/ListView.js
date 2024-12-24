@@ -261,34 +261,96 @@ class ListView extends Flickable {
 
         let firstIndex = 0
         let lastIndex = 0
-
+        
         for(let i = 0; i < length; i++){
             if(this.$items[i] && !this.$items[i-1] && !firstIndex) firstIndex = i
             if(this.$items[i] && !this.$items[i+1] && !lastIndex) lastIndex = i
         }
 
-        for(let i = firstIndex; i < length; i++){
+        let _firstIndex = -1
+        let _lastIndex = -1
+        
+        for(let i = firstIndex; i <= lastIndex; i++){
             let info = this.$getItemInfo(i)
+
             if(info.inner){
-                if(!info.exist){
-                    if(this.$createElement(i, info)) this.$updateGeometry()
+                if(_firstIndex < 0) {
+                    _firstIndex = i
+                    _lastIndex = i
+                } else {
+                    _lastIndex = i
                 }
             } else if(info.exist){
                 this.$items[i].destroy()
                 this.$items[i] = undefined
             }
-            
         }
-        for(let i = lastIndex; i >= 0; i--){
-            let info = this.$getItemInfo(i)
-            if(info.inner){
-                if(!info.exist){
-                    if(this.$createElement(i, info)) this.$updateGeometry()
+
+        if(_firstIndex >= 0){
+            for(let i = _firstIndex; i >= 0; i--){
+                let info = this.$getItemInfo(i)
+                if(info.inner){
+                    if(!info.exist){
+                        if(this.$createElement(i, info)) this.$updateGeometry()
+                    }
+                } else {
+                    break
                 }
-            } else if(info.exist){
-                this.$items[i].destroy()
-                this.$items[i] = undefined
             }
+        }
+        
+        if(_lastIndex >= 0){
+            for(let i = _lastIndex; i < length; i++){
+                let info = this.$getItemInfo(i)
+                if(info.inner){
+                    if(!info.exist){
+                        if(this.$createElement(i, info)) this.$updateGeometry()
+                    }
+                } else {
+                    break
+                }
+            }
+        }
+        
+        if(_firstIndex < 0 && _lastIndex < 0){
+            let approximateMiddleIndex = -1
+
+            if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                if((this.middleWidth + this.getPropertyValue('spacing')) > 0){
+                    approximateMiddleIndex = Math.trunc((this.getPropertyValue('contentX') + this.getPropertyValue('width') / 2 - this.getPropertyValue('originX')) / (this.middleWidth + this.getPropertyValue('spacing')))
+                } else {
+                    approximateMiddleIndex = 0
+                }
+            } else {
+                if((this.middleHeight + this.getPropertyValue('spacing')) > 0){
+                    approximateMiddleIndex = Math.trunc((this.getPropertyValue('contentY') + this.getPropertyValue('height') / 2 - this.getPropertyValue('originY')) / (this.middleHeight + this.getPropertyValue('spacing')))
+                } else {
+                    approximateMiddleIndex = 0
+                }
+            }
+
+            for(let i = approximateMiddleIndex; i >= 0; i--){
+                let info = this.$getItemInfo(i)
+                if(info.inner){
+                    if(!info.exist){
+                        if(this.$createElement(i, info)) this.$updateGeometry()
+                    }
+                } else {
+                    break
+                }
+            }
+
+            for(let i = approximateMiddleIndex + 1; i < length; i++){
+                let info = this.$getItemInfo(i)
+                if(info.inner){
+                    if(!info.exist){
+                        if(this.$createElement(i, info)) this.$updateGeometry()
+                    }
+                } else {
+                    break
+                }
+            }
+
         }
     }
 

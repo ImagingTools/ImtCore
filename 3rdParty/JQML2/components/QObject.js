@@ -48,9 +48,9 @@ class QObject extends ComplexObject {
 
                     return property.get()
                 },
-                set:(val)=>{
-                    this.getPropertyValue('parentModelData_').getProperty('modelData_').reset(val)
-                },
+                // set:(val)=>{
+                //     this.getPropertyValue('parentModelData_').getProperty('modelData_').reset(val)
+                // },
                 configurable: true,
             })
 
