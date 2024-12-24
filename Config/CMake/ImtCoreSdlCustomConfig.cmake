@@ -287,19 +287,16 @@ macro (ImtCoreCustomConfigureSdlCppQml)
 	set(oneValueArgs
 		SCHEMA_PATH
 		VERSION
-		SOURCE_NAME
 		QML_NAME)
-	cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
 
-	if (ARG_SOURCE_NAME)
+	set(booleanArgs
+		CXX)
+	cmake_parse_arguments(ARG "${booleanArgs}" "${oneValueArgs}" "" ${ARGN})
+
+	if (ARG_CXX)
 		ImtCoreCustomConfigureSdlCpp(
 			SCHEMA_PATH "${ARG_SCHEMA_PATH}"
-			VERSION "${ARG_VERSION}"
-			SOURCE_NAME	"${ARG_SOURCE_NAME}"
-			EXTRA_DEPS "${ARG_CPP_EXTRA_DEPS}"
-			FOUND_DEPS CPP_FOUND_DEPS)
-
-		set (${ARG_FOUND_CPP_EXTRA_DEPS_OUT_VAR} "${CPP_FOUND_DEPS}")
+			VERSION "${ARG_VERSION}")
 	endif()
 
 	if (ARG_QML_NAME)
@@ -307,11 +304,7 @@ macro (ImtCoreCustomConfigureSdlCppQml)
 		ImtCoreCustomConfigureSdlQml(
 			SCHEMA_PATH "${ARG_SCHEMA_PATH}"
 			VERSION "${ARG_VERSION}"
-			QML_NAME "${ARG_QML_NAME}"
-			EXTRA_DEPS "${ARG_QML_EXTRA_DEPS}"
-			FOUND_DEPS QML_FOUND_DEPS)
-
-		set (${ARG_FOUND_QML_EXTRA_DEPS_OUT_VAR} "${QML_FOUND_DEPS}")
+			QML_NAME "${ARG_QML_NAME}")
 	endif()
 
 endmacro()

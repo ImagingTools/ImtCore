@@ -12,30 +12,28 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Profile.sdl
 			)
 
-ImtCoreCustomConfigureSdlCppQml(
+ImtCoreCustomConfigureSdlCppQml(CXX
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Roles.sdl"
 			VERSION		"1.0"
-			SOURCE_NAME	"Roles"
 			QML_NAME	"imtauthRolesSdl")
-ImtCoreCustomConfigureSdlCppQml(
+
+ImtCoreCustomConfigureSdlCppQml(CXX
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Users.sdl"
 			VERSION		"1.0"
-			SOURCE_NAME	"Users"
 			QML_NAME	"imtauthUsersSdl")
-ImtCoreCustomConfigureSdlCppQml(
+
+ImtCoreCustomConfigureSdlCppQml(CXX
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Groups.sdl"
 			VERSION		"1.0"
-			SOURCE_NAME	"Groups"
 			QML_NAME	"imtauthGroupsSdl")
-ImtCoreCustomConfigureSdlCppQml(
+
+ImtCoreCustomConfigureSdlCppQml(CXX
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Authorization.sdl"
 			VERSION		"1.0"
-			SOURCE_NAME	"Authorization"
 			QML_NAME	"imtauthAuthorizationSdl")
 
-ImtCoreCustomConfigureSdlCppQml(
+ImtCoreCustomConfigureSdlCppQml(CXX
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Profile.sdl"
 			VERSION		"1.0"
-			SOURCE_NAME	"Profile"
 			QML_NAME	"imtauthProfileSdl")
 
