@@ -536,7 +536,12 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 	return rootModelPtr.PopPtr();
 }
 
-bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(const imtgql::CGqlRequest& rawGqlRequest, const sdl::imtauth::Users::V1_0::CUserUpdateGqlRequest& userUpdateRequest, istd::IChangeable& object, QString& errorMessage) const
+
+bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
+			const imtgql::CGqlRequest& /*rawGqlRequest*/,
+			const sdl::imtauth::Users::V1_0::CUserUpdateGqlRequest& /*userUpdateRequest*/,
+			istd::IChangeable& /*object*/,
+			QString& /*errorMessage*/) const
 {
 	return false;
 }

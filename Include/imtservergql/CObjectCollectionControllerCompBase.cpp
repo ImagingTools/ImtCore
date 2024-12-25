@@ -1409,7 +1409,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 		return;
 	}
 
-	iprm::CParamsSet* objectFilterPtr				= new iprm::CParamsSet();
+	iprm::CParamsSet* objectFilterPtr = new iprm::CParamsSet();
 	imtbase::CCollectionFilter* collectionFilterPtr = new imtbase::CCollectionFilter();
 
 	imtbase::CTreeItemModel* filterIdsModelPtr = generalModel.GetTreeItemModel("FilterIds");

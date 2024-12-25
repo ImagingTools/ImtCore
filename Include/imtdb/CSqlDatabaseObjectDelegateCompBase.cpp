@@ -256,14 +256,14 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfoQuery
 
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionByMetaInfoQuery(
-			const QByteArray& metaInfoId,
-			const QVariant& metaInfoValue) const
+			const QByteArray& /*metaInfoId*/,
+			const QVariant& /*metaInfoValue*/) const
 {
 	return QByteArray();
 }
 
 
-QByteArray CSqlDatabaseObjectDelegateCompBase::CreateUpdateMetaInfoQuery(const QSqlRecord& record) const
+QByteArray CSqlDatabaseObjectDelegateCompBase::CreateUpdateMetaInfoQuery(const QSqlRecord& /*record*/) const
 {
 	return QByteArray();
 }

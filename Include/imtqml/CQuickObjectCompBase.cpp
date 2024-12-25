@@ -26,7 +26,7 @@ QString CQuickObjectCompBase::GetPathToQml()
 }
 
 
-void CQuickObjectCompBase::OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IUrlParam* urlParamPtr)
+void CQuickObjectCompBase::OnUrlParamChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::IUrlParam* urlParamPtr)
 {
 	if (!m_applicationInfoCompPtr.IsValid()){
 		return;

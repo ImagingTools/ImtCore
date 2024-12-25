@@ -275,7 +275,11 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	return true;
 }
 
-bool CLicenseCollectionControllerComp::UpdateObjectFromRepresentationRequest(const imtgql::CGqlRequest& rawGqlRequest, const sdl::imtlic::Licenses::V1_0::CLicenseUpdateGqlRequest& licenseUpdateRequest, istd::IChangeable& object, QString& errorMessage) const
+bool CLicenseCollectionControllerComp::UpdateObjectFromRepresentationRequest(
+			const imtgql::CGqlRequest& /*rawGqlRequest*/,
+			const sdl::imtlic::Licenses::V1_0::CLicenseUpdateGqlRequest& /*licenseUpdateRequest*/,
+			istd::IChangeable& /*object*/,
+			QString& /*errorMessage*/) const
 {
 	return false;
 }

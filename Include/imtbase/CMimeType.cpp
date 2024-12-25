@@ -181,31 +181,31 @@ bool CMimeType::FromString(const QString& string)
 
 // protected methods
 
-bool CMimeType::isTypeValid(const QString& type)
+bool CMimeType::isTypeValid(const QString& /*type*/)
 {
 	return true;
 }
 
 
-bool CMimeType::isTreeValid(const QStringList& tree)
+bool CMimeType::isTreeValid(const QStringList& /*tree*/)
 {
 	return true;
 }
 
 
-bool CMimeType::isSubTypeValid(const QString& subType)
+bool CMimeType::isSubTypeValid(const QString& /*subType*/)
 {
 	return true;
 }
 
 
-bool CMimeType::isSuffixValid(const QString& suffix)
+bool CMimeType::isSuffixValid(const QString& /*suffix*/)
 {
 	return true;
 }
 
 
-bool CMimeType::isParametersValid(const Parameters& parameters)
+bool CMimeType::isParametersValid(const Parameters& /*parameters*/)
 {
 	return true;
 }

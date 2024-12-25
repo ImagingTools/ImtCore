@@ -297,12 +297,12 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 		QWriteLocker queryLocker(&m_queryDataMapLock);
 
 		if(m_queryDataMap.contains(key)){
-			QByteArray queryData = m_queryDataMap.value(key);
+			QByteArray responseData = m_queryDataMap.value(key);
 			m_queryDataMap.remove(key);
 			queryLocker.unlock();
 
 			imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
-			responsePtr->SetResponseData(queryData);
+			responsePtr->SetResponseData(responseData);
 			retVal.reset(responsePtr);
 
 

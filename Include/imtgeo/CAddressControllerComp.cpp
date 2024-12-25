@@ -67,8 +67,8 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 						const IAddressTypeInfo* typeInfoPtr =
 							dynamic_cast<const IAddressTypeInfo*>(dataTypePtr.GetPtr());
 						QString shortName = typeInfoPtr->GetShortName();
-						QString name = addressInfoPtr->GetName();
-						address += shortName + " " + name + ",";
+						QString addressName = addressInfoPtr->GetName();
+						address += shortName + " " + addressName + ",";
 					}
 				}
 			}

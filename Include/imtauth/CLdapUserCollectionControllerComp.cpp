@@ -81,7 +81,7 @@ QByteArrayList CLdapUserCollectionControllerComp::CheckLdapUsersThread::GetLdapU
 
 	NetUserEnum(NULL, 3, 0, (LPBYTE*)&l_pUserInfo, MAX_PREFERRED_LENGTH, &l_dwentriesread, &l_dwtotalentries, NULL);
 
-	for(int i = 0; i < l_dwentriesread; i++){
+	for(DWORD i = 0; i < l_dwentriesread; i++){
 		if(l_pUserInfo[i].usri3_flags & UF_ACCOUNTDISABLE){
 			continue;
 		}
@@ -116,8 +116,8 @@ const imtauth::IUserInfo* CLdapUserCollectionControllerComp::CheckLdapUsersThrea
 
 		userInfoPtr->AddToSystem(systemInfo);
 
-		QByteArray userId = QString::fromWCharArray(userInfo3BufPtr->usri3_name).toUtf8();
-		userInfoPtr->SetId(userId);
+		QByteArray userName = QString::fromWCharArray(userInfo3BufPtr->usri3_name).toUtf8();
+		userInfoPtr->SetId(userName);
 
 		QByteArray password = QString::fromWCharArray(userInfo3BufPtr->usri3_password).toUtf8();
 		userInfoPtr->SetPasswordHash(password);
@@ -127,7 +127,7 @@ const imtauth::IUserInfo* CLdapUserCollectionControllerComp::CheckLdapUsersThrea
 			userInfoPtr->SetName(name);
 		}
 		else{
-			userInfoPtr->SetName(userId);
+			userInfoPtr->SetName(userName);
 		}
 
 		QString description = QString::fromWCharArray(userInfo3BufPtr->usri3_comment);

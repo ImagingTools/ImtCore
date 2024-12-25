@@ -571,7 +571,7 @@ QByteArray CDepthBitmap::SerializeRobotTrajectory(const IDepthBitmap::RobotTraje
 IDepthBitmap::RobotTrajectory CDepthBitmap::DeserealizeRobotTrajectory(const QByteArray& robotTrajectoryArchive)
 {
 	RobotTrajectory result;
-	size_t bytesOffset = 0;
+	qsizetype bytesOffset = 0;
 	while (bytesOffset < robotTrajectoryArchive.size()){
 		RobotPosition p;
 		p.timestampMicrosecond = *(robotTrajectoryArchive.data() + bytesOffset);

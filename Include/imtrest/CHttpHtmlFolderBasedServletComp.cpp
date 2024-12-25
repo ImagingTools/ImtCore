@@ -201,7 +201,7 @@ QByteArray CHttpHtmlFolderBasedServletComp::GetMimeType(const QFileInfo& fileInf
 	else if (setMimeTypeByExtention("video/x-flv",				{"f4f", "flv"}));
 	else if (setMimeTypeByExtention("video/x-msvideo",			{"avi"}));
 	else if (setMimeTypeByExtention("video/3gpp",				{"3gp", "3gp2", "3p2", "k3g"}));
-	else if (setMimeTypeByExtention("video/3gpp2",				{"3g2", "3gpp2"}));
+	else if (setMimeTypeByExtention("video/3gpp2",				{"3g2", "3gpp2"}))
 
 	retval.append("; charset=UTF-8");
 

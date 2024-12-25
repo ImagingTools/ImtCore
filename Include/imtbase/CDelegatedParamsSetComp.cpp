@@ -56,7 +56,7 @@ iser::ISerializable* CDelegatedParamsSetComp::GetEditableParameter(const QByteAr
 
 // reimplemented (iser::ISerializable)
 
-bool CDelegatedParamsSetComp::Serialize(iser::IArchive& archive)
+bool CDelegatedParamsSetComp::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
 }

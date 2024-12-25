@@ -327,9 +327,9 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 
 bool CProductCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			const imtgql::CGqlRequest& /*rawGqlRequest*/,
-			const sdl::imtlic::Products::V1_0::CProductUpdateGqlRequest& productUpdateRequest,
-			istd::IChangeable& object,
-			QString& errorMessage) const
+			const sdl::imtlic::Products::V1_0::CProductUpdateGqlRequest& /*productUpdateRequest*/,
+			istd::IChangeable& /*object*/,
+			QString& /*errorMessage*/) const
 {
 	return false;
 }

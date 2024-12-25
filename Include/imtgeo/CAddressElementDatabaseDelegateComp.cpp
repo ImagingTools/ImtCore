@@ -201,10 +201,10 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 
 QByteArray CAddressElementDatabaseDelegateComp::CreateRenameObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& newObjectName,
-			const imtbase::IOperationContext* operationContextPtr) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*newObjectName*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
 }

@@ -343,7 +343,12 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 	return true;
 }
 
-bool CFeatureCollectionControllerComp::UpdateObjectFromRepresentationRequest(const imtgql::CGqlRequest& rawGqlRequest, const sdl::imtlic::Features::V1_0::CUpdateFeatureGqlRequest& updateFeatureRequest, istd::IChangeable& object, QString& errorMessage) const
+
+bool CFeatureCollectionControllerComp::UpdateObjectFromRepresentationRequest(
+			const imtgql::CGqlRequest& /*rawGqlRequest*/,
+			const sdl::imtlic::Features::V1_0::CUpdateFeatureGqlRequest& /*updateFeatureRequest*/,
+			istd::IChangeable& /*object*/,
+			QString& /*errorMessage*/) const
 {
 	return false;
 }

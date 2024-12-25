@@ -31,7 +31,7 @@ bool CHttpRootServletComp::IsCommandSupported(const QByteArray& commandId) const
 }
 
 
-imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
+imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request, const QByteArray& /*subCommandId*/) const
 {
 	QByteArray commandId = request.GetCommandId();
 	if (commandId.startsWith('/')){

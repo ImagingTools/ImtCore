@@ -126,7 +126,7 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionIterator::GetCollectionMetaInfo() 
 }
 
 
-QVariant CSqlDatabaseObjectCollectionIterator::GetElementInfo(int infoType) const
+QVariant CSqlDatabaseObjectCollectionIterator::GetElementInfo(int /*infoType*/) const
 {
 	return QVariant();
 }
