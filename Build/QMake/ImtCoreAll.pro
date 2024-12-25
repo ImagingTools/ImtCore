@@ -23,6 +23,13 @@ imtsdlgen.file = ../../Include/imtsdlgen/QMake/imtsdlgen.pro
 SUBDIRS += imtsdlgenv2
 imtsdlgenv2.file = ../../Include/imtsdlgenv2/QMake/imtsdlgenv2.pro
 
+SUBDIRS += imtoas
+imtoas.file = ../../Include/imtoas/QMake/imtoas.pro
+
+SUBDIRS += ImtOasPck
+ImtOasPck.file = ../../Impl/ImtOasPck/QMake/ImtOasPck.pro
+ImtOasPck.depends = imtoas
+
 SUBDIRS += ImtDesignPck
 ImtDesignPck.file = ../../Impl/ImtDesignPck/QMake/ImtDesignPck.pro
 ImtDesignPck.depends = imtdesign
