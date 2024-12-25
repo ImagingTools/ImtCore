@@ -127,8 +127,10 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::CreateIntern
 
 // reimplemented (imtgql::IGqlRequestExtractor)
 
-istd::IChangeable* CLegacyObjectCollectionControllerCompBase::ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const
+istd::IChangeable* CLegacyObjectCollectionControllerCompBase::ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const
 {
+	QString name;
+	QString description;
 	return CreateObjectFromRequest(gqlRequest, newObjectId, name, description, errorMessage);
 }
 

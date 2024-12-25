@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5323" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="CheckPermissionOr" PackageId="ImtAuthPck" ComponentId="CheckPermissionOr">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="DocumentRevisionController" PackageId="ImtServerGqlPck" ComponentId="DocumentRevisionController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionIds" Type="Id[]" ExportId="CollectionIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GetRevisionInfoList</Value>
+                                <Value>RestoreRevision</Value>
+                                <Value>DeleteRevision</Value>
+                                <Value>BackupRevision</Value>
+                                <Value>ExportRevision</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RevisionPermissions"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentChangeGenerators" Type="Reference[]" ExportId="DocumentChangeGenerators">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollections" Type="Reference[]" ExportId="ObjectCollections">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CheckPermissionOr"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RevisionPermissions" PackageId="ImtCoreVoce" ComponentId="RevisionPermissions">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="DocumentRevisionController"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="DocumentRevisionController"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

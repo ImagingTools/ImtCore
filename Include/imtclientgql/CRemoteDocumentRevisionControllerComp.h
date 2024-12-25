@@ -2,33 +2,24 @@
 
 
 // ImtCore includes
-#include <imtbase/ISearchController.h>
-#include <imtbase/IObjectCollection.h>
-#include <imtbase/IDocumentChangeGenerator.h>
-#include <imtservergql/CGqlRequestHandlerCompBase.h>
+#include <imtclientgql/TClientRequestManagerCompWrap.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision.h>
 
 
-namespace imtservergql
+namespace imtclientgql
 {
 
 
-class CDocumentRevisionControllerComp: public sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase
+class CRemoteDocumentRevisionControllerComp: public imtclientgql::TClientRequestManagerCompWrap<sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase>
 {
 public:
-	typedef sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase> BaseClass;
 
-	I_BEGIN_COMPONENT(CDocumentRevisionControllerComp);
+	I_BEGIN_COMPONENT(CRemoteDocumentRevisionControllerComp);
 		I_ASSIGN_MULTI_0(m_collectionIdsAttrPtr, "CollectionIds", "Collection ID-s", false);
-		I_ASSIGN_MULTI_0(m_objectCollectionsCompPtr, "ObjectCollections", "Object collections", false);
-		I_ASSIGN_MULTI_0(m_documentChangeGeneratorsCompPtr, "DocumentChangeGenerators", "Document change generators", false);
 	I_END_COMPONENT;
 
 protected:
-	virtual bool IsCollectionSupported(const QByteArray& typeId) const;
-	virtual imtbase::IObjectCollection* FindObjectCollection(const QByteArray& typeId) const;
-	virtual imtbase::IDocumentChangeGenerator* FindDocumentChangeGenerator(const QByteArray& typeId) const;
-
 	// reimplemented (sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase)
 	virtual sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 OnGetRevisionInfoList(const sdl::imtbase::DocumentRevision::V1_0::CGetRevisionInfoListGqlRequest& getRevisionInfoListRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0 OnBackupRevision(const sdl::imtbase::DocumentRevision::V1_0::CBackupRevisionGqlRequest& backupRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -41,11 +32,9 @@ protected:
 
 protected:
 	I_MULTIATTR(QByteArray, m_collectionIdsAttrPtr);
-	I_MULTIREF(imtbase::IObjectCollection, m_objectCollectionsCompPtr);
-	I_MULTIREF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorsCompPtr);
 };
 
 
-} // namespace imtservergql
+} // namespace imtclientgql
 
 

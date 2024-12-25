@@ -252,8 +252,6 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentation(
 			const sdl::imtlic::Features::CFeatureData::V1_0& featureDataRepresentation,
 			QByteArray& newObjectId,
-			QString& name,
-			QString& description,
 			QString& errorMessage) const
 {
 	if (!m_featureInfoFactCompPtr.IsValid()){
@@ -286,6 +284,9 @@ istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentat
 		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
 	featureInfoPtr->SetObjectUuid(newObjectId);
+
+	QString name;
+	QString description;
 
 	if (featureDataRepresentation.FeatureName){
 		name = *featureDataRepresentation.FeatureName;

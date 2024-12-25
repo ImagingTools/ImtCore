@@ -44,6 +44,7 @@ public:
 
 	static void InitImtCoreSdl()
 	{
+		Q_INIT_RESOURCE(imtbaseImtCollectionSdl);
 		Q_INIT_RESOURCE(imtbaseComplexCollectionFilterSdl);
 		Q_INIT_RESOURCE(imtbaseDocumentRevisionSdl);
 		Q_INIT_RESOURCE(imtauthGroupsSdl);

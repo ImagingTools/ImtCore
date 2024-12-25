@@ -65,8 +65,6 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 istd::IChangeable* CRoleControllerComp::CreateObjectFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
 		QByteArray& objectId,
-		QString& name,
-		QString& description,
 		QString& errorMessage) const
 {
 	if (!m_roleFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
@@ -146,6 +144,9 @@ istd::IChangeable* CRoleControllerComp::CreateObjectFromRequest(
 	}
 
 	roleInfoPtr->SetRoleId(roleId);
+
+	QString name;
+	QString description;
 
 	if (itemModel.ContainsKey("Name")){
 		name = itemModel.GetData("Name").toString();

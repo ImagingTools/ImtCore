@@ -1,6 +1,9 @@
 #include <imtauthgql/CUserGroupCollectionControllerComp.h>
 
 
+// ACF includes
+#include <iqt/iqt.h>
+
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
 
@@ -10,6 +13,115 @@ namespace imtauthgql
 
 
 // protected methods
+
+bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
+			const sdl::imtauth::Groups::CGroupData::V1_0& groupDataRepresentation,
+			istd::IChangeable& object,
+			QByteArray& newObjectId,
+			QString& errorMessage) const
+{
+	imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(&object);
+	if (userGroupInfoPtr == nullptr){
+		errorMessage = QString("Unable to cast user group instance to identifable object. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
+		return false;
+	}
+
+	QByteArray productId;
+	if (groupDataRepresentation.ProductId){
+		productId = *groupDataRepresentation.ProductId;
+	}
+
+	QString name;
+	if (groupDataRepresentation.Name){
+		name = *groupDataRepresentation.Name;
+	}
+	if (name.isEmpty()){
+		errorMessage = QString("Group Name cannot be empty");
+		return false;
+	}
+
+	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+	for (imtbase::ICollectionInfo::Id& collectionId : collectionIds){
+		imtbase::IObjectCollection::DataPtr groupDataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(collectionId, groupDataPtr)){
+			imtauth::IUserGroupInfo* currentUserGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
+			if (currentUserGroupInfoPtr != nullptr){
+				if (collectionId != newObjectId){
+					QString currentUserGroupName = currentUserGroupInfoPtr->GetName();
+					if (currentUserGroupName == name){
+						errorMessage = QT_TR_NOOP(QString("Group Name '%1' already exists").arg(currentUserGroupName));
+						return false;
+					}
+				}
+			}
+		}
+	}
+
+	userGroupInfoPtr->SetName(name);
+
+	if (groupDataRepresentation.Description){
+		userGroupInfoPtr->SetDescription(*groupDataRepresentation.Description);
+	}
+
+	QByteArrayList userIds;
+	if (groupDataRepresentation.Users){
+		userIds = groupDataRepresentation.Users->split(';');
+	}
+	userIds.removeAll("");
+	userGroupInfoPtr->SetUsers(userIds);
+
+	QByteArrayList roleIds;
+	if (groupDataRepresentation.Roles){
+		roleIds = groupDataRepresentation.Roles->split(';');
+	}
+	roleIds.removeAll("");
+
+	if (!roleIds.isEmpty()){
+		userGroupInfoPtr->SetRoles(productId, roleIds);
+	}
+	else{
+		userGroupInfoPtr->RemoveProduct(productId);
+	}
+
+	if (groupDataRepresentation.ParentGroups){
+		QByteArrayList groupIds = groupDataRepresentation.ParentGroups->split(';');
+		for (const QByteArray& parentGroupId : groupIds){
+			if (!parentGroupId.isEmpty()){
+				userGroupInfoPtr->AddParentGroup(parentGroupId);
+			}
+		}
+	}
+
+	return true;
+}
+
+
+// reimplemented (sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase)
+
+sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CUserGroupCollectionControllerComp::OnGetObjectVisualStatus(
+			const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response = BaseClass::OnGetObjectVisualStatus(getObjectVisualStatusRequest, gqlRequest, errorMessage);
+
+	QByteArray languageId;
+	const imtgql::IGqlContext* gqlContextPtr = getObjectVisualStatusRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		languageId = gqlContextPtr->GetLanguageId();
+	}
+
+	if (response.Text->isEmpty()){
+		response.Text = "<no name>";
+	}
+
+	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Groups")).toUtf8(), languageId, "CRoleCollectionControllerComp");
+	response.Text = translation + QByteArrayLiteral(" / ") + *response.Text;
+
+	return response;
+}
+
 
 // reimplemented (sdl::imtauth::Groups::V1_0::CGroupCollectionControllerCompBase)
 
@@ -83,8 +195,6 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresentation(
 			const sdl::imtauth::Groups::CGroupData::V1_0& groupDataRepresentation,
 			QByteArray& newObjectId,
-			QString& name,
-			QString& description,
 			QString& errorMessage) const
 {
 	if (!m_userGroupInfoFactCompPtr.IsValid()){
@@ -118,70 +228,8 @@ istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresent
 	}
 	userGroupInfoPtr->SetObjectUuid(newObjectId);
 
-	QByteArray productId;
-	if (groupDataRepresentation.ProductId){
-		productId = *groupDataRepresentation.ProductId;
-	}
-
-	if (groupDataRepresentation.Name){
-		name = *groupDataRepresentation.Name;
-	}
-	if (name.isEmpty()){
-		errorMessage = QString("Group name cannot be empty");
+	if (!FillObjectFromRepresentation(groupDataRepresentation, *userGroupInfoPtr, newObjectId, errorMessage)){
 		return nullptr;
-	}
-
-	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-	for (imtbase::ICollectionInfo::Id& collectionId : collectionIds){
-		imtbase::IObjectCollection::DataPtr groupDataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(collectionId, groupDataPtr)){
-			imtauth::IUserGroupInfo* currentUserGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
-			if (currentUserGroupInfoPtr != nullptr){
-				if (collectionId != newObjectId){
-					QString currentUserGroupName = currentUserGroupInfoPtr->GetName();
-					if (currentUserGroupName == name){
-						errorMessage = QT_TR_NOOP(QString("Group name '%1' already exists").arg(currentUserGroupName));
-						return nullptr;
-					}
-				}
-			}
-		}
-	}
-
-	userGroupInfoPtr->SetName(name);
-
-	if (groupDataRepresentation.Description){
-		description = *groupDataRepresentation.Description;
-	}
-	userGroupInfoPtr->SetDescription(description);
-
-	QByteArrayList userIds;
-	if (groupDataRepresentation.Users){
-		userIds = groupDataRepresentation.Users->split(';');
-	}
-	userIds.removeAll("");
-	userGroupInfoPtr->SetUsers(userIds);
-
-	QByteArrayList roleIds;
-	if (groupDataRepresentation.Roles){
-		roleIds = groupDataRepresentation.Roles->split(';');
-	}
-	roleIds.removeAll("");
-
-	if (!roleIds.isEmpty()){
-		userGroupInfoPtr->SetRoles(productId, roleIds);
-	}
-	else{
-		userGroupInfoPtr->RemoveProduct(productId);
-	}
-
-	if (groupDataRepresentation.ParentGroups){
-		QByteArrayList groupIds = groupDataRepresentation.ParentGroups->split(';');
-		for (const QByteArray& parentGroupId : groupIds){
-			if (!parentGroupId.isEmpty()){
-				userGroupInfoPtr->AddParentGroup(parentGroupId);
-			}
-		}
 	}
 
 	return userGroupInstancePtr.PopPtr();
@@ -322,13 +370,40 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 	return rootModelPtr.PopPtr();
 }
 
+
 bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
-			const imtgql::CGqlRequest& /*rawGqlRequest*/,
-			const sdl::imtauth::Groups::V1_0::CGroupUpdateGqlRequest& /*groupUpdateRequest*/,
-			istd::IChangeable& /*object*/,
-			QString& /*errorMessage*/) const
+			const imtgql::CGqlRequest& rawGqlRequest,
+			const sdl::imtauth::Groups::V1_0::CGroupUpdateGqlRequest& groupUpdateRequest,
+			istd::IChangeable& object,
+			QString& errorMessage) const
 {
-	return false;
+	sdl::imtauth::Groups::CGroupData::V1_0 representation;
+
+	if (groupUpdateRequest.GetRequestedArguments().input.Item){
+		representation = *groupUpdateRequest.GetRequestedArguments().input.Item;
+	}
+
+	imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(&object);
+	if (userGroupInfoPtr == nullptr){
+		errorMessage = QString("Unable to cast user group instance to identifable object. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
+
+		return false;
+	}
+
+	QByteArray objectId = userGroupInfoPtr->GetObjectUuid();
+
+	QByteArrayList groupIds = userGroupInfoPtr->GetParentGroups();
+	for (const QByteArray& groupId : groupIds){
+		userGroupInfoPtr->RemoveParentGroup(groupId);
+	}
+
+	QByteArrayList userIds = userGroupInfoPtr->GetUsers();
+	for (const QByteArray& userId : userIds){
+		userGroupInfoPtr->RemoveUser(userId);
+	}
+
+	return FillObjectFromRepresentation(representation, object, objectId, errorMessage);
 }
 
 

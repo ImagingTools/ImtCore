@@ -2,13 +2,11 @@ schema {
 	name: ImtCollection
 	namespace: imtbase
 	version: 1.0
-	# extends @file("../1.0/ImtCollection.sdl")
-	# extends @module(imtbase.ImtCollection.1.0)
+	query: Query
 }
 
 import {
 	"../../imtbase/1.0/ComplexCollectionFilter.sdl"
-	# imtbase.ComplexCollectionFilter.1.0
 }
 
 type CollectionViewParams {
@@ -22,39 +20,40 @@ type NotificationItem {
 	TotalCount: Integer
 }
 
-type NotificationInfo {
-	Id: ID!
-	Name: String!
-}
-
 type UpdatedNotificationPayload {
-	updatedNotification: NotificationInfo!
+	Id: ID!
 }
 
 type AddedNotificationPayload {
-	addedNotification: NotificationInfo!
-}
-
-type SortingInfoId {
-	Id: ID
-}
-
-type FilteringInfoId {
-	Id: ID
+	Id: ID!
 }
 
 type CollectionFilter {
 	ObjectTypeId: ID
 	Filter: String
 	SortingOrder: String
-	SortingInfoIds: [SortingInfoId]
-	FilteringInfoIds: [FilteringInfoId]
+	SortingInfoIds: [String!]
+	FilteringInfoIds: [String!]
 }
 
 input InputId {
 	Id: ID!
 }
 
+type VisualStatus {
+	ObjectId: ID
+	Icon: String
+	Text: String
+	Description: String
+}
 
+input ObjectVisualStatusInput {
+	ObjectId: ID!
+	TypeId: ID!
+}
+
+type Query {
+	GetObjectVisualStatus (input: ObjectVisualStatusInput): VisualStatus!
+}
 
 

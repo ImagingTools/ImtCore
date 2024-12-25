@@ -118,8 +118,6 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentation(
 	const sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0& licenseDataRepresentation,
 	QByteArray& newObjectId,
-	QString& name,
-	QString& description,
 	QString& errorMessage) const
 {
 	if (!m_licenseInfoFactCompPtr.IsValid()){
@@ -186,6 +184,9 @@ istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentat
 	}
 
 	licenseInfoPtr->SetLicenseId(licenseId);
+
+	QString name;
+	QString description;
 
 	if (licenseDataRepresentation.Name){
 		name = *licenseDataRepresentation.Name;

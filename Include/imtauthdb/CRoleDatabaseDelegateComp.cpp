@@ -67,14 +67,24 @@ QByteArray CRoleDatabaseDelegateComp::CreateDeleteObjectQuery(
 }
 
 
-QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const istd::IChangeable& object,
-			const imtbase::IOperationContext* operationContextPtr,
-			bool useExternDelegate) const
+bool CRoleDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	return BaseClass::CreateUpdateObjectQuery(collection, objectId, object, operationContextPtr, useExternDelegate);
+	BaseClass::SetCollectionItemMetaInfoFromRecord(record, metaInfo);
+
+	if (record.contains("Document")){
+		QByteArray json = record.value("Document").toByteArray();
+		QJsonDocument jsonDocument = QJsonDocument::fromJson(json);
+
+		if (!jsonDocument.isNull()){
+			QString description = jsonDocument["RoleDescription"].toString();
+			metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_DESCRIPTION, description);
+
+			QString name = jsonDocument["RoleName"].toString();
+			metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_NAME, name);
+		}
+	}
+
+	return true;
 }
 
 

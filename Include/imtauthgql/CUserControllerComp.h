@@ -24,6 +24,11 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (sdl::imtauth::Users::V1_0::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::ImtCollection::CVisualStatus::V1_0 OnGetObjectVisualStatus(
+				const sdl::imtauth::Users::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::imtauth::Users::CUsersListPayload::V1_0 OnUsersList(
 				const sdl::imtauth::Users::V1_0::CUsersListGqlRequest& usersListRequest,
 				const imtgql::CGqlRequest& gqlRequest,

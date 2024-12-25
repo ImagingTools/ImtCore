@@ -15,6 +15,16 @@ namespace imtlicgql
 
 // protected methods
 
+
+sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CProductControllerComp::OnGetObjectVisualStatus(
+	const sdl::imtlic::Products::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+	const ::imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
+{
+	return sdl::imtbase::ImtCollection::CVisualStatus::V1_0();
+}
+
+
 sdl::imtlic::Products::CProductsListPayload::V1_0 CProductControllerComp::OnProductsList(
 	const sdl::imtlic::Products::V1_0::CProductsListGqlRequest& /*productsListRequest*/,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,

@@ -82,8 +82,6 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 istd::IChangeable* CAccountControllerComp::CreateObjectFromInputParams(
 			const QList<imtgql::CGqlObject>& inputParams,
 			QByteArray& objectId,
-			QString& name,
-			QString& description,
 			QString& errorMessage) const
 {
 	if (!m_accountInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
@@ -122,6 +120,9 @@ istd::IChangeable* CAccountControllerComp::CreateObjectFromInputParams(
 		itemModel.CreateFromJson(itemData);
 
 		companyInfoPtr->SetObjectUuid(objectId);
+
+		QString name;
+		QString description;
 
 		if (itemModel.ContainsKey("Name")){
 			name = itemModel.GetData("Name").toString();

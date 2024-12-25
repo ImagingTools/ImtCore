@@ -6,6 +6,7 @@
 #include <iprm/CTextParam.h>
 #include <iprm/TParamsPtr.h>
 #include <iprm/CEnableableParam.h>
+#include <iqt/iqt.h>
 
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
@@ -17,6 +18,147 @@ namespace imtauthgql
 
 
 // protected methods
+
+bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
+			const sdl::imtauth::Roles::CRoleData::V1_0& roleDataRepresentation,
+			istd::IChangeable& object,
+			QByteArray& objectId,
+			QString& errorMessage) const
+{
+	imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(&object);
+	if (roleInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
+
+		return false;
+	}
+
+	QByteArray roleId;
+	if (roleDataRepresentation.RoleId){
+		roleId = *roleDataRepresentation.RoleId;
+	}
+
+	if (roleId.isEmpty()){
+		errorMessage = QString("Role-ID can't be empty!");
+		return false;
+	}
+
+	roleInfoPtr->SetRoleId(roleId);
+
+	QByteArray productId;
+	if (roleDataRepresentation.ProductId){
+		productId = *roleDataRepresentation.ProductId;
+	}
+
+	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+	for (const imtbase::ICollectionInfo::Id& collectionId : collectionIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
+			imtauth::IRole* currentRoleInfoPtr = dynamic_cast<imtauth::IRole*>(dataPtr.GetPtr());
+			if (currentRoleInfoPtr != nullptr){
+				if (collectionId != objectId){
+					QByteArray currentRoleId = currentRoleInfoPtr->GetRoleId();
+					QByteArray currentProductId = currentRoleInfoPtr->GetProductId();
+
+					if (currentRoleId == roleId && currentProductId == productId){
+						errorMessage = QString("Role with ID: '%1' already exists").arg(qPrintable(currentRoleId));
+						return false;
+					}
+				}
+			}
+		}
+	}
+
+	roleInfoPtr->SetProductId(productId);
+
+	QString roleName;
+	if (roleDataRepresentation.Name){
+		roleName = *roleDataRepresentation.Name;
+	}
+	roleInfoPtr->SetRoleName(roleName);
+
+	QString roleDescription;
+	if (roleDataRepresentation.Description){
+		roleDescription = *roleDataRepresentation.Description;
+	}
+	roleInfoPtr->SetRoleDescription(roleDescription);
+
+	QByteArray parentRoles;
+	if (roleDataRepresentation.ParentRoles){
+		parentRoles = *roleDataRepresentation.ParentRoles;
+	}
+	if (!parentRoles.isEmpty()){
+		QByteArrayList parentRoleIds = parentRoles.split(';');
+		parentRoleIds.removeAll("");
+
+		for (const QByteArray& parentRoleId : parentRoleIds){
+			if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
+				errorMessage = QT_TR_NOOP(QString("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
+											  .arg(qPrintable(parentRoleId))
+											  .arg(qPrintable(roleId)));
+
+				return false;
+			}
+		}
+	}
+
+	QByteArray permissions;
+	if (roleDataRepresentation.Permissions){
+		permissions = *roleDataRepresentation.Permissions;
+	}
+	QByteArrayList permissionIds = permissions.split(';');
+	permissionIds.removeAll("");
+	roleInfoPtr->SetLocalPermissions(permissionIds);
+
+	bool isGuest = bool(roleDataRepresentation.IsGuest && *roleDataRepresentation.IsGuest);
+	roleInfoPtr->SetGuest(isGuest);
+
+	bool isDefault = bool(roleDataRepresentation.IsDefault && *roleDataRepresentation.IsDefault);
+	roleInfoPtr->SetDefault(isDefault);
+
+	if (isGuest || isDefault){
+		if (m_gqlRequestProviderCompPtr.IsValid()){
+			const imtgql::IGqlRequest* gqlRequestPtr = m_gqlRequestProviderCompPtr->GetGqlRequest();
+			if (gqlRequestPtr != nullptr){
+				const imtgql::IGqlContext* gqlContextPtr = gqlRequestPtr->GetRequestContext();
+				if (gqlContextPtr != nullptr){
+					if (!gqlContextPtr->GetUserInfo()->IsAdmin()){
+						errorMessage = QString("Only the admin can change the default/guest role");
+						return false;
+					}
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+
+// reimplemented (sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase)
+
+sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CRoleCollectionControllerComp::OnGetObjectVisualStatus(
+			const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response = BaseClass::OnGetObjectVisualStatus(getObjectVisualStatusRequest, gqlRequest, errorMessage);
+
+	QByteArray languageId;
+	const imtgql::IGqlContext* gqlContextPtr = getObjectVisualStatusRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		languageId = gqlContextPtr->GetLanguageId();
+	}
+
+	if (response.Text->isEmpty()){
+		response.Text = "<no name>";
+	}
+
+	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Roles")).toUtf8(), languageId, "CRoleCollectionControllerComp");
+	response.Text = translation + QByteArrayLiteral(" / ") + *response.Text;
+	return response;
+}
+
 
 // reimplemented (sdl::imtauth::Roles::V1_0::CRoleCollectionControllerCompBase)
 
@@ -94,8 +236,6 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation(
 			const sdl::imtauth::Roles::CRoleData::V1_0& roleDataRepresentation,
 			QByteArray& newObjectId,
-			QString& name,
-			QString& description,
 			QString& errorMessage) const
 {
 	if (!m_roleInfoFactCompPtr.IsValid()){
@@ -132,103 +272,11 @@ istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation
 	roleInfoPtr->SetObjectUuid(id);
 	newObjectId = id;
 
-	QByteArray roleId;
-	if (roleDataRepresentation.RoleId){
-		roleId = *roleDataRepresentation.RoleId;
-	}
-	if (roleId.isEmpty()){
-		errorMessage = QString("Role-ID can't be empty!");
+	QString name;
+	QString description;
+
+	if (!FillObjectFromRepresentation(roleDataRepresentation, *roleInfoPtr, newObjectId, errorMessage)){
 		return nullptr;
-	}
-
-	roleInfoPtr->SetRoleId(roleId);
-
-	QByteArray productId;
-	if (roleDataRepresentation.ProductId){
-		productId = *roleDataRepresentation.ProductId;
-	}
-
-	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-	for (const imtbase::ICollectionInfo::Id& collectionId : collectionIds){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-			imtauth::IRole* currentRoleInfoPtr = dynamic_cast<imtauth::IRole*>(dataPtr.GetPtr());
-			if (currentRoleInfoPtr != nullptr){
-				if (collectionId != id){
-					QByteArray currentRoleId = currentRoleInfoPtr->GetRoleId();
-					QByteArray currentProductId = currentRoleInfoPtr->GetProductId();
-
-					if (currentRoleId == roleId && currentProductId == productId){
-						errorMessage = QString("Role with ID: '%1' already exists").arg(qPrintable(currentRoleId));
-						return nullptr;
-					}
-				}
-			}
-		}
-	}
-
-	roleInfoPtr->SetProductId(productId);
-
-	QString roleName;
-	if (roleDataRepresentation.Name){
-		roleName = *roleDataRepresentation.Name;
-	}
-	name = roleName;
-	roleInfoPtr->SetRoleName(roleName);
-
-	QString roleDescription;
-	if (roleDataRepresentation.Description){
-		roleDescription = *roleDataRepresentation.Description;
-	}
-	description = roleDescription;
-	roleInfoPtr->SetRoleDescription(roleDescription);
-
-	QByteArray parentRoles;
-	if (roleDataRepresentation.ParentRoles){
-		parentRoles = *roleDataRepresentation.ParentRoles;
-	}
-	if (!parentRoles.isEmpty()){
-		QByteArrayList parentRoleIds = parentRoles.split(';');
-		parentRoleIds.removeAll("");
-
-		for (const QByteArray& parentRoleId : parentRoleIds){
-			if (parentRoleId == id || !roleInfoPtr->IncludeRole(parentRoleId)){
-				errorMessage = QT_TR_NOOP(QString("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
-										.arg(qPrintable(parentRoleId))
-										.arg(qPrintable(roleId)));
-
-				return nullptr;
-			}
-		}
-	}
-
-	QByteArray permissions;
-	if (roleDataRepresentation.Permissions){
-		permissions = *roleDataRepresentation.Permissions;
-	}
-	QByteArrayList permissionIds = permissions.split(';');
-	permissionIds.removeAll("");
-	roleInfoPtr->SetLocalPermissions(permissionIds);
-
-	bool isGuest = bool(roleDataRepresentation.IsGuest && *roleDataRepresentation.IsGuest);
-	roleInfoPtr->SetGuest(isGuest);
-
-	bool isDefault = bool(roleDataRepresentation.IsDefault && *roleDataRepresentation.IsDefault);
-	roleInfoPtr->SetDefault(isDefault);
-
-	if (isGuest || isDefault){
-		if (m_gqlRequestProviderCompPtr.IsValid()){
-			const imtgql::IGqlRequest* gqlRequestPtr = m_gqlRequestProviderCompPtr->GetGqlRequest();
-			if (gqlRequestPtr != nullptr){
-				const imtgql::IGqlContext* gqlContextPtr = gqlRequestPtr->GetRequestContext();
-				if (gqlContextPtr != nullptr){
-					if (!gqlContextPtr->GetUserInfo()->IsAdmin()){
-						errorMessage = QString("Only the admin can change the default/guest role");
-						return nullptr;
-					}
-				}
-			}
-		}
 	}
 
 	return roleInstancePtr.PopPtr();
@@ -386,9 +434,29 @@ void CRoleCollectionControllerComp::SetObjectFilter(
 }
 
 
-bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(const imtgql::CGqlRequest& /*rawGqlRequest*/, const sdl::imtauth::Roles::V1_0::CRoleUpdateGqlRequest& /*roleUpdateRequest*/, istd::IChangeable& /*object*/, QString& /*errorMessage*/) const
+bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
+			const imtgql::CGqlRequest& /*rawGqlRequest*/,
+			const sdl::imtauth::Roles::V1_0::CRoleUpdateGqlRequest& roleUpdateRequest,
+			istd::IChangeable& object,
+			QString& errorMessage) const
 {
-	return false;
+	sdl::imtauth::Roles::CRoleData::V1_0 roleDataRepresentation = *roleUpdateRequest.GetRequestedArguments().input.Item;
+
+	imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(&object);
+	if (roleInfoPtr == nullptr){
+		errorMessage = QString("Unable to cast role instance to identifable object. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
+
+		return false;
+	}
+
+	QByteArrayList includedRole = roleInfoPtr->GetIncludedRoles();
+	for (const QByteArray& roleId : includedRole){
+		roleInfoPtr->ExcludeRole(roleId);
+	}
+
+	QByteArray objectId = roleInfoPtr->GetObjectUuid();
+	return FillObjectFromRepresentation(roleDataRepresentation, object, objectId, errorMessage);
 }
 
 

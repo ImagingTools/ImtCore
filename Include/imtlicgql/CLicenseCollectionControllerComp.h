@@ -30,8 +30,6 @@ protected:
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
 				const sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0& licenseDataRepresentation,
 				QByteArray& newObjectId,
-				QString& name,
-				QString& description,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,

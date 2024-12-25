@@ -13,10 +13,12 @@
         <Element ComponentName="Demultiplexer" X="625" Y="125" Note=""/>
         <Element ComponentName="GraphQLClientEngine" X="225" Y="475" Note=""/>
         <Element ComponentName="HttpUrlParam" X="220" Y="680" Note=""/>
+        <Element ComponentName="RemoteDocumentRevisionController" X="600" Y="250" Note=""/>
+        <Element ComponentName="RemoteObjectVisualStatusController" X="600" Y="325" Note=""/>
         <Element ComponentName="RemoteRepositories" X="625" Y="675" Note=""/>
         <Element ComponentName="RemoteRepresentationController" X="225" Y="150" Note=""/>
-        <Element ComponentName="RoleMetaInfoControllerProxy" X="625" Y="300" Note=""/>
-        <Element ComponentName="SlaveSubscriberController" X="725" Y="500" Note=""/>
+        <Element ComponentName="RoleMetaInfoControllerProxy" X="625" Y="425" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="725" Y="525" Note=""/>
         <Element ComponentName="Subscription" X="1020" Y="380" Note=""/>
         <Element ComponentName="WebSocketUrlParam" X="1040" Y="680" Note=""/>
     </PositionMap>

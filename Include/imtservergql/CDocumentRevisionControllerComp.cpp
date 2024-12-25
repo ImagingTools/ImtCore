@@ -17,6 +17,12 @@ namespace imtservergql
 
 // protected methods
 
+bool CDocumentRevisionControllerComp::IsCollectionSupported(const QByteArray& typeId) const
+{
+	return m_collectionIdsAttrPtr.FindValue(typeId) >= 0;
+}
+
+
 imtbase::IObjectCollection* CDocumentRevisionControllerComp::FindObjectCollection(const QByteArray& typeId) const
 {
 	int index = m_collectionIdsAttrPtr.FindValue(typeId);
@@ -48,6 +54,10 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 CDocumentRevisionControl
 
 	QByteArray documentId = *getRevisionInfoListRequest.GetRequestedArguments().input.DocumentId;
 	QByteArray collectionId = *getRevisionInfoListRequest.GetRequestedArguments().input.CollectionId;
+
+	if (!IsCollectionSupported(collectionId)){
+		return response;
+	}
 
 	const imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
 	Q_ASSERT(objectCollectionPtr != nullptr);
@@ -127,6 +137,10 @@ sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0 CDocumentRevision
 	QByteArray documentId = *restoreRevisionRequest.GetRequestedArguments().input.ObjectId;
 	int revisionNumber = *restoreRevisionRequest.GetRequestedArguments().input.Revision;
 
+	if (!IsCollectionSupported(collectionId)){
+		return response;
+	}
+
 	imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
 	Q_ASSERT(objectCollectionPtr != nullptr);
 
@@ -180,6 +194,10 @@ sdl::imtbase::DocumentRevision::CDeleteRevisionResponse::V1_0 CDocumentRevisionC
 	int revisionNumber = *deleteRevisionRequest.GetRequestedArguments().input.Revision;
 	QByteArray collectionId = *deleteRevisionRequest.GetRequestedArguments().input.CollectionId;
 
+	if (!IsCollectionSupported(collectionId)){
+		return response;
+	}
+
 	imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
 	Q_ASSERT(objectCollectionPtr != nullptr);
 
@@ -195,6 +213,30 @@ sdl::imtbase::DocumentRevision::CDeleteRevisionResponse::V1_0 CDocumentRevisionC
 
 	return response;
 }
+
+
+// reimplemented (imtgql::IGqlRequestHandler)
+
+bool CDocumentRevisionControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	bool isSupported = BaseClass::IsRequestSupported(gqlRequest);
+	if (!isSupported){
+		return false;
+	}
+
+	const imtgql::CGqlObject* inputObjectPtr = gqlRequest.GetParamObject("input");
+	if (inputObjectPtr == nullptr){
+		return false;
+	}
+
+	QByteArray collectionId = inputObjectPtr->GetFieldArgumentValue("CollectionId").toByteArray();
+	if (collectionId.isEmpty()){
+		return false;
+	}
+
+	return IsCollectionSupported(collectionId);
+}
+
 
 } // namespace imtservergql
 

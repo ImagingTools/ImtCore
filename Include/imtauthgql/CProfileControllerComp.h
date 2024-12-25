@@ -2,7 +2,6 @@
 
 
 // ImtCore includes
-#include <imtclientgql/TClientRequestManagerCompWrap.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtlic/IProductInfo.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Profile.h>

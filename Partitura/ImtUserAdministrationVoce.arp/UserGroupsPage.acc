@@ -69,8 +69,7 @@
                                 <Value>GroupsMetaInfo</Value>
                                 <Value>GroupsRename</Value>
                                 <Value>GroupsSetDescription</Value>
-                                <Value>GroupsObjectView</Value>
-                                <Value>GroupHistory</Value>
+                                <Value>GetObjectVisualStatus</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -88,6 +87,13 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserGroupRepository">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Group</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="OperationContextController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="OperationContextController"/>
@@ -352,7 +358,7 @@
         <EmbeddedRegistry Id="UsersCommands">
             <Data Description="" Keywords="">
                 <ElementsList>
-                    <Element Id="CollectionCommandsController" PackageId="ImtGraphQlVoce" ComponentId="StandardCollectionCommandsController">
+                    <Element Id="CollectionCommands" PackageId="ImtCoreVoce" ComponentId="StandardCollectionCommands">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="">
@@ -363,18 +369,11 @@
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
-                                <AttributeInfo Id="GqlCommandIds" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>GroupsCommands</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="NewCommandName" Type="String" ExportId="">
-                                    <Data IsEnabled="true" Value="New group"/>
+                                    <Data IsEnabled="true" Value="New Group"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
@@ -399,12 +398,87 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
+                    <Element Id="CollectionCommandsController" PackageId="ImtGraphQlVoce" ComponentId="CommandsController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="GqlCommandIds" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>GroupsCommands</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="LeftAlignmentCommands" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>CollectionCommands/New</Value>
+                                            <Value>CollectionCommands/Edit</Value>
+                                            <Value>CollectionCommands/Remove</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RightAlignmentCommands" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>Revision</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="Revision" PackageId="ImtCoreVoce" ComponentId="Command">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="Revision"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>ViewRevisions</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="IconPath" Type="String" ExportId="">
+                                    <Data IsEnabled="true" Value="Icons/Restore"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Name" Type="String" ExportId="">
+                                    <Data IsEnabled="true" Value="Revision"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
-                    <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="CollectionCommandsController"/>
                     <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CollectionCommandsController"/>
-                    <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="CollectionCommandsController"/>
+                    <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="CollectionCommands"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="CollectionCommandsController"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>
             </Data>
@@ -414,5 +488,7 @@
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="UserGroupChangeGenerator" ComponentId="UserGroupChangeGenerator"/>
+    </ExportedComponents>
 </Acf>

@@ -148,8 +148,6 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 istd::IChangeable* CProductCollectionControllerComp::CreateObjectFromRepresentation(
 	const sdl::imtlic::Products::CProductData::V1_0& productDataRepresentation,
 	QByteArray& newObjectId,
-	QString& name,
-	QString& description,
 	QString& errorMessage) const
 {
 	if (!m_productInfoFactCompPtr.IsValid()){
@@ -215,6 +213,9 @@ istd::IChangeable* CProductCollectionControllerComp::CreateObjectFromRepresentat
 	}
 
 	productInfoPtr->SetProductId(productId);
+
+	QString name;
+	QString description;
 
 	if (productDataRepresentation.ProductName){
 		name = *productDataRepresentation.ProductName;

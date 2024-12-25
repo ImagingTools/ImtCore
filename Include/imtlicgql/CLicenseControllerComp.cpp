@@ -16,8 +16,6 @@ namespace imtlicgql
 istd::IChangeable* CLicenseControllerComp::CreateObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QByteArray& objectId,
-			QString& name,
-			QString& description,
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -93,6 +91,9 @@ istd::IChangeable* CLicenseControllerComp::CreateObjectFromRequest(
 	}
 
 	licenseInfoPtr->SetLicenseId(licenseId);
+
+	QString name;
+	QString description;
 
 	if (licenseModel.ContainsKey("LicenseName")){
 		name = licenseModel.GetData("LicenseName").toString().trimmed();

@@ -32,8 +32,6 @@ protected:
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
 				const sdl::imtlic::Products::CProductData::V1_0& productDataRepresentation,
 				QByteArray& newObjectId,
-				QString& name,
-				QString& description,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,

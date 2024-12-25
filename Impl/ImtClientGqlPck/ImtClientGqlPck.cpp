@@ -69,6 +69,16 @@ I_EXPORT_COMPONENT(
 			"Connection status subscriber",
 			"Connection Status Subscriber");
 
+I_EXPORT_COMPONENT(
+			RemoteDocumentRevisionController,
+			"Remote document revision controller",
+			"Remote Document Revision Controller");
+
+I_EXPORT_COMPONENT(
+			RemoteObjectVisualStatusController,
+			"Remote object visual status controllerr",
+			"Remote Object Visual Status Controller");
+
 
 } // namespace ImtClientGqlPck
 

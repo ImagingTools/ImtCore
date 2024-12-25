@@ -5,6 +5,7 @@
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtlic/IProductLicensingInfo.h>
 #include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Products.h>
+// #include <GeneratedFiles/imtbasesdl//SDL/1.0/CPP/ImtCollection.h>
 
 
 namespace imtlicgql
@@ -21,6 +22,11 @@ public:
 
 protected:
 	// reimplemented (sdl::imtlic::Products::V1_0::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::ImtCollection::CVisualStatus::V1_0 OnGetObjectVisualStatus(
+				const sdl::imtlic::Products::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+
 	virtual sdl::imtlic::Products::CProductsListPayload::V1_0 OnProductsList(
 				const sdl::imtlic::Products::V1_0::CProductsListGqlRequest& productsListRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

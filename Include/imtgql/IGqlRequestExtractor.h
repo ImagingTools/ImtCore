@@ -16,7 +16,7 @@ public:
 	/**
 		Create object from the GraphQL
 	*/
-	virtual istd::IChangeable* ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const = 0;
+	virtual istd::IChangeable* ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const = 0;
 };
 
 

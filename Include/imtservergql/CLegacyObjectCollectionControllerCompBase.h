@@ -72,7 +72,7 @@ public:
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	// reimplemented (imtgql::IGqlRequestExtractor)
-	virtual istd::IChangeable* ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const override;
+	virtual istd::IChangeable* ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
 
 protected:
 	void ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const;

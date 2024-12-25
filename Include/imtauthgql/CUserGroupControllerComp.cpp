@@ -71,8 +71,6 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 istd::IChangeable* CUserGroupControllerComp::CreateObjectFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
 		QByteArray& objectId,
-		QString& name,
-		QString& /*description*/,
 		QString& errorMessage) const
 {
 
@@ -115,6 +113,9 @@ istd::IChangeable* CUserGroupControllerComp::CreateObjectFromRequest(
 	}
 
 	userGroupInfoPtr->SetObjectUuid(objectId);
+
+	QString name;
+	QString description;
 
 	if (itemModel.ContainsKey("Name")){
 		name = itemModel.GetData("Name").toString();

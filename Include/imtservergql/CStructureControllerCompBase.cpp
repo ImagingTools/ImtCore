@@ -324,7 +324,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 		typeId = "DocumentInfo";
 	}
 
-	istd::IChangeable* newObjectPtr = m_gqlRequestExtractorCompPtr->ExtractObject(gqlRequest, objectId, name, description, errorMessage);
+	istd::IChangeable* newObjectPtr = m_gqlRequestExtractorCompPtr->ExtractObject(gqlRequest, objectId, errorMessage);
 	if (newObjectPtr == nullptr){
 		SendErrorMessage(0, "Unable to create object from gql request", "Object collection controller");
 

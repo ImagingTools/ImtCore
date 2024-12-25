@@ -24,12 +24,7 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray CreateUpdateObjectQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				const istd::IChangeable& object,
-				const imtbase::IOperationContext* operationContextPtr,
-				bool useExternDelegate = true) const override;
+	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 };
 
 

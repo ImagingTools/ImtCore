@@ -167,15 +167,24 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 }
 
 
-// reimplemented (imtdb::CSqlDatabaseDocumentDelegateComp)
-
-QString CUserGroupDatabaseDelegateComp::GetBaseSelectionQuery() const
+bool CUserGroupDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
-				   "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND root.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
-				   " as root WHERE \"IsActive\" = true")
-			.arg(qPrintable(*m_objectIdColumnAttrPtr))
-			.arg(qPrintable(*m_tableNameAttrPtr));
+	BaseClass::SetCollectionItemMetaInfoFromRecord(record, metaInfo);
+
+	if (record.contains("Document")){
+		QByteArray json = record.value("Document").toByteArray();
+		QJsonDocument jsonDocument = QJsonDocument::fromJson(json);
+
+		if (!jsonDocument.isNull()){
+			QString description = jsonDocument["Description"].toString();
+			metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_DESCRIPTION, description);
+
+			QString name = jsonDocument["Name"].toString();
+			metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_NAME, name);
+		}
+	}
+
+	return true;
 }
 
 

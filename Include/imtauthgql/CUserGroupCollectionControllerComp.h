@@ -24,6 +24,18 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	virtual bool FillObjectFromRepresentation(
+				const sdl::imtauth::Groups::CGroupData::V1_0& representation,
+				istd::IChangeable& object,
+				QByteArray& newObjectId,
+				QString& errorMessage) const;
+
+	// reimplemented (sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::ImtCollection::CVisualStatus::V1_0 OnGetObjectVisualStatus(
+				const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+
 	// reimplemented (sdl::imtauth::Groups::V1_0::CGroupCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
@@ -33,8 +45,6 @@ protected:
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
 				const sdl::imtauth::Groups::CGroupData::V1_0& groupDataRepresentation,
 				QByteArray& newObjectId,
-				QString& name,
-				QString& description,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,

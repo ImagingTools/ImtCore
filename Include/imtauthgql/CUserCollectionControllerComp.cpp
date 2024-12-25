@@ -4,6 +4,7 @@
 // ACF includes
 #include <iprm/CTextParam.h>
 #include <iprm/CParamsSet.h>
+#include <iqt/iqt.h>
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
@@ -14,6 +15,178 @@ namespace imtauthgql
 
 
 // protected methods
+
+bool CUserCollectionControllerComp::FillObjectFromRepresentation(
+			const sdl::imtauth::Users::CUserData::V1_0& representation,
+			istd::IChangeable& object,
+			QByteArray& newObjectId,
+			QString& errorMessage) const
+{
+	imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
+	if (userInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+		return false;
+	}
+
+	QByteArray productId;
+	if (representation.ProductId){
+		productId = *representation.ProductId;
+	}
+
+	QByteArray username;
+	if (representation.Username){
+		username = *representation.Username;
+	}
+
+	if (username.isEmpty()){
+		errorMessage = QT_TR_NOOP("Username can't be empty!");
+		SendWarningMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+		return false;
+	}
+
+	iprm::CParamsSet filterParam;
+	iprm::CParamsSet paramsSet;
+
+	iprm::CTextParam userId;
+	userId.SetText(username);
+
+	paramsSet.SetEditableParameter("Id", &userId);
+	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+
+	imtbase::IObjectCollection::Ids userIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+	if (!userIds.isEmpty()){
+		QByteArray userObjectId = userIds[0];
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
+			const imtauth::CUserInfo* currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
+			if (currentUserInfoPtr != nullptr){
+				if (userObjectId != newObjectId){
+					QByteArray currentUsername = currentUserInfoPtr->GetId();
+					if (currentUsername.toLower() == username.toLower()){
+						errorMessage = QT_TR_NOOP("Username already exists");
+						SendWarningMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
+
+						return false;
+					}
+				}
+			}
+		}
+	}
+
+	userInfoPtr->SetId(username);
+
+	QString name;
+	if (representation.Name){
+		name = *representation.Name;
+	}
+
+	if (name.isEmpty()){
+		errorMessage = QString("Name cannot be empty");
+		return false;
+	}
+
+	userInfoPtr->SetName(name);
+
+	QList<sdl::imtauth::Users::CSystemInfo::V1_0> systemInfos;
+	if (representation.SystemInfos){
+		systemInfos = *representation.SystemInfos;
+	}
+	if (systemInfos.isEmpty()){
+		// User from internal system
+		imtauth::IUserInfo::SystemInfo systemInfo;
+		userInfoPtr->AddToSystem(systemInfo);
+	}
+	else{
+		for (const sdl::imtauth::Users::CSystemInfo::V1_0& sdlSystemInfo : systemInfos){
+			QByteArray systemId;
+			if (sdlSystemInfo.Id){
+				systemId = *sdlSystemInfo.Id;
+			}
+			QString systemName;
+			if (sdlSystemInfo.Name){
+				systemName = *sdlSystemInfo.Name;
+			}
+			bool enabled = false;
+			if (sdlSystemInfo.Enabled){
+				enabled = *sdlSystemInfo.Enabled;
+			}
+
+			imtauth::IUserInfo::SystemInfo systemInfo;
+			systemInfo.systemId = systemId;
+			systemInfo.systemName = systemName;
+			systemInfo.enabled = enabled;
+
+			userInfoPtr->AddToSystem(systemInfo);
+		}
+	}
+
+	QString mail;
+	if (representation.Email){
+		mail = *representation.Email;
+	}
+	userInfoPtr->SetMail(mail);
+
+	imtauth::IUserInfo::FeatureIds permissions;
+	if (representation.Permissions){
+		permissions = representation.Permissions->split(';');
+	}
+	permissions.removeAll("");
+	userInfoPtr->SetLocalPermissions(productId, permissions);
+
+	QByteArrayList roleIds;
+	if (representation.Roles){
+		roleIds = representation.Roles->split(';');
+	}
+	roleIds.removeAll("");
+	if (!roleIds.isEmpty()){
+		userInfoPtr->SetRoles(productId, roleIds);
+	}
+	else{
+		userInfoPtr->RemoveProduct(productId);
+	}
+
+	QByteArrayList groupIds;
+	if (representation.Groups){
+		groupIds = representation.Groups->split(';');
+	}
+	groupIds.removeAll("");
+	for (const QByteArray& groupId : groupIds){
+		if (!groupId.isEmpty()){
+			userInfoPtr->AddToGroup(groupId);
+		}
+	}
+
+	return true;
+}
+
+
+// reimplemented (sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase)
+
+sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CUserCollectionControllerComp::OnGetObjectVisualStatus(
+			const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response = BaseClass::OnGetObjectVisualStatus(getObjectVisualStatusRequest, gqlRequest, errorMessage);
+
+	QByteArray languageId;
+	const imtgql::IGqlContext* gqlContextPtr = getObjectVisualStatusRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		languageId = gqlContextPtr->GetLanguageId();
+	}
+
+	if (response.Text->isEmpty()){
+		response.Text = "<no name>";
+	}
+
+	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Users")).toUtf8(), languageId, "CRoleCollectionControllerComp");
+	response.Text = translation + QByteArrayLiteral(" / ") + *response.Text;
+	return response;
+}
+
 
 // reimplemented (sdl::imtauth::Users::V1_0::CUserCollectionControllerCompBase)
 
@@ -181,8 +354,6 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation(
 	const sdl::imtauth::Users::CUserData::V1_0& userDataRepresentation,
 	QByteArray& newObjectId,
-	QString& name,
-	QString& /*description*/,
 	QString& errorMessage) const
 {
 	if (!m_userInfoFactCompPtr.IsValid()){
@@ -211,11 +382,6 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 		return nullptr;
 	}
 
-	QByteArray productId;
-	if (userDataRepresentation.ProductId){
-		productId = *userDataRepresentation.ProductId;
-	}
-
 	if (userDataRepresentation.Id){
 		newObjectId = *userDataRepresentation.Id;
 	}
@@ -224,90 +390,8 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 	}
 	userInfoPtr->SetObjectUuid(newObjectId);
 
-	imtauth::IUserInfo* oldUserInfoPtr = nullptr;
-	imtbase::IObjectCollection::DataPtr oldUserdataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(newObjectId, oldUserdataPtr)){
-		oldUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(oldUserdataPtr.GetPtr());
-	}
-
-	QByteArray username;
-	if (userDataRepresentation.Username){
-		username = *userDataRepresentation.Username;
-	}
-	if (username.isEmpty()){
-		SendWarningMessage(0, QString("Username can't be empty"), "CUserCollectionControllerComp");
-		errorMessage = QT_TR_NOOP("Username can't be empty!");
-
+	if (!FillObjectFromRepresentation(userDataRepresentation, *userInfoPtr, newObjectId, errorMessage)){
 		return nullptr;
-	}
-
-	iprm::CParamsSet filterParam;
-	iprm::CParamsSet paramsSet;
-
-	iprm::CTextParam userId;
-	userId.SetText(username);
-
-	paramsSet.SetEditableParameter("Id", &userId);
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
-
-	imtbase::IObjectCollection::Ids userIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (!userIds.isEmpty()){
-		QByteArray userObjectId = userIds[0];
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
-			const imtauth::CUserInfo* currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
-			if (currentUserInfoPtr != nullptr){
-				if (userObjectId != newObjectId){
-					QByteArray currentUsername = currentUserInfoPtr->GetId();
-					if (currentUsername.toLower() == username.toLower()){
-						SendWarningMessage(0, QString("Username already exists"), "imtauthgql::CUserControllerComp");
-						errorMessage = QT_TR_NOOP("Username already exists");
-
-						return nullptr;
-					}
-				}
-			}
-		}
-	}
-
-	userInfoPtr->SetId(username);
-
-	if (userDataRepresentation.Name){
-		name = *userDataRepresentation.Name;
-	}
-	userInfoPtr->SetName(name);
-
-	QList<sdl::imtauth::Users::CSystemInfo::V1_0> systemInfos;
-	if (userDataRepresentation.SystemInfos){
-		systemInfos = *userDataRepresentation.SystemInfos;
-	}
-	if (systemInfos.isEmpty()){
-		// User from internal system
-		imtauth::IUserInfo::SystemInfo systemInfo;
-		userInfoPtr->AddToSystem(systemInfo);
-	}
-	else{
-		for (const sdl::imtauth::Users::CSystemInfo::V1_0& sdlSystemInfo : systemInfos){
-			QByteArray systemId;
-			if (sdlSystemInfo.Id){
-				systemId = *sdlSystemInfo.Id;
-			}
-			QString systemName;
-			if (sdlSystemInfo.Name){
-				systemName = *sdlSystemInfo.Name;
-			}
-			bool enabled = false;
-			if (sdlSystemInfo.Enabled){
-				enabled = *sdlSystemInfo.Enabled;
-			}
-
-			imtauth::IUserInfo::SystemInfo systemInfo;
-			systemInfo.systemId = systemId;
-			systemInfo.systemName = systemName;
-			systemInfo.enabled = enabled;
-
-			userInfoPtr->AddToSystem(systemInfo);
-		}
 	}
 
 	for (imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
@@ -316,67 +400,17 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 			if (userDataRepresentation.Password){
 				password = *userDataRepresentation.Password;
 			}
+
 			if (password.isEmpty()) {
 				errorMessage = QString("Password cannot be empty");
-
 				return nullptr;
 			}
 
-			if (oldUserInfoPtr == nullptr){
-				password = m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
-			}
-			else{
-				password = oldUserInfoPtr->GetPasswordHash();
-			}
+			password = m_hashCalculatorCompPtr->GenerateHash(*userDataRepresentation.Username + password.toUtf8());
 
 			userInfoPtr->SetPasswordHash(password.toUtf8());
 
 			break;
-		}
-	}
-
-	QString mail;
-	if (userDataRepresentation.Email){
-		mail = *userDataRepresentation.Email;
-	}
-	userInfoPtr->SetMail(mail);
-
-	imtauth::IUserInfo::FeatureIds permissions;
-	if (userDataRepresentation.Permissions){
-		permissions = userDataRepresentation.Permissions->split(';');
-	}
-	permissions.removeAll("");
-	userInfoPtr->SetLocalPermissions(productId, permissions);
-
-	if (oldUserInfoPtr != nullptr){
-		for (const QByteArray& oldProductId : oldUserInfoPtr->GetProducts()){
-			QByteArrayList roles = oldUserInfoPtr->GetRoles(oldProductId);
-			for (const QByteArray& roleId : roles){
-				userInfoPtr->AddRole(oldProductId, roleId);
-			}
-		}
-	}
-
-	QByteArrayList roleIds;
-	if (userDataRepresentation.Roles){
-		roleIds = userDataRepresentation.Roles->split(';');
-	}
-	roleIds.removeAll("");
-	if (!roleIds.isEmpty()){
-		userInfoPtr->SetRoles(productId, roleIds);
-	}
-	else{
-		userInfoPtr->RemoveProduct(productId);
-	}
-
-	QByteArrayList groupIds;
-	if (userDataRepresentation.Groups){
-		groupIds = userDataRepresentation.Groups->split(';');
-	}
-	groupIds.removeAll("");
-	for (const QByteArray& groupId : groupIds){
-		if (!groupId.isEmpty()){
-			userInfoPtr->AddToGroup(groupId);
 		}
 	}
 
@@ -539,11 +573,35 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 
 bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			const imtgql::CGqlRequest& /*rawGqlRequest*/,
-			const sdl::imtauth::Users::V1_0::CUserUpdateGqlRequest& /*userUpdateRequest*/,
-			istd::IChangeable& /*object*/,
-			QString& /*errorMessage*/) const
+			const sdl::imtauth::Users::V1_0::CUserUpdateGqlRequest& userUpdateRequest,
+			istd::IChangeable& object,
+			QString& errorMessage) const
 {
-	return false;
+	sdl::imtauth::Users::CUserData::V1_0 userData = *userUpdateRequest.GetRequestedArguments().input.Item;
+
+	imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
+	if (userInfoPtr == nullptr){
+		errorMessage = QString("Unable to cast user instance to identifable object. Error: Invalid object");
+		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+		return false;
+	}
+
+	QByteArray objectId = userInfoPtr->GetObjectUuid();
+
+	QByteArrayList groupIds = userInfoPtr->GetGroups();
+	for (const QByteArray& groupId : groupIds){
+		if (!groupId.isEmpty()){
+			userInfoPtr->RemoveFromGroup(groupId);
+		}
+	}
+
+	imtauth::IUserInfo::SystemInfoList systemList = userInfoPtr->GetSystemInfos();
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemList){
+		userInfoPtr->RemoveFromSystem(systemInfo.systemId);
+	}
+
+	return FillObjectFromRepresentation(userData, object, objectId, errorMessage);
 }
 
 

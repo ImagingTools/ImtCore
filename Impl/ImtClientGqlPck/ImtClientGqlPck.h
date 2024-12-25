@@ -18,6 +18,8 @@
 #include <imtclientgql/CGqlHierarchicalStructureDelegateComp.h>
 #include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
 #include <imtclientgql/CConnectionStatusSubscriberComp.h>
+#include <imtclientgql/CRemoteDocumentRevisionControllerComp.h>
+#include <imtclientgql/CRemoteObjectVisualStatusControllerComp.h>
 
 
 /**
@@ -38,6 +40,8 @@ typedef imtclientgql::CWebSocketClientComp WebSocketClient;
 typedef imtclientgql::CModelSubscriberComp ModelSubscriber;
 typedef imtclientgql::CGqlHierarchicalStructureDelegateComp GqlHierarchicalStructureDelegate;
 typedef icomp::TModelCompWrap<imtclientgql::CConnectionStatusSubscriberComp> ConnectionStatusSubscriber;
+typedef imtclientgql::CRemoteDocumentRevisionControllerComp RemoteDocumentRevisionController;
+typedef imtclientgql::CRemoteObjectVisualStatusControllerComp RemoteObjectVisualStatusController;
 
 
 } // namespace ImtClientGqlPck

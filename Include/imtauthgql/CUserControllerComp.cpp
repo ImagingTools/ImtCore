@@ -13,6 +13,16 @@ namespace imtauthgql
 {
 
 
+// reimplemented (sdl::imtauth::Users::V1_0::CGraphQlHandlerCompBase)
+
+sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CUserControllerComp::OnGetObjectVisualStatus(
+			const sdl::imtauth::Users::V1_0::CGetObjectVisualStatusGqlRequest& /*getObjectVisualStatusRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	return sdl::imtbase::ImtCollection::CVisualStatus::V1_0();
+}
+
 sdl::imtauth::Users::CUsersListPayload::V1_0 CUserControllerComp::OnUsersList(
 			const sdl::imtauth::Users::V1_0::CUsersListGqlRequest& /*usersListRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,

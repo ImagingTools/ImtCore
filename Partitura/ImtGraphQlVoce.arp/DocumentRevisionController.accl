@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5323" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CheckPermissionOr" X="825" Y="450" Note=""/>
+        <Element ComponentName="DocumentRevisionController" X="550" Y="225" Note=""/>
+        <Element ComponentName="RevisionPermissions" X="300" Y="450" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

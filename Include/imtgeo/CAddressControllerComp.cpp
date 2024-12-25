@@ -113,7 +113,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 	else{
 		QByteArray objectId;
 
-		istd::IChangeable* newObject = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
+		istd::IChangeable* newObject = CreateObjectFromRequest(gqlRequest, objectId, errorMessage);
 
 		if (newObject != nullptr){
 			newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject, objectId);
@@ -150,8 +150,6 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 istd::IChangeable* CAddressControllerComp::CreateObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QByteArray& objectId,
-			QString& name,
-			QString& description,
 			QString& errorMessage) const
 {
 	if (!m_addressInfoFactCompPtr.IsValid()){
@@ -203,12 +201,12 @@ istd::IChangeable* CAddressControllerComp::CreateObjectFromRequest(
 		}
 
 		if (itemModel.ContainsKey("Name")){
-			name = itemModel.GetData("Name").toString();
+			QString name = itemModel.GetData("Name").toString();
 			addressInfoPtr->SetName(name);
 		}
 
 		if (itemModel.ContainsKey("Description")){
-			description = itemModel.GetData("Description").toString();
+			QString description = itemModel.GetData("Description").toString();
 			addressInfoPtr->SetDescription(description);
 		}
 
@@ -269,7 +267,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 			filteringOnSerialIdInfoIds << "Indexes";
 			filterOnSerialId.SetFilteringInfoIds(filteringOnSerialIdInfoIds);
 
-			istd::IChangeable* savedObject = CreateObjectFromRequest(gqlRequest, newObjectId, name, description, errorMessage);
+			istd::IChangeable* savedObject = CreateObjectFromRequest(gqlRequest, newObjectId, errorMessage);
 			if (savedObject != nullptr){
 				if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
 					errorMessage = QObject::tr("Can not update object: %1").arg(splitObjectId);

@@ -13,105 +13,39 @@ Rectangle {
 	anchors.fill: parent;
 	clip: true;
 
-	property int columnCount: 20
-	property int rowCount: 200
-
 	Component.onCompleted: {
-
+		rectComp.createObject(testPage)
 	}
 
-	// TestInfo1 {
-	// 	id: test1;
-	// 	m_test: "fdsfsdf";
-	// }
+	function onCompleted(){
+		console.log("Function onCompleted");
+	}
 
-	// BaseModel {
-	// 	id: baseModel;
-	// 	Component.onCompleted: {
-	// 		addElement(test1)
-	// 		addElement(test1)
-	// 		addElement(test1)
-	// 	}
-	// }
+	Connections {
+		target: rectComp;
 
-	// property GqlSdlRequestSender request : GqlSdlRequestSender {
-	// 	gqlCommandId: ImtappApplicationSdlCommandIds.s_getApplicationInfo;
-	// 	inputObjectComp: Component {
-	// 		GetApplicationInfoInput {
-	// 			m_productId: "Test";
-	// 			m_testInfos: baseModel;
-	// 		}
-	// 	}
+		function onCompleted(){
+			console.log("Connections onCompleted");
+		}
 
-	// 	sdlObjectComp: Component { ApplicationInfo {
-	// 		} }
-	// }
+		function onTest(){
+			console.log("Connections onTest");
+		}
+	}
 
-	// Button {
-	// 	width: 100;
-	// 	height: 30;
-	// 	text: "test"
+	Component {
+		id: rectComp;
 
-	// 	onClicked: {
-	// 		testPage.request.send();
-	// 	}
-	// }
+		Rectangle {
+			width: 100;
+			height: 100;
+			color: "red";
 
-	Table {
-		id: table;
-		anchors.top: parent.top;
-		anchors.bottom: parent.bottom;
-		width: parent.width;
-		hasFilter: true;
-		hasSort: true;
-		canMoveColumns: true;
-
-		TreeItemModel {
-			id: elementsModel;
+			signal test();
 
 			Component.onCompleted: {
-
-				for (let i = 0; i < testPage.rowCount; i++){
-					elementsModel.insertNewItem();
-
-					for (let j = 1; j <= testPage.columnCount; j++){
-						elementsModel.setData("Test" + j, "Test Data" + j, i);
-					}
-				}
-
-				table.headers = headersModel;
-				table.elements = elementsModel;
-			}
-		}
-
-		onHeaderRightMouseClicked: {
-			ModalDialogManager.openDialog(tableHeaderParamComp, {});
-		}
-
-		onHeadersChanged: {
-			resetViewParams()
-		}
-
-		Component {
-			id: tableHeaderParamComp;
-
-			TableHeaderParamComp{
-				tableItem: table;
-				onFinished: {
-				}
-			}
-		}
-
-
-		TreeItemModel {
-			id: headersModel;
-
-			Component.onCompleted: {
-				for (let i = 1; i <= testPage.columnCount; i++){
-					let index = headersModel.insertNewItem();
-					headersModel.setData("Id", "Test" + i, index);
-					headersModel.setData("Name", "Test" + i, index);
-				}
+				test()
+				console.log("Rectangle onCompleted");
 			}
 		}
 	}

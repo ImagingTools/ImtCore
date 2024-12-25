@@ -15,6 +15,7 @@
 #include <imtgql/IGqlRequestExtractor.h>
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/CMimeType.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
 #undef GetObject
@@ -26,12 +27,12 @@ namespace imtservergql
 
 class CObjectCollectionControllerCompBase:
 			public imtgql::IGqlRequestExtractor,
-			virtual public ::imtservergql::CPermissibleGqlRequestHandlerComp
+			virtual public sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase
 {
 public:
-	typedef  ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
+	typedef  sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CObjectCollectionControllerCompBase);
+	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)
 		I_ASSIGN_MULTI_0(m_replaceableFieldsAttrPtr, "ReplaceableFilterFields", "List of filter fields to be replaced", false);
 		I_ASSIGN_MULTI_0(m_replacementFieldsAttrPtr, "ReplacementFilterFields", "List of filter fields to replace with", false);
@@ -41,6 +42,7 @@ public:
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
 		I_ASSIGN_MULTI_0(m_objectTypeIdAttrPtr, "ObjectTypeIds", "Object type IDs", false);
+		I_ASSIGN_MULTI_0(m_objectIconPathsAttrPtr, "ObjectIconPaths", "List of item paths related to object type-IDs", false);
 		I_ASSIGN_MULTI_0(m_objectFactCompPtr, "CollectionObjectFactory", "Collection object factories", false);
 		I_ASSIGN_MULTI_0(m_mimeTypeAttrPtr, "MimeType", "Mime type for the import/export object", false);
 		I_ASSIGN_MULTI_0(m_importExportObjectFactCompPtr, "ImportExportObjectFactory", "Object factory for the import/export object", false);
@@ -69,10 +71,18 @@ public:
 		OT_OBJECT_TYPE_ID
 	};
 
+	// reimplemented (sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::ImtCollection::CVisualStatus::V1_0 OnGetObjectVisualStatus(
+				const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+
 	// reimplemented (imtgql::IGqlRequestExtractor)
-	virtual istd::IChangeable* ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const override;
+	virtual istd::IChangeable* ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
 
 protected:
 	void ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const;
@@ -153,12 +163,12 @@ protected:
 	/**
 		Create object from the GraphQL
 	*/
-	[[deprecated]] virtual istd::IChangeable* CreateObjectFromInputParams(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const;
+	[[deprecated]] virtual istd::IChangeable* CreateObjectFromInputParams(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString& errorMessage) const;
 
 	/**
 		Create object from the GraphQL
 	*/
-	virtual istd::IChangeable* CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const;
+	virtual istd::IChangeable* CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const;
 
 	/**
 		Prepare filters from the GraphQL
@@ -181,7 +191,7 @@ protected:
 	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
 
 private:
-	virtual bool DoUpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const;
+	virtual bool DoUpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QByteArray& newObjectId, QString& errorMessage) const;
 
 protected:
 	QMap<QByteArray, QByteArray> m_fieldReplacementMap;
@@ -195,6 +205,7 @@ protected:
 	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);
 
 	I_MULTIATTR(QByteArray, m_objectTypeIdAttrPtr);
+	I_MULTIATTR(QByteArray, m_objectIconPathsAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_objectFactCompPtr);
 
 	I_MULTIATTR(QString, m_mimeTypeAttrPtr);

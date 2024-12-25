@@ -24,6 +24,18 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	virtual bool FillObjectFromRepresentation(
+				const sdl::imtauth::Roles::CRoleData::V1_0& representation,
+				istd::IChangeable& object,
+				QByteArray& objectId,
+				QString& errorMessage) const;
+
+	// reimplemented (sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::ImtCollection::CVisualStatus::V1_0 OnGetObjectVisualStatus(
+				const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+
 	// reimplemented (sdl::imtauth::Roles::V1_0::CRoleCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
@@ -33,8 +45,6 @@ protected:
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
 				const sdl::imtauth::Roles::CRoleData::V1_0& roleDataRepresentation,
 				QByteArray& newObjectId,
-				QString& name,
-				QString& description,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,

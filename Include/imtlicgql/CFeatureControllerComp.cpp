@@ -20,8 +20,6 @@ namespace imtlicgql
 istd::IChangeable* CFeatureControllerComp::CreateObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QByteArray& objectId,
-			QString& name,
-			QString& description,
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -59,6 +57,9 @@ istd::IChangeable* CFeatureControllerComp::CreateObjectFromRequest(
 
 		return nullptr;
 	}
+
+	QString name;
+	QString description;
 
 	if (featureModel.ContainsKey("FeatureName")){
 		name = featureModel.GetData("FeatureName").toString();

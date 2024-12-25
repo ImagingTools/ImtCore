@@ -378,7 +378,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	if (operationsList.contains(imtsdl::CSdlDocumentType::OT_INSERT))
 	{
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const override;");
+		ifStream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;");
 		FeedStream(ifStream, 1, false);
 		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_INSERT);
 	}
@@ -657,14 +657,6 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 
 		FeedStreamHorizontally(stream, hIndents + 3);
 		stream << QStringLiteral("QByteArray& newObjectId,");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents + 3);
-		stream << QStringLiteral("QString& name,");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents + 3);
-		stream << QStringLiteral("QString& description,");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents + 3);
@@ -1019,7 +1011,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		stream << QStringLiteral("CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, QString& errorMessage) const");
 		break;
 	case imtsdl::CSdlDocumentType::OT_INSERT:
-		stream << QStringLiteral("CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const");
+		stream << QStringLiteral("CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const");
 		break;
 	case imtsdl::CSdlDocumentType::OT_UPDATE:
 		stream << QStringLiteral("UpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QString& errorMessage) const");
@@ -1336,7 +1328,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		stream << QStringLiteral("return CreateObjectFromRepresentation(");
 		stream << GetDecapitalizedValue(requestClassName);
 		stream << GetInputExtractionStringForTypeName(sdlRequestInfo.request, sdlRequestInfo.containerClassName);
-		stream << QStringLiteral(", newObjectId, name, description, errorMessage);");
+		stream << QStringLiteral(", newObjectId, errorMessage);");
 		FeedStream(stream, 1, false);
 	}
 
