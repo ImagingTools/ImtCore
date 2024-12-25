@@ -3,70 +3,85 @@ import Acf 1.0
 import imtguigql 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtbaseImtCollectionSdl 1.0
 
 Item {
-    id: workspaceView;
+	id: workspaceView;
 
-    property DocumentManager documentManager;
-    property alias tabPanel: tabPanel_;
-
+	property DocumentManager documentManager;
 	property int popupWidth: 200;
 
-    onDocumentManagerChanged: {
-        if (documentManager){
-            connections.target = workspaceView.documentManager;
-            tabPanel_.model = workspaceView.documentManager.documentsModel;
-            documentRepeater.model = workspaceView.documentManager.documentsModel;
-        }
-        else{
-            connections.target = undefined;
-            tabPanel_.model = 0;
-            documentRepeater.model = 0;
-        }
-    }
+	Connections {
+		id: connections;
+		target: workspaceView.documentManager;
 
-    Connections {
-        id: connections;
+		function onDocumentSaved(documentId){
+			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId);
+			getVisualStatusInfoRequest.send({"m_objectId": documentId, "m_typeId": typeId})
+		}
 
-        function onDocumentAdded(documentIndex, documentId){
-            workspaceView.tabPanel.selectedIndex = documentIndex;
-        }
+		function onDocumentAdded(documentId){
+			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId);
+			getVisualStatusInfoRequest.send({"m_objectId": documentId, "m_typeId": typeId})
 
-        function onDocumentClosed(documentIndex, documentId){
-            if (documentIndex <= workspaceView.tabPanel.selectedIndex && documentIndex > 0){
-                workspaceView.tabPanel.selectedIndex--;
-            }
-        }
-    }
+			let documentData = workspaceView.documentManager.getDocumentDataById(documentId);
 
-    function addFixedView(viewComp, name, index){
-        let viewName = name;
-        if (!viewName || viewName == ""){
-            viewName = workspaceView.documentManager.defaultDocumentName;
-        }
+			let name = documentData.documentName;
+			if (name === ""){
+				name = workspaceView.documentManager.defaultDocumentName;
+			}
 
-        if (!index){
-            index = workspaceView.documentManager.documentsModel.count;
-        }
+			tabView.addTab(documentData.documentId, "", documentData.viewComp, "", "", true);
 
-		workspaceView.documentManager.documentsModel.insert(index, {
-                                  "Uuid": UuidGenerator.generateUUID(),
-                                  "Title": viewName,
-								  "ViewComp": viewComp,
-                                  "Fixed": true
-                              })
+			let tabIndex = tabView.getIndexById(documentId);
+			tabView.currentIndex = tabIndex;
+		}
 
-        workspaceView.documentManager.documentAdded(index, "");
-    }
+		function onDocumentClosed(documentId){
+			let tabIndex = tabView.getIndexById(documentId);
+			tabView.removeTab(documentId);
 
-    function setAlertPanel(alertPanelComp){
-        alertPanel.sourceComponent = alertPanelComp;
-    }
+			if (tabIndex <= tabView.currentIndex && tabIndex > 0){
+				tabView.currentIndex--;
+			}
+		}
 
-    Rectangle {
-        anchors.fill: parent;
-        color: Style.backgroundColor2;
-    }
+		function onDocumentIsDirtyChanged(documentId, isDirty){
+			console.log("onDocumentIsDirtyChanged", documentId, isDirty);
+			let tabIndex = tabView.getIndexById(documentId);
+			if (tabIndex >= 0){
+				let tabName = tabView.getTabName(documentId);
+				if (tabName === ""){
+					tabName = workspaceView.documentManager.defaultDocumentName;
+				}
+
+				let dirtyPrefix = "* ";
+
+				if (isDirty){
+					tabView.setTabName(documentId, dirtyPrefix + tabName);
+				}
+				else{
+					if (tabName.startsWith(dirtyPrefix)){
+						tabName = tabName.slice(dirtyPrefix.length);
+						tabView.setTabName(documentId, tabName);
+					}
+				}
+			}
+		}
+	}
+
+	function addFixedView(viewComp, name, index){
+		tabView.addTab(UuidGenerator.generateUUID(), name, viewComp);
+	}
+
+	function setAlertPanel(alertPanelComp){
+		// alertPanel.sourceComponent = alertPanelComp;
+	}
+
+	Rectangle {
+		anchors.fill: parent;
+		color: Style.backgroundColor2;
+	}
 
 	Component {
 		id: popupMenuDialog;
@@ -75,8 +90,9 @@ Item {
 			itemWidth: workspaceView.popupWidth;
 			onFinished: {
 				if (commandId === "Close"){
-					if (tabPanel_.selectedIndex > 0){
-						workspaceView.documentManager.closeDocumentByIndex(tabPanel_.selectedIndex);
+					if (tabView.currentIndex > 0){
+						let tabId = tabView.getTabIdByIndex(tabView.currentIndex);
+						workspaceView.documentManager.closeDocument(tabId);
 					}
 				}
 				else if (commandId === "CloseAll"){
@@ -109,79 +125,61 @@ Item {
 		}
 	}
 
-    TabPanel {
-        id: tabPanel_;
+	GqlSdlRequestSender {
+		id: getVisualStatusInfoRequest;
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectVisualStatus;
+		inputObjectComp: Component {
+			ObjectVisualStatusInput {
+			}
+		}
 
-        anchors.top: parent.top;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
+		sdlObjectComp: Component {
+			VisualStatus {
+				onFinished: {
+					let name = m_text;
+					if (name === ""){
+						name = workspaceView.documentManager.defaultDocumentName;
+					}
 
-        clip: true;
+					tabView.setTabName(m_objectId, name);
+					tabView.setTabDescription(m_objectId, m_description);
+					tabView.setTabIcon(m_objectId, m_icon);
+				}
+			}
+		}
+	}
+
+	// Loader {
+	// 	id: alertPanel;
+	// 	anchors.top: tabPanel_.bottom;
+	// 	anchors.left: parent.left;
+	// 	anchors.right: parent.right;
+	// 	height: visible ? 40: 0;
+	// 	visible: alertPanel.item != null && alertPanel.item !== undefined;
+	// }
+
+	TabView {
+		id: tabView;
+		anchors.fill: parent;
+		closable: true;
+
+		onTabLoaded: {
+			let documentData = workspaceView.documentManager.getDocumentDataById(tabId)
+			if (documentData){
+				documentData.view = tabItem;
+			}
+		}
 
 		onTabClicked: {
 			if (mouse.button === Qt.RightButton){
-				let isFixedView = workspaceView.documentManager.documentsModel.get(index).Fixed;
-				if (isFixedView !== undefined && isFixedView){
-					return;
-				}
-
 				var point = tabItem.mapToItem(this, 0, 0);
-
 				ModalDialogManager.openDialog(popupMenuDialog, {"x": point.x + workspaceView.popupWidth, "y": point.y, "model": tabContextMenuModel});
 			}
 		}
 
-        onCloseItem: {
-            workspaceView.documentManager.closeDocumentByIndex(index);
-        }
-
-        onRightClicked: {
-            if (tabPanel_.selectedIndex < workspaceView.documentManager.documentsModel.count - 1){
-                tabPanel_.selectedIndex++;
-            }
-        }
-
-        onLeftClicked: {
-            if (tabPanel_.selectedIndex > 0){
-                tabPanel_.selectedIndex--;
-            }
-        }
-    }
-
-    Loader {
-        id: alertPanel;
-        anchors.top: tabPanel_.bottom;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        height: visible ? 40: 0;
-        visible: alertPanel.item != null && alertPanel.item !== undefined;
-    }
-
-    Repeater {
-        id: documentRepeater;
-        anchors.top: alertPanel.bottom;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        anchors.bottom: parent.bottom;
-        clip: true;
-        delegate: Item {
-            anchors.fill: documentRepeater;
-			visible: tabPanel_.selectedIndex === model.index;
-			clip: true;
-			Component.onCompleted: {
-				if (model.Fixed !== undefined && model.Fixed){
-					let item = model.ViewComp.createObject(this);
-					item.anchors.fill = this;
-					return;
-				}
-
-				let documentData = workspaceView.documentManager.getDocumentData(model.index);
-				if (documentData && documentData.views.length > 0){
-					documentData.views[0].parent = this;
-					documentData.views[0].anchors.fill = this;
-					documentData.views[0].visible = true;
-				}
-			}
-        }
-    }
+		onCloseTab: {
+			let tabId = getTabIdByIndex(index);
+			workspaceView.documentManager.closeDocument(tabId);
+		}
+	}
 }

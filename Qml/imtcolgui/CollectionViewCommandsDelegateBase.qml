@@ -162,15 +162,25 @@ ViewCommandsDelegateBase {
 
 	function updateItemSelection(selectedItems){
 		if (collectionViewCommandsDelegate.collectionView && collectionViewCommandsDelegate.collectionView.commandsController){
-			let isEnabled = selectedItems.length > 0;
 			let commandsController = collectionViewCommandsDelegate.collectionView.commandsController;
-			if(commandsController){
-				commandsController.setCommandIsEnabled("Remove", isEnabled);
-				commandsController.setCommandIsEnabled("Edit", isEnabled);
-				commandsController.setCommandIsEnabled("Export", isEnabled);
-				commandsController.setCommandIsEnabled("Revision", isEnabled);
-			}
+			let elementsModel = collectionView.table.elements;
+
+			updateStateBaseCommands(selectedItems, commandsController, elementsModel);
+			updateStateCustomCommands(selectedItems, commandsController, elementsModel);
 		}
+	}
+
+	function updateStateBaseCommands(selection, commandsController, elementsModel){
+		let isEnabled = selection.length > 0;
+		if(commandsController){
+			commandsController.setCommandIsEnabled("Remove", isEnabled);
+			commandsController.setCommandIsEnabled("Edit", isEnabled);
+			commandsController.setCommandIsEnabled("Export", selection.length === 1);
+			commandsController.setCommandIsEnabled("Revision", selection.length === 1);
+		}
+	}
+
+	function updateStateCustomCommands(selection, commandsController, elementsModel){
 	}
 
 	function setupContextMenu(){

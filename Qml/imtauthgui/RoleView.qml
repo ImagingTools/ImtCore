@@ -3,6 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtauthRolesSdl 1.0
+import imtdocgui 1.0
 
 ViewBase {
     id: container;
@@ -34,6 +35,13 @@ ViewBase {
     }
 
     property TreeItemModel copiedRolesModel: TreeItemModel {}
+
+	DocumentHistoryPanel {
+		id: historyPanel;
+		documentId: container.roleData ? container.roleData.m_id : "";
+		collectionId: "Roles";
+		editorFlickable: flickable;
+	}
 
     CustomScrollbar {
         id: scrollbar;
@@ -67,7 +75,8 @@ ViewBase {
         anchors.right: scrollbar.left;
         anchors.rightMargin: Style.size_largeMargin;
         contentWidth: bodyColumn.width;
-        contentHeight: bodyColumn.height + 2 * Style.size_largeMargin;
+		contentHeight: Math.max(bodyColumn.height + 2 * Style.size_largeMargin, historyPanel.contentHeight + 2 * Style.size_largeMargin);
+
         boundsBehavior: Flickable.StopAtBounds;
         clip: true;
 

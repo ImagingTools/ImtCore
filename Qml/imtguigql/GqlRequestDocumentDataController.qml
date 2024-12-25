@@ -5,6 +5,7 @@ import Acf 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
 import imtdocgui 1.0
+import imtbaseImtCollectionSdl 1.0
 
 DocumentDataController {
 	id: container;
@@ -58,15 +59,6 @@ DocumentDataController {
 	onOkChanged: {
 		if (documentId !== ""){
 			container.subscriptionClient.register();
-		}
-	}
-
-	function setupDocumentInfo(){
-		if (documentModel && documentModel.m_name){
-			container.documentName = documentModel.m_name;
-		}
-		else{
-			console.warn("Unable to set document name. Error: field 'm_name' is not found.");
 		}
 	}
 
@@ -156,6 +148,8 @@ DocumentDataController {
 					return;
 				}
 
+				console.log("Updated", this.json);
+
 				if ("errors" in responseObj){
 					let errorsObject = responseObj["errors"];
 					if (container.gqlUpdateCommandId in errorsObject){
@@ -183,22 +177,13 @@ DocumentDataController {
 					if (container.gqlUpdateCommandId in dataObject){
 						dataObject = dataObject[container.gqlUpdateCommandId];
 
-						if ("updatedNotification" in dataObject){
-							dataObject = dataObject["updatedNotification"];
+						let documentId = "";
 
-							let documentId = "";
-							let documentName = "";
-
-							if ("Id" in dataObject){
-								documentId = dataObject["Id"]
-							}
-
-							if ("Name" in dataObject){
-								documentName = dataObject["Name"]
-							}
-
-							container.saved(documentId, documentName);
+						if ("Id" in dataObject){
+							documentId = dataObject["Id"]
 						}
+
+						container.saved(documentId, "");
 					}
 				}
 			}
@@ -317,22 +302,13 @@ DocumentDataController {
 						dataObject = dataObject[container.gqlAddCommandId]
 					}
 
-					if ("addedNotification" in dataObject){
-						dataObject = dataObject["addedNotification"]
-					}
-
 					let documentId = ""
-					let documentName = ""
 
 					if ("Id" in dataObject){
 						documentId = dataObject["Id"];
 					}
 
-					if ("Name" in dataObject){
-						documentName = dataObject["Name"];
-					}
-
-					container.saved(documentId, documentName);
+					container.saved(documentId, "");
 				}
 			}
 		}

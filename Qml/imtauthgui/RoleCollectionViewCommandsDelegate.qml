@@ -15,6 +15,16 @@ DocumentCollectionViewDelegate {
         ModalDialogManager.openDialog(removeDialog, {});
     }
 
+	function updateStateBaseCommands(selection, commandsController, elementsModel){
+		let isEnabled = selection.length > 0;
+		if(commandsController){
+			commandsController.setCommandIsEnabled("Remove", isEnabled);
+			commandsController.setCommandIsEnabled("Edit", selection.length === 1);
+			commandsController.setCommandIsEnabled("Export", selection.length === 1);
+			commandsController.setCommandIsEnabled("Revision", selection.length === 1);
+		}
+	}
+
     Component {
         id: removeDialog;
         MessageDialog {

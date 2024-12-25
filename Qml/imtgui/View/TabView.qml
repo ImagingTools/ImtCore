@@ -11,18 +11,34 @@ Item {
     }
 
     property alias currentIndex: tabPanel.selectedIndex;
+	property alias closable: tabPanel.isCloseEnable;
 
     property int mainMargin: Style.size_mainMargin;
 
-    signal tabLoaded(int index, var tabItem);
+	signal tabLoaded(int index, string tabId, var tabItem);
+	signal tabClicked(var mouse, var tabItem, int index);
+	signal closeTab(int index);
+	signal startTabContentLoading(string tabId);
+	signal stopTabContentLoading(string tabId);
 
+	onStartTabContentLoading: {
+		tabPanel.startTabContentLoading(tabId);
+	}
+
+	onStopTabContentLoading: {
+		tabPanel.stopTabContentLoading(tabId);
+	}
 
     function clear(){
         tabModel.clear();
     }
 
-    function addTab(tabId, tabName, tabComp){
-        tabModel.append({Id: tabId, Title: tabName, SourceComponent: tabComp})
+	function addTab(tabId, tabName, tabComp, icon, description, waitName){
+		if (!waitName){
+			waitName = false;
+		}
+
+		tabModel.append({Id: tabId, Name: tabName, SourceComponent: tabComp, Icon: icon, Description: description, WaitName: waitName})
     }
 
     function removeTab(tabId){
@@ -40,6 +56,45 @@ Item {
 
         return null;
     }
+
+	function setTabDescription(tabId, description){
+		let index = getIndexById(tabId);
+		if (index < 0){
+			return;
+		}
+
+		tabModel.setProperty(index, "Description", description);
+	}
+
+	function setTabIcon(tabId, icon){
+		let index = getIndexById(tabId);
+		if (index < 0){
+			return;
+		}
+
+		tabModel.setProperty(index, "Icon", icon);
+	}
+
+	function setTabName(tabId, name){
+		console.log("setTabName", tabId, name)
+
+		let index = getIndexById(tabId);
+		if (index < 0){
+			return;
+		}
+		console.log("index", index)
+
+		tabModel.setProperty(index, "Name", name);
+	}
+
+	function getTabName(tabId){
+		let index = getIndexById(tabId);
+		if (index < 0){
+			return "";
+		}
+
+		return tabModel.get(index).Name;
+	}
 
     function getTabByIndex(index){
         if (index < 0 || bodyRepeater.count <= index){
@@ -61,6 +116,14 @@ Item {
         return -1;
     }
 
+	function getTabIdByIndex(index){
+		if (index < 0 || index >= tabModel.count){
+			return "";
+		}
+
+		return tabModel.get(index).Id;
+	}
+
     TabPanel {
         id: tabPanel;
         anchors.top: parent.top;
@@ -80,6 +143,14 @@ Item {
                 tabPanel.selectedIndex--;
             }
         }
+
+		onTabClicked: {
+			root.tabClicked(mouse, tabItem, index);
+		}
+
+		onCloseItem: {
+			root.closeTab(index);
+		}
     }
 
     Rectangle {
@@ -102,7 +173,8 @@ Item {
                 visible: tabPanel.selectedIndex == model.index;
 
                 onLoaded: {
-                    root.tabLoaded(model.index, item);
+					console.log("onLoaded", item);
+					root.tabLoaded(model.index, model.Id, item);
                 }
 
                 onStatusChanged: {

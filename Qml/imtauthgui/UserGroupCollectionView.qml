@@ -21,6 +21,16 @@ RemoteCollectionView {
 
         documentTypeId: "Group";
         viewTypeId: "GroupEditor";
+
+		function updateStateBaseCommands(selection, commandsController, elementsModel){
+			let isEnabled = selection.length > 0;
+			if(commandsController){
+				commandsController.setCommandIsEnabled("Remove", isEnabled);
+				commandsController.setCommandIsEnabled("Edit", selection.length === 1);
+				commandsController.setCommandIsEnabled("Export", selection.length === 1);
+				commandsController.setCommandIsEnabled("Revision", selection.length === 1);
+			}
+		}
     }
     }
 
@@ -28,7 +38,6 @@ RemoteCollectionView {
         collectionFilter.setSortingOrder("ASC");
         collectionFilter.setSortingInfoId("Name");
 
-        // let documentManager = MainDocumentManager.getDocumentManager("Administration");
         if (documentManager){
             userGroupCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 

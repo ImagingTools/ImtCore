@@ -14,9 +14,6 @@ Rectangle {
     property int selectedIndex: 0;
     property int count: 0;
     property alias spacing: list.spacing;
-
-    property string firstElementImageSource;
-    property string displayRoleId: "Title";
     property bool isCloseEnable: true;
 
     property alias model: list.model;
@@ -26,6 +23,8 @@ Rectangle {
 	signal tabClicked(var mouse, var tabItem, int index);
     signal rightClicked();
     signal leftClicked();
+	signal startTabContentLoading(string tabId);
+	signal stopTabContentLoading(string tabId);
 
     Component.onCompleted: {
         Events.subscribeEvent("AppSizeChanged", appSizeChanged);
@@ -70,20 +69,10 @@ Rectangle {
         delegate: TabDelegate {
             height: list.height;
 
-            selected: model.index === tabPanelContainer.selectedIndex;
-            selectedIndex: tabPanelContainer.selectedIndex;
-            firstElement: model.index === 0;
-            lastElement: model.index === list.count - 1;
-            firstElementImageSource: tabPanelContainer.firstElementImageSource;
-            text: model[tabPanelContainer.displayRoleId] ? model[tabPanelContainer.displayRoleId] : "";
+			tabPanel: tabPanelContainer;
             isCloseEnable: tabPanelContainer.isCloseEnable;
             listView: list;
             decorator: tabPanelContainer.tabDelegateDecorator;
-
-            onClicked: {
-				tabPanelContainer.tabClicked(mouse, this, model.index);
-                tabPanelContainer.selectedIndex = model.index;
-            }
 
             onCloseSignal: {
                 tabPanelContainer.closeItem(model.index);

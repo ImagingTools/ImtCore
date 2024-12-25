@@ -13,9 +13,9 @@ QtObject {
 	signal selectionChanged();
 
 	function resetSelection(){
-		root.selectedIndexes = []
+		selectedIndexes = []
 
-		root.selectionChanged();
+		selectionChanged();
 	}
 
 	function toggleSelect(index){
@@ -35,7 +35,7 @@ QtObject {
 	}
 
 	function singleSelect(index){
-		root.selectedIndexes = []
+		selectedIndexes = []
 		toggleSelect(index);
 	}
 
@@ -57,7 +57,7 @@ QtObject {
 	}
 
 	function isSelected(index){
-		return root.selectedIndexes.includes(index);
+		return selectedIndexes.includes(index);
 	}
 }
 

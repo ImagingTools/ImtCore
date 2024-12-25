@@ -3,6 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtauthGroupsSdl 1.0
+import imtdocgui 1.0
 
 ViewBase {
     id: container;
@@ -30,6 +31,13 @@ ViewBase {
 
         groupData.m_productId = productId;
     }
+
+	DocumentHistoryPanel {
+		id: historyPanel;
+		documentId: container.groupData ? container.groupData.m_id : "";
+		collectionId: "Groups";
+		editorFlickable: flickable;
+	}
 
     CustomScrollbar {
         id: scrollbar;
@@ -74,7 +82,7 @@ ViewBase {
         anchors.rightMargin: Style.size_largeMargin;
 
         contentWidth: bodyColumn.width;
-        contentHeight: bodyColumn.height + 2 * Style.size_largeMargin;
+		contentHeight: Math.max(bodyColumn.height + 2 * Style.size_largeMargin, historyPanel.contentHeight + 2 * Style.size_largeMargin);
 
         boundsBehavior: Flickable.StopAtBounds;
 

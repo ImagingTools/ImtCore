@@ -3,149 +3,157 @@ import Acf 1.0
 import imtcontrols 1.0
 
 DecoratorBase {
-    id: tabPanelDecorator;
+	id: tabPanelDecorator;
 
-    width: content.width + 2 * Style.size_mainMargin;
-    height: baseElement ? baseElement.height : 50
+	width: content.width + 2 * Style.size_mainMargin;
+	height: baseElement ? baseElement.height : 50
 
-    property string firstElementImageSource: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElementImageSource : "";
-    property bool textIsCropped: textHelper.text != "" && textHelper.width > text.width;
+	property bool textIsCropped: textHelper.text != "" && textHelper.width > text.width;
 
-    onFirstElementImageSourceChanged: {
-        if (tabPanelDecorator.firstElementImageSource !== ""){
-            firsElementImage.source = "../../../" + Style.getIconPath(tabPanelDecorator.firstElementImageSource, Icon.State.On, Icon.Mode.Normal);
-        }
-    }
+	Connections {
+		target: tabPanelDecorator.baseElement;
 
-    Rectangle {
-        anchors.fill: tabPanelDecorator;
-        color: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent": "transparent";
-    }
+		function onStartContentLoading(){
+			console.log("onStartContentLoading");
+			loading.start();
+		}
 
-    Rectangle {
-        anchors.right: tabPanelDecorator.right;
-        anchors.verticalCenter: tabPanelDecorator.verticalCenter;
+		function onStopContentLoading(){
+			console.log("onStopContentLoading");
 
-        width: 1;
-        height: tabPanelDecorator.height / 2;
+			loading.stop();
+		}
+	}
 
-        visible: tabPanelDecorator.baseElement
-                 ? tabPanelDecorator.baseElement.index < tabPanelDecorator.baseElement.listView.count - 1 &&
-                   !tabPanelDecorator.baseElement.selected &&
-                   (tabPanelDecorator.baseElement.index + 1) !== tabPanelDecorator.baseElement.selectedIndex
-                 : false;
+	Rectangle {
+		id: bg;
+		anchors.fill: tabPanelDecorator;
+		color: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent": "transparent";
+	}
 
-        color: Style.borderColor2;
-    }
+	Rectangle {
+		anchors.right: tabPanelDecorator.right;
+		anchors.verticalCenter: tabPanelDecorator.verticalCenter;
 
-    Rectangle {
-        id: selection;
+		width: 1;
+		height: tabPanelDecorator.height / 2;
 
-        anchors.bottom: tabPanelDecorator.bottom;
-        anchors.left: tabPanelDecorator.left;
-        anchors.right: tabPanelDecorator.right;
+		visible: tabPanelDecorator.baseElement
+				 ? tabPanelDecorator.baseElement.index < tabPanelDecorator.baseElement.listView.count - 1 &&
+				   !tabPanelDecorator.baseElement.selected &&
+				   (tabPanelDecorator.baseElement.index + 1) !== tabPanelDecorator.baseElement.selectedIndex
+				 : false;
 
-        height: 2;
+		color: Style.borderColor2;
+	}
 
-        color: Style.tabSelectedColor;
-        visible: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected: false;
-    }
+	Rectangle {
+		id: selection;
 
-    Row {
-        id: content;
+		anchors.bottom: tabPanelDecorator.bottom;
+		anchors.left: tabPanelDecorator.left;
+		anchors.right: tabPanelDecorator.right;
 
-        anchors.centerIn: tabPanelDecorator;
+		height: 2;
 
-        height: tabPanelDecorator.height;
+		color: Style.tabSelectedColor;
+		visible: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected: false;
+	}
 
-        spacing: Style.size_mainMargin;
+	Row {
+		id: content;
+		anchors.centerIn: tabPanelDecorator;
+		height: tabPanelDecorator.height;
+		spacing: Style.size_mainMargin;
 
-        Item {
-            id: imagetabDelegate;
+		Item {
+			id: imagetabDelegate;
+			anchors.verticalCenter: parent.verticalCenter;
+			width: visible ? firsElementImage.width : 0;
+			height: tabPanelDecorator.height;
+			visible: firsElementImage.status === Image.Ready;
 
-            anchors.verticalCenter: parent.verticalCenter;
+			Image {
+				id: firsElementImage;
+				anchors.centerIn: imagetabDelegate;
+				width: 20;
+				height: width;
+				source: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.icon !== "" ? "../../../" + Style.getIconPath(tabPanelDecorator.baseElement.icon, "On", "Normal"): "";
+				sourceSize.width: width;
+				sourceSize.height: height;
+				fillMode: Image.PreserveAspectFit;
+			}
+		}
 
-            width: visible ? height : 0;
-            height: tabPanelDecorator.height;
+		Item {
+			id: texttabDelegate;
 
-            visible: false;
+			anchors.verticalCenter: parent.verticalCenter;
 
-            Image {
-                id: firsElementImage;
+			width: tabPanelDecorator.baseElement && textHelper.width < tabPanelDecorator.baseElement.minWidth ? tabPanelDecorator.baseElement.minWidth :
+																												tabPanelDecorator.baseElement && textHelper.width > tabPanelDecorator.baseElement.maxWidth ? tabPanelDecorator.baseElement.maxWidth : textHelper.width + 10;
 
-                anchors.centerIn: imagetabDelegate;
+			height: tabPanelDecorator.height;
 
-                width: imagetabDelegate.width * 0.6;
-                height: imagetabDelegate.height * 0.6;
+			clip: true;
 
-                sourceSize.width: width;
-                sourceSize.height: height;
+			Text {
+				id: textHelper;
 
-                fillMode: Image.PreserveAspectFit;
-            }
-        }
+				visible: false;
 
-        Item {
-            id: texttabDelegate;
+				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
+				font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
+				font.bold: tabPanelDecorator.baseElement.index === 0;
+				font.pixelSize: Style.fontSize_common;
+			}
 
-            anchors.verticalCenter: parent.verticalCenter;
+			Text {
+				id: text;
 
-            width: tabPanelDecorator.baseElement && textHelper.width < tabPanelDecorator.baseElement.minWidth ? tabPanelDecorator.baseElement.minWidth :
-                   tabPanelDecorator.baseElement && textHelper.width > tabPanelDecorator.baseElement.maxWidth ? tabPanelDecorator.baseElement.maxWidth : textHelper.width + 10;
+				anchors.verticalCenter: parent.verticalCenter;
+				anchors.horizontalCenter: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.index === 0 ||
+										  tabPanelDecorator.baseElement && textHelper.width < tabPanelDecorator.baseElement.minWidth ? parent.horizontalCenter : undefined;
 
-            height: tabPanelDecorator.height;
+				width: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.index === 0 ? textHelper.width : parent.width;
 
-            clip: true;
+				color: Style.textColor;
+				font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
+				font.bold: tabPanelDecorator.baseElement.index === 0;
+				font.pixelSize: Style.fontSize_common;
+				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
 
-            Text {
-                id: textHelper;
+				elide: Text.ElideRight;
+			}
+		}
 
-                visible: false;
+		ToolButton {
+			id: closeButton;
+			anchors.verticalCenter: parent.verticalCenter;
+			width: Style.iconSizeSmall;
+			height: width;
+			visible: !tabPanelDecorator.baseElement.firstElement && tabPanelDecorator.baseElement.isCloseEnable;
+			iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+			decorator: Component {
+				ToolButtonDecorator {
+					color: "transparent";
+					icon.width: 16;
+				}
+			}
 
-                text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
-                font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
-                font.bold: tabPanelDecorator.baseElement.index === 0;
-                font.pixelSize: Style.fontSize_common;
-            }
+			onClicked: {
+				tabPanelDecorator.baseElement.closeSignal();
+			}
+		}
+	}
 
-            Text {
-                id: text;
-
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.horizontalCenter: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.index === 0 ||
-                                          tabPanelDecorator.baseElement && textHelper.width < tabPanelDecorator.baseElement.minWidth ? parent.horizontalCenter : undefined;
-
-                width: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.index === 0 ? textHelper.width : parent.width;
-
-                color: Style.textColor;
-                font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
-                font.bold: tabPanelDecorator.baseElement.index === 0;
-                font.pixelSize: Style.fontSize_common;
-                text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
-
-                elide: Text.ElideRight;
-            }
-        }
-
-        ToolButton {
-            id: closeButton;
-            anchors.verticalCenter: parent.verticalCenter;
-            width: Style.iconSizeSmall;
-            height: width;
-            visible: !tabPanelDecorator.baseElement.firstElement && tabPanelDecorator.baseElement.isCloseEnable;
-            iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
-            decorator: Component {
-                ToolButtonDecorator {
-                    color: "transparent";
-                    icon.width: 16;
-                }
-            }
-
-            onClicked: {
-                tabPanelDecorator.baseElement.closeSignal();
-            }
-        }
-    }
+	Loading {
+		id: loading;
+		anchors.fill: bg;
+		indicatorSize: 20;
+		color: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent";
+		visible: false;
+	}
 }
 
 

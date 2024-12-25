@@ -13,21 +13,10 @@ QtObject {
 		dynamicRoles: true;
 	}
 
-	signal documentClosed(int documentIndex, string documentId);
-	signal documentAdded(int documentIndex, string documentId);
-
-	onDocumentsCountChanged: {
-		documentIndexCorrection();
-	}
-
-	function documentIndexCorrection(){
-		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).DocumentData;
-			if (documentData){
-				documentData.documentIndex = i;
-			}
-		}
-	}
+	signal documentClosed(string documentId);
+	signal documentAdded(string documentId);
+	signal documentSaved(string documentId);
+	signal documentIsDirtyChanged(string documentId, bool isDirty);
 
 
 	function openErrorDialog(message){
@@ -35,33 +24,12 @@ QtObject {
 	}
 
 
-	function getDocumentsCount()
+	function getDocumentTypeId(documentId)
 	{
-		return documentsModel.count;
-	}
-
-
-	function getActiveView()
-	{
-		return internal.m_activeViewPtr;
-	}
-
-
-	function setActiveView(viewPtr)
-	{
-		if (internal.m_activeViewPtr !== viewPtr){
-			internal.m_activeViewPtr = viewPtr;
-		}
-	}
-
-
-	function getDocumentTypeId(document)
-	{
-		let documentsCount = getDocumentsCount();
-		for (let documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
-			let info = internal.getSingleDocumentData(documentIndex);
-			if (info.documentPtr === document){
-				return info.documentTypeId;
+		for (let documentIndex = 0; documentIndex < documentsModel.count; documentIndex++){
+			let id = documentsModel.get(documentIndex).Id;
+			if (id === documentId){
+				return documentsModel.get(documentIndex).TypeId;
 			}
 		}
 
@@ -136,15 +104,6 @@ QtObject {
 		return false;
 	}
 
-	function createViewForDocument(documentTypeId, viewTypeId)
-	{
-		let viewComp = getDocumentViewComp(documentTypeId, viewTypeId);
-		if (viewComp){
-			return viewComp.createObject(documentManager);
-		}
-
-		return null;
-	}
 
 	function getDocumentViewComp(documentTypeId, viewTypeId)
 	{
@@ -163,6 +122,17 @@ QtObject {
 		}
 
 		return null;
+	}
+
+
+	function getDocumentViewCompByDocumentId(documentId)
+	{
+		for (let i = 0; i < documentsModel.count; i++){
+			let documentData = documentsModel.get(i).DocumentData;
+			if (documentData && documentData.documentId === documentId){
+				return documentData.viewComp;
+			}
+		}
 	}
 
 
@@ -220,7 +190,7 @@ QtObject {
 
 	function insertNewDocument(documentTypeId, viewTypeId)
 	{
-		let documentData = createTemplateDocument("", documentTypeId);
+		let documentData = createTemplateDocument(UuidGenerator.generateUUID(), documentTypeId, viewTypeId);
 		if (!documentData){
 			return false;
 		}
@@ -229,7 +199,7 @@ QtObject {
 			documentData.documentDataController.createDocumentModel();
 		}
 
-		addDocumentToModel("", documentTypeId, viewTypeId, documentData);
+		addDocumentToModel(documentData.documentId, documentTypeId, viewTypeId, documentData);
 
 		return true;
 	}
@@ -242,6 +212,16 @@ QtObject {
 		return documentsModel.get(index).DocumentData;
 	}
 
+	function getDocumentDataById(documentId){
+		for (let i = 0; i < documentsModel.count; i++){
+			let documentData = documentsModel.get(i).DocumentData;
+			if (documentData && documentData.documentId === documentId){
+				return documentData;
+			}
+		}
+
+		return null;
+	}
 
 	function getViewTypeIds(documentTypeId){
 		if (!documentIsRegistered(documentTypeId)){
@@ -260,28 +240,14 @@ QtObject {
 	}
 
 
-	function createTemplateDocument(documentId, documentTypeId){
+	function createTemplateDocument(documentId, documentTypeId, viewTypeId){
 		let singleDocumentData = singleDocumentDataComp.createObject(documentManager);
 		if (singleDocumentData){
-			if (documentId === ""){
-				singleDocumentData.documentId = UuidGenerator.generateUUID();
-			}
-			else{
-				singleDocumentData.documentId = documentId;
-			}
-
-			singleDocumentData.uuid = UuidGenerator.generateUUID();
-			singleDocumentData.documentIndex = documentsModel.count;
+			singleDocumentData.documentId = documentId;
 			singleDocumentData.documentTypeId = documentTypeId;
 
-			let registeredViewIds = getViewTypeIds(documentTypeId);
-
-			for (let i = 0; i < registeredViewIds.length; i++){
-				let viewId = registeredViewIds[i];
-
-				let view = createViewForDocument(documentTypeId, viewId);
-				singleDocumentData.views.push(view);
-			}
+			let viewComp = getDocumentViewComp(documentTypeId, viewTypeId);
+			singleDocumentData.viewComp = viewComp;
 
 			let documentDataController = getDocumentDataController(documentTypeId);
 			if (documentDataController){
@@ -305,14 +271,14 @@ QtObject {
 		let index = getDocumentIndexByDocumentId(documentId);
 		if (index >= 0){
 			// already opened
-			documentAdded(index, documentId);
+			documentAdded(documentId);
 
 			return;
 		}
 
 		Events.sendEvent("StartLoading");
 
-		let documentData = createTemplateDocument(documentId, documentTypeId);
+		let documentData = createTemplateDocument(documentId, documentTypeId, viewTypeId);
 		if (!documentData){
 			return false;
 		}
@@ -340,21 +306,18 @@ QtObject {
 	function addDocumentToModel(documentId, documentTypeId, viewTypeId, documentData)
 	{
 		documentsModel.append({
-								"Uuid": documentData.uuid,
-								"Title": defaultDocumentName,
+								"Id": documentId,
 								"TypeId": documentTypeId,
+								"ViewTypeId": viewTypeId,
 								"DocumentData": documentData,
 								"IsNew": documentData.isNew
 							});
 
-		documentAdded(documentsModel.count - 1, documentId);
-
-		documentManager.updateDocumentTitle(documentsModel.count - 1);
+		documentAdded(documentId);
 	}
 
 	/*!
-		Save document by UUID.
-
+		Save document by ID.
 		\param      documentId           UUID of the document
 	*/
 	function saveDocument(documentId)
@@ -368,9 +331,9 @@ QtObject {
 			if (document.isDirty){
 				Events.sendEvent("StartLoading");
 
-				for (let i = 0; i < document.views.length; i++){
-					if (!document.views[i].readOnly){
-						document.views[i].doUpdateModel();
+				if (document.view){
+					if (!document.view.readOnly){
+						document.view.doUpdateModel();
 					}
 				}
 
@@ -382,6 +345,8 @@ QtObject {
 
 					return;
 				}
+
+				console.log("isNew", isNew);
 
 				if (document.documentDataController){
 					if (isNew){
@@ -396,26 +361,32 @@ QtObject {
 	}
 
 
-	function onDocumentSaved(documentId, documentIndex)
+	function onDocumentSaved(documentId)
 	{
-		Events.sendEvent("StopLoading");
-
 		if (internal.m_closingDocuments.includes(documentId)){
 			closeDocument(documentId);
 		}
 
+		let documentIndex = getDocumentIndexByDocumentId(documentId);
 		if (documentIndex >= 0){
 			let documentData = documentsModel.get(documentIndex);
 			if (documentData && documentData.IsNew){
 				documentsModel.setProperty(documentIndex, "IsNew", false);
 			}
 		}
+
+		documentManager.documentSaved(documentId);
+		Events.sendEvent("StopLoading");
 	}
 
 
 	function getDocumentIndexByDocumentId(documentId){
+		console.log("getDocumentIndexByDocumentId", documentId);
+
 		for (let i = 0; i < documentsModel.count; i++){
 			let documentData = documentsModel.get(i).DocumentData;
+			console.log("documentData.documentId",documentData.documentId);
+
 			if (documentData && documentData.documentId === documentId){
 				return i;
 			}
@@ -428,76 +399,13 @@ QtObject {
 	function getDocumentDataByView(view){
 		for (let i = 0; i < documentsModel.count; i++){
 			let documentData = documentsModel.get(i).DocumentData;
-			if (documentData && documentData.views.includes(view)){
+			if (documentData && documentData.view === view){
 				return documentData;
 			}
 		}
 
 		return null;
 	}
-
-
-	function getDocumentTitle(documentIndex)
-	{
-		if (documentIndex < 0 || documentIndex >= documentsModel.count){
-			return "";
-		}
-
-		return documentsModel.get(documentIndex).Title;
-	}
-
-
-	function generateDocumentTitle(documentIndex){
-		if (documentIndex < 0 || documentIndex >= documentsModel.count){
-			return "";
-		}
-
-		let title = defaultDocumentName;
-
-		let documentData = documentsModel.get(documentIndex).DocumentData;
-
-		let documentName = "";
-
-		if (documentData){
-			documentName = documentData.getDocumentName();
-		}
-
-		if (documentName && documentName !== ""){
-			title = documentName;
-		}
-
-		if (documentData && documentData.isDirty){
-			title = "* " + title;
-		}
-
-		return title;
-	}
-
-
-	function updateDocumentTitle(documentIndex){
-		console.log("updateDocumentTitle", documentIndex);
-
-		if (documentIndex < 0 || documentIndex >= documentsModel.count){
-			return;
-		}
-
-		let documentTitle = generateDocumentTitle(documentIndex);
-
-		setDocumentTitle(documentIndex, documentTitle);
-	}
-
-
-	function setDocumentTitle(documentIndex, title)
-	{
-		console.log("setDocumentTitle", documentIndex, title);
-
-		if (documentIndex < 0 || documentIndex >= documentsModel.count){
-			return;
-		}
-
-		documentsModel.setProperty(documentIndex, "Title", title);
-	}
-
 
 	// soon
 	function saveDirtyDocuments(beQuiet, ignoredPtr)
@@ -513,7 +421,6 @@ QtObject {
 	*/
 	function closeDocumentByIndex(documentIndex, force)
 	{
-		console.log("closeDocumentByIndex", documentIndex, force);
 		if (documentIndex < 0 || documentIndex >= documentsModel.count){
 			console.error("Unable to close document with index: ", documentIndex);
 
@@ -549,12 +456,12 @@ QtObject {
 				internal.m_closingDocuments.splice(index, 1);
 			}
 
-			documentData.removeAllViews();
+			let documentId = documentData.documentId;
 			documentData.destroy();
 
 			documentsModel.remove(documentIndex);
 
-			documentClosed(documentIndex, "");
+			documentClosed(documentId);
 		}
 	}
 
@@ -576,8 +483,8 @@ QtObject {
 			data = {}
 		}
 
-		if (documentData.views.length > 0){
-			data["editor"] = documentData.views[0];
+		if (documentData.view){
+			data["editor"] = documentData.view;
 		}
 
 		return documentData.documentValidator.isValid(data);
@@ -599,14 +506,9 @@ QtObject {
 	property Component singleDocumentDataComp: Component{
 		QtObject {
 			id: singleDocumentData;
-
-			// UUID for unification
-			property string uuid: "";
 			// index of the document in document manager
-			property int documentIndex: -1;
 			property bool isNew: true;
 			property string documentId;
-			property string documentName;
 			property string documentTypeId;
 			property DocumentDataController documentDataController: null;
 			property DocumentValidator documentValidator: DocumentValidator {};
@@ -626,43 +528,52 @@ QtObject {
 					let undoSteps = getAvailableUndoSteps();
 					let redoSteps = getAvailableRedoSteps();
 
-					for (let i = 0; i < singleDocumentData.views.length; i++){
-						if (singleDocumentData.views[i].commandsController){
-							singleDocumentData.views[i].commandsController.setCommandIsEnabled("Undo", undoSteps > 0);
-							singleDocumentData.views[i].commandsController.setCommandIsEnabled("Redo", redoSteps > 0);
-						}
+					if (singleDocumentData.view && singleDocumentData.view.commandsController){
+						singleDocumentData.view.commandsController.setCommandIsEnabled("Undo", undoSteps > 0);
+						singleDocumentData.view.commandsController.setCommandIsEnabled("Redo", redoSteps > 0);
 					}
 				}
 			};
 
-			property var views: [];
+			property Component viewComp;
+			property ViewBase view;
 			property bool isDirty: false;
 
 			Component.onDestruction: {
-				console.log("singleDocumentData onDestruction");
-				if (views.length > 0){
-					removeAllViews();
+				if (view){
+					// view.destroy();
 				}
 			}
 
-			function removeAllViews(){
-				for (let i = 0; i < views.length; i++){
-					views[i].parent = null;
-					views[i].destroy();
+			onViewChanged: {
+				console.log("onViewChanged", view)
+				let documentModel = documentDataController.documentModel;
+				view.model = documentModel;
+				blockingUpdateModel = true;
+
+				if (isNew){
+					updateModel();
+				}
+				else{
+					updateGui();
 				}
 
-				views = []
+				if (view.commandsDelegate){
+					view.commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
+				}
+
+				blockingUpdateModel = false;
 			}
 
 			function updateGui(){
-				for (let i = 0; i < singleDocumentData.views.length; i++){
-					singleDocumentData.views[i].doUpdateGui();
+				if (singleDocumentData.view){
+					singleDocumentData.view.doUpdateGui();
 				}
 			}
 
 			function updateModel(){
-				for (let i = 0; i < singleDocumentData.views.length; i++){
-					singleDocumentData.views[i].doUpdateModel();
+				if (singleDocumentData.view){
+					singleDocumentData.view.doUpdateModel();
 				}
 			}
 
@@ -670,8 +581,8 @@ QtObject {
 				target: singleDocumentData.documentDataController;
 
 				function onSaved(documentId, documentName){
+					console.log("onSaved", documentId);
 					singleDocumentData.documentId = documentId;
-					singleDocumentData.documentName = documentName;
 
 					singleDocumentData.isDirty = false;
 
@@ -680,9 +591,9 @@ QtObject {
 						singleDocumentData.undoManager.setStandardModel(documentModel);
 					}
 
-					documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
+					documentManager.onDocumentSaved(singleDocumentData.documentId);
 
-					documentManager.onDocumentSaved(documentId, singleDocumentData.documentIndex);
+
 				}
 
 				function onModelChanged(){
@@ -695,19 +606,17 @@ QtObject {
 					let documentModel = singleDocumentData.documentDataController.documentModel;
 
 					singleDocumentData.documentId = singleDocumentData.documentDataController.getDocumentId();
-					singleDocumentData.documentName = singleDocumentData.documentDataController.getDocumentName();
 
 					singleDocumentData.blockingUpdateModel = true;
 
-					for (let i = 0; i < singleDocumentData.views.length; i++){
-						singleDocumentData.views[i].model = documentModel;
+					if (singleDocumentData.view){
+						singleDocumentData.view.model = documentModel;
 
-						if (singleDocumentData.views[i].commandsDelegate){
-							singleDocumentData.views[i].commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
+						if (singleDocumentData.view.commandsDelegate){
+							singleDocumentData.view.commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
 						}
 					}
 
-					// let isNew = documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew;
 					if (singleDocumentData.isNew){
 						singleDocumentData.updateModel();
 					}
@@ -716,8 +625,6 @@ QtObject {
 					}
 
 					singleDocumentData.blockingUpdateModel = false;
-
-					documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
 
 					singleDocumentData.undoManager.registerModel(documentModel);
 					singleDocumentData.documentValidator.documentModel = documentModel;
@@ -767,27 +674,21 @@ QtObject {
 			}
 
 			onIsDirtyChanged: {
-				for (let i = 0; i < singleDocumentData.views.length; i++){
-					if (singleDocumentData.views[i].commandsController){
-						singleDocumentData.views[i].commandsController.setCommandIsEnabled("Save", isDirty);
+				console.log("onIsDirtyChanged", isDirty, view)
+
+				if (view){
+					if (view.commandsController){
+						view.commandsController.setCommandIsEnabled("Save", isDirty);
 					}
 
-					if (singleDocumentData.views[i].commandsView){
-						if (singleDocumentData.views[i].commandsView.setPositiveAccentCommandIds !== undefined){
-							singleDocumentData.views[i].commandsView.setPositiveAccentCommandIds(["Save"]);
+					if (view.commandsView){
+						if (view.commandsView.setPositiveAccentCommandIds !== undefined){
+							view.commandsView.setPositiveAccentCommandIds(["Save"]);
 						}
 					}
 				}
 
-				documentManager.updateDocumentTitle(documentIndex);
-			}
-
-			function getDocumentName(){
-				if (singleDocumentData.documentDataController){
-					return singleDocumentData.documentDataController.getDocumentName();
-				}
-
-				return "";
+				documentManager.documentIsDirtyChanged(documentId, isDirty);
 			}
 
 			// Processing commands that came from the view
@@ -828,24 +729,9 @@ QtObject {
 	}
 
 	property QtObject internal: QtObject {
-		function getSingleDocumentData(index)
-		{
-			if (index < 0 || index >= m_documentInfos.length){
-				return null;
-			}
-
-			return m_documentInfos[index];
-		}
-
-		function getDocumentInfoFromView(view)
-		{
-			return null;
-		}
-
 		property var m_registeredView: ({});
 		property var m_registeredDataControllers: ({});
 		property var m_registeredValidators: ({});
-		property var m_documentInfos: [];
 		property var m_activeViewPtr;
 		property var m_closingDocuments: [];
 	}

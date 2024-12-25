@@ -9,12 +9,10 @@ Item {
 
     property ListModel pagesModel: ListModel {}
 
-    signal itemAdded(int index, var item);
-    signal itemRemoved(int index, var item);
+	signal itemAdded(int index, var item);
+	signal itemRemoved(int index, var item);
 
     function push(item){
-        console.log("push",item);
-
         pagesModel.append({"Component": item})
     }
 
@@ -80,7 +78,7 @@ Item {
             visible: model.index === container.pagesModel.count - 1;
 
             onLoaded: {
-                container.itemAdded(container.pagesModel.count - 1, item);
+				container.itemAdded(container.pagesModel.count - 1, item);
             }
 
             onStatusChanged: {
@@ -91,7 +89,7 @@ Item {
         }
 
         onItemRemoved: {
-            container.itemRemoved(index, item);
+			container.itemRemoved(index, item);
         }
     }
 }

@@ -33,15 +33,6 @@ DocumentDataController {
         }
     }
 
-    function setupDocumentInfo(){
-        if (documentModel && documentModel.containsKey("Name")){
-            container.documentName = documentModel.getData("Name");
-        }
-        else{
-            console.error("Unable to set document name. Error: Document model is not contains key 'Name'");
-        }
-    }
-
     function updateDocumentModel(){
         gqlGetModel.send();
     }

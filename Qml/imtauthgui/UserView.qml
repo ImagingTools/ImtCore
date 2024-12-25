@@ -3,6 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtauthUsersSdl 1.0
+import imtdocgui 1.0
 
 ViewBase {
     id: container;
@@ -87,6 +88,13 @@ ViewBase {
         }
     }
 
+	DocumentHistoryPanel {
+		id: historyPanel;
+		documentId: container.userData ? container.userData.m_id : "";
+		collectionId: "Users";
+		editorFlickable: flickable;
+	}
+
     CustomScrollbar {
         id: scrollbar;
 
@@ -131,7 +139,7 @@ ViewBase {
         anchors.rightMargin: Style.size_largeMargin;
 
         contentWidth: bodyColumn.width;
-        contentHeight: bodyColumn.height + 2 * Style.size_largeMargin;
+		contentHeight: Math.max(bodyColumn.height + 2 * Style.size_largeMargin, historyPanel.contentHeight + 2 * Style.size_largeMargin);
 
         boundsBehavior: Flickable.StopAtBounds;
 
