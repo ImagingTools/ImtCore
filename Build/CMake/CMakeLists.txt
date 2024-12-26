@@ -100,6 +100,9 @@ if(NOT DEFINED USE_SDL OR USE_SDL)
 	add_subdirectory("${SDL_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauthsdl")
 	add_dependencies(imtauthsdl imtbasesdl)
 
+	add_subdirectory("${SDL_DIR}/imtcolor/CMake" "${AUX_INCLUDE_DIR}/imtcolorsdl")
+	add_dependencies(imtcolorsdl imtbasesdl)
+
 	add_subdirectory("${SDL_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlicsdl")
 	add_dependencies(imtlicsdl imtbasesdl)
 
