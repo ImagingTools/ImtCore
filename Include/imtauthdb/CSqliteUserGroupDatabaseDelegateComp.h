@@ -35,7 +35,7 @@ public:
 				bool useExternDelegate = true) const override;
 
 	// reimplemented (imtdb::CSqlDatabaseDocumentDelegateComp)
-	virtual QString GetBaseSelectionQuery() const override;
+	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 private:
 	I_REF(imtdb::ISqlDatabaseObjectDelegate, m_userDatabaseDelegateCompPtr);

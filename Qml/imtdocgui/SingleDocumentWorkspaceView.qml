@@ -36,7 +36,7 @@ Rectangle {
 					name = root.documentManager.defaultDocumentName;
 				}
 
-				headersModel.addHeader(documentId, "");
+				headersModel.addHeader(documentId, name);
 			}
 		}
 
@@ -78,19 +78,9 @@ Rectangle {
 		headersModel.addHeader(UuidGenerator.generateUUID(), name)
 	}
 
-	function setAlertPanel(alertPanelComp){
-		alertPanel.sourceComponent = alertPanelComp;
-	}
-
-	Loader {
-		id: alertPanel;
-		height: visible ? 40: 0;
-		visible: false;
-	}
-
 	Item {
 		id: buttonPanel;
-		anchors.top: alertPanel.bottom;
+		anchors.top: parent.top;
 		anchors.left: parent.left;
 		anchors.leftMargin: visible ? Style.size_mainMargin : 0;
 		width: visible ? closeButton.width: 0;
@@ -174,11 +164,15 @@ Rectangle {
 				}
 			}
 		}
+
+		function onError(message, type){
+
+		}
 	}
 
 	ListView {
 		id: headersListView;
-		anchors.top: alertPanel.bottom;
+		anchors.top: parent.top;
 		anchors.left: buttonPanel.right;
 		anchors.leftMargin: Style.size_mainMargin;
 		anchors.right: parent.right;

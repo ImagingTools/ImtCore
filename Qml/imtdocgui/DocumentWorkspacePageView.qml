@@ -7,7 +7,10 @@ import imtgui 1.0
 PageContainer {
     id: root;
 
-    property DocumentManager documentManager: DocumentManager {};
+	property DocumentManager documentManager: DocumentManager {
+		activeView: root.documentManagerView;
+	};
+
     property Item documentManagerView: null;
 
     Component.onCompleted: {

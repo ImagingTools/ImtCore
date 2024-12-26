@@ -8,6 +8,7 @@ QtObject {
 
 	property string defaultDocumentName: qsTr("<no name>");
 	property int documentsCount: documentsModel.count;
+	property Item activeView;
 
 	property ListModel documentsModel: ListModel {
 		dynamicRoles: true;
@@ -23,6 +24,13 @@ QtObject {
 		ModalDialogManager.openDialog(errorDialogComp, {"message": message});
 	}
 
+	function getActiveView(){
+		return activeView;
+	}
+
+	function getActiveDocumentView(){
+		return null;
+	}
 
 	function getDocumentTypeId(documentId)
 	{
@@ -268,6 +276,8 @@ QtObject {
 
 	function openDocument(documentId, documentTypeId, viewTypeId)
 	{
+		console.log("openDocument", documentId, documentTypeId, viewTypeId)
+
 		let index = getDocumentIndexByDocumentId(documentId);
 		if (index >= 0){
 			// already opened
@@ -509,6 +519,7 @@ QtObject {
 			// index of the document in document manager
 			property bool isNew: true;
 			property string documentId;
+			property string documentName;
 			property string documentTypeId;
 			property DocumentDataController documentDataController: null;
 			property DocumentValidator documentValidator: DocumentValidator {};
@@ -538,12 +549,6 @@ QtObject {
 			property Component viewComp;
 			property ViewBase view;
 			property bool isDirty: false;
-
-			Component.onDestruction: {
-				if (view){
-					// view.destroy();
-				}
-			}
 
 			onViewChanged: {
 				console.log("onViewChanged", view)

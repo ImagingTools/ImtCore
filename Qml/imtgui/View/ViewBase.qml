@@ -38,9 +38,23 @@ Item {
         }
     }
 
+	function setAlertPanel(alertPanelComp){
+		alertPanel.sourceComponent = alertPanelComp;
+	}
+
+	Loader {
+		id: alertPanel;
+		anchors.top: parent.top;
+		anchors.left: parent.left;
+		anchors.right: parent.right;
+		height: visible ? 40: 0;
+		visible: alertPanel.item != null && alertPanel.item !== undefined;
+		objectName: "ViewBase";
+	}
+
     Item {
         id: headerViewItem;
-        anchors.top: parent.top;
+		anchors.top: alertPanel.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
         height: visible ? 30 + 2 * Style.size_mainMargin : 0;

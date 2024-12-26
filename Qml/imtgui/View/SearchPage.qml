@@ -142,7 +142,6 @@ ViewBase {
         anchors.topMargin: Style.size_mainMargin;
         anchors.horizontalCenter: parent.horizontalCenter;
         height: 30;
-        displayRoleId: "Name";
         visible: false;
         spacing: Style.size_mainMargin;
         color: Style.backgroundColor2;

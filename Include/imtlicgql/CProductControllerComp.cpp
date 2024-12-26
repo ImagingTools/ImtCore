@@ -17,9 +17,9 @@ namespace imtlicgql
 
 
 sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CProductControllerComp::OnGetObjectVisualStatus(
-	const sdl::imtlic::Products::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+	const sdl::imtlic::Products::V1_0::CGetObjectVisualStatusGqlRequest& /*getObjectVisualStatusRequest*/,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
 	return sdl::imtbase::ImtCollection::CVisualStatus::V1_0();
 }

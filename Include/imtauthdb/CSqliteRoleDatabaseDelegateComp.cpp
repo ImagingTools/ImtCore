@@ -17,97 +17,24 @@ namespace imtauthdb
 
 // reimplemented (imtdb::CSqliteJsonDatabaseDelegateComp)
 
-istd::IChangeable* CSqliteRoleDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+bool CSqliteRoleDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	if (!m_databaseEngineCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	if (!m_documentFactoriesCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	istd::TDelPtr<istd::IChangeable> documentPtr;
-	documentPtr.SetPtr(new imtauth::CIdentifiableRoleInfo());
-	if (!documentPtr.IsValid()){
-		return nullptr;
-	}
+	BaseClass::SetCollectionItemMetaInfoFromRecord(record, metaInfo);
 
 	if (record.contains("Document")){
-		QByteArray documentContent = record.value(qPrintable("Document")).toByteArray();
+		QByteArray json = record.value("Document").toByteArray();
+		QJsonDocument jsonDocument = QJsonDocument::fromJson(json);
 
-		if (ReadDataFromMemory("RoleInfo", documentContent, *documentPtr)){
-			return documentPtr.PopPtr();
+		if (!jsonDocument.isNull()){
+			QString description = jsonDocument["RoleDescription"].toString();
+			metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_DESCRIPTION, description);
+
+			QString name = jsonDocument["RoleName"].toString();
+			metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_NAME, name);
 		}
 	}
 
-	return nullptr;
-}
-
-
-imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqliteRoleDatabaseDelegateComp::CreateNewObjectQuery(
-	const QByteArray& /*typeId*/,
-	const QByteArray& proposedObjectId,
-	const QString& objectName,
-	const QString& /*objectDescription*/,
-	const istd::IChangeable* valuePtr,
-	const imtbase::IOperationContext* operationContextPtr) const
-{
-	imtdb::IDatabaseObjectDelegate::NewObjectQuery retVal;
-
-	istd::TOptDelPtr<const istd::IChangeable> workingDocumentPtr;
-	if (valuePtr != nullptr){
-		workingDocumentPtr.SetPtr(valuePtr, false);
-	}
-
-	if (workingDocumentPtr.IsValid()){
-		QByteArray documentContent;
-		if (WriteDataToMemory("RoleInfo", *workingDocumentPtr, documentContent)){
-			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
-			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
-
-			int revisionVersion = 1;
-			retVal.query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);")
-							.arg(qPrintable("Roles"))
-							.arg(qPrintable(objectId))
-							.arg(SqlEncode(documentContent))
-							.arg(revisionVersion)
-							.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
-							.arg(checksum).toUtf8();
-
-			retVal.query += CreateOperationDescriptionQuery(objectId, operationContextPtr);
-
-			retVal.objectName = objectName;
-		}
-	}
-
-	return retVal;
-}
-
-
-QByteArray CSqliteRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
-	const imtbase::IObjectCollection& /*collection*/,
-	const QByteArray& objectId,
-	const istd::IChangeable& object,
-	const imtbase::IOperationContext* operationContextPtr,
-	bool /*useExternDelegate*/) const
-{
-	QByteArray retVal;
-
-	QByteArray documentContent;
-	if (WriteDataToMemory("RoleInfo", object, documentContent)){
-		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
-		retVal = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );")
-					.arg(qPrintable("Roles"))
-					.arg(qPrintable(objectId))
-					.arg(SqlEncode(documentContent))
-					.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
-					.arg(checksum).toUtf8();
-
-		retVal += CreateOperationDescriptionQuery(objectId, operationContextPtr);
-	}
-
-	return retVal;
+	return true;
 }
 
 

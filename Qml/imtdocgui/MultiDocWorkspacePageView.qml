@@ -11,7 +11,7 @@ DocumentWorkspacePageView {
 
     onStartItemSourceCompChanged: {
         if (startItemSourceComp){
-            documentManagerView_.addFixedView(startItemSourceComp, pageName, 0);
+			documentManagerView_.addFixedView(startItemSourceComp, pageName, true);
         }
     }
 
@@ -19,27 +19,5 @@ DocumentWorkspacePageView {
         id: documentManagerView_;
         anchors.fill: parent;
         documentManager: multiDocPageView.documentManager;
-
-        Component.onCompleted: {
-            Events.subscribeEvent("SetAlertPanel", setAlert);
-        }
-
-        Component.onDestruction: {
-            Events.unSubscribeEvent("SetAlertPanel", setAlert);
-        }
-
-        function setAlert(parameters){
-            if (!parameters){
-                console.error("Unable to set an alert panel, 'parameters' is invalid");
-                return;
-            }
-
-            let id = parameters["Id"];
-            let alertPanelComp = parameters["AlertPanelComp"];
-
-            if (id === multiDocPageView.pageId){
-                setAlertPanel(alertPanelComp);
-            }
-        }
     }
 }

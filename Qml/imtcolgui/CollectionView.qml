@@ -72,6 +72,10 @@ Item {
         container.doubleClicked(id, index)
     }
 
+	function setAlertPanel(alertPanelComp){
+		container.setAlertPanel(alertPanelComp)
+	}
+
     function doUpdateGui(){
         container.doUpdateGui();
     }

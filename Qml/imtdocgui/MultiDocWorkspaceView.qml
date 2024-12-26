@@ -40,14 +40,9 @@ Item {
 		function onDocumentClosed(documentId){
 			let tabIndex = tabView.getIndexById(documentId);
 			tabView.removeTab(documentId);
-
-			if (tabIndex <= tabView.currentIndex && tabIndex > 0){
-				tabView.currentIndex--;
-			}
 		}
 
 		function onDocumentIsDirtyChanged(documentId, isDirty){
-			console.log("onDocumentIsDirtyChanged", documentId, isDirty);
 			let tabIndex = tabView.getIndexById(documentId);
 			if (tabIndex >= 0){
 				let tabName = tabView.getTabName(documentId);
@@ -70,12 +65,16 @@ Item {
 		}
 	}
 
-	function addFixedView(viewComp, name, index){
-		tabView.addTab(UuidGenerator.generateUUID(), name, viewComp);
-	}
+	function addFixedView(viewComp, name, forceFocus){
+		if (!forceFocus){
+			forceFocus = false;
+		}
 
-	function setAlertPanel(alertPanelComp){
-		// alertPanel.sourceComponent = alertPanelComp;
+		tabView.addTab(UuidGenerator.generateUUID(), name, viewComp);
+
+		if (forceFocus){
+			tabView.currentIndex = tabView.tabModel.count - 1;
+		}
 	}
 
 	Rectangle {
@@ -149,15 +148,6 @@ Item {
 		}
 	}
 
-	// Loader {
-	// 	id: alertPanel;
-	// 	anchors.top: tabPanel_.bottom;
-	// 	anchors.left: parent.left;
-	// 	anchors.right: parent.right;
-	// 	height: visible ? 40: 0;
-	// 	visible: alertPanel.item != null && alertPanel.item !== undefined;
-	// }
-
 	TabView {
 		id: tabView;
 		anchors.fill: parent;
@@ -177,9 +167,15 @@ Item {
 			}
 		}
 
-		onCloseTab: {
+		function onCloseTab(index){
 			let tabId = getTabIdByIndex(index);
-			workspaceView.documentManager.closeDocument(tabId);
+			let documentData = workspaceView.documentManager.getDocumentDataById(tabId);
+			if (documentData){
+				workspaceView.documentManager.closeDocument(tabId);
+			}
+			else{
+				removeTab(tabId);
+			}
 		}
 	}
 }

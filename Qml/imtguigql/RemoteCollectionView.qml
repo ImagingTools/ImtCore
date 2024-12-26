@@ -145,13 +145,6 @@ CollectionView {
         }
     }
 
-    function setAlertPanel(alertPanel){
-        let parameters = {"Id": collectionId, "AlertPanelComp": alertPanel};
-
-        Events.sendEvent("SetAlertPanel", parameters)
-    }
-
-
     MetaInfoProvider {
         id: metaInfoProvider;
 
