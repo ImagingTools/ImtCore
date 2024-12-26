@@ -213,6 +213,13 @@ macro (ImtCoreCustomConfigureSdlQml)
 		list(APPEND MODIFICATORS "--auto-join")
 	endif()
 
+	list(LENGTH GLOBAL_SDL_SCHEMA_SEARCH_PATHS SDL_SCHEMA_PATHS_COUNT)
+	if (SDL_SCHEMA_PATHS_COUNT GREATER 0 )
+		foreach(SDL_SEARCH_PATH ${GLOBAL_SDL_SCHEMA_SEARCH_PATHS})
+			list(APPEND MODIFICATORS "-I${SDL_SEARCH_PATH}")
+		endforeach()
+	endif()
+
 	ImtCoreGetSdlDeps(
 		INPUT
 			"${ARG_SCHEMA_PATH}"
