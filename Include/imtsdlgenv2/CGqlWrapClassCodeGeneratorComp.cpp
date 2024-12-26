@@ -660,6 +660,82 @@ void CGqlWrapClassCodeGeneratorComp::AddRequiredIncludesToHeaderFile(QTextStream
 			FeedStream(stream, 1, false);
 		}
 
+		QList<imtsdl::IncludeDirective> includeDirectivesList;
+		QSet<QString> customIncluded;
+		QList<imtsdl::CSdlField> requestFields = sdlRequest.GetInputArguments();
+		requestFields << sdlRequest.GetOutputArgument();
+		for (const imtsdl::CSdlField& field: requestFields){
+			std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumForField(
+				field,
+				m_sdlTypeListCompPtr->GetSdlTypes(false),
+				m_sdlEnumListCompPtr->GetEnums(false));
+
+			if (!foundEntryPtr){
+				SendCriticalMessage(0, QString("Unable to find type for %1 of %2").arg(field.GetId(), sdlRequest.GetName()));
+				I_CRITICAL();
+
+				return;
+			}
+
+			if (!foundEntryPtr->IsExternal()){
+				continue;
+			}
+
+			QString resolvedPath = ResolveRelativeHeaderFileForType(*foundEntryPtr, m_argumentParserCompPtr->GetHeadersIncludePaths(), false);
+			if (resolvedPath.isEmpty()){
+				SendErrorMessage(0, QString("Unable to find header for %1 of %2").arg(field.GetId(), sdlRequest.GetName()));
+
+				return;
+			}
+
+			const QString relativeIncludePath = '<' + resolvedPath + '>';
+			if (!resolvedPath.isEmpty() && !customIncluded.contains(relativeIncludePath)){
+				includeDirectivesList << CreateCustomDirective(relativeIncludePath);
+				customIncluded << relativeIncludePath;
+			}
+		}
+
+		QList<imtsdl::Priority> orderList = {
+			imtsdl::P_C,
+			imtsdl::P_OS_API,
+			imtsdl::P_QT,
+			imtsdl::P_ACF,
+			imtsdl::P_IMT,
+			imtsdl::P_CUSTOM
+		};
+
+		QMutableListIterator includeIter(includeDirectivesList);
+		while(!orderList.isEmpty()){
+			imtsdl::Priority currentPriority = orderList.takeFirst();
+			bool addRemark = true;
+			bool isAdded = false;
+			while(includeIter.hasNext()){
+				imtsdl::IncludeDirective directive = includeIter.next();
+				if (directive.priority == currentPriority){
+					isAdded = true;
+					if (addRemark){
+						if (!directive.remark.startsWith(QStringLiteral("//"))){
+							stream << QStringLiteral("// ");
+						}
+						stream << directive.remark;
+						FeedStream(stream, 1, false);
+						addRemark = false;
+					}
+					stream << QStringLiteral("#include ");
+					stream << directive.path;
+					FeedStream(stream, 1, false);
+
+					includeIter.remove();
+				}
+			}
+			if (isAdded){
+				FeedStream(stream, 1, false);
+			}
+			includeIter.toFront();
+		}
+
+
+		/// \fallback for V1 ? \todo inspect and remove it
 		// Add user's custom types
 		if (addDependenciesInclude){
 			// first add include comment

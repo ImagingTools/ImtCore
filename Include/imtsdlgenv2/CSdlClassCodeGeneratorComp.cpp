@@ -345,7 +345,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 					}
 
 					const QString relativeIncludePath = '<' + resolvedPath + '>';
-					if (!relativeIncludePath.isEmpty() && !customIncluded.contains(relativeIncludePath)){
+					if (!resolvedPath.isEmpty() && !customIncluded.contains(relativeIncludePath)){
 						includeDirectivesList << CreateCustomDirective(relativeIncludePath);
 						customIncluded << relativeIncludePath;
 					}
