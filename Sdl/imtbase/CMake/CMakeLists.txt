@@ -30,3 +30,8 @@ ImtCoreCustomConfigureSdlCppQml(CXX
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentRevision.sdl"
 			VERSION		"1.0"
 			QML_NAME	"imtbaseDocumentRevisionSdl")
+
+ImtCoreCustomConfigureSdlCppQml(CXX
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/MimeType.sdl"
+			VERSION		"1.0"
+			QML_NAME	"imtbaseMimeTypeSdl")
