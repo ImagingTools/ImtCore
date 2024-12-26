@@ -39,6 +39,7 @@ ControlBase {
 
 	onTextChanged: {
 		if (text !== ""){
+			model.WaitName = false;
 			stopContentLoading();
 		}
 	}

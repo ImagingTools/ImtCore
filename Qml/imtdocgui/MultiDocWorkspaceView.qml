@@ -31,9 +31,12 @@ Item {
 				name = workspaceView.documentManager.defaultDocumentName;
 			}
 
-			tabView.addTab(documentData.documentId, "", documentData.viewComp, "", "", true);
-
 			let tabIndex = tabView.getIndexById(documentId);
+			if (tabIndex < 0){
+				tabView.addTab(documentData.documentId, "", documentData.viewComp, "", "", true);
+				tabIndex = tabView.tabModel.count - 1;
+			}
+
 			tabView.currentIndex = tabIndex;
 		}
 

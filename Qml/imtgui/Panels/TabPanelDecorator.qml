@@ -65,6 +65,7 @@ DecoratorBase {
 		anchors.centerIn: tabPanelDecorator;
 		height: tabPanelDecorator.height;
 		spacing: Style.size_mainMargin;
+		visible: !loading.visible;
 
 		Item {
 			id: imagetabDelegate;
