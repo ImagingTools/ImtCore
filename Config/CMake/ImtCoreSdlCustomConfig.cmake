@@ -80,6 +80,26 @@ function(ImtCoreAddSdlSearchPath ARG_SDL_PATH)
 	endif()
 endfunction()
 
+function(ImtCoreAddSchemaSearchPath ARG_SDL_PATH)
+	if (NOT GLOBAL_SDL_SCHEMA_SEARCH_PATHS)
+		set(GLOBAL_SDL_SCHEMA_SEARCH_PATHS ${ARG_SDL_PATH}
+			CACHE
+			STRING "List of directories to search for schema files, used by SDL code generator"
+			FORCE
+		)
+
+	else()
+		list(APPEND GLOBAL_SDL_SCHEMA_SEARCH_PATHS ${ARG_SDL_PATH})
+		list(REMOVE_DUPLICATES GLOBAL_SDL_SCHEMA_SEARCH_PATHS)
+		set(GLOBAL_SDL_SCHEMA_SEARCH_PATHS ${GLOBAL_SDL_SCHEMA_SEARCH_PATHS}
+			CACHE
+			STRING "List of directories to search for schema files, used by SDL code generator"
+			FORCE
+		)
+	endif()
+endfunction()
+
+
 macro (ImtCoreCustomConfigureSdlCpp)
 	set(oneValueArgs
 				SCHEMA_PATH
@@ -118,6 +138,13 @@ macro (ImtCoreCustomConfigureSdlCpp)
 		message(FATAL_ERROR "SDL PATHS is empty!!!!")
 	endif()
 
+	list(LENGTH GLOBAL_SDL_SCHEMA_SEARCH_PATHS SDL_SCHEMA_PATHS_COUNT)
+	if (SDL_SCHEMA_PATHS_COUNT GREATER 0 )
+		foreach(SDL_SEARCH_PATH ${GLOBAL_SDL_SCHEMA_SEARCH_PATHS})
+			list(APPEND CUSTOM_MODIFICATORS "-I${SDL_SEARCH_PATH}")
+		endforeach()
+	endif()
+	
 	ImtCoreGetSdlDeps(
 		INPUT
 			"${ARG_SCHEMA_PATH}"
