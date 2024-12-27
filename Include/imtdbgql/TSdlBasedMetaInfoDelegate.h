@@ -110,7 +110,7 @@ idoc::MetaInfoPtr TGmgSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::FromJson
 	if (document.isObject() && error.error == QJsonParseError::NoError){
 		QJsonObject object = document.object();
 		MetaInfoRepresentation representation;
-		if (MetaInfoRepresentation::ReadFromJsonObject(representation, object)){
+		if (representation.ReadFromJsonObject(object)){
 			idoc::MetaInfoPtr retVal(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 			if (FillMetaInfo(*retVal, representation)){
 				return retVal;
