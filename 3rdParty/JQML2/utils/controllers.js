@@ -597,11 +597,61 @@ class MouseController {
     }
 
 }
+class KeyEvent {
+    accepted = false
+    count = 0
+    isAutoRepeat = false
+    key = ''
+    modifiers = Qt.NoModifier
+    nativeScanCode = 0
+    text = ''
+
+    event = null
+
+    constructor(event){
+        this.event = event
+        this.key = this.event.code
+
+        if(this.event.code === 'ShiftLeft' || this.event.code === 'ShiftRight') {
+            this.key = Qt.Key_Shift
+        } else if(this.event.code === 'ControlLeft' || this.event.code === 'ControlRight') {
+            this.key = Qt.Key_Control
+        } else if(this.event.code === 'AltLeft' || this.event.code === 'AltRight') {
+            this.key = Qt.Key_Alt
+        } else if(this.event.code === 'NumpadEnter') {
+            this.key = Qt.Key_Enter
+        }
+
+        if(this.event.shiftKey) {
+            this.modifiers |= Qt.ShiftModifier
+        }
+        if(this.event.altKey) {
+            this.modifiers |= Qt.AltModifier
+        }
+        if(this.event.ctrlKey) {
+            this.modifiers |= Qt.ControlModifier
+        }
+    }
+
+    matches(matchKey){
+
+    }
+
+    preventDefault(){
+        this.event.preventDefault()
+    }
+
+    stopPropagation(){
+        this.event.stopPropagation()
+    }
+}
 class KeyboardController {
     shortcuts = []
 
     constructor(){
         window.onkeydown = (e)=>{
+            let event = new KeyEvent(e)
+
             let elements = mainRoot.$activeFocusedElements.slice()
             for(let el of mainRoot.$focusedElements){
                 if(elements.indexOf(el) < 0) elements.push(el)
@@ -611,23 +661,23 @@ class KeyboardController {
 
             for(let target of elements){
                 if(target){
-                    if(e.key === 'Enter' || e.key === 'Return'){
+                    if(event.key === Qt.Key_Enter){
                         if(target instanceof TextInput || target instanceof TextEdit) {
                             if(target instanceof TextInput) e.preventDefault()
-                            target.onKeyDown(e.key)
+                            target.onKeyDown(event.key)
                             return
                         }
                         
                     }
-                    if(e.key === 'Tab'){
+                    if(event.key === 'Tab'){
                         e.preventDefault()
                         if(target instanceof TextEdit) {
-                            target.onKeyDown(e.key)
+                            target.onKeyDown(event.key)
                             return
                         }
                     }
 
-                    if((target instanceof TextInput || target instanceof TextEdit) && e.ctrlKey && (e.code === 'KeyC' || e.code === 'KeyV' || e.code === 'KeyZ' || e.code === 'KeyA')) {
+                    if((target instanceof TextInput || target instanceof TextEdit) && e.ctrlKey && (e.key === Qt.Key_C || e.key === Qt.Key_V || e.key === Qt.Key_Z || e.key === Qt.Key_A)) {
                         return
                     }
                     
@@ -637,43 +687,43 @@ class KeyboardController {
                     while(parent){
                         if(parent.$properties.KeyNavigation){
                     
-                            if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
+                            if(event.key === Qt.Key_Shift || event.key === Qt.Key_Control || event.key === Qt.Key_Alt) return
     
-                            if(e.key === 'ArrowLeft') {
+                            if(event.key === Qt.Key_Left) {
                                 if(parent.KeyNavigation.left){
                                     e.preventDefault()
                                     parent.KeyNavigation.left.getProperty('focus').reset(true)
                                     return
                                 }
                             }
-                            if(e.key === 'ArrowRight') {
+                            if(event.key === Qt.Key_Right) {
                                 if(parent.KeyNavigation.right){
                                     e.preventDefault()
                                     parent.KeyNavigation.right.getProperty('focus').reset(true)
                                     return
                                 }
                             }
-                            if(e.key === 'ArrowUp') {
+                            if(event.key === Qt.Key_Up) {
                                 if(parent.KeyNavigation.up){
                                     e.preventDefault()
                                     parent.KeyNavigation.up.getProperty('focus').reset(true)
                                     return
                                 }
                             }
-                            if(e.key === 'ArrowDown') {
+                            if(event.key === Qt.Key_Down) {
                                 if(parent.KeyNavigation.down){
                                     e.preventDefault()
                                     parent.KeyNavigation.down.getProperty('focus').reset(true)
                                     return
                                 }
                             }
-                            if(e.key === 'Tab' && e.shiftKey) {
+                            if(event.key === Qt.Key_Tab && event.modifiers & Qt.ShiftModifier) {
                                 if(parent.KeyNavigation.backtab){
                                     e.preventDefault()
                                     parent.KeyNavigation.backtab.getProperty('focus').reset(true)
                                     return
                                 }
-                            } else if(e.key === 'Tab') {
+                            } else if(event.key === Qt.Key_Tab) {
                                 if(parent.KeyNavigation.tab){
                                     e.preventDefault()
                                     parent.KeyNavigation.tab.getProperty('focus').reset(true)
@@ -682,57 +732,46 @@ class KeyboardController {
                             }
                         }
 
-                        e.modifiers = Qt.NoModifier
-                        if(e.shiftKey) {
-                            e.modifiers |= Qt.ShiftModifier
-                        }
-                        if(e.altKey) {
-                            e.modifiers |= Qt.AltModifier
-                        }
-                        if(e.ctrlKey) {
-                            e.modifiers |= Qt.ControlModifier
-                        }
-
                         if(ignore.indexOf(parent) < 0 && parent.$signals['Keys.pressed']){
                             ignore.push(parent)
-                            e.accepted = false
-                            parent.$signals['Keys.pressed'](e)
-                            if(e.accepted) return
+                            event.accepted = false
+                            parent.$signals['Keys.pressed'](event)
+                            if(event.accepted) return
                         }
-                        if(e.key === 'ArrowLeft' && parent.$signals['Keys.leftPressed']){
-                            e.accepted = false
-                            parent.$signals['Keys.leftPressed'](e)
-                            if(e.accepted) return
+                        if(event.key === Qt.Key_Left && parent.$signals['Keys.leftPressed']){
+                            event.accepted = false
+                            parent.$signals['Keys.leftPressed'](event)
+                            if(event.accepted) return
                         }
-                        if(e.key === 'ArrowRight' && parent.$signals['Keys.rightPressed']){
-                            e.accepted = false
-                            parent.$signals['Keys.rightPressed'](e)
-                            if(e.accepted) return
+                        if(event.key === Qt.Key_Right && parent.$signals['Keys.rightPressed']){
+                            event.accepted = false
+                            parent.$signals['Keys.rightPressed'](event)
+                            if(event.accepted) return
                         }
-                        if(e.key === 'ArrowUp' && parent.$signals['Keys.upPressed']){
-                            e.accepted = false
-                            parent.$signals['Keys.upPressed'](e)
-                            if(e.accepted) return
+                        if(event.key === Qt.Key_Up && parent.$signals['Keys.upPressed']){
+                            event.accepted = false
+                            parent.$signals['Keys.upPressed'](event)
+                            if(event.accepted) return
                         }
-                        if(e.key === 'ArrowDown' && parent.$signals['Keys.downPressed']){
-                            e.accepted = false
-                            parent.$signals['Keys.downPressed'](e)
-                            if(e.accepted) return
+                        if(event.key === Qt.Key_Down && parent.$signals['Keys.downPressed']){
+                            event.accepted = false
+                            parent.$signals['Keys.downPressed'](event)
+                            if(event.accepted) return
                         }
-                        if(e.key === 'Return' && parent.$signals['Keys.returnPressed']){
-                            e.accepted = false
-                            parent.$signals['Keys.returnPressed'](e)
-                            if(e.accepted) return
+                        if(event.key === Qt.Key_Return && parent.$signals['Keys.returnPressed']){
+                            event.accepted = false
+                            parent.$signals['Keys.returnPressed'](event)
+                            if(event.accepted) return
                         }
-                        if(e.key === 'Enter' && parent.$signals['Keys.enterPressed']){
-                            e.accepted = false
-                            parent.$signals['Keys.enterPressed'](e)
-                            if(e.accepted) return
+                        if(event.key === Qt.Key_Enter && parent.$signals['Keys.enterPressed']){
+                            event.accepted = false
+                            parent.$signals['Keys.enterPressed'](event)
+                            if(event.accepted) return
                         }
-                        if(e.key === 'Space' && parent.$signals['Keys.spacePressed']){
-                            e.accepted = false
-                            parent.$signals['Keys.spacePressed'](e)
-                            if(e.accepted) return
+                        if(event.key === Qt.Key_Space && parent.$signals['Keys.spacePressed']){
+                            event.accepted = false
+                            parent.$signals['Keys.spacePressed'](event)
+                            if(event.accepted) return
                         }
                         parent = parent.getPropertyValue('parent')
                     }
@@ -740,14 +779,14 @@ class KeyboardController {
                 }
             }
 
-            if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
-            let key = e.key
-            if(e.key === 'ArrowLeft') key = 'Left'
-            if(e.key === 'ArrowRight') key = 'Right'
-            if(e.key === 'ArrowUp') key = 'Up'
-            if(e.key === 'ArrowDown') key = 'Down'
-            if(e.key === 'Return') key = 'Enter'
-            if(e.code === 'Space') key = 'Space'
+            if(event.key === Qt.Key_Shift || event.key === Qt.Key_Control || event.key === Qt.Key_Alt) return
+            let key = event.key
+            if(event.key === Qt.Key_Left) key = 'Left'
+            if(event.key === Qt.Key_Right) key = 'Right'
+            if(event.key === Qt.Key_Up) key = 'Up'
+            if(event.key === Qt.Key_Down) key = 'Down'
+            if(event.key === Qt.Key_Enter) key = 'Enter'
+            if(event.key === Qt.Key_Space) key = 'Space'
 
 
             let currentShortcuts = []
