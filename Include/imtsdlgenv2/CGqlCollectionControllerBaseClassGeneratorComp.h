@@ -97,6 +97,10 @@ private:
 	QString GetInputExtractionStringForTypeName(const imtsdl::CSdlRequest& sdlRequest, const QString typeName) const;
 	bool FindCallChainForField(const imtsdl::CSdlField& sdlRequest, const QString typeName, QString& callChain) const;
 
+	/// fallback for quick fix \todo do this resolving in schemaParser
+	/// \todo improve method m_sdlDocumentListCompPtr->GetDocumentTypes(), add \param localOnly
+	[[nodiscard]] bool IsExternal(const imtsdl::CSdlDocumentType& documentType) const;
+
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(imtsdl::ISdlTypeListProvider, m_sdlTypeListCompPtr);

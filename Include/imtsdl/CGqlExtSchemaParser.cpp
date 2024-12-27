@@ -72,13 +72,15 @@ bool CGqlExtSchemaParser::ProcessCollectionSchema()
 		CSdlDocumentType documentType;
 		documentType.SetName(typeName.trimmed());
 
-		for (const CSdlRequest& aDocumentType: std::as_const(m_requests)){
-			if (aDocumentType.GetName() == documentType.GetName()){
+		for (const CSdlDocumentType& iDocumentType: std::as_const(m_documentTypes)){
+			if (iDocumentType.GetName() == documentType.GetName() && iDocumentType.GetSchemaFilePath() != m_originalSchemaFile){
 				SendLogMessage(
 					istd::IInformationProvider::InformationCategory::IC_ERROR,
 					0,
-					QString("Redifinition of '%1' at %2").arg(documentType.GetName(), QString::number(m_lastReadLine)),
+					QString("Redifinition of '%1' at %2. Alreadty defined in %3")
+						.arg(documentType.GetName(), QString::number(m_lastReadLine), iDocumentType.GetSchemaFilePath()),
 					"CGqlSchemaParser");
+
 
 				return false;
 			}

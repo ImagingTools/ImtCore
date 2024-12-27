@@ -660,6 +660,7 @@ void CGqlWrapClassCodeGeneratorComp::AddRequiredIncludesToHeaderFile(QTextStream
 			FeedStream(stream, 1, false);
 		}
 
+		/// \todo add it also for GQL Base handler and GQL CollectionHandler
 		QList<imtsdl::IncludeDirective> includeDirectivesList;
 		QSet<QString> customIncluded;
 		QList<imtsdl::CSdlField> requestFields = sdlRequest.GetInputArguments();

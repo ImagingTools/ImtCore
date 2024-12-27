@@ -83,6 +83,13 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
 
 	imtsdl::SdlDocumentTypeList sdlDocumentTypeList = m_sdlDocumentListCompPtr->GetDocumentTypes();
+
+	// remove all external
+	/// \todo use GetDocumentTypes(onlyLocal) later
+	sdlDocumentTypeList.removeIf([this](const imtsdl::CSdlDocumentType& sdlDocumentType){
+		return IsExternal(sdlDocumentType);
+	});
+
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
 		if (!m_argumentParserCompPtr->IsAutoJoinEnabled()){
 			QStringList cumulatedFiles;
@@ -164,7 +171,6 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
 				if (joinProcessResult != TS_OK){
 					SendCriticalMessage(0, "Unable to join header files");
-					I_CRITICAL();
 
 					return TS_INVALID;
 				}
@@ -184,8 +190,7 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 				outputFileNameParam.SetPath(sourceFilePath);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
 				if (joinProcessResult != TS_OK){
-					SendCriticalMessage(0, "Unable to join cource  files");
-					I_CRITICAL();
+					SendCriticalMessage(0, "Unable to join source  files");
 
 					return TS_INVALID;
 				}
@@ -1430,6 +1435,19 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 
 	if (aSdlField.GetType() == typeName){
 		return true;
+	}
+
+	return false;
+}
+
+bool CGqlCollectionControllerBaseClassGeneratorComp::IsExternal(const imtsdl::CSdlDocumentType& documentType) const
+{
+	imtsdl::ISdlProcessArgumentsParser::AutoLinkLevel autoLinkLevel = m_argumentParserCompPtr->GetAutoLinkLevel();
+	if (autoLinkLevel == imtsdl::ISdlProcessArgumentsParser::ALL_ONLY_FILE){
+		QFileInfo generatorSchemaFileInfo(m_argumentParserCompPtr->GetSchemaFilePath());
+		QFileInfo currentSchemaFileInfo(documentType.GetSchemaFilePath());
+
+		return bool(generatorSchemaFileInfo != currentSchemaFileInfo);
 	}
 
 	return false;

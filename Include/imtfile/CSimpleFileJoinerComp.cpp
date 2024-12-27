@@ -136,7 +136,7 @@ int CSimpleFileJoinerComp::DoProcessing(
 		SendVerboseMessage(QString("Joining files. [%1]'%2'").arg(QString::number(fileNameIndex), currentFilePath));
 		QFile currentFile(currentFilePath);
 		if (!currentFile.open(QIODevice::ReadOnly)){
-			SendErrorMessage(0, QString("Unable to open processing file: '%1'").arg(currentFilePath));
+			SendErrorMessage(0, QString("Unable to open processing file: '%1'. Error: %2").arg(currentFilePath, currentFile.errorString()));
 
 			return TS_INVALID;
 		}

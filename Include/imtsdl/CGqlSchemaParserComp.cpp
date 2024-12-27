@@ -352,8 +352,12 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 				// look for duplicates
 				const QString sdlRequestName = sdlRequestParam->GetName();
 				for (const CSdlRequest& sdlRequest: std::as_const(m_requests)){
-					if (sdlRequest.GetName() == sdlRequestName){
-						SendErrorMessage(0, QString("Redifinition of '%1' in '%2'").arg(sdlRequestName, schemaPath));
+					if (sdlRequest.GetName() == sdlRequestName && sdlRequest != *sdlRequestParam){
+						SendErrorMessage(0, QString("Redifinition of '%1' in '%2'. Alreadty defined at %3 and %4").arg(
+												sdlRequestName,
+												schemaPath,
+												sdlRequest.GetSchemaFilePath(),
+												sdlRequestParam->GetSchemaFilePath()));
 
 						return false;
 					}
@@ -378,8 +382,12 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 				// look for duplicates
 				const QString sdlDocumentName = sdlDocumentTypeParam->GetName();
 				for (const CSdlDocumentType& sdlDocumentType: std::as_const(m_documentTypes)){
-					if (sdlDocumentType.GetName() == sdlDocumentName){
-						SendErrorMessage(0, QString("Redifinition of '%1' in '%2'").arg(sdlDocumentName, schemaPath));
+					if (sdlDocumentType.GetName() == sdlDocumentName && sdlDocumentType != *sdlDocumentTypeParam){
+						SendErrorMessage(0, QString("Redifinition of '%1' in '%2'. alreadty defined at %3 and %4").arg(
+												sdlDocumentName,
+												schemaPath,
+												sdlDocumentType.GetSchemaFilePath(),
+												sdlDocumentTypeParam->GetSchemaFilePath()));
 
 						return false;
 					}
