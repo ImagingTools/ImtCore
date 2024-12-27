@@ -62,6 +62,8 @@ Item {
 	property Component bigIndicatorComp: bigIndicatorComponent;
 	property Item bigIndicatorItem: null;
 
+	property bool hasTooltip: true;
+
 	Component.onCompleted: {
 		compl = true;
 	}
@@ -526,6 +528,7 @@ Item {
 
 					addToValue: diagram.minValue;
 					isSelected: diagram.selectedIndex == model.index;
+					hasTooltip: diagram.hasTooltip;
 
 					parentY: diagram.parentY;
 					canChangeFilling: diagram.hasBarFillingChange;
@@ -555,7 +558,7 @@ Item {
 						if(diagram.visible && diagram.hasBigIndicator){
 							if(isSelected){
 								closeTooltip();
-								let point = mapToItem(null, barChart.x - barChart.width/2, barChart.height - barChart.positiveBarHeight);
+								let point = mapToItem(null, barChart.width/2, barChart.height - barChart.positiveBarHeight);
 								if(!diagram.bigIndicatorItem){
 									ModalDialogManager.openDialog(diagram.bigIndicatorComp, {"diagramItem": diagram, "barY": point.y,"barX" : point.x , "rootItem" : barChart, "text": shownVal});
 								}
@@ -571,9 +574,9 @@ Item {
 					}
 					onBarListContentXChanged: {
 						if(diagram.visible && diagram.hasBigIndicator && isSelected && diagram.selectedIndex >= 0 && diagram.bigIndicatorItem){
-							let point = mapToItem(null, barChart.x - barChart.width/2, 0);
+							let point = mapToItem(null, barChart.width/2, 0);
 							diagram.bigIndicatorItem.barX = point.x;
-							let pointToBarList = mapToItem(barsList, barChart.x - barChart.width/2 , diagram.bigIndicatorMargin);
+							let pointToBarList = mapToItem(barsList, barChart.width/2 , diagram.bigIndicatorMargin);
 							if((pointToBarList.x - diagram.bigIndicatorItem.width/2 < 0)||
 									pointToBarList.x + diagram.bigIndicatorItem.width/2 > barsList.width){
 								diagram.bigIndicatorItem.visible = false;
@@ -586,7 +589,7 @@ Item {
 
 					onDiagramGlobalXChanged: {
 						if(diagram.visible && diagram.hasBigIndicator && isSelected && diagram.selectedIndex >= 0 && diagram.bigIndicatorItem){
-							let point = mapToItem(null, barChart.x - barChart.width/2, 0);
+							let point = mapToItem(null, barChart.width/2, 0);
 							diagram.bigIndicatorItem.barX = point.x;
 						}
 					}
