@@ -19,6 +19,7 @@ Item {
 	property int columnIndex: -1
 	property int rowIndex: rowDelegate ? rowDelegate.rowIndex : -1;
 	property bool ready: rowDelegate;
+	property bool emptyDecorCell: rowDelegate && rowDelegate.tableItem ? rowDelegate.tableItem.emptyDecorCell : true;
 
 	property string cellHeaderId;
 
@@ -39,6 +40,53 @@ Item {
 	Component.onDestruction: {
 		if (rowDelegate && rowDelegate.tableItem){
 			rowDelegate.tableItem.widthRecalc.disconnect(delegateContainer.setCellWidth)
+		}
+	}
+
+	onEmptyDecorCellChanged: {
+		if (!delegateContainer.emptyDecorCell){
+			if (delegateContainer.rowDelegate.cellColor !== "transparent"){
+				if(!delegateContainer.backgroundItem){
+					delegateContainer.backgroundItem = cellBackground.createObject(delegateContainer)
+				}
+			}
+
+			if (delegateContainer.rowDelegate.verticalBorderSize){
+				if(!delegateContainer.leftBorderItem){
+					if(delegateContainer.columnIndex > 0){
+						delegateContainer.leftBorderItem = leftBorder.createObject(delegateContainer)
+					}
+					else if(columnIndex == 0 && delegateContainer.rowDelegate.visibleLeftBorderFirst){
+						delegateContainer.leftBorderItem = leftBorder.createObject(delegateContainer)
+					}
+				}
+			}
+			if (delegateContainer.rowDelegate.verticalBorderSize){
+				if((delegateContainer.columnIndex == delegateContainer.columnCount -1) && delegateContainer.rowDelegate.visibleRightBorderLast){
+					if(!delegateContainer.rightBorderItem){
+						delegateContainer.rightBorderItem = rightBorder.createObject(delegateContainer)
+					}
+				}
+			}
+
+			if (delegateContainer.rowDelegate.horizontalBorderSize){
+				if(!delegateContainer.topBorderItem){
+					if(delegateContainer.rowCount && delegateContainer.rowIndex > 0 && delegateContainer.rowIndex < delegateContainer.rowCount){
+						delegateContainer.topBorderItem = topBorder.createObject(delegateContainer)
+					}
+					else if(delegateContainer.rowDelegate.visibleTopBorderFirst && delegateContainer.rowIndex == 0 && delegateContainer.rowCount){
+						delegateContainer.topBorderItem = topBorder.createObject(delegateContainer)
+					}
+				}
+			}
+
+			if (delegateContainer.rowDelegate.horizontalBorderSize){
+				if(delegateContainer.rowDelegate.visibleBottomBorderLast && delegateContainer.rowIndex == delegateContainer.rowCount -1){
+					if(!delegateContainer.bottomBorderItem){
+						delegateContainer.bottomBorderItem = bottomBorder.createObject(delegateContainer)
+					}
+				}
+			}
 		}
 	}
 
