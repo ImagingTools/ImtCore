@@ -5,7 +5,6 @@ import Acf 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
 import imtdocgui 1.0
-import imtbaseImtCollectionSdl 1.0
 
 DocumentDataController {
 	id: container;
@@ -23,6 +22,9 @@ DocumentDataController {
 	property var getRequestInputParam: Gql.GqlObject("input");
 	property var addRequestInputParam: Gql.GqlObject("input");
 	property var updateRequestInputParam: Gql.GqlObject("input");
+
+	signal beforeSaveModel();
+	signal beforeInsertModel();
 
 	Component.onCompleted: {
 		let additionInputParams = container.getHeaders();
@@ -67,6 +69,8 @@ DocumentDataController {
 	}
 
 	function insertDocument(){
+		beforeInsertModel();
+
 		if (documentModel && documentModel.m_id !== undefined && documentModel.m_id !== null){
 			documentModel.m_id = documentId;
 		}
@@ -75,6 +79,8 @@ DocumentDataController {
 	}
 
 	function saveDocument(){
+		beforeSaveModel();
+
 		if (documentModel && documentModel.m_id !== undefined && documentModel.m_id !== null){
 			documentModel.m_id = documentId;
 		}
