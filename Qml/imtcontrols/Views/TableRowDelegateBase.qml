@@ -328,7 +328,6 @@ Rectangle {
 		hoverEnabled: true;
 
 		acceptedButtons: Qt.AllButtons;
-		// acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
 		Timer{
 			id:timer
@@ -366,6 +365,7 @@ Rectangle {
 				selectionManager.onMouseEvent(mouse, tableDelegateContainer.rowIndex);
 			}
 
+			tableDelegateContainer.forceActiveFocus();
 			mouse.accepted = false;
 		}
 	}

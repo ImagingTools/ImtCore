@@ -102,7 +102,7 @@ Rectangle {
 	property string currentSortOrder: "ASC";
 	property var nonSortableColumns: [];
 
-	property bool isMultiSelect: false;
+	property bool isMultiSelect: true;
 
 	property TableSelection tableSelection: TableSelection {
 		onSelectionChanged: {

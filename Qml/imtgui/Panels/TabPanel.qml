@@ -14,7 +14,7 @@ Rectangle {
     property int selectedIndex: 0;
     property int count: 0;
     property alias spacing: list.spacing;
-    property bool isCloseEnable: true;
+	property bool isCloseEnable: false;
 
     property alias model: list.model;
     property Component tabDelegateDecorator: Style.tabPanelDecorator;

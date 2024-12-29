@@ -15,10 +15,10 @@ QtObject {
 
 		let tableSelection = table.tableSelection;
 
-		if (mouse.modifiers & Qt.ControlModifier){
+		if (mouse.modifiers & Qt.ControlModifier && table.isMultiSelect){
 			tableSelection.toggleSelect(index);
 		}
-		else if (mouse.modifiers & Qt.ShiftModifier){
+		else if (mouse.modifiers & Qt.ShiftModifier && table.isMultiSelect){
 			tableSelection.rangeSelect(tableSelection.firstSelectedIndex, index);
 		}
 		else{
@@ -37,7 +37,7 @@ QtObject {
 		if (event.key === Qt.Key_Up){
 			if (tableSelection.focusedIndex > 0){
 				tableSelection.focusedIndex--;
-				if (event.modifiers & Qt.ShiftModifier){
+				if (event.modifiers & Qt.ShiftModifier && table.isMultiSelect){
 					tableSelection.rangeSelect(tableSelection.firstSelectedIndex, tableSelection.focusedIndex);
 				}
 				else{
@@ -49,7 +49,7 @@ QtObject {
 		else if (event.key === Qt.Key_Down){
 			if (tableSelection.focusedIndex < table.elementsCount - 1){
 				tableSelection.focusedIndex++;
-				if (event.modifiers & Qt.ShiftModifier){
+				if (event.modifiers & Qt.ShiftModifier && table.isMultiSelect){
 					tableSelection.rangeSelect(tableSelection.firstSelectedIndex, tableSelection.focusedIndex);
 				}
 				else{
@@ -59,7 +59,7 @@ QtObject {
 			event.accepted = true;
 		}
 		else if (event.key === Qt.Key_Space){
-			if (event.modifiers & Qt.ControlModifier){
+			if (event.modifiers & Qt.ControlModifier && table.isMultiSelect){
 				tableSelection.toggleSelect(tableSelection.focusedIndex);
 			}
 			else{
@@ -67,10 +67,12 @@ QtObject {
 			}
 			event.accepted = true;
 		}
-		else if (event.key === Qt.Key_A && event.modifiers & Qt.ControlModifier){
-			tableSelection.rangeSelect(0, table.elementsCount - 1);
+		else if (event.key === Qt.Key_A){
+			if (event.modifiers & Qt.ControlModifier && table.isMultiSelect){
+				tableSelection.rangeSelect(0, table.elementsCount - 1);
 
-			event.accepted = true;
+				event.accepted = true;
+			}
 		}
 	}
 }

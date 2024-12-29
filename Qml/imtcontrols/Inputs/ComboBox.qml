@@ -53,7 +53,7 @@ ControlBase {
 		contentLeftMargin: comboBoxContainer.contentLeftMargin;
 
         highlighted: comboBoxContainer.currentIndex == model.index
-        text: model[comboBoxContainer.nameId];
+		text: "item" in model ? model.item[comboBoxContainer.nameId] : model[comboBoxContainer.nameId];
 
         selected: comboBoxContainer.popup ? comboBoxContainer.popup.selectedIndex == model.index : false;
 
@@ -117,6 +117,10 @@ ControlBase {
         }
 
         if (comboBoxContainer.currentIndex > -1){
+			if (comboBoxContainer.model){
+
+			}
+
             if (comboBoxContainer.model.containsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
                 let name = comboBoxContainer.model.getData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
                 comboBoxContainer.currentText = name;

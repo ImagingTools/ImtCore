@@ -233,6 +233,7 @@ ViewCommandsDelegateBase {
 		id: extensionsPopupMenuDialog;
 
 		PopupMenuDialog {
+			itemWidth: 350;
 			onFinished: {
 				if (index >= 0){
 					fileDialogSave.fileExt = collectionViewCommandsDelegate.getExtensionFromNameFilter(fileDialogSave.nameFilters, index);

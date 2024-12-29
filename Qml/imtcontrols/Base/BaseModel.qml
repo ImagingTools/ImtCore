@@ -195,6 +195,18 @@ ListModel {
             owner.modelChanged([])
         }
     }
+
+	function getItemsCount(){
+		return this.count;
+	}
+
+	function containsKey(key, index){
+		return this.get(index).item[key] != undefined;
+	}
+
+	function getData(key, index){
+		return this.get(index).item[key];
+	}
 }
 
 
