@@ -1,5 +1,5 @@
 function(imt_core_get_root_dir identifier_to_use)
-    set(${identifier_to_use} "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../.." PARENT_SCOPE)
+    set(${identifier_to_use} "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.." PARENT_SCOPE)
 endfunction()
 
 function(GenerateDesignTokenWeb DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR DESIGN_TOKEN_ADDITIONAL_DEPS)
