@@ -785,7 +785,7 @@ var Qt = {
         } catch (error) {
             let name = path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '').split('_').pop()
             for(let key in classList){
-                if(key.indexOf(name) >= 0){
+                if(key.split('_').pop() === name){
                     cls = classList[key]
                     break
                 }
