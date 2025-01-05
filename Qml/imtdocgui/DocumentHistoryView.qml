@@ -26,6 +26,20 @@ Rectangle {
 		}
 	}
 
+	onCollectionIdChanged: {
+		if (collectionId !== ""){
+			subscriptionClient.registerSubscription();
+		}
+	}
+
+	SubscriptionClient {
+		id: subscriptionClient;
+		gqlCommandId: "On" + container.collectionId + "CollectionChanged";
+		onMessageReceived: {
+			request.send();
+		}
+	}
+
 	GqlSdlRequestSender {
 		id: request;
 		gqlCommandId: ImtbaseDocumentRevisionSdlCommandIds.s_getRevisionInfoList;
