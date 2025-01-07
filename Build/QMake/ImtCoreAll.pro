@@ -77,8 +77,8 @@ imtauthsdl.file = ../../Sdl/imtauth/QMake/imtauthsdl.pro
 imtauthsdl.depends = imtbasesdl
 
 SUBDIRS += imtcolorsdl
-imtauthsdl.file = ../../Sdl/imtauth/QMake/imtcolorsdl.pro
-imtauthsdl.depends = imtbasesdl
+imtcolorsdl.file = ../../Sdl/imtcolor/QMake/imtcolorsdl.pro
+imtcolorsdl.depends = imtbasesdl
 
 SUBDIRS += imtlicsdl
 imtlicsdl.file = ../../Sdl/imtlic/QMake/imtlicsdl.pro
