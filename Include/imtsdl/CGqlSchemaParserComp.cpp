@@ -128,6 +128,8 @@ int CGqlSchemaParserComp::DoProcessing(
 	QTextStream inputStream(&inputFile);
 	QString content = inputStream.readAll();
 
+	/// \todo fix it!
+	/// \example #[[sdfjkldsfjkldsjsadfjklsdafkjl]] aaa #[[sdfjkldsfjkldsjsadfjklsdafkjl]] 'aaa' nust be preserved!!!!!!
 	static QRegularExpression multiLineCommentRegex("#\\[\\[.*\\]\\]", QRegularExpression::MultilineOption | QRegularExpression::DotMatchesEverythingOption);
 	content.replace(multiLineCommentRegex, "");
 
@@ -291,6 +293,14 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 		schemaFilePathParam.SetPath(schemaPath);
 		iprm::CParamsSet outputParams;
 		outputParams.SetEditableParameter(s_processedFilesParamId, m_processedFilesPtr);
+
+		// Add types to the slave parser in order to prevent incorrect parsing if a schema with a 'known' type has already been processed.
+		if (!m_sdlTypes.isEmpty()){
+			CGqlSchemaParserComp* castedParserPtr = newSchemaProcessor.Cast<CGqlSchemaParserComp*>();
+			if (castedParserPtr != nullptr){
+				castedParserPtr->m_sdlTypes = m_sdlTypes;
+			}
+		}
 
 		int processingResult = newSchemaProcessor->DoProcessing(nullptr, &schemaFilePathParam, &outputParams);
 		if (processingResult != TS_OK){
@@ -469,6 +479,7 @@ bool CGqlSchemaParserComp::ProcessFilesImports()
 		{
 			const QString importFileName = importsIterator.next();
 			const QString absolutePath = includeDirectory.absoluteFilePath(importFileName);
+
 			if (QFile::exists(absolutePath)){
 				foundSchemaFiles << QFileInfo(absolutePath).canonicalFilePath();
 				importsIterator.remove();

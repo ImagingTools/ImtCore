@@ -78,7 +78,8 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 	}
 
 	// parse schema
-	int parsingResult = m_sdlParserCompPtr->DoProcessing(nullptr, nullptr, nullptr);
+	iprm::CParamsSet outputParamsSet;
+	int parsingResult = m_sdlParserCompPtr->DoProcessing(nullptr, nullptr, &outputParamsSet);
 	if (parsingResult != iproc::IProcessor::TS_OK){
 		SendErrorMessage(0, "Unable to parse schema");
 
