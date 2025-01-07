@@ -26,9 +26,9 @@ RemoteCollectionView {
 
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
             collectionView: userCollectionViewContainer;
-
-            documentTypeId: "User";
-            viewTypeId: "UserEditor";
+			documentManager: userCollectionViewContainer.documentManager;
+			documentTypeId: "User";
+			viewTypeId: "UserEditor";
 
 			function updateStateBaseCommands(selection, commandsController, elementsModel){
 				let isEnabled = selection.length > 0;
@@ -134,8 +134,6 @@ RemoteCollectionView {
         collectionFilter.setSortingInfoId("Name");
 
         if (documentManager){
-            userCollectionViewContainer.commandsDelegate.documentManager = documentManager;
-
             documentManager.registerDocumentView("User", "UserEditor", userDocumentComp);
             documentManager.registerDocumentDataController("User", documentDataControllerComp);
         }

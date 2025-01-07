@@ -18,6 +18,7 @@ RemoteCollectionView {
 
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
         collectionView: userGroupCollectionViewContainer;
+		documentManager: userGroupCollectionViewContainer.documentManager;
 
         documentTypeId: "Group";
         viewTypeId: "GroupEditor";
@@ -39,8 +40,6 @@ RemoteCollectionView {
         collectionFilter.setSortingInfoId("Name");
 
         if (documentManager){
-            userGroupCollectionViewContainer.commandsDelegate.documentManager = documentManager;
-
             documentManager.registerDocumentView("Group", "GroupEditor", userGroupDocumentComp);
             documentManager.registerDocumentDataController("Group", documentDataControllerComp);
         }

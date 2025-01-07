@@ -14,9 +14,63 @@ CollectionViewCommandsDelegateBase {
 	property string documentTypeId; // default document type-ID
 	property string viewTypeId; // default document view type-ID
 
+	property string documentManagerId: collectionId;
+
+	property var documentTypeIds: [];
+	property var documentViewTypeIds: [];
+	property var documentViewsComp: [];
+	property var documentDataControllersComp: [];
+	property var documentValidatorsComp: [];
+
 	onCollectionViewChanged: {
 		if (collectionView && collectionView.dataController){
 			collectionView.dataController.removed.connect(internal.onRemoved);
+		}
+	}
+
+	onDocumentManagerChanged: {
+		console.log("onDocumentManagerChanged", documentManager);
+		for (let i = 0; i < documentTypeIds.length; i++){
+			let documentTypeId = documentTypeIds[i];
+			console.log("documentTypeId", documentTypeId);
+
+
+			if (documentViewsComp.length > i && documentViewTypeIds.length > i){
+				let viewTypeId = documentViewTypeIds[i];
+				let documentViewComp = documentViewsComp[i];
+				console.log("viewTypeId", viewTypeId, documentViewComp);
+
+				if (!documentManager.registerDocumentView(documentTypeId, viewTypeId, documentViewComp)){
+					console.error("Unable to register view for document type ID: ", documentTypeId)
+				}
+			}
+
+			if (documentDataControllersComp.length > i){
+				let documentDataControllerComp = documentDataControllersComp[i];
+				documentManager.registerDocumentDataController(documentTypeId, documentDataControllerComp);
+			}
+
+			if (documentValidatorsComp.length > i){
+				let documentValidatorComp = documentValidatorsComp[i];
+				documentManager.registerDocumentValidator(documentTypeId, documentValidatorComp);
+			}
+		}
+	}
+
+	function getDocumentTypeIdIndex(typeId){
+		for (let i = 0; i < documentTypeIds.length; i++){
+			if (typeId === documentTypeIds[i]){
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	onCollectionIdChanged: {
+		let documentManager = MainDocumentManager.getDocumentManager(collectionViewCommandsDelegateBase.collectionId);
+		if (documentManager){
+			collectionViewCommandsDelegateBase.documentManager = documentManager;
 		}
 	}
 
@@ -63,8 +117,20 @@ CollectionViewCommandsDelegateBase {
 			let index = indexes[i];
 			if (elementsModel.containsKey("Id", index)){
 				let itemId = elementsModel.getData("Id", index);
+				let typeId = elementsModel.getData("TypeId", index);
 
-				collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeId, viewTypeId);
+				if (documentTypeIds.length === 0){
+					collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeId, viewTypeId);
+					return;
+				}
+
+				let typeIdindex = getDocumentTypeIdIndex(typeId);
+				if (index < 0){
+					console.error('Document with type-ID: "', typeId ,'" unsupported');
+				}
+				else{
+					collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeIds[typeIdindex], documentViewTypeIds[typeIdindex]);
+				}
 			}
 		}
 	}
@@ -87,7 +153,18 @@ CollectionViewCommandsDelegateBase {
 	}
 
 	function onNew(){
-		collectionViewCommandsDelegateBase.createNewObject(documentTypeId, viewTypeId);
+		if (documentTypeIds.length > 1){
+			// dialog
+			// collectionViewCommandsDelegateBase.createNewObject(documentTypeIds, viewTypeId);
+		}
+		else{
+			if (documentTypeIds.length > 0){
+				collectionViewCommandsDelegateBase.createNewObject(documentTypeIds[0], documentViewTypeIds[0]);
+			}
+			else{
+				collectionViewCommandsDelegateBase.createNewObject(documentTypeId, viewTypeId);
+			}
+		}
 	}
 
 	Component {

@@ -18,9 +18,7 @@ RemoteCollectionView {
 
     commandsDelegateComp: Component {RoleCollectionViewCommandsDelegate {
             collectionView: roleCollectionViewContainer;
-
-            documentTypeId: "Role";
-            viewTypeId: "RoleEditor";
+			documentManager: roleCollectionViewContainer.documentManager;
         }
     }
 
@@ -43,8 +41,6 @@ RemoteCollectionView {
         Events.subscribeEvent("OnLocalizationChanged", roleCollectionViewContainer.onLocalizationChanged);
 
         if (roleCollectionViewContainer.documentManager){
-            roleCollectionViewContainer.commandsDelegate.documentManager = documentManager;
-
             documentManager.registerDocumentView("Role", "RoleEditor", roleDocumentComp);
             documentManager.registerDocumentDataController("Role", dataControllerComp);
         }

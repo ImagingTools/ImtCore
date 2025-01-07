@@ -82,17 +82,17 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isParentLicensesRequested){
+		representationObject.ParentLicenses = QByteArray(licenseInfoPtr->GetDependencies().join(';'));
+	}
+
+	if (requestInfo.items.isFeaturesRequested){
 		QByteArrayList featureIds;
 
 		for (const imtlic::ILicenseDefinition::FeatureInfo& featureInfo : licenseInfoPtr->GetFeatureInfos()){
 			featureIds << featureInfo.id;
 		}
 
-		representationObject.ParentLicenses = QByteArray(featureIds.join(';'));
-	}
-
-	if (requestInfo.items.isFeaturesRequested){
-		representationObject.Features = QByteArray(licenseInfoPtr->GetDependencies().join(';'));
+		representationObject.Features = QByteArray(featureIds.join(';'));
 	}
 
 	if (requestInfo.items.isAddedRequested){

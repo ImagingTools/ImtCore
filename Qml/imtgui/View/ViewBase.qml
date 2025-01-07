@@ -105,6 +105,14 @@ Item {
                 i--;
             }
         }
+
+		if (commandsControllerComp){
+			commandsController = commandsControllerComp.createObject(viewBase);
+		}
+
+		if (commandsDelegateComp){
+			commandsDelegate = commandsDelegateComp.createObject(viewBase);
+		}
     }
 
     Component.onDestruction: {
@@ -117,33 +125,10 @@ Item {
         internal.isDestroyed = true;
     }
 
-    onCommandsControllerCompChanged: {
-        if (commandsController){
-            commandsController.destroy();
-            commandsController = null;
-        }
-
-        if (commandsControllerComp){
-            commandsController = commandsControllerComp.createObject(viewBase);
-        }
-    }
-
     onCommandsControllerChanged: {
         if (commandsController){
             commandsController.commandsView = viewBase.commandsView;
             commandsConnections.target = commandsController;
-        }
-    }
-
-    onCommandsDelegateCompChanged: {
-        if (commandsDelegate){
-            commandsDelegate.destroy();
-
-            commandsDelegate = null;
-        }
-
-        if (commandsDelegateComp){
-            commandsDelegate = commandsDelegateComp.createObject(viewBase);
         }
     }
 
