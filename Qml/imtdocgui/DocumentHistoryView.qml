@@ -3,6 +3,7 @@ import Acf 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 import imtbaseDocumentRevisionSdl 1.0
 
 Rectangle {
@@ -22,7 +23,7 @@ Rectangle {
 
 	onDocumentIdChanged: {
 		if (documentId !== ""){
-			request.send();
+			sendRequest();
 		}
 	}
 
@@ -36,6 +37,12 @@ Rectangle {
 		id: subscriptionClient;
 		gqlCommandId: "On" + container.collectionId + "CollectionChanged";
 		onMessageReceived: {
+			container.sendRequest();
+		}
+	}
+
+	function sendRequest(){
+		if (PermissionsController.checkPermission("ViewRevisions")){
 			request.send();
 		}
 	}

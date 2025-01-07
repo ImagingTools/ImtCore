@@ -220,7 +220,7 @@ Rectangle {
 	}
 
 	onElementsChanged: {
-		//        uncheckAll();
+		uncheckAll();
 		tableContainer.setWidth();
 	}
 

@@ -17,23 +17,16 @@ RemoteCollectionView {
 
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
             collectionView: root;
-
-            documentTypeId: "License";
-            viewTypeId: "LicenseEditor";
+			documentTypeIds: ["License"]
+			documentViewTypeIds: ["LicenseEditor"]
+			documentViewsComp: [featureDocumentComp]
+			documentDataControllersComp: [dataControllerComp]
         }
     }
 
     Component.onCompleted: {
         collectionFilter.setSortingOrder("DESC");
         collectionFilter.setSortingInfoId(LicenseItemTypeMetaInfo.s_lastModified);
-
-        let documentManager = MainDocumentManager.getDocumentManager(root.collectionId);
-        if (documentManager){
-            root.commandsDelegate.documentManager = documentManager;
-
-            documentManager.registerDocumentView("License", "LicenseEditor", featureDocumentComp);
-            documentManager.registerDocumentDataController("License", dataControllerComp);
-        }
     }
 
     Component {

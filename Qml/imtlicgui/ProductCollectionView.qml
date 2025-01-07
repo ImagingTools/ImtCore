@@ -20,19 +20,14 @@ RemoteCollectionView {
     commandsDelegateComp: Component {ProductCollectionViewCommandsDelegate {
         collectionView: productCollectionViewContainer;
 
-        documentTypeId: "Product";
-        viewTypeId: "ProductEditor";
+		documentTypeIds: ["Product"]
+		documentViewTypeIds: ["ProductEditor"]
+		documentViewsComp: [productDocumentComp]
+		documentDataControllersComp: [dataControllerComp]
     }
     }
 
     Component.onCompleted: {
-        let documentManager = MainDocumentManager.getDocumentManager(productCollectionViewContainer.collectionId);
-        if (documentManager){
-            productCollectionViewContainer.commandsDelegate.documentManager = documentManager;
-
-            documentManager.registerDocumentView("Product", "ProductEditor", productDocumentComp);
-            documentManager.registerDocumentDataController("Product", dataControllerComp);
-        }
     }
 
     Component {

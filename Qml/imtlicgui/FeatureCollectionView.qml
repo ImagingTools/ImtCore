@@ -18,9 +18,10 @@ RemoteCollectionView {
 
     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
             collectionView: featureCollectionViewContainer;
-
-            documentTypeId: "Feature";
-            viewTypeId: "FeatureEditor";
+			documentTypeIds: ["Feature"]
+			documentViewTypeIds: ["FeatureEditor"]
+			documentViewsComp: [featureDocumentComp]
+			documentDataControllersComp: [dataControllerComp]
         }
     }
 
@@ -33,14 +34,6 @@ RemoteCollectionView {
     Component.onCompleted: {
         collectionFilter.setSortingOrder("DESC");
         collectionFilter.setSortingInfoId(FeatureItemTypeMetaInfo.s_lastModified);
-
-        let documentManager = MainDocumentManager.getDocumentManager(featureCollectionViewContainer.collectionId);
-        if (documentManager){
-            featureCollectionViewContainer.commandsDelegate.documentManager = documentManager;
-
-            documentManager.registerDocumentView("Feature", "FeatureEditor", featureDocumentComp);
-            documentManager.registerDocumentDataController("Feature", dataControllerComp);
-        }
     }
 
     Component {
