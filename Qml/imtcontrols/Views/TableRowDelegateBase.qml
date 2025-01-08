@@ -310,8 +310,6 @@ Rectangle {
 		z: 10;
 	}
 
-	focus: true;
-
 	TableSelectionManager {
 		id: selectionManager;
 		table: tableDelegateContainer.tableItem;
