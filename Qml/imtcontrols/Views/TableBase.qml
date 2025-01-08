@@ -220,7 +220,8 @@ Rectangle {
 	}
 
 	onElementsChanged: {
-		uncheckAll();
+		properties._checkedItems = []
+
 		tableContainer.setWidth();
 	}
 
