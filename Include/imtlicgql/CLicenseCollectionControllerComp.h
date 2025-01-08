@@ -41,6 +41,12 @@ protected:
 				const sdl::imtlic::Licenses::V1_0::CLicenseUpdateGqlRequest& licenseUpdateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
+private:
+	bool FillObjectFromRepresentation(
+				const sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0& representation,
+				istd::IChangeable& object,
+				QByteArray& objectId,
+				QString& errorMessage) const;
 
 protected:
 	I_FACT(imtlic::ILicenseDefinition, m_licenseInfoFactCompPtr);

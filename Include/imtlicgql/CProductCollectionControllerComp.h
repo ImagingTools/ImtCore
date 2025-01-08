@@ -53,6 +53,12 @@ protected:
 	virtual QString GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const override;
 	virtual QString GetExportFileName(const QByteArray& objectId) const override;
 
+private:
+	bool FillObjectFromRepresentation(
+				const sdl::imtlic::Products::CProductData::V1_0& representation,
+				istd::IChangeable& object,
+				QByteArray& objectId,
+				QString& errorMessage) const;
 protected:
 	I_REF(imtbase::IObjectCollection, m_licenseCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_featureCollectionCompPtr);

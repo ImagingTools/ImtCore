@@ -135,94 +135,12 @@ istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentat
 		return nullptr;
 	}
 
-	imtlic::CIdentifiableLicenseDefinition* licenseInfoPtr = dynamic_cast<imtlic::CIdentifiableLicenseDefinition*>(licenseInstancePtr.GetPtr());
-	if (licenseInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast license instance to identifable object. Error: Invalid object");
+	if (!FillObjectFromRepresentation(licenseDataRepresentation, *licenseInstancePtr, newObjectId, errorMessage)){
+		errorMessage = QString("Unable to create object from representation. Error: '%1'").arg(errorMessage);
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return nullptr;
 	}
-
-	if (licenseDataRepresentation.Id){
-		newObjectId = *licenseDataRepresentation.Id;
-	}
-
-	if (newObjectId.isEmpty()){
-		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
-	}
-	licenseInfoPtr->SetObjectUuid(newObjectId);
-
-	QByteArray licenseId;
-	if (licenseDataRepresentation.LicenseId){
-		licenseId = *licenseDataRepresentation.LicenseId;
-	}
-
-	if (licenseId.isEmpty()){
-		errorMessage = QString("Unable to create license with an empty License-ID");
-		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
-
-		return nullptr;
-	}
-
-	iprm::CIdParam idParam;
-	idParam.SetId(licenseId);
-
-	iprm::CParamsSet paramsSet1;
-	paramsSet1.SetEditableParameter("LicenseId", &idParam);
-
-	iprm::CParamsSet filterParam;
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
-
-	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (!collectionIds.isEmpty()){
-		QByteArray id = collectionIds[0];
-		if (newObjectId != id){
-			errorMessage = QT_TR_NOOP(QString("License-ID: '%1' already exists.")).arg(qPrintable(licenseId));
-
-			return nullptr;
-		}
-	}
-
-	licenseInfoPtr->SetLicenseId(licenseId);
-
-	QString name;
-	QString description;
-
-	if (licenseDataRepresentation.Name){
-		name = *licenseDataRepresentation.Name;
-	}
-	licenseInfoPtr->SetLicenseName(name);
-
-	if (licenseDataRepresentation.Description){
-		description = *licenseDataRepresentation.Description;
-	}
-	licenseInfoPtr->SetLicenseDescription(description);
-
-	QByteArray productId;
-	if (licenseDataRepresentation.ProductId){
-		productId = *licenseDataRepresentation.ProductId;
-	}
-	licenseInfoPtr->SetProductId(productId);
-
-	QByteArrayList dependencyIds;
-	if (licenseDataRepresentation.ParentLicenses){
-		dependencyIds = licenseDataRepresentation.ParentLicenses->split(';');
-	}
-	dependencyIds.removeAll("");
-	licenseInfoPtr->SetDependencies(dependencyIds);
-
-	QByteArrayList featureIds;
-	if (licenseDataRepresentation.Features){
-		featureIds = licenseDataRepresentation.Features->split(';');
-	}
-
-	imtlic::ILicenseDefinition::FeatureInfos featureInfos;
-	for (const QByteArray& featureUuid : featureIds){
-		imtlic::ILicenseDefinition::FeatureInfo featureInfo;
-		featureInfo.id = featureUuid;
-		featureInfos << featureInfo;
-	}
-	licenseInfoPtr->SetFeatureInfos(featureInfos);
 
 	return licenseInstancePtr.PopPtr();
 }
@@ -278,11 +196,132 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 
 bool CLicenseCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			const imtgql::CGqlRequest& /*rawGqlRequest*/,
-			const sdl::imtlic::Licenses::V1_0::CLicenseUpdateGqlRequest& /*licenseUpdateRequest*/,
-			istd::IChangeable& /*object*/,
-			QString& /*errorMessage*/) const
+			const sdl::imtlic::Licenses::V1_0::CLicenseUpdateGqlRequest& licenseUpdateRequest,
+			istd::IChangeable& object,
+			QString& errorMessage) const
 {
-	return false;
+	imtlic::CIdentifiableLicenseDefinition* licenseInfoPtr = dynamic_cast<imtlic::CIdentifiableLicenseDefinition*>(&object);
+	if (licenseInfoPtr == nullptr){
+		errorMessage = QString("Unable to update representation from object. Error: Object is invalid");
+		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
+
+		return false;
+	}
+
+	licenseInfoPtr->ResetData();
+
+	QByteArray objectId = *licenseUpdateRequest.GetRequestedArguments().input.Id;
+	sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0 licenseData = *licenseUpdateRequest.GetRequestedArguments().input.Item;
+
+	if (!FillObjectFromRepresentation(licenseData, *licenseInfoPtr, objectId, errorMessage)){
+		errorMessage = QString("Unable to update object from representation. Error: '%1'").arg(errorMessage);
+		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
+
+		return false;
+	}
+
+	return true;
+}
+
+
+// private methods
+
+bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
+			const sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0& licenseDataRepresentation,
+			istd::IChangeable& object,
+			QByteArray& newObjectId,
+			QString& errorMessage) const
+{
+	imtlic::CIdentifiableLicenseDefinition* licenseInfoPtr = dynamic_cast<imtlic::CIdentifiableLicenseDefinition*>(&object);
+	if (licenseInfoPtr == nullptr){
+		errorMessage = QString("Unable to update representation from object. Error: Object is invalid");
+		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
+
+		return false;
+	}
+
+	if (licenseDataRepresentation.Id){
+		newObjectId = *licenseDataRepresentation.Id;
+	}
+
+	if (newObjectId.isEmpty()){
+		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
+	licenseInfoPtr->SetObjectUuid(newObjectId);
+
+	QByteArray licenseId;
+	if (licenseDataRepresentation.LicenseId){
+		licenseId = *licenseDataRepresentation.LicenseId;
+	}
+
+	if (licenseId.isEmpty()){
+		errorMessage = QString("Unable to create license with an empty License-ID");
+		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
+
+		return false;
+	}
+
+	iprm::CIdParam idParam;
+	idParam.SetId(licenseId);
+
+	iprm::CParamsSet paramsSet1;
+	paramsSet1.SetEditableParameter("LicenseId", &idParam);
+
+	iprm::CParamsSet filterParam;
+	filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
+
+	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+	if (!collectionIds.isEmpty()){
+		QByteArray id = collectionIds[0];
+		if (newObjectId != id){
+			errorMessage = QT_TR_NOOP(QString("License-ID: '%1' already exists.")).arg(qPrintable(licenseId));
+
+			return false;
+		}
+	}
+
+	licenseInfoPtr->SetLicenseId(licenseId);
+
+	QString name;
+	QString description;
+
+	if (licenseDataRepresentation.Name){
+		name = *licenseDataRepresentation.Name;
+	}
+	licenseInfoPtr->SetLicenseName(name);
+
+	if (licenseDataRepresentation.Description){
+		description = *licenseDataRepresentation.Description;
+	}
+	licenseInfoPtr->SetLicenseDescription(description);
+
+	QByteArray productId;
+	if (licenseDataRepresentation.ProductId){
+		productId = *licenseDataRepresentation.ProductId;
+	}
+	licenseInfoPtr->SetProductId(productId);
+
+	QByteArrayList dependencyIds;
+	if (licenseDataRepresentation.ParentLicenses){
+		dependencyIds = licenseDataRepresentation.ParentLicenses->split(';');
+	}
+	dependencyIds.removeAll("");
+	licenseInfoPtr->SetDependencies(dependencyIds);
+
+	QByteArrayList featureIds;
+	if (licenseDataRepresentation.Features){
+		featureIds = licenseDataRepresentation.Features->split(';');
+	}
+
+	imtlic::ILicenseDefinition::FeatureInfos featureInfos;
+	for (const QByteArray& featureUuid : featureIds){
+		imtlic::ILicenseDefinition::FeatureInfo featureInfo;
+		featureInfo.id = featureUuid;
+		featureInfos << featureInfo;
+	}
+	licenseInfoPtr->SetFeatureInfos(featureInfos);
+
+	return true;
 }
 
 
