@@ -33,6 +33,7 @@ ControlBase {
     property var contentY: decorator_ ? decorator_.contentY : null;
 
     property bool forceFocus: false;
+	property bool centered: false;
 
     // The current index of the delegate that the focus is on
     property int selectedIndex: -1;

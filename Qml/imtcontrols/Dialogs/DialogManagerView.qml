@@ -33,6 +33,7 @@ Item {
 
                 color: "gray";
                 visible: modalDialogs.visible;
+				opacity: 0.4;
 
                 property alias backgroundAreaItem: backgroundArea;
                 MouseArea {
