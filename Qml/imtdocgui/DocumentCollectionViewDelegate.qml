@@ -68,7 +68,7 @@ CollectionViewCommandsDelegateBase {
 	}
 
 	onCollectionIdChanged: {
-		let documentManager = MainDocumentManager.getDocumentManager(collectionViewCommandsDelegateBase.collectionId);
+		let documentManager = MainDocumentManager.getDocumentManager(collectionViewCommandsDelegateBase.documentManagerId);
 		if (documentManager){
 			collectionViewCommandsDelegateBase.documentManager = documentManager;
 		}
