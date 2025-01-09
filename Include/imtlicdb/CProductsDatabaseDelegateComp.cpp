@@ -74,6 +74,27 @@ bool CProductsDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord
 }
 
 
+bool CProductsDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+{
+	BaseClass::SetCollectionItemMetaInfoFromRecord(record, metaInfo);
+
+	if (record.contains("Document")){
+		QByteArray json = record.value("Document").toByteArray();
+		QJsonDocument jsonDocument = QJsonDocument::fromJson(json);
+
+		if (!jsonDocument.isNull()){
+			QString description = jsonDocument["ProductDescription"].toString();
+			metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_DESCRIPTION, description);
+
+			QString name = jsonDocument["ProductName"].toString();
+			metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_NAME, name);
+		}
+	}
+
+	return true;
+}
+
+
 } // namespace imtlicdb
 
 
