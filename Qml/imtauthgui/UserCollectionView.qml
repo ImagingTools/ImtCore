@@ -168,7 +168,7 @@ RemoteCollectionView {
 
             clip: true;
 
-            onRowIndexChanged: {
+			onDraw: {
                 if (!rowDelegate){
                     return
                 }
@@ -232,7 +232,7 @@ RemoteCollectionView {
         TableCellDelegateBase {
             id: cellDelegate
 
-            onRowIndexChanged: {
+			onDraw: {
                 if (!rowDelegate){
                     return
                 }

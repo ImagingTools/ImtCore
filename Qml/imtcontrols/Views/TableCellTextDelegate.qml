@@ -27,5 +27,4 @@ TableCellDelegateBase {
 		rowDelegate: delegateContainer ? delegateContainer.rowDelegate : null;
 		columnIndex: delegateContainer ? delegateContainer.columnIndex : -1
 	}
-
 }
