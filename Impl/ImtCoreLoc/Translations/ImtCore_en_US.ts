@@ -5930,7 +5930,7 @@ Errors: 0</source>
     <message>
         <location line="+0"/>
         <source>Close the document</source>
-        <translation>Close the product editor</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6497,7 +6497,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtgui/TDocumentWorkspaceGuiCompBase.h" line="+317"/>
         <source>Close document</source>
-        <translation type="unfinished">Close product editor</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7653,7 +7653,7 @@ Errors: 0</source>
     </message>
     <message>
         <source>Close the document</source>
-        <translation type="vanished">Close the product editor</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Save the document changes</source>
@@ -7664,7 +7664,7 @@ Errors: 0</source>
     <name>imtgui::CDocumentWorkspaceGuiCompBase</name>
     <message>
         <source>Close document</source>
-        <translation type="vanished">Close product editor</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Do you want to save your changes made in document
@@ -7804,7 +7804,7 @@ Errors: 0</source>
     </message>
     <message>
         <source>Close document</source>
-        <translation type="obsolete">Close product editor</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Do you want to save your changes made in document

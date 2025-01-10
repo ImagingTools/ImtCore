@@ -160,17 +160,6 @@ Item {
         property Component dataControllerComp;
         property var dataController: null;
 
-        onDataControllerCompChanged: {
-            if (dataController){
-                dataController.destroy();
-                dataController = null;
-            }
-
-            if (dataControllerComp){
-                dataController = dataControllerComp.createObject(container);
-            }
-        }
-
         onTableViewParamsAccepted: {
             root.tableViewParamsAccepted();
         }
@@ -242,6 +231,10 @@ Item {
 
         Component.onCompleted: {
             Events.subscribeEvent("FilterActivated", internal.filterMenuActivate);
+
+			if (dataControllerComp){
+				dataController = dataControllerComp.createObject(container);
+			}
         }
 
         Component.onDestruction: {

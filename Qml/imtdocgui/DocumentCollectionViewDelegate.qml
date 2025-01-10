@@ -22,6 +22,14 @@ CollectionViewCommandsDelegateBase {
 	property var documentDataControllersComp: [];
 	property var documentValidatorsComp: [];
 
+	Component.onCompleted: {
+		console.log("onCompleted", collectionId, documentManagerId);
+		let documentManager = MainDocumentManager.getDocumentManager(collectionViewCommandsDelegateBase.documentManagerId);
+		if (documentManager){
+			collectionViewCommandsDelegateBase.documentManager = documentManager;
+		}
+	}
+
 	onCollectionViewChanged: {
 		if (collectionView && collectionView.dataController){
 			collectionView.dataController.removed.connect(internal.onRemoved);
@@ -29,17 +37,11 @@ CollectionViewCommandsDelegateBase {
 	}
 
 	onDocumentManagerChanged: {
-		console.log("onDocumentManagerChanged", documentManager);
 		for (let i = 0; i < documentTypeIds.length; i++){
 			let documentTypeId = documentTypeIds[i];
-			console.log("documentTypeId", documentTypeId);
-
-
 			if (documentViewsComp.length > i && documentViewTypeIds.length > i){
 				let viewTypeId = documentViewTypeIds[i];
 				let documentViewComp = documentViewsComp[i];
-				console.log("viewTypeId", viewTypeId, documentViewComp);
-
 				if (!documentManager.registerDocumentView(documentTypeId, viewTypeId, documentViewComp)){
 					console.error("Unable to register view for document type ID: ", documentTypeId)
 				}
@@ -68,10 +70,7 @@ CollectionViewCommandsDelegateBase {
 	}
 
 	onCollectionIdChanged: {
-		let documentManager = MainDocumentManager.getDocumentManager(collectionViewCommandsDelegateBase.documentManagerId);
-		if (documentManager){
-			collectionViewCommandsDelegateBase.documentManager = documentManager;
-		}
+
 	}
 
 	QtObject {

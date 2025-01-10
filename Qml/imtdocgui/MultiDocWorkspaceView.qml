@@ -23,7 +23,6 @@ Item {
 		function onDocumentAdded(documentId){
 			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId);
 			getVisualStatusInfoRequest.send({"m_objectId": documentId, "m_typeId": typeId})
-
 			let documentData = workspaceView.documentManager.getDocumentDataById(documentId);
 
 			let name = documentData.documentName;
@@ -164,7 +163,7 @@ Item {
 		}
 
 		onTabClicked: {
-			if (mouse.button === Qt.RightButton){
+			if (mouse.button === Qt.RightButton && index != 0){
 				var point = tabItem.mapToItem(this, 0, 0);
 				ModalDialogManager.openDialog(popupMenuDialog, {"x": point.x + workspaceView.popupWidth, "y": point.y, "model": tabContextMenuModel});
 			}

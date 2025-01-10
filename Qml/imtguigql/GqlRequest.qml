@@ -23,6 +23,9 @@ QtObject {
         xhr.onreadystatechange = function(){
             if (xhr.readyState === XMLHttpRequest.DONE){
                 root.json = xhr.responseText;
+				if (root.state === "Ready"){
+					root.state = "Loading"
+				}
 
                 root.state = "Ready";
             }

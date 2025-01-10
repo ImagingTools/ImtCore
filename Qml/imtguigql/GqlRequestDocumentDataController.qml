@@ -90,7 +90,7 @@ DocumentDataController {
 
 	function createDocumentModel(){
 		if (container.documentModelComp){
-			let objectData = container.documentModelComp.createObject(null);
+			let objectData = container.documentModelComp.createObject(container);
 			objectData.connectProperties();
 			documentModel = objectData;
 		}
