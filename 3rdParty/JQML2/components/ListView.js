@@ -585,8 +585,7 @@ class ListView extends Flickable {
 
         this.$cache.push(item)
 
-        // if(this.$signals.pooled) this.$signals.pooled()
-        if(item.onPooled) item.onPooled()
+        if(item.$signals.pooled) item.$signals.pooled()
     }
 
     $fromCache(){
@@ -655,8 +654,7 @@ class ListView extends Flickable {
                 obj.getStatement('index').update()
             }
 
-            // if(this.$signals.reused) this.$signals.reused()
-            if(obj.onReused) obj.onReused()
+            if(obj.$signals.reused) obj.$signals.reused()
         } else {
             let ctx = new ContextController(this.getProperty('delegate').get().$exCtx, this.$exCtx)
             let createObject = this.getProperty('delegate').get().createObject
