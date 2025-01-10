@@ -102,9 +102,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 		const imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> responseModelPtr = BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
-	if (responseModelPtr.IsValid()){
-		return responseModelPtr.PopPtr();
+	sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest getVisualStatusRequest(gqlRequest, false);
+	if (getVisualStatusRequest.GetCommandId() == gqlRequest.GetCommandId()){
+		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
 	}
 
 	imtgql::CGqlObject gqlObject;
