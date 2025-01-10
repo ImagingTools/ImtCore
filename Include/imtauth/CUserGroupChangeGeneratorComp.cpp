@@ -167,7 +167,7 @@ bool CUserGroupChangeGeneratorComp::CompareDocuments(
 			QByteArrayList removedRoles;
 			GenerateChanges(oldRoles, newRoles, addedRoles, removedRoles);
 
-			for (const QByteArray& roleId : newRoles){
+			for (const QByteArray& roleId : addedRoles){
 				InsertOperationDescription(documentChangeCollection, "AddRole", "Role", "Role", roleId, roleId);
 			}
 
@@ -208,6 +208,26 @@ QString CUserGroupChangeGeneratorComp::CreateCustomOperationDescription(
 	else if (typeId == "AddUser"){
 		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added user '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
 		change = change.arg(GetUserName(newValue));
+		retVal += change;
+	}
+	else if (typeId == "AddRole"){
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added role '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
+		change = change.arg(GetRoleName(newValue));
+		retVal += change;
+	}
+	else if (typeId == "RemoveRole"){
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed role '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
+		change = change.arg(GetRoleName(newValue));
+		retVal += change;
+	}
+	else if (typeId == "AddProduct"){
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added to product '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
+		change = change.arg(qPrintable(newValue));
+		retVal += change;
+	}
+	else if (typeId == "RemoveProduct"){
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed from product '%1'"), languageId, "imtauth::CUserGroupChangeGeneratorComp");
+		change = change.arg(qPrintable(newValue));
 		retVal += change;
 	}
 

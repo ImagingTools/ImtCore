@@ -127,7 +127,7 @@ bool CUserChangeGeneratorComp::CompareDocuments(
 			QByteArrayList removedRoles;
 			GenerateChanges(oldRoles, newRoles, addedRoles, removedRoles);
 
-			for (const QByteArray& roleId : newRoles){
+			for (const QByteArray& roleId : addedRoles){
 				InsertOperationDescription(documentChangeCollection, "AddRole", "Role", "Role", roleId, roleId);
 			}
 
