@@ -6,6 +6,14 @@ TableCellDelegateBase {
 
 	property alias cellText: tableCellText
 
+    onRowDelegateChanged: {
+        rowDelegate.reused.connect(delegateContainer.onRedraw)
+        delegateContainer.onRedraw()
+    }
+
+    function onRedraw(){
+        delegateContainer.cellText.text = delegateContainer.getValue()
+    }
 
 	TableCellText {
 		id: tableCellText
@@ -17,9 +25,7 @@ TableCellDelegateBase {
 		anchors.verticalCenter: parent.verticalCenter
 
 		rowDelegate: delegateContainer ? delegateContainer.rowDelegate : null;
-		text: delegateContainer ? delegateContainer.getValue() : ""
 		columnIndex: delegateContainer ? delegateContainer.columnIndex : -1
-
 	}
 
 }

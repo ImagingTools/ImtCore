@@ -6,7 +6,7 @@ Rectangle {
 	id: tableDelegateContainer;
 
 	width: 1000;
-	height: visible ? minHeight : 0;
+    height: minHeight;
 	property real minHeight: 40;
 	property real contentHeight: height;
 
@@ -74,6 +74,7 @@ Rectangle {
 	signal rightButtonMouseClicked(int mX, int mY);
 	signal doubleClicked(int mX, int mY);
 	signal widthRecalc();
+    signal reused();
 
 	Component.onCompleted: {
 		tableDelegateContainer.compl = true;
@@ -146,7 +147,7 @@ Rectangle {
 		}
 	}
 
-    function onReused(){
+    onReused: {
         tableDelegateContainer.onSelectionChanged(tableItem.getSelectedIndexes())
     }
 
