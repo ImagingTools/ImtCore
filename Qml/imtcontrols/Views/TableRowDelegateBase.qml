@@ -146,6 +146,10 @@ Rectangle {
 		}
 	}
 
+    function onReused(){
+        tableDelegateContainer.onSelectionChanged(tableItem.getSelectedIndexes())
+    }
+
 	function onSelectionChanged(selection){
 		if (!tableDelegateContainer || !tableDelegateContainer.tableItem){
 			return;
