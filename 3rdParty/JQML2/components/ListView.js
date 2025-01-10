@@ -1,5 +1,6 @@
+const { Item } = require('./Item')
 const { Flickable } = require('./Flickable')
-const { QVar, QReal, QAutoGeometry } = require('../utils/properties')
+const { QVar, QReal, QBool, QAutoGeometry } = require('../utils/properties')
 const { ListModel } = require('./ListModel')
 
 class ListView extends Flickable {
@@ -34,6 +35,11 @@ class ListView extends Flickable {
         contentHeight: { type: QAutoGeometry, value: 0, changed: '$contentHeightChanged' },
     }
 
+    static defaultSignals = {
+        pooled: { params: [] },
+		reused: { params: [] },
+    }
+
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
         this.$exCtx = exCtx
@@ -42,6 +48,8 @@ class ListView extends Flickable {
         this.middleHeight = 0
 
         this.$items = []
+
+        this.$cache = []
     }
 
     $complete(){
@@ -149,7 +157,9 @@ class ListView extends Flickable {
                         if(!info.inner && info.exist){
                             let removed = this.$items.splice(i, this.$items.length - i)
                             for(let item of removed){
-                                if(item) item.destroy()
+                                if(item) {
+                                    this.$toCache(item)
+                                }
                             } 
                             break
                         }
@@ -163,7 +173,7 @@ class ListView extends Flickable {
                     }
 
                     for(let item of removed){
-                        if(item) item.destroy()
+                        this.$toCache(item)
                     } 
                 }
             }
@@ -179,6 +189,11 @@ class ListView extends Flickable {
     }
 
     $clear(){
+        while(this.$cache.length){
+            let obj = this.$cache.shift()
+            if(obj) obj.destroy()
+        }
+
         while(this.$items.length){
             let obj = this.$items.shift()
             if(obj) obj.destroy()
@@ -281,7 +296,7 @@ class ListView extends Flickable {
                     _lastIndex = i
                 }
             } else if(info.exist){
-                this.$items[i].destroy()
+                this.$toCache(this.$items[i])
                 this.$items[i] = undefined
             }
         }
@@ -565,103 +580,175 @@ class ListView extends Flickable {
         }
     }
 
+    $toCache(item){
+        if(item instanceof Item) item.setStyle({ display: 'none' })
+
+        this.$cache.push(item)
+
+        // if(this.$signals.pooled) this.$signals.pooled()
+        if(item.onPooled) item.onPooled()
+    }
+
+    $fromCache(){
+        let item = this.$cache.pop()
+        if(item instanceof Item) item.setStyle({ display: item.getProperty('visible').get() ? Item.defaultCSS.display : 'none' })
+
+        return item
+    }
+
     $createElement(index, info){ 
         if(this.$items[index]) return this.$items[index]
 
         let obj = undefined
 
-        let ctx = new ContextController(this.getProperty('delegate').get().$exCtx, this.$exCtx)
-        let createObject = this.getProperty('delegate').get().createObject
-        let cls = this.getProperty('delegate').get().constructor
+        if(this.$cache.length){
+            obj = this.$fromCache()
+
+            this.$items[index] = obj
+
+            let exModel = null
+
+            if(Array.isArray(this.getPropertyValue('model'))){
+                exModel = {'$modelData': this.getPropertyValue('model')[index], index: index}
+            } else if(typeof this.getPropertyValue('model') === 'number'){
+                exModel = {index: index}
+            } else {
+                let model = this.getPropertyValue('model').getPropertyValue('data')[index]
+                exModel =  model   
+            }
+
+            if(this.$items[index - 1]){
+                if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                    obj.getProperty('x').reset(this.$items[index - 1].getPropertyValue('x') + this.$items[index - 1].getPropertyValue('width') + this.getPropertyValue('spacing'))
+                    obj.getProperty('y').reset(info.y)
+                } else {
+                    obj.getProperty('x').reset(info.x)
+                    obj.getProperty('y').reset(this.$items[index - 1].getPropertyValue('y') + this.$items[index - 1].getPropertyValue('height') + this.getPropertyValue('spacing'))
+                }
+            } else if(this.$items[index + 1]){
+                if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                    obj.getProperty('x').reset(this.$items[index + 1].getPropertyValue('x') - obj.getPropertyValue('width') - this.getPropertyValue('spacing'))
+                    obj.getProperty('y').reset(info.y)
+                } else {
+                    obj.getProperty('x').reset(info.x)
+                    obj.getProperty('y').reset(this.$items[index + 1].getPropertyValue('y') - obj.getPropertyValue('height') - this.getPropertyValue('spacing'))
+                }
+            } else {
+                obj.getProperty('x').reset(info.x)
+                obj.getProperty('y').reset(info.y)
+            }
+            
+            
+            if(exModel){
+                if('$modelData' in exModel){
+                    obj.getStatement('modelData_').reset(exModel['$modelData'])
+                } else {
+                    let keys = Object.keys(exModel)
+                    if(keys.length === 1){
+                        obj.getStatement('modelData_').reset(exModel[keys[0]])
+                    }
+                }
+
+                obj.getStatement('model').reset(exModel)
+                obj.getStatement('model_').reset(exModel)
+                obj.getStatement('index').setCompute(()=>{return exModel.index})
+                obj.getStatement('index').update()
+            }
+
+            // if(this.$signals.reused) this.$signals.reused()
+            if(obj.onReused) obj.onReused()
+        } else {
+            let ctx = new ContextController(this.getProperty('delegate').get().$exCtx, this.$exCtx)
+            let createObject = this.getProperty('delegate').get().createObject
+            let cls = this.getProperty('delegate').get().constructor
+            
+            if(Array.isArray(this.getPropertyValue('model'))){
+                obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, {'$modelData': this.getPropertyValue('model')[index], index: index}, false) : new cls(this.getProperty('contentItem').get(),ctx, {'$modelData': this.getPropertyValue('model')[index], index: index})
+
+                this.$items[index] = obj
+            } else if(typeof this.getPropertyValue('model') === 'number'){
+                obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, {index: index}, false) : new cls(this.getProperty('contentItem').get(),ctx, {index: index})
+
+                this.$items[index] = obj
+            } else {
+                let model = this.getPropertyValue('model').getPropertyValue('data')[index]
+                obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, model, false) : new cls(this.getProperty('contentItem').get(),ctx, model)
+
+                this.$items[index] = obj   
+            }
+
+            for(let update of updateList.splice(0, updateList.length)){
+                update()
+            }
+
+            if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
+                obj.setStyle({
+                    visibility: 'hidden'
+                })
+            } else {
+                obj.setStyle({
+                    visibility: 'visible'
+                })
+            }
         
-        if(Array.isArray(this.getPropertyValue('model'))){
-            obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, {'$modelData': this.getPropertyValue('model')[index], index: index}, false) : new cls(this.getProperty('contentItem').get(),ctx, {'$modelData': this.getPropertyValue('model')[index], index: index})
-
-            this.$items[index] = obj
-        } else if(typeof this.getPropertyValue('model') === 'number'){
-            obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, {index: index}, false) : new cls(this.getProperty('contentItem').get(),ctx, {index: index})
-
-            this.$items[index] = obj
-        } else {
-            let model = this.getPropertyValue('model').getPropertyValue('data')[index]
-            obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, model, false) : new cls(this.getProperty('contentItem').get(),ctx, model)
-
-            this.$items[index] = obj   
-        }
-
-        for(let update of updateList.splice(0, updateList.length)){
-            update()
-        }
-
-        if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
-            obj.setStyle({
-                visibility: 'hidden'
+            obj.getProperty('x').getNotify().connect(()=>{
+                if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                    let index = this.$items.indexOf(obj)
+                    if(index >= 0 && this.$items[index+1]){
+                        this.$items[index+1].getProperty('x').reset(this.$items[index].getPropertyValue('x')+this.$items[index].getPropertyValue('width')+this.getPropertyValue('spacing'))
+                    }
+                }
+                this.$updateGeometry()
             })
-        } else {
-            obj.setStyle({
-                visibility: 'visible'
+            obj.getProperty('y').getNotify().connect(()=>{
+                if(this.getPropertyValue('orientation') === ListView.Vertical){
+                    let index = this.$items.indexOf(obj)
+                    if(index >= 0 && this.$items[index+1]){
+                        this.$items[index+1].getProperty('y').reset(this.$items[index].getPropertyValue('y')+this.$items[index].getPropertyValue('height')+this.getPropertyValue('spacing'))
+                    }
+                }
+                this.$updateGeometry()
             })
+            obj.getProperty('width').getNotify().connect(()=>{
+                if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
+                    obj.setStyle({
+                        visibility: 'hidden'
+                    })
+                } else {
+                    obj.setStyle({
+                        visibility: 'visible'
+                    })
+                }
+                if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                    let index = this.$items.indexOf(obj)
+                    if(index >= 0 && this.$items[index+1]){
+                        this.$items[index+1].getProperty('x').reset(obj.getPropertyValue('x')+obj.getPropertyValue('width')+this.getPropertyValue('spacing'))
+                    }
+                }
+                this.$updateGeometry()
+            })
+            obj.getProperty('height').getNotify().connect(()=>{
+                if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
+                    obj.setStyle({
+                        visibility: 'hidden'
+                    })
+                } else {
+                    obj.setStyle({
+                        visibility: 'visible'
+                    })
+                }
+                if(this.getPropertyValue('orientation') === ListView.Vertical){
+                    let index = this.$items.indexOf(obj)
+                    if(index >= 0 && this.$items[index+1]){
+                        this.$items[index+1].getProperty('y').reset(obj.getPropertyValue('y')+obj.getPropertyValue('height')+this.getPropertyValue('spacing'))
+                    }
+                }
+                this.$updateGeometry()
+            })
+
+            obj.getProperty('x').reset(info.x)
+            obj.getProperty('y').reset(info.y)
         }
-    
-        obj.getProperty('x').getNotify().connect(()=>{
-            if(this.getPropertyValue('orientation') === ListView.Horizontal){
-                let index = this.$items.indexOf(obj)
-                if(index >= 0 && this.$items[index+1]){
-                    this.$items[index+1].getProperty('x').reset(this.$items[index].getPropertyValue('x')+this.$items[index].getPropertyValue('width')+this.getPropertyValue('spacing'))
-                }
-            }
-            this.$updateGeometry()
-        })
-        obj.getProperty('y').getNotify().connect(()=>{
-            if(this.getPropertyValue('orientation') === ListView.Vertical){
-                let index = this.$items.indexOf(obj)
-                if(index >= 0 && this.$items[index+1]){
-                    this.$items[index+1].getProperty('y').reset(this.$items[index].getPropertyValue('y')+this.$items[index].getPropertyValue('height')+this.getPropertyValue('spacing'))
-                }
-            }
-            this.$updateGeometry()
-        })
-        obj.getProperty('width').getNotify().connect(()=>{
-            if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
-                obj.setStyle({
-                    visibility: 'hidden'
-                })
-            } else {
-                obj.setStyle({
-                    visibility: 'visible'
-                })
-            }
-            if(this.getPropertyValue('orientation') === ListView.Horizontal){
-                let index = this.$items.indexOf(obj)
-                if(index >= 0 && this.$items[index+1]){
-                    this.$items[index+1].getProperty('x').reset(obj.getPropertyValue('x')+obj.getPropertyValue('width')+this.getPropertyValue('spacing'))
-                }
-            }
-            this.$updateGeometry()
-        })
-        obj.getProperty('height').getNotify().connect(()=>{
-            if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
-                obj.setStyle({
-                    visibility: 'hidden'
-                })
-            } else {
-                obj.setStyle({
-                    visibility: 'visible'
-                })
-            }
-            if(this.getPropertyValue('orientation') === ListView.Vertical){
-                let index = this.$items.indexOf(obj)
-                if(index >= 0 && this.$items[index+1]){
-                    this.$items[index+1].getProperty('y').reset(obj.getPropertyValue('y')+obj.getPropertyValue('height')+this.getPropertyValue('spacing'))
-                }
-            }
-            this.$updateGeometry()
-        })
-
-
-        obj.getProperty('x').reset(info.x)
-        obj.getProperty('y').reset(info.y)
-
    
         obj.$complete()
         
