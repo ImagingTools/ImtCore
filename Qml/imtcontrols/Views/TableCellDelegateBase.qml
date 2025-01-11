@@ -283,9 +283,13 @@ Item {
 				if ("item" in delegateContainer.rowDelegate.dataModel){
 					val = delegateContainer.rowDelegate.dataModel.item[key]
 				}
+				else if(delegateContainer.rowDelegate.modelData){
+					val = delegateContainer.rowDelegate.modelData[key];
+				}
 				else {
 					val = delegateContainer.rowDelegate.dataModel[key];
 				}
+
 
 				return val !== undefined ? val : "";
 			}

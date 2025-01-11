@@ -124,6 +124,15 @@ Rectangle{
                 property var selection_ : null;
                 property var hover_ : null;
                 property int addItemWidth: 0;
+				signal reused();
+
+				onReused: {
+					if(deleg.hover_){
+						deleg.hover_.destroy();
+						deleg.hover_ = null;
+					}
+				}
+
                 onAddItemWidthChanged: {
                     //console.log("addItemWidth:: ", addItemWidth)
                 }

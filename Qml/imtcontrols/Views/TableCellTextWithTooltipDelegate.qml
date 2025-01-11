@@ -6,6 +6,15 @@ TableCellDelegateBase {
 
     signal clicked();
 
+	onRowDelegateChanged: {
+		rowDelegate.reused.connect(delegateContainer.onRedraw)
+		delegateContainer.onRedraw()
+	}
+
+	function onRedraw(){
+		tableCellText.text = delegateContainer.getValue()
+	}
+
     TableCellText {
         id: tableCellText;
 
@@ -16,7 +25,6 @@ TableCellDelegateBase {
         anchors.verticalCenter: parent.verticalCenter
 
         rowDelegate: delegateContainer.rowDelegate
-        text: delegateContainer.getValue()
         columnIndex: delegateContainer.columnIndex
     }
 
