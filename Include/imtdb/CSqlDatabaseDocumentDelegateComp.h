@@ -7,7 +7,6 @@
 // ImtCore includes
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/IRevisionController.h>
-#include <imtdb/IMetaInfoTableDelegate.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 #include <imtdb/IJsonBasedMetaInfoDelegate.h>
 
