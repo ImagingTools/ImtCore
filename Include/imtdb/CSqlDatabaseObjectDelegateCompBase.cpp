@@ -278,8 +278,8 @@ QString CSqlDatabaseObjectDelegateCompBase::GetBaseSelectionQuery() const
 	}
 
 	return QString("SELECT * FROM %0.\"%1\"")
-			.arg(qPrintable(*m_tableSchemaAttrPtr))
-			.arg(qPrintable(*m_tableNameAttrPtr));
+				.arg(qPrintable(*m_tableSchemaAttrPtr))
+				.arg(qPrintable(*m_tableNameAttrPtr));
 }
 
 
@@ -306,20 +306,20 @@ bool CSqlDatabaseObjectDelegateCompBase::SetCollectionItemMetaInfoFromRecord(con
 		metaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME, insertionTime);
 	}
 
-	if (record.contains("LastModified")) {
+	if (record.contains("LastModified")){
 		QDateTime lastModificationTime = record.value("LastModified").toDateTime();
 
 		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, lastModificationTime);
 		metaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, lastModificationTime);
 	}
 
-	if (record.contains("RevisionNumber")) {
+	if (record.contains("RevisionNumber")){
 		qlonglong revisionNumber = record.value("RevisionNumber").toLongLong();
 
 		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::MIT_REVISION, revisionNumber);
 	}
 
-	if (record.contains("Checksum")) {
+	if (record.contains("Checksum")){
 		int checksum = record.value("Checksum").toUInt();
 
 		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM, checksum);

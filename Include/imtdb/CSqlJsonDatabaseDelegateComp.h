@@ -59,7 +59,7 @@ public:
 protected:
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const override;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const override;
-	virtual bool TableIsExists(const QString& tableName) const;
+	virtual bool TableExists(const QString& tableName) const;
 
 protected:
 	I_ATTR(bool, m_isMultiTypeAttrPtr);

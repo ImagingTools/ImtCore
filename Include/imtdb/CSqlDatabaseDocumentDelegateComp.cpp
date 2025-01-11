@@ -64,8 +64,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 
 	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
 
-
-	if (m_uniqueValuesFieldAttrPtr.IsValid() && *m_uniqueValuesFieldAttrPtr != ""){
+	if (m_uniqueValuesFieldAttrPtr.IsValid() && !(*m_uniqueValuesFieldAttrPtr).isEmpty()){
 		QString valueField = s_filterableColumns.contains(*m_uniqueValuesFieldAttrPtr) ? QString("%1").arg(*m_uniqueValuesFieldAttrPtr) : QString("\"DataMetaInfo\"->>'%1'").arg(*m_uniqueValuesFieldAttrPtr);
 
 		selectionQuery = QString("SELECT DISTINCT ON (%1) * FROM (%2)").arg(valueField).arg(selectionQuery).toUtf8();

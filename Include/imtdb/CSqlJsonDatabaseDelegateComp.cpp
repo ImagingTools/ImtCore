@@ -113,12 +113,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 			}
 
 			retVal.query = queryStr
-							   .arg(qPrintable(*m_tableNameAttrPtr))
-							   .arg(qPrintable(objectId))
-							   .arg(SqlEncode(documentContent))
-							   .arg(revisionVersion)
-							   .arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
-							   .arg(checksum).toUtf8();
+						.arg(qPrintable(*m_tableNameAttrPtr))
+						.arg(qPrintable(objectId))
+						.arg(SqlEncode(documentContent))
+						.arg(revisionVersion)
+						.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
+						.arg(checksum).toUtf8();
 
 			retVal.query += CreateOperationDescriptionQuery(objectId, operationContextPtr);
 			retVal.objectName = objectName;
@@ -182,11 +182,11 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDescriptionObjectQuery(
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"Document\" = jsonb_set(\"Document\", '{Description}', '\"%2\"', true), \"LastModified\" = '%3' WHERE \"%4\" ='%5' AND \"IsActive\" = true;")
-			.arg(qPrintable(*m_tableNameAttrPtr))
-			.arg(SqlEncode(description))
-			.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
-			.arg(qPrintable(*m_objectIdColumnAttrPtr))
-			.arg(qPrintable(objectId)).toUtf8();
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(SqlEncode(description))
+				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
+				.arg(qPrintable(*m_objectIdColumnAttrPtr))
+				.arg(qPrintable(objectId)).toUtf8();
 
 	return retVal;
 }
@@ -574,7 +574,7 @@ bool CSqlJsonDatabaseDelegateComp::ReadDataFromMemory(
 }
 
 
-bool CSqlJsonDatabaseDelegateComp::TableIsExists(const QString& tableName) const
+bool CSqlJsonDatabaseDelegateComp::TableExists(const QString& tableName) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return false;
