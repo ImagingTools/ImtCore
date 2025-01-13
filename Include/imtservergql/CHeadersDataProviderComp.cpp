@@ -34,9 +34,15 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 	}
 
 	for (int i = 0; i < m_headersIdsAttrPtr.GetCount(); i++){
-		headersModelPtr->InsertNewItem();
+		QString headerId = m_headersIdsAttrPtr[i];
 
-		headersModelPtr->SetData("Id", m_headersIdsAttrPtr[i], i);
+		if (!CheckHeaderPermission(headerId.toUtf8(), *gqlContextPtr)){
+			continue;
+		}
+
+		int index = headersModelPtr->InsertNewItem();
+
+		headersModelPtr->SetData("Id", m_headersIdsAttrPtr[i], index);
 
 		QString headerName = m_headersNamesAttrPtr[i];
 
@@ -46,18 +52,60 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 			headerName = headerNameTr;
 		}
 
-		headersModelPtr->SetData("Name", headerName, i);
+		headersModelPtr->SetData("Name", headerName, index);
 	}
 
 	if (m_headersSearchByFilterAttrPtr.IsValid()){
 		imtbase::CTreeItemModel* searchModel = dataModelPtr->AddTreeModel("FilterSearch");
 		for (int i = 0; i < m_headersSearchByFilterAttrPtr.GetCount(); i++){
+			QString headerId = m_headersSearchByFilterAttrPtr[i];
+			if (!CheckHeaderPermission(headerId.toUtf8(), *gqlContextPtr)){
+				continue;
+			}
+
 			int index = searchModel->InsertNewItem();
 			searchModel->SetData("Id", m_headersSearchByFilterAttrPtr[i], index);
 		}
 	}
 
 	return dataModelPtr.PopPtr();
+}
+
+
+// private methods
+
+bool CHeadersDataProviderComp::CheckHeaderPermission(const QByteArray& headerId, const imtgql::IGqlContext& gqlContext) const
+{
+	if (m_headerPermissionsAttrPtr.GetCount() == 0){
+		return true;
+	}
+
+	const imtauth::IUserInfo* userInfoPtr = gqlContext.GetUserInfo();
+	if (userInfoPtr == nullptr){
+		return false;
+	}
+
+	if (userInfoPtr->IsAdmin()){
+		return true;
+	}
+
+	int index = m_headersIdsAttrPtr.FindValue(headerId);
+	if (index < 0){
+		return false;
+	}
+
+	if (m_headerPermissionsAttrPtr.GetCount() <= index){
+		return false;
+	}
+
+	QByteArrayList userPermissions = userInfoPtr->GetPermissions();
+	QByteArray headerPermission = m_headerPermissionsAttrPtr[index];
+
+	if (headerPermission.isEmpty()){
+		return true;
+	}
+
+	return userPermissions.contains(headerPermission);
 }
 
 
