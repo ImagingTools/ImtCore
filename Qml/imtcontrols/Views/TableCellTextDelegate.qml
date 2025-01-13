@@ -7,8 +7,10 @@ TableCellDelegateBase {
 	property alias cellText: tableCellText
 
     onRowDelegateChanged: {
-        rowDelegate.reused.connect(delegateContainer.onRedraw)
-        delegateContainer.onRedraw()
+		if(rowDelegate){
+			rowDelegate.reused.connect(delegateContainer.onRedraw)
+			delegateContainer.onRedraw()
+		}
     }
 
     function onRedraw(){

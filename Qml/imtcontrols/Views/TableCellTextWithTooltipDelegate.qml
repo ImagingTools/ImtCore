@@ -7,8 +7,10 @@ TableCellDelegateBase {
     signal clicked();
 
 	onRowDelegateChanged: {
-		rowDelegate.reused.connect(delegateContainer.onRedraw)
-		delegateContainer.onRedraw()
+		if(rowDelegate){
+			rowDelegate.reused.connect(delegateContainer.onRedraw)
+			delegateContainer.onRedraw()
+		}
 	}
 
 	function onRedraw(){
