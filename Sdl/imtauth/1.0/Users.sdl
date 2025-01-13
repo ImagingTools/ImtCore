@@ -17,7 +17,8 @@ input UsersListInput {
 }
 
 type UserItem {
-	Id: ID
+	Id: ID!
+	TypeId: ID!
 	UserId: ID
 	Name: String
 	Description: String

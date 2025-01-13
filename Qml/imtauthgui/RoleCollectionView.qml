@@ -19,6 +19,10 @@ RemoteCollectionView {
     commandsDelegateComp: Component {RoleCollectionViewCommandsDelegate {
             collectionView: roleCollectionViewContainer;
 			documentManager: roleCollectionViewContainer.documentManager;
+
+			documentViewsComp: [roleDocumentComp];
+			documentDataControllersComp: [dataControllerComp];
+			documentValidatorsComp: [];
         }
     }
 

@@ -11,8 +11,8 @@ DocumentCollectionViewDelegate {
     removeDialogTitle: qsTr("Deleting a role");
     removeMessage: qsTr("Delete the selected role ?");
 
-	documentTypeId: "Role";
-	viewTypeId: "RoleEditor";
+	documentTypeIds: ["Role"];
+	documentViewTypeIds: ["RoleEditor"];
 
     function onRemove(){
         ModalDialogManager.openDialog(removeDialog, {});

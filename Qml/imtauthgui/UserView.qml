@@ -16,6 +16,9 @@ ViewBase {
     property UserData userData: model;
     property string productId;
 
+	property alias passwordInput: passwordInput_;
+	property alias passwordInputConfirm: confirmPassword;
+
     function updateGui(){
         generalGroup.updateGui();
         rolesGroup.updateGui();
@@ -56,8 +59,8 @@ ViewBase {
     }
 
     function checkChangePasswordLogic(){
-        passwordInput.visible = userData.m_id == "";
-        changePasswordButton.visible = userData.m_id != "";
+		passwordInput_.visible = userData.m_id == "";
+		changePasswordButton.visible = !passwordInput_.visible;
     }
 
     function checkSystemId(){
@@ -67,7 +70,7 @@ ViewBase {
         }
 
         usernameInput.readOnly = false;
-        passwordInput.readOnly = false;
+		passwordInput_.readOnly = false;
 
         for (let i = 0; i < userData.m_systemInfos.count; i++){
             let systemId = userData.m_systemInfos.get(i).item.m_id;
@@ -79,11 +82,11 @@ ViewBase {
             let enabled = userData.m_systemInfos.get(i).item.m_enabled;
             if (enabled && systemId !== ""){
                 usernameInput.readOnly = true;
-                passwordInput.readOnly = true;
+				passwordInput_.readOnly = true;
                 changePasswordButton.visible = false;
             }
             else if (enabled && systemId === ""){
-                passwordInput.readOnly = false;
+				passwordInput_.readOnly = false;
             }
         }
     }
@@ -168,8 +171,11 @@ ViewBase {
                     id: usernameInput;
 
                     name: qsTr("Username");
-                    placeHolderText: qsTr("Enter the user name");
+					placeHolderText: qsTr("Enter the username");
                     readOnly: container.readOnly;
+					showErrorWhenInvalid: true;
+					errorText: qsTr("Please enter the username");
+					textInputValidator: notEmptyRegexp;
 
                     onEditingFinished: {
                         let oldText = container.userData.m_username;
@@ -179,60 +185,14 @@ ViewBase {
                         }
                     }
 
-                    KeyNavigation.tab: passwordInput;
+					KeyNavigation.tab: passwordInput_;
                     KeyNavigation.backtab: groupsTable;
                 }
 
-                TextInputElementView {
-                    id: passwordInput;
-
-                    name: qsTr("Password");
-                    placeHolderText: qsTr("Enter the password");
-
-                    echoMode: TextInput.Password;
-
-                    readOnly: container.readOnly;
-                    visible: false;
-
-                    onEditingFinished: {
-                        let oldText = container.userData.m_password;
-                        if (oldText && oldText !== passwordInput.text || !oldText && passwordInput.text !== ""){
-                            container.doUpdateModel();
-                        }
-                    }
-
-                    KeyNavigation.tab: nameInput;
-                    KeyNavigation.backtab: usernameInput;
-                }
-
-                ElementView {
-                    id: changePasswordButton;
-                    name: qsTr("Change password");
-                    visible: false;
-
-                    controlComp: Component {
-                        Button {
-                            width: 100;
-                            height: 30;
-                            text: qsTr("Change");
-                            onClicked: {
-                                ModalDialogManager.openDialog(changePasswordComp, {});
-                            }
-                        }
-                    }
-
-                    Component {
-                        id: changePasswordComp;
-                        ChangePasswordDialog {
-                            title: qsTr("Change Password");
-                            onFinished: {
-                                if (buttonId == Enums.save){
-                                    AuthorizationController.changePassword(container.userData.m_id, contentItem.oldPassword, contentItem.newPassword);
-                                }
-                            }
-                        }
-                    }
-                }
+				RegularExpressionValidator {
+					id: notEmptyRegexp;
+					regularExpression: /^(?!\s*$).+/;
+				}
 
                 TextInputElementView {
                     id: nameInput;
@@ -240,6 +200,9 @@ ViewBase {
                     name: qsTr("Name");
                     placeHolderText: qsTr("Enter the name");
                     readOnly: container.readOnly;
+					showErrorWhenInvalid: true;
+					errorText: qsTr("Please enter the name");
+					textInputValidator: notEmptyRegexp;
 
                     onEditingFinished: {
                         let oldText = container.userData.m_name;
@@ -249,7 +212,7 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: mailInput;
-                    KeyNavigation.backtab: passwordInput;
+					KeyNavigation.backtab: passwordInput_;
                 }
 
                 RegularExpressionValidator {
@@ -279,16 +242,132 @@ ViewBase {
                     usernameInput.text = container.userData.m_username;
                     nameInput.text = container.userData.m_name;
                     mailInput.text = container.userData.m_email;
-                    passwordInput.text = container.userData.m_password;
+					passwordInput_.text = container.userData.m_password;
                 }
 
                 function updateModel(){
                     container.userData.m_username = usernameInput.text;
                     container.userData.m_name = nameInput.text;
                     container.userData.m_email = mailInput.text;
-                    container.userData.m_password = passwordInput.text;
+					container.userData.m_password = passwordInput_.text;
                 }
             }
+
+			GroupElementView {
+				id: passwordGroup;
+				width: parent.width;
+
+				Component {
+					id: errorComp;
+
+					Text {
+						text: qsTr("Passwords don't match");
+						color: Style.errorTextColor;
+						font.family: Style.fontFamily;
+						font.pixelSize: Style.fontSize_common;
+					}
+				}
+
+				Component {
+					id: emptyPasswordErrorComp;
+
+					Text {
+						text: qsTr("Passwords don't match");
+						color: Style.errorTextColor;
+						font.family: Style.fontFamily;
+						font.pixelSize: Style.fontSize_common;
+					}
+				}
+
+				Component {
+					id: emptyComp;
+
+					BaseText {
+					}
+				}
+
+				function checkPassword(){
+					if (passwordInput_.text === ""){
+						confirmPassword.bottomComp = emptyPasswordErrorComp;
+						return;
+					}
+
+					if (passwordInput_.text !== confirmPassword.text){
+						confirmPassword.bottomComp = errorComp;
+
+						return;
+					}
+
+					confirmPassword.bottomComp = emptyComp;
+
+					let oldText = container.userData.m_password;
+					if (oldText && oldText !== passwordInput_.text || !oldText && passwordInput_.text !== ""){
+						container.doUpdateModel();
+					}
+				}
+
+				TextInputElementView {
+					id: passwordInput_;
+					name: qsTr("Password");
+					placeHolderText: qsTr("Enter the password");
+					echoMode: TextInput.Password;
+					readOnly: container.readOnly;
+					visible: passwordGroup.visible;
+					onEditingFinished: {
+						passwordGroup.checkPassword();
+					}
+
+					KeyNavigation.tab: confirmPassword;
+					KeyNavigation.backtab: nameInput;
+				}
+
+				TextInputElementView {
+					id: confirmPassword;
+					name: qsTr("Confirm password");
+					echoMode: TextInput.Password;
+					placeHolderText: qsTr("Confirm password");
+					// bottomComp: emptyComp;
+					readOnly: container.readOnly;
+					visible: passwordInput_.visible;
+					showErrorWhenInvalid: true;
+					errorText: qsTr("Please enter the password");
+					textInputValidator: notEmptyRegexp;
+					onEditingFinished: {
+						passwordGroup.checkPassword();
+					}
+					KeyNavigation.tab: usernameInput;
+					KeyNavigation.backtab: passwordInput_;
+				}
+
+				ElementView {
+					id: changePasswordButton;
+					name: qsTr("Change password");
+					visible: false;
+
+					controlComp: Component {
+						Button {
+							width: 100;
+							height: 30;
+							text: qsTr("Change");
+							onClicked: {
+								ModalDialogManager.openDialog(changePasswordComp, {});
+							}
+						}
+					}
+
+					Component {
+						id: changePasswordComp;
+						ChangePasswordDialog {
+							title: qsTr("Change Password");
+							onFinished: {
+								if (buttonId == Enums.save){
+									AuthorizationController.changePassword(container.userData.m_id, contentItem.oldPassword, contentItem.newPassword);
+								}
+							}
+						}
+					}
+				}
+			}
 
             GroupHeaderView {
                 id: headerSystemInfoGroup;

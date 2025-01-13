@@ -241,6 +241,10 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.Id = QByteArray(objectId);
 	}
 
+	if (requestInfo.items.isTypeIdRequested){
+		representationObject.TypeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+	}
+
 	if (requestInfo.items.isUserIdRequested){
 		representationObject.UserId = QByteArray(userInfoPtr->GetId());
 	}

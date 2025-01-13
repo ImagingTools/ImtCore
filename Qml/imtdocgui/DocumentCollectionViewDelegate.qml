@@ -124,7 +124,7 @@ CollectionViewCommandsDelegateBase {
 				}
 
 				let typeIdindex = getDocumentTypeIdIndex(typeId);
-				if (index < 0){
+				if (typeIdindex < 0){
 					console.error('Document with type-ID: "', typeId ,'" unsupported');
 				}
 				else{

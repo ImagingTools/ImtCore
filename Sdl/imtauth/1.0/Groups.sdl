@@ -18,6 +18,7 @@ input GroupsListInput {
 
 type GroupItem {
 	Id: ID!
+	TypeId: ID!
 	Name: String!
 	Description: String
 	Roles: ID
