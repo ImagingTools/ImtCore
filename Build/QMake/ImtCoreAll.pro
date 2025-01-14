@@ -110,6 +110,9 @@ SUBDIRS += imtapp
 imtapp.file = ../../Include/imtapp/QMake/imtapp.pro
 imtapp.depends = imtappsdl
 
+SUBDIRS += imtmail
+imtmail.file = ../../Include/imtmail/QMake/imtmail.pro
+
 SUBDIRS += imtauth
 imtauth.file = ../../Include/imtauth/QMake/imtauth.pro
 
@@ -368,6 +371,10 @@ ImtImagePck.depends = imtimg
 SUBDIRS += ImtAppPck
 ImtAppPck.file = ../../Impl/ImtAppPck/QMake/ImtAppPck.pro
 ImtAppPck.depends = imtapp
+
+SUBDIRS += ImtMailPck
+ImtMailPck.file = ../../Impl/ImtMailPck/QMake/ImtMailPck.pro
+ImtMailPck.depends = imtmail
 
 SUBDIRS += ImtAuthDbPck
 ImtAuthDbPck.file = ../../Impl/ImtAuthDbPck/QMake/ImtAuthDbPck.pro

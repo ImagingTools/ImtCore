@@ -4,6 +4,7 @@
 // ACF includes
 #include <iprm/CParamsSet.h>
 #include <iprm/CTextParam.h>
+#include <iprm/CEnableableParam.h>
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
@@ -146,6 +147,171 @@ sdl::imtauth::Users::CChangePasswordPayload::V1_0 CUserControllerComp::OnChangeP
 }
 
 
+sdl::imtauth::Users::CRegisterUserPayload::V1_0 CUserControllerComp::OnRegisterUser(
+			const sdl::imtauth::Users::V1_0::CRegisterUserGqlRequest& registerUserRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::imtauth::Users::CRegisterUserPayload::V1_0 response;
+	if (!m_userCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
+		return response;
+	}
+
+	if (!m_userFactoryCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'UserFactory' was not set", "CUserControllerComp");
+		return response;
+	}
+
+	if (!m_hashCalculatorCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'HashCalculator' was not set", "CUserControllerComp");
+		return response;
+	}
+
+	sdl::imtauth::Users::V1_0::RegisterUserRequestArguments arguments = registerUserRequest.GetRequestedArguments();
+	if (!arguments.input.UserData){
+		errorMessage = QString("Unable to register user. Error: User data is invalid");
+		return response;
+	}
+
+	QByteArray productId;
+	if (!arguments.input.ProductId){
+		productId = *arguments.input.ProductId;
+	}
+
+	istd::TDelPtr<imtauth::IUserInfo> userInfoPtr = m_userFactoryCompPtr.CreateInstance();
+	sdl::imtauth::Users::CUserData::V1_0 userData = *arguments.input.UserData;
+
+	QByteArray userId;
+	if (!m_userRepresentationController.FillUserInfoFromRepresentation(userData, *userInfoPtr, *m_userCollectionCompPtr, userId, errorMessage)){
+		errorMessage = QString("Unable to register user. Error: '%1'").arg(errorMessage);
+		return response;
+	}
+
+	QString password;
+	if (userData.Password){
+		password = *userData.Password;
+	}
+
+	if (password.isEmpty()) {
+		errorMessage = QString("Unable to register user. Error: Password cannot be empty");
+		return response;
+	}
+
+	if (!userData.Username){
+		errorMessage = QString("Unable to register user. Error: Invalid username");
+		return response;
+	}
+
+	password = m_hashCalculatorCompPtr->GenerateHash(*userData.Username + password.toUtf8());
+
+	userInfoPtr->SetPasswordHash(password.toUtf8());
+
+	response.Id = userId;
+
+	iprm::CParamsSet filterParam;
+	iprm::CParamsSet paramsSet;
+
+	iprm::CEnableableParam enableableParam;
+	enableableParam.SetEnabled(true);
+
+	paramsSet.SetEditableParameter("IsDefault", &enableableParam);
+
+	iprm::CTextParam productIdParam;
+	productIdParam.SetText(productId);
+
+	paramsSet.SetEditableParameter("ProductId", &productIdParam);
+
+	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+
+	imtbase::IObjectCollection::Ids roleIds = m_roleCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+	if (!roleIds.isEmpty()){
+		userInfoPtr->AddRole(productId, roleIds[0]);
+	}
+
+	m_userCollectionCompPtr->InsertNewObject("", "", "", userInfoPtr.GetPtr(), userId);
+
+	return response;
+}
+
+
+sdl::imtauth::Users::CCheckEmailPayload::V1_0 CUserControllerComp::OnCheckEmail(
+			const sdl::imtauth::Users::V1_0::CCheckEmailGqlRequest& checkEmailRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::imtauth::Users::CCheckEmailPayload::V1_0 response;
+	if (!m_userCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
+		return response;
+	}
+
+	sdl::imtauth::Users::V1_0::CheckEmailRequestArguments arguments = checkEmailRequest.GetRequestedArguments();
+
+	QByteArray login;
+	if (arguments.input.Login){
+		login = *arguments.input.Login;
+	}
+
+	if (login.isEmpty()){
+		errorMessage = QString("Unable to check email. Error: Login is empty");
+		return response;
+	}
+
+	QString email;
+	if (arguments.input.Email){
+		email = *arguments.input.Email;
+	}
+
+	if (email.isEmpty()){
+		errorMessage = QString("Unable to check email. Error: Email is empty");
+		return response;
+	}
+
+	iprm::CParamsSet filterParam;
+	iprm::CParamsSet paramsSet;
+
+	iprm::CTextParam userIdParam;
+	userIdParam.SetText(login);
+
+	paramsSet.SetEditableParameter("Id", &userIdParam);
+	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	const imtauth::CUserInfo* userInfoPtr = nullptr;
+	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+	if (!userIds.isEmpty()){
+		QByteArray userObjectId = userIds[0];
+		if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
+			userInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
+		}
+	}
+
+	if (userInfoPtr == nullptr){
+		errorMessage = QString("The user with username '%1' does not exist").arg(qPrintable(login));
+		return response;
+	}
+
+	response.CorrectEmail = false;
+
+	QString userMail = userInfoPtr->GetMail();
+	if (userMail == email){
+		response.CorrectEmail = true;
+	}
+
+	return response;
+}
+
+
+sdl::imtauth::Users::CCheckEmailPayload::V1_0 CUserControllerComp::OnSendEmailCode(
+	const sdl::imtauth::Users::V1_0::CSendEmailCodeGqlRequest& /*sendEmailCodeRequest*/,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
+{
+	sdl::imtauth::Users::CCheckEmailPayload::V1_0 response;
+
+	return response;
+}
+
+
 } // namespace imtauthgql
-
-

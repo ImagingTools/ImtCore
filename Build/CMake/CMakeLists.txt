@@ -112,6 +112,7 @@ endif()
 
 #-------- Libraries --------
 add_subdirectory("${INCLUDE_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtapp")
+add_subdirectory("${INCLUDE_DIR}/imtmail/CMake" "${AUX_INCLUDE_DIR}/imtmail")
 add_subdirectory("${INCLUDE_DIR}/imtdev/CMake" "${AUX_INCLUDE_DIR}/imtdev")
 add_subdirectory("${INCLUDE_DIR}/imtrest/CMake" "${AUX_INCLUDE_DIR}/imtrest")
 add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
@@ -203,6 +204,9 @@ if(NOT ANDROID)
 
 	add_subdirectory("${IMPL_DIR}/ImtAppPck/CMake" "${AUX_INCLUDE_DIR}/ImtAppPck")
 	add_dependencies(ImtAppPck imtapp)
+
+        add_subdirectory("${IMPL_DIR}/ImtMailPck/CMake" "${AUX_INCLUDE_DIR}/ImtMailPck")
+        add_dependencies(ImtMailPck imtmail)
 
 	add_subdirectory("${IMPL_DIR}/ImtDevPck/CMake" "${AUX_INCLUDE_DIR}/ImtDevPck")
 	add_dependencies(ImtDevPck imtdev)

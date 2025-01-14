@@ -248,6 +248,8 @@
                                 <Value>RoleItemTypeId</Value>
                                 <Value>GroupItemTypeId</Value>
                                 <Value>UserItemTypeId</Value>
+                                <Value>RegisterUser</Value>
+                                <Value>CheckEmail</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
