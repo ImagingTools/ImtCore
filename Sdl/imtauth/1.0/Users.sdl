@@ -81,15 +81,41 @@ input ChangePasswordPayload {
 	UserId: ID!
 }
 
+input RegisterUserInput {
+    UserData: UserData!
+    ProductId: ID!
+}
+
+input CheckEmailInput {
+    Login: ID!
+    Email: String!
+}
+
+type CheckEmailPayload {
+    CorrectEmail: Boolean!
+}
+
+type RegisterUserPayload {
+    Id: ID!
+}
+
+input SendEmailCodeInput {
+    Login: ID!
+    Email: String!
+}
+
 type Query {
-	UsersList (input:UsersListInput): UsersListPayload!
-	UserItem (input: UserItemInput): UserDataPayload!
+    UsersList (input:UsersListInput): UsersListPayload!
+    UserItem (input: UserItemInput): UserDataPayload!
+    CheckEmail (input: CheckEmailInput): CheckEmailPayload!
+    SendEmailCode (input: CheckEmailInput): CheckEmailPayload!
 }
 
 type Mutation {
 	UserUpdate (input: UserDataInput): UpdatedNotificationPayload!
 	UserAdd (input: UserDataInput): AddedNotificationPayload!
 	ChangePassword (input: ChangePasswordInput): ChangePasswordPayload!
+        RegisterUser (input: RegisterUserInput): RegisterUserPayload!
 }
 
 collectionSchema {
