@@ -121,7 +121,9 @@ Item {
         }
 
         Events.unSubscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged);
-
+        if (model){
+            model.destroy()
+        }
         internal.isDestroyed = true;
     }
 

@@ -242,7 +242,7 @@ Item {
             return;
         }
 
-        internal.m_defaultStateModel = model.copyMe();
+        internal.setModel(model)
     }
 
 
@@ -265,6 +265,17 @@ Item {
 
         property var m_undoStack: [];
         property var m_redoStack: [];
+        function setModel(model){
+            if (m_defaultStateModel){
+                m_defaultStateModel = model.copyMe()
+            }
+        }
+
+        Component.onDestruction: {
+            if (m_defaultStateModel){
+                m_defaultStateModel.destroy()
+            }
+        }
     }
 
     function onModelChanged(){
