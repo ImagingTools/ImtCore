@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395011" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Base framework for a console application</Description>
@@ -110,6 +110,7 @@
         <Component ExportedId="DatabaseFilePath" ComponentId="SqLiteDatabaseEngine/DatabaseFilePath"/>
         <Component ExportedId="Log" ComponentId="ConsoleApplicationFramework/Log"/>
         <Component ExportedId="LogFilePath" ComponentId="ConsoleApplicationFramework/LogFilePath"/>
+        <Component ExportedId="LogSystemLocation" ComponentId="ConsoleApplicationFramework/LogSystemLocation"/>
         <Component ExportedId="MessageSqlRepository" ComponentId="SqlLogDatabase"/>
         <Component ExportedId="RuntimeStatus" ComponentId="ConsoleApplicationFramework/RuntimeStatus"/>
     </ExportedComponents>

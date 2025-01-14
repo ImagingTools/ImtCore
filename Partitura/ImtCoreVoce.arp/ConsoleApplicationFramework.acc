@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5274" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395011" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -137,6 +137,7 @@
         <Component ExportedId="ApplicationInfo" ComponentId="ApplicationInfo"/>
         <Component ExportedId="Log" ComponentId="ConsoleLog"/>
         <Component ExportedId="LogFilePath" ComponentId="LogFilePath"/>
+        <Component ExportedId="LogSystemLocation" ComponentId="LogSystemLocation"/>
         <Component ExportedId="RuntimeStatus" ComponentId="Application/RuntimeStatus"/>
     </ExportedComponents>
 </Acf>
