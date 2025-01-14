@@ -234,7 +234,7 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 {
 	imtlic::CIdentifiableLicenseDefinition* licenseInfoPtr = dynamic_cast<imtlic::CIdentifiableLicenseDefinition*>(&object);
 	if (licenseInfoPtr == nullptr){
-		errorMessage = QString("Unable to update representation from object. Error: Object is invalid");
+		errorMessage = QString("Object is invalid");
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return false;
@@ -255,7 +255,7 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (licenseId.isEmpty()){
-		errorMessage = QString("Unable to create license with an empty License-ID");
+		errorMessage = QString("Empty License-ID");
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return false;

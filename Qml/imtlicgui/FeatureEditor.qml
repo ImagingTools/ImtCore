@@ -261,7 +261,7 @@ ViewBase {
                     }
 
                     onError: {
-                        ModalDialogManager.showWarningDialog(message);
+						// ModalDialogManager.showWarningDialog(message);
                     }
                 } }
 

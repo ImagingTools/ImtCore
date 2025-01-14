@@ -507,7 +507,7 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 		name = *productDataRepresentation.ProductName;
 	}
 	if (name.isEmpty()){
-		errorMessage = QT_TR_NOOP("Unable to create product with an empty product name");
+		errorMessage = QT_TR_NOOP("Product name is empty");
 		SendErrorMessage(0, errorMessage, "Product controller");
 
 		return false;
