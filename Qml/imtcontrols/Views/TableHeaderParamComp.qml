@@ -73,8 +73,10 @@ Dialog {
 					for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
 						let id = leftTable.elements.getData("Id", i)
 						let visible = item.checkedIndexes.includes(i);
+						let headerSize = dialog.tableViewParamsCopied.getHeaderSize(id)
+
 						dialog.tableViewParamsCopied.setHeaderVisible(id, visible);
-						if(!dialog.tableItem.isFlickable){
+						if(!dialog.tableItem.isFlickable || Number(headerSize === 0)){
 							dialog.tableViewParamsCopied.setHeaderSize(id, visible ? -1 : 0);
 						}
 					}
