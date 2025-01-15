@@ -76,7 +76,7 @@ Dialog {
 						let headerSize = dialog.tableViewParamsCopied.getHeaderSize(id)
 
 						dialog.tableViewParamsCopied.setHeaderVisible(id, visible);
-						if(!dialog.tableItem.isFlickable || Number(headerSize === 0)){
+						if(!dialog.tableItem.isFlickable || Number(headerSize) === 0){
 							dialog.tableViewParamsCopied.setHeaderSize(id, visible ? -1 : 0);
 						}
 					}
