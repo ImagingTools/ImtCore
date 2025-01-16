@@ -64,6 +64,48 @@ ControlBase {
         Events.unSubscribeEvent("OnLocalizationChanged", dialogContainer.onLocalizationChanged);
     }
 
+	function addButton(id, name, enabled){
+		buttonsModel.append({Id: id, Name:name, Enabled: enabled})
+	}
+
+	function insertButton(id, name, enabled, index){
+		buttonsModel.insert(index, {Id: id, Name:name, Enabled: enabled})
+	}
+
+	function removeButton(id){
+		for(let i = 0; i < buttonsModel.count; i++){
+			let buttonId = buttonsModel.get(i).Id;
+			if (buttonId === id){
+				buttonsModel.remove(i);
+				break;
+			}
+		}
+	}
+
+	function clearButtons(){
+		buttonsModel.clear();
+	}
+
+	function setButtonName(id, name){
+		for(let i = 0; i < buttonsModel.count; i++){
+			let buttonId = buttonsModel.get(i).Id;
+			if (buttonId === id){
+				buttonsModel.setProperty(i, "Name", name);
+				break;
+			}
+		}
+	}
+
+	function setButtonEnabled(id, enabled){
+		for(let i = 0; i < buttonsModel.count; i++){
+			let buttonId = buttonsModel.get(i).Id;
+			if (buttonId === id){
+				buttonsModel.setProperty(i, "Enabled", enabled);
+				break;
+			}
+		}
+	}
+
     function onLocalizationChanged(language){
         dialogContainer.localizationChanged(language);
     }

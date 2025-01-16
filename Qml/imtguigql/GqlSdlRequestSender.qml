@@ -44,7 +44,7 @@ GqlRequest {
 
 	property var inputParams: Gql.GqlObject("input");
 
-	signal finished();
+	signal finished(int status); // If status -1 - error, 1 - success response
 
 	function addInputParam(id, value){
 		inputParams.InsertField(id, value);
@@ -64,7 +64,7 @@ GqlRequest {
 		sdlObject = sdlObjectComp.createObject(root);
 		sdlObject.fromObject(data);
 
-		root.finished();
+		root.finished(1);
 	}
 
 	function onError(message, type){
@@ -80,6 +80,8 @@ GqlRequest {
 		else if (type == "Error"){
 			ModalDialogManager.showErrorDialog(message);
 		}
+
+		root.finished(-1);
 	}
 
 	function getHeaders(){

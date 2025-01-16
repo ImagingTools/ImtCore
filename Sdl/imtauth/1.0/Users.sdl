@@ -1,84 +1,84 @@
 schema {
-	query: Query
-	mutation: Mutation
-	subscription: Subscription
-	name: Users
-	namespace: imtauth
-	version: 1.0
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
+    name: Users
+    namespace: imtauth
+    version: 1.0
 }
 
 import {
-	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
 }
 
 input UsersListInput {
-	ProductId: ID
-	viewParams: CollectionViewParams
+    ProductId: ID
+    viewParams: CollectionViewParams
 }
 
 type UserItem {
-	Id: ID!
-	TypeId: ID!
-	UserId: ID
-	Name: String
-	Description: String
-	Mail: String
-	SystemId: ID
-	SystemName: String
-	Roles: ID
-	Groups: ID
-	Added: String
-	LastModified: String
-	LastConnection: String
+    Id: ID!
+    TypeId: ID!
+    UserId: ID
+    Name: String
+    Description: String
+    Mail: String
+    SystemId: ID
+    SystemName: String
+    Roles: ID
+    Groups: ID
+    Added: String
+    LastModified: String
+    LastConnection: String
 }
 
 type UsersListPayload {
-	items: [UserItem]
-	notification: NotificationItem
+    items: [UserItem]
+    notification: NotificationItem
 }
 
 type SystemInfo {
-	Id: ID
-	Name: String
-	Enabled: Bool
+    Id: ID
+    Name: String
+    Enabled: Bool
 }
 
 type UserData {
-	Id: ID
-	ProductId: ID
-	Name: String
-	Username: ID
-	Password: String
-	Email: String
-	Groups: ID
-	Roles: ID
-	Permissions: ID
-	SystemInfos: [SystemInfo]
+    Id: ID
+    ProductId: ID
+    Name: String
+    Username: ID
+    Password: String
+    Email: String
+    Groups: ID
+    Roles: ID
+    Permissions: ID
+    SystemInfos: [SystemInfo]
 }
 
 input UserDataInput {
-	Id: ID!
-	ProductId: ID!
-	Item: UserData!
+    Id: ID!
+    ProductId: ID!
+    Item: UserData!
 }
 
 type UserDataPayload {
-	UserData: UserData
+    UserData: UserData
 }
 
 input UserItemInput {
-	Id: ID!
-	ProductId: ID!
+    Id: ID!
+    ProductId: ID!
 }
 
 input ChangePasswordInput {
-	UserId: ID
-	OldPassword: String
-	NewPassword: String
+    Login: ID
+    OldPassword: String
+    NewPassword: String
 }
 
 input ChangePasswordPayload {
-	UserId: ID!
+    Success: Boolean
 }
 
 input RegisterUserInput {
@@ -87,12 +87,14 @@ input RegisterUserInput {
 }
 
 input CheckEmailInput {
-    Login: ID!
     Email: String!
 }
 
 type CheckEmailPayload {
-    CorrectEmail: Boolean!
+    UserName: String
+    Login: ID
+    Success: Boolean
+    Message: String
 }
 
 type RegisterUserPayload {
@@ -101,38 +103,54 @@ type RegisterUserPayload {
 
 input SendEmailCodeInput {
     Login: ID!
-    Email: String!
+}
+
+input CheckEmailCodeInput {
+    Login: ID!
+    Code: String!
+}
+
+type CheckEmailCodePayload {
+    CorrectCode: Boolean!
+    Message: String
+}
+
+type SendEmailCodePayload {
+    Login: ID!
+    Success: Boolean!
+    Message: String
 }
 
 type Query {
     UsersList (input:UsersListInput): UsersListPayload!
     UserItem (input: UserItemInput): UserDataPayload!
     CheckEmail (input: CheckEmailInput): CheckEmailPayload!
-    SendEmailCode (input: CheckEmailInput): CheckEmailPayload!
+    SendEmailCode (input: SendEmailCodeInput): SendEmailCodePayload!
+    CheckEmailCode (input: CheckEmailCodeInput): CheckEmailCodePayload!
 }
 
 type Mutation {
-	UserUpdate (input: UserDataInput): UpdatedNotificationPayload!
-	UserAdd (input: UserDataInput): AddedNotificationPayload!
-	ChangePassword (input: ChangePasswordInput): ChangePasswordPayload!
-        RegisterUser (input: RegisterUserInput): RegisterUserPayload!
+    UserUpdate (input: UserDataInput): UpdatedNotificationPayload!
+    UserAdd (input: UserDataInput): AddedNotificationPayload!
+    ChangePassword (input: ChangePasswordInput): ChangePasswordPayload!
+    RegisterUser (input: RegisterUserInput): RegisterUserPayload!
 }
 
 collectionSchema {
-	type User {
-		ref: UserItem
-		operations {
-			list: UsersList
-		}
-		subtype User {
-			ref: UserData
-			operations {
-				get: UserItem
-				update: UserUpdate
-				insert: UserAdd
-			}
-		}
-	}
+    type User {
+        ref: UserItem
+        operations {
+                list: UsersList
+        }
+        subtype User {
+            ref: UserData
+            operations {
+                get: UserItem
+                update: UserUpdate
+                insert: UserAdd
+            }
+        }
+    }
 }
 
 

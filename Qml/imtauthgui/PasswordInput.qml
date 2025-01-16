@@ -9,13 +9,7 @@ Column {
     property alias oldPassword: currentPasswordInput.text;
     property alias newPassword: newPasswordInput1.text;
     property bool accepted: false;
-
-    Component.onCompleted: {
-        if (AuthorizationController.loggedUserIsSuperuser()){
-            currentPasswordInput.visible = false;
-            currentPasswordInput.text = " ";
-        }
-    }
+	property bool currentPasswordInputVisible: true;
 
     onFocusChanged: {
         if (root.focus){
@@ -31,6 +25,15 @@ Column {
 
         newPasswordInput2.bottomComp = root.accepted ? emptyComp : errorComp;
     }
+
+	Component.onCompleted: {
+		if (currentPasswordInputVisible){
+			currentPasswordInput.forceActiveFocus();
+		}
+		else{
+			oldPasswordGroup.forceActiveFocus();
+		}
+	}
 
     Component {
         id: errorComp;
@@ -56,6 +59,13 @@ Column {
         name: qsTr("Current password");
         echoMode: TextInput.Password;
         placeHolderText: qsTr("Enter the current password");
+		visible: root.currentPasswordInputVisible;
+		onVisibleChanged: {
+			if (!visible){
+				text = " ";
+			}
+		}
+
         onEditingFinished: {
         }
 
@@ -71,12 +81,12 @@ Column {
             name: qsTr("New password");
             echoMode: TextInput.Password;
             placeHolderText: qsTr("Enter the new password");
-            readOnly: currentPasswordInput.text === "";
+			readOnly: currentPasswordInput.visible && currentPasswordInput.text === "";
             onTextChanged: {
                 root.checkPassword();
             }
             KeyNavigation.tab: newPasswordInput2;
-            KeyNavigation.backtab: currentPasswordInput;
+			KeyNavigation.backtab: currentPasswordInput.visible ? currentPasswordInput : newPasswordInput2;
         }
 
         TextInputElementView {
@@ -84,12 +94,12 @@ Column {
             name: qsTr("Confirm password");
             echoMode: TextInput.Password;
             placeHolderText: qsTr("Confirm password");
-            readOnly: currentPasswordInput.text === "";
+			readOnly: newPasswordInput1.readOnly;
             bottomComp: emptyComp;
             onTextChanged: {
                 root.checkPassword();
             }
-            KeyNavigation.tab: currentPasswordInput;
+			KeyNavigation.tab: currentPasswordInput.visible ? currentPasswordInput : newPasswordInput1;
             KeyNavigation.backtab: newPasswordInput1;
         }
     }

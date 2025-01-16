@@ -549,7 +549,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateOperationDescriptionQuery(con
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(objectInfo.id))
 				.arg(objectInfo.name)
-				.arg(operationDescription)
+				.arg(SqlEncode(operationDescription))
 				.arg(qPrintable(objectId))
 				.toUtf8();
 		}

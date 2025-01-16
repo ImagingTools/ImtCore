@@ -8,6 +8,8 @@ Dialog {
 
     width: 700;
 
+	property bool currentPasswordInputVisible: true;
+
     Component.onCompleted: {
         buttonsModel.append({Id: Enums.save, Name:qsTr("Save"), Enabled: false})
         buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
@@ -38,6 +40,7 @@ Dialog {
                 anchors.leftMargin: Style.size_largeMargin;
                 anchors.right: parent.right;
                 anchors.rightMargin: Style.size_largeMargin;
+				currentPasswordInputVisible: rootDialog.currentPasswordInputVisible;
 
                 onAcceptedChanged: {
                     if (rootDialog.buttons){

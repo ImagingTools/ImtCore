@@ -194,9 +194,11 @@ ViewBase {
                     id: changePasswordComp;
                     ChangePasswordDialog {
                         title: qsTr("Change Password");
+						currentPasswordInputVisible: !AuthorizationController.loggedUserIsSuperuser();
+
                         onFinished: {
                             if (buttonId == Enums.save){
-                                AuthorizationController.changePassword(container.profileData.m_id, contentItem.oldPassword, contentItem.newPassword);
+								AuthorizationController.changePassword(container.profileData.m_username, contentItem.oldPassword, contentItem.newPassword);
                             }
                         }
                     }

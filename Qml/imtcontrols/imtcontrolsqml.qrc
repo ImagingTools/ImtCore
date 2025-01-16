@@ -94,6 +94,8 @@
         <file alias="imtcontrols/Models/DoubleValidator.qml">Models/DoubleValidator.qml</file>
         <file alias="imtcontrols/Models/NavigationController.qml">Models/NavigationController.qml</file>
 	<file alias="imtcontrols/Models/PopupMenuModel.qml">Models/PopupMenuModel.qml</file>
+	<file alias="imtcontrols/Models/MailRegExpValidator.qml">Models/MailRegExpValidator.qml</file>
+
         <file alias="imtcontrols/Views/TableRowViewer.qml">Views/TableRowViewer.qml</file>
         <file alias="imtcontrols/Views/TableRowDelegateBase.qml">Views/TableRowDelegateBase.qml</file>
         <file alias="imtcontrols/Views/TablePainterRowDelegateBase.qml">Views/TablePainterRowDelegateBase.qml</file>

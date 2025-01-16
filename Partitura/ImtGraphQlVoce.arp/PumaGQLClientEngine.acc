@@ -250,6 +250,8 @@
                                 <Value>UserItemTypeId</Value>
                                 <Value>RegisterUser</Value>
                                 <Value>CheckEmail</Value>
+                                <Value>CheckEmailCode</Value>
+                                <Value>SendEmailCode</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

@@ -96,6 +96,114 @@ sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CObjectCollectionControllerComp
 }
 
 
+// sdl::imtbase::ImtCollection::CHeadersInfo::V1_0 CObjectCollectionControllerCompBase::OnGetHeaders(
+// 			const sdl::imtbase::ImtCollection::V1_0::CGetHeadersGqlRequest& /*getHeadersRequest*/,
+// 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+// 			QString& /*errorMessage*/) const
+// {
+// 	return sdl::imtbase::ImtCollection::CHeadersInfo::V1_0();
+// }
+
+
+// sdl::imtbase::ImtCollection::CStandardResponse::V1_0 CObjectCollectionControllerCompBase::OnSetElementName(
+// 			const sdl::imtbase::ImtCollection::V1_0::CSetElementNameGqlRequest& setElementNameRequest,
+// 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+// 			QString& errorMessage) const
+// {
+// 	sdl::imtbase::ImtCollection::CStandardResponse::V1_0 response;
+
+// 	sdl::imtbase::ImtCollection::V1_0::SetElementNameRequestArguments arguments = setElementNameRequest.GetRequestedArguments();
+
+// 	QByteArray objectId;
+// 	if (arguments.input.ObjectId){
+// 		objectId = *arguments.input.ObjectId;
+// 	}
+
+// 	QString name;
+// 	if (arguments.input.Name){
+// 		name = *arguments.input.Name;
+// 	}
+
+// 	if (!m_objectCollectionCompPtr->SetElementName(objectId, name)){
+// 		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(name).arg(qPrintable(objectId));
+// 		SendErrorMessage(0, errorMessage, "Object collection controller");
+
+// 		return response;
+// 	}
+
+// 	response.Result = true;
+
+// 	return response;
+// }
+
+
+// sdl::imtbase::ImtCollection::CStandardResponse::V1_0 CObjectCollectionControllerCompBase::OnSetElementDescription(
+// 	const sdl::imtbase::ImtCollection::V1_0::CSetElementDescriptionGqlRequest& setElementDescriptionRequest,
+// 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+// 	QString& errorMessage) const
+// {
+// 	sdl::imtbase::ImtCollection::CStandardResponse::V1_0 response;
+
+// 	sdl::imtbase::ImtCollection::V1_0::SetElementDescriptionRequestArguments arguments = setElementDescriptionRequest.GetRequestedArguments();
+
+// 	QByteArray objectId;
+// 	if (arguments.input.ObjectId){
+// 		objectId = *arguments.input.ObjectId;
+// 	}
+
+// 	QString description;
+// 	if (arguments.input.Description){
+// 		description = *arguments.input.Description;
+// 	}
+
+// 	if (!m_objectCollectionCompPtr->SetElementDescription(objectId, description)){
+// 		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description).arg(qPrintable(objectId));
+// 		SendErrorMessage(0, errorMessage, "Object collection controller");
+
+// 		return response;
+// 	}
+
+// 	response.Result = true;
+
+// 	return response;
+// }
+
+
+// sdl::imtbase::ImtCollection::CStandardResponse::V1_0 CObjectCollectionControllerCompBase::OnRemoveElement(
+// 	const sdl::imtbase::ImtCollection::V1_0::CRemoveElementGqlRequest& removeElementRequest,
+// 	const ::imtgql::CGqlRequest& gqlRequest,
+// 	QString& errorMessage) const
+// {
+// 	sdl::imtbase::ImtCollection::CStandardResponse::V1_0 response;
+
+// 	sdl::imtbase::ImtCollection::V1_0::RemoveElementRequestArguments arguments = removeElementRequest.GetRequestedArguments();
+
+// 	QByteArray objectId;
+// 	if (arguments.input.ObjectId){
+// 		objectId = *arguments.input.ObjectId;
+// 	}
+
+// 	imtbase::IObjectCollection::DataPtr dataPtr;
+// 	m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
+
+// 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
+// 	if (m_operationContextControllerCompPtr.IsValid()){
+// 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", objectId, *dataPtr.GetPtr());
+// 	}
+
+// 	if (!m_objectCollectionCompPtr->RemoveElement(objectId, operationContextPtr.GetPtr())){
+// 		errorMessage = QString("Can't remove object with ID: '%1'").arg(QString(objectId));
+// 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+// 		return response;
+// 	}
+
+// 	response.Result = true;
+
+// 	return response;
+// }
+
+
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResponse(

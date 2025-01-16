@@ -2,387 +2,502 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtauthUsersSdl 1.0
 
 Rectangle {
-    id: authPageContainer;
+	id: authPageContainer;
 
-    color: "transparent";
+	color: "transparent";
 
-    property string state:"";
+	property string state:"";
 
-    property int mainRadius: 3;
-    property string mainColor: Style.backgroundColor;
+	property int mainRadius: 3;
+	property string mainColor: Style.backgroundColor;
 
-    property bool canRecoveryPassword: true;
+	property bool canRecoveryPassword: true;
+	property bool canRegisterUser: false;
 
-    property string appName: context.appName
+	property string appName: context.appName
 
-    Component.onCompleted: {
-        decoratorPause.start();
-        Events.subscribeEvent("OnLocalizationChanged", authPageContainer.onLocalizationChanged);
-    }
+	Component.onCompleted: {
+		decoratorPause.start();
+		Events.subscribeEvent("OnLocalizationChanged", authPageContainer.onLocalizationChanged);
+	}
 
-    Component.onDestruction: {
-        Events.unSubscribeEvent("OnLocalizationChanged", authPageContainer.onLocalizationChanged);
-    }
+	Component.onDestruction: {
+		Events.unSubscribeEvent("OnLocalizationChanged", authPageContainer.onLocalizationChanged);
+	}
 
-    function onLocalizationChanged(language){
-        titleLogin.text = qsTr("Login")
-    }
+	function onLocalizationChanged(language){
+		titleLogin.text = qsTr("Login")
+	}
 
-    onVisibleChanged: {
-        if (authPageContainer.visible){
-            authPageContainer.state = "unauthorized";
+	onVisibleChanged: {
+		if (authPageContainer.visible){
+			authPageContainer.state = "unauthorized";
 
-            passwordTextInput.text = "";
-            loginTextInput.text = "";
+			passwordTextInput.text = "";
+			loginTextInput.text = "";
 
-            loginTextInput.focus = true;
-        }
-    }
+			loginTextInput.focus = true;
+		}
+	}
 
-    function passwordRecovery(){
-        console.log("passwordRecovery");
-    }
+	function passwordRecovery(){
+		console.log("passwordRecovery");
 
-    function setDecorators(){
-        if(inputDecoratorLoader1.item && inputDecoratorLoader1.item.rootItem){
-            inputDecoratorLoader1.item.rootItem = loginTextInput;
-        }
-        if(titleDecoratorLoader2.item && inputDecoratorLoader2.item.rootItem){
-            titleDecoratorLoader2.item.rootItem = titlePassword;
-        }
-        if(inputDecoratorLoader2.item && inputDecoratorLoader2.item.rootItem){
-            inputDecoratorLoader2.item.rootItem = passwordTextInput;
-        }
-    }
+		ModalDialogManager.openDialog(passwordRecoveryDialogComp, {});
+	}
 
-    function onLogin(login, password){
-        Events.sendEvent("Login", {"Login": login, "Password": password})
-    }
+	function setDecorators(){
+		if(inputDecoratorLoader1.item && inputDecoratorLoader1.item.rootItem){
+			inputDecoratorLoader1.item.rootItem = loginTextInput;
+		}
+		if(titleDecoratorLoader2.item && inputDecoratorLoader2.item.rootItem){
+			titleDecoratorLoader2.item.rootItem = titlePassword;
+		}
+		if(inputDecoratorLoader2.item && inputDecoratorLoader2.item.rootItem){
+			inputDecoratorLoader2.item.rootItem = passwordTextInput;
+		}
+	}
 
-    Rectangle{
-        anchors.fill: parent;
-        color: "gray";
-        opacity: 0.5;
-    }
+	function onLogin(login, password){
+		Events.sendEvent("Login", {"Login": login, "Password": password})
+	}
 
-    PauseAnimation {
-        id: decoratorPause;
+	Rectangle{
+		anchors.fill: parent;
+		color: "gray";
+		opacity: 0.5;
+	}
 
-        duration: 500;
+	PauseAnimation {
+		id: decoratorPause;
 
-        onFinished: {
-            authPageContainer.setDecorators();
-        }
-    }
+		duration: 500;
 
-    Component{
-        id: emptyDecorator;
-        Item{
-            property Item rootItem: null;
-        }
-    }
+		onFinished: {
+			authPageContainer.setDecorators();
+		}
+	}
 
-    MouseArea {
-        anchors.fill: parent;
+	Component{
+		id: emptyDecorator;
+		Item{
+			property Item rootItem: null;
+		}
+	}
 
-        onClicked: {}
-    }
+	MouseArea {
+		anchors.fill: parent;
 
-    Rectangle {
-        id: loginContainer;
+		onClicked: {}
+	}
 
-        anchors.horizontalCenter: parent.horizontalCenter;
-        anchors.verticalCenter: parent.verticalCenter;
+	Rectangle {
+		id: loginContainer;
 
-        width: 400;
-        //height: 380;
-        height: bodyColumn.height + headerItem.height;
+		anchors.horizontalCenter: parent.horizontalCenter;
+		anchors.verticalCenter: parent.verticalCenter;
 
-        radius: authPageContainer.mainRadius;
-        color: authPageContainer.mainColor;
+		width: 400;
+		//height: 380;
+		height: bodyColumn.height + headerItem.height;
 
-        clip: true;
+		radius: authPageContainer.mainRadius;
+		color: authPageContainer.mainColor;
 
-        Component{
-            id: headerDefaultComp;
+		clip: true;
 
-            Rectangle{
-                id: headerRec;
+		Component{
+			id: headerDefaultComp;
 
-                width: loginContainer.width;
-                height: 80;
+			Rectangle{
+				id: headerRec;
 
-                color: loginContainer.color;
-                radius: loginContainer.radius;
+				width: loginContainer.width;
+				height: 80;
 
-                Text{
-                    id: welcomeText;
+				color: loginContainer.color;
+				radius: loginContainer.radius;
 
-                    anchors.top: parent.top;
-                    anchors.topMargin: 30;
-                    anchors.left: parent.left;
-                    anchors.leftMargin: (parent.width - welcomeText.width)/2;
+				Text{
+					id: welcomeText;
 
-                    color: Style.textColor;
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_title;
+					anchors.top: parent.top;
+					anchors.topMargin: 30;
+					anchors.left: parent.left;
+					anchors.leftMargin: (parent.width - welcomeText.width)/2;
 
-                    text: authPageContainer.appName !== "" ? qsTr("Welcome to") + " " + authPageContainer.appName : qsTr("Welcome");
-                }
-            }
-        }
+					color: Style.textColor;
+					font.family: Style.fontFamily;
+					font.pixelSize: Style.fontSize_title;
 
-        Item{
-            id: headerItem;
+					text: authPageContainer.appName !== "" ? qsTr("Welcome to") + " " + authPageContainer.appName : qsTr("Welcome");
+				}
+			}
+		}
 
-            width: parent.width;
-            height: 70;
+		Item{
+			id: headerItem;
 
-            Loader{
-                id: headerLoader;
+			width: parent.width;
+			height: 70;
 
-                anchors.horizontalCenter: parent.horizontalCenter;
+			Loader{
+				id: headerLoader;
 
-                sourceComponent: Style.authorizationHeaderDecorator !== undefined ? Style.authorizationHeaderDecorator: headerDefaultComp;
+				anchors.horizontalCenter: parent.horizontalCenter;
 
-                onLoaded:{
-                    headerItem.height = headerLoader.item.height;
-                    headerLoader.width = headerLoader.item.width;
-                    headerLoader.height = headerLoader.item.height;
-                }
-            }
-        }
+				sourceComponent: Style.authorizationHeaderDecorator !== undefined ? Style.authorizationHeaderDecorator: headerDefaultComp;
 
+				onLoaded:{
+					headerItem.height = headerLoader.item.height;
+					headerLoader.width = headerLoader.item.width;
+					headerLoader.height = headerLoader.item.height;
+				}
+			}
+		}
 
-        Column {
-            id: bodyColumn;
 
-            anchors.top: headerItem.bottom;
-            anchors.horizontalCenter: parent.horizontalCenter;
+		Column {
+			id: bodyColumn;
 
-            spacing: Style.size_mainMargin;
+			anchors.top: headerItem.bottom;
+			anchors.horizontalCenter: parent.horizontalCenter;
 
-            Text {
-                id: titleLogin;
+			spacing: Style.size_mainMargin;
 
-                color: Style.textColor;
-                font.family: Style.fontFamilyBold;
-                font.pixelSize: Style.fontSize_common;
+			Text {
+				id: titleLogin;
 
-                text: qsTr("Login");
+				color: Style.textColor;
+				font.family: Style.fontFamilyBold;
+				font.pixelSize: Style.fontSize_common;
 
-                Loader{
-                    id: titleDecoratorLoader1;
+				text: qsTr("Login");
 
-                    sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                    onLoaded: {
-                    }
-                }
-            }
+				Loader{
+					id: titleDecoratorLoader1;
 
-            CustomTextField {
-                id: loginTextInput;
+					sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
+					onLoaded: {
+					}
+				}
+			}
 
-                width: 300;
-                height: 30;
+			CustomTextField {
+				id: loginTextInput;
 
-                placeHolderText: qsTr("Enter the login");
-                KeyNavigation.tab: passwordTextInput;
-                KeyNavigation.backtab: passwordTextInput;
+				width: 300;
+				height: 30;
 
-                onTextChanged: {
-                    if (errorMessage.text != ""){
-                        errorMessage.text = "";
-                    }
-                }
+				placeHolderText: qsTr("Enter the login");
+				KeyNavigation.tab: passwordTextInput;
+				KeyNavigation.backtab: passwordTextInput;
 
-                onAccepted: {
-                    if (passwordTextInput.text != "" && loginTextInput.text != ""){
-                        loginButton.clicked();
-                    }
-                    else if(loginTextInput.text != ""){
-                        passwordTextInput.forceActiveFocus();
-                    }
-                }
+				onTextChanged: {
+					if (errorMessage.text != ""){
+						errorMessage.text = "";
+					}
+				}
 
-                Loader{
-                    id: inputDecoratorLoader1;
+				onAccepted: {
+					if (passwordTextInput.text != "" && loginTextInput.text != ""){
+						loginButton.clicked();
+					}
+					else if(loginTextInput.text != ""){
+						passwordTextInput.forceActiveFocus();
+					}
+				}
 
-                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                    onLoaded: {
-                    }
-                }
-            }
+				Loader{
+					id: inputDecoratorLoader1;
 
-            Text {
-                id: titlePassword;
+					sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+					onLoaded: {
+					}
+				}
+			}
 
-                color: Style.textColor;
-                font.family: Style.fontFamilyBold;
-                font.pixelSize: Style.fontSize_common;
+			Text {
+				id: titlePassword;
 
-                text: qsTr("Password");
+				color: Style.textColor;
+				font.family: Style.fontFamilyBold;
+				font.pixelSize: Style.fontSize_common;
 
-                Loader{
-                    id: titleDecoratorLoader2;
+				text: qsTr("Password");
 
-                    sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                    onLoaded: {
-                    }
-                }
-            }
+				Loader{
+					id: titleDecoratorLoader2;
 
-            CustomTextField {
-                id: passwordTextInput;
+					sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
+					onLoaded: {
+					}
+				}
+			}
 
-                width: 300;
-                height: 30;
+			CustomTextField {
+				id: passwordTextInput;
 
-                placeHolderText: qsTr("Enter the password");
-                echoMode: TextInput.Password;
+				width: 300;
+				height: 30;
 
-                KeyNavigation.tab: loginTextInput;
-                KeyNavigation.backtab: loginTextInput;
+				placeHolderText: qsTr("Enter the password");
+				echoMode: TextInput.Password;
 
-                onTextChanged: {
-                    if (errorMessage.text != ""){
-                        errorMessage.text = "";
-                    }
-                }
+				KeyNavigation.tab: loginTextInput;
+				KeyNavigation.backtab: loginTextInput;
 
-                onAccepted: {
-                    if (passwordTextInput.text != "" && loginTextInput.text != ""){
-                        loginButton.clicked();
-                    }
-                }
+				onTextChanged: {
+					if (errorMessage.text != ""){
+						errorMessage.text = "";
+					}
+				}
 
-                Loader{
-                    id: inputDecoratorLoader2;
+				onAccepted: {
+					if (passwordTextInput.text != "" && loginTextInput.text != ""){
+						loginButton.clicked();
+					}
+				}
 
-                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                    onLoaded: {
+				Loader{
+					id: inputDecoratorLoader2;
 
-                    }
-                }
+					sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+					onLoaded: {
 
-                ToolButton {
-                    id: eyeButton;
+					}
+				}
 
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.right: parent.right;
-                    anchors.rightMargin: 4;
+				ToolButton {
+					id: eyeButton;
 
-                    height: Math.min(24, parent.height - 10);
-                    width: height;
-                    z: 20
+					anchors.verticalCenter: parent.verticalCenter;
+					anchors.right: parent.right;
+					anchors.rightMargin: 4;
 
-                    iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../" + Style.getIconPath("Icons/ShownPassword", Icon.State.On, Icon.Mode.Normal) :
-                                                                                   "../../../" + Style.getIconPath("Icons/HiddenPassword", Icon.State.On, Icon.Mode.Normal) ;
+					height: Math.min(24, parent.height - 10);
+					width: height;
+					z: 20
 
-                    onClicked: {
-                        if(passwordTextInput.echoMode == TextInput.Password){
-                            passwordTextInput.echoMode = TextInput.Normal;
-                        }
-                        else if(passwordTextInput.echoMode == TextInput.Normal){
-                            passwordTextInput.echoMode = TextInput.Password;
-                        }
-                    }
-                }
-            }
+					iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../" + Style.getIconPath("Icons/ShownPassword", Icon.State.On, Icon.Mode.Normal) :
+																				   "../../../" + Style.getIconPath("Icons/HiddenPassword", Icon.State.On, Icon.Mode.Normal) ;
 
-            Item{
-                id: passwordRecoveryItem;
+					onClicked: {
+						if(passwordTextInput.echoMode == TextInput.Password){
+							passwordTextInput.echoMode = TextInput.Normal;
+						}
+						else if(passwordTextInput.echoMode == TextInput.Normal){
+							passwordTextInput.echoMode = TextInput.Password;
+						}
+					}
+				}
+			}
 
-                width: parent.width;
-                height: titlePasswordRecovery.height;
+			Item{
+				id: passwordRecoveryItem;
 
-                visible: authPageContainer.canRecoveryPassword;
+				width: parent.width;
+				height: titlePasswordRecovery.height;
 
-                Text {
-                    id: titlePasswordRecovery;
+				visible: authPageContainer.canRecoveryPassword;
 
-                    anchors.right: parent.right;
+				Text {
+					id: titlePasswordRecovery;
 
-                    color: Style.textColor;
-                    font.family: Style.fontFamilyBold;
-                    font.pixelSize: Style.fontSize_common;
-                    font.underline: true;
+					anchors.right: parent.right;
 
-                    text: qsTr("Password recovery");
+					color: Style.textColor;
+					font.family: Style.fontFamilyBold;
+					font.pixelSize: Style.fontSize_common;
+					font.underline: true;
 
-                    Loader{
-                        id: titleDecoratorLoader3;
+					text: qsTr("Password recovery");
 
-                        sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                        onLoaded: {
-                        }
-                    }
-                }
+					Loader{
+						id: titleDecoratorLoader3;
 
-                MouseArea{
-                    id: passwordRecoveryMA;
+						sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
+						onLoaded: {
+						}
+					}
+				}
 
-                    anchors.fill: parent;
+				MouseArea{
+					id: passwordRecoveryMA;
 
-                    cursorShape: Qt.PointingHandCursor;
-                    hoverEnabled: true;
-                    onClicked: {
-                        authPageContainer.passwordRecovery();
-                    }
-                }
-            }
+					anchors.fill: parent;
 
-            Item{
-                id: errorMessageItem;
+					cursorShape: Qt.PointingHandCursor;
+					hoverEnabled: true;
+					onClicked: {
+						authPageContainer.passwordRecovery();
+					}
+				}
+			}
 
-                width: parent.width;
-                height: 20;
+			Item{
+				id: registerItem;
+				width: parent.width;
+				height: registerUserText.height;
+				visible: authPageContainer.canRegisterUser;
 
-                Text {
-                    id: errorMessage;
+				Text {
+					id: registerUserText;
 
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.horizontalCenter: parent.horizontalCenter;
+					anchors.right: parent.right;
 
-                    color:  Style.errorTextColor;
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
+					color: Style.textColor;
+					font.family: Style.fontFamilyBold;
+					font.pixelSize: Style.fontSize_common;
+					font.underline: true;
 
-                    visible:  errorMessage.text != "";
-                }
-            }
+					text: qsTr("Register");
 
-            Item {
-                id: buttonItem;
+					Loader{
+						sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
+						onLoaded: {
+						}
+					}
+				}
 
-                width: parent.width;
-                height: 70;
+				MouseArea{
+					anchors.fill: registerUserText;
 
-                Button{
-                    id: loginButton;
+					cursorShape: Qt.PointingHandCursor;
+					hoverEnabled: true;
+					onClicked: {
+						ModalDialogManager.openDialog(registerDialogComp, {});
+					}
+				}
+			}
 
-                    anchors.centerIn: parent;
-                    width: 100;
-                    height: 30;
+			Item{
+				id: errorMessageItem;
 
-                    property int loadingCount: 0;//for web
-                    function setItemPropertiesAdd(){
-                        if(loginButton.loadingCount > 0){
-                            loginButton.width = 0;
-                        }
-                    }
+				width: parent.width;
+				height: 20;
 
-                    enabled: loginTextInput.text != "" && passwordTextInput.text != "";
+				Text {
+					id: errorMessage;
 
-                    text: qsTr("Login");
+					anchors.verticalCenter: parent.verticalCenter;
+					anchors.horizontalCenter: parent.horizontalCenter;
 
-                    onClicked: {
-                        authPageContainer.onLogin(loginTextInput.text, passwordTextInput.text)
-                    }
-                }
-            }//
-        }//bodyColumn
-    }
+					color:  Style.errorTextColor;
+					font.family: Style.fontFamily;
+					font.pixelSize: Style.fontSize_common;
+
+					visible:  errorMessage.text != "";
+				}
+			}
+
+			Item {
+				id: buttonItem;
+
+				width: parent.width;
+				height: 70;
+
+				Button{
+					id: loginButton;
+
+					anchors.centerIn: parent;
+					width: 100;
+					height: 30;
+
+					property int loadingCount: 0;//for web
+					function setItemPropertiesAdd(){
+						if(loginButton.loadingCount > 0){
+							loginButton.width = 0;
+						}
+					}
+
+					enabled: loginTextInput.text != "" && passwordTextInput.text != "";
+
+					text: qsTr("Login");
+
+					onClicked: {
+						authPageContainer.onLogin(loginTextInput.text, passwordTextInput.text)
+					}
+				}
+			}//
+		}//bodyColumn
+	}
+
+	PasswordRecoveryDialog {
+		id: passwordRecoveryDialogComp;
+	}
+
+	property Component registerDialogComp: Component {
+		Dialog {
+			id: registerFialog;
+			width: 700;
+			height: ModalDialogManager.activeView.height - 100;
+			title: qsTr("User Registration");
+			canMove: false;
+
+			property UserData userData: UserData {
+				m_id: UuidGenerator.generateUUID();
+			}
+
+			Component.onCompleted: {
+				addButton(Enums.save, qsTr("Register"), true);
+				addButton(Enums.close, qsTr("Close"), true);
+			}
+
+			contentComp: Component {
+				Item {
+					width: registerFialog.width;
+					height: registerFialog.height - 100;
+
+					clip: true;
+
+					CustomScrollbar {
+						id: scrollbar;
+
+						z: parent.z + 1;
+
+						anchors.right: parent.right;
+						anchors.top: flickable.top;
+						anchors.bottom: flickable.bottom;
+
+						secondSize: 10;
+						targetItem: flickable;
+
+						radius: 2;
+					}
+
+					Flickable {
+						id: flickable;
+						anchors.left: parent.left;
+						anchors.leftMargin: Style.size_largeMargin;
+						anchors.right: parent.right
+						anchors.rightMargin: Style.size_largeMargin;
+						height: parent.height;
+
+						contentHeight: userGeneralEditor.height;
+						contentWidth: width;
+
+						UserGeneralEditor {
+							id: userGeneralEditor;
+							width: flickable.width;
+							userData: registerFialog.userData;
+
+							onEmitUpdateModel: {
+								userGeneralEditor.updateModel();
+							}
+						}
+					}
+				}
+			}
+
+			onFinished: {
+				if (buttonId === Enums.save){
+					AuthorizationController.registerUser(userData);
+				}
+			}
+		}
+	}
 }

@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtmail/CSmtpClientComp.h>
 #include <imtmail/CSmtpMessage.h>
+#include <imtmail/CSmtpMessageCreatorComp.h>
 
 
 /**
@@ -23,6 +24,7 @@ typedef icomp::TModelCompWrap<
 				imtmail::CSmtpMessage,
 				imtmail::ISmtpMessage,
 				iser::ISerializable>> SmtpMessage;
+typedef imtmail::CSmtpMessageCreatorComp SmtpMessageCreator;
 
 
 } // namespace ImtMailPck

@@ -159,6 +159,22 @@ I_EXPORT_COMPONENT(
 			"User group change generator",
 			"User Group Change Generator");
 
+I_EXPORT_COMPONENT(
+			UserVerification,
+			"User verification",
+			"User Verification");
+
+I_EXPORT_COMPONENT(
+			UserVerificationController,
+			"User verification controller",
+			"User Verification Controller");
+
+I_EXPORT_COMPONENT(
+			UserVerificationCodeSender,
+			"User verification code sender",
+			"User Verification Code Sender");
+
+
 } // namespace ImtAuthPck
 
 

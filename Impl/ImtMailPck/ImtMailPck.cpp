@@ -24,6 +24,11 @@ I_EXPORT_COMPONENT(
 			"Smtp message",
 			"Smtp Message");
 
+I_EXPORT_COMPONENT(
+			SmtpMessageCreator,
+			"Smtp message creator",
+			"Smtp Message Creator");
+
 
 } // namespace ImtAppPck
 

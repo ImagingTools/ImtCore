@@ -8,7 +8,8 @@ namespace imtmail
 // public methods
 
 CSmtpClientComp::CSmtpClientComp()
-	:m_socketPtr(nullptr)
+	:m_socketPtr(nullptr),
+	m_currentMailSendState(MS_CLOSE)
 {
 }
 
@@ -39,10 +40,25 @@ CSmtpClientComp::ResponseCode CSmtpClientComp::ExtractResponseCode(const QByteAr
 
 void CSmtpClientComp::SendCommand(const QString& command)
 {
+	qDebug() << "SendCommand" << command;
 	if (m_textStreamPtr != nullptr){
 		*m_textStreamPtr << command << "\r\n";
 		m_textStreamPtr->flush();
 	}
+}
+
+
+void CSmtpClientComp::ClearData()
+{
+	if (m_socketPtr){
+		m_socketPtr->disconnect();
+	}
+
+	m_socketPtr.reset();
+	m_textStreamPtr.reset();
+	m_smtpMessagePtr.reset();
+
+	m_message.clear();
 }
 
 
@@ -70,6 +86,10 @@ int CSmtpClientComp::GetPort() const
 
 bool CSmtpClientComp::SendEmail(const ISmtpMessage& smtpMessage) const
 {
+	if (m_currentMailSendState != MS_CLOSE){
+		return false;
+	}
+
 	m_message = "To: " + smtpMessage.GetTo() + "\n";
 	m_message.append("From: " + smtpMessage.GetFrom() + "\n");
 	m_message.append("Subject: " + smtpMessage.GetSubject() + "\n");
@@ -87,9 +107,9 @@ bool CSmtpClientComp::SendEmail(const ISmtpMessage& smtpMessage) const
 	m_message.replace( QString::fromLatin1( "\n" ), QString::fromLatin1( "\r\n" ) );
 	m_message.replace( QString::fromLatin1( "\r\n.\r\n" ),QString::fromLatin1( "\r\n..\r\n" ) );
 
-	m_rcpt = smtpMessage.GetTo();
-	m_rcpt = smtpMessage.GetFrom();
 	m_currentMailSendState = MS_INIT;
+
+	m_smtpMessagePtr.reset(dynamic_cast<const ISmtpMessage*>(smtpMessage.CloneMe()));
 
 	QString host = GetHost();
 	int port = GetPort();
@@ -200,13 +220,17 @@ void CSmtpClientComp::OnReadyRead()
 	}
 	else if (m_currentMailSendState == MS_MAIL && code == RC_AUTHENTIFICATION_SUCCESSFUL)
 	{
-		SendCommand(QString("MAIL FROM:<%1>").arg(m_senderAddress));
-		m_currentMailSendState = MS_RCPT;
+		if (m_smtpMessagePtr != nullptr){
+			SendCommand(QString("MAIL FROM:<%1>").arg(m_smtpMessagePtr->GetFrom()));
+			m_currentMailSendState = MS_RCPT;
+		}
 	}
 	else if (m_currentMailSendState == MS_RCPT && code == RC_OK)
 	{
-		SendCommand(QString("RCPT TO:<%1>").arg(m_rcpt));
-		m_currentMailSendState = MS_DATA;
+		if (m_smtpMessagePtr != nullptr){
+			SendCommand(QString("RCPT TO:<%1>").arg(m_smtpMessagePtr->GetTo()));
+			m_currentMailSendState = MS_DATA;
+		}
 	}
 	else if (m_currentMailSendState == MS_DATA && code == RC_OK)
 	{
@@ -216,20 +240,15 @@ void CSmtpClientComp::OnReadyRead()
 	else if (m_currentMailSendState == MS_BODY && code == RC_START_MAIL_INPUT)
 	{
 		SendCommand(QString("%1%2").arg(m_message).arg("\r\n."));
+
 		m_currentMailSendState = MS_QUIT;
 	}
 	else if (m_currentMailSendState == MS_QUIT && code == RC_OK)
 	{
 		SendCommand("QUIT");
 		m_currentMailSendState = MS_CLOSE;
-
-		qDebug() << "Message was sended";
-
+		SendInfoMessage(0, QString("Message  succesfully sended"), "CSmtpClientComp");
 		m_message.clear();
-
-		if (m_socketPtr){
-			m_socketPtr->disconnect();
-		}
 	}
 	else if (m_currentMailSendState == MS_CLOSE)
 	{
@@ -237,7 +256,7 @@ void CSmtpClientComp::OnReadyRead()
 	}
 	else
 	{
-		qDebug() << "Failed to send message";
+		SendErrorMessage(0, QString("Failed to send message"), "CSmtpClientComp");
 		m_currentMailSendState = MS_CLOSE;
 		m_message.clear();
 	}

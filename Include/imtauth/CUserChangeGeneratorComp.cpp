@@ -193,6 +193,10 @@ QString CUserChangeGeneratorComp::CreateCustomOperationDescription(const imtbase
 		change = change.arg(qPrintable(newValue));
 		retVal += change;
 	}
+	else if (typeId == "ChangePassword"){
+		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Password changed"), languageId, "imtauth::CUserChangeGeneratorComp");
+		retVal += change;
+	}
 
 	return retVal;
 }

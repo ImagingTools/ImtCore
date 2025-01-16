@@ -37,6 +37,9 @@
 #include <imtauth/CUserChangeGeneratorComp.h>
 #include <imtauth/CRoleChangeGeneratorComp.h>
 #include <imtauth/CUserGroupChangeGeneratorComp.h>
+#include <imtauth/CUserVerification.h>
+#include <imtauth/CUserVerificationControllerComp.h>
+#include <imtauth/CUserVerificationCodeSenderComp.h>
 
 
 namespace ImtAuthPck
@@ -67,6 +70,12 @@ typedef imtauth::CCompanyInfoMetaInfoCreatorComp CompanyInfoMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CRoleComp> Role;
 typedef imtauth::CRoleMetaInfoCreatorComp RoleMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserInfoComp> UserInfo;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+				imtauth::CIdentifiableUserVerificationInfo,
+				imtauth::IUserVerification,
+				iser::ISerializable,
+				istd::IChangeable>> UserVerification;
 typedef icomp::TModelCompWrap<imtauth::CUserGroupInfoComp> UserGroupInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
@@ -97,6 +106,8 @@ typedef imtauth::CLdapUserCollectionJoinerComp LdapUserCollectionJoiner;
 typedef imtauth::CUserChangeGeneratorComp UserChangeGenerator;
 typedef imtauth::CRoleChangeGeneratorComp RoleChangeGenerator;
 typedef imtauth::CUserGroupChangeGeneratorComp UserGroupChangeGenerator;
+typedef imtauth::CUserVerificationControllerComp UserVerificationController;
+typedef imtauth::CUserVerificationCodeSenderComp UserVerificationCodeSender;
 
 
 } // namespace ImtAuthPck

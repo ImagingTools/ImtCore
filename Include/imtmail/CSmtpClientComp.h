@@ -5,7 +5,8 @@
 #include <QtNetwork/QSslSocket>
 
 // ACF includes
-#include <icomp/CComponentBase.h>
+#include <ilog/TLoggerCompWrap.h>
+#include <iprm/ITextParam.h>
 
 // ImtCore includes
 #include <imtmail/ISmtpClient.h>
@@ -15,19 +16,23 @@ namespace imtmail
 {
 
 
-class CSmtpClientComp: public QObject, public icomp::CComponentBase, virtual public ISmtpClient
+class CSmtpClientComp: public QObject, public ilog::CLoggerComponentBase, virtual public ISmtpClient
 {
 	Q_OBJECT
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSmtpClientComp);
 		I_REGISTER_INTERFACE(ISmtpClient);
-		I_ASSIGN(m_hostNameAttrPtr, "HostName", "The property holds connection's host name.", true, "smtp.gmail.com");
-		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", true, 465);
-		I_ASSIGN(m_timeoutAttrPtr, "Timeout", "Timeout", true, 100);
-		I_ASSIGN(m_userAttrPtr, "User", "User", true, "");
-		I_ASSIGN(m_passwordAttrPtr, "Password", "Password", true, "");
+		I_ASSIGN(m_hostNameAttrPtr, "Host", "The property holds connection's host name.", false, "smtp.gmail.com");
+		I_ASSIGN(m_hostParamCompPtr, "HostParam", "The property holds connection's host name parameter", false, "");
+		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", false, 465);
+		I_ASSIGN(m_portParamCompPtr, "PortParam", "The property holds connection's port number parameter", false, "");
+		I_ASSIGN(m_timeoutAttrPtr, "Timeout", "Timeout (in msecs)", false, 1000);
+		I_ASSIGN(m_userAttrPtr, "User", "User", false, "");
+		I_ASSIGN(m_userParamCompPtr, "UserParam", "User parameter", false, "");
+		I_ASSIGN(m_passwordAttrPtr, "Password", "Password", false, "");
+		I_ASSIGN(m_passwordParamCompPtr, "PasswordParam", "Password parameter", false, "");
 	I_END_COMPONENT;
 
 	CSmtpClientComp();
@@ -62,6 +67,7 @@ protected:
 
 	ResponseCode ExtractResponseCode(const QByteArray& response);
 	void SendCommand(const QString& command);
+	void ClearData();
 
 	// reimplemented (imtmail::ISmtpClient)
 	virtual QString GetHost() const override;
@@ -79,18 +85,21 @@ private slots:
 
 private:
 	I_ATTR(QByteArray, m_userAttrPtr);
+	I_REF(iprm::ITextParam, m_userParamCompPtr);
 	I_ATTR(QByteArray, m_passwordAttrPtr);
+	I_REF(iprm::ITextParam, m_passwordParamCompPtr);
 	I_ATTR(QString, m_hostNameAttrPtr);
+	I_REF(iprm::ITextParam, m_hostParamCompPtr);
 	I_ATTR(int, m_portAttrPtr);
+	I_REF(iprm::ITextParam, m_portParamCompPtr);
 	I_ATTR(int, m_timeoutAttrPtr);
 
 private:
 	mutable std::unique_ptr<QSslSocket> m_socketPtr;
+	mutable std::unique_ptr<const ISmtpMessage> m_smtpMessagePtr;
 	std::unique_ptr<QTextStream> m_textStreamPtr;
 	mutable int m_currentMailSendState;
 	mutable QString m_message;
-	mutable QString m_rcpt;
-	mutable QString m_senderAddress;
 };
 
 

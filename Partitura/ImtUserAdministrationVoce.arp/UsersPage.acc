@@ -100,6 +100,42 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SmtpClient" PackageId="ImtMailPck" ComponentId="SmtpClient">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Host" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="smtp.gmail.com"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Password" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="qqmbxszuzxnylorx"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Port" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="465"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Timeout" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1000"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="User" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="kucherenkord@gmail.com"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SmtpMessageCreator" PackageId="ImtMailPck" ComponentId="SmtpMessageCreator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="From" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="kucherenkord@gmail.com"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="UserChangeGenerator" PackageId="ImtAuthPck" ComponentId="UserChangeGenerator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -140,6 +176,10 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ChangePassword</Value>
+                                <Value>RegisterUser</Value>
+                                <Value>CheckEmail</Value>
+                                <Value>CheckEmailCode</Value>
+                                <Value>SendEmailCode</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -152,11 +192,29 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SmtpClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SmtpClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SmtpMessageCreator" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SmtpMessageCreator"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserRepository">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserOperationContextController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="OperationContextController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserVerificationCodeSender" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserVerificationCodeSender"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserVerificationController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserVerificationController"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -230,6 +288,30 @@
                         <Data IsEnabled="true" Value="UserInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserGroupInfoProvider" Type="Reference" ExportId="UserGroupInfoProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserVerificationCodeSender" PackageId="ImtAuthPck" ComponentId="UserVerificationCodeSender">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SmtpClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SmtpClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SmtpMessageCreator" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SmtpMessageCreator"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserVerificationController" PackageId="ImtAuthPck" ComponentId="UserVerificationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CodeValidityPeriod" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="180"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserVerificationCollection" Type="Reference" ExportId="UserVerificationCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

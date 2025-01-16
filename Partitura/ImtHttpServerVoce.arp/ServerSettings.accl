@@ -8,18 +8,18 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Backup" X="975" Y="300" Note=""/>
-        <Element ComponentName="ConnectionCollection" X="600" Y="700" Note=""/>
+        <Element ComponentName="Backup" X="800" Y="300" Note=""/>
+        <Element ComponentName="ConnectionCollection" X="525" Y="700" Note=""/>
         <Element ComponentName="Database" X="125" Y="300" Note=""/>
         <Element ComponentName="DatabaseAccessSettings" X="125" Y="525" Note=""/>
         <Element ComponentName="FileAutoPersistence" X="600" Y="50" Note=""/>
         <Element ComponentName="FileBasedSslConfiguration" X="175" Y="100" Note=""/>
-        <Element ComponentName="FileNameParam" X="1100" Y="525" Note=""/>
-        <Element ComponentName="LoggingParams" X="350" Y="300" Note=""/>
+        <Element ComponentName="FileNameParam" X="800" Y="700" Note=""/>
+        <Element ComponentName="LoggingParams" X="325" Y="300" Note=""/>
         <Element ComponentName="Preferences" X="600" Y="150" Note=""/>
-        <Element ComponentName="SchedulerParams" X="875" Y="525" Note=""/>
-        <Element ComponentName="Server" X="600" Y="301" Note=""/>
-        <Element ComponentName="ServerConnectionParams" X="575" Y="525" Note=""/>
+        <Element ComponentName="SchedulerParams" X="825" Y="525" Note=""/>
+        <Element ComponentName="Server" X="525" Y="300" Note=""/>
+        <Element ComponentName="ServerConnectionParams" X="525" Y="525" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

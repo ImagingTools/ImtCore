@@ -4,161 +4,183 @@ import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
+import imtauthgui 1.0
+import imtauthUsersSdl 1.0
 
 QtObject {
-    id: root;
+	id: root;
 
-    property string productId: "";
+	property string productId: "";
 
-    signal logoutSignal();
-    signal userModeChanged(string userMode);
-    signal superuserExistResult(bool exists);
-    signal loginSuccessful();
-    signal loginFailed();
+	signal logoutSignal();
+	signal userModeChanged(string userMode);
+	signal superuserExistResult(bool exists);
+	signal loginSuccessful();
+	signal loginFailed();
 
-    Component.onCompleted: {
-        Events.subscribeEvent("Login", root.login)
-        Events.subscribeEvent("Logout", root.userLogout)
-    }
+	Component.onCompleted: {
+		Events.subscribeEvent("Login", root.login)
+		Events.subscribeEvent("Logout", root.userLogout)
+	}
 
-    Component.onDestruction: {
-        Events.unSubscribeEvent("Login", root.login)
-        Events.unSubscribeEvent("Logout", root.userLogout)
-    }
+	Component.onDestruction: {
+		Events.unSubscribeEvent("Login", root.login)
+		Events.unSubscribeEvent("Logout", root.userLogout)
+	}
 
-    property UserManagementProvider userManagementProvider: UserManagementProvider {
-        onUserModeChanged: {
-            root.userModeChanged(userMode);
-        }
+	property UserManagementProvider userManagementProvider: UserManagementProvider {
+		onUserModeChanged: {
+			root.userModeChanged(userMode);
+		}
 
-        function getHeaders(){
-            return root.getHeaders();
-        }
-    }
+		function getHeaders(){
+			return root.getHeaders();
+		}
+	}
 
-    property SuperuserProvider superuserProvider: SuperuserProvider {
-        onResult: {
-            root.superuserExistResult(exists)
-        }
+	property SuperuserProvider superuserProvider: SuperuserProvider {
+		onResult: {
+			root.superuserExistResult(exists)
+		}
 
-        function getHeaders(){
-            return root.getHeaders();
-        }
-    }
+		function getHeaders(){
+			return root.getHeaders();
+		}
+	}
 
-    property UserTokenProvider userTokenProvider: UserTokenProvider {
-        productId: root.productId;
-        onAccepted: {
-            root.loginSuccessful();
-        }
+	property UserTokenProvider userTokenProvider: UserTokenProvider {
+		productId: root.productId;
+		onAccepted: {
+			root.loginSuccessful();
+		}
 
-        onFailed: {
-            root.loginFailed();
-        }
+		onFailed: {
+			root.loginFailed();
+		}
 
-        function getHeaders(){
-            return root.getHeaders();
-        }
-    }
+		function getHeaders(){
+			return root.getHeaders();
+		}
+	}
 
-    function getHeaders(){
-        return {"ProductId": root.productId}
-    }
+	function getHeaders(){
+		return {"ProductId": root.productId}
+	}
 
-    function updateSuperuserModel(){
-        superuserProvider.superuserExists();
-    }
+	function updateSuperuserModel(){
+		superuserProvider.superuserExists();
+	}
 
-    function updateUserManagementModel(){
-        userManagementProvider.updateModel();
-    }
+	function updateUserManagementModel(){
+		userManagementProvider.updateModel();
+	}
 
-    function loggedUserIsSuperuser(){
-        return userTokenProvider.login === "su";
-    }
+	function loggedUserIsSuperuser(){
+		return userTokenProvider.login === "su";
+	}
 
-    function getLoggedUserId(){
-        return userTokenProvider.login;
-    }
+	function getLoggedUserId(){
+		return userTokenProvider.login;
+	}
 
-    function getPermissions(){
-        return userTokenProvider.permissions;
-    }
+	function getPermissions(){
+		return userTokenProvider.permissions;
+	}
 
-    function getSystemId(){
-        return userTokenProvider.systemId;
-    }
+	function getSystemId(){
+		return userTokenProvider.systemId;
+	}
 
-    function userLogout(param){
-        userTokenProvider.login = ""
-        userTokenProvider.userId = ""
-        userTokenProvider.token = ""
-        userTokenProvider.permissions = []
+	function userLogout(param){
+		userTokenProvider.login = ""
+		userTokenProvider.userId = ""
+		userTokenProvider.token = ""
+		userTokenProvider.permissions = []
 
-        userTokenProvider.authorizationGqlModel.SetGlobalAccessToken("");
+		userTokenProvider.authorizationGqlModel.SetGlobalAccessToken("");
 
-        root.logoutSignal();
-    }
+		root.logoutSignal();
+	}
 
-    function login(param){
-        if (!param){
-            return;
-        }
+	function login(param){
+		if (!param){
+			return;
+		}
 
-        let login = param["Login"];
-        let password = param["Password"];
+		let login = param["Login"];
+		let password = param["Password"];
 
-        userTokenProvider.authorization(login, password)
-    }
+		userTokenProvider.authorization(login, password)
+	}
 
-    function getToken(callback){
-        if (callback){
-            callback(userTokenProvider.token);
-        }
-    }
+	function getToken(callback){
+		if (callback){
+			callback(userTokenProvider.token);
+		}
+	}
 
-    function getLogin(callback){
-        if (callback){
-            callback(userTokenProvider.login);
-        }
-    }
+	function getLogin(callback){
+		if (callback){
+			callback(userTokenProvider.login);
+		}
+	}
 
-    function getUserMode(){
-        return userManagementProvider.userMode;
-    }
+	function getUserMode(){
+		return userManagementProvider.userMode;
+	}
 
-    function isStrongUserManagement(){
-        return userManagementProvider.userMode === "STRONG_USER_MANAGEMENT";
-    }
+	function isStrongUserManagement(){
+		return userManagementProvider.userMode === "STRONG_USER_MANAGEMENT";
+	}
 
-    function isSimpleUserManagement(){
-        return userManagementProvider.userMode === "NO_USER_MANAGEMENT" || userManagementProvider.userMode === "OPTIONAL_USER_MANAGEMENT";
-    }
+	function isSimpleUserManagement(){
+		return userManagementProvider.userMode === "NO_USER_MANAGEMENT" || userManagementProvider.userMode === "OPTIONAL_USER_MANAGEMENT";
+	}
 
-    function changePassword(userId, oldPassword, newPassword){
-        changePasswordGqlSender.inputParam.InsertField("UserId", userId);
-        changePasswordGqlSender.inputParam.InsertField("OldPassword", oldPassword);
-        changePasswordGqlSender.inputParam.InsertField("NewPassword", newPassword);
+	function changePassword(userId, oldPassword, newPassword){
+		changePasswordGqlSender.send({"m_login":userId,"m_oldPassword":oldPassword,"m_newPassword":newPassword});
+	}
 
-        changePasswordGqlSender.send();
-    }
+	function registerUser(userData){
+		registerUserRequestSender.send({"m_userData": userData})
+	}
 
-    property GqlRequestSender changePasswordGqlSender: GqlRequestSender {
-        requestType: 1; // Mutation
-        gqlCommandId: "ChangePassword";
+	property GqlSdlRequestSender registerUserRequestSender: GqlSdlRequestSender {
+		requestType: 1; // Mutation
+		gqlCommandId: ImtauthUsersSdlCommandIds.s_registerUser;
 
-        property var inputParam: Gql.GqlObject("input");
+		inputObjectComp: Component {
+			RegisterUserInput {
+				m_productId: root.productId;
+			}
+		}
 
-        function createQueryParams(query){
-            query.AddParam(inputParam);
-        }
+		sdlObjectComp: Component {
+			RegisterUserPayload {
+				onFinished: {
+					ModalDialogManager.showInfoDialog(qsTr("The user has been successfully registered"));
+				}
+			}
+		}
+	}
 
-        function onResult(data){
-            ModalDialogManager.showInfoDialog(qsTr("Password changed successfully"));
-        }
+	property GqlSdlRequestSender changePasswordGqlSender: GqlSdlRequestSender {
+		id: changePasswordRequestSender;
+		gqlCommandId: ImtauthUsersSdlCommandIds.s_changePassword;
 
-        function getHeaders(){
-            return root.getHeaders();
-        }
-    }
+		inputObjectComp: Component {
+			ChangePasswordInput {
+			}
+		}
+
+		sdlObjectComp: Component {
+			ChangePasswordPayload {
+				onFinished: {
+					if (m_success){
+						ModalDialogManager.showInfoDialog(qsTr("Password changed successfully"));
+					}
+				}
+			}
+		}
+	}
 }

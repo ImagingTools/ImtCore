@@ -76,6 +76,22 @@ public:
 				const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	// virtual sdl::imtbase::ImtCollection::CHeadersInfo::V1_0 OnGetHeaders(
+	// 			const sdl::imtbase::ImtCollection::V1_0::CGetHeadersGqlRequest& getHeadersRequest,
+	// 			const ::imtgql::CGqlRequest& gqlRequest,
+	// 			QString& errorMessage) const override;
+	// virtual sdl::imtbase::ImtCollection::CStandardResponse::V1_0 OnSetElementName(
+	// 			const sdl::imtbase::ImtCollection::V1_0::CSetElementNameGqlRequest& setElementNameRequest,
+	// 			const ::imtgql::CGqlRequest& gqlRequest,
+	// 			QString& errorMessage) const override;
+	// virtual sdl::imtbase::ImtCollection::CStandardResponse::V1_0 OnSetElementDescription(
+	// 			const sdl::imtbase::ImtCollection::V1_0::CSetElementDescriptionGqlRequest& setElementDescriptionRequest,
+	// 			const ::imtgql::CGqlRequest& gqlRequest,
+	// 			QString& errorMessage) const override;
+	// virtual sdl::imtbase::ImtCollection::CStandardResponse::V1_0 OnRemoveElement(
+	// 			const sdl::imtbase::ImtCollection::V1_0::CRemoveElementGqlRequest& removeElementRequest,
+	// 			const ::imtgql::CGqlRequest& gqlRequest,
+	// 			QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
