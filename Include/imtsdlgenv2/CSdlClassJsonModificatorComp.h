@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtsdlgen/CSdlClassModificatorBaseComp.h>
-#include <imtsdlgenv2/CSdlGenTools.h>
+#include <imtsdlgenv2/CObjectModificatorCompBase.h>
 
 
 namespace imtsdlgenv2
@@ -14,40 +14,38 @@ namespace imtsdlgenv2
 	The C++ class modificator, adds saving and loading generated SDL types to Json
 	Extends generated classes by add methods, allows to save and load it from/to \c QJsonObject
  */
-class CSdlClassJsonModificatorComp: public imtsdlgen::CSdlClassModificatorBaseComp, protected CSdlGenTools
+class CSdlClassJsonModificatorComp: public CObjectModificatorCompBase
 {
-	using CSdlGenTools::AddArrayInternalChecksFail;
 
 public:
-	typedef imtsdlgen::CSdlClassModificatorBaseComp BaseClass;
+	typedef imtsdlgenv2::CObjectModificatorCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSdlClassJsonModificatorComp)
-	I_END_COMPONENT;
+	I_END_COMPONENT
 
-protected:
+public:
 	// reimplemented (IIncludeDirectivesProvider)
 	[[nodiscard]] virtual QList<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
 
-	// reimplemented (imtsdlgen::CSdlClassModificatorBaseComp)
-	virtual bool ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType) override;
-	virtual bool ProcessSourceClassFile(const imtsdl::CSdlType& sdlType) override;
+
+protected:
+	// reimplemented (CObjectModificatorCompBase)
+	virtual QString GetContainerObjectClassName() const override;
+	virtual QString GetContainerObjectVariableName() const override;
+	virtual QString GetArrayContainerObjectClassName() const override;
+	virtual QString GetArrayContainerObjectVariableName() const override;
+	virtual bool AddFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, uint horizontalIndents) const override;
+	virtual bool AddObjectValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, uint horizontalIndents) const override;
+	virtual QString AddCreationOfTemporaryArray(QTextStream& stream, const imtsdl::CSdlField& field) const override;
+	virtual bool AddFieldValueAppendToObjectArray(QTextStream& stream, const imtsdl::CSdlField& field, const QString& arrayContainerVariableName, const QString& variableName, uint horizontalIndents) const override;
+	virtual bool AddArrayWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, const QString& targetObjectVariableName, uint horizontalIndents) const override;
+	virtual bool AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents) override;
+	virtual bool AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents) override;
+	virtual bool AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result) override;
 
 private:
-	void AddFieldWriteToJsonCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddFieldReadFromJsonCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddCustomFieldWriteToJsonCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddCustomFieldWriteToJsonImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
-	void AddArrayFieldWriteToJsonCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddArrayFieldWriteToJsonImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
-	void AddCustomFieldReadFromJsonCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddCustomFieldReadFromJsonImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
-	void AddArrayFieldReadFromJsonCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddArrayFieldReadFromJsonImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
-	void AddCustomArrayFieldWriteToJsonCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddCustomArrayFieldWriteToJsonImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
-	void AddCustomArrayFieldReadFromJsonCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddCustomArrayFieldReadToJsonImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
-	void AddJsonValueCheckAndConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected = true, quint16 hIndents = 1);
+	/// writes end for convert 'value' to 'dest' \example String() (if string) \example Integer (if long)
+	[[nodiscard]] QString GetConvertEndForFieldString(const imtsdl::CSdlField& field, bool forType) const;
 };
 
 

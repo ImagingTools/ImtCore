@@ -27,6 +27,7 @@ namespace imtsdl
 
 // public static variables
 const QString CSdlTools::s_variantMapClassMemberName = QStringLiteral("_m_settedFields"); // add first underscore to avoid ambiguity
+QString CSdlTools::s_sdlGlobalPrefix = QStringLiteral("sdl");
 
 
 // public static methods
@@ -763,14 +764,17 @@ QString CSdlTools::BuildNamespaceFromComponents(const QString& schemaNamespace, 
 }
 
 
-QString CSdlTools::BuildNamespaceFromParams(const iprm::IParamsSet& schemaParams)
+QString CSdlTools::BuildNamespaceFromParams(const iprm::IParamsSet& schemaParams, bool addVersion, bool addPrefix)
 {
 	QString retVal;
 
 	QString schemaNamespace;
+	if (addPrefix && !s_sdlGlobalPrefix.isEmpty()){
+		schemaNamespace = s_sdlGlobalPrefix + QStringLiteral("::");
+	}
 	iprm::TParamsPtr<iprm::ITextParam> namespaceParamPtr(&schemaParams, SdlCustomSchemaKeys::SchemaNamespace.toUtf8(), false);
 	if (namespaceParamPtr.IsValid()){
-		schemaNamespace = namespaceParamPtr->GetText();
+		schemaNamespace += namespaceParamPtr->GetText();
 	}
 
 	QString schemaName;
@@ -780,9 +784,11 @@ QString CSdlTools::BuildNamespaceFromParams(const iprm::IParamsSet& schemaParams
 	}
 
 	QString versionName;
-	iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&schemaParams, SdlCustomSchemaKeys::VersionName.toUtf8(), false);
-	if (versionNameParamPtr.IsValid()){
-		versionName = versionNameParamPtr->GetText();
+	if (addVersion){
+		iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&schemaParams, SdlCustomSchemaKeys::VersionName.toUtf8(), false);
+		if (versionNameParamPtr.IsValid()){
+			versionName = versionNameParamPtr->GetText();
+		}
 	}
 
 	retVal = BuildNamespaceFromComponents(schemaNamespace, schemaName, versionName);
@@ -821,7 +827,8 @@ QString CSdlTools::BuildQmlImportDeclarationFromParams(const iprm::IParamsSet& s
 
 QString CSdlTools::GetNamespaceFromParamsOrArguments(
 			const SchemaParamsCompPtr& schemaParamsCompPtr,
-			const ArgumentParserCompPtr& argumentParamsCompPtr)
+			const ArgumentParserCompPtr& argumentParamsCompPtr,
+			bool addVersion)
 {
 	return GetNamespaceFromParamsOrArguments(
 				(schemaParamsCompPtr.IsValid() ? schemaParamsCompPtr.GetPtr() : nullptr),
@@ -829,20 +836,14 @@ QString CSdlTools::GetNamespaceFromParamsOrArguments(
 }
 
 
-QString CSdlTools::GetNamespaceFromParamsOrArguments(const iprm::IParamsSet* schemaParamsCompPtr, const ArgumentParserCompPtr& argumentParamsCompPtr)
+QString CSdlTools::GetNamespaceFromParamsOrArguments(
+			const iprm::IParamsSet* schemaParamsCompPtr,
+			const ArgumentParserCompPtr& argumentParamsCompPtr,
+			bool addVersion)
 {
 	QString sdlNamespace;
 	if (schemaParamsCompPtr != nullptr){
-		sdlNamespace = BuildNamespaceFromParams(*schemaParamsCompPtr);
-		if (argumentParamsCompPtr.IsValid()){
-			QString namespacePrefix =argumentParamsCompPtr->GetNamespacePrefix();
-			if (!namespacePrefix.isEmpty()){
-				while (!namespacePrefix.endsWith(QStringLiteral("::"))){
-					namespacePrefix.append(':');
-				}
-				sdlNamespace.prepend(namespacePrefix);
-			}
-		}
+		sdlNamespace = BuildNamespaceFromParams(*schemaParamsCompPtr, addVersion, true);
 	}
 
 	// we should override nmespace from agrs if it porvided

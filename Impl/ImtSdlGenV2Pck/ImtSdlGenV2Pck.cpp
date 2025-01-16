@@ -59,6 +59,11 @@ I_EXPORT_COMPONENT(
 			"A C++ class generator of GraphQL Collection controllers for SDL requests",
 			"Schema Definition Language SDL Class Generator JSON GraphQL GQL Request")
 
+I_EXPORT_COMPONENT(
+			SdlEnumGenerator,
+			"A processor that creating C++ enums from SDL schema",
+			"Schema Definition Language SDL Class Generator Enum")
+
 
 } // namespace ImtSdlGenV2Pck
 

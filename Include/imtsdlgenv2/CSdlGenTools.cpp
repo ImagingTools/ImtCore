@@ -35,8 +35,10 @@ CSdlGenTools::CStructNamespaceConverter::CStructNamespaceConverter(
 			const imtsdl::CSdlEntryBase& aSdlEntry,
 			const QString& aRelatedNamespace,
 			const imtsdl::ISdlTypeListProvider& aListProvider,
+			const imtsdl::ISdlEnumListProvider& aEnumListProvider,
 			bool aListWrap):
 	typeListProviderPtr(&aListProvider),
+	enumListProviderPtr(&aEnumListProvider),
 	relatedNamespace(aRelatedNamespace),
 	listWrap(aListWrap),
 	sdlEntryPtr(&aSdlEntry)
@@ -48,8 +50,10 @@ CSdlGenTools::CStructNamespaceConverter::CStructNamespaceConverter(
 			const imtsdl::CSdlField& aSdlField,
 			const QString& aRelatedNamespace,
 			const imtsdl::ISdlTypeListProvider& aListProvider,
+			const imtsdl::ISdlEnumListProvider& aEnumListProvider,
 			bool aListWrap):
 	typeListProviderPtr(&aListProvider),
+	enumListProviderPtr(&aEnumListProvider),
 	relatedNamespace(aRelatedNamespace),
 	listWrap(aListWrap),
 	sdlFieldPtr(&aSdlField)
@@ -81,39 +85,50 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 	if (!relatedNamespace.isEmpty()){
 
 		const imtsdl::CSdlEntryBase* namespaceEntryPtr = sdlEntryPtr;
-		std::unique_ptr<imtsdl::CSdlType> typeForFieldPtr;
+		std::shared_ptr<imtsdl::CSdlEntryBase> typeForFieldPtr;
 
 		QString typeNamespace;
 		if (sdlFieldPtr != nullptr){
-			typeForFieldPtr.reset(new imtsdl::CSdlType);
-			const bool isFound = imtsdl::CSdlTools::GetSdlTypeForField(*sdlFieldPtr, typeListProviderPtr->GetSdlTypes(false), *typeForFieldPtr);
-			Q_ASSERT(isFound);
+			typeForFieldPtr = imtsdl::CSdlTools::GetSdlTypeOrEnumForField(
+				*sdlFieldPtr,
+				typeListProviderPtr->GetSdlTypes(false),
+				enumListProviderPtr->GetEnums(false));
+			if (!typeForFieldPtr){
+				I_CRITICAL();
+				qCritical() << "Unable to find enum or type for" << sdlFieldPtr->GetId() << "of" << sdlFieldPtr->GetType();
+
+				return QString();
+			}
 			namespaceEntryPtr = typeForFieldPtr.get();
 		}
 
 		typeNamespace = GetNamespaceFromSchemaParams(namespaceEntryPtr->GetSchemaParams());
-		typeNamespace += QStringLiteral("::");
 
 		const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<const imtsdl::CSdlType*>(namespaceEntryPtr);
 		if (sdlTypePtr != nullptr){
-			typeNamespace += 'C' + imtsdl::CSdlTools::GetCapitalizedValue(sdlTypePtr->GetName());
+			typeNamespace += QStringLiteral("::C") + imtsdl::CSdlTools::GetCapitalizedValue(sdlTypePtr->GetName());
 		}
 
 		const imtsdl::CSdlDocumentType* sdlDocumentTypePtr = dynamic_cast<const imtsdl::CSdlDocumentType*>(namespaceEntryPtr);
 		if (sdlDocumentTypePtr != nullptr){
-			typeNamespace += 'C' + imtsdl::CSdlTools::GetCapitalizedValue(sdlDocumentTypePtr->GetName());
+			typeNamespace += QStringLiteral("::C") + imtsdl::CSdlTools::GetCapitalizedValue(sdlDocumentTypePtr->GetName());
 		}
 
 		const imtsdl::CSdlRequest* sdlRequestPtr = dynamic_cast<const imtsdl::CSdlRequest*>(namespaceEntryPtr);
 		if (sdlRequestPtr != nullptr){
-			typeNamespace += 'C' + imtsdl::CSdlTools::GetCapitalizedValue(sdlRequestPtr->GetName());
+			typeNamespace += QStringLiteral("::C") + imtsdl::CSdlTools::GetCapitalizedValue(sdlRequestPtr->GetName());
 			typeNamespace += QStringLiteral("GqlRequest");
 		}
 
-
+		const imtsdl::CSdlEnum* sdlEnumPtr = dynamic_cast<const imtsdl::CSdlEnum*>(namespaceEntryPtr);
+		if (sdlEnumPtr != nullptr){
+			typeNamespace += QStringLiteral("::");
+			typeNamespace += imtsdl::CSdlTools::GetCapitalizedValue(sdlEnumPtr->GetName());
+		}
 
 		if (typeNamespace != relatedNamespace){
-			if (addVersion){
+			// vsrsions does NOT exists for enumerators
+			if (sdlEnumPtr == nullptr && addVersion){
 				typeNamespace += QStringLiteral("::");
 				typeNamespace += GetSdlEntryVersion(*namespaceEntryPtr);
 			}
@@ -235,10 +250,19 @@ QString CSdlGenTools::GetSchemaVerstionString(const iprm::IParamsSet& schemaPara
 }
 
 
-QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider, bool listWrap,  bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
+QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(
+	const imtsdl::CSdlField& sdlField,
+	const QString& relatedNamespace,
+	const imtsdl::ISdlTypeListProvider& listProvider,
+	const imtsdl::ISdlEnumListProvider& enumlistProvider,
+	bool listWrap,
+	bool* isCustomPtr,
+	bool* isComplexPtr,
+	bool* isArrayPtr,
+	bool* isEnumPtr)
 {
 	bool _isCustom = false;
-	QString retVal = imtsdl::CSdlTools::ConvertType(sdlField.GetType(), &_isCustom, isComplexPtr);
+	QString retVal = imtsdl::CSdlTools::ConvertTypeOrEnum(sdlField, enumlistProvider.GetEnums(false), &_isCustom, isComplexPtr, isArrayPtr, isEnumPtr);
 	if (isCustomPtr != nullptr){
 		*isCustomPtr = _isCustom;
 	}
@@ -246,8 +270,8 @@ QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlFi
 		*isArrayPtr = sdlField.IsArray();
 	}
 
+	// no processing is required if a type is scalar
 	if (!_isCustom){
-		// we can define namespace only for custom types
 		if (listWrap && sdlField.IsArray()){
 			imtsdl::CSdlTools::WrapTypeToList(retVal);
 		}
@@ -255,7 +279,7 @@ QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(const imtsdl::CSdlFi
 		return retVal;
 	}
 
-	CStructNamespaceConverter converter(sdlField, relatedNamespace, listProvider, listWrap);
+	CStructNamespaceConverter converter(sdlField, relatedNamespace, listProvider, enumlistProvider, listWrap);
 	converter.addVersion = true;
 
 	return converter.GetString();

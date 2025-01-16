@@ -284,7 +284,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 	imtsdl::SdlFieldList requestArguments = sdlRequest.GetInputArguments();
 	for (const imtsdl::CSdlField& sdlField: requestArguments){
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << OptListConvertTypeWithNamespaceStruct(sdlField, sdlNamespace, *m_sdlTypeListCompPtr);
+		ifStream << OptListConvertTypeWithNamespaceStruct(sdlField, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
 		ifStream << ' ' << sdlField.GetId() << ';';
 		FeedStream(ifStream, 1, false);
 	}
@@ -968,7 +968,7 @@ void CGqlWrapClassCodeGeneratorComp::AddScalarFieldWriteToRequestCode(QTextStrea
 void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 
 	// declare temp GQL object
 	FeedStreamHorizontally(stream, hIndents);
@@ -1089,7 +1089,7 @@ void CGqlWrapClassCodeGeneratorComp::AddCheckCustomRequiredValueCode(QTextStream
 void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	// declare bool variable and read data in private property
 	stream << QStringLiteral("const bool is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read = ");
 	stream << QStringLiteral("m_requestedArguments.") << field.GetId();

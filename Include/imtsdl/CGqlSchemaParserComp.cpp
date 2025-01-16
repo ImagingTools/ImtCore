@@ -166,7 +166,7 @@ int CGqlSchemaParserComp::DoProcessing(
 	}
 
 	if (m_schemaNamespaceCompPtr.IsValid()){
-		const QString curretNamespace = GetNamespaceFromParamsOrArguments(m_schemaParamsPtr.get(), m_argumentParserCompPtr);
+		const QString curretNamespace = GetNamespaceFromParamsOrArguments(m_schemaParamsPtr.get(), m_argumentParserCompPtr, false);
 		m_schemaNamespaceCompPtr->SetText(curretNamespace);
 	}
 

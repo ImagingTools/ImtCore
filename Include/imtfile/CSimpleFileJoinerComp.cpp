@@ -155,7 +155,7 @@ int CSimpleFileJoinerComp::DoProcessing(
 			fileStream << Qt::endl;
 		}
 
-		// write data and cleat buffer
+		// write data and clear buffer
 		fileStream.flush();
 	}
 

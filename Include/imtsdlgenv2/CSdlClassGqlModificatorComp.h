@@ -34,7 +34,7 @@ protected:
 private:
 	// read methods
 	void AddFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddScalarFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
+	void AddScalarFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum);
 	void AddScalarListFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 	void AddCustomFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 	void AddCustomListFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
@@ -50,7 +50,7 @@ private:
 	void AddExtractValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
 	/// \todo add error handling for it.
 	void AddDataCheckRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
-	void AddSetValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field);
+	void AddSetValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
 
 	// general help methods for custom
 	void AddExtractCustomValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);

@@ -19,7 +19,7 @@
 #include <imtsdl/CSdlType.h>
 
 
-namespace imtsdlgen
+namespace imtsdlgenv2
 {
 
 
@@ -67,7 +67,11 @@ int CSdlEnumGeneratorComp::DoProcessing(
 
 	imtsdl::SdlEnumList sdlEnumList = m_sdlEnumListCompPtr->GetEnums(true);
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
-		if (!m_argumentParserCompPtr->IsAutoJoinEnabled()){
+		if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
+			// in case if auto join, nothing todo, because files already defined.
+			return TS_OK;
+		}
+		else {
 			const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
 			QStringList cumulatedFiles;
 			for (const imtsdl::CSdlEnum& sdlEnum: sdlEnumList){
@@ -95,7 +99,7 @@ int CSdlEnumGeneratorComp::DoProcessing(
 		FeedStream(stream, 3, false);
 
 		// namespace begin
-		QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+		QString sdlNamespace = GetNamespaceFromSchemaParams(sdlEnum.GetSchemaParams());
 
 		stream << QStringLiteral("namespace ");
 		stream << sdlNamespace;
@@ -130,5 +134,5 @@ int CSdlEnumGeneratorComp::DoProcessing(
 
 
 
-} // namespace imtsdlgen
+} // namespace imtsdlgenv2
 

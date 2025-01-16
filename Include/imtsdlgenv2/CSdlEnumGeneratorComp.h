@@ -15,9 +15,10 @@
 #include <imtsdl/CSdlTools.h>
 #include <imtsdl/CSdlEnumConverter.h>
 #include <imtsdlgen/IIncludeDirectivesProvider.h>
+#include <imtsdlgenv2/CSdlGenTools.h>
 
 
-namespace imtsdlgen
+namespace imtsdlgenv2
 {
 
 /**
@@ -26,6 +27,7 @@ namespace imtsdlgen
 class  CSdlEnumGeneratorComp:
 			public iproc::CSyncProcessorCompBase,
 			private imtsdl::CSdlTools,
+			private imtsdlgenv2::CSdlGenTools,
 			private imtsdl::CSdlEnumConverter
 {
 
@@ -55,5 +57,5 @@ private:
 };
 
 
-} // namespace imtsdlgen
+} // namespace imtsdlgenv2
 

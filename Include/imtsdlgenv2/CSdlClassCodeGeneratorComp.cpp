@@ -175,9 +175,17 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 			if (joinHeaders){
 				filterParams.ResetOptions();
+				// first join enums
+				const imtsdl::SdlEnumList enumList = m_sdlEnumListCompPtr->GetEnums(false);
+				for (const imtsdl::CSdlEnum& sdlEnum: enumList){
+					filterParams.InsertOption(sdlEnum.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
+					SendVerboseMessage(QString("Add join enum file '%1. Total: %2").arg(sdlEnum.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
+				}
+
+				// then join types
 				for (const imtsdl::CSdlType& sdlType: sdlTypeList){
 					filterParams.InsertOption("C" + sdlType.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
-					SendVerboseMessage(QString("Add join file '%1', %2").arg("C" + sdlType.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
+					SendVerboseMessage(QString("Add join file '%1'. Total: %2").arg("C" + sdlType.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
 				}
 
 				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
@@ -190,9 +198,13 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 				}
 
 				// cleanup joined files
+				for (const imtsdl::CSdlEnum& sdlEnum: enumList){
+					QFile::remove(outputDirectoryPath + '/' + sdlEnum.GetName() + ".h");
+				}
 				for (const imtsdl::CSdlType& sdlType: sdlTypeList){
 					QFile::remove(QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
 				}
+
 			}
 			if (joinSources){
 				filterParams.ResetOptions();
@@ -327,19 +339,18 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 					continue;
 				}
 
-				imtsdl::CSdlType foundType;
-				bool isFound = GetSdlTypeForField(field, m_sdlTypeListCompPtr->GetSdlTypes(false), foundType);
-				if (!isFound){
+				std::shared_ptr<imtsdl::CSdlEntryBase> foundType = GetSdlTypeOrEnumForField(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false));
+				if (!foundType){
 					SendCriticalMessage(0, QString("Unable to find type for %1 of %2").arg(field.GetId(), sdlType.GetName()));
 					I_CRITICAL();
 
 					return false;
 				}
 
-				if (foundType.IsExternal()){
-					QString resolvedPath = ResolveRelativeHeaderFileForType(foundType, m_argumentParserCompPtr->GetHeadersIncludePaths(), false);
+				if (foundType->IsExternal()){
+					QString resolvedPath = ResolveRelativeHeaderFileForType(*foundType, m_argumentParserCompPtr->GetHeadersIncludePaths(), false);
 					if (resolvedPath.isEmpty()){
-						SendErrorMessage(0, QString("Unable to find header file for type '%1'").arg(foundType.GetName()));
+						SendErrorMessage(0, QString("Unable to find header file for type of '%1' in ").arg(field.GetId(), sdlType.GetName()));
 
 						return false;
 					}
@@ -589,7 +600,16 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 
 	// add types members
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
-		const QString convertedType = OptListConvertTypeWithNamespaceStruct(field, sdlNamespace, *m_sdlTypeListCompPtr, true);
+		const QString convertedType = OptListConvertTypeWithNamespaceStruct(
+			field,
+			sdlNamespace,
+			*m_sdlTypeListCompPtr,
+			*m_sdlEnumListCompPtr,
+			true,
+			nullptr,
+			nullptr,
+			nullptr,
+			nullptr);
 		FeedStreamHorizontally(stream, indents + 1);
 		stream << QStringLiteral("std::optional<");
 		stream << convertedType;

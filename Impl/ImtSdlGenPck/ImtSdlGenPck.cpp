@@ -100,11 +100,6 @@ I_EXPORT_COMPONENT(
 			"A processor that finalizes files",
 			"SDL Class File Finalize Generated")
 
-I_EXPORT_COMPONENT(
-			SdlEnumGenerator,
-			"A processor that creating C++ enums from SDL schema",
-			"Schema Definition Language SDL Class Generator Enum")
-
 } // namespace ImtSdlGenPck
 
 

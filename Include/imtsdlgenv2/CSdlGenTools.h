@@ -10,6 +10,7 @@
 #include <imtsdl/imtsdl.h>
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
+#include <imtsdl/ISdlEnumListProvider.h>
 
 
 class QTextStream;
@@ -38,10 +39,11 @@ public:
 	{
 	public:
 		CStructNamespaceConverter();
-		CStructNamespaceConverter(const imtsdl::CSdlEntryBase& sdlEntry, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider, bool listWrap);
-		CStructNamespaceConverter(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider, bool listWrap);
+		CStructNamespaceConverter(const imtsdl::CSdlEntryBase& sdlEntry, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider, const imtsdl::ISdlEnumListProvider& enumListProvider, bool listWrap);
+		CStructNamespaceConverter(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider,	const imtsdl::ISdlEnumListProvider& enumListProvider, bool listWrap);
 
 		const imtsdl::ISdlTypeListProvider* typeListProviderPtr = nullptr;
+		const imtsdl::ISdlEnumListProvider* enumListProviderPtr = nullptr;
 		QString relatedNamespace;
 		bool listWrap = false;
 		bool addVersion = false;
@@ -67,10 +69,12 @@ public:
 		const imtsdl::CSdlField& sdlField,
 		const QString& relatedNamespace,
 		const imtsdl::ISdlTypeListProvider& listProvider,
+		const imtsdl::ISdlEnumListProvider& enumlistProvider,
 		bool listWrap = false,
 		bool* isCustomPtr = nullptr,
 		bool* isComplexPtr = nullptr,
-		bool* isArrayPtr = nullptr);
+		bool* isArrayPtr = nullptr,
+		bool* isEnumPtr = nullptr);
 
 	/**
 		\brief Generates a string, checks, if a field of object, named \c objectName, defined or not

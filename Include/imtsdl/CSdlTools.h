@@ -32,7 +32,13 @@ class ISdlProcessArgumentsParser;
 class CSdlTools
 {
 public:
+	// static variables
 	static const QString s_variantMapClassMemberName;
+	/**
+		\brief Defines an SDL scheme namespace prefix.
+		\warning If a change is required, it MUST ONLY be made BEFORE the process of parsing the scheme.
+	*/
+	static QString s_sdlGlobalPrefix;
 
 public:
 	typedef icomp::TReferenceMember<iprm::IParamsSet> SchemaParamsCompPtr;
@@ -95,14 +101,14 @@ public:
 	[[nodiscard]] static QString GetNamespaceAcceptableString(const QString& originalText);
 	[[nodiscard]] static QString GetFileSystemAcceptableEntryPath(const QString& originalText);
 	[[nodiscard]] static QString BuildNamespaceFromComponents(const QString& schemaNamespace, const QString& schemaName, const QString& versionName);
-	[[nodiscard]] static QString BuildNamespaceFromParams(const iprm::IParamsSet& schemaParams);
+	[[nodiscard]] static QString BuildNamespaceFromParams(const iprm::IParamsSet& schemaParams, bool addVersion = true, bool addPrefix = false);
 	[[nodiscard]] static QString BuildQmlImportDeclarationFromParams(const iprm::IParamsSet& schemaParams, const QString& suffix);
 	[[nodiscard]] static QString GetNamespaceFromParamsOrArguments(
 				const SchemaParamsCompPtr& schemaParamsCompPtr,
-				const ArgumentParserCompPtr& argumentParamsCompPtr);
+				const ArgumentParserCompPtr& argumentParamsCompPtr, bool addVersion = true);
 	[[nodiscard]] static QString GetNamespaceFromParamsOrArguments(
 				const iprm::IParamsSet* schemaParamsCompPtr,
-				const ArgumentParserCompPtr& argumentParamsCompPtr);
+				const ArgumentParserCompPtr& argumentParamsCompPtr, bool addVersion = true);
 
 	/// \sa imtsdlgen::ISdlProcessArgumentsParser::s_headerFileType imtsdlgen::ISdlProcessArgumentsParser::s_sourceFileType
 	[[nodiscard]] static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());

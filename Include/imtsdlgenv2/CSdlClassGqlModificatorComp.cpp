@@ -57,7 +57,7 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 	QTextStream ofStream(m_sourceFilePtr);
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	structNameConverter.addVersion = true;
 
 	// add method implementation
@@ -127,12 +127,12 @@ void CSdlClassGqlModificatorComp::AddFieldReadFromRequestCode(QTextStream& strea
 		AddScalarListFieldReadFromRequestCode(stream, field, optional);
 	}
 	else {
-		AddScalarFieldReadFromRequestCode(stream, field, optional);
+		AddScalarFieldReadFromRequestCode(stream, field, optional, isEnum);
 	}
 }
 
 
-void CSdlClassGqlModificatorComp::AddScalarFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
+void CSdlClassGqlModificatorComp::AddScalarFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	const QString tempVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data.") + GetFromVariantConversionStringExt(field);
@@ -142,18 +142,29 @@ void CSdlClassGqlModificatorComp::AddScalarFieldReadFromRequestCode(QTextStream&
 
 	if (!optional && field.IsRequired()){
 		AddDataCheckRequiredValueCode(stream, field);
+
 		FeedStreamHorizontally(stream);
 
-		stream << GetSettingValueString(field, sdlNamespace, *m_sdlTypeListCompPtr, tempVarName);
-		FeedStream(stream, 1, false);
+		if (isEnum){
+			AddSetValueToObjectCode(stream, field);
+		}
+		else {
+			stream << GetSettingValueString(field, sdlNamespace, *m_sdlTypeListCompPtr, tempVarName);
+			FeedStream(stream, 1, false);
+		}
 	}
 	else {
 		stream << QStringLiteral("if (!") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, 2);
-		stream << GetSettingValueString(field, sdlNamespace, *m_sdlTypeListCompPtr, tempVarName);
-		FeedStream(stream, 1, false);
+		if (isEnum){
+			AddSetValueToObjectCode(stream, field, 2);
+		}
+		else{
+			stream << GetSettingValueString(field, sdlNamespace, *m_sdlTypeListCompPtr, tempVarName);
+			FeedStream(stream, 1, false);
+		}
 
 		FeedStreamHorizontally(stream);
 		stream << '}';
@@ -299,12 +310,55 @@ void CSdlClassGqlModificatorComp::AddFieldWriteToRequestCode(QTextStream& stream
 
 void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents)
 {
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("request.InsertField(");
-	stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
-	stream << QStringLiteral("QVariant(*") << field.GetId() << ')';
-	stream << QStringLiteral(");");
-	FeedStream(stream, 1, false);
+	QString tempListVarName;
+	GenerateListTempValueCode(stream, field, tempListVarName, hIndents);
+
+	bool isEnum = false;
+	ConvertTypeOrEnum(
+		field,
+		m_sdlEnumListCompPtr->GetEnums(false),
+		nullptr,
+		nullptr,
+		nullptr,
+		&isEnum);
+
+	if (isEnum){
+		FeedStreamHorizontally(stream, hIndents);
+		const QString enumSourceVarName = '*' +  field.GetId();
+		const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+
+		// declare target value, to store value
+		stream << QStringLiteral("QString ");
+		stream << enumConvertedVarName << ';';
+		FeedStream(stream, 1, false);
+
+		imtsdl::CSdlEnum foundEnum;
+		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+		Q_ASSERT(found);
+
+		WriteConversionFromEnum(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents);
+
+		FeedStreamHorizontally(stream, hIndents);
+
+		stream << QStringLiteral("request.InsertField(");
+		stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
+		if (field.IsArray()){
+			stream << tempListVarName;
+		}
+		else {
+			stream << QStringLiteral("QVariant(") << enumConvertedVarName << ')';
+		}
+		stream << QStringLiteral(");");
+		FeedStream(stream, 1, false);
+	}
+	else {
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("request.InsertField(");
+		stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
+		stream << QStringLiteral("QVariant(*") << field.GetId() << ')';
+		stream << QStringLiteral(");");
+		FeedStream(stream, 1, false);
+	}
 }
 
 
@@ -355,7 +409,7 @@ void CSdlClassGqlModificatorComp::AddScalarListFieldWriteToRequestCode(QTextStre
 void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	const QString dataObjectVariableName = field.GetId() + QStringLiteral("DataObject");
 
 	// declare temp GQL object
@@ -394,7 +448,7 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 
 	const QString dataObjectVariableName = field.GetId() + QStringLiteral("DataObject");
 	const QString dataObjectListVariableName = dataObjectVariableName + QStringLiteral("List");
@@ -490,19 +544,46 @@ void CSdlClassGqlModificatorComp::AddDataCheckRequiredValueCode(QTextStream& str
 }
 
 
-void CSdlClassGqlModificatorComp::AddSetValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field)
+void CSdlClassGqlModificatorComp::AddSetValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	bool isEnum = false;
+
+	ConvertTypeWithNamespace(
+		field,
+		sdlNamespace,
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		nullptr,
+		nullptr,
+		nullptr,
+		&isEnum);
+
+	if (!isEnum){
+		SendCriticalMessage(0, "GQL Potential generation error! AddSetValueToObjectCode called for NON ENUM!!!");
+
+		return;
+	}
+
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	structNameConverter.addVersion = true;
 
-	// reset pointer for object
-	stream << field.GetId();
+	const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
+	const QString enumSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+
+	// declare temp value, to store string equivalent
+	stream << QStringLiteral("QString ");
+	stream << enumSourceVarName;
 	stream << QStringLiteral(" = ");
-	stream << structNameConverter.GetString();
-	stream << field.GetId() << '(';
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
-	stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+	stream << dataVarName;
+	stream << QStringLiteral(".toString();");
+	FeedStream(stream, 1, false);
+
+	imtsdl::CSdlEnum foundEnum;
+	[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+	Q_ASSERT(found);
+
+	WriteConversionFromString(stream, foundEnum, enumSourceVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText(), hIndents);
 }
 
 
@@ -536,7 +617,7 @@ void CSdlClassGqlModificatorComp::AddCheckCustomRequiredValueCode(QTextStream& s
 void CSdlClassGqlModificatorComp::AddSetCustomValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 
 	// reset pointer for object
 	FeedStreamHorizontally(stream, hIndents);
@@ -596,7 +677,7 @@ void CSdlClassGqlModificatorComp::AddCheckCustomListRequiredValueCode(QTextStrea
 void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	structNameConverter.addVersion = true;
 	structNameConverter.listWrap = true;
 

@@ -748,8 +748,11 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 					imtsdl::CSdlType typeForField;
 					const bool isFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), typeForField);
 					Q_ASSERT(isFound);
-					const QString typeNamespace = typeForField.GetNamespace();
+					QString typeNamespace = typeForField.GetNamespace();
 					if (typeNamespace != originalSchemaNamespace){
+						if (!typeNamespace.endsWith(QStringLiteral("::"))){
+							typeNamespace += QStringLiteral("::");
+						}
 						convertedArrayType.prepend(typeNamespace);
 						// use global namespace
 						if (!convertedArrayType.startsWith(QStringLiteral("::"))){
@@ -915,8 +918,11 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 					imtsdl::CSdlType typeForField;
 					const bool isFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), typeForField);
 					Q_ASSERT(isFound);
-					const QString typeNamespace = typeForField.GetNamespace();
+					QString typeNamespace = typeForField.GetNamespace();
 					if (typeNamespace != originalSchemaNamespace){
+						if (!typeNamespace.endsWith(QStringLiteral("::"))){
+							typeNamespace += QStringLiteral("::");
+						}
 						convertedArrayType.prepend(typeNamespace);
 						// use global namespace
 						if (!convertedArrayType.startsWith(QStringLiteral("::"))){

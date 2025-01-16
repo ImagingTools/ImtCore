@@ -125,7 +125,7 @@ void CSdlEnumConverter::WriteConversionFromEnum(
 			const QString& relatedNamespace,
 			uint hIndents)
 {
-	QString typeNamespace = CSdlTools::BuildNamespaceFromParams(sdlEnum.GetSchemaParams());
+	QString typeNamespace = CSdlTools::BuildNamespaceFromParams(sdlEnum.GetSchemaParams(), false, true);
 	if (typeNamespace != relatedNamespace){
 		while (!typeNamespace.endsWith(QStringLiteral("::"))){
 			typeNamespace.append(':');
@@ -192,7 +192,7 @@ void CSdlEnumConverter::WriteConversionFromString(
 			const QString& relatedNamespace,
 			uint hIndents)
 {
-	QString typeNamespace = CSdlTools::BuildNamespaceFromParams(sdlEnum.GetSchemaParams());
+	QString typeNamespace = CSdlTools::BuildNamespaceFromParams(sdlEnum.GetSchemaParams(), false, true);
 	if (typeNamespace != relatedNamespace){
 		while (!typeNamespace.endsWith(QStringLiteral("::"))){
 			typeNamespace.append(':');

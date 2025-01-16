@@ -422,7 +422,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream
 
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("virtual ");
-	stream << OptListConvertTypeWithNamespaceStruct(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, false);
+	stream << OptListConvertTypeWithNamespaceStruct(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	stream << QStringLiteral(" On");
 	stream << GetCapitalizedValue(sdlRequest.GetName());
 	stream << QStringLiteral("(const C");
@@ -514,7 +514,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	const QString requestClassName = sdlRequest.GetName() + QStringLiteral("GqlRequest");
 	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
-	CStructNamespaceConverter structNameConverter(outputArgument, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(outputArgument, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	structNameConverter.addVersion = true;
 
 	// [1] command ID check

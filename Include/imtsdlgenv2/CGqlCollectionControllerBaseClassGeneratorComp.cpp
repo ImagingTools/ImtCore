@@ -608,6 +608,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 	CStructNamespaceConverter structNameConverter;
 	structNameConverter.relatedNamespace = sdlNamespace;
 	structNameConverter.typeListProviderPtr = &*m_sdlTypeListCompPtr;
+	structNameConverter.enumListProviderPtr = &*m_sdlEnumListCompPtr;
 	structNameConverter.addVersion = true;
 
 	if (operationType == imtsdl::CSdlDocumentType::OT_GET ||
@@ -1222,11 +1223,11 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 {
 	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlRequestInfo.request.GetSchemaParams());
 	imtsdl::CSdlType referenceType = sdlDocumentType.GetReferenceType();
-	CStructNamespaceConverter structNameConverter(referenceType, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(referenceType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	structNameConverter.addVersion = true;
 
 	imtsdl::CSdlField outputArgument = sdlRequestInfo.request.GetOutputArgument();
-	CStructNamespaceConverter getStructNameConverter(outputArgument, sdlNamespace, *m_sdlTypeListCompPtr, false);
+	CStructNamespaceConverter getStructNameConverter(outputArgument, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 	getStructNameConverter.addVersion = true;
 
 	FeedStreamHorizontally(stream, hIndents);

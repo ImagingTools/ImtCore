@@ -151,6 +151,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	}
 	if (commandLineParser.isSet(namespacePrefixOption)){
 		m_namespacePrefix = commandLineParser.value(namespacePrefixOption);
+		imtsdl::CSdlTools::s_sdlGlobalPrefix = m_namespacePrefix;
+	}
+	else {
+		imtsdl::CSdlTools::s_sdlGlobalPrefix = QString();
 	}
 	if (commandLineParser.isSet(generateOption)){
 		m_isGenerateMode = true;
