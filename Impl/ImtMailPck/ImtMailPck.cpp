@@ -15,19 +15,14 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
-			EmailEngine,
-			"EmailEngine",
-			"Email Mail Sender Engine");
+			SmtpClient,
+			"Smtp client",
+			"Smtp Client");
 
 I_EXPORT_COMPONENT(
-			MailSmtpRequestFactory,
-			"Mail smtp request factory",
-			"Mail Sender");
-
-I_EXPORT_COMPONENT(
-			MailSettings,
-			"Mail settings",
-			"Mail Settings");
+			SmtpMessage,
+			"Smtp message",
+			"Smtp Message");
 
 
 } // namespace ImtAppPck

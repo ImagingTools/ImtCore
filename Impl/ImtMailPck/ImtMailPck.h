@@ -6,9 +6,8 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
-#include <imtmail/CSmtpMailSendRequest.h>
-#include <imtmail/CMailEngineComp.h>
-#include <imtmail/CMailSettingsComp.h>
+#include <imtmail/CSmtpClientComp.h>
+#include <imtmail/CSmtpMessage.h>
 
 
 /**
@@ -18,9 +17,12 @@ namespace ImtMailPck
 {
 
 
-typedef imtmail::CMailEngineComp EmailEngine;
-typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtmail::CSmtpMailSendRequest>> MailSmtpRequestFactory;
-typedef icomp::TModelCompWrap<imtmail::CMailSettingsComp> MailSettings;
+typedef imtmail::CSmtpClientComp SmtpClient;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+				imtmail::CSmtpMessage,
+				imtmail::ISmtpMessage,
+				iser::ISerializable>> SmtpMessage;
 
 
 } // namespace ImtMailPck
