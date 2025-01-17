@@ -93,6 +93,10 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 CDocumentRevisionControl
 		revisionItem.IsActive = std::make_optional<bool>(revisionInfo.isRevisionAvailable);
 		revisionItem.Timestamp = std::make_optional<QString>(revisionInfo.timestamp.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
 
+		if (revisionItem.User->isEmpty()){
+			continue;
+		}
+
 		if (!revisionInfo.comment.isEmpty() && documentChangeGeneratorPtr != nullptr){
 			imtbase::CObjectCollection changeCollection;
 
@@ -104,6 +108,9 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 CDocumentRevisionControl
 				QString operationDescription = documentChangeGeneratorPtr->GetOperationDescription(changeCollection, languageId);
 				if (!operationDescription.isEmpty()){
 					revisionItem.Description = std::make_optional<QString>(operationDescription);
+				}
+				else{
+					continue;
 				}
 			}
 		}

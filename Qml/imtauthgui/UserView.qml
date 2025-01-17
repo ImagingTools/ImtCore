@@ -285,7 +285,7 @@ ViewBase {
                     id: rolesTable;
 
                     KeyNavigation.tab: groupsTable;
-                    KeyNavigation.backtab: mailInput;
+					KeyNavigation.backtab: userGeneralEditor.mailInput;
 
                     Connections {
                         target: rolesTable.table;
@@ -374,7 +374,7 @@ ViewBase {
                 TableElementView {
                     id: groupsTable;
 
-                    KeyNavigation.tab: usernameInput;
+					KeyNavigation.tab: userGeneralEditor.usernameInput;
                     KeyNavigation.backtab: rolesTable;
 
                     Component.onCompleted: {

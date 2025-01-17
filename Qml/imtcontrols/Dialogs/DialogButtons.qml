@@ -59,6 +59,7 @@ Item {
                 enabled: model.Enabled;
                 focus: model.Active !==undefined ? model.Active: false;
                 text: model.Name;
+				widthFromDecorator: true;
                 onClicked: {
                     buttonsDialogContainer.buttonClicked(model.Id);
                 }

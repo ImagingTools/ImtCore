@@ -34,7 +34,6 @@ Component {
 				return;
 			}
 
-			passwordRecoveryDialog.removeButton(Enums.no);
 			stackView.clear();
 			if (currentIndex === -1){
 				stackView.push(loadingPageComp);
@@ -46,7 +45,6 @@ Component {
 				stackView.push(pageComp0);
 			}
 			else if (currentIndex === 1){
-				passwordRecoveryDialog.insertButton(Enums.no, qsTr("No"), true, 1)
 				passwordRecoveryDialog.setButtonName(Enums.yes, qsTr("Yes"));
 
 				stackView.push(pageComp1);
@@ -221,9 +219,10 @@ Component {
 						id: timer;
 						interval: 1000;
 						running: passwordRecoveryDialog.secs > 0;
-						triggeredOnStart: true;
+						repeat: true;
 
 						onTriggered: {
+							console.log("onTriggered");
 							if (passwordRecoveryDialog.secs > 0){
 								passwordRecoveryDialog.secs--;
 							}

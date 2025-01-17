@@ -127,6 +127,30 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	if (representation.Email){
 		mail = *representation.Email;
 	}
+
+	if (mail.isEmpty()){
+		errorMessage = QString("Email cannot be empty");
+		return false;
+	}
+
+	iprm::CParamsSet mailFilterParam;
+	iprm::CParamsSet mailParamsSet;
+
+	iprm::CTextParam mailParam;
+	mailParam.SetText(mail);
+
+	mailParamsSet.SetEditableParameter("Mail", &mailParam);
+	mailFilterParam.SetEditableParameter("ObjectFilter", &mailParamsSet);
+
+	userIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &mailFilterParam);
+	if (!userIds.isEmpty()){
+		QByteArray userObjectId = userIds[0];
+		if (newObjectId != userObjectId){
+			errorMessage = QT_TR_NOOP("Email already exists");
+			return false;
+		}
+	}
+
 	userInfoPtr->SetMail(mail);
 
 	imtauth::IUserInfo::FeatureIds permissions;

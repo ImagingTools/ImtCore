@@ -303,6 +303,9 @@ RemoteCollectionView {
 		id: documentValidator;
 		DocumentValidator {
 			property UserData userData: documentModel;
+			property MailRegExpValidator mailRegExp: MailRegExpValidator {};
+
+			property var regExp: new RegExp(mailRegExp.regularExpression)
 
 			function isValid(data){
 				if (!data.editor){
@@ -322,6 +325,10 @@ RemoteCollectionView {
 				}
 
 				if (userData.m_password === ""){
+					return false;
+				}
+
+				if (!regExp.test(userData.m_email)){
 					return false;
 				}
 

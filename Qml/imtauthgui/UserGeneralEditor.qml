@@ -16,6 +16,7 @@ Column {
 	signal emitUpdateGui();
 
 	property alias usernameInput: usernameInput_;
+	property alias mailInput: mailInput_;
 	property alias passwordInput: passwordInput_;
 	property alias confirmPasswordInput: confirmPassword;
 	property alias changePasswordButton: changePasswordButton_;
@@ -23,14 +24,14 @@ Column {
 	function updateGui(){
 		usernameInput_.text = container.userData.m_username;
 		nameInput.text = container.userData.m_name;
-		mailInput.text = container.userData.m_email;
+		mailInput_.text = container.userData.m_email;
 		passwordInput_.text = container.userData.m_password;
 	}
 
 	function updateModel(){
 		container.userData.m_username = usernameInput_.text;
 		container.userData.m_name = nameInput.text;
-		container.userData.m_email = mailInput.text;
+		container.userData.m_email = mailInput_.text;
 		container.userData.m_password = passwordInput_.text;
 	}
 
@@ -64,7 +65,9 @@ Column {
 				}
 			}
 
-			KeyNavigation.tab: passwordInput_;
+			KeyNavigation.tab: nameInput;
+			KeyNavigation.backtab: passwordInput_.visible ? confirmPassword : mailInput_;
+
 		}
 
 		RegularExpressionValidator {
@@ -89,8 +92,8 @@ Column {
 				}
 			}
 
-			KeyNavigation.tab: mailInput;
-			KeyNavigation.backtab: passwordInput_;
+			KeyNavigation.tab: mailInput_;
+			KeyNavigation.backtab: usernameInput_;
 		}
 
 		RegularExpressionValidator {
@@ -100,19 +103,20 @@ Column {
 		}
 
 		TextInputElementView {
-			id: mailInput;
+			id: mailInput_;
 
 			name: qsTr("Email Address");
 			textInputValidator: mailValid;
 
 			placeHolderText: qsTr("Enter the email");
 			readOnly: container.readOnly;
-
+			showErrorWhenInvalid: true;
+			errorText: qsTr("Please enter the email");
 			onEditingFinished: {
 				container.emitUpdateModel();
 			}
 
-			KeyNavigation.tab: usernameInput_;
+			KeyNavigation.tab: passwordInput_.visible ? passwordInput_ : usernameInput_;
 			KeyNavigation.backtab: nameInput;
 		}
 
@@ -123,7 +127,7 @@ Column {
 
 			usernameInput_.text = container.userData.m_username;
 			nameInput.text = container.userData.m_name;
-			mailInput.text = container.userData.m_email;
+			mailInput_.text = container.userData.m_email;
 			passwordInput_.text = container.userData.m_password;
 		}
 
@@ -134,7 +138,7 @@ Column {
 
 			container.userData.m_username = usernameInput_.text;
 			container.userData.m_name = nameInput.text;
-			container.userData.m_email = mailInput.text;
+			container.userData.m_email = mailInput_.text;
 			container.userData.m_password = passwordInput_.text;
 		}
 	}
@@ -204,7 +208,7 @@ Column {
 			}
 
 			KeyNavigation.tab: confirmPassword;
-			KeyNavigation.backtab: nameInput;
+			KeyNavigation.backtab: mailInput_;
 		}
 
 		TextInputElementView {
