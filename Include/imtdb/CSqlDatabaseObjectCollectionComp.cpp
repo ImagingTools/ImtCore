@@ -75,6 +75,12 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 		objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
+	if (!IsObjectTypeSupported(typeId)){
+		SendErrorMessage(0, QString("Object type ID \"%1\" not supported").arg(typeId));
+
+		return QByteArray();
+	}
+
 	imtdb::IDatabaseObjectDelegate::NewObjectQuery objectQuery = m_objectDelegateCompPtr->CreateNewObjectQuery(
 				typeId,
 				objectId,
@@ -622,6 +628,28 @@ bool CSqlDatabaseObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 
 
 // protected methods
+
+bool CSqlDatabaseObjectCollectionComp::IsObjectTypeSupported(const QByteArray& typeId) const
+{
+	if (m_objectDelegateCompPtr.IsValid()){
+		const iprm::IOptionsList* infosPtr = m_objectDelegateCompPtr->GetObjectTypeInfos();
+		if (infosPtr == nullptr){
+			return true;
+		}
+
+		int count = infosPtr->GetOptionsCount();
+		for (int i = 0; i < count; i++){
+			if (infosPtr->GetOptionId(i) == typeId){
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	return false;
+}
+
 
 bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQuery) const
 {

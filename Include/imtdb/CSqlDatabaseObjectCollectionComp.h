@@ -117,6 +117,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
+	virtual bool IsObjectTypeSupported(const QByteArray& typeId) const;
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery, const QVariantMap& bindValues) const;
 	QSqlRecord GetObjectRecord(const QByteArray& objectId) const;
