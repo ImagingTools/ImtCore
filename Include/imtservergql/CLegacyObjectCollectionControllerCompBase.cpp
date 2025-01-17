@@ -821,7 +821,8 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::GetHeaders(
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
-	imtbase::CTreeItemModel* headersModelPtr = m_headersProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
+	imtgql::CGqlRequest headersRequest;
+	imtbase::CTreeItemModel* headersModelPtr = m_headersProviderCompPtr->CreateResponse(headersRequest, errorMessage);
 	if (headersModelPtr != nullptr){
 		rootModelPtr->SetExternTreeModel("data", headersModelPtr);
 	}
