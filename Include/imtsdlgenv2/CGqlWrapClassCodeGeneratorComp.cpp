@@ -526,8 +526,9 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 
 		// add custom types for nested structs creation
 		bool isCustom = false;
-		ConvertType(fieldFromType, &isCustom);
-		if (isCustom){
+		bool isEnum = false;
+		ConvertTypeOrEnum(fieldFromType, m_sdlEnumListCompPtr->GetEnums(false), &isCustom, nullptr, nullptr, &isEnum);
+		if (isCustom && !isEnum){
 			customTypes << fieldFromType;
 		}
 	}

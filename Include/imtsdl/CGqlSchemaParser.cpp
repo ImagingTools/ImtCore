@@ -348,7 +348,7 @@ bool CGqlSchemaParser::ProcessEnum()
 
 	bool atEnd = false;
 	while (!atEnd){
-		retVal = retVal && MoveToNextReadableSymbol();
+		retVal = retVal && MoveToNextReadableSymbol() && MoveInside();
 		QByteArray enumValue;
 		char foundDelimeter = '}';
 		retVal = retVal && ReadToDelimeterOrSpace("}", enumValue, &foundDelimeter);
@@ -818,6 +818,16 @@ bool CGqlSchemaParser::MoveToNextReadableSymbol(char* foundDelimeterPtr, bool sk
 				<< QChar::Symbol_Modifier
 				<< QChar::Symbol_Other,
 						  foundDelimeterPtr, skipDelimeter);
+}
+
+
+bool CGqlSchemaParser::MoveInside()
+{
+	if (m_lastReadChar == '{'){
+		return MoveToNextReadableSymbol();
+	}
+
+	return true;
 }
 
 
