@@ -11,13 +11,18 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
-
-bool CHeadersDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*gqlRequest*/) const
+bool CHeadersDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
+	bool isSupported = BaseClass::IsRequestSupported(gqlRequest);
+	if (!isSupported){
+		return m_commandIdsAttrPtr.FindValue("");
+	}
+
 	return true;
 }
 
+
+// reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
 
 imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 			const imtgql::CGqlRequest& gqlRequest,
