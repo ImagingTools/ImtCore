@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.26)
 
 if(WIN32)
         set(XLSX_LIB_SEARCH_PATH "${CMAKE_CURRENT_LIST_DIR}/../../3rdParty/QXlsx/Lib/${CMAKE_BUILD_TYPE}${TARGETNAME}")
