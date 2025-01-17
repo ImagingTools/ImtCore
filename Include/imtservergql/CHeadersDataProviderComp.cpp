@@ -16,7 +16,7 @@ bool CHeadersDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gql
 	bool isSupported = BaseClass::IsRequestSupported(gqlRequest);
 	if (!isSupported){
 		QByteArray commandId = gqlRequest.GetCommandId();
-		if (commandId.isEmpty() && m_commandIdsAttrPtr.GetCount() == 0){
+		if (commandId.isEmpty()){
 			return true;
 		}
 
