@@ -15,7 +15,12 @@ bool CHeadersDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gql
 {
 	bool isSupported = BaseClass::IsRequestSupported(gqlRequest);
 	if (!isSupported){
-		return m_commandIdsAttrPtr.FindValue("");
+		QByteArray commandId = gqlRequest.GetCommandId();
+		if (commandId.isEmpty() && m_commandIdsAttrPtr.GetCount() == 0){
+			return true;
+		}
+
+		return false;
 	}
 
 	return true;
