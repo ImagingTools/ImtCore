@@ -29,6 +29,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
+	Q_ASSERT(m_sdlEnumListCompPtr.IsValid());
 
 	int retVal = TS_OK;
 
@@ -255,6 +256,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	// add imports for external types
 	QSet<QString> requiredImports;
 	const imtsdl::SdlTypeList allTypes = m_sdlTypeListCompPtr->GetSdlTypes(false);
+	const imtsdl::SdlEnumList enumList = m_sdlEnumListCompPtr->GetEnums(false);
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
 		bool isCustom = false;
 		ConvertType(field, &isCustom);
@@ -263,17 +265,17 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 			continue;
 		}
 
-		imtsdl::CSdlType type;
-		const bool exists = GetSdlTypeForField(field, allTypes, type);
-		if (!exists){
+
+		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumForField(field, allTypes, enumList);
+		if (!foundEntry){
 			SendCriticalMessage(0, QString("Unable to find type for %1:%2").arg(field.GetId(), field.GetType()));
 			I_CRITICAL();
 
 			return false;
 		}
 
-		if (type.IsExternal()){
-			QString qmlImportDeclaration = type.GetQmlImportDeclaration();
+		if (foundEntry->IsExternal()){
+			QString qmlImportDeclaration = foundEntry->GetQmlImportDeclaration();
 			if (!qmlImportDeclaration.isEmpty())
 				requiredImports << qmlImportDeclaration;
 		}
@@ -311,6 +313,9 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 
 		ifStream << QStringLiteral("property ");
 
+		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumForField(sdlField, allTypes, enumList);
+		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
+
 		bool isCustom = false;
 		QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
 		if (sdlField.IsArray() && !isCustom){
@@ -318,6 +323,9 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		}
 		else if (sdlField.IsArray()){
 			ifStream << QStringLiteral("BaseModel");
+		}
+		else if (isEnum){
+			ifStream << QStringLiteral("string");
 		}
 		else {
 			ifStream << QmlConvertType(sdlField.GetType());
@@ -328,7 +336,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		if (sdlField.IsArray() && !isCustom){
 			ifStream << QStringLiteral("[]");
 		}
-		else if (!isCustom){
+		else if (!isCustom || isEnum){
 			if (convertedType == QStringLiteral("int") ||
 				convertedType == QStringLiteral("real") ||
 				convertedType == QStringLiteral("double"))
@@ -338,7 +346,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 			else if (convertedType == QStringLiteral("bool")){
 				ifStream << QStringLiteral("false");
 			}
-			else if (convertedType == QStringLiteral("string"))
+			else if (convertedType == QStringLiteral("string") || isEnum)
 			{
 				ifStream << QStringLiteral("''");
 			}
@@ -389,8 +397,12 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
 		bool isCustom = false;
 		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
+
+		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumForField(sdlField, allTypes, enumList);
+		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
+
 		// skip simple scalars and list of scalars
-		if (!isCustom){
+		if (!isCustom || isEnum){
 			continue;
 		}
 
