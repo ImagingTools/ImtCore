@@ -188,7 +188,8 @@ class ListView extends Flickable {
         
     }
 
-    $clear(){
+    $clear(destroyCache = false){
+        if(destroyCache)
         while(this.$cache.length){
             let obj = this.$cache.shift()
             if(obj) obj.destroy()
@@ -235,7 +236,7 @@ class ListView extends Flickable {
     }
 
     $delegateChanged(){
-        this.$clear()
+        this.$clear(true)
         this.$updateView()
     }
 
@@ -756,7 +757,7 @@ class ListView extends Flickable {
 
     destroy(){
         this.$disconnectModel()
-        this.$clear()
+        this.$clear(true)
         
         super.destroy()
     }

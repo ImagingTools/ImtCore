@@ -59,4 +59,6 @@ module.exports.listComponents = [
     'GqlModel',
     'FileIO',
     'Flow',
+    'BaseClass',
+    'BaseModel',
 ]

@@ -1079,7 +1079,7 @@ class TransactionController {
             }
             return true
         } else {
-            return false
+            if(!obj.UID) obj.$free()
         }
     }
 
