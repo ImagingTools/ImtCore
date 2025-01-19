@@ -68,6 +68,16 @@ sdl::imtauth::Users::CChangePasswordPayload::V1_0 CUserControllerComp::OnChangeP
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
+	if (!m_userCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
+		return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
+	}
+
+	if (!m_hashCalculatorCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'HashCalculator' was not set", "CUserControllerComp");
+		return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
+	}
+
 	sdl::imtauth::Users::CChangePasswordInput::V1_0 inputArgument = changePasswordRequest.GetRequestedArguments().input;
 	QByteArray login;
 	if (inputArgument.Login){

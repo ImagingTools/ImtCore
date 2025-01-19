@@ -83,11 +83,7 @@ void CUserVerification::SetExpirationDate(const QDateTime& expirationDate)
 
 bool CUserVerification::IsExpired() const
 {
-	qDebug() << "IsExpired";
 	QDateTime currentDateTime = QDateTime::currentDateTime();
-	qDebug() << "currentDateTime" << currentDateTime.toString();
-	qDebug() << "m_expirationDate" << m_expirationDate.toString();
-
 	return m_expirationDate <= currentDateTime;
 }
 
@@ -124,7 +120,7 @@ bool CUserVerification::Serialize(iser::IArchive& archive)
 
 // reimplemented (iser::IChangeable)
 
-bool CUserVerification::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CUserVerification::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CUserVerification* sourcePtr = dynamic_cast<const CUserVerification*>(&object);
 	if (sourcePtr != nullptr){
@@ -170,7 +166,7 @@ istd::IChangeable* CUserVerification::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CUserVerification::ResetData(CompatibilityMode mode)
+bool CUserVerification::ResetData(CompatibilityMode /*mode*/)
 {
 	m_userId.clear();
 	m_verificationCode.clear();

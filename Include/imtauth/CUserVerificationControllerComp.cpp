@@ -25,6 +25,10 @@ CUserVerificationControllerComp::CUserVerificationControllerComp()
 
 const imtauth::IUserVerification* CUserVerificationControllerComp::GetVerificationData(const QByteArray& verificationId) const
 {
+	if (!m_userVerificationCollectionCompPtr.IsValid()){
+		return nullptr;
+	}
+
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userVerificationCollectionCompPtr->GetObjectData(verificationId, dataPtr)){
 		if (dataPtr.IsValid()){
@@ -143,6 +147,10 @@ void CUserVerificationControllerComp::CheckExpiredVerificationDataThread::Start(
 void CUserVerificationControllerComp::CheckExpiredVerificationDataThread::run()
 {
 	int interval = 5;
+	if (!m_parent.m_userVerificationCollectionCompPtr.IsValid()){
+		return;
+	}
+
 	while (!isInterruptionRequested()){
 		imtbase::ICollectionInfo::Ids ids = m_parent.m_userVerificationCollectionCompPtr->GetElementIds();
 		if (ids.isEmpty()){

@@ -1,5 +1,6 @@
 #include <imtauthgql/CSessionControllerComp.h>
 
+
 // ImtCore includes
 #include <imtauth/ISession.h>
 
@@ -15,6 +16,7 @@ namespace imtauthgql
 imtbase::CTreeItemModel* CSessionControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribure 'ObjectCollection' was not set", "CSessionControllerComp");
 		return nullptr;
 	}
 
@@ -40,5 +42,4 @@ imtbase::CTreeItemModel* CSessionControllerComp::GetObject(const imtgql::CGqlReq
 
 
 } // namespace imtauthgql
-
 
