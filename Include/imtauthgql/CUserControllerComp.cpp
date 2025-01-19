@@ -249,9 +249,11 @@ sdl::imtauth::Users::CRegisterUserPayload::V1_0 CUserControllerComp::OnRegisterU
 
 	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
 
-	imtbase::IObjectCollection::Ids roleIds = m_roleCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (!roleIds.isEmpty()){
-		userInfoPtr->AddRole(productId, roleIds[0]);
+	if (m_roleCollectionCompPtr.IsValid()){
+		imtbase::IObjectCollection::Ids roleIds = m_roleCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+		if (!roleIds.isEmpty()){
+			userInfoPtr->AddRole(productId, roleIds[0]);
+		}
 	}
 
 	m_userCollectionCompPtr->InsertNewObject("", "", "", userInfoPtr.GetPtr(), userId);
