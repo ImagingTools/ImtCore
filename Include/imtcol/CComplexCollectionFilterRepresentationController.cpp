@@ -170,8 +170,8 @@ bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
 	if (source.groupFilters){
 		sourceGroupSubFilters = *source.groupFilters;
 	}
-	QList<imtbase::IComplexCollectionFilter::FieldFilter> targetFieldSubFilters;
-	QList<imtbase::IComplexCollectionFilter::GroupFilter> targetGroupSubFilters;
+	QVector<imtbase::IComplexCollectionFilter::FieldFilter> targetFieldSubFilters;
+	QVector<imtbase::IComplexCollectionFilter::GroupFilter> targetGroupSubFilters;
 
 	for (const sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& sourceFieldSubFilter : sourceFieldSubFilters){
 		imtbase::IComplexCollectionFilter::FieldFilter targetFieldSubFilter;
