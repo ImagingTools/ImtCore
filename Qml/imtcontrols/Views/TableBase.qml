@@ -11,6 +11,7 @@ Rectangle {
 	property int itemHeight: 35;
 	property int headerHeight: 35;
 	property int headerMinHeight: 35;
+	property int headerGap: 0;
 
 	property bool hasFilter: false;
 	property bool hasSort: false;
@@ -42,6 +43,7 @@ Rectangle {
 	property TreeItemModel widthDecoratorDynamic: TreeItemModel{}
 
 	property alias scrollbarItem: scrollbar;
+	property alias scrollbarItemHoriz: scrollHoriz;
 
 	property alias rowDelegate: elementsListObj.delegate;
 	property alias elements: elementsListObj.model;
@@ -730,7 +732,7 @@ Rectangle {
 		id: elementsBg;
 
 		anchors.fill: elementsListObj;
-		color: Style.baseColor;
+		color: tableContainer.color;//Style.baseColor;
 
 		radius: tableContainer.radius;
 
@@ -783,6 +785,7 @@ Rectangle {
 		anchors.left: parent.left;
 		anchors.right: scrollbar.visible ? scrollbar.left : parent.right;
 		anchors.top: headersPanel.bottom;
+		anchors.topMargin: tableContainer.headerGap;
 		anchors.bottom: parent.bottom;
 		anchors.bottomMargin: scrollHoriz.visible ? scrollHoriz.secondSize + scrollHoriz.anchors.topMargin : 0;
 
