@@ -234,8 +234,8 @@ ViewCommandsDelegateBase {
 
 		PopupMenuDialog {
 			itemWidth: 350;
-			centered: true;
-			hiddenBackground: false;
+			// centered: true;
+			// hiddenBackground: false;
 			onFinished: {
 				if (index >= 0){
 					fileDialogSave.fileExt = collectionViewCommandsDelegate.getExtensionFromNameFilter(fileDialogSave.nameFilters, index);
