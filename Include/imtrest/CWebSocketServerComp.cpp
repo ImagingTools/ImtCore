@@ -62,7 +62,6 @@ void CWebSocketServerComp::RegisterSender(const QByteArray& clientId, QWebSocket
 	}
 	socketSender->moveToThread(mainThread);
 
-	qDebug() << "RegisterSender" << clientId;
 	m_senders.insert(clientId, socketSender);
 }
 
@@ -288,8 +287,6 @@ void CWebSocketServerComp::OnSocketDisconnected()
 
 	for (const QByteArray& key: m_senders.keys()){
 		if (socketObjectPtr == m_senders[key]->GetSocket()){
-			qDebug() << "OnSocketDisconnected" << key;
-
 			m_senders.remove(key);
 
 			istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));

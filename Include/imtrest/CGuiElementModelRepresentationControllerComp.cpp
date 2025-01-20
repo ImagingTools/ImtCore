@@ -4,9 +4,9 @@
 // ACF includes
 #include <iprm/IIdParam.h>
 #include <iprm/TParamsPtr.h>
+#include <iqt/iqt.h>
 
 // ImtCore includes
-#include <iqt/iqt.h>
 #include <imtrest/IGuiElementContainer.h>
 #include <imtrest/IGuiElementModel.h>
 

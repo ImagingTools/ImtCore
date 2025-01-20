@@ -4,8 +4,6 @@
 // ACF includes
 #include <iprm/TParamsPtr.h>
 #include <iprm/IIdParam.h>
-
-// ImtCore includes
 #include <iqt/iqt.h>
 
 

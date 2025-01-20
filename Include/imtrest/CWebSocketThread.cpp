@@ -100,7 +100,7 @@ void CWebSocketThread::run()
 		return;
 	}
 
-	QWebSocket* webSocketPtr = m_socket.get();
+	QWebSocket* webSocketPtr = m_socket.data();
 	if (!m_webSocket.IsValid()){
 		m_webSocket.SetPtr(new CWebSocket(this));
 	}
@@ -129,9 +129,7 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		return;
 	}
 
-	// QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
-	QWebSocket* webSocketPtr = m_socket.get();
-
+	QWebSocket* webSocketPtr = m_socket.data();
 	if (webSocketPtr == nullptr){
 		return;
 	}
