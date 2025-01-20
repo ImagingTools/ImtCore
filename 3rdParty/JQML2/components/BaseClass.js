@@ -135,7 +135,7 @@ class BaseClass extends QtObject {
         let list = this.getProperties()
 
         for (let name of list) {
-            this[name + 'Changed'].connect(function () {
+            this[name + 'Changed'].connect(()=>{
                 if (this.enableNotifications)
                     this._internal.internalModelChanged(name, self)
             })
