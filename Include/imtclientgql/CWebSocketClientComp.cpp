@@ -95,7 +95,7 @@ bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) con
 		QByteArray body = data;
 		imtrest::IResponse::Headers headers = response->GetHeaders();
 		data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
-				   .arg(headers.value("id")).arg(body).toUtf8();
+				   .arg(qPrintable(headers.value("id"))).arg(qPrintable(body)).toUtf8();
 		qDebug() << "SendResponse" << data;
 	}
 
@@ -153,6 +153,20 @@ QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArra
 }
 
 
+// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
+
+void CWebSocketClientComp::OnSystemShutdown()
+{
+	disconnect(&m_webSocket, &QWebSocket::connected, this, &CWebSocketClientComp::OnWebSocketConnected);
+	m_refreshTimer.stop();
+	m_webSocket.disconnect();
+
+	m_webSocket.moveToThread(qApp->thread());
+
+	m_webSocket.close();
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CWebSocketClientComp::OnComponentCreated()
@@ -190,9 +204,10 @@ void CWebSocketClientComp::OnComponentCreated()
 
 void CWebSocketClientComp::OnComponentDestroyed()
 {
-	disconnect(&m_webSocket, &QWebSocket::connected, this, &CWebSocketClientComp::OnWebSocketConnected);
-	m_refreshTimer.stop();
-	m_webSocket.disconnect();
+	// Fallback (will not work in someb situations)
+	if (!m_runtimeStatusCompPtr.IsValid()){
+		OnSystemShutdown();
+	}
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -255,7 +270,6 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 {
 	if (!message.contains("keep_alive")){
 		SendVerboseMessage(message, "OnWebSocketTextMessageReceived");
-		qDebug() << "OnWebSocketTextMessageReceived" << message;
 	}
 
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());

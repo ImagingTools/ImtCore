@@ -6,6 +6,7 @@
 #include <istd/TPointerVector.h>
 #include <iprm/ITextParam.h>
 #include <imod/TModelWrap.h>
+#include <ibase/TRuntimeStatusHanderCompWrap.h>
 
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
@@ -29,7 +30,7 @@ namespace imtclientgql
 
 class CWebSocketClientComp:
 			public QObject,
-			public ilog::CLoggerComponentBase,
+			public ibase::TRuntimeStatusHanderCompWrap <ilog::CLoggerComponentBase>,
 			virtual public imtrest::ISender,
 			virtual public imtcom::IConnectionController,
 			virtual public imtrest::IRequestManager,
@@ -37,7 +38,7 @@ class CWebSocketClientComp:
 {
 	Q_OBJECT
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef ibase::TRuntimeStatusHanderCompWrap <ilog::CLoggerComponentBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CWebSocketClientComp);
 		I_REGISTER_INTERFACE(ISender)
@@ -59,7 +60,7 @@ public:
 		I_ASSIGN(m_clientIdAttrPtr, "ClientId", "ID of the client that needs to be identified on the server", false, "");
 		I_ASSIGN(m_clientIdCompPtr, "ClientIdParam", "Parameter providing the client-ID that needs to be identified on the server", false, "ClientIdParam");
 		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded grapgQl requests", false, "");
-		I_END_COMPONENT;
+	I_END_COMPONENT;
 
 	CWebSocketClientComp();
 
@@ -80,14 +81,18 @@ public:
 protected:
 	QByteArray Sign(const QByteArray& message, const QByteArray& key = "") const;
 
+	// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
+	virtual void OnSystemShutdown() override;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
 Q_SIGNALS:
 	void EmitQueryDataReceived(int resultCode = 1);
-	void EmitWebSocketClose(QWebSocketProtocol::CloseCode closeCode = QWebSocketProtocol::CloseCodeNormal,
-							const QString &reason = QString());
+	void EmitWebSocketClose(
+				QWebSocketProtocol::CloseCode closeCode = QWebSocketProtocol::CloseCodeNormal,
+				const QString &reason = QString());
 	void EmitStopTimer();
 	void EmitStartTimer();
 	void EmitSendTextMessage(const QByteArray message) const;
