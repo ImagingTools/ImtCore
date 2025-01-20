@@ -197,17 +197,17 @@ int CFileCollectionComp::BackupRevision(
 				}
 			}
 			else{
-				SendErrorMessage(0, QString(QObject::tr("Target file '%1' could not be created")).arg(targetFilePath));
+				SendErrorMessage(0, QT_TR_NOOP(QString("Target file '%1' could not be created").arg(targetFilePath)));
 			}
 
 			tempDir.removeRecursively();
 		}
 		else{
-			SendErrorMessage(0, QString(QObject::tr("Target folder '%1' could not be created")).arg(tempPath));
+			SendErrorMessage(0, QT_TR_NOOP(QString("Target folder '%1' could not be created").arg(tempPath)));
 		}
 	}
 	else{
-		SendErrorMessage(0, QString(QObject::tr("Target folder '%1' could not be created")).arg(revisionsPath));
+		SendErrorMessage(0, QT_TR_NOOP(QString("Target folder '%1' could not be created").arg(revisionsPath)));
 	}
 
 	return -1;
@@ -287,13 +287,13 @@ bool CFileCollectionComp::RestoreRevision(
 						}
 					}
 					else{
-						SendErrorMessage(0, QString(QObject::tr("Revision '%1' could not be decompressed")).arg(revisionFilePath));
+						SendErrorMessage(0, QT_TR_NOOP(QString("Revision '%1' could not be decompressed").arg(revisionFilePath)));
 					}
 
 					tempDir.removeRecursively();
 				}
 				else{
-					SendErrorMessage(0, QString(QObject::tr("Target folder '%1' could not be created")).arg(tempPath));
+					SendErrorMessage(0, QT_TR_NOOP(QString("Target folder '%1' could not be created").arg(tempPath)));
 				}
 			}
 		}
@@ -355,13 +355,13 @@ bool CFileCollectionComp::ExportRevision(
 						}
 					}
 					else{
-						SendErrorMessage(0, QString(QObject::tr("Revision '%1' could not be decompressed")).arg(revisionFilePath));
+						SendErrorMessage(0, QT_TR_NOOP(QString("Revision '%1' could not be decompressed").arg(revisionFilePath)));
 					}
 
 					tempDir.removeRecursively();
 				}
 				else{
-					SendErrorMessage(0, QString(QObject::tr("Target folder '%1' could not be created")).arg(tempPath));
+					SendErrorMessage(0, QT_TR_NOOP(QString("Target folder '%1' could not be created").arg(tempPath)));
 				}
 			}
 		}
@@ -422,7 +422,7 @@ bool CFileCollectionComp::RemoveElement(const Id& elementId, const imtbase::IOpe
 		QString dataFilePath = GetDataItemFilePath(itemToRemove);
 		QFile dataFile(dataFilePath);
 		if (!dataFile.remove()){
-			SendErrorMessage(0, QObject::tr("File '%1' could not be removed. Error status: %2").arg(dataFilePath).arg(dataFile.errorString()));
+			SendErrorMessage(0, QT_TR_NOOP(QString("File '%1' could not be removed. Error status: %2").arg(dataFilePath).arg(dataFile.errorString())));
 
 			return false;
 		}
@@ -430,7 +430,7 @@ bool CFileCollectionComp::RemoveElement(const Id& elementId, const imtbase::IOpe
 		QString metaDataFilePath = GetMetaInfoFilePath(itemToRemove);
 		QFile metaDataFile(metaDataFilePath);
 		if (!metaDataFile.remove()){
-			SendErrorMessage(0, QObject::tr("File '%1' could not be removed. Error status: %2").arg(metaDataFilePath).arg(metaDataFile.errorString()));
+			SendErrorMessage(0, QT_TR_NOOP(QString("File '%1' could not be removed. Error status: %2").arg(metaDataFilePath).arg(metaDataFile.errorString())));
 
 			return false;
 		}
@@ -438,7 +438,7 @@ bool CFileCollectionComp::RemoveElement(const Id& elementId, const imtbase::IOpe
 		QString parentDirectory = fileInfo.absolutePath();
 
 		if (!istd::CSystem::RemoveDirectory(parentDirectory)){
-			SendErrorMessage(0, QObject::tr("Folder containing file '%1'could not be removed").arg(itemToRemove.GetFilePath()));
+			SendErrorMessage(0, QT_TR_NOOP(QString("Folder containing file '%1'could not be removed").arg(itemToRemove.GetFilePath())));
 
 			return false;
 		}
@@ -457,7 +457,7 @@ bool CFileCollectionComp::RemoveElement(const Id& elementId, const imtbase::IOpe
 		return true;
 	}
 	else{
-		SendInfoMessage(0, QObject::tr("Resource '%1' doesn't exist").arg(qPrintable(elementId)));
+		SendInfoMessage(0, QT_TR_NOOP(QString("Resource '%1' doesn't exist").arg(qPrintable(elementId))));
 	}
 
 	return true;
@@ -480,7 +480,7 @@ bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& nam
 				bool isSameResourceType = (m_files[fileIndex].GetTypeId() == m_files[foundIndex].GetTypeId());
 
 				if (isSameResourceType){
-					SendErrorMessage(0, QObject::tr("Resource with the name '%1' already exists").arg(name));
+					SendErrorMessage(0, QT_TR_NOOP(QString("Resource with the name '%1' already exists").arg(name)));
 
 					return false;
 				}
@@ -509,7 +509,7 @@ bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& nam
 			// Remove old data file:
 			QString oldDataItemFilePath = GetDataItemFilePath(item);
 			if (!QFile::remove(oldDataItemFilePath)){
-				SendWarningMessage(0, QObject::tr("Data file '%1' could not be removed").arg(oldDataItemFilePath));
+				SendWarningMessage(0, QT_TR_NOOP(QString("Data file '%1' could not be removed").arg(oldDataItemFilePath)));
 			}
 
 			// Rename meta info file:
@@ -519,7 +519,7 @@ bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& nam
 				QString newMetaInfoFilePath = metaFileInfo.absolutePath() + "/" + newFileName + "." + GetRepositoryInfo().metaInfoFileSuffix;
 
 				if (!QFile::rename(oldMetaInfoFilePath, newMetaInfoFilePath)){
-					SendWarningMessage(0, QObject::tr("Meta-info file '%1' could not be removed").arg(oldMetaInfoFilePath));
+					SendWarningMessage(0, QT_TR_NOOP(QString("Meta-info file '%1' could not be removed").arg(oldMetaInfoFilePath)));
 
 					QFile::remove(oldMetaInfoFilePath);
 				}
@@ -538,7 +538,7 @@ bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& nam
 			targetFolderPath += "/" + newPhysicalName;
 
 			if (!resourceDir.rename(resouceDirPath, targetFolderPath)){
-				SendErrorMessage(0, QObject::tr("Resource path could not be renamed from '%1' into '%2'. Resource could not be renamed to '%3'").arg(resouceDirPath).arg(targetFolderPath).arg(name));
+				SendErrorMessage(0, QT_TR_NOOP(QString("Resource path could not be renamed from '%1' into '%2'. Resource could not be renamed to '%3'").arg(resouceDirPath).arg(targetFolderPath).arg(name)));
 
 				locker.unlock();
 
@@ -561,7 +561,7 @@ bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& nam
 		return true;
 	}
 
-	SendErrorMessage(0, QObject::tr("Resource with the ID '%1' doesn't exist").arg(elementId.constData()));
+	SendErrorMessage(0, QT_TR_NOOP(QString("Resource with the ID '%1' doesn't exist").arg(elementId.constData())));
 
 	return false;
 }
@@ -688,33 +688,33 @@ QByteArray CFileCollectionComp::ImportFile(
 									return collectionItem.GetFileId();
 								}
 								else{
-									SendErrorMessage(0, tr("File could not be inserted into the repository"));
+									SendErrorMessage(0, QT_TR_NOOP("File could not be inserted into the repository"));
 								}
 							}
 							else{
-								SendErrorMessage(0, tr("Item file '%1' could not be saved").arg(newItemFile));
+								SendErrorMessage(0, QT_TR_NOOP(QString("Item file '%1' could not be saved").arg(newItemFile)));
 							}
 						}
 						else{
-							SendErrorMessage(0, tr("Data file '%1' not found").arg(dataFile));
+							SendErrorMessage(0, QT_TR_NOOP(QString("Data file '%1' not found").arg(dataFile)));
 						}
 					}
 					else{
-						SendErrorMessage(0, tr("Unable read item file '%1'").arg(itemFile));
+						SendErrorMessage(0, QT_TR_NOOP(QString("Unable read item file '%1'").arg(itemFile)));
 					}
 				}
 				else{
-					SendErrorMessage(0, tr("Item file not found in '%1'").arg(workingPath));
+					SendErrorMessage(0, QT_TR_NOOP(QString("Item file not found in '%1'").arg(workingPath)));
 				}
 			}
 			else{
-				SendErrorMessage(0, tr("Unable to uncompress '%1'").arg(sourceFilePath));
+				SendErrorMessage(0, QT_TR_NOOP(QString("Unable to uncompress '%1'").arg(sourceFilePath)));
 			}
 
 			workingDir.removeRecursively();
 		}
 		else{
-			SendErrorMessage(0, tr("Target folder '%1' could not be created").arg(workingPath));
+			SendErrorMessage(0, QT_TR_NOOP(QString("Target folder '%1' could not be created").arg(workingPath)));
 		}
 	}
 	else if (!IsPathInsideRepository(sourceFilePath)){
@@ -816,7 +816,7 @@ bool CFileCollectionComp::UpdateRepositoryFormat()
 	QString path = GetCollectionRootFolder();
 	if (!path.isEmpty()){
 		if (!istd::CSystem::EnsurePathExists(path)){
-			SendCriticalMessage(0, QObject::tr("Root folder for the file collection could not be created in '%1'").arg(path));
+			SendCriticalMessage(0, QT_TR_NOOP(QString("Root folder for the file collection could not be created in '%1'").arg(path)));
 		}
 
 		revisionFilePath = path + "/Revision";
@@ -899,7 +899,7 @@ QString CFileCollectionComp::CalculateFolderPathInRepository(
 {
 	QFileInfo inputFileInfo(localFilePath);
 	if (!inputFileInfo.isFile()){
-		SendErrorMessage(0 , QObject::tr("Path '%1' is not a valid path to an existing file").arg(localFilePath));
+		SendErrorMessage(0 , QT_TR_NOOP(QString("Path '%1' is not a valid path to an existing file").arg(localFilePath)));
 
 		return QString();
 	}
@@ -937,7 +937,7 @@ QString CFileCollectionComp::CalculateFolderPathInRepository(
 	}
 
 	if (newDirPath != targetDirPath){
-		QString warning = tr("Input file name %1 renamed to %2").arg(QDir(targetDirPath).dirName()).arg(QDir(newDirPath).dirName());
+		QString warning = QT_TR_NOOP(QString("Input file name %1 renamed to %2").arg(QDir(targetDirPath).dirName()).arg(QDir(newDirPath).dirName()));
 
 		SendWarningMessage(0, warning);
 
@@ -965,11 +965,11 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 			return CalculateTargetFilePath(targetFolderPath, filePath);
 		}
 		else{
-			SendErrorMessage(0, QObject::tr("Collection folder for the input file '%1' could not be calculated").arg(filePath));
+			SendErrorMessage(0, QT_TR_NOOP(QString("Collection folder for the input file '%1' could not be calculated").arg(filePath)));
 		}
 	}
 	else{
-		SendErrorMessage(0, QObject::tr("Input file '%1' doesn't exist").arg(filePath));
+		SendErrorMessage(0, QT_TR_NOOP(QString("Input file '%1' doesn't exist").arg(filePath)));
 	}
 
 	return QString();

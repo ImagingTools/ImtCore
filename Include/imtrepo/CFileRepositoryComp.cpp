@@ -117,11 +117,11 @@ QString CFileRepositoryComp::GetFile(
 			return outputFilePath;
 		}
 		else{
-			SendErrorMessage(0, QObject::tr("File could not be copied from '%1' to '%2'").arg(fileItemInfo.GetFilePath()).arg(targetFilePath));
+			SendErrorMessage(0, QT_TR_NOOP(QString("File could not be copied from '%1' to '%2'").arg(fileItemInfo.GetFilePath()).arg(targetFilePath)));
 		}
 	}
 	else{
-		SendErrorMessage(0, QObject::tr("File doesn't exist '%1'").arg(fileItemInfo.GetFilePath()));
+		SendErrorMessage(0, QT_TR_NOOP(QString("File doesn't exist '%1'").arg(fileItemInfo.GetFilePath())));
 	}
 
 	return QString();
@@ -215,20 +215,20 @@ QByteArray CFileRepositoryComp::InsertFile(
 						return fileId;
 					}
 					else{
-						SendErrorMessage(0, tr("File could not be inserted into the repository"));
+						SendErrorMessage(0, QT_TR_NOOP("File could not be inserted into the repository"));
 					}
 				}
 			}
 			else{
-				SendErrorMessage(0, tr("Meta-information for the file '%1' could not be created").arg(workingFilePath));
+				SendErrorMessage(0, QT_TR_NOOP(QString("Meta-information for the file '%1' could not be created").arg(workingFilePath)));
 			}
 		}
 		else{
-			SendErrorMessage(0, tr("Permissions for the file '%1' could not be set").arg(workingFilePath));
+			SendErrorMessage(0, QT_TR_NOOP(QString("Permissions for the file '%1' could not be set").arg(workingFilePath)));
 		}
 	}
 	else{
-		SendErrorMessage(0, tr("Can't copy the file '%1' to working folder").arg(localFilePath));
+		SendErrorMessage(0, QT_TR_NOOP(QString("Can't copy the file '%1' to working folder").arg(localFilePath)));
 	}
 
 	QDir(workingPath).removeRecursively();
@@ -257,7 +257,7 @@ bool CFileRepositoryComp::UpdateFile(
 	// Create meta-informations for the file contents:
 	fileItemInfo.SetContentsMetaInfo(CreateItemMetaInfo(localFilePath, fileItemInfo.GetTypeId()));
 	if (!fileItemInfo.GetContentsMetaInfo().IsValid()){
-		SendErrorMessage(0, QObject::tr("Meta-informations could not be created for'%1'. File could not be updated").arg(localFilePath));
+		SendErrorMessage(0, QT_TR_NOOP(QString("Meta-informations could not be created for'%1'. File could not be updated").arg(localFilePath)));
 
 		return false;
 	}
@@ -268,7 +268,7 @@ bool CFileRepositoryComp::UpdateFile(
 
 	if (istd::CSystem::FileCopy(localFilePath, targetFilePath, true)){
 		if (!QFile::setPermissions(targetFilePath, QFile::WriteGroup)){
-			SendErrorMessage(0, QObject::tr("Permissions for the file '%1' could not be set").arg(targetFilePath));
+			SendErrorMessage(0, QT_TR_NOOP(QString("Permissions for the file '%1' could not be set").arg(targetFilePath)));
 		}
 
 		static ChangeSet changes(CF_OBJECT_DATA_CHANGED);
@@ -276,13 +276,13 @@ bool CFileRepositoryComp::UpdateFile(
 		istd::CChangeNotifier changeNotifier(this, &changes);
 
 		if (!WriteItemInfo(fileItemInfo)){
-			SendErrorMessage(0, QObject::tr("Meta information of the file '%1' could not be updated").arg(targetFilePath));
+			SendErrorMessage(0, QT_TR_NOOP(QString("Meta information of the file '%1' could not be updated").arg(targetFilePath)));
 
 			return false;
 		}
 
 		if (!WriteFileMetaInfo(*fileItemInfo.GetContentsMetaInfo())){
-			SendErrorMessage(0, QObject::tr("Meta information of the file '%1' could not be updated").arg(targetFilePath));
+			SendErrorMessage(0, QT_TR_NOOP(QString("Meta information of the file '%1' could not be updated").arg(targetFilePath)));
 
 			return false;
 		}
@@ -290,7 +290,7 @@ bool CFileRepositoryComp::UpdateFile(
 		return true;
 	}
 
-	SendErrorMessage(0, QObject::tr("File '%1' could not be copied to %2").arg(localFilePath).arg(targetFilePath));
+	SendErrorMessage(0, QT_TR_NOOP(QString("File '%1' could not be copied to %2").arg(localFilePath).arg(targetFilePath)));
 
 	return false;
 }
@@ -340,7 +340,7 @@ QByteArray CFileRepositoryComp::InsertNewObject(
 		if (persistencePtr != nullptr){
 			imtbase::CTempDir tempDir("ImtCore");
 			if (tempDir.Path().isEmpty()){
-				SendErrorMessage(0, tr("Temp folder could not be created"));
+				SendErrorMessage(0, QT_TR_NOOP("Temp folder could not be created"));
 
 				return QByteArray();
 			}
@@ -361,7 +361,7 @@ QByteArray CFileRepositoryComp::InsertNewObject(
 				return retval;
 			}
 			else{
-				SendErrorMessage(0, QObject::tr("File could not be saved into '%1'").arg(tempFilePath));
+				SendErrorMessage(0, QT_TR_NOOP(QString("File could not be saved into '%1'").arg(tempFilePath)));
 			}
 		}
 	}
@@ -460,7 +460,7 @@ bool CFileRepositoryComp::SetObjectData(
 	if (persistencePtr != nullptr){
 		imtbase::CTempDir tempDir("ImtCore");
 		if (tempDir.Path().isEmpty()){
-			SendErrorMessage(0, tr("Temp folder could not be created"));
+			SendErrorMessage(0, QT_TR_NOOP("Temp folder could not be created"));
 
 			return false;
 		}
@@ -481,7 +481,7 @@ bool CFileRepositoryComp::SetObjectData(
 			return retVal;
 		}
 		else{
-			SendErrorMessage(0, QObject::tr("File could not be saved into '%1'").arg(tempFilePath));
+			SendErrorMessage(0, QT_TR_NOOP(QString("File could not be saved into '%1'").arg(tempFilePath)));
 		}
 	}
 
@@ -825,7 +825,7 @@ QString CFileRepositoryComp::CalculateFolderPathInRepository(
 {
 	QFileInfo inputFileInfo(localFilePath);
 	if (!inputFileInfo.isFile()){
-		SendErrorMessage(0 , QObject::tr("Path '%1' is not a valid path to an existing file").arg(localFilePath));
+		SendErrorMessage(0 , QT_TR_NOOP(QString("Path '%1' is not a valid path to an existing file").arg(localFilePath)));
 
 		return QString();
 	}
@@ -863,7 +863,7 @@ QString CFileRepositoryComp::CalculateFolderPathInRepository(
 	}
 
 	if (newDirPath != targetDirPath){
-		QString warning = tr("Input file name %1 renamed to %2").arg(QDir(targetDirPath).dirName()).arg(QDir(newDirPath).dirName());
+		QString warning = QT_TR_NOOP(QString("Input file name %1 renamed to %2").arg(QDir(targetDirPath).dirName()).arg(QDir(newDirPath).dirName()));
 
 		SendWarningMessage(0, warning);
 
@@ -891,11 +891,11 @@ QString CFileRepositoryComp::CalculateTargetFilePath(
 			return CalculateTargetFilePath(targetFolderPath, filePath);
 		}
 		else{
-			SendErrorMessage(0, QObject::tr("Collection folder for the input file '%1' could not be calculated").arg(filePath));
+			SendErrorMessage(0, QT_TR_NOOP(QString("Collection folder for the input file '%1' could not be calculated").arg(filePath)));
 		}
 	}
 	else{
-		SendErrorMessage(0, QObject::tr("Input file '%1' doesn't exist").arg(filePath));
+		SendErrorMessage(0, QT_TR_NOOP(QString("Input file '%1' doesn't exist").arg(filePath)));
 	}
 
 	return QString();
@@ -983,7 +983,7 @@ void CFileRepositoryComp::OnComponentCreated()
 	// Ensure, that the repository folder was created:
 	if (!path.isEmpty()){
 		if (!istd::CSystem::EnsurePathExists(path)){
-			SendCriticalMessage(0, QObject::tr("Root folder for the file collection could not be created in '%1'").arg(path));
+			SendCriticalMessage(0, QT_TR_NOOP(QString("Root folder for the file collection could not be created in '%1'").arg(path)));
 		}
 	}
 }
