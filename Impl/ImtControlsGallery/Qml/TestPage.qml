@@ -14,6 +14,10 @@ Rectangle {
 	anchors.fill: parent;
 	clip: true;
 
+	BaseModel {
+		id: baseModel;
+	}
+
 	UserData {
 		id: userData;
 
@@ -22,18 +26,48 @@ Rectangle {
 		}
 	}
 
-	Button {
-		width: 100;
+	SystemInfo {
+		id: systemInfo;
+	}
+
+	Row {
 		height: 30;
 
-		text: "Test";
+		Button {
+			width: 100;
+			height: 30;
 
-		property int index: 1
-		onClicked: {
-			console.log("onClicked");
+			text: "owner";
 
-			index++;
-			userData.m_name = "ffd" + index;
+			property int index: 1
+			onClicked: {
+				console.log("onClicked");
+
+				index++;
+
+				userData.m_systemInfos.addElement(systemInfo);
+			}
+		}
+
+		Button {
+			width: 100;
+			height: 30;
+
+			text: "changeList";
+
+			property int index: 1
+			onClicked: {
+				console.log("onClicked");
+
+				index++;
+
+				userData.beginChanges();
+				userData.m_roles = "rewrwer;werwerwe;rwer";
+				userData.m_name = "Test";
+				userData.m_username = "Test";
+				userData.endChanges();
+			}
 		}
 	}
+
 }
