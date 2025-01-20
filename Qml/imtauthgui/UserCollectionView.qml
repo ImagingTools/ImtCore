@@ -385,6 +385,8 @@ RemoteCollectionView {
 		GqlRequestDocumentDataController {
 			id: requestDocumentDataController
 
+			typeId: "User";
+
 			gqlGetCommandId: ImtauthUsersSdlCommandIds.s_userItem;
 			gqlUpdateCommandId: ImtauthUsersSdlCommandIds.s_userUpdate;
 			gqlAddCommandId: ImtauthUsersSdlCommandIds.s_userAdd;
@@ -411,16 +413,6 @@ RemoteCollectionView {
 
 			function getHeaders(){
 				return userCollectionViewContainer.getHeaders();
-			}
-
-			function getDocumentName(){
-				let prefixName = qsTr("Users");
-
-				if (documentName !== ""){
-					return prefixName + " / " + documentName;
-				}
-
-				return prefixName + " / " + qsTr("New User");
 			}
 		}
 	}

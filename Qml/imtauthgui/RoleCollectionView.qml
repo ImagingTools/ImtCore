@@ -100,12 +100,13 @@ RemoteCollectionView {
             }
         }
     }
-
     Component {
         id: dataControllerComp;
 
         GqlRequestDocumentDataController {
             id: requestDocumentDataController
+
+			typeId: "Role";
 
             gqlGetCommandId: ImtauthRolesSdlCommandIds.s_roleItem;
             gqlUpdateCommandId: ImtauthRolesSdlCommandIds.s_roleUpdate;
@@ -115,7 +116,7 @@ RemoteCollectionView {
                 if (roleCollectionViewContainer.productId === ""){
                     console.error("Unable to create an additional GraphQL input parameters. Product-ID is empty:", gqlGetCommandId);
                     return null;
-                }
+				}
 
                 getRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
                 addRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
@@ -134,16 +135,6 @@ RemoteCollectionView {
 
             function getHeaders(){
                 return roleCollectionViewContainer.getHeaders()
-            }
-
-            function getDocumentName(){
-                let prefixName = qsTr("Roles");
-
-                if (documentName !== ""){
-                    return prefixName + " / " + documentName;
-                }
-
-                return prefixName + " / " + qsTr("New Role");
             }
         }
     }

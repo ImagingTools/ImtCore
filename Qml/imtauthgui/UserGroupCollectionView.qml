@@ -84,6 +84,8 @@ RemoteCollectionView {
         GqlRequestDocumentDataController {
             id: requestDocumentDataController
 
+			typeId: "Group";
+
             gqlGetCommandId: ImtauthGroupsSdlCommandIds.s_groupItem;
             gqlUpdateCommandId: ImtauthGroupsSdlCommandIds.s_groupUpdate;
             gqlAddCommandId: ImtauthGroupsSdlCommandIds.s_groupAdd;
@@ -102,16 +104,6 @@ RemoteCollectionView {
                 onFinished: {
                     requestDocumentDataController.documentModel = m_groupData;
                 }
-            }
-
-            function getDocumentName(){
-                let prefixName = qsTr("Groups");
-
-                if (documentName !== ""){
-                    return prefixName + " / " + documentName;
-                }
-
-                return prefixName + " / " + qsTr("New Group");
             }
 
             function getHeaders(){

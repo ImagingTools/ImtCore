@@ -130,6 +130,9 @@ ViewBase {
                     id: usernameView;
                     name: qsTr("Username");
                     readOnly: true;
+
+					KeyNavigation.tab: nameInput;
+					KeyNavigation.backtab: mailInput;
                 }
 
                 TextInputElementView {
@@ -138,6 +141,9 @@ ViewBase {
                     name: qsTr("Name");
                     placeHolderText: qsTr("Enter the name");
                     readOnly: container.readOnly;
+
+					KeyNavigation.tab: mailInput;
+					KeyNavigation.backtab: usernameView;
 
                     onEditingFinished: {
                         container.doUpdateModel();
@@ -158,7 +164,8 @@ ViewBase {
 
                     placeHolderText: qsTr("Enter the email");
                     readOnly: container.readOnly;
-
+					KeyNavigation.tab: usernameView;
+					KeyNavigation.backtab: nameInput;
                     onEditingFinished: {
                         container.doUpdateModel();
                     }
