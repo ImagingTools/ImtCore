@@ -128,9 +128,7 @@ int CGqlSchemaParserComp::DoProcessing(
 	QTextStream inputStream(&inputFile);
 	QString content = inputStream.readAll();
 
-	/// \todo fix it!
-	/// \example #[[sdfjkldsfjkldsjsadfjklsdafkjl]] aaa #[[sdfjkldsfjkldsjsadfjklsdafkjl]] 'aaa' nust be preserved!!!!!!
-	static QRegularExpression multiLineCommentRegex("#\\[\\[.*\\]\\]", QRegularExpression::MultilineOption | QRegularExpression::DotMatchesEverythingOption);
+	static QRegularExpression multiLineCommentRegex("#\\[\\[[^\\[\\[]*\\]\\]", QRegularExpression::MultilineOption | QRegularExpression::DotMatchesEverythingOption);
 	content.replace(multiLineCommentRegex, "");
 
 	static QRegularExpression commentRegex("#.*\n");
