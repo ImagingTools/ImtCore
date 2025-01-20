@@ -6,6 +6,7 @@ import imtgui 1.0
 import imtdocgui 1.0
 import imtappApplicationSdl 1.0
 import imtguigql 1.0
+import imtauthUsersSdl 1.0
 
 Rectangle {
 	id: testPage;
@@ -13,40 +14,26 @@ Rectangle {
 	anchors.fill: parent;
 	clip: true;
 
-	Component.onCompleted: {
-		rectComp.createObject(testPage)
-	}
+	UserData {
+		id: userData;
 
-	function onCompleted(){
-		console.log("Function onCompleted");
-	}
-
-	Connections {
-		target: rectComp;
-
-		function onCompleted(){
-			console.log("Connections onCompleted");
-		}
-
-		function onTest(){
-			console.log("Connections onTest");
+		onModelChanged: {
+			console.log("onModelChanged");
 		}
 	}
 
-	Component {
-		id: rectComp;
+	Button {
+		width: 100;
+		height: 30;
 
-		Rectangle {
-			width: 100;
-			height: 100;
-			color: "red";
+		text: "Test";
 
-			signal test();
+		property int index: 1
+		onClicked: {
+			console.log("onClicked");
 
-			Component.onCompleted: {
-				test()
-				console.log("Rectangle onCompleted");
-			}
+			index++;
+			userData.m_name = "ffd" + index;
 		}
 	}
 }
