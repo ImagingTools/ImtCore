@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QDirIterator>
 #include <QtCore/QDebug>
 
 // ACF includes

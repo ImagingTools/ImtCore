@@ -117,7 +117,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 					QJsonObject rootObject = document.object();
 					QJsonObject paletteObject = rootObject["palette"].toObject();
 					if (paletteObject.isEmpty()){
-						SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+						SendErrorMessage(0, QT_TR_NOOP("Palette file parsing error"));
 
 						return;
 					}
@@ -127,7 +127,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 					if (!m_designShemaIdAttrPtr[i].isEmpty() && !m_paletteModeAttrPtr[i].isEmpty()){
 						QJsonObject modeObject;
 						if (!GetObjectValue(paletteObject, m_paletteModeAttrPtr[i], modeObject)){
-							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+							SendErrorMessage(0, QT_TR_NOOP("Palette file parsing error"));
 
 							return;
 						}
@@ -135,19 +135,19 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 						QJsonObject textObject = modeObject["text"].toObject();
 						QJsonObject backgroundObject = modeObject["background"].toObject();
 						if (textObject.isEmpty() || backgroundObject.isEmpty()){
-							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+							SendErrorMessage(0, QT_TR_NOOP("Palette file parsing error"));
 
 							return;
 						}
 
 						if (!textObject.contains("primary") || !backgroundObject.contains("default")){
-							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+							SendErrorMessage(0, QT_TR_NOOP("Palette file parsing error"));
 
 							return;
 						}
 
 						if (!textObject["primary"].isString() || !backgroundObject["default"].isString()){
-							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+							SendErrorMessage(0, QT_TR_NOOP("Palette file parsing error"));
 
 							return;
 						}
@@ -159,7 +159,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 						QColor backgroundColor;
 
 						if (!StringToColor(textColorString, textColor) || !StringToColor(backgroundColorString, backgroundColor)){
-							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+							SendErrorMessage(0, QT_TR_NOOP("Palette file parsing error"));
 
 							return;
 						}
@@ -179,7 +179,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 
 					QJsonObject typographyObject;
 					if (!GetObjectValue(rootObject, "typography", typographyObject)){
-						SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+						SendErrorMessage(0, QT_TR_NOOP("Palette file parsing error"));
 
 						return;
 					}
@@ -188,7 +188,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 					double fontSize = 0.0;
 					if (		!GetArrayValue(typographyObject, "fontFamily", fontFamilyArray) ||
 								!GetDoubleValue(typographyObject, "fontSize", fontSize)){
-						SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+						SendErrorMessage(0, QT_TR_NOOP("Palette file parsing error"));
 
 						return;
 					}
@@ -196,7 +196,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 					for (int fontFamilyIndex = 0; fontFamilyIndex < fontFamilyArray.count(); fontFamilyIndex++){
 						QString fontName;
 						if (!GetStringValue(fontFamilyArray, fontFamilyIndex, fontName)){
-							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+							SendErrorMessage(0, QT_TR_NOOP("Palette file parsing error"));
 
 							return;
 						}
