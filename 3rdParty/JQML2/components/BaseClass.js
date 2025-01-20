@@ -204,7 +204,7 @@ class BaseClass extends QtObject {
 
     copyMe() {
         let obj = this.createMe()
-        obj.fromJSON(toJson())
+        obj.fromJSON(this.toJson())
         obj.connectProperties()
 
         return obj

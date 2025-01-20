@@ -274,8 +274,13 @@ class ListView extends Flickable {
         }
 
         if(length === 0) {
-            this.getProperty('contentWidth').reset(0)
-            this.getProperty('contentHeight').reset(0)
+            if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                this.getProperty('contentWidth').setAuto(0)
+                this.getProperty('contentHeight').setAuto(this.getPropertyValue('height'))
+            } else {
+                this.getProperty('contentWidth').setAuto(this.getPropertyValue('width'))
+                this.getProperty('contentHeight').setAuto(0)
+            }  
             return
         }
 
@@ -376,8 +381,13 @@ class ListView extends Flickable {
 
     $updateGeometry(){
         if(!this.$items.length) {
-            this.getProperty('contentWidth').reset(0)
-            this.getProperty('contentHeight').reset(0)
+            if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                this.getProperty('contentWidth').setAuto(0)
+                this.getProperty('contentHeight').setAuto(this.getPropertyValue('height'))
+            } else {
+                this.getProperty('contentWidth').setAuto(this.getPropertyValue('width'))
+                this.getProperty('contentHeight').setAuto(0)
+            }  
             return 
         }
 
