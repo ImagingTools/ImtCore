@@ -160,7 +160,7 @@ Item {
 		Rectangle{
 			anchors.fill: parent;
 			z:-4;
-			color: !delegateContainer.rowDelegate ? "transparent" : delegateContainer.rowDelegate.selected ? delegateContainer.rowDelegate.selectedColor: !delegateContainer.rowDelegate.tableItem ? "transparent" : (delegateContainer.rowDelegate.tableItem.enableAlternating && delegateContainer.rowIndex % 2) ? delegateContainer.rowDelegate.tableItem.alternatingCellColor : delegateContainer.rowDelegate.cellColor;
+			color: !delegateContainer.rowDelegate ? "transparent" : delegateContainer.rowDelegate.selected ? delegateContainer.rowDelegate.selectedColor: !delegateContainer.rowDelegate.tableItem ? "transparent" : (delegateContainer.rowDelegate.tableItem.enableAlternating && delegateContainer.rowDelegate.tableItem.alternatingCellColor !== "transparent" && delegateContainer.rowIndex % 2) ? delegateContainer.rowDelegate.tableItem.alternatingCellColor : delegateContainer.rowDelegate.cellColor;
 		}
 	}
 
