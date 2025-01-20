@@ -405,8 +405,6 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		}
 	}
 
-	QString json = rootModelPtr->ToJson();
-
 	return rootModelPtr.PopPtr();
 }
 
