@@ -56,7 +56,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 			*sqlErrorPtr = retVal.lastError();
 		}
 
-		SendErrorMessage(0, QObject::tr("Database query failed: '%1'").arg(retVal.lastError().text()), "Database engine");
+		SendErrorMessage(0, QT_TR_NOOP(QString("Database query failed: '%1'").arg(retVal.lastError().text())), "Database engine");
 
 		return QSqlQuery();
 	}
@@ -236,7 +236,7 @@ bool CDatabaseEngineComp::OpenDatabase() const
 bool CDatabaseEngineComp::CreateDatabase(int flags) const
 {
 	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()){
-		SendCriticalMessage(0, QObject::tr("Maintenance database name was not set"));
+		SendCriticalMessage(0, QT_TR_NOOP("Maintenance database name was not set"));
 
 		return false;
 	}
@@ -276,7 +276,7 @@ bool CDatabaseEngineComp::CreateDatabase(int flags) const
 			}
 		}
 		else {
-			SendErrorMessage(0, QString("\n\t| Database could not be connected""\n\t| Error: %1").arg(databaseConnection.lastError().text()));
+			SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Database could not be connected""\n\t| Error: %1").arg(databaseConnection.lastError().text())));
 		}
 	}
 
@@ -398,7 +398,7 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 						<< "\n\t| Unable to open database"
 						<< "\n\t| Error: " << databaseConnection.lastError().text();
 
-			SendErrorMessage(0, QObject::tr("Database '%1' could not be connected").arg(GetDatabaseName()), "Database engine");
+			SendErrorMessage(0, QT_TR_NOOP(QString("Database '%1' could not be connected").arg(GetDatabaseName())), "Database engine");
 		}
 	}
 
@@ -422,7 +422,7 @@ bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 			}
 		}
 		else{
-			SendErrorMessage(0, QObject::tr("Database server could not be connected: %1").arg(errorMessage), "Database Engine");
+			SendErrorMessage(0, QT_TR_NOOP(QString("Database server could not be connected: %1").arg(errorMessage)), "Database Engine");
 
 			return false;
 		}
@@ -456,7 +456,7 @@ bool CDatabaseEngineComp::EnsureDatabaseConsistency() const
 bool CDatabaseEngineComp::CreateDatabaseInstance() const
 {
 	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()){
-		SendCriticalMessage(0, QObject::tr("Maintenance database name was not set"));
+		SendCriticalMessage(0, QT_TR_NOOP("Maintenance database name was not set"));
 
 		return false;
 	}
@@ -478,7 +478,7 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 	if (retVal){
 		QFile scriptFile(":/SQL/CreateDatabase.sql");
 		if (!scriptFile.open(QFile::ReadOnly)){
-			SendErrorMessage(0, QString("Database creation script '%1'could not be loaded").arg(scriptFile.fileName()));
+			SendErrorMessage(0, QT_TR_NOOP(QString("Database creation script '%1'could not be loaded").arg(scriptFile.fileName())));
 
 			return false;
 		}
@@ -497,11 +497,11 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 						<< "\n\t| Error: " << sqlError
 						<< "\n\t| Query: " << createDatabaseQuery;
 
-			SendErrorMessage(0, QString("\n\t| Database could not be created"
+			SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Database could not be created"
 										"\n\t| Error: %1"
 										"\n\t| Query: %2")
 									.arg(sqlError.text())
-									.arg(createDatabaseQuery));
+									.arg(createDatabaseQuery)));
 
 		}
 
@@ -513,7 +513,7 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 		return retVal;
 	}
 	else {
-		SendErrorMessage(0, QObject::tr("Maintanance database could not be opened. Error message: '%1'").arg(maintainanceDb.lastError().text()));
+		SendErrorMessage(0, QT_TR_NOOP(QString("Maintanance database could not be opened. Error message: '%1'").arg(maintainanceDb.lastError().text())));
 	}
 
 	return false;
@@ -527,7 +527,7 @@ bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 	// Create revision table in the database:
 	ExecSqlQueryFromFile(":/SQL/CreateRevision.sql", &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
-		SendErrorMessage(0, QObject::tr("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
+		SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text())));
 
 		return false;
 	}
@@ -568,7 +568,7 @@ QString CDatabaseEngineComp::GetDatabasePath() const
 	}
 
 	if (!m_dbFilePathCompPtr.IsValid()){
-		SendErrorMessage(0, QObject::tr("Database file path incorrect"));
+		SendErrorMessage(0, QT_TR_NOOP("Database file path incorrect"));
 
 		return QString();
 	}
