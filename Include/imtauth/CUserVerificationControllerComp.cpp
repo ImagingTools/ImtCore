@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QUuid>
+#include <QtCore/QDebug>
 #include <QtCore/QRandomGenerator>
 
 // ImtCore includes

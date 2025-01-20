@@ -1,6 +1,9 @@
 #include <imtauth/CUserVerification.h>
 
 
+// Qt includes
+#include <QtCore/QDebug>
+
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
