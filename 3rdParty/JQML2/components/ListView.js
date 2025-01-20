@@ -273,7 +273,11 @@ class ListView extends Flickable {
             return
         }
 
-        if(length === 0) return
+        if(length === 0) {
+            this.getProperty('contentWidth').reset(0)
+            this.getProperty('contentHeight').reset(0)
+            return
+        }
 
         let firstIndex = 0
         let lastIndex = 0
@@ -371,7 +375,11 @@ class ListView extends Flickable {
     }
 
     $updateGeometry(){
-        if(!this.$items.length) return 
+        if(!this.$items.length) {
+            this.getProperty('contentWidth').reset(0)
+            this.getProperty('contentHeight').reset(0)
+            return 
+        }
 
         let model = this.getPropertyValue('model')
         if(model instanceof ListModel){     
