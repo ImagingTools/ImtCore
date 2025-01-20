@@ -36,7 +36,7 @@ void CDatabaseLoginSettingsEditorComp::UpdateModel() const
 	objectPtr->SetUserName(UserEdit->text());
 	objectPtr->SetPassword(PasswordEdit->text());
 
-	int options = objectPtr->GetConnectionFlags();
+	int options = objectPtr->GetConnectionFlags() & ~imtdb::IDatabaseLoginSettings::COF_SSL;
 	int newOptions = UseSslCheck->isChecked() ? imtdb::IDatabaseLoginSettings::COF_SSL : 0;
 
 	objectPtr->SetConnectionFlags(options | newOptions);
