@@ -28,7 +28,7 @@ public:
 		I_ASSIGN(m_hostParamCompPtr, "HostParam", "The property holds connection's host name parameter", false, "");
 		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", false, 465);
 		I_ASSIGN(m_portParamCompPtr, "PortParam", "The property holds connection's port number parameter", false, "");
-		I_ASSIGN(m_timeoutAttrPtr, "Timeout", "Timeout (in msecs)", false, 1000);
+		I_ASSIGN(m_timeoutAttrPtr, "Timeout", "Timeout (in msecs)", false, 5000);
 		I_ASSIGN(m_userAttrPtr, "User", "User", false, "");
 		I_ASSIGN(m_userParamCompPtr, "UserParam", "User parameter", false, "");
 		I_ASSIGN(m_passwordAttrPtr, "Password", "Password", false, "");

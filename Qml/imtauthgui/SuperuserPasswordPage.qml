@@ -8,187 +8,100 @@ import imtauthUsersSdl 1.0
 
 Rectangle {
     id: root;
-
     anchors.fill: parent;
-
     color: Style.backgroundColor;
-
-    property UserData userData: UserData {}
-    property string userId: "su";
 
     signal beforeSetted();
     signal passwordSetted();
     signal failed(string message);
 
-    Component.onCompleted: {
-        userData.m_username = userId;
-        userData.m_name = "superuser";
-    }
+	UserData {
+		id: userDataModel;
+		m_username: "su";
+		m_name: "superuser";
+	}
 
-    function setSuperuserPassword(password){
+	function setSuperuserPassword(){
         root.beforeSetted();
-        userData.m_password = password;
-        documentController.documentModel = root.userData;
-        documentController.insertDocument();
+		createSuperuserRequest.send();
     }
 
-    GqlRequestDocumentDataController{
-        id: documentController;
-        documentId: root.userId;
-        gqlGetCommandId: ImtauthUsersSdlCommandIds.s_userItem;
-        gqlUpdateCommandId: ImtauthUsersSdlCommandIds.s_userUpdate;
-        gqlAddCommandId: ImtauthUsersSdlCommandIds.s_userAdd;
+	GqlSdlRequestSender {
+		id: createSuperuserRequest;
+		requestType: 1;
+		gqlCommandId: ImtauthUsersSdlCommandIds.s_createSuperuser;
 
-        Component.onCompleted: {
-            getRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, AuthorizationController.productId);
-            addRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, AuthorizationController.productId);
-            updateRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, AuthorizationController.productId);
-        }
+		inputObjectComp: Component {
+			CreateSuperuserInput {
+				m_password: userGeneralEditor.passwordInput.text;
+				m_mail: userGeneralEditor.mailInput.text;
+				m_name: userGeneralEditor.nameInput.text;
+			}
+		}
 
-        onSaved: {
-            root.passwordSetted();
-        }
-
-        onError: {
-            root.failed(message);
-        }
-    }
-
-    function checkPassword(){
-        let ok = true;
-        if (passwordTextInput.text === ""){
-            errorText.text = qsTr("Please enter a non-empty password");
-
-            ok = false;
-        }
-        else if (passwordTextInput.text !== confirmPasswordInput.text){
-            errorText.text = qsTr("Passwords don't match");
-
-            ok = false;
-        }
-
-        okButton.enabled = ok;
-        errorText.visible = !ok;
-    }
-
-    Component{
-        id: emptyDecorator;
-        Item{
-            property Item rootItem: null;
-        }
-    }
+		sdlObjectComp: Component {
+			CreateSuperuserPayload {
+				onFinished: {
+					if (m_success){
+						root.passwordSetted();
+					}
+					else{
+						ModalDialogManager.showErrorDialog(m_message);
+					}
+				}
+			}
+		}
+	}
 
     Column {
         id: bodyColumn;
-
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
         spacing: Style.size_mainMargin;
-        width: 300;
+		width: 700;
 
-        Item {
-            width: bodyColumn.width;
-            height: 30;
+		GroupHeaderView {
+			width: parent.width;
+			bottomPadding: Style.size_mainMargin;
+			title: qsTr("Please fill in the information for the system administrator");
+		}
 
-            BaseText {
-                id: title;
-                font.family: Style.fontFamilyBold;
-                text: qsTr("Please enter the password for system administrator");
-            }
-        }
+		UserGeneralEditor {
+			id: userGeneralEditor;
+			width: bodyColumn.width;
+			userData: userDataModel;
+			canHideGroup: false;
+			usernameInput.readOnly: true;
 
-        BaseText {
-            id: titlePassword;
+			onEmitUpdateModel: {
+				updateModel();
+			}
 
-            text: qsTr("Password");
-        }
+			onUserDataChanged: {
+				updateGui();
+			}
+		}
 
-        CustomTextField {
-            id: passwordTextInput;
+		Item {
+			width: bodyColumn.width;
+			height: 30;
 
-            width: bodyColumn.width;
-            height: 30;
-
-            placeHolderText: qsTr("Enter the password");
-            echoMode: TextInput.Password;
-            KeyNavigation.tab: confirmPasswordInput;
-
-            Loader{
-                id: inputDecoratorLoader1;
-
-                sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                onLoaded: {}
-            }
-
-            onTextChanged: {
-                root.checkPassword();
-            }
-        }
-
-        BaseText {
-            id: titleConfirmPassword;
-            text: qsTr("Confirm Password");
-        }
-
-        CustomTextField {
-            id: confirmPasswordInput;
-
-            width: bodyColumn.width;
-            height: 30;
-
-            placeHolderText: qsTr("Confirm password");
-            echoMode: TextInput.Password;
-            KeyNavigation.tab: passwordTextInput;
-
-            Loader{
-                id: inputDecoratorLoader2;
-
-                sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                onLoaded: {}
-            }
-
-            onTextChanged: {
-                root.checkPassword();
-            }
-        }
-
-        Item {
-            width: bodyColumn.width;
-            height: 30;
-
-            BaseText {
-                id: errorText;
-
-                anchors.left: parent.left;
-                anchors.verticalCenter: parent.verticalCenter;
-
-                color: Style.errorTextColor;
-
-                visible: false;
-
-                text: qsTr("Passwords don't match");
-            }
-
-            Button {
-                id: okButton;
-
-                anchors.right: parent.right;
-                anchors.verticalCenter: parent.verticalCenter;
-
-                enabled: false;
-
-                text: qsTr("OK");
-
-                onClicked: {
-                    root.setSuperuserPassword(passwordTextInput.text);
-                }
-
-                decorator: Component{ButtonDecorator{
-                    width: 70;
-                    height: 23;
-
-                }}
-            }
-        }
+			Button {
+				id: okButton;
+				anchors.right: parent.right;
+				anchors.verticalCenter: parent.verticalCenter;
+				enabled: userGeneralEditor.mailInput.acceptableInput &&
+						 userGeneralEditor.confirmPasswordInput.acceptableInput &&
+						 userGeneralEditor.passwordInput.text === userGeneralEditor.confirmPasswordInput.text;
+				text: qsTr("OK");
+				onClicked: {
+					root.setSuperuserPassword();
+				}
+				decorator: Component{ButtonDecorator{
+					width: 70;
+					height: 30;
+				}}
+			}
+		}
     }
 }

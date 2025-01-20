@@ -183,49 +183,35 @@ Item {
         Events.sendEvent("SetUserPanelEnabled", false);
 
         if (status === 0){
-            thumbnailDecorator.stackView.push(connectingMessagePageComp);
+			showMessagePage(qsTr("Try connecting to ") + application.getServerUrl() + " ...");
         }
         else if (status === 4 || status === 3){
-            thumbnailDecorator.stackView.push(errorMessagePageComp);
+			showMessagePage(qsTr("Server connection error"));
         }
         else if (status === 1){
             Events.sendEvent("SearchVisible", true);
             Events.sendEvent("SetUserPanelEnabled", true);
         }
         else if (status === 5){
-            thumbnailDecorator.stackView.push(authorizatioErrorMessagePageComp);
+			showMessagePage(qsTr("Authorization server connection error"));
         }
     }
 
-    property Component connectingMessagePageComp: Component {
-        ServerNoConnectionView {
-            z: 5;
-            anchors.fill: parent;
-            anchors.topMargin: thumbnailDecorator.topPanel.height;
-            loadingVisible: true;
-            text: qsTr("Try connecting to ") + application.getServerUrl() + " ...";
-        }
-    }
+	function showMessagePage(message){
+		application.errorMessage = message;
 
-    property Component errorMessagePageComp: Component {
-        ServerNoConnectionView {
-            z: 5;
-            anchors.fill: parent;
-            anchors.topMargin: thumbnailDecorator.topPanel.height;
-            loadingVisible: false;
-            text: qsTr("Server connection error")
-        }
-    }
+		thumbnailDecorator.stackView.push(messagePageComp);
+	}
 
-    property Component authorizatioErrorMessagePageComp: Component {
-        ServerNoConnectionView {
-            z: 5;
-            anchors.fill: parent;
-            anchors.topMargin: thumbnailDecorator.topPanel.height;
-            loadingVisible: false;
-            text: qsTr("Authorization server connection error")
-        }
-    }
+	property Component messagePageComp: Component {
+		ServerNoConnectionView {
+			z: 5;
+			anchors.fill: parent;
+			anchors.topMargin: thumbnailDecorator.topPanel.height;
+			loadingVisible: false;
+			text: application.errorMessage;
+		}
+	}
 
     WebSocketPortProvider {
         id: webSocketPortProvider;
@@ -325,6 +311,8 @@ Item {
         subscriptionManager_.active = true;
     }
 
+	property string errorMessage: "";
+
     Connections {
         target: AuthorizationController;
 
@@ -337,12 +325,17 @@ Item {
             }
         }
 
-        function onSuperuserExistResult(exists){
+		function onSuperuserExistResult(exists, type, message){
             if (exists){
                 thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
             }
             else{
-                thumbnailDecorator.showPage(thumbnailDecorator.superuserPasswordPageComp)
+				if (type === 'NotExists'){
+					thumbnailDecorator.showPage(thumbnailDecorator.superuserPasswordPageComp)
+				}
+				else if (type === 'DbNotConnection'){
+					application.showMessagePage(message);
+				}
             }
         }
 

@@ -4,44 +4,44 @@ import imtguigql 1.0
 import imtauthUsersSdl 1.0
 
 QtObject {
-    id: root;
+	id: root;
 
-    signal result(bool exists, string error);
+	signal result(bool exists, string type, string error);
 
-    signal modelStateChanged(string state);
+	signal modelStateChanged(string state);
 
-    function superuserExists(){
-        request.addInputParam("Id", "su");
-        request.send();
-    }
+	function superuserExists(){
+		request.send();
+	}
 
-    function getHeaders(){
-        return {};
-    }
+	function getHeaders(){
+		return {};
+	}
 
-    property GqlSdlRequestSender request : GqlSdlRequestSender {
-        gqlCommandId: ImtauthUsersSdlCommandIds.s_userItem;
+	property GqlSdlRequestSender request : GqlSdlRequestSender {
+		gqlCommandId: ImtauthUsersSdlCommandIds.s_checkSuperuserExists;
 
-        function createQueryParams(query){
-            var queryFields = Gql.GqlObject("item");
-            queryFields.InsertField("Id");
-            query.AddField(queryFields);
+		inputObjectComp: Component {
+			CheckSuperuserInput {
+			}
+		}
 
-            query.AddParam(inputParams);
-        }
+		sdlObjectComp: Component {
+			CheckSuperuserPayload {
+				onFinished: {
+					root.result(m_exists, m_errorType, m_message);
+				}
+			}
+		}
 
-        function getHeaders(){
-            return root.getHeaders();
-        }
+		function getHeaders(){
+			return root.getHeaders();
+		}
 
-        function onResult(){
-            root.result(true, "");
-        }
-
-        function onError(){
-            root.result(false, "");
-        }
-    }
+		function onError(){
+			root.result(false, "");
+		}
+	}
 }
 
 

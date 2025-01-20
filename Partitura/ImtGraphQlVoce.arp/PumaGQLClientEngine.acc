@@ -252,6 +252,8 @@
                                 <Value>CheckEmail</Value>
                                 <Value>CheckEmailCode</Value>
                                 <Value>SendEmailCode</Value>
+                                <Value>CheckSuperuserExists</Value>
+                                <Value>CreateSuperuser</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

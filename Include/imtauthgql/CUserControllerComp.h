@@ -10,6 +10,7 @@
 #include <imtmail/ISmtpClient.h>
 #include <imtmail/ISmtpMessageCreator.h>
 #include <imtauth/IUserVerificationCodeSender.h>
+#include <imtdb/IDatabaseServerConnectionChecker.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 
 
@@ -31,6 +32,7 @@ public:
 		I_ASSIGN(m_userFactoryCompPtr, "UserFactory", "User factory", true, "UserFactory");
 		I_ASSIGN(m_userOperationContextControllerCompPtr, "UserOperationContextController", "User operation context controller", false, "UserOperationContextController");
 		I_ASSIGN(m_userVerificationCodeSenderCompPtr, "UserVerificationCodeSender", "User verification code sender", false, "UserVerificationCodeSender");
+		I_ASSIGN(m_databaseConnectionCheckerCompPtr, "DatabaseConnectionChecker", "Database connection checker", false, "DatabaseConnectionChecker");
 	I_END_COMPONENT;
 
 protected:
@@ -75,6 +77,14 @@ protected:
 		const sdl::imtauth::Users::V1_0::CCheckEmailCodeGqlRequest& checkEmailCodeRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
+	virtual sdl::imtauth::Users::CCheckSuperuserPayload::V1_0 OnCheckSuperuserExists(
+		const sdl::imtauth::Users::V1_0::CCheckSuperuserExistsGqlRequest& checkSuperuserExistsRequest,
+		const ::imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const override;
+	virtual sdl::imtauth::Users::CCreateSuperuserPayload::V1_0 OnCreateSuperuser(
+		const sdl::imtauth::Users::V1_0::CCreateSuperuserGqlRequest& createSuperuserRequest,
+		const ::imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const override;
 
 private:
 	bool SendUserCode(const QByteArray& userId, const imtauth::IUserInfo& userInfo) const;
@@ -91,6 +101,7 @@ private:
 	I_FACT(imtauth::IUserInfo, m_userFactoryCompPtr);
 	I_REF(imtbase::IOperationContextController, m_userOperationContextControllerCompPtr);
 	I_REF(imtauth::IUserVerificationCodeSender, m_userVerificationCodeSenderCompPtr);
+	I_REF(imtdb::IDatabaseServerConnectionChecker, m_databaseConnectionCheckerCompPtr);
 
 private:
 	imtauthgql::CUserRepresentationController m_userRepresentationController;

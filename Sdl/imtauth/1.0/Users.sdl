@@ -110,8 +110,35 @@ input CheckEmailCodeInput {
     Code: String!
 }
 
+input CheckSuperuserInput {
+    Id: ID
+}
+
+input CreateSuperuserInput {
+    Password: String!
+    Mail: String!
+    Name: String!
+}
+
+type CreateSuperuserPayload {
+    Message: String
+    Success: Boolean!
+}
+
 type CheckEmailCodePayload {
     CorrectCode: Boolean!
+    Message: String
+}
+
+type CheckSuperuserErrorType {
+    Unknown: String
+    NotExists: String
+    DbNotConnection: String
+}
+
+type CheckSuperuserPayload {
+    ErrorType: String
+    Exists: Boolean
     Message: String
 }
 
@@ -127,6 +154,7 @@ type Query {
     CheckEmail (input: CheckEmailInput): CheckEmailPayload!
     SendEmailCode (input: SendEmailCodeInput): SendEmailCodePayload!
     CheckEmailCode (input: CheckEmailCodeInput): CheckEmailCodePayload!
+    CheckSuperuserExists (input: CheckSuperuserInput): CheckSuperuserPayload!
 }
 
 type Mutation {
@@ -134,6 +162,7 @@ type Mutation {
     UserAdd (input: UserDataInput): AddedNotificationPayload!
     ChangePassword (input: ChangePasswordInput): ChangePasswordPayload!
     RegisterUser (input: RegisterUserInput): RegisterUserPayload!
+    CreateSuperuser (input: CreateSuperuserInput): CreateSuperuserPayload!
 }
 
 collectionSchema {

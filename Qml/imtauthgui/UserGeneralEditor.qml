@@ -16,31 +16,34 @@ Column {
 	signal emitUpdateGui();
 
 	property alias usernameInput: usernameInput_;
+	property alias nameInput: nameInput_;
 	property alias mailInput: mailInput_;
 	property alias passwordInput: passwordInput_;
 	property alias confirmPasswordInput: confirmPassword;
 	property alias changePasswordButton: changePasswordButton_;
 
+	property bool canHideGroup: true;
+
 	function updateGui(){
 		usernameInput_.text = container.userData.m_username;
-		nameInput.text = container.userData.m_name;
+		nameInput_.text = container.userData.m_name;
 		mailInput_.text = container.userData.m_email;
 		passwordInput_.text = container.userData.m_password;
 	}
 
 	function updateModel(){
 		container.userData.m_username = usernameInput_.text;
-		container.userData.m_name = nameInput.text;
+		container.userData.m_name = nameInput_.text;
 		container.userData.m_email = mailInput_.text;
 		container.userData.m_password = passwordInput_.text;
 	}
 
-	GroupHeaderView {
-		width: parent.width;
+	// GroupHeaderView {
+	// 	width: parent.width;
 
-		title: qsTr("General");
-		groupView: generalGroup;
-	}
+	// 	title: qsTr("General");
+	// 	groupView: container.canHideGroup ? generalGroup : null;
+	// }
 
 	GroupElementView {
 		id: generalGroup;
@@ -65,9 +68,8 @@ Column {
 				}
 			}
 
-			KeyNavigation.tab: nameInput;
+			KeyNavigation.tab: nameInput_;
 			KeyNavigation.backtab: passwordInput_.visible ? confirmPassword : mailInput_;
-
 		}
 
 		RegularExpressionValidator {
@@ -76,7 +78,7 @@ Column {
 		}
 
 		TextInputElementView {
-			id: nameInput;
+			id: nameInput_;
 
 			name: qsTr("Name");
 			placeHolderText: qsTr("Enter the name");
@@ -87,7 +89,7 @@ Column {
 
 			onEditingFinished: {
 				let oldText = container.userData.m_name;
-				if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
+				if (oldText && oldText !== nameInput_.text || !oldText && nameInput_.text !== ""){
 					container.emitUpdateModel();
 				}
 			}
@@ -117,29 +119,7 @@ Column {
 			}
 
 			KeyNavigation.tab: passwordInput_.visible ? passwordInput_ : usernameInput_;
-			KeyNavigation.backtab: nameInput;
-		}
-
-		function updateGui(){
-			if (!container.userData){
-				return;
-			}
-
-			usernameInput_.text = container.userData.m_username;
-			nameInput.text = container.userData.m_name;
-			mailInput_.text = container.userData.m_email;
-			passwordInput_.text = container.userData.m_password;
-		}
-
-		function updateModel(){
-			if (!container.userData){
-				return;
-			}
-
-			container.userData.m_username = usernameInput_.text;
-			container.userData.m_name = nameInput.text;
-			container.userData.m_email = mailInput_.text;
-			container.userData.m_password = passwordInput_.text;
+			KeyNavigation.backtab: nameInput_;
 		}
 	}
 

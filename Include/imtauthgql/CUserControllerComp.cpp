@@ -386,6 +386,128 @@ sdl::imtauth::Users::CCheckEmailCodePayload::V1_0 CUserControllerComp::OnCheckEm
 }
 
 
+
+sdl::imtauth::Users::CCheckSuperuserPayload::V1_0 CUserControllerComp::OnCheckSuperuserExists(
+	const sdl::imtauth::Users::V1_0::CCheckSuperuserExistsGqlRequest& checkSuperuserExistsRequest,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& errorMessage) const
+{
+	sdl::imtauth::Users::CCheckSuperuserPayload::V1_0 response;
+
+	if (!m_userCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
+		return response;
+	}
+
+	response.Exists = false;
+
+	if (m_databaseConnectionCheckerCompPtr.IsValid()){
+		QString errorMessage;
+		bool ok = m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(errorMessage);
+		if (!ok){
+			response.ErrorType = sdl::imtauth::Users::CCheckSuperuserErrorType::V1_0::CheckSuperuserErrorTypeFields::DbNotConnection;
+			response.Message = errorMessage;
+
+			return response;
+		}
+	}
+
+	istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr = GetUserInfoByLogin("su");
+	if (!userInfoPtr.IsValid()){
+		response.ErrorType = sdl::imtauth::Users::CCheckSuperuserErrorType::V1_0::CheckSuperuserErrorTypeFields::NotExists;
+		return response;
+	}
+
+	response.Exists = true;
+
+	return response;
+}
+
+
+sdl::imtauth::Users::CCreateSuperuserPayload::V1_0 CUserControllerComp::OnCreateSuperuser(
+	const sdl::imtauth::Users::V1_0::CCreateSuperuserGqlRequest& createSuperuserRequest,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
+{
+	sdl::imtauth::Users::CCreateSuperuserPayload::V1_0 response;
+
+	if (!m_userCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
+		return response;
+	}
+
+	if (!m_hashCalculatorCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'HashCalculator' was not set", "CUserControllerComp");
+		return response;
+	}
+
+	response.Success = false;
+
+	istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr = GetUserInfoByLogin("su");
+	if (userInfoPtr.IsValid()){
+		response.Message = QString("Superuser already exists");
+		return response;
+	}
+
+	sdl::imtauth::Users::V1_0::CreateSuperuserRequestArguments arguments = createSuperuserRequest.GetRequestedArguments();
+
+	QString name;
+	if (arguments.input.Name){
+		name = *arguments.input.Name;
+	}
+
+	if (name.isEmpty()){
+		name = "superuser";
+	}
+
+	QString mail;
+	if (arguments.input.Mail){
+		mail = *arguments.input.Mail;
+	}
+
+	if (mail.isEmpty()){
+		response.Message = QString("Unable to create superuser with empty email");
+		return response;
+	}
+
+	QString password;
+	if (arguments.input.Password){
+		password = *arguments.input.Password;
+	}
+
+	if (password.isEmpty()){
+		response.Message = QString("Unable to create superuser with empty password");
+		return response;
+	}
+
+	istd::TDelPtr<imtauth::IUserInfo> superuserInfoPtr = m_userFactoryCompPtr.CreateInstance();
+	if (!superuserInfoPtr.IsValid()){
+		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
+		return response;
+	}
+
+	QByteArray login = "su";
+
+	QString passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password.toUtf8());
+	superuserInfoPtr->SetId(login);
+	superuserInfoPtr->SetName(name);
+	superuserInfoPtr->SetMail(mail);
+	superuserInfoPtr->SetPasswordHash(passwordHash.toUtf8());
+	imtauth::IUserInfo::SystemInfo systemInfo;
+	superuserInfoPtr->AddToSystem(systemInfo);
+
+	QByteArray objectId = m_userCollectionCompPtr->InsertNewObject("User", "", "", superuserInfoPtr.GetPtr(), login);
+	if (objectId.isEmpty()){
+		response.Message = QString("Unable to insert superuser to user collection");
+		return response;
+	}
+
+	response.Success = true;
+
+	return response;
+}
+
+
 // private methods
 
 bool CUserControllerComp::SendUserCode(const QByteArray& userId, const imtauth::IUserInfo& userInfo) const

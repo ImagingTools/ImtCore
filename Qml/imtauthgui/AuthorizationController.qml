@@ -14,7 +14,7 @@ QtObject {
 
 	signal logoutSignal();
 	signal userModeChanged(string userMode);
-	signal superuserExistResult(bool exists);
+	signal superuserExistResult(bool exists, string type, string error);
 	signal loginSuccessful();
 	signal loginFailed();
 
@@ -40,7 +40,7 @@ QtObject {
 
 	property SuperuserProvider superuserProvider: SuperuserProvider {
 		onResult: {
-			root.superuserExistResult(exists)
+			root.superuserExistResult(exists, type, error)
 		}
 
 		function getHeaders(){

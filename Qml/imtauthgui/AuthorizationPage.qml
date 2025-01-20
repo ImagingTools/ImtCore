@@ -15,17 +15,18 @@ Rectangle {
 	property string mainColor: Style.backgroundColor;
 
 	property bool canRecoveryPassword: true;
-	property bool canRegisterUser: false;
+	property bool canRegisterUser: true;
 
 	property string appName: context.appName
 
 	Component.onCompleted: {
 		decoratorPause.start();
-		Events.subscribeEvent("OnLocalizationChanged", authPageContainer.onLocalizationChanged);
 	}
 
-	Component.onDestruction: {
-		Events.unSubscribeEvent("OnLocalizationChanged", authPageContainer.onLocalizationChanged);
+	LocalizationEvent {
+		onLocalizationChanged: {
+			authPageContainer.onLocalizationChanged(langId);
+		}
 	}
 
 	function onLocalizationChanged(language){
@@ -430,15 +431,17 @@ Rectangle {
 		id: passwordRecoveryDialogComp;
 	}
 
-	property Component registerDialogComp: Component {
+	Component {
+		id: registerDialogComp;
 		Dialog {
-			id: registerFialog;
+			id: registerDialog;
 			width: 700;
 			height: ModalDialogManager.activeView.height - 100;
 			title: qsTr("User Registration");
 			canMove: false;
 
-			property UserData userData: UserData {
+			UserData {
+				id: userDataModel;
 				m_id: UuidGenerator.generateUUID();
 			}
 
@@ -449,8 +452,8 @@ Rectangle {
 
 			contentComp: Component {
 				Item {
-					width: registerFialog.width;
-					height: registerFialog.height - 100;
+					width: registerDialog.width;
+					height: registerDialog.height - 100;
 
 					clip: true;
 
@@ -483,7 +486,7 @@ Rectangle {
 						UserGeneralEditor {
 							id: userGeneralEditor;
 							width: flickable.width;
-							userData: registerFialog.userData;
+							userData: userDataModel;
 
 							onEmitUpdateModel: {
 								userGeneralEditor.updateModel();
@@ -495,7 +498,7 @@ Rectangle {
 
 			onFinished: {
 				if (buttonId === Enums.save){
-					AuthorizationController.registerUser(userData);
+					AuthorizationController.registerUser(userDataModel);
 				}
 			}
 		}
