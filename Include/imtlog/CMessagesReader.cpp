@@ -225,7 +225,7 @@ CMessagesReader::EventContainerPtr CMessagesReader::ImportContainer(const QStrin
 
 	if (info.suffix() == m_archiveExtension){
 		if (m_compressorPtr == nullptr){
-			SendErrorMessage(QObject::tr("No compressor component. Load history container failed"));
+			SendErrorMessage(QT_TR_NOOP("No compressor component. Load history container failed"));
 			return containerPtr;
 		}
 
@@ -235,7 +235,7 @@ CMessagesReader::EventContainerPtr CMessagesReader::ImportContainer(const QStrin
 			}
 		}
 		else{
-			SendErrorMessage(QObject::tr("Cannot create temporary folder. Load history container failed"));
+			SendErrorMessage(QT_TR_NOOP("Cannot create temporary folder. Load history container failed"));
 		}
 	}
 
@@ -247,7 +247,7 @@ CMessagesReader::EventContainerPtr CMessagesReader::ImportContainer(const QStrin
 	containerPtr.SetPtr(new CEventContainer);
 	if (!containerPtr->Serialize(xmlArchive)){
 		containerPtr.Reset();
-		SendErrorMessage(QObject::tr("Unable to deserialize history container \"%1\". History container skipped").arg(containerPath));
+		SendErrorMessage(QT_TR_NOOP(QString("Unable to deserialize history container \"%1\". History container skipped").arg(containerPath)));
 	}
 
 	if (QDir(tempDir).exists()){

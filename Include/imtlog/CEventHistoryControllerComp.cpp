@@ -165,19 +165,19 @@ void CEventHistoryControllerComp::OnComponentCreated()
 	m_systemStartTime = QDateTime::currentDateTime();
 
 	if (!m_logFolderCompPtr.IsValid() || (m_logFolderCompPtr->GetPathType() != ifile::IFileNameParam::PT_DIRECTORY)){
-		SendWarningMessage(0, tr("Log folder not specified. Event history disabled"));
+		SendWarningMessage(0, QT_TR_NOOP("Log folder not specified. Event history disabled"));
 		m_controllerState = CS_FAILED;
 		return;
 	}
 
 	if (!istd::CSystem::EnsurePathExists(m_logFolderCompPtr->GetPath())){
-		SendErrorMessage(0, tr("Unable access log folder. Event history disabled"));
+		SendErrorMessage(0, QT_TR_NOOP("Unable access log folder. Event history disabled"));
 		m_controllerState = CS_FAILED;
 		return;
 	}
 
 	if (!m_versionInfoCompPtr.IsValid()){
-		SendWarningMessage(0, tr("Unavailable version info provider. Event history disabled"));
+		SendWarningMessage(0, QT_TR_NOOP("Unavailable version info provider. Event history disabled"));
 		m_controllerState = CS_FAILED;
 		return;
 	}

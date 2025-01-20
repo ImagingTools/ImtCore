@@ -301,8 +301,8 @@ void CMessagesController::Writer::run()
 
 				if (!containerPtr->Serialize(xmlArchive)){
 					m_parent.SendErrorMessage(
-								0, tr("Unable to serialize message history container \"%1\". Event container skipped")
-								.arg(containerPath));
+								0, QT_TR_NOOP(QString("Unable to serialize message history container \"%1\". Event container skipped")
+								.arg(containerPath)));
 
 					break;
 				}
@@ -315,8 +315,8 @@ void CMessagesController::Writer::run()
 				if (m_compressorPtr != nullptr){
 					if (!m_compressorPtr->CompressFile(containerPath, archivePath)){
 						m_parent.SendErrorMessage(
-									0, tr("Unable to compress message history container \"%1\". Event container skipped")
-									.arg(archivePath));
+									0, QT_TR_NOOP(QString("Unable to compress message history container \"%1\". Event container skipped")
+									.arg(archivePath)));
 
 						break;
 					}
@@ -328,8 +328,8 @@ void CMessagesController::Writer::run()
 
 				if (!istd::CSystem::FileCopy(archivePath, outPath, true)){
 					m_parent.SendErrorMessage(
-								0, tr("Unable to copy history archive to repository. Event container skipped")
-								.arg(archivePath));
+								0, QT_TR_NOOP(QString("Unable to copy history archive to repository. Event container skipped")
+								.arg(archivePath)));
 
 					break;
 				}			
@@ -338,7 +338,7 @@ void CMessagesController::Writer::run()
 			istd::CSystem::RemoveDirectory(tempDir);
 		}
 		else{
-			m_parent.SendErrorMessage(0, tr("Cannot create temporary folder. Event container skipped"));
+			m_parent.SendErrorMessage(0, QT_TR_NOOP("Cannot create temporary folder. Event container skipped"));
 		}
 	}
 }
