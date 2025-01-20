@@ -21,7 +21,7 @@ class Internal extends QtObject {
                 if (this.isTransaction){
                     let changeObj = {"name":name,"sender":sender}
 
-                    changeList.push(changeObj)
+                    this.changeList.push(changeObj)
     
                     this.countChanges++;
     
@@ -56,7 +56,7 @@ class Internal extends QtObject {
         if (this.countChanges > 0){
             this.parent.modelChanged(this.changeList)
 
-            countChanges = 0
+            this.countChanges = 0
         }
 
         this.isTransaction = false

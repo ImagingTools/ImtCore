@@ -176,15 +176,15 @@ class BaseModel extends ListModel {
         element.owner = this.owner
         element.connectProperties()
         this.append({item: element})
-        if (owner){
-            owner.modelChanged([])
+        if (this.owner){
+            this.owner.modelChanged([])
         }
     }
 
     removeElement(index){
         this.remove(index)
-        if (owner){
-            owner.modelChanged([])
+        if (this.owner){
+            this.owner.modelChanged([])
         }
     }
 
