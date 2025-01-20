@@ -8,6 +8,12 @@ QtObject {
 
     signal filterChanged();
 
+	Component.onDestruction: {
+		if (filterModel){
+			filterModel.destroy();
+		}
+	}
+
     function getTextFilter(){
         if (filterModel.containsKey("TextFilter")){
             return filterModel.getData("TextFilter");

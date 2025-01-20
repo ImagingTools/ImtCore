@@ -550,6 +550,20 @@ QtObject {
 			property ViewBase view;
 			property bool isDirty: false;
 
+			Component.onDestruction: {
+				if (documentDataController){
+					documentDataController.destroy();
+				}
+
+				if (documentValidator){
+					documentValidator.destroy();
+				}
+
+				if (undoManager){
+					undoManager.destroy();
+				}
+			}
+
 			onViewChanged: {
 				console.log("onViewChanged", view)
 				let documentModel = documentDataController.documentModel;
@@ -719,9 +733,12 @@ QtObject {
 
 			function checkDocumentModel(){
 				let currentStateModel = undoManager.getStandardModel();
+				console.log("checkDocumentModel",currentStateModel);
+
 				if (currentStateModel){
 					let documentModel = singleDocumentData.documentDataController.documentModel
 					let isEqual = currentStateModel.isEqualWithModel(documentModel);
+					console.log("isEqual", isEqual);
 
 					isDirty = !isEqual && documentManager.documentIsValid(singleDocumentData);
 				}

@@ -34,6 +34,8 @@ Item {
 
     property int commandsCount: 0;
 
+	signal buttonClicked(string buttonId, var button);
+
     function setCommandData(commandId, key, value){
         for (let j = 0; j < allElements.length; j++){
             if (allElements[j].modelData["Id"] === commandId){
@@ -182,7 +184,8 @@ Item {
                                     property int maxWidth: -1;
 
                                     onClicked: {
-                                        Events.sendEvent(commandsItem.eventCommandPrefix + "CommandActivated", model.Id);
+										// commandsItem.buttonClicked(model.Id, this);
+										Events.sendEvent(commandsItem.eventCommandPrefix + "CommandActivated", model.Id);
                                     }
 
                                     onWidthChanged: {

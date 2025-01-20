@@ -6,8 +6,8 @@ import imtcontrols 1.0
 Item {
     id: viewBase;
 
-    property string updateCommandsGuiEventCommandId: "UpdateCommandsGui";
-    property string clearCommandsGuiEventCommandId: "ClearCommandsGui";
+	property string updateCommandsGuiEventCommandId;
+	property string clearCommandsGuiEventCommandId;
 
     property string viewId;
     property var model: null;
@@ -15,7 +15,12 @@ Item {
     property Component commandsControllerComp: null;
     property CommandsController commandsController: null;
 
-    property Component commandsDelegateComp: null;
+	property Component commandsDelegateComp: Component {
+		ViewCommandsDelegateBase {
+			view: viewBase;
+		}
+	}
+
     property ViewCommandsDelegateBase commandsDelegate: null;
 
     property alias commandsView: headerViewLoader.item;
@@ -96,7 +101,6 @@ Item {
 
     Component.onCompleted: {
         viewId = UuidGenerator.generateUUID();
-        Events.subscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged);
 
         for (let i = 0; i < viewBase.children.length; i++){
             if (viewBase.children[i].objectName !== "ViewBase"){
@@ -120,10 +124,6 @@ Item {
             Events.unSubscribeEvent(viewId + "CommandActivated", commandsDelegate.commandHandle);
         }
 
-        Events.unSubscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged);
-        if (model){
-            model.destroy()
-        }
         internal.isDestroyed = true;
     }
 
@@ -139,6 +139,10 @@ Item {
             Events.unSubscribeAllFromSlot(commandsDelegate.commandHandle);
             Events.subscribeEvent(viewBase.viewId + "CommandActivated", commandsDelegate.commandHandle);
         }
+
+		if (commandsDelegate){
+			commandsDelegate.view = viewBase;
+		}
     }
 
     onReadOnlyChanged: {
@@ -286,6 +290,12 @@ Item {
     function guiIsBlocked(){
         return internal.blockingUpdateGui;
     }
+
+	LocalizationEvent {
+		onLocalizationChanged: {
+			internal.onLocalizationChanged(langId)
+		}
+	}
 
     QtObject {
         id: internal;

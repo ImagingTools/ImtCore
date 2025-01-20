@@ -49,6 +49,16 @@ QtObject {
         filter.setSortingInfoId(sortByField);
     }
 
+	Component.onDestruction: {
+		if (collectionModel){
+			collectionModel.destroy();
+		}
+
+		if (filter){
+			filter.destroy();
+		}
+	}
+
     onOrderTypeChanged: {
         filter.setSortingOrder(orderType);
     }

@@ -18,6 +18,12 @@ QtObject {
     signal error(string message, string type);
     signal modelChanged();
 
+	Component.onDestruction: {
+		if (documentModel){
+			documentModel.destroy();
+		}
+	}
+
     onDocumentModelChanged: {
         setupDocumentInfo();
 

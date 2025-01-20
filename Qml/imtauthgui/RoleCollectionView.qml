@@ -37,13 +37,13 @@ RemoteCollectionView {
         roleCollectionViewContainer.doUpdateGui();
     }
 
-    Component.onDestruction: {
-        Events.unSubscribeEvent("OnLocalizationChanged", roleCollectionViewContainer.onLocalizationChanged);
-    }
+	LocalizationEvent {
+		onLocalizationChanged: {
+			roleCollectionViewContainer.dataController.updateHeaders();
+		}
+	}
 
     Component.onCompleted: {
-        Events.subscribeEvent("OnLocalizationChanged", roleCollectionViewContainer.onLocalizationChanged);
-
         if (roleCollectionViewContainer.documentManager){
             documentManager.registerDocumentView("Role", "RoleEditor", roleDocumentComp);
             documentManager.registerDocumentDataController("Role", dataControllerComp);
@@ -82,11 +82,6 @@ RemoteCollectionView {
             permissionsModel: roleCollectionViewContainer.permissionsModel;
             rolesModel: roleCollectionViewContainer.rolesModel;
             productId: roleCollectionViewContainer.productId;
-
-            commandsDelegateComp: Component {ViewCommandsDelegateBase {
-                    view: roleEditor;
-                }
-            }
 
             commandsControllerComp: Component {CommandsPanelController {
                     commandId: "Role";

@@ -65,10 +65,6 @@ RemoteCollectionView {
 
             productId: userGroupCollectionViewContainer.productId;
 
-            commandsDelegateComp: Component {ViewCommandsDelegateBase {
-                view: groupEditor;
-            }}
-
             commandsControllerComp: Component {CommandsPanelController {
                 commandId: "Group";
                 uuid: groupEditor.viewId;

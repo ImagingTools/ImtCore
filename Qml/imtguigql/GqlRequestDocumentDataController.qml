@@ -37,6 +37,8 @@ DocumentDataController {
 			addRequestInputParam.InsertFieldObject(additionParams);
 			updateRequestInputParam.InsertFieldObject(additionParams);
 		}
+
+		setupObjectTypeId();
 	}
 
 	Component.onDestruction: {
@@ -52,6 +54,16 @@ DocumentDataController {
 		getRequestInputParam.InsertField("Id", container.documentId);
 		addRequestInputParam.InsertField("Id", container.documentId);
 		updateRequestInputParam.InsertField("Id", container.documentId);
+	}
+
+	onTypeIdChanged: {
+		setupObjectTypeId();
+	}
+
+	function setupObjectTypeId(){
+		getRequestInputParam.InsertField("typeId", container.typeId);
+		addRequestInputParam.InsertField("typeId", container.typeId);
+		updateRequestInputParam.InsertField("typeId", container.typeId);
 	}
 
 	onError: {

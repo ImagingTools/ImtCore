@@ -48,23 +48,17 @@ Item {
     signal rightButtonMouseClicked(int mouseX, int mouseY);
     signal tableViewParamsAccepted();
 
-    Component.onCompleted: {
-        Events.subscribeEvent("OnLocalizationChanged", onLocalizationChanged)
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("OnLocalizationChanged", onLocalizationChanged)
-    }
+	LocalizationEvent {
+		onLocalizationChanged: {
+			if (root.dataController){
+				root.dataController.updateModel();
+			}
+		}
+	}
 
     Keys.onPressed: {
         if (event.key === Qt.Key_Delete){
             container.commandsDelegate.commandHandle("Remove");
-        }
-    }
-
-    function onLocalizationChanged(language){
-        if (root.dataController){
-            root.dataController.updateModel();
         }
     }
 
