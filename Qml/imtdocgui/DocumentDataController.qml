@@ -8,6 +8,7 @@ QtObject {
 
     property string documentId;
     property string documentName;
+	property string typeId;
 
     property bool hasRemoteChanges: false;
 

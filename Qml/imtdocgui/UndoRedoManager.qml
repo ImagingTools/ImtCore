@@ -52,11 +52,6 @@ Item {
         internal.m_redoStack.push(internal.m_observedModel.toJson());
 
         let prevStateModel = internal.m_undoStack.pop();
-
-        // let copiedModel = internal.m_observedModel.copyMe();
-        // copiedModel.createFromJson(prevStateModel)
-        // internal.m_observedModel.copy(copiedModel);
-
         internal.m_observedModel.createFromJson(prevStateModel)
 
         internal.m_beginStateModel = prevStateModel;
@@ -79,11 +74,6 @@ Item {
         internal.m_undoStack.push(internal.m_observedModel.toJson());
 
         let nextStateModel = internal.m_redoStack.pop();
-
-        // let copiedModel = internal.m_observedModel.copyMe();
-        // copiedModel.createFromJson(nextStateModel)
-        // internal.m_observedModel.copy(copiedModel);
-
        internal.m_observedModel.createFromJson(nextStateModel)
 
         internal.m_beginStateModel = internal.m_observedModel.toJson();
@@ -242,7 +232,7 @@ Item {
             return;
         }
 
-        internal.setModel(model)
+		internal.setDefaultStateModel(model)
     }
 
 
@@ -265,17 +255,22 @@ Item {
 
         property var m_undoStack: [];
         property var m_redoStack: [];
-        function setModel(model){
-            if (m_defaultStateModel){
-                m_defaultStateModel = model.copyMe()
-            }
+
+		function setDefaultStateModel(model){
+			removeDefaultModel()
+
+			m_defaultStateModel = model.copyMe()
         }
 
         Component.onDestruction: {
-            if (m_defaultStateModel){
-                m_defaultStateModel.destroy()
-            }
+			removeDefaultModel()
         }
+
+		function removeDefaultModel(){
+			if (m_defaultStateModel){
+				m_defaultStateModel.destroy()
+			}
+		}
     }
 
     function onModelChanged(){
