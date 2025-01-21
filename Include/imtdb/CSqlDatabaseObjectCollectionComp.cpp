@@ -631,6 +631,12 @@ bool CSqlDatabaseObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 
 bool CSqlDatabaseObjectCollectionComp::IsObjectTypeSupported(const QByteArray& typeId) const
 {
+	//! \todo REMOVE IT and replace by checking if the typeId is empty!
+	//! Adapt all controllers working with a single document type to use the empty type-ID.
+	if (typeId == "DocumentInfo"){
+		return true;
+	}
+
 	if (m_objectDelegateCompPtr.IsValid()){
 		const iprm::IOptionsList* infosPtr = m_objectDelegateCompPtr->GetObjectTypeInfos();
 		if (infosPtr == nullptr){
