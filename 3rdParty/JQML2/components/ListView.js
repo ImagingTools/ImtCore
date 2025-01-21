@@ -600,6 +600,8 @@ class ListView extends Flickable {
     }
 
     $toCache(item){
+        if(!item) return
+        
         if(item instanceof Item) item.setStyle({ display: 'none' })
 
         this.$cache.push(item)
