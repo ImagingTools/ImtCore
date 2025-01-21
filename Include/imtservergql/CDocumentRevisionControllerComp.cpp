@@ -125,9 +125,9 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 CDocumentRevisionControl
 
 
 sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0 CDocumentRevisionControllerComp::OnBackupRevision(
-	const sdl::imtbase::DocumentRevision::V1_0::CBackupRevisionGqlRequest& backupRevisionRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+	const sdl::imtbase::DocumentRevision::V1_0::CBackupRevisionGqlRequest& /*backupRevisionRequest*/,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
 	return sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0();
 }
@@ -135,7 +135,7 @@ sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0 CDocumentRevisionC
 
 sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0 CDocumentRevisionControllerComp::OnRestoreRevision(
 	const sdl::imtbase::DocumentRevision::V1_0::CRestoreRevisionGqlRequest& restoreRevisionRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& errorMessage) const
 {
 	sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0 response;

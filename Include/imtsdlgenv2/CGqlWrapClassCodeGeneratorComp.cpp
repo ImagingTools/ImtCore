@@ -406,6 +406,10 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRe
 	ifStream << '{';
 	FeedStream(ifStream, 1, false);
 
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("Q_UNUSED(optRead)");
+	FeedStream(ifStream, 1, false);
+
 	GenerateRequestParsing(ifStream, sdlRequest, 1);
 	ifStream << '}';
 	FeedStream(ifStream, 1, false);

@@ -809,7 +809,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::DeleteObject
 
 
 imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::GetHeaders(
-		const imtgql::CGqlRequest& gqlRequest,
+		const imtgql::CGqlRequest& /*gqlRequest*/,
 		QString& errorMessage) const
 {
 	if (!m_headersProviderCompPtr.IsValid()){

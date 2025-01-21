@@ -171,6 +171,8 @@ istd::IChangeable* CUserVerification::CloneMe(CompatibilityMode mode) const
 
 bool CUserVerification::ResetData(CompatibilityMode /*mode*/)
 {
+	[[maybe_unused]] istd::CChangeNotifier changeNotifier(this, &GetAllChanges());
+
 	m_userId.clear();
 	m_verificationCode.clear();
 

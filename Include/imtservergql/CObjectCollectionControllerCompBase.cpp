@@ -67,8 +67,8 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 
 sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CObjectCollectionControllerCompBase::OnGetObjectVisualStatus(
 			const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response;
 
@@ -1525,7 +1525,10 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 }
 
 
-void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGqlRequest& /*gqlRequest*/, const imtgql::CGqlObject& /*viewParamsGql*/, iprm::CParamsSet* /*filterParamsPtr*/) const
+void CObjectCollectionControllerCompBase::SetAdditionalFilters(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			const imtgql::CGqlObject& /*viewParamsGql*/,
+			iprm::CParamsSet* /*filterParamsPtr*/) const
 {
 }
 
