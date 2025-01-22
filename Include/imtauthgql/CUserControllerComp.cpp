@@ -200,7 +200,7 @@ sdl::imtauth::Users::CRegisterUserPayload::V1_0 CUserControllerComp::OnRegisterU
 	}
 
 	QByteArray productId;
-	if (!arguments.input.ProductId){
+	if (arguments.input.ProductId){
 		productId = *arguments.input.ProductId;
 	}
 
@@ -208,10 +208,17 @@ sdl::imtauth::Users::CRegisterUserPayload::V1_0 CUserControllerComp::OnRegisterU
 	sdl::imtauth::Users::CUserData::V1_0 userData = *arguments.input.UserData;
 
 	QByteArray userId;
+	if (arguments.input.UserData->Id){
+		userId = *arguments.input.UserData->Id;
+	}
+
 	if (!m_userRepresentationController.FillUserInfoFromRepresentation(userData, *userInfoPtr, *m_userCollectionCompPtr, userId, errorMessage)){
 		errorMessage = QString("Unable to register user. Error: '%1'").arg(errorMessage);
 		return response;
 	}
+
+	imtauth::IUserInfo::SystemInfo systemInfo;
+	userInfoPtr->AddToSystem(systemInfo);
 
 	QString password;
 	if (userData.Password){
@@ -256,7 +263,12 @@ sdl::imtauth::Users::CRegisterUserPayload::V1_0 CUserControllerComp::OnRegisterU
 		}
 	}
 
-	m_userCollectionCompPtr->InsertNewObject("", "", "", userInfoPtr.GetPtr(), userId);
+	QByteArray objectId = m_userCollectionCompPtr->InsertNewObject("User", "", "", userInfoPtr.GetPtr(), userId);
+	if (objectId.isEmpty()){
+		errorMessage = QString("Unable to register user. Error: Insert object to collection failed");
+		SendWarningMessage(0, errorMessage, "CUserControllerComp");
+		return response;
+	}
 
 	return response;
 }
@@ -400,6 +412,7 @@ sdl::imtauth::Users::CCheckSuperuserPayload::V1_0 CUserControllerComp::OnCheckSu
 	}
 
 	response.Exists = false;
+	response.ErrorType = "";
 
 	if (m_databaseConnectionCheckerCompPtr.IsValid()){
 		QString errorMessage;

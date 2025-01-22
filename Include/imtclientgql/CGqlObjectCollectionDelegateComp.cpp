@@ -103,29 +103,68 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 {
 	QByteArray data;
 	QByteArray commandId = *m_collectionIdAttrPtr + "Add";
-	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
+	istd::TDelPtr<imtgql::CGqlRequest> requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
 	imtgql::CGqlObject input;
 	input.InsertField("typeId", QVariant(typeId));
 	input.InsertField("name", QVariant(name));
 	input.InsertField("description", QVariant(description));
-	SerializeObject(objectPtr,data);
+
+	if (!SerializeObject(objectPtr, data)){
+		SendErrorMessage(0,
+						   QString("Unable to create insert request for object with id '%1', typeId '%2'. Error: Serialization object failed")
+								  .arg(qPrintable(proposedObjectId), qPrintable(typeId)),
+						   "CGqlObjectCollectionDelegateComp");
+
+		return nullptr;
+	}
+
 	input.InsertField("item", QVariant(data.toBase64()));
 	input.InsertField("uploadUrl", QVariant(uploadUrl));
 	input.InsertField("Id", QVariant(proposedObjectId));
 	input.InsertField("nodeId", QVariant(nodeId));
-	SerializeObject(dataMetaInfoPtr,data);
-	input.InsertField("dataMetaInfo", QVariant(data.toBase64()));
-	SerializeObject(collectionItemMetaInfoPtr,data);
-	input.InsertField("collectionItemMetaInfo", QVariant(data.toBase64()));
-	SerializeObject(operationContextPtr,data);
-	input.InsertField("operationContext", QVariant(data.toBase64()));
+
+	if (dataMetaInfoPtr != nullptr){
+		if (SerializeObject(dataMetaInfoPtr, data)){
+			input.InsertField("dataMetaInfo", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to serialize 'DataMetaInfo' for object '%1' with typeId '%2'")
+									  .arg(qPrintable(proposedObjectId), qPrintable(typeId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
+	}
+
+	if (collectionItemMetaInfoPtr != nullptr){
+		if (SerializeObject(collectionItemMetaInfoPtr, data)){
+			input.InsertField("collectionItemMetaInfo", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to serialize 'CollectionItemMetaInfo' for object '%1' with typeId '%2'")
+								   .arg(qPrintable(proposedObjectId), qPrintable(typeId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
+	}
+
+	if (operationContextPtr != nullptr){
+		if (SerializeObject(operationContextPtr, data)){
+			input.InsertField("operationContext", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to serialize 'OperationContext' for object '%1' with typeId '%2'")
+								   .arg(qPrintable(proposedObjectId), qPrintable(typeId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
+	}
 
 	requestPtr->AddParam("input", input);
 
 	imtgql::CGqlObject query;
 	requestPtr->AddField("addedNotification", query);
 
-	return requestPtr;
+	return requestPtr.PopPtr();
 }
 
 
@@ -158,27 +197,65 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 	QByteArray data;
 
 	QByteArray commandId = *m_collectionIdAttrPtr + "Update";
-	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
+	istd::TDelPtr<imtgql::CGqlRequest> requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
 	imtgql::CGqlObject input;
 	input.InsertField("Id", QVariant(objectId));
 	input.InsertField("typeId", QVariant(typeId));
-	SerializeObject(objectPtr,data);
+
+	if (!SerializeObject(objectPtr, data)){
+		SendErrorMessage(0,
+						 QString("Unable to create update request for object '%1' with type-ID '%2'. Error: Serialization object failed")
+							 .arg(qPrintable(objectId), qPrintable(typeId)),
+						 "CGqlObjectCollectionDelegateComp");
+		return nullptr;
+	}
 	input.InsertField("item", QVariant(data.toBase64()));
 	input.InsertField("uploadUrl", QVariant(uploadUrl));
-	SerializeObject(dataMetaInfoPtr,data);
-	input.InsertField("dataMetaInfo", QVariant(data.toBase64()));
-	SerializeObject(collectionItemMetaInfoPtr,data);
-	input.InsertField("collectionItemMetaInfo", QVariant(data.toBase64()));
+
+	if (dataMetaInfoPtr != nullptr){
+		if (SerializeObject(dataMetaInfoPtr, data)){
+			input.InsertField("dataMetaInfo", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to serialize 'DataMetaInfo' for object '%1' with typeId '%2'")
+								   .arg(qPrintable(objectId), qPrintable(typeId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
+	}
+
+	if (collectionItemMetaInfoPtr != nullptr){
+		if (SerializeObject(collectionItemMetaInfoPtr, data)){
+			input.InsertField("collectionItemMetaInfo", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to serialize 'CollectionItemMetaInfo' for object '%1' with typeId '%2'")
+								   .arg(qPrintable(objectId), qPrintable(typeId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
+	}
+
+	if (operationContextPtr != nullptr){
+		if (SerializeObject(operationContextPtr, data)){
+			input.InsertField("operationContext", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to serialize 'OperationContext' for object '%1' with typeId '%2'")
+								   .arg(qPrintable(objectId), qPrintable(typeId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
+	}
+
 	input.InsertField("clientVersion", QVariant(clientVersion));
-	SerializeObject(operationContextPtr,data);
-	input.InsertField("operationContext", QVariant(data.toBase64()));
 
 	requestPtr->AddParam("input", input);
 
 	imtgql::CGqlObject query;
 	requestPtr->AddField("updatedNotification", query);
 
-	return requestPtr;
+	return requestPtr.PopPtr();
 }
 
 
@@ -194,8 +271,18 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectRequest
 	imtgql::CGqlObject input;
 	input.InsertField("Id", QVariant(objectId));
 	input.InsertField("version", QVariant(clientElementVersion));
-	SerializeObject(operationContextPtr,data);
-	input.InsertField("operationContext", QVariant(data.toBase64()));
+	if (operationContextPtr != nullptr){
+		if (SerializeObject(operationContextPtr,data)){
+			input.InsertField("operationContext", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to insert field 'operationContext' to the request '%1'. Error: Serialization failed")
+								   .arg(qPrintable(commandId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
+	}
+
 	queryPtr->AddParam("input", input);
 
 	imtgql::CGqlObject query;
@@ -213,9 +300,16 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementCountRequ
 
 	QByteArray data;
 	if (selectionParamsPtr != nullptr){
-		SerializeObject(selectionParamsPtr, data);
+		if (SerializeObject(selectionParamsPtr, data)){
+			input.InsertField("selectionParams", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to insert field 'selectionParams' to the request '%1'. Error: Serialization failed")
+								   .arg(qPrintable(commandId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
 	}
-	input.InsertField("selectionParams", QVariant(data.toBase64()));
 
 	requestPtr->AddParam("input", input);
 
@@ -238,9 +332,16 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 	input.InsertField("count", QVariant(count));
 	QByteArray data;
 	if (selectionParamsPtr != nullptr){
-		SerializeObject(selectionParamsPtr, data);
+		if (SerializeObject(selectionParamsPtr, data)){
+			input.InsertField("selectionParams", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to insert field 'selectionParams' to the request '%1'. Error: Serialization failed")
+								   .arg(qPrintable(commandId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
 	}
-	input.InsertField("selectionParams", QVariant(data.toBase64()));
 	requestPtr->AddParam("input", input);
 
 	imtgql::CGqlObject query;
@@ -263,8 +364,18 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetSubCollectionReq
 	viewParams.InsertField("offset", QVariant(offset));
 	viewParams.InsertField("count", QVariant(count));
 	QByteArray data;
-	SerializeObject(selectionParamsPtr,data);
-	viewParams.InsertField("selectionParams", QVariant(data.toBase64()));
+	if (selectionParamsPtr != nullptr){
+		if (SerializeObject(selectionParamsPtr, data)){
+			viewParams.InsertField("selectionParams", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to insert field 'selectionParams' to the request '%1'. Error: Serialization failed")
+								   .arg(qPrintable(commandId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
+	}
+
 	input.InsertField("viewParams", viewParams);
 
 	requestPtr->AddParam("input", input);
@@ -294,8 +405,18 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectNameReques
 	input.InsertField("id", QVariant(objectId));
 	input.InsertField("newName", QVariant(name));
 	input.InsertField("version", QVariant(clientVersion));
-	SerializeObject(operationContextPtr,data);
-	input.InsertField("operationContext", QVariant(data.toBase64()));
+
+	if (operationContextPtr != nullptr){
+		if (SerializeObject(operationContextPtr, data)){
+			input.InsertField("operationContext", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to insert field 'operationContext' to the request '%1'. Error: Serialization failed")
+								   .arg(qPrintable(commandId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
+	}
 	queryPtr->AddParam("input", input);
 
 	imtgql::CGqlObject query;
@@ -319,8 +440,19 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectDescriptio
 	input.InsertField("id", QVariant(objectId));
 	input.InsertField("description", QVariant(description));
 	input.InsertField("version", QVariant(clientVersion));
-	SerializeObject(operationContextPtr,data);
-	input.InsertField("operationContext", QVariant(data.toBase64()));
+
+	if (operationContextPtr != nullptr){
+		if (SerializeObject(operationContextPtr, data)){
+			input.InsertField("operationContext", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to insert field 'operationContext' to the request '%1'. Error: Serialization failed")
+								   .arg(qPrintable(commandId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
+	}
+
 	queryPtr->AddParam("input", input);
 
 	imtgql::CGqlObject query;
@@ -468,7 +600,7 @@ bool CGqlObjectCollectionDelegateComp::GetItemIds(const imtgql::IGqlResponse& re
 				itemIds = itemsIdsValueStr.split(";");
 			}
 			Ids retVal;
-			for (QString itemId : itemIds){
+			for (const QString& itemId : itemIds){
 				retVal.append(itemId.toLatin1());
 			}
 
@@ -584,10 +716,6 @@ CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp:
 	imtgql::IGqlResponse::GqlRequestPtr requestPtr = response.GetOriginalRequest();
 	if (!requestPtr.isNull()){
 		data.commandId = requestPtr->GetCommandId();
-
-		if (!data.data.contains(data.commandId)) {
-			SendErrorMessage(0, "GqlResponse data don't contains " + data.commandId);
-		}
 	}
 
 	QJsonDocument document = QJsonDocument::fromJson(response.GetResponseData());
@@ -615,7 +743,7 @@ CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp:
 bool CGqlObjectCollectionDelegateComp::SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const
 {
 	if (object == nullptr){
-		SendErrorMessage(0, QString("Unable to serialize object. Error: Object is invalid"));
+		SendErrorMessage(0, QString("Unable to serialize object. Error: Object is nullptr"));
 		return false;
 	}
 
