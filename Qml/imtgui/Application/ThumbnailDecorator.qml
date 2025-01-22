@@ -36,6 +36,8 @@ Rectangle {
 
         Events.subscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
         Events.subscribeEvent("Logout", thumbnailDecoratorContainer.onLogout);
+
+		PopupManager.popupContainer = popupContainer;
     }
 
     Component.onDestruction: {
@@ -262,6 +264,14 @@ Rectangle {
             }
         }
     }
+
+	PopupContainer {
+		id: popupContainer;
+		anchors.right: parent.right;
+		anchors.rightMargin: Style.size_mainMargin;
+		anchors.bottom: parent.bottom;
+		anchors.bottomMargin: Style.size_mainMargin;
+	}
 
     Loader {
         id: loadingPageLoader;
