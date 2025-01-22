@@ -288,8 +288,8 @@ endif()
 	endif()
 
 	if(NOT DEFINED USE_EJ OR USE_EJ)
-		# add_subdirectory("${IMPL_DIR}/ImtEjPck/CMake" "${AUX_INCLUDE_DIR}/ImtEjPck")
-		# add_dependencies(ImtEjPck imtej)
+		add_subdirectory("${IMPL_DIR}/ImtEjPck/CMake" "${AUX_INCLUDE_DIR}/ImtEjPck")
+		add_dependencies(ImtEjPck imtej)
 	endif()
 
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
