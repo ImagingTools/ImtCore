@@ -226,12 +226,16 @@ Row {
 			}
 		}
 
+		Item {
+
+		}
+
 		Button {
 			id: count100;
 
 			anchors.verticalCenter: parent.verticalCenter;
 
-			width: 25;
+			width: 50;
 			height: 20;
 
 			decorator: buttonDecorator;
@@ -242,6 +246,25 @@ Row {
 
 			onClicked: {
 				paginationContainer.countElements = 100;
+			}
+		}
+
+		Button {
+			id: count250;
+
+			anchors.verticalCenter: parent.verticalCenter;
+
+			width: 50;
+			height: 20;
+
+			decorator: buttonDecorator;
+
+			enabled: paginationContainer.countElements != 250;
+
+			text: "250";
+
+			onClicked: {
+				paginationContainer.countElements = 250;
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-import QtQuick 2.12
+import QtQuick
 import Acf 1.0
 import imtcontrols 1.0
 
@@ -692,6 +692,7 @@ Rectangle {
 			anchors.bottom: parent.bottom;
 
 			clip: true;
+            reuseItems: true
 			orientation: ListView.Horizontal;
 			spacing: 0;
 			model: tableContainer.headers;
@@ -790,7 +791,7 @@ Rectangle {
 		anchors.bottom: parent.bottom;
 		anchors.bottomMargin: scrollHoriz.visible ? scrollHoriz.secondSize + scrollHoriz.anchors.topMargin : 0;
 
-		boundsBehavior: Flickable.StopAtBounds;
+        boundsBehavior: Flickable.StopAtBounds;
 
 		// cacheBuffer: elementsListObj.count * tableContainer.itemHeight;
 
