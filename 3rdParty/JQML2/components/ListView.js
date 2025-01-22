@@ -196,8 +196,14 @@ class ListView extends Flickable {
         }
 
         while(this.$items.length){
-            let obj = this.$items.shift()
-            if(obj) obj.destroy()
+            if(destroyCache){
+                let obj = this.$items.shift()
+                if(obj) obj.destroy()
+            } else {
+                let obj = this.$items.shift()
+                this.$toCache(obj)
+            }
+            
         }
 
         this.getProperty('contentX').reset(0)
@@ -601,7 +607,7 @@ class ListView extends Flickable {
 
     $toCache(item){
         if(!item) return
-        
+
         if(item instanceof Item) item.setStyle({ display: 'none' })
 
         this.$cache.push(item)

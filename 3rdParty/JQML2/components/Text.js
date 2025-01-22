@@ -95,7 +95,11 @@ class Text extends Item {
     }
 
     applyMetrics(){
-        let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font'), this.getProperty('width').auto ? 0 : this.getPropertyValue('width'), this.getPropertyValue('wrapMode'), this.getPropertyValue('textFormat'))
+        if(this.$updating) return
+
+        this.$updating = true
+
+        let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font'), this.getProperty('width').auto ? 0 : this.getPropertyValue('width'), this.getPropertyValue('textFormat'), this.getPropertyValue('wrapMode'), this.getPropertyValue('elide'))
         
         if(textMetrics.isHTML){
             this.impl.innerHTML = this.getPropertyValue('text').replaceAll('<br>', '\r')
@@ -105,14 +109,11 @@ class Text extends Item {
 
         this.getProperty('width').setAuto(textMetrics.width)
         this.getProperty('height').setAuto(textMetrics.height)
-        
-        if(this.getProperty('width').auto){
-            this.getProperty('contentWidth').reset(Math.max(textMetrics.width, this.impl.scrollWidth))
-            this.getProperty('contentHeight').reset(Math.max(textMetrics.height, this.impl.scrollHeight))
-        } else {
-            this.getProperty('contentWidth').reset(textMetrics.width)
-            this.getProperty('contentHeight').reset(textMetrics.height)
-        }
+
+        this.getProperty('contentWidth').reset(textMetrics.width)
+        this.getProperty('contentHeight').reset(textMetrics.height)
+
+        this.$updating = false
     }
 
     $lineHeightChanged(){

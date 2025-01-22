@@ -872,6 +872,22 @@ class KeyboardController {
     }
 }
 class TextFontController {
+    static NoWrap = 0
+    static WordWrap = 1
+    static WrapAnywhere = 2
+    static Wrap = 3
+    static WrapAtWordBoundaryOrAnywhere = 4
+
+    static AutoText = 0
+    static PlainText = 1
+    static StyledText = 2
+    static RichText = 3
+    static MarkdownText = 4
+
+    static ElideNone = 0
+    static ElideRight = 3
+
+
     static tags = ['<a>','<abbr>','<address>','<area>','<article>','<aside>','<audio>','<b>','<base>','<bdi>','<bdo>','<blockquote>','<body>','<br>','<button>','<canvas>','<caption>','<cite>','<code>','<col>','<colgroup>','<data>','<datalist>','<dd>','<del>','<details>','<dfn>','<dialog>','<div>','<dl>','<dt>','<em>','<embed>','<fieldset>','<figcaption>','<figure>','<footer>','<form>','<h1>','<h2>','<h3>','<h4>','<h5>','<h6>','<head>','<header>','<hr>','<html>','<i>','<iframe>','<img>','<input>','<ins>','<kbd>','<label>','<legend>','<li>','<link>','<main>','<map>','<mark>','<meta>','<meter>','<nav>','<noscript>','<object>','<ol>','<optgroup>','<option>','<output>','<p>','<param>','<picture>','<pre>','<progress>','<q>','<ruby>','<rb>','<rt>','<rtc>','<rp>','<s>','<samp>','<script>','<section>','<select>','<small>','<source>','<span>','<strong>','<style>','<sub>','<summary>','<sup>','<table>','<tbody>','<td>','<template>','<textarea>','<tfoot>','<th>','<thead>','<time>','<title>','<tr>','<track>','<u>','<ul>','<var>','<video>','<wbr>']
     static regexp = /<[^<>]+>/g
 
@@ -881,38 +897,33 @@ class TextFontController {
         this.container.style.display = 'inline'
         this.container.style.opacity = 0
         this.container.style.lineHeight = 'normal'
-        
+
         this.content = document.createElement('span')
         this.container.appendChild(this.content)
 
         document.body.appendChild(this.container)
+
+        this.canvas = document.createElement('canvas')
+        this.ctx = this.canvas.getContext("2d")
     }
 
-    measureText(text, font, maxWidth, wrapMode, textFormat){
-        this.container.style.fontFamily = font.getPropertyValue('family')
-        this.container.style.fontSize = font.getPropertyValue('pixelSize')+'px'
-        this.container.style.fontWeight = font.getPropertyValue('bold') ? 'bold' : 'normal'
-        this.container.style.fontStyle = font.getPropertyValue('italic') ? 'italic' : 'normal'
-        this.container.style.textDecoration = font.getPropertyValue('underline') ? 'underline' : 'unset'
-        if(maxWidth){
-            this.container.style.maxWidth = maxWidth+'px'
-            switch(wrapMode){
-                case Text.NoWrap: this.container.style.whiteSpace = 'pre'; this.container.style.wordBreak = 'unset'; break;
-                case Text.WordWrap: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
-                case Text.WrapAnywhere: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-all'; break;
-                case Text.Wrap: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
-                case Text.WrapAtWordBoundaryOrAnywhere: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
-            }
-        } else {
-            this.container.style.maxWidth = 'unset'
-            this.container.style.whiteSpace = 'pre'; 
-            this.container.style.wordBreak = 'unset';
-        }
+    measureTextFast(text, font){
+        this.ctx.font = `${font.italic ? 'italic ' : ''}${font.bold ? 'bold ' : ''}${font.pixelSize}px ${font.family}`
+        let textMetrics = this.ctx.measureText(text)
         
+        return {
+            width: textMetrics.width,
+            height: textMetrics.fontBoundingBoxAscent + textMetrics.fontBoundingBoxDescent,
+            isHTML: false,
+        }
+    }
+
+    measureText(text, font, maxWidth, textFormat, wrapMode, elide){
         let isHTML = false
-        if(textFormat === undefined || textFormat === Text.PlainText){
+
+        if(textFormat === undefined || textFormat === TextFontController.PlainText){
             isHTML = false
-        } else if(textFormat === Text.AutoText){
+        } else if(textFormat === TextFontController.AutoText){
             isHTML = false
             let result = text.match(TextFontController.regexp)
             if(result){
@@ -928,6 +939,38 @@ class TextFontController {
             }
         } else {
             isHTML = true
+        }
+
+        if(!isHTML && maxWidth === 0 && elide === TextFontController.ElideNone){
+            return this.measureTextFast(text, font)
+        }
+
+        this.container.style.fontFamily = font.family
+        this.container.style.fontSize = font.pixelSize+'px'
+        this.container.style.fontWeight = font.bold ? 'bold' : 'normal'
+        this.container.style.fontStyle = font.italic ? 'italic' : 'normal'
+        this.container.style.textDecoration = font.underline ? 'underline' : 'unset'
+        if(maxWidth){
+            this.container.style.maxWidth = maxWidth+'px'
+            switch(wrapMode){
+                case TextFontController.NoWrap: this.container.style.whiteSpace = 'pre'; this.container.style.wordBreak = 'unset'; break;
+                case TextFontController.WordWrap: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
+                case TextFontController.WrapAnywhere: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-all'; break;
+                case TextFontController.Wrap: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
+                case TextFontController.WrapAtWordBoundaryOrAnywhere: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
+            }
+        } else {
+            this.container.style.maxWidth = 'unset'
+            this.container.style.whiteSpace = 'pre'; 
+            this.container.style.wordBreak = 'unset';
+        }
+
+        if(elide === TextFontController.ElideRight){
+            this.content.style.textOverflow = 'ellipsis'
+            this.content.style.overflow = 'auto'
+        } else {
+            this.content.style.textOverflow = 'unset'
+            this.content.style.overflow = 'unset'
         }
 
         if(isHTML){
