@@ -29,6 +29,26 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	QByteArray InsertOperationDescription(
+		imtbase::CObjectCollection& documentChangeCollection,
+		const QByteArray& operationTypeId,
+		const QByteArray& key,
+		const QString& keyName,
+		const QByteArray& oldValue = QByteArray(),
+		const QByteArray& newValue = QByteArray()) const;
+	void GenerateChanges(
+		const QByteArrayList& oldValueList,
+		const QByteArrayList& newValueList,
+		QByteArrayList& addedValueList,
+		QByteArrayList& removedValueList) const;
+
+	virtual bool CompareDocuments(
+		const istd::IChangeable& oldDocument,
+		const istd::IChangeable& newDocument,
+		CObjectCollection& documentChangeCollection,
+		QString& errorMessage) = 0;
+	virtual QString CreateCustomOperationDescription(const imtbase::COperationDescription& operationDescription, const QByteArray& languageId = QByteArray()) const;
+
 	// reimplemented (imtbase::IDocumentChangeGenerator)
 	virtual bool GenerateDocumentChanges(
 				const QByteArray& operationTypeId,
@@ -39,30 +59,13 @@ protected:
 				const iprm::IParamsSet* paramsPtr) override;
 	virtual QString GetOperationDescription(CObjectCollection& documentChangeCollection, const QByteArray& languageId = QByteArray()) override;
 
-	virtual bool CompareDocuments(
-				const istd::IChangeable& oldDocument,
-				const istd::IChangeable& newDocument,
-				CObjectCollection& documentChangeCollection,
-				QString& errorMessage) = 0;
-	virtual imtbase::COperationDescription* CreateOperationDescription(
-				const QByteArray& operationTypeId,
-				const QByteArray& key,
-				const QString& keyName,
-				const QByteArray& oldValue,
-				const QByteArray& newValue) const;
-	virtual QByteArray InsertOperationDescription(
-				imtbase::CObjectCollection& documentChangeCollection,
-				const QByteArray& operationTypeId,
-				const QByteArray& key,
-				const QString& keyName,
-				const QByteArray& oldValue = QByteArray(),
-				const QByteArray& newValue = QByteArray()) const;
-	virtual void GenerateChanges(
-				const QByteArrayList& oldValueList,
-				const QByteArrayList& newValueList,
-				QByteArrayList& addedValueList,
-				QByteArrayList& removedValueList) const;
-	virtual QString CreateCustomOperationDescription(const imtbase::COperationDescription& operationDescription, const QByteArray& languageId = QByteArray()) const;
+private:
+	imtbase::COperationDescription* CreateOperationDescription(
+		const QByteArray& operationTypeId,
+		const QByteArray& key,
+		const QString& keyName,
+		const QByteArray& oldValue,
+		const QByteArray& newValue) const;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
