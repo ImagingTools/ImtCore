@@ -75,7 +75,7 @@ bool CLicenseControllerComp::ImportLicense(const QString& licenseFilePath, ilog:
 							addtionalMessage = *m_additionalImportLicenseErrorMessageAttrPtr;
 						}
 
-						QString errorMessage = QString(tr("License file could not be imported"));
+						QString errorMessage = QT_TR_NOOP("License file could not be imported");
 						if (!addtionalMessage.isEmpty()){
 							errorMessage += ".\n" + addtionalMessage;
 						}
@@ -117,26 +117,26 @@ bool CLicenseControllerComp::ImportLicense(const QString& licenseFilePath, ilog:
 bool CLicenseControllerComp::CheckLicense(const QByteArray& key) const
 {
 	if (!m_licensePathCompPtr.IsValid()) {
-		SendCriticalMessage(0, "No license path component was set. Please check component configuration", "CLicenseControllerComp::CheckLicense");
+		SendCriticalMessage(0,QT_TR_NOOP("No license path component was set. Please check component configuration"), "CLicenseControllerComp::CheckLicense");
 
 		return false;
 	}
 
 	if (!m_productInstancePersistenceCompPtr.IsValid()) {
-		SendCriticalMessage(0, "No product instance persistence component was set. Please check component configuration", "CLicenseControllerComp::CheckLicense");
+		SendCriticalMessage(0, QT_TR_NOOP("No product instance persistence component was set. Please check component configuration"), "CLicenseControllerComp::CheckLicense");
 
 		return false;
 	}
 
 	if (!m_encryptedInstancePersistenceCompPtr.IsValid()) {
-		SendCriticalMessage(0, "No encrypted instance persistence component was set. Please check component configuration", "CLicenseControllerComp::CheckLicense");
+		SendCriticalMessage(0, QT_TR_NOOP("No encrypted instance persistence component was set. Please check component configuration"), "CLicenseControllerComp::CheckLicense");
 
 		return false;
 	}
 
 	QString licenseFilePath = m_licensePathCompPtr->GetPath();
 	if (licenseFilePath.isEmpty()) {
-		SendCriticalMessage(0, "License file path is empty. Please check component configuration", "CLicenseControllerComp::CheckLicense");
+		SendCriticalMessage(0, QT_TR_NOOP("License file path is empty. Please check component configuration"), "CLicenseControllerComp::CheckLicense");
 
 		m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID | imtlic::ILicenseStatus::LSF_NO_LICENSE);
 
@@ -145,7 +145,7 @@ bool CLicenseControllerComp::CheckLicense(const QByteArray& key) const
 
 	QFileInfo licenseFileInfo(licenseFilePath);
 	if (!licenseFileInfo.exists()) {
-		SendErrorMessage(0, QString(QObject::tr("License file '%1' doesn't exist")).arg(licenseFilePath), "License Management");
+		SendErrorMessage(0, QT_TR_NOOP(QString("License file '%1' doesn't exist").arg(licenseFilePath)), "License Management");
 
 		m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID | imtlic::ILicenseStatus::LSF_NO_LICENSE);
 
@@ -162,25 +162,25 @@ bool CLicenseControllerComp::CheckLicense(const QByteArray& key) const
 bool CLicenseControllerComp::CheckLicense(const QByteArray& key, const QString& licensePath) const
 {
 	if (!m_productInstancePersistenceCompPtr.IsValid()) {
-		SendCriticalMessage(0, "No product instance persistence component was set. Please check component configuration", "CLicenseControllerComp::CheckLicense");
+		SendCriticalMessage(0, QT_TR_NOOP("No product instance persistence component was set. Please check component configuration"), "CLicenseControllerComp::CheckLicense");
 
 		return false;
 	}
 
 	if (!m_encryptedInstancePersistenceCompPtr.IsValid()) {
-		SendCriticalMessage(0, "No encrypted instance persistence component was set. Please check component configuration", "CLicenseControllerComp::CheckLicense");
+		SendCriticalMessage(0, QT_TR_NOOP("No encrypted instance persistence component was set. Please check component configuration"), "CLicenseControllerComp::CheckLicense");
 
 		return false;
 	}
 
 	if (licensePath.isEmpty()) {
-		SendWarningMessage(0, "License file path is empty, nothing to check", "CLicenseControllerComp::CheckLicense");
+		SendWarningMessage(0, QT_TR_NOOP("License file path is empty, nothing to check"), "CLicenseControllerComp::CheckLicense");
 		return false;
 	}
 
 	QFileInfo licenseFileInfo(licensePath);
 	if (!licenseFileInfo.exists()) {
-		SendWarningMessage(0, QString(QObject::tr("License file '%1' doesn't exist")).arg(licensePath), "CLicenseControllerComp::CheckLicense");
+		SendWarningMessage(0, QT_TR_NOOP(QString("License file '%1' doesn't exist").arg(licensePath)), "CLicenseControllerComp::CheckLicense");
 		return false;
 	}
 
@@ -195,7 +195,7 @@ bool CLicenseControllerComp::CheckLicense(const QByteArray& key, const QString& 
 
 void CLicenseControllerComp::OnFingeprintCheckTimer() const
 {
-	SendVerboseMessage(tr("Checking license fingerprint"), tr("License Controller"));
+	SendVerboseMessage(QT_TR_NOOP("Checking license fingerprint"), tr("License Controller"));
 
 	imtlic::CProductInstanceInfo tempLicense;
 	bool retVal = ReadLicenseFromFile(tempLicense);
@@ -273,7 +273,7 @@ bool CLicenseControllerComp::ReadLicenseFromFile(imtlic::IProductInstanceInfo& l
 
 	QFileInfo licenseFileInfo(licenseFilePath);
 	if (!licenseFileInfo.exists()){
-		SendErrorMessage(0, QString(QObject::tr("License file '%1' doesn't exist")).arg(licenseFilePath), "License Management");
+		SendErrorMessage(0, QT_TR_NOOP(QString("License file '%1' doesn't exist").arg(licenseFilePath)), "License Management");
 
 		m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID | imtlic::ILicenseStatus::LSF_NO_LICENSE);
 
@@ -286,20 +286,20 @@ bool CLicenseControllerComp::ReadLicenseFromFile(imtlic::IProductInstanceInfo& l
 	if (state != ifile::IFilePersistence::OS_OK){
 		int daysUntilExpire = -1;
 		if (LoadFingerprint(fingerprintFilePath, license, daysUntilExpire)){
-			SendWarningMessage(0, QString(QObject::tr("You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license")).arg(daysUntilExpire), "License Management");
+			SendWarningMessage(0, QT_TR_NOOP(QString("You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license").arg(daysUntilExpire)), "License Management");
 		}
 		else{
-			SendErrorMessage(0, QString(QObject::tr("You have no license to run this software. License file: '%1'")).arg(licenseFilePath), "License Management");
+			SendErrorMessage(0, QT_TR_NOOP(QString("You have no license to run this software. License file: '%1'").arg(licenseFilePath)), "License Management");
 
 			return false;
 		}
 	}
 	else{
 		if (!UpdateFingerprint(fingerprintFilePath, license)){
-			SendWarningMessage(0, QString(QObject::tr("License fingerprint could not be updated")), "License Management");
+			SendWarningMessage(0, QT_TR_NOOP("License fingerprint could not be updated"), "License Management");
 		}
 
-		SendVerboseMessage(QString(QObject::tr("License was successfully loaded")), "License Management");
+		SendVerboseMessage(QT_TR_NOOP("License was successfully loaded"), "License Management");
 
 		m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_VALID);
 	}
@@ -386,7 +386,7 @@ void CLicenseControllerComp::OnLicenseKeysUpdated(
 
 		QByteArray key = licenseKeysProviderPtr->GetEncryptionKey(imtcrypt::IEncryptionKeysProvider::KT_PASSWORD);
 		if (!key.isEmpty()){
-			SendVerboseMessage(tr("License key was changed. Checking license fingerprint"), tr("License Controller"));
+			SendVerboseMessage(QT_TR_NOOP("License key was changed. Checking license fingerprint"), tr("License Controller"));
 
 			ReadLicenseFromFile(*m_productInstanceCompPtr);
 		}
