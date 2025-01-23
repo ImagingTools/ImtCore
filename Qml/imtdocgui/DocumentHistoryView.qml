@@ -75,6 +75,7 @@ Rectangle {
 
 		Column {
 			width: column.width;
+			visible: model.item.m_description !== "" && model.item.m_user !== "";
 
 			Item {
 				width: parent.width;

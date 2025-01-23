@@ -214,15 +214,10 @@ CollectionViewCommandsDelegateBase {
 
 				sdlObjectComp: Component { RevisionInfoList {
 						onFinished: {
-							console.log("onFinished", m_revisions.toJson());
 							documentRevisionDialog.revisionsModel = m_revisions;
 							documentRevisionDialog.currentRevision = m_activeRevision;
 						}
 					}
-				}
-
-				onStateChanged: {
-					// loading.visible = (state === "Loading");
 				}
 			}
 
@@ -272,7 +267,7 @@ CollectionViewCommandsDelegateBase {
 				MessageDialog {
 					width: 400;
 					title: qsTr("Remove revision");
-					message: qsTr("Delete the selected revision?");
+					message: qsTr("Delete the selected revision ?");
 					onFinished: {
 						if (buttonId == Enums.yes){
 							deleteRevisionRequest.send()
@@ -312,7 +307,7 @@ CollectionViewCommandsDelegateBase {
 								sourceSize.height: height;
 							}
 
-							onRowIndexChanged: {
+							onDraw: {
 								if (!rowDelegate){
 									return
 								}
