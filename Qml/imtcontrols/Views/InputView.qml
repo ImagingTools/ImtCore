@@ -12,6 +12,7 @@ Item{
 	property alias contentWidth: list.contentWidth;
 	property bool fitToWidth: false;
 	property int orientation: Qt.Vertical;
+	property alias scrollbar: scroll;
 
 	signal modelDataChanged(string role, int index);
 
