@@ -71,15 +71,7 @@ bool CDocumentChangeGeneratorCompBase::GenerateDocumentChanges(
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(documentId, dataPtr)){
 			if (dataPtr.IsValid()){
-				istd::TDelPtr<const istd::IChangeable> oldDocumentPtr;
-				oldDocumentPtr.SetCastedOrRemove(dataPtr->CloneMe());
-				if (!oldDocumentPtr.IsValid()){
-					errorMessage = QString("Unable to generate changes for document with ID: '%1'. Error: Document is invalid").arg(qPrintable(documentId));
-
-					return false;
-				}
-
-				return CompareDocuments(*oldDocumentPtr.GetPtr(), document, documentChangeCollection, errorMessage);
+				return CompareDocuments(*dataPtr, document, documentChangeCollection, errorMessage);
 			}
 		}
 	}
