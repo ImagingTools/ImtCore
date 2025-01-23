@@ -206,11 +206,24 @@ class ListView extends Flickable {
             
         }
 
-        this.getProperty('contentX').reset(0)
-        this.getProperty('contentY').reset(0)
+        this.$updateBlocking = true
+
         this.getProperty('originX').reset(0)
         this.getProperty('originY').reset(0)
+        this.getProperty('contentX').reset(0)
+        this.getProperty('contentY').reset(0)
+
+        if(this.getPropertyValue('orientation') === ListView.Horizontal){
+            this.getProperty('contentWidth').setAuto(0)
+            this.getProperty('contentHeight').setAuto(this.getPropertyValue('height'))
+        } else {
+            this.getProperty('contentWidth').setAuto(this.getPropertyValue('width'))
+            this.getProperty('contentHeight').setAuto(0)
+        }  
+        
         this.getProperty('count').reset(0)
+
+        this.$updateBlocking = false
     }
 
     $modelChanged(){
@@ -261,10 +274,15 @@ class ListView extends Flickable {
     }
 
     $updateView(){
+        if(this.$updateBlocking) {
+            return
+        }
+
         if(!this.$ready){
             this.$needUpdate = true
             return
         }
+
         if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) return
         
         let model = this.getPropertyValue('model')
@@ -440,13 +458,13 @@ class ListView extends Flickable {
         this.middleHeight = middleHeight
 
         if(this.getPropertyValue('orientation') === ListView.Horizontal){
-            this.getStatement('contentWidth').reset(visibleContentWidth + Math.round(middleWidth)*(length-visibleCount) + this.getPropertyValue('spacing') * (length-1))
+            this.getStatement('contentWidth').setAuto(visibleContentWidth + Math.round(middleWidth)*(length-visibleCount) + this.getPropertyValue('spacing') * (length-1))
             let originX = (minX - firstIndex*(Math.round(middleWidth+this.getPropertyValue('spacing'))))
             if(originX !== Infinity && originX !== -Infinity) this.getStatement('originX').reset(originX)
 
             this.getProperty('contentHeight').setAuto(this.getPropertyValue('height'))
         } else {
-            this.getStatement('contentHeight').reset(visibleContentHeight + Math.round(middleHeight)*(length-visibleCount) + this.getPropertyValue('spacing') * (length-1))
+            this.getStatement('contentHeight').setAuto(visibleContentHeight + Math.round(middleHeight)*(length-visibleCount) + this.getPropertyValue('spacing') * (length-1))
             let originY = (minY - firstIndex*(Math.round(middleHeight+this.getPropertyValue('spacing'))))
             if(originY !== Infinity && originY !== -Infinity) this.getStatement('originY').reset(originY)
 
@@ -506,12 +524,12 @@ class ListView extends Flickable {
     }
     $widthChanged(){
         super.$widthChanged()
-        if(this.getPropertyValue('orientation') === ListView.Vertical) this.getProperty('contentWidth').reset(this.getPropertyValue('width'))
+        if(this.getPropertyValue('orientation') === ListView.Vertical) this.getProperty('contentWidth').setAuto(this.getPropertyValue('width'))
         this.$updateView()
     }
     $heightChanged(){
         super.$heightChanged()
-        if(this.getPropertyValue('orientation') === ListView.Horizontal) this.getProperty('contentHeight').reset(this.getPropertyValue('height'))
+        if(this.getPropertyValue('orientation') === ListView.Horizontal) this.getProperty('contentHeight').setAuto(this.getPropertyValue('height'))
         this.$updateView()
     }
     $cacheBufferChanged(){
