@@ -33,6 +33,7 @@ public:
 		I_ASSIGN(m_backupSettingsCompPtr, "BackupSettings", "Backup settings", false, "BackupSettings");
 		I_ASSIGN(m_programAttrPtr, "Program", "Program name", true, "Program");
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval for backup timer (in msec)", false, 60000);
+		I_ASSIGN(m_maxBackupCountAttrPtr, "MaxBackupCount", "Maximum number of backups, if -1 - unlimited", false, 20);
 		I_ASSIGN(m_backupOnStartAttrPtr, "BackupOnStart", "Backup on start", true, true);
 	I_END_COMPONENT;
 
@@ -43,6 +44,7 @@ protected:
 
 private:
 	bool Backup();
+	void CleanupOldBackups(const QString& backupFolderPath);
 
 private Q_SLOTS:
 	void OnTimeout();
@@ -55,6 +57,7 @@ protected:
 	I_REF(iprm::IParamsSet, m_backupSettingsCompPtr);
 	I_ATTR(QString, m_programAttrPtr);
 	I_ATTR(int, m_checkIntervalAttrPtr);
+	I_ATTR(int, m_maxBackupCountAttrPtr);
 	I_ATTR(bool, m_backupOnStartAttrPtr);
 
 private:
