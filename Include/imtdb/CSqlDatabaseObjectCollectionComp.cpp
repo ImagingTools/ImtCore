@@ -75,11 +75,11 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 		objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
-	if (!IsObjectTypeSupported(typeId)){
-		SendErrorMessage(0, QString("Object type ID \"%1\" not supported").arg(typeId));
+	// if (!IsObjectTypeSupported(typeId)){
+	// 	SendErrorMessage(0, QString("Object type ID \"%1\" not supported").arg(typeId));
 
-		return QByteArray();
-	}
+	// 	return QByteArray();
+	// }
 
 	imtdb::IDatabaseObjectDelegate::NewObjectQuery objectQuery = m_objectDelegateCompPtr->CreateNewObjectQuery(
 				typeId,
