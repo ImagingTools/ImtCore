@@ -5,7 +5,6 @@ include($(ACFCONFIGDIR)/QMake/QtGuiBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 # SDL
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtbasesdl
 include($(IMTCOREDIR)/Config/QMake/SdlCodeGenerator.pri)
 
 SDL_GENERATOR_FEATURES_SCHEME_PATH = $$PWD/../1.0/Features.sdl
