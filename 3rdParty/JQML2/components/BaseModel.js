@@ -134,11 +134,11 @@ class BaseModel extends ListModel {
             return false;
         }
 
-        if (count !== model.count){
+		if (this.count !== model.count){
             return false;
         }
 
-        for(let i = 0; i < count; i++){
+		for(let i = 0; i < this.count; i++){
             let item1 = this.get(i).item
             let item2 = model.get(i).item
 
