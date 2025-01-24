@@ -206,24 +206,19 @@ class ListView extends Flickable {
             
         }
 
-        this.$updateBlocking = true
+        this.getProperty('originX').value = 0
+        this.getProperty('originY').value = 0
+        this.getProperty('contentX').value = 0
+        this.getProperty('contentY').value = 0
+        this.getProperty('contentWidth').value = 0
+        this.getProperty('contentHeight').value = 0
 
-        this.getProperty('originX').reset(0)
-        this.getProperty('originY').reset(0)
-        this.getProperty('contentX').reset(0)
-        this.getProperty('contentY').reset(0)
+        this.getPropertyValue('contentItem').getProperty('x').reset(-this.getPropertyValue('contentX'))
+        this.getPropertyValue('contentItem').getProperty('y').reset(-this.getPropertyValue('contentY'))
+        this.getPropertyValue('contentItem').getProperty('width').reset(this.getPropertyValue('contentWidth'))
+        this.getPropertyValue('contentItem').getProperty('height').reset(this.getPropertyValue('contentHeight'))
 
-        if(this.getPropertyValue('orientation') === ListView.Horizontal){
-            this.getProperty('contentWidth').setAuto(0)
-            this.getProperty('contentHeight').setAuto(this.getPropertyValue('height'))
-        } else {
-            this.getProperty('contentWidth').setAuto(this.getPropertyValue('width'))
-            this.getProperty('contentHeight').setAuto(0)
-        }  
-        
-        this.getProperty('count').reset(0)
-
-        this.$updateBlocking = false
+        this.getProperty('count').value = 0
     }
 
     $modelChanged(){
@@ -274,10 +269,6 @@ class ListView extends Flickable {
     }
 
     $updateView(){
-        if(this.$updateBlocking) {
-            return
-        }
-
         if(!this.$ready){
             this.$needUpdate = true
             return
