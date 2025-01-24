@@ -11,12 +11,13 @@
 #include <imtdb/IDatabaseEngine.h>
 
 
-namespace imtgql
+namespace imtgqltest
 {
 
 
-class CGqlSdlRequestTest
+class CGqlSdlRequestTest: public QObject
 {
+	Q_OBJECT
 protected:
 	template <class  Request, class  Arguments, class  ResponseData>
 	bool SendRequest(Arguments arguments, class ResponseData::V1_0& response) const
@@ -57,10 +58,10 @@ protected:
 		return true;
 	}
 
-	virtual ipackage::CComponentAccessor* GetComponentAccessor() const;
-	virtual const imtgql::IGqlRequestHandler* GetRequestHandler() const;
+	ipackage::CComponentAccessor* GetComponentAccessor() const;
+	const imtgql::IGqlRequestHandler* GetRequestHandler() const;
 
-	virtual QSqlQuery ExecuteQuery(const QString& query, QSqlError* sqlError = nullptr) const;
+	QSqlQuery ExecuteQuery(const QString& query, QSqlError* sqlError = nullptr) const;
 
 protected:
 	mutable istd::TSmartPtr<ipackage::CComponentAccessor> m_componentAccessorPtr;
@@ -69,6 +70,5 @@ protected:
 };
 
 
-} // namespace imtgql
-
+} // namespace imtgqltest
 

@@ -1,4 +1,4 @@
-#include <imtgql/Test/CGqlSdlRequestTest.h>
+#include <imtgqltest/CGqlSdlRequestTest.h>
 
 
 // ACF includes
@@ -9,7 +9,7 @@
 #include <imtgql/IGqlRequestHandler.h>
 
 
-namespace imtgql
+namespace imtgqltest
 {
 
 
@@ -50,4 +50,4 @@ QSqlQuery CGqlSdlRequestTest::ExecuteQuery(const QString& query, QSqlError* sqlE
 }
 
 
-}
+} // namespace imtgqltest
