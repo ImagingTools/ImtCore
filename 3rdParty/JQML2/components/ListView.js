@@ -33,6 +33,7 @@ class ListView extends Flickable {
         count: { type: QReal, value: 0 },
         contentWidth: { type: QAutoGeometry, value: 0, changed: '$contentWidthChanged' },
         contentHeight: { type: QAutoGeometry, value: 0, changed: '$contentHeightChanged' },
+        reuseItems: { type: QBool, value: false },
     }
 
     static defaultSignals = {
@@ -617,11 +618,15 @@ class ListView extends Flickable {
     $toCache(item){
         if(!item) return
 
-        if(item instanceof Item) item.setStyle({ display: 'none' })
+        if(this.getPropertyValue('reuseItems')){
+            if(item instanceof Item) item.setStyle({ display: 'none' })
 
-        this.$cache.push(item)
+            this.$cache.push(item)
 
-        if(item.$signals.pooled) item.$signals.pooled()
+            if(item.$signals.pooled) item.$signals.pooled()
+        } else {
+            item.destroy()
+        }
     }
 
     $fromCache(){
