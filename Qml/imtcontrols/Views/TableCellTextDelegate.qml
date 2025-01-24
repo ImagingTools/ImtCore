@@ -9,7 +9,7 @@ TableCellDelegateBase {
     onRowDelegateChanged: {
 		if(rowDelegate){
 			rowDelegate.reused.connect(delegateContainer.onRedraw)
-			rowDelegate.tableItem.modelRefresh.connect(delegateContainer.onRedraw)
+			rowDelegate.tableItem.modelRefresh.connect(delegateContainer.refreshModelData)
 			delegateContainer.onRedraw()
 		}
     }
@@ -17,6 +17,12 @@ TableCellDelegateBase {
     function onRedraw(){
         delegateContainer.cellText.text = delegateContainer.getValue()
     }
+
+	function refreshModelData(rowIndex_, modelRole_){
+		if(rowIndex_ == delegateContainer.rowIndex && modelRole_ == delegateContainer.cellHeaderId){
+			onRedraw();
+		}
+	}
 
 	TableCellText {
 		id: tableCellText

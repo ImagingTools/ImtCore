@@ -175,7 +175,7 @@ Rectangle {
 
 	signal tableViewParamsAccepted();
 
-	signal modelRefresh();
+	signal modelRefresh(int rowIndex, string modelRole);
 
 	Component.onCompleted: {
 		tableContainer.headerMinHeight = tableContainer.headerHeight;
