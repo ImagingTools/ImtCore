@@ -58,6 +58,7 @@ protected:
 				QString& errorMessage,
 				const iprm::IParamsSet* paramsPtr) override;
 	virtual QString GetOperationDescription(CObjectCollection& documentChangeCollection, const QByteArray& languageId = QByteArray()) override;
+	virtual QString GetKeyNameForOperation(const QByteArray& key, const QByteArray& value) const;
 
 private:
 	imtbase::COperationDescription* CreateOperationDescription(

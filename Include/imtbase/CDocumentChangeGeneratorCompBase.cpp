@@ -95,8 +95,11 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 			if (operationDescriptionPtr != nullptr){
 				QByteArray typeId = operationDescriptionPtr->GetOperationTypeId();
 				QByteArray key = operationDescriptionPtr->GetKey();
+
 				QByteArray oldValue = operationDescriptionPtr->GetOldValue();
 				QByteArray newValue = operationDescriptionPtr->GetNewValue();
+				oldValue = GetKeyNameForOperation(key, oldValue).toUtf8();
+				newValue = GetKeyNameForOperation(key, newValue).toUtf8();
 
 				QString keyName = operationDescriptionPtr->GetKeyName();
 				keyName = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), keyName.toUtf8(), languageId, "Attribute");
@@ -149,6 +152,12 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 	}
 
 	return retVal;
+}
+
+
+QString CDocumentChangeGeneratorCompBase::GetKeyNameForOperation(const QByteArray& /*key*/, const QByteArray& value) const
+{
+	return value;
 }
 
 
