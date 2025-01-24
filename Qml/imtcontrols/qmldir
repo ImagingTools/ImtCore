@@ -24,6 +24,7 @@ DetailedPopupMenuDelegate 1.0 ./Actions/DetailedPopupMenuDelegate.qml
 FilterableComboBoxDelegate 1.0 ./Actions/FilterableComboBoxDelegate.qml
 ShortcutManager 1.0 ./Actions/ShortcutManager.qml
 MovingItem 1.0 ./Actions/MovingItem.qml
+ResizeItem 1.0 ./Actions/ResizeItem.qml
 ControlArea 1.0 ./Actions/ControlArea.qml
 TableSelectionManager 1.0 ./Actions/TableSelectionManager.qml
 LocalizationEvent 1.0 ./Actions/LocalizationEvent.qml

@@ -24,6 +24,7 @@
         <file alias="imtcontrols/Actions/FilterableComboBoxDelegate.qml">Actions/FilterableComboBoxDelegate.qml</file>
         <file alias="imtcontrols/Actions/ShortcutManager.qml">Actions/ShortcutManager.qml</file>
         <file alias="imtcontrols/Actions/MovingItem.qml">Actions/MovingItem.qml</file>
+		<file alias="imtcontrols/Actions/ResizeItem.qml">Actions/ResizeItem.qml</file>
         <file alias="imtcontrols/Actions/ControlArea.qml">Actions/ControlArea.qml</file>
 	<file alias="imtcontrols/Actions/TableSelectionManager.qml">Actions/TableSelectionManager.qml</file>
 	<file alias="imtcontrols/Actions/LocalizationEvent.qml">Actions/LocalizationEvent.qml</file>
