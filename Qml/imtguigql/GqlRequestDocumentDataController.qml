@@ -41,10 +41,6 @@ DocumentDataController {
 		setupObjectTypeId();
 	}
 
-	Component.onDestruction: {
-		Events.sendEvent("UnRegisterSubscription", container.subscriptionClient);
-	}
-
 	onDocumentModelChanged: {
 		updateRequestInputParam.InsertField ("Item", container.documentModel);
 		addRequestInputParam.InsertField ("Item", container.documentModel);
@@ -54,6 +50,12 @@ DocumentDataController {
 		getRequestInputParam.InsertField("Id", container.documentId);
 		addRequestInputParam.InsertField("Id", container.documentId);
 		updateRequestInputParam.InsertField("Id", container.documentId);
+	}
+
+	onSubscriptionCommandIdChanged: {
+		if (subscriptionCommandId !== ""){
+			subscriptionClient.gqlCommandId = subscriptionCommandId;
+		}
 	}
 
 	onTypeIdChanged: {
@@ -117,25 +119,8 @@ DocumentDataController {
 	}
 
 	property SubscriptionClient subscriptionClient: SubscriptionClient {
-		function register(){
-			if (container.subscriptionCommandId === ""){
-				console.warn("Unable to register subscription for document because command-ID is empty");
-				return;
-			}
-
-			let subscriptionRequestId = container.subscriptionCommandId;
-			var query = Gql.GqlRequest("subscription", subscriptionRequestId);
-			var queryFields = Gql.GqlObject("notification");
-			queryFields.InsertField("Id");
-			query.AddField(queryFields);
-
-			Events.sendEvent("RegisterSubscription", {"Query": query, "Client": container.subscriptionClient});
-		}
-
-		onStateChanged: {
-			if (state === "Ready"){
-				container.hasRemoteChanges = true;
-			}
+		onMessageReceived: {
+			container.hasRemoteChanges = true;
 		}
 	}
 
@@ -165,8 +150,6 @@ DocumentDataController {
 					console.error("Unable convert json ", json, " to object")
 					return;
 				}
-
-				console.log("Updated", this.json);
 
 				if ("errors" in responseObj){
 					let errorsObject = responseObj["errors"];

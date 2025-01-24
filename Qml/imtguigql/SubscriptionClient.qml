@@ -11,6 +11,13 @@ GqlModel {
 
 	signal messageReceived(var data);
 
+	property bool ok: subscriptionId !== "" && gqlCommandId !== "";
+	onOkChanged: {
+		if (ok){
+			registerSubscription();
+		}
+	}
+
     Component.onCompleted: {
         subscriptionId = UuidGenerator.generateUUID();
     }
@@ -21,7 +28,7 @@ GqlModel {
 
 	onStateChanged: {
 		if (container.state === "Ready"){
-			console.log("SubscriptionClient.qml onStateChanged", toJson());
+			console.log("SubscriptionClient.qml onStateChanged", gqlCommandId);
 			if (container.containsKey("data")){
 				let dataModelLocal = container.getData("data")
 				container.messageReceived(dataModelLocal);
@@ -30,8 +37,7 @@ GqlModel {
 	}
 
 	function registerSubscription(){
-		console.log("SubscriptionClient.qml registerSubscription");
-
+		console.log("registerSubscription", gqlCommandId);
 		var query = Gql.GqlRequest("subscription", gqlCommandId);
 		var inputParams = Gql.GqlObject("input");
 		query.AddParam(inputParams);
@@ -43,6 +49,8 @@ GqlModel {
 	}
 
 	function unRegisterSubscription(){
+		console.log("unRegisterSubscription", gqlCommandId);
+
 		Events.sendEvent("UnRegisterSubscription", container);
 	}
 

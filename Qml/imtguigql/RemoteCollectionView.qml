@@ -31,6 +31,12 @@ CollectionView {
         }
     }
 
+	onCollectionIdChanged: {
+		if (collectionId !== ""){
+			subscriptionClient.gqlCommandId = "On" + root.collectionId + "CollectionChanged";
+		}
+	}
+
     TableViewParamController {
         id: tableViewParamController;
         tableId: root.collectionId;
@@ -49,23 +55,6 @@ CollectionView {
 
     function getHeaders(){
         return {};
-    }
-
-    function registerSubscription(){
-        let subscriptionRequestId = "On" + root.collectionId + "CollectionChanged"
-        var query = Gql.GqlRequest("subscription", subscriptionRequestId);
-        var inputParams = Gql.GqlObject("input");
-
-        query.AddParam(inputParams);
-        var queryFields = Gql.GqlObject("notification");
-        queryFields.InsertField("Id");
-        query.AddField(queryFields);
-
-        Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient, "Headers": root.getHeaders()});
-    }
-
-    function unRegisterSubscription(){
-        Events.sendEvent("UnRegisterSubscription", subscriptionClient);
     }
 
     dataControllerComp: Component {
@@ -243,30 +232,12 @@ CollectionView {
     SubscriptionClient {
         id: subscriptionClient;
 
-        Component.onDestruction: {
-            if (root){
-                root.unRegisterSubscription()
-            }
-        }
-
-        property bool ok: root.collectionId !== "" && subscriptionClient.subscriptionId !== "";
-        onOkChanged: {
-            if (ok){
-                root.registerSubscription()
-            }
-        }
-
-        onStateChanged: {
-            if (state === "Ready"){
-                if (subscriptionClient.containsKey("data")){
-                    let dataModelLocal = subscriptionClient.getData("data")
-                    root.handleSubscription(dataModelLocal);
-                }
-            }
-        }
-
         function getHeaders(){
             return root.getHeaders();
         }
+
+		onMessageReceived: {
+			root.handleSubscription(data);
+		}
     }
 }

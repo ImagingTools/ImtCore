@@ -346,7 +346,7 @@ ViewCommandsDelegateBase {
 
 					let index = collectionViewCommandsDelegate.getDialogNameFilterIndex(importFileDialog_.nameFilters, ext)
 					if (index < 0){
-						console.error("Extension not found in namefilters");
+						console.error("Extension not found in name filters");
 						return;
 					}
 

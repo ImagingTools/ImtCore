@@ -29,13 +29,12 @@ Rectangle {
 
 	onCollectionIdChanged: {
 		if (collectionId !== ""){
-			subscriptionClient.registerSubscription();
+			subscriptionClient.gqlCommandId = "On" + container.collectionId + "CollectionChanged";
 		}
 	}
 
 	SubscriptionClient {
 		id: subscriptionClient;
-		gqlCommandId: "On" + container.collectionId + "CollectionChanged";
 		onMessageReceived: {
 			container.sendRequest();
 		}
