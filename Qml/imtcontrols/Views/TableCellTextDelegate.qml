@@ -9,6 +9,7 @@ TableCellDelegateBase {
     onRowDelegateChanged: {
 		if(rowDelegate){
 			rowDelegate.reused.connect(delegateContainer.onRedraw)
+			rowDelegate.tableItem.modelRefresh.connect(delegateContainer.onRedraw)
 			delegateContainer.onRedraw()
 		}
     }
