@@ -44,6 +44,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="MaxBackupCount" Type="Integer" ExportId="MaxBackupCount">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Program" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="pg_dump"/>
                     </AttributeInfo>
