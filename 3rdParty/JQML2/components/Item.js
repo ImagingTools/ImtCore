@@ -86,6 +86,9 @@ class Item extends QtObject {
         'Keys.volumeUpPressed': { params: ['event'] },
         'Keys.yesPressed': { params: ['event'] },
         /* Keys */
+
+        'ListView.reused': { params: [] },
+        'ListView.pooled': { params: [] },
     }
 
     $anchorsUpdateList = []

@@ -36,10 +36,10 @@ class ListView extends Flickable {
         reuseItems: { type: QBool, value: false },
     }
 
-    static defaultSignals = {
-        pooled: { params: [] },
-		reused: { params: [] },
-    }
+    // static defaultSignals = {
+    //     pooled: { params: [] },
+	// 	reused: { params: [] },
+    // }
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
@@ -623,7 +623,7 @@ class ListView extends Flickable {
 
             this.$cache.push(item)
 
-            if(item.$signals.pooled) item.$signals.pooled()
+            if(item.$signals['ListView.pooled']) item.$signals['ListView.pooled']()
         } else {
             item.destroy()
         }
@@ -695,7 +695,7 @@ class ListView extends Flickable {
                 obj.getStatement('index').update()
             }
 
-            if(obj.$signals.reused) obj.$signals.reused()
+            if(obj.$signals['ListView.reused']) obj.$signals['ListView.reused']()
         } else {
             let ctx = new ContextController(this.getProperty('delegate').get().$exCtx, this.$exCtx)
             let createObject = this.getProperty('delegate').get().createObject
