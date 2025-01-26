@@ -15,7 +15,16 @@ TableBase {
     }
 
     cellDelegate: Component {
-        TableCellTextDelegate {}
+		TableCellTextDelegate {
+			Component.onCompleted: {
+				console.log("Cell onCompleted")
+			}
+
+			Component.onDestruction: {
+				console.log("Cell onDestruction")
+			}
+
+		}
     }
 
     headerDelegate: Component {
