@@ -794,6 +794,7 @@ Rectangle {
 		anchors.bottomMargin: scrollHoriz.visible ? scrollHoriz.secondSize + scrollHoriz.anchors.topMargin : 0;
 
         boundsBehavior: Flickable.StopAtBounds;
+		reuseItems: true
 
 		// cacheBuffer: elementsListObj.count * tableContainer.itemHeight;
 
