@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <istd/TDelPtr.h>
 #include <iser/IObject.h>
 
 // ImtCore includes
@@ -22,13 +23,16 @@ public:
 	virtual const imtbase::IObjectCollection* GetCollection() const = 0;
 
 	template <class Object>
-	inline bool GetLinkedObject(istd::TSmartPtr<Object>& dataObject) const
+	inline bool GetLinkedObject(std::shared_ptr<Object>& dataObject) const
 	{
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (GetLinkedObject(dataPtr)){
-			dataObject.SetCastedOrRemove(dataPtr->CloneMe());
+			istd::TDelPtr<Object> objectPtr;
+			objectPtr.SetCastedOrRemove(dataPtr->CloneMe());
 
-			return dataObject.IsValid();
+			dataObject.reset(objectPtr.PopPtr());
+
+			return true;
 		}
 
 		return false;
