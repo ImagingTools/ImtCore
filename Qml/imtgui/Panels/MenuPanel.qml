@@ -40,11 +40,13 @@ Rectangle {
 	Component.onCompleted: {
 		Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
 		Events.subscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
+		Events.subscribeEvent("ChangePage", menuPanel.setActivePage);
 	}
 
 	Component.onDestruction: {
 		Events.unSubscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
 		Events.unSubscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
+		Events.unSubscribeEvent("ChangePage", menuPanel.setActivePage);
 	}
 
 	onActivePageIdChanged: {
