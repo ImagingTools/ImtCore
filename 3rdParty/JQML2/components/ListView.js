@@ -67,47 +67,156 @@ class ListView extends Flickable {
     }
 
     itemAtIndex(index){
-        return index >= 0 && index < this.$items.length.get() ? this.$items[index] : undefined
+        let length = 0 
+        let model = this.getPropertyValue('model')
+        if(model instanceof ListModel){     
+            length = model.getPropertyValue('count')
+        } else if(typeof model === 'number'){
+            length = model
+        } else {
+            return undefined
+        }
+
+        return index >= 0 && index < length ? this.$items[index] : undefined
     }
     positionViewAtBeginning(){
         this.positionViewAtIndex(0, ListView.Beginning)
     }
     positionViewAtEnd(){
-        this.positionViewAtIndex(this.$items.length.get()-1, ListView.Beginning)
-
-        
-    }
-    positionViewAtIndex(index, mode){
-        let pos = 'start'
-        switch(mode){
-            case ListView.Beginning: pos = 'start'; break;
-            case ListView.Center: pos = 'center'; break;
-            case ListView.End: pos = 'end'; break;
-            case ListView.Visible: break;
-            case ListView.Contain: {
-                if(this.$items[index]){
-                    if(this.getPropertyValue('orientation') === ListView.Horizontal){
-                        if(this.getPropertyValue('contentWidth') <= this.getPropertyValue('width')) return
-
-                        if(this.$items[index].getPropertyValue('x') <= this.getPropertyValue('contentX')){
-                            this.getProperty('contentX').reset(this.$items[index].getPropertyValue('x'))
-                        } else if(this.$items[index].getPropertyValue('x') + this.$items[index].getPropertyValue('width') >= this.getPropertyValue('contentX') + this.getPropertyValue('width')){
-                            this.getProperty('contentX').reset(this.$items[index].getPropertyValue('x') + this.$items[index].getPropertyValue('width') - this.getPropertyValue('width'))
-                        }
-                    } else {
-                        if(this.getPropertyValue('contentHeight') <= this.getPropertyValue('height')) return
-
-                        if(this.$items[index].getPropertyValue('y') <= this.getPropertyValue('contentY')){
-                            this.getProperty('contentY').reset(this.$items[index].getPropertyValue('y'))
-                        } else if(this.$items[index].getPropertyValue('y') + this.$items[index].getPropertyValue('height') >= this.getPropertyValue('contentY') + this.getPropertyValue('height')){
-                            this.getProperty('contentY').reset(this.$items[index].getPropertyValue('y') + this.$items[index].getPropertyValue('height') - this.getPropertyValue('height'))
-                        }
-                    }
-                }
-                break;
-            }
+        let length = 0 
+        let model = this.getPropertyValue('model')
+        if(model instanceof ListModel){     
+            length = model.getPropertyValue('count')
+        } else if(typeof model === 'number'){
+            length = model
+        } else {
+            return
         }
 
+        this.positionViewAtIndex(length-1, ListView.Beginning)
+    }
+    positionViewAtIndex(index, mode = ListView.Beginning){
+        let length = 0 
+        let model = this.getPropertyValue('model')
+        if(model instanceof ListModel){     
+            length = model.getPropertyValue('count')
+        } else if(typeof model === 'number'){
+            length = model
+        } else {
+            return
+        }
+
+        if(index < 0 || index >= length) return
+
+        let itemInfo = null
+
+        while(!itemInfo || !itemInfo.exist){
+            itemInfo = this.$getItemInfo(index)
+            let x = 0
+            let y = 0
+
+            switch(mode){
+                case ListView.Beginning: {
+                    if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                        x = itemInfo.x
+                    } else {
+                        y = itemInfo.y
+                    }
+
+                    break
+                }
+                case ListView.Center: {
+                    if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                        x = itemInfo.x - this.getPropertyValue('width') / 2 + itemInfo.width / 2
+                    } else {
+                        y = itemInfo.y - this.getPropertyValue('height') / 2 + itemInfo.height / 2
+                    }
+
+                    break
+                }
+                case ListView.End: {
+                    if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                        x = itemInfo.x - this.getPropertyValue('width') + itemInfo.width
+                    } else {
+                        y = itemInfo.y - this.getPropertyValue('height') + itemInfo.height
+                    }
+
+                    break
+                }
+                case ListView.Visible: {
+                    if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                        if(itemInfo.x + itemInfo.width < this.getPropertyValue('contentX') || itemInfo.x > this.getPropertyValue('contentX') + this.getPropertyValue('width')){
+                            if(Math.abs(itemInfo.x - this.getPropertyValue('contentX')) < Math.abs((itemInfo.x - this.getPropertyValue('width') + itemInfo.width) - this.getPropertyValue('contentX'))){
+                                x = itemInfo.x
+                            } else {
+                                x = itemInfo.x - this.getPropertyValue('width') + itemInfo.width
+                            }
+                        } else {
+                            x = this.getPropertyValue('contentX')
+                        }
+                    } else {
+                        if(itemInfo.y + itemInfo.height < this.getPropertyValue('contentY') || itemInfo.y > this.getPropertyValue('contentY') + this.getPropertyValue('height')){
+                            if(Math.abs(itemInfo.y - this.getPropertyValue('contentY')) < Math.abs((itemInfo.y - this.getPropertyValue('height') + itemInfo.height) - this.getPropertyValue('contentY'))){
+                                y = itemInfo.y
+                            } else {
+                                y = itemInfo.y - this.getPropertyValue('height') + itemInfo.height
+                            }
+                        } else {
+                            y = this.getPropertyValue('contentY')
+                        }
+                    }
+
+                    break
+                }
+                case ListView.Contain: {
+                    if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                        if(itemInfo.width >= this.getPropertyValue('width')){
+                            x = itemInfo.x
+                        } else if(itemInfo.x < this.getPropertyValue('contentX') || itemInfo.x + itemInfo.width > this.getPropertyValue('contentX') + this.getPropertyValue('width')){
+                            if(Math.abs(itemInfo.x - this.getPropertyValue('contentX')) < Math.abs((itemInfo.x - this.getPropertyValue('width') + itemInfo.width) - this.getPropertyValue('contentX'))){
+                                x = itemInfo.x
+                            } else {
+                                x = itemInfo.x - this.getPropertyValue('width') + itemInfo.width
+                            }
+                        } else {
+                            x = this.getPropertyValue('contentX')
+                        }
+                    } else {
+                        if(itemInfo.height >= this.getPropertyValue('height')){
+                            y = itemInfo.y
+                        } else if(itemInfo.y < this.getPropertyValue('contentY') || itemInfo.y + itemInfo.height > this.getPropertyValue('contentY') + this.getPropertyValue('height')){
+                            if(Math.abs(itemInfo.y - this.getPropertyValue('contentY')) < Math.abs((itemInfo.y - this.getPropertyValue('height') + itemInfo.height) - this.getPropertyValue('contentY'))){
+                                y = itemInfo.y
+                            } else {
+                                y = itemInfo.y - this.getPropertyValue('height') + itemInfo.height
+                            }
+                        } else {
+                            y = this.getPropertyValue('contentY')
+                        }
+                    }
+
+                    break
+                }
+            }
+
+            if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                if(x < this.getPropertyValue('originX')){
+                    this.getProperty('contentX').reset(this.getPropertyValue('originX'))
+                } else if(x > this.getPropertyValue('originX') + this.getPropertyValue('contentWidth') - this.getPropertyValue('width')){
+                    this.getProperty('contentX').reset(this.getPropertyValue('originX') + this.getPropertyValue('contentWidth') - this.getPropertyValue('width'))
+                } else {
+                    this.getProperty('contentX').reset(x)
+                }
+            } else {
+                if(y < this.getPropertyValue('originY')){
+                    this.getProperty('contentY').reset(this.getPropertyValue('originY'))
+                } else if(y > this.getPropertyValue('originY') + this.getPropertyValue('contentHeight') - this.getPropertyValue('height')){
+                    this.getProperty('contentY').reset(this.getPropertyValue('originY') + this.getPropertyValue('contentHeight') - this.getPropertyValue('height'))
+                } else {
+                    this.getProperty('contentY').reset(y)
+                }
+            }
+        }
     }
 
     $disconnectModel(){
