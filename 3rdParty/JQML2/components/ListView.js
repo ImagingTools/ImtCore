@@ -619,7 +619,9 @@ class ListView extends Flickable {
         if(!item) return
 
         if(this.getPropertyValue('reuseItems')){
-            if(item instanceof Item) item.setStyle({ display: 'none' })
+            if(item instanceof Item) {
+                this.getPropertyValue('contentItem').$dom.removeChild(item.$dom)
+            }
 
             this.$cache.push(item)
 
@@ -631,7 +633,9 @@ class ListView extends Flickable {
 
     $fromCache(){
         let item = this.$cache.pop()
-        if(item instanceof Item) item.setStyle({ display: item.getProperty('visible').get() ? Item.defaultCSS.display : 'none' })
+        if(item instanceof Item) {
+            this.getPropertyValue('contentItem').$dom.appendChild(item.$dom)
+        }
 
         return item
     }
