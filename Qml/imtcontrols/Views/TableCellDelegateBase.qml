@@ -32,23 +32,23 @@ Item {
 	property Item topBorderItem: null;
 	property Item bottomBorderItem: null;
 
-	signal draw();
+	signal reused();
 
 	Component.onCompleted: {
 		compl = true;
 	}
 
-	onRowIndexChanged: {
+	onRowDelegateChanged: {
 		if (rowDelegate){
-			rowDelegate.reused.connect(delegateContainer.draw)
+			rowDelegate.reused.connect(delegateContainer.reused)
 		}
 
-		draw();
+		reused();
 	}
 
 	Component.onDestruction: {
 		if (rowDelegate && rowDelegate.tableItem){
-			rowDelegate.reused.disconnect(delegateContainer.draw)
+			rowDelegate.reused.disconnect(delegateContainer.reused)
 			rowDelegate.tableItem.widthRecalc.disconnect(delegateContainer.setCellWidth)
 		}
 	}

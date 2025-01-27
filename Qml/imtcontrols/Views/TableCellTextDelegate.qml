@@ -6,21 +6,19 @@ TableCellDelegateBase {
 
 	property alias cellText: tableCellText
 
-    onRowDelegateChanged: {
+	onRowDelegateChanged: {
 		if(rowDelegate){
-			rowDelegate.reused.connect(delegateContainer.onRedraw)
 			rowDelegate.tableItem.modelRefresh.connect(delegateContainer.refreshModelData)
-			delegateContainer.onRedraw()
 		}
-    }
+	}
 
-    function onRedraw(){
-        delegateContainer.cellText.text = delegateContainer.getValue()
-    }
+	onReused: {
+		delegateContainer.cellText.text = delegateContainer.getValue()
+	}
 
 	function refreshModelData(rowIndex_, modelRole_){
 		if(rowIndex_ == delegateContainer.rowIndex && modelRole_ == delegateContainer.cellHeaderId){
-			onRedraw();
+			reused();
 		}
 	}
 
@@ -32,7 +30,6 @@ TableCellDelegateBase {
 		anchors.right: parent.right
 		anchors.rightMargin: delegateContainer && delegateContainer.rowDelegate ? delegateContainer.rowDelegate.textRightMargin : 0
 		anchors.verticalCenter: parent.verticalCenter
-
 		rowDelegate: delegateContainer ? delegateContainer.rowDelegate : null;
 		columnIndex: delegateContainer ? delegateContainer.columnIndex : -1
 	}
