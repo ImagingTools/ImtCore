@@ -6,20 +6,8 @@ TableCellDelegateBase {
 
 	property alias cellText: tableCellText
 
-	onRowDelegateChanged: {
-		if(rowDelegate){
-			rowDelegate.tableItem.modelRefresh.connect(delegateContainer.refreshModelData)
-		}
-	}
-
 	onReused: {
 		delegateContainer.cellText.text = delegateContainer.getValue()
-	}
-
-	function refreshModelData(rowIndex_, modelRole_){
-		if(rowIndex_ == delegateContainer.rowIndex && modelRole_ == delegateContainer.cellHeaderId){
-			reused();
-		}
 	}
 
 	TableCellText {

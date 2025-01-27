@@ -105,6 +105,8 @@ Item {
 			return;
 		}
 
+		delegateContainer.rowDelegate.tableItem.modelRefresh.connect(delegateContainer.refreshModelData)
+
 		if (delegateContainer.rowDelegate.cellColor !== "transparent"){
 			if(!delegateContainer.backgroundItem){
 				delegateContainer.backgroundItem = cellBackground.createObject(delegateContainer)
@@ -153,6 +155,12 @@ Item {
 		delegateContainer.rowDelegate.tableItem.widthRecalc.connect(delegateContainer.setCellWidth)
 
 
+	}
+
+	function refreshModelData(rowIndex_, modelRole_){
+		if(rowIndex_ == delegateContainer.rowIndex && modelRole_ == delegateContainer.cellHeaderId){
+			reused();
+		}
 	}
 
 	Component{
