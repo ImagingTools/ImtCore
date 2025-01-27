@@ -1,7 +1,10 @@
 #pragma once
 
+
 // Qt includes
+#include <QtCore/QDir>
 #include <QtCore/QTimer>
+#include <QtCore/QFutureWatcher>
 
 // ACF includes
 #include <icomp/CComponentBase.h>
@@ -45,9 +48,11 @@ protected:
 private:
 	bool Backup();
 	void CleanupOldBackups(const QString& backupFolderPath);
+	QStringList GetPrevBackupsList(const QString& backupFolderPath, const QDir::SortFlags& sortFlags = QDir::Time | QDir::Reversed);
 
 private Q_SLOTS:
 	void OnTimeout();
+	void OnBackupFinished();
 
 protected:
 	QTimer m_timer;
@@ -62,6 +67,8 @@ protected:
 
 private:
 	QDateTime m_lastBackupDateTime;
+
+	QFutureWatcher<bool> m_backupWatcher;
 };
 
 
