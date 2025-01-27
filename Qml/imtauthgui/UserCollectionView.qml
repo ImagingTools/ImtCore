@@ -167,7 +167,7 @@ RemoteCollectionView {
 
 			clip: true;
 
-			onDraw: {
+			onReused: {
 				if (!rowDelegate){
 					return
 				}
@@ -231,7 +231,7 @@ RemoteCollectionView {
 		TableCellDelegateBase {
 			id: cellDelegate
 
-			onDraw: {
+			onReused: {
 				if (!rowDelegate){
 					return
 				}
