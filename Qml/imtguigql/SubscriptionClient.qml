@@ -36,14 +36,19 @@ GqlModel {
 		}
 	}
 
-	function registerSubscription(){
-		console.log("registerSubscription", gqlCommandId);
+	function getGqlQuery(){
 		var query = Gql.GqlRequest("subscription", gqlCommandId);
 		var inputParams = Gql.GqlObject("input");
 		query.AddParam(inputParams);
 		var queryFields = Gql.GqlObject("notification");
 		queryFields.InsertField("Id");
 		query.AddField(queryFields);
+
+		return query;
+	}
+
+	function registerSubscription(){
+		let query = getGqlQuery();
 
 		Events.sendEvent("RegisterSubscription", {"Query": query, "Client": container, "Headers": container.getHeaders()});
 	}

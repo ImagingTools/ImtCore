@@ -13,21 +13,40 @@ QtObject {
 		popupContainer = popup;
 	}
 
-	function addErrorMessage(text, autoClose){
+	function addErrorMessage(text, autoClose, id){
 		if (popupContainer){
-			popupContainer.addMessage("error", text, autoClose)
+			popupContainer.addMessage("error", text, autoClose, id)
 		}
 	}
 
-	function addWarningMessage(text, autoClose){
+	function addWarningMessage(text, autoClose, id){
 		if (popupContainer){
-			popupContainer.addMessage("warning", text, autoClose)
+			popupContainer.addMessage("warning", text, autoClose, id)
 		}
 	}
 
-	function addSuccessMessage(text, autoClose){
+	function addSuccessMessage(text, autoClose, id){
 		if (popupContainer){
-			popupContainer.addMessage("success", text, autoClose)
+			popupContainer.addMessage("success", text, autoClose, id)
 		}
+	}
+
+	function closeMessage(id){
+		let index = getIndexByMessageId(id);
+		if (index >= 0){
+			popupContainer.removeMessage(index);
+		}
+	}
+
+	function getIndexByMessageId(id){
+		if (!id || id === ""){
+			return -1;
+		}
+
+		return popupContainer.findMessage(id);
+	}
+
+	function messageIsOpened(id){
+		return getIndexByMessageId(id) >= 0;
 	}
 }

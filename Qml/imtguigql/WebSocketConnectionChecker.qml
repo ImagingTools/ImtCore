@@ -23,49 +23,37 @@ SubscriptionClient {
     id: pumaSub;
 
     property int status: -1; // -1 - Unknown, 0 - Connecting, 1 - Connected, 2 - Disconnected
-    property string subscriptionRequestId;
-    property var subscriptionManager: null;
 
-    property bool ok: subscriptionManager ? subscriptionManager.status === 1 : false;
-    onOkChanged: {
-        if (subscriptionManager){
-            var query = Gql.GqlRequest("subscription", pumaSub.subscriptionRequestId);
-            var queryFields = Gql.GqlObject("notification");
-            queryFields.InsertField("Id");
-            query.AddField(queryFields);
+	property SubscriptionManager subscriptionManager;
 
-            subscriptionManager.registerSubscription(query, pumaSub)
+	function registerSubscription(){
+		let query = getGqlQuery();
 
-            status = 0;
-        }
-    }
+		subscriptionManager.registerSubscriptionEvent({"Query": query, "Client": pumaSub, "Headers": pumaSub.getHeaders()});
+	}
 
-    onStateChanged: {
-        if (state === "Ready"){
-            let ok = false;
-            if (pumaSub.containsKey("data")){
-                let localModel = pumaSub.getData("data")
-                if (localModel.containsKey(pumaSub.subscriptionRequestId)){
-                    localModel = localModel.getData(pumaSub.subscriptionRequestId)
+	function unRegisterSubscription(){
+		console.log("unRegisterSubscription", gqlCommandId);
 
-                    if (localModel.containsKey("status")){
-                        let status = localModel.getData("status")
-                        if (status === "Disconnected"){
-                            ok = true;
-                            pumaSub.status = 2;
-                        }
-                        else if (status === "Connected"){
-                            ok = true;
-                            pumaSub.status = 1;
-                        }
-                    }
-                }
-            }
+		subscriptionManager.unRegisterSubscription(pumaSub);
+	}
 
-            if (!ok){
-                pumaSub.status = -1;
-            }
-        }
-    }
+	onMessageReceived: {
+		console.log("onMessageReceived", data.toJson())
+		pumaSub.status = -1;
+		if (data.containsKey(gqlCommandId)){
+			data = data.getData(gqlCommandId)
+
+			if (data.containsKey("status")){
+				let status = data.getData("status")
+				if (status === "Disconnected"){
+					pumaSub.status = 2;
+				}
+				else if (status === "Connected"){
+					pumaSub.status = 1;
+				}
+			}
+		}
+	}
 }
 

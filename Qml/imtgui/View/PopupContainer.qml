@@ -24,7 +24,6 @@ Item {
 				border.color: Style.borderColor2
 
 				Component.onCompleted: {
-					console.log("onCompleted", model.closable);
 					if (model.closable){
 						autoCloseTimer.start();
 					}
@@ -39,7 +38,7 @@ Item {
 						id: icon;
 						anchors.centerIn: parent;
 						width: 20;
-						height: 20;
+						height: width;
 						sourceSize.height: height;
 						sourceSize.width: width;
 						source: model.type == "warning" ? "../../../" + Style.getIconPath("Icons/Alert", Icon.State.On, Icon.Mode.Normal) :
@@ -50,10 +49,9 @@ Item {
 
 				BaseText {
 					id: messageText
+					anchors.verticalCenter: parent.verticalCenter
 					anchors.left: iconItem.right;
 					anchors.right: parent.right;
-					anchors.top: parent.top;
-					anchors.bottom: parent.bottom;
 					anchors.margins: Style.size_mainMargin
 					text: model.text
 					wrapMode: Text.WordWrap
@@ -64,13 +62,13 @@ Item {
 					anchors.right: parent.right
 					anchors.top: parent.top
 					anchors.margins: Style.size_mainMargin
-					width: 20
-					height: 20
+					width: 15
+					height: width
 					iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 					decorator: Component {
 						ToolButtonDecorator {
 							color: "transparent";
-							icon.width: 16;
+							icon.width: 12;
 						}
 					}
 
@@ -83,8 +81,6 @@ Item {
 					id: autoCloseTimer
 					interval: 5000
 					onTriggered: {
-						console.log("onTriggered");
-
 						popupModel.remove(model.index)
 					}
 				}
@@ -96,12 +92,30 @@ Item {
 		id: popupModel
 	}
 
-	function addMessage(type, text, autoClose){
+	function addMessage(type, text, autoClose, id){
 		if (!autoClose){
 			autoClose = false
 		}
 
-		popupModel.insert(0, { "type": type, "text": text, "closable": autoClose })
+		if (!id){
+			id = ""
+		}
+
+		popupModel.insert(0, { "type": type, "text": text, "closable": autoClose, "id": id })
+	}
+
+	function removeMessage(index){
+		popupModel.remove(index);
+	}
+
+	function findMessage(id){
+		for (let i = 0; i < popupModel.count; i++){
+			if (id == popupModel.get(i).id){
+				return i;
+			}
+		}
+
+		return -1;
 	}
 }
 
