@@ -38,12 +38,12 @@ Item {
 		compl = true;
 	}
 
-	onRowDelegateChanged: {
-		if (rowDelegate){
-			rowDelegate.reused.connect(delegateContainer.reused)
+	property bool ok: rowIndex >= 0 && rowDelegate != null
+	onOkChanged: {
+		if (ok){
+			rowDelegate.reused.connect(reused)
+			reused();
 		}
-
-		reused();
 	}
 
 	Component.onDestruction: {
