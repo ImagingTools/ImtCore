@@ -5,11 +5,13 @@
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 
+// ACF includes
 #include <istd/IPolymorphic.h>
 
 
 namespace imtmdbx
 {
+
 
 class IDocumentTable: istd::IPolymorphic
 {
@@ -20,9 +22,9 @@ public:
 	virtual QByteArray GetDocument() = 0;
 	virtual QByteArray GetDocument(quint64 key) = 0;
 	virtual QByteArray GetDocument(const QByteArray& key) = 0;
-    virtual bool GetKey(quint64& key) const = 0;
-    virtual bool GetKey(QByteArray& key) const = 0;
-    virtual bool HasRecord(quint64 key) = 0;
+	virtual bool GetKey(quint64& key) const = 0;
+	virtual bool GetKey(QByteArray& key) const = 0;
+	virtual bool HasRecord(quint64 key) = 0;
 	virtual bool HasRecord(const QByteArray& key) = 0;
 	virtual bool UpdateDocument(quint64 key, const QByteArray& data) = 0;
 	virtual bool UpdateDocument(const QByteArray& key, const QByteArray& data) = 0;
@@ -45,8 +47,8 @@ public:
 	virtual bool RemoveDocument() = 0;
 	virtual bool RemoveDocument(quint64 key, const QByteArray& value = QByteArray()) = 0;
 	virtual bool RemoveDocument(const QByteArray& key, const QByteArray& value = QByteArray()) = 0;
-
 };
 
 
 }//namespace imtmdbx
+

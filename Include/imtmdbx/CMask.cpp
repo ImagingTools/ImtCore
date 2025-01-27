@@ -1,152 +1,158 @@
 #include <imtmdbx/CMask.h>
 
-// Qt includes
-#include <QtCore/QDebug>
-
 
 namespace imtmdbx
 {
 
+
+// external variables
+
 int getItemCount = 0;
 
-CMask::CMask(const QString &name, mdbx::txn_managed &txn, mdbx::key_mode keyMode, mdbx::value_mode valueMode, bool hasIndex):
-    CDocumentTable(name, txn, keyMode, valueMode, hasIndex)
+
+// public methods
+
+CMask::CMask(
+			const QString &name,
+			mdbx::txn_managed &txn,
+			mdbx::key_mode keyMode,
+			mdbx::value_mode valueMode,
+			bool hasIndex):
+	CDocumentTable(name, txn, keyMode, valueMode, hasIndex)
 {
 }
 
 
+// reimplemented (imtmdbx::IMask)
+
 bool CMask::GetUnit(quint64 position)
 {
-    quint64 offset = position / 64;
-    quint64 bitPosition = position % 64;
+	quint64 offset = position / 64;
+	quint64 bitPosition = position % 64;
 
-    quint64 item;
+	quint64 item;
 
-    if (!GetItem(offset, item)){
-        item = 0;
-    }
+	if (!GetItem(offset, item)){
+		item = 0;
+	}
 
-    return (item >> bitPosition) & (quint64)1;
+	return (item >> bitPosition) & (quint64)1;
 }
 
 
 bool CMask::SetUnit(quint64 position, bool unit)
 {
-    quint64 offset = position / 64;
-    quint64 bitPosition = position % 64;
+	quint64 offset = position / 64;
+	quint64 bitPosition = position % 64;
 
-    quint64 item;
+	quint64 item;
 
-    if (!GetItem(offset, item)){
-        item = 0;
-    }
+	if (!GetItem(offset, item)){
+		item = 0;
+	}
 
-    if(unit){
-        item = item | ((quint64)1 << bitPosition);
-    }
-    else {
-        item = item & ~((quint64)1 << bitPosition);
-    }
+	if(unit){
+		item = item | ((quint64)1 << bitPosition);
+	}
+	else {
+		item = item & ~((quint64)1 << bitPosition);
+	}
 
-    //item = (item & ~((quint64)1 << bitPosition)) | ((quint64)unit << bitPosition);
+	//item = (item & ~((quint64)1 << bitPosition)) | ((quint64)unit << bitPosition);
 
-    SetItem(offset, item);
+	SetItem(offset, item);
 
-    return true;
+	return true;
 }
 
 
+// protected methods
+
+// reimplemented (imtmdbx::IMask)
+
 bool CMask::GetItem(quint64 offset, quint64& item)
 {
+	getItemCount++;
 
-    getItemCount++;
+	mdbx::slice keySlice(&offset, 8);
+	bool found = m_cursor.seek(keySlice);
+	if (found){
+		mdbx::cursor::move_result result = m_cursor.current();
+		item = result.value.as_uint64();
+	}
 
-    mdbx::slice keySlice(&offset, 8);
-
-    if (m_cursor.seek(keySlice)){
-        mdbx::cursor::move_result result = m_cursor.current();
-        item = result.value.as_uint64();
-    }
-    else {
-        return false;
-    }
-
-    return true;
+	return found;
 }
 
 
 bool CMask::SetItem(quint64 offset, quint64 item)
 {
-    mdbx::slice keySlice(&offset, 8);
-    mdbx::slice valueSlice(&item, 8);
+	mdbx::slice keySlice(&offset, 8);
+	mdbx::slice valueSlice(&item, 8);
 
-    m_cursor.upsert(keySlice, valueSlice);
+	m_cursor.upsert(keySlice, valueSlice);
 
-    return true;
+	return true;
 }
 
 
 bool CMask::GetNearestOffset(quint64& offset, quint64 startOffset)
 {
-    mdbx::slice keySlice(&startOffset, 8);
-    mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice, false);
-    if(!result.done){
-        return false;
-    }
+	mdbx::slice keySlice(&startOffset, 8);
+	mdbx::cursor::move_result result = m_cursor.lower_bound(keySlice, false);
+	if(!result.done){
+		return false;
+	}
 
-    offset = result.key.as_uint64();
+	offset = result.key.as_uint64();
 
-    return true;
+	return true;
 }
+
 
 bool CMask::GetNextItemOffset(quint64& offset, quint64 startOffset)
 {
+	mdbx::slice keySlice(&startOffset, 8);
+	mdbx::cursor::move_result result = m_cursor.upper_bound(keySlice, false);
+	if (!result.done){
+		return false;
+	}
 
-    mdbx::slice keySlice(&startOffset, 8);
+	if(result.key.as_uint64() == startOffset){
+		result = m_cursor.to_next(false);
+		if (!result.done){
+			return false;
+		}
+	}
+	offset = result.key.as_uint64();
 
-    mdbx::cursor::move_result result = m_cursor.upper_bound(keySlice, false);
+	if(offset < startOffset){
+		Q_ASSERT(0);
+	}
 
-    if (result.done){
-        if(result.key.as_uint64() == startOffset){
-            result = m_cursor.to_next(false);
-            if (!result.done){
-                return false;
-            }
-        }
-        offset = result.key.as_uint64();
-    }
-    else{
-        return false;
-    }
-
-    if(offset < startOffset){
-        Q_ASSERT(0);
-    }
-
-    return true;
+	return true;
 }
 
 
 bool CMask::GetPreviosItemOffset(quint64& offset, quint64 startOffset)
 {
-    mdbx::slice keySlice(&startOffset, 8);
+	mdbx::slice keySlice(&startOffset, 8);
+	if (m_cursor.seek(keySlice)){
+		mdbx::cursor::move_result result = m_cursor.current();
+		if (!result.done){
+			return false;
+		}
 
-    if (m_cursor.seek(keySlice)){
-        mdbx::cursor::move_result result = m_cursor.current();
-        if (result.done){
-            result = m_cursor.to_previous(false);
-            if (!result.done){
-                return false;
-            }
-            offset = result.key.as_uint64();
-        }
-        else{
-            return false;
-        }
-    }
+		result = m_cursor.to_previous(false);
+		if (!result.done){
+			return false;
+		}
+		offset = result.key.as_uint64();
+	}
 
-    return true;
+	return true;
 }
 
 
-}//namespace imtmdbx
+} // namespace imtmdbx
+

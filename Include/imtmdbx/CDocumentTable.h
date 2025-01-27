@@ -1,11 +1,11 @@
 #pragma once
 
+
 // ImtCore includes
 #include <imtmdbx/IDocumentTable.h>
-#include <imtmdbx/IMdbxDatabaseEngine.h>
 
-// std includes
-#include <iostream>
+// 3rdParty includes
+#include <mdbx.h++>
 
 
 namespace imtmdbx
@@ -15,14 +15,12 @@ namespace imtmdbx
 class CDocumentTable: virtual public IDocumentTable
 {
 public:
-    CDocumentTable(
-            const QString& name,
-            mdbx::txn_managed& txn,
-            mdbx::key_mode keyMode = mdbx::key_mode::reverse,
-            mdbx::value_mode valueMode = mdbx::value_mode::single,
-            bool hasIndex = false
-            );
-
+	CDocumentTable(
+		const QString& name,
+		mdbx::txn_managed& txn,
+		mdbx::key_mode keyMode = mdbx::key_mode::reverse,
+		mdbx::value_mode valueMode = mdbx::value_mode::single,
+		bool hasIndex = false);
 	~CDocumentTable();
 
 	// reimplemented (imtmdbx::IDocumentTable)
@@ -32,8 +30,8 @@ public:
 	virtual QByteArray GetDocument() override;
 	virtual QByteArray GetDocument(quint64 key) override;
 	virtual QByteArray GetDocument(const QByteArray& key) override;
-    virtual bool GetKey(quint64& key) const override;
-    virtual bool GetKey(QByteArray& key) const override;
+	virtual bool GetKey(quint64& key) const override;
+	virtual bool GetKey(QByteArray& key) const override;
 	virtual bool HasRecord(quint64 key) override;
 	virtual bool HasRecord(const QByteArray& key) override;
 	virtual bool UpdateDocument(quint64 key,  const QByteArray& data) override;
@@ -60,21 +58,29 @@ public:
 
 	bool CloseTable(mdbx::env_managed& env);
 
-
 protected:
-	virtual quint64 AddDocument(const char *data, int count, const QByteArray& keyStr = QByteArray());
-	virtual bool UpdateDocument(const char *key, int count, const QByteArray& data);
+	virtual quint64 AddDocument(
+				const char *data,
+				int count,
+				const QByteArray& keyStr = QByteArray());
+	virtual bool UpdateDocument(
+				const char *key,
+				int count,
+				const QByteArray& data);
 	virtual bool Exists(const QString& name);
 
+protected:
 	QString m_tableName;
 	mdbx::txn_managed& m_txn;
 	mdbx::cursor_managed m_cursor;
 	mdbx::map_handle m_mapHandle;
 	mdbx::cursor_managed m_cursorIndex;
 	mdbx::map_handle m_mapHandleIndex;
-	bool m_hasIndex;
 	mdbx::key_mode m_keyMode;
 	mdbx::value_mode m_valueMode;
+	bool m_hasIndex;
 };
 
-}//namespace imtmdbx
+
+} // namespace imtmdbx
+

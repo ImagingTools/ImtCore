@@ -3,11 +3,7 @@
 
 // Qt includes
 #include <QtCore/QList>
-#include <QtCore/QMap>
 #include <QtCore/QPair>
-
-// std includes
-#include <iostream>
 
 // ImtCore includes
 #include <imtmdbx/IMaskContainer.h>
@@ -21,7 +17,6 @@ namespace imtmdbx
 class CMaskContainer: virtual public IMaskContainer, virtual public IMask
 {
 public:
-
 	enum OperationType
 	{
 		OT_OR,
@@ -30,7 +25,7 @@ public:
 
 	CMaskContainer(OperationType operationType);
 
-	// reimplemented (IMask)
+	// reimplemented (imtmdbx::IMask)
 	virtual bool GetUnit(quint64 position) override;
 	virtual bool SetUnit(quint64 position, bool unit) override;
 
@@ -41,20 +36,20 @@ public:
 	virtual bool GetNextItemOffset(quint64& offset, quint64 startOffset = -1) override;
 	virtual bool GetPreviosItemOffset(quint64& offset, quint64 startOffset = 0xffffffffffffff) override;
 
-	// reimplemented (IMaskContainer)
+	// reimplemented (imtmdbx::IMaskContainer)
 	void AddMask(IMask* mask, bool isInversion = false) override;
 	void Clear() override;
-	void Erase();
-    bool isEmpty();
 	bool RemoveLastMask(bool isInversion = false) override;
 	bool RemoveMask(int index, int n = 1, bool isInversion = false) override;
 	int GetMaskCount(bool isInversion = false) override;
 	void SetDocumentTable(IDocumentTable* documentTable) override;
 	quint64 GetUnitCount() override;
-    QList<quint64> GetUnitPositions(quint64 offset = 0, quint64 limit = -1) override;
-    QList<QByteArray> GetDocuments(quint64 offset = 0, quint64 limit = -1) override;
-	bool GetActiveItem(quint64& activeOffset, quint64& activeItem, bool isStart);
+	QList<quint64> GetUnitPositions(quint64 offset = 0, quint64 limit = -1) override;
+	QList<QByteArray> GetDocuments(quint64 offset = 0, quint64 limit = -1) override;
 
+	void Erase();
+	bool isEmpty();
+	bool GetActiveItem(quint64& activeOffset, quint64& activeItem, bool isStart);
 
 protected:
 	QList<QPair<IMask*,quint64>> m_maskList; // IMask*, next offset
@@ -65,3 +60,4 @@ protected:
 
 
 }//namespace imtmdbx
+

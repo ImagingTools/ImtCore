@@ -1,7 +1,8 @@
 #pragma once
 
+
 // Qt includes
-#include "QtCore/QString"
+#include <QtCore/QString>
 
 // ImtCore includes
 #include <imtmdbx/IMdbxDatabaseEngine.h>
