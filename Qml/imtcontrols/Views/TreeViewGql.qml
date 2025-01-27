@@ -1,4 +1,4 @@
-import QtQuick 2.12
+import QtQuick
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
@@ -104,6 +104,7 @@ Rectangle{
             property int delegateWidth: treeViewGql.delegateWidht;
             property int delegateWidthFull: list.maxLevel * treeViewGql.shift + list.delegateWidth;
             property int maxLevel: 1;
+			reuseItems: true
 
             onContentYChanged: {
                 listFrame.contentY = contentY;
@@ -124,12 +125,15 @@ Rectangle{
                 property var selection_ : null;
                 property var hover_ : null;
                 property int addItemWidth: 0;
-				signal reused();
+				property var additionalItem: null
 
-				onReused: {
+				ListView.onReused: {
 					if(deleg.hover_){
 						deleg.hover_.destroy();
 						deleg.hover_ = null;
+					}
+					if (additionalItem){
+						additionalItem.onRedraw()
 					}
 				}
 
@@ -139,8 +143,8 @@ Rectangle{
 
                 Component.onCompleted: {
                     if(treeViewGql.hasAddDelegInfo){
-                        var addItem =  treeViewGql.additionalDelegateComp.createObject(deleg);
-                        deleg.addItemWidth = addItem.width;
+						additionalItem =  treeViewGql.additionalDelegateComp.createObject(deleg);
+						deleg.addItemWidth = additionalItem.width;
                         //console.log("width::: ",deleg.width, list.width)
                     }
                 }

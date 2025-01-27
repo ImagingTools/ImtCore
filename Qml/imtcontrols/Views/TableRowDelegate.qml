@@ -7,10 +7,6 @@ TableRowDelegateBase {
 
 	width: tableRow.width + tableRow.anchors.leftMargin;
 
-	ListView.onReused: {
-		tableDelegateContainer.reused()
-	}
-
 	TableRowViewer {
 		id: tableRow
 

@@ -90,6 +90,10 @@ Rectangle {
 		}
 	}
 
+	ListView.onReused: {
+		tableDelegateContainer.reused()
+	}
+
 	onCellDecoratorChanged: {
 		if (tableDelegateContainer.tableItem.cellDecorator){
 			tableDelegateContainer.setBorderParams();
