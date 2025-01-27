@@ -23,32 +23,7 @@ ElementView {
 
 	signal finished(string itemId, int index);
 
-  //   onModelChanged: {
-		// if (comboBoxElementView && cbRef && cbRef.model != comboBoxElementView.model){
-		// 	cbRef.model = model;
-  //       }
-  //   }
-
-   //  onControlItemChanged: {
-   //      if (cbRef && cbRef.model != model){
-			// cbRef.model = model;
-   //      }
-   //  }
-
-   //  onCurrentIndexChanged: {
-   //      if (cbRef && cbRef.currentIndex !== currentIndex){
-   //          cbRef.currentIndex = currentIndex;
-   //      }
-   //  }
-
-	// onChangeableChanged: {
-	//     if (cbRef){
-	//         cbRef.changeable = changeable;
-	//     }
-	// }
-
     function setupComboBox(cbRef){
-		console.log("setupComboBox", cbRef);
         if (!cbRef){
             return;
         }
@@ -59,8 +34,6 @@ ElementView {
         cbRef.currentIndex = comboBoxElementView.currentIndex;
 
         comboBoxElementView.cbRef = cbRef;
-
-		// cbConn.target = cbRef;
     }
 
     Connections {
