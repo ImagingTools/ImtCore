@@ -88,15 +88,7 @@ ControlBase {
     signal highlighted(int index);
 
     signal clicked();
-    signal finished(string commandId, int index);
-
-    onFinished: {
-        if (index >= 0){
-            comboBoxContainer.currentIndex = index;
-        }
-
-        comboBoxContainer.isOpen = false;
-    }
+	signal finished(string itemId, int index);
 
     onModelChanged: {
         if (!comboBoxContainer.model){
@@ -150,6 +142,12 @@ ControlBase {
             selectedIndex: comboBoxContainer.currentIndex;
 
             onFinished: {
+				if (index >= 0){
+					comboBoxContainer.currentIndex = index;
+				}
+
+				comboBoxContainer.isOpen = false;
+
                 comboBoxContainer.finished(commandId, index)
             }
 
@@ -178,6 +176,7 @@ ControlBase {
     }
 
     function openPopupMenu(){
+		console.log("openPopupMenu", comboBoxContainer.model);
         var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
         ModalDialogManager.openDialog(popupMenuComp, {
                                           "x":     point.x,
@@ -197,7 +196,12 @@ ControlBase {
         cursorShape: comboBoxContainer.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
         onClicked: {
+			console.log("onClicked", comboBoxContainer.model);
+			console.log("comboBoxContainer", comboBoxContainer);
+
             if (!comboBoxContainer.model || !comboBoxContainer.changeable){
+				console.log("1");
+
                 return;
             }
 
@@ -207,6 +211,9 @@ ControlBase {
             if (comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() > 0){
                 comboBoxContainer.openPopupMenu();
             }
+
+			console.log("2");
+
 
             comboBoxContainer.clicked();
         }

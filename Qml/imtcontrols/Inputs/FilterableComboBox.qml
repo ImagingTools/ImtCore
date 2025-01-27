@@ -12,12 +12,52 @@ ComboBox {
 
     itemHeight: 35;
 
+	property var sourceModel;
+
     delegate: Component {
-        FilterableComboBoxDelegate {
+		FilterableComboBoxDelegate {
             width: comboBoxContainer.width;
-            comboBoxRef: comboBoxContainer;
+			comboBoxRef: comboBoxContainer;
         }
     }
+
+	onSourceModelChanged: {
+		updateFilterModel()
+	}
+
+	function updateFilterModel(){
+		comboBoxContainer.model = 0;
+		if (filter === ""){
+			comboBoxContainer.model = sourceModel;
+		}
+	}
+
+	onFilterChanged: {
+		updateFilterModel();
+	}
+
+	onFinished: {
+		// console.log("onFinished", itemId);
+		// console.log("proxyModel.sourceIndexes", JSON.stringify(proxyModel.sourceIndexes));
+		if (index >= 0){
+			if (itemId in proxyModel.sourceIndexes){
+				comboBoxContainer.currentIndex = proxyModel.sourceIndexes[itemId]
+			}
+			else{
+				comboBoxContainer.currentIndex = index;
+			}
+		}
+	}
+
+	SortFilterProxyModel {
+		id: proxyModel;
+		textFilter: comboBoxContainer.filter;
+		sourceModel: comboBoxContainer.sourceModel;
+		filterableFields: comboBoxContainer.filteringFields;
+		onAccepted: {
+			comboBoxContainer.model = proxyModel.filteredModel;
+		}
+	}
 
     property CustomTextField textInput;
 
@@ -49,21 +89,23 @@ ComboBox {
                     comboBoxContainer.decorator_.textVisible = true;
                 }
 
-                comboBoxContainer.filter = "";
+				comboBoxContainer.filter = "";
             }
 
-            function onKeyboardUp(){
-            }
+			Connections {
+				target: comboBoxContainer;
 
-            function onKeyboardDown(){
-            }
+				function onModelChanged(){
+					popup.model = comboBoxContainer.model;
+				}
+			}
 
             decorator: Component {PopupDecorator {
                     topContentLoaderSourceComp: Component {
                         Item {
                             id: contentItem;
 
-                            width: popup.width;
+							width: popup.width;
                             height: 25;
 
                             Component.onCompleted: {
@@ -85,7 +127,7 @@ ComboBox {
 
                                 text: comboBoxContainer.currentText;
 
-                                onTextChanged: {
+								onEditingFinished: {
                                     if (text === "" || text != comboBoxContainer.currentText){
                                         comboBoxContainer.filter = text;
                                     }
@@ -101,6 +143,7 @@ ComboBox {
             }
 
             onFinished: {
+				comboBoxContainer.isOpen = false;
                 comboBoxContainer.finished(commandId, index)
             }
 
@@ -112,6 +155,7 @@ ComboBox {
 
     function openPopupMenu(){
         comboBoxContainer.isOpen = true;
+
         var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
         ModalDialogManager.openDialog(popupMenuComp, {
                                           "x":     point.x,

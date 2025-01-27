@@ -21,47 +21,51 @@ ElementView {
 
     property ComboBox cbRef: null;
 
-    onModelChanged: {
-		if (comboBoxElementView && cbRef && cbRef.model != comboBoxElementView.model){
-            cbRef.model = model;
-        }
-    }
+	signal finished(string itemId, int index);
 
-    onControlItemChanged: {
-        if (cbRef && cbRef.model != model){
-            cbRef.model = model;
-        }
-    }
+  //   onModelChanged: {
+		// if (comboBoxElementView && cbRef && cbRef.model != comboBoxElementView.model){
+		// 	cbRef.model = model;
+  //       }
+  //   }
 
-    onCurrentIndexChanged: {
-        if (cbRef && cbRef.currentIndex !== currentIndex){
-            cbRef.currentIndex = currentIndex;
-        }
-    }
+   //  onControlItemChanged: {
+   //      if (cbRef && cbRef.model != model){
+			// cbRef.model = model;
+   //      }
+   //  }
 
-    onChangeableChanged: {
-        if (cbRef){
-            cbRef.changeable = changeable;
-        }
-    }
+   //  onCurrentIndexChanged: {
+   //      if (cbRef && cbRef.currentIndex !== currentIndex){
+   //          cbRef.currentIndex = currentIndex;
+   //      }
+   //  }
+
+	// onChangeableChanged: {
+	//     if (cbRef){
+	//         cbRef.changeable = changeable;
+	//     }
+	// }
 
     function setupComboBox(cbRef){
+		console.log("setupComboBox", cbRef);
         if (!cbRef){
             return;
         }
 
         cbRef.changeable = comboBoxElementView.changeable;
         cbRef.nameId = comboBoxElementView.nameId;
-        cbRef.model = comboBoxElementView.model;
+		cbRef.model = comboBoxElementView.model;
         cbRef.currentIndex = comboBoxElementView.currentIndex;
 
         comboBoxElementView.cbRef = cbRef;
 
-        cbConn.target = cbRef;
+		// cbConn.target = cbRef;
     }
 
     Connections {
         id: cbConn;
+		target: comboBoxElementView.cbRef;
 
         function onCurrentIndexChanged(){
             if (!comboBoxElementView.cbRef){
@@ -92,6 +96,28 @@ ElementView {
 
                 comboBoxElementView.setupComboBox(cb);
             }
+
+			Connections {
+				target: comboBoxElementView;
+
+				function onModelChanged(){
+					if (cb.model != comboBoxElementView.model){
+						cb.model = comboBoxElementView.model;
+					}
+				}
+
+				function onChangeableChanged(){
+					if (cb.changeable != comboBoxElementView.changeable){
+						cb.changeable = comboBoxElementView.changeable;
+					}
+				}
+
+				function onCurrentIndexChanged(){
+					if (cb.currentIndex != comboBoxElementView.currentIndex){
+						cb.currentIndex = comboBoxElementView.currentIndex;
+					}
+				}
+			}
         }
     }
 

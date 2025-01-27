@@ -20,7 +20,7 @@ DecoratorBase {
 
     property alias topContentLoaderSourceComp: topContentLoader.sourceComponent;
     property alias bottomContentLoaderSourceComp: bottomContentLoader.sourceComponent;
-    property alias repeater: repeater_;
+	property alias repeater: popupMenuListView;
 
     onModelChanged: {
         popupMenuListView.model = root.model;
@@ -73,54 +73,19 @@ DecoratorBase {
             canFade: Style.isMobile == undefined ? false : Style.isMobile;
         }
 
-        Flickable {
-            id: popupMenuListView;
+		ListView {
+			id: popupMenuListView;
 
-            anchors.verticalCenter: parent.verticalCenter;
+			anchors.verticalCenter: parent.verticalCenter;
 
-            width: root.width;
-            height: Math.min(root.shownItemsCount * root.itemHeight, contentHeight)
+			width: root.width;
+			height: Math.min(root.shownItemsCount * root.itemHeight, root.itemHeight * count)
 
-            contentWidth: width;
-            contentHeight: column.height;
+			boundsBehavior: Flickable.StopAtBounds;
+			clip: true;
 
-            boundsBehavior: Flickable.StopAtBounds;
-            clip: true;
-
-            property alias model: repeater_.model;
-            property alias count: repeater_.count;
-
-            function positionViewAtIndex(index, mode){
-                if (index >= 0 && index < repeater_.count){
-                    let y = index * root.itemHeight;
-
-                    popupMenuListView.contentY = y;
-                }
-            }
-
-            function positionViewAtEnd(){
-                if (repeater_.count > 0){
-                    let lastIndex = repeater_.count - 1;
-
-                    positionViewAtIndex(lastIndex, ListView.Beginning);
-                }
-            }
-
-            Column {
-                id: column;
-                anchors.left: parent.left;
-                anchors.leftMargin: Style.size_smallMargin//itemBody.border.width;
-                anchors.right: parent.right;
-                anchors.rightMargin: Style.size_smallMargin//itemBody.border.width;
-                clip: true;
-
-                Repeater {
-                    id: repeater_;
-
-                    delegate: root.delegate;
-                }
-            }
-        }
+			delegate: root.delegate;
+		}
 
         MouseArea{
             anchors.fill: parent;

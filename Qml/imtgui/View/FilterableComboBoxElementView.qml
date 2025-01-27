@@ -11,6 +11,8 @@ ComboBoxElementView {
     property var filteringFields: [nameId];
     property string descriptionFieldId;
 
+	property var sourceModel;
+
     Component {
         id: cbComp;
 
@@ -35,31 +37,50 @@ ComboBoxElementView {
 
                 filteringFields: root.filteringFields;
                 descriptionFieldId: root.descriptionFieldId;
+				nameId: root.nameId;
+				sourceModel: root.sourceModel;
 
                 Component.onCompleted: {
                     if (root.delegate){
                         cb.delegate = root.delegate;
                     }
 
-                    root.setupComboBox(cb);
+					root.cbRef = cb;
                 }
+
+				onCurrentIndexChanged: {
+					if (currentIndex != root.currentIndex){
+						root.currentIndex = currentIndex;
+					}
+				}
+
+				onFinished: {
+					root.finished(itemId, index);
+				}
+
+				Connections {
+					target: root;
+
+					function onCurrentIndexChanged(){
+						cb.currentIndex = root.currentIndex;
+					}
+
+					function onSourceModelChanged() {
+						cb.sourceModel = root.sourceModel;
+					}
+				}
             }
 
             Button {
                 id: clearButton;
-
                 anchors.right: parent.right;
-
                 height: 30;
-
                 text: qsTr("Clear");
-
                 widthFromDecorator: true;
-
                 enabled: root.changeable && root.currentIndex >= 0;
-
                 onClicked: {
-                    root.currentIndex = -1;
+					root.currentIndex = -1;
+					root.finished("", -1);
                 }
             }
         }
