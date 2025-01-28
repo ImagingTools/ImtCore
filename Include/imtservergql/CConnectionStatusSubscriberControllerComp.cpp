@@ -32,7 +32,7 @@ QString CConnectionStatusSubscriberControllerComp::CreateBodySubscription() cons
 }
 
 
-// reimplemented (imtservergql::CGqlSubscriberControllerCompBase)
+// reimplemented (imtservergql::CGqlPublisherCompBase)
 
 bool CConnectionStatusSubscriberControllerComp::RegisterSubscription(
 			const QByteArray& subscriptionId,
@@ -46,7 +46,7 @@ bool CConnectionStatusSubscriberControllerComp::RegisterSubscription(
 
 	bool result = BaseClass::RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage);
 	if (result){
-		SetData(subscriptionId, m_commandIdsAttrPtr[0], CreateBodySubscription().toUtf8(), networkRequest);
+		PushDataToSubscriber(subscriptionId, m_commandIdsAttrPtr[0], CreateBodySubscription().toUtf8(), networkRequest);
 	}
 
 	return result;
@@ -61,7 +61,7 @@ void CConnectionStatusSubscriberControllerComp::OnUpdate(const istd::IChangeable
 		return;
 	}
 
-	SetAllSubscriptions(m_commandIdsAttrPtr[0], CreateBodySubscription().toUtf8());
+	PublishData(m_commandIdsAttrPtr[0], CreateBodySubscription().toUtf8());
 }
 
 

@@ -56,7 +56,7 @@ GqlModel {
 	function unRegisterSubscription(){
 		console.log("unRegisterSubscription", gqlCommandId);
 
-		Events.sendEvent("UnRegisterSubscription", container);
+		Events.sendEvent("UnregisterSubscription", container);
 	}
 
 	function getHeaders(){

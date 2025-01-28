@@ -5,7 +5,7 @@
 #include <ilog/IMessageConsumer.h>
 
 // ImtCore includes
-#include <imtservergql/CGqlSubscriberControllerCompBase.h>
+#include <imtservergql/CGqlPublisherCompBase.h>
 
 
 namespace imtservergql
@@ -13,11 +13,11 @@ namespace imtservergql
 
 
 class CBroadcastMessageConsumerSubscriberComp:
-			public imtservergql::CGqlSubscriberControllerCompBase,
+			public imtservergql::CGqlPublisherCompBase,
 			virtual public ilog::IMessageConsumer
 {
 public:
-	typedef imtservergql::CGqlSubscriberControllerCompBase BaseClass;
+	typedef imtservergql::CGqlPublisherCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CBroadcastMessageConsumerSubscriberComp);
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer)

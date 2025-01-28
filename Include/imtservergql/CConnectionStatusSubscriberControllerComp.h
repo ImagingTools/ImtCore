@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtcom/IConnectionStatusProvider.h>
-#include <imtservergql/CGqlSubscriberControllerCompBase.h>
+#include <imtservergql/CGqlPublisherCompBase.h>
 
 
 namespace imtservergql
@@ -14,11 +14,11 @@ namespace imtservergql
 
 
 class CConnectionStatusSubscriberControllerComp:
-			public imtservergql::CGqlSubscriberControllerCompBase,
+			public imtservergql::CGqlPublisherCompBase,
 			public imod::TSingleModelObserverBase<istd::IChangeable>
 {
 public:
-	typedef imtservergql::CGqlSubscriberControllerCompBase BaseClass;
+	typedef imtservergql::CGqlPublisherCompBase BaseClass;
 	typedef imod::TSingleModelObserverBase<istd::IChangeable> BaseClass2;
 
 	I_BEGIN_COMPONENT(CConnectionStatusSubscriberControllerComp);
@@ -29,7 +29,7 @@ public:
 protected:
 	QString CreateBodySubscription() const;
 
-	// reimplemented (imtservergql::CGqlSubscriberControllerCompBase)
+	// reimplemented (imtservergql::CGqlPublisherCompBase)
 	virtual bool RegisterSubscription(
 				const QByteArray& subscriptionId,
 				const imtgql::CGqlRequest& gqlRequest,

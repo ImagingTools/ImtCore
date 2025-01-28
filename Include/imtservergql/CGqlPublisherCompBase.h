@@ -16,7 +16,7 @@ namespace imtservergql
 {
 
 
-class CGqlSubscriberControllerCompBase:
+class CGqlPublisherCompBase:
 			public ilog::CLoggerComponentBase,
 			virtual public imtgql::IGqlSubscriberController,
 			virtual public imtrest::IRequestEventHandler
@@ -24,12 +24,10 @@ class CGqlSubscriberControllerCompBase:
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CGqlSubscriberControllerCompBase);
+	I_BEGIN_BASE_COMPONENT(CGqlPublisherCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlSubscriberController);
 		I_ASSIGN_MULTI_0(m_commandIdsAttrPtr, "CommandIds", "List of model-IDs for GraphQL-response", true);
-		I_ASSIGN(m_requestHandlerCompPtr, "GqlRequestHandler", "Graphql request handler to create the subscription body", false, "GqlRequestHandler");
 		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Request manager registered for the server", true, "RequestManager");
-		I_ASSIGN(m_requestHandlerCommandIdAtrPtr, "RequestHandlerCommandId", "Request handler commandId to create the subscription body", true, "");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlSubscriberController)
@@ -39,15 +37,14 @@ public:
 				const imtgql::CGqlRequest& gqlRequest,
 				const imtrest::IRequest& networkRequest,
 				QString& errorMessage) override;
-	virtual bool UnRegisterSubscription(const QByteArray& subscriptionId) override;
+	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) override;
 
 	// reimplemented (imtrest::IRequestEventHandler)
 	virtual void OnRequestDestroyed(imtrest::IRequest* request) override;
 
 protected:
-	virtual bool SetSubscriptions();
-	virtual bool SetData(const QByteArray& id, const QByteArray& subscriptionId, const QByteArray& data, const imtrest::IRequest& networkRequest);
-	virtual bool SetAllSubscriptions(const QByteArray& subscriptionId, const QByteArray& data);
+	virtual bool PushDataToSubscriber(const QByteArray& id, const QByteArray& subscriptionId, const QByteArray& data, const imtrest::IRequest& networkRequest);
+	virtual bool PublishData(const QByteArray& subscriptionId, const QByteArray& data);
 
 protected:
 	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);
@@ -60,7 +57,10 @@ protected:
 		imtgql::CGqlRequest gqlRequest;
 		QMap<QByteArray, const imtrest::IRequest*> networkRequests;
 
-		RequestNetworks(): gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION){}
+		RequestNetworks()
+			:gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION)
+		{
+		}
 	};
 	
 	QList<RequestNetworks> m_registeredSubscribers;

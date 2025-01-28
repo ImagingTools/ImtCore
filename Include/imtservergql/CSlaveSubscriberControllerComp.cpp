@@ -1,11 +1,6 @@
 #include <imtservergql/CSlaveSubscriberControllerComp.h>
 
 
-// ImtCore includes
-#include<imtbase/IOperationContext.h>
-#include<imtrest/IProtocolEngine.h>
-
-
 namespace imtservergql
 {
 
@@ -15,9 +10,9 @@ namespace imtservergql
 bool CSlaveSubscriberControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
 	for (int index = 0; index < m_subscriberControllerListCompPtr.GetCount(); index++){
-		imtgql::IGqlSubscriberController* subscriberControllerPtr = m_subscriberControllerListCompPtr[index];
-		if (subscriberControllerPtr != nullptr){
-			if (subscriberControllerPtr->IsRequestSupported(gqlRequest)){
+		imtgql::IGqlSubscriberController* publisherPtr = m_subscriberControllerListCompPtr[index];
+		if (publisherPtr != nullptr){
+			if (publisherPtr->IsRequestSupported(gqlRequest)){
 				return true;
 			}
 		}
@@ -34,11 +29,21 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 			QString& errorMessage)
 {
 	for (int index = 0; index < m_subscriberControllerListCompPtr.GetCount(); index++){
-		imtgql::IGqlSubscriberController* subscriberControllerPtr = m_subscriberControllerListCompPtr[index];
-		if (subscriberControllerPtr != nullptr){
-			if (subscriberControllerPtr->IsRequestSupported(gqlRequest)
-				&& subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
-				return true;
+		imtgql::IGqlSubscriberController* publisherPtr = m_subscriberControllerListCompPtr[index];
+		if (publisherPtr != nullptr){
+			if (publisherPtr->IsRequestSupported(gqlRequest)){
+				if (!m_publisherMap.contains(subscriptionId)){
+					if (publisherPtr->RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
+						m_publisherMap[subscriptionId] = publisherPtr;
+
+						return true;
+					}
+				}
+				else{
+					qWarning("Subscription already registered");
+
+					return true;
+				}
 			}
 		}
 	}
@@ -47,15 +52,13 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 }
 
 
-bool CSlaveSubscriberControllerComp::UnRegisterSubscription(const QByteArray& subscriptionId)
+bool CSlaveSubscriberControllerComp::UnregisterSubscription(const QByteArray& subscriptionId)
 {
-	for (int index = 0; index < m_subscriberControllerListCompPtr.GetCount(); index++){
-		imtgql::IGqlSubscriberController* subscriberControllerPtr = m_subscriberControllerListCompPtr[index];
-		if (subscriberControllerPtr != nullptr){
-			if (subscriberControllerPtr->UnRegisterSubscription(subscriptionId)){
-				return true;
-			}
-		}
+	if (m_publisherMap.contains(subscriptionId)){
+		imtgql::IGqlSubscriberController* publisherPtr = m_publisherMap[subscriptionId];
+		Q_ASSERT(publisherPtr != nullptr);
+
+		return publisherPtr->UnregisterSubscription(subscriptionId);
 	}
 
 	return false;

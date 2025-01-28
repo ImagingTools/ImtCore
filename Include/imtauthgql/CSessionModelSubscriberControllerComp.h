@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtauth/ISessionChangeNotifier.h>
-#include <imtservergql/CGqlSubscriberControllerCompBase.h>
+#include <imtservergql/CGqlPublisherCompBase.h>
 
 
 namespace imtauthgql
@@ -11,11 +11,11 @@ namespace imtauthgql
 
 
 class CSessionModelSubscriberControllerComp:
-			public imtservergql::CGqlSubscriberControllerCompBase,
+			public imtservergql::CGqlPublisherCompBase,
 			virtual public imtauth::ISessionChangeNotifier
 {
 public:
-	typedef imtservergql::CGqlSubscriberControllerCompBase BaseClass;
+	typedef imtservergql::CGqlPublisherCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSessionModelSubscriberControllerComp);
 		I_REGISTER_INTERFACE(imtauth::ISessionChangeNotifier);

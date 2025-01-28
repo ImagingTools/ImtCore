@@ -29,7 +29,7 @@ void CBroadcastMessageConsumerSubscriberComp::AddMessage(const MessagePtr& messa
 
 	QString data = QString("{\"source\": \"%1\", \"message\": \"%2\"}").arg(source).arg(message);
 
-	SetAllSubscriptions(m_commandIdsAttrPtr[0], data.toUtf8());
+	PublishData(m_commandIdsAttrPtr[0], data.toUtf8());
 }
 
 

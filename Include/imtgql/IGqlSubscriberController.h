@@ -26,7 +26,7 @@ public:
 				const imtgql::CGqlRequest& gqlRequest,
 				const imtrest::IRequest& networkRequest,
 				QString& errorMessage) = 0;
-	virtual bool UnRegisterSubscription(const QByteArray& subscriptionId) = 0;
+	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) = 0;
 };
 
 

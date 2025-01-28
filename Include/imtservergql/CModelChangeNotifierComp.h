@@ -2,27 +2,30 @@
 
 
 // ACF includes
-#include <imod/TSingleModelObserverBase.h>
+#include <imod/IModel.h>
+#include <imod/CSingleModelObserverBase.h>
 
 // ImtCore includes
 #include <imtservergql/CGqlPublisherCompBase.h>
-#include <imtbase/IHierarchicalStructure.h>
 
 
 namespace imtservergql
 {
 
 
-class CStructureSubscriberControllerComp:
+/**
+	Simple notifier of the data changes.
+	The subscriber will be informed about the fact of data model change. But no other information will be sent to the subscriber.
+*/
+class CModelChangeNotifierComp:
 			public imtservergql::CGqlPublisherCompBase,
-			public imod::TSingleModelObserverBase<istd::IChangeable>
+			protected imod::CSingleModelObserverBase
 {
 public:
 	typedef imtservergql::CGqlPublisherCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CStructureSubscriberControllerComp);
-		I_ASSIGN(m_collectionStructureCompPtr, "CollectionStructure", "Collection structure", true, "CollectionStructure");
-		I_ASSIGN_TO(m_modelCompPtr, m_collectionStructureCompPtr, true);
+	I_BEGIN_COMPONENT(CModelChangeNotifierComp);
+		I_ASSIGN(m_modelCompPtr, "Model", "Observed data model. On changes of this data model the subscriber will be notified", true, "Model");
 	I_END_COMPONENT;
 
 protected:
@@ -34,9 +37,7 @@ protected:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 protected:
-	I_REF(imtbase::IHierarchicalStructure, m_collectionStructureCompPtr);
 	I_REF(imod::IModel, m_modelCompPtr);
-
 };
 
 

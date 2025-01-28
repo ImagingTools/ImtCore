@@ -193,7 +193,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 		imtgql::IGqlSubscriberController* controllerPtr = m_gqlSubscriberControllersCompPtr[index];
 		if (controllerPtr != nullptr){
 			QByteArray subscriptionId = webSocketRequest->GetRequestId();
-			if (controllerPtr->UnRegisterSubscription(subscriptionId)){
+			if (controllerPtr->UnregisterSubscription(subscriptionId)){
 				QByteArray data = QString(R"({"type": "stop","id": "%1"})").arg(QString(subscriptionId)).toUtf8();
 				return CreateDataResponse(data, request);
 			}

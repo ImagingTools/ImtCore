@@ -11,7 +11,7 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (imtservergql::CGqlSubscriberControllerCompBase)
+// reimplemented (imtservergql::CGqlPublisherCompBase)
 
 bool CLoginStatusSubscriberControllerComp::RegisterSubscription(
 			const QByteArray& subscriptionId,
@@ -43,7 +43,7 @@ bool CLoginStatusSubscriberControllerComp::RegisterSubscription(
 
 		QByteArray commandId = m_commandIdsAttrPtr[0];
 
-		SetData(subscriptionId, commandId, data.toUtf8(), networkRequest);
+		PushDataToSubscriber(subscriptionId, commandId, data.toUtf8(), networkRequest);
 	}
 
 	return result;
@@ -73,7 +73,7 @@ void CLoginStatusSubscriberControllerComp::OnUpdate(const istd::IChangeable::Cha
 	if (changeSet.Contains(0) || changeSet.Contains(imtauth::ILoginStatusProvider::LSF_LOGGED_IN)){
 		QString data = QString("{\"status\": \"%1\"}").arg(qPrintable(status));
 
-		SetAllSubscriptions(m_commandIdsAttrPtr[0], data.toUtf8());
+		PublishData(m_commandIdsAttrPtr[0], data.toUtf8());
 	}
 }
 

@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtservergql/CGqlSubscriberControllerCompBase.h>
+#include <imtservergql/CGqlPublisherCompBase.h>
 
 
 namespace imtservergql
@@ -28,10 +28,13 @@ public:
 		const imtgql::CGqlRequest& gqlRequest,
 		const imtrest::IRequest& networkRequest,
 		QString& errorMessage) override;
-	virtual bool UnRegisterSubscription(const QByteArray& subscriptionId) override;
+	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) override;
 
 protected:
 	I_MULTIREF(imtgql::IGqlSubscriberController, m_subscriberControllerListCompPtr);
+
+	typedef QMap<QByteArray, imtgql::IGqlSubscriberController*> PublisherMap;
+	PublisherMap m_publisherMap;
 };
 
 

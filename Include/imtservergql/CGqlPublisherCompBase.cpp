@@ -1,4 +1,4 @@
-#include <imtservergql/CGqlSubscriberControllerCompBase.h>
+#include <imtservergql/CGqlPublisherCompBase.h>
 
 
 // ACF includes
@@ -18,7 +18,7 @@ namespace imtservergql
 
 // reimplemented (imtgql::IGqlSubscriberController)
 
-bool CGqlSubscriberControllerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+bool CGqlPublisherCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
 	imtgql::CGqlObject fieldsPtr = gqlRequest.GetFields();
 	if (fieldsPtr.GetFieldIds().isEmpty()){
@@ -31,7 +31,7 @@ bool CGqlSubscriberControllerCompBase::IsRequestSupported(const imtgql::CGqlRequ
 }
 
 
-bool CGqlSubscriberControllerCompBase::RegisterSubscription(
+bool CGqlPublisherCompBase::RegisterSubscription(
 		const QByteArray& subscriptionId,
 		const imtgql::CGqlRequest& gqlRequest,
 		const imtrest::IRequest& networkRequest,
@@ -40,8 +40,8 @@ bool CGqlSubscriberControllerCompBase::RegisterSubscription(
 	Q_ASSERT(IsRequestSupported(gqlRequest));
 
 	if (!IsRequestSupported(gqlRequest)){
-		errorMessage = QString("Request with Command-ID: '%1 'is not supported").arg(qPrintable(gqlRequest.GetCommandId()));
-		SendErrorMessage(0, errorMessage, "CGqlSubscriberControllerCompBase");
+		errorMessage = QString("Request with command-ID: '%1 'is not supported").arg(qPrintable(gqlRequest.GetCommandId()));
+		SendErrorMessage(0, errorMessage, "CGqlPublisherCompBase");
 
 		return false;
 	}
@@ -50,7 +50,7 @@ bool CGqlSubscriberControllerCompBase::RegisterSubscription(
 	imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<imtrest::CWebSocketRequest*>(const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));
 	if (webSocketRequest == nullptr){
 		errorMessage = QString("Internal error");
-		SendErrorMessage(0, errorMessage, "CGqlSubscriberControllerCompBase");
+		SendErrorMessage(0, errorMessage, "CGqlPublisherCompBase");
 
 		return false;
 	}
@@ -76,7 +76,7 @@ bool CGqlSubscriberControllerCompBase::RegisterSubscription(
 }
 
 
-bool CGqlSubscriberControllerCompBase::UnRegisterSubscription(const QByteArray& subscriptionId)
+bool CGqlPublisherCompBase::UnregisterSubscription(const QByteArray& subscriptionId)
 {
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		if (requestNetworks.networkRequests.contains(subscriptionId)){
@@ -92,72 +92,25 @@ bool CGqlSubscriberControllerCompBase::UnRegisterSubscription(const QByteArray& 
 
 // reimplemented (imtrest::IRequestEventHandler)
 
-void CGqlSubscriberControllerCompBase::OnRequestDestroyed(imtrest::IRequest* request)
+void CGqlPublisherCompBase::OnRequestDestroyed(imtrest::IRequest* request)
 {
 	imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<imtrest::CWebSocketRequest*>(request);
 	if (webSocketRequestPtr != nullptr){
-		UnRegisterSubscription(webSocketRequestPtr->GetQueryId());
+		UnregisterSubscription(webSocketRequestPtr->GetQueryId());
 	}
 }
 
 
 // protected methods
 
-bool CGqlSubscriberControllerCompBase::SetSubscriptions()
-{
-	if (*m_requestHandlerCommandIdAtrPtr == ""){
-		return false;
-	}
-
-	if (!m_requestHandlerCompPtr.IsValid()){
-		return false;
-	}
-
-	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
-		imtgql::CGqlRequest clonedRequest;
-		clonedRequest.CopyFrom(requestNetworks.gqlRequest);
-		clonedRequest.SetRequestType(imtgql::CGqlRequest::RT_QUERY);
-		clonedRequest.SetCommandId(*m_requestHandlerCommandIdAtrPtr);
-
-		QString errorMessage;
-		istd::TDelPtr<imtbase::CTreeItemModel> resultModelPtr = m_requestHandlerCompPtr->CreateResponse(clonedRequest, errorMessage);
-		if (!resultModelPtr.IsValid()){
-			errorMessage = QString("Unable to send response to the subscribers result model is invalid");
-			SendErrorMessage(0, errorMessage, "CGqlSubscriberControllerCompBase");
-
-			return false;
-		}
-
-		imtbase::CTreeItemModel* dataModelPtr = resultModelPtr->GetTreeItemModel("data");
-		if (dataModelPtr == nullptr){
-			errorMessage = QString("Unable to send response to the subscribers result model is invalid");
-			SendErrorMessage(0, errorMessage, "CGqlSubscriberControllerCompBase");
-
-			return false;
-		}
-
-		QByteArray data =  dataModelPtr->ToJson().toUtf8();
-
-		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
-			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];
-			if (networkRequestPtr != nullptr){
-				SetData(id, "", data, *networkRequestPtr);
-			}
-		}
-	}
-
-	return true;
-}
-
-
-bool CGqlSubscriberControllerCompBase::SetData(
+bool CGqlPublisherCompBase::PushDataToSubscriber(
 		const QByteArray& id,
 		const QByteArray& subscriptionId,
 		const QByteArray& data,
 		const imtrest::IRequest& networkRequest)
 {
 	if (!m_requestManagerCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Attribute 'RequestManager' was not set", "CGqlSubscriberControllerCompBase");
+		Q_ASSERT_X(false, "Attribute 'RequestManager' was not set", "CGqlPublisherCompBase");
 		return false;
 	}
 
@@ -171,40 +124,40 @@ bool CGqlSubscriberControllerCompBase::SetData(
 
 	imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(networkRequest, imtrest::IProtocolEngine::SC_OK, body, reponseTypeId));
 	if (!responsePtr.IsValid()){
-		SendErrorMessage(0, QString("Unable to send response to subscriber. Error: Response is invalid"), "CGqlSubscriberControllerCompBase");
+		SendErrorMessage(0, QString("Unable to send response to subscriber. Error: Response is invalid"), "CGqlPublisherCompBase");
+
 		return false;
 	}
 
 	const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest.GetRequestId());
 	if (sender == nullptr){
-		SendErrorMessage(0, QString("Unable to send response to subscriber. Error: Cannot found sender for request ID '%1'").arg(qPrintable(networkRequest.GetRequestId())), "CGqlSubscriberControllerCompBase");
+		SendErrorMessage(0, QString("Unable to send response to subscriber. Error: Cannot found sender for request ID '%1'").arg(qPrintable(networkRequest.GetRequestId())), "CGqlPublisherCompBase");
+
 		return false;
 	}
 
 	bool retVal = sender->SendResponse(responsePtr);
 	if (!retVal){
 		QString message = QString("Unable to send response to subscriber. Data: '%1'").arg(qPrintable(data));
-		qDebug() << message;
-		SendErrorMessage(0, message, "CGqlSubscriberControllerCompBase");
+
+		SendErrorMessage(0, message, "CGqlPublisherCompBase");
 	}
 
 	return true;
 }
 
 
-bool CGqlSubscriberControllerCompBase::SetAllSubscriptions(const QByteArray& subscriptionId, const QByteArray& data)
+bool CGqlPublisherCompBase::PublishData(const QByteArray& subscriptionId, const QByteArray& data)
 {
-	qDebug() << "SetAllSubscriptions" << m_registeredSubscribers.count() << subscriptionId << data;
-
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];
 			if (networkRequestPtr != nullptr){
-				bool retVal = SetData(id, subscriptionId, data, *networkRequestPtr);
+				bool retVal = PushDataToSubscriber(id, subscriptionId, data, *networkRequestPtr);
 				if (!retVal){
 					QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(subscriptionId)).arg(qPrintable(data));
-					qDebug() << message;
-					SendErrorMessage(0, message, "CGqlSubscriberControllerCompBase");
+	
+					SendErrorMessage(0, message, "CGqlPublisherCompBase");
 				}
 			}
 		}

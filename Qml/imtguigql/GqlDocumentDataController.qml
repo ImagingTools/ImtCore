@@ -20,7 +20,7 @@ DocumentDataController {
     }
 
     Component.onDestruction: {
-        Events.sendEvent("UnRegisterSubscription", container.subscriptionClient);
+        Events.sendEvent("UnregisterSubscription", container.subscriptionClient);
     }
 
     onError: {

@@ -80,12 +80,12 @@ I_EXPORT_COMPONENT(
 			"Operation Context Controller");
 
 I_EXPORT_COMPONENT(
-			ObjectCollectionSubscriberController,
+			ObjectCollectionChangeNotifier,
 			"Subscriprion controller for object collection",
 			"Subscriprion Subscriber Collection ObjectCollection");
 
 I_EXPORT_COMPONENT(
-			ModelSubscriberController,
+			ModelChangeNotifier,
 			"Model subscriber controller",
 			"Model Subscriber Collection");
 

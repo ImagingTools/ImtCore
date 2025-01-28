@@ -14,12 +14,12 @@ WebSocket {
 
     Component.onCompleted: {
         Events.subscribeEvent("RegisterSubscription", container.registerSubscriptionEvent);
-        Events.subscribeEvent("UnRegisterSubscription", container.unRegisterSubscription);
+        Events.subscribeEvent("UnregisterSubscription", container.unRegisterSubscription);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("RegisterSubscription", container.registerSubscriptionEvent);
-        Events.unSubscribeEvent("UnRegisterSubscription", container.unRegisterSubscription);
+        Events.unSubscribeEvent("UnregisterSubscription", container.unRegisterSubscription);
     }
 
     onStatusChanged: {

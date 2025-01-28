@@ -12,12 +12,6 @@ namespace imtservergql
 
 // protected methods
 
-bool CStructureSubscriberControllerComp::SetSubscriptions()
-{
-	return false;
-}
-
-
 // reimplemented (icomp::CComponentBase)
 
 void CStructureSubscriberControllerComp::OnComponentCreated()
@@ -43,7 +37,6 @@ void CStructureSubscriberControllerComp::OnComponentDestroyed()
 
 void CStructureSubscriberControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	qDebug() << "Structure OnUpdate";
 	if (!m_requestManagerCompPtr.IsValid()){
 		return;
 	}
@@ -63,8 +56,6 @@ void CStructureSubscriberControllerComp::OnUpdate(const istd::IChangeable::Chang
 			if (responsePtr.IsValid()){
 				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
 				if (sender != nullptr){
-					qDebug() << "SetSubscriptions";
-
 					sender->SendResponse(responsePtr);
 				}
 			}

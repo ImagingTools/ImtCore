@@ -6,22 +6,25 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtservergql/CGqlSubscriberControllerCompBase.h>
+#include <imtservergql/CGqlPublisherCompBase.h>
 
 
 namespace imtservergql
 {
 
 
-class CObjectCollectionSubscriberControllerComp:
-			public imtservergql::CGqlSubscriberControllerCompBase,
-			public imod::TSingleModelObserverBase<imtbase::IObjectCollection>
+/**
+	Notifier about changes in the underlaying object collection.
+*/
+class CObjectCollectionChangeNotifierComp:
+			public imtservergql::CGqlPublisherCompBase,
+			protected imod::TSingleModelObserverBase<imtbase::IObjectCollection>
 {
 public:
-	typedef imtservergql::CGqlSubscriberControllerCompBase BaseClass;
+	typedef imtservergql::CGqlPublisherCompBase BaseClass;
 	typedef imod::TSingleModelObserverBase<imtbase::IObjectCollection> BaseClass2;
 
-	I_BEGIN_COMPONENT(CObjectCollectionSubscriberControllerComp);
+	I_BEGIN_COMPONENT(CObjectCollectionChangeNotifierComp);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN_TO(m_objectCollectionModelCompPtr, m_objectCollectionCompPtr, true);
 		I_ASSIGN(m_isSendItemSource, "IsSendItemSource", "Object collection", false, false);
@@ -34,7 +37,6 @@ protected:
 
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-	virtual bool SetSubscriptions() override;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);

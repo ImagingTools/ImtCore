@@ -1,4 +1,4 @@
-#include <imtservergql/CObjectCollectionSubscriberControllerComp.h>
+#include <imtservergql/CObjectCollectionChangeNotifierComp.h>
 
 
 // ACF includes
@@ -16,17 +16,17 @@ namespace imtservergql
 
 // reimplemented (icomp::CComponentBase)
 
-void CObjectCollectionSubscriberControllerComp::OnComponentCreated()
+void CObjectCollectionChangeNotifierComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_objectCollectionModelCompPtr.IsValid()) {
+	if (m_objectCollectionModelCompPtr.IsValid()){
 		m_objectCollectionModelCompPtr->AttachObserver(this);
 	}
 }
 
 
-void CObjectCollectionSubscriberControllerComp::OnComponentDestroyed()
+void CObjectCollectionChangeNotifierComp::OnComponentDestroyed()
 {
 	if (m_objectCollectionModelCompPtr.IsValid()){
 		m_objectCollectionModelCompPtr->DetachObserver(this);
@@ -38,7 +38,7 @@ void CObjectCollectionSubscriberControllerComp::OnComponentDestroyed()
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CObjectCollectionSubscriberControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	if (!m_requestManagerCompPtr.IsValid()){
 		return;
@@ -104,15 +104,9 @@ void CObjectCollectionSubscriberControllerComp::OnUpdate(const istd::IChangeable
 			jsonDocument.setObject(dataObject);
 			data = jsonDocument.toJson(QJsonDocument::Compact);
 
-			SetData(id, networkRequest->GetCommandId(), data, *networkRequest);
+			PushDataToSubscriber(id, networkRequest->GetCommandId(), data, *networkRequest);
 		}
 	}
-}
-
-
-bool CObjectCollectionSubscriberControllerComp::SetSubscriptions()
-{
-	return false;
 }
 
 
