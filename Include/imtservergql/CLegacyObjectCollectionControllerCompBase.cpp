@@ -29,7 +29,6 @@
 #include <imtbase/CObjectCollection.h>
 #include <imtbase/COperationDescription.h>
 #include <imtgql/imtgql.h>
-#include <imtgql/CGqlContext.h>
 #include <imtcol/CComplexCollectionFilterRepresentationController.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 

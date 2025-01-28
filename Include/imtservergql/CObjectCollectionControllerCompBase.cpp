@@ -899,6 +899,15 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 	imtgql::CGqlRequest headersRequest;
+	const imtgql::IGqlContext* gqlContext = gqlRequest.GetRequestContext();
+	if(gqlContext != nullptr){
+		const istd::IChangeable* clonePtr = gqlContext->CloneMe();
+		if(clonePtr != nullptr){
+			const imtgql::IGqlContext* headerGqlContext = dynamic_cast<const imtgql::IGqlContext*>(clonePtr);
+			headersRequest.SetGqlContext(headerGqlContext);
+		}
+	}
+
 	imtbase::CTreeItemModel* headersModelPtr = m_headersProviderCompPtr->CreateResponse(headersRequest, errorMessage);
 	if (headersModelPtr != nullptr){
 		rootModelPtr->SetExternTreeModel("data", headersModelPtr);
