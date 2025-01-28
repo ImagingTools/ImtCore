@@ -485,7 +485,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	Q_ASSERT(savedObjectPtr.IsValid());
 
 	if (!DoUpdateObjectFromRequest(gqlRequest, *savedObjectPtr, objectId, errorMessage)){
-		errorMessage = QString("Can't update object in the collection: '%1'. Error: %2").arg(qPrintable(objectId)).arg(errorMessage);
+		if (errorMessage.isEmpty()){
+			errorMessage = QString("Can't update object in the collection: '%1'").arg(qPrintable(objectId));
+		}
 
 		return nullptr;
 	}

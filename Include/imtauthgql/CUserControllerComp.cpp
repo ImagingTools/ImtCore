@@ -68,14 +68,17 @@ sdl::imtauth::Users::CChangePasswordPayload::V1_0 CUserControllerComp::OnChangeP
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
+	sdl::imtauth::Users::CChangePasswordPayload::V1_0 payload;
+	payload.Success = false;
+
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
-		return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
+		return payload;
 	}
 
 	if (!m_hashCalculatorCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'HashCalculator' was not set", "CUserControllerComp");
-		return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
+		return payload;
 	}
 
 	sdl::imtauth::Users::CChangePasswordInput::V1_0 inputArgument = changePasswordRequest.GetRequestedArguments().input;
@@ -102,14 +105,14 @@ sdl::imtauth::Users::CChangePasswordPayload::V1_0 CUserControllerComp::OnChangeP
 
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to change password for user '%1'. Error: The user does not exist").arg(qPrintable(login));
-		return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
+		return payload;
 	}
 
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to change password for user '%1'. Error: The user does not exist").arg(qPrintable(login));
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
-		return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
+		return payload;
 	}
 
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
@@ -118,7 +121,7 @@ sdl::imtauth::Users::CChangePasswordPayload::V1_0 CUserControllerComp::OnChangeP
 			errorMessage = QString("Unable to change password for user '%1'. Error: A user from an external system").arg(qPrintable(login));
 			SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
-			return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
+			return payload;
 		}
 	}
 
@@ -147,7 +150,7 @@ sdl::imtauth::Users::CChangePasswordPayload::V1_0 CUserControllerComp::OnChangeP
 		errorMessage = QString("Unable to change password for user '%1'. Error: Invalid login or password.").arg(qPrintable(login));
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
-		return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
+		return payload;
 	}
 
 	QByteArray passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + newPassword.toUtf8());
@@ -162,10 +165,9 @@ sdl::imtauth::Users::CChangePasswordPayload::V1_0 CUserControllerComp::OnChangeP
 		errorMessage = QString("Unable to change password for user '%1'").arg(qPrintable(login));
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
-		return sdl::imtauth::Users::CChangePasswordPayload::V1_0();
+		return payload;
 	}
 
-	sdl::imtauth::Users::CChangePasswordPayload::V1_0 payload;
 	payload.Success = true;
 
 	return payload;
@@ -277,7 +279,7 @@ sdl::imtauth::Users::CRegisterUserPayload::V1_0 CUserControllerComp::OnRegisterU
 sdl::imtauth::Users::CCheckEmailPayload::V1_0 CUserControllerComp::OnCheckEmail(
 	const sdl::imtauth::Users::V1_0::CCheckEmailGqlRequest& checkEmailRequest,
 	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+	QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Users::CCheckEmailPayload::V1_0 response;
 	if (!m_userCollectionCompPtr.IsValid()){
@@ -413,6 +415,7 @@ sdl::imtauth::Users::CCheckSuperuserPayload::V1_0 CUserControllerComp::OnCheckSu
 
 	response.Exists = false;
 	response.ErrorType = "";
+	response.Message = "";
 
 	if (m_databaseConnectionCheckerCompPtr.IsValid()){
 		QString errorMessage;
@@ -443,7 +446,6 @@ sdl::imtauth::Users::CCreateSuperuserPayload::V1_0 CUserControllerComp::OnCreate
 	QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Users::CCreateSuperuserPayload::V1_0 response;
-
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
 		return response;
@@ -455,6 +457,7 @@ sdl::imtauth::Users::CCreateSuperuserPayload::V1_0 CUserControllerComp::OnCreate
 	}
 
 	response.Success = false;
+	response.Message = "";
 
 	istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr = GetUserInfoByLogin("su");
 	if (userInfoPtr.IsValid()){
@@ -518,6 +521,15 @@ sdl::imtauth::Users::CCreateSuperuserPayload::V1_0 CUserControllerComp::OnCreate
 	response.Success = true;
 
 	return response;
+}
+
+
+sdl::imtauth::Users::CRemoveUserPayload::V1_0 CUserControllerComp::OnUsersRemove(
+	const sdl::imtauth::Users::V1_0::CUsersRemoveGqlRequest& /*removeUserRequest*/,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
+{
+	return sdl::imtauth::Users::CRemoveUserPayload::V1_0();
 }
 
 

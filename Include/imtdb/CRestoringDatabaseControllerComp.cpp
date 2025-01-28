@@ -71,11 +71,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 		QString fullPath = backupFolderPath + "/" + fileName;
 
 		QString pgDumpCommand = QString("pg_dump -h %1 -U %2 -p %3 -b -v -f \"%4\" \"%5\"")
-					.arg(host)
-					.arg(userName)
-					.arg(QString::number(port))
-					.arg(fullPath)
-					.arg(dbName);
+									.arg(host, userName, QString::number(port), fullPath, dbName);
 
 		if (!ExecuteCommand(process, pgDumpCommand)){
 			SendErrorMessage(0, QString("Unable to execute command %1").arg(pgDumpCommand), "CRestoringDatabaseControllerComp");
@@ -85,10 +81,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 	}
 
 	QString dropCommand = QString("psql -h %1 -U %2 -p %3 -c \"%4\"")
-			.arg(host)
-			.arg(userName)
-			.arg(QString::number(port))
-			.arg(QString("DROP DATABASE \"%1\" WITH (FORCE)").arg(dbName));
+							  .arg(host, userName, QString::number(port), QString("DROP DATABASE \"%1\" WITH (FORCE)").arg(dbName));
 
 	if (!ExecuteCommand(process, dropCommand)){
 		SendErrorMessage(0, QString("Unable to execute command %1").arg(dropCommand), "CRestoringDatabaseControllerComp");
@@ -97,10 +90,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 	}
 
 	QString createCommand = QString("psql -h %1 -U %2 -p %3 -c \"%4\"")
-				.arg(host)
-				.arg(userName)
-				.arg(QString::number(port))
-				.arg(QString("CREATE DATABASE \"%1\"").arg(dbName));
+								.arg(host, userName, QString::number(port), QString("CREATE DATABASE \"%1\"").arg(dbName));
 
 	if (!ExecuteCommand(process, createCommand)){
 		SendErrorMessage(0, QString("Unable to execute command %1").arg(createCommand), "CRestoringDatabaseControllerComp");
@@ -108,15 +98,12 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 		return false;
 	}
 
-	QString restoreCommand = QString("psql -h %1 -U %2 -p %3 -d \"%4\" -f \"%5\"")
-				.arg(host)
-				.arg(userName)
-				.arg(QString::number(port))
-				.arg(dbName)
-				.arg(filePathTmp);
+	QString pgRestoreCommand = QString("pg_restore -h %1 -U %2 -p %3 -d %4 \"%5\"")
+								   .arg(host, userName, QString::number(port), dbName, filePathTmp);
 
-	if (!ExecuteCommand(process, restoreCommand)){
-		SendErrorMessage(0, QString("Unable to execute command %1").arg(restoreCommand), "CRestoringDatabaseControllerComp");
+
+	if (!ExecuteCommand(process, pgRestoreCommand)){
+		SendErrorMessage(0, QString("Unable to execute command %1").arg(pgRestoreCommand), "CRestoringDatabaseControllerComp");
 
 		return false;
 	}
@@ -182,11 +169,7 @@ bool CRestoringDatabaseControllerComp::GetData(
 	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + ".backup";
 
 	QString pgDumpCommand = QString("pg_dump -h %1 -U %2 -p %3 -b -v -f \"%4\" \"%5\"")
-				.arg(host)
-				.arg(userName)
-				.arg(QString::number(port))
-				.arg(filePathTmp)
-				.arg(dbName);
+								.arg(host, userName, QString::number(port), filePathTmp, dbName);
 
 	if (!ExecuteCommand(process, pgDumpCommand)){
 		SendErrorMessage(0, QString("Unable to execute command %1").arg(pgDumpCommand), "CRestoringDatabaseControllerComp");
@@ -213,9 +196,9 @@ bool CRestoringDatabaseControllerComp::GetData(
 
 bool CRestoringDatabaseControllerComp::ExecuteCommand(QProcess& process, const QString& command) const
 {
-	process.start(command);
+	process.startCommand(command);
 
-	if(!process.waitForFinished()){
+	if(!process.waitForFinished(-1)){
 		return false;
 	}
 
