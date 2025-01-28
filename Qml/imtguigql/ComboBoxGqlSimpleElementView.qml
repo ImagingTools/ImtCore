@@ -45,6 +45,28 @@ ComboBoxElementView {
             function getHeaders(){
                 return root.getHeaders();
             }
+
+			Connections {
+				target: root;
+
+				function onModelChanged(){
+					if (cb.model != root.model){
+						cb.model = root.model;
+					}
+				}
+
+				function onChangeableChanged(){
+					if (cb.changeable != root.changeable){
+						cb.changeable = root.changeable;
+					}
+				}
+
+				function onCurrentIndexChanged(){
+					if (cb.currentIndex != root.currentIndex){
+						cb.currentIndex = root.currentIndex;
+					}
+				}
+			}
         }
     }
 }
