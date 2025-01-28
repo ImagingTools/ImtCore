@@ -29,6 +29,7 @@
 #include <imtbase/CObjectCollection.h>
 #include <imtbase/COperationDescription.h>
 #include <imtgql/imtgql.h>
+#include <imtgql/CGqlContext.h>
 #include <imtcol/CComplexCollectionFilterRepresentationController.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
@@ -809,7 +810,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::DeleteObject
 
 
 imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::GetHeaders(
-		const imtgql::CGqlRequest& /*gqlRequest*/,
+		const imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
 	if (!m_headersProviderCompPtr.IsValid()){
@@ -822,6 +823,15 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::GetHeaders(
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 	imtgql::CGqlRequest headersRequest;
+	const imtgql::IGqlContext* gqlContext = gqlRequest.GetRequestContext();
+	if(gqlContext != nullptr){
+		const istd::IChangeable* clonePtr = gqlContext->CloneMe();
+		if(clonePtr != nullptr){
+			const imtgql::IGqlContext* headerGqlContext = dynamic_cast<const imtgql::IGqlContext*>(clonePtr);
+			headersRequest.SetGqlContext(headerGqlContext);
+		}
+	}
+
 	imtbase::CTreeItemModel* headersModelPtr = m_headersProviderCompPtr->CreateResponse(headersRequest, errorMessage);
 	if (headersModelPtr != nullptr){
 		rootModelPtr->SetExternTreeModel("data", headersModelPtr);
