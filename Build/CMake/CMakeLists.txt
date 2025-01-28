@@ -150,6 +150,7 @@ add_subdirectory("${INCLUDE_DIR}/imtpay/CMake" "${AUX_INCLUDE_DIR}/imtpay")
 
 if(NOT DEFINED USE_GEO OR USE_GEO)
 	add_subdirectory("${INCLUDE_DIR}/imtgeo/CMake" "${AUX_INCLUDE_DIR}/imtgeo")
+	add_dependencies(imtgeo imtbasesdl)
 endif()
 
 if(DEFINED USE_MONGODB AND USE_MONGODB)
