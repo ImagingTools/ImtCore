@@ -78,7 +78,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 
 	imtsdl::SdlRequestList requests = m_sdlRequestListCompPtr->GetRequests();
 	if (requests.isEmpty()){
-		SendVerboseMessage("Requests is not provided. Nothing todo");
+		SendVerboseMessage("Requests is empty. Nothing todo");
 
 		return TS_OK;
 	}

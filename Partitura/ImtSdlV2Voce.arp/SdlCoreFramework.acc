@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5326" Description="ACF"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
@@ -112,6 +112,7 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="BaseClassExtender" ComponentId="BaseClassExtender"/>
+        <Component ExportedId="BasicRequestsProvider" ComponentId="GqlSchemaParser/BasicRequestsProvider"/>
         <Component ExportedId="OriginalNamespace" ComponentId="GqlSchemaParser/OriginalNamespace"/>
         <Component ExportedId="SchemaCustomParams" ComponentId="GqlSchemaParser/SchemaCustomParams"/>
     </ExportedComponents>

@@ -1,0 +1,41 @@
+#include <imtsdl/CBasicRequestsProxyProviderComp.h>
+
+
+
+
+namespace imtsdl
+{
+
+
+SdlRequestList CBasicRequestsProxyProviderComp::GetRequests() const
+{
+	if (m_sdlRequestListCompPtr.IsValid() && m_sdlDocumentListCompPtr.IsValid()){
+		SdlRequestList retVal = m_sdlRequestListCompPtr->GetRequests();
+		SdlDocumentTypeList documentList = m_sdlDocumentListCompPtr->GetDocumentTypes();
+
+		for (const CSdlDocumentType& documentType: documentList){
+			const SdlRequestList typeRequestList = documentType.GetOperationsList().values();
+			for (const CSdlRequest& typeRequest: typeRequestList){
+				retVal.removeAll(typeRequest);
+			}
+			const SdlDocumentTypeList subtypeList = documentType.GetSubtypes();
+			for (const CSdlDocumentType& documentSubtype: subtypeList){
+				const SdlRequestList subtypeRequestList = documentSubtype.GetOperationsList().values();
+				for (const CSdlRequest& subtypeRequest: subtypeRequestList){
+					retVal.removeAll(subtypeRequest);
+				}
+			}
+		}
+
+		return retVal;
+	}
+
+	I_CRITICAL();
+	return SdlRequestList();
+}
+
+
+
+} // namespace imtsdl
+
+

@@ -20,6 +20,11 @@ I_EXPORT_COMPONENT(
 			"GQL GraphQL Schema Definition Language SDL Parser")
 
 I_EXPORT_COMPONENT(
+			BasicRequestsProxyProvider,
+			"The requests provider, that filters collection handler requests",
+			"GQL GraphQL Schema Definition Language SDL Parser")
+
+I_EXPORT_COMPONENT(
 			LogFilter,
 			"The SDL specific log filter, used to remove unnecessary messages",
 			"Schema Definition Language SDL Log Filter")

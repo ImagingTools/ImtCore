@@ -9,7 +9,7 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="Application" X="575" Y="275" Note=""/>
-        <Element ComponentName="CodeGenWorker" X="575" Y="525" Note=""/>
+        <Element ComponentName="CodeGenWorker" X="600" Y="525" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="Application">

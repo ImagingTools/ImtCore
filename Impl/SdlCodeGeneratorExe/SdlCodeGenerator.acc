@@ -225,6 +225,9 @@
                                 <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework/OriginalNamespace"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="SdlBaseRequestListProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework/BasicRequestsProvider"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
