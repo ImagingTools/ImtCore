@@ -810,6 +810,8 @@ var Qt = {
     btoa: function(data){
         return btoa(data)
     },
+
+    get localStorage(){return localStorage},
 }
 
 module.exports.Qt = Qt
