@@ -380,10 +380,19 @@ class QBool extends QProperty {
 
 class QLinkedBool extends QBool {
     originValue = true
+    step = 0
 
     update(){
-        // if(this.updating) return
-        // this.updating = true
+        let currentStep = this.step
+
+        if(this.updating) {
+            this.step++
+        } else {
+            this.step = 0
+            currentStep = 0
+            this.updating = true
+        }
+        
         global.queueLink.push(this)
         let value = this.value
         try {
@@ -405,9 +414,11 @@ class QLinkedBool extends QBool {
         } finally {
             global.queueLink.pop()
         }
+
+        if(currentStep !== this.step) return
         
         this.set(value)
-        // this.updating = false
+        this.updating = false
         this.completed = true
     }
 
