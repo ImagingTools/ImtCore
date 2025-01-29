@@ -382,8 +382,8 @@ class QLinkedBool extends QBool {
     originValue = true
 
     update(){
-        if(this.updating) return
-        this.updating = true
+        // if(this.updating) return
+        // this.updating = true
         global.queueLink.push(this)
         let value = this.value
         try {
@@ -407,7 +407,7 @@ class QLinkedBool extends QBool {
         }
         
         this.set(value)
-        this.updating = false
+        // this.updating = false
         this.completed = true
     }
 
