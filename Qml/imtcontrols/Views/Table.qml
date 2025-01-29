@@ -17,11 +17,11 @@ TableBase {
     cellDelegate: Component {
 		TableCellTextDelegate {
 			Component.onCompleted: {
-				console.log("Cell onCompleted")
+				//console.log("Cell onCompleted")
 			}
 
 			Component.onDestruction: {
-				console.log("Cell onDestruction")
+				//console.log("Cell onDestruction")
 			}
 
 		}
