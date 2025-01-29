@@ -323,8 +323,11 @@ class ListView extends Flickable {
 
         this.getProperty('originX').value = 0
         this.getProperty('originY').value = 0
-        this.getProperty('contentX').value = 0
-        this.getProperty('contentY').value = 0
+        // this.getProperty('contentX').value = 0
+        // this.getProperty('contentY').value = 0
+
+        // this.getPropertyValue('contentItem').getProperty('x').reset(-this.getPropertyValue('contentX'))
+        // this.getPropertyValue('contentItem').getProperty('y').reset(-this.getPropertyValue('contentY'))
 
         this.getProperty('count').value = 0
     }
