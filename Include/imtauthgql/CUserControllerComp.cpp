@@ -27,42 +27,6 @@ sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CUserControllerComp::OnGetObjec
 }
 
 
-sdl::imtauth::Users::CUsersListPayload::V1_0 CUserControllerComp::OnUsersList(
-	const sdl::imtauth::Users::V1_0::CUsersListGqlRequest& /*usersListRequest*/,
-	const imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
-{
-	return sdl::imtauth::Users::CUsersListPayload::V1_0();
-}
-
-
-sdl::imtauth::Users::CUserDataPayload::V1_0 CUserControllerComp::OnUserItem(
-	const sdl::imtauth::Users::V1_0::CUserItemGqlRequest& /*userItemRequest*/,
-	const imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
-{
-	return sdl::imtauth::Users::CUserDataPayload::V1_0();
-}
-
-
-sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0 CUserControllerComp::OnUserUpdate(
-	const sdl::imtauth::Users::V1_0::CUserUpdateGqlRequest& /*userUpdateRequest*/,
-	const imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
-{
-	return sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0();
-}
-
-
-sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0 CUserControllerComp::OnUserAdd(
-	const sdl::imtauth::Users::V1_0::CUserAddGqlRequest& /*userAddRequest*/,
-	const imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
-{
-	return sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0();
-}
-
-
 sdl::imtauth::Users::CChangePasswordPayload::V1_0 CUserControllerComp::OnChangePassword(
 	const sdl::imtauth::Users::V1_0::CChangePasswordGqlRequest& changePasswordRequest,
 	const imtgql::CGqlRequest& gqlRequest,

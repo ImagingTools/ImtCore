@@ -41,22 +41,6 @@ protected:
 		const sdl::imtauth::Users::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::CUsersListPayload::V1_0 OnUsersList(
-		const sdl::imtauth::Users::V1_0::CUsersListGqlRequest& usersListRequest,
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::CUserDataPayload::V1_0 OnUserItem(
-		const sdl::imtauth::Users::V1_0::CUserItemGqlRequest& userItemRequest,
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0 OnUserUpdate(
-		const sdl::imtauth::Users::V1_0::CUserUpdateGqlRequest& userUpdateRequest,
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0 OnUserAdd(
-		const sdl::imtauth::Users::V1_0::CUserAddGqlRequest& userAddRequest,
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
 	virtual sdl::imtauth::Users::CChangePasswordPayload::V1_0 OnChangePassword(
 		const sdl::imtauth::Users::V1_0::CChangePasswordGqlRequest& changePasswordRequest,
 		const imtgql::CGqlRequest& gqlRequest,
