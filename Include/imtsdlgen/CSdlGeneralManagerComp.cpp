@@ -81,7 +81,7 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 	iprm::CParamsSet outputParamsSet;
 	int parsingResult = m_sdlParserCompPtr->DoProcessing(nullptr, nullptr, &outputParamsSet);
 	if (parsingResult != iproc::IProcessor::TS_OK){
-		SendErrorMessage(0, "Unable to parse schema");
+		SendErrorMessage(0, QString("Unable to parse schema '%1'").arg(QFileInfo(m_sdlArgumentParserCompPtr->GetSchemaFilePath()).absoluteFilePath()));
 
 		::exit(3);
 	}

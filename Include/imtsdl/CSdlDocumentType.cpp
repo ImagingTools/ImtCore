@@ -44,7 +44,7 @@ void CSdlDocumentType::SetReferenceType(const CSdlType& referenceType)
 }
 
 
-QMap<CSdlDocumentType::OperationType, CSdlRequest> CSdlDocumentType::GetOperationsList() const
+QMultiMap<CSdlDocumentType::OperationType, CSdlRequest> CSdlDocumentType::GetOperationsList() const
 {
 	return m_operationsList;
 }
@@ -59,7 +59,7 @@ bool CSdlDocumentType::HasRequest(OperationType operationType) const
 CSdlRequest CSdlDocumentType::GetRequest(OperationType operationType) const
 {
 	if (m_operationsList.contains(operationType)){
-		return m_operationsList[operationType];
+		return m_operationsList.value(operationType);
 	}
 
 	Q_ASSERT_X(false, __func__, "Request for operationType is not exists. Did you check it with HasRequest()?");
@@ -68,7 +68,7 @@ CSdlRequest CSdlDocumentType::GetRequest(OperationType operationType) const
 }
 
 
-void CSdlDocumentType::SetOperationsList(const QMap<OperationType, CSdlRequest>& operationsList)
+void CSdlDocumentType::SetOperationsList(const QMultiMap<OperationType, CSdlRequest>& operationsList)
 {
 	if (m_operationsList != operationsList){
 		istd::CChangeNotifier notifier(this);
@@ -78,9 +78,9 @@ void CSdlDocumentType::SetOperationsList(const QMap<OperationType, CSdlRequest>&
 
 void CSdlDocumentType::AddOperation(OperationType type, const CSdlRequest& operation)
 {
-	Q_ASSERT(!m_operationsList.contains(type));
+	Q_ASSERT(type == OT_GET_VIEW || !m_operationsList.contains(type));
 
-	if (!m_operationsList.contains(type)){
+	if (type == OT_GET_VIEW || !m_operationsList.contains(type)){
 		istd::CChangeNotifier notifier(this);
 		m_operationsList.insert(type, operation);
 	}
@@ -204,7 +204,7 @@ bool CSdlDocumentType::SerializeDocumentTypeList(
 
 bool CSdlDocumentType::SerializeOperationsList(
 			iser::IArchive& archive,
-			QMap<OperationType, CSdlRequest>& container,
+			QMultiMap<OperationType, CSdlRequest>& container,
 			const QByteArray& containerTagName,
 			const QByteArray& elementTagName,
 			const QByteArray& keyTagId,

@@ -171,32 +171,45 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 					SendLogMessage(
 								istd::IInformationProvider::IC_ERROR,
 								0,
-								QString("Unexpected operation type :'%1' at %2").arg(operationTypeId, QString::number(m_lastReadLine + 1)),
+								QString("Unexpected operation type :'%1' at line %2").arg(operationTypeId, QString::number(m_lastReadLine + 1)),
 								__func__);
-					I_CRITICAL();
 
 					return false;
 				}
 
-				QByteArray requestName;
-				retVal = retVal && MoveToNextReadableSymbol();
-				retVal = retVal && ReadToDelimeterOrSpace("}", requestName);
-				requestName = requestName.trimmed();
+				bool hasNext = false;
+				do{
+					hasNext = false;
+					QByteArray requestName;
+					retVal = retVal && MoveToNextReadableSymbol();
+					retVal = retVal && ReadToDelimeterOrSpace("}|", requestName);
+					requestName = requestName.trimmed();
 
-				auto foundIterator = std::find_if(m_requests.cbegin(), m_requests.cend(), [&requestName](const CSdlRequest& request){
-					return (request.GetName() == requestName);
-				});
-				if (foundIterator == m_requests.cend()){
-					SendLogMessage(
-								istd::IInformationProvider::IC_ERROR,
-								0,
-								QString("Unable to find request '%1' at %2").arg(requestName, QString::number(m_lastReadLine + 1)),
-								__func__);
-					I_CRITICAL();
+					auto foundIterator = std::find_if(m_requests.cbegin(), m_requests.cend(), [&requestName](const CSdlRequest& request){
+						return (request.GetName() == requestName);
+					});
+					if (foundIterator == m_requests.cend()){
+						SendLogMessage(
+							istd::IInformationProvider::IC_ERROR,
+							0,
+							QString("Unable to find request '%1' at %2").arg(requestName, QString::number(m_lastReadLine + 1)),
+							__func__);
+						I_CRITICAL();
 
-					return false;
-				}
-				documentType.AddOperation(operationType, *foundIterator);
+						return false;
+					}
+					documentType.AddOperation(operationType, *foundIterator);
+
+					// get view might has several operations
+					if (operationType == CSdlDocumentType::OT_GET_VIEW){
+						if (QChar(m_lastReadChar).isSpace()){
+							retVal = retVal && MoveToNextReadableSymbol();
+						}
+						if (m_lastReadChar == '|'){
+							hasNext = true;
+						}
+					}
+				} while(hasNext);
 			}
 		}
 		// extract subtypes
@@ -210,6 +223,9 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 			if (retVal){
 				documentType.AddSubtype(documentSubtype);
 			}
+			else {
+				return false;
+			}
 		}
 		else {
 			SendLogMessage(
@@ -217,7 +233,6 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 						0,
 						QString("Unexpected directive '%1' at %2").arg(keyword, QString::number(m_lastReadLine + 1)),
 						__func__);
-			I_CRITICAL();
 
 			return false;
 		}

@@ -529,7 +529,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddRequiredIncludesForDocum
 	stream << QStringLiteral(" includes");
 	FeedStream(stream, 1, false);
 
-	const QMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
+	const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
 	for (auto operationIter = operationsList.cbegin(); operationIter != operationsList.cend(); ++operationIter){
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("#include \"C");
@@ -551,10 +551,10 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 
 	const QString documentClassName = sdlDocumentType.GetReferenceType().GetName();
 
-	const QMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
+	const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
 
 	QList<imtsdl::CSdlRequest> implementedGetRequests;
-	QMapIterator operationsIter(operationsList);
+	QMultiMapIterator operationsIter(operationsList);
 	while (operationsIter.hasNext()){
 		auto operation = operationsIter.next();
 		imtsdl::CSdlRequest sdlRequest = operation.value();
@@ -896,7 +896,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestCheck(QT
 		std::make_pair(imtsdl::CSdlDocumentType::OT_EXPORT,					QStringLiteral("OT_EXPORT"))
 	});
 
-	QMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operations = sdlDocumentType.GetOperationsList();
+	QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operations = sdlDocumentType.GetOperationsList();
 
 	for (auto operationsIter = operations.cbegin(); operationsIter != operations.cend(); ++operationsIter){
 		const QString requestClassName = operationsIter->GetName() + QStringLiteral("GqlRequest");
@@ -929,14 +929,14 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplFor
 	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
 
 	QMultiMap<imtsdl::CSdlDocumentType::OperationType, ImplGenerationInfo> requestInfoMultiMap;
-	QMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> requestMap(sdlDocumentType.GetOperationsList());
+	QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> requestMap(sdlDocumentType.GetOperationsList());
 	const QString typeClassName = sdlDocumentType.GetReferenceType().GetName();
 	for (auto mapIter = requestMap.cbegin(); mapIter != requestMap.cend(); ++mapIter){
 		requestInfoMultiMap.insert(mapIter.key(), ImplGenerationInfo(mapIter.value(), typeClassName));
 	}
 
 	for (const imtsdl::CSdlDocumentType& documentType: sdlDocumentType.GetSubtypes()){
-		QMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> subtypeRequestMap(documentType.GetOperationsList());
+		QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> subtypeRequestMap(documentType.GetOperationsList());
 		const QString subtypeClassName = documentType.GetReferenceType().GetName();
 		for (auto mapIter = subtypeRequestMap.cbegin(); mapIter != subtypeRequestMap.cend(); ++mapIter){
 			requestInfoMultiMap.insert(mapIter.key(), ImplGenerationInfo(mapIter.value(), subtypeClassName));
@@ -1107,7 +1107,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCodeFor
 	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
 
 	QMultiMap<imtsdl::CSdlDocumentType::OperationType, ImplGenerationInfo> requestInfoMultiMap;
-	QMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> requestMap(sdlDocumentType.GetOperationsList());
+	QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> requestMap(sdlDocumentType.GetOperationsList());
 	const QString typeClassName = sdlDocumentType.GetReferenceType().GetName();
 	for (auto mapIter = requestMap.cbegin(); mapIter != requestMap.cend(); ++mapIter){
 		if (s_nonTrivialOperationMethodsMap.contains(mapIter.key())){
@@ -1116,7 +1116,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCodeFor
 	}
 
 	for (const imtsdl::CSdlDocumentType& documentType: sdlDocumentType.GetSubtypes()){
-		QMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> subtypeRequestMap(documentType.GetOperationsList());
+		QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> subtypeRequestMap(documentType.GetOperationsList());
 		const QString subtypeClassName = documentType.GetReferenceType().GetName();
 		for (auto mapIter = subtypeRequestMap.cbegin(); mapIter != subtypeRequestMap.cend(); ++mapIter){
 			if (s_nonTrivialOperationMethodsMap.contains(mapIter.key())){

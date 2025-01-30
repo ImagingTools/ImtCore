@@ -39,7 +39,8 @@ public:
 		OT_ELEMENT_IDS,
 		OT_ELEMENT_HISTORY,
 		OT_IMPORT,
-		OT_EXPORT
+		OT_EXPORT,
+		OT_GET_VIEW
 	};
 	I_DECLARE_ENUM(OperationType,
 				OT_GET,
@@ -58,7 +59,8 @@ public:
 				OT_ELEMENT_IDS,
 				OT_ELEMENT_HISTORY,
 				OT_IMPORT,
-				OT_EXPORT)
+				OT_EXPORT,
+				OT_GET_VIEW)
 
 	QString GetName() const;
 	void SetName(const QString& name);
@@ -66,10 +68,10 @@ public:
 	CSdlType GetReferenceType() const;
 	void SetReferenceType(const CSdlType& referenceType);
 
-	QMap<OperationType, CSdlRequest> GetOperationsList() const;
+	QMultiMap<OperationType, CSdlRequest> GetOperationsList() const;
 	bool HasRequest(OperationType operationType) const;
 	CSdlRequest GetRequest(OperationType operationType) const;
-	void SetOperationsList(const QMap<OperationType, CSdlRequest>& operationsList);
+	void SetOperationsList(const QMultiMap<OperationType, CSdlRequest>& operationsList);
 	void AddOperation(OperationType type, const CSdlRequest& operation);
 
 	SdlDocumentTypeList GetSubtypes() const;
@@ -90,18 +92,17 @@ public:
 				const QByteArray& containerTagName,
 				const QByteArray& elementTagName);
 
-	static bool SerializeOperationsList(
-				iser::IArchive& archive,
-				QMap<OperationType, CSdlRequest>& container,
-				const QByteArray& containerTagName,
-				const QByteArray& elementTagName,
-				const QByteArray& keyTagId,
-				const QByteArray& valueTagId);
+	static bool SerializeOperationsList(iser::IArchive& archive,
+										QMultiMap<OperationType, CSdlRequest>& container,
+										const QByteArray& containerTagName,
+										const QByteArray& elementTagName,
+										const QByteArray& keyTagId,
+										const QByteArray& valueTagId);
 
 private:
 	QString m_name;
 	CSdlType m_referenceType;
-	QMap<OperationType, CSdlRequest> m_operationsList;
+	QMultiMap<OperationType, CSdlRequest> m_operationsList;
 	SdlDocumentTypeList m_subtypes;
 };
 
