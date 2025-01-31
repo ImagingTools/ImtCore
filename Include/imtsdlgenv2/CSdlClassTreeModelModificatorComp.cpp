@@ -141,7 +141,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 	}
 
 	else if (isArray){
-		AddPrimitiveArrayFieldWriteToModelCode(stream, field, sdlType, optional);
+		AddPrimitiveArrayFieldWriteToModelCode(stream, field, sdlType, isEnum, optional);
 
 		return;
 	}
@@ -267,7 +267,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 	}
 
 	else if (isArray){
-		AddPrimitiveArrayFieldReadFromModelCode(stream, field, sdlType, optional);
+		AddPrimitiveArrayFieldReadFromModelCode(stream, field, sdlType, isEnum, optional);
 
 		return;
 	}
@@ -532,6 +532,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(
 	QTextStream& stream,
 	const imtsdl::CSdlField& field,
 	const imtsdl::CSdlType& sdlType,
+	bool isEnum,
 	bool optional)
 {
 	if (!optional && field.IsRequired()){
@@ -541,7 +542,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(
 		else if (!optional && (!field.IsArray() || field.IsNonEmpty())){
 			AddArrayInternalChecksFail(stream, field, false);
 		}
-		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field, sdlType, optional);
+		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field, sdlType, isEnum, optional);
 		FeedStream(stream, 1, false);
 	}
 	else {
@@ -550,7 +551,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(
 		stream << GetNullCheckString(field, false);
 		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
-		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field, sdlType, optional, 2);
+		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field, sdlType, isEnum, optional, 2);
 		stream << QStringLiteral("\n\t}");
 		FeedStream(stream, 1, false);
 	}
@@ -561,6 +562,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			const imtsdl::CSdlType& sdlType,
+			bool isEnum,
 			bool optional,
 			quint16 hIndents)
 {
@@ -588,6 +590,23 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
+	if(isEnum){
+		FeedStreamHorizontally(stream, hIndents + 1);
+		const QString enumSourceVarName =  field.GetId() + QStringLiteral("->at(") + treeModelIndexVarName + ')';
+		const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+
+		// declare target value, to store value
+		stream << QStringLiteral("QString ");
+		stream << enumConvertedVarName << ';';
+		FeedStream(stream, 1, false);
+
+		imtsdl::CSdlEnum foundEnum;
+		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+		Q_ASSERT(found);
+
+		WriteConversionFromEnum(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+	}
+
 	// inLoop: insert ien item to model
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << newTreeModelVarName << QStringLiteral("->InsertNewItem();");
@@ -596,9 +615,14 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 	// inLoop: add item and check
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << newTreeModelVarName << QStringLiteral("->SetData(QByteArray(), ");
-	stream << field.GetId();
-	stream << QStringLiteral("->at(") << treeModelIndexVarName;
-	stream << QStringLiteral("), ") << treeModelIndexVarName << ')' << ';';
+	if (isEnum){
+		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("StringValue");
+	}
+	else{
+		stream << field.GetId();
+		stream << QStringLiteral("->at(") << treeModelIndexVarName << ')';
+	}
+	stream << ',' << ' ' << treeModelIndexVarName << ')' << ';';
 	FeedStream(stream, 1, false);
 
 	// end of loop
@@ -611,6 +635,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			const imtsdl::CSdlType& sdlType,
+			bool isEnum,
 			bool optional)
 {
 	FeedStreamHorizontally(stream, 1);
@@ -632,13 +657,13 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 		stream << '}';
 		FeedStream(stream, 1, false);
 
-		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field, optional);
+		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field, isEnum, optional);
 	}
 	else {
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model != nullptr){");
 		FeedStream(stream, 1, false);
 
-		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field, optional, 2);
+		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field, isEnum, optional, 2);
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
@@ -651,6 +676,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
+			bool isEnum,
 			bool optional,
 			quint16 hIndents)
 {
@@ -677,9 +703,17 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 	}
 
 	// declare temp list var
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, true);
+	structNameConverter.addVersion = true;
+
 	const QString listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("List");
 	FeedStreamHorizontally(stream, hIndents);
-	stream << ConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+	if (isEnum){
+		stream << structNameConverter.GetString();
+	}
+	else{
+		stream << ConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+	}
 	stream << ' ' << listVariableName << ';';
 	FeedStream(stream, 1, false);
 
@@ -693,20 +727,53 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 
 	// inLoop: declare temp var
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << OptListConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
-	stream << ' ' << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral(" = ");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetData(QByteArray(), ");
-	stream << indexVariableName << QStringLiteral(").");
-	stream << GetFromVariantConversionStringExt(field, true);
-	stream << ';';
+	if (isEnum){
+
+		const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
+		const QString enumSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+
+
+		structNameConverter.listWrap = false;
+		stream << structNameConverter.GetString();
+		stream << ' ' << dataVarName << ';';
+		FeedStream(stream, 1, false);
+
+		// declare temp value, to store string equivalent
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("QString ");
+		stream << enumSourceVarName;
+		stream << QStringLiteral(" = ");
+		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetData(QByteArray(), ");
+		stream << indexVariableName << QStringLiteral(").toString();");
+		FeedStream(stream, 1, false);
+
+		imtsdl::CSdlEnum foundEnum;
+		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+		Q_ASSERT(found);
+
+		WriteConversionFromString(stream, foundEnum, enumSourceVarName, dataVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+	}
+	else{
+		stream << OptListConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+		stream << ' ' << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral(" = ");
+		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetData(QByteArray(), ");
+		stream << indexVariableName << QStringLiteral(").");
+		stream << GetFromVariantConversionStringExt(field, true);
+		stream << ';';
+	}
 	FeedStream(stream, 1, false);
 
 	// inLoop: add variable to tempList
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << listVariableName;
 	stream << QStringLiteral(" << ");
-	stream << GetDecapitalizedValue(field.GetId()) << ';';
+	if (isEnum){
+		stream << GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data") << ';';
+	}
+	else{
+		stream << GetDecapitalizedValue(field.GetId()) << ';';
+	}
 	FeedStream(stream, 1, false);
 
 	// inLoop: end
