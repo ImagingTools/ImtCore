@@ -130,7 +130,6 @@ Item {
     onCommandsControllerChanged: {
         if (commandsController){
             commandsController.commandsView = viewBase.commandsView;
-            commandsConnections.target = commandsController;
         }
     }
 
@@ -161,8 +160,10 @@ Item {
 
     Connections {
         id: commandsConnections;
+		target: viewBase.commandsController;
 
         function onCommandsModelChanged(){
+			console.log("ViewBase onCommandsModelChanged");
             if (viewBase.commandsController){
                 for (let i = 0; i < internal.cachedCommandsModel.getItemsCount(); i++){
                     let subElements = internal.cachedCommandsModel.getData("SubElements", i);
