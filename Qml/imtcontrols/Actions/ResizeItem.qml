@@ -11,8 +11,19 @@ Item{
 	property int gap: 100;
 	property int minSize: 100;
 	property int cursorAreaSize: 6;
+	property bool canCorrectCoord: true;
+
+	signal sizeChanged(real deltaWidth, real deltaHeight);
 
 	function resize(item, globalCoord, deltaX, deltaY){
+
+		if(!resizeItem.targetItem){
+			return;
+		}
+
+		if(resizeItem.targetItem.centered !== undefined){
+			resizeItem.targetItem.centered = false;
+		}
 
 		let width_ = resizeItem.targetItem.width
 		let height_ = resizeItem.targetItem.height
@@ -34,6 +45,10 @@ Item{
 
 			if(okX){
 				resizeItem.targetItem.width -= deltaX;
+				if(resizeItem.canCorrectCoord){
+					resizeItem.targetItem.x += deltaX;
+				}
+				resizeItem.sizeChanged(-deltaX, 0);
 			}
 		}
 		else if(item === right){
@@ -42,6 +57,7 @@ Item{
 
 			if(okX){
 				resizeItem.targetItem.width += deltaX;
+				resizeItem.sizeChanged(deltaX, 0);
 			}
 		}
 		else if(item === top){
@@ -50,6 +66,10 @@ Item{
 
 			if(okY){
 				resizeItem.targetItem.height -= deltaY;
+				if(resizeItem.canCorrectCoord){
+					resizeItem.targetItem.y += deltaY;
+				}
+				resizeItem.sizeChanged(0, -deltaY);
 			}
 		}
 		else if(item === bottom){
@@ -58,6 +78,7 @@ Item{
 
 			if(okY){
 				resizeItem.targetItem.height += deltaY;
+				resizeItem.sizeChanged(0, deltaY);
 			}
 		}
 		else if(item === leftTop){
@@ -68,6 +89,11 @@ Item{
 			if(okX && okY){
 				resizeItem.targetItem.width -= deltaX;
 				resizeItem.targetItem.height -= deltaY;
+				if(resizeItem.canCorrectCoord){
+					resizeItem.targetItem.x += deltaX;
+					resizeItem.targetItem.y += deltaY;
+				}
+				resizeItem.sizeChanged(-deltaX, -deltaY);
 			}
 		}
 		else if(item === rightTop){
@@ -78,6 +104,10 @@ Item{
 			if(okX && okY){
 				resizeItem.targetItem.width += deltaX;
 				resizeItem.targetItem.height -= deltaY;
+				if(resizeItem.canCorrectCoord){
+					resizeItem.targetItem.y += deltaY;
+				}
+				resizeItem.sizeChanged(deltaX, -deltaY);
 			}
 		}
 		else if(item === leftBottom){
@@ -88,6 +118,10 @@ Item{
 			if(okX && okY){
 				resizeItem.targetItem.width -= deltaX;
 				resizeItem.targetItem.height += deltaY;
+				if(resizeItem.canCorrectCoord){
+					resizeItem.targetItem.x += deltaX;
+				}
+				resizeItem.sizeChanged(-deltaX, deltaY);
 			}
 		}
 		else if(item === rightBottom){
@@ -98,9 +132,9 @@ Item{
 			if(okX && okY){
 				resizeItem.targetItem.width += deltaX;
 				resizeItem.targetItem.height += deltaY;
+				resizeItem.sizeChanged(deltaX, deltaY);
 			}
 		}
-
 	}
 
 	MouseArea{
@@ -463,7 +497,8 @@ Item{
 // 	anchors.fill: parent;
 
 // 	Rectangle{
-// 		anchors.centerIn: parent;
+// 	x: 700;
+// 	y:300;
 // 		width: 400;
 // 		height: 400;
 // 		color: "red";

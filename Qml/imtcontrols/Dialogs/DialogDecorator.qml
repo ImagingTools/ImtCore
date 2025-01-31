@@ -51,7 +51,17 @@ DecoratorBase {
 
         if (loaderBodyDialog && loaderBodyDialog.item){
         }
+
+		if(baseElement && baseElement.canResize && width > baseElement.width){
+			baseElement.width = width;
+		}
     }
+
+	onHeightChanged: {
+		if(baseElement && baseElement.canResize && height > baseElement.height){
+			baseElement.height = height;
+		}
+	}
 
     onTitleChanged: {
         if(loaderTopPanel.item){
