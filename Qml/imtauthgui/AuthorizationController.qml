@@ -40,6 +40,29 @@ QtObject {
 
 	property SuperuserProvider superuserProvider: SuperuserProvider {
 		onResult: {
+			if (exists){
+				if (Qt.platform.os == "web"){
+					let token = localStorage.getItem("token");
+					if (token && token !== ""){
+						let savedDateStr = localStorage.getItem("authSavedDate");
+
+						let savedDate = new Date(savedDateStr);
+						let currentDate = new Date();
+						savedDate.setDate(savedDate.getDate() + 1)
+
+						if (savedDate > currentDate){
+							AuthorizationController.readDataFromStorage();
+							AuthorizationController.setAccessToken(token);
+							AuthorizationController.loginSuccessful();
+
+							return;
+						}
+					}
+
+					AuthorizationController.removeDataFromStorage();
+				}
+			}
+
 			root.superuserExistResult(exists, type, error)
 		}
 
@@ -51,6 +74,14 @@ QtObject {
 	property UserTokenProvider userTokenProvider: UserTokenProvider {
 		productId: root.productId;
 		onAccepted: {
+			if (Qt.platform.os == "web"){
+				root.saveDataToStorage();
+			}
+
+			if (isTokenGlobal){
+				root.setAccessToken(token);
+			}
+
 			root.loginSuccessful();
 		}
 
@@ -61,6 +92,37 @@ QtObject {
 		function getHeaders(){
 			return root.getHeaders();
 		}
+	}
+
+	function readDataFromStorage(){
+		userTokenProvider.token = localStorage.getItem("token");
+		userTokenProvider.userId = localStorage.getItem("userId");
+		userTokenProvider.login = localStorage.getItem("login");
+		userTokenProvider.systemId = localStorage.getItem("systemId");
+		userTokenProvider.productId = localStorage.getItem("productId");
+		userTokenProvider.permissions = localStorage.getItem("permissions");
+	}
+
+	function saveDataToStorage(){
+		localStorage.setItem("token", userTokenProvider.token);
+		localStorage.setItem("userId", userTokenProvider.userId);
+		localStorage.setItem("login", userTokenProvider.login);
+		localStorage.setItem("systemId", userTokenProvider.systemId);
+		localStorage.setItem("productId", userTokenProvider.productId);
+		localStorage.setItem("permissions", userTokenProvider.permissions);
+
+		let currentDate = new Date();
+		localStorage.setItem("authSavedDate", currentDate.toISOString());
+	}
+
+	function removeDataFromStorage(){
+		localStorage.removeItem("token");
+		localStorage.removeItem("userId");
+		localStorage.removeItem("login");
+		localStorage.removeItem("systemId");
+		localStorage.removeItem("productId");
+		localStorage.removeItem("permissions");
+		localStorage.removeItem("authSavedDate");
 	}
 
 	function getHeaders(){
@@ -95,11 +157,17 @@ QtObject {
 		userTokenProvider.login = ""
 		userTokenProvider.userId = ""
 		userTokenProvider.token = ""
+		userTokenProvider.systemId = ""
 		userTokenProvider.permissions = []
+		setAccessToken("");
 
-		userTokenProvider.authorizationGqlModel.SetGlobalAccessToken("");
+		removeDataFromStorage();
 
 		root.logoutSignal();
+	}
+
+	function setAccessToken(token){
+		userTokenProvider.authorizationGqlModel.SetGlobalAccessToken(token);
 	}
 
 	function login(param){

@@ -53,9 +53,6 @@ QtObject {
             AuthorizationPayload {
                 onFinished: {
                     container.token = m_token;
-                    if (container.isTokenGlobal){
-                        container.authorizationGqlModel.SetGlobalAccessToken(m_token);
-                    }
 
                     container.userId = m_userId;
                     container.login = m_username;
