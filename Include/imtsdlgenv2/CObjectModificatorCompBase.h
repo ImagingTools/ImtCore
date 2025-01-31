@@ -236,8 +236,8 @@ private:
 	void AddFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, quint16 hIndents = 1);
 	void AddCustomFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 	void AddCustomFieldReadFromObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
-	void AddArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddArrayFieldReadFromObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
+	void AddArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum);
+	void AddArrayFieldReadFromObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, quint16 hIndents = 1);
 	void AddCustomArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 	void AddCustomArrayFieldReadToObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
 };

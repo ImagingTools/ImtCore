@@ -100,7 +100,18 @@ bool CSdlClassJsonModificatorComp::AddFieldValueAppendToObjectArray(QTextStream&
 {
 	stream << arrayContainerVariableName;
 	stream << ' '<< '<' << '<' << ' ';
-	stream << variableName;
+
+	// special type for bytearray. Json Array Can't store bytes, only string
+	const QString convertedType = ConvertTypeOrEnum(field, m_sdlEnumListCompPtr->GetEnums(false));
+	if (convertedType == QStringLiteral("QByteArray")){
+		stream << QStringLiteral("QString(");
+		stream << variableName;
+		stream << ')';
+	}
+	else{
+		stream << variableName;
+	}
+
 	stream << ';';
 
 	return true;

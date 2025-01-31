@@ -275,7 +275,7 @@ void CObjectModificatorCompBase::AddFieldReadFromObjectCode(QTextStream& stream,
 		AddCustomFieldReadFromObjectCode(stream, field, optional);
 	}
 	else if (isArray){
-		AddArrayFieldReadFromObjectCode(stream, field, optional);
+		AddArrayFieldReadFromObjectCode(stream, field, optional, isEnum);
 	}
 	else {
 		AddFieldValueReadFromObject(stream, field, optional, isEnum);
@@ -413,7 +413,7 @@ void CObjectModificatorCompBase::AddCustomFieldWriteToObjectImplCode(
 	AddObjectValueWriteToObject(stream, field, objectContainerVariableName, hIndents);
 }
 
-/// \todo add enum support
+
 void CObjectModificatorCompBase::AddArrayFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
 {
 	if (!optional && field.IsRequired()){
@@ -461,13 +461,31 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
+	imtsdl::CSdlEnum sdlEnum;
+	const bool isEnum = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), sdlEnum);
+
+	QString variableName = (field.GetId() + QStringLiteral("->at(") + dataIndexVarName + ')');
+	if (isEnum){
+		const QString enumSourceVarName = variableName;
+		const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+		variableName = enumConvertedVarName;
+
+		// declare target value, to store value
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("QString ");
+		stream << enumConvertedVarName << ';';
+		FeedStream(stream, 1, false);
+
+		WriteConversionFromEnum(stream, sdlEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+	}
+
 	// inLoop: add item
 	FeedStreamHorizontally(stream, hIndents + 1);
 	AddFieldValueAppendToObjectArray(
 				stream,
 				field,
 				newObjectArrayVarName,
-				(field.GetId() + QStringLiteral("->at(") + dataIndexVarName + ')'),
+				variableName,
 				hIndents);
 	FeedStream(stream, 1, false);
 
@@ -704,7 +722,7 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectImplCode(
 
 
 
-void CObjectModificatorCompBase::AddArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
+void CObjectModificatorCompBase::AddArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum)
 {
 	const bool isStrict = bool(!optional && field.IsRequired());
 
@@ -722,7 +740,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectCode(QTextStream& st
 
 	}
 
-	AddArrayFieldReadFromObjectImplCode(stream, field, optional, 1 + quint16(!isStrict));
+	AddArrayFieldReadFromObjectImplCode(stream, field, optional, isEnum, 1 + quint16(!isStrict));
 
 	if (!isStrict){
 		FeedStreamHorizontally(stream, 1);
@@ -736,6 +754,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			bool optional,
+			bool isEnum,
 			quint16 hIndents)
 {
 	ListAccessResult result;
@@ -778,7 +797,12 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 	
 	// inLoop: declare temp var
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << OptListConvertTypeWithNamespace(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+	if (isEnum){
+		stream << QStringLiteral("QString");
+	}
+	else{
+		stream << OptListConvertTypeWithNamespace(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+	}
 	stream << QStringLiteral(" temp") << GetCapitalizedValue(field.GetId());
 	stream << ' ' << '=' << ' ';
 	stream << result.listVariableName;
@@ -802,12 +826,36 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 	FeedStream(stream, 1, false);
 
 	// inLoop: add temp variable to object's List
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << field.GetId();
-	stream << QStringLiteral("->append(");
-	stream <<  QStringLiteral("temp") << GetCapitalizedValue(field.GetId());
-	stream << ')' << ';';
-	FeedStream(stream, 1, false);
+	if (isEnum){
+		const QString enumSourceVarName = QStringLiteral("temp") + GetCapitalizedValue(field.GetId());
+		const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataValue");
+
+		imtsdl::CSdlEnum foundEnum;
+		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
+		Q_ASSERT(found);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << OptListConvertTypeWithNamespace(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+		stream << ' ' << dataVarName << ';';
+		FeedStream(stream, 1, false);
+
+		WriteConversionFromString(stream, foundEnum, enumSourceVarName, dataVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << field.GetId();
+		stream << QStringLiteral("->append(");
+		stream << dataVarName;
+		stream << ')' << ';';
+		FeedStream(stream, 1, false);
+	}
+	else{
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << field.GetId();
+		stream << QStringLiteral("->append(");
+		stream <<  QStringLiteral("temp") << GetCapitalizedValue(field.GetId());
+		stream << ')' << ';';
+		FeedStream(stream, 1, false);
+	}
 
 	// inLoop: end
 	FeedStreamHorizontally(stream, hIndents);
