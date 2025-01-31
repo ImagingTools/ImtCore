@@ -26,9 +26,10 @@ void CDatabaseAutomaticBackupComp::OnComponentCreated()
 		connect(&m_backupWatcher, &QFutureWatcher<bool>::finished, this, &CDatabaseAutomaticBackupComp::OnBackupFinished);
 
 		const int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr : 60000;
+		m_timer.setInterval(interval);
 
 		if (!*m_backupOnStartAttrPtr){
-			m_timer.start(interval);
+			m_timer.start();
 		}
 		else{
 			m_backupWatcher.setFuture(QtConcurrent::run(&CDatabaseAutomaticBackupComp::Backup, this));
