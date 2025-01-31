@@ -52,7 +52,7 @@ Item {
 					anchors.verticalCenter: parent.verticalCenter
 					anchors.left: iconItem.right;
 					anchors.right: parent.right;
-					anchors.margins: Style.size_mainMargin
+					anchors.rightMargin: Style.size_mainMargin;
 					text: model.text
 					wrapMode: Text.WordWrap
 				}

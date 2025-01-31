@@ -37,8 +37,6 @@ ComboBox {
 	}
 
 	onFinished: {
-		// console.log("onFinished", itemId);
-		// console.log("proxyModel.sourceIndexes", JSON.stringify(proxyModel.sourceIndexes));
 		if (index >= 0){
 			if (itemId in proxyModel.sourceIndexes){
 				comboBoxContainer.currentIndex = proxyModel.sourceIndexes[itemId]

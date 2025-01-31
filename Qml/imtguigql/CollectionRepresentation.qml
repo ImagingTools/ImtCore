@@ -438,6 +438,10 @@ Item {
                         if(dataModelLocal.containsKey("Headers")){
                             dataModelLocal = dataModelLocal.getData("Headers");
 
+							if (root.headersModel){
+								root.headersModel.destroy();
+							}
+
                             root.headersModel = dataModelLocal;
 
                             internal.headersUpdatingBlock = false;
@@ -530,6 +534,11 @@ Item {
                                 let dataObject = responseObj["data"];
                                 let dataModelLocal = dataObject[root.collectionId + "List"];
                                 root.payloadModel.fromObject(dataModelLocal)
+
+								if (root.elementsModel){
+									root.elementsModel.destroy()
+								}
+
                                 root.elementsModel = root.payloadModel.m_items
                             }
                         }

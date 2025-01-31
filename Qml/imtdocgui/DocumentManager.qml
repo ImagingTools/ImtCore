@@ -186,7 +186,7 @@ QtObject {
 	function getDocumentDataController(documentTypeId)
 	{
 		if (!dataControllerIsRegistered(documentTypeId)){
-			console.error("Data controller for documents with type-ID: ", documentTypeId, " is unregistered!");
+			console.warn("Data controller for documents with type-ID: ", documentTypeId, " is unregistered!");
 
 			return defaultDataController.createObject(documentManager);
 		}
@@ -276,7 +276,7 @@ QtObject {
 
 	function openDocument(documentId, documentTypeId, viewTypeId)
 	{
-		console.log("openDocument", documentId, documentTypeId, viewTypeId)
+		console.debug("openDocument", documentId, documentTypeId, viewTypeId)
 
 		let index = getDocumentIndexByDocumentId(documentId);
 		if (index >= 0){
@@ -302,9 +302,8 @@ QtObject {
 		}
 
 		if (documentData.documentDataController){
-			documentData.documentDataController.updateDocumentModel();
-
 			documentData.documentDataController.modelChanged.connect(onResult);
+			documentData.documentDataController.updateDocumentModel();
 		}
 		else{
 			Events.sendEvent("StopLoading");

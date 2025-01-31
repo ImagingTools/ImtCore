@@ -39,6 +39,7 @@ ComboBoxElementView {
                 descriptionFieldId: root.descriptionFieldId;
 				nameId: root.nameId;
 				sourceModel: root.sourceModel;
+				changeable: root.changeable;
 
                 Component.onCompleted: {
                     if (root.delegate){
@@ -67,6 +68,12 @@ ComboBoxElementView {
 
 					function onSourceModelChanged() {
 						cb.sourceModel = root.sourceModel;
+					}
+
+					function onChangeableChanged(){
+						if (cb.changeable != root.changeable){
+							cb.changeable = root.changeable;
+						}
 					}
 				}
             }

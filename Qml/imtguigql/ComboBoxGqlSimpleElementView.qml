@@ -40,7 +40,9 @@ ComboBoxElementView {
                 root.setupComboBox(cb);
             }
 
-            onModelChanged: root.model = model;
+			onModelChanged:  {
+				root.model = model;
+			}
 
             function getHeaders(){
                 return root.getHeaders();

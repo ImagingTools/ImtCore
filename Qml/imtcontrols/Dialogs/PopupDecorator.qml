@@ -1,4 +1,4 @@
-import QtQuick 2.12
+import QtQuick
 import Qt5Compat.GraphicalEffects
 import QtGraphicalEffects 1.0
 import Acf 1.0
@@ -50,9 +50,11 @@ DecoratorBase {
         anchors.top: topContentLoader.bottom;
 
         width: root.width;
-        height: popupMenuListView.height + 2 * Style.size_smallMargin;
+		height: visible ? popupMenuListView.height + 2 * Style.size_smallMargin : false;
 
-        color: Style.baseColor;
+		color: Style.baseColor;
+
+		visible: popupMenuListView.count > 0;
 
         border.width: 1;
         border.color: Style.borderColor;
@@ -79,10 +81,15 @@ DecoratorBase {
 			anchors.verticalCenter: parent.verticalCenter;
 
 			width: root.width;
-			height: Math.min(root.shownItemsCount * root.itemHeight, root.itemHeight * count)
 
 			boundsBehavior: Flickable.StopAtBounds;
 			clip: true;
+
+			onContentHeightChanged: {
+				console.log("onContentHeightChanged", root, popupMenuListView);
+				let height_ = Math.min(root.shownItemsCount * root.itemHeight, contentHeight);
+				popupMenuListView.height = height_;
+			}
 
 			delegate: root.delegate;
 		}

@@ -15,13 +15,16 @@ Item {
     */
     property bool loadByClick: true;
 
-    Component.onCompleted: {
-        Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
-    }
+	LocalizationEvent {
+		id: localizationEvent;
 
-    Component.onDestruction: {
-        Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
-    }
+		onLocalizationChanged: {
+			let loggedUserId = AuthorizationController.getLoggedUserId();
+			if (loggedUserId !== ""){
+				pagesProvider.updateModel();
+			}
+		}
+	}
 
     function updateModel(){
         pagesProvider.updateModel();
@@ -30,13 +33,6 @@ Item {
     function clearModels(){
         pagesData.model = 0;
         pageModel.clear();
-    }
-
-    function onLocalizationChanged(language){
-        let loggedUserId = AuthorizationController.getLoggedUserId();
-        if (loggedUserId !== ""){
-            pagesProvider.updateModel();
-        }
     }
 
     property alias modelState: pagesProvider.modelState;
