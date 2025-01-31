@@ -728,10 +728,8 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 	// inLoop: declare temp var
 	FeedStreamHorizontally(stream, hIndents + 1);
 	if (isEnum){
-
 		const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
 		const QString enumSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
-
 
 		structNameConverter.listWrap = false;
 		stream << structNameConverter.GetString();
