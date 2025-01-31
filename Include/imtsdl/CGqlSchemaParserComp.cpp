@@ -26,6 +26,7 @@ const QByteArray CGqlSchemaParserComp::s_processedFilesParamId = QByteArrayLiter
 const QByteArray CGqlSchemaParserComp::s_typeListParamId = QByteArrayLiteral("TypeList");
 const QByteArray CGqlSchemaParserComp::s_requestListParamId = QByteArrayLiteral("RequestList");
 const QByteArray CGqlSchemaParserComp::s_documentTypeListParamId = QByteArrayLiteral("DocumentTypeList");
+const QByteArray CGqlSchemaParserComp::s_enumListParamId = QByteArrayLiteral("EnumList");
 
 
 // public methods
@@ -62,6 +63,7 @@ int CGqlSchemaParserComp::DoProcessing(
 	iprm::CParamsSet* typeListParamsPtr = nullptr;
 	iprm::CParamsSet* requestListParamsPtr = nullptr;
 	iprm::CParamsSet* documentTypeListParamsPtr = nullptr;
+	iprm::CParamsSet* enumListParamsPtr = nullptr;
 	if (outputParamsSetPtr != nullptr){
 		processedFilesPtr = dynamic_cast<iprm::IOptionsManager*>(outputParamsSetPtr->GetEditableParameter(s_processedFilesParamId));
 		if (processedFilesPtr == nullptr){
@@ -86,6 +88,13 @@ int CGqlSchemaParserComp::DoProcessing(
 			documentTypeListParamsPtr = new iprm::CParamsSet;
 			outputParamsSetPtr->SetEditableParameter(s_documentTypeListParamId, documentTypeListParamsPtr, true);
 		}
+
+		enumListParamsPtr = dynamic_cast<iprm::CParamsSet*>(outputParamsSetPtr->GetEditableParameter(s_enumListParamId));
+		if (enumListParamsPtr == nullptr){
+			enumListParamsPtr = new iprm::CParamsSet;
+			outputParamsSetPtr->SetEditableParameter(s_enumListParamId, enumListParamsPtr, true);
+		}
+
 	}
 
 	// first ensure, this file is not processed
@@ -188,6 +197,13 @@ int CGqlSchemaParserComp::DoProcessing(
 		for (const CSdlDocumentType& sdlDocumentType: std::as_const(m_documentTypes)){
 			CSdlDocumentType* sdlDocumentTypePtr = new CSdlDocumentType(sdlDocumentType);
 			documentTypeListParamsPtr->SetEditableParameter(QByteArray::number(documentTypeListParamsPtr->GetParamIds().size()), sdlDocumentTypePtr, true);
+		}
+	}
+
+	if (enumListParamsPtr != nullptr){
+		for (const CSdlEnum& sdlEnum: std::as_const(m_enums)){
+			CSdlEnum* sdlEnumPtr = new CSdlEnum(sdlEnum);
+			enumListParamsPtr->SetEditableParameter(QByteArray::number(enumListParamsPtr->GetParamIds().size()), sdlEnumPtr, true);
 		}
 	}
 
@@ -403,6 +419,36 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 
 				CSdlDocumentType copiedType(*sdlDocumentTypeParam);
 				m_documentTypes << copiedType;
+			}
+		}
+
+		iprm::IParamsSet* enumListParamsPtr = dynamic_cast<iprm::IParamsSet*>(outputParams.GetEditableParameter(s_enumListParamId));
+		if (enumListParamsPtr != nullptr){
+			const iprm::IParamsSet::Ids paramIdList = enumListParamsPtr->GetParamIds();
+			for (const QByteArray& paramId: paramIdList){
+				iprm::TParamsPtr<CSdlEnum> sdlEnumParam(enumListParamsPtr, paramId, true);
+				if (!sdlEnumParam.IsValid()){
+					SendCriticalMessage(0, "Import processing failed");
+
+					return false;
+				}
+
+				// look for duplicates
+				const QString sdlEnumName = sdlEnumParam->GetName();
+				for (const CSdlEnum& sdlEnum: std::as_const(m_enums)){
+					if (sdlEnum.GetName() == sdlEnumName && sdlEnum != *sdlEnumParam){
+						SendErrorMessage(0, QString("Redifinition of '%1' in '%2'. alreadty defined at %3 and %4").arg(
+												sdlEnumName,
+												schemaPath,
+												sdlEnum.GetSchemaFilePath(),
+												sdlEnumParam->GetSchemaFilePath()));
+
+						return false;
+					}
+				}
+
+				CSdlEnum copiedType(*sdlEnumParam);
+				m_enums << copiedType;
 			}
 		}
 	}

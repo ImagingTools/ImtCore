@@ -32,6 +32,7 @@ public:
 	static const QByteArray s_typeListParamId;
 	static const QByteArray s_requestListParamId;
 	static const QByteArray s_documentTypeListParamId;
+	static const QByteArray s_enumListParamId;
 
 public:
 	typedef ilog::TLoggerCompWrap<icomp::TMakeComponentWrap<CGqlExtSchemaParser>> BaseClass;
