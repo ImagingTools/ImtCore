@@ -39,6 +39,13 @@ CommandsRepresentationProvider {
         return false;
     }
 
+	function setIsToggleable(commandId, toggleable){
+		setCommandProperty(commandId, "IsToggleable", toggleable);
+		if (container.commandsView){
+			container.commandsView.setCommandData(commandId, "IsToggleable", toggleable);
+		}
+	}
+
     function setToggled(commandId, toggled){
         setCommandProperty(commandId, "IsToggled", toggled);
         if (container.commandsView){
