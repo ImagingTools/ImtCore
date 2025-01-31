@@ -679,6 +679,15 @@ bool CGqlSchemaParserComp::ValidateSchema()
 				continue;
 			}
 
+			if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_ONLY_FILE){
+				isExternal =  bool(QDir::cleanPath(m_currentSchemaFilePath) != QDir::cleanPath(m_argumentParserCompPtr->GetSchemaFilePath()));
+				if (sdlEnum.GetTargetHeaderFilePath().isEmpty()){
+					const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), QFileInfo(m_currentSchemaFilePath).fileName());
+					const QString headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
+					sdlEnum.SetTargetHeaderFilePath(headerFilePath);
+				}
+			}
+
 			sdlEnum.SetExternal(isExternal);
 			if (!isExternal){
 				const bool isSet = UpdateTypeInfo(sdlEnum, m_schemaParamsPtr.get(), m_argumentParserCompPtr.GetPtr());
