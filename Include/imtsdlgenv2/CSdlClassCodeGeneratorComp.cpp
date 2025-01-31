@@ -108,7 +108,8 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	imtsdl::SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);	for (const imtsdl::CSdlType& sdlType: sdlTypeList){
+	imtsdl::SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
+	for (const imtsdl::CSdlType& sdlType: sdlTypeList){
 		m_headerFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
 		m_sourceFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
 		const bool hasExtDeps = m_argumentParserCompPtr->GetAutoLinkLevel() != imtsdl::ISdlProcessArgumentsParser::ALL_NONE;
@@ -176,7 +177,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 			if (joinHeaders){
 				filterParams.ResetOptions();
 				// first join enums
-				const imtsdl::SdlEnumList enumList = m_sdlEnumListCompPtr->GetEnums(false);
+				const imtsdl::SdlEnumList enumList = m_sdlEnumListCompPtr->GetEnums(true);
 				for (const imtsdl::CSdlEnum& sdlEnum: enumList){
 					filterParams.InsertOption(sdlEnum.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
 					SendVerboseMessage(QString("Add join enum file '%1. Total: %2").arg(sdlEnum.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
