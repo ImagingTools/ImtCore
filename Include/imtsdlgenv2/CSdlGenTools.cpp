@@ -94,8 +94,8 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 				typeListProviderPtr->GetSdlTypes(false),
 				enumListProviderPtr->GetEnums(false));
 			if (!typeForFieldPtr){
-				I_CRITICAL();
 				qCritical() << "Unable to find enum or type for" << sdlFieldPtr->GetId() << "of" << sdlFieldPtr->GetType();
+				I_CRITICAL();
 
 				return QString();
 			}
