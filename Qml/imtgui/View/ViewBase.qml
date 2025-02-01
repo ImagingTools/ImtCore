@@ -29,6 +29,16 @@ Item {
     property bool readOnly: false;
 
     signal commandsModelChanged(var commandsModel)
+	signal commandActivated(string commandId);
+	signal commandsModelEnabled()
+
+	Connections {
+		target: viewBase.commandsDelegate
+		function onCommandActivated(commandId){
+			viewBase.commandActivated(commandId)
+		}
+
+	}
 
     Component {
         id: commandsDecoratorComp;
@@ -45,6 +55,11 @@ Item {
 
 	function setAlertPanel(alertPanelComp){
 		alertPanel.sourceComponent = alertPanelComp;
+	}
+
+
+	onCommandsModelChanged: {
+		console.log("ViewBase local onCommandsModelChanged" ,commandsModel)
 	}
 
 	Loader {
@@ -163,7 +178,6 @@ Item {
 		target: viewBase.commandsController;
 
         function onCommandsModelChanged(){
-			console.log("ViewBase onCommandsModelChanged");
             if (viewBase.commandsController){
                 for (let i = 0; i < internal.cachedCommandsModel.getItemsCount(); i++){
                     let subElements = internal.cachedCommandsModel.getData("SubElements", i);
@@ -181,8 +195,9 @@ Item {
 
                     internal.localizationChanged = false;
                 }
-
-                viewBase.commandsModelChanged(viewBase.commandsController.commandsModel)
+				console.log("ViewBase onCommandsModelChanged");
+				// viewBase.commandsModelEnabled()
+				viewBase.commandsModelChanged(viewBase.commandsController.commandsModel)
             }
 
             blockArea.visible = false;
