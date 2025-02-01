@@ -146,26 +146,25 @@ Item {
                         height: commandsItem.height;
                         spacing: Style.size_mainMargin;
 
-                        Repeater {
+						Repeater {
                             id: repeater2;
                             model: itemDelegate.dataModel.SubElements;
                             delegate: Component { Button {
                                     id: button;
                                     enabled: model ? model.IsEnabled : false;
-                                    visible: priority < 0 || !model ? false : model.Visible;
                                     text: model ? model.Name : "";
                                     widthFromDecorator: true;
                                     heightFromDecorator: true;
-                                    checkable: model && model.IsToggled !== undefined;
+									checkable: model && model.IsToggled !== undefined && model.IsToggleable === true;
                                     checked: model && model.IsToggled !== undefined ? model.IsToggled : false;
-                                    iconSource: model.Icon === "" ? "" : model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
+									iconSource: !model ? "" : model.Icon === "" ? "" : model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
                                                                                            "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
                                     decorator: Component {
                                         TopButtonDecorator {
-                                            property string baseColor: baseElement && baseElement.mouseArea.containsMouse ? Style.baseColor : Style.backgroundColor2;
+											property string baseColor: !baseElement ? "transparent" : baseElement.checked ? Style.borderColor : baseElement.mouseArea.containsMouse ? Style.baseColor : Style.backgroundColor2
                                             property string baseTextColor: !baseElement ? "transparent" : baseElement.enabled ? Style.textColor : Style.inactive_textColor;
-                                            color: button.isPositiveAccent ? commandsItem.positiveAccentColor :
-                                                                             button.isNegativeAccent ? commandsItem.negativeAccentColor : baseColor;
+											color: button.isPositiveAccent ? commandsItem.positiveAccentColor :
+																			 button.isNegativeAccent ? commandsItem.negativeAccentColor : baseColor;
                                             textColor: button.isPositiveAccent || button.isNegativeAccent ? "white" : baseTextColor;
                                             icon.source: button.isPositiveAccent || button.isNegativeAccent ?
                                                              "../../../../" + Style.getIconPath(button.modelData.Icon, Icon.State.Off, Icon.Mode.Disabled)
@@ -175,13 +174,15 @@ Item {
                                         }
                                     }
 
-                                    property bool isNegativeAccent: model.IsEnabled ? commandsItem.negativeAccentCommandIds.includes(model.Id) : false;
-                                    property bool isPositiveAccent: model.IsEnabled ? commandsItem.positiveAccentCommandIds.includes(model.Id) : false;
-                                    property int priority: model.Priority;
-                                    property int groupPriority: itemDelegate.priority;
+									property bool isNegativeAccent: model && model.IsEnabled ? commandsItem.negativeAccentCommandIds.includes(model.Id) : false;
+									property bool isPositiveAccent: model && model.IsEnabled ? commandsItem.positiveAccentCommandIds.includes(model.Id) : false;
+									property int priority: model ? model.Priority : -1;
+									property int groupPriority: itemDelegate.priority;
                                     property var modelData: model;
                                     property var subElements: repeater2.model;
                                     property int maxWidth: -1;
+
+									visible: !model || priority < 0 ? false : model.Visible;
 
                                     onClicked: {
 										// commandsItem.buttonClicked(model.Id, this);

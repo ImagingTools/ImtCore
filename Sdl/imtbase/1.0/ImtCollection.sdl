@@ -40,6 +40,11 @@ input InputId {
 	Id: ID!
 }
 
+input DocumentRepresentation {
+	ObjectId: ID!
+	ViewTypeId: ID
+}
+
 type VisualStatus {
 	ObjectId: ID
 	Icon: String

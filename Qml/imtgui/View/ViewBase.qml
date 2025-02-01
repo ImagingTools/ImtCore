@@ -30,7 +30,6 @@ Item {
 
     signal commandsModelChanged(var commandsModel)
 	signal commandActivated(string commandId);
-	signal commandsModelEnabled()
 
 	Connections {
 		target: viewBase.commandsDelegate
@@ -55,11 +54,6 @@ Item {
 
 	function setAlertPanel(alertPanelComp){
 		alertPanel.sourceComponent = alertPanelComp;
-	}
-
-
-	onCommandsModelChanged: {
-		console.log("ViewBase local onCommandsModelChanged" ,commandsModel)
 	}
 
 	Loader {
@@ -196,7 +190,6 @@ Item {
                     internal.localizationChanged = false;
                 }
 				console.log("ViewBase onCommandsModelChanged");
-				// viewBase.commandsModelEnabled()
 				viewBase.commandsModelChanged(viewBase.commandsController.commandsModel)
             }
 
