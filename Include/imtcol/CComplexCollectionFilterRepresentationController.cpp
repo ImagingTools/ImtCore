@@ -17,103 +17,104 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 			imtbase::IComplexCollectionFilter::FieldFilter& target,
 			ilog::IMessageConsumer* messageConsumerPtr)
 {
-	bool retVal = true;
+	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+
 	bool isOk = true;
+	bool retVal = true;
 
 	QByteArray targetFieldId;
 	if (!source.fieldId){
+		SendErrorMessage("Filter field ID not available", messageConsumerPtr);
 		return false;
 	}
-
 	target.fieldId = *source.fieldId;
 
 	QString value;
 	if (source.filterValue){
-		value = *source.filterValue;
+		SendErrorMessage("Filter field value not available", messageConsumerPtr);
+		return false;
+	}
+	value = *source.filterValue;
+
+	if (!source.filterValueType){
+		SendErrorMessage("Filter field value type not available", messageConsumerPtr);
+		return false;
 	}
 
-	sdl::imtbase::ComplexCollectionFilter::CValueType::V1_0 sourceFilterValueType;
-	if (source.filterValueType){
-		sourceFilterValueType = *source.filterValueType;
-	}
-
-	if (sourceFilterValueType.signedNumber && *sourceFilterValueType.signedNumber){
+	Filter::ValueType sourceFilterValueType = *source.filterValueType;
+	switch (sourceFilterValueType){
+	case Filter::ValueType::Integer:
 		target.filterValue = value.toLongLong(&isOk);
-	}
-	else if (sourceFilterValueType.unsignedNumber && *sourceFilterValueType.unsignedNumber){
-		target.filterValue = value.toULongLong(&isOk);
-	}
-	else if (sourceFilterValueType.floatingPoint && *sourceFilterValueType.floatingPoint){
+		break;
+	case Filter::ValueType::Number:
 		target.filterValue = value.toDouble(&isOk);
-	}
-	else if (sourceFilterValueType.stringValue && *sourceFilterValueType.stringValue){
+		break;
+	case Filter::ValueType::String:
 		target.filterValue = value;
-	}
-	else if (sourceFilterValueType.boolValue && *sourceFilterValueType.boolValue){
-		if (value == "true"){
+		break;
+	case Filter::ValueType::Bool:
+		if (value.compare("true", Qt::CaseInsensitive)){
 			target.filterValue = true;
 		}
-		else if (value == "false"){
+		else if (value.compare("false", Qt::CaseInsensitive)){
 			target.filterValue = false;
 		}
 		else{
-			isOk = false;
+			SendErrorMessage("Invalid filter bool value", messageConsumerPtr);
+			return false;
 		}
-	}
-	else{
-		retVal = false;
+		break;
+	default:
+		SendErrorMessage("Invalid filter value type", messageConsumerPtr);
+		return false;
 	}
 
 	retVal = retVal && isOk;
 
 	if (retVal){
-		sdl::imtbase::ComplexCollectionFilter::CFilterOperations::V1_0 filterOperations;
-		if (source.filterOperation){
-			filterOperations = *source.filterOperation;
+		if (source.filterOperations){
+			SendErrorMessage("Filter operation not available", messageConsumerPtr);
+			return false;
 		}
+		QList<Filter::FilterOperation> filterOperations = *source.filterOperations;
 
 		int flags = 0;
 
-		if (filterOperations.equalOp && *filterOperations.equalOp){
+		if (filterOperations.contains(Filter::FilterOperation::Equal)){
 			if (flags & FOF_CONTAINS){
 				SendErrorMessage("Equal and Contains flags can't be combined", messageConsumerPtr);
-
 				return false;
 			}
 
 			flags |= FOF_EQUAL;
 		}
-		else if (filterOperations.notOp && *filterOperations.notOp){
+		else if (filterOperations.contains(Filter::FilterOperation::Not)){
 			flags |= FOF_NOT;
 		}
-		else if (filterOperations.greaterOp && *filterOperations.greaterOp){
+		else if (filterOperations.contains(Filter::FilterOperation::Greater)){
 			if (flags & FOF_CONTAINS){
 				SendErrorMessage("Greater and Contains flags can't be combined", messageConsumerPtr);
-
 				return false;
 			}
 
 			flags |= FOF_GREATER;
 		}
-		else if (filterOperations.lessOp && *filterOperations.lessOp){
+		else if (filterOperations.contains(Filter::FilterOperation::Less)){
 			if (flags & FOF_GREATER){
 				SendErrorMessage("Less and Greater flags can't be combined", messageConsumerPtr);
-
 				return false;
 			}
 
 			if (flags & FOF_CONTAINS){
 				SendErrorMessage("Less and Contains flags can't be combined", messageConsumerPtr);
-
 				return false;
 			}
 
 			flags |= FOF_LESS;
 		}
-		else if (filterOperations.containsOp && *filterOperations.containsOp){
+		else if (filterOperations.contains(Filter::FilterOperation::Contains)){
 			if (flags != 0){
 				SendErrorMessage("Contains flag can't be combined with any other flag", messageConsumerPtr);
-
 				return false;
 			}
 
@@ -162,18 +163,20 @@ bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
 			imtbase::IComplexCollectionFilter::GroupFilter& target,
 			ilog::IMessageConsumer* messageConsumerPtr)
 {
-	QList<sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0> sourceFieldSubFilters;
+	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+
+	QList<Filter::CFieldFilter::V1_0> sourceFieldSubFilters;
 	if (source.fieldFilters){
 		sourceFieldSubFilters = *source.fieldFilters;
 	}
-	QList<sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0> sourceGroupSubFilters;
+	QList<Filter::CGroupFilter::V1_0> sourceGroupSubFilters;
 	if (source.groupFilters){
 		sourceGroupSubFilters = *source.groupFilters;
 	}
 	QVector<imtbase::IComplexCollectionFilter::FieldFilter> targetFieldSubFilters;
 	QVector<imtbase::IComplexCollectionFilter::GroupFilter> targetGroupSubFilters;
 
-	for (const sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& sourceFieldSubFilter : sourceFieldSubFilters){
+	for (const Filter::CFieldFilter::V1_0& sourceFieldSubFilter : sourceFieldSubFilters){
 		imtbase::IComplexCollectionFilter::FieldFilter targetFieldSubFilter;
 
 		if (!ProcessFieldFilter(sourceFieldSubFilter, targetFieldSubFilter, messageConsumerPtr)){
@@ -183,7 +186,7 @@ bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
 		targetFieldSubFilters.append(targetFieldSubFilter);
 	}
 
-	for (const sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& sourceGroupSubFilter : sourceGroupSubFilters){
+	for (const Filter::CGroupFilter::V1_0& sourceGroupSubFilter : sourceGroupSubFilters){
 		imtbase::IComplexCollectionFilter::GroupFilter targetGroupSubFilter;
 
 		if (!ProcessGroupFilter(sourceGroupSubFilter, targetGroupSubFilter, messageConsumerPtr)){
@@ -196,20 +199,20 @@ bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
 	target.fieldFilters = targetFieldSubFilters;
 	target.groupFilters = targetGroupSubFilters;
 
-	sdl::imtbase::ComplexCollectionFilter::CLogicalOperation::V1_0 sourceLogicalOperation;
-	if (source.logicalOperation){
-		sourceLogicalOperation = *source.logicalOperation;
+	if (!source.logicalOperation){
+		return false;
 	}
+	Filter::LogicalOperation sourceLogicalOperation = *source.logicalOperation;
 
-	if (sourceLogicalOperation.andOp && *sourceLogicalOperation.andOp){
+	switch (sourceLogicalOperation){
+	case Filter::LogicalOperation::And:
 		target.logicalOperation = imtbase::IComplexCollectionFilter::LO_AND;
-	}
-	else if (sourceLogicalOperation.orOp && *sourceLogicalOperation.orOp){
+		break;
+	case Filter::LogicalOperation::Or:
 		target.logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
-	}
-	else{
+		break;
+	default:
 		SendErrorMessage("Logical group operation was not defined", messageConsumerPtr);
-
 		return false;
 	}
 
@@ -218,26 +221,28 @@ bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
 
 
 bool CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRepresentationToModel(
-			sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& filterRepresentaion,
-			imtbase::IComplexCollectionFilter& filter,
-			ilog::IMessageConsumer* messageConsumerPtr)
+	sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& filterRepresentaion,
+	imtbase::IComplexCollectionFilter& filter,
+	ilog::IMessageConsumer* messageConsumerPtr)
 {
-	QList<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo::V1_0> sourceSorting;
+	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+
+	QList<Filter::CFieldSortingInfo::V1_0> sourceSorting;
 	if (filterRepresentaion.sortingInfo){
 		sourceSorting = *filterRepresentaion.sortingInfo;
 	}
-	sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0 sourceFilter;
+	Filter::CGroupFilter::V1_0 sourceFilter;
 	if (filterRepresentaion.fieldsFilter){
 		sourceFilter = *filterRepresentaion.fieldsFilter;
 	}
-	sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0 sourceTimeFilter;
+	Filter::CTimeFilter::V1_0 sourceTimeFilter;
 	if (filterRepresentaion.timeFilter){
 		sourceTimeFilter = *filterRepresentaion.timeFilter;
 	}
 
 	// ---
 	imtbase::IComplexCollectionFilter::FieldSortingInfoList sorting;
-	for (const sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo::V1_0& sourceSortingItem  :sourceSorting){
+	for (const Filter::CFieldSortingInfo::V1_0& sourceSortingItem  :sourceSorting){
 		imtbase::IComplexCollectionFilter::FieldSortingInfo fieldSorting;
 
 		if (sourceSortingItem.fieldId){
@@ -268,7 +273,7 @@ bool CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRe
 
 	imtbase::CTimeFilterParam timeFilter;
 	if (filterRepresentaion.timeFilter){
-		sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0 timeFilterSdl = *filterRepresentaion.timeFilter;
+		Filter::CTimeFilter::V1_0 timeFilterSdl = *filterRepresentaion.timeFilter;
 		if (timeFilterSdl.timeRange){
 			sdl::imtbase::ImtBaseTypes::CTimeRange::V1_0 timeRangeSdl = *timeFilterSdl.timeRange;
 
@@ -332,6 +337,10 @@ bool CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRe
 		timeFilter.SetTimeUnit(timeUnit, interpretationMode, multiplier);
 	}
 	filter.SetTimeFilter(timeFilter);
+
+	if (filterRepresentaion.distinctFields){
+		filter.SetDistinctFieldsList(*filterRepresentaion.distinctFields);
+	}
 
 	return true;
 }

@@ -77,6 +77,26 @@ bool CComplexCollectionFilter::SetTimeFilter(const imtbase::ITimeFilterParam& fi
 }
 
 
+const QByteArrayList& CComplexCollectionFilter::GetDistinctFieldsList() const
+{
+	return m_distinctFields;
+}
+
+
+bool CComplexCollectionFilter::SetDistinctFieldsList(const QByteArrayList& filedIds)
+{
+	QSet<QByteArray> idsSet(filedIds.cbegin(), filedIds.cend());
+
+	if (idsSet.count() == filedIds.count()){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_distinctFields = filedIds;
+	}
+
+	return false;
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CComplexCollectionFilter::Serialize(iser::IArchive &archive)
@@ -122,6 +142,9 @@ bool CComplexCollectionFilter::Serialize(iser::IArchive &archive)
 	retVal = retVal && m_timeFilter.Serialize(archive);
 	retVal = retVal && archive.EndTag(timeFilterTag);
 
+	// Serialization of the distinct fields IDs
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_distinctFields, "DistinctFields", "FieldId");
+
 	return retVal;
 }
 
@@ -143,6 +166,7 @@ bool CComplexCollectionFilter::CopyFrom(const IChangeable &object, Compatibility
 		m_sortingInfo = implPtr->m_sortingInfo;
 		m_fieldsFilter = implPtr->m_fieldsFilter;
 		m_timeFilter = implPtr->m_timeFilter;
+		m_distinctFields = implPtr->m_distinctFields;
 
 		return true;
 	}
@@ -157,8 +181,9 @@ bool CComplexCollectionFilter::IsEqual(const IChangeable &object) const
 	if (implPtr != nullptr){
 		return
 			(m_sortingInfo == implPtr->m_sortingInfo) &&
-			(m_fieldsFilter == implPtr->m_fieldsFilter);
-			(m_timeFilter.IsEqual(implPtr->m_timeFilter));
+			(m_fieldsFilter == implPtr->m_fieldsFilter) &&
+			(m_timeFilter.IsEqual(implPtr->m_timeFilter) &&
+			(m_distinctFields == implPtr->m_distinctFields));
 	}
 
 	return false;
@@ -185,6 +210,7 @@ bool CComplexCollectionFilter::ResetData(CompatibilityMode /*mode*/)
 	m_fieldsFilter.fieldFilters.clear();
 	m_fieldsFilter.groupFilters.clear();
 	m_fieldsFilter.logicalOperation = LO_AND;
+	m_distinctFields.clear();
 
 	return m_timeFilter.ResetData();
 }

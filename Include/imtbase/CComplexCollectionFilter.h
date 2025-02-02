@@ -25,6 +25,8 @@ public:
 	virtual bool SetFieldsFilter(const GroupFilter& filter) override;
 	virtual const imtbase::ITimeFilterParam& GetTimeFilter() const override;
 	virtual bool SetTimeFilter(const imtbase::ITimeFilterParam& filter) override;
+	virtual const QByteArrayList& GetDistinctFieldsList() const override;
+	virtual bool SetDistinctFieldsList(const QByteArrayList& filedIds) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -45,6 +47,7 @@ private:
 	FieldSortingInfoList m_sortingInfo;
 	GroupFilter m_fieldsFilter;
 	CTimeFilterParam m_timeFilter;
+	QByteArrayList m_distinctFields;
 };
 
 

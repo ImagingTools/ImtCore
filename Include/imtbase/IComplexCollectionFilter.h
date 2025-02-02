@@ -92,6 +92,8 @@ public:
 	virtual bool SetFieldsFilter(const GroupFilter& filter) = 0;
 	virtual const imtbase::ITimeFilterParam& GetTimeFilter() const = 0;
 	virtual bool SetTimeFilter(const imtbase::ITimeFilterParam& filter) = 0;
+	virtual const QByteArrayList& GetDistinctFieldsList() const = 0;
+	virtual bool SetDistinctFieldsList(const QByteArrayList& filedIds) = 0;
 };
 
 

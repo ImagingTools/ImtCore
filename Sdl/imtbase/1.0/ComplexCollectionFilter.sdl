@@ -9,28 +9,27 @@ import {
 	"ImtBaseTypes.sdl"
 }
 
-type ValueType
+enum ValueType
 {
-	signedNumber: Bool
-	unsignedNumber: Bool
-	floatingPoint: Bool
-	stringValue: Bool
-	boolValue: Bool
+	Integer
+	Number
+	String
+	Bool
 }
 
-type FilterOperations
+enum FilterOperation
 {
-	notOp: Bool
-	equalOp: Bool
-	lessOp: Bool
-	greaterOp: Bool
-	containsOp: Bool
+	Not
+	Equal
+	Less
+	Greater
+	Contains
 }
 
-type LogicalOperation
+enum LogicalOperation
 {
-	andOp: Bool
-	orOp: Bool
+	And
+	Or
 }
 
 type TimeFilter
@@ -52,14 +51,13 @@ type FieldFilter
 	fieldId: ID!
 	filterValue: String!
 	filterValueType: ValueType!
-	filterOperation: FilterOperations!
+	filterOperations: [FilterOperation]!
 }
 
 type GroupFilter
 {
 	fieldFilters: [FieldFilter]
 	groupFilters: [GroupFilter]
-
 	logicalOperation: LogicalOperation!
 }
 
@@ -67,6 +65,7 @@ type ComplexCollectionFilter {
 	sortingInfo: [FieldSortingInfo]
 	fieldsFilter: GroupFilter
 	timeFilter: TimeFilter
+	distinctFields: [ID]
 }
 
 

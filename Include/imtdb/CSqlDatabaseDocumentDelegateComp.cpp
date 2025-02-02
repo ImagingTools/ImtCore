@@ -64,10 +64,22 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 
 	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
 
-	if (m_uniqueValuesFieldAttrPtr.IsValid() && !(*m_uniqueValuesFieldAttrPtr).isEmpty()){
-		QString valueField = s_filterableColumns.contains(*m_uniqueValuesFieldAttrPtr) ? QString("%1").arg(*m_uniqueValuesFieldAttrPtr) : QString("\"DataMetaInfo\"->>'%1'").arg(*m_uniqueValuesFieldAttrPtr);
+	iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
+	if (complexFilterParamPtr.IsValid()){
+		QByteArrayList fieldIds = complexFilterParamPtr->GetDistinctFieldsList();
 
-		selectionQuery = QString("SELECT DISTINCT ON (%1) * FROM (%2)").arg(valueField).arg(selectionQuery).toUtf8();
+		QString disitonctOnString;
+		Q_ASSERT(fieldIds.count() < 2);
+		for (int i = 0; i < fieldIds.count(); i++){
+			QString fieldId = fieldIds[i];
+			fieldId = s_filterableColumns.contains(fieldId) ? fieldId : QString("\"DataMetaInfo\"->>'%1'").arg(fieldId);
+
+			disitonctOnString += i > 0 ? QString(", %1").arg(fieldId) : fieldId;
+		}
+
+		if (!disitonctOnString.isEmpty()){
+			selectionQuery = QString("SELECT DISTINCT ON (%1) * FROM (%2)").arg(disitonctOnString).arg(selectionQuery).toUtf8();
+		}
 	}
 
 	return selectionQuery;
