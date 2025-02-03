@@ -105,10 +105,10 @@ public:
 			return m_objectPtr != nullptr;
 		}
 
-		template<typename Intefrace = istd::IChangeable>
-		const Intefrace* GetPtr() const
+		template<typename Interface = istd::IChangeable>
+		const Interface* GetPtr() const
 		{
-			return dynamic_cast<const Intefrace*>(m_objectPtr);
+			return dynamic_cast<const Interface*>(m_objectPtr);
 		}
 
 		const istd::IChangeable* operator->() const
@@ -125,10 +125,10 @@ public:
 			return *m_objectPtr;
 		}
 
-		template<typename Intefrace = istd::IChangeable>
-		Intefrace* GetPtr()
+		template<typename Interface = istd::IChangeable>
+		Interface* GetPtr()
 		{
-			return dynamic_cast<Intefrace*>(const_cast<istd::IChangeable*>(m_objectPtr));
+			return dynamic_cast<Interface*>(const_cast<istd::IChangeable*>(m_objectPtr));
 		}
 
 		istd::IChangeable& operator*()
@@ -214,10 +214,10 @@ public:
 		\note This method should return a valid instance for an object only for objects that are permanent in the collection and have
 		the given interface.
 	*/
-	template<typename Intefrace>
-	const Intefrace* GetObjectPtr(const Id& objectId) const
+	template<typename Interface>
+	const Interface* GetObjectPtr(const Id& objectId) const
 	{
-		return dynamic_cast<const Intefrace*>(GetObjectPtr(objectId));
+		return dynamic_cast<const Interface*>(GetObjectPtr(objectId));
 	}
 
 	/**
