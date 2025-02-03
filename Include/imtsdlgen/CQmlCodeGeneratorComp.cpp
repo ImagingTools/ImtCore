@@ -318,7 +318,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 
 		bool isCustom = false;
 		QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
-		if (sdlField.IsArray() && !isCustom){
+		if (sdlField.IsArray() && (!isCustom || isEnum)){
 			ifStream << QStringLiteral("var");
 		}
 		else if (sdlField.IsArray()){
@@ -333,7 +333,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		// use 'm_' prefix to avoid ambiguity
 		ifStream << QStringLiteral(" m_") << GetDecapitalizedValue(sdlField.GetId());
 		ifStream << ':' << ' ';
-		if (sdlField.IsArray() && !isCustom){
+		if (sdlField.IsArray() && (!isCustom || isEnum)){
 			ifStream << QStringLiteral("[]");
 		}
 		else if (!isCustom || isEnum){
