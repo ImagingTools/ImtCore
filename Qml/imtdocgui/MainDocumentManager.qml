@@ -20,6 +20,19 @@ QtObject {
         return root.documentManagers[typeId];
     }
 
+	function getDocumentDataByView(viewRef){
+		let typeIds = Object.keys(root.documentManagers);
+		for (let i = 0; i < typeIds.length; i++){
+			let manager = root.documentManagers[typeIds[i]];
+			let document = manager.getDocumentDataByView(viewRef);
+			if (document != null){
+				return document;
+			}
+		}
+
+		return null;
+	}
+
     function unregisterDocumentManager(documentManager){
         let typeIds = Object.keys(root.documentManagers);
         for (let i = 0; i < typeIds.length; i++){
