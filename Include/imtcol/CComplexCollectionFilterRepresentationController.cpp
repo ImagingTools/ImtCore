@@ -24,20 +24,20 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 
 	QByteArray targetFieldId;
 	if (!source.fieldId){
-		SendErrorMessage("Filter field ID not available", messageConsumerPtr);
+		SendErrorMessage("ComplexCollectionFilter: Filter field ID not available", messageConsumerPtr);
 		return false;
 	}
 	target.fieldId = *source.fieldId;
 
 	QString value;
 	if (!source.filterValue){
-		SendErrorMessage("Filter field value not available", messageConsumerPtr);
+		SendErrorMessage("ComplexCollectionFilter: Filter field value not available", messageConsumerPtr);
 		return false;
 	}
 	value = *source.filterValue;
 
 	if (!source.filterValueType){
-		SendErrorMessage("Filter field value type not available", messageConsumerPtr);
+		SendErrorMessage("ComplexCollectionFilter: Filter field value type not available", messageConsumerPtr);
 		return false;
 	}
 
@@ -60,20 +60,20 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 			target.filterValue = false;
 		}
 		else{
-			SendErrorMessage("Invalid filter bool value", messageConsumerPtr);
+			SendErrorMessage("ComplexCollectionFilter: Invalid filter bool value", messageConsumerPtr);
 			return false;
 		}
 		break;
 	default:
-		SendErrorMessage("Invalid filter value type", messageConsumerPtr);
+		SendErrorMessage("ComplexCollectionFilter: Invalid filter value type", messageConsumerPtr);
 		return false;
 	}
 
 	retVal = retVal && isOk;
 
 	if (retVal){
-		if (source.filterOperations){
-			SendErrorMessage("Filter operation not available", messageConsumerPtr);
+		if (!source.filterOperations){
+			SendErrorMessage("ComplexCollectionFilter: Filter operation not available", messageConsumerPtr);
 			return false;
 		}
 		QList<Filter::FilterOperation> filterOperations = *source.filterOperations;
@@ -82,7 +82,7 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 
 		if (filterOperations.contains(Filter::FilterOperation::Equal)){
 			if (flags & FOF_CONTAINS){
-				SendErrorMessage("Equal and Contains flags can't be combined", messageConsumerPtr);
+				SendErrorMessage("ComplexCollectionFilter: Equal and Contains flags can't be combined", messageConsumerPtr);
 				return false;
 			}
 
@@ -93,7 +93,7 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 		}
 		else if (filterOperations.contains(Filter::FilterOperation::Greater)){
 			if (flags & FOF_CONTAINS){
-				SendErrorMessage("Greater and Contains flags can't be combined", messageConsumerPtr);
+				SendErrorMessage("ComplexCollectionFilter: Greater and Contains flags can't be combined", messageConsumerPtr);
 				return false;
 			}
 
@@ -101,12 +101,12 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 		}
 		else if (filterOperations.contains(Filter::FilterOperation::Less)){
 			if (flags & FOF_GREATER){
-				SendErrorMessage("Less and Greater flags can't be combined", messageConsumerPtr);
+				SendErrorMessage("ComplexCollectionFilter: Less and Greater flags can't be combined", messageConsumerPtr);
 				return false;
 			}
 
 			if (flags & FOF_CONTAINS){
-				SendErrorMessage("Less and Contains flags can't be combined", messageConsumerPtr);
+				SendErrorMessage("ComplexCollectionFilter: Less and Contains flags can't be combined", messageConsumerPtr);
 				return false;
 			}
 
@@ -114,7 +114,7 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 		}
 		else if (filterOperations.contains(Filter::FilterOperation::Contains)){
 			if (flags != 0){
-				SendErrorMessage("Contains flag can't be combined with any other flag", messageConsumerPtr);
+				SendErrorMessage("ComplexCollectionFilter: Contains flag can't be combined with any other flag", messageConsumerPtr);
 				return false;
 			}
 
@@ -212,7 +212,7 @@ bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
 		target.logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
 		break;
 	default:
-		SendErrorMessage("Logical group operation was not defined", messageConsumerPtr);
+		SendErrorMessage("ComplexCollectionFilter: Logical group operation was not defined", messageConsumerPtr);
 		return false;
 	}
 
