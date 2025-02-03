@@ -30,7 +30,7 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 	target.fieldId = *source.fieldId;
 
 	QString value;
-	if (source.filterValue){
+	if (!source.filterValue){
 		SendErrorMessage("Filter field value not available", messageConsumerPtr);
 		return false;
 	}
