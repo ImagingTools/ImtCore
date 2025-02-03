@@ -68,17 +68,17 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 	if (complexFilterParamPtr.IsValid()){
 		QByteArrayList fieldIds = complexFilterParamPtr->GetDistinctFieldsList();
 
-		QString disitonctOnString;
+		QString distinctString;
 		Q_ASSERT(fieldIds.count() < 2);
 		for (int i = 0; i < fieldIds.count(); i++){
 			QString fieldId = fieldIds[i];
 			fieldId = s_filterableColumns.contains(fieldId) ? fieldId : QString("\"DataMetaInfo\"->>'%1'").arg(fieldId);
 
-			disitonctOnString += i > 0 ? QString(", %1").arg(fieldId) : fieldId;
+			distinctString += i > 0 ? QString(", %1").arg(fieldId) : fieldId;
 		}
 
-		if (!disitonctOnString.isEmpty()){
-			selectionQuery = QString("SELECT DISTINCT ON (%1) * FROM (%2)").arg(disitonctOnString).arg(selectionQuery).toUtf8();
+		if (!distinctString.isEmpty()){
+			selectionQuery = QString("SELECT DISTINCT ON (%1) * FROM (%2)").arg(distinctString).arg(selectionQuery).toUtf8();
 		}
 	}
 
