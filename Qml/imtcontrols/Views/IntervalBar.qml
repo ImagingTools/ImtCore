@@ -35,6 +35,9 @@ Rectangle {
 	property string valueName: "";
 
 	property bool hasPercentText: true;
+	property bool hasMouseArea: false;
+
+	signal clicked();
 
 	Component.onCompleted: {
 		setCount();
@@ -141,6 +144,22 @@ Rectangle {
 
 		text: indicator.valueName;
 		visible: text !== "";
+	}
+
+	MouseArea{
+		id: legendMA;
+
+		anchors.bottom: parent.bottom;
+		anchors.top: valueText.top;
+
+		width: parent.width;
+
+		visible: indicator.hasMouseArea;
+		hoverEnabled: visible;
+		cursorShape: Qt.PointingHandCursor;
+		onClicked: {
+			indicator.clicked();
+		}
 	}
 
 
