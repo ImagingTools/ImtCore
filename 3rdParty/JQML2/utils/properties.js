@@ -380,42 +380,42 @@ class QBool extends QProperty {
 
 class QLinkedBool extends QBool {
     originValue = true
-    step = 0
 
     update(){
-        let currentStep = this.step
+        if(this.updating) return
+        this.updating = true
 
-        if(this.updating) {
-            this.step++
-        } else {
-            this.step = 0
-            currentStep = 0
-            this.updating = true
+        let value = this.value
+        
+        let step = 0
+        while(step < 2){
+            global.queueLink.push(this)
+            let value2 = value
+
+            try {
+                if(this.compute){
+                    if(this.originCompute){
+                        value2 = this.originCompute() && this.compute()
+                    } else {
+                        value2 = this.originValue && this.compute()
+                    }
+                } else {
+                    if(this.originCompute){
+                        value2 = this.originCompute() && this.originValue
+                    } else {
+                        value2 = this.originValue
+                    }
+                }
+            } catch (error) {
+                
+            } finally {
+                global.queueLink.pop()
+                step += 1
+                if(value !== value2) step = 0
+                value = value2
+            }
         }
         
-        global.queueLink.push(this)
-        let value = this.value
-        try {
-            if(this.compute){
-                if(this.originCompute){
-                    value = this.originCompute() && this.compute()
-                } else {
-                    value = this.originValue && this.compute()
-                }
-            } else {
-                if(this.originCompute){
-                    value = this.originCompute() && this.originValue
-                } else {
-                    value = this.originValue
-                }
-            }
-        } catch (error) {
-            
-        } finally {
-            global.queueLink.pop()
-        }
-
-        if(currentStep !== this.step) return
         
         this.set(value)
         this.updating = false
