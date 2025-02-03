@@ -316,6 +316,13 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 			}
 		}
 
+		if (!m_enums.isEmpty()){
+			CGqlSchemaParserComp* castedParserPtr = newSchemaProcessor.Cast<CGqlSchemaParserComp*>();
+			if (castedParserPtr != nullptr){
+				castedParserPtr->m_enums = m_enums;
+			}
+		}
+
 		int processingResult = newSchemaProcessor->DoProcessing(nullptr, &schemaFilePathParam, &outputParams);
 		if (processingResult != TS_OK){
 			SendErrorMessage(0, QString("Unable to process file '%1'").arg(schemaPath));
