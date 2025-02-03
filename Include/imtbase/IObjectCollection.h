@@ -113,11 +113,15 @@ public:
 
 		const istd::IChangeable* operator->() const
 		{
+			Q_ASSERT(m_objectPtr != nullptr);
+
 			return m_objectPtr;
 		}
 
 		const istd::IChangeable& operator*() const
 		{
+			Q_ASSERT(m_objectPtr != nullptr);
+
 			return *m_objectPtr;
 		}
 
@@ -129,11 +133,15 @@ public:
 
 		istd::IChangeable& operator*()
 		{
+			Q_ASSERT(m_objectPtr != nullptr);
+
 			return *const_cast<istd::IChangeable*>(m_objectPtr);
 		}
 
 		istd::IChangeable* operator->()
 		{
+			Q_ASSERT(m_objectPtr != nullptr);
+
 			return const_cast<istd::IChangeable*>(m_objectPtr);
 		}
 
