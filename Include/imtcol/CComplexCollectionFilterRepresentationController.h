@@ -32,17 +32,20 @@ private:
 	};
 
 private:
+	static QString GetFlagsAsString(int flags);
 	static bool ProcessFieldFilter(
 		const sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& source,
 		imtbase::IComplexCollectionFilter::FieldFilter& target,
 		ilog::IMessageConsumer* messageConsumerPtr);
-
 	static bool ProcessGroupFilter(
 		const sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& source,
 		imtbase::IComplexCollectionFilter::GroupFilter& target,
 		ilog::IMessageConsumer* messageConsumerPtr);
 
 	static void SendErrorMessage(const QString& message, ilog::IMessageConsumer* messageConsumerPtr);
+
+private:
+	static const QMap<int, imtbase::IComplexCollectionFilter::FieldOperation> m_validFlagsSetMap;
 };
 
 

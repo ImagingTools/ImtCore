@@ -72,7 +72,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 		Q_ASSERT(fieldIds.count() < 2);
 		for (int i = 0; i < fieldIds.count(); i++){
 			QString fieldId = fieldIds[i];
-			fieldId = s_filterableColumns.contains(fieldId) ? fieldId : QString("\"DataMetaInfo\"->>'%1'").arg(fieldId);
+			fieldId = s_filterableColumns.contains(fieldId) ? QString("\"%1\"").arg(fieldId) : QString("\"DataMetaInfo\"->>'%1'").arg(fieldId);
 
 			distinctString += i > 0 ? QString(", %1").arg(fieldId) : fieldId;
 		}

@@ -12,6 +12,50 @@ namespace imtcol
 {
 
 
+const QMap<int, imtbase::IComplexCollectionFilter::FieldOperation> CComplexCollectionFilterRepresentationController::m_validFlagsSetMap = {
+	{FOF_EQUAL, imtbase::IComplexCollectionFilter::FieldOperation::FO_EQUAL},
+	{FOF_EQUAL | FOF_NOT, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_EQUAL},
+
+	{FOF_GREATER, imtbase::IComplexCollectionFilter::FieldOperation::FO_GREATER},
+	{FOF_GREATER | FOF_NOT, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_GREATER},
+	{FOF_GREATER | FOF_EQUAL, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_LESS},
+
+	{FOF_LESS, imtbase::IComplexCollectionFilter::FieldOperation::FO_LESS},
+	{FOF_LESS | FOF_NOT, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_LESS},
+	{FOF_LESS | FOF_EQUAL, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_GREATER},
+
+	{FOF_CONTAINS, imtbase::IComplexCollectionFilter::FieldOperation::FO_CONTAINS}
+};
+
+
+QString CComplexCollectionFilterRepresentationController::GetFlagsAsString(int flags)
+{
+	QString retVal;
+
+	if (flags & FOF_NOT){
+		retVal = "NOT";
+	}
+
+	if (flags & FOF_EQUAL){
+		retVal += retVal.isEmpty() ? "EQUAL" : ", EQUAL";
+	}
+
+	if (flags & FOF_GREATER){
+		retVal += retVal.isEmpty() ? "GREATER" : ", GREATER";
+	}
+
+	if (flags & FOF_LESS){
+		retVal += retVal.isEmpty() ? "LESS" : ", LESS";
+	}
+
+	if (flags & FOF_CONTAINS){
+		retVal += retVal.isEmpty() ? "CONTAINS" : ", CONTAINS";
+	}
+
+	return retVal;
+}
+
+
 bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 			const sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& source,
 			imtbase::IComplexCollectionFilter::FieldFilter& target,
@@ -72,7 +116,7 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 	retVal = retVal && isOk;
 
 	if (retVal){
-		if (!source.filterOperations){
+		if (!source.filterOperations || source.filterOperations->isEmpty()){
 			SendErrorMessage("ComplexCollectionFilter: Filter operation not available", messageConsumerPtr);
 			return false;
 		}
@@ -80,78 +124,28 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 
 		int flags = 0;
 
-		if (filterOperations.contains(Filter::FilterOperation::Equal)){
-			if (flags & FOF_CONTAINS){
-				SendErrorMessage("ComplexCollectionFilter: Equal and Contains flags can't be combined", messageConsumerPtr);
-				return false;
-			}
-
-			flags |= FOF_EQUAL;
-		}
-		else if (filterOperations.contains(Filter::FilterOperation::Not)){
+		if (filterOperations.contains(Filter::FilterOperation::Not)){
 			flags |= FOF_NOT;
 		}
-		else if (filterOperations.contains(Filter::FilterOperation::Greater)){
-			if (flags & FOF_CONTAINS){
-				SendErrorMessage("ComplexCollectionFilter: Greater and Contains flags can't be combined", messageConsumerPtr);
-				return false;
-			}
-
-			flags |= FOF_GREATER;
+		if (filterOperations.contains(Filter::FilterOperation::Equal)){
+			flags |= FOF_EQUAL;
 		}
-		else if (filterOperations.contains(Filter::FilterOperation::Less)){
-			if (flags & FOF_GREATER){
-				SendErrorMessage("ComplexCollectionFilter: Less and Greater flags can't be combined", messageConsumerPtr);
-				return false;
-			}
-
-			if (flags & FOF_CONTAINS){
-				SendErrorMessage("ComplexCollectionFilter: Less and Contains flags can't be combined", messageConsumerPtr);
-				return false;
-			}
-
+		if (filterOperations.contains(Filter::FilterOperation::Less)){
 			flags |= FOF_LESS;
 		}
-		else if (filterOperations.contains(Filter::FilterOperation::Contains)){
-			if (flags != 0){
-				SendErrorMessage("ComplexCollectionFilter: Contains flag can't be combined with any other flag", messageConsumerPtr);
-				return false;
-			}
-
+		if (filterOperations.contains(Filter::FilterOperation::Greater)){
+			flags |= FOF_GREATER;
+		}
+		if (filterOperations.contains(Filter::FilterOperation::Contains)){
 			flags |= FOF_CONTAINS;
 		}
-		else{
-			retVal = false;
+
+		if (!m_validFlagsSetMap.contains(flags)){
+			SendErrorMessage(QString("ComplexCollectionFilter: invalid flags set (%1)").arg(GetFlagsAsString(flags)), messageConsumerPtr);
+			return false;
 		}
 
-		if (flags & FOF_CONTAINS){
-			Q_ASSERT(flags == FOF_CONTAINS);
-			target.filterOperation = imtbase::IComplexCollectionFilter::FieldOperation::FO_CONTAINS;
-		}
-		else if (flags & FOF_EQUAL){
-			if (flags & FOF_NOT){
-				target.filterOperation = imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_EQUAL;
-			}
-			else{
-				target.filterOperation = imtbase::IComplexCollectionFilter::FieldOperation::FO_EQUAL;
-			}
-		}
-		else if (flags & FOF_LESS){
-			if (flags & FOF_NOT){
-				target.filterOperation = imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_LESS;
-			}
-			else{
-				target.filterOperation = imtbase::IComplexCollectionFilter::FieldOperation::FO_LESS;
-			}
-		}
-		else if (flags & FOF_GREATER){
-			if (flags & FOF_NOT){
-				target.filterOperation = imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_GREATER;
-			}
-			else{
-				target.filterOperation = imtbase::IComplexCollectionFilter::FieldOperation::FO_GREATER;
-			}
-		}
+		target.filterOperation = m_validFlagsSetMap[flags];
 	}
 
 	return retVal;
