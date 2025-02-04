@@ -66,7 +66,6 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 	bool isOk = true;
 	bool retVal = true;
 
-	QByteArray targetFieldId;
 	if (!source.fieldId){
 		SendErrorMessage("ComplexCollectionFilter: Filter field ID not available", messageConsumerPtr);
 		return false;
@@ -170,7 +169,7 @@ bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
 	QVector<imtbase::IComplexCollectionFilter::FieldFilter> targetFieldSubFilters;
 	QVector<imtbase::IComplexCollectionFilter::GroupFilter> targetGroupSubFilters;
 
-	for (const Filter::CFieldFilter::V1_0& sourceFieldSubFilter : sourceFieldSubFilters){
+	for (const Filter::CFieldFilter::V1_0& sourceFieldSubFilter : std::as_const(sourceFieldSubFilters)){
 		imtbase::IComplexCollectionFilter::FieldFilter targetFieldSubFilter;
 
 		if (!ProcessFieldFilter(sourceFieldSubFilter, targetFieldSubFilter, messageConsumerPtr)){
@@ -180,7 +179,7 @@ bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
 		targetFieldSubFilters.append(targetFieldSubFilter);
 	}
 
-	for (const Filter::CGroupFilter::V1_0& sourceGroupSubFilter : sourceGroupSubFilters){
+	for (const Filter::CGroupFilter::V1_0& sourceGroupSubFilter : std::as_const(sourceGroupSubFilters)){
 		imtbase::IComplexCollectionFilter::GroupFilter targetGroupSubFilter;
 
 		if (!ProcessGroupFilter(sourceGroupSubFilter, targetGroupSubFilter, messageConsumerPtr)){
@@ -236,7 +235,7 @@ bool CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRe
 
 	// ---
 	imtbase::IComplexCollectionFilter::FieldSortingInfoList sorting;
-	for (const Filter::CFieldSortingInfo::V1_0& sourceSortingItem  :sourceSorting){
+	for (const Filter::CFieldSortingInfo::V1_0& sourceSortingItem  : std::as_const(sourceSorting)){
 		imtbase::IComplexCollectionFilter::FieldSortingInfo fieldSorting;
 
 		if (sourceSortingItem.fieldId){
