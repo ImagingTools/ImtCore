@@ -389,7 +389,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRe
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream);
-	ifStream << QStringLiteral(": m_isValid(false)");
+	ifStream << QStringLiteral(": m_isValid(true)");
 	FeedStream(ifStream, 1, false);
 
 	ifStream << '{';
