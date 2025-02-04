@@ -26,6 +26,11 @@ protected:
 	// reimplemented (IIncludeDirectivesProvider)
 	[[nodiscard]] virtual QList<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
 
+	// reimplemented (ICxxModifier)
+	[[nodiscard]] virtual QString GetReadMethodName() const override;
+	[[nodiscard]] virtual QString GetWriteMethodName() const override;
+	[[nodiscard]] virtual ArgumentList GetArguments()const override;
+
 	// reimplemented (CSdlClassModificatorBaseComp)
 	virtual bool ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType) override;
 	virtual bool ProcessSourceClassFile(const imtsdl::CSdlType& sdlType) override;

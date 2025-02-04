@@ -6,6 +6,7 @@
 #include <QtCore/QTextStream>
 
 // ImtCore includes
+#include <QtCore/qstringliteral.h>
 #include <imtsdl/CSdlType.h>
 
 
@@ -29,20 +30,20 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSd
 	QTextStream ofStream(m_headerFilePtr);
 
 	// add method definitions
-	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToModel(");
+	ofStream << QStringLiteral("\t\t[[nodiscard]] bool WriteToModel(");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex = 0) const;");
 	FeedStream(ofStream, 1, false);
 
-	ofStream << QStringLiteral("\t[[nodiscard]] bool ReadFromModel(const ");
+	ofStream << QStringLiteral("\t\t[[nodiscard]] bool ReadFromModel(const ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << ("::CTreeItemModel& model, int modelIndex = 0);");
 	FeedStream(ofStream, 1);
 
-	ofStream << QStringLiteral("\t[[nodiscard]] bool OptReadFromModel(const ");
+	ofStream << QStringLiteral("\t\t[[nodiscard]] bool OptReadFromModel(const ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << ("::CTreeItemModel& model, int modelIndex = 0);");
-	FeedStream(ofStream, 2);
+	FeedStream(ofStream, 1);
 
 	return true;
 }
@@ -1011,6 +1012,37 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 QList<imtsdl::IncludeDirective> CSdlClassTreeModelModificatorComp::GetIncludeDirectives() const
 {
 	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("<imtbase/CTreeItemModel.h>"))};
+
+	return retVal;
+}
+
+
+QString CSdlClassTreeModelModificatorComp::GetReadMethodName() const
+{
+	return QStringLiteral("ReadFromModel");
+}
+
+
+QString CSdlClassTreeModelModificatorComp::GetWriteMethodName() const
+{
+	return QStringLiteral("WriteToModel");
+}
+
+
+imtsdlgen::ICxxModifier::ArgumentList CSdlClassTreeModelModificatorComp::GetArguments() const
+{
+	ArgumentList retVal;
+
+	Argument arg;
+	arg.Name = QStringLiteral("model");
+	arg.Type = QStringLiteral("::imtbase::CTreeItemModel");
+	retVal << arg;
+
+	Argument arg2;
+	arg2.Name = QStringLiteral("modelIndex");
+	arg2.Type = QStringLiteral("int");
+	arg2.DefaultValue = QStringLiteral("0");
+	retVal << arg2;
 
 	return retVal;
 }

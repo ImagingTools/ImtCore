@@ -303,6 +303,31 @@ QString CSdlClassJsonModificatorComp::GetConvertEndForFieldString(const imtsdl::
 }
 
 
+QString CSdlClassJsonModificatorComp::GetReadMethodName() const
+{
+	return QStringLiteral("ReadFromJsonObject");
+}
+
+
+QString CSdlClassJsonModificatorComp::GetWriteMethodName() const
+{
+	return QStringLiteral("WriteToJsonObject");
+}
+
+
+imtsdlgen::ICxxModifier::ArgumentList CSdlClassJsonModificatorComp::GetArguments() const
+{
+	ArgumentList retVal;
+
+	Argument arg;
+	arg.Name = QStringLiteral("jsonObject");
+	arg.Type = QStringLiteral("QJsonObject");
+	retVal << arg;
+
+	return retVal;
+}
+
+
 
 
 } // namespace imtsdlgenv2

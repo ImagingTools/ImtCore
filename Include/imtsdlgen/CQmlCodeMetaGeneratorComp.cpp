@@ -32,6 +32,7 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_qmlKeysFileSuffixAttrPtr.IsValid());
+	Q_ASSERT(m_qmlEnumValuesFileSuffixAttrPtr.IsValid());
 	Q_ASSERT(m_qmldirFilePersistanceCompPtr.IsValid());
 
 	if (!m_argumentParserCompPtr->IsQmlEnabled()){

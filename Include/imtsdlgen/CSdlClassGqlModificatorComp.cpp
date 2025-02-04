@@ -774,6 +774,31 @@ QList<imtsdl::IncludeDirective> CSdlClassGqlModificatorComp::GetIncludeDirective
 }
 
 
+QString CSdlClassGqlModificatorComp::GetReadMethodName() const
+{
+	return QStringLiteral("ReadFromGraphQlObject");
+}
+
+
+QString CSdlClassGqlModificatorComp::GetWriteMethodName() const
+{
+	return QStringLiteral("WriteToGraphQlObject");
+}
+
+
+ICxxModifier::ArgumentList CSdlClassGqlModificatorComp::GetArguments() const
+{
+	ArgumentList retVal;
+
+	Argument arg;
+	arg.Name = QStringLiteral("gqlObject");
+	arg.Type = QStringLiteral("::imtgql::CGqlObject");
+	retVal << arg;
+
+	return retVal;
+}
+
+
 } // namespace imtsdlgen
 
 

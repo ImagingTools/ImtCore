@@ -15,6 +15,7 @@
 #include <imtsdl/CSdlTools.h>
 #include <imtsdlgen/IIncludeDirectivesProvider.h>
 #include <imtsdlgen/ICxxFileProcessor.h>
+#include <imtsdlgen/ICxxModifier.h>
 #include <imtsdlgenv2/CSdlGenTools.h>
 
 
@@ -45,8 +46,7 @@ public:
 		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
 		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
 		I_ASSIGN_MULTI_0(m_includeDirectivesProviderListCompPtr, "IncludeDirectivesProviderList", "Providers of include directives, used to generate C(++) directives", false)
-
-
+		I_ASSIGN_MULTI_0(m_modifierListCompPtr, "ModifierList", "Modifiers for specific containers, used to generate C++ methods serialization methods ", false)
 	I_END_COMPONENT
 
 	//reimplemented(iproc::IProcessor)
@@ -57,6 +57,14 @@ public:
 				ibase::IProgressManager* progressManagerPtr = NULL) override;
 
 private:
+	enum MetdodType
+	{
+		MT_READ,
+		MT_WRITE,
+		MT_OPT_READ,
+		MT_OPT_WRITE
+	};
+
 	bool BeginClassFiles(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude, bool addSelfHeaderInclude);
 	bool BeginHeaderClassFile(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude);
 	bool BeginSourceClassFile(const imtsdl::CSdlType& sdlType, bool addSelfHeaderInclude);
@@ -70,6 +78,12 @@ private:
 				QTextStream& stream,
 				const imtsdl::CSdlType& sdlType,
 				uint indents = 1);
+	void GenerateMethodDefinition(
+				QTextStream& stream,
+				const imtsdl::CSdlType& sdlType,
+				MetdodType methodType,
+				imtsdlgen::ICxxModifier& modifier,
+				bool forHeader);
 
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
@@ -81,6 +95,7 @@ private:
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);
 	I_MULTIREF(imtsdlgen::IIncludeDirectivesProvider, m_includeDirectivesProviderListCompPtr);
+	I_MULTIREF(imtsdlgen::ICxxModifier, m_modifierListCompPtr);
 
 	istd::TDelPtr<QFile> m_headerFilePtr;
 	istd::TDelPtr<QFile> m_sourceFilePtr;

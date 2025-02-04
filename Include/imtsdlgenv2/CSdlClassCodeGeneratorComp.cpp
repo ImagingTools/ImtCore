@@ -1,7 +1,13 @@
 #include "CSdlClassCodeGeneratorComp.h"
+#include "imtsdlgen/ICxxModifier.h"
 
 
 // C includes
+#include <QtCore/qassert.h>
+#include <QtCore/qbytearray.h>
+#include <QtCore/qstring.h>
+#include <QtCore/qstringlist.h>
+#include <QtCore/qstringliteral.h>
 #include <iostream>
 
 // Qt includes
@@ -128,6 +134,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 			imtsdlgen::ICxxFileProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
 			Q_ASSERT(extenderPtr != nullptr);
 
+			m_headerFilePtr->write(QByteArrayLiteral("\n"));
 			bool extendSuccess = extenderPtr->ProcessType(sdlType, m_headerFilePtr.GetPtr(), m_sourceFilePtr.GetPtr());
 			if (!extendSuccess){
 				return TS_INVALID;
@@ -431,8 +438,36 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 	stream << QStringLiteral("public:");
 	FeedStream(stream, 1, false);
 
-	GenerateVersionStruct(stream, sdlType);
+	// version enum
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("enum ProtocolVersion");
 	FeedStream(stream, 1, false);
+	
+	FeedStreamHorizontally(stream);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("PV_") << GetSdlEntryVersion(sdlType, false) << ',';
+	FeedStream(stream, 1, false);
+
+	/// \todo later add other versions here
+
+	// add last alias
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("PV_LAST = PV_") << GetSdlEntryVersion(sdlType, false);
+	FeedStream(stream, 1, false);
+
+	// complete protocol version enum
+	FeedStreamHorizontally(stream);
+	stream << '}' << ';';
+	FeedStream(stream, 2, false);
+
+	GenerateVersionStruct(stream, sdlType);
 
 	stream.flush();
 
@@ -471,10 +506,9 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 
 bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 {
-	QString namespaceString;
-
 	// finish header
 	// end of namespace
+	QString namespaceString;
 	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
 	if (!sdlNamespace.isEmpty()){
 		namespaceString += QStringLiteral("} // namespace ");
@@ -482,10 +516,28 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 	}
 
 	QTextStream headerStream(m_headerFilePtr.GetPtr());
+
 	// end of struct
 	FeedStreamHorizontally(headerStream, 1);
 	headerStream << '}' << ';';
-	FeedStream(headerStream, 1, false);
+	FeedStream(headerStream, 2, false);
+
+
+	// add version-independend read write methods
+	const int modifiersCount = m_modifierListCompPtr.GetCount();
+	for (int modifierIndex = 0; modifierIndex < modifiersCount; ++modifierIndex){
+		imtsdlgen::ICxxModifier* modifierPtr = m_modifierListCompPtr[modifierIndex];
+		Q_ASSERT(modifierPtr != nullptr);
+
+		FeedStreamHorizontally(headerStream);
+		GenerateMethodDefinition(headerStream, sdlType, MT_WRITE, *modifierPtr, true);
+		
+		FeedStreamHorizontally(headerStream);
+		GenerateMethodDefinition(headerStream, sdlType, MT_READ, *modifierPtr, true);
+		
+		FeedStreamHorizontally(headerStream);
+		GenerateMethodDefinition(headerStream, sdlType, MT_OPT_READ, *modifierPtr, true);
+	}
 
 	headerStream << QStringLiteral("};");
 	FeedStream(headerStream, 3, false);
@@ -617,6 +669,83 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 		stream << QStringLiteral("> ");
 		stream << field.GetId() << ';';
 		FeedStream(stream, 1, false);
+	}
+}
+
+
+void CSdlClassCodeGeneratorComp::GenerateMethodDefinition(
+			QTextStream& stream,
+			const imtsdl::CSdlType& sdlType,
+			MetdodType methodType,
+			imtsdlgen::ICxxModifier& modifier,
+			bool forHeader)
+{
+	// type
+	stream << QStringLiteral("[[nodiscard]] bool ");
+	
+	// optional?
+	switch (methodType) {
+	case MT_OPT_READ:
+	case MT_OPT_WRITE:
+		stream << QStringLiteral("Opt");
+		break;
+	default:
+		break;
+	}
+
+	// name
+	switch (methodType) {
+	case MT_OPT_READ:
+	case MT_READ:
+		stream << modifier.GetReadMethodName();
+		break;
+	case MT_OPT_WRITE:
+	case MT_WRITE:
+		stream << modifier.GetWriteMethodName();
+		break;
+	default:
+		break;
+	}
+
+	stream << '(';
+	// arguments
+	imtsdlgen::ICxxModifier::ArgumentList argumentList = modifier.GetArguments();
+	Q_ASSERT(!argumentList.isEmpty());
+
+	// container argument
+	switch (methodType) {
+	case MT_OPT_READ:
+	case MT_READ:
+		stream << QStringLiteral("const ");
+		break;
+	default:
+		break;
+	}
+
+	imtsdlgen::ICxxModifier::Argument containerArgument = argumentList.takeFirst();
+	stream << containerArgument.Type << '&' << ' ' << containerArgument.Name;
+
+	// other arguments
+	for (const imtsdlgen::ICxxModifier::Argument& argument: std::as_const(argumentList)){
+		stream << ',' << ' ' << argument.Type << ' ' << argument.Name;
+		if (!argument.DefaultValue.isNull()){
+			stream << ' ' << '=' << ' ' << argument.DefaultValue;
+		}
+	}
+
+	stream << QStringLiteral(", ProtocolVersion version");
+	if (forHeader){
+		switch (methodType) {
+			case MT_WRITE:
+			case MT_OPT_WRITE:
+				stream << QStringLiteral(" = PV_AUTO)");
+			break;
+			default:
+				stream << QStringLiteral(" = PV_LAST)");
+			break;
+		}
+		/// \todo REMIVE IT! leave only for compile!
+		stream << "{ return false; }";
 	}
 	FeedStream(stream, 1, false);
 }

@@ -64,7 +64,7 @@ public:
 	 */
 	[[nodiscard]] static QString GetNamespaceFromTypeSchemaParams(const imtsdl::CSdlType& type, const QString& prefix = "sdl");
 
-	[[nodiscard]] static QString GetSchemaVerstionString(const iprm::IParamsSet& schemaParams);
+	[[nodiscard]] static QString GetSchemaVerstionString(const iprm::IParamsSet& schemaParams, bool addVPrefix = true);
 	[[nodiscard]] static QString OptListConvertTypeWithNamespaceStruct(
 		const imtsdl::CSdlField& sdlField,
 		const QString& relatedNamespace,
@@ -94,14 +94,14 @@ public:
 	static void AddArrayInternalChecksFail(QTextStream& stream, const imtsdl::CSdlField& field, bool checkEmpty, const QString& objectName = QString(), uint hIndents = 1);
 
 	template <class SdlEntryClass>
-	[[nodiscard]] static QString GetSdlEntryVersion(const SdlEntryClass& entry);
+	[[nodiscard]] static QString GetSdlEntryVersion(const SdlEntryClass& entry, bool addVPrefix = true);
 };
 
 
 template<class SdlEntryClass>
-inline QString CSdlGenTools::GetSdlEntryVersion(const SdlEntryClass& entry)
+inline QString CSdlGenTools::GetSdlEntryVersion(const SdlEntryClass& entry, bool addVPrefix)
 {
-	return GetSchemaVerstionString(entry.GetSchemaParams());
+	return GetSchemaVerstionString(entry.GetSchemaParams(), addVPrefix);
 }
 
 

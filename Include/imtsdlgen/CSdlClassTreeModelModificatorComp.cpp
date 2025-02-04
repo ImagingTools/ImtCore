@@ -968,6 +968,37 @@ QList<imtsdl::IncludeDirective> CSdlClassTreeModelModificatorComp::GetIncludeDir
 }
 
 
+QString CSdlClassTreeModelModificatorComp::GetReadMethodName() const
+{
+	return QStringLiteral("ReadFromModel");
+}
+
+
+QString CSdlClassTreeModelModificatorComp::GetWriteMethodName() const
+{
+	return QStringLiteral("WriteToModel");
+}
+
+
+ICxxModifier::ArgumentList CSdlClassTreeModelModificatorComp::GetArguments() const
+{
+	ArgumentList retVal;
+
+	Argument arg;
+	arg.Name = QStringLiteral("model");
+	arg.Type = QStringLiteral("::imtbase::CTreeItemModel");
+	retVal << arg;
+
+	Argument arg2;
+	arg.Name = QStringLiteral("modelIndex");
+	arg.Type = QStringLiteral("int");
+	arg.DefaultValue = '0';
+	retVal << arg2;
+
+	return retVal;
+}
+
+
 
 } // namespace imtsdlgen
 

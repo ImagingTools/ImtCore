@@ -229,9 +229,12 @@ QString CSdlGenTools::GetNamespaceFromTypeSchemaParams(const imtsdl::CSdlType& t
 }
 
 
-QString CSdlGenTools::GetSchemaVerstionString(const iprm::IParamsSet& schemaParams)
+QString CSdlGenTools::GetSchemaVerstionString(const iprm::IParamsSet& schemaParams, bool addVPrefix)
 {
-	QString retVal = QStringLiteral("V");
+	QString retVal;
+	if (addVPrefix){
+		retVal += QStringLiteral("V");
+	}
 
 	QString versionName;
 	iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&schemaParams, imtsdl::SdlCustomSchemaKeys::VersionName.toUtf8());

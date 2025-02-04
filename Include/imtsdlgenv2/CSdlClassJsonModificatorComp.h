@@ -27,6 +27,10 @@ public:
 	// reimplemented (IIncludeDirectivesProvider)
 	[[nodiscard]] virtual QList<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
 
+	// reimplemented (ICxxModifier)
+	[[nodiscard]] virtual QString GetReadMethodName() const override;
+	[[nodiscard]] virtual QString GetWriteMethodName() const override;
+	[[nodiscard]] virtual ArgumentList GetArguments() const override;
 
 protected:
 	// reimplemented (CObjectModificatorCompBase)

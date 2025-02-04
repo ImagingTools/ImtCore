@@ -29,17 +29,17 @@ bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType&
 	QTextStream ofStream(m_headerFilePtr);
 
 	// add method definitions
-	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToGraphQlObject(");
+	ofStream << QStringLiteral("\t\t[[nodiscard]] bool WriteToGraphQlObject(");
 	ofStream << ("::imtgql::CGqlObject& request) const;");
 	FeedStream(ofStream, 1, false);
 	
-	ofStream << QStringLiteral("\t[[nodiscard]] bool ReadFromGraphQlObject(");
+	ofStream << QStringLiteral("\t\t[[nodiscard]] bool ReadFromGraphQlObject(");
 	ofStream << QStringLiteral("const ::imtgql::CGqlObject& request);");
 	FeedStream(ofStream, 1);
 	
-	ofStream << QStringLiteral("\t[[nodiscard]] bool OptReadFromGraphQlObject(");
+	ofStream << QStringLiteral("\t\t[[nodiscard]] bool OptReadFromGraphQlObject(");
 	ofStream << QStringLiteral("const ::imtgql::CGqlObject& request);");
-	FeedStream(ofStream, 2);
+	FeedStream(ofStream, 1);
 
 	return true;
 }
@@ -913,6 +913,31 @@ void CSdlClassGqlModificatorComp::AddSetScalarListValueToObjectCode(QTextStream&
 QList<imtsdl::IncludeDirective> CSdlClassGqlModificatorComp::GetIncludeDirectives() const
 {
 	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("<imtgql/CGqlObject.h>"))};
+
+	return retVal;
+}
+
+
+QString CSdlClassGqlModificatorComp::GetReadMethodName() const
+{
+	return QStringLiteral("ReadFromGraphQlObject");
+}
+
+
+QString CSdlClassGqlModificatorComp::GetWriteMethodName() const
+{
+	return QStringLiteral("WriteToGraphQlObject");
+}
+
+
+imtsdlgen::ICxxModifier::ArgumentList CSdlClassGqlModificatorComp::GetArguments() const
+{
+	ArgumentList retVal;
+
+	Argument arg;
+	arg.Name = QStringLiteral("gqlObject");
+	arg.Type = QStringLiteral("::imtgql::CGqlObject");
+	retVal << arg;
 
 	return retVal;
 }

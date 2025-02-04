@@ -896,6 +896,7 @@ void CSdlClassJsonModificatorComp::AddJsonValueCheckAndConditionBegin(QTextStrea
 	FeedStream(stream, 1, false);
 }
 
+
 QList<imtsdl::IncludeDirective> CSdlClassJsonModificatorComp::GetIncludeDirectives() const
 {
 	static QList<imtsdl::IncludeDirective> retVal = {
@@ -903,6 +904,31 @@ QList<imtsdl::IncludeDirective> CSdlClassJsonModificatorComp::GetIncludeDirectiv
 		CreateQtDirective(QStringLiteral("<QtCore/QJsonArray>")),
 		CreateQtDirective(QStringLiteral("<QtCore/QJsonValue>"))
 	};
+
+	return retVal;
+}
+
+
+QString CSdlClassJsonModificatorComp::GetReadMethodName() const
+{
+	return QStringLiteral("ReadFromJsonObject");
+}
+
+
+QString CSdlClassJsonModificatorComp::GetWriteMethodName() const
+{
+	return QStringLiteral("WriteToJsonObject");
+}
+
+
+ICxxModifier::ArgumentList CSdlClassJsonModificatorComp::GetArguments() const
+{
+	ArgumentList retVal;
+
+	Argument arg;
+	arg.Name = QStringLiteral("jsonObject");
+	arg.Type = QStringLiteral("QJsonObject");
+	retVal << arg;
 
 	return retVal;
 }

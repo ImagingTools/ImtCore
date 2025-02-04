@@ -79,7 +79,7 @@ bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& 
 
 	// add method definitions
 	// write
-	FeedStreamHorizontally(ofStream);
+	FeedStreamHorizontally(ofStream, 2);
 	ofStream << QStringLiteral("[[nodiscard]] bool ");
 	WriteMethodCall(ofStream, MT_WRITE);
 	ofStream << '(';
@@ -90,7 +90,7 @@ bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& 
 	FeedStream(ofStream, 1, false);
 
 	// read
-	FeedStreamHorizontally(ofStream);
+	FeedStreamHorizontally(ofStream, 2);
 	ofStream << QStringLiteral("[[nodiscard]] bool ");
 	WriteMethodCall(ofStream, MT_READ);
 	ofStream << QStringLiteral("(const ");
@@ -101,7 +101,7 @@ bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& 
 	FeedStream(ofStream, 1);
 
 	// opt read
-	FeedStreamHorizontally(ofStream);
+	FeedStreamHorizontally(ofStream, 2);
 	ofStream << QStringLiteral("[[nodiscard]] bool ");
 	WriteMethodCall(ofStream, MT_OPT_READ);
 	ofStream << QStringLiteral("(const ");
@@ -109,7 +109,7 @@ bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& 
 	ofStream << '&' << ' ';
 	ofStream << GetDecapitalizedValue(GetContainerObjectVariableName());
 	ofStream << QStringLiteral(");");
-	FeedStream(ofStream, 2);
+	FeedStream(ofStream, 1);
 
 	return true;
 }
