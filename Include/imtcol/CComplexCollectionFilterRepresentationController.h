@@ -45,7 +45,7 @@ private:
 	static void SendErrorMessage(const QString& message, ilog::IMessageConsumer* messageConsumerPtr);
 
 private:
-	static const QMap<int, imtbase::IComplexCollectionFilter::FieldOperation> m_validFlagsSetMap;
+	static const QMap<int, imtbase::IComplexCollectionFilter::FieldOperation> s_allowableFlagsCombination;
 };
 
 

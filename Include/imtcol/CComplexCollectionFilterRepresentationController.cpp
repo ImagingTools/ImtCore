@@ -12,7 +12,7 @@ namespace imtcol
 {
 
 
-const QMap<int, imtbase::IComplexCollectionFilter::FieldOperation> CComplexCollectionFilterRepresentationController::m_validFlagsSetMap = {
+const QMap<int, imtbase::IComplexCollectionFilter::FieldOperation> CComplexCollectionFilterRepresentationController::s_validFlagsSetMap = {
 	{FOF_EQUAL, imtbase::IComplexCollectionFilter::FieldOperation::FO_EQUAL},
 	{FOF_EQUAL | FOF_NOT, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_EQUAL},
 
@@ -140,12 +140,12 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 			flags |= FOF_CONTAINS;
 		}
 
-		if (!m_validFlagsSetMap.contains(flags)){
-			SendErrorMessage(QString("ComplexCollectionFilter: invalid flags set (%1)").arg(GetFlagsAsString(flags)), messageConsumerPtr);
+		if (!s_allowableFlagsCombination.contains(flags)){
+			SendErrorMessage(QString("ComplexCollectionFilter: invalid flags combination (%1)").arg(GetFlagsAsString(flags)), messageConsumerPtr);
 			return false;
 		}
 
-		target.filterOperation = m_validFlagsSetMap[flags];
+		target.filterOperation = s_allowableFlagsCombination[flags];
 	}
 
 	return retVal;
