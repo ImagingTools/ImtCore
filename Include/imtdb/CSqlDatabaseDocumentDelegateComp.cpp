@@ -78,7 +78,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 		}
 
 		if (!distinctString.isEmpty()){
-			selectionQuery = QString("SELECT DISTINCT ON (%1) * FROM (%2)").arg(distinctString).arg(selectionQuery).toUtf8();
+			selectionQuery = QString("SELECT DISTINCT ON (%1) * FROM %2 as collectiondata").arg(distinctString).arg(selectionQuery).toUtf8();
 		}
 	}
 
