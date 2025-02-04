@@ -943,6 +943,14 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive& archive, const QByteArra
 					retVal = retVal && archive.Process(doubleVal);
 				}
 #if QT_VERSION < 0x060000
+				else if (value.type() == QMetaType::Float){
+#else
+				else if (value.typeId() == QMetaType::Float){
+#endif
+					double floatVal = value.toFloat();
+					retVal = retVal && archive.Process(floatVal);
+				}
+#if QT_VERSION < 0x060000
 				else if (value.type() == QMetaType::LongLong){
 #else
 				else if (value.typeId() == QMetaType::LongLong){
