@@ -237,7 +237,7 @@ Rectangle {
 		onItemAdded: {
 			let documentData = root.documentManager.getDocumentData(root.documentManager.documentsModel.count - 1);
 			if (documentData){
-				documentData.view = item;
+				root.documentManager.setupDocumentView(documentData.documentId, item);
 			}
 		}
 	}

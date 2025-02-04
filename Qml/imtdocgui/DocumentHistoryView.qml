@@ -19,13 +19,15 @@ Rectangle {
 
 	property string collectionId: "";
 
-	clip: true;
+	property bool ok: collectionId !== "" && documentId !== "";
 
-	onDocumentIdChanged: {
-		if (documentId !== ""){
+	onOkChanged: {
+		if (ok){
 			sendRequest();
 		}
 	}
+
+	clip: true;
 
 	onCollectionIdChanged: {
 		if (collectionId !== ""){

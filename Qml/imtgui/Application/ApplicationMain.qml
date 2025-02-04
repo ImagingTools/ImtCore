@@ -327,9 +327,11 @@ Item {
 
 		function onSuperuserExistResult(exists, type, message){
             if (exists){
-                thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
+				thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
             }
             else{
+				AuthorizationController.removeDataFromStorage();
+
 				if (type === 'NotExists'){
 					thumbnailDecorator.showPage(thumbnailDecorator.superuserPasswordPageComp)
 				}

@@ -156,10 +156,7 @@ Item {
 		closable: true;
 
 		onTabLoaded: {
-			let documentData = workspaceView.documentManager.getDocumentDataById(tabId)
-			if (documentData){
-				documentData.view = tabItem;
-			}
+			workspaceView.documentManager.setupDocumentView(tabId, tabItem);
 		}
 
 		onTabClicked: {

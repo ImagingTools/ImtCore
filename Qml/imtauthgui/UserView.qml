@@ -155,6 +155,13 @@ ViewBase {
 
             spacing: Style.size_largeMargin;
 
+			GroupHeaderView {
+				id: headerGeneralGroup;
+				width: parent.width;
+
+				title: qsTr("General");
+			}
+
 			UserGeneralEditor {
 				id: userGeneralEditor;
 				width: parent.width;

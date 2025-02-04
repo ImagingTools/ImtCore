@@ -17,4 +17,4 @@ SearchPageSingleDocumentView 1.0 SearchPageSingleDocumentView.qml
 DocumentWorkspacePageView 1.0 DocumentWorkspacePageView.qml
 SingleDocumentWorkspacePageView 1.0 SingleDocumentWorkspacePageView.qml
 DocumentHistoryPanel 1.0 DocumentHistoryPanel.qml
-
+DocumentView 1.0 DocumentView.qml

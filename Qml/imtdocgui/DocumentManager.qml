@@ -14,9 +14,28 @@ QtObject {
 		dynamicRoles: true;
 	}
 
+	/*!
+		This signal is committed when the user closes the document. The corresponding handler is
+		\c onDocumentClosed.
+	*/
 	signal documentClosed(string documentId);
+
+	/*!
+		This signal is detected when the user opens or creates a new document. The corresponding handler is
+		\c onDocumentAdded.
+	*/
 	signal documentAdded(string documentId);
+
+	/*!
+		This signal is detected when the user saves the document. The corresponding handler is
+		\c onDocumentSaved.
+	*/
 	signal documentSaved(string documentId);
+
+	/*!
+		This signal is detected when the document becomes modified. The corresponding handler is
+		\c onDocumentIsDirtyChanged.
+	*/
 	signal documentIsDirtyChanged(string documentId, bool isDirty);
 
 
@@ -24,13 +43,12 @@ QtObject {
 		ModalDialogManager.openDialog(errorDialogComp, {"message": message});
 	}
 
-	function getActiveView(){
+
+	function getActiveView()
+	{
 		return activeView;
 	}
 
-	function getActiveDocumentView(){
-		return null;
-	}
 
 	function getDocumentTypeId(documentId)
 	{
@@ -331,8 +349,6 @@ QtObject {
 	*/
 	function saveDocument(documentId)
 	{
-		console.log("saveDocument", documentId);
-
 		let index = getDocumentIndexByDocumentId(documentId);
 		if (index >= 0){
 			let isNew = documentsModel.get(index).IsNew;
@@ -354,8 +370,6 @@ QtObject {
 
 					return;
 				}
-
-				console.log("isNew", isNew);
 
 				if (document.documentDataController){
 					if (isNew){
@@ -390,12 +404,8 @@ QtObject {
 
 
 	function getDocumentIndexByDocumentId(documentId){
-		console.log("getDocumentIndexByDocumentId", documentId);
-
 		for (let i = 0; i < documentsModel.count; i++){
 			let documentData = documentsModel.get(i).DocumentData;
-			console.log("documentData.documentId",documentData.documentId);
-
 			if (documentData && documentData.documentId === documentId){
 				return i;
 			}
@@ -512,13 +522,46 @@ QtObject {
 		return result;
 	}
 
+	function setupDocumentView(documentId, view){
+		let documentData = getDocumentDataById(documentId)
+		if (documentData){
+			if (view.documentId !== undefined){
+				view.documentId = documentId;
+			}
+
+			if (view.documentTypeId !== undefined){
+				view.documentTypeId = getDocumentTypeId(documentId);
+			}
+
+			if (view.viewTypeId !== undefined){
+				let viewTypeIds = getViewTypeIds(view.documentTypeId);
+				if (viewTypeIds.length > 0){
+					view.viewTypeId = viewTypeIds[0];
+				}
+			}
+
+			if (view.documentManager !== undefined){
+				view.documentManager = documentManager;
+			}
+
+			documentData.view = view;
+
+			if (view.viewRegistered !== undefined){
+				view.viewRegistered();
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
 	property Component singleDocumentDataComp: Component{
 		QtObject {
 			id: singleDocumentData;
 			// index of the document in document manager
 			property bool isNew: true;
 			property string documentId;
-			property string documentName;
 			property string documentTypeId;
 			property DocumentDataController documentDataController: null;
 			property DocumentValidator documentValidator: DocumentValidator {};
@@ -598,8 +641,7 @@ QtObject {
 			property Connections dataControllerConnections: Connections {
 				target: singleDocumentData.documentDataController;
 
-				function onSaved(documentId, documentName){
-					console.log("onSaved", documentId);
+				function onSaved(documentId){
 					singleDocumentData.documentId = documentId;
 
 					singleDocumentData.isDirty = false;
@@ -610,8 +652,6 @@ QtObject {
 					}
 
 					documentManager.onDocumentSaved(singleDocumentData.documentId);
-
-
 				}
 
 				function onModelChanged(){
@@ -732,13 +772,9 @@ QtObject {
 
 			function checkDocumentModel(){
 				let currentStateModel = undoManager.getStandardModel();
-				console.log("checkDocumentModel",currentStateModel);
-
 				if (currentStateModel){
 					let documentModel = singleDocumentData.documentDataController.documentModel
 					let isEqual = currentStateModel.isEqualWithModel(documentModel);
-					console.log("isEqual", isEqual);
-
 					isDirty = !isEqual && documentManager.documentIsValid(singleDocumentData);
 				}
 			}
@@ -753,7 +789,6 @@ QtObject {
 		property var m_registeredView: ({});
 		property var m_registeredDataControllers: ({});
 		property var m_registeredValidators: ({});
-		property var m_activeViewPtr;
 		property var m_closingDocuments: [];
 	}
 
