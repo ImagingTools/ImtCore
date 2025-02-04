@@ -2,12 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5323" Description="ACF"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="CheckPermissionOr" X="950" Y="675" Note=""/>
         <Element ComponentName="CredentialController" X="400" Y="450" Note=""/>
         <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
         <Element ComponentName="HashCalculator" X="825" Y="550" Note=""/>
@@ -20,6 +21,7 @@
         <Element ComponentName="UserController" X="150" Y="450" Note=""/>
         <Element ComponentName="UserInfo" X="650" Y="550" Note=""/>
         <Element ComponentName="UserListController" X="1025" Y="300" Note=""/>
+        <Element ComponentName="UserPermissions" X="525" Y="675" Note=""/>
         <Element ComponentName="UserVerificationCodeSender" X="175" Y="100" Note=""/>
         <Element ComponentName="UserVerificationController" X="150" Y="300" Note=""/>
         <Element ComponentName="UsersCommands" X="725" Y="300" Note=""/>

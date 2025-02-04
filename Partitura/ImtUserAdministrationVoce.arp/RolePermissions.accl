@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="PermissionsJoiner" X="550" Y="125" Note=""/>
+        <Element ComponentName="RoleCommands" X="925" Y="500" Note=""/>
+        <Element ComponentName="RoleItem" X="550" Y="500" Note=""/>
+        <Element ComponentName="RoleUpdate" X="925" Y="275" Note=""/>
+        <Element ComponentName="RolesAdd" X="200" Y="275" Note=""/>
+        <Element ComponentName="RolesCommands" X="925" Y="375" Note=""/>
+        <Element ComponentName="RolesInfo" X="550" Y="375" Note=""/>
+        <Element ComponentName="RolesList" X="550" Y="275" Note=""/>
+        <Element ComponentName="RolesMetaInfo" X="200" Y="500" Note=""/>
+        <Element ComponentName="RolesRemove" X="200" Y="375" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

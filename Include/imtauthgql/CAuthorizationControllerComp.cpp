@@ -95,8 +95,10 @@ sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 CAuthorizationControlle
 
 	if (!productId.isEmpty()){
 		imtauth::IUserInfo::FeatureIds permissionIds = userInfo.GetPermissions(productId);
-		QByteArray permissions = permissionIds.join(';');
-		payload.Permissions = std::make_optional<QByteArray>(permissions);
+		QByteArrayList uniqueList = QSet<QByteArray>(permissionIds.begin(), permissionIds.end()).values();
+		std::sort(uniqueList.begin(), uniqueList.end());
+		QByteArray permissions = uniqueList.join(';');
+		payload.Permissions = permissions;
 	}
 
 	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr;

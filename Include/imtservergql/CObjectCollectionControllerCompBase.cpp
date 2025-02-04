@@ -484,7 +484,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	Q_ASSERT(savedObjectPtr.IsValid());
 
-	if (!DoUpdateObjectFromRequest(gqlRequest, *savedObjectPtr, objectId, errorMessage)){
+	if (!UpdateObjectFromRequest(gqlRequest, *savedObjectPtr, errorMessage)){
 		if (errorMessage.isEmpty()){
 			errorMessage = QString("Can't update object in the collection: '%1'").arg(qPrintable(objectId));
 		}
@@ -862,7 +862,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
+	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+		errorMessage = QString("Unable to delete object. Object with ID '%1' does not exists").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
@@ -1591,7 +1596,8 @@ bool CObjectCollectionControllerCompBase::DoUpdateObjectFromRequest(
 		return false;
 	}
 
-	istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, errorMessage);
+	QString createErrorMessage;
+	istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, createErrorMessage);
 	if (savedObjectPtr == nullptr){
 		if (errorMessage.isEmpty()){
 			errorMessage = QString("Can not create object for update: '%1'").arg(qPrintable(objectId));

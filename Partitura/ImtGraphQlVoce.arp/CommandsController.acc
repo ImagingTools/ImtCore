@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -43,6 +43,9 @@
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="GqlCommandIds">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="CommandPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DataModel" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GuiElementContainer"/>
                     </AttributeInfo>
@@ -50,6 +53,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="PermissionChecker">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RepresentationController" Type="Reference" ExportId="">
@@ -142,10 +148,10 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="GuiElementContainer"/>
         <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="GqlCommandsController"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="GqlCommandsController"/>
         <Interface InterfaceId="imtrest::IGuiElementContainer" ComponentId="GuiElementContainer"/>
+        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="GuiElementContainer"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="GuiElementContainer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="GqlCommandsController"/>
     </ExportedInterfaces>

@@ -494,9 +494,9 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	std::sort(roleList.begin(), roleList.end());
 	userData.Roles = QByteArray(roleList.join(';'));
 
-	QByteArray permissions = userInfoPtr->GetPermissions(productId).join(';');
+	QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
 	std::sort(permissions.begin(), permissions.end());
-	userData.Permissions = QByteArray(permissions);
+	userData.Permissions = permissions.join(';');
 
 	QList<sdl::imtauth::Users::CSystemInfo::V1_0> list;
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();

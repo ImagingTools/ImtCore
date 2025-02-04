@@ -317,6 +317,32 @@ istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObjectFrom
 }
 
 
+bool CSerializableObjectCollectionControllerComp::UpdateObjectFromRequest(
+			const imtgql::CGqlRequest& gqlRequest,
+			istd::IChangeable& object,
+			QString& errorMessage) const
+{
+	const imtgql::CGqlObject* inputObjectPtr = gqlRequest.GetParamObject("input");
+	if (inputObjectPtr == nullptr){
+		errorMessage = QString("Unable to create object from request. Error: GraphQL input parameters is invalid");
+		SendErrorMessage(0, errorMessage);
+
+		return false;
+	}
+
+	QByteArray objectData64 = inputObjectPtr->GetFieldArgumentValue("item").toByteArray();
+	QByteArray objectData = QByteArray::fromBase64(objectData64);
+	if (objectData.isEmpty()){
+		errorMessage = QString("Unable to create object from request. Error: 'item' from input params is empty");
+		SendErrorMessage(0, errorMessage);
+
+		return false;
+	}
+
+	return DeSerializeObject(&object, objectData);
+}
+
+
 imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObjects(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
