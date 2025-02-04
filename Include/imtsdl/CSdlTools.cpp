@@ -177,7 +177,7 @@ QString CSdlTools::ConvertType(const QString& sdlTypeName, bool* isCustomPtr, bo
 			*isComplexPtr = false;
 		}
 
-		return QStringLiteral("float");
+		return QStringLiteral("double");
 	}
 
 	// A signed double-precision floating-point value
