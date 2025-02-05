@@ -84,6 +84,24 @@ private:
 				MetdodType methodType,
 				imtsdlgen::ICxxModifier& modifier,
 				bool forHeader);
+	QString GetVersionMemberVariableName(
+				const imtsdl::CSdlType& sdlType,
+				int versionIndex = -1) const;
+	void GenerateVersionMemberDeclaration(
+				QTextStream& stream,
+				const imtsdl::CSdlType& sdlType,
+				bool optWrap = false,
+				int versionIndex = -1);
+	void GenerateMethodImplementation(
+				QTextStream& stream,
+				const imtsdl::CSdlType& sdlType,
+				MetdodType methodType,
+				imtsdlgen::ICxxModifier& modifier);
+	void GenerateMethodCall(
+				QTextStream& stream,
+				const imtsdl::CSdlType& sdlType,
+				MetdodType methodType,
+				imtsdlgen::ICxxModifier& modifier);
 
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
