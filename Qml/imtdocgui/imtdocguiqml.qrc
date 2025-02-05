@@ -19,6 +19,7 @@
 	<file alias="imtdocgui/SingleDocumentWorkspacePageView.qml">SingleDocumentWorkspacePageView.qml</file>
 	<file alias="imtdocgui/DocumentHistoryPanel.qml">DocumentHistoryPanel.qml</file>
 	<file alias="imtdocgui/DocumentView.qml">DocumentView.qml</file>
+	<file alias="imtdocgui/DocumentViewBase.qml">DocumentViewBase.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

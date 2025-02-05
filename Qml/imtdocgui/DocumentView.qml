@@ -3,39 +3,16 @@ import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 
-// GuiComponentBase
-ViewBase {
+DocumentViewBase {
 	id: root;
 
-	property string documentId;
-	property string documentTypeId;
-	property string viewTypeId;
-	property DocumentManager documentManager;
-	property Component viewComp: null;
-	property ViewBase view: contentLoader.item;
 	property alias historyVisible: historyPanel.visible;
 
-	signal viewRegistered();
-
-	onModelChanged: {
+	onViewChanged: {
 		if (view){
-			view.model = model;
-		}
-	}
-
-	onViewRegistered: {
-		console.debug("onViewRegistered", documentId, documentTypeId, viewTypeId, root);
-	}
-
-	function updateGui(){
-		if (view){
-			view.doUpdateGui();
-		}
-	}
-
-	function updateModel(){
-		if (view){
-			view.doUpdateModel();
+			contentItem.width = view.width;
+			contentItem.height = view.height;
+			view.parent = contentItem;
 		}
 	}
 
@@ -80,20 +57,15 @@ ViewBase {
 		anchors.bottomMargin: Style.size_largeMargin;
 		anchors.right: scrollbar.left;
 		anchors.rightMargin: Style.size_largeMargin;
-		contentWidth: contentLoader.width;
-		contentHeight: Math.max(contentLoader.height + 2 * Style.size_largeMargin + 100, historyPanel.contentHeight + 2 * Style.size_largeMargin);
+		contentWidth: contentItem.width;
+		contentHeight: Math.max(contentItem.height + 2 * Style.size_largeMargin + 100, historyPanel.contentHeight + 2 * Style.size_largeMargin);
 		boundsBehavior: Flickable.StopAtBounds;
 
 		clip: true;
 		objectName: "DocumentView";
 
-		Loader {
-			id: contentLoader;
-			sourceComponent: root.viewComp;
-			onLoaded: {
-				console.debug("View for document successfully created");
-				item.model = root.model;
-			}
+		Item {
+			id: contentItem;
 		}
 	}
 }
