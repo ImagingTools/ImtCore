@@ -838,17 +838,6 @@ void CSdlClassCodeGeneratorComp::GenerateMethodImplementation(
 			MetdodType methodType,
 			imtsdlgen::ICxxModifier& modifier)
 {
-	/**
-		\code
-			if (version == PV_1_0) {
-				if (!Version_1_0){
-					return false;
-				}
-				return Version_1_0->WriteToModel(model, modelIndex);
-			}
-		\endcode
-	*/
-
 	stream << '{';
 	FeedStream(stream, 1, false);
 

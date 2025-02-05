@@ -97,12 +97,12 @@ int CGqlSchemaParserComp::DoProcessing(
 
 	}
 
-	// first ensure, this file is not processed
+	// first ensure, this file is not processed. It is OK it already processed as import from another schema
 	if (processedFilesPtr != nullptr){
 		int optionsCount = processedFilesPtr->GetOptionsCount();
 		for (int i = 0; i < optionsCount; ++i){
 			if (m_currentSchemaFilePath == processedFilesPtr->GetOptionName(i)){
-				SendWarningMessage(0, QString("File '%1' already processed. Skipping..."));
+				SendVerboseMessage(0, QString("File '%1' already processed. Skipping...").arg(m_currentSchemaFilePath));
 
 				return TS_OK;
 			}
