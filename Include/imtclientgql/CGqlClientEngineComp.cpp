@@ -5,6 +5,9 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
+// ImtCore includes
+#include<imtbase/imtbase.h>
+
 
 namespace imtclientgql
 {
@@ -61,6 +64,11 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 		if (!token.isEmpty()){
 			networkRequest->setRawHeader("x-authentication-token", token);
 		}
+	}
+
+	const QByteArray protocolVersion = request.GetProtocolVersion();
+	if (!protocolVersion.isEmpty()){
+		networkRequest->setRawHeader(imtbase::s_protocolVersionHeaderId, protocolVersion);
 	}
 
 	return networkRequest;

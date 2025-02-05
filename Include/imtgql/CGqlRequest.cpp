@@ -112,6 +112,14 @@ const CGqlObject* CGqlRequest::GetParamObject(const QByteArray& paramId) const
 	return m_params.GetFieldArgumentObjectPtr(paramId);
 }
 
+void CGqlRequest::SetProtocolVersion(const QByteArray& protocolVersion)
+{
+	if (m_protocolVersion != protocolVersion){
+		istd::CChangeNotifier notifier(this);
+		m_protocolVersion = protocolVersion;
+	}
+}
+
 
 QByteArray CGqlRequest::GetCommandId() const
 {
@@ -163,6 +171,12 @@ QByteArray CGqlRequest::GetQuery() const
 const IGqlContext* CGqlRequest::GetRequestContext() const
 {
 	return m_gqlContextPtr.get();
+}
+
+
+QByteArray CGqlRequest::GetProtocolVersion() const
+{
+	return m_protocolVersion;
 }
 
 
@@ -491,6 +505,7 @@ bool CGqlRequest::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 			m_params = sourcePtr->m_params;
 			m_fields = sourcePtr->m_fields;
 			m_gqlContextPtr = sourcePtr->m_gqlContextPtr;
+			m_protocolVersion = sourcePtr->m_protocolVersion;
 
 			return true;
 		}
@@ -520,6 +535,7 @@ bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 	m_fields.ResetData();
 
 	m_gqlContextPtr.reset();
+	m_protocolVersion.clear();
 
 	return true;
 }

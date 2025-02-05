@@ -8,6 +8,7 @@
 #include <iprm/IOptionsList.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/CGqlContext.h>
 #include <imtrest/IProtocolEngine.h>
@@ -37,6 +38,17 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 	QByteArray gqlCommand = m_lastRequest.GetCommandId();
 
+	//set a protocol version to gql object
+	for (HeadersMap::const_iterator headerIter = headers.cbegin(); headerIter != headers.cend(); ++headerIter){
+		// find header. compare with lowercase. RFC 2616: 4.2
+		if (headerIter.key().toLower() == imtbase::s_protocolVersionHeaderId.toLower()){
+			const QByteArray protocolVersion = *headerIter;
+			m_lastRequest.SetProtocolVersion(protocolVersion);
+
+			break;
+		}
+	}
+
 	QByteArray userId;
 
 	bool isSuccessful = false;
@@ -65,9 +77,9 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	}
 	else{
 		if (!headers.isEmpty()){
-			imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
-			gqlContextPtr->SetHeaders(headers);
-			m_lastRequest.SetGqlContext(gqlContextPtr);
+			imtgql::CGqlContext* gqlContextImplPtr = new imtgql::CGqlContext();
+			gqlContextImplPtr->SetHeaders(headers);
+			m_lastRequest.SetGqlContext(gqlContextImplPtr);
 		}
 		QString message = QString("There is no authentication token in the HTTP headers. Info: Command: '%1'").arg(qPrintable(gqlCommand));
 	}

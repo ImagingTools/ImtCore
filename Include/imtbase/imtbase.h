@@ -13,6 +13,7 @@
 namespace imtbase
 {
 
+static const inline QByteArray s_protocolVersionHeaderId = QByteArrayLiteral("X-Protocol-Version");
 
 } // namespace imtbase
 

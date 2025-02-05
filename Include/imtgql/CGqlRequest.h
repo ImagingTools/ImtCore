@@ -34,12 +34,16 @@ public:
 	const CGqlObject* GetFieldObject(const QByteArray& fieldId) const;
 	const CGqlObject* GetParamObject(const QByteArray& paramId) const;
 
+	void SetProtocolVersion(const QByteArray& protocolVersion);
+
+	bool ParseQuery(const QByteArray& query, int &errorPosition);
+
 	// reimplemented (IGqlRequest)
 	virtual QByteArray GetCommandId() const override;
 	virtual RequestType GetRequestType() const override;
 	virtual QByteArray GetQuery() const override;
 	virtual const imtgql::IGqlContext* GetRequestContext() const override;
-	virtual bool ParseQuery(const QByteArray& query, int &errorPosition);
+	virtual QByteArray GetProtocolVersion() const override;
 
 	// reimplemented (iser::IObject)
 	virtual QByteArray GetFactoryId() const override;
@@ -81,6 +85,7 @@ protected:
 	bool m_startArrayPrimitives;
 	bool m_textString;
 	QByteArray m_currentField;
+	QByteArray m_protocolVersion;
 
 	CGqlObject* m_activeGqlObjectPtr;
 	QList<CGqlObject*> m_objectArrayList;

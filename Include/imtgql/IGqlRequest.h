@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <QtCore/qbytearray.h>
 #include <iser/IObject.h>
 
 // ImtCore includes
@@ -40,6 +41,10 @@ public:
 	virtual RequestType GetRequestType() const = 0;
 	virtual QByteArray GetQuery() const = 0;
 	virtual const imtgql::IGqlContext* GetRequestContext() const = 0;
+	/**
+		The version of the exchange protocol used to determine the message version. X-Protocol-Version http header \sa imtbase::s_protocolVersionHeaderId
+	*/
+	virtual QByteArray GetProtocolVersion() const = 0;
 };
 
 
