@@ -330,8 +330,6 @@ Item {
 				thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
             }
             else{
-				AuthorizationController.removeDataFromStorage();
-
 				if (type === 'NotExists'){
 					thumbnailDecorator.showPage(thumbnailDecorator.superuserPasswordPageComp)
 				}
