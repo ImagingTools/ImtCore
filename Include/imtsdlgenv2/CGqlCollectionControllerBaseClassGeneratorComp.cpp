@@ -1464,7 +1464,7 @@ QString CGqlCollectionControllerBaseClassGeneratorComp::GetInputExtractionString
 }
 
 
-bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const imtsdl::CSdlField& aSdlField, const QString typeName, QString& callChain) const
+bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const imtsdl::CSdlField& aSdlField, const QString typeName, QString& callChain, bool _isRoot) const
 {
 	bool isCustom = false;
 	ConvertType(aSdlField, &isCustom);
@@ -1477,9 +1477,17 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 	Q_ASSERT(isTypeExsists);
 
 	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
-		if (sdlField.GetType() == typeName || FindCallChainForField(sdlField, typeName, callChain)){
-			callChain.append('.');
-			callChain.append(sdlField.GetId());
+		if (sdlField.GetType() == typeName || FindCallChainForField(sdlField, typeName, callChain, false)){
+			callChain.prepend(sdlField.GetId());
+			// add '.' if is root, because it is an object
+			if (_isRoot){
+				callChain.prepend('.');
+			}
+			// add '->' if reference is inside other object, because they are "pointers"/optional
+			else {
+				callChain.prepend('>');
+				callChain.prepend('-');
+			}
 
 			return true;
 		}

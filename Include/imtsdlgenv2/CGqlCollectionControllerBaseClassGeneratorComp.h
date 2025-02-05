@@ -95,7 +95,9 @@ private:
 	void AddSpecialMethodImplCodeForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
 	void AddSpecialMethodImplCode(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, uint hIndents = 1);
 	QString GetInputExtractionStringForTypeName(const imtsdl::CSdlRequest& sdlRequest, const QString typeName) const;
-	bool FindCallChainForField(const imtsdl::CSdlField& sdlRequest, const QString typeName, QString& callChain) const;
+
+	/// \param _isRoot - internal recursive param. NEVER SET IT!
+	bool FindCallChainForField(const imtsdl::CSdlField& sdlRequest, const QString typeName, QString& callChain, bool _isRoot = true) const;
 
 	/// fallback for quick fix \todo do this resolving in schemaParser
 	/// \todo improve method m_sdlDocumentListCompPtr->GetDocumentTypes(), add \param localOnly
