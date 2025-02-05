@@ -745,10 +745,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		int itemIndex = itemsModelPtr->InsertNewItem();
 		if (itemIndex >= 0){
 			if (!SetupGqlItem(gqlRequest, *itemsModelPtr, itemIndex, objectCollectionIterator.GetPtr(), errorMessage)){
-				errorMessage = QString("Unable to get object data from object collection iterator.");
-				SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-
-				return nullptr;
+				SendWarningMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 			}
 		}
 	}

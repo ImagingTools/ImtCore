@@ -222,15 +222,23 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Users::CUserItem::V1_0& representationObject,
 	QString& errorMessage) const
 {
+	QByteArray objectId = objectCollectionIterator.GetObjectId();
+
 	imtauth::IUserInfo* contextUserInfoPtr = nullptr;
 	const imtgql::IGqlContext* gqlContextPtr = usersListRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		contextUserInfoPtr = gqlContextPtr->GetUserInfo();
 	}
 
+	if (contextUserInfoPtr == nullptr){
+		errorMessage = QString("Unable to create representation from object '%1'. Error: GraphQL context is invalid").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+		return false;
+	}
+
 	sdl::imtauth::Users::V1_0::UsersListRequestArguments arguments = usersListRequest.GetRequestedArguments();
 
-	QByteArray objectId = objectCollectionIterator.GetObjectId();
 	QByteArray productId;
 	if (arguments.input.ProductId){
 		productId = *arguments.input.ProductId;
@@ -249,16 +257,11 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	bool ok = false;
+	if (!contextUserInfoPtr->IsAdmin() && userInfoPtr->IsAdmin()){
+		errorMessage = QString("Unable to create representation from object 'su'. Error: User '%1' permission denied").arg(qPrintable(contextUserInfoPtr->GetId()));
+		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
-	if (contextUserInfoPtr != nullptr){
-		if (!contextUserInfoPtr->IsAdmin() && userInfoPtr->IsAdmin()){
-			ok = true;
-		}
-	}
-
-	if (ok){
-		return true;
+		return false;
 	}
 
 	sdl::imtauth::Users::V1_0::UsersListRequestInfo requestInfo = usersListRequest.GetRequestInfo();

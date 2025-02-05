@@ -170,13 +170,21 @@ sdl::imtauth::Users::CRegisterUserPayload::V1_0 CUserControllerComp::OnRegisterU
 		productId = *arguments.input.ProductId;
 	}
 
-	istd::TDelPtr<imtauth::IUserInfo> userInfoPtr = m_userFactoryCompPtr.CreateInstance();
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
+	userInfoPtr.SetCastedOrRemove(m_userFactoryCompPtr.CreateInstance());
+	if (!userInfoPtr.IsValid()){
+		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
+		return response;
+	}
+
 	sdl::imtauth::Users::CUserData::V1_0 userData = *arguments.input.UserData;
 
 	QByteArray userId;
 	if (arguments.input.UserData->Id){
 		userId = *arguments.input.UserData->Id;
 	}
+
+	userInfoPtr->SetObjectUuid(userId);
 
 	if (!m_userRepresentationController.FillUserInfoFromRepresentation(userData, *userInfoPtr, *m_userCollectionCompPtr, userId, errorMessage)){
 		errorMessage = QString("Unable to register user. Error: '%1'").arg(errorMessage);
@@ -460,7 +468,8 @@ sdl::imtauth::Users::CCreateSuperuserPayload::V1_0 CUserControllerComp::OnCreate
 		return response;
 	}
 
-	istd::TDelPtr<imtauth::IUserInfo> superuserInfoPtr = m_userFactoryCompPtr.CreateInstance();
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> superuserInfoPtr;
+	superuserInfoPtr.SetCastedOrRemove(m_userFactoryCompPtr.CreateInstance());
 	if (!superuserInfoPtr.IsValid()){
 		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
 		return response;

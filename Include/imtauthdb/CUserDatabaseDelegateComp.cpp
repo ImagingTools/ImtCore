@@ -63,7 +63,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 		}
 
 		QByteArray documentContent;
-		if (WriteDataToMemory("DocumentInfo", *userInfoPtr, documentContent)){
+		if (WriteDataToMemory("User", *userInfoPtr, documentContent)){
 			int revisionVersion = 1;
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
@@ -179,7 +179,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	}
 	else{
 		QByteArray documentContent;
-		if (WriteDataToMemory("DocumentInfo", *userInfoPtr, documentContent)){
+		if (WriteDataToMemory("User", *userInfoPtr, documentContent)){
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 			retVal += QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );")
 					.arg(qPrintable(*m_tableNameAttrPtr))
