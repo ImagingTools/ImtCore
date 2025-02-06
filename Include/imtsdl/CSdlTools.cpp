@@ -832,7 +832,8 @@ QString CSdlTools::GetNamespaceFromParamsOrArguments(
 {
 	return GetNamespaceFromParamsOrArguments(
 				(schemaParamsCompPtr.IsValid() ? schemaParamsCompPtr.GetPtr() : nullptr),
-				argumentParamsCompPtr);
+				argumentParamsCompPtr,
+				addVersion);
 }
 
 
