@@ -228,13 +228,13 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 				if (userInfoPtr.IsValid()){
 					userInfoPtr->SetId(login);
 					sdl::imtauth::Authorization::CAuthorizationPayload retVal;
-					retVal.Version_1_0 = CreateAuthorizationSuccessfulResponse(*userInfoPtr.GetPtr(), *m_systemIdAttrPtr, productId, errorMessage);
+					retVal = CreateAuthorizationSuccessfulResponse(*userInfoPtr.GetPtr(), *m_systemIdAttrPtr, productId, errorMessage);
 
 					return retVal;
 				}
 				else{
 					sdl::imtauth::Authorization::CAuthorizationPayload retVal;
-					retVal.Version_1_0 = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+					retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 
 					return retVal;
 				}
