@@ -67,12 +67,22 @@ Item {
 		}
 	}
 
-	function addFixedView(viewComp, name, forceFocus){
+	function addFixedView(viewComp, name, id, forceFocus){
 		if (!forceFocus){
 			forceFocus = false;
 		}
 
-		tabView.addTab(UuidGenerator.generateUUID(), name, viewComp);
+		if (!id || id === ""){
+			id = UuidGenerator.generateUUID();
+		}
+
+		let index = tabView.getIndexById(id);
+		if (index >= 0){
+			tabView.currentIndex = index;
+			return;
+		}
+
+		tabView.addTab(id, name, viewComp);
 
 		if (forceFocus){
 			tabView.currentIndex = tabView.tabModel.count - 1;

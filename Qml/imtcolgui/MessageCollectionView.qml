@@ -21,6 +21,12 @@ RemoteCollectionView {
         }
     }
 
+	onDataControllerChanged: {
+		if (dataController){
+			dataController.headersModel  = collectionHeadersModel;
+		}
+	}
+
     function updateHeaders(){
         collectionHeadersModel.clear();
 
@@ -35,13 +41,11 @@ RemoteCollectionView {
         index = collectionHeadersModel.insertNewItem();
         collectionHeadersModel.setData("Id", "Source", index);
         collectionHeadersModel.setData("Name", qsTr("Source"), index);
-
-        log.dataController.headersModel  = collectionHeadersModel;
     }
 
     onHeadersChanged: {
         if (log.table.headers.getItemsCount() > 0){
-            log.table.tableDecorator = logTableDecoratorModel
+			log.table.tableDecorator = logTableDecoratorModel
             log.table.setColumnContentComponent(0, messageColumnContentComp);
         }
     }
@@ -105,7 +109,7 @@ RemoteCollectionView {
         id: messageColumnContentComp;
         TableCellIconTextDelegate {
             id: cellDelegate
-            onRowIndexChanged: {
+			onReused: {
                 if (rowIndex >= 0){
                     let category = rowDelegate.tableItem.elements.getData("Category", rowIndex);
                     if (category === 0){

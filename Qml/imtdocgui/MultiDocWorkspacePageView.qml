@@ -11,7 +11,7 @@ DocumentWorkspacePageView {
 
     onStartItemSourceCompChanged: {
         if (startItemSourceComp){
-			documentManagerView_.addFixedView(startItemSourceComp, pageName, true);
+			documentManagerView_.addFixedView(startItemSourceComp, pageName, "", true);
         }
     }
 
