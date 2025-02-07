@@ -72,6 +72,8 @@
         <file alias="imtcontrols/Inputs/TimeIntervalPicker.qml">Inputs/TimeIntervalPicker.qml</file>
         <file alias="imtcontrols/Inputs/TimePicker.qml">Inputs/TimePicker.qml</file>
         <file alias="imtcontrols/Inputs/TimeInput.qml">Inputs/TimeInput.qml</file>
+		<file alias="imtcontrols/Inputs/DateInput.qml">Inputs/DateInput.qml</file>
+		<file alias="imtcontrols/Inputs/DateTimeInput.qml">Inputs/DateTimeInput.qml</file>
         <file alias="imtcontrols/Inputs/CheckBox.qml">Inputs/CheckBox.qml</file>
         <file alias="imtcontrols/Inputs/CheckBoxMenu.qml">Inputs/CheckBoxMenu.qml</file>
         <file alias="imtcontrols/Inputs/Slider.qml">Inputs/Slider.qml</file>
