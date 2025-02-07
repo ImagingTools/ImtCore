@@ -2,177 +2,155 @@ import QtQuick 2.15
 import Acf 1.0
 import imtcontrols 1.0
 
-Rectangle {
-    id: timeInput;
+Item {
+	id: timeInput;
 
-    width: minutesInput.width + minutesInput.x + mainMargin;
-    height: 36;
+	width: 84;
+	height: 36;
 
-    border.color: hoursInput.isEmpty || minutesInput.isEmpty ? "red" : "lightgray";
-    color: "transparent";
+	property int mainMargin: 0;
+	property int fontSize: Style.fontSizeNormal;
 
-    property int mainMargin: 4;
-    property int inputWidth: 36;
-    property int fontSize: 18;
+	property string fontColor: Style.textColor;
 
-    property string fontColor: Style.textColor;
+	property string placeHolderText: "hh:mm";
 
-	property var hoursRegExp: /^(([0-1]?\d)|(2[0-3]?))$/
-    property var minutesRegExp: /^[0-5]?[0-9]$/
-	property var timeRegExp: /^(([0-1]\d)|(2[0-3])):[0-5]\d$/
+	property var timeRegExpFull: /^(([0-1]\d)|(2[0-3])):[0-5]\d$/
+	//property var timeRegExp: /^(([0-1]\d)|(2[0-3]))?:{0,1}([0-5]\d)?$/
+	property var timeRegExp: /^[0-9:]{0,5}$/
 
-    property bool canShowCurrentTime: false;
+	property bool canShowCurrentTime: false;
 
-    property string time: (hoursInput.text + ":" + minutesInput.text).match(timeInput.timeRegExp) !== null ?
-                               (hoursInput.text + ":" + minutesInput.text) : "";
+	property bool  isError: false;
 
-    signal accepted(string value);
+	property Item tabKeyItem: null//input;
 
-    Component.onCompleted:{
-        if(canShowCurrentTime){
-            showCurrentTime();
-        }
-    }
+	property alias inputItem: input;
 
-    function setTime(str){
-        console.log("Set time")
-        if(str.match(timeInput.timeRegExp) === null){
-            console.log("Wrong time format!")
-            return;
-        }
-        let arr = str.split(":");
-        if(arr.length < 2){
-            return;
-        }
+	property string time;
 
-        hoursInput.text = arr[0];
-        minutesInput.text = arr[1];
-    }
+	signal accepted(string value);
 
-    function showCurrentTime(){
-        console.log("showCurrentTime")
-        let date = new Date();
+	Component.onCompleted:{
+		if(canShowCurrentTime){
+			showCurrentTime();
+		}
+	}
 
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-        if(String(hours).length == 1){
-            hours = "0" + hours;
-        }
-        if(String(minutes).length == 1){
-            minutes = "0" + minutes;
-        }
+	function checkDateFormat(str){
+		console.log("Check Date Format")
+		timeInput.isError = str.match(timeInput.timeRegExpFull) === null;
+		if(timeInput.isError){
+			console.log("Wrong time format!")
+		}
+		if(timeInput.isError){
+			let point = timeInput.mapToItem(null, 0, -8 - tooltip.componentHeight)
+			tooltip.openTooltipWithCoord(point.x,point.y)
+			closeTooltipPause.restart();
+		}
+		return !timeInput.isError;
+	}
 
-        let time  = hours + ":" + minutes;
-        //console.log("showCurrentTime:: ", time)
-        setTime(time);
-    }
+	function setTime(str){
+		console.log("Set time")
+		if(str.match(timeInput.timeRegExpFull) === null){
+			console.log("Wrong time format!")
+			return;
+		}
 
-    TextField{
-        id: hoursInput
+		input.text = str
+	}
 
-        anchors.left: parent.left;
-        anchors.leftMargin:  parent.mainMargin;
-        anchors.verticalCenter: parent.verticalCenter;
+	function showCurrentTime(){
+		console.log("showCurrentTime")
+		let date = new Date();
 
-        width: parent.inputWidth;
-        height: parent.height - 2 * parent.mainMargin;
+		let hours = date.getHours();
+		let minutes = date.getMinutes();
+		if(String(hours).length == 1){
+			hours = "0" + hours;
+		}
+		if(String(minutes).length == 1){
+			minutes = "0" + minutes;
+		}
 
-        textSize: parent.fontSize;
-        fontColor: timeInput.fontColor;
+		let time  = hours + ":" + minutes;
+		//console.log("showCurrentTime:: ", time)
+		setTime(time);
+	}
 
-        KeyNavigation.right: minutesInput;
-        KeyNavigation.tab: minutesInput;
+	CustomTextField{
+		id: input
 
-        textInputValidator : RegularExpressionValidator { regularExpression: timeInput.hoursRegExp }
+		anchors.centerIn: parent
 
-        property bool isEmpty: false;
+		width: parent.width - 2 * parent.mainMargin;
+		height: parent.height - 2 * parent.mainMargin;
 
-        onVisibleChanged: {
-            if(text == ""){
-                isEmpty = true;
-            }
-        }
+		textSize: parent.fontSize;
+		fontColor: timeInput.fontColor;
+		borderColor: Style.iconColorOnSelected;
 
-        onFocusChanged: {
-            if(!focus && text.length == 1){
-                text = "0" + text;
-            }
-        }
-        onAccepted: {
-            if(text.length == 1){
-                text = "0" + text;
-            }
-        }
+		KeyNavigation.tab: timeInput.tabKeyItem;
 
-        onTextChanged: {
-            if(text !== ""){
-                isEmpty = false;
-            }
+		placeHolderText: timeInput.placeHolderText;
+		placeHolderTextSize: fontSize-2;
 
-        }
-    }
+		textInputValidator : RegularExpressionValidator { regularExpression: timeInput.timeRegExp }
 
-    Text{
-        id: colon;
+		property bool isEmpty: false;
 
-        anchors.left: hoursInput.right;
-        anchors.leftMargin: 4;
-        anchors.verticalCenter: parent.verticalCenter;
+		onVisibleChanged: {
+			if(text == ""){
+				isEmpty = true;
+			}
+		}
 
-        font.family: Style.fontFamily;
-        font.pixelSize:  parent.fontSize;
-        color: timeInput.fontColor;
+		onFocusChanged: {
+			if(!focus){
+				timeInput.checkDateFormat(input.text);
+			}
+		}
+		onAccepted: {
+			if(timeInput.checkDateFormat(input.text)){
+				timeInput.time = input.text;
+				timeInput.accepted(input.text);
+			}
 
-        text: ":"
+		}
 
-    }
+		onTextChanged: {
+			if(text !== ""){
+				isEmpty = false;
+				timeInput.isError = false;
+			}
 
-    TextField{
-        id: minutesInput
+		}
+	}
 
-        anchors.left: colon.right;
-        anchors.leftMargin: 4;
-        anchors.verticalCenter: parent.verticalCenter;
+	Rectangle{
+		id: frame;
 
-        width: parent.inputWidth;
-        height: parent.height - 2 * parent.mainMargin;
+		anchors.fill: parent;
 
-        textSize: parent.fontSize;
-        fontColor: timeInput.fontColor;
+		radius: input.radius;
+		color: "transparent";
+		border.color: timeInput.isError ? Style.errorTextColor : "transparent";
+	}
 
-        KeyNavigation.left: hoursInput;
-        KeyNavigation.tab: hoursInput;
+	CustomTooltip{
+		id: tooltip;
 
-        textInputValidator : RegularExpressionValidator { regularExpression: timeInput.minutesRegExp }
+		text: "Wrong time format!"
+	}
 
-        property bool isEmpty: false;
 
-        onVisibleChanged: {
-            if(text == ""){
-                isEmpty = true;
-            }
-        }
+	PauseAnimation {
+		id: closeTooltipPause;
 
-        onFocusChanged: {
-            if(!focus && text.length == 1){
-                text = "0" + text;
-            }
-        }
-        onAccepted: {
-            if(text.length == 1){
-                text = "0" + text;
-            }
-            let str = hoursInput.text + ":" + minutesInput.text;
-            if(str.match(timeInput.timeRegExp) !== null){
-                timeInput.accepted(str);
-            }
-
-        }
-
-        onTextChanged: {
-            if(text !== ""){
-                isEmpty = false;
-            }
-        }
-    }
+		duration: 2000
+		onFinished: {
+			tooltip.hide();
+		}
+	}
 }

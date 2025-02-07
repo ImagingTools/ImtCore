@@ -210,10 +210,12 @@ FocusScope {
 
             anchors.verticalCenter: textField.verticalCenter;
             anchors.left: textField.left;
+			anchors.right: textField.right;
 
             font.pixelSize: containerTextField.placeHolderTextSize;
             font.bold: containerTextField.fontBold;
             font.family: Style.fontFamily;
+			verticalAlignment: Text.AlignVCenter;
 
             //TODO -> Style
             color: containerTextField.placeHolderFontColor;
