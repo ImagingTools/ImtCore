@@ -148,11 +148,11 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 }
 
 
-// reimplemented (sdl::imtlic::Features::V1_0::CFeatureCollectionControllerCompBase)
+// reimplemented (sdl::imtlic::Features::CFeatureCollectionControllerCompBase)
 
 bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtlic::Features::V1_0::CFeaturesListGqlRequest& featuresListRequest,
+			const sdl::imtlic::Features::CFeaturesListGqlRequest& featuresListRequest,
 			sdl::imtlic::Features::CFeatureItem::V1_0& representationObject,
 			QString& errorMessage) const
 {
@@ -180,7 +180,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
 
-	sdl::imtlic::Features::V1_0::FeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
+	sdl::imtlic::Features::FeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.Id = std::make_optional<QByteArray>(objectId);
@@ -311,7 +311,7 @@ istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentat
 
 bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const sdl::imtlic::Features::V1_0::CGetFeatureItemGqlRequest& featureItemRequest,
+			const sdl::imtlic::Features::CGetFeatureItemGqlRequest& featureItemRequest,
 			sdl::imtlic::Features::CFeatureDataPayload::V1_0& representationPayload,
 			QString& errorMessage) const
 {
@@ -323,13 +323,13 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtlic::Features::V1_0::GetFeatureItemRequestArguments arguments = featureItemRequest.GetRequestedArguments();
+	sdl::imtlic::Features::GetFeatureItemRequestArguments arguments = featureItemRequest.GetRequestedArguments();
 
 	sdl::imtlic::Features::CFeatureData::V1_0 featureData;
 
 	QByteArray id;
-	if (arguments.input.Id){
-		id = *arguments.input.Id;
+	if (arguments.input.Version_1_0->Id){
+		id = *arguments.input.Version_1_0->Id;
 	}
 	featureData.Id = std::make_optional<QByteArray>(id);
 
@@ -349,7 +349,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 bool CFeatureCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			const imtgql::CGqlRequest& /*rawGqlRequest*/,
-			const sdl::imtlic::Features::V1_0::CUpdateFeatureGqlRequest& updateFeatureRequest,
+			const sdl::imtlic::Features::CUpdateFeatureGqlRequest& updateFeatureRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
 {
@@ -363,8 +363,8 @@ bool CFeatureCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 	featureInfoPtr->ResetData();
 
-	QByteArray featureId = *updateFeatureRequest.GetRequestedArguments().input.Id;
-	sdl::imtlic::Features::CFeatureData::V1_0 featureData = *updateFeatureRequest.GetRequestedArguments().input.Item;
+	QByteArray featureId = *updateFeatureRequest.GetRequestedArguments().input.Version_1_0->Id;
+	sdl::imtlic::Features::CFeatureData::V1_0 featureData = *updateFeatureRequest.GetRequestedArguments().input.Version_1_0->Item;
 
 	bool ok = CreateFeatureFromRepresentationModel(featureData, featureId, *featureInfoPtr, errorMessage);
 	if (!ok){

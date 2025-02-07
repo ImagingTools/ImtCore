@@ -75,8 +75,8 @@ protected:
 
 		bool ok = Request::SetupGqlRequest(gqlRequest, arguments);
 		if (ok){
-			typename ResponseData::V1_0 response;
-			if (!SendModelRequest<typename ResponseData::V1_0, ResponseData>(gqlRequest, response)){
+			ResponseData response;
+			if (!SendModelRequest<ResponseData, ResponseData>(gqlRequest, response)){
 				return;
 			}
 

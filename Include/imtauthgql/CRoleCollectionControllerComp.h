@@ -12,10 +12,10 @@ namespace imtauthgql
 {
 
 
-class CRoleCollectionControllerComp: public sdl::imtauth::Roles::V1_0::CRoleCollectionControllerCompBase
+class CRoleCollectionControllerComp: public sdl::imtauth::Roles::CRoleCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtauth::Roles::V1_0::CRoleCollectionControllerCompBase BaseClass;
+	typedef sdl::imtauth::Roles::CRoleCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRoleCollectionControllerComp);
 		I_ASSIGN(m_gqlRequestProviderCompPtr, "GqlRequestProvider", "GraphQL request provider", false, "GqlRequestProvider");
@@ -30,16 +30,16 @@ protected:
 				QByteArray& objectId,
 				QString& errorMessage) const;
 
-	// reimplemented (sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::ImtCollection::CVisualStatus::V1_0 OnGetObjectVisualStatus(
-				const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+	// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::ImtCollection::CVisualStatus OnGetObjectVisualStatus(
+				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-	// reimplemented (sdl::imtauth::Roles::V1_0::CRoleCollectionControllerCompBase)
+	// reimplemented (sdl::imtauth::Roles::CRoleCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtauth::Roles::V1_0::CRolesListGqlRequest& rolesListRequest,
+				const sdl::imtauth::Roles::CRolesListGqlRequest& rolesListRequest,
 				sdl::imtauth::Roles::CRoleItem::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
@@ -48,12 +48,12 @@ protected:
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::imtauth::Roles::V1_0::CRoleItemGqlRequest& roleItemRequest,
+				const sdl::imtauth::Roles::CRoleItemGqlRequest& roleItemRequest,
 				sdl::imtauth::Roles::CRoleDataPayload::V1_0& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const ::imtgql::CGqlRequest& rawGqlRequest,
-				const sdl::imtauth::Roles::V1_0::CRoleUpdateGqlRequest& roleUpdateRequest,
+				const sdl::imtauth::Roles::CRoleUpdateGqlRequest& roleUpdateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;

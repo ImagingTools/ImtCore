@@ -7,10 +7,10 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (sdl::imtapp::Application::V1_0::CGraphQlHandlerCompBase)
+// reimplemented (sdl::imtapp::Application::CGraphQlHandlerCompBase)
 
-sdl::imtapp::Application::CApplicationInfo::V1_0 CApplicationInfoControllerComp::OnGetApplicationInfo(
-			const sdl::imtapp::Application::V1_0::CGetApplicationInfoGqlRequest& /*getApplicationInfoRequest*/,
+sdl::imtapp::Application::CApplicationInfo CApplicationInfoControllerComp::OnGetApplicationInfo(
+			const sdl::imtapp::Application::CGetApplicationInfoGqlRequest& /*getApplicationInfoRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
@@ -18,7 +18,7 @@ sdl::imtapp::Application::CApplicationInfo::V1_0 CApplicationInfoControllerComp:
 		errorMessage = QString("Unable to get an application info. Error: Component attribute 'm_applicationInfoCompPtr' was not set");
 		SendErrorMessage(0, errorMessage, "CApplicationInfoControllerComp");
 
-		return sdl::imtapp::Application::CApplicationInfo::V1_0();
+		return sdl::imtapp::Application::CApplicationInfo();
 	}
 
 	sdl::imtapp::Application::CApplicationInfo::V1_0 applicationInfo;
@@ -47,7 +47,10 @@ sdl::imtapp::Application::CApplicationInfo::V1_0 CApplicationInfoControllerComp:
 	QString type = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_TYPE);
 	applicationInfo.ApplicationType = std::make_optional<QString>(type);
 
-	return applicationInfo;
+	sdl::imtapp::Application::CApplicationInfo retVal;
+	retVal.Version_1_0 = std::make_optional(applicationInfo);
+
+	return retVal;
 }
 
 

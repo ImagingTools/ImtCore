@@ -63,17 +63,17 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 }
 
 
-// reimplemented (sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase)
+// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
 
-sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CObjectCollectionControllerCompBase::OnGetObjectVisualStatus(
-			const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::OnGetObjectVisualStatus(
+			const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
 	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response;
 
-	QByteArray objectId = *getObjectVisualStatusRequest.GetRequestedArguments().input.ObjectId;
-	QByteArray typeId = *getObjectVisualStatusRequest.GetRequestedArguments().input.TypeId;
+	QByteArray objectId = *getObjectVisualStatusRequest.GetRequestedArguments().input.Version_1_0->ObjectId;
+	QByteArray typeId = *getObjectVisualStatusRequest.GetRequestedArguments().input.Version_1_0->TypeId;
 
 	QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 	QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
@@ -92,7 +92,10 @@ sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CObjectCollectionControllerComp
 	response.Text = name;
 	response.Description = description;
 
-	return response;
+	sdl::imtbase::ImtCollection::CVisualStatus retVal;
+	retVal.Version_1_0 = std::make_optional(response);
+
+	return retVal;
 }
 
 
@@ -102,7 +105,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 		const imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest getVisualStatusRequest(gqlRequest, false);
+	sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest getVisualStatusRequest(gqlRequest, false);
 	if (getVisualStatusRequest.GetCommandId() == gqlRequest.GetCommandId()){
 		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
 	}
@@ -165,7 +168,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 
 bool CObjectCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
-	sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest getVisualStatusRequest(gqlRequest, false);
+	sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest getVisualStatusRequest(gqlRequest, false);
 
 	QByteArray getVisualStatusCommandId = getVisualStatusRequest.GetCommandId();
 	QByteArray requestCommandId = gqlRequest.GetCommandId();
@@ -177,7 +180,7 @@ bool CObjectCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlR
 	}
 
 	if (getVisualStatusRequest.IsValid()){
-		QByteArray typeId = *getVisualStatusRequest.GetRequestedArguments().input.TypeId;
+		QByteArray typeId = *getVisualStatusRequest.GetRequestedArguments().input.Version_1_0->TypeId;
 
 		return m_objectTypeIdAttrPtr.FindValue(typeId) >= 0;
 	}

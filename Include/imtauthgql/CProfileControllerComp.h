@@ -11,10 +11,10 @@ namespace imtauthgql
 {
 
 
-class CProfileControllerComp: public sdl::imtauth::Profile::V1_0::CGraphQlHandlerCompBase
+class CProfileControllerComp: public sdl::imtauth::Profile::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::Profile::V1_0::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::imtauth::Profile::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProfileControllerComp);
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", false, "UserCollection");
@@ -24,13 +24,13 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtauth::Profile::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Profile::CProfileData::V1_0 OnGetProfile(
-				const sdl::imtauth::Profile::V1_0::CGetProfileGqlRequest& getProfileRequest,
+	// reimplemented (sdl::imtauth::Profile::CGraphQlHandlerCompBase)
+	virtual sdl::imtauth::Profile::CProfileData OnGetProfile(
+				const sdl::imtauth::Profile::CGetProfileGqlRequest& getProfileRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Profile::CSetProfileResponse::V1_0 OnSetProfile(
-				const sdl::imtauth::Profile::V1_0::CSetProfileGqlRequest& setProfileRequest,
+	virtual sdl::imtauth::Profile::CSetProfileResponse OnSetProfile(
+				const sdl::imtauth::Profile::CSetProfileGqlRequest& setProfileRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 protected:

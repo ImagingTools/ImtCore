@@ -11,10 +11,10 @@ namespace imtlicgql
 {
 
 
-class CLicenseCollectionControllerComp: public sdl::imtlic::Licenses::V1_0::CLicenseCollectionControllerCompBase
+class CLicenseCollectionControllerComp: public sdl::imtlic::Licenses::CLicenseCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtlic::Licenses::V1_0::CLicenseCollectionControllerCompBase BaseClass;
+	typedef sdl::imtlic::Licenses::CLicenseCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CLicenseCollectionControllerComp);
 		I_ASSIGN(m_licenseInfoFactCompPtr, "LicenseFactory", "Factory used for creation of the new license instance", true, "LicenseFactory");
@@ -24,7 +24,7 @@ protected:
 	// reimplemented (sdl::imtlic::Licenses::CLicenseCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtlic::Licenses::V1_0::CLicensesListGqlRequest& licensesListRequest,
+				const sdl::imtlic::Licenses::CLicensesListGqlRequest& licensesListRequest,
 				sdl::imtlic::Licenses::CLicenseItem::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
@@ -33,12 +33,12 @@ protected:
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::imtlic::Licenses::V1_0::CLicenseItemGqlRequest& licenseItemRequest,
+				const sdl::imtlic::Licenses::CLicenseItemGqlRequest& licenseItemRequest,
 				sdl::imtlic::Licenses::CLicenseDataPayload::V1_0& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const ::imtgql::CGqlRequest& rawGqlRequest,
-				const sdl::imtlic::Licenses::V1_0::CLicenseUpdateGqlRequest& licenseUpdateRequest,
+				const sdl::imtlic::Licenses::CLicenseUpdateGqlRequest& licenseUpdateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 private:

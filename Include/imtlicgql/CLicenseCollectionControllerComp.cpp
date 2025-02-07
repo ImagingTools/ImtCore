@@ -15,11 +15,11 @@ namespace imtlicgql
 
 // protected methods
 
-// reimplemented (sdl::imtlic::Licenses::V1_0::CLicenseCollectionControllerCompBase)
+// reimplemented (sdl::imtlic::Licenses::CLicenseCollectionControllerCompBase)
 
 bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-	const sdl::imtlic::Licenses::V1_0::CLicensesListGqlRequest& licensesListRequest,
+	const sdl::imtlic::Licenses::CLicensesListGqlRequest& licensesListRequest,
 	sdl::imtlic::Licenses::CLicenseItem::V1_0& representationObject,
 	QString& errorMessage) const
 {
@@ -47,7 +47,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 
 	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
 
-	sdl::imtlic::Licenses::V1_0::LicensesListRequestInfo requestInfo = licensesListRequest.GetRequestInfo();
+	sdl::imtlic::Licenses::LicensesListRequestInfo requestInfo = licensesListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.Id = QByteArray(objectId);
@@ -148,7 +148,7 @@ istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentat
 
 bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	const istd::IChangeable& data,
-	const sdl::imtlic::Licenses::V1_0::CLicenseItemGqlRequest& licenseItemRequest,
+	const sdl::imtlic::Licenses::CLicenseItemGqlRequest& licenseItemRequest,
 	sdl::imtlic::Licenses::CLicenseDataPayload::V1_0& representationPayload,
 	QString& errorMessage) const
 {
@@ -160,11 +160,11 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtlic::Licenses::V1_0::LicenseItemRequestArguments arguments = licenseItemRequest.GetRequestedArguments();
+	sdl::imtlic::Licenses::LicenseItemRequestArguments arguments = licenseItemRequest.GetRequestedArguments();
 	sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0 licenseData;
 
-	if (arguments.input.Id){
-		licenseData.Id = QByteArray(*arguments.input.Id);
+	if (arguments.input.Version_1_0->Id){
+		licenseData.Id = QByteArray(*arguments.input.Version_1_0->Id);
 	}
 
 	QString name = licenseInfoPtr->GetLicenseName();
@@ -196,7 +196,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 
 bool CLicenseCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			const imtgql::CGqlRequest& /*rawGqlRequest*/,
-			const sdl::imtlic::Licenses::V1_0::CLicenseUpdateGqlRequest& licenseUpdateRequest,
+			const sdl::imtlic::Licenses::CLicenseUpdateGqlRequest& licenseUpdateRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
 {
@@ -210,8 +210,8 @@ bool CLicenseCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 	licenseInfoPtr->ResetData();
 
-	QByteArray objectId = *licenseUpdateRequest.GetRequestedArguments().input.Id;
-	sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0 licenseData = *licenseUpdateRequest.GetRequestedArguments().input.Item;
+	QByteArray objectId = *licenseUpdateRequest.GetRequestedArguments().input.Version_1_0->Id;
+	sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0 licenseData = *licenseUpdateRequest.GetRequestedArguments().input.Version_1_0->Item;
 
 	if (!FillObjectFromRepresentation(licenseData, *licenseInfoPtr, objectId, errorMessage)){
 		errorMessage = QString("Unable to update object from representation. Error: '%1'").arg(errorMessage);

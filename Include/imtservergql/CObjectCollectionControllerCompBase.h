@@ -27,10 +27,10 @@ namespace imtservergql
 
 class CObjectCollectionControllerCompBase:
 			public imtgql::IGqlRequestExtractor,
-			virtual public sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase
+			virtual public sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase
 {
 public:
-	typedef  sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase BaseClass;
+	typedef  sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)
@@ -70,9 +70,9 @@ public:
 		OT_OBJECT_TYPE_ID
 	};
 
-	// reimplemented (sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::ImtCollection::CVisualStatus::V1_0 OnGetObjectVisualStatus(
-				const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+	// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::ImtCollection::CVisualStatus OnGetObjectVisualStatus(
+				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

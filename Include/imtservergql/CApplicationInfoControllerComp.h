@@ -12,19 +12,19 @@ namespace imtservergql
 {
 
 
-class CApplicationInfoControllerComp: public sdl::imtapp::Application::V1_0::CGraphQlHandlerCompBase
+class CApplicationInfoControllerComp: public sdl::imtapp::Application::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtapp::Application::V1_0::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::imtapp::Application::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CApplicationInfoControllerComp);
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application data info", true, "ApplicationInfo");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtapp::Application::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtapp::Application::CApplicationInfo::V1_0 OnGetApplicationInfo(
-				const sdl::imtapp::Application::V1_0::CGetApplicationInfoGqlRequest& getApplicationInfoRequest,
+	// reimplemented (sdl::imtapp::Application::CGraphQlHandlerCompBase)
+	virtual sdl::imtapp::Application::CApplicationInfo OnGetApplicationInfo(
+				const sdl::imtapp::Application::CGetApplicationInfoGqlRequest& getApplicationInfoRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

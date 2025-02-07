@@ -12,26 +12,26 @@ namespace imtlicgql
 {
 
 
-class CProductControllerComp: public sdl::imtlic::Products::V1_0::CGraphQlHandlerCompBase
+class CProductControllerComp: public sdl::imtlic::Products::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtlic::Products::V1_0::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::imtlic::Products::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProductControllerComp);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtlic::Products::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::ImtCollection::CVisualStatus::V1_0 OnGetObjectVisualStatus(
-				const sdl::imtlic::Products::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+	// reimplemented (sdl::imtlic::Products::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::ImtCollection::CVisualStatus OnGetObjectVisualStatus(
+				const sdl::imtlic::Products::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtlic::Products::CProductExportResponse::V1_0 OnProductsExport(
-				const sdl::imtlic::Products::V1_0::CProductsExportGqlRequest& productsExportRequest,
+	virtual sdl::imtlic::Products::CProductExportResponse OnProductsExport(
+				const sdl::imtlic::Products::CProductsExportGqlRequest& productsExportRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtlic::Products::CProductImportResponse::V1_0 OnProductsImport(
-				const sdl::imtlic::Products::V1_0::CProductsImportGqlRequest& productsImportRequest,
+	virtual sdl::imtlic::Products::CProductImportResponse OnProductsImport(
+				const sdl::imtlic::Products::CProductsImportGqlRequest& productsImportRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 };

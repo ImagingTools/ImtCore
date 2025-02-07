@@ -1,7 +1,10 @@
 #include "CGqlWrapClassCodeGeneratorComp.h"
+#include "imtsdl/CSdlField.h"
 
 
 // C includes
+#include <QtCore/qassert.h>
+#include <QtCore/qbytearray.h>
 #include <iostream>
 
 // Qt includes
@@ -238,22 +241,16 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 	AddRequiredIncludesToHeaderFile(ifStream, sdlRequest, addDependenciesInclude);
 
 	// namespace begin
-	const QString sdlNamespace = GetNamespaceFromSchemaParams(*m_customSchemaParamsCompPtr);
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
+				m_customSchemaParamsCompPtr,
+				m_argumentParserCompPtr,
+				false);
 
 	ifStream << QStringLiteral("namespace ");
 	ifStream <<  sdlNamespace;
 	FeedStream(ifStream, 1, false);
 	ifStream <<  QStringLiteral("{");
 	FeedStream(ifStream, 2, false);
-
-	// ver namespace begin
-	ifStream << QStringLiteral("namespace ");
-	ifStream <<  GetNamespaceAcceptableString(GetSchemaVerstionString(*m_customSchemaParamsCompPtr));
-	FeedStream(ifStream, 1, false);
-
-	ifStream <<  QStringLiteral("{");
-	FeedStream(ifStream, 1, false);
-
 
 	// RequestInfo struct Begin
 	FeedStream(ifStream, 2, false);
@@ -264,8 +261,9 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 	ifStream << '{';
 	FeedStream(ifStream, 1, false);
 
+	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
 	// RequestInfo struct props
-	GenerateFieldRequestInfo(ifStream, sdlRequest.GetOutputArgument());
+	GenerateFieldRequestInfo(ifStream, outputArgument);
 
 	// RequestInfo struct End
 	ifStream << '}' << ';';
@@ -283,8 +281,10 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 	// RequestArguments struct props
 	imtsdl::SdlFieldList requestArguments = sdlRequest.GetInputArguments();
 	for (const imtsdl::CSdlField& sdlField: requestArguments){
+		CStructNamespaceConverter structNameConverter(sdlField, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << OptListConvertTypeWithNamespaceStruct(sdlField, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+		ifStream << structNameConverter.GetString();
 		ifStream << ' ' << sdlField.GetId() << ';';
 		FeedStream(ifStream, 1, false);
 	}
@@ -318,11 +318,6 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 	ifStream << QStringLiteral("};");
 	FeedStream(ifStream, 3, false);
 
-	// end of ver namespace
-	ifStream << QStringLiteral("} // namespace ");
-	ifStream << GetSchemaVerstionString(*m_customSchemaParamsCompPtr);
-	FeedStream(ifStream, 1, true);
-
 	// end of namespace
 	ifStream << QStringLiteral("} // namespace ");
 	ifStream << sdlNamespace;
@@ -346,7 +341,10 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRe
 	FeedStream(ifStream, 1);
 
 	// namespace begin
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
+		m_customSchemaParamsCompPtr,
+		m_argumentParserCompPtr,
+		false);
 	if (!sdlNamespace.isEmpty()){
 		ifStream << QStringLiteral("namespace ");
 		ifStream << sdlNamespace;
@@ -563,9 +561,15 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 	stream << QStringLiteral("m_gqlContextPtr = gqlRequest.GetRequestContext();");
 	FeedStream(stream, 2, false);
 
+	// declare and read gql protocol version
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("const QByteArray protocolVersion = gqlRequest.GetProtocolVersion();");
+	FeedStream(stream, 2, false);
+
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("// reading input arguments");
 	FeedStream(stream, 1, false);
+
 	for (const imtsdl::CSdlField& field: sdlRequest.GetInputArguments()){
 		AddFieldReadFromRequestCode(stream, field);
 	}
@@ -746,7 +750,7 @@ void CGqlWrapClassCodeGeneratorComp::AddRequiredIncludesToHeaderFile(QTextStream
 		if (addDependenciesInclude){
 			// first add include comment
 			if (!complexTypeList.isEmpty()){
-				stream << QStringLiteral("// ") << GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) << QStringLiteral(" includes");
+				stream << QStringLiteral("// ") << GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr, false) << QStringLiteral(" includes");
 				FeedStream(stream, 1, false);
 			}
 
@@ -1093,32 +1097,116 @@ void CGqlWrapClassCodeGeneratorComp::AddCheckCustomRequiredValueCode(QTextStream
 
 void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
 {
-	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
-	// declare bool variable and read data in private property
-	stream << QStringLiteral("const bool is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read = ");
-	stream << QStringLiteral("m_requestedArguments.") << field.GetId();
-	stream <<  QStringLiteral(".ReadFromGraphQlObject(*");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr);");
+	// check if a protocol is acceptable
+	stream << QStringLiteral("if (!protocolVersion.isEmpty()){");
 	FeedStream(stream, 1, false);
 
-	// update validation status
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("m_isValid = is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read;");
-	FeedStream(stream, 1, false);
+	imtsdl::CSdlType foundType;
+	[[maybe_unused]]const bool isTypeFound = GetSdlTypeForField(
+				field,
+				m_sdlTypeListCompPtr->GetSdlTypes(false),
+				foundType);
+	Q_ASSERT(isTypeFound);
 
-	// check the result of reading...
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (!is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read){");
-	FeedStream(stream, 1, false);
+	/// \todo check all versions
+	const QString fieldVersion = GetTypeVersion(foundType);
 	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (protocolVersion == \"");
+	stream << fieldVersion;
+	stream << QStringLiteral("\"){");
+	FeedStream(stream, 1, false);
 
+	/// \todo do this for all versions
+	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
+	CStructNamespaceConverter structNameConverter(
+				foundType,
+				sdlNamespace,
+				*m_sdlTypeListCompPtr,
+				*m_sdlEnumListCompPtr,
+				false);
+
+	QString typeVersion = structNameConverter.GetString();
+	typeVersion += QStringLiteral("::PV_");
+	typeVersion += GetSdlEntryVersion(foundType, false);
+	AddSetCustomValueToObjectCodeImpl(stream, field, typeVersion, hIndents + 1);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("else {");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("qWarning() << QString(\"Bad request. Version %1 is not supported\").arg(protocolVersion);");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("m_isValid = false;");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, hIndents + 2);
 	stream << QStringLiteral("return;");
 	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("else {");
+	FeedStream(stream, 1, false);
+
+	AddSetCustomValueToObjectCodeImpl(stream, field, QString(), hIndents);
+
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 }
 
+void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCodeImpl(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const QString typeVersion,
+			uint hIndents)
+{
+	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+
+	// declare bool variable and read data in private property
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("const bool is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read = ");
+	stream << QStringLiteral("m_requestedArguments.") << field.GetId();
+	stream <<  QStringLiteral(".ReadFromGraphQlObject(*");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr");
+	if (!typeVersion.isEmpty()){
+		stream << ',' << ' '<< typeVersion;
+	}
+	stream << ')' << ';';
+	FeedStream(stream, 1, false);
+
+	// update validation status
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("m_isValid = is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read;");
+	FeedStream(stream, 1, false);
+
+	// check the result of reading...
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (!is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("return;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+	FeedStream(stream, 1, false);
+}
 
 
 } // namespace imtsdlgenv2

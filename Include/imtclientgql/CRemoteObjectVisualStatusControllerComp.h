@@ -10,19 +10,19 @@ namespace imtclientgql
 {
 
 
-class CRemoteObjectVisualStatusControllerComp: public imtclientgql::TClientRequestManagerCompWrap<sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase>
+class CRemoteObjectVisualStatusControllerComp: public imtclientgql::TClientRequestManagerCompWrap<sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase> BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteObjectVisualStatusControllerComp);
 		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "Remote object type-IDs", false);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::ImtCollection::CVisualStatus::V1_0 OnGetObjectVisualStatus(
-				const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+	// reimplemented (sdl::imtbase::DocumentRevision::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::ImtCollection::CVisualStatus OnGetObjectVisualStatus(
+				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

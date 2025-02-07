@@ -151,15 +151,15 @@ const imtauth::CUserInfo* CLdapAuthorizationControllerComp::CreateUserInfoFromLd
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 CLdapAuthorizationControllerComp::OnAuthorization(
-			const sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest& authorizationRequest,
+sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAuthorization(
+			const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	if (m_enableableParamCompPtr.IsValid()){
 		bool enabled = m_enableableParamCompPtr->IsEnabled();
 		if (enabled){
-			sdl::imtauth::Authorization::CAuthorizationInput::V1_0 inputArgument = authorizationRequest.GetRequestedArguments().input;
+			sdl::imtauth::Authorization::CAuthorizationInput::V1_0 inputArgument = *authorizationRequest.GetRequestedArguments().input.Version_1_0;
 
 			QByteArray login;
 			if (inputArgument.Login){
@@ -227,10 +227,16 @@ sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 CLdapAuthorizationContr
 
 				if (userInfoPtr.IsValid()){
 					userInfoPtr->SetId(login);
-					return CreateAuthorizationSuccessfulResponse(*userInfoPtr.GetPtr(), *m_systemIdAttrPtr, productId, errorMessage);
+					sdl::imtauth::Authorization::CAuthorizationPayload retVal;
+					retVal.Version_1_0 = CreateAuthorizationSuccessfulResponse(*userInfoPtr.GetPtr(), *m_systemIdAttrPtr, productId, errorMessage);
+
+					return retVal;
 				}
 				else{
-					return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+					sdl::imtauth::Authorization::CAuthorizationPayload retVal;
+					retVal.Version_1_0 = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+
+					return retVal;
 				}
 			}
 		}

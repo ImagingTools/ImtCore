@@ -47,21 +47,22 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 	namespace authsdl = sdl::imtauth::Authorization;
 
 	QByteArray productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
-	authsdl::V1_0::AuthorizationRequestArguments arguments;
-	arguments.input.Login = QString(userName);
-	arguments.input.Password = QString(password);
-	arguments.input.ProductId = QByteArray(productId);
+	authsdl::AuthorizationRequestArguments arguments;
+	arguments.input.Version_1_0 = authsdl::CAuthorizationInput::V1_0();
+	arguments.input.Version_1_0->Login = QString(userName);
+	arguments.input.Version_1_0->Password = QString(password);
+	arguments.input.Version_1_0->ProductId = QByteArray(productId);
 
 	imtgql::CGqlRequest gqlRequest;
-	if (authsdl::V1_0::CAuthorizationGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		authsdl::CAuthorizationPayload::V1_0 response;
-		if (!SendModelRequest<authsdl::CAuthorizationPayload::V1_0, authsdl::CAuthorizationPayload>(gqlRequest, response)){
+	if (authsdl::CAuthorizationGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		authsdl::CAuthorizationPayload response;
+		if (!SendModelRequest<authsdl::CAuthorizationPayload, authsdl::CAuthorizationPayload>(gqlRequest, response)){
 			return false;
 		}
 
 		QByteArray userId;
-		if (response.UserId){
-			userId = *response.UserId;
+		if (response.Version_1_0->UserId){
+			userId = *response.Version_1_0->UserId;
 		}
 		if (userId.isEmpty()){
 			return false;
@@ -72,25 +73,25 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			return false;
 		}
 
-		if (response.Username){
-			m_userInfoPtr->SetId(*response.Username);
+		if (response.Version_1_0->Username){
+			m_userInfoPtr->SetId(*response.Version_1_0->Username);
 		}
-		if (response.Permissions){
-			m_userInfoPtr->SetLocalPermissions(productId, response.Permissions->split(';'));
+		if (response.Version_1_0->Permissions){
+			m_userInfoPtr->SetLocalPermissions(productId, response.Version_1_0->Permissions->split(';'));
 		}
 
 		m_userPermissionIds = m_userInfoPtr->GetPermissions(productId);
 
-		if (response.Token){
-			m_loggedUserToken = *response.Token;
+		if (response.Version_1_0->Token){
+			m_loggedUserToken = *response.Version_1_0->Token;
 		}
 		imtqml::CGqlModel::SetGlobalAccessToken(m_loggedUserToken);
 
-		if (response.Username){
+		if (response.Version_1_0->Username){
 			istd::CChangeNotifier notifier(this);
 			Q_UNUSED(notifier);
 
-			m_loggedUserId = *response.Username;
+			m_loggedUserId = *response.Version_1_0->Username;
 		}
 
 		m_loggedUserPassword = password.toUtf8();

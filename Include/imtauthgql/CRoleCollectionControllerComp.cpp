@@ -135,14 +135,14 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 }
 
 
-// reimplemented (sdl::imtbase::ImtCollection::V1_0::CGraphQlHandlerCompBase)
+// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
 
-sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CRoleCollectionControllerComp::OnGetObjectVisualStatus(
-			const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+sdl::imtbase::ImtCollection::CVisualStatus CRoleCollectionControllerComp::OnGetObjectVisualStatus(
+			const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response = BaseClass::OnGetObjectVisualStatus(getObjectVisualStatusRequest, gqlRequest, errorMessage);
+	sdl::imtbase::ImtCollection::CVisualStatus response = BaseClass::OnGetObjectVisualStatus(getObjectVisualStatusRequest, gqlRequest, errorMessage);
 
 	QByteArray languageId;
 	const imtgql::IGqlContext* gqlContextPtr = getObjectVisualStatusRequest.GetRequestContext();
@@ -150,21 +150,21 @@ sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CRoleCollectionControllerComp::
 		languageId = gqlContextPtr->GetLanguageId();
 	}
 
-	if (response.Text->isEmpty()){
-		response.Text = "<no name>";
+	if (response.Version_1_0->Text->isEmpty()){
+		response.Version_1_0->Text = "<no name>";
 	}
 
 	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Roles")).toUtf8(), languageId, "CRoleCollectionControllerComp");
-	response.Text = translation + QByteArrayLiteral(" / ") + *response.Text;
+	response.Version_1_0->Text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->Text;
 	return response;
 }
 
 
-// reimplemented (sdl::imtauth::Roles::V1_0::CRoleCollectionControllerCompBase)
+// reimplemented (sdl::imtauth::Roles::CRoleCollectionControllerCompBase)
 
 bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtauth::Roles::V1_0::CRolesListGqlRequest& rolesListRequest,
+			const sdl::imtauth::Roles::CRolesListGqlRequest& rolesListRequest,
 			sdl::imtauth::Roles::CRoleItem::V1_0& representationObject,
 			QString& errorMessage) const
 {
@@ -183,7 +183,7 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtauth::Roles::V1_0::RolesListRequestInfo requestInfo = rolesListRequest.GetRequestInfo();
+	sdl::imtauth::Roles::RolesListRequestInfo requestInfo = rolesListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.Id = QByteArray(objectId);
@@ -285,7 +285,7 @@ istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation
 
 bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const sdl::imtauth::Roles::V1_0::CRoleItemGqlRequest& roleItemRequest,
+			const sdl::imtauth::Roles::CRoleItemGqlRequest& roleItemRequest,
 			sdl::imtauth::Roles::CRoleDataPayload::V1_0& representationPayload,
 			QString& errorMessage) const
 {
@@ -297,7 +297,7 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtauth::Roles::V1_0::RoleItemRequestArguments arguments = roleItemRequest.GetRequestedArguments();
+	sdl::imtauth::Roles::RoleItemRequestArguments arguments = roleItemRequest.GetRequestedArguments();
 	sdl::imtauth::Roles::CRoleData::V1_0 roleData;
 
 	QByteArray id = roleInfoPtr->GetObjectUuid();
@@ -436,11 +436,11 @@ void CRoleCollectionControllerComp::SetObjectFilter(
 
 bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			const imtgql::CGqlRequest& /*rawGqlRequest*/,
-			const sdl::imtauth::Roles::V1_0::CRoleUpdateGqlRequest& roleUpdateRequest,
+			const sdl::imtauth::Roles::CRoleUpdateGqlRequest& roleUpdateRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Roles::CRoleData::V1_0 roleDataRepresentation = *roleUpdateRequest.GetRequestedArguments().input.Item;
+	sdl::imtauth::Roles::CRoleData::V1_0 roleDataRepresentation = *roleUpdateRequest.GetRequestedArguments().input.Version_1_0->Item;
 
 	imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(&object);
 	if (roleInfoPtr == nullptr){

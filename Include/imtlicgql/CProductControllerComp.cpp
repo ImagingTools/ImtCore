@@ -16,30 +16,30 @@ namespace imtlicgql
 // protected methods
 
 
-sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CProductControllerComp::OnGetObjectVisualStatus(
-	const sdl::imtlic::Products::V1_0::CGetObjectVisualStatusGqlRequest& /*getObjectVisualStatusRequest*/,
+sdl::imtbase::ImtCollection::CVisualStatus CProductControllerComp::OnGetObjectVisualStatus(
+	const sdl::imtlic::Products::CGetObjectVisualStatusGqlRequest& /*getObjectVisualStatusRequest*/,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return sdl::imtbase::ImtCollection::CVisualStatus::V1_0();
+	return sdl::imtbase::ImtCollection::CVisualStatus();
 }
 
 
-sdl::imtlic::Products::CProductExportResponse::V1_0 CProductControllerComp::OnProductsExport(
-			const sdl::imtlic::Products::V1_0::CProductsExportGqlRequest& /*productsExportRequest*/,
+sdl::imtlic::Products::CProductExportResponse CProductControllerComp::OnProductsExport(
+			const sdl::imtlic::Products::CProductsExportGqlRequest& /*productsExportRequest*/,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return sdl::imtlic::Products::CProductExportResponse::V1_0();
+	return sdl::imtlic::Products::CProductExportResponse();
 }
 
 
-sdl::imtlic::Products::CProductImportResponse::V1_0 CProductControllerComp::OnProductsImport(
-			const sdl::imtlic::Products::V1_0::CProductsImportGqlRequest& /*productsImportRequest*/,
+sdl::imtlic::Products::CProductImportResponse CProductControllerComp::OnProductsImport(
+			const sdl::imtlic::Products::CProductsImportGqlRequest& /*productsImportRequest*/,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return sdl::imtlic::Products::CProductImportResponse::V1_0();
+	return sdl::imtlic::Products::CProductImportResponse();
 }
 
 

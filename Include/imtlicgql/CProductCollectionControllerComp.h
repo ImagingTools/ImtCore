@@ -11,10 +11,10 @@ namespace imtlicgql
 {
 
 
-class CProductCollectionControllerComp: public sdl::imtlic::Products::V1_0::CProductCollectionControllerCompBase
+class CProductCollectionControllerComp: public sdl::imtlic::Products::CProductCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtlic::Products::V1_0::CProductCollectionControllerCompBase BaseClass;
+	typedef sdl::imtlic::Products::CProductCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProductCollectionControllerComp);
 		I_ASSIGN(m_licenseCollectionCompPtr, "LicenseCollection", "License collection", true, "LicenseCollection");
@@ -23,10 +23,10 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtlic::Products::V1_0::CProductCollectionControllerCompBase)
+	// reimplemented (sdl::imtlic::Products::CProductCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtlic::Products::V1_0::CProductsListGqlRequest& productsListRequest,
+				const sdl::imtlic::Products::CProductsListGqlRequest& productsListRequest,
 				sdl::imtlic::Products::CProductItem::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
@@ -35,12 +35,12 @@ protected:
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::imtlic::Products::V1_0::CProductItemGqlRequest& productItemRequest,
+				const sdl::imtlic::Products::CProductItemGqlRequest& productItemRequest,
 				sdl::imtlic::Products::CProductDataPayload::V1_0& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const ::imtgql::CGqlRequest& rawGqlRequest,
-				const sdl::imtlic::Products::V1_0::CProductUpdateGqlRequest& productUpdateRequest,
+				const sdl::imtlic::Products::CProductUpdateGqlRequest& productUpdateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 

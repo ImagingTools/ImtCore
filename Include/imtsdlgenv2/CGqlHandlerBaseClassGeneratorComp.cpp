@@ -276,21 +276,16 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 
 	// namespace begin
 
-	const QString sdlNamespace = GetNamespaceFromSchemaParams(*m_customSchemaParamsCompPtr);
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
+				m_customSchemaParamsCompPtr,
+				m_argumentParserCompPtr,
+				false);
 	ifStream << QStringLiteral("namespace ");
 	ifStream <<  sdlNamespace;
 	FeedStream(ifStream, 1, false);
 
 	ifStream <<  QStringLiteral("{");
-	FeedStream(ifStream, 1, false);
-
-	// ver namespace begin
-	ifStream << QStringLiteral("namespace ");
-	ifStream <<  GetNamespaceAcceptableString(GetSchemaVerstionString(*m_customSchemaParamsCompPtr));
-	FeedStream(ifStream, 1, false);
-
-	ifStream <<  QStringLiteral("{");
-	FeedStream(ifStream, 2, false);
+	FeedStream(ifStream, 3, false);
 
 	// class begin
 	ifStream << QStringLiteral("class CGraphQlHandlerCompBase");
@@ -318,16 +313,10 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 	FeedStream(ifStream, 1, false);
 
 	AddMethodsForDocument(ifStream, 1);
-	FeedStream(ifStream, 1, false);
 
 	// class end
 	ifStream << QStringLiteral("};");
 	FeedStream(ifStream, 3, false);
-
-	// end of ver namespace
-	ifStream << QStringLiteral("} // namespace ");
-	ifStream << GetSchemaVerstionString(*m_customSchemaParamsCompPtr);
-	FeedStream(ifStream, 1, true);
 
 	// end of namespace
 	ifStream << QStringLiteral("} // namespace ");
@@ -351,7 +340,10 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessSourceClassFile(bool addSelfHeade
 	FeedStream(ifStream, 1);
 
 	// namespace begin
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
+				m_customSchemaParamsCompPtr,
+				m_argumentParserCompPtr,
+				false);
 	if (!sdlNamespace.isEmpty()){
 		ifStream << QStringLiteral("namespace ");
 		ifStream << sdlNamespace;
@@ -418,11 +410,22 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodsForDocument(QTextStream& strea
 
 void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents)
 {
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
+				m_customSchemaParamsCompPtr,
+				m_argumentParserCompPtr,
+				false);
+
+	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
+	CStructNamespaceConverter structNameConverter(
+			outputArgument,
+			sdlNamespace, 
+			*m_sdlTypeListCompPtr, 
+			*m_sdlEnumListCompPtr,
+			false);
 
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("virtual ");
-	stream << OptListConvertTypeWithNamespaceStruct(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	stream << structNameConverter.GetString();
 	stream << QStringLiteral(" On");
 	stream << GetCapitalizedValue(sdlRequest.GetName());
 	stream << QStringLiteral("(const C");
@@ -458,7 +461,6 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 		FeedStream(stream, 1, false);
 	}
 	else {
-
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("const QByteArray commandId = gqlRequest.GetCommandId();");
 		FeedStream(stream, 1, false);
@@ -511,11 +513,18 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 	stream << '/' << '/' << ' ' << sdlRequest.GetName();
 	FeedStream(stream, 1, false);
 
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
+		m_customSchemaParamsCompPtr,
+		m_argumentParserCompPtr,
+		false);
 	const QString requestClassName = sdlRequest.GetName() + QStringLiteral("GqlRequest");
 	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
-	CStructNamespaceConverter structNameConverter(outputArgument, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
-	structNameConverter.addVersion = true;
+	CStructNamespaceConverter structNameConverter(
+		outputArgument,
+		sdlNamespace,
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		false);
 
 	// [1] command ID check
 	FeedStreamHorizontally(stream, hIndents);

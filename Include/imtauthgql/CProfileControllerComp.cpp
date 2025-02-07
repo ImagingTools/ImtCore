@@ -17,10 +17,10 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::imtauth::Profile::V1_0::CGraphQlHandlerCompBase)
+// reimplemented (sdl::imtauth::Profile::CGraphQlHandlerCompBase)
 
-sdl::imtauth::Profile::CProfileData::V1_0 CProfileControllerComp::OnGetProfile(
-			const sdl::imtauth::Profile::V1_0::CGetProfileGqlRequest& getProfileRequest,
+sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
+			const sdl::imtauth::Profile::CGetProfileGqlRequest& getProfileRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
@@ -28,10 +28,10 @@ sdl::imtauth::Profile::CProfileData::V1_0 CProfileControllerComp::OnGetProfile(
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CProfileControllerComp");
-		return profileData;
+		return sdl::imtauth::Profile::CProfileData();
 	}
 
-	sdl::imtauth::Profile::CGetProfileInput::V1_0 inputArgument = getProfileRequest.GetRequestedArguments().input;
+	sdl::imtauth::Profile::CGetProfileInput::V1_0 inputArgument = *getProfileRequest.GetRequestedArguments().input.Version_1_0;
 	QByteArray objectId;
 	if (inputArgument.id){
 		objectId = *inputArgument.id;
@@ -49,7 +49,7 @@ sdl::imtauth::Profile::CProfileData::V1_0 CProfileControllerComp::OnGetProfile(
 
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to get a profile info. Error: User with ID '%1' does not exists").arg(qPrintable(objectId));
-		return profileData;
+		return sdl::imtauth::Profile::CProfileData();
 	}
 
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
@@ -145,12 +145,15 @@ sdl::imtauth::Profile::CProfileData::V1_0 CProfileControllerComp::OnGetProfile(
 
 	profileData.permissions = std::make_optional<QList<sdl::imtauth::Profile::CPermissionInfo::V1_0>>(permissionList);
 
-	return profileData;
+	sdl::imtauth::Profile::CProfileData retVal;
+	retVal.Version_1_0 = std::make_optional(profileData);
+
+	return retVal;
 }
 
 
-sdl::imtauth::Profile::CSetProfileResponse::V1_0 CProfileControllerComp::OnSetProfile(
-			const sdl::imtauth::Profile::V1_0::CSetProfileGqlRequest& setProfileRequest,
+sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
+			const sdl::imtauth::Profile::CSetProfileGqlRequest& setProfileRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
@@ -158,10 +161,11 @@ sdl::imtauth::Profile::CSetProfileResponse::V1_0 CProfileControllerComp::OnSetPr
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CProfileControllerComp");
-		return response;
+
+		return sdl::imtauth::Profile::CSetProfileResponse();
 	}
 
-	sdl::imtauth::Profile::CSetProfileInput::V1_0 inputArgument = setProfileRequest.GetRequestedArguments().input;
+	sdl::imtauth::Profile::CSetProfileInput::V1_0 inputArgument = *setProfileRequest.GetRequestedArguments().input.Version_1_0;
 	QByteArray id;
 	if (inputArgument.id){
 		id = *inputArgument.id;
@@ -175,7 +179,7 @@ sdl::imtauth::Profile::CSetProfileResponse::V1_0 CProfileControllerComp::OnSetPr
 
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to set a profile info. Error: User with ID '%1' does not exists").arg(qPrintable(id));
-		return response;
+		return sdl::imtauth::Profile::CSetProfileResponse();
 	}
 
 	QString name;
@@ -192,12 +196,16 @@ sdl::imtauth::Profile::CSetProfileResponse::V1_0 CProfileControllerComp::OnSetPr
 
 	if (!m_userCollectionCompPtr->SetObjectData(id, *userInfoPtr)){
 		errorMessage = QString("Unable to set a profile info. Error: User collection cannot to update an object with ID '%1'").arg(qPrintable(id));
-		return response;
+
+		return sdl::imtauth::Profile::CSetProfileResponse();
 	}
 
 	response.status = true;
 
-	return response;
+	sdl::imtauth::Profile::CSetProfileResponse retVal;
+	retVal.Version_1_0 = std::make_optional(response);
+
+	return retVal;
 }
 
 

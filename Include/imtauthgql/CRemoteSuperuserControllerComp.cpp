@@ -21,11 +21,12 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 		return false;
 	}
 
-	namespace userssdl = sdl::imtauth::Users::V1_0;
+	namespace userssdl = sdl::imtauth::Users;
 
 	userssdl::UserAddRequestArguments arguments;
-	arguments.input.Id = QByteArray("su");
-	arguments.input.ProductId = QByteArray(m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8());
+	arguments.input.Version_1_0 = userssdl::CUserDataInput::V1_0();
+	arguments.input.Version_1_0->Id = QByteArray("su");
+	arguments.input.Version_1_0->ProductId = QByteArray(m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8());
 
 	sdl::imtauth::Users::CUserData::V1_0 userData;
 	userData.Id = QByteArray("su");
@@ -33,7 +34,7 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 	userData.Name = QString("superuser");
 	userData.Password = QString(qPrintable(password));
 
-	arguments.input.Item = std::make_optional<sdl::imtauth::Users::CUserData::V1_0>(userData);
+	arguments.input.Version_1_0->Item = std::make_optional<sdl::imtauth::Users::CUserData::V1_0>(userData);
 
 	imtgql::CGqlRequest gqlRequest;
 	if (userssdl::CUserAddGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

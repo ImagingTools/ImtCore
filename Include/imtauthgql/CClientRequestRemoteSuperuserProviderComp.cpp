@@ -21,15 +21,16 @@ bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& /*error
 
 	namespace userssdl = sdl::imtauth::Users;
 
-	userssdl::V1_0::UserItemRequestArguments arguments;
-	arguments.input.Id = QByteArray(*m_superuserIdAttrPtr);
+	userssdl::UserItemRequestArguments arguments;
+	arguments.input.Version_1_0 = sdl::imtauth::Users::CUserItemInput::V1_0();
+	arguments.input.Version_1_0->Id = QByteArray(*m_superuserIdAttrPtr);
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.ProductId = QByteArray(m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8());
+		arguments.input.Version_1_0->ProductId = QByteArray(m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8());
 	}
 
 	imtgql::CGqlRequest gqlRequest;
-	if (userssdl::V1_0::CUserItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+	if (userssdl::CUserItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		userssdl::CUserDataPayload::V1_0 response;
 		if (!SendModelRequest<userssdl::CUserDataPayload::V1_0, userssdl::CUserDataPayload>(gqlRequest, response)){
 			return false;

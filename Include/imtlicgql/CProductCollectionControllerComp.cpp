@@ -24,11 +24,11 @@ namespace imtlicgql
 
 // protected methods
 
-// reimplemented (sdl::imtlic::Products::V1_0::CProductCollectionControllerCompBase)
+// reimplemented (sdl::imtlic::Products::CProductCollectionControllerCompBase)
 
 bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-	const sdl::imtlic::Products::V1_0::CProductsListGqlRequest& productsListRequest,
+	const sdl::imtlic::Products::CProductsListGqlRequest& productsListRequest,
 	sdl::imtlic::Products::CProductItem::V1_0& representationObject,
 	QString& errorMessage) const
 {
@@ -56,7 +56,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 
 	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
 
-	sdl::imtlic::Products::V1_0::ProductsListRequestInfo requestInfo = productsListRequest.GetRequestInfo();
+	sdl::imtlic::Products::ProductsListRequestInfo requestInfo = productsListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.Id = QByteArray(objectId);
@@ -178,7 +178,7 @@ istd::IChangeable* CProductCollectionControllerComp::CreateObjectFromRepresentat
 
 bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	const istd::IChangeable& data,
-	const sdl::imtlic::Products::V1_0::CProductItemGqlRequest& productItemRequest,
+	const sdl::imtlic::Products::CProductItemGqlRequest& productItemRequest,
 	sdl::imtlic::Products::CProductDataPayload::V1_0& representationPayload,
 	QString& errorMessage) const
 {
@@ -190,13 +190,13 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtlic::Products::V1_0::ProductItemRequestArguments arguments = productItemRequest.GetRequestedArguments();
+	sdl::imtlic::Products::ProductItemRequestArguments arguments = productItemRequest.GetRequestedArguments();
 
 	sdl::imtlic::Products::CProductData::V1_0 productData;
 
 	QByteArray id;
-	if (arguments.input.Id){
-		id = *arguments.input.Id;
+	if (arguments.input.Version_1_0->Id){
+		id = *arguments.input.Version_1_0->Id;
 	}
 	productData.Id = QByteArray(id);
 
@@ -223,7 +223,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 
 bool CProductCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			const imtgql::CGqlRequest& /*rawGqlRequest*/,
-			const sdl::imtlic::Products::V1_0::CProductUpdateGqlRequest& productUpdateRequest,
+			const sdl::imtlic::Products::CProductUpdateGqlRequest& productUpdateRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
 {
@@ -235,8 +235,8 @@ bool CProductCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 
-	QByteArray objectId = *productUpdateRequest.GetRequestedArguments().input.Id;
-	sdl::imtlic::Products::CProductData::V1_0 productData = *productUpdateRequest.GetRequestedArguments().input.Item;
+	QByteArray objectId = *productUpdateRequest.GetRequestedArguments().input.Version_1_0->Id;
+	sdl::imtlic::Products::CProductData::V1_0 productData = *productUpdateRequest.GetRequestedArguments().input.Version_1_0->Item;
 
 	productInfoPtr->ResetData();
 

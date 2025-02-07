@@ -318,18 +318,12 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	}
 
 	// namespace begin
-	const QString sdlNamespace = GetNamespaceFromSchemaParams(*m_customSchemaParamsCompPtr);
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
+		m_customSchemaParamsCompPtr,
+		m_argumentParserCompPtr,
+		false);
 	ifStream << QStringLiteral("namespace ");
 	ifStream <<  sdlNamespace;
-	FeedStream(ifStream, 1, false);
-
-	ifStream <<  QStringLiteral("{");
-	FeedStream(ifStream, 2, false);
-
-
-	// ver namespace begin
-	ifStream << QStringLiteral("namespace ");
-	ifStream <<  GetNamespaceAcceptableString(GetSchemaVerstionString(*m_customSchemaParamsCompPtr));
 	FeedStream(ifStream, 1, false);
 
 	ifStream <<  QStringLiteral("{");
@@ -444,11 +438,6 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	ifStream << sdlNamespace;
 	FeedStream(ifStream, 1, false);
 
-	// end of ver namespace
-	ifStream << QStringLiteral("} // namespace ");
-	ifStream << GetSchemaVerstionString(*m_customSchemaParamsCompPtr);
-	FeedStream(ifStream, 1, true);
-
 	return true;
 }
 
@@ -466,7 +455,10 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(cons
 	FeedStream(ifStream, 1);
 
 	// namespace begin
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
+				m_customSchemaParamsCompPtr,
+				m_argumentParserCompPtr,
+				false);
 	if (!sdlNamespace.isEmpty()){
 		ifStream << QStringLiteral("namespace ");
 		ifStream << sdlNamespace;
@@ -524,9 +516,16 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodDeclarationForOper
 	functionName.prepend(QStringLiteral(" On"));
 
 	imtsdl::CSdlField type = sdlRequest.GetOutputArgument();
-	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlRequest.GetSchemaParams());
-	CStructNamespaceConverter structNamespaceConverter(type, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
-	structNamespaceConverter.addVersion = true;
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
+		&sdlRequest.GetSchemaParams(),
+		m_argumentParserCompPtr,
+		false);
+	CStructNamespaceConverter structNamespaceConverter(
+		type,
+		sdlNamespace,
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		false);
 
 	stream << structNamespaceConverter.GetString();
 	stream << ' ';
@@ -634,7 +633,11 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 			const imtsdl::CSdlDocumentType& sdlDocumentType,
 			uint hIndents)
 {
-	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlRequest.GetSchemaParams());
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
+				&sdlRequest.GetSchemaParams(),
+				m_argumentParserCompPtr,
+				false);
+
 	CStructNamespaceConverter structNameConverter;
 	structNameConverter.relatedNamespace = sdlNamespace;
 	structNameConverter.typeListProviderPtr = &*m_sdlTypeListCompPtr;
@@ -651,6 +654,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 		FeedStreamHorizontally(stream, hIndents + 3);
 		stream << QStringLiteral("const ");
 
+		/// \todo do this for all versions
 		if (operationType == imtsdl::CSdlDocumentType::OT_GET){
 			stream << QStringLiteral("istd::IChangeable& data,");
 			FeedStream(stream, 1, false);
@@ -706,7 +710,6 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 		imtsdl::CSdlType referenceType = sdlDocumentType.GetReferenceType();
 		structNameConverter.sdlEntryPtr = &referenceType;
 		structNameConverter.sdlFieldPtr = nullptr;
-		structNameConverter.addVersion = true;
 
 		FeedStreamHorizontally(stream, hIndents + 3);
 		stream << QStringLiteral("const ");
@@ -785,7 +788,11 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 	stream << '/' << '/' << ' ' << functionName;
 	FeedStream(stream, 1, false);
 
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
+				m_customSchemaParamsCompPtr,
+				m_argumentParserCompPtr,
+				false);
+
 	const QString requestClassName = sdlRequest.GetName() + QStringLiteral("GqlRequest");
 
 	// [1] command ID check
@@ -837,8 +844,13 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 	FeedStream(stream, 2, false);
 
 	imtsdl::CSdlField type = sdlRequest.GetOutputArgument();
-	CStructNamespaceConverter structNamespaceConverter(type, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
-	structNamespaceConverter.addVersion = true;
+	CStructNamespaceConverter structNamespaceConverter(
+				type,
+				sdlNamespace,
+				*m_sdlTypeListCompPtr,
+				*m_sdlEnumListCompPtr,
+				false);
+
 	// [1] create payload variable by calling reimplemented method
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << structNamespaceConverter.GetString();
@@ -1123,6 +1135,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 
 	// create sections for expected command IDs
 	for (const ImplGenerationInfo& sdlRequest: requestList){
+		/// \todo do this for all versions
 		AddImplCodeForRequest(stream, sdlRequest, operationType, sdlDocumentType, hIndents + 1);
 	}
 
@@ -1279,13 +1292,27 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 			const imtsdl::CSdlDocumentType& sdlDocumentType,
 			uint hIndents)
 {
-	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlRequestInfo.request.GetSchemaParams());
+	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
+				&sdlRequestInfo.request.GetSchemaParams(),
+				m_argumentParserCompPtr,
+				false);
+
 	imtsdl::CSdlType referenceType = sdlDocumentType.GetReferenceType();
-	CStructNamespaceConverter structNameConverter(referenceType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(
+				referenceType,
+				sdlNamespace,
+				*m_sdlTypeListCompPtr,
+				*m_sdlEnumListCompPtr,
+				false);
 	structNameConverter.addVersion = true;
 
 	imtsdl::CSdlField outputArgument = sdlRequestInfo.request.GetOutputArgument();
-	CStructNamespaceConverter getStructNameConverter(outputArgument, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter getStructNameConverter(
+				outputArgument,
+				sdlNamespace,
+				*m_sdlTypeListCompPtr,
+				*m_sdlEnumListCompPtr,
+				false);
 	getStructNameConverter.addVersion = true;
 
 	FeedStreamHorizontally(stream, hIndents);
@@ -1430,7 +1457,10 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("return CreateObjectFromRepresentation(*");
 		stream << GetDecapitalizedValue(requestClassName);
-		stream << GetInputExtractionStringForTypeName(sdlRequestInfo.request, sdlRequestInfo.containerClassName);
+		stream << GetInputExtractionStringForTypeName(
+			sdlRequestInfo.request,
+			sdlRequestInfo.containerClassName,
+			QStringLiteral("Version_") + GetSdlEntryVersion(referenceType, false));
 		stream << QStringLiteral(", newObjectId, errorMessage);");
 		FeedStream(stream, 1, false);
 	}
@@ -1442,7 +1472,10 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 }
 
 
-QString CGqlCollectionControllerBaseClassGeneratorComp::GetInputExtractionStringForTypeName(const imtsdl::CSdlRequest& sdlRequest, const QString typeName) const
+QString CGqlCollectionControllerBaseClassGeneratorComp::GetInputExtractionStringForTypeName(
+			const imtsdl::CSdlRequest& sdlRequest,
+			const QString typeName,
+			const QString version) const
 {
 	QString retVal = QStringLiteral(".GetRequestedArguments().");
 
@@ -1452,6 +1485,12 @@ QString CGqlCollectionControllerBaseClassGeneratorComp::GetInputExtractionString
 		QString callChain;
 		if (FindCallChainForField(sdlField, typeName, callChain)){
 			retVal.append(sdlField.GetId());
+			retVal.append('.');
+			if (!version.isEmpty()){
+				retVal.append(version);
+				retVal.append('-');
+				retVal.append('>');
+			}
 			retVal.append(callChain);
 
 			return retVal;
@@ -1479,14 +1518,12 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
 		if (sdlField.GetType() == typeName || FindCallChainForField(sdlField, typeName, callChain, false)){
 			callChain.prepend(sdlField.GetId());
-			// add '.' if is root, because it is an object
-			if (_isRoot){
-				callChain.prepend('.');
-			}
+			
 			// add '->' if reference is inside other object, because they are "pointers"/optional
-			else {
+			if (!_isRoot){
 				callChain.prepend('>');
 				callChain.prepend('-');
+			
 			}
 
 			return true;

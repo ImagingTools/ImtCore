@@ -7,20 +7,24 @@ namespace imtclientgql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::DocumentRevision::V1_0::CGraphQlHandlerCompBase)
+// reimplemented (sdl::imtbase::DocumentRevision::CGraphQlHandlerCompBase)
 
-sdl::imtbase::ImtCollection::CVisualStatus::V1_0 CRemoteObjectVisualStatusControllerComp::OnGetObjectVisualStatus(
-			const sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest& /*getObjectVisualStatusRequest*/,
+sdl::imtbase::ImtCollection::CVisualStatus CRemoteObjectVisualStatusControllerComp::OnGetObjectVisualStatus(
+			const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& /*getObjectVisualStatusRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response;
 	if (!SendModelRequest<sdl::imtbase::ImtCollection::CVisualStatus::V1_0, sdl::imtbase::ImtCollection::CVisualStatus>(gqlRequest, response)){
 		errorMessage = QString("Unable to get remote object visual status. Error: Sending request is failed");
-		return response;
+
+		return sdl::imtbase::ImtCollection::CVisualStatus();
 	}
 
-	return response;
+	sdl::imtbase::ImtCollection::CVisualStatus retVal;
+	retVal.Version_1_0 = std::make_optional(response);
+
+	return retVal;
 }
 
 
@@ -33,9 +37,9 @@ bool CRemoteObjectVisualStatusControllerComp::IsRequestSupported(const imtgql::C
 		return false;
 	}
 
-	sdl::imtbase::ImtCollection::V1_0::CGetObjectVisualStatusGqlRequest getVisualStatusRequest(gqlRequest, false);
+	sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest getVisualStatusRequest(gqlRequest, false);
 	if (getVisualStatusRequest.IsValid()){
-		QByteArray typeId = *getVisualStatusRequest.GetRequestedArguments().input.TypeId;
+		QByteArray typeId = *getVisualStatusRequest.GetRequestedArguments().input.Version_1_0->TypeId;
 
 		return m_typeIdsAttrPtr.FindValue(typeId) >= 0;
 	}

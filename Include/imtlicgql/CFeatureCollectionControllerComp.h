@@ -11,10 +11,10 @@ namespace imtlicgql
 {
 
 
-class CFeatureCollectionControllerComp: public sdl::imtlic::Features::V1_0::CFeatureCollectionControllerCompBase
+class CFeatureCollectionControllerComp: public sdl::imtlic::Features::CFeatureCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtlic::Features::V1_0::CFeatureCollectionControllerCompBase BaseClass;
+	typedef sdl::imtlic::Features::CFeatureCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFeatureCollectionControllerComp);
 		I_ASSIGN(m_featureInfoFactCompPtr, "FeatureFactory", "Factory used for creation of the new feature instance", true, "FeatureFactory");
@@ -31,10 +31,10 @@ protected:
 				sdl::imtlic::Features::CFeatureData::V1_0& featureRepresentationData,
 				QString& errorMessage) const;
 
-	// reimplemented (sdl::imtlic::Features::V1_0::CFeatureCollectionControllerCompBase)
+	// reimplemented (sdl::imtlic::Features::CFeatureCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtlic::Features::V1_0::CFeaturesListGqlRequest& featuresListRequest,
+				const sdl::imtlic::Features::CFeaturesListGqlRequest& featuresListRequest,
 				sdl::imtlic::Features::CFeatureItem::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObjectFromRepresentation(
@@ -43,12 +43,12 @@ protected:
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::imtlic::Features::V1_0::CGetFeatureItemGqlRequest& featureItemRequest,
+				const sdl::imtlic::Features::CGetFeatureItemGqlRequest& featureItemRequest,
 				sdl::imtlic::Features::CFeatureDataPayload::V1_0& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const ::imtgql::CGqlRequest& rawGqlRequest,
-				const sdl::imtlic::Features::V1_0::CUpdateFeatureGqlRequest& updateFeatureRequest,
+				const sdl::imtlic::Features::CUpdateFeatureGqlRequest& updateFeatureRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 

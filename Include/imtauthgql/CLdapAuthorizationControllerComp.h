@@ -41,11 +41,10 @@ protected:
 	const imtauth::CUserInfo* CreateUserInfoFromLdapUser(const QByteArray& ldapUserId) const;
 
 	// reimplemented (CAuthorizationControllerComp)
-	virtual sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 OnAuthorization(
-				const sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest& authorizationRequest,
+	virtual sdl::imtauth::Authorization::CAuthorizationPayload OnAuthorization(
+				const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	// virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	I_REF(iprm::IEnableableParam, m_enableableParamCompPtr);

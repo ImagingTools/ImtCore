@@ -14,10 +14,10 @@ namespace imtauthgql
 {
 
 
-class CAuthorizationControllerComp: public sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase
+class CAuthorizationControllerComp: public sdl::imtauth::Authorization::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::imtauth::Authorization::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthorizationControllerComp);
 		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection", true, "SessionCollection");
@@ -37,17 +37,17 @@ protected:
 				const QByteArray& productId,
 				QString& errorMessage) const;
 
-	// reimplemented (sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 OnAuthorization(
-				const sdl::imtauth::Authorization::V1_0::CAuthorizationGqlRequest& authorizationRequest,
+	// reimplemented (sdl::imtauth::Authorization::CGraphQlHandlerCompBase)
+	virtual sdl::imtauth::Authorization::CAuthorizationPayload OnAuthorization(
+				const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 OnUserToken(
-				const sdl::imtauth::Authorization::V1_0::CUserTokenGqlRequest& userTokenRequest,
+	virtual sdl::imtauth::Authorization::CAuthorizationPayload OnUserToken(
+				const sdl::imtauth::Authorization::CUserTokenGqlRequest& userTokenRequest,
                 const ::imtgql::CGqlRequest& gqlRequest,
                 QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::CUserManagementPayload::V1_0 OnGetUserMode(
-				const sdl::imtauth::Authorization::V1_0::CGetUserModeGqlRequest& getUserModeRequest,
+	virtual sdl::imtauth::Authorization::CUserManagementPayload OnGetUserMode(
+				const sdl::imtauth::Authorization::CGetUserModeGqlRequest& getUserModeRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 protected:
