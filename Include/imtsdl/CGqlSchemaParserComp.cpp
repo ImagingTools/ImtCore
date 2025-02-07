@@ -453,9 +453,12 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 						return false;
 					}
 				}
-
+				
 				CSdlEnum copiedType(*sdlEnumParam);
-				m_enums << copiedType;
+				// it is ok if it already imported from another scheme
+				if (!m_enums.contains(copiedType)){
+					m_enums << copiedType;
+				}
 			}
 		}
 	}
