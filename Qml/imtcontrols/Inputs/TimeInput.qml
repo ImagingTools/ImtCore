@@ -17,9 +17,9 @@ Rectangle {
 
     property string fontColor: Style.textColor;
 
-    property var hoursRegExp: /^([01]?\d)|(2[0-3]?)$/
+	property var hoursRegExp: /^(([0-1]?\d)|(2[0-3]?))$/
     property var minutesRegExp: /^[0-5]?[0-9]$/
-    property var timeRegExp: /^[01]\d|2[0-3]:[0-5]\d$/
+	property var timeRegExp: /^(([0-1]\d)|(2[0-3])):[0-5]\d$/
 
     property bool canShowCurrentTime: false;
 
