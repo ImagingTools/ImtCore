@@ -31,8 +31,6 @@ const imtlic::ILicenseDefinition* CLicenseInfoProviderComp::GetLicenseInfo(const
 		if (m_productCollectionCompPtr->GetObjectData(productId, dataPtr)){
 			const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
 			if (productPtr != nullptr){
-				const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
-
 				const imtlic::ILicenseDefinition* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
 				if (licenseInfoPtr != nullptr){
 					return dynamic_cast<const imtlic::ILicenseDefinition*>(licenseInfoPtr->CloneMe());

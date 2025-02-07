@@ -96,10 +96,12 @@ const CGqlObject& CGqlRequest::GetParams() const
 	return m_params;
 }
 
+
 void CGqlRequest::SetParams(const CGqlObject& params)
 {
 	m_params = params;
 }
+
 
 const CGqlObject* CGqlRequest::GetFieldObject(const QByteArray& fieldId) const
 {
@@ -112,10 +114,12 @@ const CGqlObject* CGqlRequest::GetParamObject(const QByteArray& paramId) const
 	return m_params.GetFieldArgumentObjectPtr(paramId);
 }
 
+
 void CGqlRequest::SetProtocolVersion(const QByteArray& protocolVersion)
 {
 	if (m_protocolVersion != protocolVersion){
 		istd::CChangeNotifier notifier(this);
+
 		m_protocolVersion = protocolVersion;
 	}
 }
