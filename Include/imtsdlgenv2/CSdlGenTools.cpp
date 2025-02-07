@@ -16,7 +16,6 @@
 #include <imtsdl/CSdlField.h>
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlRequest.h>
-#include <imtsdl/CSdlTools.h>
 #include <imtsdl/CSdlDocumentType.h>
 
 
@@ -345,6 +344,63 @@ void CSdlGenTools::AddArrayInternalChecksFail(QTextStream& stream, const imtsdl:
 
 	imtsdl::CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;\n\t}");
+	imtsdl::CSdlTools::FeedStream(stream, 1, false);
+}
+
+
+void CSdlGenTools::GenerateIsRequestSupportedMethodImpl(
+			QTextStream& stream,
+			const imtsdl::SdlRequestList& requestList,
+			const QString& className,
+			const imtsdl::CSdlTools::SchemaParamsCompPtr& schemaParamsCompPtr,
+			const imtsdl::CSdlTools::ArgumentParserCompPtr& argumentParamsCompPtr,
+			const imtsdl::ISdlTypeListProvider& listProvider,
+			const imtsdl::ISdlEnumListProvider& enumListProvider)
+{
+	stream << QStringLiteral("bool ");
+	stream << className;
+	stream << ("::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const");
+	imtsdl::CSdlTools::FeedStream(stream);
+
+	stream << '{';
+	imtsdl::CSdlTools::FeedStream(stream);
+
+	imtsdl::CSdlTools::FeedStreamHorizontally(stream);
+	stream << QStringLiteral("const QByteArray commandId = gqlRequest.GetCommandId();");
+	imtsdl::CSdlTools::FeedStream(stream, 1, false);
+
+	bool isFirst = true;
+	for (const imtsdl::CSdlRequest& sdlRequest: requestList){
+		const QString requestClassName = sdlRequest.GetName() + QStringLiteral("GqlRequest");
+
+		imtsdl::CSdlTools::FeedStreamHorizontally(stream);
+		if (!isFirst){
+			stream << QStringLiteral("else ");
+		}
+		else {
+			isFirst = false;
+		}
+		stream << QStringLiteral("if (commandId == C");
+		stream << requestClassName;
+		stream << QStringLiteral("::GetCommandId()){");
+		imtsdl::CSdlTools::FeedStream(stream, 1, false);
+
+		imtsdl::CSdlTools::FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("return true;");
+		imtsdl::CSdlTools::FeedStream(stream, 1, false);
+
+		stream << '}';
+		imtsdl::CSdlTools::FeedStream(stream, 1, false);
+	}
+
+	// default call
+
+	imtsdl::CSdlTools::FeedStreamHorizontally(stream);
+	stream << QStringLiteral("return BaseClass::IsRequestSupported(gqlRequest);");
+	imtsdl::CSdlTools::FeedStream(stream, 1, false);
+
+	imtsdl::CSdlTools::FeedStreamHorizontally(stream);
+	stream << '}';
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
 }
 

@@ -11,6 +11,7 @@
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlEnumListProvider.h>
+#include <imtsdl/CSdlTools.h>
 
 
 class QTextStream;
@@ -95,6 +96,15 @@ public:
 
 	template <class SdlEntryClass>
 	[[nodiscard]] static QString GetSdlEntryVersion(const SdlEntryClass& entry, bool addVPrefix = true);
+
+	static void GenerateIsRequestSupportedMethodImpl(
+				QTextStream& stream,
+				const imtsdl::SdlRequestList& requestList,
+				const QString& className,
+				const imtsdl::CSdlTools::SchemaParamsCompPtr& schemaParamsCompPtr,
+				const imtsdl::CSdlTools::ArgumentParserCompPtr& argumentParamsCompPtr,
+				const imtsdl::ISdlTypeListProvider& listProvider,
+				const imtsdl::ISdlEnumListProvider& enumListProvider);
 };
 
 
