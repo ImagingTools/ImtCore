@@ -67,38 +67,38 @@ bool CAuthorizationControllerComp::CheckCredential(const QByteArray& systemId, c
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const
+sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const
 {
 	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'").arg(qPrintable(login)));
 	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 
-	return sdl::imtauth::Authorization::CAuthorizationPayload::V1_0();
+	return sdl::imtauth::Authorization::CAuthorizationPayload();
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
+sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
 			imtauth::CUserInfo& userInfo,
 			const QByteArray& systemId,
 			const QByteArray& productId,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 payload;
+	sdl::imtauth::Authorization::CAuthorizationPayload payload;
 
 	QByteArray login = userInfo.GetId();
 	QByteArray objectId = GetUserObjectId(login);
 	QByteArray tokenValue = QUuid::createUuid().toByteArray();
 
-	payload.Token = std::make_optional<QByteArray>(tokenValue);
-	payload.Username = std::make_optional<QByteArray>(login);
-	payload.UserId = std::make_optional<QByteArray>(objectId);
-	payload.SystemId = std::make_optional<QByteArray>(systemId);
-
+	(*payload.Version_1_0).Token = std::make_optional<QByteArray>(tokenValue);
+	(*payload.Version_1_0).Username = std::make_optional<QByteArray>(login);
+	(*payload.Version_1_0).UserId = std::make_optional<QByteArray>(objectId);
+	(*payload.Version_1_0).SystemId = std::make_optional<QByteArray>(systemId);
+	
 	if (!productId.isEmpty()){
 		imtauth::IUserInfo::FeatureIds permissionIds = userInfo.GetPermissions(productId);
 		QByteArrayList uniqueList = QSet<QByteArray>(permissionIds.begin(), permissionIds.end()).values();
 		std::sort(uniqueList.begin(), uniqueList.end());
 		QByteArray permissions = uniqueList.join(';');
-		payload.Permissions = permissions;
+		(*payload.Version_1_0).Permissions = permissions;
 	}
 
 	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr;
@@ -158,7 +158,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 
 		QByteArray userObjectId = GetUserObjectId(login);
 		if (userObjectId.isEmpty()){
-			retVal.Version_1_0 = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+			retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 
 			return retVal;
 		}
@@ -170,7 +170,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 		}
 
 		if (userInfoPtr == nullptr){
-			retVal.Version_1_0 = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+			retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 
 			return retVal;
 		}
@@ -188,12 +188,12 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 		}
 
 		if (!ok){
-			retVal.Version_1_0 = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+			retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 
 			return retVal;
 		}
 
-		retVal.Version_1_0 = CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
+		retVal = CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
 	}
 
 	return retVal;
@@ -234,7 +234,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 
 		QByteArray userObjectId = GetUserObjectId(login);
 		if (userObjectId.isEmpty()){
-			retVal.Version_1_0 = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+			retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 
 			return retVal;
 		}
@@ -246,7 +246,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 		}
 
 		if (userInfoPtr == nullptr){
-			retVal.Version_1_0 = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+			retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 
 			return retVal;
 		}
@@ -264,12 +264,12 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 		}
 
 		if (!ok){
-			retVal.Version_1_0 = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+			retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 
 			return retVal;
 		}
 
-		retVal.Version_1_0 = CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
+		retVal = CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
 	}
 
 	return retVal;

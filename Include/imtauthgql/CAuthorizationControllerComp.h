@@ -30,8 +30,8 @@ protected:
 	bool ParseDataFromGqlRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& login, QByteArray& password, QByteArray& productId) const;
 	QByteArray GetUserObjectId(const QByteArray& login) const;
 	bool CheckCredential(const QByteArray& systemId, const QByteArray& login, const QByteArray& password) const;
-	sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
-	sdl::imtauth::Authorization::CAuthorizationPayload::V1_0 CreateAuthorizationSuccessfulResponse(
+	sdl::imtauth::Authorization::CAuthorizationPayload CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
+	sdl::imtauth::Authorization::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
 				imtauth::CUserInfo& userInfo,
 				const QByteArray& systemId,
 				const QByteArray& productId,
