@@ -88,19 +88,18 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 	QByteArray objectId = GetUserObjectId(login);
 	QByteArray tokenValue = QUuid::createUuid().toByteArray();
 
-	payload.Version_1_0 = std::make_optional<sdl::imtauth::Authorization::CAuthorizationPayload::V1_0>();
-
-	payload.Version_1_0->Token = std::make_optional<QByteArray>(tokenValue);
-	payload.Version_1_0->Username = std::make_optional<QByteArray>(login);
-	payload.Version_1_0->UserId = std::make_optional<QByteArray>(objectId);
-	payload.Version_1_0->SystemId = std::make_optional<QByteArray>(systemId);
+	payload.Version_1_0.emplace();
+	payload.Version_1_0->Token = tokenValue;
+	payload.Version_1_0->Username = login;
+	payload.Version_1_0->UserId = objectId;
+	payload.Version_1_0->SystemId = systemId;
 	
 	if (!productId.isEmpty()){
 		imtauth::IUserInfo::FeatureIds permissionIds = userInfo.GetPermissions(productId);
 		QByteArrayList uniqueList = QSet<QByteArray>(permissionIds.begin(), permissionIds.end()).values();
 		std::sort(uniqueList.begin(), uniqueList.end());
 		QByteArray permissions = uniqueList.join(';');
-		payload.Version_1_0->Permissions = permissions;
+		(*payload.Version_1_0).Permissions = permissions;
 	}
 
 	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr;
