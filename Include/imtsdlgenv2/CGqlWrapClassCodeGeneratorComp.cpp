@@ -3,8 +3,6 @@
 
 
 // C includes
-#include <QtCore/qassert.h>
-#include <QtCore/qbytearray.h>
 #include <iostream>
 
 // Qt includes
