@@ -25,8 +25,8 @@ public:
 	virtual idoc::MetaInfoPtr FromJsonRepresentation(const QByteArray& data) const override;
 
 protected:
-	virtual bool FillRepresentation(typename MetaInfoRepresentation::V1_0& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const = 0;
-	virtual bool FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const typename MetaInfoRepresentation::V1_0& metaInfoRepresentation) const = 0;
+	virtual bool FillRepresentation(typename MetaInfoRepresentation& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const = 0;
+	virtual bool FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const typename MetaInfoRepresentation& metaInfoRepresentation) const = 0;
 };
 
 
@@ -35,7 +35,7 @@ QByteArray TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::ToJsonRepresentati
 {
 	QByteArray retVal;
 
-	typename MetaInfoRepresentation::V1_0 representation;
+	MetaInfoRepresentation representation;
 	if (FillRepresentation(representation, metaInfo)){
 		QJsonObject object;
 
@@ -57,7 +57,7 @@ idoc::MetaInfoPtr TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::FromJsonRep
 	document = document.fromJson(data, &error);
 	if (document.isObject() && error.error == QJsonParseError::NoError){
 		QJsonObject object = document.object();
-		typename MetaInfoRepresentation::V1_0 representation;
+		MetaInfoRepresentation representation;
 		if (representation.ReadFromJsonObject(object)){
 			idoc::MetaInfoPtr retVal(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 			if (FillMetaInfo(*retVal, representation)){
