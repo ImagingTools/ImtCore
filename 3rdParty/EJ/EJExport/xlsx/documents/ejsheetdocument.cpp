@@ -313,15 +313,6 @@ QByteArray EjSheetDocument::getDocumentData()
 			documentWriter->writeEndElement();
 		}
 
-		// for (int i = 0; i < colsModel.count(); i++){
-		// 	documentWriter->writeStartElement("col");
-		// 	documentWriter->writeAttribute("customWidth", colsModel[i].toObject()["customWidth"].toString());
-		// 	documentWriter->writeAttribute("max", colsModel[i].toObject()["max"].toString());
-		// 	documentWriter->writeAttribute("min", colsModel[i].toObject()["min"].toString());
-		// 	documentWriter->writeAttribute("width", colsModel[i].toObject()["width"].toString());
-		// 	documentWriter->writeEndElement();
-		// }
-
 		documentWriter->writeEndElement();
 	}
 

@@ -16,9 +16,9 @@ QByteArray EjSharedStringsDocument::getDocumentData()
 	documentWriter->writeStartElement("sst");
 	documentWriter->writeAttribute("xmlns", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
 	for(int i = 0; i < siModel.count(); i++){
-		if (siModel[i].toObject()["text"].toString().isEmpty()){
-			continue;
-		}
+		// if (siModel[i].toObject()["text"].toString().isEmpty()){
+		// 	continue;
+		// }
 		documentWriter->writeStartElement("si");
 		if (siModel[i].toObject().contains("sz")){
 			documentWriter->writeStartElement("r");
@@ -155,7 +155,14 @@ void EjSharedStringsDocument::insertIntoSi(QString str)
 		}
 	}
 
-	selecedSi["text"] =  str;
+	if (selecedSi.contains("text")){
+		QString prevText = selecedSi["text"].toString();
+		selecedSi["text"] = prevText + str;
+	}
+	else{
+		selecedSi["text"] =  str;
+	}
+
 
 	siModel[si_index] = selecedSi;
 }
