@@ -46,10 +46,7 @@ protected:
 				const sdl::imtauth::Authorization::CUserTokenGqlRequest& userTokenRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::CUserManagementPayload OnGetUserMode(
-				const sdl::imtauth::Authorization::CGetUserModeGqlRequest& getUserModeRequest,
-				const imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
+
 protected:
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);

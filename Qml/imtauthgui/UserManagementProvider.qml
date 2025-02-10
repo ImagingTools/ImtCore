@@ -3,7 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
-import imtauthAuthorizationSdl 1.0
+import imtauthAuthorizationOptionsSdl 1.0
 
 QtObject {
     id: container;
@@ -30,7 +30,7 @@ QtObject {
     }
 
     property GqlSdlRequestSender request : GqlSdlRequestSender {
-        gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_getUserMode;
+		gqlCommandId: ImtauthAuthorizationOptionsSdlCommandIds.s_getUserMode;
         sdlObjectComp:
             Component {
             UserManagementPayload {

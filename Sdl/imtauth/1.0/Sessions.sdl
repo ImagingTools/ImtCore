@@ -1,0 +1,92 @@
+schema {
+    query: Query
+    mutation: Mutation
+    name: Session
+    namespace: imtauth
+    version: 1.0
+}
+
+input ValidateSessionInput {
+    sessionId: ID!
+}
+
+type ValidateSessionPayload {
+    isValid: Boolean!
+}
+
+input ValidateJwtInput {
+    jwt: ID!
+}
+
+enum JwtState {
+    NONE
+    OK
+    EXPIRED
+    INVALID
+}
+
+type ValidateJwtPayload {
+    state: JwtState!
+}
+
+type UserSession {
+    userId: ID!
+    accessToken: ID!
+    refreshToken: ID!
+}
+
+input RefreshTokenInput {
+    refreshToken: ID!
+}
+
+type RefreshTokenPayload {
+    ok: Boolean!
+    userSession: UserSession
+}
+
+input CreateNewSessionInput {
+    userId: ID!
+}
+
+type CreateNewSessionPayload {
+    ok: Boolean!
+    userSession: UserSession
+}
+
+input GetSessionInput {
+    sessionId: ID!
+}
+
+type GetSessionPayload {
+    sessionData: ID!
+}
+
+input RemoveSessionInput {
+    sessionId: ID!
+}
+
+type RemoveSessionPayload {
+    ok: Boolean!
+}
+
+input GetUserFromJwtInput {
+    jwt: ID!
+}
+
+type GetUserFromJwtPayload {
+    userId: ID!
+}
+
+type Query {
+    ValidateSession (input: ValidateSessionInput): ValidateSessionPayload!
+    ValidateJwt (input: ValidateJwtInput): ValidateJwtPayload!
+    GetSession (input: GetSessionInput): GetSessionPayload!
+    GetUserFromJwt (input: GetUserFromJwtInput): GetUserFromJwtPayload!
+}
+
+type Mutation {
+    RefreshToken (input: RefreshTokenInput): RefreshTokenPayload!
+    CreateNewSession (input: CreateNewSessionInput): CreateNewSessionPayload!
+    RemoveSession (input: RemoveSessionInput): RemoveSessionPayload!
+}
+

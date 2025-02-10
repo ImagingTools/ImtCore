@@ -9,17 +9,17 @@
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 #include <imtauth/ISuperuserProvider.h>
 #include <imtservergql/CGqlRepresentationDataControllerComp.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/AuthorizationOptions.h>
 
 
 namespace imtauthgql
 {
 
 
-class CAuthorizationOptionsControllerComp: public sdl::imtauth::Authorization::CGraphQlHandlerCompBase
+class CAuthorizationOptionsControllerComp: public sdl::imtauth::AuthorizationOptions::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::Authorization::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::imtauth::AuthorizationOptions::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthorizationOptionsControllerComp);
 		I_ASSIGN(m_selectionParamCompPtr, "SelectionParam", "Selection param", true, "SelectionParam");
@@ -33,18 +33,10 @@ protected:
 		UM_STRONG_USER_MANAGEMENT
 	};
 
-	// reimplemented (sdl::imtauth::Authorization::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Authorization::CAuthorizationPayload OnAuthorization(
-				const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
-				const imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::CAuthorizationPayload OnUserToken(
-				const sdl::imtauth::Authorization::CUserTokenGqlRequest& userTokenRequest,
+	// reimplemented (sdl::imtauth::AuthorizationOptions::CGraphQlHandlerCompBase)
+	virtual sdl::imtauth::AuthorizationOptions::CUserManagementPayload OnGetUserMode(
+				const sdl::imtauth::AuthorizationOptions::CGetUserModeGqlRequest& getUserModeRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::CUserManagementPayload OnGetUserMode(
-				const sdl::imtauth::Authorization::CGetUserModeGqlRequest& getUserModeRequest,
-				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
 protected:

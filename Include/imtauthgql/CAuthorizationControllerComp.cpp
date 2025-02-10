@@ -277,17 +277,6 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 }
 
 
-sdl::imtauth::Authorization::CUserManagementPayload CAuthorizationControllerComp::OnGetUserMode(
-			const sdl::imtauth::Authorization::CGetUserModeGqlRequest& /*getUserModeRequest*/,
-			const imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
-{
-	sdl::imtauth::Authorization::CUserManagementPayload payload;
-
-	return payload;
-}
-
-
 } // namespace imtauthgql
 
 
