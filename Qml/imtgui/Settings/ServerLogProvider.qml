@@ -31,7 +31,7 @@ ButtonElementView {
             var fileName = fileDialogSave.file.toString().replace(pathDir + "/", '');
             var id = "GetServerLog";
             if (fileName == "") fileName = "ServerLog.txt";
-            remoteFileController.GetFile(id, fileName);
+            remoteFileController.getFile(id, fileName);
         }
     }
 }

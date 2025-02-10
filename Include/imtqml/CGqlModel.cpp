@@ -51,9 +51,12 @@ bool CGqlModel::SetGqlQuery(QString query, QVariantMap headers)
 		QString message = QString("Post to url '%1' query '%2'").arg(requestUrl.toString()).arg(query);
 		qDebug() << message;
 
-		QNetworkReply* reply = accessManager->post(networkRequest, query.toUtf8());
-		connect(reply, &QNetworkReply::finished, this, &CGqlModel::replyFinished);
-		connect(reply, &QNetworkReply::errorOccurred, this, &CGqlModel::errorOccurred);
+		QNetworkReply* replyPtr = accessManager->post(networkRequest, query.toUtf8());
+		if (replyPtr != nullptr){
+			replyPtr->ignoreSslErrors();
+			connect(replyPtr, &QNetworkReply::finished, this, &CGqlModel::replyFinished);
+			connect(replyPtr, &QNetworkReply::errorOccurred, this, &CGqlModel::errorOccurred);
+		}
 
 		return true;
 	}
@@ -87,7 +90,7 @@ void CGqlModel::errorOccurred(QNetworkReply::NetworkError /*code*/)
 {
 	QNetworkReply* networkReplyPtr = dynamic_cast<QNetworkReply*>(sender());
 	if (networkReplyPtr != nullptr){
-		qDebug() << networkReplyPtr->errorString();
+		qDebug() << "CGqlModel errorOccurred: " << networkReplyPtr->errorString();
 
 		networkReplyPtr->deleteLater();
 	}

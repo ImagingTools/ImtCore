@@ -91,7 +91,7 @@ Item {
             let filePath = fileDialog.file.toString();
             filePath = filePath.replace('file:///', '')
 
-            remoteFileController.SendFile(filePath);
+			remoteFileController.sendFile(filePath);
         }
     }
 
@@ -109,7 +109,7 @@ Item {
             remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
             var fileName = fileDialogSave.file.toString().replace(pathDir + "/", '');
 
-            remoteFileController.GetFile("GetBackupFile", fileName);
+            remoteFileController.getFile("GetBackupFile", fileName);
         }
     }
 }
