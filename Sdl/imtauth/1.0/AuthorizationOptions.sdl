@@ -6,14 +6,14 @@ schema {
     version: 1.0
 }
 
-enum UserMode {
+enum UserManagementMode {
     NO_USER_MANAGEMENT
     OPTIONAL_USER_MANAGEMENT
     STRONG_USER_MANAGEMENT
 }
 
 type UserManagementPayload {
-    UserMode: UserMode
+    UserMode: UserManagementMode
 }
 
 input UserManagementInput {
