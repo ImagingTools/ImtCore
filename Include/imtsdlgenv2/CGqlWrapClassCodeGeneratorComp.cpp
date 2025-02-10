@@ -402,11 +402,18 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRe
 	ifStream << '{';
 	FeedStream(ifStream, 1, false);
 
-	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("Q_UNUSED(optRead)");
-	FeedStream(ifStream, 1, false);
+	if (sdlRequest.GetInputArguments().isEmpty()){
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("Q_UNUSED(optRead)");
+		FeedStream(ifStream, 1, false);
+
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("m_isValid = true;");
+		FeedStream(ifStream, 1, false);
+	}
 
 	GenerateRequestParsing(ifStream, sdlRequest, 1);
+
 	ifStream << '}';
 	FeedStream(ifStream, 1, false);
 
@@ -1169,32 +1176,48 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& 
 void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCodeImpl(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
-			const QString typeVersion,
+			const QString& typeVersion,
 			uint hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
 
 	// declare bool variable and read data in private property
+	const QString readVariableName = QStringLiteral("is") + GetCapitalizedValue(field.GetId()) + QStringLiteral("Read");
+
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("const bool is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read = ");
-	stream << QStringLiteral("m_requestedArguments.") << field.GetId();
-	stream <<  QStringLiteral(".ReadFromGraphQlObject(*");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr");
-	if (!typeVersion.isEmpty()){
-		stream << ',' << ' '<< typeVersion;
-	}
-	stream << ')' << ';';
+	stream << QStringLiteral("bool ");
+	stream << readVariableName << ';';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (optRead){");
+	FeedStream(stream, 1, false);
+	
+	AddReadFromRequestCode(stream, field, typeVersion, readVariableName, true, hIndents + 2);
+	
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("else {");
+	FeedStream(stream, 1, false);
+
+	AddReadFromRequestCode(stream, field, typeVersion, readVariableName, false, hIndents + 2);
+	
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
 	FeedStream(stream, 1, false);
 
 	// update validation status
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("m_isValid = is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read;");
+	stream << QStringLiteral("m_isValid = ") << readVariableName << ';';
 	FeedStream(stream, 1, false);
 
 	// check the result of reading...
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("if (!is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read){");
+	stream << QStringLiteral("if (!") << readVariableName << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 2);
@@ -1203,6 +1226,32 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCodeImpl(
 
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << '}';
+	FeedStream(stream, 1, false);
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::AddReadFromRequestCode(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const QString& typeVersion,
+			const QString& readVariableName,
+			bool optRead,
+			uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << readVariableName;
+	stream << QStringLiteral(" = ");
+	stream << QStringLiteral("m_requestedArguments.") << field.GetId();
+	stream << '.';
+	if (optRead){
+		stream << QStringLiteral("Opt");
+	}
+	stream <<  QStringLiteral("ReadFromGraphQlObject(*");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr");
+	if (!typeVersion.isEmpty()){
+		stream << ',' << ' '<< typeVersion;
+	}
+	stream << ')' << ';';
 	FeedStream(stream, 1, false);
 }
 

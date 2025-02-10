@@ -86,7 +86,8 @@ private:
 	/// \todo add error handling for it.
 	void AddCheckCustomRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
 	void AddSetCustomValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
-	void AddSetCustomValueToObjectCodeImpl(QTextStream& stream, const imtsdl::CSdlField& field, const QString typeVersion = QString(), uint hIndents = 1);
+	void AddSetCustomValueToObjectCodeImpl(QTextStream& stream, const imtsdl::CSdlField& field, const QString& typeVersion = QString(), uint hIndents = 1);
+	void AddReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& typeVersion, const QString& readVariableName, bool optRead, uint hIndents = 1);
 
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
