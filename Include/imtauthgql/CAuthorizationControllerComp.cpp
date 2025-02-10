@@ -277,6 +277,15 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 }
 
 
+sdl::imtauth::Authorization::CLogoutPayload CAuthorizationControllerComp::OnLogout(
+	const sdl::imtauth::Authorization::CLogoutGqlRequest& /*logoutRequest*/,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
+{
+	return sdl::imtauth::Authorization::CLogoutPayload();
+}
+
+
 } // namespace imtauthgql
 
 

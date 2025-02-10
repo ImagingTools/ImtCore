@@ -46,6 +46,10 @@ protected:
 				const sdl::imtauth::Authorization::CUserTokenGqlRequest& userTokenRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtauth::Authorization::CLogoutPayload OnLogout(
+				const sdl::imtauth::Authorization::CLogoutGqlRequest& logoutRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
