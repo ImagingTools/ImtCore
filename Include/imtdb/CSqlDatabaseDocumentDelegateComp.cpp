@@ -1052,10 +1052,21 @@ void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query) const
 	static QRegularExpression regexp("(\\\"[^\\\"]{1,}\\\")");
 
 	QStringList list;
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+	QRegularExpressionMatchIterator iterator = regexp.globalMatch(query);
+	while (iterator.hasNext()){
+		const QRegularExpressionMatch& match = iterator.next();
+
+		QStringList capturedList = match.capturedTexts();
+		list.append(capturedList.first());
+	}
+#else
 	for (const QRegularExpressionMatch& match : regexp.globalMatch(query)){
 		QStringList capturedList = match.capturedTexts();
 		list.append(capturedList.first());
 	}
+#endif
 
 	for (const QString& item : list){
 		QString substitute = item;
