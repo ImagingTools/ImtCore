@@ -494,6 +494,29 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 		FeedStream(stream, 3);
 	}
 
+	//implement GetVersionId method
+	stream << QStringLiteral("QByteArray C");
+	stream << sdlType.GetName();
+	stream << ':' << ':';
+	stream << GetSdlEntryVersion(sdlType);
+	stream << QStringLiteral("::GetVersionId()");
+	FeedStream(stream, 1, false);
+
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("return QByteArrayLiteral(\"");
+	stream << GetTypeVersion(sdlType);
+	stream << QStringLiteral("\");");
+	FeedStream(stream, 1, false);
+
+	stream << '}';
+	FeedStream(stream, 3, false);
+
+
+
+
 	return true;
 }
 
@@ -704,6 +727,13 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 		stream << field.GetId() << ';';
 		FeedStream(stream, 1, false);
 	}
+	
+	FeedStream(stream, 1, false);
+
+	// add GetVersionId method
+	FeedStreamHorizontally(stream, indents + 1);
+	stream << QStringLiteral("static QByteArray GetVersionId();");
+	FeedStream(stream, indents, false);
 }
 
 
