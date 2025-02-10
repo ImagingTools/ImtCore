@@ -100,11 +100,7 @@ public:
 	static void GenerateIsRequestSupportedMethodImpl(
 				QTextStream& stream,
 				const imtsdl::SdlRequestList& requestList,
-				const QString& className,
-				const imtsdl::CSdlTools::SchemaParamsCompPtr& schemaParamsCompPtr,
-				const imtsdl::CSdlTools::ArgumentParserCompPtr& argumentParamsCompPtr,
-				const imtsdl::ISdlTypeListProvider& listProvider,
-				const imtsdl::ISdlEnumListProvider& enumListProvider);
+				const QString& className);
 };
 
 

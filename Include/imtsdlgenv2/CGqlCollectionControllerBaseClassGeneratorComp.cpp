@@ -357,6 +357,10 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;");
+	FeedStream(ifStream, 1, false);
+
+	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("virtual bool GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const override;");
 	FeedStream(ifStream, 1, false);
 
@@ -927,6 +931,45 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType)
 {
 	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
+
+	// add IsRequestSupported() method
+	imtsdl::SdlRequestList requestList;
+	imtsdl::SdlDocumentTypeList sdlDocumentTypeList = m_sdlDocumentListCompPtr->GetDocumentTypes();
+
+	// remove all external
+	/// \todo use GetDocumentTypes(onlyLocal) later
+	sdlDocumentTypeList.removeIf([this](const imtsdl::CSdlDocumentType& sdlDocumentType){
+		return IsExternal(sdlDocumentType);
+	});
+
+	// add requests for operations only
+	for (const imtsdl::CSdlDocumentType &documentType : sdlDocumentTypeList){
+		const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operations = sdlDocumentType.GetOperationsList();
+
+		QMultiMapIterator operationIter(operations);
+		while(operationIter.hasNext()){
+			auto operationIterValue = operationIter.next();
+			if (!requestList.contains(*operationIterValue)){
+				requestList << *operationIterValue;
+			}
+		}
+
+		imtsdl::SdlDocumentTypeList subtypes = documentType.GetSubtypes();
+		for (const imtsdl::CSdlDocumentType& documentSubtype: subtypes){
+			const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> suboperations = documentSubtype.GetOperationsList();
+			QMultiMapIterator suboperationIter(suboperations);
+			while(suboperationIter.hasNext()){
+				auto suboperationIterValue = suboperationIter.next();
+				if (!requestList.contains(*suboperationIterValue)){
+					requestList << *suboperationIterValue;
+				}
+			}
+		}
+	}
+	GenerateIsRequestSupportedMethodImpl(stream, requestList, className);
+	FeedStream(stream, 2, false);
+
+	// add GetOperationFromRequest() method
 	stream << QStringLiteral("bool ");
 	stream << className << ':' << ':';
 	stream << QStringLiteral("GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const");
@@ -1523,7 +1566,6 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 			if (!_isRoot){
 				callChain.prepend('>');
 				callChain.prepend('-');
-			
 			}
 
 			return true;

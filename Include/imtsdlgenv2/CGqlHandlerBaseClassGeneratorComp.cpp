@@ -304,6 +304,10 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;");
+	FeedStream(ifStream, 1, false);
+
+	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("virtual ::imtbase::CTreeItemModel* CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
 	FeedStream(ifStream, 2, false);
 
@@ -442,6 +446,11 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 	const QString className = QStringLiteral("CGraphQlHandlerCompBase");
 	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests();
 
+	// add IsRequestSupported() method
+	GenerateIsRequestSupportedMethodImpl(stream, requestList, className);
+	FeedStream(stream, 2, false);
+
+	// add CreateInternalResponse method
 	// declare method
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("::imtbase::CTreeItemModel* ");

@@ -351,11 +351,7 @@ void CSdlGenTools::AddArrayInternalChecksFail(QTextStream& stream, const imtsdl:
 void CSdlGenTools::GenerateIsRequestSupportedMethodImpl(
 			QTextStream& stream,
 			const imtsdl::SdlRequestList& requestList,
-			const QString& className,
-			const imtsdl::CSdlTools::SchemaParamsCompPtr& schemaParamsCompPtr,
-			const imtsdl::CSdlTools::ArgumentParserCompPtr& argumentParamsCompPtr,
-			const imtsdl::ISdlTypeListProvider& listProvider,
-			const imtsdl::ISdlEnumListProvider& enumListProvider)
+			const QString& className)
 {
 	stream << QStringLiteral("bool ");
 	stream << className;
@@ -389,17 +385,18 @@ void CSdlGenTools::GenerateIsRequestSupportedMethodImpl(
 		stream << QStringLiteral("return true;");
 		imtsdl::CSdlTools::FeedStream(stream, 1, false);
 
+		imtsdl::CSdlTools::FeedStreamHorizontally(stream);
 		stream << '}';
 		imtsdl::CSdlTools::FeedStream(stream, 1, false);
 	}
-
+	imtsdl::CSdlTools::FeedStream(stream, 1, false);
+	
 	// default call
 
 	imtsdl::CSdlTools::FeedStreamHorizontally(stream);
 	stream << QStringLiteral("return BaseClass::IsRequestSupported(gqlRequest);");
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
 
-	imtsdl::CSdlTools::FeedStreamHorizontally(stream);
 	stream << '}';
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
 }
