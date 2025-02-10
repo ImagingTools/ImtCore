@@ -20,6 +20,12 @@ class ISession:
 		virtual public iser::IObject
 {
 public:
+	enum MetaInfoTypes
+	{
+		MIT_TOKEN = idoc::IDocumentMetaInfo::MIT_USER + 1,
+		MIT_USER_ID
+	};
+
 	/**
 		Get token of the session.
 	*/
@@ -39,6 +45,26 @@ public:
 		Set user info of the session.
 	*/
 	virtual void SetUserId(const QByteArray& userId) = 0;
+
+	/**
+		Get session creation date.
+	*/
+	virtual QDateTime GetCreationDate() const = 0;
+
+	/**
+		Set session creation date.
+	*/
+	virtual void SetCreationDate(const QDateTime& creationDate) = 0;
+
+	/**
+		Get session expiration date.
+	*/
+	virtual QDateTime GetExpirationDate() const = 0;
+
+	/**
+		Set session expiration date.
+	*/
+	virtual void SetExpirationDate(const QDateTime& expirationDate) = 0;
 };
 
 

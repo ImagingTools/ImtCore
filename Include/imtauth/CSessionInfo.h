@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QDateTime>
+
 // ImtCore includes
 #include <imtauth/ISession.h>
 
@@ -17,13 +20,26 @@ public:
 	virtual void SetToken(const QByteArray &token) override;
 	virtual QByteArray GetUserId() const override;
 	virtual void SetUserId(const QByteArray &userId) override;
+	virtual QDateTime GetCreationDate() const override;
+	virtual void SetCreationDate(const QDateTime& creationDate) override;
+	virtual QDateTime GetExpirationDate() const override;
+	virtual void SetExpirationDate(const QDateTime& expirationDate) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
 
+	// reimplemented (iser::IChangeable)
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const IChangeable& object) const override;
+	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+
 private:
 	QByteArray m_token;
 	QByteArray m_userId;
+
+	QDateTime m_creationDate;
+	QDateTime m_expirationDate;
 };
 
 
