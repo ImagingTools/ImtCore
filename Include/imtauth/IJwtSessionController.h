@@ -5,7 +5,7 @@
 #include <istd/IPolymorphic.h>
 
 // ImtCore includes
-#include <imtauth/IJwtSessionInfo.h>
+#include <imtauth/ISession.h>
 
 
 namespace imtauth
@@ -15,10 +15,29 @@ namespace imtauth
 class IJwtSessionController: virtual public istd::IPolymorphic
 {
 public:
-	virtual bool ValidateAccessToken(const QByteArray& accessToken) const = 0;
-	virtual QByteArray GenerateAccessToken(const QByteArray& refreshToken) const = 0;
-	virtual QByteArray CreateNewSession(const QByteArray& userId) const = 0;
-	virtual const IJwtSessionInfo* GetSession(const QByteArray& userId) const = 0;
+	struct UserSession
+	{
+		QByteArray userId;
+		QByteArray accessToken;
+		QByteArray refreshToken;
+	};
+
+	enum JwtState
+	{
+		JS_NONE,
+		JS_OK,
+		JS_EXPIRED,
+		JS_INVALID
+	};
+
+	virtual bool ValidateSession(const QByteArray& sessionId) const = 0;
+	virtual JwtState ValidateJwt(const QByteArray& jwt) const = 0;
+	virtual bool RefreshToken(const QByteArray& refreshToken, UserSession& outputData) const = 0;
+	virtual bool CreateNewSession(const QByteArray& userId, UserSession& outputData) const = 0;
+	virtual const imtauth::ISession* GetSession(const QByteArray& sessionId) const = 0;
+	virtual bool RemoveSession(const QByteArray& sessionId) const = 0;
+	virtual QByteArray GetUserFromJwt(const QByteArray& jwt) const = 0;
+	virtual QByteArray GetSessionFromJwt(const QByteArray& jwt) const = 0;
 };
 
 
