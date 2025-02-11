@@ -1,6 +1,9 @@
 #include <imtbase/CCachedObjectCollectionComp.h>
 
 
+// Qt includes
+#include <QtCore/QUuid>
+
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
