@@ -55,6 +55,7 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_baseClassExtenderCompPtr.IsValid());
 	Q_ASSERT(m_sdlDocumentListCompPtr.IsValid());
+	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
 	if (!m_argumentParserCompPtr->IsGqlEnabled()){
 		return TS_OK;
@@ -102,7 +103,7 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 					cumulatedFiles << WrapFileName(sdlDocumentType.GetName(), QStringLiteral("cpp"), outputDirectoryPath);
 				}
 			}
-
+			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
 			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		}
 

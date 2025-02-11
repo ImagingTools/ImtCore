@@ -126,6 +126,7 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="BasicRequestsProvider" ComponentId="BasicRequestsProxyProvider"/>
+        <Component ExportedId="DependentSchemaList" ComponentId="GqlSchemaParser/DependentSchemaList"/>
         <Component ExportedId="OriginalNamespace" ComponentId="OriginalNamespace"/>
         <Component ExportedId="SchemaCustomParams" ComponentId="GqlSchemaParser/SchemaCustomParams"/>
     </ExportedComponents>

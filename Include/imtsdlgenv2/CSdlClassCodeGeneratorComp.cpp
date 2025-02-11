@@ -32,6 +32,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_originalSchemaNamespaceCompPtr.IsValid());
+	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
 	if (!m_argumentParserCompPtr->IsCppEnabled()){
 		return TS_OK;
@@ -82,6 +83,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 			}
 
 			QStringList autoJoinFilePaths = GetAutoJoinedCppFilePaths(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
+			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), autoJoinFilePaths, *m_dependentSchemaListCompPtr);
 			PrintFiles(std::cout, autoJoinFilePaths, m_argumentParserCompPtr->GetGeneratorType());
 		}
 		else {
@@ -101,7 +103,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 			if (joinSources){
 				cumulatedFiles << joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
 			}
-
+			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
 			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		}
 

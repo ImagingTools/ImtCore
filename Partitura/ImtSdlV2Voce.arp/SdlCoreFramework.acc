@@ -113,6 +113,7 @@
     <ExportedComponents>
         <Component ExportedId="BaseClassExtender" ComponentId="BaseClassExtender"/>
         <Component ExportedId="BasicRequestsProvider" ComponentId="GqlSchemaParser/BasicRequestsProvider"/>
+        <Component ExportedId="DependentSchemaList" ComponentId="GqlSchemaParser/DependentSchemaList"/>
         <Component ExportedId="OriginalNamespace" ComponentId="GqlSchemaParser/OriginalNamespace"/>
         <Component ExportedId="SchemaCustomParams" ComponentId="GqlSchemaParser/SchemaCustomParams"/>
     </ExportedComponents>

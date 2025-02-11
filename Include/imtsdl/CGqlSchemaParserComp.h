@@ -46,6 +46,8 @@ public:
 		I_REGISTER_INTERFACE(ISdlDocumentTypeListProvider)
 		I_REGISTER_SUBELEMENT(SchemaCustomParams)
 		I_REGISTER_SUBELEMENT_INTERFACE(SchemaCustomParams, iprm::IParamsSet, ExtractSchemaCustomParams);
+		I_REGISTER_SUBELEMENT(DependentSchemaList)
+		I_REGISTER_SUBELEMENT_INTERFACE(DependentSchemaList, iprm::IOptionsManager, ExtractDependentSchemaList);
 
 		I_ASSIGN(m_useFilesImportAttrPtr, "UseJavaStyleImport", "If enabled, all imports will be procesed by resloving paths in file a system", true, true)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
@@ -81,6 +83,11 @@ private:
 	static InterfaceType* ExtractSchemaCustomParams(CGqlSchemaParserComp& component)
 	{
 		return component.m_schemaParamsPtr.get();
+	}
+	template <class InterfaceType>
+	static InterfaceType* ExtractDependentSchemaList(CGqlSchemaParserComp& component)
+	{
+		return component.m_processedFilesPtr;
 	}
 
 protected:

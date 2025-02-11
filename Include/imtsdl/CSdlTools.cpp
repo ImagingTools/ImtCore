@@ -1,3 +1,4 @@
+#include "iprm/IOptionsList.h"
 #include <imtsdl/CSdlTools.h>
 
 
@@ -1194,8 +1195,50 @@ void CSdlTools::GenerateListTempValueCode(QTextStream& stream, const CSdlField& 
 }
 
 
+void CSdlTools::PrintFiles(const QString& filePath, const QStringList& files, const iprm::IOptionsManager& depsList)
+{
+	if (filePath.isEmpty()){
+		return;
+	}
+
+	QFile depFile(filePath);
+	const bool isOpen = depFile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
+	if (!isOpen){
+		qCritical() << "Can't open dep file" << filePath;
+	}
+
+	QTextStream fStream(&depFile);
+
+	for(QString targetPath: files){
+		targetPath.replace(' ', "\\ ");
+		fStream << targetPath;
+		fStream << ' ';
+	}
+
+	fStream << ':' << ' ';
+
+	QSet<QString> cumulatedFiles;
+	int optionsCount = depsList.GetOptionsCount();
+	for (int i = 0; i < optionsCount; ++i){
+		cumulatedFiles << depsList.GetOptionName(i);
+	}
+
+	for(QString depPath: cumulatedFiles){
+		depPath.replace(' ', "\\ ");
+		fStream << depPath;
+		fStream << ' ';
+	}
+
+	fStream << Qt::endl;
+}
+
+
 void CSdlTools::PrintFiles(std::ostream& outStream, const QStringList& files, ISdlProcessArgumentsParser::GeneratorType projectCodeGenerator)
 {
+	if (projectCodeGenerator == ISdlProcessArgumentsParser::GT_DEP_FILE){
+		return;
+	}
+
 	char glue = ' ';
 	if (projectCodeGenerator == ISdlProcessArgumentsParser::GT_CMAKE){
 		glue = '\n';

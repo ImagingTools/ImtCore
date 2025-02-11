@@ -56,6 +56,7 @@ public:
 	virtual QStringList GetHeadersIncludePaths() const override;
 	virtual QString GetCachePath() override;
 	virtual QStringList GetAdditionalCachePaths() override;
+	virtual QString GetDepFilePath() override;
 
 protected:
 	/**
@@ -98,6 +99,7 @@ private:
 	QStringList m_headersIncludePaths;
 	QString m_cachePath;
 	QStringList m_additionalCacheList;
+	QString m_depFilePath;
 };
 
 

@@ -4,6 +4,8 @@
 //Qt includes
 #include <QtCore/QRegularExpression>
 #include <QtCore/QCommandLineParser>
+#include <QtCore/QFileInfo>
+#include <QtCore/QDir>
 
 // ImtCore includes
 #include <imtsdlgen/imtsdlgen.h>
@@ -55,7 +57,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption baseClassOption({"B", "base-class"}, "Defines base class of all generated classes with include path CLASS=/include/path", "BaseClassList");
 	QCommandLineOption joinRulesOption({"J", "join"}, "Defines file types, will be joined TYPE(H or CPP)=/Destination/File/Path", "JoinRules");
 	QCommandLineOption includePathOption({"I", "include"}, "Specifies the import directories which should be searched when parsing the schema.", "IncludePathList");
-	QCommandLineOption generatorOption("generator", "{QMake | CMake | CMake-pipe}. Optional. Only for dependencies mode. Defines a type of output of files to be generated. Default - CMake", "generator");
+	QCommandLineOption generatorOption("generator", "{QMake | CMake | CMake-pipe | DEPFILE}. Optional. Only for dependencies mode. Defines a type of output of files to be generated. Default - CMake.\nNote: DEPFILE also supports define a dep file path i.e.: DEPFILE:<FILE_PATH>", "generator");
 	QCommandLineOption autoLinkOption("auto-link", "Defines the compilation order of the schema files.\n"
 												   "0 - disabled. ALL files will be compiled.\n"
 												   "1 - only those schemas with the same namespace as the original one will be compiled\n"
@@ -64,6 +66,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single.");
 	QCommandLineOption cacheOption({"C", "cache"}, "Specifies the file location where the cache will be created.", "CacheFile");
 	QCommandLineOption cacheListOption({"CC", "additional-cache"}, "Specifies additional location where other cache(s) was created. \nNote: all files MUST exist.", "AdditionalCacheFileList");
+	QCommandLineOption depFileParhOption("DEPFILE", "Depfile, used by CMake to collect dependencies. MUST be a valid file path if 'generator' option is 'DEPFILE'. If the file exsists it will be overwritten!", "DEPFILE");
 
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
@@ -97,7 +100,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 				autoLinkOption,
 				includeHeadersOption,
 				cacheOption,
-				cacheListOption
+				cacheListOption,
+				depFileParhOption
 	});
 
 	bool isOptionsAcceptable = true;
@@ -239,7 +243,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	}
 
 	if (commandLineParser.isSet(generatorOption)){
-		const QString generatorName = commandLineParser.value(generatorOption).toLower();
+		const QString originalGeneratorName = commandLineParser.value(generatorOption);
+		const QString generatorName = originalGeneratorName.toLower();
 		if (generatorName == QStringLiteral("qmake")){
 			m_generatorType = GT_QMAKE;
 		}
@@ -248,6 +253,17 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 		}
 		else if (generatorName == QStringLiteral("cmake-pipe")){
 			m_generatorType = GT_CMAKE_PIPE;
+		}
+		else if (originalGeneratorName.startsWith(QStringLiteral("DEPFILE"))){
+			m_generatorType = GT_DEP_FILE;
+			// also set a path if it defined with 'generator option' DEPFILE:C:\depfile.txt
+			if (originalGeneratorName.contains(':')){
+				QStringList fileParts = originalGeneratorName.split(':');
+				fileParts.removeFirst(); ///< remove 'DEPFILE' part
+				if (!fileParts.isEmpty()){
+					m_depFilePath = fileParts.join(':');
+				}
+			}
 		}
 		else {
 			SendErrorMessage(0, QString("Unexpected generator option '%1'. See %2 help for detales").arg(generatorName, generatorOption.names().join('/')));
@@ -264,6 +280,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 
 	if (commandLineParser.isSet(cacheListOption)){
 		m_additionalCacheList = commandLineParser.values(cacheListOption);
+	}
+
+	if (commandLineParser.isSet(depFileParhOption)){
+		m_depFilePath = commandLineParser.value(depFileParhOption);
 	}
 
 	// special modes
@@ -290,6 +310,28 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 
 	// only one mode MUST be used
 	Q_ASSERT(commandLineParser.isSet(generateOption) ^ commandLineParser.isSet(dependenciesOption) ^ commandLineParser.isSet(schemaDependencyOption));
+
+	if (m_generatorType == GT_DEP_FILE){
+		QFileInfo depFileInfo(m_depFilePath);
+		if (depFileInfo.exists()){
+			const bool removed = QFile::remove(depFileInfo.absoluteFilePath());
+			if (!removed){
+				SendErrorMessage(0, QString("Unable to remove file '%1'").arg(depFileInfo.absoluteFilePath()));
+
+				return false;
+			}
+		}
+
+		QDir depFileDir = depFileInfo.dir();
+		if (!depFileDir.exists()){
+			const bool dirCreated = depFileDir.mkpath(depFileDir.absolutePath());
+			if (!dirCreated){
+				SendErrorMessage(0, QString("Unable to create dir '%1'").arg(depFileDir.absolutePath()));
+
+				return false;
+			}
+		}
+	}
 
 	bool retVal = ProcessCommandLineOptions(commandLineParser);
 
@@ -456,6 +498,12 @@ QString CSdlProcessArgumentsParserComp::GetCachePath()
 QStringList CSdlProcessArgumentsParserComp::GetAdditionalCachePaths()
 {
 	return m_additionalCacheList;
+}
+
+
+QString CSdlProcessArgumentsParserComp::GetDepFilePath()
+{
+	return m_depFilePath;
 }
 
 

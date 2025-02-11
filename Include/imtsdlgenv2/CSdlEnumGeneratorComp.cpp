@@ -33,6 +33,7 @@ int CSdlEnumGeneratorComp::DoProcessing(
 	Q_ASSERT(m_originalSchemaNamespaceCompPtr.IsValid());
 	Q_ASSERT(m_sdlEnumListCompPtr.IsValid());
 	Q_ASSERT(m_customSchemaParamsCompPtr.IsValid());
+	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
 	if (!m_argumentParserCompPtr->IsCppEnabled()){
 		return TS_OK;
@@ -78,6 +79,7 @@ int CSdlEnumGeneratorComp::DoProcessing(
 				if (!joinHeaders){
 					cumulatedFiles << QString(outputDirectoryPath + "/" + sdlEnum.GetName() + ".h");
 				}
+				PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
 				PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 			}
 		}

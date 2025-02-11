@@ -5,6 +5,7 @@
 
 // ACF includes
 #include <icomp/TReferenceMember.h>
+#include <iprm/IOptionsManager.h>
 
 // ImtCore includes
 #include <imtsdl/imtsdl.h>
@@ -135,6 +136,7 @@ public:
 
 	static void GenerateListTempValueCode(QTextStream& stream, const CSdlField& sdlField, QString& tempVariableName, uint indents = 1);
 
+	static void PrintFiles(const QString& filePath, const QStringList& files, const iprm::IOptionsManager& depsList);
 	static void PrintFiles(std::ostream& outStream, const QStringList& files, imtsdl::ISdlProcessArgumentsParser::GeneratorType projectCodeGenerator = imtsdl::ISdlProcessArgumentsParser::GT_CMAKE);
 
 	/// \todo remove \param rawLookup - V1 fallback use ONLY for V1 generation!!!!!

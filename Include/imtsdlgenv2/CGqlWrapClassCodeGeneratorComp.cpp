@@ -34,6 +34,7 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlRequestListCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
+	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
 	if (!m_argumentParserCompPtr->IsGqlEnabled()){
 		return TS_OK;
@@ -74,7 +75,7 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 					cumulatedFiles << QString(outputDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.cpp");
 				}
 			}
-
+			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
 			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		}
 

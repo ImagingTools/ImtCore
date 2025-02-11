@@ -7,6 +7,7 @@
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <iprm/ITextParam.h>
+#include <iprm/IOptionsManager.h>
 #include <iproc/TSyncProcessorCompBase.h>
 
 // ImtCore includes
@@ -47,6 +48,7 @@ public:
 		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
 		I_ASSIGN_MULTI_0(m_includeDirectivesProviderListCompPtr, "IncludeDirectivesProviderList", "Providers of include directives, used to generate C(++) directives", false)
 		I_ASSIGN_MULTI_0(m_modifierListCompPtr, "ModifierList", "Modifiers for specific containers, used to generate C++ methods serialization methods ", false)
+		I_ASSIGN(m_dependentSchemaListCompPtr, "DependentSchemaList", "The list of dependent schemas, used to generate dependencies of output file", true, "DependentSchemaList");
 	I_END_COMPONENT
 
 	//reimplemented(iproc::IProcessor)
@@ -114,6 +116,7 @@ private:
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);
 	I_MULTIREF(imtsdlgen::IIncludeDirectivesProvider, m_includeDirectivesProviderListCompPtr);
 	I_MULTIREF(imtsdlgen::ICxxModifier, m_modifierListCompPtr);
+	I_REF(iprm::IOptionsManager, m_dependentSchemaListCompPtr);
 
 	istd::TDelPtr<QFile> m_headerFilePtr;
 	istd::TDelPtr<QFile> m_sourceFilePtr;

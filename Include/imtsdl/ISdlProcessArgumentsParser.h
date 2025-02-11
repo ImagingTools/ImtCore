@@ -23,7 +23,8 @@ public:
 	{
 		GT_CMAKE,
 		GT_QMAKE,
-		GT_CMAKE_PIPE
+		GT_CMAKE_PIPE,
+		GT_DEP_FILE
 	};
 
 	enum AutoLinkLevel
@@ -52,8 +53,9 @@ public:
 	virtual bool IsAutoJoinEnabled() const = 0;
 	virtual AutoLinkLevel GetAutoLinkLevel() const = 0;
 	virtual QStringList GetHeadersIncludePaths() const = 0;
-	virtual QString GetCachePath() = 0;
+	[[deprecated]]virtual QString GetCachePath() = 0;
 	virtual QStringList GetAdditionalCachePaths() = 0;
+	virtual QString GetDepFilePath() = 0;
 };
 
 
