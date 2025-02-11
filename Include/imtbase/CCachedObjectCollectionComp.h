@@ -9,7 +9,7 @@
 #include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
-#include <imtbase/CFilterCollectionProxy.h>
+#include <imtbase/IObjectCollection.h>
 
 
 namespace imtbase

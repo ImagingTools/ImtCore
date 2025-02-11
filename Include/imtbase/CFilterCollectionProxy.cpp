@@ -162,7 +162,7 @@ bool CFilterCollectionProxy::InsertObjectIntoCollection(ObjectInfo info)
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(info.objectPtr.GetPtr());
 	if (modelPtr != nullptr){
 		if (!modelPtr->AttachObserver(&m_modelUpdateBridge)){
-			qDebug("CObjectCollectionBase::InsertObjectIntoCollection: Attaching object's model to the internal observer failed");
+			qDebug("CFilterCollectionProxy::InsertObjectIntoCollection: Attaching object's model to the internal observer failed");
 
 			return false;
 		}
@@ -172,7 +172,6 @@ bool CFilterCollectionProxy::InsertObjectIntoCollection(ObjectInfo info)
 
 	return true;
 }
-
 
 
 } // namespace imtbase

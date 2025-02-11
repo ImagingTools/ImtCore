@@ -12,7 +12,6 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IObjectCollectionIterator.h>
-#include <imtbase/CObjectCollection.h>
 #include <imtbase/ICollectionDataController.h>
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/TModelUpdateBinder.h>

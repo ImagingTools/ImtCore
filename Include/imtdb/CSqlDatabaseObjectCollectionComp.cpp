@@ -13,8 +13,6 @@
 // ImtCore includes
 #include <imtbase/IRevisionController.h>
 #include <imtbase/CParamsSetJoiner.h>
-#include <imtbase/CObjectCollection.h>
-#include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/CSqlDatabaseObjectCollectionIterator.h>
 
 
