@@ -410,11 +410,21 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	}
 
 	QByteArray objectId;
-	istd::TDelPtr<istd::IChangeable> newObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, errorMessage);
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	if (inputParamPtr != nullptr){
+		objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	}
+
+	QByteArray objectIdFromRepresentation;
+	istd::TDelPtr<istd::IChangeable> newObjectPtr = CreateObjectFromRequest(gqlRequest, objectIdFromRepresentation, errorMessage);
 	if (!newObjectPtr.IsValid()){
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return nullptr;
+	}
+
+	if (!objectIdFromRepresentation.isEmpty()){
+		objectId = objectIdFromRepresentation;
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
