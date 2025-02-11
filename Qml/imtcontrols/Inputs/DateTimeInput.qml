@@ -2,177 +2,111 @@ import QtQuick 2.15
 import Acf 1.0
 import imtcontrols 1.0
 
-Rectangle {
-    id: timeInput;
+Row{
+	id: dateTimeInput;
 
-    width: minutesInput.width + minutesInput.x + mainMargin;
-    height: 36;
+	height: Math.max(dateInput.height, timeInput.height);
 
-    border.color: hoursInput.isEmpty || minutesInput.isEmpty ? "red" : "lightgray";
-    color: "transparent";
+	spacing: 16;
 
-    property int mainMargin: 4;
-    property int inputWidth: 36;
-    property int fontSize: 18;
+	property bool canShowCurrentTime: true;
+	property bool hasTitle: true;
+	property string color: Style.baseColor;
 
-    property string fontColor: Style.textColor;
+	property var selectedDate;
 
-	property var hoursRegExp: /^(([0-1]?\d)|(2[0-3]?))$/
-    property var minutesRegExp: /^[0-5]?[0-9]$/
-	property var timeRegExp: /^(([0-1]\d)|(2[0-3])):[0-5]\d$/
+	property string dateStr: "";
+	property string timeStr: "";
+	property string dateTimeStr: dateStr + ":" + timeStr;
 
-    property bool canShowCurrentTime: false;
+	signal dateChanged(string value)
 
-    property string time: (hoursInput.text + ":" + minutesInput.text).match(timeInput.timeRegExp) !== null ?
-                               (hoursInput.text + ":" + minutesInput.text) : "";
+	Component.onCompleted: {
+		selectedDate = new Date();
+	}
 
-    signal accepted(string value);
+	function setDateTime(date){
+		setDate(date);
+		setTime(date);
+	}
 
-    Component.onCompleted:{
-        if(canShowCurrentTime){
-            showCurrentTime();
-        }
-    }
+	function setDate(date){
+		dateTimeInput.dateStr = Functions.dateToStr(date,"dd.MM.yyyy");
+		dateInput.setDate(date);
 
-    function setTime(str){
-        console.log("Set time")
-        if(str.match(timeInput.timeRegExp) === null){
-            console.log("Wrong time format!")
-            return;
-        }
-        let arr = str.split(":");
-        if(arr.length < 2){
-            return;
-        }
+		dateTimeInput.selectedDate.setFullYear(date.getFullYear())
+		dateTimeInput.selectedDate.setMonth(date.getMonth())
+		dateTimeInput.selectedDate.setDate(date.getDate())
 
-        hoursInput.text = arr[0];
-        minutesInput.text = arr[1];
-    }
+		signalPause.restart();
 
-    function showCurrentTime(){
-        console.log("showCurrentTime")
-        let date = new Date();
+	}
 
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-        if(String(hours).length == 1){
-            hours = "0" + hours;
-        }
-        if(String(minutes).length == 1){
-            minutes = "0" + minutes;
-        }
+	function setTime(date){
+		let hours = date.getHours();
+		let minutes = date.getMinutes();
+		if(Number(hours) < 10){
+			hours = "0" + hours;
+		}
+		if(Number(minutes) < 10){
+			minutes = "0" + minutes;
+		}
+		dateTimeInput.timeStr = hours + ":" + minutes
+		timeInput.setTime(dateTimeInput.timeStr);
 
-        let time  = hours + ":" + minutes;
-        //console.log("showCurrentTime:: ", time)
-        setTime(time);
-    }
+		dateTimeInput.selectedDate.setHours(date.getHours())
+		dateTimeInput.selectedDate.setMinutes(date.getMinutes())
 
-    TextField{
-        id: hoursInput
+		signalPause.restart();
+	}
 
-        anchors.left: parent.left;
-        anchors.leftMargin:  parent.mainMargin;
-        anchors.verticalCenter: parent.verticalCenter;
 
-        width: parent.inputWidth;
-        height: parent.height - 2 * parent.mainMargin;
+	function setDateTimeAsString(str){
+	}
 
-        textSize: parent.fontSize;
-        fontColor: timeInput.fontColor;
+	function setDateAsString(str){
+	}
 
-        KeyNavigation.right: minutesInput;
-        KeyNavigation.tab: minutesInput;
+	function setTimeAsString(str){
+	}
 
-        textInputValidator : RegularExpressionValidator { regularExpression: timeInput.hoursRegExp }
 
-        property bool isEmpty: false;
+	DateInput{
+		id: dateInput;
 
-        onVisibleChanged: {
-            if(text == ""){
-                isEmpty = true;
-            }
-        }
+		anchors.bottom: parent.bottom;
 
-        onFocusChanged: {
-            if(!focus && text.length == 1){
-                text = "0" + text;
-            }
-        }
-        onAccepted: {
-            if(text.length == 1){
-                text = "0" + text;
-            }
-        }
+		canShowCurrentDate: dateTimeInput.canShowCurrentTime;
+		hasTitle: dateTimeInput.hasTitle;
+		color: dateTimeInput.color;
 
-        onTextChanged: {
-            if(text !== ""){
-                isEmpty = false;
-            }
+		tabKeyItem: timeInput.inputItem;
+		onDateChanged: {
 
-        }
-    }
+		}
+	}
 
-    Text{
-        id: colon;
+	TimeInput{
+		id: timeInput;
 
-        anchors.left: hoursInput.right;
-        anchors.leftMargin: 4;
-        anchors.verticalCenter: parent.verticalCenter;
+		anchors.bottom: parent.bottom;
 
-        font.family: Style.fontFamily;
-        font.pixelSize:  parent.fontSize;
-        color: timeInput.fontColor;
+		canShowCurrentTime: dateTimeInput.canShowCurrentTime;
+		hasTitle: dateTimeInput.hasTitle;
+		color: dateTimeInput.color;
 
-        text: ":"
+		tabKeyItem: dateInput.inputItem;
+		onTimeChanged: {
 
-    }
+		}
+	}
 
-    TextField{
-        id: minutesInput
+	PauseAnimation {
+		id: signalPause;
 
-        anchors.left: colon.right;
-        anchors.leftMargin: 4;
-        anchors.verticalCenter: parent.verticalCenter;
-
-        width: parent.inputWidth;
-        height: parent.height - 2 * parent.mainMargin;
-
-        textSize: parent.fontSize;
-        fontColor: timeInput.fontColor;
-
-        KeyNavigation.left: hoursInput;
-        KeyNavigation.tab: hoursInput;
-
-        textInputValidator : RegularExpressionValidator { regularExpression: timeInput.minutesRegExp }
-
-        property bool isEmpty: false;
-
-        onVisibleChanged: {
-            if(text == ""){
-                isEmpty = true;
-            }
-        }
-
-        onFocusChanged: {
-            if(!focus && text.length == 1){
-                text = "0" + text;
-            }
-        }
-        onAccepted: {
-            if(text.length == 1){
-                text = "0" + text;
-            }
-            let str = hoursInput.text + ":" + minutesInput.text;
-            if(str.match(timeInput.timeRegExp) !== null){
-                timeInput.accepted(str);
-            }
-
-        }
-
-        onTextChanged: {
-            if(text !== ""){
-                isEmpty = false;
-            }
-        }
-    }
+		duration: 200;
+		onFinished: {
+			dateChanged(dateTimeInput.dateTimeStr);
+		}
+	}
 }

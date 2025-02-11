@@ -2,177 +2,303 @@ import QtQuick 2.15
 import Acf 1.0
 import imtcontrols 1.0
 
-Rectangle {
-    id: timeInput;
+Item {
+	id: dateInput;
 
-    width: minutesInput.width + minutesInput.x + mainMargin;
-    height: 36;
+	width: 130;
+	height: column.height;
 
-    border.color: hoursInput.isEmpty || minutesInput.isEmpty ? "red" : "lightgray";
-    color: "transparent";
+	property int inputHeight: 36;
+	property int fontSize: Style.fontSizeNormal;
 
-    property int mainMargin: 4;
-    property int inputWidth: 36;
-    property int fontSize: 18;
+	property string fontColor: Style.textColor;
+	property alias radius: input.radius;
+	property alias color: input.color;
 
-    property string fontColor: Style.textColor;
+	property string placeHolderText: "dd.MM.yyyy";
 
-	property var hoursRegExp: /^(([0-1]?\d)|(2[0-3]?))$/
-    property var minutesRegExp: /^[0-5]?[0-9]$/
-	property var timeRegExp: /^(([0-1]\d)|(2[0-3])):[0-5]\d$/
+	property var dateRegDay: /^([0-3]\d)$/
+	property var dateRegMonth: /^((0[1-9])|(1[0-2]))$/
+	//property var dateRegExpFull: /^(([0-3]\d)\.([0-1])\d)\.\d{4}$/
+	property var dateRegExpFull: /^\d{2}\.\d{2}\.\d{4}$/
+	property var dateRegExp: /^[0-9\.]{0,10}$/
 
-    property bool canShowCurrentTime: false;
+	property bool canShowCurrentDate: false;
+	property bool hasTitle: true;
 
-    property string time: (hoursInput.text + ":" + minutesInput.text).match(timeInput.timeRegExp) !== null ?
-                               (hoursInput.text + ":" + minutesInput.text) : "";
+	property bool  isError: false;
+	property bool  isMonthError: false;
+	property bool  isDayError: false;
 
-    signal accepted(string value);
+	property string errorString: qsTr("Wrong date format!");
+	property string errorStringMonth: qsTr("Invalid month value!");
+	property string errorStringDay: qsTr("Invalid day value!");
 
-    Component.onCompleted:{
-        if(canShowCurrentTime){
-            showCurrentTime();
-        }
-    }
+	property Item tabKeyItem: null;
 
-    function setTime(str){
-        console.log("Set time")
-        if(str.match(timeInput.timeRegExp) === null){
-            console.log("Wrong time format!")
-            return;
-        }
-        let arr = str.split(":");
-        if(arr.length < 2){
-            return;
-        }
+	property alias inputItem: input;
 
-        hoursInput.text = arr[0];
-        minutesInput.text = arr[1];
-    }
+	property string dateStr;
+	property var selectedDate;
 
-    function showCurrentTime(){
-        console.log("showCurrentTime")
-        let date = new Date();
+	signal dateChanged(string value);
 
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-        if(String(hours).length == 1){
-            hours = "0" + hours;
-        }
-        if(String(minutes).length == 1){
-            minutes = "0" + minutes;
-        }
+	Component.onCompleted:{
+		selectedDate = new Date();
+		if(canShowCurrentDate){
+			showCurrentDate();
+		}
+	}
 
-        let time  = hours + ":" + minutes;
-        //console.log("showCurrentTime:: ", time)
-        setTime(time);
-    }
+	function setDate(date){
+		dateInput.selectedDate = date;
+		dateInput.dateStr = Functions.dateToStr(date,"dd.MM.yyyy");
+		input.text = dateInput.dateStr;
+		dateInput.dateChanged(dateInput.dateStr);
+	}
 
-    TextField{
-        id: hoursInput
+	function setDateAsString(str){
+		//console.log("Set date", str)
+		if(!dateInput.checkDateFormat(str)){
+			return false;
+		}
+		if(input.text !== str){
+			input.text = str
+		}
 
-        anchors.left: parent.left;
-        anchors.leftMargin:  parent.mainMargin;
-        anchors.verticalCenter: parent.verticalCenter;
+		let day = str.slice(0, 2)
+		let month = str.slice(3,5)
+		let year = str.slice(7);
+		if(day[0] == "0"){
+			day = day[1]
+		}
+		if(month[0] == "0"){
+			month = month[1]
+		}
+		month -=1
 
-        width: parent.inputWidth;
-        height: parent.height - 2 * parent.mainMargin;
+		dateInput.dateStr = str;
 
-        textSize: parent.fontSize;
-        fontColor: timeInput.fontColor;
+		dateInput.selectedDate.setFullYear(year);
+		dateInput.selectedDate.setMonth(month);
+		dateInput.selectedDate.setDate(day);
 
-        KeyNavigation.right: minutesInput;
-        KeyNavigation.tab: minutesInput;
+		dateInput.dateChanged(dateInput.dateStr);
 
-        textInputValidator : RegularExpressionValidator { regularExpression: timeInput.hoursRegExp }
+		return true;
+	}
 
-        property bool isEmpty: false;
+	function showCurrentDate(){
+		//console.log("showCurrentDate")
+		let date = new Date();
 
-        onVisibleChanged: {
-            if(text == ""){
-                isEmpty = true;
-            }
-        }
+		let day = date.getDate();
+		let month = date.getMonth() +1;
+		let year = date.getFullYear();
+		if(String(day).length == 1){
+			day = "0" + day;
+		}
+		if(String(month).length == 1){
+			month = "0" + month;
+		}
 
-        onFocusChanged: {
-            if(!focus && text.length == 1){
-                text = "0" + text;
-            }
-        }
-        onAccepted: {
-            if(text.length == 1){
-                text = "0" + text;
-            }
-        }
+		let date_  = day + "." + month + "." + year;
+		dateInput.setDateAsString(date_);
+	}
 
-        onTextChanged: {
-            if(text !== ""){
-                isEmpty = false;
-            }
+	function checkDateFormat(str){
+		//console.log("Check Date Format")
+		dateInput.isError = false;
+		dateInput.isMonthError = false;
+		dateInput.isDayError = false;
 
-        }
-    }
+		let ok = false;
 
-    Text{
-        id: colon;
+		let mainRegErr = str.match(dateInput.dateRegExpFull) === null;
+		if(mainRegErr){
+			dateInput.isError = true;
+		}
+		else {
+			let day = str.slice(0, 2)
+			let month = str.slice(3,5)
+			let year = str.slice(7);
 
-        anchors.left: hoursInput.right;
-        anchors.leftMargin: 4;
-        anchors.verticalCenter: parent.verticalCenter;
+			let monthErr = !dateInput.checkMonth(month);
+			if(monthErr){
+				dateInput.isMonthError = true;
+			}
+			let dayErr = !dateInput.checkDay(day, month, year);
+			if(dayErr){
+				dateInput.isDayError = true;
+			}
+		}
 
-        font.family: Style.fontFamily;
-        font.pixelSize:  parent.fontSize;
-        color: timeInput.fontColor;
+		ok = !dateInput.isError && !dateInput.isMonthError && !dateInput.isDayError
+		let toShowErr = dateInput.isError || dateInput.isMonthError || dateInput.isDayError
 
-        text: ":"
 
-    }
+		if(toShowErr){
+			let errorString_ = dateInput.isError ? dateInput.errorString :
+													   dateInput.isMonthError ? dateInput.errorStringMonth :
+																	 dateInput.isDayError ? dateInput.errorStringDay: ""
 
-    TextField{
-        id: minutesInput
+			tooltip.text = errorString_;
 
-        anchors.left: colon.right;
-        anchors.leftMargin: 4;
-        anchors.verticalCenter: parent.verticalCenter;
+			let point = dateInput.mapToItem(null, 0, -8 - tooltip.componentHeight)
+			tooltip.openTooltipWithCoord(point.x,point.y)
+			closeTooltipPause.restart();
+		}
 
-        width: parent.inputWidth;
-        height: parent.height - 2 * parent.mainMargin;
+		return ok;
+	}
 
-        textSize: parent.fontSize;
-        fontColor: timeInput.fontColor;
+	function checkMonth(month){
+		return month.match(dateInput.dateRegMonth) !== null;
+	}
 
-        KeyNavigation.left: hoursInput;
-        KeyNavigation.tab: hoursInput;
+	function checkDay(day, month, year){
+		let ok  = false;
+		let regOk = day.match(dateInput.dateRegDay) !== null;
+		if(!regOk){
+			return false;
+		}
 
-        textInputValidator : RegularExpressionValidator { regularExpression: timeInput.minutesRegExp }
+		if(day[0] == "0"){
+			day = day[1];
+		}
+		if(month[0] == "0"){
+			month = month[1];
+		}
 
-        property bool isEmpty: false;
+		let dayNumber = Number(day);
 
-        onVisibleChanged: {
-            if(text == ""){
-                isEmpty = true;
-            }
-        }
+		if(dayNumber > 31){
+			return false;
+		}
+		if(dayNumber <= 28){
+			return true;
+		}
 
-        onFocusChanged: {
-            if(!focus && text.length == 1){
-                text = "0" + text;
-            }
-        }
-        onAccepted: {
-            if(text.length == 1){
-                text = "0" + text;
-            }
-            let str = hoursInput.text + ":" + minutesInput.text;
-            if(str.match(timeInput.timeRegExp) !== null){
-                timeInput.accepted(str);
-            }
+		if(Number(month) == 2){
+			let isLeapYear_ = dateInput.isLeapYear(year);
+			ok  = isLeapYear_ ? dayNumber <= 29 :  dayNumber <=28;
+		}
+		else if(month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12){
+			ok = dayNumber <= 31
+		}
+		else {
+			ok = dayNumber <= 30
+		}
 
-        }
+		return ok;
+	}
 
-        onTextChanged: {
-            if(text !== ""){
-                isEmpty = false;
-            }
-        }
-    }
+	function isLeapYear(year){
+		let isLeapYear;
+
+		if(!(year % 400)){
+			isLeapYear = true;
+		}
+		else if(!(year % 100)){
+			isLeapYear = false;
+		}
+		else if(!(year % 4)){
+			isLeapYear = true;
+		}
+		else{
+			isLeapYear = false;
+		}
+		return isLeapYear;
+	}
+
+	Column{
+		id: column;
+
+		spacing: Style.size_smallMargin;
+
+		Text{
+			id: titleText;
+
+			font.family: Style.fontFamily;
+			font.pixelSize: Style.fontSizeNormal;
+			color: Style.textColor;
+
+			visible: dateInput.hasTitle;
+
+			text: qsTr("Date:");
+		}
+
+		CustomTextField{
+			id: input
+
+			width: dateInput.width;
+			height: dateInput.inputHeight;
+
+			textSize: dateInput.fontSize;
+			fontColor: dateInput.fontColor;
+			//borderColorConst:  (dateInput.isError || dateInput.isMonthError || dateInput.isDayError) ? Style.errorTextColor : input.textInputActiveFocus ? Style.iconColorOnSelected: Style.borderColor;
+			borderColor: Style.iconColorOnSelected;
+
+			KeyNavigation.tab: dateInput.tabKeyItem;
+
+			placeHolderText: dateInput.placeHolderText;
+			placeHolderTextSize: fontSize-2;
+
+			textInputValidator : RegularExpressionValidator { regularExpression: dateInput.dateRegExp }
+
+			property bool isEmpty: false;
+
+			onVisibleChanged: {
+				if(text == ""){
+					isEmpty = true;
+				}
+			}
+
+			onFocusChanged: {
+				if(!focus){
+					dateInput.setDateAsString(input.text);
+				}
+			}
+			onAccepted: {
+				dateInput.setDateAsString(input.text)
+			}
+
+			onTextChanged: {
+				if(text !== ""){
+					isEmpty = false;
+					dateInput.isError = false;
+					dateInput.isMonthError = false;
+					dateInput.isDayError = false;
+				}
+
+			}
+
+			Rectangle{
+				id: frame;
+
+				anchors.fill: parent;
+
+				radius: input.radius;
+				color: "transparent";
+				border.color:(dateInput.isError || dateInput.isMonthError || dateInput.isDayError) ? Style.errorTextColor : "transparent";
+			}
+		}
+
+	}
+
+	CustomTooltip{
+		id: tooltip;
+
+		fontPixelSize: Style.fontSizeNormal
+	}
+
+
+	PauseAnimation {
+		id: closeTooltipPause;
+
+		duration: 2000
+		onFinished: {
+			tooltip.hide();
+		}
+	}
 }

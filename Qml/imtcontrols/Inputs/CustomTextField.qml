@@ -10,6 +10,7 @@ FocusScope {
     property string text: textField.text; // for web TEMP!!!
     property alias acceptableInput: textField.acceptableInput;
     property alias textInputFocus: textField.focus;
+	property alias textInputActiveFocus: textField.activeFocus;
     property alias textInputMask: textField.inputMask;
     property alias textInputValidator: textField.validator;
     property alias readOnly: textField.readOnly;

@@ -6,12 +6,14 @@ Item {
 	id: timeInput;
 
 	width: 84;
-	height: 36;
+	height: column.height;
 
-	property int mainMargin: 0;
+	property int inputHeight: 36;
 	property int fontSize: Style.fontSizeNormal;
 
 	property string fontColor: Style.textColor;
+	property alias radius: input.radius;
+	property alias color: input.color;
 
 	property string placeHolderText: "hh:mm";
 
@@ -20,6 +22,7 @@ Item {
 	property var timeRegExp: /^[0-9:]{0,5}$/
 
 	property bool canShowCurrentTime: false;
+	property bool hasTitle: true;
 
 	property bool  isError: false;
 
@@ -27,9 +30,9 @@ Item {
 
 	property alias inputItem: input;
 
-	property string time;
+	property string selectedTime;
 
-	signal accepted(string value);
+	signal timeChanged(string value);
 
 	Component.onCompleted:{
 		if(canShowCurrentTime){
@@ -38,11 +41,9 @@ Item {
 	}
 
 	function checkDateFormat(str){
-		console.log("Check Date Format")
+		//console.log("Check Date Format")
 		timeInput.isError = str.match(timeInput.timeRegExpFull) === null;
-		if(timeInput.isError){
-			console.log("Wrong time format!")
-		}
+
 		if(timeInput.isError){
 			let point = timeInput.mapToItem(null, 0, -8 - tooltip.componentHeight)
 			tooltip.openTooltipWithCoord(point.x,point.y)
@@ -54,10 +55,11 @@ Item {
 	function setTime(str){
 		console.log("Set time")
 		if(str.match(timeInput.timeRegExpFull) === null){
-			console.log("Wrong time format!")
+			//console.log("Wrong time format!")
 			return;
 		}
 
+		timeInput.selectedTime = str;
 		input.text = str
 	}
 
@@ -79,69 +81,93 @@ Item {
 		setTime(time);
 	}
 
-	CustomTextField{
-		id: input
 
-		anchors.centerIn: parent
+	Column{
+		id: column;
 
-		width: parent.width - 2 * parent.mainMargin;
-		height: parent.height - 2 * parent.mainMargin;
+		spacing: Style.size_smallMargin;
 
-		textSize: parent.fontSize;
-		fontColor: timeInput.fontColor;
-		borderColor: Style.iconColorOnSelected;
+		Text{
+			id: titleText;
 
-		KeyNavigation.tab: timeInput.tabKeyItem;
+			font.family: Style.fontFamily;
+			font.pixelSize: Style.fontSizeNormal;
+			color: Style.textColor;
 
-		placeHolderText: timeInput.placeHolderText;
-		placeHolderTextSize: fontSize-2;
+			visible: timeInput.hasTitle;
 
-		textInputValidator : RegularExpressionValidator { regularExpression: timeInput.timeRegExp }
-
-		property bool isEmpty: false;
-
-		onVisibleChanged: {
-			if(text == ""){
-				isEmpty = true;
-			}
+			text: qsTr("Time:");
 		}
 
-		onFocusChanged: {
-			if(!focus){
-				timeInput.checkDateFormat(input.text);
-			}
-		}
-		onAccepted: {
-			if(timeInput.checkDateFormat(input.text)){
-				timeInput.time = input.text;
-				timeInput.accepted(input.text);
+		CustomTextField{
+			id: input
+
+			width: timeInput.width;
+			height: timeInput.inputHeight;
+
+			textSize: timeInput.fontSize;
+			fontColor: timeInput.fontColor;
+			borderColor: Style.iconColorOnSelected;
+
+			KeyNavigation.tab: timeInput.tabKeyItem;
+
+			placeHolderText: timeInput.placeHolderText;
+			placeHolderTextSize: fontSize-2;
+
+			textInputValidator : RegularExpressionValidator { regularExpression: timeInput.timeRegExp }
+
+			property bool isEmpty: false;
+
+			onVisibleChanged: {
+				if(text == ""){
+					isEmpty = true;
+				}
 			}
 
-		}
+			onFocusChanged: {
+				if(!focus){
+					if(timeInput.checkDateFormat(input.text)){
+						timeInput.timeChanged(input.text);
+					}
 
-		onTextChanged: {
-			if(text !== ""){
-				isEmpty = false;
-				timeInput.isError = false;
+				}
+			}
+			onAccepted: {
+				if(timeInput.checkDateFormat(input.text)){
+					timeInput.selectedTime = input.text;
+					timeInput.timeChanged(input.text);
+				}
+
 			}
 
+			onTextChanged: {
+				if(text !== ""){
+					isEmpty = false;
+					timeInput.isError = false;
+				}
+
+			}
+
+			Rectangle{
+				id: frame;
+
+				anchors.fill: parent;
+
+				radius: input.radius;
+				color: "transparent";
+				border.color: timeInput.isError ? Style.errorTextColor : "transparent";
+			}
 		}
 	}
 
-	Rectangle{
-		id: frame;
 
-		anchors.fill: parent;
-
-		radius: input.radius;
-		color: "transparent";
-		border.color: timeInput.isError ? Style.errorTextColor : "transparent";
-	}
 
 	CustomTooltip{
 		id: tooltip;
 
-		text: "Wrong time format!"
+		text: qsTr("Wrong time format!")
+
+		fontPixelSize: Style.fontSizeNormal
 	}
 
 
