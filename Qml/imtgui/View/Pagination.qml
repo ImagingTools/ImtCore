@@ -267,6 +267,25 @@ Row {
 				paginationContainer.countElements = 250;
 			}
 		}
+
+		Button {
+			id: count500;
+
+			anchors.verticalCenter: parent.verticalCenter;
+
+			width: 50;
+			height: 20;
+
+			decorator: buttonDecorator;
+
+			enabled: paginationContainer.countElements != 500;
+
+			text: "500";
+
+			onClicked: {
+				paginationContainer.countElements = 500;
+			}
+		}
 	}
 }
 

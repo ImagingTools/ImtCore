@@ -191,12 +191,19 @@ DocumentDataController {
 		}
 	}
 
+	function getBodyForGetModel(){
+		return null
+	}
+
 	property GqlRequest gqlGetModel: GqlRequest {
 		function getData(){
 			var query = Gql.GqlRequest("query", container.gqlGetCommandId);
 
-			var queryFields = Gql.GqlObject("item");
-			queryFields.InsertField("Id");
+			var queryFields = container.getBodyForGetModel()
+			if (!queryFields){
+				queryFields = Gql.GqlObject("item");
+				queryFields.InsertField("Id");
+			}
 			query.AddField(queryFields);
 
 			query.AddParam(container.getRequestInputParam);
