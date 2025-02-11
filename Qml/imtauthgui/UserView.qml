@@ -158,7 +158,6 @@ ViewBase {
 			GroupHeaderView {
 				id: headerGeneralGroup;
 				width: parent.width;
-
 				title: qsTr("General");
 			}
 

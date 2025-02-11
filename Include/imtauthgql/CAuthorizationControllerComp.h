@@ -7,6 +7,7 @@
 #include <imtcrypt/IHashGenerator.h>
 #include <imtauth/ICredentialController.h>
 #include <imtauth/CUserInfo.h>
+#include <imtauth/IJwtSessionController.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
@@ -24,6 +25,7 @@ public:
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
 		I_ASSIGN_MULTI_0(m_credentialControllersCompPtr, "CredentialControllers", "Credential Controllers", true);
 		I_ASSIGN_MULTI_0(m_systemIdsAttrPtr, "SystemIds", "System-IDs", true);
+		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "JWT session controller", false, "JwtSessionController");
 	I_END_COMPONENT;
 
 protected:
@@ -54,6 +56,7 @@ protected:
 protected:
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
+	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
 	I_MULTIREF(imtauth::ICredentialController, m_credentialControllersCompPtr);
 	I_MULTIATTR(QByteArray, m_systemIdsAttrPtr);
 };

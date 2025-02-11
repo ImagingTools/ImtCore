@@ -13,14 +13,12 @@ Item {
     property string updateCommandsGuiEventCommandId: "UpdateCommandsGui";
 
     Component.onCompleted: {
-        Events.subscribeEvent("Logout", commandsDecoratorContainer.clearModel);
         Events.subscribeEvent(setCommandsVisibleEventCommandId, commandsDecoratorContainer.setVisible);
         Events.subscribeEvent(clearEventCommandId, commandsDecoratorContainer.clearModel);
         Events.subscribeEvent(updateCommandsGuiEventCommandId, commandsDecoratorContainer.setCommandsModel);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("Logout", commandsDecoratorContainer.clearModel);
         Events.unSubscribeEvent(setCommandsVisibleEventCommandId, commandsDecoratorContainer.setVisible);
         Events.unSubscribeEvent(clearEventCommandId, commandsDecoratorContainer.clearModel);
         Events.unSubscribeEvent(updateCommandsGuiEventCommandId, commandsDecoratorContainer.setCommandsModel);

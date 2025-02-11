@@ -33,9 +33,7 @@ Rectangle {
     Component.onCompleted: {
         Events.subscribeEvent("StartLoading", thumbnailDecoratorContainer.startLoading);
         Events.subscribeEvent("StopLoading", thumbnailDecoratorContainer.stopLoading);
-
         Events.subscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
-        Events.subscribeEvent("Logout", thumbnailDecoratorContainer.onLogout);
 
 		PopupManager.popupContainer = popupContainer;
     }
@@ -45,7 +43,6 @@ Rectangle {
         Events.unSubscribeEvent("StopLoading", thumbnailDecoratorContainer.stopLoading);
 
         Events.unSubscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
-        Events.unSubscribeEvent("Logout", thumbnailDecoratorContainer.onLogout);
     }
 
     function updateModels(){
@@ -69,6 +66,14 @@ Rectangle {
 
         MainDocumentManager.clear();
     }
+
+	Connections {
+		target: AuthorizationController;
+
+		function onLoggedOut(){
+			thumbnailDecoratorContainer.onLogout();
+		}
+	}
 
     Connections {
         target: MainDocumentManager;

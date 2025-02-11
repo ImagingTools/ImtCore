@@ -11,6 +11,7 @@ namespace imtqml
 
 
 QString CGqlModel::s_accessToken = QString();
+QString CGqlModel::s_refreshToken = QString();
 
 
 CGqlModel::CGqlModel(QObject *parent)
@@ -105,6 +106,13 @@ void CGqlModel::SetGlobalAccessToken(const QString &accessToken)
 }
 
 
-} // namespace imtqml
+void CGqlModel::SetRefreshToken(const QString& refreshToken)
+{
+	if (s_refreshToken != refreshToken){
+		s_refreshToken = refreshToken;
+	}
+}
 
+
+} // namespace imtqml
 

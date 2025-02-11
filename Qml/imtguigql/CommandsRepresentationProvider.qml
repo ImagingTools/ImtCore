@@ -18,57 +18,29 @@ CommandsController {
             return;
         }
 
-        commandsProviderContainer.modelCommands.updateModel();
+		modelCommands.gqlCommandId = commandId + "Commands"
+		commandsProviderContainer.modelCommands.send();
     }
 
     function getHeaders(){
         return {};
     }
 
-    property GqlModel modelCommands: GqlModel {
-        function updateModel() {
-            var query = Gql.GqlRequest("query", commandsProviderContainer.commandId + "Commands");
-            let additionInputParams = commandsProviderContainer.getHeaders();
-            if (Object.keys(additionInputParams).length > 0){
-                let inputParams = Gql.GqlObject("input");
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-                inputParams.InsertFieldObject(additionParams);
-                query.AddParam(inputParams);
-            }
-            var gqlData = query.GetQuery();
-            this.setGqlQuery(gqlData);
+	property GqlRequestSender modelCommands: GqlRequestSender {
+		function createQueryParams(query, params){
+			commandsProviderContainer.isReady = false;
+		}
 
-            commandsProviderContainer.isReady = false;
-        }
+		function getHeaders(){
+			return commandsProviderContainer.getHeaders();
+		}
 
-        onStateChanged: {
-            if (this.state === "Ready"){
-                var dataModelLocal;
-                if (this.containsKey("errors")){
-                    return;
-                }
+		function onResult(data){
+			commandsProviderContainer.setAdditionalProperties(data);
+			commandsProviderContainer.commandsModel = data;
 
-                if (this.containsKey("data")){
-                    dataModelLocal = this.getData("data")
-                    if (!dataModelLocal){
-                        return;
-                    }
-
-                    if(dataModelLocal.containsKey(commandsProviderContainer.commandId + "Commands")){
-                        dataModelLocal = dataModelLocal.getData(commandsProviderContainer.commandId + "Commands");
-                        if (dataModelLocal != "null"){
-                            commandsProviderContainer.setAdditionalProperties(dataModelLocal);
-                            commandsProviderContainer.commandsModel = dataModelLocal;
-
-                            commandsProviderContainer.isReady = true;
-                        }
-                    }
-                }
-            }
-        }
+			commandsProviderContainer.isReady = true;
+		}
     }
 }
 

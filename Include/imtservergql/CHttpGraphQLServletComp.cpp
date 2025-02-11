@@ -21,19 +21,19 @@ namespace imtservergql
 // reimplemented (imtrest::IRequestServlet)
 
 imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
-			const QByteArray& /*commandId*/,
-			const imtrest::IRequest::CommandParams& /*commandParams*/,
-			const HeadersMap& headers,
-			const imtrest::CHttpRequest& request) const
+	const QByteArray& /*commandId*/,
+	const imtrest::IRequest::CommandParams& /*commandParams*/,
+	const HeadersMap& headers,
+	const imtrest::CHttpRequest& request) const
 {
 	m_lastRequest.ResetData();
 
 	int errorPosition = -1;
 	QByteArray requestBody = request.GetBody();
 	if (!m_lastRequest.ParseQuery(requestBody, errorPosition)){
-			qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: '%1'; Error position: '%2'")
-						.arg(qPrintable(request.GetBody()))
-						.arg(errorPosition);
+		qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: '%1'; Error position: '%2'")
+		.arg(qPrintable(request.GetBody()))
+			.arg(errorPosition);
 	}
 
 	QByteArray gqlCommand = m_lastRequest.GetCommandId();
@@ -55,6 +55,17 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 	imtgql::IGqlContext* gqlContextPtr = nullptr;
 	QByteArray accessToken = headers.value("x-authentication-token");
+
+	if (!accessToken.isEmpty() && m_jwtSessionControllerCompPtr.IsValid()){
+		imtauth::IJwtSessionController::JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
+		if (state == imtauth::IJwtSessionController::JS_EXPIRED){
+			return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_UNAUTHORIZED, "", request);
+		}
+		else if (state == imtauth::IJwtSessionController::JS_INVALID){
+			return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_FORBIDDEN, "", request);
+		}
+	}
+
 	if (!accessToken.isEmpty() && m_gqlContextControllerCompPtr.IsValid()){
 		QString errorMessage;
 
@@ -68,9 +79,9 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 		else{
 			SendCriticalMessage(
-						0,
-						QString("Unable to get a GraphQL context for the access token '%1' for Command-ID: '%2'").arg(qPrintable(accessToken)).arg(qPrintable(gqlCommand)),
-						"GraphQL - servlet");
+				0,
+				QString("Unable to get a GraphQL context for the access token '%1' for Command-ID: '%2'").arg(qPrintable(accessToken)).arg(qPrintable(gqlCommand)),
+				"GraphQL - servlet");
 
 			return GenerateError(imtrest::IProtocolEngine::StatusCode::SC_INTERNAL_SERVER_ERROR, "Request incorrected", request);
 		}
@@ -180,19 +191,19 @@ const imtgql::IGqlRequest* CHttpGraphQLServletComp::GetGqlRequest() const
 // private methods
 
 imtrest::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
-			const imtrest::IProtocolEngine::StatusCode& statusCode,
-			const QByteArray& payload,
-			const imtrest::IRequest& request,
-			const QByteArray& contentTypeId) const
+	const imtrest::IProtocolEngine::StatusCode& statusCode,
+	const QByteArray& payload,
+	const imtrest::IRequest& request,
+	const QByteArray& contentTypeId) const
 {
 	return imtrest::ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, contentTypeId));
 }
 
 
 imtrest::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
-			const imtrest::IProtocolEngine::StatusCode& errorCode,
-			const QString& /*errorString*/,
-			const imtrest::CHttpRequest& request) const
+	const imtrest::IProtocolEngine::StatusCode& errorCode,
+	const QString& /*errorString*/,
+	const imtrest::CHttpRequest& request) const
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
@@ -202,11 +213,11 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
 
 	QByteArray responseJson;
 	return imtrest::ConstResponsePtr(
-				engine.CreateResponse(
-					request,
-					errorCode,
-					responseJson,
-					QByteArray("application/json;charset=utf-8")));
+		engine.CreateResponse(
+			request,
+			errorCode,
+			responseJson,
+			QByteArray("application/json;charset=utf-8")));
 }
 
 

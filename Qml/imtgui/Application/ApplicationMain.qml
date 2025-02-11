@@ -101,7 +101,7 @@ Item {
         settingsProvider: application.settingsProvider;
 
         onUrlChanged: {
-            AuthorizationController.userLogout();
+			AuthorizationController.logout();
             application.reconnect();
         }
     }
@@ -339,14 +339,16 @@ Item {
             }
         }
 
-        function onLoginSuccessful(){
+		function onLoggedIn(){
             thumbnailDecorator.drawingContainer.content = Style.drawingContainerDecorator;
             thumbnailDecorator.showPage(undefined)
 
             application.updateAllModels();
         }
 
-        function onLogoutSignal(){
+		function onLoggedOut(){
+			console.log("onLoggedOut")
+			thumbnailDecorator.stopLoading();
             application.firstModelsInit();
             NavigationController.clear();
             application.settingsProvider.serverModel = null;

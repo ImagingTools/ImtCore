@@ -74,9 +74,9 @@ DocumentCollectionViewDelegate {
         }
     }
 
-    function onImport(){
-        ModalDialogManager.openDialog(messageDialogComp, {});
-    }
+	function onImport(){
+		ModalDialogManager.openDialog(messageDialogComp, {});
+	}
 
     function onImportDialogResult(name, fileData, mimeType){
         console.log("onImportDialogResult", name, mimeType)

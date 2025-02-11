@@ -15,7 +15,7 @@ Item {
     property var dialogManager: ModalDialogManager;
 
     function logout(){
-        Events.sendEvent("Logout");
+		AuthorizationController.logout();
     }
 }
 

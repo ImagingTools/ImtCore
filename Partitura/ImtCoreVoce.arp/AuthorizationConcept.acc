@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5274" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -28,11 +28,14 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="JwtSessionController"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserSessionRepository"/>
+                        <Data IsEnabled="true" Value="JwtSessionController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SystemIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
@@ -67,25 +70,7 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="UserSessionRepository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UsersSessionsDatabaseDelegate"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UsersSessionsDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="UsersSessionsDatabaseDelegate">
+        <Element Id="JwtSessionController" PackageId="ImtAuthVoce" ComponentId="JwtSessionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
@@ -94,14 +79,11 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="AccessToken"/>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TableName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="UserSessions"/>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -112,6 +94,6 @@
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="AuthorizationController"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="UserSessionRepository" ComponentId="UserSessionRepository"/>
+        <Component ExportedId="JwtSessionController" ComponentId="JwtSessionController"/>
     </ExportedComponents>
 </Acf>

@@ -12,8 +12,10 @@
         <Element ComponentName="CheckPermissionOr" X="950" Y="775" Note=""/>
         <Element ComponentName="ConnectionStatusSubscriberController" X="975" Y="450" Note=""/>
         <Element ComponentName="Demultiplexer" X="650" Y="150" Note=""/>
+        <Element ComponentName="GqlJwtSessionController" X="725" Y="275" Note=""/>
         <Element ComponentName="GraphQLClientEngine" X="125" Y="500" Note=""/>
         <Element ComponentName="RemoteDocumentRevisionController" X="650" Y="675" Note=""/>
+        <Element ComponentName="RemoteJwtSessionController" X="450" Y="275" Note=""/>
         <Element ComponentName="RemoteObjectVisualStatusController" X="450" Y="375" Note=""/>
         <Element ComponentName="RemoteRepositories" X="975" Y="200" Note=""/>
         <Element ComponentName="RemoteRepresentationController" X="225" Y="150" Note=""/>

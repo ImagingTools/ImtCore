@@ -10,6 +10,33 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="FileAutoPersistence" PackageId="ImtCoreVoce" ComponentId="FileAutoPersistence">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="DefaultPath">
+                        <Data IsEnabled="true" Value="key.xml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="104"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Object" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Uuid"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="JwtSessionController" PackageId="ImtAuthPck" ComponentId="JwtSessionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -18,6 +45,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RefreshTokenLifetime" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="86400"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SecretKeyParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Uuid"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SessionSqlRepository"/>
@@ -49,6 +79,11 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Uuid" PackageId="BasePck" ComponentId="Uuid">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
             </Data>
         </Element>
     </ElementsList>

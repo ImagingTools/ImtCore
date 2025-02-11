@@ -2,22 +2,27 @@
 
 
 // ImtCore includes
-#include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
+#include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
 
 
 namespace imtauthdb
 {
 
 
-class CUsersSessionsDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
+class CUsersSessionsDatabaseDelegateComp: public imtdb::CSqlDatabaseDocumentDelegateComp
 {
 public:
-	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
+	typedef imtdb::CSqlDatabaseDocumentDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CUsersSessionsDatabaseDelegateComp)
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
+	virtual QByteArray GetSelectionQuery(
+				const QByteArray& objectId = QByteArray(),
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual istd::IChangeable* CreateObjectFromRecord(const QSqlRecord& record) const override;
 	virtual NewObjectQuery CreateNewObjectQuery(
 				const QByteArray& typeId,
@@ -26,27 +31,18 @@ public:
 				const QString& objectDescription,
 				const istd::IChangeable* valuePtr,
 				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray CreateDeleteObjectQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
 				const imtbase::IOperationContext* operationContextPtr,
 				bool useExternDelegate = true) const override;
-	virtual QByteArray CreateRenameObjectQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				const QString& newObjectName,
-				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray CreateDescriptionObjectQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				const QString& description,
-				const imtbase::IOperationContext* operationContextPtr) const override;
 	QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
+	virtual QByteArray CreateDeleteObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const imtbase::IOperationContext* operationContextPtr) const override;
+	virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 };
 
 

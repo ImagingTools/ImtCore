@@ -62,10 +62,6 @@ Rectangle {
 		}
 	}
 
-	function onLogin(login, password){
-		Events.sendEvent("Login", {"Login": login, "Password": password})
-	}
-
 	Rectangle{
 		anchors.fill: parent;
 		color: "gray";
@@ -420,7 +416,7 @@ Rectangle {
 					text: qsTr("Login");
 
 					onClicked: {
-						authPageContainer.onLogin(loginTextInput.text, passwordTextInput.text)
+						AuthorizationController.login(loginTextInput.text, passwordTextInput.text);
 					}
 				}
 			}//

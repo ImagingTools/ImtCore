@@ -30,9 +30,11 @@ public Q_SLOTS:
 	void errorOccurred(QNetworkReply::NetworkError code);
 
 	static void SetGlobalAccessToken(const QString& accessToken);
+	static void SetRefreshToken(const QString& refreshToken);
 
 public:
 	static QString s_accessToken;
+	static QString s_refreshToken;
 };
 
 

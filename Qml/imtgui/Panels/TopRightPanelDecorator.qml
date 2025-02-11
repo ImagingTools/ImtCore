@@ -26,13 +26,13 @@ DecoratorBase {
             }
         }
 
-        function onLoginSuccessful(){
+		function onLoggedIn(){
             if (Qt.platform.os === "web"){
                 preferenceButton.visible = true;
             }
         }
 
-        function onLogoutSignal(){
+		function onLoggedOut(){
             topRightPanelDecorator.onLogout()
         }
     }

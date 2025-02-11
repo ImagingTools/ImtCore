@@ -21,12 +21,12 @@ DecoratorBase {
     Connections {
         target: AuthorizationController;
 
-        function onLoginSuccessful(){
+		function onLoggedIn(){
             topCenterPanelDecorator.canSearch = true;
             topCenterPanelDecorator.visible = topCenterPanelDecorator.canSearch;
         }
 
-        function onLogoutSignal(){
+		function onLoggedOut(){
             topCenterPanelDecorator.canSearch = false;
             topCenterPanelDecorator.visible = topCenterPanelDecorator.canSearch;
             tfc.text = "";

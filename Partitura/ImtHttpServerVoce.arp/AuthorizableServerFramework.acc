@@ -188,6 +188,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="imtauth::IJwtSessionController" ComponentId="PumaGQLClientEngine"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="PumaGQLClientEngine"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="PumaGQLClientEngine"/>
     </ExportedInterfaces>

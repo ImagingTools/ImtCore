@@ -65,10 +65,46 @@
                                 <Value>RemoteRepresentationController</Value>
                                 <Value>RemoteDocumentRevisionController</Value>
                                 <Value>RemoteObjectVisualStatusController</Value>
+                                <Value>GqlJwtSessionController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GqlJwtSessionController" PackageId="ImtAuthGqlPck" ComponentId="GqlJwtSessionController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ValidateSession</Value>
+                                <Value>ValidateJwt</Value>
+                                <Value>GenerateJwt</Value>
+                                <Value>GetSession</Value>
+                                <Value>RefreshToken</Value>
+                                <Value>CreateNewSession</Value>
+                                <Value>RemoveSession</Value>
+                                <Value>GetUserFromJwt</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RemoteJwtSessionController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -125,6 +161,18 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteJwtSessionController" PackageId="ImtAuthGqlPck" ComponentId="RemoteJwtSessionController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -196,7 +244,6 @@
                             <Values>
                                 <Value>GetUserInfo</Value>
                                 <Value>GetRoleInfo</Value>
-                                <Value>GetSessionInfo</Value>
                                 <Value>GetUserGroupInfo</Value>
                                 <Value>GetDatabaseStatus</Value>
                                 <Value>UserToken</Value>
@@ -240,7 +287,6 @@
                                 <Value>GroupHistory</Value>
                                 <Value>RoleHistory</Value>
                                 <Value>UserHistory</Value>
-                                <Value>SessionTypeId</Value>
                                 <Value>RoleItemTypeId</Value>
                                 <Value>GroupItemTypeId</Value>
                                 <Value>UserItemTypeId</Value>
@@ -250,6 +296,7 @@
                                 <Value>SendEmailCode</Value>
                                 <Value>CheckSuperuserExists</Value>
                                 <Value>CreateSuperuser</Value>
+                                <Value>Logout</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -346,6 +393,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="imtauth::IJwtSessionController" ComponentId="RemoteJwtSessionController"/>
         <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="ApiClient"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>

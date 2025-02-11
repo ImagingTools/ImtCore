@@ -25,3 +25,4 @@ WebSocketConnectionChecker 1.0 WebSocketConnectionChecker.qml
 GqlSdlRequestSender 1.0 GqlSdlRequestSender.qml
 SdlObjectProvider 1.0 SdlObjectProvider.qml
 GqlSdlDocumentDataController 1.0 GqlSdlDocumentDataController.qml
+XmlHttpRequestProxy 1.0 XmlHttpRequestProxy.qml

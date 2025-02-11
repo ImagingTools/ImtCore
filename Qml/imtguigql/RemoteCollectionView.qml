@@ -3,6 +3,7 @@ import Acf 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 import imtcolgui 1.0
 
 CollectionView {
@@ -217,15 +218,14 @@ CollectionView {
         }
 
         if (dataModel.containsKey("token")){
+			let currentToken = AuthorizationController.getAccessToken();
             let accessToken = dataModel.getData("token");
-            Events.sendEvent("GetToken", function (token){
-                if (String(token) == String(accessToken)){
-                    root.doUpdateGui();
-                }
-                else{
-                    root.hasRemoteChanges = true;
-                }
-            });
+			if (String(currentToken) == String(accessToken)){
+				root.doUpdateGui();
+			}
+			else{
+				root.hasRemoteChanges = true;
+			}
         }
     }
 

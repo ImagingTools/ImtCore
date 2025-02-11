@@ -6,26 +6,103 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtauthgui 1.0
 import imtauthUsersSdl 1.0
+import imtauthAuthorizationSdl 1.0
+import imtauthSessionsSdl 1.0
 
 QtObject {
 	id: root;
 
 	property string productId: "";
 
-	signal logoutSignal();
 	signal userModeChanged(string userMode);
 	signal superuserExistResult(bool exists, string type, string error);
-	signal loginSuccessful();
 	signal loginFailed();
 
-	Component.onCompleted: {
-		Events.subscribeEvent("Login", root.login)
-		Events.subscribeEvent("Logout", root.userLogout)
-	}
+	signal loggedIn();
+	signal loggedOut();
 
-	Component.onDestruction: {
-		Events.unSubscribeEvent("Login", root.login)
-		Events.unSubscribeEvent("Logout", root.userLogout)
+	property XmlHttpRequestProxy requestProxy: XmlHttpRequestProxy {
+		onForbidden: {
+			console.log("onForbidden", gqlData);
+
+			root.logoutForce();
+		}
+
+		onUnauthorized: {
+			console.log("onUnauthorized", gqlData);
+
+			if (Qt.platform.os == "web"){
+				refreshToken(function(success){
+					if (success){statusCode == 401
+						let xhr = new XMLHttpRequest()
+						xhr.open("POST", "../../graphql")
+						xhr.send(gqlData)
+					}
+				})
+			}
+			else{
+				root.setAccessToken("");
+				let cb = function(status){
+					console.log("refreshTokenGqlSender finished", gqlData, status);
+					if (status >= 0){
+						if (gqlRequestRef){
+							gqlRequestRef.setGqlQuery(gqlData, root.getHeaders());
+						}
+					}
+
+					root.refreshTokenGqlSender.finished.disconnect(cb);
+				}
+
+				root.refreshTokenGqlSender.finished.connect(cb)
+				root.refreshTokenGqlSender.send();
+			}
+		}
+
+		function refreshToken(callback) {
+			XMLHttpRequest.QMLAuthToken = "";
+
+			let xhr = new XMLHttpRequest()
+			xhr.open("POST", "../../graphql")
+
+			var query = Gql.GqlRequest("mutation", "RefreshToken");
+			var inputParams = Gql.GqlObject("input");
+			inputParams.InsertField("refreshToken", XMLHttpRequest.QMLAuthRefreshToken);
+			query.AddParam(inputParams);
+
+			xhr.send(query.GetQuery())
+
+			xhr.onreadystatechange = function(){
+				if (xhr.readyState === XMLHttpRequest.DONE){
+					if (xhr.status === 200){
+						var response = JSON.parse(xhr.responseText)
+
+						if ("data" in response){
+							let data = response.data
+							if ("RefreshToken" in data){
+								let refreshToken = data.RefreshToken
+								if (!refreshToken.ok){
+									callback(false)
+								}
+								else{
+									let userSession = refreshToken.userSession;
+
+									XMLHttpRequest.QMLAuthToken = userSession.accessToken
+									XMLHttpRequest.QMLAuthRefreshToken = userSession.refreshToken
+
+									root.userTokenProvider.accessToken = XMLHttpRequest.QMLAuthToken;
+									root.userTokenProvider.refreshToken = XMLHttpRequest.QMLAuthRefreshToken;
+
+									callback(true)
+								}
+							}
+						}
+					}
+					else{
+						callback(false)
+					}
+				}
+			}
+		}
 	}
 
 	property UserManagementProvider userManagementProvider: UserManagementProvider {
@@ -42,21 +119,15 @@ QtObject {
 		onResult: {
 			if (exists){
 				if (Qt.platform.os == "web"){
-					let token = localStorage.getItem("token");
+					let token = localStorage.getItem("accessToken");
+					let refreshToken = localStorage.getItem("refreshToken");
 					if (token && token !== ""){
-						let savedDateStr = localStorage.getItem("authSavedDate");
+						AuthorizationController.readDataFromStorage();
+						AuthorizationController.setAccessToken(token);
+						AuthorizationController.setRefreshToken(refreshToken);
+						AuthorizationController.loggedIn();
 
-						let savedDate = new Date(savedDateStr);
-						let currentDate = new Date();
-						savedDate.setDate(savedDate.getDate() + 1)
-
-						if (savedDate > currentDate){
-							AuthorizationController.readDataFromStorage();
-							AuthorizationController.setAccessToken(token);
-							AuthorizationController.loginSuccessful();
-
-							return;
-						}
+						return;
 					}
 
 					AuthorizationController.removeDataFromStorage();
@@ -79,10 +150,11 @@ QtObject {
 			}
 
 			if (isTokenGlobal){
-				root.setAccessToken(token);
+				root.setAccessToken(accessToken);
+				root.setRefreshToken(refreshToken);
 			}
 
-			root.loginSuccessful();
+			root.loggedIn();
 		}
 
 		onFailed: {
@@ -95,7 +167,8 @@ QtObject {
 	}
 
 	function readDataFromStorage(){
-		userTokenProvider.token = localStorage.getItem("token");
+		userTokenProvider.accessToken = localStorage.getItem("accessToken");
+		userTokenProvider.refreshToken = localStorage.getItem("refreshToken");
 		userTokenProvider.userId = localStorage.getItem("userId");
 		userTokenProvider.login = localStorage.getItem("login");
 		userTokenProvider.systemId = localStorage.getItem("systemId");
@@ -104,25 +177,23 @@ QtObject {
 	}
 
 	function saveDataToStorage(){
-		localStorage.setItem("token", userTokenProvider.token);
+		localStorage.setItem("accessToken", userTokenProvider.accessToken);
+		localStorage.setItem("refreshToken", userTokenProvider.refreshToken);
 		localStorage.setItem("userId", userTokenProvider.userId);
 		localStorage.setItem("login", userTokenProvider.login);
 		localStorage.setItem("systemId", userTokenProvider.systemId);
 		localStorage.setItem("productId", userTokenProvider.productId);
 		localStorage.setItem("permissions", userTokenProvider.permissions);
-
-		let currentDate = new Date();
-		localStorage.setItem("authSavedDate", currentDate.toISOString());
 	}
 
 	function removeDataFromStorage(){
-		localStorage.removeItem("token");
+		localStorage.removeItem("refreshToken");
+		localStorage.removeItem("accessToken");
 		localStorage.removeItem("userId");
 		localStorage.removeItem("login");
 		localStorage.removeItem("systemId");
 		localStorage.removeItem("productId");
 		localStorage.removeItem("permissions");
-		localStorage.removeItem("authSavedDate");
 	}
 
 	function getHeaders(){
@@ -153,44 +224,41 @@ QtObject {
 		return userTokenProvider.systemId;
 	}
 
-	function userLogout(param){
+	function logout(){
+		logoutGqlSender.send();
+	}
+
+	function logoutForce(){
 		userTokenProvider.login = ""
 		userTokenProvider.userId = ""
-		userTokenProvider.token = ""
+		userTokenProvider.accessToken = ""
+		userTokenProvider.refreshToken = ""
 		userTokenProvider.systemId = ""
 		userTokenProvider.permissions = []
 		setAccessToken("");
+		setRefreshToken("");
 
-		removeDataFromStorage();
+		if (Qt.platform.os == "web"){
+			removeDataFromStorage();
+		}
 
-		root.logoutSignal();
+		loggedOut();
+	}
+
+	function getAccessToken(){
+		return userTokenProvider.accessToken;
 	}
 
 	function setAccessToken(token){
 		userTokenProvider.authorizationGqlModel.SetGlobalAccessToken(token);
 	}
 
-	function login(param){
-		if (!param){
-			return;
-		}
+	function setRefreshToken(token){
+		userTokenProvider.authorizationGqlModel.SetRefreshToken(token);
+	}
 
-		let login = param["Login"];
-		let password = param["Password"];
-
+	function login(login, password){
 		userTokenProvider.authorization(login, password)
-	}
-
-	function getToken(callback){
-		if (callback){
-			callback(userTokenProvider.token);
-		}
-	}
-
-	function getLogin(callback){
-		if (callback){
-			callback(userTokenProvider.login);
-		}
 	}
 
 	function getUserMode(){
@@ -246,6 +314,49 @@ QtObject {
 				onFinished: {
 					if (m_success){
 						ModalDialogManager.showInfoDialog(qsTr("Password changed successfully"));
+					}
+				}
+			}
+		}
+	}
+
+	property GqlSdlRequestSender logoutGqlSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_logout;
+		inputObjectComp: Component {
+			LogoutInput {
+			}
+		}
+		sdlObjectComp: Component {
+			LogoutPayload {
+				onFinished: {
+					root.logoutForce();
+				}
+			}
+		}
+	}
+
+	property GqlSdlRequestSender refreshTokenGqlSender: GqlSdlRequestSender {
+		requestType: 1;
+		gqlCommandId: ImtauthSessionsSdlCommandIds.s_refreshToken;
+		inputObjectComp: Component {
+			RefreshTokenInput {
+				m_refreshToken: root.userTokenProvider.refreshToken;
+			}
+		}
+
+		sdlObjectComp: Component {
+			RefreshTokenPayload {
+				onFinished: {
+					if (m_ok){
+						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
+						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
+
+						root.setAccessToken(m_userSession.m_accessToken);
+
+						if (Qt.platform.os == "web"){
+							XMLHttpRequest.QMLAuthToken = m_userSession.m_accessToken
+							XMLHttpRequest.QMLAuthRefreshToken = m_userSession.m_refreshToken
+						}
 					}
 				}
 			}

@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtqml/CGqlModel.h>
+#include <imtqml/CNetworkEventInterceptor.h>
 
 
 namespace imtqml
@@ -52,8 +53,12 @@ bool CGqlRequest::SetGqlQuery(QString query, QVariantMap headers)
 		qDebug() << message;
 
 		QNetworkReply* reply = accessManager->post(networkRequest, query.toUtf8());
+
+		reply->setProperty("requestBody", query.toUtf8());
+
 		connect(reply, &QNetworkReply::finished, this, &CGqlRequest::replyFinished);
 		connect(reply, &QNetworkReply::errorOccurred, this, &CGqlRequest::errorOccurred);
+		CNetworkEventInterceptor::Instance()->InterceptRequest(reply, this);
 
 		return true;
 	}
@@ -66,17 +71,26 @@ void CGqlRequest::replyFinished()
 {
 	QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
 	if(reply){
-		m_json = reply->readAll();
-
-		if (m_json.isEmpty()){
-			SetState("Error");
+		int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+		if (statusCode == 401){
+			SetState("Unauthorized");
 		}
-		else{
-			if (m_state == "Ready"){
-				SetState("Loading");
-			}
+		else if (statusCode == 403){
+			SetState("Forbidden");
+		}
+		else if (statusCode == 200){
+			m_json = reply->readAll();
 
-			SetState("Ready");
+			if (m_json.isEmpty()){
+				SetState("Error");
+			}
+			else{
+				if (m_state == "Ready"){
+					SetState("Loading");
+				}
+
+				SetState("Ready");
+			}
 		}
 
 		reply->deleteLater();

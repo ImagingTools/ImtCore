@@ -29,21 +29,24 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 {
 	QMutexLocker lock(&m_mutex);
 
-	if (!m_sessionCollectionCompPtr.IsValid() || !m_userCollectionCompPtr.IsValid()){
+	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT(false);
 
 		return nullptr;
 	}
 
-	QByteArray userObjectId;
-	imtbase::IObjectCollection::DataPtr sessionDataPtr;
-	if (m_sessionCollectionCompPtr->GetObjectData(token, sessionDataPtr)){
-		const imtauth::ISession* sessionInfoPtr = dynamic_cast<const imtauth::ISession*>(sessionDataPtr.GetPtr());
-		if (sessionInfoPtr != nullptr){
-			userObjectId = sessionInfoPtr->GetUserId();
-		}
+	if (!m_jwtSessionControllerCompPtr.IsValid()){
+		Q_ASSERT(false);
+		return nullptr;
 	}
 
+	if (!m_jwtSessionControllerCompPtr->ValidateJwt(token)){
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Token is invalid").arg(qPrintable(token));
+		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
+		return nullptr;
+	}
+
+	QByteArray userObjectId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
 	if (userObjectId.isEmpty()){
 		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session model is invalid.").arg(qPrintable(token));
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
@@ -125,10 +128,7 @@ void CGqlContextControllerComp::OnComponentCreated()
 
 	QMutexLocker lock(&m_mutex);
 
-	m_sessionCollectionCompPtr.EnsureInitialized();
 	m_userCollectionCompPtr.EnsureInitialized();
-
-	Q_ASSERT(m_sessionCollectionCompPtr.IsValid());
 	Q_ASSERT(m_userCollectionCompPtr.IsValid());
 }
 

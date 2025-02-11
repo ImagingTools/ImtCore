@@ -15,23 +15,27 @@ Item {
     property bool isExitButton: false;
 
     Component.onCompleted: {
-        Events.subscribeEvent("OnLocalizationChanged", root.onLocalizationChanged);
         Events.subscribeEvent("SetUserPanelEnabled", root.setUserPanelEnabled);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("OnLocalizationChanged", root.onLocalizationChanged);
         Events.unSubscribeEvent("SetUserPanelEnabled", root.setUserPanelEnabled);
     }
+
+	LocalizationEvent {
+		onLocalizationChanged: {
+			contextMenuModel.fillModel();
+		}
+	}
 
     Connections {
         target: AuthorizationController;
 
-        function onLoginSuccessful(){
+		function onLoggedIn(){
             root.enabled = true;
         }
 
-        function onLogoutSignal(){
+		function onLoggedOut(){
             root.enabled = false;
         }
     }
@@ -74,7 +78,7 @@ Item {
 
         onClicked: {
             if(root.isExitButton){
-                panelDelegate.logout();
+				AuthorizationController.logout();
             }
             else{
                 contextMenuModel.fillModel();
@@ -95,10 +99,10 @@ Item {
 
             onFinished: {
                 if (commandId == "Logout"){
-                    panelDelegate.logout();
+					AuthorizationController.logout();
                 }
                 else if (commandId == "Profile"){
-                    ModalDialogManager.openDialog(profileViewComp, {});
+					ModalDialogManager.openDialog(profileViewComp, {});
                 }
             }
         }

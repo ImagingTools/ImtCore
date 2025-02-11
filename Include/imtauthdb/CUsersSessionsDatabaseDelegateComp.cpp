@@ -1,6 +1,10 @@
 #include <imtauthdb/CUsersSessionsDatabaseDelegateComp.h>
 
 
+// ACF includes
+#include <iprm/TParamsPtr.h>
+#include <iprm/ITextParam.h>
+
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
 #include <imtauth/CSessionInfo.h>
@@ -15,26 +19,59 @@ namespace imtauthdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
+QByteArray CUsersSessionsDatabaseDelegateComp::GetSelectionQuery(
+			const QByteArray& objectId,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* paramsPtr) const
+{
+	if (!objectId.isEmpty()){
+		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
+			.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(*m_objectIdColumnAttrPtr), qPrintable(objectId)).toUtf8();
+	}
+
+	QString filterQuery;
+	if (paramsPtr != nullptr){
+		CreateFilterQuery(*paramsPtr, filterQuery);
+	}
+
+	return QString("SELECT * FROM \"%1\" %2;")
+		.arg(qPrintable(*m_tableNameAttrPtr), filterQuery).toUtf8();
+}
+
+
 istd::IChangeable* CUsersSessionsDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
+	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr;
+	sessionInfoPtr.SetCastedOrRemove(CreateObject("Session"));
 
-	QByteArray token;
-	if (record.contains("AccessToken")){
-		token = record.value("AccessToken").toByteArray();
+	if (!sessionInfoPtr.IsValid()){
+		return nullptr;
+	}
+
+	if (record.contains("RefreshToken")){
+		QByteArray token = record.value("RefreshToken").toByteArray();
 		sessionInfoPtr->SetToken(token);
 	}
 
-	QByteArray userId;
 	if (record.contains("UserId")){
-		userId = record.value("UserId").toByteArray();
+		QByteArray userId = record.value("UserId").toByteArray();
+		sessionInfoPtr->SetUserId(userId);
 	}
 
-	sessionInfoPtr->SetUserId(userId);
+	if (record.contains("CreationDate")){
+		QDateTime creationDate = record.value("CreationDate").toDateTime();
+		sessionInfoPtr->SetCreationDate(creationDate);
+	}
+
+	if (record.contains("ExpirationDate")){
+		QDateTime expirationDate = record.value("ExpirationDate").toDateTime();
+		sessionInfoPtr->SetExpirationDate(expirationDate);
+	}
 
 	return sessionInfoPtr.PopPtr();
 }
@@ -42,7 +79,7 @@ istd::IChangeable* CUsersSessionsDatabaseDelegateComp::CreateObjectFromRecord(co
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateComp::CreateNewObjectQuery(
 			const QByteArray& /*typeId*/,
-			const QByteArray& /*proposedObjectId*/,
+			const QByteArray& proposedObjectId,
 			const QString& /*objectName*/,
 			const QString& /*objectDescription*/,
 			const istd::IChangeable* valuePtr,
@@ -54,63 +91,82 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 	}
 
 	QByteArray token = sessionPtr->GetToken();
-
 	QByteArray userId = sessionPtr->GetUserId();
+	QDateTime creationDate = sessionPtr->GetCreationDate();
+	QDateTime expirationDate = sessionPtr->GetExpirationDate();
 
 	NewObjectQuery retVal;
 
-	retVal.query += QString("\nINSERT INTO \"UserSessions\" (\"AccessToken\", \"UserId\", \"LastActivity\") VALUES ('%1', '%2', '%3');")
-				.arg(qPrintable(token))
-				.arg(qPrintable(userId))
-				.arg(QDateTime::currentDateTime().toString(Qt::ISODate)).toUtf8();
+	retVal.query += QString("\nINSERT INTO \"UserSessions\" (\"Id\", \"RefreshToken\", \"UserId\", \"CreationDate\", \"ExpirationDate\") VALUES ('%0', '%1', '%2', '%3', '%4');")
+				.arg(qPrintable(proposedObjectId), qPrintable(token), qPrintable(userId), creationDate.toString(Qt::ISODate), expirationDate.toString(Qt::ISODate)).toUtf8();
 
 	return retVal;
 }
 
 
-QByteArray CUsersSessionsDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
-{
-	return QByteArray();
-}
-
-
 QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const istd::IChangeable& /*object*/,
+			const QByteArray& objectId,
+			const istd::IChangeable& object,
 			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
-	return QByteArray();
-}
+	const imtauth::ISession* sessionPtr = dynamic_cast<const imtauth::ISession*>(&object);
+	if (sessionPtr == nullptr){
+		return QByteArray();
+	}
 
+	QByteArray token = sessionPtr->GetToken();
+	QByteArray userId = sessionPtr->GetUserId();
+	QDateTime creationDate = sessionPtr->GetCreationDate();
+	QDateTime expirationDate = sessionPtr->GetExpirationDate();
 
-QByteArray CUsersSessionsDatabaseDelegateComp::CreateRenameObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const QString& /*newObjectName*/,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
-{
-	return QByteArray();
-}
+	QByteArray retVal;
 
+	retVal += QString("\nUPDATE \"%0\" SET \"RefreshToken\" = '%1', \"CreationDate\" = '%2', \"ExpirationDate\" = '%3' WHERE \"%4\" = '%5'")
+				  .arg(
+					  qPrintable(*m_tableNameAttrPtr),
+					  qPrintable(token),
+					creationDate.toString(Qt::ISODate),
+					expirationDate.toString(Qt::ISODate),
+					qPrintable(*m_objectIdColumnAttrPtr),
+					qPrintable(objectId)).toUtf8();
 
-QByteArray CUsersSessionsDatabaseDelegateComp::CreateDescriptionObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const QString& /*description*/,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
-{
-	return QByteArray();
+	return retVal;
 }
 
 
 QByteArray CUsersSessionsDatabaseDelegateComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
 {
 	return QByteArray("Session");
+}
+
+
+QByteArray CUsersSessionsDatabaseDelegateComp::CreateDeleteObjectQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& objectId,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';")
+			.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(*m_objectIdColumnAttrPtr), qPrintable(objectId)).toUtf8();
+}
+
+
+bool CUsersSessionsDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
+{
+	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+	if (paramIds.contains("RefreshToken")){
+		const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter("RefreshToken"));
+		if (textParamPtr == nullptr){
+			return false;
+		}
+
+		filterQuery += QString(R"( WHERE "RefreshToken" = '%1')").arg(textParamPtr->GetText());
+
+		return true;
+	}
+
+	return false;
 }
 
 

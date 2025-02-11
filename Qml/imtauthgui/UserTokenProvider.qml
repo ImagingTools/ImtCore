@@ -7,7 +7,8 @@ import imtauthAuthorizationSdl 1.0
 QtObject {
     id: container;
 
-    property string token: "";
+	property string accessToken: "";
+	property string refreshToken: "";
     property string login: "";
     property string userId: "";
     property string systemId: "";
@@ -19,20 +20,6 @@ QtObject {
     signal failed(string message);
 
     property string modelState: container.authorizationGqlModel.state;
-
-    Component.onCompleted: {
-        Events.subscribeEvent("GetToken", container.getToken);
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("GetToken", container.getToken);
-    }
-
-    function getToken(callback){
-        if (callback){
-            callback(token);
-        }
-    }
 
     function getHeaders(){
         return {}
@@ -52,7 +39,8 @@ QtObject {
             Component {
             AuthorizationPayload {
                 onFinished: {
-                    container.token = m_token;
+					container.refreshToken = m_refreshToken;
+					container.accessToken = m_token;
 
                     container.userId = m_userId;
                     container.login = m_username;

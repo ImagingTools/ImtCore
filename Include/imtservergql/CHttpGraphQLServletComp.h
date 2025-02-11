@@ -8,6 +8,7 @@
 #include <imtgql/IGqlContextController.h>
 #include <imtgql/IGqlRequestProvider.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtauth/IJwtSessionController.h>
 
 
 namespace imtservergql
@@ -23,6 +24,7 @@ public:
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestProvider);
 		I_ASSIGN_MULTI_0(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "Handler for GraphQL-request", true);
 		I_ASSIGN(m_gqlContextControllerCompPtr, "GqlContextController", "GraphQL-related context controller", false, "GqlContextController");
+		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "JWT session controller", false, "JwtSessionController");
 	I_END_COMPONENT;
 
 protected:
@@ -46,6 +48,7 @@ private:
 private:
 	I_MULTIREF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
 	I_REF(imtgql::IGqlContextController, m_gqlContextControllerCompPtr);
+	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
 
 private:
 	mutable imtgql::CGqlRequest m_lastRequest;

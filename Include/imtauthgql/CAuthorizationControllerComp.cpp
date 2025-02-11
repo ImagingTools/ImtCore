@@ -17,10 +17,10 @@ namespace imtauthgql
 // protected methods
 
 bool CAuthorizationControllerComp::ParseDataFromGqlRequest(
-			const imtgql::CGqlRequest& gqlRequest,
-			QByteArray& login,
-			QByteArray& password,
-			QByteArray& productId) const
+	const imtgql::CGqlRequest& gqlRequest,
+	QByteArray& login,
+	QByteArray& password,
+	QByteArray& productId) const
 {
 	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
@@ -55,7 +55,10 @@ QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login
 }
 
 
-bool CAuthorizationControllerComp::CheckCredential(const QByteArray& systemId, const QByteArray& login, const QByteArray& password) const
+bool CAuthorizationControllerComp::CheckCredential(
+			const QByteArray& systemId,
+			const QByteArray& login,
+			const QByteArray& password) const
 {
 	int index = m_systemIdsAttrPtr.FindValue(systemId);
 	Q_ASSERT_X(index >= 0, "CAuthorizationControllerComp::CreateInternalResponse", QString("System-ID '%1' cannot found").arg(qPrintable(systemId)).toUtf8());
@@ -67,7 +70,9 @@ bool CAuthorizationControllerComp::CheckCredential(const QByteArray& systemId, c
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const
+sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(
+			const QByteArray& login,
+			QString& errorMessage) const
 {
 	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'").arg(qPrintable(login)));
 	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
@@ -77,10 +82,10 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 
 
 sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
-			imtauth::CUserInfo& userInfo,
-			const QByteArray& systemId,
-			const QByteArray& productId,
-			QString& errorMessage) const
+	imtauth::CUserInfo& userInfo,
+	const QByteArray& systemId,
+	const QByteArray& productId,
+	QString& errorMessage) const
 {
 	sdl::imtauth::Authorization::CAuthorizationPayload payload;
 
@@ -89,11 +94,12 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 	QByteArray tokenValue = QUuid::createUuid().toByteArray();
 
 	payload.Version_1_0.emplace();
+
 	payload.Version_1_0->Token = tokenValue;
 	payload.Version_1_0->Username = login;
 	payload.Version_1_0->UserId = objectId;
 	payload.Version_1_0->SystemId = systemId;
-	
+
 	if (!productId.isEmpty()){
 		imtauth::IUserInfo::FeatureIds permissionIds = userInfo.GetPermissions(productId);
 		QByteArrayList uniqueList = QSet<QByteArray>(permissionIds.begin(), permissionIds.end()).values();
@@ -102,14 +108,13 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 		(*payload.Version_1_0).Permissions = permissions;
 	}
 
-	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr;
-	sessionInfoPtr.SetPtr(new imtauth::CSessionInfo());
-
-	sessionInfoPtr->SetUserId(objectId);
-	sessionInfoPtr->SetToken(tokenValue);
-
-	if (m_sessionCollectionCompPtr.IsValid()){
-		m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.GetPtr(), tokenValue);
+	if (m_jwtSessionControllerCompPtr.IsValid()){
+		imtauth::IJwtSessionController::UserSession userSession;
+		if (m_jwtSessionControllerCompPtr->CreateNewSession(objectId, userSession)){
+			payload.Version_1_0->RefreshToken = userSession.refreshToken;
+			payload.Version_1_0->Token = userSession.accessToken;
+			payload.Version_1_0->UserId = userSession.userId;
+		}
 	}
 
 	userInfo.SetLastConnection(QDateTime::currentDateTimeUtc());
@@ -123,166 +128,155 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 }
 
 
-// reimplemented (sdl::imtauth::Authorization::CGraphQlHandlerCompBase)
+// reimplemented (sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase)
 
 sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::OnAuthorization(
-			const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
-			const imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& errorMessage) const
+	const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& errorMessage) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
 		return sdl::imtauth::Authorization::CAuthorizationPayload();
 	}
 
-	if (!m_sessionCollectionCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Component 'SessionCollection' was not set", "CAuthorizationControllerComp");
-		return sdl::imtauth::Authorization::CAuthorizationPayload();
+	sdl::imtauth::Authorization::CAuthorizationInput inputArgument = authorizationRequest.GetRequestedArguments().input;
+	QByteArray login;
+	if (inputArgument.Version_1_0->Login) {
+		login = inputArgument.Version_1_0->Login->toUtf8();
+	}
+	QByteArray productId;
+	if (inputArgument.Version_1_0->ProductId) {
+		productId = *inputArgument.Version_1_0->ProductId;
+	}
+	QByteArray password;
+	if (inputArgument.Version_1_0->Password) {
+		password = inputArgument.Version_1_0->Password->toUtf8();
 	}
 
-	sdl::imtauth::Authorization::CAuthorizationPayload retVal;
+	QByteArray userObjectId = GetUserObjectId(login);
+	if (userObjectId.isEmpty()){
+		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+	}
 
-	if (authorizationRequest.GetRequestedArguments().input.Version_1_0){
-		sdl::imtauth::Authorization::CAuthorizationInput::V1_0 inputArgument = *authorizationRequest.GetRequestedArguments().input.Version_1_0;
-		QByteArray login;
-		if (inputArgument.Login){
-			login = inputArgument.Login->toUtf8();
-		}
-		QByteArray productId;
-		if (inputArgument.ProductId){
-			productId = *inputArgument.ProductId;
-		}
-		QByteArray password;
-		if (inputArgument.Password){
-			password = inputArgument.Password->toUtf8();
-		}
+	imtauth::CUserInfo* userInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
+		userInfoPtr = dynamic_cast<imtauth::CUserInfo*>(dataPtr.GetPtr());
+	}
 
-		QByteArray userObjectId = GetUserObjectId(login);
-		if (userObjectId.isEmpty()){
-			retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+	if (userInfoPtr == nullptr){
+		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+	}
 
-			return retVal;
-		}
-
-		imtauth::CUserInfo* userInfoPtr = nullptr;
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
-			userInfoPtr = dynamic_cast<imtauth::CUserInfo*>(dataPtr.GetPtr());
-		}
-
-		if (userInfoPtr == nullptr){
-			retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
-
-			return retVal;
-		}
-
-		QByteArray activeSystemId;
-		bool ok = false;
-		for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
-			if (systemInfo.enabled){
-				if (CheckCredential(systemInfo.systemId, login, password)){
-					ok = true;
-					activeSystemId = systemInfo.systemId;
-					break;
-				}
+	QByteArray activeSystemId;
+	bool ok = false;
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
+		if (systemInfo.enabled){
+			if (CheckCredential(systemInfo.systemId, login, password)){
+				ok = true;
+				activeSystemId = systemInfo.systemId;
+				break;
 			}
 		}
-
-		if (!ok){
-			retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
-
-			return retVal;
-		}
-
-		retVal = CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
 	}
 
-	return retVal;
+	if (!ok){
+		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+	}
+
+	return CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
 }
 
 
 sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::OnUserToken(
-			const sdl::imtauth::Authorization::CUserTokenGqlRequest& userTokenRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& errorMessage) const
+	const sdl::imtauth::Authorization::CUserTokenGqlRequest& userTokenRequest,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& errorMessage) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
 		return sdl::imtauth::Authorization::CAuthorizationPayload();
 	}
 
-	if (!m_sessionCollectionCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Component 'SessionCollection' was not set", "CAuthorizationControllerComp");
-		return sdl::imtauth::Authorization::CAuthorizationPayload();
+	sdl::imtauth::Authorization::CAuthorizationInput inputArgument = userTokenRequest.GetRequestedArguments().input;
+	QByteArray login;
+	if (inputArgument.Version_1_0->Login) {
+		login = inputArgument.Version_1_0->Login->toUtf8();
+	}
+	QByteArray productId;
+	if (inputArgument.Version_1_0->ProductId) {
+		productId = *inputArgument.Version_1_0->ProductId;
+	}
+	QByteArray password;
+	if (inputArgument.Version_1_0->Password) {
+		password = inputArgument.Version_1_0->Password->toUtf8();
 	}
 
-	sdl::imtauth::Authorization::CAuthorizationPayload retVal;
+	QByteArray userObjectId = GetUserObjectId(login);
+	if (userObjectId.isEmpty()){
+		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+	}
 
-	if (userTokenRequest.GetRequestedArguments().input.Version_1_0) {
-		sdl::imtauth::Authorization::CAuthorizationInput::V1_0 inputArgument = *userTokenRequest.GetRequestedArguments().input.Version_1_0;
-		QByteArray login;
-		if (inputArgument.Login){
-			login = inputArgument.Login->toUtf8();
-		}
-		QByteArray productId;
-		if (inputArgument.ProductId){
-			productId = *inputArgument.ProductId;
-		}
-		QByteArray password;
-		if (inputArgument.Password){
-			password = inputArgument.Password->toUtf8();
-		}
+	imtauth::CUserInfo* userInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
+		userInfoPtr = dynamic_cast<imtauth::CUserInfo*>(dataPtr.GetPtr());
+	}
 
-		QByteArray userObjectId = GetUserObjectId(login);
-		if (userObjectId.isEmpty()){
-			retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+	if (userInfoPtr == nullptr){
+		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+	}
 
-			return retVal;
-		}
-
-		imtauth::CUserInfo* userInfoPtr = nullptr;
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
-			userInfoPtr = dynamic_cast<imtauth::CUserInfo*>(dataPtr.GetPtr());
-		}
-
-		if (userInfoPtr == nullptr){
-			retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
-
-			return retVal;
-		}
-
-		QByteArray activeSystemId;
-		bool ok = false;
-		for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
-			if (systemInfo.enabled){
-				if (CheckCredential(systemInfo.systemId, login, password)){
-					ok = true;
-					activeSystemId = systemInfo.systemId;
-					break;
-				}
+	QByteArray activeSystemId;
+	bool ok = false;
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
+		if (systemInfo.enabled){
+			if (CheckCredential(systemInfo.systemId, login, password)){
+				ok = true;
+				activeSystemId = systemInfo.systemId;
+				break;
 			}
 		}
-
-		if (!ok){
-			retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
-
-			return retVal;
-		}
-
-		retVal = CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
 	}
 
-	return retVal;
+	if (!ok){
+		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+	}
+
+	return CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
 }
 
 
 sdl::imtauth::Authorization::CLogoutPayload CAuthorizationControllerComp::OnLogout(
-	const sdl::imtauth::Authorization::CLogoutGqlRequest& /*logoutRequest*/,
+	const sdl::imtauth::Authorization::CLogoutGqlRequest& logoutRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+	QString& errorMessage) const
 {
-	return sdl::imtauth::Authorization::CLogoutPayload();
+	sdl::imtauth::Authorization::CLogoutPayload response;
+	const imtgql::IGqlContext* gqlContextPtr = logoutRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		errorMessage = QString("Unable to logout user with token '%1'. Error: GraphQL context is invalid");
+		SendErrorMessage(0, errorMessage, "CAuthorizationControllerComp");
+		return response;
+	}
+
+	response.Version_1_0.emplace();
+
+	sdl::imtauth::Authorization::CLogoutInput arguments = logoutRequest.GetRequestedArguments().input;
+
+	QByteArray accessToken = gqlContextPtr->GetToken();
+	if (m_jwtSessionControllerCompPtr.IsValid()){
+		QByteArray sessionId = m_jwtSessionControllerCompPtr->GetSessionFromJwt(accessToken);
+		if (!m_jwtSessionControllerCompPtr->RemoveSession(sessionId)){
+			response.Version_1_0->Ok = false;
+			return response;
+		}
+	}
+
+	response.Version_1_0->Ok = true;
+
+	return response;
 }
 
 

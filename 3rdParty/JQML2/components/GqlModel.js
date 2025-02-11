@@ -4,6 +4,10 @@ class GqlModel extends TreeItemModel {
     SetGlobalAccessToken(token){
         XMLHttpRequest.QMLAuthToken = token
     }
+
+	SetRefreshToken(token){
+		XMLHttpRequest.QMLAuthRefreshToken = token
+	}
     
     setGqlQuery(gqlData, headers={}){
         this.getProperty('state').reset("Loading")

@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import imtcontrols 1.0
 
 QtObject {
     id: root;
@@ -22,6 +23,11 @@ QtObject {
 
         xhr.onreadystatechange = function(){
             if (xhr.readyState === XMLHttpRequest.DONE){
+				if (xhr.status === 401 || xhr.status === 403){
+					root.state = "Error";
+					return
+				}
+
                 root.json = xhr.responseText;
 				if (root.state === "Ready"){
 					root.state = "Loading"

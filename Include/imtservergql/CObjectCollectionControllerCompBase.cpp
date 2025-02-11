@@ -641,7 +641,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 	QString newName = inputParamPtr->GetFieldArgumentValue("newName").toString();
 
 	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
-		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName).arg(qPrintable(objectId));
+		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName, qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return nullptr;
@@ -680,7 +680,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 	QString description = inputParamPtr->GetFieldArgumentValue("Description").toString();
 
 	if (!m_objectCollectionCompPtr->SetElementDescription(objectId, description)){
-		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description).arg(qPrintable(objectId));
+		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description, qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return nullptr;

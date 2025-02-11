@@ -28,13 +28,13 @@ SingleDocumentWorkspacePageView {
     Connections {
         target: AuthorizationController;
 
-        function onLoginSuccessful(){
+		function onLoggedIn(){
             if (container.productId !== ""){
                 container.startItemSourceComp = administrationViewComp
             }
         }
 
-        function onLogoutSignal(){
+		function onLoggedOut(){
         }
     }
 

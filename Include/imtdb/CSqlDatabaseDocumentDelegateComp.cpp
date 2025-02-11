@@ -1118,7 +1118,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 				.arg(schemaPrefix)
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(stateDocumentFilter)
-				.arg(qPrintable(*m_objectIdColumnAttrPtr))
+				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(objectId)).toUtf8();
 }
 

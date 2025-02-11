@@ -8,9 +8,11 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="FileAutoPersistence" X="875" Y="475" Note=""/>
         <Element ComponentName="JwtSessionController" X="275" Y="275" Note=""/>
         <Element ComponentName="SessionInfo" X="275" Y="475" Note=""/>
-        <Element ComponentName="SessionSqlRepository" X="775" Y="275" Note=""/>
+        <Element ComponentName="SessionSqlRepository" X="825" Y="275" Note=""/>
+        <Element ComponentName="Uuid" X="550" Y="475" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
