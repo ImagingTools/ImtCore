@@ -15,6 +15,7 @@
 #include <imtqml/CGqlRequest.h>
 #include <imtqml/CRemoteFileController.h>
 #include <imtqml/CFileIO.h>
+#include <imtqml/CNetworkEventInterceptor.h>
 
 
 class DefaultImtCoreQmlInitializer
@@ -52,8 +53,8 @@ public:
 		Q_INIT_RESOURCE(imtauthUsersSdl);
 		Q_INIT_RESOURCE(imtauthProfileSdl);
 		Q_INIT_RESOURCE(imtauthSessionsSdl);
-		Q_INIT_RESOURCE(imtauthAuthorizationSdl);
 		Q_INIT_RESOURCE(imtauthAuthorizationOptionsSdl);
+		Q_INIT_RESOURCE(imtauthAuthorizationSdl);
 		Q_INIT_RESOURCE(imtappApplicationSdl);
 	}
 
@@ -71,6 +72,7 @@ public:
 		qmlRegisterType<imtqml::CGqlRequest>("Acf", 1, 0, "GqlRequest");
 		qmlRegisterType<imtqml::CRemoteFileController>("Acf", 1, 0, "RemoteFileController");
 		qmlRegisterType<imtqml::FileIO>("Acf", 1, 0, "FileIO");
+		qmlRegisterSingletonInstance<imtqml::CNetworkEventInterceptor>("Acf", 1, 0, "NetworkEventInterceptor", imtqml::CNetworkEventInterceptor::Instance());
 
 	#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 		qmlRegisterModule("QtGraphicalEffects", 1, 12);

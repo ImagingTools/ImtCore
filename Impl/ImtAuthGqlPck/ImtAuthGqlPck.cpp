@@ -129,6 +129,16 @@ I_EXPORT_COMPONENT(
 			"Role meta info controller proxy",
 			"Role Meta Info Controller Proxy");
 
+I_EXPORT_COMPONENT(
+			RemoteJwtSessionController,
+			"Remote JWT session controller",
+			"Remote Jwt Session Controller");
+
+I_EXPORT_COMPONENT(
+			GqlJwtSessionController,
+			"GraphQL JWT session controller",
+			"GraphQL GQL Jwt Session Controller");
+
 
 } // namespace ImtAuthGqlPck
 

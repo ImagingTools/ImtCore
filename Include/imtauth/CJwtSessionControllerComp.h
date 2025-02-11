@@ -4,6 +4,7 @@
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <ifile/IFileNameParam.h>
+#include <iprm/INameParam.h>
 
 // ImtCore includes
 #include <imtauth/IJwtSessionController.h>
@@ -25,7 +26,7 @@ public:
 		I_REGISTER_INTERFACE(imtauth::IJwtSessionController);
 		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection", true, "SessionCollection");
 		I_ASSIGN(m_sessionFactoryCompPtr, "SessionFactory", "Session factory", true, "SessionFactory");
-		I_ASSIGN(m_secretKeyFileNameCompPtr, "SecretKeyFilePath", "Secret key file path", true, "SecretKeyFilePath");
+		I_ASSIGN(m_secretKeyParamCompPtr, "SecretKeyParam", "Secret key param", true, "SecretKeyParam");
 		I_ASSIGN(m_refreshTokenLifetimeAttrPtr, "RefreshTokenLifetime", "Refresh token Lifetime (in secs)", false, 86400);
 		I_ASSIGN(m_jwtLifetimeAttrPtr, "JwtLifetime", "JWT Lifetime (in secs)", false, 3600);
 	I_END_COMPONENT;
@@ -51,7 +52,7 @@ private:
 
 private:
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
-	I_REF(ifile::IFileNameParam, m_secretKeyFileNameCompPtr);
+	I_REF(iprm::INameParam, m_secretKeyParamCompPtr);
 	I_FACT(imtauth::ISession, m_sessionFactoryCompPtr);
 	I_ATTR(int, m_refreshTokenLifetimeAttrPtr);
 	I_ATTR(int, m_jwtLifetimeAttrPtr);

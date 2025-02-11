@@ -40,6 +40,8 @@
 #include <imtauth/CUserVerification.h>
 #include <imtauth/CUserVerificationControllerComp.h>
 #include <imtauth/CUserVerificationCodeSenderComp.h>
+#include <imtauth/CJwtSessionControllerComp.h>
+#include <imtauth/CSessionMetaInfoCreatorComp.h>
 
 
 namespace ImtAuthPck
@@ -108,8 +110,9 @@ typedef imtauth::CRoleChangeGeneratorComp RoleChangeGenerator;
 typedef imtauth::CUserGroupChangeGeneratorComp UserGroupChangeGenerator;
 typedef imtauth::CUserVerificationControllerComp UserVerificationController;
 typedef imtauth::CUserVerificationCodeSenderComp UserVerificationCodeSender;
+typedef imtauth::CJwtSessionControllerComp JwtSessionController;
+typedef imtauth::CSessionMetaInfoCreatorComp SessionMetaInfoCreator;
 
 
 } // namespace ImtAuthPck
-
 

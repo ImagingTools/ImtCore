@@ -154,7 +154,11 @@ sdl::imtbase::ImtCollection::CVisualStatus CRoleCollectionControllerComp::OnGetO
 		response.Version_1_0->Text = "<no name>";
 	}
 
-	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Roles")).toUtf8(), languageId, "CRoleCollectionControllerComp");
+	QString translation = iqt::GetTranslation(
+		m_translationManagerCompPtr.GetPtr(),
+		QString(QT_TR_NOOP("Roles")).toUtf8(),
+		languageId,
+		"CRoleCollectionControllerComp");
 	response.Version_1_0->Text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->Text;
 	return response;
 }

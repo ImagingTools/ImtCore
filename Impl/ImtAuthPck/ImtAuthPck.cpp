@@ -174,6 +174,15 @@ I_EXPORT_COMPONENT(
 			"User verification code sender",
 			"User Verification Code Sender");
 
+I_EXPORT_COMPONENT(
+			JwtSessionController,
+			"Json web token session controller",
+			"JWT JsonWebToken Session Controller");
+
+I_EXPORT_COMPONENT(
+		SessionMetaInfoCreator,
+		"Session meta info creator",
+		"Session Meta Info Creator");
 
 } // namespace ImtAuthPck
 

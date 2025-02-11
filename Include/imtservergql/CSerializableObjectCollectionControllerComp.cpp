@@ -92,7 +92,7 @@ bool CSerializableObjectCollectionControllerComp::IsRequestSupported(const imtgq
 		}
 	}
 
-	return BaseClass::IsRequestSupported(gqlRequest);
+	return false;
 }
 
 

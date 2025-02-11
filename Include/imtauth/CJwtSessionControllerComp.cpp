@@ -62,8 +62,12 @@ imtauth::IJwtSessionController::JwtState CJwtSessionControllerComp::ValidateJwt(
 		return imtauth::IJwtSessionController::JS_INVALID;
 	}
 
-	QString sessionId = payloadObj["sessionId"].toString();
-	if (!ValidateSession(sessionId.toUtf8())){
+	QByteArray sessionId = payloadObj["sessionId"].toString().toUtf8();
+	if (!ValidateSession(sessionId)){
+		if (!RemoveSession(sessionId)){
+			SendWarningMessage(0, QString("Unable to remove session '%1' after JWT validation").arg(qPrintable(sessionId)), "CJwtSessionControllerComp");
+		}
+
 		return imtauth::IJwtSessionController::JS_INVALID;
 	}
 
@@ -280,23 +284,14 @@ QByteArray CJwtSessionControllerComp::CreateSignature(
 			const QByteArray& headerBase64,
 			const QByteArray& payloadBase64) const
 {
-	// if (!m_secretKeyFileNameCompPtr.IsValid()){
-	// 	Q_ASSERT_X(false, "Attribute 'SecretKeyFilePath' was not set", "CJwtSessionControllerComp");
-	// 	return QByteArray();
-	// }
+	if (!m_secretKeyParamCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'SecretKeyParam' was not set", "CJwtSessionControllerComp");
+		return QByteArray();
+	}
 
-	// const QString filePath = m_secretKeyFileNameCompPtr->GetPath();
+	QString key = m_secretKeyParamCompPtr->GetName();
 
-	// QFile file(filePath);
-	// if (!file.open(QIODevice::ReadOnly)){
-	// 	SendErrorMessage(0, "Secret key file could not be opened", "CJwtSessionControllerComp");
-	// 	return QByteArray();
-	// }
-
-	// QByteArray secretKey = file.readAll();
-	// file.close();
-
-	return QCryptographicHash::hash(headerBase64 + "." + payloadBase64 + "12345",
+	return QCryptographicHash::hash(headerBase64 + "." + payloadBase64 + key.toUtf8(),
 							 QCryptographicHash::Sha256).toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
 }
 

@@ -29,6 +29,8 @@
 #include <imtauthgql/CUserSettingsControllerComp.h>
 #include <imtauthgql/CProfileControllerComp.h>
 #include <imtauthgql/CRoleMetaInfoControllerProxyComp.h>
+#include <imtauthgql/CRemoteJwtSessionControllerComp.h>
+#include <imtauthgql/CGqlJwtSessionControllerComp.h>.h>
 
 
 /**
@@ -61,6 +63,8 @@ typedef imtauthgql::CUserSerializableCollectionControllerComp UserSerializableCo
 typedef imtauthgql::CUserSettingsControllerComp UserSettingsController;
 typedef imtauthgql::CProfileControllerComp ProfileController;
 typedef imtauthgql::CRoleMetaInfoControllerProxyComp RoleMetaInfoControllerProxy;
+typedef imtauthgql::CRemoteJwtSessionControllerComp RemoteJwtSessionController;
+typedef imtauthgql::CGqlJwtSessionControllerComp GqlJwtSessionController;
 
 
 } // namespace ImtAuthGqlPck

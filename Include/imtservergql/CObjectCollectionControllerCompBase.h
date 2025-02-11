@@ -30,7 +30,7 @@ class CObjectCollectionControllerCompBase:
 			virtual public sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase
 {
 public:
-	typedef  sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)
