@@ -38,11 +38,13 @@ int main(int argc, char *argv[])
 
 	Q_INIT_RESOURCE(imtguivars);
 	Q_INIT_RESOURCE(imtauthAuthorizationSdl);
+	Q_INIT_RESOURCE(imtauthAuthorizationOptionsSdl);
 	Q_INIT_RESOURCE(imtappApplicationSdl);
 	Q_INIT_RESOURCE(imtauthGroupsSdl);
 	Q_INIT_RESOURCE(imtauthUsersSdl);
 	Q_INIT_RESOURCE(imtauthRolesSdl);
 	Q_INIT_RESOURCE(imtauthProfileSdl);
+	Q_INIT_RESOURCE(imtauthSessionsSdl);
 
 	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	
