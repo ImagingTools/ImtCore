@@ -225,7 +225,8 @@ QtObject {
 	}
 
 	function logout(){
-		logoutGqlSender.send();
+		logoutForce();
+		// logoutGqlSender.send();
 	}
 
 	function logoutForce(){
