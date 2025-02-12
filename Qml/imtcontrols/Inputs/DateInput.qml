@@ -59,6 +59,7 @@ Item {
 
 	function setDateAsString(str){
 		//console.log("Set date", str)
+		str = correctDateFormat(str);
 		if(!dateInput.checkDateFormat(str)){
 			return false;
 		}
@@ -68,7 +69,7 @@ Item {
 
 		let day = str.slice(0, 2)
 		let month = str.slice(3,5)
-		let year = str.slice(7);
+		let year = str.slice(6);
 		if(day[0] == "0"){
 			day = day[1]
 		}
@@ -78,7 +79,6 @@ Item {
 		month -=1
 
 		dateInput.dateStr = str;
-
 		dateInput.selectedDate.setFullYear(year);
 		dateInput.selectedDate.setMonth(month);
 		dateInput.selectedDate.setDate(day);
@@ -106,6 +106,37 @@ Item {
 		dateInput.setDateAsString(date_);
 	}
 
+	function correctDateFormat(str){
+		let str_ = str;
+		let reg = /^\d{1,2}\.\d{1,2}\.\d{1,4}$/
+		if(str.match(reg) === null){
+			return str;
+		}
+		let arr = str.split(".");
+		let day = arr[0];
+		let month = arr[1];
+		let year  = arr[2];
+		if(String(day).length == 1){
+			day = "0" + day;
+		}
+		if(String(month).length == 1){
+			month = "0" + month;
+		}
+		if(String(year).length == 1){
+			year = "200" + year;
+		}
+		else if(String(year).length == 2){
+			year = "20" + year;
+		}
+		else if(String(year).length == 3){
+			year = "2" + year;
+		}
+
+		str_ = day + "." + month + "." + year;
+		input.text = str_;
+		return str_;
+	}
+
 	function checkDateFormat(str){
 		//console.log("Check Date Format")
 		dateInput.isError = false;
@@ -121,7 +152,7 @@ Item {
 		else {
 			let day = str.slice(0, 2)
 			let month = str.slice(3,5)
-			let year = str.slice(7);
+			let year = str.slice(6);
 
 			let monthErr = !dateInput.checkMonth(month);
 			if(monthErr){
@@ -260,7 +291,9 @@ Item {
 				}
 			}
 			onAccepted: {
-				dateInput.setDateAsString(input.text)
+				if(dateInput.setDateAsString(input.text)){
+					dateInput.tabKeyItem.forceActiveFocus();
+				}
 			}
 
 			onTextChanged: {

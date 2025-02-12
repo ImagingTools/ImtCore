@@ -17,7 +17,11 @@ Row{
 
 	property string dateStr: "";
 	property string timeStr: "";
-	property string dateTimeStr: dateStr + ":" + timeStr;
+	property string dateTimeStr: dateStr + " " + timeStr;
+
+	property var dateTimeRegExp: /^\d{2}\.\d{2}\.\d{4}\s\d{2}:\d{2}$/
+
+	//time format: "dd.MM.yyyy hh:mm"
 
 	signal dateChanged(string value)
 
@@ -62,12 +66,58 @@ Row{
 
 
 	function setDateTimeAsString(str){
+		if(str.match(dateTimeInput.dateTimeRegExp) !== null){
+			let date_= str.slice(0,10);
+			let time_ = str.slice(11);
+			setDateAsString(date_);
+			setTimeAsString(time_);
+		}
 	}
 
 	function setDateAsString(str){
+		if(dateInput.checkDateFormat(str)){
+			dateStr = str;
+
+			let day = str.slice(0, 2)
+			let month = str.slice(3,5)
+			let year = str.slice(6);
+			if(day[0] == "0"){
+				day = day[1]
+			}
+			if(month[0] == "0"){
+				month = month[1]
+			}
+			month -=1
+
+			dateTimeInput.selectedDate.setFullYear(year);
+			dateTimeInput.selectedDate.setMonth(month);
+			dateTimeInput.selectedDate.setDate(day);
+
+			dateInput.setDateAsString(str);
+			signalPause.restart();
+		}
+
 	}
 
 	function setTimeAsString(str){
+		if(timeInput.checkDateFormat(str)){
+			timeStr = str;
+
+			let hours = str.slice(0, 2)
+			let minutes = str.slice(3);
+			if(hours[0] == "0"){
+				hours = hours[1];
+			}
+			if(minutes[0] == "0"){
+				minutes = minutes[1];
+			}
+			dateTimeInput.selectedDate.setHours(hours);
+			dateTimeInput.selectedDate.setMinutes(minutes);
+
+			timeInput.setTime(str);
+			signalPause.restart();
+		}
+
 	}
 
 
@@ -82,6 +132,15 @@ Row{
 
 		tabKeyItem: timeInput.inputItem;
 		onDateChanged: {
+			if(value !== dateTimeInput.dateStr){
+				dateTimeInput.dateStr = value;
+
+				dateTimeInput.selectedDate.setFullYear(dateInput.selectedDate.getFullYear())
+				dateTimeInput.selectedDate.setMonth(dateInput.selectedDate.getMonth())
+				dateTimeInput.selectedDate.setDate(dateInput.selectedDate.getDate())
+
+				signalPause.restart();
+			}
 
 		}
 	}
@@ -95,18 +154,36 @@ Row{
 		hasTitle: dateTimeInput.hasTitle;
 		color: dateTimeInput.color;
 
-		tabKeyItem: dateInput.inputItem;
+		tabKeyItem: forFocus;
 		onTimeChanged: {
+			if(value !== dateTimeInput.timeStr){
+				dateTimeInput.timeStr = value;
 
+				let hours = value.slice(0,2)
+				let minutes = value.slice(3);
+				if(hours[0] == "0"){
+					hours = hours[1];
+				}
+				if(minutes[0] == "0"){
+					minutes = minutes[1];
+				}
+
+				dateTimeInput.selectedDate.setHours(hours)
+				dateTimeInput.selectedDate.setMinutes(minutes)
+
+				signalPause.restart();
+			}
 		}
 	}
+
+	Item{id: forFocus}
 
 	PauseAnimation {
 		id: signalPause;
 
 		duration: 200;
 		onFinished: {
-			dateChanged(dateTimeInput.dateTimeStr);
+			dateTimeInput.dateChanged(dateTimeInput.dateStr + " " + dateTimeInput.timeStr);
 		}
 	}
 }

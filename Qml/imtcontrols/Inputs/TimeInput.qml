@@ -18,7 +18,6 @@ Item {
 	property string placeHolderText: "hh:mm";
 
 	property var timeRegExpFull: /^(([0-1]\d)|(2[0-3])):[0-5]\d$/
-	//property var timeRegExp: /^(([0-1]\d)|(2[0-3]))?:{0,1}([0-5]\d)?$/
 	property var timeRegExp: /^[0-9:]{0,5}$/
 
 	property bool canShowCurrentTime: false;
@@ -42,6 +41,7 @@ Item {
 
 	function checkDateFormat(str){
 		//console.log("Check Date Format")
+		str = correctTimeFormat(str);
 		timeInput.isError = str.match(timeInput.timeRegExpFull) === null;
 
 		if(timeInput.isError){
@@ -52,15 +52,42 @@ Item {
 		return !timeInput.isError;
 	}
 
+	function correctTimeFormat(str){
+		let str_ = str;
+		let reg = /^\d{0,2}:\d{0,2}$/
+		if(str.match(reg) === null){
+			return str;
+		}
+		let arr = str.split(":");
+		let hours = arr[0];
+		let minutes = arr[1];
+		if(String(hours).length == 1){
+			hours = "0" + hours;
+		}
+		if(String(hours).length == 0){
+			hours = "00";
+		}
+		if(String(minutes).length == 1){
+			minutes = "0" + minutes;
+		}
+		if(String(minutes).length == 0){
+			minutes = "00";
+		}
+		str_ = hours + ":" + minutes;
+		input.text = str_;
+		return str_;
+	}
+
 	function setTime(str){
 		console.log("Set time")
 		if(str.match(timeInput.timeRegExpFull) === null){
 			//console.log("Wrong time format!")
-			return;
+			return false;
 		}
 
 		timeInput.selectedTime = str;
 		input.text = str
+		return true;
 	}
 
 	function showCurrentTime(){
@@ -79,6 +106,7 @@ Item {
 		let time  = hours + ":" + minutes;
 		//console.log("showCurrentTime:: ", time)
 		setTime(time);
+		timeChanged(time);
 	}
 
 
@@ -127,6 +155,7 @@ Item {
 			onFocusChanged: {
 				if(!focus){
 					if(timeInput.checkDateFormat(input.text)){
+						timeInput.selectedTime = input.text;
 						timeInput.timeChanged(input.text);
 					}
 
@@ -136,6 +165,7 @@ Item {
 				if(timeInput.checkDateFormat(input.text)){
 					timeInput.selectedTime = input.text;
 					timeInput.timeChanged(input.text);
+					timeInput.tabKeyItem.forceActiveFocus();
 				}
 
 			}
