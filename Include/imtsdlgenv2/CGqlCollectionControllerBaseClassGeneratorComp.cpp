@@ -1532,10 +1532,12 @@ QString CGqlCollectionControllerBaseClassGeneratorComp::GetInputExtractionString
 			retVal.append('.');
 			if (!version.isEmpty()){
 				retVal.append(version);
+			}
+			if (!callChain.isEmpty()){
 				retVal.append('-');
 				retVal.append('>');
+				retVal.append(callChain);
 			}
-			retVal.append(callChain);
 
 			return retVal;
 		}
@@ -1558,6 +1560,12 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 	imtsdl::CSdlType sdlType;
 	bool isTypeExsists = GetSdlTypeForField(aSdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), sdlType);
 	Q_ASSERT(isTypeExsists);
+
+	// special case if a ref is the required type
+	if (_isRoot && aSdlField.GetType() == typeName){
+
+		return true;
+	}
 
 	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
 		if (sdlField.GetType() == typeName || FindCallChainForField(sdlField, typeName, callChain, false)){
