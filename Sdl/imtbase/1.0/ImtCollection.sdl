@@ -36,6 +36,12 @@ type CollectionFilter {
 	FilteringInfoIds: [String!]
 }
 
+type CollectionMetaInfo {
+	Id: ID!
+	name: String
+	description: String
+}
+
 input InputId {
 	Id: ID!
 }
