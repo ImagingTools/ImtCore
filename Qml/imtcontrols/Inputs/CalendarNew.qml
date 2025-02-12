@@ -471,14 +471,13 @@ Rectangle {
 		}
 
 		let lastDay = calendar.getLastDayOfMonth(month, year);
-		for(i = 1; i <= lastDay; i++){
-			index = model.insertNewItem();
+		for(let i = 1; i <= lastDay; i++){
+			let index = model.insertNewItem();
 			model.setData("Id", index, index);
 			model.setData("Day",i,index);
 			model.setData("Month",month,index);
 			model.setData("Year",year,index);
 			model.setData("CurrMonth",true,index);
-
 
 		}
 
@@ -487,8 +486,8 @@ Rectangle {
 
 		let count = model.getItemsCount();
 
-		for(i = 1; i <= (42 - count); i++){
-			index = model.insertNewItem();
+		for(let i = 1; i <= (42 - count); i++){
+			let index = model.insertNewItem();
 			model.setData("Id", index, index);
 			model.setData("Day",i,index);
 			model.setData("Month",nextMonth,index);
