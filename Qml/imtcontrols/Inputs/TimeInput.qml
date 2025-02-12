@@ -29,7 +29,7 @@ Item {
 
 	property alias inputItem: input;
 
-	property string selectedTime;
+	property string selectedTime: "00:00";
 
 	signal timeChanged(string value);
 
@@ -109,6 +109,29 @@ Item {
 		timeChanged(time);
 	}
 
+	function getHours(){
+		let hours
+		if(selectedTime !== "" && selectedTime.match(timeInput.timeRegExpFull) !== null){
+			hours = selectedTime.slice(0,2);
+			if(hours[0] == "0"){
+				hours = hours[1]
+			}
+			return hours;
+		}
+		return 0;
+	}
+
+	function getMinutes(){
+		let minutes
+		if(selectedTime !== "" && selectedTime.match(timeInput.timeRegExpFull) !== null){
+			minutes = selectedTime.slice(3);
+			if(minutes[0] == "0"){
+				minutes = minutes[1]
+			}
+			return minutes;
+		}
+		return 0;
+	}
 
 	Column{
 		id: column;
