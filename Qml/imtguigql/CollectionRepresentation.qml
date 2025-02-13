@@ -4,617 +4,619 @@ import imtcontrols 1.0
 import imtguigql 1.0
 
 Item {
-    id: root;
+	id: root;
 
-    property string collectionId: "";
+	property string collectionId: "";
+	property string gqlGetListCommandId: collectionId + "List";
 
-    property TreeItemModel elementsModel: TreeItemModel {}
-    property TreeItemModel headersModel: TreeItemModel {}
-    property TreeItemModel objectEditorInfoModel: TreeItemModel {}
 
-    property TreeItemModel notificationModel: TreeItemModel {}
+	property TreeItemModel elementsModel: TreeItemModel {}
+	property TreeItemModel headersModel: TreeItemModel {}
+	property TreeItemModel objectEditorInfoModel: TreeItemModel {}
 
-    property TreeItemModel filterableHeadersModel: TreeItemModel {}
+	property TreeItemModel notificationModel: TreeItemModel {}
 
-    property var additionalFieldIds: []
+	property TreeItemModel filterableHeadersModel: TreeItemModel {}
 
+	property var additionalFieldIds: []
 
-    signal removed(string objectId);
-    signal renamed(string objectId, string newName);
-    signal imported(string objectId);
-    signal exported(string fileName, string data);
-    signal descriptionSetted(string objectId, string description);
 
-    property alias removeGqlModel: removeModel;
-    property alias headersGqlModel: headersGqlModel;
+	signal removed(string objectId);
+	signal renamed(string objectId, string newName);
+	signal imported(string objectId);
+	signal exported(string fileName, string data);
+	signal descriptionSetted(string objectId, string description);
 
-    property var payloadModel: null
+	property alias removeGqlModel: removeModel;
+	property alias headersGqlModel: headersGqlModel;
 
-    signal beginUpdate();
-    signal endUpdate();
+	property var payloadModel: null
 
+	signal beginUpdate();
+	signal endUpdate();
 
-    function importObject(typeId, name, description, b64encoded, mimeType, additionalParamsObj){
-        let params = {}
-        params["typeId"] = typeId;
-        params["name"] = name;
-        params["description"] = description;
-        params["fileData"] = b64encoded;
-        params["mimeType"] = mimeType;
 
-        if (additionalParamsObj){
-            for (let key in additionalParamsObj){
-                params[key] = additionalParamsObj[key]
-            }
-        }
+	function importObject(typeId, name, description, b64encoded, mimeType, additionalParamsObj){
+		let params = {}
+		params["typeId"] = typeId;
+		params["name"] = name;
+		params["description"] = description;
+		params["fileData"] = b64encoded;
+		params["mimeType"] = mimeType;
 
-        importObjectRequestSender.send(params)
-    }
+		if (additionalParamsObj){
+			for (let key in additionalParamsObj){
+				params[key] = additionalParamsObj[key]
+			}
+		}
 
-    function exportObject(objectId, mimeType, additionalParamsObj){
-        let params = {}
-        params["id"] = objectId
-        params["mimeType"] = mimeType
+		importObjectRequestSender.send(params)
+	}
 
-        if (additionalParamsObj){
-            for (let key in additionalParamsObj){
-                params[key] = additionalParamsObj[key]
-            }
-        }
+	function exportObject(objectId, mimeType, additionalParamsObj){
+		let params = {}
+		params["id"] = objectId
+		params["mimeType"] = mimeType
 
-        exportObjectRequestSender.send(params);
-    }
+		if (additionalParamsObj){
+			for (let key in additionalParamsObj){
+				params[key] = additionalParamsObj[key]
+			}
+		}
 
-    onCollectionIdChanged: {
-        updateModel();
-    }
+		exportObjectRequestSender.send(params);
+	}
 
-    onEndUpdate: {
-        internal.elementsUpdatingBlock = false;
-    }
+	onCollectionIdChanged: {
+		updateModel();
+	}
 
-    QtObject {
-        id: internal;
+	onEndUpdate: {
+		internal.elementsUpdatingBlock = false;
+	}
 
-        property string removeGqlCommand: root.collectionId + "Remove";
-        property string renameGqlCommand: root.collectionId + "Rename";
-        property string setDescriptionGqlCommand: root.collectionId + "SetDescription";
-        property string importGqlCommand: root.collectionId + "Import";
-        property string exportGqlCommand: root.collectionId + "Export";
+	QtObject {
+		id: internal;
 
-        property bool elementsUpdatingBlock: false;
-        property bool headersUpdatingBlock: false;
-    }
+		property string removeGqlCommand: root.collectionId + "Remove";
+		property string renameGqlCommand: root.collectionId + "Rename";
+		property string setDescriptionGqlCommand: root.collectionId + "SetDescription";
+		property string importGqlCommand: root.collectionId + "Import";
+		property string exportGqlCommand: root.collectionId + "Export";
 
-    function updateModel(){
-        updateHeaders();
-    }
+		property bool elementsUpdatingBlock: false;
+		property bool headersUpdatingBlock: false;
+	}
 
-    function updateHeaders(){
-        if (internal.headersUpdatingBlock){
-            return;
-        }
+	function updateModel(){
+		updateHeaders();
+	}
 
-        if (root.collectionId === ""){
-            console.error("Unable to update headers 'collectionId' is empty!");
+	function updateHeaders(){
+		if (internal.headersUpdatingBlock){
+			return;
+		}
 
-            return;
-        }
+		if (root.collectionId === ""){
+			console.error("Unable to update headers 'collectionId' is empty!");
 
-        headersGqlModel.getCollectionHeaders();
-    }
+			return;
+		}
 
-    function updateElements(count, offset, filterModel){
-        if (internal.elementsUpdatingBlock){
-            return;
-        }
+		headersGqlModel.getCollectionHeaders();
+	}
 
-        if (root.collectionId === ""){
-            console.error("Unable to update elements 'collectionId' is empty!");
-            return;
-        }
+	function updateElements(count, offset, filterModel){
+		if (internal.elementsUpdatingBlock){
+			return;
+		}
 
-        elementsGqlModel.getElements(count, offset, filterModel)
-    }
+		if (root.collectionId === ""){
+			console.error("Unable to update elements 'collectionId' is empty!");
+			return;
+		}
 
-    function getElementsRepresentation(){
-        return root.elementsModel;
-    }
+		elementsGqlModel.getElements(count, offset, filterModel)
+	}
 
-    function getHeadersRepresentation(){
-        return root.headersModel;
-    }
+	function getElementsRepresentation(){
+		return root.elementsModel;
+	}
 
-    function insertNewObject(typeId){
-    }
+	function getHeadersRepresentation(){
+		return root.headersModel;
+	}
 
-    function getObjectData(objectId, callback){
-    }
+	function insertNewObject(typeId){
+	}
 
-    function setObjectData(objectId, objectData, callback){
-    }
+	function getObjectData(objectId, callback){
+	}
 
-    function removeElement(elementIndex){
-        if (elementIndex < 0 || elementIndex >= root.elementsModel.getItemsCount()){
-            console.error();
+	function setObjectData(objectId, objectData, callback){
+	}
 
-            return;
-        }
+	function removeElement(elementIndex){
+		if (elementIndex < 0 || elementIndex >= root.elementsModel.getItemsCount()){
+			console.error();
 
-        let elementId = root.elementsModel.getData("Id", elementIndex);
+			return;
+		}
 
-        removeModel.remove(elementId)
-    }
+		let elementId = root.elementsModel.getData("Id", elementIndex);
 
-    function setElementName(elementIndex, name){
-        if (elementIndex < 0 || elementIndex >= root.elementsModel.getItemsCount()){
-            console.error();
+		removeModel.remove(elementId)
+	}
 
-            return;
-        }
+	function setElementName(elementIndex, name){
+		if (elementIndex < 0 || elementIndex >= root.elementsModel.getItemsCount()){
+			console.error();
 
-        let elementId = root.elementsModel.getData("Id", elementIndex);
+			return;
+		}
 
-        renameQuery.rename(elementId, name)
-    }
+		let elementId = root.elementsModel.getData("Id", elementIndex);
 
-    function setElementDescription(elementIndex, description){
-        if (elementIndex < 0 || elementIndex >= root.elementsModel.getItemsCount()){
-            console.error();
+		renameQuery.rename(elementId, name)
+	}
 
-            return;
-        }
+	function setElementDescription(elementIndex, description){
+		if (elementIndex < 0 || elementIndex >= root.elementsModel.getItemsCount()){
+			console.error();
 
-        let elementId = root.elementsModel.getData("Id", elementIndex);
+			return;
+		}
 
-        setDescriptionQuery.setDescription(elementId, description)
-    }
+		let elementId = root.elementsModel.getData("Id", elementIndex);
 
-    function getHeaders(){
-        return {};
-    }
+		setDescriptionQuery.setDescription(elementId, description)
+	}
 
-    GqlModel {
-        id: removeModel;
+	function getHeaders(){
+		return {};
+	}
 
-        function remove(id) {
-            var query = Gql.GqlRequest("mutation", internal.removeGqlCommand);
+	GqlModel {
+		id: removeModel;
 
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", id);
+		function remove(id) {
+			var query = Gql.GqlRequest("mutation", internal.removeGqlCommand);
 
-            query.AddParam(inputParams);
+			var inputParams = Gql.GqlObject("input");
+			inputParams.InsertField("Id", id);
 
-            var queryFields = Gql.GqlObject("removedNotification");
-            queryFields.InsertField("Id");
-            query.AddField(queryFields);
+			query.AddParam(inputParams);
 
-            var gqlData = query.GetQuery();
-            let headers = root.getHeaders()
+			var queryFields = Gql.GqlObject("removedNotification");
+			queryFields.InsertField("Id");
+			query.AddField(queryFields);
 
-            this.setGqlQuery(gqlData, headers);
-        }
+			var gqlData = query.GetQuery();
+			let headers = root.getHeaders()
 
-        onStateChanged: {
-            if (this.state === "Ready"){
-                var dataModelLocal;
-                if (removeModel.containsKey("errors")){
-                    dataModelLocal = removeModel.getData("errors");
+			this.setGqlQuery(gqlData, headers);
+		}
 
-                    if (dataModelLocal.containsKey(internal.removeGqlCommand)){
-                        dataModelLocal = dataModelLocal.getData(internal.removeGqlCommand);
-                    }
+		onStateChanged: {
+			if (this.state === "Ready"){
+				var dataModelLocal;
+				if (removeModel.containsKey("errors")){
+					dataModelLocal = removeModel.getData("errors");
 
-                    let message = ""
-                    if (dataModelLocal.containsKey("message")){
-                        message = dataModelLocal.getData("message");
-                    }
+					if (dataModelLocal.containsKey(internal.removeGqlCommand)){
+						dataModelLocal = dataModelLocal.getData(internal.removeGqlCommand);
+					}
 
-                    let type;
-                    if (dataModelLocal.containsKey("type")){
-                        type = dataModelLocal.getData("type");
-                    }
+					let message = ""
+					if (dataModelLocal.containsKey("message")){
+						message = dataModelLocal.getData("message");
+					}
 
-                    ModalDialogManager.showWarningDialog(message)
+					let type;
+					if (dataModelLocal.containsKey("type")){
+						type = dataModelLocal.getData("type");
+					}
 
-                    return;
-                }
+					ModalDialogManager.showWarningDialog(message)
 
-                if (removeModel.containsKey("data")){
-                    dataModelLocal = removeModel.getData("data");
+					return;
+				}
 
-                    if (dataModelLocal.containsKey(internal.removeGqlCommand)){
-                        dataModelLocal = dataModelLocal.getData(internal.removeGqlCommand);
+				if (removeModel.containsKey("data")){
+					dataModelLocal = removeModel.getData("data");
 
-                        if (dataModelLocal.containsKey("removedNotification")){
-                            dataModelLocal = dataModelLocal.getData("removedNotification");
+					if (dataModelLocal.containsKey(internal.removeGqlCommand)){
+						dataModelLocal = dataModelLocal.getData(internal.removeGqlCommand);
 
-                            if (dataModelLocal.containsKey("Id")){
-                                var itemId = dataModelLocal.getData("Id");
+						if (dataModelLocal.containsKey("removedNotification")){
+							dataModelLocal = dataModelLocal.getData("removedNotification");
 
-                                root.removed(itemId);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+							if (dataModelLocal.containsKey("Id")){
+								var itemId = dataModelLocal.getData("Id");
 
-    GqlModel {
-        id: renameQuery;
+								root.removed(itemId);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
-        function rename(id, name) {
-            var query;
-            var queryFields;
-            var inputParams = Gql.GqlObject("input");
+	GqlModel {
+		id: renameQuery;
 
-            query = Gql.GqlRequest("mutation", internal.renameGqlCommand);
+		function rename(id, name) {
+			var query;
+			var queryFields;
+			var inputParams = Gql.GqlObject("input");
+
+			query = Gql.GqlRequest("mutation", internal.renameGqlCommand);
 
 			inputParams.InsertField("id", id);
 			inputParams.InsertField("newName", name);
 
-            query.AddParam(inputParams);
+			query.AddParam(inputParams);
 
-            queryFields = Gql.GqlObject("rename");
-            query.AddField(queryFields);
+			queryFields = Gql.GqlObject("rename");
+			query.AddField(queryFields);
 
-            var gqlData = query.GetQuery();
-            let headers = root.getHeaders()
+			var gqlData = query.GetQuery();
+			let headers = root.getHeaders()
 
-            this.setGqlQuery(gqlData, headers);
-        }
+			this.setGqlQuery(gqlData, headers);
+		}
 
-        onStateChanged: {
-            if (this.state === "Ready"){
-                var dataModelLocal;
+		onStateChanged: {
+			if (this.state === "Ready"){
+				var dataModelLocal;
 
-                if (renameQuery.containsKey("errors")){
-                    dataModelLocal = renameQuery.getData("errors");
+				if (renameQuery.containsKey("errors")){
+					dataModelLocal = renameQuery.getData("errors");
 
-                    if (dataModelLocal.containsKey(internal.renameGqlCommand)){
-                        dataModelLocal = dataModelLocal.getData(internal.renameGqlCommand);
+					if (dataModelLocal.containsKey(internal.renameGqlCommand)){
+						dataModelLocal = dataModelLocal.getData(internal.renameGqlCommand);
 
-                        let message = ""
-                        if (dataModelLocal.containsKey("message")){
-                            message = dataModelLocal.getData("message");
-                        }
+						let message = ""
+						if (dataModelLocal.containsKey("message")){
+							message = dataModelLocal.getData("message");
+						}
 
-                        let type;
-                        if (dataModelLocal.containsKey("type")){
-                            type = dataModelLocal.getData("type");
-                        }
+						let type;
+						if (dataModelLocal.containsKey("type")){
+							type = dataModelLocal.getData("type");
+						}
 
-                        ModalDialogManager.showWarningDialog(message)
-                    }
+						ModalDialogManager.showWarningDialog(message)
+					}
 
-                    return;
-                }
+					return;
+				}
 
-                if (renameQuery.containsKey("data")){
-                    dataModelLocal = renameQuery.getData("data");
+				if (renameQuery.containsKey("data")){
+					dataModelLocal = renameQuery.getData("data");
 
-                    if (dataModelLocal.containsKey(internal.renameGqlCommand)) {
-                        dataModelLocal = dataModelLocal.getData(internal.renameGqlCommand);
+					if (dataModelLocal.containsKey(internal.renameGqlCommand)) {
+						dataModelLocal = dataModelLocal.getData(internal.renameGqlCommand);
 
 						let id = dataModelLocal.getData("id");
 						let newName = dataModelLocal.getData("name");
 
-                        root.renamed(id, newName);
-                    }
-                }
-            }
-        }
-    }
+						root.renamed(id, newName);
+					}
+				}
+			}
+		}
+	}
 
-    GqlModel {
-        id: setDescriptionQuery;
+	GqlModel {
+		id: setDescriptionQuery;
 
-        function setDescription(id, description){
-            var query = Gql.GqlRequest("mutation", internal.setDescriptionGqlCommand);
+		function setDescription(id, description){
+			var query = Gql.GqlRequest("mutation", internal.setDescriptionGqlCommand);
 
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", id);
-            inputParams.InsertField("Description", description);
+			var inputParams = Gql.GqlObject("input");
+			inputParams.InsertField("Id", id);
+			inputParams.InsertField("Description", description);
 
-            query.AddParam(inputParams);
+			query.AddParam(inputParams);
 
-            var queryFields = Gql.GqlObject("setDescription");
-            queryFields.InsertField("Description");
+			var queryFields = Gql.GqlObject("setDescription");
+			queryFields.InsertField("Description");
 
-            query.AddField(queryFields);
+			query.AddField(queryFields);
 
-            var gqlData = query.GetQuery();
-            let headers = root.getHeaders()
+			var gqlData = query.GetQuery();
+			let headers = root.getHeaders()
 
-            this.setGqlQuery(gqlData, headers);
-        }
+			this.setGqlQuery(gqlData, headers);
+		}
 
-        onStateChanged: {
-            if (this.state === "Ready"){
-                var dataModelLocal;
+		onStateChanged: {
+			if (this.state === "Ready"){
+				var dataModelLocal;
 
-                if (setDescriptionQuery.containsKey("errors")){
-                    dataModelLocal = setDescriptionQuery.getData("errors");
+				if (setDescriptionQuery.containsKey("errors")){
+					dataModelLocal = setDescriptionQuery.getData("errors");
 
-                    if (dataModelLocal.containsKey(internal.setDescriptionGqlCommand)){
-                        dataModelLocal = dataModelLocal.getData(internal.setDescriptionGqlCommand);
+					if (dataModelLocal.containsKey(internal.setDescriptionGqlCommand)){
+						dataModelLocal = dataModelLocal.getData(internal.setDescriptionGqlCommand);
 
-                        let message = ""
-                        if (dataModelLocal.containsKey("message")){
-                            message = dataModelLocal.getData("message");
-                        }
+						let message = ""
+						if (dataModelLocal.containsKey("message")){
+							message = dataModelLocal.getData("message");
+						}
 
-                        let type;
-                        if (dataModelLocal.containsKey("type")){
-                            type = dataModelLocal.getData("type");
-                        }
+						let type;
+						if (dataModelLocal.containsKey("type")){
+							type = dataModelLocal.getData("type");
+						}
 
-                        ModalDialogManager.showWarningDialog(message)
-                    }
+						ModalDialogManager.showWarningDialog(message)
+					}
 
-                    return;
-                }
+					return;
+				}
 
-                if (setDescriptionQuery.containsKey("data")){
-                    dataModelLocal = setDescriptionQuery.getData("data");
+				if (setDescriptionQuery.containsKey("data")){
+					dataModelLocal = setDescriptionQuery.getData("data");
 
-                    if (dataModelLocal.containsKey(internal.setDescriptionGqlCommand)) {
+					if (dataModelLocal.containsKey(internal.setDescriptionGqlCommand)) {
 
-                        dataModelLocal = dataModelLocal.getData(internal.setDescriptionGqlCommand);
+						dataModelLocal = dataModelLocal.getData(internal.setDescriptionGqlCommand);
 
-                        var id = dataModelLocal.getData("Id");
-                        var description = dataModelLocal.getData("Description");
+						var id = dataModelLocal.getData("Id");
+						var description = dataModelLocal.getData("Description");
 
-                        root.descriptionSetted(id ,description);
-                    }
-                }
-            }
-        }
-    }
+						root.descriptionSetted(id ,description);
+					}
+				}
+			}
+		}
+	}
 
-    GqlModel {
-        id: headersGqlModel;
+	GqlModel {
+		id: headersGqlModel;
 
-        function getCollectionHeaders() {
-            var query = Gql.GqlRequest("query", root.collectionId + "Info");
+		function getCollectionHeaders() {
+			var query = Gql.GqlRequest("query", root.collectionId + "Info");
 
-            var inputParams = Gql.GqlObject("input");
-            query.AddParam(inputParams);
+			var inputParams = Gql.GqlObject("input");
+			query.AddParam(inputParams);
 
-            var queryHeaders = Gql.GqlObject("headers");
-            queryHeaders.InsertField("Id");
-            queryHeaders.InsertField("Name");
-            query.AddField(queryHeaders);
+			var queryHeaders = Gql.GqlObject("headers");
+			queryHeaders.InsertField("Id");
+			queryHeaders.InsertField("Name");
+			query.AddField(queryHeaders);
 
-            var gqlData = query.GetQuery();
-            let headers = root.getHeaders()
-            internal.headersUpdatingBlock = true;
+			var gqlData = query.GetQuery();
+			let headers = root.getHeaders()
+			internal.headersUpdatingBlock = true;
 
-            this.setGqlQuery(gqlData, headers);
-        }
+			this.setGqlQuery(gqlData, headers);
+		}
 
-        onStateChanged: {
-            if (this.state === "Ready"){
-                var dataModelLocal;
+		onStateChanged: {
+			if (this.state === "Ready"){
+				var dataModelLocal;
 
-                if (this.containsKey("errors")){
-                    dataModelLocal = this.getData("errors");
+				if (this.containsKey("errors")){
+					dataModelLocal = this.getData("errors");
 
-                    if (dataModelLocal.containsKey(root.collectionId + "Info")){
-                        dataModelLocal = dataModelLocal.getData(root.collectionId + "Info");
-                    }
+					if (dataModelLocal.containsKey(root.collectionId + "Info")){
+						dataModelLocal = dataModelLocal.getData(root.collectionId + "Info");
+					}
 
-                    let message = ""
-                    if (dataModelLocal.containsKey("message")){
-                        message = dataModelLocal.getData("message");
-                    }
+					let message = ""
+					if (dataModelLocal.containsKey("message")){
+						message = dataModelLocal.getData("message");
+					}
 
-                    let type;
-                    if (dataModelLocal.containsKey("type")){
-                        type = dataModelLocal.getData("type");
-                    }
+					let type;
+					if (dataModelLocal.containsKey("type")){
+						type = dataModelLocal.getData("type");
+					}
 
-                    ModalDialogManager.showWarningDialog(message)
+					ModalDialogManager.showWarningDialog(message)
 
-                    return;
-                }
+					return;
+				}
 
-                if (this.containsKey("data")){
-                    dataModelLocal = this.getData("data");
+				if (this.containsKey("data")){
+					dataModelLocal = this.getData("data");
 
-                    if (dataModelLocal.containsKey(root.collectionId + "Info")){
-                        dataModelLocal = dataModelLocal.getData(root.collectionId + "Info");
-                        if (!dataModelLocal){
-                            return;
-                        }
+					if (dataModelLocal.containsKey(root.collectionId + "Info")){
+						dataModelLocal = dataModelLocal.getData(root.collectionId + "Info");
+						if (!dataModelLocal){
+							return;
+						}
 
-                        if (dataModelLocal.containsKey("FilterSearch")){
-                            let filterSearchModel = dataModelLocal.getData("FilterSearch")
+						if (dataModelLocal.containsKey("FilterSearch")){
+							let filterSearchModel = dataModelLocal.getData("FilterSearch")
 
-                            root.filterableHeadersModel = filterSearchModel;
-                        }
+							root.filterableHeadersModel = filterSearchModel;
+						}
 
-                        if(dataModelLocal.containsKey("Headers")){
-                            dataModelLocal = dataModelLocal.getData("Headers");
+						if(dataModelLocal.containsKey("Headers")){
+							dataModelLocal = dataModelLocal.getData("Headers");
 
 							if (root.headersModel){
 								root.headersModel.destroy();
 							}
 
-                            root.headersModel = dataModelLocal;
+							root.headersModel = dataModelLocal;
 
-                            internal.headersUpdatingBlock = false;
-                        }
-                    }
-                }
-            }
-        }
-    }
+							internal.headersUpdatingBlock = false;
+						}
+					}
+				}
+			}
+		}
+	}
 
-    GqlModel {
-        id: elementsGqlModel;
+	GqlModel {
+		id: elementsGqlModel;
 
-        function getElements(count, offset, filterModel) {
-            var query = Gql.GqlRequest("query", root.collectionId + "List");
+		function getElements(count, offset, filterModel) {
+			var query = Gql.GqlRequest("query", root.gqlGetListCommandId);
 
-            var viewParams = Gql.GqlObject("viewParams");
-            viewParams.InsertField("Count", count);
-            viewParams.InsertField("Offset", offset);
-            if (filterModel.toGraphQL){
-                viewParams.InsertField("ComplexFilterModel", filterModel);
-            }
-            else{
-                viewParams.InsertField("FilterModel", filterModel.toJson());
-            }
+			var viewParams = Gql.GqlObject("viewParams");
+			viewParams.InsertField("Count", count);
+			viewParams.InsertField("Offset", offset);
+			if (filterModel.toGraphQL){
+				viewParams.InsertField("ComplexFilterModel", filterModel);
+			}
+			else{
+				viewParams.InsertField("FilterModel", filterModel.toJson());
+			}
 
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertFieldObject(viewParams);
+			var inputParams = Gql.GqlObject("input");
+			inputParams.InsertFieldObject(viewParams);
 
-            query.AddParam(inputParams);
+			query.AddParam(inputParams);
 
-            var queryFields = Gql.GqlObject("items");
+			var queryFields = Gql.GqlObject("items");
 
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
+			queryFields.InsertField("Id");
+			queryFields.InsertField("Name");
 
-            for(var i = 0; i < root.headersModel.getItemsCount(); i++){
-                let headerId = root.headersModel.getData("Id", i);
-                queryFields.InsertField(headerId);
-            }
+			for(var i = 0; i < root.headersModel.getItemsCount(); i++){
+				let headerId = root.headersModel.getData("Id", i);
+				queryFields.InsertField(headerId);
+			}
 
-            for (let i = 0; i < root.additionalFieldIds.length; i++){
-                queryFields.InsertField(root.additionalFieldIds[i]);
-            }
+			for (let i = 0; i < root.additionalFieldIds.length; i++){
+				queryFields.InsertField(root.additionalFieldIds[i]);
+			}
 
-            query.AddField(queryFields);
+			query.AddField(queryFields);
 
-            var gqlData = query.GetQuery();
-            let headers = root.getHeaders()
-            root.beginUpdate();
+			var gqlData = query.GetQuery();
+			let headers = root.getHeaders()
+			root.beginUpdate();
 
-            this.setGqlQuery(gqlData, headers);
-        }
+			this.setGqlQuery(gqlData, headers);
+		}
 
-        onStateChanged: {
-            if (this.state === "Ready"){
-                var dataModelLocal;
-                if (this.containsKey("errors")){
-                    dataModelLocal = this.getData("errors");
+		onStateChanged: {
+			if (this.state === "Ready"){
+				var dataModelLocal;
+				if (this.containsKey("errors")){
+					dataModelLocal = this.getData("errors");
 
-                    if (dataModelLocal.containsKey(root.collectionId + "List")){
-                        dataModelLocal = dataModelLocal.getData(root.collectionId + "List");
-                    }
+					if (dataModelLocal.containsKey(root.gqlGetListCommandId)){
+						dataModelLocal = dataModelLocal.getData(root.gqlGetListCommandId);
+					}
 
-                    let message = ""
-                    if (dataModelLocal.containsKey("message")){
-                        message = dataModelLocal.getData("message");
-                    }
+					let message = ""
+					if (dataModelLocal.containsKey("message")){
+						message = dataModelLocal.getData("message");
+					}
 
-                    let type;
-                    if (dataModelLocal.containsKey("type")){
-                        type = dataModelLocal.getData("type");
-                    }
+					let type;
+					if (dataModelLocal.containsKey("type")){
+						type = dataModelLocal.getData("type");
+					}
 
-                    ModalDialogManager.showWarningDialog(message)
+					ModalDialogManager.showWarningDialog(message)
 
-                    return;
-                }
+					return;
+				}
 
-                if (this.containsKey("data")){
-                    dataModelLocal = this.getData("data");
-                    if (dataModelLocal.containsKey(root.collectionId + "List")){
-                        if (root.payloadModel){
-                            let responseObj = JSON.parse(this.json)
-                            if (!responseObj){
-                                console.error("Unable convert json ", json, " to object")
-                                return;
-                            }
-                            if ("data" in responseObj){
-                                let dataObject = responseObj["data"];
-                                let dataModelLocal = dataObject[root.collectionId + "List"];
-                                root.payloadModel.fromObject(dataModelLocal)
+				if (this.containsKey("data")){
+					dataModelLocal = this.getData("data");
+					if (dataModelLocal.containsKey(root.gqlGetListCommandId)){
+						if (root.payloadModel){
+							let responseObj = JSON.parse(this.json)
+							if (!responseObj){
+								console.error("Unable convert json ", json, " to object")
+								return;
+							}
+							if ("data" in responseObj){
+								let dataObject = responseObj["data"];
+								let dataModelLocal = dataObject[root.gqlGetListCommandId];
+								root.payloadModel.fromObject(dataModelLocal)
 
 								if (root.elementsModel){
 									root.elementsModel.destroy()
 								}
 
-                                root.elementsModel = root.payloadModel.m_items
-                            }
-                        }
-                        else{
-                            dataModelLocal = dataModelLocal.getData(root.collectionId + "List");
+								root.elementsModel = root.payloadModel.m_items
+							}
+						}
+						else{
+							dataModelLocal = dataModelLocal.getData(root.gqlGetListCommandId);
 
-                            if (dataModelLocal.containsKey("notification")){
-                                root.notificationModel = dataModelLocal.getData("notification");
-                            }
+							if (dataModelLocal.containsKey("notification")){
+								root.notificationModel = dataModelLocal.getData("notification");
+							}
 
-                            if (!dataModelLocal.containsKey("items")){
-                                dataModelLocal.addTreeModel("items")
-                            }
+							if (!dataModelLocal.containsKey("items")){
+								dataModelLocal.addTreeModel("items")
+							}
 
-                            if (dataModelLocal.containsKey("items")){
-                                root.elementsModel = dataModelLocal.getData("items");
-                            }
-                        }
-                    }
-                }
-            }
-            if (this.state !== "Loading"){
-                root.endUpdate();
-            }
-        }
-    }
+							if (dataModelLocal.containsKey("items")){
+								root.elementsModel = dataModelLocal.getData("items");
+							}
+						}
+					}
+				}
+			}
+			if (this.state !== "Loading"){
+				root.endUpdate();
+			}
+		}
+	}
 
-    GqlRequestSender {
-        id: importObjectRequestSender;
-        gqlCommandId: internal.importGqlCommand;
-        requestType: 1;
+	GqlRequestSender {
+		id: importObjectRequestSender;
+		gqlCommandId: internal.importGqlCommand;
+		requestType: 1;
 
-        function createQueryParams(query, params){
-            var inputParams = Gql.GqlObject("input");
-            if (params){
-                for (let key in params){
-                    inputParams.InsertField(key, params[key]);
-                }
-            }
-            query.AddParam(inputParams);
+		function createQueryParams(query, params){
+			var inputParams = Gql.GqlObject("input");
+			if (params){
+				for (let key in params){
+					inputParams.InsertField(key, params[key]);
+				}
+			}
+			query.AddParam(inputParams);
 
-            var queryFields = Gql.GqlObject("import");
-            queryFields.InsertField("status");
-            query.AddField(queryFields);
-        }
+			var queryFields = Gql.GqlObject("import");
+			queryFields.InsertField("status");
+			query.AddField(queryFields);
+		}
 
-        function onResult(data){
-            root.imported("");
-            // Result handler
-        }
-    }
+		function onResult(data){
+			root.imported("");
+			// Result handler
+		}
+	}
 
-    GqlRequestSender {
-        id: exportObjectRequestSender;
-        gqlCommandId: internal.exportGqlCommand;
+	GqlRequestSender {
+		id: exportObjectRequestSender;
+		gqlCommandId: internal.exportGqlCommand;
 
-        function createQueryParams(query, params){
-            var inputParams = Gql.GqlObject("input");
-            if (params){
-                for (let key in params){
-                    inputParams.InsertField(key, params[key]);
-                }
-            }
-            query.AddParam(inputParams);
+		function createQueryParams(query, params){
+			var inputParams = Gql.GqlObject("input");
+			if (params){
+				for (let key in params){
+					inputParams.InsertField(key, params[key]);
+				}
+			}
+			query.AddParam(inputParams);
 
-            var queryFields = Gql.GqlObject("export");
-            queryFields.InsertField("fileData");
-            query.AddField(queryFields);
-        }
+			var queryFields = Gql.GqlObject("export");
+			queryFields.InsertField("fileData");
+			query.AddField(queryFields);
+		}
 
-        function onResult(data){
-            if (data.containsKey("fileData")){
-                let contentData = data.getData("fileData");
-                let fileName = data.getData("fileName");
-                root.exported(fileName, contentData);
-            }
-        }
-    }
+		function onResult(data){
+			if (data.containsKey("fileData")){
+				let contentData = data.getData("fileData");
+				let fileName = data.getData("fileName");
+				root.exported(fileName, contentData);
+			}
+		}
+	}
 }

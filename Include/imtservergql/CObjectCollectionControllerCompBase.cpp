@@ -753,6 +753,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 	}
 
 	imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->AddTreeModel("items");
+	itemsModelPtr->SetIsArray(true);
 	while (objectCollectionIterator->Next()){
 		imtbase::IObjectCollection::DataPtr objectDataPtr;
 		int itemIndex = itemsModelPtr->InsertNewItem();

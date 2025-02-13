@@ -7,30 +7,31 @@ import imtauthgui 1.0
 import imtcolgui 1.0
 
 CollectionView {
-    id: root;
+	id: root;
 
-    property bool hasRemoteChanges: false;
-    property bool tableViewParamsStoredServer: true;
-    property var payloadModel: null
-    property string importTitle: qsTr("Select file")
-    property string importFilter: qsTr("Text files (*.txt)")
+	property bool hasRemoteChanges: false;
+	property bool tableViewParamsStoredServer: true;
+	property var payloadModel: null
+	property string importTitle: qsTr("Select file")
+	property string importFilter: qsTr("Text files (*.txt)")
+	property string gqlGetListCommandId: root.collectionId + "List";
 
-    // Invisible fields that will be requested for collection
-    property var additionalFieldIds: ["Id", "Name"]
+	// Invisible fields that will be requested for collection
+	property var additionalFieldIds: ["Id", "Name"]
 
-    commandsControllerComp: Component {
-        CommandsPanelController {
-            commandId: root.collectionId;
-            uuid: root.viewId;
-            commandsView: root.commandsView;
-        }
-    }
+	commandsControllerComp: Component {
+		CommandsPanelController {
+			commandId: root.collectionId;
+			uuid: root.viewId;
+			commandsView: root.commandsView;
+		}
+	}
 
-    onHeadersChanged: {
-        if (table.headers.getItemsCount() > 0 && tableViewParamsStoredServer){
-            tableViewParamController.getModel();
-        }
-    }
+	onHeadersChanged: {
+		if (table.headers.getItemsCount() > 0 && tableViewParamsStoredServer){
+			tableViewParamController.getModel();
+		}
+	}
 
 	onCollectionIdChanged: {
 		if (collectionId !== ""){
@@ -38,206 +39,207 @@ CollectionView {
 		}
 	}
 
-    TableViewParamController {
-        id: tableViewParamController;
-        tableId: root.collectionId;
-        onUpdated: {
-            root.table.tableViewParams = tableViewParamController.tableViewParams;
-            root.table.updateWidthFromViewParams();
-        }
-    }
+	TableViewParamController {
+		id: tableViewParamController;
+		tableId: root.collectionId;
+		onUpdated: {
+			root.table.tableViewParams = tableViewParamController.tableViewParams;
+			root.table.updateWidthFromViewParams();
+		}
+	}
 
-    onTableViewParamsAccepted: {
-        if (tableViewParamsStoredServer){
-            tableViewParamController.tableViewParams = root.table.tableViewParams;
-            tableViewParamController.saveModel();
-        }
-    }
+	onTableViewParamsAccepted: {
+		if (tableViewParamsStoredServer){
+			tableViewParamController.tableViewParams = root.table.tableViewParams;
+			tableViewParamController.saveModel();
+		}
+	}
 
-    function getHeaders(){
-        return {};
-    }
+	function getHeaders(){
+		return {};
+	}
 
-    dataControllerComp: Component {
-        CollectionRepresentation {
-            property bool isReady: false;
+	dataControllerComp: Component {
+		CollectionRepresentation {
+			property bool isReady: false;
 
-            payloadModel: root.payloadModel
-            Component.onCompleted: {
-                Events.subscribeEvent("CommandsGuiReady", commandsIsReady);
-            }
+			payloadModel: root.payloadModel
+			Component.onCompleted: {
+				Events.subscribeEvent("CommandsGuiReady", commandsIsReady);
+			}
 
-            Component.onDestruction: {
-                Events.unSubscribeEvent("CommandsGuiReady", commandsIsReady);
-            }
+			Component.onDestruction: {
+				Events.unSubscribeEvent("CommandsGuiReady", commandsIsReady);
+			}
 
-            function commandsIsReady(){
-                isReady = true;
+			function commandsIsReady(){
+				isReady = true;
 
-                Events.unSubscribeEvent("CommandsGuiReady", commandsIsReady);
-            }
+				Events.unSubscribeEvent("CommandsGuiReady", commandsIsReady);
+			}
 
-            //            collectionId: isReady ? root.collectionId : "";
-            collectionId: root.collectionId;
+			//            collectionId: isReady ? root.collectionId : "";
+			collectionId: root.collectionId;
+			gqlGetListCommandId: root.gqlGetListCommandId
 
-            additionalFieldIds: root.additionalFieldIds;
+			additionalFieldIds: root.additionalFieldIds;
 
-            function getHeaders(){
-                return root.getHeaders();
-            }
-        }
-    }
+			function getHeaders(){
+				return root.getHeaders();
+			}
+		}
+	}
 
-    Component.onCompleted: {
-        table.saveWidth.connect(root.tableViewParamsAccepted)
-        Events.subscribeEvent("UpdateAllModels", root.receiveRemoteChanges);
-    }
+	Component.onCompleted: {
+		table.saveWidth.connect(root.tableViewParamsAccepted)
+		Events.subscribeEvent("UpdateAllModels", root.receiveRemoteChanges);
+	}
 
-    Component.onDestruction: {
-        table.saveWidth.disconnect(root.tableViewParamsAccepted)
-        Events.unSubscribeEvent("UpdateAllModels", root.receiveRemoteChanges);
-    }
+	Component.onDestruction: {
+		table.saveWidth.disconnect(root.tableViewParamsAccepted)
+		Events.unSubscribeEvent("UpdateAllModels", root.receiveRemoteChanges);
+	}
 
-    onHasRemoteChangesChanged: {
-        if (root.visible && hasRemoteChanges){
-            root.setAlertPanel(alertPanelComp)
-        }
-    }
+	onHasRemoteChangesChanged: {
+		if (root.visible && hasRemoteChanges){
+			root.setAlertPanel(alertPanelComp)
+		}
+	}
 
-    onSelectionChanged: {
-        if (!root.visibleMetaInfo){
-            return;
-        }
+	onSelectionChanged: {
+		if (!root.visibleMetaInfo){
+			return;
+		}
 
-        if (selection.length === 1){
-            let index = selection[0];
-            let elementsModel = root.table.elements;
-            let elementId = elementsModel.getData("Id", index);
-            metaInfoProvider.getMetaInfo(elementId);
-        }
-    }
+		if (selection.length === 1){
+			let index = selection[0];
+			let elementsModel = root.table.elements;
+			let elementId = elementsModel.getData("Id", index);
+			metaInfoProvider.getMetaInfo(elementId);
+		}
+	}
 
-    onVisibleChanged: {
-        if (hasRemoteChanges && visible){
-            root.setAlertPanel(alertPanelComp)
-        }
-        else{
-            root.setAlertPanel(undefined)
-        }
-    }
+	onVisibleChanged: {
+		if (hasRemoteChanges && visible){
+			root.setAlertPanel(alertPanelComp)
+		}
+		else{
+			root.setAlertPanel(undefined)
+		}
+	}
 
-    function receiveRemoteChanges(){
-        if (hasRemoteChanges){
-            hasRemoteChanges = false;
+	function receiveRemoteChanges(){
+		if (hasRemoteChanges){
+			hasRemoteChanges = false;
 
-            root.doUpdateGui();
-            root.setAlertPanel(undefined);
-        }
-    }
+			root.doUpdateGui();
+			root.setAlertPanel(undefined);
+		}
+	}
 
-    MetaInfoProvider {
-        id: metaInfoProvider;
+	MetaInfoProvider {
+		id: metaInfoProvider;
 
-        getMetaInfoGqlCommand: root.collectionId + "MetaInfo";
+		getMetaInfoGqlCommand: root.collectionId + "MetaInfo";
 
-        onMetaInfoModelChanged: {
-            root.metaInfoView.metaInfoModel = metaInfoProvider.metaInfoModel
-        }
+		onMetaInfoModelChanged: {
+			root.metaInfoView.metaInfoModel = metaInfoProvider.metaInfoModel
+		}
 
-        onStateChanged: {
-            if (state === "Loading"){
-                root.metaInfoView.startLoading();
-            }
-            else{
-                root.metaInfoView.stopLoading();
-            }
-        }
+		onStateChanged: {
+			if (state === "Loading"){
+				root.metaInfoView.startLoading();
+			}
+			else{
+				root.metaInfoView.stopLoading();
+			}
+		}
 
-        function getHeaders(){
-            return root.getHeaders();
-        }
-    }
+		function getHeaders(){
+			return root.getHeaders();
+		}
+	}
 
-    Component {
-        id: alertPanelComp;
+	Component {
+		id: alertPanelComp;
 
-        Rectangle {
-            anchors.fill: parent;
+		Rectangle {
+			anchors.fill: parent;
 
-            color: Style.selectedColor;
+			color: Style.selectedColor;
 
-            Image {
-                id: icon;
+			Image {
+				id: icon;
 
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.left: parent.left;
-                anchors.leftMargin: 10;
+				anchors.verticalCenter: parent.verticalCenter;
+				anchors.left: parent.left;
+				anchors.leftMargin: 10;
 
-                width: 20;
-                height: 20;
+				width: 20;
+				height: 20;
 
-                sourceSize.height: height;
-                sourceSize.width: width;
+				sourceSize.height: height;
+				sourceSize.width: width;
 
-                source: "../../../" + Style.getIconPath("Icons/Lamp", Icon.State.On, Icon.Mode.Normal);
-            }
+				source: "../../../" + Style.getIconPath("Icons/Lamp", Icon.State.On, Icon.Mode.Normal);
+			}
 
-            BaseText {
-                id: message;
+			BaseText {
+				id: message;
 
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.left: icon.right;
-                anchors.leftMargin: 10;
-                anchors.right: updateButton.left;
+				anchors.verticalCenter: parent.verticalCenter;
+				anchors.left: icon.right;
+				anchors.leftMargin: 10;
+				anchors.right: updateButton.left;
 
-                text: qsTr("This table has been modified from another computer");
-            }
+				text: qsTr("This table has been modified from another computer");
+			}
 
-            Button {
-                id: updateButton;
+			Button {
+				id: updateButton;
 
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.right: parent.right;
-                anchors.rightMargin: 10;
+				anchors.verticalCenter: parent.verticalCenter;
+				anchors.right: parent.right;
+				anchors.rightMargin: 10;
 
-                width: 70;
-                height: 30;
+				width: 70;
+				height: 30;
 
-                text: qsTr("Update");
+				text: qsTr("Update");
 
-                onClicked: {
-                    root.receiveRemoteChanges()
-                }
-            }
-        }
-    }
+				onClicked: {
+					root.receiveRemoteChanges()
+				}
+			}
+		}
+	}
 
-    function handleSubscription(dataModel){
-        if (!dataModel){
-            return;
-        }
+	function handleSubscription(dataModel){
+		if (!dataModel){
+			return;
+		}
 
-        if (dataModel.containsKey("token")){
+		if (dataModel.containsKey("token")){
 			let currentToken = AuthorizationController.getAccessToken();
-            let accessToken = dataModel.getData("token");
+			let accessToken = dataModel.getData("token");
 			if (String(currentToken) == String(accessToken)){
 				root.doUpdateGui();
 			}
 			else{
 				root.hasRemoteChanges = true;
 			}
-        }
-    }
+		}
+	}
 
-    SubscriptionClient {
-        id: subscriptionClient;
+	SubscriptionClient {
+		id: subscriptionClient;
 
-        function getHeaders(){
-            return root.getHeaders();
-        }
+		function getHeaders(){
+			return root.getHeaders();
+		}
 
 		onMessageReceived: {
 			root.handleSubscription(data);
 		}
-    }
+	}
 }
