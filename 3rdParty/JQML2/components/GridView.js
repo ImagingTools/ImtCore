@@ -89,6 +89,35 @@ class GridView extends Flickable {
         this.updateView()
     }
 
+    createElement(index){
+        if(this.$items[index]) return this.$items[index]
+        let ctx = new ContextController(this.delegate.get().$exCtx,this.$exCtx)
+        let createObject = this.getStatement('delegate').get().createObject
+        let cls = this.getStatement('delegate').get().constructor
+
+        if(typeof this.getPropertyValue('model') === 'number'){
+            let obj = createObject ? createObject(this.contentItem,ctx, {index: index}, false) : new cls(this.contentItem,ctx, {index: index})
+
+            this.$items[index] = obj
+        } else if(Array.isArray(this.getPropertyValue('model'))){
+            let obj = createObject ? createObject(this.contentItem,ctx, {'$modelData': this.getPropertyValue('model')[index], index: index}, false) : new cls(this.contentItem,ctx, {'$modelData': this.getPropertyValue('model')[index], index: index})
+
+            this.$items[index] = obj
+        } else {
+            let model = this.getPropertyValue('model').getPropertyValue('data')[index]
+            let obj = createObject ? createObject(this.contentItem,ctx, model, false) : new cls(this.contentItem,ctx, model)
+
+            this.$items[index] = obj   
+        }
+
+        for(let update of updateList.splice(0, updateList.length)){
+            update()
+        }
+        
+        this.$items[index].$complete()
+        return this.$items[index]
+    }
+
     updateView(){
         if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) return
 
@@ -96,61 +125,27 @@ class GridView extends Flickable {
             item.destroy()
         }
         this.$items = []
-        let ctx = new ContextController(this.delegate.get().$exCtx, this.$exCtx)
-        let createObject = this.getStatement('delegate').get().createObject
-        let cls = this.getStatement('delegate').get().constructor
 
-        if(typeof this.getPropertyValue('model') === 'number'){
-            for(let i = 0; i < this.getPropertyValue('model'); i++){
-                let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, {index: i}, false) : new cls(this.getStatement('contentItem').get(),ctx, {index: i})
-                // obj.setStyle({
-                //     position: 'relative'
-                // })
-                // obj.getProperty('width').setCompute(()=>{obj.getProperty('width').subscribe(this.getProperty('cellWidth')); return this.getProperty('cellWidth').get()})
-                // obj.getProperty('height').setCompute(()=>{obj.getProperty('height').subscribe(this.getProperty('cellHeight')); return this.getProperty('cellHeight').get()})
-                // obj.getProperty('width').getNotify().connect(()=>{
-                //     this.updateGeometry()
-                // })
-                // obj.getProperty('height').getNotify().connect(()=>{
-                //     this.updateGeometry()
-                // })
-                // obj.getStatement('index').reset(i)
-                // obj.getStatement('model').reset({index: i})
-                // while(updateList.length){
-                    for(let update of updateList.splice(0, updateList.length)){
-                        update()
-                    }
-                // }
-                obj.$complete()
-                this.$items.push(obj)
-            }
+        let model = this.getPropertyValue('model')
+        let length = 0 
+        if(model instanceof ListModel){     
+            length = model.getPropertyValue('count')
+        } else if(typeof model === 'object' && Array.isArray(model)){
+            length = model.length
+        } else if(typeof model === 'number'){
+            length = model
         } else {
-            for(let model of this.getPropertyValue('model').getPropertyValue('data')){
-                let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, model, false) : new cls(this.getStatement('contentItem').get(),ctx, model)
-                
-                // obj.setStyle({
-                //     position: 'relative'
-                // })
-                // obj.getProperty('width').setCompute(()=>{obj.getProperty('width').subscribe(this.getProperty('cellWidth')); return this.getProperty('cellWidth').get()})
-                // obj.getProperty('height').setCompute(()=>{obj.getProperty('height').subscribe(this.getProperty('cellHeight')); return this.getProperty('cellHeight').get()})
-                // obj.getProperty('width').getNotify().connect(()=>{
-                //     this.updateGeometry()
-                // })
-                // obj.getProperty('height').getNotify().connect(()=>{
-                //     this.updateGeometry()
-                // })
-                // obj.getStatement('index').setCompute(()=>{obj.getStatement('index').subscribe(model.getStatement('index')); return model.getStatement('index').get()})
-                // obj.getStatement('index').update()
-                // obj.getStatement('model').reset(model)
-                // while(updateList.length){
-                    for(let update of updateList.splice(0, updateList.length)){
-                        update()
-                    }
-                // }
-                obj.$complete()
-                this.$items.push(obj)
-            }
+            return
         }
+
+        if(length === 0) {
+            return
+        }
+
+        for(let i = 0; i < length; i++){
+            this.createElement(i)
+        }
+
         this.getProperty('count').reset(this.$items.length)
         this.updateGeometry()
     }
