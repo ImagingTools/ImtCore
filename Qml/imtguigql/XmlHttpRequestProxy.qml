@@ -32,10 +32,11 @@ QtObject {
 
 				var xhr = this;
 				var originalOnReadyStateChange = xhr.onreadystatechange;
+				var gqlRequestRef = xhr.gqlRequest;
 
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState === XMLHttpRequest.DONE) {
-						handleResponse(gqlBody, xhr);
+						handleResponse(gqlBody, xhr, gqlRequestRef);
 					}
 
 					if (originalOnReadyStateChange) {
@@ -44,7 +45,7 @@ QtObject {
 				};
 
 				xhr.addEventListener("loadend", function() {
-					handleResponse(gqlBody, xhr);
+					handleResponse(gqlBody, xhr, gqlRequestRef);
 				});
 
 				originalXHRSend.apply(xhr, arguments);
@@ -57,19 +58,19 @@ QtObject {
 		}
 	}
 
-	function handleResponse(gqlBody, xhr) {
+	function handleResponse(gqlBody, xhr, gqlRequestRef) {
 		switch(xhr.status) {
 			case 200:
-				ok(gqlBody);
+				ok(gqlBody, gqlRequestRef);
 				break;
 			case 403:
-				forbidden(gqlBody);
+				forbidden(gqlBody, gqlRequestRef);
 				break;
 			case 401:
-				unauthorized(gqlBody);
+				unauthorized(gqlBody, gqlRequestRef);
 				break;
 			case 500:
-				internalError(gqlBody);
+				internalError(gqlBody, gqlRequestRef);
 				break;
 		}
 	}

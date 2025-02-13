@@ -54,6 +54,8 @@ bool CGqlModel::SetGqlQuery(QString query, QVariantMap headers)
 
 		QNetworkReply* replyPtr = accessManager->post(networkRequest, query.toUtf8());
 		if (replyPtr != nullptr){
+			replyPtr->setProperty("requestBody", query.toUtf8());
+			
 			replyPtr->ignoreSslErrors();
 			connect(replyPtr, &QNetworkReply::finished, this, &CGqlModel::replyFinished);
 			connect(replyPtr, &QNetworkReply::errorOccurred, this, &CGqlModel::errorOccurred);
