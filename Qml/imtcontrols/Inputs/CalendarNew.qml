@@ -257,6 +257,84 @@ Rectangle {
 		}
 	}
 
+	function setDate(date_){
+		let year = date_.getFullYear();
+		let month = date_.getMonth();
+		let day = date_.getDate()
+
+		goToMonth(month + 1, year);
+		calendar.selectedDay = day
+		calendar.selectedMonth = month;
+		calendar.selectedYear = year;
+
+		calendar.selectedDateExist = true;
+		calendar.endDateExist = false;
+
+		calendar.acceptFunction();
+	}
+
+	function goToMonth(month, year){
+		//Numbers the months of the year starting with 1
+		if(month < 1){
+			month = 1
+		}
+		if(month > 12){
+			month = 12
+		}
+
+		calendar.selectedIndexMonth = month - 1;
+		calendar.selectedIndexYear = year;
+		calendar.fillMonthModel(calendar.selectedIndexMonth,calendar.selectedIndexYear);
+	}
+
+	function acceptFunction(){
+		let dateStart;
+		let dateFinish;
+		if((!calendar.selectedDateExist) && (!calendar.endDateExist))
+		{
+			dateStart = new Date();
+			dateFinish = new Date();
+		}
+		else if (calendar.selectedDateExist && (!calendar.endDateExist))
+		{
+			dateStart = new Date(calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay);
+			dateFinish = new Date(calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay);
+
+		}
+		else if((!calendar.selectedDateExist) && calendar.endDateExist)
+		{
+			dateStart = new Date(calendar.endYear, calendar.endMonth, calendar.endDay);
+			dateFinish = new Date(calendar.endYear, calendar.endMonth, calendar.endDay);
+		}
+		else
+		{
+			dateStart = new Date(calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay);
+			dateFinish = new Date(calendar.endYear, calendar.endMonth, calendar.endDay);
+		}
+
+		if(dateStart > dateFinish)
+		{
+			let dateTemp;
+
+			dateTemp = dateStart;
+			dateStart = dateFinish;
+			dateFinish = dateTemp;
+
+		}
+
+		//ВЫХОДНЫЕ ДАННЫЕ
+		calendar.dateStart = dateStart;
+		calendar.dateFinish = dateFinish;
+		calendar.dateStartStr = calendar.getDateStr(calendar.dateStart);
+		calendar.dateFinishStr = calendar.getDateStr(calendar.dateFinish);
+
+		//console.log("__________CALENDAR:______");
+		//console.log(calendar.format(calendar.dateStart.getDate()) + "." + calendar.format(calendar.dateStart.getMonth() + 1) + "." + calendar.dateStart.getFullYear());
+		//console.log(calendar.format(calendar.dateFinish.getDate()) + "." + calendar.format(calendar.dateFinish.getMonth() + 1) + "." + calendar.dateFinish.getFullYear());
+		//console.log(calendar.getDateStr(calendar.dateStart));
+		//console.log(calendar.getDateStr(calendar.dateFinish));
+	}
+
 	function close(){
 		if(calendar.root){
 			calendar.root.closeDialog();
@@ -1005,180 +1083,7 @@ Rectangle {
 					boundsBehavior: Flickable.StopAtBounds;
 
 					model: modelData.DayModel;
-					delegate: Rectangle{
-						id: dayDelegate;
-
-						width: grid.cellWidth;
-						height: grid.cellHeight;
-						color: calendar.cellColor;
-
-						property bool isSelectedDate:
-							(modelData.Day === calendar.selectedDay &&
-							 modelData.Month === calendar.selectedMonth &&
-							 modelData.Year === calendar.selectedYear) ? true : false;
-						property bool isEndDate:
-
-							(modelData.Day === calendar.endDay &&
-							 modelData.Month === calendar.endMonth &&
-							 modelData.Year === calendar.endYear) ? true : false;
-
-
-						property bool isToday: modelData.Day === calendar.todayDay && modelData.Month === calendar.todayMonth && modelData.Year === calendar.todayYear;
-
-						property real modelDay: modelData.Day;
-						property real modelMonth: modelData.Month;
-						property real modelYear: modelData.Year;
-
-						property bool isMidlleDateLR: (calendar.selectedDateExist
-													   && calendar.endDateExist
-													   && calendar.moreThanDate(modelData.Year, modelData.Month, modelData.Day, calendar.selectedYear,calendar.selectedMonth,calendar.selectedDay)
-													   && calendar.lessThanDate(modelData.Year, modelData.Month, modelData.Day, calendar.endYear,calendar.endMonth,calendar.endDay)
-													   ) ? true : false;
-
-
-
-
-						Rectangle {
-							id: circle;
-
-							anchors.fill: parent;
-
-							color: (dayDelegate.isSelectedDate || (dayDelegate.isEndDate && calendar.endDateExist)) ?
-									   calendar.selectColor : " transparent";
-							radius:  calendar.height/7;
-							border.color: calendar.mainColor;
-							border.width: (dayDelegate.isToday && calendar.canShowToday) ? 2 :0;
-
-
-							Rectangle {
-								id: rectangleLeft;
-
-								anchors.verticalCenter: parent.verticalCenter;
-								anchors.left: parent.left;
-
-								height: parent.height;
-								width: parent.width/2;
-								color: (dayDelegate.isMidlleDateLR || (dayDelegate.isEndDate && calendar.endDateExist))?
-										   calendar.selectColor : "transparent";
-
-
-							}
-
-							Rectangle {
-								id: rectangleRight;
-
-								anchors.right: parent.right;
-								anchors.verticalCenter: parent.verticalCenter;
-
-								height: parent.height;
-								width: parent.width/2;
-								color: (dayDelegate.isMidlleDateLR || (dayDelegate.isSelectedDate && calendar.endDateExist))?
-										   calendar.selectColor : "transparent";
-
-							}
-
-						}
-
-						Text{
-							anchors.centerIn: parent;
-
-							font.family: Style.fontFamily;
-							font.pixelSize: calendar.fontSize_cell;
-							color: calendar.fontColor_cell;
-							opacity: modelData.CurrMonth ? 1: 0.5;
-
-							text: modelData.Day;
-						}
-
-						MouseArea {
-							anchors.fill:parent;
-
-							visible: !calendar.readOnly
-
-							onClicked:{
-
-								if(!calendar.multiSelection)
-								{
-									calendar.selectedDateExist = true;
-
-									calendar.selectedDay = dayDelegate.modelDay;
-									calendar.selectedMonth = dayDelegate.modelMonth;
-									calendar.selectedYear = dayDelegate.modelYear;
-								}
-								else
-								{
-									if (!calendar.selectedDateExist){
-
-										calendar.selectedDateExist = true;
-
-										calendar.selectedDay = dayDelegate.modelDay;
-										calendar.selectedMonth = dayDelegate.modelMonth;
-										calendar.selectedYear = dayDelegate.modelYear;
-
-
-									} else if(!calendar.endDateExist)
-									{
-
-										if (calendar.moreThanDate(dayDelegate.modelYear, dayDelegate.modelMonth, dayDelegate.modelDay,
-																  calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay))
-
-										{
-											calendar.endDateExist = true;
-
-											calendar.endDay = dayDelegate.modelDay;
-											calendar.endMonth = dayDelegate.modelMonth;
-											calendar.endYear = dayDelegate.modelYear;
-
-										} else if (calendar.lessThanDate(dayDelegate.modelYear, dayDelegate.modelMonth, dayDelegate.modelDay,
-																		 calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay))
-
-										{
-											calendar.endDateExist = true;
-
-											let year;
-											let month;
-											let day;
-
-											year = calendar.selectedYear;
-											month =  calendar.selectedMonth;
-											day = calendar.selectedDay;
-
-											calendar.selectedYear = dayDelegate.modelYear;
-											calendar.selectedMonth = dayDelegate.modelMonth;
-											calendar.selectedDay = dayDelegate.modelDay;
-
-											calendar.endYear = year;
-											calendar.endMonth = month;
-											calendar.endDay = day;
-
-
-										} else {
-
-											calendar.selectedDateExist = true;
-
-											calendar.selectedDay = dayDelegate.modelDay;
-											calendar.selectedMonth = dayDelegate.modelMonth;
-											calendar.selectedYear = dayDelegate.modelYear;
-
-										}
-
-									} else
-
-									{
-										calendar.selectedDateExist = true;
-										calendar.endDateExist = false;
-
-										calendar.selectedDay = dayDelegate.modelDay;
-										calendar.selectedMonth = dayDelegate.modelMonth;
-										calendar.selectedYear = dayDelegate.modelYear;
-
-									}
-
-								}
-							}
-
-						}
-					}//gridDelegate
+					delegate: calendar.dayCellDelegate;
 				}//grid
 			}
 		}
@@ -1205,51 +1110,7 @@ Rectangle {
 				enabled: !calendar.readOnly
 
 				onClicked:{
-					let dateStart;
-					let dateFinish;
-					if((!calendar.selectedDateExist) && (!calendar.endDateExist))
-					{
-						dateStart = new Date();
-						dateFinish = new Date();
-					}
-					else if (calendar.selectedDateExist && (!calendar.endDateExist))
-					{
-						dateStart = new Date(calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay);
-						dateFinish = new Date(calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay);
-
-					}
-					else if((!calendar.selectedDateExist) && calendar.endDateExist)
-					{
-						dateStart = new Date(calendar.endYear, calendar.endMonth, calendar.endDay);
-						dateFinish = new Date(calendar.endYear, calendar.endMonth, calendar.endDay);
-					}
-					else
-					{
-						dateStart = new Date(calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay);
-						dateFinish = new Date(calendar.endYear, calendar.endMonth, calendar.endDay);
-					}
-
-					if(dateStart > dateFinish)
-					{
-						let dateTemp;
-
-						dateTemp = dateStart;
-						dateStart = dateFinish;
-						dateFinish = dateTemp;
-
-					}
-
-					//ВЫХОДНЫЕ ДАННЫЕ
-					calendar.dateStart = dateStart;
-					calendar.dateFinish = dateFinish;
-					calendar.dateStartStr = calendar.getDateStr(calendar.dateStart);
-					calendar.dateFinishStr = calendar.getDateStr(calendar.dateFinish);
-
-					//console.log("__________CALENDAR:______");
-					//console.log(calendar.format(calendar.dateStart.getDate()) + "." + calendar.format(calendar.dateStart.getMonth() + 1) + "." + calendar.dateStart.getFullYear());
-					//console.log(calendar.format(calendar.dateFinish.getDate()) + "." + calendar.format(calendar.dateFinish.getMonth() + 1) + "." + calendar.dateFinish.getFullYear());
-					//console.log(calendar.getDateStr(calendar.dateStart));
-					//console.log(calendar.getDateStr(calendar.dateFinish));
+					calendar.acceptFunction();
 
 					calendar.accepted();
 
@@ -1379,7 +1240,9 @@ Rectangle {
 	Component{
 		id: dayCellComp;
 
-		Rectangle{}
+		CalendarCellTextDelegate{
+			calendarItem: calendar;
+		}
 
 	}
 
