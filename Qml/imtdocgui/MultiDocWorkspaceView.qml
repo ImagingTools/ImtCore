@@ -17,12 +17,17 @@ Item {
 
 		function onDocumentSaved(documentId){
 			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId);
-			getVisualStatusInfoRequest.send({"m_objectId": documentId, "m_typeId": typeId})
+			objectVisualStatusInput.m_objectId = documentId
+			objectVisualStatusInput.m_typeId = typeId
+			getVisualStatusInfoRequest.send(objectVisualStatusInput)
 		}
 
 		function onDocumentAdded(documentId){
 			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId);
-			getVisualStatusInfoRequest.send({"m_objectId": documentId, "m_typeId": typeId})
+			objectVisualStatusInput.m_objectId = documentId
+			objectVisualStatusInput.m_typeId = typeId
+			getVisualStatusInfoRequest.send(objectVisualStatusInput)
+			
 			let documentData = workspaceView.documentManager.getDocumentDataById(documentId);
 
 			let name = documentData.documentName;
@@ -136,13 +141,13 @@ Item {
 		}
 	}
 
+	ObjectVisualStatusInput {
+		id: objectVisualStatusInput;
+	}
+	
 	GqlSdlRequestSender {
 		id: getVisualStatusInfoRequest;
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectVisualStatus;
-		inputObjectComp: Component {
-			ObjectVisualStatusInput {
-			}
-		}
 
 		sdlObjectComp: Component {
 			VisualStatus {

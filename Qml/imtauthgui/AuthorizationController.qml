@@ -217,7 +217,10 @@ QtObject {
 	}
 	
 	function changePassword(userId, oldPassword, newPassword){
-		changePasswordGqlSender.send({"m_login":userId,"m_oldPassword":oldPassword,"m_newPassword":newPassword});
+		changePasswordInput.m_login = userId;
+		changePasswordInput.m_oldPassword = oldPassword;
+		changePasswordInput.m_newPassword = newPassword;
+		changePasswordGqlSender.send(changePasswordInput);
 	}
 	
 	function registerUser(userData){
@@ -243,14 +246,10 @@ QtObject {
 		}
 	}
 	
+	property ChangePasswordInput changePasswordInput : ChangePasswordInput {}
 	property GqlSdlRequestSender changePasswordGqlSender: GqlSdlRequestSender {
 		id: changePasswordRequestSender;
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_changePassword;
-		
-		inputObjectComp: Component {
-			ChangePasswordInput {
-			}
-		}
 		
 		sdlObjectComp: Component {
 			ChangePasswordPayload {

@@ -88,7 +88,7 @@ GqlRequest {
 		return {};
 	}
 
-	function send(inputObj){
+	function send(sdlInputObject){
 		if (gqlCommandId == "" || gqlCommandId === undefined || gqlCommandId == null ){
 			console.error("Unable to send request. Error: GraphQL command-ID is invalid.");
 			return;
@@ -110,34 +110,24 @@ GqlRequest {
 		}
 
 		var query = Gql.GqlRequest(type, root.gqlCommandId);
-
-		if (inputObjectComp != null){
+		
+		let gqlObject = Gql.GqlObject("input")
+		if (sdlInputObject){
+			gqlObject.fromObject(sdlInputObject)
+			query.AddParam(gqlObject);
+		}
+		else if (inputObjectComp != null){
 			let inputObject = inputObjectComp.createObject(root);
-			if (inputObj){
-				let inputKeys = Object.keys(inputObj);
-				for (let i = 0; i < inputKeys.length; i++){
-					inputObject[inputKeys[i]] = inputObj[inputKeys[i]]
-				}
-			}
-			let gqlObject = Gql.GqlObject("input")
 			gqlObject.fromObject(inputObject)
 			query.AddParam(gqlObject);
-
-			root.setGqlQuery(query.GetQuery(), root.getHeaders());
 
 			inputObject.destroy()
 		}
 		else{
-			if (inputObj){
-				let inputKeys = Object.keys(inputObj);
-				for (let i = 0; i < inputKeys.length; i++){
-					addInputParam(inputKeys[i], inputObj[inputKeys[i]]);
-				}
-			}
-
 			createQueryParams(query);
-			root.setGqlQuery(query.GetQuery(), root.getHeaders());
 		}
+		
+		root.setGqlQuery(query.GetQuery(), root.getHeaders());
 	}
 
 	function createQueryParams(query){

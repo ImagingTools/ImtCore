@@ -21,12 +21,20 @@ Rectangle {
 
 		function onDocumentSaved(documentId){
 			let typeId = root.documentManager.getDocumentTypeId(documentId);
-			getVisualStatusInfoRequest.send({"m_objectId": documentId, "m_typeId": typeId})
+			
+			objectVisualStatusInput.m_objectId = documentId
+			objectVisualStatusInput.m_typeId = typeId
+			
+			getVisualStatusInfoRequest.send(objectVisualStatusInput)
 		}
 
 		function onDocumentAdded(documentId){
 			let typeId = root.documentManager.getDocumentTypeId(documentId);
-			getVisualStatusInfoRequest.send({"m_objectId": documentId, "m_typeId": typeId})
+			
+			objectVisualStatusInput.m_objectId = documentId
+			objectVisualStatusInput.m_typeId = typeId
+			
+			getVisualStatusInfoRequest.send(objectVisualStatusInput)
 
 			let documentData = root.documentManager.getDocumentDataById(documentId);
 			if (documentData){
@@ -128,6 +136,7 @@ Rectangle {
 		function setHeaderName(id, name){
 			for (let i = 0; i < headersModel.count; i++){
 				if (headersModel.get(i).Id === id){
+					console.log("setHeaderName", id, name);
 					headersModel.setProperty(i, "Name", name)
 					return;
 				}
@@ -143,15 +152,14 @@ Rectangle {
 			return "";
 		}
 	}
+	
+	ObjectVisualStatusInput {
+		id: objectVisualStatusInput;
+	}
 
 	GqlSdlRequestSender {
 		id: getVisualStatusInfoRequest;
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectVisualStatus;
-		inputObjectComp: Component {
-			ObjectVisualStatusInput {
-			}
-		}
-
 		sdlObjectComp: Component {
 			VisualStatus {
 				onFinished: {
@@ -166,7 +174,6 @@ Rectangle {
 		}
 
 		function onError(message, type){
-
 		}
 	}
 
