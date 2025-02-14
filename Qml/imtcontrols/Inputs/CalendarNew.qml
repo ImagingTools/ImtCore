@@ -20,8 +20,13 @@ Rectangle {
 	property bool centered: true;
 	property Item root: null;
 
-	property bool simpleCalendar: true;
-	property bool interactive: true;
+	property bool multiSelection: false;
+	property bool canFlick: false;
+	property bool hasTopMenu: true;
+	property bool hasButtonMenu: true;
+	property bool gridOnly: false;
+	property bool canShowToday: true;
+	property bool readOnly: false;
 
 	property int startYear: 1900;
 	property int lastYear: 2100;
@@ -51,7 +56,7 @@ Rectangle {
 	property string maxMonthName:"";
 	property int listViewContentX: 0;
 
-	property var monthNames: monthNamesRus;
+	property var monthNames: monthNamesEng;
 
 	property var monthNamesEng:
 		[
@@ -85,7 +90,7 @@ Rectangle {
 		qsTr("Декабрь")
 	];
 
-	property var dayOfWeek: dayOfWeekRus;
+	property var dayOfWeek: dayOfWeekEng;
 
 	property var dayOfWeekRus:
 		[
@@ -127,11 +132,13 @@ Rectangle {
 	property int buttonWidth: 100;
 	property int buttonHeight: 35;
 	property int buttonRadius: 6;
+	property int weekDayListHeight: 50;
 	property alias leftImageSource: leftButton.iconSource;
 	property alias rightImageSource: rightButton.iconSource;
-	property string okButtonText: "Ок";
-	property string cancelButtonText: "Отмена";
-	property string todayButtonText: "Сегодня";
+	property int bodyWidth: mainRec.width;
+	property string okButtonText: qsTr("Ok");
+	property string cancelButtonText: qsTr("Cancel");
+	property string todayButtonText: qsTr("Today");
 
 	//comboBox
 	property bool hasMonthCombo: true;
@@ -157,9 +164,10 @@ Rectangle {
 	property string dateStr: dateStartStr;
 	//OUTPUT
 
-	property TreeItemModel monthTreeModel: TreeItemModel{};
-	property TreeItemModel monthTreeModel_temp1: TreeItemModel{};
-	property TreeItemModel monthTreeModel_temp2: TreeItemModel{};
+	property var calendarModel: [];
+
+	property Component weekDayCellDelegate : weekDayCellComp;
+	property Component dayCellDelegate: dayCellComp;
 
 	signal accepted();
 	signal canceled();
@@ -302,6 +310,8 @@ Rectangle {
 		calendar.maxMonthName = maxVal;
 	}
 
+
+
 	function fillMonthComboModel(){
 		if(calendar.hasMonthCombo){
 			for(let i = 0; i < calendar.monthNames.length; i++){
@@ -369,79 +379,70 @@ Rectangle {
 		return retval;
 	}
 
+
 	function fillMonthModel(month, year){
 
 		//console.log("_________FILL_MONTH_MODEL____________");
 
 		listview.canFillModel = false;
 
-		calendar.monthTreeModel.clear();
-
 		let prevMonth = month == 0 ? 11 : month - 1;
 		let prevMonth_year = month == 0 ? year -1 : year;
 
-		calendar.fillDayModel(dayTreeModelPrev,prevMonth, prevMonth_year);
-		calendar.fillDayModel(dayTreeModel, month, year);
+		let daysPrev = calendar.fillDayModel(prevMonth, prevMonth_year);
+		let daysCurrent = calendar.fillDayModel(month, year);
 
 		let nextMonth = month == 11 ? 0 : month + 1;
 		let nextMonth_year = month == 11 ? year + 1 : year;
 
-		calendar.fillDayModel(dayTreeModelNext, nextMonth, nextMonth_year);
+		let daysNext = calendar.fillDayModel(nextMonth, nextMonth_year);
 
-		//calendar.monthTreeModel.clear();
-
-		let modelToFill;
-		let isFirstTempModel = true;
-		if(!calendar.monthTreeModel_temp1.getItemsCount()){
-			modelToFill = calendar.monthTreeModel_temp1;
-			isFirstTempModel = true;
+		let prevMonthObj = {
+			DayModel: daysPrev,
+			MonthName: calendar.monthName(prevMonth),
+			Month: prevMonth,
+			Year: prevMonth_year,
 		}
-		else{
-			modelToFill = calendar.monthTreeModel_temp2;
-			isFirstTempModel = false;
+		let currentMonthObj = {
+			DayModel: daysCurrent,
+			MonthName: calendar.monthName(month),
+			Month: month,
+			Year: year,
 		}
-
-		let index = modelToFill.insertNewItem();
-		modelToFill.setData("DayModel", dayTreeModelPrev, index);
-		modelToFill.setData("MonthName", calendar.monthName(prevMonth), index);
-		modelToFill.setData("Month", prevMonth, index);
-		modelToFill.setData("Year", prevMonth_year , index);
-
-		index = modelToFill.insertNewItem();
-		modelToFill.setData("DayModel", dayTreeModel, index);
-		modelToFill.setData("MonthName", calendar.monthName(month), index);
-		modelToFill.setData("Month", month, index);
-		modelToFill.setData("Year", year, index);
-
-		index = modelToFill.insertNewItem();
-		modelToFill.setData("DayModel", dayTreeModelNext, index);
-		modelToFill.setData("MonthName", calendar.monthName(nextMonth), index);
-		modelToFill.setData("Month", nextMonth, index);
-		modelToFill.setData("Year", nextMonth_year , index);
-
-
-		modelToFill.setIsArray(true);
-
-		calendar.monthTreeModel = modelToFill;
-		if(isFirstTempModel){
-			calendar.monthTreeModel_temp2.clear();
-		}
-		else{
-			calendar.monthTreeModel_temp1.clear();
+		let nextMonthObj = {
+			DayModel: daysNext,
+			MonthName: calendar.monthName(nextMonth),
+			Month: nextMonth,
+			Year: nextMonth_year,
 		}
 
+		let monthModel = [];
 
-		//console.log("____________MonthModel______________");
-		//        console.log(calendar.monthTreeModel.toJson());
+		if(calendar.canFlick){
+			monthModel = [
+						prevMonthObj,
+						currentMonthObj,
+						nextMonthObj,
+					]
 
+		}
+		else {
+			monthModel = [
+						currentMonthObj
+					]
+		}
 
+		listview.model = monthModel;
 
-		listview.positionViewAtIndex(1,ListView.Beginning);
+		calendar.calendarModel = monthModel;
+
+		if(calendar.canFlick){
+			listview.positionViewAtIndex(1,ListView.Beginning);//!!!
+		}
+
 		calendar.listViewContentX = listview.contentX;
 
-		//calendar.selectedIndexMonth = calendar.monthTreeModel.getData("Month",1);
 		calendar.selectedMonthName = calendar.monthName(calendar.selectedIndexMonth);
-		//calendar.selectedIndexYear = calendar.monthTreeModel.getData("Year",1);
 
 		listview.canFillModel = true;
 
@@ -449,8 +450,8 @@ Rectangle {
 
 
 
-	function fillDayModel(model, month, year){
-		model.clear();
+	function fillDayModel(month, year){
+		let daysModel = [];
 
 		let date  = new Date(year, month, 1);
 		let firstWeekDay = calendar.weekDayNumber(date.getDay());
@@ -459,43 +460,53 @@ Rectangle {
 		let prevMonth_year = month == 0 ? year -1 : year;
 		let prevMonthLastDay = calendar.getLastDayOfMonth(prevMonth, prevMonth_year);
 
+		let index = -1;
 
 		for(let i = prevMonthLastDay - (firstWeekDay - 1 -1) ; i <= prevMonthLastDay; i++){
-			let index = model.insertNewItem();
-			model.setData("Id", index, index);
-			model.setData("Day",i,index);
-			model.setData("Month",prevMonth,index);
-			model.setData("Year",prevMonth_year,index);
-			model.setData("CurrMonth",false,index);
+			index++;
+			let day = {};
+			day.Id = index;
+			day.Day = i;
+			day.Month = prevMonth;
+			day.Year = prevMonth_year;
+			day.CurrMonth = false;
+
+			daysModel.push(day);
 
 		}
 
 		let lastDay = calendar.getLastDayOfMonth(month, year);
 		for(let i = 1; i <= lastDay; i++){
-			let index = model.insertNewItem();
-			model.setData("Id", index, index);
-			model.setData("Day",i,index);
-			model.setData("Month",month,index);
-			model.setData("Year",year,index);
-			model.setData("CurrMonth",true,index);
+			index++;
+			let day = {};
+			day.Id = index;
+			day.Day = i;
+			day.Month = month;
+			day.Year = year;
+			day.CurrMonth = true;
+
+			daysModel.push(day);
 
 		}
 
 		let nextMonth = month == 11 ? 0 : month + 1;
 		let nextMonth_year = month == 11 ? year + 1 : year;
 
-		let count = model.getItemsCount();
+		let count = daysModel.length;
 
 		for(let i = 1; i <= (42 - count); i++){
-			let index = model.insertNewItem();
-			model.setData("Id", index, index);
-			model.setData("Day",i,index);
-			model.setData("Month",nextMonth,index);
-			model.setData("Year",nextMonth_year,index);
-			model.setData("CurrMonth",false,index);
+			index++;
+			let day = {};
+			day.Id = index;
+			day.Day = i;
+			day.Month = nextMonth;
+			day.Year = nextMonth_year;
+			day.CurrMonth = false;
+
+			daysModel.push(day);
 
 		}
-
+		return daysModel;
 	}
 
 	function getLastDayOfMonth(month,year){
@@ -539,7 +550,6 @@ Rectangle {
 
 		}
 
-
 		return (lastDay);
 
 	}//
@@ -571,19 +581,6 @@ Rectangle {
 		id: yearComboModel;
 	}
 
-
-	TreeItemModel {
-		id: dayTreeModel;
-	}
-
-	TreeItemModel {
-		id: dayTreeModelPrev;
-	}
-
-	TreeItemModel {
-		id: dayTreeModelNext;
-	}
-
 	MouseArea{
 		anchors.fill: parent;
 		hoverEnabled: true;
@@ -602,7 +599,8 @@ Rectangle {
 		id: dropShadow;
 
 		anchors.fill: forShadowRec;
-		visible: true;
+
+		visible: forShadowRec.visible;
 		horizontalOffset: 2;
 		verticalOffset: 2;
 
@@ -618,6 +616,7 @@ Rectangle {
 		anchors.fill: parent;
 		radius: parent.radius;
 		color: parent.color;
+		visible: !calendar.gridOnly;
 	}
 
 	ListModel{
@@ -632,17 +631,26 @@ Rectangle {
 		anchors.top: parent.top;
 		anchors.bottom: parent.bottom;
 
-		anchors.leftMargin: 10;
-		anchors.rightMargin: 10;
-		anchors.topMargin: 10;
-		anchors.bottomMargin: 10;
+		anchors.leftMargin: mainMargin;
+		anchors.rightMargin: mainMargin;
+		anchors.topMargin: mainMargin;
+		anchors.bottomMargin: mainMargin;
+
+		color: calendar.color;
+
+		property int mainMargin: calendar.gridOnly ? 0 : 10;
 
 		Rectangle{
 			id: topPanelObj;
+
 			width: parent.width;
-			height: parent.height/7;
+			height: visible ? parent.height/7 : 1;
+
 			color: calendar.topPanelColor;
 			radius: calendar.radius;
+			visible: !calendar.gridOnly;
+			clip: true;
+
 			Item{
 				id: topPanelTextItem;
 
@@ -684,6 +692,7 @@ Rectangle {
 						font.bold: topPanelTextMonth.font.bold;
 						text: calendar.maxMonthName;
 
+
 					}
 
 					ComboBox {
@@ -694,7 +703,7 @@ Rectangle {
 						width: forSizeTextMonth.width;
 						height: parent.height;
 
-						visible: calendar.hasMonthCombo;
+						visible: calendar.hasMonthCombo && !calendar.readOnly;
 						enabled: visible;
 						model: monthComboModel;
 
@@ -710,7 +719,7 @@ Rectangle {
 						isColor: true;
 						contentLeftMargin: 0;
 
-						//titleTxtColor: "transparent";
+						fontColorTitle: "transparent";
 						//compTextCentered: true;
 						shownItemsCount: 12;
 						//imageVisible: false;
@@ -757,7 +766,7 @@ Rectangle {
 						width: parent.width;
 						height: parent.height;
 
-						visible: calendar.hasYearCombo;
+						visible: calendar.hasYearCombo && !calendar.readOnly;
 						enabled: visible;
 						model: yearComboModel;
 
@@ -773,7 +782,7 @@ Rectangle {
 						isColor:true
 						contentLeftMargin: 0;
 
-						//titleTxtColor: "transparent";
+						fontColorTitle: "transparent";
 						//compTextCentered: true;
 						shownItemsCount: calendar.shownItemsCountCombo;
 						//imageVisible: false;
@@ -802,6 +811,9 @@ Rectangle {
 
 				width: 25;
 				height: width;
+
+				enabled: !calendar.readOnly;
+
 				decorator: Component{IconButtonDecorator{
 						icon.width: !baseElement ? 0 : baseElement.width - 3;
 						icon.height: !baseElement ? 0 : baseElement.height - 3;
@@ -811,8 +823,7 @@ Rectangle {
 
 				onClicked: {
 					listview.decrease();
-					listview.canSetIndexes = false;
-					listview.contentX -= listview.width;
+					calendar.fillMonthModel(calendar.selectedIndexMonth,calendar.selectedIndexYear)
 				}
 			}
 
@@ -826,6 +837,8 @@ Rectangle {
 				width: 25;
 				height: width;
 
+				enabled: !calendar.readOnly;
+
 				decorator: Component{IconButtonDecorator{
 						icon.width: !baseElement ? 0 : baseElement.width - 3;
 						icon.height: !baseElement ? 0 : baseElement.height - 3;
@@ -835,12 +848,10 @@ Rectangle {
 
 				onClicked: {
 					listview.increase();
-					listview.canSetIndexes = false;
-					listview.contentX += listview.width;
+					calendar.fillMonthModel(calendar.selectedIndexMonth,calendar.selectedIndexYear)
+
 				}
 			}
-
-
 		}
 
 
@@ -850,11 +861,9 @@ Rectangle {
 			anchors.top: topPanelObj.bottom;
 			anchors.left: parent.left;
 			anchors.right: parent.right;
-			anchors.bottom: okButton.top;
-			anchors.bottomMargin: Style.size_mainMargin;
+			anchors.bottom: buttonsContainer.top;
 
 			clip: true;
-			interactive: true;//calendar.interactive;
 
 			snapMode: ListView.SnapOneItem;
 			orientation: ListView.Horizontal;
@@ -961,15 +970,12 @@ Rectangle {
 				topPanelTextYear.text = date.getFullYear();
 			}
 
-			model: calendar.monthTreeModel;
 			delegate: Rectangle{
 				id: monthRec;
 
 				width: listview.width;
 				height: listview.height;
 				radius: calendar.radius;
-				property TreeItemModel emptyModel: TreeItemModel{};
-				property TreeItemModel dayModel:  model.DayModel !== undefined ? model.DayModel: emptyModel;
 
 				ListView{
 					id: dayOfWeekList;
@@ -978,28 +984,13 @@ Rectangle {
 					anchors.left: parent.left;
 					anchors.right: parent.right;
 
-					height: 50;
+					height: calendar.weekDayListHeight;
 					orientation: ListView.Horizontal;
 					boundsBehavior: Flickable.StopAtBounds;
 					clip: true;
 					model: dayOfWeekListModel;
-					delegate: Rectangle{
 
-						width: grid.cellWidth;
-						height: dayOfWeekList.height;
-						color: calendar.cellColor;
-
-						Text{
-							anchors.centerIn: parent;
-
-							font.family: Style.fontFamily;
-							font.pixelSize: calendar.fontSize_cell;
-							font.bold: true;
-							color: calendar.fontColor_cell;
-
-							text: model.name;
-						}
-					}
+					delegate: calendar.weekDayCellDelegate;
 				}
 
 				GridView{
@@ -1009,11 +1000,11 @@ Rectangle {
 					anchors.bottom: parent.bottom;
 
 					width: parent.width;
-					cellWidth: grid.width/7;
-					cellHeight: grid.height/6;
+					cellWidth: Math.trunc(grid.width/7);
+					cellHeight: Math.trunc(grid.height/6);
 					boundsBehavior: Flickable.StopAtBounds;
 
-					model: monthRec.dayModel;
+					model: modelData.DayModel;
 					delegate: Rectangle{
 						id: dayDelegate;
 
@@ -1022,28 +1013,26 @@ Rectangle {
 						color: calendar.cellColor;
 
 						property bool isSelectedDate:
-							(model.Day === calendar.selectedDay &&
-							 model.Month === calendar.selectedMonth &&
-							 model.Year === calendar.selectedYear) ? true : false;
+							(modelData.Day === calendar.selectedDay &&
+							 modelData.Month === calendar.selectedMonth &&
+							 modelData.Year === calendar.selectedYear) ? true : false;
 						property bool isEndDate:
 
-							(model.Day === calendar.endDay &&
-							 model.Month === calendar.endMonth &&
-							 model.Year === calendar.endYear) ? true : false;
+							(modelData.Day === calendar.endDay &&
+							 modelData.Month === calendar.endMonth &&
+							 modelData.Year === calendar.endYear) ? true : false;
 
 
-						//property bool isToday: model.Day === calendar.today.getDate() && model.Month === calendar.today.getMonth() && model.Year === calendar.today.getFullYear();
-						property bool isToday: model.Day === calendar.todayDay && model.Month === calendar.todayMonth && model.Year === calendar.todayYear;
+						property bool isToday: modelData.Day === calendar.todayDay && modelData.Month === calendar.todayMonth && modelData.Year === calendar.todayYear;
 
-
-						property real modelDay: model.Day;
-						property real modelMonth: model.Month;
-						property real modelYear: model.Year;
+						property real modelDay: modelData.Day;
+						property real modelMonth: modelData.Month;
+						property real modelYear: modelData.Year;
 
 						property bool isMidlleDateLR: (calendar.selectedDateExist
 													   && calendar.endDateExist
-													   && calendar.moreThanDate(model.Year, model.Month, model.Day, calendar.selectedYear,calendar.selectedMonth,calendar.selectedDay)
-													   && calendar.lessThanDate(model.Year, model.Month, model.Day, calendar.endYear,calendar.endMonth,calendar.endDay)
+													   && calendar.moreThanDate(modelData.Year, modelData.Month, modelData.Day, calendar.selectedYear,calendar.selectedMonth,calendar.selectedDay)
+													   && calendar.lessThanDate(modelData.Year, modelData.Month, modelData.Day, calendar.endYear,calendar.endMonth,calendar.endDay)
 													   ) ? true : false;
 
 
@@ -1058,7 +1047,7 @@ Rectangle {
 									   calendar.selectColor : " transparent";
 							radius:  calendar.height/7;
 							border.color: calendar.mainColor;
-							border.width: dayDelegate.isToday ? 2 :0;
+							border.width: (dayDelegate.isToday && calendar.canShowToday) ? 2 :0;
 
 
 							Rectangle {
@@ -1096,17 +1085,19 @@ Rectangle {
 							font.family: Style.fontFamily;
 							font.pixelSize: calendar.fontSize_cell;
 							color: calendar.fontColor_cell;
-							opacity: model.CurrMonth ? 1: 0.5;
+							opacity: modelData.CurrMonth ? 1: 0.5;
 
-							text: model.Day;
+							text: modelData.Day;
 						}
 
 						MouseArea {
 							anchors.fill:parent;
 
+							visible: !calendar.readOnly
+
 							onClicked:{
 
-								if(calendar.simpleCalendar)
+								if(!calendar.multiSelection)
 								{
 									calendar.selectedDateExist = true;
 
@@ -1187,123 +1178,139 @@ Rectangle {
 							}
 
 						}
+					}//gridDelegate
+				}//grid
+			}
+		}
+
+		Item{
+			id: buttonsContainer
+
+			anchors.bottom: parent.bottom;
+
+			width: parent.width;
+			height: visible ? okButton.height + Style.size_smallMargin : 1;
+
+			visible: !calendar.gridOnly;
+			clip: true;
+
+			Button {
+				id: okButton;
+
+				anchors.right: parent.right;
+				anchors.bottom: parent.bottom;
+
+				text: calendar.okButtonText;
+
+				enabled: !calendar.readOnly
+
+				onClicked:{
+					let dateStart;
+					let dateFinish;
+					if((!calendar.selectedDateExist) && (!calendar.endDateExist))
+					{
+						dateStart = new Date();
+						dateFinish = new Date();
+					}
+					else if (calendar.selectedDateExist && (!calendar.endDateExist))
+					{
+						dateStart = new Date(calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay);
+						dateFinish = new Date(calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay);
+
+					}
+					else if((!calendar.selectedDateExist) && calendar.endDateExist)
+					{
+						dateStart = new Date(calendar.endYear, calendar.endMonth, calendar.endDay);
+						dateFinish = new Date(calendar.endYear, calendar.endMonth, calendar.endDay);
+					}
+					else
+					{
+						dateStart = new Date(calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay);
+						dateFinish = new Date(calendar.endYear, calendar.endMonth, calendar.endDay);
+					}
+
+					if(dateStart > dateFinish)
+					{
+						let dateTemp;
+
+						dateTemp = dateStart;
+						dateStart = dateFinish;
+						dateFinish = dateTemp;
+
+					}
+
+					//ВЫХОДНЫЕ ДАННЫЕ
+					calendar.dateStart = dateStart;
+					calendar.dateFinish = dateFinish;
+					calendar.dateStartStr = calendar.getDateStr(calendar.dateStart);
+					calendar.dateFinishStr = calendar.getDateStr(calendar.dateFinish);
+
+					//console.log("__________CALENDAR:______");
+					//console.log(calendar.format(calendar.dateStart.getDate()) + "." + calendar.format(calendar.dateStart.getMonth() + 1) + "." + calendar.dateStart.getFullYear());
+					//console.log(calendar.format(calendar.dateFinish.getDate()) + "." + calendar.format(calendar.dateFinish.getMonth() + 1) + "." + calendar.dateFinish.getFullYear());
+					//console.log(calendar.getDateStr(calendar.dateStart));
+					//console.log(calendar.getDateStr(calendar.dateFinish));
+
+					calendar.accepted();
+
+					calendar.close();
+				}
+			}
+
+			Button {
+				id: cancelButton;
+
+				anchors.right: okButton.left;
+				anchors.bottom: parent.bottom;
+				anchors.rightMargin: 10;
+
+				enabled: !calendar.readOnly
+
+				text: calendar.cancelButtonText;
+
+				onClicked:{
+					calendar.canceled();
+					calendar.close();
+				}
+			}
+
+			Button {
+				id: todayButton;
+
+				anchors.left: parent.left;
+				anchors.bottom: parent.bottom;
+
+				text: calendar.todayButtonText;
+
+				enabled: !calendar.readOnly;
+
+				onClicked:{
+					let date = new Date();
+
+					// выбор текущей даты
+					calendar.selectedDay = date.getDate();
+					calendar.selectedDateExist = true;
+					calendar.endDateExist = false;
+
+					let year = date.getFullYear();
+					let month = date.getMonth();
+					if(calendar.selectedYear !== year ||
+							calendar.selectedIndexYear !== year ||
+							calendar.selectedMonth !== month ||
+							calendar.selectedIndexMonth !== month){
+
+						calendar.selectedYear = year;
+						calendar.selectedMonth = month;
+						calendar.selectedIndexYear = year;
+						calendar.selectedIndexMonth = month;
+						calendar.fillMonthModel(month, year);
+
 					}
 
 				}
-
 			}
 
-		}
-
-		Button {
-			id: okButton;
-
-			anchors.right: parent.right;
-			anchors.bottom: parent.bottom;
-
-			text: calendar.okButtonText;
-
-			onClicked:{
-				let dateStart;
-				let dateFinish;
-				if((!calendar.selectedDateExist) && (!calendar.endDateExist))
-				{
-					dateStart = new Date();
-					dateFinish = new Date();
-				}
-				else if (calendar.selectedDateExist && (!calendar.endDateExist))
-				{
-					dateStart = new Date(calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay);
-					dateFinish = new Date(calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay);
-
-				}
-				else if((!calendar.selectedDateExist) && calendar.endDateExist)
-				{
-					dateStart = new Date(calendar.endYear, calendar.endMonth, calendar.endDay);
-					dateFinish = new Date(calendar.endYear, calendar.endMonth, calendar.endDay);
-				}
-				else
-				{
-					dateStart = new Date(calendar.selectedYear, calendar.selectedMonth, calendar.selectedDay);
-					dateFinish = new Date(calendar.endYear, calendar.endMonth, calendar.endDay);
-				}
-
-				if(dateStart > dateFinish)
-				{
-					let dateTemp;
-
-					dateTemp = dateStart;
-					dateStart = dateFinish;
-					dateFinish = dateTemp;
-
-				}
-
-				//ВЫХОДНЫЕ ДАННЫЕ
-				calendar.dateStart = dateStart;
-				calendar.dateFinish = dateFinish;
-				calendar.dateStartStr = calendar.getDateStr(calendar.dateStart);
-				calendar.dateFinishStr = calendar.getDateStr(calendar.dateFinish);
-
-				//console.log("__________CALENDAR:______");
-				//console.log(calendar.format(calendar.dateStart.getDate()) + "." + calendar.format(calendar.dateStart.getMonth() + 1) + "." + calendar.dateStart.getFullYear());
-				//console.log(calendar.format(calendar.dateFinish.getDate()) + "." + calendar.format(calendar.dateFinish.getMonth() + 1) + "." + calendar.dateFinish.getFullYear());
-				//console.log(calendar.getDateStr(calendar.dateStart));
-				//console.log(calendar.getDateStr(calendar.dateFinish));
-
-				calendar.accepted();
-
-				calendar.close();
-			}
-		}
-
-		Button {
-			id: cancelButton;
-
-			anchors.right: okButton.left;
-			anchors.bottom: parent.bottom;
-			anchors.rightMargin: 10;
-
-			text: calendar.cancelButtonText;
-
-			onClicked:{
-				calendar.canceled();
-				calendar.close();
-			}
-		}
-
-		Button {
-			id: todayButton;
-
-			anchors.left: parent.left;
-			anchors.bottom: parent.bottom;
-
-			text: calendar.todayButtonText;
-
-			onClicked:{
-				let date = new Date();
-
-				// выбор текущей даты
-				calendar.selectedDay = date.getDate();
-				calendar.selectedDateExist = true;
-				calendar.endDateExist = false;
-
-				let year = date.getFullYear();
-				let month = date.getMonth();
-				if(calendar.selectedYear !== year ||
-						calendar.selectedIndexYear !== year ||
-						calendar.selectedMonth !== month ||
-						calendar.selectedIndexMonth !== month){
-
-					calendar.selectedYear = year;
-					calendar.selectedMonth = month;
-					calendar.selectedIndexYear = year;
-					calendar.selectedIndexMonth = month;
-					calendar.fillMonthModel(month, year);
-
-				}
-
-			}
-		}
+		}//buttonsContainer
 
 	}
 
@@ -1335,29 +1342,7 @@ Rectangle {
 
 	}
 
-	Rectangle{
-		anchors.fill: parent;
-		color: "#000000";
-		opacity: 0.3;
-		visible: false;//blockingComboMA.visible;
-	}
 
-	MouseArea{
-		id: blockingComboMA;
-
-		anchors.fill: parent;
-		visible: yearComboObj.openST || monthComboObj.openST;
-		enabled: visible;
-		hoverEnabled: true;
-		onClicked: {
-			calendar.root.closeDialog();
-			mouse.accepted = true;
-		}
-		onWheel: {
-			wheel.accepted = true;
-		}
-
-	}
 
 	Shortcut {
 		sequence: "Escape";
@@ -1368,6 +1353,35 @@ Rectangle {
 		}
 	}
 
+	Component{
+		id: weekDayCellComp;
+
+		Rectangle{
+
+			width: calendar.bodyWidth/7;
+			height: calendar.weekDayListHeight;
+
+			color: calendar.cellColor;
+
+			Text{
+				anchors.centerIn: parent;
+
+				font.family: Style.fontFamily;
+				font.pixelSize: calendar.fontSize_cell;
+				font.bold: true;
+				color: calendar.fontColor_cell;
+
+				text: model.name;
+			}
+		}
+	}
+
+	Component{
+		id: dayCellComp;
+
+		Rectangle{}
+
+	}
 
 }
 
