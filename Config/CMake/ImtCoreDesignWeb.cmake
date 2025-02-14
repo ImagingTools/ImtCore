@@ -1,5 +1,6 @@
 function(imt_core_get_root_dir identifier_to_use)
-    set(${identifier_to_use} "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.." PARENT_SCOPE)
+	get_filename_component(root_dir "../.." ABSOLUTE BASE_DIR ${CMAKE_CURRENT_FUNCTION_LIST_DIR})
+	set(${identifier_to_use} "${root_dir}" PARENT_SCOPE)
 endfunction()
 
 function(GenerateDesignTokenWeb DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR DESIGN_TOKEN_ADDITIONAL_DEPS)

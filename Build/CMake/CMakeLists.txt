@@ -29,8 +29,8 @@ imt_core_upgrade_partitura("${CMAKE_CURRENT_LIST_DIR}/../..")
 
 message("ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
 
-if(NOT DEFINED BUILDDIR)
-	set(BUILDDIR "${CMAKE_CURRENT_LIST_DIR}/../../..")
+if(NOT DEFINED IMTCOREDIR_BUILD)
+	set(IMTCOREDIR_BUILD "${CMAKE_CURRENT_LIST_DIR}/../..")
 endif()
 
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
@@ -39,7 +39,7 @@ set (QML_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Qml")
 set (SDL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Sdl")
 set (TESTS_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Tests")
 
-set(AUX_INCLUDE_DIR "${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}/GeneratedFiles")
+set(AUX_INCLUDE_DIR "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles")
 
 set(BUILD_TESTING OFF CACHE BOOL "Configures projects for testing")
 
@@ -93,7 +93,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 #-------- Sdl --------
 if(NOT DEFINED USE_SDL OR USE_SDL)
 	include("${IMTCOREDIR}/Config/CMake/ImtCoreSdlCustomConfig.cmake")
-	ImtCoreAddSdlSearchPath("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}")
+	ImtCoreAddSdlSearchPath("${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}")
 
 	add_subdirectory("${SDL_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbasesdl")
 
