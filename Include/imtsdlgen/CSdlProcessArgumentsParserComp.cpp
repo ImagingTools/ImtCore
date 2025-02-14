@@ -25,6 +25,7 @@ CSdlProcessArgumentsParserComp::CSdlProcessArgumentsParserComp()
 	m_notUseModificators(true),
 	m_qmlEnabled(false),
 	m_cppEnabled(true),
+	m_gqlEnabled(false),
 	m_schemaDependencyModeEnabled(false),
 	m_generatorType(GT_CMAKE),
 	m_autoJoinEnabled(false),
