@@ -384,6 +384,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	if (m_currentInformationViewPtr == nullptr){
 		RightPanel->setVisible(false);
 	}
+
+	m_collectionCommandsToolBar.RegisterCommands(TopFrame, &m_commands);
 }
 
 
@@ -416,6 +418,12 @@ void CObjectCollectionViewComp::OnGuiRetranslate()
 	if (IsModelAttached()){
 		UpdateGui(istd::IChangeable::GetAnyChange());
 	}
+}
+
+
+void CObjectCollectionViewComp::OnGuiDesignChanged()
+{
+	BaseClass::OnGuiDesignChanged();
 }
 
 

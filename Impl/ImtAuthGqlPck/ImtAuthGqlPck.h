@@ -30,7 +30,7 @@
 #include <imtauthgql/CProfileControllerComp.h>
 #include <imtauthgql/CRoleMetaInfoControllerProxyComp.h>
 #include <imtauthgql/CRemoteJwtSessionControllerComp.h>
-#include <imtauthgql/CGqlJwtSessionControllerComp.h>.h>
+#include <imtauthgql/CGqlJwtSessionControllerComp.h>
 
 
 /**

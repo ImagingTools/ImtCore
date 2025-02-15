@@ -3,6 +3,12 @@ QAbstractItemView
 	outline: 0;
 }
 
+QWidget#TopFrame
+{
+	background: ${Active.Background2};
+}
+
+
 QTreeView#ItemList 
 {
 	background: ${Active.Base};

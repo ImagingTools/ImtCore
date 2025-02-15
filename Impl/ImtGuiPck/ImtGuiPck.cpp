@@ -192,6 +192,11 @@ I_EXPORT_COMPONENT(
 			"Button based selection gui",
 			"Selection Param Gui");
 
+I_EXPORT_COMPONENT(
+			PageDecorator,
+			"Page decorator",
+			"Page Decorator");
+
 
 } // namespace ImtGuiPck
 

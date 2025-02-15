@@ -42,6 +42,7 @@
 #include <imtgui/CMultiParamsSetGuiComp.h>
 #include <imtgui/CMultiSelectionEditorComp.h>
 #include <imtgui/CButtonBasedSelectionGuiComp.h>
+#include <imtgui/CPageDecoratorComp.h>
 
 
 /**
@@ -87,7 +88,7 @@ typedef icomp::TModelCompWrap<imtgui::CStandardClientAreaProviderComp> StandardC
 typedef imtgui::CMultiParamsSetGuiComp MultiParamsSetGui;
 typedef imtgui::CMultiSelectionEditorComp MultiSelectionEditor;
 typedef imtgui::CButtonBasedSelectionGuiComp ButtonBasedSelectionGui;
-
+typedef imtgui::CPageDecoratorComp PageDecorator;
 
 } // namespace ImtGuiPck
 

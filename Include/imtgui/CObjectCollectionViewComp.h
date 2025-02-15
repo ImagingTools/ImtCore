@@ -30,6 +30,7 @@
 #include <imtbase/CCollectionFilter.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
+#include <imtgui/CCommandToolBar.h>
 #include <GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h>
 
 
@@ -124,6 +125,7 @@ protected:
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 	virtual void OnGuiRetranslate() override;
+	virtual void OnGuiDesignChanged() override;
 
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
@@ -335,6 +337,9 @@ private:
 	I_REF(iprm::ISelectionParam, m_filterSelectionCompPtr);
 	I_REF(iqtgui::IGuiObject, m_paginationGuiCompPtr);
 	I_REF(imod::IObserver, m_paginationGuiObserverCompPtr);
+
+	imtgui::CCommandToolBar m_collectionCommandsToolBar;
+
 };
 
 

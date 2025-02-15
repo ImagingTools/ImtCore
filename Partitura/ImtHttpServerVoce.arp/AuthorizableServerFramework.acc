@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -195,7 +195,6 @@
     <ExportedComponents>
         <Component ExportedId="Backup" ComponentId="ServerSettings/Backup"/>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="ServerSettings/DatabaseAccessSettings"/>
-        <Component ExportedId="DatabaseAutomaticBackup" ComponentId="DatabaseEngine/DatabaseAutomaticBackup"/>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="FeatureContainer" ComponentId="IdentifiableProductInfo"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="PumaGQLClientEngine/GroupRemoteRepository"/>

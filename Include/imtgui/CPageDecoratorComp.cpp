@@ -27,52 +27,22 @@ void CPageDecoratorComp::OnVisualStatusChanged(const istd::IChangeable::ChangeSe
 }
 
 
-void CPageDecoratorComp::OnPageCommandsChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const ibase::ICommandsProvider* /*commandsPtr*/)
-{
-	UpdateCommands();
-}
-
-
-void CPageDecoratorComp::UpdateCommands()
-{
-	if (m_pageCommandsProviderCompPtr.IsValid()) {
-		const iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_pageCommandsProviderCompPtr->GetCommands());
-		if (commandPtr != nullptr) {
-			if (m_mainCommandsToolBar == nullptr){
-				m_mainCommandsToolBar = new QToolBar(MiddleCommandsFrame);
-				m_mainCommandsToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-				m_mainCommandsToolBar->setIconSize(QSize(24, 24));
-
-				QLayout* layoutPtr = MiddleCommandsFrame->layout();
-				if (layoutPtr != nullptr){
-					layoutPtr->addWidget(m_mainCommandsToolBar);
-				}
-			}
-
-			m_mainCommandsToolBar->clear();
-
-			iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_mainCommandsToolBar);
-		}
-	}
-}
-
-
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CPageDecoratorComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	if (m_pageGuiCompPtr.IsValid()) {
+	if (m_pageGuiCompPtr.IsValid()){
 		m_pageGuiCompPtr->CreateGui(Content);
 	}
 
-	if (m_pageVisualStatusCompPtr.IsValid()) {
+	if (m_pageVisualStatusCompPtr.IsValid()){
 		m_pageVisualStatusObserver.RegisterObject(m_pageVisualStatusCompPtr.GetPtr(), &CPageDecoratorComp::OnVisualStatusChanged);
 	}
 
-	if (m_pageCommandsProviderCompPtr.IsValid()) {
-		m_pageCommandsObserver.RegisterObject(m_pageCommandsProviderCompPtr.GetPtr(), &CPageDecoratorComp::OnPageCommandsChanged);
+	if (m_pageCommandsProviderCompPtr.IsValid()){
+		m_pageCommandsToolBar.RegisterCommands(MiddleCommandsFrame, m_pageCommandsProviderCompPtr.GetPtr());
 	}
 }
 
@@ -83,13 +53,15 @@ void CPageDecoratorComp::OnGuiDestroyed()
 		m_pageGuiCompPtr->DestroyGui();
 	}
 
+	m_pageCommandsToolBar.UnregisterCommands();
+
 	BaseClass::OnGuiDestroyed();
 }
 
 
 void CPageDecoratorComp::OnGuiDesignChanged()
 {
-	if (m_pageVisualStatusCompPtr.IsValid()) {
+	if (m_pageVisualStatusCompPtr.IsValid()){
 		PageIcon->setPixmap(m_pageVisualStatusCompPtr->GetStatusIcon().pixmap(32, 32));
 
 		PageTitle->setText(m_pageVisualStatusCompPtr->GetStatusText());
@@ -97,9 +69,6 @@ void CPageDecoratorComp::OnGuiDesignChanged()
 
 	BaseClass::OnGuiDesignChanged();
 }
-
-
-// private slots
 
 
 } // namespace imtgui

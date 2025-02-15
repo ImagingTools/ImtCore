@@ -10,6 +10,7 @@
 
 // ImtCore includes
 #include <imtbase/TModelUpdateBinder.h>
+#include <imtgui/CCommandToolBar.h>
 #include <GeneratedFiles/imtgui/ui_CPageDecoratorComp.h>
 
 
@@ -33,15 +34,11 @@ public:
 
 protected:
 	void OnVisualStatusChanged(const istd::IChangeable::ChangeSet& changeSet, const iqtgui::IVisualStatus* visualStatusPtr);
-	void OnPageCommandsChanged(const istd::IChangeable::ChangeSet& changeSet, const ibase::ICommandsProvider* commandsPtr);
-	void UpdateCommands();
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 	virtual void OnGuiDesignChanged() override;
-
-private Q_SLOTS:
 
 private:
 	I_REF(iqtgui::IGuiObject, m_pageGuiCompPtr);
@@ -51,7 +48,7 @@ private:
 	imtbase::TModelUpdateBinder<iqtgui::IVisualStatus, CPageDecoratorComp> m_pageVisualStatusObserver;
 	imtbase::TModelUpdateBinder<ibase::ICommandsProvider, CPageDecoratorComp> m_pageCommandsObserver;
 
-	QToolBar* m_mainCommandsToolBar = nullptr;
+	imtgui::CCommandToolBar m_pageCommandsToolBar;
 };
 
 
