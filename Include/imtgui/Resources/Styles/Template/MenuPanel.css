@@ -1,11 +1,7 @@
-QWidget#PageTree
+QWidget#PageTree, QWidget#BottomPageTree 
 {
-	background-color: ${Active.Background};
-}
-
-QWidget#BottomPageTree
-{
-	background-color: ${Active.Background};
+	background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 ${ImagingToolsGradient1}, stop: 0.9 ${ImagingToolsGradient2}, stop: 0.97 ${ImagingToolsGradient2}, stop: 1.0 ${ImagingToolsGradient3});
+	border-right: 1px solid ${ImagingToolsGradient4};
 }
 
 QTreeView#PageTree::item::hover
