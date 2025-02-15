@@ -111,9 +111,9 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 
 	if (!SerializeObject(objectPtr, data)){
 		SendErrorMessage(0,
-						   QString("Unable to create insert request for object with id '%1', typeId '%2'. Error: Serialization object failed")
-								  .arg(qPrintable(proposedObjectId), qPrintable(typeId)),
-						   "CGqlObjectCollectionDelegateComp");
+					QString("Unable to create insert request for object with id '%1', typeId '%2'. Error: Serialization object failed")
+						.arg(qPrintable(proposedObjectId), qPrintable(typeId)),
+						"CGqlObjectCollectionDelegateComp");
 
 		return nullptr;
 	}
@@ -128,10 +128,10 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 			input.InsertField("dataMetaInfo", QVariant(data.toBase64()));
 		}
 		else{
-			SendWarningMessage(0,
-							   QString("Unable to serialize 'DataMetaInfo' for object '%1' with typeId '%2'")
-									  .arg(qPrintable(proposedObjectId), qPrintable(typeId)),
-							   "CGqlObjectCollectionDelegateComp");
+			SendWarningMessage(
+					0,
+					QString("Unable to serialize 'DataMetaInfo' for object '%1' with typeId '%2'").arg(qPrintable(proposedObjectId), qPrintable(typeId)),
+					"CGqlObjectCollectionDelegateComp");
 		}
 	}
 
@@ -140,10 +140,10 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 			input.InsertField("collectionItemMetaInfo", QVariant(data.toBase64()));
 		}
 		else{
-			SendWarningMessage(0,
-							   QString("Unable to serialize 'CollectionItemMetaInfo' for object '%1' with typeId '%2'")
-								   .arg(qPrintable(proposedObjectId), qPrintable(typeId)),
-							   "CGqlObjectCollectionDelegateComp");
+			SendWarningMessage(
+						0,
+						QString("Unable to serialize 'CollectionItemMetaInfo' for object '%1' with typeId '%2'").arg(qPrintable(proposedObjectId), qPrintable(typeId)),
+						"CGqlObjectCollectionDelegateComp");
 		}
 	}
 
@@ -152,10 +152,10 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 			input.InsertField("operationContext", QVariant(data.toBase64()));
 		}
 		else{
-			SendWarningMessage(0,
-							   QString("Unable to serialize 'OperationContext' for object '%1' with typeId '%2'")
-								   .arg(qPrintable(proposedObjectId), qPrintable(typeId)),
-							   "CGqlObjectCollectionDelegateComp");
+			SendWarningMessage(
+					0,
+					QString("Unable to serialize 'OperationContext' for object '%1' with typeId '%2'").arg(qPrintable(proposedObjectId), qPrintable(typeId)),
+					"CGqlObjectCollectionDelegateComp");
 		}
 	}
 
@@ -217,10 +217,10 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 			input.InsertField("dataMetaInfo", QVariant(data.toBase64()));
 		}
 		else{
-			SendWarningMessage(0,
-							   QString("Unable to serialize 'DataMetaInfo' for object '%1' with typeId '%2'")
-								   .arg(qPrintable(objectId), qPrintable(typeId)),
-							   "CGqlObjectCollectionDelegateComp");
+			SendWarningMessage(
+					0,
+					QString("Unable to serialize 'DataMetaInfo' for object '%1' with typeId '%2'").arg(qPrintable(objectId), qPrintable(typeId)),
+					"CGqlObjectCollectionDelegateComp");
 		}
 	}
 
@@ -229,10 +229,10 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 			input.InsertField("collectionItemMetaInfo", QVariant(data.toBase64()));
 		}
 		else{
-			SendWarningMessage(0,
-							   QString("Unable to serialize 'CollectionItemMetaInfo' for object '%1' with typeId '%2'")
-								   .arg(qPrintable(objectId), qPrintable(typeId)),
-							   "CGqlObjectCollectionDelegateComp");
+			SendWarningMessage(
+						0,
+						QString("Unable to serialize 'CollectionItemMetaInfo' for object '%1' with typeId '%2'").arg(qPrintable(objectId), qPrintable(typeId)),
+						"CGqlObjectCollectionDelegateComp");
 		}
 	}
 
@@ -241,10 +241,10 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 			input.InsertField("operationContext", QVariant(data.toBase64()));
 		}
 		else{
-			SendWarningMessage(0,
-							   QString("Unable to serialize 'OperationContext' for object '%1' with typeId '%2'")
-								   .arg(qPrintable(objectId), qPrintable(typeId)),
-							   "CGqlObjectCollectionDelegateComp");
+			SendWarningMessage(
+						0,
+						QString("Unable to serialize 'OperationContext' for object '%1' with typeId '%2'").arg(qPrintable(objectId), qPrintable(typeId)),
+						"CGqlObjectCollectionDelegateComp");
 		}
 	}
 
