@@ -3,3 +3,9 @@ QWidget#PageTitle
 	font-family: "Verdana";
 	font-size: 14pt;
 }
+
+QWidget#TopFrame
+{
+	background: ${Active.Background2};
+}
+
