@@ -39,11 +39,11 @@ void CPageDecoratorComp::UpdateCommands()
 		const iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_pageCommandsProviderCompPtr->GetCommands());
 		if (commandPtr != nullptr) {
 			if (m_mainCommandsToolBar == nullptr){
-				m_mainCommandsToolBar = new QToolBar(LeftCommandsFrame);
+				m_mainCommandsToolBar = new QToolBar(MiddleCommandsFrame);
 				m_mainCommandsToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 				m_mainCommandsToolBar->setIconSize(QSize(24, 24));
 
-				QLayout* layoutPtr = LeftCommandsFrame->layout();
+				QLayout* layoutPtr = MiddleCommandsFrame->layout();
 				if (layoutPtr != nullptr){
 					layoutPtr->addWidget(m_mainCommandsToolBar);
 				}
