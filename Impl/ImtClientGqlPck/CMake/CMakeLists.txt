@@ -1,6 +1,6 @@
 project(ImtClientGqlPck LANGUAGES CXX)
 
-message("QT_VERSION_MAJOR " ${QT_VERSION_MAJOR})
+message(VERBOSE "QT_VERSION_MAJOR ${QT_VERSION_MAJOR}")
 
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
