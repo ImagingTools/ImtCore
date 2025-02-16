@@ -5,9 +5,8 @@ function(GenerateDdlCodeExt MODULE_CPP_NAME MODULE_QML_NAME DDL_CONST_VAR_TEMPLA
 #----------------------------------------------------------- The DESIGN TOKEN CREATOR config
 # Setting the executable file name for specific OS
 get_target_name(TARGETNAME)
-#message ("number of arguments sent to function: ${ARGC}")
-message ("all function arguments:               ${ARGV}")
-message("GenerateDdlCodeExt ${PROJECT_NAME} TARGETNAME ${TARGETNAME}")
+message(VERBOSE "all function arguments:               ${ARGV}")
+message(VERBOSE "GenerateDdlCodeExt ${PROJECT_NAME} TARGETNAME ${TARGETNAME}")
 set(COMPILER_DIR ${CMAKE_BUILD_TYPE}_${TARGETNAME})
 string(FIND "$ENV{ARXCHOST}" "VC" POSITION_OF_VC)
 if (WIN32 OR (${POSITION_OF_VC} GREATER_EQUAL 0))
@@ -25,10 +24,10 @@ else()
 	set(DDL_CODE_CREATOR_EXE_BIN "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../Bin/${COMPILER_DIR}/${DDL_CODE_CREATOR_EXE}")
 endif()
 
-message("DDL_CODE_CREATOR_EXE_BIN ${DDL_CODE_CREATOR_EXE_BIN}")
-message("DDL_CONST_VAR_TEMPLATE_INPUT_DIR ${DDL_CONST_VAR_TEMPLATE_INPUT_DIR}")
-message("DDL_CPP_OUTPUT_DIR ${DDL_CPP_OUTPUT_DIR}")
-message("DDL_QML_OUTPUT_DIR ${DDL_QML_OUTPUT_DIR}")
+message(VERBOSE "DDL_CODE_CREATOR_EXE_BIN ${DDL_CODE_CREATOR_EXE_BIN}")
+message(VERBOSE "DDL_CONST_VAR_TEMPLATE_INPUT_DIR ${DDL_CONST_VAR_TEMPLATE_INPUT_DIR}")
+message(VERBOSE "DDL_CPP_OUTPUT_DIR ${DDL_CPP_OUTPUT_DIR}")
+message(VERBOSE "DDL_QML_OUTPUT_DIR ${DDL_QML_OUTPUT_DIR}")
 
 string(TOLOWER ${PROJECT_NAME} LOWER_PROJECT_NAME)
 
@@ -64,7 +63,7 @@ target_sources(${PROJECT_NAME} PRIVATE ${H_OUTPUT_FILE} ${CPP_OUTPUT_FILE})
 set(QRC_CPP_FILE ${DDL_QML_OUTPUT_DIR}/../qrc_${MODULE_QML_NAME}.cpp)
 set(QRC_QRC_FILE ${DDL_QML_OUTPUT_DIR}/../${MODULE_QML_NAME}.qrc)
 
-message("DdlCodeCreator:: ${DDL_CODE_CREATOR_EXE_BIN} ${CONST_VAR_CREATOR_COMMAND_PARAMS}")
+message(VERBOSE "DdlCodeCreator:: ${DDL_CODE_CREATOR_EXE_BIN} ${CONST_VAR_CREATOR_COMMAND_PARAMS}")
 
 add_custom_command(
 	OUTPUT

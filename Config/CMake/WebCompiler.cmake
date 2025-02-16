@@ -64,7 +64,7 @@ function(jqml_compile_web)
 		set(PYTHONEXE python3)
 	endif()
 
-	message("buildwebdir ${buildwebdir}")
+	message(VERBOSE "buildwebdir ${buildwebdir}")
 
 	set(NODE_EXE node)
 
@@ -132,7 +132,7 @@ function(jqml_compile_web2)
 	        set(PYTHONEXE python3)
 	endif()
 
-	message("buildwebdir ${buildwebdir}")
+	message(VERBOSE "buildwebdir ${buildwebdir}")
 
 	if(NOT NODE_EXE)
 		if(${MSVC})
@@ -147,18 +147,17 @@ function(jqml_compile_web2)
 	set(INDEX 0)
 	set(DEPEND_LIST)
 
-	message("DIRS_COUNT ${DIRS_COUNT}")
+	message(VERBOSE "DIRS_COUNT ${DIRS_COUNT}")
 
 	while(INDEX LESS DIRS_COUNT)
 		list(GET webdirs ${INDEX} _FOLDER)
 		file(GLOB_RECURSE FOUND_FILES "${_FOLDER}/*.qml")
-		# message("_FOLDER ${_FOLDER}/*.qml")
 		list(APPEND DEPEND_LIST ${FOUND_FILES})
 		math(EXPR INDEX "${INDEX} + 2")
 		set(INDEX ${INDEX})
 	endwhile()
 
-	message("QRC_CPP_WEB_FILE ${QRC_CPP_WEB_FILE}")
+	message(VERBOSE "QRC_CPP_WEB_FILE ${QRC_CPP_WEB_FILE}")
 
 	#               COMMAND ${CMAKE_COMMAND} -E rm -rf ${buildwebdir}
 
@@ -212,7 +211,7 @@ function(jq_compile_web)
 		set(PYTHONEXE python3)
 	endif()
 
-	message("buildwebdir ${buildwebdir}")
+	message(VERBOSE "buildwebdir ${buildwebdir}")
 
 	if(NOT NODE_EXE)
 		if(${MSVC})
@@ -227,20 +226,17 @@ function(jq_compile_web)
 	set(INDEX 0)
 	set(DEPEND_LIST)
 
-	message("DIRS_COUNT ${DIRS_COUNT}")
+	message(VERBOSE "DIRS_COUNT ${DIRS_COUNT}")
 
 	while(INDEX LESS DIRS_COUNT)
 		list(GET webdirs ${INDEX} _FOLDER)
 		file(GLOB_RECURSE FOUND_FILES "${_FOLDER}/*.qml")
-		# message("_FOLDER ${_FOLDER}/*.qml")
 		list(APPEND DEPEND_LIST ${FOUND_FILES})
 		math(EXPR INDEX "${INDEX} + 2")
 		set(INDEX ${INDEX})
 	endwhile()
 
-	message("QRC_CPP_WEB_FILE ${QRC_CPP_WEB_FILE}")
-
-	#               COMMAND ${CMAKE_COMMAND} -E rm -rf ${buildwebdir}
+	message(VERBOSE "QRC_CPP_WEB_FILE ${QRC_CPP_WEB_FILE}")
 
 	add_custom_command(
 		OUTPUT
