@@ -27,7 +27,7 @@ include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 include(${IMTCOREDIR}/Config/CMake/PartituraUpgrade.cmake)
 imt_core_upgrade_partitura("${CMAKE_CURRENT_LIST_DIR}/../..")
 
-message("ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
+message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
 
 if(NOT DEFINED IMTCOREDIR_BUILD)
 	set(IMTCOREDIR_BUILD "${CMAKE_CURRENT_LIST_DIR}/../..")
