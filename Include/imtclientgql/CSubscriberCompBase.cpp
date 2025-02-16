@@ -48,6 +48,6 @@ void CSubscriberCompBase::OnComponentCreated()
 }
 
 
-} // namespace gmgaws
+} // namespace imtclientgql
 
 
