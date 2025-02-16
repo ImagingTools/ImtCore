@@ -1,14 +1,14 @@
 project(ImtControlsGallery LANGUAGES CXX)
 
-message("ACFDIR LISA " ${ACFDIR})
-message("CMAKE_PROJECT_INCLUDE_BEFORE " ${CMAKE_PROJECT_INCLUDE_BEFORE})
+message(VERBOSE "ACFDIR LISA " ${ACFDIR})
+message(VERBOSE "CMAKE_PROJECT_INCLUDE_BEFORE " ${CMAKE_PROJECT_INCLUDE_BEFORE})
 
 set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/ImtCore.awc")
 set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../${PROJECT_NAME}.acc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
 
-message("ARXC_CONFIG " ${ARXC_CONFIG})
-message("ARXC_OUTDIR " ${ARXC_OUTDIR})
+message(VERBOSE "ARXC_CONFIG " ${ARXC_CONFIG})
+message(VERBOSE "ARXC_OUTDIR " ${ARXC_OUTDIR})
 
 if(WIN32)
 	set(CMAKE_WIN32_EXECUTABLE "on")
@@ -56,7 +56,7 @@ if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
 	set(resname "controlsgallery")
 	set(inputjs "${IMTCOREDIR}/Qml/web/imtcore.json")
-	jqml_compile_web2("${webdirs}", "${buildwebdir}", "${resname}")
+	jqml_compile_web2("${webdirs}" "${buildwebdir}" "${resname}")
 	#jq_compile_web("${webdirs}", "${buildwebdir}", "${resname}", "${inputjs}")
 endif()
 
@@ -70,14 +70,11 @@ endif()
 
 set(QML_IMPORT_DIRS ${QML_IMPORT_PATH})
 
-# message("QML_IMPORT_PATH ${QML_IMPORT_PATH}")
-
-
 list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Qml")
 list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Qml/imtcontrols/Base")
 
 if(DEFINED QML_DIRS_CONTROLS AND QML_DIRS_CONTROLS)
-	message("CONTROLS_QML_DIRS ${CONTROLS_QML_DIRS}")
+	message(VERBOSE "CONTROLS_QML_DIRS ${CONTROLS_QML_DIRS}")
 	list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml")
 endif()
 
