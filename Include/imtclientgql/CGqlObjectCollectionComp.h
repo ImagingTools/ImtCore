@@ -41,7 +41,7 @@ public:
 		I_ASSIGN_MULTI_0(m_typeNamesAttrPtr, "TypeNames", "List of type names corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", false);
 		I_ASSIGN(m_clientCompPtr, "ApiClient", "GraphQL API client", true, "ApiClient");
-		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
+		I_ASSIGN_MULTI_0(m_metaInfoCreatorListCompPtr, "MetaInfoCreators", "List of the meta-info creators corresponding to the reigstered type-IDs", false);
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlSubscriptionClient)
@@ -63,7 +63,7 @@ protected:
 	I_MULTITEXTATTR(m_typeNamesAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_objectFactoriesCompPtr);
 	I_REF(IGqlClient, m_clientCompPtr);
-	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
+	I_MULTIREF(imtbase::IMetaInfoCreator, m_metaInfoCreatorListCompPtr);
 
 	iprm::COptionsManager m_typeInfos;
 };

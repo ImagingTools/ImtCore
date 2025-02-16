@@ -94,7 +94,9 @@ private:
 protected:
 	const IGqlClient* m_gqlClientPtr;
 	const IGqlObjectCollectionDelegate* m_gqlObjectCollectionDelegatePtr;
-	imtbase::IMetaInfoCreator* m_metaInfoCreatorPtr;
+	
+	typedef QMap<QByteArray, imtbase::IMetaInfoCreator*> MetaInfoCreatorMap;
+	MetaInfoCreatorMap m_metaInfoCreatorMap;
 };
 
 

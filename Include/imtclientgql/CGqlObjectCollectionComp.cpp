@@ -63,14 +63,17 @@ void CGqlObjectCollectionComp::OnComponentCreated()
 		m_gqlObjectCollectionDelegatePtr = m_delegateCompPtr.GetPtr();
 	}
 
-	if (m_metaInfoCreatorCompPtr.IsValid()){
-		m_metaInfoCreatorPtr = m_metaInfoCreatorCompPtr.GetPtr();
-	}
-
 	for (int i = 0; i < m_typeIdsAttrPtr.GetCount(); i++){
 		QByteArray typeId = m_typeIdsAttrPtr[i];
 		if (!typeId.isEmpty()){
 			m_typeInfos.InsertOption(typeId, typeId);
+
+			if (i < m_metaInfoCreatorListCompPtr.GetCount()){
+				imtbase::IMetaInfoCreator* metaInfoCreatorPtr = m_metaInfoCreatorListCompPtr[i];
+				if (metaInfoCreatorPtr != nullptr) {
+					m_metaInfoCreatorMap[typeId] = metaInfoCreatorPtr;
+				}
+			}
 		}
 	}
 }

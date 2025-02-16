@@ -22,8 +22,7 @@ typedef QSharedPointer<imtgql::IGqlResponse> GqlResponsePtr;
 
 CRemoteGqlCollectionController::CRemoteGqlCollectionController()
 	:m_gqlClientPtr(nullptr),
-	m_gqlObjectCollectionDelegatePtr(nullptr),
-	m_metaInfoCreatorPtr(nullptr)
+	m_gqlObjectCollectionDelegatePtr(nullptr)
 {
 }
 
@@ -212,16 +211,11 @@ imtbase::IObjectCollection* CRemoteGqlCollectionController::CreateSubCollection(
 	Q_ASSERT(collectionPtr != nullptr);
 
 	if (collectionPtr != nullptr){
-		QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList;
-		if (m_metaInfoCreatorPtr != nullptr){
-			metaInfoCreatorList.append(m_metaInfoCreatorPtr);
-		}
-
 		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetSubCollectionRequest(offset, count, selectionParamsPtr));
 		if (!requestPtr.isNull()){
 			GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
 			if (!responsePtr.isNull()){
-				retVal = m_gqlObjectCollectionDelegatePtr->GetSubCollection(*collectionPtr, *responsePtr, metaInfoCreatorList);
+				retVal = m_gqlObjectCollectionDelegatePtr->GetSubCollection(*collectionPtr, *responsePtr, m_metaInfoCreatorMap.values());
 			}
 		}
 	}
@@ -279,10 +273,14 @@ idoc::MetaInfoPtr CRemoteGqlCollectionController::GetDataMetaInfo(const Id& obje
 	if (!requestPtr.isNull()){
 		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
 		if (!responsePtr.isNull()){
+			QByteArray typeId = GetObjectTypeId(objectId);
+
 			idoc::MetaInfoPtr metaInfoPtr;
-			if (m_metaInfoCreatorPtr != nullptr){
-				QByteArray typeId = GetObjectTypeId(objectId);
-				m_metaInfoCreatorPtr->CreateMetaInfo(nullptr, typeId, metaInfoPtr);
+			if (m_metaInfoCreatorMap.contains(typeId)){
+				imtbase::IMetaInfoCreator* metaInfoCreatorPtr = m_metaInfoCreatorMap[typeId];
+				Q_ASSERT(metaInfoCreatorPtr != nullptr);
+
+				metaInfoCreatorPtr->CreateMetaInfo(nullptr, typeId, metaInfoPtr);
 			}
 			else{
 				metaInfoPtr.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
