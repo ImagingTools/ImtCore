@@ -55,6 +55,8 @@ public:
 		I_ASSIGN_MULTI_0(m_fixedTabsCompPtr, "FixedViews", "List of fixed views", false);
 		I_ASSIGN_MULTI_0(m_fixedTabsNamesAttrPtr, "FixedViewNames", "List of names for the fixed views", false);
 		I_ASSIGN_MULTI_0(m_fixedVisualInfosCompPtr, "FixedVisualInfos", "List of additional visual infos related to the fixed views", false);
+		I_ASSIGN(m_showDocumentTitleAttrPtr, "ShowDocumentTitle", "If enabled, the document name will be shown in the main tool bar of the document decorator", true, false);
+		I_ASSIGN(m_showDocumentControlFrameAttrPtr, "ShowDocumentControlFrame", "If enabled, the document header frame will be shown", true, false);
 	I_END_COMPONENT;
 
 	enum ModelIds
@@ -198,6 +200,10 @@ private:
 	{
 		return &component.m_commands;
 	}
+
+protected:
+	I_ATTR(bool, m_showDocumentTitleAttrPtr);
+	I_ATTR(bool, m_showDocumentControlFrameAttrPtr);
 
 private:
 	imod::TModelWrap<DocumentList> m_documentList;

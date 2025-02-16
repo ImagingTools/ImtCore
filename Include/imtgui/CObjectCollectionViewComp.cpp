@@ -315,7 +315,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 {
 	Message->hide();
 	Progress->hide();
-
+	
 	connect(this, &CObjectCollectionViewComp::EmitUpdateGui, this, &CObjectCollectionViewComp::DoUpdateGui, Qt::QueuedConnection);
 
 	if (m_filterParamsGuiCompPtr.IsValid()){
@@ -385,7 +385,9 @@ void CObjectCollectionViewComp::OnGuiCreated()
 		RightPanel->setVisible(false);
 	}
 
-	m_collectionCommandsToolBar.RegisterCommands(TopFrame, &m_commands);
+	m_collectionCommandsToolBar.RegisterCommands(CommandsFrame, &m_commands);
+
+	ShowMetaInfoPanelButton->setVisible(*m_viewRightPanelAttrPtr);
 }
 
 
@@ -423,6 +425,8 @@ void CObjectCollectionViewComp::OnGuiRetranslate()
 
 void CObjectCollectionViewComp::OnGuiDesignChanged()
 {
+	ShowMetaInfoPanelButton->setIcon(GetIcon(":/Icons/Info"));
+
 	BaseClass::OnGuiDesignChanged();
 }
 
@@ -989,6 +993,7 @@ void CObjectCollectionViewComp::OnTypeChanged()
 			m_currentInformationViewPtr->CreateGui(RightPanel);
 			if (*m_viewRightPanelAttrPtr){
 				RightPanel->setVisible(true);
+				ShowMetaInfoPanelButton->setChecked(true);
 			}
 		}
 	}

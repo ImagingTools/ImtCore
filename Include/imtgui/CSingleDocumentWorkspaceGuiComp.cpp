@@ -46,6 +46,8 @@ IDocumentViewDecorator* CSingleDocumentWorkspaceGuiComp::CreateDocumentViewDecor
 			const ifile::IFilePersistence* persistencePtr)
 {
 	SdiDocumentViewDecorator::DecoratorConfiguration configuration;
+	configuration.showDocumentTitle = true;
+	configuration.commandOptions = SdiDocumentViewDecorator::CO_SHOW_ALL;
 	configuration.iconSize = *m_iconSizeAttrPtr;
 	configuration.showDocumentTitle = *m_showDocumentTitleAttrPtr;
 	configuration.fileButtonsStyle = Qt::ToolButtonStyle(*m_fileButtonsStyleAttrPtr);

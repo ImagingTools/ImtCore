@@ -210,6 +210,61 @@
          <property name="bottomMargin">
           <number>9</number>
          </property>
+         <item>
+          <widget class="QFrame" name="CommandsFrame">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>45</height>
+            </size>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="ShowMetaInfoPanelButton">
+           <property name="text">
+            <string>Info</string>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -315,5 +370,22 @@
  <resources>
   <include location="imtguidark.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>ShowMetaInfoPanelButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>RightPanel</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1011</x>
+     <y>72</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1104</x>
+     <y>148</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

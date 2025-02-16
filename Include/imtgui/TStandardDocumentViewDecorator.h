@@ -46,6 +46,15 @@ public:
 		MI_DOCUMENT_META_INFO
 	};
 
+	enum CommandOptions
+	{
+		CO_SHOW_NEW = 1,
+		CO_SHOW_OPEN = 2,
+		CO_SHOW_SAVE = 4,
+		CO_SHOW_SAVE_AS = 8,
+		CO_SHOW_ALL = CO_SHOW_NEW | CO_SHOW_OPEN | CO_SHOW_SAVE | CO_SHOW_SAVE_AS
+	};
+
 	typedef WorkspaceImpl Workspace;
 
 	struct DecoratorConfiguration
@@ -55,7 +64,8 @@ public:
 			fileButtonsStyle(Qt::ToolButtonFollowStyle),
 			documentButtonsStyle(Qt::ToolButtonFollowStyle),
 			undoButtonsStyle(Qt::ToolButtonFollowStyle),
-			showDocumentTitle(true)
+			showDocumentTitle(true),
+			showDocumentControlFrame(false)
 		{
 		}
 
@@ -63,8 +73,9 @@ public:
 		Qt::ToolButtonStyle fileButtonsStyle;
 		Qt::ToolButtonStyle documentButtonsStyle;
 		Qt::ToolButtonStyle undoButtonsStyle;
+		int commandOptions = CO_SHOW_SAVE;
 		bool showDocumentTitle;
-
+		bool showDocumentControlFrame;
 		QVector<int> includedCommandGroups;
 		QVector<int> excludedCommandGroups;
 	};
@@ -160,13 +171,13 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	m_parentPtr(parentPtr),
 	m_isInitialized(false),
 	m_configuration(configuration),
-	m_newCommand("New", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
-	m_openCommand("Open", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
-	m_saveCommand("Save", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
+	m_newCommand("New", 110, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
+	m_openCommand("Open", 109, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
+	m_saveCommand("Save", 108, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
 	m_saveAsCommand("SaveAs", 100, ibase::ICommand::CF_GLOBAL_MENU, 20000),
-	m_undoCommand("Undo", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
-	m_redoCommand("Redo", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
-	m_closeCommand("Close", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20001),
+	m_undoCommand("Undo", 99, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
+	m_redoCommand("Redo", 99, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
+	m_closeCommand("Close", 99, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20001),
 	m_uiResourcesManager(*this)
 {
 	m_uiResourcesManager.EnableDesignHandler();
@@ -183,12 +194,25 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	istd::IChangeable* documentPtr = m_parentPtr->GetDocumentFromView(*viewPtr);
 	Q_ASSERT(documentPtr != nullptr);
 
-	m_commands.InsertChild(&m_newCommand);
-	m_commands.InsertChild(&m_openCommand);
+	if (configuration.commandOptions & CO_SHOW_NEW) {
+		m_commands.InsertChild(&m_newCommand);
+	}
+
+	if (configuration.commandOptions & CO_SHOW_OPEN) {
+		m_commands.InsertChild(&m_openCommand);
+	}
+
 	m_commands.InsertChild(&m_undoCommand);
 	m_commands.InsertChild(&m_redoCommand);
-	m_commands.InsertChild(&m_saveCommand);
-	m_commands.InsertChild(&m_saveAsCommand);
+
+	if (configuration.commandOptions & CO_SHOW_SAVE) {
+		m_commands.InsertChild(&m_saveCommand);
+	}
+
+	if (configuration.commandOptions & CO_SHOW_SAVE_AS) {
+		m_commands.InsertChild(&m_saveAsCommand);
+	}
+
 	m_commands.InsertChild(&m_closeCommand);
 
 	m_isUndoEnabled = false;
@@ -198,6 +222,8 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 
 	UI::UndoButton->setVisible(undoManagerPtr != nullptr);
 	UI::RedoButton->setVisible(undoManagerPtr != nullptr);
+	UI::UndoButton->setIconSize(QSize(configuration.iconSize, configuration.iconSize));
+	UI::RedoButton->setIconSize(QSize(configuration.iconSize, configuration.iconSize));
 	m_undoCommand.setVisible(undoManagerPtr != nullptr);
 	m_redoCommand.setVisible(undoManagerPtr != nullptr);
 
@@ -216,9 +242,13 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 
 	UI::NewButton->setToolButtonStyle(configuration.fileButtonsStyle);
 	UI::NewButton->setDefaultAction(&m_newCommand);
+	UI::NewButton->setVisible(configuration.commandOptions & CO_SHOW_NEW);
+	UI::NewButton->setIconSize(QSize(configuration.iconSize, configuration.iconSize));
 
 	UI::OpenButton->setToolButtonStyle(configuration.fileButtonsStyle);
 	UI::OpenButton->setDefaultAction(&m_openCommand);
+	UI::OpenButton->setVisible(configuration.commandOptions & CO_SHOW_OPEN);
+	UI::OpenButton->setIconSize(QSize(configuration.iconSize, configuration.iconSize));
 
 	UI::UndoButton->setToolButtonStyle(configuration.undoButtonsStyle);
 	UI::UndoButton->setDefaultAction(&m_undoCommand);
@@ -230,9 +260,12 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 
 	UI::SaveButton->setToolButtonStyle(configuration.fileButtonsStyle);
 	UI::SaveButton->setDefaultAction(&m_saveCommand);
+	UI::SaveButton->setVisible(configuration.commandOptions & CO_SHOW_SAVE);
+	UI::SaveButton->setIconSize(QSize(configuration.iconSize, configuration.iconSize));
 
 	UI::SaveAsButton->setToolButtonStyle(configuration.fileButtonsStyle);
 	UI::SaveAsButton->setDefaultAction(&m_saveAsCommand);
+	UI::SaveAsButton->setVisible(configuration.commandOptions & CO_SHOW_SAVE_AS);
 
 	connect(&m_newCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnNew);
 	connect(&m_openCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnOpen);
@@ -277,7 +310,7 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 		}
 	}
 
-	UI::HeaderFrame->setVisible(false);
+	UI::HeaderFrame->setVisible(configuration.showDocumentControlFrame);
 }
 
 

@@ -33,7 +33,9 @@ IDocumentViewDecorator* CMultiDocumentWorkspaceGuiComp::CreateDocumentViewDecora
 			const ifile::IFilePersistence* persistencePtr)
 {
 	MdiDocumentViewDecorator::DecoratorConfiguration configuration;
+	configuration.showDocumentTitle = *m_showDocumentTitleAttrPtr;
 	configuration.iconSize = *m_iconSizeAttrPtr;
+	configuration.showDocumentControlFrame = *m_showDocumentControlFrameAttrPtr;
 	configuration.fileButtonsStyle = Qt::ToolButtonStyle(*m_fileButtonsStyleAttrPtr);
 	configuration.undoButtonsStyle = Qt::ToolButtonStyle(*m_undoButtonsStyleAttrPtr);
 	configuration.documentButtonsStyle = Qt::ToolButtonStyle(*m_documentButtonsStyleAttrPtr);
