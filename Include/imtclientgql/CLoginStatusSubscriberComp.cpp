@@ -64,6 +64,6 @@ int CLoginStatusSubscriberComp::GetLoginStatus(const QByteArray& /*clientId*/) c
 }
 
 
-} // namespace gmgaws
+} // namespace imtclientgql
 
 

@@ -1,7 +1,7 @@
 #pragma once
 
 
-// Gmg includes
+// ImtCore includes
 #include <imtcom/IFileTransfer.h>
 
 

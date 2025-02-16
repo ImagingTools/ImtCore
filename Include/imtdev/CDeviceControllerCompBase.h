@@ -14,8 +14,6 @@
 
 // ImtCore includes
 #include <imtbase/CCollectionInfo.h>
-
-// GmgCore includes
 #include <imtdev/IDeviceController.h>
 
 

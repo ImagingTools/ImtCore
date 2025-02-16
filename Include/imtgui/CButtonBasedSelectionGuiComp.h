@@ -10,7 +10,7 @@
 #include <iqtgui/IIconProvider.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
-// GmgCore includes
+// ImtCore includes
 #include <imtbase/TModelUpdateBinder.h>
 #include <GeneratedFiles/imtgui/ui_CButtonBasedSelectionGuiComp.h>
 

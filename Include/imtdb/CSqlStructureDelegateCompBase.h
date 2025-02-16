@@ -5,12 +5,10 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <ifile/IFilePersistence.h>
-
-// GmgCore includes
 #include <imtbase/IOperationContext.h>
 #include <imtbase/IHierarchicalStructure.h>
 #include <imtbase/IStructuredCollectionFinder.h>
+#include <ifile/IFilePersistence.h>
 #include <imtdb/IDatabaseEngine.h>
 
 
