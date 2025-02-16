@@ -19,12 +19,12 @@ public:
 	/**
 		Create JSON-representation of the given meta informations.
 	*/
-	virtual QByteArray ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo) const = 0;
+	virtual bool ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json) const = 0;
 
 	/**
 		Create meta information from its JSON-representation.
 	*/
-	virtual idoc::MetaInfoPtr FromJsonRepresentation(const QByteArray& data) const = 0;
+	virtual bool FromJsonRepresentation(const QByteArray& json, idoc::IDocumentMetaInfo& metaInfo) const = 0;
 };
 
 

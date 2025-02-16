@@ -21,8 +21,8 @@ template<class MetaInfoRepresentation>
 class TSdlBasedMetaInfoDelegate: virtual public imtdb::IJsonBasedMetaInfoDelegate
 {
 public:
-	virtual QByteArray ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo) const override;
-	virtual idoc::MetaInfoPtr FromJsonRepresentation(const QByteArray& data) const override;
+	virtual bool ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json) const override;
+	virtual bool FromJsonRepresentation(const QByteArray& json, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 protected:
 	virtual bool FillRepresentation(MetaInfoRepresentation& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const = 0;
@@ -31,7 +31,7 @@ protected:
 
 
 template<class MetaInfoRepresentation>
-QByteArray TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo) const
+bool TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json) const
 {
 	QByteArray retVal;
 
@@ -41,85 +41,35 @@ QByteArray TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::ToJsonRepresentati
 
 		if (representation.WriteToJsonObject(object)){
 			QJsonDocument document(object);
-			retVal = document.toJson(QJsonDocument::Compact);
+			json = document.toJson(QJsonDocument::Compact);
+
+			return !json.isEmpty();
 		}
 	}
 
-	return retVal;
+	return false;
 }
 
 
 template<class MetaInfoRepresentation>
-idoc::MetaInfoPtr TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::FromJsonRepresentation(const QByteArray& data) const
+bool TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::FromJsonRepresentation(const QByteArray& json, idoc::IDocumentMetaInfo& metaInfo) const
 {
 	QJsonDocument document;
 	QJsonParseError error;
-	document = document.fromJson(data, &error);
+	document = document.fromJson(json, &error);
 	if (document.isObject() && error.error == QJsonParseError::NoError){
 		QJsonObject object = document.object();
 		MetaInfoRepresentation representation;
 		if (representation.ReadFromJsonObject(object)){
-			idoc::MetaInfoPtr retVal(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
-			if (FillMetaInfo(*retVal, representation)){
-				return retVal;
+			if (FillMetaInfo(metaInfo, representation)){
+				return true;
 			}
 		}
 	}
 
-	return idoc::MetaInfoPtr();
+	return false;
 }
 
-
-template<class MetaInfoRepresentation>
-class TGmgSdlBasedMetaInfoDelegate : virtual public imtdb::IJsonBasedMetaInfoDelegate
-{
-public:
-	virtual QByteArray ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo) const override;
-	virtual idoc::MetaInfoPtr FromJsonRepresentation(const QByteArray& data) const override;
-
-protected:
-	virtual bool FillRepresentation(MetaInfoRepresentation& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const = 0;
-	virtual bool FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const MetaInfoRepresentation& metaInfoRepresentation) const = 0;
-};
-
-
-template<class MetaInfoRepresentation>
-QByteArray TGmgSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo) const
-{
-	QByteArray retVal;
-
-	MetaInfoRepresentation representation;
-	if (FillRepresentation(representation, metaInfo)){
-		QJsonObject object;
-		if (representation.WriteToJsonObject(object)){
-			QJsonDocument document(object);
-			retVal = document.toJson(QJsonDocument::Compact);
-		}
-	}
-
-	return retVal;
-}
-
-
-template<class MetaInfoRepresentation>
-idoc::MetaInfoPtr TGmgSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::FromJsonRepresentation(const QByteArray& data) const
-{
-	QJsonDocument document;
-	QJsonParseError error;
-	document = document.fromJson(data, &error);
-	if (document.isObject() && error.error == QJsonParseError::NoError){
-		QJsonObject object = document.object();
-		MetaInfoRepresentation representation;
-		if (representation.ReadFromJsonObject(object)){
-			idoc::MetaInfoPtr retVal(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
-			if (FillMetaInfo(*retVal, representation)){
-				return retVal;
-			}
-		}
-	}
-
-	return idoc::MetaInfoPtr();
-}
 
 
 } // namespace imtdbgql

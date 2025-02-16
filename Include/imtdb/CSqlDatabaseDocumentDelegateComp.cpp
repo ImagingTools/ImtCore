@@ -270,7 +270,11 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSq
 		idoc::MetaInfoPtr metaInfoPtr;
 		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(objectPtr.GetPtr(), typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
 			if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
-				metaInfoRepresentation = m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr());
+				if (!m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation)){
+					SendErrorMessage(0, "Meta information could not be converted to the JSON-based representation");
+
+					return QByteArray();
+				}
 			}
 		}
 	}
@@ -410,9 +414,9 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 			int revision) const
 {
 	QByteArray checkCurrentRevisionQuery = QString("SELECT * FROM \"%1\" WHERE \"DocumentId\" = '%2' AND \"IsActive\" = true;")
-								.arg(qPrintable(*m_tableNameAttrPtr))
-								.arg(qPrintable(objectId))
-								.toUtf8();
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(objectId))
+				.toUtf8();
 
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(checkCurrentRevisionQuery, &sqlError);
@@ -439,10 +443,10 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 	}
 
 	QByteArray query = QString("DELETE  FROM \"%1\" WHERE \"DocumentId\" = '%2' AND \"RevisionNumber\" = %3;")
-								.arg(qPrintable(*m_tableNameAttrPtr))
-								.arg(qPrintable(objectId))
-								.arg(revision)
-								.toUtf8();
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(objectId))
+				.arg(revision)
+				.toUtf8();
 
 	sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
@@ -463,13 +467,13 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 // protected methods
 
 QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
-	const QByteArray& typeId,
-	const QByteArray& objectId,
-	const QString& objectName,
-	const QString& objectDescription,
-	const istd::IChangeable& object,
-	const imtbase::IOperationContext* operationContextPtr,
-	const QVariant& revisionArgument) const
+			const QByteArray& typeId,
+			const QByteArray& objectId,
+			const QString& objectName,
+			const QString& objectDescription,
+			const istd::IChangeable& object,
+			const imtbase::IOperationContext* operationContextPtr,
+			const QVariant& revisionArgument) const
 {
 	QByteArray retVal;
 
@@ -500,23 +504,27 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 		idoc::MetaInfoPtr metaInfoPtr;
 		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(&object, typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
 			if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
-				metaInfoRepresentation = m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr());
+				if (!m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation)) {
+					SendErrorMessage(0, "Meta information could not be converted to the JSON-based representation");
+
+					return QByteArray();
+				}
 			}
 		}
 	}
 	
 	query += QString("; INSERT INTO \"%1\"(\"TypeId\", \"DocumentId\", \"Name\", \"Description\", \"Document\", \"DataMetaInfo\", \"CollectionMetaInfo\", \"Checksum\", \"LastModified\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', '%6', '%7', '%8', %9, '%10', %11, %12)")
-		.arg(qPrintable(*m_tableNameAttrPtr))
-		.arg(qPrintable(typeId))
-		.arg(qPrintable(objectId))
-		.arg(objectName)
-		.arg(objectDescription)
-		.arg(qPrintable(documentContent))
-		.arg(SqlEncode(metaInfoRepresentation))
-		.arg("{}")
-		.arg(checksum)
-		.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
-		.arg("true");
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(typeId))
+				.arg(qPrintable(objectId))
+				.arg(objectName)
+				.arg(objectDescription)
+				.arg(qPrintable(documentContent))
+				.arg(SqlEncode(metaInfoRepresentation))
+				.arg("{}")
+				.arg(checksum)
+				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
+				.arg("true");
 
 	if (revisionArgument.type() == QMetaType::Int){
 		query = query.arg(revisionArgument.toInt());
@@ -536,7 +544,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateOperationDescriptionQuery(const QByteArray& objectId, const imtbase::IOperationContext* operationContextPtr) const
+QByteArray CSqlDatabaseDocumentDelegateComp::CreateOperationDescriptionQuery(
+			const QByteArray& objectId,
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	if (operationContextPtr != nullptr){
 		imtbase::IOperationContext* operationPtr = const_cast<imtbase::IOperationContext*>(operationContextPtr);
@@ -647,7 +657,10 @@ bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const QByteArray& typeI
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const
+bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(
+			const QByteArray& typeId,
+			const QByteArray& data,
+			istd::IChangeable& object) const
 {
 	const ifile::IFilePersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
 	if (documentPersistencePtr == nullptr){
@@ -730,8 +743,29 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 }
 
 
-idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
+idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
+	if (m_metaInfoCreatorCompPtr.IsValid()){
+		QByteArrayList supportedTypeIds = m_metaInfoCreatorCompPtr->GetSupportedTypeIds();
+		if (!supportedTypeIds.contains(typeId)){
+			Q_ASSERT(false);
+
+			return idoc::MetaInfoPtr();
+		}
+
+		idoc::MetaInfoPtr metaInfoPtr;
+		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(nullptr, typeId, metaInfoPtr)){
+			Q_ASSERT(metaInfoPtr.IsValid());
+
+			return metaInfoPtr;
+		}
+
+		Q_ASSERT(false);
+
+		return idoc::MetaInfoPtr();
+
+	}
+
 	return idoc::MetaInfoPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
 }
 
@@ -741,14 +775,11 @@ bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRec
 	if (record.contains("DataMetaInfo")){
 		QByteArray metaInfoRepresentation = record.value("DataMetaInfo").toByteArray();
 		if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
-			idoc::MetaInfoPtr metaInfoPtr = m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(metaInfoRepresentation);
-			if (metaInfoPtr.IsValid()){
-				metaInfo.CopyFrom(*metaInfoPtr);
-			}
+			return m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(metaInfoRepresentation, metaInfo);
 		}
 	}
 
-	return true;
+	return false;
 }
 
 
