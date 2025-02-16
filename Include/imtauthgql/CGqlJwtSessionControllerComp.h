@@ -6,17 +6,17 @@
 
 // ImtCore includes
 #include <imtauth/IJwtSessionController.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Session.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 
 
 namespace imtauthgql
 {
 
 
-class CGqlJwtSessionControllerComp: public sdl::imtauth::Session::CGraphQlHandlerCompBase
+class CGqlJwtSessionControllerComp: public sdl::imtauth::Sessions::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::Session::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::imtauth::Sessions::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlJwtSessionControllerComp);
 		I_REGISTER_INTERFACE(imtauth::IJwtSessionController);
@@ -25,33 +25,33 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtauth::Session::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Session::CValidateSessionPayload OnValidateSession(
-		const sdl::imtauth::Session::CValidateSessionGqlRequest& validateSessionRequest,
+	// reimplemented (sdl::imtauth::Sessions::CGraphQlHandlerCompBase)
+	virtual sdl::imtauth::Sessions::CValidateSessionPayload OnValidateSession(
+		const sdl::imtauth::Sessions::CValidateSessionGqlRequest& validateSessionRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Session::CValidateJwtPayload OnValidateJwt(
-		const sdl::imtauth::Session::CValidateJwtGqlRequest& validateJwtRequest,
+	virtual sdl::imtauth::Sessions::CValidateJwtPayload OnValidateJwt(
+		const sdl::imtauth::Sessions::CValidateJwtGqlRequest& validateJwtRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Session::CGetSessionPayload OnGetSession(
-		const sdl::imtauth::Session::CGetSessionGqlRequest& getSessionRequest,
+	virtual sdl::imtauth::Sessions::CGetSessionPayload OnGetSession(
+		const sdl::imtauth::Sessions::CGetSessionGqlRequest& getSessionRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Session::CRefreshTokenPayload OnRefreshToken(
-		const sdl::imtauth::Session::CRefreshTokenGqlRequest& refreshTokenRequest,
+	virtual sdl::imtauth::Sessions::CRefreshTokenPayload OnRefreshToken(
+		const sdl::imtauth::Sessions::CRefreshTokenGqlRequest& refreshTokenRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Session::CCreateNewSessionPayload OnCreateNewSession(
-		const sdl::imtauth::Session::CCreateNewSessionGqlRequest& createNewSessionRequest,
+	virtual sdl::imtauth::Sessions::CCreateNewSessionPayload OnCreateNewSession(
+		const sdl::imtauth::Sessions::CCreateNewSessionGqlRequest& createNewSessionRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Session::CRemoveSessionPayload OnRemoveSession(
-		const sdl::imtauth::Session::CRemoveSessionGqlRequest& removeSessionRequest,
+	virtual sdl::imtauth::Sessions::CRemoveSessionPayload OnRemoveSession(
+		const sdl::imtauth::Sessions::CRemoveSessionGqlRequest& removeSessionRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Session::CGetUserFromJwtPayload OnGetUserFromJwt(
-		const sdl::imtauth::Session::CGetUserFromJwtGqlRequest& getUserFromJwtRequest,
+	virtual sdl::imtauth::Sessions::CGetUserFromJwtPayload OnGetUserFromJwt(
+		const sdl::imtauth::Sessions::CGetUserFromJwtGqlRequest& getUserFromJwtRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
 

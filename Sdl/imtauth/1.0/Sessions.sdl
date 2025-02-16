@@ -1,7 +1,7 @@
 schema {
     query: Query
     mutation: Mutation
-    name: Session
+    name: Sessions
     namespace: imtauth
     version: 1.0
 }

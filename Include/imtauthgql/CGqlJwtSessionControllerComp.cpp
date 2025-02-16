@@ -11,14 +11,14 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::imtauth::Session::CGraphQlHandlerCompBase)
+// reimplemented (sdl::imtauth::Sessions::CGraphQlHandlerCompBase)
 
-sdl::imtauth::Session::CValidateSessionPayload CGqlJwtSessionControllerComp::OnValidateSession(
-	const sdl::imtauth::Session::CValidateSessionGqlRequest& validateSessionRequest,
+sdl::imtauth::Sessions::CValidateSessionPayload CGqlJwtSessionControllerComp::OnValidateSession(
+	const sdl::imtauth::Sessions::CValidateSessionGqlRequest& validateSessionRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Session::CValidateSessionPayload response;
+	sdl::imtauth::Sessions::CValidateSessionPayload response;
 
 	if (!m_jwtSessionControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'JwtSessionController' was not set", "CGqlJwtSessionControllerComp");
@@ -28,7 +28,7 @@ sdl::imtauth::Session::CValidateSessionPayload CGqlJwtSessionControllerComp::OnV
 	response.Version_1_0.emplace();
 
 	QByteArray sessionId;
-	sdl::imtauth::Session::ValidateSessionRequestArguments arguments = validateSessionRequest.GetRequestedArguments();
+	sdl::imtauth::Sessions::ValidateSessionRequestArguments arguments = validateSessionRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->sessionId){
 		sessionId = *arguments.input.Version_1_0->sessionId;
 	}
@@ -39,12 +39,12 @@ sdl::imtauth::Session::CValidateSessionPayload CGqlJwtSessionControllerComp::OnV
 }
 
 
-sdl::imtauth::Session::CValidateJwtPayload CGqlJwtSessionControllerComp::OnValidateJwt(
-	const sdl::imtauth::Session::CValidateJwtGqlRequest& validateJwtRequest,
+sdl::imtauth::Sessions::CValidateJwtPayload CGqlJwtSessionControllerComp::OnValidateJwt(
+	const sdl::imtauth::Sessions::CValidateJwtGqlRequest& validateJwtRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Session::CValidateJwtPayload response;
+	sdl::imtauth::Sessions::CValidateJwtPayload response;
 
 	if (!m_jwtSessionControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'JwtSessionController' was not set", "CGqlJwtSessionControllerComp");
@@ -52,7 +52,7 @@ sdl::imtauth::Session::CValidateJwtPayload CGqlJwtSessionControllerComp::OnValid
 	}
 
 	QByteArray jwt;
-	sdl::imtauth::Session::ValidateJwtRequestArguments arguments = validateJwtRequest.GetRequestedArguments();
+	sdl::imtauth::Sessions::ValidateJwtRequestArguments arguments = validateJwtRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->jwt){
 		jwt = *arguments.input.Version_1_0->jwt;
 	}
@@ -61,28 +61,28 @@ sdl::imtauth::Session::CValidateJwtPayload CGqlJwtSessionControllerComp::OnValid
 
 	imtauth::IJwtSessionController::JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(jwt);
 
-	response.Version_1_0->state = sdl::imtauth::Session::JwtState::NONE;
+	response.Version_1_0->state = sdl::imtauth::Sessions::JwtState::NONE;
 
 	if (state == imtauth::IJwtSessionController::JS_EXPIRED){
-		response.Version_1_0->state = sdl::imtauth::Session::JwtState::EXPIRED;
+		response.Version_1_0->state = sdl::imtauth::Sessions::JwtState::EXPIRED;
 	}
 	else if (state == imtauth::IJwtSessionController::JS_INVALID){
-		response.Version_1_0->state = sdl::imtauth::Session::JwtState::INVALID;
+		response.Version_1_0->state = sdl::imtauth::Sessions::JwtState::INVALID;
 	}
 	else if (state == imtauth::IJwtSessionController::JS_OK){
-		response.Version_1_0->state = sdl::imtauth::Session::JwtState::OK;
+		response.Version_1_0->state = sdl::imtauth::Sessions::JwtState::OK;
 	}
 
 	return response;
 }
 
 
-sdl::imtauth::Session::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSession(
-	const sdl::imtauth::Session::CGetSessionGqlRequest& getSessionRequest,
+sdl::imtauth::Sessions::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSession(
+	const sdl::imtauth::Sessions::CGetSessionGqlRequest& getSessionRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Session::CGetSessionPayload response;
+	sdl::imtauth::Sessions::CGetSessionPayload response;
 
 	if (!m_jwtSessionControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'JwtSessionController' was not set", "CGqlJwtSessionControllerComp");
@@ -92,7 +92,7 @@ sdl::imtauth::Session::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSes
 	response.Version_1_0.emplace();
 
 	QByteArray sessionId;
-	sdl::imtauth::Session::GetSessionRequestArguments arguments = getSessionRequest.GetRequestedArguments();
+	sdl::imtauth::Sessions::GetSessionRequestArguments arguments = getSessionRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->sessionId){
 		sessionId = *arguments.input.Version_1_0->sessionId;
 	}
@@ -123,12 +123,12 @@ sdl::imtauth::Session::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSes
 }
 
 
-sdl::imtauth::Session::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefreshToken(
-	const sdl::imtauth::Session::CRefreshTokenGqlRequest& refreshTokenRequest,
+sdl::imtauth::Sessions::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefreshToken(
+	const sdl::imtauth::Sessions::CRefreshTokenGqlRequest& refreshTokenRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Session::CRefreshTokenPayload response;
+	sdl::imtauth::Sessions::CRefreshTokenPayload response;
 
 	if (!m_jwtSessionControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'JwtSessionController' was not set", "CGqlJwtSessionControllerComp");
@@ -138,7 +138,7 @@ sdl::imtauth::Session::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefr
 	response.Version_1_0.emplace();
 
 	QByteArray refreshToken;
-	sdl::imtauth::Session::RefreshTokenRequestArguments arguments = refreshTokenRequest.GetRequestedArguments();
+	sdl::imtauth::Sessions::RefreshTokenRequestArguments arguments = refreshTokenRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->refreshToken){
 		refreshToken = *arguments.input.Version_1_0->refreshToken;
 	}
@@ -146,7 +146,7 @@ sdl::imtauth::Session::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefr
 	imtauth::IJwtSessionController::UserSession userSession;
 	response.Version_1_0->ok = m_jwtSessionControllerCompPtr->RefreshToken(refreshToken, userSession);
 	if (response.Version_1_0->ok){
-		sdl::imtauth::Session::CUserSession::V1_0 userData;
+		sdl::imtauth::Sessions::CUserSession::V1_0 userData;
 		userData.userId = userSession.userId;
 		userData.accessToken = userSession.accessToken;
 		userData.refreshToken = userSession.refreshToken;
@@ -158,12 +158,12 @@ sdl::imtauth::Session::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefr
 }
 
 
-sdl::imtauth::Session::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCreateNewSession(
-	const sdl::imtauth::Session::CCreateNewSessionGqlRequest& createNewSessionRequest,
+sdl::imtauth::Sessions::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCreateNewSession(
+	const sdl::imtauth::Sessions::CCreateNewSessionGqlRequest& createNewSessionRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Session::CCreateNewSessionPayload response;
+	sdl::imtauth::Sessions::CCreateNewSessionPayload response;
 
 	if (!m_jwtSessionControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'JwtSessionController' was not set", "CGqlJwtSessionControllerComp");
@@ -173,7 +173,7 @@ sdl::imtauth::Session::CCreateNewSessionPayload CGqlJwtSessionControllerComp::On
 	response.Version_1_0.emplace();
 
 	QByteArray userId;
-	sdl::imtauth::Session::CreateNewSessionRequestArguments arguments = createNewSessionRequest.GetRequestedArguments();
+	sdl::imtauth::Sessions::CreateNewSessionRequestArguments arguments = createNewSessionRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->userId){
 		userId = *arguments.input.Version_1_0->userId;
 	}
@@ -181,7 +181,7 @@ sdl::imtauth::Session::CCreateNewSessionPayload CGqlJwtSessionControllerComp::On
 	imtauth::IJwtSessionController::UserSession userSession;
 	response.Version_1_0->ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, userSession);
 	if (response.Version_1_0->ok){
-		sdl::imtauth::Session::CUserSession::V1_0 userData;
+		sdl::imtauth::Sessions::CUserSession::V1_0 userData;
 		userData.userId = userSession.userId;
 		userData.accessToken = userSession.accessToken;
 		userData.refreshToken = userSession.refreshToken;
@@ -193,12 +193,12 @@ sdl::imtauth::Session::CCreateNewSessionPayload CGqlJwtSessionControllerComp::On
 }
 
 
-sdl::imtauth::Session::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRemoveSession(
-	const sdl::imtauth::Session::CRemoveSessionGqlRequest& removeSessionRequest,
+sdl::imtauth::Sessions::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRemoveSession(
+	const sdl::imtauth::Sessions::CRemoveSessionGqlRequest& removeSessionRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Session::CRemoveSessionPayload response;
+	sdl::imtauth::Sessions::CRemoveSessionPayload response;
 
 	if (!m_jwtSessionControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'JwtSessionController' was not set", "CGqlJwtSessionControllerComp");
@@ -208,7 +208,7 @@ sdl::imtauth::Session::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRem
 	response.Version_1_0.emplace();
 
 	QByteArray sessionId;
-	sdl::imtauth::Session::RemoveSessionRequestArguments arguments = removeSessionRequest.GetRequestedArguments();
+	sdl::imtauth::Sessions::RemoveSessionRequestArguments arguments = removeSessionRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->sessionId){
 		sessionId = *arguments.input.Version_1_0->sessionId;
 	}
@@ -219,27 +219,27 @@ sdl::imtauth::Session::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRem
 }
 
 
-sdl::imtauth::Session::CGetUserFromJwtPayload CGqlJwtSessionControllerComp::OnGetUserFromJwt(
-	const sdl::imtauth::Session::CGetUserFromJwtGqlRequest& getUserFromJwtRequest,
+sdl::imtauth::Sessions::CGetUserFromJwtPayload CGqlJwtSessionControllerComp::OnGetUserFromJwt(
+	const sdl::imtauth::Sessions::CGetUserFromJwtGqlRequest& getUserFromJwtRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Session::CGetUserFromJwtPayload::V1_0 response;
+	sdl::imtauth::Sessions::CGetUserFromJwtPayload::V1_0 response;
 
 	if (!m_jwtSessionControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'JwtSessionController' was not set", "CGqlJwtSessionControllerComp");
-		return sdl::imtauth::Session::CGetUserFromJwtPayload();
+		return sdl::imtauth::Sessions::CGetUserFromJwtPayload();
 	}
 
 	QByteArray jwt;
-	sdl::imtauth::Session::GetUserFromJwtRequestArguments arguments = getUserFromJwtRequest.GetRequestedArguments();
+	sdl::imtauth::Sessions::GetUserFromJwtRequestArguments arguments = getUserFromJwtRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->jwt){
 		jwt = *arguments.input.Version_1_0->jwt;
 	}
 
 	response.userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(jwt);
 
-	sdl::imtauth::Session::CGetUserFromJwtPayload retVal;
+	sdl::imtauth::Sessions::CGetUserFromJwtPayload retVal;
 	retVal.Version_1_0 = std::make_optional(response);
 
 	return retVal;

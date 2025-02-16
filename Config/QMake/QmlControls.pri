@@ -32,10 +32,12 @@ defineTest(prepareWebQml) {
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRolesSdl, $$buildwebdir/src/imtauthRolesSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthUsersSdl, $$buildwebdir/src/imtauthUsersSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationSdl, $$buildwebdir/src/imtauthAuthorizationSdl)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationOptionsSdl, $$buildwebdir/src/imtauthAuthorizationOptionsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthProfileSdl, $$buildwebdir/src/imtauthProfileSdl)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthSessionsSdl, $$buildwebdir/src/imtauthSessionsSdl)
+	
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicFeaturesSdl, $$buildwebdir/src/imtlicFeaturesSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicProductsSdl, $$buildwebdir/src/imtlicProductsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicLicensesSdl, $$buildwebdir/src/imtlicLicensesSdl)
-	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtappsdl/SDL/1.0/QML/imtappApplicationSdl, $$buildwebdir/src/imtappApplicationSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtappsdl/SDL/1.0/QML/imtappApplicationSdl, $$buildwebdir/src/imtappApplicationSdl)
 }

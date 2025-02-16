@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtauth/ISession.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Session.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 
 
 namespace imtauthgql
@@ -19,7 +19,7 @@ namespace imtauthgql
 
 bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionId) const
 {
-	namespace sessionsdl = sdl::imtauth::Session;
+	namespace sessionsdl = sdl::imtauth::Sessions;
 
 	sessionsdl::ValidateSessionRequestArguments arguments;
 	arguments.input.Version_1_0 = sessionsdl::CValidateSessionInput::V1_0();
@@ -33,7 +33,7 @@ bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionI
 	}
 
 	if (!SendModelRequest<
-			sdl::imtauth::Session::CValidateSessionPayload,
+			sdl::imtauth::Sessions::CValidateSessionPayload,
 			sessionsdl::CValidateSessionPayload>(gqlRequest, response)){
 		return false;
 	}
@@ -48,7 +48,7 @@ bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionI
 
 imtauth::IJwtSessionController::JwtState CRemoteJwtSessionControllerComp::ValidateJwt(const QByteArray& token) const
 {
-	namespace sessionsdl = sdl::imtauth::Session;
+	namespace sessionsdl = sdl::imtauth::Sessions;
 
 	sessionsdl::ValidateJwtRequestArguments arguments;
 	arguments.input.Version_1_0 = sessionsdl::CValidateJwtInput::V1_0();
@@ -62,7 +62,7 @@ imtauth::IJwtSessionController::JwtState CRemoteJwtSessionControllerComp::Valida
 	}
 
 	if (!SendModelRequest<
-			sdl::imtauth::Session::CValidateJwtPayload,
+			sdl::imtauth::Sessions::CValidateJwtPayload,
 			sessionsdl::CValidateJwtPayload>(gqlRequest, response)){
 		return imtauth::IJwtSessionController::JS_NONE;
 	}
@@ -89,7 +89,7 @@ bool CRemoteJwtSessionControllerComp::RefreshToken(
 			const QByteArray& refreshToken,
 			imtauth::IJwtSessionController::UserSession& userSession) const
 {
-	namespace sessionsdl = sdl::imtauth::Session;
+	namespace sessionsdl = sdl::imtauth::Sessions;
 
 	sessionsdl::RefreshTokenRequestArguments arguments;
 	arguments.input.Version_1_0 = sessionsdl::CRefreshTokenInput::V1_0();
@@ -103,7 +103,7 @@ bool CRemoteJwtSessionControllerComp::RefreshToken(
 	}
 
 	if (!SendModelRequest<
-			sdl::imtauth::Session::CRefreshTokenPayload,
+			sdl::imtauth::Sessions::CRefreshTokenPayload,
 			sessionsdl::CRefreshTokenPayload>(gqlRequest, response)){
 		return false;
 	}
@@ -134,7 +134,7 @@ bool CRemoteJwtSessionControllerComp::CreateNewSession(
 			const QByteArray& userId,
 			imtauth::IJwtSessionController::UserSession& userSession) const
 {
-	namespace sessionsdl = sdl::imtauth::Session;
+	namespace sessionsdl = sdl::imtauth::Sessions;
 
 	sessionsdl::CreateNewSessionRequestArguments arguments;
 	arguments.input.Version_1_0 = sessionsdl::CCreateNewSessionInput::V1_0();
@@ -148,7 +148,7 @@ bool CRemoteJwtSessionControllerComp::CreateNewSession(
 	}
 
 	if (!SendModelRequest<
-			sdl::imtauth::Session::CCreateNewSessionPayload,
+			sdl::imtauth::Sessions::CCreateNewSessionPayload,
 			sessionsdl::CCreateNewSessionPayload>(gqlRequest, response)){
 		return false;
 	}
@@ -177,7 +177,7 @@ bool CRemoteJwtSessionControllerComp::CreateNewSession(
 
 const imtauth::ISession* CRemoteJwtSessionControllerComp::GetSession(const QByteArray& sessionId) const
 {
-	namespace sessionsdl = sdl::imtauth::Session;
+	namespace sessionsdl = sdl::imtauth::Sessions;
 
 	sessionsdl::GetSessionRequestArguments arguments;
 	arguments.input.Version_1_0 = sessionsdl::CGetSessionInput::V1_0();
@@ -191,7 +191,7 @@ const imtauth::ISession* CRemoteJwtSessionControllerComp::GetSession(const QByte
 	}
 
 	if (!SendModelRequest<
-			sdl::imtauth::Session::CGetSessionPayload,
+			sdl::imtauth::Sessions::CGetSessionPayload,
 			sessionsdl::CGetSessionPayload>(gqlRequest, response)){
 		return nullptr;
 	}
@@ -217,7 +217,7 @@ const imtauth::ISession* CRemoteJwtSessionControllerComp::GetSession(const QByte
 
 bool CRemoteJwtSessionControllerComp::RemoveSession(const QByteArray& sessionId) const
 {
-	namespace sessionsdl = sdl::imtauth::Session;
+	namespace sessionsdl = sdl::imtauth::Sessions;
 
 	sessionsdl::RemoveSessionRequestArguments arguments;
 	arguments.input.Version_1_0 = sessionsdl::CRemoveSessionInput::V1_0();
@@ -231,7 +231,7 @@ bool CRemoteJwtSessionControllerComp::RemoveSession(const QByteArray& sessionId)
 	}
 
 	if (!SendModelRequest<
-			sdl::imtauth::Session::CRemoveSessionPayload,
+			sdl::imtauth::Sessions::CRemoveSessionPayload,
 			sessionsdl::CRemoveSessionPayload>(gqlRequest, response)){
 		return false;
 	}
@@ -246,7 +246,7 @@ bool CRemoteJwtSessionControllerComp::RemoveSession(const QByteArray& sessionId)
 
 QByteArray CRemoteJwtSessionControllerComp::GetUserFromJwt(const QByteArray& jwt) const
 {
-	namespace sessionsdl = sdl::imtauth::Session;
+	namespace sessionsdl = sdl::imtauth::Sessions;
 
 	sessionsdl::GetUserFromJwtRequestArguments arguments;
 	arguments.input.Version_1_0 = sessionsdl::CGetUserFromJwtInput::V1_0();
@@ -260,7 +260,7 @@ QByteArray CRemoteJwtSessionControllerComp::GetUserFromJwt(const QByteArray& jwt
 	}
 
 	if (!SendModelRequest<
-			sdl::imtauth::Session::CGetUserFromJwtPayload,
+			sdl::imtauth::Sessions::CGetUserFromJwtPayload,
 			sessionsdl::CGetUserFromJwtPayload>(gqlRequest, response)){
 		return QByteArray();
 	}
