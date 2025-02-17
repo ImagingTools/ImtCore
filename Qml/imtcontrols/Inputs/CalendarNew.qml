@@ -1006,7 +1006,7 @@ Rectangle {
 
 		Rectangle{
 
-			width: calendar.bodyWidth/7;
+			width: Math.trunc(calendar.bodyWidth/7);
 			height: calendar.weekDayListHeight;
 
 			color: calendar.cellColor;

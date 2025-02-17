@@ -101,7 +101,7 @@ ListView{
 
 		Rectangle{
 
-			width: calendarView.width/7;
+			width: calendarView.gridCellWidth;
 			height: calendarView.weekDayListHeight;
 
 			color: calendarView.cellColor;
