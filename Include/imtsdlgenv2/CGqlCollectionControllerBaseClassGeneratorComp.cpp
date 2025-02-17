@@ -92,7 +92,7 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 		return IsExternal(sdlDocumentType);
 	});
 
-	if (m_argumentParserCompPtr->IsDependenciesMode()){
+	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
 		if (!m_argumentParserCompPtr->IsAutoJoinEnabled()){
 			QStringList cumulatedFiles;
 			for (const imtsdl::CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){
@@ -107,7 +107,9 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		}
 
-		return TS_OK;
+		if (m_argumentParserCompPtr->IsDependenciesMode()){
+			return TS_OK;
+		}
 	}
 
 	for (const imtsdl::CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){

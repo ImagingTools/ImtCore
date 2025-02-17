@@ -74,17 +74,16 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
 	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
 
-	if (m_argumentParserCompPtr->IsDependenciesMode()){
+	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
 		if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
 			if (!m_customSchemaParamsCompPtr.IsValid()){
 				SendErrorMessage(0, "Application is not configured with custom parameters. Auto join is not possible. Please specify paths to join explicitly(use -J option), or disable join.");
 
 				return TS_INVALID;
 			}
-
 			QStringList autoJoinFilePaths = GetAutoJoinedCppFilePaths(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
-			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), autoJoinFilePaths, *m_dependentSchemaListCompPtr);
 			PrintFiles(std::cout, autoJoinFilePaths, m_argumentParserCompPtr->GetGeneratorType());
+			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), autoJoinFilePaths, *m_dependentSchemaListCompPtr);
 		}
 		else {
 			QStringList cumulatedFiles;
@@ -107,7 +106,9 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		}
 
-		return TS_OK;
+		if (m_argumentParserCompPtr->IsDependenciesMode()){
+			return TS_OK;
+		}
 	}
 
 	imtsdl::SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);

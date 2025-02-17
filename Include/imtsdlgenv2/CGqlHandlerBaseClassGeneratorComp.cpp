@@ -61,7 +61,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 	}
 	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
 	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
-	if (m_argumentParserCompPtr->IsDependenciesMode()){
+	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
 		if (!m_argumentParserCompPtr->IsAutoJoinEnabled()){
 			QStringList cumulatedFiles;
 			if (!joinHeaders){
@@ -74,7 +74,9 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		}
 
-		return TS_OK;
+		if (m_argumentParserCompPtr->IsDependenciesMode()){
+			return TS_OK;
+		}
 	}
 
 	imtsdl::SdlRequestList requests = m_sdlRequestListCompPtr->GetRequests();

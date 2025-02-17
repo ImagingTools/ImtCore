@@ -30,6 +30,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_sdlEnumListCompPtr.IsValid());
+	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
 	int retVal = TS_OK;
 
@@ -58,7 +59,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	if (m_argumentParserCompPtr->IsDependenciesMode()){
+	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
 		if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
 			if (!m_customSchemaParamsCompPtr.IsValid()){
 				SendErrorMessage(0, "Application is not configured with custom parameters. Auto join is not possible. Please specify paths to join explicitly(use -J option), or disable join.");
@@ -69,6 +70,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 			QStringList qmlFilePaths;
 			qmlFilePaths << GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath());
 			PrintFiles(std::cout, qmlFilePaths, m_argumentParserCompPtr->GetGeneratorType());
+			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), qmlFilePaths, *m_dependentSchemaListCompPtr);
 		}
 		else{
 			QStringList cumulatedFiles;
@@ -78,7 +80,9 @@ int CQmlCodeGeneratorComp::DoProcessing(
 			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		}
 
-		return TS_OK;
+		if (m_argumentParserCompPtr->IsDependenciesMode()){
+			return TS_OK;
+		}
 	}
 
 	imtsdl::SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);

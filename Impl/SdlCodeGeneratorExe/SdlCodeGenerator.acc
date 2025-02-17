@@ -306,6 +306,9 @@
                                 <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="DependentSchemaList" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework/DependentSchemaList"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>

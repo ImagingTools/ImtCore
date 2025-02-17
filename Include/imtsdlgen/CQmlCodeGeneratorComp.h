@@ -35,6 +35,7 @@ public:
 		I_ASSIGN_MULTI_0(m_codeGeneratorExtenderListCompPtr, "CodeGeneratorExtenderList", "Extenders, used to generate an additional code", false)
 		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
 		I_ASSIGN(m_sdlEnumListCompPtr, "SdlEnumListProvider", "SDL enums used to create a code", true, "SdlEnumListProvider")
+		I_ASSIGN(m_dependentSchemaListCompPtr, "DependentSchemaList", "The list of dependent schemas, used to generate dependencies of output file", true, "DependentSchemaList");
 
 	I_END_COMPONENT;
 
@@ -58,6 +59,7 @@ private:
 	I_MULTIREF(iproc::IProcessor, m_codeGeneratorExtenderListCompPtr);
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 	I_REF(imtsdl::ISdlEnumListProvider, m_sdlEnumListCompPtr);
+	I_REF(iprm::IOptionsManager, m_dependentSchemaListCompPtr);
 
 	istd::TDelPtr<QFile> m_qmlFilePtr;
 };

@@ -64,7 +64,7 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
 
 	imtsdl::SdlRequestList sdlRequestList = m_sdlRequestListCompPtr->GetRequests();
-	if (m_argumentParserCompPtr->IsDependenciesMode()){
+	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
 		if (!m_argumentParserCompPtr->IsAutoJoinEnabled()){
 			QStringList cumulatedFiles;
 			for (const imtsdl::CSdlRequest& sdlRequest: sdlRequestList){
@@ -78,8 +78,9 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
 			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		}
-
-		return TS_OK;
+		if (m_argumentParserCompPtr->IsDependenciesMode()){
+			return TS_OK;
+		}
 	}
 
 	for (const imtsdl::CSdlRequest& sdlRequest: sdlRequestList){
