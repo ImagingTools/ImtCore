@@ -30,6 +30,8 @@ Rectangle {
 
 	property int startYear: 1900;
 	property int lastYear: 2100;
+	property var minDate;
+	property var maxDate;
 
 	//read only
 	property int selectedIndexMonth: 0;

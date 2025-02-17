@@ -62,6 +62,8 @@
         <file alias="imtcontrols/Inputs/CalendarNew.qml">Inputs/CalendarNew.qml</file>
 		<file alias="imtcontrols/Inputs/CalendarCellDelegateBase.qml">Inputs/CalendarCellDelegateBase.qml</file>
 		<file alias="imtcontrols/Inputs/CalendarCellTextDelegate.qml">Inputs/CalendarCellTextDelegate.qml</file>
+		<file alias="imtcontrols/Inputs/CalendarView.qml">Inputs/CalendarView.qml</file>
+		<file alias="imtcontrols/Inputs/CalendarFunctions.qml">Inputs/CalendarFunctions.qml</file>
         <file alias="imtcontrols/Inputs/ComboBox.qml">Inputs/ComboBox.qml</file>
         <file alias="imtcontrols/Inputs/FilterableComboBox.qml">Inputs/FilterableComboBox.qml</file>
         <file alias="imtcontrols/Inputs/DatePicker.qml">Inputs/DatePicker.qml</file>

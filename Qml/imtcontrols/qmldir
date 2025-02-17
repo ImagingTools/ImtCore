@@ -64,6 +64,8 @@ Calendar 1.0 ./Inputs/Calendar.qml
 CalendarNew 1.0 ./Inputs/CalendarNew.qml
 CalendarCellDelegateBase 1.0 ./Inputs/CalendarCellDelegateBase.qml
 CalendarCellTextDelegate 1.0 ./Inputs/CalendarCellTextDelegate.qml
+CalendarView 1.0 ./Inputs/CalendarView.qml
+CalendarFunctions 1.0 ./Inputs/CalendarFunctions.qml
 ComboBox 1.0 ./Inputs/ComboBox.qml
 FilterableComboBox 1.0 ./Inputs/FilterableComboBox.qml
 CheckBox 1.0 ./Inputs/CheckBox.qml
