@@ -1,12 +1,10 @@
 import argparse
-import io
 import os
 import re
 
 
 def ReadTextFromFile(path, aEncoding='utf-8'):
-	encoding = io.text_encoding(aEncoding)
-	with open(path, 'r', encoding=encoding) as f:
+	with open(path, 'r', encoding = aEncoding) as f:
 		return f.read()
 
 
@@ -87,11 +85,16 @@ if __name__ == '__main__':
 												   '0 - disabled. ALL files will be compiled.\n'
 												   '1 - only those schemas with the same namespace as the original one will be compiled\n'
 												   '2 - only the schema will be compiled. See the \'schema-file\' option', default=2)
-	parser.add_argument('--CPP', required=False, help='C++ Modificator to generate code. (enabled default)', action='store_true', default=True)
+	parser.add_argument('--CPP', required=False, help='C++ Modificator to generate code.', action='store_true', default=False)
 	parser.add_argument('--GQL', required=False, help='GraphQL Modificator to generate GrqphQL wrap C++ code . (disables CPP and QML if it not setted explicit)', action='store_true', default=False)
 	parser.add_argument('--QML', required=False, help='QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)', action='store_true', default=False)
 
-	args = parser.parse_args()
+	args, unknown_args = parser.parse_known_args()
+
+	# first ensure, at least one general mode is enabled
+	if not args.CPP and not args.GQL and not args.QML:
+		raise BaseException('No expected arguments!')
+
 	outputDirectoryPath = args.output_directory
 	schemaFilePath = args.schema_file
 	schemaFileData = ReadTextFromFile(schemaFilePath)
@@ -112,12 +115,13 @@ if __name__ == '__main__':
 		elif key == 'version':
 			schemaVersion = value
 
+	cumulatedFiles = ''
 	if args.CPP or args.GQL:
 		for path in CalculateTargetCppFilesFromSchemaParams(schemaName, schemaVersion, outputDirectoryPath, ''):
-			print(path)
+			cumulatedFiles += path + ';'
+
 	if args.QML:
-		print(CalculateTargetQmlFilesFromSchemaParams(schemaName, schemaNamespace, schemaVersion, outputDirectoryPath, ''))
+		cumulatedFiles += CalculateTargetQmlFilesFromSchemaParams(schemaName, schemaNamespace, schemaVersion, outputDirectoryPath, '') + ';'
 
-	if not args.CPP and not args.GQL and not args.QML:
-		raise BaseException('No expected arguments!')
-
+	cumulatedFiles = cumulatedFiles[:-1]
+	print(cumulatedFiles, end='')
