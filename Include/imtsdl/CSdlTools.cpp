@@ -1145,6 +1145,7 @@ QString CSdlTools::GetAutoDefinedQmlQrcFilePath(const iprm::IParamsSet& schemaPa
 
 	QString retVal;
 	retVal = GetFileSystemAcceptableEntryPath(baseFilePath + qrcFileName + QStringLiteral(".qrc"));
+	retVal = QDir::cleanPath(retVal);
 
 	return retVal;
 }
