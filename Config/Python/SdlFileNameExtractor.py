@@ -42,24 +42,24 @@ def GetFileSystemAcceptableEntryPath(originalText):
 def CalculateTargetCppFilesFromSchemaParams(schemaName, schemaVersion, baseDirPath, defaultName):
 	retVal = []
 
-	baseFilePath = baseDirPath;
+	baseFilePath = baseDirPath
 
 	if schemaVersion != None and len(schemaVersion) > 0:
 		if not baseFilePath.endswith('/'):
-			baseFilePath += '/';
+			baseFilePath += '/'
 
 		baseFilePath += schemaVersion
 
 
 	if not baseFilePath.endswith('/'):
-		baseFilePath += '/';
+		baseFilePath += '/'
 
-	baseFilePath += ("CPP/");
+	baseFilePath += ("CPP/")
 
 	if schemaName != None and len(schemaName) > 0:
 		baseFilePath += schemaName
 	else:
-		baseFilePath += defaultName;
+		baseFilePath += defaultName
 
 	retVal.append(GetFileSystemAcceptableEntryPath(baseFilePath + (".h")))
 	retVal.append(GetFileSystemAcceptableEntryPath(baseFilePath + (".cpp")))
@@ -69,7 +69,7 @@ def CalculateTargetCppFilesFromSchemaParams(schemaName, schemaVersion, baseDirPa
 def CalculateTargetQmlFilesFromSchemaParams(schemaName, schemaNamespace, schemaVersion, outputDirectoryPath, defaultName):
 	retVal = outputDirectoryPath
 	if not retVal.endswith('/'):
-		retVal += '/';
+		retVal += '/'
 
 	retVal += schemaVersion + '/QML/' + schemaNamespace + schemaName + 'Sdl'
 	retVal += '/' + schemaNamespace + schemaName +'Sdl.qrc'
