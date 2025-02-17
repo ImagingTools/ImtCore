@@ -234,6 +234,7 @@ macro (ImtCoreCustomConfigureSdlQml)
 	if (ARG_QML_NAME)
 		list(APPEND MODIFICATORS "-N=${ARG_QML_NAME}")
 	else()
+		set(SDL_OUTPUT_DIRECTORY "${SDL_OUTPUT_ROOT_DIRECTORY}")
 		list(APPEND MODIFICATORS "--auto-join")
 	endif()
 
