@@ -354,7 +354,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 				if (foundType->IsExternal()){
 					QString resolvedPath = ResolveRelativeHeaderFileForType(*foundType, m_argumentParserCompPtr->GetHeadersIncludePaths(), false);
 					if (resolvedPath.isEmpty()){
-						SendErrorMessage(0, QString("Unable to find header file for type of '%1' in ").arg(field.GetId(), sdlType.GetName()));
+						SendErrorMessage(0, QString("Unable to find header file for type of '%1' in '%2'").arg(field.GetId(), sdlType.GetName()));
 
 						return false;
 					}
