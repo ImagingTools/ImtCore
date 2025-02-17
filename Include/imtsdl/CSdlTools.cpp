@@ -889,8 +889,8 @@ QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const 
 		baseFilePath += defaultName;
 	}
 
-	retVal.insert(ISdlProcessArgumentsParser::s_headerFileType, GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".h")));
-	retVal.insert(ISdlProcessArgumentsParser::s_sourceFileType, GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".cpp")));
+	retVal.insert(ISdlProcessArgumentsParser::s_headerFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".h"))));
+	retVal.insert(ISdlProcessArgumentsParser::s_sourceFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".cpp"))));
 
 	return retVal;
 }
