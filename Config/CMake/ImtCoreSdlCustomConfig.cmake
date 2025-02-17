@@ -1,7 +1,8 @@
 include (${CMAKE_CURRENT_LIST_DIR}/ImtSdlConfig.cmake)
+set(IMT_CONFIG_CMAKE_PATH "${CMAKE_CURRENT_LIST_DIR}/..")
 
+#! \PARAM GET_SCHEMA_DEPS - \DEPRECATED NEWER USE IT! \TODO After adapting all the projects, remove it.
 macro(ImtCoreGetSdlDeps)
-
 	set(booleanArgs GET_SCHEMA_DEPS)
 	set(oneValueArgs INPUT OUT_DIR RESULT_VARIABLE)
 	set(multiValueArgs MODIFICATORS)
@@ -9,7 +10,19 @@ macro(ImtCoreGetSdlDeps)
 
 	GetSdlGeneratorPath(SDL_GENERATOR_EXE_PATH)
 
+	set (CUSTOM_PYTHON OFF)
+	if (NOT PYTHONEXE)
+		set (CUSTOM_PYTHON ON)
+		set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
+
+		if (NOT WIN32)
+			set(PYTHONEXE python3)
+		endif()
+	endif()
+
 	if (ARG_GET_SCHEMA_DEPS)
+		MESSAGE(FATAL_ERROR " DEPRECATED Argument provided DO NOT USE 'GET_SCHEMA_DEPS' argument")
+		# unreachable code!
 		set(SDL_DEPS_GENERATION_COMMAND ${SDL_GENERATOR_EXE_PATH} -S ${ARG_INPUT} --schema-dependencies --auto-link=2)
 
 		list(LENGTH GLOBAL_SDL_SCHEMA_SEARCH_PATHS SDL_SCHEMA_PATHS_COUNT)
@@ -21,7 +34,7 @@ macro(ImtCoreGetSdlDeps)
 
 		set(SDL_ERRORS_FILE_PATH "${ARG_OUT_DIR}/__SDL_SCHEMA__DependsList_errors.txt")
 	else()
-		set(SDL_DEPS_GENERATION_COMMAND ${SDL_GENERATOR_EXE_PATH} -DS ${ARG_INPUT} -O ${ARG_OUT_DIR} ${ARG_MODIFICATORS})
+		set(SDL_DEPS_GENERATION_COMMAND ${PYTHONEXE} ${IMT_CONFIG_CMAKE_PATH}/Python/SdlFileNameExtractor.py -S ${ARG_INPUT} -O ${ARG_OUT_DIR} ${ARG_MODIFICATORS})
 		set(SDL_ERRORS_FILE_PATH "${ARG_OUT_DIR}/__SDL__DependsList_errors.txt")
 	endif()
 
@@ -65,6 +78,10 @@ macro(ImtCoreGetSdlDeps)
 
 	# cleanup on success
 	file(REMOVE ${SDL_ERRORS_FILE_PATH})
+	if (CUSTOM_PYTHON)
+		unset(PYTHONEXE)
+	endif()
+	unset(CUSTOM_PYTHON)
 
 endmacro()
 
@@ -118,12 +135,17 @@ macro (ImtCoreCustomConfigureSdlCpp)
 				CUSTOM_OUTPUT_ROOT_DIR_PATH)
 	cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
 
+	get_filename_component(SCHEMA_NAME "${ARG_SCHEMA_PATH}" NAME_WE)
+
 	set (SDL_OUTPUT_ROOT_DIRECTORY "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL")
 	if (ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH)
 		set (SDL_OUTPUT_ROOT_DIRECTORY "${ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH}")
 	endif()
+
 	set(SDL_OUTPUT_DIRECTORY "${SDL_OUTPUT_ROOT_DIRECTORY}")
 	set(SDL_CPP_OUTPUT_DIRECTORY "${SDL_OUTPUT_ROOT_DIRECTORY}/${ARG_VERSION}/CPP")
+	set(DEP_FILE_PATH "${SDL_CPP_OUTPUT_DIRECTORY}/${SCHEMA_NAME}.depfile")
+
 
 	set(CUSTOM_MODIFICATORS)
 	list(APPEND CUSTOM_MODIFICATORS "--GG=2") ##< Compile, using a new version of code generator.
@@ -133,6 +155,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	list(APPEND CUSTOM_MODIFICATORS "-Psdl")
 	list(APPEND CUSTOM_MODIFICATORS "-Bistd::IPolymorphic=istd/IPolymorphic.h")
 	list(APPEND CUSTOM_MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
+	list(APPEND CUSTOM_MODIFICATORS "--generator=DEPFILE:${DEP_FILE_PATH}") ##< use depfile
 
 	if (ARG_SOURCE_NAME)
 		list(APPEND CUSTOM_MODIFICATORS "-JCPP=${SDL_CPP_OUTPUT_DIRECTORY}/${ARG_SOURCE_NAME}.cpp")
@@ -169,17 +192,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 
 	set(${ARG_FOUND_DEPS} "${FOUND_DEPS}")
 
-	ImtCoreGetSdlDeps(GET_SCHEMA_DEPS
-		INPUT
-			"${ARG_SCHEMA_PATH}"
-		OUT_DIR
-			"${SDL_OUTPUT_DIRECTORY}"
-		MODIFICATORS
-			"${CUSTOM_MODIFICATORS}"
-		RESULT_VARIABLE
-			FOUND_SCHEMA_DEPS)
-
-	message(VERBOSE "CPP: FOUND for ${PROJECT_NAME} DEPS: ${FOUND_DEPS} SCHEMAS: ${FOUND_SCHEMA_DEPS}")
+	message(VERBOSE "CPP: FOUND for ${PROJECT_NAME} DEPS: ${FOUND_DEPS}")
 
 	GetSdlGeneratorPath(SDL_GENERATOR_EXE_PATH)
 
@@ -191,7 +204,9 @@ macro (ImtCoreCustomConfigureSdlCpp)
 		ARGS
 			-GS ${ARG_SCHEMA_PATH} -O "${SDL_OUTPUT_DIRECTORY}" ${CUSTOM_MODIFICATORS}
 		DEPENDS
-			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH} "${FOUND_SCHEMA_DEPS}" "${ARG_EXTRA_DEPS}"
+			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH} "${ARG_EXTRA_DEPS}"
+		DEPFILE
+			${DEP_FILE_PATH}
 		COMMENT
 			"[CPP:SDL::${PROJECT_NAME}] Creating classes for schema ${ARG_SCHEMA_PATH}"
 		VERBATIM)
@@ -218,24 +233,28 @@ macro (ImtCoreCustomConfigureSdlQml)
 	if (ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH)
 		set (SDL_OUTPUT_ROOT_DIRECTORY "${ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH}")
 	endif()
-
 	set(SDL_OUTPUT_DIRECTORY "${SDL_OUTPUT_ROOT_DIRECTORY}/${ARG_VERSION}/QML/${ARG_QML_NAME}")
 
 	set(MODIFICATORS)
-	list(APPEND MODIFICATORS "--QML")
-	list(APPEND MODIFICATORS "--use-all-modificators")
-	list(APPEND MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
-
-	# use cache file if provided
-	if (GLOBAL_SDL_CACHE_FILE)
-		list(APPEND MODIFICATORS "-C${GLOBAL_SDL_CACHE_FILE}")
-	endif()
 
 	if (ARG_QML_NAME)
 		list(APPEND MODIFICATORS "-N=${ARG_QML_NAME}")
 	else()
 		set(SDL_OUTPUT_DIRECTORY "${SDL_OUTPUT_ROOT_DIRECTORY}")
 		list(APPEND MODIFICATORS "--auto-join")
+	endif()
+
+	get_filename_component(SCHEMA_NAME "${ARG_SCHEMA_PATH}" NAME_WE)
+	set(DEP_FILE_PATH "${SDL_OUTPUT_DIRECTORY}/${SCHEMA_NAME}.depfile")
+
+	list(APPEND MODIFICATORS "--QML")
+	list(APPEND MODIFICATORS "--use-all-modificators")
+	list(APPEND MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
+	list(APPEND MODIFICATORS "--generator=DEPFILE:${DEP_FILE_PATH}") ##< use depfile
+
+	# use cache file if provided
+	if (GLOBAL_SDL_CACHE_FILE)
+		list(APPEND MODIFICATORS "-C${GLOBAL_SDL_CACHE_FILE}")
 	endif()
 
 	list(LENGTH GLOBAL_SDL_SCHEMA_SEARCH_PATHS SDL_SCHEMA_PATHS_COUNT)
@@ -257,17 +276,7 @@ macro (ImtCoreCustomConfigureSdlQml)
 
 	set(${ARG_FOUND_DEPS} "${FOUND_DEPS}")
 
-	ImtCoreGetSdlDeps(GET_SCHEMA_DEPS
-		INPUT
-			"${ARG_SCHEMA_PATH}"
-		OUT_DIR
-			"${SDL_OUTPUT_DIRECTORY}"
-		MODIFICATORS
-			"${MODIFICATORS}"
-		RESULT_VARIABLE
-			FOUND_SCHEMA_DEPS)
-
-	message(VERBOSE "QML DEP FOUND for ${PROJECT_NAME} DEPS: ${FOUND_DEPS} SCHEMAS: ${FOUND_SCHEMA_DEPS}")
+	message(VERBOSE "QML DEP FOUND for ${PROJECT_NAME} DEPS: ${FOUND_DEPS} ")
 
 	GetSdlGeneratorPath(SDL_GENERATOR_EXE_PATH)
 	add_custom_command(
@@ -278,7 +287,9 @@ macro (ImtCoreCustomConfigureSdlQml)
 		ARGS
 			-GS ${ARG_SCHEMA_PATH} -O "${SDL_OUTPUT_DIRECTORY}" ${MODIFICATORS}
 		DEPENDS
-			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH} "${FOUND_SCHEMA_DEPS}" "${ARG_EXTRA_DEPS}"
+			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH} "${ARG_EXTRA_DEPS}"
+		DEPFILE
+			${DEP_FILE_PATH}
 		COMMENT
 			"[QML:SDL::${PROJECT_NAME}] Creating resources for schema ${ARG_SCHEMA_PATH}"
 		VERBATIM)
@@ -294,7 +305,7 @@ endmacro()
 
 #! CPP+QML+GQL \NOTE this function enables ALL modificators
 #! \param SCHEMA_PATH		- The absolute path to the schema file to be compiled.
-#! \param QML_NAME			- \DEPRECATED \WARNING NEVER USE IT! set \param 'QML' instead (boolean)
+#! \param QML_NAME			- \DEPRECATED \WARNING NEVER USE IT! set \param 'QML' instead (boolean) \TODO After adapting all the projects, remove it.
 macro (ImtCoreCustomConfigureSdlCppQml)
 	set(oneValueArgs
 		SCHEMA_PATH
@@ -317,6 +328,8 @@ macro (ImtCoreCustomConfigureSdlCppQml)
 	if (ARG_QML_NAME)
 		# \TODO use FATAL_ERROR for it
 		message(WARNING "DEPRECATED argument provided! replace 'QML_NAME MyQmlSdl' to 'QML' ")
+
+		# unreachable code!
 		message(VERBOSE "Additing SDL for QML compile source '${ARG_SCHEMA_PATH}' for ${PROJECT_NAME}")
 		ImtCoreCustomConfigureSdlQml(
 			SCHEMA_PATH "${ARG_SCHEMA_PATH}"

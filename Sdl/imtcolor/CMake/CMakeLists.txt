@@ -9,13 +9,11 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/RgbColorHex.sdl
 			)
 
-ImtCoreCustomConfigureSdlCppQml(CXX
+ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Lab.sdl"
-			VERSION		"1.0"
-			QML_NAME	"imtcolorLabSdl")
+			VERSION		"1.0")
 
-ImtCoreCustomConfigureSdlCppQml(CXX
+ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/RgbColorHex.sdl"
-			VERSION		"1.0"
-			QML_NAME	"imtcolorRgbColorHexSdl")
+			VERSION		"1.0")
 

@@ -9,17 +9,14 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Licenses.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Products.sdl)
 
-ImtCoreCustomConfigureSdlCppQml(CXX
+ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Features.sdl"
-			VERSION		"1.0"
-			QML_NAME	"imtlicFeaturesSdl")
-ImtCoreCustomConfigureSdlCppQml(CXX
+			VERSION		"1.0")
+ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Licenses.sdl"
 			VERSION		"1.0"
-			SOURCE_NAME	"Licenses"
-			QML_NAME	"imtlicLicensesSdl")
-ImtCoreCustomConfigureSdlCppQml(CXX
+			SOURCE_NAME	"Licenses")
+ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Products.sdl"
 			VERSION		"1.0"
-			SOURCE_NAME	"Products"
-			QML_NAME	"imtlicProductsSdl")
+			SOURCE_NAME	"Products")

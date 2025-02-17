@@ -11,27 +11,22 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentRevision.sdl
 		)
 
-ImtCoreCustomConfigureSdlCppQml(CXX
+ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ImtBaseTypes.sdl"
-			VERSION		"1.0"
-			QML_NAME	"imtbaseImtBaseTypesSdl")
+			VERSION		"1.0")
 
-ImtCoreCustomConfigureSdlCppQml(CXX
+ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ComplexCollectionFilter.sdl"
-			VERSION		"1.0"
-			QML_NAME	"imtbaseComplexCollectionFilterSdl")
+			VERSION		"1.0")
 
-ImtCoreCustomConfigureSdlCppQml(CXX
+ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ImtCollection.sdl"
-			VERSION		"1.0"
-			QML_NAME	"imtbaseImtCollectionSdl")
+			VERSION		"1.0")
 
-ImtCoreCustomConfigureSdlCppQml(CXX
+ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentRevision.sdl"
-			VERSION		"1.0"
-			QML_NAME	"imtbaseDocumentRevisionSdl")
+			VERSION		"1.0")
 
-ImtCoreCustomConfigureSdlCppQml(CXX
+ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/MimeType.sdl"
-			VERSION		"1.0"
-			QML_NAME	"imtbaseMimeTypeSdl")
+			VERSION		"1.0")
