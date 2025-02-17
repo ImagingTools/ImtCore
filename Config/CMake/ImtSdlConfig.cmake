@@ -47,7 +47,7 @@ function(ImtGenerateSdlWithDeps
 		DEPENDS
 			${SDL_GENERATOR_EXE_PATH} ${SDL_GENERATOR_COMMAND_PARAM_INPUT_FILE_PATH}
 		COMMENT
-			"[SDL::${PROJECT_NAME}] Creating classes"
+			"[SDL::${PROJECT_NAME}] Creating classes for schema ${ARG_SCHEMA_PATH}"
 		VERBATIM
 	)
 

@@ -10,8 +10,8 @@ macro(ImtCoreGetSdlDeps)
 	GetSdlGeneratorPath(SDL_GENERATOR_EXE_PATH)
 
 	if (ARG_GET_SCHEMA_DEPS)
-	set(SDL_DEPS_GENERATION_COMMAND ${SDL_GENERATOR_EXE_PATH} -S ${ARG_INPUT} --schema-dependencies --auto-link=2)
-		
+		set(SDL_DEPS_GENERATION_COMMAND ${SDL_GENERATOR_EXE_PATH} -S ${ARG_INPUT} --schema-dependencies --auto-link=2)
+
 		list(LENGTH GLOBAL_SDL_SCHEMA_SEARCH_PATHS SDL_SCHEMA_PATHS_COUNT)
 		if (SDL_SCHEMA_PATHS_COUNT GREATER 0 )
 			foreach(SDL_SEARCH_PATH ${GLOBAL_SDL_SCHEMA_SEARCH_PATHS})
@@ -156,7 +156,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 			list(APPEND CUSTOM_MODIFICATORS "-I${SDL_SEARCH_PATH}")
 		endforeach()
 	endif()
-	
+
 	ImtCoreGetSdlDeps(
 		INPUT
 			"${ARG_SCHEMA_PATH}"
@@ -193,7 +193,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 		DEPENDS
 			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH} "${FOUND_SCHEMA_DEPS}" "${ARG_EXTRA_DEPS}"
 		COMMENT
-			"[CPP:SDL::${PROJECT_NAME}] Creating classes"
+			"[CPP:SDL::${PROJECT_NAME}] Creating classes for schema ${ARG_SCHEMA_PATH}"
 		VERBATIM)
 
 	target_sources(${PROJECT_NAME} PRIVATE ${FOUND_DEPS})
@@ -204,12 +204,12 @@ endmacro()
 
 
 macro (ImtCoreCustomConfigureSdlQml)
-	set(oneValueArgs 
+	set(oneValueArgs
 		SCHEMA_PATH
-			VERSION 
-			QML_NAME 
-			EXTRA_DEPS 
-			FOUND_DEPS 
+			VERSION
+			QML_NAME
+			EXTRA_DEPS
+			FOUND_DEPS
 			CUSTOM_OUTPUT_ROOT_DIR_PATH)
 	cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
 
@@ -279,7 +279,7 @@ macro (ImtCoreCustomConfigureSdlQml)
 		DEPENDS
 			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH} "${FOUND_SCHEMA_DEPS}" "${ARG_EXTRA_DEPS}"
 		COMMENT
-			"[QML:SDL::${PROJECT_NAME}] Creating resources"
+			"[QML:SDL::${PROJECT_NAME}] Creating resources for schema ${ARG_SCHEMA_PATH}"
 		VERBATIM)
 
 	message(VERBOSE "EXEC: ${SDL_GENERATOR_EXE_PATH} -GS ${ARG_SCHEMA_PATH} -O ${SDL_OUTPUT_DIRECTORY} ${MODIFICATORS}")
@@ -293,6 +293,7 @@ endmacro()
 
 #! CPP+QML+GQL \NOTE this function enables ALL modificators
 #! \param SCHEMA_PATH		- The absolute path to the schema file to be compiled.
+#! \param QML_NAME			- \DEPRECATED \WARNING NEVER USE IT! set \param 'QML' instead (boolean)
 macro (ImtCoreCustomConfigureSdlCppQml)
 	set(oneValueArgs
 		SCHEMA_PATH
@@ -301,7 +302,8 @@ macro (ImtCoreCustomConfigureSdlCppQml)
 		CUSTOM_OUTPUT_ROOT_DIR_PATH)
 
 	set(booleanArgs
-		CXX)
+		CXX
+		QML)
 	cmake_parse_arguments(ARG "${booleanArgs}" "${oneValueArgs}" "" ${ARGN})
 
 	if (ARG_CXX)
@@ -312,11 +314,21 @@ macro (ImtCoreCustomConfigureSdlCppQml)
 	endif()
 
 	if (ARG_QML_NAME)
+		# \TODO use FATAL_ERROR for it
+		message(WARNING "DEPRECATED argument provided! replace 'QML_NAME MyQmlSdl' to 'QML' ")
 		message(VERBOSE "Additing SDL for QML compile source '${ARG_SCHEMA_PATH}' for ${PROJECT_NAME}")
 		ImtCoreCustomConfigureSdlQml(
 			SCHEMA_PATH "${ARG_SCHEMA_PATH}"
 			VERSION "${ARG_VERSION}"
 			QML_NAME "${ARG_QML_NAME}"
+			CUSTOM_OUTPUT_ROOT_DIR_PATH "${ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH}")
+	endif()
+
+	if (ARG_QML)
+		message(VERBOSE "Additing SDL for QML compile source '${ARG_SCHEMA_PATH}' for ${PROJECT_NAME}")
+		ImtCoreCustomConfigureSdlQml(
+			SCHEMA_PATH "${ARG_SCHEMA_PATH}"
+			VERSION "${ARG_VERSION}"
 			CUSTOM_OUTPUT_ROOT_DIR_PATH "${ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH}")
 	endif()
 

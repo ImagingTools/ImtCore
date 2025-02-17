@@ -103,7 +103,7 @@ function (ImtCoreAutoConfigureSdlCpp)
 		DEPENDS
 			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH}
 		COMMENT
-			"[CPP:SDL::${PROJECT_NAME}] Creating classes"
+			"[CPP:SDL::${PROJECT_NAME}] Creating classes for schema ${ARG_SCHEMA_PATH}"
 		VERBATIM)
 
 	target_sources(${PROJECT_NAME} PRIVATE ${FOUND_DEPS})
@@ -156,7 +156,7 @@ function (ImtCoreAutoConfigureSdlQml)
 		DEPENDS
 			${SDL_GENERATOR_EXE_PATH} ${ARG_SCHEMA_PATH}
 		COMMENT
-			"[QML:SDL::${PROJECT_NAME}] Creating resources"
+			"[QML:SDL::${PROJECT_NAME}] Creating resources for schema ${ARG_SCHEMA_PATH}"
 		VERBATIM)
 
 	ImtFutureResourceWrap (
