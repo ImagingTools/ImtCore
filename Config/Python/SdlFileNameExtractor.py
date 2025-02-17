@@ -59,8 +59,8 @@ def CalculateTargetCppFilesFromSchemaParams(schemaName, schemaVersion, baseDirPa
 	else:
 		baseFilePath += defaultName
 
-	retVal.append(GetFileSystemAcceptableEntryPath(baseFilePath + (".h")))
 	retVal.append(GetFileSystemAcceptableEntryPath(baseFilePath + (".cpp")))
+	retVal.append(GetFileSystemAcceptableEntryPath(baseFilePath + (".h")))
 
 	return retVal
 
