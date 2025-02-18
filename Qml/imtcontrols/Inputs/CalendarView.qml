@@ -26,6 +26,7 @@ ListView{
 
 	property ListModel dayOfWeekModel: ListModel{};
 
+	property string color: "#ffffff";
 	property string cellColor: "#ffffff";
 	property string fontColor_cell: "#000000";
 	property int fontSize_cell: 12;
@@ -59,6 +60,7 @@ ListView{
 		width: calendarView.width;
 		height: calendarView.height;
 		radius: calendarView.radius;
+		color: calendarView.color;
 
 		Row{
 			id: dayOfWeekList;
