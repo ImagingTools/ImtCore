@@ -21,14 +21,11 @@ SingleDocumentWorkspacePageView {
         Style.setDecorators(decorators_)
     }
 
-    onWebSocketUrlChanged: {
-        console.log("onWebSocketUrlChanged", webSocketUrl);
-    }
-
     Connections {
         target: AuthorizationController;
 
 		function onLoggedIn(){
+			console.log("onLoggedIn", container.productId);
             if (container.productId !== ""){
                 container.startItemSourceComp = administrationViewComp
             }
@@ -57,7 +54,6 @@ SingleDocumentWorkspacePageView {
     SubscriptionManager {
         id: subscriptionManager;
         url: container.webSocketUrl;
-        // url: "ws://localhost:8112";
     }
 
     DialogManagerView {
@@ -81,12 +77,13 @@ SingleDocumentWorkspacePageView {
     }
 
     function login(login, password){
-        let param = {"Login": login,"Password": password }
-        AuthorizationController.login(param)
+		console.log("login",login, password);
+		
+        AuthorizationController.login(login, password)
     }
 
     function logout(){
-        AuthorizationController.userLogout({});
+        AuthorizationController.logoutForce();
     }
 }
 

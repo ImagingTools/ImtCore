@@ -43,7 +43,7 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 		Q_ASSERT_X(false, "Attribute 'ApplicationInfo' was not set", "CSimpleLoginWrapComp");
 		return false;
 	}
-
+	
 	namespace authsdl = sdl::imtauth::Authorization;
 
 	QByteArray productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
@@ -59,6 +59,7 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 		if (!SendModelRequest<authsdl::CAuthorizationPayload, authsdl::CAuthorizationPayload>(gqlRequest, response)){
 			return false;
 		}
+		m_loggedUserPassword = password.toUtf8();
 
 		QByteArray userId;
 		if (response.Version_1_0->UserId){
@@ -93,9 +94,7 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 
 			m_loggedUserId = *response.Version_1_0->Username;
 		}
-
-		m_loggedUserPassword = password.toUtf8();
-
+		
 		return true;
 	}
 

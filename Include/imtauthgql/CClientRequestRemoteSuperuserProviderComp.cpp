@@ -39,7 +39,7 @@ bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& /*error
 		if (response.UserData.has_value()){
 			Q_ASSERT_X((*response.UserData).Id.has_value(), "CClientRequestRemoteSuperuserProviderComp::SuperuserExists", "User-ID was requested and should be returned by server");
 			if ((*response.UserData).Id.has_value()){
-				return (*m_superuserIdAttrPtr == *(*response.UserData).Id);
+				return (*m_superuserIdAttrPtr == *(*response.UserData).Username);
 			}
 		}
 	}
