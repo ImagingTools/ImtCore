@@ -13,7 +13,7 @@ TableCellDelegateBase {
 
     signal currentIndexChanged(int index);
 
-    onRowIndexChanged: {
+    onReused: {
         if (rowIndex >= 0 && model){
             cb.model = model;
 

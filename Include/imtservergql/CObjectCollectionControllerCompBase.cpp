@@ -458,6 +458,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 
 	if (!response.WriteToModel(*dataModelPtr)){
 		errorMessage = QString("Unable to insert object '%1'. Error: Unable to write notification data to the model").arg(qPrintable(newObjectId));
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return nullptr;
 	}
 
@@ -891,12 +892,21 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 
 		return nullptr;
 	}
-
+	
+	sdl::imtbase::ImtCollection::CRemovedNotificationPayload::V1_0 response;
+	response.Id = objectId;
+	
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	imtbase::CTreeItemModel* notificationModelPtr = dataModelPtr->AddTreeModel("removedNotification");
-	notificationModelPtr->SetData("Id", objectId);
-
+	Q_ASSERT(dataModelPtr != nullptr);
+	
+	if (!response.WriteToModel(*dataModelPtr)){
+		errorMessage = QString("Unable to delete object '%1'. Error: Unable to write notification data to the model").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+	
 	return rootModelPtr.PopPtr();
 }
 

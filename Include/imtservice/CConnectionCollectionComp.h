@@ -43,12 +43,12 @@ public:
 	virtual bool SetServiceTypeName(const QString& serviceTypeName) const override;
 	virtual const imtbase::ICollectionInfo* GetUrlList() const override;
 	virtual const QUrl* GetUrl(const QByteArray& id) const override;
-	virtual const IServiceConnectionParam* GetConnectionMetaInfo(const QByteArray& id) const override;
+	virtual const IServiceConnectionInfo* GetConnectionMetaInfo(const QByteArray& id) const override;
 	virtual bool SetUrl(const QByteArray& id, const QUrl& url) const override;
 	virtual QByteArray InsertNewConnection(
 						const QByteArray& connectionId,
 						const QUrl& url,
-						imtservice::IServiceConnectionParam::ConnectionType connectionType,
+						imtservice::IServiceConnectionInfo::ConnectionType connectionType,
 						const QString& name = QString(),
 						const QString& description = QString() ) override;
 

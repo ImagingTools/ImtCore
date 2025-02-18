@@ -5,7 +5,7 @@
 #include <ilog/ITracingConfiguration.h>
 
 // ImtCore includes
-#include <imtservice/IServiceConnectionParam.h>
+#include <imtservice/IServiceConnectionInfo.h>
 #include <imtbase/ICollectionInfo.h>
 #include <imtbase/IUrlParam.h>
 
@@ -27,12 +27,12 @@ public:
 	virtual bool SetServiceTypeName(const QString& serviceTypeName) const = 0;
 	virtual const imtbase::ICollectionInfo* GetUrlList() const = 0;
 	virtual const QUrl* GetUrl(const QByteArray& id) const = 0;
-	virtual const IServiceConnectionParam* GetConnectionMetaInfo(const QByteArray& id) const = 0;
+	virtual const IServiceConnectionInfo* GetConnectionMetaInfo(const QByteArray& id) const = 0;
 	virtual bool SetUrl(const QByteArray& id, const QUrl& url) const = 0;
 	virtual QByteArray InsertNewConnection(
 				const QByteArray& connectionId,
 				const QUrl& url,
-				imtservice::IServiceConnectionParam::ConnectionType connectionType,
+				imtservice::IServiceConnectionInfo::ConnectionType connectionType,
 				const QString& name = QString(),
 				const QString& description = QString() ) = 0;
 };

@@ -2,8 +2,8 @@
 
 
 // ImtCore includes
+#include <imtservice/CServiceConnectionInfo.h>
 #include <imtservice/IServiceConnectionLinkParam.h>
-#include <imtservice/IConnectionStatus.h>
 
 
 namespace imtservice
@@ -11,28 +11,16 @@ namespace imtservice
 
 
 class CUrlConnectionLinkParam:
-			public virtual imtservice::IServiceConnectionLinkParam,
-			public virtual imtservice::IConnectionStatus
+			public imtservice::CServiceConnectionInfo,
+			public virtual imtservice::IServiceConnectionLinkParam
 {
 public:
-	CUrlConnectionLinkParam();
-	CUrlConnectionLinkParam(const QByteArray& serviceTypeName, const QByteArray& usageId, const QByteArray& dependantServiceConnectionId);
-
-	void SetServiceTypeName(const QByteArray& serviceTypeName);
-	void SetDependantServiceConnectionId(const QByteArray& dependantId);
-	void SetUsageId(const QByteArray& usageId);
-
-	// reimplemented (imtservice::IServiceInfo)
-	virtual ConnectionType GetConnectionType() const override;
-	virtual QByteArray GetServiceTypeName() const override;
-	virtual QByteArray GetUsageId() const override;
-	virtual QUrl GetDefaultUrl() const override;
+	typedef imtservice::CServiceConnectionInfo BaseClass;
+	
+	void SetDependantServiceConnectionId(const QByteArray& connectionId);
 
 	// reimplemented (imtservice::IServiceConnectionLinkParam)
 	virtual QByteArray GetDependantServiceConnectionId() const override;
-
-	// reimplemented (imtservice::IConnectionStatus)
-	virtual ConnectionStatus GetConnectionStatus() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -43,11 +31,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	QByteArray m_serviceTypeName;
-	QByteArray m_usageId;
 	QByteArray m_dependantServiceConnectionId;
-	ConnectionStatus m_connectionStatus;
-	QUrl m_defaultUrl;
 };
 
 

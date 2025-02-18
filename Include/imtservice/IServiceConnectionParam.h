@@ -5,11 +5,9 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUuid>
 
-// ACF includes
-#include <istd/IChangeable.h>
 
-// ImtCore includes
-#include <imtservice/IServiceConnectionInfo.h>
+// ACF includes
+#include <iser/ISerializable.h>
 
 
 namespace imtservice
@@ -20,7 +18,7 @@ namespace imtservice
 	Interface for describing an service connection param.
 	\ingroup Service
 */
-class IServiceConnectionParam: virtual public IServiceConnectionInfo
+class IServiceConnectionParam: virtual public iser::ISerializable
 {
 public:
 

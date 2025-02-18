@@ -28,6 +28,10 @@ type AddedNotificationPayload {
 	Id: ID!
 }
 
+type RemovedNotificationPayload {
+	Id: ID!
+}
+
 type CollectionFilter {
 	ObjectTypeId: ID
 	Filter: String

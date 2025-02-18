@@ -56,7 +56,7 @@ const QUrl* CConnectionCollectionComp::GetUrl(const QByteArray& id) const
 }
 
 
-const IServiceConnectionParam* CConnectionCollectionComp::GetConnectionMetaInfo(const QByteArray& id) const
+const IServiceConnectionInfo* CConnectionCollectionComp::GetConnectionMetaInfo(const QByteArray& id) const
 {
 	CUrlConnectionParam* urlConnectionParam =  dynamic_cast<CUrlConnectionParam*>(const_cast<istd::IChangeable*>(m_collection.GetObjectPtr(id)));
 	if (urlConnectionParam != nullptr){
@@ -105,7 +105,7 @@ bool CConnectionCollectionComp::SetUrl(const QByteArray& id, const QUrl& url) co
 QByteArray CConnectionCollectionComp::InsertNewConnection(
 			const QByteArray& /*connectionId*/,
 			const QUrl& /*url*/,
-			imtservice::IServiceConnectionParam::ConnectionType /*connectionType*/,
+			imtservice::IServiceConnectionInfo::ConnectionType /*connectionType*/,
 			const QString& /*name*/,
 			const QString& /*description*/)
 {
@@ -115,8 +115,7 @@ QByteArray CConnectionCollectionComp::InsertNewConnection(
 
 int CConnectionCollectionComp::GetTracingLevel() const
 {
-	if (!m_tracingConfigurationCompPtr.IsValid())
-	{
+	if (!m_tracingConfigurationCompPtr.IsValid()){
 		return -1;
 	}
 
@@ -126,8 +125,7 @@ int CConnectionCollectionComp::GetTracingLevel() const
 
 void CConnectionCollectionComp::SetTracingLevel(int tracingLevel)
 {
-	if (!m_tracingConfigurationCompPtr.IsValid())
-	{
+	if (!m_tracingConfigurationCompPtr.IsValid()){
 		return;
 	}
 
@@ -150,9 +148,9 @@ void CConnectionCollectionComp::OnComponentCreated()
 		m_connectionUsageIds.GetCount() == m_connectionTypes.GetCount() &&
 		m_connectionUsageIds.GetCount() == m_connectionUrlListCompPtr.GetCount()){
 		for (int index = 0; index < m_connectionUsageIds.GetCount(); index++){
-			IServiceConnectionParam::ConnectionType connectionType = IServiceConnectionParam::CT_INPUT;
+			IServiceConnectionInfo::ConnectionType connectionType = IServiceConnectionInfo::CT_INPUT;
 			if (m_connectionTypes[index] == 1){
-				connectionType = IServiceConnectionParam::CT_OUTPUT;
+				connectionType = IServiceConnectionInfo::CT_OUTPUT;
 			}
 			QByteArray name = m_connectionNames[index];
 			QByteArray serviceTypeName = m_connectionServiceTypeNames[index];
@@ -160,8 +158,19 @@ void CConnectionCollectionComp::OnComponentCreated()
 			QByteArray connectionUsageId = m_connectionUsageIds[index];
 			QByteArray description = m_connectionDescriptions[index];
 
-			CUrlConnectionParam urlConnectionParam(serviceTypeName, connectionUsageId, connectionType, url);
-			m_collection.InsertNewObject("ConnectionInfo", name, description, &urlConnectionParam, connectionUsageId);
+			CUrlConnectionParam urlConnectionParam;
+			urlConnectionParam.SetServiceTypeName(serviceTypeName);
+			urlConnectionParam.SetUsageId(connectionUsageId);
+			urlConnectionParam.SetConnectionType(connectionType);
+			urlConnectionParam.SetUrl(url);
+			
+			QByteArray retVal = m_collection.InsertNewObject("ConnectionInfo", name, description, &urlConnectionParam, connectionUsageId);
+			if (retVal.isEmpty()){
+				SendErrorMessage(
+					0,
+					QString("Unable to insert connection '%1' to collection. Insert to collection failed").arg(qPrintable(connectionUsageId)),
+					"CConnectionCollectionComp");
+			}
 		}
 	}
 }

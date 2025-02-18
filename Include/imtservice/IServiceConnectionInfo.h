@@ -19,7 +19,6 @@ namespace imtservice
 class IServiceConnectionInfo: virtual public iser::ISerializable
 {
 public:
-
 	enum ConnectionType
 	{
 		CT_INPUT,
@@ -27,10 +26,12 @@ public:
 	};
 
 	I_DECLARE_ENUM(ConnectionType, CT_INPUT, CT_OUTPUT);
+	
 	/**
 		Get connection input/output type.
 	*/
 	virtual ConnectionType GetConnectionType() const = 0;
+
 	/**
 		Get service type name.
 	*/

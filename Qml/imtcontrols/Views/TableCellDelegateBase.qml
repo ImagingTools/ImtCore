@@ -312,14 +312,17 @@ Item {
 				let tableItem = rowDelegate.tableItem;
 				let elements = tableItem.elements;
 				let headerId = delegateContainer.rowDelegate.tableItem.headers.getData("Id", delegateContainer.columnIndex);
-
-				elements.setData(headerId, value, delegateContainer.rowIndex);
+				if ("item" in delegateContainer.rowDelegate.dataModel){
+					delegateContainer.rowDelegate.dataModel.item[headerId] = value;
+				}
+				else{
+					elements.setData(headerId, value, delegateContainer.rowIndex);
+				}
 			}
 		}
 	}
 
 	function setCellWidth(){
-
 		if(!delegateContainer || !delegateContainer.rowDelegate){
 			return;
 		}

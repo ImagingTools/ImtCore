@@ -66,6 +66,10 @@ RemoteCollectionView {
 
         log.doUpdateGui();
     }
+	
+	function getHeaders(){
+		return {};
+	}
 
     dataControllerComp: Component { CollectionRepresentation {
             id: messageCollectionRepresentation
