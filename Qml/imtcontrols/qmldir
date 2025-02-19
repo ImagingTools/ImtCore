@@ -82,6 +82,7 @@ TextInputWithLabel 1.0 ./Inputs/TextInputWithLabel.qml
 TimeIntervalPicker 1.0 ./Inputs/TimeIntervalPicker.qml
 TimePicker 1.0 ./Inputs/TimePicker.qml
 TimeInput 1.0 ./Inputs/TimeInput.qml
+TimeInputDialog 1.0 ./Inputs/TimeInputDialog.qml
 DateInput 1.0 ./Inputs/DateInput.qml
 DateTimeInput 1.0 ./Inputs/DateTimeInput.qml
 TextArea 1.0 ./Inputs/TextArea.qml
