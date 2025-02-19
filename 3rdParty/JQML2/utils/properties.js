@@ -87,12 +87,14 @@ class QProperty {
     }
 
     reset(newValue){
+        this.$isReset = true
         this.subscribersReset()
         this.unsubscribe()
         this.set(newValue)
     }
 
     setCompute(compute){
+        delete this.$isReset
         // updateList.push(this)
         this.compute = compute
         this.completed = false
@@ -460,12 +462,55 @@ class QLinkedBool extends QBool {
     }
 }
 
-class QVisible extends QLinkedBool {
+class QVisible extends QBool {
+    getDefaultValue(){
+        return true
+    }
 
+    get(){
+        if(!this.completed){
+            this.update()
+        }   
+        return this.value && this.value2
+    }
+
+    set(newValue){
+        let safeValue = this.value
+        try {
+            safeValue = this.typeCasting(newValue)
+        } catch (error) {
+            console.error(error)
+        }
+
+        if((this.value && this.value2) !== (safeValue && this.value2)){
+            this.value = safeValue
+            if(this.notify) this.notify()
+        } else {
+            this.value = safeValue
+        }
+    }
+
+    set2(newValue){
+        let safeValue = this.value2
+        try {
+            safeValue = this.typeCasting(newValue)
+        } catch (error) {
+            console.error(error)
+        }
+
+        if((this.value && this.value2) !== (safeValue && this.value)){
+            this.value2 = safeValue
+            if(this.notify) this.notify()
+        } else {
+            this.value2 = safeValue
+        }
+    }
 }
 
 class QVisibleNot extends QVisible {
-    originValue = false
+    getDefaultValue(){
+        return false
+    }
 }
 
 class QVar extends QProperty {

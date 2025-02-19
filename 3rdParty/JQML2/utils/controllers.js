@@ -268,6 +268,10 @@ class MouseController {
         if(!this.target || !(this.target instanceof TextInput || this.target instanceof TextEdit || this.target instanceof Map)){
             e.preventDefault()
         }
+
+        if(this.target instanceof Flickable){
+            this.target.$moveStart()
+        }
     }
     onMouseUp(x, y, button, e){
         global['TransactionController'].begin()
@@ -385,6 +389,10 @@ class MouseController {
             
         }
         
+        if(this.target instanceof Flickable){
+            this.target.$moveEnd()
+        }
+
         this.pressed = []
         this.pressedMouseArea = []
         this.target = null
@@ -450,6 +458,11 @@ class MouseController {
                                 (Math.abs(this.originY - y) >= 10 && parent.getPropertyValue('height') < parent.getPropertyValue('contentItem').getPropertyValue('height'))){
                                     this.target.getProperty('pressed').value = false
                                     this.target = parent
+
+                                    if(this.target instanceof Flickable){
+                                        this.target.$moveStart()
+                                    }
+
                                     break
                                 }
                                 

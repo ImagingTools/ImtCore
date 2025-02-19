@@ -2,6 +2,9 @@ const { Item } = require('./Item')
 const { Flickable } = require('./Flickable')
 const { QVar, QReal, QBool, QAutoGeometry } = require('../utils/properties')
 const { ListModel } = require('./ListModel')
+const { PropertyAnimation } = require('./PropertyAnimation')
+
+
 
 class ListView extends Flickable {
     static Horizontal = 0
@@ -51,6 +54,10 @@ class ListView extends Flickable {
         this.$items = []
 
         this.$cache = []
+
+        this.$animation = new PropertyAnimation()
+        this.$animation.target = this
+        // this.$animation.duration = 600
     }
 
     $complete(){
@@ -87,6 +94,8 @@ class ListView extends Flickable {
         let model = this.getPropertyValue('model')
         if(model instanceof ListModel){     
             length = model.getPropertyValue('count')
+        } else if(typeof model === 'object' && Array.isArray(model)){
+            length = model.length
         } else if(typeof model === 'number'){
             length = model
         } else {
@@ -100,6 +109,8 @@ class ListView extends Flickable {
         let model = this.getPropertyValue('model')
         if(model instanceof ListModel){     
             length = model.getPropertyValue('count')
+        } else if(typeof model === 'object' && Array.isArray(model)){
+            length = model.length
         } else if(typeof model === 'number'){
             length = model
         } else {
@@ -380,12 +391,12 @@ class ListView extends Flickable {
     }
 
     $updateView(){
-        if(!this.$ready){
+        if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) return
+
+        if(!this.$ready && !this.$properties.model.$isReset){
             this.$needUpdate = true
             return
         }
-
-        if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) return
         
         let model = this.getPropertyValue('model')
         let length = 0 
@@ -586,17 +597,17 @@ class ListView extends Flickable {
     }
 
     $contentXChanged(){
-        this.getPropertyValue('contentItem').getProperty('x').reset(-this.getPropertyValue('contentX'))
+        if(this.UID) this.getPropertyValue('contentItem').getProperty('x').reset(-this.getPropertyValue('contentX'))
         this.$updateView()
     }
 
     $contentYChanged(){
-        this.getPropertyValue('contentItem').getProperty('y').reset(-this.getPropertyValue('contentY'))
+        if(this.UID) this.getPropertyValue('contentItem').getProperty('y').reset(-this.getPropertyValue('contentY'))
         this.$updateView()
     }
 
     $contentWidthChanged(){
-        this.getPropertyValue('contentItem').getProperty('width').reset(this.getPropertyValue('contentWidth'))
+        if(this.UID) this.getPropertyValue('contentItem').getProperty('width').reset(this.getPropertyValue('contentWidth'))
         if(this.getPropertyValue('contentWidth') < this.getPropertyValue('width')){
             if(this.$items[0]){
                 this.getProperty('contentX').reset(this.$items[0].getPropertyValue('x'))
@@ -607,7 +618,7 @@ class ListView extends Flickable {
     }
 
     $contentHeightChanged(){
-        this.getPropertyValue('contentItem').getProperty('height').reset(this.getPropertyValue('contentHeight'))
+        if(this.UID) this.getPropertyValue('contentItem').getProperty('height').reset(this.getPropertyValue('contentHeight'))
         if(this.getPropertyValue('contentHeight') < this.getPropertyValue('height')){
             if(this.$items[0]){
                 this.getProperty('contentY').reset(this.$items[0].getPropertyValue('y'))
@@ -900,6 +911,88 @@ class ListView extends Flickable {
         return obj
     }
 
+    $moveStart(){
+        this.$mouseX = this.contentX
+        this.$mouseY = this.contentY
+    }
+
+    $moveEnd(){
+        if(this.getPropertyValue('snapMode') === ListView.SnapToItem) {
+            let targetIndex = 0
+
+            for(let i = 0; i < this.$items.length; i++){
+                if(this.$items[i]){
+                    if(this.getPropertyValue('orientation') === ListView.Vertical){
+                        if(this.$items[i].getPropertyValue('y') <= this.getPropertyValue('contentY') && this.$items[i].getPropertyValue('y') + this.$items[i].getPropertyValue('height') > this.getPropertyValue('contentY')){
+                            targetIndex = i
+                            break
+                        }
+                    } else {
+                        if(this.$items[i].getPropertyValue('x') <= this.getPropertyValue('contentX') && this.$items[i].getPropertyValue('x') + this.$items[i].getPropertyValue('width') > this.getPropertyValue('contentX')){
+                            targetIndex = i
+                            break
+                        }
+                    }
+                }
+                
+            }
+
+            if(this.getPropertyValue('orientation') === ListView.Vertical){
+                this.$animation.property = 'contentY'
+                this.$animation.from = this.getPropertyValue('contentY')
+                this.$animation.to = this.$items[targetIndex].getPropertyValue('y')
+                this.$animation.start()
+            } else {
+                this.$animation.property = 'contentX'
+                this.$animation.from = this.getPropertyValue('contentX')
+                this.$animation.to = this.$items[targetIndex].getPropertyValue('x')
+                this.$animation.start()
+            }
+        } else if(this.getPropertyValue('snapMode') === ListView.SnapOneItem){
+            let currentIndex = 0
+
+            for(let i = 0; i < this.$items.length; i++){
+                if(this.$items[i]){
+                    if(this.getPropertyValue('orientation') === ListView.Vertical){
+                        if(this.$items[i].getPropertyValue('y') <= this.$mouseY && this.$items[i].getPropertyValue('y') + this.$items[i].getPropertyValue('height') > this.$mouseY){
+                            currentIndex = i
+                            break
+                        }
+                    } else {
+                        if(this.$items[i].getPropertyValue('x') <= this.$mouseX && this.$items[i].getPropertyValue('x') + this.$items[i].getPropertyValue('width') > this.$mouseX){
+                            currentIndex = i
+                            break
+                        }
+                    }
+                }
+                
+            }
+            
+            if(this.getPropertyValue('orientation') === ListView.Vertical){
+                this.$animation.property = 'contentY'
+                this.$animation.from = this.getPropertyValue('contentY')
+                
+                if(this.contentY > this.$mouseY){
+                    this.$animation.to = this.$items[currentIndex + 1].getPropertyValue('y')
+                    this.$animation.start()
+                } else if(this.contentY < this.$mouseY){
+                    this.$animation.to = this.$items[currentIndex - 1].getPropertyValue('y')
+                    this.$animation.start()
+                }
+            } else {
+                this.$animation.property = 'contentX'
+                this.$animation.from = this.getPropertyValue('contentX')
+
+                if(this.contentX > this.$mouseX){
+                    this.$animation.to = this.$items[currentIndex + 1].getPropertyValue('x')
+                    this.$animation.start()
+                } else if(this.contentX < this.$mouseX){
+                    this.$animation.to = this.$items[currentIndex - 1].getPropertyValue('x')
+                    this.$animation.start()
+                }
+            }
+        }
+    }
 
     destroy(){
         this.$disconnectModel()

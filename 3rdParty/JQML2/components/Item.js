@@ -105,8 +105,8 @@ class Item extends QtObject {
         })
         
         if(parent){
-            this.getProperty('visible').setOriginCompute(()=>{this.getProperty('visible').subscribe(this.getProperty('parent').get().getProperty('visible')); return this.getProperty('parent').get().getProperty('visible').get()})
-            this.getProperty('visible').update()
+            // this.getProperty('visible').setOriginCompute(()=>{this.getProperty('visible').subscribe(this.getProperty('parent').get().getProperty('visible')); return this.getProperty('parent').get().getProperty('visible').get()})
+            this.getProperty('visible').set2(parent.getPropertyValue('visible'))
 
             this.getProperty('activeFocus').setCompute(()=>{this.getProperty('activeFocus').subscribe(this.getProperty('focus'));return this.getProperty('focus').get()})
             this.getProperty('activeFocus').update()
@@ -343,7 +343,12 @@ class Item extends QtObject {
     }
 
     $visibleChanged(){
-        this.setStyle({ display: this.getProperty('visible').get() ? Item.defaultCSS.display : 'none' })
+        let currentValue = this.getPropertyValue('visible')
+        this.setStyle({ display: currentValue ? Item.defaultCSS.display : 'none' })
+
+        for(let child of this.children){
+            if(child.UID) child.getProperty('visible').set2(currentValue)
+        }
     }
 
     $xChanged(){
