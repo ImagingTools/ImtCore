@@ -15,7 +15,7 @@ macro(ImtCoreGetSdlDeps)
 		set (CUSTOM_PYTHON ON)
 		set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
 
-		if (NOT WIN32)
+		if (NOT WIN32 AND NOT ANDROID)
 			set(PYTHONEXE python3)
 		endif()
 	endif()
