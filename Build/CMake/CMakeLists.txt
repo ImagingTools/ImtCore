@@ -149,6 +149,7 @@ add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb"
 add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
 
 add_subdirectory("${INCLUDE_DIR}/imtpay/CMake" "${AUX_INCLUDE_DIR}/imtpay")
+add_dependencies(imtpay imtbasesdl)
 
 if(NOT DEFINED USE_GEO OR USE_GEO)
 	add_subdirectory("${INCLUDE_DIR}/imtgeo/CMake" "${AUX_INCLUDE_DIR}/imtgeo")
