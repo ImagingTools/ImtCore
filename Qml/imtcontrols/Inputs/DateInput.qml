@@ -5,7 +5,7 @@ import imtcontrols 1.0
 Item {
 	id: dateInput;
 
-	width: 130;
+	width: 160;
 	height: column.height;
 
 	property int inputHeight: 36;
@@ -259,61 +259,104 @@ Item {
 			text: qsTr("Date:");
 		}
 
-		CustomTextField{
-			id: input
-
+		Item{
 			width: dateInput.width;
 			height: dateInput.inputHeight;
 
-			textSize: dateInput.fontSize;
-			fontColor: dateInput.fontColor;
-			//borderColorConst:  (dateInput.isError || dateInput.isMonthError || dateInput.isDayError) ? Style.errorTextColor : input.textInputActiveFocus ? Style.iconColorOnSelected: Style.borderColor;
-			borderColor: Style.iconColorOnSelected;
+			CustomTextField{
+				id: input
 
-			KeyNavigation.tab: dateInput.tabKeyItem;
+				width: dateInput.width - calendarButtonContainer.width;
+				height: dateInput.inputHeight;
 
-			placeHolderText: dateInput.placeHolderText;
-			placeHolderTextSize: fontSize-2;
+				textSize: dateInput.fontSize;
+				fontColor: dateInput.fontColor;
+				//borderColorConst:  (dateInput.isError || dateInput.isMonthError || dateInput.isDayError) ? Style.errorTextColor : input.textInputActiveFocus ? Style.iconColorOnSelected: Style.borderColor;
+				borderColor: Style.iconColorOnSelected;
 
-			textInputValidator : RegularExpressionValidator { regularExpression: dateInput.dateRegExp }
+				KeyNavigation.tab: dateInput.tabKeyItem;
 
-			property bool isEmpty: false;
+				placeHolderText: dateInput.placeHolderText;
+				placeHolderTextSize: fontSize-2;
 
-			onVisibleChanged: {
-				if(text == ""){
-					isEmpty = true;
-				}
-			}
+				textInputValidator : RegularExpressionValidator { regularExpression: dateInput.dateRegExp }
 
-			onFocusChanged: {
-				if(!focus){
-					dateInput.setDateAsString(input.text);
-				}
-			}
-			onAccepted: {
-				if(dateInput.setDateAsString(input.text)){
-					dateInput.tabKeyItem.forceActiveFocus();
-				}
-			}
+				property bool isEmpty: false;
 
-			onTextChanged: {
-				if(text !== ""){
-					isEmpty = false;
-					dateInput.isError = false;
-					dateInput.isMonthError = false;
-					dateInput.isDayError = false;
+				onVisibleChanged: {
+					if(text == ""){
+						isEmpty = true;
+					}
 				}
 
-			}
+				onFocusChanged: {
+					if(!focus){
+						dateInput.setDateAsString(input.text);
+					}
+				}
+				onAccepted: {
+					if(dateInput.setDateAsString(input.text)){
+						dateInput.tabKeyItem.forceActiveFocus();
+					}
+				}
 
-			Rectangle{
-				id: frame;
+				onTextChanged: {
+					if(text !== ""){
+						isEmpty = false;
+						dateInput.isError = false;
+						dateInput.isMonthError = false;
+						dateInput.isDayError = false;
+					}
 
-				anchors.fill: parent;
+				}
 
-				radius: input.radius;
-				color: "transparent";
-				border.color:(dateInput.isError || dateInput.isMonthError || dateInput.isDayError) ? Style.errorTextColor : "transparent";
+				Rectangle{
+					id: frame;
+
+					anchors.fill: parent;
+
+					radius: input.radius;
+					color: "transparent";
+					border.color:(dateInput.isError || dateInput.isMonthError || dateInput.isDayError) ? Style.errorTextColor : "transparent";
+				}
+			}//TextField
+
+			Item {
+				id: calendarButtonContainer;
+
+				anchors.verticalCenter: parent.verticalCenter;
+				anchors.left: input.right;
+				width: 30;
+				height: parent.height;
+				clip: true;
+				Rectangle{
+					anchors.left: parent.left;
+					anchors.leftMargin: -20;
+
+					width: 50;
+					height: parent.height;
+					radius: input.radius;
+					border.color: Style.borderColor;
+				}
+				Button{
+					id: calendarButton;
+
+					anchors.centerIn: parent;
+
+					width: parent.width - 8;
+					height: width;
+
+					iconSource: "../../../" + Style.getIconPath("Icons/Calendar", Icon.State.Off, Icon.Mode.Normal);
+					decorator: Component{IconButtonDecorator{}}
+					onClicked: {
+						let point = input.mapToItem(null, 0, input.height + 2);
+						let parameters = {"x": point.x, "y":point.y};
+
+						ModalDialogManager.openDialog(calendarComp, parameters);
+
+					}
+
+				}
 			}
 		}
 
@@ -332,6 +375,20 @@ Item {
 		duration: 2000
 		onFinished: {
 			tooltip.hide();
+		}
+	}
+
+	Component{
+		id: calendarComp;
+
+		Calendar{
+			width: 350;
+			height: 350;
+			hiddenBackground: true;
+			centered: false;
+			onAccepted: {
+				dateInput.setDate(date);
+			}
 		}
 	}
 }

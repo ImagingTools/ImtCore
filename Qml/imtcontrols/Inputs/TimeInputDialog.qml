@@ -10,7 +10,7 @@ import imtgui 1.0
 PopupView {
 	id: timeInputDialog;
 
-	width: 150;
+	width: 140;
 	height: 120;
 
 	property int radius: 8;

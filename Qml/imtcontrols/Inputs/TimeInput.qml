@@ -79,7 +79,7 @@ Item {
 	}
 
 	function setTime(str){
-		console.log("Set time")
+		//console.log("Set time")
 		if(str.match(timeInput.timeRegExpFull) === null){
 			//console.log("Wrong time format!")
 			return false;
@@ -176,12 +176,21 @@ Item {
 			}
 
 			onFocusChanged: {
+				console.log("FOCUS:: ", focus)
 				if(!focus){
 					if(timeInput.checkDateFormat(input.text)){
 						timeInput.selectedTime = input.text;
 						timeInput.timeChanged(input.text);
 					}
+					ModalDialogManager.closeByComp(timeInputDialogComp);
+				}
+				else {
+					let point = input.mapToItem(null, 0, input.height + 2);
+					let hours = timeInput.getHours();
+					let minutes = timeInput.getMinutes();
+					let parameters = {"x": point.x, "y":point.y, "hours": hours, "minutes": minutes};
 
+					ModalDialogManager.openDialog(timeInputDialogComp, parameters);
 				}
 			}
 			onAccepted: {
@@ -189,6 +198,7 @@ Item {
 					timeInput.selectedTime = input.text;
 					timeInput.timeChanged(input.text);
 					timeInput.tabKeyItem.forceActiveFocus();
+					//ModalDialogManager.closeByComp(timeInputDialogComp);
 				}
 
 			}
@@ -230,6 +240,17 @@ Item {
 		duration: 2000
 		onFinished: {
 			tooltip.hide();
+		}
+	}
+
+	Component{
+		id: timeInputDialogComp;
+		TimeInputDialog{
+			onTimeChanged: {
+				if(time !== timeInput.selectedTime){
+					timeInput.setTime(time)
+				}
+			}
 		}
 	}
 }

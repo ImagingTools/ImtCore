@@ -19,6 +19,9 @@ Rectangle {
 
 	property bool centered: true;
 	property Item root: null;
+	property bool hiddenBackground: false;
+	property bool noMouseArea: false;
+	property bool forceFocus: true;
 
 	property bool multiSelection: false;
 	property bool canFlick: false;
@@ -176,6 +179,7 @@ Rectangle {
 
 
 	Component.onCompleted: {
+		Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
 
 		calendar.setMaxMonthName();
 
@@ -222,8 +226,14 @@ Rectangle {
 
 	}
 
+	Component.onDestruction: {
+		Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged);
+	}
+
 	onRootChanged: {
-		calendar.root.backgroundItem.opacity = 0.4;
+		if(!calendar.hiddenBackground){
+			calendar.root.backgroundItem.opacity = 0.4;
+		}
 	}
 
 	onVisibleChanged: {
@@ -256,6 +266,16 @@ Rectangle {
 		if(topPanelTextYear.text !== calendar.selectedIndexYear){
 			topPanelTextYear.text = calendar.selectedIndexYear;
 		}
+	}
+
+	function onBackgroundClicked(){
+		if (root){
+			root.closeDialog();
+		}
+	}
+
+	function onAppSizeChanged(parameters){
+		onBackgroundClicked()
 	}
 
 	function setModel(model_){
