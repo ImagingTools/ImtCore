@@ -59,7 +59,6 @@
         <file alias="imtcontrols/Dialogs/CriticalErrorDialog.qml">Dialogs/CriticalErrorDialog.qml</file>
         <file alias="imtcontrols/Inputs/CustomTextField.qml">Inputs/CustomTextField.qml</file>
         <file alias="imtcontrols/Inputs/Calendar.qml">Inputs/Calendar.qml</file>
-        <file alias="imtcontrols/Inputs/CalendarNew.qml">Inputs/CalendarNew.qml</file>
 		<file alias="imtcontrols/Inputs/CalendarCellDelegateBase.qml">Inputs/CalendarCellDelegateBase.qml</file>
 		<file alias="imtcontrols/Inputs/CalendarCellTextDelegate.qml">Inputs/CalendarCellTextDelegate.qml</file>
 		<file alias="imtcontrols/Inputs/CalendarView.qml">Inputs/CalendarView.qml</file>
