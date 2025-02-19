@@ -4,11 +4,11 @@
         <VersionInfos>
             <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GqlObjectCollectionDelegate" X="940" Y="380" Note=""/>
+        <Element ComponentName="GqlObjectCollectionDelegate" X="950" Y="375" Note=""/>
         <Element ComponentName="GraphQLObjectCollectionBase" X="575" Y="200" Note=""/>
         <Element ComponentName="GraphQlApiClient" X="260" Y="380" Note=""/>
     </PositionMap>

@@ -1152,7 +1152,10 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 						imtbase::ICollectionInfo::Ids ids = collectionInfo.GetElementIds();
 						for (int i = 0; i < ids.count(); ++i){
 							QByteArray id = ids[i];
-							ItemList->itemDelegateForColumn(i)->deleteLater();
+							QAbstractItemDelegate* itemDelegatePtr = ItemList->itemDelegateForColumn(i);
+							if (itemDelegatePtr != nullptr){
+								itemDelegatePtr->deleteLater();
+							}
 							QAbstractItemDelegate* itemDelegate = delegatePtr->GetColumnItemDelegate(id);
 							ItemList->setItemDelegateForColumn(i, itemDelegate);
 						}

@@ -263,13 +263,8 @@ QByteArray CCachedObjectCollectionComp::GetObjectTypeId(const Id& objectId) cons
 
 idoc::MetaInfoPtr CCachedObjectCollectionComp::GetDataMetaInfo(const Id& objectId) const
 {
-	QReadLocker locker(&m_lock);
-
-	for (int index = 0; index < m_cachedCollections.GetCount(); index++){
-		FilteredCollection* collectionChacheItemPtr = m_cachedCollections.GetAt(index);
-		if (collectionChacheItemPtr->cachePtr->GetElementIds().contains(objectId)){
-			return collectionChacheItemPtr->cachePtr->GetDataMetaInfo(objectId);
-		}
+	if (m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 	}
 
 	return idoc::MetaInfoPtr();

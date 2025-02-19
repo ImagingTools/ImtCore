@@ -279,16 +279,18 @@ idoc::MetaInfoPtr CRemoteGqlCollectionController::GetDataMetaInfo(const Id& obje
 			if (m_metaInfoCreatorMap.contains(typeId)){
 				imtbase::IMetaInfoCreator* metaInfoCreatorPtr = m_metaInfoCreatorMap[typeId];
 				Q_ASSERT(metaInfoCreatorPtr != nullptr);
-
-				metaInfoCreatorPtr->CreateMetaInfo(nullptr, typeId, metaInfoPtr);
+				
+				// TODO: Read full object ?
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				GetObjectData(objectId, dataPtr);
+				
+				metaInfoCreatorPtr->CreateMetaInfo(dataPtr.GetPtr(), typeId, metaInfoPtr);
 			}
 			else{
 				metaInfoPtr.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 			}
-
-			if (m_gqlObjectCollectionDelegatePtr->GetMetaInfo(*responsePtr, *metaInfoPtr)){
-				retVal = metaInfoPtr;
-			}
+			
+			retVal = metaInfoPtr;
 		}
 	}
 

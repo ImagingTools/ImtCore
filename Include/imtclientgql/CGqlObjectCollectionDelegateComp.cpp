@@ -634,7 +634,7 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 			QJsonObject jsonObject = items.at(index).toObject();
 			QJsonObject info = jsonObject.value("info").toObject();
 			QByteArray objectId = info.value("id").toString().toUtf8();
-			QByteArray typeId = info.value("typeId").toString().toUtf8();
+			QByteArray objectTypeId = info.value("typeId").toString().toUtf8();
 			int version = info.value("version").toInt();
 			Q_UNUSED(version);
 
@@ -642,7 +642,7 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 			QString description = info.value("description").toString();
 
 			idoc::MetaInfoPtr dataMetainfoPtr;
-			auto CreateMetaInfo = [](const QByteArray typeId,
+			auto CreateMetaInfo = [&objectId, this, &objectTypeId](const QByteArray typeId,
 									 QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList){
 				idoc::MetaInfoPtr metaInfoPtr;
 				for (int i = 0; i < metaInfoCreatorList.count(); i++){
@@ -650,7 +650,13 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 					if (metaInfoCreatorPtr != nullptr){
 						QByteArrayList typeIds = metaInfoCreatorPtr->GetSupportedTypeIds();
 						if (typeIds.contains(typeId)){
-							metaInfoCreatorPtr->CreateMetaInfo(nullptr, typeId, metaInfoPtr);
+							imtbase::IObjectCollection::DataPtr dataPtr;
+							if (m_objectCollectionCompPtr.IsValid()){
+								// TODO: Read full object ?
+								m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
+							}
+
+							metaInfoCreatorPtr->CreateMetaInfo(dataPtr.GetPtr(), typeId, metaInfoPtr);
 						}
 					}
 				}
@@ -664,7 +670,7 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 				return metaInfoPtr;
 			};
 
-			dataMetainfoPtr = CreateMetaInfo(typeId, metaInfoCreatorList);
+			dataMetainfoPtr = CreateMetaInfo(objectTypeId, metaInfoCreatorList);
 
 			idoc::CStandardDocumentMetaInfo metainfo;
 			if (jsonObject.contains("metaInfo")){
@@ -691,7 +697,7 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 			}
 
 			subCollectionPtr->InsertNewObject(
-						typeId,
+						objectTypeId,
 						name,
 						description,
 						nullptr,
@@ -801,7 +807,6 @@ bool CGqlObjectCollectionDelegateComp::DeSerializeObject(istd::IPolymorphic* obj
 
 	return true;
 }
-
 
 
 } // namespace imtclientgql
