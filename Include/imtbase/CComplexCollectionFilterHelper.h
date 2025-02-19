@@ -20,6 +20,7 @@ public:
 
 	static QString GetTextFilter(const imtbase::IComplexCollectionFilter::GroupFilter& filter);
 	static void SetTextFilter(imtbase::IComplexCollectionFilter& filter, const QByteArrayList& fieldIds, const QString& text);
+	static void FillTextFilter(imtbase::IComplexCollectionFilter::GroupFilter& groupFilter, const QByteArrayList& fieldIds, const QString& text);
 };
 
 

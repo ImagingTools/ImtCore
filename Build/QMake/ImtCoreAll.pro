@@ -194,7 +194,7 @@ imtservice.file = ../../Include/imtservice/QMake/imtservice.pro
 # GUI libraries
 SUBDIRS += imtgui
 imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
-imtgui.depends = imtstyle imtwidgets DesignTokenCreator DdlCodeCreator
+imtgui.depends = imtstyle imtwidgets DesignTokenCreator DdlCodeCreator imtcol
 
 SUBDIRS += imtauthgui
 imtauthgui.file = ../../Include/imtauthgui/QMake/imtauthgui.pro

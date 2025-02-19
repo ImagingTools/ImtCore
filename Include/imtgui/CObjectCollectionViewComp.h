@@ -28,7 +28,10 @@
 // ImtCore includes
 #include <imtbase/ISelection.h>
 #include <imtbase/CCollectionFilter.h>
+#include <imtbase/IComplexCollectionFilter.h>
+#include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtcol/CObjectTypeIdFilter.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
 #include <imtgui/CCommandToolBar.h>
 #include <GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h>
@@ -85,6 +88,7 @@ public:
 		I_ASSIGN(m_filterSelectionCompPtr, "FilterSelection", "Filter selection", false, "FilterSelection");
 		I_ASSIGN(m_paginationGuiCompPtr, "PaginationGui", "Pagination gui", false, "PaginationGui");
 		I_ASSIGN_TO(m_paginationGuiObserverCompPtr, m_paginationGuiCompPtr, false);
+		I_ASSIGN(m_complexFilterCompPtr, "CompelxCollectionFilter", "Compelx collection filter", false, "CompelxCollectionFilter");
 	I_END_COMPONENT;
 
 	enum ModelId
@@ -307,6 +311,7 @@ private:
 		CObjectCollectionViewComp& m_parent;
 		mutable QMap<QByteArray, ICollectionViewDelegate::ObjectMetaInfo> m_metaInfoMap;
 		imtbase::CCollectionFilter m_filter;
+		imtcol::CObjectTypeIdFilter m_objectTypeIdFilter;
 	};
 
 	QStandardItemModel m_typeModel;
@@ -337,9 +342,9 @@ private:
 	I_REF(iprm::ISelectionParam, m_filterSelectionCompPtr);
 	I_REF(iqtgui::IGuiObject, m_paginationGuiCompPtr);
 	I_REF(imod::IObserver, m_paginationGuiObserverCompPtr);
+	I_REF(imtbase::IComplexCollectionFilter, m_complexFilterCompPtr);
 
 	imtgui::CCommandToolBar m_collectionCommandsToolBar;
-
 };
 
 

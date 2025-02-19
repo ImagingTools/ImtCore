@@ -22,6 +22,7 @@
 #include <imtbase/ICollectionFilter.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
 #include <imtcol/CDocumentCollectionFilter.h>
+#include <imtcol/IObjectTypeIdFilter.h>
 
 
 namespace imtdb
@@ -849,9 +850,17 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
 
+	QString objectTypeIdQuery;
 	QString textFilterQuery;
 	QString timeFilterQuery;
 	QString additionalFilters;
+
+	if (paramIds.contains("ObjectTypeIdFilter")){
+		iprm::TParamsPtr<imtcol::IObjectTypeIdFilter> complexFilterParamPtr(&filterParams, "ObjectTypeIdFilter");
+		if (complexFilterParamPtr.IsValid()){
+			objectTypeIdQuery = QString("\"TypeId\" = '%1'").arg(qPrintable(complexFilterParamPtr->GetObjectTypeId())).toUtf8();
+		}
+	}
 
 	if (paramIds.contains("ComplexFilter")){
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(&filterParams, "ComplexFilter");
@@ -904,6 +913,9 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		additionalFilters = CreateAdditionalFiltersQuery(filterParams);
 	}
 
+	if (!objectTypeIdQuery.isEmpty()){
+		filterQuery += " AND (" + objectTypeIdQuery + ")";
+	}
 
 	if (!objectFilterQuery.isEmpty()){
 		filterQuery += " AND (" + objectFilterQuery + ")";

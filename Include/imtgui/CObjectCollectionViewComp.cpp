@@ -463,6 +463,19 @@ void CObjectCollectionViewComp::OnComponentCreated()
 			}
 		}
 	}
+
+	if (m_complexFilterCompPtr.IsValid()){
+		imtbase::IComplexCollectionFilter::GroupFilter mainGroup = m_complexFilterCompPtr->GetFieldsFilter();
+		Q_ASSERT(mainGroup.groupFilters.count() == 0);
+		if (mainGroup.groupFilters.count() == 0){
+			// Create group filters for text and object filtering
+			mainGroup.groupFilters.append(imtbase::IComplexCollectionFilter::GroupFilter());
+			mainGroup.groupFilters.append(imtbase::IComplexCollectionFilter::GroupFilter());
+
+			// Set OR operation for fields text filtering
+			mainGroup.groupFilters[0].logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
+		}
+	}
 }
 
 
@@ -1385,6 +1398,12 @@ void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjec
 
 	iprm::CParamsSet filterParams;
 	filterParams.SetEditableParameter("Filter", &m_filter);
+	filterParams.SetEditableParameter("ObjectTypeIdFilter", &m_objectTypeIdFilter);
+	if (m_parent.m_complexFilterCompPtr.IsValid()){
+		filterParams.SetEditableParameter("ComplexFilter", m_parent.m_complexFilterCompPtr.GetPtr());
+	}
+
+	m_objectTypeIdFilter.SetObjectTypeId(m_parent.m_currentTypeId);
 
 	m_totalRowCount = collection.GetElementsCount(&filterParams);
 	m_fetchedRowCount = 0;
@@ -1531,6 +1550,16 @@ void CObjectCollectionViewComp::TableModel::SetSorting(int logicalIndex, Qt::Sor
 
 	m_filter.SetSortingInfoIds(QByteArrayList() << informationIds[logicalIndex]);
 
+	if (m_parent.m_complexFilterCompPtr.IsValid()){
+		imtbase::IComplexCollectionFilter::SortingOrder complexFilterSortingOrder =
+			order == Qt::AscendingOrder ?
+			imtbase::IComplexCollectionFilter::SO_ASC : imtbase::IComplexCollectionFilter::SO_DESC;
+		imtbase::CComplexCollectionFilterHelper::SetSortingOrder(
+			*m_parent.m_complexFilterCompPtr.GetPtr(),
+			m_filter.GetSortingInfoIds(),
+			complexFilterSortingOrder);
+	}
+
 	if (objectCollectionPtr != nullptr && !m_parent.IsUpdateBlocked()){
 		UpdateFromData(*objectCollectionPtr, istd::IChangeable::GetAnyChange());
 	}
@@ -1571,6 +1600,14 @@ void CObjectCollectionViewComp::TableModel::SetTextFilter(const QString& textFil
 	m_filter.SetFilteringInfoIds(filterableInfoIds);
 
 	m_filter.SetTextFilter(textFilter);
+
+	if (m_parent.m_complexFilterCompPtr.IsValid()){
+		imtbase::IComplexCollectionFilter::GroupFilter mainGroupFilter = m_parent.m_complexFilterCompPtr->GetFieldsFilter();
+		Q_ASSERT(mainGroupFilter.groupFilters.count() == 2);
+		if (mainGroupFilter.groupFilters.count() >= 1){
+			imtbase::CComplexCollectionFilterHelper::FillTextFilter(mainGroupFilter.groupFilters[0], filterableInfoIds, textFilter);
+		}
+	}
 
 	if (objectCollectionPtr)
 		UpdateFromData(*objectCollectionPtr, istd::IChangeable::GetAnyChange());
@@ -1631,15 +1668,16 @@ QVariant CObjectCollectionViewComp::TableModel::data(const QModelIndex& index, i
 		if (metaInfo.count() > index.column()){
 			return metaInfo[index.column()].text;
 		}
+		break;
 	case Qt::DecorationRole:
 		if (metaInfo.count() > index.column()){
 			return metaInfo[index.column()].icon;
 		}
+		break;
 	case ICollectionViewDelegate::DR_TYPE_ID:
 		if (itemTypeId.isEmpty()){
 			itemTypeId = collectionPtr->GetObjectTypeId(objectId);
 		}
-
 		return itemTypeId;
 	case ICollectionViewDelegate::DR_OBJECT_ID:
 		return objectId;

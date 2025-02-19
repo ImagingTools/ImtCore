@@ -85,6 +85,14 @@ void CComplexCollectionFilterHelper::SetTextFilter(imtbase::IComplexCollectionFi
 {
 	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
 
+	FillTextFilter(groupFilter, fieldIds, text);
+
+	filter.SetFieldsFilter(groupFilter);
+}
+
+
+void CComplexCollectionFilterHelper::FillTextFilter(imtbase::IComplexCollectionFilter::GroupFilter& groupFilter, const QByteArrayList& fieldIds, const QString& text)
+{
 	QVector<imtbase::IComplexCollectionFilter::FieldFilter> fieldFilters;
 	for (const QByteArray& fieldId : fieldIds){
 		imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
@@ -96,8 +104,6 @@ void CComplexCollectionFilterHelper::SetTextFilter(imtbase::IComplexCollectionFi
 		fieldFilters.append(fieldFilter);
 	}
 	groupFilter.fieldFilters = fieldFilters;
-
-	filter.SetFieldsFilter(groupFilter);
 }
 
 
