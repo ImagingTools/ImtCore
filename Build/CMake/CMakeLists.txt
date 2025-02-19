@@ -281,6 +281,9 @@ endif()
 	add_subdirectory("${IMPL_DIR}/ImtHttpPck/CMake" "${AUX_INCLUDE_DIR}/ImtHttpPck")
 	add_dependencies(ImtHttpPck imthttp)
 
+	add_subdirectory("${IMPL_DIR}/ImtColPck/CMake" "${AUX_INCLUDE_DIR}/ImtColPck")
+	add_dependencies(ImtColPck imtcol)
+
 	if(NOT DEFINED USE_GEO OR USE_GEO)
 		add_subdirectory("${IMPL_DIR}/ImtGeoPck/CMake" "${AUX_INCLUDE_DIR}/ImtGeoPck")
 		add_dependencies(ImtGeoPck imtgeo)
