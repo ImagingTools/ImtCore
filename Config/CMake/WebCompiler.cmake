@@ -310,6 +310,9 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseComplexCollectionFilterSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseComplexCollectionFilterSdl)
+	
+	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentCollectionFilterSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseDocumentCollectionFilterSdl)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtBaseTypesSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseImtBaseTypesSdl)
