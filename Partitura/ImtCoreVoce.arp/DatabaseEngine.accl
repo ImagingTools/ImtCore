@@ -4,16 +4,17 @@
         <VersionInfos>
             <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395011" Description="Qt Framework"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CompositeMigrationController" X="200" Y="280" Note=""/>
+        <Element ComponentName="CompositeMigrationController" X="200" Y="275" Note=""/>
         <Element ComponentName="DatabaseAutomaticBackup" X="800" Y="560" Note=""/>
-        <Element ComponentName="MigrationController" X="200" Y="440" Note=""/>
+        <Element ComponentName="DelegatedMigrationController" X="200" Y="375" Note=""/>
+        <Element ComponentName="MigrationController" X="475" Y="425" Note=""/>
         <Element ComponentName="PgSqlDatabaseEngine" X="480" Y="100" Note=""/>
-        <Element ComponentName="RelativeFileNameParam" X="200" Y="600" Note=""/>
-        <Element ComponentName="SystemLocation" X="200" Y="725" Note=""/>
+        <Element ComponentName="RelativeFileNameParam" X="475" Y="525" Note=""/>
+        <Element ComponentName="SystemLocation" X="475" Y="650" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

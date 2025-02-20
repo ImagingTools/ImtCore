@@ -20,6 +20,7 @@
 #include <imtbase/TObjectCollectionSearchControllerCompWrap.h>
 #include <imtdb/CMigrationControllerComp.h>
 #include <imtdb/CCompositeMigrationControllerComp.h>
+#include <imtdb/CObjectCollectionMigrationControllerComp.h>
 
 
 /**
@@ -43,6 +44,7 @@ typedef imtdb::CSqliteJsonDatabaseDelegateComp SqliteJsonDatabaseDelegate;
 typedef imtdb::TMessageDatabaseDelegateComp<imtdb::CSqliteJsonDatabaseDelegateComp> SqliteJsonMessageDatabaseDelegate;
 typedef imtdb::CMigrationControllerComp MigrationController;
 typedef imtdb::CCompositeMigrationControllerComp CompositeMigrationController;
+typedef imtdb::CObjectCollectionMigrationControllerComp ObjectCollectionMigrationController;
 
 
 } // namespace ImtDatabasePck

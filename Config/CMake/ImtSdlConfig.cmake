@@ -1,6 +1,6 @@
 
 #! Gets SDL generator executable path
-macro(GetSdlGeneratorPath OUTPUT_SDL_GENERATOR_EXE_PATH)
+function(GetSdlGeneratorPath OUTPUT_SDL_GENERATOR_EXE_PATH)
 
 	get_target_name(TARGETNAME)
 	set(COMPILER_DIR ${CMAKE_BUILD_TYPE}_${TARGETNAME})
@@ -22,8 +22,8 @@ macro(GetSdlGeneratorPath OUTPUT_SDL_GENERATOR_EXE_PATH)
 	endif()
 
 	get_filename_component(SDL_GENERATOR_EXE_ABSOLUTE_PATH ${SDL_GENERATOR_EXE_PATH} ABSOLUTE)
-	set(${OUTPUT_SDL_GENERATOR_EXE_PATH} ${SDL_GENERATOR_EXE_ABSOLUTE_PATH})
-endmacro()
+	set(${OUTPUT_SDL_GENERATOR_EXE_PATH} ${SDL_GENERATOR_EXE_ABSOLUTE_PATH} PARENT_SCOPE)
+endfunction()
 
 #! Generates code form SDL, and including provided deps to sources
 function(ImtGenerateSdlWithDeps

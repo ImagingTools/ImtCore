@@ -16,7 +16,7 @@ public:
 	{
 		DS_ACTIVE,
 		DS_INACTIVE,
-		DS_DELETED
+		DS_DISABLED
 	};
 
 	typedef QVector<DocumentState> DocumentStates;

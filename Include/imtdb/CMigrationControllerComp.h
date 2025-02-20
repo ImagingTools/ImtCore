@@ -6,30 +6,24 @@
 #include <ifile/IFileNameParam.h>
 
 // ImtCore includes
-#include <imtdb/IMigrationController.h>
-#include <imtdb/IDatabaseEngine.h>
+#include <imtdb/CMigrationControllerCompBase.h>
 
 
 namespace imtdb
 {
 
 
-class CMigrationControllerComp: public ilog::CLoggerComponentBase, virtual public imtdb::IMigrationController
+class CMigrationControllerComp: virtual public imtdb::CMigrationControllerCompBase
 {
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef imtdb::CMigrationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CMigrationControllerComp);
-		I_REGISTER_INTERFACE(imtdb::IMigrationController)
-		I_ASSIGN(m_rangeFromAttrPtr, "From", "Range of from value", false, -1);
-		I_ASSIGN(m_rangeToAttrPtr, "To", "if value -1, then maximum value in the migration folder", false, -1);
 		I_ASSIGN(m_migrationFolderPathCompPtr, "MigrationFolderPath", "The property holds the folder contains SQL migraton script", false, "MigrationFolderPath");
-		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine", true, "DatabaseEngine");
 	I_END_COMPONENT;
 
 protected:
 	// reimplemented (imtdb::IMigrationController)
-	virtual istd::CIntRange GetMigrationRange() const override;
 	virtual bool DoMigration(int& resultRevision, const istd::CIntRange& subRange = istd::CIntRange()) const override;
 
 	// reimplemented (icomp::CComponentBase)
@@ -38,13 +32,8 @@ protected:
 private:
 	int GetLastMigration(const QString& migrationFolder, QString& errorMessage) const;
 
-private:
+protected:
 	I_REF(ifile::IFileNameParam, m_migrationFolderPathCompPtr);
-	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
-	I_ATTR(int, m_rangeFromAttrPtr);
-	I_ATTR(int, m_rangeToAttrPtr);
-
-	istd::CIntRange m_range;
 };
 
 

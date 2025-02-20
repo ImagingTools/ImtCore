@@ -16,11 +16,6 @@ namespace imtdb
 
 // reimplemented (imtdb::IMigrationController)
 
-istd::CIntRange CMigrationControllerComp::GetMigrationRange() const
-{
-	return m_range;
-}
-
 
 bool CMigrationControllerComp::DoMigration(int& resultRevision, const istd::CIntRange& subRange) const
 {

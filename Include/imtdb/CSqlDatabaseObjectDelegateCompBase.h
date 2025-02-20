@@ -64,6 +64,7 @@ public:
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr) const override;
 	virtual QByteArray GetSelectionByMetaInfoQuery(const QByteArray& metaInfoId, const QVariant& metaInfoValue) const override;
 	virtual QByteArray CreateUpdateMetaInfoQuery(const QSqlRecord& record) const override;
+	virtual QByteArray GetTableName() const override;
 
 protected:
 	virtual QString GetBaseSelectionQuery() const;

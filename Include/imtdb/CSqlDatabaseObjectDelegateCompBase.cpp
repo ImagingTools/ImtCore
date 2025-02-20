@@ -269,6 +269,12 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateUpdateMetaInfoQuery(const Q
 }
 
 
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableName() const
+{
+	return *m_tableNameAttrPtr;
+}
+
+
 // protected methods
 
 QString CSqlDatabaseObjectDelegateCompBase::GetBaseSelectionQuery() const
@@ -306,8 +312,8 @@ bool CSqlDatabaseObjectDelegateCompBase::SetCollectionItemMetaInfoFromRecord(con
 		metaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME, insertionTime);
 	}
 
-	if (record.contains("LastModified")){
-		QDateTime lastModificationTime = record.value("LastModified").toDateTime();
+	if (record.contains("TimeStamp")){
+		QDateTime lastModificationTime = record.value("TimeStamp").toDateTime();
 
 		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, lastModificationTime);
 		metaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, lastModificationTime);

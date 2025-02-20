@@ -4,5 +4,6 @@
 	<file alias="CreateRevision.sql">Resources/SQL/CreateRevision.sql</file>
 	<file alias="GetRevision.sql">Resources/SQL/GetRevision.sql</file>
 	<file alias="SetRevision.sql">Resources/SQL/SetRevision.sql</file>
+	<file alias="CreateCollectionTable.sql">Resources/SQL/CreateCollectionTable.sql</file>
     </qresource>
 </RCC>

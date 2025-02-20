@@ -51,6 +51,11 @@ public:
 		Create query for the updating the meta info by SQL record.
 	*/
 	virtual QByteArray CreateUpdateMetaInfoQuery(const QSqlRecord& record) const = 0;
+
+	/**
+		Get name of the collection table in the SQL database.
+	*/
+	virtual QByteArray GetTableName() const = 0;
 };
 
 

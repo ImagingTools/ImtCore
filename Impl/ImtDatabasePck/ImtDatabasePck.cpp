@@ -85,6 +85,11 @@ I_EXPORT_COMPONENT(
 			"Composite migration controller",
 			"Composite Migration Controller");
 
+I_EXPORT_COMPONENT(
+			ObjectCollectionMigrationController,
+			"ObjectCollection migration controller",
+			"ObjectCollection Migration Controller");
+
 
 } // namespace ImtDatabasePck
 
