@@ -18,8 +18,6 @@ set(DDL_OUTPUT_DIR "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/Ddl")
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../Config/CMake/DdlCreator.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtcol)
-
 GenerateDdlCode(${MODULE_CPP_NAME}
 	${MODULE_QML_NAME}
 	${DDL_CONST_VAR_TEMPLATE_INPUT_DIR}
