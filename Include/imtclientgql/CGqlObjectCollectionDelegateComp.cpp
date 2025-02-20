@@ -481,13 +481,10 @@ bool CGqlObjectCollectionDelegateComp::GetOperationResult(const imtgql::IGqlResp
 bool CGqlObjectCollectionDelegateComp::GetObjectId(const imtgql::IGqlResponse& response, Id& out) const
 {
 	ResponseData responseData = GetResponseData(response);
-	if (responseData.data.contains("addedNotification")){
-		QJsonObject addedNotification = responseData.data["addedNotification"].toObject();
-		if (addedNotification.contains("Id")){
-			out = addedNotification["Id"].toString().toLatin1();
-
-			return true;
-		}
+	if (responseData.data.contains("Id")){
+		out = responseData.data["Id"].toString().toLatin1();
+		
+		return true;
 	}
 
 	return false;
