@@ -154,9 +154,9 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 		QString queryStr;
 		if (*m_isMultiTypeAttrPtr){
-			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', true, "
-							   " (SELECT MAX(\"RevisionNumber\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1,"
-                               " (SELECT \"TypeId\" FROM \"%1\" WHERE \"DocumentId\" = '%2' LIMIT 1) );" );
+			queryStr =  QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', true, "
+								" (SELECT MAX(\"RevisionNumber\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1,"
+								" (SELECT \"TypeId\" FROM \"%1\" WHERE \"DocumentId\" = '%2' LIMIT 1) );" );
 		}
 		else{
 			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT MAX(\"RevisionNumber\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );");
@@ -563,6 +563,44 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteArra
 		.arg(stateDocumentFilter)
 		.arg(qPrintable(objectId)).toUtf8();
 }
+
+
+QByteArray CSqlJsonDatabaseDelegateComp::CreateOperationDescriptionQuery(
+	const QByteArray& objectId,
+	const imtbase::IOperationContext* operationContextPtr) const
+{
+	if (operationContextPtr != nullptr){
+		imtbase::IOperationContext* operationPtr = const_cast<imtbase::IOperationContext*>(operationContextPtr);
+		if (operationPtr != nullptr){
+			imtbase::CObjectCollection* changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationPtr->GetChangesCollection());
+
+			QByteArray json;
+			{
+				iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
+				if (!changeCollectionPtr->Serialize(archive)){
+					qDebug() << QString("Unable to serialize a change object collection");
+				}
+				else{
+					json = archive.GetData();
+				}
+			}
+
+			QString operationDescription = json;
+
+			imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationPtr->GetOperationOwnerId();
+			return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5';)")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(objectInfo.id))
+				.arg(objectInfo.name)
+				.arg(SqlEncode(operationDescription))
+				.arg(qPrintable(objectId))
+				.toUtf8();
+		}
+	}
+
+	return QByteArray();
+}
+
 
 
 idoc::MetaInfoPtr CSqlJsonDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
