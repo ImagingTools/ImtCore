@@ -523,6 +523,48 @@ bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFil
 }
 
 
+QByteArray CSqlJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const
+{
+	QString stateDocumentFilter;
+	if (paramsPtr != nullptr){
+		iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
+		if (paramIds.contains("DocumentFilter")){
+			iprm::TParamsPtr<imtcol::IDocumentCollectionFilter> documentFilterParamPtr(paramsPtr, "DocumentFilter");
+			if (documentFilterParamPtr.IsValid()){
+				imtcol::IDocumentCollectionFilter::DocumentStates states = documentFilterParamPtr->GetDocumentStates();
+				
+				if (states.contains(imtcol::IDocumentCollectionFilter::DS_ACTIVE)){
+					stateDocumentFilter += QString("\"IsActive\" = true");
+				}
+				
+				if (states.contains(imtcol::IDocumentCollectionFilter::DS_INACTIVE)){
+					if (!stateDocumentFilter.isEmpty()){
+						stateDocumentFilter += QString(" OR ");
+					}
+					
+					stateDocumentFilter += QString("\"IsActive\" = false");
+				}
+			}
+		}
+	}
+	
+	if (stateDocumentFilter.isEmpty()){
+		stateDocumentFilter = QString("\"IsActive\" = true");
+	}
+	
+	QString schemaPrefix;
+	if (m_tableSchemaAttrPtr.IsValid()){
+		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
+	}
+	
+	return QString("(SELECT * FROM %0\"%1\" WHERE (%2) AND \"DocumentId\" = '%3') ORDER BY \"RevisionNumber\" DESC;")
+		.arg(schemaPrefix)
+		.arg(qPrintable(*m_tableNameAttrPtr))
+		.arg(stateDocumentFilter)
+		.arg(qPrintable(objectId)).toUtf8();
+}
+
+
 idoc::MetaInfoPtr CSqlJsonDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
 	return idoc::MetaInfoPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
