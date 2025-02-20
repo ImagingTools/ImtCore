@@ -40,11 +40,6 @@ bool CObjectCollectionMigrationControllerComp::DoMigration(int& resultRevision, 
 		endIndex = subRange.GetMaxValue();
 	}
 
-	if (endIndex == 0){
-		QByteArray createEnumSql = "CREATE TYPE \"DocumentState\" AS ENUM ('Active', 'InActive', 'Deleted');";
-		m_databaseEngineCompPtr->ExecSqlQuery(createEnumSql);
-	}
-
 	for (int index = 0; index < m_sqlDatabaseObjectDelegatesCompPtr.GetCount(); index++){
 		imtdb::ISqlDatabaseObjectDelegate *sqlDatabaseObjectDelegatePtr = m_sqlDatabaseObjectDelegatesCompPtr[index];
 		if (sqlDatabaseObjectDelegatePtr == nullptr){
