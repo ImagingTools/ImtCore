@@ -109,8 +109,6 @@ bool CCompositeMigrationControllerComp::DoMigration(int& resultRevision, const i
 		if (!step.migrationControllerPtr->DoMigration(currentRevision, istd::CIntRange(step.from, step.to))){
 			return false;
 		}
-
-		Q_ASSERT(step.to == currentRevision);
 	}
 
 	resultRevision = currentRevision;
