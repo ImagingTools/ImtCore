@@ -13,7 +13,7 @@ Rectangle {
 
 	property int count: 5;
 	property int barWidth: continuous ? 8 : 4;
-	property alias spacing: row.spacing;
+	property int spacing: indicator.continuous ? 0 : 4;
 	property int percent: 0;
 
 	property string colorActive: "red";
@@ -27,7 +27,7 @@ Rectangle {
 		id: row;
 
 		height: parent.height;
-		spacing: indicator.continuous ? 0 : 4;
+		spacing: indicator.spacing;
 
 		Repeater{
 			model: indicator.count;
