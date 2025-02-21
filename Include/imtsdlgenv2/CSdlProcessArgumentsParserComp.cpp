@@ -54,13 +54,19 @@ QList<QCommandLineOption> CSdlProcessArgumentsParserComp::PrepareCommandLineOpti
 
 bool CSdlProcessArgumentsParserComp::ProcessCommandLineOptions(const QCommandLineParser& commandLineParser)
 {
+	if (m_generationCommandLinePtr == nullptr) {
+		SendCriticalMessage(0, QString("Command line controller was not set"));
+
+		return false;
+	}
+
 	if (commandLineParser.isSet(*m_generationCommandLinePtr)){
 		const QString generationVersionData = commandLineParser.value(*m_generationCommandLinePtr);
 
 		bool isDigit = false;
 		m_generationVersion = generationVersionData.toUInt(&isDigit);
 		if (!isDigit){
-			SendErrorMessage(0, QString("Unexpected %1 option value. See help for detales").arg(m_generationCommandLinePtr->names().join('|')));
+			SendErrorMessage(0, QString("Unexpected %1 option value. See help for details").arg(m_generationCommandLinePtr->names().join('|')));
 
 			return false;
 		}

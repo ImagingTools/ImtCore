@@ -46,8 +46,6 @@ void CCommandToolBar::UnregisterCommands()
 	}
 
 	m_parentWidgetPtr = nullptr;
-
-	m_pageCommandsObserver.UnregisterAllObjects();
 }
 
 

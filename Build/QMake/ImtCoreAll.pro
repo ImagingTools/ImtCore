@@ -398,7 +398,7 @@ ImtServicePck.depends = imtservice
 
 SUBDIRS += ImtColPck
 ImtColPck.file = ../../Impl/ImtColPck/QMake/ImtColPck.pro
-ImtColPck.depends = imtcol
+ImtColPck.depends = imtcol imtbase
 
 
 # SUBDIRS += ImtControlsGallery

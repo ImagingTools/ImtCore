@@ -36,7 +36,7 @@ protected:
 	};
 
 	/*!
-		\brief The ListAccessResult used as a storage for list methods. See methods for detales, uses it.
+		\brief The ListAccessResult used as a storage for list methods. See methods for details, uses it.
 		\sa AddContainerListAccessCode
 		\c listVariableName				- a name of variable, that defines a storage list
 		\c listCountVariableName		- a name of variable, that defines a  number of elements

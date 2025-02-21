@@ -143,6 +143,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 
 		return false;
 	}
+
 	commandLineParser.process(arguments);
 
 	if (commandLineParser.isSet(schemaFilePathOption)){
@@ -228,14 +229,14 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 		const QString autoLinkLevelString = commandLineParser.value(autoLinkOption);
 		const int autoLinkLevel =  autoLinkLevelString.toInt(&isDigit);
 		if (!isDigit){
-			SendErrorMessage(0, QString("Unexpected auto link [%1] argument value '%2'. See help for detales").arg(autoLinkOption.names().join('|'), autoLinkLevelString));
+			SendErrorMessage(0, QString("Unexpected auto link [%1] argument value '%2'. See help for details").arg(autoLinkOption.names().join('|'), autoLinkLevelString));
 
 			return false;
 		}
 
 		const QList<int> acceptableValues = QList<int>({ALL_NONE, ALL_SAME_NAMESPACE, ALL_ONLY_FILE});
 		if (!acceptableValues.contains(autoLinkLevel)){
-			SendErrorMessage(0, QString("Unexpected auto link [%1] argument value '%2'. See help for detales").arg(autoLinkOption.names().join('|'), autoLinkLevelString));
+			SendErrorMessage(0, QString("Unexpected auto link [%1] argument value '%2'. See help for details").arg(autoLinkOption.names().join('|'), autoLinkLevelString));
 
 			return false;
 		}
@@ -267,7 +268,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 			}
 		}
 		else {
-			SendErrorMessage(0, QString("Unexpected generator option '%1'. See %2 help for detales").arg(generatorName, generatorOption.names().join('/')));
+			SendErrorMessage(0, QString("Unexpected generator option '%1'. See %2 help for details").arg(generatorName, generatorOption.names().join('/')));
 		}
 	}
 
@@ -317,7 +318,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 		if (depFileInfo.exists()){
 			const bool removed = QFile::remove(depFileInfo.absoluteFilePath());
 			if (!removed){
-				SendErrorMessage(0, QString("Unable to remove file '%1'").arg(depFileInfo.absoluteFilePath()));
+				SendErrorMessage(0, QString("Unable to remove dependency file '%1'").arg(depFileInfo.absoluteFilePath()));
 
 				return false;
 			}
@@ -327,7 +328,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 		if (!depFileDir.exists()){
 			const bool dirCreated = depFileDir.mkpath(depFileDir.absolutePath());
 			if (!dirCreated){
-				SendErrorMessage(0, QString("Unable to create dir '%1'").arg(depFileDir.absolutePath()));
+				SendErrorMessage(0, QString("Unable to create folder '%1'").arg(depFileDir.absolutePath()));
 
 				return false;
 			}
