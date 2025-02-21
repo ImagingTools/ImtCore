@@ -36,12 +36,17 @@ const imtdb::IMigrationController* CCompositeMigrationControllerComp::FindMigrat
 
 istd::CIntRange CCompositeMigrationControllerComp::GetMigrationRange() const
 {
-	istd::CIntRange availableRange(0, 0);
+	istd::CIntRange availableRange;
 	for (int i = 0; i < m_migrationControllersCompPtr.GetCount(); i++){
 		const imtdb::IMigrationController* migrationControllerPtr = m_migrationControllersCompPtr[i];
 		if (migrationControllerPtr != nullptr){
 			istd::CIntRange range = migrationControllerPtr->GetMigrationRange();
-			availableRange.Unite(range);
+			if (i == 0){
+				availableRange = range;
+			}
+			else{
+				availableRange.Unite(range);
+			}
 		}
 	}
 

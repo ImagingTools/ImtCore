@@ -19,6 +19,7 @@
                     <AttributeInfo Id="MigrationControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>MigrationControllerStart</Value>
                                 <Value>DelegatedMigrationController</Value>
                                 <Value>MigrationController</Value>
                             </Values>
@@ -79,7 +80,7 @@
                         <Data IsEnabled="true" Value="PgSqlDatabaseEngine"/>
                     </AttributeInfo>
                     <AttributeInfo Id="From" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="-1"/>
+                        <Data IsEnabled="true" Value="2"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -89,6 +90,30 @@
                     </AttributeInfo>
                     <AttributeInfo Id="To" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="-1"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MigrationControllerStart" PackageId="ImtDatabasePck" ComponentId="MigrationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PgSqlDatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="From" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="0"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RelativeFileNameParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="To" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="0"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
