@@ -393,6 +393,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 void CObjectCollectionViewComp::OnGuiDestroyed()
 {
+	m_collectionCommandsToolBar.UnregisterCommands();
+
 	if (m_paginationGuiObserverCompPtr.IsValid() && m_paginationGuiObserverCompPtr->IsModelAttached(&m_pageSelection)){
 		m_pageSelection.DetachObserver(m_paginationGuiObserverCompPtr.GetPtr());
 	}

@@ -65,8 +65,9 @@ void CGqlObjectCollectionComp::OnComponentCreated()
 
 	for (int i = 0; i < m_typeIdsAttrPtr.GetCount(); i++){
 		QByteArray typeId = m_typeIdsAttrPtr[i];
+		QString typeName = m_typeNamesAttrPtr[i];
 		if (!typeId.isEmpty()){
-			m_typeInfos.InsertOption(typeId, typeId);
+			m_typeInfos.InsertOption(typeName, typeId);
 
 			if (i < m_metaInfoCreatorListCompPtr.GetCount()){
 				imtbase::IMetaInfoCreator* metaInfoCreatorPtr = m_metaInfoCreatorListCompPtr[i];

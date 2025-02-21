@@ -37,7 +37,15 @@ void CCommandToolBar::RegisterCommands(QWidget* parentWidgetPtr, const ibase::IC
 
 void CCommandToolBar::UnregisterCommands()
 {
-	UpdateCommands(nullptr);
+	m_pageCommandsObserver.UnregisterAllObjects();
+
+	if (m_parentWidgetPtr != nullptr){
+		m_commandsToolBar->deleteLater();
+
+		m_commandsToolBar = nullptr;
+	}
+
+	m_parentWidgetPtr = nullptr;
 
 	m_pageCommandsObserver.UnregisterAllObjects();
 }
