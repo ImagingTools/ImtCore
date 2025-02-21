@@ -16,6 +16,11 @@ Item{
 
 	signal modelDataChanged(string role, int index);
 
+
+	function setChildParam(param, val, index_){
+		list.children[0].children[index_].item[param] = val;
+	}
+
 	onModelDataChanged: {
 		// console.log("Role:: ", role, "Index:: ", index);
 	}
