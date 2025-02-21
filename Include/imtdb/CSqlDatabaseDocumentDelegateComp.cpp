@@ -744,7 +744,6 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 }
 
 
-
 idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
 	if (m_metaInfoCreatorCompPtr.IsValid()){
@@ -857,9 +856,12 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 	QString additionalFilters;
 
 	if (paramIds.contains("ObjectTypeIdFilter")){
-		iprm::TParamsPtr<imtcol::IObjectTypeIdFilter> complexFilterParamPtr(&filterParams, "ObjectTypeIdFilter");
-		if (complexFilterParamPtr.IsValid()){
-			objectTypeIdQuery = QString("\"TypeId\" = '%1'").arg(qPrintable(complexFilterParamPtr->GetObjectTypeId())).toUtf8();
+		iprm::TParamsPtr<imtcol::IObjectTypeIdFilter> objectTypeIdFilterPtr(&filterParams, "ObjectTypeIdFilter");
+		if (objectTypeIdFilterPtr.IsValid()){
+			QByteArray objectTypeId = objectTypeIdFilterPtr->GetObjectTypeId();
+			if (!objectTypeId.isEmpty()){
+				objectTypeIdQuery = QString("\"TypeId\" = '%1'").arg(qPrintable(objectTypeId)).toUtf8();
+			}
 		}
 	}
 
