@@ -156,9 +156,20 @@ SdlFieldList CGqlSchemaParser::GetFields(const QString typeName) const
 
 // reimplemented (ISdlRequestListProvider)
 
-SdlRequestList CGqlSchemaParser::GetRequests() const
+SdlRequestList CGqlSchemaParser::GetRequests(bool onlyLocal) const
 {
-	return m_requests;
+	SdlRequestList retVal = m_requests;
+	if (onlyLocal){
+		QMutableListIterator requestsIter(retVal);
+		while (requestsIter.hasNext()){
+			CSdlRequest request = requestsIter.next();
+			if (request.IsExternal()){
+				requestsIter.remove();
+			}
+		}
+	}
+
+	return retVal;
 }
 
 

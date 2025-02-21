@@ -37,10 +37,6 @@ public:
 
 protected:
 	// reimplemented (sdl::imtauth::Users::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::ImtCollection::CVisualStatus OnGetObjectVisualStatus(
-		const sdl::imtauth::Users::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
 	virtual sdl::imtauth::Users::CChangePasswordPayload OnChangePassword(
 		const sdl::imtauth::Users::CChangePasswordGqlRequest& changePasswordRequest,
 		const imtgql::CGqlRequest& gqlRequest,

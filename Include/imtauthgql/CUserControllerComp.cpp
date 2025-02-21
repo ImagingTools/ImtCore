@@ -18,14 +18,6 @@ namespace imtauthgql
 
 // reimplemented (sdl::imtauth::Users::CGraphQlHandlerCompBase)
 
-sdl::imtbase::ImtCollection::CVisualStatus CUserControllerComp::OnGetObjectVisualStatus(
-	const sdl::imtauth::Users::CGetObjectVisualStatusGqlRequest& /*getObjectVisualStatusRequest*/,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
-{
-	return sdl::imtbase::ImtCollection::CVisualStatus();
-}
-
 
 sdl::imtauth::Users::CChangePasswordPayload CUserControllerComp::OnChangePassword(
 	const sdl::imtauth::Users::CChangePasswordGqlRequest& changePasswordRequest,

@@ -7,10 +7,10 @@ namespace imtsdl
 {
 
 
-SdlRequestList CBasicRequestsProxyProviderComp::GetRequests() const
+SdlRequestList CBasicRequestsProxyProviderComp::GetRequests(bool onlyLocal) const
 {
 	if (m_sdlRequestListCompPtr.IsValid() && m_sdlDocumentListCompPtr.IsValid()){
-		SdlRequestList retVal = m_sdlRequestListCompPtr->GetRequests();
+		SdlRequestList retVal = m_sdlRequestListCompPtr->GetRequests(onlyLocal);
 		SdlDocumentTypeList documentList = m_sdlDocumentListCompPtr->GetDocumentTypes();
 
 		for (const CSdlDocumentType& documentType: documentList){

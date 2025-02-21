@@ -265,7 +265,7 @@ bool CQmlCodeCommandIdGeneratorComp::ProcessQmlFile()
 
 	qmlFileStream << QStringLiteral("QtObject {");
 
-	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests();
+	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests(true);
 	for (const imtsdl::CSdlRequest& request: requestList){
 		FeedStream(qmlFileStream, 1, false);
 		FeedStreamHorizontally(qmlFileStream, 1);

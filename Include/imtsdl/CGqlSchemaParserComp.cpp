@@ -611,6 +611,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 
 	ISdlProcessArgumentsParser::AutoLinkLevel autoLinkLevel = m_argumentParserCompPtr->GetAutoLinkLevel();
 
+	/// \todo generalize all loops. use common nethod
 	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled()){
 		for (CSdlType& sdlType: m_sdlTypes){
 			bool isExternal = sdlType.IsExternal();
@@ -678,9 +679,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 				}
 			}
 		}
-	}
 
-	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled()){
 		for (CSdlEnum& sdlEnum: m_enums){
 			bool isExternal = sdlEnum.IsExternal();
 
@@ -703,6 +702,34 @@ bool CGqlSchemaParserComp::ValidateSchema()
 				const bool isSet = UpdateTypeInfo(sdlEnum, m_schemaParamsPtr.get(), m_argumentParserCompPtr.GetPtr());
 				if (!isSet){
 					SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlEnum.GetName(), m_currentSchemaFilePath));
+
+					return false;
+				}
+			}
+		}
+
+		for (CSdlRequest& sdlRequest: m_requests){
+			bool isExternal = sdlRequest.IsExternal();
+
+			if (isExternal){
+				// if external, that mean, it is already processed
+				continue;
+			}
+
+			if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_ONLY_FILE){
+				isExternal =  bool(QDir::cleanPath(m_currentSchemaFilePath) != QDir::cleanPath(m_argumentParserCompPtr->GetSchemaFilePath()));
+				if (sdlRequest.GetTargetHeaderFilePath().isEmpty()){
+					const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), QFileInfo(m_currentSchemaFilePath).fileName());
+					const QString headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
+					sdlRequest.SetTargetHeaderFilePath(headerFilePath);
+				}
+			}
+
+			sdlRequest.SetExternal(isExternal);
+			if (!isExternal){
+				const bool isSet = UpdateTypeInfo(sdlRequest, m_schemaParamsPtr.get(), m_argumentParserCompPtr.GetPtr());
+				if (!isSet){
+					SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlRequest.GetName(), m_currentSchemaFilePath));
 
 					return false;
 				}

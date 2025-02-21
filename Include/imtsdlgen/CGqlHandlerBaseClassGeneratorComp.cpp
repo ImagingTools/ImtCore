@@ -76,7 +76,7 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	imtsdl::SdlRequestList requests = m_sdlRequestListCompPtr->GetRequests();
+	imtsdl::SdlRequestList requests = m_sdlRequestListCompPtr->GetRequests(true);
 	if (requests.isEmpty()){
 		SendVerboseMessage("Requests is not provided. Nothing todo");
 
@@ -383,7 +383,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddRequiredIncludesForDocument(QTextStre
 	stream << QStringLiteral("// generated SDL includes");
 	FeedStream(stream, 1, false);
 
-	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests();
+	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests(true);
 	for (const imtsdl::CSdlRequest& sdlRequest: requestList){
 		stream << QStringLiteral("#include \"C");
 		stream << sdlRequest.GetName();
@@ -400,7 +400,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodsForDocument(QTextStream& strea
 	stream << QStringLiteral("// abstract methods");
 	FeedStream(stream, 1, false);
 
-	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests();
+	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests(true);
 	for (const imtsdl::CSdlRequest& sdlRequest: requestList){
 		AddMethodForDocument(stream, sdlRequest, hIndents);
 	}
@@ -428,7 +428,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream
 void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTextStream& stream, uint hIndents)
 {
 	const QString className = QStringLiteral("CGraphQlHandlerCompBase");
-	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests();
+	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests(true);
 
 	// declare method
 	FeedStreamHorizontally(stream, hIndents);

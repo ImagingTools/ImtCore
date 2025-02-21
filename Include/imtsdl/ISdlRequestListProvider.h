@@ -15,7 +15,7 @@ class ISdlRequestListProvider: virtual public istd::IPolymorphic
 {
 
 public:
-	virtual SdlRequestList GetRequests() const = 0;
+	virtual SdlRequestList GetRequests(bool onlyLocal) const = 0;
 };
 
 

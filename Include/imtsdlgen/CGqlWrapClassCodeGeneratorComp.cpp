@@ -61,7 +61,7 @@ int CGqlWrapClassCodeGeneratorComp::DoProcessing(
 	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
 	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
 
-	imtsdl::SdlRequestList sdlRequestList = m_sdlRequestListCompPtr->GetRequests();
+	imtsdl::SdlRequestList sdlRequestList = m_sdlRequestListCompPtr->GetRequests(true);
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
 		if (!m_argumentParserCompPtr->IsAutoJoinEnabled()){
 			QStringList cumulatedFiles;

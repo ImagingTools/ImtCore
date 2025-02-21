@@ -58,7 +58,7 @@ public:
 	virtual SdlFieldList GetFields(const QString typeName) const override;
 
 	// reimplemented (ISdlRequestListProvider)
-	virtual SdlRequestList GetRequests() const override;
+	virtual SdlRequestList GetRequests(bool onlyLocal) const override;
 
 	// reimplemented (ISdlEnumListProvider)
 	virtual SdlEnumList GetEnums(bool onlyLocal) const override;

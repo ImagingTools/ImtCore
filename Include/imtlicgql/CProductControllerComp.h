@@ -22,10 +22,6 @@ public:
 
 protected:
 	// reimplemented (sdl::imtlic::Products::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::ImtCollection::CVisualStatus OnGetObjectVisualStatus(
-				const sdl::imtlic::Products::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
 	virtual sdl::imtlic::Products::CProductExportResponse OnProductsExport(
 				const sdl::imtlic::Products::CProductsExportGqlRequest& productsExportRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

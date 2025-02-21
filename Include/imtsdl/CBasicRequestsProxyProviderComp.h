@@ -34,7 +34,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented ISdlRequestListProvider
-	virtual SdlRequestList GetRequests() const override;
+	virtual SdlRequestList GetRequests(bool onlyLocal) const override;
 
 private:
 	I_REF(ISdlRequestListProvider, m_sdlRequestListCompPtr);
