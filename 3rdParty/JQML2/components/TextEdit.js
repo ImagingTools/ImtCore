@@ -208,6 +208,8 @@ class TextEdit extends Item {
     }
 
     $visibleChanged(){
+        super.$visibleChanged()
+        
         if(this.getPropertyValue('visible') && this.getPropertyValue('activeFocus')){
             this.$input.focus()
         }

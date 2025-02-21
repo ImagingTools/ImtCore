@@ -482,11 +482,13 @@ class QVisible extends QBool {
             console.error(error)
         }
 
-        if((this.value && this.value2) !== (safeValue && this.value2)){
+        if(safeValue !== this.value){
+            let oldValue = this.value && this.value2
             this.value = safeValue
-            if(this.notify) this.notify()
-        } else {
-            this.value = safeValue
+            let newValue = this.value && this.value2
+            if(oldValue !== newValue){
+                if(this.notify) this.notify()
+            }
         }
     }
 
@@ -498,11 +500,13 @@ class QVisible extends QBool {
             console.error(error)
         }
 
-        if((this.value && this.value2) !== (safeValue && this.value)){
+        if(safeValue !== this.value2){
+            let oldValue = this.value && this.value2
             this.value2 = safeValue
-            if(this.notify) this.notify()
-        } else {
-            this.value2 = safeValue
+            let newValue = this.value && this.value2
+            if(oldValue !== newValue){
+                if(this.notify) this.notify()
+            }
         }
     }
 }
@@ -643,8 +647,13 @@ class QAlias extends QProperty {
         } finally {
             global.queueLink.pop()
         }
+
+        if(targetProperty instanceof QVisible){
+            this.set(this.compute ? value : targetProperty.value)    
+        } else {
+            this.set(value)
+        }
         
-        this.set(value)
         this.updating = false
         this.completed = true
     }
