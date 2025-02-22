@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.26)
 
 function (imt_core_upgrade_partitura A_WORKING_DIRECTORY)
-	if (ANDROID)
-		return()
-	endif()
 
 	set (CUSTOM_PYTHON OFF)
 	if (NOT PYTHONEXE)
