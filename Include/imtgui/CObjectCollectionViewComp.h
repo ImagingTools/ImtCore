@@ -31,6 +31,7 @@
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtcol/CObjectTypeIdFilter.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
 #include <imtgui/CCommandToolBar.h>
@@ -89,6 +90,7 @@ public:
 		I_ASSIGN(m_paginationGuiCompPtr, "PaginationGui", "Pagination gui", false, "PaginationGui");
 		I_ASSIGN_TO(m_paginationGuiObserverCompPtr, m_paginationGuiCompPtr, false);
 		I_ASSIGN(m_complexFilterCompPtr, "CompelxCollectionFilter", "Compelx collection filter", false, "CompelxCollectionFilter");
+		I_ASSIGN_TO(m_complexFilterModelCompPtr, m_complexFilterCompPtr, true);
 	I_END_COMPONENT;
 
 	enum ModelId
@@ -219,6 +221,7 @@ private:
 	void RestoreColumnsSettings();
 	void ValidateSectionSize(int logicalIndex, int newSize);
 	void UpdateTypeStatus();
+	void OnComplexFilterUpdate(const istd::IChangeable::ChangeSet&, const imtbase::IComplexCollectionFilter* filterPtr);
 
 	// reimplemented (QObject)
 	virtual bool eventFilter(QObject* object, QEvent* event) override;
@@ -333,6 +336,8 @@ private:
 
 	iqtgui::IGuiObject* m_currentInformationViewPtr;
 
+	imtbase::TModelUpdateBinder<imtbase::IComplexCollectionFilter, CObjectCollectionViewComp> m_complexFilterObserver;
+
 private:
 	/**
 		List of collection view delegates.
@@ -343,6 +348,7 @@ private:
 	I_REF(iqtgui::IGuiObject, m_paginationGuiCompPtr);
 	I_REF(imod::IObserver, m_paginationGuiObserverCompPtr);
 	I_REF(imtbase::IComplexCollectionFilter, m_complexFilterCompPtr);
+	I_REF(imod::IModel, m_complexFilterModelCompPtr);
 
 	imtgui::CCommandToolBar m_collectionCommandsToolBar;
 };

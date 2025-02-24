@@ -144,7 +144,7 @@ QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexC
 	for (const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : filter.fieldFilters){
 		QString retValPart = ProcessColumn(fieldFilter);
 		if (retValPart.isEmpty()){
-			return QString();
+			continue;
 		}
 
 		retVal += retVal.isEmpty() ? retValPart : QString(" %1 %2").arg(logicOperation).arg(retValPart);
@@ -153,14 +153,16 @@ QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexC
 	for (const imtbase::IComplexCollectionFilter::GroupFilter& groupFilter : filter.groupFilters){
 		QString retValPart = ProcessGroup(groupFilter);
 		if (retValPart.isEmpty()){
-			return QString();
+			continue;
 		}
 
 		retVal += retVal.isEmpty() ? retValPart : QString(" %1 %2").arg(logicOperation).arg(retValPart);
 	}
 
-	retVal.prepend("(");
-	retVal.append(")");
+	if (!retVal.isEmpty()){
+		retVal.prepend("(");
+		retVal.append(")");
+	}
 
 	return retVal;
 };

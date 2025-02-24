@@ -39,7 +39,8 @@ namespace imtgui
 CObjectCollectionViewComp::CObjectCollectionViewComp()
 	:m_semaphoreCounter(0),
 	m_currentInformationViewPtr(nullptr),
-	m_tableModel(*this)
+	m_tableModel(*this),
+	m_complexFilterObserver(*this)
 {
 	m_pageSelection.SetParent(this);
 	m_commands.SetParent(this);
@@ -388,11 +389,17 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	m_collectionCommandsToolBar.RegisterCommands(CommandsFrame, &m_commands);
 
 	ShowMetaInfoPanelButton->setVisible(*m_viewRightPanelAttrPtr);
+
+	if (m_complexFilterModelCompPtr.IsValid()){
+		m_complexFilterObserver.RegisterObject(m_complexFilterCompPtr.GetPtr(), &CObjectCollectionViewComp::OnComplexFilterUpdate);
+	}
 }
 
 
 void CObjectCollectionViewComp::OnGuiDestroyed()
 {
+	m_complexFilterObserver.UnregisterAllObjects();
+
 	m_collectionCommandsToolBar.UnregisterCommands();
 
 	if (m_paginationGuiObserverCompPtr.IsValid() && m_paginationGuiObserverCompPtr->IsModelAttached(&m_pageSelection)){
@@ -792,6 +799,15 @@ void CObjectCollectionViewComp::UpdateTypeStatus()
 				}
 			}
 		}
+	}
+}
+
+
+void CObjectCollectionViewComp::OnComplexFilterUpdate(const istd::IChangeable::ChangeSet&, const imtbase::IComplexCollectionFilter* filterPtr)
+{
+	const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+	if (collectionPtr != nullptr){
+		m_tableModel.UpdateFromData(*collectionPtr, istd::IChangeable::GetAnyChange());
 	}
 }
 

@@ -21,12 +21,6 @@ const IComplexCollectionFilter::FieldSortingInfoList& CComplexCollectionFilter::
 }
 
 
-IComplexCollectionFilter::FieldSortingInfoList& CComplexCollectionFilter::GetSortingInfo()
-{
-	return m_sortingInfo;
-}
-
-
 bool CComplexCollectionFilter::SetSortingInfo(const FieldSortingInfoList& info)
 {
 	if (m_sortingInfo != info){
@@ -40,12 +34,6 @@ bool CComplexCollectionFilter::SetSortingInfo(const FieldSortingInfoList& info)
 
 
 const IComplexCollectionFilter::GroupFilter& CComplexCollectionFilter::GetFieldsFilter() const
-{
-	return m_fieldsFilter;
-}
-
-
-IComplexCollectionFilter::GroupFilter& CComplexCollectionFilter::GetFieldsFilter()
 {
 	return m_fieldsFilter;
 }

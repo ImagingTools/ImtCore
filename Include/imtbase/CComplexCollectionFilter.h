@@ -18,10 +18,8 @@ class CComplexCollectionFilter: virtual public IComplexCollectionFilter
 public:
 	// reimplemented (imtbase::IComplexCollectionFilter)
 	virtual const FieldSortingInfoList& GetSortingInfo() const override;
-	virtual FieldSortingInfoList& GetSortingInfo() override;
 	virtual bool SetSortingInfo(const FieldSortingInfoList& info) override;
 	virtual const GroupFilter& GetFieldsFilter() const override;
-	virtual GroupFilter& GetFieldsFilter() override;
 	virtual bool SetFieldsFilter(const GroupFilter& filter) override;
 	virtual const imtbase::ITimeFilterParam& GetTimeFilter() const override;
 	virtual bool SetTimeFilter(const imtbase::ITimeFilterParam& filter) override;

@@ -85,10 +85,8 @@ public:
 	};
 
 	virtual const FieldSortingInfoList& GetSortingInfo() const = 0;
-	virtual FieldSortingInfoList& GetSortingInfo() = 0;
 	virtual bool SetSortingInfo(const FieldSortingInfoList& info) = 0;
 	virtual const GroupFilter& GetFieldsFilter() const = 0;
-	virtual GroupFilter& GetFieldsFilter() = 0;
 	virtual bool SetFieldsFilter(const GroupFilter& filter) = 0;
 	virtual const imtbase::ITimeFilterParam& GetTimeFilter() const = 0;
 	virtual bool SetTimeFilter(const imtbase::ITimeFilterParam& filter) = 0;

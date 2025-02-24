@@ -139,11 +139,13 @@ istd::IChangeable* CLegacyObjectCollectionControllerCompBase::ExtractObject(cons
 
 void CLegacyObjectCollectionControllerCompBase::ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const
 {
-	for (imtbase::IComplexCollectionFilter::FieldSortingInfo& fieldSortingInfo : filter.GetSortingInfo()){
+	imtbase::IComplexCollectionFilter::FieldSortingInfoList sortingInfoList = filter.GetSortingInfo();
+	for (imtbase::IComplexCollectionFilter::FieldSortingInfo& fieldSortingInfo : sortingInfoList){
 		if (m_fieldReplacementMap.contains(fieldSortingInfo.fieldId)){
 			fieldSortingInfo.fieldId = m_fieldReplacementMap[fieldSortingInfo.fieldId];
 		}
 	}
+	filter.SetSortingInfo(sortingInfoList);
 
 	std::function<void (imtbase::IComplexCollectionFilter::GroupFilter&)> ProcessGroupFilter = [&](imtbase::IComplexCollectionFilter::GroupFilter& groupFilter){
 		for (imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : groupFilter.fieldFilters){
@@ -157,7 +159,9 @@ void CLegacyObjectCollectionControllerCompBase::ReplaceComplexFilterFields(imtba
 		}
 	};
 
-	ProcessGroupFilter(filter.GetFieldsFilter());
+	imtbase::IComplexCollectionFilter::GroupFilter fieldsFilter = filter.GetFieldsFilter();
+	ProcessGroupFilter(fieldsFilter);
+	filter.SetFieldsFilter(fieldsFilter);
 }
 
 
