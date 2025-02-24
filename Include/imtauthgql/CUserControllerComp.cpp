@@ -134,9 +134,9 @@ sdl::imtauth::Users::CChangePasswordPayload CUserControllerComp::OnChangePasswor
 
 
 sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
-	const sdl::imtauth::Users::CRegisterUserGqlRequest& registerUserRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const sdl::imtauth::Users::CRegisterUserGqlRequest& registerUserRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
 {
 	sdl::imtauth::Users::CRegisterUserPayload::V1_0 response;
 	if (!m_userCollectionCompPtr.IsValid()){
@@ -252,9 +252,9 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 
 
 sdl::imtauth::Users::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
-	const sdl::imtauth::Users::CCheckEmailGqlRequest& checkEmailRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& /*errorMessage*/) const
+			const sdl::imtauth::Users::CCheckEmailGqlRequest& checkEmailRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Users::CCheckEmailPayload retVal;
 	retVal.Version_1_0 = sdl::imtauth::Users::CCheckEmailPayload::V1_0();
@@ -390,9 +390,9 @@ sdl::imtauth::Users::CCheckEmailCodePayload CUserControllerComp::OnCheckEmailCod
 
 
 sdl::imtauth::Users::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuserExists(
-	const sdl::imtauth::Users::CCheckSuperuserExistsGqlRequest& checkSuperuserExistsRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& errorMessage) const
+			const sdl::imtauth::Users::CCheckSuperuserExistsGqlRequest& /*checkSuperuserExistsRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Users::CCheckSuperuserPayload retVal;
 	retVal.Version_1_0 = sdl::imtauth::Users::CCheckSuperuserPayload::V1_0();
@@ -409,11 +409,11 @@ sdl::imtauth::Users::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuse
 	response.Message = "";
 
 	if (m_databaseConnectionCheckerCompPtr.IsValid()){
-		QString errorMessage;
-		bool ok = m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(errorMessage);
+		QString connectionMessage;
+		bool ok = m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage);
 		if (!ok){
 			response.ErrorType = sdl::imtauth::Users::CCheckSuperuserErrorType::V1_0::CheckSuperuserErrorTypeFields::DbNotConnection;
-			response.Message = errorMessage;
+			response.Message = connectionMessage;
 
 			return retVal;
 		}
@@ -433,9 +433,9 @@ sdl::imtauth::Users::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuse
 
 
 sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperuser(
-	const sdl::imtauth::Users::CCreateSuperuserGqlRequest& createSuperuserRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+			const sdl::imtauth::Users::CCreateSuperuserGqlRequest& createSuperuserRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Users::CCreateSuperuserPayload retVal;
 	retVal.Version_1_0 = sdl::imtauth::Users::CCreateSuperuserPayload::V1_0();

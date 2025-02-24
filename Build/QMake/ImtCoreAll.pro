@@ -187,6 +187,7 @@ imtimg.file = ../../Include/imtimg/QMake/imtimg.pro
 
 SUBDIRS += imtclientgql
 imtclientgql.file = ../../Include/imtclientgql/QMake/imtclientgql.pro
+imtclientgql.depends = imtbasesdl
 
 SUBDIRS += imtservice
 imtservice.file = ../../Include/imtservice/QMake/imtservice.pro
