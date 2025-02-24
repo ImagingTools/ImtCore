@@ -1625,6 +1625,7 @@ void CObjectCollectionViewComp::TableModel::SetTextFilter(const QString& textFil
 		if (mainGroupFilter.groupFilters.count() >= 1){
 			imtbase::CComplexCollectionFilterHelper::FillTextFilter(mainGroupFilter.groupFilters[0], filterableInfoIds, textFilter);
 		}
+		m_parent.m_complexFilterCompPtr->SetFieldsFilter(mainGroupFilter);
 	}
 
 	if (objectCollectionPtr)

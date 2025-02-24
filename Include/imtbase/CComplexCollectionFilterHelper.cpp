@@ -103,7 +103,9 @@ void CComplexCollectionFilterHelper::FillTextFilter(imtbase::IComplexCollectionF
 
 		fieldFilters.append(fieldFilter);
 	}
+
 	groupFilter.fieldFilters = fieldFilters;
+	groupFilter.logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
 }
 
 
