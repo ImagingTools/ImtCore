@@ -34,6 +34,9 @@ Item {
 	property string errorStringMonth: qsTr("Invalid month value!");
 	property string errorStringDay: qsTr("Invalid day value!");
 
+	property int calendarWidth: 350;
+	property int calendarHeight: 350;
+
 	property Item tabKeyItem: null;
 
 	property alias inputItem: input;
@@ -350,7 +353,12 @@ Item {
 					decorator: Component{IconButtonDecorator{}}
 					onClicked: {
 						let point = input.mapToItem(null, 0, input.height + 2);
-						let parameters = {"x": point.x, "y":point.y};
+						let y_ = point.y;
+						if(y_ + dateInput.calendarHeight > ModalDialogManager.activeView.height){
+							y_ = point.y - (input.height + 2) - dateInput.calendarHeight - 4;
+						}
+						let parameters = {"x": point.x, "y":y_};
+
 
 						ModalDialogManager.openDialog(calendarComp, parameters);
 
@@ -382,8 +390,8 @@ Item {
 		id: calendarComp;
 
 		Calendar{
-			width: 350;
-			height: 350;
+			width: dateInput.calendarWidth;
+			height: dateInput.calendarHeight;
 			hiddenBackground: true;
 			centered: false;
 			onAccepted: {

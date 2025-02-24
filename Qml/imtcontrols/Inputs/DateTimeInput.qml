@@ -21,6 +21,11 @@ Row{
 
 	property var dateTimeRegExp: /^\d{2}\.\d{2}\.\d{4}\s\d{2}:\d{2}$/
 
+	property int calendarWidth: 350;
+	property int calendarHeight: 350;
+	property int timeInputDialogWidth: 140;
+	property int timeInputDialogHeight: 120;
+
 	//time format: "dd.MM.yyyy hh:mm"
 
 	signal dateChanged(string value)
@@ -130,6 +135,9 @@ Row{
 		hasTitle: dateTimeInput.hasTitle;
 		color: dateTimeInput.color;
 
+		calendarWidth:  dateTimeInput.calendarWidth
+		calendarHeight: dateTimeInput.calendarHeight
+
 		tabKeyItem: timeInput.inputItem;
 		onDateChanged: {
 			if(value !== dateTimeInput.dateStr){
@@ -153,6 +161,9 @@ Row{
 		canShowCurrentTime: dateTimeInput.canShowCurrentTime;
 		hasTitle: dateTimeInput.hasTitle;
 		color: dateTimeInput.color;
+
+		timeInputDialogWidth: dateTimeInput.timeInputDialogWidth;
+		timeInputDialogHeight:  dateTimeInput.timeInputDialogHeight;
 
 		tabKeyItem: forFocus;
 		onTimeChanged: {

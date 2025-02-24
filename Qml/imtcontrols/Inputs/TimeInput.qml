@@ -15,6 +15,9 @@ Item {
 	property alias radius: input.radius;
 	property alias color: input.color;
 
+	property int timeInputDialogWidth: 140;
+	property int timeInputDialogHeight: 120;
+
 	property string placeHolderText: "hh:mm";
 
 	property var timeRegExpFull: /^(([0-1]\d)|(2[0-3])):[0-5]\d$/
@@ -176,7 +179,7 @@ Item {
 			}
 
 			onFocusChanged: {
-				console.log("FOCUS:: ", focus)
+				//console.log("FOCUS:: ", focus)
 				if(!focus){
 					if(timeInput.checkDateFormat(input.text)){
 						timeInput.selectedTime = input.text;
@@ -185,10 +188,15 @@ Item {
 					ModalDialogManager.closeByComp(timeInputDialogComp);
 				}
 				else {
-					let point = input.mapToItem(null, 0, input.height + 2);
 					let hours = timeInput.getHours();
 					let minutes = timeInput.getMinutes();
-					let parameters = {"x": point.x, "y":point.y, "hours": hours, "minutes": minutes};
+
+					let point = input.mapToItem(null, 0, input.height + 2);
+					let y_ = point.y;
+					if(y_ + timeInput.timeInputDialogHeight > ModalDialogManager.activeView.height){
+						y_ = point.y - (input.height + 2) - timeInput.timeInputDialogHeight - 2;
+					}
+					let parameters = {"x": point.x, "y":y_, "hours": hours, "minutes": minutes};
 
 					ModalDialogManager.openDialog(timeInputDialogComp, parameters);
 				}
@@ -246,6 +254,8 @@ Item {
 	Component{
 		id: timeInputDialogComp;
 		TimeInputDialog{
+			width: timeInput.timeInputDialogWidth;
+			height: timeInput.timeInputDialogHeight;
 			onTimeChanged: {
 				if(time !== timeInput.selectedTime){
 					timeInput.setTime(time)
