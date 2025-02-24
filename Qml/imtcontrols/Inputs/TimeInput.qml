@@ -166,7 +166,7 @@ Item {
 			KeyNavigation.tab: timeInput.tabKeyItem;
 
 			placeHolderText: timeInput.placeHolderText;
-			placeHolderTextSize: fontSize-2;
+			placeHolderTextSize: timeInput.fontSize-2;
 
 			textInputValidator : RegularExpressionValidator { regularExpression: timeInput.timeRegExp }
 

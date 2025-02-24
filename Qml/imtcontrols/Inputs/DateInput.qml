@@ -281,7 +281,7 @@ Item {
 				KeyNavigation.tab: dateInput.tabKeyItem;
 
 				placeHolderText: dateInput.placeHolderText;
-				placeHolderTextSize: fontSize-2;
+				placeHolderTextSize: dateInput.fontSize-2;
 
 				textInputValidator : RegularExpressionValidator { regularExpression: dateInput.dateRegExp }
 
