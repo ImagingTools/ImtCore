@@ -12,11 +12,12 @@
 #include <istd/CChangeGroup.h>
 #include <istd/CChangeNotifier.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
+#include <iqtgui/CProgressDialog.h>
 #include <ifilegui/CFileDialogLoaderComp.h>
 
 // ImtCore includes
 #include <imtbase/IRevisionController.h>
-#include<imtbase/IObjectCollectionIterator.h>
+#include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/ICollectionDataController.h>
 #include <imtgui/CObjectCollectionRevisionDialog.h>
 #include <imtwidgets/CNoEditableItemDelegate.h>

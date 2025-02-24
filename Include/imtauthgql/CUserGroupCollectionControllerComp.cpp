@@ -376,7 +376,7 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 
 
 bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
-			const imtgql::CGqlRequest& rawGqlRequest,
+			const imtgql::CGqlRequest& /*rawGqlRequest*/,
 			const sdl::imtauth::Groups::CGroupUpdateGqlRequest& groupUpdateRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
