@@ -3,6 +3,7 @@
 
 
 // C includes
+#include <QtCore/qstring.h>
 #include <iostream>
 
 // Qt includes
@@ -509,27 +510,13 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 		stream << '{';
 		FeedStream(stream, 1, false);
 	}
-	// first add general prop
-	FeedStreamHorizontally(stream, hIndents + createStructDefinition);
-	stream << QStringLiteral("bool isRequested = true;");
-	FeedStream(stream, 1, false);
 
 	// then add general props
 	imtsdl::SdlFieldList customTypes;
 	for (const imtsdl::CSdlField& fieldFromType: sdlType.GetFields()){
 		FeedStreamHorizontally(stream, hIndents + createStructDefinition);
 		stream << QStringLiteral("bool is") << GetCapitalizedValue(fieldFromType.GetId()) << QStringLiteral("Requested = ");
-/// \todo fix it in \c GenerateRequestParsing
-#if SDL__PARSING_OF_REQUESTED_FIELDS_FIXED
-		if (fieldFromType.IsRequired()){
-			stream << QStringLiteral("true");
-		}
-		else {
-			stream << QStringLiteral("false");
-		}
-#else
 		stream << QStringLiteral("true");
-#endif
 		stream << ';';
 		FeedStream(stream, 1, false);
 
@@ -580,13 +567,184 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 	for (const imtsdl::CSdlField& field: sdlRequest.GetInputArguments()){
 		AddFieldReadFromRequestCode(stream, field);
 	}
-
 	FeedStream(stream, 1, false);
+
+	// fill requested fields
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("// reading requested fields");
 	FeedStream(stream, 1, false);
+
+	// Get requested fields from request
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("/// implemenatation will be in new version");
+	stream << QStringLiteral("const imtgql::CGqlObject* requestedFieldsObject = &gqlRequest.GetFields();");
+	FeedStream(stream, 1, false);
+
+	// get top-level request ID list
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("const QByteArrayList requestedIds = requestedFieldsObject->GetFieldIds();");
+	FeedStream(stream, 1, false);
+
+	GenerateRequestedFieldsParsing(
+				stream,
+				sdlRequest.GetOutputArgument(),
+				QStringLiteral("requestedIds"),
+				QStringLiteral("requestedFieldsObject"),
+				QString(),
+				hIndents);
+	FeedStream(stream, 1, false);
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
+			QTextStream& stream,
+			const imtsdl::CSdlField& sdlField,
+			const QString& idListContainerParamName,
+			const QString& gqlObjectVarName,
+			const QString& complexFieldName,
+			uint hIndents)
+{
+	bool isCustom = false;
+	bool isEnum = false;
+	ConvertTypeOrEnum(sdlField, m_sdlEnumListCompPtr->GetEnums(false), &isCustom, nullptr, nullptr, &isEnum);
+	if (!isCustom || isEnum){
+		return;
+	}
+
+	std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false));
+	const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<imtsdl::CSdlType*>(foundEntry.get());
+	if(sdlTypePtr == nullptr){
+		I_CRITICAL();
+
+		return;
+	}
+
+	GenerateRequestedFieldsParsing(stream, *sdlTypePtr, idListContainerParamName, gqlObjectVarName, complexFieldName, hIndents);
+}
+
+
+void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
+			QTextStream& stream,
+			const imtsdl::CSdlType& sdlType,
+			const QString& idListContainerParamName,
+			const QString& gqlObjectVarName,
+			const QString& complexFieldName,
+			uint hIndents)
+{
+	const imtsdl::SdlFieldList typeFieldList = sdlType.GetFields();
+	if (typeFieldList.isEmpty()){
+		I_CRITICAL();
+
+		return;
+	}
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (!");
+	stream << idListContainerParamName;
+	stream << QStringLiteral(".isEmpty()){");
+	FeedStream(stream, 1, false);
+
+	// Initialize variables with values from the specified list, if they are present.
+	for (const imtsdl::CSdlField& typeField: typeFieldList){
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("m_requestInfo.");
+		if (!complexFieldName.isEmpty()){
+			stream << complexFieldName;
+			if (!complexFieldName.endsWith('.')){
+				stream << '.';
+			}
+		}
+		stream << QStringLiteral("is");
+		stream << GetCapitalizedValue(typeField.GetId());
+		stream << QStringLiteral("Requested = ");
+		stream << idListContainerParamName;
+		stream << QStringLiteral(".contains(\"");
+		stream << typeField.GetId();
+		stream << '"' << ')' << ';';
+		FeedStream(stream, 1, false);
+	}
+
+	// Initialize variables for complex fields of this
+	for (const imtsdl::CSdlField& typeField: typeFieldList){
+		bool isCustom = false;
+		bool isEnum = false;
+		ConvertTypeOrEnum(typeField, m_sdlEnumListCompPtr->GetEnums(false), &isCustom, nullptr, nullptr, &isEnum);
+		if (!isCustom || isEnum){
+			continue;
+		}
+
+		std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumForField(typeField, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false));
+		const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<imtsdl::CSdlType*>(foundEntry.get());
+		if(sdlTypePtr == nullptr){
+			I_CRITICAL();
+
+			return;
+		}
+
+		// check if a type contains itself
+		QStringList processedIdList = complexFieldName.split('.');
+		if (processedIdList.contains(typeField.GetId())){
+
+			FeedStreamHorizontally(stream, hIndents);
+			stream << '}';
+			FeedStream(stream, 1, false);
+
+			return;
+		}
+
+		QString newComplexFieldName = complexFieldName;
+		if (!newComplexFieldName.isEmpty()){
+			newComplexFieldName += '.';
+		}
+		newComplexFieldName += typeField.GetId();
+
+		const QString newGqlContainerVarName = GetDecapitalizedValue(typeField.GetId()) + QStringLiteral("RequestedFieldsPtr");
+		const QString newIdListContainerVarName = GetDecapitalizedValue(typeField.GetId()) + QStringLiteral("RequestedIds");
+
+		// first create a GQL-info object
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("const imtgql::CGqlObject* ");
+		stream << newGqlContainerVarName;
+		stream << ' ' << '=' << ' ';
+		stream << gqlObjectVarName;
+		stream << QStringLiteral("->GetFieldArgumentObjectPtr(\"");
+		stream << typeField.GetId();
+		stream << '"' << ')' << ';';
+		FeedStream(stream, 1, false);
+
+		// ensure is not null
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("if (");
+		stream << newGqlContainerVarName;
+		stream << QStringLiteral(" != nullptr){");
+		FeedStream(stream, 1, false);
+
+		// get requested id list
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("const QByteArrayList ");
+		stream << newIdListContainerVarName;
+		stream << ' ' << '=' << ' ';
+		stream << newGqlContainerVarName;
+		stream << QStringLiteral("->GetFieldIds();");
+		FeedStream(stream, 1, true);
+
+		// then generate field info (self nested is not allowed)
+		if (sdlType != *sdlTypePtr){
+			GenerateRequestedFieldsParsing(
+				stream,
+				*sdlTypePtr,
+				newIdListContainerVarName,
+				newGqlContainerVarName,
+				newComplexFieldName,
+				hIndents + 2);
+		}
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << '}';
+		FeedStream(stream, 1, false);
+	}
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
 	FeedStream(stream, 1, false);
 }
 
