@@ -3,273 +3,294 @@ import Acf 1.0
 import imtcontrols 1.0
 
 ControlBase {
-    id: comboBoxContainer;
+	id: comboBoxContainer;
 
-    decorator: Style.comboBoxDecorator
+	decorator: Style.comboBoxDecorator
 
-    property var model:0;
+	property var model:0;
 
-    property color borderColor: comboBoxContainer.activeFocus ? Style.iconColorOnSelected : Style.borderColor;
+	property color borderColor: comboBoxContainer.activeFocus ? Style.iconColorOnSelected : Style.borderColor;
 
-    property color backgroundColor: changeable ? Style.baseColor : Style.alternateBaseColor;
+	property color backgroundColor: changeable ? Style.baseColor : Style.alternateBaseColor;
 
-    property string currentText;
+	property string currentText;
 
-    property bool changeable: true;
+	property bool changeable: true;
 
-    property bool isColor: false;
+	property bool isColor: false;
 
-    property bool textCentered: false;
-    property bool hiddenBackground: true;
-    property bool openST: false;
+	property bool textCentered: false;
+	property bool hiddenBackground: true;
+	property bool openST: false;
 
-    property bool visibleScrollBar: true;
+	property bool visibleScrollBar: true;
 	property bool visibleIcon: true;
-    property string compMainColor: "transparent";
-    property string compSelectedColor: Style.selectedColor;
-    property bool moveToEnd: false;
-    property int moveToIndex: currentIndex;
+	property string compMainColor: "transparent";
+	property string compSelectedColor: Style.selectedColor;
+	property bool moveToEnd: false;
+	property int moveToIndex: currentIndex;
 	property int contentLeftMargin: Style.size_mainMargin;
 
-    property int shownItemsCount: 5;
+	property int shownItemsCount: 5;
 
-    property int radius: Style.comboBoxRadius;
-    property int currentIndex: -1;
+	property int radius: Style.comboBoxRadius;
+	property int currentIndex: -1;
 
-    property string placeHolderText: "";
+	property string placeHolderText: "";
 
-    property real contentY;
+	property real contentY;
 
-    // ID for display in combo box delegates
-    property string nameId: "Name";
+	// ID for display in combo box delegates
+	property string nameId: "Name";
 
-    property bool hoverBlocked: true;
+	property bool hoverBlocked: true;
 
-    property var popup: null;
+	property var popup: null;
 
-    property Component delegate: Component {PopupMenuDelegate{
-        width: comboBoxContainer.width;
-        height: comboBoxContainer.itemHeight;
-		contentLeftMargin: comboBoxContainer.contentLeftMargin;
+	property Component delegate: Component {PopupMenuDelegate{
+			width: comboBoxContainer.width;
+			height: comboBoxContainer.itemHeight;
+			contentLeftMargin: comboBoxContainer.contentLeftMargin;
 
-        highlighted: comboBoxContainer.currentIndex == model.index
-		text: "item" in model ? model.item[comboBoxContainer.nameId] : model[comboBoxContainer.nameId];
+			highlighted: comboBoxContainer.currentIndex == model.index
+			text: "item" in model ? model.item[comboBoxContainer.nameId] : model[comboBoxContainer.nameId];
 
-        selected: comboBoxContainer.popup ? comboBoxContainer.popup.selectedIndex == model.index : false;
+			selected: comboBoxContainer.popup ? comboBoxContainer.popup.selectedIndex == model.index : false;
 
-        onClicked: {
-            if (comboBoxContainer.popup){
-                comboBoxContainer.popup.finished(model.Id, model.index)
-            }
-        }
+			onClicked: {
+				if (comboBoxContainer.popup){
+					comboBoxContainer.popup.finished(model.Id, model.index)
+				}
+			}
 
-        onEntered: {
-            if (comboBoxContainer.popup){
-                comboBoxContainer.popup.selectedIndex = model.index;
-            }
-        }
-    }
-    }
+			onEntered: {
+				if (comboBoxContainer.popup){
+					comboBoxContainer.popup.selectedIndex = model.index;
+				}
+			}
+		}
+	}
 
-    property alias containsMouse: cbMouseArea.containsMouse;
-    property alias mouseArea: cbMouseArea;
+	property alias containsMouse: cbMouseArea.containsMouse;
+	property alias mouseArea: cbMouseArea;
 
-    property int textSize: Style.fontSize_common;
-    property int itemHeight: 30;
-    property string fontColor: Style.textColor;
-    property string fontColorTitle: fontColor;
+	property int textSize: Style.fontSize_common;
+	property int itemHeight: 30;
+	property string fontColor: Style.textColor;
+	property string fontColorTitle: fontColor;
 
-    property alias tooltipText: tooltip.text;
-    property alias tooltipItem: tooltip;
-    property bool isOpen: false;
+	property alias tooltipText: tooltip.text;
+	property alias tooltipItem: tooltip;
+	property bool isOpen: false;
 
-    signal accepted();
-    signal activated();
-    signal highlighted(int index);
+	signal accepted();
+	signal activated();
+	signal highlighted(int index);
 
-    signal clicked();
+	signal clicked();
 	signal finished(string itemId, int index);
 
-    onModelChanged: {
-        if (!comboBoxContainer.model){
-            return;
-        }
+	onModelChanged: {
+		if (!comboBoxContainer.model){
+			return;
+		}
 
-        if (comboBoxContainer.currentIndex > -1){
-            if (comboBoxContainer.model.containsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
-                comboBoxContainer.currentText = comboBoxContainer.model.getData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
-            }
-        }
-    }
+		if (comboBoxContainer.currentIndex > -1){
+			if (comboBoxContainer.model.containsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
+				comboBoxContainer.currentText = comboBoxContainer.model.getData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
+			}
+		}
+	}
 
-    onCurrentIndexChanged: {
-        if (!comboBoxContainer.model){
-            comboBoxContainer.currentText = "";
-            return;
-        }
+	onCurrentIndexChanged: {
+		if (!comboBoxContainer.model){
+			comboBoxContainer.currentText = "";
+			return;
+		}
 
-        if (comboBoxContainer.currentIndex > -1){
+		if (comboBoxContainer.currentIndex > -1){
 			if (comboBoxContainer.model){
 
 			}
 
-            if (comboBoxContainer.model.containsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
-                let name = comboBoxContainer.model.getData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
-                comboBoxContainer.currentText = name;
-            }
-        }
-        else{
-            comboBoxContainer.currentText = "";
-        }
-    }
+			if (comboBoxContainer.model.containsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
+				let name = comboBoxContainer.model.getData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
+				comboBoxContainer.currentText = name;
+			}
+		}
+		else{
+			comboBoxContainer.currentText = "";
+		}
+	}
 
-    property Component popupMenuComp: Component {
-        id: popupMenu;
+	property Component popupMenuComp: Component {
+		id: popupMenu;
 
-        PopupMenuDialog {
-            id: popup;
+		PopupMenuDialog {
+			id: popup;
 
-            delegate: comboBoxContainer.delegate;
-            width: comboBoxContainer.width;
-            itemHeight: comboBoxContainer.itemHeight;
-            hiddenBackground: comboBoxContainer.hiddenBackground;
-            textSize: comboBoxContainer.textSize;
-            fontColor: comboBoxContainer.fontColor;
-            shownItemsCount: comboBoxContainer.shownItemsCount;
-            moveToEnd: comboBoxContainer.moveToEnd;
-            moveToIndex: comboBoxContainer.moveToIndex;
-            visibleScrollBar: comboBoxContainer.visibleScrollBar;
-            selectedIndex: comboBoxContainer.currentIndex;
+			opacity:  0;
+			delegate: comboBoxContainer.delegate;
+			width: comboBoxContainer.width;
+			itemHeight: comboBoxContainer.itemHeight;
+			hiddenBackground: comboBoxContainer.hiddenBackground;
+			textSize: comboBoxContainer.textSize;
+			fontColor: comboBoxContainer.fontColor;
+			shownItemsCount: comboBoxContainer.shownItemsCount;
+			moveToEnd: comboBoxContainer.moveToEnd;
+			moveToIndex: comboBoxContainer.moveToIndex;
+			visibleScrollBar: comboBoxContainer.visibleScrollBar;
+			selectedIndex: comboBoxContainer.currentIndex;
 
-            onFinished: {
+			onHeightChanged: {
+				popup.setY();
+			}
+
+			function setY(){
+				if(popup.height == 0){
+					return
+				}
+				let point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height)
+				let y_ = point.y;
+				console.log("Y__", y_, popup.height, ModalDialogManager.activeView.height)
+				if(y_ + popup.height > ModalDialogManager.activeView.height){
+					popup.y = point.y - popup.height - comboBoxContainer.height;
+					popup.isUpwards = true;
+				}
+				else {
+					popup.y = point.y;
+				}
+				popup.opacity = 1;
+			}
+
+			onFinished: {
 				if (index >= 0){
 					comboBoxContainer.currentIndex = index;
 				}
 
 				comboBoxContainer.isOpen = false;
 
-                comboBoxContainer.finished(commandId, index)
-            }
+				comboBoxContainer.finished(commandId, index)
+			}
 
-            onStarted: {
-                comboBoxContainer.popup = popup;
-            }
-        }
-    }
+			onStarted: {
+				comboBoxContainer.popup = popup;
+			}
+		}
+	}
 
-    onDecoratorChanged: {
-        bindCurrentIndex.target = decorator_
-    }
+	onDecoratorChanged: {
+		bindCurrentIndex.target = decorator_
+	}
 
-    Binding {
-        id: bindCurrentIndex;
-        property: "currentIndex"
-        value: comboBoxContainer.currentIndex;
-    }
+	Binding {
+		id: bindCurrentIndex;
+		property: "currentIndex"
+		value: comboBoxContainer.currentIndex;
+	}
 
-    function closePopupMenu(){
-        if (comboBoxContainer.popup){
-            comboBoxContainer.popup.close();
-        }
+	function closePopupMenu(){
+		if (comboBoxContainer.popup){
+			comboBoxContainer.popup.close();
+		}
 
-        comboBoxContainer.isOpen = false;
-    }
+		comboBoxContainer.isOpen = false;
+	}
 
-    function openPopupMenu(){
+	function openPopupMenu(){
 		console.log("openPopupMenu", comboBoxContainer.model);
-        var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
-        ModalDialogManager.openDialog(popupMenuComp, {
-                                          "x":     point.x,
-                                          "y":     point.y,
-                                          "model": comboBoxContainer.model,
-                                          "width": comboBoxContainer.width});
+		let point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
+		ModalDialogManager.openDialog(popupMenuComp, {
+										  "x":     point.x,
+										  "model": comboBoxContainer.model,
+										  "width": comboBoxContainer.width});
 
-        comboBoxContainer.isOpen = true;
-    }
+		comboBoxContainer.isOpen = true;
+	}
 
-    MouseArea {
-        id: cbMouseArea;
+	MouseArea {
+		id: cbMouseArea;
 
-        anchors.fill: parent;
-        hoverEnabled: true;
+		anchors.fill: parent;
+		hoverEnabled: true;
 
-        cursorShape: comboBoxContainer.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor;
+		cursorShape: comboBoxContainer.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
-        onClicked: {
+		onClicked: {
 			console.log("onClicked", comboBoxContainer.model);
 			console.log("comboBoxContainer", comboBoxContainer);
 
-            if (!comboBoxContainer.model || !comboBoxContainer.changeable){
+			if (!comboBoxContainer.model || !comboBoxContainer.changeable){
 				console.log("1");
 
-                return;
-            }
+				return;
+			}
 
-            comboBoxContainer.focus = true;
-            comboBoxContainer.forceActiveFocus();
+			comboBoxContainer.focus = true;
+			comboBoxContainer.forceActiveFocus();
 
-            if (comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() > 0){
-                comboBoxContainer.openPopupMenu();
-            }
+			if (comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() > 0){
+				comboBoxContainer.openPopupMenu();
+			}
 
 			console.log("2");
 
 
-            comboBoxContainer.clicked();
-        }
+			comboBoxContainer.clicked();
+		}
 
-        onPressed: {
-            if(tooltip.text !== ""){
-                tooltip.closeTooltip();
-            }
-        }
+		onPressed: {
+			if(tooltip.text !== ""){
+				tooltip.closeTooltip();
+			}
+		}
 
-        onPositionChanged: {
-            if(tooltip.text !== ""){
-                tooltip.show(mouseX, mouseY);
-            }
-        }
+		onPositionChanged: {
+			if(tooltip.text !== ""){
+				tooltip.show(mouseX, mouseY);
+			}
+		}
 
-        onExited: {
-            if(tooltip.text !== ""){
-                tooltip.hide();
-            }
-        }
-    }
+		onExited: {
+			if(tooltip.text !== ""){
+				tooltip.hide();
+			}
+		}
+	}
 
-    CustomTooltip{
-        id: tooltip;
+	CustomTooltip{
+		id: tooltip;
 
-        fitToTextWidth: true;
-    }
+		fitToTextWidth: true;
+	}
 
-    Shortcut {
-        sequence: "Space";
-        enabled: !comboBoxContainer.isOpen && (comboBoxContainer.activeFocus) && comboBoxContainer.visible;
-        onActivated: {
-            comboBoxContainer.openPopupMenu();
-        }
-    }
+	Shortcut {
+		sequence: "Space";
+		enabled: !comboBoxContainer.isOpen && (comboBoxContainer.activeFocus) && comboBoxContainer.visible;
+		onActivated: {
+			comboBoxContainer.openPopupMenu();
+		}
+	}
 
-    Shortcut {
-        sequence: "Ctrl+Up";
-        enabled: !comboBoxContainer.isOpen && comboBoxContainer.activeFocus && comboBoxContainer.visible;
-        onActivated: {
-            if(comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() && comboBoxContainer.currentIndex > 0){
-                comboBoxContainer.currentIndex--;
-            }
+	Shortcut {
+		sequence: "Ctrl+Up";
+		enabled: !comboBoxContainer.isOpen && comboBoxContainer.activeFocus && comboBoxContainer.visible;
+		onActivated: {
+			if(comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() && comboBoxContainer.currentIndex > 0){
+				comboBoxContainer.currentIndex--;
+			}
 
-        }
-    }
+		}
+	}
 
-    Shortcut {
-        sequence: "Ctrl+Down";
-        enabled: !comboBoxContainer.isOpen && comboBoxContainer.activeFocus && comboBoxContainer.visible;
-        onActivated: {
-            if(comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() && comboBoxContainer.currentIndex < (comboBoxContainer.model.getItemsCount()-1)){
-                comboBoxContainer.currentIndex++;
-            }
+	Shortcut {
+		sequence: "Ctrl+Down";
+		enabled: !comboBoxContainer.isOpen && comboBoxContainer.activeFocus && comboBoxContainer.visible;
+		onActivated: {
+			if(comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() && comboBoxContainer.currentIndex < (comboBoxContainer.model.getItemsCount()-1)){
+				comboBoxContainer.currentIndex++;
+			}
 
-        }
-    }
+		}
+	}
 }

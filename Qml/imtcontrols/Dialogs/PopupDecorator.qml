@@ -7,6 +7,8 @@ import imtcontrols 1.0
 DecoratorBase {
     id: root;
 
+	height: bottomContentLoader.y + bottomContentLoader.height;
+
     property int itemHeight: !baseElement ? 0 : baseElement.itemHeight;
     property int itemWidth: !baseElement ? 0 : baseElement.itemWidth;
     property int shownItemsCount: !baseElement ? 0 : baseElement.shownItemsCount;
@@ -21,6 +23,8 @@ DecoratorBase {
     property alias topContentLoaderSourceComp: topContentLoader.sourceComponent;
     property alias bottomContentLoaderSourceComp: bottomContentLoader.sourceComponent;
 	property alias repeater: popupMenuListView;
+
+	property bool isUpwards: !baseElement ? false: baseElement.isUpwards;
 
     onModelChanged: {
         popupMenuListView.model = root.model;
@@ -109,6 +113,8 @@ DecoratorBase {
 
     Loader {
         id: bottomContentLoader;
+
+		anchors.top: itemBody.bottom;
     }
 
     DropShadow {
@@ -116,7 +122,7 @@ DecoratorBase {
         anchors.fill: itemBody;
         z: itemBody.z-1
         horizontalOffset: 3;
-        verticalOffset: 3;
+		verticalOffset: root.isUpwards ? -3 : 3;
         radius: 8;
         spread: 0;
         color: Style.shadowColor;
