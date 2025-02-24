@@ -139,6 +139,9 @@ Row{
 		calendarHeight: dateTimeInput.calendarHeight
 
 		tabKeyItem: timeInput.inputItem;
+		onCalendarButtonClicked: {
+			forFocus.forceActiveFocus();
+		}
 		onDateChanged: {
 			if(value !== dateTimeInput.dateStr){
 				dateTimeInput.dateStr = value;

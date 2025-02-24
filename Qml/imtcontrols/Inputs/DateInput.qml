@@ -45,6 +45,7 @@ Item {
 	property var selectedDate;
 
 	signal dateChanged(string value);
+	signal calendarButtonClicked();
 
 	Component.onCompleted:{
 		selectedDate = new Date();
@@ -361,7 +362,7 @@ Item {
 
 
 						ModalDialogManager.openDialog(calendarComp, parameters);
-
+						dateInput.calendarButtonClicked();
 					}
 
 				}
