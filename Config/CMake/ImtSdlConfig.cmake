@@ -1,5 +1,8 @@
+
+
 #! Gets SDL generator executable path
 function(GetSdlGeneratorPath OUTPUT_SDL_GENERATOR_EXE_PATH)
+	set(IMT_SDL_BIN_DIR_INTERNAL "${IMTCOREDIR_BUILD}/Bin/" CACHE INTERNAL "INTERNAL. Dir where an SDL generator is located.")
 
 	get_target_name(TARGETNAME)
 	set(COMPILER_DIR ${CMAKE_BUILD_TYPE}_${TARGETNAME})
