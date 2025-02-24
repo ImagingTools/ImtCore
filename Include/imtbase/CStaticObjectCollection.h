@@ -53,6 +53,7 @@ public:
 protected:
 	// reimplemented (CObjectCollectionBase)
 	virtual DataPtr CreateObjectInstance(const QByteArray& typeId) const;
+	virtual IObjectCollection* CreateSubCollectionInstance() const override;
 };
 
 

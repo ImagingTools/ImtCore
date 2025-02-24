@@ -18,7 +18,6 @@
 #include <iprm/IIdParam.h>
 
 // ImtCore includes
-#include <imtbase/CObjectCollection.h>
 #include <imtbase/ICollectionFilter.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
 #include <imtcol/CDocumentCollectionFilter.h>
@@ -555,7 +554,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateOperationDescriptionQuery(con
 	if (operationContextPtr != nullptr){
 		imtbase::IOperationContext* operationPtr = const_cast<imtbase::IOperationContext*>(operationContextPtr);
 		if (operationPtr != nullptr){
-			imtbase::CObjectCollection* changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationPtr->GetChangesCollection());
+			iser::ISerializable* changeCollectionPtr = dynamic_cast<iser::ISerializable*>(operationPtr->GetChangesCollection());
 
 			QByteArray json;
 			{
@@ -742,6 +741,7 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 
 	return query;
 }
+
 
 
 idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const

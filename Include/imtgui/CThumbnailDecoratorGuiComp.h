@@ -93,6 +93,7 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CThumbnailDecoratorGuiCompAttr2);
 		I_ASSIGN(m_hideMenuPanelOnHomePageAttrPtr, "HideMenuPanelOnHomePage", "Hide menu panel when home page is active", true, true);
+		I_ASSIGN(m_hideCommandButtonAttrPtr, "HideCommandButton", "Hide command button", true, true);
 		I_ASSIGN(m_hideHomeButtonAttrPtr, "HideHomeButton", "Hide home button", true, false);
 		I_ASSIGN(m_accountMenuCompPtr, "AccountMenu", "Menu for logged account", false, "AccountMenu");
 		I_ASSIGN(m_viewPageNavigationAttrPtr, "ViewPageNavigation", "View page navigation", true, true);
@@ -109,6 +110,7 @@ public:
 protected:
 	I_ATTR(bool, m_hideMenuPanelOnHomePageAttrPtr);
 	I_ATTR(bool, m_hideHomeButtonAttrPtr);
+	I_ATTR(bool, m_hideCommandButtonAttrPtr);
 	I_REF(iqtgui::IGuiObject, m_accountMenuCompPtr);
 	I_ATTR(bool, m_viewPageNavigationAttrPtr);
 	I_ATTR(bool, m_quitDialogIgnoredAttrPtr);

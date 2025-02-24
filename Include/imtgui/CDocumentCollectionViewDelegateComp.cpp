@@ -113,6 +113,7 @@ QByteArray CDocumentCollectionViewDelegateComp::ImportObject(const QByteArray& t
 					QFileInfo sourceFileInfo(sourcePath);
 
 					QString documentName = sourceFileInfo.completeBaseName();
+					documentName = GetUniqueName(documentName);
 
 					QByteArray documentId = m_collectionPtr->InsertNewObject(typeId, documentName, QString(tr("Imported from %1")).arg(sourceFileInfo.fileName()), documentPtr.GetPtr());
 					if (!documentId.isEmpty()){
@@ -590,6 +591,8 @@ int CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::SaveToFile(
 						description = documentMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
 					}
 
+					objectName = m_parent.GetUniqueName(objectName);
+					
 					QByteArray objectId = m_parent.m_collectionPtr->InsertNewObject(typeId, objectName, description, &data);
 					if (!objectId.isEmpty()){
 						objectInfoPtr->uuid = objectId;

@@ -53,6 +53,7 @@ public:
 	I_BEGIN_BASE_COMPONENT(CObjectCollectionViewAttr);
 		I_ASSIGN(m_columnSettingsKeyAttrPtr, "ColumnSettingsKey", "Registry/INI file key for storing column settings", true, "");
 		I_ASSIGN(m_useSearchWidgetAttrPtr, "UseSearchWidget", "Use internal search widget", true, true);
+		I_ASSIGN(m_useCloseButtonAttrPtr, "UseCloseButton", "Add close button to the right", true, false);
 		I_ASSIGN(m_viewRightPanelAttrPtr, "ViewRightPanel", "View right panel", true, true);
 		I_ASSIGN(m_viewFilterAttrPtr, "ViewFilter", "View filter for default", true, false);
 	I_END_COMPONENT;
@@ -62,6 +63,7 @@ protected:
 	I_ATTR(bool, m_useSearchWidgetAttrPtr);
 	I_ATTR(bool, m_viewRightPanelAttrPtr);
 	I_ATTR(bool, m_viewFilterAttrPtr);
+	I_ATTR(bool, m_useCloseButtonAttrPtr);
 };
 
 

@@ -8,16 +8,11 @@
 #include <imod/IModel.h>
 #include <iprm/IOptionsList.h>
 #include <iprm/IParamsManager.h>
-// #include <ilog/TLoggerCompWrap.h>
 #include <iprm/TParamsPtr.h>
-
-// #include <istd/CChangeGroup.h>
 
 // ImtCore includes
 #include <imtbase/TPluginManager.h>
 #include <imtbase/IPluginStatusMonitor.h>
-
-// #undef SetDllDirectoryA
 
 
 namespace imtbase

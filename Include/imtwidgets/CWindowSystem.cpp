@@ -116,7 +116,7 @@ Qt::HANDLE CWindowSystem::FindHandleByProcessId(qint64 processId)
 			HWND parentWindowHandle = ::GetParent(topWindowHandle);
 			HWND lastWindowHandle = topWindowHandle;
 
-			while(topWindowHandle != nullptr){
+			while(parentWindowHandle != nullptr){
 				lastWindowHandle = parentWindowHandle;
 
 				parentWindowHandle = ::GetParent(lastWindowHandle);
@@ -155,22 +155,33 @@ Qt::HANDLE CWindowSystem::FindHandleByTitle(const QString& title)
 }
 
 
-void CWindowSystem::RaiseWindowByProcessId(qint64 processId)
+bool CWindowSystem::RaiseWindowByProcessId(qint64 processId)
 {
+	bool ok = false;
 #ifdef Q_OS_WIN
 	HWND windowHandle = (HWND)FindHandleByProcessId(processId);
+	HWND lastActiveWindowHandle = windowHandle;
+
+	if (windowHandle != nullptr){
+		lastActiveWindowHandle = ::GetLastActivePopup(windowHandle);
+	}
+
 	if (windowHandle){
 		::SetForegroundWindow(windowHandle);
-
-		if (::IsIconic(windowHandle)){
-			::ShowWindow(windowHandle, SW_RESTORE);
+		ok = ::ShowWindow(windowHandle, SW_RESTORE);
+		::ShowWindow(windowHandle, SW_NORMAL);
+		
+		if (::IsIconic(lastActiveWindowHandle) && (windowHandle != lastActiveWindowHandle)) {
+			::ShowWindow(lastActiveWindowHandle, SW_RESTORE);
+			::ShowWindow(lastActiveWindowHandle, SW_NORMAL);
 		}
 	}
 #endif
+	return ok;
 }
 
 
-void CWindowSystem::RaiseWindowByTitle(const QString& title)
+bool CWindowSystem::RaiseWindowByTitle(const QString& title)
 {
 #ifdef Q_OS_WIN
 	HWND mainWindowHandle = (HWND)FindHandleByTitle(title);
@@ -181,13 +192,37 @@ void CWindowSystem::RaiseWindowByTitle(const QString& title)
 	}
 
 	if (lastActiveWindowHandle != nullptr){
-		::SetForegroundWindow(lastActiveWindowHandle);
+		bool ok = ::SetForegroundWindow(mainWindowHandle);
+		::ShowWindow(mainWindowHandle, SW_RESTORE);
+		::ShowWindow(mainWindowHandle, SW_SHOWNORMAL);
 
-		if (::IsIconic(lastActiveWindowHandle)){
+		if ((lastActiveWindowHandle!= mainWindowHandle) && (::IsIconic(lastActiveWindowHandle))){
+			ok = ::SetForegroundWindow(lastActiveWindowHandle);
 			::ShowWindow(lastActiveWindowHandle, SW_RESTORE);
+			::ShowWindow(lastActiveWindowHandle, SW_SHOWNORMAL);
+			return ok;
 		}
+
+		return ok;
 	}
 #endif
+
+	return false;
+}
+
+
+bool CWindowSystem::RaiseWindowByProcessTitle(const QString& title)
+{
+#ifdef Q_OS_WIN
+	quint64 processId = FindProcessIdByTitle(title);
+	if (processId != 0){
+		return RaiseWindowByProcessId(processId);
+	}
+
+	return false;
+#endif
+
+	return false;
 }
 
 

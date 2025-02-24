@@ -77,6 +77,12 @@ CObjectCollection::DataPtr CObjectCollection::CreateObjectInstance(const QByteAr
 }
 
 
+IObjectCollection* CObjectCollection::CreateSubCollectionInstance() const
+{
+	return new CObjectCollection;
+}
+
+
 } // namespace imtbase
 
 

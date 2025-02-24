@@ -105,6 +105,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_animationWidth.setTargetObject(PageTree);
 	m_animationWidth.setPropertyName("maximumWidth");
 	m_animationIndent.setPropertyName("indent");
+	m_animationIndent.setTargetObject(PageTree);
 	connect(&m_animationWidth, &QPropertyAnimation::finished, this, &CMenuPanel::OnAnimationFinished);
 
 	pushTop->setIcon(QIcon(":/Icons/Up"));
@@ -1092,8 +1093,13 @@ void CMenuPanel::StartAnimation()
 
 void CMenuPanel::StopAnimation()
 {
-	m_animationWidth.stop();
-	m_animationIndent.stop();
+	if (m_animationWidth.state() == QAbstractAnimation::Running){
+		m_animationWidth.stop();
+	}
+
+	if (m_animationIndent.state() == QAbstractAnimation::Running){
+		m_animationIndent.stop();
+	}
 }
 
 

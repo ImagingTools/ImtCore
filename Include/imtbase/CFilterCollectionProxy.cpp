@@ -5,6 +5,9 @@
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 
+// ImtCore includes
+#include <imtbase/CObjectCollection.h>
+
 
 namespace imtbase
 {
@@ -157,12 +160,18 @@ CFilterCollectionProxy::DataPtr CFilterCollectionProxy::CreateObjectInstance(con
 }
 
 
+IObjectCollection* CFilterCollectionProxy::CreateSubCollectionInstance() const
+{
+	return new CObjectCollection;
+}
+
+
 bool CFilterCollectionProxy::InsertObjectIntoCollection(ObjectInfo info)
 {
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(info.objectPtr.GetPtr());
 	if (modelPtr != nullptr){
 		if (!modelPtr->AttachObserver(&m_modelUpdateBridge)){
-			qDebug("CFilterCollectionProxy::InsertObjectIntoCollection: Attaching object's model to the internal observer failed");
+			qDebug("CObjectCollectionBase::InsertObjectIntoCollection: Attaching object's model to the internal observer failed");
 
 			return false;
 		}
@@ -172,6 +181,7 @@ bool CFilterCollectionProxy::InsertObjectIntoCollection(ObjectInfo info)
 
 	return true;
 }
+
 
 
 } // namespace imtbase

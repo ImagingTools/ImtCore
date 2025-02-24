@@ -397,7 +397,8 @@ bool CFileCollectionCompBase::ExportFile(
 QByteArray CFileCollectionCompBase::ImportFile(
 			imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& /*typeId*/,
-			const QString& /*sourceFilePath*/) const
+			const QString& /*sourceFilePath*/,
+			const QString& /*objectName*/) const
 {
 	return QByteArray();
 }

@@ -38,6 +38,7 @@ public:
 protected:
 	// reimplemented (CObjectCollectionBase)
 	virtual DataPtr CreateObjectInstance(const QByteArray& typeId) const override;
+	virtual IObjectCollection* CreateSubCollectionInstance() const override;
 
 private:
 	int m_operationFlags;

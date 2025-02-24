@@ -57,17 +57,20 @@ bool CCollectionDataControllerComp::ExportFile(
 QByteArray CCollectionDataControllerComp::ImportFile(
 			imtbase::IObjectCollection& collection,
 			const QByteArray& typeId,
-			const QString& sourceFilePath) const
+			const QString& sourceFilePath,
+			const QString& objectName) const
 {
 	const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
 	if (persistencePtr != nullptr){
 		imtbase::IObjectCollection::DataPtr dataPtr(CreateObjectInstance(typeId));
 		if (dataPtr.IsValid()){
-			int state= persistencePtr->LoadFromFile(*dataPtr, sourceFilePath);
+			int state = persistencePtr->LoadFromFile(*dataPtr, sourceFilePath);
 			if (state == ifile::IFilePersistence::OS_OK){
 				QFileInfo fileInfo(sourceFilePath);
 
-				return collection.InsertNewObject(typeId, fileInfo.completeBaseName(), QString(QObject::tr("Import from %1").arg(sourceFilePath)), dataPtr);
+				QString targetName = objectName.isEmpty() ? fileInfo.completeBaseName() : objectName;
+
+				return collection.InsertNewObject(typeId, targetName, QString(QObject::tr("Import from %1").arg(sourceFilePath)), dataPtr);
 			}
 		}
 	}

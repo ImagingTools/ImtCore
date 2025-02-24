@@ -46,7 +46,8 @@ public:
 	virtual Id ImportFile(
 				imtbase::IObjectCollection& collection,
 				const QByteArray& typeId,
-				const QString& sourceFilePath = QString()) const override;
+				const QString& sourceFilePath = QString(),
+				const QString& objectName = QString()) const override;
 
 	// reimplemented (IObjectCollection)
 	virtual const IRevisionController* GetRevisionController() const override;
@@ -136,6 +137,10 @@ protected:
 		virtual QVariant GetElementInfo(QByteArray infoId) const override;
 
 	private:
+		const IObjectCollection* GetCollectionPtr(int index) const;
+		QByteArray GetObjectId(int index) const;
+
+	private:
 		const CObjectCollectionBase& m_parent;
 		mutable int m_index;
 	};
@@ -187,14 +192,32 @@ protected:
 
 protected:
 	// abstract methods
+	
+	/**
+		Create object instance of the given type.
+	*/
 	virtual DataPtr CreateObjectInstance(const QByteArray& typeId) const = 0;
 
 protected:
+	/**
+		Get an external object storage to persist the object of the given type.
+		If the implementation provides such a collection,
+		then the object will be stored there and this collection will only store the link.
+	*/
+	virtual IObjectCollection* GetObjectStorage(const QByteArray& typeId, const istd::IChangeable* objectPtr) const;
+
+	/**
+		Create sub-collection instance.
+	*/
+	virtual IObjectCollection* CreateSubCollectionInstance() const;
+
 	virtual bool InsertObjectIntoCollection(ObjectInfo info);
 	virtual int GetItemDefaultFlags() const;
 	ObjectInfo* GetObjectInfo(const Id& id) const;
 	virtual void RemoveAllObjects();
 
+private:
+	DataPtr CreateDataObject(const QByteArray& typeId) const;
 
 protected:
 	imod::CModelUpdateBridge m_modelUpdateBridge;

@@ -1390,7 +1390,10 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 
 				SetupCommandsMenu(*commandsPtr, m_commandsMenu, group);
 
-				CommandsMenuButton->setVisible(!m_commandsMenu.isEmpty());
+				if (*m_hideCommandButtonAttrPtr)
+					CommandsMenuButton->hide();
+				else
+					CommandsMenuButton->setVisible(!m_commandsMenu.isEmpty());
 			}
 			else{
 				QAction* placeholderAction = new QAction(QIcon("/"), "");

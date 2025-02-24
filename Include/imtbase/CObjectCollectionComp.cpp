@@ -90,6 +90,19 @@ CObjectCollectionComp::DataPtr CObjectCollectionComp::CreateObjectInstance(const
 }
 
 
+IObjectCollection* CObjectCollectionComp::GetObjectStorage(const QByteArray& typeId, const istd::IChangeable* /*objectPtr*/) const
+{
+	int index = m_externalTypeIdsAttrPtr.FindValue(typeId);
+	if (index >= 0){
+		Q_ASSERT(m_externalStorageCompPtr.IsValid());
+
+		return m_externalStorageCompPtr.GetPtr();
+	}
+
+	return nullptr;
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CObjectCollectionComp::OnComponentCreated()

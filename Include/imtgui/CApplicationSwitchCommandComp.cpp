@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtWidgets/QMessageBox>
+#include <QProcess>
 
 // ImtCore includes
 #include <imtwidgets/CWindowSystem.h>
@@ -62,6 +63,13 @@ void CApplicationSwitchCommandComp::OnComponentCreated()
 
 	m_switchCommand.setVisible(m_executablePathCompPtr.IsValid());
 
+	if (m_actionShortcutAttrPtr.IsValid()) {
+		m_switchCommand.setShortcut(*m_actionShortcutAttrPtr);
+
+		if (m_switchCommand.toolTip().size())
+			m_switchCommand.setToolTip(m_switchCommand.toolTip() + " (" + *m_actionShortcutAttrPtr + ")");
+	}
+
 	connect(&m_switchCommand, SIGNAL(triggered()), this, SLOT(OnCommandActivated()));
 
 	EnableLocalization(true);
@@ -112,8 +120,27 @@ void CApplicationSwitchCommandComp::OnCommandActivated()
 		QString executablePath = m_executablePathCompPtr->GetPath();
 
 		QString processTitle = QFileInfo(executablePath).baseName();
+		QString processTitleExe = QFileInfo(executablePath).fileName();
 
-		imtwidgets::CWindowSystem::RaiseWindowByTitle(processTitle);
+		bool ok = imtwidgets::CWindowSystem::RaiseWindowByProcessTitle(processTitleExe);
+
+		if (!ok)
+		{
+			ok = imtwidgets::CWindowSystem::RaiseWindowByTitle(processTitle);
+
+			// if !ok then run the app
+			if (!ok) {
+				QStringList params;
+				if (m_parametersCompPtr.IsValid()) {
+					params = m_parametersCompPtr->GetName().split(";");
+				}
+
+				ok = QProcess::startDetached(executablePath, params);
+			}
+		}
+		//if (!ok) {	//try start by process name
+		//	ok = imtwidgets::CWindowSystem::RaiseWindowByProcessTitle(processTitleExe);
+		//}
 	}
 }
 

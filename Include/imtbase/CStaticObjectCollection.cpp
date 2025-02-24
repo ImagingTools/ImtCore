@@ -5,6 +5,9 @@
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 
+// ImtCore includes
+#include <imtbase/CObjectCollection.h>
+
 
 namespace imtbase
 {
@@ -99,6 +102,12 @@ istd::IChangeable* CStaticObjectCollection::CloneMe(CompatibilityMode mode) cons
 CStaticObjectCollection::DataPtr CStaticObjectCollection::CreateObjectInstance(const QByteArray& /*typeId*/) const
 {
 	return nullptr;
+}
+
+
+IObjectCollection* CStaticObjectCollection::CreateSubCollectionInstance() const
+{
+	return new CObjectCollection;
 }
 
 

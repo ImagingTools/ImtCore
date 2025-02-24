@@ -58,8 +58,15 @@ public:
 	virtual bool SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr = nullptr) override;
 
 	// reimplemented (ICollectionDataController)
-	virtual bool ExportFile(const imtbase::IObjectCollection& collection, const Id& objectId, const QString& targetFilePath = QString()) const override;
-	virtual QByteArray ImportFile(imtbase::IObjectCollection& collection, const QByteArray& typeId, const QString& sourceFilePath = QString()) const override;
+	virtual bool ExportFile(
+				const imtbase::IObjectCollection& collection,
+				const Id& objectId,
+				const QString& targetFilePath = QString()) const override;
+	virtual Id ImportFile(
+				imtbase::IObjectCollection& collection,
+				const QByteArray& typeId,
+				const QString& sourceFilePath = QString(),
+				const QString& objectName = QString()) const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;

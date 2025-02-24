@@ -319,7 +319,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 {
 	Message->hide();
 	Progress->hide();
-	
+
 	connect(this, &CObjectCollectionViewComp::EmitUpdateGui, this, &CObjectCollectionViewComp::DoUpdateGui, Qt::QueuedConnection);
 
 	if (m_filterParamsGuiCompPtr.IsValid()){
@@ -352,11 +352,17 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	m_filterPanelAnimationPtr = new QPropertyAnimation(FilterPanel, "maximumHeight", this);
 
 	connect(FilterEdit, &QLineEdit::textChanged, this, &CObjectCollectionViewComp::OnFilterChanged);
-	connect(CloseButton, &QToolButton::clicked, this, &CObjectCollectionViewComp::OnEscShortCut);
+
+	CloseButton->setVisible(*m_useCloseButtonAttrPtr);
+	if (*m_useCloseButtonAttrPtr){
+		connect(CloseButton, &QToolButton::clicked, this, &CObjectCollectionViewComp::OnEscShortCut);
+		connect(m_escShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnEscShortCut);
+	}
+
 	if (*m_useSearchWidgetAttrPtr == true){
 		connect(m_searchShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnSearchShortCut);
 	}
-	connect(m_escShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnEscShortCut);
+
 	connect(m_delShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnDelShortCut);
 	connect(m_renameShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnRenameShortCut);
 
@@ -1193,10 +1199,12 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 						imtbase::ICollectionInfo::Ids ids = collectionInfo.GetElementIds();
 						for (int i = 0; i < ids.count(); ++i){
 							QByteArray id = ids[i];
-							QAbstractItemDelegate* itemDelegatePtr = ItemList->itemDelegateForColumn(i);
-							if (itemDelegatePtr != nullptr){
-								itemDelegatePtr->deleteLater();
+
+							QAbstractItemDelegate* oldItemDelegatePtr = ItemList->itemDelegateForColumn(i);
+							if (oldItemDelegatePtr != nullptr){
+								oldItemDelegatePtr->deleteLater();
 							}
+
 							QAbstractItemDelegate* itemDelegate = delegatePtr->GetColumnItemDelegate(id);
 							ItemList->setItemDelegateForColumn(i, itemDelegate);
 						}
@@ -1707,6 +1715,7 @@ QVariant CObjectCollectionViewComp::TableModel::data(const QModelIndex& index, i
 		if (itemTypeId.isEmpty()){
 			itemTypeId = collectionPtr->GetObjectTypeId(objectId);
 		}
+
 		return itemTypeId;
 	case ICollectionViewDelegate::DR_OBJECT_ID:
 		return objectId;

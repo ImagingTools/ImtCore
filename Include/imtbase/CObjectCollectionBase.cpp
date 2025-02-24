@@ -14,11 +14,14 @@
 // ImtCore includes
 #include <imtcore/Version.h>
 #include <imtbase/MetaTypes.h>
-#include <imtbase/CObjectCollection.h>
+#include <imtbase/CObjectLink.h>
 
 
 namespace imtbase
 {
+
+
+static QByteArray s_externalLinkTypeId = QByteArrayLiteral("imtbase::CObjectCollectionBase::Link");
 
 
 // public methods
@@ -45,10 +48,15 @@ const ifile::IFilePersistence* CObjectCollectionBase::GetPersistenceForObjectTyp
 }
 
 
-bool CObjectCollectionBase::ExportFile(const imtbase::IObjectCollection& /*collection*/, const Id& objectId, const QString& targetFilePath) const
+bool CObjectCollectionBase::ExportFile(
+			const imtbase::IObjectCollection& /*collection*/,
+			const Id& objectId,
+			const QString& targetFilePath) const
 {
 	QByteArray objectTypeId = GetObjectTypeId(objectId);
 	if (!objectTypeId.isEmpty()){
+		Q_ASSERT(objectTypeId != s_externalLinkTypeId);
+
 		const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(objectTypeId);
 		if (persistencePtr != nullptr){
 			DataPtr objectDataPtr;
@@ -62,17 +70,23 @@ bool CObjectCollectionBase::ExportFile(const imtbase::IObjectCollection& /*colle
 }
 
 
-ICollectionInfo::Id CObjectCollectionBase::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& typeId, const QString& sourceFilePath) const
+ICollectionInfo::Id CObjectCollectionBase::ImportFile(
+			imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& typeId,
+			const QString& sourceFilePath,
+			const QString& objectName) const
 {
 	if (!typeId.isEmpty()){
+		Q_ASSERT(typeId != s_externalLinkTypeId);
+
 		const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
 		if (persistencePtr != nullptr){
-			DataPtr objectDataPtr(CreateObjectInstance(typeId));
+			DataPtr objectDataPtr(CreateDataObject(typeId));
 			if (objectDataPtr.IsValid()){
 				if (persistencePtr->LoadFromFile(*objectDataPtr, sourceFilePath) == ifile::IFilePersistence::OS_OK){
 					QFileInfo fileInfo(sourceFilePath);
 
-					QString newObjectName = fileInfo.baseName();
+					QString newObjectName = objectName.isEmpty() ? fileInfo.baseName() : objectName;
 
 					return (const_cast<CObjectCollectionBase*>(this))->InsertNewObject(typeId, newObjectName, QString("Imported from %1").arg(sourceFilePath), objectDataPtr.GetPtr());
 				}
@@ -122,9 +136,26 @@ ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 			const Id& proposedElementId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
-			const IOperationContext* /*operationContextPtr*/)
+			const IOperationContext* operationContextPtr)
 {
 	ObjectInfo info;
+
+	QByteArray storageId;
+	IObjectCollection* storagePtr = GetObjectStorage(typeId, defaultValuePtr.GetPtr());
+	if (storagePtr != nullptr){
+		storageId = storagePtr->InsertNewObject(
+					typeId,
+					name,
+					description,
+					defaultValuePtr,
+					"",
+					dataMetaInfoPtr,
+					elementMetaInfoPtr,
+					operationContextPtr);
+		if (storageId.isEmpty()){
+			return QByteArray();
+		}
+	}
 
 	if (!proposedElementId.isEmpty()){
 		if (GetObjectInfo(proposedElementId) == nullptr){
@@ -132,27 +163,43 @@ ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 		}
 	}
 
-	info.objectPtr = CreateObjectInstance(typeId);
-	if (info.objectPtr.IsValid()){
-		if (defaultValuePtr.IsValid()){
-			if (!info.objectPtr->CopyFrom(*defaultValuePtr)){
-				return QByteArray();
+	if (storageId.isEmpty()){
+		info.objectPtr = CreateDataObject(typeId);
+		if (info.objectPtr.IsValid()){
+			if (defaultValuePtr.IsValid()){
+				if (!info.objectPtr->CopyFrom(*defaultValuePtr)){
+					return QByteArray();
+				}
+			}
+
+			info.description = description;
+			info.name = name;
+			info.typeId = typeId;
+			info.flags = GetItemDefaultFlags();
+
+			if (elementMetaInfoPtr != nullptr){
+				info.collectionItemMetaInfo.CopyFrom(*elementMetaInfoPtr);
+			}
+
+			if (dataMetaInfoPtr != nullptr){
+				info.contentsMetaInfoPtr.SetCastedOrRemove(dataMetaInfoPtr->CloneMe());
 			}
 		}
+	}
+	else{
+		istd::TDelPtr<imtbase::CObjectLink> linkPtr = new CObjectLink;
+		linkPtr->SetCollectionPtr(storagePtr);
+		linkPtr->SetFactoryId(typeId);
+		linkPtr->SetObjectUuid(storageId);
 
+		info.objectPtr = linkPtr.PopPtr();
 		info.description = description;
 		info.name = name;
-		info.typeId = typeId;
+		info.typeId = s_externalLinkTypeId;
 		info.flags = GetItemDefaultFlags();
+	}
 
-		if (elementMetaInfoPtr != nullptr){
-			info.collectionItemMetaInfo.CopyFrom(*elementMetaInfoPtr);
-		}
-
-		if (dataMetaInfoPtr != nullptr){
-			info.contentsMetaInfoPtr.SetCastedOrRemove(dataMetaInfoPtr->CloneMe());
-		}
-
+	if (info.objectPtr.IsValid()){
 		if (InsertObjectIntoCollection(info)){
 			istd::IChangeable::ChangeSet changeSet(CF_ADDED);
 			changeSet.SetChangeInfo(CN_ELEMENT_INSERTED, info.id);
@@ -169,8 +216,24 @@ ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 bool CObjectCollectionBase::RemoveElement(const Id& elementId, const IOperationContext* /*operationContextPtr*/)
 {
 	QReadLocker locker(&m_lock);
+
 	for (Objects::iterator iter = m_objects.begin(); iter != m_objects.end(); ++iter){
 		if ((*iter).id == elementId){
+			if ((*iter).typeId == s_externalLinkTypeId){
+				const ICollectionObjectLink* linkPtr = dynamic_cast<const ICollectionObjectLink*>((*iter).objectPtr.GetPtr());
+				Q_ASSERT(linkPtr != nullptr);
+
+				QByteArray realObjectTypeId = linkPtr->GetFactoryId();
+				imtbase::IObjectCollection* externalStoragePtr = GetObjectStorage(realObjectTypeId, nullptr);
+				if (externalStoragePtr == nullptr){
+					return false;
+				}
+
+				QByteArray externalObjectId = linkPtr->GetObjectUuid();
+
+				externalStoragePtr->RemoveElement(externalObjectId);
+			}
+
 			istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
 			changeSet.SetChangeInfo(CN_ELEMENT_REMOVED, elementId);
 
@@ -217,8 +280,23 @@ bool CObjectCollectionBase::GetObjectData(const Id& objectId, DataPtr& dataPtr) 
 
 	for (const ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
+			if (objectInfo.typeId == s_externalLinkTypeId){
+				const ICollectionObjectLink* linkPtr = dynamic_cast<const ICollectionObjectLink*>(objectInfo.objectPtr.GetPtr());
+				Q_ASSERT(linkPtr != nullptr);
+
+				QByteArray realObjectTypeId = linkPtr->GetFactoryId();
+				imtbase::IObjectCollection* externalStoragePtr = GetObjectStorage(realObjectTypeId, nullptr);
+				if (externalStoragePtr == nullptr){
+					return false;
+				}
+
+				QByteArray externalObjectId = linkPtr->GetObjectUuid();
+
+				return externalStoragePtr->GetObjectData(externalObjectId, dataPtr);
+			}
+
 			if (!dataPtr.IsValid()){
-				DataPtr newInstancePtr = CreateObjectInstance(objectInfo.typeId);
+				DataPtr newInstancePtr = CreateDataObject(objectInfo.typeId);
 				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*objectInfo.objectPtr, objectInfo.copyMode)){
 						dataPtr = newInstancePtr;
@@ -241,12 +319,27 @@ bool CObjectCollectionBase::SetObjectData(
 			const Id& objectId,
 			const istd::IChangeable& object,
 			CompatibilityMode mode,
-			const IOperationContext* /*operationContextPtr*/)
+			const IOperationContext* operationContextPtr)
 {
 	QReadLocker locker(&m_lock);
 
 	for (ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
+			if (objectInfo.typeId == s_externalLinkTypeId){
+				const ICollectionObjectLink* linkPtr = dynamic_cast<const ICollectionObjectLink*>(objectInfo.objectPtr.GetPtr());
+				Q_ASSERT(linkPtr != nullptr);
+
+				QByteArray realObjectTypeId = linkPtr->GetFactoryId();
+				imtbase::IObjectCollection* externalStoragePtr = GetObjectStorage(realObjectTypeId, nullptr);
+				if (externalStoragePtr == nullptr){
+					return false;
+				}
+
+				QByteArray externalObjectId = linkPtr->GetObjectUuid();
+
+				return externalStoragePtr->SetObjectData(externalObjectId, object, mode, operationContextPtr);
+			}
+
 			istd::IChangeable::ChangeSet changeSet(CF_OBJECT_DATA_CHANGED);
 			changeSet.SetChangeInfo(CN_OBJECT_DATA_CHANGED, objectId);
 
@@ -274,19 +367,22 @@ IObjectCollection* CObjectCollectionBase::CreateSubCollection(
 			int count,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
-	imtbase::IObjectCollection* collectionPtr = new imtbase::CObjectCollection;
+	imtbase::IObjectCollection* collectionPtr = CreateSubCollectionInstance();
+	if (collectionPtr != nullptr){
+		Q_ASSERT(offset >= 0);
 
-	Q_ASSERT(offset >= 0);
+		QWriteLocker locker(&m_lock);
 
-	QWriteLocker locker(&m_lock);
+		int objectsCount = count >= 0 ? qMin(count, m_objects.count()) : m_objects.count();
 
-	int objectsCount = count >= 0 ? qMin(count, m_objects.count()) : m_objects.count();
+		for (int i = offset; i < objectsCount; i++){
+			collectionPtr->InsertNewObject(m_objects[i].typeId, m_objects[i].name, m_objects[i].description, m_objects[i].objectPtr, m_objects[i].id);
+		}
 
-	for (int i = offset; i < objectsCount; i++){
-		collectionPtr->InsertNewObject(m_objects[i].typeId, m_objects[i].name, m_objects[i].description, m_objects[i].objectPtr, m_objects[i].id);
+		return collectionPtr;
 	}
 
-	return collectionPtr;
+	return nullptr;
 }
 
 
@@ -314,6 +410,12 @@ ICollectionInfo::Id CObjectCollectionBase::GetObjectTypeId(const Id& objectId) c
 
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
+			if (objectInfo.typeId == s_externalLinkTypeId){
+				const ICollectionObjectLink* linkPtr = dynamic_cast<const ICollectionObjectLink*>(objectInfo.objectPtr.GetPtr());
+				Q_ASSERT(linkPtr != nullptr);
+
+				return linkPtr->GetFactoryId();
+			}
 			return objectInfo.typeId;
 		}
 	}
@@ -330,6 +432,21 @@ idoc::MetaInfoPtr CObjectCollectionBase::GetDataMetaInfo(const Id& objectId) con
 
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
+			if (objectInfo.typeId == s_externalLinkTypeId){
+				const ICollectionObjectLink* linkPtr = dynamic_cast<const ICollectionObjectLink*>(objectInfo.objectPtr.GetPtr());
+				Q_ASSERT(linkPtr != nullptr);
+
+				QByteArray realObjectTypeId = linkPtr->GetFactoryId();
+				imtbase::IObjectCollection* externalStoragePtr = GetObjectStorage(realObjectTypeId, nullptr);
+				if (externalStoragePtr == nullptr){
+					return idoc::MetaInfoPtr();
+				}
+
+				QByteArray externalObjectId = linkPtr->GetObjectUuid();
+
+				return externalStoragePtr->GetDataMetaInfo(externalObjectId);
+			}
+
 			if (objectInfo.contentsMetaInfoPtr.IsValid()){
 				metaInfoPtr.SetCastedOrRemove(objectInfo.contentsMetaInfoPtr->CloneMe());
 			}
@@ -422,6 +539,21 @@ idoc::MetaInfoPtr CObjectCollectionBase::GetElementMetaInfo(const Id& elementId,
 
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
+			if (objectInfo.typeId == s_externalLinkTypeId){
+				const ICollectionObjectLink* linkPtr = dynamic_cast<const ICollectionObjectLink*>(objectInfo.objectPtr.GetPtr());
+				Q_ASSERT(linkPtr != nullptr);
+
+				QByteArray realObjectTypeId = linkPtr->GetFactoryId();
+				imtbase::IObjectCollection* externalStoragePtr = GetObjectStorage(realObjectTypeId, nullptr);
+				if (externalStoragePtr == nullptr){
+					return idoc::MetaInfoPtr();
+				}
+
+				QByteArray externalObjectId = linkPtr->GetObjectUuid();
+
+				return externalStoragePtr->GetElementMetaInfo(externalObjectId);
+			}
+
 			metaInfoPtr.SetCastedOrRemove(objectInfo.collectionItemMetaInfo.CloneMe());
 		}
 	}
@@ -589,7 +721,7 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 
 		istd::IChangeable* objectPtr = nullptr;
 		if (!archive.IsStoring()){
-			elementInfo.objectPtr = CreateObjectInstance(elementInfo.typeId);
+			elementInfo.objectPtr = CreateDataObject(elementInfo.typeId);
 
 			objectPtr = elementInfo.objectPtr.GetPtr();
 		}
@@ -614,6 +746,7 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(objectListTag);
 
 	m_lock.unlock();
+
 	return retVal;
 }
 
@@ -713,7 +846,7 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 
 					if (sourceObjectPtr != nullptr){
 						if (!targetInfoPtr->objectPtr.IsValid()){
-							targetInfoPtr->objectPtr = CreateObjectInstance(typeId);
+							targetInfoPtr->objectPtr = CreateDataObject(typeId);
 						}
 
 						if (targetInfoPtr->objectPtr.IsValid()){
@@ -742,6 +875,18 @@ bool CObjectCollectionBase::ResetData(CompatibilityMode /*mode*/)
 
 
 // protected methods
+
+IObjectCollection* CObjectCollectionBase::GetObjectStorage(const QByteArray& /*typeId*/, const istd::IChangeable* /*objectPtr*/) const
+{
+	return nullptr;
+}
+
+
+IObjectCollection* CObjectCollectionBase::CreateSubCollectionInstance() const
+{
+	return nullptr;
+}
+
 
 bool CObjectCollectionBase::InsertObjectIntoCollection(ObjectInfo info)
 {
@@ -798,6 +943,16 @@ void CObjectCollectionBase::RemoveAllObjects()
 }
 
 
+IObjectCollection::DataPtr CObjectCollectionBase::CreateDataObject(const QByteArray& typeId) const
+{
+	if (s_externalLinkTypeId == typeId){
+		return new CObjectLink;
+	}
+	
+	return CreateObjectInstance(typeId);
+}
+
+
 // public methods of the embedded class CollectionIterator
 
 CObjectCollectionBase::CollectionIterator::CollectionIterator(const CObjectCollectionBase& parent)
@@ -825,7 +980,7 @@ void CObjectCollectionBase::CollectionIterator::Reset()
 
 bool CObjectCollectionBase::CollectionIterator::IsValid() const
 {
-	return m_index >= 0 && m_index < m_parent.m_objects.count() /*&& IsModelAttached()*/;
+	return m_index >= 0 && m_index < m_parent.m_objects.count();
 }
 
 
@@ -848,7 +1003,7 @@ void CObjectCollectionBase::CollectionIterator::OnUpdate(const istd::IChangeable
 
 bool CObjectCollectionBase::CollectionIterator::Next() const
 {
-	if (/*IsModelAttached() &&*/ m_index < m_parent.m_objects.count() - 1){
+	if (m_index < m_parent.m_objects.count() - 1){
 		m_index++;
 
 		return true;
@@ -873,7 +1028,7 @@ bool CObjectCollectionBase::CollectionIterator::Previous() const
 QByteArray CObjectCollectionBase::CollectionIterator::GetObjectId() const
 {
 	if (IsValid()){
-		return m_parent.m_objects[m_index].id;
+		return GetObjectId(m_index);
 	}
 
 	return QByteArray();
@@ -883,7 +1038,16 @@ QByteArray CObjectCollectionBase::CollectionIterator::GetObjectId() const
 QByteArray CObjectCollectionBase::CollectionIterator::GetObjectTypeId() const
 {
 	if (IsValid()){
-		return m_parent.m_objects[m_index].typeId;
+		QByteArray typeId = m_parent.m_objects[m_index].typeId;
+
+		if (typeId == s_externalLinkTypeId){
+			const ICollectionObjectLink* linkPtr = dynamic_cast<const ICollectionObjectLink*>(m_parent.m_objects[m_index].objectPtr.GetPtr());
+			Q_ASSERT(linkPtr != nullptr);
+
+			return linkPtr->GetFactoryId();
+		}
+
+		return typeId;
 	}
 
 	return QByteArray();
@@ -893,8 +1057,15 @@ QByteArray CObjectCollectionBase::CollectionIterator::GetObjectTypeId() const
 bool CObjectCollectionBase::CollectionIterator::GetObjectData(IObjectCollection::DataPtr& dataPtr) const
 {
 	if (IsValid()){
-		QByteArray id = m_parent.m_objects[m_index].id;
-		return m_parent.GetObjectData(id, dataPtr);
+		QByteArray objectId = GetObjectId(m_index);
+		Q_ASSERT(!objectId.isEmpty());
+
+		const IObjectCollection* collectionPtr = GetCollectionPtr(m_index);
+		if (collectionPtr != nullptr){
+			return collectionPtr->GetObjectData(objectId, dataPtr);
+		}
+
+		Q_ASSERT(false);
 	}
 
 	return false;
@@ -904,8 +1075,15 @@ bool CObjectCollectionBase::CollectionIterator::GetObjectData(IObjectCollection:
 idoc::MetaInfoPtr CObjectCollectionBase::CollectionIterator::GetDataMetaInfo() const
 {
 	if (IsValid()){
-		QByteArray id = m_parent.m_objects[m_index].id;
-		return m_parent.GetDataMetaInfo(id);
+		QByteArray objectId = GetObjectId(m_index);
+		Q_ASSERT(!objectId.isEmpty());
+
+		const IObjectCollection* collectionPtr = GetCollectionPtr(m_index);
+		if (collectionPtr != nullptr){
+			return collectionPtr->GetDataMetaInfo(objectId);
+		}
+
+		Q_ASSERT(false);
 	}
 
 	return idoc::MetaInfoPtr();
@@ -915,8 +1093,15 @@ idoc::MetaInfoPtr CObjectCollectionBase::CollectionIterator::GetDataMetaInfo() c
 idoc::MetaInfoPtr CObjectCollectionBase::CollectionIterator::GetCollectionMetaInfo() const
 {
 	if (IsValid()){
-		QByteArray id = m_parent.m_objects[m_index].id;
-		return m_parent.GetElementMetaInfo(id);
+		QByteArray objectId = GetObjectId(m_index);
+		Q_ASSERT(!objectId.isEmpty());
+
+		const IObjectCollection* collectionPtr = GetCollectionPtr(m_index);
+		if (collectionPtr != nullptr){
+			return collectionPtr->GetElementMetaInfo(objectId);
+		}
+
+		Q_ASSERT(false);
 	}
 
 	return idoc::MetaInfoPtr();
@@ -926,17 +1111,56 @@ idoc::MetaInfoPtr CObjectCollectionBase::CollectionIterator::GetCollectionMetaIn
 QVariant CObjectCollectionBase::CollectionIterator::GetElementInfo(int infoType) const
 {
 	if (IsValid()){
-		QByteArray id = m_parent.m_objects[m_index].id;
-		return m_parent.GetElementInfo(id, infoType);
+		QByteArray objectId = GetObjectId(m_index);
+		Q_ASSERT(!objectId.isEmpty());
+
+		const IObjectCollection* collectionPtr = GetCollectionPtr(m_index);
+		if (collectionPtr != nullptr){
+			return collectionPtr->GetElementInfo(objectId, infoType);
+		}
+
+		Q_ASSERT(false);
 	}
 
 	return QVariant();
 }
 
 
-QVariant CObjectCollectionBase::CollectionIterator::GetElementInfo(QByteArray infoId) const
+QVariant CObjectCollectionBase::CollectionIterator::GetElementInfo(QByteArray /*infoId*/) const
 {
 	return QVariant();
+}
+
+
+// private methods of the embedded class CollectionIterator
+
+const IObjectCollection* CObjectCollectionBase::CollectionIterator::GetCollectionPtr(int index) const
+{
+	QByteArray typeId = m_parent.m_objects[index].typeId;
+	if (typeId == s_externalLinkTypeId){
+		const ICollectionObjectLink* linkPtr = dynamic_cast<const ICollectionObjectLink*>(m_parent.m_objects[index].objectPtr.GetPtr());
+		Q_ASSERT(linkPtr != nullptr);
+
+		return linkPtr->GetCollection();
+	}
+
+	return &m_parent;
+}
+
+
+QByteArray CObjectCollectionBase::CollectionIterator::GetObjectId(int index) const
+{
+	QByteArray typeId = m_parent.m_objects[index].typeId;
+	if (typeId == s_externalLinkTypeId){
+		const ICollectionObjectLink* linkPtr = dynamic_cast<const ICollectionObjectLink*>(m_parent.m_objects[index].objectPtr.GetPtr());
+		Q_ASSERT(linkPtr != nullptr);
+
+		return linkPtr->GetObjectUuid();
+	}
+
+	QByteArray objectId = m_parent.m_objects[index].id;
+
+	return objectId;
 }
 
 

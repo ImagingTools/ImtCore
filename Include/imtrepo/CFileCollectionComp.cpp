@@ -601,7 +601,8 @@ bool CFileCollectionComp::ExportFile(
 QByteArray CFileCollectionComp::ImportFile(
 			imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& typeId,
-			const QString& sourceFilePath) const
+			const QString& sourceFilePath,
+			const QString& objectName) const
 {
 	int repositoryRevision = *m_revisionAttrPtr;
 
@@ -651,12 +652,12 @@ QByteArray CFileCollectionComp::ImportFile(
 							QWriteLocker locker(&m_filesLock);
 
 							QString targetDirPath = CalculateFolderPathInRepository(dataFile, dataFileInfo.completeBaseName(), typeId, nullptr);
-							QString objectName = QDir(targetDirPath).dirName();
-							ResourceLocker(const_cast<CFileCollectionComp&>(*this), QByteArray(), objectName);
+							QString newObjectName = objectName.isEmpty() ? QDir(targetDirPath).dirName() : objectName;
+							ResourceLocker(const_cast<CFileCollectionComp&>(*this), QByteArray(), newObjectName);
 
 							locker.unlock();
 
-							QString newDataFile = dataFileInfo.dir().path() + "/" + objectName + "." + dataFileInfo.suffix();
+							QString newDataFile = dataFileInfo.dir().path() + "/" + newObjectName + "." + dataFileInfo.suffix();
 							QString newItemFile = newDataFile + "." + GetRepositoryInfo().dataFileSuffix;
 							QString newMetaInfoFile = newDataFile + "." + GetRepositoryInfo().metaInfoFileSuffix;
 
@@ -672,7 +673,7 @@ QByteArray CFileCollectionComp::ImportFile(
 							collectionItem.SetContentsMetaInfo(metaInfoPtr);
 							SaveMetaInfo(*metaInfoPtr, newMetaInfoFile);
 
-							collectionItem.SetObjectName(objectName);
+							collectionItem.SetObjectName(newObjectName);
 							collectionItem.SetFileId(QUuid::createUuid().toByteArray());
 							collectionItem.SetPathInRepository(targetDirPath + QDir::separator() + QFileInfo(newDataFile).fileName());
 							collectionItem.SetRepositoryRevision(repositoryRevision);

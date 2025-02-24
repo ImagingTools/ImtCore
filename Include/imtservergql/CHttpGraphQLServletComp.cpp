@@ -79,9 +79,11 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 		else{
 			SendCriticalMessage(
-				0,
-				QString("Unable to get a GraphQL context for the access token '%1' for Command-ID: '%2'").arg(qPrintable(accessToken)).arg(qPrintable(gqlCommand)),
-				"GraphQL - servlet");
+						0,
+						QString("Unable to get a GraphQL context for the access token '%1' for Command-ID: '%2'")
+									.arg(qPrintable(accessToken))
+									.arg(qPrintable(gqlCommand)),
+						"GraphQL - servlet");
 
 			return GenerateError(imtrest::IProtocolEngine::StatusCode::SC_INTERNAL_SERVER_ERROR, "Request incorrected", request);
 		}

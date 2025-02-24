@@ -47,12 +47,14 @@ public:
 		\param collection	Collection instance where the will be imported.
 		\param typeId		Object type ID.
 		\param sourcePath	Path to the imported file.
+		\param objectName	Name of the imported object after import in the collection.
 		\return \c true if the file object was successfully imported or \c false otherwise.
 	*/
 	virtual ICollectionInfo::Id ImportFile(
 				imtbase::IObjectCollection& collection,
 				const QByteArray& typeId,
-				const QString& sourceFilePath = QString()) const = 0;
+				const QString& sourceFilePath = QString(),
+				const QString& objectName = QString()) const = 0;
 };
 
 

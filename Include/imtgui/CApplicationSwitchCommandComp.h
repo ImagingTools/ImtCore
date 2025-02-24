@@ -11,6 +11,7 @@
 #include <iqtgui/TMakeIconProviderCompWrap.h>
 #include <ibase/TLocalizableWrap.h>
 #include <iprm/IEnableableParam.h>
+#include <iprm/INameParam.h>
 
 
 namespace imtgui
@@ -35,14 +36,16 @@ public:
 
 	I_BEGIN_COMPONENT(CApplicationSwitchCommandComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
-		I_ASSIGN(m_actionIconAttrPtr, "ActionIcon", "Icon used command menu", true, ":/Icons");
+		I_ASSIGN(m_actionIconAttrPtr, "ActionIcon", "Icon used for command menu", true, ":/Icons");
+		I_ASSIGN(m_actionShortcutAttrPtr, "ActionShortcut", "Keyboard shortcut", false, "");
 		I_ASSIGN(m_menuNameAttrPtr, "MenuName", "Name of the menu for the action group", true, "Application Switch");
 		I_ASSIGN(m_menuDescriptionAttrPtr, "MenuDescription", "Description for the action group", true, "Swtich between applications");
 		I_ASSIGN(m_rootMenuNameAttrPtr, "RootMenu", "Name of the root command", true, "");
 		I_ASSIGN(m_executablePathCompPtr, "ExecutablePath", "Path to process exectuable", true, "ExecutablePath");
 		I_ASSIGN_TO(m_executablePathModelCompPtr, m_executablePathCompPtr, true);
-		I_ASSIGN(m_menuItemVisibilityCompPtr, "MenuItemVisibility", "Visibility of menu item (true = visibile)", true, "MenuItemVisibility");
+		I_ASSIGN(m_menuItemVisibilityCompPtr, "MenuItemVisibility", "Visibility of menu item (true = visibile)", false, "MenuItemVisibility");
 		I_ASSIGN_TO(m_menuItemVisibilityModelCompPtr, m_menuItemVisibilityCompPtr, true);
+		I_ASSIGN(m_parametersCompPtr, "Parameters", "List of parameters to pass to the application split by ;", false, "");
 	I_END_COMPONENT;
 
 	enum ModelIds
@@ -77,10 +80,12 @@ protected:
 	I_TEXTATTR(m_menuNameAttrPtr);
 	I_TEXTATTR(m_menuDescriptionAttrPtr);
 	I_TEXTATTR(m_rootMenuNameAttrPtr);
+	I_TEXTATTR(m_actionShortcutAttrPtr);
 	I_REF(ifile::IFileNameParam, m_executablePathCompPtr);
 	I_REF(imod::IModel, m_executablePathModelCompPtr);
 	I_REF(iprm::IEnableableParam, m_menuItemVisibilityCompPtr);
 	I_REF(imod::IModel, m_menuItemVisibilityModelCompPtr);
+	I_REF(iprm::INameParam, m_parametersCompPtr);
 
 	iqtgui::CHierarchicalCommand m_rootMenuCommand;
 	iqtgui::CHierarchicalCommand m_mainMenuCommand;

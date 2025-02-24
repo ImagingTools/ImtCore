@@ -187,21 +187,21 @@ public:
 		\return If the operation was successful the method will return ID of the created data object in the collection or an empty ID otherwise.
 	*/
 	virtual Id InsertNewObject(
-		const QByteArray& typeId,
-		const QString& name,
-		const QString& description,
-		DataPtr defaultValuePtr = DataPtr(),
-		const Id& proposedElementId = Id(),
-		const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-		const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
-		const IOperationContext* operationContextPtr = nullptr) = 0;
+				const QByteArray& typeId,
+				const QString& name,
+				const QString& description,
+				DataPtr defaultValuePtr = DataPtr(),
+				const Id& proposedElementId = Id(),
+				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
+				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
+				const IOperationContext* operationContextPtr = nullptr) = 0;
 
 	/**
 		Remove element with the given ID.
 	*/
 	virtual bool RemoveElement(
-		const Id& elementId,
-		const IOperationContext* operationContextPtr = nullptr) = 0;
+				const Id& elementId,
+				const IOperationContext* operationContextPtr = nullptr) = 0;
 
 	/**
 		Get access to the object instance inside of collecton.
@@ -229,10 +229,10 @@ public:
 		Set data for the entry with the given ID.
 	*/
 	virtual bool SetObjectData(
-		const Id& objectId,
-		const istd::IChangeable& object,
-		CompatibilityMode mode = CM_WITHOUT_REFS,
-		const IOperationContext* operationContextPtr = nullptr) = 0;
+				const Id& objectId,
+				const istd::IChangeable& object,
+				CompatibilityMode mode = CM_WITHOUT_REFS,
+				const IOperationContext* operationContextPtr = nullptr) = 0;
 
 	/**
 		Create a sub-collection (a subset) of the whole collection according to the given filtering/sorting parameters.
@@ -241,9 +241,9 @@ public:
 		\param selectionParamsPtr	[optional] Additional parameters for filtering/ordering elements.
 	*/
 	virtual imtbase::IObjectCollection* CreateSubCollection(
-		int offset = 0,
-		int count = -1,
-		const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 
 	/**
 		Create a collection iterator according to the given filtering/sorting parameters.
@@ -252,10 +252,10 @@ public:
 		\param selectionParamsPtr	[optional] Additional parameters for filtering/ordering elements.
 	*/
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
-		const QByteArray& objectId = QByteArray(),
-		int offset = 0,
-		int count = -1,
-		const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
+				const QByteArray& objectId = QByteArray(),
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 
 	/**
 		This method will re-create all object-IDs.

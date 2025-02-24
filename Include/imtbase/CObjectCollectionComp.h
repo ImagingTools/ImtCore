@@ -43,6 +43,8 @@ public:
 		I_ASSIGN_MULTI_0(m_fixedObjectTypeIdsAttrPtr, "FixedObjectTypeIds", "List of type-IDs for corresponding fixed object", false);
 		I_ASSIGN_MULTI_0(m_fixedObjectNamesAttrPtr, "FixedObjectNames", "List of names for corresponding fixed object", false);
 		I_ASSIGN_MULTI_0(m_fixedObjectTypeNamesAttrPtr, "FixedObjectTypeNames", "List of names for corresponding fixed object type", false);
+		I_ASSIGN_MULTI_0(m_externalTypeIdsAttrPtr, "ExternaObjectTypeIds", "List of IDs for object types should be stored in the external storage", false);
+		I_ASSIGN(m_externalStorageCompPtr, "ExternalStorage", "External storage used to persist objects of types specified in 'ExternaObjectTypeIds'", false, "ExternalStorage");
 	I_END_COMPONENT;
 
 	// reimplemented (IObjectCollection::IDataFactory)
@@ -61,6 +63,7 @@ public:
 protected:
 	// reimplemented (CObjectCollectionBase)
 	virtual DataPtr CreateObjectInstance(const QByteArray& typeId) const override;
+	virtual IObjectCollection* GetObjectStorage(const QByteArray& typeId, const istd::IChangeable* objectPtr) const override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -76,6 +79,8 @@ private:
 	I_MULTITEXTATTR(m_fixedObjectNamesAttrPtr);
 	I_MULTITEXTATTR(m_fixedObjectTypeNamesAttrPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_objectPersistenceListCompPtr);
+	I_MULTIATTR(QByteArray, m_externalTypeIdsAttrPtr);
+	I_REF(imtbase::IObjectCollection, m_externalStorageCompPtr);
 
 	iprm::COptionsManager m_typesInfo;
 };
