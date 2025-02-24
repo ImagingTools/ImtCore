@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QThread>
+#include <QtCore/QTimer>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QPropertyAnimation>
 #include <QtGui/QStandardItem>
@@ -234,6 +235,7 @@ private Q_SLOTS:
 	void OnSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex);
 	void OnSortingChanged(int logicalIndex, Qt::SortOrder order);
 	void OnTypeChanged();
+	void OnTextFilterTimer();
 
 	void OnFilterChanged(const QString& text);
 	void OnSearchShortCut();
@@ -337,6 +339,8 @@ private:
 	iqtgui::IGuiObject* m_currentInformationViewPtr;
 
 	imtbase::TModelUpdateBinder<imtbase::IComplexCollectionFilter, CObjectCollectionViewComp> m_complexFilterObserver;
+
+	QTimer m_textFilterTimer;
 
 private:
 	/**

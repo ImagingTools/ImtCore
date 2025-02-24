@@ -46,6 +46,9 @@ CObjectCollectionViewComp::CObjectCollectionViewComp()
 	m_commands.SetParent(this);
 
 	qRegisterMetaType<istd::IChangeable::ChangeSet>("istd::IChangeable::ChangeSet");
+
+	m_textFilterTimer.setSingleShot(true);
+	m_textFilterTimer.setInterval(1000);
 }
 
 
@@ -361,6 +364,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	ItemList->header()->setFirstSectionMovable(true);
 	ItemList->installEventFilter(this);
 
+	connect(&m_textFilterTimer, &QTimer::timeout, this, &CObjectCollectionViewComp::OnTextFilterTimer);
 	connect(TypeList, &QTreeWidget::itemSelectionChanged, this, &CObjectCollectionViewComp::OnTypeChanged);
 	connect(ItemList->selectionModel(), &QItemSelectionModel::selectionChanged, this, &CObjectCollectionViewComp::OnSelectionChanged);
 	connect(ItemList, &QTreeView::doubleClicked, this, &CObjectCollectionViewComp::OnItemDoubleClick);
@@ -1051,11 +1055,17 @@ void CObjectCollectionViewComp::OnTypeChanged()
 }
 
 
-void CObjectCollectionViewComp::OnFilterChanged(const QString& text)
+void CObjectCollectionViewComp::OnTextFilterTimer()
 {
-	m_tableModel.SetTextFilter(text);
+	m_tableModel.SetTextFilter(FilterEdit->text());
 
 	RestoreColumnsSettings();
+}
+
+
+void CObjectCollectionViewComp::OnFilterChanged(const QString& text)
+{
+	m_textFilterTimer.start();
 }
 
 
