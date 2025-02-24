@@ -62,7 +62,7 @@ class QSignal {
     emit(...args){
         if(!this.connections) return
 
-        for(let connection of this.connections){
+        for(let connection of this.connections.slice()){
             try {
                 if(connection.target){
                     connection.slot.call(connection.target, ...args)  
