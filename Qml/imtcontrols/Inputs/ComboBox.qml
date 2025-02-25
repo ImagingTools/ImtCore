@@ -152,7 +152,7 @@ ControlBase {
 				}
 				let point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height)
 				let y_ = point.y;
-				console.log("Y__", y_, popup.height, ModalDialogManager.activeView.height)
+				//console.log("Y__", y_, popup.height, ModalDialogManager.activeView.height)
 				if(y_ + popup.height > ModalDialogManager.activeView.height){
 					popup.y = point.y - popup.height - comboBoxContainer.height;
 					popup.isUpwards = true;

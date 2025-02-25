@@ -36,6 +36,7 @@ Item {
     property int currentIndex: -1;
     property int offset: 0;
     property int count: 15;
+	property int countVisibleItem: 5;
     property int delegateRadius: 0;
     property int itemHeight: 26;
     property int filterHeiht: 30;
@@ -64,6 +65,7 @@ Item {
     property bool hoverBlocked: true;
     property bool doNotCorrectPosition : false;
     property bool readOnly: false;
+	property bool isUpwards: false;
 
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainerGql.width;
@@ -141,6 +143,7 @@ Item {
         PopupMenuDialogGql {
             id: popup;
 
+			opacity: 0;
             rootItem: comboBoxContainerGql;
             offset: comboBoxContainerGql.offset;
             count: comboBoxContainerGql.count;
@@ -162,6 +165,7 @@ Item {
             excludeFilterPart: comboBoxContainerGql.excludeFilterPart;
             canUpdateModel: comboBoxContainerGql.canUpdateModel;
             additionalFilter: comboBoxContainerGql.additionalFilter;
+			isUpwards: comboBoxContainerGql.isUpwards;
             // doNotCorrectPosition: comboBoxContainerGql.doNotCorrectPosition; !!!!!!!!!!!!
 
 //            function getCurrentText(index){
@@ -176,6 +180,21 @@ Item {
                 comboBoxContainerGql.finished.connect(popup.finished);
                 popup.clearSignal.connect(comboBoxContainerGql.clearSignal);
             }
+
+			onHeightChanged: {
+				popup.setY();
+			}
+
+			function setY(){
+				if(popup.height == 0){
+					return
+				}
+				if(comboBoxContainerGql.isUpwards){
+					let point = comboBoxContainerGql.mapToItem(null, 0, 0)
+					popup.y = point.y;
+				}
+				popup.opacity = 1;
+			}
 
             onFilterTextChanged: {
 //                comboBoxContainerGql.filterText = popup.filterText;
@@ -227,15 +246,36 @@ Item {
 
     function openPopupMenu(){
         comboBoxContainerGql.dialogsCountPrev = ModalDialogManager.count;
-        //var point = comboBoxContainerGql.mapToItem(thumbnailDecoratorContainer, 0, 0);
-        var point = comboBoxContainerGql.mapToItem(null, 0, 0);
-        var filterText_ = comboBoxContainerGql.keepFilterText ? comboBoxContainerGql.currentText : "";
-        ModalDialogManager.openDialog(popupMenu, { "x":     point.x,
-                                                   "y":     point.y,
-                                                   "filterText": filterText_,
-                                                   "model": comboBoxContainerGql.model,
-                                                   "width": comboBoxContainerGql.width,
-                                                   "countVisibleItem": 5 });
+		let filterText_ = comboBoxContainerGql.keepFilterText ? comboBoxContainerGql.currentText : "";
+		let point = comboBoxContainerGql.mapToItem(null, 0, 0);
+		let y_ = point.y;
+		if(y_ + comboBoxContainerGql.height + comboBoxContainerGql.countVisibleItem * comboBoxContainerGql.itemHeight > ModalDialogManager.activeView.height){
+			comboBoxContainerGql.isUpwards = true;
+		}
+		else {
+			comboBoxContainerGql.isUpwards = false;
+		}
+
+		let params = {};
+		if(!comboBoxContainerGql.isUpwards){
+			params = {
+				"x": point.x,
+				"y": point.y,
+				"filterText": filterText_,
+				"model": comboBoxContainerGql.model,
+				"width": comboBoxContainerGql.width,
+				"countVisibleItem": comboBoxContainerGql.countVisibleItem}
+		}
+		else {
+			params = {
+				"x": point.x,
+				"filterText": filterText_,
+				"model": comboBoxContainerGql.model,
+				"width": comboBoxContainerGql.width,
+				"countVisibleItem": comboBoxContainerGql.countVisibleItem}
+		}
+
+		ModalDialogManager.openDialog(popupMenu, params);
     }
 
     function closeFunc(){

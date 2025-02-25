@@ -10,7 +10,7 @@ Item {
 
 
     width: itemWidth;
-    height: popupMenuListView.height;
+	height: filterField.height + itemBody.height;
 
     property var model;
     //property TreeItemModel model: TreeItemModel{};
@@ -41,6 +41,7 @@ Item {
 
     property int elementsCount: -1;
     property int pauseDuration: 500;
+	property real contentHeight: itemBody.height;
 
 
     onElementsCountChanged: {
@@ -85,6 +86,7 @@ Item {
     property bool hoverBlocked: true;
 
     property bool notSetProperties: true;
+	property bool isUpwards: false;
 
     signal finished(string commandId, int index);
     signal endList();
@@ -270,11 +272,12 @@ Item {
     Rectangle {
         id: itemBody;
 
-        anchors.top: filterField.bottom
+		anchors.top: !popupMenuContainer.isUpwards ? filterField.bottom : undefined;
+		anchors.bottom: popupMenuContainer.isUpwards ? filterField.top : undefined;
         anchors.left: parent.left
 
         width: popupMenuContainer.width;
-        height: popupMenuListView.height + noDataRec.height * noDataRec.visible;
+		height: !noDataRec.visible * popupMenuListView.height + noDataRec.height * noDataRec.visible;
         radius: popupMenuContainer.delegateRadius;
 
         color: Style.baseColor;
@@ -325,12 +328,11 @@ Item {
         }
 
 
-
         ListView {
             id: popupMenuListView;
 
             width: popupMenuContainer.width;
-            height: (popupMenuContainer.countVisibleItem == -1 || popupMenuContainer.countVisibleItem > popupMenuListView.count) ?
+			height: !count ? 0 :(popupMenuContainer.countVisibleItem == -1 || popupMenuContainer.countVisibleItem > popupMenuListView.count) ?
                         popupMenuListView.count * popupMenuContainer.itemHeight :
                         popupMenuContainer.countVisibleItem * popupMenuContainer.itemHeight;
 
@@ -347,6 +349,7 @@ Item {
             }
             //delegate: PopupMenuDelegate{textSize: popupMenuContainer.textSize}// Delegate Item
             delegate: popupMenuContainer.delegate;
+
 
         }//ListView
 
@@ -372,7 +375,7 @@ Item {
         anchors.fill: itemBody;
 
         horizontalOffset: 2;
-        verticalOffset: 2;
+		verticalOffset: popupMenuContainer.isUpwards ? -2 : 2;
 
         radius: 4;
         color: Style.shadowColor;
