@@ -9,7 +9,7 @@ Item {
 	property string updateCommandsGuiEventCommandId;
 	property string clearCommandsGuiEventCommandId;
 
-    property string viewId;
+	property string viewId; // uuid unic identifier
     property var model: null;
 
     property Component commandsControllerComp: null;
