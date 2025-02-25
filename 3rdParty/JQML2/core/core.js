@@ -344,6 +344,7 @@ global.JQModules = {
     },
     QtQuick: {
         Item: __components.Item,
+        FocusScope: __components.FocusScope,
         Rectangle: __components.Rectangle,
         Repeater: __components.Repeater,
         Row: __components.Row,

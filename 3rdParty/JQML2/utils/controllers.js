@@ -665,9 +665,25 @@ class KeyboardController {
         window.onkeydown = (e)=>{
             let event = new KeyEvent(e)
 
-            let elements = mainRoot.$activeFocusedElements.slice()
-            for(let el of mainRoot.$focusedElements){
-                if(elements.indexOf(el) < 0) elements.push(el)
+
+            // let elements = mainRoot.$activeFocusedElements.slice()
+            // for(let el of mainRoot.$focusedElements){
+            //     if(elements.indexOf(el) < 0) elements.push(el)
+            // }
+
+            let elements = []
+
+            if(mainRoot.$focusScope instanceof FocusScope){
+                elements.push(mainRoot.$focusScope.$focusedElement)
+                elements.push(mainRoot.$focusScope)
+            } else {
+                if(mainRoot.$focusedElement instanceof FocusScope){
+                    elements.push(mainRoot.$focusedElement.$focusedElement)
+                    elements.push(mainRoot.$focusedElement)
+                } else {
+                    elements.push(mainRoot.$focusedElement)
+                }
+                
             }
             
             let ignore = []
@@ -705,41 +721,47 @@ class KeyboardController {
                             if(event.key === Qt.Key_Left) {
                                 if(parent.KeyNavigation.left){
                                     e.preventDefault()
-                                    parent.KeyNavigation.left.getProperty('focus').reset(true)
+                                    parent.KeyNavigation.left.forceActiveFocus()
+                                    
                                     return
                                 }
                             }
                             if(event.key === Qt.Key_Right) {
                                 if(parent.KeyNavigation.right){
                                     e.preventDefault()
-                                    parent.KeyNavigation.right.getProperty('focus').reset(true)
+                                    parent.KeyNavigation.right.forceActiveFocus()
+
                                     return
                                 }
                             }
                             if(event.key === Qt.Key_Up) {
                                 if(parent.KeyNavigation.up){
                                     e.preventDefault()
-                                    parent.KeyNavigation.up.getProperty('focus').reset(true)
+                                    parent.KeyNavigation.up.forceActiveFocus()
+
                                     return
                                 }
                             }
                             if(event.key === Qt.Key_Down) {
                                 if(parent.KeyNavigation.down){
                                     e.preventDefault()
-                                    parent.KeyNavigation.down.getProperty('focus').reset(true)
+                                    parent.KeyNavigation.down.forceActiveFocus()
+
                                     return
                                 }
                             }
                             if(event.key === Qt.Key_Tab && event.modifiers & Qt.ShiftModifier) {
                                 if(parent.KeyNavigation.backtab){
                                     e.preventDefault()
-                                    parent.KeyNavigation.backtab.getProperty('focus').reset(true)
+                                    parent.KeyNavigation.backtab.forceActiveFocus()
+
                                     return
                                 }
                             } else if(event.key === Qt.Key_Tab) {
                                 if(parent.KeyNavigation.tab){
                                     e.preventDefault()
-                                    parent.KeyNavigation.tab.getProperty('focus').reset(true)
+                                    parent.KeyNavigation.tab.forceActiveFocus()
+   
                                     return
                                 }
                             }

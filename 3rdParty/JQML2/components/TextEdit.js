@@ -78,6 +78,9 @@ class TextEdit extends Item {
         this.$input.onfocus = ()=>{
             if(!this.getPropertyValue('activeFocus') && !this.getPropertyValue('readOnly')) this.forceActiveFocus()
         }
+        // this.$input.onblur = ()=>{
+        //     this.getProperty('activeFocus').reset(false)
+        // }
 
         this.$input.oninput = (e)=>{
             this.getProperty('text').reset(this.$input.value)
@@ -139,11 +142,11 @@ class TextEdit extends Item {
         })
     }
 
-    forceActiveFocus(){
-        this.getProperty('focus').reset(true)
-        if(!this.getPropertyValue('readOnly')) this.getProperty('activeFocus').reset(true)
-        this.$input.focus()
-    }
+    // forceActiveFocus(){
+    //     this.getProperty('focus').reset(true)
+    //     if(!this.getPropertyValue('readOnly')) this.getProperty('activeFocus').reset(true)
+    //     this.$input.focus()
+    // }
 
     $selectionColorChanged(){
 
@@ -199,12 +202,22 @@ class TextEdit extends Item {
     }
 
     $focusChanged(){
+        super.$focusChanged()
         if(this.getPropertyValue('focus')){
             this.$input.focus()
         } else {
             this.$input.blur()
         }
-        super.$focusChanged()
+    }
+
+    $activeFocusChanged(){
+        super.$activeFocusChanged()
+        if(this.getPropertyValue('activeFocus')){
+            this.$input.focus()
+        } else {
+            this.$input.blur()
+            if(this.$signals.editingFinished) this.$signals.editingFinished()
+        }
     }
 
     $visibleChanged(){

@@ -92,6 +92,7 @@ class Item extends QtObject {
     }
 
     $anchorsUpdateList = []
+    $focusedElement = null
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
@@ -214,9 +215,51 @@ class Item extends QtObject {
         }
     }
 
+    $testRelation(obj){
+        if(!obj || !obj.UID) return true
+
+        let parent = obj.parent
+
+        while(parent){
+            if(parent === this) return true
+
+            parent = parent.parent
+        }
+
+        parent = this.parent
+
+        while(parent){
+            if(parent === obj) return true
+
+            parent = parent.parent
+        }
+
+        return false
+    }
+
     forceActiveFocus(){
-        this.getProperty('focus').reset(true)
-        this.getProperty('activeFocus').reset(true)
+        if(!this.$testRelation(mainRoot.$forceElement)) return
+        
+        let focusScope = null
+        let parent = this.parent
+        while(parent){
+            if(parent instanceof FocusScope){ 
+                focusScope = parent
+                break
+            } else {
+                parent = parent.parent
+            }
+        }
+
+        if(!mainRoot.$forceElement) mainRoot.$forceElement = this
+        if(focusScope){
+            mainRoot.$setFocusScope(focusScope)
+            focusScope.$setActiveFocusedElement(this)
+        } else {
+            mainRoot.$setFocusScope(null)
+            mainRoot.$setActiveFocusedElement(this)
+        }
+        if(mainRoot.$forceElement === this) mainRoot.$forceElement = null
     }
 
     $updateShadow(){
@@ -254,68 +297,84 @@ class Item extends QtObject {
         
     }
 
-    $focusChanged(){
-        let focusedElements = this.getPropertyValue('context').$focusedElements
-        if(this.getPropertyValue('focus')){
-            if(focusedElements.indexOf(this) < 0) {
-                for(let element of focusedElements){
-                    if(element.UID){
-                        element.getProperty('activeFocus').reset(false)
-                        element.getProperty('focus').reset(false)
-                    }
-                }
-                focusedElements.push(this)
+    $setFocusScope(element){
+        let oldElement = this.$focusScope
+
+        this.$focusScope = element
+
+        if(oldElement !== element && oldElement && oldElement.UID) {
+            if(oldElement.$focusedElement && oldElement.$focusedElement.UID){
+                oldElement.$focusedElement.activeFocus = false
             }
-        } else {
-            let index = focusedElements.indexOf(this)
-            if(index >= 0) focusedElements.splice(index, 1)
+
+            oldElement.focus = false
+            oldElement.activeFocus = false
+        } 
+    }
+
+    $setFocusedElement(element){
+        let oldElement = this.$focusedElement
+        this.$focusedElement = element
+
+        if(element instanceof FocusScope && element.UID && element.$focusedElement && element.$focusedElement.UID){
+            element.$focusedElement.focus = true
+        }
+
+        if(oldElement !== element && oldElement && oldElement.UID) {
+            oldElement.focus = false
+            oldElement.activeFocus = false
+        }
+
+        element.focus = true
+    }
+
+    $setActiveFocusedElement(element){
+        let oldElement = this.$focusedElement
+        this.$focusedElement = element
+
+        if(element instanceof FocusScope && element.UID && element.$focusedElement && element.$focusedElement.UID){
+            element.$focusedElement.activeFocus = true
+            element.$focusedElement.focus = true
+            if(element.$focusedElement.$input) element.$focusedElement.$input.focus()
+        }
+
+        if(oldElement !== element && oldElement && oldElement.UID) {
+            oldElement.focus = false
+            oldElement.activeFocus = false
         }
         
-        let parent = this.parent
-        // if(!(parent instanceof FocusScope))
-        while(parent){
-            if(parent instanceof FocusScope){
-                if(this.getPropertyValue('focus') && focusedElements.indexOf(parent) < 0) {
-                    focusedElements.push(parent)
+        element.focus = true
+        element.activeFocus = true
+        if(element.$input) element.$input.focus()
+    }
+
+    $focusChanged(){
+        if(this.focus){
+            let focusScope = null
+            let parent = this.parent
+            while(parent){
+                if(parent instanceof FocusScope){
+                    focusScope = parent
+                    break
+                } else {
+                    parent = parent.parent
                 }
-                parent.getProperty('focus').reset(this.getPropertyValue('focus'))
-                break
+            }
+
+        
+            if(focusScope){
+                mainRoot.$setFocusScope(focusScope)
+                focusScope.$setFocusedElement(this)
             } else {
-                parent = parent.parent
+                mainRoot.$setFocusScope(null)
+                mainRoot.$setFocusedElement(this)
             }
         }
-        // this.getProperty('activeFocus').reset(this.getPropertyValue('focus'))
+        
     }
 
     $activeFocusChanged(){
-        let activeFocusedElements = this.getPropertyValue('context').$activeFocusedElements
-        if(this.getPropertyValue('activeFocus')){
-            if(activeFocusedElements.indexOf(this) < 0) {
-                for(let element of activeFocusedElements){
-                    if(element.UID){
-                        element.getProperty('activeFocus').reset(false)
-                    }
-                }
-                activeFocusedElements.push(this)
-            }
-        } else {
-            let index = activeFocusedElements.indexOf(this)
-            if(index >= 0) activeFocusedElements.splice(index, 1)
-        }
-        
-        let parent = this.parent
-        // if(!(parent instanceof FocusScope))
-        while(parent){
-            if(parent instanceof FocusScope){
-                if(this.getPropertyValue('activeFocus') && activeFocusedElements.indexOf(parent) < 0) {
-                    activeFocusedElements.push(parent)
-                }
-                parent.getProperty('activeFocus').reset(this.getPropertyValue('activeFocus'))
-                break
-            } else {
-                parent = parent.parent
-            }
-        }
+       
     }
 
     $enabledChanged(){
