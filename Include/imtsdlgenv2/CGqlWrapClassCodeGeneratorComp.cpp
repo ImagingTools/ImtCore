@@ -575,23 +575,34 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 	FeedStream(stream, 1, false);
 
 	// Get requested fields from request
+
+	// get top-level request. Usually it always one => we need only first
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const imtgql::CGqlObject* requestedFieldsObject = &gqlRequest.GetFields();");
+	stream << QStringLiteral("const imtgql::CGqlObject* requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());");
 	FeedStream(stream, 1, false);
 
-	// get top-level request ID list
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const QByteArrayList requestedIds = requestedFieldsObject->GetFieldIds();");
+	stream << QStringLiteral("if (requestedFieldsObjectPtr != nullptr){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();");
 	FeedStream(stream, 1, false);
 
 	GenerateRequestedFieldsParsing(
 				stream,
 				sdlRequest.GetOutputArgument(),
 				QStringLiteral("requestedIds"),
-				QStringLiteral("requestedFieldsObject"),
+				QStringLiteral("requestedFieldsObjectPtr"),
 				QString(),
-				hIndents);
+				hIndents + 1);
+
 	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
 }
 
 
