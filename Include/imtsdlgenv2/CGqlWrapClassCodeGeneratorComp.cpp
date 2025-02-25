@@ -609,8 +609,6 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 	stream << '}';
 	FeedStream(stream, 1, false);
 
-	FeedStream(stream, 1, false);
-
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 1, false);
