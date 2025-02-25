@@ -3,7 +3,7 @@ const { QReal, QBool, QString } = require('../utils/properties')
 
 class FocusScope extends Item {
     $setFocusedElement(element){
-        if(mainRoot.$focusedElement && mainRoot.$focusedElement.UID) {
+        if(mainRoot.$focusedElement && mainRoot.$focusedElement !== this && mainRoot.$focusedElement.UID) {
             mainRoot.$focusedElement.focus = false
             mainRoot.$focusedElement.activeFocus = false
             delete mainRoot.$focusedElement
@@ -15,7 +15,7 @@ class FocusScope extends Item {
     }
 
     $setActiveFocusedElement(element){
-        if(mainRoot.$focusedElement && mainRoot.$focusedElement.UID) {
+        if(mainRoot.$focusedElement && mainRoot.$focusedElement !== this && mainRoot.$focusedElement.UID) {
             mainRoot.$focusedElement.focus = false
             mainRoot.$focusedElement.activeFocus = false
             delete mainRoot.$focusedElement
