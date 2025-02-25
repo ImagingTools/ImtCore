@@ -656,10 +656,15 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 		stream << QStringLiteral("is");
 		stream << GetCapitalizedValue(typeField.GetId());
 		stream << QStringLiteral("Requested = ");
-		stream << idListContainerParamName;
-		stream << QStringLiteral(".contains(\"");
-		stream << typeField.GetId();
-		stream << '"' << ')' << ';';
+		if (typeField.IsRequired()){
+			stream << QStringLiteral("true;");
+		}
+		else {
+			stream << idListContainerParamName;
+			stream << QStringLiteral(".contains(\"");
+			stream << typeField.GetId();
+			stream << '"' << ')' << ';';
+		}
 		FeedStream(stream, 1, false);
 	}
 
