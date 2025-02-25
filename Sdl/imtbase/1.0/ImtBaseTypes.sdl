@@ -11,13 +11,13 @@ type TimeRange
 	End: String
 }
 
-type Size
+type SdlSize
 {
 	width: Double!
 	height: Double!
 }
 
-type Point
+type SdlPoint
 {
 	x: Double!
 	y: Double!

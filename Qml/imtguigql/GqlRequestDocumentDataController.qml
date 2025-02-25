@@ -202,7 +202,6 @@ DocumentDataController {
 			var queryFields = container.getBodyForGetModel()
 			if (!queryFields){
 				queryFields = Gql.GqlObject("item");
-				queryFields.InsertField("Id");
 			}
 			query.AddField(queryFields);
 
@@ -258,6 +257,7 @@ DocumentDataController {
 
 	property GqlRequest gqlAddModel: GqlRequest {
 		function save(){
+			console.log("gqlAddModel save()", container.gqlAddCommandId)
 			var query = Gql.GqlRequest("mutation", container.gqlAddCommandId);
 			query.AddParam(container.addRequestInputParam);
 

@@ -134,7 +134,6 @@ DocumentDataController {
 
         function createQueryParams(query){
             var queryFields = Gql.GqlObject("item");
-            queryFields.InsertField("Id");
             query.AddField(queryFields);
 
             var inputParams = Gql.GqlObject("input");
