@@ -64,10 +64,12 @@ IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr,
 				}
 				else{
 					category = istd::IInformationProvider::IC_ERROR;
-					message = "Response for request-ID " + uuid + "\n" + replyPtr->errorString();
+					message = "Null response for request-ID " + uuid;
 				}
 
-				replyPtr->deleteLater();
+				if (replyPtr != nullptr){
+					replyPtr->deleteLater();
+				}
 
 				if (category > istd::IInformationProvider::IC_INFO){
 					SendLogMessage(category, 0, message, "API Client");
