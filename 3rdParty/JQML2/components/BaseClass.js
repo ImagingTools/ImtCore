@@ -384,6 +384,20 @@ class BaseClass extends QtObject {
     }
 
     fromObject(sourceObject) {
+        for(let objKey of this.getProperties()){
+			if (!(this.getJSONKeyForProperty(objKey) in sourceObject)){
+				if(typeof this[objKey] === "object"){
+					if (this[objKey].clear){
+						this[objKey].clear()
+					}
+					if (this[objKey].destroy){
+						this[objKey].destroy()
+					}
+					this[objKey] = null
+				}
+			}
+		}
+
         for (let key in sourceObject) {
             let _key = "m_" + key[0].toLowerCase() + key.slice(1, key.length)
             if (typeof sourceObject[key] === "object") {
