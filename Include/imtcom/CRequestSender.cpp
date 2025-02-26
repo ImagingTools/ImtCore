@@ -17,7 +17,7 @@ QNetworkReply* CRequestSender::DoSyncGet(const QNetworkRequest& request, int tim
 
 	QNetworkReply* replyPtr = networkOperation.networkManagerPtr->get(request);
 	if (replyPtr != nullptr){
-        replyPtr->ignoreSslErrors();
+		replyPtr->ignoreSslErrors();
 
 		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		networkOperation.timer.stop();
@@ -53,17 +53,16 @@ QNetworkReply* CRequestSender::DoSyncPost(const QNetworkRequest& request, const 
 {
 	NetworkOperation networkOperation(timeout);
 
-    QNetworkReply* replyPtr = networkOperation.networkManagerPtr->post(request, data);
-
+	QNetworkReply* replyPtr = networkOperation.networkManagerPtr->post(request, data);
 	if (replyPtr != nullptr){
-        replyPtr->ignoreSslErrors();
+		replyPtr->ignoreSslErrors();
 
 		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		networkOperation.timer.stop();
 
-        if (replyPtr->isRunning()){
-            replyPtr->abort();
-        }
+		if (replyPtr->isRunning()){
+			replyPtr->abort();
+		}
 	}
 
 	return replyPtr;
@@ -111,9 +110,21 @@ CRequestSender::NetworkOperation::NetworkOperation(int timeout)
 	}
 }
 
+
 CRequestSender::NetworkOperation::~NetworkOperation()
 {
-    networkManagerPtr->deleteLater();
+	QObject::disconnect(networkManagerPtr, &QNetworkAccessManager::finished, &connectionLoop, &QEventLoop::quit);
+	QObject::disconnect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit);
+
+	if (timer.isActive()){
+		timer.stop();
+	}
+
+	if (connectionLoop.isRunning()){
+		connectionLoop.quit();
+	}
+
+	networkManagerPtr->deleteLater();
 }
 
 
