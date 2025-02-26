@@ -71,6 +71,8 @@ public:
 	virtual iqtgui::IGuiObject* GetInformationView() const override;
 
 protected:
+	virtual bool RenameObjectOnSave() const;
+
 	/**
 		The persistence proxy is needed for the document manager for saving resources,
 		but not to the file system rather to the collection:

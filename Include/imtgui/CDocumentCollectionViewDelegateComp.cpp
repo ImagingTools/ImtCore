@@ -373,6 +373,12 @@ iqtgui::IGuiObject* CDocumentCollectionViewDelegateComp::GetInformationView() co
 
 // protected methods
 
+bool CDocumentCollectionViewDelegateComp::RenameObjectOnSave() const
+{
+	return false;
+}
+
+
 // reimplemented (imtgui::CObjectCollectionViewDelegate)
 
 bool CDocumentCollectionViewDelegateComp::IsRestoreAllowed(const QByteArray& objectId)
@@ -607,6 +613,12 @@ int CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::SaveToFile(
 				// An existing object in the collection should be updated:
 				else{
 					if (m_parent.UpdateObject(objectInfoPtr->uuid, data)){
+						if (m_parent.RenameObjectOnSave()){
+							objectInfoPtr->name = m_parent.GetUniqueName(objectName);
+
+							m_parent.m_collectionPtr->SetElementName(objectInfoPtr->uuid, objectInfoPtr->name);
+						}
+
 						CreateBackup(*m_parent.m_collectionPtr, objectInfoPtr->uuid);
 
 						return OS_OK;
