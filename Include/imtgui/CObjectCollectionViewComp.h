@@ -103,7 +103,7 @@ NOTE
 (*) This attribute belongs to a group of logically related attributes(LeftToolBarCommandGroupId, CenterToolBarCommandGroupId, RightToolBarCommandGroupId)
 (*) If all attributes are less than 0, then the entire set of commands is placed in the left part of the toolbar
 (*) If at least one attribute is greater than or equal to 0, then commands with the specified group id are placed in the corresponding part of the toolbar
-    If any of the attributes has a group id value less than 0, the corresponding part of the toolbar will remain empty)"
+	If any of the attributes has a group id value less than 0, the corresponding part of the toolbar will remain empty)"
 			, true, -1);
 		I_ASSIGN(m_rightToolBarCommandGroupIdAttrPtr, "RightToolBarCommandGroupId",
 			R"(Commands with the specified group ID will be placed in the right part of the toolbar
@@ -112,8 +112,8 @@ NOTE
 (*) This attribute belongs to a group of logically related attributes(LeftToolBarCommandGroupId, CenterToolBarCommandGroupId, RightToolBarCommandGroupId)
 (*) If all attributes are less than 0, then the entire set of commands is placed in the left part of the toolbar
 (*) If at least one attribute is greater than or equal to 0, then commands with the specified group id are placed in the corresponding part of the toolbar
-    If any of the attributes has a group id value less than 0, the corresponding part of the toolbar will remain empty)"
-			, "", true, -1);
+	If any of the attributes has a group id value less than 0, the corresponding part of the toolbar will remain empty)"
+			, true, -1);
 		I_ASSIGN_MULTI_0(m_viewDelegatesCompPtr, "ViewDelegates", "List of view delegates (corresponding with the object type) used for the collection", false);
 		I_ASSIGN(m_filterParamsGuiCompPtr, "FilterParamsGui", "UI for the additional filtering parameters for the collection", false, "FilterParamsGui");
 		I_ASSIGN(m_filterSelectionCompPtr, "FilterSelection", "Filter selection", false, "FilterSelection");
