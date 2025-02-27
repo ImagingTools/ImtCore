@@ -1261,7 +1261,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 
 		// [1] create write check variable
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("const bool isRepresentationWritted = representationObject.WriteToModel(dataModel");
+		stream << QStringLiteral("const bool isRepresentationWritten = representationObject.WriteToModel(dataModel");
 		// [-||-] add index for list
 		if (operationType == imtsdl::CSdlDocumentType::OT_LIST){
 			stream << QStringLiteral(", itemIndex");
@@ -1271,7 +1271,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 
 		// [1->2] checks write validate
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("if (!isRepresentationWritted){");
+		stream << QStringLiteral("if (!isRepresentationWritten){");
 		FeedStream(stream, 1, false);
 
 		// [2] return
