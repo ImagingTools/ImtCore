@@ -87,9 +87,33 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
-		I_ASSIGN(m_leftToolBarCommandGroupIdAttrPtr, "LeftToolBarCommandGroupId", "", true, -1);
-		I_ASSIGN(m_centerToolBarCommandGroupIdAttrPtr, "CenterToolBarCommandGroupId", "", true, -1);
-		I_ASSIGN(m_rightToolBarCommandGroupIdAttrPtr, "RightToolBarCommandGroupId", "", true, -1);
+		I_ASSIGN(m_leftToolBarCommandGroupIdAttrPtr, "LeftToolBarCommandGroupId", 
+			R"(Commands with the specified group ID will be placed in the left part of the toolbar
+
+NOTE
+(*) This attribute belongs to a group of logically related attributes(LeftToolBarCommandGroupId, CenterToolBarCommandGroupId, RightToolBarCommandGroupId)
+(*) If all attributes are less than 0, then the entire set of commands is placed in the left part of the toolbar
+(*) If at least one attribute is greater than or equal to 0, then commands with the specified group id are placed in the corresponding part of the toolbar
+    If any of the attributes has a group id value less than 0, the corresponding part of the toolbar will remain empty)"
+			, true, -1);
+		I_ASSIGN(m_centerToolBarCommandGroupIdAttrPtr, "CenterToolBarCommandGroupId",
+			R"(Commands with the specified group ID will be placed in the center of the toolbar
+
+NOTE
+(*) This attribute belongs to a group of logically related attributes(LeftToolBarCommandGroupId, CenterToolBarCommandGroupId, RightToolBarCommandGroupId)
+(*) If all attributes are less than 0, then the entire set of commands is placed in the left part of the toolbar
+(*) If at least one attribute is greater than or equal to 0, then commands with the specified group id are placed in the corresponding part of the toolbar
+    If any of the attributes has a group id value less than 0, the corresponding part of the toolbar will remain empty)"
+			, true, -1);
+		I_ASSIGN(m_rightToolBarCommandGroupIdAttrPtr, "RightToolBarCommandGroupId",
+			R"(Commands with the specified group ID will be placed in the right part of the toolbar
+
+NOTE
+(*) This attribute belongs to a group of logically related attributes(LeftToolBarCommandGroupId, CenterToolBarCommandGroupId, RightToolBarCommandGroupId)
+(*) If all attributes are less than 0, then the entire set of commands is placed in the left part of the toolbar
+(*) If at least one attribute is greater than or equal to 0, then commands with the specified group id are placed in the corresponding part of the toolbar
+    If any of the attributes has a group id value less than 0, the corresponding part of the toolbar will remain empty)"
+			, "", true, -1);
 		I_ASSIGN_MULTI_0(m_viewDelegatesCompPtr, "ViewDelegates", "List of view delegates (corresponding with the object type) used for the collection", false);
 		I_ASSIGN(m_filterParamsGuiCompPtr, "FilterParamsGui", "UI for the additional filtering parameters for the collection", false, "FilterParamsGui");
 		I_ASSIGN(m_filterSelectionCompPtr, "FilterSelection", "Filter selection", false, "FilterSelection");
