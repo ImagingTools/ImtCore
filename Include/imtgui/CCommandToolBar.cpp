@@ -19,8 +19,10 @@ CCommandToolBar::CCommandToolBar()
 }
 
 
-void CCommandToolBar::RegisterCommands(QWidget* parentWidgetPtr, const ibase::ICommandsProvider* commandsPtr)
+void CCommandToolBar::RegisterCommands(QWidget* parentWidgetPtr, const ibase::ICommandsProvider* commandsPtr, int commandGroupId)
 {
+	m_groupId = commandGroupId;
+
 	if (commandsPtr != nullptr){
 		if (m_parentWidgetPtr != nullptr){
 			m_commandsToolBar->deleteLater();
@@ -69,6 +71,11 @@ void CCommandToolBar::UpdateCommands(const ibase::ICommandsProvider* commandsPtr
 
 	if (commandsPtr != nullptr){
 		const iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(commandsPtr->GetCommands());
+
+		if (m_groupId >= 0){
+			commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(FindCommand(commandPtr, m_groupId));
+		}
+
 		if (commandPtr != nullptr){
 			if (m_commandsToolBar == nullptr){
 				m_commandsToolBar = new QToolBar(m_parentWidgetPtr);
@@ -84,6 +91,31 @@ void CCommandToolBar::UpdateCommands(const ibase::ICommandsProvider* commandsPtr
 			iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_commandsToolBar);
 		}
 	}
+}
+
+
+const ibase::IHierarchicalCommand* CCommandToolBar::FindCommand(const ibase::IHierarchicalCommand* commandPtr, int groupId)
+{
+	if (commandPtr == nullptr){
+		return nullptr;
+	}
+
+	if (commandPtr->GetGroupId() == groupId){
+		return commandPtr;
+	}
+
+	int count = commandPtr->GetChildsCount();
+	for (int i = 0; i < count; i++){
+		const ibase::IHierarchicalCommand* childPtr = dynamic_cast<const ibase::IHierarchicalCommand*>(commandPtr->GetChild(i));
+
+		const ibase::IHierarchicalCommand* foundPtr = FindCommand(childPtr, groupId);
+
+		if (foundPtr != nullptr){
+			return foundPtr;
+		}
+	}
+
+	return nullptr;
 }
 
 

@@ -396,7 +396,26 @@ void CObjectCollectionViewComp::OnGuiCreated()
 		RightPanel->setVisible(false);
 	}
 
-	m_collectionCommandsToolBar.RegisterCommands(CommandsFrame, &m_commands);
+	int leftGroupId = *m_leftToolBarCommandGroupIdAttrPtr;
+	int centerGroupId = *m_centerToolBarCommandGroupIdAttrPtr;
+	int rightGroupId = *m_rightToolBarCommandGroupIdAttrPtr;
+
+	if (leftGroupId < 0 && centerGroupId < 0 && rightGroupId < 0){
+		m_collectionCommandsLeftToolBar.RegisterCommands(LeftCommandsFrame, &m_commands, -1);
+	}
+	else{
+		if (leftGroupId >= 0){
+			m_collectionCommandsLeftToolBar.RegisterCommands(LeftCommandsFrame, &m_commands, leftGroupId);
+		}
+
+		if (centerGroupId >= 0){
+			m_collectionCommandsCenterToolBar.RegisterCommands(CenterCommandsFrame, &m_commands, centerGroupId);
+		}
+
+		if (rightGroupId >= 0){
+			m_collectionCommandsRightToolBar.RegisterCommands(RightCommandsFrame, &m_commands, rightGroupId);
+		}
+	}
 
 	ShowMetaInfoPanelButton->setVisible(*m_viewRightPanelAttrPtr);
 
@@ -410,7 +429,9 @@ void CObjectCollectionViewComp::OnGuiDestroyed()
 {
 	m_complexFilterObserver.UnregisterAllObjects();
 
-	m_collectionCommandsToolBar.UnregisterCommands();
+	m_collectionCommandsLeftToolBar.UnregisterCommands();
+	m_collectionCommandsCenterToolBar.UnregisterCommands();
+	m_collectionCommandsRightToolBar.UnregisterCommands();
 
 	if (m_paginationGuiObserverCompPtr.IsValid() && m_paginationGuiObserverCompPtr->IsModelAttached(&m_pageSelection)){
 		m_pageSelection.DetachObserver(m_paginationGuiObserverCompPtr.GetPtr());

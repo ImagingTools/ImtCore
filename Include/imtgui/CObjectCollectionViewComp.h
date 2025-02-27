@@ -87,6 +87,9 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
+		I_ASSIGN(m_leftToolBarCommandGroupIdAttrPtr, "LeftToolBarCommandGroupId", "", true, -1);
+		I_ASSIGN(m_centerToolBarCommandGroupIdAttrPtr, "CenterToolBarCommandGroupId", "", true, -1);
+		I_ASSIGN(m_rightToolBarCommandGroupIdAttrPtr, "RightToolBarCommandGroupId", "", true, -1);
 		I_ASSIGN_MULTI_0(m_viewDelegatesCompPtr, "ViewDelegates", "List of view delegates (corresponding with the object type) used for the collection", false);
 		I_ASSIGN(m_filterParamsGuiCompPtr, "FilterParamsGui", "UI for the additional filtering parameters for the collection", false, "FilterParamsGui");
 		I_ASSIGN(m_filterSelectionCompPtr, "FilterSelection", "Filter selection", false, "FilterSelection");
@@ -348,6 +351,9 @@ private:
 	/**
 		List of collection view delegates.
 	*/
+	I_ATTR(int, m_leftToolBarCommandGroupIdAttrPtr);
+	I_ATTR(int, m_centerToolBarCommandGroupIdAttrPtr);
+	I_ATTR(int, m_rightToolBarCommandGroupIdAttrPtr);
 	I_MULTIREF(ICollectionViewDelegate, m_viewDelegatesCompPtr);
 	I_REF(iqtgui::IGuiObject, m_filterParamsGuiCompPtr);
 	I_REF(iprm::ISelectionParam, m_filterSelectionCompPtr);
@@ -356,7 +362,9 @@ private:
 	I_REF(imtbase::IComplexCollectionFilter, m_complexFilterCompPtr);
 	I_REF(imod::IModel, m_complexFilterModelCompPtr);
 
-	imtgui::CCommandToolBar m_collectionCommandsToolBar;
+	imtgui::CCommandToolBar m_collectionCommandsLeftToolBar;
+	imtgui::CCommandToolBar m_collectionCommandsCenterToolBar;
+	imtgui::CCommandToolBar m_collectionCommandsRightToolBar;
 };
 
 

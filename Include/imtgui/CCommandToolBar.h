@@ -22,7 +22,7 @@ public:
 
 	CCommandToolBar();
 
-	void RegisterCommands(QWidget* parentWidgetPtr, const ibase::ICommandsProvider* commandsPtr);
+	void RegisterCommands(QWidget* parentWidgetPtr, const ibase::ICommandsProvider* commandsPtr, int commandGroupId = -1);
 	void UnregisterCommands();
 
 protected:
@@ -30,12 +30,15 @@ protected:
 
 private:
 	void UpdateCommands(const ibase::ICommandsProvider* commandsPtr);
+	const ibase::IHierarchicalCommand* FindCommand(const ibase::IHierarchicalCommand* commandPtr, int groupId);
 
 private:
 	imtbase::TModelUpdateBinder<ibase::ICommandsProvider, CCommandToolBar> m_pageCommandsObserver;
 
 	QToolBar* m_commandsToolBar = nullptr;
 	QWidget* m_parentWidgetPtr = nullptr;
+
+	int m_groupId = -1;
 };
 
 
