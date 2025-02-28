@@ -11,12 +11,18 @@ namespace imtcom
 
 // public methods
 
+
+QNetworkAccessManager CRequestSender::s_networkManager;
+
+
 QNetworkReply* CRequestSender::DoSyncGet(const QNetworkRequest& request, int timeout)
 {
 	NetworkOperation networkOperation(timeout);
 
-	QNetworkReply* replyPtr = networkOperation.networkManagerPtr->get(request);
+	QNetworkReply* replyPtr = s_networkManager.get(request);
 	if (replyPtr != nullptr){
+		QObject::connect(replyPtr, &QNetworkReply::finished, &networkOperation.connectionLoop, &QEventLoop::quit);
+
 		replyPtr->ignoreSslErrors();
 
 		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
@@ -35,8 +41,10 @@ QNetworkReply* CRequestSender::DoSyncPut(const QNetworkRequest& request, const Q
 {
 	NetworkOperation networkOperation(timeout);
 
-	QNetworkReply* replyPtr = networkOperation.networkManagerPtr->put(request, data);
+	QNetworkReply* replyPtr = s_networkManager.put(request, data);
 	if (replyPtr != nullptr){
+		QObject::connect(replyPtr, &QNetworkReply::finished, &networkOperation.connectionLoop, &QEventLoop::quit);
+
 		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		networkOperation.timer.stop();
 
@@ -53,8 +61,10 @@ QNetworkReply* CRequestSender::DoSyncPost(const QNetworkRequest& request, const 
 {
 	NetworkOperation networkOperation(timeout);
 
-	QNetworkReply* replyPtr = networkOperation.networkManagerPtr->post(request, data);
+	QNetworkReply* replyPtr = s_networkManager.post(request, data);
 	if (replyPtr != nullptr){
+		QObject::connect(replyPtr, &QNetworkReply::finished, &networkOperation.connectionLoop, &QEventLoop::quit);
+
 		replyPtr->ignoreSslErrors();
 
 		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
@@ -73,8 +83,10 @@ QNetworkReply* CRequestSender::DoSyncCustomRequest(const QNetworkRequest& reques
 {
 	NetworkOperation networkOperation(timeout);
 
-	QNetworkReply* replyPtr = networkOperation.networkManagerPtr->sendCustomRequest(request, verb, data);
+	QNetworkReply* replyPtr = s_networkManager.sendCustomRequest(request, verb, data);
 	if (replyPtr != nullptr){
+		QObject::connect(replyPtr, &QNetworkReply::finished, &networkOperation.connectionLoop, &QEventLoop::quit);
+
 		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		networkOperation.timer.stop();
 
@@ -91,20 +103,15 @@ QNetworkReply* CRequestSender::DoSyncCustomRequest(const QNetworkRequest& reques
 
 CRequestSender::NetworkOperation::NetworkOperation(int timeout)
 {
-	networkManagerPtr = new QNetworkAccessManager();
-
-	// If the network reply is finished, the internal event loop will be finished:
-	QObject::connect(networkManagerPtr, &QNetworkAccessManager::finished, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
-
 	// If the application will be finished, the internal event loop will be also finished:
-	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
+	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit);
 
 	// If a timeout for the request was defined, start the timer:
 	if (timeout > 0){
 		timer.setSingleShot(true);
 
 		// If the timer is running out, the internal event loop will be finished:
-		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
+		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit);
 
 		timer.start(timeout);
 	}
@@ -113,18 +120,13 @@ CRequestSender::NetworkOperation::NetworkOperation(int timeout)
 
 CRequestSender::NetworkOperation::~NetworkOperation()
 {
-	QObject::disconnect(networkManagerPtr, &QNetworkAccessManager::finished, &connectionLoop, &QEventLoop::quit);
+	timer.stop();
+
+	QObject::disconnect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit);
 	QObject::disconnect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit);
 
-	if (timer.isActive()){
-		timer.stop();
-	}
-
-	if (connectionLoop.isRunning()){
-		connectionLoop.quit();
-	}
-
-	networkManagerPtr->deleteLater();
+	Q_ASSERT(!timer.isActive());
+	Q_ASSERT(!connectionLoop.isRunning());
 }
 
 

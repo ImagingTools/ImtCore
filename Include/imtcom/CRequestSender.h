@@ -30,10 +30,11 @@ private:
 		NetworkOperation(int timeout);
 		~NetworkOperation();
 
-		QNetworkAccessManager* networkManagerPtr;
 		QEventLoop connectionLoop;
 		QTimer timer;
 	};
+
+	static QNetworkAccessManager s_networkManager;
 };
 
 
