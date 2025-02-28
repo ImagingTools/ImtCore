@@ -92,12 +92,12 @@ private:
 	 */
 	void AddOperationRequestMethodImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
 	void AddOperationRequestCheck(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
-	void AddCollectionMethodsImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
-	void AddImplCodeForRequests(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
-	void AddImplCodeForRequest(QTextStream& stream, const ImplGenerationInfo& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
+	bool AddCollectionMethodsImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
+	bool AddImplCodeForRequests(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
+	bool AddImplCodeForRequest(QTextStream& stream, const ImplGenerationInfo& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
 	void AddSpecialMethodImplCodeForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
 	void AddSpecialMethodImplCode(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, uint hIndents = 1);
-	QString GetInputExtractionStringForTypeName(const imtsdl::CSdlRequest& sdlRequest, const QString typeName, const QString version = QString()) const;
+	QString GetInputExtractionStringForTypeName(const imtsdl::CSdlRequest& sdlRequest, const QString typeName, const QString version = QString(), bool* okPtr = nullptr) const;
 
 	/// \param _isRoot - internal recursive param. NEVER SET IT!
 	bool FindCallChainForField(const imtsdl::CSdlField& sdlRequest, const QString typeName, QString& callChain, bool _isRoot = true) const;

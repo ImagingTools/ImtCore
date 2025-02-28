@@ -117,8 +117,7 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 		m_sourceFilePtr.SetPtr(new QFile(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("cpp"), outputDirectoryPath)));
 
 		if (!ProcessFiles(sdlDocumentType, !joinHeaders, !joinSources)){
-			SendErrorMessage(0, QString("Unable to begin files"));
-			I_CRITICAL();
+			SendErrorMessage(0, QString("Unable to process files"));
 
 			return TS_INVALID;
 		}
@@ -476,7 +475,10 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(cons
 
 	AddOperationRequestMethodImplForDocument(ifStream, sdlDocumentType);
 
-	AddCollectionMethodsImplForDocument(ifStream, sdlDocumentType);
+	bool isCorrect = AddCollectionMethodsImplForDocument(ifStream, sdlDocumentType);
+	if (!isCorrect){
+		return false;
+	}
 
 	AddSpecialMethodImplCodeForDocument(ifStream, sdlDocumentType);
 
@@ -1053,7 +1055,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestCheck(QT
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType)
+bool CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType)
 {
 	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
 
@@ -1079,13 +1081,18 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplFor
 
 	for (imtsdl::CSdlDocumentType::OperationType operationType: requestInfoMultiMap.uniqueKeys()){
 		const QList<ImplGenerationInfo> requestList = requestInfoMultiMap.values(operationType);
-		AddImplCodeForRequests(stream, operationType, requestList, className, sdlDocumentType);
+		bool isCorrect = AddImplCodeForRequests(stream, operationType, requestList, className, sdlDocumentType);
+		if (!isCorrect){
+			return false;
+		}
 		remainingOperations.removeAll(operationType);
 	}
+
+	return true;
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
+bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 			QTextStream& stream,
 			imtsdl::CSdlDocumentType::OperationType operationType,
 			const QList<ImplGenerationInfo>& requestList,
@@ -1123,7 +1130,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	case imtsdl::CSdlDocumentType::OT_EXPORT:
 	case imtsdl::CSdlDocumentType::OT_GET_VIEW:
 		// special non-trivial methods
-		return;
+		return true;
 		break;
 	default:
 		SendCriticalMessage(0, QString("Unexpected type: %1").arg(QString::number(operationType)));
@@ -1159,8 +1166,6 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-
-
 	// method's body
 	// for list we must ensure, the iterator is not null
 	if (operationType == imtsdl::CSdlDocumentType::OT_LIST){
@@ -1182,7 +1187,10 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	// create sections for expected command IDs
 	for (const ImplGenerationInfo& sdlRequest: requestList){
 		/// \todo do this for all versions
-		AddImplCodeForRequest(stream, sdlRequest, operationType, sdlDocumentType, hIndents + 1);
+		bool isCorrect = AddImplCodeForRequest(stream, sdlRequest, operationType, sdlDocumentType, hIndents + 1);
+		if (!isCorrect){
+			return false;
+		}
 	}
 
 	switch (operationType){
@@ -1230,6 +1238,8 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 3, false);
+
+	return true;
 }
 
 
@@ -1331,7 +1341,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCode(QT
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
+bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 			QTextStream& stream,
 			const ImplGenerationInfo& sdlRequestInfo,
 			imtsdl::CSdlDocumentType::OperationType operationType,
@@ -1500,28 +1510,35 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		stream << '}';
 		FeedStream(stream, 2, false);
 
+		bool isCorrect = false;
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("return CreateObjectFromRepresentation(*");
 		stream << GetDecapitalizedValue(requestClassName);
 		stream << GetInputExtractionStringForTypeName(
 			sdlRequestInfo.request,
 			sdlRequestInfo.containerClassName,
-			QStringLiteral("Version_") + GetSdlEntryVersion(referenceType, false));
+			QStringLiteral("Version_") + GetSdlEntryVersion(referenceType, false),& isCorrect);
 		stream << QStringLiteral(", newObjectId, errorMessage);");
 		FeedStream(stream, 1, false);
+		if (!isCorrect){
+			return false;
+		}
 	}
 
 	// [1] end of section
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 2, false);
+
+	return true;
 }
 
 
 QString CGqlCollectionControllerBaseClassGeneratorComp::GetInputExtractionStringForTypeName(
 			const imtsdl::CSdlRequest& sdlRequest,
 			const QString typeName,
-			const QString version) const
+			const QString version,
+			bool* okPtr) const
 {
 	QString retVal = QStringLiteral(".GetRequestedArguments().");
 
@@ -1541,11 +1558,19 @@ QString CGqlCollectionControllerBaseClassGeneratorComp::GetInputExtractionString
 				retVal.append(callChain);
 			}
 
+			if (okPtr != nullptr){
+				*okPtr = true;
+			}
+
 			return retVal;
 		}
 	}
 
-	SendErrorMessage(0, QString("Unable to find reference name '%1' in input arguments for '%2'").arg(sdlRequest.GetName(), typeName));
+	if (okPtr != nullptr){
+		*okPtr = false;
+	}
+
+	SendErrorMessage(0, QString("'collectionSchema' section processing error: Unable to find reference name '%1' in input arguments for '%2'").arg(sdlRequest.GetName(), typeName));
 
 	return QString();
 }
