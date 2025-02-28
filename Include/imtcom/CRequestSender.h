@@ -23,6 +23,9 @@ public:
 	static QNetworkReply* DoSyncCustomRequest(const QNetworkRequest& request, const QByteArray& verb, const QByteArray& data, int timeout);
 
 private:
+	static void EnsureNetworkAccessManager();
+
+private:
 	class NetworkOperation
 	{
 	public:
@@ -34,7 +37,7 @@ private:
 		QTimer timer;
 	};
 
-	static QNetworkAccessManager s_networkManager;
+	static std::unique_ptr<QNetworkAccessManager> s_networkManagerPtr;
 };
 
 

@@ -12,14 +12,16 @@ namespace imtcom
 // public methods
 
 
-QNetworkAccessManager CRequestSender::s_networkManager;
+std::unique_ptr<QNetworkAccessManager> CRequestSender::s_networkManagerPtr;
 
 
 QNetworkReply* CRequestSender::DoSyncGet(const QNetworkRequest& request, int timeout)
 {
+	EnsureNetworkAccessManager();
+
 	NetworkOperation networkOperation(timeout);
 
-	QNetworkReply* replyPtr = s_networkManager.get(request);
+	QNetworkReply* replyPtr = s_networkManagerPtr->get(request);
 	if (replyPtr != nullptr){
 		QObject::connect(replyPtr, &QNetworkReply::finished, &networkOperation.connectionLoop, &QEventLoop::quit);
 
@@ -39,9 +41,11 @@ QNetworkReply* CRequestSender::DoSyncGet(const QNetworkRequest& request, int tim
 
 QNetworkReply* CRequestSender::DoSyncPut(const QNetworkRequest& request, const QByteArray& data, int timeout)
 {
+	EnsureNetworkAccessManager();
+
 	NetworkOperation networkOperation(timeout);
 
-	QNetworkReply* replyPtr = s_networkManager.put(request, data);
+	QNetworkReply* replyPtr = s_networkManagerPtr->put(request, data);
 	if (replyPtr != nullptr){
 		QObject::connect(replyPtr, &QNetworkReply::finished, &networkOperation.connectionLoop, &QEventLoop::quit);
 
@@ -59,9 +63,11 @@ QNetworkReply* CRequestSender::DoSyncPut(const QNetworkRequest& request, const Q
 
 QNetworkReply* CRequestSender::DoSyncPost(const QNetworkRequest& request, const QByteArray& data, int timeout)
 {
+	EnsureNetworkAccessManager();
+
 	NetworkOperation networkOperation(timeout);
 
-	QNetworkReply* replyPtr = s_networkManager.post(request, data);
+	QNetworkReply* replyPtr = s_networkManagerPtr->post(request, data);
 	if (replyPtr != nullptr){
 		QObject::connect(replyPtr, &QNetworkReply::finished, &networkOperation.connectionLoop, &QEventLoop::quit);
 
@@ -81,9 +87,11 @@ QNetworkReply* CRequestSender::DoSyncPost(const QNetworkRequest& request, const 
 
 QNetworkReply* CRequestSender::DoSyncCustomRequest(const QNetworkRequest& request, const QByteArray& verb, const QByteArray& data, int timeout)
 {
+	EnsureNetworkAccessManager();
+
 	NetworkOperation networkOperation(timeout);
 
-	QNetworkReply* replyPtr = s_networkManager.sendCustomRequest(request, verb, data);
+	QNetworkReply* replyPtr = s_networkManagerPtr->sendCustomRequest(request, verb, data);
 	if (replyPtr != nullptr){
 		QObject::connect(replyPtr, &QNetworkReply::finished, &networkOperation.connectionLoop, &QEventLoop::quit);
 
@@ -96,6 +104,16 @@ QNetworkReply* CRequestSender::DoSyncCustomRequest(const QNetworkRequest& reques
 	}
 
 	return replyPtr;
+}
+
+
+// private methods
+
+void CRequestSender::EnsureNetworkAccessManager()
+{
+	if (s_networkManagerPtr == nullptr){
+		s_networkManagerPtr.reset(new QNetworkAccessManager());
+	}
 }
 
 
