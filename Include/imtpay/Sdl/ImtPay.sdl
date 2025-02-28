@@ -7,6 +7,10 @@ schema {
 	version: 1.0
 }
 
+import {
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+}
+
 type Payment {
 	Type: String!
 	Sum: Integer!
@@ -56,9 +60,7 @@ type RegistrationResult {
 }
 
 input ReceiptRequest {
-	AbonentId: String
-	MonthDate: Integer
-	YearDate: Integer
+	viewParams: CollectionViewParams
 }
 
 type ReceiptItem {
@@ -68,6 +70,7 @@ type ReceiptItem {
 
 type ReceiptReply {
 	items: [ReceiptItem]
+	notification: NotificationItem
 }
 
 type Query {
@@ -83,12 +86,6 @@ collectionSchema {
 		ref: ReceiptItem
 		operations {
 			list: GetReceipts
-		}
-		subtype Receipt {
-		ref: Receipt
-			operations {
-				insert: AddReceipt
-			}
 		}
 	}
 }
