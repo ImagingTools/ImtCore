@@ -37,14 +37,19 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imtguiTheme);
 
 	Q_INIT_RESOURCE(imtguivars);
-	Q_INIT_RESOURCE(imtauthAuthorizationSdl);
-	Q_INIT_RESOURCE(imtauthAuthorizationOptionsSdl);
-	Q_INIT_RESOURCE(imtappApplicationSdl);
+	Q_INIT_RESOURCE(imtbaseImtBaseTypesSdl);
+	Q_INIT_RESOURCE(imtbaseImtCollectionSdl);
+	Q_INIT_RESOURCE(imtbaseDocumentCollectionFilterSdl);
+	Q_INIT_RESOURCE(imtbaseComplexCollectionFilterSdl);
+	Q_INIT_RESOURCE(imtbaseDocumentRevisionSdl);
 	Q_INIT_RESOURCE(imtauthGroupsSdl);
-	Q_INIT_RESOURCE(imtauthUsersSdl);
 	Q_INIT_RESOURCE(imtauthRolesSdl);
+	Q_INIT_RESOURCE(imtauthUsersSdl);
 	Q_INIT_RESOURCE(imtauthProfileSdl);
 	Q_INIT_RESOURCE(imtauthSessionsSdl);
+	Q_INIT_RESOURCE(imtauthAuthorizationOptionsSdl);
+	Q_INIT_RESOURCE(imtauthAuthorizationSdl);
+	Q_INIT_RESOURCE(imtappApplicationSdl);
 
 	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	
