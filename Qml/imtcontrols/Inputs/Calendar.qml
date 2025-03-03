@@ -130,7 +130,7 @@ Rectangle {
 	property string fontColor_cell: "#000000";
 	property string fontColor_button: "#ffffff";
 	property int fontSize_cell: 12;
-	property int fontSize_title: 24;
+	property int fontSize_title: 20;
 	property int fontSize_button: 14;
 	property bool fontBold_title: false;
 	property int buttonWidth: 100;

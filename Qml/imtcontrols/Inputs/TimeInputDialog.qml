@@ -140,7 +140,7 @@ PopupView {
 					anchors.centerIn: parent;
 
 					font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSize_Large
+					font.pixelSize: Style.fontSize_Normal
 					color: Style.textColor;
 
 					text: timeInputDialog.hoursStr;
@@ -228,7 +228,7 @@ PopupView {
 					anchors.centerIn: parent;
 
 					font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSize_Large
+					font.pixelSize: Style.fontSize_Normal
 					color: Style.textColor;
 
 					text: timeInputDialog.minutesStr;
@@ -274,7 +274,7 @@ PopupView {
 			anchors.centerIn:  parent;
 
 			font.family: Style.fontFamily;
-			font.pixelSize: Style.fontSize_Large
+			font.pixelSize: Style.fontSize_Normal
 			color: Style.textColor;
 
 			text: ":"

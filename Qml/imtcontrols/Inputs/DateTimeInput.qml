@@ -25,6 +25,7 @@ Row{
 	property int calendarHeight: 350;
 	property int timeInputDialogWidth: 140;
 	property int timeInputDialogHeight: 120;
+	property int fontSize: Style.fontSize_common;
 
 	//time format: "dd.MM.yyyy hh:mm"
 
@@ -34,9 +35,12 @@ Row{
 		selectedDate = new Date();
 	}
 
-	function setDateTime(date){
-		setDate(date);
-		setTime(date);
+	function setDateTime(datetime){
+		console.log("setDateTime", datetime)
+		setDate(datetime);
+		signalPause.stop()
+		setTime(datetime);
+		selectedDate = datetime
 	}
 
 	function setDate(date){
@@ -130,10 +134,12 @@ Row{
 		id: dateInput;
 
 		anchors.bottom: parent.bottom;
+		width: 110;
 
 		canShowCurrentDate: dateTimeInput.canShowCurrentTime;
 		hasTitle: dateTimeInput.hasTitle;
 		color: dateTimeInput.color;
+		fontSize: dateTimeInput.fontSize
 
 		calendarWidth:  dateTimeInput.calendarWidth
 		calendarHeight: dateTimeInput.calendarHeight
@@ -143,6 +149,7 @@ Row{
 			forFocus.forceActiveFocus();
 		}
 		onDateChanged: {
+			console.log("onDateChanged", value)
 			if(value !== dateTimeInput.dateStr){
 				dateTimeInput.dateStr = value;
 
@@ -164,12 +171,14 @@ Row{
 		canShowCurrentTime: dateTimeInput.canShowCurrentTime;
 		hasTitle: dateTimeInput.hasTitle;
 		color: dateTimeInput.color;
+		fontSize: dateTimeInput.fontSize
 
 		timeInputDialogWidth: dateTimeInput.timeInputDialogWidth;
 		timeInputDialogHeight:  dateTimeInput.timeInputDialogHeight;
 
 		tabKeyItem: forFocus;
 		onTimeChanged: {
+			console.log("onTimeChanged", value)
 			if(value !== dateTimeInput.timeStr){
 				dateTimeInput.timeStr = value;
 

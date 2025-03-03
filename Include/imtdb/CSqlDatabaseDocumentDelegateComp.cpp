@@ -727,7 +727,7 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 				SELECT
 					root.*,
 					(SELECT "TimeStamp" FROM %1"%2" as t1 WHERE "RevisionInfo"->>'RevisionNumber' = '1' AND root."DocumentId" = t1."DocumentId" LIMIT 1) as "Added"
-				FROM %1"%2" as root WHERE "State" != 'InActive')";
+				FROM %1"%2" as root WHERE "State" = 'Active')";
 
 	QString schema;
 	if (m_tableSchemaAttrPtr.IsValid()){

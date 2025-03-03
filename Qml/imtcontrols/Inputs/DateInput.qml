@@ -48,9 +48,11 @@ Item {
 	signal calendarButtonClicked();
 
 	Component.onCompleted:{
-		selectedDate = new Date();
-		if(canShowCurrentDate){
-			showCurrentDate();
+		if (!selectedDate){
+			selectedDate = new Date();
+			if(canShowCurrentDate){
+				showCurrentDate();
+			}
 		}
 	}
 

@@ -37,7 +37,7 @@ Item {
 	signal timeChanged(string value);
 
 	Component.onCompleted:{
-		if(canShowCurrentTime){
+		if(canShowCurrentTime && selectedTime == "00:00"){
 			showCurrentTime();
 		}
 	}
@@ -82,7 +82,7 @@ Item {
 	}
 
 	function setTime(str){
-		//console.log("Set time")
+		console.log("Set time", str)
 		if(str.match(timeInput.timeRegExpFull) === null){
 			//console.log("Wrong time format!")
 			return false;
@@ -94,7 +94,7 @@ Item {
 	}
 
 	function showCurrentTime(){
-		console.log("showCurrentTime")
+		// console.log("showCurrentTime")
 		let date = new Date();
 
 		let hours = date.getHours();
@@ -107,7 +107,7 @@ Item {
 		}
 
 		let time  = hours + ":" + minutes;
-		//console.log("showCurrentTime:: ", time)
+		console.log("showCurrentTime:: ", time)
 		setTime(time);
 		timeChanged(time);
 	}
