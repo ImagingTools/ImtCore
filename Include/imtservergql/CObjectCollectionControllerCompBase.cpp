@@ -538,7 +538,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	if (isNameUpdateRquired){
 		QString currentName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		if (currentName != name){
-			// m_objectCollectionCompPtr->SetElementName(objectId, name);
+			m_objectCollectionCompPtr->SetElementName(objectId, name);
 		}
 	}
 
