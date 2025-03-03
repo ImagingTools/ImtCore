@@ -88,7 +88,17 @@ Rectangle{
 		visible: !dayDelegate.calendarItem.readOnly
 
 		onClicked:{
+			clickFunction();
+		}
 
+		onDoubleClicked: {
+			if(dayDelegate.calendarItem && dayDelegate.calendarItem.hasDoubleClickReaction && !dayDelegate.calendarItem.multiSelection){
+				clickFunction();
+				dayDelegate.calendarItem.doubleClicked();
+			}
+		}
+
+		function clickFunction(){
 			if(!dayDelegate.calendarItem.multiSelection)
 			{
 				dayDelegate.calendarItem.selectedDateExist = true;

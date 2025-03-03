@@ -27,6 +27,9 @@ Row{
 	property int timeInputDialogHeight: 120;
 	property int fontSize: Style.fontSize_common;
 
+	property alias dateInputWidth: dateInput.width;
+	property alias timeInputWidth: timeInput.width;
+
 	//time format: "dd.MM.yyyy hh:mm"
 
 	signal dateChanged(string value)
@@ -134,7 +137,6 @@ Row{
 		id: dateInput;
 
 		anchors.bottom: parent.bottom;
-		width: 110;
 
 		canShowCurrentDate: dateTimeInput.canShowCurrentTime;
 		hasTitle: dateTimeInput.hasTitle;
@@ -178,7 +180,7 @@ Row{
 
 		tabKeyItem: forFocus;
 		onTimeChanged: {
-			console.log("onTimeChanged", value)
+			//console.log("onTimeChanged", value)
 			if(value !== dateTimeInput.timeStr){
 				dateTimeInput.timeStr = value;
 

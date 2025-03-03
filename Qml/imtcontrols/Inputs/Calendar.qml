@@ -30,6 +30,7 @@ Rectangle {
 	property bool gridOnly: false;
 	property bool canShowToday: true;
 	property bool readOnly: false;
+	property bool hasDoubleClickReaction: !multiSelection;
 
 	property int startYear: 1900;
 	property int lastYear: 2100;
@@ -175,6 +176,7 @@ Rectangle {
 
 	signal accepted();
 	signal canceled();
+	signal doubleClicked();
 	//
 
 
@@ -265,6 +267,14 @@ Rectangle {
 	onSelectedIndexYearChanged: {
 		if(topPanelTextYear.text !== calendar.selectedIndexYear){
 			topPanelTextYear.text = calendar.selectedIndexYear;
+		}
+	}
+
+	onDoubleClicked: {
+		if(!calendar.multiSelection && calendar.hasDoubleClickReaction){
+			calendar.acceptFunction();
+			calendar.accepted();
+			calendar.close();
 		}
 	}
 

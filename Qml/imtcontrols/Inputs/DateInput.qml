@@ -5,10 +5,10 @@ import imtcontrols 1.0
 Item {
 	id: dateInput;
 
-	width: 160;
+	width: 130;
 	height: column.height;
 
-	property int inputHeight: 36;
+	property int inputHeight: 30;
 	property int fontSize: Style.fontSizeNormal;
 
 	property string fontColor: Style.textColor;
