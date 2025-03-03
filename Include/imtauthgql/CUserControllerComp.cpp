@@ -114,7 +114,7 @@ sdl::imtauth::Users::CChangePasswordPayload CUserControllerComp::OnChangePasswor
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr =  nullptr;
 	if (m_userOperationContextControllerCompPtr.IsValid()){
-		operationContextPtr.SetPtr(m_userOperationContextControllerCompPtr->CreateOperationContext("ChangePassword", userId, *userInfoPtr));
+		operationContextPtr.SetPtr(m_userOperationContextControllerCompPtr->CreateOperationContext("ChangePassword", userId, userInfoPtr));
 	}
 
 	if (!m_userCollectionCompPtr->SetObjectData(userId, *userInfoPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
