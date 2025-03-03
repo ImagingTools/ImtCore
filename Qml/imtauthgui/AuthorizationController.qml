@@ -20,6 +20,8 @@ QtObject {
 	
 	signal loggedIn();
 	signal loggedOut();
+	signal changePasswordSuccessfully();
+	signal changePasswordFailed();
 	
 	property XmlHttpRequestProxy requestProxy: XmlHttpRequestProxy {
 		onForbidden: {
@@ -256,6 +258,10 @@ QtObject {
 				onFinished: {
 					if (m_success){
 						ModalDialogManager.showInfoDialog(qsTr("Password changed successfully"));
+						root.changePasswordSuccessfully();
+					}
+					else{
+						root.changePasswordFailed();
 					}
 				}
 			}
