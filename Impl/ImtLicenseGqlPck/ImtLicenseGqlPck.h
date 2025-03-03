@@ -8,7 +8,6 @@
 // ImtCore includes
 #include <imtservergql/TObjectCollectionControllerSearchCompWrap.h>
 #include <imtlicgql/CProductCollectionControllerComp.h>
-#include <imtlicgql/CAccountCollectionControllerComp.h>
 #include <imtlicgql/CProductControllerComp.h>
 #include <imtlicgql/CLicenseControllerComp.h>
 #include <imtlicgql/CLicenseCollectionControllerComp.h>
@@ -35,7 +34,6 @@ typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CProd
 typedef imtlicgql::CProductControllerComp ProductController;
 typedef imtlicgql::CLicenseControllerComp LicenseController;
 typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CLicenseCollectionControllerComp> LicenseCollectionController;
-typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CAccountCollectionControllerComp> AccountCollectionController;
 typedef imtlicgql::CAccountControllerComp AccountController;
 typedef imtlicgql::CProductPermissionsControllerComp ProductPermissionController;
 typedef imtlicgql::CFeatureControllerComp FeatureController;

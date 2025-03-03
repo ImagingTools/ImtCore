@@ -340,7 +340,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const im
 
 				istd::TDelPtr<imtbase::IOperationContext> operationContextPtr =  nullptr;
 				if (m_operationContextControllerCompPtr.IsValid()){
-					operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Update", objectId, *productInfoPtr);
+					operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Update", objectId, productInfoPtr);
 				}
 
 				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *productInfoPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){

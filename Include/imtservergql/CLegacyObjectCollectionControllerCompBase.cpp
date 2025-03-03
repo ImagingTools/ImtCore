@@ -369,7 +369,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::InsertObject
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Create", objectId, *newObjectPtr.GetPtr());
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Create", objectId, newObjectPtr.GetPtr());
 	}
 
 	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
@@ -431,7 +431,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::UpdateObject
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Update", objectId, *savedObjectPtr.GetPtr());
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Update", objectId, savedObjectPtr.GetPtr());
 	}
 
 	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
@@ -793,7 +793,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::DeleteObject
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", objectId, *dataPtr.GetPtr());
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", objectId, dataPtr.GetPtr());
 	}
 
 	if (!m_objectCollectionCompPtr->RemoveElement(objectId, operationContextPtr.GetPtr())){

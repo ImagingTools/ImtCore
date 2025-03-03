@@ -453,7 +453,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Create", objectId, *newObjectPtr.GetPtr());
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Create", objectId, newObjectPtr.GetPtr());
 	}
 
 	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
@@ -524,7 +524,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Update", objectId, *savedObjectPtr.GetPtr());
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Update", objectId, savedObjectPtr.GetPtr());
 	}
 
 	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
@@ -888,18 +888,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return nullptr;
 	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to delete object. Object with ID '%1' does not exists").arg(qPrintable(objectId));
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-
-		return nullptr;
-	}
-
+	
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", objectId, *dataPtr.GetPtr());
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", objectId);
 	}
 
 	if (!m_objectCollectionCompPtr->RemoveElement(objectId, operationContextPtr.GetPtr())){

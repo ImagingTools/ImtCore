@@ -334,7 +334,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
 
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext("Create", objectId, *newObjectPtr));
+		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext("Create", objectId, newObjectPtr));
 	}
 
 	imtbase::IStructuredObjectCollectionController* collectionStructureController = nullptr; // connect via I_REF 

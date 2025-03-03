@@ -20,7 +20,7 @@ public:
 	virtual bool GenerateDocumentChanges(
 				const QByteArray& operationTypeId,
 				const QByteArray& documentId,
-				const istd::IChangeable& document,
+				const istd::IChangeable* documentPtr,
 				CObjectCollection& documentChangeCollection,
 				QString& errorMessage,
 				const iprm::IParamsSet* paramsPtr) = 0;

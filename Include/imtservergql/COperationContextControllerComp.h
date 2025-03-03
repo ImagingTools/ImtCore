@@ -30,8 +30,8 @@ protected:
 	virtual imtbase::IOperationContext* CreateOperationContext(
 				const QByteArray& operationTypeId,
 				const QByteArray& objectId,
-				const istd::IChangeable& object,
-				const iprm::IParamsSet* paramsPtr) override;
+				const istd::IChangeable* objectPtr = nullptr,
+				const iprm::IParamsSet* paramsPtr = nullptr) override;
 protected:
 	I_REF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorCompPtr);
 };

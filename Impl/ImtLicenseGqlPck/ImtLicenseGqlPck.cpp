@@ -35,11 +35,6 @@ I_EXPORT_COMPONENT(
 			"Product License Collection Controller");
 
 I_EXPORT_COMPONENT(
-			AccountCollectionController,
-			"AccountCollectionController",
-			"Account Collection Controller");
-
-I_EXPORT_COMPONENT(
 			AccountController,
 			"AccountController",
 			"Account Controller");

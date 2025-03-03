@@ -57,7 +57,7 @@ void CDocumentChangeGeneratorCompBase::GenerateChanges(
 bool CDocumentChangeGeneratorCompBase::GenerateDocumentChanges(
 			const QByteArray& operationTypeId,
 			const QByteArray& documentId,
-			const istd::IChangeable& document,
+			const istd::IChangeable* documentPtr,
 			CObjectCollection& documentChangeCollection,
 			QString& errorMessage,
 			const iprm::IParamsSet* /*paramsPtr*/)
@@ -71,7 +71,7 @@ bool CDocumentChangeGeneratorCompBase::GenerateDocumentChanges(
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(documentId, dataPtr)){
 			if (dataPtr.IsValid()){
-				return CompareDocuments(*dataPtr, document, documentChangeCollection, errorMessage);
+				return CompareDocuments(*dataPtr, *documentPtr, documentChangeCollection, errorMessage);
 			}
 		}
 	}

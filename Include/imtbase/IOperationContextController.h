@@ -19,7 +19,7 @@ public:
 	virtual imtbase::IOperationContext* CreateOperationContext(
 				const QByteArray& operationTypeId,
 				const QByteArray& objectId,
-				const istd::IChangeable& object,
+				const istd::IChangeable* objectPtr = nullptr,
 				const iprm::IParamsSet* paramsPtr = nullptr) = 0;
 };
 
