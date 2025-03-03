@@ -96,10 +96,10 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 		target.filterValue = value;
 		break;
 	case Filter::ValueType::Bool:
-		if (value.compare("true", Qt::CaseInsensitive)){
+		if (value.compare("true", Qt::CaseInsensitive) == 0){
 			target.filterValue = true;
 		}
-		else if (value.compare("false", Qt::CaseInsensitive)){
+		else if (value.compare("false", Qt::CaseInsensitive) == 0){
 			target.filterValue = false;
 		}
 		else{
