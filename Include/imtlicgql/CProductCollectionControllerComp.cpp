@@ -2,20 +2,14 @@
 
 
 // ACF includes
-#include <idoc/IDocumentMetaInfo.h>
 #include <istd/TDelPtr.h>
-#include <iprm/CTextParam.h>
-#include <iprm/CIdParam.h>
 #include <iprm/CParamsSet.h>
-#include <iprm/CParamsSet.h>
-#include <iser/CCompactXmlMemReadArchive.h>
-#include <iser/CCompactXmlMemWriteArchive.h>
 
 // ImtCore includes
+#include <imtbase/CComplexCollectionFilter.h>
 #include <imtlic/CLicenseDefinition.h>
 #include <imtlic/CProductInfo.h>
 #include <imtlic/IFeatureInfo.h>
-#include <imtlic/CFeatureContainer.h>
 
 
 namespace imtlicgql
@@ -94,14 +88,18 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 		QList<sdl::imtlic::Products::CLicenseData::V1_0> licenseDataList;
 
 		if (m_licenseCollectionCompPtr.IsValid()){
-			iprm::CIdParam idParam;
-			idParam.SetId(objectId);
-
-			iprm::CParamsSet paramsSet1;
-			paramsSet1.SetEditableParameter("ProductId", &idParam);
+			imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+			fieldFilter.fieldId = "ProductId";
+			fieldFilter.filterValue = objectId;
+			
+			imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+			groupFilter.fieldFilters << fieldFilter;
+			
+			imtbase::CComplexCollectionFilter complexFilter;
+			complexFilter.SetFieldsFilter(groupFilter);
 
 			iprm::CParamsSet filterParam;
-			filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
+			filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
 			imtbase::ICollectionInfo::Ids licenseCollectionIds = m_licenseCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 
@@ -126,16 +124,14 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isAddedRequested){
-		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime();
-		addedTime.setTimeSpec(Qt::UTC);
+		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime().toUTC();
 
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 		representationObject.Added = QString(added);
 	}
 
 	if (requestInfo.items.isLastModifiedRequested){
-		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("LastModified").toDateTime();
-		lastModifiedTime.setTimeSpec(Qt::UTC);
+		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("Timestamp").toDateTime().toUTC();
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 		representationObject.LastModified = QString(lastModified);
@@ -234,9 +230,22 @@ bool CProductCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 		return false;
 	}
-
-	QByteArray objectId = *productUpdateRequest.GetRequestedArguments().input.Version_1_0->Id;
-	sdl::imtlic::Products::CProductData::V1_0 productData = *productUpdateRequest.GetRequestedArguments().input.Version_1_0->Item;
+	
+	sdl::imtlic::Products::ProductUpdateRequestArguments arguments = productUpdateRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return false;
+	}
+	
+	QByteArray objectId;
+	if (arguments.input.Version_1_0->Id){
+		objectId = *productUpdateRequest.GetRequestedArguments().input.Version_1_0->Id;
+	}
+	
+	sdl::imtlic::Products::CProductData::V1_0 productData;
+	if (arguments.input.Version_1_0->Item){
+		productData = *productUpdateRequest.GetRequestedArguments().input.Version_1_0->Item;
+	}
 
 	productInfoPtr->ResetData();
 
@@ -297,22 +306,6 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(const imt
 	}
 
 	return rootModelPtr.PopPtr();
-}
-
-
-void CProductCollectionControllerComp::SetObjectFilter(
-	const imtgql::CGqlRequest& /*gqlRequest*/,
-	const imtbase::CTreeItemModel& objectFilterModel,
-	iprm::CParamsSet& filterParams) const
-{
-	if (objectFilterModel.ContainsKey("CategoryId")){
-		QByteArray filterValue = objectFilterModel.GetData("CategoryId").toByteArray();
-		if (!filterValue.isEmpty()){
-			iprm::CTextParam* textParamPtr = new iprm::CTextParam();
-			textParamPtr->SetText(filterValue);
-			filterParams.SetEditableParameter("CategoryId", textParamPtr, true);
-		}
-	}
 }
 
 
@@ -478,15 +471,19 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 
 		return false;
 	}
-
-	iprm::CIdParam idParam;
-	idParam.SetId(productId);
-
-	iprm::CParamsSet paramsSet1;
-	paramsSet1.SetEditableParameter("ProductId", &idParam);
-
+	
+	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+	fieldFilter.fieldId = "ProductId";
+	fieldFilter.filterValue = productId;
+	
+	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+	groupFilter.fieldFilters << fieldFilter;
+	
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.SetFieldsFilter(groupFilter);
+	
 	iprm::CParamsSet filterParam;
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
+	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
 	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 	if (!collectionIds.isEmpty()){
@@ -512,17 +509,21 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 
 		return false;
 	}
+	
+	imtbase::IComplexCollectionFilter::FieldFilter nameFieldFilter;
+	nameFieldFilter.fieldId = "ProductName";
+	nameFieldFilter.filterValue = name;
+	
+	imtbase::IComplexCollectionFilter::GroupFilter nameGroupFilter;
+	nameGroupFilter.fieldFilters << nameFieldFilter;
+	
+	imtbase::CComplexCollectionFilter nameComplexFilter;
+	nameComplexFilter.SetFieldsFilter(nameGroupFilter);
+	
+	iprm::CParamsSet nameFilterParam;
+	nameFilterParam.SetEditableParameter("ComplexFilter", &nameComplexFilter);
 
-	iprm::CIdParam nameParam;
-	nameParam.SetId(name.toUtf8());
-
-	iprm::CParamsSet paramsSet2;
-	paramsSet2.SetEditableParameter("ProductName", &nameParam);
-
-	iprm::CParamsSet filterParam2;
-	filterParam2.SetEditableParameter("ObjectFilter", &paramsSet2);
-
-	imtbase::ICollectionInfo::Ids collectionIds2 = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam2);
+	imtbase::ICollectionInfo::Ids collectionIds2 = m_objectCollectionCompPtr->GetElementIds(0, -1, &nameFilterParam);
 	if (!collectionIds2.isEmpty()){
 		QByteArray id = collectionIds2[0];
 		if (objectId != id){

@@ -34,6 +34,8 @@ protected:
 				const QByteArray& subscriptionId,
 				const SubscriptionStatus& status,
 				const QString& message) override;
+	
+	QByteArray GetCommandId(const QByteArray& subscriptionId) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

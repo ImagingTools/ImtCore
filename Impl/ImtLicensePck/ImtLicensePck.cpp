@@ -104,6 +104,22 @@ I_EXPORT_COMPONENT(
 			"Product controller",
 			"Product Controller");
 
+I_EXPORT_COMPONENT(
+			FeatureMetaInfoCreator,
+			"Feature meta info creator",
+			"Feature Meta Info Creator");
+
+I_EXPORT_COMPONENT(
+			LicenseMetaInfoCreator,
+			"License meta info creator",
+			"License Meta Info Creator");
+
+I_EXPORT_COMPONENT(
+			ProductMetaInfoCreator,
+			"Product meta info creator",
+			"Product Meta Info Creator");
+
+
 } // namespace ImtLicensePck
 
 

@@ -6,6 +6,7 @@
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
+#include <imtbase/CComplexCollectionFilter.h>
 #include <imtlic/CFeatureInfo.h>
 
 
@@ -27,18 +28,21 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 
 		return false;
 	}
-
+	
 	QByteArray featureId = *featureRepresentationData.FeatureId;
-	featureInfo.SetFeatureId(featureId);
-
-	iprm::CIdParam idParam;
-	idParam.SetId(featureId);
-
-	iprm::CParamsSet paramsSet1;
-	paramsSet1.SetEditableParameter("FeatureId", &idParam);
-
+	
+	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+	fieldFilter.fieldId = "FeatureId";
+	fieldFilter.filterValue = featureId;
+	
+	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+	groupFilter.fieldFilters << fieldFilter;
+	
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.SetFieldsFilter(groupFilter);
+	
 	iprm::CParamsSet filterParam;
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
+	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
 	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 	if (!collectionIds.isEmpty()){
@@ -53,6 +57,8 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 		errorMessage = QString("Feature Name cannot be empty");
 		return false;
 	}
+	
+	featureInfo.SetFeatureId(featureId);
 
 	QString featureName = *featureRepresentationData.FeatureName;
 	featureInfo.SetFeatureName(featureName);
@@ -230,16 +236,13 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isAddedRequested){
-		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime();
-		addedTime.setTimeSpec(Qt::UTC);
-
+		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime().toUTC();
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 		representationObject.Added = std::make_optional<QString>(added);
 	}
 
 	if (requestInfo.items.isLastModifiedRequested){
-		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("LastModified").toDateTime();
-		lastModifiedTime.setTimeSpec(Qt::UTC);
+		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("Timestamp").toDateTime().toUTC();
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 		representationObject.LastModified = std::make_optional<QString>(lastModified);

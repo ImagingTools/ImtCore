@@ -133,6 +133,9 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
+	
+private:
+	void AddOperationContextToChangeSet(const imtbase::IOperationContext& operationContext, istd::IChangeable::ChangeSet& changeSet) const;
 
 protected:
 	I_REF(IDatabaseEngine, m_dbEngineCompPtr);

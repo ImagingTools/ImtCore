@@ -71,9 +71,21 @@ sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::
 			QString& /*errorMessage*/) const
 {
 	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response;
-
-	QByteArray objectId = *getObjectVisualStatusRequest.GetRequestedArguments().input.Version_1_0->ObjectId;
-	QByteArray typeId = *getObjectVisualStatusRequest.GetRequestedArguments().input.Version_1_0->TypeId;
+	
+	sdl::imtbase::ImtCollection::GetObjectVisualStatusRequestArguments arguments = getObjectVisualStatusRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0){
+		return sdl::imtbase::ImtCollection::CVisualStatus();
+	}
+	
+	QByteArray objectId;
+	if (arguments.input.Version_1_0->ObjectId){
+		objectId = *getObjectVisualStatusRequest.GetRequestedArguments().input.Version_1_0->ObjectId;
+	}
+	
+	QByteArray typeId;
+	if (arguments.input.Version_1_0->TypeId){
+		typeId = *getObjectVisualStatusRequest.GetRequestedArguments().input.Version_1_0->TypeId;
+	}
 
 	QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 	QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
@@ -526,7 +538,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	if (isNameUpdateRquired){
 		QString currentName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		if (currentName != name){
-			m_objectCollectionCompPtr->SetElementName(objectId, name);
+			// m_objectCollectionCompPtr->SetElementName(objectId, name);
 		}
 	}
 

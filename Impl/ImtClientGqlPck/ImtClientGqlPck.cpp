@@ -76,8 +76,13 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			RemoteObjectVisualStatusController,
-			"Remote object visual status controllerr",
+			"Remote object visual status controller",
 			"Remote Object Visual Status Controller");
+
+I_EXPORT_COMPONENT(
+			ObjectCollectionSubscriber,
+			"Object collection subscriber",
+			"Object Collection Subscriber");
 
 
 } // namespace ImtClientGqlPck

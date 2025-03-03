@@ -36,6 +36,9 @@ public:
 			return !operator==(other);
 		}
 	};
+	
+	static const QByteArray OPERATION_CONTEXT_INFO;
+	typedef IdentifableObjectInfo OperationContextInfo;
 
 	/**
 		Get information about the initiator of the operation. E.g user-ID
@@ -55,5 +58,8 @@ public:
 
 
 } // namespace imtbase
+
+
+Q_DECLARE_METATYPE(imtbase::IOperationContext::OperationContextInfo);
 
 

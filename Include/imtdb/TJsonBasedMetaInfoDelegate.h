@@ -18,15 +18,15 @@ namespace imtdbgql
 
 
 template<class MetaInfoRepresentation>
-class TSdlBasedMetaInfoDelegate: virtual public imtdb::IJsonBasedMetaInfoDelegate
+class TJsonBasedMetaInfoDelegate: virtual public imtdb::IJsonBasedMetaInfoDelegate
 {
 public:
 	virtual bool ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json) const override;
 	virtual bool FromJsonRepresentation(const QByteArray& json, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 protected:
-	virtual bool FillRepresentation(MetaInfoRepresentation& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const = 0;
-	virtual bool FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const MetaInfoRepresentation& metaInfoRepresentation) const = 0;
+	virtual bool FillRepresentation(QJsonObject& representationObject, const idoc::IDocumentMetaInfo& metaInfo) const = 0;
+	virtual bool FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, QJsonObject& representationObject) const = 0;
 };
 
 

@@ -2,11 +2,11 @@
 
 
 // ACF includes
-#include <iprm/CIdParam.h>
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtlic/CLicenseDefinition.h>
+#include <imtbase/CComplexCollectionFilter.h>
 
 
 namespace imtlicgql
@@ -61,10 +61,6 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.LicenseId = QByteArray(licenseInfoPtr->GetLicenseId());
 	}
 
-	if (requestInfo.items.isNameRequested){
-		representationObject.Name = QString(licenseInfoPtr->GetLicenseName());
-	}
-
 	if (requestInfo.items.isLicenseNameRequested){
 		representationObject.LicenseName = QString(licenseInfoPtr->GetLicenseName());
 	}
@@ -104,7 +100,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isLastModifiedRequested){
-		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("LastModified").toDateTime();
+		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("Timestamp").toDateTime();
 		lastModifiedTime.setTimeSpec(Qt::UTC);
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
@@ -168,7 +164,6 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	QString name = licenseInfoPtr->GetLicenseName();
-	licenseData.Name = QString(name);
 	licenseData.LicenseName = QString(name);
 
 	QByteArray licenseId = licenseInfoPtr->GetLicenseId();
@@ -260,15 +255,19 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 
 		return false;
 	}
-
-	iprm::CIdParam idParam;
-	idParam.SetId(licenseId);
-
-	iprm::CParamsSet paramsSet1;
-	paramsSet1.SetEditableParameter("LicenseId", &idParam);
-
+	
+	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+	fieldFilter.fieldId = "LicenseId";
+	fieldFilter.filterValue = licenseId;
+	
+	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+	groupFilter.fieldFilters << fieldFilter;
+	
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.SetFieldsFilter(groupFilter);
+	
 	iprm::CParamsSet filterParam;
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
+	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
 	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 	if (!collectionIds.isEmpty()){
@@ -285,8 +284,8 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 	QString name;
 	QString description;
 
-	if (licenseDataRepresentation.Name){
-		name = *licenseDataRepresentation.Name;
+	if (licenseDataRepresentation.LicenseName){
+		name = *licenseDataRepresentation.LicenseName;
 	}
 	licenseInfoPtr->SetLicenseName(name);
 

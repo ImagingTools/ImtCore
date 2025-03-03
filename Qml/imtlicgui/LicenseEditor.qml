@@ -35,7 +35,7 @@ ViewBase {
     }
 
     function updateModel(){
-        licenseData.m_name = licenseNameInput.text;
+        licenseData.m_licenseName = licenseNameInput.text;
         licenseData.m_licenseId = licenseIdInput.text;
         licenseData.m_description = descriptionInput.text;
 
@@ -78,7 +78,7 @@ ViewBase {
 
     function updateGui(){
         licenseIdInput.text = licenseData.m_licenseId;
-        licenseNameInput.text = licenseData.m_name;
+        licenseNameInput.text = licenseData.m_licenseName;
         descriptionInput.text = licenseData.m_description;
 
         productsCB.currentIndex = -1;

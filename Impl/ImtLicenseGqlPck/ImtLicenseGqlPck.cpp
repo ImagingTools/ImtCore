@@ -74,6 +74,22 @@ I_EXPORT_COMPONENT(
 			"Product info provider",
 			"Product Info Provider");
 
+I_EXPORT_COMPONENT(
+			FeatureMetaInfoDelegate,
+			"Feature meta info delegate",
+			"Feature Meta Info Delegate");
+
+I_EXPORT_COMPONENT(
+			ProductMetaInfoDelegate,
+			"Product meta info delegate",
+			"Product Meta Info Delegate");
+
+I_EXPORT_COMPONENT(
+			LicenseMetaInfoDelegate,
+			"License meta info delegate",
+			"License Meta Info Delegate");
+
+
 } // namespace ImtLicenseGqlPck
 
 

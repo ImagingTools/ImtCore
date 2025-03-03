@@ -79,6 +79,17 @@ void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::Chan
 
 				dataObject.insert("typeOperation", "updated");
 			}
+			
+			QVariant operationContext = changeSet.GetChangeInfo(imtbase::IOperationContext::OPERATION_CONTEXT_INFO);
+			if (operationContext.isValid()){
+				QJsonObject operationContextObject;
+				
+				imtbase::IOperationContext::OperationContextInfo info = operationContext.value<imtbase::IOperationContext::OperationContextInfo>();
+				operationContextObject.insert("ownerId", QString(info.id));
+				operationContextObject.insert("ownerName", info.name);
+
+				dataObject.insert("operationContext", operationContextObject);
+			}
 
 			dataObject.insert("itemId", QString(itemId));
 

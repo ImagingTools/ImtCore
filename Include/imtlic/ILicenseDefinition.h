@@ -37,7 +37,12 @@ public:
 		/**
 			License Description given as QString.
 		*/
-		MIT_LICENSE_DESCRIPTION
+		MIT_LICENSE_DESCRIPTION,
+		
+		/**
+			Product-ID given as QByteArray.
+		*/
+		MIT_PRODUCT_ID
 	};
 
 	struct FeatureInfo

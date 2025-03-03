@@ -37,27 +37,26 @@ class IProductInstanceInfo: virtual public imtlic::ILicenseInstanceProvider, vir
 public:
 	enum MetaInfoTypes
 	{
-		/**
-		ID of the product instance.
-		*/
 		MIT_PRODUCT_INSTANCE_ID = idoc::IDocumentMetaInfo::MIT_USER + 1000,
-
-		/**
-			Customer name.
-		*/
 		MIT_CUSTOMER_NAME,
-
-		/**
-			Product ID.
-		*/
 		MIT_PRODUCT_ID,
-
-		/**
-			Product category.
-		*/
-		MIT_PRODUCT_CATEGORY_ID
+		MIT_PRODUCT_CATEGORY_ID,
+		MIT_PROJECT,
+		MIT_SERIAL_NUMBER,
+		MIT_CUSTOMER_ID,
+		MIT_IN_USE,
+		MIT_PRODUCT_UUID,
+		MIT_PRODUCT_NAME,
+		MIT_LICENSE_UUID,
+		MIT_LICENSE_ID,
+		MIT_LICENSE_NAME,
+		MIT_ORDER_ID,
+		MIT_DELIVERY_ID,
+		MIT_PURCHASE_ID,
+		MIT_HARDWARE_ID,
+		MIT_HARDWARE_MAC_ADDRESS,
+		MIT_IS_PAIRED
 	};
-
 
 	/**
 		Get access to the product database.

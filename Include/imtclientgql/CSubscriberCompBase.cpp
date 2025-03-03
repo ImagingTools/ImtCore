@@ -28,6 +28,21 @@ void CSubscriberCompBase::OnSubscriptionStatusChanged(
 }
 
 
+QByteArray CSubscriberCompBase::GetCommandId(const QByteArray& subscriptionId) const
+{
+	int index = m_subscriptionIds.indexOf(subscriptionId);
+	if (index < 0){
+		return QByteArray();
+	}
+	
+	if (index >= m_commandAttrPtr.GetCount()){
+		return QByteArray();
+	}
+	
+	return m_commandAttrPtr[index];
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CSubscriberCompBase::OnComponentCreated()

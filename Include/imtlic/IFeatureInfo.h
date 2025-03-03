@@ -20,6 +20,15 @@ namespace imtlic
 class IFeatureInfo: virtual public iser::IObject
 {
 public:
+	enum MetaInfoTypes
+	{
+		MIT_FEATURE_ID = idoc::IDocumentMetaInfo::MIT_USER + 1,
+		MIT_FEATURE_NAME,
+		MIT_FEATURE_DESCRIPTION,
+		MIT_IS_OPTIONAL,
+		MIT_IS_PERMISSION
+	};
+
 	typedef QSet<QByteArray> FeatureIds;
 
 	/**

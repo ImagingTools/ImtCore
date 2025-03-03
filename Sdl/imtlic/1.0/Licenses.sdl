@@ -20,7 +20,6 @@ type LicenseItem {
 	TypeId: ID!
 	LicenseId: ID!
 	LicenseName: String!
-	Name: String!
 	Description: String
 	ProductId: ID
 	ProductUuid: ID
@@ -36,9 +35,8 @@ type LicensesListPayload {
 }
 
 type LicenseDefinitionData {
-	Id: ID!
-	Name: String!
-	LicenseName: String!
+	Id: ID
+	LicenseName: String
 	Description: String
 	ProductId: ID
 	LicenseId: ID

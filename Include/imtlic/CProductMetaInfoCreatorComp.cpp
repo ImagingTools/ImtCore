@@ -5,12 +5,7 @@
 #include <imod/TModelWrap.h>
 
 // ImtCore includes
-#include <imtbase/ICollectionInfo.h>
-#include <imtlic/ILicenseInstance.h>
-#include <imtlic/IProductLicensingInfo.h>
-#include <imtlic/IProductInstanceInfo.h>
-//#include <imtlic/IProductInstanceInfoProvider.h>
-#include <imtlic/CProductLicensingMetaInfo.h>
+#include <imtlic/IProductInfo.h>
 
 
 namespace imtlic
@@ -30,23 +25,44 @@ bool CProductMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-	metaInfoPtr.SetPtr(new imod::TModelWrap<CProductLicensingMetaInfo>);
+	metaInfoPtr.SetPtr(new imod::TModelWrap<MetaInfo>);
 
 	if (dataPtr == nullptr){
 		return true;
 	}
 
-	const imtlic::IProductLicensingInfo* productLicensingPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr);
-	if (productLicensingPtr == nullptr){
+	const imtlic::IProductInfo* productInfoPtr = dynamic_cast<const imtlic::IProductInfo*>(dataPtr);
+	if (productInfoPtr == nullptr){
 		return false;
 	}
-
-//	metaInfoPtr->SetMetaInfo(IProductLicensingInfo::MIT_PRODUCT_NAME, productLicensingPtr->GetName());
-//	metaInfoPtr->SetMetaInfo(IProductLicensingInfo::MIT_PRODUCT_PRODUCT_ID, productLicensingPtr->GetProductId());
-//	metaInfoPtr->SetMetaInfo(IProductLicensingInfo::MIT_PRODUCT_CATEGORY_ID, productLicensingPtr->GetCategoryId());
+	
+	metaInfoPtr->SetMetaInfo(IProductInfo::MIT_PRODUCT_NAME, productInfoPtr->GetName());
+	metaInfoPtr->SetMetaInfo(IProductInfo::MIT_PRODUCT_ID, productInfoPtr->GetProductId());
+	metaInfoPtr->SetMetaInfo(IProductInfo::MIT_PRODUCT_CATEGORY, productInfoPtr->GetCategoryId());
+	metaInfoPtr->SetMetaInfo(IProductInfo::MIT_PRODUCT_DESCRIPTION, productInfoPtr->GetProductDescription());
 
 	return true;
 }
+
+
+// public methods of embedded class MetaInfo
+
+QString CProductMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
+{
+	switch (metaInfoType){
+	case IProductInfo::MIT_PRODUCT_NAME:
+		return QObject::tr("Product Name");
+	case IProductInfo::MIT_PRODUCT_ID:
+		return QObject::tr("Product-ID");
+	case IProductInfo::MIT_PRODUCT_CATEGORY:
+		return QObject::tr("Category");
+	case IProductInfo::MIT_PRODUCT_DESCRIPTION:
+		return QObject::tr("Description");
+	}
+	
+	return BaseClass::GetMetaInfoName(metaInfoType);
+}
+
 
 
 } // namespace imtlic

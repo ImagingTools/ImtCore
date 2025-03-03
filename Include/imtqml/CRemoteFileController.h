@@ -24,6 +24,11 @@ class CRemoteFileController: public QObject
 	QString m_downloadedFilePath;
 
 public:
+	Q_INVOKABLE inline bool deleteFile(const QString& fileId){ return DeleteFile(fileId); }
+	Q_INVOKABLE inline bool getFile(const QString& fileId, const QString& fileName){ return GetFile(fileId, fileName); }
+	Q_INVOKABLE inline bool sendFile(const QString& fileId){ return SendFile(fileId); }
+	Q_INVOKABLE inline bool openFile(const QString& filePath = QString()){ return OpenFile(filePath); }
+	
 	explicit CRemoteFileController(QObject* parent = nullptr);
 	~CRemoteFileController();
 

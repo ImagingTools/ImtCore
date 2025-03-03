@@ -13,14 +13,14 @@ namespace imtlic
 
 
 /**
-	Meta-info creator for the product object.
+	Meta-info creator for the feature object.
 */
-class CProductMetaInfoCreatorComp: public imtbase::CObjectMetaInfoCreatorCompBase
+class CFeatureMetaInfoCreatorComp: public imtbase::CObjectMetaInfoCreatorCompBase
 {
 public:
 	typedef imtbase::CObjectMetaInfoCreatorCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CProductMetaInfoCreatorComp);
+	I_BEGIN_COMPONENT(CFeatureMetaInfoCreatorComp);
 	I_END_COMPONENT;
 
 protected:

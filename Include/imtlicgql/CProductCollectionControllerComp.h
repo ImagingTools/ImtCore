@@ -45,9 +45,6 @@ protected:
 				QString& errorMessage) const override;
 
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual void SetObjectFilter(const imtgql::CGqlRequest& gqlRequest,
-								 const imtbase::CTreeItemModel& objectFilterModel,
-								 iprm::CParamsSet& filterParams) const override;
 	virtual imtbase::CTreeItemModel* RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual QString GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const override;

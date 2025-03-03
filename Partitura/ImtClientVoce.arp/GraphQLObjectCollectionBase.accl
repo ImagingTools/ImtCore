@@ -4,12 +4,12 @@
         <VersionInfos>
             <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GqlObjectCollection" X="425" Y="325" Note=""/>
-        <Element ComponentName="ModelSubscriptionManager" X="825" Y="325" Note=""/>
+        <Element ComponentName="GqlObjectCollection" X="600" Y="400" Note=""/>
+        <Element ComponentName="ObjectCollectionSubscriptionManager" X="600" Y="150" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

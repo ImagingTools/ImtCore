@@ -20,6 +20,9 @@
 #include <imtlic/CFeatureInfoProviderComp.h>
 #include <imtlic/CProductInfoComp.h>
 #include <imtlic/CProductControllerComp.h>
+#include <imtlic/CFeatureMetaInfoCreatorComp.h>
+#include <imtlic/CLicenseMetaInfoCreatorComp.h>
+#include <imtlic/CProductMetaInfoCreatorComp.h>
 
 
 /**
@@ -95,6 +98,9 @@ typedef icomp::TModelCompWrap<
 						imtlic::IFeatureInfoProvider,
 						iser::ISerializable>> FeatureContainer;
 typedef imtlic::CProductControllerComp ProductController;
+typedef imtlic::CFeatureMetaInfoCreatorComp FeatureMetaInfoCreator;
+typedef imtlic::CLicenseMetaInfoCreatorComp LicenseMetaInfoCreator;
+typedef imtlic::CProductMetaInfoCreatorComp ProductMetaInfoCreator;
 
 
 } // namespace ImtLicensePck

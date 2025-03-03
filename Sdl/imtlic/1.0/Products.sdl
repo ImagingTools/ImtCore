@@ -41,9 +41,9 @@ type ProductsListPayload {
 }
 
 type ProductData {
-	Id: ID!
-	Name: String!
-	ProductName: String!
+	Id: ID
+	Name: String
+	ProductName: String
 	Description: String
 	ProductId: ID
 	CategoryId: ID
