@@ -38,6 +38,7 @@ Item {
 	property int calendarHeight: 350;
 
 	property Item tabKeyItem: null;
+	property Item calendarItem: null;
 
 	property alias inputItem: input;
 
@@ -355,6 +356,30 @@ Item {
 					iconSource: "../../../" + Style.getIconPath("Icons/Calendar", Icon.State.Off, Icon.Mode.Normal);
 					decorator: Component{IconButtonDecorator{}}
 					onClicked: {
+						let dateStr_ = "";
+						let dateOk = false;
+						let date_ = new Date();
+						if(input.text !==""){
+							let reg = /^\d{1,2}\.\d{1,2}\.\d{1,4}$/
+							if(input.text.match(reg) !== null){
+								dateStr_ = dateInput.correctDateFormat(input.text);
+								let day = dateStr_.slice(0, 2)
+								let month = dateStr_.slice(3,5)
+								let year = dateStr_.slice(6);
+
+								let monthOk = dateInput.checkMonth(month);
+								let dayOk = dateInput.checkDay(day, month, year);
+								if(monthOk && dayOk){
+									let dayInt = day[0] == "0" ? Number(day[1]) : Number(day);
+									let monthInt = month[0] == "0" ? Number(month[1]) -1 : Number(month)  - 1;
+									date_.setFullYear(Number(year));
+									date_.setMonth(monthInt);
+									date_.setDate(dayInt);
+									dateOk = true;
+								}
+							}
+						}
+
 						let point = input.mapToItem(null, 0, input.height + 2);
 						let y_ = point.y;
 						if(y_ + dateInput.calendarHeight > ModalDialogManager.activeView.height){
@@ -364,6 +389,10 @@ Item {
 
 
 						ModalDialogManager.openDialog(calendarComp, parameters);
+						dateInput.calendarItem = ModalDialogManager.topItem;
+						if(dateOk){
+							dateInput.calendarItem.setDate(date_)
+						}
 						dateInput.calendarButtonClicked();
 					}
 
@@ -399,6 +428,9 @@ Item {
 			centered: false;
 			onAccepted: {
 				dateInput.setDate(date);
+			}
+			Component.onDestruction: {
+				dateInput.calendarItem = null;
 			}
 		}
 	}
