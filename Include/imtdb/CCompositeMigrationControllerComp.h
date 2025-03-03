@@ -39,6 +39,10 @@ protected:
 	// reimplemented (imtdb::IMigrationController)
 	virtual istd::CIntRange GetMigrationRange() const override;
 	virtual bool DoMigration(int& resultRevision, const istd::CIntRange& subRange = istd::CIntRange()) const override;
+	
+private:
+	MigrationStep CreateMigrationStep(int from, int to, const imtdb::IMigrationController* migrationControllerPtr) const;
+	bool ContainsStep(const istd::CIntRange& range, const MigrationSteps steps) const;
 
 private:
 	I_MULTIREF(imtdb::IMigrationController, m_migrationControllersCompPtr);

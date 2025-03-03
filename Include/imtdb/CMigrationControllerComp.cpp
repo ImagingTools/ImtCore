@@ -29,8 +29,6 @@ bool CMigrationControllerComp::DoMigration(int& resultRevision, const istd::CInt
 		return false;
 	}
 
-	QString migrationFolder = m_migrationFolderPathCompPtr->GetPath();
-
 	int min = m_range.GetMinValue();
 	int max = m_range.GetMaxValue();
 
@@ -68,7 +66,7 @@ bool CMigrationControllerComp::DoMigration(int& resultRevision, const istd::CInt
 		m_databaseEngineCompPtr->ExecSqlQueryFromFile(migrationFilePath.toUtf8(), &sqlError);
 
 		if (sqlError.type() != QSqlError::NoError){
-			SendErrorMessage(0, QString("Unable to execute migration file '%1'. Error: '%2'").arg(migrationFilePath).arg(sqlError.text()), "CMigrationControllerComp");
+			SendErrorMessage(0, QString("Unable to execute migration file '%1'. Error: '%2'").arg(migrationFilePath, sqlError.text()), "CMigrationControllerComp");
 
 			return false;
 		}

@@ -25,66 +25,66 @@ bool CObjectCollectionMigrationControllerComp::DoMigration(int& resultRevision, 
 		return false;
 	}
 
-	// int min = m_range.GetMinValue();
 	int max = m_range.GetMaxValue();
 
-	if (subRange.IsValid() && !m_range.Contains(subRange)){
+	if (!subRange.IsValid()){
+		return false;
+	}
+	
+	if (!m_range.Contains(subRange)){
 		return false;
 	}
 
-	// int startIndex = min;
 	int endIndex = max;
 
 	if (subRange.IsValid()){
-		// startIndex = subRange.GetMinValue();
 		endIndex = subRange.GetMaxValue();
 	}
+	
+	QFile scriptFile(":/SQL/CreateCollectionTable.sql");
+	if (!scriptFile.open(QFile::ReadOnly)){
+		SendErrorMessage(0, QT_TR_NOOP(QString("Collection table creation script '%1'could not be loaded").arg(scriptFile.fileName())));
+		
+		return false;
+	}
+	
+	QByteArray createTableQuery = scriptFile.readAll();
+	scriptFile.close();
 
 	for (int index = 0; index < m_sqlDatabaseObjectDelegatesCompPtr.GetCount(); index++){
 		imtdb::ISqlDatabaseObjectDelegate *sqlDatabaseObjectDelegatePtr = m_sqlDatabaseObjectDelegatesCompPtr[index];
 		if (sqlDatabaseObjectDelegatePtr == nullptr){
 			continue;
 		}
+		
+		QByteArray query = createTableQuery;
 
-		QFile scriptFile(":/SQL/CreateCollectionTable.sql");
-		if (!scriptFile.open(QFile::ReadOnly)){
-			SendErrorMessage(0, QT_TR_NOOP(QString("Collection table creation script '%1'could not be loaded").arg(scriptFile.fileName())));
-
-			return false;
-		}
-
-		QByteArray createTableQuery = scriptFile.readAll();
-		createTableQuery.replace("${TableName}", sqlDatabaseObjectDelegatePtr->GetTableName());
+		query.replace("${TableName}", sqlDatabaseObjectDelegatePtr->GetTableName());
 
 		QSqlError sqlError;
-		m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
+		m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
 
-		if (!(sqlError.type() == QSqlError::ErrorType::NoError)){
+		if (sqlError.type() != QSqlError::NoError){
 			qCritical() << __FILE__ << __LINE__
 						<< "\n\t| Table could not be created"
 						<< "\n\t| Error: " << sqlError
-						<< "\n\t| Query: " << createTableQuery;
+						<< "\n\t| Query: " << query;
 
 			SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Table could not be created"
 												   "\n\t| Error: %1"
 												   "\n\t| Query: %2")
-											   .arg(sqlError.text())
-											   .arg(createTableQuery)));
-
+											   .arg(sqlError.text(), qPrintable(query))));
+			
+			return false;
 		}
-
 	}
-
-
 
 	resultRevision = endIndex;
 
 	SendInfoMessage(0, QString("Migration '%1' succesfully migrated").arg(resultRevision), "CObjectCollectionMigrationControllerComp");
 
-
 	return true;
 }
-
 
 
 } // namespace imtdb

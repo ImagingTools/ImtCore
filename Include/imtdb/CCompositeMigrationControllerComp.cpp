@@ -77,6 +77,9 @@ bool CCompositeMigrationControllerComp::DoMigration(int& resultRevision, const i
 			composedRange.GetMaxValue() >= inputRange.GetMaxValue())){
 		return false;
 	}
+	
+	int inputMinValue = inputRange.GetMinValue();
+	int inputMaxValue = inputRange.GetMaxValue();
 
 	MigrationSteps steps;
 
@@ -85,29 +88,30 @@ bool CCompositeMigrationControllerComp::DoMigration(int& resultRevision, const i
 		if (migrationControllerPtr != nullptr){
 			istd::CIntRange currentMigrationRange = migrationControllerPtr->GetMigrationRange();
 
-			int startRevision = inputRange.GetMinValue();
-			int stopRevision = inputRange.GetMaxValue();
-
-			while (startRevision <= stopRevision){
-				istd::CIntRange checkRange(startRevision, stopRevision);
-
-				if (currentMigrationRange.Contains(checkRange)){
-					MigrationStep step;
-					step.from = checkRange.GetMinValue();
-					step.to = checkRange.GetMaxValue();
-					step.migrationControllerPtr = migrationControllerPtr;
-
-					steps.push_back(step);
-
-					inputRange.SetMinValue(checkRange.GetMaxValue() + 1);
-
-					break;
+			int startRevision = inputMinValue;
+			while (startRevision <= inputMaxValue){
+				int stopRevision = inputMaxValue;
+				while (startRevision <= stopRevision){
+					istd::CIntRange checkRange(startRevision, stopRevision);
+					
+					if (currentMigrationRange.Contains(checkRange) && !ContainsStep(checkRange, steps)){
+						steps.push_back(CreateMigrationStep(checkRange.GetMinValue(), checkRange.GetMaxValue(), migrationControllerPtr));
+						inputRange.SetMinValue(checkRange.GetMaxValue() + 1);
+						
+						break;
+					}
+					
+					stopRevision--;
 				}
-
-				stopRevision--;
+				
+				startRevision++;
 			}
 		}
 	}
+	
+	std::sort(steps.begin(), steps.end(), [](const MigrationStep& a, const MigrationStep& b) {
+		return a.from < b.from;
+	});
 
 	int currentRevision = -1;
 	for (const MigrationStep& step : steps){
@@ -119,6 +123,35 @@ bool CCompositeMigrationControllerComp::DoMigration(int& resultRevision, const i
 	resultRevision = currentRevision;
 
 	return true;
+}
+
+
+// private methods
+
+CCompositeMigrationControllerComp::MigrationStep CCompositeMigrationControllerComp::CreateMigrationStep(
+	int from,
+	int to,
+	const imtdb::IMigrationController* migrationControllerPtr) const
+{
+	MigrationStep step;
+	step.from = from;
+	step.to = to;
+	step.migrationControllerPtr = migrationControllerPtr;
+	
+	return step;
+}
+
+
+bool CCompositeMigrationControllerComp::ContainsStep(const istd::CIntRange& range, const MigrationSteps steps) const
+{
+	for (const MigrationStep& step : steps){
+		istd::CIntRange migrationRange(step.from, step.to);
+		if (range.Contains(migrationRange)){
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 
