@@ -30,10 +30,7 @@ Item {
 			
 			let documentData = workspaceView.documentManager.getDocumentDataById(documentId);
 
-			let name = documentData.documentName;
-			if (name === ""){
-				name = workspaceView.documentManager.defaultDocumentName;
-			}
+			let name = workspaceView.documentManager.defaultDocumentName;
 
 			let tabIndex = tabView.getIndexById(documentId);
 			if (tabIndex < 0){
@@ -162,6 +159,10 @@ Item {
 					tabView.setTabIcon(m_objectId, m_icon);
 				}
 			}
+		}
+		
+		onFinished: {
+			// tabView.stopTabContentLoading();
 		}
 	}
 

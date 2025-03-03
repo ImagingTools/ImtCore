@@ -106,7 +106,7 @@ Rectangle {
 
 		clip: true;
 
-		Component{
+		Component {
 			id: headerDefaultComp;
 
 			Rectangle{
@@ -118,7 +118,7 @@ Rectangle {
 				color: loginContainer.color;
 				radius: loginContainer.radius;
 
-				Text{
+				Text {
 					id: welcomeText;
 
 					anchors.top: parent.top;

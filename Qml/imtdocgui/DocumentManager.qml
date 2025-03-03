@@ -642,8 +642,6 @@ QtObject {
 				target: singleDocumentData.documentDataController;
 
 				function onSaved(documentId){
-					singleDocumentData.documentId = documentId;
-
 					singleDocumentData.isDirty = false;
 
 					let documentModel = singleDocumentData.documentDataController.documentModel;
@@ -651,7 +649,7 @@ QtObject {
 						singleDocumentData.undoManager.setStandardModel(documentModel);
 					}
 
-					documentManager.onDocumentSaved(singleDocumentData.documentId);
+					documentManager.onDocumentSaved(documentId);
 				}
 
 				function onModelChanged(){

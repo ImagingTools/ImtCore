@@ -17,8 +17,6 @@ DocumentDataController {
 
 	property string subscriptionCommandId;
 
-	property bool ok: subscriptionCommandId != "" && documentId != "";
-
 	property var getRequestInputParam: Gql.GqlObject("input");
 	property var addRequestInputParam: Gql.GqlObject("input");
 	property var updateRequestInputParam: Gql.GqlObject("input");
@@ -26,63 +24,46 @@ DocumentDataController {
 	signal beforeSaveModel();
 	signal beforeInsertModel();
 
-	Component.onCompleted: {
-		let additionInputParams = container.getHeaders();
-		if (additionInputParams && Object.keys(additionInputParams).length > 0){
-			let additionParams = Gql.GqlObject("addition");
-			for (let key in additionInputParams){
-				additionParams.InsertField(key, additionInputParams[key]);
-			}
-			getRequestInputParam.InsertFieldObject(additionParams);
-			addRequestInputParam.InsertFieldObject(additionParams);
-			updateRequestInputParam.InsertFieldObject(additionParams);
-		}
-
-		setupObjectTypeId();
-	}
-
-	onDocumentModelChanged: {
-		updateRequestInputParam.InsertField ("Item", container.documentModel);
-		addRequestInputParam.InsertField ("Item", container.documentModel);
-	}
-
-	onDocumentIdChanged: {
-		getRequestInputParam.InsertField("Id", container.documentId);
-		addRequestInputParam.InsertField("Id", container.documentId);
-		updateRequestInputParam.InsertField("Id", container.documentId);
-	}
-
 	onSubscriptionCommandIdChanged: {
 		if (subscriptionCommandId !== ""){
 			subscriptionClient.gqlCommandId = subscriptionCommandId;
 		}
 	}
 
-	onTypeIdChanged: {
-		setupObjectTypeId();
-	}
-
-	function setupObjectTypeId(){
-		getRequestInputParam.InsertField("typeId", container.typeId);
-		addRequestInputParam.InsertField("typeId", container.typeId);
-		updateRequestInputParam.InsertField("typeId", container.typeId);
-	}
-
 	onError: {
 		ModalDialogManager.showWarningDialog(message)
 	}
-
-	onOkChanged: {
-		if (documentId !== ""){
-			container.subscriptionClient.register();
-		}
+	
+	function setupGetRequestInputData(){
+		getRequestInputParam.InsertField ("Id", getDocumentId());
+		getRequestInputParam.InsertField("typeId", getDocumentTypeId());
 	}
-
+	
+	function setupAddRequestInputData(){
+		addRequestInputParam.InsertField ("Id", getDocumentId());
+		addRequestInputParam.InsertField ("Item", getDocumentModel());
+		addRequestInputParam.InsertField("typeId", getDocumentTypeId());
+		addRequestInputParam.InsertField("name", getDocumentName());
+		addRequestInputParam.InsertField("description", getDocumentDescription());
+	}
+	
+	function setupUpdateRequestInputData(){
+		updateRequestInputParam.InsertField ("Id", getDocumentId());
+		updateRequestInputParam.InsertField ("Item", getDocumentModel());
+		updateRequestInputParam.InsertField("typeId", getDocumentTypeId());
+		updateRequestInputParam.InsertField("name", getDocumentName());
+		updateRequestInputParam.InsertField("description", getDocumentDescription());
+	}
+	
 	function updateDocumentModel(){
+		setupGetRequestInputData();
+		
 		gqlGetModel.getData();
 	}
 
 	function insertDocument(){
+		setupAddRequestInputData()
+		
 		beforeInsertModel();
 
 		if (documentModel && documentModel.m_id !== undefined && documentModel.m_id !== null){
@@ -93,6 +74,8 @@ DocumentDataController {
 	}
 
 	function saveDocument(){
+		setupUpdateRequestInputData()
+		
 		beforeSaveModel();
 
 		if (documentModel && documentModel.m_id !== undefined && documentModel.m_id !== null){

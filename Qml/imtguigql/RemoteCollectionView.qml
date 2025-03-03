@@ -219,15 +219,25 @@ CollectionView {
 			return;
 		}
 
-		if (dataModel.containsKey("token")){
-			let currentToken = AuthorizationController.getAccessToken();
-			let accessToken = dataModel.getData("token");
-			if (String(currentToken) == String(accessToken)){
-				root.doUpdateGui();
+		if (dataModel.containsKey("operationContext")){
+			let operationContextInfo = dataModel.getData("operationContext");
+			if (!operationContextInfo){
+				return;
 			}
-			else{
-				root.hasRemoteChanges = true;
+			
+			if (operationContextInfo.containsKey("ownerId")){
+				let ownerId = operationContextInfo.getData("ownerId");
+				let currentUserId = AuthorizationController.getLoggedUserId();
+				if (ownerId == currentUserId){
+					root.doUpdateGui();
+				}
+				else{
+					root.hasRemoteChanges = true;
+				}
 			}
+		}
+		else{
+			root.doUpdateGui();
 		}
 	}
 
@@ -239,6 +249,8 @@ CollectionView {
 		}
 
 		onMessageReceived: {
+			console.log("RemoteCollectionView.qml onMessageReceived", data.toJson());
+			
 			root.handleSubscription(data);
 		}
 	}

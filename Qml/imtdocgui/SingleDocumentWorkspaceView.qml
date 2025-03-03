@@ -39,11 +39,7 @@ Rectangle {
 			let documentData = root.documentManager.getDocumentDataById(documentId);
 			if (documentData){
 				stackView.push(documentData.viewComp);
-				let name = documentData.documentName;
-				if (name === ""){
-					name = root.documentManager.defaultDocumentName;
-				}
-
+				let name = root.documentManager.defaultDocumentName;
 				headersModel.addHeader(documentId, name);
 			}
 		}
@@ -111,6 +107,7 @@ Rectangle {
 		id: headersModel;
 
 		function addHeader(id, name){
+			console.log("addHeader", id, name);
 			headersModel.append({Id: id, Name: name})
 		}
 

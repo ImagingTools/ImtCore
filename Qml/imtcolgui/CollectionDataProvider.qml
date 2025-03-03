@@ -45,8 +45,7 @@ QtObject {
 	}
 
 	Component.onCompleted: {
-		filter.setSortingOrder(orderType);
-		filter.setSortingInfoId(sortByField);
+		filter.setSortingInfo(sortByField, orderType)
 	}
 
 	Component.onDestruction: {
@@ -60,11 +59,11 @@ QtObject {
 	}
 
 	onOrderTypeChanged: {
-		filter.setSortingOrder(orderType);
+		filter.setSortingInfo(sortByField, orderType)
 	}
 
 	onSortByFieldChanged: {
-		filter.setSortingInfoId(sortByField);
+		filter.setSortingInfo(sortByField, orderType)
 	}
 
 	function getData(objectId, value){
@@ -95,11 +94,11 @@ QtObject {
 			viewParams.InsertField("Offset", container.offset);
 			viewParams.InsertField("Count", container.count);
 
-			if (container.filter.filterModel.toGraphQL){
-				viewParams.InsertField("ComplexFilterModel", container.filter.filterModel);
+			if (container.filter.toGraphQL){
+				viewParams.InsertField("ComplexFilterModel", container.filter);
 			}
 			else{
-				viewParams.InsertField("FilterModel", container.filter.filterModel.toJson());
+				viewParams.InsertField("FilterModel", container.filter.toJson());
 			}
 
 			var inputParams = Gql.GqlObject("input");

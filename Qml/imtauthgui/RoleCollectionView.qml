@@ -9,128 +9,122 @@ import imtdocgui 1.0
 import imtauthRolesSdl 1.0
 
 RemoteCollectionView {
-    id: roleCollectionViewContainer;
-
-    collectionId: "Roles";
-    visibleMetaInfo: true;
-
-    additionalFieldIds: ["ProductId", "ParentRoles"]
-
-    commandsDelegateComp: Component {RoleCollectionViewCommandsDelegate {
-            collectionView: roleCollectionViewContainer;
+	id: roleCollectionViewContainer;
+	
+	collectionId: "Roles";
+	visibleMetaInfo: true;
+	
+	additionalFieldIds: ["ProductId", "ParentRoles"]
+	
+	commandsDelegateComp: Component {RoleCollectionViewCommandsDelegate {
+			collectionView: roleCollectionViewContainer;
 			documentManager: roleCollectionViewContainer.documentManager;
-
+			
 			documentViewsComp: [roleDocumentComp];
 			documentDataControllersComp: [dataControllerComp];
 			documentValidatorsComp: [];
-        }
-    }
-
-    property string productId;
-    property var documentManager: null;
-
-    function onLocalizationChanged(language){
-        roleCollectionViewContainer.dataController.updateHeaders();
-    }
-
-    function handleSubscription(dataModel){
-        roleCollectionViewContainer.doUpdateGui();
-    }
-
-	LocalizationEvent {
-		onLocalizationChanged: {
-			roleCollectionViewContainer.dataController.updateHeaders();
 		}
 	}
-
-    Component.onCompleted: {
-        if (roleCollectionViewContainer.documentManager){
-            documentManager.registerDocumentView("Role", "RoleEditor", roleDocumentComp);
-            documentManager.registerDocumentDataController("Role", dataControllerComp);
-        }
-    }
-
-    onProductIdChanged: {
-        permissionsProvider.productId = productId;
-        permissionsProvider.updateModel();
-    }
-
-    property TreeItemModel rolesModel;
-    property TreeItemModel permissionsModel;
-
-    PermissionsProvider {
-        id: permissionsProvider;
-        productId: roleCollectionViewContainer.productId;
-
-        onPermissionsModelChanged: {
-            if (permissionsProvider.permissionsModel != null){
-                roleCollectionViewContainer.permissionsModel = permissionsProvider.permissionsModel;
-            }
-        }
-
-        function getHeaders(){
-            return roleCollectionViewContainer.getHeaders()
-        }
-    }
-
-    Component {
-        id: roleDocumentComp;
-
-        RoleView {
-            id: roleEditor;
-
-            permissionsModel: roleCollectionViewContainer.permissionsModel;
-            rolesModel: roleCollectionViewContainer.rolesModel;
-            productId: roleCollectionViewContainer.productId;
-
-            commandsControllerComp: Component {CommandsPanelController {
-                    commandId: "Role";
-                    uuid: roleEditor.viewId;
-                    commandsView: roleEditor.commandsView;
-                }
-            }
-
-            function getHeaders(){
-                return roleCollectionViewContainer.getHeaders()
-            }
-        }
-    }
-    Component {
-        id: dataControllerComp;
-
-        GqlRequestDocumentDataController {
-            id: requestDocumentDataController
-
-			typeId: "Role";
-
-            gqlGetCommandId: ImtauthRolesSdlCommandIds.s_roleItem;
-            gqlUpdateCommandId: ImtauthRolesSdlCommandIds.s_roleUpdate;
-            gqlAddCommandId: ImtauthRolesSdlCommandIds.s_roleAdd;
-
-            Component.onCompleted: {
-                if (roleCollectionViewContainer.productId === ""){
-                    console.error("Unable to create an additional GraphQL input parameters. Product-ID is empty:", gqlGetCommandId);
-                    return null;
+	
+	property string productId;
+	property var documentManager: null;
+	
+	function handleSubscription(dataModel){
+		roleCollectionViewContainer.doUpdateGui();
+	}
+	
+	Component.onCompleted: {
+		if (roleCollectionViewContainer.documentManager){
+			documentManager.registerDocumentView("Role", "RoleEditor", roleDocumentComp);
+			documentManager.registerDocumentDataController("Role", dataControllerComp);
+		}
+	}
+	
+	onProductIdChanged: {
+		permissionsProvider.productId = productId;
+		permissionsProvider.updateModel();
+	}
+	
+	property TreeItemModel rolesModel;
+	property TreeItemModel permissionsModel;
+	
+	PermissionsProvider {
+		id: permissionsProvider;
+		productId: roleCollectionViewContainer.productId;
+		
+		onPermissionsModelChanged: {
+			if (permissionsProvider.permissionsModel != null){
+				roleCollectionViewContainer.permissionsModel = permissionsProvider.permissionsModel;
+			}
+		}
+		
+		function getHeaders(){
+			return roleCollectionViewContainer.getHeaders()
+		}
+	}
+	
+	Component {
+		id: roleDocumentComp;
+		
+		RoleView {
+			id: roleEditor;
+			
+			permissionsModel: roleCollectionViewContainer.permissionsModel;
+			rolesModel: roleCollectionViewContainer.rolesModel;
+			productId: roleCollectionViewContainer.productId;
+			
+			commandsControllerComp: Component {CommandsPanelController {
+					commandId: "Role";
+					uuid: roleEditor.viewId;
+					commandsView: roleEditor.commandsView;
 				}
-
-                getRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
-                addRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
-                updateRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
-            }
-
-            documentModelComp: Component {
-                RoleData {}
-            }
-
-            payloadModel: RoleDataPayload {
-                onFinished: {
-                    requestDocumentDataController.documentModel = m_roleData;
-                }
-            }
-
-            function getHeaders(){
-                return roleCollectionViewContainer.getHeaders()
-            }
-        }
-    }
+			}
+			
+			function getHeaders(){
+				return roleCollectionViewContainer.getHeaders()
+			}
+		}
+	}
+	Component {
+		id: dataControllerComp;
+		
+		GqlRequestDocumentDataController {
+			id: requestDocumentDataController
+			
+			property RoleData roleData: documentModel;
+			
+			typeId: "Role";
+			documentName: roleData ? roleData.m_name: "";
+			documentDescription: roleData ? roleData.m_description: "";
+			
+			gqlGetCommandId: ImtauthRolesSdlCommandIds.s_roleItem;
+			gqlUpdateCommandId: ImtauthRolesSdlCommandIds.s_roleUpdate;
+			gqlAddCommandId: ImtauthRolesSdlCommandIds.s_roleAdd;
+			
+			Component.onCompleted: {
+				if (roleCollectionViewContainer.productId === ""){
+					console.error("Unable to create an additional GraphQL input parameters. Product-ID is empty:", gqlGetCommandId);
+					return null;
+				}
+				
+				getRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
+				addRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
+				updateRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
+			}
+			
+			documentModelComp: Component {
+				RoleData {}
+			}
+			
+			payloadModel: RoleDataPayload {
+				onFinished: {
+					requestDocumentDataController.documentModel = m_roleData;
+				}
+			}
+			
+			function getHeaders(){
+				return roleCollectionViewContainer.getHeaders()
+			}
+		}
+	}
 }
