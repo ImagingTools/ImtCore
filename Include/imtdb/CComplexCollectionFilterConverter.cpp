@@ -26,9 +26,9 @@ QMap<imtbase::IComplexCollectionFilter::FieldOperation, QString> stringOperation
 	{imtbase::IComplexCollectionFilter::FO_CONTAINS, "ILIKE"}});
 
 QSet<int> boolTypes({ QMetaType::Bool });
-QSet<imtbase::IComplexCollectionFilter::FieldOperation> boolOperations({
-	imtbase::IComplexCollectionFilter::FO_EQUAL,
-	imtbase::IComplexCollectionFilter::FO_NOT_EQUAL});
+QMap<imtbase::IComplexCollectionFilter::FieldOperation, QString> boolOperations({
+	{imtbase::IComplexCollectionFilter::FO_EQUAL, "="},
+	{imtbase::IComplexCollectionFilter::FO_NOT_EQUAL, "!="}});
 
 
 QString CComplexCollectionFilterConverter::CreateSqlSortQuery(const imtbase::IComplexCollectionFilter& filter)
@@ -86,23 +86,27 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 
 	if (numericTypes.contains(filter.filterValue.type()) && numericOperations.contains(filter.filterOperation)){
 		QString filterValue;
+		QString type;
 
 		switch (filter.filterValue.type()){
 		case QMetaType::LongLong:
 			filterValue = QString::number(filter.filterValue.toLongLong(&isOk));
+			type = "int";
 			break;
 		case QMetaType::ULongLong:
 			filterValue = QString::number(filter.filterValue.toULongLong(&isOk));
+			type = "int";
 			break;
 		case QMetaType::Double:
 			filterValue = QString::number(filter.filterValue.toDouble(&isOk));
+			type = "decimal";
 			break;
 		default:
 			break;
 		}
 
 		if (isOk){
-			retVal = QString("\"%1\" %2 %3").arg(qPrintable(filter.fieldId)).arg(numericOperations[filter.filterOperation]).arg(filterValue);
+			retVal = QString("(\"%1\")::%2 %3 %4").arg(qPrintable(filter.fieldId)).arg(type).arg(numericOperations[filter.filterOperation]).arg(filterValue);
 		}
 	}
 	else if (stringTypes.contains(filter.filterValue.type()) && stringOperations.contains(filter.filterOperation)){
@@ -116,7 +120,7 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 	else if (boolTypes.contains(filter.filterValue.type()) && boolOperations.contains(filter.filterOperation)){
 		bool value = filter.filterValue.toBool();
 
-		retVal = QString("\"%1\" %2 %3").arg(qPrintable(filter.fieldId)).arg(filter.filterOperation).arg(value ? "true" : "false");
+		retVal = QString("(\"%1\")::bool %2 %3").arg(qPrintable(filter.fieldId)).arg(boolOperations[filter.filterOperation]).arg(value ? "true" : "false");
 	}
 
 	return retVal;
