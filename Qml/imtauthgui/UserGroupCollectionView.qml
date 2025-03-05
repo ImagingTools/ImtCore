@@ -36,7 +36,9 @@ RemoteCollectionView {
 	}
 	
 	Component.onCompleted: {
-		collectionFilter.setSortingInfo("Name", "ASC");
+		collectionFilter.setSortingInfoId("Name");
+		collectionFilter.setSortingOrder("ASC");
+		// collectionFilter.setSortingInfo("Name", "ASC");
 		
 		if (documentManager){
 			documentManager.registerDocumentView("Group", "GroupEditor", userGroupDocumentComp);

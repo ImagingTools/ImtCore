@@ -19,10 +19,11 @@
 		<file alias="imtcolgui/CollectionCommandsController.qml">CollectionCommandsController.qml</file>
 		<file alias="imtcolgui/CollectionViewDelegate.qml">CollectionViewDelegate.qml</file>
 		<file alias="imtcolgui/SchemeView.qml">SchemeView.qml</file>
-        	<file alias="imtcolgui/MetaInfo.qml">MetaInfo.qml</file>
-        	<file alias="imtcolgui/MessageCollectionFilterDecorator.qml">MessageCollectionFilterDecorator.qml</file>
-        	<file alias="imtcolgui/MessageCollectionFilter.qml">MessageCollectionFilter.qml</file>
-        	<file alias="imtcolgui/MessageFilterItem.qml">MessageFilterItem.qml</file>
+		<file alias="imtcolgui/MetaInfo.qml">MetaInfo.qml</file>
+		<file alias="imtcolgui/MessageCollectionFilterDecorator.qml">MessageCollectionFilterDecorator.qml</file>
+		<file alias="imtcolgui/MessageCollectionFilter.qml">MessageCollectionFilter.qml</file>
+		<file alias="imtcolgui/MessageFilterItem.qml">MessageFilterItem.qml</file>
 		<file alias="imtcolgui/MessageCollectionView.qml">MessageCollectionView.qml</file>
+		<file alias="imtcolgui/JsonCollectionFilter.qml">JsonCollectionFilter.qml</file>
     </qresource>
 </RCC>

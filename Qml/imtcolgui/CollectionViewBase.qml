@@ -23,7 +23,7 @@ ViewBase {
 	property alias pagination: pagination_;
 	property alias elementsCount: tableInternal.elementsCount;
 	
-	property CollectionFilter collectionFilter: CollectionFilter {}
+	property JsonCollectionFilter collectionFilter: JsonCollectionFilter {}
 	
 	signal selectedIndexChanged(int index);
 	signal tableViewParamsAccepted();
@@ -46,9 +46,12 @@ ViewBase {
 		target: collectionViewBaseContainer.collectionFilter;
 		
 		function onFilterChanged(){
-			console.log("onFilterChanged")
+			// console.log("onFilterChanged")
 			
-			collectionViewBaseContainer.doUpdateGui();
+			// collectionViewBaseContainer.doUpdateGui();
+
+			tableInternal.currentHeaderId = collectionViewBaseContainer.collectionFilter.getSortingInfoId();
+			tableInternal.currentSortOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
 			
 			// let sortingInfo = collectionViewBaseContainer.collectionFilter.getSortingInfo();
 			// if (sortingInfo){
@@ -70,25 +73,25 @@ ViewBase {
 		anchors.right: parent.right;
 		anchors.rightMargin: Style.margin;
 		
-		complexFilter: collectionViewBaseContainer.collectionFilter;
+		// complexFilter: collectionViewBaseContainer.collectionFilter;
 		
 		onClose: {
 			filterMenu_.visible = false;
 		}
 		
 		onFilterChanged: {
-			// if (filterId == "TextFilter"){
-			// 	collectionViewBaseContainer.collectionFilter.setTextFilter(filterValue);
-			// 	collectionViewBaseContainer.doUpdateGui();
-			// }
-			// else if (filterId == "TimeFilter"){
-			// 	collectionViewBaseContainer.collectionFilter.m_timeFilter.
-			// 	collectionViewBaseContainer.collectionFilter.setTimeFilter(filterValue);
-			// 	collectionViewBaseContainer.doUpdateGui();
-			// }
-			// else{
-			// 	collectionViewBaseContainer.filterChanged(filterId, filterValue);
-			// }
+			if (filterId == "TextFilter"){
+				collectionViewBaseContainer.collectionFilter.setTextFilter(filterValue);
+				collectionViewBaseContainer.doUpdateGui();
+			}
+			else if (filterId == "TimeFilter"){
+				collectionViewBaseContainer.collectionFilter.m_timeFilter.
+				collectionViewBaseContainer.collectionFilter.setTimeFilter(filterValue);
+				collectionViewBaseContainer.doUpdateGui();
+			}
+			else{
+				collectionViewBaseContainer.filterChanged(filterId, filterValue);
+			}
 		}
 	}
 	
@@ -236,21 +239,23 @@ ViewBase {
 			}
 			
 			onCurrentHeaderIdChanged: {
-				if (collectionViewBaseContainer.collectionFilter){
-					collectionViewBaseContainer.collectionFilter.setSortingInfo(currentHeaderId, currentSortOrder);
-					collectionViewBaseContainer.collectionFilter.filterChanged();
-				}
+				collectionViewBaseContainer.collectionFilter.setSortingInfoId(currentHeaderId);
+				// if (collectionViewBaseContainer.collectionFilter){
+				// 	collectionViewBaseContainer.collectionFilter.setSortingInfo(currentHeaderId, currentSortOrder);
+				// 	collectionViewBaseContainer.collectionFilter.filterChanged();
+				// }
 			}
 			
 			onCurrentSortOrderChanged: {
-				if (collectionViewBaseContainer.collectionFilter){
-					collectionViewBaseContainer.collectionFilter.setSortingInfo(currentHeaderId, currentSortOrder);
-					collectionViewBaseContainer.collectionFilter.filterChanged();
-				}
+				collectionViewBaseContainer.collectionFilter.setSortingOrder(currentSortOrder);
+				// if (collectionViewBaseContainer.collectionFilter){
+				// 	collectionViewBaseContainer.collectionFilter.setSortingInfo(currentHeaderId, currentSortOrder);
+				// 	collectionViewBaseContainer.collectionFilter.filterChanged();
+				// }
 			}
 			
 			onHeaderClicked: {
-				// collectionViewBaseContainer.doUpdateGui();
+				collectionViewBaseContainer.doUpdateGui();
 			}
 		}
 		

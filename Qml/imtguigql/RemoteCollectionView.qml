@@ -219,25 +219,35 @@ CollectionView {
 			return;
 		}
 
-		if (dataModel.containsKey("operationContext")){
-			let operationContextInfo = dataModel.getData("operationContext");
-			if (!operationContextInfo){
-				return;
+		// if (dataModel.containsKey("operationContext")){
+		// 	let operationContextInfo = dataModel.getData("operationContext");
+		// 	if (!operationContextInfo){
+		// 		return;
+		// 	}
+
+		// 	if (operationContextInfo.containsKey("ownerId")){
+		// 		let ownerId = operationContextInfo.getData("ownerId");
+		// 		let currentUserId = AuthorizationController.getLoggedUserId();
+		// 		if (ownerId == currentUserId){
+		// 			root.doUpdateGui();
+		// 		}
+		// 		else{
+		// 			root.hasRemoteChanges = true;
+		// 		}
+		// 	}
+		// }
+		// else{
+		// 	root.doUpdateGui();
+		// }
+		if (dataModel.containsKey("token")){
+			let currentToken = AuthorizationController.getAccessToken();
+			let accessToken = dataModel.getData("token");
+			if (String(currentToken) == String(accessToken)){
+				root.doUpdateGui();
 			}
-			
-			if (operationContextInfo.containsKey("ownerId")){
-				let ownerId = operationContextInfo.getData("ownerId");
-				let currentUserId = AuthorizationController.getLoggedUserId();
-				if (ownerId == currentUserId){
-					root.doUpdateGui();
-				}
-				else{
-					root.hasRemoteChanges = true;
-				}
+			else{
+				root.hasRemoteChanges = true;
 			}
-		}
-		else{
-			root.doUpdateGui();
 		}
 	}
 

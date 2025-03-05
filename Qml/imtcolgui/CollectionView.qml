@@ -103,7 +103,7 @@ Item {
 	function onFilterChanged(filterId, filterValue){
 		container.collectionFilter.setTextFilter(filterValue);
 		
-		// container.doUpdateGui();
+		container.doUpdateGui();
 	}
 	
 	Connections {
@@ -202,19 +202,27 @@ Item {
 				}
 			}
 			
+			// function onFilterableHeadersModelChanged(){
+			// 	if (!container.dataController){
+			// 		return;
+			// 	}
+
+			// 	let filteringIds = []
+			// 	let filteringModel = container.dataController.filterableHeadersModel;
+			// 	for (let i = 0; i < filteringModel.getItemsCount(); i++){
+			// 		let infoId = filteringModel.getData("Id", i);
+			// 		filteringIds.push(infoId)
+			// 	}
+
+			// 	container.collectionFilter.setFilteringInfoIds(filteringIds);
+			// }
+
 			function onFilterableHeadersModelChanged(){
 				if (!container.dataController){
 					return;
 				}
-				
-				let filteringIds = []
-				let filteringModel = container.dataController.filterableHeadersModel;
-				for (let i = 0; i < filteringModel.getItemsCount(); i++){
-					let infoId = filteringModel.getData("Id", i);
-					filteringIds.push(infoId)
-				}
-				
-				container.collectionFilter.setFilteringInfoIds(filteringIds);
+
+				container.collectionFilter.setFilteringInfoIds(container.dataController.filterableHeadersModel);
 			}
 		}
 		
@@ -301,7 +309,8 @@ Item {
 			}
 			
 			if (container.dataController){
-				container.dataController.updateElements(count, offset, container.collectionFilter);
+				// container.dataController.updateElements(count, offset, container.collectionFilter);
+				container.dataController.updateElements(count, offset, container.collectionFilter.filterModel);
 			}
 			
 			container.table.resetSelection();

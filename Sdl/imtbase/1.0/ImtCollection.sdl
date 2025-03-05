@@ -32,14 +32,6 @@ type RemovedNotificationPayload {
 	Id: ID!
 }
 
-type CollectionFilter {
-	ObjectTypeId: ID
-	Filter: String
-	SortingOrder: String
-	SortingInfoIds: [String!]
-	FilteringInfoIds: [String!]
-}
-
 type CollectionMetaInfo {
 	Id: ID!
 	name: String
