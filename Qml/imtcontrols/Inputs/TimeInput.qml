@@ -15,8 +15,8 @@ Item {
 	property alias radius: input.radius;
 	property alias color: input.color;
 
-	property int timeInputDialogWidth: 140;
-	property int timeInputDialogHeight: 120;
+	property int timeInputDialogWidth: 100;
+	property int timeInputDialogHeight: 90;
 
 	property string placeHolderText: "hh:mm";
 
@@ -35,6 +35,7 @@ Item {
 	property string selectedTime: "00:00";
 
 	signal timeChanged(string value);
+	signal dialogClosed();
 
 	Component.onCompleted:{
 		if(canShowCurrentTime && selectedTime == "00:00"){
@@ -261,6 +262,11 @@ Item {
 					timeInput.setTime(time)
 				}
 			}
+			Component.onDestruction:{
+				timeInput.dialogClosed();
+			}
 		}
 	}
+
+
 }

@@ -23,8 +23,8 @@ Row{
 
 	property int calendarWidth: 350;
 	property int calendarHeight: 350;
-	property int timeInputDialogWidth: 140;
-	property int timeInputDialogHeight: 120;
+	property int timeInputDialogWidth: 100;
+	property int timeInputDialogHeight: 90;
 	property int fontSize: Style.fontSize_common;
 
 	property alias dateInputWidth: dateInput.width;
@@ -198,6 +198,9 @@ Row{
 
 				signalPause.restart();
 			}
+		}
+		onDialogClosed: {
+			forFocus.forceActiveFocus();
 		}
 	}
 

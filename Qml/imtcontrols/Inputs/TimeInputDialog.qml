@@ -10,8 +10,8 @@ import imtgui 1.0
 PopupView {
 	id: timeInputDialog;
 
-	width: 140;
-	height: 120;
+	width: 100;
+	height: 90;
 
 	property int radius: 8;
 	property string color: Style.baseColor;
@@ -97,13 +97,17 @@ PopupView {
 		color: parent.color;
 		border.color: Style.borderColor;
 
+		property int buttonWidth: 20;
+		property int buttonHeight: 16;
+		property int fontSize: Style.fontSize_XSmall;
+
 		Item{
 			id: hoursColumn;
 
 			anchors.left: parent.left;
 			anchors.leftMargin: Style.size_mainMargin;
 
-			width: 30;
+			width: body.buttonWidth;
 			height: parent.height;
 
 			Button{
@@ -113,8 +117,8 @@ PopupView {
 				anchors.top: parent.top;
 				anchors.topMargin: Style.size_smallMargin;
 
-				width: 30;
-				height: 25;
+				width: body.buttonWidth;
+				height: body.buttonHeight;
 
 				iconSource: "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Selected);
 				decorator: Component{IconButtonDecorator{}}
@@ -140,7 +144,7 @@ PopupView {
 					anchors.centerIn: parent;
 
 					font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSize_Normal
+					font.pixelSize: body.fontSize;
 					color: Style.textColor;
 
 					text: timeInputDialog.hoursStr;
@@ -167,8 +171,8 @@ PopupView {
 				anchors.bottom: parent.bottom;
 				anchors.bottomMargin: Style.size_smallMargin;
 
-				width: 30;
-				height: 25;
+				width: body.buttonWidth;
+				height: body.buttonHeight;
 
 				iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Selected);
 				decorator: Component{IconButtonDecorator{}}
@@ -191,7 +195,7 @@ PopupView {
 			anchors.verticalCenter: parent.verticalCenter;
 			anchors.rightMargin: Style.size_mainMargin;
 
-			width: 30;
+			width: body.buttonWidth;
 			height: parent.height
 
 
@@ -202,8 +206,8 @@ PopupView {
 				anchors.top: parent.top;
 				anchors.topMargin: Style.size_smallMargin;
 
-				width: 30;
-				height: 25;
+				width: body.buttonWidth;
+				height: body.buttonHeight;
 
 				iconSource: "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Selected);
 				decorator: Component{IconButtonDecorator{}}
@@ -228,7 +232,7 @@ PopupView {
 					anchors.centerIn: parent;
 
 					font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSize_Normal
+					font.pixelSize: body.fontSize;
 					color: Style.textColor;
 
 					text: timeInputDialog.minutesStr;
@@ -254,8 +258,8 @@ PopupView {
 				anchors.bottom: parent.bottom;
 				anchors.bottomMargin: Style.size_smallMargin;
 
-				width: 30;
-				height: 25;
+				width: body.buttonWidth;
+				height: body.buttonHeight;
 
 				iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Selected);
 				decorator: Component{IconButtonDecorator{}}
@@ -274,7 +278,7 @@ PopupView {
 			anchors.centerIn:  parent;
 
 			font.family: Style.fontFamily;
-			font.pixelSize: Style.fontSize_Normal
+			font.pixelSize: body.fontSize;
 			color: Style.textColor;
 
 			text: ":"
@@ -332,6 +336,14 @@ PopupView {
 			if(canRepeat){
 				start();
 			}
+		}
+	}
+
+	Shortcut {
+		sequence: "Escape";
+		enabled: true;
+		onActivated: {
+			ModalDialogManager.closeDialog();
 		}
 	}
 }
