@@ -3,72 +3,82 @@ import Acf 1.0;
 import imtcontrols 1.0
 
 ControlBase {
-    id: checkBox;
+	id: checkBox;
 
-    decorator: Style.checkBoxDecorator
+	decorator: Style.checkBoxDecorator
 
-    property string text: "";
+	property string text: "";
 
-    property alias tooltipText: tooltip.text;
-    property alias tooltipItem: tooltip;
+	property alias tooltipText: tooltip.text;
+	property alias tooltipItem: tooltip;
 
-    property string borderColor: "";
-    property int radius: 0;
-    property bool isActive: true;
+	property string borderColor: "";
+	property int radius: 0;
+	property bool isActive: true;
 
-    property int checkState: Qt.Unchecked;
+	property int checkState: Qt.Unchecked;
 
-    property string checkIndicator: "image";
+	property string checkIndicator: "image";
 
-    property string imageSourceActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
-    property string imageSourceNotActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.Off, Icon.Mode.Disabled);
+	property string imageSourceActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
+	property string imageSourceNotActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.Off, Icon.Mode.Disabled);
 
-    property int fontPixelSize: Style.fontSize_common;
-    property bool fontBold: false;
-    property bool isLeftText: false;
+	property int fontPixelSize: Style.fontSize_common;
+	property bool fontBold: false;
+	property bool isLeftText: false;
 
-    property int mainMargin: 8;
+	property int mainMargin: 8;
 
-    signal clicked();
+	signal clicked();
 
-    MouseArea {
-        id: ma;
+	function clickReaction(){
+		if(checkState == Qt.Unchecked){
+			checkState = Qt.Checked;
+		}
+		else if(checkState == Qt.Checked){
+			checkState = Qt.Unchecked;
+		}
+	}
 
-        anchors.fill: parent;
-        hoverEnabled: true;
+	MouseArea {
+		id: ma;
 
-        cursorShape: Qt.PointingHandCursor;
+		anchors.fill: parent;
+		hoverEnabled: true;
 
-        visible: checkBox.isActive;
+		cursorShape: Qt.PointingHandCursor;
 
-        onClicked: {
-            checkBox.clicked();
-        }
+		visible: checkBox.isActive;
 
-        onPressed: {
-            if(tooltip.text !== ""){
-                tooltip.closeTooltip();
-            }
-        }
+		onClicked: {
+			checkBox.clicked();
+			//checkBox.clickReaction();
+		}
 
-        onPositionChanged: {
-            if(tooltip.text !== ""){
-                tooltip.show(mouseX, mouseY);
-            }
-        }
+		onPressed: {
+			if(tooltip.text !== ""){
+				tooltip.closeTooltip();
+			}
+		}
 
-        onExited: {
-            if(tooltip.text !== ""){
-                tooltip.hide();
-            }
-        }
-    }
+		onPositionChanged: {
+			if(tooltip.text !== ""){
+				tooltip.show(mouseX, mouseY);
+			}
+		}
 
-    CustomTooltip{
-        id: tooltip;
+		onExited: {
+			if(tooltip.text !== ""){
+				tooltip.hide();
+			}
+		}
+	}
 
-        fitToTextWidth: true;
-    }
+	CustomTooltip{
+		id: tooltip;
+
+		fitToTextWidth: true;
+	}
 
 
 }

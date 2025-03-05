@@ -3,111 +3,121 @@ import Acf 1.0
 import imtcontrols 1.0
 
 ControlBase {
-    id: baseButton;
+	id: baseButton;
 
-    decorator: Style.buttonDecorator
+	decorator: Style.buttonDecorator
 
-    property string text: ""
-    property string iconSource: ""
+	property string text: ""
+	property string iconSource: ""
 	property string tooltipText: "";
 	property color textColor: Style.textColor;
 
-    property bool down: false
-    property bool hoverEnabled: true
-    property bool hovered: enabled && hoverEnabled ? ma.containsMouse : false;
-    property bool checkable: false;
-    property bool checked: false;
-    property bool enabled: true;
+	property bool down: false
+	property bool hoverEnabled: true
+	property bool hovered: enabled && hoverEnabled ? ma.containsMouse : false;
+	property bool checkable: false;
+	property bool checked: false;
+	property bool enabled: true;
 
-    property int focusPolicy: Qt.WheelFocus;
-    property int focusReason: -1;
+	property int focusPolicy: Qt.WheelFocus;
+	property int focusReason: -1;
 
-    property alias mouseArea: ma;
+	property alias mouseArea: ma;
+	property IconProperties icon: buttonIcon;
+	property FontProperties font: buttonFont;
 
-    signal clicked();
-    signal doubleClicked();
-    signal pressed();
-    signal released();
-    signal entered(real mouseX, real mouseY);
-    signal exited(real mouseX, real mouseY);
-    signal positionChanged(real mouseX, real mouseY);
-    signal toggled();
-    signal closeTooltip();
+	signal clicked();
+	signal doubleClicked();
+	signal pressed();
+	signal released();
+	signal entered(real mouseX, real mouseY);
+	signal exited(real mouseX, real mouseY);
+	signal positionChanged(real mouseX, real mouseY);
+	signal toggled();
+	signal closeTooltip();
 
-    QtObject {
-        id: _private
-        function onClicked(){
-            // baseButton.focus = true;
-            // baseButton.forceActiveFocus();
-            if (baseButton.checkable){
-                baseButton.checked = !baseButton.checked
-                baseButton.toggled()
-            }
-            baseButton.closeTooltip();
-            baseButton.clicked();
-        }
-    }
+	QtObject {
+		id: _private
+		function onClicked(){
+			// baseButton.focus = true;
+			// baseButton.forceActiveFocus();
+			if (baseButton.checkable){
+				baseButton.checked = !baseButton.checked
+				baseButton.toggled()
+			}
+			baseButton.closeTooltip();
+			baseButton.clicked();
+		}
+	}
 
-    onDecoratorChanged: {
-        if(focus){
-            forceActiveFocus()
-        }
-    }
+	IconProperties{
+		id: buttonIcon;
+	}
 
-    Keys.onPressed: {
-        if (event.key === Qt.Key_Return || event.key === Qt.Key_Space){
-            event.accepted = true;
-            _private.onClicked()
-        }
-    }
+	FontProperties{
+		id: buttonFont;
+	}
 
-    MouseArea{
-        id: ma;
+	onDecoratorChanged: {
+		if(focus){
+			forceActiveFocus()
+		}
+	}
 
-        anchors.fill: parent;
+	Keys.onPressed: {
+		if (event.key === Qt.Key_Return || event.key === Qt.Key_Space){
+			event.accepted = true;
+			_private.onClicked()
+		}
+	}
 
-        z: 10;
+	MouseArea{
+		id: ma;
 
-        enabled: baseButton.enabled;
-        hoverEnabled: enabled;
-        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+		anchors.fill: parent;
 
-        onClicked: {
-            if (baseButton.enabled){
-                _private.onClicked()
-            }
-        }
+		z: 10;
 
-        onDoubleClicked: {
-            baseButton.doubleClicked();
-        }
+		enabled: baseButton.enabled;
+		hoverEnabled: enabled;
+		cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
-        onPressed: {
-            baseButton.down = true
-            baseButton.pressed();
-        }
+		onClicked: {
+			if (baseButton.enabled){
+				_private.onClicked()
+			}
+		}
 
-        onReleased: {
-            baseButton.down = false
-            baseButton.released();
-        }
+		onDoubleClicked: {
+			baseButton.doubleClicked();
+		}
 
-        onEntered: {
-            if (baseButton){
-                baseButton.entered(mouseX, mouseY);
-            }
-        }
+		onPressed: {
+			baseButton.down = true
+			baseButton.pressed();
+		}
 
-        onExited: {
-            if (baseButton){
-                baseButton.exited(mouseX, mouseY);
-            }
-        }
+		onReleased: {
+			baseButton.down = false
+			baseButton.released();
+		}
 
-        onPositionChanged: {
-            if (baseButton){
-                baseButton.positionChanged(mouse.x, mouse.y);
-            }
-        }
-    }
+		onEntered: {
+			if (baseButton){
+				baseButton.entered(mouseX, mouseY);
+			}
+		}
+
+		onExited: {
+			if (baseButton){
+				baseButton.exited(mouseX, mouseY);
+			}
+		}
+
+		onPositionChanged: {
+			if (baseButton){
+				baseButton.positionChanged(mouse.x, mouse.y);
+			}
+		}
+	}
 }

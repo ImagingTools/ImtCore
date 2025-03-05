@@ -20,8 +20,8 @@ DecoratorBase {
 	property int widthDefault: 0;
 	property alias icon: iconObj
 	property alias font: textObj.font
-	property string fontFamily: Style.fontFamily
-	property int fontSize:  Style.fontSize_common
+	property string fontFamily: (baseElement && baseElement.font) ? baseElement.font.fontFamily : Style.fontFamily
+	property int fontSize:  (baseElement && baseElement.font) ? baseElement.font.pixelSize : Style.fontSize_common
 	property alias textColor: textObj.color
 	property alias color: background.color
 	property alias radius: background.radius
@@ -121,12 +121,20 @@ DecoratorBase {
 			anchors.verticalCenter: content.verticalCenter;
 			anchors.left: parent.left;
 
-			width: !visible ? 0 : Style.iconSizeSmall
-			height: width
+			width: (!visible || !commonButtonDecorator.baseElement) ? 0 :
+																	  (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.width !== 0) ?
+																	  commonButtonDecorator.baseElement.icon.width : Style.iconSizeSmall
+
+			height: !commonButtonDecorator.baseElement ? 0 :
+														 (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.height !== 0) ?
+														 commonButtonDecorator.baseElement.icon.height : width
 
 			sourceSize.width: width
 			sourceSize.height: height
-			source: commonButtonDecorator.baseElement &&  commonButtonDecorator.baseElement.iconSource ? commonButtonDecorator.baseElement.iconSource: "";
+			source: !commonButtonDecorator.baseElement ? "" :
+														(commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.source !== "") ?
+															 commonButtonDecorator.baseElement.icon.source :
+															 commonButtonDecorator.baseElement.iconSource ? commonButtonDecorator.baseElement.iconSource: "";
 			visible: source != "" && source != undefined;
 		}
 
@@ -152,7 +160,7 @@ DecoratorBase {
 
 				width: parent.width;
 
-				color: !commonButtonDecorator.baseElement ? "transparent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
+				color: !commonButtonDecorator.baseElement ? "transparent" : (commonButtonDecorator.baseElement.font && commonButtonDecorator.baseElement.font.color !== "") ? commonButtonDecorator.baseElement.font.color : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
 
 				font.pixelSize: commonButtonDecorator.fontSize;
 				font.family: commonButtonDecorator.fontFamily;

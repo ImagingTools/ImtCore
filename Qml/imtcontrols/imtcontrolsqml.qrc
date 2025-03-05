@@ -14,6 +14,8 @@
 		<file alias="imtcontrols/Base/Functions.qml">Base/Functions.qml</file>
         <file alias="imtcontrols/Base/ButtonType.js">Base/ButtonType.js</file>
         <file alias="imtcontrols/Base/IconTest.qml">Base/IconTest.qml</file>
+		<file alias="imtcontrols/Base/IconProperties.qml">Base/IconProperties.qml</file>
+		<file alias="imtcontrols/Base/FontProperties.qml">Base/FontProperties.qml</file>
         <file alias="imtcontrols/Base/Icon.js">Base/Icon.js</file>
         <file alias="imtcontrols/Base/jsonpath.js">Base/jsonpath.js</file>
         <file alias="MainWindow.qml">Base/MainWindow.qml</file>
