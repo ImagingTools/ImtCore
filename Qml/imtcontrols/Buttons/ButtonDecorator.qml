@@ -20,7 +20,7 @@ DecoratorBase {
 	property int widthDefault: 0;
 	property alias icon: iconObj
 	property alias font: textObj.font
-	property string fontFamily: (baseElement && baseElement.font) ? baseElement.font.fontFamily : Style.fontFamily
+	property string fontFamily: (baseElement && baseElement.font && baseElement.fontFamily) ? baseElement.font.fontFamily : Style.fontFamily
 	property int fontSize:  (baseElement && baseElement.font) ? baseElement.font.pixelSize : Style.fontSize_common
 	property alias textColor: textObj.color
 	property alias color: background.color
