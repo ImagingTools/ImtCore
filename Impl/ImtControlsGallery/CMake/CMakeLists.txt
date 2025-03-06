@@ -14,7 +14,7 @@ if(WIN32)
 	set(CMAKE_WIN32_EXECUTABLE "on")
 	# set(ACF_CONVERT_FILES "${PROJECT_SOURCE_DIR}/../VC/ImtControlsGallery.rc.xtracf")
 	# set(ACF_CONVERT_REGISTRY "${PROJECT_SOURCE_DIR}/../VC/FileSubstitCopyApp.acc")
-	# set(ACF_CONVERT_CONFIG  "${PROJECT_SOURCE_DIR}/../../../Config/BaseOnly.awc")
+	# set(ACF_CONVERT_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/BaseOnly.awc")
 	# set(RC_FILE "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/ImtControlsGallery.rc")
 endif()
 
@@ -31,7 +31,7 @@ include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
+if(DEFINED WEB_COMPILE AND WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
 endif()
 
@@ -39,8 +39,8 @@ target_link_libraries(${PROJECT_NAME} iauth)
 target_link_libraries(${PROJECT_NAME} imtbase imtzip imtrest imtcrypt imtstyle imtqml imtdb imtfile imtguigqlqml imtauthguiqml imtguiqml imtcolguiqml imtauthsdl imtappsdl imtbasesdl)
 target_link_libraries(${PROJECT_NAME} imtlicgql imtguigql imtgql imtclientgql imtauthgui imtauthgql imtauthdb imtapp imtstylecontrolsqml imtcontrolsqml imtdocguiqml imtgui imtservergql)
 target_link_libraries(${PROJECT_NAME} iqtgui)
-target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::Quick  Qt${QT_VERSION_MAJOR}::WebSockets)
-target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::QuickControls2)
+target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::WebSockets)
+target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::QuickControls2)
 
 set(buildwebdir ${CMAKE_CURRENT_LIST_DIR}/../../../Bin/web)
 
@@ -52,7 +52,7 @@ list(APPEND webdirs ${buildwebdir}/Resources)
 
 getImtCoreQmlWebDirs(webdirs "${buildwebdir}")
 
-if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
+if(DEFINED WEB_COMPILE AND WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
 	set(resname "controlsgallery")
 	set(inputjs "${IMTCOREDIR}/Qml/web/imtcore.json")
@@ -62,7 +62,7 @@ endif()
 
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
-	set(files  \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
+	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
 
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
 	unset(listOptions)

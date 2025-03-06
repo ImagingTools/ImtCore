@@ -20,7 +20,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 if (NOT DEFINED IMTCOREDIR)
-    set(IMTCOREDIR "$ENV{IMTCOREDIR}")
+	set(IMTCOREDIR "$ENV{IMTCOREDIR}")
 endif ()
 
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
@@ -209,8 +209,8 @@ if(NOT ANDROID)
 	add_subdirectory("${IMPL_DIR}/ImtAppPck/CMake" "${AUX_INCLUDE_DIR}/ImtAppPck")
 	add_dependencies(ImtAppPck imtapp)
 
-        add_subdirectory("${IMPL_DIR}/ImtMailPck/CMake" "${AUX_INCLUDE_DIR}/ImtMailPck")
-        add_dependencies(ImtMailPck imtmail)
+		add_subdirectory("${IMPL_DIR}/ImtMailPck/CMake" "${AUX_INCLUDE_DIR}/ImtMailPck")
+		add_dependencies(ImtMailPck imtmail)
 
 	add_subdirectory("${IMPL_DIR}/ImtDevPck/CMake" "${AUX_INCLUDE_DIR}/ImtDevPck")
 	add_dependencies(ImtDevPck imtdev)
@@ -373,7 +373,7 @@ if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
 
 	add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
 	add_subdirectory("${INCLUDE_DIR}/imtgql/Test/CMake" "${AUX_INCLUDE_DIR}/imtgql/Test")
-        add_subdirectory("${INCLUDE_DIR}/imtgqltest/CMake" "${AUX_INCLUDE_DIR}/imtgqltest")
+		add_subdirectory("${INCLUDE_DIR}/imtgqltest/CMake" "${AUX_INCLUDE_DIR}/imtgqltest")
 
 	add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
 	add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")

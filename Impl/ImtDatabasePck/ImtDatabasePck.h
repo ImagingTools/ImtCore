@@ -21,6 +21,8 @@
 #include <imtdb/CMigrationControllerComp.h>
 #include <imtdb/CCompositeMigrationControllerComp.h>
 #include <imtdb/CObjectCollectionMigrationControllerComp.h>
+#include <imtdb/CDatabaseConnectorComp.h>
+#include <imtdb/CDependentTableMetaInfoControllerComp.h>
 
 
 /**
@@ -45,6 +47,8 @@ typedef imtdb::TMessageDatabaseDelegateComp<imtdb::CSqliteJsonDatabaseDelegateCo
 typedef imtdb::CMigrationControllerComp MigrationController;
 typedef imtdb::CCompositeMigrationControllerComp CompositeMigrationController;
 typedef imtdb::CObjectCollectionMigrationControllerComp ObjectCollectionMigrationController;
+typedef imtdb::CDatabaseConnectorComp DatabaseConnector;
+typedef imtdb::CDependentTableMetaInfoControllerComp DependentTableMetaInfoController;
 
 
 } // namespace ImtDatabasePck

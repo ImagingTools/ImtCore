@@ -8,7 +8,7 @@ set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
 message(VERBOSE "ARXC_CONFIG " ${ARXC_CONFIG})
 
 if(WIN32)
-	set(ACF_CONVERT_CONFIG  "${PROJECT_SOURCE_DIR}/../../../Config/BaseOnly.awc")
+	set(ACF_CONVERT_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/BaseOnly.awc")
 endif()
 
 if(APPLE)
@@ -26,6 +26,6 @@ include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 target_link_libraries(${PROJECT_NAME} imtoas imtfile imtbase)
 
 if(WIN32)
-	set(files  \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
+	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
 	windeploy(${PROJECT_NAME} "" "${files}")
 endif()

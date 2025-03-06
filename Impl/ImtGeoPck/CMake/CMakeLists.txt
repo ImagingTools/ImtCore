@@ -13,6 +13,6 @@ target_link_libraries(${PROJECT_NAME} imtgeo imtdb imtguigql imtservergql imtgql
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 
 if(WIN32)
-	set(files  \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.arp\")
+	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.arp\")
 	windeploy(${PROJECT_NAME} "" "${files}")
 endif()

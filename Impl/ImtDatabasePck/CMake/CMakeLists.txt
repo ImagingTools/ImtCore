@@ -11,7 +11,7 @@ include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 if(WIN32)
 
 	list(APPEND listOptions "")
-	set(files  \"${IMTCOREDIR_BUILD}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.arp\")
+	set(files \"${IMTCOREDIR_BUILD}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.arp\")
 
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
 	unset(listOptions)
