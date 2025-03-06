@@ -14,32 +14,8 @@ namespace imtqml
 // public methods
 
 CQuickObjectCompBase::CQuickObjectCompBase()
-	:m_quickItemPtr(nullptr),
-	m_urlParamObserver(*this)
+	:m_quickItemPtr(nullptr)
 {
-}
-
-
-QString CQuickObjectCompBase::GetPathToQml()
-{
-	return "QmlFilePath";
-}
-
-
-void CQuickObjectCompBase::OnUrlParamChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::IUrlParam* urlParamPtr)
-{
-	if (!m_applicationInfoCompPtr.IsValid()){
-		return;
-	}
-
-	if (urlParamPtr != nullptr){
-		if (m_quickItemPtr != nullptr){
-			QQmlEngine* qmlEnginePtr = qmlEngine(m_quickItemPtr);
-			if (qmlEnginePtr != nullptr){
-				SetBaseUrl(*qmlEnginePtr);
-			}
-		}
-	}
 }
 
 
@@ -69,12 +45,11 @@ bool CQuickObjectCompBase::CreateQuickItem(QQuickItem* parentPtr)
 
 	QQmlEngine* engine = qmlEngine(parentPtr);
 	if (engine != nullptr){
-		SetBaseUrl(*engine);
+		InitializeEngine(*engine);
+
 		m_quickItemPtr = CreateItem(engine);
 		if (m_quickItemPtr != nullptr){
 			m_quickItemPtr->setParentItem(parentPtr);
-
-			m_itemCreated.SetQuickItemCreated(true);
 
 			OnItemCreated();
 
@@ -108,31 +83,28 @@ QQuickItem* CQuickObjectCompBase::GetQuickItem() const
 }
 
 
-void CQuickObjectCompBase::SetBaseUrl(QQmlEngine& qmlEngine) const
-{
-	QString baseUrl;
-	if (m_urlParamPtr.IsValid()){
-		baseUrl = m_urlParamPtr->GetUrl().toString();
-	}
-	else if (m_baseUrlAttrPtr.IsValid()){
-		baseUrl = *m_baseUrlAttrPtr;
-	}
-
-	QString appId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID);
-	if (!appId.isEmpty() && !baseUrl.isEmpty()){
-		baseUrl += "/" + appId;
-	}
-
-	qmlEngine.setBaseUrl(baseUrl);
-}
-
-
 void CQuickObjectCompBase::OnTryClose(bool* /*ignoredPtr*/)
 {
 }
 
 
 // protected methods
+
+bool CQuickObjectCompBase::InitializeEngine(QQmlEngine& /*qmlEngine*/) const
+{
+	return true;
+}
+
+
+void CQuickObjectCompBase::OnItemCreated()
+{
+}
+
+
+void CQuickObjectCompBase::OnItemDestroyed()
+{
+}
+
 
 QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr) const
 {
@@ -148,7 +120,7 @@ QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr) const
 		QObject* createdComponentPtr = component.create(contextPtr);
 		QQuickItem* quickItemPtr = qobject_cast<QQuickItem*>(createdComponentPtr);
 
-		if (component.isError()) {
+		if (component.isError()){
 			qWarning() << "UNABLE TO CREATE QML COMPONENT " << componentUrl;
 			qWarning() << component.errors();
 			qWarning() << "----------------";
@@ -174,103 +146,6 @@ QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr, const QVaria
 	return qobject_cast<QQuickItem*>(component.createWithInitialProperties(initialProperties, enginePtr->rootContext()));
 #endif
 	return nullptr;
-}
-
-
-void CQuickObjectCompBase::OnItemCreated()
-{
-	for (int i = 0; i < m_modelIdsAttrPtr.GetCount(); ++i){
-		QByteArray modelId = m_modelIdsAttrPtr[i];
-
-		imtbase::CTreeItemModel* modelPtr = new imtbase::CTreeItemModel(this);
-
-		connect(modelPtr, SIGNAL(needsReload()), this, SLOT(OnModelNeedsReload()));
-
-		m_models.append(modelPtr);
-
-		m_quickItemPtr->setProperty(modelId, QVariant::fromValue(modelPtr));
-	}
-
-	if (m_urlParamPtr.IsValid()){
-		OnUrlParamChanged(istd::IChangeable::GetAnyChange(), m_urlParamPtr.GetPtr());
-	}
-}
-
-
-void CQuickObjectCompBase::OnItemDestroyed()
-{
-	m_itemCreated.SetQuickItemCreated(false);
-}
-
-
-// reimplemented (icomp::CComponentBase)
-
-void CQuickObjectCompBase::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	if (m_urlParamPtr.IsValid()){
-		m_urlParamObserver.RegisterObject(m_urlParamPtr.GetPtr(), &CQuickObjectCompBase::OnUrlParamChanged);
-	}
-}
-
-
-void CQuickObjectCompBase::OnComponentDestroyed()
-{
-	m_urlParamObserver.UnregisterAllObjects();
-
-	BaseClass::OnComponentDestroyed();
-}
-
-
-void CQuickObjectCompBase::OnModelNeedsReload(imtbase::CTreeItemModel* /*itemModelPtr*/)
-{
-}
-
-
-// private methods of the embedded class QuickItemCreated
-
-CQuickObjectCompBase::QuickItemCreated::QuickItemCreated()
-	:m_isCreated(false)
-{
-}
-
-
-void CQuickObjectCompBase::QuickItemCreated::SetQuickItemCreated(bool isCreated)
-{
-	if (m_isCreated != isCreated){
-		istd::CChangeNotifier changePtr(this);
-
-		m_isCreated = isCreated;
-	}
-}
-
-
-// reimplemented (iprm::IEnableableParam)
-
-bool CQuickObjectCompBase::QuickItemCreated::IsEnabled() const
-{
-	return m_isCreated;
-}
-
-
-bool CQuickObjectCompBase::QuickItemCreated::IsEnablingAllowed() const
-{
-	return false;
-}
-
-
-bool CQuickObjectCompBase::QuickItemCreated::SetEnabled(bool /*isEnabled*/)
-{
-	return false;
-}
-
-
-// reimplemented (iser::ISerializable)
-
-bool CQuickObjectCompBase::QuickItemCreated::Serialize(iser::IArchive& /*archive*/)
-{
-	return false;
 }
 
 

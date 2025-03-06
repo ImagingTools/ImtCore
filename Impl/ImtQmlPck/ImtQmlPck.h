@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtqml/CQuickApplicationComp.h>
-#include <imtqml/CQuickObjectCompBase.h>
+#include <imtqml/CGqlQuickObjectComp.h>
 #include <imtqml/CGuiQuickWrapComp.h>
 #include <imtqml/CObserverQmlComp.h>
 #include <imtqml/CClientUserContextComp.h>
@@ -24,7 +24,7 @@ namespace ImtQmlPck
 
 
 typedef imtqml::CQuickApplicationComp QuickApplication;
-typedef imtqml::CQuickObjectCompBase QuickObject;
+typedef imtqml::CGqlQuickObjectComp QuickObject;
 typedef imtqml::CGuiQuickWrapComp GuiQuickWrap;
 typedef imtqml::CObserverQmlComp ObserverQml;
 typedef imtqml::CClientUserContextComp ClientUserContext;
