@@ -30,13 +30,11 @@ namespace imtdb
 class CSqlDatabaseObjectCollectionComp:
 			public QObject,
 			virtual public imtbase::IObjectCollection,
-			public ilog::CLoggerComponentBase,
-			public imod::CMultiModelDispatcherBase
+			public ilog::CLoggerComponentBase
 {
 	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
-	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CSqlDatabaseObjectCollectionComp);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
@@ -49,8 +47,6 @@ public:
 		I_ASSIGN(m_filterParamsCompPtr, "FilteringParams", "Parameter using for the filterering the table", false, "FilteringParams");
 		I_ASSIGN(m_databaseAccessSettingsCompPtr, "DatabaseAccessSettings", "Database access settings", false, "DatabaseAccessSettings");
 		I_ASSIGN(m_collectionDataControllerCompPtr, "CollectionDataController", "Data export/import controller for the collection", false, "DataController");
-		I_ASSIGN(m_optionsListCompPtr, "DependentMetaInfoList", "Meta info IDs from dependent collection", false, "DependentMetaInfoList");
-		I_ASSIGN_MULTI_0(m_objectCollectionsCompPtr, "DependentCollections", "References to dependent collections", false);
 	I_END_COMPONENT;
 
 	CSqlDatabaseObjectCollectionComp();
@@ -127,9 +123,6 @@ protected:
 				const istd::IChangeable::ChangeSet& changeSet,
 				const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
 
-	// reimplemented (imod::CMultiModelDispatcherBase)
-	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
-
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
@@ -147,8 +140,6 @@ private:
 	I_REF(iprm::IParamsSet, m_filterParamsCompPtr);
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
 	I_REF(imtbase::ICollectionDataController, m_collectionDataControllerCompPtr);
-	I_REF(iprm::IOptionsList, m_optionsListCompPtr);
-	I_MULTIREF(imod::IModel, m_objectCollectionsCompPtr);
 
 	imtbase::TModelUpdateBinder<iprm::IParamsSet, CSqlDatabaseObjectCollectionComp> m_filterParamsObserver;
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CSqlDatabaseObjectCollectionComp> m_databaseAccessObserver;
