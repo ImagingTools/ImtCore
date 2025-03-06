@@ -31,7 +31,6 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/MimeType.sdl"
 			VERSION		"1.0")
-		   
 ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentCollectionFilter.sdl"
 			VERSION		"1.0")

@@ -16,7 +16,7 @@ acf_use_qt_graphics_modules()
 
 imtcore_generate_tests(${TESTS_DIR}/RevisionControllerTest)
 if(WIN32)
-        set(listFiles \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
+	set(listFiles \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
 
 	windeploy(${PROJECT_NAME} "" "${listFiles}")
 endif()
