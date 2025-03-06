@@ -10,7 +10,7 @@ namespace imtauthgql
 // reimplemented (sdl::imtauth::AuthorizationOptions::CGraphQlHandlerCompBase)
 
 sdl::imtauth::AuthorizationOptions::CUserManagementPayload CAuthorizationOptionsControllerComp::OnGetUserMode(
-	const sdl::imtauth::AuthorizationOptions::CGetUserModeGqlRequest& getUserModeRequest,
+	const sdl::imtauth::AuthorizationOptions::CGetUserModeGqlRequest& /*getUserModeRequest*/,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
