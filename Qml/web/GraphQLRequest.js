@@ -105,7 +105,15 @@ var GqlObject = function(objectId){
 				this.m_fieldsMap[fieldId] = newField
 				objectPtr.m_parentPtr = this
 			}
-		}
+        },
+
+        RemoveField: function(fieldId){
+            delete this.m_fieldsMap[fieldId]
+        },
+
+        Clear(){
+            this.m_fieldsMap = {}
+        }
 	}
 }
 
@@ -139,6 +147,22 @@ var GqlRequest = function(requestType, commandId){
 		AddParam:function (param){
 			this.m_params.push(param)
 		},
+
+        RemoveField: function(field){
+            let index = this.m_fields.indexOf(field)
+            if(index >= 0) this.m_fields.splice(index, 1)
+        },
+
+        RemoveParam: function (param){
+            let index = this.m_params.indexOf(param)
+            if(index >= 0) this.m_params.splice(index, 1)
+        },
+
+        Clear(){
+            this.m_fields = []
+            this.m_params = []
+        },
+
 
 		AddObjectFieldPart: function(gqlObject){
 			var retVal = ""
