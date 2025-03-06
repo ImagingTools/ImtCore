@@ -25,7 +25,7 @@
 #include <imod/TModelWrap.h>
 
 // ImtCore includes
-#include <imtbase/ICollectionInfo.h>
+#include <imtauth/IRole.h>
 
 
 namespace imtauth
@@ -37,10 +37,30 @@ namespace imtauth
 // reimplemented (imtbase::IMetaInfoCreator)
 
 bool CRoleMetaInfoCreatorComp::CreateMetaInfo(
-			const istd::IChangeable* /*dataPtr*/,
-			const QByteArray& /*typeId*/,
-			idoc::MetaInfoPtr& /*metaInfoPtr*/) const
+			const istd::IChangeable* dataPtr,
+			const QByteArray& typeId,
+			idoc::MetaInfoPtr& metaInfoPtr) const
 {
+	if (typeId != *m_objectTypeIdAttrPtr){
+		return false;
+	}
+	
+	metaInfoPtr.SetPtr(new imod::TModelWrap<MetaInfo>);
+	
+	if (dataPtr == nullptr){
+		return true;
+	}
+	
+	const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr);
+	if (roleInfoPtr == nullptr){
+		return false;
+	}
+	
+	metaInfoPtr->SetMetaInfo(imtauth::IRole::MIT_ROLE_ID, roleInfoPtr->GetRoleId());
+	metaInfoPtr->SetMetaInfo(imtauth::IRole::MIT_ROLE_NAME, roleInfoPtr->GetRoleName());
+	metaInfoPtr->SetMetaInfo(imtauth::IRole::MIT_ROLE_DESCRIPTION, roleInfoPtr->GetRoleDescription());
+	metaInfoPtr->SetMetaInfo(imtauth::IRole::MIT_PRODUCT_ID, roleInfoPtr->GetProductId());
+	
 	return true;
 }
 

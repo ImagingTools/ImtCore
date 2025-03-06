@@ -180,9 +180,20 @@ I_EXPORT_COMPONENT(
 			"JWT JsonWebToken Session Controller");
 
 I_EXPORT_COMPONENT(
-		SessionMetaInfoCreator,
-		"Session meta info creator",
-		"Session Meta Info Creator");
+			SessionMetaInfoCreator,
+			"Session meta info creator",
+			"Session Meta Info Creator");
+
+I_EXPORT_COMPONENT(
+			UserMetaInfoCreator,
+			"User meta info creator",
+			"User Meta Info Creator");
+
+I_EXPORT_COMPONENT(
+			GroupMetaInfoCreator,
+			"Group meta info creator",
+			"Group Meta Info Creator");
+
 
 } // namespace ImtAuthPck
 

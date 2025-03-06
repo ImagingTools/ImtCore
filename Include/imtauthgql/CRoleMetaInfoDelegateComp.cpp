@@ -1,0 +1,59 @@
+#include <imtauthgql/CRoleMetaInfoDelegateComp.h>
+
+
+// Qt includes
+#include <QJsonObject>
+
+// ImtCore includes
+#include <imtauth/IRole.h>
+
+
+namespace imtauthgql
+{
+
+
+// protected methods
+
+bool CRoleMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo) const
+{
+	QByteArray roleId = metaInfo.GetMetaInfo(imtauth::IRole::MIT_ROLE_ID).toByteArray();
+	representation["RoleId"] = QString(roleId);
+	
+	QString roleName = metaInfo.GetMetaInfo(imtauth::IRole::MIT_ROLE_NAME).toString();
+	representation["RoleName"] = roleName;
+	
+	QString description = metaInfo.GetMetaInfo(imtauth::IRole::MIT_ROLE_DESCRIPTION).toString();
+	representation["RoleDescription"] = description;
+	
+	QByteArray productId = metaInfo.GetMetaInfo(imtauth::IRole::MIT_PRODUCT_ID).toByteArray();
+	representation["ProductId"] = QString(productId);
+
+	return true;
+}
+
+
+bool CRoleMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation) const
+{
+	if (representation.contains("RoleId")){
+		metaInfo.SetMetaInfo(imtauth::IRole::MIT_ROLE_ID, representation.value("RoleId"));
+	}
+	
+	if (representation.contains("RoleName")){
+		metaInfo.SetMetaInfo(imtauth::IRole::MIT_ROLE_NAME, representation.value("RoleName"));
+	}
+	
+	if (representation.contains("RoleDescription")){
+		metaInfo.SetMetaInfo(imtauth::IRole::MIT_ROLE_DESCRIPTION, representation.value("RoleDescription"));
+	}
+	
+	if (representation.contains("ProductId")){
+		metaInfo.SetMetaInfo(imtauth::IRole::MIT_PRODUCT_ID, representation.value("ProductId"));
+	}
+	
+	return true;
+}
+
+
+} // namespace imtauthgql
+
+

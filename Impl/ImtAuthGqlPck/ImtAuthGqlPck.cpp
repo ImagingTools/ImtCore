@@ -139,6 +139,21 @@ I_EXPORT_COMPONENT(
 			"GraphQL JWT session controller",
 			"GraphQL GQL Jwt Session Controller");
 
+I_EXPORT_COMPONENT(
+			RoleMetaInfoDelegate,
+			"Role meta info delegate",
+			"Role Meta Info Delegate");
+
+I_EXPORT_COMPONENT(
+			UserMetaInfoDelegate,
+			"User meta info delegate",
+			"User Meta Info Delegate");
+
+I_EXPORT_COMPONENT(
+			GroupMetaInfoDelegate,
+			"Group meta info delegate",
+			"Group Meta Info Delegate");
+
 
 } // namespace ImtAuthGqlPck
 

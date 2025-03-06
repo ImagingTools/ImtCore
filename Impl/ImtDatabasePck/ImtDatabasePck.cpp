@@ -90,6 +90,16 @@ I_EXPORT_COMPONENT(
 			"ObjectCollection migration controller",
 			"ObjectCollection Migration Controller");
 
+I_EXPORT_COMPONENT(
+			DatabaseConnector,
+			"Database connector",
+			"Database Connector");
+
+I_EXPORT_COMPONENT(
+			DependentTableMetaInfoController,
+			"Dependent table meta info controller",
+			"Dependent Table Meta Info Controller");
+
 
 } // namespace ImtDatabasePck
 
