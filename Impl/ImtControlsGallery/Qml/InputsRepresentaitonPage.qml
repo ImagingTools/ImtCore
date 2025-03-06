@@ -207,6 +207,9 @@ Rectangle {
                 controlColorChecked: "violet"
                 height: 40;
                 backgroundWidth: 80;
+				onCheckedChanged: {
+					console.log("CHECKED::", checked);
+				}
 
             }
 

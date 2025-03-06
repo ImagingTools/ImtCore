@@ -16,7 +16,7 @@ ElementView {
 
     onCheckedChanged: {
         if (switchRef && switchRef.checked != checked){
-            switchRef.setChecked(checked);
+			switchRef.checked = checked;
         }
     }
 
