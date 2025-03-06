@@ -34,6 +34,7 @@ Rectangle {
 
     Column{
         anchors.centerIn: parent;
+
         spacing: 150;
         Row{
             id: inputsRow;
@@ -191,14 +192,6 @@ Rectangle {
 
                 text: "text";
 
-                onClicked: {
-                    if(checkBox.checkState !== Qt.Checked){
-                        checkBox.checkState = Qt.Checked;
-                    }
-                    else {
-                        checkBox.checkState = Qt.Unchecked;
-                    }
-                }
             }
 
             SwitchCustom{
@@ -262,6 +255,21 @@ Rectangle {
 
         }//row4 - boxRow
 
-    }//Column
+	}//Column
 
+	ComboBox{
+		id: comboboxBottom;
+
+		anchors.bottom: parent.bottom;
+		anchors.bottomMargin: 50;
+		anchors.right: parent.right;
+		anchors.rightMargin: 400;
+
+
+		model: comboModel;
+		placeHolderText: "ComboBox"
+
+
+
+	}
 }

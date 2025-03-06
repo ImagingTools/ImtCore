@@ -671,18 +671,18 @@ Rectangle {
 
 			isActive: !tableContainer.readOnly;
 
-			onClicked: {
+			onCheckStateChanged: {
 				if (tableContainer.readOnly){
 					return;
 				}
-
-				if (checkBox.checkState === Qt.Checked){
+				if (checkBox.checkState === Qt.Unchecked){
 					tableContainer.uncheckAll();
 				}
 				else{
 					tableContainer.checkAll();
 				}
 			}
+
 		}
 
 		ListView {

@@ -116,7 +116,7 @@ Item {
 
                 visible: model.Level >= 1 && model.Optional;
 
-                onClicked: {
+				function nextCheckState() {
                     if (!model.Active){
                         return;
                     }

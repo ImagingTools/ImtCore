@@ -195,15 +195,6 @@ Rectangle {
 
                         text: "Do not ask again";
 
-                        onClicked: {
-                            if(checkBox.checkState !== Qt.Checked){
-                                checkBox.checkState = Qt.Checked;
-                            }
-                            else {
-                                checkBox.checkState = Qt.Unchecked;
-                            }
-                        }
-
                     }
 
                 }}

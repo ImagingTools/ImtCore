@@ -393,7 +393,7 @@ Rectangle {
 			visible: tableDelegateContainer.tableItem ? tableDelegateContainer.tableItem.checkable : false;
 			isActive: !tableDelegateContainer.readOnly;
 
-			onClicked: {
+			function nextCheckState() {
 				if (tableDelegateContainer.readOnly){
 					return;
 				}

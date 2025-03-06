@@ -289,7 +289,7 @@ FocusScope{
 
                     //imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
 
-                    onClicked: {
+					function nextCheckState() {
                         if(!enabled){
                             return;
                         }
@@ -390,7 +390,7 @@ FocusScope{
                                 }
                             }
 
-                            onClicked: {
+							function nextCheckState() {
                                 if(checkState == Qt.Unchecked){
                                     popupMenuContainer.dataModel.setData("checkState", Qt.Checked, model.index);
                                     popupMenuContainer.rootItem.dataModel.setData("checkState", Qt.Checked, model.index);

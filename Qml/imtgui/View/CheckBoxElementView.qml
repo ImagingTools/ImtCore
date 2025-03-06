@@ -33,7 +33,7 @@ ElementView {
             checkState: checkBoxElementView.checkState;
             text: checkBoxElementView.text;
 
-            onClicked: {
+			function nextCheckState() {
                 checkBoxElementView.clicked();
             }
         }

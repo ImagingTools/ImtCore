@@ -15,6 +15,7 @@ ControlBase {
 	property string borderColor: "";
 	property int radius: 0;
 	property bool isActive: true;
+	property bool tristate: false;
 
 	property int checkState: Qt.Unchecked;
 
@@ -29,14 +30,25 @@ ControlBase {
 
 	property int mainMargin: 8;
 
-	signal clicked();
-
-	function clickReaction(){
-		if(checkState == Qt.Unchecked){
-			checkState = Qt.Checked;
+	function nextCheckState(){
+		if(!tristate){
+			if(checkState == Qt.Unchecked){
+				checkState = Qt.Checked;
+			}
+			else if(checkState == Qt.Checked){
+				checkState = Qt.Unchecked;
+			}
 		}
-		else if(checkState == Qt.Checked){
-			checkState = Qt.Unchecked;
+		else {
+			if(checkState == Qt.Unchecked){
+				checkState = Qt.Checked;
+			}
+			else if(checkState == Qt.PartiallyChecked){
+				checkState = Qt.Unchecked;
+			}
+			else if(checkState == Qt.Checked){
+				checkState = Qt.Unchecked;
+			}
 		}
 	}
 
@@ -51,8 +63,7 @@ ControlBase {
 		visible: checkBox.isActive;
 
 		onClicked: {
-			checkBox.clicked();
-			//checkBox.clickReaction();
+			checkBox.nextCheckState();
 		}
 
 		onPressed: {

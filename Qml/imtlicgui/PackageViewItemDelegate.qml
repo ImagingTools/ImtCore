@@ -230,7 +230,7 @@ TreeViewItemDelegateBase {
                     isActive: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : true;
                     visible: !packageTreeItemDelegate.hasChild;
 
-                    onClicked: {
+					function nextCheckState() {
                         packageTreeItemDelegate.featureData.m_optional = !packageTreeItemDelegate.featureData.m_optional;
                     }
                 }
@@ -251,7 +251,7 @@ TreeViewItemDelegateBase {
                     isActive: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : true;
                     visible: !packageTreeItemDelegate.hasChild;
 
-                    onClicked: {
+					function nextCheckState() {
                         packageTreeItemDelegate.featureData.m_isPermission = !packageTreeItemDelegate.featureData.m_isPermission;
                     }
                 }
