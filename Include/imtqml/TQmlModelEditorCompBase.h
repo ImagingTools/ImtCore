@@ -84,18 +84,20 @@ TQmlModelEditorCompBase<ModelInterface>::TQmlModelEditorCompBase()
 template<typename ModelInterface>
 inline void TQmlModelEditorCompBase<ModelInterface>::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	ModelInterface* objectPtr = BaseClass::GetObservedObject();
-	Q_ASSERT(objectPtr != nullptr);
-
 	if (IsUpdateBlocked()){
 		return;
 	}
+
+	UpdateBlocker blocker(this);
+
+	ModelInterface* objectPtr = BaseClass2::GetObservedObject();
+	Q_ASSERT(objectPtr != nullptr);
 
 	QQuickItem* quickItemPtr = BaseClass::GetQuickItem();
 	if (quickItemPtr != nullptr){
 		QJsonDocument jsonDoc = CreateRepresentationFromObject(*objectPtr);
 		if (jsonDoc.isObject()){
-			json = QString::fromUtf8(jsonDoc.toJson(QJsonDocument::Compact));
+			QString json = QString::fromUtf8(jsonDoc.toJson(QJsonDocument::Compact));
 
 			QMetaObject::invokeMethod(
 				quickItemPtr, "setRepresentation", Q_ARG(QVariant, QVariant::fromValue(json)));
@@ -121,10 +123,14 @@ inline bool TQmlModelEditorCompBase<ModelInterface>::IsUpdateBlocked() const
 template<typename ModelInterface>
 inline void TQmlModelEditorCompBase<ModelInterface>::OnRepresentationChanged()
 {
-	ModelInterface* objectPtr = BaseClass2::GetObservedObject();
-	Q_ASSERT(objectPtr != nullptr);
+	if (IsUpdateBlocked()){
+		return;
+	}
 
 	UpdateBlocker blocker(this);
+
+	ModelInterface* objectPtr = BaseClass2::GetObservedObject();
+	Q_ASSERT(objectPtr != nullptr);
 
 	QQuickItem* quickItemPtr = BaseClass::GetQuickItem();
 	if (quickItemPtr != nullptr){
@@ -135,7 +141,7 @@ inline void TQmlModelEditorCompBase<ModelInterface>::OnRepresentationChanged()
 			if (var.typeId() == QMetaType::QString){
 				QString representation = var.toString();
 
-				QJsonDocument document = QJsonDocument::fromJson(representation);
+				QJsonDocument document = QJsonDocument::fromJson(representation.toUtf8());
 
 				UpdeteObjectFromRepresentation(document, *objectPtr);
 			}
