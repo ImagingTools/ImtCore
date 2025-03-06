@@ -21,7 +21,7 @@ public:
 
 	I_BEGIN_COMPONENT(CCompositeMigrationControllerComp);
 		I_REGISTER_INTERFACE(imtdb::IMigrationController)
-		I_ASSIGN_MULTI_0(m_migrationControllersCompPtr, "MigrationControllers", "Database engine", true);
+		I_ASSIGN_MULTI_0(m_migrationControllersCompPtr, "MigrationControllers", "Migration controllers", false);
 	I_END_COMPONENT;
 
 protected:
