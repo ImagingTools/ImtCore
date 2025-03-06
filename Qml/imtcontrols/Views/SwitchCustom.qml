@@ -37,6 +37,16 @@ ControlBase {
         setChecked(switchCustom.checked)
     }
 
+	onCheckedChanged: {
+		if(checked){
+			switchCustom.controlRecX = switchCustom.backgroundWidth - switchCustom.controlWidth;
+		}
+		else {
+			switchCustom.controlRecX = 0;
+		}
+	}
+
+
     function setChecked(checkedVal){
         if(checkedVal !== switchCustom.checked){
             switchCustom.checked = checkedVal;
