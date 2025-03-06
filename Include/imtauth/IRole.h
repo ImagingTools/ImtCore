@@ -19,6 +19,14 @@ namespace imtauth
 class IRole: virtual public iser::IObject
 {
 public:
+	enum MetaInfoTypes
+	{
+		MIT_ROLE_ID = idoc::IDocumentMetaInfo::MIT_USER + 1,
+		MIT_ROLE_NAME,
+		MIT_ROLE_DESCRIPTION,
+		MIT_PRODUCT_ID
+	};
+	
 	typedef QByteArrayList FeatureIds;
 
 	virtual const IRoleInfoProvider* GetParentRolesProvider() const = 0;

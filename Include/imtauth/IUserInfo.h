@@ -45,15 +45,10 @@ public:
 
 	enum MetaInfoTypes
 	{
-		/**
-			Contact email given as QString.
-		*/
 		MIT_EMAIL = MIT_ROLES + 1,
-
-		/**
-			Groups given as QString.
-		*/
-		MIT_GROUPS
+		MIT_GROUPS,
+		MIT_SYSTEM_ID,
+		MIT_SYSTEM_NAME
 	};
 
 	struct SystemInfo

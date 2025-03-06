@@ -4,6 +4,7 @@
 // ACF includes
 #include <iser/ISerializable.h>
 #include <iimg/IBitmap.h>
+#include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtauth/IAddressProvider.h>
@@ -16,6 +17,14 @@ namespace imtauth
 class IContactBaseInfo: virtual public iser::ISerializable
 {
 public:
+	enum MetaInfoTypes
+	{
+		MIT_CONTACT_NAME = idoc::IDocumentMetaInfo::MIT_USER + 1,
+		MIT_CONTACT_DESCRIPTION,
+		MIT_EMAIL,
+		MIT_GROUPS
+	};
+	
 	virtual QString GetName() const = 0;
 	virtual void SetName(const QString& name) = 0;
 	virtual QString GetDescription() const = 0;
