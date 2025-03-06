@@ -2,16 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5302" Description="ACF"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331532" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="CachedRemoteCollection" X="525" Y="125" Note=""/>
-        <Element ComponentName="RemoteCollectionObserver" X="525" Y="500" Note=""/>
-        <Element ComponentName="RemoteRepository" X="525" Y="275" Note=""/>
-        <Element ComponentName="RemoteSubscriberController" X="525" Y="675" Note=""/>
+        <Element ComponentName="ObjectCollectionChangeNotifier" X="550" Y="525" Note=""/>
+        <Element ComponentName="RemoteRepository" X="525" Y="300" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

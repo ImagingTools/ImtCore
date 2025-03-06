@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5302" Description="ACF"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331532" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -19,14 +19,23 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteCollectionObserver" PackageId="ImtAuthGqlPck" ComponentId="SessionModelObserver">
+        <Element Id="ObjectCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Model" Type="Reference" ExportId="">
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="SubscriptionCommandId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="RemoteRepository"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SessionChangeNotifier" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RemoteSubscriberController"/>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -76,24 +85,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteSubscriberController" PackageId="ImtAuthGqlPck" ComponentId="SessionModelSubscriberController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="SubscriptionCommandId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -101,7 +92,7 @@
         <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="CachedRemoteCollection"/>
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="CachedRemoteCollection"/>
         <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="CachedRemoteCollection"/>
-        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="RemoteSubscriberController"/>
+        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="ObjectCollectionChangeNotifier"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="CachedRemoteCollection"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="CachedRemoteCollection"/>
     </ExportedInterfaces>

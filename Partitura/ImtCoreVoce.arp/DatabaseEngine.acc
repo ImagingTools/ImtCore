@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5344" Description="ACF"/>
-            <Version Id="1" Number="2234" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -19,7 +19,6 @@
                     <AttributeInfo Id="MigrationControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>MigrationControllerStart</Value>
                                 <Value>DelegatedMigrationController</Value>
                                 <Value>MigrationController</Value>
                             </Values>
@@ -74,30 +73,6 @@
             </Data>
         </Element>
         <Element Id="MigrationController" PackageId="ImtDatabasePck" ComponentId="MigrationController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PgSqlDatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="From" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="2"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RelativeFileNameParam"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="To" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="-1"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="MigrationControllerStart" PackageId="ImtDatabasePck" ComponentId="MigrationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">

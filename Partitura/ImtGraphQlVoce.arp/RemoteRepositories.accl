@@ -11,7 +11,7 @@
         <Element ComponentName="GroupRemoteRepository" X="925" Y="400" Note=""/>
         <Element ComponentName="Role" X="200" Y="575" Note=""/>
         <Element ComponentName="RoleRemoteRepository" X="200" Y="400" Note=""/>
-        <Element ComponentName="SessionInfo" X="538.686291501" Y="755.656854249" Note=""/>
+        <Element ComponentName="SessionInfo" X="550" Y="750" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="550" Y="400" Note=""/>
         <Element ComponentName="UserGroupInfo" X="950" Y="575" Note=""/>
         <Element ComponentName="UserInfo" X="550" Y="75" Note=""/>
