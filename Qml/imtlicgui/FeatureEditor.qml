@@ -151,17 +151,17 @@ ViewBase {
     Row {
         id: headerPanel;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_mainMargin
+        anchors.leftMargin: Style.sizeMainMargin
         anchors.right: parent.right;
-        anchors.rightMargin: Style.size_mainMargin
-        spacing: Style.size_mainMargin;
+        anchors.rightMargin: Style.sizeMainMargin
+        spacing: Style.sizeMainMargin;
         height: 50;
 
         Text {
             anchors.verticalCenter: parent.verticalCenter;
             color: Style.buttonText;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
             text: qsTr("Feature Name");
         }
 
@@ -185,7 +185,7 @@ ViewBase {
             anchors.verticalCenter: parent.verticalCenter;
             color: Style.buttonText;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
             text: qsTr("Feature-ID");
         }
 
@@ -204,7 +204,7 @@ ViewBase {
             anchors.verticalCenter: parent.verticalCenter;
             color: Style.buttonText;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
             text: qsTr("Description");
         }
 
@@ -225,11 +225,11 @@ ViewBase {
 
         anchors.top: headerPanel.bottom;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_mainMargin;
+        anchors.leftMargin: Style.sizeMainMargin;
         anchors.right: rightBlock.left;
-        anchors.rightMargin: Style.size_mainMargin;
+        anchors.rightMargin: Style.sizeMainMargin;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: Style.size_mainMargin;
+        anchors.bottomMargin: Style.sizeMainMargin;
 
         BasicTreeView {
             id: tableView_;
@@ -351,9 +351,9 @@ ViewBase {
 
         anchors.top: headerPanel.bottom;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: Style.size_mainMargin;
+        anchors.bottomMargin: Style.sizeMainMargin;
         anchors.right: parent.right;
-        anchors.rightMargin: Style.size_mainMargin;
+        anchors.rightMargin: Style.sizeMainMargin;
 
         width: 300;
 

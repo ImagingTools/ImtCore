@@ -113,7 +113,7 @@ Item {
         for (let j = 0; j < priorityElements.length; j++){
             let elementWidth = priorityElements[j].maxWidth;
             tempWidth += elementWidth;
-            if (tempWidth + visibleCount * Style.size_mainMargin < maxWidth){
+            if (tempWidth + visibleCount * Style.sizeMainMargin < maxWidth){
                 priorityElements[j].modelData.Visible = true;
                 visibleCount++;
             }
@@ -127,7 +127,7 @@ Item {
     Row {
         id: content_;
         height: commandsItem.height;
-        spacing: Style.size_mainMargin;
+        spacing: Style.sizeMainMargin;
 
         Repeater {
             id: repeater;
@@ -144,7 +144,7 @@ Item {
                     Row {
                         id: listView;
                         height: commandsItem.height;
-                        spacing: Style.size_mainMargin;
+                        spacing: Style.sizeMainMargin;
 
 						Repeater {
                             id: repeater2;

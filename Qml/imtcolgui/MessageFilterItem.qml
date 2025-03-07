@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Row {
     id: content;
 
-    spacing: Style.size_mainMargin;
+    spacing: Style.sizeMainMargin;
 
     property alias icon: image_
     property alias text: infoText.text
@@ -40,7 +40,7 @@ Row {
 
         color: Style.textColor;
         font.family: Style.fontFamily;
-        font.pixelSize: Style.fontSize_common;
+        font.pixelSize: Style.fontSizeXSmall;
     }
 
 

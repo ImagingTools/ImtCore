@@ -24,7 +24,7 @@ Rectangle {
     property string backgroundColor: Style.backgroundColor;
     property string fontColor: Style.textColor;
 
-    property int fontSize: Style.fontSize_common;
+    property int fontSize: Style.fontSizeXSmall;
 
     property bool modelIsDirty: false;
 
@@ -71,7 +71,7 @@ Rectangle {
         anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.bottom: parent.bottom;
-        anchors.margins: Style.size_mainMargin;
+        anchors.margins: Style.sizeMainMargin;
 
         width: 150;
         height: parent.height;
@@ -82,23 +82,23 @@ Rectangle {
             id: mainPanel;
 
             anchors.fill: parent;
-            anchors.topMargin: Style.size_mainMargin;
+            anchors.topMargin: Style.sizeMainMargin;
 
             property alias selectedIndex: mainPanelRepeater.currentIndex;
 
-            spacing: Style.size_mainMargin;
+            spacing: Style.sizeMainMargin;
 
             ListView {
                 id: mainPanelRepeater;
 
                 anchors.left: parent.left;
-                anchors.leftMargin: Style.size_mainMargin;
+                anchors.leftMargin: Style.sizeMainMargin;
                 anchors.right: parent.right;
-                anchors.rightMargin: Style.size_mainMargin;
+                anchors.rightMargin: Style.sizeMainMargin;
 
                 height: contentHeight;
 
-                spacing: Style.size_mainMargin;
+                spacing: Style.sizeMainMargin;
                 model: root.settingsModel;
 
                 boundsBehavior: Flickable.StopAtBounds;
@@ -123,7 +123,7 @@ Rectangle {
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
         anchors.top: parent.top;
-        secondSize: Style.size_mainMargin;
+        secondSize: Style.sizeMainMargin;
         targetItem: flickable;
     }
 

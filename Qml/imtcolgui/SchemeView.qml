@@ -108,8 +108,8 @@ Rectangle {
 			return
 		}
 		
-		let scaleCoeff_ = (canvas.width - Style.size_mainMargin * 2) / canvas.backgroundWidth;
-		let scaleCoeff_h = (canvas.height - Style.size_mainMargin * 2) / canvas.backgroundHeight;
+		let scaleCoeff_ = (canvas.width - Style.sizeMainMargin * 2) / canvas.backgroundWidth;
+		let scaleCoeff_h = (canvas.height - Style.sizeMainMargin * 2) / canvas.backgroundHeight;
 		if (scaleCoeff_ > scaleCoeff_h){
 			scaleCoeff_ = scaleCoeff_h
 		}

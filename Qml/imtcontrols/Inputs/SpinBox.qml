@@ -22,7 +22,7 @@ ControlBase{
     property string icon: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
 
     property string fontColor: "#000000";
-    property int fontSize: Style.fontSize_common;
+    property int fontSize: Style.fontSizeXSmall;
 
     onDecoratorChanged: {
         bindValue.target = decorator_;

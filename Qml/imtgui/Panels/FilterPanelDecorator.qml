@@ -74,7 +74,7 @@ DecoratorBase {
 		id: content;
 		anchors.right: filterPanelDecorator.right;
 		height: tfc.height;
-		spacing: Style.size_mainMargin;
+		spacing: Style.sizeMainMargin;
 		
 		Rectangle {
 			id: rect;
@@ -100,13 +100,13 @@ DecoratorBase {
 			Item {
 				id: item;
 				anchors.centerIn: parent;
-				width: row.width + 2 * Style.size_mainMargin;
+				width: row.width + 2 * Style.sizeMainMargin;
 				height: row.height;
 				
 				Row {
 					id: row;
 					anchors.horizontalCenter: parent.horizontalCenter;
-					spacing: Style.size_mainMargin;
+					spacing: Style.sizeMainMargin;
 					
 					BaseText {
 						id: buttonText;

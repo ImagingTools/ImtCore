@@ -5,7 +5,7 @@ import imtcontrols 1.0
 DecoratorBase {
 	id: tabPanelDecorator;
 
-	width: content.width + 2 * Style.size_mainMargin;
+	width: content.width + 2 * Style.sizeMainMargin;
 	height: baseElement ? baseElement.height : 50
 
 	property bool textIsCropped: textHelper.text != "" && textHelper.width > text.width;
@@ -61,7 +61,7 @@ DecoratorBase {
 		id: content;
 		anchors.centerIn: tabPanelDecorator;
 		height: tabPanelDecorator.height;
-		spacing: Style.size_mainMargin;
+		spacing: Style.sizeMainMargin;
 		// visible: !loading.visible;
 
 		Item {
@@ -111,7 +111,7 @@ DecoratorBase {
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
 				font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
 				font.bold: tabPanelDecorator.baseElement.index === 0;
-				font.pixelSize: Style.fontSize_common;
+				font.pixelSize: Style.fontSizeXSmall;
 			}
 
 			Text {
@@ -126,7 +126,7 @@ DecoratorBase {
 				color: Style.textColor;
 				font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
 				font.bold: tabPanelDecorator.baseElement.index === 0;
-				font.pixelSize: Style.fontSize_common;
+				font.pixelSize: Style.fontSizeXSmall;
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
 
 				elide: Text.ElideRight;

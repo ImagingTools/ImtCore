@@ -116,7 +116,7 @@ ComboBox {
                                 anchors.verticalCenter: parent.verticalCenter;
                                 anchors.left: parent.left;
                                 anchors.right: parent.right;
-                                anchors.rightMargin: Style.size_mainMargin;
+                                anchors.rightMargin: Style.sizeMainMargin;
 
                                 height: parent.height;
 

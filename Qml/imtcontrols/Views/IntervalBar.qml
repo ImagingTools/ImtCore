@@ -62,7 +62,7 @@ Rectangle {
 		anchors.bottomMargin: 4;
 
 		font.family: Style.fontFamilyBold;
-		font.pixelSize: Style.fontSizeLarge;
+		font.pixelSize: Style.fontSizeXLarge;
 
 		color: indicator.percent >= indicator.percentCritical ? indicator.negativeColor: indicator.textColor;
 

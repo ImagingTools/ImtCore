@@ -219,18 +219,18 @@ ViewBase {
     Column {
         id: column;
         anchors.top: parent.top;
-        anchors.topMargin: Style.size_mainMargin;
+        anchors.topMargin: Style.sizeMainMargin;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_mainMargin;
+        anchors.leftMargin: Style.sizeMainMargin;
         width: 500;
-        spacing: Style.size_mainMargin;
+        spacing: Style.sizeMainMargin;
 
         Text {
             id: titleLicense;
 
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
 
             text: qsTr("License Name");
         }
@@ -260,7 +260,7 @@ ViewBase {
 
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
 
             text: qsTr("License-ID");
         }
@@ -290,7 +290,7 @@ ViewBase {
 
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
 
             text: qsTr("Description");
         }
@@ -320,7 +320,7 @@ ViewBase {
             text: qsTr("Product");
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
         }
 
         ComboBox {
@@ -359,7 +359,7 @@ ViewBase {
         Text {
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
 
             text: qsTr("Features");
         }
@@ -369,9 +369,9 @@ ViewBase {
         id: featuresTable;
 
         anchors.top: column.bottom;
-        anchors.topMargin: Style.size_mainMargin;
+        anchors.topMargin: Style.sizeMainMargin;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: Style.size_mainMargin;
+        anchors.bottomMargin: Style.sizeMainMargin;
 
         width: column.width;
         height: 300;
@@ -394,20 +394,20 @@ ViewBase {
         id: dependenciesBlock;
 
         anchors.top: parent.top;
-        anchors.topMargin: Style.size_mainMargin;
+        anchors.topMargin: Style.sizeMainMargin;
         anchors.left: column.right;
-        anchors.leftMargin: Style.size_mainMargin;
+        anchors.leftMargin: Style.sizeMainMargin;
         anchors.right: parent.right;
-        anchors.rightMargin: Style.size_mainMargin;
+        anchors.rightMargin: Style.sizeMainMargin;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: Style.size_mainMargin;
+        anchors.bottomMargin: Style.sizeMainMargin;
 
         Text {
             id: dependenciesTitle;
 
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
 
             text: qsTr("Dependencies");
         }

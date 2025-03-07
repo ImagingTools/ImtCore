@@ -36,11 +36,11 @@ Rectangle {
             id: column;
 
             anchors.top: parent.top;
-            anchors.topMargin: Style.size_mainMargin;
+            anchors.topMargin: Style.sizeMainMargin;
             anchors.left: parent.left;
-            anchors.leftMargin: Style.size_mainMargin;
+            anchors.leftMargin: Style.sizeMainMargin;
             anchors.right: parent.right;
-            anchors.rightMargin: Style.size_mainMargin;
+            anchors.rightMargin: Style.sizeMainMargin;
 
             visible: container.contentVisible;
 
@@ -66,9 +66,9 @@ Rectangle {
 
 //                        anchors.horizontalCenter: parent.horizontalCenter;
 //                        anchors.left: parent.left;
-//                        anchors.leftMargin: Style.size_mainMargin;
+//                        anchors.leftMargin: Style.sizeMainMargin;
 
-                        font.pixelSize: Style.fontSize_common;
+                        font.pixelSize: Style.fontSizeXSmall;
                         font.family: Style.fontFamilyBold;
                         font.bold: true;
 
@@ -83,7 +83,7 @@ Rectangle {
                         id: childColumn;
 
                         anchors.top: nameTitle.bottom;
-                        anchors.topMargin: Style.size_smallMargin;
+                        anchors.topMargin: Style.sizeSmallMargin;
 
                         width: column.width;
 
@@ -105,7 +105,7 @@ Rectangle {
 
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.left: parent.left;
-                                    anchors.leftMargin: width > 0 ? Style.size_mainMargin : 0;
+                                    anchors.leftMargin: width > 0 ? Style.sizeMainMargin : 0;
 
                                     width: model.Icon === undefined ? 0 : Style.iconSizeSmall
                                     height: width
@@ -120,12 +120,12 @@ Rectangle {
 
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.left: icon.right;
-                                    anchors.leftMargin: icon.width == 0 ? 0 : Style.size_mainMargin;
+                                    anchors.leftMargin: icon.width == 0 ? 0 : Style.sizeMainMargin;
                                     anchors.right: parent.right;
-//                                    anchors.rightMargin: Style.size_mainMargin;
+//                                    anchors.rightMargin: Style.sizeMainMargin;
 
                                     font.family: Style.fontFamily;
-                                    font.pixelSize: Style.fontSize_small;
+                                    font.pixelSize: Style.fontSizeXXSmall;
                                     wrapMode: Text.WordWrap
 
                                     color: Style.textColor;

@@ -59,7 +59,7 @@ Item {
         anchors.rightMargin: 5;
         color: Style.textColor;
         font.family: Style.fontFamily;
-        font.pixelSize: Style.fontSize_common;
+        font.pixelSize: Style.fontSizeXSmall;
         text: AuthorizationController.userTokenProvider.login;
     }
 

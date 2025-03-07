@@ -128,7 +128,7 @@ Rectangle {
 
 					color: Style.textColor;
 					font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSize_title;
+					font.pixelSize: Style.fontSizeLarge;
 
 					text: authPageContainer.appName !== "" ? qsTr("Welcome to") + " " + authPageContainer.appName : qsTr("Welcome");
 				}
@@ -163,14 +163,14 @@ Rectangle {
 			anchors.top: headerItem.bottom;
 			anchors.horizontalCenter: parent.horizontalCenter;
 
-			spacing: Style.size_mainMargin;
+			spacing: Style.sizeMainMargin;
 
 			Text {
 				id: titleLogin;
 
 				color: Style.textColor;
 				font.family: Style.fontFamilyBold;
-				font.pixelSize: Style.fontSize_common;
+				font.pixelSize: Style.fontSizeXSmall;
 
 				text: qsTr("Login");
 
@@ -222,7 +222,7 @@ Rectangle {
 
 				color: Style.textColor;
 				font.family: Style.fontFamilyBold;
-				font.pixelSize: Style.fontSize_common;
+				font.pixelSize: Style.fontSizeXSmall;
 
 				text: qsTr("Password");
 
@@ -308,7 +308,7 @@ Rectangle {
 
 					color: Style.textColor;
 					font.family: Style.fontFamilyBold;
-					font.pixelSize: Style.fontSize_common;
+					font.pixelSize: Style.fontSizeXSmall;
 					font.underline: true;
 
 					text: qsTr("Password recovery");
@@ -348,7 +348,7 @@ Rectangle {
 
 					color: Style.textColor;
 					font.family: Style.fontFamilyBold;
-					font.pixelSize: Style.fontSize_common;
+					font.pixelSize: Style.fontSizeXSmall;
 					font.underline: true;
 
 					text: qsTr("Register");
@@ -385,7 +385,7 @@ Rectangle {
 
 					color:  Style.errorTextColor;
 					font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSize_common;
+					font.pixelSize: Style.fontSizeXSmall;
 
 					visible:  errorMessage.text != "";
 				}

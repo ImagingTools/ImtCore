@@ -22,7 +22,7 @@ ControlBase {
     property int itemHeight: 30;
     property int shownItemsCount: 5;
 
-    property int textSize: Style.fontSize_common;
+    property int textSize: Style.fontSizeXSmall;
     property string fontColor: Style.textColor;
 
     property bool hiddenBackground: true;

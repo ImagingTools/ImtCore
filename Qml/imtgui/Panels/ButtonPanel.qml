@@ -104,7 +104,7 @@ Rectangle {
                 active: model.Active !== undefined ? model.Active : false;
                 fontFamily: Style.fontFamily;
                 fontBold: true;
-                fontPixelSize: Style.fontSize_common;
+                fontPixelSize: Style.fontSizeXSmall;
 
                 property Item rootItem: buttonPanel;
                 property string id: model.Id !== undefined ? model.Id : "";

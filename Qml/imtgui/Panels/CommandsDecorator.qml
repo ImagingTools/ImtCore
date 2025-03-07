@@ -102,12 +102,12 @@ Item {
 
         anchors.verticalCenter: parent.verticalCenter;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_mainMargin;
+        anchors.leftMargin: Style.sizeMainMargin;
 
         width:  parent.width - 2*anchors.leftMargin;
         height: parent.height
 
-        horizontalSpacing: Style.size_mainMargin;
+        horizontalSpacing: Style.sizeMainMargin;
         verticalSpacing: 2;
 
         openButtonImageSource: "../../../" + Style.getIconPath("Icons/Next", Icon.Mode.On, Icon.State.Active);

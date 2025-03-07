@@ -113,7 +113,7 @@ ViewBase {
 		
 		anchors.top: filterMenu_.visible ? filterMenu_.bottom: parent.top;
 		anchors.left: parent.left;
-		anchors.topMargin: filterMenu_.visible ? Style.size_mainMargin : 0;
+		anchors.topMargin: filterMenu_.visible ? Style.sizeMainMargin : 0;
 		anchors.bottom: paginationObj.top;
 		
 		width: tableInternal.minWidth * tableInternal.columnCount < parent.width ? tableInternal.minWidth * tableInternal.columnCount : parent.width;

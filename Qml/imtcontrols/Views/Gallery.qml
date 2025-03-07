@@ -81,7 +81,7 @@ Rectangle {
 
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_title;
+            font.pixelSize: Style.fontSizeLarge;
 
             text: "Галерея";
 
@@ -92,7 +92,7 @@ Rectangle {
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: parent.left;
-            anchors.leftMargin: Style.size_smallMargin;
+            anchors.leftMargin: Style.sizeSmallMargin;
 
             width: 20;
             height: width;
@@ -115,7 +115,7 @@ Rectangle {
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.right: parent.right;
-            anchors.rightMargin: Style.size_smallMargin;
+            anchors.rightMargin: Style.sizeSmallMargin;
 
             width: 20;
             height: width;
@@ -390,7 +390,7 @@ Rectangle {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_title;
+                font.pixelSize: Style.fontSizeLarge;
 
                 text: "Вы уверены, что хотите удалить фото?";
 
@@ -401,10 +401,10 @@ Rectangle {
 
                 anchors.bottom: parent.bottom;
                 anchors.right: cancelButton.left;
-                anchors.rightMargin: Style.size_smallMargin;
-                anchors.bottomMargin: Style.size_smallMargin;
+                anchors.rightMargin: Style.sizeSmallMargin;
+                anchors.bottomMargin: Style.sizeSmallMargin;
 
-                width: (parent.width - 3 * Style.size_smallMargin)/2;
+                width: (parent.width - 3 * Style.sizeSmallMargin)/2;
                 height: Style.size_ButtonHeight;
 
                 text: "Ок";
@@ -420,10 +420,10 @@ Rectangle {
 
                 anchors.bottom: parent.bottom;
                 anchors.right: parent.right;
-                anchors.rightMargin: Style.size_smallMargin;
-                anchors.bottomMargin: Style.size_smallMargin;
+                anchors.rightMargin: Style.sizeSmallMargin;
+                anchors.bottomMargin: Style.sizeSmallMargin;
 
-                width: (parent.width - 3 * Style.size_smallMargin)/2;
+                width: (parent.width - 3 * Style.sizeSmallMargin)/2;
                 height: Style.size_ButtonHeight;
 
                 text: "Отмена";

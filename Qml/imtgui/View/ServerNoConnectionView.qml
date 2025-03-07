@@ -18,7 +18,7 @@ Rectangle {
 
         width: parent.width - 100;
 
-        spacing: Style.size_mainMargin;
+        spacing: Style.sizeMainMargin;
 
         Text {
             id: textNoConnection;
@@ -28,7 +28,7 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter;
 
             color: Style.textColor;
-            font.pixelSize: Style.fontSize_title;
+            font.pixelSize: Style.fontSizeLarge;
             font.family: Style.fontFamily;
 
             wrapMode: Text.Wrap;

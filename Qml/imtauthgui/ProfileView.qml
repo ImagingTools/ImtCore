@@ -77,7 +77,7 @@ ViewBase {
         anchors.top: flickable.top;
         anchors.bottom: flickable.bottom;
 
-        secondSize: Style.size_mainMargin;
+        secondSize: Style.sizeMainMargin;
         targetItem: flickable;
     }
 
@@ -90,7 +90,7 @@ ViewBase {
         anchors.right: flickable.right;
         anchors.bottom: flickable.bottom;
 
-        secondSize: Style.size_mainMargin;
+        secondSize: Style.sizeMainMargin;
 
         vertical: false;
         targetItem: flickable;

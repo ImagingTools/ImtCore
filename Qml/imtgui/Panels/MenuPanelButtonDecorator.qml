@@ -30,7 +30,7 @@ DecoratorBase {
     Rectangle {
         id: marker;
         anchors.fill: leftPanelElement;
-//        anchors.margins: Style.size_smallMargin;
+//        anchors.margins: Style.sizeSmallMargin;
         anchors.margins: 8;
         radius: Style.buttonRadius;
         color: leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted ? Style.backgroundColor2 : "transparent";
@@ -63,14 +63,14 @@ DecoratorBase {
         Text {
             id: description;
             anchors.top: image.bottom;
-            anchors.topMargin: Style.size_mainMargin;
+            anchors.topMargin: Style.sizeMainMargin;
             anchors.left: itemBody.left;
-            anchors.leftMargin: Style.size_mainMargin;
+            anchors.leftMargin: Style.sizeMainMargin;
             anchors.right: itemBody.right;
-            anchors.rightMargin: Style.size_mainMargin;
+            anchors.rightMargin: Style.sizeMainMargin;
             color: leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted ? Style.iconColorOnSelected : Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_small;
+            font.pixelSize: Style.fontSizeXXSmall;
             text: leftPanelElement.baseElement.text;
             horizontalAlignment: Text.AlignHCenter;
             elide: Text.ElideRight;

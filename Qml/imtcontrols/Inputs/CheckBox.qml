@@ -24,7 +24,7 @@ ControlBase {
 	property string imageSourceActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
 	property string imageSourceNotActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.Off, Icon.Mode.Disabled);
 
-	property int fontPixelSize: Style.fontSize_common;
+	property int fontPixelSize: Style.fontSizeXSmall;
 	property bool fontBold: false;
 	property bool isLeftText: false;
 

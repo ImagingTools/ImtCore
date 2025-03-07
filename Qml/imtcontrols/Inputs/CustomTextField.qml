@@ -35,10 +35,10 @@ FocusScope {
     property string borderColorConst: "";
 
     property int radius: Style.textFieldRadius;
-    property int textSize: Style.fontSize_common;
+    property int textSize: Style.fontSizeXSmall;
     property int placeHolderTextSize: textSize;
     property int echoMode: TextInput.Normal;
-    property int margin: Style.size_mainMargin;
+    property int margin: Style.sizeMainMargin;
 
     property int textFieldLeftMargin: margin;
     property int textFieldRightMargin: margin;

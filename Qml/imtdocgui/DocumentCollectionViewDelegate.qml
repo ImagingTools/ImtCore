@@ -299,7 +299,7 @@ CollectionViewCommandsDelegateBase {
 								id: image;
 								anchors.verticalCenter: parent.verticalCenter;
 								anchors.left: parent.left;
-								anchors.leftMargin: Style.size_mainMargin;
+								anchors.leftMargin: Style.sizeMainMargin;
 								width: 20;
 								height: width;
 								source: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
@@ -323,9 +323,9 @@ CollectionViewCommandsDelegateBase {
 					SplitView {
 						id: splitView;
 						anchors.left: parent.left;
-						anchors.leftMargin: Style.size_mainMargin;
+						anchors.leftMargin: Style.sizeMainMargin;
 						anchors.right: parent.right;
-						anchors.rightMargin: Style.size_mainMargin;
+						anchors.rightMargin: Style.sizeMainMargin;
 						height: parent.height;
 						orientation: Qt.Vertical
 
@@ -395,10 +395,10 @@ CollectionViewCommandsDelegateBase {
 							Text {
 								id: descriptionTitle;
 								anchors.top: parent.top;
-								anchors.topMargin: Style.size_mainMargin;
+								anchors.topMargin: Style.sizeMainMargin;
 								color: Style.buttonText;
 								font.family: Style.fontFamilyBold;
-								font.pixelSize: Style.fontSize_common;
+								font.pixelSize: Style.fontSizeXSmall;
 								font.bold: true;
 								text: qsTr("Description");
 							}
@@ -406,7 +406,7 @@ CollectionViewCommandsDelegateBase {
 							Rectangle {
 								id: background;
 								anchors.top: descriptionTitle.bottom;
-								anchors.topMargin: Style.size_mainMargin;
+								anchors.topMargin: Style.sizeMainMargin;
 								anchors.bottom: parent.bottom;
 								width: parent.width;
 								border.width: 1;
@@ -420,15 +420,15 @@ CollectionViewCommandsDelegateBase {
 								anchors.right: parent.right;
 								anchors.top: parent.top;
 								anchors.bottom: parent.bottom;
-								secondSize: Style.size_smallMargin;
+								secondSize: Style.sizeSmallMargin;
 								targetItem: flickable;
 							}
 
 							Flickable {
 								id: flickable;
 								anchors.centerIn: background;
-								width: background.width - 2 * Style.size_mainMargin;
-								height: background.height - 2 * Style.size_mainMargin;
+								width: background.width - 2 * Style.sizeMainMargin;
+								height: background.height - 2 * Style.sizeMainMargin;
 								contentHeight: descriptionTextField.height;
 								clip: true;
 								boundsBehavior: Flickable.StopAtBounds;
@@ -437,7 +437,7 @@ CollectionViewCommandsDelegateBase {
 									id: descriptionTextField;
 									width: parent.width;
 									font.family: Style.fontFamily;
-									font.pixelSize: Style.fontSize_common;
+									font.pixelSize: Style.fontSizeXSmall;
 									color: Style.textColor;
 									wrapMode: Text.WordWrap;
 								}

@@ -71,7 +71,7 @@ Item {
 		anchors.top: alertPanel.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        height: visible ? 30 + 2 * Style.size_mainMargin : 0;
+        height: visible ? 30 + 2 * Style.sizeMainMargin : 0;
         objectName: "ViewBase";
         visible: headerViewLoader.item && viewBase.commandsController != null;
 

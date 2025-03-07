@@ -231,7 +231,7 @@ Rectangle {
                     anchors.centerIn: parent;
 
                     font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_subtitle;
+                    font.pixelSize: Style.fontSizeNormal;
                     color: Style.textColor;
                     width: parent.width - 20;
                     wrapMode: Text.WordWrap;

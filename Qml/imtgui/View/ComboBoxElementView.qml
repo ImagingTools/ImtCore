@@ -101,7 +101,7 @@ ElementView {
             text: comboBoxElementView.errorText;
             color: Style.errorTextColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
         }
     }
 }

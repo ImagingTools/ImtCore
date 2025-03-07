@@ -10,7 +10,7 @@ PopupView {
 	id: root;
 	
 	width: 260;
-	height: content.height + 2 * Style.size_mainMargin;
+	height: content.height + 2 * Style.sizeMainMargin;
 		
 	property TimeFilter timeFilter: TimeFilter {}
 	
@@ -118,13 +118,13 @@ PopupView {
 	Item {
 		id: body;
 		anchors.fill: parent;
-		anchors.margins: Style.size_mainMargin;
+		anchors.margins: Style.sizeMainMargin;
 		
 		Column {
 			id: content;
 			anchors.verticalCenter: parent.verticalCenter;
 			width: parent.width;
-			spacing: Style.size_mainMargin;
+			spacing: Style.sizeMainMargin;
 			
 			ListView {
 				id: listView;
@@ -200,7 +200,7 @@ PopupView {
 					hasDayCombo: false;
 					hasMonthCombo: false;
 					hasYearCombo: false;
-					mainMargin: Style.size_mainMargin;
+					mainMargin: Style.sizeMainMargin;
 					
 					function checkDate(year, month, day){
 						let date = new Date(year, month, day);
@@ -239,7 +239,7 @@ PopupView {
 					hasMonthCombo: false;
 					hasYearCombo: false;
 					startWithCurrentDay: true;
-					mainMargin: Style.size_mainMargin;
+					mainMargin: Style.sizeMainMargin;
 					
 					function checkDate(year, month, day){
 						let date = new Date(year, month, day);
@@ -267,7 +267,7 @@ PopupView {
 				Row {
 					anchors.horizontalCenter: parent.horizontalCenter;
 					height: 30;
-					spacing: Style.size_mainMargin;
+					spacing: Style.sizeMainMargin;
 					
 					Button {
 						id: applyButton;

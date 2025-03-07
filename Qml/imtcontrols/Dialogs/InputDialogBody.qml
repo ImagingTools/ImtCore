@@ -21,9 +21,9 @@ Item {
 
         anchors.verticalCenter: parent.verticalCenter;
         anchors.right: parent.right;
-        anchors.rightMargin: Style.size_mainMargin;
+        anchors.rightMargin: Style.sizeMainMargin;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_mainMargin;
+        anchors.leftMargin: Style.sizeMainMargin;
 
         spacing: 5;
 
@@ -35,7 +35,7 @@ Item {
             text: inputDialogBodyContainer.message;
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
             elide: Text.ElideRight;
 
             wrapMode: Text.WordWrap;

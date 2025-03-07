@@ -46,7 +46,7 @@ Item {
     Row {
         id: rowButtons;
         height: buttonsDialogContainer.height;
-        spacing: Style.size_mainMargin;
+        spacing: Style.sizeMainMargin;
 
         Repeater {
             id: buttonsRepeater;

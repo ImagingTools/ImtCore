@@ -48,7 +48,7 @@ DecoratorBase {
 
         height: 30;
 
-        spacing: Style.size_mainMargin;
+        spacing: Style.sizeMainMargin;
 
         Connections {
             target: NavigationController;

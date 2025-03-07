@@ -14,7 +14,7 @@ ControlBase {
     property int tooltipWidth: customTooltip.fitToTextWidth ? forWidthText.width + 2.5*customTooltip.textMargin : Math.min(customTooltip.componentWidth, forWidthText.width + 2.5*customTooltip.textMargin);
 
     property int componentMinHeight: 40;
-    property int componentMargin: Style.size_mainMargin;
+    property int componentMargin: Style.sizeMainMargin;
 
     property bool fitToTextWidth: false;
     property bool fitToHCenter: false;
@@ -22,10 +22,10 @@ ControlBase {
     property int componentHeight: Math.max(customTooltip.componentMinHeight, forHeightText.height + 2*customTooltip.textMargin);
 
 
-    property int fontPixelSize: Style.fontSize_common;
+    property int fontPixelSize: Style.fontSizeXSmall;
     property bool fontBold: false;
     property string fontColor: Style.textColor;
-    property int textMargin: Style.size_smallMargin;
+    property int textMargin: Style.sizeSmallMargin;
     property int horizontalAlignment: Text.AlignHCenter;
 
     property int radius: 4;

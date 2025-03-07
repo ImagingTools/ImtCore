@@ -25,7 +25,7 @@ Item {
     property string icon: !baseElement ? "" : baseElement.icon;
 
     property string fontColor: "#000000";
-    property int fontSize: Style.fontSize_common;
+    property int fontSize: Style.fontSizeXSmall;
 
     Component.onCompleted: {
         numberTextField.text = String(startValue);

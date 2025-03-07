@@ -25,7 +25,7 @@ ComboBoxElementView {
 
                 anchors.left: parent.left;
                 anchors.right: clearButton.left;
-                anchors.rightMargin: Style.size_mainMargin
+                anchors.rightMargin: Style.sizeMainMargin
 
                 height: 30;
 

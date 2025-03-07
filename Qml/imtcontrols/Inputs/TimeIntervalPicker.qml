@@ -127,7 +127,7 @@ Item {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
+                font.pixelSize: Style.fontSizeXSmall;
             }
 
             Spinner {
@@ -153,7 +153,7 @@ Item {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
+                font.pixelSize: Style.fontSizeXSmall;
             }
 
             Spinner {
@@ -179,7 +179,7 @@ Item {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
+                font.pixelSize: Style.fontSizeXSmall;
             }
 
             Spinner {

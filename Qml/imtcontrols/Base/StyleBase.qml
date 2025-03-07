@@ -22,26 +22,18 @@ StyleComponents {
 	property bool isQtStyle: false;  // deprecated
 	property string styleId: "StyleAcf"
 
-	property int fontSizeExtraLarge: 64
-	property int fontSizeHuge: 32
-	property int fontSizeLarge: 24
-	property int fontSizeNormal: 18
-	property int fontSizeMedium: 12
-	property int fontSizeSmall: 8
-	property int fontSizeTiny: 4
-
 	//new fonts
-	property int fontSize_Huge: 64
-	property int fontSize_XXXLarge: 48
-	property int fontSize_XXLarge: 32
-	property int fontSize_XLarge: 24
-	property int fontSize_Large: 20
-	property int fontSize_Normal: 18
-	property int fontSize_Small: 16
-	property int fontSize_XSmall: 12
-	property int fontSize_XXSmall: 10
-	property int fontSize_XXXSmall: 8
-	property int fontSize_Tiny: 4
+	property int fontSizeHuge: 64
+	property int fontSizeXXXLarge: 48
+	property int fontSizeXXLarge: 32
+	property int fontSizeXLarge: 24
+	property int fontSizeLarge: 20
+	property int fontSizeNormal: 18
+	property int fontSizeSmall: 16
+	property int fontSizeXSmall: 12
+	property int fontSizeXXSmall: 10
+	property int fontSizeXXXSmall: 8
+	property int fontSizeTiny: 4
 
 	property int buttonWidthExtraSmall: 4
 	property int buttonWidthLarge: 32
@@ -106,8 +98,8 @@ StyleComponents {
 	property int textFieldRadius: 3;
 	property int comboBoxRadius: 3;
 
-	property int size_smallMargin: 6;
-	property int size_mainMargin: 11;
+	property int sizeSmallMargin: 6;
+	property int sizeMainMargin: 11;
 	property int size_largeMargin: 23;
 	property int size_indicatorHeight: 50;
 	property int size_leftPanelWidth: 250;
@@ -182,10 +174,6 @@ StyleComponents {
 
 	property string iconColorOnSelected: "#1a76e7";
 
-	property int fontSize_title: 20;
-	property int fontSize_subtitle: 18; // mobile ? 16 :18;
-	property int fontSize_common: 13; // mobile ? 14 :16;
-	property int fontSize_small: 11;
 
 	property string hover: "#e6e6e8";
 

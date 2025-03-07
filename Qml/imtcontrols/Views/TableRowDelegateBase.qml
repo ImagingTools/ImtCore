@@ -386,7 +386,7 @@ Rectangle {
 
 			anchors.verticalCenter: parent.verticalCenter;
 			anchors.left: parent.left;
-			anchors.leftMargin: Style.size_mainMargin;
+			anchors.leftMargin: Style.sizeMainMargin;
 
 			checkState: tableDelegateContainer.checkedState;
 

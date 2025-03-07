@@ -57,12 +57,12 @@ Rectangle {
         id: bodyColumn;
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
-        spacing: Style.size_mainMargin;
+        spacing: Style.sizeMainMargin;
 		width: 700;
 
 		GroupHeaderView {
 			width: parent.width;
-			bottomPadding: Style.size_mainMargin;
+			bottomPadding: Style.sizeMainMargin;
 			title: qsTr("Please fill in the information for the system administrator");
 		}
 

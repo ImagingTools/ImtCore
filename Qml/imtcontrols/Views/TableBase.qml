@@ -141,8 +141,8 @@ Rectangle {
 
 	property string maxLengthText: '';
 
-	property int textMarginHor: Style.size_mainMargin;
-	property int textMarginVer: Style.size_mainMargin;
+	property int textMarginHor: Style.sizeMainMargin;
+	property int textMarginVer: Style.sizeMainMargin;
 
 	property bool emptyDecor: true;
 	property bool emptyDecorHeader: true;
@@ -663,7 +663,7 @@ Rectangle {
 
 			anchors.verticalCenter: parent.verticalCenter;
 			anchors.left: parent.left;
-			anchors.leftMargin: Style.size_mainMargin;
+			anchors.leftMargin: Style.sizeMainMargin;
 
 			checkState: tableContainer.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
 

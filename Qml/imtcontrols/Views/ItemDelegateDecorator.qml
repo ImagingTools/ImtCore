@@ -11,7 +11,7 @@ ButtonDecorator {
                                    Style.buttonPressedColor : root.baseElement.hovered ?
                                        Style.buttonHoverColor : Style.buttonColor
 
-    maxTextWidth: root.baseElement ? root.baseElement.width - Style.size_mainMargin : 100;
+    maxTextWidth: root.baseElement ? root.baseElement.width - Style.sizeMainMargin : 100;
 }
 
 

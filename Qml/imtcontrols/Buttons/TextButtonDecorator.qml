@@ -39,7 +39,7 @@ Item {
 
             color: commonButtonDecorator.baseButton.enabled ? Style.textColor : Style.inactive_textColor;
 
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
             font.family: Style.fontFamily;
 
             text: commonButtonDecorator.baseButton.text;

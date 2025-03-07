@@ -184,10 +184,10 @@ ViewBase {
         id: headerPanel;
 
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_mainMargin
+        anchors.leftMargin: Style.sizeMainMargin
         height: 50;
 
-        spacing: Style.size_mainMargin;
+        spacing: Style.sizeMainMargin;
 
         Text {
             id: productNameLable;
@@ -196,7 +196,7 @@ ViewBase {
 
             color: Style.buttonText;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
 
             text: qsTr("Product Name");
         }
@@ -228,7 +228,7 @@ ViewBase {
 
             color: Style.buttonText;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
 
             text: qsTr("Category");
         }

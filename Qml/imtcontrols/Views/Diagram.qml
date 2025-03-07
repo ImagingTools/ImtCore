@@ -333,11 +333,11 @@ Item {
 
 		anchors.left: parent.left;
 		anchors.top: legendYText.bottom;
-		anchors.topMargin: Style.size_mainMargin;
+		anchors.topMargin: Style.sizeMainMargin;
 		anchors.bottom: legendXText.top;
-		anchors.bottomMargin: 10;//Style.size_mainMargin
+		anchors.bottomMargin: 10;//Style.sizeMainMargin
 
-		width: sizeText.width + 2 * Style.size_mainMargin;
+		width: sizeText.width + 2 * Style.sizeMainMargin;
 
 		color: diagram.backgroundColor;
 
@@ -397,7 +397,7 @@ Item {
 		anchors.left: axeYValuesContainer.right;
 		anchors.top: axeYValuesContainer.top;
 		anchors.bottom: axeYValuesContainer.bottom;
-		anchors.bottomMargin: 10;//Style.size_mainMargin
+		anchors.bottomMargin: 10;//Style.sizeMainMargin
 
 		width: 2;
 		visible: diagram.visibleAxeY;
@@ -423,7 +423,7 @@ Item {
 		id: legendYText;
 
 		anchors.top: titleText.text !== "" ? titleText.bottom : parent.top;
-		anchors.topMargin: Style.size_smallMargin;
+		anchors.topMargin: Style.sizeSmallMargin;
 		anchors.horizontalCenter: axeY.horizontalCenter;
 
 		wrapMode: Text.NoWrap;

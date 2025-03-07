@@ -29,7 +29,7 @@ ControlBase {
 	property string compSelectedColor: Style.selectedColor;
 	property bool moveToEnd: false;
 	property int moveToIndex: currentIndex;
-	property int contentLeftMargin: Style.size_mainMargin;
+	property int contentLeftMargin: Style.sizeMainMargin;
 
 	property int shownItemsCount: 5;
 
@@ -74,7 +74,7 @@ ControlBase {
 	property alias containsMouse: cbMouseArea.containsMouse;
 	property alias mouseArea: cbMouseArea;
 
-	property int textSize: Style.fontSize_common;
+	property int textSize: Style.fontSizeXSmall;
 	property int itemHeight: 30;
 	property string fontColor: Style.textColor;
 	property string fontColorTitle: fontColor;

@@ -258,7 +258,7 @@ StyleComponents {
                 anchors.verticalCenter: textFieldItem.verticalCenter;
 
 
-                font.pixelSize: Style.fontSize_common;
+                font.pixelSize: Style.fontSizeXSmall;
                 font.family: Style.fontFamily;
 
                 //TODO -> Style
@@ -329,7 +329,7 @@ StyleComponents {
                 anchors.verticalCenter: textAreaItem.verticalCenter;
 
 
-                font.pixelSize: Style.fontSize_common;
+                font.pixelSize: Style.fontSizeXSmall;
                 font.family: Style.fontFamily;
 
                 //TODO -> Style
@@ -390,16 +390,16 @@ StyleComponents {
 
                 anchors.verticalCenter: cbMainRect.verticalCenter;
                 anchors.left: cbMainRect.left;
-                anchors.leftMargin: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.textCentered ? cbMainRect.width/2 - width/2 : Style.size_mainMargin;
+                anchors.leftMargin: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.textCentered ? cbMainRect.width/2 - width/2 : Style.sizeMainMargin;
                 anchors.right: cbArrowIcon.left;
-                anchors.rightMargin: Style.size_mainMargin;
+                anchors.rightMargin: Style.sizeMainMargin;
 
 				horizontalAlignment: !cbMainRect.baseElement ? Text.AlignLeft : cbMainRect.baseElement.textCentered ? Text.AlignHCenter : Text.AlignLeft;
 
                 color: !cbMainRect.baseElement ? "transparent" : cbMainRect.baseElement.fontColorTitle;
                 text: !cbMainRect.baseElement ? "" : cbMainRect.baseElement.currentText !== "" ? cbMainRect.baseElement.currentText : cbMainRect.baseElement.placeHolderText;
                 font.family: Style.fontFamily;
-                font.pixelSize: !cbMainRect.baseElement ? Style.fontSize_common : cbMainRect.baseElement.textSize;
+                font.pixelSize: !cbMainRect.baseElement ? Style.fontSizeXSmall : cbMainRect.baseElement.textSize;
 
                 elide: Text.ElideRight;
             }
@@ -419,7 +419,7 @@ StyleComponents {
 
                 anchors.right: cbMainRect.right;
                 anchors.verticalCenter: cbMainRect.verticalCenter;
-                anchors.rightMargin: Style.size_smallMargin;
+                anchors.rightMargin: Style.sizeSmallMargin;
 
                 width: 12;
                 height: 10;
@@ -828,7 +828,7 @@ StyleComponents {
                 anchors.verticalCenter: textAreaItem.verticalCenter;
 
 
-                font.pixelSize: Style.fontSize_common;
+                font.pixelSize: Style.fontSizeXSmall;
                 font.family: Style.fontFamily;
 
                 //TODO -> Style
@@ -942,7 +942,7 @@ StyleComponents {
 
                 color: Style.color_text_common !==undefined ? Style.color_text_common : "#000000";
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_subtitle;
+                font.pixelSize: Style.fontSizeNormal;
                 visible: !progressBar.hasTitle ? false : !progressBar.title ? false : true;
 
                 text: qsTr(progressBar.title);
@@ -957,7 +957,7 @@ StyleComponents {
 
                 color: Style.color_text_common !==undefined ? Style.color_text_common : "#000000";
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_subtitle;
+                font.pixelSize: Style.fontSizeNormal;
                 visible: !progressBar.hasText ? false : !progressBar.text ? false : true;
 
                 text: !progressBar.text ? "" : !progressBar.indeterminate ? qsTr("Выполнено") + ": " + progressBar.text :

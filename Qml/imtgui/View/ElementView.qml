@@ -116,7 +116,7 @@ Rectangle {
 
         clip: true;
 
-        spacing: Style.size_mainMargin;
+        spacing: Style.sizeMainMargin;
 
         Loader {
             id: topLoader;
@@ -142,7 +142,7 @@ Rectangle {
 
                 color: Style.textColor;
                 font.family: Style.fontFamilyBold;
-                font.pixelSize: Style.fontSize_subtitle;
+                font.pixelSize: Style.fontSizeNormal;
 
                 elide: Text.ElideRight;
                 wrapMode: Text.NoWrap;
@@ -173,7 +173,7 @@ Rectangle {
 
                 color: Style.inactive_textColor
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
+                font.pixelSize: Style.fontSizeXSmall;
 
                 wrapMode: Text.WordWrap;
                 elide: Text.ElideRight;

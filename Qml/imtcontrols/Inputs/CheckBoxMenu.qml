@@ -37,7 +37,7 @@ FocusScope{
 
     property string checkImageSource: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
 
-    property int textSize: Style.fontSize_common;
+    property int textSize: Style.fontSizeXSmall;
     property string fontColor: Style.textColor;
     property string fontColorTitle: fontColor;
 
@@ -273,7 +273,7 @@ FocusScope{
                     // anchors.top: body.top
                     // anchors.topMargin: 50
                     anchors.left: parent.left;
-                    anchors.leftMargin: Style.size_mainMargin;
+                    anchors.leftMargin: Style.sizeMainMargin;
                     anchors.verticalCenter: searchBlock.verticalCenter;
 
                     width: 20;
@@ -313,8 +313,8 @@ FocusScope{
                     anchors.top: parent.top;
                     anchors.left: checkBoxAll.right;
                     anchors.right: parent.right;
-                    anchors.leftMargin: Style.size_mainMargin;
-                    anchors.rightMargin: Style.size_mainMargin;
+                    anchors.leftMargin: Style.sizeMainMargin;
+                    anchors.rightMargin: Style.sizeMainMargin;
                     anchors.topMargin: 10;
 
                     width: parent.width;
@@ -336,7 +336,7 @@ FocusScope{
                         radius: parent.radius;
                         color: "#ffffff";
                         fontColor: "#000000";
-                        textSize: Style.fontSize_common;
+                        textSize: Style.fontSizeXSmall;
                         borderColorConst: "transparent";
                         placeHolderText: "Поиск";
                         readOnly: !searchBlock.visible;
@@ -351,10 +351,10 @@ FocusScope{
                     anchors.bottom: parent.bottom;
                     anchors.left: parent.left;
                     anchors.right: parent.right;
-                    anchors.topMargin: Style.size_smallMargin;
-                    anchors.bottomMargin: Style.size_smallMargin;
-                    anchors.leftMargin: Style.size_mainMargin;
-                    anchors.rightMargin: Style.size_mainMargin;
+                    anchors.topMargin: Style.sizeSmallMargin;
+                    anchors.bottomMargin: Style.sizeSmallMargin;
+                    anchors.leftMargin: Style.sizeMainMargin;
+                    anchors.rightMargin: Style.sizeMainMargin;
 
                     boundsBehavior: Flickable.StopAtBounds;
                     clip: true;

@@ -42,7 +42,7 @@ Item {
 
         width: parent.width;
 
-        spacing: Style.size_smallMargin;
+        spacing: Style.sizeSmallMargin;
 
         Text {
             id: title;
@@ -52,7 +52,7 @@ Item {
             text: root.title;
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
         }
 
         CustomTextField {

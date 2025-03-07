@@ -916,7 +916,7 @@ Rectangle {
 			anchors.bottom: parent.bottom;
 
 			width: parent.width;
-			height: visible ? okButton.height + Style.size_smallMargin : 1;
+			height: visible ? okButton.height + Style.sizeSmallMargin : 1;
 
 			visible: !calendar.gridOnly;
 			clip: true;

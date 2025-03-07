@@ -25,7 +25,7 @@ ViewBase {
 
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
 
             text: qsTr("Log");
         }
@@ -84,7 +84,7 @@ ViewBase {
 
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSizeXSmall;
 
             lineHeight: 2;
         }

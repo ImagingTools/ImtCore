@@ -99,13 +99,13 @@ PopupView {
 
 		property int buttonWidth: 20;
 		property int buttonHeight: 16;
-		property int fontSize: Style.fontSize_XSmall;
+		property int fontSize: Style.fontSizeXSmall;
 
 		Item{
 			id: hoursColumn;
 
 			anchors.left: parent.left;
-			anchors.leftMargin: Style.size_mainMargin;
+			anchors.leftMargin: Style.sizeMainMargin;
 
 			width: body.buttonWidth;
 			height: parent.height;
@@ -115,7 +115,7 @@ PopupView {
 
 				anchors.horizontalCenter: parent.horizontalCenter;
 				anchors.top: parent.top;
-				anchors.topMargin: Style.size_smallMargin;
+				anchors.topMargin: Style.sizeSmallMargin;
 
 				width: body.buttonWidth;
 				height: body.buttonHeight;
@@ -169,7 +169,7 @@ PopupView {
 
 				anchors.horizontalCenter: parent.horizontalCenter;
 				anchors.bottom: parent.bottom;
-				anchors.bottomMargin: Style.size_smallMargin;
+				anchors.bottomMargin: Style.sizeSmallMargin;
 
 				width: body.buttonWidth;
 				height: body.buttonHeight;
@@ -193,7 +193,7 @@ PopupView {
 
 			anchors.right: parent.right;
 			anchors.verticalCenter: parent.verticalCenter;
-			anchors.rightMargin: Style.size_mainMargin;
+			anchors.rightMargin: Style.sizeMainMargin;
 
 			width: body.buttonWidth;
 			height: parent.height
@@ -204,7 +204,7 @@ PopupView {
 
 				anchors.horizontalCenter: parent.horizontalCenter;
 				anchors.top: parent.top;
-				anchors.topMargin: Style.size_smallMargin;
+				anchors.topMargin: Style.sizeSmallMargin;
 
 				width: body.buttonWidth;
 				height: body.buttonHeight;
@@ -256,7 +256,7 @@ PopupView {
 
 				anchors.horizontalCenter: parent.horizontalCenter;
 				anchors.bottom: parent.bottom;
-				anchors.bottomMargin: Style.size_smallMargin;
+				anchors.bottomMargin: Style.sizeSmallMargin;
 
 				width: body.buttonWidth;
 				height: body.buttonHeight;

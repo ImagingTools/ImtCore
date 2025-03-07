@@ -54,7 +54,7 @@ DecoratorBase {
         anchors.top: topContentLoader.bottom;
 
         width: root.width;
-		height: visible ? popupMenuListView.height + 2 * Style.size_smallMargin : false;
+		height: visible ? popupMenuListView.height + 2 * Style.sizeSmallMargin : false;
 
 		color: Style.baseColor;
 

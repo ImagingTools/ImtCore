@@ -63,7 +63,7 @@ RemoteCollectionView {
 				id: content;
 				anchors.left: parent.left;
 				anchors.verticalCenter: parent.verticalCenter;
-				spacing: Style.size_mainMargin;
+				spacing: Style.sizeMainMargin;
 				
 				TreeItemModel {
 					id: systemInfoModel;
@@ -186,7 +186,7 @@ RemoteCollectionView {
 				
 				anchors.verticalCenter: parent.verticalCenter;
 				
-				font.pixelSize: Style.fontSize_common;
+				font.pixelSize: Style.fontSizeXSmall;
 				font.family: Style.fontFamily;
 				color: Style.textColor;
 				
@@ -254,9 +254,9 @@ RemoteCollectionView {
 					
 					anchors.verticalCenter: parent.verticalCenter;
 					anchors.left: parent.left
-					anchors.leftMargin: Style.size_mainMargin;
+					anchors.leftMargin: Style.sizeMainMargin;
 					
-					font.pixelSize: Style.fontSize_common;
+					font.pixelSize: Style.fontSizeXSmall;
 					font.family: Style.fontFamily;
 					color: Style.textColor;
 					
@@ -268,7 +268,7 @@ RemoteCollectionView {
 					
 					anchors.verticalCenter: parent.verticalCenter;
 					anchors.left: name2.right;
-					anchors.leftMargin: Style.size_smallMargin;
+					anchors.leftMargin: Style.sizeSmallMargin;
 					
 					width: 15;
 					height: width;

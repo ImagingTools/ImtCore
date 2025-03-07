@@ -13,7 +13,7 @@ Item {
     property string legend: "";
     property int textWidth: legendText.width;
     property string fontFamily: Style.fontFamilyBold;
-    property int fontPixelSize: Style.fontSize_subtitle;
+    property int fontPixelSize: Style.fontSizeNormal;
     property bool fontBold: false;
     property alias indicatorHeight: activeIndicator.height;
 

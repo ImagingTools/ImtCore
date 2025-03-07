@@ -65,7 +65,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
 
-        spacing: Style.size_mainMargin;
+        spacing: Style.sizeMainMargin;
 
         Repeater {
             id: repeater;

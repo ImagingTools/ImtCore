@@ -11,7 +11,7 @@ Item {
 
     property alias currentIndex: mainPanelRepeater.currentIndex;
 
-    property int mainMargin: Style.size_mainMargin;
+    property int mainMargin: Style.sizeMainMargin;
     property int panelWidth: 150;
 
     signal pageLoaded(int index, var pageItem);
@@ -116,7 +116,7 @@ Item {
             anchors.right: parent.right;
             anchors.topMargin: root.mainMargin;
 
-            spacing: Style.size_mainMargin;
+            spacing: Style.sizeMainMargin;
 
             ListView {
                 id: mainPanelRepeater;
@@ -126,7 +126,7 @@ Item {
 
                 model: root.pagesModel;
 
-                spacing: Style.size_mainMargin;
+                spacing: Style.sizeMainMargin;
 
                 boundsBehavior: Flickable.StopAtBounds;
 

@@ -12,7 +12,7 @@ Rectangle {
 	color: Style.baseColor;
 
 	property string title;
-	property int titleFontSize: Style.fontSize_subtitle;
+	property int titleFontSize: Style.fontSizeNormal;
 	property string titleFontFamily: Style.fontFamily;
 	property color titleTextColor: Style.textColor;
 

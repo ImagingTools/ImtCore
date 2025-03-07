@@ -273,9 +273,9 @@ Rectangle {
 	PopupContainer {
 		id: popupContainer;
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.size_mainMargin;
+		anchors.rightMargin: Style.sizeMainMargin;
 		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: Style.size_mainMargin;
+		anchors.bottomMargin: Style.sizeMainMargin;
 	}
 
     Loader {

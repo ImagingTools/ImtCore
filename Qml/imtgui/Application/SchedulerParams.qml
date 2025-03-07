@@ -26,7 +26,7 @@ Item {
     Column {
         id: column;
         width: root.width;
-        spacing: Style.size_mainMargin;
+        spacing: Style.sizeMainMargin;
 
         GroupElementView {
             id: group;

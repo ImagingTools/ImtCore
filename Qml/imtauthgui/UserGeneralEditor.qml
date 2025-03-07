@@ -134,7 +134,7 @@ Column {
 				text: qsTr("Passwords don't match");
 				color: Style.errorTextColor;
 				font.family: Style.fontFamily;
-				font.pixelSize: Style.fontSize_common;
+				font.pixelSize: Style.fontSizeXSmall;
 			}
 		}
 
@@ -145,7 +145,7 @@ Column {
 				text: qsTr("Passwords don't match");
 				color: Style.errorTextColor;
 				font.family: Style.fontFamily;
-				font.pixelSize: Style.fontSize_common;
+				font.pixelSize: Style.fontSizeXSmall;
 			}
 		}
 

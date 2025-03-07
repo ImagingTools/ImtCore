@@ -20,7 +20,7 @@ Dialog {
 			property var checkedIndexes: [];
 			property bool block: true;
 
-			spacing: Style.size_mainMargin;
+			spacing: Style.sizeMainMargin;
 
 			function updateGui(){
 				item.block = true;
@@ -114,10 +114,10 @@ Dialog {
 					id: buttonRow;
 
 					anchors.left: parent.left;
-					anchors.leftMargin: Style.size_mainMargin;
+					anchors.leftMargin: Style.sizeMainMargin;
 
 					height: 25;
-					spacing: Style.size_smallMargin
+					spacing: Style.sizeSmallMargin
 
 					visible: !dialog.tableItem ? false : dialog.tableItem.canSwapColumns;
 
@@ -195,7 +195,7 @@ Dialog {
 
 					anchors.verticalCenter: buttonRow.verticalCenter;
 					anchors.right: buttonRow.visible ? parent.right : undefined;
-					anchors.rightMargin: buttonRow.visible ? Style.size_mainMargin : 0;
+					anchors.rightMargin: buttonRow.visible ? Style.sizeMainMargin : 0;
 					anchors.horizontalCenter: !buttonRow.visible ? parent.horizontalCenter : undefined;
 
 					visible: !dialog.tableItem ? false : dialog.tableItem.isFlickable;

@@ -140,7 +140,7 @@ Item {
 	Column{
 		id: column;
 
-		spacing: Style.size_smallMargin;
+		spacing: Style.sizeSmallMargin;
 
 		Text{
 			id: titleText;

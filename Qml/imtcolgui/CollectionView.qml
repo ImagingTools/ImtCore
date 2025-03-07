@@ -374,7 +374,7 @@ Item {
 		id: additionalInformation;
 		
 		anchors.fill: collectionMetaInfo;
-		anchors.margins: Style.size_mainMargin;
+		anchors.margins: Style.sizeMainMargin;
 		
 		color: collectionMetaInfo.color;
 		
@@ -386,7 +386,7 @@ Item {
 			anchors.fill: parent;
 			
 			font.family: Style.fontFamily;
-			font.pixelSize: Style.fontSize_common;
+			font.pixelSize: Style.fontSizeXSmall;
 			
 			wrapMode: Text.WordWrap;
 			color: Style.textColor;

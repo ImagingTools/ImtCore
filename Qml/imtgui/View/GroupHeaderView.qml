@@ -16,7 +16,7 @@ Rectangle {
     property alias title: titleText.text;
     property int topPadding: 0
     property int leftPadding: 0
-    property int rightPadding: Style.size_mainMargin
+    property int rightPadding: Style.sizeMainMargin
     property int bottomPadding: 0
     property Component controlComp: baseControlComp
 
@@ -94,7 +94,7 @@ Rectangle {
 
         color: Style.textColor;
         font.family: Style.fontFamilyBold;
-        font.pixelSize: Style.fontSize_title;
+        font.pixelSize: Style.fontSizeLarge;
     }
 }
 

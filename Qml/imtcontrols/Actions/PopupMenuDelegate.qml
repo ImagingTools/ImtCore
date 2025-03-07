@@ -13,7 +13,7 @@ ItemDelegate {
     // Reference to the control in which the delegate is declared
     property Item containerItem: null;
     property Item rootItem: null;
-	property int contentLeftMargin: Style.size_mainMargin;
+	property int contentLeftMargin: Style.sizeMainMargin;
 
     onHeightChanged: {
         internal.checkSeparator();

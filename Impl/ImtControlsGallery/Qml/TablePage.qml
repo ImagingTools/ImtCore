@@ -155,11 +155,11 @@ Rectangle {
         id: table;
 
         anchors.top: parent.top;
-        anchors.topMargin: Style.size_mainMargin;
+        anchors.topMargin: Style.sizeMainMargin;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_mainMargin;
+        anchors.leftMargin: Style.sizeMainMargin;
         anchors.right: parent.right;
-        anchors.rightMargin: Style.size_mainMargin;
+        anchors.rightMargin: Style.sizeMainMargin;
         height: 500;
         itemHeight: 50;
         headerHeight: 50;
@@ -189,9 +189,9 @@ Rectangle {
         anchors.top: table.bottom;
         anchors.topMargin: 70;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_mainMargin;
+        anchors.leftMargin: Style.sizeMainMargin;
         anchors.right: parent.right;
-        anchors.rightMargin: Style.size_mainMargin;
+        anchors.rightMargin: Style.sizeMainMargin;
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 50;
 

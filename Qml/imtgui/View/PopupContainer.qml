@@ -10,7 +10,7 @@ Item {
 
 	Column {
 		id: messageColumn
-		spacing: Style.size_mainMargin
+		spacing: Style.sizeMainMargin
 		anchors.bottom: parent.bottom
 
 		Repeater {
@@ -52,7 +52,7 @@ Item {
 					anchors.verticalCenter: parent.verticalCenter
 					anchors.left: iconItem.right;
 					anchors.right: parent.right;
-					anchors.rightMargin: Style.size_mainMargin;
+					anchors.rightMargin: Style.sizeMainMargin;
 					text: model.text
 					wrapMode: Text.WordWrap
 				}
@@ -61,7 +61,7 @@ Item {
 					id: closeButton;
 					anchors.right: parent.right
 					anchors.top: parent.top
-					anchors.margins: Style.size_mainMargin
+					anchors.margins: Style.sizeMainMargin
 					width: 15
 					height: width
 					iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);

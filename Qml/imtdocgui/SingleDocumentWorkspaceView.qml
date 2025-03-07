@@ -86,7 +86,7 @@ Rectangle {
 		id: buttonPanel;
 		anchors.top: parent.top;
 		anchors.left: parent.left;
-		anchors.leftMargin: visible ? Style.size_mainMargin : 0;
+		anchors.leftMargin: visible ? Style.sizeMainMargin : 0;
 		width: visible ? closeButton.width: 0;
 		height: headersListView.height;
 		visible: headersModel.count > 1;
@@ -178,7 +178,7 @@ Rectangle {
 		id: headersListView;
 		anchors.top: parent.top;
 		anchors.left: buttonPanel.right;
-		anchors.leftMargin: Style.size_mainMargin;
+		anchors.leftMargin: Style.sizeMainMargin;
 		anchors.right: parent.right;
 		height: visible ? 40 : 0;
 		orientation: ListView.Horizontal;
@@ -193,7 +193,7 @@ Rectangle {
 			Item {
 				id: spacer;
 				anchors.left: parent.left;
-				width: visible ? Style.size_mainMargin : 0;
+				width: visible ? Style.sizeMainMargin : 0;
 				visible: model.index === 1 && !root.initialItemTitleVisible ? false : true;
 			}
 
@@ -201,12 +201,12 @@ Rectangle {
 				id: content;
 				anchors.left: spacer.right;
 				height: parent.height;
-				spacing: Style.size_mainMargin;
+				spacing: Style.sizeMainMargin;
 
 				Text {
 					id: separator;
 					anchors.verticalCenter: content.verticalCenter;
-					font.pixelSize: Style.fontSize_title;
+					font.pixelSize: Style.fontSizeLarge;
 					font.family: Style.fontFamily;
 					color: Style.titleColor;
 					text: root.titleSeparation;
@@ -216,7 +216,7 @@ Rectangle {
 				Text {
 					id: headerText;
 					anchors.verticalCenter: content.verticalCenter;
-					font.pixelSize: Style.fontSize_title;
+					font.pixelSize: Style.fontSizeLarge;
 					font.family: Style.fontFamily;
 					color: Style.titleColor;
 					text: model.Name;

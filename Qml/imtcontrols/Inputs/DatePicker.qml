@@ -78,7 +78,7 @@ Item {
 	property int textFieldWidthMonth: 85;
 	property int textFieldWidthDay: 25;
 	property int textFieldRadius:0;
-	property int textSize: Style.fontSize_common;
+	property int textSize: Style.fontSizeXSmall;
 	property string textFieldColor: Style.baseColor;
 	property string fontColor: Style.textColor;
 	property string textFieldBorderColor: "";//textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
@@ -381,7 +381,7 @@ Item {
 
 		height: datePicker.height;
 
-		spacing: Style.size_mainMargin;
+		spacing: Style.sizeMainMargin;
 
 		RegularExpressionValidator {
 			id: yearValid;
@@ -726,7 +726,7 @@ Item {
 					enabled: visible;
 					model: monthTreeModel;
 
-					textSize: datePicker.textSize;//Style.fontSize_common;
+					textSize: datePicker.textSize;//Style.fontSizeXSmall;
 					fontColor: monthField.fontColor;
 					borderColor: "transparent";
 					backgroundColor: "transparent";

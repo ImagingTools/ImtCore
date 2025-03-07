@@ -133,7 +133,7 @@ Item {
     CommandsView {
         id: leftCommands;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_mainMargin;
+        anchors.leftMargin: Style.sizeMainMargin;
         eventCommandPrefix: commandsItem.commandId;
         maximumWidth: (centerCommands.commandsCount > 0 ?
                                     centerCommands.x :
@@ -152,7 +152,7 @@ Item {
     CommandsView {
         id: rightCommands;
         anchors.right: button.left;
-        anchors.rightMargin: Style.size_mainMargin;
+        anchors.rightMargin: Style.sizeMainMargin;
         eventCommandPrefix: commandsItem.commandId;
         maximumWidth: (commandsItem.width - (centerCommands.x + centerCommands.contentWidth)) - button.width;
     }

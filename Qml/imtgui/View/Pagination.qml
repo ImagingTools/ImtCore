@@ -117,7 +117,7 @@ Row {
 	Row{
 		anchors.verticalCenter: parent.verticalCenter;
 
-		spacing: Style.size_smallMargin;
+		spacing: Style.sizeSmallMargin;
 
 		Repeater {
 			id: repeaterPagination;

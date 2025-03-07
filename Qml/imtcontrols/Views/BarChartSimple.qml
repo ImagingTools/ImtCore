@@ -89,7 +89,7 @@ Item {
 		fitToTextWidth: true;
 
 		componentHeight: 30;
-		fontPixelSize:  Style.fontSize_common;
+		fontPixelSize:  Style.fontSizeXSmall;
 
 		color: Style.color_buttonText;
 		fontColor: "#ffffff";

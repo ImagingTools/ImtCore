@@ -61,7 +61,7 @@ DecoratorBase {
         id: preferenceButton;
 
         anchors.left: userPanel.right;
-        anchors.leftMargin: Style.size_mainMargin;
+        anchors.leftMargin: Style.sizeMainMargin;
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
 
         width: 24;

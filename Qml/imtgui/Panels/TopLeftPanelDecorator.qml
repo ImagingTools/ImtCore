@@ -9,19 +9,19 @@ DecoratorBase {
 
     Item {
         id: content;
-        width: tempText.width + 2*Style.size_mainMargin > topLeftPanelDecorator.maxWidth ?
+        width: tempText.width + 2*Style.sizeMainMargin > topLeftPanelDecorator.maxWidth ?
                    topLeftPanelDecorator.maxWidth:
-                   tempText.width + 2*Style.size_mainMargin;
+                   tempText.width + 2*Style.sizeMainMargin;
         height: topLeftPanelDecorator.height;
         Text {
             id: applicationName;
             anchors.verticalCenter: content.verticalCenter;
             anchors.left: parent.left;
-            anchors.leftMargin: Style.size_mainMargin;
+            anchors.leftMargin: Style.sizeMainMargin;
             anchors.right: parent.right;
-            anchors.rightMargin: Style.size_mainMargin;
+            anchors.rightMargin: Style.sizeMainMargin;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSize_title;
+            font.pixelSize: Style.fontSizeLarge;
             color: Style.textColor;
             text: context && context.appName && context.appName !== "" ? context.appName : "";
             elide: Text.ElideRight;
@@ -31,7 +31,7 @@ DecoratorBase {
     Text {
         id: tempText;
         font.family: Style.fontFamilyBold;
-        font.pixelSize: Style.fontSize_title;
+        font.pixelSize: Style.fontSizeLarge;
         color: Style.textColor;
         text: applicationName.text;
         visible: false;
