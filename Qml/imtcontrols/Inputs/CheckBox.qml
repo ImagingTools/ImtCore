@@ -38,13 +38,16 @@ ControlBase {
 			else if(checkState == Qt.Checked){
 				checkState = Qt.Unchecked;
 			}
+			else {
+				checkState = Qt.Checked;
+			}
 		}
 		else {
 			if(checkState == Qt.Unchecked){
-				checkState = Qt.Checked;
+				checkState = Qt.PartiallyChecked;
 			}
 			else if(checkState == Qt.PartiallyChecked){
-				checkState = Qt.Unchecked;
+				checkState = Qt.Checked;
 			}
 			else if(checkState == Qt.Checked){
 				checkState = Qt.Unchecked;
