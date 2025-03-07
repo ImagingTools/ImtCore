@@ -30,10 +30,10 @@ StyleComponents {
 	property int fontSizeLarge: 20
 	property int fontSizeNormal: 18
 	property int fontSizeSmall: 16
-	property int fontSizeXSmall: 12
-	property int fontSizeXXSmall: 10
+	property int fontSizeXSmall: 13
+	property int fontSizeXXSmall: 11
 	property int fontSizeXXXSmall: 8
-	property int fontSizeTiny: 4
+	property int fontSizeTiny: 6
 
 	property int buttonWidthExtraSmall: 4
 	property int buttonWidthLarge: 32
