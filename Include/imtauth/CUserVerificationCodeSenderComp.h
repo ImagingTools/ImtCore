@@ -28,7 +28,7 @@ public:
 	// reimplemented (imtauth::IUserVerificationCodeSender)
 	virtual bool SendCode(const IUserInfo& userInfo, const QByteArray& verificationCode) const override;
 
-private:
+protected:
 	I_REF(imtmail::ISmtpClient, m_smtpClientCompPtr);
 	I_REF(imtmail::ISmtpMessageCreator, m_smtpMessageCreatorCompPtr);
 };
