@@ -81,7 +81,7 @@ Rectangle {
 
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeLarge;
+            font.pixelSize: Style.fontSizeXXLarge;
 
             text: "Галерея";
 
@@ -390,7 +390,7 @@ Rectangle {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeLarge;
+                font.pixelSize: Style.fontSizeXXLarge;
 
                 text: "Вы уверены, что хотите удалить фото?";
 

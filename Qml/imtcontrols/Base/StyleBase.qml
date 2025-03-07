@@ -40,16 +40,18 @@ StyleComponents {
 	property alias boldFontLoader: boldFont;
 
 	//Font size
-	property int fontSizeHuge: 64
-	property int fontSizeXXXLarge: 48
-	property int fontSizeXXLarge: 32
-	property int fontSizeXLarge: 24
-	property int fontSizeLarge: 20
-	property int fontSizeNormal: 18
-	property int fontSizeSmall: 16
-	property int fontSizeXSmall: 13
-	property int fontSizeXXSmall: 11
-	property int fontSizeXXXSmall: 8
+
+	property int fontSizeXHuge: 64
+	property int fontSizeHuge: 48
+	property int fontSizeXXXXLarge: 32
+	property int fontSizeXXXLarge: 24
+	property int fontSizeXXLarge: 20
+	property int fontSizeXLarge: 18
+	property int fontSizeLarge: 16
+	property int fontSizeNormal: 13
+	property int fontSizeSmall: 11
+	property int fontSizeXSmall: 10
+	property int fontSizeXXSmall: 8
 	property int fontSizeTiny: 6
 
 	//Button sizes

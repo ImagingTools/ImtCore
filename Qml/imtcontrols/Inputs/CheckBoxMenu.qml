@@ -37,7 +37,7 @@ FocusScope{
 
     property string checkImageSource: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
 
-    property int textSize: Style.fontSizeXSmall;
+    property int textSize: Style.fontSizeNormal;
     property string fontColor: Style.textColor;
     property string fontColorTitle: fontColor;
 
@@ -336,7 +336,7 @@ FocusScope{
                         radius: parent.radius;
                         color: "#ffffff";
                         fontColor: "#000000";
-                        textSize: Style.fontSizeXSmall;
+                        textSize: Style.fontSizeNormal;
                         borderColorConst: "transparent";
                         placeHolderText: "Поиск";
                         readOnly: !searchBlock.visible;

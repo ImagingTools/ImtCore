@@ -111,7 +111,7 @@ DecoratorBase {
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
 				font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
 				font.bold: tabPanelDecorator.baseElement.index === 0;
-				font.pixelSize: Style.fontSizeXSmall;
+				font.pixelSize: Style.fontSizeNormal;
 			}
 
 			Text {
@@ -126,7 +126,7 @@ DecoratorBase {
 				color: Style.textColor;
 				font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
 				font.bold: tabPanelDecorator.baseElement.index === 0;
-				font.pixelSize: Style.fontSizeXSmall;
+				font.pixelSize: Style.fontSizeNormal;
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
 
 				elide: Text.ElideRight;

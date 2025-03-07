@@ -13,7 +13,7 @@ Rectangle {
 		anchors.centerIn: parent;
 		color: Style.baseColor;
 		font.family:Style.fontFamily;
-		font.pixelSize: Style.fontSizeXSmall;
+		font.pixelSize: Style.fontSizeNormal;
 	}
 }
 

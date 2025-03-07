@@ -24,7 +24,7 @@ Rectangle {
     property string backgroundColor: Style.backgroundColor;
     property string fontColor: Style.textColor;
 
-    property int fontSize: Style.fontSizeXSmall;
+    property int fontSize: Style.fontSizeNormal;
 
     property bool modelIsDirty: false;
 

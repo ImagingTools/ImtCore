@@ -78,7 +78,7 @@ Item {
 	property int textFieldWidthMonth: 85;
 	property int textFieldWidthDay: 25;
 	property int textFieldRadius:0;
-	property int textSize: Style.fontSizeXSmall;
+	property int textSize: Style.fontSizeNormal;
 	property string textFieldColor: Style.baseColor;
 	property string fontColor: Style.textColor;
 	property string textFieldBorderColor: "";//textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
@@ -726,7 +726,7 @@ Item {
 					enabled: visible;
 					model: monthTreeModel;
 
-					textSize: datePicker.textSize;//Style.fontSizeXSmall;
+					textSize: datePicker.textSize;//Style.fontSizeNormal;
 					fontColor: monthField.fontColor;
 					borderColor: "transparent";
 					backgroundColor: "transparent";

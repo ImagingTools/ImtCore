@@ -12,7 +12,7 @@ DecoratorBase{
 
     property string color: "gray";
     property string selectedColor: Style.imaginToolsAccent;
-    property int fontSize: Style.fontSizeXSmall;
+    property int fontSize: Style.fontSizeNormal;
 
     Rectangle {
         id: circle;

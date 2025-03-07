@@ -212,7 +212,7 @@ Rectangle {
             wrapMode: Text.WordWrap;
             horizontalAlignment: Text.AlignHCenter;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeLarge;
+            font.pixelSize: Style.fontSizeXXLarge;
             color: Style.errorTextColor;
 
             text: "Click!";

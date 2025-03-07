@@ -74,7 +74,7 @@ ControlBase {
 	property alias containsMouse: cbMouseArea.containsMouse;
 	property alias mouseArea: cbMouseArea;
 
-	property int textSize: Style.fontSizeXSmall;
+	property int textSize: Style.fontSizeNormal;
 	property int itemHeight: 30;
 	property string fontColor: Style.textColor;
 	property string fontColorTitle: fontColor;

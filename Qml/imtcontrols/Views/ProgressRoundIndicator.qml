@@ -150,7 +150,7 @@ Item{
         anchors.centerIn: parent;
 
         font.family: Style.fontFamily;
-        font.pixelSize: Style.fontSizeNormal;
+        font.pixelSize: Style.fontSizeXLarge;
         color: Style.textColor;
         visible: !roundIndicator.indeterminate && roundIndicator.hasText && !roundIndicator.hasIcon && roundIndicator.percent > 0;
 

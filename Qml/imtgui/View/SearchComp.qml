@@ -16,7 +16,7 @@ Rectangle{
 	property int elementHeight: 60;
 
 	property string fontColor: Style.textColor;
-	property int textSize: Style.fontSizeXSmall -2;
+	property int textSize: Style.fontSizeNormal -2;
 
 	property string commandId: "AddressesList";
 

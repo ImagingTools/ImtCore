@@ -104,7 +104,7 @@ Canvas {
 
 		// ctx.stroke();
 		ctx.strokeStyle =  rowDelegate.tableItem.borderColorVertical
-		let fontPixelSize = rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeXSmall : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeXSmall
+		let fontPixelSize = rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeNormal : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeNormal
 		ctx.font = '' + fontPixelSize + "px " + Style.fontFamily
 
 

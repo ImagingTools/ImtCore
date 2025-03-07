@@ -316,7 +316,7 @@ FocusScope {
 
                         width: parent.width;
 
-                        font.pixelSize: Style.fontSizeXSmall;
+                        font.pixelSize: Style.fontSizeNormal;
                         font.family: Style.fontFamilyBold;
                         font.bold: true;
                         color: Style.textColor;

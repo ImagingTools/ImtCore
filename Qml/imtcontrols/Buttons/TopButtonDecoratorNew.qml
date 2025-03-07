@@ -15,7 +15,7 @@ Item {
 
     property string textColor: Style.textColor;
     property string textColorDisabled: "gray";
-    property real fontSize: Style.fontSizeXXSmall;
+    property real fontSize: Style.fontSizeSmall;
     property int radius: 4;
     property bool isEmpty: topButtonDecorator.baseButton.text === "";
 

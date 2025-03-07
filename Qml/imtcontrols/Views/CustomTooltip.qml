@@ -22,7 +22,7 @@ ControlBase {
     property int componentHeight: Math.max(customTooltip.componentMinHeight, forHeightText.height + 2*customTooltip.textMargin);
 
 
-    property int fontPixelSize: Style.fontSizeXSmall;
+    property int fontPixelSize: Style.fontSizeNormal;
     property bool fontBold: false;
     property string fontColor: Style.textColor;
     property int textMargin: Style.sizeSmallMargin;

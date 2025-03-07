@@ -294,7 +294,7 @@ Rectangle{
                         elide: Text.ElideRight;
 
                         font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSizeNormal !==undefined ? Style.fontSizeNormal : 18;
+                        font.pixelSize: Style.fontSizeXLarge !==undefined ? Style.fontSizeXLarge : 18;
                         color: treeViewGql.textColor;
 
                         text: model[treeViewGql.nameId] !== undefined ? model[treeViewGql.nameId] : "";
@@ -747,7 +747,7 @@ Rectangle{
         visible: false;
 
         font.family: Style.fontFamily;
-        font.pixelSize: Style.fontSizeNormal !==undefined ? Style.fontSizeNormal : 18;
+        font.pixelSize: Style.fontSizeXLarge !==undefined ? Style.fontSizeXLarge : 18;
         color: Style.textColor;
 
         property real sourceWidth: 0;

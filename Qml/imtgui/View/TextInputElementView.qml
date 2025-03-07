@@ -125,7 +125,7 @@ ElementView {
             text: root.errorText;
             color: Style.errorTextColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeXSmall;
+            font.pixelSize: Style.fontSizeNormal;
         }
     }
 }

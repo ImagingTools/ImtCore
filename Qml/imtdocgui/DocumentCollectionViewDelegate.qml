@@ -398,7 +398,7 @@ CollectionViewCommandsDelegateBase {
 								anchors.topMargin: Style.sizeMainMargin;
 								color: Style.buttonText;
 								font.family: Style.fontFamilyBold;
-								font.pixelSize: Style.fontSizeXSmall;
+								font.pixelSize: Style.fontSizeNormal;
 								font.bold: true;
 								text: qsTr("Description");
 							}
@@ -437,7 +437,7 @@ CollectionViewCommandsDelegateBase {
 									id: descriptionTextField;
 									width: parent.width;
 									font.family: Style.fontFamily;
-									font.pixelSize: Style.fontSizeXSmall;
+									font.pixelSize: Style.fontSizeNormal;
 									color: Style.textColor;
 									wrapMode: Text.WordWrap;
 								}

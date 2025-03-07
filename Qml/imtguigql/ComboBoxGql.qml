@@ -40,8 +40,8 @@ Item {
     property int delegateRadius: 0;
     property int itemHeight: 26;
     property int filterHeiht: 30;
-    property int textSize: Style.fontSizeXSmall;//
-    property int textDelegateSize: Style.fontSizeXSmall;
+    property int textSize: Style.fontSizeNormal;//
+    property int textDelegateSize: Style.fontSizeNormal;
     property int dialogsCountPrev: 1000;
     property int dialogsCount: ModalDialogManager.count;
 

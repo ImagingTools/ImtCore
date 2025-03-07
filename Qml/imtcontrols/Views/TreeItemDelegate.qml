@@ -147,7 +147,7 @@ Item {
 
                 color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
 
-                font.pixelSize: Style.fontSizeXSmall;
+                font.pixelSize: Style.fontSizeNormal;
                 font.family: Style.fontFamily;
 
                 text: model.Name;

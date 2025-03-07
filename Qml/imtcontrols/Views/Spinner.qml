@@ -85,7 +85,7 @@ Rectangle {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeXSmall;
+                font.pixelSize: Style.fontSizeNormal;
             }
 
             MouseArea {

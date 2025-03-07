@@ -88,7 +88,7 @@ Rectangle{
 		anchors.verticalCenterOffset: bigIndicatorContainer.textVerticalOffset;
 
 		font.family: Style.fontFamily;
-		font.pixelSize: Style.fontSizeNormal;
+		font.pixelSize: Style.fontSizeXLarge;
 		color: Style.color_first;
 		text: bigIndicatorContainer.text;
 		z: 10;

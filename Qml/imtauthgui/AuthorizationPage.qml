@@ -128,7 +128,7 @@ Rectangle {
 
 					color: Style.textColor;
 					font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSizeLarge;
+					font.pixelSize: Style.fontSizeXXLarge;
 
 					text: authPageContainer.appName !== "" ? qsTr("Welcome to") + " " + authPageContainer.appName : qsTr("Welcome");
 				}
@@ -170,7 +170,7 @@ Rectangle {
 
 				color: Style.textColor;
 				font.family: Style.fontFamilyBold;
-				font.pixelSize: Style.fontSizeXSmall;
+				font.pixelSize: Style.fontSizeNormal;
 
 				text: qsTr("Login");
 
@@ -222,7 +222,7 @@ Rectangle {
 
 				color: Style.textColor;
 				font.family: Style.fontFamilyBold;
-				font.pixelSize: Style.fontSizeXSmall;
+				font.pixelSize: Style.fontSizeNormal;
 
 				text: qsTr("Password");
 
@@ -308,7 +308,7 @@ Rectangle {
 
 					color: Style.textColor;
 					font.family: Style.fontFamilyBold;
-					font.pixelSize: Style.fontSizeXSmall;
+					font.pixelSize: Style.fontSizeNormal;
 					font.underline: true;
 
 					text: qsTr("Password recovery");
@@ -348,7 +348,7 @@ Rectangle {
 
 					color: Style.textColor;
 					font.family: Style.fontFamilyBold;
-					font.pixelSize: Style.fontSizeXSmall;
+					font.pixelSize: Style.fontSizeNormal;
 					font.underline: true;
 
 					text: qsTr("Register");
@@ -385,7 +385,7 @@ Rectangle {
 
 					color:  Style.errorTextColor;
 					font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSizeXSmall;
+					font.pixelSize: Style.fontSizeNormal;
 
 					visible:  errorMessage.text != "";
 				}

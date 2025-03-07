@@ -8,7 +8,7 @@ import imtcontrols 1.0
 //     property TableRowDelegateBase rowDelegate: null;
 //     property int columnIndex: -1;
 //     property string text
-//     height: rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeXSmall : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeXSmall
+//     height: rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeNormal : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeNormal
 
 //     Component.onCompleted: {
 //         console.log("onCompleted", text)
@@ -68,7 +68,7 @@ import imtcontrols 1.0
 
 
 //         ctx.strokeStyle =  rowDelegate.tableItem.borderColorVertical
-//         let fontPixelSize = height // rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeXSmall : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeXSmall
+//         let fontPixelSize = height // rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeNormal : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeNormal
 //         ctx.font = '' + fontPixelSize + "px " + Style.fontFamily
 //         // ctx.fillStyle = rowDelegate.tableItem.emptyDecorCell ? Style.textColor : rowDelegate.tableItem.cellDecorator.isValidData("FontColor", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontColor", columnIndex) : Style.textColor
 
@@ -93,7 +93,7 @@ Text {
     verticalAlignment: Text.AlignVCenter
     horizontalAlignment: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Text.AlignLeft : rowDelegate.tableItem.cellDecorator.isValidData("TextPosition", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("TextPosition", name.columnIndex) : Text.AlignLeft : Text.AlignLeft
 
-    font.pixelSize: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeXSmall : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", name.columnIndex) : Style.fontSizeXSmall : Style.fontSizeXSmall
+    font.pixelSize: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeNormal : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", name.columnIndex) : Style.fontSizeNormal : Style.fontSizeNormal
     font.family: Style.fontFamily
 
     color: rowDelegate

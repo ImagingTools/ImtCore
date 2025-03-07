@@ -35,7 +35,7 @@ Item {
             text: inputDialogBodyContainer.message;
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeXSmall;
+            font.pixelSize: Style.fontSizeNormal;
             elide: Text.ElideRight;
 
             wrapMode: Text.WordWrap;

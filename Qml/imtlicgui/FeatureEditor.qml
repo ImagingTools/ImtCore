@@ -161,7 +161,7 @@ ViewBase {
             anchors.verticalCenter: parent.verticalCenter;
             color: Style.buttonText;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeXSmall;
+            font.pixelSize: Style.fontSizeNormal;
             text: qsTr("Feature Name");
         }
 
@@ -185,7 +185,7 @@ ViewBase {
             anchors.verticalCenter: parent.verticalCenter;
             color: Style.buttonText;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeXSmall;
+            font.pixelSize: Style.fontSizeNormal;
             text: qsTr("Feature-ID");
         }
 
@@ -204,7 +204,7 @@ ViewBase {
             anchors.verticalCenter: parent.verticalCenter;
             color: Style.buttonText;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeXSmall;
+            font.pixelSize: Style.fontSizeNormal;
             text: qsTr("Description");
         }
 

@@ -62,7 +62,7 @@ Rectangle {
 		anchors.bottomMargin: 4;
 
 		font.family: Style.fontFamilyBold;
-		font.pixelSize: Style.fontSizeXLarge;
+		font.pixelSize: Style.fontSizeXXXLarge;
 
 		color: indicator.percent >= indicator.percentCritical ? indicator.negativeColor: indicator.textColor;
 
@@ -121,7 +121,7 @@ Rectangle {
 		anchors.bottomMargin: valueNameText.visible *(valueNameText.height + valueNameText.anchors.bottomMargin);
 
 		font.family: Style.fontFamilyBold;
-		font.pixelSize: Style.fontSizeNormal;
+		font.pixelSize: Style.fontSizeXLarge;
 
 		color:  indicator.textColor;
 
@@ -138,7 +138,7 @@ Rectangle {
 		anchors.bottomMargin: 0;
 
 		font.family: Style.fontFamilyBold;
-		font.pixelSize: Style.fontSizeNormal;
+		font.pixelSize: Style.fontSizeXLarge;
 
 		color:  indicator.textColor;
 

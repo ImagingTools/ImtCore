@@ -64,7 +64,7 @@ TextInputElementView {
             text: qsTr("MAC Address must be in the format XX:XX:XX:XX:XX:XX");
             color: Style.errorTextColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeXSmall;
+            font.pixelSize: Style.fontSizeNormal;
         }
     }
 
@@ -77,7 +77,7 @@ TextInputElementView {
             text: qsTr("Only the symbols <a-f> and <0 - 9> may be included");
             color: Style.errorTextColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeXSmall;
+            font.pixelSize: Style.fontSizeNormal;
         }
     }
 }

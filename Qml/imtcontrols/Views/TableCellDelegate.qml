@@ -286,10 +286,10 @@ Item {
                                                                                             delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("TextPosition", delegateContainer.columnIndex) ?
                                                                                                 delegateContainer.pTableDelegateContainer.cellDecorator.getData("TextPosition", delegateContainer.columnIndex) :
                                                                                                 Text.AlignLeft: Text.AlignLeft;
-            font.pixelSize: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.emptyDecorCell ? Style.fontSizeXSmall:
+            font.pixelSize: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.emptyDecorCell ? Style.fontSizeNormal:
                                                                                        delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("FontSize", delegateContainer.columnIndex) ?
                                                                                            delegateContainer.pTableDelegateContainer.cellDecorator.getData("FontSize", delegateContainer.columnIndex) :
-                                                                                           Style.fontSizeXSmall : Style.fontSizeXSmall;
+                                                                                           Style.fontSizeNormal : Style.fontSizeNormal;
             font.family: Style.fontFamily;
 //            font.bold: delegateContainer.pTableDelegateContainer ?
 //                           delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :

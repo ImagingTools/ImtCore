@@ -186,7 +186,7 @@ RemoteCollectionView {
 				
 				anchors.verticalCenter: parent.verticalCenter;
 				
-				font.pixelSize: Style.fontSizeXSmall;
+				font.pixelSize: Style.fontSizeNormal;
 				font.family: Style.fontFamily;
 				color: Style.textColor;
 				
@@ -256,7 +256,7 @@ RemoteCollectionView {
 					anchors.left: parent.left
 					anchors.leftMargin: Style.sizeMainMargin;
 					
-					font.pixelSize: Style.fontSizeXSmall;
+					font.pixelSize: Style.fontSizeNormal;
 					font.family: Style.fontFamily;
 					color: Style.textColor;
 					

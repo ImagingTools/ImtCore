@@ -28,7 +28,7 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter;
 
             color: Style.textColor;
-            font.pixelSize: Style.fontSizeLarge;
+            font.pixelSize: Style.fontSizeXXLarge;
             font.family: Style.fontFamily;
 
             wrapMode: Text.Wrap;

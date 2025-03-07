@@ -206,7 +206,7 @@ Rectangle {
 				Text {
 					id: separator;
 					anchors.verticalCenter: content.verticalCenter;
-					font.pixelSize: Style.fontSizeLarge;
+					font.pixelSize: Style.fontSizeXXLarge;
 					font.family: Style.fontFamily;
 					color: Style.titleColor;
 					text: root.titleSeparation;
@@ -216,7 +216,7 @@ Rectangle {
 				Text {
 					id: headerText;
 					anchors.verticalCenter: content.verticalCenter;
-					font.pixelSize: Style.fontSizeLarge;
+					font.pixelSize: Style.fontSizeXXLarge;
 					font.family: Style.fontFamily;
 					color: Style.titleColor;
 					text: model.Name;

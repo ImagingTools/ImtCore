@@ -68,7 +68,7 @@ Rectangle {
 //                        anchors.left: parent.left;
 //                        anchors.leftMargin: Style.sizeMainMargin;
 
-                        font.pixelSize: Style.fontSizeXSmall;
+                        font.pixelSize: Style.fontSizeNormal;
                         font.family: Style.fontFamilyBold;
                         font.bold: true;
 
@@ -125,7 +125,7 @@ Rectangle {
 //                                    anchors.rightMargin: Style.sizeMainMargin;
 
                                     font.family: Style.fontFamily;
-                                    font.pixelSize: Style.fontSizeXXSmall;
+                                    font.pixelSize: Style.fontSizeSmall;
                                     wrapMode: Text.WordWrap
 
                                     color: Style.textColor;

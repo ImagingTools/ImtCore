@@ -22,7 +22,7 @@ Item {
     property int filterHeight: 30;
     property int offset: 0;
     property int delegateRadius: 0;
-    property int textSize: Style.fontSizeXSmall;
+    property int textSize: Style.fontSizeNormal;
     property int count: 15;
     property string commandId: "";
     property string filterName: "Name";
@@ -320,7 +320,7 @@ Item {
                 anchors.centerIn: parent;
 
                 color: Style.textColor;
-                font.pixelSize: Style.fontSizeXSmall;
+                font.pixelSize: Style.fontSizeNormal;
                 font.family: Style.fontFamily;
 
                 text: "Loaded..."

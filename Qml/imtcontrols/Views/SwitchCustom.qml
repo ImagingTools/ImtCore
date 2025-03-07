@@ -24,7 +24,7 @@ ControlBase {
     property real controlWidth: height > 0 ? height :20;
 
     property bool isLeftText: false;
-	property int fontPixelSize: Style.fontSizeXSmall;
+	property int fontPixelSize: Style.fontSizeNormal;
     property bool fontBold: false;
 
     property int mainMargin: 8;

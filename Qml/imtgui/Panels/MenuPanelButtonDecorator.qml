@@ -70,7 +70,7 @@ DecoratorBase {
             anchors.rightMargin: Style.sizeMainMargin;
             color: leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted ? Style.iconColorOnSelected : Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeXXSmall;
+            font.pixelSize: Style.fontSizeSmall;
             text: leftPanelElement.baseElement.text;
             horizontalAlignment: Text.AlignHCenter;
             elide: Text.ElideRight;

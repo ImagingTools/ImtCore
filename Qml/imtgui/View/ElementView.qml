@@ -142,7 +142,7 @@ Rectangle {
 
                 color: Style.textColor;
                 font.family: Style.fontFamilyBold;
-                font.pixelSize: Style.fontSizeNormal;
+                font.pixelSize: Style.fontSizeXLarge;
 
                 elide: Text.ElideRight;
                 wrapMode: Text.NoWrap;
@@ -173,7 +173,7 @@ Rectangle {
 
                 color: Style.inactive_textColor
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeXSmall;
+                font.pixelSize: Style.fontSizeNormal;
 
                 wrapMode: Text.WordWrap;
                 elide: Text.ElideRight;

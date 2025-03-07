@@ -37,7 +37,7 @@ TreeViewItemDelegateBase {
                     anchors.verticalCenter: nameItem.verticalCenter;
                     width: parent.width;
                     font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSizeXSmall;
+                    font.pixelSize: Style.fontSizeNormal;
                     color: Style.textColor;
                     elide: Text.ElideRight;
                     visible: !inputName.visible;
@@ -100,7 +100,7 @@ TreeViewItemDelegateBase {
                     anchors.verticalCenter: idItem.verticalCenter;
                     width: parent.width;
                     font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSizeXSmall;
+                    font.pixelSize: Style.fontSizeNormal;
                     color: Style.textColor;
                     visible: !inputId.visible;
                     elide: Text.ElideRight;
@@ -169,7 +169,7 @@ TreeViewItemDelegateBase {
                     anchors.verticalCenter: descriptionItem.verticalCenter;
                     width: parent.width;
                     font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSizeXSmall;
+                    font.pixelSize: Style.fontSizeNormal;
                     color: Style.textColor;
                     visible: !inputDescription.visible;
                     elide: Text.ElideRight;

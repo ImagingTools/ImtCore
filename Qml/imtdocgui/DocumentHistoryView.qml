@@ -93,7 +93,7 @@ Rectangle {
 						Text {
 							width: parent.width;
 							font.family: Style.fontFamily;
-							font.pixelSize: Style.fontSizeXSmall;
+							font.pixelSize: Style.fontSizeNormal;
 							color: Style.textColor;
 							wrapMode: Text.WrapAnywhere;
 							text: model.item.m_description;
@@ -163,7 +163,7 @@ Rectangle {
 
 	Text {
 		anchors.centerIn: parent;
-		font.pixelSize: Style.fontSizeXSmall;
+		font.pixelSize: Style.fontSizeNormal;
 		font.family: Style.fontFamilyBold;
 		font.bold: true;
 		color: Style.textColor;

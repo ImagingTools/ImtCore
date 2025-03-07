@@ -9,7 +9,7 @@ Item {
 	height: column.height;
 
 	property int inputHeight: 30;
-	property int fontSize: Style.fontSizeNormal;
+	property int fontSize: Style.fontSizeXLarge;
 
 	property string fontColor: Style.textColor;
 	property alias radius: input.radius;
@@ -258,7 +258,7 @@ Item {
 			id: titleText;
 
 			font.family: Style.fontFamily;
-			font.pixelSize: Style.fontSizeNormal;
+			font.pixelSize: Style.fontSizeXLarge;
 			color: Style.textColor;
 
 			visible: dateInput.hasTitle;
@@ -405,7 +405,7 @@ Item {
 	CustomTooltip{
 		id: tooltip;
 
-		fontPixelSize: Style.fontSizeNormal
+		fontPixelSize: Style.fontSizeXLarge
 	}
 
 

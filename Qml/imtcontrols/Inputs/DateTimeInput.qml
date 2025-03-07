@@ -25,7 +25,7 @@ Row{
 	property int calendarHeight: 350;
 	property int timeInputDialogWidth: 100;
 	property int timeInputDialogHeight: 90;
-	property int fontSize: Style.fontSizeXSmall;
+	property int fontSize: Style.fontSizeNormal;
 
 	property alias dateInputWidth: dateInput.width;
 	property alias timeInputWidth: timeInput.width;

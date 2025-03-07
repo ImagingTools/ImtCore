@@ -196,7 +196,7 @@ ViewBase {
 
             color: Style.buttonText;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeXSmall;
+            font.pixelSize: Style.fontSizeNormal;
 
             text: qsTr("Product Name");
         }
@@ -228,7 +228,7 @@ ViewBase {
 
             color: Style.buttonText;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeXSmall;
+            font.pixelSize: Style.fontSizeNormal;
 
             text: qsTr("Category");
         }

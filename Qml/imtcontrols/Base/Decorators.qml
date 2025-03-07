@@ -258,7 +258,7 @@ StyleComponents {
                 anchors.verticalCenter: textFieldItem.verticalCenter;
 
 
-                font.pixelSize: Style.fontSizeXSmall;
+                font.pixelSize: Style.fontSizeNormal;
                 font.family: Style.fontFamily;
 
                 //TODO -> Style
@@ -329,7 +329,7 @@ StyleComponents {
                 anchors.verticalCenter: textAreaItem.verticalCenter;
 
 
-                font.pixelSize: Style.fontSizeXSmall;
+                font.pixelSize: Style.fontSizeNormal;
                 font.family: Style.fontFamily;
 
                 //TODO -> Style
@@ -399,7 +399,7 @@ StyleComponents {
                 color: !cbMainRect.baseElement ? "transparent" : cbMainRect.baseElement.fontColorTitle;
                 text: !cbMainRect.baseElement ? "" : cbMainRect.baseElement.currentText !== "" ? cbMainRect.baseElement.currentText : cbMainRect.baseElement.placeHolderText;
                 font.family: Style.fontFamily;
-                font.pixelSize: !cbMainRect.baseElement ? Style.fontSizeXSmall : cbMainRect.baseElement.textSize;
+                font.pixelSize: !cbMainRect.baseElement ? Style.fontSizeNormal : cbMainRect.baseElement.textSize;
 
                 elide: Text.ElideRight;
             }
@@ -828,7 +828,7 @@ StyleComponents {
                 anchors.verticalCenter: textAreaItem.verticalCenter;
 
 
-                font.pixelSize: Style.fontSizeXSmall;
+                font.pixelSize: Style.fontSizeNormal;
                 font.family: Style.fontFamily;
 
                 //TODO -> Style
@@ -942,7 +942,7 @@ StyleComponents {
 
                 color: Style.color_text_common !==undefined ? Style.color_text_common : "#000000";
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeNormal;
+                font.pixelSize: Style.fontSizeXLarge;
                 visible: !progressBar.hasTitle ? false : !progressBar.title ? false : true;
 
                 text: qsTr(progressBar.title);
@@ -957,7 +957,7 @@ StyleComponents {
 
                 color: Style.color_text_common !==undefined ? Style.color_text_common : "#000000";
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeNormal;
+                font.pixelSize: Style.fontSizeXLarge;
                 visible: !progressBar.hasText ? false : !progressBar.text ? false : true;
 
                 text: !progressBar.text ? "" : !progressBar.indeterminate ? qsTr("Выполнено") + ": " + progressBar.text :

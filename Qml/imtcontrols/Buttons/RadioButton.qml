@@ -13,7 +13,7 @@ ControlBase {
     property bool checked: false;
 
     property int checkSize: 20;
-    property int fontPixelSize: Style.fontSizeXSmall;
+    property int fontPixelSize: Style.fontSizeNormal;
     property bool fontBold: false;
 
     property int mainMargin: 8;

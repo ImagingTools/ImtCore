@@ -99,7 +99,7 @@ PopupView {
 
 		property int buttonWidth: 20;
 		property int buttonHeight: 16;
-		property int fontSize: Style.fontSizeXSmall;
+		property int fontSize: Style.fontSizeNormal;
 
 		Item{
 			id: hoursColumn;

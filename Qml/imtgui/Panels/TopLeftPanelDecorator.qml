@@ -21,7 +21,7 @@ DecoratorBase {
             anchors.right: parent.right;
             anchors.rightMargin: Style.sizeMainMargin;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeLarge;
+            font.pixelSize: Style.fontSizeXXLarge;
             color: Style.textColor;
             text: context && context.appName && context.appName !== "" ? context.appName : "";
             elide: Text.ElideRight;
@@ -31,7 +31,7 @@ DecoratorBase {
     Text {
         id: tempText;
         font.family: Style.fontFamilyBold;
-        font.pixelSize: Style.fontSizeLarge;
+        font.pixelSize: Style.fontSizeXXLarge;
         color: Style.textColor;
         text: applicationName.text;
         visible: false;

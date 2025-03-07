@@ -206,10 +206,10 @@ Item{
 																			 Text.AlignLeft;
 
 
-		font.pixelSize: headerDelegate.tableItem.emptyDecorHeader ? Style.fontSizeXSmall * headerDelegate.scale :
+		font.pixelSize: headerDelegate.tableItem.emptyDecorHeader ? Style.fontSizeNormal * headerDelegate.scale :
 																	headerDelegate.tableItem.headerDecorator.isValidData("FontSize", headerDelegate.columnIndex) ?
 																		headerDelegate.tableItem.headerDecorator.getData("FontSize", headerDelegate.columnIndex) :
-																		Style.fontSizeXSmall * headerDelegate.scale;
+																		Style.fontSizeNormal * headerDelegate.scale;
 
 
 		font.family: Style.fontFamilyBold;

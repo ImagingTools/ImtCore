@@ -173,7 +173,7 @@ FocusScope {
                         width: parent.width;
 
                         font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSizeXSmall;
+                        font.pixelSize: Style.fontSizeNormal;
 
                         color: delegate.isActive ? Style.textColor : Style.disabledInActiveTextColor;
 

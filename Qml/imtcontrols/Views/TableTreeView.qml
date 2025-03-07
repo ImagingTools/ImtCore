@@ -221,7 +221,7 @@ Table{
                     //anchors.right: parent.right;
 
                     font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSizeNormal !==undefined ? Style.fontSizeNormal : 18;
+                    font.pixelSize: Style.fontSizeXLarge !==undefined ? Style.fontSizeXLarge : 18;
                     color: Style.textColor;
 
                     text: model[tableTreeView.nameId] !== undefined ? model[tableTreeView.nameId] : "";
