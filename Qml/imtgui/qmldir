@@ -69,6 +69,7 @@ DoubleInputElementView 1.0 View/DoubleInputElementView.qml
 TimeFilterParamView 1.0 View/TimeFilterParamView.qml
 PopupView 1.0 View/PopupView.qml
 SearchPage 1.0 View/SearchPage.qml
+SearchResultsView 1.0 View/SearchResultsView.qml
 CommandsView 1.0 View/CommandsView.qml
 PageContainer 1.0 View/PageContainer.qml
 CheckBoxElementView 1.0 View/CheckBoxElementView.qml

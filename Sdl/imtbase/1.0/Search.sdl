@@ -1,0 +1,36 @@
+schema {
+	name: Search
+	namespace: imtbase
+	version: 1.0
+	query: Query
+}
+
+input SearchInput
+{
+	text: String
+}
+
+type ResultItem
+{
+	contextId: ID
+	contextTypeId: ID
+	resultName: String
+	resultDescription: String
+}
+
+type SearchResult
+{
+	id: ID
+	name: String
+	items: [ResultItem]
+}
+
+type SearchResults
+{
+	searchResults: [SearchResult]
+}
+
+type Query {
+	Search (input: SearchInput): SearchResults!
+}
+

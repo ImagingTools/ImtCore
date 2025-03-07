@@ -1,12 +1,16 @@
 #pragma once
 
 
+// ACF includes
+#include <icomp/CComponentBase.h>
+
 // ImtCore includes
-#include <imtbase/TObjectCollectionSearchControllerCompWrap.h>
+#include <imtbase/CSearchResults.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtbase/ISearchController.h>
 #include <imtgql/IGqlRequestProvider.h>
 #include <imtgql/CGqlRequest.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
 #undef GetObject
 
@@ -85,20 +89,40 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 	if (filterSearchModelPtr == nullptr){
 		return nullptr;
 	}
-
-	imtbase::CTreeItemModel filterModel;
-
-	filterModel.SetExternTreeModel("FilterIds", filterSearchModelPtr);
-	filterModel.SetData("TextFilter", text);
+	
+	sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilter;
+	
+	sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0 groupFilter;
+	groupFilter.logicalOperation = sdl::imtbase::ComplexCollectionFilter::LogicalOperation::Or;
+	
+	QList<sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0> fieldList;
+	for (int i = 0; i < filterSearchModelPtr->GetItemsCount(); i++){
+		sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0 fieldFilter;
+		fieldFilter.fieldId = filterSearchModelPtr->GetData("Id", i).toByteArray();
+		fieldFilter.filterValue = text;
+		fieldFilter.filterValueType = sdl::imtbase::ComplexCollectionFilter::ValueType::String;
+		
+		QList<sdl::imtbase::ComplexCollectionFilter::FilterOperation> filterOperations;
+		filterOperations << sdl::imtbase::ComplexCollectionFilter::FilterOperation::Contains;
+		fieldFilter.filterOperations = filterOperations;
+		
+		fieldList << fieldFilter;
+	}
+	
+	groupFilter.fieldFilters = fieldList;
+	complexFilter.fieldsFilter = groupFilter;
 
 	imtgql::CGqlObject input;
 	imtgql::CGqlObject viewParams;
 	viewParams.InsertField("Offset", 0);
 	viewParams.InsertField("Count", -1);
-	viewParams.InsertField("FilterModel", filterModel.ToJson());
-
+	
+	imtgql::CGqlObject complexFilterGqlOblect;
+	if (complexFilter.WriteToGraphQlObject(complexFilterGqlOblect)){
+		viewParams.InsertField("ComplexFilterModel", complexFilterGqlOblect);
+	}
+	
 	input.InsertField("viewParams", viewParams);
-
 	gqlRequest.AddParam("input", input);
 
 	imtgql::CGqlObject items;
@@ -107,7 +131,7 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 	items.InsertField("TypeId");
 	items.InsertField("Description");
 	gqlRequest.AddField("items", items);
-
+	
 	istd::TDelPtr<imtbase::CTreeItemModel> resultModelPtr = BaseClass::ListObjects(gqlRequest, errorMessage);
 	if (!resultModelPtr.IsValid()){
 		return nullptr;

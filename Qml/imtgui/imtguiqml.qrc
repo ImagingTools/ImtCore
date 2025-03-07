@@ -67,6 +67,7 @@
         <file alias="imtgui/View/TimeFilterParamView.qml">View/TimeFilterParamView.qml</file>
         <file alias="imtgui/View/PopupView.qml">View/PopupView.qml</file>
         <file alias="imtgui/View/SearchPage.qml">View/SearchPage.qml</file>
+	<file alias="imtgui/View/SearchResultsView.qml">View/SearchResultsView.qml</file>
         <file alias="imtgui/View/CommandsView.qml">View/CommandsView.qml</file>
         <file alias="imtgui/View/PageContainer.qml">View/PageContainer.qml</file>
         <file alias="imtgui/View/CheckBoxElementView.qml">View/CheckBoxElementView.qml</file>
