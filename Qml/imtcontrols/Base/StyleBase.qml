@@ -19,10 +19,27 @@ import QtQuick 2.0
 StyleComponents {
 	id: styleContainer;
 
+	//Main
 	property bool isQtStyle: false;  // deprecated
 	property string styleId: "StyleAcf"
 
-	//new fonts
+	property bool mobile;
+	property real mainWidth;
+	property real mainHeight;
+	property real mainSize;
+
+	property string theme: "Light";
+
+	//Font properties
+	property string mainFontSource: "../../../Fonts/Ubuntu-Light.ttf";
+	property string boldFontSource: "../../../Fonts/Ubuntu-Medium.ttf";
+	property string fontFamily: "Verdana";
+	property string fontFamilyBold: "Verdana";
+
+	property alias mainFontLoader: mainFont;
+	property alias boldFontLoader: boldFont;
+
+	//Font size
 	property int fontSizeHuge: 64
 	property int fontSizeXXXLarge: 48
 	property int fontSizeXXLarge: 32
@@ -35,6 +52,7 @@ StyleComponents {
 	property int fontSizeXXXSmall: 8
 	property int fontSizeTiny: 6
 
+	//Button sizes
 	property int buttonWidthExtraSmall: 4
 	property int buttonWidthLarge: 32
 	property int buttonWidthMedium: 24
@@ -43,111 +61,129 @@ StyleComponents {
 	property int buttonRadius: 4
 	property int buttonBorderWidth: 1
 	property int buttonHeight: 30
-	property int horizontalPageMargin: 24
+
+	//Icon sizes
 	property int iconSizeExtraSmall: 8
 	property int iconSizeSmall: 16
 	property int iconSizeMedium: 32
 	property int iconSizeLarge: 64
 	property int iconSizeExtraLarge: 128
 	property int iconSizeLauncher: 100
+
+	//Item sizes
 	property int itemSizeExtraSmall: 8
 	property int itemSizeSmall: 16
 	property int itemSizeMedium: 32
 	property int itemSizeLarge: 48
 	property int itemSizeExtraLarge: 64
 	property int itemSizeHuge: 128
-	property real maximumFlickVelocity: 75
+
+	//Opacity
 	property real opacityFaint: 0.05
 	property real opacityHigh: 0.75
 	property real opacityLow: 0.25
 	property real opacityOverlay: 0.15
+	property real highlightBackgroundOpacity: 0.15
+	property real selectedOpacity: 0.75
+	property real hoverOpacity: selectedOpacity/2
+
+	//Paddings
 	property int paddingSmall: 8
 	property int paddingMedium: 16
 	property int paddingLarge: 32
 	property int paddingHuge: 64
-	property real highlightBackgroundOpacity: 0.15
-	property color placeHolderTextColor : '#AAA'
+
+	//Margins
+	property int sizeSmallMargin: 6;
+	property int sizeMainMargin: 11;
+	property int sizeLargeMargin: 23;
+	property int horizontalPageMargin: 24
+	property int margin: 13;
+
+	//Radius
+	property int textFieldRadius: 3;
+	property int comboBoxRadius: 3;
+
+	//Other sizes
+	property int size_indicatorHeight: 50;
+	property int size_leftPanelWidth: 250;
+
+	//Alternating
+	property bool enableAlternating: true;
+	property color alternatingColor: '#000'
+	property string alternateBaseColor: "#f5f5f5";
+	property real alternatingOpacity: 0.05
+
+	//Gradient
+	property string imagingToolsGradient0: "#f6f6f6";
+	property string imagingToolsGradient1: "#e3e3e5";
+	property string imagingToolsGradient2: "#d4d4d6";
+	property string imagingToolsGradient3: "#bebec0";
+	property string imagingToolsGradient4: "#b4b4b6";
+
+	//Colors
+		//main
+	property string baseColor: "white";
+	property string mainColor: "#e6e6e8";
+	property color primaryColor: mainColor
+	property string secondColor: "#F18C16";
+	property color secondaryColor: secondColor
+
+		//dark - light
 	property color darkPrimaryColor : '#000'
 	property color darkSecondaryColor: '#FFF'
-	property color errorColor: errorTextColor
-	property color highlightBackgroundColor: '#000'
-	property color highlightColor: selectedColor
-	property color highlightDimmerColor: '#DED'
 	property color lightPrimaryColor: '#000'
 	property color lightSecondaryColor: '#000'
-	property color overlayBackgroundColor: '#000'
-	property color primaryColor: mainColor
-	property color secondaryColor: secondColor
-	property color secondaryHighlightColor: linkColor
-	property color imaginToolsAccent: "#2a82da"
 
+		//error
+	property color errorColor: errorTextColor
+	property string errorTextColor: "#FF4500";
+
+		//accent
+	property color imaginToolsAccent: "#2a82da"
 	property string positiveAccentColor: "#00FFD1";
 	property string negativeAccentColor: "#FF5449";
 	property string middleAccentColor: "yellow";
 
-	//------------------------------------------for basic components
-
-	property real selectedOpacity: 0.75
-	property real hoverOpacity: selectedOpacity/2
-
-	property bool enableAlternating: true;
-	property color alternatingColor: '#000'
-	property real alternatingOpacity: 0.05
-	property bool enableHoverEffect: true
-
-	property int textFieldRadius: 3;
-	property int comboBoxRadius: 3;
-
-	property int sizeSmallMargin: 6;
-	property int sizeMainMargin: 11;
-	property int sizeLargeMargin: 23;
-	property int size_indicatorHeight: 50;
-	property int size_leftPanelWidth: 250;
+		//text
+	property string textColor: "#335777";
+	property string textSelected: "#0078d7";
+	property string titleColor: "#055A85";
+	property color inactive_textColor: "#aaaaaa";
+	property color placeHolderTextColor : '#AAA'
+	property string linkColor: "#0078D7";
+	property string selectedLinkFromColor: "#1974d2";
+	property string selectedLinkToColor: "#51AC2A";
 	property string color_text_titles: "#7700FF";
 	property string color_text_notActive: "#C2CEDB";
-
-	property alias mainFontLoader: mainFont;
-	property alias boldFontLoader: boldFont;
-
-	property string mainFontSource: "../../../Fonts/Ubuntu-Light.ttf";
-	property string boldFontSource: "../../../Fonts/Ubuntu-Medium.ttf";
-
-	property bool mobile;
-	property real mainWidth;
-	property real mainHeight;
-	property real mainSize;
-
-	property string theme: "Light";
-
-	property string fontFamily: "Verdana";
-	property string fontFamilyBold: "Verdana";
-
-	property string mainColor: "#e6e6e8";
-
-	property string greenColor: "#00ff00";
-	property string secondColor: "#F18C16";
-	property string titleColor: "#055A85";
 	property string subtitleColor: "#6A6E6F";
-	property string baseColor: "white";
-	property string alternateBaseColor: "#f5f5f5";
+	property string disabledInActiveTextColor: "#c0c0c0";
+
+		//border
+	property string borderColor: "#d0d0d2";
+	property string borderColor2: "#a4a4a6";
+	property string borderFocusColor: "#1a76e7";
+
+		//background
 	property string backgroundColor: "#e6e6e8";
 	property string backgroundColor2: "#f7f7f7";
-	property string linkColor: "#0078D7";
-	property string selectedColor: "#e3eefa";
-	// #ddeeff
+	property string menuPanelBackgroundColor: "#e2e2e8";
+	property string dialogBackgroundColor: "#f6f6f6";
+	property color overlayBackgroundColor: '#000'
 	property string tabPanelBackgroundColor: backgroundColor;
 
-	property string color_scrollBackground: styleContainer.imagingToolsGradient0;
-	property string color_scrollIndicator: styleContainer.imagingToolsGradient3;
-	property string color_scrollHighlight: styleContainer.imagingToolsGradient0;
+		//highlight
+	property color highlightBackgroundColor: '#000'
+	property color highlightColor: selectedColor
+	property color highlightDimmerColor: '#DED'
+	property color secondaryHighlightColor: linkColor
 
-	property string lightBlueColor: "#69b8e3";
-
+		//selected
+	property string selectedColor: "#e3eefa";
 	property string tabSelectedColor: "#FF4500";
+	property string iconColorOnSelected: "#1a76e7";
 
-	property string errorTextColor: "#FF4500";
-	property string shadowColor: "#ececec";
-
+		//button
 	property string buttonColor: "#dddddd";
 	property string buttonBorderColor: "#b0b0b0";
 	property string buttonHoverColor: "#d2d2d2";
@@ -157,35 +193,24 @@ StyleComponents {
 	property color buttonText: "#335777";
 	property color inactive_buttonText: "#335777";
 
-	property string borderColor: "#d0d0d2";
-	property string borderFocusColor: "#1a76e7";   //b0b0b0
-	property string borderColor2: "#a4a4a6";
+		//scroll
+	property string color_scrollBackground: styleContainer.imagingToolsGradient0;
+	property string color_scrollIndicator: styleContainer.imagingToolsGradient3;
+	property string color_scrollHighlight: styleContainer.imagingToolsGradient0;
 
-	property string selectedLinkFromColor: "#1974d2";
-	property string selectedLinkToColor: "#51AC2A";
-
-	property string dialogBackgroundColor: "#f6f6f6";
-
-	property string imagingToolsGradient0: "#f6f6f6";
-	property string imagingToolsGradient1: "#e3e3e5";
-	property string imagingToolsGradient2: "#d4d4d6";
-	property string imagingToolsGradient3: "#bebec0";
-	property string imagingToolsGradient4: "#b4b4b6";
-
-	property string iconColorOnSelected: "#1a76e7";
-
-
+		//shadow, hover
+	property string shadowColor: "#ececec";
 	property string hover: "#e6e6e8";
 
-	property string textColor: "#335777";
-	property string textSelected: "#0078d7";
-	property color inactive_textColor: "#aaaaaa";
+		//simple colors
+	property string greenColor: "#00ff00";
+	property string lightBlueColor: "#69b8e3";
 
-	property string disabledInActiveTextColor: "#c0c0c0";
 
-	property int margin: 13;
+	//other parameters
+	property real maximumFlickVelocity: 75
+	property bool enableHoverEffect: true
 
-	property string menuPanelBackgroundColor: "#e2e2e8";
 
 	function getIconPath(iconName, state, mode){
 		if(iconName == undefined){
