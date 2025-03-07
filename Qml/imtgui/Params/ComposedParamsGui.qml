@@ -5,7 +5,7 @@ import imtcontrols 1.0
 
 Column {
     id: root;
-    spacing: Style.size_largeMargin;
+    spacing: Style.sizeLargeMargin;
     property int contentWidth: 700;
 
     property alias model: bodyPanelRepeater.model;

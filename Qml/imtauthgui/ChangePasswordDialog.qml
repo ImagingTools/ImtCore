@@ -27,7 +27,7 @@ Dialog {
     contentComp: Component {
         Item {
             width: rootDialog.width;
-            height: column.height + 2 *  Style.size_largeMargin;
+            height: column.height + 2 *  Style.sizeLargeMargin;
 
             property alias oldPassword: column.oldPassword;
             property alias newPassword: column.newPassword;
@@ -37,9 +37,9 @@ Dialog {
 
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.left: parent.left;
-                anchors.leftMargin: Style.size_largeMargin;
+                anchors.leftMargin: Style.sizeLargeMargin;
                 anchors.right: parent.right;
-                anchors.rightMargin: Style.size_largeMargin;
+                anchors.rightMargin: Style.sizeLargeMargin;
 				currentPasswordInputVisible: rootDialog.currentPasswordInputVisible;
 
                 onAcceptedChanged: {

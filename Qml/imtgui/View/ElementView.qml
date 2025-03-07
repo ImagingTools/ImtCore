@@ -7,7 +7,7 @@ Rectangle {
     id: rootElement;
 
     width: 700;
-    height: content.height + 2 * Style.size_largeMargin;
+    height: content.height + 2 * Style.sizeLargeMargin;
 
     border.width: 1;
     border.color: Style.borderColor;
@@ -109,10 +109,10 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter;
 
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_largeMargin;
+        anchors.leftMargin: Style.sizeLargeMargin;
 
         anchors.right: parent.right;
-        anchors.rightMargin: Style.size_largeMargin;
+        anchors.rightMargin: Style.sizeLargeMargin;
 
         clip: true;
 
@@ -138,7 +138,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.left: parent.left;
                 anchors.right: controlLoader.left;
-                anchors.rightMargin: Style.size_largeMargin;
+                anchors.rightMargin: Style.sizeLargeMargin;
 
                 color: Style.textColor;
                 font.family: Style.fontFamilyBold;

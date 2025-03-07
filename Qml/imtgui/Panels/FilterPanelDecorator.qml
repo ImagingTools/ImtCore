@@ -30,8 +30,8 @@ DecoratorBase {
 	}
 	
 	function checkWidth(){
-		//        rect.visible = width - rect.width <= contentWidth + Style.size_largeMargin;
-		//        tfc.visible = width - tfc.width <= contentWidth + Style.size_largeMargin;
+		//        rect.visible = width - rect.width <= contentWidth + Style.sizeLargeMargin;
+		//        tfc.visible = width - tfc.width <= contentWidth + Style.sizeLargeMargin;
 	}
 	
 	function updateText(){

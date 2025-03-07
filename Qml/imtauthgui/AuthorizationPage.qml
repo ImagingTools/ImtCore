@@ -471,9 +471,9 @@ Rectangle {
 					Flickable {
 						id: flickable;
 						anchors.left: parent.left;
-						anchors.leftMargin: Style.size_largeMargin;
+						anchors.leftMargin: Style.sizeLargeMargin;
 						anchors.right: parent.right
-						anchors.rightMargin: Style.size_largeMargin;
+						anchors.rightMargin: Style.sizeLargeMargin;
 						height: parent.height;
 
 						contentHeight: userGeneralEditor.height;

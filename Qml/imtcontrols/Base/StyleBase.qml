@@ -100,7 +100,7 @@ StyleComponents {
 
 	property int sizeSmallMargin: 6;
 	property int sizeMainMargin: 11;
-	property int size_largeMargin: 23;
+	property int sizeLargeMargin: 23;
 	property int size_indicatorHeight: 50;
 	property int size_leftPanelWidth: 250;
 	property string color_text_titles: "#7700FF";

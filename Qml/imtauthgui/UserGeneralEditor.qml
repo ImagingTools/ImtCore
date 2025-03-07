@@ -7,7 +7,7 @@ import imtdocgui 1.0
 
 Column {
     id: container;
-	spacing: Style.size_largeMargin;
+	spacing: Style.sizeLargeMargin;
 
 	property UserData userData;
 	property bool readOnly: false;

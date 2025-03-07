@@ -70,11 +70,11 @@ Rectangle {
 	GroupHeaderView {
 		id: historyHeader;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.size_largeMargin;
+		anchors.leftMargin: Style.sizeLargeMargin;
 		anchors.top: parent.top;
-		anchors.topMargin: Style.size_largeMargin;
+		anchors.topMargin: Style.sizeLargeMargin;
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.size_largeMargin;
+		anchors.rightMargin: Style.sizeLargeMargin;
 		title: qsTr("History");
 
 		controlComp: Component {
@@ -101,11 +101,11 @@ Rectangle {
 	DocumentHistoryView {
 		id: historyView;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.size_largeMargin;
+		anchors.leftMargin: Style.sizeLargeMargin;
 		anchors.top: historyHeader.bottom;
 		anchors.bottom: parent.bottom;
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.size_largeMargin;
+		anchors.rightMargin: Style.sizeLargeMargin;
 		visible: historyPanel.width !== 0;
 		documentId: historyPanel.documentId;
 	}

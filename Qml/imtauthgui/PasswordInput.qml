@@ -5,7 +5,7 @@ import imtcontrols 1.0
 
 Column {
     id: root;
-    spacing: Style.size_largeMargin;
+    spacing: Style.sizeLargeMargin;
     property alias oldPassword: currentPasswordInput.text;
     property alias newPassword: newPasswordInput1.text;
     property bool accepted: false;

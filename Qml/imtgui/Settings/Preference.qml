@@ -130,13 +130,13 @@ Rectangle {
     Flickable {
         id: flickable;
         anchors.top: parent.top;
-        anchors.topMargin: Style.size_largeMargin;
+        anchors.topMargin: Style.sizeLargeMargin;
         anchors.left: mainPanelBackground.right;
-        anchors.leftMargin: Style.size_largeMargin;
+        anchors.leftMargin: Style.sizeLargeMargin;
         anchors.right: parent.right;
-        anchors.rightMargin: Style.size_largeMargin;
+        anchors.rightMargin: Style.sizeLargeMargin;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: Style.size_largeMargin;
+        anchors.bottomMargin: Style.sizeLargeMargin;
         clip: true;
         contentWidth: width;
         contentHeight: bodyPanel.height;

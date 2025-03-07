@@ -67,15 +67,15 @@ ViewBase {
     Flickable {
         id: flickable;
         anchors.top: parent.top;
-        anchors.topMargin: Style.size_largeMargin;
+        anchors.topMargin: Style.sizeLargeMargin;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: Style.size_largeMargin;
+        anchors.bottomMargin: Style.sizeLargeMargin;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_largeMargin;
+        anchors.leftMargin: Style.sizeLargeMargin;
         anchors.right: scrollbar.left;
-        anchors.rightMargin: Style.size_largeMargin;
+        anchors.rightMargin: Style.sizeLargeMargin;
         contentWidth: bodyColumn.width;
-		contentHeight: Math.max(bodyColumn.height + 2 * Style.size_largeMargin, historyPanel.contentHeight + 2 * Style.size_largeMargin);
+		contentHeight: Math.max(bodyColumn.height + 2 * Style.sizeLargeMargin, historyPanel.contentHeight + 2 * Style.sizeLargeMargin);
 
         boundsBehavior: Flickable.StopAtBounds;
         clip: true;
@@ -83,7 +83,7 @@ ViewBase {
         Column {
             id: bodyColumn;
             width: 700;
-            spacing: Style.size_largeMargin;
+            spacing: Style.sizeLargeMargin;
 
             GroupHeaderView {
                 width: parent.width;

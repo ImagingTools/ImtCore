@@ -7,7 +7,7 @@ import imtcontrols 1.0
 Column {
     id: root;
     width: 700;
-    spacing: Style.size_largeMargin;
+    spacing: Style.sizeLargeMargin;
 
     property var parameters: model.Parameters
 

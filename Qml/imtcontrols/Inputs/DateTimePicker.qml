@@ -178,7 +178,7 @@ CustomTextField {
         anchors.right: root.right;
         anchors.rightMargin: Style.sizeSmallMargin;
         anchors.verticalCenter: root.verticalCenter;
-        width: Style.size_largeMargin;
+        width: Style.sizeLargeMargin;
         z: root.parent.z + 1;
 
         Button {

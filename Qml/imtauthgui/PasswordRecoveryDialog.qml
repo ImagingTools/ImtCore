@@ -138,11 +138,11 @@ Component {
 					id: group;
 
 					anchors.top: parent.top;
-					anchors.topMargin: Style.size_largeMargin;
+					anchors.topMargin: Style.sizeLargeMargin;
 					anchors.left: parent.left;
-					anchors.leftMargin: Style.size_largeMargin;
+					anchors.leftMargin: Style.sizeLargeMargin;
 					anchors.right: parent.right;
-					anchors.rightMargin: Style.size_largeMargin;
+					anchors.rightMargin: Style.sizeLargeMargin;
 
 					TextInputElementView {
 						id: emailElementView;
@@ -184,11 +184,11 @@ Component {
 				GroupElementView {
 					id: group;
 					anchors.top: parent.top;
-					anchors.topMargin: Style.size_largeMargin;
+					anchors.topMargin: Style.sizeLargeMargin;
 					anchors.left: parent.left;
-					anchors.leftMargin: Style.size_largeMargin;
+					anchors.leftMargin: Style.sizeLargeMargin;
 					anchors.right: parent.right;
-					anchors.rightMargin: Style.size_largeMargin;
+					anchors.rightMargin: Style.sizeLargeMargin;
 
 					TextInputElementView {
 						id: codeElementView;
@@ -247,11 +247,11 @@ Component {
 				GroupElementView {
 					id: group;
 					anchors.top: parent.top;
-					anchors.topMargin: Style.size_largeMargin;
+					anchors.topMargin: Style.sizeLargeMargin;
 					anchors.left: parent.left;
-					anchors.leftMargin: Style.size_largeMargin;
+					anchors.leftMargin: Style.sizeLargeMargin;
 					anchors.right: parent.right;
-					anchors.rightMargin: Style.size_largeMargin;
+					anchors.rightMargin: Style.sizeLargeMargin;
 
 					TextInputElementView {
 						id: usernameElementView;
@@ -270,11 +270,11 @@ Component {
 			Item {
 				PasswordInput {
 					anchors.top: parent.top;
-					anchors.topMargin: Style.size_largeMargin;
+					anchors.topMargin: Style.sizeLargeMargin;
 					anchors.left: parent.left;
-					anchors.leftMargin: Style.size_largeMargin;
+					anchors.leftMargin: Style.sizeLargeMargin;
 					anchors.right: parent.right;
-					anchors.rightMargin: Style.size_largeMargin;
+					anchors.rightMargin: Style.sizeLargeMargin;
 					currentPasswordInputVisible: false;
 					onAcceptedChanged: {
 						passwordRecoveryDialog.setButtonEnabled(Enums.yes, accepted);
