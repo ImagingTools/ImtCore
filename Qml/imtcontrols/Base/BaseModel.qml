@@ -205,6 +205,10 @@ ListModel {
 	}
 
 	function getData(key, index){
+		if (this.get(index) == undefined){
+			return undefined
+		}
+
 		return this.get(index).item[key];
 	}
 }
