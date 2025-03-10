@@ -110,18 +110,16 @@ inline QByteArray TSpecificationBasedDocumentEditorCompWrap<BaseClass>::CreateNe
 	std::unique_ptr<istd::IChangeable> specPtr(m_specFactPtr.CreateInstance());
 	imod::IModel* specModelPtr = dynamic_cast<imod::IModel*>(specPtr.get());
 	if (specModelPtr != nullptr) {
-		if (specModelPtr->AttachObserver(m_specObserverCompPtr.GetAttributePtr())) {
-			int retVal = m_specDialogCompPtr->ExecuteDialog();
-			if (retVal == QDialog::Accepted) {
+		if (specModelPtr->AttachObserver(m_specObserverCompPtr.GetPtr())) {
+			if (m_specDialogCompPtr->ExecuteDialog(this) == QDialog::Accepted) {
 				QString name = CreateSpecificationName(specPtr.get());
 				if (!name.isEmpty()) {
-
 					retVal =
 						m_specCollectionCompPtr->InsertNewObject(*m_specObjectTypeIdAttrPtr, name, "", specPtr.get());
 				}
 			}
 
-			specModelPtr->DetachObserver(m_specObserverCompPtr.GetAttributePtr());
+			specModelPtr->DetachObserver(m_specObserverCompPtr.GetPtr());
 		}
 	}
 
