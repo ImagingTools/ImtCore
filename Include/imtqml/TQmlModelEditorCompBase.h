@@ -43,6 +43,9 @@ protected:
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
+	// reimplemented (CQuickObjectCompBase)
+	virtual void OnItemCreated() override;
+
 protected:
 	class UpdateBlocker
 	{
@@ -59,9 +62,6 @@ private:
 
 	// reimplemented (CQmlBasedEditorCompBase)
 	virtual void OnRepresentationChanged() override;
-
-	// reimplemented (CQuickObjectCompBase)
-	virtual void OnItemCreated() override;
 
 private:
 	bool m_isUpdatePending = false;
@@ -97,14 +97,29 @@ inline void TQmlModelEditorCompBase<ModelInterface>::OnUpdate(const istd::IChang
 	if (quickItemPtr != nullptr){
 		QJsonDocument jsonDoc = CreateRepresentationFromObject(*objectPtr);
 		if (jsonDoc.isObject()){
-			QString json = QString::fromUtf8(jsonDoc.toJson(QJsonDocument::Compact));
+			QString jsonRepresentation = QString::fromUtf8(jsonDoc.toJson(QJsonDocument::Compact));
 
 			QMetaObject::invokeMethod(
-				quickItemPtr, "setRepresentation", Q_ARG(QVariant, QVariant::fromValue(json)));
+				quickItemPtr, "setRepresentation", Q_ARG(QVariant, QVariant::fromValue(jsonRepresentation)));
 		}
 	}
 	else{
 		m_isUpdatePending = true;
+	}
+}
+
+
+// reimplemented (CQuickObjectCompBase)
+
+template<typename ModelInterface>
+inline void TQmlModelEditorCompBase<ModelInterface>::OnItemCreated()
+{
+	BaseClass::OnItemCreated();
+
+	if (m_isUpdatePending){
+		m_isUpdatePending = false;
+
+		OnUpdate(istd::IChangeable::GetAnyChange());
 	}
 }
 
@@ -139,30 +154,13 @@ inline void TQmlModelEditorCompBase<ModelInterface>::OnRepresentationChanged()
 			quickItemPtr, "getRepresentation", Qt::DirectConnection, Q_RETURN_ARG(QVariant, var)))
 		{
 			if (var.typeId() == QMetaType::QString){
-				QString representation = var.toString();
+				QString jsonRepresentation = var.toString();
 
-				QJsonDocument document = QJsonDocument::fromJson(representation.toUtf8());
+				QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonRepresentation.toUtf8());
 
-				UpdeteObjectFromRepresentation(document, *objectPtr);
+				UpdeteObjectFromRepresentation(jsonDocument, *objectPtr);
 			}
 		}
-	}
-}
-
-
-// private methods
-
-// reimplemented (CQuickObjectCompBase)
-
-template<typename ModelInterface>
-inline void TQmlModelEditorCompBase<ModelInterface>::OnItemCreated()
-{
-	BaseClass::OnItemCreated();
-
-	if (m_isUpdatePending){
-		m_isUpdatePending = false;
-
-		OnUpdate(istd::IChangeable::GetAnyChange());
 	}
 }
 
