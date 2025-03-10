@@ -5,7 +5,7 @@ function(GenerateDdlCodeExt MODULE_CPP_NAME MODULE_QML_NAME DDL_CONST_VAR_TEMPLA
 #----------------------------------------------------------- The DESIGN TOKEN CREATOR config
 # Setting the executable file name for specific OS
 get_target_name(TARGETNAME)
-message(VERBOSE "all function arguments:               ${ARGV}")
+message(VERBOSE "all function arguments:			   ${ARGV}")
 message(VERBOSE "GenerateDdlCodeExt ${PROJECT_NAME} TARGETNAME ${TARGETNAME}")
 set(COMPILER_DIR ${CMAKE_BUILD_TYPE}_${TARGETNAME})
 string(FIND "$ENV{ARXCHOST}" "VC" POSITION_OF_VC)

@@ -6,19 +6,19 @@ set (Boost_USE_STATIC_LIBS ON)
 find_package (Boost REQUIRED)# COMPONENTS program_options random REQUIRED)
 # Если библиотека найдена, то
 if (Boost_FOUND)
-        include_directories (${Boost_INCLUDE_DIR})
-        target_link_libraries (${PROJECT_NAME} ${Boost_LIBRARIES}) # подключаем библиотеку
+		include_directories (${Boost_INCLUDE_DIR})
+		target_link_libraries (${PROJECT_NAME} ${Boost_LIBRARIES}) # подключаем библиотеку
 endif ()
 
 include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
 set (OPENSSL_ROOT_DIR "${IMTCOREDIR}/3rdParty/openssl/1.1/")
 #find_package(OpenSSL REQUIRED)
 #if ( OPENSSL_FOUND )
-#        message(STATUS "OpenSSL Found: ${OPENSSL_VERSION}")
-#        message(STATUS "OpenSSL Include: ${OPENSSL_INCLUDE_DIR}")
-#        message(STATUS "OpenSSL Libraries: ${OPENSSL_LIBRARIES}")
-#        include_directories (${OPENSSL_INCLUDE_DIR})
-#        target_link_libraries (${PROJECT_NAME} ${OPENSSL_LIBRARIES})
+#		message(STATUS "OpenSSL Found: ${OPENSSL_VERSION}")
+#		message(STATUS "OpenSSL Include: ${OPENSSL_INCLUDE_DIR}")
+#		message(STATUS "OpenSSL Libraries: ${OPENSSL_LIBRARIES}")
+#		include_directories (${OPENSSL_INCLUDE_DIR})
+#		target_link_libraries (${PROJECT_NAME} ${OPENSSL_LIBRARIES})
 #endif()
 
 

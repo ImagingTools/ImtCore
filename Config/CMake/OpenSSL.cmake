@@ -6,21 +6,21 @@ if (OPENSSLDIR)
 endif()
 
 if(WIN32)
-    if(${CMAKE_CL_64} STREQUAL 1)
-        target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/x64/libcrypto.lib)
+	if(${CMAKE_CL_64} STREQUAL 1)
+		target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/x64/libcrypto.lib)
 		target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/x64/libssl.lib)
 	else()
-        target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/x86/libcrypto.lib)
+		target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/x86/libcrypto.lib)
 		target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/x86/libssl.lib)
 	endif()
 elseif(ANDROID)
-    target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/android/libcrypto_1_1.so)
-    target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/android/libssl_1_1.so)
-    set(ANDROID_EXTRA_LIBS
-        ${OPENSSLDIR}/lib/android/libcrypto_1_1.so
-        ${OPENSSLDIR}/lib/android/libssl_1_1.so
-        CACHE INTERNAL "")
-    message("ANDROID_EXTRA_LIBS ${ANDROID_EXTRA_LIBS}")
+	target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/android/libcrypto_1_1.so)
+	target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/android/libssl_1_1.so)
+	set(ANDROID_EXTRA_LIBS
+		${OPENSSLDIR}/lib/android/libcrypto_1_1.so
+		${OPENSSLDIR}/lib/android/libssl_1_1.so
+		CACHE INTERNAL "")
+	message("ANDROID_EXTRA_LIBS ${ANDROID_EXTRA_LIBS}")
 elseif(APPLE)
 	if("${CMAKE_OSX_ARCHITECTURES}" STREQUAL "arm64")
 		target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/ClangOSX_arm64/libcrypto.a)
@@ -29,7 +29,7 @@ elseif(APPLE)
 	endif()
 
 elseif(UNIX)
-    # target_link_libraries(${PROJECT_NAME} -lcrypto)
-    target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/linux/libcrypto.so)
+	# target_link_libraries(${PROJECT_NAME} -lcrypto)
+	target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/linux/libcrypto.so)
 endif()
 

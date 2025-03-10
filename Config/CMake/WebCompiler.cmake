@@ -15,7 +15,7 @@ function(imtcore_compile_web)
 
 	add_custom_command(
 		OUTPUT
-		${CMAKE_CURRENT_BINARY_DIR}/__header.h  # fake! ensure we run!
+		${CMAKE_CURRENT_BINARY_DIR}/__header.h # fake! ensure we run!
 		${QRC_WEB_FILE}
 		PRE_BUILD
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/WebCompiler/webcompiler.py ${webdirs}
@@ -40,12 +40,12 @@ function(imtcore_compile_web)
 		${QRC_WEB_FILE}
 		COMMENT
 		"Compile QRC_WEB_FILE"
-	    )
+		)
 
 	add_custom_target(
 		WebCompiler${PROJECT_NAME} ALL
 		DEPENDS ${QRC_CPP_WEB_FILE}
-	    )
+		)
 
 	set(QRC_QRC_FILES)
 
@@ -69,17 +69,17 @@ function(jqml_compile_web)
 	set(NODE_EXE node)
 
 	if(${MSVC})
-		set(NODE_EXE  ${IMTCOREDIR}/3rdParty/nodejs/node.exe)
+		set(NODE_EXE ${IMTCOREDIR}/3rdParty/nodejs/node.exe)
 	endif()
 
 	# Python path
 	list(APPEND webdirs ${buildwebdir})
 
-	#               COMMAND ${CMAKE_COMMAND} -E rm -rf ${buildwebdir}
+	#			COMMAND ${CMAKE_COMMAND} -E rm -rf ${buildwebdir}
 
 	add_custom_command(
 		OUTPUT
-		${buildwebdir}/__header.h  # fake! ensure we run!
+		${buildwebdir}/__header.h # fake! ensure we run!
 		${QRC_WEB_FILE}
 		PRE_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
@@ -87,7 +87,7 @@ function(jqml_compile_web)
 		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQML
 		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQML/Compiler/index.js ${buildwebdir}/src
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
-	    )
+		)
 
 
 	add_custom_target(
@@ -95,11 +95,11 @@ function(jqml_compile_web)
 
 		DEPENDS
 		${buildwebdir}/__header.h
-	    )
+		)
 
 	add_custom_command(
 		OUTPUT ${QRC_CPP_WEB_FILE}
-		COMMAND  ${CMAKE_COMMAND} -E copy ${buildwebdir}/src/jqml.full.js  ${buildwebdir}/Resources/jqml.${resname}.js
+		COMMAND ${CMAKE_COMMAND} -E copy ${buildwebdir}/src/jqml.full.js ${buildwebdir}/Resources/jqml.${resname}.js
 		COMMAND
 		Qt${QT_VERSION_MAJOR}::rcc
 		ARGS
@@ -108,12 +108,12 @@ function(jqml_compile_web)
 		${QRC_WEB_FILE}
 		COMMENT
 		"Compile QRC_WEB_FILE"
-	    )
+		)
 
 	add_custom_target(
 		WebCompiler${PROJECT_NAME} ALL
 		DEPENDS ${QRC_CPP_WEB_FILE}
-	    )
+		)
 
 	set(QRC_QRC_FILES)
 
@@ -129,14 +129,14 @@ function(jqml_compile_web2)
 
 	set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
 	if (NOT WIN32)
-	        set(PYTHONEXE python3)
+			set(PYTHONEXE python3)
 	endif()
 
 	message(VERBOSE "buildwebdir ${buildwebdir}")
 
 	if(NOT NODE_EXE)
 		if(${MSVC})
-			set(NODE_EXE  ${IMTCOREDIR}/3rdParty/nodejs/node.exe)
+			set(NODE_EXE ${IMTCOREDIR}/3rdParty/nodejs/node.exe)
 		else()
 			set(NODE_EXE node)
 		endif()
@@ -159,21 +159,21 @@ function(jqml_compile_web2)
 
 	message(VERBOSE "QRC_CPP_WEB_FILE ${QRC_CPP_WEB_FILE}")
 
-	#               COMMAND ${CMAKE_COMMAND} -E rm -rf ${buildwebdir}
+	#			COMMAND ${CMAKE_COMMAND} -E rm -rf ${buildwebdir}
 
 	add_custom_command(
-	        OUTPUT
+			OUTPUT
 		${buildwebdir}/Resources/jqml.${resname}.js
 		POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQML2/preparesources.py ${webdirs}
 		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQML2
 		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQML2/compiler/compiler.js ${buildwebdir}/src
-		COMMAND  ${CMAKE_COMMAND} -E copy ${buildwebdir}/src/jqml.full.js  ${buildwebdir}/Resources/jqml.${resname}.js
+		COMMAND ${CMAKE_COMMAND} -E copy ${buildwebdir}/src/jqml.full.js ${buildwebdir}/Resources/jqml.${resname}.js
 		DEPENDS ${DEPEND_LIST} ${sdldependency}
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
 		VERBATIM
-	    )
+		)
 
 	add_custom_command(
 		OUTPUT ${QRC_CPP_WEB_FILE}
@@ -185,12 +185,12 @@ function(jqml_compile_web2)
 		${buildwebdir}/Resources/jqml.${resname}.js
 		COMMENT
 		"Compile QRC_WEB_FILE"
-	    )
+		)
 
 	add_custom_target(
-	        WebCompiler${PROJECT_NAME} ALL
+			WebCompiler${PROJECT_NAME} ALL
 		DEPENDS ${QRC_CPP_WEB_FILE}
-	    )
+		)
 
 	add_dependencies(WebCompiler${PROJECT_NAME} ${PROJECT_NAME})
 
@@ -215,7 +215,7 @@ function(jq_compile_web)
 
 	if(NOT NODE_EXE)
 		if(${MSVC})
-			set(NODE_EXE  ${IMTCOREDIR}/3rdParty/nodejs/node.exe)
+			set(NODE_EXE ${IMTCOREDIR}/3rdParty/nodejs/node.exe)
 		else()
 			set(NODE_EXE node)
 		endif()
