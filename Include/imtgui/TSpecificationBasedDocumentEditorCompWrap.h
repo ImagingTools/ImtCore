@@ -9,6 +9,7 @@
 #include <iqtgui/IDialog.h>
 
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtcol/IObjectTypeIdFilter.h>
 
@@ -16,12 +17,11 @@
 namespace imtgui
 {
 
-template<typename BaseClass>
-class TSpecificationBasedDocumentEditorCompWrap : public BaseClass
+template<typename Base>
+class TSpecificationBasedDocumentEditorCompWrap : public Base
 {
-	Q_OBJECT
 public:
-	typedef BaseClass BaseClass;
+	typedef Base BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(TSpecificationBasedDocumentEditorCompWrap)
 		I_ASSIGN(m_specObjectTypeIdAttrPtr, "SpecificationObjectTypeId", "Type ID of the specification object", false, "Specification");
@@ -42,10 +42,6 @@ protected:
 	};
 
 	typedef QList<SpecificationInfo> SpecificationList;
-
-
-protected Q_SLOTS:
-	virtual void OnCreateNewSpecificationClicked();
 
 protected:
 	/**
@@ -94,14 +90,6 @@ private:
 template<typename BaseClass>
 inline TSpecificationBasedDocumentEditorCompWrap<BaseClass>::TSpecificationBasedDocumentEditorCompWrap()
 	: m_collectionObserver(*this)
-{
-}
-
-
-// protected slots
-
-template<typename BaseClass>
-inline void OnCreateNewSpecificationClicked()
 {
 }
 
