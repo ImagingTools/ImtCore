@@ -125,12 +125,6 @@ StyleComponents {
 	property string secondColor: "#F18C16";
 	property color secondaryColor: secondColor
 
-		//dark - light
-	property color darkPrimaryColor : '#000'
-	property color darkSecondaryColor: '#FFF'
-	property color lightPrimaryColor: '#000'
-	property color lightSecondaryColor: '#000'
-
 		//error
 	property color errorColor: errorTextColor
 	property string errorTextColor: "#FF4500";
@@ -191,17 +185,19 @@ StyleComponents {
 	property color inactive_buttonText: "#335777";
 
 		//scroll
-	property string color_scrollBackground: styleContainer.imagingToolsGradient0;
-	property string color_scrollIndicator: styleContainer.imagingToolsGradient3;
-	property string color_scrollHighlight: styleContainer.imagingToolsGradient0;
+	property string scrollBackgroundColor: styleContainer.imagingToolsGradient0;
+	property string scrollIndicatorColor: styleContainer.imagingToolsGradient3;
+	property string scrollHighlightColor: styleContainer.imagingToolsGradient0;
 
 		//shadow, hover
 	property string shadowColor: "#ececec";
 	property string hover: "#e6e6e8";
+	// shadowColor			!
 
 		//simple colors
 	property string greenColor: "#00ff00";
 	property string lightBlueColor: "#69b8e3";
+
 
 	//other parameters
 	property real maximumFlickVelocity: 75

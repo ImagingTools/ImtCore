@@ -18,9 +18,9 @@ Rectangle{
     property real minSize: 20;
     property real secondSize: 20;
     property int indicatorRadius: 2;
-    property string backgroundColor: decorator_ ? "transparent" : Style.color_scrollBackground !== undefined ? Style.color_scrollBackground  : "#efefef";
-    property string indicatorColor: decorator_ ? "transparent" : Style.color_scrollIndicator !== undefined ? Style.color_scrollIndicator : "lightgray";
-    property string highlightColor: decorator_ ? "transparent" : Style.color_scrollHighlight !== undefined ? Style.color_scrollHighlight : "lightgray";
+    property string backgroundColor: decorator_ ? "transparent" : Style.scrollBackgroundColor !== undefined ? Style.scrollBackgroundColor  : "#efefef";
+    property string indicatorColor: decorator_ ? "transparent" : Style.scrollIndicatorColor !== undefined ? Style.scrollIndicatorColor : "lightgray";
+    property string highlightColor: decorator_ ? "transparent" : Style.scrollHighlightColor !== undefined ? Style.scrollHighlightColor : "lightgray";
 
     property bool canFade: false;
     property bool isMoving: false;
