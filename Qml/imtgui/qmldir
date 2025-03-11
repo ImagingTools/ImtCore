@@ -12,6 +12,7 @@ PagesProvider 1.0 ./Application/PagesProvider.qml
 SchedulerParams 1.0 ./Application/SchedulerParams.qml
 ShortcutManager 1.0 ./Application/ShortcutManager.qml
 ThumbnailDecorator 1.0 ./Application/ThumbnailDecorator.qml
+ApplicationEvents 1.0 ./Application/ApplicationEvents.qml
 
 ButtonPanel 1.0 Panels/ButtonPanel.qml
 CommandsDecorator 1.0 Panels/CommandsDecorator.qml

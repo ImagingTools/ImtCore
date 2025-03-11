@@ -13,6 +13,7 @@
         <file alias="imtgui/Application/SchedulerParams.qml">Application/SchedulerParams.qml</file>
         <file alias="imtgui/Application/ShortcutManager.qml">Application/ShortcutManager.qml</file>
         <file alias="imtgui/Application/ThumbnailDecorator.qml">Application/ThumbnailDecorator.qml</file>
+	<file alias="imtgui/Application/ApplicationEvents.qml">Application/ApplicationEvents.qml</file>
         <file alias="imtgui/Panels/ButtonPanel.qml">Panels/ButtonPanel.qml</file>
         <file alias="imtgui/Panels/CommandsDecorator.qml">Panels/CommandsDecorator.qml</file>
         <file alias="imtgui/Panels/FilterMenu.qml">Panels/FilterMenu.qml</file>
