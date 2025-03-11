@@ -52,6 +52,8 @@ bool CQmlGuiCompBase::DestroyGui()
 		BaseClass::DestroyQuickItem();
 
 		m_quickWidget->deleteLater();
+
+		m_quickWidget = nullptr;
 	}
 
 	return true;
