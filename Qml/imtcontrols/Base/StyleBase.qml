@@ -20,7 +20,6 @@ StyleComponents {
 	id: styleContainer;
 
 	//Main
-	property bool isQtStyle: false;  // deprecated
 	property string styleId: "StyleAcf"
 
 	property bool mobile;
@@ -40,7 +39,6 @@ StyleComponents {
 	property alias boldFontLoader: boldFont;
 
 	//Font size
-
 	property int fontSizeXHuge: 64
 	property int fontSizeHuge: 48
 	property int fontSizeXXXXLarge: 32
@@ -55,66 +53,61 @@ StyleComponents {
 	property int fontSizeTiny: 6
 
 	//Button sizes
-	property int buttonWidthExtraSmall: 4
 	property int buttonWidthLarge: 32
 	property int buttonWidthMedium: 24
 	property int buttonWidthSmall: 16
-	property int buttonWidthTiny: 8
+	property int buttonWidthXSmall: 8
+	property int buttonWidthTiny: 4
+
 	property int buttonRadius: 4
 	property int buttonBorderWidth: 1
 	property int buttonHeight: 30
 
 	//Icon sizes
-	property int iconSizeExtraSmall: 8
-	property int iconSizeSmall: 16
-	property int iconSizeMedium: 32
+	property int iconSizeXLarge: 128
 	property int iconSizeLarge: 64
-	property int iconSizeExtraLarge: 128
-	property int iconSizeLauncher: 100
+	property int iconSizeMedium: 32
+	property int iconSizeSmall: 16
+	property int iconSizeXSmall: 8
 
 	//Item sizes
-	property int itemSizeExtraSmall: 8
-	property int itemSizeSmall: 16
-	property int itemSizeMedium: 32
-	property int itemSizeLarge: 48
-	property int itemSizeExtraLarge: 64
 	property int itemSizeHuge: 128
+	property int itemSizeXLarge: 64
+	property int itemSizeLarge: 48
+	property int itemSizeMedium: 32
+	property int itemSizeSmall: 16
+	property int itemSizeXSmall: 8
 
 	//Opacity
 	property real opacityFaint: 0.05
 	property real opacityHigh: 0.75
 	property real opacityLow: 0.25
 	property real opacityOverlay: 0.15
-	property real highlightBackgroundOpacity: 0.15
 	property real selectedOpacity: 0.75
 	property real hoverOpacity: selectedOpacity/2
+	property real highlightBackgroundOpacity: 0.15
 
 	//Paddings
-	property int paddingSmall: 8
-	property int paddingMedium: 16
-	property int paddingLarge: 32
 	property int paddingHuge: 64
+	property int paddingLarge: 32
+	property int paddingMedium: 16
+	property int paddingSmall: 8
 
 	//Margins
 	property int sizeSmallMargin: 6;
 	property int sizeMainMargin: 11;
 	property int sizeLargeMargin: 23;
-	property int horizontalPageMargin: 24
 	property int margin: 13;
 
 	//Radius
 	property int textFieldRadius: 3;
 	property int comboBoxRadius: 3;
 
-	//Other sizes
-	property int size_indicatorHeight: 50;
-	property int size_leftPanelWidth: 250;
-
 	//Alternating
 	property bool enableAlternating: true;
+	property real alternatingOpacity: 0.05
 	property color alternatingColor: '#000'
 	property string alternateBaseColor: "#f5f5f5";
-	property real alternatingOpacity: 0.05
 
 	//Gradient
 	property string imagingToolsGradient0: "#f6f6f6";
@@ -123,10 +116,11 @@ StyleComponents {
 	property string imagingToolsGradient3: "#bebec0";
 	property string imagingToolsGradient4: "#b4b4b6";
 
+
 	//Colors
 		//main
-	property string baseColor: "white";
 	property string mainColor: "#e6e6e8";
+	property string baseColor: "white";
 	property color primaryColor: mainColor
 	property string secondColor: "#F18C16";
 	property color secondaryColor: secondColor
@@ -151,7 +145,6 @@ StyleComponents {
 	property string textColor: "#335777";
 	property string textSelected: "#0078d7";
 	property string titleColor: "#055A85";
-	property color inactive_textColor: "#aaaaaa";
 	property color placeHolderTextColor : '#AAA'
 	property string linkColor: "#0078D7";
 	property string selectedLinkFromColor: "#1974d2";
@@ -159,6 +152,7 @@ StyleComponents {
 	property string color_text_titles: "#7700FF";
 	property string color_text_notActive: "#C2CEDB";
 	property string subtitleColor: "#6A6E6F";
+	property color inactive_textColor: "#aaaaaa";
 	property string disabledInActiveTextColor: "#c0c0c0";
 
 		//border
@@ -184,6 +178,7 @@ StyleComponents {
 	property string selectedColor: "#e3eefa";
 	property string tabSelectedColor: "#FF4500";
 	property string iconColorOnSelected: "#1a76e7";
+	// selectedColor		!
 
 		//button
 	property string buttonColor: "#dddddd";
@@ -207,7 +202,6 @@ StyleComponents {
 		//simple colors
 	property string greenColor: "#00ff00";
 	property string lightBlueColor: "#69b8e3";
-
 
 	//other parameters
 	property real maximumFlickVelocity: 75

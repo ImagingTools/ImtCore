@@ -18,10 +18,6 @@ DecoratorBase  {
 
     property bool isQtStyle: false;
 
-    onIsQtStyleChanged: {
-        Style.isQtStyle = isQtStyle;
-    }
-
 
     Row{
         id: buttonRow;
