@@ -30,9 +30,19 @@ CGqlExtSchemaParser::CGqlExtSchemaParser(QIODevice& device): BaseClass(device)
 
 // reimplemented (ISdlDocumentTypeListProvider)
 
-SdlDocumentTypeList CGqlExtSchemaParser::GetDocumentTypes() const
+SdlDocumentTypeList CGqlExtSchemaParser::GetDocumentTypes(bool onlyLocal) const
 {
-	return m_documentTypes;
+	SdlDocumentTypeList retVal = m_documentTypes;
+	if (onlyLocal){
+		QMutableListIterator documentTypesIter(retVal);
+		while (documentTypesIter.hasNext()) {
+			CSdlDocumentType& documentType = documentTypesIter.next();
+			if (documentType.IsExternal()){
+				documentTypesIter.remove();
+			}
+		}
+	}
+	return retVal;
 }
 
 

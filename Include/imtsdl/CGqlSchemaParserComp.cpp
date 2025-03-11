@@ -737,6 +737,25 @@ bool CGqlSchemaParserComp::ValidateSchema()
 		}
 	}
 
+	for (CSdlDocumentType& sdlDocumentType: m_documentTypes){
+		bool isExternal = sdlDocumentType.IsExternal();
+		if (isExternal){
+			// if external, that mean, it is already processed
+			continue;
+		}
+
+		if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_ONLY_FILE){
+			isExternal =  bool(QDir::cleanPath(m_currentSchemaFilePath) != QDir::cleanPath(m_argumentParserCompPtr->GetSchemaFilePath()));
+			if (sdlDocumentType.GetTargetHeaderFilePath().isEmpty()){
+				const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), QFileInfo(m_currentSchemaFilePath).fileName());
+				const QString headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
+				sdlDocumentType.SetTargetHeaderFilePath(headerFilePath);
+			}
+		}
+
+		sdlDocumentType.SetExternal(isExternal);
+	}
+
 	QList<CSdlType> uniqueTypes;
 	QMutableListIterator typesIter(m_sdlTypes);
 	while(typesIter.hasNext()){

@@ -1347,7 +1347,7 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntr
 }
 
 
-QString CSdlTools::GetTypeVersion(const CSdlType& sdlType)
+QString CSdlTools::GetTypeVersion(const CSdlEntryBase& sdlType)
 {
 	QString typeVersionName;
 	const iprm::IParamsSet& schemaParams = sdlType.GetSchemaParams();

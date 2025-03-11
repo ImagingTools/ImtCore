@@ -14,7 +14,7 @@
 namespace imtsdlgen
 {
 
-
+/// \todo move to base framework; add comfort methods
 class CQtResourceFilePersistenceComp:
 			public ilog::CLoggerComponentBase,
 			virtual public ifile::IFilePersistence,

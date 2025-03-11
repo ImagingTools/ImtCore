@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5343" Description="ACF"/>
-            <Version Id="1" Number="2234" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5345" Description="ACF"/>
+            <Version Id="1" Number="2235" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -119,7 +119,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>1.6</Value>
-                                            <Value>2.12</Value>
+                                            <Value>2.13</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -314,6 +314,9 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>

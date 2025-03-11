@@ -34,6 +34,7 @@ class CSdlTools
 {
 public:
 	// static variables
+	/// \todo remove it. \deprecated
 	static const QString s_variantMapClassMemberName;
 	/**
 		\brief Defines an SDL scheme namespace prefix.
@@ -141,7 +142,7 @@ public:
 
 	/// \todo remove \param rawLookup - V1 fallback use ONLY for V1 generation!!!!!
 	[[nodiscard]] static QString ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntry, const QStringList& lookupPaths, bool rawLookup = true);
-	[[nodiscard]] static QString GetTypeVersion(const CSdlType& sdlType);
+	[[nodiscard]] static QString GetTypeVersion(const CSdlEntryBase& sdlType);
 
 	[[nodiscard]] static IncludeDirective CreateCxxDirective(const QString& path);
 	[[nodiscard]] static IncludeDirective CreateQtDirective(const QString& path);

@@ -17,7 +17,7 @@ class ISdlDocumentTypeListProvider: virtual public istd::IPolymorphic
 {
 
 public:
-	virtual SdlDocumentTypeList GetDocumentTypes() const = 0;
+	virtual SdlDocumentTypeList GetDocumentTypes(bool onlyLocal) const = 0;
 };
 
 

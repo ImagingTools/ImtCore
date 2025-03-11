@@ -84,13 +84,7 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
 	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
 
-	imtsdl::SdlDocumentTypeList sdlDocumentTypeList = m_sdlDocumentListCompPtr->GetDocumentTypes();
-
-	// remove all external
-	/// \todo use GetDocumentTypes(onlyLocal) later
-	sdlDocumentTypeList.removeIf([this](const imtsdl::CSdlDocumentType& sdlDocumentType){
-		return IsExternal(sdlDocumentType);
-	});
+	imtsdl::SdlDocumentTypeList sdlDocumentTypeList = m_sdlDocumentListCompPtr->GetDocumentTypes(true);
 
 	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
 		if (!m_argumentParserCompPtr->IsAutoJoinEnabled()){
@@ -939,13 +933,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 
 	// add IsRequestSupported() method
 	imtsdl::SdlRequestList requestList;
-	imtsdl::SdlDocumentTypeList sdlDocumentTypeList = m_sdlDocumentListCompPtr->GetDocumentTypes();
-
-	// remove all external
-	/// \todo use GetDocumentTypes(onlyLocal) later
-	sdlDocumentTypeList.removeIf([this](const imtsdl::CSdlDocumentType& sdlDocumentType){
-		return IsExternal(sdlDocumentType);
-	});
+	imtsdl::SdlDocumentTypeList sdlDocumentTypeList = m_sdlDocumentListCompPtr->GetDocumentTypes(true);
 
 	// add requests for operations only
 	for (const imtsdl::CSdlDocumentType &documentType : sdlDocumentTypeList){

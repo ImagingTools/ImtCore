@@ -11,7 +11,7 @@ SdlRequestList CBasicRequestsProxyProviderComp::GetRequests(bool onlyLocal) cons
 {
 	if (m_sdlRequestListCompPtr.IsValid() && m_sdlDocumentListCompPtr.IsValid()){
 		SdlRequestList retVal = m_sdlRequestListCompPtr->GetRequests(onlyLocal);
-		SdlDocumentTypeList documentList = m_sdlDocumentListCompPtr->GetDocumentTypes();
+		SdlDocumentTypeList documentList = m_sdlDocumentListCompPtr->GetDocumentTypes(false);
 
 		for (const CSdlDocumentType& documentType: documentList){
 			const SdlRequestList typeRequestList = documentType.GetOperationsList().values();

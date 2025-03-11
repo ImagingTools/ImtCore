@@ -82,7 +82,7 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
 	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
 
-	imtsdl::SdlDocumentTypeList sdlDocumentTypeList = m_sdlDocumentListCompPtr->GetDocumentTypes();
+	imtsdl::SdlDocumentTypeList sdlDocumentTypeList = m_sdlDocumentListCompPtr->GetDocumentTypes(false);
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
 		if (!m_argumentParserCompPtr->IsAutoJoinEnabled()){
 			QStringList cumulatedFiles;

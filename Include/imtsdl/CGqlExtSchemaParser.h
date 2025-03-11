@@ -40,7 +40,7 @@ public:
 	CGqlExtSchemaParser(QIODevice& device);
 
 	// reimplemented (ISdlDocumentTypeListProvider)
-	virtual SdlDocumentTypeList GetDocumentTypes() const override;
+	virtual SdlDocumentTypeList GetDocumentTypes(bool onlyLocal) const override;
 
 protected:
 	virtual bool ProcessCollectionSchema();
