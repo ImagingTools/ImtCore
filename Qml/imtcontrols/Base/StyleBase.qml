@@ -97,7 +97,7 @@ StyleComponents {
 	property int sizeSmallMargin: 6;
 	property int sizeMainMargin: 11;
 	property int sizeLargeMargin: 23;
-	property int margin: 13;
+	property int margin: 13;//?
 
 	//Radius
 	property int textFieldRadius: 3;
@@ -119,11 +119,10 @@ StyleComponents {
 
 	//Colors
 		//main
-	property string mainColor: "#e6e6e8";
 	property string baseColor: "white";
-	property color primaryColor: mainColor
+	property string mainColor: "#e6e6e8";
+	property string firstColor: mainColor
 	property string secondColor: "#F18C16";
-	property color secondaryColor: secondColor
 
 		//error
 	property color errorColor: errorTextColor
@@ -152,7 +151,6 @@ StyleComponents {
 		//border
 	property string borderColor: "#d0d0d2";
 	property string borderColor2: "#a4a4a6";
-	property string borderFocusColor: "#1a76e7";
 
 		//background
 	property string backgroundColor: "#e6e6e8";
@@ -172,7 +170,6 @@ StyleComponents {
 	property string selectedColor: "#e3eefa";
 	property string tabSelectedColor: "#FF4500";
 	property string iconColorOnSelected: "#1a76e7";
-	// selectedColor		!
 
 		//button
 	property string buttonColor: "#dddddd";
@@ -192,12 +189,10 @@ StyleComponents {
 		//shadow, hover
 	property string shadowColor: "#ececec";
 	property string hover: "#e6e6e8";
-	// shadowColor			!
 
 		//simple colors
 	property string greenColor: "#00ff00";
 	property string lightBlueColor: "#69b8e3";
-
 
 	//other parameters
 	property real maximumFlickVelocity: 75
