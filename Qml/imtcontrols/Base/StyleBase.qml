@@ -29,6 +29,8 @@ StyleComponents {
 
 	property string theme: "Light";
 
+	property string language;//deprecated?
+
 	//Font properties
 	property string mainFontSource: "../../../Fonts/Ubuntu-Light.ttf";
 	property string boldFontSource: "../../../Fonts/Ubuntu-Medium.ttf";
@@ -97,6 +99,10 @@ StyleComponents {
 	property int sizeSmallMargin: 6;
 	property int sizeMainMargin: 11;
 	property int sizeLargeMargin: 23;
+
+	property int mainWindowMargin: 0;
+	property int pageMargin: 0;
+
 
 	//Radius
 	property int textFieldRadius: 3;
