@@ -97,7 +97,6 @@ StyleComponents {
 	property int sizeSmallMargin: 6;
 	property int sizeMainMargin: 11;
 	property int sizeLargeMargin: 23;
-	property int margin: 13;//?
 
 	//Radius
 	property int textFieldRadius: 3;
@@ -147,6 +146,12 @@ StyleComponents {
 	property string subtitleColor: "#6A6E6F";
 	property color inactive_textColor: "#aaaaaa";
 	property string disabledInActiveTextColor: "#c0c0c0";
+	// textColor				!
+	// textDisabledColor		!
+	// titleColor				!
+	// subtitleColor			!
+	// placeHolderTextColor		!
+	// linkColor				!
 
 		//border
 	property string borderColor: "#d0d0d2";
@@ -159,6 +164,9 @@ StyleComponents {
 	property string dialogBackgroundColor: "#f6f6f6";
 	property color overlayBackgroundColor: '#000'
 	property string tabPanelBackgroundColor: backgroundColor;
+	// backgroundColor				!
+	// backgroundColor2				!
+	// menuPanelBackgroundColor		!
 
 		//highlight
 	property color highlightBackgroundColor: '#000'
@@ -180,6 +188,13 @@ StyleComponents {
 	property color inactive_buttonColor: "#C0C0C0";
 	property color buttonText: "#335777";
 	property color inactive_buttonText: "#335777";
+	// buttonColor					!
+	// buttonAccentColor
+	// buttonBorderColor			!
+	// buttonHoverColor				!
+	// buttonPressedColor			!
+	// buttonBorderFocusColor		!
+	// buttonDisabledColor
 
 		//scroll
 	property string scrollBackgroundColor: styleContainer.imagingToolsGradient0;

@@ -65,7 +65,7 @@ Item {
         id: filterMenuLocal;
 
         anchors.top: collectionStructureBaseContainer.top;
-        anchors.topMargin: Style.margin;
+		anchors.topMargin: Style.sizeMainMargin;
 
         width: parent.width;
 
@@ -121,7 +121,7 @@ Item {
         id: backgroundTreeView;
 
         anchors.top: filterMenuLocal.visible ? filterMenuLocal.bottom: parent.top;
-        anchors.topMargin: filterMenuLocal.visible ? Style.margin : 0;
+		anchors.topMargin: filterMenuLocal.visible ? Style.sizeMainMargin : 0;
         anchors.left: parent.left;
 
         width: parent.width

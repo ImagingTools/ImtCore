@@ -127,7 +127,7 @@ DecoratorBase {
 
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.right: parent.right;
-                anchors.rightMargin: Style.margin;
+				anchors.rightMargin: Style.sizeMainMargin;
 
                 width: Style.buttonWidthSmall;
                 height: width;

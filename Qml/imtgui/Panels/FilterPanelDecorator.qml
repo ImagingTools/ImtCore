@@ -195,7 +195,7 @@ DecoratorBase {
 				
 				anchors.verticalCenter: tfc.verticalCenter;
 				anchors.right: tfc.right;
-				anchors.rightMargin: Style.margin;
+				anchors.rightMargin: Style.sizeMainMargin;
 				
 				width: Style.buttonWidthSmall;
 				height: width;

@@ -67,11 +67,11 @@ ViewBase {
 		id: filterMenu_;
 		
 		anchors.top: parent.top;
-		anchors.topMargin: Style.margin;
+		anchors.topMargin: Style.sizeMainMargin;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.margin;
+		anchors.leftMargin: Style.sizeMainMargin;
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.margin;
+		anchors.rightMargin: Style.sizeMainMargin;
 		
 		// complexFilter: collectionViewBaseContainer.collectionFilter;
 		
