@@ -198,7 +198,7 @@ StyleComponents {
 	property string alternateBaseColor: "#f5f5f5";
 
 		//simple colors
-	property string colorGray: "#C2CEDB";
+	property string grayColor: "#C2CEDB";
 	property string greenColor: "#00ff00";
 	property string lightBlueColor: "#69b8e3";
 

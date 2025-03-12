@@ -280,7 +280,7 @@ FocusScope{
                     height: 20;
                     //radius: 5
                     mainMargin: 16;
-					borderColor:Style.colorGray;
+					borderColor:Style.grayColor;
                     //borderWidth: 2;
                     visible: checkBoxMenu.hasAllSelection;
                     enabled: visible;
@@ -320,7 +320,7 @@ FocusScope{
                     width: parent.width;
                     height: Style.size_TextFieldHeight;
                     border.width: 1;
-					border.color: Style.colorGray;
+					border.color: Style.grayColor;
                     radius: Style.size_TextFieldRadius;
 
                     visible: checkBoxMenu.hasSearch;
@@ -375,7 +375,7 @@ FocusScope{
                             height: 20;
                             //radius: 5
                             mainMargin: 16;
-							borderColor:Style.colorGray;
+							borderColor:Style.grayColor;
 
                             //imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
                             text: model[checkBoxMenu.nameId];
