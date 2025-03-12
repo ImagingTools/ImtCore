@@ -94,7 +94,7 @@ Item{
 
 		targetItem: list;
 		secondSize: 16;
-		//indicatorColor: Style.color_gray;
+		//indicatorColor: Style.colorGray;
 		z: 20;
 	}
 }

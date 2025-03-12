@@ -126,6 +126,7 @@ StyleComponents {
 	property string mainColor: "#e6e6e8";
 	property string firstColor: mainColor
 	property string secondColor: "#F18C16";
+	property string colorMenuPanel: baseColor;
 
 		//error
 	property string errorColor: errorTextColor
@@ -197,6 +198,7 @@ StyleComponents {
 	property string alternateBaseColor: "#f5f5f5";
 
 		//simple colors
+	property string colorGray: "#C2CEDB";
 	property string greenColor: "#00ff00";
 	property string lightBlueColor: "#69b8e3";
 
