@@ -89,7 +89,7 @@ Rectangle{
 
 		font.family: Style.fontFamily;
 		font.pixelSize: Style.fontSizeXLarge;
-		color: Style.color_first;
+		color: Style.firstColor;
 		text: bigIndicatorContainer.text;
 		z: 10;
 		onWidthChanged: {
