@@ -5,5 +5,5 @@ schema {
 }
 
 type RgbColorHex {
-	Color: String
+	Color: String!
 }

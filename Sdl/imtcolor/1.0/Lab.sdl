@@ -5,7 +5,7 @@ schema {
 }
 
 type Lab {
-	L: Double
-	a: Double
-	b: Double
+	L: Double!
+	a: Double!
+	b: Double!
 }
