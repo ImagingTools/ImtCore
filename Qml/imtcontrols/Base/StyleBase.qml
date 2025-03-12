@@ -105,8 +105,6 @@ StyleComponents {
 	//Alternating
 	property bool enableAlternating: true;
 	property real alternatingOpacity: 0.05
-	property color alternatingColor: '#000'
-	property string alternateBaseColor: "#f5f5f5";
 
 	//Gradient
 	property string imagingToolsGradient0: "#f6f6f6";
@@ -124,34 +122,25 @@ StyleComponents {
 	property string secondColor: "#F18C16";
 
 		//error
-	property color errorColor: errorTextColor
+	property string errorColor: errorTextColor
 	property string errorTextColor: "#FF4500";
 
 		//accent
-	property color imaginToolsAccent: "#2a82da"
+	property string imaginToolsAccentColor: "#2a82da"
 	property string positiveAccentColor: "#00FFD1";
 	property string negativeAccentColor: "#FF5449";
 	property string middleAccentColor: "yellow";
 
 		//text
 	property string textColor: "#335777";
-	property string textSelected: "#0078d7";
 	property string titleColor: "#055A85";
-	property color placeHolderTextColor : '#AAA'
+	property string subtitleColor: "#6A6E6F";
+	property string textSelectedColor: "#0078d7";
+	property string inactiveTextColor: "#aaaaaa";
+	property string placeHolderTextColor : '#AAA'
 	property string linkColor: "#0078D7";
 	property string selectedLinkFromColor: "#1974d2";
 	property string selectedLinkToColor: "#51AC2A";
-	property string color_text_titles: "#7700FF";
-	property string color_text_notActive: "#C2CEDB";
-	property string subtitleColor: "#6A6E6F";
-	property color inactive_textColor: "#aaaaaa";
-	property string disabledInActiveTextColor: "#c0c0c0";
-	// textColor				!
-	// textDisabledColor		!
-	// titleColor				!
-	// subtitleColor			!
-	// placeHolderTextColor		!
-	// linkColor				!
 
 		//border
 	property string borderColor: "#d0d0d2";
@@ -161,18 +150,16 @@ StyleComponents {
 	property string backgroundColor: "#e6e6e8";
 	property string backgroundColor2: "#f7f7f7";
 	property string menuPanelBackgroundColor: "#e2e2e8";
+
 	property string dialogBackgroundColor: "#f6f6f6";
-	property color overlayBackgroundColor: '#000'
+	property string overlayBackgroundColor: '#000'
 	property string tabPanelBackgroundColor: backgroundColor;
-	// backgroundColor				!
-	// backgroundColor2				!
-	// menuPanelBackgroundColor		!
 
 		//highlight
-	property color highlightBackgroundColor: '#000'
-	property color highlightColor: selectedColor
-	property color highlightDimmerColor: '#DED'
-	property color secondaryHighlightColor: linkColor
+	property string highlightBackgroundColor: '#000'
+	property string highlightColor: selectedColor
+	property string highlightDimmerColor: '#DED'
+	property string secondaryHighlightColor: linkColor
 
 		//selected
 	property string selectedColor: "#e3eefa";
@@ -184,17 +171,11 @@ StyleComponents {
 	property string buttonBorderColor: "#b0b0b0";
 	property string buttonHoverColor: "#d2d2d2";
 	property string buttonPressedColor: "#c6c6c6";
+	property string buttonAccentColor: imaginToolsAccentColor;
+	property string buttonInactiveColor: "#C0C0C0";
 	property string buttonBorderFocusColor: borderColor;
-	property color inactive_buttonColor: "#C0C0C0";
-	property color buttonText: "#335777";
-	property color inactive_buttonText: "#335777";
-	// buttonColor					!
-	// buttonAccentColor
-	// buttonBorderColor			!
-	// buttonHoverColor				!
-	// buttonPressedColor			!
-	// buttonBorderFocusColor		!
-	// buttonDisabledColor
+	property string buttonTextColor: "#335777";
+	property string buttonInactiveTextColor: "#335777";
 
 		//scroll
 	property string scrollBackgroundColor: styleContainer.imagingToolsGradient0;
@@ -204,6 +185,10 @@ StyleComponents {
 		//shadow, hover
 	property string shadowColor: "#ececec";
 	property string hover: "#e6e6e8";
+
+		//Alternating
+	property color alternatingColor: '#000'
+	property string alternateBaseColor: "#f5f5f5";
 
 		//simple colors
 	property string greenColor: "#00ff00";
@@ -435,11 +420,11 @@ StyleComponents {
 
 			styleContainer.buttonColor = styleContainer.getThemeColor("ActiveColors", "Button", dataSource);
 			styleContainer.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", dataSource);
-			styleContainer.inactive_buttonColor = styleContainer.getThemeColor("InactiveColors", "Button", dataSource);
+			styleContainer.buttonInactiveColor = styleContainer.getThemeColor("InactiveColors", "Button", dataSource);
 			styleContainer.buttonText = styleContainer.getThemeColor("ActiveColors", "ButtonText", dataSource);
-			styleContainer.inactive_buttonText = styleContainer.getThemeColor("InactiveColors", "ButtonText", dataSource);
+			styleContainer.buttonInactiveTextColor = styleContainer.getThemeColor("InactiveColors", "ButtonText", dataSource);
 
-			styleContainer.disabledInActiveTextColor = styleContainer.getThemeColor("DisabledInActiveColors", "Text", dataSource);
+			styleContainer.inactiveTextColor = styleContainer.getThemeColor("DisabledInActiveColors", "Text", dataSource);
 
 			styleContainer.buttonHoverColor = styleContainer.alternateBaseColor;
 			styleContainer.buttonPressedColor = styleContainer.getThemeColor("ActiveColors", "BackgroundSelected", dataSource);
@@ -456,7 +441,7 @@ StyleComponents {
 			styleContainer.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", dataSource);
 			styleContainer.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);
 
-			styleContainer.imaginToolsAccent = dataSource.getData("ColorPalette").getData("ImaginTools Accent");
+			styleContainer.imaginToolsAccentColor = dataSource.getData("ColorPalette").getData("ImaginTools Accent");
 		}
 	}
 

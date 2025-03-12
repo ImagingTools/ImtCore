@@ -159,7 +159,7 @@ ViewBase {
 
         Text {
             anchors.verticalCenter: parent.verticalCenter;
-            color: Style.buttonText;
+            color: Style.buttonTextColor;
             font.family: Style.fontFamilyBold;
             font.pixelSize: Style.fontSizeNormal;
             text: qsTr("Feature Name");
@@ -183,7 +183,7 @@ ViewBase {
 
         Text {
             anchors.verticalCenter: parent.verticalCenter;
-            color: Style.buttonText;
+            color: Style.buttonTextColor;
             font.family: Style.fontFamilyBold;
             font.pixelSize: Style.fontSizeNormal;
             text: qsTr("Feature-ID");
@@ -202,7 +202,7 @@ ViewBase {
 
         Text {
             anchors.verticalCenter: parent.verticalCenter;
-            color: Style.buttonText;
+            color: Style.buttonTextColor;
             font.family: Style.fontFamilyBold;
             font.pixelSize: Style.fontSizeNormal;
             text: qsTr("Description");

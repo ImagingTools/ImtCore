@@ -171,7 +171,7 @@ Rectangle {
 
                 width: parent.width;
 
-                color: Style.inactive_textColor
+                color: Style.inactiveTextColor
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSizeNormal;
 

@@ -97,7 +97,7 @@ Text {
     font.family: Style.fontFamily
 
     color: rowDelegate
-           && rowDelegate.enabled ? (rowDelegate.tableItem.emptyDecorCell ? Style.textColor : rowDelegate.tableItem.cellDecorator.isValidData("FontColor", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontColor", name.columnIndex) : Style.textColor) : Style.inactive_textColor
+           && rowDelegate.enabled ? (rowDelegate.tableItem.emptyDecorCell ? Style.textColor : rowDelegate.tableItem.cellDecorator.isValidData("FontColor", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontColor", name.columnIndex) : Style.textColor) : Style.inactiveTextColor
 
     elide: rowDelegate ? rowDelegate.elideMode : Text.ElideLeft
     wrapMode: (!rowDelegate

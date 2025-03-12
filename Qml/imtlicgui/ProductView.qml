@@ -194,7 +194,7 @@ ViewBase {
 
             anchors.verticalCenter: headerPanel.verticalCenter;
 
-            color: Style.buttonText;
+            color: Style.buttonTextColor;
             font.family: Style.fontFamilyBold;
             font.pixelSize: Style.fontSizeNormal;
 
@@ -226,7 +226,7 @@ ViewBase {
 
             anchors.verticalCenter: headerPanel.verticalCenter;
 
-            color: Style.buttonText;
+            color: Style.buttonTextColor;
             font.family: Style.fontFamilyBold;
             font.pixelSize: Style.fontSizeNormal;
 

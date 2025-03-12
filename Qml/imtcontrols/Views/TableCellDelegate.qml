@@ -300,7 +300,7 @@ Item {
                        (delegateContainer.pTableDelegateContainer.emptyDecorCell ? Style.textColor :
                                                                               delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("FontColor", delegateContainer.columnIndex) ?
                                                                                   delegateContainer.pTableDelegateContainer.cellDecorator.getData("FontColor", delegateContainer.columnIndex) :
-                                                                                  Style.textColor) : Style.inactive_textColor;
+                                                                                  Style.textColor) : Style.inactiveTextColor;
 
 
             elide: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.elideMode : Text.ElideLeft;

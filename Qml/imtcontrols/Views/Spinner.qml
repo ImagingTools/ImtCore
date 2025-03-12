@@ -115,7 +115,7 @@ Rectangle {
         height: root.itemHeight;
 
         border.width: 2;
-        border.color: Style.textSelected;
+        border.color: Style.textSelectedColor;
 
         color: "transparent";
     }

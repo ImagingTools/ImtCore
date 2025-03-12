@@ -21,8 +21,8 @@ Item {
     property alias tooltipItem: tooltip;
     //property alias legendColor: legendText.color;
 
-    property var legendColor: textButton.active ? Style.color_text_titles : Style.color_text_notActive;
-    property string indicatorColor: Style.color_text_titles;
+	property var legendColor: textButton.active ? Style.titleColor : Style.inactiveTextColor;
+	property string indicatorColor: Style.titleColor;
 
     signal clicked();
 

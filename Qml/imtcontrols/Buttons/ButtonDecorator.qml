@@ -160,7 +160,7 @@ DecoratorBase {
 
 				width: parent.width;
 
-				color: !commonButtonDecorator.baseElement ? "transparent" : (commonButtonDecorator.baseElement.font && commonButtonDecorator.baseElement.font.color !== "") ? commonButtonDecorator.baseElement.font.color : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
+				color: !commonButtonDecorator.baseElement ? "transparent" : (commonButtonDecorator.baseElement.font && commonButtonDecorator.baseElement.font.color !== "") ? commonButtonDecorator.baseElement.font.color : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactiveTextColor
 
 				font.pixelSize: commonButtonDecorator.fontSize;
 				font.family: commonButtonDecorator.fontFamily;

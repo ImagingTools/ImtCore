@@ -29,7 +29,7 @@ Item {
     // Commands with positive accent
     property var positiveAccentCommandIds: []
 
-    property string positiveAccentColor: Style.imaginToolsAccent;
+    property string positiveAccentColor: Style.imaginToolsAccentColor;
     property string negativeAccentColor: Style.errorTextColor;
 
     property int commandsCount: 0;
@@ -162,7 +162,7 @@ Item {
                                     decorator: Component {
                                         TopButtonDecorator {
 											property string baseColor: !baseElement ? "transparent" : baseElement.checked ? Style.borderColor : baseElement.mouseArea.containsMouse ? Style.baseColor : Style.backgroundColor2
-                                            property string baseTextColor: !baseElement ? "transparent" : baseElement.enabled ? Style.textColor : Style.inactive_textColor;
+                                            property string baseTextColor: !baseElement ? "transparent" : baseElement.enabled ? Style.textColor : Style.inactiveTextColor;
 											color: button.isPositiveAccent ? commandsItem.positiveAccentColor :
 																			 button.isNegativeAccent ? commandsItem.negativeAccentColor : baseColor;
                                             textColor: button.isPositiveAccent || button.isNegativeAccent ? "white" : baseTextColor;

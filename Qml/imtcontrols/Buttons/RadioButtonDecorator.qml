@@ -11,7 +11,7 @@ DecoratorBase{
     opacity: !baseElement ? 0.4 : baseElement.checked ? 1 : 0.25
 
     property string color: "gray";
-    property string selectedColor: Style.imaginToolsAccent;
+    property string selectedColor: Style.imaginToolsAccentColor;
     property int fontSize: Style.fontSizeNormal;
 
     Rectangle {

@@ -175,7 +175,7 @@ FocusScope {
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSizeNormal;
 
-                        color: delegate.isActive ? Style.textColor : Style.disabledInActiveTextColor;
+                        color: delegate.isActive ? Style.textColor : Style.inactiveTextColor;
 
                         wrapMode: Text.WordWrap;
                         elide: Text.ElideRight;

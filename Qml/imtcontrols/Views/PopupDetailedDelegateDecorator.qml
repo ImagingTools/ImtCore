@@ -36,7 +36,7 @@ DecoratorBase {
 
             width: parent.width;
 
-            color: !commonButtonDecorator.baseElement ? "transparent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
+            color: !commonButtonDecorator.baseElement ? "transparent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactiveTextColor
 
             font.pixelSize: Style.fontSizeNormal
             font.family: Style.fontFamily
@@ -50,7 +50,7 @@ DecoratorBase {
 
             width: parent.width;
 
-            color: Style.inactive_textColor
+            color: Style.inactiveTextColor
 
             font.pixelSize: Style.fontSizeSmall
             font.family: Style.fontFamily

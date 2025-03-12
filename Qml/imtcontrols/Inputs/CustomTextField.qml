@@ -24,7 +24,7 @@ FocusScope {
     property alias selectionEnd: textField.selectionEnd;
 
     property string placeHolderText;
-    property string focusColor: Style.textSelected;
+    property string focusColor: Style.textSelectedColor;
 
     property string fontColor: Style.textColor;
 	property alias fontFamily: textField.font.family;
@@ -180,7 +180,7 @@ FocusScope {
         echoMode: containerTextField.echoMode;
 
         verticalAlignment: TextInput.AlignVCenter;
-        selectionColor: Style.textSelected;
+        selectionColor: Style.textSelectedColor;
         selectByMouse: true;
         clip: true;
 

@@ -396,7 +396,7 @@ CollectionViewCommandsDelegateBase {
 								id: descriptionTitle;
 								anchors.top: parent.top;
 								anchors.topMargin: Style.sizeMainMargin;
-								color: Style.buttonText;
+								color: Style.buttonTextColor;
 								font.family: Style.fontFamilyBold;
 								font.pixelSize: Style.fontSizeNormal;
 								font.bold: true;

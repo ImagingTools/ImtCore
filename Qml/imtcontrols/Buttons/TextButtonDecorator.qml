@@ -37,7 +37,7 @@ Item {
             anchors.left: parent.left;
             anchors.leftMargin: commonButtonDecorator.baseButton.imageSource ? Style.paddingSmall : commonButtonDecorator.baseButton.width/2 - width/2;
 
-            color: commonButtonDecorator.baseButton.enabled ? Style.textColor : Style.inactive_textColor;
+            color: commonButtonDecorator.baseButton.enabled ? Style.textColor : Style.inactiveTextColor;
 
             font.pixelSize: Style.fontSizeNormal;
             font.family: Style.fontFamily;

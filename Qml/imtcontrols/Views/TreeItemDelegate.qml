@@ -145,7 +145,7 @@ Item {
                 anchors.leftMargin: 10;
                 anchors.verticalCenter: parent.verticalCenter;
 
-                color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
+                color: model.Active ? Style.textColor : Style.inactiveTextColor;
 
                 font.pixelSize: Style.fontSizeNormal;
                 font.family: Style.fontFamily;

@@ -466,7 +466,7 @@ Rectangle {
 			property string selectedLinkToColor: Style.selectedLinkToColor
 			property string linkColor: Style.borderColor2
 			property string mainTextColor: Style.textColor
-			property string secondTextColor: Style.inactive_textColor
+			property string secondTextColor: Style.inactiveTextColor
 			property string gridColor: Style.imagingToolsGradient1;
 			property string backgroundBorderColor: Style.borderColor; // Style.alternateBaseColor;
 			property string backgroundColor: Style.baseColor;

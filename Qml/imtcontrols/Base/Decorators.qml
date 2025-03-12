@@ -475,7 +475,7 @@ StyleComponents {
                 radius: !checkBoxItem.baseElement ? 0 : checkBoxItem.baseElement.radius;
 
                 border.width: 1;
-                border.color: !checkBoxItem.baseElement ? "transparent" : checkBoxItem.borderColor !=="" ? checkBoxItem.borderColor  : checkBoxItem.baseElement.isActive ? Style.borderColor : Style.disabledInActiveTextColor;
+				border.color: !checkBoxItem.baseElement ? "transparent" : checkBoxItem.borderColor !=="" ? checkBoxItem.borderColor  : checkBoxItem.baseElement.isActive ? Style.borderColor : Style.inactiveTextColor;
 
                 Image {
                     id: image;
@@ -516,7 +516,7 @@ StyleComponents {
                 anchors.leftMargin: !checkBoxItem.baseElement ? 0 : checkBoxItem.baseElement.isLeftText ? 0 : checkRect.width + checkBoxItem.baseElement.mainMargin;
                 anchors.verticalCenter: checkBoxItem ? checkBoxItem.verticalCenter : undefined;
 
-                color: !checkBoxItem.baseElement ? "transparent" :  checkBoxItem.baseElement.enabled ? Style.buttonText : Style.inactive_buttonText;
+				color: !checkBoxItem.baseElement ? "transparent" :  checkBoxItem.baseElement.enabled ? Style.buttonTextColor : Style.buttonInactiveTextColor;
 
                 font.pixelSize: checkBoxItem.fontPixelSize;
                 font.family: Style.fontFamily;
@@ -585,7 +585,7 @@ StyleComponents {
                 anchors.leftMargin: !switchItem.baseElement ? 0 : switchItem.baseElement.isLeftText ? 0 : backgroundRec.width + switchItem.baseElement.mainMargin;
                 anchors.verticalCenter: switchItem.verticalCenter;
 
-                color: !switchItem.baseElement ? "transparent" :  switchItem.baseElement.enabled ? Style.buttonText : Style.inactive_buttonText;
+				color: !switchItem.baseElement ? "transparent" :  switchItem.baseElement.enabled ? Style.buttonTextColor : Style.buttonInactiveTextColor;
 
                 font.pixelSize: switchItem.fontPixelSize;
                 font.family: Style.fontFamily;
@@ -780,7 +780,7 @@ StyleComponents {
                 anchors.leftMargin: !radioButtonItem.baseElement ? 0 : radioButtonItem.baseElement.mainMargin;
                 anchors.verticalCenter: radioButtonItem.verticalCenter;
 
-                color: !radioButtonItem.baseElement ? "transparent" : radioButtonItem.baseElement.enabled ? Style.buttonText : Style.inactive_buttonText;
+				color: !radioButtonItem.baseElement ? "transparent" : radioButtonItem.baseElement.enabled ? Style.buttonTextColor : Style.buttonInactiveTextColor;
 
                 font.pixelSize: !radioButtonItem.baseElement ? 8 : radioButtonItem.baseElement.fontPixelSize;
                 font.family: Style.fontFamily;
