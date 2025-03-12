@@ -756,7 +756,7 @@ StyleComponents {
                     radius: width;
                     border.color: Style.borderColor;
                     border.width: 1;
-                    color: "lightgrey";//Style.color_shadow;
+					color: "lightgrey";
 
                     Rectangle{
                         id: selectCircle
