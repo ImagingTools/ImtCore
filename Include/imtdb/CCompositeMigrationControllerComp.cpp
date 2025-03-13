@@ -36,7 +36,8 @@ const imtdb::IMigrationController* CCompositeMigrationControllerComp::FindMigrat
 
 istd::CIntRange CCompositeMigrationControllerComp::GetMigrationRange() const
 {
-	istd::CIntRange availableRange;
+	istd::CIntRange availableRange(0, -1);
+	
 	for (int i = 0; i < m_migrationControllersCompPtr.GetCount(); i++){
 		const imtdb::IMigrationController* migrationControllerPtr = m_migrationControllersCompPtr[i];
 		if (migrationControllerPtr != nullptr){
@@ -49,7 +50,7 @@ istd::CIntRange CCompositeMigrationControllerComp::GetMigrationRange() const
 			}
 		}
 	}
-
+	
 	return availableRange;
 }
 
@@ -87,6 +88,9 @@ bool CCompositeMigrationControllerComp::DoMigration(int& resultRevision, const i
 		const imtdb::IMigrationController* migrationControllerPtr = m_migrationControllersCompPtr[i];
 		if (migrationControllerPtr != nullptr){
 			istd::CIntRange currentMigrationRange = migrationControllerPtr->GetMigrationRange();
+			if (!currentMigrationRange.IsValid()){
+				continue;
+			}
 
 			int startRevision = inputMinValue;
 			while (startRevision <= inputMaxValue){
@@ -146,7 +150,7 @@ bool CCompositeMigrationControllerComp::ContainsStep(const istd::CIntRange& rang
 {
 	for (const MigrationStep& step : steps){
 		istd::CIntRange migrationRange(step.from, step.to);
-		if (range.Contains(migrationRange)){
+		if (migrationRange.Contains(range)){
 			return true;
 		}
 	}
