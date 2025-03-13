@@ -126,7 +126,7 @@ StyleComponents {
 	property string mainColor: "#e6e6e8";
 	property string firstColor: mainColor
 	property string secondColor: "#F18C16";
-	property string colorMenuPanel: baseColor;
+	property string colorMenuPanel: imagingToolsGradient1;
 
 		//error
 	property string errorColor: errorTextColor
