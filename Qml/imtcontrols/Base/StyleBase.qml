@@ -103,10 +103,13 @@ StyleComponents {
 	property int mainWindowMargin: 0;
 	property int pageMargin: 0;
 
-
 	//Radius
 	property int textFieldRadius: 3;
 	property int comboBoxRadius: 3;
+
+	//Other sizes
+	property int sizePanelsHeight: 50;
+
 
 	//Alternating
 	property bool enableAlternating: true;
