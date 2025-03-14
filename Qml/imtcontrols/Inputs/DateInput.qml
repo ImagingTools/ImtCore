@@ -9,7 +9,7 @@ Item {
 	height: column.height;
 
 	property int inputHeight: 30;
-	property int fontSize: Style.fontSizeXLarge;
+	property int fontSize: Style.fontSizeNormal;
 
 	property string fontColor: Style.textColor;
 	property alias radius: input.radius;
@@ -23,7 +23,7 @@ Item {
 	property var dateRegExpFull: /^\d{2}\.\d{2}\.\d{4}$/
 	property var dateRegExp: /^[0-9\.]{0,10}$/
 
-	property bool canShowCurrentDate: false;
+	property bool canShowCurrentDate: true;
 	property bool hasTitle: true;
 
 	property bool  isError: false;
