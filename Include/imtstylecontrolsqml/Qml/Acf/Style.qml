@@ -10,5 +10,5 @@ ClientStyle {
     dialogBackgroundColor: styleContainer.backgroundColor2;
 
     property int comboBoxHeight: 30;
-    property int size_panelsHeight: 50;
+	property int sizePanelsHeight: 50;
 }

@@ -184,7 +184,7 @@ Rectangle {
         anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
 
         width: parent.width;
-        height: Style.size_panelsHeight !== undefined ? Style.size_panelsHeight : 60;
+        height: Style.sizePanelsHeight !== undefined ? Style.sizePanelsHeight : 60;
     }
 
     function showPreferencePage(){

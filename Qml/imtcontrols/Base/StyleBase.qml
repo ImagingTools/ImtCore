@@ -420,8 +420,7 @@ StyleComponents {
 			styleContainer.backgroundColor2 = styleContainer.getThemeColor("ActiveColors", "Background2", dataSource);
 
 			styleContainer.textColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
-			styleContainer.textSelected = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", dataSource);
-			styleContainer.inactive_textColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
+			styleContainer.textSelectedColor = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", dataSource);
 			styleContainer.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
 
 			styleContainer.selectedColor = styleContainer.getThemeColor("ActiveColors", "ItemSelected", dataSource);
@@ -429,7 +428,7 @@ StyleComponents {
 			styleContainer.buttonColor = styleContainer.getThemeColor("ActiveColors", "Button", dataSource);
 			styleContainer.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", dataSource);
 			styleContainer.buttonInactiveColor = styleContainer.getThemeColor("InactiveColors", "Button", dataSource);
-			styleContainer.buttonText = styleContainer.getThemeColor("ActiveColors", "ButtonText", dataSource);
+			styleContainer.buttonTextColor = styleContainer.getThemeColor("ActiveColors", "ButtonText", dataSource);
 			styleContainer.buttonInactiveTextColor = styleContainer.getThemeColor("InactiveColors", "ButtonText", dataSource);
 
 			styleContainer.inactiveTextColor = styleContainer.getThemeColor("DisabledInActiveColors", "Text", dataSource);
