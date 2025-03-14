@@ -1,3 +1,9 @@
+DO $$ 
+BEGIN
+   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'DocumentState') THEN
+      CREATE TYPE "DocumentState" AS ENUM ('Active', 'InActive', 'Disabled');
+   END IF;
+END $$;
 
 CREATE TABLE "${TableName}"
 (
