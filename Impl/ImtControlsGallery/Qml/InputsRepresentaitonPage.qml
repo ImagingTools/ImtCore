@@ -116,6 +116,26 @@ Rectangle {
             }
         }//row - inputsRow
 
+		Row{
+			id: dateRow;
+
+			anchors.horizontalCenter: parent.horizontalCenter;
+			height: 40;
+			spacing: 100;
+
+			DateInput{
+				id: dateInput;
+			}
+
+			TimeInput{
+				id: timeInput;
+			}
+
+			DateTimeInput{
+				id: dateTimeInput;
+			}
+		}//row - dateRow
+
         Row{
             id: sliderRow;
 
@@ -176,7 +196,7 @@ Rectangle {
 
             }
 
-        }//row2 - sliderRow
+		}//row - sliderRow
 
         Row{
             id: checkRow;
@@ -228,7 +248,7 @@ Rectangle {
 //                text: "radioButton2";
 //            }
 
-        }//row3 - checkRow
+		}//row - checkRow
 
         Row{
             id: boxRow;
@@ -243,7 +263,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter;
 
                 width: 160;
-                height: 60;
+				height: 40;
 
                 radius: 4;
                 color: "transparent";
