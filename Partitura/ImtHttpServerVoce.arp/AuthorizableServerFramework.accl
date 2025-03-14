@@ -2,20 +2,20 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5343" Description="ACF"/>
+            <Version Id="1" Number="2232" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="DatabaseEngine" X="200" Y="475" Note=""/>
-        <Element ComponentName="HttpServerFramework" X="600" Y="102" Note=""/>
-        <Element ComponentName="IdentifiableProductInfo" X="600" Y="625" Note=""/>
-        <Element ComponentName="PumaGQLClientEngine" X="600" Y="475" Note=""/>
-        <Element ComponentName="QtResourceLoaderComp" X="975" Y="625" Note=""/>
-        <Element ComponentName="ServerSettings" X="200" Y="250" Note=""/>
-        <Element ComponentName="SlaveSubscriberController" X="975" Y="250" Note=""/>
-        <Element ComponentName="WebSocketServerFramework" X="600" Y="250" Note=""/>
+        <Element ComponentName="DatabaseEngine" X="150" Y="500" Note=""/>
+        <Element ComponentName="HttpServerFramework" X="150" Y="125" Note=""/>
+        <Element ComponentName="IdentifiableProductInfo" X="850" Y="625" Note=""/>
+        <Element ComponentName="PumaGQLClientEngine" X="850" Y="500" Note=""/>
+        <Element ComponentName="QtResourceLoaderComp" X="850" Y="725" Note=""/>
+        <Element ComponentName="ServerSettings" X="375" Y="250" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="675" Y="350" Note=""/>
+        <Element ComponentName="WebSocketServerFramework" X="825" Y="125" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

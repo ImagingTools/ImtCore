@@ -11,6 +11,8 @@ namespace imtqml
 
 void CQmlModelEditorCompBase::OnItemCreated()
 {
+	Q_ASSERT(BaseClass::GetQuickItem());
+
 	bool retVal = connect(
 				BaseClass::GetQuickItem(),
 				SIGNAL(representationChanged()),

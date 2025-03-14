@@ -2,14 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395011" Description="Qt Framework"/>
+            <Version Id="0" Number="5343" Description="ACF"/>
+            <Version Id="1" Number="2232" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ConsoleApplicationFramework" X="550" Y="175" Note=""/>
-        <Element ComponentName="Log" X="225" Y="375" Note=""/>
+        <Element ComponentName="Log" X="200" Y="350" Note=""/>
         <Element ComponentName="SqLiteDatabaseEngine" X="1025" Y="175" Note=""/>
         <Element ComponentName="SqlLogDatabase" X="560" Y="520" Note=""/>
     </PositionMap>
