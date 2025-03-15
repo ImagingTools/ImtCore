@@ -1334,8 +1334,16 @@ QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntr
 	const QString targetPath = sdlEntry.GetTargetHeaderFilePath();
 	if (!targetPath.isEmpty()){
 		for (const QString& path: lookupPaths){
-			const QString cleanPath = QDir::cleanPath(path);
-			const QString cleanTargetPath = QDir::cleanPath(targetPath);
+			const QString cleanPath = QDir::cleanPath(path)
+#ifdef Q_OS_WIN
+			.toLower()
+#endif
+			;
+			const QString cleanTargetPath = QDir::cleanPath(targetPath)
+#ifdef Q_OS_WIN
+			.toLower()
+#endif
+			;
 			if (cleanTargetPath.startsWith(cleanPath)){
 				QDir currentDir(path);
 				return currentDir.relativeFilePath(cleanTargetPath);
