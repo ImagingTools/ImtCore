@@ -60,7 +60,23 @@
         </Element>
         <Element Id="LogDatabase" PackageId="" ComponentId="LogDatabase">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="SlaveMessageConsumer">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SqlLogFilePath" Type="String" ExportId="SqlLogFilePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
     </ElementsList>
