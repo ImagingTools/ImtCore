@@ -7,7 +7,7 @@
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description>Base framework for a console application</Description>
+    <Description>Base framework for a console application with integrated SQLite log database</Description>
     <Keywords></Keywords>
     <ElementsList>
         <Element Id="ConsoleApplicationFramework" PackageId="ImtCoreVoce" ComponentId="ConsoleApplicationFramework">
@@ -50,7 +50,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Log"/>
+                        <Data IsEnabled="true" Value="LogDatabase"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
@@ -58,60 +58,103 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Log" PackageId="ImtLogPck" ComponentId="CollectionBasedMessageConsumer">
+        <Element Id="LogDatabase" PackageId="" ComponentId="LogDatabase">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SqlLogDatabase"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConsoleApplicationFramework/RuntimeStatus"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="SlaveMessageConsumer">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SqLiteDatabaseEngine" PackageId="ImtCoreVoce" ComponentId="SqLiteDatabaseEngine">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConsoleApplicationFramework/ApplicationInfo"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseSqlFilePath" Type="String" ExportId="SqlLogFilePath">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MigrationPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="LogMigrations"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SqlLogDatabase" PackageId="ImtDatabaseVoce" ComponentId="LogSqlRepository">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SqLiteDatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
+                <AttributeInfoMap/>
             </Data>
         </Element>
     </ElementsList>
-    <EmbeddedRegistriesList/>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="LogDatabase">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="Log" PackageId="ImtLogPck" ComponentId="CollectionBasedMessageConsumer">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="LogDatabase"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="SlaveMessageConsumer">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="LogDatabase" PackageId="ImtDatabaseVoce" ComponentId="LogSqlRepository">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SqLiteDatabaseEngine"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="LogMigration" PackageId="ImtDatabaseVoce" ComponentId="SqlScriptBasedMigration">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SqLiteDatabaseEngine"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="From" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="0"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="MigrationPath" Type="String" ExportId="">
+                                    <Data IsEnabled="true" Value="LogMigrations"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="To" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="1"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="SqLiteDatabaseEngine" PackageId="ImtCoreVoce" ComponentId="SqLiteDatabaseEngine">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DatabaseSqlFilePath" Type="String" ExportId="SqlLogFilePath">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="MigrationController" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="LogMigration"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="ilog::IMessageConsumer" ComponentId="Log"/>
+                    <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="LogDatabase"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="Log"/>
+                </ExportedInterfaces>
+                <ExportedComponents>
+                    <Component ExportedId="DatabaseFilePath" ComponentId="SqLiteDatabaseEngine/DatabaseFilePath"/>
+                    <Component ExportedId="LogDatabase" ComponentId="LogDatabase"/>
+                </ExportedComponents>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
     <ExportedInterfaces>
         <Interface InterfaceId="ibase::IApplication" ComponentId="ConsoleApplicationFramework"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ApplicationInfo" ComponentId="ConsoleApplicationFramework/ApplicationInfo"/>
-        <Component ExportedId="DatabaseFilePath" ComponentId="SqLiteDatabaseEngine/DatabaseFilePath"/>
+        <Component ExportedId="DatabaseFilePath" ComponentId="LogDatabase/DatabaseFilePath"/>
         <Component ExportedId="Log" ComponentId="ConsoleApplicationFramework/Log"/>
+        <Component ExportedId="LogDatabase" ComponentId="LogDatabase/LogDatabase"/>
         <Component ExportedId="LogFilePath" ComponentId="ConsoleApplicationFramework/LogFilePath"/>
         <Component ExportedId="LogSystemLocation" ComponentId="ConsoleApplicationFramework/LogSystemLocation"/>
-        <Component ExportedId="MessageSqlRepository" ComponentId="SqlLogDatabase"/>
         <Component ExportedId="RuntimeStatus" ComponentId="ConsoleApplicationFramework/RuntimeStatus"/>
     </ExportedComponents>
 </Acf>
