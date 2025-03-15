@@ -22,7 +22,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MigrationControllers" Type="Reference[]" ExportId="MigrationControllers">
+                    <AttributeInfo Id="MigrationController" Type="Reference" ExportId="MigrationController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
@@ -60,7 +60,7 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="PumaGQLClientEngine" PackageId="ImtGraphQlVoce" ComponentId="PumaGQLClientEngine">
+        <Element Id="PumaClientEngine" PackageId="ImtGraphQlVoce" ComponentId="PumaGQLClientEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="HttpUrlParam" Type="Reference" ExportId="">
@@ -169,7 +169,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>SlaveSubscriberController</Value>
-                                <Value>PumaGQLClientEngine</Value>
+                                <Value>PumaClientEngine</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -194,25 +194,25 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtauth::IJwtSessionController" ComponentId="PumaGQLClientEngine"/>
-        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="PumaGQLClientEngine"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="PumaGQLClientEngine"/>
+        <Interface InterfaceId="imtauth::IJwtSessionController" ComponentId="PumaClientEngine"/>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="PumaClientEngine"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="PumaClientEngine"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="Backup" ComponentId="ServerSettings/Backup"/>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="ServerSettings/DatabaseAccessSettings"/>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="FeatureContainer" ComponentId="IdentifiableProductInfo"/>
-        <Component ExportedId="GroupRemoteRepository" ComponentId="PumaGQLClientEngine/GroupRemoteRepository"/>
+        <Component ExportedId="GroupRemoteRepository" ComponentId="PumaClientEngine/GroupRemoteRepository"/>
         <Component ExportedId="HttpServerFramework" ComponentId="HttpServerFramework"/>
         <Component ExportedId="LoggingParams" ComponentId="ServerSettings/LoggingParams"/>
-        <Component ExportedId="PumaGQLClientEngine" ComponentId="PumaGQLClientEngine"/>
+        <Component ExportedId="PumaGQLClientEngine" ComponentId="PumaClientEngine"/>
         <Component ExportedId="PumaUrl" ComponentId="ServerSettings/PumaUrl"/>
         <Component ExportedId="PumaWebSocketPort" ComponentId="ServerSettings/PumaWebSocketPort"/>
-        <Component ExportedId="RoleRemoteRepository" ComponentId="PumaGQLClientEngine/RoleRemoteRepository"/>
+        <Component ExportedId="RoleRemoteRepository" ComponentId="PumaClientEngine/RoleRemoteRepository"/>
         <Component ExportedId="ServerPort" ComponentId="ServerSettings/ServerPort"/>
-        <Component ExportedId="UserRemoteRepository" ComponentId="PumaGQLClientEngine/UserRemoteRepository"/>
-        <Component ExportedId="UserSessionRemoteRepository" ComponentId="PumaGQLClientEngine/UserSessionRemoteRepository"/>
+        <Component ExportedId="UserRemoteRepository" ComponentId="PumaClientEngine/UserRemoteRepository"/>
+        <Component ExportedId="UserSessionRemoteRepository" ComponentId="PumaClientEngine/UserSessionRemoteRepository"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
         <Component ExportedId="WebSocketServerPort" ComponentId="ServerSettings/WebSocketServerPort"/>
     </ExportedComponents>

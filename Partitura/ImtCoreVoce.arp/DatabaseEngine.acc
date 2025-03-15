@@ -10,26 +10,6 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="CompositeMigrationController" PackageId="ImtDatabasePck" ComponentId="CompositeMigrationController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MigrationControllers" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>DelegatedMigrationController</Value>
-                                <Value>MigrationController</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="DatabaseAutomaticBackup" PackageId="ImtDatabasePck" ComponentId="DatabaseAutomaticBackup">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
@@ -50,45 +30,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="Program" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="pg_dump"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="DelegatedMigrationController" PackageId="ImtDatabasePck" ComponentId="CompositeMigrationController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MigrationControllers" Type="Reference[]" ExportId="MigrationControllers">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="MigrationController" PackageId="ImtDatabasePck" ComponentId="MigrationController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PgSqlDatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="From" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="0"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RelativeFileNameParam"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="To" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="-1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -126,8 +67,8 @@
                     <AttributeInfo Id="MaintainanceDatabase" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="postgres"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MigrationController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="CompositeMigrationController"/>
+                    <AttributeInfo Id="MigrationController" Type="Reference" ExportId="MigrationController">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Pasword" Type="Id" ExportId="Password">
                         <Data IsEnabled="true" Value="root"/>
@@ -140,30 +81,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UserName" Type="Id" ExportId="UserName">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="RelativeFileNameParam" PackageId="FilePck" ComponentId="RelativeFileNameParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="MigrationPath">
-                        <Data IsEnabled="true" Value="Migrations"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="2"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ReferencePath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SystemLocation"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SystemLocation" PackageId="FilePck" ComponentId="SystemLocation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="101"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
