@@ -12,7 +12,7 @@ import {
 type CollectionViewParams {
 	Count: Int
 	Offset: Int
-	FilterModel: ComplexCollectionFilter
+	ComplexFilter: ComplexCollectionFilter
 }
 
 type NotificationItem {
@@ -40,11 +40,6 @@ type CollectionMetaInfo {
 
 input InputId {
 	Id: ID!
-}
-
-input DocumentRepresentation {
-	ObjectId: ID!
-	ViewTypeId: ID
 }
 
 type VisualStatus {

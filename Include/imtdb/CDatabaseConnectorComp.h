@@ -13,6 +13,7 @@ namespace imtdb
 {
 
 
+// PostgresDatabaseConnector
 class CDatabaseConnectorComp:
 			public ilog::CLoggerComponentBase,
 			virtual public imtdb::IDatabaseConnector

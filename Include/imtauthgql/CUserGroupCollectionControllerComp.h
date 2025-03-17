@@ -49,7 +49,7 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const sdl::imtauth::Groups::CGroupItemGqlRequest& groupItemRequest,
-				sdl::imtauth::Groups::CGroupDataPayload::V1_0& representationPayload,
+				sdl::imtauth::Groups::CGroupData::V1_0& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const ::imtgql::CGqlRequest& rawGqlRequest,

@@ -34,8 +34,8 @@ type RolesListPayload {
 }
 
 type RoleData {
-	Id: ID!
-	Name: String!
+	Id: ID
+	Name: String
 	Description: String
 	RoleId: ID
 	ProductId: ID
@@ -51,10 +51,6 @@ input RoleDataInput {
 	Item: RoleData!
 }
 
-type RoleDataPayload {
-	RoleData: RoleData
-}
-
 input RoleItemInput {
 	Id: ID!
 	ProductId: ID!
@@ -62,7 +58,7 @@ input RoleItemInput {
 
 type Query {
 	RolesList (input:RolesListInput): RolesListPayload!
-	RoleItem (input: RoleItemInput): RoleDataPayload!
+	RoleItem (input: RoleItemInput): RoleData!
 }
 
 type Mutation {

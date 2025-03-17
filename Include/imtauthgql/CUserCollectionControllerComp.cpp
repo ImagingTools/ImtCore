@@ -7,6 +7,7 @@
 #include <iqt/iqt.h>
 
 // ImtCore includes
+#include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/CUserInfo.h>
 
 
@@ -47,14 +48,18 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		return false;
 	}
 
+	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+	fieldFilter.fieldId = "UserId";
+	fieldFilter.filterValue = username;
+	
+	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+	groupFilter.fieldFilters << fieldFilter;
+	
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.SetFieldsFilter(groupFilter);
+
 	iprm::CParamsSet filterParam;
-	iprm::CParamsSet paramsSet;
-
-	iprm::CTextParam userId;
-	userId.SetText(username);
-
-	paramsSet.SetEditableParameter("Id", &userId);
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
 	imtbase::IObjectCollection::Ids userIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 	if (!userIds.isEmpty()){
@@ -133,15 +138,19 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 			errorMessage = QString("Email cannot be empty");
 			return false;
 		}
-
+		
+		imtbase::IComplexCollectionFilter::FieldFilter mailFieldFilter;
+		mailFieldFilter.fieldId = "Mail";
+		mailFieldFilter.filterValue = mail;
+		
+		imtbase::IComplexCollectionFilter::GroupFilter mailGroupFilter;
+		mailGroupFilter.fieldFilters << mailFieldFilter;
+		
+		imtbase::CComplexCollectionFilter mailComplexFilter;
+		mailComplexFilter.SetFieldsFilter(mailGroupFilter);
+		
 		iprm::CParamsSet mailFilterParam;
-		iprm::CParamsSet mailParamsSet;
-
-		iprm::CTextParam mailParam;
-		mailParam.SetText(mail);
-
-		mailParamsSet.SetEditableParameter("Mail", &mailParam);
-		mailFilterParam.SetEditableParameter("ObjectFilter", &mailParamsSet);
+		mailFilterParam.SetEditableParameter("ComplexFilter", &mailComplexFilter);
 
 		userIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &mailFilterParam);
 		if (!userIds.isEmpty()){
@@ -454,7 +463,7 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	const istd::IChangeable& data,
 	const sdl::imtauth::Users::CUserItemGqlRequest& userItemRequest,
-	sdl::imtauth::Users::CUserDataPayload::V1_0& representationPayload,
+	sdl::imtauth::Users::CUserData::V1_0& representationPayload,
 	QString& errorMessage) const
 {
 	const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(&data);
@@ -470,36 +479,35 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	if (arguments.input.Version_1_0->ProductId){
 		productId = *arguments.input.Version_1_0->ProductId;
 	}
-	sdl::imtauth::Users::CUserData::V1_0 userData;
-
+	
 	QByteArray objectId = userInfoPtr->GetObjectUuid();
-	userData.Id = QByteArray(objectId);
+	representationPayload.Id = QByteArray(objectId);
 
-	userData.ProductId = QByteArray(productId);
+	representationPayload.ProductId = QByteArray(productId);
 
 	QByteArray userName = userInfoPtr->GetId();
-	userData.Username = QByteArray(userName);
+	representationPayload.Username = QByteArray(userName);
 
 	QString name = userInfoPtr->GetName();
-	userData.Name = QString(name);
+	representationPayload.Name = QString(name);
 
 	QByteArray password = userInfoPtr->GetPasswordHash();
-	userData.Password = QString(password);
+	representationPayload.Password = QString(password);
 
 	QString mail = userInfoPtr->GetMail();
-	userData.Email = QString(mail);
+	representationPayload.Email = QString(mail);
 
 	QByteArrayList groupList = userInfoPtr->GetGroups();
 	std::sort(groupList.begin(), groupList.end());
-	userData.Groups = QByteArray(groupList.join(';'));
+	representationPayload.Groups = QByteArray(groupList.join(';'));
 
 	QByteArrayList roleList = userInfoPtr->GetRoles(productId);
 	std::sort(roleList.begin(), roleList.end());
-	userData.Roles = QByteArray(roleList.join(';'));
+	representationPayload.Roles = QByteArray(roleList.join(';'));
 
 	QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
 	std::sort(permissions.begin(), permissions.end());
-	userData.Permissions = permissions.join(';');
+	representationPayload.Permissions = permissions.join(';');
 
 	QList<sdl::imtauth::Users::CSystemInfo::V1_0> list;
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
@@ -519,9 +527,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 		list << info;
 	}
-	userData.SystemInfos = std::make_optional<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
-
-	representationPayload.UserData = std::make_optional<sdl::imtauth::Users::CUserData::V1_0>(userData);
+	representationPayload.SystemInfos = std::make_optional<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
 
 	return true;
 }

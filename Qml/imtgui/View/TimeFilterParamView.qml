@@ -113,6 +113,16 @@ PopupView {
 	
 	MouseArea {
 		anchors.fill: background;
+		onWheel: {
+			wheel.accepted = true;
+		}
+		onClicked: {
+			mouse.accepted = true;
+		}
+		onReleased: {}
+		onPressAndHold: {}
+		onPressed: {}
+		onPositionChanged: {}
 	}
 	
 	Item {

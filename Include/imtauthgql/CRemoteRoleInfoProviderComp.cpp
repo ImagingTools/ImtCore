@@ -40,14 +40,9 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& rol
 
 	imtgql::CGqlRequest gqlRequest;
 	if (rolessdl::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		rolessdl::CRoleDataPayload::V1_0 response;
-		if (!SendModelRequest<rolessdl::CRoleDataPayload::V1_0, rolessdl::CRoleDataPayload>(gqlRequest, response)){
+		rolessdl::CRoleData::V1_0 response;
+		if (!SendModelRequest<rolessdl::CRoleData::V1_0, rolessdl::CRoleData>(gqlRequest, response)){
 			return nullptr;
-		}
-
-		rolessdl::CRoleData::V1_0 roleData;
-		if (response.RoleData){
-			roleData = *response.RoleData;
 		}
 
 		istd::TDelPtr<imtauth::IRole> roleInfoPtr;
@@ -56,22 +51,22 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& rol
 			return nullptr;
 		}
 
-		roleInfoPtr->SetDefault(bool(roleData.IsDefault && *roleData.IsDefault));
-		roleInfoPtr->SetGuest(bool(roleData.IsGuest) && *roleData.IsGuest);
-		if (roleData.Permissions){
-			roleInfoPtr->SetLocalPermissions(roleData.Permissions->split(';'));
+		roleInfoPtr->SetDefault(bool(response.IsDefault && *response.IsDefault));
+		roleInfoPtr->SetGuest(bool(response.IsGuest) && *response.IsGuest);
+		if (response.Permissions){
+			roleInfoPtr->SetLocalPermissions(response.Permissions->split(';'));
 		}
-		if (roleData.ProductId){
-			roleInfoPtr->SetProductId(*roleData.ProductId);
+		if (response.ProductId){
+			roleInfoPtr->SetProductId(*response.ProductId);
 		}
-		if (roleData.Description){
-			roleInfoPtr->SetRoleDescription(*roleData.Description);
+		if (response.Description){
+			roleInfoPtr->SetRoleDescription(*response.Description);
 		}
-		if (roleData.RoleId){
-			roleInfoPtr->SetRoleId(*roleData.RoleId);
+		if (response.RoleId){
+			roleInfoPtr->SetRoleId(*response.RoleId);
 		}
-		if (roleData.Name){
-			roleInfoPtr->SetRoleName(*roleData.Name);
+		if (response.Name){
+			roleInfoPtr->SetRoleName(*response.Name);
 		}
 
 		return roleInfoPtr.PopPtr();

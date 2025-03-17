@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5323" Description="ACF"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -38,7 +38,7 @@
                         <Data IsEnabled="true" Value="RoleMetaInfoCreator"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RoleDatabaseDelegate"/>
+                        <Data IsEnabled="true" Value="SqlDatabaseDocumentDelegate"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -58,20 +58,41 @@
                     <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repository"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RoleMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="RoleMetaInfoCreator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Role"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RoleDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="RoleDatabaseDelegate">
+        <Element Id="RoleMetaInfoDelegate" PackageId="ImtAuthGqlPck" ComponentId="RoleMetaInfoDelegate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SqlDatabaseDocumentDelegate" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseDocumentDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DocumentContentColumnId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Document"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentFactories" Type="Factory[]" ExportId="">
                         <Data IsEnabled="true">
@@ -87,8 +108,14 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="JsonBasedMetaInfoDelegate" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleMetaInfoDelegate"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleMetaInfoCreator"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="DocumentId"/>
@@ -99,20 +126,14 @@
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Roles"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseDocumentBase64Encoding" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="RoleMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="RoleMetaInfoCreator">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Role"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -150,5 +171,6 @@
     <ExportedComponents>
         <Component ExportedId="RoleCollectionAdapter" ComponentId="RoleCollectionAdapter"/>
         <Component ExportedId="RoleRepository" ComponentId="Repository"/>
+        <Component ExportedId="SqlDatabaseDocumentDelegate" ComponentId="SqlDatabaseDocumentDelegate"/>
     </ExportedComponents>
 </Acf>

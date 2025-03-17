@@ -3,11 +3,10 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
-#include <iprm/CTextParam.h>
 
 // ImtCore includes
+#include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/CUserInfo.h>
-#include <imtauth/CSessionInfo.h>
 
 
 namespace imtauthgql
@@ -37,14 +36,18 @@ bool CAuthorizationControllerComp::ParseDataFromGqlRequest(
 
 QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login) const
 {
+	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+	fieldFilter.fieldId = "UserId";
+	fieldFilter.filterValue = login;
+	
+	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+	groupFilter.fieldFilters << fieldFilter;
+	
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.SetFieldsFilter(groupFilter);
+	
 	iprm::CParamsSet filterParam;
-	iprm::CParamsSet paramsSet;
-
-	iprm::CTextParam userIdParam;
-	userIdParam.SetText(login);
-
-	paramsSet.SetEditableParameter("Id", &userIdParam);
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
 	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 	if (userIds.isEmpty()){

@@ -21,6 +21,7 @@
 #include <imtclientgql/CRemoteDocumentRevisionControllerComp.h>
 #include <imtclientgql/CRemoteObjectVisualStatusControllerComp.h>
 #include <imtclientgql/CObjectCollectionSubscriberComp.h>
+#include <imtclientgql/CRemoteCommandsControllerComp.h>
 
 
 /**
@@ -44,6 +45,7 @@ typedef icomp::TModelCompWrap<imtclientgql::CConnectionStatusSubscriberComp> Con
 typedef imtclientgql::CRemoteDocumentRevisionControllerComp RemoteDocumentRevisionController;
 typedef imtclientgql::CRemoteObjectVisualStatusControllerComp RemoteObjectVisualStatusController;
 typedef imtclientgql::CObjectCollectionSubscriberComp ObjectCollectionSubscriber;
+typedef imtclientgql::CRemoteCommandsControllerComp RemoteCommandsController;
 
 
 } // namespace ImtClientGqlPck

@@ -243,7 +243,7 @@ istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresent
 bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
 			const sdl::imtauth::Groups::CGroupItemGqlRequest& groupItemRequest,
-			sdl::imtauth::Groups::CGroupDataPayload::V1_0& representationPayload,
+			sdl::imtauth::Groups::CGroupData::V1_0& representationPayload,
 			QString& errorMessage) const
 {
 	const imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(&data);
@@ -255,30 +255,27 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	sdl::imtauth::Groups::GroupItemRequestArguments arguments = groupItemRequest.GetRequestedArguments();
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
 
 	QByteArray productId;
 	if (arguments.input.Version_1_0->ProductId){
 		productId = *arguments.input.Version_1_0->ProductId;
 	}
 
-	groupData.Id = QByteArray(userGroupInfoPtr->GetObjectUuid());
-	groupData.Name = QString(userGroupInfoPtr->GetName());
-	groupData.Description = QString(userGroupInfoPtr->GetDescription());
+	representationPayload.Id = QByteArray(userGroupInfoPtr->GetObjectUuid());
+	representationPayload.Name = QString(userGroupInfoPtr->GetName());
+	representationPayload.Description = QString(userGroupInfoPtr->GetDescription());
 
 	imtauth::IUserGroupInfo::UserIds userIds = userGroupInfoPtr->GetUsers();
 	std::sort(userIds.begin(), userIds.end());
-	groupData.Users = QByteArray(userIds.join(';'));
+	representationPayload.Users = QByteArray(userIds.join(';'));
 
 	imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
 	std::sort(roleIds.begin(), roleIds.end());
-	groupData.Roles = QByteArray(roleIds.join(';'));
+	representationPayload.Roles = QByteArray(roleIds.join(';'));
 
 	imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
 	std::sort(groupIds.begin(), groupIds.end());
-	groupData.ParentGroups = QByteArray(groupIds.join(';'));
-
-	representationPayload.GroupData = std::make_optional<sdl::imtauth::Groups::CGroupData::V1_0>(groupData);
+	representationPayload.ParentGroups = QByteArray(groupIds.join(';'));
 
 	return true;
 }
@@ -382,6 +379,11 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			QString& errorMessage) const
 {
 	sdl::imtauth::Groups::CGroupData representation;
+	
+	if (!groupUpdateRequest.GetRequestedArguments().input.Version_1_0.has_value()){
+		I_CRITICAL();
+		return false;
+	}
 
 	if (groupUpdateRequest.GetRequestedArguments().input.Version_1_0->Item){
 		representation.Version_1_0 = groupUpdateRequest.GetRequestedArguments().input.Version_1_0->Item;

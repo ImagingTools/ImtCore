@@ -17,7 +17,6 @@ GridCollectionViewBase 1.0 GridCollectionViewBase.qml
 GridExtendingBaseDelegate 1.0 GridExtendingBaseDelegate.qml
 
 CollectionFilter 1.0 CollectionFilter.qml
-JsonCollectionFilter 1.0 JsonCollectionFilter.qml
 CollectionCommandsController 1.0 CollectionCommandsController.qml
 CollectionViewDelegate 1.0 CollectionViewDelegate.qml
 
@@ -28,3 +27,5 @@ MessageCollectionView 1.0 MessageCollectionView.qml
 
 SchemeView 1.0 SchemeView.qml
 MetaInfo 1.0 MetaInfo.qml
+
+CollectionDataController 1.0 CollectionDataController.qml

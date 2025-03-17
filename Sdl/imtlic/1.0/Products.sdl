@@ -55,10 +55,6 @@ input ProductDataInput {
 	Item: ProductData!
 }
 
-type ProductDataPayload {
-	ProductData: ProductData
-}
-
 input ProductItemInput {
 	Id: ID!
 }
@@ -83,7 +79,7 @@ type ProductExportResponse {
 
 type Query {
 	ProductsList (input:ProductsListInput): ProductsListPayload!
-	ProductItem (input: ProductItemInput): ProductDataPayload!
+	ProductItem (input: ProductItemInput): ProductData!
 	ProductsExport (input: ProductExportInput): ProductExportResponse!
 }
 

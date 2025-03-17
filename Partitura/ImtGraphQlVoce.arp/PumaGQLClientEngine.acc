@@ -66,6 +66,7 @@
                                 <Value>RemoteDocumentRevisionController</Value>
                                 <Value>RemoteObjectVisualStatusController</Value>
                                 <Value>GqlJwtSessionController</Value>
+                                <Value>RemoteCommandsController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -118,6 +119,36 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UrlParam" Type="Reference" ExportId="HttpUrlParam">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteCommandsController" PackageId="ImtClientGqlPck" ComponentId="RemoteCommandsController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Role</Value>
+                                <Value>Roles</Value>
+                                <Value>User</Value>
+                                <Value>Users</Value>
+                                <Value>Group</Value>
+                                <Value>Groups</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

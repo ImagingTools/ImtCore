@@ -49,17 +49,13 @@ input LicenseDataInput {
 	Item: LicenseDefinitionData!
 }
 
-type LicenseDataPayload {
-	LicenseDefinitionData: LicenseDefinitionData
-}
-
 input LicenseItemInput {
 	Id: ID!
 }
 
 type Query {
 	LicensesList (input:LicensesListInput): LicensesListPayload!
-	LicenseItem (input: LicenseItemInput): LicenseDataPayload!
+	LicenseItem (input: LicenseItemInput): LicenseDefinitionData!
 }
 
 type Mutation {

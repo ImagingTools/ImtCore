@@ -230,12 +230,16 @@ imtbase::IObjectCollectionIterator* CCachedObjectCollectionComp::CreateObjectCol
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	FilteredCollection* collectionChacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
-	if (collectionChacheItemPtr != nullptr){
-		return collectionChacheItemPtr->cachePtr->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
+	// FilteredCollection* collectionChacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
+	// if (collectionChacheItemPtr != nullptr){
+	// 	return collectionChacheItemPtr->cachePtr->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
+	// }
+	
+	if (!m_objectCollectionCompPtr.IsValid()){
+		return nullptr;
 	}
-
-	return nullptr;
+	
+	return m_objectCollectionCompPtr->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
 }
 
 

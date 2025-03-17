@@ -62,10 +62,6 @@ input UserDataInput {
     Item: UserData!
 }
 
-type UserDataPayload {
-    UserData: UserData
-}
-
 input UserItemInput {
     Id: ID!
     ProductId: ID!
@@ -159,7 +155,7 @@ type RemoveUserPayload {
 
 type Query {
     UsersList (input:UsersListInput): UsersListPayload!
-    UserItem (input: UserItemInput): UserDataPayload!
+    UserItem (input: UserItemInput): UserData!
     CheckEmail (input: CheckEmailInput): CheckEmailPayload!
     SendEmailCode (input: SendEmailCodeInput): SendEmailCodePayload!
     CheckEmailCode (input: CheckEmailCodeInput): CheckEmailCodePayload!

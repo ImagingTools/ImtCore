@@ -73,10 +73,8 @@ RemoteCollectionView {
 			rolesModel: roleCollectionViewContainer.rolesModel;
 			productId: roleCollectionViewContainer.productId;
 			
-			commandsControllerComp: Component {CommandsPanelController {
-					commandId: "Role";
-					uuid: roleEditor.viewId;
-					commandsView: roleEditor.commandsView;
+			commandsControllerComp: Component {GqlBasedCommandsController {
+					typeId: "Role";
 				}
 			}
 			
@@ -114,12 +112,6 @@ RemoteCollectionView {
 			
 			documentModelComp: Component {
 				RoleData {}
-			}
-			
-			payloadModel: RoleDataPayload {
-				onFinished: {
-					requestDocumentDataController.documentModel = m_roleData;
-				}
 			}
 			
 			function getHeaders(){

@@ -59,7 +59,6 @@ bool CDatabaseConnectorComp::ConnectToDatabase(const IDatabaseLoginSettings& log
 				server_count INT;
 				mapping_count INT;
 			BEGIN
-				-- Проверяем, есть ли уже сервер
 				SELECT COUNT(*) INTO server_count FROM pg_foreign_server WHERE srvname = server_nam;
 				IF server_count = 0 THEN
 					EXECUTE format(
@@ -68,7 +67,6 @@ bool CDatabaseConnectorComp::ConnectToDatabase(const IDatabaseLoginSettings& log
 					);
 				END IF;
 			
-				-- Проверяем, есть ли уже user mapping
 				SELECT COUNT(*) INTO mapping_count FROM pg_user_mappings WHERE srvname = server_nam AND umuser = SESSION_USER::regrole;
 				IF mapping_count = 0 THEN
 					EXECUTE format(

@@ -48,7 +48,6 @@ ControlBase {
 		target: tabDelegate.tabPanel;
 
 		function onStartTabContentLoading(tabId){
-			console.log("onStartTabContentLoading", tabId, model.Id);
 			if (model.Id === tabId){
 				tabDelegate.startContentLoading();
 			}

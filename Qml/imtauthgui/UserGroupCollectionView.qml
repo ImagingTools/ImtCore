@@ -36,9 +36,7 @@ RemoteCollectionView {
 	}
 	
 	Component.onCompleted: {
-		collectionFilter.setSortingInfoId("Name");
-		collectionFilter.setSortingOrder("ASC");
-		// collectionFilter.setSortingInfo("Name", "ASC");
+		table.setSortingInfo("Name", "ASC");
 		
 		if (documentManager){
 			documentManager.registerDocumentView("Group", "GroupEditor", userGroupDocumentComp);
@@ -66,10 +64,8 @@ RemoteCollectionView {
 			
 			productId: userGroupCollectionViewContainer.productId;
 			
-			commandsControllerComp: Component {CommandsPanelController {
-					commandId: "Group";
-					uuid: groupEditor.viewId;
-					commandsView: groupEditor.commandsView;
+			commandsControllerComp: Component {GqlBasedCommandsController {
+					typeId: "Group";
 				}
 			}
 		}
@@ -99,12 +95,6 @@ RemoteCollectionView {
 			
 			documentModelComp: Component {
 				GroupData {}
-			}
-			
-			payloadModel: GroupDataPayload {
-				onFinished: {
-					requestDocumentDataController.documentModel = m_groupData;
-				}
 			}
 			
 			function getHeaders(){

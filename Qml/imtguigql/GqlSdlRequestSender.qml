@@ -51,7 +51,6 @@ GqlRequest {
 	}
 
 	function onResult(data){
-		console.log("onResult", data);
 		if (!sdlObjectComp){
 			console.error("Unable to parse response. Please set SDL Component for creating response instance");
 			return;
@@ -63,7 +62,6 @@ GqlRequest {
 		}
 
 		sdlObject = sdlObjectComp.createObject(root);
-		console.log("sdlObject", sdlObject);
 
 		sdlObject.fromObject(data);
 

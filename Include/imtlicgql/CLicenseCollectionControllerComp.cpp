@@ -145,7 +145,7 @@ istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentat
 bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	const istd::IChangeable& data,
 	const sdl::imtlic::Licenses::CLicenseItemGqlRequest& licenseItemRequest,
-	sdl::imtlic::Licenses::CLicenseDataPayload::V1_0& representationPayload,
+	sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0& representationPayload,
 	QString& errorMessage) const
 {
 	const imtlic::CIdentifiableLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CIdentifiableLicenseDefinition*>(&data);
@@ -157,34 +157,31 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	sdl::imtlic::Licenses::LicenseItemRequestArguments arguments = licenseItemRequest.GetRequestedArguments();
-	sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0 licenseData;
 
 	if (arguments.input.Version_1_0->Id){
-		licenseData.Id = QByteArray(*arguments.input.Version_1_0->Id);
+		representationPayload.Id = QByteArray(*arguments.input.Version_1_0->Id);
 	}
 
 	QString name = licenseInfoPtr->GetLicenseName();
-	licenseData.LicenseName = QString(name);
+	representationPayload.LicenseName = QString(name);
 
 	QByteArray licenseId = licenseInfoPtr->GetLicenseId();
-	licenseData.LicenseId = std::make_optional<QByteArray>(licenseId);
+	representationPayload.LicenseId = std::make_optional<QByteArray>(licenseId);
 
 	QString description = licenseInfoPtr->GetLicenseDescription();
-	licenseData.Description = std::make_optional<QString>(description);
+	representationPayload.Description = std::make_optional<QString>(description);
 
 	QByteArray productId = licenseInfoPtr->GetProductId();
-	licenseData.ProductId = std::make_optional<QByteArray>(productId);
+	representationPayload.ProductId = std::make_optional<QByteArray>(productId);
 
 	QByteArrayList featureUuids;
 	for (const imtlic::ILicenseDefinition::FeatureInfo& featureInfo : licenseInfoPtr->GetFeatureInfos()){
 		featureUuids << featureInfo.id;
 	}
-	licenseData.Features = QByteArray(featureUuids.join(';'));
+	representationPayload.Features = QByteArray(featureUuids.join(';'));
 
 	QByteArray dependencies = licenseInfoPtr->GetDependencies().join(';');
-	licenseData.ParentLicenses = std::make_optional<QByteArray>(dependencies);
-
-	representationPayload.LicenseDefinitionData = std::make_optional<sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0>(licenseData);
+	representationPayload.ParentLicenses = std::make_optional<QByteArray>(dependencies);
 
 	return true;
 }

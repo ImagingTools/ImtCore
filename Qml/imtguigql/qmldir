@@ -1,8 +1,6 @@
 module imtguigql
 
 GqlDocumentDataController 1.0 GqlDocumentDataController.qml
-GqlDocumentObserver 1.0 GqlDocumentObserver.qml
-GqlModelObserver 1.0 GqlModelObserver.qml
 ComboBoxGql 1.0 ComboBoxGql.qml
 ComboBoxGqlSimple 1.0 ComboBoxGqlSimple.qml
 PopupMenuDialogGql 1.0 PopupMenuDialogGql.qml
@@ -11,18 +9,16 @@ SubscriptionClient 1.0 SubscriptionClient.qml
 SubscriptionManager 1.0 SubscriptionManager.qml
 Gql 1.0 ../web/GraphQLRequest.js
 ClientStyle 1.0 ClientStyle.qml
-CommandsRepresentationProvider 1.0 CommandsRepresentationProvider.qml
 CollectionRepresentation 1.0 CollectionRepresentation.qml
 RemoteCollectionView 1.0 RemoteCollectionView.qml
 MetaInfoProvider 1.0 MetaInfoProvider.qml
 WebSocketPortProvider 1.0 WebSocketPortProvider.qml
 ComboBoxGqlSimpleElementView 1.0 ComboBoxGqlSimpleElementView.qml
 GqlRequestDocumentDataController 1.0 GqlRequestDocumentDataController.qml
-CommandsPanelController 1.0 CommandsPanelController.qml
 TableViewParamController 1.0 TableViewParamController.qml
 GqlRequestSender 1.0 GqlRequestSender.qml
 WebSocketConnectionChecker 1.0 WebSocketConnectionChecker.qml
 GqlSdlRequestSender 1.0 GqlSdlRequestSender.qml
-SdlObjectProvider 1.0 SdlObjectProvider.qml
-GqlSdlDocumentDataController 1.0 GqlSdlDocumentDataController.qml
 XmlHttpRequestProxy 1.0 XmlHttpRequestProxy.qml
+GqlBasedCollectionDataController 1.0 GqlBasedCollectionDataController.qml
+GqlBasedCommandsController 1.0 GqlBasedCommandsController.qml

@@ -21,7 +21,7 @@ CollectionViewCommandsDelegateBase {
 	property var documentViewsComp: [];
 	property var documentDataControllersComp: [];
 	property var documentValidatorsComp: [];
-
+	
 	Component.onCompleted: {
 		console.log("onCompleted", collectionId, documentManagerId);
 		let documentManager = MainDocumentManager.getDocumentManager(collectionViewCommandsDelegateBase.documentManagerId);
@@ -35,7 +35,7 @@ CollectionViewCommandsDelegateBase {
 			collectionView.dataController.removed.connect(internal.onRemoved);
 		}
 	}
-
+	
 	onDocumentManagerChanged: {
 		for (let i = 0; i < documentTypeIds.length; i++){
 			let documentTypeId = documentTypeIds[i];
@@ -67,10 +67,6 @@ CollectionViewCommandsDelegateBase {
 		}
 
 		return -1;
-	}
-
-	onCollectionIdChanged: {
-
 	}
 
 	QtObject {
@@ -105,6 +101,8 @@ CollectionViewCommandsDelegateBase {
 	}
 
 	function onEdit(){
+		console.log("onEdit", collectionId, documentManagerId);
+		
 		let elementsModel = collectionViewCommandsDelegateBase.collectionView.table.elements;
 		if (!elementsModel){
 			console.error("Unable to edit document. Error: Elements for collection view is invalid");

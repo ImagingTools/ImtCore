@@ -36,7 +36,7 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const sdl::imtlic::Products::CProductItemGqlRequest& productItemRequest,
-				sdl::imtlic::Products::CProductDataPayload::V1_0& representationPayload,
+				sdl::imtlic::Products::CProductData::V1_0& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const ::imtgql::CGqlRequest& rawGqlRequest,

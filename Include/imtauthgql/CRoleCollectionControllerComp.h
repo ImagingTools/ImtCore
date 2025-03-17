@@ -49,7 +49,7 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const sdl::imtauth::Roles::CRoleItemGqlRequest& roleItemRequest,
-				sdl::imtauth::Roles::CRoleDataPayload::V1_0& representationPayload,
+				sdl::imtauth::Roles::CRoleData::V1_0& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const ::imtgql::CGqlRequest& rawGqlRequest,
@@ -57,10 +57,8 @@ protected:
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	void SetObjectFilter(
-				const imtgql::CGqlRequest& gqlRequest,
-				const imtbase::CTreeItemModel& objectFilterModel,
-				iprm::CParamsSet& filterParams) const override;
+
+	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const override;
 
 protected:
 	I_REF(imtgql::IGqlRequestProvider, m_gqlRequestProviderCompPtr);

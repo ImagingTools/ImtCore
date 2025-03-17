@@ -9,6 +9,7 @@
 #include <imtbase/IRevisionController.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 #include <imtdb/IJsonBasedMetaInfoDelegate.h>
+#include <imtdb/IDependentMetaInfoController.h>
 
 
 namespace imtdb
@@ -17,13 +18,15 @@ namespace imtdb
 
 class CSqlDatabaseDocumentDelegateComp:
 			public imtdb::CSqlDatabaseObjectDelegateCompBase,
-			virtual public imtbase::IRevisionController
+			virtual public imtbase::IRevisionController,
+			virtual public imtdb::IDependentMetaInfoController
 {
 public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSqlDatabaseDocumentDelegateComp)
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
+		I_REGISTER_INTERFACE(imtdb::IDependentMetaInfoController);
 		I_ASSIGN(m_useBase64AttrPtr, "UseDocumentBase64Encoding", "", true, true);
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN_MULTI_0(m_documentPersistenceListCompPtr, "DocumentPersistenceList", "List of persistence components for each type of the document", true);
@@ -68,7 +71,7 @@ public:
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray GetSelectionByMetaInfoQuery(const QByteArray& metaInfoId, const QVariant& metaInfoValue) const override;
 	virtual QByteArray CreateUpdateMetaInfoQuery(const QSqlRecord& record) const override;
-
+	
 	// reimplemented (imtbase::IRevisionController)
 	virtual RevisionInfoList GetRevisionInfoList(
 				const imtbase::IObjectCollection& collection,
@@ -90,6 +93,10 @@ public:
 				imtbase::IObjectCollection& collection,
 				const imtbase::ICollectionInfo::Id& objectId,
 				int revision) const override;
+	
+	// reimplemented (imtdb::IDependentMetaInfoController)
+	virtual bool UpdateDependentMetaInfo(const DependentMetaInfo& metaInfo) const override;
+	virtual bool ClearDependentMetaInfo(const DependentMetaInfo& metaInfo) const override;
 
 protected:
 	virtual QByteArray PrepareInsertNewObjectQuery(
@@ -115,12 +122,15 @@ protected:
 	virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const override;
 	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const override;
-
+	
 protected:
+	virtual bool CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const;
 	virtual bool CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const;
 	const ifile::IFilePersistence* FindDocumentPersistence(const QByteArray& typeId) const;
 	void SubstituteFieldIds(QString& query) const;
 	virtual QByteArray GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const;
+	virtual QByteArray CreateJoinTablesQuery() const;
+	virtual QByteArray GetCustomColumnsQuery() const;
 
 protected:
 	I_ATTR(bool, m_useBase64AttrPtr);

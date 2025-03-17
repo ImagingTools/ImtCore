@@ -7,6 +7,7 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthUsersSdl 1.0
+import imtbaseComplexCollectionFilterSdl 1.0
 
 RemoteCollectionView {
 	id: userCollectionViewContainer;
@@ -59,6 +60,8 @@ RemoteCollectionView {
 			width: baseElement ? baseElement.width: 0;
 			height: 40;
 			
+			property CollectionFilter complexFilter: baseElement ? baseElement.complexFilter : null;
+			
 			Row {
 				id: content;
 				anchors.left: parent.left;
@@ -91,6 +94,14 @@ RemoteCollectionView {
 					}
 				}
 				
+				FieldFilter {
+					id: systemFilter
+					m_fieldId: "SystemId"
+					m_filterValue: ""
+					m_filterValueType: "String"
+					m_filterOperations: ["Equal"]
+				}
+				
 				ComboBox {
 					id: systemComboBox;
 					
@@ -98,18 +109,18 @@ RemoteCollectionView {
 					height: filtermenu.height;
 					currentIndex: 0;
 					onCurrentIndexChanged: {
-						if (currentIndex == 1){
-							userCollectionViewContainer.collectionFilter.addAdditionalFilter("SystemId", "")
-						}
-						else if (currentIndex > 1){
-							let id = systemComboBox.model.getData("Id", currentIndex);
-							userCollectionViewContainer.collectionFilter.addAdditionalFilter("SystemId", id)
-						}
-						else{
-							userCollectionViewContainer.collectionFilter.removeFilterById("SystemId");
-						}
+						userCollectionViewContainer.collectionFilter.removeFieldFilter(systemFilter)
 						
-						userCollectionViewContainer.doUpdateGui();
+						if (currentIndex == 1){
+							systemFilter.m_filterOperations = ["Equal"]
+							userCollectionViewContainer.collectionFilter.addFieldFilter(systemFilter)
+						}
+						else if (currentIndex == 2){
+							systemFilter.m_filterOperations = ["Not","Equal"]
+							userCollectionViewContainer.collectionFilter.addFieldFilter(systemFilter)
+						}
+
+						userCollectionViewContainer.collectionFilter.filterChanged()
 					}
 				}
 			}
@@ -120,14 +131,14 @@ RemoteCollectionView {
 				anchors.right: parent.right;
 				baseElement: decoratorBase.baseElement;
 				width: 325;
+				complexFilter: decoratorBase.complexFilter;
 			}
 		}
 	}
 	
 	Component.onCompleted: {
-		collectionFilter.setSortingInfo("Name", "ASC");
-		
-		userCollectionViewContainer.table.nonSortableColumns = ["Roles", "Groups"]
+		table.setSortingInfo("Name", "ASC");
+		table.nonSortableColumns = ["Roles", "Groups"]
 		table.rowDelegate = tableRowDelegateBaseComp;
 	}
 	
@@ -353,10 +364,8 @@ RemoteCollectionView {
 				}
 			}
 			
-			commandsControllerComp: Component {CommandsPanelController {
-					commandId: "User";
-					uuid: userEditor.viewId;
-					commandsView: userEditor.commandsView;
+			commandsControllerComp: Component {GqlBasedCommandsController {
+					typeId: "User";
 				}
 			}
 			
@@ -391,12 +400,6 @@ RemoteCollectionView {
 			
 			documentModelComp: Component {
 				UserData {}
-			}
-			
-			payloadModel: UserDataPayload {
-				onFinished: {
-					requestDocumentDataController.documentModel = m_userData;
-				}
 			}
 			
 			onSaved: {

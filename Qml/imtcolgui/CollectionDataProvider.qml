@@ -20,12 +20,12 @@ QtObject {
 	property string orderType: "ASC";
 	property string sortByField;
 
-	property alias stateModel: container.itemsInfoModel.state;
+	property alias state: container.itemsInfoModel.state;
 
 	property int offset: 0;
 	property int count: -1;
 
-	property var filter: JsonCollectionFilter {}
+	property CollectionFilter filter: CollectionFilter {}
 
 	signal modelUpdated();
 	signal failed();
@@ -45,9 +45,7 @@ QtObject {
 	}
 
 	Component.onCompleted: {
-		filter.setSortingOrder(orderType);
-		filter.setSortingInfoId(sortByField);
-		// filter.setSortingInfo(sortByField, orderType)
+		filter.setSortingInfo(sortByField, orderType)
 	}
 
 	Component.onDestruction: {
@@ -61,15 +59,11 @@ QtObject {
 	}
 
 	onOrderTypeChanged: {
-		filter.setSortingOrder(orderType);
-		filter.setSortingInfoId(sortByField);
-		// filter.setSortingInfo(sortByField, orderType)
+		filter.setSortingInfo(sortByField, orderType)
 	}
 
 	onSortByFieldChanged: {
-		filter.setSortingOrder(orderType);
-		filter.setSortingInfoId(sortByField);
-		// filter.setSortingInfo(sortByField, orderType)
+		filter.setSortingInfo(sortByField, orderType)
 	}
 
 	function getData(objectId, value){
@@ -101,12 +95,10 @@ QtObject {
 			viewParams.InsertField("Count", container.count);
 
 			if (container.filter.toGraphQL){
-				// viewParams.InsertField("ComplexFilterModel", container.filter);
-				viewParams.InsertField("ComplexFilterModel", container.filter.filterModel);
+				viewParams.InsertField("ComplexFilterModel", container.filter);
 			}
 			else{
-				// viewParams.InsertField("FilterModel", container.filter.toJson());
-				viewParams.InsertField("ComplexFilterModel", container.filter.filterModel.toJson());
+				viewParams.InsertField("FilterModel", container.filter.toJson());
 			}
 
 			var inputParams = Gql.GqlObject("input");

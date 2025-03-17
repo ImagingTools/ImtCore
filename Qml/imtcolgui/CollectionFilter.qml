@@ -44,17 +44,10 @@ ComplexCollectionFilter {
 	}
 	
 	function getTextFilter(){
-		if (filterModel.containsKey("TextFilter")){
-			return filterModel.getData("TextFilter")
-		}
-		
 		return ""
 	}
 
 	function setTextFilter(filter){
-		console.log("setTextFilter", filter, valueType.STRING, filterOperation.CONTAINS)
-		console.log("textFilteringInfoIds", textFilteringInfoIds)
-		
 		m_fieldsFilter.m_groupFilters.clear();
 		
 		let fieldsModel = createBaseModel();
@@ -71,7 +64,6 @@ ComplexCollectionFilter {
 	}
 	
 	function setSortingInfo(infoId, sortOrder){
-		console.log("setSortingInfo", infoId, sortOrder)
 		clearSortFilter()
 
 		let obj = fieldSortingInfoFact.createObject(m_sortingInfo)

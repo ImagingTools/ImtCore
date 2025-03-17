@@ -93,6 +93,6 @@ ControlBase {
 
 		fitToTextWidth: true;
 	}
-
-
 }
+
+

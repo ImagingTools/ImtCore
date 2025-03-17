@@ -52,17 +52,13 @@ input FeatureDataInput {
 	Item: FeatureData!
 }
 
-type FeatureDataPayload {
-	FeatureData: FeatureData
-}
-
 input FeatureItemInput {
 	Id: ID!
 }
 
 type Query {
 	FeaturesList (input:FeaturesListInput): FeaturesListPayload!
-	GetFeatureItem (input: FeatureItemInput): FeatureDataPayload!
+	GetFeatureItem (input: FeatureItemInput): FeatureData!
 }
 
 type Mutation {

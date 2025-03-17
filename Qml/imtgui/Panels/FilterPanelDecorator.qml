@@ -12,7 +12,7 @@ DecoratorBase {
 	
 	property alias contentWidth: content.width;
 	
-	// property CollectionFilter complexFilter: baseElement ? baseElement.complexFilter : null;
+	property CollectionFilter complexFilter: baseElement ? baseElement.complexFilter : null;
 	
 	Component.onCompleted: {
 		updateText();
@@ -43,20 +43,15 @@ DecoratorBase {
 		
 		TimeFilterParamView {
 			onAccepted: {
-				// if (filterPanelDecorator.complexFilter){
-				// 	filterPanelDecorator.complexFilter.setTimeFilter(this.timeFilter);
-				// 	filterPanelDecorator.complexFilter.filterChanged()
-				// }
+				if (filterPanelDecorator.complexFilter){
+					filterPanelDecorator.complexFilter.setTimeFilter(this.timeFilter);
+					filterPanelDecorator.complexFilter.filterChanged()
+				}
 				
 				// filterPanelDecorator.baseElement.filterChanged("TimeFilter", this.model);
-				// ModalDialogManager.closeByComp(timeFilterParamComp);
-				// rect.filterEnabled = true;
-				
-				// buttonText.text = name;
-				filterPanelDecorator.baseElement.filterChanged("TimeFilter", this.model);
 				ModalDialogManager.closeByComp(timeFilterParamComp);
 				rect.filterEnabled = true;
-
+				
 				buttonText.text = name;
 			}
 			
@@ -126,12 +121,10 @@ DecoratorBase {
 							rect.filterEnabled = false;
 							buttonText.text = qsTr("Date");
 							
-							// if (filterPanelDecorator.complexFilter){
-							// 	filterPanelDecorator.complexFilter.clearTimeFilter();
-							// 	filterPanelDecorator.complexFilter.filterChanged()
-							// }
-							filterModel.clear();
-							filterPanelDecorator.baseElement.filterChanged("TimeFilter", filterModel);
+							if (filterPanelDecorator.complexFilter){
+								filterPanelDecorator.complexFilter.clearTimeFilter();
+								filterPanelDecorator.complexFilter.filterChanged()
+							}
 						}
 						decorator: Component {
 							ToolButtonDecorator {
@@ -180,11 +173,10 @@ DecoratorBase {
 				interval: 500;
 				
 				onTriggered: {
-					// if (filterPanelDecorator.complexFilter){
-					// 	filterPanelDecorator.complexFilter.setTextFilter(tfc.text);
-					// 	filterPanelDecorator.complexFilter.filterChanged()
-					// }
-					filterPanelDecorator.baseElement.filterChanged("TextFilter", tfc.text);
+					if (filterPanelDecorator.complexFilter){
+						filterPanelDecorator.complexFilter.setTextFilter(tfc.text);
+						filterPanelDecorator.complexFilter.filterChanged()
+					}
 				}
 			}
 			

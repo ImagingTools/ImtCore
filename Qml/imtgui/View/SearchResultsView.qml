@@ -22,8 +22,8 @@ Item {
 	}
 	
 	function checkWidth(){
-		if (width - 2 * Style.size_mainMargin <= root.contentWidth){
-			table.width = width - 2 * Style.size_mainMargin;
+		if (width - 2 * Style.sizeMainMargin <= root.contentWidth){
+			table.width = width - 2 * Style.sizeMainMargin;
 		}
 		else{
 			table.width = root.contentWidth;
@@ -72,11 +72,11 @@ Item {
 	TabPanel {
 		id: tabPanel;
 		anchors.top: parent.top;
-		anchors.topMargin: Style.size_mainMargin;
+		anchors.topMargin: Style.sizeMainMargin;
 		anchors.horizontalCenter: parent.horizontalCenter;
 		height: 30;
 		visible: false;
-		spacing: Style.size_mainMargin;
+		spacing: Style.sizeMainMargin;
 		color: Style.backgroundColor2;
 		selectedIndex: -1;
 		onSelectedIndexChanged: {
@@ -91,7 +91,7 @@ Item {
 			DecoratorBase {
 				id: tabPanelDecorator;
 				
-				width: content.width + 2 * Style.size_mainMargin;
+				width: content.width + 2 * Style.sizeMainMargin;
 				height: baseElement ? baseElement.height : 50
 				
 				Rectangle {
@@ -106,14 +106,14 @@ Item {
 					id: content;
 					anchors.centerIn: tabPanelDecorator;
 					height: tabPanelDecorator.height;
-					spacing: Style.size_mainMargin;
+					spacing: Style.sizeMainMargin;
 					
 					Text {
 						id: text;
 						anchors.verticalCenter: content.verticalCenter;
 						color: Style.textColor;
 						font.family: Style.fontFamily;
-						font.pixelSize: Style.fontSize_common;
+						font.pixelSize: Style.fontSizeNormal;
 						text: model.item.m_name;
 						elide: Text.ElideRight;
 					}
@@ -125,7 +125,7 @@ Item {
 	Rectangle {
 		id: separator;
 		anchors.top: tabPanel.bottom;
-		anchors.topMargin: Style.size_mainMargin;
+		anchors.topMargin: Style.sizeMainMargin;
 		width: parent.width;
 		height: 1;
 		color: Style.borderColor;
@@ -134,29 +134,25 @@ Item {
 	Table {
 		id: table;
 		anchors.top: separator.bottom;
-		anchors.topMargin: Style.size_mainMargin;
+		anchors.topMargin: Style.sizeMainMargin;
 		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: Style.size_mainMargin;
+		anchors.bottomMargin: Style.sizeMainMargin;
 		anchors.horizontalCenter: parent.horizontalCenter;
 		width: root.contentWidth;
 		visible: tabPanel.visible;
 		showHeaders: false;
 		backgroundElementsColor: Style.backgroundColor2;
-		elementsSpacing: Style.size_mainMargin;
+		elementsSpacing: Style.sizeMainMargin;
 		enableAlternating: false;
 		itemHeight: 70;
 		rowDelegate: Component {
 			TableRowDelegateBase {
 				id: tableDelegate;
 				tableItem: table
-				width: table.elementsListWidth - Style.size_mainMargin;
+				width: table.elementsListWidth - Style.sizeMainMargin;
 				height: elementView.height;
 				selectedOpacity: 0;
 				hoverOpacity: 0;
-				
-				Component.onCompleted: {
-					console.log("TableRowDelegateBase onCompleted", model.item.m_name, model.item);
-				}
 				
 				ElementView {
 					id: elementView;

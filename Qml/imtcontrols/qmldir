@@ -101,7 +101,6 @@ StateMachine 1.0 Models/StateMachine.qml
 TreeItemModelConverter 1.0 ./Models/TreeItemModelConverter.qml
 TreeItemModelObserver 1.0 ./Models/TreeItemModelObserver.qml
 CommandsController 1.0 Models/CommandsController.qml
-CommandsProvider 1.0 Models/CommandsProvider.qml
 MacAddressValidator 1.0 Models/MacAddressValidator.qml
 PopupMenuModel 1.0 Models/PopupMenuModel.qml
 MailRegExpValidator 1.0 Models/MailRegExpValidator.qml

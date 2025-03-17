@@ -2,8 +2,6 @@
     <qresource prefix="/qml">
 	<file alias="web/GraphQLRequest.js">../web/GraphQLRequest.js</file>
 	<file alias="imtguigql/qmldir">qmldir</file>
-	<file alias="imtguigql/GqlModelObserver.qml">GqlModelObserver.qml</file>
-	<file alias="imtguigql/GqlDocumentObserver.qml">GqlDocumentObserver.qml</file>
 	<file alias="imtguigql/GqlDocumentDataController.qml">GqlDocumentDataController.qml</file>
 	<file alias="imtguigql/ComboBoxGql.qml">ComboBoxGql.qml</file>
 	<file alias="imtguigql/ComboBoxGqlSimple.qml">ComboBoxGqlSimple.qml</file>
@@ -12,19 +10,18 @@
 	<file alias="imtguigql/SubscriptionClient.qml">SubscriptionClient.qml</file>
 	<file alias="imtguigql/SubscriptionManager.qml">SubscriptionManager.qml</file>
 	<file alias="imtguigql/ClientStyle.qml">ClientStyle.qml</file>
-	<file alias="imtguigql/CommandsRepresentationProvider.qml">CommandsRepresentationProvider.qml</file>
 	<file alias="imtguigql/CollectionRepresentation.qml">CollectionRepresentation.qml</file>
 	<file alias="imtguigql/RemoteCollectionView.qml">RemoteCollectionView.qml</file>
 	<file alias="imtguigql/MetaInfoProvider.qml">MetaInfoProvider.qml</file>
 	<file alias="imtguigql/WebSocketPortProvider.qml">WebSocketPortProvider.qml</file>
 	<file alias="imtguigql/ComboBoxGqlSimpleElementView.qml">ComboBoxGqlSimpleElementView.qml</file>
 	<file alias="imtguigql/GqlRequestDocumentDataController.qml">GqlRequestDocumentDataController.qml</file>
-	<file alias="imtguigql/CommandsPanelController.qml">CommandsPanelController.qml</file>
 	<file alias="imtguigql/TableViewParamController.qml">TableViewParamController.qml</file>
 	<file alias="imtguigql/GqlRequestSender.qml">GqlRequestSender.qml</file>
 	<file alias="imtguigql/WebSocketConnectionChecker.qml">WebSocketConnectionChecker.qml</file>
 	<file alias="imtguigql/GqlSdlRequestSender.qml">GqlSdlRequestSender.qml</file>
-	<file alias="imtguigql/GqlSdlDocumentDataController.qml">GqlSdlDocumentDataController.qml</file>
 	<file alias="imtguigql/XmlHttpRequestProxy.qml">XmlHttpRequestProxy.qml</file>
+	<file alias="imtguigql/GqlBasedCollectionDataController.qml">GqlBasedCollectionDataController.qml</file>
+	<file alias="imtguigql/GqlBasedCommandsController.qml">GqlBasedCommandsController.qml</file>
     </qresource>
 </RCC>

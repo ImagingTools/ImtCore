@@ -97,7 +97,6 @@
         <file alias="imtcontrols/Models/TreeItemModelConverter.qml">Models/TreeItemModelConverter.qml</file>
         <file alias="imtcontrols/Models/TreeItemModelObserver.qml">Models/TreeItemModelObserver.qml</file>
         <file alias="imtcontrols/Models/CommandsController.qml">Models/CommandsController.qml</file>
-        <file alias="imtcontrols/Models/CommandsProvider.qml">Models/CommandsProvider.qml</file>
         <file alias="imtcontrols/Models/MacAddressValidator.qml">Models/MacAddressValidator.qml</file>
         <file alias="imtcontrols/Models/IntValidator.qml">Models/IntValidator.qml</file>
         <file alias="imtcontrols/Models/DoubleValidator.qml">Models/DoubleValidator.qml</file>

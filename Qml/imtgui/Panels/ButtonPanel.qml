@@ -700,8 +700,6 @@ Rectangle {
             property bool hiddenBackground: true;
 
             function onBackgroundClicked(){
-                console.log("ButtonPanel onBackgroundClicked");
-
                 ModalDialogManager.closeByComp(vertMenuComp);
                 buttonPanel.openST = false;
             }

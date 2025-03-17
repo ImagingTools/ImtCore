@@ -72,7 +72,7 @@ Rectangle {
 
 	/*property int */radius: 7;
 
-	property alias columnCount: headersList.count;
+	property int columnCount: 0;
 
 	//
 	property string borderColorHorizontal: "transparent";
@@ -115,6 +115,7 @@ Rectangle {
 
 	property TableProperties properties: TableProperties {
 		onCheckedItemsChanged: {
+			tableContainer.isAllItemChecked = tableContainer.isAllChecked();
 			tableContainer.checkedItemsChanged();
 		}
 	}
@@ -169,6 +170,7 @@ Rectangle {
 	signal textFilterChanged(string id, int index, string text);
 	signal filterClicked();
 	signal saveWidth();
+	signal sortingChanged(string headerId, string sortOrder);
 
 	signal widthRecalc();
 	signal heightRecalc();
@@ -243,6 +245,13 @@ Rectangle {
 		if(tableContainer.isFlickable){
 			elementsListObj.contentWidth = contentWidth;
 		}
+	}
+
+	function setSortingInfo(headerId, sortOrder){
+		currentHeaderId = headerId;
+		currentSortOrder = sortOrder;
+		
+		sortingChanged(currentHeaderId, currentSortOrder);
 	}
 
 	function setDecorators(){
@@ -665,24 +674,29 @@ Rectangle {
 			anchors.left: parent.left;
 			anchors.leftMargin: Style.sizeMainMargin;
 
-			checkState: tableContainer.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
-
 			visible: tableContainer.checkable && tableContainer.elementsList.count > 0 && tableContainer.canSelectAll;
 
 			isActive: !tableContainer.readOnly;
+			
+			property bool isAllItemChecked: tableContainer.isAllItemChecked;
+			
+			onIsAllItemCheckedChanged: {
+				checkState = isAllItemChecked ? Qt.Checked : Qt.Unchecked;
+			}
 
-			onCheckStateChanged: {
+			function nextCheckState(){
 				if (tableContainer.readOnly){
 					return;
 				}
 				if (checkBox.checkState === Qt.Unchecked){
-					tableContainer.uncheckAll();
-				}
-				else{
+					checkState = Qt.Checked;
 					tableContainer.checkAll();
 				}
+				else{
+					checkState = Qt.Unchecked;
+					tableContainer.uncheckAll();
+				}
 			}
-
 		}
 
 		ListView {
@@ -713,6 +727,15 @@ Rectangle {
 			onContentXChanged: {
 				if(tableContainer.isFlickable){
 					elementsListObj.contentX = headersList.contentX + elementsListObj.originX
+				}
+			}
+			
+			onModelChanged: {
+				if (model){
+					tableContainer.columnCount = model.getItemsCount();
+				}
+				else{
+					tableContainer.columnCount = 0;
 				}
 			}
 

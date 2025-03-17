@@ -13,9 +13,6 @@ Item {
 	property alias commandsViewComp: container.commandsViewComp;
 	property alias commandsView: container.commandsView;
 	
-	property alias updateCommandsGuiEventCommandId: container.updateCommandsGuiEventCommandId;
-	property alias clearCommandsGuiEventCommandId: container.clearCommandsGuiEventCommandId;
-	
 	property alias commandsControllerComp: container.commandsControllerComp;
 	property alias commandsController: container.commandsController;
 	
@@ -100,16 +97,10 @@ Item {
 		}
 	}
 	
-	function onFilterChanged(filterId, filterValue){
-		container.collectionFilter.setTextFilter(filterValue);
-		
-		container.doUpdateGui();
-	}
-	
 	Connections {
 		target: container.commandsController;
 		
-		function onCommandsModelChanged(){
+		function onCommandsChanged(){
 			if (root.commandsDelegate){
 				root.commandsDelegate.setupContextMenu();
 			}
@@ -151,7 +142,7 @@ Item {
 		anchors.left: parent.left;
 		anchors.right: collectionMetaInfo.left;
 		
-		property Component dataControllerComp;
+		property Component dataControllerComp: Component {CollectionDataController { collectionId: container.collectionId}}
 		property var dataController: null;
 		
 		onTableViewParamsAccepted: {
@@ -180,6 +171,7 @@ Item {
 			}
 			
 			function onHeadersModelChanged(){
+				internal.isReady = true;
 				container.doUpdateGui();
 			}
 			
@@ -202,35 +194,27 @@ Item {
 				}
 			}
 			
-			// function onFilterableHeadersModelChanged(){
-			// 	if (!container.dataController){
-			// 		return;
-			// 	}
-
-			// 	let filteringIds = []
-			// 	let filteringModel = container.dataController.filterableHeadersModel;
-			// 	for (let i = 0; i < filteringModel.getItemsCount(); i++){
-			// 		let infoId = filteringModel.getData("Id", i);
-			// 		filteringIds.push(infoId)
-			// 	}
-
-			// 	container.collectionFilter.setFilteringInfoIds(filteringIds);
-			// }
-
 			function onFilterableHeadersModelChanged(){
 				if (!container.dataController){
 					return;
 				}
-
-				container.collectionFilter.setFilteringInfoIds(container.dataController.filterableHeadersModel);
+				
+				let filteringIds = []
+				let filteringModel = container.dataController.filterableHeadersModel;
+				for (let i = 0; i < filteringModel.getItemsCount(); i++){
+					let infoId = filteringModel.getData("Id", i);
+					filteringIds.push(infoId)
+				}
+				
+				container.collectionFilter.setFilteringInfoIds(filteringIds);
 			}
 		}
 		
 		QtObject {
 			id: internal;
 			
-			property bool guiUpdateRequired: false
-			
+			property bool isReady: false;
+
 			function filterMenuActivate(){
 				if (container.hasFilter){
 					container.filterMenuVisible = !container.filterMenuVisible;
@@ -272,7 +256,6 @@ Item {
 		Binding {
 			id: bindHeaders;
 			property: "headers";
-			
 			value: container.dataController.headersModel;
 		}
 		
@@ -282,23 +265,12 @@ Item {
 			value: container.dataController.elementsModel;
 		}
 		
-		onVisibleChanged: {
-			if (container.visible){
-				if (internal.guiUpdateRequired){
-					internal.guiUpdateRequired = false;
-					container.doUpdateGui();
-				}
-			}
-		}
-		
 		function doUpdateGui(){
-			if (!container.visible){
-				internal.guiUpdateRequired = true;
-				
+			if (!internal.isReady){
 				return;
 			}
-			
-			console.log("doUpdateGui");
+
+			console.log("CollectionView.qml doUpdateGui");
 			
 			let count = -1;
 			let offset = 0;
@@ -309,17 +281,19 @@ Item {
 			}
 			
 			if (container.dataController){
-				// container.dataController.updateElements(count, offset, container.collectionFilter);
-				container.dataController.updateElements(count, offset, container.collectionFilter.filterModel);
+				container.dataController.updateElements(count, offset, container.collectionFilter);
 			}
 			
 			container.table.resetSelection();
 		}
 		
 		function openPopupMenu(x, y){
+			console.log("openPopupMenu", x, y)
 			if (container.commandsDelegate){
 				let contextMenuModel = container.commandsDelegate.getContextMenuModel();
 				let count = contextMenuModel.getItemsCount();
+				console.log("count", count)
+				
 				if (count > 0){
 					let offset = 30 * count;
 					ModalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": contextMenuModel});

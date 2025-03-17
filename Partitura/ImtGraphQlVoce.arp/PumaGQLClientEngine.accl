@@ -14,6 +14,7 @@
         <Element ComponentName="Demultiplexer" X="650" Y="150" Note=""/>
         <Element ComponentName="GqlJwtSessionController" X="725" Y="275" Note=""/>
         <Element ComponentName="GraphQLClientEngine" X="125" Y="500" Note=""/>
+        <Element ComponentName="RemoteCommandsController" X="575" Y="550" Note=""/>
         <Element ComponentName="RemoteDocumentRevisionController" X="650" Y="675" Note=""/>
         <Element ComponentName="RemoteJwtSessionController" X="450" Y="275" Note=""/>
         <Element ComponentName="RemoteObjectVisualStatusController" X="450" Y="375" Note=""/>

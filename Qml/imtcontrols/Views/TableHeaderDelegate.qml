@@ -295,14 +295,17 @@ Item{
 					if(!headerDelegate.tableItem.nonSortableColumns.includes(model.Id)){
 						let currentHeaderId = headerDelegate.tableItem.currentHeaderId;
 						let currentSortOrder = headerDelegate.tableItem.currentSortOrder;
+						
+						let sortOrder = currentSortOrder
 
-						headerDelegate.tableItem.currentHeaderId = model.Id;
 						if (currentHeaderId !== model.Id){
-							headerDelegate.tableItem.currentSortOrder = "ASC";
+							sortOrder = "ASC";
 						}
 						else{
-							headerDelegate.tableItem.currentSortOrder = currentSortOrder == "ASC" ? "DESC" : "ASC";
+							sortOrder = currentSortOrder == "ASC" ? "DESC" : "ASC";
 						}
+						
+						headerDelegate.tableItem.setSortingInfo(model.Id, sortOrder);
 
 						headerDelegate.tableItem.headerClicked(model.Id);
 					}

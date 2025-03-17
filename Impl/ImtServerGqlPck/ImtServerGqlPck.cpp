@@ -134,6 +134,11 @@ I_EXPORT_COMPONENT(
 			"Document revision controller",
 			"Document Revision Controller");
 
+I_EXPORT_COMPONENT(
+			CommandsController,
+			"Commands controller",
+			"Commands Controller");
+
 
 } // namespace ImtServerGqlPck
 

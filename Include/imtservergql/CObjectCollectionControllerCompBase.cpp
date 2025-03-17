@@ -79,12 +79,12 @@ sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::
 	
 	QByteArray objectId;
 	if (arguments.input.Version_1_0->ObjectId){
-		objectId = *getObjectVisualStatusRequest.GetRequestedArguments().input.Version_1_0->ObjectId;
+		objectId = *arguments.input.Version_1_0->ObjectId;
 	}
 	
 	QByteArray typeId;
 	if (arguments.input.Version_1_0->TypeId){
-		typeId = *getObjectVisualStatusRequest.GetRequestedArguments().input.Version_1_0->TypeId;
+		typeId = *arguments.input.Version_1_0->TypeId;
 	}
 
 	QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
@@ -190,9 +190,18 @@ bool CObjectCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlR
 			return false;
 		}
 	}
+	
+	sdl::imtbase::ImtCollection::GetObjectVisualStatusRequestArguments arguments = getVisualStatusRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return false;
+	}
 
 	if (getVisualStatusRequest.IsValid()){
-		QByteArray typeId = *getVisualStatusRequest.GetRequestedArguments().input.Version_1_0->TypeId;
+		QByteArray typeId;
+		if (arguments.input.Version_1_0->TypeId.has_value()){
+			typeId = *arguments.input.Version_1_0->TypeId;
+		}
 
 		return m_objectTypeIdAttrPtr.FindValue(typeId) >= 0;
 	}
@@ -503,7 +512,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
 	QString name = inputParamPtr->GetFieldArgumentValue("name").toString();
-	QString description = inputParamPtr->GetFieldArgumentValue("description").toString();
 
 	imtbase::IObjectCollection::DataPtr savedObjectPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, savedObjectPtr)){
@@ -1212,7 +1220,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 	}
 
 	if (m_filePersistenceCompPtr[index]->SaveToFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(qPrintable(objectId)).arg(filePathTmp);
+		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(qPrintable(objectId), filePathTmp);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return nullptr;
@@ -1220,7 +1228,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::ReadOnly)){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Unable to open file with name '%1'").arg(qPrintable(objectId)).arg(filePathTmp);
+		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Unable to open file with name '%1'").arg(qPrintable(objectId), filePathTmp);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
@@ -1292,6 +1300,19 @@ bool CObjectCollectionControllerCompBase::UpdateObjectFromRequest(
 			QString& /*errorMessage*/) const
 {
 	return false;
+}
+
+
+QVariant CObjectCollectionControllerCompBase::GetInputArgumentFromRequest(
+	const imtgql::CGqlRequest& gqlRequest,
+	const QString& argumentKey) const
+{
+	const imtgql::CGqlObject* inputParamObjectPtr = gqlRequest.GetParamObject("input");
+	if (inputParamObjectPtr == nullptr){
+		return QVariant();
+	}
+	
+	return inputParamObjectPtr->GetFieldArgumentValue(argumentKey.toUtf8());
 }
 
 
@@ -1488,7 +1509,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 		iprm::CParamsSet& filterParams) const
 {
 	this->SetAdditionalFilters(gqlRequest, viewParamsGql, &filterParams);
-
+	
 	const imtgql::CGqlObject* complexFilterModelPtr = viewParamsGql.GetFieldArgumentObjectPtr("ComplexFilterModel");
 	if (complexFilterModelPtr != nullptr){
 		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilterSdl;
@@ -1498,6 +1519,8 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 			istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
 			if (imtcol::CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRepresentationToModel(complexFilterSdl, *complexFilterPtr, GetLogPtr())){
 				ReplaceComplexFilterFields(*complexFilterPtr);
+				SetAdditionalFilters(gqlRequest, *complexFilterPtr);
+
 				filterParams.SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
 			}
 		}
@@ -1574,6 +1597,13 @@ void CObjectCollectionControllerCompBase::SetAdditionalFilters(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			const imtgql::CGqlObject& /*viewParamsGql*/,
 			iprm::CParamsSet* /*filterParamsPtr*/) const
+{
+}
+
+
+void CObjectCollectionControllerCompBase::SetAdditionalFilters(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			imtbase::CComplexCollectionFilter& /*complexFilter*/) const
 {
 }
 

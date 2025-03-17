@@ -176,7 +176,7 @@ Rectangle {
 		id: loading;
 		anchors.fill: parent;
 		visible: false;
-		color: Style.backgroundColor2;
+		color: Style.baseColor;
 	}
 }
 

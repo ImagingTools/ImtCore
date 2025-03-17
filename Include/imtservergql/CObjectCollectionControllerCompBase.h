@@ -10,6 +10,7 @@
 #include <imtbase/IOperationContext.h>
 #include <imtbase/IDocumentChangeGenerator.h>
 #include <imtbase/IOperationContextController.h>
+#include <imtbase/CComplexCollectionFilter.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 #include <imtrest/CTimeFilterParamRepresentationController.h>
 #include <imtgql/IGqlRequestExtractor.h>
@@ -75,7 +76,7 @@ public:
 				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-
+	
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
@@ -116,6 +117,7 @@ protected:
 	virtual QString GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const;
 	virtual QString GetExportFileName(const QByteArray& objectId) const;
 	virtual bool UpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QString& errorMessage) const;
+	virtual QVariant GetInputArgumentFromRequest(const imtgql::CGqlRequest& gqlRequest, const QString& argumentKey) const;
 
 	/**
 		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.
@@ -178,6 +180,8 @@ protected:
 		Set multiple optional additional filters to initially get a more refined collection.
 	*/
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest,const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const;
+	
+	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const;
 
 	/**
 		Set object filter.

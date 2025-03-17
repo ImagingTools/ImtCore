@@ -84,6 +84,11 @@ I_EXPORT_COMPONENT(
 			"Object collection subscriber",
 			"Object Collection Subscriber");
 
+I_EXPORT_COMPONENT(
+			RemoteCommandsController,
+			"Remote commands controller",
+			"Remote Commands Controller");
+
 
 } // namespace ImtClientGqlPck
 

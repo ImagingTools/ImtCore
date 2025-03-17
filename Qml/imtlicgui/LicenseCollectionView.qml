@@ -40,10 +40,8 @@ RemoteCollectionView {
 				}
 			}
 			
-			commandsControllerComp: Component {CommandsPanelController {
-					commandId: "License";
-					uuid: licenceEditor.viewId;
-					commandsView: licenceEditor.commandsView;
+			commandsControllerComp: Component {GqlBasedCommandsController {
+					typeId: "License";
 				}
 			}
 		}
@@ -67,12 +65,6 @@ RemoteCollectionView {
 			
 			documentModelComp: Component {
 				LicenseDefinitionData {}
-			}
-			
-			payloadModel: LicenseDataPayload {
-				onFinished: {
-					requestDocumentDataController.documentModel = m_licenseDefinitionData;
-				}
 			}
 		}
 	}

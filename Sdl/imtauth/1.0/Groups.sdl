@@ -34,9 +34,9 @@ type GroupsListPayload {
 }
 
 type GroupData {
-	Id: ID!
+	Id: ID
 	ProductId: ID
-	Name: String!
+	Name: String
 	Description: String
 	Roles: ID
 	Users: ID
@@ -49,10 +49,6 @@ input GroupDataInput {
 	Item: GroupData!
 }
 
-type GroupDataPayload {
-	GroupData: GroupData
-}
-
 input GroupItemInput {
 	Id: ID!
 	ProductId: ID!
@@ -60,7 +56,7 @@ input GroupItemInput {
 
 type Query {
 	GroupsList (input:GroupsListInput): GroupsListPayload!
-	GroupItem (input: GroupItemInput): GroupDataPayload!
+	GroupItem (input: GroupItemInput): GroupData!
 }
 
 type Mutation {

@@ -48,7 +48,7 @@ PageContainer {
             let curr_id = model.getData("Id",i);
             let curr_name = model.getData("Name",i);
             if(curr_id == id && curr_name && documentManager.documentsModel){
-                documentManager.documentsModel.setProperty(0, "Title", curr_name);
+                documentManager.documentsModel.setProperty(0, "Name", curr_name);
                 break;
             }
         }

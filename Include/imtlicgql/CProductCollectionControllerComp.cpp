@@ -175,7 +175,7 @@ istd::IChangeable* CProductCollectionControllerComp::CreateObjectFromRepresentat
 bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	const istd::IChangeable& data,
 	const sdl::imtlic::Products::CProductItemGqlRequest& productItemRequest,
-	sdl::imtlic::Products::CProductDataPayload::V1_0& representationPayload,
+	sdl::imtlic::Products::CProductData::V1_0& representationPayload,
 	QString& errorMessage) const
 {
 	imtlic::CIdentifiableProductInfo* productInfoPtr = const_cast<imtlic::CIdentifiableProductInfo*>(dynamic_cast<const imtlic::CIdentifiableProductInfo*>(&data));
@@ -188,30 +188,26 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 
 	sdl::imtlic::Products::ProductItemRequestArguments arguments = productItemRequest.GetRequestedArguments();
 
-	sdl::imtlic::Products::CProductData::V1_0 productData;
-
 	QByteArray id;
 	if (arguments.input.Version_1_0->Id){
 		id = *arguments.input.Version_1_0->Id;
 	}
-	productData.Id = QByteArray(id);
+	representationPayload.Id = QByteArray(id);
 
 	QByteArray productId = productInfoPtr->GetProductId();
-	productData.ProductId = QByteArray((productId));
+	representationPayload.ProductId = QByteArray((productId));
 
 	QString productName = productInfoPtr->GetName();
-	productData.Name = QString((productName));
-	productData.ProductName = QString((productName));
+	representationPayload.Name = QString((productName));
+	representationPayload.ProductName = QString((productName));
 
 	QString description = productInfoPtr->GetProductDescription();
-	productData.Description = QString((description));
+	representationPayload.Description = QString((description));
 
 	QByteArray categoryId = productInfoPtr->GetCategoryId();
-	productData.CategoryId = QByteArray((categoryId));
+	representationPayload.CategoryId = QByteArray((categoryId));
 
-	productData.Features = QByteArray((productInfoPtr->GetFeatures()->GetElementIds().join(';')));
-
-	representationPayload.ProductData = std::make_optional<sdl::imtlic::Products::CProductData::V1_0>(productData);
+	representationPayload.Features = QByteArray((productInfoPtr->GetFeatures()->GetElementIds().join(';')));
 
 	return true;
 }

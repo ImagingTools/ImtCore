@@ -44,7 +44,7 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const sdl::imtlic::Features::CGetFeatureItemGqlRequest& featureItemRequest,
-				sdl::imtlic::Features::CFeatureDataPayload::V1_0& representationPayload,
+				sdl::imtlic::Features::CFeatureData::V1_0& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const ::imtgql::CGqlRequest& rawGqlRequest,

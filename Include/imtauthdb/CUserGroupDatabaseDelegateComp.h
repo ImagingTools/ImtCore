@@ -2,17 +2,17 @@
 
 
 // ImtCore includes
-#include <imtdb/CSqlJsonDatabaseDelegateComp.h>
+#include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
 
 
 namespace imtauthdb
 {
 
 
-class CUserGroupDatabaseDelegateComp: public imtdb::CSqlJsonDatabaseDelegateComp
+class CUserGroupDatabaseDelegateComp: public imtdb::CSqlDatabaseDocumentDelegateComp
 {
 public:
-	typedef imtdb::CSqlJsonDatabaseDelegateComp BaseClass;
+	typedef imtdb::CSqlDatabaseDocumentDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CUserGroupDatabaseDelegateComp)
 		I_ASSIGN(m_userDatabaseDelegateCompPtr, "UserDatabaseSqlDelegate", "User database sql delegate", true, "UserDatabaseSqlDelegate");
@@ -33,7 +33,6 @@ public:
 				const istd::IChangeable& object,
 				const imtbase::IOperationContext* operationContextPtr = nullptr,
 				bool useExternDelegate = true) const override;
-	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 private:
 	I_REF(imtdb::ISqlDatabaseObjectDelegate, m_userDatabaseDelegateCompPtr);

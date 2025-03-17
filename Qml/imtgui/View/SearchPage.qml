@@ -89,7 +89,6 @@ Item {
 		sdlObjectComp: Component {
 			SearchResults {
 				onFinished: {
-					console.log("SearchResults onFinished", this);
 					searchResultsView.searchResults = this;
 				}
 			}

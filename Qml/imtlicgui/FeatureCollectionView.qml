@@ -32,8 +32,7 @@ RemoteCollectionView {
 	}
 	
 	Component.onCompleted: {
-		collectionFilter.setSortingOrder("DESC");
-		collectionFilter.setSortingInfoId(FeatureItemTypeMetaInfo.s_lastModified);
+		table.setSortingInfo(FeatureItemTypeMetaInfo.s_lastModified, "DESC");
 	}
 	
 	Component {
@@ -47,10 +46,8 @@ RemoteCollectionView {
 		FeatureEditor {
 			id: featureEditor;
 			
-			commandsControllerComp: Component {CommandsPanelController {
-					commandId: "Feature";
-					uuid: featureEditor.viewId;
-					commandsView: featureEditor.commandsView;
+			commandsControllerComp: Component {GqlBasedCommandsController {
+					typeId: "Feature";
 				}
 			}
 			
@@ -110,12 +107,6 @@ RemoteCollectionView {
 			
 			documentModelComp: Component {
 				FeatureData {}
-			}
-			
-			payloadModel: FeatureDataPayload {
-				onFinished: {
-					requestDocumentDataController.documentModel = m_featureData;
-				}
 			}
 		}
 	}

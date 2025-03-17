@@ -36,10 +36,8 @@ RemoteCollectionView {
 		ProductView {
 			id: productEditor;
 			
-			commandsControllerComp: Component {CommandsPanelController {
-					commandId: "Product";
-					uuid: productEditor.viewId;
-					commandsView: productEditor.commandsView;
+			commandsControllerComp: Component {GqlBasedCommandsController {
+					typeId: "Product";
 				}
 			}
 			
@@ -68,12 +66,6 @@ RemoteCollectionView {
 			
 			documentModelComp: Component {
 				ProductData {}
-			}
-			
-			payloadModel: ProductDataPayload {
-				onFinished: {
-					requestDocumentDataController.documentModel = m_productData;
-				}
 			}
 		}
 	}

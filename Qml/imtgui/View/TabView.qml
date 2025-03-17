@@ -178,7 +178,6 @@ Item {
 				visible: tabPanel.selectedIndex == model.index;
 
 				onLoaded: {
-					console.log("onLoaded", item);
 					root.tabLoaded(model.index, model.Id, item);
 				}
 

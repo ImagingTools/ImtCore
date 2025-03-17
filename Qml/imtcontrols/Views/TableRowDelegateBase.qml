@@ -120,12 +120,6 @@ Rectangle {
 		}
 	}
 
-	onCheckedStateChanged: {
-		if (tableDelegateContainer.tableItem){
-			tableDelegateContainer.tableItem.isAllItemChecked = tableDelegateContainer.tableItem.isAllChecked();
-		}
-	}
-
 	onTableItemChanged: {
 		if (tableItem){
 			checkedItemsChanged()
@@ -270,7 +264,8 @@ Rectangle {
 
 	function checkedItemsChanged(){
 		if (tableItem && model){
-			checkedState = tableItem.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
+			let ok = tableItem.getCheckedItems().includes(model.index);
+			checkedState = ok ? Qt.Checked : Qt.Unchecked;
 		}
 	}
 
@@ -381,32 +376,31 @@ Rectangle {
 		id: checkBox;
 
 		CheckBox {
-
 			z: 1000;
 
 			anchors.verticalCenter: parent.verticalCenter;
 			anchors.left: parent.left;
 			anchors.leftMargin: Style.sizeMainMargin;
 
-			checkState: tableDelegateContainer.checkedState;
-
 			visible: tableDelegateContainer.tableItem ? tableDelegateContainer.tableItem.checkable : false;
 			isActive: !tableDelegateContainer.readOnly;
-
-			function nextCheckState() {
-				if (tableDelegateContainer.readOnly){
-					return;
+			
+			property int rowCheckedState: tableDelegateContainer.checkedState;
+			property bool block: false;
+			onRowCheckedStateChanged: {
+				block = true;
+				if (checkState != rowCheckedState){
+					checkState = rowCheckedState;
 				}
-
-				if (!tableDelegateContainer.tableItem){
-					return;
-				}
-
-				if (tableDelegateContainer.tableItem.itemIsChecked(tableDelegateContainer.rowIndex)){
-					tableDelegateContainer.tableItem.uncheckItem(tableDelegateContainer.rowIndex);
+				block = false;
+			}
+			
+			onCheckStateChanged: {
+				if (checkState == Qt.Checked){
+					tableDelegateContainer.tableItem.checkItem(tableDelegateContainer.rowIndex);
 				}
 				else{
-					tableDelegateContainer.tableItem.checkItem(tableDelegateContainer.rowIndex);
+					tableDelegateContainer.tableItem.uncheckItem(tableDelegateContainer.rowIndex);
 				}
 			}
 		}

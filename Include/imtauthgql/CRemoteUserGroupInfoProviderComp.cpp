@@ -40,15 +40,10 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 
 	imtgql::CGqlRequest gqlRequest;
 	if (groupssdl::CGroupItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		groupssdl::CGroupDataPayload::V1_0 response;
+		groupssdl::CGroupData::V1_0 response;
 
-		if (!SendModelRequest<groupssdl::CGroupDataPayload::V1_0, groupssdl::CGroupDataPayload>(gqlRequest, response)){
+		if (!SendModelRequest<groupssdl::CGroupData::V1_0, groupssdl::CGroupData>(gqlRequest, response)){
 			return nullptr;
-		}
-
-		groupssdl::CGroupData::V1_0 groupData;
-		if (response.GroupData){
-			groupData= *response.GroupData;
 		}
 
 		istd::TDelPtr<imtauth::IUserGroupInfo> groupInfoPtr;
@@ -58,7 +53,7 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 		}
 
 		QJsonObject object;
-		if (!groupData.WriteToJsonObject(object)){
+		if (!response.WriteToJsonObject(object)){
 			return nullptr;
 		}
 

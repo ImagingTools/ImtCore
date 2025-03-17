@@ -315,7 +315,7 @@ istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentat
 bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
 			const sdl::imtlic::Features::CGetFeatureItemGqlRequest& featureItemRequest,
-			sdl::imtlic::Features::CFeatureDataPayload::V1_0& representationPayload,
+			sdl::imtlic::Features::CFeatureData::V1_0& representationPayload,
 			QString& errorMessage) const
 {
 	const imtlic::CIdentifiableFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CIdentifiableFeatureInfo*>(&data);
@@ -328,23 +328,19 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 	sdl::imtlic::Features::GetFeatureItemRequestArguments arguments = featureItemRequest.GetRequestedArguments();
 
-	sdl::imtlic::Features::CFeatureData::V1_0 featureData;
-
 	QByteArray id;
 	if (arguments.input.Version_1_0->Id){
 		id = *arguments.input.Version_1_0->Id;
 	}
-	featureData.Id = std::make_optional<QByteArray>(id);
+	representationPayload.Id = std::make_optional<QByteArray>(id);
 
-	bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, featureData, errorMessage);
+	bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, representationPayload, errorMessage);
 	if (!ok){
 		errorMessage = QString("Unable to create representaion from object. Error: '%1'").arg(errorMessage);
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
 
 		return false;
 	}
-
-	representationPayload.FeatureData = std::make_optional<sdl::imtlic::Features::CFeatureData::V1_0>(featureData);
 
 	return true;
 }

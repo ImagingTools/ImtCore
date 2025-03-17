@@ -11,19 +11,19 @@ CollectionView {
 
 	property bool hasRemoteChanges: false;
 	property bool tableViewParamsStoredServer: true;
-	property var payloadModel: null
-	property string importTitle: qsTr("Select file")
-	property string importFilter: qsTr("Text files (*.txt)")
+
 	property string gqlGetListCommandId: root.collectionId + "List";
 
 	// Invisible fields that will be requested for collection
 	property var additionalFieldIds: ["Id", "Name"]
 
 	commandsControllerComp: Component {
-		CommandsPanelController {
-			commandId: root.collectionId;
-			uuid: root.viewId;
-			commandsView: root.commandsView;
+		GqlBasedCommandsController {
+			typeId: root.collectionId;
+			
+			function getHeaders(){
+				return root.getHeaders();
+			}
 		}
 	}
 
@@ -63,7 +63,6 @@ CollectionView {
 		CollectionRepresentation {
 			property bool isReady: false;
 
-			payloadModel: root.payloadModel
 			Component.onCompleted: {
 				Events.subscribeEvent("CommandsGuiReady", commandsIsReady);
 			}
@@ -219,35 +218,25 @@ CollectionView {
 			return;
 		}
 
-		// if (dataModel.containsKey("operationContext")){
-		// 	let operationContextInfo = dataModel.getData("operationContext");
-		// 	if (!operationContextInfo){
-		// 		return;
-		// 	}
-
-		// 	if (operationContextInfo.containsKey("ownerId")){
-		// 		let ownerId = operationContextInfo.getData("ownerId");
-		// 		let currentUserId = AuthorizationController.getLoggedUserId();
-		// 		if (ownerId == currentUserId){
-		// 			root.doUpdateGui();
-		// 		}
-		// 		else{
-		// 			root.hasRemoteChanges = true;
-		// 		}
-		// 	}
-		// }
-		// else{
-		// 	root.doUpdateGui();
-		// }
-		if (dataModel.containsKey("token")){
-			let currentToken = AuthorizationController.getAccessToken();
-			let accessToken = dataModel.getData("token");
-			if (String(currentToken) == String(accessToken)){
-				root.doUpdateGui();
+		if (dataModel.containsKey("operationContext")){
+			let operationContextInfo = dataModel.getData("operationContext");
+			if (!operationContextInfo){
+				return;
 			}
-			else{
-				root.hasRemoteChanges = true;
+			
+			if (operationContextInfo.containsKey("ownerId")){
+				let ownerId = operationContextInfo.getData("ownerId");
+				let currentUserId = AuthorizationController.getLoggedUserId();
+				if (ownerId == currentUserId){
+					root.doUpdateGui();
+				}
+				else{
+					root.hasRemoteChanges = true;
+				}
 			}
+		}
+		else{
+			root.doUpdateGui();
 		}
 	}
 
@@ -259,8 +248,7 @@ CollectionView {
 		}
 
 		onMessageReceived: {
-			console.log("RemoteCollectionView.qml onMessageReceived", data.toJson());
-			
+			console.debug("RemoteCollectionView.qml onMessageReceived", data.toJson());
 			root.handleSubscription(data);
 		}
 	}

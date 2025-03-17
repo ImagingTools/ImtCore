@@ -28,7 +28,6 @@ GqlModel {
 
 	onStateChanged: {
 		if (container.state === "Ready"){
-			console.log("SubscriptionClient.qml onStateChanged", gqlCommandId);
 			if (container.containsKey("data")){
 				let dataModelLocal = container.getData("data")
 				container.messageReceived(dataModelLocal);
@@ -54,8 +53,6 @@ GqlModel {
 	}
 
 	function unRegisterSubscription(){
-		console.log("unRegisterSubscription", gqlCommandId);
-
 		Events.sendEvent("UnregisterSubscription", container);
 	}
 

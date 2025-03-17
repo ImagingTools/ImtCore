@@ -23,7 +23,7 @@ ViewBase {
 	property alias pagination: pagination_;
 	property alias elementsCount: tableInternal.elementsCount;
 	
-	property JsonCollectionFilter collectionFilter: JsonCollectionFilter {}
+	property CollectionFilter collectionFilter: CollectionFilter {}
 	
 	signal selectedIndexChanged(int index);
 	signal tableViewParamsAccepted();
@@ -46,18 +46,7 @@ ViewBase {
 		target: collectionViewBaseContainer.collectionFilter;
 		
 		function onFilterChanged(){
-			// console.log("onFilterChanged")
-			
-			// collectionViewBaseContainer.doUpdateGui();
-
-			tableInternal.currentHeaderId = collectionViewBaseContainer.collectionFilter.getSortingInfoId();
-			tableInternal.currentSortOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
-			
-			// let sortingInfo = collectionViewBaseContainer.collectionFilter.getSortingInfo();
-			// if (sortingInfo){
-			// 	tableInternal.currentHeaderId = sortingInfo.m_fieldId;
-			// 	tableInternal.currentSortOrder = sortingInfo.m_sortingOrder;
-			// }
+			collectionViewBaseContainer.doUpdateGui();
 		}
 	}
 	
@@ -73,25 +62,10 @@ ViewBase {
 		anchors.right: parent.right;
 		anchors.rightMargin: Style.sizeMainMargin;
 		
-		// complexFilter: collectionViewBaseContainer.collectionFilter;
+		complexFilter: collectionViewBaseContainer.collectionFilter;
 		
 		onClose: {
 			filterMenu_.visible = false;
-		}
-		
-		onFilterChanged: {
-			if (filterId == "TextFilter"){
-				collectionViewBaseContainer.collectionFilter.setTextFilter(filterValue);
-				collectionViewBaseContainer.doUpdateGui();
-			}
-			else if (filterId == "TimeFilter"){
-				collectionViewBaseContainer.collectionFilter.m_timeFilter.
-				collectionViewBaseContainer.collectionFilter.setTimeFilter(filterValue);
-				collectionViewBaseContainer.doUpdateGui();
-			}
-			else{
-				collectionViewBaseContainer.filterChanged(filterId, filterValue);
-			}
 		}
 	}
 	
@@ -238,24 +212,11 @@ ViewBase {
 				collectionViewBaseContainer.doubleClicked(id, index);
 			}
 			
-			onCurrentHeaderIdChanged: {
-				collectionViewBaseContainer.collectionFilter.setSortingInfoId(currentHeaderId);
-				// if (collectionViewBaseContainer.collectionFilter){
-				// 	collectionViewBaseContainer.collectionFilter.setSortingInfo(currentHeaderId, currentSortOrder);
-				// 	collectionViewBaseContainer.collectionFilter.filterChanged();
-				// }
-			}
-			
-			onCurrentSortOrderChanged: {
-				collectionViewBaseContainer.collectionFilter.setSortingOrder(currentSortOrder);
-				// if (collectionViewBaseContainer.collectionFilter){
-				// 	collectionViewBaseContainer.collectionFilter.setSortingInfo(currentHeaderId, currentSortOrder);
-				// 	collectionViewBaseContainer.collectionFilter.filterChanged();
-				// }
-			}
-			
-			onHeaderClicked: {
-				collectionViewBaseContainer.doUpdateGui();
+			onSortingChanged: {
+				if (collectionViewBaseContainer.collectionFilter){
+					collectionViewBaseContainer.collectionFilter.setSortingInfo(headerId, sortOrder);
+					collectionViewBaseContainer.collectionFilter.filterChanged();
+				}
 			}
 		}
 		
@@ -347,11 +308,13 @@ ViewBase {
 			onCurrentIndexChanged: {
 				tableInternal.resetSelection();
 				
+				console.log("onCurrentIndexChanged")
 				collectionViewBaseContainer.doUpdateGui();
 			}
 			
 			onCountElementsChanged: {
 				tableInternal.selectedIndex = -1;
+				console.log("onCountElementsChanged")
 				
 				collectionViewBaseContainer.doUpdateGui();
 			}
