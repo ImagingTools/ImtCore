@@ -16,6 +16,9 @@ namespace imtbase
 class CComplexCollectionFilter: virtual public IComplexCollectionFilter
 {
 public:
+	bool AddFieldFilter(const FieldFilter& fieldFilter);
+	bool AddGroupFilter(const GroupFilter& groupFilter);
+	
 	// reimplemented (imtbase::IComplexCollectionFilter)
 	virtual const FieldSortingInfoList& GetSortingInfo() const override;
 	virtual bool SetSortingInfo(const FieldSortingInfoList& info) override;

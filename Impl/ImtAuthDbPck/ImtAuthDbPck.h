@@ -11,7 +11,6 @@
 #include <imtauthdb/CSqliteUserGroupDatabaseDelegateComp.h>
 #include <imtauthdb/CSqliteUserDatabaseDelegateComp.h>
 #include <imtauthdb/CSqliteRoleDatabaseDelegateComp.h>
-#include <imtdb/CSqliteJsonDatabaseDelegateComp.h>
 
 
 /**

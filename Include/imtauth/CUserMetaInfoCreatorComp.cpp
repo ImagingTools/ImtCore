@@ -41,6 +41,8 @@ bool CUserMetaInfoCreatorComp::CreateMetaInfo(
 	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_NAME, userInfoPtr->GetName());
 	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_DESCRIPTION, userInfoPtr->GetDescription());
 	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_EMAIL, userInfoPtr->GetMail());
+	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_SYSTEM_ID, "");
+	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_SYSTEM_NAME, "");
 	
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){

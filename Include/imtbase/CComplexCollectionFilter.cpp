@@ -13,6 +13,34 @@ namespace imtbase
 {
 
 
+bool CComplexCollectionFilter::AddFieldFilter(const FieldFilter& fieldFilter)
+{
+	if (m_fieldsFilter.fieldFilters.contains(fieldFilter)){
+		return false;
+	}
+	
+	istd::CChangeNotifier changeNotifier(this);
+	
+	m_fieldsFilter.fieldFilters << fieldFilter;
+	
+	return true;
+}
+
+
+bool CComplexCollectionFilter::AddGroupFilter(const GroupFilter& groupFilter)
+{
+	if (m_fieldsFilter.groupFilters.contains(groupFilter)){
+		return false;
+	}
+	
+	istd::CChangeNotifier changeNotifier(this);
+	
+	m_fieldsFilter.groupFilters << groupFilter;
+	
+	return true;
+}
+
+
 // reimplemented (imtbase::IComplexCollectionFilter)
 
 const IComplexCollectionFilter::FieldSortingInfoList& CComplexCollectionFilter::GetSortingInfo() const

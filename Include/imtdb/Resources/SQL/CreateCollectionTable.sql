@@ -31,3 +31,5 @@ CREATE INDEX IF NOT EXISTS "${TableName}StateIndex"
     ("State" ASC NULLS LAST)
     TABLESPACE pg_default;
 
+CREATE INDEX IF NOT EXISTS "${TableName}RevisionNumberIndex"
+    ON public."${TableName}" ((("RevisionInfo"->>'RevisionNumber')::int));
