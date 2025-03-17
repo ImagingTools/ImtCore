@@ -47,6 +47,7 @@ public:
 	{
 		Q_INIT_RESOURCE(imtbaseImtBaseTypesSdl);
 		Q_INIT_RESOURCE(imtbaseSearchSdl);
+		Q_INIT_RESOURCE(imtbaseCommandsSdl);
 		Q_INIT_RESOURCE(imtbaseImtCollectionSdl);
 		Q_INIT_RESOURCE(imtbaseDocumentCollectionFilterSdl);
 		Q_INIT_RESOURCE(imtbaseComplexCollectionFilterSdl);

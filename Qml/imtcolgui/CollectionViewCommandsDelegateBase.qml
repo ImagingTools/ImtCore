@@ -65,7 +65,7 @@ ViewCommandsDelegateBase {
 	Connections {
 		id: commandsControllerConn;
 
-		function onCommandsModelChanged(){
+		function onCommandsChanged(){
 			collectionViewCommandsDelegate.setupContextMenu();
 		}
 	}
@@ -478,7 +478,7 @@ ViewCommandsDelegateBase {
 	}
 
 	function commandHandle(commandId){
-		console.log("commandHandle", commandId);
+		console.log("CollectionViewCommandsDelegateBase commandHandle", commandId);
 
 		if (!collectionViewCommandsDelegate.collectionView){
 			return;
@@ -490,6 +490,8 @@ ViewCommandsDelegateBase {
 		}
 
 		let commandIsEnabled = commandsController.commandIsEnabled(commandId);
+		console.log("commandIsEnabled", commandIsEnabled);
+		
 		if (commandIsEnabled){
 			if (commandId === "New"){
 				collectionViewCommandsDelegate.onNew();

@@ -1,0 +1,38 @@
+schema 
+{
+	name: Commands
+	namespace: imtbase
+	version: 1.0
+	query: Query
+}
+
+type GuiElementModel
+{
+	elementId: ID
+	elementName: String
+	elementDescription: String
+	elementItemPath: String
+	elementStatus: String
+	enabled: Boolean
+	visible: Boolean
+	toggled: Boolean
+	toggleable: Boolean
+	priority: Integer
+	alignment: Integer
+	subElements: [GuiElementModel]
+}
+
+type GuiElementContainer
+{
+	elements: [GuiElementModel]
+}
+
+input GetCommandsInput
+{
+	typeId: ID!
+}
+
+type Query {
+	GetCommands (input: GetCommandsInput): GuiElementContainer!
+}
+

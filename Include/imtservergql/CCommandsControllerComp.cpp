@@ -1,0 +1,171 @@
+#include <imtservergql/CCommandsControllerComp.h>
+
+
+// ACF includes
+#include <iqt/iqt.h>
+
+// ImtCore includes
+#include <imtrest/IGuiElementModel.h>
+
+
+namespace imtservergql
+{
+
+
+// protected methods
+
+// reimplemented (sdl::imtbase::Commands::CGraphQlHandlerCompBase)
+
+bool CCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	sdl::imtbase::Commands::CGetCommandsGqlRequest getCommandsGqlRequest(gqlRequest, false);
+	
+	QByteArray getCommandsCommandId = getCommandsGqlRequest.GetCommandId();
+	QByteArray requestCommandId = gqlRequest.GetCommandId();
+	if (getCommandsCommandId != requestCommandId){
+		bool isSupported = BaseClass::IsRequestSupported(gqlRequest);
+		if (!isSupported){
+			return false;
+		}
+	}
+	
+	sdl::imtbase::Commands::GetCommandsRequestArguments arguments = getCommandsGqlRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0.has_value()){
+		return false;
+	}
+	
+	QByteArray typeId;
+	if (arguments.input.Version_1_0->typeId){
+		typeId = *arguments.input.Version_1_0->typeId;
+	}
+	
+	if (!typeId.isEmpty() && getCommandsGqlRequest.IsValid()){
+		return *m_typeIdAttrPtr == typeId;
+	}
+
+	return false;
+}
+
+
+sdl::imtbase::Commands::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
+	const sdl::imtbase::Commands::CGetCommandsGqlRequest& getCommandsRequest,
+	const ::imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
+{
+	sdl::imtbase::Commands::CGuiElementContainer::V1_0 response;
+	
+	if (!m_guiElementContainerCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'GuiElementContainer' was not set", "CCommandsControllerComp");
+		return sdl::imtbase::Commands::CGuiElementContainer();
+	}
+	
+	sdl::imtbase::Commands::GetCommandsRequestArguments arguments = getCommandsRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return sdl::imtbase::Commands::CGuiElementContainer();
+	}
+	
+	QByteArray typeId;
+	if (arguments.input.Version_1_0->typeId){
+		typeId = *arguments.input.Version_1_0->typeId;
+	}
+	
+	QByteArray languageId;
+	const imtgql::IGqlContext* gqlContextPtr = getCommandsRequest.GetRequestContext();
+	if (gqlContextPtr !=  nullptr){
+		languageId = gqlContextPtr->GetLanguageId();
+	}
+
+	if (!GetRepresentationFromGuiElementContainer(*m_guiElementContainerCompPtr, response, languageId)){
+		errorMessage = QString("Unable to get commands for type-ID '%1'. Error: Get representation failed").arg(qPrintable(typeId));
+		SendErrorMessage(0, errorMessage, "CCommandsControllerComp");
+		return sdl::imtbase::Commands::CGuiElementContainer();
+	}
+	
+	sdl::imtbase::Commands::CGuiElementContainer retVal;
+	retVal.Version_1_0 = std::make_optional(response);
+	
+	return retVal;
+}
+
+
+// private methods
+
+bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
+	const imtrest::IGuiElementContainer& guiElementContainer,
+	sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
+	const QByteArray languageId) const
+{
+	QByteArrayList elementIds = guiElementContainer.GetElementIds();
+	
+	QList<sdl::imtbase::Commands::CGuiElementModel::V1_0> elementList;
+	
+	for (const QByteArray& elementId : elementIds){
+		const imtrest::IGuiElementModel* guiElementPtr = guiElementContainer.GetGuiElementModel(elementId);
+		if (guiElementPtr != nullptr){
+			sdl::imtbase::Commands::CGuiElementModel::V1_0 element;
+			if (!GetRepresentationFromGuiElement(*guiElementPtr, element, languageId)){
+				return false;
+			}
+			
+			const imtrest::IGuiElementContainer* subElementContainerPtr = guiElementPtr->GetSubElements();
+			if (subElementContainerPtr != nullptr){
+				sdl::imtbase::Commands::CGuiElementContainer::V1_0 subElements;
+				if (!GetRepresentationFromGuiElementContainer(*subElementContainerPtr, subElements, languageId)){
+					return false;
+				}
+				
+				QList<sdl::imtbase::Commands::CGuiElementModel::V1_0> subElementList;
+				for (const sdl::imtbase::Commands::CGuiElementModel::V1_0& subElement : *subElements.elements){
+					subElementList << subElement;
+				}
+
+				element.subElements = subElementList;
+			}
+			
+			elementList << element;
+		}
+	}
+	
+	representation.elements = elementList;
+	
+	return true;
+}
+
+
+bool CCommandsControllerComp::GetRepresentationFromGuiElement(
+	const imtrest::IGuiElementModel& guiElementModel,
+	sdl::imtbase::Commands::CGuiElementModel::V1_0& representation,
+	const QByteArray languageId) const
+{
+	representation.elementId = guiElementModel.GetElementId();
+	
+	QString elementName = guiElementModel.GetElementName();
+	elementName = TranslateName(elementName, "Attribute", languageId);
+	
+	representation.elementName = elementName;
+	representation.elementDescription = guiElementModel.GetElementDescription();
+	representation.elementItemPath = guiElementModel.GetElementItemPath();
+	representation.elementStatus = guiElementModel.GetElementStatus();
+	representation.enabled = guiElementModel.IsEnabled();
+	representation.visible = guiElementModel.IsVisible();
+	representation.priority = guiElementModel.GetPriority();
+	representation.alignment = guiElementModel.GetAlignment();
+	
+	return true;
+}
+
+
+QString CCommandsControllerComp::TranslateName(const QString& name, const QString& context, const QByteArray& languageId) const
+{
+	if (!m_translationManagerCompPtr.IsValid()){
+		return name;
+	}
+	
+	return iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), name.toUtf8(), languageId, context.toUtf8());
+}
+
+
+} // namespace imtservergql
+
+
