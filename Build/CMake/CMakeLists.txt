@@ -19,9 +19,7 @@ if(UNIX AND NOT APPLE)
 	endif()
 endif()
 
-if (NOT DEFINED IMTCOREDIR)
-	set(IMTCOREDIR "$ENV{IMTCOREDIR}")
-endif ()
+get_filename_component(IMTCOREDIR "../.." ABSOLUTE BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 include(${IMTCOREDIR}/Config/CMake/PartituraUpgrade.cmake)
@@ -32,7 +30,7 @@ endif()
 message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
 
 if(NOT DEFINED IMTCOREDIR_BUILD)
-	set(IMTCOREDIR_BUILD "${CMAKE_CURRENT_LIST_DIR}/../..")
+	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
 endif()
 
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
