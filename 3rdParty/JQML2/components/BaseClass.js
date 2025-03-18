@@ -400,7 +400,7 @@ class BaseClass extends QtObject {
 
 		for (let key in sourceObject) {
 			let _key = "m_" + key[0].toLowerCase() + key.slice(1, key.length)
-			if (!sourceObject[key]){
+			if (sourceObject[key] === null){
 				this[_key] = null
 			}
 			else if (typeof sourceObject[key] === "object") {
