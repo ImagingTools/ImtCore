@@ -19,7 +19,9 @@ public:
 	enum IdTypes
 	{
 		IT_SERIAL,
-		IT_MAC
+		IT_MAC,
+		IT_IPv4,
+		IT_IPv6
 	};
 
 	enum VersionIds
