@@ -7,8 +7,6 @@
 #include <imtauth/IUserVerificationController.h>
 #include <imtauthgql/CUserRepresentationController.h>
 #include <imtcrypt/IHashGenerator.h>
-#include <imtmail/ISmtpClient.h>
-#include <imtmail/ISmtpMessageCreator.h>
 #include <imtauth/IUserVerificationCodeSender.h>
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
@@ -38,37 +36,37 @@ public:
 protected:
 	// reimplemented (sdl::imtauth::Users::CGraphQlHandlerCompBase)
 	virtual sdl::imtauth::Users::CChangePasswordPayload OnChangePassword(
-		const sdl::imtauth::Users::CChangePasswordGqlRequest& changePasswordRequest,
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::imtauth::Users::CChangePasswordGqlRequest& changePasswordRequest,
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::imtauth::Users::CRegisterUserPayload OnRegisterUser(
-		const sdl::imtauth::Users::CRegisterUserGqlRequest& registerUserRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::imtauth::Users::CRegisterUserGqlRequest& registerUserRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::imtauth::Users::CCheckEmailPayload OnCheckEmail(
-		const sdl::imtauth::Users::CCheckEmailGqlRequest& checkEmailRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::imtauth::Users::CCheckEmailGqlRequest& checkEmailRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::imtauth::Users::CSendEmailCodePayload OnSendEmailCode(
-		const sdl::imtauth::Users::CSendEmailCodeGqlRequest& sendEmailCodeRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::imtauth::Users::CSendEmailCodeGqlRequest& sendEmailCodeRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::imtauth::Users::CCheckEmailCodePayload OnCheckEmailCode(
-		const sdl::imtauth::Users::CCheckEmailCodeGqlRequest& checkEmailCodeRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::imtauth::Users::CCheckEmailCodeGqlRequest& checkEmailCodeRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::imtauth::Users::CCheckSuperuserPayload OnCheckSuperuserExists(
-		const sdl::imtauth::Users::CCheckSuperuserExistsGqlRequest& checkSuperuserExistsRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::imtauth::Users::CCheckSuperuserExistsGqlRequest& checkSuperuserExistsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::imtauth::Users::CCreateSuperuserPayload OnCreateSuperuser(
-		const sdl::imtauth::Users::CCreateSuperuserGqlRequest& createSuperuserRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::imtauth::Users::CCreateSuperuserGqlRequest& createSuperuserRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::imtauth::Users::CRemoveUserPayload OnUsersRemove(
-		const sdl::imtauth::Users::CUsersRemoveGqlRequest& removeUserRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::imtauth::Users::CUsersRemoveGqlRequest& removeUserRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 private:
 	bool SendUserCode(const QByteArray& userId, const imtauth::IUserInfo& userInfo) const;

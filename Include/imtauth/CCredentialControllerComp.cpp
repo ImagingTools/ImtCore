@@ -5,6 +5,9 @@
 #include <iprm/CParamsSet.h>
 #include <iprm/CTextParam.h>
 
+// ImtCore includes
+#include <imtbase/CComplexCollectionFilter.h>
+
 
 namespace imtauth
 {
@@ -17,27 +20,30 @@ namespace imtauth
 bool CCredentialControllerComp::CheckCredential(const QByteArray& login, const QByteArray& password) const
 {
 	if (!m_hashCalculatorCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'HashCalculator' was not set", "CCredentialControllerComp");
 		return false;
 	}
 
 	if (!m_userCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CCredentialControllerComp");
 		return false;
 	}
-
-	iprm::CParamsSet filterParam;
-	iprm::CParamsSet paramsSet;
-
-	iprm::CTextParam userId;
-	userId.SetText(login);
-	paramsSet.SetEditableParameter("Id", &userId);
-
+	
+	imtbase::CComplexCollectionFilter complexFilter;
+	
+	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+	fieldFilter.fieldId = "UserId";
+	fieldFilter.filterValue = login;
+	complexFilter.AddFieldFilter(fieldFilter);
+	
 	QByteArray passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password);
-
-	iprm::CTextParam passwordHashParam;
-	passwordHashParam.SetText(passwordHash);
-	paramsSet.SetEditableParameter("PasswordHash", &passwordHashParam);
-
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+	imtbase::IComplexCollectionFilter::FieldFilter passwordFieldFilter;
+	passwordFieldFilter.fieldId = "PasswordHash";
+	passwordFieldFilter.filterValue = passwordHash;
+	complexFilter.AddFieldFilter(passwordFieldFilter);
+	
+	iprm::CParamsSet filterParam;
+	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
 	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 	return userIds.size() > 0;

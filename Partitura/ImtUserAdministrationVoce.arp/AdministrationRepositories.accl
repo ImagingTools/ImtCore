@@ -8,11 +8,6 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CachedGroupRepository" X="1025" Y="500" Note=""/>
-        <Element ComponentName="CachedRoleRepository" X="200" Y="225" Note=""/>
-        <Element ComponentName="CachedUserRepository" X="1050" Y="100" Note=""/>
-        <Element ComponentName="CachedUserSessionsRepository" X="925" Y="775" Note=""/>
-        <Element ComponentName="CachedUserSettingsRepository" X="525" Y="650" Note=""/>
         <Element ComponentName="RoleDocumentSqlRepository" X="200" Y="100" Note=""/>
         <Element ComponentName="UserGroupSqlRepository" X="775" Y="450" Note=""/>
         <Element ComponentName="UserSessionsSqlRepository" X="925" Y="650" Note=""/>

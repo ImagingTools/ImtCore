@@ -25,6 +25,9 @@ bool CUserMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, 
 	QString email = metaInfo.GetMetaInfo(imtauth::IUserInfo::MIT_EMAIL).toString();
 	representation["Email"] = email;
 	
+	QString passwordHash = metaInfo.GetMetaInfo(imtauth::IUserInfo::MIT_PASSWORD_HASH).toString();
+	representation["PasswordHash"] = passwordHash;
+	
 	QByteArray systemId = metaInfo.GetMetaInfo(imtauth::IUserInfo::MIT_SYSTEM_ID).toByteArray();
 	representation["SystemId"] = QString(systemId);
 	
@@ -47,6 +50,10 @@ bool CUserMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, 
 	
 	if (representation.contains("Mail")){
 		metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_EMAIL, representation.value("Mail"));
+	}
+	
+	if (representation.contains("PasswordHash")){
+		metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_PASSWORD_HASH, representation.value("PasswordHash"));
 	}
 	
 	if (representation.contains("SystemId")){

@@ -144,16 +144,23 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 	}
 
 	sdl::imtauth::Authorization::CAuthorizationInput inputArgument = authorizationRequest.GetRequestedArguments().input;
+	if (!inputArgument.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return sdl::imtauth::Authorization::CAuthorizationPayload();
+	}
+
 	QByteArray login;
-	if (inputArgument.Version_1_0->Login) {
+	if (inputArgument.Version_1_0->Login){
 		login = inputArgument.Version_1_0->Login->toUtf8();
 	}
+	
 	QByteArray productId;
-	if (inputArgument.Version_1_0->ProductId) {
+	if (inputArgument.Version_1_0->ProductId){
 		productId = *inputArgument.Version_1_0->ProductId;
 	}
+	
 	QByteArray password;
-	if (inputArgument.Version_1_0->Password) {
+	if (inputArgument.Version_1_0->Password){
 		password = inputArgument.Version_1_0->Password->toUtf8();
 	}
 
@@ -203,14 +210,21 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 	}
 
 	sdl::imtauth::Authorization::CAuthorizationInput inputArgument = userTokenRequest.GetRequestedArguments().input;
+	if (!inputArgument.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return sdl::imtauth::Authorization::CAuthorizationPayload();
+	}
+	
 	QByteArray login;
 	if (inputArgument.Version_1_0->Login) {
 		login = inputArgument.Version_1_0->Login->toUtf8();
 	}
+	
 	QByteArray productId;
 	if (inputArgument.Version_1_0->ProductId) {
 		productId = *inputArgument.Version_1_0->ProductId;
 	}
+	
 	QByteArray password;
 	if (inputArgument.Version_1_0->Password) {
 		password = inputArgument.Version_1_0->Password->toUtf8();

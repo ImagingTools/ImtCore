@@ -25,22 +25,23 @@ bool CUserMetaInfoCreatorComp::CreateMetaInfo(
 	if (typeId != *m_objectTypeIdAttrPtr){
 		return false;
 	}
-	
+
 	metaInfoPtr.SetPtr(new imod::TModelWrap<MetaInfo>);
-	
+
 	if (dataPtr == nullptr){
 		return true;
 	}
-	
+
 	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr);
 	if (userInfoPtr == nullptr){
 		return false;
 	}
-	
+
 	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_ID, userInfoPtr->GetId());
 	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_NAME, userInfoPtr->GetName());
 	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_DESCRIPTION, userInfoPtr->GetDescription());
 	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_EMAIL, userInfoPtr->GetMail());
+	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_PASSWORD_HASH, userInfoPtr->GetPasswordHash());
 	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_SYSTEM_ID, "");
 	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_SYSTEM_NAME, "");
 	

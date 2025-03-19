@@ -3,13 +3,10 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
-#include <iprm/CTextParam.h>
-#include <iprm/CEnableableParam.h>
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CUserVerification.h>
-#include <imtmail/CSmtpMessage.h>
 
 
 namespace imtauthgql
@@ -18,11 +15,10 @@ namespace imtauthgql
 
 // reimplemented (sdl::imtauth::Users::CGraphQlHandlerCompBase)
 
-
 sdl::imtauth::Users::CChangePasswordPayload CUserControllerComp::OnChangePassword(
-	const sdl::imtauth::Users::CChangePasswordGqlRequest& changePasswordRequest,
-	const imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const sdl::imtauth::Users::CChangePasswordGqlRequest& changePasswordRequest,
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	sdl::imtauth::Users::CChangePasswordPayload::V1_0 payload;
 	payload.Success = false;
@@ -37,15 +33,23 @@ sdl::imtauth::Users::CChangePasswordPayload CUserControllerComp::OnChangePasswor
 		return sdl::imtauth::Users::CChangePasswordPayload();
 	}
 
-	sdl::imtauth::Users::CChangePasswordInput::V1_0 inputArgument = *changePasswordRequest.GetRequestedArguments().input.Version_1_0;
+	sdl::imtauth::Users::ChangePasswordRequestArguments arguments = changePasswordRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return sdl::imtauth::Users::CChangePasswordPayload();
+	}
+
+	sdl::imtauth::Users::CChangePasswordInput::V1_0 inputArgument = *arguments.input.Version_1_0;
 	QByteArray login;
 	if (inputArgument.Login){
 		login = *inputArgument.Login;
 	}
+
 	QString oldPassword;
 	if (inputArgument.OldPassword){
 		oldPassword = *inputArgument.OldPassword;
 	}
+
 	QString newPassword;
 	if (inputArgument.NewPassword){
 		newPassword = *inputArgument.NewPassword;
@@ -155,6 +159,11 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 	}
 
 	sdl::imtauth::Users::RegisterUserRequestArguments arguments = registerUserRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return sdl::imtauth::Users::CRegisterUserPayload();
+	}
+
 	if (!arguments.input.Version_1_0->UserData){
 		errorMessage = QString("Unable to register user. Error: User data is invalid");
 		return sdl::imtauth::Users::CRegisterUserPayload();
@@ -214,25 +223,19 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 
 	response.Id = userId;
 
-	iprm::CParamsSet filterParam;
-	iprm::CParamsSet paramsSet;
-
-	iprm::CEnableableParam enableableParam;
-	enableableParam.SetEnabled(true);
-
-	paramsSet.SetEditableParameter("IsDefault", &enableableParam);
-
-	iprm::CTextParam productIdParam;
-	productIdParam.SetText(productId);
-
-	paramsSet.SetEditableParameter("ProductId", &productIdParam);
-
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
-
 	if (m_roleCollectionCompPtr.IsValid()){
-		imtbase::IObjectCollection::Ids roleIds = m_roleCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-		if (!roleIds.isEmpty()){
-			userInfoPtr->AddRole(productId, roleIds[0]);
+		imtbase::IObjectCollection::Ids roleIds = m_roleCollectionCompPtr->GetElementIds();
+		for (const QByteArray& roleId : roleIds){
+			imtbase::IObjectCollection::DataPtr roleDataPtr;
+			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){
+				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
+				if (roleInfoPtr != nullptr){
+					if (roleInfoPtr->GetProductId() == productId && roleInfoPtr->IsDefault()){
+						userInfoPtr->AddRole(productId, roleId);
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -275,6 +278,11 @@ sdl::imtauth::Users::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
 	response.Success = false;
 
 	sdl::imtauth::Users::CheckEmailRequestArguments arguments = checkEmailRequest.GetRequestedArguments();
+	
+	if (!arguments.input.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return sdl::imtauth::Users::CCheckEmailPayload();
+	}
 
 	QString email;
 	if (arguments.input.Version_1_0->Email){
@@ -297,7 +305,6 @@ sdl::imtauth::Users::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
 
 	if (userInfoPtr == nullptr){
 		response.Message = QString("There are no users with email '%1' in the system").arg(email);
-
 		return retVal;
 	}
 
@@ -310,9 +317,9 @@ sdl::imtauth::Users::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
 
 
 sdl::imtauth::Users::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
-	const sdl::imtauth::Users::CSendEmailCodeGqlRequest& sendEmailCodeRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+			const sdl::imtauth::Users::CSendEmailCodeGqlRequest& sendEmailCodeRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Users::CSendEmailCodePayload retVal;
 	retVal.Version_1_0 = sdl::imtauth::Users::CSendEmailCodePayload::V1_0();
@@ -324,6 +331,10 @@ sdl::imtauth::Users::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
 	}
 
 	sdl::imtauth::Users::SendEmailCodeRequestArguments arguments = sendEmailCodeRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return retVal;
+	}
 
 	QByteArray login;
 	if (arguments.input.Version_1_0->Login){
@@ -353,9 +364,9 @@ sdl::imtauth::Users::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
 
 
 sdl::imtauth::Users::CCheckEmailCodePayload CUserControllerComp::OnCheckEmailCode(
-	const sdl::imtauth::Users::CCheckEmailCodeGqlRequest& checkEmailCodeRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+			const sdl::imtauth::Users::CCheckEmailCodeGqlRequest& checkEmailCodeRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Users::CCheckEmailCodePayload::V1_0 response;
 
@@ -366,7 +377,12 @@ sdl::imtauth::Users::CCheckEmailCodePayload CUserControllerComp::OnCheckEmailCod
 	}
 
 	sdl::imtauth::Users::CheckEmailCodeRequestArguments arguments = checkEmailCodeRequest.GetRequestedArguments();
-
+	
+	if (!arguments.input.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return sdl::imtauth::Users::CCheckEmailCodePayload();
+	}
+	
 	QByteArray login;
 	if (arguments.input.Version_1_0->Login){
 		login = *arguments.input.Version_1_0->Login;
@@ -386,7 +402,6 @@ sdl::imtauth::Users::CCheckEmailCodePayload CUserControllerComp::OnCheckEmailCod
 
 	return retVal;
 }
-
 
 
 sdl::imtauth::Users::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuserExists(
@@ -465,6 +480,11 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 
 	sdl::imtauth::Users::CreateSuperuserRequestArguments arguments = createSuperuserRequest.GetRequestedArguments();
 
+	if (!arguments.input.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return retVal;
+	}
+
 	QString name;
 	if (arguments.input.Version_1_0->Name){
 		name = *arguments.input.Version_1_0->Name;
@@ -511,7 +531,7 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 	imtauth::IUserInfo::SystemInfo systemInfo;
 	superuserInfoPtr->AddToSystem(systemInfo);
 
-	QByteArray objectId = m_userCollectionCompPtr->InsertNewObject("User", "", "", superuserInfoPtr.GetPtr(), login);
+	QByteArray objectId = m_userCollectionCompPtr->InsertNewObject("User", "", "", superuserInfoPtr.GetPtr());
 	if (objectId.isEmpty()){
 		response.Message = QString("Unable to insert superuser to user collection");
 		return retVal;
@@ -524,9 +544,9 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 
 
 sdl::imtauth::Users::CRemoveUserPayload CUserControllerComp::OnUsersRemove(
-	const sdl::imtauth::Users::CUsersRemoveGqlRequest& /*removeUserRequest*/,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+			const sdl::imtauth::Users::CUsersRemoveGqlRequest& /*removeUserRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	return sdl::imtauth::Users::CRemoveUserPayload();
 }
@@ -537,10 +557,12 @@ sdl::imtauth::Users::CRemoveUserPayload CUserControllerComp::OnUsersRemove(
 bool CUserControllerComp::SendUserCode(const QByteArray& userId, const imtauth::IUserInfo& userInfo) const
 {
 	if (!m_userVerificationControllerCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'UserVerificationController' was not set", "CUserControllerComp");
 		return false;
 	}
 
 	if (!m_userVerificationCodeSenderCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'UserVerificationCodeSender' was not set", "CUserControllerComp");
 		return false;
 	}
 
@@ -549,10 +571,9 @@ bool CUserControllerComp::SendUserCode(const QByteArray& userId, const imtauth::
 	if (ok){
 		if (!m_userVerificationCodeSenderCompPtr->SendCode(userInfo, userVerification.GetVerificationCode())){
 			SendErrorMessage(0,
-							 QString("Unable to send verification code to '%1' for user '%2'. Error: Unknown error")
-								 .arg(userInfo.GetMail())
-								 .arg(userInfo.GetName()),
-							 "CUserControllerComp");
+							QString("Unable to send verification code to '%1' for user '%2'. Error: Unknown error")
+								.arg(userInfo.GetMail(), userInfo.GetName()),
+							"CUserControllerComp");
 
 			return false;
 		}
@@ -583,43 +604,48 @@ const imtauth::IUserInfo* CUserControllerComp::GetUserInfoByLogin(const QByteArr
 
 const QByteArray CUserControllerComp::GetUserIdByLogin(const QByteArray& login) const
 {
+	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+	fieldFilter.fieldId = "UserId";
+	fieldFilter.filterValue = login;
+	
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.AddFieldFilter(fieldFilter);
+	
 	iprm::CParamsSet filterParam;
-	iprm::CParamsSet paramsSet;
+	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
-	iprm::CTextParam userIdParam;
-	userIdParam.SetText(login);
-
-	paramsSet.SetEditableParameter("Id", &userIdParam);
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
-
-	QByteArray userObjectId;
 	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (!userIds.isEmpty()){
-		userObjectId = userIds[0];
+	if (userIds.size() > 0){
+		return userIds[0];
 	}
 
-	return userObjectId;
+	return QByteArray();
 }
 
 
 const QByteArray CUserControllerComp::GetUserIdByEmail(const QString& email) const
 {
-	iprm::CParamsSet filterParam;
-	iprm::CParamsSet paramsSet;
-
-	iprm::CTextParam emailParam;
-	emailParam.SetText(email);
-
-	paramsSet.SetEditableParameter("Mail", &emailParam);
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
-
-	QByteArray userObjectId;
-	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (!userIds.isEmpty()){
-		userObjectId = userIds[0];
+	if (!m_userCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
+		return QByteArray();
 	}
 
-	return userObjectId;
+	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+	fieldFilter.fieldId = "Email";
+	fieldFilter.filterValue = email;
+
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.AddFieldFilter(fieldFilter);
+	
+	iprm::CParamsSet filterParam;
+	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
+
+	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+	if (userIds.size() > 0){
+		return userIds[0];
+	}
+
+	return QByteArray();
 }
 
 

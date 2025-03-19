@@ -48,7 +48,8 @@ public:
 		MIT_EMAIL = MIT_ROLES + 1,
 		MIT_GROUPS,
 		MIT_SYSTEM_ID,
-		MIT_SYSTEM_NAME
+		MIT_SYSTEM_NAME,
+		MIT_PASSWORD_HASH,
 	};
 
 	struct SystemInfo

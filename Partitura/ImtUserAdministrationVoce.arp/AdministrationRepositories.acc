@@ -10,51 +10,6 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="CachedGroupRepository" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserGroupSqlRepository"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="CachedRoleRepository" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RoleDocumentSqlRepository"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="CachedUserRepository" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserSqlRepository"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="CachedUserSessionsRepository" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserSessionsSqlRepository"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="CachedUserSettingsRepository" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserSettingsDatabaseDelegate/UserSettingsRepository"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="RoleDocumentSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="RoleRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -173,10 +128,10 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces/>
     <ExportedComponents>
-        <Component ExportedId="CachedGroupRepository" ComponentId="CachedGroupRepository"/>
-        <Component ExportedId="CachedRoleRepository" ComponentId="CachedRoleRepository"/>
-        <Component ExportedId="CachedUserRepository" ComponentId="CachedUserRepository"/>
-        <Component ExportedId="CachedUserSessionsRepository" ComponentId="CachedUserSessionsRepository"/>
-        <Component ExportedId="CachedUserSettingsRepository" ComponentId="CachedUserSettingsRepository"/>
+        <Component ExportedId="RoleRepository" ComponentId="RoleDocumentSqlRepository/RoleRepository"/>
+        <Component ExportedId="UserGroupRepository" ComponentId="UserGroupSqlRepository"/>
+        <Component ExportedId="UserRepository" ComponentId="UserSqlRepository/UserRepository"/>
+        <Component ExportedId="UserSessionsRepository" ComponentId="UserSessionsSqlRepository"/>
+        <Component ExportedId="UserSettingsRepository" ComponentId="UserSettingsDatabaseDelegate/UserSettingsRepository"/>
     </ExportedComponents>
 </Acf>

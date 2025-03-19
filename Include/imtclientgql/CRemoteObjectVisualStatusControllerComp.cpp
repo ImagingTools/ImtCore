@@ -39,7 +39,15 @@ bool CRemoteObjectVisualStatusControllerComp::IsRequestSupported(const imtgql::C
 
 	sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest getVisualStatusRequest(gqlRequest, false);
 	if (getVisualStatusRequest.IsValid()){
-		QByteArray typeId = *getVisualStatusRequest.GetRequestedArguments().input.Version_1_0->TypeId;
+		sdl::imtbase::ImtCollection::GetObjectVisualStatusRequestArguments arguments = getVisualStatusRequest.GetRequestedArguments();
+		if (!arguments.input.Version_1_0.has_value()){
+			return false;
+		}
+		
+		QByteArray typeId;
+		if (arguments.input.Version_1_0->TypeId){
+			typeId = *getVisualStatusRequest.GetRequestedArguments().input.Version_1_0->TypeId;
+		}
 
 		return m_typeIdsAttrPtr.FindValue(typeId) >= 0;
 	}

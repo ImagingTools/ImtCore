@@ -226,19 +226,18 @@ QtObject {
 	}
 	
 	function registerUser(userData){
-		registerUserRequestSender.send({"m_userData": userData})
+		registerUserInput.m_userData = userData;
+		registerUserRequestSender.send(registerUserInput)
+	}
+
+	property RegisterUserInput registerUserInput: RegisterUserInput {
+		m_productId: root.productId;
 	}
 	
 	property GqlSdlRequestSender registerUserRequestSender: GqlSdlRequestSender {
 		requestType: 1; // Mutation
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_registerUser;
-		
-		inputObjectComp: Component {
-			RegisterUserInput {
-				m_productId: root.productId;
-			}
-		}
-		
+
 		sdlObjectComp: Component {
 			RegisterUserPayload {
 				onFinished: {
