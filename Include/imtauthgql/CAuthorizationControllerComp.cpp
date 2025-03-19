@@ -91,9 +91,15 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 	QString& errorMessage) const
 {
 	sdl::imtauth::Authorization::CAuthorizationPayload payload;
-
+	
 	QByteArray login = userInfo.GetId();
 	QByteArray objectId = GetUserObjectId(login);
+	Q_ASSERT(!objectId.isEmpty());
+	if (objectId.isEmpty()){
+		errorMessage = QString("Unable to create authorization request. Error: User with login '%1' does not exists").arg(qPrintable(login));
+		return payload;
+	}
+	
 	QByteArray tokenValue = QUuid::createUuid().toByteArray();
 
 	payload.Version_1_0.emplace();

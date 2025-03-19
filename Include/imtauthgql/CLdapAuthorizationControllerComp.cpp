@@ -26,34 +26,24 @@ namespace imtauthgql
 
 QByteArray CLdapAuthorizationControllerComp::CheckExistsRole(const QByteArray& productId, RoleType roleType) const
 {
-	iprm::CParamsSet filterParam;
-	iprm::CParamsSet paramsSet;
-
-	iprm::CEnableableParam enableableParam;
-	enableableParam.SetEnabled(true);
-
-	switch (roleType) {
-	case RT_DEFAULT:
-		paramsSet.SetEditableParameter("IsDefault", &enableableParam);
-		break;
-	case RT_GUEST:
-		paramsSet.SetEditableParameter("IsGuest", &enableableParam);
-		break;
+	if (m_roleCollectionCompPtr.IsValid()){
+		imtbase::IObjectCollection::Ids roleIds = m_roleCollectionCompPtr->GetElementIds();
+		for (const QByteArray& roleId : roleIds){
+			imtbase::IObjectCollection::DataPtr roleDataPtr;
+			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){
+				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
+				if (roleInfoPtr != nullptr){
+					QByteArray roleProductId = roleInfoPtr->GetProductId();
+					if (roleType == RT_DEFAULT && roleInfoPtr->IsDefault() && roleProductId == productId ||
+						roleType == RT_GUEST && roleInfoPtr->IsGuest() && roleProductId == productId){
+						return roleId;
+					}
+				}
+			}
+		}
 	}
 
-	iprm::CTextParam productIdParam;
-	productIdParam.SetText(productId);
-
-	paramsSet.SetEditableParameter("ProductId", &productIdParam);
-
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
-
-	imtbase::IObjectCollection::Ids roleIds = m_roleCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (roleIds.isEmpty()){
-		return QByteArray();
-	}
-
-	return roleIds[0];
+	return QByteArray();
 }
 
 
@@ -118,7 +108,7 @@ const imtauth::CUserInfo* CLdapAuthorizationControllerComp::CreateUserInfoFromLd
 		istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
 		userInfoPtr.SetPtr(new imtauth::CIdentifiableUserInfo);
 
-		userInfoPtr->SetObjectUuid(ldapUserId);
+		userInfoPtr->SetObjectUuid(QUuid::createUuid().toByteArray(QUuid::WithoutBraces));
 
 		imtauth::IUserInfo::SystemInfo systemInfo;
 		systemInfo.systemId = *m_systemIdAttrPtr;
@@ -159,16 +149,25 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 	if (m_enableableParamCompPtr.IsValid()){
 		bool enabled = m_enableableParamCompPtr->IsEnabled();
 		if (enabled){
-			sdl::imtauth::Authorization::CAuthorizationInput::V1_0 inputArgument = *authorizationRequest.GetRequestedArguments().input.Version_1_0;
+			
+			sdl::imtauth::Authorization::AuthorizationRequestArguments arguments = authorizationRequest.GetRequestedArguments();
+			if (!arguments.input.Version_1_0.has_value()){
+				Q_ASSERT(false);
+				return sdl::imtauth::Authorization::CAuthorizationPayload();
+			}
+			
+			sdl::imtauth::Authorization::CAuthorizationInput::V1_0 inputArgument = *arguments.input.Version_1_0;
 
 			QByteArray login;
 			if (inputArgument.Login){
 				login = inputArgument.Login->toUtf8();
 			}
+			
 			QByteArray productId;
 			if (inputArgument.ProductId){
 				productId = *inputArgument.ProductId;
 			}
+			
 			QByteArray password;
 			if (inputArgument.Password){
 				password = inputArgument.Password->toUtf8();
@@ -188,7 +187,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 					defaultRoleId = InsertNewIdentifiableRoleInfo("Default", "Default", "Default role", productId, true, false);
 				}
 
-				istd::TDelPtr<imtauth::CUserInfo> userInfoPtr;
+				istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
 				if (userObjectId.isEmpty()){
 					userInfoPtr.SetCastedOrRemove(const_cast<imtauth::CUserInfo*>(CreateUserInfoFromLdapUser(login)));
 					if (!userInfoPtr.IsValid()){
@@ -196,6 +195,8 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 
 						userInfoPtr->SetId(login);
 					}
+					
+					userObjectId = userInfoPtr->GetObjectUuid();
 
 					imtauth::IUserInfo::SystemInfo systemInfo;
 					systemInfo.systemId = *m_systemIdAttrPtr;
@@ -204,7 +205,11 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 
 					userInfoPtr->AddRole(productId, defaultRoleId);
 
-					m_userCollectionCompPtr->InsertNewObject("User", "", "", userInfoPtr.GetPtr(), login);
+					QByteArray retVal = m_userCollectionCompPtr->InsertNewObject("User", "", "", userInfoPtr.GetPtr(), userObjectId);
+					if (retVal.isEmpty()){
+						errorMessage = QString("Unable to insert LDAP user to the collection");
+						return sdl::imtauth::Authorization::CAuthorizationPayload();
+					}
 				}
 				else{
 					imtbase::IObjectCollection::DataPtr dataPtr;
