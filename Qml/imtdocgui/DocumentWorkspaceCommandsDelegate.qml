@@ -9,10 +9,6 @@ QtObject {
     property Component documentHistoryDialogComp: Component {
         DocumentHistoryDialog {
             title: qsTr("Document history");
-
-            onStarted: {
-                updateModel();
-            }
         }
     }
 

@@ -123,10 +123,6 @@ Item {
         }
     }
 
-    UserPanelDelegate {
-        id: panelDelegate;
-    }
-
     Component {
         id: profileViewComp;
 

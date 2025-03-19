@@ -31,7 +31,6 @@ ProfileView 1.0 ProfileView.qml
 RoleCollectionView 1.0 RoleCollectionView.qml
 UserCollectionView 1.0 UserCollectionView.qml
 UserGroupCollectionView 1.0 UserGroupCollectionView.qml
-UserPanelDelegate 1.0 UserPanelDelegate.qml
 ChangePasswordDialog 1.0 ChangePasswordDialog.qml
 PasswordInput 1.0 PasswordInput.qml
 UserGeneralEditor 1.0 UserGeneralEditor.qml

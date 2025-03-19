@@ -38,13 +38,6 @@ Column {
 		container.userData.m_password = passwordInput_.text;
 	}
 
-	// GroupHeaderView {
-	// 	width: parent.width;
-
-	// 	title: qsTr("General");
-	// 	groupView: container.canHideGroup ? generalGroup : null;
-	// }
-
 	GroupElementView {
 		id: generalGroup;
 

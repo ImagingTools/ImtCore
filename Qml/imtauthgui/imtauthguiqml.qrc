@@ -7,16 +7,11 @@
         <file alias="imtauthgui/AuthorizationPage.qml">AuthorizationPage.qml</file>
         <file alias="imtauthgui/AuthorizationController.qml">AuthorizationController.qml</file>
         <file alias="imtauthgui/UserCollectionView.qml">UserCollectionView.qml</file>
-        <file alias="imtauthgui/UserCollectionViewCommandsDelegate.qml">UserCollectionViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/UserGroupCollectionView.qml">UserGroupCollectionView.qml</file>
-        <file alias="imtauthgui/UserGroupCollectionViewCommandsDelegate.qml">UserGroupCollectionViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/UserView.qml">UserView.qml</file>
-        <file alias="imtauthgui/UserViewCommandsDelegate.qml">UserViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/UserManagementProvider.qml">UserManagementProvider.qml</file>
         <file alias="imtauthgui/UserPanel.qml">UserPanel.qml</file>
-        <file alias="imtauthgui/UserPanelDelegate.qml">UserPanelDelegate.qml</file>
         <file alias="imtauthgui/UserTokenProvider.qml">UserTokenProvider.qml</file>
-        <file alias="imtauthgui/RoleViewCommandsDelegate.qml">RoleViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/RoleCollectionViewCommandsDelegate.qml">RoleCollectionViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/RoleCollectionView.qml">RoleCollectionView.qml</file>
         <file alias="imtauthgui/RoleView.qml">RoleView.qml</file>
@@ -31,12 +26,12 @@
         <file alias="imtauthgui/CachedRoleCollection.qml">CachedRoleCollection.qml</file>
         <file alias="imtauthgui/CachedUserCollection.qml">CachedUserCollection.qml</file>
         <file alias="imtauthgui/CachedGroupCollection.qml">CachedGroupCollection.qml</file>
-	<file alias="imtauthgui/RoleCollectionDataProvider.qml">RoleCollectionDataProvider.qml</file>
-	<file alias="imtauthgui/UserCollectionDataProvider.qml">UserCollectionDataProvider.qml</file>
-	<file alias="imtauthgui/GroupCollectionDataProvider.qml">GroupCollectionDataProvider.qml</file>
-	<file alias="imtauthgui/ProfileView.qml">ProfileView.qml</file>
-	<file alias="imtauthgui/UserGeneralEditor.qml">UserGeneralEditor.qml</file>
-	<file alias="imtauthgui/PasswordRecoveryDialog.qml">PasswordRecoveryDialog.qml</file>
+        <file alias="imtauthgui/RoleCollectionDataProvider.qml">RoleCollectionDataProvider.qml</file>
+        <file alias="imtauthgui/UserCollectionDataProvider.qml">UserCollectionDataProvider.qml</file>
+        <file alias="imtauthgui/GroupCollectionDataProvider.qml">GroupCollectionDataProvider.qml</file>
+        <file alias="imtauthgui/ProfileView.qml">ProfileView.qml</file>
+        <file alias="imtauthgui/UserGeneralEditor.qml">UserGeneralEditor.qml</file>
+        <file alias="imtauthgui/PasswordRecoveryDialog.qml">PasswordRecoveryDialog.qml</file>
         <file alias="imtauthgui/qmldir">qmldir</file>
     </qresource>
     <qresource prefix="/"/>
