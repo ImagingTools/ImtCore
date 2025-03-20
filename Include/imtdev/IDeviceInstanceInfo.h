@@ -32,9 +32,6 @@ public:
 		VI_HARDWARE_VERSION_MAJOR,
 		VI_HARDWARE_VERSION_MINOR,
 		VI_HARDWARE_VERSION_PATCH,
-		VI_SDK_VERSION_MAJOR,
-		VI_SDK_VERSION_MINOR,
-		VI_SDK_VERSION_PATCH
 	};
 
 	/**
@@ -43,7 +40,7 @@ public:
 	virtual const IDeviceStaticInfo& GetDeviceStaticInfo() const = 0;
 
 	/**
-		Get the device id for the given IdType
+		Get the device ID for the given IdType
 	*/
 	virtual QByteArray GetDeviceIdentifier(int idType) const = 0;
 
@@ -52,7 +49,10 @@ public:
 	*/
 	virtual const iser::IVersionInfo& GetVersion() const = 0;
 
-	virtual const iattr::IAttributesProvider* GetDeviceInfo() const = 0;
+	/**
+		Get device instance attributes provider
+	*/
+	virtual const iattr::IAttributesProvider* GetDeviceAttributes() const = 0;
 };
 
 

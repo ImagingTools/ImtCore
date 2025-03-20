@@ -1,13 +1,21 @@
+#
+# For using sparse checkout from the local repo set
+# git config --global uploadpack.allowFilter true
+#
+
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 from conan.tools.env import Environment, VirtualBuildEnv, VirtualRunEnv
 from conan.tools.build import can_run
-from conan.tools.files import collect_libs, patch, rmdir
+from conan.tools.files import collect_libs, patch, rmdir, update_conandata, move_folder_contents
+from conan.tools.scm import Git
 from conan.errors import ConanInvalidConfiguration
 from conans.tools import SVN  # TODO: no svn in conan v2
 import os
+import sys
 import shutil
 from pathlib import Path
+import json
 
 
 class ImtCoreConan(ConanFile):
@@ -30,7 +38,7 @@ class ImtCoreConan(ConanFile):
     }
 
     description = "ImagingTools Core Framework"
-    url = "https://h2815060.stratoserver.net/svn/ImtReleases/ImtCore"
+    url = "http://b035a0a.online-server.cloud/svn/ImtReleases/ImtCore"
     license = "LGPL"
     author = "ImagingTools"
     topics = None
@@ -44,17 +52,32 @@ class ImtCoreConan(ConanFile):
     def _gmgtools(self):
         return self.python_requires["conantools"].module
 
+    def set_version(self):
+        git = Git(self)
+        self.version = 'git.' + git.get_commit()[:8]
+        if git.is_dirty():
+            self.version += '-dirty'
+        self.output.info(f'Detected version {self.version}')
+
+    def export(self):
+        git = Git(self)
+        url, commit = git.get_url_and_commit()
+        subfolder = self.recipe_path.relative_to(Path(git.get_repo_root())).as_posix()
+        # we store the current url and commit in conandata.yml
+        update_conandata(self, {"sources": {"commit": commit, "url": url, "subfolder": subfolder}})
+
     def validate(self):
         if self.settings.arch == "x86":
             raise ConanInvalidConfiguration("Not supported arch")
 
     def requirements(self):
         if self.options.qt_package == "conan":
-            self.requires("qt/[>=5.15]")
+            self.requires("qt/6.2.4-r2@gmg/system")
 
         self.requires("quazip/[~1]@gmg/stable")
         self.requires("openssl/1.1.1u")
-        self.requires("AcfPublic/[~1]@gmg/stable")
+        self.requires("AcfPublic/[>=1.2.480-r0 <1.3.0]@gmg/stable", include_prerelease=True)
+        self.requires("zlib/1.2.11-r1@gmg/stable", override=True)
 
     def build_requirements(self):
         if self.settings.os == "Linux":
@@ -69,40 +92,45 @@ class ImtCoreConan(ConanFile):
 
     def layout(self):
         # FIXME: ImtCore cmake files done wrong and expect sources to be located in the ImtCore subdirectory
-        cmake_layout(self, build_folder='out', src_folder='.')
+        cmake_layout(self, build_folder='out', src_folder='.', generator='Ninja')
         for layoutData in (self.layouts.source, self.layouts.package):
             layoutData.buildenv_info.define_path("IMTCOREDIR", ".")
 
+        self.layouts.build.buildenv_info.define_path("IMTCOREDIR_BUILD", ".")
+
     def source(self):
-        version = self.version.split("-")[0]
-        version_parts = version.split(".")
-        if len(version_parts) != 3:
-            raise ConanInvalidConfiguration("Version must be specified in the form X.Y.Z, where Z specifies SVN revision to build")
+        git = Git(self)
+        sources = self.conan_data["sources"]
+        url = sources["url"]
+        commit = sources["commit"]
+        subfolder = sources["subfolder"]
+        git.run('init')
+        git.run(f'remote add origin "{url}"')
+        git.run(f'fetch --depth=1 --filter=tree:0 origin "{commit}"')
+        git.run(f'sparse-checkout set "{subfolder}"')
+        git.checkout(commit)
 
-        svn_revision = version_parts[2]
-
-        svn = SVN(folder=self.source_folder, verify_ssl=False, username='buildserver', password='stuResw4')
-        svn.checkout('https://h2815060.stratoserver.net/svn/ImtReleases/ImtCore', revision=svn_revision)
-        self.output.info("using svn revision " + svn.get_revision())
-        rmdir(self, os.path.join(self.source_folder, ".svn"))
-
-        # there are pre-compiled third-party libraries which may be incompatible with our environment
-        # also they are duplicating the same third-party libraries that we already have
-        # preserve 'WebCompiler' to create a web components
-        thirdPartyPreserveList = ["JQML", "JQML2", "Python", "nodejs"]
-        for folder in os.listdir(os.path.join(self.source_folder, "3rdParty")):
-            if folder not in thirdPartyPreserveList:
-                full_path = os.path.join(self.source_folder, "3rdParty", folder)
-                if os.path.isdir(full_path):
-                    shutil.rmtree(full_path)
-
-        patch(self, patch_file="patches/0002-supply-quazip.patch")
-        patch(self, patch_file="patches/0003-supply-openssl.patch")
-        patch(self, patch_file="patches/0004-imtcoredir.patch")
+        # move_folder_contents works only one level down, iterate through levels
+        for sub in os.path.split(subfolder):
+            self.output.info(f'moving {sub} -> {self.source_folder}')
+            move_folder_contents(self, sub, self.source_folder)
 
     def _print_env(self, env):
         for variable, value in env.items():
             self.output.info(f'{variable}={value}')
+
+    def _write_env_to_presets(self, env):
+        presetsPath = self.generators_path / 'CMakePresets.json'
+        with open(presetsPath) as f:
+            data = json.load(f)
+        for conf in data['configurePresets']:
+            if conf['name'].endswith(str(self.settings.build_type).lower()):
+                if 'environment' not in conf:
+                    conf['environment'] = {}
+                for var, val in env.items():
+                    conf['environment'][var] = val
+        with open(presetsPath, 'w') as f:
+            json.dump(data, f, indent=2)
 
     def _get_qt_version(self):
         if self.options.qt_package == "system":
@@ -128,6 +156,9 @@ class ImtCoreConan(ConanFile):
         tc.variables["USE_GEO"] = False
         tc.variables["USE_FIND_PACKAGE"] = True
         tc.variables["CMAKE_CXX_STANDARD"] = 17
+        tc.variables['BUILDDIR'] = self.build_path.as_posix()
+        tc.variables['IMTCOREDIR_BUILD'] = self.build_path.as_posix()
+        tc.variables['PYTHONEXE'] = Path(sys.executable).as_posix()
         tc.generate()
 
         env = Environment()
@@ -139,6 +170,11 @@ class ImtCoreConan(ConanFile):
         buildEnv = VirtualBuildEnv(self)
         buildEnv.generate()
         self._print_env(buildEnv.environment().vars(self))
+
+        env = buildEnv.environment().compose_env(env).vars(self)
+        self._write_env_to_presets({
+            var: val for var, val in env.items()
+            if var.startswith('ACF') or var.startswith('IACF') or var.startswith('IMTCORE')})
 
         # AcfPublic shall be both build_requires() and requires() dependency because of the Arxc compiler tool
         # However, we want to make things simple and use only requires()
@@ -152,11 +188,7 @@ class ImtCoreConan(ConanFile):
 
     def build(self):
         cmake = CMake(self)
-        self.output.info("Building toolset")
-        cmake.configure(build_script_folder='Build/CMake', variables={"IMT_BUILD_ONLYTOOLS": True})
-        cmake.build()
-        self.output.info("Building ImtCore libraries")
-        cmake.configure(build_script_folder='Build/CMake', variables={"IMT_BUILD_ONLYTOOLS": False})
+        cmake.configure(build_script_folder='Build/CMake')
         cmake.build()
 
     def package_id(self):
@@ -259,15 +291,19 @@ class ImtCoreConan(ConanFile):
 
         # In editable mode with conan v2 layout() package_folder is None
         # and we need to implement our own search
-        libs = []
+        libs = set()
         for libdir in self.cpp_info.libdirs:
             for ext in ('*.a', '*.so', '*.lib', '*.dylib'):
-                libPaths = Path(self.source_path / libdir).glob(ext)
-                libs.extend(lib.stem for lib in libPaths)
-        return libs
+                libPaths = Path(self.build_path / libdir).glob(ext)
+                for lib in libPaths:
+                    lib = lib.stem
+                    if lib[:3] == 'lib' and ext != '*.lib':
+                        lib = lib[3:]
+                    libs.add(lib)
+        return list(libs)
 
     def package_info(self):
-        self.cpp_info.srcdirs = ["."]
+        #self.cpp_info.srcdirs = ["."]
 
         self.cpp_info.includedirs = [os.path.join("AuxInclude", self._include_folder_suffix()), "Include", "Impl"]
         self.cpp_info.libdirs = [os.path.join("Lib", self._build_folder_suffix())]
@@ -276,8 +312,9 @@ class ImtCoreConan(ConanFile):
         # To support editable mode we need explicitly assign same values to conan v2 fields,
         # probably limitation of conan 1.x when using v2 features
         # HACK: we call it in package_info() instead of layout() because deps_cpp_info is needed to calculate the directory name
-        self.cpp.source.includedirs = self.cpp_info.includedirs
-        self.cpp.source.libdirs = self.cpp_info.libdirs
+        self.cpp.source.includedirs = ["Include", "Impl"]
+        self.cpp.build.includedirs = [os.path.join("AuxInclude", self._include_folder_suffix())]
+        self.cpp.build.libdirs = self.cpp_info.libdirs
 
         self.cpp_info.build_modules["cmake_find_package"] = [
             "Config/CMake/ImtCoreDesign.cmake",

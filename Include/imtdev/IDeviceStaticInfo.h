@@ -4,6 +4,7 @@
 // ACF includes
 #include <istd/IChangeable.h>
 #include <idoc/IDocumentMetaInfo.h>
+#include <iattr/IAttributesManager.h>
 
 
 namespace iprm
@@ -51,6 +52,11 @@ public:
 		Get the default device configuration
 	*/
 	virtual const iprm::IParamsSet& GetDefaultConfiguration() const = 0;
+
+	/**
+		Create device attributes manager
+	*/
+	virtual iattr::IAttributesManager* CreateAttributesManagerInstance() const = 0;
 
 	/**
 		Check if device configuration is valid
