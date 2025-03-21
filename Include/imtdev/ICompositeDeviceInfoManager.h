@@ -29,7 +29,7 @@ public:
 	virtual QByteArray AddSubDevice(
 		const QByteArray& deviceTypeId,
 		const QString& name,
-		const QString& description,
+		const QString& description = QString(),
 		const istd::IChangeable* defaultValuePtr = nullptr,
 		const QByteArray& proposedId = QByteArray()) = 0;
 	virtual bool RemoveSubDevice(const QByteArray& id) = 0;
