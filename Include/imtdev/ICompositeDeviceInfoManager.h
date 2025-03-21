@@ -25,11 +25,12 @@ class ICompositeDeviceInfoManager: virtual public ICompositeDeviceInfo
 public:
 	virtual imtdev::IDeviceInstanceInfoManager* GetDeviceInstanceInfo() = 0;
 	virtual ICompositeDeviceInfoManager* GetSubDeviceInfo(const QByteArray& subDeviceId) = 0;
+	virtual QSet<QByteArray> GetSupportedSubDeviceTypeIds() const = 0;
 	virtual QByteArray AddSubDevice(
 		const QByteArray& deviceTypeId,
 		const QString& name,
 		const QString& description,
-		const istd::IChangeable* defaultValuePtr,
+		const istd::IChangeable* defaultValuePtr = nullptr,
 		const QByteArray& proposedId = QByteArray()) = 0;
 	virtual bool RemoveSubDevice(const QByteArray& id) = 0;
 };
