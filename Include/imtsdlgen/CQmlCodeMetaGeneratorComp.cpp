@@ -81,8 +81,7 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 		m_qmlKeysFilePtr.SetPtr(new QFile(outputDirectoryPath + '/' + GetQmlKeysWrappedName(sdlType.GetName()) + ".qml"));
 
 		if (!BeginQmlFile(sdlType)){
-			SendErrorMessage(0, QString("Unable to begin files"));
-			I_CRITICAL();
+			SendErrorMessage(0, QString("Unable to process files"));
 
 			return TS_INVALID;
 		}
@@ -153,7 +152,7 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 			QmldirFileInfo subtypeQmldirFileInfo;
 			subtypeQmldirFileInfo.IsSingleton = true;
 			subtypeQmldirFileInfo.Version = GetTypeVersion(sdlDocumentType);
-			QString subtypeFileName = GetQmlCollectionInfoWrappedName(sdlDocumentSubtype.GetName(), sdlDocumentSubtype.GetName());
+			QString subtypeFileName = GetQmlCollectionInfoWrappedName(sdlDocumentType.GetName(), sdlDocumentSubtype.GetName());
 			subtypeQmldirFileInfo.FileName = subtypeFileName;
 			subtypeQmldirFileInfo.Type = QString(&subtypeFileName[0], subtypeFileName.size() - 4); ///< remove '.qml'
 			qmldirFileInfoList << subtypeQmldirFileInfo;

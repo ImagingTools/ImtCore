@@ -119,8 +119,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 		// First create all files with basic methods
 		if (!BeginClassFiles(sdlType, hasExtDeps || !joinHeaders, !joinSources)){
-			SendErrorMessage(0, QString("Unable to begin files"));
-			I_CRITICAL();
+			SendErrorMessage(0, QString("Unable to process files"));
 
 			return TS_INVALID;
 		}
@@ -355,7 +354,18 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 				if (foundType->IsExternal()){
 					QString resolvedPath = ResolveRelativeHeaderFileForType(*foundType, m_argumentParserCompPtr->GetHeadersIncludePaths(), false);
 					if (resolvedPath.isEmpty()){
-						SendErrorMessage(0, QString("Unable to find header file for type of '%1' in '%2'").arg(field.GetId(), sdlType.GetName()));
+						QString foundTypeName;
+						imtsdl::CSdlType* typePtr = dynamic_cast<imtsdl::CSdlType*>(foundType.get());
+						if (typePtr != nullptr){
+							foundTypeName = typePtr->GetName();
+						}
+						else {
+							imtsdl::CSdlEnum* enumPtr = dynamic_cast<imtsdl::CSdlEnum*>(foundType.get());
+							if (enumPtr !=nullptr){
+								foundTypeName = enumPtr->GetName();
+							}
+						}
+						SendErrorMessage(0, QString("Unable to find header file for type '%1' of '%2' in '%3' ").arg(foundTypeName, field.GetId(), sdlType.GetName()));
 
 						return false;
 					}

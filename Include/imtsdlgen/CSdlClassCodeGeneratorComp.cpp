@@ -117,8 +117,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 		// First create all files with basic methods
 		if (!BeginClassFiles(sdlType, hasExtDeps || !joinHeaders, !joinSources)){
-			SendErrorMessage(0, QString("Unable to begin files"));
-			I_CRITICAL();
+			SendErrorMessage(0, QString("Unable to process files"));
 
 			return TS_INVALID;
 		}

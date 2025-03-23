@@ -92,9 +92,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 		m_qmlFilePtr.SetPtr(new QFile(outputDirectoryPath + '/' + sdlType.GetName() + ".qml"));
 
 		if (!BeginQmlFile(sdlType)){
-			SendErrorMessage(0, QString("Unable to begin files"));
-			I_CRITICAL();
-
+			SendErrorMessage(0, QString("Unable to process files"));
 			return TS_INVALID;
 		}
 

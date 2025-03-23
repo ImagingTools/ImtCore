@@ -73,8 +73,7 @@ int CQmlCodeCommandIdGeneratorComp::DoProcessing(
 	m_qmlCommandsFilePtr.SetPtr(new QFile(GetQmlCommandIdsFilePath()));
 
 	if (!ProcessQmlFile()){
-		SendErrorMessage(0, QString("Unable to begin files"));
-		I_CRITICAL();
+		SendErrorMessage(0, QString("Unable to process files"));
 
 		return TS_INVALID;
 	}

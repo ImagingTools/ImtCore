@@ -90,15 +90,13 @@ int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 	m_sourceFilePtr.SetPtr(new QFile(WrapFileName(QStringLiteral("cpp"), outputDirectoryPath)));
 
 	if (!ProcessFiles(!joinHeaders, !joinSources)){
-		SendErrorMessage(0, QString("Unable to begin files"));
-		I_CRITICAL();
+		SendErrorMessage(0, QString("Unable to process files"));
 
 		return TS_INVALID;
 	}
 
 	if (!CloseFiles()){
 		SendErrorMessage(0, QString("Unable to finalize files"));
-		I_CRITICAL();
 
 		return TS_INVALID;
 	}

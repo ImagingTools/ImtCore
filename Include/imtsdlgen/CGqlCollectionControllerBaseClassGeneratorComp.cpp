@@ -106,15 +106,13 @@ int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 		m_sourceFilePtr.SetPtr(new QFile(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("cpp"), outputDirectoryPath)));
 
 		if (!ProcessFiles(sdlDocumentType, !joinHeaders, !joinSources)){
-			SendErrorMessage(0, QString("Unable to begin files"));
-			I_CRITICAL();
+			SendErrorMessage(0, QString("Unable to process files"));
 
 			return TS_INVALID;
 		}
 
 		if (!CloseFiles()){
 			SendErrorMessage(0, QString("Unable to finalize files"));
-			I_CRITICAL();
 
 			return TS_INVALID;
 		}
