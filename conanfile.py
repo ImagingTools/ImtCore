@@ -53,6 +53,9 @@ class ImtCoreConan(ConanFile):
         return self.python_requires["conantools"].module
 
     def set_version(self):
+        if self.version is not None:
+            self.output.warning(f'Version overriden')
+            return self.version
         git = Git(self)
         self.version = 'git.' + git.get_commit()[:8]
         if git.is_dirty():
