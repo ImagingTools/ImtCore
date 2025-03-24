@@ -4,6 +4,7 @@
 // ACF includes
 #include <iprm/IOptionsList.h>
 #include <iprm/IParamsSet.h>
+#include <idoc/IDocumentMetaInfo.h>
 
 // Acula includes
 #include <imtdev/IDeviceInstanceInfo.h>
@@ -20,6 +21,11 @@ namespace imtdev
 class IDeviceDataProvider: virtual public imtdev::IDeviceInstanceInfo
 {
 public:
+	/**
+		Get device metainfo
+	*/
+	virtual idoc::IDocumentMetaInfo* GetDeviceMetaInfo() const = 0;
+
 	/**
 		Get the group info list for the data stored on the device.
 	*/
