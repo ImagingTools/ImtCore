@@ -5,23 +5,23 @@
 #include <iattr/IAttributesProvider.h>
 #include <iser/IVersionInfo.h>
 
+// ImtCore includes
+#include <imtdev/IDeviceStaticInfo.h>
+
 
 namespace imtdev
 {
 
 
-class IDeviceStaticInfo;
-
-
+/**
+	Interface for describing information about a device instance
+*/
 class IDeviceInstanceInfo: virtual public istd::IChangeable
 {
 public:
-	enum IdTypes
+	enum IdentifierTypes
 	{
-		IT_SERIAL,
-		IT_MAC,
-		IT_IPv4,
-		IT_IPv6
+		IT_SERIAL
 	};
 
 	enum VersionIds
@@ -37,12 +37,12 @@ public:
 	/**
 		Get device static info associated with device instance
 	*/
-	virtual const IDeviceStaticInfo& GetDeviceStaticInfo() const = 0;
+	virtual const IDeviceStaticInfo& GetStaticInfo() const = 0;
 
 	/**
 		Get the device ID for the given IdType
 	*/
-	virtual QByteArray GetDeviceIdentifier(int idType) const = 0;
+	virtual QByteArray GetIdentifier(int idType) const = 0;
 
 	/**
 		Get device instance version
@@ -52,11 +52,11 @@ public:
 	/**
 		Get device instance attributes provider
 	*/
-	virtual const iattr::IAttributesProvider* GetDeviceAttributes() const = 0;
+	virtual const iattr::IAttributesProvider* GetAttributes() const = 0;
 };
 
 
-typedef QSharedPointer<IDeviceInstanceInfo> DeviceInstanceInfoPtr;
+typedef std::shared_ptr<IDeviceInstanceInfo> DeviceInstanceInfoPtr;
 
 
 } // namespace imtdev

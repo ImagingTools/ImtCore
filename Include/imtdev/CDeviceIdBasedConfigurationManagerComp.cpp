@@ -30,7 +30,7 @@ DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfigur
 			staticInfoPtr = m_deviceControllerCompPtr->GetDeviceStaticInfo(deviceTypeId);
 		}
 
-		if (staticInfoPtr != nullptr && staticInfoPtr->GetDeviceTypeId() == deviceTypeId){
+		if (staticInfoPtr != nullptr && staticInfoPtr->GetTypeId() == deviceTypeId){
 			if (m_configurations.contains(deviceId) && m_configurations[deviceId].deviceTypeId == deviceTypeId){
 				if (staticInfoPtr->AreConfigurationAccepted(*m_configurations[deviceId].configurationPtr.data())) {
 					configurationPtr.reset(new iprm::CParamsSet());
@@ -60,7 +60,7 @@ bool CDeviceIdBasedConfigurationManagerComp::SetDeviceConfiguration(
 			staticInfoPtr = m_deviceControllerCompPtr->GetDeviceStaticInfo(deviceTypeId);
 		}
 
-		if (staticInfoPtr != nullptr && staticInfoPtr->GetDeviceTypeId() == deviceTypeId){
+		if (staticInfoPtr != nullptr && staticInfoPtr->GetTypeId() == deviceTypeId){
 			if (staticInfoPtr->AreConfigurationAccepted(configuration)){
 				DeviceConfigurationPtr deviceConfigurationPtr(new iprm::CParamsSet);
 				if (deviceConfigurationPtr->CopyFrom(configuration)){
@@ -163,8 +163,8 @@ const IDeviceStaticInfo* CDeviceIdBasedConfigurationManagerComp::FindDeviceStati
 {
 	if (!deviceId.isEmpty() && m_deviceControllerCompPtr.IsValid()){
 		DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_deviceControllerCompPtr->GetDeviceInstanceInfo("", deviceId);
-		if (!deviceInstanceInfoPtr.isNull()){
-			return &deviceInstanceInfoPtr->GetDeviceStaticInfo();
+		if (deviceInstanceInfoPtr != nullptr){
+			return &deviceInstanceInfoPtr->GetStaticInfo();
 		}
 	}
 

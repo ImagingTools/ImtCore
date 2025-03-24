@@ -276,7 +276,7 @@ void CCompositeDeviceControllerComp::UpdateDeviceTypeIdList()
 					const IDeviceStaticInfo* staticInfoPtr = deviceControllerPtr->GetDeviceStaticInfo(id);
 
 					if (staticInfoPtr != nullptr){
-						m_deviceTypeList.InsertItem(id, staticInfoPtr->GetDeviceTypeName(), "");
+						m_deviceTypeList.InsertItem(id, staticInfoPtr->GetTypeName(), "");
 					}
 				}
 
@@ -361,8 +361,8 @@ void CCompositeDeviceControllerComp::UpdateExtendedDeviceList()
 QByteArray CCompositeDeviceControllerComp::GetDeviceTypeId(const QByteArray& deviceId) const
 {
 	DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo("", deviceId);
-	if (!instanceInfoPtr.isNull()){
-		QByteArray deviceTypeId = instanceInfoPtr->GetDeviceStaticInfo().GetDeviceTypeId();
+	if (instanceInfoPtr != nullptr){
+		QByteArray deviceTypeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
 
 		return deviceTypeId;
 	}
@@ -395,10 +395,10 @@ bool CCompositeDeviceControllerComp::DeviceConnectionState::IsDeviceConnected(co
 			QByteArrayList deviceIds = m_parentPtr->m_deviceControllerMap.keys();
 			for (int i = 0; i < deviceIds.count(); i++){
 				DeviceInstanceInfoPtr instancePtr = m_parentPtr->GetDeviceInstanceInfo("", deviceIds[i]);
-				Q_ASSERT(!instancePtr.isNull());
+				Q_ASSERT(instancePtr != nullptr);
 
-				if (!instancePtr.isNull()){
-					if (instancePtr->GetDeviceStaticInfo().GetDeviceTypeId() == deviceId){
+				if (instancePtr != nullptr){
+					if (instancePtr->GetStaticInfo().GetTypeId() == deviceId){
 						return true;
 					}
 				}
