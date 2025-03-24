@@ -16,12 +16,12 @@ class ICompositeDeviceInstanceInfoEditor : virtual public ICompositeDeviceInstan
 {
 public:
 	virtual QByteArray AddSubDevice(
-		const QByteArray& deviceTypeId,
-		const QString& name,
-		const QString& description = QString(),
-		const istd::IChangeable* defaultValuePtr = nullptr,
-		const QByteArray& proposedId = QByteArray()) = 0;
-	virtual bool RemoveSubDevice(const QByteArray& id) = 0;
+				const QByteArray& deviceTypeId,
+				const QString& name,
+				const QString& description = QString(),
+				const istd::IChangeable* defaultValuePtr = nullptr,
+				const QByteArray& proposedId = QByteArray()) = 0;
+	virtual bool RemoveSubDevice(const QByteArray& subDeviceId) = 0;
 };
 
 

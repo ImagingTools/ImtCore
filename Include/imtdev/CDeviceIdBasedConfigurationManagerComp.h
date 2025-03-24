@@ -29,11 +29,11 @@ class CDeviceIdBasedConfigurationManagerComp:
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CDeviceIdBasedConfigurationManagerComp)
+	I_BEGIN_COMPONENT(CDeviceIdBasedConfigurationManagerComp)
 		I_REGISTER_INTERFACE(IDeviceConfigurationManager);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(istd::IChangeable);
-		I_ASSIGN(m_deviceControllerCompPtr, "DeviceController", "Device controller for creating and validating configurations", false, "");
+		I_ASSIGN(m_deviceControllerCompPtr, "DeviceController", "Device controller for creating and validating configurations", false, "DeviceController");
 		I_ASSIGN_MULTI_0(m_deviceConfigurationFactoryCompPtr, "ConfigurationFactory", "Configuration factories for deserialization", false);
 	I_END_COMPONENT;
 

@@ -40,9 +40,9 @@ public:
 	virtual const IDeviceStaticInfo& GetStaticInfo() const = 0;
 
 	/**
-		Get the device ID for the given IdType
+		Get the device-ID related to the given type of the identifier.
 	*/
-	virtual QByteArray GetIdentifier(int idType) const = 0;
+	virtual QByteArray GetIdentifier(int identifierType) const = 0;
 
 	/**
 		Get device instance version

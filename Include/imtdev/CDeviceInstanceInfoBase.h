@@ -71,7 +71,7 @@ protected:
 	mutable imod::CModelUpdateBridge m_updateBridge;
 
 private:
-	bool EnsureAttributes();
+	bool EnsureAttributesCreated() const;
 
 private:
 	QMap<int, QByteArray> m_identifiers;

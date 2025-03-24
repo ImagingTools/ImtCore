@@ -1,4 +1,4 @@
-#include "CDeviceInstanceInfoBase.h"
+#include <imtdev/CDeviceInstanceInfoBase.h>
 
 
 // ACF includes
@@ -45,9 +45,7 @@ bool CDeviceInstanceInfoBase::SetVersion(int versionId, quint32 version, const Q
 
 iattr::IAttributesManager* CDeviceInstanceInfoBase::GetAttributesManager()
 {
-	if (m_attributesPtr == nullptr){
-		m_attributesPtr.reset(GetStaticInfo().CreateAttributes());
-	}
+	EnsureAttributesCreated();
 
 	return dynamic_cast<iattr::IAttributesManager*>(m_attributesPtr.get());
 }
@@ -73,6 +71,8 @@ const iser::IVersionInfo& CDeviceInstanceInfoBase::GetVersion() const
 
 const iattr::IAttributesProvider* CDeviceInstanceInfoBase::GetAttributes() const
 {
+	EnsureAttributesCreated();
+
 	return m_attributesPtr.get();
 }
 
@@ -101,7 +101,8 @@ bool CDeviceInstanceInfoBase::CopyFrom(const IChangeable& object, CompatibilityM
 		if (retVal) {
 			const iattr::IAttributesProvider* sourceAttributesPtr = sourcePtr->GetAttributes();
 			if (sourceAttributesPtr != nullptr){
-				if (retVal = EnsureAttributes()){
+				retVal = EnsureAttributesCreated();
+				if (retVal){
 					retVal = m_attributesPtr->CopyFrom(*sourceAttributesPtr);
 				}
 			}
@@ -120,6 +121,7 @@ bool CDeviceInstanceInfoBase::ResetData(CompatibilityMode mode)
 
 	m_identifiers.clear();
 	m_attributesPtr.reset();
+
 	bool retVal = m_versionInfo.ResetData();
 
 	return retVal;
@@ -128,7 +130,7 @@ bool CDeviceInstanceInfoBase::ResetData(CompatibilityMode mode)
 
 // private metods
 
-bool CDeviceInstanceInfoBase::EnsureAttributes()
+bool CDeviceInstanceInfoBase::EnsureAttributesCreated() const
 {
 	if (m_attributesPtr == nullptr){
 		m_attributesPtr.reset(GetStaticInfo().CreateAttributes());
@@ -229,3 +231,5 @@ bool CDeviceInstanceInfoBase::VersionInfo::ResetData(CompatibilityMode mode)
 
 
 } // namespace imtdev
+
+

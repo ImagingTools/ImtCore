@@ -41,9 +41,9 @@ public:
 	virtual const IDeviceInstanceInfo* GetSubDeviceInstanceInfo(const QByteArray& subDeviceId) const override;
 
 	// reimplemented (istd::IChangeable)
-	int GetSupportedOperations() const override;
-	bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual int GetSupportedOperations() const override;
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
 	virtual IDeviceInstanceInfo* CreateDeviceInstanceInfo(const QByteArray& deviceTypeId) const;
@@ -55,30 +55,39 @@ private:
 		void SetParent(CCompositeDeviceInstanceInfoBase* parentPtr);
 
 		// reimpolemented (imtbase::ICollectionInfo)
-		int GetElementsCount(
+		virtual int GetElementsCount(
 			const iprm::IParamsSet* selectionParamsPtr = nullptr,
 			ilog::IMessageConsumer* logPtr = nullptr) const override;
-		Ids GetElementIds(
+		virtual Ids GetElementIds(
 			int offset = 0,
 			int count = -1,
 			const iprm::IParamsSet* selectionParamsPtr = nullptr,
 			ilog::IMessageConsumer* logPtr = nullptr) const override;
-		bool GetSubsetInfo(
+		virtual bool GetSubsetInfo(
 			ICollectionInfo& subsetInfo,
 			int offset = 0,
 			int count = -1,
 			const iprm::IParamsSet* selectionParamsPtr = nullptr,
 			ilog::IMessageConsumer* logPtr = nullptr) const override;
-		QVariant GetElementInfo(
-			const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr = nullptr) const override;
-		idoc::MetaInfoPtr GetElementMetaInfo(
-			const Id& elementId, ilog::IMessageConsumer* logPtr = nullptr) const override;
-		bool SetElementName(
-			const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr = nullptr) override;
-		bool SetElementDescription(
-			const Id& elementId, const QString& description, ilog::IMessageConsumer* logPtr = nullptr) override;
-		bool SetElementEnabled(
-			const Id& elementId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) override;
+		virtual QVariant GetElementInfo(
+					const Id& elementId,
+					int infoType,
+					ilog::IMessageConsumer* logPtr = nullptr) const override;
+		virtual idoc::MetaInfoPtr GetElementMetaInfo(
+					const Id& elementId,
+					ilog::IMessageConsumer* logPtr = nullptr) const override;
+		virtual bool SetElementName(
+					const Id& elementId,
+					const QString& name,
+					ilog::IMessageConsumer* logPtr = nullptr) override;
+		virtual bool SetElementDescription(
+					const Id& elementId,
+					const QString& description,
+					ilog::IMessageConsumer* logPtr = nullptr) override;
+		virtual bool SetElementEnabled(
+					const Id& elementId,
+					bool isEnabled = true,
+					ilog::IMessageConsumer* logPtr = nullptr) override;
 
 	private:
 		CCompositeDeviceInstanceInfoBase* m_parentPtr;
@@ -102,3 +111,5 @@ private:
 
 
 } // namespace imtdev
+
+
