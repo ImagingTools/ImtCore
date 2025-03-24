@@ -131,6 +131,10 @@ bool CCompositeDeviceInstanceInfoBase::CopyFrom(const IChangeable& object, Compa
 {
 	const CCompositeDeviceInstanceInfoBase* sourcePtr = dynamic_cast<const CCompositeDeviceInstanceInfoBase*>(&object);
 	if (sourcePtr != nullptr) {
+		if (GetStaticInfo().GetTypeId() != sourcePtr->GetStaticInfo().GetTypeId()){
+			return false;
+		}
+
 		istd::CChangeNotifier notifier(this);
 
 		RemoveAllSubDevices();

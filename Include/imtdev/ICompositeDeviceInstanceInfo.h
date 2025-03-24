@@ -44,7 +44,7 @@ public:
 };
 
 
-typedef std::unique_ptr<ICompositeDeviceInstanceInfo> CompositeDeviceInstanceInfoPtr;
+typedef std::shared_ptr<ICompositeDeviceInstanceInfo> CompositeDeviceInstanceInfoPtr;
 
 
 } // namespace imtdev

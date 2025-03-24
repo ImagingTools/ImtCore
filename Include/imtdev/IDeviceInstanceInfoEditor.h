@@ -36,7 +36,7 @@ public:
 };
 
 
-typedef std::unique_ptr<IDeviceInstanceInfoEditor> DeviceInstanceInfoEditorPtr;
+typedef std::shared_ptr<IDeviceInstanceInfoEditor> DeviceInstanceInfoEditorPtr;
 
 
 } // namespace imtdev

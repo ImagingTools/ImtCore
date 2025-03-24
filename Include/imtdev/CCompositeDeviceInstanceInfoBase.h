@@ -104,7 +104,6 @@ private:
 		DeviceInstanceInfoPtr instanceInfoPtr;
 	};
 
-	mutable CompositeDeviceStaticInfoPtr m_compositeStaticInfoPtr;
 	QMap<QByteArray, SubDeviceItem> m_subDeviceMap;
 	imod::TModelWrap<SubDeviceCollectionInfo> m_subDeviceCollection;
 };

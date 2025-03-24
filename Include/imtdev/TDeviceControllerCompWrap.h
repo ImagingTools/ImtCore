@@ -12,7 +12,7 @@
 
 // Acula includes
 #include <imtdev/IDeviceController.h>
-#include <imtdev/IDeviceInfo.h>
+#include <imtdev/IDeviceInstanceInfo.h>
 
 
 namespace imtdev
@@ -36,7 +36,7 @@ public:
 
 	// pseudo-reimplemented (IDeviceController)
 	virtual const iprm::IOptionsList& GetDeviceInfoList() const override;
-	virtual const IDeviceInfo* GetDeviceInfo(const QByteArray& deviceId) const override;
+	virtual const IDeviceInstanceInfo* GetDeviceInfo(const QByteArray& deviceId) const override;
 	virtual int GetDeviceCapabilities(const QByteArray& deviceId) const override;
 	virtual IDeviceController::DeviceState GetDeviceState(const QByteArray& deviceId) const override;
 	virtual bool InitializeDevice(const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr = nullptr) override;
@@ -137,7 +137,7 @@ inline const iprm::IOptionsList& TDeviceControllerCompWrap<Base>::GetDeviceInfoL
 
 
 template<class Base>
-inline const IDeviceInfo* TDeviceControllerCompWrap<Base>::GetDeviceInfo(const QByteArray& deviceId) const
+inline const IDeviceInstanceInfo* TDeviceControllerCompWrap<Base>::GetDeviceInfo(const QByteArray& deviceId) const
 {
 	QMutexLocker lock(&m_deviceMapMutex);
 
@@ -150,6 +150,7 @@ inline const IDeviceInfo* TDeviceControllerCompWrap<Base>::GetDeviceInfo(const Q
 
 	return nullptr;
 }
+
 
 template<class Base>
 inline int TDeviceControllerCompWrap<Base>::GetDeviceCapabilities(const QByteArray & deviceId) const
