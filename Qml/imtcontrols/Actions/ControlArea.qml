@@ -28,7 +28,14 @@ MouseArea{
         this.coord = coord_;
         this.coordPressed = coord_;
         if(movingItem){
-            this.insideMovingItem = checkInsideMovingItem(movingItem.x, movingItem.y, movingItem.width, movingItem.height);
+			let scaleOffsetX = (movingItem.width - movingItem.width * movingItem.scale)/2
+			let scaleOffsetY = (movingItem.height - movingItem.height * movingItem.scale)/2
+
+			let x_ = movingItem.x + scaleOffsetX
+			let y_ = movingItem.y + scaleOffsetY;
+			let width_ = movingItem.width * movingItem.scale
+			let height_ = movingItem.height * movingItem.scale
+			this.insideMovingItem = checkInsideMovingItem(x_, y_, width_, height_);
         }
 
         wasMoving = false;
@@ -70,7 +77,14 @@ MouseArea{
 
     function movingFunction(delta){
         if(movingItem){
-            let withinBorders_ = withinBorders(delta, movingItem.x, movingItem.y, movingItem.width, movingItem.height);
+			let scaleOffsetX = (movingItem.width - movingItem.width * movingItem.scale)/2
+			let scaleOffsetY = (movingItem.height - movingItem.height * movingItem.scale)/2
+
+			let x_ = movingItem.x + scaleOffsetX
+			let y_ = movingItem.y + scaleOffsetY;
+			let width_ = movingItem.width * movingItem.scale
+			let height_ = movingItem.height * movingItem.scale
+			let withinBorders_ = withinBorders(delta, x_, y_, width_, height_);
 
             if(insideMovingItem && withinBorders_){
                 movingItem.x += delta.x;
@@ -110,17 +124,31 @@ MouseArea{
     }
 
     function wheelFunction(wheelDelta){
-        if(wheelTargetItem && hasWheelControl){
+		if(wheelTargetItem && hasWheelControl && withinWheelTargetItem()){
             if(wheelDelta > 0){//up
                 wheelTargetItem.scale += scaleStep
             }
             else{//down
-                if(wheelTargetItem.scale > scaleStep){
+				if(wheelTargetItem.scale > 2* scaleStep){
                     wheelTargetItem.scale -= scaleStep
                 }
             }
         }
     }
+
+	function withinWheelTargetItem () {
+		let ok = false;
+		let scaleOffsetX = (wheelTargetItem.width - wheelTargetItem.width * wheelTargetItem.scale)/2
+		let scaleOffsetY = (wheelTargetItem.height - wheelTargetItem.height * wheelTargetItem.scale)/2
+		ok =
+				mouseX >= wheelTargetItem.x + scaleOffsetX
+				&& mouseX <= wheelTargetItem.x + scaleOffsetX + wheelTargetItem.width * wheelTargetItem.scale
+				&& mouseY >= wheelTargetItem.y + scaleOffsetY
+				&& mouseY <= wheelTargetItem.y + scaleOffsetY + wheelTargetItem.height * wheelTargetItem.scale
+
+		return ok;
+
+	}
 
 
 }//controlArea
