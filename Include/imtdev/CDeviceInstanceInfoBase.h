@@ -40,9 +40,6 @@ public:
 	bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	virtual const IDeviceStaticInfo& GetStaticInfo() const override = 0;
-
-protected:
 	class VersionInfo : virtual public iser::IVersionInfo
 	{
 	public:
