@@ -257,6 +257,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 	return TS_OK;
 }
 
+
 bool CSdlClassCodeGeneratorComp::BeginClassFiles(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude, bool addSelfHeaderInclude)
 {
 	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
@@ -379,7 +380,6 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 			}
 		}
 	}
-
 
 	// add all required includes
 	QList<imtsdl::Priority> orderList = {
@@ -527,8 +527,38 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 	stream << '}';
 	FeedStream(stream, 3, false);
 
+	// implement coparation operator
+	stream << QStringLiteral("bool C");
+	stream << sdlType.GetName();
+	stream << ':' << ':';
+	stream << GetSdlEntryVersion(sdlType);
+	stream << QStringLiteral("::operator==(const ");
+	stream << GetSdlEntryVersion(sdlType);
+	stream << QStringLiteral("& other) const");
+	FeedStream(stream, 1, false);
 
+	stream << '{';
+	FeedStream(stream, 1, false);
 
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("return ");
+	FeedStream(stream, 1, true);
+
+	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
+		FeedStreamHorizontally(stream, 4);
+		stream << sdlField.GetId();
+		stream << QStringLiteral(" == other.");
+		stream << sdlField.GetId();
+		stream << QStringLiteral(" &&");
+		FeedStream(stream, 1, true);
+	}
+
+	stream.seek(stream.pos() - 4); /// < remove last ' &&'
+	stream << ';';
+	FeedStream(stream, 1, false);
+
+	stream << '}';
+	FeedStream(stream, 3, false);
 
 	return true;
 }
@@ -746,7 +776,21 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 	// add GetVersionId method
 	FeedStreamHorizontally(stream, indents + 1);
 	stream << QStringLiteral("static QByteArray GetVersionId();");
-	FeedStream(stream, indents, false);
+	FeedStream(stream, 2, false);
+
+	// add coparation operators
+	FeedStreamHorizontally(stream, indents + 1);
+	stream << QStringLiteral("[[nodiscard]] bool operator==(const ");
+	stream << GetSdlEntryVersion(sdlType);
+	stream << QStringLiteral("& other) const;");
+	FeedStream(stream, 1, false);
+
+	// add inverted coparation operator
+	FeedStreamHorizontally(stream, indents + 1);
+	stream << QStringLiteral("[[nodiscard]] bool operator!=(const ");
+	stream << GetSdlEntryVersion(sdlType);
+	stream << QStringLiteral("& other) const {return !(operator==(other));}");
+	FeedStream(stream, 1, false);
 }
 
 
