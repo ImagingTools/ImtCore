@@ -104,7 +104,7 @@ public:
 	[[nodiscard]] static QString GetFileSystemAcceptableEntryPath(const QString& originalText);
 	[[nodiscard]] static QString BuildNamespaceFromComponents(const QString& schemaNamespace, const QString& schemaName, const QString& versionName);
 	[[nodiscard]] static QString BuildNamespaceFromParams(const iprm::IParamsSet& schemaParams, bool addVersion = true, bool addPrefix = false);
-	[[nodiscard]] static QString BuildQmlImportDeclarationFromParams(const iprm::IParamsSet& schemaParams, const QString& suffix);
+	[[nodiscard]] static QString BuildQmlImportDeclarationFromParams(const iprm::IParamsSet& schemaParams, const QString& suffix, bool addVersion = true);
 	[[nodiscard]] static QString GetNamespaceFromParamsOrArguments(
 				const SchemaParamsCompPtr& schemaParamsCompPtr,
 				const ArgumentParserCompPtr& argumentParamsCompPtr, bool addVersion = true);

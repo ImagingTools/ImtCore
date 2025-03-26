@@ -798,7 +798,7 @@ QString CSdlTools::BuildNamespaceFromParams(const iprm::IParamsSet& schemaParams
 }
 
 
-QString CSdlTools::BuildQmlImportDeclarationFromParams(const iprm::IParamsSet& schemaParams, const QString& suffix)
+QString CSdlTools::BuildQmlImportDeclarationFromParams(const iprm::IParamsSet& schemaParams, const QString& suffix, bool addVersion)
 {
 	QString retVal;
 
@@ -820,7 +820,11 @@ QString CSdlTools::BuildQmlImportDeclarationFromParams(const iprm::IParamsSet& s
 		versionName = versionNameParamPtr->GetText();
 	}
 
-	retVal = schemaNamespace + schemaName + suffix + ' ' + versionName;
+	retVal = schemaNamespace + schemaName + suffix;
+
+	if (addVersion){
+		retVal += ' ' + versionName;
+	}
 
 	return retVal;
 }

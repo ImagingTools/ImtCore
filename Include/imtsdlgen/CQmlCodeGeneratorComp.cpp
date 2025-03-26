@@ -397,7 +397,6 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	FeedStreamHorizontally(ifStream, 2);
 	ifStream << QStringLiteral("switch (propertyId){");
 
-	const QString qmlModuleName = GetQmlModuleNameFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
 		bool isCustom = false;
 		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
@@ -411,10 +410,18 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		}
 
 		FeedStream(ifStream, 1, false);
+
+		imtsdl::CSdlType foundType;
+		[[maybe_unused]]const bool isTypeFound = GetSdlTypeForField(
+			sdlField,
+			m_sdlTypeListCompPtr->GetSdlTypes(false),
+			foundType);
+		Q_ASSERT(isTypeFound);
+
 		FeedStreamHorizontally(ifStream, 3);
 		ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId());
 		ifStream << QStringLiteral("': return Qt.createComponent('qrc:/qml/");
-		ifStream << qmlModuleName << '/';
+		ifStream << BuildQmlImportDeclarationFromParams(foundType.GetSchemaParams(), QStringLiteral("Sdl"), false) << '/';
 		ifStream << convertedType << QStringLiteral(".qml')");
 	}
 	FeedStream(ifStream, 1, false);
