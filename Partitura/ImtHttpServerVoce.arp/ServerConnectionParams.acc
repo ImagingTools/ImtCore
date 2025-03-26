@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5211" Description="ACF"/>
-            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5346" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Connection parameters for the server side</Description>
@@ -13,7 +13,7 @@
         <Element Id="ServerConnectionParams" PackageId="BasePck" ComponentId="ComposedParamsSet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="Parameters">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ServerPort</Value>
@@ -21,7 +21,7 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="ParametersId">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ServerPort</Value>
