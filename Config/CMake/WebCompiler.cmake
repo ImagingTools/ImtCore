@@ -285,15 +285,21 @@ function(jq_compile_web)
 
 endfunction(jq_compile_web)
 
-macro(getImtBaseQmlWebDirs webdirs buildwebdir)
+macro(getImtBaseQmlWebDirs webdirs buildwebdir useImtControlsStyle)
+	if (NOT DEFINED useImtControlsStyle)
+		set(useImtControlsStyle TRUE)
+	endif()
+
 	list(APPEND ${webdirs} ${IMTCOREDIR}/3rdParty/JQML2/core/dist)
 	list(APPEND ${webdirs} ${buildwebdir}/Resources)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml/Fonts)
 	list(APPEND ${webdirs} ${buildwebdir}/Resources)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml/Acf)
-	list(APPEND ${webdirs} ${buildwebdir}/src/Acf)
+	if (useImtControlsStyle)
+		list(APPEND ${webdirs} ${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml/Acf)
+		list(APPEND ${webdirs} ${buildwebdir}/src/Acf)
+	endif()
 
 	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/web)
 	list(APPEND ${webdirs} ${buildwebdir}/Resources)
@@ -382,7 +388,12 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 endmacro(getImtAuthQmlWebDirs)
 
 macro(getImtCoreQmlWebDirs webdirs buildwebdir)
-	getImtBaseQmlWebDirs(${webdirs} ${buildwebdir})
+	set(useImtControlsStyle TRUE)
+	if(${ARGC} GREATER 2)
+		set(useImtControlsStyle ${ARGV2})
+	endif()
+
+	getImtBaseQmlWebDirs(${webdirs} ${buildwebdir} ${useImtControlsStyle})
 	getImtLicQmlWebDirs(${webdirs} ${buildwebdir})
 	getImtAuthQmlWebDirs(${webdirs} ${buildwebdir})
 endmacro(getImtCoreQmlWebDirs)
