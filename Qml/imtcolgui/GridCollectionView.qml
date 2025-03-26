@@ -60,15 +60,14 @@ Item {
 
 	property alias gridElementsDelegate: gridCollectionViewBase.gridElementsDelegate;
 	property alias gridElementsModel: gridCollectionViewBase.gridElementsModel;
-	//property alias selectedIndex: gridCollectionViewBase.grid.selectedIndex;
+	// property alias selectedIndex: gridCollectionViewBase.grid.selectedIndex;
 	property int selectedIndex: gridCollectionViewBase.selectedIndex;
-	//    property alias elementsList: gridCollectionViewBase.elementsList;
-	//    property alias gridMinWidth: gridCollectionViewBase.gridMinWidth;
+	// property alias elementsList: gridCollectionViewBase.elementsList;
+	// property alias gridMinWidth: gridCollectionViewBase.gridMinWidth;
 	property alias gridDecoratorPath: gridCollectionViewBase.gridDecoratorPath;
 
-	//    property alias tableItemHeight: gridCollectionViewBase.gridItemHeight;
+	// property alias tableItemHeight: gridCollectionViewBase.gridItemHeight;
 	property alias metaInfo: collectionMetaInfo;
-	property alias commandsProvider: commandsProvider;
 	property int paginationCurrentIndex: gridCollectionViewBase.paginationCurrentIndex;
 	property alias paginationPageSize: gridCollectionViewBase.paginationPageSize;
 	property alias paginationCountAllElements: gridCollectionViewBase.paginationCountAllElements;
@@ -77,12 +76,10 @@ Item {
 
 	property string backgroundColor: Style.baseColor;
 
-	//    Component.onCompleted: {
-	//        itemId = documentsData.getData("Id", model.index);
-	//        itemName = documentsData.getData("Title", model.index);
-	//    }
-
-
+	// Component.onCompleted: {
+	// 	itemId = documentsData.getData("Id", model.index);
+	// 	itemName = documentsData.getData("Title", model.index);
+	// }
 
 	Component.onDestruction: {
 		Events.unSubscribeEvent(commandUpdateGui, updateGui);
@@ -92,18 +89,7 @@ Item {
 		Events.subscribeEvent(commandUpdateGui, updateGui);
 	}
 
-	//    onVisibleChanged: {
-	//        if (visible){
-	//            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
-	//                                                      "CommandId": commandsProvider.commandsId});
-	//            console.log("IDTEST::Model", commandsProvider.commandsModel, "IDTEST::CommandsId", commandsProvider.commandsId);
-	//        }
-	//    }
-
 	onCommandsIdChanged: {
-		commandsProvider.commandId = commandsId;
-		commandsProvider.uuid = commandsId;
-
 		gridCollectionViewBase.commandsId = commandsId;
 
 		collectionMetaInfo.gqlModelMetaInfo = commandsId + "MetaInfo";
@@ -130,12 +116,12 @@ Item {
 	function selectItem(id, name){
 		console.log("MEGATEST2")
 		let editorPath = gridCollectionViewBase.commands.objectViewEditorPath;
-		//        let editorPath = "qrc:/Chronos/DeviceElementCollectionView.qml"
+		// let editorPath = "qrc:/Chronos/DeviceElementCollectionView.qml"
 		let commandsId = gridCollectionViewBase.commands.objectViewEditorCommandsId;
 		console.log("CollectionView selectItem", id, name, commandsId, editorPath);
 
 		if (gridCollectionViewContainer.isUsedDocumentManager){
-			//            documentManagerPtr.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandId": commandsId});
+			// documentManagerPtr.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandId": commandsId});
 			documentManagerPtr.insertNewDocument(commandsId);
 		}
 		else{
@@ -256,26 +242,6 @@ Item {
 		}
 	}
 
-	CommandsProvider {
-		id: commandsProvider;
-
-		property bool ok: gridCollectionViewContainer.visible && commandId !== "";
-		onOkChanged: {
-			if (commandsModel == null){
-				commandsProvider.updateModel();
-
-				return;
-			}
-
-			if (ok){
-				commandsProvider.updateGui()
-			}
-			else{
-				commandsProvider.clearGui();
-			}
-		}
-	}
-
 	MetaInfo {
 		id: collectionMetaInfo;
 
@@ -286,10 +252,8 @@ Item {
 
 		visible: gridCollectionViewContainer.visibleMetaInfo;
 
-		//        tableData: gridCollectionViewBase.grid;
-
-		//        contentVisible: gridCollectionViewBase.grid.selectedIndex != -1;
-
+		// tableData: gridCollectionViewBase.grid;
+		// contentVisible: gridCollectionViewBase.grid.selectedIndex != -1;
 	}
 }
 
