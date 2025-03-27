@@ -5,7 +5,7 @@
 #include <iprm/CTextParam.h>
 
 // ImtCore includes
-#include <imtauth/IUserInfo.h>
+#include <imtbase/CComplexCollectionFilter.h>
 
 
 namespace imtauthdb
@@ -19,26 +19,22 @@ namespace imtauthdb
 bool CSuperuserProviderComp::SuperuserExists(QString& /*errorMessage*/) const
 {
 	if (m_userCollectionCompPtr.IsValid()) {
+		imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+		fieldFilter.fieldId = "UserId";
+		fieldFilter.filterValue = *m_superuserIdAttrPtr;
+		
+		imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+		groupFilter.fieldFilters << fieldFilter;
+		
+		imtbase::CComplexCollectionFilter complexFilter;
+		complexFilter.SetFieldsFilter(groupFilter);
+		
 		iprm::CParamsSet filterParam;
-		iprm::CParamsSet paramsSet;
-
-		iprm::CTextParam suId;
-		suId.SetText(*m_superuserIdAttrPtr);
-
-		paramsSet.SetEditableParameter("Id", &suId);
-		filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+		filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
 		imtbase::ICollectionInfo::Ids userObjectIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-		for (const imtbase::ICollectionInfo::Id& userObjectId : userObjectIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
-				const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
-				if (userInfoPtr != nullptr){
-					if (*m_superuserIdAttrPtr == userInfoPtr->GetId()){
-						return true;
-					}
-				}
-			}
+		if (!userObjectIds.isEmpty()){
+			return true;
 		}
 	}
 
