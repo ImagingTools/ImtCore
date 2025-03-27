@@ -210,6 +210,10 @@ QtObject {
 		return userManagementProvider.userMode;
 	}
 	
+	function getUserId(){
+		return userTokenProvider.userId
+	}
+	
 	function isStrongUserManagement(){
 		return userManagementProvider.userMode === "STRONG_USER_MANAGEMENT";
 	}

@@ -5,7 +5,7 @@ import imtcontrols 1.0
 TableRowDelegateBase {
 	id: tableDelegateContainer
 
-	width: tableRow.width + tableRow.anchors.leftMargin;
+	width: tableRow.width //+ tableRow.anchors.leftMargin;
 
 	TableRowViewer {
 		id: tableRow

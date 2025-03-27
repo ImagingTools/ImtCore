@@ -60,8 +60,8 @@ DecoratorBase {
 
 		visible: popupMenuListView.count > 0;
 
-        border.width: 1;
-        border.color: Style.borderColor;
+        // border.width: 1;
+        // border.color: Style.borderColor;
 
         radius: Style.buttonRadius;
 

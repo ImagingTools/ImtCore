@@ -33,8 +33,6 @@ SubscriptionClient {
 	}
 
 	function unRegisterSubscription(){
-		console.log("unRegisterSubscription", gqlCommandId);
-
 		subscriptionManager.unRegisterSubscription(pumaSub);
 	}
 

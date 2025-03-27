@@ -62,7 +62,7 @@ DecoratorBase {
 		anchors.centerIn: tabPanelDecorator;
 		height: tabPanelDecorator.height;
 		spacing: Style.sizeMainMargin;
-		// visible: !loading.visible;
+		visible: !loading.visible;
 
 		Item {
 			id: imagetabDelegate;
@@ -81,14 +81,6 @@ DecoratorBase {
 				sourceSize.height: height;
 				fillMode: Image.PreserveAspectFit;
 			}
-		}
-		
-		Loading {
-			id: loading;
-			anchors.fill: imagetabDelegate;
-			indicatorSize: 20;
-			color: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent";
-			visible: false;
 		}
 
 		Item {
@@ -151,6 +143,14 @@ DecoratorBase {
 				tabPanelDecorator.baseElement.closeSignal();
 			}
 		}
+	}
+
+	Loading {
+		id: loading;
+		anchors.fill: bg;
+		indicatorSize: 20;
+		color: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent";
+		visible: false;
 	}
 }
 

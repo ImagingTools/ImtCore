@@ -434,7 +434,7 @@ StyleComponents {
 			styleContainer.buttonTextColor = styleContainer.getThemeColor("ActiveColors", "ButtonText", dataSource);
 			styleContainer.buttonInactiveTextColor = styleContainer.getThemeColor("InactiveColors", "ButtonText", dataSource);
 
-			styleContainer.inactiveTextColor = styleContainer.getThemeColor("DisabledInActiveColors", "Text", dataSource);
+			styleContainer.inactiveTextColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
 
 			styleContainer.buttonHoverColor = styleContainer.alternateBaseColor;
 			styleContainer.buttonPressedColor = styleContainer.getThemeColor("ActiveColors", "BackgroundSelected", dataSource);

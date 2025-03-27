@@ -31,17 +31,11 @@ QtObject {
 	signal failed();
 
 	function updateModel(){
-		if (completed){
-			console.warn("Collection data already loaded")
-			//return;
-		}
-
 		container.itemsInfoModel.send();
 	}
 
 	function clearModel(){
 		collectionModel.clear();
-		completed = false;
 	}
 
 	Component.onCompleted: {
@@ -119,7 +113,6 @@ QtObject {
 
 		function onResult(data){
 			container.collectionModel = data.getData("items");
-			container.completed = true;
 			container.modelUpdated();
 		}
 

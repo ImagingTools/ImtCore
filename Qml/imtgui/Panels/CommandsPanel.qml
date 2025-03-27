@@ -138,6 +138,10 @@ Item {
 		onCommandActivated: {
 			commandsItem.commandActivated(commandId);
 		}
+		
+		onCommandsCountChanged: {
+			timer.restart();
+		}
 	}
 	
 	CommandsView {
@@ -149,6 +153,10 @@ Item {
 		onCommandActivated: {
 			commandsItem.commandActivated(commandId);
 		}
+		
+		onCommandsCountChanged: {
+			timer.restart();
+		}
 	}
 	
 	CommandsView {
@@ -159,6 +167,10 @@ Item {
 		
 		onCommandActivated: {
 			commandsItem.commandActivated(commandId);
+		}
+		
+		onCommandsCountChanged: {
+			timer.restart();
 		}
 	}
 	

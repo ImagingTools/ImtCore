@@ -36,7 +36,6 @@ QtObject {
     }
 
     function updateGui(){
-        console.log("CommandsProvider updateGui", commandId);
         Events.sendEvent("CommandsModelChanged", {"Model": commandsModel, "CommandId": uuid});
     }
 
@@ -164,8 +163,6 @@ QtObject {
 
     property GqlModel modelCommands: GqlModel {
         function updateModel() {
-            console.log("__DEBUG__modelCommands", commandsProviderContainer.commandId, JSON.stringify(commandsProviderContainer.additionInputParams))
-
             var query = Gql.GqlRequest("query", commandsProviderContainer.commandId + "Commands");
             if (Object.keys(commandsProviderContainer.additionInputParams).length > 0){
                 let inputParams = Gql.GqlObject("input");
@@ -181,7 +178,6 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, commandsProviderContainer.modelCommands);
             if (this.state === "Ready"){
                 var dataModelLocal;
 

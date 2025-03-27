@@ -12,6 +12,7 @@ ButtonDecorator {
                                        Style.buttonHoverColor : Style.buttonColor
 
     maxTextWidth: root.baseElement ? root.baseElement.width - Style.sizeMainMargin : 100;
+	backgroundItem.radius: 0
 }
 
 

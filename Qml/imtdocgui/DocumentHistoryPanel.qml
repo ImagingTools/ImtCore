@@ -76,7 +76,8 @@ Rectangle {
 		anchors.right: parent.right;
 		anchors.rightMargin: Style.sizeLargeMargin;
 		title: qsTr("History");
-
+		titleText.visible: historyPanel.width == historyPanel.contentWidth;
+		
 		controlComp: Component {
 			id: baseControlComp;
 
@@ -106,7 +107,8 @@ Rectangle {
 		anchors.bottom: parent.bottom;
 		anchors.right: parent.right;
 		anchors.rightMargin: Style.sizeLargeMargin;
-		visible: historyPanel.width !== 0;
+		// visible: historyPanel.width !== 0;
+		visible: historyPanel.width == historyPanel.contentWidth;
 		documentId: historyPanel.documentId;
 	}
 }

@@ -174,7 +174,6 @@ QtObject {
 	}
 
 	function createComponent(name){
-
 	}
 
 	function getJSONKeyForProperty(propertyId){
@@ -221,15 +220,17 @@ QtObject {
 					json += "["
 
 					for (let j = 0; j < this[key].length; j++){
+						let value = this[key][j]
 						if (j != 0){
 							json += ", "
 						}
 
-						if (typeof this[key][j] === "string"){
-							json += "\"" + this[key][j] + "\""
+						if (typeof value === "string"){
+							value = JSON.stringify(value)
+							json += value
 						}
 						else{
-							json += this[key][j]
+							json += value
 						}
 					}
 
@@ -330,7 +331,7 @@ QtObject {
 			obj = JSON.parse(escapeSpecialChars(json));
 		} catch (e) {
 			console.error(e);
-			return null;
+			return false;
 		}
 
 		return fromObject(obj)
@@ -408,5 +409,7 @@ QtObject {
 		}
 
 		finished()
+		
+		return true
 	}
 }
