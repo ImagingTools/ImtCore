@@ -261,16 +261,16 @@ class BaseClass extends QtObject {
 					json += "["
 
 					for (let j = 0; j < this[key].length; j++) {
+						let value = this[key][j]
 						if (j != 0) {
 							json += ", "
 						}
 
-						if (typeof this[key][j] === "string") {
-							json += "\"" + this[key][j] + "\""
+						if (typeof value === "string") {
+							value = JSON.stringify(value)
 						}
-						else {
-							json += this[key][j]
-						}
+						
+						json += value
 					}
 
 					json += "]"
@@ -370,7 +370,7 @@ class BaseClass extends QtObject {
 			obj = JSON.parse(this.escapeSpecialChars(json));
 		} catch (e) {
 			console.error(e);
-			return null;
+			return false;
 		}
 
 		return this.fromObject(obj)
@@ -451,6 +451,8 @@ class BaseClass extends QtObject {
 		}
 
 		this.finished()
+		
+		return true
 	}
 
 	destroy(){
