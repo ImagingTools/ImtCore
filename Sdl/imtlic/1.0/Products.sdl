@@ -32,7 +32,7 @@ type ProductItem {
 	Features: ID
 	Licenses: [LicenseData]
 	Added: String
-	LastModified: String
+	TimeStamp: String
 }
 
 type ProductsListPayload {

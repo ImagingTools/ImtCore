@@ -26,7 +26,7 @@ type LicenseItem {
 	ParentLicenses: ID
 	Features: ID
 	Added: String
-	LastModified: String
+	TimeStamp: String
 }
 
 type LicensesListPayload {

@@ -38,7 +38,7 @@ type FeatureItem {
 	IsPermission: Bool
 	Dependencies: ID
 	Added: String
-	LastModified: String
+	TimeStamp: String
 	SubFeatures: [FeatureData]
 }
 
