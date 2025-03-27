@@ -584,7 +584,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 		revisionInfo = revisionInfo.arg(qPrintable(revisionArgument.toByteArray()));
 	}
 	
-	query += QString("INSERT INTO \"%1\"(\"TypeId\", \"DocumentId\", \"Name\", \"Description\", \"Document\", \"DataMetaInfo\", \"RevisionInfo\", \"TimeStamp\", \"State\") VALUES('%2', '%3', '%4', '%5', '%6', '%7', %8, '%9', '%10');")
+	query += QString("INSERT INTO \"%1\"(\"Id\", \"TypeId\", \"DocumentId\", \"Name\", \"Description\", \"Document\", \"DataMetaInfo\", \"RevisionInfo\", \"TimeStamp\", \"State\") VALUES('%11', '%2', '%3', '%4', '%5', '%6', '%7', %8, '%9', '%10');")
 				 .arg(
 					qPrintable(*m_tableNameAttrPtr),
 					qPrintable(typeId),
@@ -595,7 +595,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 					SqlEncode(metaInfoRepresentation),
 					revisionInfo,
 					QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
-					"Active"
+					"Active",
+					QUuid::createUuid().toString(QUuid::WithoutBraces)
 					);
 	
 	
@@ -798,9 +799,14 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 				root.*,
 				root1."TimeStamp" as "Added" %4
 			FROM %1"%2" as root
-			LEFT JOIN %1"%2" AS root1 
-				ON root."DocumentId" = root1."DocumentId" 
-				AND (root1."RevisionInfo"->>'RevisionNumber')::int = 1
+			LEFT JOIN LATERAL (
+				SELECT *
+				FROM %1"%2" AS root1
+				WHERE root."DocumentId" = root1."DocumentId" 
+					AND (root1."RevisionInfo"->>'RevisionNumber')::int = 1
+				ORDER BY root1."TimeStamp" DESC
+				LIMIT 1
+			) AS root1 ON true
 			%3
 			WHERE root."State" = 'Active'
 		)")
@@ -902,7 +908,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::IComplexCo
 {
 	bool retVal = BaseClass::CreateSortQuery(collectionFilter, sortQuery);
 	
-	SubstituteFieldIds(sortQuery);
+	SubstituteFieldIds(sortQuery, false);
 	
 	return retVal;
 }
@@ -1129,7 +1135,7 @@ const ifile::IFilePersistence* CSqlDatabaseDocumentDelegateComp::FindDocumentPer
 }
 
 
-void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query) const
+void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool castToStr) const
 {
 	static QRegularExpression regexp("(\\\"[^\\\"]{1,}\\\")");
 	
@@ -1156,7 +1162,7 @@ void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query) const
 		substitute.replace("\"", "");
 		
 		if (!s_filterableColumns.contains(substitute)){
-			substitute = QString("root.\"DataMetaInfo\"->>'%1'").arg(substitute);
+			substitute = QString("root.\"DataMetaInfo\"%0'%1'").arg(castToStr ? "->>" : "->", substitute);
 			query.replace(item, substitute);
 		}
 		else if (substitute != s_addedColumn){

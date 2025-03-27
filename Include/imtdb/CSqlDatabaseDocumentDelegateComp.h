@@ -127,7 +127,7 @@ protected:
 	virtual bool CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const;
 	virtual bool CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const;
 	const ifile::IFilePersistence* FindDocumentPersistence(const QByteArray& typeId) const;
-	void SubstituteFieldIds(QString& query) const;
+	void SubstituteFieldIds(QString& query, bool castToStr = true) const;
 	virtual QByteArray GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const;
 	virtual QByteArray CreateJoinTablesQuery() const;
 	virtual QByteArray GetCustomColumnsQuery() const;
