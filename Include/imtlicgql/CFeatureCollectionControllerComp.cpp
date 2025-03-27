@@ -241,11 +241,11 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.Added = std::make_optional<QString>(added);
 	}
 
-	if (requestInfo.items.isLastModifiedRequested){
-		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("Timestamp").toDateTime().toUTC();
+	if (requestInfo.items.isTimeStampRequested){
+		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("TimeStamp").toDateTime().toUTC();
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.LastModified = std::make_optional<QString>(lastModified);
+		representationObject.TimeStamp = std::make_optional<QString>(lastModified);
 	}
 
 	return true;

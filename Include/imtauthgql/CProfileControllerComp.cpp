@@ -30,15 +30,22 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CProfileControllerComp");
 		return sdl::imtauth::Profile::CProfileData();
 	}
+	
+	sdl::imtauth::Profile::GetProfileRequestArguments arguments = getProfileRequest.GetRequestedArguments();
 
-	sdl::imtauth::Profile::CGetProfileInput::V1_0 inputArgument = *getProfileRequest.GetRequestedArguments().input.Version_1_0;
-	QByteArray objectId;
-	if (inputArgument.id){
-		objectId = *inputArgument.id;
+	if (!arguments.input.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return sdl::imtauth::Profile::CProfileData();
 	}
+	
+	QByteArray objectId;
+	if (arguments.input.Version_1_0->id){
+		objectId = *arguments.input.Version_1_0->id;
+	}
+
 	QByteArray productId;
-	if (inputArgument.productId){
-		productId = *inputArgument.productId;
+	if (arguments.input.Version_1_0->productId){
+		productId = *arguments.input.Version_1_0->productId;
 	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -49,6 +56,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to get a profile info. Error: User with ID '%1' does not exists").arg(qPrintable(objectId));
+		SendErrorMessage(0, errorMessage, "CProfileControllerComp");
 		return sdl::imtauth::Profile::CProfileData();
 	}
 
@@ -164,11 +172,16 @@ sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 
 		return sdl::imtauth::Profile::CSetProfileResponse();
 	}
+	
+	sdl::imtauth::Profile::SetProfileRequestArguments arguments = setProfileRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return sdl::imtauth::Profile::CSetProfileResponse();
+	}
 
-	sdl::imtauth::Profile::CSetProfileInput::V1_0 inputArgument = *setProfileRequest.GetRequestedArguments().input.Version_1_0;
 	QByteArray id;
-	if (inputArgument.id){
-		id = *inputArgument.id;
+	if (arguments.input.Version_1_0->id){
+		id = *arguments.input.Version_1_0->id;
 	}
 
 	imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -183,12 +196,13 @@ sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 	}
 
 	QString name;
-	if (inputArgument.name){
-		name = *inputArgument.name;
+	if (arguments.input.Version_1_0->name){
+		name = *arguments.input.Version_1_0->name;
 	}
+
 	QString email;
-	if (inputArgument.email){
-		email = *inputArgument.email;
+	if (arguments.input.Version_1_0->email){
+		email = *arguments.input.Version_1_0->email;
 	}
 
 	userInfoPtr->SetName(name);

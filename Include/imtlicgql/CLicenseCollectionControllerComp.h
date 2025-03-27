@@ -18,6 +18,7 @@ public:
 
 	I_BEGIN_COMPONENT(CLicenseCollectionControllerComp);
 		I_ASSIGN(m_licenseInfoFactCompPtr, "LicenseFactory", "Factory used for creation of the new license instance", true, "LicenseFactory");
+		I_ASSIGN(m_productCollectionCompPtr, "ProductCollection", "Product collection", false, "ProductCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -50,6 +51,7 @@ private:
 
 protected:
 	I_FACT(imtlic::ILicenseDefinition, m_licenseInfoFactCompPtr);
+	I_REF(imtbase::IObjectCollection, m_productCollectionCompPtr);
 };
 
 

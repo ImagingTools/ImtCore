@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtlic/CLicenseDefinition.h>
+#include <imtlic/IProductInfo.h>
 #include <imtbase/CComplexCollectionFilter.h>
 
 
@@ -44,6 +45,8 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 
 		return false;
 	}
+	
+	QByteArray productUuid = licenseInfoPtr->GetProductId();
 
 	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
 
@@ -70,7 +73,15 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isProductIdRequested){
-		representationObject.ProductId = QByteArray(objectCollectionIterator.GetElementInfo("ProductId").toByteArray());
+		if (m_productCollectionCompPtr.IsValid()){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_productCollectionCompPtr->GetObjectData(productUuid, dataPtr)){
+				const imtlic::IProductInfo* productInfoPtr = dynamic_cast<const imtlic::IProductInfo*>(dataPtr.GetPtr());
+				if (productInfoPtr != nullptr){
+					representationObject.ProductId = productInfoPtr->GetProductId();
+				}
+			}
+		}
 	}
 
 	if (requestInfo.items.isProductUuidRequested){
@@ -99,12 +110,12 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.Added = std::make_optional<QString>(added);
 	}
 
-	if (requestInfo.items.isLastModifiedRequested){
-		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("Timestamp").toDateTime();
+	if (requestInfo.items.isTimeStampRequested){
+		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("TimeStamp").toDateTime();
 		lastModifiedTime.setTimeSpec(Qt::UTC);
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.LastModified = std::make_optional<QString>(lastModified);
+		representationObject.TimeStamp = std::make_optional<QString>(lastModified);
 	}
 
 	return true;

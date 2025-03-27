@@ -130,11 +130,11 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.Added = QString(added);
 	}
 
-	if (requestInfo.items.isLastModifiedRequested){
-		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("Timestamp").toDateTime().toUTC();
+	if (requestInfo.items.isTimeStampRequested){
+		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("TimeStamp").toDateTime().toUTC();
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.LastModified = QString(lastModified);
+		representationObject.TimeStamp = QString(lastModified);
 	}
 
 	return true;
