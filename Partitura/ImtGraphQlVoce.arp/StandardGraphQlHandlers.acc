@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5346" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Server framework for GraphQL-based implementations</Description>
@@ -140,13 +140,13 @@
                     <AttributeInfo Id="CompressionLevel" Type="Integer" ExportId="CompressionLevel">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="RequestHandlers">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>WebResourcesServlet</Value>
@@ -186,8 +186,29 @@
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="FileTemplateHomePath" Type="Reference" ExportId="FileTemplateHomePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="HomePath" Type="Reference" ExportId="LogPath">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ResourceProvider" PackageId="ImtRestPck" ComponentId="BinaryDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HomePath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ResourcesPath"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -206,24 +227,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="PathType" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="RessourcesProvider" PackageId="ImtRestPck" ComponentId="BinaryDataProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="HomePath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ResourcesPath"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -268,7 +271,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>IconDataProvider</Value>
-                                <Value>RessourcesProvider</Value>
+                                <Value>ResourceProvider</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -299,7 +302,11 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="HttpRootHandler"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="FileAccess" ComponentId="FileAccess"/>
+        <Component ExportedId="GraphQlRoot" ComponentId="GraphQlRoot"/>
+        <Component ExportedId="HttpRedirect" ComponentId="HttpRedirect"/>
         <Component ExportedId="LogFileDataProvider" ComponentId="LogFileDataProvider"/>
         <Component ExportedId="ServerLogDataProvider" ComponentId="ServerLogDataProvider"/>
+        <Component ExportedId="WebResourcesServlet" ComponentId="WebResourcesServlet"/>
     </ExportedComponents>
 </Acf>

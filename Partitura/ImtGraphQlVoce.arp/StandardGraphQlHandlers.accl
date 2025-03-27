@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5346" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -16,8 +16,8 @@
         <Element ComponentName="HttpRootHandler" X="600" Y="375" Note=""/>
         <Element ComponentName="IconDataProvider" X="800" Y="50" Note=""/>
         <Element ComponentName="LogFileDataProvider" X="800" Y="700" Note=""/>
+        <Element ComponentName="ResourceProvider" X="800" Y="200" Note=""/>
         <Element ComponentName="ResourcesPath" X="550" Y="125" Note=""/>
-        <Element ComponentName="RessourcesProvider" X="800" Y="200" Note=""/>
         <Element ComponentName="ServerLogDataProvider" X="1050" Y="700" Note=""/>
         <Element ComponentName="SlaveGraphQLDemultiplexer" X="150" Y="700" Note=""/>
         <Element ComponentName="WebResourcesServlet" X="1075" Y="125" Note="Handler for all compiled resources of the application. Primary used in the web application"/>
