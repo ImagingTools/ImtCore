@@ -16,29 +16,20 @@ namespace imtauthgql
 
 bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& /*errorMessage*/) const
 {
-	Q_ASSERT(m_superuserIdAttrPtr.IsValid());
-	Q_ASSERT(m_applicationInfoCompPtr.IsValid());
-	
 	namespace userssdl = sdl::imtauth::Users;
 	
-	userssdl::UserItemRequestArguments arguments;
-	arguments.input.Version_1_0 = sdl::imtauth::Users::CUserItemInput::V1_0();
-	arguments.input.Version_1_0->Id = QByteArray(*m_superuserIdAttrPtr);
-	
-	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.Version_1_0->ProductId = QByteArray(m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8());
-	}
+	userssdl::CheckSuperuserExistsRequestArguments arguments;
+	arguments.input.Version_1_0 = userssdl::CCheckSuperuserInput::V1_0();
 	
 	imtgql::CGqlRequest gqlRequest;
-	if (userssdl::CUserItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		userssdl::CUserData::V1_0 response;
-		if (!SendModelRequest<userssdl::CUserData::V1_0, userssdl::CUserData>(gqlRequest, response)){
+	if (userssdl::CCheckSuperuserExistsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		userssdl::CCheckSuperuserPayload::V1_0 response;
+		if (!SendModelRequest<userssdl::CCheckSuperuserPayload::V1_0, userssdl::CCheckSuperuserPayload>(gqlRequest, response)){
 			return false;
 		}
 		
-		Q_ASSERT_X(response.Username.has_value(), "CClientRequestRemoteSuperuserProviderComp::SuperuserExists", "User-ID was requested and should be returned by server");
-		if (response.Username.has_value()){
-			return (*m_superuserIdAttrPtr == *response.Username);
+		if (response.Exists.has_value()){
+			return *response.Exists;
 		}
 	}
 	

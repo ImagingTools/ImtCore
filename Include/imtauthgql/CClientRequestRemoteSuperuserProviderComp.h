@@ -23,7 +23,6 @@ public:
 	I_BEGIN_COMPONENT(CClientRequestRemoteSuperuserProviderComp)
 		I_REGISTER_INTERFACE(imtauth::ISuperuserProvider);
 		I_ASSIGN(m_superuserIdAttrPtr, "SuperuserId", "ID of the superuser", false, "su");
-		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application Info", true, "");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ISuperuserProvider)
@@ -32,7 +31,6 @@ public:
 
 protected:
 	I_ATTR(QByteArray, m_superuserIdAttrPtr);
-	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 };
 
 

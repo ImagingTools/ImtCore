@@ -520,10 +520,13 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
 		return retVal;
 	}
+	
+	QByteArray objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	QByteArray login = "su";
 
 	QString passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password.toUtf8());
+	superuserInfoPtr->SetObjectUuid(objectId);
 	superuserInfoPtr->SetId(login);
 	superuserInfoPtr->SetName(name);
 	superuserInfoPtr->SetMail(mail);
@@ -531,8 +534,8 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 	imtauth::IUserInfo::SystemInfo systemInfo;
 	superuserInfoPtr->AddToSystem(systemInfo);
 
-	QByteArray objectId = m_userCollectionCompPtr->InsertNewObject("User", "", "", superuserInfoPtr.GetPtr());
-	if (objectId.isEmpty()){
+	QByteArray result = m_userCollectionCompPtr->InsertNewObject("User", "", "", superuserInfoPtr.GetPtr(), objectId);
+	if (result.isEmpty()){
 		response.Message = QString("Unable to insert superuser to user collection");
 		return retVal;
 	}

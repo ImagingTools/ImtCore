@@ -23,6 +23,8 @@ public:
 	I_BEGIN_COMPONENT(CRemoteSuperuserControllerComp)
 		I_REGISTER_INTERFACE(imtauth::ISuperuserController);
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application Info", true, "");
+		I_ASSIGN(m_superuserNameAttrPtr, "SuperuserName", "Superuser name", false, "superuser");
+		I_ASSIGN(m_superuserMailAttrPtr, "SuperuserMail", "Superuser mail", false, "superuser");
 	I_END_COMPONENT;
 
 	// reimplemented (ISuperuserController)
@@ -30,6 +32,8 @@ public:
 
 private:
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
+	I_ATTR(QString, m_superuserNameAttrPtr);
+	I_ATTR(QString, m_superuserMailAttrPtr);
 };
 
 

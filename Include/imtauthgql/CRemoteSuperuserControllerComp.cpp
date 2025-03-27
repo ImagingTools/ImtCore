@@ -20,27 +20,22 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 		Q_ASSERT_X(false, "Attribute 'ApplicationInfo' was not set", "CRemoteSuperuserControllerComp");
 		return false;
 	}
-
+	
 	namespace userssdl = sdl::imtauth::Users;
 
-	userssdl::UserAddRequestArguments arguments;
-	arguments.input.Version_1_0 = userssdl::CUserDataInput::V1_0();
-	arguments.input.Version_1_0->Id = QByteArray("su");
-	arguments.input.Version_1_0->ProductId = QByteArray(m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8());
-
-	sdl::imtauth::Users::CUserData::V1_0 userData;
-	userData.Id = QByteArray("su");
-	userData.Username = QByteArray("su");
-	userData.Name = QString("superuser");
-	userData.Password = QString(qPrintable(password));
-
-	arguments.input.Version_1_0->Item = std::make_optional<sdl::imtauth::Users::CUserData::V1_0>(userData);
+	userssdl::CreateSuperuserRequestArguments arguments;
+	arguments.input.Version_1_0 = userssdl::CCreateSuperuserInput::V1_0();
+	arguments.input.Version_1_0->Name = *m_superuserNameAttrPtr;
+	arguments.input.Version_1_0->Mail = *m_superuserMailAttrPtr;
+	arguments.input.Version_1_0->Password = password;
 
 	imtgql::CGqlRequest gqlRequest;
-	if (userssdl::CUserAddGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0 response;
-		if (SendModelRequest<sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0, sdl::imtbase::ImtCollection::CAddedNotificationPayload>(gqlRequest, response)){
-			return true;
+	if (userssdl::CCreateSuperuserGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		userssdl::CCreateSuperuserPayload::V1_0 response;
+		if (SendModelRequest<userssdl::CCreateSuperuserPayload::V1_0, userssdl::CCreateSuperuserPayload>(gqlRequest, response)){
+			if (response.Success.has_value()){
+				return *response.Success;
+			}
 		}
 	}
 
