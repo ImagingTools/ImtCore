@@ -175,3 +175,29 @@ TooltipArea 1.0 ./Views/TooltipArea.qml
 TableViewParams 1.0 ./Views/TableViewParams.qml
 TableHeaderDelegate 1.0 ./Views/TableHeaderDelegate.qml
 TableRowCanvasViewer 1.0 ./Views/TableRowCanvasViewer.qml
+
+GraphicsView 1.0 ./Views/GraphicsView.qml
+GraphicsLayer 1.0 ./Views/GraphicsLayer.qml
+GraphicsShape 1.0 ./Views/GraphicsShape.qml
+
+GraphicsPolygonShape 1.0 ./Views/GraphicsPolygonShape.qml
+GraphicsRectangleShape 1.0 ./Views/GraphicsRectangleShape.qml
+GraphicsCircleShape 1.0 ./Views/GraphicsCircleShape.qml
+GraphicsLineShape 1.0 ./Views/GraphicsLineShape.qml
+GraphicsArcShape 1.0 ./Views/GraphicsArcShape.qml
+GraphicsBezierCurveShape 1.0 ./Views/GraphicsBezierCurveShape.qml
+GraphicsQuadraticCurveShape 1.0 ./Views/GraphicsQuadraticCurveShape.qml
+GraphicsTextShape 1.0 ./Views/GraphicsTextShape.qml
+GraphicsImageShape 1.0 ./Views/GraphicsImageShape.qml
+
+GraphicsPolygonParams 1.0 ./Views/GraphicsPolygonParams.qml
+GraphicsRectangleParams 1.0 ./Views/GraphicsRectangleParams.qml
+GraphicsCircleParams 1.0 ./Views/GraphicsCircleParams.qml
+GraphicsLineParams 1.0 ./Views/GraphicsLineParams.qml
+GraphicsArcParams 1.0 ./Views/GraphicsArcParams.qml
+GraphicsBezierCurveParams 1.0 ./Views/GraphicsBezierCurveParams.qml
+GraphicsQuadraticCurveParams 1.0 ./Views/GraphicsQuadraticCurveParams.qml
+GraphicsTextParams 1.0 ./Views/GraphicsTextParams.qml
+GraphicsImageParams 1.0 ./Views/GraphicsImageParams.qml
+
+GraphicsComplexShape 1.0 ./Views/GraphicsComplexShape.qml

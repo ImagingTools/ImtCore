@@ -21,6 +21,7 @@ MouseArea{
     signal deltaSignal(point delta)
     signal wheelDeltaSignal(int wheelDelta)
     signal positionSignal(point position)
+	signal rightClicked(real mouseX, real mouseY)
 
     onPressed: {
         isPressed = true;
@@ -74,6 +75,12 @@ MouseArea{
     onWheelDeltaSignal: {
         wheelFunction(wheelDelta);
     }
+
+	onClicked: {
+		if (mouse.button == Qt.RightButton){
+			rightClicked(mouse.x, mouse.y);
+		}
+	}
 
     function movingFunction(delta){
         if(movingItem){
