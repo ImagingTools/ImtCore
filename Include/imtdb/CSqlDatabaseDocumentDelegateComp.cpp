@@ -591,7 +591,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 					qPrintable(objectId),
 					objectName,
 					objectDescription,
-					*m_useBase64AttrPtr ? qPrintable(documentContentBase64) : qPrintable(documentContentJson),
+					*m_useBase64AttrPtr ? qPrintable(documentContentBase64) : QString(documentContentJson),
 					SqlEncode(metaInfoRepresentation),
 					revisionInfo,
 					QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
