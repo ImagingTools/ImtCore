@@ -46,21 +46,25 @@ QString CSdlTools::ConvertTypeWithNamespace(
 			const QString& relatedNamespace,
 			const ISdlTypeListProvider& listProvider,
 			const ISdlEnumListProvider& enumProvider,
+			const ISdlUnionListProvider& unionProvider,
 			bool* isCustomPtr,
 			bool* isComplexPtr,
 			bool* isArrayPtr,
-			bool* isEnumPtr)
+			bool* isEnumPtr,
+			bool* isUnionPtr)
 {
 	return OptListConvertTypeWithNamespace(
 				sdlField,
 				relatedNamespace,
 				listProvider,
 				enumProvider,
+				unionProvider,
 				true,
 				isCustomPtr,
 				isComplexPtr,
 				isArrayPtr,
-				isEnumPtr);
+				isEnumPtr,
+				isUnionPtr);
 }
 
 
@@ -69,14 +73,16 @@ QString CSdlTools::OptListConvertTypeWithNamespace(
 			const QString& relatedNamespace,
 			const ISdlTypeListProvider& listProvider,
 			const ISdlEnumListProvider& enumProvider,
+			const ISdlUnionListProvider& unionProvider,
 			bool listWrap,
 			bool* isCustomPtr,
 			bool* isComplexPtr,
 			bool* isArrayPtr,
-			bool* isEnumPtr)
+			bool* isEnumPtr,
+			bool* isUnionPtr)
 {
 	bool _isCustom = false;
-	QString retVal = ConvertTypeOrEnum(sdlField, enumProvider.GetEnums(false), &_isCustom, isComplexPtr, isArrayPtr, isEnumPtr);
+	QString retVal = ConvertTypeOrEnumOrUnion(sdlField, enumProvider.GetEnums(false), unionProvider.GetUnions(false), &_isCustom, isComplexPtr, isArrayPtr, isEnumPtr, isUnionPtr);
 	if (isCustomPtr != nullptr){
 		*isCustomPtr = _isCustom;
 	}
@@ -95,17 +101,22 @@ QString CSdlTools::OptListConvertTypeWithNamespace(
 	if (!relatedNamespace.isEmpty()){
 		CSdlType typeForField;
 		CSdlEnum enumForField;
+		CSdlUnion unionForField;
 		const bool isType = GetSdlTypeForField(sdlField, listProvider.GetSdlTypes(false), typeForField);
 		[[maybe_unused]] const bool isEnum = GetSdlEnumForField(sdlField, enumProvider.GetEnums(false), enumForField);
+		[[maybe_unused]] const bool isUnion = GetSdlUnionForField(sdlField, unionProvider.GetUnions(false), unionForField);
 
-		Q_ASSERT(isType || isEnum);
+		Q_ASSERT(isType || isEnum || isUnion);
 
 		QString typeNamespace;
 		if (isType){
 			typeNamespace = typeForField.GetNamespace();
 		}
-		else {
-			typeNamespace = BuildNamespaceFromParams(enumForField.GetSchemaParams());
+		else if (isEnum) {
+			typeNamespace = BuildNamespaceFromParams(enumForField.GetSchemaParams(), false);
+		}
+		else if (isUnion){
+			typeNamespace = BuildNamespaceFromParams(unionForField.GetSchemaParams(), false);
 		}
 		if (typeNamespace != relatedNamespace){
 			while (!typeNamespace.endsWith(QStringLiteral("::"))){
@@ -113,7 +124,7 @@ QString CSdlTools::OptListConvertTypeWithNamespace(
 			}
 			retVal.prepend(typeNamespace);
 			// use global namespace
-			if (!retVal.startsWith(QStringLiteral("::"))){
+			if (!retVal.startsWith(QStringLiteral("::")) && !isUnion && !isEnum){
 				retVal.prepend(QStringLiteral("::"));
 			}
 		}
@@ -243,8 +254,24 @@ QString CSdlTools::ConvertType(const QString& sdlTypeName, bool* isCustomPtr, bo
 
 QString CSdlTools::ConvertTypeOrEnum(const CSdlField& sdlField, const SdlEnumList& enumList, bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr, bool* isEnumPtr)
 {
+	return ConvertTypeOrEnumOrUnion(sdlField, enumList, SdlUnionList(), isCustomPtr, isComplexPtr, isArrayPtr, isEnumPtr);
+}
+
+QString CSdlTools::ConvertTypeOrEnumOrUnion(const CSdlField& sdlField,
+	const SdlEnumList& enumList,
+	const SdlUnionList& unionList,
+	bool* isCustomPtr,
+	bool* isComplexPtr,
+	bool* isArrayPtr,
+	bool* isEnumPtr,
+	bool* isUnion)
+{
 	if (isEnumPtr != nullptr){
 		*isEnumPtr = false;
+	}
+
+	if (isUnion != nullptr){
+		*isUnion = false;
 	}
 
 	QString retVal;
@@ -272,6 +299,18 @@ QString CSdlTools::ConvertTypeOrEnum(const CSdlField& sdlField, const SdlEnumLis
 			isComplex = false;
 			if (isEnumPtr != nullptr){
 				*isEnumPtr = true;
+			}
+		}
+	}
+
+	if (isComplex && !unionList.isEmpty()){
+		CSdlUnion foundUnion;
+		const bool found = GetSdlUnionForField(sdlField, unionList, foundUnion);
+		if (found){
+			fieldTypeName = foundUnion.GetName();
+			isComplex = false;
+			if (isUnion != nullptr){
+				*isUnion = true;
 			}
 		}
 	}
@@ -606,12 +645,13 @@ QString CSdlTools::FromInternalMapCheckString(const CSdlField& sdlField)
 }
 
 
-bool CSdlTools::EnsureFieldHasValidType(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList)
+bool CSdlTools::EnsureFieldHasValidType(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList)
 {
 	CSdlType dummyType;
 	CSdlEnum dummyEnum;
+	CSdlUnion dummyUnion;
 
-	return GetSdlTypeForField(sdlField, typeList, dummyType) || GetSdlEnumForField(sdlField, enumList, dummyEnum);
+	return GetSdlTypeForField(sdlField, typeList, dummyType) || GetSdlEnumForField(sdlField, enumList, dummyEnum) || GetSdlUnionForField(sdlField, unionList, dummyUnion);
 }
 
 
@@ -642,8 +682,24 @@ bool CSdlTools::GetSdlEnumForField(const CSdlField& sdlField, const SdlEnumList&
 	return false;
 }
 
+bool CSdlTools::GetSdlUnionForField(const CSdlField& sdlField, const SdlUnionList& unionList, CSdlUnion& sdlUnion)
+{
+	for (const CSdlUnion& unionElement : unionList){
+		if (unionElement.GetName() == sdlField.GetType()){
+			sdlUnion = unionElement;
 
-std::shared_ptr<CSdlEntryBase> CSdlTools::GetSdlTypeOrEnumForField(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList)
+			return true;
+		}
+	}
+	return false;
+}
+
+
+std::shared_ptr<CSdlEntryBase> CSdlTools::GetSdlTypeOrEnumOrUnionForField(
+	const CSdlField& sdlField,
+	const SdlTypeList& typeList,
+	const SdlEnumList& enumList,
+	const SdlUnionList& unionList)
 {
 	std::shared_ptr<CSdlEntryBase> retVal;
 
@@ -652,11 +708,18 @@ std::shared_ptr<CSdlEntryBase> CSdlTools::GetSdlTypeOrEnumForField(const CSdlFie
 	if (isType){
 		retVal = typePtr;
 	}
-	else {
+	else{
 		std::shared_ptr<CSdlEnum> sdlEnumPtr(new CSdlEnum);
 		const bool isEnum = GetSdlEnumForField(sdlField, enumList, *sdlEnumPtr);
 		if (isEnum){
 			retVal = sdlEnumPtr;
+		}
+		else{
+			std::shared_ptr<CSdlUnion> sdlUnionPtr(new CSdlUnion);
+			const bool isUnion = GetSdlUnionForField(sdlField, unionList, *sdlUnionPtr);
+			if (isUnion){
+				retVal = sdlUnionPtr;
+			}
 		}
 	}
 

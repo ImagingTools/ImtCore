@@ -50,7 +50,7 @@ public:
 				const QString& targetVariableName,
 				const QString& relatedNamespace,
 				uint hIndents = 1);
-	static void WriteConversionFromString(
+	static void WriteEnumConversionFromString(
 				QTextStream& stream,
 				const CSdlEnum& sdlEnum,
 				const QString& sourceVariableName,

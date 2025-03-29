@@ -184,7 +184,7 @@ void CSdlEnumConverter::WriteConversionFromEnum(
 }
 
 
-void CSdlEnumConverter::WriteConversionFromString(
+void CSdlEnumConverter::WriteEnumConversionFromString(
 			QTextStream& stream,
 			const CSdlEnum& sdlEnum,
 			const QString& sourceVariableName,

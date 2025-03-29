@@ -10,9 +10,11 @@
 // ImtCore includes
 #include <imtsdl/imtsdl.h>
 #include <imtsdl/CSdlEnum.h>
+#include <imtsdl/CSdlUnion.h>
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlEnumListProvider.h>
+#include <imtsdl/ISdlUnionListProvider.h>
 
 class QTextStream;
 
@@ -53,25 +55,30 @@ public:
 				const QString& relatedNamespace,
 				const ISdlTypeListProvider& listProvider,
 				const ISdlEnumListProvider& enumProvider,
+				const ISdlUnionListProvider& unionProvider,
 				bool* isCustomPtr = nullptr,
 				bool* isComplexPtr = nullptr,
 				bool* isArrayPtr = nullptr,
-				bool* isEnumPtr = nullptr);
+				bool* isEnumPtr = nullptr,
+				bool* isUnionPtr = nullptr);
 
 	[[nodiscard]] static QString OptListConvertTypeWithNamespace(
 				const CSdlField& sdlField,
 				const QString& relatedNamespace,
 				const ISdlTypeListProvider& listProvider,
 				const ISdlEnumListProvider& enumProvider,
+				const ISdlUnionListProvider& unionProvider,
 				bool listWrap = false,
 				bool* isCustomPtr = nullptr,
 				bool* isComplexPtr = nullptr,
 				bool* isArrayPtr = nullptr,
-				bool* isEnumPtr = nullptr);
+				bool* isEnumPtr = nullptr,
+				bool* isUnionPtr = nullptr);
 
 	static QString ConvertType(const CSdlField& sdlField, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr);
 	static QString ConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr);
 	static QString ConvertTypeOrEnum(const CSdlField& sdlField, const SdlEnumList& enumList, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr, bool* isEnumPtr = nullptr);
+	static QString ConvertTypeOrEnumOrUnion(const CSdlField& sdlField, const SdlEnumList& enumList, const SdlUnionList& unionList, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr, bool* isEnumPtr = nullptr, bool* isUnion = nullptr);
 
 	static QString QmlConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr);
 
@@ -91,10 +98,11 @@ public:
 
 	[[nodiscard]] static QString GetFromVariantConversionStringExt(const CSdlField& sdlField, bool singleValue = false);
 	[[nodiscard]] static QString FromInternalMapCheckString(const CSdlField& sdlField);
-	[[nodiscard]] static bool EnsureFieldHasValidType(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList);
+	[[nodiscard]] static bool EnsureFieldHasValidType(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList);
 	[[nodiscard]] static bool GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList& typeList, CSdlType& sdlType);
 	[[nodiscard]] static bool GetSdlEnumForField(const CSdlField& sdlField, const SdlEnumList& enumList, CSdlEnum& sdlEnum);
-	[[nodiscard]] static std::shared_ptr<CSdlEntryBase> GetSdlTypeOrEnumForField(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList);
+	[[nodiscard]] static bool GetSdlUnionForField(const CSdlField& sdlField, const SdlUnionList& unionList, CSdlUnion& sdlEnum);
+	[[nodiscard]] static std::shared_ptr<CSdlEntryBase> GetSdlTypeOrEnumOrUnionForField(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList);
 
 	static void AddSelfCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 	static void AddBeginSelfCheckNonRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
