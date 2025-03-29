@@ -42,6 +42,10 @@ SUBDIRS += ImtDdlPck
 ImtDdlPck.file = ../../Impl/ImtDdlPck/QMake/ImtDdlPck.pro
 ImtDdlPck.depends = imtddl
 
+SUBDIRS += ImtFilePck
+ImtFilePck.file = ../../Impl/ImtFilePck/QMake/ImtFilePck.pro
+ImtFilePck.depends = imtfile
+
 SUBDIRS += DdlCodeCreator
 DdlCodeCreator.file = ../../Impl/DdlCodeCreatorExe/QMake/DdlCodeCreatorExe.pro
 DdlCodeCreator.depends = imtddl ImtDdlPck
@@ -131,6 +135,7 @@ imtwidgets.file = ../../Include/imtwidgets/QMake/imtwidgets.pro
 
 SUBDIRS += imtgeo
 imtgeo.file = ../../Include/imtgeo/QMake/imtgeo.pro
+imtgeo.depends = imtbasesdl
 
 SUBDIRS += imtcom
 imtcom.file = ../../Include/imtcom/QMake/imtcom.pro
@@ -187,7 +192,7 @@ imtimg.file = ../../Include/imtimg/QMake/imtimg.pro
 
 SUBDIRS += imtclientgql
 imtclientgql.file = ../../Include/imtclientgql/QMake/imtclientgql.pro
-imtclientgql.depends = imtbasesdl
+imtclientgql.depends = imtbasesdl imtappsdl
 
 SUBDIRS += imtservice
 imtservice.file = ../../Include/imtservice/QMake/imtservice.pro
@@ -355,7 +360,7 @@ ImtGqlPck.depends = imtgql
 
 SUBDIRS += ImtServerGqlPck
 ImtServerGqlPck.file = ../../Impl/ImtServerGqlPck/QMake/ImtServerGqlPck.pro
-ImtServerGqlPck.depends = imtservergql
+ImtServerGqlPck.depends = imtservergql imtbasesdl
 
 SUBDIRS += ImtLicenseDbPck
 ImtLicenseDbPck.file = ../../Impl/ImtLicenseDbPck/QMake/ImtLicenseDbPck.pro
@@ -387,7 +392,7 @@ ImtAuthGqlPck.depends = imtauthgql
 
 SUBDIRS += ImtClientGqlPck
 ImtClientGqlPck.file = ../../Impl/ImtClientGqlPck/QMake/ImtClientGqlPck.pro
-ImtClientGqlPck.depends = imtclientgql
+ImtClientGqlPck.depends = imtclientgql imtbasesdl
 
 SUBDIRS += ImtHttpPck
 ImtHttpPck.file = ../../Impl/ImtHttpPck/QMake/ImtHttpPck.pro
