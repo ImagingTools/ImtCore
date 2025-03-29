@@ -13,8 +13,10 @@
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlEnumListProvider.h>
+#include <imtsdl/ISdlUnionListProvider.h>
 #include <imtsdl/CSdlTools.h>
 #include <imtsdl/CSdlEnumConverter.h>
+#include <imtsdl/CSdlUnionConverter.h>
 #include <imtsdlgen/IIncludeDirectivesProvider.h>
 #include <imtsdlgen/ICxxFileProcessor.h>
 #include <imtsdlgen/ICxxModifier.h>
@@ -33,7 +35,8 @@ class CSdlClassModificatorBaseComp:
 			public ICxxFileProcessor,
 			public ICxxModifier,
 			protected imtsdl::CSdlTools,
-			protected imtsdl::CSdlEnumConverter
+			protected imtsdl::CSdlEnumConverter,
+			protected imtsdl::CSdlUnionConverter
 {
 
 	/**
@@ -56,6 +59,7 @@ public:
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
 		I_ASSIGN(m_sdlEnumListCompPtr, "SdlEnumListProvider", "SDL enums used to create a code", true, "SdlEnumListProvider")
+		I_ASSIGN(m_sdlUnionListCompPtr, "SdlUnionListProvider", "SDL unioins used to create a code", true, "SdlUnionListProvider")
 		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
 	I_END_COMPONENT;
 
@@ -72,6 +76,7 @@ protected:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(imtsdl::ISdlTypeListProvider, m_sdlTypeListCompPtr);
 	I_REF(imtsdl::ISdlEnumListProvider, m_sdlEnumListCompPtr);
+	I_REF(imtsdl::ISdlUnionListProvider, m_sdlUnionListCompPtr);
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);
 
 	QFile* m_headerFilePtr;

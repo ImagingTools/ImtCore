@@ -326,7 +326,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 					continue;
 				}
 
-				std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumForField(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false));
+				std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
 
 				if (foundEntryPtr == nullptr){
 					SendCriticalMessage(0, QString("Unable to find type for %1 of %2").arg(field.GetId(), sdlType.GetName()));
@@ -462,7 +462,7 @@ bool CSdlClassCodeGeneratorComp::EndHeaderClassFile(const imtsdl::CSdlType& sdlT
 	FeedStream(ifStream, 1, false);
 
 	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
-		ifStream << '\t' << ConvertTypeWithNamespace(sdlField, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+		ifStream << '\t' << ConvertTypeWithNamespace(sdlField, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
 		ifStream << " m_" << GetDecapitalizedValue(sdlField.GetId()) << ";";
 		FeedStream(ifStream, 1, false);
 	}
@@ -513,16 +513,19 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 			bool isComplex = true;
 			bool isArray = true;
 			bool isEnum = false;
+			bool isUnion = false;
 			const QString convertedType = OptListConvertTypeWithNamespace(
 				sdlField,
 				sdlNamespace,
 				*m_sdlTypeListCompPtr,
 				*m_sdlEnumListCompPtr,
+				*m_sdlUnionListCompPtr,
 				false,
 				nullptr,
 				&isComplex,
 				&isArray,
-				&isEnum);
+				&isEnum,
+				&isUnion);
 
 			if ((isComplex && !isEnum) || isArray){
 				// we need to initialize only fundamental types
@@ -557,6 +560,9 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 				Q_ASSERT(found);
 				ifStream << convertedType;
 				ifStream << ':' << ':' << sdlEnum.GetValues().constFirst().first;
+			}
+			else if (isUnion){
+				ifStream << '{}';
 			}
 			ifStream << (')');
 			isAdded = true;
@@ -696,6 +702,7 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
 		originalSchemaNamespace,
 		*m_sdlTypeListCompPtr,
 		*m_sdlEnumListCompPtr,
+		*m_sdlUnionListCompPtr,
 		&isCustom,
 		nullptr,
 		nullptr,
@@ -820,7 +827,8 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 					sdlField,
 					m_originalSchemaNamespaceCompPtr->GetText(),
 					*m_sdlTypeListCompPtr,
-					*m_sdlEnumListCompPtr);
+					*m_sdlEnumListCompPtr,
+					*m_sdlUnionListCompPtr);
 
 		stream << QStringLiteral(" C") + className + QStringLiteral("::");
 		stream << QStringLiteral("Get") + GetCapitalizedValue(sdlField.GetId());
@@ -848,10 +856,12 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 			m_originalSchemaNamespaceCompPtr->GetText(),
 			*m_sdlTypeListCompPtr,
 			*m_sdlEnumListCompPtr,
+			*m_sdlUnionListCompPtr,
 			&isCustom,
 			nullptr,
 			nullptr,
-			&isEnum);
+			&isEnum,
+			nullptr);
 
 		bool isComplex = sdlField.IsArray() ||
 					sdlField.GetType() == QStringLiteral("String") ||
@@ -1028,16 +1038,19 @@ void CSdlClassCodeGeneratorComp::GenerateResetMethodImpl(
 	bool isComplex = false;
 	bool isArray = false;
 	bool isEnum = false;
+	bool isUnion = false;
 	const QString originalSchemaNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	const QString convertedType = ConvertTypeWithNamespace(
 					sdlField,
 					originalSchemaNamespace,
 					*m_sdlTypeListCompPtr,
 					*m_sdlEnumListCompPtr,
+					*m_sdlUnionListCompPtr,
 					&isCustom,
 					&isComplex,
 					&isArray,
-					&isEnum);
+					&isEnum,
+					&isUnion);
 	// list, string, byte has a 'clear' method
 	if (isArray || convertedType == QStringLiteral("QString") || convertedType == QStringLiteral("QByteArray")){
 		stream << QStringLiteral("m_");
@@ -1045,7 +1058,7 @@ void CSdlClassCodeGeneratorComp::GenerateResetMethodImpl(
 		stream << QStringLiteral(".clear();");
 	}
 	// if suctom - just reset with a defaul constructor
-	else if (isCustom && !isEnum){
+	else if (isCustom && !isEnum && !isUnion){
 		stream << QStringLiteral("m_");
 		stream << GetDecapitalizedValue(sdlField.GetId());
 		stream << QStringLiteral(" = ");
@@ -1053,7 +1066,7 @@ void CSdlClassCodeGeneratorComp::GenerateResetMethodImpl(
 		stream << QStringLiteral("();");
 	}
 	// set default value to scalar types
-	else if (!isComplex || isEnum){
+	else if (!isComplex || isEnum || isUnion){
 		stream << QStringLiteral("m_");
 		stream << GetDecapitalizedValue(sdlField.GetId());
 		stream << QStringLiteral(" = ");
@@ -1078,6 +1091,9 @@ void CSdlClassCodeGeneratorComp::GenerateResetMethodImpl(
 			Q_ASSERT(found);
 			stream << convertedType;
 			stream << ':' << ':' << sdlEnum.GetValues().first().first;
+		}
+		else if (isUnion){
+			stream << '{}';
 		}
 		else {
 			I_CRITICAL();

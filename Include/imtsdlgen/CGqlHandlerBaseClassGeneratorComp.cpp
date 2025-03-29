@@ -411,7 +411,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream
 
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("virtual ");
-	stream << OptListConvertTypeWithNamespace(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 	stream << QStringLiteral(" On");
 	stream << GetCapitalizedValue(sdlRequest.GetName());
 	stream << QStringLiteral("(const C");
@@ -546,7 +546,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 	// [1] create payload variable by calling reimplemented method
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << OptListConvertTypeWithNamespace(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(sdlRequest.GetOutputArgument(), sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 	stream << QStringLiteral(" replyPayload = On");
 	stream << sdlRequest.GetName() << '(';
 	stream << GetDecapitalizedValue(requestClassName);

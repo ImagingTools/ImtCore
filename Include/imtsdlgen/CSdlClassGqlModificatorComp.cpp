@@ -257,7 +257,8 @@ void CSdlClassGqlModificatorComp::AddFieldWriteToRequestCode(QTextStream& stream
 	bool isCustom = false;
 	bool isArray = false;
 	bool isEnum = false;
-	ConvertTypeOrEnum(field, m_sdlEnumListCompPtr->GetEnums(false), &isCustom, nullptr, &isArray, &isEnum);
+	bool isUnion = false;
+	ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
 
 	const bool isFieldRequired = field.IsRequired();
 	if (isFieldRequired){
@@ -273,13 +274,13 @@ void CSdlClassGqlModificatorComp::AddFieldWriteToRequestCode(QTextStream& stream
 	}
 
 	const int hIndents = (isFieldRequired ? 1 : 2);
-	if ((isCustom && !isEnum) && isArray){
+	if ((isCustom && !isEnum && !isUnion) && isArray){
 		AddCustomListFieldWriteToRequestCode(stream, field, hIndents, optional);
 	}
-	else if ((isCustom && !isEnum) && !isArray){
+	else if ((isCustom && !isEnum && !isUnion) && !isArray){
 		AddCustomFieldWriteToRequestCode(stream, field, hIndents, optional);
 	}
-	else if ((!isCustom || isEnum) && isArray){
+	else if ((!isCustom || isEnum || isUnion) && isArray){
 		AddScalarListFieldWriteToRequestCode(stream, field, hIndents, optional);
 	}
 	else {
@@ -300,13 +301,16 @@ void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& 
 	GenerateListTempValueCode(stream, field, tempListVarName, hIndents);
 
 	bool isEnum = false;
-	ConvertTypeOrEnum(
+	bool isUnion = false;
+	ConvertTypeOrEnumOrUnion(
 		field,
 		m_sdlEnumListCompPtr->GetEnums(false),
+		m_sdlUnionListCompPtr->GetUnions(false),
 		nullptr,
 		nullptr,
 		nullptr,
-		&isEnum);
+		&isEnum,
+		&isUnion);
 
 	if (isEnum){
 		FeedStreamHorizontally(stream, hIndents);
@@ -336,6 +340,9 @@ void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& 
 		}
 		stream << QStringLiteral(");");
 		FeedStream(stream, 1, false);
+	}
+	else if (isUnion){
+		// ToDo
 	}
 	else {
 		FeedStreamHorizontally(stream, hIndents);
@@ -491,11 +498,13 @@ void CSdlClassGqlModificatorComp::AddSetValueToObjectCode(QTextStream& stream, c
 		field,
 		sdlNamespace,
 		*m_sdlTypeListCompPtr,
-		*m_sdlEnumListCompPtr,
+		*m_sdlEnumListCompPtr, 
+		*m_sdlUnionListCompPtr,
 		nullptr,
 		nullptr,
 		nullptr,
-		&isEnum);
+		&isEnum,
+		nullptr);
 
 	if (isEnum){
 		const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
@@ -519,7 +528,7 @@ void CSdlClassGqlModificatorComp::AddSetValueToObjectCode(QTextStream& stream, c
 		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
 		Q_ASSERT(found);
 
-		WriteConversionFromString(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText());
+		WriteEnumConversionFromString(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText());
 
 		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
@@ -563,14 +572,14 @@ void CSdlClassGqlModificatorComp::AddCheckCustomRequiredValueCode(QTextStream& s
 void CSdlClassGqlModificatorComp::AddSetCustomValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents)
 {
 	// declare object to read
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 	stream << ' ' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data;");
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
 
 	// declare bool variable and read data method
 	stream << QStringLiteral("const bool is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read = ");
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 	stream << QStringLiteral("::");
 	if (optional){
 		stream << QStringLiteral("Opt");
@@ -615,7 +624,7 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 {
 	// declare list
 	FeedStreamHorizontally(stream, hIndents);
-	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
 	stream << ' ' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List;");
 	FeedStream(stream, 1, false);
 
@@ -648,14 +657,14 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 	// declare read variable
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 	stream << ' ' << GetDecapitalizedValue(field.GetId()) << ';';
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents + 1);
 
 	// read
 	stream << QStringLiteral("if (!");
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 	stream << QStringLiteral("::");
 	if (optional){
 		stream << QStringLiteral("Opt");
@@ -714,7 +723,7 @@ void CSdlClassGqlModificatorComp::AddSetScalarListValueToObjectCode(QTextStream&
 {
 	// declare list to sotre extracted values
 	FeedStreamHorizontally(stream, hIndents);
-	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
 	stream << ' ' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List;");
 	FeedStream(stream, 1, false);
 
@@ -740,7 +749,7 @@ void CSdlClassGqlModificatorComp::AddSetScalarListValueToObjectCode(QTextStream&
 
 	// declare read variable
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 	stream << ' ' << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral(" = ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataList[");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index].");

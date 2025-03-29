@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QDir>
+#include <QtCore/QDebug>
 #include <QtCore/QXmlStreamWriter>
 #include <QtCore/QTextStream>
 
@@ -144,7 +145,9 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 		qmldirFileInfo.IsSingleton = true;
 		qmldirFileInfo.Version = GetTypeVersion(sdlDocumentType);
 		QString fileName = GetQmlCollectionInfoWrappedName(sdlDocumentType.GetName(), QString());
-		qmldirFileInfo.Type = QString(&fileName[0], fileName.size() - 4); ///< remove '.qml'
+		QString type = fileName;
+		type.remove(".qml");
+		qmldirFileInfo.Type = type;
 		qmldirFileInfo.FileName = fileName;
 		qmldirFileInfoList << qmldirFileInfo;
 
@@ -154,7 +157,10 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 			subtypeQmldirFileInfo.Version = GetTypeVersion(sdlDocumentType);
 			QString subtypeFileName = GetQmlCollectionInfoWrappedName(sdlDocumentType.GetName(), sdlDocumentSubtype.GetName());
 			subtypeQmldirFileInfo.FileName = subtypeFileName;
-			subtypeQmldirFileInfo.Type = QString(&subtypeFileName[0], subtypeFileName.size() - 4); ///< remove '.qml'
+			QString subType = subtypeFileName;
+			subType.remove(".qml");
+			subtypeQmldirFileInfo.Type = subType;
+
 			qmldirFileInfoList << subtypeQmldirFileInfo;
 		}
 	}
@@ -177,7 +183,7 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 	if (!isGenerated){
 		SendInfoMessage(0, "Unable to generate collection QML info");
 
-		return false;
+		return TS_INVALID;
 	}
 
 	// and finally create a QRC file
@@ -231,8 +237,6 @@ int CQmlCodeMetaGeneratorComp::DoProcessing(
 			xmlWriter.writeEndElement();
 		}
 	}
-
-
 
 	// also add qmldir file
 	xmlWriter.writeStartElement("file");

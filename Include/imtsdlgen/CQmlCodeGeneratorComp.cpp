@@ -259,6 +259,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	QSet<QString> requiredImports;
 	const imtsdl::SdlTypeList allTypes = m_sdlTypeListCompPtr->GetSdlTypes(false);
 	const imtsdl::SdlEnumList enumList = m_sdlEnumListCompPtr->GetEnums(false);
+	const imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(false);
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
 		bool isCustom = false;
 		ConvertType(field, &isCustom);
@@ -268,7 +269,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		}
 
 
-		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumForField(field, allTypes, enumList);
+		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumOrUnionForField(field, allTypes, enumList, unionList);
 		if (!foundEntry){
 			SendCriticalMessage(0, QString("Unable to find type for %1:%2").arg(field.GetId(), field.GetType()));
 			I_CRITICAL();
@@ -315,7 +316,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 
 		ifStream << QStringLiteral("property ");
 
-		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumForField(sdlField, allTypes, enumList);
+		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(sdlField, allTypes, enumList, unionList);
 		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
 
 		bool isCustom = false;
@@ -401,7 +402,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		bool isCustom = false;
 		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
 
-		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumForField(sdlField, allTypes, enumList);
+		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(sdlField, allTypes, enumList, unionList);
 		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
 
 		// skip simple scalars and list of scalars
