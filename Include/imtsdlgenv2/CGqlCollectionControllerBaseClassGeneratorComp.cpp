@@ -599,7 +599,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 	const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
 
 	QList<imtsdl::CSdlRequest> implementedGetRequests;
-	QMapIterator operationsIter(operationsList);
+	QMultiMapIterator operationsIter(operationsList);
 	while (operationsIter.hasNext()){
 		auto operation = operationsIter.next();
 		imtsdl::CSdlRequest sdlRequest = operation.value();
@@ -942,7 +942,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 	for (const imtsdl::CSdlDocumentType &documentType : sdlDocumentTypeList){
 		const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operations = sdlDocumentType.GetOperationsList();
 
-		QMapIterator operationIter(operations);
+		QMultiMapIterator operationIter(operations);
 		while(operationIter.hasNext()){
 			auto operationIterValue = operationIter.next();
 			if (!requestList.contains(*operationIterValue)){
@@ -953,7 +953,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 		imtsdl::SdlDocumentTypeList subtypes = documentType.GetSubtypes();
 		for (const imtsdl::CSdlDocumentType& documentSubtype: subtypes){
 			const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> suboperations = documentSubtype.GetOperationsList();
-			QMapIterator suboperationIter(suboperations);
+			QMultiMapIterator suboperationIter(suboperations);
 			while(suboperationIter.hasNext()){
 				auto suboperationIterValue = suboperationIter.next();
 				if (!requestList.contains(*suboperationIterValue)){
