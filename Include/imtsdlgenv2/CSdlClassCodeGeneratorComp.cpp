@@ -185,6 +185,12 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 					filterParams.InsertOption(sdlEnum.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
 					SendVerboseMessage(QString("Add join enum file '%1. Total: %2").arg(sdlEnum.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
 				}
+				// then join unions
+				const imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(true);
+				for (const imtsdl::CSdlUnion& sdlUnion : unionList){
+					filterParams.InsertOption(sdlUnion.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
+					SendVerboseMessage(QString("Add join enum file '%1. Total: %2").arg(sdlUnion.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
+				}
 
 				// then join types
 				for (const imtsdl::CSdlType& sdlType: sdlTypeList){
@@ -344,7 +350,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 					continue;
 				}
 
-				std::shared_ptr<imtsdl::CSdlEntryBase> foundType = GetSdlTypeOrEnumForField(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false));
+				std::shared_ptr<imtsdl::CSdlEntryBase> foundType = GetSdlTypeOrEnumOrUnionForField(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
 				if (!foundType){
 					SendCriticalMessage(0, QString("Unable to find type for %1 of %2").arg(field.GetId(), sdlType.GetName()));
 					I_CRITICAL();
@@ -758,6 +764,7 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 			sdlNamespace,
 			*m_sdlTypeListCompPtr,
 			*m_sdlEnumListCompPtr,
+			*m_sdlUnionListCompPtr,
 			true,
 			nullptr,
 			nullptr,

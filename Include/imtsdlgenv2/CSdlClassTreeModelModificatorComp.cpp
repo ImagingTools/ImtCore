@@ -61,7 +61,7 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 	QTextStream ofStream(m_sourceFilePtr);
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 	structNameConverter.addVersion = true;
 
 	// add method implementation
@@ -127,27 +127,30 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 	bool isArray = false;
 	bool isCustom = false;
 	bool isEnum = false;
-	ConvertTypeOrEnum(
+	bool isUnion = false;
+	ConvertTypeOrEnumOrUnion(
 		field,
 		m_sdlEnumListCompPtr->GetEnums(false),
+		m_sdlUnionListCompPtr->GetUnions(false),
 		&isCustom,
 		nullptr,
 		&isArray,
-		&isEnum);
+		&isEnum,
+		&isUnion);
 
-	if ((isCustom && !isEnum) && isArray){
+	if ((isCustom && !isEnum && !isUnion) && isArray){
 		AddCustomArrayFieldWriteToModelCode(stream, field, sdlType, optional);
 
 		return;
 	}
 
 	else if (isArray){
-		AddPrimitiveArrayFieldWriteToModelCode(stream, field, sdlType, isEnum, optional);
+		AddPrimitiveArrayFieldWriteToModelCode(stream, field, sdlType, isEnum, isUnion, optional);
 
 		return;
 	}
 
-	else if ((isCustom && !isEnum)){
+	else if ((isCustom && !isEnum && !isUnion)){
 		AddCustomFieldWriteToModelCode(stream, field, sdlType, optional);
 
 		return;
@@ -187,6 +190,25 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 			FeedStreamHorizontally(stream);
 			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
 			stream << enumConvertedVarName;
+		}
+		else if (isUnion){
+			const QString unionSourceVarName = QStringLiteral("*") + field.GetId();
+			const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
+
+
+			// declare target value, to store value
+			stream << QStringLiteral("QVariant ");
+			stream << unionConvertedVarName << ';';
+			FeedStream(stream, 1, false);
+
+			imtsdl::CSdlUnion foundUnion;
+			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+
+			WriteConversionFromUnion(stream, foundUnion, unionSourceVarName, unionConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), 2);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
+			stream << unionConvertedVarName;
 		}
 		else {
 			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
@@ -228,6 +250,25 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
 			stream << enumConvertedVarName;
 		}
+		else if (isUnion){
+			const QString unionSourceVarName = QStringLiteral("*") + field.GetId();
+			const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
+
+
+			// declare target value, to store value
+			stream << QStringLiteral("QVariant ");
+			stream << unionConvertedVarName << ';';
+			FeedStream(stream, 1, false);
+
+			imtsdl::CSdlUnion foundUnion;
+			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+
+			WriteConversionFromUnion(stream, foundUnion, unionSourceVarName, unionConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), 2);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
+			stream << unionConvertedVarName;
+		}
 		else {
 			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
 			if (field.IsArray()){
@@ -251,29 +292,32 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 	bool isArray = false;
 	bool isCustom = false;
 	bool isEnum = false;
+	bool isUnion = false;
 	const QString convertedType = ConvertTypeWithNamespace(
 		field,
 		m_originalSchemaNamespaceCompPtr->GetText(),
 		*m_sdlTypeListCompPtr,
 		*m_sdlEnumListCompPtr,
+		*m_sdlUnionListCompPtr,
 		&isCustom,
 		nullptr,
 		&isArray,
-		&isEnum);
+		&isEnum,
+		&isUnion);
 
-	if ((isCustom && !isEnum) && isArray){
+	if ((isCustom && !isEnum && !isUnion) && isArray){
 		AddCustomArrayFieldReadFromModelCode(stream, field, sdlType, optional);
 
 		return;
 	}
 
 	else if (isArray){
-		AddPrimitiveArrayFieldReadFromModelCode(stream, field, sdlType, isEnum, optional);
+		AddPrimitiveArrayFieldReadFromModelCode(stream, field, sdlType, isEnum, isUnion, optional);
 
 		return;
 	}
 
-	else if (isCustom && !isEnum){
+	else if (isCustom && !isEnum && !isUnion){
 		AddCustomFieldReadFromModelCode(stream, field, sdlType, optional);
 
 		return;
@@ -315,7 +359,15 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 			[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
 			Q_ASSERT(found);
 
-			WriteConversionFromString(stream, foundEnum, enumSourceVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText());
+			WriteEnumConversionFromString(stream, foundEnum, enumSourceVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText());
+		}
+		else if (isUnion){
+			const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
+
+			imtsdl::CSdlUnion foundUnion;
+			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+
+			WriteUnionConversionFromString(stream, foundUnion, dataVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText());
 		}
 		else {
 			stream << GetSettingValueString(
@@ -330,8 +382,8 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 		stream << QStringLiteral("if (!") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
 		FeedStream(stream, 1, false);
 
-		FeedStreamHorizontally(stream, 2);
 		if (isEnum){
+			FeedStreamHorizontally(stream, 2);
 			const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
 			const QString enumSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
 
@@ -349,9 +401,18 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 			[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
 			Q_ASSERT(found);
 
-			WriteConversionFromString(stream, foundEnum, enumSourceVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText(), 2);
+			WriteEnumConversionFromString(stream, foundEnum, enumSourceVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText(), 2);
+		}
+		else if (isUnion){
+			const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
+
+			imtsdl::CSdlUnion foundUnion;
+			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+
+			WriteUnionConversionFromString(stream, foundUnion, dataVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText(), 2);
 		}
 		else{
+			FeedStreamHorizontally(stream, 2);
 			stream << GetSettingValueString(
 				field,
 				sdlNamespace,
@@ -399,7 +460,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelImplCode(
 			quint16 hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 	// Create a new model
 	FeedStreamHorizontally(stream, hIndents);
@@ -491,7 +552,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(
 			quint16 hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 	// reset pointer for object
 	FeedStreamHorizontally(stream, hIndents);
@@ -534,6 +595,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(
 	const imtsdl::CSdlField& field,
 	const imtsdl::CSdlType& sdlType,
 	bool isEnum,
+	bool isUnion,
 	bool optional)
 {
 	if (!optional && field.IsRequired()){
@@ -543,7 +605,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(
 		else if (!optional && (!field.IsArray() || field.IsNonEmpty())){
 			AddArrayInternalChecksFail(stream, field, false);
 		}
-		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field, sdlType, isEnum, optional);
+		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field, sdlType, isEnum, isUnion, optional);
 		FeedStream(stream, 1, false);
 	}
 	else {
@@ -552,7 +614,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(
 		stream << GetNullCheckString(field, false);
 		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
-		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field, sdlType, isEnum, optional, 2);
+		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field, sdlType, isEnum, isUnion, optional, 2);
 		stream << QStringLiteral("\n\t}");
 		FeedStream(stream, 1, false);
 	}
@@ -564,6 +626,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 			const imtsdl::CSdlField& field,
 			const imtsdl::CSdlType& sdlType,
 			bool isEnum,
+			bool isUnion,
 			bool optional,
 			quint16 hIndents)
 {
@@ -607,6 +670,22 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 
 		WriteConversionFromEnum(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
 	}
+	else if (isUnion){
+		FeedStreamHorizontally(stream, hIndents + 1);
+		const QString unionSourceVarName = field.GetId() + QStringLiteral("->at(") + treeModelIndexVarName + ')';
+		const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
+
+		// declare target value, to store value
+		stream << QStringLiteral("QVariant ");
+		stream << unionConvertedVarName << ';';
+		FeedStream(stream, 1, false);
+
+		imtsdl::CSdlUnion foundUnion;
+		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+		Q_ASSERT(found);
+
+		WriteConversionFromUnion(stream, foundUnion, unionSourceVarName, unionConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+	}
 
 	// inLoop: insert ien item to model
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -618,6 +697,9 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 	stream << newTreeModelVarName << QStringLiteral("->SetData(QByteArray(), ");
 	if (isEnum){
 		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("StringValue");
+	}
+	else if (isUnion){
+		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("VariantValue");
 	}
 	else{
 		stream << field.GetId();
@@ -636,7 +718,8 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			const imtsdl::CSdlType& sdlType,
-			bool isEnum,
+			bool isEnum, 
+			bool isUnion,
 			bool optional)
 {
 	FeedStreamHorizontally(stream, 1);
@@ -658,13 +741,13 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 		stream << '}';
 		FeedStream(stream, 1, false);
 
-		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field, isEnum, optional);
+		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field, isEnum, isUnion, optional);
 	}
 	else {
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model != nullptr){");
 		FeedStream(stream, 1, false);
 
-		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field, isEnum, optional, 2);
+		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field, isEnum, isUnion, optional, 2);
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
@@ -678,6 +761,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			bool isEnum,
+			bool isUnion,
 			bool optional,
 			quint16 hIndents)
 {
@@ -704,16 +788,16 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 	}
 
 	// declare temp list var
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, true);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, true);
 	structNameConverter.addVersion = true;
 
 	const QString listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("List");
 	FeedStreamHorizontally(stream, hIndents);
-	if (isEnum){
+	if (isEnum || isUnion){
 		stream << structNameConverter.GetString();
 	}
 	else{
-		stream << ConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+		stream << ConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
 	}
 	stream << ' ' << listVariableName << ';';
 	FeedStream(stream, 1, false);
@@ -750,10 +834,33 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
 		Q_ASSERT(found);
 
-		WriteConversionFromString(stream, foundEnum, enumSourceVarName, dataVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+		WriteEnumConversionFromString(stream, foundEnum, enumSourceVarName, dataVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+	}
+	else if (isUnion){
+		const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
+		const QString unionSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
+
+		structNameConverter.listWrap = false;
+		stream << structNameConverter.GetString();
+		stream << ' ' << dataVarName << ';';
+		FeedStream(stream, 1, false);
+
+		// declare temp value, to store string equivalent
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("QVariant ");
+		stream << unionSourceVarName;
+		stream << QStringLiteral(" = ");
+		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetData(QByteArray(), ");
+		stream << indexVariableName << QStringLiteral(");");
+		FeedStream(stream, 1, false);
+
+		imtsdl::CSdlUnion foundUnion;
+		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+
+		WriteUnionConversionFromString(stream, foundUnion, unionSourceVarName, dataVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
 	}
 	else{
-		stream << OptListConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+		stream << OptListConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 		stream << ' ' << GetDecapitalizedValue(field.GetId());
 		stream << QStringLiteral(" = ");
 		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetData(QByteArray(), ");
@@ -767,7 +874,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << listVariableName;
 	stream << QStringLiteral(" << ");
-	if (isEnum){
+	if (isEnum || isUnion){
 		stream << GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data") << ';';
 	}
 	else{
@@ -819,7 +926,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 			quint16 hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 	const QString newTreeModelVarName = QStringLiteral("new") + GetCapitalizedValue(field.GetId()) + QStringLiteral("ModelPtr");
 
@@ -924,7 +1031,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 			quint16 hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 	structNameConverter.addVersion = true;
 	structNameConverter.listWrap = true;
 

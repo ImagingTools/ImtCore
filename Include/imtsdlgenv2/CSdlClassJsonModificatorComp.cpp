@@ -102,9 +102,16 @@ bool CSdlClassJsonModificatorComp::AddFieldValueAppendToObjectArray(QTextStream&
 	stream << ' '<< '<' << '<' << ' ';
 
 	// special type for bytearray. Json Array Can't store bytes, only string
-	const QString convertedType = ConvertTypeOrEnum(field, m_sdlEnumListCompPtr->GetEnums(false));
+	// Special for Union
+	bool isUnion = false;
+	const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), nullptr, nullptr, nullptr, nullptr, &isUnion);
 	if (convertedType == QStringLiteral("QByteArray")){
 		stream << QStringLiteral("QString(");
+		stream << variableName;
+		stream << ')';
+	}
+	else if (isUnion){
+		stream << QStringLiteral("QJsonValue::fromVariant(");
 		stream << variableName;
 		stream << ')';
 	}
@@ -162,7 +169,8 @@ bool CSdlClassJsonModificatorComp::AddContainerValueCheckConditionBegin(QTextStr
 	bool isArray = false;
 	bool isCustom = false;
 	bool isEnum = false;
-	const QString convertedType = ConvertTypeOrEnum(field, m_sdlEnumListCompPtr->GetEnums(false), &isCustom, nullptr, &isArray, &isEnum);
+	bool isUnion = false;
+	const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
 
 	if(isArray){
 		stream << QStringLiteral("Array");
@@ -173,7 +181,7 @@ bool CSdlClassJsonModificatorComp::AddContainerValueCheckConditionBegin(QTextStr
 	{
 		stream << QStringLiteral("String");
 	}
-	else if (isCustom){
+	else if (isCustom || isUnion){
 		stream << QStringLiteral("Object");
 	}
 	else if (	convertedType == QStringLiteral("int") ||
@@ -259,7 +267,8 @@ QString CSdlClassJsonModificatorComp::GetConvertEndForFieldString(const imtsdl::
 	bool isArray = false;
 	bool isCustom = false;
 	bool isEnum = false;
-	const QString convertedType = ConvertTypeOrEnum(field, m_sdlEnumListCompPtr->GetEnums(false), &isCustom, nullptr, &isArray, &isEnum);
+	bool isUnion = false;
+	const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
 
 	if(!forType && isArray){
 		retVal += QStringLiteral("Array");
@@ -268,6 +277,9 @@ QString CSdlClassJsonModificatorComp::GetConvertEndForFieldString(const imtsdl::
 			 convertedType == QStringLiteral("QString"))
 	{
 		retVal += QStringLiteral("String");
+	}
+	else if (isUnion){
+		retVal += QStringLiteral("Variant");
 	}
 	else if (isCustom){
 		retVal += QStringLiteral("Object");

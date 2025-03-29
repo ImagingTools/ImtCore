@@ -35,9 +35,11 @@ CSdlGenTools::CStructNamespaceConverter::CStructNamespaceConverter(
 			const QString& aRelatedNamespace,
 			const imtsdl::ISdlTypeListProvider& aListProvider,
 			const imtsdl::ISdlEnumListProvider& aEnumListProvider,
+			const imtsdl::ISdlUnionListProvider& aUnionListProvider,
 			bool aListWrap):
 	typeListProviderPtr(&aListProvider),
 	enumListProviderPtr(&aEnumListProvider),
+	unionListProviderPtr(&aUnionListProvider),
 	relatedNamespace(aRelatedNamespace),
 	listWrap(aListWrap),
 	sdlEntryPtr(&aSdlEntry)
@@ -50,9 +52,11 @@ CSdlGenTools::CStructNamespaceConverter::CStructNamespaceConverter(
 			const QString& aRelatedNamespace,
 			const imtsdl::ISdlTypeListProvider& aListProvider,
 			const imtsdl::ISdlEnumListProvider& aEnumListProvider,
+			const imtsdl::ISdlUnionListProvider& aUnionListProvider,
 			bool aListWrap):
 	typeListProviderPtr(&aListProvider),
 	enumListProviderPtr(&aEnumListProvider),
+	unionListProviderPtr(&aUnionListProvider),
 	relatedNamespace(aRelatedNamespace),
 	listWrap(aListWrap),
 	sdlFieldPtr(&aSdlField)
@@ -88,10 +92,11 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 
 		QString typeNamespace;
 		if (sdlFieldPtr != nullptr){
-			typeForFieldPtr = imtsdl::CSdlTools::GetSdlTypeOrEnumForField(
+			typeForFieldPtr = imtsdl::CSdlTools::GetSdlTypeOrEnumOrUnionForField(
 				*sdlFieldPtr,
 				typeListProviderPtr->GetSdlTypes(false),
-				enumListProviderPtr->GetEnums(false));
+				enumListProviderPtr->GetEnums(false),
+				unionListProviderPtr->GetUnions(false));
 			if (!typeForFieldPtr){
 				qCritical() << "Unable to find enum or type for" << sdlFieldPtr->GetId() << "of" << sdlFieldPtr->GetType();
 				I_CRITICAL();
@@ -125,9 +130,15 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 			typeNamespace += imtsdl::CSdlTools::GetCapitalizedValue(sdlEnumPtr->GetName());
 		}
 
+		const imtsdl::CSdlUnion* sdlUnionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(namespaceEntryPtr);
+		if (sdlUnionPtr != nullptr){
+			typeNamespace += QStringLiteral("::");
+			typeNamespace += imtsdl::CSdlTools::GetCapitalizedValue(sdlUnionPtr->GetName());
+		}
+
 		if (typeNamespace != relatedNamespace){
-			// vsrsions does NOT exists for enumerators
-			if (sdlEnumPtr == nullptr && addVersion){
+			// versions does NOT exists for enumerators and unions
+			if ((sdlEnumPtr == nullptr && sdlUnionPtr == nullptr) && addVersion){
 				typeNamespace += QStringLiteral("::");
 				typeNamespace += GetSdlEntryVersion(*namespaceEntryPtr);
 			}
@@ -257,14 +268,16 @@ QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(
 	const QString& relatedNamespace,
 	const imtsdl::ISdlTypeListProvider& listProvider,
 	const imtsdl::ISdlEnumListProvider& enumlistProvider,
+	const imtsdl::ISdlUnionListProvider& unionlistProvider,
 	bool listWrap,
 	bool* isCustomPtr,
 	bool* isComplexPtr,
 	bool* isArrayPtr,
-	bool* isEnumPtr)
+	bool* isEnumPtr,
+	bool* isUnionPtr)
 {
 	bool _isCustom = false;
-	QString retVal = imtsdl::CSdlTools::ConvertTypeOrEnum(sdlField, enumlistProvider.GetEnums(false), &_isCustom, isComplexPtr, isArrayPtr, isEnumPtr);
+	QString retVal = imtsdl::CSdlTools::ConvertTypeOrEnumOrUnion(sdlField, enumlistProvider.GetEnums(false), unionlistProvider.GetUnions(false), &_isCustom, isComplexPtr, isArrayPtr, isEnumPtr, isUnionPtr);
 	if (isCustomPtr != nullptr){
 		*isCustomPtr = _isCustom;
 	}
@@ -281,7 +294,7 @@ QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(
 		return retVal;
 	}
 
-	CStructNamespaceConverter converter(sdlField, relatedNamespace, listProvider, enumlistProvider, listWrap);
+	CStructNamespaceConverter converter(sdlField, relatedNamespace, listProvider, enumlistProvider, unionlistProvider, listWrap);
 	converter.addVersion = true;
 
 	return converter.GetString();

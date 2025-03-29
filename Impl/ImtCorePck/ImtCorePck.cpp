@@ -193,6 +193,11 @@ I_EXPORT_COMPONENT(
 			DelegatedUrlParam,
 			"Delegated url param",
 			"Delegated Url Param");
+			
+I_EXPORT_COMPONENT(
+			SelectionParamSummaryRepresentationController,
+			"Selection param Summary representation controller",
+			"Selection param Summary representation controller");
 
 I_EXPORT_COMPONENT(
 			ComplexCollectionFilter,

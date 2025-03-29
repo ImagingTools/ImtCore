@@ -280,7 +280,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 	// RequestArguments struct props
 	imtsdl::SdlFieldList requestArguments = sdlRequest.GetInputArguments();
 	for (const imtsdl::CSdlField& sdlField: requestArguments){
-		CStructNamespaceConverter structNameConverter(sdlField, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+		CStructNamespaceConverter structNameConverter(sdlField, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 		FeedStreamHorizontally(ifStream, 1);
 		ifStream << structNameConverter.GetString();
@@ -521,8 +521,16 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 		// add custom types for nested structs creation
 		bool isCustom = false;
 		bool isEnum = false;
-		ConvertTypeOrEnum(fieldFromType, m_sdlEnumListCompPtr->GetEnums(false), &isCustom, nullptr, nullptr, &isEnum);
-		if (isCustom && !isEnum){
+		bool isUnion = false;
+		ConvertTypeOrEnumOrUnion(fieldFromType,
+			m_sdlEnumListCompPtr->GetEnums(false),
+			m_sdlUnionListCompPtr->GetUnions(false),
+			&isCustom,
+			nullptr,
+			nullptr,
+			&isEnum,
+			&isUnion);
+		if (isCustom && !isEnum && !isUnion){
 			customTypes << fieldFromType;
 		}
 	}
@@ -629,7 +637,10 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 		return;
 	}
 
-	std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false));
+	std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumOrUnionForField(sdlField, 
+		m_sdlTypeListCompPtr->GetSdlTypes(false),
+		m_sdlEnumListCompPtr->GetEnums(false),
+		m_sdlUnionListCompPtr->GetUnions(false));
 	const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<imtsdl::CSdlType*>(foundEntry.get());
 	if(sdlTypePtr == nullptr){
 		I_CRITICAL();
@@ -691,12 +702,20 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 	for (const imtsdl::CSdlField& typeField: typeFieldList){
 		bool isCustom = false;
 		bool isEnum = false;
-		ConvertTypeOrEnum(typeField, m_sdlEnumListCompPtr->GetEnums(false), &isCustom, nullptr, nullptr, &isEnum);
-		if (!isCustom || isEnum){
+		bool isUnion = false;
+		ConvertTypeOrEnumOrUnion(typeField,
+			m_sdlEnumListCompPtr->GetEnums(false),
+			m_sdlUnionListCompPtr->GetUnions(false),
+			&isCustom,
+			nullptr,
+			nullptr,
+			&isEnum,
+			&isUnion);
+		if (!isCustom || isEnum || isUnion){
 			continue;
 		}
 
-		std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumForField(typeField, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false));
+		std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumOrUnionForField(typeField, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
 		const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<imtsdl::CSdlType*>(foundEntry.get());
 		if(sdlTypePtr == nullptr){
 			I_CRITICAL();
@@ -864,10 +883,11 @@ void CGqlWrapClassCodeGeneratorComp::AddRequiredIncludesToHeaderFile(QTextStream
 		QList<imtsdl::CSdlField> requestFields = sdlRequest.GetInputArguments();
 		requestFields << sdlRequest.GetOutputArgument();
 		for (const imtsdl::CSdlField& field: requestFields){
-			std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumForField(
+			std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(
 				field,
 				m_sdlTypeListCompPtr->GetSdlTypes(false),
-				m_sdlEnumListCompPtr->GetEnums(false));
+				m_sdlEnumListCompPtr->GetEnums(false),
+				m_sdlUnionListCompPtr->GetUnions(false));
 
 			if (!foundEntryPtr){
 				SendCriticalMessage(0, QString("Unable to find type for %1 of %2").arg(field.GetId(), sdlRequest.GetName()));
@@ -1166,7 +1186,7 @@ void CGqlWrapClassCodeGeneratorComp::AddScalarFieldWriteToRequestCode(QTextStrea
 void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 	// declare temp GQL object
 	FeedStreamHorizontally(stream, hIndents);
@@ -1312,6 +1332,7 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& 
 				sdlNamespace,
 				*m_sdlTypeListCompPtr,
 				*m_sdlEnumListCompPtr,
+				*m_sdlUnionListCompPtr,
 				false);
 
 	QString typeVersion = structNameConverter.GetString();
@@ -1328,7 +1349,7 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& 
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("qWarning() << QString(\"Bad request. Version %1 is not supported\").arg(protocolVersion);");
+	stream << QStringLiteral("qWarning() << QString(\"Bad request. Version %1 is not supported\").arg(qPrintable(protocolVersion));");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 2);
@@ -1364,7 +1385,7 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCodeImpl(
 			uint hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 	// declare bool variable and read data in private property
 	const QString readVariableName = QStringLiteral("is") + GetCapitalizedValue(field.GetId()) + QStringLiteral("Read");

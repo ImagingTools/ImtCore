@@ -426,6 +426,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream
 			sdlNamespace, 
 			*m_sdlTypeListCompPtr, 
 			*m_sdlEnumListCompPtr,
+			*m_sdlUnionListCompPtr,
 			false);
 
 	FeedStreamHorizontally(stream, hIndents);
@@ -534,6 +535,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 		sdlNamespace,
 		*m_sdlTypeListCompPtr,
 		*m_sdlEnumListCompPtr,
+		*m_sdlUnionListCompPtr,
 		false);
 
 	// [1] command ID check

@@ -21,6 +21,7 @@
 #include <imtservergql/COperationContextControllerComp.h>
 #include <imtservergql/CObjectCollectionChangeNotifierComp.h>
 #include <imtservergql/CModelChangeNotifierComp.h>
+#include <imtservergql/CModelPublisherComp.h>
 #include <imtservergql/CStructureSubscriberControllerComp.h>
 #include <imtservergql/CBroadcastMessageConsumerControllerComp.h>
 #include <imtservergql/CBroadcastMessageConsumerSubscriberComp.h>
@@ -55,6 +56,7 @@ typedef imtservergql::CSerializableObjectCollectionControllerComp SerializableOb
 typedef imtservergql::COperationContextControllerComp OperationContextController;
 typedef imtservergql::CObjectCollectionChangeNotifierComp ObjectCollectionChangeNotifier;
 typedef imtservergql::CModelChangeNotifierComp ModelChangeNotifier;
+typedef imtservergql::CModelPublisherComp ModelPublisher;
 typedef imtservergql::CStructureSubscriberControllerComp StructureSubscriberController;
 typedef imtservergql::CBroadcastMessageConsumerControllerComp BroadcastMessageConsumerController;
 typedef imtservergql::CBroadcastMessageConsumerSubscriberComp BroadcastMessageConsumerSubscriber;

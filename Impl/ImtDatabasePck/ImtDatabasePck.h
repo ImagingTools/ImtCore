@@ -9,6 +9,7 @@
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/CSqlDatabaseObjectCollectionComp.h>
 #include <imtdb/CDatabaseAccessSettingsComp.h>
+#include <imtdb/CSqlDatabaseDocumentDelegateLegacyComp.h>
 #include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
 #include <imtdb/CSqlJsonDatabaseDelegateComp.h>
 #include <imtdb/CStandardSqlMetaInfoTableDelegateComp.h>
@@ -36,6 +37,7 @@ typedef imtdb::CDatabaseEngineComp SqlDatabaseEngine;
 typedef icomp::TModelCompWrap<imtdb::CSqlDatabaseObjectCollectionComp> SqlDatabaseCollection;
 typedef imtbase::TObjectCollectionSearchControllerCompWrap<SqlDatabaseCollection> SqlDatabaseCollectionSearchController;
 typedef icomp::TModelCompWrap<imtdb::CDatabaseAccessSettingsComp> DatabaseAccessSettings;
+typedef imtdb::CSqlDatabaseDocumentDelegateLegacyComp SqlDatabaseDocumentDelegateLegacy;
 typedef imtdb::CSqlDatabaseDocumentDelegateComp SqlDatabaseDocumentDelegate;
 typedef imtdb::CSqlJsonDatabaseDelegateComp SqlDatabaseJsonDelegate;
 typedef imtdb::CStandardSqlMetaInfoTableDelegateComp StandardMetaInfoTableDelegate;

@@ -196,9 +196,13 @@ bool CRestoringDatabaseControllerComp::GetData(
 
 bool CRestoringDatabaseControllerComp::ExecuteCommand(QProcess& process, const QString& command) const
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+	process.start(command);
+#else
 	process.startCommand(command);
-
-	if(!process.waitForFinished(-1)){
+#endif
+	
+	if(!process.waitForFinished()){
 		return false;
 	}
 

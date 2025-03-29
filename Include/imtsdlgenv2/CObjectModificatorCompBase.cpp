@@ -127,7 +127,7 @@ bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& 
 	QTextStream ofStream(m_sourceFilePtr);
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 	structNameConverter.addVersion = true;
 
 	// add method implementation
@@ -232,25 +232,28 @@ void CObjectModificatorCompBase::AddFieldWriteToObjectCode(QTextStream& stream, 
 	bool isArray = false;
 	bool isCustom = false;
 	bool isEnum = false;
-	ConvertTypeOrEnum(
+	bool isUnion = false;
+	ConvertTypeOrEnumOrUnion(
 		field,
 		m_sdlEnumListCompPtr->GetEnums(false),
+		m_sdlUnionListCompPtr->GetUnions(false),
 		&isCustom,
 		nullptr,
 		&isArray,
-		&isEnum);
+		&isEnum,
+		&isUnion);
 
-	if ((isCustom && !isEnum) && isArray){
+	if ((isCustom && !isEnum && !isUnion) && isArray){
 		AddCustomArrayFieldWriteToObjectCode(stream, field, optional);
 	}
-	else if (isCustom && !isEnum){
+	else if (isCustom && !isEnum && !isUnion){
 		AddCustomFieldWriteToObjectCode(stream, field, optional);
 	}
 	else if (isArray){
 		AddArrayFieldWriteToObjectCode(stream, field, optional);
 	}
 	else {
-		AddScalarFieldWriteToObjectCode(stream, field, optional, isEnum);
+		AddScalarFieldWriteToObjectCode(stream, field, optional, isEnum, isUnion);
 	}
 }
 
@@ -260,32 +263,35 @@ void CObjectModificatorCompBase::AddFieldReadFromObjectCode(QTextStream& stream,
 	bool isArray = false;
 	bool isCustom = false;
 	bool isEnum = false;
-	ConvertTypeOrEnum(
+	bool isUnion = false;
+	ConvertTypeOrEnumOrUnion(
 		field,
 		m_sdlEnumListCompPtr->GetEnums(false),
+		m_sdlUnionListCompPtr->GetUnions(false),
 		&isCustom,
 		nullptr,
 		&isArray,
-		&isEnum);
+		&isEnum,
+		&isUnion);
 
-	if ((isCustom && !isEnum) && isArray){
+	if ((isCustom && !isEnum && !isUnion) && isArray){
 		AddCustomArrayFieldReadFromObjectCode(stream, field, optional);
 	}
-	else if ((isCustom && !isEnum)){
+	else if ((isCustom && !isEnum && !isUnion)){
 		AddCustomFieldReadFromObjectCode(stream, field, optional);
 	}
 	else if (isArray){
-		AddArrayFieldReadFromObjectCode(stream, field, optional, isEnum);
+		AddArrayFieldReadFromObjectCode(stream, field, optional, isEnum, isUnion);
 	}
 	else {
-		AddFieldValueReadFromObject(stream, field, optional, isEnum);
+		AddFieldValueReadFromObject(stream, field, optional, isEnum, isUnion);
 	}
 }
 
 
 // write helpers
 
-void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum)
+void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion)
 {
 	const bool isStrict = bool(!optional && field.IsRequired());
 
@@ -320,6 +326,25 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 
 		FeedStreamHorizontally(stream, hIndents);
 		AddFieldValueWriteToObject(stream, field, enumConvertedVarName, hIndents);
+	}
+	else if (isUnion){
+		const QString unionSourceVarName = '*' + field.GetId();
+		const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
+
+		// declare target value, to store value
+		stream << QStringLiteral("QVariant ");
+		stream << unionConvertedVarName << ';';
+		FeedStream(stream, 1, false);
+
+		imtsdl::CSdlUnion foundUnion;
+		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+		Q_ASSERT(found);
+
+		WriteConversionFromUnion(stream, foundUnion, unionSourceVarName, unionConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents);
+
+		FeedStreamHorizontally(stream, hIndents);
+		AddFieldValueWriteToObject(stream, field, unionConvertedVarName, hIndents);
+
 	}
 	else{
 		AddFieldValueWriteToObject(stream, field, QStringLiteral("*") + field.GetId(), hIndents);
@@ -372,7 +397,7 @@ void CObjectModificatorCompBase::AddCustomFieldWriteToObjectImplCode(
 			quint16 hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 	// Create an object container
 	const QString objectContainerVariableName = GetDecapitalizedValue(field.GetId()) + GetContainerObjectVariableName();
@@ -461,11 +486,24 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
-	imtsdl::CSdlEnum sdlEnum;
-	const bool isEnum = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), sdlEnum);
-
 	QString variableName = (field.GetId() + QStringLiteral("->at(") + dataIndexVarName + ')');
+
+	bool isEnum = false;
+	bool isUnion = false;
+	ConvertTypeOrEnumOrUnion(
+		field,
+		m_sdlEnumListCompPtr->GetEnums(false),
+		m_sdlUnionListCompPtr->GetUnions(false),
+		nullptr,
+		nullptr,
+		nullptr,
+		&isEnum,
+		&isUnion);
+
 	if (isEnum){
+		imtsdl::CSdlEnum sdlEnum;
+		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), sdlEnum);
+
 		const QString enumSourceVarName = variableName;
 		const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
 		variableName = enumConvertedVarName;
@@ -477,6 +515,22 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 		FeedStream(stream, 1, false);
 
 		WriteConversionFromEnum(stream, sdlEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+	}
+	else if (isUnion){
+		imtsdl::CSdlUnion sdlUnion;
+		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), sdlUnion);
+
+		const QString unionSourceVarName = variableName;
+		const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
+		variableName = unionConvertedVarName;
+
+		// declare target value, to store value
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("QVariant ");
+		stream << unionConvertedVarName << ';';
+		FeedStream(stream, 1, false);
+
+		WriteConversionFromUnion(stream, sdlUnion, unionSourceVarName, unionConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
 	}
 
 	// inLoop: add item
@@ -593,7 +647,7 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldWriteToObjectImplCode(
 // read helpers
 
 
-void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, quint16 hIndents)
+void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion, quint16 hIndents)
 {
 	const bool isStrict = bool(!optional && field.IsRequired());
 
@@ -612,14 +666,20 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 
 	const quint16 hhIndents = hIndents + quint16(!isStrict);
 	const QString enumSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
+	const QString unionSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
 	FeedStreamHorizontally(stream, hhIndents);
-	if (!isEnum){
-		stream << field.GetId();
-	}
-	else {
+	if (isEnum){
 		// declare temp value, to store string equivalent
 		stream << QStringLiteral("QString ");
 		stream << enumSourceVarName;
+	}
+	else if (isUnion){
+		// declare temp value, to store variant equivalent
+		stream << QStringLiteral("QVariant ");
+		stream << unionSourceVarName;
+	}
+	else{
+		stream << field.GetId();
 	}
 
 	stream << ' ' << '=' << ' ';
@@ -633,7 +693,14 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
 		Q_ASSERT(found);
 
-		WriteConversionFromString(stream, foundEnum, enumSourceVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText(), hhIndents);
+		WriteEnumConversionFromString(stream, foundEnum, enumSourceVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText(), hhIndents);
+	}
+	else if (isUnion){
+		imtsdl::CSdlUnion foundUnion;
+		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+		Q_ASSERT(found);
+
+		WriteUnionConversionFromString(stream, foundUnion, unionSourceVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText(), hhIndents);
 	}
 
 
@@ -680,7 +747,7 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectImplCode(
 			quint16 hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 	// reset pointer for object
 	FeedStreamHorizontally(stream, hIndents);
@@ -722,7 +789,7 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectImplCode(
 
 
 
-void CObjectModificatorCompBase::AddArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum)
+void CObjectModificatorCompBase::AddArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion)
 {
 	const bool isStrict = bool(!optional && field.IsRequired());
 
@@ -740,7 +807,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectCode(QTextStream& st
 
 	}
 
-	AddArrayFieldReadFromObjectImplCode(stream, field, optional, isEnum, 1 + quint16(!isStrict));
+	AddArrayFieldReadFromObjectImplCode(stream, field, optional, isEnum, isUnion, 1 + quint16(!isStrict));
 
 	if (!isStrict){
 		FeedStreamHorizontally(stream, 1);
@@ -755,6 +822,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 			const imtsdl::CSdlField& field,
 			bool optional,
 			bool isEnum,
+			bool isUnion,
 			quint16 hIndents)
 {
 	ListAccessResult result;
@@ -782,7 +850,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << field.GetId();
 	stream << ' ' << '=' << ' ';
-	stream << ConvertTypeWithNamespace(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
 	stream << '(' << ')' << ';';
 	FeedStream(stream, 1, false);
 
@@ -794,14 +862,17 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 	stream << indexVariableName << QStringLiteral(" < ") << result.listCountVariableName;
 	stream << QStringLiteral("; ++") << indexVariableName << QStringLiteral("){");
 	FeedStream(stream, 1, false);
-	
+
 	// inLoop: declare temp var
 	FeedStreamHorizontally(stream, hIndents + 1);
 	if (isEnum){
 		stream << QStringLiteral("QString");
 	}
+	else if (isUnion){
+		stream << QStringLiteral("QVariant");
+	}
 	else{
-		stream << OptListConvertTypeWithNamespace(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+		stream << OptListConvertTypeWithNamespace(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
 	}
 	stream << QStringLiteral(" temp") << GetCapitalizedValue(field.GetId());
 	stream << ' ' << '=' << ' ';
@@ -835,11 +906,33 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		Q_ASSERT(found);
 
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << OptListConvertTypeWithNamespace(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr);
+		stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
 		stream << ' ' << dataVarName << ';';
 		FeedStream(stream, 1, false);
 
-		WriteConversionFromString(stream, foundEnum, enumSourceVarName, dataVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+		WriteEnumConversionFromString(stream, foundEnum, enumSourceVarName, dataVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << field.GetId();
+		stream << QStringLiteral("->append(");
+		stream << dataVarName;
+		stream << ')' << ';';
+		FeedStream(stream, 1, false);
+	}
+	else if (isUnion){
+		const QString unionSourceVarName = QStringLiteral("temp") + GetCapitalizedValue(field.GetId());
+		const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataValue");
+
+		imtsdl::CSdlUnion foundUnion;
+		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+		Q_ASSERT(found);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
+		stream << ' ' << dataVarName << ';';
+		FeedStream(stream, 1, false);
+
+		WriteUnionConversionFromString(stream, foundUnion, unionSourceVarName, dataVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
 
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << field.GetId();
@@ -918,7 +1011,7 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldReadToObjectImplCode(
 	}
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, false);
+	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 	structNameConverter.addVersion = true;
 	structNameConverter.listWrap = true;
 

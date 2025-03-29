@@ -11,6 +11,7 @@
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlEnumListProvider.h>
+#include <imtsdl/ISdlUnionListProvider.h>
 #include <imtsdl/CSdlTools.h>
 
 
@@ -34,17 +35,17 @@ namespace imtsdlgenv2
 
 class CSdlGenTools
 {
-
 public:
 	class CStructNamespaceConverter
 	{
 	public:
 		CStructNamespaceConverter();
-		CStructNamespaceConverter(const imtsdl::CSdlEntryBase& sdlEntry, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider, const imtsdl::ISdlEnumListProvider& enumListProvider, bool listWrap);
-		CStructNamespaceConverter(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider,	const imtsdl::ISdlEnumListProvider& enumListProvider, bool listWrap);
+		CStructNamespaceConverter(const imtsdl::CSdlEntryBase& sdlEntry, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider, const imtsdl::ISdlEnumListProvider& enumListProvider, const imtsdl::ISdlUnionListProvider& unionListProvider, bool listWrap);
+		CStructNamespaceConverter(const imtsdl::CSdlField& sdlField, const QString& relatedNamespace, const imtsdl::ISdlTypeListProvider& listProvider,	const imtsdl::ISdlEnumListProvider& enumListProvider, const imtsdl::ISdlUnionListProvider& unionListProvider, bool listWrap);
 
 		const imtsdl::ISdlTypeListProvider* typeListProviderPtr = nullptr;
 		const imtsdl::ISdlEnumListProvider* enumListProviderPtr = nullptr;
+		const imtsdl::ISdlUnionListProvider* unionListProviderPtr = nullptr;
 		QString relatedNamespace;
 		bool listWrap = false;
 		bool addVersion = false;
@@ -71,11 +72,13 @@ public:
 		const QString& relatedNamespace,
 		const imtsdl::ISdlTypeListProvider& listProvider,
 		const imtsdl::ISdlEnumListProvider& enumlistProvider,
+		const imtsdl::ISdlUnionListProvider& unionlistProvider,
 		bool listWrap = false,
 		bool* isCustomPtr = nullptr,
 		bool* isComplexPtr = nullptr,
 		bool* isArrayPtr = nullptr,
-		bool* isEnumPtr = nullptr);
+		bool* isEnumPtr = nullptr,
+		bool* isUnionPtr = nullptr);
 
 	/**
 		\brief Generates a string, checks, if a field of object, named \c objectName, defined or not

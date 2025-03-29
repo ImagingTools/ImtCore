@@ -36,6 +36,11 @@ I_EXPORT_COMPONENT(
 			"Database User Access Login Settings Parameters");
 
 I_EXPORT_COMPONENT(
+			SqlDatabaseDocumentDelegateLegacy,
+			"Delegate for the document-oriented tables (legacy version)",
+			"Database Document");
+
+I_EXPORT_COMPONENT(
 			SqlDatabaseDocumentDelegate,
 			"Delegate for the document-oriented tables",
 			"Database Document");

@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5345" Description="ACF"/>
-            <Version Id="1" Number="2235" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5302" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331532" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -192,6 +192,9 @@
                                 <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -209,9 +212,6 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework/BaseClassExtender"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="CacheManager" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
@@ -241,6 +241,9 @@
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
@@ -324,6 +327,9 @@
                                 <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -360,6 +366,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>CppCodeGeneratorFrameworkV2/SdlEnumGenerator</Value>
+                                            <Value>CppCodeGeneratorFrameworkV2/SdlUnionGenerator</Value>
                                             <Value>CppCodeGeneratorFrameworkV2/SdlClassCodeGenerator</Value>
                                             <Value>CppCodeGeneratorFrameworkV2/GqlWrapClassCodeGenerator</Value>
                                             <Value>CppCodeGeneratorFrameworkV2/GqlHandlerBaseClassGenerator</Value>
@@ -381,9 +388,11 @@
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
                     <Interface InterfaceId="imtsdl::ISdlDocumentTypeListProvider" ComponentId="SdlCoreFramework"/>
+                    <Interface InterfaceId="imtsdl::ISdlEnumListProvider" ComponentId="SdlCoreFramework"/>
                     <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser" ComponentId="SdlCoreFramework"/>
                     <Interface InterfaceId="imtsdl::ISdlRequestListProvider" ComponentId="SdlCoreFramework"/>
                     <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="SdlCoreFramework"/>
+                    <Interface InterfaceId="imtsdl::ISdlUnionListProvider" ComponentId="SdlCoreFramework"/>
                     <Interface InterfaceId="imtsdlgenv2::ISdlProcessArgumentsParser" ComponentId="SdlCoreFramework"/>
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="SdlCoreFramework"/>
                 </ExportedInterfaces>

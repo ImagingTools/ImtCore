@@ -39,15 +39,15 @@ protected:
 private:
 	// read methods
 	void AddFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddScalarFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum);
-	void AddScalarListFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool isEnum, bool optional);
+	void AddScalarFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion);
+	void AddScalarListFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool isEnum, bool isUnion, bool optional);
 	void AddCustomFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 	void AddCustomListFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 
 	// write methods
 	void AddFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 	void AddScalarFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents);
-	void AddScalarListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool isEnum, bool optional, uint hIndents);
+	void AddScalarListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool isEnum, bool isUnion, bool optional, uint hIndents);
 	void AddCustomFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents);
 	void AddCustomListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents);
 
@@ -71,7 +71,7 @@ private:
 	// general help methods for scalar list
 	/// \todo add error handling for it. do not forget about arrays and arrays.isEmpty
 	void AddCheckScalarListRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);
-	void AddSetScalarListValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool isEnum, uint hIndents = 1);
+	void AddSetScalarListValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool isEnum, bool isUnion, uint hIndents = 1);
 };
 
 

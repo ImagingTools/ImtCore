@@ -528,6 +528,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodDeclarationForOper
 		sdlNamespace,
 		*m_sdlTypeListCompPtr,
 		*m_sdlEnumListCompPtr,
+		*m_sdlUnionListCompPtr,
 		false);
 
 	stream << structNamespaceConverter.GetString();
@@ -598,7 +599,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 	const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
 
 	QList<imtsdl::CSdlRequest> implementedGetRequests;
-	QMultiMapIterator operationsIter(operationsList);
+	QMapIterator operationsIter(operationsList);
 	while (operationsIter.hasNext()){
 		auto operation = operationsIter.next();
 		imtsdl::CSdlRequest sdlRequest = operation.value();
@@ -645,6 +646,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 	structNameConverter.relatedNamespace = sdlNamespace;
 	structNameConverter.typeListProviderPtr = &*m_sdlTypeListCompPtr;
 	structNameConverter.enumListProviderPtr = &*m_sdlEnumListCompPtr;
+	structNameConverter.unionListProviderPtr = &*m_sdlUnionListCompPtr;
 	structNameConverter.addVersion = true;
 
 	if (operationType == imtsdl::CSdlDocumentType::OT_GET ||
@@ -852,6 +854,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 				sdlNamespace,
 				*m_sdlTypeListCompPtr,
 				*m_sdlEnumListCompPtr,
+				*m_sdlUnionListCompPtr,
 				false);
 
 	// [1] create payload variable by calling reimplemented method
@@ -939,7 +942,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 	for (const imtsdl::CSdlDocumentType &documentType : sdlDocumentTypeList){
 		const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operations = sdlDocumentType.GetOperationsList();
 
-		QMultiMapIterator operationIter(operations);
+		QMapIterator operationIter(operations);
 		while(operationIter.hasNext()){
 			auto operationIterValue = operationIter.next();
 			if (!requestList.contains(*operationIterValue)){
@@ -950,7 +953,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 		imtsdl::SdlDocumentTypeList subtypes = documentType.GetSubtypes();
 		for (const imtsdl::CSdlDocumentType& documentSubtype: subtypes){
 			const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> suboperations = documentSubtype.GetOperationsList();
-			QMultiMapIterator suboperationIter(suboperations);
+			QMapIterator suboperationIter(suboperations);
 			while(suboperationIter.hasNext()){
 				auto suboperationIterValue = suboperationIter.next();
 				if (!requestList.contains(*suboperationIterValue)){
@@ -1347,6 +1350,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 				sdlNamespace,
 				*m_sdlTypeListCompPtr,
 				*m_sdlEnumListCompPtr,
+				*m_sdlUnionListCompPtr,
 				false);
 	structNameConverter.addVersion = true;
 
@@ -1356,6 +1360,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 				sdlNamespace,
 				*m_sdlTypeListCompPtr,
 				*m_sdlEnumListCompPtr,
+				*m_sdlUnionListCompPtr,
 				false);
 	getStructNameConverter.addVersion = true;
 

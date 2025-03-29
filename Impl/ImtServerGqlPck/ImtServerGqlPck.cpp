@@ -86,7 +86,12 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			ModelChangeNotifier,
-			"Model subscriber controller",
+			"Model-based subscription notifier",
+			"Model Subscriber Collection");
+
+I_EXPORT_COMPONENT(
+			ModelPublisher,
+			"Model-based publisher",
 			"Model Subscriber Collection");
 
 I_EXPORT_COMPONENT(

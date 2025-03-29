@@ -224,7 +224,7 @@ private:
 	void AddFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 
 	// write helpers
-	void AddScalarFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum);
+	void AddScalarFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion);
 	void AddCustomFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 	void AddCustomFieldWriteToObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
 	void AddArrayFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
@@ -233,11 +233,11 @@ private:
 	void AddCustomArrayFieldWriteToObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
 
 	// read helpers
-	void AddFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, quint16 hIndents = 1);
+	void AddFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion, quint16 hIndents = 1);
 	void AddCustomFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 	void AddCustomFieldReadFromObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
-	void AddArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum);
-	void AddArrayFieldReadFromObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, quint16 hIndents = 1);
+	void AddArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion);
+	void AddArrayFieldReadFromObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion, quint16 hIndents = 1);
 	void AddCustomArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 	void AddCustomArrayFieldReadToObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
 };

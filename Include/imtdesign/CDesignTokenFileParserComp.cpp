@@ -148,7 +148,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 		}
 
 		if (styleName != designTokenFileFileBaseName){
-			SendInfoMessage(0, QString("The file name and the theme name have different case '%1' VS '%2'").arg(designTokenFileFileBaseName).arg(styleName));
+			SendVerboseMessage(0, QString("The file name and the theme name have different case '%1' VS '%2'").arg(designTokenFileFileBaseName).arg(styleName));
 		}
 
 		ReplaceColorNamesRecursive(styleEntry, colorPaletteVariables);

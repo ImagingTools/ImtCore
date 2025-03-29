@@ -1,0 +1,34 @@
+#pragma once
+
+
+// ACF includes
+#include <icomp/CComponentBase.h>
+
+// ImtCore includes
+#include <imtbase/ISummaryRepresentationController.h>
+
+
+namespace imtbase
+{
+
+
+class CSelectionParamSummaryRepresentationControllerComp:
+			public icomp::CComponentBase,
+			public imtbase::ISummaryRepresentationController
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CSelectionParamSummaryRepresentationControllerComp)
+		I_REGISTER_INTERFACE(ISummaryRepresentationController);
+	I_END_COMPONENT;
+
+protected:
+	// reimplemented (ISummaryRepresentationController)
+	virtual bool CreateSummaryRepresentation(const istd::IChangeable& object, QString& textRepresentation) const override;
+};
+
+
+} // namespace imtbase
+
+

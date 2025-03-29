@@ -32,7 +32,11 @@ void CDatabaseAutomaticBackupComp::OnComponentCreated()
 			m_timer.start();
 		}
 		else{
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+			m_backupWatcher.setFuture(QtConcurrent::run(this, &CDatabaseAutomaticBackupComp::Backup));
+#else
 			m_backupWatcher.setFuture(QtConcurrent::run(&CDatabaseAutomaticBackupComp::Backup, this));
+#endif
 		}
 	}
 }
@@ -95,7 +99,12 @@ bool CDatabaseAutomaticBackupComp::Backup()
 	QProcess process;
 	process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
 	process.setEnvironment(QStringList() << QStringLiteral("PGPASSWORD=") + password);
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+	process.start(pgDumpCommand);
+#else
 	process.startCommand(pgDumpCommand);
+#endif
 
 	if (!process.waitForFinished(-1)){
 		SendErrorMessage(0, QStringLiteral("Backup process timed out"), QStringLiteral("CDatabaseAutomaticBackupComp"));
@@ -104,7 +113,7 @@ bool CDatabaseAutomaticBackupComp::Backup()
 	}
 
 	if (process.exitCode() != 0){
-		SendErrorMessage(0, QString("Backup failed: '%1'").arg(process.readAllStandardError()), QStringLiteral("CDatabaseAutomaticBackupComp"));
+		SendErrorMessage(0, QString("Backup failed: '%1'").arg(qPrintable(process.readAllStandardError())), QStringLiteral("CDatabaseAutomaticBackupComp"));
 
 		return false;
 	}
@@ -252,7 +261,12 @@ void CDatabaseAutomaticBackupComp::OnTimeout()
 			SendInfoMessage(0, QStringLiteral("Starting database backup..."), QStringLiteral("CDatabaseAutomaticBackupComp"));
 
 			m_timer.stop();
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+			m_backupWatcher.setFuture(QtConcurrent::run(this, &CDatabaseAutomaticBackupComp::Backup));
+#else
 			m_backupWatcher.setFuture(QtConcurrent::run(&CDatabaseAutomaticBackupComp::Backup, this));
+#endif
 		}
 	}
 }

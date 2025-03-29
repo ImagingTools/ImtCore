@@ -16,7 +16,6 @@ namespace imtdb
 
 // reimplemented (imtdb::IMigrationController)
 
-
 bool CMigrationControllerComp::DoMigration(int& resultRevision, const istd::CIntRange& subRange) const
 {
 	resultRevision = -1;
@@ -47,6 +46,11 @@ bool CMigrationControllerComp::DoMigration(int& resultRevision, const istd::CInt
 	if (subRange.IsValid()){
 		startIndex = subRange.GetMinValue();
 		endIndex = subRange.GetMaxValue();
+	}
+	else{
+		if (subRange.GetMinValue() >= 0){
+			startIndex = subRange.GetMinValue();
+		}
 	}
 
 	QStringList nameFilter = {"migration_*.sql"};
