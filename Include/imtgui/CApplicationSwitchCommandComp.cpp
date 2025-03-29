@@ -138,9 +138,6 @@ void CApplicationSwitchCommandComp::OnCommandActivated()
 				ok = QProcess::startDetached(executablePath, params);
 			}
 		}
-		//if (!ok) {	//try start by process name
-		//	ok = imtwidgets::CWindowSystem::RaiseWindowByProcessTitle(processTitleExe);
-		//}
 	}
 }
 
