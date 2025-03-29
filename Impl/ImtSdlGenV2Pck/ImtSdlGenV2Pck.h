@@ -14,6 +14,7 @@
 #include <imtsdlgenv2/CGqlHandlerBaseClassGeneratorComp.h>
 #include <imtsdlgenv2/CGqlCollectionControllerBaseClassGeneratorComp.h>
 #include <imtsdlgenv2/CSdlEnumGeneratorComp.h>
+#include <imtsdlgenv2/CSdlUnionGeneratorComp.h>
 
 
 /**
@@ -33,6 +34,7 @@ typedef imtsdlgenv2::CGqlWrapClassCodeGeneratorComp GqlWrapClassCodeGenerator;
 typedef imtsdlgenv2::CGqlHandlerBaseClassGeneratorComp GqlHandlerBaseClassGenerator;
 typedef imtsdlgenv2::CGqlCollectionControllerBaseClassGeneratorComp GqlCollectionControllerBaseClassGenerator;
 typedef imtsdlgenv2::CSdlEnumGeneratorComp SdlEnumGenerator;
+typedef imtsdlgenv2::CSdlUnionGeneratorComp SdlUnionGenerator;
 
 
 } // namespace ImtSdlGenV2Pck

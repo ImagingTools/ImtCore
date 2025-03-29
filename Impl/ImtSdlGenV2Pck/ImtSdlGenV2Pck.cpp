@@ -64,6 +64,11 @@ I_EXPORT_COMPONENT(
 			"A processor that creating C++ enums from SDL schema",
 			"Schema Definition Language SDL Class Generator Enum")
 
+I_EXPORT_COMPONENT(
+			SdlUnionGenerator,
+			"A processor that creating C++ Union from SDL schema",
+			"Schema Definition Language SDL Class Generator Union")
+
 
 } // namespace ImtSdlGenV2Pck
 
