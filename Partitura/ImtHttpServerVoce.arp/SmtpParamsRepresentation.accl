@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="PasswordRepresentation" X="1050" Y="375" Note=""/>
+        <Element ComponentName="PortRepresentation" X="450" Y="375" Note=""/>
+        <Element ComponentName="ServerAddressRepresentation" X="150" Y="375" Note=""/>
+        <Element ComponentName="SmtpParamsRepresentation" X="575" Y="175" Note=""/>
+        <Element ComponentName="UsernameRepresentation" X="750" Y="375" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
