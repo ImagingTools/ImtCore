@@ -249,6 +249,7 @@ bool CLicenseControllerComp::ReadLicenseFromFile(imtlic::IProductInstanceInfo& l
 	istd::CChangeGroup changeGroup(&m_licenseStatus);
 
 	m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID);
+	m_licenseStatus.SetGoodwillRemainingDays(0);
 
 	if (!m_licensePathCompPtr.IsValid()){
 		SendCriticalMessage(0, "No license path component was set. Please check component configuration", "CLicenseControllerComp::ReadLicenseFile");
@@ -287,6 +288,10 @@ bool CLicenseControllerComp::ReadLicenseFromFile(imtlic::IProductInstanceInfo& l
 		int daysUntilExpire = -1;
 		if (LoadFingerprint(fingerprintFilePath, license, daysUntilExpire)){
 			SendWarningMessage(0, QT_TR_NOOP(QString("You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license").arg(daysUntilExpire)), "License Management");
+
+			m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID | imtlic::ILicenseStatus::LSF_GOODWILL);
+
+			m_licenseStatus.SetGoodwillRemainingDays(daysUntilExpire);
 		}
 		else{
 			SendErrorMessage(0, QT_TR_NOOP(QString("You have no license to run this software. License file: '%1'").arg(licenseFilePath)), "License Management");
@@ -401,7 +406,8 @@ void CLicenseControllerComp::OnLicenseKeysUpdated(
 // public methods of the embedded class LicenseStatus
 
 CLicenseControllerComp::LicenseStatus::LicenseStatus()
-	:m_licenseStatusFlags(LSF_LICENSE_INVALID)
+	:m_licenseStatusFlags(LSF_LICENSE_INVALID),
+	m_goodwillRemainingDays(0)
 {
 }
 
@@ -436,6 +442,22 @@ void CLicenseControllerComp::LicenseStatus::SetLicenseLocation(const QString& li
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_licenseLocation = licenseLocation;
+	}
+}
+
+
+int CLicenseControllerComp::LicenseStatus::GetGoodwillRemainingDays() const
+{
+	return m_goodwillRemainingDays;
+}
+
+
+void CLicenseControllerComp::LicenseStatus::SetGoodwillRemainingDays(int days)
+{
+	if (m_goodwillRemainingDays != days){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_goodwillRemainingDays = days;
 	}
 }
 

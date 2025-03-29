@@ -86,10 +86,13 @@ private:
 		virtual void SetLicenseStatusFlags(int licenseStatusFlags) override;
 		virtual QString GetLicenseLocation() const override;
 		virtual void SetLicenseLocation(const QString & licenseLocation) override;
+		virtual int GetGoodwillRemainingDays() const override;
+		virtual void SetGoodwillRemainingDays(int days)  override;
 
 	private:
 		int m_licenseStatusFlags;
 		QString m_licenseLocation;
+		int m_goodwillRemainingDays;
 	};
 
 	template <typename InterfaceType>

@@ -35,7 +35,12 @@ public:
 		/**
 			License is expired.
 		*/
-		LSF_LICENSE_EXPIRED = 8
+		LSF_LICENSE_EXPIRED = 8,
+
+		/**
+			License is in goodwill mode.
+		*/
+		LSF_GOODWILL = 16
 	};
 
 	/**
@@ -57,6 +62,16 @@ public:
 		Set location of the license file in the system.
 	*/
 	virtual void SetLicenseLocation(const QString& licenseLocation) = 0;
+
+	/**
+		Get goodwill remainging days.
+	*/
+	virtual int GetGoodwillRemainingDays() const = 0;
+
+	/**
+		Set goodwill remainging days.
+	*/
+	virtual void SetGoodwillRemainingDays(int days) = 0;
 };
 
 
