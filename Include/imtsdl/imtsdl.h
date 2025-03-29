@@ -13,12 +13,14 @@ class CSdlType;
 class CSdlRequest;
 class CSdlDocumentType;
 class CSdlEnum;
+class CSdlUnion;
 
 typedef QList<CSdlType> SdlTypeList;
 typedef QList<CSdlField> SdlFieldList;
 typedef QList<CSdlRequest> SdlRequestList;
 typedef QList<CSdlDocumentType> SdlDocumentTypeList;
 typedef QList<CSdlEnum> SdlEnumList;
+typedef QList<CSdlUnion> SdlUnionList;
 
 enum KeyId
 {
