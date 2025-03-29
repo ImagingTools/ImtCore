@@ -14,9 +14,11 @@
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlRequestListProvider.h>
 #include <imtsdl/ISdlEnumListProvider.h>
+#include <imtsdl/ISdlUnionListProvider.h>
 #include <imtsdl/CSdlRequest.h>
 #include <imtsdl/CSdlEnumConverter.h>
 #include <imtsdl/CSdlEnum.h>
+#include <imtsdl/CSdlUnion.h>
 
 
 namespace iprm {
@@ -38,6 +40,7 @@ class CGqlSchemaParser:
 			virtual public ISdlTypeListProvider,
 			virtual public ISdlRequestListProvider,
 			virtual public ISdlEnumListProvider,
+			virtual public ISdlUnionListProvider,
 			virtual protected istd::ILogger,
 			protected CSdlEnumConverter
 {
@@ -62,6 +65,9 @@ public:
 
 	// reimplemented (ISdlEnumListProvider)
 	virtual SdlEnumList GetEnums(bool onlyLocal) const override;
+
+	// reimplemented (ISdlUnionListProvider)
+	virtual SdlUnionList GetUnions(bool onlyLocal) const override;
 
 protected:
 	virtual bool ProcessSchema();
@@ -127,6 +133,7 @@ protected:
 	SdlTypeList m_sdlTypes;
 	SdlRequestList m_requests;
 	SdlEnumList m_enums;
+	SdlUnionList m_unions;
 
 	/**
 		\brief saved schema parameters, declarated in .sdl file
