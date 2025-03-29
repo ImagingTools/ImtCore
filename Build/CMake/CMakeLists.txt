@@ -196,6 +196,7 @@ if(NOT DEFINED USE_QTQML OR USE_QTQML)
 	add_subdirectory("${QML_DIR}/imtlicgui/CMake" "${AUX_INCLUDE_DIR}/imtlicguiqml")
 	add_subdirectory("${QML_DIR}/imtcontrols/CMake" "${AUX_INCLUDE_DIR}/imtcontrolsqml")
 	add_subdirectory("${INCLUDE_DIR}/imtqml/CMake" "${AUX_INCLUDE_DIR}/imtqml")
+	add_dependencies(imtqml imtbasesdl)
 	add_subdirectory("${INCLUDE_DIR}/imtstylecontrolsqml/CMake" "${AUX_INCLUDE_DIR}/imtstylecontrolsqml")
 endif()
 
